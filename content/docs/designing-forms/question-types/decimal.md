@@ -13,6 +13,3 @@ The "decimal" type is used to prompt the user to enter a number, which can inclu
 
 ### Available appearance 
 
-{{< vimeo 55073825 >}}
-
-{{< twitter user="SanDiegoZoo" id="1453110110599868418" >}}
