@@ -1,0 +1,42 @@
+stages:
+  - build-test
+  - build-prod
+  - cleanup
+
+default:
+  image: docker
+  tags:
+    - hugo-builder
+
+variables:
+  GIT_STRATEGY: fetch
+  GIT_CLEAN_FLAGS: none
+  TEST_CONTAINER: hugo-test-docs-rtsurvey
+  PROD_CONTAINER: hugo-prod-docs-rtsurvey
+
+services:
+  - docker:dind
+
+build-test:
+  stage: build-test
+  script:
+    - docker rm -f ${TEST_CONTAINER}
+    - docker run --name ${TEST_CONTAINER} hugomods/hugo sh -c "hugo --gc --minify"
+  environment: production
+
+build-prod:
+  stage: build-prod
+  script:
+    - rm -rf public/ resources/
+    - docker rm -f ${PROD_CONTAINER}
+    - docker run --name ${PROD_CONTAINER} -v ${PWD}:/src hugomods/hugo sh -c "hugo --gc --minify && chmod -R 777 public/ resources/"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  environment: production
+
+cleanup-job:
+  stage: cleanup
+  script:
+    - docker rm -f ${TEST_CONTAINER}
+    - docker rm -f ${PROD_CONTAINER}
+  when: always
