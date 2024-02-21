@@ -21,7 +21,7 @@ build-test:
   stage: build-test
   script:
     - docker rm -f ${TEST_CONTAINER}
-    - docker run --name ${TEST_CONTAINER} -v ${PWD}:/src -v /src/public -v /src/resources hugomods/hugo sh -c "hugo --gc --minify"
+    - docker run --name ${TEST_CONTAINER} -v ${PWD}:/src -v /src/public -v /src/resources hugomods/hugo sh -c "git config --global --add safe.directory /src && hugo --gc --minify"
   environment: production
 
 build-prod:
@@ -29,7 +29,7 @@ build-prod:
   script:
     - rm -rf public/ resources/
     - docker rm -f ${PROD_CONTAINER}
-    - docker run --name ${PROD_CONTAINER} -v ${PWD}:/src hugomods/hugo sh -c "hugo --gc --minify && chmod -R 777 public/ resources/"
+    - docker run --name ${PROD_CONTAINER} -v ${PWD}:/src hugomods/hugo sh -c "git config --global --add safe.directory /src && hugo --gc --minify && chmod -R 777 public/ resources/"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   environment: production
