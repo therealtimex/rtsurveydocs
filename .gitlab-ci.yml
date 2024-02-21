@@ -21,7 +21,7 @@ build-test:
   stage: build-test
   script:
     - docker rm -f ${TEST_CONTAINER}
-    - docker run --name ${TEST_CONTAINER} hugomods/hugo sh -c "hugo --gc --minify"
+    - docker run --name ${TEST_CONTAINER} -v ${PWD}:/src -v /src/public -v /src/resources hugomods/hugo sh -c "hugo --gc --minify"
   environment: production
 
 build-prod:
