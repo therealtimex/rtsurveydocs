@@ -1,5 +1,5 @@
 ---
-weight: 300
+weight: 400
 title: "Managing surveys"
 description: "Survey managers using rtSurvey Cloud to manage surveys"
 icon: "tune"

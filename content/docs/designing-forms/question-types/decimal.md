@@ -12,4 +12,3 @@ weight: 223
 The "decimal" type is used to prompt the user to enter a number, which can include decimals. This constraint allows for inputting both whole numbers and fractional values.
 
 ### Available appearance 
-
