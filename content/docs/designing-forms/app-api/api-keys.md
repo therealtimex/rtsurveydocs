@@ -1,0 +1,68 @@
+---
+title: "App API Data Keys"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 302
+---
+
+Here are the supported data keys that you can use with the App-API:
+
+`osPlatform`: Returns the current OS name (Android or iOS) and the OS version. Web platforms will return an empty value.
+
+`appPlatform`: Returns the app platform name, whichs is `rtSurvey`.
+
+`appVersion`: Returns the app's version name.
+
+`getDisplayWidth`: Returns the device screen width in pixels.
+
+`getDisplayHeight`: Returns the device screen height in pixels.
+
+`getScreenSize`: Returns the device screen size in inches.
+
+`projectCode`: Returns the current project code of the site the user is signing in to.
+
+`projectURL`: Returns the current project URL of the site the user is signing in to. The default/fallback value is an empty text ("").
+
+`startingPoint`: Returns the path of the point that starts the form. Refer to the "Form starting point" for more details.
+
+`serverTime`: Returns the best available approximation of the date and time on the server.
+
+`user.[attribute]`: Returns the current user attributes based on the specified attribute key. Refer to the "User attributes" table for available attribute keys.
+
+Combine the below attribute keys with "user." in the `pulldata()` params to retrieve the current user information. For example, use `user.username`, `user.email`, etc.
+
+| Attribute Key        | Description                          |
+|----------------------|--------------------------------------|
+| username             | Username of the user                  |
+| name                 | Full name of the user                 |
+| staffCode            | User's staff code                     |
+| phone                | Phone number of the user              |
+| email                | Email address of the user             |
+| description          | Description text in user information  |
+| organization_id      | Organization ID the user belongs to    |
+| organization_name    | Organization name the user belongs to  |
+| team_id              | Team ID the user belongs to            |
+| supervisor_id        | ID of the user's supervisor            |
+| user_role            | User role                             |
+| user_group           | User group                            |
+| is_supervisor        | 1 if the user is a supervisor, 0 if not|
+| auto_approve_edit_request | 1 if the user is allowed to approve automatic "request to edit", 0 if not |
+| ipcall.user          | IP Call account's parameter - username |
+| ipcall.token         | IP Call account's parameter - token    |
+| ipcall.password      | IP Call account's parameter - password |
+| ipcall.url           | IP Call account'sparam - URL |
+| ipcall.auth          | IP Call account's parameter - auth (optional) |
+| ipcall.port          | IP Call account's parameter - port (optional) |
+
+`instancePath`: Returns the current instance folder path.
+
+`appLanguage`: Returns the current app language set in the app's settings (e.g., vi, en).
+
+`openArgs.[attribute]`: Returns the open-form-argument passed from the ActionButton (act_fill_form, act_get_instance). The default/fallback value is an empty text ("").
+
+`primaryAppColor`: Retrieves the app's primary color. 
+
