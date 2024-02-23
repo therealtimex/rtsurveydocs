@@ -14,7 +14,7 @@ The AppAPI allows users to load system meta data from the app using different me
 In the xlsform, you can use the `pulldata()` function with the following syntax:
 
 
-{{< alert context="light" text="calculate | any_name | pulldata('app-api', 'data-key')" />}}
+{{< alert context="light" text="pulldata('app-api', 'data-key')" />}}
 
 - `'app-api'`: This keyword informs the FormEngine to load the data from the App API.
 - `'data-key'`: This is the key of the data you want to load from the App API.
