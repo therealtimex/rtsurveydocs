@@ -111,3 +111,60 @@ In rtSurvey, if you want to ask the same question(s) multiple times, you can put
 14. `rank-index-if(index, repeatedfield, expression)`: This function works similarly to `rank-index()`, but it checks each instance in the repeated field's repeat group using the supplied expression. If the expression evaluates to false, the item will be omitted from the calculation. The index used is based on the full set of instances before evaluating the expression for each instance. If you pass an index for an instance that was ignored due to not satisfying the expression, it is considered an invalid index, and a rank of 999 will be returned.
     - Example: `rank-index-if(1, ${age}, ${age} >= 18)` calculates the age rank within the set of adults, considering only instances where the age is greater than or equal to 18.
 
+### Number functions 
+
+{{< table >}}
+| Operator | Operation | Example | Example answer |
+|----------|-----------|---------|----------------|
+| `+` | Addition | 1 + 1 | 2 |
+| `-` | Subtraction | 3 - 2 | 1 |
+| `*` | Multiplication | 3 * 2 | 6 |
+| `div` | Division | 10 div 2 | 5 |
+| `mod` | Modulus | 9 mod 2 | 1 |
+{{< /table >}}
+
+rtSurvey supports number functions, including:
+- `number(field)`: Converts the value of the field to a number.
+  - Example: `number('34.8')` = 34.8
+
+- `int(field)`: Converts the value of the field to an integer.
+  - Example: `int('39.2')` = 39
+
+- `min(field1, ..., fieldx)`: Returns the minimum value among the passed fields.
+  - Example: `min(${father_age}, ${mother_age})` will return the age of either the mother or the father, whichever is smaller.
+
+- `max(field1, ..., fieldx)`: Returns the maximum value among the passed fields.
+  - Example: `max(${father_age}, ${mother_age})` will return the age of either the mother or the father, whichever is larger.
+
+- `format-number(field)`: Formats the value of an integer or decimal field according to the user's locale settings.
+  - Example: `format-number(${income})` This expression might format "120000" as "120,000".
+
+- `round(field, digits)`: Rounds the numeric field value to the specified number of digits after the decimal place.
+  - Example: `round(${interest_rate}, 2)`
+
+- `abs(number)`: Returns the absolute value of a number.
+  
+- `pow(base, exponent)`: Returns the value of the first parameter raised to the power of the second parameter.
+  - Each parameter can be a field, number, or expression.
+
+- `log10(fieldorvalue)`: Returns the base-ten logarithm of the field or value passed in.
+
+- `sin(fieldorvalue)`: Returns the sine of the field or value passed in, expressed in radians.
+  
+- `cos(fieldorvalue)`: Returns the cosine of the field or value passed in, expressed in radians.
+
+- `tan(fieldorvalue)`: Returns the tangent of the field or value passed in, expressed in radians.
+
+- `asin(fieldorvalue)`: Returns the arcsine of the field or value passed in, expressed in radians.
+
+- `acos(fieldorvalue)`: Returns the arccosine of the field or value passed in, expressed in radians.
+
+- `atan(fieldorvalue)`: Returns the arctangent of the field or value passed in, expressed in radians.
+
+- `atan2(x, y)`: Returns the angle in radians subtended at the origin by the point with coordinates (x, y) and the positive x-axis. The result is in the range -pi() to pi().
+
+- `sqrt(fieldorvalue)`: Returns the non-negative square root of the field or value passed in.
+
+- `exp(x)`: Returns the value of e^x.
+
+- `pi()`: Returns the value of pi.
