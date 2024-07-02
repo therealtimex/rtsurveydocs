@@ -3,7 +3,7 @@ weight: 100
 title: "Getting started"
 date: "2023-05-03T22:37:22+01:00"
 draft: false
-author: "RealTimeX"
+author: "rtSurvey"
 icon: "rocket_launch"
 toc: true
 description: "A quickstart guide to running a survey with rtSurvey"
@@ -24,7 +24,7 @@ it is. You can:
 Researchers, field teams, and other professionals just like you use rtSurvey
 to collect their important data. Here\'s how to get started.
 
-## 1. Get a rtSurvey Cloud {#getting-started-get-rtCloud}
+## 1. Get a rtSurvey Cloud {#getting-started-rtCloud}
 
 To obtain rtSurvey Cloud, the quickest and simplest method is to use the official managed hosting service called  [rtSurvey
 Cloud](https://rtSurvey.com/#rtSurvey-cloud). It is available on rtSurvey's website and is built on a fast, dependable, and secure infrastructure.
