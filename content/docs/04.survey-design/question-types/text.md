@@ -1,7 +1,7 @@
 ---
 title: "Text"
 description: ""
-icon: "code"
+icon: "text_fields"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
 draft: false
