@@ -1,0 +1,126 @@
+---
+title: "Multi-language support"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 285
+---
+
+rtSurvey provides robust multi-language support, allowing you to create surveys in multiple languages. This feature is crucial for conducting research across diverse linguistic populations or in multilingual environments.
+
+## Setting Up Multi-Language Surveys
+
+To create a multi-language survey in rtSurvey, you need to add language-specific columns to your XLSForm. Here's how:
+
+1. **Label Translations**: Add columns for each language using the format `label::Language (code)`.
+2. **Hint Translations**: Use `hint::Language (code)` for translating hints.
+3. **Media File Translations**: For language-specific media, use `media::Language (code)`.
+
+Example:
+
+```
+| type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
+|---------|------|---------------------|---------------------|---------------------|---------------------|
+| integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
+```
+
+## Language Codes
+
+It's recommended to use the official 2-character language codes (subtags) after the language name. This facilitates matching form language with user interface language. You can find the official codes [here](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+
+## Setting a Default Language
+
+To set a default language for data collection, use the `settings` worksheet in your XLSForm:
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | French (fr)       |
+```
+
+## rtSurvey-Specific Features
+
+### Dynamic Language Switching
+
+rtSurvey allows users to switch languages dynamically during data collection:
+
+- In the web interface, use the language dropdown in the top navigation bar.
+- In the mobile app, access language options through the settings menu.
+
+### Language-Specific Validation Messages
+
+rtSurvey extends multi-language support to validation messages:
+
+```
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
+|---------|------|------------|----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
+```
+
+### RTL Language Support
+
+For right-to-left (RTL) languages like Arabic or Hebrew, rtSurvey automatically adjusts the layout:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Your name           | اسمك                |
+```
+
+### Language-Specific Appearance
+
+rtSurvey allows you to specify different appearances for different languages:
+
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Address          | 地址                 | multiline                | textarea                  |
+```
+
+## Best Practices for Multi-Language Surveys
+
+1. **Consistent Naming**: Use consistent language codes across your form.
+2. **Professional Translation**: Employ professional translators familiar with the survey context.
+3. **Context Notes**: Provide context notes for translators to ensure accurate translations.
+4. **Testing**: Test your form in all languages before deployment.
+5. **Unicode Support**: Ensure your data collection devices support Unicode for non-Latin scripts.
+6. **Language-Specific Media**: Use culturally appropriate images or audio for each language.
+7. **Avoid Text in Images**: If using images with text, create separate images for each language.
+
+## Handling Special Cases
+
+### Mixed Language Responses
+
+rtSurvey allows respondents to input text in any script, regardless of the selected form language. This is useful for capturing names or addresses in their original script.
+
+### Language-Specific Question Types
+
+Some question types may be more appropriate for certain languages. rtSurvey allows you to use different question types for different languages:
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
+```
+
+## Exporting Multi-Language Data
+
+When exporting data from rtSurvey:
+
+- Choose to export in a specific language or include all language versions.
+- Language metadata is included in the export, indicating which language was used for each response.
+
+## Mobile App Considerations
+
+- The rtSurvey mobile app supports offline language switching.
+- Ensure all required language files are downloaded before going offline.
+
+## Known Limitations
+
+- Some advanced features may not be available in all languages.
+- Extremely long translations may affect layout on smaller screens.
+
+By leveraging rtSurvey's multi-language capabilities, you can create inclusive, accessible surveys that reach diverse populations and provide high-quality, linguistically accurate data.

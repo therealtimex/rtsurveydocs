@@ -1,0 +1,147 @@
+---
+title: "Media"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 286
+---
+
+rtSurvey supports rich media integration in surveys, allowing you to enhance your questionnaires with images, audio, and video. This feature can significantly improve the respondent experience and the quality of data collected.
+
+## Types of Media Supported
+
+rtSurvey supports the following media types:
+- Images (jpg, png, gif)
+- Audio (mp3, wav)
+- Video (mp4, webm)
+
+## Adding Media to Your Survey
+
+To include media in your rtSurvey form, use the following columns in your XLSForm:
+
+- `image`: For displaying images
+- `audio`: For playing audio files
+- `video`: For playing video files
+
+Example:
+
+```
+| type | name          | label         | image        | audio       | video       |
+|------|---------------|---------------|--------------|-------------|-------------|
+| note | media_example | Media example | example.jpg  | sound.mp3   | clip.mp4    |
+```
+
+## Media File Management
+
+### Web-based surveys
+For web-based surveys, rtSurvey provides a media management interface where you can upload and organize your media files. These files are then automatically available for use in your surveys.
+
+### Mobile app
+When using the rtSurvey mobile app:
+1. Place your media files in the `/rtSurvey/forms/[form-name]-media/` folder on your device.
+2. Reference the exact file name in your XLSForm.
+
+## rtSurvey-Specific Features
+
+### Dynamic Media Loading
+rtSurvey supports dynamic loading of media based on survey responses:
+
+```
+| type         | name      | label              | image                    |
+|--------------|-----------|--------------------|--------------------------| 
+| select_one species | animal | Select an animal | ${animal}.jpg            |
+```
+
+### Media in Choice Options
+rtSurvey allows you to use media in choice options for select questions:
+
+```
+| type                | name    | label           | media::image |
+|---------------------|---------|-----------------|--------------|
+| select_one_from_file animals | Choose an animal |              |
+```
+
+In the choices sheet:
+```
+| list_name | name  | label | media::image |
+|-----------|-------|-------|--------------|
+| animals   | dog   | Dog   | dog.jpg      |
+| animals   | cat   | Cat   | cat.jpg      |
+```
+
+### Media Capture
+rtSurvey extends XLSForm with media capture capabilities:
+
+```
+| type  | name        | label               |
+|-------|-------------|---------------------|
+| image | photo       | Take a photo        |
+| audio | voice_note  | Record a voice note |
+| video | video_clip  | Record a video      |
+```
+
+## Best Practices for Using Media
+
+1. **Optimize file sizes**: Large media files can slow down survey loading and submission.
+2. **Use appropriate formats**: Stick to widely supported formats (jpg for images, mp3 for audio, mp4 for video).
+3. **Provide alternatives**: Always include text alternatives for accessibility.
+4. **Test thoroughly**: Ensure media displays correctly on all target devices.
+5. **Consider offline use**: For surveys that may be conducted offline, ensure all media is available locally.
+
+## Multilingual Media Support
+
+rtSurvey supports language-specific media. Use the `::language` suffix:
+
+```
+| type | name  | label    | image::English | image::Spanish |
+|------|-------|----------|----------------|----------------|
+| note | intro | Welcome  | welcome_en.jpg | welcome_es.jpg |
+```
+
+## Media in Data Export
+
+When exporting data from rtSurvey:
+- For web surveys, media URLs are included in the export.
+- For mobile app surveys, file paths are included.
+
+## Mobile App Considerations
+
+- Ensure sufficient storage space on devices for media-heavy surveys.
+- The rtSurvey mobile app supports offline media playback and capture.
+- Large media files may impact app performance on low-end devices.
+
+## Known Limitations
+
+- Some older browsers may not support all media formats.
+- Very large video files may cause issues in low-bandwidth situations.
+
+## Troubleshooting Media Issues
+
+1. **Media not displaying**: Check file paths and names for accuracy.
+2. **Playback issues**: Ensure the media format is supported by the target devices.
+3. **Slow loading**: Consider optimizing file sizes or preloading media.
+
+## Advanced Media Features
+
+### Geotagging
+rtSurvey can automatically geotag media captured during surveys:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Take a photo | geotag     |
+```
+
+### Media Annotations
+Allow respondents to annotate images:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Annotate the image | annotate |
+```
+
+By effectively using media in your rtSurvey forms, you can create more engaging, informative, and accurate surveys. Remember to balance the benefits of media inclusion with performance considerations, especially for surveys deployed in areas with limited internet connectivity or on lower-end devices.
