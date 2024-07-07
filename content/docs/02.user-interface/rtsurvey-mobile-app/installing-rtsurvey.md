@@ -1,6 +1,6 @@
 ---
 title: "Installing rtSurvey"
-description: "Mobile app"
+description: "Learn how to download and install the rtSurvey mobile app on Android and iOS devices, with step-by-step instructions and troubleshooting tips for a smooth setup process"
 icon: "get_app"
 date: "2023-05-22T00:34:57+01:00"
 lastmod: "2023-05-22T00:34:57+01:00"
