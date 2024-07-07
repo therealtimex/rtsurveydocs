@@ -61,7 +61,38 @@ Access and manage tasks assigned by the server. This feature helps organize work
 View all reports sent from the server to the tablet. This functionality allows users to access analysis results and project insights directly on their device.
 
 ## Review Form
-Examine finalized forms, regardless of whether they have been sent to the server or not. This feature enables quality control and data verification before final submission.
+
+The Review Form functionality in rtSurvey offers a comprehensive system for examining and managing finalized survey instances, ensuring robust quality control and data verification. This feature is divided into four distinct tabs, each serving a specific purpose in the data management process:
+
+1. **Finalized**:
+   - Holds completed and finalized instances that have not yet been submitted to the server.
+   - Allows for final checks before submission.
+
+2. **Sent**:
+   - Contains finalized instances that have been successfully submitted to the server.
+   - Provides a record of transmitted data.
+
+3. **Transferred**:
+   - Displays completed instances that have been transferred to other devices.
+   - Facilitates tracking of data movement between devices.
+
+4. **Received**:
+   - Shows completed instances originally created on another device and transferred to the current device.
+   - Enables collaborative work and data sharing among team members.
+
+Key Features:
+- **View-Only Access**: All instances in these tabs are initially view-only, preserving data integrity of finalized forms.
+- **Edit Request System**: Users can request to edit an instance if corrections are needed.
+  - Requests can be approved automatically or manually by Administrators or Project Managers.
+  - Once approved, the instance becomes editable, allowing for necessary modifications.
+
+Benefits:
+- Enhances data quality through multiple review stages.
+- Provides a clear audit trail of data submissions and transfers.
+- Offers flexibility in data management while maintaining control over finalized data.
+- Supports collaborative workflows and quality assurance processes.
+
+This advanced Review Form system sets rtSurvey apart by offering a structured approach to managing finalized data, ensuring accuracy, and allowing for controlled post-finalization edits when necessary. It strikes a balance between data integrity and the need for occasional corrections, making it an invaluable tool for survey projects requiring high levels of data quality and accountability.
 
 ## Map
 Utilize GPS functionality to pinpoint the exact location where the interview is being conducted. This feature enhances data accuracy and helps in spatial analysis of survey results.
