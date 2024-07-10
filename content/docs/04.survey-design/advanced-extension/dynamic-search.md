@@ -15,9 +15,8 @@ Dynamic Search is a powerful feature in rtSurvey that allows you to integrate dy
 
 The basic syntax for using Search-API is:
 
-```
-search-api(method, url, post_body, value_column, display, data_path, save_path)
-```
+{{< alert context="info" text="search-api(method, url, post_body, value_column, display, data_path, save_path)" />}}
+
 
 ### Parameters
 

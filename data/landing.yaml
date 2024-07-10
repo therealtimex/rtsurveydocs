@@ -2,7 +2,7 @@
 
 # Hero
 hero:
-  enable: true
+  enable: false
   weight: 10
   template: hero
 
@@ -47,7 +47,7 @@ hero:
 
 # Feature Grid
 featureGrid:
-  enable: true
+  enable: false
   weight: 20
   template: feature grid
 
