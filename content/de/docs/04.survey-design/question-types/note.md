@@ -1,0 +1,85 @@
+---
+title: "Note (Hinweis)"
+description: "Note-Fragen zeigen schreibgeschützten Text oder Medien an, um Informationen oder Anweisungen in Ihrer Umfrage bereitzustellen."
+icon: "info"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 255
+---
+
+Der `note`-Fragetyp in XLSForms und rtSurvey wird verwendet, um dem Umfrageteilnehmer schreibgeschützten Text oder Medien anzuzeigen. Es handelt sich nicht um eine Frage, die eine Antwort erfordert, sondern vielmehr um eine Möglichkeit, Informationen, Anweisungen oder Kontext innerhalb der Umfrage bereitzustellen.
+
+## Grundlegende XLSForm-Spezifikation
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | In dieser Umfrage geht es um Ihre Lesegewohnheiten. |
+
+Weitere Details zum grundlegenden `note`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+
+## Anwendungen
+
+`Note`-Fragen werden häufig verwendet für:
+
+1. Bereitstellung von Anweisungen oder Kontext für kommende Fragen
+2. Anzeige berechneter Ergebnisse oder Zusammenfassungen
+3. Anzeige von Bildern oder anderen Medien
+4. Trennung von Abschnitten einer Umfrage
+5. Rückmeldung basierend auf vorherigen Antworten
+
+## Best Practices
+
+1. Halten Sie den Hinweistext kurz und klar, um das Engagement der Befragten aufrechtzuerhalten.
+2. Verwenden Sie Formatierungen (Fett, Kursiv), um wichtige Informationen hervorzuheben.
+3. Erwägen Sie die Verwendung von Medien (Bilder, Audio), um das Verständnis bei Bedarf zu verbessern.
+4. Verwenden Sie Hinweise sparsam, um die Umfrage nicht zu überladen.
+
+## Beispielhafte Verwendung
+
+Hier ist ein Beispiel dafür, wie Sie `note`-Fragen in einer Umfrage verwenden könnten:
+
+| type | name | label |
+|------|------|-------|
+| note | intro | Willkommen bei unserer Umfrage zu Lesegewohnheiten. Wir werden Sie nach Ihren Vorlieben und der Lesehäufigkeit fragen. |
+| ... | ... | ... |
+| calculate | books_per_month | ${fiction_books} + ${non_fiction_books} |
+| note | reading_summary | Sie lesen etwa ${books_per_month} Bücher pro Monat. |
+
+In diesem Beispiel verwenden wir Hinweise, um die Umfrage einzuleiten und eine Zusammenfassung der berechneten Ergebnisse zu geben.
+
+## rtSurvey-Erweiterungen
+
+Während die grundlegende XLSForm-Spezifikation für `note`-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen:
+
+1. Rich-Text-Formatierung
+2. Unterstützung für eingebettete Medien (Bilder, Audio, Video)
+3. Dynamische Inhalte basierend auf vorherigen Antworten
+4. Benutzerdefinierte Styling-Optionen
+
+(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für `note`-Fragen müssten hier bestätigt und detailliert werden.)
+
+## Fortgeschrittene Verwendung
+
+### Bedingte Anzeige
+
+Sie können Relevanz-Ausdrücke verwenden, um Hinweise bedingt anzuzeigen:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | Sie sind ein begeisterter Leser! | ${books_per_month} > 5 |
+
+### Einbeziehung von Berechnungen
+
+Hinweise können Berechnungen enthalten, um dynamisches Feedback zu geben:
+
+| type | name | label |
+|------|------|-------|
+| note | reading_time | Basierend auf Ihren Antworten verbringen Sie jeden Monat etwa ${books_per_month * 5} Stunden mit Lesen. |
+
+## Einschränkungen
+
+- Hinweise erfassen keine Daten und sollten daher nicht verwendet werden, wenn Sie Informationen von den Befragten sammeln müssen.
+- Eine übermäßige Verwendung von Hinweisen kann dazu führen, dass sich eine Umfrage überladen oder übermäßig lang anfühlt.
+- Einige erweiterte Formatierungs- oder Medienoptionen werden möglicherweise nicht auf allen Geräten oder Plattformen unterstützt.
