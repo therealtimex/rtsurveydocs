@@ -1,0 +1,124 @@
+---
+title: "Hỗ trợ Đa ngôn ngữ"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 285
+---
+
+rtSurvey cung cấp khả năng hỗ trợ đa ngôn ngữ mạnh mẽ, cho phép bạn tạo các bản khảo sát bằng nhiều ngôn ngữ. Tính năng này rất quan trọng để thực hiện nghiên cứu trên các nhóm dân cư đa dạng về ngôn ngữ hoặc trong môi trường đa ngôn ngữ.
+
+## Thiết lập Khảo sát Đa ngôn ngữ
+
+Để tạo một khảo sát đa ngôn ngữ trong rtSurvey, bạn cần thêm các cột dành riêng cho ngôn ngữ vào XLSForm của mình. Cách thực hiện như sau:
+
+1. **Dịch Nhãn (Label)**: Thêm các cột cho mỗi ngôn ngữ theo định dạng `label::Language (code)`.
+2. **Dịch Gợi ý (Hint)**: Sử dụng `hint::Language (code)` để dịch các gợi ý.
+3. **Dịch tệp Phương tiện**: Đối với phương tiện dành riêng cho ngôn ngữ, sử dụng `media::Language (code)`.
+
+Ví dụ:
+
+```
+| type    | name | label::English (en) | label::Tiếng Việt (vi) | hint::English (en) | hint::Tiếng Việt (vi) |
+|---------|------|---------------------|------------------------|---------------------|-----------------------|
+| integer | age  | How old are you?    | Bạn bao nhiêu tuổi?    | Enter your age      | Nhập tuổi của bạn     |
+```
+
+## Mã ngôn ngữ (Language Codes)
+
+Bạn nên sử dụng các mã ngôn ngữ 2 ký tự (phụ đề) chính thức sau tên ngôn ngữ. Điều này giúp đồng bộ ngôn ngữ biểu mẫu với ngôn ngữ giao diện người dùng. Bạn có thể tìm thấy các mã chính thức [tại đây](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+
+## Thiết lập Ngôn ngữ Mặc định
+
+Để thiết lập ngôn ngữ mặc định cho việc thu thập dữ liệu, hãy sử dụng bảng tính `settings` trong XLSForm của bạn:
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | Tiếng Việt (vi)   |
+```
+
+## Các tính năng dành riêng cho rtSurvey
+
+### Chuyển đổi ngôn ngữ động
+
+rtSurvey cho phép người dùng chuyển đổi ngôn ngữ một cách linh hoạt trong quá trình thu thập dữ liệu:
+
+- Trên giao diện web, sử dụng menu thả xuống chọn ngôn ngữ ở thanh điều hướng trên cùng.
+- Trong ứng dụng di động, truy cập các tùy chọn ngôn ngữ thông qua menu cài đặt.
+
+### Thông báo xác thực dành riêng cho ngôn ngữ
+
+rtSurvey mở rộng hỗ trợ đa ngôn ngữ cho cả các thông báo xác thực (`validation messages`):
+
+```
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Tiếng Việt (vi) |
+|---------|------|------------|----------------------------------|-------------------------------------|
+| integer | age  | . <= 150   | Age must be 150 or less          | Tuổi phải từ 150 trở xuống          |
+```
+
+### Hỗ trợ Ngôn ngữ RTL (Phải sang trái)
+
+Đối với các ngôn ngữ viết từ phải sang trái (RTL) như tiếng Ả Rập hoặc tiếng Do Thái, rtSurvey sẽ tự động điều chỉnh bố cục:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Your name           | اسمك                |
+```
+
+### Hiển thị (Appearance) dành riêng cho ngôn ngữ
+
+rtSurvey cho phép bạn chỉ định các kiểu hiển thị khác nhau cho các ngôn ngữ khác nhau:
+
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Address          | 地址                 | multiline                | textarea                  |
+```
+
+## Các phương pháp hay nhất khi khảo sát đa ngôn ngữ
+
+1. **Đặt tên nhất quán**: Sử dụng mã ngôn ngữ nhất quán trong suốt biểu mẫu của bạn.
+2. **Dịch thuật chuyên nghiệp**: Sử dụng các biên dịch viên chuyên nghiệp, những người hiểu bối cảnh của bản khảo sát.
+3. **Ghi chú bối cảnh**: Cung cấp các ghi chú bối cảnh cho biên dịch viên để đảm bảo bản dịch chính xác.
+4. **Kiểm thử**: Kiểm tra biểu mẫu của bạn ở tất cả các ngôn ngữ trước khi triển khai.
+5. **Hỗ trợ Unicode**: Đảm bảo các thiết bị thu thập dữ liệu của bạn hỗ trợ Unicode cho các chữ viết không phải Latinh.
+6. **Phương tiện theo ngôn ngữ**: Sử dụng hình ảnh hoặc âm thanh phù hợp về văn hóa cho từng ngôn ngữ.
+7. **Tránh văn bản trong ảnh**: Nếu sử dụng hình ảnh có văn bản, hãy tạo các hình ảnh riêng biệt cho từng ngôn ngữ.
+
+## Xử lý các trường hợp đặc biệt
+
+### Câu trả lời bằng nhiều ngôn ngữ hỗn hợp
+
+rtSurvey cho phép người trả lời nhập văn bản bằng bất kỳ bộ chữ viết nào, bất kể ngôn ngữ biểu mẫu được chọn. Điều này hữu ích để thu thập tên hoặc địa chỉ bằng chữ viết gốc của họ.
+
+### Loại câu hỏi dành riêng cho ngôn ngữ
+
+Một số loại câu hỏi có thể phù hợp hơn cho một số ngôn ngữ nhất định. rtSurvey cho phép bạn sử dụng các loại câu hỏi khác nhau cho các ngôn ngữ khác nhau:
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
+```
+
+## Xuất dữ liệu đa ngôn ngữ
+
+Khi xuất dữ liệu từ rtSurvey:
+
+- Chọn xuất bằng một ngôn ngữ cụ thể hoặc bao gồm tất cả các phiên bản ngôn ngữ.
+- Siêu dữ liệu ngôn ngữ được bao gồm trong bản xuất, cho biết ngôn ngữ nào đã được sử dụng cho mỗi câu trả lời.
+
+## Lưu ý cho Ứng dụng di động
+
+- Ứng dụng di động rtSurvey hỗ trợ chuyển đổi ngôn ngữ ngoại tuyến.
+- Đảm bảo tất cả các tệp ngôn ngữ cần thiết đã được tải xuống trước khi chuyển sang chế độ ngoại tuyến.
+
+## Các hạn chế đã biết
+
+- Một số tính năng nâng cao có thể không khả dụng trong tất cả các ngôn ngữ.
+- Các bản dịch quá dài có thể ảnh hưởng đến bố cục trên màn hình nhỏ.

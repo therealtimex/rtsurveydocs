@@ -1,9 +1,70 @@
 baseURL = "/" # (or set via env variable HUGO_BASEURL)
 languageCode = "en-US"
-title = "rtSurey Documentation"
+title = "rtSurvey Documentation"
 # theme = "lotusdocs"
-contentDir = "content"
 enableEmoji = true
+defaultContentLanguage = "en"
+
+[languages]
+  [languages.en]
+    languageName = "English"
+    contentDir = "content/en"
+    weight = 1
+    title = "rtSurvey Documentation"
+    [[languages.en.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+    [[languages.en.menu.primary]]
+        name  = "Community"
+        url = "https://github.com/colinwilson/lotusdocs/discussions"
+        identifier = "community"
+        weight = 30
+  [languages.vi]
+    languageName = "Tiếng Việt"
+    contentDir = "content/vi"
+    weight = 2
+    title = "Tài liệu rtSurvey"
+    [[languages.vi.menu.primary]]
+        name  = "Tài liệu"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+    [[languages.vi.menu.primary]]
+        name  = "Cộng đồng"
+        url = "https://github.com/colinwilson/lotusdocs/discussions"
+        identifier = "community"
+        weight = 30
+  [languages.fr]
+    languageName = "Français"
+    contentDir = "content/fr"
+    weight = 3
+    title = "Documentation rtSurvey"
+    [[languages.fr.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.de]
+    languageName = "Deutsch"
+    contentDir = "content/de"
+    weight = 4
+    title = "rtSurvey Dokumentation"
+    [[languages.de.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.pt]
+    languageName = "Português"
+    weight = 5
+    title = "Documentação rtSurvey"
+    [[languages.pt.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
 enableGitInfo = true # N.B. .GitInfo does not currently function with submodule content directories
 # googleAnalytics = "G-VXQVVP7V8K" # (or set via env variable HUGO_GOOGLEANALYTICS)
 
