@@ -19,7 +19,7 @@
 # ------------------------------------------------------------------------------
 # <UDF name="domain"      label="Domain (DNS A record must point to this server IP before SSL can be issued)" default="rtsurvey-linode-oidc.rtworkspace.com" />
 #
-# <UDF name="letsencrypt_email" label="Let's Encrypt Email"                       default="" example="admin@example.com" />
+# <UDF name="letsencrypt_email" label="Let's Encrypt Email" example="admin@example.com" />
 
 # <UDF name="rtcloud_image"       label="Docker Image tag" default="rtawebteam/rta-smartsurvey:survey-dockerize" />
 
