@@ -17,7 +17,7 @@
 # ------------------------------------------------------------------------------
 # UDF - Domain + SSL
 # ------------------------------------------------------------------------------
-# <UDF name="domain"      label="Domain (DNS A record must point to this server IP before SSL can be issued)" default="rtsurvey-linode-oidc.rtworkspace.com" />
+# <UDF name="domain"      label="Domain (DNS A record must point to this server IP before SSL can be issued)" />
 #
 # <UDF name="letsencrypt_email" label="Let's Encrypt Email" example="admin@example.com" />
 
