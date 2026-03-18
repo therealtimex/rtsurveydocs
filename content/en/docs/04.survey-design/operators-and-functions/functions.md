@@ -168,3 +168,159 @@ rtSurvey supports number functions, including:
 - `exp(x)`: Returns the value of e^x.
 
 - `pi()`: Returns the value of pi.
+
+### Date and time functions
+
+{{% alert icon=" " context="warning" %}}
+Date values in rtSurvey are stored as strings in `YYYY-MM-DD` format. Datetime values are stored as ISO 8601 strings (`YYYY-MM-DDTHH:MM:SS`). Use `decimal-date-time()` to convert to a number for arithmetic (e.g., calculating durations).
+{{% /alert %}}
+
+1. `today()`: Returns today's date as a string in `YYYY-MM-DD` format. Evaluated once when the form opens.
+   - Example: `today()` → `'2024-03-15'`
+   - Common use: `default` column to pre-fill today's date, or in `relevant`/`constraint` to compare against a date field.
+
+2. `now()`: Returns the current date and time as an ISO 8601 string. Evaluated each time the expression is computed.
+   - Example: `now()` → `'2024-03-15T14:32:00.000+03:00'`
+   - Common use: Recording the exact timestamp of a specific event during the survey.
+
+3. `date(value)`: Converts a value (string or number) to a date string. Useful for coercing calculated values into a date type.
+   - Example: `date('2024-03-15')` → `'2024-03-15'`
+
+4. `date-time(value)`: Converts a value to a datetime string.
+   - Example: `date-time(${event_timestamp})`
+
+5. `decimal-date-time(value)`: Converts a date or datetime string to a decimal number representing milliseconds since the Unix epoch divided by 86400000 (i.e., fractional days since 1970-01-01). Use this to perform arithmetic on dates.
+   - Example: Duration in days between two dates:
+     `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
+   - Example: Duration in minutes between two datetimes:
+     `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
+
+6. `format-date(date, format)`: Formats a date value using a pattern string.
+   - Format tokens: `%Y` (4-digit year), `%y` (2-digit year), `%m` (month 01–12), `%d` (day 01–31), `%a` (abbreviated weekday), `%b` (abbreviated month name)
+   - Example: `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+   - Example: `format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
+
+7. `format-date-time(datetime, format)`: Formats a datetime value using a pattern string. Accepts all `format-date` tokens plus:
+   - `%H` (hour 00–23), `%h` (hour 01–12), `%M` (minutes 00–59), `%S` (seconds 00–59), `%3` (milliseconds), `%P` (AM/PM)
+   - Example: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+   - Example: `format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
+
+---
+
+### Boolean functions
+
+1. `boolean(value)`: Converts any value to a boolean. Returns `true` for non-empty strings, non-zero numbers, and `true`; returns `false` for empty strings, `0`, and `false`.
+   - Example: `boolean(${name})` returns `true` if `name` is not empty.
+
+2. `boolean-from-string(string)`: Returns `true` if the string is `'1'` or `'true'` (case-insensitive); returns `false` otherwise.
+   - Example: `boolean-from-string(${enabled_flag})` — useful when a field stores `'true'`/`'false'` as text.
+
+3. `true()`: Returns the boolean value `true`.
+   - Example: In the `required` column, `true()` is equivalent to `yes`.
+
+4. `false()`: Returns the boolean value `false`.
+   - Example: `if(${skip_section} = 'yes', false(), true())` — dynamically set required.
+
+5. `not(expression)`: Returns the logical negation of the expression. Returns `true` if the expression is false, and vice versa.
+   - Example: `not(${consent} = 'yes')` — show a warning when consent was NOT given.
+   - Example: `not(selected(${issues}, 'none'))` — require detail only if "none" was not selected.
+
+---
+
+### Additional string functions
+
+1. `starts-with(string, prefix)`: Returns `true` if `string` begins with `prefix`.
+   - Example: `starts-with(${phone}, '+254')` checks if the phone number begins with the Kenya country code.
+
+2. `contains(string, substring)`: Returns `true` if `string` contains `substring`.
+   - Example: `contains(${email}, '@')` checks that an email address has an `@` sign.
+   - Example: `contains(${notes}, 'urgent')` triggers a follow-up question if the notes mention "urgent".
+
+3. `substring-before(string, needle)`: Returns the part of `string` that appears before the first occurrence of `needle`.
+   - Example: `substring-before(${full_name}, ' ')` extracts the first word (first name).
+
+4. `substring-after(string, needle)`: Returns the part of `string` that appears after the first occurrence of `needle`.
+   - Example: `substring-after(${email}, '@')` extracts the domain part of an email address.
+
+5. `normalize-space(string)`: Strips leading and trailing whitespace and collapses all internal whitespace sequences to a single space.
+   - Example: `normalize-space(${name})` — cleans up a name that may have been typed with extra spaces.
+
+6. `translate(string, search_chars, replace_chars)`: Replaces each character in `string` that appears in `search_chars` with the corresponding character in `replace_chars`. Characters in `search_chars` with no corresponding character in `replace_chars` are deleted.
+   - Example: `translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` converts to uppercase (equivalent to `upper()`).
+   - Example: `translate(${phone}, ' -()', '')` removes spaces, dashes, and parentheses from a phone number.
+
+---
+
+### Additional math functions
+
+1. `floor(number)`: Returns the largest integer less than or equal to `number` (rounds towards negative infinity).
+   - Example: `floor(4.9)` = 4, `floor(-2.1)` = -3
+
+2. `ceiling(number)`: Returns the smallest integer greater than or equal to `number` (rounds towards positive infinity).
+   - Example: `ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
+
+3. `random()`: Returns a random decimal number between 0.0 (inclusive) and 1.0 (exclusive). Typically used in `calculate` fields to assign random values or randomize question order.
+   - Example: `random()` → e.g., `0.7341`
+   - Example: `int(random() * 6) + 1` → random number 1–6 (dice roll)
+
+4. `coalesce(a, b)`: Returns `a` if `a` is non-empty; otherwise returns `b`. Useful as a fallback when a field might be empty.
+   - Example: `coalesce(${preferred_name}, ${full_name})` — use preferred name if set, otherwise fall back to full name.
+
+5. `once(value)`: Evaluates `value` and stores it, but only if the current field is **empty**. If the field already has a value (e.g., was previously set), `once()` returns the existing value unchanged. This prevents recalculation from overwriting user input.
+   - Example: `once(today())` in the `default` column sets today's date once and does not update if the enumerator re-opens the form.
+   - Example: `once(uuid())` generates a UUID once and keeps it stable across re-edits.
+
+---
+
+### Geo functions
+
+1. `area(geoshape_value)`: Calculates the **area in square meters** enclosed by a geoshape (polygon) value.
+   - The parameter is a geoshape field value in the format `lat1 lon1 0 0; lat2 lon2 0 0; ...`
+   - Example: `area(${field_boundary})` — calculate the area of a surveyed field in m².
+   - Example: `round(area(${field_boundary}) div 10000, 2)` — convert to hectares.
+
+2. `distance(coordinates)`: Calculates the **total path length in meters** of a geotrace (line), or the distance between two geopoints.
+   - For a geotrace: `distance(${route})` returns the total path length in meters.
+   - For two geopoints: `distance(concat(${point_a}, ' ', ${point_b}))` returns the distance between them.
+   - Example: `round(distance(${road_trace}) div 1000, 3)` — road length in kilometers.
+
+---
+
+### Validation functions
+
+1. `regex(value, pattern)`: Returns `true` if `value` matches the regular expression `pattern`. Use in the `constraint` column for pattern-based validation.
+   - The pattern uses standard regex syntax (POSIX ERE subset).
+   - Example: `regex(., '^[0-9]{10}$')` — validate a 10-digit number.
+   - Example: `regex(., '^[A-Z]{2}[0-9]{6}$')` — validate a passport number format (2 uppercase letters followed by 6 digits).
+   - Example: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — basic email format check.
+
+2. `checklist(min, max, v1, v2, ...)`: Evaluates a list of boolean expressions and returns `true` if the number of `true` values is between `min` and `max` (inclusive). Pass `-1` for `min` or `max` to skip that bound.
+   - Example: `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — passes if exactly 2 or 3 of the three conditions are true.
+   - Example: `checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — at least one safety measure must be true.
+
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Like `checklist()`, but each value has a weight. The sum of weights for `true` values must be between `min` and `max`.
+   - Example: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — sum of weights for present facilities must be at least 10.
+
+---
+
+### Utility functions
+
+1. `uuid()`: Generates a random UUID (RFC 4122 v4 format) as a string.
+   - Example: `uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
+   - Typically used with `once()` to generate a stable unique ID: `once(uuid())`
+
+2. `version()`: Returns the value of the form's `version` attribute as set in the settings worksheet.
+   - Example: `version()` → `'3.1'`
+   - Useful in `calculate` fields to embed the form version in exported data.
+
+3. `position()`: When called inside a **repeat group**, returns the 1-based index of the current repeat instance.
+   - Example: `position()` in the first instance returns `1`, in the second returns `2`, and so on.
+   - See also: `index()` (alias), `indexed-repeat()` for referencing repeat values from outside the group.
+
+4. `thousandsep(length, separator, value)`: Formats a number with a thousands separator. `length` is the minimum total string length (padded with spaces if shorter), `separator` is the character to use (e.g., `','`), and `value` is the number to format.
+   - Example: `thousandsep(0, ',', 1234567)` → `'1,234,567'`
+   - Example: `thousandsep(0, '.', ${income})` → formats income with period as thousands separator.
+
+5. `substr-jsonpath(value, jsonpath)`: Extracts a substring from a JSON string using a JSONPath expression.
+   - Example: `substr-jsonpath(${api_response}, '$.data.name')` — extract the `name` field from a JSON string stored in `api_response`.
+   - Typically used alongside `callapi()` to extract specific values from API responses.

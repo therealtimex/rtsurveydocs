@@ -71,6 +71,62 @@ rtSurvey allows for dynamic appearance changes based on form logic:
 - Some appearances (e.g., `quick`, `signature`) are specific to mobile devices.
 - Test thoroughly on both Android and iOS to ensure consistent behavior.
 
+## rtSurvey Extended Appearance Attributes
+
+In addition to standard XLSForm appearances, rtSurvey supports the following platform-specific options:
+
+### Data and display control
+
+| Appearance Attribute | Question Types | Description |
+|----------------------|----------------|-------------|
+| `invisible` | any | Hides the field from view while still collecting or calculating its value. Different from `hidden` type — the field still participates in logic. |
+| `displaytitle` | any | Forces display of the field's label/title even when it would otherwise be suppressed. |
+| `autopull` | select_one, select_multiple | Automatically fetches external data to populate choices when the form loads or a trigger field changes. |
+| `floating_hint` | text, integer, decimal | Shows the hint text as a floating label above the input field rather than below it. |
+| `calculate-button` | calculate | Adds a visible button that triggers recalculation of the field on demand, rather than computing automatically. |
+
+### Layout
+
+| Appearance Attribute | Question Types | Description |
+|----------------------|----------------|-------------|
+| `1screen` | group | Forces the entire group to display on a single screen regardless of group size. |
+| `columns(n)` | select_one, select_multiple | Displays choices in `n` columns. Example: `columns(3)` shows three columns of radio buttons. |
+| `gridformat<row=R col=C colspan=S align=center>` | any | Positions the field in a CSS-grid layout at row `R`, column `C`, spanning `S` columns. Used with `advanced-extension/grid-layout`. |
+| `ignore-simplify` | any | Instructs the form renderer to skip automatic simplification or condensing of this field's layout. |
+
+### Widgets
+
+| Appearance Attribute | Question Types | Description |
+|----------------------|----------------|-------------|
+| `likert` | select_one | Presents choices as a Likert scale row (already in standard table above; confirmed supported). |
+| `distress` | select_one | Renders choices as the Kessler Psychological Distress Scale (K10) visual widget with emotional icons. |
+
+### API integration
+
+| Appearance Attribute | Question Types | Description |
+|----------------------|----------------|-------------|
+| `callapi` | text, integer, decimal, select_one | Enables API call integration for this field. The calculation column should contain a `callapi()` expression. See [Call API](advanced-extension/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Triggers an API verification call using static parameters. The form blocks progress until the API confirms the value. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Same as `callapi-verify` but with parameters derived from other field values at runtime. |
+
+### Inline date/time format
+
+For `date`, `time`, and `datetime` fields, you can specify a custom display format using a format string appended to the appearance:
+
+```
+inline-[%d/%m/%Y]
+inline-1line-[%d/%m/%Y %H:%M]
+```
+
+Format tokens are the same as `format-date()` and `format-date-time()`. See [Functions — Date and time functions](operators-and-functions/functions#date-and-time-functions).
+
+Example:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| datetime | event_time | Event date and time | inline-[%d/%m/%Y %I:%M %p] |
+| date | birth_date | Date of birth | inline-[%d/%m/%Y] |
+
 ## Known Limitations
 
 - Complex appearances may not render identically across all platforms.
