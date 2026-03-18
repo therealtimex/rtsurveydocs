@@ -1,6 +1,6 @@
 ---
 title: "Dynamic Search"
-description: ""
+description: "Dynamic Search loads choices from a remote API in real time as the enumerator types, enabling large or frequently updated datasets."
 icon: "manage_search"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,107 +9,135 @@ toc: true
 weight: 293
 ---
 
-Dynamic Search is a powerful feature in rtSurvey that allows you to integrate dynamic search functionality into your surveys, enabling real-time data retrieval from external sources.
+**Dynamic Search** (also called Search API) allows a `select_one`, `select_multiple`, or `text` field to load its choices from a remote web service **at runtime** as the enumerator types. This is the right approach when your choice list is too large to bundle in a CSV file, is updated frequently, or comes from a live database.
 
-## Syntax
+---
 
-The basic syntax for using Search-API is:
+## `search-api()` appearance
 
-{{< alert context="info" text="search-api(method, url, post_body, value_column, display, data_path, save_path)" />}}
+The dynamic search is configured through the `appearance` column using the `search-api()` function:
 
+```
+search-api(method, url, post_body, value_column, display, data_path, save_path)
+```
 
 ### Parameters
 
-- `method`: Always use 'POST'
-- `url`: The URL to fetch data from
-- `post_body`: The request body. Use searchView syntax (see DataModel Views documentation)
-- `value_column`: The data field to use as the value
-- `display`: The data field to use as the label. Supports template-like syntax with `##key##` and `@{func}` for advanced formatting
-- `data_path`: JSONPath to extract the desired data from the response (e.g., `$.hits.hits.*._source`)
-- `save_path`: Location to store the response data for later use
+| Parameter | Description |
+|-----------|-------------|
+| `method` | Always use `'POST'` |
+| `url` | The API endpoint to query |
+| `post_body` | JSON body sent to the API. Use `%__input__%` as a placeholder for the enumerator's current search text |
+| `value_column` | The key in the response object to use as the stored **value** |
+| `display` | The key (or template) to use as the **label** shown in the dropdown. Supports `##key##` placeholders and `@{func}` expressions |
+| `data_path` | JSONPath to the array of result objects in the response (e.g., `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | A name under which the raw response is saved for use by other fields |
 
-## Usage Examples
+---
 
-### Basic Usage
+## Basic example
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'search_results')
-```
+A health facility lookup where the enumerator types part of the facility name:
 
-### With Advanced Display Formatting
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Select health facility | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '##name## (##age## years old)', '$.results', 'search_results')
-```
+The API receives `{"query": "nair"}` when the enumerator types "nair" and returns:
 
-### With Function in Display
-
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '@{if_else(eq("##status##", "active"), "Active: ##name##", "Inactive: ##name##")}', '$.results', 'search_results')
-```
-
-## Supported Question Types
-
-- `select_one`
-- `select_multiple`
-- `text` (for autocomplete functionality)
-
-## Additional Features
-
-### Default API
-
-Use `search-default-api()` after `search-api()` to set default values:
-
-```
-appearance: search-api(...) search-default-api(...)
+```json
+{
+  "results": [
+    {"id": "HF001", "name": "Nairobi Central Clinic"},
+    {"id": "HF002", "name": "Nairobi West Hospital"}
+  ]
+}
 ```
 
-### Multiple Selection Separator
+The dropdown shows `Nairobi Central Clinic` and `Nairobi West Hospital`; the stored value is `HF001` or `HF002`.
 
-For `select_multiple`, use `search-default-separator()` to specify a custom separator:
+---
+
+## Advanced display formatting
+
+### Using `##key##` templates
+
+Show multiple fields in the label:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
+```
+
+Displayed as: `Nairobi Central Clinic (Nairobi)`.
+
+### Using `@{func}` expressions
+
+Apply conditional logic in the display label:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
+  '@{if_else(eq("##status##", "active"), "✓ ##name##", "✗ ##name##")}',
+  '$.data', 'res')
+```
+
+Active results show `✓ Clinic Name`; inactive show `✗ Clinic Name`.
+
+---
+
+## Setting a default value: `search-default-api()`
+
+Use `search-default-api()` after `search-api()` to pre-populate the field with a default choice loaded from a separate API call (e.g., when editing an existing record):
+
+```
+appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
+```
+
+---
+
+## Custom separator for select_multiple: `search-default-separator()`
+
+For `select_multiple` fields, specify how multiple selected values are joined in the stored string:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
 ```
 
+Default separator is a space.
+
+---
+
+## Supported question types
+
+| Question type | Use case |
+|---------------|----------|
+| `select_one` | Single selection from search results |
+| `select_multiple` | Multiple selections from search results |
+| `text` | Autocomplete — enumerator types freely but can select a suggestion |
+
+---
+
+## Using saved response data
+
+The `save_path` stores the full API response object under the given name. Other fields can reference it with `pulldata()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one | facility | Select facility | `search-api(..., 'facility_data')` |
+| calculate | facility_district | | `pulldata('facility_data', 'district')` |
+| calculate | facility_type | | `pulldata('facility_data', 'type')` |
+
+---
+
 ## Best Practices
 
-1. Optimize API endpoints for performance, especially with large datasets.
-2. Use appropriate caching strategies to reduce API calls.
-3. Handle network errors gracefully in your survey design.
-4. Test thoroughly with various input scenarios.
+1. Ensure your API endpoint responds within 1–2 seconds — slow APIs make the search feel unresponsive.
+2. Use `%__input__%` in the `post_body` so the API only returns matching results, not the entire dataset.
+3. Index the search field on the server side (e.g., Elasticsearch, database full-text index) for fast responses.
+4. Limit results to 20–50 items per query — returning thousands of results defeats the purpose of search.
+5. Include a minimum input length requirement in the API to avoid triggering broad queries on single-character inputs.
 
-## Known Limitations
+## Limitations
 
-- Complex queries may impact survey loading times.
-- Offline functionality may be limited depending on the implementation.
-
-```mermaid
-    graph TD
-    %% Define styles for nodes
-    classDef light fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#003366
-    classDef dark fill:#2e3b4e,stroke:#a6b1c2,stroke-width:2px,color:#e1e1e1
-    classDef submit fill:#ffcc99,stroke:#cc6600,stroke-width:2px,color:#663300
-    classDef link fill:#ccffcc,stroke:#009933,stroke-width:2px,color:#003300
-    classDef storage fill:#ffffcc,stroke:#999900,stroke-width:2px,color:#333300
-    
-    %% Define shapes for nodes
-    A[<span class="iconify" data-icon="mdi:file-document-multiple" data-inline="false" data-width="18" data-height="18"></span> Receipts in PDF, PNG, HEIC, JPEG, Excel] --> B{<span class="iconify" data-icon="mdi:send" data-inline="false" data-width="18" data-height="18"></span> Submit the Receipts}
-    B --> C1([<a href="mailto:keep@keepy.us?subject=Keep%20my%20receipts" style="color:#003300;"><span class="iconify" data-icon="mdi:email" data-inline="false" data-width="18" data-height="18"></span> Email: keep@keepy.us</a>])
-    B --> C2([<a href="sms:+16504173562" style="color:#003300;"><span class="iconify" data-icon="mdi:message-text" data-inline="false" data-width="18" data-height="18"></span> SMS: 650-417-3562</a>])
-    B --> C3([<a href="https://m.me/keepy.us" target="_blank" style="color:#003300;"><span class="iconify" data-icon="mdi:facebook-messenger" data-inline="false" data-width="18" data-height="18"></span> Messenger: m.me/keepy.us</a>])
-    C1 --> D[[<span class="iconify" data-icon="mdi:database" data-inline="false" data-width="18" data-height="18"></span> <b>Receipt Data Stored in Google Sheet</b><br> - Automatic Text Recognition<br> - Human-Verified for Accuracy<br> - Data and Digital Receipt Copies]]
-    C2 --> D
-    C3 --> D
-    
-    %% Apply classes to nodes
-    class A light
-    class B submit
-    class C1 link
-    class C2 link
-    class C3 link
-    class D storage
-    
-    %% Adjust arrow styles for better visibility
-    linkStyle default stroke:#666,stroke-width:3px
-```
+- Dynamic Search requires network connectivity — it does not work offline.
+- The `%__input__%` placeholder is injected as-is; sanitise inputs on the server side to prevent injection attacks.
+- Complex `@{func}` display expressions may have limited support across all rtSurvey client versions.

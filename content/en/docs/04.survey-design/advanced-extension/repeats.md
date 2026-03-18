@@ -1,116 +1,160 @@
 ---
-title: "Repeats"
-description: ""
+title: "Advanced Repeats"
+description: "Advanced patterns for repeat groups: dynamic counts, nested repeats, summarising repeat data, and referencing values across repeats."
 icon: "manage_search"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
 draft: false
 toc: true
-weight: 294
+weight: 295
 ---
 
-Dynamic Search is a powerful feature in rtSurvey that allows you to integrate dynamic search functionality into your surveys, enabling real-time data retrieval from external sources.
+This page covers advanced patterns for working with repeat groups in rtSurvey. For the basics of setting up a repeat group, see [Grouping and Repeats](../repeats).
 
-## Syntax
+---
 
-The basic syntax for using Search-API is:
+## Dynamic repeat count
 
-```
-search-api(method, url, post_body, value_column, display, data_path, save_path)
-```
+By default, the enumerator decides how many times to repeat. You can fix the number of repetitions using `repeat_count`:
 
-### Parameters
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Household member | `${num_members}` |
+| text | member_name | Member name | |
+| integer | member_age | Age | |
+| end_repeat | | | |
 
-- `method`: Always use 'POST'
-- `url`: The URL to fetch data from
-- `post_body`: The request body. Use searchView syntax (see DataModel Views documentation)
-- `value_column`: The data field to use as the value
-- `display`: The data field to use as the label. Supports template-like syntax with `##key##` and `@{func}` for advanced formatting
-- `data_path`: JSONPath to extract the desired data from the response (e.g., `$.hits.hits.*._source`)
-- `save_path`: Location to store the response data for later use
+The repeat runs exactly `${num_members}` times, where `num_members` was collected earlier in the form. The enumerator cannot add or remove instances.
 
-## Usage Examples
+---
 
-### Basic Usage
+## Indexed access: `indexed-repeat()`
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'search_results')
-```
+Access a specific repeat instance's field value from **outside** the repeat group using `indexed-repeat(repeatedField, repeatGroup, index)`:
 
-### With Advanced Display Formatting
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '##name## (##age## years old)', '$.results', 'search_results')
-```
+This is useful for building summary fields or referencing the "primary" member's data after the repeat.
 
-### With Function in Display
+---
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '@{if_else(eq("##status##", "active"), "Active: ##name##", "Inactive: ##name##")}', '$.results', 'search_results')
-```
+## Current instance position: `index()`
 
-## Supported Question Types
+Inside a repeat group, `index()` returns the 1-based position of the current instance. Use it to label each repetition or create unique identifiers:
 
-- `select_one`
-- `select_multiple`
-- `text` (for autocomplete functionality)
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Plot |
+| note | plot_label | Plot number ${index()} |
+| text | plot_id | Plot ID |
+| end_repeat | | |
 
-## Additional Features
+---
 
-### Default API
+## Referencing fields in the same instance
 
-Use `search-default-api()` after `search-api()` to set default values:
+Within a repeat, use `${fieldname}` to reference another field **in the same repeat instance**. There is no need for `indexed-repeat()` within the same loop:
 
-```
-appearance: search-api(...) search-default-api(...)
-```
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Member | |
+| text | member_name | Name | |
+| integer | member_age | Age | |
+| text | school_name | School name | `${member_age} < 18` |
+| end_repeat | | | |
 
-### Multiple Selection Separator
+---
 
-For `select_multiple`, use `search-default-separator()` to specify a custom separator:
+## Referencing parent fields from inside a repeat
 
-```
-appearance: search-api(...) search-default-separator(' || ')
-```
+Fields outside (above) the repeat group can be referenced normally with `${fieldname}`:
+
+| type | name | label |
+|------|------|-------|
+| text | village | Village name |
+| begin_repeat | plots | Agricultural plot |
+| note | plot_context | Plots in ${village} |
+| end_repeat | | |
+
+---
+
+## Summarising repeat data
+
+Use repeat aggregate functions **outside** the repeat group to summarise:
+
+| Function | Example | Description |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | Number of instances |
+| `sum(field)` | `sum(${loan_amount})` | Sum of a numeric field |
+| `min(field)` | `min(${member_age})` | Minimum value |
+| `max(field)` | `max(${member_age})` | Maximum value |
+| `join(sep, field)` | `join(', ', ${member_name})` | Comma-separated list |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Conditional count |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Conditional sum |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Conditional join |
+
+### Example: Household summary
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | How many members? | |
+| begin_repeat | members | Member | `${num_members}` |
+| text | member_name | Name | |
+| integer | member_age | Age | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | ${total_members} members; ${children_count} under 18. Adults: ${adult_names} | |
+
+---
+
+## Nested repeats
+
+A repeat group can contain another repeat group. Use this carefully — nested repeats add complexity and can be confusing for enumerators.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Household |
+| text | hh_id | Household ID |
+| begin_repeat | hh_members | Member |
+| text | member_name | Member name |
+| end_repeat | | |
+| end_repeat | | |
+
+To reference a field in an outer repeat from the inner repeat, use `${fieldname}` — it resolves to the nearest matching ancestor:
+
+Inside the `hh_members` repeat, `${hh_id}` returns the ID of the **current** household, not all households.
+
+---
+
+## Rank inside repeat groups: `rank-index()`
+
+When a `rank` field exists inside a repeat, use `rank-index(instanceNumber, repeatedField)` from outside to get the ordinal rank of a specific instance:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` returns the instance index of the highest score.
+
+---
 
 ## Best Practices
 
-1. Optimize API endpoints for performance, especially with large datasets.
-2. Use appropriate caching strategies to reduce API calls.
-3. Handle network errors gracefully in your survey design.
-4. Test thoroughly with various input scenarios.
+1. Always use `repeat_count` when the number of repetitions is known in advance — it prevents enumerators from accidentally adding or removing instances.
+2. Keep repeat groups focused — a repeat with 20+ questions per instance is difficult to navigate.
+3. Name repeat groups clearly (e.g., `household_members`, not `repeat1`) — the name appears in function calls and exported data.
+4. Test with the maximum expected number of instances to verify performance.
+5. Use `field-list` appearance on the repeat group to show all fields on one screen per instance (mobile).
 
-## Known Limitations
+---
 
-- Complex queries may impact survey loading times.
-- Offline functionality may be limited depending on the implementation.
+## Limitations
 
-```mermaid
-    graph TD
-    %% Define styles for nodes
-    classDef light fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#003366
-    classDef dark fill:#2e3b4e,stroke:#a6b1c2,stroke-width:2px,color:#e1e1e1
-    classDef submit fill:#ffcc99,stroke:#cc6600,stroke-width:2px,color:#663300
-    classDef link fill:#ccffcc,stroke:#009933,stroke-width:2px,color:#003300
-    classDef storage fill:#ffffcc,stroke:#999900,stroke-width:2px,color:#333300
-    
-    %% Define shapes for nodes
-    A[<span class="iconify" data-icon="mdi:file-document-multiple" data-inline="false" data-width="18" data-height="18"></span> Receipts in PDF, PNG, HEIC, JPEG, Excel] --> B{<span class="iconify" data-icon="mdi:send" data-inline="false" data-width="18" data-height="18"></span> Submit the Receipts}
-    B --> C1([<a href="mailto:keep@keepy.us?subject=Keep%20my%20receipts" style="color:#003300;"><span class="iconify" data-icon="mdi:email" data-inline="false" data-width="18" data-height="18"></span> Email: keep@keepy.us</a>])
-    B --> C2([<a href="sms:+16504173562" style="color:#003300;"><span class="iconify" data-icon="mdi:message-text" data-inline="false" data-width="18" data-height="18"></span> SMS: 650-417-3562</a>])
-    B --> C3([<a href="https://m.me/keepy.us" target="_blank" style="color:#003300;"><span class="iconify" data-icon="mdi:facebook-messenger" data-inline="false" data-width="18" data-height="18"></span> Messenger: m.me/keepy.us</a>])
-    C1 --> D[[<span class="iconify" data-icon="mdi:database" data-inline="false" data-width="18" data-height="18"></span> <b>Receipt Data Stored in Google Sheet</b><br> - Automatic Text Recognition<br> - Human-Verified for Accuracy<br> - Data and Digital Receipt Copies]]
-    C2 --> D
-    C3 --> D
-    
-    %% Apply classes to nodes
-    class A light
-    class B submit
-    class C1 link
-    class C2 link
-    class C3 link
-    class D storage
-    
-    %% Adjust arrow styles for better visibility
-    linkStyle default stroke:#666,stroke-width:3px
-```
+- `indexed-repeat()` requires a valid index (1 to count of instances) — out-of-range indices return empty.
+- Nested repeats beyond 2 levels are not recommended and may cause display issues on some clients.
+- Aggregate functions (`sum`, `count`, etc.) operate on the entire repeat group — you cannot aggregate a subset of instances without `*-if` variants.

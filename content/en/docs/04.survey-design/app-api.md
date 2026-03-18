@@ -75,5 +75,76 @@ Combine the below attribute keys with "user." in the `pulldata()` params to retr
 
 `openArgs.[attribute]`: Returns the open-form-argument passed from the ActionButton (act_fill_form, act_get_instance). The default/fallback value is an empty text ("").
 
-`primaryAppColor`: Retrieves the app's primary color. 
+`primaryAppColor`: Retrieves the app's primary color.
 
+---
+
+## Usage examples
+
+### Store the enumerator's username and organisation
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Use these in note labels for audit purposes:
+```
+note | interviewer_info | Interviewer: ${enumerator_name} (${enumerator_org})
+```
+
+### Device and screen info
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+Useful for troubleshooting: export `device_platform` and `app_ver` alongside your data to identify which device version was used for each submission.
+
+### Server time instead of device time
+
+Device clocks can be wrong. Use `serverTime` for a more reliable timestamp:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Conditional logic based on user role
+
+Show a supervisor-only section only to supervisors:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Supervisor review | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Supervisor notes | |
+| end_group | | | |
+
+### Pass arguments from an action button
+
+When the form is launched from an `act_fill_form` action button with custom arguments:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+The action button must pass the arguments with matching keys (e.g., `household_id`, `task_code`).
+
+### Using project info
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## Notes
+
+- All `pulldata('app-api', ...)` calls are evaluated when the form is opened and are not re-evaluated dynamically during the session (except `serverTime` and `now()`).
+- If a key is unsupported or the data is unavailable, the function returns `'n/a'` (not empty string — test with `!= 'n/a'` rather than `!= ''`).
+- `openArgs` values are only available when the form is launched from an action button; they return empty string otherwise.

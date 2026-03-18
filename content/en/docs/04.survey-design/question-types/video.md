@@ -9,75 +9,91 @@ toc: true
 weight: 229
 ---
 
-The video question type in XLSForms and rtSurvey enables respondents to record and submit video files as part of their survey responses. This feature is particularly useful for capturing visual evidence, demonstrations, or testimonials relevant to the survey.
+The `video` question type enables respondents to **record video** or upload an existing video file as part of their survey response. It is useful for capturing visual evidence, demonstrations, environmental conditions, or any information that benefits from motion and audio together.
 
 ## Basic XLSForm Specification
 
-| type  | name        | label                           |
-|-------|-------------|--------------------------------|
-| video | demo_video  | Please record a short demo video |
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Please record a short demonstration |
 
-For more details on the basic video question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+For more details on the standard video question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
 ## Uses
 
 Video questions are commonly used for:
 
-1. Capturing visual evidence in field surveys
-2. Recording product demonstrations or usage scenarios
-3. Collecting video testimonials
-4. Documenting processes or procedures
-5. Allowing respondents to provide detailed visual explanations
+1. Documenting field conditions — road damage, infrastructure state, crop health
+2. Recording product demonstrations or procedural compliance checks
+3. Collecting video testimonials from respondents
+4. Capturing evidence that requires spatial context (e.g., the size and extent of a problem area)
+5. Before/after documentation for monitoring and evaluation surveys
+
+## Data format
+
+Video files are stored as binary attachments:
+
+- **Format:** MP4 or MOV (mobile recording)
+- **Naming:** `{instanceID}-{fieldname}.mp4` (or equivalent)
+- **Storage:** Uploaded to the server media folder and linked to the submission record
+- **Access:** Playable and downloadable from the submission management interface
+
+## rtSurvey extensions
+
+### Maximum duration
+
+Use the `parameters` column to limit the recording length:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Record the site conditions | `max-duration=60` |
+
+`max-duration` is in seconds. The recording stops automatically at the limit.
+
+### Quality / resolution
+
+Control the recording resolution via `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Record video evidence | `quality=low` |
+
+Supported values: `low` (faster upload), `normal` (default), `high`. Use `low` in areas with limited connectivity.
+
+### Upload existing video
+
+On mobile, the respondent can choose to **upload an existing video** from the device gallery instead of recording a new one. This is enabled by default in the native camera/gallery integration.
+
+### Playback before submission
+
+On mobile, the recorded clip can be reviewed before proceeding. No additional configuration is needed.
+
+## Example usage
+
+### Site inspection video with limit
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Record the water point | Walk around the entire facility. Max 90 seconds. | `max-duration=90 quality=normal` |
+
+### Conditional video — only if damage is reported
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | Was damage found? | | |
+| video | damage_video | Record video of the damage | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
 ## Best Practices
 
-1. Provide clear instructions on what to record and for how long.
-2. Consider privacy implications and inform respondents about how their video will be used.
-3. Be mindful of file sizes and storage limitations, especially for surveys in areas with limited internet connectivity.
-4. Test the video recording feature on various devices to ensure compatibility.
-5. Consider specifying desired video quality or resolution in the instructions.
-
-## Example Usage
-
-Here's an example of how you might use a video question in a survey:
-
-| type  | name           | label                                                | hint                                    |
-|-------|----------------|------------------------------------------------------|----------------------------------------|
-| video | product_demo   | Please record a short demo of using the product      | Record for 30-60 seconds, showing key features |
-
-## rtSurvey Extensions
-
-While the basic XLSForm specification for video questions is straightforward, rtSurvey may offer additional features or customizations:
-
-1. Maximum recording duration setting
-2. Video quality options (e.g., low, medium, high)
-3. Playback functionality for review before submission
-4. Integration with device's native video recording app
-5. Option to upload existing video files instead of recording new ones
-
-(Note: The specific extensions available in rtSurvey for video questions would need to be confirmed and detailed here.)
+1. Set `max-duration` — unrestricted video recordings can easily exceed 100 MB and fail to upload on weak connections.
+2. Use `quality=low` for monitoring surveys where visual evidence is required but fine detail is not — it cuts file size dramatically.
+3. Write specific recording instructions in the `hint` column (e.g., "Walk around the entire building, hold camera steady").
+4. Consider whether video is necessary — a photo (`image`) is usually sufficient for static evidence and produces much smaller files.
+5. Test upload performance on the actual field network before deployment.
 
 ## Limitations
 
-- Video files can be very large, which may significantly impact data transfer and storage.
-- Not all devices may support video recording capabilities or may have limited storage.
-- Analyzing video responses can be time-consuming and may require specialized software.
-- Privacy concerns may be more pronounced with video data collection.
-
-## Data Handling
-
-Video files collected through this question type are typically:
-
-1. Saved in a common video format (e.g., MP4, MOV)
-2. Stored alongside other survey data, often in a separate media folder
-3. Accessible for playback and analysis through the survey management platform
-
-## Considerations for Analysis
-
-When using video questions, consider:
-
-1. How the video data will be analyzed (e.g., manual review, automated video analysis)
-2. The additional time and resources needed for processing video responses
-3. Privacy and data protection measures for storing and handling video recordings
-4. Potential need for video editing or compilation tools in the analysis phase
-
+- Video files are very large — a 1-minute video at normal quality is typically 20–60 MB depending on device.
+- Uploading large video files requires a good network connection; consider requiring Wi-Fi sync for video-heavy forms.
+- Not all web browsers support video recording via MediaRecorder — Chrome is the most reliable.
+- Analysis of video responses is manual and time-consuming; use sparingly and only when video content adds unique value.

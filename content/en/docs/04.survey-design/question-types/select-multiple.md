@@ -1,6 +1,6 @@
 ---
 title: "Select_multiple"
-description: ""
+description: "Select_multiple questions let respondents choose one or more options from a predefined list."
 icon: "check_box"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,18 +9,140 @@ toc: true
 weight: 225
 ---
 
-### select_multiple listname
+The `select_multiple` question type displays a list where the respondent can select **one or more options**. By default choices render as checkboxes. The stored value is a **space-separated list** of all selected choice values.
 
-The "select_multiple listname" prompts the user to select one or more choices from a predefined list of choices. In a xlsform definition, the "listname" should correspond to a value listed in the choices worksheet's list_name column (e.g., "country").
+## Basic XLSForm Specification
 
-By default, the choices are displayed as checkboxes, where each checkbox represents a single static choice from the specified list. However, there are various appearance options available to customize the look, functionality, and even the choice list itself. Please refer to the sub-sections below for more information on those options.
+**survey worksheet:**
 
-When exporting the data, each row will include a column with a space-separated list of all chosen response values for each select_multiple field.
+| type | name | label |
+|------|------|-------|
+| select_multiple crops | crops_grown | Which crops does the household grow? |
 
-When using a select_multiple field in field validation or skip patterns (constraint or relevance expressions), the "selected()" function needs to be utilized to check whether a specific choice has been selected. You can find more information on constraint and relevance expressions in the help topics.
+**choices worksheet:**
 
-In the xlsform definition:
+| list_name | name | label |
+|-----------|------|-------|
+| crops | maize | Maize |
+| crops | beans | Beans |
+| crops | rice | Rice |
+| crops | vegetables | Vegetables |
+| crops | other | Other |
 
-| Type                  | Name      | Label          | Appearance |
-|-----------------------|-----------|----------------|------------|
-| select_multiple listname | fieldname | question text |            |
+For more details see the [XLSForm specification](https://xlsform.org/en/#question-types).
+
+## Stored data format
+
+The exported column contains a space-separated list of selected values:
+
+```
+maize beans vegetables
+```
+
+Use the `selected()` function — not `=` — when testing select_multiple values in expressions (see below).
+
+## Uses
+
+Select_multiple questions are used for:
+
+1. Collecting multiple applicable answers (e.g., sources of income, crops grown, symptoms)
+2. Checkbox-style agreement items (e.g., "Select all that apply")
+3. Language or skill inventories
+4. Any question where multiple answers are simultaneously valid
+
+## Appearance options
+
+{{< table >}}
+| Appearance | Description |
+|------------|-------------|
+| *(none)* | Default checkboxes, one per line |
+| `minimal` | Dropdown multi-select widget |
+| `compact` | Compact grid, columns adjust to screen width |
+| `compact-N` | Compact grid forced to N columns |
+| `horizontal` | Choices arranged horizontally in a row (web) |
+| `horizontal-compact` | Horizontal, compact spacing (web) |
+| `label` | Shows only labels, no checkboxes (use with `list-nolabel`) |
+| `list-nolabel` | Shows only checkboxes, no labels (use with `label`) |
+| `columns(N)` | Display in N columns (rtSurvey extension) |
+{{< /table >}}
+
+### Example: 3-column compact layout
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple symptoms | symptoms | Select all symptoms observed | compact-3 |
+
+## Using `selected()` in expressions
+
+Because the stored value is a space-separated string, you **must** use `selected()` to test whether a specific choice was picked. Using `=` will not work correctly.
+
+### In `relevant`
+
+Show a follow-up question only if "other" was selected:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_multiple crops | crops_grown | Which crops are grown? | |
+| text | crops_other | Please specify other crops | `selected(${crops_grown}, 'other')` |
+
+### In `constraint`
+
+Require at least 2 choices:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple issues | issues | `count-selected(.) >= 2` | Select at least 2 issues |
+
+Limit to a maximum of 3:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple priorities | priorities | `count-selected(.) <= 3` | Select no more than 3 priorities |
+
+### In `calculate` — joining selected labels
+
+Combine `selected-at()`, `count-selected()`, and `choice-label()` to build a readable summary:
+
+| type | name | calculation |
+|------|------|-------------|
+| calculate | crops_summary | join(', ', ${crops_grown}) |
+
+## "None of the above" / exclusive option
+
+A common pattern is to make one option mutually exclusive with all others. Use a `constraint` to enforce it:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| select_multiple issues | issues | Select all issues present | `not(selected(., 'none') and count-selected(.) > 1)` | "None" cannot be selected with other options |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| issues | water | Water shortage |
+| issues | roads | Poor roads |
+| issues | health | Lack of health services |
+| issues | none | None of the above |
+
+## Counting and summarising selections
+
+| Function | Example | Result |
+|----------|---------|--------|
+| `count-selected(field)` | `count-selected(${crops_grown})` | Number of choices selected |
+| `selected(field, value)` | `selected(${crops_grown}, 'maize')` | true/false |
+| `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | First selected value |
+| `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | Label for a value |
+
+## Best Practices
+
+1. Always use `selected()` in `relevant`, `constraint`, and `calculate` — never `=` or `!=`.
+2. Add a constraint to limit the maximum number of selections if the question design requires it.
+3. Include a "None" or "Not applicable" option when zero selections is a valid answer.
+4. For long lists (15+ choices), use `minimal` (multi-select dropdown) to avoid excessive scrolling.
+5. Export data and use string-splitting in your analysis tool — the space-separated format requires splitting before pivoting.
+
+## Limitations
+
+- Select_multiple values cannot be directly compared with `=`. Always use `selected()`.
+- The compact appearance may not render well for very long choice labels.
+- When filtering choices with `choice_filter`, filtering applies to all displayed choices, same as `select_one`.

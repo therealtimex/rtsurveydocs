@@ -9,73 +9,108 @@ toc: true
 weight: 221
 ---
 
-## Overview
+The `text` question type collects a free-text response — any string of characters. It is the most flexible input type and is used for names, addresses, descriptions, codes, and anything that does not fit a more specific type.
 
-The "text" question type in rtSurvey allows for free text responses, providing flexibility for collecting various types of textual data. It is based on the standard XLSForm specification but includes rtSurvey-specific extensions for enhanced functionality.
+rtSurvey also extends `text` with **time input widgets** that allow precise time entry with a clock picker.
 
-## XLSForm Specification
+## Basic XLSForm Specification
 
-In XLSForm, the text question type is specified as:
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | Full name of respondent |
+| text | address | Home address |
 
-```
-type: text
-```
+For more details on the standard XLSForm text type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
-For more details on the standard XLSForm syntax, refer to the [official XLSForm documentation](https://xlsform.org/en/#question-types).
+## Uses
 
-## rtSurvey-specific Extensions
+Text questions are used for:
 
-rtSurvey extends the functionality of the text question type through various appearance options, particularly for time input:
+1. Names, addresses, free descriptions
+2. Open-ended comments or feedback
+3. Codes, IDs, or reference numbers that do not fit integer/decimal
+4. Collecting time values with rtSurvey's time input extensions
+5. Autocomplete text fields (via `search-autocomplete-noedit-v2()`)
 
-### Time Input Extensions
+## Standard appearance options
 
-- `appearance:` - Displays a clock for selecting hours and minutes
-- `appearance: inline` - Displays the clock as an icon
-- `appearance: inline colors("0099FF")` - Displays the clock as an icon with customizable color
-- `appearance: inline-1line` - Displays the clock for selection in a single row format
-- `appearance: inline-1line-0000FF` - Single row format with customizable color
-- `appearance: inline-1line colors("0000FF","FFFF00")` - Single row format with multiple color options
-- `appearance: inline-onlyresult` - Displays the clock as an icon at the end of the line, disappearing after selection
-- `appearance: inline-onlyresult colors("0099FF")` - Same as above, with customizable icon color
+| Appearance | Description |
+|------------|-------------|
+| *(none)* | Single-line text input |
+| `multiline` | Multi-line text area — best for longer free text on web |
 
-### Time Format Extensions
+## rtSurvey time input extensions
 
-- `appearance: inline-[%3]` - Displays milliseconds
-- `appearance: inline-[%S]` - Displays seconds
-- `appearance: inline-[%M]` - Displays minutes
-- `appearance: inline-[%h]` - Displays hours (12-hour format)
-- `appearance: inline-[%H]` - Displays hours (24-hour format)
-- `appearance: inline-[%H-%M-%S]` - Displays time in HH-MM-SS format
-- `appearance: inline-[%H:%M:%3]` - Displays time in HH:MM:milliseconds format
-- `appearance: inline-[%h:%M:%S]` - Displays time in 12-hour format with seconds
-- `appearance: inline-[%H:%M]` - Displays time in 24-hour format
-- `appearance: inline-[%h:%M]` - Displays time in 12-hour format
-- `appearance: inline-[%M:%S]` - Displays minutes and seconds
-- `appearance: inline-[%M:%3]` - Displays minutes and milliseconds
+rtSurvey extends `text` with a **clock picker widget** for collecting time values. These appearance options display a clock icon the enumerator can tap to select hours, minutes, seconds, or milliseconds.
 
-## Data Format
+### Appearance variants
 
-Text data is stored and exported as text. For time-based inputs, the data is stored in a text-based datetime format.
+| Appearance | Description |
+|------------|-------------|
+| `inline` | Clock icon displayed next to the field |
+| `inline colors("RRGGBB")` | Clock icon with custom hex color |
+| `inline-1line` | Clock displayed in a compact single-row format |
+| `inline-1line-RRGGBB` | Single-row with custom icon color (hex, no `#`) |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Single-row with two colors |
+| `inline-onlyresult` | Clock icon disappears after selection; only the value is shown |
+| `inline-onlyresult colors("RRGGBB")` | Same, with custom icon color |
 
-## Mobile App Considerations
+### Time format tokens
 
-The text question type, including all its variants and appearances, is fully supported on iOS, Android, and Web platforms.
+Append a format string in brackets to control which time components are shown:
 
-## Related Question Types
+| Format string | Displays |
+|---------------|----------|
+| `inline-[%H:%M]` | Hours and minutes (24-hour) |
+| `inline-[%h:%M]` | Hours and minutes (12-hour) |
+| `inline-[%H:%M:%S]` | Hours, minutes, seconds (24-hour) |
+| `inline-[%h:%M:%S]` | Hours, minutes, seconds (12-hour) |
+| `inline-[%H:%M:%3]` | Hours, minutes, milliseconds |
+| `inline-[%M:%S]` | Minutes and seconds only |
+| `inline-[%M:%3]` | Minutes and milliseconds only |
+| `inline-[%S]` | Seconds only |
+| `inline-[%3]` | Milliseconds only |
+| `inline-[%H]` | Hours only (24-hour) |
+| `inline-[%h]` | Hours only (12-hour) |
 
-- Integers
-- Datetime
+### Example: Record a task duration in minutes and seconds
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | task_duration | Time taken to complete the task | `inline-[%M:%S]` |
+
+### Example: Record an event time in 24-hour format with custom color
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | event_time | Time of event | `inline-1line colors("0099FF")` |
+
+## Data format
+
+Text data is stored and exported as a plain string. For time-based inputs using the inline clock widget, the value is stored in the format matching the chosen format string (e.g., `14:32` for `%H:%M`).
+
+## Constraints and validation
+
+Apply constraints to enforce format, length, or pattern:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| text | name | Full name | `string-length(.) >= 2` | Name must be at least 2 characters |
+| text | code | Reference code | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Enter 2 uppercase letters followed by 4 digits |
+| text | phone | Phone number | `regex(., '^[0-9]{9,15}$')` | Enter a valid phone number |
 
 ## Best Practices
 
-- Use clear and concise labels for text questions to guide respondents.
-- Consider using constraints or validation rules to ensure data quality.
-- For time inputs, choose the appropriate appearance option based on the level of precision required for your survey.
+1. Use more specific types (`integer`, `decimal`, `date`) whenever the data has a known structure — this prevents invalid entries and simplifies analysis.
+2. Add `constraint` with `string-length()` or `regex()` to validate codes or IDs.
+3. Use `multiline` appearance for open-ended questions where respondents may write several sentences.
+4. For time collection, choose the time format tokens that match the precision your analysis requires — collecting milliseconds when you only need minutes wastes enumerator effort.
 
-## Known Limitations
+## Platform support
 
-Currently, there are no known limitations for the text question type in rtSurvey.
+The text question type and all time input appearances are supported on iOS, Android, and web platforms.
 
-## Screenshots
+## Limitations
 
-[Note: Include relevant screenshots to illustrate different appearances and variants of the text question type.]
+- Text responses are free-form — there is no built-in spell check or vocabulary constraint beyond regex patterns.
+- The inline time widget is an rtSurvey extension and is not part of the standard XLSForm specification.

@@ -9,72 +9,91 @@ toc: true
 weight: 228
 ---
 
-The audio question type in XLSForms and rtSurvey enables respondents to record and submit audio files as part of their survey responses. This feature is particularly useful for capturing verbal responses, testimonials, or environmental sounds relevant to the survey.
+The `audio` question type enables respondents to **record audio** or upload an existing audio file as part of their survey response. It is useful for capturing verbal accounts, environmental sounds, testimonials, or any information that is better conveyed through voice than text.
 
 ## Basic XLSForm Specification
 
-| type  | name        | label                           |
-|-------|-------------|--------------------------------|
-| audio | voice_note  | Please record your comments    |
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Please record your comments  |
 
-For more details on the basic audio question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+For more details on the standard audio question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
 ## Uses
 
 Audio questions are commonly used for:
 
-1. Capturing verbal responses to open-ended questions
-2. Recording testimonials or personal stories
-3. Documenting environmental sounds or noise levels
-4. Collecting voice samples for research purposes
-5. Allowing respondents to provide detailed explanations
+1. Capturing open-ended verbal responses to reduce enumerator typing burden
+2. Recording testimonials, personal stories, or oral histories
+3. Documenting environmental sounds (e.g., noise levels near infrastructure)
+4. Collecting voice samples for linguistic or health research
+5. Allowing respondents to add verbal clarifications to numeric or select answers
+
+## Data format
+
+Audio files are stored as binary attachments alongside the form submission, typically:
+
+- **Format:** MP3 or AAC (mobile recording); WAV (high-quality recording)
+- **Naming:** `{instanceID}-{fieldname}.mp3` (or equivalent)
+- **Storage:** Uploaded to the server media folder and linked to the submission record
+- **Access:** Playable and downloadable from the submission management interface
+
+## rtSurvey extensions
+
+### Maximum duration
+
+Use the `parameters` column to limit recording length:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | interview | Record the interview | `max-duration=120` |
+
+`max-duration` is in seconds. The recorder stops automatically at the limit.
+
+### Quality settings
+
+The recording quality can be set via `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Record feedback | `quality=normal` |
+
+Supported values: `low`, `normal` (default), `voice-only`. `voice-only` optimises for spoken audio with noise reduction.
+
+### Playback before submission
+
+On mobile, the enumerator can play back the recorded clip before proceeding. This is enabled by default — there is no configuration needed.
+
+### Native recorder integration
+
+On Android and iOS, `audio` launches the device's native recording app. On web, it uses the browser's built-in MediaRecorder API.
+
+## Example usage
+
+### With maximum duration and hint
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| audio | story | Tell us about the incident in your own words | Speak clearly. Recording stops after 3 minutes. | `max-duration=180` |
+
+### Conditional audio — only if an issue was reported
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | issue_found | Was an issue found? | | |
+| audio | issue_audio | Record a description of the issue | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
 ## Best Practices
 
-1. Provide clear instructions on what to record and for how long.
-2. Consider privacy implications and inform respondents about how their audio will be used.
-3. Be mindful of file sizes and storage limitations, especially for surveys in areas with limited internet connectivity.
-4. Test the audio recording feature on various devices to ensure compatibility.
-
-## Example Usage
-
-Here's an example of how you might use an audio question in a survey:
-
-| type  | name           | label                                                | hint                                    |
-|-------|----------------|------------------------------------------------------|----------------------------------------|
-| audio | feedback_audio | Please record your feedback about the product        | Speak clearly for up to 60 seconds     |
-
-## rtSurvey Extensions
-
-While the basic XLSForm specification for audio questions is straightforward, rtSurvey may offer additional features or customizations:
-
-1. Maximum recording duration setting
-2. Audio quality options (e.g., low, medium, high)
-3. Playback functionality for review before submission
-4. Integration with device's native audio recording app
-
-(Note: The specific extensions available in rtSurvey for audio questions would need to be confirmed and detailed here.)
+1. State clearly in the `label` or `hint` what the enumerator should say and for how long.
+2. Use `max-duration` to prevent excessively large files in areas with slow upload speeds.
+3. Inform respondents before starting the recording — unexpected recording can raise privacy concerns.
+4. Test recording on the target device and network conditions before deployment.
+5. Set `quality=voice-only` for interview-style recordings to reduce file size without losing intelligibility.
 
 ## Limitations
 
-- Audio files can be large, which may impact data transfer and storage.
-- Not all devices may support audio recording capabilities.
-- Transcription of audio responses may be necessary for analysis, which can be time-consuming.
-- Privacy concerns may arise with the collection of voice data.
-
-## Data Handling
-
-Audio files collected through this question type are typically:
-
-1. Saved in a common audio format (e.g., MP3, WAV)
-2. Stored alongside other survey data
-3. Accessible for playback and analysis through the survey management platform
-
-## Considerations for Analysis
-
-When using audio questions, consider:
-
-1. How the audio data will be analyzed (e.g., manual transcription, automated speech-to-text)
-2. The additional time and resources needed for processing audio responses
-3. Privacy and data protection measures for storing and handling voice recordings
-
+- Audio files can be large (a 2-minute recording at normal quality is ~2–4 MB) — factor this into your data plan and upload time estimates.
+- Not all browsers support the MediaRecorder API — Chrome and Firefox work reliably; Safari on older iOS versions may have issues.
+- Transcription of audio responses requires additional post-processing (manual or automated speech-to-text).
+- Privacy regulations may restrict recording voices — verify local data protection requirements.

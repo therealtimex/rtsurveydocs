@@ -1,6 +1,6 @@
 ---
 title: "File"
-description: "File questions allow respondents to upload files as part of their survey responses."
+description: "File questions allow respondents to upload documents and other files as part of their survey responses."
 icon: "upload_file"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,72 +9,97 @@ toc: true
 weight: 230
 ---
 
-The file question type in XLSForms and rtSurvey enables respondents to upload files as part of their survey responses. This feature is particularly useful for collecting documents, images, or other file types relevant to the survey.
+The `file` question type allows respondents to **upload any file** from their device — documents, spreadsheets, PDFs, or other file types. Unlike `image`, `audio`, and `video` which launch specific capture tools, `file` opens a general-purpose file picker.
 
 ## Basic XLSForm Specification
 
-| type | name      | label                       |
-|------|-----------|----------------------------|
-| file | document  | Please upload your document |
+| type | name      | label                        |
+|------|-----------|------------------------------|
+| file | document  | Please upload your document  |
 
-For more details on the basic file question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+For more details on the standard file question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
 ## Uses
 
 File questions are commonly used for:
 
-1. Collecting supporting documents (e.g., receipts, certificates)
-2. Gathering visual evidence (e.g., photos of field conditions)
-3. Uploading completed forms or spreadsheets
-4. Collecting any type of digital file relevant to the survey
+1. Collecting supporting documents (receipts, certificates, contracts, reports)
+2. Uploading completed paper forms that were scanned
+3. Gathering spreadsheets or data exports from other systems
+4. Any digital file type that image/audio/video does not cover
+
+## Data format
+
+Uploaded files are stored as binary attachments:
+
+- **Format:** Preserved in original format (PDF, XLSX, DOCX, etc.)
+- **Naming:** `{instanceID}-{fieldname}.{extension}`
+- **Storage:** Uploaded to the server media folder alongside the submission
+- **Access:** Downloadable from the submission management interface
+
+## rtSurvey extensions
+
+### Accepted file types
+
+Use the `parameters` column to restrict which file types can be selected:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| file | report | Upload the inspection report | `accept=.pdf` |
+| file | spreadsheet | Upload the data file | `accept=.xlsx,.csv` |
+
+The `accept` parameter uses standard file extension syntax (comma-separated).
+
+### File size guidance
+
+rtSurvey does not enforce a hard file-size limit at the question level, but the server upload limit applies. Use `hint` to communicate expectations to the enumerator:
+
+| type | name | label | hint |
+|------|------|-------|------|
+| file | receipt | Upload the payment receipt | Accepted: PDF or image. Maximum file size: 5 MB |
+
+### Integration with device file system and cloud storage
+
+On Android and iOS, the `file` question opens the device's native file picker, which may include access to:
+- Local device storage
+- SD card (Android)
+- iCloud Drive (iOS)
+- Google Drive, Dropbox (if installed)
+
+On web, it opens the browser's standard file upload dialog.
+
+## Example usage
+
+### Required PDF upload
+
+| type | name | label | hint | required | required_message |
+|------|------|-------|------|----------|-----------------|
+| file | signed_consent | Upload the signed consent form | PDF only, max 2MB | yes | A consent form is required |
+
+### Conditional document upload
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_land_title | Does the household have a land title? | |
+| file | land_title_doc | Upload a photo or scan of the land title | `${has_land_title} = 'yes'` |
 
 ## Best Practices
 
-1. Provide clear instructions on what type of file to upload and any size limitations.
-2. Consider privacy implications and inform respondents about how their files will be used and stored.
-3. Be mindful of file sizes and storage limitations, especially for surveys in areas with limited internet connectivity.
-4. Specify accepted file formats if necessary.
+1. Use `accept` to restrict file types — this prevents enumerators from accidentally uploading wrong files.
+2. Always include size and format guidance in the `hint` column.
+3. For photos and images, use the `image` type instead — it offers better compression and consistent format handling.
+4. For large surveys with file attachments, plan your data storage and download bandwidth accordingly.
+5. Test the file picker on the target device type (Android vs. iOS vs. web) before deployment — access to cloud drives varies.
 
-## Example Usage
+## Data handling considerations
 
-Here's an example of how you might use a file question in a survey:
-
-| type | name           | label                                      | hint                                        |
-|------|----------------|--------------------------------------------|--------------------------------------------|
-| file | receipt_upload | Please upload a photo of your receipt      | Accepted formats: JPG, PNG. Max size: 5MB   |
-
-## rtSurvey Extensions
-
-While the basic XLSForm specification for file questions is straightforward, rtSurvey may offer additional features or customizations:
-
-1. File type restrictions (e.g., only images, only PDFs)
-2. File size limitations
-3. Multiple file upload capability
-4. Integration with device's file system or cloud storage services
-
-(Note: The specific extensions available in rtSurvey for file questions would need to be confirmed and detailed here.)
-
-## Data Handling
-
-Files collected through this question type are typically:
-
-1. Saved in their original format
-2. Stored alongside other survey data, often in a separate media folder
-3. Accessible for download and analysis through the survey management platform
-
-## Considerations for Analysis
-
-When using file questions, consider:
-
-1. How the uploaded files will be processed and analyzed
-2. The additional storage space required for file attachments
-3. Privacy and data protection measures for storing and handling uploaded files
-4. Potential need for specialized software to open or analyze certain file types
+- Files are stored in their original format; they are not converted or compressed by rtSurvey.
+- Analyse files after download — rtSurvey does not extract or index file contents.
+- Large file attachments significantly increase the time required to download a full dataset.
 
 ## Limitations
 
-- Large files can significantly impact data transfer and storage requirements.
-- Not all devices may have easy access to files for uploading.
-- Analyzing file attachments can be more time-consuming than text-based responses.
-- There may be compatibility issues with certain file types across different systems.
-
+- File questions do not validate file contents — only the file extension check via `accept` is enforced at the UI level.
+- Very large files (100 MB+) may time out on upload in low-connectivity environments.
+- Offline enumerators can attach files but they will not upload until connectivity is restored.
+- Some device configurations restrict access to certain storage locations (e.g., corporate MDM policies).
