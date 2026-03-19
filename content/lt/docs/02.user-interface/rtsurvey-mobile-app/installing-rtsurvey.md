@@ -1,6 +1,6 @@
 ---
 title: "rtSurvey diegimas"
-description: "Sužinokite, kaip atsisiųsti ir įdiegti rtSurvey mobilią programą „Android" ir „iOS" įrenginiuose, su žingsnis po žingsnio instrukcijomis ir trikčių šalinimo patarimais sklandžiam sąrankos procesui"
+description: "Sužinokite, kaip atsisiųsti ir įdiegti rtSurvey mobilią programą „Android\" ir „iOS\" įrenginiuose, su žingsnis po žingsnio instrukcijomis ir trikčių šalinimo patarimais sklandžiam sąrankos procesui"
 icon: "get_app"
 date: "2023-05-22T00:34:57+01:00"
 lastmod: "2023-05-22T00:34:57+01:00"

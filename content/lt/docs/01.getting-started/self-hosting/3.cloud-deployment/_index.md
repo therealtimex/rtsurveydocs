@@ -7,7 +7,7 @@ draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "Diekite rtCloud pas pagrindinius debesijos teikėjus naudodami automatizuotus scenarijus „DigitalOcean", AWS EC2, „Google Cloud" ir Linode."
+description: "Diekite rtCloud pas pagrindinius debesijos teikėjus naudodami automatizuotus scenarijus „DigitalOcean\", AWS EC2, „Google Cloud\" ir Linode."
 ---
 
 Diegimo saugykloje yra automatizuoti parengimo scenarijai pagrindiniams debesijos teikėjams. Kiekvienas scenarijus veikia pirmą kartą paleidžiant naują **Ubuntu 22.04 LTS** serverį ir atlieka visiškai neprižiūrimą sąranką:
