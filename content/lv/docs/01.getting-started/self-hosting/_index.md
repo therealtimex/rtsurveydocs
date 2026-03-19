@@ -1,0 +1,75 @@
+---
+weight: 115
+title: "Pašmitināšana"
+date: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-03-12T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+icon: "dns"
+toc: true
+description: "Izvietojiet un pārvaldiet savu rtCloud instanci, izmantojot Docker. Pilnīga kontrole pār jūsu datiem, infrastruktūru un konfigurāciju."
+---
+
+Palaidiet rtCloud savā infrastruktūrā, izmantojot Docker Compose. Pašmitināšana sniedz pilnīgu jūsu datu, tīkla un izvietošanas vides īpašumtiesības — ideāli piemērota organizācijām ar datu atrašanās vietas prasībām, gaisa spraugas tīkliem vai pielāgotas infrastruktūras vajadzībām.
+
+## Kas ir rtCloud pašmitināšana?
+
+rtCloud pašmitināšana ir oficiāls Docker attēls, kas iepako visu rtCloud platformu pārvietojamā konteineru stekā, ko varat palaist jebkurā Linux serverī. Steks ietver:
+
+| Pakalpojums | Apraksts |
+|---------|-------------|
+| **rtCloud lietotne** | Apache 2.4 + PHP 7.4 tīmekļa lietojumprogramma ar iebūvētu fona rindu (Beanstalkd), analītikas serveri (Shiny) un plānotajiem uzdevumiem |
+| **MySQL 8.0** | Relāciju datu bāze visiem lietojumprogrammas un aptaujas datiem |
+| **Keycloak** *(neobligāts)* | Iebūvēts vienas pieteikšanās serveris uzņēmumu identitātes pārvaldībai |
+
+## Kad izmantot pašmitināšanu
+
+Pašmitināšana ir pareizā izvēle, ja:
+
+- Nepieciešama **datu suverenitāte** — visi dati paliek jūsu infrastruktūrā
+- Darbojaties **gaisa spraugā vai ierobežotā tīklā** bez piekļuves ārējam mākonim
+- Ir **atbilstības prasības** (VDAR, HIPAA, valdības datu politikas), kas nosaka vietējo glabāšanu
+- Nepieciešama integrācija ar **iekšējo identitātes nodrošinātāju** (Active Directory, LDAP, SAML)
+- Vēlaties **pielāgot resursus** — CPU, RAM un krātuves piešķīrumu pēc saviem noteikumiem
+
+## Šajā sadaļā
+
+| Lapa | Apraksts |
+|------|-------------|
+| [Ātrā sākšana](quick-start) | Palaidiet rtCloud serverī mazāk nekā 10 minūtēs |
+| [Konfigurācijas uzziņa](configuration) | Pilns visu vides mainīgo saraksts un to noklusējumi |
+| [Mākoņa izvietošana](cloud-deployment) | Vienas klikšķa automatizēti skripti DigitalOcean, AWS, GCP un Linode |
+| [SSO autentifikācija](sso-authentication) | Konfigurējiet Keycloak, ārējo OIDC vai Azure AD |
+| [Apkope](maintenance) | Jaunināšana, dublēšana, atjaunošana un problēmu novēršana jūsu instancē |
+
+## Arhitektūras pārskats
+
+Izvietošana darbojas kā Docker konteineru kopums, savienots iekšējā tīklā:
+
+```
+┌────────────────────────────────────────┐
+│            rtcloud-app                 │
+│  Apache 2.4 (ports 80)                 │
+│  PHP 7.4 lietojumprogramma             │
+│  Beanstalkd rinda (iekšēja)            │
+│  Shiny Server (ports 3838)             │
+│  Cron plānotājs                        │
+└─────────────────┬──────────────────────┘
+                  │ rtcloud-net (tilts)
+┌─────────────────▼──────────────────────┐
+│            rtcloud-mysql               │
+│  MySQL 8.0 (ports 3306, tikai iekšēji) │
+└────────────────────────────────────────┘
+```
+
+Kad SSO ir iespējots, darbojas trešais konteiners:
+
+```
+┌─────────────────────────────────────────┐
+│            rtcloud-keycloak             │
+│  Keycloak (ports 8080, tikai iekšēji)   │
+│  Administratora UI (ports 9000, iekšēji)│
+└─────────────────────────────────────────┘
+```
+
+Visi konteineri komunicē izolētā Docker tilta tīklā. Tikai tīmekļa lietojumprogrammas ports un (pēc izvēles) Shiny analītikas ports ir redzami saimniekdatoram.

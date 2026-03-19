@@ -1,0 +1,40 @@
+---
+title: "Beküldések kezelése"
+description: "Nyers adatbevitelek és beküldések felülvizsgálata, kezelése és exportálása."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 317
+---
+
+A **Beküldések kezelése** modul (az Űrlapcsalád szakasz **Adatnézet** gombjával érhető el) lehetővé teszi a projektmenedzserek és felügyelők számára a beérkező nyers adatokkal való közvetlen interakciót. Egységesített munkaterületként szolgál a kérdezőbiztos-beküldések felülvizsgálatához, az eszközazonosítók nyomon követéséhez és az adatminőségi műveletek végrehajtásához.
+
+![Beküldéskezelő felület](/images/manage_submissions.png)
+
+## Adatok áttekintése és oszlopok
+
+Az adatrács dinamikusan jeleníti meg az adott űrlaphoz gyűjtött adatokat. Két fő módban működik: **Hivatalos** (véglegesített rekordok) és **Munkában lévő** (valós idejű, nem véglegesített rekordok).
+
+### Főbb adatoszlopok
+
+Az űrlapban meghatározott egyéni kérdésektől függetlenül a rács számos szabványos metaadat-oszlopot tartalmaz az auditálás segítésére:
+
+- **Beküldte:** Azonosítja a beküldés forrásplatformját (pl. FA terepen lévő alkalmazáshoz, WEB webes űrlaphoz, RS távoli rendszerekhez).
+- **Részletek:** Megnyit egy fókuszált, egyrekordos nézetet (keresési ikon), amellyel megvizsgálható az adott példányhoz beküldött minden változó és válasz.
+- **iJegyzet:** Lehetővé teszi a felügyelők számára, hogy oldalmegjegyzéseket vagy belső megjegyzéseket csatoljanak egy adott rekordhoz az összegyűjtött adatok megváltoztatása nélkül (ceruza ikonnal jelölve).
+- **Dátummezők:** Időbélyegek, amelyek jelzik, mikor indult, fejeződött be vagy szinkronizálódott a rekord.
+- **Médiamellékletek:** Közvetlen bélyegkép-hivatkozások a felmérés során összegyűjtött képekhez, aláírásokhoz vagy fájlokhoz.
+- **Ismétlési csoportok:** Dedikált hivatkozások a szülőűrlapon belüli ismétlődő kérdések beágyazott tábláihoz való hozzáféréshez.
+
+## Beküldési műveletek
+
+Az aktív adatminőség-ellenőrzés megkönnyítése érdekében a felület legördülő menüt biztosít a kiválasztott rekordokon végrehajtható parancsokkal:
+
+- **Új példány létrehozása:** Lehetővé teszi a rendszergazdák számára, hogy manuálisan vigyenek be egy új felmérési rekordot közvetlenül az adatbázisba.
+- **Példány visszaküldése:** Elutasítja a beküldött rekordot, és megkéri a kérdezőbiztost az információk újbóli ellenőrzésére vagy gyűjtésére.
+- **Példány nyomon követése:** Megjelöl egy rekordot további figyelemre, általában riasztást küld a terepi csapatnak pontosításért.
+- **Exportálás visszaküldési parancsfájlba / Nyomon követési parancscsomag:** Kötegelt exportokat (fájlokat) generál, amelyek kifejezetten visszaküldésre vagy nyomon követésre jelölt adatkészleteket tartalmaznak.
+- **Konvertálás XML-be:** Az strukturált adatkészletet visszaalakítja nyers XML-formátumba háttérelemzés vagy rendszerintegráció céljából.
+- **Példányok továbbítása:** (Csak *Munkában lévő* módban elérhető) Azonnali nem véglegesített adatot küld egy másik eszközre vagy felhasználónak.
+- **Törlés:** Véglegesen eltávolítja a kiválasztott példányokat az adatbázisból.

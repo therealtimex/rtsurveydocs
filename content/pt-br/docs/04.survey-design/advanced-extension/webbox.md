@@ -1,0 +1,109 @@
+---
+title: "Webbox"
+description: "O Webbox incorpora uma página web externa dentro da pesquisa como um iframe modal, permitindo que os entrevistadores visualizem referências ou interajam com ferramentas externas sem sair do formulário."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 299
+---
+
+O **Webbox** incorpora uma página web externa dentro da pesquisa como um **popup modal** (iframe). O entrevistador toca um botão no rótulo ou texto de nota, a página abre em uma sobreposição em tela cheia dentro do formulário e, quando ele fecha, retorna exatamente de onde estava. Isso permite exibir material de referência, mapas, painéis ou ferramentas personalizadas sem abrir uma aba separada do navegador.
+
+---
+
+## Sintaxe
+
+Insira uma tag HTML `<webbox>` diretamente em uma coluna `label` de `label` ou `note`:
+
+```html
+<webbox src='https://example.com/reference' title='Guia de Referência'>Abrir Guia de Referência</webbox>
+```
+
+| Atributo | Descrição |
+|----------|-----------|
+| `src` | A URL a carregar no iframe. Suporta aspas simples e duplas. |
+| `title` | Texto exibido na barra de cabeçalho do modal. Suporta texto simples. |
+| *(conteúdo)* | O rótulo do botão clicável mostrado no campo da pesquisa |
+
+---
+
+## Exemplo básico
+
+| type | name | label |
+|------|------|-------|
+| note | ref_guide | `<webbox src='https://docs.example.com/field-guide' title='Guia de Campo'>📖 Abrir Guia de Campo</webbox>` |
+
+Isso renderiza um botão com o rótulo "📖 Abrir Guia de Campo". Quando tocado, um modal abre exibindo o site do guia de campo.
+
+---
+
+## Incorporando um mapa
+
+| type | name | label |
+|------|------|-------|
+| note | area_map | `<webbox src='https://maps.example.com/survey-area' title='Mapa da Área de Pesquisa'>🗺 Ver Mapa</webbox>` |
+
+---
+
+## Passando valores de formulário para a página incorporada
+
+Anexe valores de campos do formulário à URL usando `concat()` na coluna `calculation` e referencie o resultado no rótulo:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | webbox_url | | `concat('https://dashboard.example.com/household?id=', ${household_id})` |
+| note | hh_dash | `<webbox src='${webbox_url}' title='Painel do Domicílio'>Abrir Painel</webbox>` |
+
+{{% alert icon=" " context="warning" %}}
+O atributo `src` na tag `<webbox>` suporta referências `${fieldname}` quando o rótulo é calculado a partir de um campo `calculate`. Construa a URL completa em um campo `calculate` e referencie-a.
+{{% /alert %}}
+
+---
+
+## Interação com repetição: botões de exclusão
+
+O Webbox também suporta tags de ação especiais para gerenciar grupos de repetição dentro de rótulos:
+
+```html
+<delete-repeat-current>Remover esta linha</delete-repeat-current>
+<delete-repeat-last>Remover última linha</delete-repeat-last>
+```
+
+Esses renderizam como botões que excluem instâncias de repetição quando tocados. Coloque-os em um campo `note` dentro (ou logo após) do grupo de repetição:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | items | Item |
+| text | item_name | Nome do item |
+| note | delete_btn | `<delete-repeat-current>✕ Remover este item</delete-repeat-current>` |
+| end_repeat | | |
+
+---
+
+## Comunicação com a página incorporada (postMessage)
+
+O iframe webbox e o formulário pai podem se comunicar usando a API `postMessage` do navegador. O pai envia uma mensagem `init` ao iframe quando ele abre. A página incorporada pode responder com:
+
+- `delete-repeat-current` — aciona a exclusão da instância de repetição atual
+- `delete-repeat-last` — aciona a exclusão da última instância de repetição
+
+Isso permite que ferramentas web personalizadas (por exemplo, ferramentas de desenho, mapas interativos) acionem ações do formulário quando o usuário confirma uma ação dentro do iframe.
+
+---
+
+## Práticas recomendadas
+
+1. Use o webbox para **material de referência** (diretrizes, tabelas de consulta, mapas) — não para coletar dados que devem estar no formulário em si.
+2. Garanta que a URL incorporada esteja acessível na rede do dispositivo — o webbox requer conectividade.
+3. Mantenha a página incorporada compatível com dispositivos móveis — o modal tem no máximo 800px de largura e 80% da altura da janela de visualização.
+4. Use texto de botão descritivo (por exemplo, "Ver Mapa da Aldeia") em vez de rótulos genéricos ("Clique aqui").
+5. Informe os entrevistadores que fechar o modal os retorna à pesquisa — alguns usuários podem não saber como fechar uma sobreposição de iframe.
+
+## Limitações
+
+- O Webbox requer conectividade de rede para carregar a URL incorporada.
+- Alguns sites externos bloqueiam a incorporação em iframes via cabeçalhos `X-Frame-Options` ou `Content-Security-Policy` — esses sites não podem ser usados com o webbox.
+- O modal fecha quando o entrevistador navega para longe da pergunta — qualquer estado não salvo no iframe é perdido.
+- O Webbox é uma extensão do formulário web rtSurvey e pode não funcionar em outros clientes compatíveis com ODK.

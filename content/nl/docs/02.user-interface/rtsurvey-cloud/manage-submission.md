@@ -1,0 +1,40 @@
+---
+title: "Inzendingen beheren"
+description: "Ruwe gegevensvermeldingen en inzendingen bekijken, beheren en exporteren."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 317
+---
+
+De module **Inzendingen beheren** (toegankelijk via de knop **Gegevensweergave** in de sectie Formulierfamilie) stelt projectmanagers en supervisors in staat om rechtstreeks te werken met inkomende ruwe gegevens. Het fungeert als een uniforme werkruimte voor het bekijken van enquêteurinzendingen, het traceren van apparaatidentificatoren en het uitvoeren van gegevenskwaliteitsoperaties.
+
+![Interface Inzendingen beheren](/images/manage_submissions.png)
+
+## Gegevensoverzicht en kolommen
+
+Het gegevensraster toont dynamisch gegevens die zijn verzameld voor een specifiek formulier. Het werkt in twee hoofdmodi: **Officieel** (Definitieve records) en **Werkend** (Realtime, niet-definitieve records).
+
+### Belangrijkste gegevenskolommen
+
+Ongeacht de aangepaste vragen die zijn gedefinieerd in het formulier, bevat het raster verschillende standaard metagegevenskolommen om te helpen bij auditing:
+
+- **Ingediend door:** Identificeert het oorsprongsplatform van de inzending (bijv. FA voor veldapp, WEB voor webformulier, RS voor externe systemen).
+- **Detail:** Opent een gerichte weergave van één record (zoekpictogram) om elke variabele en elk antwoord dat voor die instantie is ingediend, te inspecteren.
+- **iOpmerking:** Stelt supervisors in staat om zijnotas of interne opmerkingen toe te voegen aan een specifiek record zonder de verzamelde gegevens zelf te wijzigen (weergegeven door een potloodpictogram).
+- **Datumvelden:** Tijdstempels die aangeven wanneer het record is gestart, voltooid of gesynchroniseerd.
+- **Mediabijlagen:** Directe miniatuurlinks naar afbeeldingen, handtekeningen of bestanden die zijn verzameld tijdens de enquête.
+- **Herhaalgroepen:** Toegewijde links om toegang te krijgen tot geneste tabellen voor herhaalde vragen binnen het bovenliggende formulier.
+
+## Inzendingsacties
+
+Om actieve gegevenskwaliteitscontrole te vergemakkelijken, biedt de interface een vervolgkeuzemenu van uitvoerbare opdrachten die kunnen worden uitgevoerd op geselecteerde records:
+
+- **Een nieuwe instantie aanmaken:** Stelt beheerders in staat om een nieuw enquêterecord handmatig rechtstreeks in de database in te voeren.
+- **Instantie retourneren:** Wijst het ingediende record af en geeft de enquêteur de opdracht om de informatie opnieuw te verifiëren of te verzamelen.
+- **Instantie opvolgen:** Markeert een record voor verdere aandacht, waarbij gewoonlijk een melding wordt gestuurd naar het veldteam ter verduidelijking.
+- **Exporteren naar Geretourneerde opdrachtenbestand / Opvolgingsopdrachtenspakket:** Genereert batchexports (bestanden) met datasets specifiek gemarkeerd voor retourzendingen of opvolgingen.
+- **Converteren naar XML:** Transformeert de gestructureerde dataset terug naar het ruwe XML-formaat voor backend-analyse of systeemintegratie.
+- **Instanties doorsturen:** (Beschikbaar in de *Werkende* modus) Duwt niet-definitieve gegevens onmiddellijk naar een ander apparaat of gebruiker.
+- **Verwijderen:** Verwijdert geselecteerde instanties permanent uit de database.

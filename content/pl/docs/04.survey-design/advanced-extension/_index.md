@@ -1,0 +1,89 @@
+---
+title: "Zaawansowane rozszerzenia"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 289
+---
+
+Kolumna `appearance` w rtSurvey umożliwia dostosowanie prezentacji wizualnej i zachowania pytań w ankietach. Funkcja ta poprawia doświadczenie użytkownika i może znacznie zwiększyć efektywność zbierania danych. rtSurvey obsługuje standardowe atrybuty wyglądu XLSForm i rozszerza je o dodatkowe opcje.
+
+## Rozszerzenia wyglądu specyficzne dla rtSurvey
+
+rtSurvey rozszerza standardowe opcje wyglądu o następujące:
+
+### Dostosowanie wprowadzania czasu
+
+Dla pytań typu `text` używanych do wprowadzania czasu:
+
+- `appearance:` — wyświetla zegar do wyboru godzin i minut
+- `appearance: inline` — wyświetla zegar jako ikonę
+- `appearance: inline-1line` — wyświetla zegar w formacie jednego wiersza
+- `appearance: inline-onlyresult` — wyświetla ikonę zegara, znika po wyborze
+- `appearance: inline-[FORMAT]` — dostosowuje wyświetlanie formatu czasu (np. `[%H:%M]`, `[%h:%M:%S]`)
+
+### Dostosowanie kolorów
+
+rtSurvey umożliwia dostosowanie kolorów dla różnych wygląd:
+
+- `appearance: inline colors("0099FF")` — dostosowuje kolor ikony
+- `appearance: inline-1line colors("0000FF","FFFF00")` — dostosowuje kolory w formacie jednego wiersza
+
+### Układ siatki
+
+rtSurvey wprowadza układ siatki dla zwartych, tabelarycznych wyświetlaczy:
+
+- `appearance: grid` — stosuje się do grup, aby utworzyć układ siatki
+
+### Zwijane grupy
+
+- `appearance: collapsible` — tworzy rozwijalne/zwijalne grupy
+
+## Najlepsze praktyki dotyczące używania wyglądu
+
+1. **Spójność**: Używaj atrybutów wyglądu konsekwentnie w całej ankiecie dla jednolitego wyglądu.
+2. **Mobilne a web**: Rozważ, jak wyglądy będą renderować się na różnych urządzeniach i platformach.
+3. **Wydajność**: Zachowaj ostrożność w przypadku atrybutów wyglądu, które mogą spowolnić ładowanie formularza (np. `table-list` dla dużych grup).
+4. **Doświadczenie użytkownika**: Wybieraj wyglądy, które ułatwiają wprowadzanie danych i są bardziej intuicyjne dla respondentów.
+5. **Testowanie**: Zawsze testuj formularz na docelowych urządzeniach, aby upewnić się, że wyglądy działają zgodnie z oczekiwaniami.
+
+## Zaawansowane techniki
+
+### Łączenie wygląd
+
+Niektóre atrybuty wyglądu można łączyć dla bardziej złożonych układów:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Wybierz jeden: | minimal compact |
+```
+
+### Dynamiczne wyglądy
+
+rtSurvey umożliwia dynamiczne zmiany wyglądu na podstawie logiki formularza:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Wprowadź godzinę: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Zagadnienia dotyczące aplikacji mobilnej
+
+- Niektóre wyglądy (np. `quick`, `signature`) są specyficzne dla urządzeń mobilnych.
+- Dokładnie testuj zarówno na Androidzie, jak i iOS, aby zapewnić spójne zachowanie.
+
+## Znane ograniczenia
+
+- Złożone wyglądy mogą nie renderować się identycznie na wszystkich platformach.
+- Niektóre zaawansowane wyglądy rtSurvey mogą nie być obsługiwane w trybie offline.
+
+## Rozwiązywanie problemów z wyglądem
+
+1. **Wygląd nie jest stosowany**: Sprawdź literówki w kolumnie appearance.
+2. **Niespójne renderowanie**: Zweryfikuj kompatybilność z typem pytania i platformą.
+3. **Problemy z wydajnością**: Rozważ uproszczenie złożonych wygląd, szczególnie w przypadku dużych ankiet.

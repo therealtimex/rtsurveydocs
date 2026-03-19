@@ -1,0 +1,56 @@
+---
+title: "Advanced Extensions"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 289
+---
+
+column `appearance` ក្នុង rtSurvey អនុញ្ញាតឱ្យ customize ការ បង្ហាញ ដោយ ភ្នែក ។
+
+## rtSurvey-Specific Appearance Extensions
+
+### Time Input Customization
+
+- `appearance:` — បង្ហាញ clock ។
+- `appearance: inline` — បង្ហាញ clock ជា icon ។
+- `appearance: inline-1line` — បង្ហាញ clock single row ។
+
+### Color Customization
+
+- `appearance: inline colors("0099FF")` — customize icon color ។
+
+### Grid Layout
+
+- `appearance: grid` — អនុវត្ត ទៅ groups ។
+
+### Collapsible Groups
+
+- `appearance: collapsible` — expandable/collapsible groups ។
+
+## Best Practices
+
+1. **ភាព Consistent**: ប្រើ appearance attributes ដោយ consistent ។
+2. **Mobile vs. Web**: ពិ ចារ ណា ការ render ។
+3. **Testing**: Test form ជ ា ន ិ ច ្ ច ។
+
+## Advanced Techniques
+
+### Combining Appearances
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Select one: | minimal compact |
+```
+
+### Dynamic Appearances
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Enter time: | inline-[%H:%M] | ${show_time} = 'yes' |
+```

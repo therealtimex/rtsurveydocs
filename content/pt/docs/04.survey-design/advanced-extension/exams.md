@@ -1,0 +1,121 @@
+---
+title: "Exams"
+description: "A funcionalidade de exame adiciona um modo de quiz cronometrado a um inquérito, com feedback de áudio opcional para respostas corretas e incorretas."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 298
+---
+
+A funcionalidade **Exame** transforma um inquérito num quiz cronometrado. Um temporizador de contagem regressiva é exibido ao respondente, e o inquérito regista quanto tempo resta quando termina. Opcionalmente, sons de áudio podem tocar para respostas corretas e incorretas.
+
+Isto é útil para avaliações de conhecimento, testes de literacia, verificações de competência de pessoal de campo e qualquer inquérito onde o tempo na tarefa seja dados significativos.
+
+---
+
+## Função `check-exam()`
+
+Configure o exame usando `check-exam()` na coluna **`calculation`** de um campo `calculate` colocado no início do formulário:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Parâmetros
+
+| # | Parâmetro | Descrição |
+|---|-----------|-----------|
+| 1 | `examTime` | Duração total do exame em segundos |
+| 2 | `questionToStoreRemainingTime` | O `name` de um campo `calculate` ou `integer` que armazenará o tempo restante quando o exame terminar |
+| 3 | `rightSound` | *(Opcional)* Nome do ficheiro de áudio a tocar quando uma resposta correta é dada (anexe ao formulário como ficheiro de media) |
+| 4 | `wrongSound` | *(Opcional)* Nome do ficheiro de áudio a tocar quando uma resposta incorreta é dada |
+| 5 | `excludeQuestion` | *(Opcional)* Lista separada por vírgulas de nomes de campos a excluir do temporizador do exame (por ex., `'intro_note,consent'`) |
+
+---
+
+## Configuração básica
+
+### Passo 1: Adicionar campos do exame
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` aciona o temporizador de 600 segundos (10 minutos). `remaining_time` é preenchido automaticamente quando o respondente termina.
+
+### Passo 2: Adicionar as suas perguntas
+
+O temporizador do exame cobre todas as perguntas do formulário exceto as listadas em `excludeQuestion`.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | A capital do Quénia é Nairobi. Verdadeiro ou falso? |
+| select_one choices | q2 | Que órgão bombeia sangue pelo corpo? |
+| select_one choices | q3 | A água ferve a 100°C ao nível do mar. Verdadeiro ou falso? |
+
+### Passo 3: Armazenar o tempo restante
+
+O campo nomeado no parâmetro 2 (`remaining_time`) é automaticamente definido com o número de segundos restantes quando o respondente submete. Um valor de `0` significa que o tempo esgotou; um valor alto significa que terminaram rapidamente.
+
+---
+
+## Com feedback de áudio
+
+Anexe ficheiros de som ao formulário (como anexos de media) e referencie-os:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` toca quando o respondente seleciona a resposta correta
+- `wrong.mp3` toca quando o respondente seleciona uma resposta errada
+
+{{% alert icon=" " context="warning" %}}
+Os ficheiros de som devem ser anexados ao formulário como ficheiros de media e o nome do ficheiro deve corresponder exatamente (sensível a maiúsculas e minúsculas) incluindo a extensão.
+{{% /alert %}}
+
+---
+
+## Excluir perguntas do temporizador
+
+Passe uma lista separada por vírgulas de nomes de campos a excluir do exame (por ex., notas introdutórias ou perguntas de consentimento):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+Deixe `rightSound` e `wrongSound` como cadeias vazias `''` se não precisar de áudio mas precisar de exclusões.
+
+---
+
+## Exemplo completo
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | Bem-vindo à avaliação de conhecimentos de saúde. Tem 5 minutos para responder a todas as perguntas. | |
+| trigger | start_ack | Toque em OK quando estiver pronto para começar. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | A lavagem das mãos previne a propagação de doenças. | |
+| select_one yesno | q2 | Deve beber pelo menos 2 litros de água por dia. | |
+| select_one yesno | q3 | A malária é causada por um vírus. | |
+
+---
+
+## Melhores Práticas
+
+1. Informe sempre os respondentes sobre o limite de tempo antes de começar — use uma `note` ou `trigger` antes do campo `check-exam()`.
+2. Exclua notas de introdução e perguntas de consentimento do temporizador usando o parâmetro `excludeQuestion`.
+3. Use `remaining_time` num cálculo de seguimento para detetar tempos esgotados: `if(${remaining_time} = 0, 'Tempo esgotado', 'Concluído')`.
+4. Mantenha o número de perguntas proporcional ao tempo permitido — 2–3 minutos por pergunta é uma base razoável para a maioria das avaliações de conhecimento.
+5. Teste com ficheiros de áudio no dispositivo real antes da implementação — a reprodução de áudio varia entre versões de Android e navegadores.
+
+## Limitações
+
+- O temporizador é apenas de exibição — o formulário não é submetido automaticamente quando o tempo esgota; o respondente deve ainda submeter manualmente.
+- O feedback de áudio requer que o volume do dispositivo esteja ativado e não silenciado.
+- A funcionalidade de exame é uma extensão do rtSurvey e não faz parte da especificação XLSForm padrão.

@@ -1,0 +1,60 @@
+---
+title: "Odwoływanie się do wartości"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 291
+---
+
+Składnia `${nazwa_pola}` jest używana do odwołania się do bieżącej wartości innego pola w formularzu. Może reprezentować wartość, która została wprowadzona, wybrana lub obliczona i będzie wyświetlana dokładnie tak, jak pojawia się w przesłanych danych.
+
+Przykład:
+Jeśli masz pole o nazwie „age" i chcesz pobrać dokładną wartość wprowadzoną w tym polu, możesz użyć `${age}`.
+
+W przypadku ograniczeń symbol „." jest używany do odwołania się do proponowanego wpisu lub wyboru użytkownika dla bieżącego pola. Pozwala to stosować warunki lub limity na podstawie wartości, którą użytkownik wprowadza lub wybiera w danym momencie.
+
+Przykład:
+Jeśli chcesz sprawdzić, czy proponowana wartość dla bieżącego pola jest mniejsza niż 3, możesz użyć ograniczenia `. < 3`.
+
+---
+
+## `..` — Odwołanie do grupy nadrzędnej
+
+Wewnątrz grupy lub grupy powtórzeń, `..` odnosi się do **kontekstu nadrzędnego**. Jest to rzadko potrzebne w praktyce, ale używane w zaawansowanych wyrażeniach XPath do nawigacji po hierarchii formularza.
+
+---
+
+## Gdzie używane są odwołania
+
+| Kolumna | Typ odwołania | Przykład |
+|--------|---------------|---------|
+| `relevant` | `${nazwa_pola}` | `${consent} = 'yes'` |
+| `constraint` | `.` dla bieżącego pola, `${nazwa_pola}` dla innych | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${nazwa_pola}` | `${adults} + ${children}` |
+| `required` | `${nazwa_pola}` | `${has_income} = 'yes'` |
+| `default` | `${nazwa_pola}` | `${previous_answer}` |
+| `label` | `${nazwa_pola}` w tekście | `"Twój wiek to ${age} lat"` |
+| `choice_filter` | Nazwa kolumny (bez `${}`) | `district = ${district}` |
+
+{{% alert icon=" " context="warning" %}}
+W kolumnie `choice_filter` odwołuj się bezpośrednio do **nazw kolumn wyboru** (bez `${}`), a do **pól formularza** używając `${}`. Mylenie tych dwóch jest częstym źródłem błędów.
+{{% /alert %}}
+
+---
+
+## Sprawdzanie pustych wartości
+
+Sprawdź, czy pole zostało wypełnione:
+
+```
+${nazwa_pola} != ''       (pole nie jest puste)
+${nazwa_pola} = ''        (pole jest puste)
+```
+
+Dla liczb sprawdź też:
+```
+${age} > 0               (wiek ma wartość dodatnią — domyślnie niepuste w kontekście numerycznym)
+```

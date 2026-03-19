@@ -1,0 +1,145 @@
+---
+title: "HTML 樣式"
+description: "rtSurvey 在標籤和提示中支援 HTML 標籤，允許富文字格式、連結和動態顏色主題。"
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 297
+---
+
+rtSurvey 在網頁表單上將**標籤**和**提示**文字呈現為 HTML。這意味著您可以使用標準 HTML 標籤來格式化文字、添加換行符、創建連結並應用顏色。這對備注字段、章節說明和動態摘要特別有用。
+
+{{% alert icon=" " context="warning" %}}
+標籤中的 HTML 在**網頁表單**和 rtSurvey 行動應用程式上呈現。它在所有 ODK 兼容客戶端中可能無法呈現。始終在您的目標平台上進行測試。
+{{% /alert %}}
+
+---
+
+## 支援的 HTML 標籤
+
+### 文字格式
+
+| 標籤 | 結果 |
+|-----|--------|
+| `<strong>text</strong>` 或 `<b>text</b>` | **粗體文字** |
+| `<em>text</em>` 或 `<i>text</i>` | *斜體文字* |
+| `<u>text</u>` | 底線文字 |
+| `<br>` | 換行 |
+| `<span style="...">text</span>` | 內聯樣式 |
+
+### 連結
+
+```html
+<a href="https://example.com" target="_blank">點擊這裡</a>
+```
+
+在新標籤頁中打開。用於調查員應查閱的參考文件、指南或外部資源。
+
+### 顏色
+
+使用帶內聯樣式的 `<span>`：
+
+```html
+<span style="color: red;">警告：值超出範圍</span>
+<span style="color: #009688;">章節已完成</span>
+```
+
+---
+
+## 顏色主題變數
+
+rtSurvey 支援適應應用程式配置主題的**顏色主題符號**。使用 `__COLOR_THEME_NAME__` 語法：
+
+```html
+<span style="color: var(--color-theme-primary);">主色文字</span>
+```
+
+或在標籤文字中使用符號簡寫：
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">重要備注</font>
+```
+
+這在呈現時自動轉換為帶有 CSS 變數的等效 `<span>`。
+
+---
+
+## 多語言標籤
+
+將內容包裹在語言標籤中以在單個標籤單元格中支援多種語言：
+
+```
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey 提取符合當前應用程式語言的內容。如果找不到匹配的語言標籤，則按原樣顯示完整字串。
+
+---
+
+## 備注字段中的範例
+
+### 帶粗體和換行的章節說明
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>第 3 章節：土地使用</strong><br>此章節中的所有問題僅向戶主提問。` |
+
+### 帶計算引用的動態摘要
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `家庭成員總數：<strong>${total}</strong><br><span style="color: gray;">成年人：${adults} · 兒童：${children}</span>` |
+
+### 紅色警告
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>警告：</strong>輸入的年齡（${age}）異常高。請核實。</span>` | `${age} > 100` |
+
+### 連結到參考文件
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `開始此章節前請參閱<a href="https://docs.example.com/guidelines" target="_blank">現場指南</a>。` |
+
+---
+
+## 特殊 rtSurvey HTML 標籤
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+嵌入一個在表單內模態框中打開 URL 的按鈕。有關完整詳細資訊，請參閱 [Webbox](webbox)。
+
+### `<delete-repeat-current>label</delete-repeat-current>`
+
+在重複群組內呈現一個按鈕，點擊時刪除當前重複實例。
+
+### `<delete-repeat-last>label</delete-repeat-last>`
+
+呈現一個刪除最後一個重複實例的按鈕。
+
+在重複群組中的使用範例：
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>移除此成員</delete-repeat-current>` |
+
+---
+
+## 最佳實踐
+
+1. 謹慎使用 HTML——過度格式化的標籤更難閱讀，而不是更容易。
+2. 優先使用 `<strong>` 表示粗體，`<em>` 表示斜體，而非已棄用的 `<b>` 和 `<i>`。
+3. 保持顏色使用有意義——使用紅色表示警告，而非裝飾。
+4. 始終在行動應用程式和網頁表單上測試 HTML 呈現，因為呈現可能略有不同。
+5. 避免在標籤內使用 `<table>` 標籤——它們在行動螢幕上很少能良好呈現。
+6. 不要使用 JavaScript（`<script>`）——它將被去除或導致錯誤。
+
+## 限制
+
+- 不支援複雜的 HTML（表格、表單、腳本），可能會破壞呈現。
+- 某些較舊的行動客戶端可能將 HTML 標籤顯示為字面文字——在所有目標裝置上進行測試。
+- `<a>` 連結在瀏覽器或 WebView 中打開——調查員離開表單，這在行動裝置上可能造成干擾。

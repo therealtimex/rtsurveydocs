@@ -1,0 +1,40 @@
+---
+title: "Upravljanje slanjima"
+description: "Pregled, upravljanje i izvoz sirovih unosa podataka i slanja."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 317
+---
+
+Modul **Upravljanje slanjima** (pristupa se putem dugmeta **Prikaz podataka** u odeljku Porodica formulara) omogućava menadžerima projekata i supervizorima da direktno interaguju sa dolaznim sirovim podacima. Služi kao objedinjen radni prostor za pregled slanja anketara, praćenje identifikatora uređaja i obavljanje operacija kvaliteta podataka.
+
+![Interfejs za upravljanje slanjima](/images/manage_submissions.png)
+
+## Pregled podataka i kolone
+
+Mreža podataka dinamički prikazuje podatke prikupljene za određeni formular. Radi u dva glavna režima: **Zvanični** (finalizovani zapisi) i **Radni** (u realnom vremenu, nefinalizovani zapisi).
+
+### Ključne kolone podataka
+
+Bez obzira na prilagođena pitanja definisana u formularu, mreža uključuje nekoliko standardnih metapodatkovnih kolona za pomoć pri reviziji:
+
+- **Poslao:** Identifikuje platformu porekla slanja (npr. FA za terensku aplikaciju, WEB za veb formular, RS za udaljene sisteme).
+- **Detalj:** Otvara fokusirani prikaz jednog zapisa (ikona pretrage) za pregled svake promenljive i odgovora poslatog za tu instancu.
+- **iNapomena:** Dozvoljava supervizorima da priložu bočne napomene ili interne komentare određenom zapisu bez menjanja samih prikupljenih podataka (predstavljeno ikonom olovke).
+- **Polja datuma:** Vremenske oznake koje ukazuju kada je zapis pokrenut, završen ili sinhronizovan.
+- **Medijski prilozi:** Direktne minijaturne veze do slika, potpisa ili datoteka prikupljenih tokom ankete.
+- **Grupe ponavljanja:** Namenske veze za pristup ugniježđenim tabelama za ponavljajuća pitanja unutar roditeljskog formulara.
+
+## Akcije slanja
+
+Da bi se olakšala aktivna kontrola kvaliteta podataka, interfejs pruža padajući meni akcionih komandi koje se mogu izvršiti na izabranim zapisima:
+
+- **Kreirajte novu instancu:** Dozvoljava administratorima da ručno unesu novi zapis ankete direktno u bazu podataka.
+- **Vrati instancu:** Odbacuje poslani zapis i zadaje anketaru da ponovo verifikuje ili prikupi informacije.
+- **Praćenje instance:** Označava zapis za dalju pažnju, obično slanjem upozorenja terenskoj ekipi za razjašnjenje.
+- **Izvezi u datoteku vraćenih komandi / paket komandi za praćenje:** Generiše batch izvoze (datoteke) koji sadrže skupove podataka posebno označene za vraćanja ili praćenja.
+- **Konvertuj u XML:** Transformiše strukturisani skup podataka nazad u sirovi XML format za pozadinsku analizu ili integraciju sistema.
+- **Prosledi instance:** (Dostupno u *Radnom* režimu) Odmah prenosi nefinalizovane podatke na drugi uređaj ili korisnika.
+- **Obriši:** Trajno uklanja izabrane instance iz baze podataka.

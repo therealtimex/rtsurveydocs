@@ -1,0 +1,121 @@
+---
+title: "Egzaminai"
+description: "Egzamino funkcija prideda laiko apribotą viktorinos režimą apklausai, su pasirinktiniais garso signalais teisingiems ir neteisingiems atsakymams."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 298
+---
+
+Funkcija **Egzaminas** paverčia apklausą laiko apribotos viktorinos formatu. Respondentui rodomas atgalinio skaičiavimo laikmatis, o apklausa įrašo, kiek laiko liko, kai jie baigia. Pasirinktinai galima paleisti garso signalus teisingiems ir neteisingiems atsakymams.
+
+Tai naudinga žinių vertinimams, raštingumo testams, lauko darbuotojų kompetencijos patikrinimams ir bet kuriai apklausai, kurioje užduoties laikas yra reikšmingi duomenys.
+
+---
+
+## Funkcija `check-exam()`
+
+Sukonfigūruokite egzaminą naudodami `check-exam()` stulpelyje **`calculation`** `calculate` lauko, esančio formos pradžioje:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Parametrai
+
+| # | Parametras | Aprašymas |
+|---|-----------|-------------|
+| 1 | `examTime` | Bendras egzamino trukmė sekundėmis |
+| 2 | `questionToStoreRemainingTime` | `calculate` arba `integer` lauko `name`, kuris saugos likusį laiką, kai egzaminas baigiasi |
+| 3 | `rightSound` | *(Neprivaloma)* Garso failo pavadinimas, paleidžiamas pateikus teisingą atsakymą (pridėkite prie formos kaip medijos failą) |
+| 4 | `wrongSound` | *(Neprivaloma)* Garso failo pavadinimas, paleidžiamas pateikus neteisingą atsakymą |
+| 5 | `excludeQuestion` | *(Neprivaloma)* Kableliais atskirtas lauko pavadinimų sąrašas, neįtraukiamų į egzamino laikmatį (pvz., `'intro_note,consent'`) |
+
+---
+
+## Pagrindinė konfigūracija
+
+### 1 žingsnis: egzamino laukų pridėjimas
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` aktyvina 600 sekundžių (10 minučių) laikmatį. `remaining_time` automatiškai užpildomas, kai respondentas baigia.
+
+### 2 žingsnis: klausimų pridėjimas
+
+Egzamino laikmatis apima visus formos klausimus, išskyrus nurodytus `excludeQuestion`.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | Kenijos sostinė yra Nairobi. Tiesa ar melas? |
+| select_one choices | q2 | Kuris organas pumpuoja kraują po kūną? |
+| select_one choices | q3 | Vanduo verda 100°C jūros lygyje. Tiesa ar melas? |
+
+### 3 žingsnis: likusio laiko saugojimas
+
+Laukas, nurodytas 2 parametre (`remaining_time`), automatiškai nustatomas į likusių sekundžių skaičių, kai respondentas pateikia. Reikšmė `0` reiškia, kad laikas baigėsi; didelė reikšmė reiškia, kad jie greitai baigė.
+
+---
+
+## Su garso signalais
+
+Pridėkite garso failus prie formos (kaip medijos priedus), tada nurodykite juos:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` paleidžiamas, kai respondentas pasirenka teisingą atsakymą
+- `wrong.mp3` paleidžiamas, kai respondentas pasirenka neteisingą atsakymą
+
+{{% alert icon=" " context="warning" %}}
+Garso failai turi būti pridėti prie formos kaip medijos failai, o failo pavadinimas turi tiksliai sutapti (skiria didžiąsias ir mažąsias raides), įskaitant plėtinį.
+{{% /alert %}}
+
+---
+
+## Klausimų neįtraukimas į laikmatį
+
+Perduokite kableliais atskirtą lauko pavadinimų sąrašą, kurių nereikia įtraukti į egzaminą (pvz., įvadines pastabas ar sutikimo klausimus):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+Palikite `rightSound` ir `wrongSound` kaip tuščias eilutes `''`, jei garso nereikia, bet reikia neįtraukimų.
+
+---
+
+## Pilnas pavyzdys
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | Sveiki atvykę į sveikatos žinių vertinimą. Turite 5 minutes atsakyti į visus klausimus. | |
+| trigger | start_ack | Paspauskite Gerai, kai esate pasiruošęs pradėti. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | Rankų plovimas neleidžia plisti ligoms. | |
+| select_one yesno | q2 | Per dieną turėtumėte išgerti mažiausiai 2 litrus vandens. | |
+| select_one yesno | q3 | Malariją sukelia virusas. | |
+
+---
+
+## Geriausios praktikos
+
+1. Visada informuokite respondentus apie laiko limitą prieš pradėdami — naudokite `note` arba `trigger` prieš `check-exam()` lauką.
+2. Neįtraukite įvadinių pastabų ir sutikimo klausimų į laikmatį naudodami parametrą `excludeQuestion`.
+3. Naudokite `remaining_time` tolesniame skaičiavime, kad aptiktumėte laiko pabaigą: `if(${remaining_time} = 0, 'Laikas baigėsi', 'Baigta')`.
+4. Laikykite klausimų skaičių proporcingą skirtam laikui — 2–3 minutės vienam klausimui yra pagrįsta pradžia daugumai žinių vertinimų.
+5. Patikrinkite su garso failais tiksliniame įrenginyje prieš diegimą — garso atkūrimas skiriasi Android versijose ir naršyklėse.
+
+## Apribojimai
+
+- Laikmatis yra tik rodyklės — forma automatiškai nepateikiama, kai laikas baigiasi; respondentas vis tiek turi pateikti rankiniu būdu.
+- Garso signalai reikalauja, kad įrenginio garsas būtų įjungtas ir nutildytas.
+- Egzamino funkcija yra rtSurvey plėtinys ir nėra standartinės XLSForm specifikacijos dalis.

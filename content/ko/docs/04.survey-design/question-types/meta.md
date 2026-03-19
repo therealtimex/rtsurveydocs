@@ -1,0 +1,190 @@
+---
+title: "Meta"
+description: "Meta 질문 유형은 응답자의 입력 없이 기기, 조사원 및 타이밍 정보를 자동으로 캡처합니다."
+icon: "info"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 237
+---
+
+Meta 질문 유형은 **자동으로 채워지는** 특수 필드입니다 — 응답자는 이를 절대 볼 수 없습니다. 제출에 대한 컨텍스트를 캡처합니다: 언제 수집되었는지, 어떤 기기가 사용되었는지, 누가 수집했는지. 다른 질문 유형처럼 `survey` 워크시트에 추가하면 되며, 화면에 표시되지 않습니다.
+
+## 기본 XLSForm 사양
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| deviceid | deviceid | |
+
+레이블은 meta 필드에서 선택 사항입니다 (표시되지 않으므로).
+
+---
+
+## 타이밍 meta 필드
+
+### `start`
+
+**양식이 열린 날짜와 시간**을 기록합니다. ISO 8601 형식으로 저장됩니다 (`YYYY-MM-DDTHH:MM:SS.sss+HH:MM`).
+
+```
+type    | name  | label
+start   | start |
+```
+
+### `end`
+
+**양식이 제출된 날짜와 시간**을 기록합니다. `start`와 함께 양식을 작성하는 데 걸린 시간을 계산할 수 있습니다:
+
+```
+type      | name          | calculation
+calculate | duration_min  | (decimal-date-time(${end}) - decimal-date-time(${start})) * 1440
+```
+
+### `today`
+
+**현재 날짜** (시간 구성 요소 없음)를 기록합니다. `YYYY-MM-DD`로 저장됩니다. 전체 타임스탬프 없이 날짜만 필요할 때 유용합니다.
+
+```
+type  | name  | label
+today | today |
+```
+
+---
+
+## 기기 meta 필드
+
+### `deviceid`
+
+데이터 수집에 사용된 **기기의 고유 식별자**를 기록합니다. Android에서는 일반적으로 IMEI 또는 Android ID입니다. 어떤 기기가 각 양식을 제출했는지 추적하고 같은 기기에서 중복 제출을 감지하는 데 유용합니다.
+
+```
+type      | name     | label
+deviceid  | deviceid |
+```
+
+### `devicephonenum`
+
+기기의 SIM 카드 **전화번호**를 기록합니다 (사용 가능한 경우). SIM이 없거나 번호가 SIM에 저장되어 있지 않으면 비어 있을 수 있습니다.
+
+```
+type           | name          | label
+devicephonenum | devicephonenum |
+```
+
+### `simserial`
+
+SIM 카드의 **일련 번호** (ICCID)를 기록합니다. 어떤 SIM/통신사가 사용되었는지 식별하는 데 유용합니다.
+
+```
+type      | name      | label
+simserial | simserial |
+```
+
+### `subscriberid`
+
+**IMSI (국제 이동 가입자 신원)** — SIM 카드의 고유 가입자 식별자를 기록합니다.
+
+```
+type         | name        | label
+subscriberid | subscriberid |
+```
+
+---
+
+## 조사원 meta 필드
+
+### `username`
+
+**로그인한 조사원의 사용자 이름** (rtSurvey 앱에서 사용된 계정)을 기록합니다. 각 제출을 수집한 사람을 추적하는 가장 신뢰할 수 있는 방법입니다.
+
+```
+type     | name     | label
+username | username |
+```
+
+### `email`
+
+**로그인한 조사원의 이메일 주소**를 기록합니다.
+
+```
+type  | name  | label
+email | email |
+```
+
+### `phonenumber`
+
+조사원 계정과 연결된 **전화번호**를 기록합니다 (구성된 경우).
+
+```
+type        | name       | label
+phonenumber | phonenumber |
+```
+
+---
+
+## 감사 로그
+
+### `audit`
+
+`audit` meta 필드는 **상세 감사 로깅**을 활성화합니다 — 조사원이 방문한 모든 질문, 각 질문에 소요된 시간, 그리고 선택적으로 각 단계에서의 GPS 위치에 대한 타임스탬프 로그를 기록합니다. 감사 로그는 각 제출과 함께 별도의 `audit.csv` 파일로 저장됩니다.
+
+```
+type  | name  | parameters
+audit | audit | location-priority=balanced location-min-interval=30 location-max-age=60
+```
+
+#### 감사 매개변수
+
+| 매개변수 | 설명 |
+|-----------|-------------|
+| `location-priority` | GPS 정확도 수준: `no-gps`, `low-power`, `balanced`, `high-accuracy` |
+| `location-min-interval` | 위치 캡처 사이의 최소 초 수 |
+| `location-max-age` | 허용할 캐시된 위치의 최대 기간 (초) |
+
+감사 로그는 다음을 캡처합니다:
+- 질문 이름 및 이벤트 유형 (`question`, `form.start`, `form.exit`, `form.save`, `form.finalize`)
+- 각 이벤트의 시작 및 종료 타임스탬프
+- GPS 좌표 (`location-priority`가 설정된 경우)
+
+{{% alert icon=" " context="warning" %}}
+`audit` 필드는 제출마다 별도의 파일을 생성합니다. 데이터 파이프라인이 메인 양식 데이터와 감사 CSV를 모두 처리하는지 확인하세요.
+{{% /alert %}}
+
+---
+
+## 완전한 예시
+
+일반적인 가구 설문에는 모든 타이밍 및 조사원 meta 필드가 포함될 수 있습니다:
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| today | today | |
+| deviceid | deviceid | |
+| username | username | |
+| email | email | |
+| audit | audit | |
+| text | household_id | 가구 ID |
+| ... | ... | ... |
+
+---
+
+## 모범 사례
+
+1. 항상 `start`와 `end`를 포함합니다 — 무료이고 자동이며, 품질 모니터링에 매우 유용합니다.
+2. 항상 `username`을 포함하여 조사원을 추적합니다.
+3. 중복 제출을 감지하거나 현장 기기를 추적하려면 `deviceid`를 포함합니다.
+4. 조사원이 실제로 각 질문을 방문했는지 확인해야 하는 높은 책임 설문에서는 `audit`을 사용합니다.
+5. SIM 관련 필드 (`simserial`, `subscriberid`, `devicephonenum`)는 활성 SIM 카드가 있는 Android 기기에서만 신뢰할 수 있습니다 — 태블릿 전용 배포에는 건너뜁니다.
+
+---
+
+## 제한 사항
+
+- 모든 meta 필드는 **읽기 전용**입니다 — 다른 계산에서 참조하거나 수정할 수 없습니다.
+- `username`과 `email`은 조사원이 로그인되어 있어야 합니다; 익명 제출의 경우 비어 있습니다.
+- SIM/전화 meta 필드는 Wi-Fi 전용 태블릿 및 권한 제한으로 인해 일부 Android 버전에서 빈 값을 반환할 수 있습니다.

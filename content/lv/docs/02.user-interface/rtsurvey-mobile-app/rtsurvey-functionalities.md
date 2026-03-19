@@ -1,0 +1,103 @@
+---
+title: "Lietotāja saskarne"
+description: "Izpētiet rtSurvey mobilās lietotnes galvenās funkcijas, ieskaitot formu aizpildīšanu, rediģēšanu, iesniegšanu, paziņojumus, uzdevumu pārvaldību, atskaites un GPS kartēšanas iespējas"
+icon: "apps"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 314
+---
+
+rtSurvey mobilā lietotne piedāvā visaptverošu funkciju kopu, kas izstrādāta, lai racionalizētu aptaujas procesu. Lūk, galvenās funkcionalitātes:
+
+## Aizpildīt formu
+Funkcija "Aizpildīt formu" ir vieta, kur enumeratori var piekļūt tukšām aptaujas formām un ievadīt datus. Šī funkcionalitāte ļauj efektīvi un precīzi vākt datus laukā. Galvenās iezīmes:
+
+1. Formu saraksts: Piekļūstot sadaļai "Aizpildīt formu", lietotājiem tiek parādīts visu tiem pieejamo tukšo formu saraksts.
+
+2. Automātiska formu lejupielāde: Atšķirībā no citiem aptaujas rīkiem, rtSurvey mobilā lietotne automātiski lejupielādē formas, kurām lietotājam ir piešķirta piekļuve no aptaujas administratora vai projektu vadītāja. Tas novērš nepieciešamību enumeratoriem manuāli iegūt tukšas formas.
+
+3. Tiešā datu ievade: Enumeratori var atlasīt formu no saraksta un sākt tieši ievadīt aptaujas atbildes lietotnē.
+
+4. Reāllaika atjauninājumi: Kad tiek piešķirtas jaunas formas vai tiek veikti atjauninājumi, pieejamo formu saraksts tiek automātiski atsvaidzināts, nodrošinot enumeratoru piekļuvi visjaunākajām aptaujām.
+
+5. Bezsaistes iespēja: Formas var lejupielādēt, kad ir pieejams interneta savienojums, ļaujot enumeratoriem tās aizpildīt pat apgabalos ar sliktu vai bez tīkla pārklājuma.
+
+## Rediģēt formu
+
+Funkcija "Rediģēt formu" rtSurvey piedāvā visaptverošu un elastīgu pieeju aptaujas instanču pārvaldībai, izceļot to starp citām CAPI lietotnēm. Šī funkcija nodrošina datu precizitāti un pilnīgumu caur trim atšķirīgām cilnēm:
+
+1. **Saglabātas**:
+   - Piekļūstiet un modificējiet nepabeigtās intervijas instances, kas saglabātas enumeratora ierīcē.
+   - Līdzīgi tradicionālajām CAPI lietotnēm, ļaujot lietotājiem atsākt un pabeigt nepabeigtas aptaujas.
+
+2. **Atgrieztas** (ekskluzīvi rtSurvey):
+   - Rediģējiet aptaujas instances, kas iepriekš tika pabeigtas, finalizētas un iesniegtas serverim.
+   - Unikāli rtSurvey, šī funkcija ļauj veikt pēc-iesniegšanas rediģēšanu, kad nepieciešama papildinformācija vai korekcijas.
+
+3. **Pārsūtītas** (ekskluzīvi rtSurvey):
+   - Piekļūstiet un rediģējiet aptaujas instances, kas sākotnēji izveidotas uz citas ierīces.
+   - Šī inovatīvā funkcija atbalsta dažādus scenārijus:
+     * Uzraugi var pārskatīt un rediģēt enumeratoru iesniegājumus.
+     * Lietotāji var turpināt darbu uz citas ierīces, ja oriģinālā ierīce ir pazaudēta vai bojāta.
+     * Iespējo sadarbīgu rediģēšanu un kvalitātes kontroles procesus.
+
+Galvenās priekšrocības:
+- Uzlabota datu kvalitāte caur vairākiem pārskatīšanas un rediģēšanas iespējām.
+- Uzlabota darbplūsmas elastība lauka komandām un uzraugiem.
+- Netraucēts darba turpinājums starp ierīcēm, samazinot dīkstāvi un datu zudumu riskus.
+
+
+## Nosūtīt formu
+Iesniedziet 100% pabeigtas formas centrālajam serverim. Šī funkcija iespējo reāllaika datu pārraidi, ļaujot tūlītēju analīzi un lēmumu pieņemšanu.
+
+## Paziņojumi
+Saņemiet svarīgus paziņojumus un atjauninājumus no servera. Tas notur visus komandas locekļus informētus par projektu attīstību, izmaiņām vai steidzamiem jautājumiem.
+
+## Uzdevumi
+Piekļūstiet un pārvaldiet uzdevumus, kas piešķirti no servera. Šī funkcija palīdz organizēt darba slodzi un noteikt prioritātes lauka enumeratoru aptaujas aktivitātēm.
+
+## Atskaites
+Skatiet visas atskaites, kas nosūtītas no servera uz planšetdatoru. Šī funkcionalitāte ļauj lietotājiem piekļūt analīzes rezultātiem un projektu ieskatiem tieši ierīcē.
+
+## Pārskatīt formu
+
+Funkcija "Pārskatīt formu" rtSurvey piedāvā visaptverošu sistēmu finalizētu aptaujas instanču pārbaudei un pārvaldībai, nodrošinot stingru kvalitātes kontroli un datu verifikāciju. Šī funkcija ir sadalīta četrās atšķirīgās cilnēs, katra kalpo konkrētam mērķim datu pārvaldības procesā:
+
+1. **Finalizētas**:
+   - Satur pabeigtas un finalizētas instances, kas vēl nav iesniegtas serverim.
+   - Ļauj veikt galīgās pārbaudes pirms iesniegšanas.
+
+2. **Nosūtītas**:
+   - Satur finalizētas instances, kas veiksmīgi iesniegtas serverim.
+   - Nodrošina pārsūtīto datu uzskaiti.
+
+3. **Pārsūtītas**:
+   - Parāda pabeigtās instances, kas pārsūtītas uz citām ierīcēm.
+   - Atvieglo datu kustības izsekošanu starp ierīcēm.
+
+4. **Saņemtas**:
+   - Parāda pabeigtas instances, kas sākotnēji izveidotas uz citas ierīces un pārsūtītas uz pašreizējo ierīci.
+   - Iespējo sadarbīgu darbu un datu kopīgošanu starp komandas locekļiem.
+
+Galvenās funkcijas:
+- **Tikai lasāmā piekļuve**: Visas instances šajās cilnēs sākotnēji ir tikai lasāmas, saglabājot finalizēto formu datu integritāti.
+- **Rediģēšanas pieprasījumu sistēma**: Lietotāji var pieprasīt rediģēšanu, ja nepieciešamas korekcijas.
+  - Pieprasījumus var automātiski vai manuāli apstiprināt administrators vai projektu vadītājs.
+  - Pēc apstiprināšanas instance kļūst rediģējama, ļaujot veikt nepieciešamās modifikācijas.
+
+Priekšrocības:
+- Uzlabo datu kvalitāti caur vairākiem pārskatīšanas posmiem.
+- Nodrošina skaidru datu iesniegšanas un pārsūtīšanas revīzijas ceļu.
+- Piedāvā elastību datu pārvaldībā, saglabājot kontroli pār finalizētajiem datiem.
+- Atbalsta sadarbīgas darbplūsmas un kvalitātes nodrošināšanas procesus.
+
+Šī uzlabotā pārskatīšanas formu sistēma izceļ rtSurvey ar strukturētu pieeju finalizēto datu pārvaldībai, nodrošinot precizitāti un ļaujot kontrolētu pēc-finalizācijas rediģēšanu, kad nepieciešams. Tā sasniedz līdzsvaru starp datu integritāti un nepieciešamību pēc gadījuma korekcijām, padarot to par nenovērtējamu rīku aptaujas projektiem, kuriem nepieciešama augsta datu kvalitāte un atbildība.
+
+## Karte
+Izmantojiet GPS funkcionalitāti, lai precīzi noteiktu atrašanās vietu, kur tiek veikta intervija. Šī funkcija uzlabo datu precizitāti un palīdz telpiskā aptaujas rezultātu analīzē.
+
+## Iziet
+Aizveriet lietotni, neizlogojoties no rtSurvey konta. Tas ļauj ātri atgriezties lietotnē bez atkārtotas autentifikācijas nepieciešamības.
+
+Šīs funkcionalitātes kopā veido jaudīgu, lietotājam draudzīgu mobilo aptaujas rīku, kas apkalpo dažādas lomas aptaujas procesā, no datu vākšanas līdz analīzei un projektu pārvaldībai.

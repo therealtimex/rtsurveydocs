@@ -1,0 +1,75 @@
+---
+weight: 100
+title: "Початок роботи"
+date: "2023-05-03T22:37:22+01:00"
+draft: false
+author: "rtSurvey"
+icon: "rocket_launch"
+toc: true
+description: "Посібник для швидкого старту з проведення опитувань за допомогою rtSurvey"
+publishdate: "2023-05-03T22:37:22+01:00"
+---
+
+rtSurvey дозволяє створювати потужні форми та робочі процеси для збору необхідних даних де завгодно. Ви можете:
+
+1.  Створювати складні форми з фотографіями, GPS-координатами, логікою пропуску,
+    обчисленнями, зовнішніми наборами даних, підтримкою кількох мов тощо.
+2.  Збирати дані офлайн — за допомогою мобільного або веб-додатку.
+    Форми та відповіді синхронізуються при наявності підключення до Інтернету.
+3.  Легко аналізувати дані, завантажуючи їх у форматі CSV або пов'язуючи rtSurvey
+    з Excel, Power BI, Python або R для створення дашбордів з оновленням у реальному часі.
+
+Дослідники, польові команди та інші фахівці використовують rtSurvey
+для збору важливих даних. Ось як розпочати.
+
+## 1. Отримайте rtSurvey Cloud {#getting-started-rtCloud}
+
+Найшвидший і найпростіший спосіб отримати rtSurvey Cloud — скористатись офіційним керованим хостингом [rtSurvey
+Cloud](https://rtSurvey.com/#rtSurvey-cloud). Він доступний на сайті rtSurvey і побудований на швидкій, надійній та захищеній інфраструктурі.
+
+## 2. Завантажте XLSForm до rtCloud або створіть форму за допомогою Form Builder (Beta) {#getting-started-create-form}
+
+1.  Створіть визначення форми за допомогою `XLSForm <xlsform>`{.interpreted-text
+    role="doc"} або скористайтеся цією [формою All Widgets
+    form](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0).
+2.  `Завантажте свій XLSForm до rtCloud <rtCloud-forms-upload>`{.interpreted-text
+    role="ref"} та опублікуйте його.
+
+## 3. Отримайте додаток rtSurvey {#getting-started-get-collect}
+
+Щоб завантажити додаток rtSurvey, виконайте такі кроки залежно від вашого пристрою:
+
+### Для пристроїв Android:
+1. Відвідайте [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
+2. У рядку пошуку введіть «rtSurvey».
+3. Натисніть на додаток із логотипом rtSurvey.
+4. Натисніть кнопку «Встановити», щоб завантажити та встановити додаток.
+
+### Для пристроїв iOS:
+1. Відкрийте [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) на своєму пристрої.
+2. На вкладці пошуку введіть «rtSurvey».
+3. Знайдіть додаток із логотипом rtSurvey.
+4. Натисніть «Отримати», щоб завантажити та встановити додаток.
+
+Після встановлення ви можете запустити додаток і розпочати використання rtSurvey для опитувань та аналітики.
+
+## 4. Підключіть Collect до rtCloud {#getting-started-connect}
+
+1.  `Створіть Користувача Додатку <rtCloud-users-app-overview>`{.interpreted-text
+    role="ref"} у rtCloud та
+    `призначте форму цьому користувачу <rtCloud-projects-form-access>`{.interpreted-text
+    role="ref"}.
+2.  Відкрийте Collect, натисніть `Налаштувати за допомогою QR-коду`{.interpreted-text
+    role="guilabel"} та відскануйте код, створений для вашого Користувача Додатку.
+
+## 5. Заповніть форму в Collect {#getting-started-fill-form}
+
+1.  Виберіть `Заповнити порожню форму`{.interpreted-text role="guilabel"} для заповнення форми.
+2.  Дані вашої форми будуть автоматично надіслані до rtCloud після завершення.
+
+## 6. Використовуйте свої дані в rtCloud {#getting-started-use-data}
+
+1.  Увійдіть до rtCloud та перегляньте свої дані.
+2.  Завантажте дані у форматі CSV або
+    `візуалізуйте їх у Power BI <rtCloud-submissions-odata>`{.interpreted-text
+    role="ref"}.

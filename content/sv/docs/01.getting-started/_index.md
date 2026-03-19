@@ -1,0 +1,66 @@
+---
+weight: 100
+title: "Kom igång"
+date: "2023-05-03T22:37:22+01:00"
+draft: false
+author: "rtSurvey"
+icon: "rocket_launch"
+toc: true
+description: "En snabbstartsguide för att genomföra en undersökning med rtSurvey"
+publishdate: "2023-05-03T22:37:22+01:00"
+---
+
+rtSurvey låter dig bygga kraftfulla formulär och arbetsflöden för att samla in de data du behöver, var du än befinner dig. Du kan:
+
+1.  Bygga kraftfulla formulär som inkluderar foton, GPS-platser, hopplogik,
+    beräkningar, externa datauppsättningar, flera språk och mycket mer.
+2.  Samla in data offline med antingen mobilappen eller webbappen.
+    Formulär och inlämningar synkroniseras när en internetanslutning hittas.
+3.  Analysera enkelt genom att ladda ned dina data som en CSV-fil eller koppla rtSurvey
+    till Excel, Power BI, Python eller R för att skapa dashboardar med liveuppdateringar.
+
+Forskare, fältteam och andra yrkesverksamma precis som du använder rtSurvey
+för att samla in sina viktiga data. Så här kommer du igång.
+
+## 1. Skaffa rtSurvey Cloud {#getting-started-rtCloud}
+
+Det snabbaste och enklaste sättet att få tillgång till rtSurvey Cloud är att använda den officiella hanterade värdtjänsten [rtSurvey
+Cloud](https://rtSurvey.com/#rtSurvey-cloud). Den finns på rtSurveys webbplats och är byggd på en snabb, tillförlitlig och säker infrastruktur.
+
+## 2. Ladda upp ditt XLSForm till rtCloud eller bygg ett formulär med Form Builder (Beta) {#getting-started-create-form}
+
+1.  Skapa en formulärdefinition med XLSForm eller prova detta [All Widgets-formulär](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0).
+2.  Ladda upp ditt XLSForm till rtCloud och publicera det.
+
+## 3. Hämta rtSurvey-appen {#getting-started-get-collect}
+
+Följ dessa steg för att ladda ned rtSurvey-appen baserat på din enhet:
+
+### För Android-enheter:
+1. Besök [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
+2. Sök efter "rtSurvey" i sökfältet.
+3. Tryck på appen med rtSurvey-logotypen.
+4. Klicka på knappen "Installera" för att ladda ned och installera appen på din Android-enhet.
+
+### För iOS-enheter:
+1. Öppna [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) på din iOS-enhet.
+2. Sök efter "rtSurvey" på sökfliken.
+3. Hitta appen med rtSurvey-logotypen.
+4. Tryck på "Hämta"-knappen för att ladda ned och installera appen på din iOS-enhet.
+
+När appen är nedladdad och installerad kan du starta den och börja använda rtSurvey för undersöknings- och analystjänster.
+
+## 4. Anslut Collect till rtCloud {#getting-started-connect}
+
+1.  Skapa en appanvändare i rtCloud och tilldela ditt formulär till den användaren.
+2.  Öppna Collect, tryck på `Konfigurera med QR-kod` och skanna koden som skapats för din appanvändare.
+
+## 5. Fyll i ditt formulär i Collect {#getting-started-fill-form}
+
+1.  Välj `Fyll i tomt formulär` för att fylla i ditt formulär.
+2.  Dina formulärdata skickas automatiskt till rtCloud när du är klar.
+
+## 6. Använd dina data i rtCloud {#getting-started-use-data}
+
+1.  Logga in på rtCloud och se dina data.
+2.  Ladda ned dina data som en CSV-fil eller visualisera dem i Power BI.

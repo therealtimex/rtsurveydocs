@@ -1,0 +1,145 @@
+---
+title: "HTML-tyylittely"
+description: "rtSurvey tukee HTML-tageja otsikoissa ja vihjeissä, mahdollistaen monipuolisen tekstin muotoilun, linkit ja dynaamiset väriteemat."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 297
+---
+
+rtSurvey renderöi **otsikon** ja **vihjeen** tekstin HTML:nä weblomalekkeissa. Tämä tarkoittaa, että voit käyttää vakio HTML-tageja tekstin muotoiluun, rivinvaihtojen lisäämiseen, linkkien luomiseen ja värien soveltamiseen. Tämä on erityisen hyödyllinen note-kentille, osio-ohjeille ja dynaamisille yhteenvedoille.
+
+{{% alert icon=" " context="warning" %}}
+HTML otsikoissa renderöidään **weblomalekkeessa** ja rtSurvey-mobiilisovelluksissa. Se ei välttämättä renderöidy kaikissa ODK-yhteensopivissa asiakkaissa. Testaa aina kohdealustallasi.
+{{% /alert %}}
+
+---
+
+## Tuetut HTML-tagit
+
+### Tekstin muotoilu
+
+| Tagi | Tulos |
+|------|-------|
+| `<strong>teksti</strong>` tai `<b>teksti</b>` | **Lihavoitu teksti** |
+| `<em>teksti</em>` tai `<i>teksti</i>` | *Kursivoitu teksti* |
+| `<u>teksti</u>` | Alleviivattu teksti |
+| `<br>` | Rivinvaihto |
+| `<span style="...">teksti</span>` | Inline-tyylittely |
+
+### Linkit
+
+```html
+<a href="https://example.com" target="_blank">Klikkaa tästä</a>
+```
+
+Avautuu uudessa välilehdessä. Käytä viiteasiakirjoille, ohjeille tai ulkoisille resursseille, joihin luetteloijan tulisi tutustua.
+
+### Värit
+
+Käytä `<span>`-elementtiä inline-tyyleillä:
+
+```html
+<span style="color: red;">Varoitus: arvo on alueen ulkopuolella</span>
+<span style="color: #009688;">Osio suoritettu</span>
+```
+
+---
+
+## Väriteemat-muuttujat
+
+rtSurvey tukee **väritiemaistokeneita**, jotka mukautuvat sovelluksen konfiguroituun teemaan. Käytä `__COLOR_THEME_NAME__`-syntaksia:
+
+```html
+<span style="color: var(--color-theme-primary);">Pääväri teksti</span>
+```
+
+Tai käyttämällä token-lyhennettä otsikkotekstissä:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Tärkeä huomio</font>
+```
+
+Tämä muunnetaan automaattisesti vastaavaksi `<span>`-elementiksi CSS-muuttujalla renderöinnin yhteydessä.
+
+---
+
+## Monikieliset otsikot
+
+Kääri sisältö kielitunnisteisiin tukemaan useita kieliä yhdessä otsikkosolussa:
+
+```
+<en>Enter the household size</en><fi>Syötä kotitalouden koko</fi>
+```
+
+rtSurvey poimii nykyisen sovelluskielen mukaisen sisällön. Jos vastaavaa kielitunnistetta ei löydy, koko merkkijono näytetään sellaisenaan.
+
+---
+
+## Esimerkkejä note-kentissä
+
+### Osio-ohje lihavoituna ja rivinvaihdolla
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Osio 3: Maankäyttö</strong><br>Esitä kaikki tämän osion kysymykset vain kotitalouden päähenkilölle.` |
+
+### Dynaaminen yhteenveto laskentaviittauksella
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Kotitalouden jäsenet yhteensä: <strong>${total}</strong><br><span style="color: gray;">Aikuiset: ${adults} · Lapset: ${children}</span>` |
+
+### Varoitus punaisella
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Varoitus:</strong> Syötetty ikä (${age}) on epätavallisen korkea. Tarkista.` | `${age} > 100` |
+
+### Linkki viiteasiakirjaan
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Tutustu <a href="https://docs.example.com/guidelines" target="_blank">kenttäohjeisiin</a> ennen tämän osion aloittamista.` |
+
+---
+
+## rtSurvey:n erityiset HTML-tagit
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+Upottaa painikkeen, joka avaa URL-osoitteen lomakkeen sisäisessä modaalissa. Katso lisätietoja [Webbox](webbox)-sivulta.
+
+### `<delete-repeat-current>otsikko</delete-repeat-current>`
+
+Renderöi painikkeen toistoryhmän sisällä, joka poistaa nykyisen toistotapauksen napautettaessa.
+
+### `<delete-repeat-last>otsikko</delete-repeat-last>`
+
+Renderöi painikkeen, joka poistaa viimeisen toistotapauksen.
+
+Esimerkki käytöstä toistoryhmässä:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Poista tämä jäsen</delete-repeat-current>` |
+
+---
+
+## Parhaat käytännöt
+
+1. Käytä HTML:ää säästeliäästi — liiaksi muotoillut otsikot ovat vaikeampia lukea, eivät helpompia.
+2. Suosi `<strong>`:tä lihavointiin ja `<em>`:ää kursivointiin vanhentuneiden `<b>` ja `<i>` sijaan.
+3. Pidä värien käyttö merkityksellisenä — käytä punaista varoituksiin, ei koristukseen.
+4. Testaa aina HTML-renderöinti sekä mobiilisovelluksessa että weblomalekkeessa, sillä renderöinti saattaa erota hieman.
+5. Vältä `<table>`-tageja otsikoiden sisällä — ne renderöityvät harvoin hyvin mobiilityötöillä.
+6. Älä käytä JavaScriptiä (`<script>`) — se poistetaan tai aiheuttaa virheitä.
+
+## Rajoitukset
+
+- Monimutkainen HTML (taulukot, lomakkeet, skriptit) ei ole tuettu ja saattaa rikkoa renderöinnin.
+- Jotkut vanhemmat mobiiliasiakkaat saattavat näyttää HTML-tagit literaalitekstinä — testaa kaikilla kohdejaitteilla.
+- `<a>`-linkit avautuvat selaimessa tai WebViewssä — luetteloija poistuu lomakkeesta, mikä voi olla häiritsevää mobiililla.

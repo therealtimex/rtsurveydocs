@@ -1,0 +1,83 @@
+---
+title: "Avanserte utvidelser"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 289
+---
+
+`appearance`-kolonnen i rtSurvey lar deg tilpasse den visuelle presentasjonen og oppførselen til spørsmål i spørreundersøkelsene dine. Denne funksjonen forbedrer brukeropplevelsen og kan øke effektiviteten ved datainnsamling betydelig. rtSurvey støtter standard XLSForm-utseendeattributter og utvider dem med ytterligere alternativer.
+
+## rtSurvey-spesifikke utseendeutvidelser
+
+rtSurvey utvider standardutseendealternativene med følgende:
+
+### Tilpasning av tidsinput
+
+For `text`-spørsmål brukt for tidsinput:
+
+- `appearance:` — Viser en klokke for valg av timer og minutter
+- `appearance: inline` — Viser klokken som et ikon
+- `appearance: inline-1line` — Viser klokken i enkeltradformat
+- `appearance: inline-onlyresult` — Viser klokkeikonet, forsvinner etter valg
+- `appearance: inline-[FORMAT]` — Tilpasser klokkeslettformatvisning (f.eks. `[%H:%M]`, `[%h:%M:%S]`)
+
+### Fargetilpasning
+
+rtSurvey tillater fargetilpasning for ulike utseender:
+
+- `appearance: inline colors("0099FF")` — Tilpasser ikonfarge
+- `appearance: inline-1line colors("0000FF","FFFF00")` — Tilpasser farger i enkeltradformat
+
+### Grid-oppsett
+
+rtSurvey introduserer et grid-oppsett for kompakte, tabellignende visninger:
+
+- `appearance: grid` — Brukes på grupper for å lage et grid-oppsett
+
+### Sammenleggbare grupper
+
+- `appearance: collapsible` — Oppretter utvidbare/sammenleggbare grupper
+
+## Beste praksis for bruk av utseende
+
+1. **Konsistens**: Bruk utseendeattributter konsekvent i hele spørreundersøkelsen for et enhetlig utseende.
+2. **Mobil vs. web**: Vurder hvordan utseender vil vises på ulike enheter og plattformer.
+3. **Ytelse**: Vær forsiktig med utseendeattributter som kan bremse skjemalastingen (f.eks. `table-list` for store grupper).
+4. **Brukeropplevelse**: Velg utseender som gjør datainntasting enklere og mer intuitiv for respondentene.
+5. **Testing**: Test alltid skjemaet på målenheter for å sikre at utseender fungerer som forventet.
+
+## Avanserte teknikker
+
+### Kombinere utseender
+
+Noen utseendeattributter kan kombineres for mer komplekse oppsett:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Velg én: | minimal compact |
+```
+
+### Dynamiske utseender
+
+rtSurvey tillater dynamiske utseendeendringer basert på skjemalogikk:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Skriv inn tid: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Hensyn til mobilapp
+
+- Noen utseender (f.eks. `quick`, `signature`) er spesifikke for mobile enheter.
+- Test grundig på både Android og iOS for å sikre konsistent adferd.
+
+## Kjente begrensninger
+
+- Komplekse utseender kan ikke gjengis identisk på alle plattformer.
+- Noen avanserte rtSurvey-utseender støttes kanskje ikke i frakoblet modus.

@@ -1,0 +1,88 @@
+---
+title: "排序"
+description: "排序問題讓受訪者按喜好或優先順序排列一組選項。"
+icon: "list-ol"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 242
+---
+
+`rank` 問題類型呈現一個選項列表，受訪者必須**拖曳排序**（或以其他方式從第一到最後排列）。它將結果儲存為以空格分隔的選項值列表（按選擇的順序排列），優先順序最高的選項排在最前面。
+
+## 基本 XLSForm 規格
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | 按重要性從高到低排列這些社區需求 |
+
+選項在**choices 工作表**中定義，就像 `select_one` 一樣：
+
+**survey：**
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | 按重要性從高到低排列這些需求 |
+
+**choices：**
+
+| list_name | name | label |
+|-----------|------|-------|
+| priorities | water | 清潔水源 |
+| priorities | health | 醫療保健 |
+| priorities | education | 教育 |
+| priorities | roads | 道路 |
+| priorities | electricity | 電力 |
+
+## 儲存值格式
+
+儲存值是按排序順序排列的**以空格分隔的選項值列表**（第一位 = 優先順序最高）：
+
+```
+water education health roads electricity
+```
+
+## 提取排序位置
+
+使用 `selected-at()` 獲取特定排名的選項：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| rank priorities | main_priority | 排列社區需求 | |
+| calculate | top_priority | | selected-at(${main_priority}, 0) |
+| calculate | second_priority | | selected-at(${main_priority}, 1) |
+
+`selected-at(${main_priority}, 0)` 返回**排在第一位**的值（索引 0 = 最高排名）。
+
+## 在重複群組中使用 `rank-index()`
+
+當 `rank` 在重複群組中使用時，`rank-index()` 讓您從重複外部引用序數排名：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_ranked | | rank-index(1, ${score}) |
+
+有關 `rank-index()` 和 `rank-index-if()` 的完整詳細資訊，請參閱[函數——重複字段函數](../operators-and-functions/functions#repeated-field-functions)。
+
+## 用途
+
+排序問題通常用於：
+
+1. **優先順序排列**——讓社區對發展需求排序
+2. **偏好排序**——對產品功能、服務屬性或政策選項排序
+3. **考試項目排序**——排列流程中的步驟
+4. **前 N 項選擇**——與 `selected-at()` 結合使用，只提取前 1、2 或 3 個選項
+
+## 最佳實踐
+
+1. 保持列表簡短（3–7 個項目）——超過 7–8 個選項後，排序在認知上會變得費力。
+2. 使用清晰、互斥的選項標籤，以避免對「第一」含義的混淆。
+3. 添加提示文字說明排序方向（例如「拖曳排序：第一 = 最重要」）。
+4. 如果需要確保所有選項都已排序，使用 `count-selected(.) = x` 進行驗證。
+
+## 限制
+
+- 拖曳排序小工具需要觸控螢幕或滑鼠——在僅限鍵盤的環境中可能無法正常工作。
+- 在某些較舊的行動客戶端上，排序小工具可能會退回到數字輸入介面。
+- 您不能部分排序（即只對某些選項排序）——所有選項都必須排序。

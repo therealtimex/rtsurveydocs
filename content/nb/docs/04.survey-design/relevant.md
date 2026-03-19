@@ -1,0 +1,110 @@
+---
+title: "Hoppe over spørsmål"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 280
+---
+
+Hopplogikk, også kjent som forgrening eller betinget logikk, lar deg lage dynamiske spørreundersøkelser som tilpasser seg respondentenes svar. I rtSurvey implementeres hopplogikk ved hjelp av `relevant`-kolonnen i XLSForm.
+
+## Grunnleggende hopplogikk
+
+For å implementere grunnleggende hopplogikk, bruk `relevant`-kolonnen til å angi en betingelse:
+
+```
+| type           | name          | label                       | relevant            |
+|----------------|---------------|-----------------------------|--------------------|
+| select_one y_n | likes_pizza   | Liker du pizza?             |                    |
+| select_multiple pizza_toppings | favorite_topping | Favorittoppinger | ${likes_pizza} = 'yes' |
+```
+
+I dette eksemplet vises spørsmålet "Favorittoppinger" bare hvis respondenten svarer "ja" på om de liker pizza.
+
+## Syntaks for relevant-uttrykk
+
+- Bruk `${ }` for å referere til andre spørsmålsvariabler.
+- For `select_one`-spørsmål, sammenlign direkte: `${spørsmålsnavn} = 'svar'`
+- For `select_multiple`-spørsmål, bruk `selected()`-funksjonen.
+
+## Avansert hopplogikk
+
+### Flere betingelser
+
+Du kan kombinere flere betingelser med `and`, `or` og parenteser:
+
+```
+| type    | name  | label                   | relevant                                  |
+|---------|-------|-------------------------|-------------------------------------------|
+| integer | age   | Hva er alderen din?     |                                           |
+| text    | school| Hvilken skole går du på?| ${age} < 18 and (${location} = 'urban' or ${location} = 'suburban') |
+```
+
+### Bruke select_multiple-spørsmål
+
+For `select_multiple`-spørsmål, bruk `selected()`-funksjonen:
+
+```
+| type           | name          | label                       | relevant                               |
+|----------------|---------------|-----------------------------|-----------------------------------------|
+| select_multiple pizza_toppings | favorite_topping | Favorittoppinger |                                         |
+| text           | cheese_type   | Favorittostetypen           | selected(${favorite_topping}, 'cheese') |
+```
+
+### "Annet"-alternativ i flervalg
+
+Implementer et fritekst "Annet"-alternativ ved hjelp av `relevant`:
+
+```
+| type           | name                  | label                               | relevant                               |
+|----------------|----------------------|-------------------------------------|---------------------------------------|
+| select_multiple pizza_toppings | favorite_toppings | Hva er favorittoppingene dine? |                                       |
+| text           | favorite_toppings_other | Hvilke andre oppinger liker du?    | selected(${favorite_toppings}, 'other') |
+```
+
+Husk å inkludere 'other' som et alternativ i choices-regnearket.
+
+## rtSurvey-spesifikke funksjoner
+
+### Dynamisk relevans
+
+rtSurvey tillater dynamisk relevans basert på beregnede felt:
+
+```
+| type      | name       | label              | calculation                   |
+|-----------|------------|--------------------|-----------------------------|
+| calculate | total_score| Totalscore         | ${score1} + ${score2} + ${score3} |
+| text      | feedback   | Tilbakemelding     | ${total_score} > 75             |
+```
+
+### Relevans i repeats
+
+rtSurvey støtter relevans innenfor repeat-grupper:
+
+```
+| type         | name         | label            | relevant               |
+|--------------|--------------|------------------|------------------------|
+| begin repeat | child_info   | Barneinformasjon |                        |
+| integer      | child_age    | Barnets alder    |                        |
+| text         | school_name  | Skolenavn        | ${child_age} >= 5      |
+| end repeat   |              |                  |                        |
+```
+
+## Beste praksis for hopplogikk i rtSurvey
+
+1. **Hold det enkelt**: Unngå for komplekse relevant-betingelser når det er mulig.
+2. **Test grundig**: Bruk rtSurveys forhåndsvisningsfunksjon for å teste alle mulige veier gjennom spørreundersøkelsen.
+3. **Vurder ytelse**: Svært kompleks hopplogikk kan påvirke ytelsen til spørreundersøkelsen, spesielt på mobile enheter.
+4. **Bruk klare variabelnavn**: Dette gjør relevant-uttrykkene enklere å lese og vedlikeholde.
+5. **Dokumenter logikken**: Legg til notater for å forklare komplekse hoppemønstre, spesielt for teamsamarbeid.
+6. **Vær oppmerksom på dataanalyse**: Hoppede spørsmål vil resultere i manglende data. Planlegg analysen deretter.
+
+## Feilsøking av hopplogikk
+
+- **Syntaksfeil**: Sørg for at alle `${ }` er riktig lukket og stavet korrekt.
+- **Sirkulære referanser**: Unngå å lage løkker der spørsmål avhenger av hverandre.
+- **Skiftsensitivitet**: Husk at svaralternativer skiller mellom store og små bokstaver i relevant-uttrykk.
+- **Numeriske sammenligninger**: Bruk passende operatorer (`<`, `>`, `=`) for numeriske sammenligninger.

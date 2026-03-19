@@ -1,0 +1,113 @@
+---
+title: "Layout a griglia"
+description: "Il layout a griglia consente di posizionare i campi in una griglia CSS all'interno di un gruppo, abilitando design di moduli a più colonne."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 296
+---
+
+La funzionalità **Layout a griglia** consente di disporre le domande in una **griglia a più colonne** all'interno di un gruppo, usando il tag appearance `gridformat<>`. Questo è utile per i moduli ad alta densità di inserimento dati dove più campi correlati dovrebbero apparire fianco a fianco invece di essere impilati verticalmente.
+
+---
+
+## Come funziona
+
+Il layout a griglia viene applicato a due livelli:
+
+1. **Il gruppo** — imposta `appearance: field-list grid(weight=N)` per definire quante colonne ha la griglia
+2. **Ogni campo nel gruppo** — imposta `appearance: gridformat<row=R col=C colspan=S/>` per posizionare il campo
+
+La griglia usa un sistema a 12 colonne in stile Bootstrap. `weight=N` definisce quante colonne logiche ha la tua griglia; ogni colonna occupa `12/N` colonne Bootstrap.
+
+---
+
+## Appearance a livello di gruppo
+
+| Appearance | Descrizione |
+|------------|-------------|
+| `field-list grid(weight=2)` | Griglia a 2 colonne (ogni colonna = 6 colonne Bootstrap) |
+| `field-list grid(weight=3)` | Griglia a 3 colonne (ogni colonna = 4 colonne Bootstrap) |
+| `field-list grid(weight=4)` | Griglia a 4 colonne (ogni colonna = 3 colonne Bootstrap) |
+| `field-list grid(weight=6)` | Griglia a 6 colonne (ogni colonna = 2 colonne Bootstrap) |
+
+---
+
+## Sintassi `gridformat<>` a livello di campo
+
+```
+gridformat<row=R col=C colspan=S/>
+gridformat<row=R col=C colspan=S backgroundcolor=COLOR/>
+```
+
+| Attributo | Descrizione |
+|-----------|-------------|
+| `row` | Numero di riga (basato su 1) |
+| `col` | Numero di colonna (basato su 1, all'interno della griglia definita da `weight`) |
+| `colspan` | Numero di colonne che questo campo occupa (predefinito 1) |
+| `backgroundcolor` | Colore CSS opzionale per lo sfondo del campo (es. `#f0f0f0`, `lightblue`) |
+
+---
+
+## Esempio: Sezione sondaggio familiare a 2 colonne
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | demographics | Dati demografici | `field-list grid(weight=2)` |
+| text | first_name | Nome | `gridformat<row=1 col=1/>` |
+| text | last_name | Cognome | `gridformat<row=1 col=2/>` |
+| integer | age | Età | `gridformat<row=2 col=1/>` |
+| select_one gender | gender | Genere | `gridformat<row=2 col=2/>` |
+| text | address | Indirizzo completo | `gridformat<row=3 col=1 colspan=2/>` |
+| end_group | | | |
+
+Questo viene renderizzato come:
+
+```
+[ Nome                ] [ Cognome              ]
+[ Età                 ] [ Genere               ]
+[ Indirizzo completo (occupa entrambe le colonne)  ]
+```
+
+---
+
+## Esempio: Inserimento dati appezzamento a 3 colonne
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | plot_data | Dettagli appezzamento | `field-list grid(weight=3)` |
+| text | plot_id | ID appezzamento | `gridformat<row=1 col=1/>` |
+| decimal | area_ha | Area (ha) | `gridformat<row=1 col=2/>` |
+| select_one crop_type | crop | Tipo di coltura | `gridformat<row=1 col=3/>` |
+| decimal | yield | Resa (kg) | `gridformat<row=2 col=1/>` |
+| decimal | revenue | Ricavi | `gridformat<row=2 col=2/>` |
+| text | notes | Note | `gridformat<row=2 col=3/>` |
+| end_group | | | |
+
+---
+
+## Colori di sfondo
+
+Usa `backgroundcolor` per distinguere visivamente le sezioni:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | section_a | Sezione A | `gridformat<row=1 col=1 colspan=2 backgroundcolor=#e8f4f8/>` |
+
+---
+
+## Best practice
+
+1. Usa il layout a griglia solo per schermate **ad alta intensità di inserimento dati** dove i campi affiancati riducono genuinamente lo scorrimento.
+2. Mantieni i campi `colspan=1` brevi (ID, codici, selezioni brevi) — le etichette larghe vengono troncate male nelle colonne di griglia strette.
+3. Usa `colspan=N` per i campi con etichette lunghe o input di testo multiriga.
+4. Testa sulla dimensione di schermo più piccola che ti aspetti usino gli intervistatori — una griglia a 4 colonne è stretta su un telefono.
+5. Il layout a griglia funziona meglio sui form factor web e tablet; sui telefoni cellulari un layout a 2 colonne è solitamente la larghezza massima confortevole.
+
+## Limitazioni
+
+- `gridformat<>` funziona solo all'interno di un gruppo con appearance `grid(weight=N)` — non ha effetto al livello superiore.
+- Il layout a griglia è un'estensione del modulo web di rtSurvey e potrebbe non renderizzarsi correttamente in altri client compatibili con ODK.
+- Il posizionamento per riga e colonna non viene validato al momento della costruzione del modulo — i campi sovrapposti verranno entrambi renderizzati ma potrebbero apparire rotti.

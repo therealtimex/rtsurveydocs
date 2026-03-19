@@ -1,0 +1,147 @@
+---
+title: "Media"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 286
+---
+
+rtSurvey ondersteunt rijke media-integratie in enquêtes, waardoor u uw vragenlijsten kunt verrijken met afbeeldingen, audio en video. Deze functie kan de respondentervaring en de kwaliteit van de verzamelde gegevens aanzienlijk verbeteren.
+
+## Ondersteunde mediatypen
+
+rtSurvey ondersteunt de volgende mediatypen:
+- Afbeeldingen (jpg, png, gif)
+- Audio (mp3, wav)
+- Video (mp4, webm)
+
+## Media toevoegen aan uw enquête
+
+Om media op te nemen in uw rtSurvey-formulier, gebruikt u de volgende kolommen in uw XLSForm:
+
+- `image`: Voor het weergeven van afbeeldingen
+- `audio`: Voor het afspelen van audiobestanden
+- `video`: Voor het afspelen van videobestanden
+
+Voorbeeld:
+
+```
+| type | name          | label          | image       | audio     | video    |
+|------|---------------|----------------|-------------|-----------|----------|
+| note | media_example | Mediavoorbeeld | example.jpg | sound.mp3 | clip.mp4 |
+```
+
+## Beheer van mediabestanden
+
+### Webgebaseerde enquêtes
+Voor webgebaseerde enquêtes biedt rtSurvey een mediabeheerinterface waar u uw mediabestanden kunt uploaden en organiseren. Deze bestanden zijn dan automatisch beschikbaar voor gebruik in uw enquêtes.
+
+### Mobiele app
+Bij gebruik van de rtSurvey mobiele app:
+1. Plaats uw mediabestanden in de map `/rtSurvey/forms/[formuliernaam]-media/` op uw apparaat.
+2. Verwijs naar de exacte bestandsnaam in uw XLSForm.
+
+## rtSurvey-specifieke functies
+
+### Dynamisch laden van media
+rtSurvey ondersteunt dynamisch laden van media op basis van enquêteresponsen:
+
+```
+| type               | name   | label              | image          |
+|--------------------|--------|--------------------|----------------|
+| select_one species | animal | Selecteer een dier | ${animal}.jpg  |
+```
+
+### Media in keuzeopties
+rtSurvey staat het gebruik van media in keuzeopties voor selectievragen toe:
+
+```
+| type                        | name   | label             | media::image |
+|-----------------------------|--------|-------------------|--------------|
+| select_one_from_file animals| Kies een dier |              |
+```
+
+In het choices-werkblad:
+```
+| list_name | name | label | media::image |
+|-----------|------|-------|--------------|
+| animals   | dog  | Hond  | dog.jpg      |
+| animals   | cat  | Kat   | cat.jpg      |
+```
+
+### Media vastleggen
+rtSurvey breidt XLSForm uit met mogelijkheden voor het vastleggen van media:
+
+```
+| type  | name       | label                      |
+|-------|------------|----------------------------|
+| image | photo      | Maak een foto              |
+| audio | voice_note | Neem een spraaknotitie op  |
+| video | video_clip | Neem een video op          |
+```
+
+## Aanbevolen werkwijzen voor het gebruik van media
+
+1. **Optimaliseer bestandsgroottes**: Grote mediabestanden kunnen het laden en indienen van enquêtes vertragen.
+2. **Gebruik geschikte formaten**: Houd u aan breed ondersteunde formaten (jpg voor afbeeldingen, mp3 voor audio, mp4 voor video).
+3. **Bied alternatieven**: Neem altijd tekstalternatieven op voor toegankelijkheid.
+4. **Test grondig**: Zorg ervoor dat media correct wordt weergegeven op alle doelappara ten.
+5. **Overweeg offline gebruik**: Voor enquêtes die offline kunnen worden uitgevoerd, zorg ervoor dat alle media lokaal beschikbaar is.
+
+## Meertalige mediaondersteuning
+
+rtSurvey ondersteunt taalspecifieke media. Gebruik het achtervoegsel `::taal`:
+
+```
+| type | name  | label    | image::English | image::Spanish |
+|------|-------|----------|----------------|----------------|
+| note | intro | Welkom   | welcome_en.jpg | welcome_es.jpg |
+```
+
+## Media in gegevensexport
+
+Bij het exporteren van gegevens uit rtSurvey:
+- Voor websurveys worden media-URL's opgenomen in de export.
+- Voor enquêtes via de mobiele app worden bestandspaden opgenomen.
+
+## Overwegingen voor de mobiele app
+
+- Zorg voor voldoende opslagruimte op apparaten voor media-intensieve enquêtes.
+- De mobiele app van rtSurvey ondersteunt offline media-afspeling en -opname.
+- Grote mediabestanden kunnen de app-prestaties beïnvloeden op apparaten aan de onderkant van de markt.
+
+## Bekende beperkingen
+
+- Sommige oudere browsers ondersteunen mogelijk niet alle mediaformaten.
+- Zeer grote videobestanden kunnen problemen veroorzaken in situaties met lage bandbreedte.
+
+## Mediaproblemen oplossen
+
+1. **Media wordt niet weergegeven**: Controleer bestandspaden en namen op nauwkeurigheid.
+2. **Afspeelproblemen**: Zorg ervoor dat het mediaformaat wordt ondersteund door de doelappara ten.
+3. **Langzaam laden**: Overweeg het optimaliseren van bestandsgroottes of het vooraf laden van media.
+
+## Geavanceerde mediafuncties
+
+### Geotagging
+rtSurvey kan automatisch geotaggen toepassen op media die tijdens enquêtes is vastgelegd:
+
+```
+| type  | name  | label          | appearance |
+|-------|-------|----------------|------------|
+| image | photo | Maak een foto  | geotag     |
+```
+
+### Media-annotaties
+Sta respondenten toe afbeeldingen te annoteren:
+
+```
+| type  | name  | label                    | appearance |
+|-------|-------|--------------------------|------------|
+| image | photo | Annoteer de afbeelding   | annotate   |
+```
+
+Door media effectief te gebruiken in uw rtSurvey-formulieren kunt u boeiendere, informatievere en nauwkeurigere enquêtes maken. Vergeet niet de voordelen van media-inclusie af te wegen tegen prestatieoverwegingen, vooral voor enquêtes die worden ingezet in gebieden met beperkte internetverbinding of op apparaten aan de onderkant van de markt.

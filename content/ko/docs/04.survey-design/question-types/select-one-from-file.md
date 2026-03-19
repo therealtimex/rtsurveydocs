@@ -1,0 +1,97 @@
+---
+title: "Select from file"
+description: "select_one_from_file 및 select_multiple_from_file은 양식에 첨부된 외부 CSV 또는 XML 파일에서 동적으로 선택지를 로드합니다."
+icon: "file-earmark-spreadsheet"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 241
+---
+
+`select_one_from_file` 및 `select_multiple_from_file`은 `select_one` 및 `select_multiple`처럼 작동하지만, **choices 워크시트**에 선택지를 정의하는 대신 양식에 첨부된 **외부 CSV 또는 XML 파일**에서 선택지를 로드합니다. 이는 선택지 목록이 매우 길거나 자주 변경되거나 전체 양식을 다시 만들지 않고 업데이트해야 할 때 유용합니다.
+
+## 기본 XLSForm 사양
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | 의료 시설을 선택하세요 |
+| select_multiple_from_file crops.csv | crops | 가구에서 어떤 작물을 재배합니까? |
+
+유형 이름 뒤의 파일 이름은 양식을 업로드할 때 첨부하는 파일 이름과 일치해야 합니다.
+
+## CSV 파일 형식
+
+CSV 파일에는 최소 두 개의 열이 있어야 합니다: `name` (저장된 값)과 `label` (표시되는 텍스트). 필터링을 위해 원하는 수의 추가 열을 추가할 수 있습니다.
+
+**health_facilities.csv:**
+
+```
+name,label,district,type
+HF001,Nairobi Central Clinic,Nairobi,clinic
+HF002,Westlands Health Centre,Nairobi,health_centre
+HF003,Kisumu District Hospital,Kisumu,hospital
+```
+
+## 선택지 필터링
+
+`choice_filter` 열을 사용하여 현재 맥락과 일치하는 선택지만 표시합니다. CSV 열은 열 이름을 직접 참조합니다 (`${}` 없이):
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | 지역을 선택하세요 | |
+| select_one_from_file health_facilities.csv | facility | 시설을 선택하세요 | district = ${district} |
+
+이 예시에서는 선택된 지역의 시설만 표시됩니다. `choice_filter`의 `district`는 CSV 파일의 `district` 열을 참조하고, `${district}`는 `district`라는 이름의 양식 필드를 참조합니다.
+
+## 용도
+
+파일에서 선택 질문은 일반적으로 다음 용도로 사용됩니다:
+
+1. **긴 선택지 목록** — 의료 시설, 학교, 마을, 종 목록 (수백 또는 수천 개의 항목)
+2. **자주 업데이트되는 목록** — 설문 라운드 사이에 마스터 목록이 변경될 때 양식을 재구성하지 않고 CSV만 업데이트
+3. **공유 참조 데이터** — 여러 양식에서 사용되는 하나의 CSV 파일
+4. **필터링된 계단식 선택** — 하나의 파일에 모든 지역/구/마을을 로드한 다음 상위 선택으로 필터링
+
+## 파일 첨부
+
+rtSurvey에 양식을 업로드할 때 CSV 파일을 **미디어 첨부 파일**로 첨부합니다. 양식 정의의 파일 이름은 첨부 파일의 파일 이름과 정확히 일치해야 합니다.
+
+{{% alert icon=" " context="warning" %}}
+파일 이름은 대소문자를 구분합니다. `Health_Facilities.csv`와 `health_facilities.csv`는 서로 다른 파일로 처리됩니다.
+{{% /alert %}}
+
+## 파일에서 `choice-label()` 사용
+
+note 또는 calculate 필드에 선택된 선택지의 레이블을 표시하려면:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | 시설을 선택하세요 | |
+| calculate | facility_label | | choice-label(${facility}, ${facility}) |
+| note | summary | 선택된 시설: ${facility_label} | |
+
+## 모범 사례
+
+1. 모바일 기기에서 좋은 성능을 위해 CSV 파일을 5,000행 이하로 유지합니다.
+2. 항상 `name`과 `label` 열을 포함합니다 — 추가 열은 선택 사항입니다.
+3. 계단식 선택의 경우 상위 열이 있는 단일 CSV를 사용하고 `choice_filter`로 필터링합니다.
+4. 열 구조에 중대한 변경이 있을 때 CSV 파일 이름에 버전을 붙입니다 (예: `facilities_v3.csv`).
+5. 필터링 표현식을 주의 깊게 테스트합니다 — `choice_filter`의 오타는 선택지가 조용히 표시되지 않게 합니다.
+
+## 제한 사항
+
+- 매우 큰 CSV 파일 (10,000개 이상의 행)은 특히 저사양 기기에서 양식 로딩을 느리게 할 수 있습니다.
+- CSV 파일은 양식과 함께 업로드되어야 합니다 — 런타임에 URL에서 가져올 수 없습니다 (동적 조회에는 `search()` 또는 `pulldata()` 사용).
+- `select_multiple_from_file`은 클라이언트 전반에서 덜 일반적으로 지원됩니다 — 사용 전에 호환성을 확인합니다.
+
+## `search()`와의 비교
+
+| | `select_one_from_file` | `search()` appearance |
+|--|----------------------|----------------------|
+| 선택지 소스 | 첨부된 CSV/XML 파일 | 서버 측 데이터베이스 쿼리 |
+| 오프라인 작동 | 예 (파일이 번들됨) | 연결 필요 |
+| 선택지 수 | 기기 메모리로 제한 | 무제한 (페이지 분할) |
+| 실시간 데이터 | 아니오 | 예 |
+
+대규모, 자주 변경되거나 서버 측 데이터셋의 경우 [동적 검색](../advanced-extension/dynamic-search)을 참조하세요.

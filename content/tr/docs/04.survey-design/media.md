@@ -1,0 +1,147 @@
+---
+title: "Medya"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 286
+---
+
+rtSurvey, anketlerde zengin medya entegrasyonunu destekler; soru formlarınızı görüntüler, ses ve video ile zenginleştirmenize olanak tanır. Bu özellik, katılımcı deneyimini ve toplanan veri kalitesini önemli ölçüde artırabilir.
+
+## Desteklenen Medya Türleri
+
+rtSurvey aşağıdaki medya türlerini destekler:
+- Görüntüler (jpg, png, gif)
+- Ses (mp3, wav)
+- Video (mp4, webm)
+
+## Anketinize Medya Ekleme
+
+rtSurvey formunuza medya eklemek için XLSForm'unuzdaki aşağıdaki sütunları kullanın:
+
+- `image`: Görüntü görüntülemek için
+- `audio`: Ses dosyaları oynatmak için
+- `video`: Video dosyaları oynatmak için
+
+Örnek:
+
+```
+| type | name          | label         | image        | audio       | video       |
+|------|---------------|---------------|--------------|-------------|-------------|
+| note | media_example | Medya örneği | example.jpg  | sound.mp3   | clip.mp4    |
+```
+
+## Medya Dosyası Yönetimi
+
+### Web tabanlı anketler
+Web tabanlı anketler için rtSurvey, medya dosyalarınızı yükleyip düzenleyebileceğiniz bir medya yönetim arayüzü sağlar. Bu dosyalar daha sonra anketlerinizde kullanım için otomatik olarak erişilebilir hale gelir.
+
+### Mobil uygulama
+rtSurvey mobil uygulamasını kullanırken:
+1. Medya dosyalarınızı cihazınızdaki `/rtSurvey/forms/[form-adı]-media/` klasörüne yerleştirin.
+2. XLSForm'unuzda tam dosya adına referans verin.
+
+## rtSurvey'e Özgü Özellikler
+
+### Dinamik Medya Yükleme
+rtSurvey, anket yanıtlarına dayalı dinamik medya yüklemeyi destekler:
+
+```
+| type         | name      | label              | image                    |
+|--------------|-----------|--------------------|--------------------------| 
+| select_one species | animal | Bir hayvan seçin | ${animal}.jpg            |
+```
+
+### Seçenek Seçeneklerinde Medya
+rtSurvey, seçme soruları için seçenek seçeneklerinde medya kullanmanıza olanak tanır:
+
+```
+| type                | name    | label           | media::image |
+|---------------------|---------|-----------------|--------------|
+| select_one_from_file animals | Bir hayvan seçin |              |
+```
+
+Choices sayfasında:
+```
+| list_name | name  | label | media::image |
+|-----------|-------|-------|--------------|
+| animals   | dog   | Köpek | dog.jpg      |
+| animals   | cat   | Kedi  | cat.jpg      |
+```
+
+### Medya Yakalama
+rtSurvey, medya yakalama yetenekleriyle XLSForm'u genişletir:
+
+```
+| type  | name        | label               |
+|-------|-------------|---------------------|
+| image | photo       | Fotoğraf çekin       |
+| audio | voice_note  | Ses notu kaydedin   |
+| video | video_clip  | Video kaydedin       |
+```
+
+## Medya Kullanımı için En İyi Uygulamalar
+
+1. **Dosya boyutlarını optimize edin**: Büyük medya dosyaları anket yükleme ve gönderimi yavaşlatabilir.
+2. **Uygun biçimleri kullanın**: Yaygın desteklenen biçimlere bağlı kalın (görüntüler için jpg, ses için mp3, video için mp4).
+3. **Alternatifler sağlayın**: Erişilebilirlik için her zaman metin alternatifleri ekleyin.
+4. **Kapsamlı test edin**: Medyanın tüm hedef cihazlarda doğru görüntülendiğinden emin olun.
+5. **Çevrimdışı kullanımı göz önünde bulundurun**: Çevrimdışı yapılabilecek anketler için tüm medyanın yerel olarak mevcut olduğundan emin olun.
+
+## Çok Dilli Medya Desteği
+
+rtSurvey, dile özgü medyayı destekler. `::language` sonekini kullanın:
+
+```
+| type | name  | label    | image::English | image::Spanish |
+|------|-------|----------|----------------|----------------|
+| note | intro | Hoş geldiniz  | welcome_en.jpg | welcome_es.jpg |
+```
+
+## Veri Dışa Aktarmada Medya
+
+rtSurvey'den veri dışa aktarılırken:
+- Web anketleri için medya URL'leri dışa aktarmaya dahil edilir.
+- Mobil uygulama anketleri için dosya yolları dahil edilir.
+
+## Mobil Uygulama Hususları
+
+- Medya yoğun anketlerde cihazlarda yeterli depolama alanı olduğundan emin olun.
+- rtSurvey mobil uygulaması çevrimdışı medya oynatma ve yakalamayı destekler.
+- Büyük medya dosyaları düşük özellikli cihazlarda uygulama performansını etkileyebilir.
+
+## Bilinen Sınırlamalar
+
+- Bazı eski tarayıcılar tüm medya biçimlerini desteklemeyebilir.
+- Çok büyük video dosyaları düşük bant genişlikli durumlarda sorunlara yol açabilir.
+
+## Medya Sorunlarında Sorun Giderme
+
+1. **Medya görüntülenmiyor**: Dosya yollarını ve adlarını doğruluk açısından kontrol edin.
+2. **Oynatma sorunları**: Medya biçiminin hedef cihazlar tarafından desteklendiğinden emin olun.
+3. **Yavaş yükleme**: Dosya boyutlarını optimize etmeyi veya medyayı önceden yüklemeyi düşünün.
+
+## Gelişmiş Medya Özellikleri
+
+### Coğrafi etiketleme
+rtSurvey, anketler sırasında yakalanan medyayı otomatik olarak coğrafi etiketleyebilir:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Fotoğraf çekin | geotag     |
+```
+
+### Medya Açıklamaları
+Katılımcıların görüntülere açıklama eklemesine izin verin:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Görüntüye açıklama ekleyin | annotate |
+```
+
+rtSurvey formlarında medyayı etkin biçimde kullanarak daha ilgi çekici, bilgilendirici ve doğru anketler oluşturabilirsiniz. Özellikle sınırlı internet bağlantısı olan veya daha düşük özellikli cihazlardaki alanlarda yapılan anketler için performans değerlendirmeleriyle medya eklemanın faydalarını dengelemeyi unutmayın.

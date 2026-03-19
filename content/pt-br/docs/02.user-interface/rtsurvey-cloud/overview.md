@@ -1,0 +1,72 @@
+---
+title: "Visão geral"
+description: "O rtCloud é o poderoso componente de servidor do rtSurvey, oferecendo gerenciamento de projetos, manipulação de formulários, coleta de dados e fluxos de trabalho avançados de envio para operações eficientes de pesquisa e estudos longitudinais."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 313
+---
+
+![Página inicial do rtCloud](images/rtsurvey/rtsurvey-cloud-home.webp)
+
+O rtCloud é o robusto componente de servidor do ecossistema rtSurvey, projetado para otimizar a coleta, o gerenciamento e a análise de dados. Como hub central para as operações do rtSurvey, o rtCloud oferece um conjunto abrangente de funcionalidades para suportar projetos de pesquisa complexos e estudos longitudinais.
+
+## Principais funcionalidades
+
+### Gerenciamento de projetos
+- Organize todos os aspectos do seu projeto de pesquisa em um único lugar
+- Gerencie funções de usuário, formulários, análises, entregáveis e permissões dentro de cada projeto
+
+### Gerenciamento de usuários e segurança
+- Crie e gerencie contas de usuário com permissões baseadas em função
+- Garanta a segurança dos dados e o controle de acesso em todos os níveis
+
+### Gerenciamento de formulários
+- Faça upload e gerencie XLSForms diretamente
+- Suporte para atualizações de versão de formulários, incluindo pequenos ajustes e mudanças estruturais
+- Anexe multimídia ou dados adicionais aos formulários
+- Capacidade de exclusão verdadeira de formulários para controle completo sobre seus instrumentos de pesquisa
+
+### Coleta de dados e gerenciamento de envios
+- Integração perfeita com o aplicativo móvel rtSurvey, aplicativo web e formulário web
+- Suporte para envios de usuários autenticados e links públicos anônimos
+- Manipule multimídia de envio e anexos de dados
+- Visualização em tabela interativa dos dados de envio para insights rápidos
+
+### Fluxos de trabalho avançados de envio
+- Retorne envios para dispositivos dos usuários para edição ou verificação adicional
+- Encaminhe envios para outros dispositivos, habilitando fluxos de trabalho colaborativos e controle de qualidade
+
+### Gerenciamento de dados longitudinais
+- Manipule com eficiência medidas repetidas e estudos de longo prazo
+- Acompanhe alterações e atualizações dos dados dos participantes ao longo do tempo
+
+### Conectividade flexível
+- Permita que o aplicativo móvel rtSurvey se conecte para downloads de formulários e uploads de envios
+- Suporte à coleta de dados off-line com sincronização perfeita quando a conectividade for restaurada
+
+## Como o rtCloud se destaca
+
+Embora inspirado em outras plataformas de coleta de dados, o rtCloud oferece recursos únicos que o diferenciam:
+
+1. **Exclusão verdadeira de formulários**: Ao contrário de algumas plataformas, o rtCloud permite a remoção completa de formulários quando necessário.
+
+2. **Fluxos de trabalho flexíveis de envio**: A capacidade de retornar e encaminhar envios permite processos complexos de revisão de dados e controle de qualidade.
+
+3. **Gerenciamento de projeto integrado**: O rtCloud vai além do gerenciamento de formulários e dados, oferecendo ferramentas para organizar todos os aspectos do seu projeto de pesquisa.
+
+4. **Suporte direto a XLSForm**: Faça upload dos seus XLSForms diretamente sem conversão, simplificando o processo de criação de formulários.
+
+5. **Sistema de permissões abrangente**: Controle granular sobre acesso e capacidades dos usuários dentro dos projetos.
+
+## Começando com o rtCloud
+
+Para começar a usar o rtCloud nos seus projetos de pesquisa:
+
+1. Configure o seu servidor rtCloud ou entre em contato com o rtSurvey para soluções hospedadas.
+2. Crie o seu primeiro projeto e convide membros da equipe.
+3. Faça upload dos seus XLSForms e configure seus fluxos de trabalho de coleta de dados.
+4. Conecte seus aplicativos móveis rtSurvey e comece a coletar dados.
+
+O rtCloud capacita pesquisadores, organizações e equipes de coleta de dados a gerenciar projetos de pesquisa complexos com facilidade, segurança e flexibilidade. Seja conduzindo uma pesquisa única ou um estudo longitudinal de vários anos, o rtCloud fornece as ferramentas que você precisa para ter sucesso.

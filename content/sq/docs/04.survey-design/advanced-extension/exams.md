@@ -1,0 +1,121 @@
+---
+title: "Provime"
+description: "Veçoria e provimit shton modalitetin e kuizit me kohë në sondazh, me reagim audio opsional për përgjigjet e sakta dhe të gabuara."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 298
+---
+
+Veçoria **Provimit** kthen sondazhin në kuiz me kohë. Numëruesi shfaq minutor mbrapsht, dhe sondazhi regjistron sa kohë mbetet kur mbarojnë. Opsionalisht, mund të luajnë tinguj audio për përgjigjet e sakta dhe të gabuara.
+
+Kjo është e dobishme për vlerësimet e njohurive, testet e shkrim-leximit, kontrollet e kompetencës së stafit, dhe çdo sondazh ku koha-mbi-detyrë janë të dhëna kuptimplote.
+
+---
+
+## Funksioni `check-exam()`
+
+Konfiguroni provimin duke përdorur `check-exam()` në kolonën **`calculation`** të fushës `calculate` të vendosur në fillim të formularit:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Parametrat
+
+| # | Parametri | Përshkrimi |
+|---|-----------|------------|
+| 1 | `examTime` | Kohëzgjatja totale e provimit në sekonda |
+| 2 | `questionToStoreRemainingTime` | `name`-i i fushës `calculate` ose `integer` që do të ruajë kohën e mbetur kur mbarojë provimi |
+| 3 | `rightSound` | *(Opsionale)* Emri i skedarit audio për të luajtur kur jepet përgjigje e saktë (bashkëngjitur formularit si skedar media) |
+| 4 | `wrongSound` | *(Opsionale)* Emri i skedarit audio për të luajtur kur jepet përgjigje e gabuar |
+| 5 | `excludeQuestion` | *(Opsionale)* Lista e ndarë me presje e emrave të fushave për t'i përjashtuar nga minutori i provimit (p.sh., `'intro_note,consent'`) |
+
+---
+
+## Konfigurimi bazë
+
+### Hapi 1: Shtoni fushat e provimit
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` aktivizon minutoren 600-sekondësh (10 minuta). `remaining_time` plotësohet automatikisht kur i anketuari mbaron.
+
+### Hapi 2: Shtoni pyetjet tuaja
+
+Minutori i provimit mbulon të gjitha pyetjet në formular me përjashtim të atyre të listuara në `excludeQuestion`.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | Kryeqyteti i Kenias është Nairobi. E vërtetë apo e rreme? |
+| select_one choices | q2 | Cili organ pompon gjakun rreth trupit? |
+| select_one choices | q3 | Uji zien në 100°C në nivelin e detit. E vërtetë apo e rreme? |
+
+### Hapi 3: Ruani kohën e mbetur
+
+Fusha e emërtuar në parametrin 2 (`remaining_time`) caktohet automatikisht në numrin e sekondave të mbetura kur i anketuari dorëzon. Vlera `0` nënkupton se koha mbaroi; vlera e lartë nënkupton se mbaruan shpejt.
+
+---
+
+## Me reagim audio
+
+Bashkëngjisat skedarë zëri formularit (si bashkëngjitje media), pastaj i referoni:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` luan kur i anketuari zgjedh përgjigjen e saktë
+- `wrong.mp3` luan kur i anketuari zgjedh përgjigjen e gabuar
+
+{{% alert icon=" " context="warning" %}}
+Skedarët zëri duhet të bashkëngjitur formularit si skedarë media dhe emri i skedarit duhet të përputhet saktësisht (i ndjeshëm ndaj shkronjave) duke përfshirë shtesën.
+{{% /alert %}}
+
+---
+
+## Përjashtimi i pyetjeve nga minutori
+
+Kaloni listën e ndarë me presje të emrave të fushave për t'i përjashtuar nga provimi (p.sh., shënimet hyrëse ose pyetjet e pëlqimit):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+Lërini `rightSound` dhe `wrongSound` si vargje bosh `''` nëse nuk keni nevojë për audio por keni nevojë për përjashtim.
+
+---
+
+## Shembull i plotë
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | Mirë se vini në vlerësimin e njohurive shëndetësore. Keni 5 minuta për t'iu përgjigjur të gjitha pyetjeve. | |
+| trigger | start_ack | Trokitni OK kur jeni gati të filloni. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | Larja e duarve parandalon përhapjen e sëmundjes. | |
+| select_one yesno | q2 | Duhet të pini të paktën 2 litra ujë në ditë. | |
+| select_one yesno | q3 | Malaria shkaktohet nga virusi. | |
+
+---
+
+## Praktikat më të mira
+
+1. Gjithmonë informoni të anketuarit mbi kufirin e kohës para fillimit — përdorni `note` ose `trigger` para fushës `check-exam()`.
+2. Përjashtoni shënimet hyrëse dhe pyetjet e pëlqimit nga minutori duke përdorur parametrin `excludeQuestion`.
+3. Përdorni `remaining_time` në llogaritje vijuese për të zbuluar ndaljet e kohës: `if(${remaining_time} = 0, 'Koha mbaroi', 'U plotësua')`.
+4. Mbajeni numrin e pyetjeve proporcional me kohën e lejuar — 2-3 minuta për pyetje është bazë e arsyeshme për shumicën e vlerësimeve të njohurive.
+5. Testoni me skedarë audio në pajisjen aktuale para vendosjes — riprodhimi audio ndryshon nëpër versionet Android dhe shfletuesit.
+
+## Kufizimet
+
+- Minutori është vetëm shfaqje — formulari nuk dorëzohet automatikisht kur mbaron koha; i anketuari duhet ta dorëzojë manualisht.
+- Reagimi audio kërkon që volumi i pajisjes të jetë ndezur dhe pa u fikur.
+- Veçoria e provimit është zgjerim i rtSurvey dhe nuk është pjesë e specifikimit standard XLSForm.

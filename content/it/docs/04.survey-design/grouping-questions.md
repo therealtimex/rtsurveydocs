@@ -1,0 +1,146 @@
+---
+title: "Raggruppamento delle domande"
+description: ""
+icon: "auto_awesome"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 250
+---
+
+I gruppi in XLSForm ti consentono di organizzare le domande correlate insieme, migliorando la struttura del tuo sondaggio e migliorando le capacità di analisi dei dati. rtSurvey supporta pienamente i gruppi XLSForm ed estende la loro funzionalità con funzionalità aggiuntive.
+
+## Struttura di base dei gruppi
+
+Per creare un gruppo di domande, usa la sintassi `begin_group` e `end_group`:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | respondent | Informazioni del rispondente             |
+| text         | name       | Inserisci il nome del rispondente        |
+| text         | position   | Inserisci la posizione del rispondente   |
+| end_group    |            |                                          |
+```
+
+Punti chiave:
+- La riga `begin_group` richiede un `name` e una `label`.
+- La riga `end_group` non ha bisogno di nome o etichetta.
+- Le domande tra `begin_group` e `end_group` fanno parte del gruppo.
+
+## Appearance dei gruppi
+
+rtSurvey supporta varie opzioni di appearance per i gruppi:
+
+1. **field-list**: Mostra più domande sullo stesso schermo.
+   ```
+   | type         | name       | label        | appearance |
+   |--------------|------------|--------------|------------|
+   | begin_group  | respondent | Rispondente  | field-list |
+   | text         | name       | Nome         |            |
+   | text         | position   | Posizione    |            |
+   | end_group    |            |              |            |
+   ```
+
+2. **grid**: Crea un layout compatto simile a una tabella per i gruppi (specifico di rtSurvey).
+   ```
+   | type         | name       | label          | appearance |
+   |--------------|------------|----------------|------------|
+   | begin_group  | household  | Nucleo familiare| grid       |
+   | text         | member_name| Nome           |            |
+   | integer      | member_age | Età            |            |
+   | end_group    |            |                |            |
+   ```
+
+3. **collapsible**: Crea gruppi espandibili/comprimibili (specifico di rtSurvey).
+   ```
+   | type         | name       | label    | appearance  |
+   |--------------|------------|----------|-------------|
+   | begin_group  | details    | Dettagli | collapsible |
+   | text         | address    | Indirizzo|             |
+   | text         | phone      | Telefono |             |
+   | end_group    |            |          |             |
+   ```
+
+## Gruppi annidati
+
+I gruppi possono essere annidati all'interno di altri gruppi per strutture più complesse:
+
+```
+| type         | name       | label                                      |
+|--------------|------------|------------------------------------------|
+| begin_group  | hospital   | Informazioni sull'ospedale               |
+| text         | hosp_name  | Qual è il nome di questo ospedale?       |
+| begin_group  | medication | Disponibilità dei farmaci                |
+| select_one y_n| hiv_meds  | Questo ospedale ha farmaci per l'HIV?    |
+| end_group    |            |                                          |
+| end_group    |            |                                          |
+```
+
+**Nota**: Chiudi sempre prima il gruppo avviato più di recente per mantenere un corretto annidamento.
+
+## Logica di salto per i gruppi
+
+Usa la colonna `relevant` per implementare la logica di salto per interi gruppi:
+
+```
+| type         | name   | label                                             | relevant        |
+|--------------|--------|---------------------------------------------------|-----------------|
+| integer      | age    | Quanti anni hai?                                  |                 |
+| begin_group  | child  | Bambino                                           | ${age} <= 5     |
+| integer      | muac   | Registra la circonferenza del braccio del bambino |                 |
+| select_one y_n| mrdt  | Il test diagnostico rapido del bambino è positivo?|                 |
+| end_group    |        |                                                   |                 |
+```
+
+In questo esempio, il gruppo `child` apparirà solo se l'età del rispondente è 5 anni o meno.
+
+## Best practice per l'uso dei gruppi
+
+1. Usa nomi significativi per i gruppi per migliorare l'analisi dei dati.
+2. Mantieni i gruppi focalizzati sulle domande correlate.
+3. Usa i gruppi annidati con parsimonia per evitare strutture eccessivamente complesse.
+4. Testa approfonditamente la logica di salto quando usi `relevant` sui gruppi.
+5. Considera di usare l'appearance `field-list` per i gruppi brevi per ridurre lo scorrimento.
+6. Utilizza il layout a griglia di rtSurvey per la visualizzazione compatta delle informazioni correlate.
+7. Usa i gruppi comprimibili per i moduli lunghi per migliorare la navigazione.
+
+## Funzionalità specifiche di rtSurvey
+
+1. **Layout a griglia**: Usa l'appearance `grid` per visualizzazioni simili a tabelle.
+2. **Gruppi comprimibili**: Implementa l'appearance `collapsible` per sezioni espandibili.
+3. **Stile personalizzato**: Applica CSS personalizzato ai gruppi per design visivi unici.
+4. **Comportamento dinamico del gruppo**: Implementa logica di salto complessa e calcoli all'interno dei gruppi.
+
+## Supporto multilingua
+
+rtSurvey supporta i gruppi multilingua. Usa le colonne specifiche della lingua per le etichette:
+
+```
+| type         | name       | label::Italian     | label::English |
+|--------------|------------|--------------------|----------------|
+| begin_group  | personal   | Info personali     | Personal Info  |
+| text         | name       | Nome               | Name           |
+| end_group    |            |                    |                |
+```
+
+## Considerazioni sull'app mobile
+
+- I gruppi con l'appearance `field-list` vengono visualizzati come un'unica schermata nell'app mobile.
+- I gruppi comprimibili possono migliorare la navigazione su schermi più piccoli.
+- I layout a griglia possono adattarsi per una migliore visibilità sui dispositivi mobili.
+
+## Limitazioni note
+
+- Un eccessivo annidamento dei gruppi può influire sulle prestazioni su alcuni dispositivi.
+- Alcune opzioni di stile avanzate potrebbero non essere disponibili per i gruppi nell'app mobile.
+
+## Risoluzione dei problemi con i gruppi
+
+1. Assicurati che ogni `begin_group` abbia un corrispondente `end_group`.
+2. Controlla che i nomi dei gruppi siano univoci all'interno del modulo.
+3. Verifica che la logica di salto faccia riferimento ai nomi di domanda corretti.
+4. Testa i gruppi approfonditamente sia sulle interfacce web che mobili.
+
+Usando efficacemente i gruppi nei tuoi XLSForm con rtSurvey, puoi creare sondaggi ben organizzati ed efficienti che migliorano sia l'esperienza di raccolta dati che la qualità della tua analisi dei dati.

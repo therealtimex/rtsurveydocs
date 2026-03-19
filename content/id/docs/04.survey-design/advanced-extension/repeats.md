@@ -1,0 +1,160 @@
+---
+title: "Pengulangan Lanjutan"
+description: "Pola lanjutan untuk grup pengulangan: jumlah dinamis, pengulangan bersarang, meringkas data pengulangan, dan mereferensikan nilai antar pengulangan."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 295
+---
+
+Halaman ini mencakup pola lanjutan untuk bekerja dengan grup pengulangan di rtSurvey. Untuk dasar-dasar pengaturan grup pengulangan, lihat [Pengelompokan dan Pengulangan](../repeats).
+
+---
+
+## Jumlah pengulangan dinamis
+
+Secara default, enumerator memutuskan berapa kali harus mengulang. Anda dapat memperbaiki jumlah pengulangan menggunakan `repeat_count`:
+
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Anggota rumah tangga | `${num_members}` |
+| text | member_name | Nama anggota | |
+| integer | member_age | Usia | |
+| end_repeat | | | |
+
+Pengulangan berjalan tepat `${num_members}` kali, di mana `num_members` dikumpulkan sebelumnya dalam formulir. Enumerator tidak dapat menambah atau menghapus instans.
+
+---
+
+## Akses terindeks: `indexed-repeat()`
+
+Akses nilai bidang instans pengulangan tertentu dari **luar** grup pengulangan menggunakan `indexed-repeat(repeatedField, repeatGroup, index)`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+Ini berguna untuk membangun bidang ringkasan atau mereferensikan data anggota "utama" setelah pengulangan.
+
+---
+
+## Posisi instans saat ini: `index()`
+
+Di dalam grup pengulangan, `index()` mengembalikan posisi berbasis 1 dari instans saat ini. Gunakan untuk memberi label setiap pengulangan atau membuat pengidentifikasi unik:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Plot |
+| note | plot_label | Plot nomor ${index()} |
+| text | plot_id | ID Plot |
+| end_repeat | | |
+
+---
+
+## Mereferensikan bidang dalam instans yang sama
+
+Di dalam pengulangan, gunakan `${fieldname}` untuk mereferensikan bidang lain **dalam instans pengulangan yang sama**. Tidak perlu `indexed-repeat()` dalam loop yang sama:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Anggota | |
+| text | member_name | Nama | |
+| integer | member_age | Usia | |
+| text | school_name | Nama sekolah | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## Mereferensikan bidang induk dari dalam pengulangan
+
+Bidang di luar (di atas) grup pengulangan dapat direferensikan secara normal dengan `${fieldname}`:
+
+| type | name | label |
+|------|------|-------|
+| text | village | Nama desa |
+| begin_repeat | plots | Lahan pertanian |
+| note | plot_context | Plot di ${village} |
+| end_repeat | | |
+
+---
+
+## Meringkas data pengulangan
+
+Gunakan fungsi agregat pengulangan **di luar** grup pengulangan untuk meringkas:
+
+| Fungsi | Contoh | Deskripsi |
+|--------|--------|-----------|
+| `count(group)` | `count(${household_members})` | Jumlah instans |
+| `sum(field)` | `sum(${loan_amount})` | Jumlah bidang numerik |
+| `min(field)` | `min(${member_age})` | Nilai minimum |
+| `max(field)` | `max(${member_age})` | Nilai maksimum |
+| `join(sep, field)` | `join(', ', ${member_name})` | Daftar yang dipisahkan koma |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Jumlah kondisional |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Jumlah kondisional |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Gabungan kondisional |
+
+### Contoh: Ringkasan rumah tangga
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | Berapa banyak anggota? | |
+| begin_repeat | members | Anggota | `${num_members}` |
+| text | member_name | Nama | |
+| integer | member_age | Usia | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | ${total_members} anggota; ${children_count} di bawah 18. Dewasa: ${adult_names} | |
+
+---
+
+## Pengulangan bersarang
+
+Grup pengulangan dapat berisi grup pengulangan lain. Gunakan ini dengan hati-hati — pengulangan bersarang menambah kompleksitas dan bisa membingungkan enumerator.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Rumah Tangga |
+| text | hh_id | ID Rumah Tangga |
+| begin_repeat | hh_members | Anggota |
+| text | member_name | Nama anggota |
+| end_repeat | | |
+| end_repeat | | |
+
+Untuk mereferensikan bidang dalam pengulangan luar dari pengulangan dalam, gunakan `${fieldname}` — itu diselesaikan ke leluhur yang paling dekat cocok:
+
+Di dalam pengulangan `hh_members`, `${hh_id}` mengembalikan ID rumah tangga **saat ini**, bukan semua rumah tangga.
+
+---
+
+## Peringkat dalam grup pengulangan: `rank-index()`
+
+Ketika bidang `rank` ada di dalam pengulangan, gunakan `rank-index(instanceNumber, repeatedField)` dari luar untuk mendapatkan peringkat ordinal instans tertentu:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` mengembalikan indeks instans dari skor tertinggi.
+
+---
+
+## Praktik Terbaik
+
+1. Selalu gunakan `repeat_count` ketika jumlah pengulangan diketahui sebelumnya — ini mencegah enumerator secara tidak sengaja menambah atau menghapus instans.
+2. Jaga grup pengulangan tetap terfokus — pengulangan dengan 20+ pertanyaan per instans sulit dinavigasi.
+3. Beri nama grup pengulangan dengan jelas (misalnya, `household_members`, bukan `repeat1`) — nama muncul dalam panggilan fungsi dan data yang diekspor.
+4. Uji dengan jumlah instans maksimum yang diharapkan untuk memverifikasi kinerja.
+5. Gunakan appearance `field-list` pada grup pengulangan untuk menampilkan semua bidang di satu layar per instans (mobile).
+
+---
+
+## Keterbatasan
+
+- `indexed-repeat()` memerlukan indeks yang valid (1 hingga jumlah instans) — indeks di luar rentang mengembalikan kosong.
+- Pengulangan bersarang lebih dari 2 tingkat tidak disarankan dan dapat menyebabkan masalah tampilan pada beberapa klien.
+- Fungsi agregat (`sum`, `count`, dll.) beroperasi pada seluruh grup pengulangan — Anda tidak dapat mengagregat subset instans tanpa varian `*-if`.

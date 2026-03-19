@@ -1,0 +1,105 @@
+---
+title: "File"
+description: "As perguntas de ficheiro permitem aos respondentes carregar documentos e outros ficheiros como parte das suas respostas ao inquérito."
+icon: "upload_file"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 230
+---
+
+O tipo de pergunta `file` permite aos respondentes **carregar qualquer ficheiro** do seu dispositivo — documentos, folhas de cálculo, PDFs ou outros tipos de ficheiro. Ao contrário de `image`, `audio` e `video` que lançam ferramentas de captura específicas, `file` abre um seletor de ficheiros de uso geral.
+
+## Especificação XLSForm Básica
+
+| type | name      | label                              |
+|------|-----------|-----------------------------------|
+| file | document  | Por favor carregue o seu documento |
+
+Para mais detalhes sobre o tipo de pergunta file padrão, consulte a [especificação XLSForm](https://xlsform.org/en/#question-types).
+
+## Utilizações
+
+As perguntas de ficheiro são comummente usadas para:
+
+1. Recolher documentos de suporte (recibos, certificados, contratos, relatórios)
+2. Carregar formulários em papel preenchidos que foram digitalizados
+3. Recolher folhas de cálculo ou exportações de dados de outros sistemas
+4. Qualquer tipo de ficheiro digital que image/audio/video não cubra
+
+## Formato de dados
+
+Os ficheiros carregados são armazenados como anexos binários:
+
+- **Formato:** Preservado no formato original (PDF, XLSX, DOCX, etc.)
+- **Nomenclatura:** `{instanceID}-{fieldname}.{extension}`
+- **Armazenamento:** Carregado para a pasta de media do servidor juntamente com a submissão
+- **Acesso:** Transferível a partir da interface de gestão de submissões
+
+## Extensões rtSurvey
+
+### Tipos de ficheiro aceites
+
+Use a coluna `parameters` para restringir que tipos de ficheiro podem ser selecionados:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| file | report | Carregue o relatório de inspeção | `accept=.pdf` |
+| file | spreadsheet | Carregue o ficheiro de dados | `accept=.xlsx,.csv` |
+
+O parâmetro `accept` usa sintaxe padrão de extensão de ficheiro (separada por vírgulas).
+
+### Orientação sobre tamanho de ficheiro
+
+O rtSurvey não impõe um limite rígido de tamanho de ficheiro ao nível da pergunta, mas aplica-se o limite de carregamento do servidor. Use `hint` para comunicar as expectativas ao enumerador:
+
+| type | name | label | hint |
+|------|------|-------|------|
+| file | receipt | Carregue o recibo de pagamento | Aceite: PDF ou imagem. Tamanho máximo do ficheiro: 5 MB |
+
+### Integração com o sistema de ficheiros do dispositivo e armazenamento na nuvem
+
+No Android e iOS, a pergunta `file` abre o seletor de ficheiros nativo do dispositivo, que pode incluir acesso a:
+- Armazenamento local do dispositivo
+- Cartão SD (Android)
+- iCloud Drive (iOS)
+- Google Drive, Dropbox (se instalados)
+
+Na web, abre o diálogo padrão de carregamento de ficheiros do navegador.
+
+## Exemplo de utilização
+
+### Carregamento obrigatório de PDF
+
+| type | name | label | hint | required | required_message |
+|------|------|-------|------|----------|-----------------|
+| file | signed_consent | Carregue o formulário de consentimento assinado | Apenas PDF, máx 2MB | yes | É necessário um formulário de consentimento |
+
+### Carregamento condicional de documento
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_land_title | O agregado familiar tem título de propriedade? | |
+| file | land_title_doc | Carregue uma fotografia ou digitalização do título de propriedade | `${has_land_title} = 'yes'` |
+
+## Melhores Práticas
+
+1. Use `accept` para restringir os tipos de ficheiro — evita que os enumeradores carreguem ficheiros errados acidentalmente.
+2. Inclua sempre orientação sobre tamanho e formato na coluna `hint`.
+3. Para fotografias e imagens, use o tipo `image` — oferece melhor compressão e tratamento de formato consistente.
+4. Para inquéritos extensos com anexos de ficheiros, planeie o seu armazenamento de dados e largura de banda de transferência em conformidade.
+5. Teste o seletor de ficheiros no tipo de dispositivo alvo (Android vs. iOS vs. web) antes da implementação — o acesso a unidades de nuvem varia.
+
+## Considerações sobre tratamento de dados
+
+- Os ficheiros são armazenados no seu formato original; não são convertidos ou comprimidos pelo rtSurvey.
+- Analise os ficheiros após transferência — o rtSurvey não extrai nem indexa o conteúdo dos ficheiros.
+- Anexos de ficheiros grandes aumentam significativamente o tempo necessário para transferir um conjunto de dados completo.
+
+## Limitações
+
+- As perguntas de ficheiro não validam o conteúdo do ficheiro — apenas a verificação de extensão de ficheiro via `accept` é aplicada ao nível da interface.
+- Ficheiros muito grandes (100 MB+) podem exceder o tempo limite de carregamento em ambientes com pouca conectividade.
+- Os enumeradores offline podem anexar ficheiros, mas estes não serão carregados até que a conectividade seja restaurada.
+- Algumas configurações de dispositivos restringem o acesso a determinadas localizações de armazenamento (por ex., políticas MDM corporativas).

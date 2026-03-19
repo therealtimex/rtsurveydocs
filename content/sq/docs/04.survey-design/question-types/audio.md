@@ -1,0 +1,99 @@
+---
+title: "Audio"
+description: "Pyetjet audio lejojnë të anketuarit të regjistrojnë dhe dorëzojnë skedarë audio si pjesë e sondazhit."
+icon: "mic"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 228
+---
+
+Lloji i pyetjes `audio` mundëson të anketuarve të **regjistrojnë audio** ose të ngarkojnë një skedar audio ekzistues si pjesë të përgjigjes së tyre të sondazhit. Është i dobishëm për kapjen e llogarive verbale, zërave të mjedisit, dëshmive, ose çdo informacioni që shprehet më mirë nëpërmjet zërit sesa tekstit.
+
+## Specifikimi bazë XLSForm
+
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Ju lutemi regjistroni komentet tuaja |
+
+Për më shumë detaje mbi llojin standard të pyetjes audio, shikoni [specifikimin XLSForm](https://xlsform.org/en/#question-types).
+
+## Përdorimet
+
+Pyetjet audio përdoren zakonisht për:
+
+1. Kapja e përgjigjeve verbale me fund të hapur për të reduktuar barrën e shtypjes tek numëruesi
+2. Regjistrimi i dëshmive, historive personale, ose historive gojore
+3. Dokumentimi i zërave të mjedisit (p.sh., nivelet e zhurmës pranë infrastrukturës)
+4. Mbledhja e mostrave të zërit për kërkime gjuhësore ose shëndetësore
+5. Lejimi i të anketuarve të shtojnë sqarime verbale ndaj përgjigjeve numerike ose me zgjedhje
+
+## Formati i të dhënave
+
+Skedarët audio ruhen si bashkëngjitje binare krahas dorëzimit të formularit, zakonisht:
+
+- **Formati:** MP3 ose AAC (regjistrim mobile); WAV (regjistrim me cilësi të lartë)
+- **Emërtimi:** `{instanceID}-{fieldname}.mp3` (ose ekuivalent)
+- **Ruajtja:** Ngarkuar në dosjen media të serverit dhe e lidhur me rekordin e dorëzimit
+- **Aksesi:** I luajtshëm dhe i shkarkueshëm nga ndërfaqja e menaxhimit të dorëzimeve
+
+## Zgjerime të rtSurvey
+
+### Kohëzgjatja maksimale
+
+Përdorni kolonën `parameters` për të kufizuar gjatësinë e regjistrimit:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | interview | Regjistroni intervistën | `max-duration=120` |
+
+`max-duration` është në sekonda. Rekordi ndalon automatikisht në kufi.
+
+### Cilësimet e cilësisë
+
+Cilësia e regjistrimit mund të caktohet nëpërmjet `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Regjistroni reagimin | `quality=normal` |
+
+Vlerat e mbështetura: `low`, `normal` (parazgjedhje), `voice-only`. `voice-only` optimizon për audio të folur me reduktim të zhurmës.
+
+### Riprodhimi para dorëzimit
+
+Në mobile, numëruesi mund të riprodhojë klipën e regjistruar para se të vazhdojë. Kjo aktivizohet si parazgjedhje — nuk nevojitet konfigurim.
+
+### Integrimi me regjistruesin nativ
+
+Në Android dhe iOS, `audio` niset regjistruesin nativ të pajisjes. Në web, përdor API-n MediaRecorder të shfletuesit të integruar.
+
+## Shembull i përdorimit
+
+### Me kohëzgjatje maksimale dhe hint
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| audio | story | Na tregoni për incidentin me fjalët tuaja | Flisni qartë. Regjistrimi ndalon pas 3 minutave. | `max-duration=180` |
+
+### Audio e kushtëzuar — vetëm nëse u raportua një problem
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | issue_found | U gjet ndonjë problem? | | |
+| audio | issue_audio | Regjistroni një përshkrim të problemit | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+
+## Praktikat më të mira
+
+1. Deklaroni qartë në `label` ose `hint` çfarë duhet të thotë numëruesi dhe për sa kohë.
+2. Përdorni `max-duration` për të parandaluar skedarë tepër të mëdhenj në zonat me shpejtësi të ngadaltë ngarkimi.
+3. Informoni të anketuarit para se të nisni regjistrimin — regjistrimi i papritur mund të ngrejë shqetësime për privatësinë.
+4. Testoni regjistrimin në pajisjen dhe kushtet e rrjetit të synuar para vendosjes.
+5. Vendosni `quality=voice-only` për regjistrimet në stil interviste për të reduktuar madhësinë e skedarit pa humbur kuptueshmërinë.
+
+## Kufizimet
+
+- Skedarët audio mund të jenë të mëdhenj (një regjistrim 2-minutësh me cilësi normale është ~2-4 MB) — merreni parasysh këtë në planin e të dhënave dhe kohën e ngarkimit.
+- Jo të gjithë shfletuesit mbështesin API-n MediaRecorder — Chrome dhe Firefox funksionojnë me besueshmëri; Safari në versionet më të vjetra iOS mund të ketë probleme.
+- Transkriptimi i përgjigjeve audio kërkon përpunim shtesë post-procesimi (manual ose me tekst të automatizuar nga e folura).
+- Rregulloret e privatësisë mund të kufizojnë regjistrimin e zërave — verifikoni kërkesat lokale për mbrojtjen e të dhënave.

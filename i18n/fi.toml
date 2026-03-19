@@ -1,0 +1,38 @@
+[lang_select_title]
+    other = "Valitse kielesi"
+
+[search_title]
+    other = "Haku"
+
+[search_navigate]
+    other = "navigointiin"
+
+[search_select]
+    other = "valitsemiseen"
+
+[search_close]
+    other = "sulkemiseen"
+
+[search_cancel]
+    other = "peruuta"
+
+[search_no_results]
+    other = "Ei tuloksia haulle"
+
+[feedback_yes]
+    other = "Kyllä"
+
+[feedback_no]
+    other = "Ei"
+
+[feedback_helpful]
+    other = "Oliko tämä sivu hyödyllinen?"
+
+[feedback_submit]
+    other = "Lähetä"
+
+[enable_light_mode]
+    other = "Ota vaalea tila käyttöön"
+
+[enable_dark_mode]
+    other = "Ota tumma tila käyttöön"

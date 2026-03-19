@@ -1,0 +1,38 @@
+[lang_select_title]
+    other = "Välj ditt språk"
+
+[search_title]
+    other = "Sök"
+
+[search_navigate]
+    other = "för att navigera"
+
+[search_select]
+    other = "för att välja"
+
+[search_close]
+    other = "för att stänga"
+
+[search_cancel]
+    other = "avbryt"
+
+[search_no_results]
+    other = "Inga resultat för"
+
+[feedback_yes]
+    other = "Ja"
+
+[feedback_no]
+    other = "Nej"
+
+[feedback_helpful]
+    other = "Var den här sidan hjälpsam?"
+
+[feedback_submit]
+    other = "Skicka"
+
+[enable_light_mode]
+    other = "Aktivera ljust läge"
+
+[enable_dark_mode]
+    other = "Aktivera mörkt läge"

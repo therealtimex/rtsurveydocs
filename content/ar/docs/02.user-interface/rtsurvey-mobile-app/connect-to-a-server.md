@@ -1,0 +1,111 @@
+---
+title: "الاتصال بخادم"
+description: "تعرّف على كيفية ربط تطبيق rtSurvey المحمول بخادم مشروعك، والوصول إلى الوظائف الخاصة بكل دور، وبدء التعاون في الاستطلاعات عبر مشاريع متعددة."
+icon: "cloud_sync"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 313
+---
+
+يُعدّ ربط تطبيق rtSurvey بخادم خطوة أساسية لبدء استخدام التطبيق لجمع البيانات وإدارتها وتحليلها. تضمن هذه العملية أن جميع أدوار الاستطلاع يمكنها الوصول إلى الوظائف والبيانات اللازمة في الوقت الفعلي.
+
+## الاختلافات الرئيسية عن ODK Collect
+
+يقدم rtSurvey وظائف محسّنة مقارنةً بـ ODK Collect، تلبي احتياجات أدوار الاستطلاع المختلفة:
+- **المسؤول**: المراسلة والإشعارات بالتحديثات (إرسال البيانات، التقارير الجديدة، الحسابات الجديدة) وملء النماذج وعرض تقارير التحليل.
+- **مدير المشروع**: وظائف مماثلة للمسؤولين، بما في ذلك إعداد المشاريع وإدارتها.
+- **مصمّم الاستطلاع**: المراسلة والإشعارات وملء النماذج وعرض تقارير التحليل.
+- **المعدِّد الميداني**: ملء النماذج والمراسلة والإشعارات وتقارير التقدم.
+- **محلل البيانات**: المراسلة والإشعارات والوصول إلى تقارير التحليلات.
+
+## خطوات ربط تطبيق rtSurvey بخادم
+
+### 1. تأكد من وجود حساب
+
+للاتصال بالخادم، تحتاج إلى حساب. يمكن إنشاء الحسابات من قِبَل مسؤول أو من قِبَل الكوادر باستخدام رابط إنشاء حساب يُعدّه المسؤول.
+
+### 2. افتح تطبيق rtSurvey
+
+شغّل تطبيق rtSurvey على جهازك المحمول. إذا لم تكن قد ثبّته بعد، راجع صفحة [تثبيت تطبيق rtSurvey](#installing-rtsurvey-app).
+
+### 3. الوصول إلى إعدادات الاتصال بالخادم
+
+1. افتح التطبيق وانتقل إلى قائمة الإعدادات.
+2. اختر خيار الاتصال بخادم.
+
+### 4. إدخال بيانات الحساب واختيار المشروع
+
+عند الاتصال بـ rtSurvey، تُبسَّط العملية بناءً على إعداد حسابك:
+
+- **اسم المستخدم**: أدخل اسم مستخدم حسابك.
+- **كلمة المرور**: أدخل كلمة مرور حسابك.
+
+بعد إدخال بياناتك:
+
+- إذا كان حسابك مرتبطاً بمشروع استطلاع واحد فقط:
+  - سيُسجّل التطبيق دخولك تلقائياً إلى خادم ذلك المشروع.
+  - لا تحتاج إلى إدخال عنوان URL الخادم أو اختيار مشروع يدوياً.
+
+- إذا كان حسابك مرتبطاً بمشاريع استطلاع متعددة:
+  - بعد المصادقة الناجحة، ستظهر قائمة بالمشاريع التي يمكنك الوصول إليها.
+  - اختر المشروع الذي تريد العمل عليه من هذه القائمة.
+
+### 5. المصادقة
+
+بعد إدخال تفاصيل الخادم، اضغط على زر "اتصال" أو "تسجيل الدخول". سيُصادق التطبيق على بياناتك وينشئ اتصالاً بالخادم.
+
+```mermaid
+flowchart TD
+    A["📱 Start rtSurvey App"] --> B["🔑 Enter Username<br>and Password"]
+    style A fill:#4CAF50,stroke:#666666,stroke-width:3px,color:white
+    style B fill:#2196F3,stroke:#666666,stroke-width:3px,color:white
+
+    B --> C{"🌳 Multiple<br>projects?"}
+    style C fill:#FFC107,stroke:#666666,stroke-width:3px,color:black
+
+    C -->|Yes| D["📋 Display list<br>of projects"]
+    C -->|No| E["🔄 Auto-connect to<br>single project"]
+    style D fill:#FF9800,stroke:#666666,stroke-width:3px,color:white
+    style E fill:#009688,stroke:#666666,stroke-width:3px,color:white
+
+    D --> F["👆 User selects<br>a project"]
+    style F fill:#FF5722,stroke:#666666,stroke-width:3px,color:white
+
+    E --> G["☁️ Connect to server"]
+    F --> G
+    style G fill:#3F51B5,stroke:#666666,stroke-width:3px,color:white
+    G --> H["👥 Access role-specific<br>functionalities"]
+    style H fill:#9C27B0,stroke:#666666,stroke-width:3px,color:white
+
+    H --> I["👨‍💼 Administrator/<br>Project Manager"]
+    H --> J["🎨 Survey Designer"]
+    H --> K["📝 Field Enumerator"]
+    H --> L["📊 Data Analyst"]
+    style I fill:#E91E63,stroke:#666666,stroke-width:3px,color:white
+    style J fill:#795548,stroke:#666666,stroke-width:3px,color:white
+    style K fill:#607D8B,stroke:#666666,stroke-width:3px,color:white
+    style L fill:#8BC34A,stroke:#666666,stroke-width:3px,color:white
+
+    I --> M["💬 Messaging<br>🔔 Notifications<br>📄 Form Filling<br>📈 Viewing Reports"]
+    J --> N["💬 Messaging<br>🔔 Notifications<br>🧪 Form Testing<br>📈 Viewing Reports"]
+    K --> O["📝 Form Filling<br>💬 Messaging<br>🔔 Notifications<br>📊 Progress Reports"]
+    L --> P["💬 Messaging<br>🔔 Notifications<br>📊 Analytics Reports"]
+    style M fill:#FF4081,stroke:#666666,stroke-width:3px,color:white
+    style N fill:#9E9E9E,stroke:#666666,stroke-width:3px,color:white
+    style O fill:#00BCD4,stroke:#666666,stroke-width:3px,color:white
+    style P fill:#CDDC39,stroke:#666666,stroke-width:3px,color:white
+```
+
+## استكشاف مشكلات الاتصال
+
+إذا واجهت مشكلات أثناء الاتصال بالخادم:
+
+1. **تحقق من اتصال الإنترنت**: تأكد من اتصال جهازك بالإنترنت.
+2. **تأكد من بيانات الاعتماد**: تأكد من صحة اسم المستخدم وكلمة المرور.
+3. **أعد تشغيل التطبيق**: أغلق تطبيق rtSurvey وأعد فتحه.
+4. **تواصل مع الدعم**: إذا استمرت المشكلات، تواصل مع مسؤول النظام أو دعم rtSurvey للمساعدة.
+
+## الخلاصة
+
+ربط تطبيق rtSurvey بخادم هو عملية مباشرة تُتيح لك الاستفادة من الإمكانات الكاملة للتطبيق. باتباع الخطوات الموضحة أعلاه، يمكنك ضمان جمع البيانات وإدارتها وتحليلها بسلاسة وفقاً لدورك المحدد في الاستطلاع.

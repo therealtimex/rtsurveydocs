@@ -1,0 +1,139 @@
+---
+title: "Izskats"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 288
+---
+
+Kolonna `appearance` rtSurvey ļauj pielāgot jautājumu vizuālo noformējumu un uzvedību aptaujās. Šī funkcija uzlabo lietotāja pieredzi un var ievērojami uzlabot datu vākšanas efektivitāti. rtSurvey atbalsta standarta XLSForm izskata atribūtus un paplašina tos ar papildu opcijām.
+
+## Standarta XLSForm izskata atribūti
+
+rtSurvey atbalsta šādus standarta XLSForm izskata atribūtus:
+
+| Izskata atribūts | Jautājumu tipi | Apraksts |
+|----------------------|----------------|-------------|
+| multiline | text | Izveido daudzrindu teksta lodziņu (vislabākais tīmekļa klientiem) |
+| minimal | select_one, select_multiple | Parāda izvēles nolaižamā izvēlnē |
+| quick | select_one | Automātiski pāriet uz nākamo jautājumu pēc atlases (tikai mobilajiem) |
+| no-calendar | date | Apspiež kalendāra attēlojumu (tikai mobilajiem) |
+| month-year | date | Ļauj atlasīt tikai mēnesi un gadu |
+| year | date | Ļauj atlasīt tikai gadu |
+| horizontal-compact | select_one, select_multiple | Parāda izvēles horizontāli (tikai tīmeklim) |
+| horizontal | select_one, select_multiple | Parāda izvēles horizontāli kolonnās (tikai tīmeklim) |
+| likert | select_one | Piedāvā izvēles kā Likerta skalu |
+| compact | select_one, select_multiple | Parāda izvēles blakus ar minimālu iekšējo polsterjumu |
+| quickcompact | select_one | Apvieno kompakto attēlojumu ar automātisko pāreju (tikai mobilajiem) |
+| field-list | groups | Parāda visu grupu vienā ekrānā (tikai mobilajiem) |
+| label | select_one, select_multiple | Rāda izvēļu etiķetes bez ievades laukiem |
+| list-nolabel | select_one, select_multiple | Rāda ievades laukus bez etiķetēm (izmantot ar `label`) |
+| table-list | groups | Parāda jautājumus tabulas formātā |
+| signature | image | Iespējo paraksta tveršanu (tikai mobilajiem) |
+| draw | image | Ļauj brīvroku zīmēšanu (tikai mobilajiem) |
+| map, quick map | select_one, select_one_from_file | Iespējo atlasi no kartes objektiem |
+
+## Labākā prakse izskata izmantošanā
+
+1. **Konsekvence**: Izmantojiet izskata atribūtus konsekventi visā aptaujā vienmērīgam izskatam.
+2. **Mobilais vs. tīmeklis**: Apsveriet, kā izskata varianti tiks renderēti dažādās ierīcēs un platformās.
+3. **Veiktspēja**: Esiet uzmanīgi ar izskata atribūtiem, kas varētu palēnināt formas ielādi (piem., `table-list` lielām grupām).
+4. **Lietotāja pieredze**: Izvēlieties izskata variantus, kas atvieglo un padara datu ievadi intuitīvāku respondentiem.
+5. **Testēšana**: Vienmēr pārbaudiet formu mērķierīcēs, lai nodrošinātu, ka izskata varianti darbojas kā paredzēts.
+
+## Uzlabotas tehnikas
+
+### Izskata varianta apvienošana
+
+Dažus izskata atribūtus var apvienot sarežģītākiem izkārtojumiem:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Atlasiet vienu: | minimal compact |
+```
+
+### Dinamiskais izskats
+
+rtSurvey ļauj dinamiski mainīt izskata variantus, pamatojoties uz formas loģiku:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Ievadiet laiku: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Mobilās lietotnes apsvērumi
+
+- Daži izskata varianti (piem., `quick`, `signature`) ir specifiski mobilajām ierīcēm.
+- Rūpīgi pārbaudiet gan uz Android, gan iOS, lai nodrošinātu konsekventu uzvedību.
+
+## rtSurvey paplašinātie izskata atribūti
+
+Papildus standarta XLSForm izskata variantiem, rtSurvey atbalsta šādas platformai specifiskas opcijas:
+
+### Datu un attēlojuma vadība
+
+| Izskata atribūts | Jautājumu tipi | Apraksts |
+|----------------------|----------------|-------------|
+| `invisible` | jebkuri | Slēpj lauku no skata, vienlaikus joprojām vācot vai aprēķinot tā vērtību. Atšķiras no tipa `hidden` — lauks joprojām piedalās loģikā. |
+| `displaytitle` | jebkuri | Liek parādīt lauka etiķeti/nosaukumu pat tad, kad tas citādi tiktu nomākts. |
+| `autopull` | select_one, select_multiple | Automātiski iegūst ārējos datus, lai aizpildītu izvēles, kad forma ielādējas vai mainās aktivatora lauks. |
+| `floating_hint` | text, integer, decimal | Rāda norādījumu tekstu kā peldošu etiķeti virs ievades lauka, nevis zem tā. |
+| `calculate-button` | calculate | Pievieno redzamu pogu, kas aktivizē lauka pārrēķinēšanu pēc pieprasījuma, nevis aprēķina automātiski. |
+
+### Izkārtojums
+
+| Izskata atribūts | Jautājumu tipi | Apraksts |
+|----------------------|----------------|-------------|
+| `1screen` | group | Liek visai grupai attēloties vienā ekrānā neatkarīgi no grupas lieluma. |
+| `columns(n)` | select_one, select_multiple | Parāda izvēles `n` kolonnās. Piemērs: `columns(3)` rāda trīs radio pogu kolonnas. |
+| `gridformat<row=R col=C colspan=S align=center>` | jebkuri | Novieto lauku CSS-grid izkārtojumā rindā `R`, kolonnā `C`, aptverot `S` kolonnas. Izmanto ar `advanced-extension/grid-layout`. |
+| `ignore-simplify` | jebkuri | Instruē formas renderētāju izlaist šī lauka izkārtojuma automātisko vienkāršošanu vai saīsināšanu. |
+
+### Logrīki
+
+| Izskata atribūts | Jautājumu tipi | Apraksts |
+|----------------------|----------------|-------------|
+| `likert` | select_one | Piedāvā izvēles kā Likerta skalas rindu. |
+| `distress` | select_one | Renderē izvēles kā Kesslera psiholoģiskā distresa skalas (K10) vizuālo logrīku ar emocionālām ikonām. |
+
+### API integrācija
+
+| Izskata atribūts | Jautājumu tipi | Apraksts |
+|----------------------|----------------|-------------|
+| `callapi` | text, integer, decimal, select_one | Iespējo API izsaukumu integrāciju šim laukam. Aprēķina kolonnā jāietver `callapi()` izteiksme. Skatiet [API izsaukums](advanced-extension/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Aktivizē API verifikācijas izsaukumu, izmantojot statiskus parametrus. Forma bloķē virzību, līdz API apstiprina vērtību. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Tāpat kā `callapi-verify`, bet ar parametriem, kas izriet no citiem lauku vērtībām izpildes laikā. |
+
+### Iekļautais datuma/laika formāts
+
+Laukiem `date`, `time` un `datetime` varat norādīt pielāgotu attēlojuma formātu, izmantojot formāta virkni, kas pievienota izskatam:
+
+```
+inline-[%d/%m/%Y]
+inline-1line-[%d/%m/%Y %H:%M]
+```
+
+Formāta pilnvaru ir tās pašas kā `format-date()` un `format-date-time()`. Skatiet [Funkcijas — Datuma un laika funkcijas](operators-and-functions/functions#date-and-time-functions).
+
+Piemērs:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| datetime | event_time | Pasākuma datums un laiks | inline-[%d/%m/%Y %I:%M %p] |
+| date | birth_date | Dzimšanas datums | inline-[%d/%m/%Y] |
+
+## Zināmie ierobežojumi
+
+- Sarežģīti izskata varianti var neatainot identisko visu platformu ietvaros.
+- Daži uzlabotie rtSurvey izskata varianti var nebūt atbalstīti bezsaistes režīmā.
+
+## Izskata problēmu novēršana
+
+1. **Izskats netiek piemērots**: Pārbaudiet drukas kļūdas izskata kolonnā.
+2. **Nekonsekvents renderējums**: Pārbaudiet saderību ar jautājuma tipu un platformu.
+3. **Veiktspējas problēmas**: Apsveriet sarežģītu izskata variantu vienkāršošanu, īpaši lielām aptaujām.

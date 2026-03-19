@@ -1,0 +1,143 @@
+---
+title: "Pencarian Dinamis"
+description: "Pencarian Dinamis memuat pilihan dari API jarak jauh secara real time saat enumerator mengetik, memungkinkan dataset yang besar atau sering diperbarui."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 293
+---
+
+**Pencarian Dinamis** (juga disebut Search API) memungkinkan bidang `select_one`, `select_multiple`, atau `text` memuat pilihannya dari layanan web jarak jauh **saat runtime** saat enumerator mengetik. Ini adalah pendekatan yang tepat ketika daftar pilihan Anda terlalu besar untuk dibundel dalam file CSV, sering diperbarui, atau berasal dari database langsung.
+
+---
+
+## Appearance `search-api()`
+
+Pencarian dinamis dikonfigurasi melalui kolom `appearance` menggunakan fungsi `search-api()`:
+
+```
+search-api(method, url, post_body, value_column, display, data_path, save_path)
+```
+
+### Parameter
+
+| Parameter | Deskripsi |
+|-----------|-----------|
+| `method` | Selalu gunakan `'POST'` |
+| `url` | Endpoint API untuk dikueri |
+| `post_body` | Body JSON yang dikirim ke API. Gunakan `%__input__%` sebagai placeholder untuk teks pencarian enumerator saat ini |
+| `value_column` | Kunci dalam objek respons yang digunakan sebagai **nilai** yang disimpan |
+| `display` | Kunci (atau template) yang digunakan sebagai **label** yang ditampilkan dalam dropdown. Mendukung placeholder `##key##` dan ekspresi `@{func}` |
+| `data_path` | JSONPath ke array objek hasil dalam respons (misalnya, `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Nama di mana respons mentah disimpan untuk digunakan oleh bidang lain |
+
+---
+
+## Contoh dasar
+
+Pencarian fasilitas kesehatan di mana enumerator mengetik sebagian nama fasilitas:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Pilih fasilitas kesehatan | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+
+API menerima `{"query": "nair"}` ketika enumerator mengetik "nair" dan mengembalikan:
+
+```json
+{
+  "results": [
+    {"id": "HF001", "name": "Nairobi Central Clinic"},
+    {"id": "HF002", "name": "Nairobi West Hospital"}
+  ]
+}
+```
+
+Dropdown menampilkan `Nairobi Central Clinic` dan `Nairobi West Hospital`; nilai yang disimpan adalah `HF001` atau `HF002`.
+
+---
+
+## Format tampilan lanjutan
+
+### Menggunakan template `##key##`
+
+Tampilkan beberapa bidang dalam label:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
+```
+
+Ditampilkan sebagai: `Nairobi Central Clinic (Nairobi)`.
+
+### Menggunakan ekspresi `@{func}`
+
+Terapkan logika kondisional dalam label tampilan:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
+  '@{if_else(eq("##status##", "active"), "✓ ##name##", "✗ ##name##")}',
+  '$.data', 'res')
+```
+
+Hasil aktif menampilkan `✓ Clinic Name`; tidak aktif menampilkan `✗ Clinic Name`.
+
+---
+
+## Mengatur nilai default: `search-default-api()`
+
+Gunakan `search-default-api()` setelah `search-api()` untuk mengisi bidang terlebih dahulu dengan pilihan default yang dimuat dari panggilan API terpisah (misalnya, saat mengedit catatan yang ada):
+
+```
+appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
+```
+
+---
+
+## Pemisah kustom untuk select_multiple: `search-default-separator()`
+
+Untuk bidang `select_multiple`, tentukan bagaimana beberapa nilai yang dipilih digabungkan dalam string yang disimpan:
+
+```
+appearance: search-api(...) search-default-separator(' || ')
+```
+
+Pemisah default adalah spasi.
+
+---
+
+## Tipe pertanyaan yang didukung
+
+| Tipe pertanyaan | Kasus penggunaan |
+|----------------|-----------------|
+| `select_one` | Pilihan tunggal dari hasil pencarian |
+| `select_multiple` | Beberapa pilihan dari hasil pencarian |
+| `text` | Pelengkap otomatis — enumerator mengetik bebas tetapi dapat memilih saran |
+
+---
+
+## Menggunakan data respons yang disimpan
+
+`save_path` menyimpan objek respons API lengkap di bawah nama yang diberikan. Bidang lain dapat mereferensikannya dengan `pulldata()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one | facility | Pilih fasilitas | `search-api(..., 'facility_data')` |
+| calculate | facility_district | | `pulldata('facility_data', 'district')` |
+| calculate | facility_type | | `pulldata('facility_data', 'type')` |
+
+---
+
+## Praktik Terbaik
+
+1. Pastikan endpoint API Anda merespons dalam 1–2 detik — API yang lambat membuat pencarian terasa tidak responsif.
+2. Gunakan `%__input__%` dalam `post_body` sehingga API hanya mengembalikan hasil yang cocok, bukan seluruh dataset.
+3. Indeks bidang pencarian di sisi server (misalnya, Elasticsearch, indeks teks lengkap database) untuk respons yang cepat.
+4. Batasi hasil hingga 20–50 item per kueri — mengembalikan ribuan hasil mengalahkan tujuan pencarian.
+5. Sertakan persyaratan panjang input minimum dalam API untuk menghindari memicu kueri luas pada input karakter tunggal.
+
+## Keterbatasan
+
+- Pencarian Dinamis memerlukan konektivitas jaringan — tidak berfungsi secara offline.
+- Placeholder `%__input__%` disuntikkan apa adanya; sanitasi input di sisi server untuk mencegah serangan injeksi.
+- Ekspresi tampilan `@{func}` yang kompleks mungkin memiliki dukungan terbatas di semua versi klien rtSurvey.

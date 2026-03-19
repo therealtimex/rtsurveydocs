@@ -1,0 +1,131 @@
+---
+title: "Извикване на API"
+description: "Функцията Call API позволява на анкетата ви да извлича данни от zewnętrzна уеб услуга и да използва отговора за попълване на полета или валидиране на отговори."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 294
+---
+
+Функцията **Call API** позволява на поле от анкетата да направи HTTP заявка към zewnętrzна услуга и да използва отговора за попълване на изчислена стойност или валидиране на потребителски вход. Това позволява справки в реално време, верификация на ID, справки за баркод и всяка друга сървърна проверка по времe на събиране на данни.
+
+Има две функции:
+
+- `callapi()` — fetches a value from an API and stores it in a `calculate` or `text` field
+- `callapi-verify()` — calls an API and blocks progress if the response does not match the expected value (used in `constraint`)
+
+---
+
+## `callapi()` — Fetch and store an API response
+
+### Синтаксис
+
+Поставете `callapi()` в колоната **`calculation`** на поле `calculate` или `text`:
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### Параметри
+
+| # | Parameter | Description |
+|---|-----------|-------------|
+| 1 | `method` | HTTP метод: `'GET'` or `'POST'` |
+| 2 | `url` | URL адрес на API крайна точка |
+| 3 | `allowed_auto` | `1` за автоматично извикване при достигане на полето; `0` за изискване на ръчен бутон за тригер |
+| 4 | `max_retry` | Максимален брой опити за повторен опит при неуспех |
+| 5 | `no_overwrite` | `1` за запазване на съществуващата стойност ако полето вече има такава; `0` за винаги презаписване |
+| 6 | `extract_expr` | JSONPath израз за извличане на желаната стойност от отговора (e.g., `$.data.name`) |
+| 7 | `timeout` | Таймаут на заявката в милисекунди |
+| 8 | `lifetime` | Колко дълго (мс) кешираният отговор остава валиден преди повторно извличане |
+| 9 | `response_q` | Наименование на поле за съхранение на необработения HTTP код на отговора (e.g., `${response_status}`) |
+| 10 | `call_type` | *(Optional)* Special call mode: `'lazy-upload'` or `'lazy-upload-multiple'` |
+| 11 | `post_body` | *(Optional)* POST body string. Reference form fields with `##fieldname##` |
+
+### Пример: GET request to look up a household by ID
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | Household ID | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+| note | hh_display | Household: ${hh_name} | | |
+
+### Пример: POST request with a JSON body
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+In the `post_body`, use `##fieldname##` to inject the current value of any form field.
+
+### Appearance: `callapi`
+
+Add `callapi` to the `appearance` column of the field to enable the API call integration:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | api_result | | callapi | `callapi('GET', ...)` |
+
+When `allowed_auto` is `0`, rtSurvey shows a **"Fetch" button** that the enumerator taps manually.
+
+---
+
+## `callapi-verify()` — Validate a value against an API
+
+`callapi-verify()` blocks submission of a field until an API confirms the entered value is valid. Use it in the **`constraint`** column.
+
+### Синтаксис
+
+```
+callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
+```
+
+### Параметри
+
+| # | Parameter | Description |
+|---|-----------|-------------|
+| 1 | `method` | HTTP метод: `'GET'` or `'POST'` |
+| 2 | `url` | Verification API endpoint |
+| 3 | `extract_expr` | JSONPath to extract the expected value from the response |
+| 4 | `match_expr` | Expression comparing extracted value to the field value (e.g., `$.status = 'valid'`) |
+| 5 | `timeout` | Таймаут на заявката в милисекунди |
+| 6 | `constraint_mode` | `'soft'` for a warning only; `'hard'` to block progression |
+| 7 | `post_body` | *(Optional)* POST body with `##fieldname##` substitutions |
+| 8 | `message` | *(Optional)* Error message. Supports multi-language: `<en>Invalid!</en><vi>Không hợp lệ!</vi>` |
+
+### Пример: Verify a barcode against an asset registry
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| barcode | asset_code | Scan the asset barcode | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` | Asset not found in registry |
+
+### Appearance: `callapi-verify(...)`
+
+The `appearance` column on a field with `callapi-verify()` in constraint should contain `callapi-verify(params)` or `callapi-verify(dynamicParams)` to signal to rtSurvey that this field uses API verification.
+
+---
+
+## Using App API data alongside callapi
+
+Combine `callapi()` with `pulldata('app-api', 'user.token')` to inject the authenticated user's token into your API request:
+
+```
+callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, '', '',
+  concat('{"token":"', pulldata('app-api','user.token'), '","id":"##item_id##"}'))
+```
+
+## Best Practices
+
+1. Always set a reasonable `timeout` (5000–15000 ms) — do not use 0 or very high values.
+2. Set `allowed_auto=0` for verifications the enumerator should trigger consciously (e.g., ID checks).
+3. Set `no_overwrite=1` when the field may be edited later and you do not want re-fetching to overwrite manual corrections.
+4. Use `extract_expr` with a specific JSONPath rather than relying on raw response text.
+5. Test API calls in offline mode — callapi will fail gracefully and show an error, but the form should still be completable for non-critical fields.
+
+## Limitations
+
+- Requires network connectivity at the time of the call — calls will fail when the device is offline.
+- API responses must be JSON — XML or plain-text responses require additional parsing.
+- High call frequency (e.g., one API call per repeat instance) can slow down form navigation.

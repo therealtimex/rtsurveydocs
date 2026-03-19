@@ -1,0 +1,70 @@
+---
+weight: 100
+title: "Primeiros Passos"
+date: "2023-05-03T22:37:22+01:00"
+draft: false
+author: "rtSurvey"
+icon: "rocket_launch"
+toc: true
+description: "Um guia de início rápido para executar um inquérito com o rtSurvey"
+publishdate: "2023-05-03T22:37:22+01:00"
+---
+
+O rtSurvey permite-lhe construir formulários e fluxos de trabalho poderosos para recolher os dados de que necessita, onde quer que esteja. Pode:
+
+1.  Criar formulários poderosos que incluem fotos, localizações GPS, lógica de salto,
+    cálculos, conjuntos de dados externos, múltiplos idiomas e muito mais.
+2.  Recolher dados offline com a aplicação móvel ou a aplicação web.
+    Os formulários e as submissões são sincronizados quando uma ligação à Internet
+    é encontrada.
+3.  Analisar com facilidade descarregando os seus dados como CSV ou ligando o rtSurvey
+    ao Excel, Power BI, Python ou R para criar dashboards com atualizações em tempo real.
+
+Investigadores, equipas de campo e outros profissionais como você utilizam o rtSurvey
+para recolher os seus dados importantes. Aqui está como começar.
+
+## 1. Obtenha o rtSurvey Cloud {#getting-started-rtCloud}
+
+Para obter o rtSurvey Cloud, o método mais rápido e simples é utilizar o serviço oficial de alojamento gerido chamado [rtSurvey Cloud](https://rtSurvey.com/#rtSurvey-cloud). Está disponível no site do rtSurvey e é construído sobre uma infraestrutura rápida, fiável e segura.
+
+## 2. Carregue o seu XLSForm para o rtCloud ou crie um formulário com o Construtor de Formulários (Beta) {#getting-started-create-form}
+
+1.  Crie uma definição de formulário usando `XLSForm <xlsform>`{.interpreted-text
+    role="doc"} ou experimente este formulário [All Widgets](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0).
+2.  Carregue o seu XLSForm para o rtCloud e publique-o.
+
+## 3. Obtenha a aplicação rtSurvey {#getting-started-get-collect}
+
+Para descarregar a aplicação rtSurvey, siga estes passos de acordo com o seu dispositivo:
+
+### Para Dispositivos Android:
+1. Visite o [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
+2. Pesquise "rtSurvey" na barra de pesquisa.
+3. Toque na aplicação com o logótipo do rtSurvey.
+4. Clique no botão "Instalar" para descarregar e instalar a aplicação no seu dispositivo Android.
+
+### Para Dispositivos iOS:
+1. Abra a [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) no seu dispositivo iOS.
+2. Pesquise "rtSurvey" no separador de pesquisa.
+3. Localize a aplicação com o logótipo do rtSurvey.
+4. Toque no botão "Obter" para descarregar e instalar a aplicação no seu dispositivo iOS.
+
+Após a descarga e instalação da aplicação, pode iniciá-la e começar a utilizar o rtSurvey para serviços de inquérito e análise.
+
+## 4. Ligue o Collect ao rtCloud {#getting-started-connect}
+
+1.  Crie um Utilizador de Aplicação no rtCloud e
+    atribua o seu formulário a esse utilizador.
+2.  Abra o Collect, toque em `Configurar com código QR` e digitalize o código criado para o seu Utilizador de Aplicação.
+
+## 5. Preencha o seu formulário no Collect {#getting-started-fill-form}
+
+1.  Selecione `Preencher Formulário em Branco` para preencher
+    o seu formulário.
+2.  Os seus dados do formulário serão enviados automaticamente para o rtCloud quando
+    terminar.
+
+## 6. Utilize os seus dados no rtCloud {#getting-started-use-data}
+
+1.  Inicie sessão no rtCloud e veja os seus dados.
+2.  Descarregue os seus dados como CSV ou visualize-os no Power BI.

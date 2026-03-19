@@ -1,0 +1,102 @@
+---
+title: "動態問題類型"
+description: "動態問題類型允許根據 API 回應或計算值在執行時決定字段的問題類型和小工具。"
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 301
+---
+
+**動態問題類型**功能允許字段的輸入小工具和驗證行為在**執行時**而不是在表單設計時決定。這是一個進階的 rtSurvey 擴展，當要收集的資料類型取決於伺服器端配置、API 回應或前面的字段值時使用。
+
+一個常見的使用案例是可配置的檢查清單，伺服器定義哪些字段是必填的、它們是什麼類型（文字、整數、選擇等）以及有哪些選項——而無需為每個配置重建表單。
+
+---
+
+## 工作原理
+
+標記為動態問題類型的字段使用 `callapi()` 從 API 獲取其配置。API 回應定義：
+
+- 要呈現的輸入類型（text、integer、select_one 等）
+- 可用選項（對於選擇類型）
+- 驗證規則
+
+字段在內部標記有 `specialFeature: isDynamicQuestionType`，告知表單引擎使用 API 回應來構建小工具，而不是靜態表單定義。
+
+---
+
+## 設定
+
+### 步驟 1：獲取字段配置
+
+使用帶有 `callapi()` 的 `calculate` 字段來檢索動態配置：
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | field_config | | callapi | `callapi('POST', 'https://api.example.com/field-config', 1, 2, 0, '$.config', 10000, 0, '', '', '{"form_id": "##form_id##", "field_id": "inspection_result"}')` |
+
+### 步驟 2：在動態字段中引用配置
+
+動態字段在其 `appearance` 或 `constraint` 中使用 `callapi-verify()` 連結到獲取的配置：
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | inspection_result | 檢查結果 | `callapi-verify(dynamicParams)` |
+
+表單引擎讀取 `field_config` 並動態決定是否將 `inspection_result` 呈現為 `text`、`integer` 或 `select_one` 字段。
+
+---
+
+## API 回應格式
+
+API 應返回描述字段配置的 JSON 物件。典型回應：
+
+```json
+{
+  "config": {
+    "type": "select_one",
+    "choices": [
+      {"value": "pass", "label": "通過"},
+      {"value": "fail", "label": "失敗"},
+      {"value": "na", "label": "不適用"}
+    ],
+    "required": true,
+    "constraint": ". != ''"
+  }
+}
+```
+
+---
+
+## 範例：可配置檢查表單
+
+根據檢查類別從伺服器獲取清單項目及其答案類型的檢查表單：
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| select_one inspection_type | insp_type | 檢查類型 | | |
+| calculate | checklist_config | | callapi | `callapi('POST', 'https://api.example.com/checklist', 1, 2, 0, '$.items', 10000, 0, '', '', '{"type": "##insp_type##"}')` |
+| text | item_1 | 項目 1 | `callapi-verify(dynamicParams)` | |
+| text | item_2 | 項目 2 | `callapi-verify(dynamicParams)` | |
+| text | item_3 | 項目 3 | `callapi-verify(dynamicParams)` | |
+
+伺服器根據 `insp_type` 為每個項目返回正確的小工具類型、標籤、選項和驗證。
+
+---
+
+## 最佳實踐
+
+1. 僅在字段結構在執行時確實變化時使用動態問題類型——對於靜態表單，使用標準問題類型。
+2. 確保配置 API 響應迅速（2 秒以內）且在現場網路上可用。
+3. 始終在表單中為 API 無法訪問的情況定義合理的備用方案——帶有備注的普通 `text` 字段比損壞的小工具更好。
+4. 對 API 回應結構進行版本控制——回應格式的更改將影響所有使用該端點的活躍表單。
+5. 在部署前測試 API 可能返回的每種字段類型組合。
+
+## 限制
+
+- 動態問題類型需要網路連線以獲取配置。
+- 動態可用的小工具類型的完整範圍取決於 rtSurvey 客戶端版本——測試您的目標版本。
+- 這是一個進階的 rtSurvey 擴展，在標準 XLSForm 規格中沒有等效項。
+- 除錯錯誤更難追蹤，因為字段定義部分在表單中，部分在 API 回應中。

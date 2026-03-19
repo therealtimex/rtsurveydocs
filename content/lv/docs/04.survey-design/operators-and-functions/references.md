@@ -1,0 +1,86 @@
+---
+title: "Vērtību atsauces"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 291
+---
+
+Sintakse `${fieldname}` tiek izmantota, lai atsauktos uz cita lauka pašreizējo vērtību jūsu formā. Tā var attēlot ievadīto, atlasīto vai aprēķināto vērtību, un tā tiks attēlota tieši tā, kā parādās iesniegtajos datos.
+
+Piemērs:
+Ja jums ir lauks ar nosaukumu "age" un vēlaties iegūt tajā ievadīto precīzo vērtību, varat izmantot `${age}`.
+
+Ierobežojumu gadījumā simbols "." tiek izmantots, lai atsauktos uz lietotāja piedāvāto ierakstu vai atlasi pašreizējam laukam. Tas ļauj piemērot nosacījumus vai ierobežojumus, pamatojoties uz vērtību, kuru lietotājs pašlaik ievada vai atlasa.
+
+Piemērs:
+Ja vēlaties pārbaudīt, vai pašreizējā lauka piedāvātā vērtība ir mazāka par 3, varat izmantot ierobežojumu `. < 3`.
+
+---
+
+## `..` — Mātes grupas atsauce
+
+Iekšā grupā vai atkārtojumu grupā `..` atsaucas uz **mātes kontekstu**. Praksē tas ir nepieciešams reti, bet tiek izmantots uzlabotos XPath izteiksmēs, lai navigētu formas hierarhijā.
+
+---
+
+## Kur tiek izmantotas atsauces
+
+| Kolonna | Atsauces tips | Piemērs |
+|--------|---------------|---------|
+| `relevant` | `${fieldname}` | `${consent} = 'yes'` |
+| `constraint` | `.` pašreizējam laukam, `${fieldname}` citiem | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${fieldname}` | `${adults} + ${children}` |
+| `required` | `${fieldname}` | `${has_income} = 'yes'` |
+| `default` | `${fieldname}` | `${previous_answer}` |
+| `label` | `${fieldname}` tekstā | `"Jūsu vecums ir ${age} gadi"` |
+| `choice_filter` | Kolonnas nosaukums (bez `${}`) | `district = ${district}` |
+
+{{% alert icon=" " context="warning" %}}
+Kolonnā `choice_filter` atsaucieties uz **izvēles kolonnu nosaukumiem** tieši (bez `${}`), un uz **formas laukiem** ar `${}`. Šo sajaukšana ir izplatīts kļūdu avots.
+{{% /alert %}}
+
+---
+
+## Atsauces uz vērtībām atkārtojumu grupās
+
+Atkārtojuma iekšā `${fieldname}` atsaucas uz lauku **tajā pašā atkārtojuma instancē**:
+
+```
+relevant: ${member_age} < 18
+```
+
+Tas izmanto `member_age` vērtību pašreizējai atkārtojuma instancei, nevis visām instancēm.
+
+Lai atsauktos uz lauku **konkrētā** atkārtojuma instancē no ārpuses atkārtojumu grupas, izmantojiet `indexed-repeat()`:
+
+```
+indexed-repeat(${member_name}, ${household_members}, 1)
+```
+
+Skatiet [Funkcijas — Atkārtotu lauku funkcijas](functions#repeated-field-functions) pilnīgai informācijai.
+
+---
+
+## Tukšu vērtību pārbaudes
+
+Pārbaudiet, vai lauks ir atbildēts:
+
+```
+${fieldname} != ''       (lauks nav tukšs)
+${fieldname} = ''        (lauks ir tukšs)
+```
+
+Skaitļiem pārbaudiet arī:
+```
+${age} > 0               (vecumam ir pozitīva vērtība — netieši nav tukšs skaitliskajā kontekstā)
+```
+
+---
+
+## Tipa piespiešana atsaucēs
+
+Kad izmantojat `${fieldname}` skaitliskā kontekstā (piem., `${age} + 1`), rtSurvey automātiski piespiež virknes vērtību uz skaitli. Tukšs lauks tiek piespiests uz `0` vai `NaN` atkarībā no operācijas — izmantojiet `coalesce(${field}, 0)`, lai droši noklusinātu tukšu skaitlisku lauku uz nulli.

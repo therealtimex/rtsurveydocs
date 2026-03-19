@@ -1,0 +1,97 @@
+---
+title: "Select from file"
+description: "select_one_from_fileとselect_multiple_from_fileは、フォームに添付された外部CSVまたはXMLファイルから動的に選択肢を読み込みます。"
+icon: "file-earmark-spreadsheet"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 241
+---
+
+`select_one_from_file`と`select_multiple_from_file`は`select_one`と`select_multiple`と同様に機能しますが、**choicesワークシート**で選択肢を定義する代わりに、フォームに添付された**外部CSVまたはXMLファイル**から選択肢を読み込みます。これは選択肢リストが非常に長い場合、頻繁に変更される場合、またはフォーム全体を再構築せずに更新する必要がある場合に便利です。
+
+## 基本XLSForm仕様
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | 医療施設を選択してください |
+| select_multiple_from_file crops.csv | crops | 世帯ではどの作物を栽培していますか？ |
+
+タイプ名の後のファイル名は、フォームをアップロードするときに添付するファイルの名前と一致しなければなりません。
+
+## CSVファイル形式
+
+CSVファイルには少なくとも2つの列が必要です：`name`（保存される値）と`label`（表示されるテキスト）。フィルタリングのための追加列を任意の数追加できます。
+
+**health_facilities.csv：**
+
+```
+name,label,district,type
+HF001,Nairobi Central Clinic,Nairobi,clinic
+HF002,Westlands Health Centre,Nairobi,health_centre
+HF003,Kisumu District Hospital,Kisumu,hospital
+```
+
+## 選択肢のフィルタリング
+
+`choice_filter`列を使用して現在のコンテキストに一致する選択肢のみを表示します。CSV列をその列名で直接参照します（`${}`なし）：
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | 地区を選択してください | |
+| select_one_from_file health_facilities.csv | facility | 施設を選択してください | district = ${district} |
+
+この例では、選択された地区の施設のみが表示されます。`choice_filter`の`district`はCSVファイルの`district`列を参照し、`${district}`はフォームフィールドの`district`を参照します。
+
+## 用途
+
+ファイルから選択する質問は一般的に以下に使用されます：
+
+1. **長い選択肢リスト** — 医療施設、学校、村、種のリスト（数百または数千の項目）
+2. **頻繁に更新されるリスト** — マスターリストが調査ラウンド間で変更される場合、フォームを再構築せずにCSVのみを更新
+3. **共有参照データ** — 複数のフォームで使用される1つのCSVファイル
+4. **フィルタリングされたカスケード選択** — 1つのファイルにすべての地域/地区/村を読み込み、親の選択でフィルタリング
+
+## ファイルの添付
+
+フォームをrtSurveyにアップロードする際に、CSVファイルを**メディア添付**として添付してください。フォーム定義のファイル名は添付ファイルのファイル名と完全に一致しなければなりません。
+
+{{% alert icon=" " context="warning" %}}
+ファイル名は大文字小文字を区別します。`Health_Facilities.csv`と`health_facilities.csv`は異なるファイルとして扱われます。
+{{% /alert %}}
+
+## ファイルから`choice-label()`を使用する
+
+注記または計算フィールドで選択された選択肢のラベルを表示するには：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | 施設を選択してください | |
+| calculate | facility_label | | choice-label(${facility}, ${facility}) |
+| note | summary | 選択された施設：${facility_label} | |
+
+## ベストプラクティス
+
+1. モバイルデバイスで良好なパフォーマンスを得るために、CSVファイルを5,000行以内に保ってください。
+2. 必ず`name`と`label`列を含めてください — 追加列はオプションです。
+3. カスケード選択には親列を持つ単一のCSVを使用し、`choice_filter`でフィルタリングしてください。
+4. 列構造に破壊的な変更を加える場合は、CSVファイル名をバージョン管理してください（例：`facilities_v3.csv`）。
+5. フィルタリング式を慎重にテストしてください — `choice_filter`のタイポは選択肢が表示されなくなります。
+
+## 制限事項
+
+- 非常に大きなCSVファイル（10,000行以上）は、特に低スペックのデバイスではフォームの読み込みを遅くする可能性があります。
+- CSVファイルはフォームと一緒にアップロードする必要があります — 実行時にURLからフェッチすることはできません（動的検索には`search()`または`pulldata()`を使用してください）。
+- `select_multiple_from_file`はクライアント間でのサポートがあまり一般的ではありません — 使用する前に互換性を確認してください。
+
+## `search()`との比較
+
+| | `select_one_from_file` | `search()`外観 |
+|--|----------------------|----------------------|
+| 選択肢のソース | 添付CSVまたはXMLファイル | サーバー側データベースクエリ |
+| オフライン動作 | はい（ファイルがバンドル） | 接続が必要 |
+| 選択肢数 | デバイスメモリによる制限 | 無制限（ページネーション） |
+| リアルタイムデータ | なし | はい |
+
+大規模、頻繁に変更される、またはサーバー側のデータセットについては、[ダイナミック検索](../advanced-extension/dynamic-search)を参照してください。

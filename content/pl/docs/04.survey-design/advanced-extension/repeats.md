@@ -1,0 +1,160 @@
+---
+title: "Advanced Repeats"
+description: "Zaawansowane wzorce dla grup powtórzeń: dynamiczne liczniki, zagnieżdżone powtórzenia, podsumowywanie danych z powtórzeń i odwoływanie się do wartości między powtórzeniami."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 295
+---
+
+Ta strona opisuje zaawansowane wzorce pracy z grupami powtórzeń w rtSurvey. Podstawy konfigurowania grup powtórzeń znajdziesz w [Grupowanie i powtórzenia](../repeats).
+
+---
+
+## Dynamiczna liczba powtórzeń
+
+Domyślnie ankieter decyduje o liczbie powtórzeń. Możesz ustalić liczbę powtórzeń za pomocą `repeat_count`:
+
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Członek gospodarstwa | `${num_members}` |
+| text | member_name | Imię członka | |
+| integer | member_age | Wiek | |
+| end_repeat | | | |
+
+Powtórzenie uruchamia się dokładnie `${num_members}` razy, gdzie `num_members` zostało zebrane wcześniej w formularzu. Ankieter nie może dodawać ani usuwać instancji.
+
+---
+
+## Dostęp indeksowany: `indexed-repeat()`
+
+Uzyskaj dostęp do wartości pola konkretnej instancji powtórzenia **spoza** grupy powtórzeń za pomocą `indexed-repeat(repeatedField, repeatGroup, index)`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+Jest to przydatne do budowania pól podsumowań lub odwoływania się do danych „głównego" członka po powtórzeniu.
+
+---
+
+## Bieżąca pozycja instancji: `index()`
+
+Wewnątrz grupy powtórzeń `index()` zwraca 1-opartą pozycję bieżącej instancji. Użyj go do etykietowania każdego powtórzenia lub tworzenia unikalnych identyfikatorów:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Działka |
+| note | plot_label | Działka numer ${index()} |
+| text | plot_id | ID działki |
+| end_repeat | | |
+
+---
+
+## Odwoływanie się do pól w tej samej instancji
+
+Wewnątrz powtórzenia użyj `${fieldname}`, aby odwołać się do innego pola **w tej samej instancji powtórzenia**. Nie ma potrzeby używania `indexed-repeat()` w obrębie tej samej pętli:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Członek | |
+| text | member_name | Imię | |
+| integer | member_age | Wiek | |
+| text | school_name | Nazwa szkoły | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## Odwoływanie się do pól nadrzędnych z wewnątrz powtórzenia
+
+Do pól spoza (powyżej) grupy powtórzeń można normalnie odwoływać się za pomocą `${fieldname}`:
+
+| type | name | label |
+|------|------|-------|
+| text | village | Nazwa wsi |
+| begin_repeat | plots | Działka rolna |
+| note | plot_context | Działki w ${village} |
+| end_repeat | | |
+
+---
+
+## Podsumowywanie danych z powtórzeń
+
+Użyj funkcji agregujących powtórzeń **poza** grupą powtórzeń do podsumowania:
+
+| Funkcja | Przykład | Opis |
+|---------|---------|------|
+| `count(group)` | `count(${household_members})` | Liczba instancji |
+| `sum(field)` | `sum(${loan_amount})` | Suma pola numerycznego |
+| `min(field)` | `min(${member_age})` | Wartość minimalna |
+| `max(field)` | `max(${member_age})` | Wartość maksymalna |
+| `join(sep, field)` | `join(', ', ${member_name})` | Lista rozdzielona przecinkami |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Liczenie warunkowe |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Sumowanie warunkowe |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Łączenie warunkowe |
+
+### Przykład: Podsumowanie gospodarstwa domowego
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | Ile osób? | |
+| begin_repeat | members | Członek | `${num_members}` |
+| text | member_name | Imię | |
+| integer | member_age | Wiek | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | ${total_members} członków; ${children_count} poniżej 18 lat. Dorośli: ${adult_names} | |
+
+---
+
+## Zagnieżdżone powtórzenia
+
+Grupa powtórzeń może zawierać inną grupę powtórzeń. Używaj tego ostrożnie — zagnieżdżone powtórzenia dodają złożoności i mogą być mylące dla ankieterów.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Gospodarstwo |
+| text | hh_id | ID gospodarstwa |
+| begin_repeat | hh_members | Członek |
+| text | member_name | Imię członka |
+| end_repeat | | |
+| end_repeat | | |
+
+Aby odwołać się do pola w zewnętrznym powtórzeniu z wewnętrznego, użyj `${fieldname}` — rozwiązuje się do najbliższego pasującego przodka:
+
+Wewnątrz powtórzenia `hh_members`, `${hh_id}` zwraca ID **bieżącego** gospodarstwa, a nie wszystkich gospodarstw.
+
+---
+
+## Rank wewnątrz grup powtórzeń: `rank-index()`
+
+Gdy pole `rank` istnieje wewnątrz powtórzenia, użyj `rank-index(instanceNumber, repeatedField)` spoza, aby uzyskać pozycję rankingową określonej instancji:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` zwraca indeks instancji z najwyższym wynikiem.
+
+---
+
+## Najlepsze praktyki
+
+1. Zawsze używaj `repeat_count`, gdy liczba powtórzeń jest z góry znana — zapobiega to przypadkowemu dodawaniu lub usuwaniu instancji przez ankieterów.
+2. Utrzymuj grupy powtórzeń skupione — powtórzenie z ponad 20 pytaniami na instancję jest trudne do nawigacji.
+3. Nazwy grup powtórzeń powinny być jasne (np. `household_members`, a nie `repeat1`) — nazwa pojawia się w wywołaniach funkcji i wyeksportowanych danych.
+4. Testuj z maksymalną oczekiwaną liczbą instancji, aby zweryfikować wydajność.
+5. Używaj wyglądu `field-list` na grupie powtórzeń, aby pokazywać wszystkie pola na jednym ekranie na instancję (mobilne).
+
+---
+
+## Ograniczenia
+
+- `indexed-repeat()` wymaga prawidłowego indeksu (od 1 do liczby instancji) — indeksy poza zakresem zwracają puste.
+- Zagnieżdżone powtórzenia powyżej 2 poziomów nie są zalecane i mogą powodować problemy z wyświetlaniem w niektórych klientach.
+- Funkcje agregujące (`sum`, `count` itp.) operują na całej grupie powtórzeń — nie można agregować podzbioru instancji bez wariantów `*-if`.

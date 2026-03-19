@@ -1,0 +1,40 @@
+---
+title: "Mengelola Kiriman"
+description: "Tinjau, kelola, dan ekspor entri data dan kiriman mentah."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 317
+---
+
+Modul **Kelola Kiriman** (diakses melalui tombol **Tampilan Data** di bagian Keluarga Formulir) memungkinkan manajer proyek dan supervisor untuk berinteraksi langsung dengan data mentah yang masuk. Modul ini berfungsi sebagai ruang kerja terpadu untuk meninjau kiriman enumerator, melacak pengidentifikasi perangkat, dan melakukan operasi kualitas data.
+
+![Antarmuka Kelola Kiriman](/images/manage_submissions.png)
+
+## Ikhtisar Data dan Kolom
+
+Grid data secara dinamis menampilkan data yang dikumpulkan untuk formulir tertentu. Ini beroperasi dalam dua mode utama: **Official** (Catatan yang difinalkan) dan **Working** (Real-Time, catatan yang belum difinalkan).
+
+### Kolom Data Utama
+
+Terlepas dari pertanyaan kustom yang didefinisikan dalam formulir, grid mencakup beberapa kolom metadata standar untuk membantu audit:
+
+- **Dikirim oleh:** Mengidentifikasi platform asal kiriman (misalnya, FA untuk Aplikasi Lapangan, WEB untuk Webform, RS untuk sistem jarak jauh).
+- **Detail:** Membuka tampilan rekaman tunggal yang terfokus (ikon Pencarian) untuk memeriksa setiap variabel dan jawaban yang dikirimkan untuk instans tersebut.
+- **iNote:** Memungkinkan supervisor untuk melampirkan catatan sampingan atau komentar internal ke rekaman tertentu tanpa mengubah data yang dikumpulkan itu sendiri (diwakili oleh ikon pensil).
+- **Bidang tanggal:** Cap waktu yang menunjukkan kapan rekaman dimulai, diselesaikan, atau disinkronkan.
+- **Lampiran media:** Tautan thumbnail langsung ke gambar, tanda tangan, atau file yang dikumpulkan selama survei.
+- **Grup pengulangan:** Tautan khusus untuk mengakses tabel bersarang untuk pertanyaan berulang di dalam formulir induk.
+
+## Tindakan Kiriman
+
+Untuk memfasilitasi kontrol kualitas data yang aktif, antarmuka menyediakan menu dropdown perintah yang dapat dieksekusi pada rekaman yang dipilih:
+
+- **Buat instans baru:** Memungkinkan admin untuk secara manual memasukkan rekaman survei baru langsung ke database.
+- **Kembalikan instans:** Menolak rekaman yang dikirimkan dan menugaskan enumerator untuk memverifikasi ulang atau mengumpulkan kembali informasi.
+- **Tindak lanjut instans:** Menandai rekaman untuk perhatian lebih lanjut, biasanya mengirimkan peringatan ke tim lapangan untuk klarifikasi.
+- **Ekspor ke file perintah Dikembalikan / paket perintah Tindak Lanjut:** Menghasilkan ekspor batch (file) yang berisi dataset yang secara khusus ditandai untuk pengembalian atau tindak lanjut.
+- **Konversi ke XML:** Mengubah dataset terstruktur kembali ke format XML mentahnya untuk analisis backend atau integrasi sistem.
+- **Teruskan Instans:** (Tersedia dalam mode *Working*) Mendorong data yang belum difinalkan segera ke perangkat atau pengguna lain.
+- **Hapus:** Menghapus secara permanen instans yang dipilih dari database.

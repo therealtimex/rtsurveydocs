@@ -1,0 +1,83 @@
+---
+title: "Geoshape"
+description: "Otázky typu geoshape umožňujú respondentom kresliť tvary na mape, zachytávajúc komplexné geografické dáta ako súčasť prieskumu."
+icon: "map"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 233
+---
+
+Typ otázky geoshape v XLSForms a rtSurvey umožňuje respondentom kresliť tvary (polygóny) na mape, zachytávajúc komplexné geografické dáta. Táto funkcia je obzvlášť užitočná na mapovanie oblastí, definovanie hraníc alebo označovanie regiónov záujmu v priestorových prieskumoch.
+
+## Základná špecifikácia XLSForm
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geoshape | field_area  | Nakreslete hranicu poľa  |
+
+Pre viac podrobností o základnom type otázky geoshape pozrite si [špecifikáciu XLSForm](https://xlsform.org/en/#question-types).
+
+## Použitia
+
+Otázky typu geoshape sa bežne používajú pre:
+
+1. Mapovanie hraníc polí v poľnohospodárskych prieskumoch
+2. Definovanie oblastí environmentálneho vplyvu
+3. Označovanie zón v štúdiách územného plánovania
+4. Ohraničovanie regiónov pre geologické prieskumy
+5. Zachytávanie komplexných geografických prvkov pre priestorovú analýzu
+
+## Najlepšie postupy
+
+1. Uistite sa, že zariadenie má povolené lokalizačné služby a udelené oprávnenia.
+2. Poskytnite jasné pokyny, ako nakresliť tvar a aká oblasť by mala byť zahrnutá.
+3. Zvážte použitie satelitných snímok alebo podkladových máp, aby respondenti mohli presne nakresliť tvary.
+4. Buďte pozorní na potenciálnu zložitosť tvarov a ich vplyv na veľkosť a spracovanie dát.
+
+## Príklad použitia
+
+Tu je príklad, ako by ste mohli použiť otázku geoshape v prieskume:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geoshape | forest_area    | Obkreslete hranicu lesného porastu   | Použite aspoň 3 body na vytvorenie uzavretého tvaru |
+
+## Rozšírenia rtSurvey
+
+Hoci je základná špecifikácia XLSForm pre otázky geoshape priamočiara, rtSurvey môže ponúkať ďalšie funkcie alebo prispôsobenia:
+
+1. Integrácia s offline mapami pre vzdialené oblasti
+2. Možnosti nastavenia minimálneho a maximálneho počtu bodov pre tvar
+3. Možnosť úpravy alebo spresnenia tvarov po počiatočnom kreslení
+4. Podpora pre rôzne typy tvarov (napr. obdĺžniky, kruhy) okrem voľných polygónov
+
+## Formát dát
+
+Dáta geoshape sú typicky ukladané ako reťazec súradnicových párov oddelených medzerami, uzavretý v zátvorkách:
+
+```
+(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+```
+
+Napríklad:
+```
+(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+```
+
+## Úvahy pre analýzu
+
+Pri používaní otázok geoshape zvážte:
+
+1. Ako budú geografické dáta vizualizované a analyzované (napr. GIS softvér)
+2. Potenciálnu potrebu čistenia dát alebo zjednodušenia komplexných tvarov
+3. Opatrenia na ochranu súkromia a dát pri manipulácii s podrobnými priestorovými dátami
+4. Integráciu s inými priestorovými zdrojmi dát pre komplexnú analýzu
+
+## Obmedzenia
+
+- Kreslenie presných tvarov na malých mobilných obrazovkách môže byť náročné.
+- Komplexné tvary môžu vyžadovať značnú úložnú a procesorovú kapacitu.
+- Otázky geoshape nemusia byť vhodné pre všetky typy prieskumov alebo respondentov.
+- So zberom podrobných priestorových dát môžu byť spojené obavy o súkromie.

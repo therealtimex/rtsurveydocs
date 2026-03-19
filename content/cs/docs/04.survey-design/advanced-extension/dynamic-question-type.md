@@ -1,0 +1,102 @@
+---
+title: "Dynamický typ otázky"
+description: "Dynamický typ otázky umožňuje, aby byl typ pole a widget určen za běhu na základě odpovědi API nebo vypočítané hodnoty."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 301
+---
+
+Funkce **Dynamický typ otázky** umožňuje, aby vstupní widget pole a chování validace bylo určeno **za běhu** spíše než v době návrhu formuláře. Toto je pokročilé rozšíření rtSurvey používané, když typ dat ke sběru závisí na konfiguraci na straně serveru, odpovědi API nebo hodnotě předchozího pole.
+
+Běžným případem použití je konfigurovatelný kontrolní seznam inspekce, kde server definuje, která pole jsou požadována, jaký typ jsou (text, integer, select atd.) a jaké možnosti jsou dostupné — bez přestavění formuláře pro každou konfiguraci.
+
+---
+
+## Jak to funguje
+
+Pole označené jako dynamický typ otázky používá `callapi()` pro načtení konfigurace z API. Odpověď API definuje:
+
+- Typ vstupu k vykreslení (text, integer, select_one atd.)
+- Dostupné volby (pro typy select)
+- Pravidla validace
+
+Pole je interně označeno `specialFeature: isDynamicQuestionType`, což říká formátovacímu enginu, aby použil odpověď API pro sestavení widgetu spíše než statickou definici formuláře.
+
+---
+
+## Nastavení
+
+### Krok 1: Načtěte konfiguraci pole
+
+Použijte pole `calculate` s `callapi()` pro načtení dynamické konfigurace:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | field_config | | callapi | `callapi('POST', 'https://api.example.com/field-config', 1, 2, 0, '$.config', 10000, 0, '', '', '{"form_id": "##form_id##", "field_id": "inspection_result"}')` |
+
+### Krok 2: Odkazujte konfiguraci v dynamickém poli
+
+Dynamické pole používá `callapi-verify()` ve svém `appearance` nebo `constraint` pro propojení s načtenou konfigurací:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | inspection_result | Výsledek inspekce | `callapi-verify(dynamicParams)` |
+
+Formátovací engine přečte `field_config` a dynamicky určí, zda vykreslit `inspection_result` jako pole `text`, `integer` nebo `select_one`.
+
+---
+
+## Formát odpovědi API
+
+API by mělo vrátit JSON objekt popisující konfiguraci pole. Typická odpověď:
+
+```json
+{
+  "config": {
+    "type": "select_one",
+    "choices": [
+      {"value": "pass", "label": "Vyhovuje"},
+      {"value": "fail", "label": "Nevyhovuje"},
+      {"value": "na", "label": "N/A"}
+    ],
+    "required": true,
+    "constraint": ". != ''"
+  }
+}
+```
+
+---
+
+## Příklad: Konfigurovatelný inspekční formulář
+
+Inspekční formulář, kde jsou položky kontrolního seznamu a jejich typy odpovědí načteny ze serveru na základě kategorie inspekce:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| select_one inspection_type | insp_type | Typ inspekce | | |
+| calculate | checklist_config | | callapi | `callapi('POST', 'https://api.example.com/checklist', 1, 2, 0, '$.items', 10000, 0, '', '', '{"type": "##insp_type##"}')` |
+| text | item_1 | Položka 1 | `callapi-verify(dynamicParams)` | |
+| text | item_2 | Položka 2 | `callapi-verify(dynamicParams)` | |
+| text | item_3 | Položka 3 | `callapi-verify(dynamicParams)` | |
+
+Server vrátí správný typ widgetu, popisek, volby a validaci pro každou položku na základě `insp_type`.
+
+---
+
+## Osvědčené postupy
+
+1. Používejte dynamické typy otázek pouze tehdy, když se struktura pole skutečně mění za běhu — pro statické formuláře použijte standardní typy otázek.
+2. Zajistěte, aby konfigurační API odpovídalo rychle (pod 2 sekundy) a bylo dostupné v terénní síti.
+3. Vždy definujte rozumné záložní řešení ve formuláři pro případ, že API není dostupné — prosté pole `text` s poznámkou je lepší než nefungující widget.
+4. Verzujte schéma odpovědi API — změny ve formátu odpovědi ovlivní všechny aktivní formuláře používající tento koncový bod.
+5. Testujte každou kombinaci typů polí, které API může vrátit, před nasazením.
+
+## Omezení
+
+- Dynamické typy otázek vyžadují připojení k síti pro načtení konfigurace.
+- Plný rozsah typů widgetů dostupných dynamicky závisí na verzi klienta rtSurvey — testujte svou cílovou verzi.
+- Toto je pokročilé rozšíření rtSurvey bez ekvivalentu ve standardní specifikaci XLSForm.
+- Chyby ladění je obtížnější trasovat, protože definice pole leží částečně ve formuláři a částečně v odpovědi API.

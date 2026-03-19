@@ -1,0 +1,97 @@
+---
+title: "File से चुनें"
+description: "select_one_from_file और select_multiple_from_file choices को form से attached बाहरी CSV या XML file से dynamically load करते हैं।"
+icon: "file-earmark-spreadsheet"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 241
+---
+
+`select_one_from_file` और `select_multiple_from_file` `select_one` और `select_multiple` की तरह काम करते हैं, लेकिन **choices worksheet** में choices define करने के बजाय, choices form से attached **बाहरी CSV या XML file** से load की जाती हैं। यह तब उपयोगी है जब आपकी choice list बहुत लंबी हो, बार-बार बदलती हो, या पूरे form को rebuild किए बिना update होने की आवश्यकता हो।
+
+## Basic XLSForm Specification
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | health facility चुनें |
+| select_multiple_from_file crops.csv | crops | Household कौन से crops उगाता है? |
+
+Type name के बाद filename उस file के नाम से match होना चाहिए जिसे आप form upload करते समय attach करते हैं।
+
+## CSV file format
+
+आपकी CSV file में कम से कम दो columns होने चाहिए: `name` (stored value) और `label` (displayed text)। आप filtering के लिए कितने भी extra columns जोड़ सकते हैं।
+
+**health_facilities.csv:**
+
+```
+name,label,district,type
+HF001,Nairobi Central Clinic,Nairobi,clinic
+HF002,Westlands Health Centre,Nairobi,health_centre
+HF003,Kisumu District Hospital,Kisumu,hospital
+```
+
+## Choices filter करना
+
+केवल वे choices दिखाने के लिए जो current context से match करती हैं, `choice_filter` column का उपयोग करें। CSV columns को उनके column name से directly refer करें (बिना `${}`):
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | District चुनें | |
+| select_one_from_file health_facilities.csv | facility | Facility चुनें | district = ${district} |
+
+इस उदाहरण में, केवल selected district में facilities दिखाई देती हैं। `choice_filter` में `district` CSV file के `district` column को refer करता है; `${district}` `district` नामक form field को refer करता है।
+
+## उपयोग
+
+Select-from-file questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+
+1. **लंबी choice lists** — health facilities, schools, villages, species lists (सैकड़ों या हजारों items)
+2. **बार-बार update होने वाली lists** — जब master list survey rounds के बीच बदलती है, केवल CSV update करें बिना form rebuild किए
+3. **Shared reference data** — एक CSV file कई forms में उपयोग की जाती है
+4. **Filtered cascading selects** — सभी regions/districts/villages एक file में load करें, फिर parent selection से filter करें
+
+## File attach करना
+
+जब आप अपना form rtSurvey पर upload करते हैं, तो CSV file को **media attachment** के रूप में attach करें। Form definition में filename attachment के filename से exactly match होना चाहिए।
+
+{{% alert icon=" " context="warning" %}}
+File names case-sensitive हैं। `Health_Facilities.csv` और `health_facilities.csv` को अलग-अलग files माना जाता है।
+{{% /alert %}}
+
+## from-file के साथ `choice-label()` का उपयोग करना
+
+Note या calculate field में selected choice का label प्रदर्शित करने के लिए:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | Facility चुनें | |
+| calculate | facility_label | | choice-label(${facility}, ${facility}) |
+| note | summary | Selected facility: ${facility_label} | |
+
+## Best Practices
+
+1. Mobile devices पर अच्छे performance के लिए अपनी CSV files को 5,000 rows से कम रखें।
+2. हमेशा `name` और `label` column शामिल करें — additional columns optional हैं।
+3. Cascading selects के लिए, एक parent column के साथ एक single CSV का उपयोग करें और `choice_filter` से filter करें।
+4. Column structure में breaking changes करते समय अपने CSV filenames को version करें (जैसे `facilities_v3.csv`)।
+5. Filtering expressions को सावधानी से test करें — `choice_filter` में typo होने पर silently कोई choices नहीं दिखेंगी।
+
+## सीमाएं
+
+- बहुत बड़ी CSV files (10,000+ rows) form loading को धीमा कर सकती हैं, विशेषकर low-end devices पर।
+- CSV files को form के साथ upload की जानी चाहिए — उन्हें runtime पर URL से fetch नहीं किया जा सकता।
+- `select_multiple_from_file` सभी clients में कम commonly supported है — उपयोग करने से पहले compatibility verify करें।
+
+## `search()` के साथ तुलना
+
+| | `select_one_from_file` | `search()` appearance |
+|--|----------------------|----------------------|
+| Choices source | Attached CSV/XML file | Server-side database query |
+| Offline काम करता है | हाँ (file bundled है) | Connectivity की आवश्यकता है |
+| Choice count | Device memory द्वारा सीमित | Unlimited (paginated) |
+| Real-time data | नहीं | हाँ |
+
+बड़े, बार-बार बदलने वाले, या server-side datasets के लिए, [Dynamic search](../advanced-extension/dynamic-search) देखें।

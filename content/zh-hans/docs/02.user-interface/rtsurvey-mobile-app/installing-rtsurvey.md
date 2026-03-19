@@ -1,0 +1,61 @@
+---
+title: "安装 rtSurvey"
+description: "了解如何在 Android 和 iOS 设备上下载和安装 rtSurvey 移动应用，包含分步说明和安装故障排除技巧"
+icon: "get_app"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 312
+---
+
+rtSurvey 适用于 Android 和 iOS 设备，让您可以在各种移动平台上进行调查和收集数据。请按以下步骤在您的设备上安装 rtSurvey。
+
+## 系统要求
+
+安装前，请确保您的设备满足以下要求：
+
+- Android：Android 7.0 或更高版本
+- iOS：iOS 11.0 或更高版本
+- 初次下载和更新需要稳定的网络连接
+
+## 在 Android 上安装
+
+1. 在您的 Android 设备上打开 Google Play 商店。
+2. 在搜索栏中输入"rtSurvey"或使用此直达链接：[Google Play 上的 rtSurvey](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey&hl=ln&gl=US)
+3. 点击搜索结果中的 rtSurvey 应用。
+4. 按下"安装"按钮。
+5. 等待下载和安装完成。
+6. 安装后，您可以从设备主屏幕或应用程序抽屉中打开应用。
+
+## 在 iOS 上安装
+
+1. 在您的 iOS 设备上打开 App Store。
+2. 点击搜索图标并输入"rtSurvey"或使用此直达链接：[App Store 上的 rtSurvey](https://apps.apple.com/vn/app/rtsurvey/id1178851547)
+3. 点击搜索结果中的 rtSurvey 应用。
+4. 按下"获取"或云图标开始下载。
+5. 您可能需要通过面容 ID、触控 ID 或 Apple ID 密码进行验证。
+6. 等待下载和安装完成。
+7. 安装后，应用图标将出现在您的主屏幕上。
+
+## 安装问题故障排除
+
+如果安装过程中遇到任何问题：
+
+1. 检查网络连接并重试。
+2. 确保设备有足够的存储空间。
+3. 重启设备并重新尝试安装。
+4. Android：清除 Google Play 商店在设备设置中的缓存和数据。
+5. iOS：退出 Apple ID 并重新登录。
+
+如果问题仍然存在，请访问 rtSurvey 支持网站或联系您的系统管理员寻求帮助。
+
+## 更新 rtSurvey
+
+为确保您拥有最新功能和错误修复：
+
+- Android：在 Google Play 商店中启用自动更新或手动更新应用。
+- iOS：在 App Store 设置中开启自动更新或手动更新。
+
+定期更新有助于保持应用的性能和安全性。
+
+成功安装 rtSurvey 后，您就可以开始使用它进行数据收集了。下一节将引导您完成将应用连接到服务器的步骤。

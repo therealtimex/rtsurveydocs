@@ -1,0 +1,100 @@
+---
+title: "Uživatelské rozhraní"
+description: "Prozkoumejte klíčové funkce mobilní aplikace rtSurvey, včetně vyplňování formulářů, úprav, odevzdání, oznámení, správy úkolů, reportování a mapování GPS"
+icon: "apps"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 314
+---
+
+Mobilní aplikace rtSurvey nabízí komplexní sadu funkcí navržených pro zefektivnění procesu průzkumu. Zde jsou klíčové funkce:
+
+## Vyplnit formulář
+Funkce Vyplnit formulář je místem, kde mohou enumerátoři přistupovat k prázdným průzkumovým formulářům a zadávat do nich data. Tato funkce umožňuje efektivní a přesný sběr dat v terénu. Klíčové body zahrnují:
+
+1. Seznam formulářů: Po přístupu do sekce Vyplnit formulář se uživatelům zobrazí seznam všech dostupných prázdných formulářů přiřazených jim.
+
+2. Automatické stahování formulářů: Na rozdíl od některých jiných průzkumných nástrojů mobilní aplikace rtSurvey automaticky stahuje formuláře, ke kterým má uživatel přístup udělený administrátorem průzkumu nebo projektovým manažerem. Tím se eliminuje potřeba enumerátorů ručně stahovat prázdné formuláře.
+
+3. Přímé zadávání dat: Enumerátoři mohou vybrat formulář ze seznamu a začít přímo zadávat odpovědi do aplikace.
+
+4. Aktualizace v reálném čase: Jak jsou přiřazovány nové formuláře nebo prováděny aktualizace, seznam dostupných formulářů se automaticky obnovuje, čímž enumerátoři vždy mají přístup k nejnovějším průzkumům.
+
+5. Offline schopnost: Formuláře lze stáhnout při dostupném internetovém připojení, což umožňuje enumerátorům je vyplnit i v oblastech se slabým nebo žádným pokrytím sítě.
+
+## Upravit formulář
+
+Funkce Upravit formulář v rtSurvey nabízí komplexní a flexibilní přístup ke správě instancí průzkumu, čímž se odlišuje od jiných CAPI aplikací. Tato funkce zajišťuje přesnost a úplnost dat prostřednictvím tří odlišných záložek:
+
+1. **Uložené**:
+   - Přístup a úprava neúplných instancí rozhovoru uložených na zařízení enumerátora.
+   - Podobné tradičním CAPI aplikacím, umožňující uživatelům pokračovat v nedokončených průzkumech.
+
+2. **Vrácené** (exkluzivní pro rtSurvey):
+   - Úprava instancí průzkumu, které byly dříve dokončeny, finalizovány a odeslány na server.
+   - Unikátní pro rtSurvey, tato funkce umožňuje po odevzdání provádět úpravy, když jsou potřeba další informace nebo opravy.
+
+3. **Předané** (exkluzivní pro rtSurvey):
+   - Přístup a úprava instancí průzkumu původně vytvořených na jiném zařízení.
+   - Tato inovativní funkce podporuje různé scénáře:
+     * Supervizoři mohou kontrolovat a upravovat odevzdání enumerátorů.
+     * Uživatelé mohou pokračovat v práci na jiném zařízení, pokud bylo jejich původní zařízení ztraceno nebo poškozeno.
+     * Umožňuje kolaborativní úpravy a procesy kontroly kvality.
+
+Klíčové výhody:
+- Zvýšená kvalita dat prostřednictvím více příležitostí ke kontrole a úpravě.
+- Zlepšená flexibilita pracovního postupu pro terénní týmy a supervizory.
+- Bezproblémové pokračování práce napříč zařízeními, snižování prostojů a rizik ztráty dat.
+
+## Odeslat formulář
+Odevzdejte 100% dokončené formuláře na centrální server. Tato funkce umožňuje přenos dat v reálném čase pro okamžitou analýzu a rozhodování.
+
+## Oznámení
+Přijímejte důležité oznámení a aktualizace ze serveru. Tím jsou všichni členové týmu informováni o vývoji projektu, změnách nebo naléhavých záležitostech.
+
+## Úkoly
+Přistupujte a spravujte úkoly přiřazené serverem. Tato funkce pomáhá organizovat pracovní zátěž a prioritizovat průzkumné aktivity pro terénní enumerátory.
+
+## Sestavy
+Prohlédněte si všechny sestavy odeslané ze serveru na tablet. Tato funkce umožňuje uživatelům přistupovat k výsledkům analýzy a přehledům projektu přímo na svém zařízení.
+
+## Zkontrolovat formulář
+
+Funkce Zkontrolovat formulář v rtSurvey nabízí komplexní systém pro zkoumání a správu finalizovaných instancí průzkumu, zajišťující robustní kontrolu kvality a ověřování dat. Tato funkce je rozdělena do čtyř odlišných záložek, každá sloužící specifickému účelu v procesu správy dat:
+
+1. **Finalizované**:
+   - Obsahuje dokončené a finalizované instance, které dosud nebyly odeslány na server.
+   - Umožňuje závěrečné kontroly před odesláním.
+
+2. **Odeslané**:
+   - Obsahuje finalizované instance, které byly úspěšně odeslány na server.
+   - Poskytuje záznam přenesených dat.
+
+3. **Přenesené**:
+   - Zobrazuje dokončené instance, které byly přeneseny na jiná zařízení.
+   - Usnadňuje sledování pohybu dat mezi zařízeními.
+
+4. **Přijaté**:
+   - Zobrazuje dokončené instance původně vytvořené na jiném zařízení a přenesené na aktuální zařízení.
+   - Umožňuje kolaborativní práci a sdílení dat mezi členy týmu.
+
+Klíčové funkce:
+- **Přístup pouze pro prohlížení**: Všechny instance v těchto záložkách jsou zpočátku jen pro prohlížení, zachovávající integritu dat finalizovaných formulářů.
+- **Systém žádostí o úpravu**: Uživatelé mohou požádat o úpravu instance, pokud jsou potřeba opravy.
+  - Žádosti mohou být schváleny automaticky nebo ručně administrátory nebo projektovými manažery.
+  - Po schválení se instance stane upravitelnou, umožňující potřebné úpravy.
+
+Výhody:
+- Zvyšuje kvalitu dat prostřednictvím více fází kontroly.
+- Poskytuje jasný auditní trail odevzdání a přenosů dat.
+- Nabízí flexibilitu ve správě dat při zachování kontroly nad finalizovanými daty.
+- Podporuje kolaborativní pracovní postupy a procesy zajišťování kvality.
+
+## Mapa
+Využijte funkci GPS pro přesné určení polohy, kde probíhá rozhovor. Tato funkce zvyšuje přesnost dat a pomáhá při prostorové analýze výsledků průzkumu.
+
+## Konec
+Zavřete aplikaci bez odhlášení z účtu rtSurvey. To umožňuje rychlý návrat do aplikace bez nutnosti opakovaného ověřování.
+
+Tyto funkce spolupracují a vytvářejí výkonný, uživatelsky přívětivý mobilní průzkumný nástroj, který vyhovuje různým rolím v rámci průzkumného procesu, od sběru dat po analýzu a správu projektů.

@@ -1,0 +1,97 @@
+---
+title: "Pasirinkimas iš failo"
+description: "select_one_from_file ir select_multiple_from_file dinamiškai įkelia pasirinkimus iš išorinio CSV arba XML failo, pridėto prie formos."
+icon: "file-earmark-spreadsheet"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 241
+---
+
+`select_one_from_file` ir `select_multiple_from_file` veikia kaip `select_one` ir `select_multiple`, tačiau vietoj pasirinkimų apibrėžimo **pasirinkimų darbalapyje**, pasirinkimai įkeliami iš **išorinio CSV arba XML failo**, pridėto prie formos. Tai naudinga, kai pasirinkimų sąrašas yra labai ilgas, dažnai keičiasi arba reikia atnaujinti neperkuriant visos formos.
+
+## Pagrindinė XLSForm specifikacija
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | Pasirinkite sveikatos įstaigą |
+| select_multiple_from_file crops.csv | crops | Kokias kultūras augina namų ūkis? |
+
+Failo pavadinimas po tipo pavadinimo turi atitikti failo, pridedamo įkeliant formą, pavadinimą.
+
+## CSV failo formatas
+
+Jūsų CSV failas turi turėti bent du stulpelius: `name` (saugoma reikšmė) ir `label` (rodomas tekstas). Galite pridėti bet kokį kiekį papildomų stulpelių filtravimui.
+
+**health_facilities.csv:**
+
+```
+name,label,district,type
+HF001,Nairobi centrinis klinikos,Nairobi,clinic
+HF002,Westlands sveikatos centras,Nairobi,health_centre
+HF003,Kisumu apygardos ligoninė,Kisumu,hospital
+```
+
+## Pasirinkimų filtravimas
+
+Naudokite stulpelį `choice_filter`, kad rodytumėte tik pasirinkimus, atitinkančius esamą kontekstą. Nurodykite CSV stulpelius tiesiogiai pagal stulpelio pavadinimą (be `${}`):
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | Pasirinkite apygardą | |
+| select_one_from_file health_facilities.csv | facility | Pasirinkite įstaigą | district = ${district} |
+
+Šiame pavyzdyje rodomos tik pasirinktos apygardos įstaigos. `district` stulpelyje `choice_filter` nurodo `district` stulpelį CSV faile; `${district}` nurodo formos lauką pavadinimu `district`.
+
+## Naudojimo atvejai
+
+Pasirinkimo iš failo klausimai dažnai naudojami:
+
+1. **Ilgiems pasirinkimų sąrašams** — sveikatos įstaigos, mokyklos, kaimai, rūšių sąrašai (šimtai ar tūkstančiai elementų)
+2. **Dažnai atnaujinamiems sąrašams** — kai pagrindinis sąrašas keičiasi tarp apklausos etapų, atnaujinkite tik CSV neperkurdami formos
+3. **Bendriems referenciniams duomenims** — vienas CSV failas naudojamas keliose formose
+4. **Filtruotiems kaskadiniams pasirinkimams** — įkelkite visus regionus/apygardas/kaimus viename faile, tada filtruokite pagal tėvinio elemento pasirinkimą
+
+## Failo pridėjimas
+
+Kai įkeliate savo formą į rtSurvey, pridėkite CSV failą kaip **medijos priedą**. Failo pavadinimas formos apibrėžtyje turi tiksliai atitikti priedo failo pavadinimą.
+
+{{% alert icon=" " context="warning" %}}
+Failų pavadinimai skiria didžiąsias ir mažąsias raides. `Health_Facilities.csv` ir `health_facilities.csv` laikomi skirtingais failais.
+{{% /alert %}}
+
+## `choice-label()` naudojimas su from-file
+
+Pasirinkto pasirinkimo etiketei rodyti pastaboje ar skaičiavimo lauke:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | Pasirinkite įstaigą | |
+| calculate | facility_label | | choice-label(${facility}, ${facility}) |
+| note | summary | Pasirinkta įstaiga: ${facility_label} | |
+
+## Geriausios praktikos
+
+1. Laikykite CSV failus iki 5 000 eilučių geresniam veikimui mobiliuosiuose įrenginiuose.
+2. Visada įtraukite `name` ir `label` stulpelius — papildomi stulpeliai yra neprivalomi.
+3. Kaskadiniams pasirinkimams naudokite vieną CSV su tėvinio elemento stulpeliu ir filtruokite su `choice_filter`.
+4. Versijuokite CSV failų pavadinimus (pvz., `facilities_v3.csv`) darydami esminius pakeitimus stulpelių struktūroje.
+5. Atidžiai testuokite filtravimo išraiškas — rašybos klaida `choice_filter` tyliai neparodys jokių pasirinkimų.
+
+## Apribojimai
+
+- Labai dideli CSV failai (10 000+ eilučių) gali sulėtinti formos įkėlimą, ypač žemos klasės įrenginiuose.
+- CSV failai turi būti įkelti kartu su forma — juos negalima gauti iš URL vykdymo metu (naudokite `search()` arba `pulldata()` dinaminėms paieškomis).
+- `select_multiple_from_file` yra mažiau palaikomas visose kliento programose — patikrinkite suderinamumą prieš naudojant.
+
+## Palyginimas su `search()`
+
+| | `select_one_from_file` | `search()` išvaizda |
+|--|----------------------|----------------------|
+| Pasirinkimų šaltinis | Pridėtas CSV/XML failas | Serverio pusės duomenų bazės užklausa |
+| Veikia neprisijungus | Taip (failas yra įtrauktas) | Reikia ryšio |
+| Pasirinkimų skaičius | Ribotas įrenginio atmintimi | Neribojamas (puslapiais) |
+| Realaus laiko duomenys | Ne | Taip |
+
+Dideliems, dažnai kintantiems ar serverio pusės duomenų rinkiniams žr. [Dinaminė paieška](../advanced-extension/dynamic-search).

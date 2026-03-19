@@ -1,0 +1,51 @@
+---
+weight: 15
+date: "2026-03-04T00:00:00+00:00"
+draft: false
+title: "Systembruger"
+icon: "people"
+toc: true
+description: "Administrer roller, tilladelser og onboarding for alle platformdeltagere."
+tags: ["Brugere", "Adgangskontrol", "Onboarding", "Roller"]
+---
+
+# Administration af systembrugere
+
+Modulet **Systembruger** (`/cpms/cpmsSystemUser/admin`) er en omfattende administrationsgrænseflade til styring af, hvem der har adgang til din Real-Time Survey-platform (RT-CPMS), og hvilke handlinger de kan udføre.
+
+![Systembrugergrænseflade](/images/system_user.png)
+
+## Unified tilgang til administration
+
+I RT-CPMS er en **interviewer** blot en specifik rolle tildelt en systembruger. Der findes ingen separat "interviewer"-database. Uanset om en bruger er en administratorniveauovervåger af webportalen eller en feltinterviewer, der indsamler data via mobilappen, administreres de alle inden for denne ene, unified ramme.
+
+## Nøglefunktioner
+
+### 1. Brugerbibliotek og gittervisning
+Hovedgrænsefladen viser en pagineret liste over alle brugere tilknyttet arbejdsområdet. Vigtige attributter inkluderer:
+* **Organisations-ID og navn**: Logisk gruppering af brugere under specifikke organisationsenheder (f.eks. `rta`, `partner_org`).
+* **Rolle**: Angiver brugerens tilladelsesniveau (f.eks. `Administrator`, `Holdleder`, `Interviewer`).
+* **Gruppe**: Rumlig eller logisk grupperingstildeling (f.eks. specifikke distrikter eller driftsteams).
+* **Er synkroniseret**: Angiver, om kontoen er integreret med det centrale Single Sign-On (SSO)-system.
+* **Status**: Visuelle indikatorer, der bekræfter, om en konto er `Aktiv`, `Inaktiv`, `Slettet` eller `Blokeret`.
+
+**Globale handlinger:**
+* **Tilføj systembruger**: Opret manuelt en individuel profil.
+* **Importer systembruger**: Masseupload af konti ved hjælp af en Excel-skabelon. Du kan løse konflikter ved hjælp af tilstandene `Spring over` eller `Erstat` og synkronisere direkte med SSO.
+* **Massesletning**: Multi-valgssupport til massekontofjernelse.
+
+### 2. Adgangskontrol og sikkerhed
+Når du opretter eller redigerer en brugerprofil, er der adskillige kritiske sikkerheds- og arbejdsgangfelter til rådighed:
+* **Brugerkode**: En unik identifikator, der forbinder den lokale CPMS-konto med det centrale SSO-lager.
+* **Skift-enheds-kode**: Et robust sikkerhedstoken, der kræves, når en interviewer skal skifte den mobilenhed, de bruger til dataindsamling.
+* **Strømniveau**: En granulær prioritets-/adgangsskala fra 0 (lavest) til 20 (højest).
+* **Tilsynsskift**: Et afkrydsningsfelt, der øjeblikkeligt hæver en standardbruger til lederstatus.
+* **Arbejdsgangsautomatisering**: En mulighed for automatisk at godkende anmodninger om redigering, som strømliner datarenerings- og verifikationsprocessen for betroede brugere.
+
+### 3. Kodehåndtering (automatiseret onboarding)
+Dette findes under underfanen "Kode" og styrer hash-baserede registrerings- og invitationslinks, der strømliner onboardingprocessen for store teams.
+
+* **Registrering vs. invitation**: Vælg, om brugere kan selvregistrere sig via et distribueret link, eller om de kræver en direkte admin-invitation.
+* **Udløbsdatoer**: Begræns onboarding til specifikke tidsvinduer.
+* **Brugsgrænser**: Begræns antallet af brugere, der kan tilslutte sig via en enkelt genereret kode.
+* **Forudtildelte roller**: Brugere, der tilslutter sig via disse koder, arver automatisk den foruddefinerede rolle og strømniveau, hvilket sikrer, at de er klar til at arbejde med det samme uden manuel admin-intervention.

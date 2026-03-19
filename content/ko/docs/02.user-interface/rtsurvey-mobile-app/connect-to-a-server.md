@@ -1,0 +1,111 @@
+---
+title: "서버에 연결하기"
+description: "rtSurvey 모바일 앱을 프로젝트 서버에 연결하고, 역할별 기능에 접근하며, 여러 프로젝트에서 설문 협업을 시작하는 방법을 알아보세요."
+icon: "cloud_sync"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 313
+---
+
+rtSurvey 앱을 서버에 연결하는 것은 데이터 수집, 관리 및 분석에 앱을 사용하기 시작하는 중요한 단계입니다. 이 과정을 통해 모든 설문 역할이 필요한 기능과 데이터에 실시간으로 접근할 수 있게 됩니다.
+
+## ODK Collect와의 주요 차이점
+
+rtSurvey는 ODK Collect에 비해 향상된 기능을 제공하여 다양한 설문 역할에 맞게 제공됩니다:
+- **관리자**: 메시지, 업데이트 알림(데이터 제출, 새 보고서, 새 계정), 양식 작성 및 분석 보고서 조회.
+- **프로젝트 매니저**: 프로젝트 설정 및 관리를 포함하여 관리자와 유사한 기능.
+- **설문 설계자**: 메시지, 알림, 양식 작성 및 분석 보고서 조회.
+- **현장 조사원**: 양식 작성, 메시지, 알림 및 진행 보고서.
+- **데이터 분석가**: 메시지, 알림 및 분석 보고서 접근.
+
+## rtSurvey 앱을 서버에 연결하는 단계
+
+### 1. 계정이 있는지 확인
+
+서버에 연결하려면 계정이 필요합니다. 계정은 관리자가 만들거나 관리자가 설정한 계정 생성 URL을 사용하여 직원이 만들 수 있습니다.
+
+### 2. rtSurvey 앱 열기
+
+모바일 기기에서 rtSurvey 앱을 실행합니다. 아직 설치하지 않은 경우 [rtSurvey 앱 설치](#installing-rtsurvey-app) 페이지를 참조하세요.
+
+### 3. 서버 연결 설정 접근
+
+1. 앱을 열고 설정 메뉴로 이동합니다.
+2. 서버에 연결하는 옵션을 선택합니다.
+
+### 4. 계정 세부 정보 입력 및 프로젝트 선택
+
+rtSurvey에 연결할 때 계정 구성에 따라 프로세스가 간소화됩니다:
+
+- **사용자명**: 계정 사용자명을 입력합니다.
+- **비밀번호**: 계정 비밀번호를 입력합니다.
+
+자격 증명 입력 후:
+
+- 계정이 하나의 설문 프로젝트에만 연결된 경우:
+  - 앱이 해당 프로젝트의 서버에 자동으로 로그인합니다.
+  - 서버 URL을 입력하거나 프로젝트를 수동으로 선택할 필요가 없습니다.
+
+- 계정이 여러 설문 프로젝트에 연결된 경우:
+  - 성공적으로 인증되면 접근 권한이 있는 프로젝트 목록이 표시됩니다.
+  - 이 목록에서 작업할 프로젝트를 선택합니다.
+
+### 5. 인증
+
+서버 세부 정보를 입력한 후 "연결" 또는 "로그인" 버튼을 탭합니다. 앱이 자격 증명을 인증하고 서버에 연결을 설정합니다.
+
+```mermaid
+flowchart TD
+    A["📱 rtSurvey 앱 시작"] --> B["🔑 사용자명 및 비밀번호 입력"]
+    style A fill:#4CAF50,stroke:#666666,stroke-width:3px,color:white
+    style B fill:#2196F3,stroke:#666666,stroke-width:3px,color:white
+
+    B --> C{"🌳 프로젝트가 여러 개?"}
+    style C fill:#FFC107,stroke:#666666,stroke-width:3px,color:black
+
+    C -->|예| D["📋 프로젝트 목록 표시"]
+    C -->|아니오| E["🔄 단일 프로젝트에 자동 연결"]
+    style D fill:#FF9800,stroke:#666666,stroke-width:3px,color:white
+    style E fill:#009688,stroke:#666666,stroke-width:3px,color:white
+
+    D --> F["👆 사용자가 프로젝트 선택"]
+    style F fill:#FF5722,stroke:#666666,stroke-width:3px,color:white
+
+    E --> G["☁️ 서버에 연결"]
+    F --> G
+    style G fill:#3F51B5,stroke:#666666,stroke-width:3px,color:white
+    G --> H["👥 역할별 기능 접근"]
+    style H fill:#9C27B0,stroke:#666666,stroke-width:3px,color:white
+
+    H --> I["👨‍💼 관리자/<br>프로젝트 매니저"]
+    H --> J["🎨 설문 설계자"]
+    H --> K["📝 현장 조사원"]
+    H --> L["📊 데이터 분석가"]
+    style I fill:#E91E63,stroke:#666666,stroke-width:3px,color:white
+    style J fill:#795548,stroke:#666666,stroke-width:3px,color:white
+    style K fill:#607D8B,stroke:#666666,stroke-width:3px,color:white
+    style L fill:#8BC34A,stroke:#666666,stroke-width:3px,color:white
+
+    I --> M["💬 메시지\n🔔 알림\n📄 양식 작성\n📈 보고서 조회"]
+    J --> N["💬 메시지\n🔔 알림\n🧪 양식 테스트\n📈 보고서 조회"]
+    K --> O["📝 양식 작성\n💬 메시지\n🔔 알림\n📊 진행 보고서"]
+    L --> P["💬 메시지\n🔔 알림\n📊 분석 보고서"]
+    style M fill:#FF4081,stroke:#666666,stroke-width:3px,color:white
+    style N fill:#9E9E9E,stroke:#666666,stroke-width:3px,color:white
+    style O fill:#00BCD4,stroke:#666666,stroke-width:3px,color:white
+    style P fill:#CDDC39,stroke:#666666,stroke-width:3px,color:white
+```
+
+## 연결 문제 해결
+
+서버에 연결하는 동안 문제가 발생하면:
+
+1. **인터넷 연결 확인**: 기기가 인터넷에 연결되어 있는지 확인합니다.
+2. **자격 증명 확인**: 사용자명과 비밀번호가 정확한지 확인합니다.
+3. **앱 재시작**: rtSurvey 앱을 닫고 다시 엽니다.
+4. **지원 연락**: 문제가 지속되면 시스템 관리자 또는 rtSurvey 지원팀에 문의하세요.
+
+## 결론
+
+rtSurvey 앱을 서버에 연결하는 것은 앱의 전체 기능을 활용할 수 있게 해주는 간단한 프로세스입니다. 위에 설명된 단계를 따르면 특정 설문 역할에 맞춤화된 원활한 데이터 수집, 관리 및 분석을 보장할 수 있습니다.

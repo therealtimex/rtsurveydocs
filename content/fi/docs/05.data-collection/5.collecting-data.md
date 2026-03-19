@@ -1,0 +1,63 @@
+---
+weight: 150
+date: "2023-05-03T22:37:22+01:00"
+draft: false
+author: "RealTimeX"
+title: "Tietojen kerääminen"
+icon: "rocket_launch"
+toc: true
+description: "Pikaopas kyselyn suorittamiseen rtSurveylla"
+publishdate: "2023-05-03T22:37:22+01:00"
+tags: ["Beginners"]
+---
+
+Kun lomake on otettu käyttöön ja luetteloijat on määritetty, tiedonkeruu voi alkaa. **rtSurvey** tukee saumatonta tietojen keräämistä sekä verkkoselaimilla että omistettujen mobiilisovellusten kautta, tarjoten joustavuutta riippumatta siitä, onko tiimisi yhteydessä Internetiin vai työskentelee syrjäisissä, offline-ympäristöissä.
+
+## Oikean keruumenetelmän valitseminen
+
+Projektin maantieteestä ja yhteydestä riippuen voit valita luetteloijillesi optimaalisen menetelmän:
+
+- **Verkkoselain (online):** Parhaiten sopii puhelinkeskuksiin, toimistossa tapahtuvaan tietojen syöttöön tai vastaajille, jotka täyttävät itsehallinnoidun julkisen kyselyn.
+- **rtWork / rtSurvey-mobiilisovellus (online ja offline):** Parhaiten sopii kenttäoperaatioihin, syrjäisille alueille, joilla on epävakaa Internet, ja kyselyihin, jotka vaativat medialiitteitä (valokuvat, GPS-koordinaatit, offline-kartat).
+
+---
+
+## Menetelmä 1: Tietojen kerääminen verkkoselaimella
+
+Webform-käyttöliittymän avulla luetteloijat voivat aloittaa tietojen keräämisen välittömästi ilman ohjelmistojen asennusta.
+
+### 1. Pääsy Webform-URL:iin
+Etsi Ohjauspaneelin **Hallinnoi lomakkeita** -kojetaulusta kohdelomakkeesi ja napsauta **Webformin URL**-painiketta suojatun linkin luomiseksi.
+
+### 2. Lomakkeen täyttö
+- Avaa annettu URL missä tahansa nykyaikaisessa verkkoselaimessa.
+- Jos lomake vaatii todennuksen, luetteloijan on kirjauduttava sisään tunnistetiedoillaan. Jos se on asetettu "Julkinen näkyvyys" -tilaan, he voivat jatkaa suoraan.
+- Täytä kyselykysymykset. Käyttöliittymä pakottaa automaattisesti logiikan, ohituskaavat ja validointisäännöt.
+- **Median tallentaminen:** Jos lomake sisältää kuva-, ääni- tai videokysymyksiä, verkkoselain pyytää sinua lataamaan tiedoston tietokoneeltasi tai käyttämään laitteesi verkkokameraa/mikrofonia, jos saatavilla.
+
+### 3. Lähettäminen
+Saavutettuasi viimeisen sivun napsauta **Lähetä**. Selain vaatii aktiivisen Internet-yhteyden lähetyksen viimeistelemiseksi. Onnistumisen jälkeen tiedot näkyvät välittömästi **Hallinnoi lähetyksiä** -käyttöliittymässä.
+
+---
+
+## Menetelmä 2: Tietojen kerääminen mobiilisovelluksella (offline)
+
+Robustia kenttätiedonkeruuta varten mobiilisovellukset tarjoavat täydelliset offline-valmiudet.
+
+### 1. Asennus ja todennus
+- Lataa **rtWork** (tai **rtSurvey**) -sovellus Google Play Storesta tai Apple App Storesta.
+- Avaa sovellus ja kirjaudu sisään määritetyillä luetteloijatunnistetiedoilla.
+
+### 2. Lomakkeiden lataaminen (vaatii Internet-yhteyden)
+- Siirry sovelluksen **Lomakkeet**- tai **Tehtävät**-osioon.
+- Napauta **Synkronointi**- tai **Lataa**-kuvaketta hakeaksesi uusimmat kyselylomakkeet palvelimelta. Latauksen jälkeen lomakkeet tallennetaan paikallisesti laitteelle.
+
+### 3. Tietojen kerääminen (offline)
+- Avaa ladattu lomake ja aloita haastattelu.
+- Voit kerätä tietoja turvallisesti täysin offline-tilassa.
+- **Median tallentaminen:** Mobiilisovellus integroituu natiivisti laitteen laitteistoon. Voit ottaa valokuvia, nauhoittaa ääntä, nauhoittaa videota ja kirjata tarkat GPS-koordinaatit suoraan sovelluksessa, myös ilman Internet-yhteyttä.
+- Kun haastattelu on valmis, viimeistele tietue. Viimeistellyt tietueet asetetaan turvallisesti sovelluksen lähteviin viesteihin.
+
+### 4. Lähetysten synkronointi (vaatii Internet-yhteyden)
+- Kun luetteloija palaa alueelle, jolla on Internet-yhteys (Wi-Fi tai mobiilidata), hänen on siirryttävä **Lähtevät**- tai **Synkronointi**-käyttöliittymään.
+- Ohjaa sovellus lähettämään viimeistellyt lomakkeet. Sovellus siirtää jonossa olevat tietueet ja kaikki liitetyt mediatiedostot turvallisesti palvelimelle, jonka jälkeen ne näkyvät tietoruudukossa tarkastelua varten.

@@ -1,0 +1,126 @@
+---
+title: "Salto delle domande"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 280
+---
+
+La logica di salto, nota anche come diramazione o logica condizionale, ti consente di creare sondaggi dinamici che si adattano alle risposte dei rispondenti. In rtSurvey, la logica di salto viene implementata usando la colonna `relevant` nel tuo XLSForm.
+
+## Logica di salto di base
+
+Per implementare la logica di salto di base, usa la colonna `relevant` per specificare una condizione:
+
+```
+| type           | name          | label                       | relevant            |
+|----------------|---------------|-----------------------------|--------------------|
+| select_one y_n | likes_pizza   | Ti piace la pizza?          |                    |
+| select_multiple pizza_toppings | favorite_topping | Condimenti preferiti | ${likes_pizza} = 'yes' |
+```
+
+In questo esempio, la domanda "Condimenti preferiti" appare solo se il rispondente risponde "sì" al gradire la pizza.
+
+## Sintassi per le espressioni relevant
+
+- Usa `${ }` per fare riferimento ad altre variabili di domanda.
+- Per le domande `select_one`, confronta direttamente: `${question_name} = 'answer'`
+- Per le domande `select_multiple`, usa la funzione `selected()`.
+
+## Logica di salto avanzata
+
+### Condizioni multiple
+
+Puoi combinare più condizioni usando `and`, `or` e parentesi:
+
+```
+| type    | name  | label                   | relevant                                  |
+|---------|-------|-------------------------|-------------------------------------------|
+| integer | age   | Quanti anni hai?       |                                           |
+| text    | school| Quale scuola frequenti? | ${age} < 18 and (${location} = 'urban' or ${location} = 'suburban') |
+```
+
+### Utilizzo delle domande select_multiple
+
+Per le domande `select_multiple`, usa la funzione `selected()`:
+
+```
+| type           | name          | label                       | relevant                               |
+|----------------|---------------|-----------------------------|-----------------------------------------|
+| select_multiple pizza_toppings | favorite_topping | Condimenti preferiti |                                         |
+| text           | cheese_type   | Tipo di formaggio preferito     | selected(${favorite_topping}, 'cheese') |
+```
+
+### Opzione "Altro" nelle scelte multiple
+
+Implementa un'opzione "Altro" a testo libero usando `relevant`:
+
+```
+| type           | name                  | label                               | relevant                               |
+|----------------|----------------------|-------------------------------------|---------------------------------------|
+| select_multiple pizza_toppings | favorite_toppings | Quali sono i tuoi condimenti preferiti per la pizza? |                                       |
+| text           | favorite_toppings_other | Quali altri condimenti ti piacciono?   | selected(${favorite_toppings}, 'other') |
+```
+
+Ricorda di includere 'other' come opzione nel tuo foglio di lavoro choices.
+
+## Funzionalità specifiche di rtSurvey
+
+### Rilevanza dinamica
+
+rtSurvey consente la rilevanza dinamica basata su campi calcolati:
+
+```
+| type      | name       | label              | calculation                   |
+|-----------|------------|--------------------|-----------------------------|
+| calculate | total_score| Punteggio totale        | ${score1} + ${score2} + ${score3} |
+| text      | feedback   | Feedback           | ${total_score} > 75             |
+```
+
+### Rilevanza nei repeat
+
+rtSurvey supporta la rilevanza all'interno dei gruppi repeat:
+
+```
+| type         | name         | label            | relevant               |
+|--------------|--------------|------------------|------------------------|
+| begin repeat | child_info   | Informazioni sul bambino|                        |
+| integer      | child_age    | Età del bambino      |                        |
+| text         | school_name  | Nome della scuola      | ${child_age} >= 5      |
+| end repeat   |              |                  |                        |
+```
+
+### Rilevanza a cascata
+
+rtSurvey gestisce in modo efficiente la rilevanza a cascata, in cui la rilevanza di una domanda dipende da un'altra, che a sua volta dipende da una terza:
+
+```
+| type           | name        | label                  | relevant               |
+|----------------|-------------|------------------------|------------------------|
+| select_one y_n | has_car     | Possiedi un'auto?      |                        |
+| select_one car_type | car_type | Che tipo di auto?    | ${has_car} = 'yes'     |
+| text           | model       | Modello specifico         | ${car_type} = 'sedan'  |
+```
+
+## Best practice per la logica di salto in rtSurvey
+
+1. **Mantienila semplice**: Evita condizioni di rilevanza eccessivamente complesse quando possibile.
+2. **Testa approfonditamente**: Usa la funzione di anteprima di rtSurvey per testare tutti i possibili percorsi nel tuo sondaggio.
+3. **Considera le prestazioni**: La logica di salto molto complessa può influire sulle prestazioni del sondaggio, specialmente sui dispositivi mobili.
+4. **Usa nomi di variabili chiari**: Questo rende le tue espressioni di rilevanza più facili da leggere e mantenere.
+5. **Documenta la tua logica**: Aggiungi note per spiegare i pattern di salto complessi, specialmente per la collaborazione di gruppo.
+6. **Sii consapevole dell'analisi dei dati**: Le domande saltate risulteranno in dati mancanti. Pianifica la tua analisi di conseguenza.
+
+## Risoluzione dei problemi con la logica di salto
+
+- **Errori di sintassi**: Assicurati che tutti i `${ }` siano correttamente chiusi e scritti correttamente.
+- **Riferimenti circolari**: Evita di creare loop in cui le domande dipendono l'una dall'altra.
+- **Distinzione maiuscole/minuscole**: Ricorda che le scelte di risposta sono sensibili alle maiuscole nelle espressioni di rilevanza.
+- **Confronti numerici**: Usa gli operatori appropriati (`<`, `>`, `=`) per i confronti numerici.
+
+## Conclusione
+
+L'uso efficace della logica di salto può migliorare significativamente l'esperienza del rispondente e la qualità dei dati nei tuoi progetti rtSurvey. Sfruttando le funzionalità avanzate di rtSurvey e seguendo le best practice, puoi creare sondaggi dinamici ed efficienti che si adattano alla situazione unica di ogni rispondente.

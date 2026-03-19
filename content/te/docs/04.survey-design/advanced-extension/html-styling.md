@@ -1,0 +1,145 @@
+---
+title: "HTML స్టైలింగ్"
+description: "rtSurvey లేబుళ్ళు మరియు hints లో HTML tags కు మద్దతు ఇస్తుంది, rich text ఫార్మాటింగ్, links మరియు డైనమిక్ కలర్ theming అనుమతిస్తుంది."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 297
+---
+
+rtSurvey వెబ్ ఫారాలలో **label** మరియు **hint** టెక్స్ట్‌ను HTML గా రెండర్ చేస్తుంది. అంటే టెక్స్ట్ ఫార్మాట్ చేయడానికి, లైన్ బ్రేక్‌లు జోడించడానికి, links సృష్టించడానికి మరియు రంగులు వర్తించడానికి ప్రామాణిక HTML tags ఉపయోగించవచ్చు. నోట్ ఫీల్డ్‌లు, విభాగ సూచనలు మరియు డైనమిక్ సారాంశాలకు ఇది ముఖ్యంగా ఉపయోగకరం.
+
+{{% alert icon=" " context="warning" %}}
+లేబుళ్ళలో HTML **వెబ్ ఫారం** మరియు rtSurvey మొబైల్ యాప్‌లలో రెండర్ అవుతుంది. అన్ని ODK-అనుకూల క్లయింట్‌లలో రెండర్ కాకపోవచ్చు. మీ లక్ష్య ప్లాట్‌ఫారమ్‌పై ఎల్లప్పుడూ పరీక్షించండి.
+{{% /alert %}}
+
+---
+
+## మద్దతు ఉన్న HTML tags
+
+### టెక్స్ట్ ఫార్మాటింగ్
+
+| Tag | ఫలితం |
+|-----|--------|
+| `<strong>text</strong>` లేదా `<b>text</b>` | **Bold text** |
+| `<em>text</em>` లేదా `<i>text</i>` | *Italic text* |
+| `<u>text</u>` | Underlined text |
+| `<br>` | లైన్ బ్రేక్ |
+| `<span style="...">text</span>` | Inline స్టైలింగ్ |
+
+### Links
+
+```html
+<a href="https://example.com" target="_blank">Click here</a>
+```
+
+కొత్త tab లో తెరుస్తుంది. సూచన పత్రాలు, మార్గదర్శకాలు, లేదా గణికుడు సంప్రదించాల్సిన బాహ్య వనరులకు ఉపయోగించండి.
+
+### రంగులు
+
+inline styles తో `<span>` ఉపయోగించండి:
+
+```html
+<span style="color: red;">Warning: value is out of range</span>
+<span style="color: #009688;">Section completed</span>
+```
+
+---
+
+## కలర్ థీమ్ variables
+
+rtSurvey యాప్ యొక్క కాన్ఫిగర్ చేయబడిన థీమ్‌కు అనుగుణంగా మారే **కలర్ థీమ్ tokens** కు మద్దతు ఇస్తుంది. `__COLOR_THEME_NAME__` సింటాక్స్ ఉపయోగించండి:
+
+```html
+<span style="color: var(--color-theme-primary);">Primary color text</span>
+```
+
+లేదా లేబుల్ టెక్స్ట్‌లో token shorthand ఉపయోగించడం:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
+```
+
+రెండర్ సమయంలో ఇది స్వయంచాలకంగా CSS variable తో సమానమైన `<span>` కు మార్చబడుతుంది.
+
+---
+
+## బహుభాషా లేబుళ్ళు
+
+ఒకే లేబుల్ సెల్‌లో బహుళ భాషలకు మద్దతు ఇవ్వడానికి కంటెంట్‌ను భాషా tags లో చుట్టండి:
+
+```
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey ప్రస్తుత యాప్ భాషతో సరిపోలే కంటెంట్ సేకరిస్తుంది. సరిపోలే భాషా tag కనుగొనబడకపోతే, పూర్తి స్ట్రింగ్ యథాతథంగా చూపించబడుతుంది.
+
+---
+
+## నోట్ ఫీల్డ్‌లలో ఉదాహరణలు
+
+### Bold మరియు లైన్ బ్రేక్‌తో విభాగ సూచన
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
+
+### లెక్కింపు సూచనతో డైనమిక్ సారాంశం
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
+
+### ఎరుపులో హెచ్చరిక
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
+
+### సూచన పత్రానికి Link
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Refer to the <a href="https://docs.example.com/guidelines" target="_blank">Field Guidelines</a> before starting this section.` |
+
+---
+
+## ప్రత్యేక rtSurvey HTML tags
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+ఇన్-ఫారం modal లో URL ఎంబెడ్ చేసే బటన్ రెండర్ చేస్తుంది. పూర్తి వివరాలకు [Webbox](webbox) చూడండి.
+
+### `<delete-repeat-current>label</delete-repeat-current>`
+
+తనిచినప్పుడు ప్రస్తుత రిపీట్ ఇన్‌స్టెన్స్ తొలగించే రిపీట్ సమూహంలో బటన్ రెండర్ చేస్తుంది.
+
+### `<delete-repeat-last>label</delete-repeat-last>`
+
+చివరి రిపీట్ ఇన్‌స్టెన్స్ తొలగించే బటన్ రెండర్ చేస్తుంది.
+
+రిపీట్ సమూహంలో వినియోగ ఉదాహరణ:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Remove this member</delete-repeat-current>` |
+
+---
+
+## ఉత్తమ పద్ధతులు
+
+1. HTML పొదుపుగా ఉపయోగించండి — అతిగా ఫార్మాట్ చేయబడిన లేబుళ్ళు చదవడం కష్టం, సులభం కాదు.
+2. Bold కోసం `<strong>` మరియు italics కోసం `<em>` పాత `<b>` మరియు `<i>` కంటే ప్రాధాన్యంగా ఉపయోగించండి.
+3. రంగు వినియోగం అర్థవంతంగా ఉంచండి — హెచ్చరికలకు ఎరుపు ఉపయోగించండి, అలంకారానికి కాదు.
+4. రెండింగ్ కొద్దిగా మారవచ్చు కాబట్టి మొబైల్ యాప్ మరియు వెబ్ ఫారం రెండింటిపై HTML రెండరింగ్ ఎల్లప్పుడూ పరీక్షించండి.
+5. లేబుళ్ళలో `<table>` tags నివారించండి — అవి మొబైల్ స్క్రీన్‌లపై అరుదుగా బాగా రెండర్ అవుతాయి.
+6. JavaScript (`<script>`) ఉపయోగించకండి — ఇది తొలగించబడుతుంది లేదా లోపాలు కలిగిస్తుంది.
+
+## పరిమితులు
+
+- సంక్లిష్ట HTML (tables, forms, scripts) మద్దతు లేదు మరియు రెండరింగ్ విచ్ఛిన్నం చేయవచ్చు.
+- కొన్ని పాత మొబైల్ క్లయింట్‌లు HTML tags ని అక్షరార్థంగా టెక్స్ట్‌గా చూపించవచ్చు — అన్ని లక్ష్య పరికరాలపై పరీక్షించండి.
+- `<a>` links బ్రౌజర్ లేదా WebView లో తెరుచుకుంటాయి — గణికుడు ఫారం నుండి వెళ్తాడు, ఇది మొబైల్‌లో అంతరాయం కలిగించవచ్చు.

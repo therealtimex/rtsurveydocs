@@ -1,0 +1,102 @@
+---
+title: "Tipo de pergunta dinâmica"
+description: "O tipo de pergunta dinâmica permite que o tipo de pergunta e o widget de um campo sejam determinados em tempo de execução com base em uma resposta de API ou valor calculado."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 301
+---
+
+O recurso **Tipo de pergunta dinâmica** permite que o widget de entrada e o comportamento de validação de um campo sejam determinados **em tempo de execução** em vez de no momento do design do formulário. Esta é uma extensão avançada do rtSurvey usada quando o tipo de dados a coletar depende de uma configuração no lado do servidor, resposta de API ou valor de campo anterior.
+
+Um caso de uso comum é uma lista de verificação de inspeção configurável onde o servidor define quais campos são obrigatórios, de que tipo são (text, integer, select, etc.) e quais opções estão disponíveis — sem reconstruir o formulário para cada configuração.
+
+---
+
+## Como funciona
+
+Um campo marcado como tipo de pergunta dinâmica usa `callapi()` para buscar sua configuração de uma API. A resposta da API define:
+
+- O tipo de entrada a renderizar (text, integer, select_one, etc.)
+- As opções disponíveis (para tipos de seleção)
+- Regras de validação
+
+O campo é marcado internamente com `specialFeature: isDynamicQuestionType`, o que instrui o motor do formulário a usar a resposta da API para construir o widget em vez da definição estática do formulário.
+
+---
+
+## Configuração
+
+### Etapa 1: Buscar a configuração do campo
+
+Use um campo `calculate` com `callapi()` para recuperar a configuração dinâmica:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | field_config | | callapi | `callapi('POST', 'https://api.example.com/field-config', 1, 2, 0, '$.config', 10000, 0, '', '', '{"form_id": "##form_id##", "field_id": "inspection_result"}')` |
+
+### Etapa 2: Referenciar a configuração no campo dinâmico
+
+O campo dinâmico usa `callapi-verify()` em sua `appearance` ou `constraint` para vincular à configuração buscada:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | inspection_result | Resultado da inspeção | `callapi-verify(dynamicParams)` |
+
+O motor do formulário lê `field_config` e determina dinamicamente se deve renderizar `inspection_result` como um campo `text`, `integer` ou `select_one`.
+
+---
+
+## Formato de resposta da API
+
+A API deve retornar um objeto JSON descrevendo a configuração do campo. Uma resposta típica:
+
+```json
+{
+  "config": {
+    "type": "select_one",
+    "choices": [
+      {"value": "pass", "label": "Aprovado"},
+      {"value": "fail", "label": "Reprovado"},
+      {"value": "na", "label": "N/A"}
+    ],
+    "required": true,
+    "constraint": ". != ''"
+  }
+}
+```
+
+---
+
+## Exemplo: Formulário de inspeção configurável
+
+Um formulário de inspeção onde os itens da lista de verificação e seus tipos de resposta são buscados de um servidor com base na categoria de inspeção:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| select_one inspection_type | insp_type | Tipo de inspeção | | |
+| calculate | checklist_config | | callapi | `callapi('POST', 'https://api.example.com/checklist', 1, 2, 0, '$.items', 10000, 0, '', '', '{"type": "##insp_type##"}')` |
+| text | item_1 | Item 1 | `callapi-verify(dynamicParams)` | |
+| text | item_2 | Item 2 | `callapi-verify(dynamicParams)` | |
+| text | item_3 | Item 3 | `callapi-verify(dynamicParams)` | |
+
+O servidor retorna o tipo de widget correto, rótulo, opções e validação para cada item com base em `insp_type`.
+
+---
+
+## Práticas recomendadas
+
+1. Use tipos de perguntas dinâmicas apenas quando a estrutura do campo genuinamente variar em tempo de execução — para formulários estáticos, use tipos de perguntas padrão.
+2. Garanta que a API de configuração responda rapidamente (menos de 2 segundos) e esteja disponível na rede de campo.
+3. Sempre defina um fallback sensato no formulário para o caso em que a API não esteja acessível — um campo `text` simples com uma nota é melhor do que um widget quebrado.
+4. Versione o esquema de resposta da sua API — mudanças no formato de resposta afetarão todos os formulários ativos usando esse endpoint.
+5. Teste cada combinação de tipos de campo que a API pode retornar antes da implantação.
+
+## Limitações
+
+- Os tipos de perguntas dinâmicas requerem conectividade de rede para buscar a configuração.
+- A gama completa de tipos de widget disponíveis dinamicamente depende da versão do cliente rtSurvey — teste sua versão de destino.
+- Esta é uma extensão avançada do rtSurvey sem equivalente na especificação padrão do XLSForm.
+- Os erros de depuração são mais difíceis de rastrear, pois a definição do campo fica parcialmente no formulário e parcialmente na resposta da API.

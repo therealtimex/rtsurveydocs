@@ -1,0 +1,126 @@
+---
+title: "Dukungan multibahasa"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 285
+---
+
+rtSurvey menyediakan dukungan multibahasa yang kuat, memungkinkan Anda membuat survei dalam berbagai bahasa. Fitur ini sangat penting untuk melakukan penelitian di berbagai populasi linguistik atau dalam lingkungan multibahasa.
+
+## Menyiapkan Survei Multibahasa
+
+Untuk membuat survei multibahasa di rtSurvey, Anda perlu menambahkan kolom spesifik bahasa ke XLSForm Anda. Berikut caranya:
+
+1. **Terjemahan Label**: Tambahkan kolom untuk setiap bahasa menggunakan format `label::Language (code)`.
+2. **Terjemahan Hint**: Gunakan `hint::Language (code)` untuk menerjemahkan petunjuk.
+3. **Terjemahan File Media**: Untuk media spesifik bahasa, gunakan `media::Language (code)`.
+
+Contoh:
+
+```
+| type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
+|---------|------|---------------------|---------------------|---------------------|---------------------|
+| integer | age  | Berapa usia Anda?   | ¿Cuántos años tienes?| Masukkan usia Anda | Ingrese su edad     |
+```
+
+## Kode Bahasa
+
+Disarankan untuk menggunakan kode bahasa resmi 2 karakter (subtag) setelah nama bahasa. Ini memfasilitasi pencocokan bahasa formulir dengan bahasa antarmuka pengguna. Anda dapat menemukan kode resmi [di sini](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+
+## Menetapkan Bahasa Default
+
+Untuk menetapkan bahasa default untuk pengumpulan data, gunakan lembar kerja `settings` dalam XLSForm Anda:
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | French (fr)       |
+```
+
+## Fitur Khusus rtSurvey
+
+### Pergantian Bahasa Dinamis
+
+rtSurvey memungkinkan pengguna mengganti bahasa secara dinamis selama pengumpulan data:
+
+- Di antarmuka web, gunakan dropdown bahasa di bilah navigasi atas.
+- Di aplikasi mobile, akses opsi bahasa melalui menu pengaturan.
+
+### Pesan Validasi Spesifik Bahasa
+
+rtSurvey memperluas dukungan multibahasa ke pesan validasi:
+
+```
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
+|---------|------|------------|----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Usia harus 150 atau kurang       | La edad debe ser 150 o menos     |
+```
+
+### Dukungan Bahasa RTL
+
+Untuk bahasa kanan-ke-kiri (RTL) seperti Arab atau Ibrani, rtSurvey secara otomatis menyesuaikan tata letak:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Nama Anda           | اسمك                |
+```
+
+### Appearance Spesifik Bahasa
+
+rtSurvey memungkinkan Anda menentukan appearance yang berbeda untuk bahasa yang berbeda:
+
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Alamat          | 地址                 | multiline                | textarea                  |
+```
+
+## Praktik Terbaik untuk Survei Multibahasa
+
+1. **Penamaan Konsisten**: Gunakan kode bahasa yang konsisten di seluruh formulir Anda.
+2. **Terjemahan Profesional**: Gunakan penerjemah profesional yang familiar dengan konteks survei.
+3. **Catatan Konteks**: Berikan catatan konteks untuk penerjemah untuk memastikan terjemahan yang akurat.
+4. **Pengujian**: Uji formulir Anda dalam semua bahasa sebelum penerapan.
+5. **Dukungan Unicode**: Pastikan perangkat pengumpulan data Anda mendukung Unicode untuk skrip non-Latin.
+6. **Media Spesifik Bahasa**: Gunakan gambar atau audio yang sesuai secara budaya untuk setiap bahasa.
+7. **Hindari Teks dalam Gambar**: Jika menggunakan gambar dengan teks, buat gambar terpisah untuk setiap bahasa.
+
+## Menangani Kasus Khusus
+
+### Respons Bahasa Campuran
+
+rtSurvey memungkinkan responden memasukkan teks dalam skrip apa pun, terlepas dari bahasa formulir yang dipilih. Ini berguna untuk menangkap nama atau alamat dalam skrip aslinya.
+
+### Jenis Pertanyaan Spesifik Bahasa
+
+Beberapa jenis pertanyaan mungkin lebih sesuai untuk bahasa tertentu. rtSurvey memungkinkan Anda menggunakan jenis pertanyaan yang berbeda untuk bahasa yang berbeda:
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Masukkan nama Anda  | 名前を選んでください    |
+```
+
+## Mengekspor Data Multibahasa
+
+Saat mengekspor data dari rtSurvey:
+
+- Pilih untuk mengekspor dalam bahasa tertentu atau sertakan semua versi bahasa.
+- Metadata bahasa disertakan dalam ekspor, menunjukkan bahasa mana yang digunakan untuk setiap respons.
+
+## Pertimbangan Aplikasi Mobile
+
+- Aplikasi mobile rtSurvey mendukung pergantian bahasa offline.
+- Pastikan semua file bahasa yang diperlukan diunduh sebelum offline.
+
+## Keterbatasan yang Diketahui
+
+- Beberapa fitur lanjutan mungkin tidak tersedia dalam semua bahasa.
+- Terjemahan yang sangat panjang dapat memengaruhi tata letak di layar yang lebih kecil.
+
+Dengan memanfaatkan kemampuan multibahasa rtSurvey, Anda dapat membuat survei yang inklusif dan dapat diakses yang menjangkau populasi yang beragam dan menyediakan data yang akurat secara linguistik dan berkualitas tinggi.

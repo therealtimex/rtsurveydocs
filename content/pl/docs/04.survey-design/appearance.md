@@ -1,0 +1,83 @@
+---
+title: "Wygląd"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 288
+---
+
+Kolumna `appearance` w rtSurvey pozwala dostosować wizualną prezentację i zachowanie pytań w ankietach. Ta funkcja poprawia doświadczenie użytkownika i może znacznie zwiększyć efektywność zbierania danych. rtSurvey obsługuje standardowe atrybuty wyglądu XLSForm i rozszerza je o dodatkowe opcje.
+
+## Standardowe atrybuty wyglądu XLSForm
+
+rtSurvey obsługuje następujące standardowe atrybuty wyglądu XLSForm:
+
+| Atrybut wyglądu | Typy pytań | Opis |
+|----------------------|----------------|-------------|
+| multiline | text | Tworzy wieloliniowe pole tekstowe (najlepsze dla klientów webowych) |
+| minimal | select_one, select_multiple | Wyświetla opcje w menu rozwijanym |
+| quick | select_one | Automatycznie przechodzi do następnego pytania po wyborze (tylko mobile) |
+| no-calendar | date | Ukrywa wyświetlanie kalendarza (tylko mobile) |
+| month-year | date | Umożliwia wybór tylko miesiąca i roku |
+| year | date | Umożliwia wybór tylko roku |
+| horizontal-compact | select_one, select_multiple | Wyświetla opcje poziomo (tylko web) |
+| horizontal | select_one, select_multiple | Wyświetla opcje poziomo w kolumnach (tylko web) |
+| likert | select_one | Prezentuje opcje jako skalę Likerta |
+| compact | select_one, select_multiple | Wyświetla opcje obok siebie z minimalnym odstępem |
+| quickcompact | select_one | Łączy kompaktowy wyświetlacz z automatycznym przejściem (tylko mobile) |
+| field-list | groups | Wyświetla całą grupę na jednym ekranie (tylko mobile) |
+| label | select_one, select_multiple | Pokazuje etykiety opcji bez danych wejściowych |
+| list-nolabel | select_one, select_multiple | Pokazuje dane wejściowe bez etykiet (użyj z `label`) |
+| table-list | groups | Wyświetla pytania w formacie tabeli |
+| signature | image | Umożliwia przechwytywanie podpisu (tylko mobile) |
+| draw | image | Umożliwia rysowanie odręczne (tylko mobile) |
+| map, quick map | select_one, select_one_from_file | Umożliwia wybór z elementów mapy |
+
+## Najlepsze praktyki używania wyglądu
+
+1. **Spójność**: Używaj atrybutów wyglądu spójnie w całej ankiecie dla jednolitego wyglądu.
+2. **Mobile vs. Web**: Rozważ, jak wyglądy będą renderowane na różnych urządzeniach i platformach.
+3. **Wydajność**: Zachowaj ostrożność z atrybutami wyglądu, które mogą spowalniać ładowanie formularza (np. `table-list` dla dużych grup).
+4. **Doświadczenie użytkownika**: Wybierz wyglądy, które ułatwiają wprowadzanie danych i są intuicyjne dla respondentów.
+5. **Testowanie**: Zawsze testuj formularz na docelowych urządzeniach, aby upewnić się, że wyglądy działają zgodnie z oczekiwaniami.
+
+## Zaawansowane techniki
+
+### Łączenie wyglądu
+
+Niektóre atrybuty wyglądu można łączyć dla bardziej złożonych układów:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Wybierz jeden: | minimal compact |
+```
+
+### Dynamiczny wygląd
+
+rtSurvey umożliwia dynamiczne zmiany wyglądu na podstawie logiki formularza:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Wprowadź czas: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Uwagi dotyczące aplikacji mobilnej
+
+- Niektóre wyglądy (np. `quick`, `signature`) są specyficzne dla urządzeń mobilnych.
+- Testuj dokładnie zarówno na Android, jak i iOS, aby zapewnić spójne działanie.
+
+## Znane ograniczenia
+
+- Złożone wyglądy mogą nie renderować się identycznie na wszystkich platformach.
+- Niektóre zaawansowane wyglądy rtSurvey mogą nie być obsługiwane w trybie offline.
+
+## Rozwiązywanie problemów z wyglądem
+
+1. **Wygląd nie jest stosowany**: Sprawdź literówki w kolumnie wyglądu.
+2. **Niespójne renderowanie**: Zweryfikuj kompatybilność z typem pytania i platformą.
+3. **Problemy z wydajnością**: Rozważ uproszczenie złożonych wyglądów, szczególnie dla dużych ankiet.

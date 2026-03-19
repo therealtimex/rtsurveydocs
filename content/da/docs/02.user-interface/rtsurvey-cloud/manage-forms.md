@@ -1,0 +1,36 @@
+---
+title: "Administration af formularer"
+description: "Upload, konfiguration og administration af dataindsamlingsformularer i RT-CPMS."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 315
+---
+
+Modulet **Administrér formularer** fungerer som den primære gateway til organisering af dine undersøgelsesinstrumenter og koordinering af feltarbejdsopgaver. Det giver finkornet kontrol over formularadgang, datavisning og enhedsmålretning.
+
+![Formularadministrationsgrænseflade](/images/manage_forms.png)
+
+## Oversigt over formularfamilie
+
+Under menuen **Formular og dataindtastning** viser sektionen **Formularfamilie** et omfattende gitter med alle dine importerede formularer samt vigtige hurtigadgangskontroller. Denne centraliserede visning giver projektledere mulighed for hurtigt at implementere og konfigurere individuelle undersøgelser.
+
+### Vigtige datakolonner og konfigurationsmuligheder
+
+- **Datavisning:** Tilgå indsendte poster og datasætforhåndsvisninger direkte for hver formular.
+- **Tillad redigering:** En hurtig skifter til at låse eller låse op for feltpersonalets mulighed for at redigere indsendte data (Aktiv/Inaktiv-status).
+- **Offentlig synlighed:** En skifter til at gøre en formular offentligt tilgængelig uden krav om interviewergodkendelse.
+- **Webformularens URL:** Hent øjeblikkeligt det unikke offentlige link til at dele browserbaserede dataindsamlingsformularer.
+- **Tilsidesæt indstillinger:** En avanceret konfigurationsmodal (tilgås via tandhjulsikonet) til tilpasning af formularspecifikke regler, værdier og deaktivering af specifikke funktioner.
+- **Formularidentifikatorer:** Se standardmetadata, herunder formularfamiliens navn, familiekode og et unikt formular-ID.
+- **Geografisk konfiguration:** Specifikke kortlægnings- eller geopoint-konfigurationer knyttet til formularstrukturen.
+- **Lås formular:** Funktion til at låse indsendelsesadgang til afslutning af dataindsamlingsfasen.
+
+## Formularhandlinger og navigation
+
+Det øverste kontrolpanel letter batchhandlinger og alternative formularvisninger:
+
+- **Handling til enhed:** Et kraftfuldt rullemenueværktøj, der giver projektledere mulighed for at tildele opgaver, sende målrettede formularer eller udsende handlinger direkte til specifikke intervieweres feltenheder.
+- **XLSX Formular-fane:** Naviger hurtigt fra det primære administrationsgitter til uploadmiljøer til håndtering af nye native XLSForm-filer.
+- **Formularbygger-fane:** Tilgå det indbyggede værktøj til visuelt at konstruere eller ændre formularer dynamisk uden brug af eksternt regnearkssoftware.

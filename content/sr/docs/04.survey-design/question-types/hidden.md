@@ -1,0 +1,72 @@
+---
+title: "Hidden"
+description: "Skrivena polja čuvaju vrednosti koje se nikada ne prikazuju ispitaniku — koriste se za prenos konteksta, prethodno popunjavanje podataka ili čuvanje međurezultata."
+icon: "eye-slash"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 239
+---
+
+Polje `hidden` čuva vrednost koja se **nikada ne prikazuje ispitaniku**. Za razliku od `calculate` (koje izračunava vrednost), `hidden` se koristi za nošenje **spoljno pružene vrednosti** — na primer, ID zadatka, ID domaćinstva prosleđen iz drugog sistema, ili kod anketara ubačen pri pokretanju formulara.
+
+## Osnovna XLSForm specifikacija
+
+| type | name | label |
+|------|------|-------|
+| hidden | household_id | |
+
+Oznake nisu potrebne za skrivena polja jer se ništa ne prikazuje na ekranu.
+
+## Upotrebe
+
+Skrivena polja se uobičajeno koriste za:
+
+1. Prenos unapred dodeljenog ID-a iz sistema za upravljanje anketom (npr. ID domaćinstva, broj slučaja, kod zadatka)
+2. Čuvanje verzije formulara ili metapodataka primene
+3. Ubacivanje konfiguracije specifične za anketara pri pokretanju formulara
+4. Nošenje podataka iz nadređenog formulara u podređeni formular u povezanim tokovima posla
+5. Čuvanje vrednosti dobijene iz URL parametara kada se formular otvori putem veb linka
+
+## Postavljanje podrazumevane vrednosti
+
+Najčešći obrazac je korišćenje `hidden` sa izrazom `default` da se vrednost postavi kada se formular otvori:
+
+| type | name | default |
+|------|------|---------|
+| hidden | deployment_code | 'ZONE_A_2024' |
+| hidden | form_version | '3.1' |
+
+## Referenciranje skrivenog polja u proračunima
+
+Skrivene vrednosti se mogu referencirati kao bilo koje drugo polje koristeći `${ime_polja}`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| hidden | zone_code | | |
+| calculate | label_prefix | | concat('[', ${zone_code}, '] ') |
+| note | intro | ${label_prefix} Dobrodošli u anketu o domaćinstvu | |
+
+## Korišćenje hidden sa prethodnim popunjavanjem / URL parametrima
+
+Kada se veb formular pokreće putem URL-a, možete prosleđivati parametre koji popunjavaju skrivena polja. Ovo vam omogućava da unapred učitate ID domaćinstva ili kod zadatka bez da anketar to kuca:
+
+```
+https://vas-server.com/form/FORMID?household_id=H00123&zone_code=NORTH
+```
+
+Polje nazvano `household_id` će automatski biti popunjeno sa `H00123`.
+
+## Najbolje prakse
+
+1. Koristite `hidden` (ne `calculate`) kada je vrednost **ubačena spolja** i ne treba ponovo da se izračunava.
+2. Koristite `calculate` kada je vrednost **izvedena iz drugih polja** u formularu.
+3. Uvek postavite `default` ako skriveno polje mora imati vrednost — skriveno polje bez podrazumevane vrednosti će biti prazno.
+4. Imenujte skrivena polja jasno da biste ih razlikovali (npr. dodajte prefiks `_skriveno_` ili koristite doslednu konvenciju imenovanja).
+
+## Ograničenja
+
+- Skrivena polja su uključena u izvezene podatke kao i bilo koje drugo polje.
+- Ne mogu se prikazati uslovno — uvek su prisutna (ali nevidljiva).
+- Ako vam treba polje koje se dinamički izračunava, umesto toga koristite `calculate`.

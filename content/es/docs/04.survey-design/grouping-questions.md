@@ -1,0 +1,146 @@
+---
+title: "Agrupación de preguntas"
+description: ""
+icon: "auto_awesome"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 250
+---
+
+Los grupos en XLSForm le permiten organizar preguntas relacionadas juntas, mejorando la estructura de su encuesta y mejorando las capacidades de análisis de datos. rtSurvey admite completamente los grupos de XLSForm y amplía su funcionalidad con características adicionales.
+
+## Estructura básica de grupos
+
+Para crear un grupo de preguntas, use la sintaxis `begin_group` y `end_group`:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | respondent | Información del encuestado               |
+| text         | name       | Ingrese el nombre del encuestado         |
+| text         | position   | Ingrese el cargo del encuestado          |
+| end_group    |            |                                          |
+```
+
+Puntos clave:
+- La fila `begin_group` requiere un `name` y un `label`.
+- La fila `end_group` no necesita un nombre ni una etiqueta.
+- Las preguntas entre `begin_group` y `end_group` son parte del grupo.
+
+## Apariencia del grupo
+
+rtSurvey admite varias opciones de apariencia para grupos:
+
+1. **field-list**: Muestra múltiples preguntas en la misma pantalla.
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | respondent | Encuestado| field-list |
+   | text         | name       | Nombre    |            |
+   | text         | position   | Cargo     |            |
+   | end_group    |            |           |            |
+   ```
+
+2. **grid**: Crea un diseño compacto similar a una tabla para grupos (específico de rtSurvey).
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | household  | Hogar     | grid       |
+   | text         | member_name| Nombre    |            |
+   | integer      | member_age | Edad      |            |
+   | end_group    |            |           |            |
+   ```
+
+3. **collapsible**: Crea grupos expandibles/plegables (específico de rtSurvey).
+   ```
+   | type         | name       | label     | appearance  |
+   |--------------|------------|-----------|-------------|
+   | begin_group  | details    | Detalles  | collapsible |
+   | text         | address    | Dirección |             |
+   | text         | phone      | Teléfono  |             |
+   | end_group    |            |           |             |
+   ```
+
+## Grupos anidados
+
+Los grupos pueden anidarse dentro de otros grupos para estructuras más complejas:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | hospital   | Información del hospital                 |
+| text         | hosp_name  | ¿Cuál es el nombre de este hospital?     |
+| begin_group  | medication | Disponibilidad de medicamentos           |
+| select_one y_n| hiv_meds  | ¿Este hospital tiene medicación para el VIH? |
+| end_group    |            |                                          |
+| end_group    |            |                                          |
+```
+
+**Nota**: Siempre termine el grupo iniciado más recientemente primero para mantener la anidación correcta.
+
+## Lógica de salto para grupos
+
+Use la columna `relevant` para implementar la lógica de salto para grupos enteros:
+
+```
+| type         | name   | label                                        | relevant        |
+|--------------|--------|----------------------------------------------|-----------------|
+| integer      | age    | ¿Cuántos años tiene?                         |                 |
+| begin_group  | child  | Niño                                         | ${age} <= 5     |
+| integer      | muac   | Registre la circunferencia media del brazo del niño |          |
+| select_one y_n| mrdt  | ¿Es positiva la prueba de diagnóstico rápido del niño? |       |
+| end_group    |        |                                              |                 |
+```
+
+En este ejemplo, el grupo `child` solo aparecerá si la edad del encuestado es 5 o menor.
+
+## Mejores prácticas para usar grupos
+
+1. Use nombres significativos para los grupos para mejorar el análisis de datos.
+2. Mantenga los grupos enfocados en preguntas relacionadas.
+3. Use grupos anidados con criterio para evitar estructuras excesivamente complejas.
+4. Pruebe la lógica de salto exhaustivamente cuando use `relevant` en grupos.
+5. Considere usar la apariencia `field-list` para grupos cortos para reducir el desplazamiento.
+6. Utilice el diseño de cuadrícula de rtSurvey para una visualización compacta de información relacionada.
+7. Use grupos plegables para formularios largos para mejorar la navegación.
+
+## Características específicas de rtSurvey
+
+1. **Diseño de cuadrícula**: Use la apariencia `grid` para visualizaciones similares a tablas.
+2. **Grupos plegables**: Implemente la apariencia `collapsible` para secciones expandibles.
+3. **Estilo personalizado**: Aplique CSS personalizado a los grupos para diseños visuales únicos.
+4. **Comportamiento dinámico del grupo**: Implemente lógica de salto y cálculos complejos dentro de los grupos.
+
+## Soporte multilingüe
+
+rtSurvey admite grupos multilingües. Use columnas específicas del idioma para las etiquetas:
+
+```
+| type         | name       | label::English | label::Spanish |
+|--------------|------------|----------------|---------------|
+| begin_group  | personal   | Personal Info  | Información personal |
+| text         | name       | Name           | Nombre        |
+| end_group    |            |                |               |
+```
+
+## Consideraciones de la aplicación móvil
+
+- Los grupos con la apariencia `field-list` se muestran como una sola pantalla en la aplicación móvil.
+- Los grupos plegables pueden mejorar la navegación en pantallas más pequeñas.
+- Los diseños de cuadrícula pueden ajustarse para mejor visibilidad en dispositivos móviles.
+
+## Limitaciones conocidas
+
+- La anidación extremadamente profunda de grupos puede afectar el rendimiento en algunos dispositivos.
+- Algunas opciones de estilo avanzadas pueden no estar disponibles para los grupos en la aplicación móvil.
+
+## Solución de problemas de grupos
+
+1. Asegúrese de que cada `begin_group` tenga un `end_group` correspondiente.
+2. Verifique que los nombres de los grupos sean únicos dentro del formulario.
+3. Verifique que la lógica de salto haga referencia a nombres de preguntas correctos.
+4. Pruebe los grupos exhaustivamente tanto en interfaces web como móviles.
+
+Al usar efectivamente los grupos en sus XLSForms con rtSurvey, puede crear encuestas bien organizadas y eficientes que mejoran tanto la experiencia de recopilación de datos como la calidad de su análisis de datos.

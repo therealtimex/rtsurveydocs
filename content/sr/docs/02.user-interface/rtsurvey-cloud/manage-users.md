@@ -1,0 +1,47 @@
+---
+title: "Upravljanje korisnicima"
+description: "Kreiranje, organizovanje i upravljanje sistemskim korisnicima i terenskim osobljem."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 314
+---
+
+Modul **Upravljanje korisnicima** (često označen kao **Upravljanje osobljem** u meniju Podešavanje) je centralizovani direktorijum za upravljanje svim nalozima u vašem CPMS okruženju. Pruža administratorima projekata alate potrebne za uključivanje osoblja, dodelu uloga i određivanje nivoa geografskog pristupa.
+
+![Interfejs za upravljanje korisnicima](/images/manage_users.png)
+
+## Pregled mreže korisnika
+
+Glavni interfejs sadrži sveobuhvatnu mrežu koja prikazuje sve registrovane članove osoblja. Ovaj prikaz dozvoljava administratorima da brzo pretražuju, filtriraju i pregledaju statuse naloga.
+
+### Ključne kolone podataka
+
+Mreža uključuje sledeće ključne detalje za svakog korisnika:
+
+- **Korisničko ime i puno ime:** Primarni identifikatori člana osoblja.
+- **Email:** Kontakt email adresa vezana za nalog.
+- **Korisnička uloga:** Ukazuje na sistemske dozvole dodeljene korisniku (npr. Administrator, Osoblje, Monitor, Gost).
+- **Grupa:** Prikazuje određenu korisničku grupu ili ekipu kojoj član osoblja pripada.
+- **Status:** Ukazuje da li je nalog trenutno **Aktivan** ili **Neaktivan**.
+- **Datum kreiranja:** Vremenska oznaka kada je nalog registrovan.
+
+## Akcije upravljanja osobljem
+
+Administratori imaju pristup skupu alata za uključivanje i održavanje korisničkih naloga, dostupnih sa gornjeg kontrolnog panela:
+
+- **Dodaj osoblje:** Otvara detaljan formular za kreiranje za ručno unošenje profila novog korisnika, uključujući njegovu ulogu, dodeljene regione i kontakt informacije.
+- **Uvezi osoblje:** Dozvoljava masovno kreiranje naloga otpremanjem Excel tabele. Ovo je posebno korisno za brzo uspostavljanje velikih terenskih ekipa.
+- **Preuzmi šablon za uvoz:** Pruža standardizovani `.xlsx` šablon neophodan za proces masovnog uvoza.
+- **Izvezi u Excel:** Generiše preuzimljivi izveštaj koji sadrži filtrisanu listu korisnika iz trenutne mreže i njihove detalje.
+- **Obriši:** Trajno uklanja izabrane korisničke naloge iz sistema.
+
+## Korisnički profili i dodeljivanja
+
+Kada se kreira ili uređuje određeni korisnik (putem dugmeta **Dodaj osoblje** ili klikom na korisničko ime), administratori mogu konfigurisati detaljne profile:
+
+- **Lične informacije:** Polja za datum rođenja, pol, identifikacioni broj i avatar.
+- **Kontakt detalji:** Broj mobilnog telefona i detaljne informacije o lokaciji (provincija, okrug, opština, adresa).
+- **Sistemska dodeljivanja:** Ključno za bezbednost podataka, administratori mogu povezati korisnike sa određenim **regionima** i dodeliti precizne **korisničke uloge**.
+- **Konfiguracija supervizora:** U naprednim podešavanjima, korisnicima se mogu dodeliti specifični nadzorni kodovi ili mapirani na određene tablete (uređaje).

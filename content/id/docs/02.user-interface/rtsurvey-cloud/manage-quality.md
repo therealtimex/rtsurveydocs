@@ -1,0 +1,35 @@
+---
+title: "Mengelola Kualitas"
+description: "Pantau kemajuan pengumpulan data, lihat peta wawancara, dan analisis kinerja enumerator."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 316
+---
+
+Modul **Kelola Kualitas** (dapat diakses melalui Dasbor) menyediakan analitik real-time dan visualisasi spasial untuk memantau kemajuan pengumpulan data dan kinerja enumerator. Modul ini menawarkan antarmuka tampilan terpisah bagi manajer proyek untuk beralih dengan cepat antara kuesioner individual dan laporan analitis yang dikustomisasi.
+
+![Dasbor Kelola Kualitas](/images/manage_quality.png)
+
+## Ikhtisar Dasbor
+
+Dasbor Kelola Kualitas dibagi menjadi dua tab navigasi utama: **Forms** dan **Reports**. Menu lateral ini memungkinkan pengguna untuk mencari dan memilih dataset atau laporan spesifik yang ingin dianalisis secara efisien.
+
+### Analisis Formulir
+
+Saat memilih formulir tertentu dari daftar, dasbor menyediakan beberapa alat visualisasi bawaan untuk melacak kualitas dan frekuensi kiriman:
+
+- **Hitung berdasarkan waktu mulai:** Bagan batang yang memvisualisasikan frekuensi wawancara yang dimulai sepanjang waktu.
+- **Hitung berdasarkan waktu selesai:** Bagan batang yang memvisualisasikan kapan wawancara diselesaikan.
+- **Hitung berdasarkan tanggal kiriman:** Melacak volume harian data yang disinkronkan ke server.
+- **Hitung berdasarkan nama pengguna:** Bagan batang yang mengidentifikasi enumerator dengan kinerja terbaik berdasarkan total jumlah kiriman mereka.
+- **Peta wawancara:** Plot sebar geografis (didukung oleh Leaflet) yang menampilkan koordinat GPS tempat setiap kiriman berlangsung, memungkinkan manajer untuk memverifikasi lokasi pekerjaan lapangan.
+
+### Laporan Kustom
+
+Tab **Reports** memberikan akses ke desain analitis R Markdown yang telah dikonfigurasi sebelumnya dan statistik kustom lainnya. Setelah laporan dipilih, area tampilan utama secara dinamis memuat analisis yang dihasilkan melalui penampil tertanam, memungkinkan verifikasi statistik yang lebih mendalam dari data yang dikumpulkan.
+
+## Pencarian dan Pemfilteran
+
+Bilah pencarian cepat tersedia di atas daftar bilah sisi, memungkinkan pengguna untuk menemukan formulir atau laporan tertentu berdasarkan nama dengan cepat.

@@ -1,0 +1,48 @@
+---
+title: "Uzlaboti attēli"
+description: "Uzlabotas attēlu funkcijas rtSurvey: ūdenszīmes, multivides režģa attēlošana un attēlu anotācijas."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 300
+---
+
+Papildus standarta `image` jautājuma tipam, rtSurvey nodrošina paplašinājumus **ūdenszīmju** pievienošanai uzņemtajiem fotoattēliem un vairāku attēlu rādīšanai **multivides režģī**. Tie ir noderīgi pierādījumu bāzētām aptaujām, kur fotoattēli jāatzīmē ar enumeratora identitāti vai aptaujas metadatiem, un vizuālo pārskatīšanas saskarnēm.
+
+---
+
+## Ūdenszīmes
+
+Ūdenszīme automātiski pievieno tekstu vai metadatus uzņemtajam attēlam. Tas palīdz nodrošināt, ka fotoattēli ir saistīti ar konkrētu iesniegumu un enumeratoru.
+
+### Konfigurācija
+
+Aktivizējiet ūdenszīmes, pievienojot parametrus izskatam vai konfigurācijā:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | evidence | Uzņemiet pierādījuma fotoattēlu | watermark |
+```
+
+## Multivides režģis
+
+Multivides režģis parāda vairākus attēlus kompaktos sīktēlos.
+
+## Attēlu anotācijas
+
+Atzīmējiet attēlus ar zīmējumiem vai tekstiem.
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated | Anotējiet attēlu | annotate |
+```
+
+## Labākā prakse
+
+1. Informējiet enumeratorus par ūdenszīmju izmantošanu.
+2. Apsveriet ūdenszīmju teksta lasāmību.
+3. Pārbaudiet anotāciju funkcionalitāti dažādas ekrāna izmēros.

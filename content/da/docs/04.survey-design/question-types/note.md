@@ -1,0 +1,83 @@
+---
+title: "Note"
+description: "Note-spørgsmål viser skrivebeskyttet tekst eller medier for at give information eller instruktioner i din undersøgelse."
+icon: "info"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 255
+---
+
+Spørgsmålstypen note i XLSForms og rtSurvey bruges til at vise skrivebeskyttet tekst eller medier for undersøgelsens respondent. Det er ikke et spørgsmål, der kræver et svar, men snarere en måde at give information, instruktioner eller kontekst i undersøgelsen.
+
+## Grundlæggende XLSForm-specifikation
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | Denne undersøgelse handler om dine læsevaner. |
+
+For flere detaljer om den grundlæggende note-spørgsmålstype, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+
+## Anvendelser
+
+Note-spørgsmål bruges typisk til:
+
+1. At give instruktioner eller kontekst til kommende spørgsmål
+2. At vise beregnede resultater eller opsummeringer
+3. At vise billeder eller andre medier
+4. At adskille sektioner i en undersøgelse
+5. At give feedback baseret på tidligere svar
+
+## Bedste praksis
+
+1. Hold notetekst kortfattet og klar for at fastholde respondenternes engagement.
+2. Brug formatering (fed, kursiv) til at fremhæve vigtig information.
+3. Overvej at bruge medier (billeder, lyd) til at forbedre forståelsen, når det er hensigtsmæssigt.
+4. Brug noter sparsomt for at undgå at overfylde undersøgelsen.
+
+## Eksempel på brug
+
+Her er et eksempel på, hvordan du kan bruge note-spørgsmål i en undersøgelse:
+
+| type | name | label |
+|------|------|-------|
+| note | intro | Velkommen til vores undersøgelse om læsevaner. Vi spørger om dine præferencer og læsefrekvens. |
+| ... | ... | ... |
+| calculate | books_per_month | ${fiction_books} + ${non_fiction_books} |
+| note | reading_summary | Du læser cirka ${books_per_month} bøger om måneden. |
+
+I dette eksempel bruger vi noter til at introducere undersøgelsen og give en opsummering af beregnede resultater.
+
+## rtSurvey-udvidelser
+
+Mens den grundlæggende XLSForm-specifikation for note-spørgsmål er enkel, kan rtSurvey tilbyde yderligere funktioner eller tilpasninger:
+
+1. Rig tekstformatering
+2. Understøttelse af indlejrede medier (billeder, lyd, video)
+3. Dynamisk indhold baseret på tidligere svar
+4. Brugerdefinerede styringsmuligheder
+
+## Avanceret brug
+
+### Betinget visning
+
+Du kan bruge relevansudtryk til betinget at vise noter:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | Du er en ivrig læser! | ${books_per_month} > 5 |
+
+### Inkludering af beregninger
+
+Noter kan inkludere beregninger til at give dynamisk feedback:
+
+| type | name | label |
+|------|------|-------|
+| note | reading_time | Baseret på dine svar bruger du cirka ${books_per_month * 5} timer på at læse hver måned. |
+
+## Begrænsninger
+
+- Noter indsamler ikke data, så de bør ikke bruges, når du har brug for at indsamle information fra respondenter.
+- Overdreven brug af noter kan få en undersøgelse til at virke overfyldt eller for lang.
+- Visse avancerede formaterings- eller medievalgmuligheder understøttes muligvis ikke på alle enheder eller platforme.

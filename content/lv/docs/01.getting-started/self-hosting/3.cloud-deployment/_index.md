@@ -1,0 +1,127 @@
+---
+weight: 3
+title: "Mākoņa izvietošana"
+date: "2026-03-16T00:00:00+07:00"
+lastmod: "2026-03-16T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+icon: "cloud_upload"
+toc: true
+description: "Izvietojiet rtCloud pie lielākajiem mākoņa nodrošinātājiem ar automatizētiem skriptiem DigitalOcean, AWS EC2, Google Cloud un Linode."
+---
+
+Izvietošanas repozitorijs ietver automatizētus nodrošināšanas skriptus lielākajiem mākoņa nodrošinātājiem. Katrs skripts darbojas pirmajā palaišanā jaunā **Ubuntu 22.04 LTS** serverī un veic pilnībā bez uzraudzības iestatīšanu:
+
+- Instalē Docker un Docker Compose
+- Ģenerē drošas nejaušas paroles visiem iekšējiem pakalpojumiem
+- Raksta `docker-compose.production.yml` un `.env`
+- Konfigurē Nginx kā apgrieztā starpniekserveri
+- Iegūst bezmaksas TLS sertifikātu no Let's Encrypt (automātiski atkārto mēģinājumus, līdz DNS atrisina)
+- Konfigurē UFW ugunsmūri
+- Pēc izvēles izvieto iebūvēto Keycloak SSO serveri
+- Izvada pilnu izvietošanas kopsavilkumu ar visiem akreditācijas datiem
+
+Iestatīšana tiek pabeigta **5–10 minūtēs** standarta instancē.
+
+---
+
+## Skripta izvēle
+
+Ir vairāki skripta varianti atkarībā no jūsu mākoņa nodrošinātāja un SSO iestatījumiem:
+
+| Skripts | Nodrošinātājs | SSO režīms | Piemērots |
+|--------|----------|----------|----------|
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Iebūvēts Keycloak | Vienkāršs, pašpietiekams SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak vai ārējais OIDC | Pilna kontrole |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Iebūvēts Keycloak | Formu bāzēta iestatīšana, vienkāršākā |
+| `linode-stackscript-oidc.sh` | Linode | Tikai ārējais OIDC | Esošs identitātes nodrošinātājs |
+| `linode-stackscript.sh` | Linode | Keycloak vai ārējais OIDC | Pilna kontrole |
+| `aws-ec2.sh` | AWS EC2 | Keycloak vai ārējais OIDC | AWS izvietojumi |
+| `gcp-compute.sh` | Google Cloud | Keycloak vai ārējais OIDC | GCP izvietojumi |
+
+> **Ieteicams lielākajai daļai lietotāju:** Izmantojiet `keycloak-embed` variantu. Tas ietver iebūvētu Keycloak identitātes serveri un prasa vismazāk konfigurācijas lauku.
+
+---
+
+## Servera izmēru vadlīnijas
+
+| Lietojums | RAM | Disks | Piemērs |
+|----------|-----|------|---------|
+| Novērtēšana / izstrāde | 2 GB | 25 GB | DO Basic $18/mēn, t3.small, e2-small |
+| Maza komanda (< 50 lietotāji) | 4 GB | 40 GB | DO Basic $24/mēn, t3.medium, e2-medium |
+| Ražošana (> 50 lietotāji) | 8 GB | 80 GB | DO General $48/mēn, t3.large, n2-standard-2 |
+
+> Iebūvētajam Keycloak nepieciešams vismaz **4 GB RAM**. Izmantojiet 2 GB tikai novērtēšanai bez Keycloak.
+
+---
+
+## DNS iestatīšana
+
+Visi skripti prasa domēnu ar **A ierakstu, kas norāda uz jūsu servera IP**, pirms Let's Encrypt var izsniegt sertifikātu.
+
+Skripts drīz pēc iestatīšanas procesa sākuma izdrukā jūsu servera IP:
+
+```
+============================================================
+ Servera IP : 139.162.51.85
+ Pievienojiet šo DNS A ierakstu tagad, ja vēl neesat:
+   myapp.example.com  ->  139.162.51.85
+ Skripts atkārtos Certbot mēģinājumus ik 60s, līdz DNS atrisinās.
+============================================================
+```
+
+Skripts **automātiski atkārto** Let's Encrypt mēģinājumus ik 60 sekundes līdz 1 stundai. Vienkārši pievienojiet DNS ierakstu un gaidiet — restartēšana nav nepieciešama.
+
+> **Ātruma ierobežojums:** Let's Encrypt pieļauj maksimāli **5 sertifikātus uz domēnu 7 dienās**. Izvairieties no atkārtotas serveru izveides un iznīcināšanas ar vienu un to pašu domēnu. Ja sasniegsit ierobežojumu, skripts parādīs laika zīmogu `retry after` un nekavējoties apstāsies.
+
+---
+
+## Pēc izvietošanas kontrolsaraksts
+
+- [ ] Lietotne atveras adresē `https://your-domain.com`
+- [ ] Piesakieties ar `admin` un jūsu konfigurēto paroli
+- [ ] Visi konteineri ir veseli: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt atjaunošana darbojas: `certbot renew --dry-run`
+- [ ] MySQL ports 3306 **nav** atklāts: `ufw status`
+- [ ] Iestatiet ikdienas datu bāzes dublēšanu (skatiet [Apkopi](../maintenance))
+
+---
+
+## Problēmu novēršana
+
+### Pārbaudiet pilno iestatīšanas žurnālu
+
+```bash
+# Linode
+tail -200 /var/log/stackscript.log
+
+# DigitalOcean / AWS / GCP
+tail -200 /var/log/rtcloud-setup.log
+```
+
+### Let's Encrypt ātruma ierobežojums
+
+Ja žurnālā redzat `too many certificates`, esat sasnieguši 5 sertifikātu / 7 dienu ierobežojumu. Žurnāls rāda precīzu atkārtošanas laiku:
+
+```
+[SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
+```
+
+Pagaidiet līdz šim laikam, pēc tam atkārtoti izvietojiet.
+
+### Keycloak paliek neveselīgs
+
+Pārliecinieties, ka serverim ir vismaz 4 GB RAM, pēc tam pārbaudiet žurnālus:
+
+```bash
+docker logs rtcloud-keycloak --tail 50
+free -h
+```
+
+### SSL konfigurācija nav piemērota pēc certbot
+
+Ja sertifikāts tika izsniegts, bet Nginx joprojām rāda tikai HTTP, pārbaudiet žurnālu kļūdas rindu un manuāli pārlādējiet Nginx:
+
+```bash
+nginx -t && systemctl reload nginx
+```

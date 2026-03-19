@@ -58,9 +58,324 @@ defaultContentLanguage = "en"
         weight = 10
   [languages.pt]
     languageName = "Português"
+    contentDir = "content/pt"
     weight = 5
     title = "Documentação rtSurvey"
     [[languages.pt.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  # ── Tier 1 ──────────────────────────────────────────────────────────────────
+  [languages.es]
+    languageName = "Español"
+    contentDir = "content/es"
+    weight = 6
+    title = "Documentación rtSurvey"
+    [[languages.es.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.zh-hans]
+    languageName = "简体中文"
+    contentDir = "content/zh-hans"
+    weight = 7
+    title = "rtSurvey 文档"
+    [[languages.zh-hans.menu.primary]]
+        name  = "文档"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.ar]
+    languageName = "العربية"
+    contentDir = "content/ar"
+    languageDirection = "rtl"
+    weight = 8
+    title = "توثيق rtSurvey"
+    [[languages.ar.menu.primary]]
+        name  = "الوثائق"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.th]
+    languageName = "ไทย"
+    contentDir = "content/th"
+    weight = 9
+    title = "เอกสาร rtSurvey"
+    [[languages.th.menu.primary]]
+        name  = "เอกสาร"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.id]
+    languageName = "Bahasa Indonesia"
+    contentDir = "content/id"
+    weight = 10
+    title = "Dokumentasi rtSurvey"
+    [[languages.id.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.km]
+    languageName = "ភាសាខ្មែរ"
+    contentDir = "content/km"
+    weight = 11
+    title = "ឯកសារ rtSurvey"
+    [[languages.km.menu.primary]]
+        name  = "ឯកសារ"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 11
+  [languages.hi]
+    languageName = "हिन्दी"
+    contentDir = "content/hi"
+    weight = 12
+    title = "rtSurvey दस्तावेज़"
+    [[languages.hi.menu.primary]]
+        name  = "डॉक्स"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.ru]
+    languageName = "Русский"
+    contentDir = "content/ru"
+    weight = 13
+    title = "Документация rtSurvey"
+    [[languages.ru.menu.primary]]
+        name  = "Документы"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  # ── Tier 2 ──────────────────────────────────────────────────────────────────
+  [languages.zh-hant]
+    languageName = "繁體中文"
+    contentDir = "content/zh-hant"
+    weight = 14
+    title = "rtSurvey 文件"
+    [[languages.zh-hant.menu.primary]]
+        name  = "文件"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.ko]
+    languageName = "한국어"
+    contentDir = "content/ko"
+    weight = 15
+    title = "rtSurvey 문서"
+    [[languages.ko.menu.primary]]
+        name  = "문서"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.ja]
+    languageName = "日本語"
+    contentDir = "content/ja"
+    weight = 16
+    title = "rtSurvey ドキュメント"
+    [[languages.ja.menu.primary]]
+        name  = "ドキュメント"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.it]
+    languageName = "Italiano"
+    contentDir = "content/it"
+    weight = 17
+    title = "Documentazione rtSurvey"
+    [[languages.it.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.nl]
+    languageName = "Nederlands"
+    contentDir = "content/nl"
+    weight = 18
+    title = "rtSurvey Documentatie"
+    [[languages.nl.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.tr]
+    languageName = "Türkçe"
+    contentDir = "content/tr"
+    weight = 19
+    title = "rtSurvey Belgeleri"
+    [[languages.tr.menu.primary]]
+        name  = "Belgeler"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.uk]
+    languageName = "Українська"
+    contentDir = "content/uk"
+    weight = 20
+    title = "Документація rtSurvey"
+    [[languages.uk.menu.primary]]
+        name  = "Документи"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  # ── Tier 3 ──────────────────────────────────────────────────────────────────
+  [languages.nb]
+    languageName = "Norsk Bokmål"
+    contentDir = "content/nb"
+    weight = 21
+    title = "rtSurvey Dokumentasjon"
+    [[languages.nb.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.da]
+    languageName = "Dansk"
+    contentDir = "content/da"
+    weight = 22
+    title = "rtSurvey Dokumentation"
+    [[languages.da.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.sv]
+    languageName = "Svenska"
+    contentDir = "content/sv"
+    weight = 23
+    title = "rtSurvey Dokumentation"
+    [[languages.sv.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.fi]
+    languageName = "Suomi"
+    contentDir = "content/fi"
+    weight = 24
+    title = "rtSurvey Dokumentaatio"
+    [[languages.fi.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.el]
+    languageName = "Ελληνικά"
+    contentDir = "content/el"
+    weight = 25
+    title = "Τεκμηρίωση rtSurvey"
+    [[languages.el.menu.primary]]
+        name  = "Έγγραφα"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.pl]
+    languageName = "Polski"
+    contentDir = "content/pl"
+    weight = 26
+    title = "Dokumentacja rtSurvey"
+    [[languages.pl.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.cs]
+    languageName = "Čeština"
+    contentDir = "content/cs"
+    weight = 27
+    title = "Dokumentace rtSurvey"
+    [[languages.cs.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.sk]
+    languageName = "Slovenčina"
+    contentDir = "content/sk"
+    weight = 28
+    title = "Dokumentácia rtSurvey"
+    [[languages.sk.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.hu]
+    languageName = "Magyar"
+    contentDir = "content/hu"
+    weight = 29
+    title = "rtSurvey Dokumentáció"
+    [[languages.hu.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.bg]
+    languageName = "Български"
+    contentDir = "content/bg"
+    weight = 30
+    title = "Документация на rtSurvey"
+    [[languages.bg.menu.primary]]
+        name  = "Документи"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.sr]
+    languageName = "Srpski"
+    contentDir = "content/sr"
+    weight = 31
+    title = "rtSurvey Dokumentacija"
+    [[languages.sr.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.sq]
+    languageName = "Shqip"
+    contentDir = "content/sq"
+    weight = 32
+    title = "Dokumentacioni rtSurvey"
+    [[languages.sq.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.lv]
+    languageName = "Latviešu"
+    contentDir = "content/lv"
+    weight = 33
+    title = "rtSurvey Dokumentācija"
+    [[languages.lv.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.lt]
+    languageName = "Lietuvių"
+    contentDir = "content/lt"
+    weight = 34
+    title = "rtSurvey Dokumentacija"
+    [[languages.lt.menu.primary]]
+        name  = "Docs"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.te]
+    languageName = "తెలుగు"
+    contentDir = "content/te"
+    weight = 35
+    title = "rtSurvey డాక్యుమెంటేషన్"
+    [[languages.te.menu.primary]]
+        name  = "డాక్యుమెంట్లు"
+        url = "/docs/"
+        identifier = "docs"
+        weight = 10
+  [languages.pt-br]
+    languageName = "Português (Brasil)"
+    contentDir = "content/pt-br"
+    weight = 36
+    title = "Documentação rtSurvey"
+    [[languages.pt-br.menu.primary]]
         name  = "Docs"
         url = "/docs/"
         identifier = "docs"

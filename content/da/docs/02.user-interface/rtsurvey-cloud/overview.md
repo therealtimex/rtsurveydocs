@@ -1,0 +1,72 @@
+---
+title: "Oversigt"
+description: "rtCloud er den kraftfulde serverkomponent i rtSurvey, der tilbyder projektstyring, formularhåndtering, dataindsamling og avancerede indsendelsesarbejdsgange til effektiv undersøgelsesdrift og longitudinale studier."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 313
+---
+
+![rtCloud-startside](images/rtsurvey/rtsurvey-cloud-home.webp)
+
+rtCloud er den robuste serverkomponent i rtSurvey-økosystemet, designet til at strømline dataindsamling, -administration og -analyse. Som det centrale knudepunkt for rtSurvey-driften tilbyder rtCloud et omfattende sæt funktioner til understøttelse af komplekse undersøgelsesprojekter og longitudinale studier.
+
+## Nøglefunktioner
+
+### Projektstyring
+- Organisér alle aspekter af dit undersøgelsesprojekt ét sted
+- Administrér brugerroller, formularer, analyse, leverancer og tilladelser inden for hvert projekt
+
+### Brugeradministration og sikkerhed
+- Opret og administrér brugerkonti med rollebaserede tilladelser
+- Sikr datasikkerhed og adgangskontrol på alle niveauer
+
+### Formularstyring
+- Upload og administrér XLSForms direkte
+- Understøttelse af formularversionsopdateringer, herunder mindre ændringer og strukturelle ændringer
+- Knyt multimedie eller yderligere data til formularer
+- Ægte formularsletningsmulighed for fuld kontrol over dine undersøgelsesinstrumenter
+
+### Dataindsamling og styring af indsendelser
+- Problemfri integration med rtSurvey-mobilappen, webappen og webformularen
+- Understøttelse af både godkendte brugerindsendelser og anonyme offentlige links
+- Håndtering af indsendelsesmultimedier og databilag
+- Interaktiv tabelforhåndsvisning af indsendelsesdata til hurtig indsigt
+
+### Avancerede indsendelsesarbejdsgange
+- Returner indsendelser til brugernes enheder til yderligere redigering eller verifikation
+- Videresend indsendelser til andre enheder, hvilket muliggør samarbejdende arbejdsgange og kvalitetskontrol
+
+### Longitudinal datastyring
+- Håndtér gentagne målinger og langsigtede studier effektivt
+- Spor ændringer og opdateringer til deltagernes data over tid
+
+### Fleksibel forbindelsesmulighed
+- Tillad rtSurvey-mobilappen at oprette forbindelse til formulardownloads og indsendelsesupload
+- Understøt offline-dataindsamling med problemfri synkronisering, når forbindelsen gendannes
+
+## Hvad adskiller rtCloud
+
+Selvom rtCloud er inspireret af andre dataindsamlingsplatforme, tilbyder det unikke funktioner, der adskiller det:
+
+1. **Ægte formularsletning**: I modsætning til nogle platforme tillader rtCloud komplet fjernelse af formularer, når det er nødvendigt.
+
+2. **Fleksible indsendelsesarbejdsgange**: Muligheden for at returnere og videresende indsendelser muliggør komplekse datareview- og kvalitetskontrolprocesser.
+
+3. **Integreret projektstyring**: rtCloud går ud over formular- og datastyring og tilbyder værktøjer til at organisere alle aspekter af dit undersøgelsesprojekt.
+
+4. **Direkte XLSForm-understøttelse**: Upload dine XLSForms direkte uden konvertering, hvilket strømliner formularoprettelsesprocessen.
+
+5. **Omfattende tilladelsessystem**: Detaljeret kontrol over brugeradgang og -muligheder inden for projekter.
+
+## Kom i gang med rtCloud
+
+For at begynde at bruge rtCloud til dine undersøgelsesprojekter:
+
+1. Opsæt din rtCloud-server, eller kontakt rtSurvey for hostede løsninger.
+2. Opret dit første projekt og invitér teammedlemmer.
+3. Upload dine XLSForms og konfigurér dine dataindsamlingsarbejdsgange.
+4. Forbind dine rtSurvey-mobilapps og begynd at indsamle data.
+
+rtCloud giver forskere, organisationer og dataindsamlingsteams mulighed for at administrere komplekse undersøgelsesprojekter med lethed, sikkerhed og fleksibilitet. Uanset om du gennemfører en engangsundersøgelse eller et mangeårigt longitudinalt studie, giver rtCloud dig de værktøjer, du har brug for til at lykkes.

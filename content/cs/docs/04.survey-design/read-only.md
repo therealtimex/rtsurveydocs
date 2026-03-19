@@ -1,0 +1,67 @@
+---
+title: "Pole pouze pro čtení"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 287
+---
+
+Pole pouze pro čtení v rtSurvey vám umožňují zobrazit informace, které respondent nemůže upravovat. Tato funkce je zvláště užitečná pro zobrazení předvyplněných dat, vypočtených výsledků nebo informací, které by měly zůstat konstantní po celou dobu průzkumu.
+
+## Základní použití
+
+Pro nastavení pole pouze pro čtení použijte sloupec `read_only` ve vašem XLSForm:
+
+```
+| type    | name | label                 | read_only | default |
+|---------|------|----------------------|-----------|---------|
+| integer | num  | Číslo pacienta je:   | yes       | 5       |
+```
+
+## Případy použití
+
+Pole pouze pro čtení jsou běžně používána pro:
+
+1. Zobrazení informací přenesených z předchozích průzkumů nebo databází
+2. Prezentace vypočtených výsledků respondentovi
+3. Zobrazení kontextových informací jako ID průzkumu nebo datum
+4. Ukázání hodnot, které byly předvyplněny systémem
+
+## Předdefinované hodnoty s read_only
+
+Kombinujte `read_only` s `default` pro zobrazení přednastavených informací:
+
+```
+| type      | name        | label                    | read_only | default                    |
+|-----------|-------------|--------------------------|-----------|----------------------------|
+| calculate | enumerator  |                          |           | pulldata('app-api','user.name') |
+| text      | enum_display| Enumerátor:              | yes       | ${enumerator}              |
+| date      | survey_date | Datum průzkumu:          | yes       | today()                    |
+```
+
+## Vypočtené výsledky jako pole pouze pro čtení
+
+Použijte `read_only` pro zobrazení výsledků výpočtů respondentovi:
+
+```
+| type      | name   | label              | calculation         | read_only |
+|-----------|--------|--------------------|---------------------|-----------|
+| integer   | adults | Počet dospělých    |                     |           |
+| integer   | children| Počet dětí        |                     |           |
+| calculate | total  |                    | ${adults}+${children}|          |
+| integer   | total_display | Celkem členů domácnosti: | | yes  |
+```
+
+## Osvědčené postupy
+
+1. Jasně označte pole pouze pro čtení, aby respondenti věděli, že nemohou upravovat hodnoty.
+2. Používejte pole pouze pro čtení střídmě, abyste neohromili respondenty informacemi.
+3. Zajistěte, aby hodnoty zobrazené v polích pouze pro čtení byly přesné a aktuální.
+
+## Omezení
+
+- Pole pouze pro čtení jsou stále zahrnuta v datech formuláře a exportech.
+- Na mobilních zařízeních mohou pole pouze pro čtení stále zobrazovat klávesnici, pokud na ně uživatel klepne, ale zadání budou ignorována.

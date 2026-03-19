@@ -1,0 +1,63 @@
+---
+weight: 150
+date: "2023-05-03T22:37:22+01:00"
+draft: false
+author: "RealTimeX"
+title: "Recolher Dados"
+icon: "rocket_launch"
+toc: true
+description: "Um guia de início rápido para executar um inquérito com o rtSurvey"
+publishdate: "2023-05-03T22:37:22+01:00"
+tags: ["Beginners"]
+---
+
+Uma vez que um formulário foi implementado e os enumeradores estão atribuídos, a recolha de dados pode começar. O **rtSurvey** suporta a recolha de dados de forma integrada tanto em navegadores web como em aplicações móveis dedicadas, garantindo flexibilidade quer a sua equipa esteja ligada à internet quer esteja a trabalhar em ambientes remotos e offline.
+
+## Escolher o Método de Recolha Correto
+
+Dependendo da geografia e conectividade do seu projeto, pode escolher o método ideal para os seus enumeradores:
+
+- **Navegador Web (Online):** Melhor para centros de atendimento, entrada de dados em escritório, ou respondentes a preencher inquéritos públicos de autoadministração.
+- **rtWork / Aplicação Móvel rtSurvey (Online e Offline):** Melhor para operações de campo, áreas remotas com internet instável e inquéritos que requerem anexos de media (fotografias, coordenadas GPS, mapas offline).
+
+---
+
+## Método 1: Recolher Dados via Navegador Web
+
+Usar a interface de Webform permite aos enumeradores começar a recolher dados imediatamente sem instalar nenhum software.
+
+### 1. Aceder ao URL do Webform
+No painel de controlo **Gerir Formulários**, localize o seu formulário alvo e clique no botão **URL do Webform** para gerar uma ligação segura.
+
+### 2. Preenchimento do Formulário
+- Abra o URL fornecido em qualquer navegador web moderno.
+- Se o formulário requer autenticação, o enumerador deve iniciar sessão com as suas credenciais. Se estiver definido como "Visibilidade Pública", pode prosseguir diretamente.
+- Preencha as perguntas do inquérito. A interface aplicará automaticamente a lógica, padrões de salto e regras de validação.
+- **Captura de Media:** Se o formulário incluir perguntas de imagem, áudio ou vídeo, o navegador web irá solicitá-lo para carregar um ficheiro do seu computador ou usar a webcam/microfone do dispositivo se disponível.
+
+### 3. Submissão
+Ao atingir a página final, clique em **Submeter**. O navegador requer uma ligação à internet ativa para finalizar a submissão. Uma vez bem-sucedida, os dados refletir-se-ão instantaneamente na interface de **Gerir Submissões**.
+
+---
+
+## Método 2: Recolher Dados via Aplicação Móvel (Offline)
+
+Para recolha de dados de campo robusta, as aplicações móveis fornecem capacidades offline completas.
+
+### 1. Instalar e Autenticar
+- Descarregue a aplicação **rtWork** (ou **rtSurvey**) da Google Play Store ou Apple App Store.
+- Abra a aplicação e inicie sessão usando as credenciais de enumerador atribuídas.
+
+### 2. Descarregar Formulários (Requer Internet)
+- Navegue até à secção **Formulários** ou **Tarefas** na aplicação.
+- Toque no ícone **Sincronizar** ou **Descarregar** para obter os designs de questionário mais recentes do servidor. Uma vez descarregados, os formulários são armazenados localmente no dispositivo.
+
+### 3. Recolher Dados (Offline)
+- Abra o formulário descarregado e comece a entrevista.
+- Pode recolher dados com segurança totalmente offline.
+- **Captura de Media:** A aplicação móvel integra-se nativamente com o hardware do seu dispositivo. Pode tirar fotografias, gravar áudio, gravar vídeo e registar coordenadas GPS precisas diretamente na aplicação, mesmo sem ligação à internet.
+- Quando terminar uma entrevista, finalize o registo. Os registos finalizados são colocados em fila com segurança na caixa de saída da aplicação.
+
+### 4. Sincronizar Submissões (Requer Internet)
+- Assim que o enumerador regressar a uma área com acesso à internet (Wi-Fi ou dados móveis), deve navegar até à interface de **Caixa de Saída** ou **Sincronizar**.
+- Instrua a aplicação a enviar os formulários finalizados. A aplicação transmitirá os registos em fila e todos os ficheiros de media anexados de forma segura para o servidor, após o que aparecerão na grelha de dados para revisão.

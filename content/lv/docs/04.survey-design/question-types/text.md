@@ -1,0 +1,52 @@
+---
+title: "Teksts"
+description: "Brīva teksta atbilžu jautājuma tips rtSurvey"
+icon: "text_fields"
+date: "2024-07-01T12:00:00+01:00"
+lastmod: "2024-07-01T12:00:00+01:00"
+draft: false
+toc: true
+weight: 221
+---
+
+Jautājuma tips `text` apkopo brīvas teksta atbildes — jebkādas rakstzīmju virknes. Tas ir elastīgākais ievades tips un tiek izmantots vārdiem, adresēm, aprakstiem, kodiem un visam, kas neatbilst specifiskākam tipam.
+
+rtSurvey arī paplašina `text` ar **laika ievades logrīkiem**, kas ļauj precīzu laika ievadi ar pulksteņa izvēlētāju.
+
+## Pamata XLSForm specifikācija
+
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | Respondenta pilnais vārds |
+| text | address | Dzīvesvietas adrese |
+
+## Lietojums
+
+Teksta jautājumi tiek izmantoti:
+
+1. Vārdiem, adresēm, brīviem aprakstiem
+2. Atvērtiem komentāriem vai atsauksmēm
+3. Kodiem, ID vai atsauces numuriem, kas neatbilst integer/decimal
+4. Laika vērtību vākšanai ar rtSurvey laika ievades paplašinājumiem
+5. Automātiskās pabeigšanas teksta laukiem
+
+## Standarta izskata iespējas
+
+| Izskats | Apraksts |
+|------------|-------------|
+| *(nav)* | Vienas rindiņas teksta ievade |
+| `multiline` | Vairāku rindiņu teksta apgabals — piemērots garākam brīvam tekstam tīmeklī |
+
+## rtSurvey laika ievades paplašinājumi
+
+rtSurvey paplašina `text` ar **pulksteņa izvēlētāja logrīku** laika vērtību vākšanai.
+
+## Datu formāts
+
+Teksta dati tiek glabāti un eksportēti kā vienkārša virkne. Laika bāzētām ievadēm, izmantojot iebūvēto pulksteņa logrīku, vērtība tiek glabāta formātā, kas atbilst izvēlētajai formāta virknei (piemēram, `14:32` `%H:%M`).
+
+## Labākā prakse
+
+1. Izmantojiet specifiskākus tipus (`integer`, `decimal`, `date`), ja iespējams — tas novērš nederīgus ierakstus un vienkāršo analīzi.
+2. Pievienojiet `constraint` ar `string-length()` vai `regex()`, lai validētu kodus vai ID.
+3. Izmantojiet `multiline` izskata jautājumiem, kur respondenti var rakstīt vairākus teikumus.

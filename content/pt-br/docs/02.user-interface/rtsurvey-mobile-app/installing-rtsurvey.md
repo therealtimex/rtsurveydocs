@@ -1,0 +1,61 @@
+---
+title: "Instalando o rtSurvey"
+description: "Aprenda como baixar e instalar o aplicativo móvel rtSurvey em dispositivos Android e iOS, com instruções passo a passo e dicas de solução de problemas para um processo de configuração tranquilo"
+icon: "get_app"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 312
+---
+
+O rtSurvey está disponível para dispositivos Android e iOS, permitindo que você realize pesquisas e colete dados em uma ampla variedade de plataformas móveis. Siga estas etapas para instalar o rtSurvey no seu dispositivo.
+
+## Requisitos do sistema
+
+Antes de instalar, certifique-se de que seu dispositivo atende aos seguintes requisitos:
+
+- Para Android: Android 7.0 ou posterior
+- Para iOS: iOS 11.0 ou posterior
+- Conexão estável com a internet para download inicial e atualizações
+
+## Instalando no Android
+
+1. Abra o Google Play Store no seu dispositivo Android.
+2. Na barra de pesquisa, digite "rtSurvey" ou use este link direto: [rtSurvey no Google Play](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey&hl=ln&gl=US)
+3. Toque no aplicativo rtSurvey nos resultados da pesquisa.
+4. Pressione o botão "Instalar".
+5. Aguarde o download e a instalação serem concluídos.
+6. Após a instalação, você pode abrir o aplicativo na tela inicial ou gaveta de aplicativos do seu dispositivo.
+
+## Instalando no iOS
+
+1. Abra a App Store no seu dispositivo iOS.
+2. Toque no ícone de pesquisa e digite "rtSurvey" ou use este link direto: [rtSurvey na App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547)
+3. Toque no aplicativo rtSurvey nos resultados da pesquisa.
+4. Pressione "Obter" ou o ícone de nuvem para iniciar o download.
+5. Pode ser necessário autenticar com Face ID, Touch ID ou a senha do seu Apple ID.
+6. Aguarde o download e a instalação serem concluídos.
+7. Após a instalação, o ícone do aplicativo aparecerá na sua tela inicial.
+
+## Solução de problemas de instalação
+
+Se você encontrar problemas durante a instalação:
+
+1. Verifique sua conexão com a internet e tente novamente.
+2. Certifique-se de ter espaço de armazenamento suficiente no seu dispositivo.
+3. Reinicie o seu dispositivo e tente a instalação novamente.
+4. Para Android: Limpe o cache e os dados do Google Play Store nas configurações do seu dispositivo.
+5. Para iOS: Saia do seu Apple ID e entre novamente.
+
+Se os problemas persistirem, visite o site de suporte do rtSurvey ou entre em contato com o administrador do seu sistema para obter assistência.
+
+## Atualizando o rtSurvey
+
+Para garantir que você tenha os recursos mais recentes e correções de bugs:
+
+- No Android: Habilite atualizações automáticas no Google Play Store ou atualize o aplicativo manualmente.
+- No iOS: Ative as atualizações automáticas nas configurações da App Store ou atualize manualmente.
+
+Atualizações regulares ajudam a manter o desempenho e a segurança do aplicativo.
+
+Agora que você instalou com sucesso o rtSurvey, está pronto para começar a usá-lo para suas necessidades de coleta de dados. A próxima seção guiará você sobre como conectar o aplicativo a um servidor.

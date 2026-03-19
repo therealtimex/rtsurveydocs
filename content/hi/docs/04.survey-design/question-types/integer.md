@@ -1,0 +1,81 @@
+---
+title: "Integer"
+description: "Integer questions आपके survey में whole number inputs की अनुमति देते हैं।"
+icon: "123"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 222
+---
+
+XLSForms और rtSurvey में integer question type का उपयोग whole number responses एकत्र करने के लिए किया जाता है। यह question type decimal places के बिना numerical data gather करने के लिए आवश्यक है, जैसे counts, ages, या years।
+
+## Basic XLSForm Specification
+
+| type    | name  | label                 |
+|---------|-------|------------------------|
+| integer | age   | अपनी आयु वर्षों में दर्ज करें |
+
+Basic integer question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+
+## उपयोग
+
+Integer questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+
+1. आयु inputs
+2. Items count करना (जैसे बच्चों की संख्या, household members)
+3. Year inputs (जैसे जन्म का वर्ष)
+4. Numerical scale पर ratings
+5. कोई भी whole number data collection
+
+## rtSurvey Extensions
+
+Basic XLSForm specification के अतिरिक्त, rtSurvey अतिरिक्त सुविधाएं प्रदान कर सकता है:
+
+1. Range validation
+2. Custom error messages
+3. Number input के लिए appearance options
+
+## Best Practices
+
+1. Expected input निर्दिष्ट करने के लिए clear और concise labels का उपयोग करें।
+2. Unrealistic या erroneous inputs को रोकने के लिए range constraints लागू करें।
+3. Expected format को स्पष्ट करने या उदाहरण प्रदान करने के लिए hint text का उपयोग करने पर विचार करें।
+4. बड़ी संख्याओं के लिए, readability में सुधार करने के लिए label में commas या spaces का उपयोग करने पर विचार करें।
+
+## Constraints और Validation
+
+आप यह सुनिश्चित करने के लिए constraints जोड़ सकते हैं कि दर्ज किया गया मूल्य एक specific range में हो:
+
+| type    | name  | label                 | constraint        | constraint_message                    |
+|---------|-------|------------------------|-------------------|---------------------------------------|
+| integer | age   | अपनी आयु वर्षों में दर्ज करें | .>0 and .<=120    | आयु 1 और 120 वर्ष के बीच होनी चाहिए   |
+
+## Example Usage
+
+यहाँ बताया गया है कि आप household survey में integer questions का उपयोग कैसे कर सकते हैं:
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| integer | household_size | आपके घर में कितने लोग रहते हैं?          | .>0        | Household size कम से कम 1 होनी चाहिए |
+| integer | num_children   | Household में 18 से कम आयु के कितने बच्चे हैं? | .>=0    | बच्चों की संख्या negative नहीं हो सकती |
+| integer | year_built     | आपका घर किस वर्ष बना था?                | .>1800 and .<=2023 | वर्ष 1800 और 2023 के बीच होना चाहिए |
+
+## Integer Values के साथ Calculation
+
+Integer values का उपयोग calculations में किया जा सकता है। यहाँ एक उदाहरण है:
+
+| type    | name           | label                                     |
+|---------|----------------|-------------------------------------------|
+| integer | num_adults     | Household में adults की संख्या             |
+| integer | num_children   | Household में बच्चों की संख्या             |
+| calculate | total_members | | 
+
+calculate row में, आप इसका उपयोग कर सकते हैं:
+
+```
+calculation | ${num_adults} + ${num_children}
+```
+
+यह total household members प्राप्त करने के लिए adults और children की संख्या को जोड़ देगा।

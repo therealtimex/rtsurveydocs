@@ -1,0 +1,62 @@
+---
+title: "Barcode"
+description: "Pertanyaan barcode memungkinkan pemindaian dan pengambilan data barcode dalam survei Anda."
+icon: "qr_code_scanner"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 231
+---
+
+Tipe pertanyaan barcode dalam XLSForm dan rtSurvey memungkinkan pengguna memindai dan mengambil data barcode langsung dalam survei. Fitur ini sangat berguna untuk manajemen inventaris, pelacakan produk, atau skenario apa pun yang memerlukan entri data cepat dan akurat dari informasi berkode.
+
+## Spesifikasi XLSForm Dasar
+
+| type    | name          | label                   |
+|---------|---------------|-------------------------|
+| barcode | product_code  | Pindai barcode produk   |
+
+Untuk detail lebih lanjut tentang tipe pertanyaan barcode dasar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+
+## Penggunaan
+
+Pertanyaan barcode umum digunakan untuk:
+
+1. Identifikasi produk dalam survei inventaris
+2. Pelacakan aset dalam operasi lapangan
+3. Verifikasi tiket atau ID di acara
+4. Entri data cepat untuk informasi berkode
+
+## Ekstensi rtSurvey
+
+Meskipun spesifikasi XLSForm dasar untuk pertanyaan barcode sederhana, rtSurvey dapat menawarkan fitur atau kustomisasi tambahan, termasuk:
+
+1. Dukungan untuk berbagai format barcode (misalnya, kode QR, UPC, EAN)
+2. Integrasi dengan kamera perangkat untuk pemindaian barcode
+3. Opsi entri manual jika barcode rusak atau tidak dapat dipindai
+
+## Praktik Terbaik
+
+1. Pastikan kondisi pencahayaan yang tepat untuk pemindaian barcode yang akurat.
+2. Berikan instruksi yang jelas kepada pengguna tentang cara memposisikan perangkat untuk pemindaian.
+3. Sertakan opsi entri manual sebagai cadangan jika terjadi kesulitan pemindaian.
+4. Uji fitur pemindaian barcode dengan berbagai perangkat dan tipe barcode sebelum menerapkan survei.
+
+## Keterbatasan
+
+- Akurasi pemindaian barcode mungkin bervariasi tergantung pada kualitas kamera perangkat dan kondisi lingkungan.
+- Beberapa perangkat lama atau kelas bawah mungkin tidak mendukung pemindaian barcode.
+- Jenis barcode tertentu mungkin tidak didukung, tergantung pada implementasinya.
+
+## Contoh Penggunaan
+
+Berikut adalah contoh cara menggunakan pertanyaan barcode dalam survei inventaris:
+
+| type    | name          | label                   | hint                                      |
+|---------|---------------|-------------------------|-------------------------------------------|
+| barcode | product_code  | Pindai barcode produk   | Posisikan barcode dalam bingkai           |
+| integer | quantity      | Masukkan jumlah produk  |                                           |
+| note    | confirmation  | Produk dipindai: ${product_code}. Jumlah: ${quantity} |           |
+
+Dalam contoh ini, survei mengambil barcode produk, menanyakan jumlah, kemudian menampilkan catatan konfirmasi dengan informasi yang dipindai.

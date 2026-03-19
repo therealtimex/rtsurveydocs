@@ -1,0 +1,126 @@
+---
+title: "Podpora viacerých jazykov"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 285
+---
+
+rtSurvey poskytuje robustnú podporu viacerých jazykov, čo vám umožňuje vytvárať prieskumy v mnohých jazykoch. Táto funkcia je kľúčová pre vykonávanie výskumu naprieč rôznymi jazykovými populáciami alebo vo viacjazyčných prostrediach.
+
+## Nastavenie viacjazyčných prieskumov
+
+Na vytvorenie viacjazyčného prieskumu v rtSurvey musíte do vášho XLSForm pridať stĺpce špecifické pre jazyk. Tu je postup:
+
+1. **Preklady popiskov**: Pridajte stĺpce pre každý jazyk vo formáte `label::Jazyk (kód)`.
+2. **Preklady nápovied**: Použite `hint::Jazyk (kód)` na prekladanie nápovied.
+3. **Preklady mediálnych súborov**: Pre médiá špecifické pre jazyk použite `media::Jazyk (kód)`.
+
+Príklad:
+
+```
+| type    | name | label::Slovenčina (sk) | label::Angličtina (en) | hint::Slovenčina (sk) | hint::Angličtina (en) |
+|---------|------|---------------------|---------------------|---------------------|---------------------|
+| integer | age  | Koľko máte rokov?    | How old are you?    | Zadajte váš vek      | Enter your age     |
+```
+
+## Jazykové kódy
+
+Odporúča sa používať oficiálne 2-znakové jazykové kódy (podznačky) za názvom jazyka. To uľahčuje porovnanie jazyka formulára s jazykom používateľského rozhrania. Oficiálne kódy nájdete [tu](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+
+## Nastavenie predvoleného jazyka
+
+Na nastavenie predvoleného jazyka pre zber dát použite hárok `settings` vo vašom XLSForm:
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | Slovak (sk)       |
+```
+
+## Funkcie špecifické pre rtSurvey
+
+### Dynamické prepínanie jazykov
+
+rtSurvey umožňuje používateľom dynamicky prepínať jazyky počas zberu dát:
+
+- Vo webovom rozhraní použite rozbaľovací zoznam jazyka v hornej navigačnej lište.
+- V mobilnej aplikácii pristúpte k možnostiam jazyka cez menu nastavení.
+
+### Správy overovania špecifické pre jazyk
+
+rtSurvey rozširuje viacjazyčnú podporu na správy overovania:
+
+```
+| type    | name | constraint | constraint_message::Slovenčina (sk) | constraint_message::Angličtina (en) |
+|---------|------|------------|----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Vek musí byť 150 alebo menej          | Age must be 150 or less          |
+```
+
+### Podpora RTL jazykov
+
+Pre jazyky sprava doľava (RTL) ako arabčina alebo hebrejčina rtSurvey automaticky prispôsobuje rozloženie:
+
+```
+| type | name | label::Slovenčina (sk) | label::Arabčina (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Vaše meno           | اسمك                |
+```
+
+### Vzhľad špecifický pre jazyk
+
+rtSurvey umožňuje zadať rôzne vzhľady pre rôzne jazyky:
+
+```
+| type | name | label::Angličtina (en) | label::Čínština (zh) | appearance::Angličtina (en) | appearance::Čínština (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Address          | 地址                 | multiline                | textarea                  |
+```
+
+## Najlepšie postupy pre viacjazyčné prieskumy
+
+1. **Konzistentné pomenovanie**: Používajte konzistentné jazykové kódy v celom formulári.
+2. **Profesionálny preklad**: Zamestnajte profesionálnych prekladateľov oboznámených s kontextom prieskumu.
+3. **Kontextové poznámky**: Poskytnite kontextové poznámky pre prekladateľov na zabezpečenie presných prekladov.
+4. **Testovanie**: Pred nasadením otestujte váš formulár vo všetkých jazykoch.
+5. **Podpora Unicode**: Uistite sa, že vaše zariadenia na zber dát podporujú Unicode pre nelatin písma.
+6. **Médiá špecifické pre jazyk**: Používajte kultúrne vhodné obrázky alebo zvuk pre každý jazyk.
+7. **Vyhnite sa textu v obrázkoch**: Ak používate obrázky s textom, vytvorte samostatné obrázky pre každý jazyk.
+
+## Spracovanie špeciálnych prípadov
+
+### Odpovede v zmiešanom jazyku
+
+rtSurvey umožňuje respondentom zadávať text v akomkoľvek písme bez ohľadu na zvolený jazyk formulára. Je to užitočné na zachytávanie mien alebo adries v ich pôvodnom písme.
+
+### Typy otázok špecifické pre jazyk
+
+Niektoré typy otázok môžu byť vhodnejšie pre určité jazyky. rtSurvey umožňuje používať rôzne typy otázok pre rôzne jazyky:
+
+```
+| type::Angličtina (en) | type::Japončina (ja) | name | label::Angličtina (en) | label::Japončina (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
+```
+
+## Export viacjazyčných dát
+
+Pri exporte dát z rtSurvey:
+
+- Vyberte export v konkrétnom jazyku alebo zahrňte všetky jazykové verzie.
+- Metadáta jazyka sú zahrnuté v exporte a označujú, ktorý jazyk bol použitý pre každú odpoveď.
+
+## Úvahy pre mobilnú aplikáciu
+
+- Mobilná aplikácia rtSurvey podporuje offline prepínanie jazykov.
+- Pred prechodom do offline režimu sa uistite, že sú stiahnuté všetky požadované jazykové súbory.
+
+## Známe obmedzenia
+
+- Niektoré pokročilé funkcie nemusia byť dostupné vo všetkých jazykoch.
+- Extrémne dlhé preklady môžu ovplyvniť rozloženie na menších obrazovkách.
+
+Využívaním viacjazyčných schopností rtSurvey môžete vytvárať inkluzívne, prístupné prieskumy, ktoré oslovujú rôzne populácie a poskytujú vysokokvalitnée, jazykovo presné dáta.

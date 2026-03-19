@@ -1,0 +1,78 @@
+---
+title: "Imagem"
+description: "As perguntas de imagem permitem que os respondentes capturem e enviem fotos como parte da pesquisa."
+icon: "image"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 227
+---
+
+O tipo de pergunta image em XLSForms e rtSurvey permite que os respondentes capturem e enviem fotos como parte de suas respostas à pesquisa. Este recurso é particularmente útil para coletar dados visuais, documentar observações ou fornecer evidências em pesquisas de campo.
+
+## Especificação básica do XLSForm
+
+| type  | name        | label                           |
+|-------|-------------|--------------------------------|
+| image | photo       | Tire uma foto do local          |
+
+Para mais detalhes sobre o tipo básico de pergunta image, consulte a [especificação do XLSForm](https://xlsform.org/en/#question-types).
+
+## Usos
+
+As perguntas de imagem são comumente usadas para:
+
+1. Documentar condições de campo ou observações
+2. Capturar evidências visuais em estudos de pesquisa
+3. Coletar fotos antes e depois em avaliações de impacto
+4. Verificar a conclusão de tarefas ou presença em locais
+5. Reunir dados visuais para análise remota
+
+## Práticas recomendadas
+
+1. Forneça instruções claras sobre o que deve ser fotografado.
+2. Considere as implicações de privacidade e informe os respondentes sobre como suas fotos serão usadas.
+3. Esteja ciente dos tamanhos de arquivo e limitações de armazenamento, especialmente para pesquisas em áreas com conectividade limitada à internet.
+4. Garanta que o dispositivo tenha espaço de armazenamento suficiente e que as permissões de câmera sejam concedidas.
+
+## Exemplo de uso
+
+Aqui está um exemplo de como você pode usar uma pergunta image em uma pesquisa:
+
+| type  | name           | label                                      | hint                                        |
+|-------|----------------|--------------------------------------------|--------------------------------------------|
+| image | storefront     | Tire uma foto da entrada da loja           | Garanta que o nome da loja esteja claramente visível |
+
+## Extensões do rtSurvey
+
+Embora a especificação básica do XLSForm para perguntas image seja direta, o rtSurvey pode oferecer recursos ou personalizações adicionais:
+
+1. Configurações de qualidade de imagem (por exemplo, resolução baixa, média, alta)
+2. Opção para adicionar legendas ou tags às imagens
+3. Captura de múltiplas imagens para uma única pergunta
+4. Integração com o aplicativo de câmera nativo ou galeria do dispositivo
+
+## Manipulação de dados
+
+As imagens coletadas por este tipo de pergunta são tipicamente:
+
+1. Salvas em um formato de imagem comum (por exemplo, JPG, PNG)
+2. Armazenadas junto com outros dados da pesquisa, geralmente em uma pasta de mídia separada
+3. Acessíveis para visualização e análise por meio da plataforma de gerenciamento de pesquisa
+
+## Considerações para análise
+
+Ao usar perguntas de imagem, considere:
+
+1. Como as imagens serão analisadas (por exemplo, revisão manual, análise automatizada de imagens)
+2. O espaço de armazenamento adicional necessário para arquivos de imagem
+3. Medidas de privacidade e proteção de dados para armazenar e manipular fotos
+4. Possível necessidade de ferramentas de edição ou organização de imagens na fase de análise
+
+## Limitações
+
+- Os arquivos de imagem podem ser grandes, o que pode impactar a transferência de dados e o armazenamento.
+- Nem todos os dispositivos podem ter câmeras de alta qualidade ou espaço de armazenamento suficiente.
+- Analisar um grande número de imagens pode ser demorado.
+- Pode haver preocupações de privacidade ao capturar imagens, especialmente em espaços públicos.

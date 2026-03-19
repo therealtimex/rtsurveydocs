@@ -1,0 +1,127 @@
+---
+weight: 3
+title: "การติดตั้งบนคลาวด์"
+date: "2026-03-16T00:00:00+07:00"
+lastmod: "2026-03-16T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+icon: "cloud_upload"
+toc: true
+description: "ติดตั้ง rtCloud บนผู้ให้บริการคลาวด์หลักด้วยสคริปต์อัตโนมัติสำหรับ DigitalOcean, AWS EC2, Google Cloud และ Linode"
+---
+
+ที่เก็บการติดตั้งใช้งานมีสคริปต์จัดเตรียมอัตโนมัติสำหรับผู้ให้บริการคลาวด์หลัก สคริปต์แต่ละตัวทำงานเมื่อบูตครั้งแรกของเซิร์ฟเวอร์ **Ubuntu 22.04 LTS** ใหม่และดำเนินการตั้งค่าแบบไม่มีการดูแลอย่างสมบูรณ์:
+
+- ติดตั้ง Docker และ Docker Compose
+- สร้างรหัสผ่านสุ่มที่ปลอดภัยสำหรับบริการภายในทั้งหมด
+- เขียน `docker-compose.production.yml` และ `.env`
+- กำหนดค่า Nginx เป็น reverse proxy
+- ขอใบรับรอง TLS ฟรีจาก Let's Encrypt (ลองใหม่อัตโนมัติจนกว่า DNS จะ resolve)
+- กำหนดค่าไฟร์วอลล์ UFW
+- ติดตั้งเซิร์ฟเวอร์ Keycloak SSO แบบฝังไม่บังคับ
+- แสดงผลสรุปการติดตั้งพร้อมข้อมูลประจำตัวทั้งหมด
+
+การตั้งค่าเสร็จสิ้นใน **5–10 นาที** บนอินสแตนซ์มาตรฐาน
+
+---
+
+## การเลือกสคริปต์
+
+มีหลายตัวแปรสคริปต์ขึ้นอยู่กับผู้ให้บริการคลาวด์และการตั้งค่า SSO ของคุณ:
+
+| สคริปต์ | ผู้ให้บริการ | โหมด SSO | เหมาะสำหรับ |
+|--------|----------|----------|----------|
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Keycloak ในตัว | SSO แบบง่ายและครบในตัวเอง |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak หรือ External OIDC | ควบคุมเต็มรูปแบบ |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Keycloak ในตัว | การตั้งค่าแบบฟอร์ม ง่ายที่สุด |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC เท่านั้น | ผู้ให้บริการตัวตนที่มีอยู่ |
+| `linode-stackscript.sh` | Linode | Keycloak หรือ External OIDC | ควบคุมเต็มรูปแบบ |
+| `aws-ec2.sh` | AWS EC2 | Keycloak หรือ External OIDC | การติดตั้ง AWS |
+| `gcp-compute.sh` | Google Cloud | Keycloak หรือ External OIDC | การติดตั้ง GCP |
+
+> **แนะนำสำหรับผู้ใช้ส่วนใหญ่:** ใช้ตัวแปร `keycloak-embed` มีเซิร์ฟเวอร์ตัวตน Keycloak ในตัวและต้องการฟิลด์การกำหนดค่าน้อยที่สุด
+
+---
+
+## คู่มือการกำหนดขนาดเซิร์ฟเวอร์
+
+| กรณีการใช้งาน | RAM | Disk | ตัวอย่าง |
+|----------|-----|------|---------|
+| การประเมิน / การพัฒนา | 2 GB | 25 GB | DO Basic $18/เดือน, t3.small, e2-small |
+| ทีมขนาดเล็ก (< 50 ผู้ใช้) | 4 GB | 40 GB | DO Basic $24/เดือน, t3.medium, e2-medium |
+| การผลิต (> 50 ผู้ใช้) | 8 GB | 80 GB | DO General $48/เดือน, t3.large, n2-standard-2 |
+
+> Keycloak แบบฝังต้องการ RAM อย่างน้อย **4 GB** ใช้ 2 GB เฉพาะสำหรับการประเมินโดยไม่มี Keycloak
+
+---
+
+## การตั้งค่า DNS
+
+สคริปต์ทั้งหมดต้องการโดเมนที่มี **A record ชี้ไปยัง IP ของเซิร์ฟเวอร์** ก่อนที่ Let's Encrypt จะออกใบรับรองได้
+
+สคริปต์แสดง IP ของเซิร์ฟเวอร์ในช่วงต้นของกระบวนการตั้งค่า:
+
+```
+============================================================
+ Server IP : 139.162.51.85
+ Add this DNS A record now if you haven't already:
+   myapp.example.com  ->  139.162.51.85
+ The script will retry Certbot every 60s until DNS resolves.
+============================================================
+```
+
+สคริปต์ **ลองใหม่โดยอัตโนมัติ** กับ Let's Encrypt ทุก 60 วินาทีเป็นเวลาถึง 1 ชั่วโมง เพียงเพิ่ม DNS record และรอ — ไม่จำเป็นต้องรีสตาร์ท
+
+> **Rate limit:** Let's Encrypt อนุญาตสูงสุด **5 ใบรับรองต่อโดเมนต่อ 7 วัน** หลีกเลี่ยงการติดตั้งและทำลายเซิร์ฟเวอร์ซ้ำๆ ด้วยโดเมนเดียวกัน หากถึงขีดจำกัด สคริปต์จะแสดง timestamp `retry after` และหยุดทันที
+
+---
+
+## รายการตรวจสอบหลังการติดตั้ง
+
+- [ ] แอปเปิดที่ `https://your-domain.com`
+- [ ] เข้าสู่ระบบด้วย `admin` และรหัสผ่านที่คุณกำหนดค่า
+- [ ] คอนเทนเนอร์ทั้งหมดมีสุขภาพดี: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] การต่ออายุ Let's Encrypt ทำงาน: `certbot renew --dry-run`
+- [ ] พอร์ต MySQL 3306 **ไม่** ถูกเปิดเผย: `ufw status`
+- [ ] ตั้งค่าการสำรองข้อมูลรายวัน (ดู [การบำรุงรักษา](../maintenance))
+
+---
+
+## การแก้ไขปัญหา
+
+### ตรวจสอบล็อกการตั้งค่าเต็ม
+
+```bash
+# Linode
+tail -200 /var/log/stackscript.log
+
+# DigitalOcean / AWS / GCP
+tail -200 /var/log/rtcloud-setup.log
+```
+
+### Rate limit ของ Let's Encrypt
+
+หากเห็น `too many certificates` ในล็อก แสดงว่าถึงขีดจำกัด 5 ใบรับรอง/7 วัน ล็อกแสดงเวลาลองใหม่ที่แน่นอน:
+
+```
+[SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
+```
+
+รอจนถึงเวลานั้น แล้วติดตั้งใหม่
+
+### Keycloak ไม่มีสุขภาพ
+
+ตรวจสอบให้แน่ใจว่าเซิร์ฟเวอร์มี RAM อย่างน้อย 4 GB แล้วตรวจสอบล็อก:
+
+```bash
+docker logs rtcloud-keycloak --tail 50
+free -h
+```
+
+### การกำหนดค่า SSL ไม่ถูกใช้หลัง certbot
+
+หากมีการออกใบรับรองแล้วแต่ Nginx ยังแสดง HTTP เท่านั้น ให้ตรวจสอบล็อกสำหรับบรรทัดข้อผิดพลาดและโหลด Nginx ด้วยตนเอง:
+
+```bash
+nginx -t && systemctl reload nginx
+```

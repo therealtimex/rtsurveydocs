@@ -1,0 +1,95 @@
+---
+title: "Avanserte bilder"
+description: "Avanserte bildefunksjoner i rtSurvey: vannmerking, mediagridvisning og bildeannotering."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 300
+---
+
+Utover standard `image`-spørsmålstype gir rtSurvey utvidelser for **vannmerking** av tatte bilder og visning av flere bilder i et **mediagrid**. Dette er nyttig for evidensbaserte undersøkelser der bilder trenger å merkes med tellerens identitet eller undersøkelsesmetadata, og for visuelle gjennomgangsgrensesnitt.
+
+---
+
+## Vannmerke
+
+Vannmerkefunksjonen legger tekst eller et bilde over et tatt bilde før det lagres. Dette brukes til å merke feltbilder med dato, tellernavn, GPS-plassering eller andre undersøkelsesdata — noe som gjør det vanskeligere å sende inn eksisterende bilder som nytatt bevis.
+
+### Oppsett
+
+Bruk `watermark()` i **`calculation`**-kolonnen til et `image`-felt, kombinert med `callapi`-utseende:
+
+```
+watermark(type, size, distance, color, shadow, rotate, blur)
+```
+
+| Parameter | Beskrivelse |
+|-----------|-------------|
+| `type` | `'text'` for et tekstvannmerke; `'file'` for et bildevannmerke |
+| `size` | Skriftstørrelse i piksler (tekst) eller vannmerkestørrelse som % av bildebredde (fil) |
+| `distance` | Avstand mellom gjentatte vannmerkefliser (piksler) |
+| `color` | Tekstfarge (CSS-farge eller hex). Brukes ikke for `file`-type |
+| `shadow` | Skyggefarge (CSS-farge eller hex) |
+| `rotate` | Rotasjonsvinkel i grader (f.eks. `45` for diagonal) |
+| `blur` | Opasitet til vannmerket (0 = usynlig, 100 = fullt synlig) |
+
+### Eksempel på tekstvannmerke
+
+Legg tellerens navn og dagens dato diagonalt over hvert tatt bilde:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | wm_text | | | `concat(pulldata('app-api', 'user.name'), ' | ', format-date(today(), '%d/%m/%Y'))` |
+| image | site_photo | Ta et bilde av stedet | watermark | `watermark('text', 20, 60, '#ffffff', '#000000', 45, 40)` |
+
+Vannmerketeksten tas fra `${wm_text}`. Sett vannmerketekstfeltet **før** bildefeltet i skjemaet.
+
+### Eksempel på bilde/logo-vannmerke
+
+Legg en organisasjonslogo (vedlagt som en mediefil kalt `logo.png`) over bildet:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| image | evidence_photo | Ta bilde av beviset | watermark | `watermark('file', 25, 80, '', '#000000', 0, 50)` |
+
+### Angre/gjøre om
+
+Vannmerkeeditoren støtter angre og gjøre om — tellere kan gå tilbake gjennom redigeringshistorikken før de bekrefter bildet.
+
+### Vannmerkeflising
+
+Vannmerket gjentas (fliser) over hele bildet automatisk. `distance`-parameteren kontrollerer avstand mellom fliser; `rotate` kontrollerer vinkelen til hver flis.
+
+---
+
+## Mediagrid-widget
+
+Mediagrid-widgeten viser en samling mediefiler (bilder, lyd, video) i et gridoppsett, noe som lar anmeldere eller tellere bla gjennom innsamlede filer visuelt.
+
+Denne widgeten aktiveres av `mediagridwidget`-utseendet og brukes vanligvis på `note`- eller `calculate`-felt for å vise tidligere innsamlede medier fra en repeat-gruppe.
+
+### Eksempel: Vis alle bilder fra en repeat som et grid
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | photo_list | | | `join(' ', ${site_photo})` |
+| note | photo_review | Gjennomgå innsamlede bilder | mediagridwidget | |
+
+---
+
+## Beste praksis for vannmerkede bilder
+
+1. Beregn alltid vannmerketeksten i et `calculate`-felt **over** bildefeltet slik at det er tilgjengelig når bildet tas.
+2. Bruk en rotasjonsvinkel (f.eks. 45°) for å gjøre vannmerker vanskeligere å beskjære bort.
+3. Sett opasitet (`blur`) mellom 30–60% — høy nok til å være lesbar, lav nok til ikke å skjule bildeemnet.
+4. Inkluder tellerens navn, dato og GPS-koordinater i vannmerketeksten for å maksimere revisjonsverdi.
+5. Test vannmerkegjengivelse på den laveste spesifikasjonsenheten i flåten — canvas-basert vannmerking kan være treg på eldre maskinvare.
+
+## Begrensninger
+
+- Vannmerking brukes klientsiden ved hjelp av HTML5 Canvas API — det krever en capabel nettleser eller mobil WebView.
+- Svært høyoppløselige bilder kan ta flere sekunder å vannmerke på lavende-end enheter.
+- Vannmerker er bakt inn i bildefilen — de kan ikke fjernes etter innsending uten bilderedigering.
+- `file`-vannmerketypen krever at logobildet er vedlagt som en mediefil med nøyaktig det forventede filnavnet.

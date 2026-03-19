@@ -1,0 +1,51 @@
+---
+weight: 15
+date: "2026-03-04T00:00:00+00:00"
+draft: false
+title: "Sistemos naudotojas"
+icon: "people"
+toc: true
+description: "Visų platformos dalyvių vaidmenų, teisių ir įtraukimo valdymas."
+tags: ["Naudotojai", "Prieigos valdymas", "Įtraukimas", "Vaidmenys"]
+---
+
+# Sistemos naudotojų valdymas
+
+**Sistemos naudotojo** modulis (`/cpms/cpmsSystemUser/admin`) yra išsami valdymo sąsaja, skirta kontroliuoti, kas turi prieigą prie jūsų „Real-Time Survey" platformos (RT-CPMS) ir kokie veiksmai jiems leidžiami.
+
+![Sistemos naudotojo sąsaja](/images/system_user.png)
+
+## Unifikuotas valdymo požiūris
+
+RT-CPMS sistemoje **apklausos vykdytojas** yra tiesiog specifinis vaidmuo, priskirtas sistemos naudotojui. Atskiros „apklausų vykdytojų" duomenų bazės nėra. Nesvarbu, ar naudotojas yra aukšto lygio administratorius, stebintis žiniatinklio portalą, ar lauko apklausų vykdytojas, renkantis duomenis per mobilią programą, visi jie valdomi šioje vienoje, unifikuotoje sistemoje.
+
+## Pagrindinės funkcijos
+
+### 1. Naudotojų katalogas ir tinklelio rodinys
+Pagrindinė sąsaja rodo puslapiais suskirstytą visų darbo srityje prijungtų naudotojų sąrašą. Pagrindiniai atributai:
+* **Organizacijos ID ir pavadinimas**: naudotojų loginis grupavimas pagal konkrečius organizacinius subjektus (pvz., `rta`, `partner_org`).
+* **Vaidmuo**: nurodo naudotojo leidimų lygį (pvz., `Administratorius`, `Komandos vadovas`, `Apklausų vykdytojas`).
+* **Grupė**: erdvinis arba loginis grupavimo priskyrimas (pvz., konkretūs rajonai arba operatyvinės komandos).
+* **Sinchronizuota**: nurodo, ar paskyra sėkmingai integruota su centrine vieningo prisijungimo (SSO) sistema.
+* **Statusas**: vaizdiniai rodikliai, patvirtinantys, ar paskyra yra `Aktyvi`, `Neaktyvi`, `Ištrinta` ar `Blokuota`.
+
+**Globalūs veiksmai:**
+* **Pridėti sistemos naudotoją**: neautomatiniu būdu sukurti atskirą profilį.
+* **Importuoti sistemos naudotoją**: masinis paskyrų įkėlimas naudojant „Excel" šabloną. Galite spręsti konfliktus naudodami `Praleisti` ar `Pakeisti` režimus ir tiesiogiai sinchronizuoti su SSO.
+* **Masinis ištrynimas**: kelių pasirinkimo palaikymas masiškai šalinant paskyras.
+
+### 2. Prieigos valdymas ir saugumas
+Kuriant ar redaguojant naudotojo profilį, galima naudoti kelis svarbius saugos ir darbo eigos laukus:
+* **Naudotojo kodas**: unikalus identifikatorius, siejantis vietinę CPMS paskyrą su centrine SSO saugykla.
+* **Įrenginio keitimo kodas**: patikimas saugos žetonas, reikalingas, kai apklausų vykdytojas turi pakeisti mobilų įrenginį, naudojamą duomenų rinkimui.
+* **Galios lygis**: detali prioriteto/prieigos skalė nuo 0 (žemiausias) iki 20 (aukščiausias).
+* **Priežiūros perjungimas**: žymimasis langelis, kuris iš karto pakelia standartinį naudotoją į valdymo statusą.
+* **Darbo eigos automatizavimas**: parinktis „Automatiškai patvirtinti prašymą redaguoti", kuri supaprastina duomenų valymo ir patikrinimo procesą patikimų naudotojų atžvilgiu.
+
+### 3. Kodų valdymas (automatizuotas įtraukimas)
+Skirtuke „Kodas" ši funkcija valdo maišos pagrindu sukurtus registracijos ir kvietimų saitus, supaprastindama didelių komandų įtraukimo procesą.
+
+* **Registracija vs. kvietimas**: pasirinkite, ar naudotojai gali savarankiškai registruotis naudodami platinamos nuorodos, ar jiems reikia tiesioginio administratoriaus kvietimo.
+* **Galiojimo datos**: apribokite įtraukimą konkrečiais laiko langais.
+* **Naudojimo limitai**: apribokite naudotojų, galimų prisijungti naudojant vieną sugeneruotą kodą, skaičių.
+* **Iš anksto priskirti vaidmenys**: naudotojai, prisijungę per šiuos kodus, automatiškai paveldi iš anksto apibrėžtą vaidmenį ir galios lygį, užtikrinant, kad jie iš karto būtų pasiruošę dirbti be neautomatinių administratoriaus veiksmų.

@@ -1,0 +1,116 @@
+---
+title: "Tekst"
+description: "Fritekst-svar spørgsmålstype i rtSurvey"
+icon: "text_fields"
+date: "2024-07-01T12:00:00+01:00"
+lastmod: "2024-07-01T12:00:00+01:00"
+draft: false
+toc: true
+weight: 221
+---
+
+Spørgsmålstypen `text` indsamler et fritekst-svar — enhver tegnstreng. Det er den mest fleksible inputtype og bruges til navne, adresser, beskrivelser, koder og alt, der ikke passer til en mere specifik type.
+
+rtSurvey udvider også `text` med **tidsinputwidgetter**, der muliggør præcis tidsindtastning med en urpicker.
+
+## Grundlæggende XLSForm-specifikation
+
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | Respondentens fulde navn |
+| text | address | Hjemmeadresse |
+
+For flere detaljer om standard XLSForm-teksttypen, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+
+## Anvendelser
+
+Tekstspørgsmål bruges til:
+
+1. Navne, adresser, frie beskrivelser
+2. Åbne kommentarer eller feedback
+3. Koder, ID'er eller referencenumre, der ikke passer til integer/decimal
+4. Indsamling af tidsværdier med rtSurveys tidsinputudvidelser
+5. Autoudfyldningstekstfelter (via `search-autocomplete-noedit-v2()`)
+
+## Standard appearance-muligheder
+
+| Appearance | Beskrivelse |
+|------------|-------------|
+| *(ingen)* | Enkeltlinjet tekstinput |
+| `multiline` | Flerlinjers tekstområde — bedst til længere fritekst på web |
+
+## rtSurvey-tidsinputudvidelser
+
+rtSurvey udvider `text` med en **urpicker-widget** til indsamling af tidsværdier. Disse appearance-muligheder viser et urikon, intervieweren kan trykke på for at vælge timer, minutter, sekunder eller millisekunder.
+
+### Appearance-varianter
+
+| Appearance | Beskrivelse |
+|------------|-------------|
+| `inline` | Urikon vist ved siden af feltet |
+| `inline colors("RRGGBB")` | Urikon med brugerdefineret hexfarve |
+| `inline-1line` | Ur vist i kompakt enkeltradformat |
+| `inline-1line-RRGGBB` | Enkeltrad med brugerdefineret ikonfarve (hex, ingen `#`) |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Enkeltrad med to farver |
+| `inline-onlyresult` | Urikon forsvinder efter valg; kun værdien vises |
+| `inline-onlyresult colors("RRGGBB")` | Samme, med brugerdefineret ikonfarve |
+
+### Tidsformattokens
+
+Tilføj en formatstreng i parentes for at styre, hvilke tidskomponenter der vises:
+
+| Formatstreng | Viser |
+|--------------|-------|
+| `inline-[%H:%M]` | Timer og minutter (24-timers) |
+| `inline-[%h:%M]` | Timer og minutter (12-timers) |
+| `inline-[%H:%M:%S]` | Timer, minutter, sekunder (24-timers) |
+| `inline-[%h:%M:%S]` | Timer, minutter, sekunder (12-timers) |
+| `inline-[%H:%M:%3]` | Timer, minutter, millisekunder |
+| `inline-[%M:%S]` | Kun minutter og sekunder |
+| `inline-[%M:%3]` | Kun minutter og millisekunder |
+| `inline-[%S]` | Kun sekunder |
+| `inline-[%3]` | Kun millisekunder |
+| `inline-[%H]` | Kun timer (24-timers) |
+| `inline-[%h]` | Kun timer (12-timers) |
+
+### Eksempel: Registrer en opgavevarighed i minutter og sekunder
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | task_duration | Tid brugt på at gennemføre opgaven | `inline-[%M:%S]` |
+
+### Eksempel: Registrer en hændelsestid i 24-timers format med brugerdefineret farve
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | event_time | Tidspunkt for hændelse | `inline-1line colors("0099FF")` |
+
+## Dataformat
+
+Tekstdata gemmes og eksporteres som en ren streng. For tidsbaserede input ved brug af inline urwidgetten gemmes værdien i det format, der matcher den valgte formatstreng (f.eks. `14:32` for `%H:%M`).
+
+## Restriktioner og validering
+
+Anvend restriktioner til at håndhæve format, længde eller mønster:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| text | name | Fuldt navn | `string-length(.) >= 2` | Navn skal indeholde mindst 2 tegn |
+| text | code | Referencekode | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Indtast 2 store bogstaver efterfulgt af 4 cifre |
+| text | phone | Telefonnummer | `regex(., '^[0-9]{9,15}$')` | Indtast et gyldigt telefonnummer |
+
+## Bedste praksis
+
+1. Brug mere specifikke typer (`integer`, `decimal`, `date`), når data har en kendt struktur — dette forhindrer ugyldige indtastninger og forenkler analysen.
+2. Tilføj `constraint` med `string-length()` eller `regex()` til at validere koder eller ID'er.
+3. Brug `multiline` appearance til åbne spørgsmål, hvor respondenter kan skrive flere sætninger.
+4. Til tidsindsamling skal du vælge de tidsformattokens, der matcher den præcision, din analyse kræver — indsamling af millisekunder, når du kun har brug for minutter, spilder interviewerens indsats.
+
+## Platformunderstøttelse
+
+Tekstspørgsmålstypen og alle tidsinputappearances understøttes på iOS, Android og webplatforme.
+
+## Begrænsninger
+
+- Tekstsvar er friformatteret — der er ingen indbygget stavekontrol eller ordforrådsrestriktion ud over regex-mønstre.
+- Inline-tidswidgetten er en rtSurvey-udvidelse og er ikke en del af standard XLSForm-specifikationen.

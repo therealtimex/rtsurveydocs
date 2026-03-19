@@ -1,0 +1,160 @@
+---
+title: "高级重复"
+description: "重复组的高级模式：动态计数、嵌套重复、汇总重复数据以及跨重复引用值。"
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 295
+---
+
+本页介绍在 rtSurvey 中使用重复组的高级模式。有关设置重复组的基础知识，请参阅[分组与重复](../repeats)。
+
+---
+
+## 动态重复计数
+
+默认情况下，枚举员决定重复多少次。您可以使用 `repeat_count` 固定重复次数：
+
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | 家庭成员 | `${num_members}` |
+| text | member_name | 成员姓名 | |
+| integer | member_age | 年龄 | |
+| end_repeat | | | |
+
+重复恰好运行 `${num_members}` 次，其中 `num_members` 是在表单之前收集的。枚举员无法添加或删除实例。
+
+---
+
+## 索引访问：`indexed-repeat()`
+
+使用 `indexed-repeat(repeatedField, repeatGroup, index)` 从**重复组外部**访问特定重复实例的字段值：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+这对于构建摘要字段或在重复之后引用"主要"成员的数据很有用。
+
+---
+
+## 当前实例位置：`index()`
+
+在重复组内，`index()` 返回当前实例的从 1 开始的位置。用它来标记每次重复或创建唯一标识符：
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | 地块 |
+| note | plot_label | 地块编号 ${index()} |
+| text | plot_id | 地块 ID |
+| end_repeat | | |
+
+---
+
+## 在同一实例中引用字段
+
+在重复组内，使用 `${fieldname}` 引用**同一重复实例**中的另一个字段。在同一循环内无需使用 `indexed-repeat()`：
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | 成员 | |
+| text | member_name | 姓名 | |
+| integer | member_age | 年龄 | |
+| text | school_name | 学校名称 | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## 从重复组内引用父字段
+
+重复组外部（上方）的字段可以使用 `${fieldname}` 正常引用：
+
+| type | name | label |
+|------|------|-------|
+| text | village | 村庄名称 |
+| begin_repeat | plots | 农业地块 |
+| note | plot_context | ${village} 中的地块 |
+| end_repeat | | |
+
+---
+
+## 汇总重复数据
+
+在重复组**外部**使用重复聚合函数进行汇总：
+
+| 函数 | 示例 | 描述 |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | 实例数量 |
+| `sum(field)` | `sum(${loan_amount})` | 数字字段的总和 |
+| `min(field)` | `min(${member_age})` | 最小值 |
+| `max(field)` | `max(${member_age})` | 最大值 |
+| `join(sep, field)` | `join(', ', ${member_name})` | 逗号分隔的列表 |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | 条件计数 |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | 条件求和 |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | 条件连接 |
+
+### 示例：家庭摘要
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | 有多少成员？ | |
+| begin_repeat | members | 成员 | `${num_members}` |
+| text | member_name | 姓名 | |
+| integer | member_age | 年龄 | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | ${total_members} 名成员；${children_count} 名 18 岁以下。成年人：${adult_names} | |
+
+---
+
+## 嵌套重复
+
+重复组可以包含另一个重复组。谨慎使用——嵌套重复增加了复杂性，可能会让枚举员感到困惑。
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | 家庭 |
+| text | hh_id | 家庭 ID |
+| begin_repeat | hh_members | 成员 |
+| text | member_name | 成员姓名 |
+| end_repeat | | |
+| end_repeat | | |
+
+要从内部重复引用外部重复中的字段，使用 `${fieldname}`——它解析为最近的匹配祖先：
+
+在 `hh_members` 重复内，`${hh_id}` 返回**当前**家庭的 ID，而不是所有家庭。
+
+---
+
+## 重复组内的排序：`rank-index()`
+
+当 `rank` 字段存在于重复组内时，使用 `rank-index(instanceNumber, repeatedField)` 从外部获取特定实例的序数排名：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` 返回最高分的实例索引。
+
+---
+
+## 最佳实践
+
+1. 当重复次数提前已知时，始终使用 `repeat_count`——这可以防止枚举员意外添加或删除实例。
+2. 保持重复组专注——每个实例有 20 个以上问题的重复难以导航。
+3. 清晰命名重复组（例如，`household_members`，而不是 `repeat1`）——名称出现在函数调用和导出数据中。
+4. 使用预期的最大实例数进行测试，以验证性能。
+5. 在重复组上使用 `field-list` appearance，以在移动端每个实例的一个屏幕上显示所有字段。
+
+---
+
+## 限制
+
+- `indexed-repeat()` 需要有效的索引（1 到实例数量）——超出范围的索引返回空值。
+- 不建议超过 2 级的嵌套重复，可能会在某些客户端上导致显示问题。
+- 聚合函数（`sum`、`count` 等）作用于整个重复组——您无法在没有 `*-if` 变体的情况下聚合实例的子集。

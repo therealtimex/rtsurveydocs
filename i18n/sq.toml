@@ -1,0 +1,38 @@
+[lang_select_title]
+    other = "Zgjidhni gjuhën tuaj"
+
+[search_title]
+    other = "Kërko"
+
+[search_navigate]
+    other = "për të naviguar"
+
+[search_select]
+    other = "për të zgjedhur"
+
+[search_close]
+    other = "për të mbyllur"
+
+[search_cancel]
+    other = "anulo"
+
+[search_no_results]
+    other = "Asnjë rezultat për"
+
+[feedback_yes]
+    other = "Po"
+
+[feedback_no]
+    other = "Jo"
+
+[feedback_helpful]
+    other = "A ishte e dobishme kjo faqe?"
+
+[feedback_submit]
+    other = "Dërgo"
+
+[enable_light_mode]
+    other = "Aktivizo modalitetin e ndritshëm"
+
+[enable_dark_mode]
+    other = "Aktivizo modalitetin e errët"

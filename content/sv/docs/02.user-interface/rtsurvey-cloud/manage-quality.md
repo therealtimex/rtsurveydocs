@@ -1,0 +1,35 @@
+---
+title: "Hantera kvalitet"
+description: "Övervaka datainsamlingsframsteg, visa intervjukartor och analysera intervjuarprestanda."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 316
+---
+
+Modulen **Hantera kvalitet** (tillgänglig via dashboarden) tillhandahåller realtidsanalys och rumsliga visualiseringar för att övervaka datainsamlingsframsteg och intervjuarprestanda. Den erbjuder projektledare ett delat gränssnitt för att snabbt växla mellan enskilda frågeformulär och anpassade analytiska rapporter.
+
+![Dashboard för hantera kvalitet](/images/manage_quality.png)
+
+## Dashboardöversikt
+
+Dashboarden för hantera kvalitet är uppdelad i två primära navigeringsflikar: **Formulär** och **Rapporter**. Denna laterala meny låter användare effektivt söka och välja det specifika datasetet eller rapporten de vill analysera.
+
+### Formuläranalys
+
+När du väljer ett specifikt formulär från listan tillhandahåller dashboarden flera inbyggda visualiseringsverktyg för att spåra inlämningskvalitet och -frekvens:
+
+- **Antal efter starttid:** Ett stapeldiagram som visualiserar frekvensen av initierade intervjuer över tid.
+- **Antal efter sluttid:** Ett stapeldiagram som visualiserar när intervjuer slutfördes.
+- **Antal efter inlämningsdatum:** Spårar den dagliga volymen data som synkroniserats till servern.
+- **Antal efter användarnamn:** Ett stapeldiagram som identifierar de mest produktiva intervjuarna baserat på deras totala antal inlämningar.
+- **Karta över intervjuer:** En geografisk spridningskarta (driven av Leaflet) som visar GPS-koordinaterna för var varje inlämning ägde rum, vilket gör det möjligt för chefer att verifiera fältarbetsplatser.
+
+### Anpassade rapporter
+
+Fliken **Rapporter** ger åtkomst till förkonfigurerade R Markdown-analytiska designer och annan anpassad statistik. När en rapport väljs laddar huvudvisningsområdet dynamiskt den genererade analysen via ett inbäddat visningsprogram, vilket möjliggör djupare statistisk verifiering av insamlade data.
+
+## Sök och filtrering
+
+Ett snabbsökfält finns tillgängligt ovanför sidofältslistan, vilket låter användare snabbt hitta specifika formulär eller rapporter efter namn.

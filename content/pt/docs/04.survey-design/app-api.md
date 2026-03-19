@@ -1,0 +1,60 @@
+---
+title: "API da Aplicação"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 300
+---
+
+A AppAPI permite aos utilizadores carregar metadados do sistema a partir da aplicação usando diferentes métodos no FormEngine e DMView. Fornece acesso a várias chaves de dados para recuperar informação específica da aplicação.
+
+No xlsform, pode usar a função `pulldata()` com a seguinte sintaxe:
+
+
+{{< alert context="light" text="pulldata('app-api', 'data-key')" />}}
+
+- `'app-api'`: Esta palavra-chave informa o FormEngine para carregar os dados da API da Aplicação.
+- `'data-key'`: Esta é a chave dos dados que pretende carregar da API da Aplicação.
+- Se a chave de dados for inválida ou não suportada, o cálculo retornará "n/a".
+
+Aqui estão as chaves de dados suportadas que pode usar com a App-API:
+
+`osPlatform`: Retorna o nome atual do SO (Android ou iOS) e a versão do SO. As plataformas web retornarão um valor vazio.
+
+`appPlatform`: Retorna o nome da plataforma da aplicação, que é `rtSurvey`.
+
+`appVersion`: Retorna o nome da versão da aplicação.
+
+`getDisplayWidth`: Retorna a largura do ecrã do dispositivo em píxeis.
+
+`getDisplayHeight`: Retorna a altura do ecrã do dispositivo em píxeis.
+
+`getScreenSize`: Retorna o tamanho do ecrã do dispositivo em polegadas.
+
+`projectCode`: Retorna o código de projeto atual do site em que o utilizador está a iniciar sessão.
+
+`projectURL`: Retorna o URL de projeto atual do site em que o utilizador está a iniciar sessão. O valor predefinido/fallback é um texto vazio ("").
+
+`startingPoint`: Retorna o caminho do ponto que inicia o formulário. Consulte o "Ponto de partida do formulário" para mais detalhes.
+
+`serverTime`: Retorna a melhor aproximação disponível da data e hora no servidor.
+
+`user.[attribute]`: Retorna os atributos do utilizador atual com base na chave de atributo especificada. Consulte a tabela "Atributos de utilizador" para as chaves de atributo disponíveis.
+
+Combine as chaves de atributo abaixo com "user." nos parâmetros `pulldata()` para recuperar as informações do utilizador atual. Por exemplo, use `user.username`, `user.email`, etc.
+
+| Chave de Atributo        | Descrição                          |
+|----------------------|--------------------------------------|
+| username             | Nome de utilizador do utilizador                  |
+| name                 | Nome completo do utilizador                 |
+| staffCode            | Código de pessoal do utilizador                     |
+| phone                | Número de telefone do utilizador              |
+| email                | Endereço de email do utilizador             |
+| description          | Texto de descrição na informação do utilizador  |
+| organization_id      | ID da organização a que o utilizador pertence    |
+| organization_name    | Nome da organização a que o utilizador pertence  |
+| team_id              | ID da equipa a que o utilizador pertence            |
+| supervisor_id        | ID do supervisor do utilizador            |

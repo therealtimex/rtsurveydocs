@@ -1,0 +1,127 @@
+---
+weight: 3
+title: "Molndriftsättning"
+date: "2026-03-16T00:00:00+07:00"
+lastmod: "2026-03-16T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+icon: "cloud_upload"
+toc: true
+description: "Driftsätt rtCloud hos stora molnleverantörer med automatiserade skript för DigitalOcean, AWS EC2, Google Cloud och Linode."
+---
+
+Driftsättningsförrådet inkluderar automatiserade provisionsskript för stora molnleverantörer. Varje skript körs vid första starten av en ny **Ubuntu 22.04 LTS**-server och utför en helt obevakad konfiguration:
+
+- Installerar Docker och Docker Compose
+- Genererar säkra slumpmässiga lösenord för alla interna tjänster
+- Skriver `docker-compose.production.yml` och `.env`
+- Konfigurerar Nginx som omvänd proxy
+- Erhåller ett gratis TLS-certifikat från Let's Encrypt (försöker automatiskt tills DNS löser sig)
+- Konfigurerar UFW-brandväggen
+- Driftsätter valfritt den inbäddade Keycloak SSO-servern
+- Skriver ut en fullständig driftsättningssammanfattning med alla uppgifter
+
+Konfigurationen slutförs på **5–10 minuter** på en standardinstans.
+
+---
+
+## Välja ett skript
+
+Det finns flera skriptvarianter beroende på din molnleverantör och SSO-konfiguration:
+
+| Skript | Leverantör | SSO-läge | Bäst för |
+|--------|----------|----------|----------|
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Inbyggd Keycloak | Enkel, självständig SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak eller extern OIDC | Full kontroll |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Inbyggd Keycloak | Formulärbaserad konfiguration, enklast |
+| `linode-stackscript-oidc.sh` | Linode | Endast extern OIDC | Befintlig identitetsleverantör |
+| `linode-stackscript.sh` | Linode | Keycloak eller extern OIDC | Full kontroll |
+| `aws-ec2.sh` | AWS EC2 | Keycloak eller extern OIDC | AWS-driftsättningar |
+| `gcp-compute.sh` | Google Cloud | Keycloak eller extern OIDC | GCP-driftsättningar |
+
+> **Rekommenderat för de flesta användare:** Använd varianten `keycloak-embed`. Den inkluderar en inbyggd Keycloak-identitetsserver och kräver minst konfigurationsfält.
+
+---
+
+## Guide för serverkapacitet
+
+| Användningsfall | RAM | Disk | Exempel |
+|----------|-----|------|---------|
+| Utvärdering / utveckling | 2 GB | 25 GB | DO Basic 18 $/mån, t3.small, e2-small |
+| Litet team (< 50 användare) | 4 GB | 40 GB | DO Basic 24 $/mån, t3.medium, e2-medium |
+| Produktion (> 50 användare) | 8 GB | 80 GB | DO General 48 $/mån, t3.large, n2-standard-2 |
+
+> Inbäddad Keycloak kräver minst **4 GB RAM**. Använd 2 GB endast för utvärdering utan Keycloak.
+
+---
+
+## DNS-konfiguration
+
+Alla skript kräver en domän med en **A-post som pekar på din servers IP** innan Let's Encrypt kan utfärda ett certifikat.
+
+Skriptet skriver ut din server-IP tidigt i konfigurationsprocessen:
+
+```
+============================================================
+ Server-IP : 139.162.51.85
+ Lägg till denna DNS A-post nu om du inte redan gjort det:
+   myapp.example.com  ->  139.162.51.85
+ Skriptet försöker igen med Certbot var 60:e sekund tills DNS löser sig.
+============================================================
+```
+
+Skriptet **försöker automatiskt igen** med Let's Encrypt var 60:e sekund i upp till 1 timme. Lägg bara till DNS-posten och vänta — ingen omstart behövs.
+
+> **Hastighetsbegränsning:** Let's Encrypt tillåter maximalt **5 certifikat per domän per 7 dagar**. Undvik att driftsätta och ta bort servrar upprepade gånger med samma domän. Om du når gränsen visar skriptet en `försök igen efter`-tidsstämpel och stannar omedelbart.
+
+---
+
+## Checklista efter driftsättning
+
+- [ ] Appen öppnas på `https://din-domän.com`
+- [ ] Logga in med `admin` och lösenordet du konfigurerade
+- [ ] Alla containrar är friska: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypts förnyelse fungerar: `certbot renew --dry-run`
+- [ ] MySQL-port 3306 är **inte** exponerad: `ufw status`
+- [ ] Konfigurera en daglig databassäkerhetskopiering (se [Underhåll](../maintenance))
+
+---
+
+## Felsökning
+
+### Kontrollera hela konfigurationsloggen
+
+```bash
+# Linode
+tail -200 /var/log/stackscript.log
+
+# DigitalOcean / AWS / GCP
+tail -200 /var/log/rtcloud-setup.log
+```
+
+### Let's Encrypt-hastighetsbegränsning
+
+Om du ser `too many certificates` i loggen har du nått gränsen på 5 certifikat/7 dagar. Loggen visar den exakta tidpunkten för nytt försök:
+
+```
+[SSL] FEL: Let's Encrypt-hastighetsgräns nådd. försök igen efter 2026-03-15 16:22 UTC.
+```
+
+Vänta tills den tidpunkten och driftsätt sedan igen.
+
+### Keycloak förblir ohälsosam
+
+Se till att servern har minst 4 GB RAM och kontrollera sedan loggarna:
+
+```bash
+docker logs rtcloud-keycloak --tail 50
+free -h
+```
+
+### SSL-konfiguration tillämpas inte efter certbot
+
+Om certifikatet utfärdades men Nginx fortfarande visar enbart HTTP, kontrollera loggen för felraden och ladda om Nginx manuellt:
+
+```bash
+nginx -t && systemctl reload nginx
+```

@@ -1,0 +1,47 @@
+---
+title: "Felhasználók kezelése"
+description: "Rendszerfelhasználók és terepi munkatársak létrehozása, rendszerezése és kezelése."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 314
+---
+
+A **Felhasználók kezelése** modul (a Beállítások menüben gyakran **Munkatársak kezelése** néven jelenik meg) a CPMS-környezetben lévő összes fiók kezelésének centralizált könyvtára. Projektrendszergazdáknak nyújtja a személyzet felvételéhez, szerepkörök kiosztásához és a földrajzi hozzáférési szintek meghatározásához szükséges eszközöket.
+
+![Felhasználókezelő felület](/images/manage_users.png)
+
+## Felhasználói rács áttekintése
+
+A fő felület átfogó rácsot tartalmaz, amely az összes regisztrált munkatársat jeleníti meg. Ez a nézet lehetővé teszi a rendszergazdák számára a fiókállapotok gyors keresését, szűrését és felülvizsgálatát.
+
+### Főbb adatoszlopok
+
+A rács a következő alapvető adatokat tartalmazza minden felhasználóhoz:
+
+- **Felhasználónév és teljes név:** A munkatárs elsődleges azonosítói.
+- **E-mail:** A fiókhoz tartozó kapcsolattartási e-mail cím.
+- **Felhasználói szerepkör:** Jelzi a felhasználónak biztosított rendszerjogosultságokat (pl. Rendszergazda, Munkatárs, Monitor, Vendég).
+- **Csoport:** Megjeleníti az adott felhasználói csoportot vagy csapatot, amelyhez a munkatárs tartozik.
+- **Állapot:** Jelzi, hogy a fiók jelenleg **Aktív** vagy **Inaktív**-e.
+- **Létrehozás dátuma:** A fiók regisztrálásának időbélyege.
+
+## Munkatárs-kezelési műveletek
+
+A rendszergazdák hozzáférnek a felhasználói fiókok felvételéhez és karbantartásához szükséges eszközkészlethez, amelyek a felső vezérlőpanelről érhetők el:
+
+- **Munkatárs hozzáadása:** Megnyit egy részletes létrehozási űrlapot egy új felhasználó profiljának kézi megadásához, beleértve szerepkörét, kijelölt régióit és kapcsolattartási adatait.
+- **Munkatársak importálása:** Lehetővé teszi a tömeges fióklétrehozást Excel-táblázat feltöltésével. Ez különösen hasznos nagy terepi csapatok gyors felállításakor.
+- **Importálási sablon letöltése:** Biztosítja a tömeges importálási folyamathoz szükséges szabványosított `.xlsx` sablont.
+- **Exportálás Excelbe:** Letölthető jelentést generál, amely tartalmazza a jelenlegi rács szűrt felhasználólistáját és adatait.
+- **Törlés:** Véglegesen eltávolítja a kiválasztott felhasználói fiókokat a rendszerből.
+
+## Felhasználói profilok és hozzárendelések
+
+Egy adott felhasználó létrehozásakor vagy szerkesztésekor (a **Munkatárs hozzáadása** gomb vagy a Felhasználónévre kattintás révén) a rendszergazdák részletes profilokat konfigurálhatnak:
+
+- **Személyes adatok:** Mezők a születési dátumhoz, nemhez, azonosítószámhoz és avatárhoz.
+- **Kapcsolattartási adatok:** Mobiltelefonszám és részletes helyszíninformációk (megye, körzet, kerület, cím).
+- **Rendszerhozzárendelések:** Az adatbiztonság szempontjából kritikus, a rendszergazdák összekapcsolhatják a felhasználókat meghatározott **Régiókkal** és pontos **Felhasználói szerepköröket** rendelhetnek hozzájuk.
+- **Felügyelői konfiguráció:** Speciális beállításoknál a felhasználókhoz meghatározott felügyeleti kódok rendelhetők, vagy meghatározott táblagépekhez (eszközökhöz) kapcsolhatók.

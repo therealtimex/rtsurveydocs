@@ -1,0 +1,139 @@
+---
+title: "Utseende"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 288
+---
+
+`appearance`-kolonnen i rtSurvey lar deg tilpasse den visuelle presentasjonen og oppførselen til spørsmål i spørreundersøkelsene dine. Denne funksjonen forbedrer brukeropplevelsen og kan øke effektiviteten ved datainnsamling betydelig. rtSurvey støtter standard XLSForm-utseendeattributter og utvider dem med ytterligere alternativer.
+
+## Standard XLSForm-utseendeattributter
+
+rtSurvey støtter følgende standard XLSForm-utseendeattributter:
+
+| Utseendeattributt | Spørsmålstyper | Beskrivelse |
+|-------------------|----------------|-------------|
+| multiline | text | Oppretter et flerlinjers tekstfelt (best for webklienter) |
+| minimal | select_one, select_multiple | Viser alternativer i en nedtrekksmeny |
+| quick | select_one | Går automatisk videre til neste spørsmål etter valg (kun mobil) |
+| no-calendar | date | Skjuler kalendervisningen (kun mobil) |
+| month-year | date | Tillater valg av måned og år kun |
+| year | date | Tillater valg av år kun |
+| horizontal-compact | select_one, select_multiple | Viser alternativer horisontalt (kun web) |
+| horizontal | select_one, select_multiple | Viser alternativer horisontalt i kolonner (kun web) |
+| likert | select_one | Presenterer alternativer som en Likert-skala |
+| compact | select_one, select_multiple | Viser alternativer side om side med minimal polstring |
+| quickcompact | select_one | Kombinerer kompakt visning med automatisk fremgang (kun mobil) |
+| field-list | groups | Viser hele gruppen på én skjerm (kun mobil) |
+| label | select_one, select_multiple | Viser alternativtekster uten inndata |
+| list-nolabel | select_one, select_multiple | Viser inndata uten tekster (bruk med `label`) |
+| table-list | groups | Viser spørsmål i tabellformat |
+| signature | image | Aktiverer signaturregistrering (kun mobil) |
+| draw | image | Tillater frihåndstegning (kun mobil) |
+| map, quick map | select_one, select_one_from_file | Aktiverer valg fra kartfunksjoner |
+
+## Beste praksis for bruk av utseende
+
+1. **Konsistens**: Bruk utseendeattributter konsekvent i hele spørreundersøkelsen for et enhetlig utseende.
+2. **Mobil vs. web**: Vurder hvordan utseender vil vises på ulike enheter og plattformer.
+3. **Ytelse**: Vær forsiktig med utseendeattributter som kan bremse skjemalastingen (f.eks. `table-list` for store grupper).
+4. **Brukeropplevelse**: Velg utseender som gjør datainntasting enklere og mer intuitiv for respondentene.
+5. **Testing**: Test alltid skjemaet på målenheter for å sikre at utseender fungerer som forventet.
+
+## Avanserte teknikker
+
+### Kombinere utseender
+
+Noen utseendeattributter kan kombineres for mer komplekse oppsett:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Velg én: | minimal compact |
+```
+
+### Dynamiske utseender
+
+rtSurvey tillater dynamiske utseendeendringer basert på skjemalogikk:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Skriv inn tid: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Hensyn til mobilapp
+
+- Noen utseender (f.eks. `quick`, `signature`) er spesifikke for mobile enheter.
+- Test grundig på både Android og iOS for å sikre konsistent adferd.
+
+## rtSurvey utvidede utseendeattributter
+
+I tillegg til standard XLSForm-utseender støtter rtSurvey følgende plattformspesifikke alternativer:
+
+### Data- og visningskontroll
+
+| Utseendeattributt | Spørsmålstyper | Beskrivelse |
+|-------------------|----------------|-------------|
+| `invisible` | enhver | Skjuler feltet fra visningen mens det fortsatt samler inn eller beregner verdien. Forskjellig fra `hidden`-type — feltet deltar fortsatt i logikken. |
+| `displaytitle` | enhver | Tvinger visning av feltets etikett/tittel selv om det ellers ville blitt undertrykt. |
+| `autopull` | select_one, select_multiple | Henter automatisk eksterne data for å fylle ut alternativer når skjemaet lastes eller et triggerfelt endres. |
+| `floating_hint` | text, integer, decimal | Viser hintteksten som en flytende etikett over inndatafeltet i stedet for under det. |
+| `calculate-button` | calculate | Legger til en synlig knapp som utløser omberegning av feltet på forespørsel, i stedet for å beregne automatisk. |
+
+### Oppsett
+
+| Utseendeattributt | Spørsmålstyper | Beskrivelse |
+|-------------------|----------------|-------------|
+| `1screen` | group | Tvinger hele gruppen til å vises på én skjerm uavhengig av gruppestørrelse. |
+| `columns(n)` | select_one, select_multiple | Viser alternativer i `n` kolonner. Eksempel: `columns(3)` viser tre kolonner med radioknapper. |
+| `gridformat<row=R col=C colspan=S align=center>` | enhver | Plasserer feltet i et CSS-grid-oppsett ved rad `R`, kolonne `C`, med `S` kolonner. Brukes med `advanced-extension/grid-layout`. |
+| `ignore-simplify` | enhver | Instruerer skjemaviseren til å hoppe over automatisk forenkling eller komprimering av dette feltets oppsett. |
+
+### Widgets
+
+| Utseendeattributt | Spørsmålstyper | Beskrivelse |
+|-------------------|----------------|-------------|
+| `likert` | select_one | Presenterer alternativer som en Likert-skalarad (allerede i standardtabellen ovenfor; bekreftet støttet). |
+| `distress` | select_one | Gjengir alternativer som Kessler Psychological Distress Scale (K10) visuell widget med emosjonelle ikoner. |
+
+### API-integrasjon
+
+| Utseendeattributt | Spørsmålstyper | Beskrivelse |
+|-------------------|----------------|-------------|
+| `callapi` | text, integer, decimal, select_one | Aktiverer API-kallintegrasjon for dette feltet. Beregningskolonnen skal inneholde et `callapi()`-uttrykk. Se [Call API](advanced-extension/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Utløser et API-verifiseringskall med statiske parametere. Skjemaet blokkerer fremgang til API-en bekrefter verdien. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Samme som `callapi-verify`, men med parametere avledet fra andre feltverdier ved kjøretid. |
+
+### Innebygd dato/klokkeslettformat
+
+For `date`-, `time`- og `datetime`-felt kan du angi et tilpasset visningsformat ved å legge til en formatstreng til utseendet:
+
+```
+inline-[%d/%m/%Y]
+inline-1line-[%d/%m/%Y %H:%M]
+```
+
+Formattokener er de samme som for `format-date()` og `format-date-time()`. Se [Funksjoner — Dato og klokkeslettfunksjoner](operators-and-functions/functions#dato-og-klokkeslettfunksjoner).
+
+Eksempel:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| datetime | event_time | Hendelsesdato og -tid | inline-[%d/%m/%Y %I:%M %p] |
+| date | birth_date | Fødselsdato | inline-[%d/%m/%Y] |
+
+## Kjente begrensninger
+
+- Komplekse utseender kan ikke gjengis identisk på alle plattformer.
+- Noen avanserte rtSurvey-utseender støttes kanskje ikke i frakoblet modus.
+
+## Feilsøking av utseendeproblemer
+
+1. **Utseende ikke brukt**: Sjekk for skrivefeil i utseendekolonnen.
+2. **Inkonsistent gjengivelse**: Verifiser kompatibilitet med spørsmålstypen og plattformen.
+3. **Ytelsesproblemer**: Vurder å forenkle komplekse utseender, spesielt for store spørreundersøkelser.

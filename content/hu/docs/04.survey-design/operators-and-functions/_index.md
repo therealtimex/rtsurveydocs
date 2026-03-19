@@ -1,0 +1,59 @@
+---
+title: "Operátorok és függvények"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 290
+---
+
+Az rtSurvey-ben a kifejezések az **XPath 1.0** egy részhalmazában íródnak, JavaRosa/ODK-függvényekkel és egyedi rtSurvey-függvényekkel kiegészítve. Kifejezéseket a `calculate`, `constraint`, `relevant`, `required` és `default` oszlopokban használhat az XLSForm-ban.
+
+## Mezőértékekre való hivatkozás
+
+Használja a `${mezőnév}` értéket egy másik mező értékére való hivatkozáshoz:
+
+```
+${age} > 18
+```
+
+A `.` (egyetlen pont) az **aktuális mező értékére** hivatkozik – általában a `constraint` kifejezésekben használatos:
+
+```
+. >= 0 and . <= 100
+```
+
+A `..` a szülőcsoportra hivatkozik (haladó használat ismétlésekben).
+
+## Kifejezés szintaxis
+
+A kifejezések a standard XPath-szabályokat követik:
+
+- A **karakterláncokat** egyszeres idézőjelbe kell tenni: `'yes'`
+- A **számokat** önmagukban kell írni: `42`, `3.14`
+- A **boolean** eredményeket a `relevant`, `required` és `constraint` mezőkben használják – minden nem üres, nem nulla érték igaznak számít
+- Az operátorok körüli szóközök figyelmen kívül maradnak
+
+{{% alert icon=" " context="warning" %}}
+Mindig egyenes idézőjeleket (`'` vagy `"`) használjon – soha ne "okos idézőjeleket" (görbe idézőjeleket). A szövegszerkesztők gyakran automatikusan konvertálják az egyenes idézőjeleket, ami tönkreteszi a kifejezéseket.
+{{% /alert %}}
+
+## Fejezetek ebben a fejezetben
+
+- **[Operátorok](operators)** — összehasonlítási operátorok (`=`, `!=`, `>`, `<`, `>=`, `<=`) és logikai operátorok (`and`, `or`, `not()`)
+- **[Függvények](functions)** — karakterlánc-, kiválasztás-, szám-, dátum/idő-, boolean-, geo- és segédfüggvények
+- **[Hivatkozások](references)** — hogyan hivatkozzon mezőkre és kontextusértékekre
+
+## Gyors példák
+
+| Felhasználási eset | Kifejezés |
+|----------|------------|
+| Megjelenítés, ha a kor 18 felett van | `${age} > 18` |
+| Megjelenítés csak ha "yes" lett kiválasztva | `${consent} = 'yes'` |
+| Kötelező, ha egy másik mező nem üres | `${name} != ''` |
+| Összeg kiszámítása | `${adults} + ${children}` |
+| Név összefűzése | `concat(${first_name}, ' ', ${last_name})` |
+| Mai dátum | `today()` |
+| Ellenőrzés, hogy ki lett-e választva egy lehetőség | `selected(${interests}, 'sports')` |

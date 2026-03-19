@@ -1,0 +1,71 @@
+---
+title: "Range"
+description: "Range ప్రశ్నలు ప్రతిస్పందించే వ్యక్తులు నిర్వచించిన minimum మరియు maximum విలువ మధ్య slider లాగడం ద్వారా సంఖ్య ఎంచుకోవడానికి అనుమతిస్తాయి."
+icon: "sliders"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 238
+---
+
+`range` ప్రశ్న రకం **slider** (లేదా సమకక్ష input) చూపిస్తుంది, ఇది ప్రతిస్పందించే వ్యక్తులు నిర్వచించిన minimum మరియు maximum మధ్య సంఖ్య ఎంచుకోవడానికి అనుమతిస్తుంది. Ratings, satisfaction scores, లేదా constraint ఉన్న input దృశ్యంగా పరిమితి చేయాలనుకున్న ఏ సంఖ్యా విలువ కోసం ఉపయోగించడానికి ఇది అనుకూలంగా ఉంది.
+
+## ప్రాథమిక XLSForm స్పెసిఫికేషన్
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | satisfaction | How satisfied are you with the service? | start=1 end=5 step=1 |
+
+`parameters` కాలమ్ slider bounds మరియు step size నిర్వచిస్తుంది:
+
+| Parameter | వివరణ | డిఫాల్ట్ |
+|-----------|--------|---------|
+| `start` | కనిష్ట విలువ (inclusive) | 0 |
+| `end` | గరిష్ట విలువ (inclusive) | 10 |
+| `step` | చెల్లుబాటు విలువల మధ్య పెరుగుదల | 1 |
+
+ప్రామాణిక range ప్రశ్న రకంపై మరిన్ని వివరాలకు, [XLSForm specification](https://xlsform.org/en/#question-types) చూడండి.
+
+## వినియోగాలు
+
+Range ప్రశ్నలు సాధారణంగా వీటికి ఉపయోగిస్తారు:
+
+1. Satisfaction లేదా rating scales (ఉదా. 1–5 లేదా 0–10)
+2. Likert-శైలి సంఖ్యా scales
+3. కేవలం discrete విలువలు చెల్లుబాటు అయినప్పుడు కొలతలు సేకరించడం
+4. వయసు brackets లేదా score ranges ఇక్కడ slider text field కంటే usability మెరుగుపరుస్తుంది
+
+## ఉదాహరణ వినియోగం
+
+### ప్రాథమిక rating scale
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | overall_rating | Overall rating (0–10) | start=0 end=10 step=1 |
+
+### Decimal step
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | weight_kg | Weight (kg) | start=0 end=200 step=0.5 |
+
+### లెక్కింపులో విలువ ఉపయోగించడం
+
+| type | name | label | parameters | calculation |
+|------|------|-------|------------|-------------|
+| range | score | Test score (0–100) | start=0 end=100 step=5 | |
+| calculate | grade | | | if(${score} >= 90, 'A', if(${score} >= 80, 'B', if(${score} >= 70, 'C', 'F'))) |
+| note | grade_note | Your grade is: ${grade} | | |
+
+## ఉత్తమ పద్ధతులు
+
+1. ఎల్లప్పుడూ అర్థవంతమైన `start`, `end`, మరియు `step` విలువలు సెట్ చేయండి — defaults పై ఆధారపడకండి.
+2. ప్రతిస్పందించే వ్యక్తులకు context అందించడానికి `hint` కాలమ్‌లో మీ scale చివరలు label చేయండి (ఉదా. `hint: 0 = Very dissatisfied, 10 = Very satisfied`).
+3. 5-point Likert scales కోసం, ప్రతిస్పందించే వ్యక్తులు "1" అత్యల్పాన్ని అర్థం చేసుకుంటారు కాబట్టి 0–4 కాకుండా `start=1 end=5 step=1` ఉపయోగించండి.
+4. Input యొక్క పరిమిత స్వభావం ప్రశ్న డిజైన్‌లో భాగం అయినప్పుడు `integer` + constraint కంటే `range` ఉపయోగించండి.
+
+## పరిమితులు
+
+- చాలా విస్తృత ranges కు (ఉదా. 0–10000) slider widget అనుకూలంగా ఉండకపోవచ్చు — అలాంటి సందర్భాలలో constraints తో text `integer` మరింత user-friendly.
+- మొబైల్ పరికరాలపై, చక్కని step విలువలు (ఉదా. `step=0.1`) touch slider తో ఖచ్చితంగా నియంత్రించడం కష్టం.

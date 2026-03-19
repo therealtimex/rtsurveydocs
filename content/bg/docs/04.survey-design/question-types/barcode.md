@@ -1,0 +1,65 @@
+---
+title: "Баркод"
+description: "Въпросите от тип баркод позволяват сканиране и заснемане на данни от баркод в анкетата."
+icon: "qr_code_scanner"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 231
+---
+
+The barcode question type in XLSForms and rtSurvey enables users to scan and capture barcode data directly within the survey. This feature is particularly useful for inventory management, product tracking, or any scenario where quick and accurate data entry of coded information is required.
+
+## Basic XLSForm Specification
+
+| type    | name          | label                   |
+|---------|---------------|-------------------------|
+| barcode | product_code  | Scan the product barcode|
+
+For more details on the basic barcode question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+
+## Uses
+
+Barcode questions are commonly used for:
+
+1. Product identification in inventory surveys
+2. Asset tracking in field operations
+3. Ticket or ID verification at events
+4. Quick data entry for coded information
+
+## rtSurvey Extensions
+
+While the basic XLSForm specification for barcode questions is straightforward, rtSurvey may offer additional features or customizations. These could include:
+
+1. Support for multiple barcode formats (e.g., QR codes, UPC, EAN)
+2. Integration with device camera for barcode scanning
+3. Manual entry option in case the barcode is damaged or can't be scanned
+
+(Note: The specific extensions available in rtSurvey for barcode questions would need to be confirmed and detailed here.)
+
+## Best Practices
+
+1. Ensure proper lighting conditions for accurate barcode scanning.
+2. Provide clear instructions to users on how to position the device for scanning.
+3. Include a manual entry option as a fallback in case of scanning difficulties.
+4. Test the barcode scanning feature with various devices and barcode types before deploying the survey.
+
+## Limitations
+
+- Barcode scanning accuracy may vary depending on the device's camera quality and environmental conditions.
+- Some older or low-end devices may not support barcode scanning.
+- Certain barcode types may not be supported, depending on the implementation.
+
+## Example Usage
+
+Here's an example of how you might use a barcode question in an inventory survey:
+
+| type    | name          | label                   | hint                                      |
+|---------|---------------|-------------------------|-------------------------------------------|
+| barcode | product_code  | Scan the product barcode| Position the barcode within the frame     |
+| integer | quantity      | Enter product quantity  |                                           |
+| note    | confirmation  | Product scanned: ${product_code}. Quantity: ${quantity} |           |
+
+In this example, the survey captures a product's barcode, asks for the quantity, and then displays a confirmation note with the scanned information.
+

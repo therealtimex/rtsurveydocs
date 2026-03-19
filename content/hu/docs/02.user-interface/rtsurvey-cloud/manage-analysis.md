@@ -1,0 +1,41 @@
+---
+title: "Elemzések kezelése"
+description: "Elemzési jelentések létrehozása, konfigurálása és megtekintése az RT-CPMS felmérési adataihoz."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 317
+---
+
+Az RT-CPMS **Elemzések kezelése** modulja átfogó eszközkészletet biztosít a felmérési adatok feldolgozásához és vizualizálásához. Két elsődleges részre oszlik, amelyek a globális navigációs oldalsávból érhetők el: **Elemzési fejlesztés** és **Elemzések és jelentések**.
+
+![Elemzéskezelő felület](/images/manage_analysis.png)
+
+## Elemzési fejlesztés
+
+Az **Elemzési fejlesztés** szakasz centralizált hubot biztosít az új elemzési tervek létrehozásához és konfigurálásához. Itt határozzák meg a kutatók és az adatkezelők, hogyan kell feldolgozni és táblázatba foglalni a nyers felmérési adatokat.
+
+### Az elemzési fejlesztés főbb funkciói
+- **Új tervek létrehozása:** Használja a kiemelkedő **Új elemzés +** gombot egy új jelentéssablon vagy elemzési terv létrehozásának megkezdéséhez.
+- **Meglévő tervek kezelése:** A fő rács átfogó áttekintést nyújt az összes elemzési modellről, megjelenítve a főbb metaadatokat, mint:
+  - Azonosító és cím/leírás
+  - Kategorizáláshoz szükséges címkék
+  - Verziókövetés
+  - Létrehozási és frissítési időbélyegek
+  - Szerzői információk
+- **Keresés és szűrés:** Könnyen megtalálhatja az adott terveket a beépített keresési és szűrési eszközök segítségével minden oszlopon.
+- **Gyors műveletek:** Az adott terveket közvetlenül a rács műveleti menüjéből tekintheti meg, szerkesztheti vagy törölheti.
+
+## Elemzések és jelentések
+
+Miután egy elemzési terv létrejön és lefut, az **Elemzések és jelentések** szakaszban léphet interakcióba a generált üzleti intelligencia (BI) kimenettel.
+
+### Az elemzések és jelentések főbb funkciói
+- **Jelentés navigációs oldalsáv:** Gyorsan válthat a különböző elérhető jelentések között a dedikált bal oldali panel segítségével.
+- **Keresés és szűrés:** Használja a keresősávot vagy az „Összes elemzés" legördülő szűrőt a jelentések listájának szűkítéséhez.
+- **Kedvencek:** Jelölje meg a fontos vagy gyakran használt jelentéseket kedvencként a jövőbeli gyorsabb eléréshez.
+
+## Irányítópult integráció
+
+A gyors áttekintés érdekében a fő **Kezdőlap irányítópult** egy dedikált **Jelentések** fület tartalmaz az elsődleges Űrlapok nyomkövetője mellett. Ez a fül azonnali hozzáférést biztosít a jelentésekhez közvetlenül az adminisztrátori vezérlőközpontból, lehetővé téve az adatgyűjtési folyamat és az elemzési kimenetek zökkenőmentes nyomon követését.

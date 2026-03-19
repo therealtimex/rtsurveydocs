@@ -1,0 +1,146 @@
+---
+title: "Zoskupovanie otázok"
+description: ""
+icon: "auto_awesome"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 250
+---
+
+Skupiny v XLSForm umožňujú organizovať súvisiace otázky dohromady, čím zlepšujú štruktúru vášho prieskumu a rozširujú možnosti analýzy dát. rtSurvey plne podporuje skupiny XLSForm a rozširuje ich funkcionalitu o ďalšie funkcie.
+
+## Základná štruktúra skupiny
+
+Na vytvorenie skupiny otázok použite syntax `begin_group` a `end_group`:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | respondent | Informácie o respondentovi                   |
+| text         | name       | Zadajte meno respondenta              |
+| text         | position   | Zadajte pozíciu respondenta          |
+| end_group    |            |                                          |
+```
+
+Kľúčové body:
+- Riadok `begin_group` vyžaduje `name` a `label`.
+- Riadok `end_group` nepotrebuje meno ani popisok.
+- Otázky medzi `begin_group` a `end_group` sú súčasťou skupiny.
+
+## Vzhľad skupiny
+
+rtSurvey podporuje rôzne možnosti vzhľadu pre skupiny:
+
+1. **field-list**: Zobrazí viacero otázok na rovnakej obrazovke.
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | respondent | Respondent| field-list |
+   | text         | name       | Meno      |            |
+   | text         | position   | Pozícia   |            |
+   | end_group    |            |           |            |
+   ```
+
+2. **grid**: Vytvorí kompaktné, tabuľkové rozloženie pre skupiny (špecifické pre rtSurvey).
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | household  | Domácnosť | grid       |
+   | text         | member_name| Meno      |            |
+   | integer      | member_age | Vek       |            |
+   | end_group    |            |           |            |
+   ```
+
+3. **collapsible**: Vytvorí rozbaľovacie/zbaľovacie skupiny (špecifické pre rtSurvey).
+   ```
+   | type         | name       | label     | appearance  |
+   |--------------|------------|-----------|-------------|
+   | begin_group  | details    | Podrobnosti   | collapsible |
+   | text         | address    | Adresa   |             |
+   | text         | phone      | Telefón     |             |
+   | end_group    |            |           |             |
+   ```
+
+## Vnorené skupiny
+
+Skupiny môžu byť vnorené do iných skupín pre komplexnejšie štruktúry:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | hospital   | Informácie o nemocnici                     |
+| text         | hosp_name  | Aký je názov tejto nemocnice?       |
+| begin_group  | medication | Dostupnosť liekov                  |
+| select_one y_n| hiv_meds  | Má táto nemocnica lieky na HIV?  |
+| end_group    |            |                                          |
+| end_group    |            |                                          |
+```
+
+**Poznámka**: Vždy ukončite naposledy začatú skupinu ako prvú, aby ste zachovali správne vnorenie.
+
+## Logika preskakovania pre skupiny
+
+Použite stĺpec `relevant` na implementáciu logiky preskakovania pre celé skupiny:
+
+```
+| type         | name   | label                                        | relevant        |
+|--------------|--------|----------------------------------------------|-----------------|
+| integer      | age    | Koľko máte rokov?                             |                 |
+| begin_group  | child  | Dieťa                                        | ${age} <= 5     |
+| integer      | muac   | Zaznamenajte obvod stredu ramena dieťaťa   |                 |
+| select_one y_n| mrdt  | Je rýchly diagnostický test dieťaťa pozitívny?|                |
+| end_group    |        |                                              |                 |
+```
+
+V tomto príklade sa skupina `child` zobrazí iba vtedy, ak je vek respondenta 5 rokov alebo menej.
+
+## Najlepšie postupy pre používanie skupín
+
+1. Používajte zmysluplné názvy pre skupiny na zlepšenie analýzy dát.
+2. Udržujte skupiny zamerané na súvisiace otázky.
+3. Používajte vnorené skupiny uvážlivo, aby ste sa vyhli príliš zložitým štruktúram.
+4. Dôkladne testujte logiku preskakovania pri použití `relevant` na skupiny.
+5. Zvážte použitie vzhľadu `field-list` pre krátke skupiny na zníženie rolovania.
+6. Využívajte rozloženie mriežky rtSurvey na kompaktné zobrazenie súvisiacich informácií.
+7. Používajte zbaľovacie skupiny pre dlhé formuláre na zlepšenie navigácie.
+
+## Funkcie špecifické pre rtSurvey
+
+1. **Rozloženie mriežky**: Použite vzhľad `grid` pre tabuľkové zobrazenia.
+2. **Zbaľovacie skupiny**: Implementujte vzhľad `collapsible` pre rozbaľovacie sekcie.
+3. **Vlastné štýlovanie**: Aplikujte vlastné CSS na skupiny pre jedinečné vizuálne dizajny.
+4. **Dynamické správanie skupiny**: Implementujte komplexnú logiku preskakovania a výpočty vo vnútri skupín.
+
+## Podpora viacerých jazykov
+
+rtSurvey podporuje viacjazyčné skupiny. Použite stĺpce špecifické pre jazyk pre popisky:
+
+```
+| type         | name       | label::Slovenčina | label::Angličtina |
+|--------------|------------|----------------|---------------|
+| begin_group  | personal   | Osobné údaje  | Personal Info  |
+| text         | name       | Meno           | Name           |
+| end_group    |            |                |               |
+```
+
+## Úvahy pre mobilnú aplikáciu
+
+- Skupiny so vzhľadom `field-list` sa zobrazujú ako jedna obrazovka v mobilnej aplikácii.
+- Zbaľovacie skupiny môžu zlepšiť navigáciu na menších obrazovkách.
+- Rozloženia mriežky sa môžu prispôsobiť pre lepšiu viditeľnosť na mobilných zariadeniach.
+
+## Známe obmedzenia
+
+- Extrémne hlboké vnorenie skupín môže ovplyvniť výkon na niektorých zariadeniach.
+- Niektoré pokročilé možnosti štýlovania nemusia byť dostupné pre skupiny v mobilnej aplikácii.
+
+## Riešenie problémov so skupinami
+
+1. Uistite sa, že každé `begin_group` má zodpovedajúce `end_group`.
+2. Skontrolujte, že názvy skupín sú v rámci formulára jedinečné.
+3. Overte, že logika preskakovania odkazuje na správne názvy otázok.
+4. Dôkladne testujte skupiny na webovom aj mobilnom rozhraní.
+
+Efektívnym používaním skupín vo vašich XLSForms s rtSurvey môžete vytvárať dobre organizované, efektívne prieskumy, ktoré zlepšujú skúsenosti so zberom dát aj kvalitu analýzy dát.

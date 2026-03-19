@@ -1,0 +1,117 @@
+---
+title: "Hanya-baca"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 287
+---
+
+Bidang hanya-baca di rtSurvey memungkinkan Anda menampilkan informasi yang tidak dapat diedit oleh responden. Fitur ini sangat berguna untuk menampilkan data yang telah diisi sebelumnya, hasil kalkulasi, atau informasi yang harus tetap konstan sepanjang survei.
+
+## Penggunaan Dasar
+
+Untuk membuat bidang hanya-baca, gunakan kolom `read_only` dalam XLSForm Anda:
+
+```
+| type    | name | label                 | read_only | default |
+|---------|------|----------------------|-----------|---------|
+| integer | num  | Nomor pasien adalah:  | yes       | 5       |
+```
+
+Dalam contoh ini, nomor pasien ditetapkan ke 5 dan tidak dapat diubah oleh responden.
+
+## Menggabungkan Hanya-Baca dengan Nilai Default
+
+Bidang hanya-baca sering digunakan bersama dengan nilai default untuk menampilkan informasi yang telah ditentukan sebelumnya atau yang dihitung:
+
+```
+| type    | name     | label               | read_only | default        |
+|---------|----------|---------------------|-----------|----------------|
+| text    | username | Pengguna masuk:     | yes       | ${current_user}|
+| date    | today    | Tanggal hari ini:   | yes       | today()        |
+```
+
+Di sini, nama pengguna dan tanggal saat ini ditampilkan tetapi tidak dapat diedit.
+
+## Fitur Khusus rtSurvey
+
+### Hanya-Baca Kondisional
+
+rtSurvey memperluas fungsionalitas hanya-baca dengan logika kondisional:
+
+```
+| type    | name     | label           | read_only                |
+|---------|----------|-----------------|--------------------------|
+| integer | age      | Usia:           | ${role} = 'viewer'       |
+| text    | comments | Komentar:       | selected(${status}, 'closed') |
+```
+
+Dalam contoh-contoh ini:
+- Bidang 'age' hanya-baca hanya jika peran pengguna adalah 'viewer'.
+- Bidang 'comments' menjadi hanya-baca jika status adalah 'closed'.
+
+### Status Hanya-Baca Dinamis
+
+rtSurvey memungkinkan Anda mengubah status hanya-baca secara dinamis:
+
+```
+| type      | name     | label    | read_only              |
+|-----------|----------|----------| ----------------------|
+| text      | address  | Alamat:  | ${edit_mode} = 'false' |
+```
+
+Ini memungkinkan Anda beralih antara mode dapat diedit dan hanya-baca berdasarkan kondisi atau tindakan pengguna tertentu.
+
+## Praktik Terbaik untuk Menggunakan Bidang Hanya-Baca
+
+1. **Kejelasan**: Tunjukkan dengan jelas bidang mana yang hanya-baca melalui isyarat visual atau label.
+2. **Konsistensi**: Gunakan bidang hanya-baca secara konsisten di seluruh survei Anda.
+3. **Validasi**: Meskipun bidang hanya-baca tidak dapat diedit, sertakan dalam proses validasi data Anda.
+4. **Kinerja**: Berhati-hatilah dengan kalkulasi kompleks dalam bidang hanya-baca, karena dapat memengaruhi waktu pemuatan formulir.
+5. **Aksesibilitas**: Pastikan bidang hanya-baca ditandai dengan benar untuk pembaca layar.
+
+## Teknik Lanjutan
+
+### Bidang Hanya-Baca yang Dihitung
+
+Gunakan bidang hanya-baca untuk menampilkan kalkulasi berdasarkan respons lain:
+
+```
+| type      | name     | label           | read_only | calculation            |
+|-----------|----------|-----------------|-----------|------------------------|
+| calculate | bmi      | BMI:            | yes       | ${weight} / (${height} * ${height}) |
+```
+
+### Menampilkan Data Historis
+
+Bidang hanya-baca dapat menampilkan data dari survei sebelumnya atau sumber eksternal:
+
+```
+| type    | name           | label                  | read_only | default                    |
+|---------|----------------|------------------------|-----------|----------------------------|
+| text    | last_visit_date| Tanggal kunjungan terakhir: | yes  | ${pulldata('visits', 'date', 'id', ${patient_id})} |
+```
+
+## Pertimbangan Manajemen Data
+
+- Bidang hanya-baca disertakan dalam ekspor data, biasanya dengan tanda yang menunjukkan status hanya-baca mereka.
+- Saat memperbarui catatan yang ada, bidang hanya-baca mempertahankan nilai aslinya kecuali secara eksplisit ditimpa melalui backend.
+
+## Perilaku Aplikasi Mobile
+
+- Aplikasi mobile rtSurvey menghormati pengaturan hanya-baca, termasuk logika hanya-baca kondisional.
+- Mode offline sepenuhnya mendukung fungsionalitas hanya-baca, termasuk bidang hanya-baca dinamis dan yang dihitung.
+
+## Keterbatasan yang Diketahui
+
+- Beberapa kondisi hanya-baca dinamis yang kompleks mungkin memiliki sedikit dampak kinerja pada perangkat kelas bawah.
+- Bidang hanya-baca mungkin tidak mencegah semua bentuk manipulasi data dalam file data yang diekspor, sehingga validasi sisi server direkomendasikan untuk data kritis.
+
+## Pemecahan Masalah Bidang Hanya-Baca
+
+1. **Bidang Secara Tidak Terduga Dapat Diedit**: Periksa kesalahan sintaks di kolom `read_only` atau logika kondisional.
+2. **Nilai yang Dihitung Tidak Diperbarui**: Verifikasi logika kalkulasi dan pastikan semua bidang yang direferensikan dinamai dengan benar.
+3. **Masalah Kinerja**: Optimalkan kalkulasi kompleks atau pertimbangkan pendekatan alternatif untuk menampilkan data hanya-baca.

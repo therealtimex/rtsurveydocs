@@ -1,0 +1,72 @@
+---
+title: "Hidden"
+description: "Hidden fields រក្សាទុក values ដែលមិន show ដល់ respondent ប្រើ ដើម្បីផ្ដល់ context, prefill data, ឬ store intermediate results។"
+icon: "eye-slash"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 239
+---
+
+`hidden` field រក្សាទុក value ដែល **មិន display ដល់ respondent**។ មិនដូច `calculate` (ដែល computes value) ទេ `hidden` ប្រើ ដើម្បី carry in **value ដែល provided ពីខាងក្រៅ** — ឧទាហរណ៍ task ID, household ID ដែល passed ពី system ផ្សេង, ឬ enumerator code ដែល injected នៅពេល form ត្រូវបាន launched។
+
+## ការបញ្ជាក់ XLSForm មូលដ្ឋាន
+
+| type | name | label |
+|------|------|-------|
+| hidden | household_id | |
+
+Labels មិនចាំបាច់សម្រាប់ hidden fields ដោយ nothing rendered ក្នុង screen។
+
+## ការប្រើប្រាស់
+
+Hidden fields ប្រើជាទូទៅសម្រាប់:
+
+1. ការ passing pre-assigned ID ពី survey management system (ឧ. household ID, case number, task code)
+2. ការ storing form version ឬ deployment metadata
+3. ការ injecting enumerator-specific configuration ក្នុង form launch
+4. ការ carrying data ពី parent form ទៅ child form ក្នុង linked workflows
+5. ការ storing value ដែល derived ពី URL parameters នៅពេល form ត្រូវ opened តាម web link
+
+## ការកំណត់ default value
+
+Pattern ទូទៅបំផុតគឺប្រើ `hidden` ជាមួយ `default` expression ដើម្បី value ត្រូវបានកំណត់ នៅពេល form បើក:
+
+| type | name | default |
+|------|------|---------|
+| hidden | deployment_code | 'ZONE_A_2024' |
+| hidden | form_version | '3.1' |
+
+## ការ reference hidden field ក្នុង calculations
+
+Hidden values អាច reference ដូចគ្នា field ណាមួយ ដោយប្រើ `${fieldname}`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| hidden | zone_code | | |
+| calculate | label_prefix | | concat('[', ${zone_code}, '] ') |
+| note | intro | ${label_prefix} Welcome to the household survey | |
+
+## ការប្រើ hidden ជាមួយ prefill / URL parameters
+
+នៅពេល launching web form តាម URL, អ្នកអាចផ្ដល់ parameters ដែល populate hidden fields។ នេះ អនុញ្ញាតឱ្យ pre-load household ID ឬ task code ដោយ enumerator មិនចាំបាច់ type:
+
+```
+https://your-server.com/form/FORMID?household_id=H00123&zone_code=NORTH
+```
+
+Field ដែលឈ្មោះ `household_id` នឹងត្រូវបាន automatically populated ជាមួយ `H00123`។
+
+## ការអនុវត្តល្អ
+
+1. ប្រើ `hidden` (មិនមែន `calculate`) នៅពេល value ត្រូវ **inject externally** ហើយ មិនគួរ recompute។
+2. ប្រើ `calculate` នៅពេល value ត្រូវ **derived ពី fields ផ្សេងទៀត** ក្នុង form។
+3. ដូចជាកំណត់ `default` ប្រសិនបើ hidden field ត្រូវតែ have value — hidden field ដែលគ្មាន default នឹង empty។
+4. Name hidden fields ច្បាស់ ដើម្បី distinguish ពួកវា (ឧ. prefix ជាមួយ `_hidden_` ឬ ប្រើ naming convention ដែល consistent)។
+
+## ការដាក់កំហិត
+
+- Hidden fields ត្រូវ include ក្នុង exported data ដូចគ្នា field ផ្សេងទៀត។
+- ពួកវាមិន show conditionally — ពួកវា always present (ប៉ុន្តែ invisible)។
+- ប្រសិនបើអ្នកត្រូវការ field ដែល compute dynamically ប្រើ `calculate` ជំនួស។

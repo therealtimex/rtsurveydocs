@@ -1,0 +1,100 @@
+---
+title: "Brukergrensesnitt"
+description: "Utforsk de viktigste funksjonene i rtSurvey-mobilappen, inkludert skjemautfylling, redigering, innsending, varsler, oppgaveadministrasjon, rapportering og GPS-kartleggingsfunksjoner"
+icon: "apps"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 314
+---
+
+rtSurvey-mobilappen tilbyr et omfattende sett med funksjoner utformet for å effektivisere undersøkelsesprosessen. Her er de viktigste funksjonene:
+
+## Fyll ut skjema
+Fyll ut skjema-funksjonen er der feltarbeidere kan få tilgang til og legge inn data i tomme undersøkelsesskjemaer. Denne funksjonaliteten muliggjør effektiv og nøyaktig datainnsamling i felten. Viktige punkter inkluderer:
+
+1. Skjemalisting: Når de åpner seksjonen for skjemautfylling, presenteres brukere med en liste over alle tilgjengelige tomme skjemaer tildelt dem.
+
+2. Automatisk skjemanedlasting: I motsetning til noen andre undersøkelsesverktøy laster rtSurvey-mobilappen automatisk ned skjemaer som brukeren har fått tilgang til av undersøkelsesadministratoren eller prosjektlederen. Dette eliminerer behovet for at feltarbeidere manuelt henter tomme skjemaer.
+
+3. Direkte dataregistrering: Feltarbeidere kan velge et skjema fra listen og begynne å legge inn undersøkelsessvar direkte i appen.
+
+4. Sanntidsoppdateringer: Etter hvert som nye skjemaer tildeles eller oppdateringer gjøres, oppdateres listen over tilgjengelige skjemaer automatisk, noe som sikrer at feltarbeidere alltid har tilgang til de nyeste undersøkelsene.
+
+5. Frakoblet kapasitet: Skjemaer kan lastes ned når internettforbindelsen er tilgjengelig, slik at feltarbeidere kan fylle dem ut selv i områder med dårlig eller ingen nettverksdekning.
+
+## Rediger skjema
+
+Rediger skjema-funksjonaliteten i rtSurvey tilbyr en omfattende og fleksibel tilnærming til administrasjon av undersøkelsesinstanser, noe som skiller den fra andre CAPI-applikasjoner. Denne funksjonen sikrer datanøyaktighet og fullstendighet gjennom tre distinkte faner:
+
+1. **Lagret**:
+   - Tilgang til og modifisering av ufullstendige intervjuinstanser lagret på feltarbeiderens enhet.
+   - Ligner tradisjonelle CAPI-apper, og lar brukere gjenoppta og fullføre uferdige undersøkelser.
+
+2. **Returnert** (rtSurvey-eksklusivt):
+   - Rediger undersøkelsesinstanser som tidligere ble fullført, ferdigstilt og sendt til serveren.
+   - Unikt for rtSurvey, denne funksjonen tillater redigering etter innsending når ytterligere informasjon eller korreksjoner er nødvendig.
+
+3. **Videresendt** (rtSurvey-eksklusivt):
+   - Tilgang til og redigering av undersøkelsesinstanser opprinnelig opprettet på en annen enhet.
+   - Denne innovative funksjonen støtter ulike scenarier:
+     * Supervisorer kan gjennomgå og redigere innsendinger fra feltarbeidere.
+     * Brukere kan fortsette arbeidet på en annen enhet hvis den opprinnelige enheten er tapt eller skadet.
+     * Muliggjør samarbeidende redigering og kvalitetskontrollprosesser.
+
+Viktige fordeler:
+- Forbedret datakvalitet gjennom flere gjennomgangs- og redigeringsmuligheter.
+- Forbedret arbeidsflytfleksibilitet for feltteam og supervisorer.
+- Sømløs fortsettelse av arbeidet på tvers av enheter, noe som reduserer nedetid og risiko for datatap.
+
+## Send skjema
+Send 100 % fullførte skjemaer til sentralserveren. Denne funksjonen muliggjør dataoverføring i sanntid, noe som tillater umiddelbar analyse og beslutningstaking.
+
+## Varsler
+Motta viktige meldinger og oppdateringer fra serveren. Dette holder alle teammedlemmer informert om prosjektutvikling, endringer eller presserende saker.
+
+## Oppgaver
+Tilgang til og administrasjon av oppgaver tildelt av serveren. Denne funksjonen bidrar til å organisere arbeidsmengden og prioritere undersøkelsesaktiviteter for feltarbeidere.
+
+## Rapporter
+Se alle rapporter sendt fra serveren til nettbrettet. Denne funksjonaliteten lar brukere få tilgang til analyseresultater og prosjektinnsikter direkte på enheten sin.
+
+## Gjennomgå skjema
+
+Gjennomgå skjema-funksjonaliteten i rtSurvey tilbyr et omfattende system for å undersøke og administrere ferdigstilte undersøkelsesinstanser, noe som sikrer robust kvalitetskontroll og databekreftelse. Denne funksjonen er delt inn i fire distinkte faner, der hver tjener et spesifikt formål i dataadministrasjonsprosessen:
+
+1. **Ferdigstilt**:
+   - Inneholder fullførte og ferdigstilte instanser som ennå ikke er sendt til serveren.
+   - Tillater endelige kontroller før innsending.
+
+2. **Sendt**:
+   - Inneholder ferdigstilte instanser som er sendt til serveren.
+   - Gir en oversikt over overførte data.
+
+3. **Overført**:
+   - Viser fullførte instanser som er overført til andre enheter.
+   - Legger til rette for sporing av databevegelse mellom enheter.
+
+4. **Mottatt**:
+   - Viser fullførte instanser opprinnelig opprettet på en annen enhet og overført til den gjeldende enheten.
+   - Muliggjør samarbeidende arbeid og datadeling mellom teammedlemmer.
+
+Viktige funksjoner:
+- **Kun visning**: Alle instanser i disse fanene er opprinnelig kun til visning, noe som bevarer dataintegriteten til ferdigstilte skjemaer.
+- **Redigeringsforespørselssystem**: Brukere kan be om å redigere en instans hvis korreksjoner er nødvendig.
+  - Forespørsler kan godkjennes automatisk eller manuelt av administratorer eller prosjektledere.
+  - Når godkjent, blir instansen redigerbar, noe som tillater nødvendige modifikasjoner.
+
+Fordeler:
+- Forbedrer datakvaliteten gjennom flere gjennomgangstrinn.
+- Gir et tydelig revisjonsspor for datainnsendinger og overføringer.
+- Tilbyr fleksibilitet i dataadministrasjon med kontroll over ferdigstilte data.
+- Støtter samarbeidsarbeidsflyter og kvalitetssikringsprosesser.
+
+## Kart
+Bruk GPS-funksjonalitet for å fastslå nøyaktig plassering der intervjuet gjennomføres. Denne funksjonen forbedrer datanøyaktigheten og hjelper med romlig analyse av undersøkelsesresultater.
+
+## Avslutt
+Lukk appen uten å logge ut av rtSurvey-kontoen. Dette tillater rask tilgang til appen igjen uten gjentatt autentisering.
+
+Disse funksjonene fungerer sammen for å skape et kraftig, brukervennlig mobilt undersøkelsesverktøy som imøtekommer ulike roller innenfor undersøkelsesprosessen, fra datainnsamling til analyse og prosjektstyring.

@@ -1,0 +1,146 @@
+---
+title: "Grupimi i pyetjeve"
+description: ""
+icon: "auto_awesome"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 250
+---
+
+Grupet në XLSForm ju lejojnë të organizoni pyetjet e lidhura bashkë, duke përmirësuar strukturën e sondazhit tuaj dhe duke zgjeruar aftësitë e analizës së të dhënave. rtSurvey mbështet plotësisht grupet XLSForm dhe zgjeron funksionalitetin e tyre me veçori shtesë.
+
+## Struktura Bazë e Grupit
+
+Për të krijuar një grup pyetjesh, përdorni sintaksën `begin_group` dhe `end_group`:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | respondent | Informacioni i të Anketuarit             |
+| text         | name       | Futni emrin e të anketuarit              |
+| text         | position   | Futni pozicionin e të anketuarit         |
+| end_group    |            |                                          |
+```
+
+Pikat kryesore:
+- Rreshti `begin_group` kërkon një `name` dhe `label`.
+- Rreshti `end_group` nuk ka nevojë për emër ose etiketë.
+- Pyetjet midis `begin_group` dhe `end_group` janë pjesë e grupit.
+
+## Pamja e Grupit
+
+rtSurvey mbështet opsione të ndryshme pamjeje për grupet:
+
+1. **field-list**: Shfaq pyetje të shumëfishta në të njëjtin ekran.
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | respondent | Të Anketuarit | field-list |
+   | text         | name       | Emri      |            |
+   | text         | position   | Pozicioni |            |
+   | end_group    |            |           |            |
+   ```
+
+2. **grid**: Krijon një paraqitje kompakte, si tabele për grupet (specifike për rtSurvey).
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | household  | Familja   | grid       |
+   | text         | member_name| Emri      |            |
+   | integer      | member_age | Mosha     |            |
+   | end_group    |            |           |            |
+   ```
+
+3. **collapsible**: Krijon grupe të zgjueshme/të palosshme (specifike për rtSurvey).
+   ```
+   | type         | name       | label     | appearance  |
+   |--------------|------------|-----------|-------------|
+   | begin_group  | details    | Detajet   | collapsible |
+   | text         | address    | Adresa    |             |
+   | text         | phone      | Telefoni  |             |
+   | end_group    |            |           |             |
+   ```
+
+## Grupet e Ndrydhura
+
+Grupet mund të ndrydhën brenda grupeve të tjera për struktura më komplekse:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | hospital   | Informacioni i Spitalit                  |
+| text         | hosp_name  | Cili është emri i këtij spitali?         |
+| begin_group  | medication | Disponueshmëria e Medikamenteve          |
+| select_one y_n| hiv_meds  | A ka ky spital medikamente HIV?          |
+| end_group    |            |                                          |
+| end_group    |            |                                          |
+```
+
+**Shënim**: Gjithmonë përfundoni grupin i cili filloi së fundmi i pari për të ruajtur ndrydhjen e duhur.
+
+## Logjika e Kapërcimit për Grupet
+
+Përdorni kolonën `relevant` për të implementuar logjikën e kapërcimit për të gjithë grupet:
+
+```
+| type         | name   | label                                        | relevant        |
+|--------------|--------|----------------------------------------------|-----------------|
+| integer      | age    | Sa vjeç jeni?                                |                 |
+| begin_group  | child  | Fëmija                                       | ${age} <= 5     |
+| integer      | muac   | Regjistroni rrethin mesatar të krahut të mesëm të fëmijës |   |
+| select_one y_n| mrdt  | A është testi i shpejtë diagnostik i fëmijës pozitiv? |       |
+| end_group    |        |                                              |                 |
+```
+
+Në këtë shembull, grupi `child` do të shfaqet vetëm nëse mosha e të anketuarit është 5 ose më e vogël.
+
+## Praktikat Më të Mira për Përdorimin e Grupeve
+
+1. Përdorni emra kuptimplota për grupet për të përmirësuar analizën e të dhënave.
+2. Mbajini grupet të fokusuar në pyetjet e lidhura.
+3. Përdorni grupet e ndrydhura me maturi për të shmangur strukturat tepër komplekse.
+4. Testoni logjikën e kapërcimit tërësisht kur përdorni `relevant` në grupe.
+5. Konsideroni përdorimin e pamjes `field-list` për grupe të shkurtra për të reduktuar lëvizjen.
+6. Shfrytëzoni paraqitjen grid të rtSurvey për shfaqje kompakte të informacioneve të lidhura.
+7. Përdorni grupet e palosshme për formularë të gjatë për të përmirësuar navigimin.
+
+## Veçoritë Specifike rtSurvey
+
+1. **Paraqitja Grid**: Përdorni pamjen `grid` për shfaqje si tabele.
+2. **Grupet e Palosshme**: Implementoni pamjen `collapsible` për seksione të zgjueshme.
+3. **Stilimi i Personalizuar**: Aplikoni CSS të personalizuar në grupe për dizajne vizuale unike.
+4. **Sjellja Dinamike e Grupit**: Implementoni logjikën komplekse të kapërcimit dhe llogaritjet brenda grupeve.
+
+## Mbështetja Shumëgjuhëshe
+
+rtSurvey mbështet grupet shumëgjuhëshe. Përdorni kolona specifike gjuhore për etiketat:
+
+```
+| type         | name       | label::Shqip   | label::French |
+|--------------|------------|----------------|---------------|
+| begin_group  | personal   | Infot Personale | Infos Personnelles |
+| text         | name       | Emri           | Nom           |
+| end_group    |            |                |               |
+```
+
+## Konsideratat e Aplikacionit Celular
+
+- Grupet me pamjen `field-list` shfaqen si një ekran i vetëm në aplikacionin celular.
+- Grupet e palosshme mund të përmirësojnë navigimin në ekrane të vogla.
+- Paraqitjet grid mund të rregullohen për dukshmëri më të mirë në pajisjet celulare.
+
+## Kufizimet e Njohura
+
+- Ndrydhja jashtëzakonisht e thellë e grupeve mund të ndikojë në performancë në disa pajisje.
+- Disa opsione të avancuara stilimi mund të mos jenë të disponueshme për grupet në aplikacionin celular.
+
+## Zgjidhja e Problemeve me Grupet
+
+1. Sigurohuni që çdo `begin_group` ka një `end_group` përkatës.
+2. Kontrolloni që emrat e grupeve janë unik brenda formularit.
+3. Verifikoni që logjika e kapërcimit referon emrat korrektë të pyetjeve.
+4. Testoni grupet tërësisht si në ndërfaqet ueb ashtu edhe në ato celulare.
+
+Duke përdorur efektivisht grupet në XLSForms tuaj me rtSurvey, mund të krijoni sondazhe të organizuara mirë, efikase që përmirësojnë si eksperiencën e mbledhjes së të dhënave ashtu edhe cilësinë e analizës tuaj të të dhënave.

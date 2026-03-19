@@ -1,0 +1,121 @@
+---
+title: "Prov"
+description: "Provfunktionen lägger till ett tidsbegränsat quizläge till en undersökning, med valfri ljudåterkoppling för rätta och felaktiga svar."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 298
+---
+
+Funktionen **Prov** förvandlar en undersökning till ett tidsbegränsat quiz. En nedräkningstimer visas för respondenten och undersökningen registrerar hur mycket tid som återstår när de avslutar. Valfritt kan ljudsignaler spelas upp för rätta och felaktiga svar.
+
+Detta är användbart för kunskapsbedömningar, läsförmågetester, kompetensprövningar för fältpersonal och alla undersökningar där tid är meningsfulla data.
+
+---
+
+## Funktionen `check-exam()`
+
+Konfigurera provet med `check-exam()` i **`calculation`**-kolumnen för ett `calculate`-fält placerat i början av formuläret:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Parametrar
+
+| # | Parameter | Beskrivning |
+|---|-----------|-------------|
+| 1 | `examTime` | Total provtid i sekunder |
+| 2 | `questionToStoreRemainingTime` | Namnet på ett `calculate`- eller `integer`-fält som lagrar återstående tid när provet avslutas |
+| 3 | `rightSound` | *(Valfritt)* Filnamn på ljudfilen som spelas när ett rätt svar ges (bifoga till formuläret som en mediefil) |
+| 4 | `wrongSound` | *(Valfritt)* Filnamn på ljudfilen som spelas när ett felaktigt svar ges |
+| 5 | `excludeQuestion` | *(Valfritt)* Kommaseparerad lista med fältnamn att utesluta från provtimern (t.ex. `'intro_note,consent'`) |
+
+---
+
+## Grundläggande konfiguration
+
+### Steg 1: Lägg till provfält
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` startar 600-sekunders (10-minuters) timern. `remaining_time` fylls i automatiskt när respondenten avslutar.
+
+### Steg 2: Lägg till dina frågor
+
+Provtimern täcker alla frågor i formuläret utom de som anges i `excludeQuestion`.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | Kenyas huvudstad är Nairobi. Sant eller falskt? |
+| select_one choices | q2 | Vilket organ pumpar blod runt kroppen? |
+| select_one choices | q3 | Vatten kokar vid 100°C vid havsytan. Sant eller falskt? |
+
+### Steg 3: Lagra återstående tid
+
+Fältet som anges i parameter 2 (`remaining_time`) ställs automatiskt in på antalet sekunder som återstår när respondenten lämnar in. Ett värde på `0` innebär att tiden tog slut; ett högt värde innebär att de avslutade snabbt.
+
+---
+
+## Med ljudåterkoppling
+
+Bifoga ljudfiler till formuläret (som mediabilagor) och referera sedan till dem:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` spelas när respondenten väljer rätt svar
+- `wrong.mp3` spelas när respondenten väljer ett felaktigt svar
+
+{{% alert icon=" " context="warning" %}}
+Ljudfiler måste bifogas formuläret som mediafiler och filnamnet måste matcha exakt (skiftlägeskänsligt) inklusive filnamnstillägget.
+{{% /alert %}}
+
+---
+
+## Utesluta frågor från timern
+
+Skicka en kommaseparerad lista med fältnamn för att utesluta från provet (t.ex. introduktionsnoteringar eller samtyckefrågor):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+Lämna `rightSound` och `wrongSound` som tomma strängar `''` om du inte behöver ljud men behöver uteslutningar.
+
+---
+
+## Fullständigt exempel
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | Välkommen till hälsokunskapsbedömningen. Du har 5 minuter på dig att svara på alla frågor. | |
+| trigger | start_ack | Tryck OK när du är redo att börja. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | Handtvätt förhindrar spridning av sjukdomar. | |
+| select_one yesno | q2 | Du bör dricka minst 2 liter vatten per dag. | |
+| select_one yesno | q3 | Malaria orsakas av ett virus. | |
+
+---
+
+## Bästa praxis
+
+1. Informera alltid respondenterna om tidsgränsen innan de börjar — använd en `note` eller `trigger` före `check-exam()`-fältet.
+2. Uteslut introduktionsnoteringar och samtyckefrågor från timern med parametern `excludeQuestion`.
+3. Använd `remaining_time` i en uppföljningsberäkning för att detektera tidsgränser: `if(${remaining_time} = 0, 'Tid slut', 'Slutförd')`.
+4. Håll antalet frågor proportionellt mot tillgänglig tid — 2–3 minuter per fråga är en rimlig grundnivå för de flesta kunskapsbedömningar.
+5. Testa med ljudfiler på den faktiska enheten innan driftsättning — ljuduppspelning varierar mellan Android-versioner och webbläsare.
+
+## Begränsningar
+
+- Timern är endast för visning — formuläret skickas inte automatiskt in när tiden rinner ut; respondenten måste fortfarande skicka in manuellt.
+- Ljudåterkoppling kräver att enhetens volym är på och inte är dämpad.
+- Provfunktionen är ett rtSurvey-tillägg och är inte en del av standardspecifikationen för XLSForm.

@@ -1,0 +1,72 @@
+---
+title: "Tersembunyi"
+description: "Bidang tersembunyi menyimpan nilai yang tidak pernah ditampilkan kepada responden — digunakan untuk meneruskan konteks, mengisi data sebelumnya, atau menyimpan hasil antara."
+icon: "eye-slash"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 239
+---
+
+Bidang `hidden` menyimpan nilai yang **tidak pernah ditampilkan kepada responden**. Tidak seperti `calculate` (yang menghitung nilai), `hidden` digunakan untuk membawa **nilai yang disediakan secara eksternal** — misalnya, ID tugas, ID rumah tangga yang diberikan dari sistem lain, atau kode enumerator yang disuntikkan saat formulir diluncurkan.
+
+## Spesifikasi XLSForm Dasar
+
+| type | name | label |
+|------|------|-------|
+| hidden | household_id | |
+
+Label tidak diperlukan untuk bidang tersembunyi karena tidak ada yang dirender di layar.
+
+## Penggunaan
+
+Bidang tersembunyi umum digunakan untuk:
+
+1. Meneruskan ID yang telah ditetapkan sebelumnya dari sistem manajemen survei (misalnya, ID rumah tangga, nomor kasus, kode tugas)
+2. Menyimpan versi formulir atau metadata penerapan
+3. Menyuntikkan konfigurasi khusus enumerator saat formulir diluncurkan
+4. Membawa data dari formulir induk ke formulir anak dalam alur kerja yang ditautkan
+5. Menyimpan nilai yang diturunkan dari parameter URL saat formulir dibuka melalui tautan web
+
+## Mengatur nilai default
+
+Pola paling umum adalah menggunakan `hidden` dengan ekspresi `default` sehingga nilai diatur saat formulir dibuka:
+
+| type | name | default |
+|------|------|---------|
+| hidden | deployment_code | 'ZONE_A_2024' |
+| hidden | form_version | '3.1' |
+
+## Mereferensikan bidang tersembunyi dalam kalkulasi
+
+Nilai tersembunyi dapat direferensikan seperti bidang lainnya menggunakan `${fieldname}`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| hidden | zone_code | | |
+| calculate | label_prefix | | concat('[', ${zone_code}, '] ') |
+| note | intro | ${label_prefix} Selamat datang di survei rumah tangga | |
+
+## Menggunakan hidden dengan pengisian awal / parameter URL
+
+Saat meluncurkan formulir web melalui URL, Anda dapat meneruskan parameter yang mengisi bidang tersembunyi. Ini memungkinkan Anda memuat ID rumah tangga atau kode tugas terlebih dahulu tanpa enumerator mengetiknya:
+
+```
+https://your-server.com/form/FORMID?household_id=H00123&zone_code=NORTH
+```
+
+Bidang bernama `household_id` akan secara otomatis diisi dengan `H00123`.
+
+## Praktik Terbaik
+
+1. Gunakan `hidden` (bukan `calculate`) ketika nilai **disuntikkan secara eksternal** dan tidak boleh dihitung ulang.
+2. Gunakan `calculate` ketika nilai **diturunkan dari bidang lain** dalam formulir.
+3. Selalu tetapkan `default` jika bidang tersembunyi harus memiliki nilai — bidang tersembunyi tanpa default akan kosong.
+4. Beri nama bidang tersembunyi dengan jelas untuk membedakannya (misalnya, awali dengan `_hidden_` atau gunakan konvensi penamaan yang konsisten).
+
+## Keterbatasan
+
+- Bidang tersembunyi disertakan dalam data yang diekspor seperti bidang lainnya.
+- Tidak dapat ditampilkan secara kondisional — selalu ada (tetapi tidak terlihat).
+- Jika Anda memerlukan bidang yang menghitung secara dinamis, gunakan `calculate` sebagai gantinya.

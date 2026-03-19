@@ -1,0 +1,51 @@
+---
+weight: 15
+date: "2026-03-04T00:00:00+00:00"
+draft: false
+title: "Përdoruesi i Sistemit"
+icon: "people"
+toc: true
+description: "Menaxhoni rolet, lejet dhe integrimin e të gjithë pjesëmarrësve të platformës."
+tags: ["Përdoruesit", "Kontrolli i Aksesit", "Integrimi", "Rolet"]
+---
+
+# Menaxhimi i Përdoruesit të Sistemit
+
+Moduli **Përdoruesi i Sistemit** (`/cpms/cpmsSystemUser/admin`) është një ndërfaqe gjithëpërfshirëse menaxhimi për kontrollin e kush ka akses në platformën tuaj të Sondazhit në Kohë Reale (RT-CPMS) dhe çfarë veprimesh mund të kryejnë.
+
+![Ndërfaqja e Përdoruesit të Sistemit](/images/system_user.png)
+
+## Qasja Uniforme e Menaxhimit
+
+Në RT-CPMS, një **Numërues** është thjesht një Rol specifik i caktuar një Përdoruesi të Sistemit. Nuk ka një bazë të dhënash të veçantë "Numëruesi". Pavarësisht nëse një përdorues është Administrator i nivelit të lartë që monitoron portalin ueb ose Numëruesi i terreneve që mbledh të dhëna nëpërmjet aplikacionit celular, të gjithë menaxhohen brenda këtij kuadri të unifikuar.
+
+## Veçoritë Kryesore
+
+### 1. Direktoria e Përdoruesve dhe Pamja e Rrjetit
+Ndërfaqja kryesore shfaq një listë me faqezim të të gjithë përdoruesve të lidhur me hapësirën e punës. Atributet kryesore përfshijnë:
+* **ID dhe Emri i Organizatës**: Grupimi logjik i përdoruesve nën entitete specifike organizative (p.sh., `rta`, `partner_org`).
+* **Roli**: Specifikon nivelin e lejeve të përdoruesit (p.sh., `Administrator`, `Kryeekipi`, `Numëruesi`).
+* **Grupi**: Caktimet e grupimit hapësinor ose logjik (p.sh., rrethe specifike ose ekipe operacionale).
+* **Është Sinkronizuar**: Tregon nëse llogaria është integruar me sukses me sistemin qendror të Hyrjes së Vetme (SSO).
+* **Statusi**: Tregues vizualë që konfirmojnë nëse një llogari është `Aktive`, `Joaktive`, `E Fshirë` ose `E Bllokuar`.
+
+**Veprimet Globale:**
+* **Shto Përdorues Sistemi**: Krijoni manualisht një profil individual.
+* **Importoni Përdorues Sistemi**: Ngarkoni llogaritë në masë duke përdorur një shabllonin Excel. Mund të zgjidhni konfliktet duke përdorur mënyrat `Anashkalo` ose `Zëvendëso` dhe sinkronizoni direkt me SSO.
+* **Fshi në Masë**: Mbështetje me zgjidhje të shumëfishta për fshirjen e llogarive në masë.
+
+### 2. Kontrolli i Aksesit dhe Siguria
+Gjatë krijimit ose editimit të një profili përdoruesi, janë të disponueshme disa fusha kritike sigurie dhe fluksi pune:
+* **Kodi i Përdoruesit**: Një identifikues unik që lidh llogarinë lokale CPMS me depozitën qendrore SSO.
+* **Kodi i Ndryshimit të Pajisjes**: Një shenjë e fuqishme sigurie e kërkuar kur një numëruesi duhet të ndërrojë pajisjen celulare që po përdor për mbledhjen e të dhënave.
+* **Niveli i Fuqisë**: Një shkallë prioriteti/aksesi e hollësishme që varion nga 0 (më i ulët) deri në 20 (më i lartë).
+* **Ndërrimi i Mbikëqyrjes**: Një kutie kontrolli që menjëherë ngre një përdorues standard në statusin e menaxhimit.
+* **Automatizimi i Fluksit të Punës**: Një opsion për të "Aprovuar Automatikisht Kërkesën për Editim", që thjeshtëzon procesin e pastrimit dhe verifikimit të të dhënave për përdoruesit e besuar.
+
+### 3. Menaxhimi i Kodeve (Integrimi i Automatizuar)
+Gjendur nën nën-skedën "Kodi", kjo veçori menaxhon lidhjet e regjistrimit dhe ftesës të bazuara në hash, duke thjeshtuar procesin e integrimit për ekipe të mëdha.
+
+* **Regjistrimi kundrejt Ftesës**: Zgjidhni nëse përdoruesit mund të regjistrohen vetë duke përdorur një lidhje të shpërndarë ose nëse u duhet një ftesë e drejtpërdrejtë nga administratori.
+* **Datat e Skadimit**: Kufizoni integrimin në dritare kohore specifike.
+* **Kufijtë e Përdorimit**: Kufizoni numrin e përdoruesve që mund të bashkohen duke përdorur një kod të vetëm të gjeneruar.
+* **Rolet e Para-caktuara**: Përdoruesit që bashkohen nëpërmjet këtyre kodeve trashëgojnë automatikisht rolin dhe nivelin e fuqisë të para-definuar, duke garantuar se janë gati për punë menjëherë pa ndërhyrje manuale të administratorit.

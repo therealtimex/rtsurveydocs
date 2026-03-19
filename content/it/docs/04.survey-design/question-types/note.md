@@ -1,0 +1,83 @@
+---
+title: "Note"
+description: "Le domande note visualizzano testo o media in sola lettura per fornire informazioni o istruzioni nel sondaggio."
+icon: "info"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 255
+---
+
+Il tipo di domanda note negli XLSForm e in rtSurvey viene usato per visualizzare testo o media in sola lettura al rispondente del sondaggio. Non è una domanda che richiede una risposta, ma piuttosto un modo per fornire informazioni, istruzioni o contesto all'interno del sondaggio.
+
+## Specifica XLSForm di base
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | Questo sondaggio riguarda le tue abitudini di lettura. |
+
+Per ulteriori dettagli sul tipo di domanda note di base, vedere la [specifica XLSForm](https://xlsform.org/en/#question-types).
+
+## Utilizzi
+
+Le domande note sono comunemente usate per:
+
+1. Fornire istruzioni o contesto per le domande successive
+2. Visualizzare risultati o riepiloghi calcolati
+3. Mostrare immagini o altri media
+4. Separare le sezioni di un sondaggio
+5. Fornire feedback basato sulle risposte precedenti
+
+## Best practice
+
+1. Mantenere il testo delle note conciso e chiaro per mantenere il coinvolgimento del rispondente.
+2. Usare la formattazione (grassetto, corsivo) per enfatizzare le informazioni importanti.
+3. Considerare l'utilizzo di media (immagini, audio) per migliorare la comprensione quando appropriato.
+4. Usare le note con parsimonia per evitare di rendere il sondaggio caotico.
+
+## Esempio di utilizzo
+
+Ecco un esempio di come potresti usare domande note in un sondaggio:
+
+| type | name | label |
+|------|------|-------|
+| note | intro | Benvenuto nel nostro sondaggio sulle abitudini di lettura. Ti chiederemo delle tue preferenze e della frequenza di lettura. |
+| ... | ... | ... |
+| calculate | books_per_month | ${fiction_books} + ${non_fiction_books} |
+| note | reading_summary | Leggi approssimativamente ${books_per_month} libri al mese. |
+
+In questo esempio, usiamo le note per introdurre il sondaggio e fornire un riepilogo dei risultati calcolati.
+
+## Estensioni rtSurvey
+
+Mentre la specifica XLSForm di base per le domande note è semplice, rtSurvey può offrire funzionalità o personalizzazioni aggiuntive:
+
+1. Formattazione rich text
+2. Supporto per media incorporati (immagini, audio, video)
+3. Contenuto dinamico basato sulle risposte precedenti
+4. Opzioni di stile personalizzate
+
+## Utilizzo avanzato
+
+### Visualizzazione condizionale
+
+Puoi usare espressioni di rilevanza per mostrare le note condizionalmente:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | Sei un lettore assiduo! | ${books_per_month} > 5 |
+
+### Inclusione di calcoli
+
+Le note possono includere calcoli per fornire feedback dinamico:
+
+| type | name | label |
+|------|------|-------|
+| note | reading_time | In base alle tue risposte, trascorri approssimativamente ${books_per_month * 5} ore a leggere ogni mese. |
+
+## Limitazioni
+
+- Le note non raccolgono dati, quindi non dovrebbero essere usate quando è necessario raccogliere informazioni dai rispondenti.
+- L'uso eccessivo di note può rendere un sondaggio caotico o eccessivamente lungo.
+- Alcune opzioni di formattazione avanzata o di media potrebbero non essere supportate su tutti i dispositivi o piattaforme.

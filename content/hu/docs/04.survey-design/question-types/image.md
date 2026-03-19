@@ -1,0 +1,78 @@
+---
+title: "Image"
+description: "A képkérdések lehetővé teszik a válaszadók számára, hogy fényképeket rögzítsenek és nyújtsanak be a felmérés részeként."
+icon: "image"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 227
+---
+
+Az XLSForm és az rtSurvey image kérdéstípusa lehetővé teszi a válaszadók számára, hogy fényképeket rögzítsenek és nyújtsanak be felmérési válaszaik részeként. Ez a funkció különösen hasznos vizuális adatok gyűjtéséhez, megfigyelések dokumentálásához vagy terepi felmérésekben bizonyítékok biztosításához.
+
+## Alapvető XLSForm-specifikáció
+
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| image | photo       | Készítsen fényképet a helyszínről   |
+
+Az image kérdéstípus alapvető részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+
+## Felhasználási területek
+
+A képkérdések általánosan használt területei:
+
+1. Terepi körülmények vagy megfigyelések dokumentálása
+2. Vizuális bizonyítékok rögzítése kutatási tanulmányokban
+3. Előtte/utána fényképek gyűjtése hatásvizsgálatokban
+4. Feladatok elvégzésének vagy helyszínen való tartózkodásnak az igazolása
+5. Vizuális adatok gyűjtése távellenőrzéshez
+
+## Bevált módszerek
+
+1. Adjon egyértelmű utasításokat arról, mit kell lefényképezni.
+2. Vegye figyelembe az adatvédelmi szempontokat, és tájékoztassa a válaszadókat arról, hogyan kerülnek felhasználásra a fotóik.
+3. Legyen tekintettel a fájlméretekre és tárolási korlátokra, különösen korlátozott internet-elérésű területeken végzett felmérések esetén.
+4. Győződjön meg arról, hogy az eszközön elegendő tárhely áll rendelkezésre és a kamera engedélyei megadottak.
+
+## Példa
+
+Íme egy példa arra, hogyan lehet képkérdést felhasználni egy felmérésben:
+
+| type  | name           | label                                      | hint                                            |
+|-------|----------------|--------------------------------------------|------------------------------------------------|
+| image | storefront     | Készítsen fényképet az üzlet bejáratáról   | Győződjön meg arról, hogy az üzlet neve jól látható |
+
+## rtSurvey-bővítések
+
+Bár az alapvető XLSForm-specifikáció egyszerű a képkérdéseknél, az rtSurvey további funkciókat kínálhat:
+
+1. Képminőség-beállítások (pl. alacsony, közepes, magas felbontás)
+2. Képfeliratok vagy címkék hozzáadásának lehetősége
+3. Több kép rögzítése egyetlen kérdéshez
+4. Integráció az eszköz natív kamera-applikációjával vagy galériájával
+
+## Adatkezelés
+
+Az ezen kérdéstípuson keresztül gyűjtött képeket általában:
+
+1. Közös képformátumban tárolják (pl. JPG, PNG)
+2. A többi felmérési adattal együtt, gyakran külön médiatárolóban tárolják
+3. A felméréskezelő platformon keresztül tekinthetők meg és elemezhetők
+
+## Elemzési szempontok
+
+A képkérdések használatakor vegye figyelembe:
+
+1. A képek elemzésének módját (pl. manuális áttekintés, automatizált képelemzés)
+2. A képfájlokhoz szükséges további tárhely igényét
+3. Az adatvédelmi és adatbiztonsági intézkedéseket a fotók tárolásához és kezeléséhez
+4. Az esetleges képszerkesztési vagy rendszerezési eszközök szükségességét az elemzési fázisban
+
+## Korlátozások
+
+- A képfájlok nagyok lehetnek, ami hatással lehet az adatátvitelre és -tárolásra.
+- Nem minden eszközön áll rendelkezésre kiváló minőségű kamera vagy elegendő tárhely.
+- Nagy mennyiségű kép elemzése időigényes lehet.
+- Képek készítésekor – különösen nyilvános helyeken – adatvédelmi aggályok merülhetnek fel.

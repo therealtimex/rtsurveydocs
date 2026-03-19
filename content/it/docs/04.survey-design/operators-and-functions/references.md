@@ -1,0 +1,86 @@
+---
+title: "Riferimento ai valori"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 291
+---
+
+La sintassi `${fieldname}` viene usata per fare riferimento al valore corrente di un altro campo nel modulo. Può rappresentare il valore inserito, selezionato o calcolato, e verrà visualizzato esattamente come appare nei dati inviati.
+
+Esempio:
+Se hai un campo chiamato "age" e vuoi recuperare il valore esatto inserito in quel campo, puoi usare `${age}`.
+
+Per i vincoli, il simbolo "." viene usato per fare riferimento alla proposta di inserimento o selezione dell'utente per il campo corrente. Ti consente di applicare condizioni o limiti basati sul valore che l'utente sta inserendo o selezionando in quel momento.
+
+Esempio:
+Se vuoi verificare che il valore proposto per il campo corrente sia inferiore a 3, puoi usare il vincolo `. < 3`.
+
+---
+
+## `..` — Riferimento al gruppo padre
+
+All'interno di un gruppo o di un gruppo di repeat, `..` fa riferimento al **contesto padre**. Questo è raramente necessario nella pratica, ma viene usato in espressioni XPath avanzate per navigare nella gerarchia del modulo.
+
+---
+
+## Dove vengono usati i riferimenti
+
+| Colonna | Tipo di riferimento | Esempio |
+|--------|---------------|---------|
+| `relevant` | `${fieldname}` | `${consent} = 'yes'` |
+| `constraint` | `.` per il campo corrente, `${fieldname}` per altri | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${fieldname}` | `${adults} + ${children}` |
+| `required` | `${fieldname}` | `${has_income} = 'yes'` |
+| `default` | `${fieldname}` | `${previous_answer}` |
+| `label` | `${fieldname}` nel testo | `"La tua età è ${age} anni"` |
+| `choice_filter` | Nome colonna (senza `${}`) | `district = ${district}` |
+
+{{% alert icon=" " context="warning" %}}
+Nella colonna `choice_filter`, fai riferimento ai **nomi delle colonne delle scelte** direttamente (senza `${}`), e fai riferimento ai **campi del modulo** con `${}`. Confondere questi due è una fonte comune di errori.
+{{% /alert %}}
+
+---
+
+## Riferimento ai valori all'interno dei gruppi repeat
+
+All'interno di un repeat, `${fieldname}` fa riferimento al campo nella **stessa istanza** del repeat:
+
+```
+relevant: ${member_age} < 18
+```
+
+Questo usa il valore `member_age` per l'istanza corrente del repeat, non per tutte le istanze.
+
+Per fare riferimento a un campo in una specifica istanza del repeat dall'esterno del repeat, usa `indexed-repeat()`:
+
+```
+indexed-repeat(${member_name}, ${household_members}, 1)
+```
+
+Vedi [Funzioni — Funzioni per i campi ripetuti](functions#repeated-field-functions) per i dettagli completi.
+
+---
+
+## Verifica dei valori vuoti
+
+Controlla se un campo ha ricevuto una risposta:
+
+```
+${fieldname} != ''       (il campo non è vuoto)
+${fieldname} = ''        (il campo è vuoto)
+```
+
+Per i numeri, controlla anche:
+```
+${age} > 0               (l'età ha un valore positivo — implicitamente non vuoto nel contesto numerico)
+```
+
+---
+
+## Coercizione di tipo nei riferimenti
+
+Quando usi `${fieldname}` in un contesto numerico (es. `${age} + 1`), rtSurvey converte automaticamente il valore stringa in un numero. Un campo vuoto viene convertito in `0` o `NaN` a seconda dell'operazione — usa `coalesce(${field}, 0)` per impostare in modo sicuro un campo numerico vuoto al valore zero.
