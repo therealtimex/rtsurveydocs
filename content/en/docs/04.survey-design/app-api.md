@@ -58,16 +58,7 @@ Combine the below attribute keys with "user." in the `pulldata()` params to retr
 | organization_name    | Organization name the user belongs to  |
 | team_id              | Team ID the user belongs to            |
 | supervisor_id        | ID of the user's supervisor            |
-| user_role            | User role                             |
-| user_group           | User group                            |
 | is_supervisor        | 1 if the user is a supervisor, 0 if not|
-| auto_approve_edit_request | 1 if the user is allowed to approve automatic "request to edit", 0 if not |
-| ipcall.user          | IP Call account's parameter - username |
-| ipcall.token         | IP Call account's parameter - token    |
-| ipcall.password      | IP Call account's parameter - password |
-| ipcall.url           | IP Call account'sparam - URL |
-| ipcall.auth          | IP Call account's parameter - auth (optional) |
-| ipcall.port          | IP Call account's parameter - port (optional) |
 
 `instancePath`: Returns the current instance folder path.
 
