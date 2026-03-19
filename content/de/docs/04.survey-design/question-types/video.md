@@ -1,6 +1,6 @@
 ---
 title: "Video"
-description: "Video-Fragen ermöglichen es den Befragten, Videodateien als Teil der Umfrage aufzunehmen und einzureichen."
+description: "Video-Fragen ermöglichen es Befragten, Videodateien als Teil der Umfrage aufzunehmen und einzureichen."
 icon: "videocam"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,74 +9,91 @@ toc: true
 weight: 229
 ---
 
-Der `video`-Fragetyp in XLSForms und rtSurvey ermöglicht es Befragten, Videodateien als Teil ihrer Umfrageantworten aufzunehmen und einzureichen. Diese Funktion ist besonders nützlich für die Erfassung visueller Beweise, Demonstrationen oder Erfahrungsberichte im Rahmen der Umfrage.
+Der Fragetyp `video` ermöglicht es Befragten, **Video aufzunehmen** oder eine vorhandene Videodatei als Teil ihrer Umfrageantwort hochzuladen. Er ist nützlich für die Erfassung visueller Beweise, Demonstrationen, Umweltbedingungen oder anderer Informationen, bei denen Bewegung und Ton zusammen von Vorteil sind.
 
 ## Grundlegende XLSForm-Spezifikation
 
-| type  | name        | label                           |
-|-------|-------------|--------------------------------|
-| video | demo_video  | Bitte nehmen Sie ein kurzes Demo-Video auf |
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Bitte nehmen Sie eine kurze Demonstration auf |
 
-Weitere Details zum grundlegenden `video`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Weitere Details zum Standard-Video-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
 
-## Anwendungen
+## Anwendungsbereiche
 
 Video-Fragen werden häufig verwendet für:
 
-1. Erfassung visueller Beweise bei Außendiensteinsätzen
-2. Aufzeichnung von Produktdemonstrationen oder Nutzungsszenarien
-3. Erfassung von Video-Testimonials
-4. Dokumentation von Prozessen oder Verfahren
-5. Ermöglichen detaillierter visueller Erklärungen durch die Befragten
+1. Dokumentation von Feldbedingungen — Straßenschäden, Infrastrukturzustand, Erntezustand
+2. Aufnahme von Produktdemonstrationen oder Compliance-Überprüfungen von Verfahren
+3. Erfassung von Video-Testimonials von Befragten
+4. Aufzeichnung von Belegen, die räumlichen Kontext erfordern (z. B. Größe und Ausmaß eines Problembereichs)
+5. Vorher/Nachher-Dokumentation für Monitoring- und Evaluierungsumfragen
 
-## Best Practices
+## Datenformat
 
-1. Geben Sie klare Anweisungen dazu, was und wie lange aufgenommen werden soll.
-2. Berücksichtigen Sie Datenschutzaspekte und informieren Sie die Befragten darüber, wie ihr Video verwendet wird.
-3. Achten Sie auf Dateigrößen und Speicherbeschränkungen, insbesondere bei Umfragen in Gebieten mit eingeschränkter Internetverbindung.
-4. Testen Sie die Videofunktion auf verschiedenen Geräten, um die Kompatibilität sicherzustellen.
-5. Erwägen Sie, die gewünschte Videoqualität oder Auflösung in den Anweisungen anzugeben.
+Videodateien werden als Binärdaten gespeichert:
 
-## Beispielhafte Verwendung
-
-Hier ist ein Beispiel dafür, wie Sie eine Video-Frage in einer Umfrage verwenden könnten:
-
-| type  | name           | label                                                | hint                                    |
-|-------|----------------|------------------------------------------------------|----------------------------------------|
-| video | product_demo   | Bitte nehmen Sie eine kurze Demo zur Nutzung des Produkts auf | Nehmen Sie 30-60 Sekunden auf und zeigen Sie die wichtigsten Funktionen |
+- **Format:** MP4 oder MOV (mobile Aufnahme)
+- **Benennung:** `{instanceID}-{fieldname}.mp4` (oder entsprechend)
+- **Speicherung:** In den Server-Medienordner hochgeladen und mit dem Übermittlungsdatensatz verknüpft
+- **Zugriff:** Über die Übermittlungsverwaltungsoberfläche abspielbar und herunterladbar
 
 ## rtSurvey-Erweiterungen
 
-Während die grundlegende XLSForm-Spezifikation für Video-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen:
+### Maximale Aufnahmedauer
 
-1. Einstellung der maximalen Aufnahmedauer
-2. Optionen für die Videoqualität (z. B. niedrig, mittel, hoch)
-3. Wiedergabefunktion zur Überprüfung vor dem Absenden
-4. Integration mit der nativen Video-App des Geräts
-5. Option zum Hochladen vorhandener Videodateien anstelle einer Neuaufnahme
+Verwenden Sie die Spalte `parameters`, um die Aufnahmelänge zu begrenzen:
 
-(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für Video-Fragen müssten hier bestätigt und detailliert werden.)
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Standortbedingungen aufnehmen | `max-duration=60` |
+
+`max-duration` wird in Sekunden angegeben. Die Aufnahme stoppt automatisch bei Erreichen des Limits.
+
+### Qualität / Auflösung
+
+Steuern Sie die Aufnahmeauflösung über `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Videobeweise aufnehmen | `quality=low` |
+
+Unterstützte Werte: `low` (schnellerer Upload), `normal` (Standard), `high`. Verwenden Sie `low` in Gebieten mit eingeschränkter Konnektivität.
+
+### Vorhandenes Video hochladen
+
+Auf mobilen Geräten kann der Befragte wählen, ein **vorhandenes Video** aus der Galerie des Geräts hochzuladen, anstatt ein neues aufzunehmen. Dies ist standardmäßig in der nativen Kamera-/Galerie-Integration aktiviert.
+
+### Wiedergabe vor der Übermittlung
+
+Auf mobilen Geräten kann der aufgenommene Clip vor dem Fortfahren überprüft werden. Keine zusätzliche Konfiguration erforderlich.
+
+## Beispielhafte Verwendung
+
+### Standortbesichtigungsvideo mit Zeitlimit
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Wasserquelle aufnehmen | Gehen Sie um die gesamte Anlage herum. Max. 90 Sekunden. | `max-duration=90 quality=normal` |
+
+### Bedingtes Video — nur bei gemeldeten Schäden
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | Wurde ein Schaden festgestellt? | | |
+| video | damage_video | Video des Schadens aufnehmen | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+
+## Empfohlene Vorgehensweisen
+
+1. Setzen Sie `max-duration` — uneingeschränkte Videoaufnahmen können leicht 100 MB überschreiten und bei schlechten Verbindungen nicht hochgeladen werden.
+2. Verwenden Sie `quality=low` bei Monitoringumfragen, bei denen visuelle Belege erforderlich, aber feine Details nicht wichtig sind — dies reduziert die Dateigröße erheblich.
+3. Schreiben Sie spezifische Aufnahmeanweisungen in die Spalte `hint` (z. B. "Gehen Sie um das gesamte Gebäude, halten Sie die Kamera ruhig").
+4. Überlegen Sie, ob Video wirklich notwendig ist — ein Foto (`image`) reicht für statische Belege meist aus und erzeugt wesentlich kleinere Dateien.
+5. Testen Sie die Upload-Leistung im tatsächlichen Feldnetzwerk vor dem Einsatz.
 
 ## Einschränkungen
 
-- Videodateien können sehr groß sein, was die Datenübertragung und Speicherung erheblich beeinflussen kann.
-- Nicht alle Geräte unterstützen Videoaufnahmen oder verfügen über begrenzten Speicherplatz.
-- Die Analyse von Videoantworten kann zeitaufwendig sein und spezialisierte Software erfordern.
-- Datenschutzbedenken können bei der Erhebung von Videodaten ausgeprägter sein.
-
-## Datenhandhabung
-
-Über diesen Fragetyp gesammelte Videodateien werden in der Regel:
-
-1. In einem gängigen Videoformat gespeichert (z. B. MP4, MOV)
-2. Zusammen mit anderen Umfragedaten gespeichert, oft in einem separaten Medienordner
-3. Über die Umfrage-Management-Plattform zur Wiedergabe und Analyse zugänglich gemacht
-
-## Überlegungen zur Analyse
-
-Berücksichtigen Sie bei der Verwendung von Video-Fragen:
-
-1. Wie die Videodaten analysiert werden (z. B. manuelle Überprüfung, automatisierte Videoanalyse)
-2. Den zusätzlichen Zeit- und Ressourcenaufwand für die Verarbeitung von Videoantworten
-3. Datenschutz- und Datensicherheitsmaßnahmen für die Speicherung und Handhabung von Videoaufnahmen
-4. Potenzielle Notwendigkeit von Videobearbeitungs- oder Kompilierungswerkzeugen in der Analysephase
+- Videodateien sind sehr groß — ein 1-minütiges Video bei normaler Qualität ist typischerweise 20–60 MB je nach Gerät.
+- Das Hochladen großer Videodateien erfordert eine gute Netzwerkverbindung; erwägen Sie, für videohaltige Formulare eine WLAN-Synchronisierung vorzuschreiben.
+- Nicht alle Webbrowser unterstützen Videoaufnahmen über MediaRecorder — Chrome ist am zuverlässigsten.
+- Die Analyse von Videoantworten ist manuell und zeitaufwendig; setzen Sie Videos sparsam und nur dann ein, wenn der Videoinhalt einen einzigartigen Wert bietet.

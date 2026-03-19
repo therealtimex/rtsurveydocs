@@ -1,116 +1,160 @@
 ---
-title: "Wiederholungen (Repeats)"
-description: ""
+title: "Erweiterte Wiederholungen"
+description: "Fortgeschrittene Muster für Wiederholungsgruppen: dynamische Zählung, verschachtelte Wiederholungen, Zusammenfassung von Wiederholungsdaten und Referenzierung von Werten über Wiederholungen hinweg."
 icon: "manage_search"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
 draft: false
 toc: true
-weight: 294
+weight: 295
 ---
 
-Die dynamische Suche (Dynamic Search) ist eine leistungsstarke Funktion in rtSurvey, mit der Sie dynamische Suchfunktionen in Ihre Umfragen integrieren können, um Daten in Echtzeit aus externen Quellen abzurufen.
+Diese Seite behandelt fortgeschrittene Muster für die Arbeit mit Wiederholungsgruppen in rtSurvey. Für die Grundlagen zur Einrichtung einer Wiederholungsgruppe, siehe [Gruppierung und Wiederholungen](../repeats).
 
-## Syntax
+---
 
-Die grundlegende Syntax für die Verwendung der `search-api` lautet:
+## Dynamische Wiederholungsanzahl
 
-```
-search-api(method, url, post_body, value_column, display, data_path, save_path)
-```
+Standardmäßig entscheidet der Interviewer, wie oft er wiederholt. Sie können die Anzahl der Wiederholungen mit `repeat_count` festlegen:
 
-### Parameter
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Haushaltsmitglied | `${num_members}` |
+| text | member_name | Name des Mitglieds | |
+| integer | member_age | Alter | |
+| end_repeat | | | |
 
-- `method`: Verwenden Sie immer 'POST'
-- `url`: Die URL zum Abrufen der Daten
-- `post_body`: Der Anfragetext. Verwenden Sie die searchView-Syntax (siehe Dokumentation zu DataModel-Ansichten)
-- `value_column`: Das Datenfeld, das als Wert verwendet werden soll
-- `display`: Das Datenfeld, das als Label verwendet werden soll. Unterstützt eine Vorlagen-Syntax mit `##key##` und `@{func}` für erweiterte Formatierung
-- `data_path`: JSONPath, um die gewünschten Daten aus der Antwort zu extrahieren (z. B. `$.hits.hits.*._source`)
-- `save_path`: Ort zum Speichern der Antwortdaten für die spätere Verwendung
+Die Wiederholung läuft genau `${num_members}` Mal, wobei `num_members` zuvor im Formular erfasst wurde. Der Interviewer kann keine Instanzen hinzufügen oder entfernen.
 
-## Anwendungsbeispiele
+---
 
-### Grundlegende Verwendung
+## Indiziierter Zugriff: `indexed-repeat()`
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'search_results')
-```
+Greifen Sie auf den Feldwert einer bestimmten Wiederholungsinstanz von **außerhalb** der Wiederholungsgruppe zu mit `indexed-repeat(repeatedField, repeatGroup, index)`:
 
-### Mit erweiterter Anzeigeformatierung
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '##name## (##age## Jahre alt)', '$.results', 'search_results')
-```
+Dies ist nützlich für das Erstellen von Zusammenfassungsfeldern oder für die Referenzierung der Daten des "primären" Mitglieds nach der Wiederholung.
 
-### Mit Funktion in der Anzeige
+---
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '@{if_else(eq("##status##", "active"), "Aktiv: ##name##", "Inaktiv: ##name##")}', '$.results', 'search_results')
-```
+## Aktuelle Instanzposition: `index()`
 
-## Unterstützte Fragetypen
+Innerhalb einer Wiederholungsgruppe gibt `index()` die 1-basierte Position der aktuellen Instanz zurück. Verwenden Sie es, um jede Wiederholung zu beschriften oder eindeutige Bezeichner zu erstellen:
 
-- `select_one`
-- `select_multiple`
-- `text` (für Autocomplete-Funktionalität)
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Parzelle |
+| note | plot_label | Parzellennummer ${index()} |
+| text | plot_id | Parzellen-ID |
+| end_repeat | | |
 
-## Zusätzliche Funktionen
+---
 
-### Standard-API (Default API)
+## Felder in derselben Instanz referenzieren
 
-Verwenden Sie `search-default-api()` nach `search-api()`, um Standardwerte festzulegen:
+Innerhalb einer Wiederholung verwenden Sie `${fieldname}`, um ein anderes Feld **in derselben Wiederholungsinstanz** zu referenzieren. `indexed-repeat()` ist innerhalb derselben Schleife nicht erforderlich:
 
-```
-appearance: search-api(...) search-default-api(...)
-```
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Mitglied | |
+| text | member_name | Name | |
+| integer | member_age | Alter | |
+| text | school_name | Schulname | `${member_age} < 18` |
+| end_repeat | | | |
 
-### Trennzeichen für Mehrfachauswahl
+---
 
-Verwenden Sie für `select_multiple` `search-default-separator()`, um ein benutzerdefiniertes Trennzeichen anzugeben:
+## Übergeordnete Felder von innerhalb einer Wiederholung referenzieren
 
-```
-appearance: search-api(...) search-default-separator(' || ')
-```
+Felder außerhalb (oberhalb) der Wiederholungsgruppe können normal mit `${fieldname}` referenziert werden:
 
-## Best Practices
+| type | name | label |
+|------|------|-------|
+| text | village | Dorfname |
+| begin_repeat | plots | Landwirtschaftliche Parzelle |
+| note | plot_context | Parzellen in ${village} |
+| end_repeat | | |
 
-1. Optimieren Sie API-Endpunkte für die Leistung, insbesondere bei großen Datensätzen.
-2. Verwenden Sie geeignete Caching-Strategien, um API-Aufrufe zu reduzieren.
-3. Gehen Sie in Ihrem Umfragedesign elegant mit Netzwerkfehlern um.
-4. Testen Sie gründlich mit verschiedenen Eingabeszenarien.
+---
 
-## Bekannte Einschränkungen
+## Wiederholungsdaten zusammenfassen
 
-- Komplexe Abfragen können die Ladezeiten der Umfrage beeinflussen.
-- Die Offline-Funktionalität kann je nach Implementierung eingeschränkt sein.
+Verwenden Sie Wiederholungs-Aggregatfunktionen **außerhalb** der Wiederholungsgruppe zur Zusammenfassung:
 
-```mermaid
-    graph TD
-    %% Define styles for nodes
-    classDef light fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#003366
-    classDef dark fill:#2e3b4e,stroke:#a6b1c2,stroke-width:2px,color:#e1e1e1
-    classDef submit fill:#ffcc99,stroke:#cc6600,stroke-width:2px,color:#663300
-    classDef link fill:#ccffcc,stroke:#009933,stroke-width:2px,color:#003300
-    classDef storage fill:#ffffcc,stroke:#999900,stroke-width:2px,color:#333300
-    
-    %% Define shapes for nodes
-    A[<span class="iconify" data-icon="mdi:file-document-multiple" data-inline="false" data-width="18" data-height="18"></span> Receipts in PDF, PNG, HEIC, JPEG, Excel] --> B{<span class="iconify" data-icon="mdi:send" data-inline="false" data-width="18" data-height="18"></span> Submit the Receipts}
-    B --> C1([<a href="mailto:keep@keepy.us?subject=Keep%20my%20receipts" style="color:#003300;"><span class="iconify" data-icon="mdi:email" data-inline="false" data-width="18" data-height="18"></span> Email: keep@keepy.us</a>])
-    B --> C2([<a href="sms:+16504173562" style="color:#003300;"><span class="iconify" data-icon="mdi:message-text" data-inline="false" data-width="18" data-height="18"></span> SMS: 650-417-3562</a>])
-    B --> C3([<a href="https://m.me/keepy.us" target="_blank" style="color:#003300;"><span class="iconify" data-icon="mdi:facebook-messenger" data-inline="false" data-width="18" data-height="18"></span> Messenger: m.me/keepy.us</a>])
-    C1 --> D[[<span class="iconify" data-icon="mdi:database" data-inline="false" data-width="18" data-height="18"></span> <b>Receipt Data Stored in Google Sheet</b><br> - Automatic Text Recognition<br> - Human-Verified for Accuracy<br> - Data and Digital Receipt Copies]]
-    C2 --> D
-    C3 --> D
-    
-    %% Apply classes to nodes
-    class A light
-    class B submit
-    class C1 link
-    class C2 link
-    class C3 link
-    class D storage
-    
-    %% Adjust arrow styles for better visibility
-    linkStyle default stroke:#666,stroke-width:3px
-```
+| Funktion | Beispiel | Beschreibung |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | Anzahl der Instanzen |
+| `sum(field)` | `sum(${loan_amount})` | Summe eines numerischen Feldes |
+| `min(field)` | `min(${member_age})` | Minimalwert |
+| `max(field)` | `max(${member_age})` | Maximalwert |
+| `join(sep, field)` | `join(', ', ${member_name})` | Kommagetrennte Liste |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Bedingte Zählung |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Bedingte Summe |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Bedingtes Verbinden |
+
+### Beispiel: Haushaltszusammenfassung
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | Wie viele Mitglieder? | |
+| begin_repeat | members | Mitglied | `${num_members}` |
+| text | member_name | Name | |
+| integer | member_age | Alter | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | ${total_members} Mitglieder; ${children_count} unter 18. Erwachsene: ${adult_names} | |
+
+---
+
+## Verschachtelte Wiederholungen
+
+Eine Wiederholungsgruppe kann eine weitere Wiederholungsgruppe enthalten. Verwenden Sie dies sorgfältig — verschachtelte Wiederholungen erhöhen die Komplexität und können für Interviewer verwirrend sein.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Haushalt |
+| text | hh_id | Haushalts-ID |
+| begin_repeat | hh_members | Mitglied |
+| text | member_name | Mitgliedsname |
+| end_repeat | | |
+| end_repeat | | |
+
+Um ein Feld in einer äußeren Wiederholung von der inneren Wiederholung aus zu referenzieren, verwenden Sie `${fieldname}` — es löst sich zum nächsten passenden Vorfahren auf:
+
+Innerhalb der `hh_members`-Wiederholung gibt `${hh_id}` die ID des **aktuellen** Haushalts zurück, nicht aller Haushalte.
+
+---
+
+## Rank innerhalb von Wiederholungsgruppen: `rank-index()`
+
+Wenn ein `rank`-Feld innerhalb einer Wiederholung vorhanden ist, verwenden Sie `rank-index(instanceNumber, repeatedField)` von außen, um den ordinalen Rang einer bestimmten Instanz zu erhalten:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` gibt den Instanzindex der höchsten Punktzahl zurück.
+
+---
+
+## Empfohlene Vorgehensweisen
+
+1. Verwenden Sie immer `repeat_count`, wenn die Anzahl der Wiederholungen im Voraus bekannt ist — dies verhindert, dass Interviewer versehentlich Instanzen hinzufügen oder entfernen.
+2. Halten Sie Wiederholungsgruppen fokussiert — eine Wiederholung mit 20+ Fragen pro Instanz ist schwer zu navigieren.
+3. Benennen Sie Wiederholungsgruppen klar (z. B. `household_members`, nicht `repeat1`) — der Name erscheint in Funktionsaufrufen und exportierten Daten.
+4. Testen Sie mit der maximal erwarteten Anzahl von Instanzen, um die Leistung zu überprüfen.
+5. Verwenden Sie das `field-list`-Erscheinungsbild für die Wiederholungsgruppe, um alle Felder auf einem Bildschirm pro Instanz anzuzeigen (mobil).
+
+---
+
+## Einschränkungen
+
+- `indexed-repeat()` erfordert einen gültigen Index (1 bis Instanzanzahl) — Indizes außerhalb des Bereichs geben leer zurück.
+- Verschachtelte Wiederholungen über 2 Ebenen hinaus werden nicht empfohlen und können bei einigen Clients Anzeigeprobleme verursachen.
+- Aggregatfunktionen (`sum`, `count` usw.) arbeiten auf der gesamten Wiederholungsgruppe — Sie können keine Teilmenge von Instanzen ohne die `*-if`-Varianten aggregieren.

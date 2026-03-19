@@ -1,6 +1,6 @@
 ---
-title: "Fichier (File)"
-description: "Les questions de type fichier permettent aux répondants de télécharger des fichiers dans le cadre de leurs réponses à l'enquête."
+title: "File"
+description: "Les questions de type fichier permettent aux répondants de téléverser des documents et autres fichiers dans le cadre de leurs réponses à l'enquête."
 icon: "upload_file"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,71 +9,97 @@ toc: true
 weight: 230
 ---
 
-Le type de question `file` dans XLSForms et rtSurvey permet aux répondants de télécharger des fichiers dans le cadre de leurs réponses à l'enquête. Cette fonctionnalité est particulièrement utile pour collecter des documents, des images ou d'autres types de fichiers pertinents pour l'enquête.
+Le type de question `file` permet aux répondants de **téléverser n'importe quel fichier** depuis leur appareil — documents, tableurs, PDF ou autres types de fichiers. Contrairement à `image`, `audio` et `video` qui lancent des outils de capture spécifiques, `file` ouvre un sélecteur de fichiers polyvalent.
 
-## Spécification XLSForm de Base
+## Spécification XLSForm de base
 
-| type | name      | label                       |
-|------|-----------|----------------------------|
-| file | document  | Veuillez télécharger votre document |
+| type | name      | label                        |
+|------|-----------|------------------------------|
+| file | document  | Veuillez téléverser votre document  |
 
-Pour plus de détails sur le type de question `file` de base, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+Pour plus de détails sur le type de question fichier standard, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
 
 ## Utilisations
 
 Les questions de type fichier sont couramment utilisées pour :
 
-1. Collecter des documents justificatifs (ex : reçus, certificats)
-2. Rassembler des preuves visuelles (ex : photos des conditions sur le terrain)
-3. Télécharger des formulaires ou des feuilles de calcul complétés
-4. Collecter tout type de fichier numérique pertinent pour l'enquête
+1. Collecter des documents justificatifs (reçus, certificats, contrats, rapports)
+2. Téléverser des formulaires papier scannés
+3. Rassembler des tableurs ou des exports de données d'autres systèmes
+4. Tout type de fichier numérique non couvert par image/audio/vidéo
 
-## Meilleures Pratiques
+## Format des données
 
-1. Fournissez des instructions claires sur le type de fichier à télécharger et sur les limitations de taille éventuelles.
-2. Tenez compte des implications en matière de confidentialité et informez les répondants de la manière dont leurs fichiers seront utilisés et stockés.
-3. Soyez attentif à la taille des fichiers et aux limitations de stockage, en particulier pour les enquêtes dans des zones où la connectivité Internet est limitée.
-4. Spécifiez les formats de fichiers acceptés si nécessaire.
+Les fichiers téléversés sont stockés comme pièces jointes binaires :
 
-## Exemple d'Utilisation
-
-Voici un exemple de la manière dont vous pourriez utiliser une question de type fichier dans une enquête :
-
-| type | name           | label                                      | hint                                        |
-|------|----------------|--------------------------------------------|--------------------------------------------|
-| file | receipt_upload | Veuillez télécharger une photo de votre reçu | Formats acceptés : JPG, PNG. Taille max : 5 Mo |
+- **Format :** Conservé dans le format d'origine (PDF, XLSX, DOCX, etc.)
+- **Nommage :** `{instanceID}-{fieldname}.{extension}`
+- **Stockage :** Téléversé dans le dossier média du serveur avec la soumission
+- **Accès :** Téléchargeable depuis l'interface de gestion des soumissions
 
 ## Extensions rtSurvey
 
-Bien que la spécification XLSForm de base pour les questions de type fichier soit simple, rtSurvey peut proposer des fonctionnalités ou des personnalisations supplémentaires :
+### Types de fichiers acceptés
 
-1. Restrictions sur le type de fichier (ex : uniquement des images, uniquement des PDF)
-2. Limitations sur la taille des fichiers
-3. Possibilité de télécharger plusieurs fichiers
-4. Intégration avec le système de fichiers de l'appareil ou les services de stockage en nuage (cloud)
+Utilisez la colonne `parameters` pour restreindre les types de fichiers pouvant être sélectionnés :
 
-(Note : Les extensions spécifiques disponibles dans rtSurvey pour les questions de type fichier devront être confirmées et détaillées ici.)
+| type | name | label | parameters |
+|------|------|-------|------------|
+| file | report | Téléverser le rapport d'inspection | `accept=.pdf` |
+| file | spreadsheet | Téléverser le fichier de données | `accept=.xlsx,.csv` |
 
-## Manipulation des Données
+Le paramètre `accept` utilise la syntaxe d'extension de fichier standard (séparée par des virgules).
 
-Les fichiers collectés via ce type de question sont typiquement :
+### Guide sur la taille des fichiers
 
-1. Enregistrés dans leur format d'origine
-2. Stockés aux côtés des autres données d'enquête, souvent dans un dossier média séparé
-3. Accessibles pour téléchargement et analyse via la plateforme de gestion d'enquête
+rtSurvey n'impose pas de limite stricte de taille de fichier au niveau de la question, mais la limite de téléversement du serveur s'applique. Utilisez `hint` pour communiquer les attentes à l'enquêteur :
 
-## Considérations pour l'Analyse
+| type | name | label | hint |
+|------|------|-------|------|
+| file | receipt | Téléverser le reçu de paiement | Accepté : PDF ou image. Taille maximale : 5 Mo |
 
-Lors de l'utilisation de questions de type fichier, tenez compte de :
+### Intégration avec le système de fichiers de l'appareil et le stockage cloud
 
-1. La manière dont les fichiers téléchargés seront traités et analysés
-2. L'espace de stockage supplémentaire requis pour les fichiers joints
-3. Les mesures de confidentialité et de protection des données pour le stockage et la manipulation des fichiers téléchargés
-4. Le besoin potentiel de logiciels spécialisés pour ouvrir ou analyser certains types de fichiers
+Sur Android et iOS, la question `file` ouvre le sélecteur de fichiers natif de l'appareil, qui peut inclure l'accès à :
+- Le stockage local de l'appareil
+- La carte SD (Android)
+- iCloud Drive (iOS)
+- Google Drive, Dropbox (si installés)
+
+Sur le web, il ouvre la boîte de dialogue standard de téléversement de fichiers du navigateur.
+
+## Exemple d'utilisation
+
+### Téléversement de PDF obligatoire
+
+| type | name | label | hint | required | required_message |
+|------|------|-------|------|----------|-----------------|
+| file | signed_consent | Téléverser le formulaire de consentement signé | PDF uniquement, max 2 Mo | yes | Un formulaire de consentement est obligatoire |
+
+### Téléversement de document conditionnel
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_land_title | Le ménage possède-t-il un titre foncier ? | |
+| file | land_title_doc | Téléverser une photo ou un scan du titre foncier | `${has_land_title} = 'yes'` |
+
+## Bonnes pratiques
+
+1. Utilisez `accept` pour restreindre les types de fichiers — cela évite aux enquêteurs de téléverser accidentellement de mauvais fichiers.
+2. Incluez toujours des indications sur la taille et le format dans la colonne `hint`.
+3. Pour les photos et images, utilisez le type `image` à la place — il offre une meilleure compression et une gestion de format cohérente.
+4. Pour les grandes enquêtes avec des pièces jointes, planifiez en conséquence votre stockage de données et la bande passante de téléchargement.
+5. Testez le sélecteur de fichiers sur le type d'appareil cible (Android vs iOS vs web) avant le déploiement — l'accès aux drives cloud varie.
+
+## Considérations sur la gestion des données
+
+- Les fichiers sont stockés dans leur format d'origine ; ils ne sont pas convertis ou compressés par rtSurvey.
+- Analysez les fichiers après téléchargement — rtSurvey n'extrait pas et n'indexe pas le contenu des fichiers.
+- Les pièces jointes de grande taille augmentent considérablement le temps nécessaire pour télécharger un jeu de données complet.
 
 ## Limitations
 
-- Les fichiers volumineux peuvent avoir un impact significatif sur le transfert de données et les exigences de stockage.
-- Tous les appareils ne permettent pas forcément un accès facile aux fichiers pour le téléchargement.
-- L'analyse des fichiers joints peut prendre plus de temps que les réponses textuelles.
-- Il peut y avoir des problèmes de compatibilité avec certains types de fichiers entre différents systèmes.
+- Les questions fichier ne valident pas le contenu des fichiers — seule la vérification de l'extension via `accept` est appliquée au niveau de l'interface.
+- Les fichiers très volumineux (100 Mo+) peuvent expirer lors du téléversement dans les environnements à faible connectivité.
+- Les enquêteurs hors ligne peuvent joindre des fichiers mais ceux-ci ne seront pas téléversés avant le rétablissement de la connexion.
+- Certaines configurations d'appareils restreignent l'accès à certains emplacements de stockage (ex. : politiques MDM d'entreprise).

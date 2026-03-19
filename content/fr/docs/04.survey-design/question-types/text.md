@@ -1,5 +1,5 @@
 ---
-title: "Texte (Text)"
+title: "Text"
 description: "Type de question de réponse textuelle libre dans rtSurvey"
 icon: "text_fields"
 date: "2024-07-01T12:00:00+01:00"
@@ -9,73 +9,108 @@ toc: true
 weight: 221
 ---
 
-## Présentation
+Le type de question `text` collecte une réponse en texte libre — toute chaîne de caractères. C'est le type de saisie le plus flexible, utilisé pour les noms, adresses, descriptions, codes et tout ce qui ne correspond pas à un type plus spécifique.
 
-Le type de question `text` dans rtSurvey permet des réponses textuelles libres, offrant une flexibilité pour collecter divers types de données textuelles. Il est basé sur la spécification XLSForm standard mais inclut des extensions spécifiques à rtSurvey pour des fonctionnalités améliorées.
+rtSurvey étend également `text` avec des **widgets de saisie de l'heure** permettant une saisie précise via un sélecteur d'horloge.
 
-## Spécification XLSForm
+## Spécification XLSForm de base
 
-Dans XLSForm, le type de question texte est spécifié comme suit :
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | Nom complet du répondant |
+| text | address | Adresse du domicile |
 
-```
-type: text
-```
+Pour plus de détails sur le type text XLSForm standard, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
 
-Pour plus de détails sur la syntaxe XLSForm standard, reportez-vous à la [documentation officielle de XLSForm](https://xlsform.org/en/#question-types).
+## Utilisations
 
-## Extensions spécifiques à rtSurvey
+Les questions texte sont utilisées pour :
 
-rtSurvey étend les fonctionnalités du type de question `text` via diverses options d'apparence, particulièrement pour la saisie de l'heure :
+1. Noms, adresses, descriptions libres
+2. Commentaires ou retours ouverts
+3. Codes, identifiants ou numéros de référence qui ne correspondent pas à integer/decimal
+4. Collecte de valeurs horaires avec les extensions de saisie de l'heure de rtSurvey
+5. Champs de texte avec autocomplétion (via `search-autocomplete-noedit-v2()`)
 
-### Extensions pour la saisie de l'heure
+## Options d'apparence standard
 
-- `appearance:` - Affiche une horloge pour sélectionner les heures et les minutes
-- `appearance: inline` - Affiche l'horloge sous forme d'icône
-- `appearance: inline colors("0099FF")` - Affiche l'horloge sous forme d'icône avec une couleur personnalisable
-- `appearance: inline-1line` - Affiche l'horloge pour la sélection dans un format à une seule ligne
-- `appearance: inline-1line-0000FF` - Format sur une seule ligne avec une couleur personnalisable
-- `appearance: inline-1line colors("0000FF","FFFF00")` - Format sur une seule ligne avec plusieurs options de couleur
-- `appearance: inline-onlyresult` - Affiche l'horloge sous forme d'icône à la fin de la ligne, disparaissant après la sélection
-- `appearance: inline-onlyresult colors("0099FF")` - Identique au cas précédent, avec une couleur d'icône personnalisable
+| Appearance | Description |
+|------------|-------------|
+| *(aucune)* | Saisie de texte sur une seule ligne |
+| `multiline` | Zone de texte multi-lignes — idéale pour le texte libre long sur le web |
 
-### Extensions pour le format de l'heure
+## Extensions de saisie de l'heure de rtSurvey
 
-- `appearance: inline-[%3]` - Affiche les millisecondes
-- `appearance: inline-[%S]` - Affiche les secondes
-- `appearance: inline-[%M]` - Affiche les minutes
-- `appearance: inline-[%h]` - Affiche les heures (format 12 heures)
-- `appearance: inline-[%H]` - Affiche les heures (format 24 heures)
-- `appearance: inline-[%H-%M-%S]` - Affiche l'heure au format HH-MM-SS
-- `appearance: inline-[%H:%M:%3]` - Affiche l'heure au format HH:MM:millisecondes
-- `appearance: inline-[%h:%M:%S]` - Affiche l'heure au format 12 heures avec les secondes
-- `appearance: inline-[%H:%M]` - Affiche l'heure au format 24 heures
-- `appearance: inline-[%h:%M]` - Affiche l'heure au format 12 heures
-- `appearance: inline-[%M:%S]` - Affiche les minutes et les secondes
-- `appearance: inline-[%M:%3]` - Affiche les minutes et les millisecondes
+rtSurvey étend `text` avec un **widget de sélection d'horloge** pour collecter des valeurs horaires. Ces options d'apparence affichent une icône d'horloge que l'enquêteur peut toucher pour sélectionner les heures, minutes, secondes ou millisecondes.
 
-## Format des Données
+### Variantes d'apparence
 
-Les données textuelles sont stockées et exportées sous forme de texte. Pour les saisies basées sur l'heure, les données sont stockées dans un format de date/heure basé sur le texte.
+| Appearance | Description |
+|------------|-------------|
+| `inline` | Icône d'horloge affichée à côté du champ |
+| `inline colors("RRGGBB")` | Icône d'horloge avec couleur hexadécimale personnalisée |
+| `inline-1line` | Horloge affichée dans un format compact sur une seule ligne |
+| `inline-1line-RRGGBB` | Format sur une seule ligne avec couleur d'icône personnalisée (hex, sans `#`) |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Format sur une seule ligne avec deux couleurs |
+| `inline-onlyresult` | L'icône d'horloge disparaît après sélection ; seule la valeur est affichée |
+| `inline-onlyresult colors("RRGGBB")` | Identique, avec couleur d'icône personnalisée |
 
-## Considérations sur l'Appli Mobile
+### Jetons de format horaire
 
-Le type de question `text`, y compris toutes ses variantes et apparences, est entièrement pris en charge sur les plateformes iOS, Android et Web.
+Ajoutez une chaîne de format entre crochets pour contrôler les composantes horaires affichées :
 
-## Types de Questions Connexes
+| Chaîne de format | Affiche |
+|------------------|---------|
+| `inline-[%H:%M]` | Heures et minutes (format 24h) |
+| `inline-[%h:%M]` | Heures et minutes (format 12h) |
+| `inline-[%H:%M:%S]` | Heures, minutes, secondes (format 24h) |
+| `inline-[%h:%M:%S]` | Heures, minutes, secondes (format 12h) |
+| `inline-[%H:%M:%3]` | Heures, minutes, millisecondes |
+| `inline-[%M:%S]` | Minutes et secondes uniquement |
+| `inline-[%M:%3]` | Minutes et millisecondes uniquement |
+| `inline-[%S]` | Secondes uniquement |
+| `inline-[%3]` | Millisecondes uniquement |
+| `inline-[%H]` | Heures uniquement (format 24h) |
+| `inline-[%h]` | Heures uniquement (format 12h) |
 
-- Entiers (Integers)
-- Date et heure (Datetime)
+### Exemple : Enregistrer la durée d'une tâche en minutes et secondes
 
-## Meilleures Pratiques
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | task_duration | Temps nécessaire pour accomplir la tâche | `inline-[%M:%S]` |
 
-- Utilisez des étiquettes claires et concises pour les questions textuelles afin de guider les répondants.
-- Envisagez d'utiliser des contraintes ou des règles de validation pour garantir la qualité des données.
-- Pour les saisies d'heure, choisissez l'option d'apparence appropriée en fonction du niveau de précision requis pour votre enquête.
+### Exemple : Enregistrer l'heure d'un événement au format 24h avec couleur personnalisée
 
-## Limitations Connues
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | event_time | Heure de l'événement | `inline-1line colors("0099FF")` |
 
-Actuellement, il n'y a pas de limitations connues pour le type de question `text` dans rtSurvey.
+## Format des données
 
-## Captures d'écran
+Les données texte sont stockées et exportées sous forme de chaîne simple. Pour les saisies basées sur l'heure utilisant le widget d'horloge inline, la valeur est stockée dans le format correspondant à la chaîne de format choisie (ex. : `14:32` pour `%H:%M`).
 
-[Note : Inclure des captures d'écran pertinentes pour illustrer les différentes apparences et variantes du type de question texte.]
+## Contraintes et validation
+
+Appliquez des contraintes pour imposer un format, une longueur ou un motif :
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| text | name | Nom complet | `string-length(.) >= 2` | Le nom doit comporter au moins 2 caractères |
+| text | code | Code de référence | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Saisir 2 lettres majuscules suivies de 4 chiffres |
+| text | phone | Numéro de téléphone | `regex(., '^[0-9]{9,15}$')` | Saisir un numéro de téléphone valide |
+
+## Bonnes pratiques
+
+1. Utilisez des types plus spécifiques (`integer`, `decimal`, `date`) dès que les données ont une structure connue — cela évite les saisies invalides et simplifie l'analyse.
+2. Ajoutez une `constraint` avec `string-length()` ou `regex()` pour valider les codes ou identifiants.
+3. Utilisez l'apparence `multiline` pour les questions ouvertes où les répondants peuvent écrire plusieurs phrases.
+4. Pour la collecte de l'heure, choisissez les jetons de format horaire qui correspondent à la précision requise par votre analyse — collecter des millisecondes quand vous n'avez besoin que des minutes représente un effort inutile pour l'enquêteur.
+
+## Support des plateformes
+
+Le type de question text et toutes les apparences de saisie de l'heure sont pris en charge sur les plateformes iOS, Android et web.
+
+## Limitations
+
+- Les réponses texte sont libres — il n'y a pas de vérification orthographique intégrée ni de contrainte de vocabulaire au-delà des motifs regex.
+- Le widget d'horloge inline est une extension rtSurvey et ne fait pas partie de la spécification XLSForm standard.

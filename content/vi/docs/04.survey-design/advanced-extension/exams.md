@@ -1,10 +1,121 @@
 ---
 title: "Bài kiểm tra (Exams)"
-description: ""
+description: "Tính năng bài kiểm tra thêm chế độ quiz có tính giờ vào khảo sát, với phản hồi âm thanh tùy chọn cho câu trả lời đúng và sai."
 icon: "manage_search"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
 draft: false
 toc: true
-weight: 294
+weight: 298
 ---
+
+Tính năng **Bài kiểm tra** biến khảo sát thành một bài quiz có tính giờ. Đồng hồ đếm ngược được hiển thị cho người trả lời, và khảo sát ghi lại thời gian còn lại khi họ hoàn thành. Tùy chọn, âm thanh có thể phát cho câu trả lời đúng và sai.
+
+Tính năng này hữu ích cho đánh giá kiến thức, bài kiểm tra đọc viết, kiểm tra năng lực nhân viên thực địa, và bất kỳ khảo sát nào mà thời gian làm bài là dữ liệu có ý nghĩa.
+
+---
+
+## Hàm `check-exam()`
+
+Cấu hình bài kiểm tra bằng `check-exam()` trong cột **`calculation`** của trường `calculate` đặt ở đầu biểu mẫu:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Tham số
+
+| # | Tham số | Mô tả |
+|---|---------|-------|
+| 1 | `examTime` | Tổng thời gian bài kiểm tra tính bằng giây |
+| 2 | `questionToStoreRemainingTime` | `name` của trường `calculate` hoặc `integer` sẽ lưu thời gian còn lại khi bài kiểm tra kết thúc |
+| 3 | `rightSound` | *(Tùy chọn)* Tên tệp âm thanh phát khi trả lời đúng (đính kèm vào biểu mẫu dưới dạng tệp media) |
+| 4 | `wrongSound` | *(Tùy chọn)* Tên tệp âm thanh phát khi trả lời sai |
+| 5 | `excludeQuestion` | *(Tùy chọn)* Danh sách tên trường cách nhau bởi dấu phẩy để loại trừ khỏi đồng hồ kiểm tra (ví dụ: `'intro_note,consent'`) |
+
+---
+
+## Thiết lập cơ bản
+
+### Bước 1: Thêm các trường bài kiểm tra
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` kích hoạt đồng hồ 600 giây (10 phút). `remaining_time` được điền tự động khi người trả lời hoàn thành.
+
+### Bước 2: Thêm câu hỏi
+
+Đồng hồ bài kiểm tra bao gồm tất cả câu hỏi trong biểu mẫu ngoại trừ những câu được liệt kê trong `excludeQuestion`.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | Thủ đô của Kenya là Nairobi. Đúng hay sai? |
+| select_one choices | q2 | Cơ quan nào bơm máu trong cơ thể? |
+| select_one choices | q3 | Nước sôi ở 100°C ở mực nước biển. Đúng hay sai? |
+
+### Bước 3: Lưu thời gian còn lại
+
+Trường được đặt tên trong tham số 2 (`remaining_time`) tự động được đặt thành số giây còn lại khi người trả lời gửi. Giá trị `0` nghĩa là hết giờ; giá trị cao nghĩa là họ hoàn thành nhanh.
+
+---
+
+## Với phản hồi âm thanh
+
+Đính kèm tệp âm thanh vào biểu mẫu (dưới dạng tệp đính kèm media), sau đó tham chiếu chúng:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` phát khi người trả lời chọn đúng
+- `wrong.mp3` phát khi người trả lời chọn sai
+
+{{% alert icon=" " context="warning" %}}
+Tệp âm thanh phải được đính kèm vào biểu mẫu dưới dạng tệp media và tên tệp phải khớp chính xác (phân biệt chữ hoa/thường) bao gồm cả phần mở rộng.
+{{% /alert %}}
+
+---
+
+## Loại trừ câu hỏi khỏi đồng hồ
+
+Truyền danh sách tên trường cách nhau bởi dấu phẩy để loại trừ khỏi bài kiểm tra (ví dụ: note giới thiệu hoặc câu hỏi đồng ý):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+Để `rightSound` và `wrongSound` là chuỗi rỗng `''` nếu bạn không cần âm thanh nhưng cần loại trừ.
+
+---
+
+## Ví dụ đầy đủ
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | Chào mừng đến với bài đánh giá kiến thức sức khỏe. Bạn có 5 phút để trả lời tất cả câu hỏi. | |
+| trigger | start_ack | Nhấn OK khi bạn sẵn sàng bắt đầu. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | Rửa tay ngăn ngừa sự lây lan của bệnh. | |
+| select_one yesno | q2 | Bạn nên uống ít nhất 2 lít nước mỗi ngày. | |
+| select_one yesno | q3 | Sốt rét do virus gây ra. | |
+
+---
+
+## Thực hành tốt
+
+1. Luôn thông báo cho người trả lời về giới hạn thời gian trước khi bắt đầu — dùng `note` hoặc `trigger` trước trường `check-exam()`.
+2. Loại trừ các note giới thiệu và câu hỏi đồng ý khỏi đồng hồ bằng tham số `excludeQuestion`.
+3. Dùng `remaining_time` trong phép tính tiếp theo để phát hiện hết giờ: `if(${remaining_time} = 0, 'Hết giờ', 'Hoàn thành')`.
+4. Giữ số câu hỏi tỷ lệ với thời gian cho phép — 2–3 phút mỗi câu là mức hợp lý cho hầu hết các bài đánh giá kiến thức.
+5. Kiểm tra với tệp âm thanh trên thiết bị thực tế trước khi triển khai — phát âm thanh khác nhau trên các phiên bản Android và trình duyệt.
+
+## Giới hạn
+
+- Đồng hồ chỉ hiển thị — biểu mẫu không tự động gửi khi hết giờ; người trả lời vẫn phải gửi thủ công.
+- Phản hồi âm thanh yêu cầu âm lượng thiết bị được bật và không tắt tiếng.
+- Tính năng bài kiểm tra là phần mở rộng của rtSurvey và không thuộc thông số kỹ thuật XLSForm tiêu chuẩn.

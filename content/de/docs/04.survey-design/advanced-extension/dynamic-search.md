@@ -1,6 +1,6 @@
 ---
-title: "Dynamische Suche (Dynamic Search)"
-description: ""
+title: "Dynamische Suche"
+description: "Die dynamische Suche lädt Auswahlmöglichkeiten in Echtzeit von einer Remote-API, während der Interviewer tippt, und ermöglicht so große oder häufig aktualisierte Datensätze."
 icon: "manage_search"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,107 +9,135 @@ toc: true
 weight: 293
 ---
 
-Die dynamische Suche (Dynamic Search) ist eine leistungsstarke Funktion in rtSurvey, mit der Sie dynamische Suchfunktionen in Ihre Umfragen integrieren können, um Daten in Echtzeit aus externen Quellen abzurufen.
+Die **Dynamische Suche** (auch Search API genannt) ermöglicht es einem `select_one`-, `select_multiple`- oder `text`-Feld, seine Auswahlmöglichkeiten **zur Laufzeit** von einem Remote-Webdienst zu laden, während der Interviewer tippt. Dies ist der richtige Ansatz, wenn Ihre Auswahlliste zu groß ist, um sie in einer CSV-Datei zu bündeln, häufig aktualisiert wird oder aus einer Live-Datenbank stammt.
 
-## Syntax
+---
 
-Die grundlegende Syntax für die Verwendung der `search-api` lautet:
+## `search-api()`-Erscheinungsbild
 
-{{< alert context="info" text="search-api(method, url, post_body, value_column, display, data_path, save_path)" />}}
+Die dynamische Suche wird über die Spalte `appearance` mit der Funktion `search-api()` konfiguriert:
 
+```
+search-api(method, url, post_body, value_column, display, data_path, save_path)
+```
 
 ### Parameter
 
-- `method`: Verwenden Sie immer 'POST'
-- `url`: Die URL zum Abrufen der Daten
-- `post_body`: Der Anfragetext. Verwenden Sie die searchView-Syntax (siehe Dokumentation zu DataModel-Ansichten)
-- `value_column`: Das Datenfeld, das als Wert verwendet werden soll
-- `display`: Das Datenfeld, das als Label verwendet werden soll. Unterstützt eine Vorlagen-Syntax mit `##key##` und `@{func}` für erweiterte Formatierung
-- `data_path`: JSONPath, um die gewünschten Daten aus der Antwort zu extrahieren (z. B. `$.hits.hits.*._source`)
-- `save_path`: Ort zum Speichern der Antwortdaten für die spätere Verwendung
+| Parameter | Beschreibung |
+|-----------|-------------|
+| `method` | Immer `'POST'` verwenden |
+| `url` | Der abzufragende API-Endpunkt |
+| `post_body` | JSON-Body, der an die API gesendet wird. Verwenden Sie `%__input__%` als Platzhalter für den aktuellen Suchtext des Interviewers |
+| `value_column` | Der Schlüssel im Antwortobjekt, der als gespeicherter **Wert** verwendet wird |
+| `display` | Der Schlüssel (oder die Vorlage), der als **Beschriftung** im Dropdown angezeigt wird. Unterstützt `##key##`-Platzhalter und `@{func}`-Ausdrücke |
+| `data_path` | JSONPath zum Array der Ergebnisobjekte in der Antwort (z. B. `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Ein Name, unter dem die Rohantwort für die Verwendung durch andere Felder gespeichert wird |
 
-## Anwendungsbeispiele
+---
 
-### Grundlegende Verwendung
+## Grundlegendes Beispiel
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'search_results')
-```
+Eine Gesundheitseinrichtungs-Suche, bei der der Interviewer einen Teil des Einrichtungsnamens eingibt:
 
-### Mit erweiterter Anzeigeformatierung
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Gesundheitseinrichtung auswählen | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '##name## (##age## Jahre alt)', '$.results', 'search_results')
-```
+Die API erhält `{"query": "nair"}`, wenn der Interviewer "nair" tippt, und gibt zurück:
 
-### Mit Funktion in der Anzeige
-
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '@{if_else(eq("##status##", "active"), "Aktiv: ##name##", "Inaktiv: ##name##")}', '$.results', 'search_results')
-```
-
-## Unterstützte Fragetypen
-
-- `select_one`
-- `select_multiple`
-- `text` (für Autocomplete-Funktionalität)
-
-## Zusätzliche Funktionen
-
-### Standard-API (Default API)
-
-Verwenden Sie `search-default-api()` nach `search-api()`, um Standardwerte festzulegen:
-
-```
-appearance: search-api(...) search-default-api(...)
+```json
+{
+  "results": [
+    {"id": "HF001", "name": "Nairobi Central Clinic"},
+    {"id": "HF002", "name": "Nairobi West Hospital"}
+  ]
+}
 ```
 
-### Trennzeichen für Mehrfachauswahl
+Das Dropdown zeigt `Nairobi Central Clinic` und `Nairobi West Hospital` an; der gespeicherte Wert ist `HF001` oder `HF002`.
 
-Verwenden Sie für `select_multiple` `search-default-separator()`, um ein benutzerdefiniertes Trennzeichen anzugeben:
+---
+
+## Erweiterte Anzeigeformatierung
+
+### Verwendung von `##key##`-Vorlagen
+
+Mehrere Felder in der Beschriftung anzeigen:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
+```
+
+Wird angezeigt als: `Nairobi Central Clinic (Nairobi)`.
+
+### Verwendung von `@{func}`-Ausdrücken
+
+Bedingte Logik in der Anzeigebeschriftung anwenden:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
+  '@{if_else(eq("##status##", "active"), "✓ ##name##", "✗ ##name##")}',
+  '$.data', 'res')
+```
+
+Aktive Ergebnisse zeigen `✓ Einrichtungsname`; inaktive zeigen `✗ Einrichtungsname`.
+
+---
+
+## Standardwert festlegen: `search-default-api()`
+
+Verwenden Sie `search-default-api()` nach `search-api()`, um das Feld mit einer Standardauswahl vorzubefüllen, die von einem separaten API-Aufruf geladen wird (z. B. beim Bearbeiten eines vorhandenen Eintrags):
+
+```
+appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
+```
+
+---
+
+## Benutzerdefiniertes Trennzeichen für select_multiple: `search-default-separator()`
+
+Für `select_multiple`-Felder legen Sie fest, wie mehrere ausgewählte Werte in der gespeicherten Zeichenkette verbunden werden:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
 ```
 
-## Best Practices
+Standard-Trennzeichen ist ein Leerzeichen.
 
-1. Optimieren Sie API-Endpunkte für die Leistung, insbesondere bei großen Datensätzen.
-2. Verwenden Sie geeignete Caching-Strategien, um API-Aufrufe zu reduzieren.
-3. Gehen Sie in Ihrem Umfragedesign elegant mit Netzwerkfehlern um.
-4. Testen Sie gründlich mit verschiedenen Eingabeszenarien.
+---
 
-## Bekannte Einschränkungen
+## Unterstützte Fragetypen
 
-- Komplexe Abfragen können die Ladezeiten der Umfrage beeinflussen.
-- Die Offline-Funktionalität kann je nach Implementierung eingeschränkt sein.
+| Fragetyp | Anwendungsfall |
+|----------|---------------|
+| `select_one` | Einzelauswahl aus Suchergebnissen |
+| `select_multiple` | Mehrfachauswahl aus Suchergebnissen |
+| `text` | Autovervollständigung — Interviewer tippt frei, kann aber einen Vorschlag auswählen |
 
-```mermaid
-    graph TD
-    %% Define styles for nodes
-    classDef light fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#003366
-    classDef dark fill:#2e3b4e,stroke:#a6b1c2,stroke-width:2px,color:#e1e1e1
-    classDef submit fill:#ffcc99,stroke:#cc6600,stroke-width:2px,color:#663300
-    classDef link fill:#ccffcc,stroke:#009933,stroke-width:2px,color:#003300
-    classDef storage fill:#ffffcc,stroke:#999900,stroke-width:2px,color:#333300
-    
-    %% Define shapes for nodes
-    A[<span class="iconify" data-icon="mdi:file-document-multiple" data-inline="false" data-width="18" data-height="18"></span> Receipts in PDF, PNG, HEIC, JPEG, Excel] --> B{<span class="iconify" data-icon="mdi:send" data-inline="false" data-width="18" data-height="18"></span> Submit the Receipts}
-    B --> C1([<a href="mailto:keep@keepy.us?subject=Keep%20my%20receipts" style="color:#003300;"><span class="iconify" data-icon="mdi:email" data-inline="false" data-width="18" data-height="18"></span> Email: keep@keepy.us</a>])
-    B --> C2([<a href="sms:+16504173562" style="color:#003300;"><span class="iconify" data-icon="mdi:message-text" data-inline="false" data-width="18" data-height="18"></span> SMS: 650-417-3562</a>])
-    B --> C3([<a href="https://m.me/keepy.us" target="_blank" style="color:#003300;"><span class="iconify" data-icon="mdi:facebook-messenger" data-inline="false" data-width="18" data-height="18"></span> Messenger: m.me/keepy.us</a>])
-    C1 --> D[[<span class="iconify" data-icon="mdi:database" data-inline="false" data-width="18" data-height="18"></span> <b>Receipt Data Stored in Google Sheet</b><br> - Automatic Text Recognition<br> - Human-Verified for Accuracy<br> - Data and Digital Receipt Copies]]
-    C2 --> D
-    C3 --> D
-    
-    %% Apply classes to nodes
-    class A light
-    class B submit
-    class C1 link
-    class C2 link
-    class C3 link
-    class D storage
-    
-    %% Adjust arrow styles for better visibility
-    linkStyle default stroke:#666,stroke-width:3px
-```
+---
+
+## Gespeicherte Antwortdaten verwenden
+
+Der `save_path` speichert das vollständige API-Antwortobjekt unter dem angegebenen Namen. Andere Felder können es mit `pulldata()` referenzieren:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one | facility | Einrichtung auswählen | `search-api(..., 'facility_data')` |
+| calculate | facility_district | | `pulldata('facility_data', 'district')` |
+| calculate | facility_type | | `pulldata('facility_data', 'type')` |
+
+---
+
+## Empfohlene Vorgehensweisen
+
+1. Stellen Sie sicher, dass Ihr API-Endpunkt innerhalb von 1–2 Sekunden antwortet — langsame APIs lassen die Suche träge wirken.
+2. Verwenden Sie `%__input__%` im `post_body`, damit die API nur passende Ergebnisse zurückgibt, nicht den gesamten Datensatz.
+3. Indizieren Sie das Suchfeld auf der Serverseite (z. B. Elasticsearch, Datenbankvolltextindex) für schnelle Antworten.
+4. Begrenzen Sie Ergebnisse auf 20–50 Einträge pro Abfrage — die Rückgabe von Tausenden von Ergebnissen untergräbt den Zweck der Suche.
+5. Fügen Sie eine Mindestlängenanforderung für die Eingabe in der API ein, um das Auslösen breiter Abfragen bei einzelnen Zeichen zu vermeiden.
+
+## Einschränkungen
+
+- Die dynamische Suche erfordert Netzwerkkonnektivität — sie funktioniert nicht offline.
+- Der Platzhalter `%__input__%` wird unverändert eingefügt; bereinigen Sie Eingaben auf der Serverseite, um Injection-Angriffe zu verhindern.
+- Komplexe `@{func}`-Anzeigeausdrücke können auf allen rtSurvey-Client-Versionen möglicherweise nur eingeschränkt unterstützt werden.

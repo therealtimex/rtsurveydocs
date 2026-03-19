@@ -9,9 +9,10 @@ toc: true
 weight: 300
 ---
 
-Die App-API ermöglicht es Benutzern, Systemmetadaten aus der App über verschiedene Methoden im FormEngine und DMView zu laden. Sie bietet Zugriff auf verschiedene Datenschlüssel zum Abrufen spezifischer Informationen aus der App.
+Die App-API ermöglicht es Benutzern, Systemmetadaten aus der App über verschiedene Methoden in der FormEngine und DMView zu laden. Sie bietet Zugriff auf verschiedene Datenschlüssel zum Abrufen spezifischer Informationen aus der App.
 
-In der XLSForm können Sie die Funktion `pulldata()` mit der folgenden Syntax verwenden:
+Im XLSForm können Sie die Funktion `pulldata()` mit der folgenden Syntax verwenden:
+
 
 {{< alert context="light" text="pulldata('app-api', 'data-key')" />}}
 
@@ -33,17 +34,17 @@ Hier sind die unterstützten Datenschlüssel, die Sie mit der App-API verwenden 
 
 `getScreenSize`: Gibt die Bildschirmgröße des Geräts in Zoll zurück.
 
-`projectCode`: Gibt den aktuellen Projektcode der Site zurück, bei der der Benutzer angemeldet ist.
+`projectCode`: Gibt den aktuellen Projektcode der Website zurück, bei der der Benutzer angemeldet ist.
 
-`projectURL`: Gibt die aktuelle Projekt-URL der Site zurück, bei der der Benutzer angemeldet ist. Der Standard-/Fallback-Wert ist ein leerer Text ("").
+`projectURL`: Gibt die aktuelle Projekt-URL der Website zurück, bei der der Benutzer angemeldet ist. Der Standard-/Fallback-Wert ist ein leerer Text ("").
 
-`startingPoint`: Gibt den Pfad des Punktes zurück, an dem das Formular startet. Weitere Details finden Sie unter "Form starting point".
+`startingPoint`: Gibt den Pfad des Punktes zurück, an dem das Formular startet. Weitere Details finden Sie unter "Formularstartpunkt".
 
 `serverTime`: Gibt die bestmögliche Annäherung an Datum und Uhrzeit auf dem Server zurück.
 
-`user.[attribute]`: Gibt die aktuellen Benutzerattribute basierend auf dem angegebenen Attributschlüssel zurück. Verfügbare Attributschlüssel finden Sie in der Tabelle "User attributes".
+`user.[attribute]`: Gibt die aktuellen Benutzerattribute basierend auf dem angegebenen Attributschlüssel zurück. Verfügbare Attributschlüssel finden Sie in der Tabelle "Benutzerattribute".
 
-Kombinieren Sie die unten stehenden Attributschlüssel mit "user." in den `pulldata()`-Parametern, um aktuelle Benutzerinformationen abzurufen. Verwenden Sie zum Beispiel `user.username`, `user.email` usw.
+Kombinieren Sie die nachstehenden Attributschlüssel mit "user." in den `pulldata()`-Parametern, um aktuelle Benutzerinformationen abzurufen. Verwenden Sie zum Beispiel `user.username`, `user.email` usw.
 
 | Attributschlüssel     | Beschreibung                          |
 |----------------------|--------------------------------------|
@@ -57,21 +58,84 @@ Kombinieren Sie die unten stehenden Attributschlüssel mit "user." in den `pulld
 | organization_name    | Organisationsname des Benutzers      |
 | team_id              | Team-ID des Benutzers                |
 | supervisor_id        | ID des Vorgesetzten des Benutzers    |
-| user_role            | Benutzerrolle                        |
-| user_group           | Benutzergruppe                       |
 | is_supervisor        | 1, wenn der Benutzer ein Vorgesetzter ist, sonst 0 |
-| auto_approve_edit_request | 1, wenn der Benutzer automatische Bearbeitungsanfragen genehmigen darf, sonst 0 |
-| ipcall.user          | IP Call Account-Parameter - Benutzername |
-| ipcall.token         | IP Call Account-Parameter - Token    |
-| ipcall.password      | IP Call Account-Parameter - Passwort |
-| ipcall.url           | IP Call Account-Parameter - URL      |
-| ipcall.auth          | IP Call Account-Parameter - Auth (optional) |
-| ipcall.port          | IP Call Account-Parameter - Port (optional) |
 
 `instancePath`: Gibt den Pfad des aktuellen Instanzordners zurück.
 
-`appLanguage`: Gibt die aktuelle App-Sprache zurück, die in den Einstellungen der App festgelegt ist (z. B. vi, en, de).
+`appLanguage`: Gibt die aktuelle App-Sprache zurück, die in den Einstellungen der App festgelegt ist (z. B. vi, en).
 
-`openArgs.[attribute]`: Gibt das open-form-argument zurück, das vom ActionButton (act_fill_form, act_get_instance) übergeben wurde. Der Standardwert ist ein leerer Text ("").
+`openArgs.[attribute]`: Gibt das open-form-argument zurück, das vom ActionButton (act_fill_form, act_get_instance) übergeben wurde. Der Standard-/Fallback-Wert ist ein leerer Text ("").
 
 `primaryAppColor`: Ruft die primäre Farbe der App ab.
+
+---
+
+## Verwendungsbeispiele
+
+### Benutzernamen und Organisation des Interviewers speichern
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Diese in Notiz-Beschriftungen für Prüfzwecke verwenden:
+```
+note | interviewer_info | Interviewer: ${enumerator_name} (${enumerator_org})
+```
+
+### Geräte- und Bildschirminformationen
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+Nützlich für die Fehlersuche: `device_platform` und `app_ver` zusammen mit Ihren Daten exportieren, um zu ermitteln, welche Geräteversion für jede Übermittlung verwendet wurde.
+
+### Serverzeit statt Gerätezeit
+
+Geräteuhren können falsch sein. Verwenden Sie `serverTime` für einen zuverlässigeren Zeitstempel:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Bedingte Logik basierend auf der Benutzerrolle
+
+Einen nur für Vorgesetzte sichtbaren Abschnitt anzeigen:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Vorgesetztenüberprüfung | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Notizen des Vorgesetzten | |
+| end_group | | | |
+
+### Argumente von einer Aktionsschaltfläche übergeben
+
+Wenn das Formular von einer `act_fill_form`-Aktionsschaltfläche mit benutzerdefinierten Argumenten gestartet wird:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+Die Aktionsschaltfläche muss die Argumente mit passenden Schlüsseln übergeben (z. B. `household_id`, `task_code`).
+
+### Projektinformationen verwenden
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## Hinweise
+
+- Alle `pulldata('app-api', ...)`-Aufrufe werden beim Öffnen des Formulars ausgewertet und werden während der Sitzung nicht dynamisch neu ausgewertet (außer `serverTime` und `now()`).
+- Wenn ein Schlüssel nicht unterstützt wird oder die Daten nicht verfügbar sind, gibt die Funktion `'n/a'` zurück (nicht leer — testen Sie mit `!= 'n/a'` statt `!= ''`).
+- `openArgs`-Werte sind nur verfügbar, wenn das Formular von einer Aktionsschaltfläche gestartet wird; sie geben andernfalls eine leere Zeichenkette zurück.

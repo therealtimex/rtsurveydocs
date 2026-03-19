@@ -1,10 +1,113 @@
 ---
 title: "Bố cục lưới (Grid-layout)"
-description: ""
+description: "Bố cục lưới cho phép sắp xếp các trường theo dạng lưới CSS bên trong nhóm, hỗ trợ thiết kế biểu mẫu nhiều cột."
 icon: "manage_search"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
 draft: false
 toc: true
-weight: 294
+weight: 296
 ---
+
+Tính năng **Bố cục lưới** cho phép sắp xếp các câu hỏi theo **lưới nhiều cột** bên trong một nhóm, sử dụng thẻ appearance `gridformat<>`. Tính năng này hữu ích cho các biểu mẫu nhập liệu dày đặc, nơi nhiều trường liên quan nên hiển thị cạnh nhau thay vì xếp chồng theo chiều dọc.
+
+---
+
+## Cách hoạt động
+
+Bố cục lưới được áp dụng ở hai cấp:
+
+1. **Nhóm** — đặt `appearance: field-list grid(weight=N)` để xác định số cột của lưới
+2. **Mỗi trường bên trong nhóm** — đặt `appearance: gridformat<row=R col=C colspan=S/>` để định vị trường
+
+Lưới dùng hệ thống 12 cột theo kiểu Bootstrap. `weight=N` xác định số cột logic của lưới; mỗi cột chiếm `12/N` cột Bootstrap.
+
+---
+
+## Appearance ở cấp nhóm
+
+| Appearance | Mô tả |
+|------------|-------|
+| `field-list grid(weight=2)` | Lưới 2 cột (mỗi cột = 6 cột Bootstrap) |
+| `field-list grid(weight=3)` | Lưới 3 cột (mỗi cột = 4 cột Bootstrap) |
+| `field-list grid(weight=4)` | Lưới 4 cột (mỗi cột = 3 cột Bootstrap) |
+| `field-list grid(weight=6)` | Lưới 6 cột (mỗi cột = 2 cột Bootstrap) |
+
+---
+
+## Cú pháp `gridformat<>` ở cấp trường
+
+```
+gridformat<row=R col=C colspan=S/>
+gridformat<row=R col=C colspan=S backgroundcolor=COLOR/>
+```
+
+| Thuộc tính | Mô tả |
+|------------|-------|
+| `row` | Số hàng (bắt đầu từ 1) |
+| `col` | Số cột (bắt đầu từ 1, trong lưới được xác định bởi `weight`) |
+| `colspan` | Số cột mà trường này chiếm (mặc định là 1) |
+| `backgroundcolor` | Màu CSS tùy chọn cho nền trường (ví dụ: `#f0f0f0`, `lightblue`) |
+
+---
+
+## Ví dụ: Phần khảo sát hộ gia đình 2 cột
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | demographics | Nhân khẩu học | `field-list grid(weight=2)` |
+| text | first_name | Tên | `gridformat<row=1 col=1/>` |
+| text | last_name | Họ | `gridformat<row=1 col=2/>` |
+| integer | age | Tuổi | `gridformat<row=2 col=1/>` |
+| select_one gender | gender | Giới tính | `gridformat<row=2 col=2/>` |
+| text | address | Địa chỉ đầy đủ | `gridformat<row=3 col=1 colspan=2/>` |
+| end_group | | | |
+
+Kết quả hiển thị:
+
+```
+[ Tên                ] [ Họ                 ]
+[ Tuổi               ] [ Giới tính          ]
+[ Địa chỉ đầy đủ (chiếm cả hai cột)        ]
+```
+
+---
+
+## Ví dụ: Nhập liệu thửa đất 3 cột
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | plot_data | Thông tin thửa đất | `field-list grid(weight=3)` |
+| text | plot_id | ID thửa đất | `gridformat<row=1 col=1/>` |
+| decimal | area_ha | Diện tích (ha) | `gridformat<row=1 col=2/>` |
+| select_one crop_type | crop | Loại cây trồng | `gridformat<row=1 col=3/>` |
+| decimal | yield | Sản lượng (kg) | `gridformat<row=2 col=1/>` |
+| decimal | revenue | Doanh thu | `gridformat<row=2 col=2/>` |
+| text | notes | Ghi chú | `gridformat<row=2 col=3/>` |
+| end_group | | | |
+
+---
+
+## Màu nền
+
+Dùng `backgroundcolor` để phân biệt các phần một cách trực quan:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | section_a | Phần A | `gridformat<row=1 col=1 colspan=2 backgroundcolor=#e8f4f8/>` |
+
+---
+
+## Thực hành tốt
+
+1. Chỉ dùng bố cục lưới cho màn hình **nhập liệu nhiều** nơi các trường cạnh nhau thực sự giảm cuộn trang.
+2. Giữ các trường `colspan=1` ngắn (ID, mã, lựa chọn ngắn) — nhãn rộng bị cắt xấu trong các cột lưới hẹp.
+3. Dùng `colspan=N` cho các trường có nhãn dài hoặc ô nhập văn bản nhiều dòng.
+4. Kiểm tra trên màn hình nhỏ nhất mà người điều tra dự kiến sử dụng — lưới 4 cột sẽ chật chội trên điện thoại.
+5. Bố cục lưới hoạt động tốt nhất trên web và máy tính bảng; trên điện thoại di động thường tối đa 2 cột là thoải mái.
+
+## Giới hạn
+
+- `gridformat<>` chỉ hoạt động bên trong nhóm có appearance `grid(weight=N)` — không có hiệu lực ở cấp cao nhất.
+- Bố cục lưới là phần mở rộng biểu mẫu web của rtSurvey và có thể không hiển thị đúng trong các client tương thích ODK khác.
+- Vị trí hàng và cột không được xác thực lúc xây dựng biểu mẫu — các trường chồng chéo đều hiển thị nhưng có thể trông bị vỡ.

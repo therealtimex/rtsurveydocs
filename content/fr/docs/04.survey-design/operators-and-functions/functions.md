@@ -1,0 +1,324 @@
+---
+title: "Fonctions"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 293
+---
+
+### Fonctions de chaîne de caractères
+
+{{% alert icon=" " context="warning" %}}
+Lorsque vous travaillez avec des chaînes dans des expressions, il est important d'utiliser des guillemets simples ('') pour délimiter les chaînes littérales. Cependant, une exception survient lorsque vous souhaitez inclure des guillemets simples dans une chaîne littérale. Dans ce cas, vous pouvez utiliser des guillemets doubles ("") pour délimiter l'ensemble de la chaîne.
+
+Par exemple :
+- Correct : if(${yesno} = 1, "a string with 'single quotes' in it", "no single quotes here")
+- Incorrect : if(${yesno} = 1, 'a string with 'single quotes' in it', 'no single quotes here')
+
+Concernant les guillemets typographiques, il est crucial d'être conscient de leur présence, car ils peuvent causer des problèmes dans les expressions. De nombreux éditeurs de texte enrichi convertissent automatiquement les guillemets droits ("" ou '') en guillemets typographiques ou courbes ("" ou ''), ce qui peut entraîner des erreurs de syntaxe ou des comportements inattendus. Pour éviter cela, assurez-vous d'utiliser des guillemets droits ('') de manière cohérente dans vos expressions.
+{{% /alert %}}
+
+rtSurvey prend en charge diverses fonctions, notamment :
+
+1. `string(field)` : Convertit un champ en chaîne de caractères.
+   - Exemple : `string(34.8)` sera converti en `'34.8'`.
+
+2. `string-length(field)` : Retourne la longueur d'un champ chaîne.
+   - Exemple : `string-length(.) > 3 and string-length(.) < 10` peut être utilisé pour s'assurer que le champ actuel contient entre 3 et 10 caractères.
+
+3. `substr(fieldorstring, startindex, endindex)` : Retourne une sous-chaîne commençant à `startindex` et se terminant juste avant `endindex`. Les index commencent à 0 pour le premier caractère.
+   - Exemple : `substr(${phone}, 0, 3)` retournera les trois premiers chiffres d'un numéro de téléphone.
+
+4. `concat(a, b, c, ...)` : Concatène des champs (et/ou des chaînes) ensemble.
+   - Exemple : `concat(${firstname}, ' ', ${lastname})` retournera un nom complet en combinant les valeurs des champs `firstname` et `lastname`.
+
+5. `linebreak()` : Retourne un caractère de saut de ligne.
+   - Exemple : `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` retournera une liste de trois valeurs de champs avec des sauts de ligne entre elles.
+
+6. `lower()` : Convertit une chaîne en minuscules.
+   - Exemple : `lower('Street Name')` retournera "street name".
+
+7. `upper()` : Convertit une chaîne en majuscules.
+   - Exemple : `upper('Street Name')` retournera "STREET NAME".
+
+### Fonctions select_one et select_multiple
+
+1. `count-selected(field)` : Retourne le nombre d'éléments sélectionnés dans un champ select_multiple.
+   - Exemple : `count-selected(.) = 3` peut être utilisé comme expression de contrainte pour s'assurer que exactement trois choix sont sélectionnés.
+
+2. `selected(field, value)` : Retourne vrai ou faux selon que la valeur spécifiée a été sélectionnée dans le champ select_one ou select_multiple.
+   - Exemple : `selected(${color}, 'Blue')` peut être utilisé comme expression de pertinence pour afficher un groupe ou un champ uniquement si le répondant a sélectionné "Blue" comme couleur préférée.
+   - Remarque : Le second paramètre doit toujours spécifier la valeur du choix, pas l'étiquette. Utilisez la valeur de la colonne de valeur dans la feuille choices de la définition du formulaire.
+
+3. `selected-at(field, number)` : Retourne l'élément sélectionné à la position spécifiée dans un champ select_multiple. Quand le nombre passé est 0, retourne le premier élément sélectionné ; quand le nombre est 1, retourne le deuxième élément sélectionné, et ainsi de suite.
+   - Exemple : `selected-at(${fruits}, 0) = 'Apple'` peut être utilisé comme expression de pertinence pour afficher un groupe ou un champ uniquement si le premier choix sélectionné est "Apple".
+   - Remarque : La valeur retournée sera la valeur du choix, pas l'étiquette.
+
+4. `choice-label(field, value)` : Retourne l'étiquette d'un choix de champ select_one ou select_multiple, telle que définie dans la feuille choices de la définition du formulaire.
+   - Exemple 1 : `choice-label(${country}, ${country})` retournera l'étiquette du choix actuellement sélectionné dans le champ nommé `country`.
+   - Exemple 2 : `choice-label(${languages}, selected-at(${languages}, 0))` retournera l'étiquette du premier choix sélectionné dans le champ nommé `languages`.
+   - Remarque : Cette fonction récupère l'étiquette du choix, pas la valeur.
+
+### Fonctions de champ répété
+
+Dans rtSurvey, si vous souhaitez poser la ou les mêmes questions plusieurs fois, vous pouvez placer un champ dans un groupe de répétition. Cela crée plusieurs instances du même champ. Les fonctions suivantes peuvent vous aider à gérer ces champs répétés et les données répétées qu'ils produisent.
+
+1. `join(string, repeatedfield)` : Pour un champ dans un groupe de répétition, génère une liste de valeurs séparées par une chaîne. Le premier paramètre spécifie le délimiteur à utiliser.
+   - Exemple : `join(', ', ${member_name})` générera une liste séparée par des virgules de tous les noms saisis.
+
+2. `join-if(string, repeatedfield, expression)` : Fonctionne exactement comme `join()`, sauf qu'il vérifie chaque instance du groupe de répétition à l'aide de l'expression fournie. Si l'expression s'évalue à faux, l'élément sera omis.
+   - Exemple : `join-if(', ', ${member_name}, ${age} >= 18)` générera une liste de noms des membres adultes uniquement (ceux ayant 18 ans et plus).
+
+3. `count(repeatgroup)` : Retourne le nombre actuel de fois qu'un groupe de répétition s'est répété.
+   - Exemple : `count(${groupname})` retournera le nombre d'instances du groupe.
+
+4. `count-if(repeatgroup, expression)` : Fonctionne exactement comme `count()`, sauf qu'il vérifie chaque instance en utilisant l'expression fournie. Si l'expression s'évalue à faux, l'élément sera omis.
+   - Exemple : `count-if(${members}, ${age} >= 18)` retournera le nombre de membres adultes basé sur le champ age dans le groupe de répétition "members".
+
+5. `sum(repeatedfield)` : Pour un champ dans un groupe de répétition, calcule la somme de toutes les valeurs.
+   - Exemple : `sum(${loan_amount})` retournera la valeur totale de tous les prêts.
+
+6. `sum-if(repeatedfield, expression)` : Fonctionne exactement comme `sum()`, sauf qu'il vérifie chaque instance en utilisant l'expression fournie.
+   - Exemple : `sum-if(${loan_amount}, ${loan_amount} > 500)` retournera la valeur totale de tous les prêts supérieurs à 500.
+
+7. `min(repeatedfield)` : Pour un champ dans un groupe de répétition, calcule le minimum de toutes les valeurs.
+   - Exemple : `min(${member_age})` retournera l'âge du membre le plus jeune dans le groupe.
+
+8. `min-if(repeatedfield, expression)` : Fonctionne exactement comme `min()`, sauf qu'il vérifie chaque instance en utilisant l'expression fournie.
+   - Exemple : `min-if(${member_age}, ${member_age} >= 18)` retournera l'âge du plus jeune adulte dans le groupe.
+
+9. `max(repeatedfield)` : Pour un champ dans un groupe de répétition, calcule le maximum de toutes les valeurs.
+   - Exemple : `max(${member_age})` retournera l'âge du membre le plus âgé dans le groupe.
+
+10. `max-if(repeatedfield, expression)` : Fonctionne exactement comme `max()`, sauf qu'il vérifie chaque instance en utilisant l'expression fournie.
+    - Exemple : `max-if(${member_age}, ${member_age} >= 18)` retournera l'âge de l'adulte le plus âgé dans le groupe.
+
+11. `index()` : Appelé dans un groupe de répétition, retourne le numéro d'index pour le groupe ou l'instance actuelle.
+    - Exemple : `index()` utilisé dans un groupe de répétition retournera 1 pour la première instance, 2 pour la deuxième, et ainsi de suite.
+
+12. `indexed-repeat(repeatedfield, repeatgroup, index)` : Référence un champ ou un groupe se trouvant dans un groupe de répétition depuis l'extérieur de ce groupe. Le premier paramètre spécifie le champ ou groupe répété d'intérêt, le second spécifie le groupe de répétition, et le troisième spécifie le numéro d'instance.
+    - Exemple 1 : `indexed-repeat(${name}, ${names}, 1)` retournera le premier nom disponible lorsque le champ name est dans un groupe de répétition antérieur nommé "names".
+    - Exemple 2 : `indexed-repeat(${name}, ${names}, index())` extraira le nom correspondant au numéro d'instance du groupe de répétition actuel.
+
+13. `rank-index(index, repeatedfield)` : Cette fonction calcule le rang ordinal de l'instance spécifiée d'un champ répété pour une utilisation en dehors du groupe de répétition. Le rang 1 est attribué à l'instance avec la valeur la plus élevée, le rang 2 à l'instance avec la valeur suivante, etc. Si vous passez un index invalide ou un index vers une instance avec une valeur non numérique, un rang de 999 sera retourné.
+    - Exemple : `rank-index(1, ${random_draw})` calcule le rang de la première instance en fonction de la valeur de son champ `random_draw` comparé aux valeurs des autres instances.
+
+14. `rank-index-if(index, repeatedfield, expression)` : Cette fonction fonctionne de manière similaire à `rank-index()`, mais elle vérifie chaque instance du groupe de répétition en utilisant l'expression fournie. Si l'expression s'évalue à faux, l'élément sera omis du calcul.
+    - Exemple : `rank-index-if(1, ${age}, ${age} >= 18)` calcule le rang d'âge dans l'ensemble des adultes, en ne considérant que les instances où l'âge est supérieur ou égal à 18.
+
+### Fonctions numériques
+
+{{< table >}}
+| Opérateur | Opération | Exemple | Résultat |
+|----------|-----------|---------|----------------|
+| `+` | Addition | 1 + 1 | 2 |
+| `-` | Soustraction | 3 - 2 | 1 |
+| `*` | Multiplication | 3 * 2 | 6 |
+| `div` | Division | 10 div 2 | 5 |
+| `mod` | Modulo | 9 mod 2 | 1 |
+{{< /table >}}
+
+rtSurvey prend en charge des fonctions numériques, notamment :
+- `number(field)` : Convertit la valeur du champ en nombre.
+  - Exemple : `number('34.8')` = 34.8
+
+- `int(field)` : Convertit la valeur du champ en entier.
+  - Exemple : `int('39.2')` = 39
+
+- `min(field1, ..., fieldx)` : Retourne la valeur minimale parmi les champs passés.
+  - Exemple : `min(${father_age}, ${mother_age})` retournera l'âge du père ou de la mère, celui qui est le plus petit.
+
+- `max(field1, ..., fieldx)` : Retourne la valeur maximale parmi les champs passés.
+  - Exemple : `max(${father_age}, ${mother_age})` retournera l'âge du père ou de la mère, celui qui est le plus grand.
+
+- `format-number(field)` : Formate la valeur d'un champ entier ou décimal selon les paramètres régionaux de l'utilisateur.
+  - Exemple : `format-number(${income})` pourrait formater "120000" en "120 000".
+
+- `round(field, digits)` : Arrondit la valeur numérique du champ au nombre de décimales spécifié.
+  - Exemple : `round(${interest_rate}, 2)`
+
+- `abs(number)` : Retourne la valeur absolue d'un nombre.
+
+- `pow(base, exponent)` : Retourne la valeur du premier paramètre élevé à la puissance du second.
+  - Chaque paramètre peut être un champ, un nombre ou une expression.
+
+- `log10(fieldorvalue)` : Retourne le logarithme en base dix du champ ou de la valeur passé.
+
+- `sin(fieldorvalue)` : Retourne le sinus du champ ou de la valeur passé, exprimé en radians.
+
+- `cos(fieldorvalue)` : Retourne le cosinus du champ ou de la valeur passé, exprimé en radians.
+
+- `tan(fieldorvalue)` : Retourne la tangente du champ ou de la valeur passé, exprimé en radians.
+
+- `asin(fieldorvalue)` : Retourne l'arcsinus du champ ou de la valeur passé, exprimé en radians.
+
+- `acos(fieldorvalue)` : Retourne l'arccosinus du champ ou de la valeur passé, exprimé en radians.
+
+- `atan(fieldorvalue)` : Retourne l'arctangente du champ ou de la valeur passé, exprimé en radians.
+
+- `atan2(x, y)` : Retourne l'angle en radians sous-tendu à l'origine par le point de coordonnées (x, y) et l'axe x positif. Le résultat est dans la plage -pi() à pi().
+
+- `sqrt(fieldorvalue)` : Retourne la racine carrée non négative du champ ou de la valeur passé.
+
+- `exp(x)` : Retourne la valeur de e^x.
+
+- `pi()` : Retourne la valeur de pi.
+
+### Fonctions de date et heure
+
+{{% alert icon=" " context="warning" %}}
+Les valeurs de date dans rtSurvey sont stockées sous forme de chaînes au format `YYYY-MM-DD`. Les valeurs datetime sont stockées sous forme de chaînes ISO 8601 (`YYYY-MM-DDTHH:MM:SS`). Utilisez `decimal-date-time()` pour les convertir en nombre pour l'arithmétique (ex. : calcul de durées).
+{{% /alert %}}
+
+1. `today()` : Retourne la date du jour sous forme de chaîne au format `YYYY-MM-DD`. Évalué une fois à l'ouverture du formulaire.
+   - Exemple : `today()` → `'2024-03-15'`
+   - Utilisation courante : colonne `default` pour pré-remplir la date du jour, ou dans `relevant`/`constraint` pour comparer à un champ date.
+
+2. `now()` : Retourne la date et l'heure actuelles sous forme de chaîne ISO 8601. Évalué à chaque fois que l'expression est calculée.
+   - Exemple : `now()` → `'2024-03-15T14:32:00.000+03:00'`
+   - Utilisation courante : Enregistrer l'horodatage exact d'un événement spécifique pendant l'enquête.
+
+3. `date(value)` : Convertit une valeur (chaîne ou nombre) en chaîne de date.
+   - Exemple : `date('2024-03-15')` → `'2024-03-15'`
+
+4. `date-time(value)` : Convertit une valeur en chaîne datetime.
+   - Exemple : `date-time(${event_timestamp})`
+
+5. `decimal-date-time(value)` : Convertit une chaîne date ou datetime en nombre décimal représentant les millisecondes depuis l'époque Unix divisées par 86400000 (c.-à-d. jours fractionnaires depuis le 1970-01-01). Utilisez cette fonction pour effectuer de l'arithmétique sur les dates.
+   - Exemple : Durée en jours entre deux dates :
+     `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
+   - Exemple : Durée en minutes entre deux datetimes :
+     `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
+
+6. `format-date(date, format)` : Formate une valeur de date en utilisant une chaîne de motif.
+   - Jetons de format : `%Y` (année sur 4 chiffres), `%y` (année sur 2 chiffres), `%m` (mois 01-12), `%d` (jour 01-31), `%a` (abréviation du jour de la semaine), `%b` (abréviation du nom du mois)
+   - Exemple : `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+   - Exemple : `format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
+
+7. `format-date-time(datetime, format)` : Formate une valeur datetime en utilisant une chaîne de motif. Accepte tous les jetons `format-date` plus :
+   - `%H` (heure 00-23), `%h` (heure 01-12), `%M` (minutes 00-59), `%S` (secondes 00-59), `%3` (millisecondes), `%P` (AM/PM)
+   - Exemple : `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+   - Exemple : `format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
+
+---
+
+### Fonctions booléennes
+
+1. `boolean(value)` : Convertit n'importe quelle valeur en booléen. Retourne `true` pour les chaînes non vides, les nombres non nuls et `true` ; retourne `false` pour les chaînes vides, `0` et `false`.
+   - Exemple : `boolean(${name})` retourne `true` si `name` n'est pas vide.
+
+2. `boolean-from-string(string)` : Retourne `true` si la chaîne est `'1'` ou `'true'` (insensible à la casse) ; retourne `false` sinon.
+   - Exemple : `boolean-from-string(${enabled_flag})` — utile lorsqu'un champ stocke `'true'`/`'false'` sous forme de texte.
+
+3. `true()` : Retourne la valeur booléenne `true`.
+   - Exemple : Dans la colonne `required`, `true()` est équivalent à `yes`.
+
+4. `false()` : Retourne la valeur booléenne `false`.
+   - Exemple : `if(${skip_section} = 'yes', false(), true())` — définir dynamiquement le caractère obligatoire.
+
+5. `not(expression)` : Retourne la négation logique de l'expression. Retourne `true` si l'expression est fausse, et vice versa.
+   - Exemple : `not(${consent} = 'yes')` — afficher un avertissement quand le consentement N'a PAS été donné.
+   - Exemple : `not(selected(${issues}, 'none'))` — exiger des détails uniquement si "aucun" n'a pas été sélectionné.
+
+---
+
+### Fonctions de chaîne supplémentaires
+
+1. `starts-with(string, prefix)` : Retourne `true` si `string` commence par `prefix`.
+   - Exemple : `starts-with(${phone}, '+254')` vérifie si le numéro de téléphone commence par l'indicatif du Kenya.
+
+2. `contains(string, substring)` : Retourne `true` si `string` contient `substring`.
+   - Exemple : `contains(${email}, '@')` vérifie qu'une adresse e-mail contient un signe `@`.
+   - Exemple : `contains(${notes}, 'urgent')` déclenche une question de suivi si les notes mentionnent "urgent".
+
+3. `substring-before(string, needle)` : Retourne la partie de `string` qui apparaît avant la première occurrence de `needle`.
+   - Exemple : `substring-before(${full_name}, ' ')` extrait le premier mot (prénom).
+
+4. `substring-after(string, needle)` : Retourne la partie de `string` qui apparaît après la première occurrence de `needle`.
+   - Exemple : `substring-after(${email}, '@')` extrait la partie domaine d'une adresse e-mail.
+
+5. `normalize-space(string)` : Supprime les espaces de début et de fin, et réduit toutes les séquences d'espaces internes à un seul espace.
+   - Exemple : `normalize-space(${name})` — nettoie un nom qui aurait pu être saisi avec des espaces supplémentaires.
+
+6. `translate(string, search_chars, replace_chars)` : Remplace chaque caractère dans `string` qui apparaît dans `search_chars` par le caractère correspondant dans `replace_chars`. Les caractères dans `search_chars` sans caractère correspondant dans `replace_chars` sont supprimés.
+   - Exemple : `translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` convertit en majuscules (équivalent à `upper()`).
+   - Exemple : `translate(${phone}, ' -()', '')` supprime les espaces, tirets et parenthèses d'un numéro de téléphone.
+
+---
+
+### Fonctions mathématiques supplémentaires
+
+1. `floor(number)` : Retourne le plus grand entier inférieur ou égal à `number` (arrondit vers l'infini négatif).
+   - Exemple : `floor(4.9)` = 4, `floor(-2.1)` = -3
+
+2. `ceiling(number)` : Retourne le plus petit entier supérieur ou égal à `number` (arrondit vers l'infini positif).
+   - Exemple : `ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
+
+3. `random()` : Retourne un nombre décimal aléatoire entre 0.0 (inclus) et 1.0 (exclus). Typiquement utilisé dans les champs `calculate` pour attribuer des valeurs aléatoires ou randomiser l'ordre des questions.
+   - Exemple : `random()` → ex. : `0.7341`
+   - Exemple : `int(random() * 6) + 1` → nombre aléatoire 1-6 (lancer de dé)
+
+4. `coalesce(a, b)` : Retourne `a` si `a` est non vide ; sinon retourne `b`. Utile comme valeur de repli lorsqu'un champ peut être vide.
+   - Exemple : `coalesce(${preferred_name}, ${full_name})` — utiliser le nom préféré s'il est défini, sinon revenir au nom complet.
+
+5. `once(value)` : Évalue `value` et le stocke, mais uniquement si le champ actuel est **vide**. Si le champ a déjà une valeur (ex. : a été défini précédemment), `once()` retourne la valeur existante sans modification. Cela empêche le recalcul d'écraser la saisie de l'utilisateur.
+   - Exemple : `once(today())` dans la colonne `default` définit la date du jour une fois et ne se met pas à jour si l'enquêteur rouvre le formulaire.
+   - Exemple : `once(uuid())` génère un UUID une fois et le maintient stable lors des modifications ultérieures.
+
+---
+
+### Fonctions géographiques
+
+1. `area(geoshape_value)` : Calcule la **superficie en mètres carrés** délimitée par une valeur geoshape (polygone).
+   - Le paramètre est une valeur de champ geoshape au format `lat1 lon1 0 0; lat2 lon2 0 0; ...`
+   - Exemple : `area(${field_boundary})` — calculer la superficie d'un champ enquêté en m².
+   - Exemple : `round(area(${field_boundary}) div 10000, 2)` — convertir en hectares.
+
+2. `distance(coordinates)` : Calcule la **longueur totale du trajet en mètres** d'une geotrace (ligne), ou la distance entre deux geopoints.
+   - Pour une geotrace : `distance(${route})` retourne la longueur totale du trajet en mètres.
+   - Pour deux geopoints : `distance(concat(${point_a}, ' ', ${point_b}))` retourne la distance entre eux.
+   - Exemple : `round(distance(${road_trace}) div 1000, 3)` — longueur de route en kilomètres.
+
+---
+
+### Fonctions de validation
+
+1. `regex(value, pattern)` : Retourne `true` si `value` correspond à l'expression régulière `pattern`. À utiliser dans la colonne `constraint` pour la validation basée sur des motifs.
+   - Le motif utilise la syntaxe regex standard (sous-ensemble POSIX ERE).
+   - Exemple : `regex(., '^[0-9]{10}$')` — valider un nombre à 10 chiffres.
+   - Exemple : `regex(., '^[A-Z]{2}[0-9]{6}$')` — valider un format de numéro de passeport (2 lettres majuscules suivies de 6 chiffres).
+   - Exemple : `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — vérification de base du format d'e-mail.
+
+2. `checklist(min, max, v1, v2, ...)` : Évalue une liste d'expressions booléennes et retourne `true` si le nombre de valeurs `true` est entre `min` et `max` (inclus). Passez `-1` pour `min` ou `max` pour ignorer cette borne.
+   - Exemple : `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — passe si exactement 2 ou 3 des trois conditions sont vraies.
+   - Exemple : `checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — au moins une mesure de sécurité doit être vraie.
+
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)` : Comme `checklist()`, mais chaque valeur a un poids. La somme des poids pour les valeurs `true` doit être entre `min` et `max`.
+   - Exemple : `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — la somme des poids des installations présentes doit être d'au moins 10.
+
+---
+
+### Fonctions utilitaires
+
+1. `uuid()` : Génère un UUID aléatoire (format RFC 4122 v4) sous forme de chaîne.
+   - Exemple : `uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
+   - Typiquement utilisé avec `once()` pour générer un identifiant unique stable : `once(uuid())`
+
+2. `version()` : Retourne la valeur de l'attribut `version` du formulaire tel que défini dans la feuille settings.
+   - Exemple : `version()` → `'3.1'`
+   - Utile dans les champs `calculate` pour intégrer la version du formulaire dans les données exportées.
+
+3. `position()` : Lorsqu'appelé dans un **groupe de répétition**, retourne l'index (basé sur 1) de l'instance de répétition actuelle.
+   - Exemple : `position()` dans la première instance retourne `1`, dans la deuxième retourne `2`, etc.
+   - Voir aussi : `index()` (alias), `indexed-repeat()` pour référencer des valeurs de répétition depuis l'extérieur du groupe.
+
+4. `thousandsep(length, separator, value)` : Formate un nombre avec un séparateur de milliers. `length` est la longueur totale minimale de la chaîne (complétée par des espaces si plus courte), `separator` est le caractère à utiliser (ex. : `','`), et `value` est le nombre à formater.
+   - Exemple : `thousandsep(0, ',', 1234567)` → `'1,234,567'`
+   - Exemple : `thousandsep(0, '.', ${income})` → formate le revenu avec un point comme séparateur de milliers.
+
+5. `substr-jsonpath(value, jsonpath)` : Extrait une sous-chaîne d'une chaîne JSON en utilisant une expression JSONPath.
+   - Exemple : `substr-jsonpath(${api_response}, '$.data.name')` — extraire le champ `name` d'une chaîne JSON stockée dans `api_response`.
+   - Typiquement utilisé avec `callapi()` pour extraire des valeurs spécifiques des réponses API.

@@ -1,6 +1,6 @@
 ---
-title: "Chọn một (Select_one)"
-description: ""
+title: "Select_one"
+description: "Câu hỏi Select_one cho phép người trả lời chọn đúng một tùy chọn từ danh sách lựa chọn đã định sẵn."
 icon: "radio_button_checked"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -8,40 +8,144 @@ draft: false
 toc: true
 weight: 224
 ---
-  
-  
-### select_one listname
-  
-Câu hỏi `select_one listname` yêu cầu người dùng chọn một tùy chọn duy nhất từ một danh sách các lựa chọn được xác định trước. Trong định nghĩa XLSForm, `listname` phải tương ứng với một giá trị được liệt kê trong cột `list_name` của bảng tính `choices` (ví dụ: "yesno").
 
-Theo mặc định, các lựa chọn được hiển thị dưới dạng các nút chọn (radio buttons), với mỗi nút đại diện cho một lựa chọn tĩnh duy nhất từ danh sách được chỉ định. Tuy nhiên, có nhiều tùy chọn hiển thị (`appearance`) khác nhau để tùy chỉnh giao diện, hành vi và chính danh sách lựa chọn. Tham khảo các phần phụ bên dưới để biết thêm thông tin về các tùy chọn đó.
+Loại câu hỏi `select_one` yêu cầu người trả lời chọn **đúng một tùy chọn** từ danh sách đã định sẵn. Mặc định, các lựa chọn được hiển thị dưới dạng nút radio, nhưng có nhiều tùy chọn hiển thị để thay đổi bố cục và hành vi.
 
-Trong định nghĩa XLSForm:
-{{< table "table table-striped" >}}
-| Type             | Name      | Label          | Appearance |
-|------------------|-----------|----------------|------------|
-| select_one listname | fieldname | câu hỏi văn bản |            |
-{{</ table >}}
-  
-### Các tùy chọn hiển thị cơ bản (Basic appearance options)
+## Cấu hình XLSForm cơ bản
 
-Chỉ định các giá trị sau trong cột `appearance` để sửa đổi hình thức hiển thị của trường `select_one listname`:
+**Bảng tính survey:**
 
-- **quick**: Tự động chuyển sang câu hỏi tiếp theo ngay sau khi một tùy chọn được chọn, không cần chờ người dùng vuốt về phía trước.
-- **minimal**: Hiển thị một trình chọn thả xuống (drop-down) duy nhất thay vì các nút chọn radio.
-- **compact**: Hiển thị một bảng các lựa chọn nhỏ gọn. Số lượng cột sẽ tùy thuộc vào chiều rộng của màn hình.
-- **compact-#**: Chỉ định số lượng cột cụ thể trong bảng nhỏ gọn, trong đó "#" đại diện cho số lượng cột mong muốn (ví dụ: `compact-3`).
-- **quickcompact**: Kết hợp hai kiểu hiển thị "quick" và "compact".
-- **quickcompact-#**: Kết hợp kiểu hiển thị "quick" và "compact" và chỉ định số cột cố định.
+| type | name | label |
+|------|------|-------|
+| select_one yesno | consent | Người trả lời có đồng ý không? |
 
-Trong định nghĩa XLSForm:  
-{{< table "table table-striped" >}}
-| Type             | Name      | Label          | Appearance       |
-|------------------|-----------|----------------|------------------|
-| select_one listname | fieldname | câu hỏi văn bản | quick            |
-| select_one listname | fieldname | câu hỏi văn bản | minimal          |
-| select_one listname | fieldname | câu hỏi văn bản | compact          |
-| select_one listname | fieldname | câu hỏi văn bản | compact-#        |
-| select_one listname | fieldname | câu hỏi văn bản | quickcompact     |
-| select_one listname | fieldname | câu hỏi văn bản | quickcompact-#   |
-{{</ table >}}
+**Bảng tính choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| yesno | yes | Có |
+| yesno | no | Không |
+
+Giá trị `listname` trong `select_one listname` phải khớp với cột `list_name` trong bảng tính choices.
+
+Để biết thêm chi tiết, xem [thông số kỹ thuật XLSForm](https://xlsform.org/en/#question-types).
+
+## Ứng dụng
+
+Câu hỏi Select_one được dùng cho:
+
+1. Câu hỏi Có/Không
+2. Câu hỏi nhiều lựa chọn một đáp án (ví dụ: trình độ học vấn, giới tính, tình trạng hôn nhân)
+3. Đánh giá theo danh mục (ví dụ: kém / trung bình / tốt / xuất sắc)
+4. Lựa chọn phân tầng (liên kết) khi các lựa chọn được lọc dựa trên câu trả lời trước
+5. Chọn quốc gia, khu vực, quận/huyện hoặc đơn vị hành chính khác
+
+## Tùy chọn hiển thị (appearance)
+
+Chỉ định giá trị trong cột `appearance` để thay đổi cách hiển thị các lựa chọn:
+
+{{< table >}}
+| Appearance | Mô tả |
+|------------|-------|
+| *(không có)* | Nút radio mặc định, một nút mỗi dòng |
+| `minimal` | Danh sách thả xuống/spinner thay vì nút radio |
+| `quick` | Tự động chuyển sang câu hỏi tiếp theo ngay sau khi chọn (chỉ trên mobile) |
+| `compact` | Lưới lựa chọn thu gọn — số cột tự điều chỉnh theo chiều rộng màn hình |
+| `compact-N` | Lưới thu gọn cố định N cột (ví dụ: `compact-3`) |
+| `quickcompact` | Kết hợp `quick` và `compact` |
+| `quickcompact-N` | Kết hợp `quick` và `compact` với N cột cố định |
+| `horizontal` | Các lựa chọn xếp thành hàng ngang (web) |
+| `horizontal-compact` | Ngang, khoảng cách thu gọn (web) |
+| `likert` | Hàng thang Likert — nhãn ở trên, nút radio ở dưới |
+| `label` | Chỉ hiển thị nhãn lựa chọn, không có input (dùng kết hợp với `list-nolabel`) |
+| `list-nolabel` | Chỉ hiển thị input, không có nhãn (dùng kết hợp với `label`) |
+| `columns(N)` | Hiển thị theo N cột (phần mở rộng rtSurvey, ví dụ: `columns(3)`) |
+| `distress` | Widget biểu tượng cảm xúc thang đo tâm lý Kessler (K10) |
+| `search-api(...)` | Tìm kiếm động — tải lựa chọn từ API trong thời gian thực |
+{{< /table >}}
+
+### Ví dụ: Thang Likert
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one satisfaction | service_rating | Bạn hài lòng với dịch vụ như thế nào? | likert |
+
+### Ví dụ: Lưới 3 cột thu gọn
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one regions | region | Chọn khu vực | compact-3 |
+
+## Lựa chọn phân tầng
+
+Lựa chọn phân tầng (liên kết) lọc các lựa chọn dựa trên giá trị được chọn ở câu hỏi trước. Dùng cột `choice_filter` với tên của cột từ bảng tính choices.
+
+**survey:**
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one province | province | Chọn tỉnh | |
+| select_one district | district | Chọn quận/huyện | province_name = ${province} |
+
+**choices:**
+
+| list_name | name | label | province_name |
+|-----------|------|-------|---------------|
+| province | nairobi | Nairobi | |
+| province | mombasa | Mombasa | |
+| district | westlands | Westlands | nairobi |
+| district | kasarani | Kasarani | nairobi |
+| district | nyali | Nyali | mombasa |
+| district | likoni | Likoni | mombasa |
+
+Khi người trả lời chọn `nairobi`, chỉ `Westlands` và `Kasarani` xuất hiện trong danh sách quận/huyện.
+
+{{% alert icon=" " context="warning" %}}
+Tên cột dùng trong `choice_filter` (ví dụ: `province_name`) phải tồn tại trong bảng tính choices. `${province}` tham chiếu đến trường survey có tên `province`.
+{{% /alert %}}
+
+## Dùng giá trị đã chọn trong biểu thức
+
+Tham chiếu **giá trị** đã chọn (không phải nhãn) bằng `${fieldname}`:
+
+```
+relevant: ${consent} = 'yes'
+```
+
+Để lấy nhãn lựa chọn thay vì giá trị, dùng `choice-label()`:
+
+```
+calculate: choice-label(${education_level}, ${education_level})
+```
+
+## Tùy chọn "Khác" kèm văn bản tự do
+
+Một mẫu phổ biến là thêm tùy chọn "khác" để hiện ra ô nhập văn bản:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one occupation | job | Nghề nghiệp của bạn là gì? | |
+| text | job_other | Vui lòng ghi rõ | `${job} = 'other'` |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| occupation | farmer | Nông dân |
+| occupation | trader | Buôn bán |
+| occupation | student | Học sinh/sinh viên |
+| occupation | other | Khác (vui lòng ghi rõ) |
+
+## Thực hành tốt
+
+1. Giữ danh sách ngắn gọn và loại trừ lẫn nhau — nếu người trả lời có thể muốn chọn nhiều hơn một, hãy dùng `select_multiple`.
+2. Đặt câu trả lời phổ biến nhất lên đầu, hoặc sắp xếp theo bảng chữ cái với danh sách dài.
+3. Luôn bao gồm tùy chọn "Không biết" hoặc "Không muốn trả lời" khi phù hợp.
+4. Dùng `minimal` (danh sách thả xuống) cho danh sách hơn 7–8 lựa chọn trên mobile để tiết kiệm không gian màn hình.
+5. Với lựa chọn phân tầng, thêm tất cả các cột lọc vào bảng tính choices trước khi xây dựng biểu mẫu.
+
+## Giới hạn
+
+- Người trả lời chỉ có thể chọn một lựa chọn — dùng `select_multiple` cho câu hỏi nhiều đáp án.
+- Kiểu hiển thị `likert` hoạt động tốt nhất với 5–7 lựa chọn vừa với một dòng.
+- Tự động chuyển `quick` chỉ hoạt động trên mobile; không có hiệu lực trên web.

@@ -1,6 +1,6 @@
 ---
 title: "Datei (File)"
-description: "Datei-Fragen ermöglichen es den Befragten, Dateien als Teil ihrer Umfrageantworten hochzuladen."
+description: "Datei-Fragen ermöglichen es Befragten, Dokumente und andere Dateien als Teil ihrer Umfrageantworten hochzuladen."
 icon: "upload_file"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,71 +9,97 @@ toc: true
 weight: 230
 ---
 
-Der `file`-Fragetyp in XLSForms und rtSurvey ermöglicht es Befragten, Dateien als Teil ihrer Umfrageantworten hochzuladen. Diese Funktion ist besonders nützlich für die Erfassung von Dokumenten, Bildern oder anderen für die Umfrage relevanten Dateitypen.
+Der Fragetyp `file` ermöglicht es Befragten, **beliebige Dateien** von ihrem Gerät hochzuladen — Dokumente, Tabellen, PDFs oder andere Dateitypen. Im Gegensatz zu `image`, `audio` und `video`, die spezifische Aufnahmetools starten, öffnet `file` einen allgemeinen Dateiauswahldialog.
 
 ## Grundlegende XLSForm-Spezifikation
 
-| type | name      | label                       |
-|------|-----------|----------------------------|
+| type | name      | label                        |
+|------|-----------|------------------------------|
 | file | document  | Bitte laden Sie Ihr Dokument hoch |
 
-Weitere Details zum grundlegenden `file`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Weitere Details zum Standard-Datei-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
 
-## Anwendungen
+## Anwendungsbereiche
 
 Datei-Fragen werden häufig verwendet für:
 
-1. Sammlung von Belegen (z. B. Quittungen, Zertifikate)
-2. Einholung visueller Beweise (z. B. Fotos von Bedingungen vor Ort)
-3. Hochladen ausgefüllter Formulare oder Tabellen
-4. Sammlung jeder Art von digitaler Datei, die für die Umfrage relevant ist
+1. Erfassung von Belegen (Quittungen, Zertifikate, Verträge, Berichte)
+2. Hochladen ausgefüllter Papierformulare, die gescannt wurden
+3. Sammlung von Tabellen oder Datenexporten aus anderen Systemen
+4. Jeden digitalen Dateityp, der nicht durch image/audio/video abgedeckt wird
 
-## Best Practices
+## Datenformat
 
-1. Geben Sie klare Anweisungen dazu, welche Art von Datei hochgeladen werden soll und ob es Größenbeschränkungen gibt.
-2. Berücksichtigen Sie Datenschutzaspekte und informieren Sie die Befragten darüber, wie ihre Dateien verwendet und gespeichert werden.
-3. Achten Sie auf Dateigrößen und Speicherbeschränkungen, insbesondere bei Umfragen in Gebieten mit eingeschränkter Internetverbindung.
-4. Geben Sie bei Bedarf die akzeptierten Dateiformate an.
+Hochgeladene Dateien werden als Binärdaten gespeichert:
 
-## Beispielhafte Verwendung
-
-Hier ist ein Beispiel dafür, wie Sie eine Datei-Frage in einer Umfrage verwenden könnten:
-
-| type | name           | label                                      | hint                                        |
-|------|----------------|--------------------------------------------|--------------------------------------------|
-| file | receipt_upload | Bitte laden Sie ein Foto Ihrer Quittung hoch | Akzeptierte Formate: JPG, PNG. Max. Größe: 5MB |
+- **Format:** Im Originalformat beibehalten (PDF, XLSX, DOCX usw.)
+- **Benennung:** `{instanceID}-{fieldname}.{extension}`
+- **Speicherung:** In den Server-Medienordner hochgeladen, zusammen mit der Übermittlung
+- **Zugriff:** Über die Übermittlungsverwaltungsoberfläche herunterladbar
 
 ## rtSurvey-Erweiterungen
 
-Während die grundlegende XLSForm-Spezifikation für Datei-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen:
+### Akzeptierte Dateitypen
 
-1. Dateityp-Beschränkungen (z. B. nur Bilder, nur PDFs)
-2. Dateigrößenbeschränkungen
-3. Möglichkeit zum Hochladen mehrerer Dateien
-4. Integration mit dem Dateisystem des Geräts oder Cloud-Speicherdiensten
+Verwenden Sie die Spalte `parameters`, um die auswählbaren Dateitypen einzuschränken:
 
-(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für Datei-Fragen müssten hier bestätigt und detailliert werden.)
+| type | name | label | parameters |
+|------|------|-------|------------|
+| file | report | Prüfbericht hochladen | `accept=.pdf` |
+| file | spreadsheet | Datendatei hochladen | `accept=.xlsx,.csv` |
 
-## Datenhandhabung
+Der Parameter `accept` verwendet die Standard-Dateiendungssyntax (kommagetrennt).
 
-Über diesen Fragetyp gesammelte Dateien werden in der Regel:
+### Dateigrößenhinweise
 
-1. In ihrem Originalformat gespeichert
-2. Zusammen mit anderen Umfragedaten gespeichert, oft in einem separaten Medienordner
-3. Über die Umfrage-Management-Plattform zum Download und zur Analyse zugänglich gemacht
+rtSurvey erzwingt keine harte Dateigrößenbeschränkung auf Frageebene, aber das Server-Upload-Limit gilt. Verwenden Sie `hint`, um dem Interviewer die Erwartungen mitzuteilen:
 
-## Überlegungen zur Analyse
+| type | name | label | hint |
+|------|------|-------|------|
+| file | receipt | Zahlungsbeleg hochladen | Akzeptiert: PDF oder Bild. Maximale Dateigröße: 5 MB |
 
-Berücksichtigen Sie bei der Verwendung von Datei-Fragen:
+### Integration mit dem Gerätedateisystem und Cloud-Speicher
 
-1. Wie die hochgeladenen Dateien verarbeitet und analysiert werden
-2. Den zusätzlichen Speicherplatzbedarf für Dateianhänge
-3. Datenschutz- und Datensicherheitsmaßnahmen für die Speicherung und Handhabung hochgeladener Dateien
-4. Potenziellen Bedarf an spezialisierter Software zum Öffnen oder Analysieren bestimmter Dateitypen
+Auf Android und iOS öffnet die `file`-Frage den nativen Dateiauswahldialog des Geräts, der möglicherweise Zugang bietet zu:
+- Lokalem Gerätespeicher
+- SD-Karte (Android)
+- iCloud Drive (iOS)
+- Google Drive, Dropbox (falls installiert)
+
+Im Web öffnet sich der Standard-Datei-Upload-Dialog des Browsers.
+
+## Beispielhafte Verwendung
+
+### Pflicht-PDF-Upload
+
+| type | name | label | hint | required | required_message |
+|------|------|-------|------|----------|-----------------|
+| file | signed_consent | Unterzeichnetes Einwilligungsformular hochladen | Nur PDF, max. 2 MB | yes | Ein Einwilligungsformular ist erforderlich |
+
+### Bedingter Dokument-Upload
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_land_title | Hat der Haushalt einen Grundbucheintrag? | |
+| file | land_title_doc | Foto oder Scan des Grundbucheintrags hochladen | `${has_land_title} = 'yes'` |
+
+## Empfohlene Vorgehensweisen
+
+1. Verwenden Sie `accept`, um Dateitypen einzuschränken — dies verhindert, dass Interviewer versehentlich falsche Dateien hochladen.
+2. Geben Sie immer Größen- und Formathinweise in der Spalte `hint` an.
+3. Verwenden Sie für Fotos und Bilder den Typ `image` stattdessen — er bietet bessere Komprimierung und konsistente Formatverarbeitung.
+4. Planen Sie bei umfangreichen Umfragen mit Dateianhängen entsprechend Datenspeicher und Download-Bandbreite ein.
+5. Testen Sie den Dateiauswahldialog auf dem Zielgerätetyp (Android vs. iOS vs. Web) vor dem Einsatz — der Zugriff auf Cloud-Laufwerke variiert.
+
+## Überlegungen zur Datenverarbeitung
+
+- Dateien werden in ihrem Originalformat gespeichert; sie werden von rtSurvey nicht konvertiert oder komprimiert.
+- Analysieren Sie Dateien nach dem Download — rtSurvey extrahiert oder indiziert keine Dateiinhalte.
+- Große Dateianhänge verlängern die Zeit, die zum Herunterladen eines vollständigen Datensatzes benötigt wird, erheblich.
 
 ## Einschränkungen
 
-- Große Dateien können die Datenübertragung und den Speicherbedarf erheblich beeinflussen.
-- Nicht alle Geräte haben möglicherweise einfachen Zugriff auf Dateien zum Hochladen.
-- Die Analyse von Dateianhängen kann zeitaufwendiger sein als bei textbasierten Antworten.
-- Es kann Kompatibilitätsprobleme mit bestimmten Dateitypen zwischen verschiedenen Systemen geben.
+- Datei-Fragen validieren keine Dateiinhalte — nur die Dateiendungsprüfung über `accept` wird auf UI-Ebene erzwungen.
+- Sehr große Dateien (100 MB+) können beim Upload in Umgebungen mit schlechter Konnektivität eine Zeitüberschreitung verursachen.
+- Offline-Interviewer können Dateien anhängen, aber sie werden erst hochgeladen, wenn die Konnektivität wiederhergestellt ist.
+- Einige Gerätekonfigurationen schränken den Zugriff auf bestimmte Speicherorte ein (z. B. unternehmenseigene MDM-Richtlinien).

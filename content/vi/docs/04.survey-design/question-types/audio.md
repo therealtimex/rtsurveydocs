@@ -1,6 +1,6 @@
 ---
-title: "Âm thanh (Audio)"
-description: "Các câu hỏi kiểu Âm thanh cho phép người trả lời ghi âm và gửi các tệp âm thanh như một phần của cuộc khảo sát."
+title: "Audio"
+description: "Câu hỏi audio cho phép người trả lời ghi âm và gửi tệp âm thanh như một phần của cuộc khảo sát."
 icon: "mic"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,69 +9,91 @@ toc: true
 weight: 228
 ---
 
-Loại câu hỏi `audio` (âm thanh) trong XLSForm và rtSurvey cho phép người trả lời ghi âm và gửi các tệp âm thanh như một phần câu trả lời khảo sát của họ. Tính năng này đặc biệt hữu ích để thu thập các câu trả lời bằng lời nói, lời chứng thực hoặc âm thanh môi trường liên quan đến cuộc khảo sát.
+Loại câu hỏi `audio` cho phép người trả lời **ghi âm** hoặc tải lên tệp âm thanh có sẵn như một phần câu trả lời khảo sát. Loại này hữu ích để ghi lại lời kể bằng miệng, âm thanh môi trường, lời chứng thực, hoặc bất kỳ thông tin nào được truyền đạt qua giọng nói tốt hơn qua văn bản.
 
-## Đặc tả XLSForm cơ bản
+## Cấu hình XLSForm cơ bản
 
-| type  | name        | label                           |
-|-------|-------------|--------------------------------|
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
 | audio | voice_note  | Vui lòng ghi âm ý kiến của bạn |
 
-Để biết thêm chi tiết về loại câu hỏi âm thanh cơ bản, hãy xem [đặc tả XLSForm](https://xlsform.org/en/#question-types).
+Để biết thêm chi tiết về loại câu hỏi audio tiêu chuẩn, xem [thông số kỹ thuật XLSForm](https://xlsform.org/en/#question-types).
 
-## Các trường hợp sử dụng
+## Ứng dụng
 
-Câu hỏi âm thanh thường được dùng cho:
+Câu hỏi audio thường được dùng cho:
 
-1. Thu thập các câu trả lời bằng lời nói cho các câu hỏi mở
-2. Ghi lại các lời chứng thực hoặc câu chuyện cá nhân
-3. Ghi lại âm thanh môi trường hoặc mức độ tiếng ồn
-4. Thu thập các mẫu giọng nói cho mục đích nghiên cứu
-5. Cho phép người trả lời cung cấp các giải thích chi tiết
+1. Ghi lại câu trả lời lời nói cho câu hỏi mở, giảm gánh nặng nhập liệu cho người điều tra
+2. Ghi lại lời chứng thực, câu chuyện cá nhân hoặc lịch sử truyền miệng
+3. Ghi lại âm thanh môi trường (ví dụ: mức tiếng ồn gần cơ sở hạ tầng)
+4. Thu thập mẫu giọng nói cho nghiên cứu ngôn ngữ học hoặc y tế
+5. Cho phép người trả lời bổ sung giải thích bằng lời cho các câu trả lời số hoặc lựa chọn
 
-## Các phương pháp hay nhất
+## Định dạng dữ liệu
 
-1. Cung cấp hướng dẫn rõ ràng về những gì cần ghi âm và thời lượng bao lâu.
-2. Xem xét hệ quả về quyền riêng tư và thông báo cho người trả lời về cách âm thanh của họ sẽ được sử dụng.
-3. Lưu ý đến kích thước tệp và giới hạn lưu trữ, đặc biệt đối với các khảo sát ở khu vực có kết nối internet hạn chế.
-4. Kiểm tra tính năng ghi âm trên nhiều thiết bị khác nhau để đảm bảo khả năng tương thích.
+Tệp âm thanh được lưu dưới dạng tệp đính kèm nhị phân cùng với bản gửi biểu mẫu, thường là:
+
+- **Định dạng:** MP3 hoặc AAC (ghi âm di động); WAV (ghi âm chất lượng cao)
+- **Tên tệp:** `{instanceID}-{fieldname}.mp3` (hoặc tương đương)
+- **Lưu trữ:** Tải lên thư mục media trên server và liên kết với bản ghi gửi
+- **Truy cập:** Có thể phát và tải xuống từ giao diện quản lý bản ghi gửi
+
+## Phần mở rộng của rtSurvey
+
+### Thời lượng tối đa
+
+Dùng cột `parameters` để giới hạn độ dài ghi âm:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | interview | Ghi âm cuộc phỏng vấn | `max-duration=120` |
+
+`max-duration` tính bằng giây. Thiết bị ghi âm tự động dừng khi đến giới hạn.
+
+### Cài đặt chất lượng
+
+Chất lượng ghi âm có thể được đặt qua `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Ghi âm phản hồi | `quality=normal` |
+
+Các giá trị hỗ trợ: `low`, `normal` (mặc định), `voice-only`. `voice-only` tối ưu hóa cho âm thanh giọng nói với giảm tiếng ồn.
+
+### Phát lại trước khi gửi
+
+Trên mobile, người điều tra có thể phát lại đoạn ghi âm trước khi tiếp tục. Tính năng này được bật mặc định — không cần cấu hình thêm.
+
+### Tích hợp máy ghi âm gốc
+
+Trên Android và iOS, `audio` khởi chạy ứng dụng ghi âm gốc của thiết bị. Trên web, sử dụng MediaRecorder API của trình duyệt.
 
 ## Ví dụ sử dụng
 
-Dưới đây là một ví dụ về cách bạn có thể sử dụng câu hỏi âm thanh trong một cuộc khảo sát:
+### Với thời lượng tối đa và gợi ý
 
-| type  | name           | label                                                | hint                                    |
-|-------|----------------|------------------------------------------------------|----------------------------------------|
-| audio | feedback_audio | Vui lòng ghi lại phản hồi của bạn về sản phẩm        | Nói rõ ràng trong tối đa 60 giây       |
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| audio | story | Hãy kể cho chúng tôi nghe về sự việc theo lời của bạn | Nói rõ ràng. Ghi âm dừng sau 3 phút. | `max-duration=180` |
 
-## Các phần mở rộng của rtSurvey
+### Audio có điều kiện — chỉ khi phát hiện vấn đề
 
-Mặc dù đặc tả XLSForm cơ bản cho câu hỏi âm thanh khá đơn giản, rtSurvey có thể cung cấp thêm các tính năng hoặc tùy chỉnh bổ sung:
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | issue_found | Có phát hiện vấn đề không? | | |
+| audio | issue_audio | Ghi âm mô tả về vấn đề | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
-1. Thiết lập thời lượng ghi âm tối đa
-2. Các tùy chọn chất lượng âm thanh (ví dụ: thấp, trung bình, cao)
-3. Chức năng phát lại để kiểm tra trước khi gửi
-4. Tích hợp với ứng dụng ghi âm gốc của thiết bị
+## Thực hành tốt
 
-## Hạn chế
+1. Nêu rõ trong `label` hoặc `hint` những gì người điều tra cần nói và trong bao lâu.
+2. Dùng `max-duration` để tránh tệp quá lớn ở các khu vực có tốc độ tải lên chậm.
+3. Thông báo cho người trả lời trước khi bắt đầu ghi — ghi âm bất ngờ có thể gây lo ngại về quyền riêng tư.
+4. Kiểm tra ghi âm trên thiết bị đích và điều kiện mạng trước khi triển khai.
+5. Đặt `quality=voice-only` cho ghi âm phỏng vấn để giảm kích thước tệp mà không mất độ rõ ràng.
 
-- Các tệp âm thanh có thể có kích thước lớn, ảnh hưởng đến việc truyền tải và lưu trữ dữ liệu.
-- Không phải tất cả các thiết bị đều hỗ trợ khả năng ghi âm.
-- Việc chuyển lời thoại từ tệp âm thanh có thể cần thiết để phân tích, điều này gây tốn thời gian.
-- Các lo ngại về quyền riêng tư có thể phát sinh khi thu thập dữ liệu giọng nói.
+## Giới hạn
 
-## Xử lý dữ liệu
-
-Các tệp âm thanh được thu thập qua loại câu hỏi này thường được:
-
-1. Lưu dưới định dạng âm thanh phổ biến (ví dụ: MP3, WAV)
-2. Lưu trữ cùng với các dữ liệu khảo sát khác
-3. Có thể phát lại và phân tích thông qua nền tảng quản lý khảo sát
-
-## Các lưu ý khi phân tích
-
-Khi sử dụng câu hỏi âm thanh, hãy cân nhắc:
-
-1. Cách dữ liệu âm thanh sẽ được phân tích (ví dụ: chép lời thủ công, tự động chuyển từ giọng nói sang văn bản)
-2. Thời gian và tài nguyên bổ sung cần thiết để xử lý các câu trả lời âm thanh
-3. Các biện pháp bảo mật và bảo vệ dữ liệu khi lưu trữ và xử lý các bản ghi giọng nói
+- Tệp âm thanh có thể lớn (bản ghi âm 2 phút ở chất lượng bình thường khoảng 2–4 MB) — cần tính đến giới hạn dữ liệu và thời gian tải lên.
+- Không phải tất cả trình duyệt đều hỗ trợ MediaRecorder API — Chrome và Firefox hoạt động ổn định; Safari trên iOS cũ hơn có thể gặp vấn đề.
+- Chuyển ngôn âm thanh cần thêm bước xử lý sau (thủ công hoặc tự động nhận dạng giọng nói).
+- Quy định về quyền riêng tư có thể hạn chế việc ghi âm giọng nói — cần xác minh yêu cầu bảo vệ dữ liệu địa phương.

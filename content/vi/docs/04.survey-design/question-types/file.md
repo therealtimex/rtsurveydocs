@@ -1,6 +1,6 @@
 ---
-title: "Tệp (File)"
-description: "Các câu hỏi kiểu Tệp cho phép người trả lời tải lên các tệp như một phần của câu trả lời khảo sát."
+title: "File"
+description: "Câu hỏi file cho phép người trả lời tải lên tài liệu và các tệp khác như một phần của câu trả lời khảo sát."
 icon: "upload_file"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,69 +9,97 @@ toc: true
 weight: 230
 ---
 
-Loại câu hỏi `file` (tệp) trong XLSForm và rtSurvey cho phép người trả lời tải lên các tệp như một phần câu trả lời khảo sát của họ. Tính năng này đặc biệt hữu ích để thu thập tài liệu, hình ảnh hoặc các loại tệp khác liên quan đến cuộc khảo sát.
+Loại câu hỏi `file` cho phép người trả lời **tải lên bất kỳ tệp nào** từ thiết bị — tài liệu, bảng tính, PDF hoặc các loại tệp khác. Không giống như `image`, `audio`, và `video` vốn khởi chạy công cụ thu thập riêng, `file` mở một trình chọn tệp đa năng.
 
-## Đặc tả XLSForm cơ bản
+## Cấu hình XLSForm cơ bản
 
-| type | name      | label                       |
-|------|-----------|----------------------------|
+| type | name      | label                        |
+|------|-----------|------------------------------|
 | file | document  | Vui lòng tải lên tài liệu của bạn |
 
-Để biết thêm chi tiết về loại câu hỏi tệp cơ bản, hãy xem [đặc tả XLSForm](https://xlsform.org/en/#question-types).
+Để biết thêm chi tiết về loại câu hỏi file tiêu chuẩn, xem [thông số kỹ thuật XLSForm](https://xlsform.org/en/#question-types).
 
-## Các trường hợp sử dụng
+## Ứng dụng
 
-Câu hỏi tệp thường được dùng cho:
+Câu hỏi file thường được dùng cho:
 
-1. Thu thập các tài liệu hỗ trợ (ví dụ: hóa đơn, chứng chỉ)
-2. Thu thập bằng chứng trực quan (ví dụ: ảnh về điều kiện thực địa)
-3. Tải lên các biểu mẫu hoặc bảng tính đã hoàn thành
-4. Thu thập bất kỳ loại tệp kỹ thuật số nào liên quan đến cuộc khảo sát
+1. Thu thập tài liệu hỗ trợ (biên lai, chứng chỉ, hợp đồng, báo cáo)
+2. Tải lên các biểu mẫu giấy đã được quét
+3. Thu thập bảng tính hoặc xuất dữ liệu từ hệ thống khác
+4. Bất kỳ loại tệp kỹ thuật số nào mà image/audio/video không bao gồm
 
-## Các phương pháp hay nhất
+## Định dạng dữ liệu
 
-1. Cung cấp hướng dẫn rõ ràng về loại tệp cần tải lên và bất kỳ giới hạn kích thước nào.
-2. Xem xét hệ quả về quyền riêng tư và thông báo cho người trả lời về cách các tệp của họ sẽ được sử dụng và lưu trữ.
-3. Lưu ý đến kích thước tệp và giới hạn lưu trữ, đặc biệt đối với các khảo sát ở khu vực có kết nối internet hạn chế.
-4. Chỉ định các định dạng tệp được chấp nhận nếu cần thiết.
+Các tệp được tải lên được lưu dưới dạng tệp đính kèm nhị phân:
+
+- **Định dạng:** Được giữ nguyên ở định dạng gốc (PDF, XLSX, DOCX, v.v.)
+- **Tên tệp:** `{instanceID}-{fieldname}.{extension}`
+- **Lưu trữ:** Tải lên thư mục media trên server cùng với bản ghi gửi
+- **Truy cập:** Có thể tải xuống từ giao diện quản lý bản ghi gửi
+
+## Phần mở rộng của rtSurvey
+
+### Loại tệp được chấp nhận
+
+Dùng cột `parameters` để hạn chế loại tệp có thể chọn:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| file | report | Tải lên báo cáo kiểm tra | `accept=.pdf` |
+| file | spreadsheet | Tải lên tệp dữ liệu | `accept=.xlsx,.csv` |
+
+Tham số `accept` sử dụng cú pháp phần mở rộng tệp tiêu chuẩn (phân cách bởi dấu phẩy).
+
+### Hướng dẫn kích thước tệp
+
+rtSurvey không áp dụng giới hạn kích thước tệp cứng ở cấp câu hỏi, nhưng giới hạn tải lên server vẫn áp dụng. Dùng `hint` để truyền đạt kỳ vọng cho người điều tra:
+
+| type | name | label | hint |
+|------|------|-------|------|
+| file | receipt | Tải lên biên lai thanh toán | Chấp nhận: PDF hoặc ảnh. Kích thước tệp tối đa: 5 MB |
+
+### Tích hợp với hệ thống tệp thiết bị và lưu trữ đám mây
+
+Trên Android và iOS, câu hỏi `file` mở trình chọn tệp gốc của thiết bị, có thể bao gồm:
+- Bộ nhớ cục bộ trên thiết bị
+- Thẻ SD (Android)
+- iCloud Drive (iOS)
+- Google Drive, Dropbox (nếu đã cài đặt)
+
+Trên web, nó mở hộp thoại tải lên tệp tiêu chuẩn của trình duyệt.
 
 ## Ví dụ sử dụng
 
-Dưới đây là một ví dụ về cách bạn có thể sử dụng câu hỏi tệp trong một cuộc khảo sát:
+### Tải lên PDF bắt buộc
 
-| type | name           | label                                      | hint                                        |
-|------|----------------|--------------------------------------------|--------------------------------------------|
-| file | receipt_upload | Vui lòng tải lên ảnh hóa đơn của bạn       | Định dạng chấp nhận: JPG, PNG. Tối đa: 5MB  |
+| type | name | label | hint | required | required_message |
+|------|------|-------|------|----------|-----------------|
+| file | signed_consent | Tải lên biểu mẫu đồng ý đã ký | Chỉ PDF, tối đa 2MB | yes | Cần có biểu mẫu đồng ý |
 
-## Các phần mở rộng của rtSurvey
+### Tải lên tài liệu có điều kiện
 
-Mặc dù đặc tả XLSForm cơ bản cho câu hỏi tệp khá đơn giản, rtSurvey có thể cung cấp thêm các tính năng hoặc tùy chỉnh bổ sung:
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_land_title | Hộ gia đình có giấy chứng nhận quyền sử dụng đất không? | |
+| file | land_title_doc | Tải lên ảnh hoặc bản scan giấy chứng nhận | `${has_land_title} = 'yes'` |
 
-1. Hạn chế loại tệp (ví dụ: chỉ cho phép ảnh, chỉ cho phép PDF)
-2. Giới hạn kích thước tệp
-3. Khả năng tải lên nhiều tệp
-4. Tích hợp với hệ thống tệp của thiết bị hoặc các dịch vụ lưu trữ đám mây
+## Thực hành tốt
 
-## Xử lý dữ liệu
+1. Dùng `accept` để hạn chế loại tệp — điều này ngăn người điều tra vô tình tải lên tệp sai.
+2. Luôn bao gồm hướng dẫn về kích thước và định dạng trong cột `hint`.
+3. Với ảnh và hình ảnh, dùng loại `image` thay thế — nó cung cấp nén tốt hơn và xử lý định dạng nhất quán hơn.
+4. Với khảo sát lớn có tệp đính kèm, lên kế hoạch lưu trữ dữ liệu và băng thông tải xuống phù hợp.
+5. Kiểm tra trình chọn tệp trên loại thiết bị đích (Android, iOS, web) trước khi triển khai — khả năng truy cập cloud storage khác nhau.
 
-Các tệp được thu thập thông qua loại câu hỏi này thường được:
+## Lưu ý xử lý dữ liệu
 
-1. Lưu dưới định dạng gốc của chúng
-2. Lưu trữ cùng với dữ liệu khảo sát khác, thường là trong một thư mục phương tiện riêng biệt
-3. Có thể tải xuống và phân tích thông qua nền tảng quản lý khảo sát
+- Tệp được lưu ở định dạng gốc; rtSurvey không chuyển đổi hoặc nén chúng.
+- Phân tích tệp sau khi tải xuống — rtSurvey không trích xuất hoặc lập chỉ mục nội dung tệp.
+- Tệp đính kèm lớn tăng đáng kể thời gian cần thiết để tải xuống toàn bộ bộ dữ liệu.
 
-## Các lưu ý khi phân tích
+## Giới hạn
 
-Khi sử dụng câu hỏi tệp, hãy cân nhắc:
-
-1. Cách các tệp tải lên sẽ được xử lý và phân tích
-2. Không gian lưu trữ bổ sung cần thiết cho các tệp đính kèm
-3. Các biện pháp bảo mật và bảo vệ dữ liệu khi lưu trữ và xử lý các tệp đã tải lên
-4. Nhu cầu tiềm năng về phần mềm chuyên dụng để mở hoặc phân tích một số loại tệp nhất định
-
-## Hạn chế
-
-- Các tệp lớn có thể ảnh hưởng đáng kể đến việc truyền tải dữ liệu và yêu cầu lưu trữ.
-- Không phải tất cả các thiết bị đều có thể dễ dàng truy cập vào các tệp để tải lên.
-- Phân tích các tệp đính kèm có thể tốn nhiều thời gian hơn so với các câu trả lời dạng văn bản.
-- Có thể có các vấn đề về khả năng tương thích với một số loại tệp nhất định trên các hệ thống khác nhau.
+- Câu hỏi file không xác thực nội dung tệp — chỉ kiểm tra phần mở rộng qua `accept` được thực thi ở cấp UI.
+- Tệp rất lớn (100 MB trở lên) có thể hết thời gian tải lên trong môi trường kết nối kém.
+- Người điều tra ngoại tuyến có thể đính kèm tệp nhưng chúng sẽ không được tải lên cho đến khi có kết nối.
+- Một số cấu hình thiết bị hạn chế truy cập vào một số vị trí lưu trữ nhất định (ví dụ: chính sách MDM doanh nghiệp).

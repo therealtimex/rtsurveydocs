@@ -9,14 +9,14 @@ toc: true
 weight: 270
 ---
 
-Một cách để đảm bảo chất lượng dữ liệu là thêm các ràng buộc (`constraints`) vào các trường dữ liệu trong biểu mẫu của bạn. Các ràng buộc giúp ngăn người dùng nhập các câu trả lời không hợp lệ hoặc không thể xảy ra. Ví dụ: khi hỏi về thu nhập của một người, bạn muốn tránh các giá trị phi thực tế, chẳng hạn như số âm hoặc giá trị cực cao. Thêm các ràng buộc dữ liệu trong biểu mẫu của bạn rất dễ thực hiện. Chỉ cần làm theo các bước dưới đây:
+Một cách để đảm bảo chất lượng dữ liệu là thêm các ràng buộc vào các trường dữ liệu trong biểu mẫu. Ràng buộc giúp ngăn người dùng nhập các câu trả lời không hợp lệ hoặc không thể xảy ra. Ví dụ: khi hỏi về thu nhập của một người, bạn muốn tránh các giá trị phi thực tế như số âm hoặc giá trị cực cao. Thêm ràng buộc dữ liệu rất dễ thực hiện. Chỉ cần làm theo các bước dưới đây:
 
 1. Thêm một cột mới có tên là "constraint" vào biểu mẫu của bạn.
-2. Trong cột "constraint", hãy nhập một công thức chỉ định các giới hạn cho câu trả lời.
+2. Trong cột "constraint", nhập công thức chỉ định giới hạn cho câu trả lời.
 
 ### Ví dụ
 
-Hãy xem xét một ví dụ mà chúng ta muốn thêm ràng buộc cho thu nhập của một người. Ràng buộc yêu cầu thu nhập phải nằm trong khoảng từ 0$ đến 1,000,000$. Đây là cách bạn có thể thiết lập ràng buộc:
+Hãy xem xét ví dụ thêm ràng buộc cho thu nhập của một người. Ràng buộc yêu cầu thu nhập phải nằm trong khoảng từ 0$ đến 1.000.000$. Đây là cách thiết lập ràng buộc:
 
 {{< table >}}
 | `name`      | `constraint`                  |
@@ -24,8 +24,83 @@ Hãy xem xét một ví dụ mà chúng ta muốn thêm ràng buộc cho thu nh�
 | Income        | . >= 0 & . <= 1000000      |
 {{< /table >}}
 
-Trong ví dụ trên, dấu "." trong công thức tham chiếu lại biến câu hỏi, đại diện cho giá trị do người dùng nhập cho câu hỏi "Income". Ràng buộc ". >= 0 && . <= 1000000" đảm bảo rằng thu nhập được nhập vào lớn hơn hoặc bằng 0 và nhỏ hơn hoặc bằng 1,000,000.
+Trong ví dụ trên, dấu "." trong công thức tham chiếu lại biến câu hỏi, đại diện cho giá trị do người dùng nhập cho câu hỏi "Income". Ràng buộc `. >= 0 && . <= 1000000` đảm bảo thu nhập được nhập lớn hơn hoặc bằng 0 và nhỏ hơn hoặc bằng 1.000.000.
+
 
 ### Ràng buộc cứng (Hard constraint)
 
+**Ràng buộc cứng** chặn hoàn toàn việc gửi biểu mẫu nếu giá trị nhập vào không thỏa mãn biểu thức. Người điều tra không thể tiếp tục cho đến khi nhập giá trị hợp lệ.
+
+Để thêm ràng buộc cứng, nhập biểu thức vào cột `constraint`. Tùy chọn thêm thông báo dễ đọc trong `constraint_message`:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Tuổi người trả lời | `. > 0 and . <= 120` | Tuổi phải nằm trong khoảng 1 đến 120 |
+| decimal | temperature | Nhiệt độ cơ thể (°C) | `. >= 35 and . <= 42` | Nhiệt độ phải nằm trong khoảng 35°C đến 42°C |
+| text | phone | Số điện thoại | `regex(., '^[0-9]{10}$')` | Nhập số điện thoại 10 chữ số |
+{{< /table >}}
+
+#### Nhiều điều kiện
+
+Kết hợp các điều kiện với `and` / `or`:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Dùng `regex()` để xác thực mẫu
+
+Hàm `regex(value, pattern)` kiểm tra một giá trị với biểu thức chính quy:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | Địa chỉ email | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Nhập địa chỉ email hợp lệ |
+| text | zip_code | Mã bưu chính | `regex(., '^[0-9]{5}$')` | Nhập mã bưu chính 5 chữ số |
+{{< /table >}}
+
+#### Tham chiếu các trường khác trong ràng buộc
+
+Dùng `${fieldname}` để tham chiếu giá trị từ câu hỏi khác:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Năm kết thúc | `. >= ${start_year}` | Năm kết thúc phải sau năm bắt đầu |
+| decimal | loan_repaid | Số tiền đã trả | `. <= ${loan_amount}` | Không thể trả nhiều hơn số tiền vay |
+{{< /table >}}
+
 ### Cảnh báo mềm (Soft alert)
+
+**Cảnh báo mềm** (còn gọi là ràng buộc mềm hoặc cảnh báo) thông báo cho người điều tra rằng một giá trị trông bất thường, nhưng vẫn cho phép tiếp tục. Điều này hữu ích khi một giá trị về mặt kỹ thuật là hợp lệ nhưng về mặt thống kê là khó xảy ra.
+
+rtSurvey hỗ trợ cảnh báo mềm qua cột `constraint` với cách tiếp cận `constraint_type` đặc biệt, hoặc qua appearance `soft` kết hợp với trường note.
+
+Mẫu phổ biến nhất là dùng **note** với biểu thức `relevant` gắn cờ giá trị đáng ngờ, kết hợp với câu hỏi **acknowledge** để xác nhận:
+
+{{< table >}}
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Số trẻ em | |
+| note | children_warning | Cảnh báo: Bạn đã nhập ${children} trẻ em. Vui lòng xác nhận lại. | `. > 15` |
+| trigger | children_confirm | Xác nhận số trẻ em là chính xác | `${children} > 15` |
+{{< /table >}}
+
+#### Cảnh báo mềm chỉ với constraint_message
+
+Để có cảnh báo mềm đơn giản hơn, bạn có thể đặt ràng buộc cảnh báo ở giá trị cực đoan nhưng vẫn cho phép phạm vi rộng:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | children | Số trẻ em | `. >= 0 and . <= 30` | Giá trị này có vẻ rất cao. Vui lòng xác minh lại. |
+{{< /table >}}
+
+{{% alert icon=" " context="warning" %}}
+Sự phân biệt giữa ràng buộc cứng và mềm quan trọng đối với chất lượng dữ liệu. Dùng **ràng buộc cứng** cho các giá trị logically không thể xảy ra (tuổi âm, nhiệt độ trên 100°C). Dùng **cảnh báo mềm** cho các giá trị thống kê khó xảy ra nhưng không phải không thể — bạn không muốn chặn các trường hợp ngoại lệ hợp lệ.
+{{% /alert %}}

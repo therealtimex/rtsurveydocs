@@ -1,6 +1,6 @@
 ---
-title: "Vidéo (Video)"
-description: "Les questions de type vidéo permettent aux répondants d'enregistrer et de soumettre des fichiers vidéo dans le cadre de l'enquête."
+title: "Video"
+description: "Les questions vidéo permettent aux répondants d'enregistrer et de soumettre des fichiers vidéo dans le cadre de l'enquête."
 icon: "videocam"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,74 +9,91 @@ toc: true
 weight: 229
 ---
 
-Le type de question `video` dans XLSForms et rtSurvey permet aux répondants d'enregistrer et de soumettre des fichiers vidéo dans le cadre de leurs réponses à l'enquête. Cette fonctionnalité est particulièrement utile pour capturer des preuves visuelles, des démonstrations ou des témoignages pertinents pour l'enquête.
+Le type de question `video` permet aux répondants d'**enregistrer une vidéo** ou de téléverser un fichier vidéo existant dans leur réponse à l'enquête. Il est utile pour capturer des preuves visuelles, des démonstrations, des conditions environnementales ou toute information qui bénéficie du mouvement et du son ensemble.
 
-## Spécification XLSForm de Base
+## Spécification XLSForm de base
 
-| type  | name        | label                           |
-|-------|-------------|--------------------------------|
-| video | demo_video  | Veuillez enregistrer une courte vidéo de démonstration |
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Veuillez enregistrer une courte démonstration |
 
-Pour plus de détails sur le type de question `video` de base, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+Pour plus de détails sur le type de question vidéo standard, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
 
 ## Utilisations
 
 Les questions vidéo sont couramment utilisées pour :
 
-1. Capturer des preuves visuelles lors d'enquêtes sur le terrain
-2. Enregistrer des démonstrations de produits ou des scénarios d'utilisation
-3. Collecter des témoignages vidéo
-4. Documenter des processus ou des procédures
-5. Permettre aux répondants de fournir des explications visuelles détaillées
+1. Documenter les conditions de terrain — dommages routiers, état des infrastructures, santé des cultures
+2. Enregistrer des démonstrations de produits ou des vérifications de conformité procédurale
+3. Collecter des témoignages vidéo auprès des répondants
+4. Capturer des preuves nécessitant un contexte spatial (ex. : taille et étendue d'une zone problématique)
+5. Documentation avant/après pour les enquêtes de suivi et d'évaluation
 
-## Meilleures Pratiques
+## Format des données
 
-1. Fournissez des instructions claires sur ce qu'il faut enregistrer et pendant combien de temps.
-2. Tenez compte des implications en matière de confidentialité et informez les répondants de la manière dont leur vidéo sera utilisée.
-3. Soyez attentif à la taille des fichiers et aux limitations de stockage, en particulier pour les enquêtes dans des zones où la connectivité Internet est limitée.
-4. Testez la fonction d'enregistrement vidéo sur différents appareils pour garantir la compatibilité.
-5. Pensez à préciser la qualité ou la résolution vidéo souhaitée dans les instructions.
+Les fichiers vidéo sont stockés comme pièces jointes binaires :
 
-## Exemple d'Utilisation
-
-Voici un exemple de la manière dont vous pourriez utiliser une question vidéo dans une enquête :
-
-| type  | name           | label                                                | hint                                    |
-|-------|----------------|------------------------------------------------------|----------------------------------------|
-| video | product_demo   | Veuillez enregistrer une courte démo de l'utilisation du produit | Enregistrez pendant 30 à 60 secondes, en montrant les fonctionnalités clés |
+- **Format :** MP4 ou MOV (enregistrement mobile)
+- **Nommage :** `{instanceID}-{fieldname}.mp4` (ou équivalent)
+- **Stockage :** Téléversé dans le dossier média du serveur et lié à l'enregistrement de soumission
+- **Accès :** Lisible et téléchargeable depuis l'interface de gestion des soumissions
 
 ## Extensions rtSurvey
 
-Bien que la spécification XLSForm de base pour les questions vidéo soit simple, rtSurvey peut proposer des fonctionnalités ou des personnalisations supplémentaires :
+### Durée maximale
 
-1. Réglage de la durée maximale d'enregistrement
-2. Options de qualité vidéo (ex : basse, moyenne, haute)
-3. Fonction de lecture pour révision avant soumission
-4. Intégration avec l'application d'enregistrement vidéo native de l'appareil
-5. Option de téléchargement de fichiers vidéo existants au lieu d'en enregistrer de nouveaux
+Utilisez la colonne `parameters` pour limiter la durée d'enregistrement :
 
-(Note : Les extensions spécifiques disponibles dans rtSurvey pour les questions vidéo devront être confirmées et détaillées ici.)
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Enregistrer les conditions du site | `max-duration=60` |
+
+`max-duration` est en secondes. L'enregistrement s'arrête automatiquement à la limite.
+
+### Qualité / résolution
+
+Contrôlez la résolution d'enregistrement via `parameters` :
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Enregistrer une preuve vidéo | `quality=low` |
+
+Valeurs supportées : `low` (téléversement plus rapide), `normal` (par défaut), `high`. Utilisez `low` dans les zones à connectivité limitée.
+
+### Téléverser une vidéo existante
+
+Sur mobile, le répondant peut choisir de **téléverser une vidéo existante** depuis la galerie de l'appareil plutôt que d'en enregistrer une nouvelle. Cette option est activée par défaut dans l'intégration native appareil-photo/galerie.
+
+### Lecture avant soumission
+
+Sur mobile, le clip enregistré peut être revu avant de continuer. Aucune configuration supplémentaire n'est nécessaire.
+
+## Exemple d'utilisation
+
+### Vidéo d'inspection de site avec limite
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Enregistrer le point d'eau | Faites le tour de toute l'installation. Maximum 90 secondes. | `max-duration=90 quality=normal` |
+
+### Vidéo conditionnelle — uniquement si des dommages sont signalés
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | Des dommages ont-ils été constatés ? | | |
+| video | damage_video | Enregistrer une vidéo des dommages | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+
+## Bonnes pratiques
+
+1. Définissez `max-duration` — les enregistrements vidéo sans restriction peuvent facilement dépasser 100 Mo et échouer au téléversement sur des connexions faibles.
+2. Utilisez `quality=low` pour les enquêtes de suivi où une preuve visuelle est requise mais le détail fin n'est pas nécessaire — cela réduit considérablement la taille du fichier.
+3. Rédigez des instructions d'enregistrement spécifiques dans la colonne `hint` (ex. : "Faites le tour du bâtiment entier, tenez l'appareil photo stable").
+4. Demandez-vous si la vidéo est nécessaire — une photo (`image`) est généralement suffisante pour les preuves statiques et produit des fichiers beaucoup plus petits.
+5. Testez les performances de téléversement sur le réseau terrain réel avant le déploiement.
 
 ## Limitations
 
-- Les fichiers vidéo peuvent être très volumineux, ce qui peut avoir un impact significatif sur le transfert et le stockage des données.
-- Tous les appareils ne prennent pas forcément en charge les capacités d'enregistrement vidéo ou peuvent avoir un stockage limité.
-- L'analyse des réponses vidéo peut prendre beaucoup de temps et nécessiter des logiciels spécialisés.
-- Les préoccupations en matière de confidentialité peuvent être plus prononcées avec la collecte de données vidéo.
-
-## Manipulation des Données
-
-Les fichiers vidéo collectés via ce type de question sont typiquement :
-
-1. Enregistrés dans un format vidéo courant (ex : MP4, MOV)
-2. Stockés aux côtés des autres données d'enquête, souvent dans un dossier média séparé
-3. Accessibles pour lecture et analyse via la plateforme de gestion d'enquête
-
-## Considérations pour l'Analyse
-
-Lors de l'utilisation de questions vidéo, tenez compte de :
-
-1. La manière dont les données vidéo seront analysées (ex : examen manuel, analyse vidéo automatisée)
-2. Le temps et les ressources supplémentaires nécessaires pour traiter les réponses vidéo
-3. Les mesures de confidentialité et de protection des données pour le stockage et la manipulation des enregistrements vidéo
-4. Le besoin potentiel d'outils de montage ou de compilation vidéo lors de la phase d'analyse
+- Les fichiers vidéo sont très volumineux — une vidéo d'1 minute en qualité normale représente généralement 20-60 Mo selon l'appareil.
+- Le téléversement de fichiers vidéo volumineux nécessite une bonne connexion réseau ; envisagez d'exiger une synchronisation Wi-Fi pour les formulaires à forte densité vidéo.
+- Tous les navigateurs web ne supportent pas l'enregistrement vidéo via MediaRecorder — Chrome est le plus fiable.
+- L'analyse des réponses vidéo est manuelle et chronophage ; utilisez-les avec parcimonie et uniquement lorsque le contenu vidéo apporte une valeur unique.

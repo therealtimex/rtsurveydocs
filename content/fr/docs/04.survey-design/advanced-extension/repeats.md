@@ -1,116 +1,160 @@
 ---
-title: "Répétitions (Repeats)"
-description: ""
+title: "Répétitions avancées"
+description: "Schémas avancés pour les groupes de répétition : comptages dynamiques, répétitions imbriquées, résumé des données répétées et référencement de valeurs entre répétitions."
 icon: "manage_search"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
 draft: false
 toc: true
-weight: 294
+weight: 295
 ---
 
-La recherche dynamique (Dynamic Search) est une fonctionnalité puissante de rtSurvey qui vous permet d'intégrer une fonctionnalité de recherche dynamique dans vos enquêtes, permettant la récupération de données en temps réel à partir de sources externes.
+Cette page couvre les schémas avancés pour travailler avec des groupes de répétition dans rtSurvey. Pour les bases de la configuration d'un groupe de répétition, consultez [Regroupement et répétitions](../repeats).
 
-## Syntaxe
+---
 
-La syntaxe de base pour l'utilisation de `search-api` est :
+## Nombre de répétitions dynamique
 
-```
-search-api(method, url, post_body, value_column, display, data_path, save_path)
-```
+Par défaut, l'enquêteur décide du nombre de répétitions. Vous pouvez fixer le nombre de répétitions en utilisant `repeat_count` :
 
-### Paramètres
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Membre du ménage | `${num_members}` |
+| text | member_name | Nom du membre | |
+| integer | member_age | Âge | |
+| end_repeat | | | |
 
-- `method` : Utilisez toujours 'POST'
-- `url` : L'URL pour récupérer les données
-- `post_body` : Le corps de la requête. Utilisez la syntaxe searchView (voir la documentation sur les vues DataModel)
-- `value_column` : Le champ de données à utiliser comme valeur
-- `display` : Le champ de données à utiliser comme étiquette (label). Prend en charge une syntaxe de type modèle avec `##key##` et `@{func}` pour un formatage avancé
-- `data_path` : JSONPath pour extraire les données souhaitées de la réponse (ex : `$.hits.hits.*._source`)
-- `save_path` : Emplacement pour stocker les données de réponse pour une utilisation ultérieure
+La répétition s'exécute exactement `${num_members}` fois, où `num_members` a été collecté plus tôt dans le formulaire. L'enquêteur ne peut pas ajouter ou supprimer des instances.
 
-## Exemples d'utilisation
+---
 
-### Utilisation de base
+## Accès indexé : `indexed-repeat()`
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'search_results')
-```
+Accédez à la valeur d'un champ d'une instance spécifique de répétition depuis **l'extérieur** du groupe de répétition en utilisant `indexed-repeat(repeatedField, repeatGroup, index)` :
 
-### Avec formatage d'affichage avancé
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '##name## (##age## ans)', '$.results', 'search_results')
-```
+C'est utile pour créer des champs récapitulatifs ou référencer les données du membre "principal" après la répétition.
 
-### Avec fonction dans l'affichage
+---
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '@{if_else(eq("##status##", "active"), "Actif : ##name##", "Inactif : ##name##")}', '$.results', 'search_results')
-```
+## Position de l'instance actuelle : `index()`
 
-## Types de questions pris en charge
+Dans un groupe de répétition, `index()` retourne la position (basée sur 1) de l'instance actuelle. Utilisez-le pour étiqueter chaque répétition ou créer des identifiants uniques :
 
-- `select_one`
-- `select_multiple`
-- `text` (pour la fonctionnalité d'autocomplétion)
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Parcelle |
+| note | plot_label | Parcelle numéro ${index()} |
+| text | plot_id | Identifiant de la parcelle |
+| end_repeat | | |
 
-## Caractéristiques supplémentaires
+---
 
-### API par défaut (Default API)
+## Référencer des champs dans la même instance
 
-Utilisez `search-default-api()` après `search-api()` pour définir des valeurs par défaut :
+Dans une répétition, utilisez `${fieldname}` pour référencer un autre champ **dans la même instance de répétition**. Il n'est pas nécessaire d'utiliser `indexed-repeat()` dans la même boucle :
 
-```
-appearance: search-api(...) search-default-api(...)
-```
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Membre | |
+| text | member_name | Nom | |
+| integer | member_age | Âge | |
+| text | school_name | Nom de l'école | `${member_age} < 18` |
+| end_repeat | | | |
 
-### Séparateur de sélection multiple
+---
 
-Pour `select_multiple`, utilisez `search-default-separator()` pour spécifier un séparateur personnalisé :
+## Référencer des champs parents depuis l'intérieur d'une répétition
 
-```
-appearance: search-api(...) search-default-separator(' || ')
-```
+Les champs en dehors (au-dessus) du groupe de répétition peuvent être référencés normalement avec `${fieldname}` :
 
-## Meilleures pratiques
+| type | name | label |
+|------|------|-------|
+| text | village | Nom du village |
+| begin_repeat | plots | Parcelle agricole |
+| note | plot_context | Parcelles dans ${village} |
+| end_repeat | | |
 
-1. Optimisez les points de terminaison de l'API pour la performance, en particulier avec de grands ensembles de données.
-2. Utilisez des stratégies de mise en cache appropriées pour réduire les appels API.
-3. Gérez les erreurs réseau avec élégance dans la conception de votre enquête.
-4. Testez soigneusement avec divers scénarios de saisie.
+---
 
-## Limitations connues
+## Résumer les données répétées
 
-- Les requêtes complexes peuvent impacter les temps de chargement de l'enquête.
-- La fonctionnalité hors connexion peut être limitée selon l'implémentation.
+Utilisez les fonctions d'agrégation de répétition **en dehors** du groupe de répétition pour résumer :
 
-```mermaid
-    graph TD
-    %% Define styles for nodes
-    classDef light fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#003366
-    classDef dark fill:#2e3b4e,stroke:#a6b1c2,stroke-width:2px,color:#e1e1e1
-    classDef submit fill:#ffcc99,stroke:#cc6600,stroke-width:2px,color:#663300
-    classDef link fill:#ccffcc,stroke:#009933,stroke-width:2px,color:#003300
-    classDef storage fill:#ffffcc,stroke:#999900,stroke-width:2px,color:#333300
-    
-    %% Define shapes for nodes
-    A[<span class="iconify" data-icon="mdi:file-document-multiple" data-inline="false" data-width="18" data-height="18"></span> Receipts in PDF, PNG, HEIC, JPEG, Excel] --> B{<span class="iconify" data-icon="mdi:send" data-inline="false" data-width="18" data-height="18"></span> Submit the Receipts}
-    B --> C1([<a href="mailto:keep@keepy.us?subject=Keep%20my%20receipts" style="color:#003300;"><span class="iconify" data-icon="mdi:email" data-inline="false" data-width="18" data-height="18"></span> Email: keep@keepy.us</a>])
-    B --> C2([<a href="sms:+16504173562" style="color:#003300;"><span class="iconify" data-icon="mdi:message-text" data-inline="false" data-width="18" data-height="18"></span> SMS: 650-417-3562</a>])
-    B --> C3([<a href="https://m.me/keepy.us" target="_blank" style="color:#003300;"><span class="iconify" data-icon="mdi:facebook-messenger" data-inline="false" data-width="18" data-height="18"></span> Messenger: m.me/keepy.us</a>])
-    C1 --> D[[<span class="iconify" data-icon="mdi:database" data-inline="false" data-width="18" data-height="18"></span> <b>Receipt Data Stored in Google Sheet</b><br> - Automatic Text Recognition<br> - Human-Verified for Accuracy<br> - Data and Digital Receipt Copies]]
-    C2 --> D
-    C3 --> D
-    
-    %% Apply classes to nodes
-    class A light
-    class B submit
-    class C1 link
-    class C2 link
-    class C3 link
-    class D storage
-    
-    %% Adjust arrow styles for better visibility
-    linkStyle default stroke:#666,stroke-width:3px
-```
+| Fonction | Exemple | Description |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | Nombre d'instances |
+| `sum(field)` | `sum(${loan_amount})` | Somme d'un champ numérique |
+| `min(field)` | `min(${member_age})` | Valeur minimale |
+| `max(field)` | `max(${member_age})` | Valeur maximale |
+| `join(sep, field)` | `join(', ', ${member_name})` | Liste séparée par des virgules |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Comptage conditionnel |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Somme conditionnelle |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Jointure conditionnelle |
+
+### Exemple : Résumé du ménage
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | Combien de membres ? | |
+| begin_repeat | members | Membre | `${num_members}` |
+| text | member_name | Nom | |
+| integer | member_age | Âge | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | ${total_members} membres ; ${children_count} de moins de 18 ans. Adultes : ${adult_names} | |
+
+---
+
+## Répétitions imbriquées
+
+Un groupe de répétition peut contenir un autre groupe de répétition. Utilisez ceci avec précaution — les répétitions imbriquées ajoutent de la complexité et peuvent être déroutantes pour les enquêteurs.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Ménage |
+| text | hh_id | Identifiant du ménage |
+| begin_repeat | hh_members | Membre |
+| text | member_name | Nom du membre |
+| end_repeat | | |
+| end_repeat | | |
+
+Pour référencer un champ dans une répétition externe depuis la répétition interne, utilisez `${fieldname}` — il se résout au plus proche ancêtre correspondant :
+
+Dans la répétition `hh_members`, `${hh_id}` retourne l'identifiant du ménage **actuel**, pas de tous les ménages.
+
+---
+
+## Classement dans les groupes de répétition : `rank-index()`
+
+Quand un champ `rank` existe dans une répétition, utilisez `rank-index(instanceNumber, repeatedField)` depuis l'extérieur pour obtenir le rang ordinal d'une instance spécifique :
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` retourne l'index d'instance du score le plus élevé.
+
+---
+
+## Bonnes pratiques
+
+1. Utilisez toujours `repeat_count` lorsque le nombre de répétitions est connu à l'avance — cela évite aux enquêteurs d'ajouter ou supprimer accidentellement des instances.
+2. Gardez les groupes de répétition focalisés — une répétition avec plus de 20 questions par instance est difficile à naviguer.
+3. Nommez les groupes de répétition clairement (ex. : `household_members`, pas `repeat1`) — le nom apparaît dans les appels de fonctions et les données exportées.
+4. Testez avec le nombre maximum d'instances attendu pour vérifier les performances.
+5. Utilisez l'apparence `field-list` sur le groupe de répétition pour afficher tous les champs sur un seul écran par instance (mobile).
+
+---
+
+## Limitations
+
+- `indexed-repeat()` nécessite un index valide (de 1 au nombre d'instances) — les index hors plage retournent vide.
+- Les répétitions imbriquées au-delà de 2 niveaux ne sont pas recommandées et peuvent causer des problèmes d'affichage sur certains clients.
+- Les fonctions d'agrégation (`sum`, `count`, etc.) opèrent sur l'ensemble du groupe de répétition — vous ne pouvez pas agréger un sous-ensemble d'instances sans les variantes `*-if`.

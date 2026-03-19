@@ -1,6 +1,6 @@
 ---
 title: "Video"
-description: "Các câu hỏi kiểu Video cho phép người trả lời quay và gửi các tệp video như một phần của cuộc khảo sát."
+description: "Câu hỏi video cho phép người trả lời quay và gửi tệp video như một phần của cuộc khảo sát."
 icon: "videocam"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
@@ -9,72 +9,91 @@ toc: true
 weight: 229
 ---
 
-Loại câu hỏi `video` trong XLSForm và rtSurvey cho phép người trả lời quay và gửi các tệp video như một phần câu trả lời khảo sát của họ. Tính năng này đặc biệt hữu ích để thu thập bằng chứng trực quan, video hướng dẫn hoặc lời chứng thực liên quan đến cuộc khảo sát.
+Loại câu hỏi `video` cho phép người trả lời **quay video** hoặc tải lên tệp video có sẵn như một phần câu trả lời khảo sát. Loại này hữu ích để ghi lại bằng chứng trực quan, minh họa, điều kiện môi trường, hoặc bất kỳ thông tin nào được truyền đạt tốt hơn qua hình ảnh kết hợp âm thanh.
 
-## Đặc tả XLSForm cơ bản
+## Cấu hình XLSForm cơ bản
 
-| type  | name        | label                           |
-|-------|-------------|--------------------------------|
-| video | demo_video  | Vui lòng quay một video demo ngắn |
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Vui lòng quay một đoạn minh họa ngắn |
 
-Để biết thêm chi tiết về loại câu hỏi video cơ bản, hãy xem [đặc tả XLSForm](https://xlsform.org/en/#question-types).
+Để biết thêm chi tiết về loại câu hỏi video tiêu chuẩn, xem [thông số kỹ thuật XLSForm](https://xlsform.org/en/#question-types).
 
-## Các trường hợp sử dụng
+## Ứng dụng
 
 Câu hỏi video thường được dùng cho:
 
-1. Thu thập bằng chứng trực quan trong các khảo sát thực địa
-2. Ghi lại các bản demo sản phẩm hoặc kịch bản sử dụng
-3. Thu thập các video chứng thực
-4. Ghi lại các quy trình hoặc thủ tục
-5. Cho phép người trả lời cung cấp các giải thích trực quan chi tiết
+1. Ghi lại điều kiện thực địa — hư hỏng đường sá, tình trạng cơ sở hạ tầng, sức khỏe cây trồng
+2. Ghi lại minh họa sản phẩm hoặc kiểm tra tuân thủ quy trình
+3. Thu thập lời chứng thực bằng video từ người trả lời
+4. Ghi lại bằng chứng cần bối cảnh không gian (ví dụ: quy mô và phạm vi của khu vực có vấn đề)
+5. Tài liệu trước/sau cho khảo sát theo dõi và đánh giá
 
-## Các phương pháp hay nhất
+## Định dạng dữ liệu
 
-1. Cung cấp hướng dẫn rõ ràng về những gì cần quay và thời lượng bao lâu.
-2. Xem xét hệ quả về quyền riêng tư và thông báo cho người trả lời về cách video của họ sẽ được sử dụng.
-3. Lưu ý đến kích thước tệp và giới hạn lưu trữ, đặc biệt đối với các khảo sát ở khu vực có kết nối internet hạn chế.
-4. Kiểm tra tính năng quay video trên nhiều thiết bị khác nhau để đảm bảo khả năng tương thích.
-5. Cân nhắc chỉ định chất lượng hoặc độ phân giải video mong muốn trong phần hướng dẫn.
+Tệp video được lưu dưới dạng tệp đính kèm nhị phân:
+
+- **Định dạng:** MP4 hoặc MOV (ghi trên mobile)
+- **Tên tệp:** `{instanceID}-{fieldname}.mp4` (hoặc tương đương)
+- **Lưu trữ:** Tải lên thư mục media trên server và liên kết với bản ghi gửi
+- **Truy cập:** Có thể phát và tải xuống từ giao diện quản lý bản ghi gửi
+
+## Phần mở rộng của rtSurvey
+
+### Thời lượng tối đa
+
+Dùng cột `parameters` để giới hạn độ dài ghi:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Ghi lại điều kiện tại chỗ | `max-duration=60` |
+
+`max-duration` tính bằng giây. Quá trình ghi tự động dừng khi đến giới hạn.
+
+### Chất lượng / độ phân giải
+
+Kiểm soát độ phân giải ghi thông qua `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Quay video bằng chứng | `quality=low` |
+
+Các giá trị hỗ trợ: `low` (tải lên nhanh hơn), `normal` (mặc định), `high`. Dùng `low` ở khu vực có kết nối hạn chế.
+
+### Tải lên video có sẵn
+
+Trên mobile, người trả lời có thể chọn **tải lên video có sẵn** từ thư viện thiết bị thay vì quay mới. Tính năng này được bật mặc định trong tích hợp camera/thư viện gốc.
+
+### Phát lại trước khi gửi
+
+Trên mobile, có thể xem lại đoạn đã quay trước khi tiếp tục. Không cần cấu hình thêm.
 
 ## Ví dụ sử dụng
 
-Dưới đây là một ví dụ về cách bạn có thể sử dụng câu hỏi video trong một cuộc khảo sát:
+### Video kiểm tra thực địa với giới hạn
 
-| type  | name           | label                                                | hint                                    |
-|-------|----------------|------------------------------------------------------|----------------------------------------|
-| video | product_demo   | Vui lòng quay một đoạn demo ngắn về việc dùng sản phẩm | Quay từ 30-60 giây, hiển thị các tính năng chính |
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Quay điểm lấy nước | Đi vòng quanh toàn bộ cơ sở. Tối đa 90 giây. | `max-duration=90 quality=normal` |
 
-## Các phần mở rộng của rtSurvey
+### Video có điều kiện — chỉ khi phát hiện hư hỏng
 
-Mặc dù đặc tả XLSForm cơ bản cho câu hỏi video khá đơn giản, rtSurvey có thể cung cấp thêm các tính năng hoặc tùy chỉnh bổ sung:
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | Có phát hiện hư hỏng không? | | |
+| video | damage_video | Quay video ghi lại hư hỏng | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
-1. Thiết lập thời lượng ghi tối đa
-2. Các tùy chọn chất lượng video (ví dụ: thấp, trung bình, cao)
-3. Chức năng phát lại để kiểm tra trước khi gửi
-4. Tích hợp với ứng dụng quay video gốc của thiết bị
-5. Tùy chọn tải lên các tệp video hiện có thay vì quay mới
+## Thực hành tốt
 
-## Hạn chế
+1. Đặt `max-duration` — video không giới hạn thời lượng có thể dễ dàng vượt quá 100 MB và không tải lên được khi kết nối kém.
+2. Dùng `quality=low` cho khảo sát giám sát nơi bằng chứng hình ảnh được yêu cầu nhưng không cần chi tiết cao — điều này giảm đáng kể kích thước tệp.
+3. Viết hướng dẫn quay cụ thể trong cột `hint` (ví dụ: "Đi vòng quanh toàn bộ tòa nhà, giữ camera ổn định").
+4. Cân nhắc xem video có thực sự cần thiết không — ảnh (`image`) thường đủ cho bằng chứng tĩnh và tạo ra tệp nhỏ hơn nhiều.
+5. Kiểm tra hiệu suất tải lên trên mạng thực địa thực tế trước khi triển khai.
 
-- Các tệp video có thể rất lớn, ảnh hưởng đáng kể đến việc truyền tải và lưu trữ dữ liệu.
-- Không phải tất cả các thiết bị đều hỗ trợ khả năng quay video hoặc có thể có dung lượng lưu trữ hạn chế.
-- Việc phân tích các câu trả lời bằng video có thể tốn thời gian và có thể yêu cầu phần mềm chuyên dụng.
-- Các lo ngại về quyền riêng tư có thể rõ rệt hơn khi thu thập dữ liệu video.
+## Giới hạn
 
-## Xử lý dữ liệu
-
-Các tệp video được thu thập qua loại câu hỏi này thường được:
-
-1. Lưu dưới định dạng video phổ biến (ví dụ: MP4, MOV)
-2. Lưu trữ cùng với dữ liệu khảo sát khác, thường là trong một thư mục phương tiện riêng biệt
-3. Có thể phát lại và phân tích thông qua nền tảng quản lý khảo sát
-
-## Các lưu ý khi phân tích
-
-Khi sử dụng câu hỏi video, hãy cân nhắc:
-
-1. Cách dữ liệu video sẽ được phân tích (ví dụ: đánh giá thủ công, phân tích video tự động)
-2. Thời gian và tài nguyên bổ sung cần thiết để xử lý các câu trả lời video
-3. Các biện pháp bảo mật và bảo vệ dữ liệu khi lưu trữ và xử lý các bản ghi video
-4. Nhu cầu tiềm năng về các công cụ chỉnh sửa hoặc tổng hợp video trong giai đoạn phân tích
+- Tệp video rất lớn — video 1 phút ở chất lượng bình thường thường là 20–60 MB tùy thiết bị.
+- Tải lên tệp video lớn cần kết nối mạng tốt; cân nhắc yêu cầu đồng bộ qua Wi-Fi cho biểu mẫu nhiều video.
+- Không phải tất cả trình duyệt web đều hỗ trợ ghi video qua MediaRecorder — Chrome là đáng tin cậy nhất.
+- Phân tích câu trả lời video là thủ công và tốn thời gian; chỉ dùng khi nội dung video mang lại giá trị đặc biệt.

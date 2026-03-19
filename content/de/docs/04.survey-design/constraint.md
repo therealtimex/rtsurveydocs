@@ -9,9 +9,9 @@ toc: true
 weight: 270
 ---
 
-Eine Möglichkeit, die Datenqualität sicherzustellen, besteht darin, Einschränkungen (Constraints) für die Datenfelder in Ihrem Formular hinzuzufügen. Constraints helfen zu verhindern, dass Benutzer ungültige oder unmögliche Antworten eingeben. Wenn Sie beispielsweise nach dem Einkommen einer Person fragen, möchten Sie unrealistische Werte wie negative Zahlen oder extrem hohe Werte vermeiden. Das Hinzufügen von Dateneinschränkungen in Ihrem Formular ist einfach. Folgen Sie einfach den unten stehenden Schritten:
+Eine Möglichkeit, die Datenqualität sicherzustellen, besteht darin, Einschränkungen (Constraints) für die Datenfelder in Ihrem Formular hinzuzufügen. Einschränkungen helfen, zu verhindern, dass Benutzer ungültige oder unmögliche Antworten eingeben. Wenn Sie beispielsweise nach dem Einkommen einer Person fragen, möchten Sie unrealistische Werte wie negative Zahlen oder extrem hohe Werte vermeiden. Das Hinzufügen von Dateneinschränkungen in Ihrem Formular ist einfach. Folgen Sie einfach den nachstehenden Schritten:
 
-1. Fügen Sie eine neue Spalte namens "constraint" zu Ihrem Formular hinzu.
+1. Fügen Sie Ihrem Formular eine neue Spalte namens "constraint" hinzu.
 2. Geben Sie in der Spalte "constraint" eine Formel ein, die die Grenzen für die Antwort festlegt.
 
 ### Beispiel
@@ -26,6 +26,81 @@ Betrachten wir ein Beispiel, bei dem wir eine Einschränkung für das Einkommen 
 
 Im obigen Beispiel bezieht sich der Punkt "." in der Formel auf die Fragevariable, die den vom Benutzer für die Frage "Income" eingegebenen Wert darstellt. Die Einschränkung ". >= 0 && . <= 1000000" stellt sicher, dass das eingegebene Einkommen größer oder gleich 0 und kleiner oder gleich 1.000.000 ist.
 
+
 ### Strikte Einschränkung (Hard constraint)
 
+Eine **strikte Einschränkung** blockiert die Formularübermittlung vollständig, wenn der eingegebene Wert den Ausdruck nicht erfüllt. Der Interviewer kann erst fortfahren, wenn er einen gültigen Wert eingegeben hat.
+
+Um eine strikte Einschränkung hinzuzufügen, geben Sie Ihren Ausdruck in die Spalte `constraint` ein. Optional können Sie eine lesbare Meldung in `constraint_message` hinzufügen:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Alter des Befragten | `. > 0 and . <= 120` | Das Alter muss zwischen 1 und 120 liegen |
+| decimal | temperature | Körpertemperatur (°C) | `. >= 35 and . <= 42` | Die Temperatur muss zwischen 35°C und 42°C liegen |
+| text | phone | Telefonnummer | `regex(., '^[0-9]{10}$')` | Geben Sie eine 10-stellige Telefonnummer ein |
+{{< /table >}}
+
+#### Mehrere Bedingungen
+
+Kombinieren Sie Bedingungen mit `and` / `or`:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Verwendung von `regex()` für Mustervalidierung
+
+Die Funktion `regex(value, pattern)` prüft einen Wert gegen einen regulären Ausdruck:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | E-Mail-Adresse | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Geben Sie eine gültige E-Mail-Adresse ein |
+| text | zip_code | Postleitzahl | `regex(., '^[0-9]{5}$')` | Geben Sie eine 5-stellige Postleitzahl ein |
+{{< /table >}}
+
+#### Referenzierung anderer Felder in einer Einschränkung
+
+Verwenden Sie `${fieldname}`, um auf Werte aus anderen Fragen zu verweisen:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Endjahr | `. >= ${start_year}` | Das Endjahr muss nach dem Startjahr liegen |
+| decimal | loan_repaid | Zurückgezahlter Betrag | `. <= ${loan_amount}` | Es kann nicht mehr zurückgezahlt werden als der Darlehensbetrag |
+{{< /table >}}
+
 ### Sanfter Hinweis (Soft alert)
+
+Ein **sanfter Hinweis** (auch Soft Constraint oder Warnung genannt) warnt den Interviewer, dass ein Wert ungewöhnlich erscheint, erlaubt aber dennoch das Fortfahren. Dies ist nützlich, wenn ein Wert technisch gültig, aber statistisch unwahrscheinlich ist.
+
+rtSurvey unterstützt sanfte Hinweise über die Spalte `constraint` mit einem speziellen `constraint_type`-Ansatz oder über das Erscheinungsbild `soft` in Kombination mit einem Notizfeld.
+
+Das häufigste Muster ist die Verwendung einer **Notiz** mit einem `relevant`-Ausdruck, der den verdächtigen Wert markiert, gepaart mit einer **acknowledge**-Frage zur Bestätigung:
+
+{{< table >}}
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Anzahl der Kinder | |
+| note | children_warning | Warnung: Sie haben ${children} Kinder eingegeben. Bitte bestätigen Sie, dass dies korrekt ist. | `. > 15` |
+| trigger | children_confirm | Bestätigen Sie, dass die Anzahl der Kinder korrekt ist | `${children} > 15` |
+{{< /table >}}
+
+#### Sanfter Hinweis nur mit constraint_message
+
+Für eine einfachere weiche Warnung können Sie die Einschränkung so formulieren, dass sie bei extremen Werten warnt, aber dennoch einen weiten Bereich zulässt:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | children | Anzahl der Kinder | `. >= 0 and . <= 30` | Dieser Wert erscheint sehr hoch. Bitte überprüfen Sie ihn. |
+{{< /table >}}
+
+{{% alert icon=" " context="warning" %}}
+Der Unterschied zwischen strikten und sanften Einschränkungen ist für die Datenqualität wichtig. Verwenden Sie **strikte Einschränkungen** für logisch unmögliche Werte (negative Altersangaben, Temperaturen über 100°C). Verwenden Sie **sanfte Hinweise** für statistisch unwahrscheinliche, aber nicht unmögliche Werte — Sie möchten keine legitimen Ausnahmefälle blockieren.
+{{% /alert %}}

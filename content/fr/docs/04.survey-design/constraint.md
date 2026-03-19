@@ -9,14 +9,14 @@ toc: true
 weight: 270
 ---
 
-Un moyen d'assurer la qualité des données est d'ajouter des contraintes aux champs de données de votre formulaire. Les contraintes aident à empêcher les utilisateurs de saisir des réponses invalides ou impossibles. Par exemple, lors de la demande de revenus d'une personne, vous voulez éviter des valeurs irréalistes, telles que des nombres négatifs ou des valeurs extrêmement élevées. Ajouter des contraintes de données dans votre formulaire est facile. Suivez simplement les étapes ci-dessous :
+L'un des moyens d'assurer la qualité des données est d'ajouter des contraintes aux champs de données de votre formulaire. Les contraintes aident à éviter que les utilisateurs ne saisissent des réponses invalides ou impossibles. Par exemple, lors de la demande du revenu d'une personne, vous souhaitez éviter des valeurs irréalistes, comme des nombres négatifs ou des valeurs extrêmement élevées. L'ajout de contraintes de données dans votre formulaire est simple. Suivez les étapes ci-dessous :
 
 1. Ajoutez une nouvelle colonne appelée "constraint" à votre formulaire.
-2. Dans la colonne "constraint", entrez une formule qui spécifie les limites de la réponse.
+2. Dans la colonne "constraint", saisissez une formule qui spécifie les limites de la réponse.
 
 ### Exemple
 
-Considérons un exemple où nous voulons ajouter une contrainte pour les revenus d'une personne. La contrainte exige que les revenus soient compris entre 0 $ et 1 000 000 $. Voici comment vous pouvez configurer la contrainte :
+Considérons un exemple où nous souhaitons ajouter une contrainte sur le revenu d'une personne. La contrainte exige que le revenu soit compris entre 0 $ et 1 000 000 $. Voici comment configurer la contrainte :
 
 {{< table >}}
 | `name`      | `constraint`                  |
@@ -26,6 +26,81 @@ Considérons un exemple où nous voulons ajouter une contrainte pour les revenus
 
 Dans l'exemple ci-dessus, le "." dans la formule fait référence à la variable de la question, qui représente la valeur saisie par l'utilisateur pour la question "Income". La contrainte ". >= 0 && . <= 1000000" garantit que le revenu saisi est supérieur ou égal à 0 et inférieur ou égal à 1 000 000.
 
-### Contrainte stricte (Hard constraint)
 
-### Alerte souple (Soft alert)
+### Contrainte stricte
+
+Une **contrainte stricte** bloque entièrement la soumission du formulaire si la valeur saisie ne satisfait pas l'expression. L'enquêteur ne peut pas avancer jusqu'à ce qu'il saisisse une valeur valide.
+
+Pour ajouter une contrainte stricte, saisissez votre expression dans la colonne `constraint`. Ajoutez optionnellement un message lisible dans `constraint_message` :
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Âge du répondant | `. > 0 and . <= 120` | L'âge doit être compris entre 1 et 120 |
+| decimal | temperature | Température corporelle (°C) | `. >= 35 and . <= 42` | La température doit être entre 35°C et 42°C |
+| text | phone | Numéro de téléphone | `regex(., '^[0-9]{10}$')` | Saisir un numéro de téléphone à 10 chiffres |
+{{< /table >}}
+
+#### Conditions multiples
+
+Combinez les conditions avec `and` / `or` :
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Utiliser `regex()` pour la validation par motif
+
+La fonction `regex(value, pattern)` teste une valeur par rapport à une expression régulière :
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | Adresse e-mail | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Saisir une adresse e-mail valide |
+| text | zip_code | Code postal | `regex(., '^[0-9]{5}$')` | Saisir un code postal à 5 chiffres |
+{{< /table >}}
+
+#### Référencer d'autres champs dans une contrainte
+
+Utilisez `${fieldname}` pour référencer des valeurs d'autres questions :
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Année de fin | `. >= ${start_year}` | L'année de fin doit être postérieure à l'année de début |
+| decimal | loan_repaid | Montant remboursé | `. <= ${loan_amount}` | Impossible de rembourser plus que le montant du prêt |
+{{< /table >}}
+
+### Alerte souple
+
+Une **alerte souple** (également appelée contrainte souple ou avertissement) avertit l'enquêteur qu'une valeur semble inhabituelle, mais lui permet quand même de continuer. C'est utile lorsqu'une valeur est techniquement valide mais statistiquement improbable.
+
+rtSurvey prend en charge les alertes souples via la colonne `constraint` avec une approche spéciale `constraint_type`, ou via l'apparence `soft` combinée avec un champ note.
+
+Le schéma le plus courant consiste à utiliser une **note** avec une expression `relevant` qui signale la valeur suspecte, associée à une question **acknowledge** pour confirmer :
+
+{{< table >}}
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Nombre d'enfants | |
+| note | children_warning | Avertissement : Vous avez saisi ${children} enfants. Veuillez confirmer que c'est correct. | `. > 15` |
+| trigger | children_confirm | Confirmer que le nombre d'enfants est correct | `${children} > 15` |
+{{< /table >}}
+
+#### Alerte souple avec uniquement constraint_message
+
+Pour un avertissement souple plus simple, vous pouvez formuler la contrainte pour avertir sur les valeurs extrêmes tout en autorisant une large plage :
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | children | Nombre d'enfants | `. >= 0 and . <= 30` | Cette valeur semble très élevée. Veuillez vérifier. |
+{{< /table >}}
+
+{{% alert icon=" " context="warning" %}}
+La distinction entre contraintes strictes et alertes souples est importante pour la qualité des données. Utilisez des **contraintes strictes** pour les valeurs logiquement impossibles (âges négatifs, températures supérieures à 100°C). Utilisez des **alertes souples** pour les valeurs statistiquement improbables mais pas impossibles — vous ne voulez pas bloquer les cas limites légitimes.
+{{% /alert %}}

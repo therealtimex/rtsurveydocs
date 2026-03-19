@@ -9,69 +9,133 @@ toc: true
 weight: 300
 ---
 
-L'AppAPI permet aux utilisateurs de charger des métadonnées système à partir de l'application en utilisant différentes méthodes dans le FormEngine et DMView. Elle donne accès à diverses clés de données pour récupérer des informations spécifiques de l'application.
+L'AppAPI permet aux utilisateurs de charger des métadonnées système depuis l'application en utilisant différentes méthodes dans le FormEngine et DMView. Elle donne accès à diverses clés de données pour récupérer des informations spécifiques de l'application.
 
-Dans l'xlsform, vous pouvez utiliser la fonction `pulldata()` avec la syntaxe suivante :
+Dans le XLSForm, vous pouvez utiliser la fonction `pulldata()` avec la syntaxe suivante :
+
 
 {{< alert context="light" text="pulldata('app-api', 'data-key')" />}}
 
-- `'app-api'` : Ce mot-clé informe le FormEngine de charger les données à partir de l'API de l'App.
-- `'data-key'` : C'est la clé de la donnée que vous souhaitez charger à partir de l'API de l'App.
-- Si la clé de données est invalide ou non prise en charge, le calcul renverra "n/a".
+- `'app-api'` : Ce mot-clé indique au FormEngine de charger les données depuis l'API de l'App.
+- `'data-key'` : C'est la clé de la donnée que vous souhaitez charger depuis l'API de l'App.
+- Si la clé de données est invalide ou non prise en charge, le calcul retournera "n/a".
 
 Voici les clés de données prises en charge que vous pouvez utiliser avec l'App-API :
 
-`osPlatform` : Renvoie le nom de l'OS actuel (Android ou iOS) et la version de l'OS. Les plateformes Web renverront une valeur vide.
+`osPlatform` : Retourne le nom de l'OS actuel (Android ou iOS) et la version de l'OS. Les plateformes web retourneront une valeur vide.
 
-`appPlatform` : Renvoie le nom de la plateforme de l'application, qui est `rtSurvey`.
+`appPlatform` : Retourne le nom de la plateforme de l'application, qui est `rtSurvey`.
 
-`appVersion` : Renvoie le nom de la version de l'application.
+`appVersion` : Retourne le nom de la version de l'application.
 
-`getDisplayWidth` : Renvoie la largeur de l'écran de l'appareil en pixels.
+`getDisplayWidth` : Retourne la largeur de l'écran de l'appareil en pixels.
 
-`getDisplayHeight` : Renvoie la hauteur de l'écran de l'appareil en pixels.
+`getDisplayHeight` : Retourne la hauteur de l'écran de l'appareil en pixels.
 
-`getScreenSize` : Renvoie la taille de l'écran de l'appareil en pouces.
+`getScreenSize` : Retourne la taille de l'écran de l'appareil en pouces.
 
-`projectCode` : Renvoie le code du projet actuel du site auquel l'utilisateur est connecté.
+`projectCode` : Retourne le code du projet actuel du site auquel l'utilisateur est connecté.
 
-`projectURL` : Renvoie l'URL du projet actuel du site auquel l'utilisateur est connecté. La valeur par défaut/de secours est un texte vide ("").
+`projectURL` : Retourne l'URL du projet actuel du site auquel l'utilisateur est connecté. La valeur par défaut/de secours est un texte vide ("").
 
-`startingPoint` : Renvoie le chemin du point qui démarre le formulaire. Reportez-vous au "Form starting point" pour plus de détails.
+`startingPoint` : Retourne le chemin du point qui démarre le formulaire. Reportez-vous au "Form starting point" pour plus de détails.
 
-`serverTime` : Renvoie la meilleure approximation disponible de la date et de l'heure sur le serveur.
+`serverTime` : Retourne la meilleure approximation disponible de la date et de l'heure sur le serveur.
 
-`user.[attribute]` : Renvoie les attributs de l'utilisateur actuel basés sur la clé d'attribut spécifiée. Reportez-vous au tableau "User attributes" pour les clés d'attribut disponibles.
+`user.[attribute]` : Retourne les attributs de l'utilisateur actuel en fonction de la clé d'attribut spécifiée. Reportez-vous au tableau "Attributs utilisateur" pour les clés d'attribut disponibles.
 
 Combinez les clés d'attribut ci-dessous avec "user." dans les paramètres de `pulldata()` pour récupérer les informations de l'utilisateur actuel. Par exemple, utilisez `user.username`, `user.email`, etc.
 
-| Clé d'attribut        | Description                               |
-|----------------------|-------------------------------------------|
-| username             | Nom d'utilisateur                         |
-| name                 | Nom complet de l'utilisateur              |
-| staffCode            | Code personnel de l'utilisateur           |
-| phone                | Numéro de téléphone                       |
-| email                | Adresse e-mail                            |
-| description          | Texte de description (infos utilisateur)  |
-| organization_id      | ID de l'organisation d'appartenance      |
-| organization_name    | Nom de l'organisation d'appartenance     |
-| team_id              | ID de l'équipe d'appartenance             |
-| supervisor_id        | ID du superviseur de l'utilisateur        |
-| user_role            | Rôle de l'utilisateur                     |
-| user_group           | Groupe de l'utilisateur                    |
-| is_supervisor        | 1 si l'utilisateur est un superviseur, 0 sinon |
-| auto_approve_edit_request | 1 si l'utilisateur peut approuver automatiquement les "demandes de modification", 0 sinon |
-| ipcall.user          | Paramètre compte IP Call - nom d'utilisateur |
-| ipcall.token         | Paramètre compte IP Call - jeton (token)    |
-| ipcall.password      | Paramètre compte IP Call - mot de passe     |
-| ipcall.url           | Paramètre compte IP Call - URL              |
-| ipcall.auth          | Paramètre compte IP Call - auth (optionnel) |
-| ipcall.port          | Paramètre compte IP Call - port (optionnel) |
+| Clé d'attribut        | Description                          |
+|----------------------|--------------------------------------|
+| username             | Nom d'utilisateur                     |
+| name                 | Nom complet de l'utilisateur          |
+| staffCode            | Code personnel de l'utilisateur       |
+| phone                | Numéro de téléphone de l'utilisateur  |
+| email                | Adresse e-mail de l'utilisateur       |
+| description          | Texte de description (infos utilisateur) |
+| organization_id      | ID de l'organisation d'appartenance   |
+| organization_name    | Nom de l'organisation d'appartenance  |
+| team_id              | ID de l'équipe d'appartenance         |
+| supervisor_id        | ID du superviseur de l'utilisateur    |
+| is_supervisor        | 1 si l'utilisateur est superviseur, 0 sinon |
 
-`instancePath` : Renvoie le chemin du dossier de l'instance actuelle.
+`instancePath` : Retourne le chemin du dossier de l'instance actuelle.
 
-`appLanguage` : Renvoie la langue actuelle de l'application définie dans les paramètres (ex: vi, en, fr).
+`appLanguage` : Retourne la langue actuelle de l'application définie dans les paramètres (ex. : vi, en).
 
-`openArgs.[attribute]` : Renvoie l'argument d'ouverture de formulaire passé depuis l'ActionButton (act_fill_form, act_get_instance). La valeur par défaut est un texte vide ("").
+`openArgs.[attribute]` : Retourne l'argument d'ouverture de formulaire passé depuis l'ActionButton (act_fill_form, act_get_instance). La valeur par défaut/de secours est un texte vide ("").
 
 `primaryAppColor` : Récupère la couleur principale de l'application.
+
+---
+
+## Exemples d'utilisation
+
+### Stocker le nom d'utilisateur et l'organisation de l'enquêteur
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Utilisez ces valeurs dans des étiquettes note à des fins d'audit :
+```
+note | interviewer_info | Enquêteur : ${enumerator_name} (${enumerator_org})
+```
+
+### Informations sur l'appareil et l'écran
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+Utile pour le dépannage : exportez `device_platform` et `app_ver` avec vos données pour identifier la version d'appareil utilisée pour chaque soumission.
+
+### Heure du serveur plutôt qu'heure de l'appareil
+
+Les horloges des appareils peuvent être incorrectes. Utilisez `serverTime` pour un horodatage plus fiable :
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Logique conditionnelle basée sur le rôle utilisateur
+
+Afficher une section réservée aux superviseurs uniquement aux superviseurs :
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Révision du superviseur | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Notes du superviseur | |
+| end_group | | | |
+
+### Passer des arguments depuis un bouton d'action
+
+Lorsque le formulaire est lancé depuis un bouton d'action `act_fill_form` avec des arguments personnalisés :
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+Le bouton d'action doit passer les arguments avec les clés correspondantes (ex. : `household_id`, `task_code`).
+
+### Utiliser les informations du projet
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## Remarques
+
+- Tous les appels `pulldata('app-api', ...)` sont évalués à l'ouverture du formulaire et ne sont pas réévalués dynamiquement pendant la session (sauf `serverTime` et `now()`).
+- Si une clé n'est pas prise en charge ou si la donnée est indisponible, la fonction retourne `'n/a'` (pas une chaîne vide — testez avec `!= 'n/a'` plutôt que `!= ''`).
+- Les valeurs `openArgs` ne sont disponibles que lorsque le formulaire est lancé depuis un bouton d'action ; elles retournent une chaîne vide sinon.

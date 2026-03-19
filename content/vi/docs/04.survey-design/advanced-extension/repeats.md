@@ -1,116 +1,160 @@
 ---
-title: "Nhóm lặp (Repeats)"
-description: ""
+title: "Nhóm lặp nâng cao"
+description: "Các mẫu nâng cao cho nhóm lặp: số lần lặp động, lặp lồng nhau, tóm tắt dữ liệu lặp và tham chiếu giá trị giữa các lần lặp."
 icon: "manage_search"
 date: "2023-05-22T00:44:31+01:00"
 lastmod: "2023-05-22T00:44:31+01:00"
 draft: false
 toc: true
-weight: 294
+weight: 295
 ---
 
-Tìm kiếm động (Dynamic Search) là một tính năng mạnh mẽ trong rtSurvey cho phép bạn tích hợp chức năng tìm kiếm động vào khảo sát của mình, cho phép truy xuất dữ liệu thời gian thực từ các nguồn bên ngoài.
+Trang này đề cập đến các mẫu nâng cao khi làm việc với nhóm lặp trong rtSurvey. Để biết kiến thức cơ bản về thiết lập nhóm lặp, xem [Nhóm và Lặp](../repeats).
 
-## Cú pháp (Syntax)
+---
 
-Cú pháp cơ bản để sử dụng Search-API là:
+## Số lần lặp động
 
-```
-search-api(method, url, post_body, value_column, display, data_path, save_path)
-```
+Mặc định, người điều tra quyết định số lần lặp. Bạn có thể cố định số lần lặp bằng `repeat_count`:
 
-### Các tham số (Parameters)
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Thành viên hộ gia đình | `${num_members}` |
+| text | member_name | Tên thành viên | |
+| integer | member_age | Tuổi | |
+| end_repeat | | | |
 
-- `method`: Luôn luôn sử dụng 'POST'.
-- `url`: URL để lấy dữ liệu.
-- `post_body`: Thân yêu cầu (request body). Sử dụng cú pháp `searchView` (xem tài liệu DataModel Views).
-- `value_column`: Trường dữ liệu được sử dụng làm giá trị (`value`).
-- `display`: Trường dữ liệu được sử dụng làm nhãn (`label`). Hỗ trợ cú pháp kiểu mẫu (template) với `##key##` và `@{func}` để định dạng nâng cao.
-- `data_path`: JSONPath để trích xuất dữ liệu mong muốn từ phản hồi (ví dụ: `$.hits.hits.*._source`).
-- `save_path`: Vị trí để lưu trữ dữ liệu phản hồi để sử dụng sau này.
+Vòng lặp chạy đúng `${num_members}` lần, nơi `num_members` được thu thập trước đó trong biểu mẫu. Người điều tra không thể thêm hoặc xóa phiên bản.
 
-## Ví dụ sử dụng (Usage Examples)
+---
 
-### Cách dùng cơ bản
+## Truy cập theo chỉ số: `indexed-repeat()`
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'search_results')
-```
+Truy cập giá trị trường của một phiên bản lặp cụ thể từ **bên ngoài** nhóm lặp bằng `indexed-repeat(repeatedField, repeatGroup, index)`:
 
-### Với định dạng hiển thị nâng cao
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '##name## (##age## tuổi)', '$.results', 'search_results')
-```
+Điều này hữu ích để xây dựng trường tóm tắt hoặc tham chiếu dữ liệu thành viên "chính" sau vòng lặp.
 
-### Với Hàm trong phần hiển thị (Function in Display)
+---
 
-```
-appearance: search-api('POST', 'https://api.example.com/search', '{"query": "%__input__%"}', 'id', '@{if_else(eq("##status##", "active"), "Hoạt động: ##name##", "Không hoạt động: ##name##")}', '$.results', 'search_results')
-```
+## Vị trí phiên bản hiện tại: `index()`
 
-## Các loại câu hỏi hỗ trợ
+Trong nhóm lặp, `index()` trả về vị trí (bắt đầu từ 1) của phiên bản hiện tại. Dùng để gán nhãn mỗi lần lặp hoặc tạo mã định danh duy nhất:
 
-- `select_one`
-- `select_multiple`
-- `text` (cho chức năng tự động hoàn thành - autocomplete)
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Thửa đất |
+| note | plot_label | Thửa đất số ${index()} |
+| text | plot_id | ID thửa đất |
+| end_repeat | | |
 
-## Các tính năng bổ sung
+---
 
-### API Mặc định (Default API)
+## Tham chiếu trường trong cùng phiên bản
 
-Sử dụng `search-default-api()` sau `search-api()` để đặt các giá trị mặc định:
+Trong vòng lặp, dùng `${fieldname}` để tham chiếu trường khác **trong cùng phiên bản lặp**. Không cần `indexed-repeat()` trong cùng vòng lặp:
 
-```
-appearance: search-api(...) search-default-api(...)
-```
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Thành viên | |
+| text | member_name | Tên | |
+| integer | member_age | Tuổi | |
+| text | school_name | Tên trường | `${member_age} < 18` |
+| end_repeat | | | |
 
-### Ký tự phân tách đa lựa chọn (Multiple Selection Separator)
+---
 
-Đối với `select_multiple`, sử dụng `search-default-separator()` để chỉ định ký tự phân tách tùy chỉnh:
+## Tham chiếu trường cha từ trong vòng lặp
 
-```
-appearance: search-api(...) search-default-separator(' || ')
-```
+Các trường bên ngoài (phía trên) nhóm lặp có thể được tham chiếu bình thường bằng `${fieldname}`:
 
-## Thực hành tốt nhất (Best Practices)
+| type | name | label |
+|------|------|-------|
+| text | village | Tên làng/xã |
+| begin_repeat | plots | Thửa đất nông nghiệp |
+| note | plot_context | Thửa đất ở ${village} |
+| end_repeat | | |
 
-1. Tối ưu hóa các điểm cuối API (API endpoints) để đạt hiệu suất cao, đặc biệt là với các tập dữ liệu lớn.
-2. Sử dụng các chiến lược lưu trữ đệm (caching) phù hợp để giảm số lượng lệnh gọi API.
-3. Xử lý các lỗi mạng một cách mượt mà trong thiết kế khảo sát của bạn.
-4. Kiểm tra kỹ lưỡng với các kịch bản đầu vào khác nhau.
+---
 
-## Các hạn chế đã biết
+## Tóm tắt dữ liệu lặp
 
-- Các truy vấn phức tạp có thể ảnh hưởng đến thời gian tải khảo sát.
-- Chức năng ngoại tuyến có thể bị hạn chế tùy thuộc vào cách triển khai.
+Dùng các hàm tổng hợp lặp **bên ngoài** nhóm lặp để tóm tắt:
 
-```mermaid
-    graph TD
-    %% Define styles for nodes
-    classDef light fill:#cce5ff,stroke:#0066cc,stroke-width:2px,color:#003366
-    classDef dark fill:#2e3b4e,stroke:#a6b1c2,stroke-width:2px,color:#e1e1e1
-    classDef submit fill:#ffcc99,stroke:#cc6600,stroke-width:2px,color:#663300
-    classDef link fill:#ccffcc,stroke:#009933,stroke-width:2px,color:#003300
-    classDef storage fill:#ffffcc,stroke:#999900,stroke-width:2px,color:#333300
-    
-    %% Define shapes for nodes
-    A[<span class="iconify" data-icon="mdi:file-document-multiple" data-inline="false" data-width="18" data-height="18"></span> Biên lai dạng PDF, PNG, HEIC, JPEG, Excel] --> B{<span class="iconify" data-icon="mdi:send" data-inline="false" data-width="18" data-height="18"></span> Gửi biên lai}
-    B --> C1([<a href="mailto:keep@keepy.us?subject=Keep%20my%20receipts" style="color:#003300;"><span class="iconify" data-icon="mdi:email" data-inline="false" data-width="18" data-height="18"></span> Email: keep@keepy.us</a>])
-    B --> C2([<a href="sms:+16504173562" style="color:#003300;"><span class="iconify" data-icon="mdi:message-text" data-inline="false" data-width="18" data-height="18"></span> SMS: 650-417-3562</a>])
-    B --> C3([<a href="https://m.me/keepy.us" target="_blank" style="color:#003300;"><span class="iconify" data-icon="mdi:facebook-messenger" data-inline="false" data-width="18" data-height="18"></span> Messenger: m.me/keepy.us</a>])
-    C1 --> D[[<span class="iconify" data-icon="mdi:database" data-inline="false" data-width="18" data-height="18"></span> <b>Dữ liệu biên lai được lưu trong Google Sheet</b><br> - Tự động nhận diện chữ viết<br> - Kiểm tra bởi con người để đảm bảo chính xác<br> - Sao lưu bản số của biên lai]]
-    C2 --> D
-    C3 --> D
-    
-    %% Apply classes to nodes
-    class A light
-    class B submit
-    class C1 link
-    class C2 link
-    class C3 link
-    class D storage
-    
-    %% Adjust arrow styles for better visibility
-    linkStyle default stroke:#666,stroke-width:3px
-```
+| Hàm | Ví dụ | Mô tả |
+|-----|-------|-------|
+| `count(group)` | `count(${household_members})` | Số phiên bản |
+| `sum(field)` | `sum(${loan_amount})` | Tổng trường số |
+| `min(field)` | `min(${member_age})` | Giá trị nhỏ nhất |
+| `max(field)` | `max(${member_age})` | Giá trị lớn nhất |
+| `join(sep, field)` | `join(', ', ${member_name})` | Danh sách phân cách bởi dấu phẩy |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Đếm có điều kiện |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Tổng có điều kiện |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Ghép có điều kiện |
+
+### Ví dụ: Tóm tắt hộ gia đình
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | Có bao nhiêu thành viên? | |
+| begin_repeat | members | Thành viên | `${num_members}` |
+| text | member_name | Tên | |
+| integer | member_age | Tuổi | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | ${total_members} thành viên; ${children_count} dưới 18 tuổi. Người lớn: ${adult_names} | |
+
+---
+
+## Lặp lồng nhau
+
+Nhóm lặp có thể chứa nhóm lặp khác. Dùng cẩn thận — lặp lồng nhau thêm độ phức tạp và có thể gây nhầm lẫn cho người điều tra.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Hộ gia đình |
+| text | hh_id | ID hộ gia đình |
+| begin_repeat | hh_members | Thành viên |
+| text | member_name | Tên thành viên |
+| end_repeat | | |
+| end_repeat | | |
+
+Để tham chiếu trường trong vòng lặp ngoài từ vòng lặp trong, dùng `${fieldname}` — nó phân giải đến tổ tiên khớp gần nhất:
+
+Bên trong vòng lặp `hh_members`, `${hh_id}` trả về ID của **hộ gia đình hiện tại**, không phải tất cả hộ gia đình.
+
+---
+
+## Rank trong nhóm lặp: `rank-index()`
+
+Khi trường `rank` tồn tại trong vòng lặp, dùng `rank-index(instanceNumber, repeatedField)` từ bên ngoài để lấy thứ hạng theo thứ tự của một phiên bản cụ thể:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` trả về chỉ số phiên bản có điểm cao nhất.
+
+---
+
+## Thực hành tốt
+
+1. Luôn dùng `repeat_count` khi số lần lặp đã biết trước — điều này ngăn người điều tra vô tình thêm hoặc xóa phiên bản.
+2. Giữ nhóm lặp tập trung — vòng lặp với 20+ câu hỏi mỗi phiên bản khó điều hướng.
+3. Đặt tên nhóm lặp rõ ràng (ví dụ: `household_members`, không phải `repeat1`) — tên xuất hiện trong lời gọi hàm và dữ liệu xuất.
+4. Kiểm tra với số lần lặp tối đa dự kiến để xác minh hiệu suất.
+5. Dùng appearance `field-list` trên nhóm lặp để hiển thị tất cả trường trên một màn hình mỗi phiên bản (mobile).
+
+---
+
+## Giới hạn
+
+- `indexed-repeat()` cần chỉ số hợp lệ (1 đến số phiên bản) — chỉ số ngoài phạm vi trả về rỗng.
+- Lặp lồng nhau quá 2 cấp không được khuyến nghị và có thể gây vấn đề hiển thị trên một số client.
+- Các hàm tổng hợp (`sum`, `count`, v.v.) hoạt động trên toàn bộ nhóm lặp — bạn không thể tổng hợp một tập con phiên bản nếu không dùng các biến thể `*-if`.
