@@ -36,6 +36,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "en/index"
+                ]
+              },
+              {
                 "group": "Getting started",
                 "pages": [
                   "en/getting-started/index",
@@ -231,6 +237,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "vi/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "vi/getting-started/index",
@@ -414,6 +426,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "fr/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -599,6 +617,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "de/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "de/getting-started/index",
@@ -782,6 +806,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "pt/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -978,6 +1008,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "es/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "es/getting-started/index",
@@ -1172,6 +1208,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "zh-Hans/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -1368,6 +1410,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "ar/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "ar/getting-started/index",
@@ -1562,6 +1610,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "id/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -1758,6 +1812,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "hi/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "hi/getting-started/index",
@@ -1952,6 +2012,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "ru/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -2148,6 +2214,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "zh-Hant/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "zh-Hant/getting-started/index",
@@ -2342,6 +2414,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "ko/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -2538,6 +2616,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "ja/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "ja/getting-started/index",
@@ -2732,6 +2816,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "it/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -2928,6 +3018,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "nl/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "nl/getting-started/index",
@@ -3122,6 +3218,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "tr/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -3318,6 +3420,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "uk/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "uk/getting-started/index",
@@ -3512,6 +3620,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "no/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -3708,6 +3822,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "sv/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "sv/getting-started/index",
@@ -3902,6 +4022,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "pl/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -4098,6 +4224,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "cs/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "cs/getting-started/index",
@@ -4292,6 +4424,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "hu/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [
@@ -4488,6 +4626,12 @@
             "tab": "Documentation",
             "groups": [
               {
+                "group": "Home",
+                "pages": [
+                  "lv/index"
+                ]
+              },
+              {
                 "group": "Getting Started",
                 "pages": [
                   "lv/getting-started/index",
@@ -4682,6 +4826,12 @@
           {
             "tab": "Documentation",
             "groups": [
+              {
+                "group": "Home",
+                "pages": [
+                  "pt-BR/index"
+                ]
+              },
               {
                 "group": "Getting Started",
                 "pages": [

@@ -145,6 +145,12 @@ def main():
             print(f"  {lang_dir:<10} SKIPPED (no content)")
             continue
 
+        # Prepend root index page as the home page for this language
+        root_index = root / lang_dir / "index.mdx"
+        if root_index.exists():
+            home_page = str(root_index.relative_to(root)).replace(".mdx", "")
+            groups = [{"group": "Home", "pages": [home_page]}] + groups
+
         # Each language entry needs "tabs" wrapping the groups
         lang_entry = {"language": lang_code}
         if lang_code == "en":
