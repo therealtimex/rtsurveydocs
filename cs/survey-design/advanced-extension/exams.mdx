@@ -1,0 +1,118 @@
+---
+description: Funkce zkoušky přidává do průzkumu časovaný kvízový režim s volitelnou
+  zvukovou zpětnou vazbou pro správné a nesprávné odpovědi.
+icon: manage_search
+title: Zkoušky
+---
+
+
+Funkce **Zkouška** přemění průzkum na časovaný kvíz. Respondentovi se zobrazí odpočítávání a průzkum zaznamená, kolik času zbývá, když skončí. Volitelně mohou přehrát zvukové signály pro správné a nesprávné odpovědi.
+
+To je užitečné pro znalostní hodnocení, testy gramotnosti, kontroly způsobilosti terénních pracovníků a jakýkoli průzkum, kde je čas strávený úkolem smysluplným údajem.
+
+---
+
+## Funkce `check-exam()`
+
+Konfigurujte zkoušku pomocí `check-exam()` ve sloupci **`calculation`** pole `calculate` umístěného na začátku formuláře:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Parametry
+
+| # | Parametr | Popis |
+|---|----------|-------|
+| 1 | `examTime` | Celková délka zkoušky v sekundách |
+| 2 | `questionToStoreRemainingTime` | `name` pole `calculate` nebo `integer`, které uloží zbývající čas po skončení zkoušky |
+| 3 | `rightSound` | *(Volitelné)* Název souboru pro přehrání při správné odpovědi (přiložte jako mediální soubor) |
+| 4 | `wrongSound` | *(Volitelné)* Název souboru pro přehrání při nesprávné odpovědi |
+| 5 | `excludeQuestion` | *(Volitelné)* Čárkami oddělený seznam názvů polí vyloučených z časovače zkoušky (např. `'intro_note,consent'`) |
+
+---
+
+## Základní nastavení
+
+### Krok 1: Přidejte pole zkoušky
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` spouští 600sekundový (10minutový) časovač. `remaining_time` je automaticky vyplněno, když respondent skončí.
+
+### Krok 2: Přidejte otázky
+
+Časovač zkoušky pokrývá všechny otázky ve formuláři kromě těch uvedených v `excludeQuestion`.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | Hlavní město Keni je Nairobi. Pravda nebo nepravda? |
+| select_one choices | q2 | Který orgán pumpuje krev po těle? |
+| select_one choices | q3 | Voda se vaří při 100°C na hladině moře. Pravda nebo nepravda? |
+
+### Krok 3: Uložte zbývající čas
+
+Pole pojmenované v parametru 2 (`remaining_time`) je automaticky nastaveno na počet zbývajících sekund, když respondent odešle formulář. Hodnota `0` znamená, že čas vypršel; vysoká hodnota znamená, že to dokončili rychle.
+
+---
+
+## Se zvukovou zpětnou vazbou
+
+Přiložte zvukové soubory k formuláři (jako mediální přílohy) a pak je odkažte:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` se přehraje, když respondent vybere správnou odpověď
+- `wrong.mp3` se přehraje, když respondent vybere nesprávnou odpověď
+
+<Warning>
+Zvukové soubory musí být přiloženy k formuláři jako mediální soubory a název souboru musí přesně odpovídat (rozlišení malých a velkých písmen) včetně přípony.
+</Warning>
+
+---
+
+## Vyloučení otázek z časovače
+
+Předejte čárkami oddělený seznam názvů polí pro vyloučení ze zkoušky (např. úvodní poznámky nebo otázky souhlasu):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+Ponechte `rightSound` a `wrongSound` jako prázdné řetězce `''`, pokud nepotřebujete zvuk, ale potřebujete vyloučení.
+
+---
+
+## Kompletní příklad
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | Vítejte v hodnocení zdravotních znalostí. Máte 5 minut na zodpovězení všech otázek. | |
+| trigger | start_ack | Klepněte na OK, až budete připraveni začít. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | Mytí rukou zabraňuje šíření nemocí. | |
+| select_one yesno | q2 | Měli byste pít alespoň 2 litry vody denně. | |
+| select_one yesno | q3 | Malárie je způsobena virem. | |
+
+---
+
+## Osvědčené postupy
+
+1. Vždy informujte respondenty o časovém limitu před zahájením — použijte `note` nebo `trigger` před polem `check-exam()`.
+2. Vylučte úvodní poznámky a otázky souhlasu z časovače pomocí parametru `excludeQuestion`.
+3. Použijte `remaining_time` v navazujícím výpočtu pro detekci vypršení času: `if(${remaining_time} = 0, 'Čas vypršel', 'Dokončeno')`.
+4. Udržujte počet otázek úměrný povolenému času — 2–3 minuty na otázku je přiměřený základ pro většinu znalostních hodnocení.
+5. Testujte se zvukovými soubory na skutečném zařízení před nasazením — přehrávání zvuku se liší napříč verzemi Androidu a prohlížeči.
+
+## Omezení
+
+- Časovač je pouze zobrazovací — formulář se automaticky neodešle, když čas vyprší; respondent musí stále odeslat ručně.
+- Zvuková zpětná vazba vyžaduje, aby hlasitost zařízení byla zapnuta a neztlumena.
+- Funkce zkoušky je rozšíření rtSurvey a není součástí standardní specifikace XLSForm.

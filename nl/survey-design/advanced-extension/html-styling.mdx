@@ -1,0 +1,142 @@
+---
+description: rtSurvey ondersteunt HTML-tags in labels en hints, waardoor rich text-opmaak,
+  koppelingen en dynamische kleurthema's mogelijk zijn.
+icon: manage_search
+title: HTML-opmaak
+---
+
+
+rtSurvey rendert **label**- en **hint**-tekst als HTML op webformulieren. Dit betekent dat u standaard HTML-tags kunt gebruiken om tekst op te maken, regeleinden toe te voegen, koppelingen te maken en kleuren toe te passen. Dit is bijzonder nuttig voor notitatievelden, sectie-instructies en dynamische samenvattingen.
+
+<Warning>
+HTML in labels wordt weergegeven op het **webformulier** en rtSurvey mobiele apps. Het wordt mogelijk niet weergegeven in alle ODK-compatibele clients. Test altijd op uw doelplatform.
+</Warning>
+
+---
+
+## Ondersteunde HTML-tags
+
+### Tekstopmaak
+
+| Tag | Resultaat |
+|-----|-----------|
+| `<strong>tekst</strong>` of `<b>tekst</b>` | **Vetgedrukte tekst** |
+| `<em>tekst</em>` of `<i>tekst</i>` | *Cursieve tekst* |
+| `<u>tekst</u>` | Onderstreepte tekst |
+| `<br>` | Regeleinde |
+| `<span style="...">tekst</span>` | Inline opmaak |
+
+### Koppelingen
+
+```html
+<a href="https://example.com" target="_blank">Klik hier</a>
+```
+
+Opent in een nieuw tabblad. Gebruik voor referentiedocumenten, richtlijnen of externe bronnen die de enumerator moet raadplegen.
+
+### Kleuren
+
+Gebruik `<span>` met inline stijlen:
+
+```html
+<span style="color: red;">Waarschuwing: waarde valt buiten het bereik</span>
+<span style="color: #009688;">Sectie voltooid</span>
+```
+
+---
+
+## Kleurthemavariabelen
+
+rtSurvey ondersteunt **kleurthema-tokens** die zich aanpassen aan het geconfigureerde thema van de app. Gebruik de syntaxis `__KLEURTHEMA_NAAM__`:
+
+```html
+<span style="color: var(--color-theme-primary);">Primaire kleurtekst</span>
+```
+
+Of gebruik de token-afkorting in labeltekst:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Belangrijke notitie</font>
+```
+
+Dit wordt automatisch geconverteerd naar het equivalente `<span>` met een CSS-variabele bij het renderen.
+
+---
+
+## Meertalige labels
+
+Wikkel inhoud in taalcodes om meerdere talen te ondersteunen in een enkele labelcel:
+
+```
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey extraheert de inhoud die overeenkomt met de huidige apptaal. Als er geen overeenkomende taalcode wordt gevonden, wordt de volledige tekenreeks weergegeven zoals die is.
+
+---
+
+## Voorbeelden in notitatievelden
+
+### Sectie-instructie met vet en een regeleinde
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Sectie 3: Landgebruik</strong><br>Stel alle vragen in deze sectie alleen aan het hoofd van het huishouden.` |
+
+### Dynamische samenvatting met berekeningsreferentie
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Totaal huishoudleden: <strong>${total}</strong><br><span style="color: gray;">Volwassenen: ${adults} · Kinderen: ${children}</span>` |
+
+### Waarschuwing in rood
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Waarschuwing:</strong> Ingevoerde leeftijd (${age}) is ongewoon hoog. Verifieer alstublieft.</span>` | `${age} > 100` |
+
+### Koppeling naar een referentiedocument
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Raadpleeg de <a href="https://docs.example.com/guidelines" target="_blank">Veldrichtlijnen</a> voor het starten van deze sectie.` |
+
+---
+
+## Speciale rtSurvey HTML-tags
+
+### `<webbox src='url' title='titel'>...</webbox>`
+
+Sluit een knop in die een URL opent in een modaal in het formulier. Zie [Webbox](webbox) voor volledige details.
+
+### `<delete-repeat-current>label</delete-repeat-current>`
+
+Rendert een knop binnen een herhalingsgroep die de huidige herhalingsinstantie verwijdert wanneer erop wordt getikt.
+
+### `<delete-repeat-last>label</delete-repeat-last>`
+
+Rendert een knop die de laatste herhalingsinstantie verwijdert.
+
+Voorbeeldgebruik in een herhalingsgroep:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Dit lid verwijderen</delete-repeat-current>` |
+
+---
+
+## Aanbevolen werkwijzen
+
+1. Gebruik HTML spaarzaam — overmatig opgemaakte labels zijn moeilijker te lezen, niet gemakkelijker.
+2. Geef de voorkeur aan `<strong>` voor vet en `<em>` voor cursief boven de verouderde `<b>` en `<i>`.
+3. Gebruik kleur betekenisvol — gebruik rood voor waarschuwingen, niet voor decoratie.
+4. Test HTML-weergave altijd op zowel de mobiele app als het webformulier, omdat de weergave enigszins kan verschillen.
+5. Vermijd `<table>`-tags in labels — ze worden zelden goed weergegeven op mobiele schermen.
+6. Gebruik geen JavaScript (`<script>`) — het wordt verwijderd of veroorzaakt fouten.
+
+## Beperkingen
+
+- Complexe HTML (tabellen, formulieren, scripts) wordt niet ondersteund en kan de weergave verbreken.
+- Sommige oudere mobiele clients kunnen HTML-tags als letterlijke tekst weergeven — test op alle doelappara ten.
+- `<a>`-koppelingen openen in een browser of WebView — de enumerator verlaat het formulier, wat storend kan zijn op mobiel.

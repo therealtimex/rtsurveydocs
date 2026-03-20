@@ -1,0 +1,110 @@
+---
+description: Naučite kako da povežete rtSurvey mobilnu aplikaciju sa serverom projekta,
+  pristupite funkcionalnostima specifičnim za uloge i počnete saradnju na anketama
+  u više projekata.
+icon: cloud_sync
+title: Povezivanje sa serverom
+---
+
+
+Povezivanje rtSurvey aplikacije sa serverom je ključni korak za početak korišćenja aplikacije za prikupljanje, upravljanje i analizu podataka. Ovaj proces osigurava da sve uloge ankete mogu pristupiti potrebnim funkcionalnostima i podacima u realnom vremenu.
+
+## Ključne razlike od ODK Collect-a
+
+rtSurvey nudi poboljšane funkcionalnosti u poređenju sa ODK Collect-om, prilagođene različitim ulogama ankete:
+- **Administrator**: Razmena poruka, obaveštenja o ažuriranjima (slanje podataka, novi izveštaji, novi nalozi), popunjavanje formulara i pregled analitičkih izveštaja.
+- **Menadžer projekta**: Slične funkcionalnosti kao administratori, uključujući podešavanje i upravljanje projektima.
+- **Dizajner ankete**: Razmena poruka, obaveštenja, popunjavanje formulara i pregled analitičkih izveštaja.
+- **Terenski anketar**: Popunjavanje formulara, razmena poruka, obaveštenja i izveštaji o napretku.
+- **Analitičar podataka**: Razmena poruka, obaveštenja i pristup analitičkim izveštajima.
+
+## Koraci za povezivanje rtSurvey aplikacije sa serverom
+
+### 1. Proverite da li imate nalog
+
+Da biste se povezali sa serverom, potreban vam je nalog. Naloge može kreirati administrator ili osoblje koristeći URL za kreiranje naloga koji je postavio administrator.
+
+### 2. Otvorite rtSurvey aplikaciju
+
+Pokrenite rtSurvey aplikaciju na mobilnom uređaju. Ako je još niste instalirali, pogledajte stranicu [Instalacija rtSurvey aplikacije](#installing-rtsurvey-app).
+
+### 3. Pristupite podešavanjima veze sa serverom
+
+1. Otvorite aplikaciju i navigirajte do menija podešavanja.
+2. Izaberite opciju za povezivanje sa serverom.
+
+### 4. Unesite detalje naloga i izaberite projekat
+
+Kada se povezujete sa rtSurvey-om, proces je pojednostavljen na osnovu konfiguracije vašeg naloga:
+
+- **Korisničko ime**: Unesite korisničko ime naloga.
+- **Lozinka**: Unesite lozinku naloga.
+
+Nakon unosa akreditiva:
+
+- Ako je vaš nalog vezan za samo jedan anketni projekat:
+  - Aplikacija će vas automatski prijaviti na server tog projekta.
+  - Nije potrebno da unesete URL servera ili ručno izaberete projekat.
+
+- Ako je vaš nalog vezan za više anketnih projekata:
+  - Nakon uspešne autentifikacije, videćete listu projekata kojima imate pristup.
+  - Izaberite projekat na kome želite da radite sa ove liste.
+
+### 5. Autentifikujte se
+
+Nakon unosa detalja servera, dodirnite dugme "Poveži" ili "Prijavi se". Aplikacija će autentifikovati vaše akreditive i uspostaviti vezu sa serverom.
+
+```mermaid
+flowchart TD
+    A["📱 Pokrenite rtSurvey aplikaciju"] --> B["🔑 Unesite korisničko ime<br>i lozinku"]
+    style A fill:#4CAF50,stroke:#666666,stroke-width:3px,color:white
+    style B fill:#2196F3,stroke:#666666,stroke-width:3px,color:white
+
+    B --> C{"🌳 Više<br>projekata?"}
+    style C fill:#FFC107,stroke:#666666,stroke-width:3px,color:black
+
+    C -->|Da| D["📋 Prikaz liste<br>projekata"]
+    C -->|Ne| E["🔄 Automatsko povezivanje na<br>jedan projekat"]
+    style D fill:#FF9800,stroke:#666666,stroke-width:3px,color:white
+    style E fill:#009688,stroke:#666666,stroke-width:3px,color:white
+
+    D --> F["👆 Korisnik bira<br>projekat"]
+    style F fill:#FF5722,stroke:#666666,stroke-width:3px,color:white
+
+    E --> G["☁️ Povezivanje sa serverom"]
+    F --> G
+    style G fill:#3F51B5,stroke:#666666,stroke-width:3px,color:white
+    G --> H["👥 Pristup funkcionalnostima<br>specifičnim za uloge"]
+    style H fill:#9C27B0,stroke:#666666,stroke-width:3px,color:white
+
+    H --> I["👨‍💼 Administrator/<br>Menadžer projekta"]
+    H --> J["🎨 Dizajner ankete"]
+    H --> K["📝 Terenski anketar"]
+    H --> L["📊 Analitičar podataka"]
+    style I fill:#E91E63,stroke:#666666,stroke-width:3px,color:white
+    style J fill:#795548,stroke:#666666,stroke-width:3px,color:white
+    style K fill:#607D8B,stroke:#666666,stroke-width:3px,color:white
+    style L fill:#8BC34A,stroke:#666666,stroke-width:3px,color:white
+
+    I --> M["💬 Poruke<br>🔔 Obaveštenja<br>📄 Popunjavanje formulara<br>📈 Pregled izveštaja"]
+    J --> N["💬 Poruke<br>🔔 Obaveštenja<br>🧪 Testiranje formulara<br>📈 Pregled izveštaja"]
+    K --> O["📝 Popunjavanje formulara<br>💬 Poruke<br>🔔 Obaveštenja<br>📊 Izveštaji o napretku"]
+    L --> P["💬 Poruke<br>🔔 Obaveštenja<br>📊 Analitički izveštaji"]
+    style M fill:#FF4081,stroke:#666666,stroke-width:3px,color:white
+    style N fill:#9E9E9E,stroke:#666666,stroke-width:3px,color:white
+    style O fill:#00BCD4,stroke:#666666,stroke-width:3px,color:white
+    style P fill:#CDDC39,stroke:#666666,stroke-width:3px,color:white
+```
+
+## Rešavanje problema sa vezom
+
+Ako naiđete na probleme pri povezivanju sa serverom:
+
+1. **Proverite internet vezu**: Proverite da li je vaš uređaj povezan na internet.
+2. **Potvrdite akreditive**: Proverite da li su vaše korisničko ime i lozinka ispravni.
+3. **Ponovo pokrenite aplikaciju**: Zatvorite i ponovo otvorite rtSurvey aplikaciju.
+4. **Kontaktirajte podršku**: Ako problemi potraju, kontaktirajte administratora sistema ili rtSurvey podršku za pomoć.
+
+## Zaključak
+
+Povezivanje rtSurvey aplikacije sa serverom je jednostavan proces koji vam omogućava da koristite pune mogućnosti aplikacije. Prateći gore navedene korake, možete osigurati besprekorno prikupljanje podataka, upravljanje i analizu prilagođenu vašoj specifičnoj ulozi u anketi.

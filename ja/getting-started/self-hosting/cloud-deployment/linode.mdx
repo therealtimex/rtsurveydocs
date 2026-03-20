@@ -1,0 +1,101 @@
+---
+description: フォームベースの設定UIを持つStackScriptsを使ってLinodeにrtCloudをデプロイする。
+icon: dns
+title: Linode（Akamai Cloud）
+---
+
+
+Linodeは**StackScripts**を使用します — コードを編集せずにLinodeマネージャーで直接設定フィールドを入力するフォームベースのUIを持つスクリプトです。
+
+> Linode StackScriptsは最も簡単なデプロイ方法です。Linodeを作成する際にフィールドがフォームとして表示されます — スクリプトの編集は不要です。
+
+---
+
+## 組み込みKeycloak（推奨）
+
+### ステップ1 — StackScriptを見つける
+
+StackScriptはLinodeコミュニティで公開されています — 手動セットアップは不要です：
+
+1. **Linodes** → **Linodeを作成**に移動する
+2. **ディストリビューションを選択**で、**StackScripts** → **コミュニティStackScripts**を選択する
+3. **`RTA rtSurvey - Self-Hosted with Keycloak SSO`**を検索する
+4. 選択して設定フォームを入力する：
+
+> または、[スクリプトをダウンロード](/scripts/linode-stackscript-keycloak-embed.sh)して**StackScripts** → **StackScriptを作成**から独自のStackScriptを作成することもできます。
+
+| フィールド | 必須 | 説明 |
+|-------|----------|-------------|
+| プロジェクトID | いいえ | 一意の識別子（デフォルト：`rtsurvey`）。データベース名とKeycloakクライアントIDとして使用される。 |
+| Keycloak管理者パスワード | いいえ | Keycloak管理コンソールとアプリ管理者ログインの両方のパスワード。デフォルトは`admin` — **初回ログイン後すぐに変更すること**。 |
+| ドメイン | はい | ドメイン名。DNSのAレコードがこのLinodeのIPを指している必要がある。HTTPSとKeycloakに必要。 |
+| Let's Encryptメール | はい | Let's Encrypt証明書通知用メール。 |
+| Dockerイメージタグ | いいえ | デプロイするイメージ（デフォルト：`rtawebteam/rta-smartsurvey:survey-dockerize`）。 |
+
+> **セキュリティ：** すべてのパスワードはデフォルトで`admin`です。初回ログイン後すぐに変更してください。
+
+5. イメージとして**Ubuntu 22.04 LTS**を選択する
+6. **Shared CPU 4 GB**プラン以上を選択する
+7. **Linodeを作成**をクリックする
+
+### ステップ2 — DNSレコードを追加する
+
+Linodeが起動している間に、DNSプロバイダーに**Aレコード**を追加する：
+
+```
+Type  : A
+Name  : myapp          (またはルートドメインには@)
+Value : <linode-ip>
+TTL   : 300
+```
+
+### ステップ3 — 進捗を監視する
+
+```bash
+ssh root@<linode-ip>
+tail -f /var/log/stackscript.log
+```
+
+スクリプトは最初の方でサーバーIPを出力します — それが表示されたらすぐにDNSレコードを追加してください。
+
+### ステップ4 — アプリにアクセスする
+
+セットアップが完了すると、ログにサマリーが表示されます：
+
+```
+============================================================
+ rtCloud deployment complete! (Embedded Keycloak)
+============================================================
+ App URL   : https://myapp.example.com
+ Admin     : admin / admin
+ Keycloak  : https://myapp.example.com/auth/admin
+
+ !! SECURITY: All passwords default to 'admin'.
+    Change them immediately after first login.
+============================================================
+```
+
+ユーザー名`admin`、パスワード`admin`でログインし、すぐにパスワードを変更してください。
+
+---
+
+## デプロイ後
+
+### パスワードを変更する
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### すべてのコンテナを確認する
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
+
+### ログを確認する
+
+```bash
+tail -200 /var/log/stackscript.log
+```

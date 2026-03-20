@@ -1,0 +1,77 @@
+---
+description: Les questions de type image permettent aux répondants de capturer et
+  de soumettre des photos dans le cadre de l'enquête.
+icon: image
+title: Image
+---
+
+
+Le type de question `image` dans XLSForms et rtSurvey permet aux répondants de capturer et de soumettre des photos dans le cadre de leurs réponses à l'enquête. Cette fonctionnalité est particulièrement utile pour collecter des données visuelles, documenter des observations ou fournir des preuves lors d'enquêtes sur le terrain.
+
+## Spécification XLSForm de Base
+
+| type  | name        | label                           |
+|-------|-------------|--------------------------------|
+| image | photo       | Prendre une photo de l'emplacement |
+
+Pour plus de détails sur le type de question `image` de base, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+
+## Utilisations
+
+Les questions d'image sont couramment utilisées pour :
+
+1. Documenter les conditions sur le terrain ou les observations
+2. Capturer des preuves visuelles dans les études de recherche
+3. Collecter des photos avant/après dans les évaluations d'impact
+4. Vérifier l'achèvement de tâches ou la présence à des endroits précis
+5. Rassembler des données visuelles pour une analyse à distance
+
+## Meilleures Pratiques
+
+1. Fournissez des instructions claires sur ce qui doit être photographié.
+2. Tenez compte des implications en matière de confidentialité et informez les répondants de la manière dont leurs photos seront utilisées.
+3. Soyez attentif à la taille des fichiers et aux limitations de stockage, en particulier pour les enquêtes dans des zones où la connectivité Internet est limitée.
+4. Assurez-vous que l'appareil dispose d'un espace de stockage suffisant et que les autorisations de caméra sont accordées.
+
+## Exemple d'Utilisation
+
+Voici un exemple de la manière dont vous pourriez utiliser une question d'image dans une enquête :
+
+| type  | name           | label                                      | hint                                        |
+|-------|----------------|--------------------------------------------|--------------------------------------------|
+| image | storefront     | Prendre une photo de l'entrée du magasin   | Assurez-vous que le nom du magasin est bien visible |
+
+## Extensions rtSurvey
+
+Bien que la spécification XLSForm de base pour les questions d'image soit simple, rtSurvey peut proposer des fonctionnalités ou des personnalisations supplémentaires :
+
+1. Paramètres de qualité d'image (ex : résolution basse, moyenne, haute)
+2. Option pour ajouter des légendes ou des étiquettes (tags) aux images
+3. Capture d'images multiples pour une seule question
+4. Intégration avec l'application caméra native de l'appareil ou la galerie
+
+(Note : Les extensions spécifiques disponibles dans rtSurvey pour les questions d'image devront être confirmées et détaillées ici.)
+
+## Manipulation des Données
+
+Les images collectées via ce type de question sont typiquement :
+
+1. Enregistrées dans un format d'image courant (ex : JPG, PNG)
+2. Stockées aux côtés des autres données d'enquête, souvent dans un dossier média séparé
+3. Accessibles pour visualisation et analyse via la plateforme de gestion d'enquête
+
+## Considérations pour l'Analyse
+
+Lors de l'utilisation de questions d'image, tenez compte de :
+
+1. La manière dont les images seront analysées (ex : examen manuel, analyse d'image automatisée)
+2. L'espace de stockage supplémentaire requis pour les fichiers image
+3. Les mesures de confidentialité et de protection des données pour le stockage et la manipulation des photos
+4. Le besoin potentiel d'outils d'édition ou d'organisation d'images lors de la phase d'analyse
+
+## Limitations
+
+- Les fichiers image peuvent être volumineux, ce qui peut avoir un impact sur le transfert et le stockage des données.
+- Tous les appareils ne disposent pas forcément de caméras de haute qualité ou d'un espace de stockage suffisant.
+- L'analyse d'un grand nombre d'images peut prendre beaucoup de temps.
+- Des préoccupations en matière de confidentialité peuvent survenir lors de la capture d'images, en particulier dans les espaces publics.

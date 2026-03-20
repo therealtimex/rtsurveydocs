@@ -1,0 +1,214 @@
+---
+description: 組み込みKeycloak、外部OIDCプロバイダー、またはAzure Active Directoryを使ってセルフホストrtCloudのシングルサインオンを設定する。
+icon: lock
+title: SSO認証
+---
+
+
+rtCloudはシングルサインオン（SSO）の3つのアプローチをサポートしています：
+
+| オプション | 最適な用途 |
+|--------|----------|
+| [組み込みKeycloak](#embedded-keycloak) | rtCloudにバンドルされた完全自己完結型SSOサーバーを求める組織 |
+| [外部OIDCプロバイダー](#external-oidc-provider) | 既存のIDプロバイダー（Auth0、Authentik、Okta、Supabaseなど）を運用している組織 |
+| [Azure Active Directory](#azure-active-directory) | Microsoft 365またはAzure ADを使用している組織 |
+
+SSO未設定の場合、ユーザーは管理パネルで管理されるローカルrtCloudアカウントでログインします。
+
+---
+
+## 組み込みKeycloak {#embedded-keycloak}
+
+デプロイにはrtCloudと並行して実行するオプションのKeycloakコンテナが含まれています。KeycloakはrtSurveyレルムで事前設定されており、すぐに使用できます。
+
+### 要件
+
+- HTTPSを持つドメイン名（Keycloakは本番環境でHTTPSが必要）
+- サーバーに少なくとも4 GB RAM（Keycloakは約512 MBのメモリを追加使用）
+
+### セットアップ
+
+**1. `.env`で環境変数を設定する：**
+
+```dotenv
+# 組み込みKeycloakコンテナを有効にする
+EMBED_KEYCLOAK=true
+
+# KeycloakのURL — 実際のドメインを使用する
+KEYCLOAK_URL=https://rtcloud.example.com/auth
+KC_HOSTNAME=https://rtcloud.example.com/auth
+KC_HOSTNAME_STRICT=false
+
+# レルムとクライアント設定（インポートされたレルムJSONと一致させる）
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey-app
+KEYCLOAK_CLIENT_SECRET=your-client-secret-here
+
+# Keycloak管理者認証情報
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change_me_keycloak_admin_password
+
+# Keycloakデータベース（自動作成）
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change_me_keycloak_db_password
+
+# KeycloakがリッスンするポートNginxによりプロキシ）
+KEYCLOAK_PORT=8091
+```
+
+**2. 組み込みKeycloakプロファイルで起動する：**
+
+```bash
+docker compose -f docker-compose.production.yml --profile embed-keycloak up -d
+```
+
+**3. Keycloakが正常であることを確認する：**
+
+```bash
+docker compose -f docker-compose.production.yml ps
+```
+
+`rtcloud-keycloak`コンテナは2〜3分後に`Up (healthy)`と表示されるはずです。
+
+**4. Keycloak管理コンソールにアクセスする：**
+
+```
+https://rtcloud.example.com/auth/admin
+```
+
+`KEYCLOAK_ADMIN_USER`と`KEYCLOAK_ADMIN_PASSWORD`でログインします。
+
+### 事前設定済みの内容
+
+組み込みKeycloakは事前インポートされた`rtsurvey`レルムで起動します：
+
+- Webアプリケーション用のクライアント設定
+- デフォルトのユーザーロール（`admin`、`project_manager`、`enumerator`、`analyst`）
+- rtSurvey向けに最適化されたセッションとトークン設定
+
+Keycloak管理コンソールで直接ユーザーを追加するか、Keycloakを上位IDプロバイダー（LDAP、SAML）に接続することができます。
+
+### Nginxルーティング
+
+クラウドデプロイスクリプトを使用する場合、Nginxは両方のサービスをプロキシするように設定されます：
+
+| パス | バックエンド |
+|------|---------|
+| `/` | `127.0.0.1:8080`のrtCloudアプリ |
+| `/auth/` | `127.0.0.1:8090`のKeycloak |
+
+---
+
+## 外部OIDCプロバイダー {#external-oidc-provider}
+
+OpenID Connect互換のIDプロバイダーにrtCloudを接続します。このアプローチではKeycloakコンテナは必要ありません。
+
+### サポートされるプロバイダー
+
+OIDC準拠のプロバイダーはどれでも動作します：
+- Authentik
+- Auth0
+- Okta
+- Keycloak（外部インスタンス）
+- Supabase
+- Google（Google Workspace組織向け）
+- GitHub（OIDCエクステンション付きOAuthアプリ経由）
+
+### セットアップ
+
+**1. IDプロバイダーにrtCloudをOIDCクライアントとして登録する。**
+
+必要なもの：
+- **クライアントID**と**クライアントシークレット**
+- **リダイレクトURI**の登録：`https://rtcloud.example.com/auth/callback`
+- モバイルアプリのサポートには、さらに登録する：`vn.rta.rtsurvey.auth://callback`
+
+**2. `.env`で環境変数を設定する：**
+
+```dotenv
+# OIDC検出URL（プロバイダー固有 — IdPのドキュメントを確認すること）
+OIDC_ISSUER_URL=https://your-identity-provider.com
+
+# IDプロバイダーからのクライアント認証情報
+OIDC_CLIENT_ID=rtcloud-app
+OIDC_CLIENT_SECRET=your-client-secret-here
+
+# 要求するスコープ（openid、profile、emailで通常は十分）
+OIDC_SCOPE=openid profile email
+
+# IDプロバイダーに登録したリダイレクトURI
+OIDC_REDIRECT_URI=https://rtcloud.example.com/auth/callback
+
+# オプション：個別のモバイルアプリクライアント
+OIDC_MOBILE_CLIENT_ID=rtcloud-mobile
+OIDC_MOBILE_REDIRECT_URI=vn.rta.rtsurvey.auth://callback
+
+# 新しいOIDCユーザーのrtCloudアカウントを自動作成するにはtrueに設定する
+OPEN_REGISTRATION=false
+```
+
+**3. 変更を適用するためにアプリコンテナを再起動する：**
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### ユーザーの自動プロビジョニング
+
+`OPEN_REGISTRATION=true`の場合、rtCloudはOIDC経由でユーザーが初めてサインインする際にローカルアカウントを自動的に作成します。アカウントにはIDトークンからユーザーの名前とメールが入力されます。
+
+`OPEN_REGISTRATION=false`（デフォルト）の場合、rtCloudの管理者が先にユーザーアカウントを作成する必要があり、OIDCのIDは初回ログイン時にリンクされます。
+
+### カスタムエンドポイント
+
+プロバイダーがOIDC検出（`.well-known/openid-configuration`）をサポートしていない場合は、エンドポイントを手動で設定できます：
+
+```dotenv
+OIDC_AUTHORIZATION_ENDPOINT=https://your-provider.com/oauth2/authorize
+OIDC_TOKEN_ENDPOINT=https://your-provider.com/oauth2/token
+OIDC_USERINFO_ENDPOINT=https://your-provider.com/oauth2/userinfo
+```
+
+---
+
+## Azure Active Directory {#azure-active-directory}
+
+組織のMicrosoft Azure ADテナントとrtCloudを統合します。
+
+### セットアップ
+
+**1. [Azureポータル](https://portal.azure.com)で新しいアプリを登録する：**
+
+   - **Azure Active Directory** → **アプリの登録** → **新規登録**に移動する
+   - 名前：`rtCloud`
+   - リダイレクトURI：`https://rtcloud.example.com/auth/callback`（Webタイプ）
+   - 作成後、**アプリケーション（クライアント）ID**と**ディレクトリ（テナント）ID**をメモする
+   - **証明書とシークレット**で新しいクライアントシークレットを作成する
+
+**2. `.env`で環境変数を設定する：**
+
+```dotenv
+AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+```
+
+**3. アプリコンテナを再起動する：**
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+Azure ADテナントのユーザーはMicrosoftの認証情報を使ってrtCloudにログインできるようになります。
+
+---
+
+## SSOの無効化
+
+ローカル認証に戻すには、`.env`からすべてのSSO関連の変数を削除またはコメントアウトしてから、アプリコンテナを再起動します：
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+組み込みKeycloakを使用していた場合は、`--profile embed-keycloak`フラグを省略し、`docker compose down`を実行してからプロファイルなしで`up -d`を実行することで停止できます。

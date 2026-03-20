@@ -1,0 +1,87 @@
+---
+description: សំណួរ audio ឱ្យអ្នកឆ្លើយតបថត និង submit audio files ជាផ្នែកនៃការស្ទង់មតិ។
+icon: mic
+title: Audio
+---
+
+
+ប្រភេទ question `audio` ឱ្យអ្នកឆ្លើយតប **ថត audio** ឬ upload ឯកសារ audio ដែលមានរួចហើយជាផ្នែកនៃ survey response ។ វាមានប្រយោជន៍សម្រាប់ capturing verbal accounts, environmental sounds, testimonials, ឬ information ណាដែលបញ្ចេញ voice ល្អជាង text។
+
+## ការបញ្ជាក់ XLSForm មូលដ្ឋាន
+
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Please record your comments  |
+
+សម្រាប់ព័ត៌មានបន្ថែម សូមមើល [XLSForm specification](https://xlsform.org/en/#question-types)។
+
+## ការប្រើប្រាស់
+
+សំណួរ audio ប្រើជាទូទៅសម្រាប់:
+
+1. ការចាប់ verbal responses ដែលបើកដើម្បីកាត់បន្ថយ enumerator typing burden
+2. ការ recording testimonials, personal stories, ឬ oral histories
+3. ការ documenting environmental sounds (ឧ. noise levels ជិត infrastructure)
+4. ការ collecting voice samples សម្រាប់ linguistic ឬ health research
+5. ការ allowing respondents ឱ្យបន្ថែម verbal clarifications ទៅ numeric ឬ select answers
+
+## ទម្រង់ Data
+
+Audio files ត្រូវបានរក្សាទុកជា binary attachments ជាមួយ form submission ជាធម្មតា:
+
+- **Format:** MP3 ឬ AAC (mobile recording); WAV (high-quality recording)
+- **Naming:** `{instanceID}-{fieldname}.mp3` (ឬ equivalent)
+- **Storage:** Upload ទៅ server media folder ហើយ link ទៅ submission record
+- **Access:** Playable និង downloadable ពី submission management interface
+
+## ផ្នែកពង្រីករបស់ rtSurvey
+
+### Maximum duration
+
+ប្រើជួរ `parameters` ដើម្បីដាក់កំហិតប្រវែងការថត:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | interview | Record the interview | `max-duration=120` |
+
+`max-duration` គឺក្នុងវិនាទី។ recorder ឈប់ដោយស្វ័យប្រវត្តិ នៅ limit។
+
+### Quality settings
+
+Recording quality អាចកំណត់តាម `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Record feedback | `quality=normal` |
+
+Values ដែលគាំទ្រ: `low`, `normal` (default), `voice-only`។ `voice-only` optimises សម្រាប់ spoken audio ជាមួយ noise reduction។
+
+## ឧទាហរណ៍ការប្រើប្រាស់
+
+### ជាមួយ maximum duration និង hint
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| audio | story | Tell us about the incident in your own words | Speak clearly. Recording stops after 3 minutes. | `max-duration=180` |
+
+### Audio conditional — តែប្រសិនបើ issue ត្រូវបានរាយការណ៍
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | issue_found | Was an issue found? | | |
+| audio | issue_audio | Record a description of the issue | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+
+## ការអនុវត្តល្អ
+
+1. ប្រាប់ច្បាស់ក្នុង `label` ឬ `hint` អ្វីដែល enumerator គួរ say ហើយ time ប៉ុន្មាន។
+2. ប្រើ `max-duration` ដើម្បីការពារ files ធំហួស ក្នុង areas ដែលមាន upload speeds យឺត។
+3. Inform respondents មុននឹងចាប់ផ្តើមការថត — ការថតដោយ unexpected អាចបង្កើន privacy concerns។
+4. ធ្វើការ test recording លើ target device ហើយ network conditions មុន deployment។
+5. កំណត់ `quality=voice-only` សម្រាប់ interview-style recordings ដើម្បីកាត់បន្ថយ file size ដោយមិន lose intelligibility។
+
+## ការដាក់កំហិត
+
+- Audio files អាចធំ (ការថតប្រវែង 2 នាទី ក្នុង normal quality ~ 2–4 MB) — factor នេះ ទៅ data plan និង upload time estimates។
+- Browsers ទាំងអស់មិន support MediaRecorder API — Chrome និង Firefox ដំណើរការ reliably; Safari លើ iOS versions ចាស់ប្រហែលមានបញ្ហា។
+- ការ transcription នៃ audio responses ត្រូវការ additional post-processing (manual ឬ automated speech-to-text)។
+- Privacy regulations ប្រហែលដាក់ restriction ការថត voices — verify local data protection requirements។

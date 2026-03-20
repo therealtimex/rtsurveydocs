@@ -1,0 +1,30 @@
+---
+description: Slēptie lauki glabā vērtības, kas nekad netiek parādītas respondentam
+  — izmanto konteksta nodošanai, datu aizpildīšanai vai starprezultātu glabāšanai.
+icon: eye-slash
+title: Slēpts
+---
+
+
+Lauks `hidden` glabā vērtību, kas **nekad netiek parādīta respondentam**. Atšķirībā no `calculate` (kas aprēķina vērtību), `hidden` tiek izmantots, lai pārnestu **ārēji nodrošinātu vērtību** — piemēram, uzdevuma ID, mājsaimniecības ID, kas nodots no citas sistēmas, vai enumeratora kods, kas tiek ievadīts, palaižot formu.
+
+## Pamata XLSForm specifikācija
+
+| type | name | label | default |
+|------|------|-------|---------|
+| hidden | survey_id | | survey_2024_q1 |
+| hidden | enumerator_id | | ${pulldata('app-api', 'user.staffCode')} |
+
+## Atšķirība no calculate
+
+| | hidden | calculate |
+|-|--------|-----------|
+| **Lietojums** | Glabā ārēji nodrošinātu vērtību | Aprēķina vērtību no citiem laukiem |
+| **Noklusējums** | Parasti fiksēts vai ārējs | Mainīts ar `calculation` kolonnu |
+| **Redzams lietotājam** | Nē | Nē |
+
+## Labākā prakse
+
+1. Izmantojiet `hidden` statiskiem metadatiem, piemēram, aptaujas versijas numuram vai organizācijas kodam.
+2. Izmantojiet `calculate` dinamiskajiem aprēķiniem.
+3. Apvienojiet ar `pulldata('app-api', ...)`, lai uztvertu ierīces vai lietotāja informāciju.

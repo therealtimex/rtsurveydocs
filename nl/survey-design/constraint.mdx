@@ -1,0 +1,90 @@
+---
+description: ''
+icon: code
+title: Antwoorden valideren
+---
+
+
+Een manier om gegevenskwaliteit te waarborgen is het toevoegen van beperkingen aan de gegevensvelden in uw formulier. Beperkingen helpen voorkomen dat gebruikers ongeldige of onmogelijke antwoorden invoeren. Als u bijvoorbeeld vraagt naar het inkomen van een persoon, wilt u onrealistische waarden vermijden, zoals negatieve getallen of extreem hoge waarden. Gegevensbeperkingen toevoegen aan uw formulier is eenvoudig. Volg gewoon de onderstaande stappen:
+
+1. Voeg een nieuwe kolom toe genaamd "constraint" aan uw formulier.
+2. Voer in de kolom "constraint" een formule in die de limieten voor het antwoord specificeert.
+
+### Voorbeeld
+
+Laten we een voorbeeld bekijken waarbij we een beperking willen toevoegen voor het inkomen van de persoon. De beperking vereist dat het inkomen tussen $0 en $1.000.000 ligt. Dit is hoe u de beperking kunt instellen:
+
+| `name`      | `constraint`                  |
+|---------------|-----------------------------|
+| Inkomen        | . >= 0 & . <= 1000000      |
+
+In het bovenstaande voorbeeld verwijst "." in de formule naar de vraagvariabele, die de waarde vertegenwoordigt die de gebruiker heeft ingevoerd voor de vraag "Inkomen". De beperking ". >= 0 && . <= 1000000" zorgt ervoor dat het ingevoerde inkomen groter dan of gelijk is aan 0 en kleiner dan of gelijk is aan 1.000.000.
+
+
+### Harde beperking
+
+Een **harde beperking** blokkeert de indiening van het formulier volledig als de ingevoerde waarde de expressie niet voldoet. De enquêteur kan niet verdergaan totdat ze een geldige waarde invoeren.
+
+Om een harde beperking toe te voegen, voert u uw expressie in de kolom `constraint` in. Voeg optioneel een voor mensen leesbaar bericht toe in `constraint_message`:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Leeftijd van respondent | `. > 0 and . <= 120` | Leeftijd moet tussen 1 en 120 zijn |
+| decimal | temperature | Lichaamstemperatuur (°C) | `. >= 35 and . <= 42` | Temperatuur moet tussen 35°C en 42°C zijn |
+| text | phone | Telefoonnummer | `regex(., '^[0-9]{10}$')` | Voer een 10-cijferig telefoonnummer in |
+
+#### Meerdere voorwaarden
+
+Combineer voorwaarden met `and` / `or`:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Gebruik van `regex()` voor patroonvalidatie
+
+De functie `regex(value, pattern)` test een waarde tegen een reguliere expressie:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | E-mailadres | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Voer een geldig e-mailadres in |
+| text | zip_code | Postcode | `regex(., '^[0-9]{4}[A-Z]{2}$')` | Voer een geldige postcode in |
+
+#### Verwijzen naar andere velden in een beperking
+
+Gebruik `${fieldname}` om te verwijzen naar waarden van andere vragen:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Eindjaar | `. >= ${start_year}` | Eindjaar moet na het beginjaar zijn |
+| decimal | loan_repaid | Terugbetaald bedrag | `. <= ${loan_amount}` | Kan niet meer terugbetalen dan het leenbedrag |
+
+### Zachte waarschuwing
+
+Een **zachte waarschuwing** (ook wel zachte beperking of waarschuwing) waarschuwt de enquêteur dat een waarde ongebruikelijk lijkt, maar laat hen toch verder gaan. Dit is handig wanneer een waarde technisch geldig is maar statistisch onwaarschijnlijk.
+
+rtSurvey ondersteunt zachte waarschuwingen met behulp van de `constraint`-kolom met een speciale `constraint_type`-benadering, of via de weergave `soft` gecombineerd met een notitatieveld.
+
+Het meest gebruikelijke patroon is het gebruik van een **note** met een `relevant`-expressie die de verdachte waarde markeert, gecombineerd met een **acknowledge**-vraag ter bevestiging:
+
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Aantal kinderen | |
+| note | children_warning | Waarschuwing: U heeft ${children} kinderen ingevoerd. Bevestig dat dit correct is. | `. > 15` |
+| trigger | children_confirm | Bevestig dat het aantal kinderen correct is | `${children} > 15` |
+
+#### Zachte waarschuwing met alleen constraint_message
+
+Voor een eenvoudigere zachte waarschuwing kunt u de beperking zo formuleren dat deze waarschuwt voor extreme waarden maar toch een breed bereik toestaat:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | children | Aantal kinderen | `. >= 0 and . <= 30` | Deze waarde lijkt erg hoog. Verifieer alstublieft. |
+
+<Warning>
+Het onderscheid tussen harde en zachte beperkingen is belangrijk voor gegevenskwaliteit. Gebruik **harde beperkingen** voor logisch onmogelijke waarden (negatieve leeftijden, temperaturen boven 100°C). Gebruik **zachte waarschuwingen** voor statistisch onwaarschijnlijke maar niet onmogelijke waarden — u wilt geen legitieme randgevallen blokkeren.
+</Warning>

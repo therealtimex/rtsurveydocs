@@ -1,0 +1,85 @@
+---
+description: ''
+icon: code
+title: Extensões avançadas
+---
+
+
+A coluna `appearance` no rtSurvey permite personalizar a apresentação visual e o comportamento das perguntas nos seus inquéritos. Esta funcionalidade melhora a experiência do utilizador e pode melhorar significativamente a eficiência da recolha de dados. O rtSurvey suporta atributos de aparência XLSForm padrão e estende-os com opções adicionais.
+
+## Extensões de Aparência Específicas do rtSurvey
+
+O rtSurvey estende as opções de aparência padrão com o seguinte:
+
+### Personalização de Entrada de Tempo
+
+Para perguntas do tipo `text` usadas para entrada de tempo:
+
+- `appearance:` - Exibe um relógio para selecionar horas e minutos
+- `appearance: inline` - Exibe o relógio como um ícone
+- `appearance: inline-1line` - Exibe o relógio num formato de linha única
+- `appearance: inline-onlyresult` - Exibe o ícone do relógio, desaparece após seleção
+- `appearance: inline-[FORMAT]` - Personaliza a exibição do formato de hora (por ex., `[%H:%M]`, `[%h:%M:%S]`)
+
+### Personalização de Cores
+
+O rtSurvey permite a personalização de cores para várias aparências:
+
+- `appearance: inline colors("0099FF")` - Personaliza a cor do ícone
+- `appearance: inline-1line colors("0000FF","FFFF00")` - Personaliza cores no formato de linha única
+
+### Layout em Grelha
+
+O rtSurvey introduz um layout em grelha para exibições compactas semelhantes a tabelas:
+
+- `appearance: grid` - Aplica-se a grupos para criar um layout em grelha
+
+### Grupos Recolhíveis
+
+- `appearance: collapsible` - Cria grupos expansíveis/recolhíveis
+
+## Melhores Práticas para Usar Aparência
+
+1. **Consistência**: Use atributos de aparência de forma consistente em todo o seu inquérito para um aspeto uniforme.
+2. **Móvel vs. Web**: Considere como as aparências serão renderizadas em diferentes dispositivos e plataformas.
+3. **Desempenho**: Tenha cuidado com atributos de aparência que possam abrandar o carregamento do formulário (por ex., `table-list` para grupos grandes).
+4. **Experiência do Utilizador**: Escolha aparências que tornem a entrada de dados mais fácil e intuitiva para os respondentes.
+5. **Testes**: Teste sempre o seu formulário em dispositivos alvo para garantir que as aparências funcionam conforme esperado.
+
+## Técnicas Avançadas
+
+### Combinar Aparências
+
+Alguns atributos de aparência podem ser combinados para layouts mais complexos:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Selecione um: | minimal compact |
+```
+
+### Aparências Dinâmicas
+
+O rtSurvey permite alterações de aparência dinâmicas com base na lógica do formulário:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Introduza a hora: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Considerações sobre a Aplicação Móvel
+
+- Algumas aparências (por ex., `quick`, `signature`) são específicas de dispositivos móveis.
+- Teste exaustivamente tanto em Android como iOS para garantir comportamento consistente.
+
+## Limitações Conhecidas
+
+- Aparências complexas podem não ser renderizadas de forma idêntica em todas as plataformas.
+- Algumas aparências avançadas do rtSurvey podem não ser suportadas em modo offline.
+
+## Resolução de Problemas de Aparência
+
+1. **Aparência Não Aplicada**: Verifique se há erros de digitação na coluna de aparência.
+2. **Renderização Inconsistente**: Verifique a compatibilidade com o tipo de pergunta e a plataforma.
+3. **Problemas de Desempenho**: Considere simplificar aparências complexas, especialmente para inquéritos extensos.

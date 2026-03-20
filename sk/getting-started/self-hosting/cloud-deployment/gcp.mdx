@@ -1,0 +1,140 @@
+---
+description: Nasadenie rtCloud na Google Cloud Compute Engine pomocou štartovacieho
+  skriptu gcp-compute.sh.
+icon: travel_explore
+title: Google Cloud (GCP)
+---
+
+
+Použite `gcp-compute.sh` ako **Štartovací skript** pri vytváraní inštancie VM v Compute Engine. Skript sa automaticky spustí pri prvom spustení.
+
+**Stiahnuť skript:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+
+---
+
+## Krok 1 — Vyplňte konfiguráciu
+
+Otvorte skript a upravte blok `CONFIGURATION` v hornej časti:
+
+```bash
+# --- Povinné ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # Zmeňte po prvom prihlásení
+
+# --- Doména + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- Vstavaný Keycloak ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Predvolené na ADMIN_PASSWORD
+```
+
+| Pole | Povinné | Popis |
+|-------|----------|-------------|
+| `PROJECT_ID` | Áno | Používa sa ako názov databázy a ID klienta Keycloak. Malými písmenami, bez medzier. |
+| `ADMIN_PASSWORD` | Nie | Heslo správcu aplikácie a Keycloak. Predvolené na `admin` — **zmeňte po prvom prihlásení**. |
+| `DOMAIN` | Nie | Vaša doména pre HTTPS. Ponechajte prázdne pre režim iba HTTP. |
+| `LETSENCRYPT_EMAIL` | Áno (ak je nastavená DOMAIN) | Email pre oznámenia Let's Encrypt. |
+| `EMBED_KEYCLOAK` | Nie | `true` na nasadenie vstavaného Keycloak (vyžaduje 4 GB RAM). |
+
+> **Bezpečnosť:** Všetky heslá majú predvolenú hodnotu `admin`. Zmeňte ich ihneď po prvom prihlásení.
+
+---
+
+## Krok 2 — Vytvorte inštanciu VM
+
+V [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. Kliknite na **Create instance**
+2. **Konfigurácia stroja:**
+   - Séria: `E2`
+   - Typ stroja: `e2-medium` (4 GB RAM) alebo väčší
+3. **Zavádzací disk:**
+   - Operačný systém: Ubuntu
+   - Verzia: Ubuntu 22.04 LTS
+   - Veľkosť: 40 GB alebo viac
+4. **Firewall:** zaškrtnite **Allow HTTP traffic** a **Allow HTTPS traffic**
+5. **Rozšírené možnosti** → **Správa** → **Automatizácia** → **Štartovací skript** → vložte celý obsah skriptu
+6. Kliknite na **Create**
+
+---
+
+## Krok 3 — Pridajte záznam DNS
+
+Kým sa VM spúšťa, pridajte **záznam A** u vášho poskytovateľa DNS:
+
+```
+Typ   : A
+Názov : myapp
+Hodnota: <vm-external-ip>
+TTL   : 300
+```
+
+Externú IP nájdete v zozname inštancií VM v konzole.
+
+---
+
+## Krok 4 — Monitorujte postup
+
+Pomocou CLI `gcloud`:
+
+```bash
+gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
+```
+
+Alebo priamo cez SSH:
+
+```bash
+ssh <username>@<vm-external-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## Krok 5 — Prístup k aplikácii
+
+Po dokončení nastavenia protokol zobrazí súhrn s URL vašej aplikácie a prihlasovacími údajmi. Prihláste sa s menom `admin` a heslom `admin`, potom ihneď zmeňte heslo.
+
+---
+
+## Pravidlá firewallu
+
+Zaškrtávacie políčka **Allow HTTP/HTTPS** GCP otvárajú porty 80 a 443. Na povolenie priameho prístupu k Shiny na porte 3838 pridajte pravidlo firewallu:
+
+```bash
+gcloud compute firewall-rules create allow-shiny \
+  --allow tcp:3838 \
+  --target-tags http-server
+```
+
+Alebo ho pridajte cez konzolu: **VPC Network** → **Firewall** → **Create rule**.
+
+> **Neotvárajte** port 3306 (MySQL) — nikdy by nemal byť verejne prístupný.
+
+---
+
+## Statická IP (voliteľné)
+
+Predvolene GCP prideľuje dočasnú externú IP, ktorá sa mení pri reštarte VM. Na zachovanie stabilnej IP:
+
+1. Prejdite na **VPC Network** → **IP addresses**
+2. Kliknite na **Reserve external static address**
+3. Priraďte ju k vašej inštancii VM
+
+---
+
+## Po nasadení
+
+### Zmeňte heslo
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Zobrazte všetky kontajnery
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```

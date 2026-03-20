@@ -1,0 +1,77 @@
+---
+description: ''
+icon: code
+title: Suporte multilingue
+---
+
+
+O rtSurvey fornece suporte multilingue robusto, permitindo-lhe criar inquéritos em múltiplos idiomas. Esta funcionalidade é crucial para realizar investigação em populações linguisticamente diversas ou em ambientes multilingues.
+
+## Configurar Inquéritos Multilingues
+
+Para criar um inquérito multilingue no rtSurvey, precisa de adicionar colunas específicas de idioma ao seu XLSForm. Aqui está como:
+
+1. **Traduções de Etiquetas**: Adicione colunas para cada idioma usando o formato `label::Idioma (código)`.
+2. **Traduções de Dicas**: Use `hint::Idioma (código)` para traduzir dicas.
+3. **Traduções de Ficheiros de Multimédia**: Para multimédia específica de idioma, use `media::Idioma (código)`.
+
+Exemplo:
+
+```
+| type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
+|---------|------|---------------------|---------------------|---------------------|---------------------|
+| integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
+```
+
+## Códigos de Idioma
+
+É recomendado usar os códigos de idioma oficiais de 2 caracteres (subetiquetas) após o nome do idioma. Isto facilita a correspondência do idioma do formulário com o idioma da interface do utilizador. Pode encontrar os códigos oficiais [aqui](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+
+## Definir um Idioma Predefinido
+
+Para definir um idioma predefinido para a recolha de dados, use a folha de trabalho `settings` no seu XLSForm:
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | French (fr)       |
+```
+
+## Funcionalidades Específicas do rtSurvey
+
+### Troca Dinâmica de Idioma
+
+O rtSurvey permite aos utilizadores trocar de idioma dinamicamente durante a recolha de dados:
+
+- Na interface web, use o menu suspenso de idioma na barra de navegação superior.
+- Na aplicação móvel, aceda às opções de idioma através do menu de configurações.
+
+### Mensagens de Validação Específicas de Idioma
+
+O rtSurvey alarga o suporte multilingue às mensagens de validação:
+
+```
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
+|---------|------|------------|----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
+```
+
+### Suporte a Idiomas RTL
+
+Para idiomas da direita para a esquerda (RTL) como árabe ou hebraico, o rtSurvey ajusta automaticamente o layout:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Your name           | اسمك                |
+```
+
+### Aparência Específica de Idioma
+
+O rtSurvey permite-lhe especificar diferentes aparências para diferentes idiomas:
+
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Address          | 地址                 | multiline                | textarea                  |
+```

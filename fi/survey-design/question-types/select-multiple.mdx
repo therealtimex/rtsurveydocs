@@ -1,0 +1,143 @@
+---
+description: Select_multiple-kysymykset antavat vastaajille mahdollisuuden valita
+  yhden tai useamman vaihtoehdon ennalta määritetystä luettelosta.
+icon: check_box
+title: Select_multiple
+---
+
+
+`select_multiple`-kysymystyyppi näyttää luettelon, josta vastaaja voi valita **yhden tai useamman vaihtoehdon**. Oletuksena valinnat näytetään valintaruutuina. Tallennettu arvo on **välilyönneillä eroteltu lista** kaikista valituista vaihtoehtoarvoista.
+
+## XLSForm-perusmäärittely
+
+**survey-laskentataulukko:**
+
+| type | name | label |
+|------|------|-------|
+| select_multiple crops | crops_grown | Mitä viljelyskasveja kotitalous kasvattaa? |
+
+**choices-laskentataulukko:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| crops | maize | Maissi |
+| crops | beans | Pavut |
+| crops | rice | Riisi |
+| crops | vegetables | Vihannekset |
+| crops | other | Muu |
+
+Lisätietoja löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+
+## Tallennetun tiedon muoto
+
+Viety sarake sisältää välilyönneillä erotelun listan valituista arvoista:
+
+```
+maize beans vegetables
+```
+
+Käytä `selected()`-funktiota — ei `=`:a — testatessasi select_multiple-arvoja lausekkeissa (katso alla).
+
+## Käyttötarkoitukset
+
+Select_multiple-kysymyksiä käytetään:
+
+1. Useiden soveltuvien vastausten keräämiseen (esim. tulonlähteet, viljeltävät kasvit, oireet)
+2. Valintaruutu-tyylisiin suostumuseriin (esim. "Valitse kaikki sopivat")
+3. Kieli- tai taitoinventaareihin
+4. Mihin tahansa kysymykseen, jossa useammat vastaukset ovat samanaikaisesti voimassa
+
+## Ulkoasuvaihtoehdot
+
+| Ulkoasu | Kuvaus |
+|---------|--------|
+| *(ei mitään)* | Oletusvalintaruudut, yksi per rivi |
+| `minimal` | Pudotusvalikko monivalintawidget |
+| `compact` | Kompakti ruudukko, sarakkeet mukautuvat näytön leveyteen |
+| `compact-N` | Kompakti ruudukko pakotettuna N sarakkeeseen |
+| `horizontal` | Valinnat järjestetty vaakasuoraan riviin (verkko) |
+| `horizontal-compact` | Vaakasuora, kompakti välistys (verkko) |
+| `label` | Näyttää vain otsikot, ei valintaruutuja (käytä `list-nolabel` kanssa) |
+| `list-nolabel` | Näyttää vain valintaruudut, ei otsikoita (käytä `label` kanssa) |
+| `columns(N)` | Näyttää N sarakkeessa (rtSurvey-laajennus) |
+
+### Esimerkki: 3 sarakkeen kompakti asettelu
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple symptoms | symptoms | Valitse kaikki havaitut oireet | compact-3 |
+
+## `selected()`-funktion käyttö lausekkeissa
+
+Koska tallennettu arvo on välilyönneillä eroteltu merkkijono, **sinun täytyy** käyttää `selected()`:a testataksesi onko tietty valinta tehty. `=`:n käyttö ei toimi oikein.
+
+### `relevant`-sarakkeessa
+
+Näytä jatkokysymys vain jos "muu" on valittu:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_multiple crops | crops_grown | Mitä kasveja viljellään? | |
+| text | crops_other | Täsmennä muut kasvit | `selected(${crops_grown}, 'other')` |
+
+### `constraint`-sarakkeessa
+
+Vaadi vähintään 2 valintaa:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple issues | issues | `count-selected(.) >= 2` | Valitse vähintään 2 ongelmaa |
+
+Rajoita enintään 3:een:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple priorities | priorities | `count-selected(.) <= 3` | Valitse enintään 3 prioriteettia |
+
+### `calculate`-sarakkeessa — valittujen otsikoiden yhdistäminen
+
+Yhdistä `selected-at()`, `count-selected()` ja `choice-label()` lukevan yhteenvedon rakentamiseksi:
+
+| type | name | calculation |
+|------|------|-------------|
+| calculate | crops_summary | join(', ', ${crops_grown}) |
+
+## "Ei mitään yllä olevista" / yksinomainen vaihtoehto
+
+Yleinen malli on tehdä yksi vaihtoehto molemminpuolisesti eksklusiiviseksi kaikkien muiden kanssa. Käytä `constraint`-saraketta sen pakottamiseksi:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| select_multiple issues | issues | Valitse kaikki läsnä olevat ongelmat | `not(selected(., 'none') and count-selected(.) > 1)` | "Ei mitään" ei voi olla valittuna muiden vaihtoehtojen kanssa |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| issues | water | Vesipula |
+| issues | roads | Huonot tiet |
+| issues | health | Terveydenhuollon puute |
+| issues | none | Ei mitään yllä olevista |
+
+## Valintojen laskeminen ja yhteenveto
+
+| Funktio | Esimerkki | Tulos |
+|---------|---------|-------|
+| `count-selected(field)` | `count-selected(${crops_grown})` | Valittujen vaihtoehtojen lukumäärä |
+| `selected(field, value)` | `selected(${crops_grown}, 'maize')` | tosi/epätosi |
+| `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | Ensimmäinen valittu arvo |
+| `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | Arvon otsikko |
+
+## Parhaat käytännöt
+
+1. Käytä aina `selected()`:a `relevant`-, `constraint`- ja `calculate`-sarakkeissa — ei koskaan `=` tai `!=`.
+2. Lisää rajoite valintojen enimmäismäärän rajoittamiseksi, jos kysymyssuunnittelu sitä vaatii.
+3. Sisällytä "Ei mitään"- tai "Ei sovellettavissa"-vaihtoehto, kun nolla valintaa on kelvollinen vastaus.
+4. Pitkille luetteloille (15+ valintaa) käytä `minimal`-ulkoasua (monivalintapudotusvalikko) liiallisen vierittämisen välttämiseksi.
+5. Vie tiedot ja käytä merkkijonon jakamista analyysivälineessäsi — välilyönneillä eroteltu muoto vaatii jakamisen ennen pivotointia.
+
+## Rajoitukset
+
+- Select_multiple-arvoja ei voi verrata suoraan `=`:lla. Käytä aina `selected()`.
+- Kompakti ulkoasu ei välttämättä renderöidy hyvin erittäin pitkille valintojen otsikoille.
+- Kun valintojen suodatus on käytössä `choice_filter`:llä, suodatus koskee kaikkia näytettäviä valintoja, kuten `select_one`.

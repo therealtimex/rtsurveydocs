@@ -1,0 +1,206 @@
+---
+description: Formu dizaina pārskats
+icon: code
+title: Galvenie jēdzieni
+---
+
+
+## Kas ir XLSForm?
+rtSurvey izmanto paplašinātu [XLSForm](https://xlsform.org/) standarta versiju formu dizainam, piedāvājot jaudīgas funkcijas sarežģītu aptauju izveidei. Šī rokasgrāmata iepazīstinās ar galvenajiem formu dizaina jēdzieniem rtSurvey, no pamata XLSForm struktūras līdz rtSurvey specifiskajām uzlabotajām funkcijām.
+
+Ar XLSForms jūs varat veidot formas cilvēkam lasāmā formātā, izmantojot pazīstamo Excel rīku, padarot to pieejamu gandrīz ikvienam.
+Šis standarts nodrošina vieglu kopīgošanu un sadarbību formu veidošanā.
+
+Lai gan XLSForms ir piemērotas iesācējiem, tās arī ļauj pieredzējušiem lietotājiem izveidot sarežģītas formas.
+
+rtSurvey nodrošina konsekventu veidu, kā iekļaut uzlabotas funkcionalitātes, piemēram, izlaišanas loģiku, formās dažādās tīmekļa un mobilajās datu vākšanas platformās.
+
+## XLSForm struktūra
+XLSForm parasti sastāv no divām galvenajām darblapām:
+
+1. **survey**: Nosaka formas struktūru un saturu.
+2. **choices**: Norāda atbilžu izvēles daudzatbildes jautājumiem.
+
+Neobligāta darblapa **settings** var nodrošināt papildu formas specifikācijas.
+
+Svarīgi atzīmēt, ka survey un choices darblapu obligātajām kolonnām jābūt klātesošām, lai forma darbotos pareizi. Neobligātās kolonnas abās darblapās sniedz papildu kontroli pār katras ieraksta uzvedību formā, taču nav būtiskas.
+
+Kolonnas jūsu Excel darbgrāmatā var parādīties jebkurā secībā, un neobligātās kolonnas var atstāt tukšas. Tomēr ir ļoti svarīgi izmantot precīzu sintaksi un nosaukumu konvencijas, kas norādītas XLSForm dokumentācijā, lai forma darbotos pareizi.
+
+### Darblapa survey
+Darblapa **survey** ir vieta, kur nosaka formas struktūru un nodrošina saturu. Katra rinda darblapā survey apzīmē jautājumu vai elementu jūsu formā. Šādas kolonnas ir obligātas darblapā survey:
+
+- `type`: Norāda ievades tipu, kādu gaidāt jautājumam.
+- `name`: Norāda unikālo mainīgā nosaukumu šim ierakstam. Nosaukumiem jāsākas ar burtu vai apakšsvītru un var saturēt tikai burtus, ciparus, defises, apakšsvītras un punktus. Nosaukumi ir reģistrjutīgi.
+- `label`: Satur faktisko tekstu, ko redzat jautājumam formā.
+
+| type                | name     | label                |
+| ------------------- | -------- | -------------------- |
+| today               | today    |                      |
+| select_one gender   | gender   | Respondenta dzimums? |
+| integer             | age      | Respondenta vecums?  |
+
+### Darblapa choices
+Darblapa **`choices`** tiek izmantota, lai norādītu atbilžu izvēles daudzatbildes jautājumiem.
+Katra rinda apzīmē atbildes izvēli. Šādas kolonnas ir obligātas darblapā choices:
+
+- **`list_name`**: Grupē kopā saistītu atbilžu izvēļu kopu.
+- **`name`**: Norāda unikālo mainīgā nosaukumu šai atbildes izvēlei.
+- **`label`**: Rāda atbildes izvēli tieši tā, kā vēlaties to parādīt formā.
+
+| list_name           | name        | label                |
+| ------------------- | ----------- | -------------------- |
+| gender              | transgender | Transpersona         |
+| gender              | female      | Sieviete             |
+| gender              | male        | Vīrietis             |
+| gender              | other       | Cits                 |
+
+Kolonnas, ko pievienojat Excel darbgrāmatai, neatkarīgi no tā, vai tās ir obligātas vai neobligātas, var parādīties jebkurā secībā. Neobligātās kolonnas var pilnībā izlaist. Rindas vai kolonnas var atstāt tukšas lasāmības uzlabošanai, taču dati pēc 20 blakusesošām tukšām kolonnām vai rindām lapā netiks apstrādāti. Visas .xlsx faila formatēšanas tiek ignorētas, tāpēc varat izmantot dalījuma līnijas, ēnojumu un citu fonta formatēšanu, lai formu padarītu lasāmāku.
+
+Viena lieta, kas jāpatur prātā, veidojot formas Excel, ir tā, ka sintaksei jābūt precīzai. Piemēram, ja rakstāt **Choices** vai **choice** nevis **choices**, forma nedarbosies.
+
+### Darblapa settings
+
+Darblapa settings ir neobligāta, bet ļauj norādīt formas līmeņa metadatus un uzvedību. Biežākās kolonnas darblapā settings:
+
+| Kolonna | Apraksts |
+|--------|-------------|
+| form_title | Formas nosaukums, kāds parādās lietotājiem |
+| form_id | Unikāls formas identifikators, ko izmanto datu pārvaldībā un API izsaukumos |
+| default_language | Noklusējuma valodas kods daudzvalodu formām (piemēram, 'en' angļu valodai) |
+| version | Formas versijas numurs, noderīgs izmaiņu izsekošanai |
+| instance_name | Izteiksme unikāla nosaukuma ģenerēšanai katram formas iesniegumam |
+| generation | Vesels skaitlis, kas atzīmē formas paaudzi. Palieliniet strukturālām izmaiņām |
+| family | Identifikators saistītu formu grupēšanai strukturālo izmaiņu laikā |
+
+Darblapa settings rtSurvey var ietvert arī papildu konfigurācijas, kas specifiskas rtSurvey paplašinātajām funkcionalitātēm. Skatiet rtSurvey dokumentāciju pilnam atbalstīto iestatījumu sarakstam.
+
+## Darblapas survey galvenie komponenti
+
+Darblapa survey ir formas dizaina kodols. Lūk, tās galveno komponentu pārskats:
+
+| Komponents | Apraksts |
+|-----------|-------------|
+| [type](#question-types) | Norāda jautājuma tipu (piemēram, text, integer, select_one) |
+| [name](#naming-conventions) | Unikāls jautājuma identifikators |
+| [label](#labels-and-translations) | Respondentam rādītais teksts |
+| [hint](#hints-and-help-text) | Papildu norādes respondentam |
+| [appearance](#appearance-options) | Modificē jautājuma attēlojumu |
+| [relevant](#relevance-and-skip-logic) | Nosaka, kad jautājums jāuzdod (izlaišanas loģika) |
+| [constraint](#constraints-and-validation) | Validē atbildi |
+| [calculation](#calculations) | Aprēķina vērtības, pamatojoties uz citām atbildēm |
+| [required](#required-fields) | Norāda, vai jautājumam obligāti jāatbild |
+
+
+Katrs no šiem komponentiem ir būtisks efektīvu un efektīvu aptauju izveidei.
+
+### Jautājumu tipi
+XLSForm atbalsta vairākus jautājumu tipus. Šie ir daži no iespējamiem ierakstiem kolonnā **`type`** darblapā **`survey`** jūsu XLSForm:
+
+| Jautājuma tips             | Atbildes ievade                                                                                 |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| integer                   | Vesela skaitļa ievade.                                                                          |
+| decimal                   | Decimāla ievade.                                                                               |
+| range                     | [Diapazona](#range) ievade (ieskaitot vērtēšanu)                                                     |
+| text                      | Brīva teksta atbilde.                                                                          |
+| select_one [options]      | [Daudzatbildes](#multiple-choice) jautājums; var izvēlēties tikai vienu atbildi.               |
+| select_multiple [options] | [Daudzatbildes](#multiple-choice) jautājums; var izvēlēties vairākas atbildes.              |
+| select_one_from_file [file]| [Daudzatbildes no faila](#multiple-choice-from-file); var izvēlēties tikai vienu atbildi.      |
+| select_multiple_from_file [file]| [Daudzatbildes no faila](#multiple-choice-from-file); var izvēlēties vairākas atbildes.|
+| rank [options]            | [Ranžēšanas](#rank) jautājums; sakārtojiet sarakstu.                                                        |
+| note                      | Parādiet piezīmi ekrānā, nepieņem ievadi.                                                       |
+| geopoint                  | Savāciet [vienu GPS koordinātu](#gps).                                                            |
+| geotrace                  | Ierakstiet [divu vai vairāku GPS koordinātu līniju](#gps).                                                |
+| geoshape                  | Ierakstiet [vairāku GPS koordinātu daudzstūri](#gps); pēdējais punkts ir tāds pats kā pirmais. |
+| date                      | Datuma ievade.                                                                                  |
+| time                      | Laika ievade.                                                                                   |
+| dateTime                  | Pieņem datuma un laika ievadi.                                                                              |
+| image                     | Uzņemiet fotoattēlu vai augšupielādējiet [attēla failu](#image).                                            |
+| audio                     | Uzņemiet audio ierakstu vai augšupielādējiet audio failu.                                             |
+| background-audio          | Audio tiek ierakstīts fonā, aizpildot formu.                                                  |
+| video                     | Uzņemiet video ierakstu vai augšupielādējiet video failu.                                               |
+| file                      | Vispārēja faila ievade (txt, pdf, xls, xlsx, doc, docx, rtf, zip)                                |
+| barcode                   | Skenējiet svītrkodu, nepieciešama svītrkodu skenera lietotne.                                            |
+| calculate                 | Veiciet aprēķinu; skatiet sadaļu [Aprēķins](#calculation) zemāk.                                    |
+| acknowledge               | Atzīšanas uzvedne, kas iestata vērtību uz "OK", ja izvēlēta.                                      |
+| hidden                    | Lauks bez saistīta UI elementa, ko var izmantot konstantes glabāšanai                  |
+| xml-external              | Pievieno atsauci uz [ārējo XML datu](#external-xml-data) failu                                         |
+
+### Etiķetes
+
+Etiķetes ir teksts, kas parādās respondentiem katram jautājumam. Tās ir ļoti svarīgas skaidrai komunikācijai aptaujās.
+
+- **Pamata lietojums**: Kolonnā `label` ievadiet jautājuma tekstu.
+- **Vairākas valodas**: Izmantojiet papildu kolonnas, piemēram, `label::English` un `label::French`, daudzvalodu aptaujām.
+- **Formatēšana**: rtSurvey atbalsta pamata HTML formatēšanu etiķetēs uzsvaram vai struktūrai.
+
+### Norādes
+
+Norādes sniedz respondentiem papildu norādījumus, nepārblīvējot galveno jautājuma tekstu.
+
+- **Lietojums**: Pievienojiet norādes kolonnā `hint`.
+- **Redzamība**: Norādes parasti tiek rādītas zem galvenā jautājuma teksta.
+- **Daudzvalodu**: Tāpat kā etiķetes, norādes var norādīt vairākās valodās, izmantojot `hint::Language` kolonnas.
+
+### Izskats
+
+Kolonna `appearance` rtSurvey ļauj pielāgot jautājumu attēlojumu.
+
+- **Standarta iespējas**: Ietver 'multiline' tekstam, 'horizontal' atlases jautājumiem.
+- **rtSurvey paplašinājumi**:
+  - Laika ievade: Dažādas pulksteņa attēlojuma iespējas (piemēram, `inline`, `inline-1line`)
+  - Krāsas pielāgošana: Izmantojiet `colors()` funkciju, lai mainītu ikonas krāsas
+
+### Relevantums
+
+Kolonna `relevant` ievieš izlaišanas loģiku, nosakot, kad jautājums jāparāda.
+
+- **Sintakse**: Izmantojiet XPath izteiksmes, lai definētu nosacījumus.
+- **Mainīgie**: Atsaucieties uz citiem jautājumu nosaukumiem, izmantojot `${question_name}`.
+
+### Obligātais
+
+Kolonna `required` norāda, vai jautājumam obligāti jāatbild.
+
+- **Pamata lietojums**: Izmantojiet 'yes' vai 'true', lai padarītu jautājumu obligātu.
+- **Uzlabots**: Var izmantot izteiksmes nosacījuma obligātumam.
+
+### Atkārtojumi
+
+Atkārtojumi ļauj atbildēt uz jautājumu grupu vairākas reizes.
+
+- **Lietojums**: Izmantojiet `begin repeat` un `end repeat` rindas, lai definētu atkārtojumu grupu.
+- **Nosaukšana**: Piešķiriet katrai atkārtojumu grupai unikālu nosaukumu.
+
+### Multivide
+
+rtSurvey atbalsta dažādus multivides tipus aptaujās, ieskaitot attēlus, audio un video.
+
+- **Jautājumu tipi**: Kolonnā type izmantojiet 'image', 'audio' vai 'video'.
+- **Multivide etiķetēs**: Atsaucieties uz multivides failiem etiķetēs, izmantojot HTML tagus.
+
+### Tikai lasāms
+
+Tikai lasāmie jautājumi rāda informāciju, neļaujot lietotājam ievadīt datus.
+
+- **Lietojums**: Pievienojiet 'readonly' kolonnai `appearance`.
+- **Aprēķini**: Bieži izmanto ar tipu calculate aprēķinātu vērtību parādīšanai.
+
+## rtSurvey paplašinājumi
+
+rtSurvey paplašina XLSForm standartu, atbalstot papildu iespējas, piemēram, `grid layout`, `html format` un daudzus jaunus `logrīkus`.
+
+### Režģa izkārtojums
+rtSurvey ļauj jūsu formai atdarināt tradicionālo papīra aptauju izskatu, iesaiņojot vairākus jautājumus vienā rindā.
+
+### Formas iestatījumi
+
+### Datu iestatījumi
+
+### Typeform stils
+
+### pulldata() paplašinājums
+
+### Izskatu bāzēti paplašinājumi
+
+### Webbox paplašinājumi

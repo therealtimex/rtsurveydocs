@@ -1,0 +1,142 @@
+---
+description: ''
+icon: auto_awesome
+title: Vragen groeperen
+---
+
+
+Groepen in XLSForm stellen u in staat gerelateerde vragen samen te organiseren, de structuur van uw enquête te verbeteren en de mogelijkheden voor gegevensanalyse te vergroten. rtSurvey ondersteunt XLSForm-groepen volledig en breidt hun functionaliteit uit met aanvullende functies.
+
+## Basisgroepstructuur
+
+Om een groep vragen te maken, gebruikt u de syntaxis `begin_group` en `end_group`:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | respondent | Respondentinformatie                     |
+| text         | name       | Voer de naam van de respondent in        |
+| text         | position   | Voer de functie van de respondent in     |
+| end_group    |            |                                          |
+```
+
+Belangrijke punten:
+- De rij `begin_group` vereist een `name` en `label`.
+- De rij `end_group` heeft geen naam of label nodig.
+- Vragen tussen `begin_group` en `end_group` maken deel uit van de groep.
+
+## Groepsweergave
+
+rtSurvey ondersteunt verschillende weergaveopties voor groepen:
+
+1. **field-list**: Toont meerdere vragen op hetzelfde scherm.
+   ```
+   | type         | name       | label      | appearance |
+   |--------------|------------|------------|------------|
+   | begin_group  | respondent | Respondent | field-list |
+   | text         | name       | Naam       |            |
+   | text         | position   | Functie    |            |
+   | end_group    |            |            |            |
+   ```
+
+2. **grid**: Maakt een compacte, tabelachtige indeling voor groepen (rtSurvey-specifiek).
+   ```
+   | type         | name       | label      | appearance |
+   |--------------|------------|------------|------------|
+   | begin_group  | household  | Huishouden | grid       |
+   | text         | member_name| Naam       |            |
+   | integer      | member_age | Leeftijd   |            |
+   | end_group    |            |            |            |
+   ```
+
+3. **collapsible**: Maakt uitvouwbare/inklapbare groepen (rtSurvey-specifiek).
+   ```
+   | type         | name       | label    | appearance  |
+   |--------------|------------|----------|-------------|
+   | begin_group  | details    | Details  | collapsible |
+   | text         | address    | Adres    |             |
+   | text         | phone      | Telefoon |             |
+   | end_group    |            |          |             |
+   ```
+
+## Geneste groepen
+
+Groepen kunnen worden genest in andere groepen voor complexere structuren:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | hospital   | Ziekenhuisinformatie                     |
+| text         | hosp_name  | Wat is de naam van dit ziekenhuis?       |
+| begin_group  | medication | Beschikbaarheid van medicijnen           |
+| select_one y_n| hiv_meds  | Heeft dit ziekenhuis hiv-medicatie?      |
+| end_group    |            |                                          |
+| end_group    |            |                                          |
+```
+
+**Let op**: Sluit altijd de meest recentelijk geopende groep als eerste om correcte nesting te behouden.
+
+## Sla-logica voor groepen
+
+Gebruik de kolom `relevant` om sla-logica te implementeren voor hele groepen:
+
+```
+| type         | name   | label                                        | relevant        |
+|--------------|--------|----------------------------------------------|-----------------|
+| integer      | age    | Hoe oud bent u?                              |                 |
+| begin_group  | child  | Kind                                         | ${age} <= 5     |
+| integer      | muac   | Registreer de bovenarmomtrek van het kind    |                 |
+| select_one y_n| mrdt  | Is de sneltest van het kind positief?        |                 |
+| end_group    |        |                                              |                 |
+```
+
+In dit voorbeeld verschijnt de groep `child` alleen als de leeftijd van de respondent 5 of jonger is.
+
+## Aanbevolen werkwijzen voor het gebruik van groepen
+
+1. Gebruik betekenisvolle namen voor groepen om gegevensanalyse te verbeteren.
+2. Houd groepen gericht op gerelateerde vragen.
+3. Gebruik geneste groepen met mate om overmatig complexe structuren te vermijden.
+4. Test sla-logica grondig bij gebruik van `relevant` op groepen.
+5. Overweeg de weergave `field-list` voor korte groepen om scrollen te verminderen.
+6. Gebruik de rasterindeling van rtSurvey voor compacte weergave van gerelateerde informatie.
+7. Gebruik inklapbare groepen voor lange formulieren om de navigatie te verbeteren.
+
+## rtSurvey-specifieke functies
+
+1. **Rasterindeling**: Gebruik de weergave `grid` voor tabelachtige weergaven.
+2. **Inklapbare groepen**: Implementeer de weergave `collapsible` voor uitvouwbare secties.
+3. **Aangepaste opmaak**: Pas aangepaste CSS toe op groepen voor unieke visuele ontwerpen.
+4. **Dynamisch groepsgedrag**: Implementeer complexe sla-logica en berekeningen binnen groepen.
+
+## Meertalige ondersteuning
+
+rtSurvey ondersteunt meertalige groepen. Gebruik taalspecifieke kolommen voor labels:
+
+```
+| type         | name       | label::Engels | label::Frans      |
+|--------------|------------|---------------|-------------------|
+| begin_group  | personal   | Persoonlijke info | Infos Personnelles |
+| text         | name       | Naam          | Nom               |
+| end_group    |            |               |                   |
+```
+
+## Overwegingen voor de mobiele app
+
+- Groepen met de weergave `field-list` worden weergegeven als één scherm in de mobiele app.
+- Inklapbare groepen kunnen de navigatie op kleinere schermen verbeteren.
+- Rasterindelingen kunnen worden aangepast voor betere zichtbaarheid op mobiele apparaten.
+
+## Bekende beperkingen
+
+- Extreem diep geneste groepen kunnen de prestaties op sommige apparaten beïnvloeden.
+- Sommige geavanceerde opmaakopties zijn mogelijk niet beschikbaar voor groepen in de mobiele app.
+
+## Problemen met groepen oplossen
+
+1. Zorg ervoor dat elke `begin_group` een overeenkomende `end_group` heeft.
+2. Controleer of groepsnamen uniek zijn binnen het formulier.
+3. Verifieer dat sla-logica verwijst naar de juiste vraagnamen.
+4. Test groepen grondig op zowel web- als mobiele interfaces.
+
+Door groepen effectief te gebruiken in uw XLSForms met rtSurvey kunt u goed georganiseerde, efficiënte enquêtes maken die zowel de gegevensverzamelingservaring als de kwaliteit van uw gegevensanalyse verbeteren.

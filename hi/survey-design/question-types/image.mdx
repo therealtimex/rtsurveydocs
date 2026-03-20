@@ -1,0 +1,75 @@
+---
+description: Image questions उत्तरदाताओं को survey के हिस्से के रूप में photos capture
+  और submit करने देते हैं।
+icon: image
+title: Image
+---
+
+
+XLSForms और rtSurvey में image question type उत्तरदाताओं को अपने survey responses के हिस्से के रूप में photos capture और submit करने में सक्षम बनाता है। यह सुविधा visual data एकत्र करने, observations document करने, या field surveys में evidence प्रदान करने के लिए विशेष रूप से उपयोगी है।
+
+## Basic XLSForm Specification
+
+| type  | name        | label                           |
+|-------|-------------|--------------------------------|
+| image | photo       | Location की photo लें           |
+
+Basic image question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+
+## उपयोग
+
+Image questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+
+1. Field conditions या observations document करना
+2. Research studies में visual evidence capture करना
+3. Impact assessments में before-and-after photos एकत्र करना
+4. Tasks की completion या locations पर presence verify करना
+5. Remote analysis के लिए visual data gather करना
+
+## Best Practices
+
+1. क्या photograph किया जाना चाहिए इस पर clear instructions प्रदान करें।
+2. Privacy implications पर विचार करें और उत्तरदाताओं को बताएं कि उनकी photos का उपयोग कैसे किया जाएगा।
+3. File sizes और storage limitations के प्रति सावधान रहें, विशेषकर limited internet connectivity वाले areas में surveys के लिए।
+4. सुनिश्चित करें कि device में पर्याप्त storage space हो और camera permissions granted हों।
+
+## Example Usage
+
+यहाँ बताया गया है कि आप survey में image question का उपयोग कैसे कर सकते हैं:
+
+| type  | name           | label                                      | hint                                        |
+|-------|----------------|--------------------------------------------|--------------------------------------------|
+| image | storefront     | Store के entrance की photo लें             | सुनिश्चित करें कि store का नाम clearly visible हो |
+
+## rtSurvey Extensions
+
+Basic XLSForm specification के अतिरिक्त, rtSurvey अतिरिक्त सुविधाएं या customizations प्रदान कर सकता है:
+
+1. Image quality settings (जैसे low, medium, high resolution)
+2. Images में captions या tags जोड़ने का विकल्प
+3. एक single question के लिए multiple image capture
+4. Device के native camera app या gallery के साथ integration
+
+## Data Handling
+
+इस question type के माध्यम से collected images आमतौर पर:
+
+1. एक common image format में save होती हैं (जैसे JPG, PNG)
+2. अन्य survey data के साथ store होती हैं, अक्सर एक separate media folder में
+3. Survey management platform के माध्यम से viewing और analysis के लिए accessible होती हैं
+
+## Analysis के लिए विचार
+
+Image questions का उपयोग करते समय, विचार करें:
+
+1. Images कैसे analyze होंगी (जैसे manual review, automated image analysis)
+2. Image files के लिए additional storage space की आवश्यकता
+3. Photos store करने और handle करने के लिए privacy और data protection measures
+4. Analysis phase में image editing या organization tools की potential need
+
+## सीमाएं
+
+- Image files बड़ी हो सकती हैं, जो data transfer और storage को प्रभावित कर सकती हैं।
+- सभी devices में high-quality cameras या पर्याप्त storage space नहीं हो सकती।
+- बड़ी संख्या में images analyze करना time-consuming हो सकता है।
+- Photos capture करते समय, विशेषकर public spaces में, privacy concerns हो सकती हैं।

@@ -1,0 +1,59 @@
+---
+description: A vonalkód-kérdések lehetővé teszik vonalkódadatok beolvasását és rögzítését
+  a felmérésben.
+icon: qr_code_scanner
+title: Vonalkód
+---
+
+
+Az XLSForm és az rtSurvey vonalkód kérdéstípusa lehetővé teszi a felhasználók számára vonalkódadatok beolvasását és rögzítését közvetlenül a felmérésben. Ez a funkció különösen hasznos készletkezeléshez, termékkövetéshez vagy bármilyen olyan helyzetben, ahol kódolt információk gyors és pontos adatbevitele szükséges.
+
+## Alapvető XLSForm-specifikáció
+
+| type    | name          | label                   |
+|---------|---------------|-------------------------|
+| barcode | product_code  | Olvassa be a termék vonalkódját |
+
+A vonalkód kérdéstípussal kapcsolatos további részletekért lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+
+## Felhasználási területek
+
+A vonalkód-kérdések általánosan használt területei:
+
+1. Termékazonosítás a készletfelmérésekben
+2. Eszközkövetés terepi műveletekben
+3. Jegy- vagy azonosítóellenőrzés eseményeken
+4. Kódolt információk gyors adatbevitele
+
+## rtSurvey-bővítések
+
+Bár az alapvető XLSForm-specifikáció egyszerű a vonalkód-kérdéseknél, az rtSurvey további funkciókat és testreszabási lehetőségeket kínálhat:
+
+1. Több vonalkód-formátum támogatása (pl. QR-kódok, UPC, EAN)
+2. Eszközkamera integrációja a vonalkód-beolvasáshoz
+3. Manuális beviteli lehetőség sérült vagy beolvashatalan vonalkód esetén
+
+## Bevált módszerek
+
+1. Biztosítson megfelelő megvilágítást a pontos vonalkód-beolvasáshoz.
+2. Adjon egyértelmű utasításokat a felhasználóknak, hogyan helyezzék az eszközt beolvasáshoz.
+3. Vegyen fel manuális beviteli lehetőséget tartalékként beolvasási nehézségek esetén.
+4. Tesztelje a vonalkód-beolvasó funkciót különféle eszközökkel és vonalkód-típusokkal a felmérés telepítése előtt.
+
+## Korlátozások
+
+- A vonalkód-beolvasás pontossága az eszköz kamerájának minőségétől és a környezeti feltételektől függően változhat.
+- Egyes régebbi vagy alacsony kategóriájú eszközök esetleg nem támogatják a vonalkód-beolvasást.
+- Egyes vonalkód-típusok a megvalósítástól függően esetleg nem támogatottak.
+
+## Példa
+
+Íme egy példa arra, hogyan lehet vonalkód-kérdést felhasználni egy készletfelmérésben:
+
+| type    | name          | label                   | hint                                      |
+|---------|---------------|-------------------------|-------------------------------------------|
+| barcode | product_code  | Olvassa be a termék vonalkódját | Helyezze a vonalkódot a keretbe |
+| integer | quantity      | Adja meg a termék mennyiségét  |                                           |
+| note    | confirmation  | Beolvasott termék: ${product_code}. Mennyiség: ${quantity} |           |
+
+Ebben a példában a felmérés rögzíti a termék vonalkódját, megkérdezi a mennyiséget, majd visszaigazoló megjegyzést jelenít meg a beolvasott adatokkal.

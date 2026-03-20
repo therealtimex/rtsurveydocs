@@ -1,0 +1,100 @@
+---
+description: Typ otázky s voľnou textovou odpoveďou v rtSurvey
+icon: text_fields
+title: Text
+---
+
+
+Typ otázky `text` zhromažďuje voľnú textovú odpoveď — akýkoľvek reťazec znakov. Je to najflexibilnejší typ vstupu a používa sa pre mená, adresy, popisy, kódy a čokoľvek, čo nezapadá do špecifickejšieho typu.
+
+rtSurvey tiež rozširuje `text` o **widgety na zadávanie času**, ktoré umožňujú presné zadávanie času pomocou výberu hodín.
+
+## Základná špecifikácia XLSForm
+
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | Celé meno respondenta |
+| text | address | Domovská adresa |
+
+Pre viac podrobností o štandardnom type textu XLSForm pozrite si [špecifikáciu XLSForm](https://xlsform.org/en/#question-types).
+
+## Použitia
+
+Textové otázky sa používajú pre:
+
+1. Mená, adresy, voľné popisy
+2. Otvorené komentáre alebo spätná väzba
+3. Kódy, ID alebo referenčné čísla, ktoré nezapadajú do integer/decimal
+4. Zber hodnôt času pomocou rozšírení vstupu času rtSurvey
+5. Automaticky dopĺňané textové polia (cez `search-autocomplete-noedit-v2()`)
+
+## Štandardné možnosti vzhľadu
+
+| Vzhľad | Popis |
+|------------|-------------|
+| *(žiadny)* | Jednoriadkový textový vstup |
+| `multiline` | Viacriadkový textový priestor — najlepší pre dlhší voľný text na webe |
+
+## Rozšírenia vstupu času rtSurvey
+
+rtSurvey rozširuje `text` o **widget výberu hodín** pre zber časových hodnôt. Tieto možnosti vzhľadu zobrazujú ikonu hodín, na ktorú môže anketár klepnúť na výber hodín, minút, sekúnd alebo milisekúnd.
+
+### Varianty vzhľadu
+
+| Vzhľad | Popis |
+|------------|-------------|
+| `inline` | Ikona hodín zobrazená vedľa poľa |
+| `inline colors("RRGGBB")` | Ikona hodín s vlastnou hexadecimálnou farbou |
+| `inline-1line` | Hodiny zobrazené v kompaktnom formáte jedného riadka |
+| `inline-1line-RRGGBB` | Jeden riadok s vlastnou farbou ikony (hex, bez `#`) |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Jeden riadok s dvoma farbami |
+| `inline-onlyresult` | Ikona hodín zmizne po výbere; zobrazí sa iba hodnota |
+| `inline-onlyresult colors("RRGGBB")` | Rovnaké s vlastnou farbou ikony |
+
+### Tokeny formátu času
+
+Pripojte reťazec formátu v zátvorkách na kontrolu zobrazených časových komponentov:
+
+| Reťazec formátu | Zobrazuje |
+|---------------|----------|
+| `inline-[%H:%M]` | Hodiny a minúty (24-hodinový formát) |
+| `inline-[%h:%M]` | Hodiny a minúty (12-hodinový formát) |
+| `inline-[%H:%M:%S]` | Hodiny, minúty, sekundy (24-hodinový) |
+| `inline-[%h:%M:%S]` | Hodiny, minúty, sekundy (12-hodinový) |
+| `inline-[%H:%M:%3]` | Hodiny, minúty, milisekundy |
+| `inline-[%M:%S]` | Iba minúty a sekundy |
+| `inline-[%M:%3]` | Iba minúty a milisekundy |
+| `inline-[%S]` | Iba sekundy |
+| `inline-[%3]` | Iba milisekundy |
+| `inline-[%H]` | Iba hodiny (24-hodinový) |
+| `inline-[%h]` | Iba hodiny (12-hodinový) |
+
+## Formát dát
+
+Textové dáta sú uložené a exportované ako jednoduchý reťazec. Pre časové vstupy používajúce inline widget hodín sa hodnota ukladá vo formáte zodpovedajúcom zvolenému reťazcu formátu (napr. `14:32` pre `%H:%M`).
+
+## Obmedzenia a overovanie
+
+Aplikujte obmedzenia na vynútenie formátu, dĺžky alebo vzoru:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| text | name | Celé meno | `string-length(.) >= 2` | Meno musí mať aspoň 2 znaky |
+| text | code | Referenčný kód | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Zadajte 2 veľké písmená nasledované 4 číslicami |
+| text | phone | Telefónne číslo | `regex(., '^[0-9]{9,15}$')` | Zadajte platné telefónne číslo |
+
+## Najlepšie postupy
+
+1. Kde je to možné, používajte špecifickejšie typy (`integer`, `decimal`, `date`) — zabraňuje to neplatným zápisom a zjednodušuje analýzu.
+2. Pridajte `constraint` s `string-length()` alebo `regex()` na overovanie kódov alebo ID.
+3. Použite vzhľad `multiline` pre otvorené otázky, kde respondenti môžu napísať niekoľko viet.
+4. Pre zber času si vyberte tokeny formátu času, ktoré zodpovedajú presnosti požadovanej vašou analýzou.
+
+## Podpora platforiem
+
+Typ textovej otázky a všetky vzhľady vstupu času sú podporované na platformách iOS, Android a web.
+
+## Obmedzenia
+
+- Textové odpovede sú voľné — neexistuje vstavaná kontrola pravopisu ani obmedzenie slovnej zásoby nad rámec vzorových výrazov regex.
+- Inline widget času je rozšírenie rtSurvey a nie je súčasťou štandardnej špecifikácie XLSForm.

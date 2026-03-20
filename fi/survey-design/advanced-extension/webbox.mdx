@@ -1,0 +1,107 @@
+---
+description: Webbox upottaa ulkoisen verkkosivun kyselyyn modaalina iframe-kehyksenä,
+  mahdollistaen luetteloijien tarkastella viitteitä tai käsitellä ulkoisia työkaluja
+  poistumatta lomakkeesta.
+icon: manage_search
+title: Webbox
+---
+
+
+**Webbox** upottaa ulkoisen verkkosivun kyselyyn **modaalisena ponnahdusikkuna** (iframe). Luetteloija napauttaa otsikon tai note-tekstin painiketta, sivu avautuu koko näytön peittävänä lomakkeen sisäisenä ikkunana, ja sulkiessaan sen hän palaa täsmälleen samaan kohtaan. Tämä mahdollistaa viitemateriaalin, karttojen, koontinäyttöjen tai mukautettujen työkalujen näyttämisen avaamatta erillistä selaimen välilehteä.
+
+---
+
+## Syntaksi
+
+Lisää `<webbox>`-HTML-tagi suoraan `label`- tai `note`-otsikko-sarakkeeseen:
+
+```html
+<webbox src='https://example.com/reference' title='Viiteopas'>Avaa viiteopas</webbox>
+```
+
+| Attribuutti | Kuvaus |
+|-------------|--------|
+| `src` | Iframe-kehyksessä ladattava URL. Tukee sekä yksittäisiä että kaksoislainausmerkkejä. |
+| `title` | Modaalin otsikkopalkkiin näytettävä teksti. Tukee pelkkää tekstiä. |
+| *(sisältö)* | Kyselykentässä näytettävä klikattava painikkeotsikko |
+
+---
+
+## Perusesimerkki
+
+| type | name | label |
+|------|------|-------|
+| note | ref_guide | `<webbox src='https://docs.example.com/field-guide' title='Kenttäopas'>📖 Avaa kenttäopas</webbox>` |
+
+Tämä renderöi painikkeen, jossa lukee "📖 Avaa kenttäopas". Napautettaessa modaali avautuu näyttäen kenttäoppaan verkkosivuston.
+
+---
+
+## Kartan upottaminen
+
+| type | name | label |
+|------|------|-------|
+| note | area_map | `<webbox src='https://maps.example.com/survey-area' title='Kyselyalueen kartta'>🗺 Näytä kartta</webbox>` |
+
+---
+
+## Lomakearvojen välittäminen upotettuun sivuun
+
+Liitä lomakekenttien arvot URL-osoitteeseen käyttämällä `concat()`:tia `calculation`-sarakkeessa ja viittaa tulokseen otsikossa:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | webbox_url | | `concat('https://dashboard.example.com/household?id=', ${household_id})` |
+| note | hh_dash | `<webbox src='${webbox_url}' title='Kotitalouden koontinäyttö'>Avaa koontinäyttö</webbox>` |
+
+<Warning>
+`<webbox>`-tagin `src`-attribuutti tukee `${fieldname}`-viittauksia, kun otsikko lasketaan `calculate`-kentästä. Rakenna täydellinen URL `calculate`-kentässä ja viittaa siihen.
+</Warning>
+
+---
+
+## Toiston vuorovaikutus: poistopainikkeet
+
+Webbox tukee myös erityisiä toimintatageja toistoryhmien hallintaan otsikoiden sisällä:
+
+```html
+<delete-repeat-current>Poista tämä rivi</delete-repeat-current>
+<delete-repeat-last>Poista viimeinen rivi</delete-repeat-last>
+```
+
+Nämä renderöivät painikkeiksi, jotka poistavat toistotapaukset napautettaessa. Sijoita ne `note`-kenttään toistoryhmän sisälle (tai heti sen jälkeen):
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | items | Kohde |
+| text | item_name | Kohteen nimi |
+| note | delete_btn | `<delete-repeat-current>✕ Poista tämä kohde</delete-repeat-current>` |
+| end_repeat | | |
+
+---
+
+## Viestintä upotetun sivun kanssa (postMessage)
+
+Webbox-iframe ja pääomake voivat kommunikoida käyttämällä selaimen `postMessage` API:a. Pääisäntä lähettää `init`-viestin iframelle sen avautuessa. Upotettu sivu voi vastata:
+
+- `delete-repeat-current` — käynnistää nykyisen toistotapauksen poistamisen
+- `delete-repeat-last` — käynnistää viimeisen toistotapauksen poistamisen
+
+Tämä mahdollistaa mukautettujen verkkotyökalujen (esim. piirtotyökalut, interaktiiviset kartat) käynnistää lomakesuorittamistoimintoja, kun käyttäjä vahvistaa toiminnon iframessa.
+
+---
+
+## Parhaat käytännöt
+
+1. Käytä webboxia **viitemateriaaliin** (ohjeet, hakutaulukot, kartat) — ei lomakkeeseen kuuluvan tiedon keräämiseen.
+2. Varmista, että upotettu URL on saavutettavissa laitteen verkosta — webbox vaatii yhteyttä.
+3. Pidä upotettu sivu mobiilikäyttäjäystävällisenä — modaali on enintään 800 px leveä ja 80 % näkymäkorkeudesta.
+4. Käytä kuvailevia painikkeotsikkoita (esim. "Näytä kylän kartta") yleisten otsikoiden ("Klikkaa tästä") sijaan.
+5. Kerro luetteloijille, että modaalin sulkeminen palauttaa heidät kyselyyn — jotkut käyttäjät eivät ehkä tiedä kuinka sulkea iframe-ponnahdusikkuna.
+
+## Rajoitukset
+
+- Webbox vaatii verkkoyhteyden upotetun URL-osoitteen latamiseen.
+- Jotkut ulkoiset sivustot estävät upottamisen iframeihin `X-Frame-Options`- tai `Content-Security-Policy`-otsikoilla — näitä sivustoja ei voi käyttää webboxin kanssa.
+- Modaali sulkeutuu, kun luetteloija siirtyy pois kysymyksestä — iframessa oleva tallentamaton tila menetetään.
+- Webbox on rtSurvey-weblomakelaajennus, joka ei välttämättä toimi muissa ODK-yhteensopivissa asiakkaissa.

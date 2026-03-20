@@ -1,0 +1,119 @@
+---
+description: aws-ec2.sh kullanıcı veri betiğini kullanarak AWS EC2 örneğine rtCloud
+  dağıtın.
+icon: cloud
+title: AWS EC2
+---
+
+
+Bir EC2 örneği başlatırken `aws-ec2.sh` dosyasını **Kullanıcı Verisi** betiği olarak kullanın. Betik, ilk açılışta otomatik olarak çalışır.
+
+**Betiği indirin:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+
+---
+
+## Adım 1 — Yapılandırmayı doldurun
+
+Betiği açın ve üstteki `CONFIGURATION` bloğunu düzenleyin:
+
+```bash
+# --- Gerekli ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # İlk girişten sonra değiştirin
+
+# --- Alan Adı + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- Yerleşik Keycloak ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ADMIN_PASSWORD varsayılan değerine sahiptir
+```
+
+| Alan | Gerekli | Açıklama |
+|-------|----------|-------------|
+| `PROJECT_ID` | Evet | Veritabanı adı ve Keycloak istemci kimliği olarak kullanılır. Küçük harf, boşluk yok. |
+| `ADMIN_PASSWORD` | Hayır | Uygulama yöneticisi şifresi ve Keycloak yönetici şifresi. Varsayılan `admin` — **ilk girişten sonra değiştirin**. |
+| `DOMAIN` | Hayır | HTTPS için alan adınız. Yalnızca HTTP modu için boş bırakın. |
+| `LETSENCRYPT_EMAIL` | Evet (DOMAIN ayarlanmışsa) | Let's Encrypt bildirimleri için e-posta. |
+| `EMBED_KEYCLOAK` | Hayır | Yerleşik Keycloak dağıtmak için `true` (4 GB RAM gerektirir). |
+
+> **Güvenlik:** Tüm şifreler varsayılan olarak `admin`'dir. İlk girişinizden hemen sonra değiştirin.
+
+---
+
+## Adım 2 — EC2 örneği başlatın
+
+[AWS EC2 konsolunda](https://console.aws.amazon.com/ec2):
+
+1. **Örnek başlat**'a tıklayın
+2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
+3. **Örnek türü:** `t3.medium` (4 GB RAM) veya daha büyük
+4. **Anahtar çifti:** SSH erişimi için bir tane seçin veya oluşturun
+5. **Ağ ayarları:** Güvenlik Grubu oluşturun veya seçin (aşağıya bakın)
+6. **Gelişmiş ayrıntılar** → **Kullanıcı verisi** → betiğin tam içeriğini yapıştırın
+7. **Örneği başlat**'a tıklayın
+
+---
+
+## Adım 3 — Güvenlik Grubunu yapılandırın
+
+Örneğin Güvenlik Grubunda bu portları açın:
+
+| Port | Protokol | Kaynak | Amaç |
+|------|----------|--------|---------|
+| 22 | TCP | IP'niz | SSH erişimi |
+| 80 | TCP | 0.0.0.0/0 | HTTP (Nginx tarafından HTTPS'ye yönlendirilir) |
+| 443 | TCP | 0.0.0.0/0 | HTTPS |
+| 3838 | TCP | 0.0.0.0/0 | Shiny doğrudan erişim |
+
+> Port 3306'yı (MySQL) **açmayın** — asla genel erişime açık olmamalıdır.
+
+---
+
+## Adım 4 — DNS kaydını ekleyin
+
+Örnek açılırken DNS sağlayıcınıza bir **A kaydı** ekleyin:
+
+```
+Tür  : A
+Ad   : myapp
+Değer: <örnek-genel-ip>
+TTL  : 300
+```
+
+---
+
+## Adım 5 — İlerlemeyi izleyin
+
+```bash
+ssh ubuntu@<instance-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## Adım 6 — Uygulamaya erişin
+
+Kurulum tamamlandığında günlük, uygulama URL'nizi ve kimlik bilgilerinizi içeren bir özet gösterir. `admin` kullanıcı adı ve `admin` şifresiyle giriş yapın, ardından hemen şifrenizi değiştirin.
+
+---
+
+## Dağıtım Sonrası
+
+### Şifre değiştirme
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Tüm konteynerleri görüntüleme
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
+
+### Elastik IP atama (isteğe bağlı)
+
+Örneği durdurup başlatırsanız genel IP değişir. Kararlı bir IP tutmak için EC2 konsolunda bir **Elastik IP** tahsis edin ve örneğe atayın.

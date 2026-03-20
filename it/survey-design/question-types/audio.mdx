@@ -1,0 +1,96 @@
+---
+description: Le domande audio permettono ai rispondenti di registrare e inviare file
+  audio come parte del sondaggio.
+icon: mic
+title: Audio
+---
+
+
+Il tipo di domanda `audio` consente ai rispondenti di **registrare audio** o caricare un file audio esistente come parte della loro risposta al sondaggio. È utile per catturare resoconti verbali, suoni ambientali, testimonianze, o qualsiasi informazione che viene meglio trasmessa attraverso la voce piuttosto che il testo.
+
+## Specifica XLSForm di base
+
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Si prega di registrare i propri commenti  |
+
+Per ulteriori dettagli sul tipo di domanda audio standard, vedere la [specifica XLSForm](https://xlsform.org/en/#question-types).
+
+## Utilizzi
+
+Le domande audio sono comunemente usate per:
+
+1. Catturare risposte verbali a domande aperte per ridurre il carico di digitazione dell'enumeratore
+2. Registrare testimonianze, storie personali o tradizioni orali
+3. Documentare suoni ambientali (es. livelli di rumore vicino alle infrastrutture)
+4. Raccogliere campioni vocali per ricerche linguistiche o sanitarie
+5. Consentire ai rispondenti di aggiungere chiarimenti verbali alle risposte numeriche o di selezione
+
+## Formato dei dati
+
+I file audio vengono memorizzati come allegati binari insieme all'invio del modulo, tipicamente:
+
+- **Formato:** MP3 o AAC (registrazione mobile); WAV (registrazione di alta qualità)
+- **Denominazione:** `{instanceID}-{fieldname}.mp3` (o equivalente)
+- **Archiviazione:** Caricati nella cartella media del server e collegati al record di invio
+- **Accesso:** Riproducibili e scaricabili dall'interfaccia di gestione degli invii
+
+## Estensioni rtSurvey
+
+### Durata massima
+
+Usa la colonna `parameters` per limitare la lunghezza della registrazione:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | interview | Registra l'intervista | `max-duration=120` |
+
+`max-duration` è in secondi. Il registratore si ferma automaticamente al limite.
+
+### Impostazioni di qualità
+
+La qualità della registrazione può essere impostata tramite `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Registra il feedback | `quality=normal` |
+
+Valori supportati: `low`, `normal` (predefinito), `voice-only`. `voice-only` ottimizza per l'audio parlato con riduzione del rumore.
+
+### Riproduzione prima dell'invio
+
+Sul mobile, l'enumeratore può riprodurre la clip registrata prima di procedere. Questo è abilitato per impostazione predefinita — non è necessaria alcuna configurazione.
+
+### Integrazione del registratore nativo
+
+Su Android e iOS, `audio` avvia l'app di registrazione nativa del dispositivo. Sul web, usa l'API MediaRecorder integrata nel browser.
+
+## Esempio di utilizzo
+
+### Con durata massima e suggerimento
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| audio | story | Raccontaci dell'incidente con parole tue | Parla chiaramente. La registrazione si ferma dopo 3 minuti. | `max-duration=180` |
+
+### Audio condizionale — solo se è stato segnalato un problema
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | issue_found | È stato trovato un problema? | | |
+| audio | issue_audio | Registra una descrizione del problema | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+
+## Best practice
+
+1. Indica chiaramente nella `label` o nel `hint` cosa dovrebbe dire l'enumeratore e per quanto tempo.
+2. Usa `max-duration` per prevenire file eccessivamente grandi in aree con velocità di caricamento lente.
+3. Informa i rispondenti prima di iniziare la registrazione — una registrazione imprevista può sollevare problemi di privacy.
+4. Testa la registrazione sul dispositivo di destinazione e nelle condizioni di rete prima del deployment.
+5. Imposta `quality=voice-only` per le registrazioni in stile intervista per ridurre le dimensioni del file senza perdere intelligibilità.
+
+## Limitazioni
+
+- I file audio possono essere grandi (una registrazione di 2 minuti a qualità normale è ~2–4 MB) — tienilo in considerazione nel tuo piano dati e nelle stime del tempo di caricamento.
+- Non tutti i browser supportano l'API MediaRecorder — Chrome e Firefox funzionano in modo affidabile; Safari su versioni iOS più vecchie potrebbe avere problemi.
+- La trascrizione delle risposte audio richiede un'elaborazione post aggiuntiva (trascrizione manuale o automatica).
+- Le normative sulla privacy potrebbero limitare la registrazione delle voci — verifica i requisiti locali di protezione dei dati.

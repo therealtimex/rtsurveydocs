@@ -1,0 +1,90 @@
+---
+description: ''
+icon: code
+title: Memvalidasi respons
+---
+
+
+Salah satu cara untuk memastikan kualitas data adalah dengan menambahkan batasan (constraint) ke bidang data dalam formulir Anda. Batasan membantu mencegah pengguna memasukkan jawaban yang tidak valid atau tidak mungkin. Misalnya, saat menanyakan pendapatan seseorang, Anda ingin menghindari nilai yang tidak realistis, seperti angka negatif atau nilai yang sangat tinggi. Menambahkan batasan data dalam formulir Anda mudah dilakukan. Cukup ikuti langkah-langkah di bawah ini:
+
+1. Tambahkan kolom baru bernama "constraint" ke formulir Anda.
+2. Di kolom "constraint", masukkan rumus yang menentukan batas pada jawaban.
+
+### Contoh
+
+Mari kita pertimbangkan contoh di mana kita ingin menambahkan batasan untuk pendapatan seseorang. Batasan mengharuskan pendapatan berada antara $0 dan $1.000.000. Berikut cara Anda mengatur batasan:
+
+| `name`      | `constraint`                  |
+|---------------|-----------------------------|
+| Income        | . >= 0 & . <= 1000000      |
+
+Dalam contoh di atas, "." dalam rumus merujuk kembali ke variabel pertanyaan, yang mewakili nilai yang dimasukkan pengguna untuk pertanyaan "Income". Batasan ". >= 0 && . <= 1000000" memastikan bahwa pendapatan yang dimasukkan lebih besar dari atau sama dengan 0 dan kurang dari atau sama dengan 1.000.000.
+
+
+### Batasan keras (Hard constraint)
+
+**Batasan keras** memblokir pengiriman formulir sepenuhnya jika nilai yang dimasukkan tidak memenuhi ekspresi. Enumerator tidak dapat melanjutkan sampai mereka memasukkan nilai yang valid.
+
+Untuk menambahkan batasan keras, masukkan ekspresi Anda di kolom `constraint`. Secara opsional tambahkan pesan yang mudah dibaca di `constraint_message`:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Usia responden | `. > 0 and . <= 120` | Usia harus antara 1 dan 120 |
+| decimal | temperature | Suhu tubuh (°C) | `. >= 35 and . <= 42` | Suhu harus antara 35°C dan 42°C |
+| text | phone | Nomor telepon | `regex(., '^[0-9]{10}$')` | Masukkan nomor telepon 10 digit |
+
+#### Beberapa kondisi
+
+Gabungkan kondisi dengan `and` / `or`:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Menggunakan `regex()` untuk validasi pola
+
+Fungsi `regex(value, pattern)` menguji nilai terhadap regular expression:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | Alamat email | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Masukkan alamat email yang valid |
+| text | zip_code | Kode pos | `regex(., '^[0-9]{5}$')` | Masukkan kode pos 5 digit |
+
+#### Mereferensikan bidang lain dalam batasan
+
+Gunakan `${fieldname}` untuk mereferensikan nilai dari pertanyaan lain:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Tahun akhir | `. >= ${start_year}` | Tahun akhir harus setelah tahun mulai |
+| decimal | loan_repaid | Jumlah yang dilunasi | `. <= ${loan_amount}` | Tidak dapat melunasi lebih dari jumlah pinjaman |
+
+### Peringatan lunak (Soft alert)
+
+**Peringatan lunak** (juga disebut batasan lunak atau peringatan) memperingatkan enumerator bahwa suatu nilai terlihat tidak biasa, tetapi tetap memungkinkan mereka melanjutkan. Ini berguna ketika suatu nilai secara teknis valid tetapi secara statistik tidak mungkin.
+
+rtSurvey mendukung peringatan lunak menggunakan kolom `constraint` dengan pendekatan `constraint_type` khusus, atau melalui appearance `soft` dikombinasikan dengan bidang note.
+
+Pola yang paling umum adalah menggunakan **note** dengan ekspresi `relevant` yang menandai nilai yang mencurigakan, dipasangkan dengan pertanyaan **acknowledge** untuk konfirmasi:
+
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Jumlah anak | |
+| note | children_warning | Peringatan: Anda memasukkan ${children} anak. Harap konfirmasi ini benar. | `. > 15` |
+| trigger | children_confirm | Konfirmasi jumlah anak sudah benar | `${children} > 15` |
+
+#### Peringatan lunak dengan constraint_message saja
+
+Untuk peringatan lunak yang lebih sederhana, Anda dapat merumuskan batasan untuk memperingatkan pada nilai ekstrem tetapi tetap memungkinkan rentang yang luas:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | children | Jumlah anak | `. >= 0 and . <= 30` | Nilai ini tampaknya sangat tinggi. Harap verifikasi. |
+
+<Warning>
+Perbedaan antara batasan keras dan lunak penting untuk kualitas data. Gunakan **batasan keras** untuk nilai yang secara logis tidak mungkin (usia negatif, suhu di atas 100°C). Gunakan **peringatan lunak** untuk nilai yang secara statistik tidak mungkin tetapi tidak mustahil — Anda tidak ingin memblokir kasus tepi yang sah.
+</Warning>

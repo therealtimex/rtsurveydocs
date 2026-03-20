@@ -1,0 +1,80 @@
+---
+description: Not soruları, anketinizde bilgi veya talimat sağlamak amacıyla salt okunur
+  metin veya medya görüntüler.
+icon: info
+title: Not
+---
+
+
+XLSForm'larda ve rtSurvey'de not soru türü, anket katılımcısına salt okunur metin veya medya görüntülemek için kullanılır. Bu, yanıt gerektiren bir soru değil, anket içinde bilgi, talimat veya bağlam sağlamanın bir yoludur.
+
+## Temel XLSForm Tanımı
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | Bu anket okuma alışkanlıklarınız hakkındadır. |
+
+Temel not soru türü hakkında daha fazla ayrıntı için [XLSForm spesifikasyonuna](https://xlsform.org/en/#question-types) bakın.
+
+## Kullanım Alanları
+
+Not soruları yaygın olarak şunlar için kullanılır:
+
+1. Sonraki sorular için talimat veya bağlam sağlama
+2. Hesaplanan sonuçları veya özetleri görüntüleme
+3. Görsel veya diğer medyaları gösterme
+4. Anketin bölümlerini ayırma
+5. Önceki yanıtlara dayalı geri bildirim verme
+
+## En İyi Uygulamalar
+
+1. Katılımcı etkileşimini sürdürmek için not metinlerini kısa ve net tutun.
+2. Önemli bilgileri vurgulamak için biçimlendirme (kalın, italik) kullanın.
+3. Uygun olduğunda anlamayı artırmak için medya (görseller, ses) kullanmayı düşünün.
+4. Anketi karmaşık hale getirmemek için notları idareli kullanın.
+
+## Örnek Kullanım
+
+Bir ankette not sorularını nasıl kullanabileceğinize dair bir örnek:
+
+| type | name | label |
+|------|------|-------|
+| note | intro | Okuma alışkanlıkları anketimize hoş geldiniz. Tercihleriniz ve okuma sıklığınız hakkında sorular soracağız. |
+| ... | ... | ... |
+| calculate | books_per_month | ${fiction_books} + ${non_fiction_books} |
+| note | reading_summary | Ayda yaklaşık ${books_per_month} kitap okuyorsunuz. |
+
+Bu örnekte, anketi tanıtmak ve hesaplanan sonuçların özetini sağlamak için notlar kullanıyoruz.
+
+## rtSurvey Uzantıları
+
+XLSForm için temel not soru tanımı basit olmakla birlikte, rtSurvey ek özellikler veya özelleştirmeler sunabilir:
+
+1. Zengin metin biçimlendirme
+2. Gömülü medya desteği (görseller, ses, video)
+3. Önceki yanıtlara dayalı dinamik içerik
+4. Özel stil seçenekleri
+
+## Gelişmiş Kullanım
+
+### Koşullu Görüntüleme
+
+Notları koşullu olarak göstermek için ilgililik ifadelerini kullanabilirsiniz:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | Hevesli bir okuyucusunuz! | ${books_per_month} > 5 |
+
+### Hesaplamalar Dahil Etme
+
+Notlar dinamik geri bildirim sağlamak için hesaplamalar içerebilir:
+
+| type | name | label |
+|------|------|-------|
+| note | reading_time | Yanıtlarınıza göre her ay yaklaşık ${books_per_month * 5} saat okuyorsunuz. |
+
+## Sınırlamalar
+
+- Notlar veri toplamaz, bu nedenle katılımcılardan bilgi almanız gerektiğinde kullanılmamalıdır.
+- Notların aşırı kullanımı anketi karmaşık veya gereğinden uzun hissettirebilir.
+- Bazı gelişmiş biçimlendirme veya medya seçenekleri tüm cihazlarda veya platformlarda desteklenmeyebilir.

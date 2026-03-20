@@ -1,0 +1,112 @@
+---
+description: rtSurvey'de serbest metin yanıt soru türü
+icon: text_fields
+title: Metin
+---
+
+
+`text` soru türü, serbest metin yanıtı toplar — herhangi bir karakter dizisi. En esnek giriş türüdür ve isimler, adresler, açıklamalar, kodlar ve daha spesifik bir türe uymayan her şey için kullanılır.
+
+rtSurvey ayrıca `text`'i, bir saat seçici ile kesin saat girişine olanak tanıyan **saat giriş widget'larıyla** genişletir.
+
+## Temel XLSForm Tanımı
+
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | Katılımcının tam adı |
+| text | address | Ev adresi |
+
+Standart XLSForm metin türü hakkında daha fazla ayrıntı için [XLSForm spesifikasyonuna](https://xlsform.org/en/#question-types) bakın.
+
+## Kullanım Alanları
+
+Metin soruları şunlar için kullanılır:
+
+1. İsimler, adresler, serbest açıklamalar
+2. Açık uçlu yorumlar veya geri bildirimler
+3. tam sayı/ondalık'a uymayan kodlar, kimlikler veya referans numaraları
+4. rtSurvey'in saat giriş uzantılarıyla saat değerleri toplama
+5. Otomatik tamamlamalı metin alanları (`search-autocomplete-noedit-v2()` ile)
+
+## Standart görünüm seçenekleri
+
+| Görünüm | Açıklama |
+|------------|-------------|
+| *(yok)* | Tek satırlı metin girişi |
+| `multiline` | Çok satırlı metin alanı — web'de daha uzun serbest metin için en iyisi |
+
+## rtSurvey saat giriş uzantıları
+
+rtSurvey, `text`'i saat, dakika, saniye veya milisaniye seçmek için dokunulabilen bir saat simgesi içeren **saat seçici widget'ıyla** genişletir.
+
+### Görünüm varyantları
+
+| Görünüm | Açıklama |
+|------------|-------------|
+| `inline` | Alanın yanında saat simgesi görüntülenir |
+| `inline colors("RRGGBB")` | Özel onaltılık renkle saat simgesi |
+| `inline-1line` | Kompakt tek satır biçiminde saat görüntülenir |
+| `inline-1line-RRGGBB` | Özel simge rengiyle tek satır (onaltılık, `#` olmadan) |
+| `inline-1line colors("RRGGBB","RRGGBB")` | İki renkli tek satır |
+| `inline-onlyresult` | Seçimden sonra saat simgesi kaybolur; yalnızca değer gösterilir |
+| `inline-onlyresult colors("RRGGBB")` | Aynısı, özel simge rengiyle |
+
+### Saat biçim belirteçleri
+
+Hangi saat bileşenlerinin gösterileceğini kontrol etmek için köşeli parantez içinde biçim dizesi ekleyin:
+
+| Biçim dizesi | Görüntülenen |
+|---------------|----------|
+| `inline-[%H:%M]` | Saat ve dakika (24 saat) |
+| `inline-[%h:%M]` | Saat ve dakika (12 saat) |
+| `inline-[%H:%M:%S]` | Saat, dakika, saniye (24 saat) |
+| `inline-[%h:%M:%S]` | Saat, dakika, saniye (12 saat) |
+| `inline-[%H:%M:%3]` | Saat, dakika, milisaniye |
+| `inline-[%M:%S]` | Yalnızca dakika ve saniye |
+| `inline-[%M:%3]` | Yalnızca dakika ve milisaniye |
+| `inline-[%S]` | Yalnızca saniye |
+| `inline-[%3]` | Yalnızca milisaniye |
+| `inline-[%H]` | Yalnızca saat (24 saat) |
+| `inline-[%h]` | Yalnızca saat (12 saat) |
+
+### Örnek: Dakika ve saniye cinsinden görev süresini kaydetme
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | task_duration | Görevi tamamlama süresi | `inline-[%M:%S]` |
+
+### Örnek: 24 saat biçiminde özel renkle olay saatini kaydetme
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | event_time | Olay saati | `inline-1line colors("0099FF")` |
+
+## Veri biçimi
+
+Metin verisi düz dize olarak saklanır ve dışa aktarılır. Satır içi saat widget'ı kullanılarak yapılan saat tabanlı girişler için değer, seçilen biçim dizesiyle eşleşen biçimde saklanır (örn. `%H:%M` için `14:32`).
+
+## Kısıtlamalar ve doğrulama
+
+Biçim, uzunluk veya desen uygulamak için kısıtlamalar ekleyin:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| text | name | Tam ad | `string-length(.) >= 2` | Ad en az 2 karakter olmalıdır |
+| text | code | Referans kodu | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 büyük harf ve ardından 4 rakam girin |
+| text | phone | Telefon numarası | `regex(., '^[0-9]{9,15}$')` | Geçerli bir telefon numarası girin |
+
+## En İyi Uygulamalar
+
+1. Verinin bilinen bir yapısı olduğunda daha spesifik türler (`integer`, `decimal`, `date`) kullanın — bu geçersiz girişleri önler ve analizi basitleştirir.
+2. Kodları veya kimlikleri doğrulamak için `string-length()` veya `regex()` ile `constraint` ekleyin.
+3. Katılımcıların birkaç cümle yazabileceği açık uçlu sorular için `multiline` görünümünü kullanın.
+4. Saat toplamak için, analizinizin gerektirdiği hassasiyetle eşleşen saat biçim belirteçlerini seçin — yalnızca dakikalara ihtiyaç duyduğunuzda milisaniye toplamak sayımcı çabasını boşa harcar.
+
+## Platform desteği
+
+Metin soru türü ve tüm saat giriş görünümleri iOS, Android ve web platformlarında desteklenmektedir.
+
+## Sınırlamalar
+
+- Metin yanıtları serbest biçimlidir — regex desenlerinin ötesinde yerleşik yazım denetimi veya kelime dağarcığı kısıtlaması yoktur.
+- Satır içi saat widget'ı bir rtSurvey uzantısıdır ve standart XLSForm spesifikasyonunun bir parçası değildir.

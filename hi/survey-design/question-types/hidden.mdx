@@ -1,0 +1,70 @@
+---
+description: Hidden fields ऐसे values store करते हैं जो कभी उत्तरदाता को नहीं दिखाए
+  जाते — context pass करने, data prefill करने, या intermediate results store करने
+  के लिए उपयोग किए जाते हैं।
+icon: eye-slash
+title: Hidden
+---
+
+
+एक `hidden` field एक value store करती है जो **उत्तरदाता को कभी display नहीं होती**। `calculate` (जो एक value compute करता है) के विपरीत, `hidden` का उपयोग एक **बाहरी रूप से provided value** को carry करने के लिए किया जाता है — उदाहरण के लिए, एक task ID, किसी अन्य system से passed household ID, या form launch होने पर inject किया गया एक enumerator code।
+
+## Basic XLSForm Specification
+
+| type | name | label |
+|------|------|-------|
+| hidden | household_id | |
+
+Hidden fields के लिए Labels आवश्यक नहीं हैं क्योंकि screen पर कुछ भी render नहीं होता।
+
+## उपयोग
+
+Hidden fields सामान्यतः इनके लिए उपयोग किए जाते हैं:
+
+1. Survey management system से एक pre-assigned ID pass करना (जैसे household ID, case number, task code)
+2. Form version या deployment metadata store करना
+3. Form launch पर enumerator-specific configuration inject करना
+4. Linked workflows में parent form से child form में data carry करना
+5. Web link के माध्यम से form खुलने पर URL parameters से derived value store करना
+
+## Default value सेट करना
+
+सबसे सामान्य pattern `hidden` को `default` expression के साथ उपयोग करना है ताकि form खुलने पर value set हो:
+
+| type | name | default |
+|------|------|---------|
+| hidden | deployment_code | 'ZONE_A_2024' |
+| hidden | form_version | '3.1' |
+
+## Calculations में hidden field को reference करना
+
+Hidden values को `${fieldname}` का उपयोग करके किसी भी अन्य field की तरह referenced किया जा सकता है:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| hidden | zone_code | | |
+| calculate | label_prefix | | concat('[', ${zone_code}, '] ') |
+| note | intro | ${label_prefix} Household survey में आपका स्वागत है | |
+
+## Hidden को prefill / URL parameters के साथ उपयोग करना
+
+URL के माध्यम से web form launch करते समय, आप ऐसे parameters pass कर सकते हैं जो hidden fields populate करते हैं। यह आपको enumerator द्वारा type किए बिना household ID या task code pre-load करने की अनुमति देता है:
+
+```
+https://your-server.com/form/FORMID?household_id=H00123&zone_code=NORTH
+```
+
+`household_id` नामक field स्वचालित रूप से `H00123` से populated हो जाएगी।
+
+## Best Practices
+
+1. `hidden` (न कि `calculate`) का उपयोग करें जब value **बाहरी रूप से inject** की जाती है और recompute नहीं होनी चाहिए।
+2. `calculate` का उपयोग करें जब value form के अन्य fields से **derived** होती है।
+3. यदि hidden field का एक value होना आवश्यक है तो हमेशा `default` सेट करें — बिना default के hidden field empty होगी।
+4. Hidden fields को clearly नाम दें ताकि उन्हें अलग किया जा सके (जैसे `_hidden_` prefix के साथ या consistent naming convention का उपयोग करें)।
+
+## सीमाएं
+
+- Hidden fields exported data में किसी भी अन्य field की तरह शामिल होती हैं।
+- उन्हें conditionally नहीं दिखाया जा सकता — वे हमेशा present (लेकिन invisible) होती हैं।
+- यदि आपको dynamically compute होने वाले field की आवश्यकता है, तो `calculate` का उपयोग करें।

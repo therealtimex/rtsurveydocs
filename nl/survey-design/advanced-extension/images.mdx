@@ -1,0 +1,92 @@
+---
+description: 'Geavanceerde afbeeldingsfuncties in rtSurvey: watermerken, mediarasterweergave
+  en afbeeldingsannotaties.'
+icon: manage_search
+title: Geavanceerde afbeeldingen
+---
+
+
+Naast het standaard `image`-vraagtype biedt rtSurvey uitbreidingen voor het **watermerken** van vastgelegde foto's en het weergeven van meerdere afbeeldingen in een **mediaraster**. Deze zijn nuttig voor op bewijs gebaseerde enquêtes waarbij foto's moeten worden gemarkeerd met de identiteit van de enumerator of enquêtemetagegevens, en voor visuele beoordelingsinterfaces.
+
+---
+
+## Watermerk
+
+De watermerkfunctie legt tekst of een afbeelding over een vastgelegde foto voordat deze wordt opgeslagen. Dit wordt gebruikt om veldfotos te markeren met de datum, naam van de enumerator, GPS-locatie of andere enquêtegegevens — waardoor het moeilijker wordt om bestaande foto's door te geven als nieuw vastgelegde bewijsmateriaal.
+
+### Installatie
+
+Gebruik `watermark()` in de kolom **`calculation`** van een `image`-veld, gecombineerd met `callapi`-weergave:
+
+```
+watermark(type, size, distance, color, shadow, rotate, blur)
+```
+
+| Parameter | Beschrijving |
+|-----------|-------------|
+| `type` | `'text'` voor een tekstwatermerk; `'file'` voor een afbeeldingswatermerk |
+| `size` | Lettergrootte in pixels (tekst) of watermarkgrootte als % van de afbeeldingsbreedte (bestand) |
+| `distance` | Afstand tussen herhaalde watermerktegelpatronen (pixels) |
+| `color` | Tekstkleur (CSS-kleur of hex). Niet gebruikt voor het `file`-type |
+| `shadow` | Schaduwkleur (CSS-kleur of hex) |
+| `rotate` | Rotatiehoek in graden (bijv. `45` voor diagonaal) |
+| `blur` | Dekking van het watermerk (0 = onzichtbaar, 100 = volledig zichtbaar) |
+
+### Voorbeeld tekstwatermerk
+
+Leg de naam van de enumerator en de datum van vandaag diagonaal over elke vastgelegde foto:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | wm_text | | | `concat(pulldata('app-api', 'user.name'), ' | ', format-date(today(), '%d/%m/%Y'))` |
+| image | site_photo | Maak een foto van de locatie | watermark | `watermark('text', 20, 60, '#ffffff', '#000000', 45, 40)` |
+
+De watermerktekst wordt overgenomen uit `${wm_text}`. Stel het watermerktekstveld **voor** het afbeeldingsveld in het formulier in.
+
+### Voorbeeld afbeelding-/logowatermerk
+
+Leg een organisatielogo (bijgevoegd als mediabestand genaamd `logo.png`) over:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| image | evidence_photo | Maak foto van bewijs | watermark | `watermark('file', 25, 80, '', '#000000', 0, 50)` |
+
+### Ongedaan maken/opnieuw uitvoeren
+
+De watermerkeditor ondersteunt ongedaan maken en opnieuw uitvoeren — enumeratoren kunnen stappen terugzetten door de bewerkingsgeschiedenis voordat ze de foto bevestigen.
+
+### Watermerktegeling
+
+Het watermerk herhaalt zich (tegelt) automatisch over de gehele afbeelding. De parameter `distance` regelt de afstand tussen tegels; `rotate` regelt de hoek van elke tegel.
+
+---
+
+## Mediaraster-widget
+
+De mediaraster-widget toont een verzameling mediabestanden (afbeeldingen, audio, video) in een rasterindeling, waardoor revisors of enumeratoren vastgelegde bestanden visueel kunnen doorbladeren.
+
+Deze widget wordt geactiveerd door de weergave `mediagridwidget` en wordt typisch gebruikt op `note`- of `calculate`-velden om eerder vastgelegde media uit een herhalingsgroep weer te geven.
+
+### Voorbeeld: Alle foto's uit een herhaling als raster weergeven
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | photo_list | | | `join(' ', ${site_photo})` |
+| note | photo_review | Vastgelegde foto's bekijken | mediagridwidget | |
+
+---
+
+## Aanbevolen werkwijzen voor foto's met watermerk
+
+1. Bereken de watermerktekst altijd in een `calculate`-veld **boven** het afbeeldingsveld zodat het beschikbaar is wanneer de foto wordt genomen.
+2. Gebruik een rotatiehoek (bijv. 45°) om watermerken moeilijker bij te snijden.
+3. Stel dekking (`blur`) in tussen 30–60% — hoog genoeg om leesbaar te zijn, laag genoeg om het fotoonderwerp niet te verhullen.
+4. Neem de naam van de enumerator, datum en GPS-coördinaten op in de watermerktekst om de auditwaarde te maximaliseren.
+5. Test de watermerkweergave op het laagste-specificatie-apparaat in uw vloot — op canvas gebaseerd watermerken kan traag zijn op oudere hardware.
+
+## Beperkingen
+
+- Watermerken worden aan de clientzijde toegepast met behulp van de HTML5 Canvas API — het vereist een geschikte browser of mobiele WebView.
+- Zeer hoge-resolutie foto's kunnen op apparaten aan de onderkant van de markt enkele seconden duren om te watermerken.
+- Watermerken worden ingebakken in het afbeeldingsbestand — ze kunnen niet worden verwijderd na indiening zonder beeldbewerking.
+- Het watermerktype `file` vereist dat de logo-afbeelding als mediabestand wordt bijgevoegd met exact de verwachte bestandsnaam.

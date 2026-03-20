@@ -1,0 +1,82 @@
+---
+description: As perguntas geoshape permitem aos respondentes desenhar formas num mapa,
+  capturando dados geográficos complexos como parte do inquérito.
+icon: map
+title: Geoshape
+---
+
+
+O tipo de pergunta geoshape em XLSForms e rtSurvey permite aos respondentes desenhar formas (polígonos) num mapa, capturando dados geográficos complexos. Esta funcionalidade é particularmente útil para mapear áreas, definir fronteiras ou marcar regiões de interesse em inquéritos espaciais.
+
+## Especificação XLSForm Básica
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geoshape | field_area  | Desenhe o limite do campo       |
+
+Para mais detalhes sobre o tipo de pergunta geoshape básico, consulte a [especificação XLSForm](https://xlsform.org/en/#question-types).
+
+## Utilizações
+
+As perguntas geoshape são comummente usadas para:
+
+1. Mapear limites de campos em inquéritos agrícolas
+2. Definir áreas de impacto ambiental
+3. Marcar zonas em estudos de planeamento urbano
+4. Delinear regiões para inquéritos geológicos
+5. Capturar características geográficas complexas para análise espacial
+
+## Melhores Práticas
+
+1. Certifique-se de que o dispositivo tem os serviços de localização ativados e as permissões concedidas.
+2. Forneça instruções claras sobre como desenhar a forma e que área deve ser incluída.
+3. Considere usar imagens de satélite ou mapas base para ajudar os respondentes a desenhar formas com precisão.
+4. Esteja ciente da potencial complexidade das formas e do seu impacto no tamanho e processamento de dados.
+
+## Exemplo de Utilização
+
+Aqui está um exemplo de como pode usar uma pergunta geoshape num inquérito:
+
+| type     | name           | label                                             | hint                                                    |
+|----------|----------------|---------------------------------------------------|---------------------------------------------------------|
+| geoshape | forest_area    | Delineie o limite do fragmento de floresta        | Use pelo menos 3 pontos para criar uma forma fechada    |
+
+## Extensões rtSurvey
+
+Embora a especificação XLSForm básica para perguntas geoshape seja direta, o rtSurvey pode oferecer funcionalidades ou personalizações adicionais:
+
+1. Integração com mapas offline para áreas remotas
+2. Opções para definir o número mínimo e máximo de pontos para a forma
+3. Capacidade de editar ou refinar formas após o desenho inicial
+4. Suporte para diferentes tipos de forma (por ex., retângulos, círculos) além de polígonos de forma livre
+
+(Nota: As extensões específicas disponíveis no rtSurvey para perguntas geoshape precisariam de ser confirmadas e detalhadas aqui.)
+
+## Formato de Dados
+
+Os dados de geoshape são tipicamente armazenados como uma cadeia de pares de coordenadas separados por espaços, entre parênteses:
+
+```
+(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+```
+
+Por exemplo:
+```
+(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+```
+
+## Considerações para Análise
+
+Ao usar perguntas geoshape, considere:
+
+1. Como os dados geográficos serão visualizados e analisados (por ex., software SIG)
+2. A potencial necessidade de limpeza ou simplificação de dados de formas complexas
+3. Medidas de privacidade e proteção de dados para o tratamento de dados espaciais detalhados
+4. Integração com outras fontes de dados espaciais para análise abrangente
+
+## Limitações
+
+- Desenhar formas precisas em pequenos ecrãs móveis pode ser desafiante.
+- Formas complexas podem requerer capacidade significativa de armazenamento e processamento.
+- As perguntas geoshape podem não ser adequadas para todos os tipos de inquéritos ou respondentes.
+- Pode haver preocupações de privacidade associadas à recolha de dados espaciais detalhados.

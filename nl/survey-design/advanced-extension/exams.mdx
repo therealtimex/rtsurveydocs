@@ -1,0 +1,118 @@
+---
+description: De examenfunctie voegt een tijdgebonden quizmodus toe aan een enquête,
+  met optionele audiofeedback voor juiste en onjuiste antwoorden.
+icon: manage_search
+title: Examens
+---
+
+
+De **Examen**-functie maakt van een enquête een tijdgebonden quiz. Een afteltimer wordt weergegeven aan de respondent, en de enquête registreert hoeveel tijd er nog over is wanneer ze klaar zijn. Optioneel kunnen audiogeluiden worden afgespeeld voor juiste en onjuiste antwoorden.
+
+Dit is nuttig voor kennisbeoordelingen, geletterheidstests, competentiecontroles voor veldmedewerkers, en elke enquête waarbij tijd-op-taak zinvolle gegevens zijn.
+
+---
+
+## `check-exam()`-functie
+
+Configureer het examen met `check-exam()` in de kolom **`calculation`** van een `calculate`-veld dat aan het begin van het formulier is geplaatst:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Parameters
+
+| # | Parameter | Beschrijving |
+|---|-----------|-------------|
+| 1 | `examTime` | Totale examenduur in seconden |
+| 2 | `questionToStoreRemainingTime` | De `name` van een `calculate`- of `integer`-veld dat de resterende tijd opslaat wanneer het examen eindigt |
+| 3 | `rightSound` | *(Optioneel)* Bestandsnaam van het audiobestand dat wordt afgespeeld bij een juist antwoord (bijvoegen als mediabestand bij het formulier) |
+| 4 | `wrongSound` | *(Optioneel)* Bestandsnaam van het audiobestand dat wordt afgespeeld bij een onjuist antwoord |
+| 5 | `excludeQuestion` | *(Optioneel)* Met komma's gescheiden lijst van veldnamen die worden uitgesloten van de examentimer (bijv. `'intro_note,consent'`) |
+
+---
+
+## Basisinstallatie
+
+### Stap 1: Voeg examenvelden toe
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` activeert de 600-seconden (10 minuten) timer. `remaining_time` wordt automatisch gevuld wanneer de respondent klaar is.
+
+### Stap 2: Voeg uw vragen toe
+
+De examentimer omvat alle vragen in het formulier, behalve die zijn opgenomen in `excludeQuestion`.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | De hoofdstad van Kenia is Nairobi. Waar of niet waar? |
+| select_one choices | q2 | Welk orgaan pompt bloed door het lichaam? |
+| select_one choices | q3 | Water kookt bij 100°C op zeeniveau. Waar of niet waar? |
+
+### Stap 3: Sla de resterende tijd op
+
+Het veld dat is benoemd in parameter 2 (`remaining_time`) wordt automatisch ingesteld op het aantal resterende seconden wanneer de respondent indient. Een waarde van `0` betekent dat de tijd is verstreken; een hoge waarde betekent dat ze snel klaar waren.
+
+---
+
+## Met audiofeedback
+
+Voeg geluidsbestanden bij het formulier (als mediabijlagen) en verwijs er dan naar:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` wordt afgespeeld wanneer de respondent het juiste antwoord selecteert
+- `wrong.mp3` wordt afgespeeld wanneer de respondent een onjuist antwoord selecteert
+
+<Warning>
+Geluidsbestanden moeten als mediabestanden bij het formulier worden gevoegd en de bestandsnaam moet exact overeenkomen (hoofdlettergevoelig), inclusief de extensie.
+</Warning>
+
+---
+
+## Vragen uitsluiten van de timer
+
+Geef een met komma's gescheiden lijst van veldnamen door om uit te sluiten van het examen (bijv. inleidende notities of toestemmingsvragen):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+Laat `rightSound` en `wrongSound` als lege tekenreeksen `''` als u geen audio nodig heeft maar wel uitsluitingen nodig heeft.
+
+---
+
+## Volledig voorbeeld
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | Welkom bij de gezondheidskennis beoordeling. U heeft 5 minuten om alle vragen te beantwoorden. | |
+| trigger | start_ack | Tik op OK wanneer u klaar bent om te beginnen. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | Handen wassen voorkomt de verspreiding van ziekte. | |
+| select_one yesno | q2 | U moet minimaal 2 liter water per dag drinken. | |
+| select_one yesno | q3 | Malaria wordt veroorzaakt door een virus. | |
+
+---
+
+## Aanbevolen werkwijzen
+
+1. Informeer respondenten altijd over de tijdslimiet voor het starten — gebruik een `note` of `trigger` voor het veld `check-exam()`.
+2. Sluit inleidende notities en toestemmingsvragen uit van de timer met de parameter `excludeQuestion`.
+3. Gebruik `remaining_time` in een vervolgberekening om time-outs te detecteren: `if(${remaining_time} = 0, 'Tijd verstreken', 'Voltooid')`.
+4. Houd het aantal vragen in verhouding tot de beschikbare tijd — 2–3 minuten per vraag is een redelijke basislijn voor de meeste kennisbeoordelingen.
+5. Test met audiobestanden op het werkelijke apparaat voor implementatie — audioweergave varieert tussen Android-versies en browsers.
+
+## Beperkingen
+
+- De timer is alleen voor weergave — het formulier wordt niet automatisch ingediend wanneer de tijd verstrijkt; de respondent moet nog steeds handmatig indienen.
+- Audiofeedback vereist dat het volume van het apparaat aan is en niet gedempt is.
+- De examenfunctie is een rtSurvey-uitbreiding en maakt geen deel uit van de standaard XLSForm-specificatie.

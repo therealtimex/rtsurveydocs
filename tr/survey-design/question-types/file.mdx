@@ -1,0 +1,102 @@
+---
+description: Dosya soruları, katılımcıların anket yanıtlarının bir parçası olarak
+  belgeler ve diğer dosyalar yüklemesine olanak tanır.
+icon: upload_file
+title: Dosya
+---
+
+
+`file` soru türü, katılımcıların cihazlarından **herhangi bir dosya yüklemesine** olanak tanır — belgeler, elektronik tablolar, PDF'ler veya diğer dosya türleri. Belirli yakalama araçlarını başlatan `image`, `audio` ve `video`'nun aksine, `file` genel amaçlı bir dosya seçici açar.
+
+## Temel XLSForm Tanımı
+
+| type | name      | label                        |
+|------|-----------|------------------------------|
+| file | document  | Lütfen belgenizi yükleyin    |
+
+Standart dosya soru türü hakkında daha fazla ayrıntı için [XLSForm spesifikasyonuna](https://xlsform.org/en/#question-types) bakın.
+
+## Kullanım Alanları
+
+Dosya soruları yaygın olarak şunlar için kullanılır:
+
+1. Destekleyici belgeler toplama (makbuzlar, sertifikalar, sözleşmeler, raporlar)
+2. Taranan kağıt formları yükleme
+3. Diğer sistemlerden elektronik tablo veya veri dışa aktarmaları toplama
+4. görsel/ses/video'nun kapsamadığı herhangi bir dijital dosya türü
+
+## Veri biçimi
+
+Yüklenen dosyalar ikili ek olarak saklanır:
+
+- **Biçim:** Orijinal biçimde korunur (PDF, XLSX, DOCX, vb.)
+- **Adlandırma:** `{instanceID}-{fieldname}.{uzanti}`
+- **Depolama:** Gönderimle birlikte sunucu medya klasörüne yüklenir
+- **Erişim:** Gönderim yönetimi arayüzünden indirilebilir
+
+## rtSurvey uzantıları
+
+### Kabul edilen dosya türleri
+
+Hangi dosya türlerinin seçilebileceğini kısıtlamak için `parameters` sütununu kullanın:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| file | report | Denetim raporunu yükleyin | `accept=.pdf` |
+| file | spreadsheet | Veri dosyasını yükleyin | `accept=.xlsx,.csv` |
+
+`accept` parametresi standart dosya uzantısı sözdizimini kullanır (virgülle ayrılmış).
+
+### Dosya boyutu rehberliği
+
+rtSurvey soru düzeyinde katı bir dosya boyutu sınırı uygulamaz, ancak sunucu yükleme sınırı geçerlidir. Sayımcıya beklentileri iletmek için `hint` kullanın:
+
+| type | name | label | hint |
+|------|------|-------|------|
+| file | receipt | Ödeme makbuzunu yükleyin | Kabul edilen: PDF veya görsel. Maksimum dosya boyutu: 5 MB |
+
+### Cihaz dosya sistemi ve bulut depolama entegrasyonu
+
+Android ve iOS'ta, `file` sorusu cihazın yerel dosya seçicisini açar ve şunlara erişim sağlayabilir:
+- Yerel cihaz depolama alanı
+- SD kart (Android)
+- iCloud Drive (iOS)
+- Google Drive, Dropbox (yüklüyse)
+
+Web'de tarayıcının standart dosya yükleme iletişim kutusunu açar.
+
+## Örnek kullanım
+
+### Gerekli PDF yükleme
+
+| type | name | label | hint | required | required_message |
+|------|------|-------|------|----------|-----------------|
+| file | signed_consent | İmzalı onay formunu yükleyin | Yalnızca PDF, maks 2MB | yes | Bir onay formu gereklidir |
+
+### Koşullu belge yükleme
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_land_title | Hanenin arazi tapusu var mı? | |
+| file | land_title_doc | Arazi tapusunun fotoğrafını veya taranmış kopyasını yükleyin | `${has_land_title} = 'yes'` |
+
+## En İyi Uygulamalar
+
+1. Dosya türlerini kısıtlamak için `accept` kullanın — bu sayımcıların yanlışlıkla yanlış dosya yüklemesini önler.
+2. `hint` sütununa her zaman boyut ve biçim rehberliği ekleyin.
+3. Fotoğraflar ve görseller için `image` türünü kullanın — daha iyi sıkıştırma ve tutarlı biçim işleme sunar.
+4. Dosya ekleri olan büyük anketler için veri depolama ve indirme bant genişliğinizi buna göre planlayın.
+5. Dağıtımdan önce hedef cihaz türünde (Android, iOS veya web) dosya seçiciyi test edin — bulut sürücülerine erişim farklılık gösterir.
+
+## Veri işleme değerlendirmeleri
+
+- Dosyalar orijinal biçimlerinde saklanır; rtSurvey tarafından dönüştürülmez veya sıkıştırılmaz.
+- İndirdikten sonra dosyaları analiz edin — rtSurvey dosya içeriklerini ayıklamaz veya dizinlemez.
+- Büyük dosya ekleri, tam bir veri kümesi indirmek için gereken süreyi önemli ölçüde artırır.
+
+## Sınırlamalar
+
+- Dosya soruları dosya içeriğini doğrulamaz — yalnızca `accept` aracılığıyla dosya uzantısı kontrolü kullanıcı arayüzü düzeyinde uygulanır.
+- Çok büyük dosyalar (100 MB+) düşük bağlantı ortamlarında yükleme sırasında zaman aşımına uğrayabilir.
+- Çevrimdışı sayımcılar dosya ekleyebilir ancak bağlantı yeniden sağlanana kadar yüklenmez.
+- Bazı cihaz yapılandırmaları belirli depolama konumlarına erişimi kısıtlayabilir (örn. kurumsal MDM politikaları).

@@ -1,0 +1,110 @@
+---
+description: Tinklelio išdėstymas leidžia pozicionuoti laukus CSS tinklelyje grupėje,
+  įgalinant kelių stulpelių formos dizainą.
+icon: manage_search
+title: Tinklelio išdėstymas
+---
+
+
+Funkcija **Tinklelio išdėstymas** leidžia išdėlioti klausimus **kelių stulpelių tinklelyje** grupėje naudojant žymę `gridformat<>`. Tai naudinga tankioms duomenų įvedimo formoms, kuriose keli susiję laukai turėtų būti greta, o ne vertikaliai sudėti.
+
+---
+
+## Kaip tai veikia
+
+Tinklelio išdėstymas taikomas dviem lygmenimis:
+
+1. **Grupė** — nustatykite `appearance: field-list grid(weight=N)`, kad apibrėžtumėte, kiek stulpelių turi tinklelis
+2. **Kiekvienas laukas grupėje** — nustatykite `appearance: gridformat<row=R col=C colspan=S/>`, kad pozicionuotumėte lauką
+
+Tinklelis naudoja 12 stulpelių Bootstrap stiliaus sistemą. `weight=N` apibrėžia, kiek loginių stulpelių turi jūsų tinklelis; kiekvienas stulpelis užima `12/N` Bootstrap stulpelių.
+
+---
+
+## Grupės lygio išvaizda
+
+| Išvaizda | Aprašymas |
+|------------|-------------|
+| `field-list grid(weight=2)` | 2 stulpelių tinklelis (kiekvienas stulpelis = 6 Bootstrap stulp.) |
+| `field-list grid(weight=3)` | 3 stulpelių tinklelis (kiekvienas stulpelis = 4 Bootstrap stulp.) |
+| `field-list grid(weight=4)` | 4 stulpelių tinklelis (kiekvienas stulpelis = 3 Bootstrap stulp.) |
+| `field-list grid(weight=6)` | 6 stulpelių tinklelis (kiekvienas stulpelis = 2 Bootstrap stulp.) |
+
+---
+
+## Lauko lygio `gridformat<>` sintaksė
+
+```
+gridformat<row=R col=C colspan=S/>
+gridformat<row=R col=C colspan=S backgroundcolor=SPALVA/>
+```
+
+| Atributas | Aprašymas |
+|-----------|-------------|
+| `row` | Eilutės numeris (skaičiuojama nuo 1) |
+| `col` | Stulpelio numeris (skaičiuojama nuo 1, tinklelyje apibrėžtame `weight`) |
+| `colspan` | Stulpelių skaičius, kurį apima šis laukas (numatytasis 1) |
+| `backgroundcolor` | Neprivaloma CSS spalva lauko fonui (pvz., `#f0f0f0`, `lightblue`) |
+
+---
+
+## Pavyzdys: 2 stulpelių namų ūkio apklausos sekcija
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | demographics | Demografija | `field-list grid(weight=2)` |
+| text | first_name | Vardas | `gridformat<row=1 col=1/>` |
+| text | last_name | Pavardė | `gridformat<row=1 col=2/>` |
+| integer | age | Amžius | `gridformat<row=2 col=1/>` |
+| select_one gender | gender | Lytis | `gridformat<row=2 col=2/>` |
+| text | address | Pilnas adresas | `gridformat<row=3 col=1 colspan=2/>` |
+| end_group | | | |
+
+Tai atvaizduojama kaip:
+
+```
+[ Vardas             ] [ Pavardė             ]
+[ Amžius             ] [ Lytis               ]
+[ Pilnas adresas (apima abu stulpelius)      ]
+```
+
+---
+
+## Pavyzdys: 3 stulpelių sklypo duomenų įvedimas
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | plot_data | Sklypo duomenys | `field-list grid(weight=3)` |
+| text | plot_id | Sklypo ID | `gridformat<row=1 col=1/>` |
+| decimal | area_ha | Plotas (ha) | `gridformat<row=1 col=2/>` |
+| select_one crop_type | crop | Kultūros tipas | `gridformat<row=1 col=3/>` |
+| decimal | yield | Derlius (kg) | `gridformat<row=2 col=1/>` |
+| decimal | revenue | Pajamos | `gridformat<row=2 col=2/>` |
+| text | notes | Pastabos | `gridformat<row=2 col=3/>` |
+| end_group | | | |
+
+---
+
+## Fono spalvos
+
+Naudokite `backgroundcolor`, kad vizualiai išskirtumėte sekcijas:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | section_a | A sekcija | `gridformat<row=1 col=1 colspan=2 backgroundcolor=#e8f4f8/>` |
+
+---
+
+## Geriausios praktikos
+
+1. Naudokite tinklelio išdėstymą tik **duomenų įvedimui intensyviuose** ekranuose, kur laukai greta iš tikrųjų sumažina slinkimą.
+2. Laikykite `colspan=1` laukus trumpus (ID, kodai, trumpi pasirinkimai) — plačios etiketės blogai nutrūksta siauruose tinklelio stulpeliuose.
+3. Naudokite `colspan=N` laukams su ilgomis etiketėmis ar kelių eilučių teksto įvestimis.
+4. Patikrinkite mažiausio ekrano dydžio, kuriuo tikitės, kad surašytojai naudos — 4 stulpelių tinklelis yra ankštas telefone.
+5. Tinklelio išdėstymas geriausiai veikia žiniatinklio ir planšetinio kompiuterio formos faktoriuose; mobiliuosiuose telefonuose 2 stulpelių išdėstymas paprastai yra maksimalus patogus plotis.
+
+## Apribojimai
+
+- `gridformat<>` veikia tik grupėje su `grid(weight=N)` išvaizda — aukščiausiu lygiu neturi jokio poveikio.
+- Tinklelio išdėstymas yra rtSurvey žiniatinklio formos plėtinys ir gali netinkamai atvaizduotis kituose ODK suderintuose klientuose.
+- Eilučių ir stulpelių pozicionavimas nėra tikrinamas formos kūrimo metu — persidengiančių laukų abu atvaizduosis, tačiau gali atrodyti sugedę.

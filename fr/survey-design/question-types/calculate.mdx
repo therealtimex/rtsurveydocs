@@ -1,0 +1,113 @@
+---
+description: ''
+icon: calculate
+title: Calculate (Calculer)
+---
+
+
+Les questions de type `calculate` dans XLSForms et rtSurvey sont utilisées pour effectuer des calculs basés sur d'autres champs ou valeurs de votre formulaire. Ces questions ne s'affichent pas à l'utilisateur mais s'exécutent en arrière-plan, stockant leurs résultats pour une utilisation ultérieure ou pour la soumission.
+
+## Syntaxe
+
+Dans le XLSForm, une question `calculate` est définie comme suit :
+
+| type      | name     | label | calculation |
+|-----------|----------|-------|-------------|
+| calculate | calc_q1  |       | ${q1} + ${q2} |
+
+- **type** : Toujours `calculate` pour ce type de question.
+- **name** : Un nom unique pour la question `calculate`.
+- **label** : Généralement laissé vide car les questions `calculate` ne sont pas affichées aux utilisateurs.
+- **calculation** : La formule à évaluer.
+
+## Utilisations
+
+Les questions `calculate` sont couramment utilisées pour :
+
+1. Effectuer des opérations arithmétiques
+2. Concaténer des chaînes de caractères
+3. Appliquer une logique ou des fonctions complexes
+4. Stocker des résultats intermédiaires pour une utilisation ultérieure
+
+## Exemples
+
+### Arithmétique de Base
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | total    | ${price} * ${quantity} |
+```
+
+### Concaténation de Chaînes
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
+```
+
+### Utilisation de Fonctions
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
+```
+
+## Utilisation Avancée dans rtSurvey
+
+### Fonction pulldata()
+
+rtSurvey prend en charge la fonction `pulldata()` dans les champs `calculate`, vous permettant de récupérer des données à partir de fichiers CSV externes :
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
+```
+
+#### Syntaxe
+
+La syntaxe de base pour `pulldata()` est :
+
+```
+pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
+```
+
+- 'csv_filename' : Nom du fichier CSV (sans l'extension .csv)
+- 'column_to_return' : Nom de la colonne contenant la donnée que vous souhaitez extraire
+- 'key_column' : Nom de la colonne pour la correspondance
+- ${matching_value} : Valeur à rechercher dans la colonne clé (souvent une variable du formulaire)
+
+#### Notes Importantes
+
+1. Le fichier CSV doit être téléchargé avec votre XLSForm lors du déploiement de l'enquête.
+2. Utilisez des virgules comme séparateurs dans votre fichier CSV, et non des points-virgules.
+3. Évitez les virgules à l'intérieur des champs de données de votre CSV, car elles peuvent causer des problèmes d'analyse.
+4. `pulldata()` ne prend en charge que les relations 1-à-1. Si plusieurs correspondances sont trouvées, il ne renvoie que la première.
+5. Il peut y avoir des limitations sur la longueur du texte pouvant être extrait (environ 76 caractères).
+6. Vous pouvez utiliser `pulldata()` dans les contraintes pour valider les entrées par rapport aux données du CSV.
+
+### Calculs Conditionnels
+
+Vous pouvez utiliser des instructions `if()` pour les calculs conditionnels :
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+```
+
+## Meilleures Pratiques
+
+1. Utilisez des noms significatifs pour les champs `calculate` afin d'améliorer la lisibilité du formulaire.
+2. Évitez les calculs trop complexes dans un seul champ ; décomposez-les si nécessaire.
+3. Testez minutieusement vos calculs, en particulier lors de l'utilisation de formules complexes ou de données externes.
+4. N'oubliez pas que les champs `calculate` s'exécutent chaque fois que le formulaire est évalué, ce qui peut avoir un impact sur les performances pour des calculs très complexes ou nombreux.
+5. Lors de l'utilisation de `pulldata()`, assurez-vous que vos fichiers CSV sont correctement formatés et testez-les soigneusement avec vos données et votre structure de formulaire spécifiques.
+
+## Limitations
+
+- Les champs `calculate` ne sont pas directement modifiables par les utilisateurs.
+- Le résultat d'un champ `calculate` n'est pas immédiatement visible à moins d'être référencé dans un champ d'affichage ou utilisé dans la logique du formulaire.

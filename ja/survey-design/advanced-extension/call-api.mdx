@@ -1,0 +1,127 @@
+---
+description: Call APIを使用すると、調査が外部Webサービスからデータを取得し、回答でフィールドを入力したり回答を検証したりできます。
+icon: manage_search
+title: Call API
+---
+
+
+**Call API**機能により、調査フィールドが外部サービスにHTTPリクエストを送り、レスポンスを使って計算値を入力したりユーザー入力を検証したりできます。これにより、データ収集中のリアルタイム検索、ID検証、バーコード検索、およびその他のサーバー側チェックが可能になります。
+
+2つの関数があります：
+
+- `callapi()` — APIから値を取得し、`calculate`または`text`フィールドに保存する
+- `callapi-verify()` — APIを呼び出し、レスポンスが期待値と一致しない場合に進行をブロックする（`constraint`で使用）
+
+---
+
+## `callapi()` — APIレスポンスの取得と保存
+
+### 構文
+
+`callapi()`を`calculate`または`text`フィールドの**`calculation`**列に配置します：
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### パラメーター
+
+| # | パラメーター | 説明 |
+|---|-----------|-------------|
+| 1 | `method` | HTTPメソッド：`'GET'`または`'POST'` |
+| 2 | `url` | APIエンドポイントURL |
+| 3 | `allowed_auto` | フィールドに到達したときに自動的に呼び出す場合は`1`；手動トリガーボタンが必要な場合は`0` |
+| 4 | `max_retry` | 失敗時の最大再試行回数 |
+| 5 | `no_overwrite` | フィールドに既に値がある場合に既存の値を保持する場合は`1`；常に上書きする場合は`0` |
+| 6 | `extract_expr` | レスポンスから目的の値を抽出するJSONPath式（例：`$.data.name`） |
+| 7 | `timeout` | リクエストタイムアウト（ミリ秒） |
+| 8 | `lifetime` | キャッシュされたレスポンスが再取得前に有効な時間（ミリ秒） |
+| 9 | `response_q` | 生のHTTPレスポンスコードを保存するフィールドの名前（例：`${response_status}`） |
+| 10 | `call_type` | *（オプション）*特別な呼び出しモード：`'lazy-upload'`または`'lazy-upload-multiple'` |
+| 11 | `post_body` | *（オプション）*POSTボディ文字列。フォームフィールドを`##fieldname##`で参照する |
+
+### 例：GETリクエストでIDによる世帯の検索
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | 世帯ID | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+| note | hh_display | 世帯：${hh_name} | | |
+
+### 例：JSONボディを使用したPOSTリクエスト
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+`post_body`では、フォームフィールドの現在の値を注入するために`##fieldname##`を使用します。
+
+### 外観：`callapi`
+
+API呼び出し統合を有効にするには、フィールドの`appearance`列に`callapi`を追加します：
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | api_result | | callapi | `callapi('GET', ...)` |
+
+`allowed_auto`が`0`の場合、rtSurveyは調査員が手動でタップする**「取得」ボタン**を表示します。
+
+---
+
+## `callapi-verify()` — APIに対する値の検証
+
+`callapi-verify()`は、APIが入力された値が有効であることを確認するまでフィールドの送信をブロックします。**`constraint`**列で使用します。
+
+### 構文
+
+```
+callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
+```
+
+### パラメーター
+
+| # | パラメーター | 説明 |
+|---|-----------|-------------|
+| 1 | `method` | HTTPメソッド：`'GET'`または`'POST'` |
+| 2 | `url` | 検証APIエンドポイント |
+| 3 | `extract_expr` | レスポンスから期待値を抽出するJSONPath |
+| 4 | `match_expr` | 抽出された値とフィールド値を比較する式（例：`$.status = 'valid'`） |
+| 5 | `timeout` | リクエストタイムアウト（ミリ秒） |
+| 6 | `constraint_mode` | 警告のみの場合は`'soft'`；進行をブロックする場合は`'hard'` |
+| 7 | `post_body` | *（オプション）*`##fieldname##`代替付きのPOSTボディ |
+| 8 | `message` | *（オプション）*エラーメッセージ。多言語をサポート：`<en>Invalid!</en><vi>Không hợp lệ!</vi>` |
+
+### 例：資産レジストリに対するバーコードの検証
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| barcode | asset_code | 資産バーコードをスキャンしてください | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` | 資産がレジストリに見つかりません |
+
+### 外観：`callapi-verify(...)`
+
+`constraint`に`callapi-verify()`があるフィールドの`appearance`列には、このフィールドがAPI検証を使用することをrtSurveyに知らせるために`callapi-verify(params)`または`callapi-verify(dynamicParams)`を含める必要があります。
+
+---
+
+## callapiと並行したApp APIデータの使用
+
+`callapi()`と`pulldata('app-api', 'user.token')`を組み合わせて、認証済みユーザーのトークンをAPIリクエストに注入します：
+
+```
+callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, '', '',
+  concat('{"token":"', pulldata('app-api','user.token'), '","id":"##item_id##"}'))
+```
+
+## ベストプラクティス
+
+1. 常に適切な`timeout`（5000〜15000 ms）を設定してください — 0や非常に高い値は使用しないでください。
+2. 調査員が意識的にトリガーすべき検証（例：IDチェック）には`allowed_auto=0`を設定してください。
+3. フィールドが後で編集される可能性があり、手動修正を上書きで再取得したくない場合は`no_overwrite=1`を設定してください。
+4. 生のレスポンステキストに依存するのではなく、特定のJSONPathで`extract_expr`を使用してください。
+5. オフラインモードでAPIコールをテストしてください — callapiは優雅に失敗してエラーを表示しますが、重要でないフィールドではフォームを完了できるべきです。
+
+## 制限事項
+
+- 呼び出し時にネットワーク接続が必要です — デバイスがオフラインの場合は呼び出しが失敗します。
+- APIレスポンスはJSONでなければなりません — XMLまたはプレーンテキストのレスポンスには追加の解析が必要です。
+- 高い呼び出し頻度（例：繰り返しインスタンスごとに1つのAPIコール）はフォームナビゲーションを遅くする可能性があります。

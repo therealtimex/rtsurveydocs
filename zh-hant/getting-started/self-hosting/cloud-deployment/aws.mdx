@@ -1,0 +1,118 @@
+---
+description: 使用 aws-ec2.sh 使用者資料腳本在 AWS EC2 實例上部署 rtCloud。
+icon: cloud
+title: AWS EC2
+---
+
+
+在啟動 EC2 實例時，使用 `aws-ec2.sh` 作為**使用者資料**腳本。該腳本在首次啟動時自動執行。
+
+**下載腳本：** [aws-ec2.sh](/scripts/aws-ec2.sh)
+
+---
+
+## 步驟 1 — 填寫設定
+
+開啟腳本並編輯頂部的 `CONFIGURATION` 區塊：
+
+```bash
+# --- Required ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # Change after first login
+
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- Embedded Keycloak ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
+```
+
+| 欄位 | 必填 | 說明 |
+|-------|----------|-------------|
+| `PROJECT_ID` | 是 | 用作資料庫名稱和 Keycloak 客戶端 ID。小寫，無空格。 |
+| `ADMIN_PASSWORD` | 否 | 應用程式管理員密碼和 Keycloak 管理員密碼。預設為 `admin`——**首次登入後請更改**。 |
+| `DOMAIN` | 否 | 用於 HTTPS 的域名。留空以僅使用 HTTP 模式。 |
+| `LETSENCRYPT_EMAIL` | 是（如果設定了 DOMAIN） | Let's Encrypt 通知的電子郵件。 |
+| `EMBED_KEYCLOAK` | 否 | `true` 以部署嵌入式 Keycloak（需要 4 GB RAM）。 |
+
+> **安全性：** 所有密碼預設為 `admin`。首次登入後請立即更改。
+
+---
+
+## 步驟 2 — 啟動 EC2 實例
+
+在 [AWS EC2 控制台](https://console.aws.amazon.com/ec2)：
+
+1. 點選**啟動實例**
+2. **AMI：** Ubuntu Server 22.04 LTS（64 位 x86）
+3. **實例類型：** `t3.medium`（4 GB RAM）或更大
+4. **金鑰對：** 選取或建立一個用於 SSH 存取的金鑰對
+5. **網路設定：** 建立或選取安全群組（見下方）
+6. **進階詳細資料** → **使用者資料** → 貼上完整腳本內容
+7. 點選**啟動實例**
+
+---
+
+## 步驟 3 — 設定安全群組
+
+在實例的安全群組中開啟以下連接埠：
+
+| 連接埠 | 協定 | 來源 | 用途 |
+|------|----------|--------|---------|
+| 22 | TCP | 您的 IP | SSH 存取 |
+| 80 | TCP | 0.0.0.0/0 | HTTP（由 Nginx 重新導向至 HTTPS） |
+| 443 | TCP | 0.0.0.0/0 | HTTPS |
+| 3838 | TCP | 0.0.0.0/0 | Shiny 直接存取 |
+
+> **請勿**開啟連接埠 3306（MySQL）——它絕不應公開存取。
+
+---
+
+## 步驟 4 — 新增 DNS 記錄
+
+實例啟動時，在您的 DNS 提供商中新增一個 **A 記錄**：
+
+```
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
+TTL   : 300
+```
+
+---
+
+## 步驟 5 — 監控進度
+
+```bash
+ssh ubuntu@<instance-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## 步驟 6 — 存取應用程式
+
+設定完成後，日誌顯示包含您的應用程式 URL 和憑證的摘要。使用使用者名稱 `admin` 和密碼 `admin` 登入，然後立即更改您的密碼。
+
+---
+
+## 部署後
+
+### 更改密碼
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### 查看所有容器
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
+
+### 指派彈性 IP（選用）
+
+如果停止並啟動實例，公開 IP 會更改。要保持穩定的 IP，請在 EC2 控制台中配置**彈性 IP**並將其與實例關聯。

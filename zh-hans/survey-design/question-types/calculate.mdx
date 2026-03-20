@@ -1,0 +1,113 @@
+---
+description: ''
+icon: calculate
+title: Calculate
+---
+
+
+XLSForm 和 rtSurvey 中的 calculate 题目用于根据表单中的其他字段或值执行计算。这些题目不向用户显示，而是在后台运行，存储其结果供以后使用或提交。
+
+## 语法
+
+在 XLSForm 中，calculate 题目定义如下：
+
+| type      | name     | label | calculation |
+|-----------|----------|-------|-------------|
+| calculate | calc_q1  |       | ${q1} + ${q2} |
+
+- **type**：此题目类型始终为 "calculate"。
+- **name**：calculate 题目的唯一名称。
+- **label**：通常留空，因为 calculate 题目不向用户显示。
+- **calculation**：要评估的公式。
+
+## 用途
+
+Calculate 题目通常用于：
+
+1. 执行算术运算
+2. 连接字符串
+3. 应用复杂逻辑或函数
+4. 存储中间结果供以后使用
+
+## 示例
+
+### 基本算术
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | total    | ${price} * ${quantity} |
+```
+
+### 字符串连接
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
+```
+
+### 使用函数
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
+```
+
+## rtSurvey 高级用法
+
+### pulldata() 函数
+
+rtSurvey 在 calculate 字段中支持 `pulldata()` 函数，允许您从外部 CSV 文件检索数据：
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
+```
+
+#### 语法
+
+pulldata() 的基本语法为：
+
+```
+pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
+```
+
+- 'csv_filename'：CSV 文件的名称（不含 .csv 扩展名）
+- 'column_to_return'：包含您想要提取的数据的列名
+- 'key_column'：用于匹配的列名
+- ${matching_value}：在键列中查找的值（通常是表单中的变量）
+
+#### 重要说明
+
+1. 部署调查时，CSV 文件必须与您的 XLSForm 一起上传。
+2. 在 CSV 文件中使用逗号作为分隔符，而不是分号。
+3. 避免在 CSV 的数据字段中使用逗号，因为这会导致解析问题。
+4. pulldata() 仅支持一对一关系。如果找到多个匹配项，只返回第一个。
+5. 可提取的文本长度可能有限制（约 76 个字符）。
+6. 您可以在约束中使用 pulldata() 来根据 CSV 数据验证输入。
+
+### 条件计算
+
+您可以使用 if() 语句进行条件计算：
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+```
+
+## 最佳实践
+
+1. 使用有意义的名称来命名 calculate 字段，以提高表单可读性。
+2. 避免在单个字段中进行过于复杂的计算；如有必要，将其分解。
+3. 彻底测试您的计算，尤其是在使用复杂公式或外部数据时。
+4. 请记住，calculate 字段在每次评估表单时都会运行，对于非常复杂或大量的计算可能影响性能。
+5. 使用 pulldata() 时，确保 CSV 文件格式正确，并使用您的特定数据和表单结构进行彻底测试。
+
+## 限制
+
+- Calculate 字段不能由用户直接编辑。
+- Calculate 字段的结果不会立即可见，除非在显示字段中引用或用于表单逻辑。

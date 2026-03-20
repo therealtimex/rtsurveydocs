@@ -1,0 +1,94 @@
+---
+description: select_one_from_file e select_multiple_from_file caricano le scelte dinamicamente
+  da un file CSV o XML esterno allegato al modulo.
+icon: file-earmark-spreadsheet
+title: Selezione da file
+---
+
+
+`select_one_from_file` e `select_multiple_from_file` funzionano come `select_one` e `select_multiple`, ma invece di definire le scelte nel foglio di lavoro **choices**, le scelte vengono caricate da un **file CSV o XML esterno** allegato al modulo. Questo è utile quando il tuo elenco di scelte è molto lungo, cambia frequentemente, o deve essere aggiornato senza ricostruire l'intero modulo.
+
+## Specifica XLSForm di base
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | Seleziona la struttura sanitaria |
+| select_multiple_from_file crops.csv | crops | Quali colture coltiva la famiglia? |
+
+Il nome del file dopo il nome del tipo deve corrispondere al nome del file che alleghi quando carichi il modulo.
+
+## Formato del file CSV
+
+Il tuo file CSV deve avere almeno due colonne: `name` (il valore memorizzato) e `label` (il testo visualizzato). Puoi aggiungere qualsiasi numero di colonne extra per il filtraggio.
+
+**health_facilities.csv:**
+
+```
+name,label,district,type
+HF001,Clinica Centrale di Nairobi,Nairobi,clinic
+HF002,Centro Sanitario di Westlands,Nairobi,health_centre
+HF003,Ospedale Distrettuale di Kisumu,Kisumu,hospital
+```
+
+## Filtraggio delle scelte
+
+Usa la colonna `choice_filter` per mostrare solo le scelte che corrispondono al contesto corrente. Fai riferimento alle colonne CSV con il loro nome di colonna direttamente (senza `${}`):
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | Seleziona distretto | |
+| select_one_from_file health_facilities.csv | facility | Seleziona struttura | district = ${district} |
+
+In questo esempio, vengono mostrate solo le strutture nel distretto selezionato. Il `district` in `choice_filter` si riferisce alla colonna `district` nel file CSV; `${district}` si riferisce al campo del modulo denominato `district`.
+
+## Utilizzi
+
+Le domande di selezione da file sono comunemente usate per:
+
+1. **Elenchi di scelte lunghi** — strutture sanitarie, scuole, villaggi, elenchi di specie (centinaia o migliaia di elementi)
+2. **Elenchi aggiornati frequentemente** — quando l'elenco principale cambia tra i cicli del sondaggio, aggiorna solo il CSV senza ricostruire il modulo
+3. **Dati di riferimento condivisi** — un file CSV usato su più moduli
+4. **Selezioni a cascata filtrate** — carica tutte le regioni/distretti/villaggi in un file, poi filtra per la selezione padre
+
+## Allegare il file
+
+Quando carichi il tuo modulo in rtSurvey, allega il file CSV come **allegato media**. Il nome del file nella definizione del modulo deve corrispondere esattamente al nome del file dell'allegato.
+
+<Warning>
+I nomi dei file distinguono tra maiuscole e minuscole. `Health_Facilities.csv` e `health_facilities.csv` vengono trattati come file diversi.
+</Warning>
+
+## Utilizzo di `choice-label()` con from-file
+
+Per visualizzare l'etichetta di una scelta selezionata in una nota o in un campo calculate:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | Seleziona struttura | |
+| calculate | facility_label | | choice-label(${facility}, ${facility}) |
+| note | summary | Struttura selezionata: ${facility_label} | |
+
+## Best practice
+
+1. Mantieni i tuoi file CSV sotto 5.000 righe per buone prestazioni sui dispositivi mobili.
+2. Includi sempre una colonna `name` e `label` — le colonne aggiuntive sono opzionali.
+3. Per le selezioni a cascata, usa un singolo CSV con una colonna padre e filtra con `choice_filter`.
+4. Versiona i nomi dei tuoi file CSV (es. `facilities_v3.csv`) quando apporti modifiche importanti alla struttura delle colonne.
+5. Testa le espressioni di filtraggio con cura — un errore di battitura in `choice_filter` mostrerà silenziosamente nessuna scelta.
+
+## Limitazioni
+
+- I file CSV molto grandi (10.000+ righe) possono rallentare il caricamento del modulo, specialmente su dispositivi di fascia bassa.
+- I file CSV devono essere caricati insieme al modulo — non possono essere recuperati da un URL in fase di esecuzione (usa `search()` o `pulldata()` per le ricerche dinamiche).
+- `select_multiple_from_file` è meno comunemente supportato tra i client — verifica la compatibilità prima di usarlo.
+
+## Confronto con `search()`
+
+| | `select_one_from_file` | Appearance `search()` |
+|--|----------------------|----------------------|
+| Fonte delle scelte | File CSV/XML allegato | Query al database lato server |
+| Funziona offline | Sì (il file è incluso) | Richiede connettività |
+| Numero di scelte | Limitato dalla memoria del dispositivo | Illimitato (paginato) |
+| Dati in tempo reale | No | Sì |
+
+Per dataset grandi, frequentemente modificati o lato server, vedi [Ricerca dinamica](../advanced-extension/dynamic-search).

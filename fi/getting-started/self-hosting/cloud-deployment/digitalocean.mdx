@@ -1,0 +1,130 @@
+---
+description: Ota rtCloud käyttöön DigitalOcean Dropletilla automaattisten user-data-skriptien
+  avulla.
+icon: water_drop
+title: DigitalOcean
+---
+
+
+DigitalOcean käyttää **User Data** -skriptejä, jotka ajetaan automaattisesti ensimmäisellä käynnistyksellä. Täytät konfiguraatiomuuttujat skriptin yläosassa ja liität sitten koko skriptin Dropletin luomisen yhteydessä.
+
+> Toisin kuin Linode StackScripts -skripteissa, DigitalOceanissa ei ole lomakekäyttöliittymää — sinun on muokattava skriptiä suoraan ennen liittämistä.
+
+**Lataa skripti:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+
+---
+
+## Upotettu Keycloak (suositeltu)
+
+Käytä `digitalocean-droplet-keycloak-embed.sh`-skriptiä yksinkertaisimpaan asennukseen sisäänrakennetulla SSO:lla.
+
+### Vaihe 1 — Täytä konfiguraatio
+
+Avaa skripti ja muokkaa yläosassa olevaa `CONFIGURATION`-lohkoa:
+
+```bash
+# --- Pakolliset ---
+PROJECT_ID="rtsurvey"                  # Projektin yksilöllinen tunniste (ei välilyöntejä)
+ADMIN_PASSWORD="admin"                 # Sovelluksen järjestelmänvalvojan ja Keycloakin salasana — vaihda ensimmäisen kirjautumisen jälkeen
+
+# --- Verkkotunnus + SSL ---
+DOMAIN="myapp.example.com"            # Verkkotunnuksesi — DNS A-tietueen täytyy osoittaa tähän
+PROJECT_URL=""                         # Jätä tyhjäksi, ellet ole Cloudflaren/välityspalvelimen takana
+LETSENCRYPT_EMAIL="admin@example.com" # Sähköposti Let's Encryptin ilmoituksia varten
+
+# --- Valinnaiset ---
+STATA_ENABLED="false"
+TZ="Asia/Ho_Chi_Minh"
+```
+
+| Kenttä | Pakollinen | Kuvaus |
+|-------|----------|-------------|
+| `PROJECT_ID` | Kyllä | Käytetään tietokannan nimenä ja Keycloakin asiakastunnuksena. Pienet kirjaimet, ei välilyöntejä. |
+| `ADMIN_PASSWORD` | Ei | Sovelluksen järjestelmänvalvojan ja Keycloakin hallintakonsolin salasana. Oletuksena `admin` — **vaihda ensimmäisen kirjautumisen jälkeen**. |
+| `DOMAIN` | Kyllä | Verkkotunnuksesi. DNS A-tietueen täytyy osoittaa Dropletin IP-osoitteeseen. |
+| `LETSENCRYPT_EMAIL` | Kyllä | Sähköpostiosoite Let's Encryptin sertifikaatti-ilmoituksia varten. |
+| `PROJECT_URL` | Ei | Ohita julkinen URL. Jätä tyhjäksi käyttääksesi `DOMAIN`-arvoa. Hyödyllinen Cloudflaren takana. |
+
+> **Turvallisuus:** Kaikki salasanat ovat oletuksena `admin`. Vaihda ne välittömästi ensimmäisen kirjautumisen jälkeen.
+
+### Vaihe 2 — Luo Droplet
+
+[DigitalOceanin ohjauspaneelissa](https://cloud.digitalocean.com):
+
+1. Napsauta **Luo** → **Dropletit**
+2. Valitse **Ubuntu 22.04 LTS** kuvaksi
+3. Valitse **Perus, 4 Gt RAM / 2 vCPU** tai suurempi
+4. Vieritä kohtaan **Lisäasetukset** → valitse **Lisää alustuksskriptejä**
+5. Liitä koko skriptin sisältö tekstialueelle
+6. Napsauta **Luo Droplet**
+
+### Vaihe 3 — Lisää DNS-tietue
+
+Dropletin käynnistyessä lisää **A-tietue** DNS-palveluntarjoajallesi:
+
+```
+Tyyppi  : A
+Nimi    : myapp          (tai @ juuriverkkotunnukselle)
+Arvo    : <droplet-ip>
+TTL     : 300
+```
+
+### Vaihe 4 — Seuraa edistymistä
+
+SSH Dropletiin ja katso lokia:
+
+```bash
+ssh root@<droplet-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+Skripti tulostaa palvelimesi IP-osoitteen alussa — lisää DNS-tietue heti, kun näet sen.
+
+### Vaihe 5 — Käytä sovellusta
+
+Kun asennus on valmis, loki näyttää yhteenvedon:
+
+```
+============================================================
+ rtCloud-käyttöönotto valmis! (Upotettu Keycloak)
+============================================================
+ Sovelluksen URL   : https://myapp.example.com
+ Järjestelmänvalvoja     : admin / admin
+ Keycloak  : https://myapp.example.com/auth/admin
+
+ !! TURVALLISUUS: Kaikki salasanat ovat oletuksena 'admin'.
+    Vaihda ne välittömästi ensimmäisen kirjautumisen jälkeen.
+============================================================
+```
+
+Avaa `https://myapp.example.com` selaimessasi ja kirjaudu sisään käyttäjätunnuksella `admin` ja salasanalla `admin`.
+
+> **Vaihda salasanasi** välittömästi kirjautumisen jälkeen yläreunan **Asetukset**-valikon kautta.
+
+---
+
+## Käyttöönoton jälkeen
+
+### Vaihda salasana
+
+SSH Dropletiin, muokkaa `.env`-tiedostoa ja käynnistä asianomainen kontti uudelleen:
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Päivitä verkkotunnus
+
+Jos määrität eri verkkotunnuksen käyttöönoton jälkeen, päivitä `PROJECT_URL` `.env`-tiedostossa:
+
+```bash
+nano /opt/rtcloud/.env   # päivitä PROJECT_URL=
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Tarkastele kaikkia kontteja
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```

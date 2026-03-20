@@ -1,0 +1,92 @@
+---
+description: 'Các tính năng ảnh nâng cao trong rtSurvey: watermark, hiển thị lưới
+  media và chú thích ảnh.'
+icon: manage_search
+title: Ảnh nâng cao (Advanced images)
+---
+
+
+Ngoài loại câu hỏi `image` tiêu chuẩn, rtSurvey cung cấp các phần mở rộng cho **watermark** ảnh chụp và hiển thị nhiều ảnh trong **lưới media**. Tính năng này hữu ích cho các khảo sát dựa trên bằng chứng, nơi ảnh cần được đánh dấu bằng danh tính người điều tra hoặc siêu dữ liệu khảo sát, và cho giao diện xem xét trực quan.
+
+---
+
+## Watermark
+
+Tính năng watermark phủ văn bản hoặc hình ảnh lên ảnh chụp trước khi lưu. Tính năng này dùng để gắn nhãn ảnh thực địa với ngày tháng, tên người điều tra, vị trí GPS, hoặc bất kỳ dữ liệu khảo sát nào khác — làm khó hơn việc dùng ảnh có sẵn thay cho ảnh mới chụp làm bằng chứng.
+
+### Thiết lập
+
+Dùng `watermark()` trong cột **`calculation`** của trường `image`, kết hợp với appearance `watermark`:
+
+```
+watermark(type, size, distance, color, shadow, rotate, blur)
+```
+
+| Tham số | Mô tả |
+|---------|-------|
+| `type` | `'text'` cho watermark văn bản; `'file'` cho watermark hình ảnh |
+| `size` | Cỡ chữ tính bằng pixel (text) hoặc kích thước watermark tính theo % chiều rộng ảnh (file) |
+| `distance` | Khoảng cách giữa các ô watermark lặp lại (pixel) |
+| `color` | Màu văn bản (màu CSS hoặc hex). Không dùng cho loại `file` |
+| `shadow` | Màu bóng đổ (màu CSS hoặc hex) |
+| `rotate` | Góc xoay tính bằng độ (ví dụ: `45` để chéo) |
+| `blur` | Độ mờ của watermark (0 = vô hình, 100 = hoàn toàn không trong suốt) |
+
+### Ví dụ watermark văn bản
+
+Phủ tên người điều tra và ngày hôm nay theo đường chéo lên mỗi ảnh chụp:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | wm_text | | | `concat(pulldata('app-api', 'user.name'), ' | ', format-date(today(), '%d/%m/%Y'))` |
+| image | site_photo | Chụp ảnh địa điểm | watermark | `watermark('text', 20, 60, '#ffffff', '#000000', 45, 40)` |
+
+Văn bản watermark được lấy từ `${wm_text}`. Đặt trường văn bản watermark **trước** trường ảnh trong biểu mẫu.
+
+### Ví dụ watermark hình ảnh/logo
+
+Phủ logo tổ chức (đính kèm dưới dạng tệp media có tên `logo.png`):
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| image | evidence_photo | Chụp ảnh bằng chứng | watermark | `watermark('file', 25, 80, '', '#000000', 0, 50)` |
+
+### Hoàn tác/làm lại
+
+Trình chỉnh sửa watermark hỗ trợ hoàn tác và làm lại — người điều tra có thể quay lại các bước chỉnh sửa trước khi xác nhận ảnh.
+
+### Lát watermark
+
+Watermark tự động lặp lại (lát) trên toàn bộ ảnh. Tham số `distance` kiểm soát khoảng cách giữa các ô; `rotate` kiểm soát góc của mỗi ô.
+
+---
+
+## Widget lưới media
+
+Widget lưới media hiển thị tập hợp các tệp media (ảnh, âm thanh, video) theo bố cục lưới, cho phép người xét duyệt hoặc người điều tra duyệt qua các tệp đã chụp một cách trực quan.
+
+Widget này được kích hoạt bằng appearance `mediagridwidget` và thường dùng trên các trường `note` hoặc `calculate` để hiển thị media đã chụp từ nhóm lặp.
+
+### Ví dụ: Hiển thị tất cả ảnh từ lặp dưới dạng lưới
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | photo_list | | | `join(' ', ${site_photo})` |
+| note | photo_review | Xem lại ảnh đã chụp | mediagridwidget | |
+
+---
+
+## Thực hành tốt cho ảnh có watermark
+
+1. Luôn tính toán văn bản watermark trong trường `calculate` **phía trên** trường ảnh để có sẵn khi chụp ảnh.
+2. Dùng góc xoay (ví dụ: 45°) để làm cho watermark khó bị cắt bỏ hơn.
+3. Đặt độ mờ (`blur`) từ 30–60% — đủ rõ để đọc, đủ nhạt để không che khuất chủ thể ảnh.
+4. Bao gồm tên người điều tra, ngày tháng và tọa độ GPS trong văn bản watermark để tối đa hóa giá trị kiểm toán.
+5. Kiểm tra hiển thị watermark trên thiết bị có cấu hình thấp nhất trong đội ngũ — watermark dựa trên canvas có thể chậm trên phần cứng cũ.
+
+## Giới hạn
+
+- Watermark được áp dụng phía client bằng Canvas API HTML5 — yêu cầu trình duyệt hoặc mobile WebView có khả năng này.
+- Ảnh có độ phân giải rất cao có thể mất vài giây để thêm watermark trên thiết bị cấu hình thấp.
+- Watermark được ghi trực tiếp vào tệp ảnh — không thể xóa sau khi gửi mà không cần chỉnh sửa ảnh.
+- Loại watermark `file` yêu cầu ảnh logo được đính kèm dưới dạng tệp media với tên tệp khớp chính xác.

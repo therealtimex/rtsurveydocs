@@ -1,0 +1,266 @@
+---
+description: Pamje e përgjithshme e dizajnit të formularëve
+icon: code
+title: Konceptet Kryesore
+---
+
+
+## Çfarë është XLSForm?
+rtSurvey përdor një version të zgjeruar të standardit [XLSForm](https://xlsform.org/) për dizajnin e formularëve, duke ofruar veçori të fuqishme për krijimin e sondazheve të sofistikuara. Ky udhëzues do t'ju prezantojë me konceptet kryesore të dizajnit të formularëve në rtSurvey, nga struktura bazë XLSForm deri te veçoritë specifike të avancuara të rtSurvey.
+
+Me XLSForms, mund të krijoni formularë në një format të lexueshëm nga njerëzit duke përdorur mjetin e njohur Excel, duke e bërë të aksesueshëm për pothuajse të gjithë.
+Ky standard mundëson ndarjen dhe bashkëpunimin e lehtë në krijimin e formularëve.
+
+Ndërkohë që XLSForms janë miqësorë me fillestarët, ato gjithashtu lejojnë përdoruesit me eksperiencë të krijojnë formularë komplekse.
+
+rtSurvey siguron një mënyrë të qëndrueshme për të inkorporuar funksionalitete të avancuara si logjika e kapërcimit në formularë nëpërmjet platformave të ndryshme të mbledhjes së të dhënave ueb dhe celulare.
+
+## Struktura XLSForm
+Një XLSForm zakonisht përbëhet nga dy fletë kryesore pune:
+
+1. **survey**: Përcakton strukturën dhe përmbajtjen e formularit tuaj.
+2. **choices**: Specifikon zgjedhjet e përgjigjeve për pyetjet me zgjedhje të shumëfishta.
+
+Një fletë pune opsionale **settings** mund të sigurojë specifikime shtesë të formularit.
+
+Është e rëndësishme të theksohet se kolonat e detyrueshme në fletat e punës survey dhe choices duhet të jenë të pranishme që formulari të funksionojë siç duhet. Kolonat opsionale në të dy fletat e punës sigurojnë kontroll të mëtejshëm mbi sjelljen e çdo hyrje në formular, por nuk janë thelbësore.
+
+Kolonat në librin tuaj të punës Excel mund të shfaqen në çdo rend, dhe kolonat opsionale mund të lihen bosh. Megjithatë, është thelbësore të përdorni sintaksën dhe konventat e emërtimit të sakta të specifikuara në dokumentacionin XLSForm që formulari të funksionojë saktë.
+
+### Fleta e punës survey
+Fleta e punës **survey** është vendi ku përcaktoni strukturën e formularit tuaj dhe siguroni përmbajtjen. Çdo rresht në fletën e punës survey përfaqëson një pyetje ose element në formularin tuaj. Kolonat e mëposhtme janë të detyrueshme në fletën e punës survey:
+
+- `type`: Specifikon llojin e hyrjes që prisni për pyetjen.
+- `name`: Specifikon emrin unik të variablit për atë hyrje. Emrat duhet të fillojnë me një shkronjë ose nënvizë dhe mund të përmbajnë vetëm shkronja, shifra, viza, nënviza dhe pika. Emrat janë të ndjeshëm ndaj shkronjave.
+- `label`: Përmban tekstin aktual që shihni për pyetjen në formular.
+
+| type                | name     | label                |
+| ------------------- | -------- | -------------------- |
+| today               | today    |                      |
+| select_one gender   | gender   | Gjinia e të anketuarit? |
+| integer             | age      | Mosha e të anketuarit? |
+
+### Fleta e punës choices
+Fleta e punës **`choices`** përdoret për të specifikuar zgjedhjet e përgjigjeve për pyetjet me zgjedhje të shumëfishta.
+Çdo rresht përfaqëson një zgjedhje përgjigjeje. Kolonat e mëposhtme janë të detyrueshme në fletën e punës choices:
+
+- **`list_name`**: Grupon bashkë një seri zgjedhjesh të lidhura përgjigjesh.
+- **`name`**: Specifikon emrin unik të variablit për atë zgjedhje.
+- **`label`**: Tregon zgjedhjen e përgjigjes saktësisht ashtu siç dëshironi të shfaqet në formular.
+
+| list_name           | name        | label                |
+| ------------------- | ----------- | -------------------- |
+| gender              | transgender | Transgender          |
+| gender              | female      | Femër                |
+| gender              | male        | Mashkull              |
+| gender              | other       | Tjetër               |
+
+Kolonat që shtoni në librin tuaj të punës Excel, qofshin të detyrueshme ose opsionale, mund të shfaqen në çdo rend. Kolonat opsionale mund të hiqen plotësisht. Rreshtat ose kolonat mund të lihen bosh për të ndihmuar lexueshmërinë, por të dhënat pas 20 kolonave ose rreshtave bosh ngjitur në një fletë nuk do të përpunohen. E gjithë formatimi i skedarit .xlsx injorohet, kështu që mund të përdorni vija ndarëse, hije dhe formatim tjetër fonti për ta bërë formularin më të lexueshëm.
+
+Një gjë për t'u mbajtur parasysh kur krijoni formularë në Excel është se sintaksa që përdorni duhet të jetë e saktë. Për shembull, nëse shkruani **Choices** ose **choice** në vend të **choices**, formulari nuk do të funksionojë.
+
+### Fleta e punës settings
+
+Fleta e punës settings është opsionale, por lejon specifikimin e metadata dhe sjelljes në nivelin e formularit. Kolonat e zakonshme në fletën e punës settings përfshijnë:
+
+| Kolona | Përshkrimi |
+|--------|-------------|
+| form_title | Titulli i formularit siç i shfaqet përdoruesve |
+| form_id | Një identifikues unik për formularin, i përdorur në menaxhimin e të dhënave dhe thirrjet API |
+| default_language | Kodi i gjuhës parazgjedhëse për formularët shumëgjuhësorë (p.sh., 'sq' për shqip) |
+| version | Numri i versionit të formularit, i dobishëm për gjurmimin e ndryshimeve |
+| instance_name | Shprehje për gjenerimin e një emri unik për çdo dorëzim formulari |
+| generation | Numër i plotë që shënon gjeneratën e formularit. Rriteni për ndryshimet strukturore |
+| family | Identifikues për grupimin e formularëve të lidhur nëpërmjet ndryshimeve strukturore |
+
+Fleta e punës settings në rtSurvey gjithashtu mund të përfshijë konfigurime shtesë specifike për funksionalitetet e zgjeruara të rtSurvey. Referojuni dokumentacionit rtSurvey për listën e plotë të cilësimeve të mbështetura.
+
+## Komponentët Kryesorë të Fletës së Punës Survey
+
+Fleta e punës survey është thelbi i dizajnit tuaj të formularëve. Ja një pamje e përgjithshme e komponentëve të saj kryesorë:
+
+| Komponenti | Përshkrimi |
+|-----------|-------------|
+| [type](#question-types) | Specifikon llojin e pyetjes (p.sh., text, integer, select_one) |
+| [name](#naming-conventions) | Identifikues unik për pyetjen |
+| [label](#labels-and-translations) | Teksti i shfaqur për të anketuarin |
+| [hint](#hints-and-help-text) | Udhëzim shtesë për të anketuarin |
+| [appearance](#appearance-options) | Modifikon mënyrën si shfaqet pyetja |
+| [relevant](#relevance-and-skip-logic) | Përcakton kur duhet të bëhet pyetja (logjika e kapërcimit) |
+| [constraint](#constraints-and-validation) | Validizon përgjigjen |
+| [calculation](#calculations) | Llogarit vlera bazuar në përgjigje të tjera |
+| [required](#required-fields) | Specifikon nëse pyetja duhet të përgjigjet |
+
+
+Secili prej këtyre komponentëve luan një rol vendimtar në krijimin e sondazheve efektive dhe efikase.
+
+### Llojet e pyetjeve
+XLSForm mbështet një numër llojesh pyetjesh. Këto janë vetëm disa nga opsionet që mund të futni në kolonën **`type`** në fletën e punës **`survey`** të XLSForm tuaj:
+
+| Lloji i pyetjes | Hyrja e përgjigjes |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| integer                   | Hyrje e numrit të plotë (pa decimale). |
+| decimal                   | Hyrje decimale. |
+| range                     | Hyrje e [diapazonit](#range) (duke përfshirë vlerësimet) |
+| text                      | Përgjigje me tekst të lirë. |
+| select_one [options]      | Pyetje me [zgjedhje të shumëfishta](#multiple-choice); vetëm një përgjigje mund të zgjidhet. |
+| select_multiple [options] | Pyetje me [zgjedhje të shumëfishta](#multiple-choice); mund të zgjidhen përgjigje të shumëfishta. |
+| select_one_from_file [file]| [Zgjedhje e shumëfishta nga skedar](#multiple-choice-from-file); vetëm një përgjigje mund të zgjidhet. |
+| select_multiple_from_file [file]| [Zgjedhje e shumëfishta nga skedar](#multiple-choice-from-file); mund të zgjidhen përgjigje të shumëfishta.|
+| rank [options]            | Pyetje [rendi](#rank); renditni një listë. |
+| note                      | Shfaqni një shënim në ekran, nuk merr hyrje. Shkurtim për type=text me readonly=true. |
+| geopoint                  | Mblidhni një [koordinatë të vetme GPS](#gps). |
+| geotrace                  | Regjistroni një [linjë të dy ose më shumë koordinatave GPS](#gps). |
+| geoshape                  | Regjistroni një [poligon të koordinatave të shumëfishta GPS](#gps); pika e fundit është e njëjtë me të parën. |
+| date                      | Hyrje date. |
+| time                      | Hyrje ore. |
+| dateTime                  | Pranon hyrje date dhe ore. |
+| image                     | Bëni një foto ose ngarkoni një [skedar imazhi](#image). |
+| audio                     | Bëni një regjistrim audio ose ngarkoni një skedar audio. |
+| background-audio          | Audio regjistrohet në sfond ndërkohë që plotësohet formulari. |
+| video                     | Bëni një regjistrim video ose ngarkoni një skedar video. |
+| file                      | Hyrje e skedarit të përgjithshëm (txt, pdf, xls, xlsx, doc, docx, rtf, zip) |
+| barcode                   | Skanoni një barcode, kërkon instalimin e aplikacionit skanues barcode. |
+| calculate                 | Kryeni një llogaritje; shikoni seksionin [Llogaritja](#calculation) më poshtë. |
+| acknowledge               | Prompt konfirmimi që cakton vlerën në "OK" nëse zgjidhet. |
+| hidden                    | Fushë pa element të ndërfaqes së lidhur që mund të përdoret për ruajtjen e një konstanteje |
+| xml-external              | Shton një referencë ndaj një skedari të dhënash [XML të jashtme](#external-xml-data) |
+
+### Etiketat
+
+Etiketat janë teksti i shfaqur për të anketuarit për çdo pyetje. Ato janë thelbësore për komunikim të qartë në sondazhe.
+
+- **Përdorimi bazë**: Në kolonën `label`, futni tekstin e pyetjes.
+- **Gjuhë të shumëfishta**: Përdorni kolona shtesë si `label::Shqip` dhe `label::Français` për sondazhe shumëgjuhësore.
+- **Formatimi**: rtSurvey mbështet formatimin bazë HTML në etiketa për theksim ose strukturë.
+
+Shembull:
+```
+| type | name | label | label::French |
+|------|------|-------|---------------|
+| text | name | Cili është emri juaj? | Quel est votre nom? |
+```
+
+### Udhëzimet
+
+Udhëzimet sigurojnë udhëzim shtesë për të anketuarit pa ngarkuar tekstin kryesor të pyetjes.
+
+- **Përdorimi**: Shtoni udhëzime në kolonën `hint`.
+- **Dukshmëria**: Udhëzimet zakonisht shfaqen nën tekstin kryesor të pyetjes.
+- **Shumëgjuhësorë**: Ashtu si etiketat, udhëzimet mund të specifikohen për gjuhë të shumëfishta duke përdorur kolonat `hint::Gjuha`.
+
+Shembull:
+```
+| type | name | label | hint |
+|------|------|-------|------|
+| integer | age | Sa vjeç jeni? | Ju lutemi futni moshën tuaj në vite |
+```
+
+### Pamja
+
+Kolona `appearance` në rtSurvey lejon personalizimin e mënyrës si shfaqen pyetjet.
+
+- **Opsionet standarde**: Përfshijë 'multiline' për tekst, 'horizontal' për pyetjet zgjedhëse.
+- **Zgjerime rtSurvey**:
+  - Hyrja e orës: Opsione të ndryshme shfaqjeje ore (p.sh., `inline`, `inline-1line`)
+  - Personalizimi i ngjyrës: Përdorni funksionin `colors()` për ndryshimin e ngjyrave të ikonave
+
+Shembull:
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | time | Futni orën | inline-[%H:%M] |
+```
+
+### Relevant
+
+Kolona `relevant` zbaton logjikën e kapërcimit, duke përcaktuar kur duhet të shfaqet një pyetje.
+
+- **Sintaksa**: Përdorni shprehjet XPath për të përcaktuar kushtet.
+- **Variablat**: Referoni emrat e tjera pyetjeve duke përdorur `${emri_pyetjes}`.
+
+Shembull:
+```
+| type | name | label | relevant |
+|------|------|-------|----------|
+| text | allergies | Listoni alergjitë | ${has_allergies} = 'yes' |
+```
+
+### E detyrueshme
+
+Kolona `required` specifikon nëse pyetja duhet të përgjigjet.
+
+- **Përdorimi bazë**: Përdorni 'yes' ose 'true' për ta bërë pyetjen të detyrueshme.
+- **Avancuar**: Mund të përdorë shprehje për kërkesën me kusht.
+
+Shembull:
+```
+| type | name | label | required |
+|------|------|-------|----------|
+| text | email | Adresa email | yes |
+```
+
+### Përsëritjet
+
+Përsëritjet lejojnë që një grup pyetjesh të përgjigjet disa herë.
+
+- **Përdorimi**: Përdorni rreshtat `begin repeat` dhe `end repeat` për të përcaktuar një grup të përsëritur.
+- **Emërtimi**: Jepini çdo grupi përsëritjeje një emër unik.
+
+Shembull:
+```
+| type | name | label |
+|------|------|-------|
+| begin repeat | household_member | Anëtari i shtëpisë |
+| text | member_name | Emri |
+| integer | member_age | Mosha |
+| end repeat | | |
+```
+
+### Media
+
+rtSurvey mbështet lloje të ndryshme mediash në sondazhe, duke përfshirë imazhe, audio dhe video.
+
+- **Llojet e pyetjeve**: Përdorni 'image', 'audio' ose 'video' në kolonën type.
+- **Media në etiketa**: Referoni skedarët media në etiketa duke përdorur etiketat HTML.
+
+Shembull:
+```
+| type | name | label |
+|------|------|-------|
+| image | house_photo | Bëni një foto të shtëpisë |
+| note | | <img src="logo.jpg" /> Mirë se vini në sondazh |
+```
+
+### Vetëm-lexueshëm
+
+Pyetjet vetëm-lexueshëm shfaqin informacion pa lejuar hyrjen e përdoruesit.
+
+- **Përdorimi**: Shtoni 'readonly' në kolonën `appearance`.
+- **Llogaritjet**: Shpesh përdoren me tipin calculate për shfaqjen e vlerave të llogaritura.
+
+Shembull:
+```
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | bmi | BMI | readonly | ${weight} / (${height} * ${height}) |
+```
+
+## Zgjerime rtSurvey
+
+rtSurvey zgjeron standardin XLSForm duke mbështetur aftësi shtesë si `paraqitja grid`, `formati HTML` dhe shumë `widget`-e të reja.
+
+### Paraqitja Grid
+rtSurvey lejon formularin tuaj të imitojë pamjen e sondazheve tradicionale në letër duke ngjeshur pyetje të shumëfishta në një rresht.
+
+### Cilësimet e formularit
+
+### Cilësimet e të dhënave
+
+### Stili Typeform
+
+### Zgjerim i pulldata()
+
+### Zgjerime të bazuara në pamje
+
+### Zgjerime Webbox

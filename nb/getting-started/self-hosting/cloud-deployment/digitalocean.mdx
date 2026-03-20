@@ -1,0 +1,130 @@
+---
+description: Distribuer rtCloud på en DigitalOcean Droplet med automatiserte User
+  Data-skript.
+icon: water_drop
+title: DigitalOcean
+---
+
+
+DigitalOcean bruker **User Data**-skript som kjøres automatisk ved første oppstart. Du fyller inn konfigurasjonsvariabler øverst i skriptet, og limer deretter inn hele skriptet når du oppretter en Droplet.
+
+> I motsetning til Linode StackScripts har DigitalOcean ingen skjema-UI — du må redigere skriptet direkte før du limer inn.
+
+**Last ned skript:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+
+---
+
+## Innebygd Keycloak (anbefalt)
+
+Bruk `digitalocean-droplet-keycloak-embed.sh` for det enkleste oppsettet med innebygd SSO.
+
+### Trinn 1 — Fyll inn konfigurasjonen
+
+Åpne skriptet og rediger `CONFIGURATION`-blokken øverst:
+
+```bash
+# --- Påkrevd ---
+PROJECT_ID="rtsurvey"                  # Unik identifikator for prosjektet (ingen mellomrom)
+ADMIN_PASSWORD="admin"                 # Passord for app-admin og Keycloak — endre etter første innlogging
+
+# --- Domene + SSL ---
+DOMAIN="myapp.example.com"            # Ditt domene — DNS A-post må peke hit
+PROJECT_URL=""                         # La stå tomt med mindre du er bak Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # E-post for Let's Encrypt-varsler
+
+# --- Valgfritt ---
+STATA_ENABLED="false"
+TZ="Asia/Ho_Chi_Minh"
+```
+
+| Felt | Påkrevd | Beskrivelse |
+|-------|----------|-------------|
+| `PROJECT_ID` | Ja | Brukes som databasenavn og Keycloak klient-ID. Kun små bokstaver, ingen mellomrom. |
+| `ADMIN_PASSWORD` | Nei | Passord for app-admininnlogging og Keycloak admin-konsoll. Standard er `admin` — **endre etter første innlogging**. |
+| `DOMAIN` | Ja | Domenenavnet ditt. DNS A-post må peke til Droplet-IP-en. |
+| `LETSENCRYPT_EMAIL` | Ja | E-postadresse for Let's Encrypt-sertifikatvarsler. |
+| `PROJECT_URL` | Nei | Overstyr den offentlige URL-en. La stå tomt for å bruke `DOMAIN`. Nyttig bak Cloudflare. |
+
+> **Sikkerhet:** Alle passord er standard `admin`. Endre dem umiddelbart etter første innlogging.
+
+### Trinn 2 — Opprett en Droplet
+
+I [DigitalOcean-kontrollpanelet](https://cloud.digitalocean.com):
+
+1. Klikk **Opprett** → **Droplets**
+2. Velg **Ubuntu 22.04 LTS** som bilde
+3. Velg **Basic, 4 GB RAM / 2 vCPUer** eller større
+4. Rull ned til **Avanserte alternativer** → merk av for **Legg til initialiseringsskript**
+5. Lim inn hele skriptinnholdet i tekstfeltet
+6. Klikk **Opprett Droplet**
+
+### Trinn 3 — Legg til DNS-posten
+
+Mens Droplet-en starter opp, legg til en **A-post** hos DNS-leverandøren din:
+
+```
+Type  : A
+Navn  : myapp          (eller @ for rotdomene)
+Verdi : <droplet-ip>
+TTL   : 300
+```
+
+### Trinn 4 — Overvåk fremdriften
+
+SSH inn i Droplet-en og se loggen:
+
+```bash
+ssh root@<droplet-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+Skriptet skriver ut server-IP-en i begynnelsen — legg til DNS-posten så snart du ser den.
+
+### Trinn 5 — Åpne appen
+
+Når oppsettet er ferdig, viser loggen et sammendrag:
+
+```
+============================================================
+ rtCloud deployment complete! (Embedded Keycloak)
+============================================================
+ App URL   : https://myapp.example.com
+ Admin     : admin / admin
+ Keycloak  : https://myapp.example.com/auth/admin
+
+ !! SECURITY: All passwords default to 'admin'.
+    Change them immediately after first login.
+============================================================
+```
+
+Åpne `https://myapp.example.com` i nettleseren og logg inn med brukernavn `admin` og passord `admin`.
+
+> **Endre passordet** umiddelbart etter innlogging via **Innstillinger** i toppmenyen til høyre.
+
+---
+
+## Etter distribusjon
+
+### Endre et passord
+
+SSH inn i Droplet-en, rediger `.env`, og start den berørte containeren på nytt:
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Oppdater domenet
+
+Hvis du tildeler et annet domene etter distribusjon, oppdater `PROJECT_URL` i `.env`:
+
+```bash
+nano /opt/rtcloud/.env   # oppdater PROJECT_URL=
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Se alle containere
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```

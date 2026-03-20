@@ -1,0 +1,35 @@
+---
+description: ''
+icon: code
+title: Odkazování na hodnoty
+---
+
+
+Syntaxe `${fieldname}` se používá pro odkazování na aktuální hodnotu jiného pole ve formuláři. Může představovat hodnotu, která byla zadána, vybrána nebo vypočtena, a zobrazí se přesně tak, jak se zobrazuje v odeslaných datech.
+
+Příklad:
+Pokud máte pole s názvem "age" a chcete získat přesnou hodnotu zadanou do tohoto pole, můžete použít `${age}`.
+
+Pokud jde o omezení, symbol "." se používá pro odkazování na navrhovaný záznam nebo výběr uživatele pro aktuální pole. Umožňuje vám aplikovat podmínky nebo limity na základě hodnoty, kterou uživatel zadává nebo vybírá v daném okamžiku.
+
+Příklad:
+Pokud chcete zkontrolovat, zda je navrhovaná hodnota pro aktuální pole menší než 3, můžete použít omezení `. < 3`.
+
+---
+
+## `..` — Odkaz na nadřazenou skupinu
+
+Uvnitř skupiny nebo skupiny opakování `..` odkazuje na **nadřazený kontext**. To je v praxi zřídka potřeba, ale používá se v pokročilých XPath výrazech pro navigaci v hierarchii formuláře.
+
+---
+
+## Kde se odkazování používá
+
+| Sloupec | Typ odkazu | Příklad |
+|--------|---------------|---------|
+| `relevant` | `${fieldname}` | `${consent} = 'yes'` |
+| `constraint` | `.` pro aktuální pole, `${fieldname}` pro ostatní | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${fieldname}` | `${adults} + ${children}` |
+| `required` | `${fieldname}` | `${household_size} > 0` |
+| `default` | `${fieldname}` | `${previous_date}` |
+| `label` | `${fieldname}` (pro zobrazení hodnot v textu) | `Zadali jste ${age} let.` |

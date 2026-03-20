@@ -1,0 +1,44 @@
+---
+description: Ģeoformas jautājumi ļauj respondentiem zīmēt formas kartē, uztveroт sarežģītus
+  ģeogrāfiskos datus aptaujas ietvaros.
+icon: map
+title: Ģeoforma
+---
+
+
+Jautājuma tips geoshape XLSForms un rtSurvey ļauj respondentiem zīmēt formas (daudzstūrus) kartē, uztveroт sarežģītus ģeogrāfiskos datus. Šī funkcija ir īpaši noderīga apgabalu kartēšanai, robežu definēšanai vai reģionu iezīmēšanai telpiskajās aptaujās.
+
+## Pamata XLSForm specifikācija
+
+| type | name | label |
+|------|------|-------|
+| geoshape | farm_boundary | Uzzīmējiet lauksaimniecības zemes robežas |
+| geoshape | flood_zone | Iezīmējiet plūdu skarto apgabalu |
+
+## Datu formāts
+
+Geoshape vērtība tiek glabāta kā GPS punktu saraksts, atdalīts ar semikolu, kur katrs punkts ir `platums garums 0 0`:
+
+`56.9460 24.1059 0 0; 56.9480 24.1080 0 0; 56.9470 24.1100 0 0; 56.9460 24.1059 0 0`
+
+Pēdējais punkts atkārto pirmo punktu, slēdzot daudzstūri.
+
+## Laukuma aprēķins
+
+Aprēķiniet daudzstūra laukumu kvadrātmetros:
+
+```
+area(${farm_boundary})
+```
+
+Konvertējiet uz hektāriem:
+
+```
+round(area(${farm_boundary}) div 10000, 2)
+```
+
+## Labākā prakse
+
+1. Apmāciet enumeratorus, kā precīzi uzzīmēt daudzstūrus.
+2. Apsveriet GPS precizitātes ierobežojumus mazos apgabalos.
+3. Pārbaudiet laukumu aprēķinus ar zināmiem referencēm.

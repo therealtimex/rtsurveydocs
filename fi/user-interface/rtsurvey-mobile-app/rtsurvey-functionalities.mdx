@@ -1,0 +1,102 @@
+---
+description: Tutki rtSurvey-mobiilisovelluksen tärkeimpiä ominaisuuksia, kuten lomakkeiden
+  täyttämistä, muokkaamista, lähettämistä, ilmoituksia, tehtävien hallintaa, raportointia
+  ja GPS-kartoitusominaisuuksia
+icon: apps
+title: Käyttöliittymä
+---
+
+
+rtSurvey-mobiilisovellus tarjoaa kattavan joukon ominaisuuksia kyselyprosessin tehostamiseen. Tässä ovat tärkeimmät toiminnot:
+
+## Täytä lomake
+Täytä lomake -ominaisuus on paikka, jossa haastattelijat voivat käyttää ja syöttää tietoja tyhjiin kyselylomakkeisiin. Tämä toiminto mahdollistaa tehokkaan ja tarkan tiedonkeruun kentällä. Tärkeimmät kohdat ovat:
+
+1. Lomakelistaus: Täytä lomake -osioon siirryttäessä käyttäjille esitetään luettelo kaikista heille osoitetuista tyhjistä lomakkeista.
+
+2. Automaattinen lomakkeiden lataus: Toisin kuin joissakin muissa kyselytyökaluissa, rtSurvey-mobiilisovellus lataa automaattisesti lomakkeet, joihin käyttäjälle on myönnetty pääsy kyselyn järjestelmänvalvojan tai projektipäällikön toimesta. Tämä poistaa tarpeen haastattelijoiden manuaaliselle tyhjien lomakkeiden hakemiselle.
+
+3. Suora tiedonsyöttö: Haastattelijat voivat valita lomakkeen luettelosta ja aloittaa kyselyn vastausten syöttämisen suoraan sovellukseen.
+
+4. Reaaliaikaiset päivitykset: Kun uusia lomakkeita osoitetaan tai päivityksiä tehdään, saatavilla olevien lomakkeiden luettelo päivittyy automaattisesti varmistaen, että haastattelijoilla on aina pääsy uusimpiin kyselyihin.
+
+5. Offline-ominaisuus: Lomakkeet voidaan ladata, kun Internet-yhteys on saatavilla, jolloin haastattelijat voivat täyttää ne myös alueilla, joilla on heikko tai ei lainkaan verkkopeitto.
+
+## Muokkaa lomaketta
+
+Lomakkeen muokkausominaisuus rtSurveyssa tarjoaa kattavan ja joustavan lähestymistavan kysely-instanssien hallintaan, erottaen sen muista CAPI-sovelluksista. Tämä ominaisuus varmistaa tietojen tarkkuuden ja täydellisyyden kolmen erillisen välilehden kautta:
+
+1. **Tallennettu**:
+   - Pääsy haastattelijan laitteelle tallennettuihin ja muokkaa keskeneräisiä haastattelu-instansseja.
+   - Samanlainen kuin perinteisissä CAPI-sovelluksissa, antaa käyttäjille mahdollisuuden jatkaa ja täydentää kesken jääneitä kyselyitä.
+
+2. **Palautettu** (rtSurvey-eksklusiivinen):
+   - Muokkaa kysely-instansseja, jotka on aiemmin täytetty, viimeisteity ja lähetetty palvelimelle.
+   - Ainutlaatuinen rtSurveylle, tämä ominaisuus mahdollistaa lähetyksen jälkeiset muokkaukset, kun lisätietoja tai korjauksia tarvitaan.
+
+3. **Välitetty** (rtSurvey-eksklusiivinen):
+   - Käytä ja muokkaa kysely-instansseja, jotka on alun perin luotu toisella laitteella.
+   - Tämä innovatiivinen ominaisuus tukee erilaisia skenaarioita:
+     * Valvojat voivat tarkistaa ja muokata haastattelijoiden lähetyksiä.
+     * Käyttäjät voivat jatkaa työtä eri laitteella, jos alkuperäinen laite katoaa tai vaurioituu.
+     * Mahdollistaa yhteistyöhön perustuvan muokkauksen ja laadunvalvontaprosessit.
+
+Tärkeimmät edut:
+- Parannettu tietojen laatu useiden tarkistus- ja muokkausmahdollisuuksien kautta.
+- Parannettu työnkulun joustavuus kenttätiimeille ja valvojille.
+- Saumaton työn jatkaminen eri laitteilla, vähentäen seisokkeja ja tietojen menetysriskejä.
+
+
+## Lähetä lomake
+Lähetä 100% täytetyt lomakkeet keskuspalvelimelle. Tämä ominaisuus mahdollistaa reaaliaikaisen tiedonsiirron, mahdollistaen välittömän analyysin ja päätöksenteon.
+
+## Ilmoitukset
+Vastaanota tärkeitä ilmoituksia ja päivityksiä palvelimelta. Tämä pitää kaikki tiimin jäsenet ajan tasalla projektin kehityksestä, muutoksista tai kiireellisistä asioista.
+
+## Tehtävät
+Käytä ja hallitse palvelimelta osoitettuja tehtäviä. Tämä ominaisuus auttaa järjestämään työmäärää ja priorisoimaan kenttähaastattelijoiden kyselytoimintoja.
+
+## Raportit
+Tarkastele kaikkia palvelimelta tabletille lähetettyjä raportteja. Tämä toiminto antaa käyttäjille mahdollisuuden käyttää analyysituloksia ja projektin oivalluksia suoraan laitteellaan.
+
+## Tarkista lomake
+
+Lomakkeen tarkistusominaisuus rtSurveyssa tarjoaa kattavan järjestelmän viimeistelyjen kysely-instanssien tutkimiseen ja hallintaan, varmistaen vankan laadunvalvonnan ja tietojen varmistuksen. Tämä ominaisuus on jaettu neljään erilliseen välilehteen, joista kukin palvelee tiettyä tarkoitusta tietojen hallintaprosessissa:
+
+1. **Viimeisteity**:
+   - Pitää valmiit ja viimeisteyt instanssit, joita ei ole vielä lähetetty palvelimelle.
+   - Mahdollistaa lopulliset tarkistukset ennen lähettämistä.
+
+2. **Lähetetty**:
+   - Sisältää viimeisteyt instanssit, jotka on onnistuneesti lähetetty palvelimelle.
+   - Tarjoaa tietueen lähetetyistä tiedoista.
+
+3. **Siirretty**:
+   - Näyttää valmiit instanssit, jotka on siirretty muille laitteille.
+   - Helpottaa tietojen liikkeen seurantaa laitteiden välillä.
+
+4. **Vastaanotettu**:
+   - Näyttää valmiit instanssit, jotka on alun perin luotu toisella laitteella ja siirretty nykyiselle laitteelle.
+   - Mahdollistaa yhteistyön ja tietojen jakamisen tiimin jäsenten kesken.
+
+Tärkeimmät ominaisuudet:
+- **Vain luku -pääsy**: Kaikki näissä välilehdissä olevat instanssit ovat aluksi vain luku -tilassa, säilyttäen viimeistelyjen lomakkeiden tietojen eheyden.
+- **Muokkauksen pyyntöjärjestelmä**: Käyttäjät voivat pyytää instanssin muokkaamista, jos korjauksia tarvitaan.
+  - Pyyntöjä voivat hyväksyä automaattisesti tai manuaalisesti Järjestelmänvalvojat tai Projektipäälliköt.
+  - Hyväksymisen jälkeen instanssista tulee muokattava, mahdollistaen tarvittavat muutokset.
+
+Edut:
+- Parantaa tietojen laatua useiden tarkistusvaiheiden kautta.
+- Tarjoaa selkeän tarkistuspolun tietojen lähetyksissä ja siirroissa.
+- Tarjoaa joustavuutta tietojen hallinnassa säilyttäen samalla hallinnan viimeistelyjen tietojen suhteen.
+- Tukee yhteistyöhön perustuvia työnkulkuja ja laadunvarmistusprosesseja.
+
+Tämä edistynyt lomakkeen tarkistusjärjestelmä erottaa rtSurveyn tarjoamalla jäsennellyn lähestymistavan viimeistelyjen tietojen hallintaan, varmistaen tarkkuuden ja mahdollistaen hallitut lähetyksen jälkeiset muokkaukset tarvittaessa.
+
+## Kartta
+Hyödynnä GPS-toimintoa paikallistaaksesi täsmällisen sijainnin, jossa haastattelu suoritetaan. Tämä ominaisuus parantaa tietojen tarkkuutta ja auttaa kyselytulosten paikallisessa analysoinnissa.
+
+## Poistu
+Sulje sovellus kirjautumatta ulos rtSurvey-tililtä. Tämä mahdollistaa nopean uudelleenpääsyn sovellukseen ilman toistuvaa todennusta.
+
+Nämä toiminnot toimivat yhdessä luodakseen tehokkaan, käyttäjäystävällisen mobiilikyselytyökalun, joka palvelee erilaisia rooleja kyselyprosessissa tiedonkeruusta analyysiin ja projektinhallintaan.

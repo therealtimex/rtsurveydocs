@@ -1,0 +1,119 @@
+---
+description: Implementér rtCloud på en AWS EC2-instans ved hjælp af aws-ec2.sh user
+  data-scriptet.
+icon: cloud
+title: AWS EC2
+---
+
+
+Brug `aws-ec2.sh` som **User Data**-script, når du starter en EC2-instans. Scriptet kører automatisk ved første opstart.
+
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+
+---
+
+## Trin 1 — Udfyld konfigurationen
+
+Åbn scriptet og rediger `CONFIGURATION`-blokken øverst:
+
+```bash
+# --- Påkrævet ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # Skift efter første login
+
+# --- Domæne + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- Indlejret Keycloak ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Standard er ADMIN_PASSWORD
+```
+
+| Felt | Påkrævet | Beskrivelse |
+|-------|----------|-------------|
+| `PROJECT_ID` | Ja | Bruges som databasenavn og Keycloak-klient-ID. Små bogstaver, ingen mellemrum. |
+| `ADMIN_PASSWORD` | Nej | App-admin-adgangskode og Keycloak-administratoradgangskode. Standard er `admin` – **skift efter første login**. |
+| `DOMAIN` | Nej | Dit domæne til HTTPS. Lad stå tom til kun HTTP-tilstand. |
+| `LETSENCRYPT_EMAIL` | Ja (hvis DOMAIN er angivet) | E-mail til Let's Encrypt-notifikationer. |
+| `EMBED_KEYCLOAK` | Nej | `true` for at implementere indlejret Keycloak (kræver 4 GB RAM). |
+
+> **Sikkerhed:** Alle adgangskoder er som standard `admin`. Skift dem øjeblikkeligt efter dit første login.
+
+---
+
+## Trin 2 — Start en EC2-instans
+
+I [AWS EC2-konsollen](https://console.aws.amazon.com/ec2):
+
+1. Klik på **Start instans**
+2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
+3. **Instanstype:** `t3.medium` (4 GB RAM) eller større
+4. **Nøglepar:** Vælg eller opret et til SSH-adgang
+5. **Netværksindstillinger:** Opret eller vælg en sikkerhedsgruppe (se nedenfor)
+6. **Avancerede detaljer** → **Brugerdata** → indsæt det fulde scriptindhold
+7. Klik på **Start instans**
+
+---
+
+## Trin 3 — Konfigurer sikkerhedsgruppen
+
+Åbn disse porte i instansens sikkerhedsgruppe:
+
+| Port | Protokol | Kilde | Formål |
+|------|----------|--------|---------|
+| 22 | TCP | Din IP | SSH-adgang |
+| 80 | TCP | 0.0.0.0/0 | HTTP (omdirigeret til HTTPS af Nginx) |
+| 443 | TCP | 0.0.0.0/0 | HTTPS |
+| 3838 | TCP | 0.0.0.0/0 | Direkte Shiny-adgang |
+
+> Åbn **ikke** port 3306 (MySQL) – den bør aldrig være offentligt tilgængelig.
+
+---
+
+## Trin 4 — Tilføj DNS-posten
+
+Mens instansen starter, tilføj en **A-post** hos din DNS-udbyder:
+
+```
+Type  : A
+Navn  : myapp
+Værdi : <instansens offentlige IP>
+TTL   : 300
+```
+
+---
+
+## Trin 5 — Overvåg fremgangen
+
+```bash
+ssh ubuntu@<instansens-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## Trin 6 — Tilgå appen
+
+Når opsætningen er færdig, viser loggen en oversigt med din app-URL og legitimationsoplysninger. Log ind med brugernavnet `admin` og adgangskoden `admin`, og skift derefter din adgangskode øjeblikkeligt.
+
+---
+
+## Efter implementering
+
+### Skift en adgangskode
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Vis alle containere
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
+
+### Tildel en Elastic IP (valgfrit)
+
+Hvis du stopper og starter instansen, ændres den offentlige IP. For at beholde en stabil IP skal du allokere en **Elastic IP** og knytte den til instansen i EC2-konsollen.

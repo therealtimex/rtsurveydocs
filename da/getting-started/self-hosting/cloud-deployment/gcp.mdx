@@ -1,0 +1,140 @@
+---
+description: Implementér rtCloud på Google Cloud Compute Engine ved hjælp af gcp-compute.sh
+  startup-scriptet.
+icon: travel_explore
+title: Google Cloud (GCP)
+---
+
+
+Brug `gcp-compute.sh` som **Startup-script**, når du opretter en Compute Engine VM-instans. Scriptet kører automatisk ved første opstart.
+
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+
+---
+
+## Trin 1 — Udfyld konfigurationen
+
+Åbn scriptet og rediger `CONFIGURATION`-blokken øverst:
+
+```bash
+# --- Påkrævet ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # Skift efter første login
+
+# --- Domæne + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- Indlejret Keycloak ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Standard er ADMIN_PASSWORD
+```
+
+| Felt | Påkrævet | Beskrivelse |
+|-------|----------|-------------|
+| `PROJECT_ID` | Ja | Bruges som databasenavn og Keycloak-klient-ID. Små bogstaver, ingen mellemrum. |
+| `ADMIN_PASSWORD` | Nej | App-admin-adgangskode og Keycloak-administratoradgangskode. Standard er `admin` – **skift efter første login**. |
+| `DOMAIN` | Nej | Dit domæne til HTTPS. Lad stå tom til kun HTTP-tilstand. |
+| `LETSENCRYPT_EMAIL` | Ja (hvis DOMAIN er angivet) | E-mail til Let's Encrypt-notifikationer. |
+| `EMBED_KEYCLOAK` | Nej | `true` for at implementere indlejret Keycloak (kræver 4 GB RAM). |
+
+> **Sikkerhed:** Alle adgangskoder er som standard `admin`. Skift dem øjeblikkeligt efter dit første login.
+
+---
+
+## Trin 2 — Opret en VM-instans
+
+I [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. Klik på **Opret instans**
+2. **Maskinkonfiguration:**
+   - Serie: `E2`
+   - Maskintype: `e2-medium` (4 GB RAM) eller større
+3. **Opstartsdisk:**
+   - Operativsystem: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Størrelse: 40 GB eller mere
+4. **Firewall:** markér **Tillad HTTP-trafik** og **Tillad HTTPS-trafik**
+5. **Avancerede indstillinger** → **Administration** → **Automatisering** → **Startup-script** → indsæt det fulde scriptindhold
+6. Klik på **Opret**
+
+---
+
+## Trin 3 — Tilføj DNS-posten
+
+Mens VM'en starter, tilføj en **A-post** hos din DNS-udbyder:
+
+```
+Type  : A
+Navn  : myapp
+Værdi : <VM'ens eksterne IP>
+TTL   : 300
+```
+
+Find den eksterne IP i listen over VM-instanser i konsollen.
+
+---
+
+## Trin 4 — Overvåg fremgangen
+
+Ved hjælp af `gcloud`-CLI'en:
+
+```bash
+gcloud compute ssh <instansnavn> -- tail -f /var/log/rtcloud-setup.log
+```
+
+Eller SSH direkte:
+
+```bash
+ssh <brugernavn>@<VM'ens-eksterne-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## Trin 5 — Tilgå appen
+
+Når opsætningen er færdig, viser loggen en oversigt med din app-URL og legitimationsoplysninger. Log ind med brugernavnet `admin` og adgangskoden `admin`, og skift derefter din adgangskode øjeblikkeligt.
+
+---
+
+## Firewall-regler
+
+GCP's afkrydsningsfelter **Tillad HTTP/HTTPS** åbner portene 80 og 443. For også at tillade direkte Shiny-adgang på port 3838 skal du tilføje en firewall-regel:
+
+```bash
+gcloud compute firewall-rules create allow-shiny \
+  --allow tcp:3838 \
+  --target-tags http-server
+```
+
+Eller tilføj den via konsollen: **VPC-netværk** → **Firewall** → **Opret regel**.
+
+> Åbn **ikke** port 3306 (MySQL) – den bør aldrig være offentligt tilgængelig.
+
+---
+
+## Statisk IP (valgfrit)
+
+Som standard tildeler GCP en flygtig ekstern IP, der ændres, når VM'en genstartes. For at beholde en stabil IP:
+
+1. Gå til **VPC-netværk** → **IP-adresser**
+2. Klik på **Reserver ekstern statisk adresse**
+3. Knyt den til din VM-instans
+
+---
+
+## Efter implementering
+
+### Skift en adgangskode
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Vis alle containere
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```

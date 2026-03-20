@@ -1,0 +1,94 @@
+---
+description: Trigger questions display a statement the enumerator must explicitly
+  acknowledge before continuing.
+icon: check-circle
+title: Trigger / Acknowledge
+---
+
+
+The `trigger` (also called `acknowledge`) question type displays a **statement with a checkbox**. The enumerator must tick the checkbox to confirm they have read and understood the statement before the form allows them to continue. No data value is stored — only whether the checkbox was ticked.
+
+## Basic XLSForm Specification
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | The respondent has provided verbal informed consent. |
+
+Or using the `acknowledge` alias:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | The respondent has provided verbal informed consent. |
+
+Both `trigger` and `acknowledge` are equivalent — use whichever your platform documents.
+
+## Uses
+
+Trigger/acknowledge questions are commonly used for:
+
+1. **Informed consent** — confirm the enumerator obtained consent before recording sensitive data
+2. **Soft alerts** — warn about an unusual value and require explicit confirmation before proceeding
+3. **Checklist items** — confirm a physical observation was completed (e.g., "I have observed the water source directly")
+4. **Instructions** — force the enumerator to acknowledge a section-level instruction before continuing
+5. **Quality checks** — flag outlier values and require the enumerator to verify them
+
+## Example Usage
+
+### Consent acknowledgement
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | The respondent has given verbal informed consent to participate in this survey. | yes |
+
+### Soft alert for outlier values
+
+Used together with a `relevant` expression to only show the trigger when a suspicious value is entered:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Number of children | | |
+| trigger | children_confirm | You entered ${children} children. Please verify with the respondent and tap OK to confirm. | `${children} > 10` | `${children} > 10` |
+
+### Instruction acknowledgement at section start
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Section B: Agricultural Land Use. Ask all questions in this section to the household head only. |
+
+## Making the trigger required
+
+Add `required: yes` to prevent advancing until the box is ticked:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | All safety equipment is present and functional. | yes | You must confirm before proceeding. |
+
+## Conditional display
+
+Show the trigger only when a condition is met:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | Does the household have a well? | |
+| trigger | well_observation | Confirm you have directly observed the well condition. | `${has_well} = 'yes'` |
+
+## Difference from `note`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Displays text | Yes | Yes |
+| Requires interaction | No | Yes (must tick) |
+| Stores data | No | No (only OK/ticked) |
+| Can block progress | No | Yes (with `required`) |
+
+## Best Practices
+
+1. Keep trigger labels concise and actionable — the enumerator should be able to read and confirm in seconds.
+2. Always add `required: yes` when the acknowledgement is mandatory.
+3. Use triggers for consent and safety checks where you need an audit trail that the enumerator confirmed.
+4. Combine with `relevant` for conditional soft alerts so the trigger only appears when a value needs verification.
+
+## Limitations
+
+- Trigger fields do not store a meaningful data value — they only record that the box was ticked.
+- The trigger widget renders as a simple checkbox/button on most clients; it is not a full e-signature.

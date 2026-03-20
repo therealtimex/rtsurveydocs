@@ -1,0 +1,110 @@
+---
+description: Paraqitja rrjetë ju lejon të poziciononi fushat në rrjetë CSS brenda
+  grupit, duke mundësuar dizajne formularësh me shumë kolona.
+icon: manage_search
+title: Paraqitja rrjetë
+---
+
+
+Veçoria **Paraqitja Rrjetë** ju lejon të rregulloni pyetjet në **rrjetë me shumë kolona** brenda grupit, duke përdorur etiketën e pamjes `gridformat<>`. Kjo është e dobishme për formularët e dendur të hyrjes së të dhënave ku fushat e shumta të lidhura duhet të shfaqen krah për krah në vend se të grumbullohen vertikalisht.
+
+---
+
+## Si funksionon
+
+Paraqitja rrjetë zbatohet në dy nivele:
+
+1. **Grupi** — vendosni `appearance: field-list grid(weight=N)` për të përcaktuar sa kolona ka rrjeta
+2. **Çdo fushë brenda grupit** — vendosni `appearance: gridformat<row=R col=C colspan=S/>` për të pozicionuar fushën
+
+Rrjeta përdor sistemin Bootstrap me 12 kolona. `weight=N` përcakton sa kolona logjike ka rrjeta juaj; çdo kolonë zë `12/N` kolona Bootstrap.
+
+---
+
+## Pamja në nivel grupi
+
+| Pamja | Përshkrimi |
+|-------|------------|
+| `field-list grid(weight=2)` | Rrjetë me 2 kolona (çdo kolonë = 6 kolona Bootstrap) |
+| `field-list grid(weight=3)` | Rrjetë me 3 kolona (çdo kolonë = 4 kolona Bootstrap) |
+| `field-list grid(weight=4)` | Rrjetë me 4 kolona (çdo kolonë = 3 kolona Bootstrap) |
+| `field-list grid(weight=6)` | Rrjetë me 6 kolona (çdo kolonë = 2 kolona Bootstrap) |
+
+---
+
+## Sintaksa `gridformat<>` në nivel fushe
+
+```
+gridformat<row=R col=C colspan=S/>
+gridformat<row=R col=C colspan=S backgroundcolor=COLOR/>
+```
+
+| Atributi | Përshkrimi |
+|----------|------------|
+| `row` | Numri i rreshtit (bazuar në 1) |
+| `col` | Numri i kolonës (bazuar në 1, brenda rrjetës të definuar nga `weight`) |
+| `colspan` | Numri i kolonave që kjo fushë mbush (parazgjedhja 1) |
+| `backgroundcolor` | Ngjyrë CSS opsionale për sfondin e fushës (p.sh., `#f0f0f0`, `lightblue`) |
+
+---
+
+## Shembull: Seksion sondazhi familje me 2 kolona
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | demographics | Demografika | `field-list grid(weight=2)` |
+| text | first_name | Emri | `gridformat<row=1 col=1/>` |
+| text | last_name | Mbiemri | `gridformat<row=1 col=2/>` |
+| integer | age | Mosha | `gridformat<row=2 col=1/>` |
+| select_one gender | gender | Gjinia | `gridformat<row=2 col=2/>` |
+| text | address | Adresa e plotë | `gridformat<row=3 col=1 colspan=2/>` |
+| end_group | | | |
+
+Kjo paraqitet si:
+
+```
+[ Emri              ] [ Mbiemri            ]
+[ Mosha             ] [ Gjinia             ]
+[ Adresa e plotë (mbush të dyja kolonat)   ]
+```
+
+---
+
+## Shembull: Hyrja e të dhënave të parcelës me 3 kolona
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | plot_data | Detajet e parcelës | `field-list grid(weight=3)` |
+| text | plot_id | ID e parcelës | `gridformat<row=1 col=1/>` |
+| decimal | area_ha | Sipërfaqja (ha) | `gridformat<row=1 col=2/>` |
+| select_one crop_type | crop | Lloji i kulturës | `gridformat<row=1 col=3/>` |
+| decimal | yield | Rendimenti (kg) | `gridformat<row=2 col=1/>` |
+| decimal | revenue | Të ardhurat | `gridformat<row=2 col=2/>` |
+| text | notes | Shënime | `gridformat<row=2 col=3/>` |
+| end_group | | | |
+
+---
+
+## Ngjyrat e sfondit
+
+Përdorni `backgroundcolor` për të dalluar vizualisht seksionet:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | section_a | Seksioni A | `gridformat<row=1 col=1 colspan=2 backgroundcolor=#e8f4f8/>` |
+
+---
+
+## Praktikat më të mira
+
+1. Përdorni paraqitjen rrjetë vetëm për ekranet **të dendura me hyrje të dhënash** ku fushat krah për krah vërtetë reduktojnë lëvizjen.
+2. Mbajeni fushat `colspan=1` të shkurtra (ID, kode, zgjedhje të shkurtra) — etiketat e gjera shkurtohen keq në kolonat e ngushta të rrjetës.
+3. Përdorni `colspan=N` për fushat me etiketa të gjata ose hyrje teksti me shumë rreshta.
+4. Testoni në madhësinë më të vogël të ekranit që prisni të përdorin numëruesit — rrjeta me 4 kolona është e ngushtë në telefon.
+5. Paraqitja rrjetë funksionon më mirë në formatet e formularëve web dhe tabletë; në telefona mobile rrjeta me 2 kolona është zakonisht gjerësia maksimale e rehatshme.
+
+## Kufizimet
+
+- `gridformat<>` funksionon vetëm brenda grupit me pamje `grid(weight=N)` — nuk ka efekt në nivelin e lartë.
+- Paraqitja rrjetë është zgjerim i formularit web rtSurvey dhe mund të mos paraqitet saktë në klientë të tjerë të përputhshëm me ODK.
+- Pozicionimi i rreshtave dhe kolonave nuk validohet në kohën e ndërtimit të formularit — fushat mbivendosëse do të paraqiten të dyja por mund të duken të prishura.

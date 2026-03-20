@@ -1,0 +1,105 @@
+---
+description: Webbox 將外部網頁作為模態 iframe 嵌入問卷調查中，允許調查員查看參考資料或與外部工具互動，而無需離開表單。
+icon: manage_search
+title: Webbox
+---
+
+
+**Webbox** 將外部網頁作為**模態彈出視窗**（iframe）嵌入問卷調查。調查員點擊標籤或備注文字中的按鈕，頁面在表單內的全螢幕覆蓋層中打開，當他們關閉時會返回到原來的位置。這讓您可以顯示參考資料、地圖、儀表板或自訂工具，而無需打開單獨的瀏覽器標籤頁。
+
+---
+
+## 語法
+
+直接在 `label` 或 `note` 標籤欄中插入 `<webbox>` HTML 標籤：
+
+```html
+<webbox src='https://example.com/reference' title='參考指南'>打開參考指南</webbox>
+```
+
+| 屬性 | 說明 |
+|-----------|-------------|
+| `src` | 在 iframe 中載入的 URL。支援單引號和雙引號。 |
+| `title` | 顯示在模態標頭欄中的文字。支援純文字。 |
+| *(內容)* | 問卷調查字段中顯示的可點擊按鈕標籤 |
+
+---
+
+## 基本範例
+
+| type | name | label |
+|------|------|-------|
+| note | ref_guide | `<webbox src='https://docs.example.com/field-guide' title='現場指南'>📖 打開現場指南</webbox>` |
+
+這呈現一個標有「📖 打開現場指南」的按鈕。點擊時，會打開一個顯示現場指南網站的模態框。
+
+---
+
+## 嵌入地圖
+
+| type | name | label |
+|------|------|-------|
+| note | area_map | `<webbox src='https://maps.example.com/survey-area' title='調查區域地圖'>🗺 查看地圖</webbox>` |
+
+---
+
+## 向嵌入頁面傳遞表單值
+
+在 `calculation` 欄中使用 `concat()` 將表單字段值附加到 URL，並在標籤中引用結果：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | webbox_url | | `concat('https://dashboard.example.com/household?id=', ${household_id})` |
+| note | hh_dash | `<webbox src='${webbox_url}' title='家庭儀表板'>打開儀表板</webbox>` |
+
+<Warning>
+當標籤從 `calculate` 字段計算時，`<webbox>` 標籤中的 `src` 屬性支援 `${fieldname}` 引用。在 `calculate` 字段中構建完整 URL 並引用它。
+</Warning>
+
+---
+
+## 重複互動：刪除按鈕
+
+Webbox 還支援用於在標籤內管理重複群組的特殊動作標籤：
+
+```html
+<delete-repeat-current>移除此行</delete-repeat-current>
+<delete-repeat-last>移除最後一行</delete-repeat-last>
+```
+
+這些呈現為點擊時刪除重複實例的按鈕。將它們放在重複群組內（或緊接其後）的 `note` 字段中：
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | items | 項目 |
+| text | item_name | 項目名稱 |
+| note | delete_btn | `<delete-repeat-current>✕ 移除此項目</delete-repeat-current>` |
+| end_repeat | | |
+
+---
+
+## 與嵌入頁面通信（postMessage）
+
+webbox iframe 和父表單可以使用瀏覽器的 `postMessage` API 通信。父頁面在打開時向 iframe 發送 `init` 訊息。嵌入頁面可以響應：
+
+- `delete-repeat-current` — 觸發刪除當前重複實例
+- `delete-repeat-last` — 觸發刪除最後一個重複實例
+
+這使自訂網頁工具（例如繪圖工具、互動地圖）能夠在使用者在 iframe 內確認動作時觸發表單動作。
+
+---
+
+## 最佳實踐
+
+1. 使用 webbox 展示**參考資料**（指南、查詢表、地圖）——而非收集應在表單本身中的資料。
+2. 確保嵌入的 URL 可從裝置的網路訪問——webbox 需要連線。
+3. 保持嵌入頁面的行動裝置友好——模態框最寬 800px，高度為視窗高度的 80%。
+4. 使用描述性的按鈕文字（例如「查看村莊地圖」），而非通用標籤（「點擊這裡」）。
+5. 告知調查員關閉模態框會返回問卷調查——部分使用者可能不知道如何關閉 iframe 覆蓋層。
+
+## 限制
+
+- Webbox 需要網路連線以載入嵌入的 URL。
+- 某些外部網站透過 `X-Frame-Options` 或 `Content-Security-Policy` 標頭阻止在 iframe 中嵌入——這些網站無法與 webbox 一起使用。
+- 當調查員從問題導航離開時，模態框關閉——iframe 中任何未儲存的狀態都會丟失。
+- Webbox 是 rtSurvey 網頁表單擴展，在其他 ODK 兼容客戶端中可能無法工作。

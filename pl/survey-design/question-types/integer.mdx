@@ -1,0 +1,27 @@
+---
+description: Pytania integer umożliwiają wpisywanie liczb całkowitych w ankiecie.
+icon: '123'
+title: Integer
+---
+
+
+Typ pytania `integer` zbiera odpowiedzi w postaci liczb całkowitych (bez części dziesiętnej).
+
+## Podstawowa specyfikacja XLSForm
+
+| type    | name | label         |
+|---------|------|---------------|
+| integer | age  | Ile masz lat? |
+
+## Typowe zastosowania
+
+- Wiek
+- Liczba osób lub przedmiotów
+- Wyniki i punktacje
+- Kody numeryczne
+
+## Walidacja
+
+| type    | name | label         | constraint      | constraint_message           |
+|---------|------|---------------|-----------------|------------------------------|
+| integer | age  | Ile masz lat? | `. > 0 and . <= 120` | Wiek musi wynosić od 1 do 120 |

@@ -1,0 +1,80 @@
+---
+description: Pyetjet note shfaqin tekst ose media vetëm-lexueshëm për të ofruar informacion
+  ose udhëzime në sondazhin tuaj.
+icon: info
+title: Note
+---
+
+
+Lloji i pyetjes note në XLSForms dhe rtSurvey përdoret për të shfaqur tekst ose media vetëm-lexueshëm te i anketuari i sondazhit. Nuk është pyetje që kërkon përgjigje, por mënyra për të ofruar informacion, udhëzime, ose kontekst brenda sondazhit.
+
+## Specifikimi bazë XLSForm
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | Ky sondazh ka të bëjë me zakonet tuaja të leximit. |
+
+Për më shumë detaje mbi llojin bazë të pyetjes note, shikoni [specifikimin XLSForm](https://xlsform.org/en/#question-types).
+
+## Përdorimet
+
+Pyetjet note përdoren zakonisht për:
+
+1. Dhënia e udhëzimeve ose kontekstit për pyetjet e ardhshme
+2. Shfaqja e rezultateve ose përmbledhjeve të llogaritura
+3. Tregimi i imazheve ose mediave të tjera
+4. Ndarja e seksioneve të sondazhit
+5. Dhënia e reagimeve bazuar në përgjigjet e mëparshme
+
+## Praktikat më të mira
+
+1. Mbajeni tekstin e shënimit të shkurtër dhe të qartë për të ruajtur angazhimin e të anketuarit.
+2. Përdorni formatimin (të trashë, kursiv) për të theksuar informacionin e rëndësishëm.
+3. Konsideroni përdorimin e mediave (imazhe, audio) për të përmirësuar kuptimin kur është e nevojshme.
+4. Përdorni shënimet me moderim për të shmangur bymimin e sondazhit.
+
+## Shembull i përdorimit
+
+Ja një shembull se si mund të përdorni pyetjet note në sondazh:
+
+| type | name | label |
+|------|------|-------|
+| note | intro | Mirë se vini në sondazhin tonë të zakoneve të leximit. Do të pyesim rreth preferencave tuaja dhe frekuencës së leximit. |
+| ... | ... | ... |
+| calculate | books_per_month | ${fiction_books} + ${non_fiction_books} |
+| note | reading_summary | Lexoni afërsisht ${books_per_month} libra në muaj. |
+
+Në këtë shembull, përdorim shënimet për të prezantuar sondazhin dhe ofruar përmbledhje të rezultateve të llogaritura.
+
+## Zgjerime të rtSurvey
+
+Ndërsa specifikimi bazë XLSForm për pyetjet note është i thjeshtë, rtSurvey ofron veçori ose personalizime shtesë:
+
+1. Formatim i pasur i tekstit
+2. Mbështetje për media të ngulitura (imazhe, audio, video)
+3. Përmbajtje dinamike bazuar në përgjigjet e mëparshme
+4. Opsione stilimi të personalizuara
+
+## Përdorimi i avancuar
+
+### Shfaqja e kushtëzuar
+
+Mund të përdorni shprehjet e relevant-it për të treguar shënimet me kusht:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | Jeni lexues i zjarrtë! | ${books_per_month} > 5 |
+
+### Përfshirja e llogaritjeve
+
+Shënimet mund të përfshijnë llogaritje për të ofruar reagime dinamike:
+
+| type | name | label |
+|------|------|-------|
+| note | reading_time | Bazuar në përgjigjet tuaja, kaloni afërsisht ${books_per_month * 5} orë duke lexuar çdo muaj. |
+
+## Kufizimet
+
+- Shënimet nuk mbledhin të dhëna, kështu nuk duhen përdorur kur keni nevojë të mblidhni informacion nga të anketuarit.
+- Përdorimi i tepërt i shënimeve mund ta bëjë sondazhin të duket i mbushur ose tepër i gjatë.
+- Disa opsione të avancuara formatimi ose media mund të mos mbështeten në të gjitha pajisjet ose platformat.

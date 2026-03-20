@@ -1,0 +1,38 @@
+---
+description: Rishikoni, menaxhoni dhe eksportoni regjistrimet e papërpunuara të të
+  dhënave dhe dorëzimet.
+icon: cloud
+title: Menaxhimi i Dorëzimeve
+---
+
+
+Moduli **Menaxhimi i Dorëzimeve** (i aksesuar nëpërmjet butonit **Pamja e të Dhënave** në seksionin Familja e Formularëve) lejon menaxherët e projekteve dhe mbikëqyrësit të ndërveprojnë direkt me të dhënat e papërpunuara hyrëse. Ai shërben si hapësirë pune e unifikuar për të rishikuar dorëzimet e numëruesve, gjurmuar identifikuesit e pajisjeve dhe kryer operacione të cilësisë së të dhënave.
+
+![Ndërfaqja e Menaxhimit të Dorëzimeve](/images/manage_submissions.png)
+
+## Pamja e Përgjithshme dhe Kolonat e të Dhënave
+
+Rrjeti i të dhënave shfaq dinamikisht të dhënat e mbledhura për një formular specifik. Ai funksionon në dy mënyra kryesore: **Zyrtare** (Rekorde të Finalizuara) dhe **Pune** (Rekorde jo të finalizuara, në Kohë Reale).
+
+### Kolonat Kryesore të të Dhënave
+
+Pavarësisht nga pyetjet e personalizuara të definuara në formular, rrjeti përfshin disa kolona standarde metadata për të ndihmuar me auditimin:
+
+- **Dorëzuar nga:** Identifikon platformën e origjinës së dorëzimit (p.sh., FA për Aplikacionin e Fushës, WEB për Formularin Ueb, RS për sistemet e largëta).
+- **Detaji:** Hap një pamje të fokusuar, të regjistrimit të vetëm (ikona e kërkimit) për të inspektuar çdo variabël dhe përgjigje të dërguar për atë instancë.
+- **iNote:** Lejon mbikëqyrësit të bashkëngjitni shënime anësore ose komente të brendshme në një rekord specifik pa ndryshuar vetë të dhënat e mbledhura (e përfaqësuar nga një ikonë lapsi).
+- **Fushat e datës:** Markat kohore që tregojnë kur u inicializua, përfundua ose sinkronizua rekordi.
+- **Bashkëngjitjet e medias:** Lidhje direkte miniaturësh me imazhet, nënshkrimet ose skedarët e mbledhur gjatë sondazhit.
+- **Grupet e përsëritura:** Lidhje të dedikuara për të aksesuar tabelat e ndryduara për pyetjet e përsëritura brenda formularit prind.
+
+## Veprimet e Dorëzimeve
+
+Për të lehtësuar kontrollin aktiv të cilësisë së të dhënave, ndërfaqja siguron një menu rënëse me komanda të veprueshme që mund të ekzekutohen mbi rekordët e zgjedhur:
+
+- **Krijo një instancë të re:** Lejon adminët të fusin manualisht një rekord të ri sondazhi direkt në bazën e të dhënave.
+- **Kthe instancën:** Refuzon rekordin e dorëzuar dhe detyron numëruesin të ri-verifikojë ose ri-mbledhë informacionin.
+- **Ndiq instancën:** Sinjalizon një rekord për vëmendje të mëtejshme, zakonisht duke dërguar një sinjalizim te ekipi i fushës për sqarim.
+- **Eksporto në skedar komandash të Kthyera / paketën e komandave Ndiqni:** Gjeneron eksporte në grup (skedarë) që përmbajnë grupe të dhënash të shënuara specifikisht për kthime ose ndiqni.
+- **Konverto në XML:** Transformon grupin e të dhënave të strukturuara sërish në formatin e tij të papërpunuar XML për analizë mbas ose integrim sistemesh.
+- **Dërgo Instancat:** (I disponueshëm në mënyrën *Pune*) Shtyn të dhënat e pa-finalizuara menjëherë në një pajisje ose përdorues tjetër.
+- **Fshi:** Heq permanentisht instancat e zgjedhura nga baza e të dhënave.

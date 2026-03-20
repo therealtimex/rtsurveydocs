@@ -1,0 +1,119 @@
+---
+description: Implante o rtCloud numa instância AWS EC2 usando o script de dados de
+  utilizador aws-ec2.sh.
+icon: cloud
+title: AWS EC2
+---
+
+
+Use `aws-ec2.sh` como script de **Dados de Utilizador** ao lançar uma instância EC2. O script é executado automaticamente na primeira inicialização.
+
+**Descarregar script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+
+---
+
+## Passo 1 — Preencher a configuração
+
+Abra o script e edite o bloco `CONFIGURAÇÃO` no topo:
+
+```bash
+# --- Obrigatório ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # Altere após o primeiro início de sessão
+
+# --- Domínio + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- Keycloak Incorporado ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Predefinição para ADMIN_PASSWORD
+```
+
+| Campo | Obrigatório | Descrição |
+|-------|-------------|-----------|
+| `PROJECT_ID` | Sim | Usado como nome de base de dados e ID de cliente Keycloak. Minúsculas, sem espaços. |
+| `ADMIN_PASSWORD` | Não | Palavra-passe de admin da aplicação e palavra-passe de admin Keycloak. Predefinição `admin` — **altere após o primeiro início de sessão**. |
+| `DOMAIN` | Não | O seu domínio para HTTPS. Deixe em branco para modo apenas HTTP. |
+| `LETSENCRYPT_EMAIL` | Sim (se DOMAIN definido) | Email para notificações da Let's Encrypt. |
+| `EMBED_KEYCLOAK` | Não | `true` para implantar Keycloak incorporado (requer 4 GB RAM). |
+
+> **Segurança:** Todas as palavras-passe têm como predefinição `admin`. Altere-as imediatamente após o seu primeiro início de sessão.
+
+---
+
+## Passo 2 — Lançar uma instância EC2
+
+Na [consola AWS EC2](https://console.aws.amazon.com/ec2):
+
+1. Clique em **Lançar instância**
+2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
+3. **Tipo de instância:** `t3.medium` (4 GB RAM) ou maior
+4. **Par de chaves:** Selecione ou crie um para acesso SSH
+5. **Configurações de rede:** Crie ou selecione um Security Group (consulte abaixo)
+6. **Detalhes avançados** → **Dados de utilizador** → cole o conteúdo completo do script
+7. Clique em **Lançar instância**
+
+---
+
+## Passo 3 — Configurar o Security Group
+
+Abra estas portas no Security Group da instância:
+
+| Porta | Protocolo | Origem | Finalidade |
+|-------|-----------|--------|-----------|
+| 22 | TCP | O seu IP | Acesso SSH |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirecionado para HTTPS pelo Nginx) |
+| 443 | TCP | 0.0.0.0/0 | HTTPS |
+| 3838 | TCP | 0.0.0.0/0 | Acesso direto ao Shiny |
+
+> **Não** abra a porta 3306 (MySQL) — nunca deve ser publicamente acessível.
+
+---
+
+## Passo 4 — Adicionar o registo DNS
+
+Enquanto a instância inicia, adicione um **registo A** no seu fornecedor DNS:
+
+```
+Tipo  : A
+Nome  : myapp
+Valor : <instance-public-ip>
+TTL   : 300
+```
+
+---
+
+## Passo 5 — Monitorizar o progresso
+
+```bash
+ssh ubuntu@<instance-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## Passo 6 — Aceder à aplicação
+
+Quando a configuração estiver concluída, o log mostra um resumo com o URL da sua aplicação e as credenciais. Inicie sessão com o nome de utilizador `admin` e a palavra-passe `admin`, depois altere a sua palavra-passe imediatamente.
+
+---
+
+## Após a Implantação
+
+### Alterar uma palavra-passe
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Ver todos os contentores
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
+
+### Atribuir um IP Elástico (opcional)
+
+Se parar e iniciar a instância, o IP público muda. Para manter um IP estável, aloque um **IP Elástico** e associe-o à instância na consola EC2.

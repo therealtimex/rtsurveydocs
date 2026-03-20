@@ -1,0 +1,122 @@
+---
+description: ''
+icon: code
+title: Fragen überspringen
+---
+
+
+Übersprunglogik (Skip Logic), auch bekannt als Verzweigungs- oder bedingte Logik, ermöglicht es Ihnen, dynamische Umfragen zu erstellen, die sich an die Antworten der Befragten anpassen. In rtSurvey wird die Übersprunglogik über die Spalte `relevant` in Ihrer XLSForm implementiert.
+
+## Grundlegende Übersprunglogik
+
+Um eine einfache Übersprunglogik zu implementieren, verwenden Sie die Spalte `relevant`, um eine Bedingung anzugeben:
+
+```
+| type           | name          | label                       | relevant            |
+|----------------|---------------|-----------------------------|--------------------|
+| select_one y_n | likes_pizza   | Mögen Sie Pizza?            |                    |
+| select_multiple pizza_toppings | favorite_topping | Lieblingsbeläge | ${likes_pizza} = 'yes' |
+```
+
+In diesem Beispiel erscheint die Frage "Lieblingsbeläge" nur, wenn der Befragte die Frage, ob er Pizza mag, mit "yes" beantwortet.
+
+## Syntax für Relevanz-Ausdrücke
+
+- Verwenden Sie `${ }`, um auf andere Fragenvariablen zu verweisen.
+- Bei `select_one`-Fragen vergleichen Sie direkt: `${fragenname} = 'antwort'`
+- Bei `select_multiple`-Fragen verwenden Sie die Funktion `selected()`.
+
+## Fortgeschrittene Übersprunglogik
+
+### Mehrere Bedingungen
+
+Sie können mehrere Bedingungen mit `and`, `or` und Klammern kombinieren:
+
+```
+| type    | name  | label                   | relevant                                  |
+|---------|-------|-------------------------|-------------------------------------------|
+| integer | age   | Wie alt sind Sie?       |                                           |
+| text    | school| Welche Schule besuchen Sie? | ${age} < 18 and (${location} = 'urban' or ${location} = 'suburban') |
+```
+
+### Verwendung von select_multiple-Fragen
+
+Für `select_multiple`-Fragen verwenden Sie die Funktion `selected()`:
+
+```
+| type           | name          | label                       | relevant                               |
+|----------------|---------------|-----------------------------|-----------------------------------------|
+| select_multiple pizza_toppings | favorite_topping | Lieblingsbeläge |                                         |
+| text           | cheese_type   | Lieblingskäsesorte          | selected(${favorite_topping}, 'cheese') |
+```
+
+### Option "Sonstiges" bei Mehrfachauswahl
+
+Implementieren Sie eine Freitext-Option "Sonstiges" mittels `relevant`:
+
+```
+| type           | name                  | label                               | relevant                               |
+|----------------|----------------------|-------------------------------------|---------------------------------------|
+| select_multiple pizza_toppings | favorite_toppings | Was sind Ihre Lieblings-Pizzabeläge? |                                       |
+| text           | favorite_toppings_other | Welche anderen Beläge mögen Sie?   | selected(${favorite_toppings}, 'other') |
+```
+
+Denken Sie daran, 'other' als Option in Ihrem Choices-Arbeitsblatt aufzuführen.
+
+## rtSurvey-spezifische Funktionen
+
+### Dynamische Relevanz
+
+rtSurvey ermöglicht dynamische Relevanz basierend auf berechneten Feldern:
+
+```
+| type      | name       | label              | calculation                   |
+|-----------|------------|--------------------|-----------------------------|
+| calculate | total_score| Gesamtpunktzahl    | ${score1} + ${score2} + ${score3} |
+| text      | feedback   | Feedback           | ${total_score} > 75             |
+```
+
+### Relevanz in Wiederholungen (Repeats)
+
+rtSurvey unterstützt Relevanz innerhalb von Wiederholungsgruppen:
+
+```
+| type         | name         | label            | relevant               |
+|--------------|--------------|------------------|------------------------|
+| begin repeat | child_info   | Kinder-Infos     |                        |
+| integer      | child_age    | Alter des Kindes |                        |
+| text         | school_name  | Name der Schule  | ${child_age} >= 5      |
+| end repeat   |              |                  |                        |
+```
+
+### Kaskadierende Relevanz
+
+rtSurvey verarbeitet kaskadierende Relevanz effizient, wobei die Relevanz einer Frage von einer anderen abhängt, die wiederum von einer dritten abhängt:
+
+```
+| type           | name        | label                  | relevant               |
+|----------------|-------------|------------------------|------------------------|
+| select_one y_n | has_car     | Besitzen Sie ein Auto? |                        |
+| select_one car_type | car_type | Welcher Autotyp?     | ${has_car} = 'yes'     |
+| text           | model       | Spezifisches Modell    | ${car_type} = 'sedan'  |
+```
+
+## Best Practices für Übersprunglogik in rtSurvey
+
+1. **Einfach halten**: Vermeiden Sie nach Möglichkeit zu komplexe Relevanzbedingungen.
+2. **Gründlich testen**: Nutzen Sie die Vorschaufunktion von rtSurvey, um alle möglichen Pfade durch Ihre Umfrage zu testen.
+3. **Leistung berücksichtigen**: Sehr komplexe Übersprunglogik kann die Umfrageleistung beeinträchtigen, insbesondere auf mobilen Geräten.
+4. **Klare Variablennamen verwenden**: Dies macht Ihre Relevanz-Ausdrücke einfacher lesbar und wartbar.
+5. **Logik dokumentieren**: Fügen Sie Notizen hinzu, um komplexe Übersprungmuster zu erklären, besonders bei der Zusammenarbeit im Team.
+6. **Datenanalyse im Blick behalten**: Übersprungene Fragen führen zu fehlenden Daten. Planen Sie Ihre Analyse entsprechend.
+
+## Fehlerbehebung bei Übersprunglogik
+
+- **Syntaxfehler**: Stellen Sie sicher, dass alle `${ }` korrekt geschlossen und geschrieben sind.
+- **Zirkelbezüge**: Vermeiden Sie Schleifen, in denen Fragen voneinander abhängen.
+- **Groß-/Kleinschreibung**: Beachten Sie, dass Antwortmöglichkeiten in Relevanz-Ausdrücken fallsensitiv sind.
+- **Numerische Vergleiche**: Verwenden Sie die passenden Operatoren (`<`, `>`, `=`) für numerische Vergleiche.
+
+## Fazit
+
+Der effektive Einsatz von Übersprunglogik kann die Erfahrung der Befragten und die Datenqualität in Ihren rtSurvey-Projekten erheblich verbessern. Durch die Nutzung der erweiterten Funktionen von rtSurvey und die Einhaltung von Best Practices können Sie dynamische, effiziente Umfragen erstellen, die sich an die individuelle Situation jedes Befragten anpassen.

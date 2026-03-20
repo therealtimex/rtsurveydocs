@@ -1,0 +1,113 @@
+---
+description: ដាក់ deployed rtCloud ទៅ cloud providers ធំៗ ជាមួយ scripts ស្វ័យប្រវត្តិ
+  សម្រាប់ DigitalOcean, AWS EC2, Google Cloud, និង Linode។
+icon: cloud_upload
+title: ការដាក់ Cloud
+---
+
+
+Repository ការដាក់ deployed រួមមាន scripts ការ provisioning ស្វ័យប្រវត្តិ សម្រាប់ cloud providers ធំៗ។ Script នីមួយៗ ដំណើរការ នៅ boot ដំបូង នៃ server **Ubuntu 22.04 LTS** ថ្មី ហើយ អនុវត្ត ការ setup ដោយ ពេញ unattended:
+
+- ដំឡើង Docker និង Docker Compose
+- Generate ពាក្យសម្ងាត់ random ដែលមានសុវត្ថិភាព សម្រាប់ services ខាងក្នុងទាំងអស់
+- សរសេរ `docker-compose.production.yml` និង `.env`
+- Configure Nginx ជា reverse proxy
+- ទទួលបាន TLS certificate ឥតគិតថ្លៃ ពី Let's Encrypt (retry ដោយស្វ័យប្រវត្តិ រហូតដល់ DNS resolves)
+- Configure UFW firewall
+- ស្រេចចិត្ត deploy Keycloak SSO server ភ្ជាប់
+- Output summary ការដាក់ deployed ពេញ ជាមួយ credentials ទាំងអស់
+
+ការ Setup បញ្ចប់ ក្នុង **៥–១០ នាទី** នៅ instance ស្ដង់ដារ។
+
+---
+
+## ជ្រើស Script
+
+មាន Script variants ច្រើន ដោយ ផ្អែកលើ cloud provider និងការ setup SSO:
+
+| Script | Provider | SSO Mode | ល្អ បំផុត សម្រាប់ |
+|--------|----------|----------|----------|
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Keycloak ភ្ជាប់ | SSO ឯករាជ្យ ងាយស្រួល |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak ឬ External OIDC | ការគ្រប់គ្រង ពេញ |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Keycloak ភ្ជាប់ | Form-based setup, ងាយ បំផុត |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Identity provider ដែល មានស្រាប់ |
+| `linode-stackscript.sh` | Linode | Keycloak ឬ External OIDC | ការគ្រប់គ្រង ពេញ |
+| `aws-ec2.sh` | AWS EC2 | Keycloak ឬ External OIDC | ការដាក់ deployed AWS |
+| `gcp-compute.sh` | Google Cloud | Keycloak ឬ External OIDC | ការដាក់ deployed GCP |
+
+> **ណែនាំ សម្រាប់ users ភាគច្រើន:** ប្រើ variant `keycloak-embed`។ វារួមបញ្ចូល Keycloak identity server ភ្ជាប់ ហើយ ត្រូវការ configuration fields តិចបំផុត។
+
+---
+
+## មគ្គទំហំ Server
+
+| Use Case | RAM | ថាស | ឧទាហរណ៍ |
+|----------|-----|------|---------|
+| ការ Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| ក្រុមតូច (< ៥០ users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> ៥០ users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
+
+> Keycloak ភ្ជាប់ ត្រូវការ **RAM យ៉ាងតិច 4 GB**។ ប្រើ 2 GB មានតែ សម្រាប់ ការ evaluation ដោយ គ្មាន Keycloak។
+
+---
+
+## ការ Setup DNS
+
+Scripts ទាំងអស់ ត្រូវការ domain ជាមួយ **A record ចង្អុល ទៅ IP server** មុន Let's Encrypt អាចចេញ certificate។
+
+Script print IP server របស់អ្នក ដំបូង ក្នុងដំណើរការ setup:
+
+```
+============================================================
+ Server IP : 139.162.51.85
+ Add this DNS A record now if you haven't already:
+   myapp.example.com  ->  139.162.51.85
+ The script will retry Certbot every 60s until DNS resolves.
+============================================================
+```
+
+Script **retry ដោយស្វ័យប្រវត្តិ** Let's Encrypt រៀងរាល់ ៦០ វិនាទី រហូតដល់ ១ ម៉ោង។ គ្រាន់តែ បន្ថែម DNS record ហើយ រង់ចាំ — មិន ត្រូវការ restart ទេ។
+
+> **ដែនកំណត់ rate:** Let's Encrypt អនុញ្ញាត certificate **ច្រើនបំផុត ៥ ក្នុង domain ៧ ថ្ងៃ**។ ចៀសវាង ការ deploy និង destroy servers ប្រើប្រាស់ ម្ដងទៀត ជាមួយ domain ដូចគ្នា ។ ប្រសិនបើ អ្នកជួប ដែនកំណត់ script នឹង បង្ហាញ `retry after` timestamp ហើយ ឈប់ភ្លាម។
+
+---
+
+## Checklist ក្រោយ Deployment
+
+- [ ] App បើកនៅ `https://your-domain.com`
+- [ ] ចូលជាមួយ `admin` និងពាក្យសម្ងាត់ ដែលអ្នកបានកំណត់
+- [ ] Containers ទាំងអស់ healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal ដំណើរការ: `certbot renew --dry-run`
+- [ ] MySQL port 3306 **មិន** ត្រូវ expose: `ufw status`
+- [ ] Setup database backup ប្រចាំថ្ងៃ (មើល [ការថែទាំ](../maintenance))
+
+---
+
+## ការដោះស្រាយបញ្ហា
+
+### ពិនិត្យ log setup ពេញ
+
+```bash
+# Linode
+tail -200 /var/log/stackscript.log
+
+# DigitalOcean / AWS / GCP
+tail -200 /var/log/rtcloud-setup.log
+```
+
+### ដំឡើង Keycloak ស្ថិតក្នុងភាពខ្សោយ
+
+ធានា server មាន RAM យ៉ាងតិច 4 GB ហើយ ពិនិត្យ logs:
+
+```bash
+docker logs rtcloud-keycloak --tail 50
+free -h
+```
+
+### SSL config មិន ត្រូវបានអនុវត្ត បន្ទាប់ certbot
+
+ប្រសិនបើ certificate ត្រូវបាន issue ប៉ុន្ដែ Nginx នៅតែ បង្ហាញ HTTP ប៉ុណ្ណោះ ពិនិត្យ log សម្រាប់ error line ហើយ reload Nginx ដោយ manual:
+
+```bash
+nginx -t && systemctl reload nginx
+```

@@ -1,0 +1,45 @@
+---
+description: Barcodevragen staan het scannen en vastleggen van barcodegegevens toe
+  in uw enquête.
+icon: qr_code_scanner
+title: Barcode
+---
+
+
+Het barcodevraagtype in XLSForms en rtSurvey stelt gebruikers in staat barcodegegevens rechtstreeks binnen de enquête te scannen en vast te leggen. Deze functie is bijzonder nuttig voor voorraadbeheer, producttracering of elk scenario waarbij snelle en nauwkeurige gegevensinvoer van gecodeerde informatie vereist is.
+
+## Basis XLSForm-specificatie
+
+| type    | name          | label                     |
+|---------|---------------|---------------------------|
+| barcode | product_code  | Scan de productbarcode    |
+
+## Toepassingen
+
+Barcodevragen worden veelgebruikt voor:
+
+1. Productidentificatie in voorraadenquêtes
+2. Activatracering in veldbewerkingen
+3. Ticket- of ID-verificatie bij evenementen
+4. Snelle gegevensinvoer voor gecodeerde informatie
+
+## Aanbevolen werkwijzen
+
+1. Zorg voor goede lichtomstandigheden voor nauwkeurig barcodes scannen.
+2. Geef duidelijke instructies aan gebruikers over hoe ze het apparaat moeten positioneren voor scannen.
+3. Neem een handmatige invoeroptie op als terugval bij scanproblemen.
+4. Test de barcodescanfunctie met verschillende apparaten en barcodetypen voor het implementeren van de enquête.
+
+## Beperkingen
+
+- Nauwkeurigheid van barcodes scannen kan variëren afhankelijk van de camerakwaliteit van het apparaat en omgevingsomstandigheden.
+- Sommige oudere of goedkopere apparaten ondersteunen mogelijk geen barcodes scannen.
+- Bepaalde barcodetypen worden mogelijk niet ondersteund, afhankelijk van de implementatie.
+
+## Voorbeeldgebruik
+
+| type    | name          | label                     | hint                                        |
+|---------|---------------|---------------------------|---------------------------------------------|
+| barcode | product_code  | Scan de productbarcode    | Positioneer de barcode binnen het kader     |
+| integer | quantity      | Voer producthoeveelheid in|                                             |
+| note    | confirmation  | Product gescand: ${product_code}. Hoeveelheid: ${quantity} |    |

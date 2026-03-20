@@ -1,0 +1,82 @@
+---
+description: ''
+icon: code
+title: Reikšmių nuoroda
+---
+
+
+Sintaksė `${lauko_pavadinimas}` naudojama nurodyti dabartinę kito lauko reikšmę jūsų formoje. Ji gali atspindėti įvestą, pasirinktą ar apskaičiuotą reikšmę, ir ji bus rodoma tiksliai taip, kaip pateiktuose duomenyse.
+
+Pavyzdys:
+Jei turite lauką pavadinimu „age" ir norite gauti tikslią įvestą reikšmę, galite naudoti `${age}`.
+
+Kalbant apie apribojimus, simbolis „." naudojamas norint nurodyti naudotojo siūlomą įvestį ar pasirinkimą dabartiniam laukui. Tai leidžia taikyti sąlygas ar ribas pagal reikšmę, kurią naudotojas šiuo metu įveda ar pasirenka.
+
+Pavyzdys:
+Jei norite patikrinti, ar siūloma dabartinio lauko reikšmė yra mažesnė nei 3, galite naudoti apribojimą `. < 3`.
+
+---
+
+## `..` — Pirminės grupės nuoroda
+
+Grupės ar kartojimų grupės viduje `..` nurodo **pirminį kontekstą**. Tai retai reikalinga praktikoje, bet naudojama pažangiose XPath išraiškose formos hierarchijai naršyti.
+
+---
+
+## Kur naudojamos nuorodos
+
+| Stulpelis | Nuorodos tipas | Pavyzdys |
+|--------|---------------|---------|
+| `relevant` | `${lauko_pavadinimas}` | `${consent} = 'yes'` |
+| `constraint` | `.` dabartiniam laukui, `${lauko_pavadinimas}` kitiems | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${lauko_pavadinimas}` | `${adults} + ${children}` |
+| `required` | `${lauko_pavadinimas}` | `${has_income} = 'yes'` |
+| `default` | `${lauko_pavadinimas}` | `${previous_answer}` |
+| `label` | `${lauko_pavadinimas}` tekste | `"Jūsų amžius yra ${age} metų"` |
+| `choice_filter` | Stulpelio pavadinimas (be `${}`) | `district = ${district}` |
+
+<Warning>
+Stulpelyje `choice_filter` nurodykite **pasirinkimo stulpelių pavadinimus** tiesiogiai (be `${}`), o **formos laukus** — su `${}`. Tai sumaišius yra dažna klaidų priežastis.
+</Warning>
+
+---
+
+## Reikšmių nuoroda kartojimų grupių viduje
+
+Kartojimo viduje `${lauko_pavadinimas}` nurodo lauką **tame pačiame kartojimo egzemplioriuje**:
+
+```
+relevant: ${member_age} < 18
+```
+
+Tai naudoja `member_age` reikšmę dabartiniam kartojimo egzemplioriui, o ne visiems egzemplioriams.
+
+Norėdami nurodyti lauką **konkrečiame** kartojimo egzemplioriuje iš kartojimo išorės, naudokite `indexed-repeat()`:
+
+```
+indexed-repeat(${member_name}, ${household_members}, 1)
+```
+
+Išsamios informacijos rasite [Funkcijos — Kartotų laukų funkcijos](functions#repeated-field-functions).
+
+---
+
+## Tuščios reikšmės tikrinimas
+
+Patikrinkite, ar laukas buvo atsakytas:
+
+```
+${lauko_pavadinimas} != ''       (laukas nėra tuščias)
+${lauko_pavadinimas} = ''        (laukas yra tuščias)
+```
+
+Skaičiams taip pat patikrinkite:
+```
+${age} > 0               (amžius turi teigiamą reikšmę — numanomai nėra tuščias skaitiniam kontekstui)
+```
+
+---
+
+## Tipo priskyrimas nuorodose
+
+Kai naudojate `${lauko_pavadinimas}` skaitiniame kontekste (pvz., `${age} + 1`), rtSurvey automatiškai konvertuoja eilutės reikšmę į skaičių. Tuščias laukas konvertuojamas į `0` arba `NaN`, priklausomai nuo operacijos — naudokite `coalesce(${field}, 0)`, kad saugiai nustatytumėte tuščio skaitinio lauko numatytąją reikšmę kaip nulis.

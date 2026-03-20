@@ -1,0 +1,86 @@
+---
+description: Audio ప్రశ్నలు ప్రతిస్పందించే వ్యక్తులు సర్వే భాగంగా audio files record
+  చేసి submit చేయడానికి అనుమతిస్తాయి.
+icon: mic
+title: Audio
+---
+
+
+`audio` ప్రశ్న రకం ప్రతిస్పందించే వ్యక్తులు **audio record** చేయడానికి లేదా వారి survey ప్రతిస్పందన భాగంగా ఇప్పటికే ఉన్న audio file upload చేయడానికి అనుమతిస్తుంది. మౌఖిక వివరణలు, పర్యావరణ శబ్దాలు, సాక్ష్యాలు, లేదా voice కంటే text ద్వారా మెరుగ్గా తెలియజేయగల ఏ సమాచారం సేకరించడానికి ఇది ఉపయోగకరం.
+
+## ప్రాథమిక XLSForm స్పెసిఫికేషన్
+
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Please record your comments  |
+
+ప్రామాణిక audio ప్రశ్న రకంపై మరిన్ని వివరాలకు, [XLSForm specification](https://xlsform.org/en/#question-types) చూడండి.
+
+## వినియోగాలు
+
+Audio ప్రశ్నలు సాధారణంగా వీటికి ఉపయోగిస్తారు:
+
+1. Enumerator typing burden తగ్గించడానికి ముక్తకంఠ మౌఖిక ప్రతిస్పందనలు సేకరించడం
+2. Testimonials, వ్యక్తిగత కథలు, లేదా నోటి చరిత్రలు రికార్డ్ చేయడం
+3. పర్యావరణ శబ్దాలు document చేయడం (ఉదా. infrastructure సమీపంలో శబ్ద స్థాయిలు)
+4. భాషా లేదా ఆరోగ్య పరిశోధన కోసం voice samples సేకరించడం
+5. Numeric లేదా select సమాధానాలకు మౌఖిక స్పష్టీకరణలు జోడించడానికి ప్రతిస్పందించే వ్యక్తులకు అనుమతించడం
+
+## డేటా ఫార్మాట్
+
+Audio files binary attachments గా నిల్వ చేయబడతాయి:
+
+- **Format:** MP3 లేదా AAC (mobile recording); WAV (high-quality recording)
+- **Naming:** `{instanceID}-{fieldname}.mp3` (లేదా సమకక్షం)
+- **Storage:** Server media folder కి upload చేయబడి submission record కి link చేయబడుతుంది
+
+## rtSurvey పొడిగింపులు
+
+### గరిష్ట వ్యవధి
+
+Recording length పరిమితం చేయడానికి `parameters` కాలమ్ ఉపయోగించండి:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | interview | Record the interview | `max-duration=120` |
+
+`max-duration` సెకన్లలో ఉంటుంది. Recorder పరిమితి వద్ద స్వయంచాలకంగా ఆగుతుంది.
+
+### నాణ్యత సెట్టింగులు
+
+Recording నాణ్యత `parameters` ద్వారా సెట్ చేయవచ్చు:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Record feedback | `quality=normal` |
+
+మద్దతు ఉన్న విలువలు: `low`, `normal` (default), `voice-only`. `voice-only` noise reduction తో spoken audio ఆప్టిమైజ్ చేస్తుంది.
+
+## ఉదాహరణ వినియోగం
+
+### గరిష్ట వ్యవధి మరియు hint తో
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| audio | story | Tell us about the incident in your own words | Speak clearly. Recording stops after 3 minutes. | `max-duration=180` |
+
+### షరతులతో కూడిన audio — సమస్య report అయినప్పుడే
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | issue_found | Was an issue found? | | |
+| audio | issue_audio | Record a description of the issue | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+
+## ఉత్తమ పద్ధతులు
+
+1. Enumerator ఏమి చెప్పాలో మరియు ఎంత సేపు `label` లేదా `hint` లో స్పష్టంగా పేర్కొనండి.
+2. నెమ్మది upload speeds ఉన్న ప్రాంతాలలో అతిగా పెద్ద files నివారించడానికి `max-duration` ఉపయోగించండి.
+3. Recording ప్రారంభించే ముందు ప్రతిస్పందించే వ్యక్తులకు తెలియజేయండి — ఊహించని recording privacy concerns లేవనెత్తవచ్చు.
+4. Deployment ముందు target device మరియు network conditions పై recording పరీక్షించండి.
+
+## పరిమితులు
+
+- Audio files పెద్దవిగా ఉండవచ్చు (normal quality లో 2-నిమిషాల recording ~2–4 MB) — మీ data plan మరియు upload time అంచనాలలో దీన్ని పరిగణించండి.
+- అన్ని browsers MediaRecorder API కు మద్దతు ఇవ్వరు — Chrome మరియు Firefox నమ్మదగినవి.
+- Audio ప్రతిస్పందనల transcription అదనపు post-processing అవసరం.
+- Privacy నిబంధనలు voices record చేయడాన్ని నిరోధించవచ్చు — local data protection requirements ధృవీకరించండి.

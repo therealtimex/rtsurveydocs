@@ -1,0 +1,69 @@
+---
+description: Skrytá pole ukládají hodnoty, které se respondentovi nikdy nezobrazí
+  — používají se pro předávání kontextu, předvyplnění dat nebo ukládání mezivýsledků.
+icon: eye-slash
+title: Hidden
+---
+
+
+Pole `hidden` ukládá hodnotu, která se **respondentovi nikdy nezobrazí**. Na rozdíl od `calculate` (který vypočítává hodnotu) se `hidden` používá pro přenos **externě poskytnuté hodnoty** — například ID úkolu, ID domácnosti předaného z jiného systému nebo kódu enumerátora vloženého při spuštění formuláře.
+
+## Základní specifikace XLSForm
+
+| type | name | label |
+|------|------|-------|
+| hidden | household_id | |
+
+Popisky nejsou pro skrytá pole vyžadovány, protože se na obrazovce nic nevykresluje.
+
+## Použití
+
+Skrytá pole se běžně používají pro:
+
+1. Předávání předem přiřazeného ID ze systému správy průzkumu (např. ID domácnosti, číslo případu, kód úkolu)
+2. Ukládání verze formuláře nebo metadat nasazení
+3. Vkládání konfigurace specifické pro enumerátora při spuštění formuláře
+4. Přenos dat z nadřazeného formuláře do podřízeného formuláře v propojených pracovních postupech
+5. Ukládání hodnoty odvozené z parametrů URL při otevření formuláře přes webový odkaz
+
+## Nastavení výchozí hodnoty
+
+Nejběžnější vzor je použití `hidden` s výrazem `default`, aby byla hodnota nastavena při otevření formuláře:
+
+| type | name | default |
+|------|------|---------|
+| hidden | deployment_code | 'ZONE_A_2024' |
+| hidden | form_version | '3.1' |
+
+## Odkazování skrytého pole ve výpočtech
+
+Skryté hodnoty lze odkazovat jako jakékoli jiné pole pomocí `${fieldname}`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| hidden | zone_code | | |
+| calculate | label_prefix | | concat('[', ${zone_code}, '] ') |
+| note | intro | ${label_prefix} Vítejte v průzkumu domácnosti | |
+
+## Použití hidden s předvyplněním / parametry URL
+
+Při spuštění webového formuláře přes URL můžete předávat parametry, které vyplní skrytá pole. To vám umožní předem načíst ID domácnosti nebo kód úkolu bez zadávání enumerátorem:
+
+```
+https://your-server.com/form/FORMID?household_id=H00123&zone_code=NORTH
+```
+
+Pole pojmenované `household_id` bude automaticky vyplněno hodnotou `H00123`.
+
+## Osvědčené postupy
+
+1. Používejte `hidden` (nikoli `calculate`), když je hodnota **vkládána zvenčí** a neměla by být přepočítávána.
+2. Používejte `calculate`, když je hodnota **odvozena z jiných polí** ve formuláři.
+3. Vždy nastavte `default`, pokud musí mít skryté pole hodnotu — skryté pole bez výchozí hodnoty bude prázdné.
+4. Jasně pojmenovávejte skrytá pole pro jejich odlišení (např. předpona `_hidden_` nebo konzistentní konvence pojmenování).
+
+## Omezení
+
+- Skrytá pole jsou zahrnuta v exportovaných datech jako jakékoli jiné pole.
+- Nelze je zobrazit podmíněně — jsou vždy přítomna (ale neviditelná).
+- Pokud potřebujete pole, které se dynamicky počítá, použijte místo toho `calculate`.

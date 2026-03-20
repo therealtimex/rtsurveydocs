@@ -1,0 +1,129 @@
+---
+description: ''
+icon: code
+title: Valeurs par défaut
+---
+
+
+Les valeurs par défaut dans rtSurvey vous permettent de pré-remplir les questions avec des réponses lorsqu'un répondant les rencontre pour la première fois. Cette fonctionnalité peut améliorer considérablement l'efficacité de l'enquête et la qualité des données en fournissant des valeurs initiales qui sont soit fréquemment sélectionnées, soit servent d'exemples d'entrée attendue.
+
+## Utilisation de Base
+
+Pour définir une valeur par défaut, utilisez la colonne `default` dans votre XLSForm :
+
+```
+| type    | name        | label                         | default    |
+|---------|-------------|-------------------------------|------------|
+| date    | survey_date | Date de l'enquête             | 2024-07-04 |
+| decimal | weight      | Poids du répondant ? (en kg)  | 51.3       |
+```
+
+Dans cet exemple, la date de l'enquête sera pré-remplie avec le 4 juillet 2024, et le champ du poids commencera avec 51,3 kg.
+
+## Valeurs par Défaut Dynamiques
+
+rtSurvey prend en charge les valeurs par défaut dynamiques à l'aide de fonctions :
+
+```
+| type | name | label                              | default  |
+|------|------|------------------------------------| ---------|
+| date | d    | Date de l'événement ?              | today()  |
+```
+
+Ici, la fonction `today()` définit automatiquement la valeur par défaut à la date du jour.
+
+## Fonctionnalités Spécifiques à rtSurvey
+
+### Valeurs par Défaut Sensibles au Contexte
+
+rtSurvey étend la fonctionnalité par défaut avec des valeurs sensibles au contexte :
+
+```
+| type    | name     | label           | default            |
+|---------|----------|-----------------|---------------------|
+| text    | location | Lieu actuel     | ${current_location} |
+```
+
+Ceci utilise la variable `${current_location}` de rtSurvey pour pré-remplir le lieu en fonction du GPS de l'appareil.
+
+### Valeurs par Défaut en Cascade
+
+rtSurvey permet des valeurs par défaut basées sur les réponses précédentes :
+
+```
+| type    | name     | label           | default         |
+|---------|----------|-----------------|-----------------|
+| text    | city     | Ville           |                 |
+| text    | district | Quartier        | ${city}-district|
+```
+
+Ici, le champ du quartier est pré-rempli en fonction de la ville saisie.
+
+### Valeurs par Défaut dans les Répétitions (Repeats)
+
+Pour les questions à l'intérieur d'un groupe de répétition, la valeur par défaut est calculée lorsque la répétition est ajoutée :
+
+```
+| type         | name      | label        | default                |
+|--------------|-----------|--------------|------------------------|
+| begin repeat | visits    | Visites Clinique |                    |
+| date         | visit_date| Date de visite | ${previous_visit_date} |
+| end repeat   |           |              |                        |
+```
+
+Ceci définit la date de visite par défaut à la date de la visite précédente.
+
+## Meilleures Pratiques pour l'Utilisation des Valeurs par Défaut
+
+1. **Utiliser avec parcimonie** : N'utilisez les valeurs par défaut que là où elles améliorent considérablement l'efficacité ou la qualité des données.
+2. **Assurer la précision** : Révisez et mettez à jour régulièrement les valeurs par défaut statiques.
+3. **Tester soigneusement** : Surtout lors de l'utilisation de valeurs par défaut dynamiques ou calculées.
+4. **Considérer l'expérience utilisateur** : Assurez-vous que les valeurs par défaut ne trompent pas les répondants et n'introduisent pas de biais.
+5. **Documenter clairement** : Assurez-vous que tous les membres de l'équipe comprennent la raison d'être des valeurs par défaut.
+
+## Techniques Avancées de Valeur par Défaut
+
+### Valeurs par Défaut Aléatoires
+
+rtSurvey prend en charge les valeurs par défaut aléatoires pour certains types de questions :
+
+```
+| type              | name    | label        | default           |
+|-------------------|---------|--------------|-------------------|
+| select_one options| choice  | Sélectionner : | random(options)   |
+```
+
+Ceci sélectionne aléatoirement une option par défaut dans la liste 'options'.
+
+### Valeurs par Défaut Conditionnelles
+
+Utilisez la pertinence pour définir des valeurs par défaut conditionnelles :
+
+```
+| type    | name     | label    | default | relevant        |
+|---------|----------|----------| ---------|-----------------|
+| text    | other    | Précisez | N/A     | ${q1} = 'other' |
+```
+
+Ici, 'N/A' est la valeur par défaut uniquement lorsque 'other' est sélectionné dans une question précédente.
+
+## Considérations sur la Gestion des Données
+
+- Les valeurs par défaut sont incluses dans les exportations de données, généralement avec un indicateur signalant qu'il s'agissait de valeurs par défaut.
+- La fonction de piste d'audit de rtSurvey suit les moments où les valeurs par défaut sont modifiées par les répondants.
+
+## Comportement de l'Application Mobile
+
+- L'application mobile rtSurvey prend en charge toutes les fonctionnalités par défaut, y compris les valeurs dynamiques et sensibles au contexte.
+- Le mode hors ligne peut affecter certaines valeurs par défaut dynamiques qui dépendent de données en temps réel.
+
+## Limitations Connues
+
+- Les valeurs par défaut calculées de manière complexe peuvent impacter le temps de chargement du formulaire, en particulier sur les appareils bas de gamme.
+- Certaines valeurs par défaut dynamiques peuvent ne pas fonctionner comme prévu en mode prévisualisation.
+
+## Dépannage des Valeurs par Défaut
+
+1. **La valeur par défaut n'apparaît pas** : Vérifiez les erreurs de syntaxe dans l'expression par défaut.
+2. **Valeurs inattendues** : Vérifiez la logique de calcul et testez différents scénarios.
+3. **Problèmes de performance** : Optimisez les calculs par défaut complexes ou envisagez d'autres approches pour afficher les données par défaut.

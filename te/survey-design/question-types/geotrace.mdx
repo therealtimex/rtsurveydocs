@@ -1,0 +1,80 @@
+---
+description: Geotrace ప్రశ్నలు ప్రతిస్పందించే వ్యక్తులు మ్యాప్‌పై అనుసంధానిత points
+  శ్రేణిని capture చేయడానికి, సర్వే భాగంగా lines లేదా paths సృష్టించడానికి అనుమతిస్తాయి.
+icon: timeline
+title: Geotrace
+---
+
+
+XLSForms మరియు rtSurvey లో geotrace ప్రశ్న రకం ప్రతిస్పందించే వ్యక్తులు మ్యాప్‌పై అనుసంధానిత points శ్రేణిని capture చేయడానికి, lines లేదా paths సృష్టించడానికి అనుమతిస్తుంది. Routes, సరిహద్దులు, లేదా spatial surveys లో రేఖాత్మక లక్షణాలు మ్యాప్ చేయడానికి ఈ ఫీచర్ ముఖ్యంగా ఉపయోగకరం.
+
+## ప్రాథమిక XLSForm స్పెసిఫికేషన్
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geotrace | river_path  | Trace the path of the river     |
+
+ప్రాథమిక geotrace ప్రశ్న రకంపై మరిన్ని వివరాలకు, [XLSForm specification](https://xlsform.org/en/#question-types) చూడండి.
+
+## వినియోగాలు
+
+Geotrace ప్రశ్నలు సాధారణంగా వీటికి ఉపయోగిస్తారు:
+
+1. Field surveys సమయంలో తీసుకున్న routes లేదా paths మ్యాప్ చేయడం
+2. Roads, rivers, లేదా సరిహద్దులు వంటి రేఖాత్మక లక్షణాలు trace చేయడం
+3. రేఖాత్మక infrastructure (ఉదా. pipelines, power lines) పరిధి capture చేయడం
+4. రవాణా అధ్యయనాలలో ప్రయాణ paths రికార్డ్ చేయడం
+5. పర్యావరణ సర్వేలలో transects నిర్వచించడం
+
+## ఉత్తమ పద్ధతులు
+
+1. Device కు location services enable మరియు permissions granted ఉన్నాయని నిర్ధారించుకోండి.
+2. Path ఎలా trace చేయాలో మరియు ఏ లక్షణాలు చేర్చాలో స్పష్టమైన సూచనలు అందించండి.
+3. ప్రతిస్పందించే వ్యక్తులు paths ఖచ్చితంగా trace చేయడంలో సహాయపడటానికి satellite imagery లేదా base maps ఉపయోగించడాన్ని పరిగణించండి.
+4. Traces యొక్క సంభావ్య సంక్లిష్టత మరియు దాని డేటా పరిమాణం మరియు processing పై ప్రభావం పట్ల జాగ్రత్తగా ఉండండి.
+
+## ఉదాహరణ వినియోగం
+
+సర్వేలో geotrace ప్రశ్న ఎలా ఉపయోగించవచ్చో ఒక ఉదాహరణ:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geotrace | hiking_trail   | Trace the path of the hiking trail         | Start at the trailhead and end at the summit |
+
+## rtSurvey పొడిగింపులు
+
+geotrace ప్రశ్నల కోసం ప్రాథమిక XLSForm specification సరళంగా ఉన్నప్పటికీ, rtSurvey అదనపు ఫీచర్‌లు లేదా అనుకూలీకరణలు అందించవచ్చు:
+
+1. మారుమూల ప్రాంతాలకు offline maps తో integration
+2. Trace కోసం కనీస మరియు గరిష్ట points సంఖ్య నిర్ణయించే ఎంపికలు
+3. ప్రారంభ drawing తర్వాత traces సవరించే లేదా శుద్ధి చేసే సామర్థ్యం
+4. కదలిక సమయంలో నిర్ణీత intervals లో automatic tracing కు మద్దతు
+
+## డేటా ఫార్మాట్
+
+Geotrace డేటా సాధారణంగా geoshape మాదిరిగా కానీ closing point లేకుండా semicolon-separated coordinate pairs string గా నిల్వ చేయబడుతుంది:
+
+```
+lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
+```
+
+ఉదాహరణకు:
+```
+38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
+```
+
+## విశ్లేషణ పరిగణనలు
+
+Geotrace ప్రశ్నలు ఉపయోగించేటప్పుడు పరిగణించండి:
+
+1. భౌగోళిక డేటా ఎలా visualize మరియు analyze చేయబడుతుందో (ఉదా. GIS software)
+2. సంక్లిష్ట traces యొక్క data cleaning లేదా simplification అవసరం
+3. వివరణాత్మక spatial డేటా నిర్వహించడానికి privacy మరియు data protection చర్యలు
+4. సమగ్ర విశ్లేషణకు ఇతర spatial data sources తో integration
+
+## పరిమితులు
+
+- చిన్న mobile screens పై ఖచ్చితమైన paths trace చేయడం సవాలుగా ఉండవచ్చు.
+- సంక్లిష్ట traces కు గణనీయమైన storage మరియు processing సామర్థ్యం అవసరం.
+- Automatic tracing కోసం నిరంతర GPS వినియోగం device batteries ని వేగంగా drain చేయవచ్చు.
+- వివరణాత్మక path డేటా సేకరించడంతో privacy concerns ఉండవచ్చు.

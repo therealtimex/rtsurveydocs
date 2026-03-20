@@ -1,0 +1,143 @@
+---
+description: ''
+icon: code
+title: Media
+---
+
+
+rtSurvey mbështet integrimin e pasur të medias në sondazhe, duke ju lejuar të zgjeroni pyetësorët tuaj me imazhe, audio dhe video. Kjo veçori mund të përmirësojë ndjeshëm eksperiencën e të anketuarit dhe cilësinë e të dhënave të mbledhura.
+
+## Llojet e Medias të Mbështetura
+
+rtSurvey mbështet llojet e mëposhtme të medias:
+- Imazhet (jpg, png, gif)
+- Audio (mp3, wav)
+- Video (mp4, webm)
+
+## Shtimi i Medias në Sondazhin Tuaj
+
+Për të përfshirë media në formularin tuaj rtSurvey, përdorni kolonat e mëposhtme në XLSForm tuaj:
+
+- `image`: Për shfaqjen e imazheve
+- `audio`: Për luajtjen e skedarëve audio
+- `video`: Për luajtjen e skedarëve video
+
+Shembull:
+
+```
+| type | name          | label         | image        | audio       | video       |
+|------|---------------|---------------|--------------|-------------|-------------|
+| note | media_example | Shembull media | example.jpg | sound.mp3   | clip.mp4    |
+```
+
+## Menaxhimi i Skedarëve Media
+
+### Sondazhet me bazë ueb
+Për sondazhet me bazë ueb, rtSurvey siguron një ndërfaqe menaxhimi mediash ku mund të ngarkoni dhe organizoni skedarët tuaja media. Këto skedarë janë pastaj automatikisht të disponueshëm për përdorim në sondazhet tuaja.
+
+### Aplikacioni celular
+Kur përdorni aplikacionin celular rtSurvey:
+1. Vendosni skedarët tuaj media në dosjen `/rtSurvey/forms/[emri-formularit]-media/` në pajisjen tuaj.
+2. Referoni emrin e saktë të skedarit në XLSForm tuaj.
+
+## Veçoritë Specifike rtSurvey
+
+### Ngarkimi Dinamik i Medias
+rtSurvey mbështet ngarkimin dinamik të medias bazuar në përgjigjet e sondazhit:
+
+```
+| type         | name      | label              | image                    |
+|--------------|-----------|--------------------|--------------------------| 
+| select_one species | animal | Zgjidhni një kafshë | ${animal}.jpg          |
+```
+
+### Media në Opsionet e Zgjedhjes
+rtSurvey ju lejon të përdorni media në opsionet e zgjedhjes për pyetjet zgjedhëse:
+
+```
+| type                | name    | label           | media::image |
+|---------------------|---------|-----------------|--------------|
+| select_one_from_file animals | Zgjidhni një kafshë |     |
+```
+
+Në fletën choices:
+```
+| list_name | name  | label  | media::image |
+|-----------|-------|--------|--------------|
+| animals   | dog   | Qen    | dog.jpg      |
+| animals   | cat   | Mace   | cat.jpg      |
+```
+
+### Kapja e Medias
+rtSurvey zgjeron XLSForm me aftësi kapjeje mediash:
+
+```
+| type  | name        | label               |
+|-------|-------------|---------------------|
+| image | photo       | Bëni një foto       |
+| audio | voice_note  | Regjistroni një shënim zanor |
+| video | video_clip  | Regjistroni një video |
+```
+
+## Praktikat Më të Mira për Përdorimin e Medias
+
+1. **Optimizoni madhësitë e skedarëve**: Skedarët e mëdhenj media mund të ngadalësojnë ngarkimin e sondazhit dhe dorëzimin.
+2. **Përdorni formate të përshtatshme**: Qëndroni me formate të mbështetura gjerësisht (jpg për imazhe, mp3 për audio, mp4 për video).
+3. **Siguroni alternativa**: Gjithmonë përfshini alternativa teksti për aksesin.
+4. **Testoni tërësisht**: Sigurohuni që media shfaqet saktë në të gjitha pajisjet e shënjestruara.
+5. **Konsideroni përdorimin offline**: Për sondazhet që mund të kryhen offline, sigurohuni që të gjitha mediat janë të disponueshme lokalisht.
+
+## Mbështetja Media Shumëgjuhëshe
+
+rtSurvey mbështet median specifike gjuhore. Përdorni sufiksin `::language`:
+
+```
+| type | name  | label    | image::Shqip | image::Spanish |
+|------|-------|----------|--------------|----------------|
+| note | intro | Mirësevini | welcome_sq.jpg | welcome_es.jpg |
+```
+
+## Media në Eksportimin e të Dhënave
+
+Kur eksportoni të dhëna nga rtSurvey:
+- Për sondazhet ueb, URL-të e medias përfshihen në eksport.
+- Për sondazhet e aplikacionit celular, rrugët e skedarëve përfshihen.
+
+## Konsideratat e Aplikacionit Celular
+
+- Siguroni hapësirë të mjaftueshme ruajtëse në pajisje për sondazhe me shumë media.
+- Aplikacioni celular rtSurvey mbështet luajtjen dhe kapjen offline të medias.
+- Skedarët e mëdhenj media mund të ndikojnë në performancën e aplikacionit në pajisje të nivelit të ulët.
+
+## Kufizimet e Njohura
+
+- Disa shfletues të vjetër mund të mos mbështesin të gjitha formatet media.
+- Skedarët shumë të mëdhenj video mund të shkaktojnë probleme në situata me brez të gjerë të ulët.
+
+## Zgjidhja e Problemeve Media
+
+1. **Media nuk shfaqet**: Kontrolloni rrugët dhe emrat e skedarëve për saktësi.
+2. **Probleme luajtjeje**: Sigurohuni që formati i medias mbështetet nga pajisjet e shënjestruara.
+3. **Ngarkimi i ngadalshëm**: Konsideroni optimizimin e madhësive të skedarëve ose parangarkim të medias.
+
+## Veçoritë e Avancuara Media
+
+### Gjeoetiketimi
+rtSurvey mund të gjeoetiketojë automatikisht mediat e kapura gjatë sondazheve:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Bëni një foto | geotag    |
+```
+
+### Shënime Media
+Lejoni të anketuarit të shënojnë imazhet:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Shënoni imazhin | annotate |
+```
+
+Duke përdorur efektivisht mediat në formularët tuaj rtSurvey, mund të krijoni sondazhe më tërheqëse, informuese dhe të sakta. Mos harroni të balanconi përfitimet e përfshirjes së medias me konsideratat e performancës, veçanërisht për sondazhet e vendosura në zona me lidhje të kufizuar interneti ose në pajisje të nivelit të ulët.

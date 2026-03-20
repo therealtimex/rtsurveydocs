@@ -1,0 +1,94 @@
+---
+description: Trigger-kysymykset näyttävät lausuman, jonka luetteloijan on nimenomaisesti
+  vahvistettava ennen jatkamista.
+icon: check-circle
+title: Trigger / Acknowledge
+---
+
+
+`trigger` (kutsutaan myös `acknowledge`)-kysymystyyppi näyttää **lausuman valintaruudun kanssa**. Luetteloijan on rastittava valintaruutu vahvistaakseen lukeneensa ja ymmärtäneensä lausuman ennen kuin lomake antaa heidän jatkaa. Mitään data-arvoa ei tallenneta — vain se, onko valintaruutu rastitettu.
+
+## XLSForm-perusmäärittely
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | Vastaaja on antanut suullisen tietoisen suostumuksensa. |
+
+Tai `acknowledge`-aliaksen avulla:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | Vastaaja on antanut suullisen tietoisen suostumuksensa. |
+
+Sekä `trigger` että `acknowledge` ovat vastaavia — käytä kumpaa tahansa, jonka alustasi dokumentoi.
+
+## Käyttötarkoitukset
+
+Trigger/acknowledge-kysymyksiä käytetään yleisesti:
+
+1. **Tietoinen suostumus** — vahvistaa, että luetteloija sai suostumuksen ennen arkaluonteisten tietojen tallentamista
+2. **Pehmeät varoitukset** — varoittaa epätavallisesta arvosta ja vaatii nimenomaista vahvistusta ennen jatkamista
+3. **Tarkistuslistaerien** — vahvistaa, että fyysinen havainto on tehty (esim. "Olen suoraan havainnut vesilähteen")
+4. **Ohjeet** — pakottaa luetteloijan vahvistamaan osiotason ohjeen ennen jatkamista
+5. **Laaduntarkistukset** — merkitsee poikkeavat arvot ja vaatii luetteloijaa tarkistamaan ne
+
+## Esimerkkikäyttö
+
+### Suostumuksen vahvistaminen
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | Vastaaja on antanut suullisen tietoisen suostumuksensa osallistua tähän kyselyyn. | yes |
+
+### Pehmeä hälytys poikkeavista arvoista
+
+Käytetään `relevant`-lausekkeen kanssa näyttämään trigger vain, kun epäilyttävä arvo syötetään:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Lasten lukumäärä | | |
+| trigger | children_confirm | Syötit ${children} lasta. Tarkista vastaajan kanssa ja napauta OK vahvistaaksesi. | `${children} > 10` | `${children} > 10` |
+
+### Ohjeen vahvistaminen osion alussa
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Osio B: Maatalousmaankäyttö. Esitä kaikki tämän osion kysymykset vain kotitalouden päälle. |
+
+## Triggerin pakolliseksi tekeminen
+
+Lisää `required: yes` estääksesi etenemisen ennen kuin ruutu on rastitettu:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | Kaikki turvalaitteet ovat läsnä ja toimivat. | yes | Sinun on vahvistettava ennen jatkamista. |
+
+## Ehdollinen näyttö
+
+Näytä trigger vain, kun ehto täyttyy:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | Onko kotitaloudella kaivo? | |
+| trigger | well_observation | Vahvista, että olet suoraan havainnut kaivon kunnon. | `${has_well} = 'yes'` |
+
+## Ero `note`-tyyppiin
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Näyttää tekstiä | Kyllä | Kyllä |
+| Vaatii vuorovaikutuksen | Ei | Kyllä (täytyy rastittaa) |
+| Tallentaa tietoja | Ei | Ei (vain OK/rastitettu) |
+| Voi estää etenemistä | Ei | Kyllä (kanssa `required`) |
+
+## Parhaat käytännöt
+
+1. Pidä trigger-otsikot tiiviinä ja toimintaa ohjaavina — luetteloijan tulisi pystyä lukemaan ja vahvistamaan sekunneissa.
+2. Lisää aina `required: yes`, kun vahvistus on pakollinen.
+3. Käytä triggereita suostumukseen ja turvallisuustarkistuksiin, joissa tarvitaan tarkastusketju siitä, että luetteloija on vahvistanut.
+4. Yhdistä `relevant`-sarakkeeseen ehdollisia pehmeitä hälytyksiä varten, jotta trigger näkyy vain silloin, kun arvo tarvitsee tarkistuksen.
+
+## Rajoitukset
+
+- Trigger-kentät eivät tallenna merkityksellistä data-arvoa — ne vain rekisteröivät, että ruutu rastittiin.
+- Trigger-widget renderöidään yksinkertaisena valintaruutuna/painikkeena useimmissa asiakkaissa; se ei ole täydellinen sähköinen allekirjoitus.

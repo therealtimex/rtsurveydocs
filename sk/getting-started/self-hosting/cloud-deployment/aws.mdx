@@ -1,0 +1,118 @@
+---
+description: Nasadenie rtCloud na inštanciu AWS EC2 pomocou skriptu user data aws-ec2.sh.
+icon: cloud
+title: AWS EC2
+---
+
+
+Použite `aws-ec2.sh` ako skript **User Data** pri spúšťaní inštancie EC2. Skript sa automaticky spustí pri prvom spustení.
+
+**Stiahnuť skript:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+
+---
+
+## Krok 1 — Vyplňte konfiguráciu
+
+Otvorte skript a upravte blok `CONFIGURATION` v hornej časti:
+
+```bash
+# --- Povinné ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # Zmeňte po prvom prihlásení
+
+# --- Doména + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- Vstavaný Keycloak ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Predvolené na ADMIN_PASSWORD
+```
+
+| Pole | Povinné | Popis |
+|-------|----------|-------------|
+| `PROJECT_ID` | Áno | Používa sa ako názov databázy a ID klienta Keycloak. Malými písmenami, bez medzier. |
+| `ADMIN_PASSWORD` | Nie | Heslo správcu aplikácie a Keycloak. Predvolené na `admin` — **zmeňte po prvom prihlásení**. |
+| `DOMAIN` | Nie | Vaša doména pre HTTPS. Ponechajte prázdne pre režim iba HTTP. |
+| `LETSENCRYPT_EMAIL` | Áno (ak je nastavená DOMAIN) | Email pre oznámenia Let's Encrypt. |
+| `EMBED_KEYCLOAK` | Nie | `true` na nasadenie vstavaného Keycloak (vyžaduje 4 GB RAM). |
+
+> **Bezpečnosť:** Všetky heslá majú predvolenú hodnotu `admin`. Zmeňte ich ihneď po prvom prihlásení.
+
+---
+
+## Krok 2 — Spustite inštanciu EC2
+
+V [konzole AWS EC2](https://console.aws.amazon.com/ec2):
+
+1. Kliknite na **Launch instance**
+2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
+3. **Typ inštancie:** `t3.medium` (4 GB RAM) alebo väčší
+4. **Kľúčový pár:** Vyberte alebo vytvorte pre SSH prístup
+5. **Nastavenia siete:** Vytvorte alebo vyberte skupinu zabezpečenia (pozrite nižšie)
+6. **Rozšírené podrobnosti** → **User data** → vložte celý obsah skriptu
+7. Kliknite na **Launch instance**
+
+---
+
+## Krok 3 — Nakonfigurujte skupinu zabezpečenia
+
+Otvorte tieto porty v skupine zabezpečenia inštancie:
+
+| Port | Protokol | Zdroj | Účel |
+|------|----------|--------|---------|
+| 22 | TCP | Vaša IP | SSH prístup |
+| 80 | TCP | 0.0.0.0/0 | HTTP (presmerovaný na HTTPS pomocou Nginx) |
+| 443 | TCP | 0.0.0.0/0 | HTTPS |
+| 3838 | TCP | 0.0.0.0/0 | Priamy prístup k Shiny |
+
+> **Neotvárajte** port 3306 (MySQL) — nikdy by nemal byť verejne prístupný.
+
+---
+
+## Krok 4 — Pridajte záznam DNS
+
+Kým sa inštancia spúšťa, pridajte **záznam A** u vášho poskytovateľa DNS:
+
+```
+Typ   : A
+Názov : myapp
+Hodnota: <instance-public-ip>
+TTL   : 300
+```
+
+---
+
+## Krok 5 — Monitorujte postup
+
+```bash
+ssh ubuntu@<instance-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## Krok 6 — Prístup k aplikácii
+
+Po dokončení nastavenia protokol zobrazí súhrn s URL vašej aplikácie a prihlasovacími údajmi. Prihláste sa s menom `admin` a heslom `admin`, potom ihneď zmeňte heslo.
+
+---
+
+## Po nasadení
+
+### Zmeňte heslo
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Zobrazte všetky kontajnery
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
+
+### Priraďte Elastic IP (voliteľné)
+
+Ak inštanciu zastavíte a spustíte, verejná IP sa zmení. Na zachovanie stabilnej IP alokujte **Elastic IP** a priraďte ju k inštancii v konzole EC2.

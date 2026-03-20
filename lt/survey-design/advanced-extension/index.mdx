@@ -1,0 +1,85 @@
+---
+description: ''
+icon: code
+title: Pažangūs plėtiniai
+---
+
+
+Stulpelis `appearance` rtSurvey sistemoje leidžia tinkinti klausimų vizualinę pateiktį ir elgseną jūsų apklausose. Ši funkcija pagerina naudotojo patirtį ir gali žymiai pagerinti duomenų rinkimo efektyvumą. rtSurvey palaiko standartinius XLSForm išvaizdos atributus ir juos papildo papildomomis parinktimis.
+
+## rtSurvey specifiniai išvaizdos plėtiniai
+
+rtSurvey išplečia standartines išvaizdos parinktis šiais:
+
+### Laiko įvesties tinkinimas
+
+`text` tipo klausimams, naudojamiems laiko įvedimui:
+
+- `appearance:` — rodo laikrodį valandoms ir minutėms pasirinkti
+- `appearance: inline` — rodo laikrodį kaip piktogramą
+- `appearance: inline-1line` — rodo laikrodį vienos eilutės formatu
+- `appearance: inline-onlyresult` — rodo laikrodžio piktogramą, po pasirinkimo dingsta
+- `appearance: inline-[FORMATAS]` — tinkina laiko formato rodymą (pvz., `[%H:%M]`, `[%h:%M:%S]`)
+
+### Spalvų tinkinimas
+
+rtSurvey leidžia spalvų tinkinimą įvairioms išvaizdamos:
+
+- `appearance: inline colors("0099FF")` — tinkina piktogramos spalvą
+- `appearance: inline-1line colors("0000FF","FFFF00")` — tinkina spalvas vienos eilutės formatu
+
+### Tinklelio išdėstymas
+
+rtSurvey pristato tinklelio išdėstymą kompaktiniams, lentelės tipo rodiniams:
+
+- `appearance: grid` — taikoma grupėms, kad būtų sukurtas tinklelio išdėstymas
+
+### Sulankstomos grupės
+
+- `appearance: collapsible` — sukuria išplečiamas/sulankstomos grupes
+
+## Geriausios išvaizdos naudojimo praktikos
+
+1. **Nuoseklumas**: naudokite išvaizdos atributus nuosekliai visoje apklausoje vienodam atrodymui.
+2. **Mobilieji ir žiniatinklis**: atsižvelkite į tai, kaip išvaizda bus atvaizduojama skirtinguose įrenginiuose ir platformose.
+3. **Našumas**: būkite atsargūs su išvaizdos atributais, kurie gali sulėtinti formos įkėlimą (pvz., `table-list` didelėms grupėms).
+4. **Naudotojo patirtis**: pasirinkite išvaizdas, kurios palengvina duomenų įvedimą ir daro jį intuityvesnį respondentams.
+5. **Testavimas**: visada patikrinkite savo formą tiksliniais įrenginiais, kad užtikrintumėte, jog išvaizdos veikia kaip tikimasi.
+
+## Pažangios technikos
+
+### Išvaizdų derinimas
+
+Kai kurie išvaizdos atributai gali būti derinami sudėtingesniems išdėstymams:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Pasirinkite vieną: | minimal compact |
+```
+
+### Dinaminė išvaizda
+
+rtSurvey leidžia dinamiškai keisti išvaizdą pagal formos logiką:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Įveskite laiką: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Mobiliosios programos svarstymai
+
+- Kai kurios išvaizados (pvz., `quick`, `signature`) yra būdingos mobiliesiems įrenginiams.
+- Išsamiai patikrinkite tiek „Android", tiek „iOS", kad užtikrintumėte nuoseklią elgseną.
+
+## Žinomos apribojimai
+
+- Sudėtingos išvaizados gali ne vienodai atvaizduotis visose platformose.
+- Kai kurios pažangios rtSurvey išvaizados gali būti nepalaikomos neprisijungusiame režime.
+
+## Išvaizdos problemų šalinimas
+
+1. **Išvaizda nepritaikyta**: patikrinkite, ar nėra rašybos klaidų išvaizdos stulpelyje.
+2. **Nesuderinamas atvaizdavimas**: patikrinkite suderinamumą su klausimo tipu ir platforma.
+3. **Našumo problemos**: apsvarstykite galimybę supaprastinti sudėtingas išvaizdas, ypač didelėms apklausoms.

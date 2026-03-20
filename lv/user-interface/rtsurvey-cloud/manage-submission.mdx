@@ -1,0 +1,38 @@
+---
+description: Pārskatiet, pārvaldiet un eksportējiet neapstrādātu datu ierakstus un
+  iesniegājumus.
+icon: cloud
+title: Iesniegumu pārvaldība
+---
+
+
+Modulis **Iesniegumu pārvaldība** (pieejams caur pogu **Datu skats** sadaļā Formu ģimene) ļauj projektu vadītājiem un uzraugiem tieši mijiedarboties ar ienākošajiem neapstrādātajiem datiem. Tas kalpo kā vienota darba vieta enumeratoru iesniegumu pārskatīšanai, ierīces identifikatoru izsekošanai un datu kvalitātes operācijām.
+
+![Iesniegumu pārvaldības interfeiss](/images/manage_submissions.png)
+
+## Datu pārskats un kolonnas
+
+Datu režģis dinamiski parāda konkrētai formai savāktos datus. Tas darbojas divos galvenajos režīmos: **Oficiāls** (Noslēgtie ieraksti) un **Darba** (Reāllaika, nenoslēgtie ieraksti).
+
+### Galvenās datu kolonnas
+
+Neatkarīgi no formā definētajiem pielāgotajiem jautājumiem, režģis ietver vairākas standarta metadatu kolonnas, kas palīdz ar auditu:
+
+- **Iesniegts ar:** Identificē iesnieguma izcelsmes platformu (piemēram, FA lauka lietotnei, WEB tīmekļa formai, RS attālām sistēmām).
+- **Detaļa:** Atver fokusētu, viena ieraksta skatu (meklēšanas ikona), lai pārbaudītu katru mainīgo un atbildi, kas iesniegta šajā instancē.
+- **iPiezīme:** Ļauj uzraugiem pievienot blakus piezīmes vai iekšējos komentārus konkrētam ierakstam, nemainot pašus savāktos datus (attēlots ar zīmuļa ikonu).
+- **Datumu lauki:** Laika zīmogi, kas norāda, kad ieraksts tika uzsākts, pabeigts vai sinhronizēts.
+- **Multivides pielikumi:** Tiešas sīktēla saites uz attēliem, parakstiem vai failiem, kas savākti aptaujas laikā.
+- **Atkārtojumu grupas:** Speciālas saites piekļuvei ligzdotajām tabulām atkārtotiem jautājumiem mātes formā.
+
+## Iesniegumu darbības
+
+Lai atvieglotu aktīvu datu kvalitātes kontroli, interfeiss nodrošina nolaižamā saraksta izvēlni ar izpildāmām komandām, kas var tikt izpildītas uz izvēlētajiem ierakstiem:
+
+- **Izveidot jaunu instanci:** Ļauj administratoriem manuāli ievadīt jaunu aptaujas ierakstu tieši datu bāzē.
+- **Atgriezt instanci:** Noraida iesniegto ierakstu un uzliek enumeratoram pienākumu atkārtoti verificēt vai savākt informāciju.
+- **Sekot instancei:** Atzīmē ierakstu tālākai uzmanībai, parasti nosūtot brīdinājumu lauka komandai precizēšanai.
+- **Eksportēt uz atgriezto komandu failu / Sekošanas komandu pakotni:** Ģenerē lielapjoma eksportus (failus), kas satur datu kopas, kas speciāli atzīmētas atgriešanai vai sekošanai.
+- **Konvertēt uz XML:** Pārveido strukturēto datu kopu atpakaļ tās neapstrādātā XML formātā aizmugures analīzei vai sistēmas integrācijai.
+- **Pārsūtīt instances:** (Pieejams *Darba* režīmā) Nekavējoties nosūta nenoslēgtos datus uz citu ierīci vai lietotāju.
+- **Dzēst:** Neatgriezeniski noņem izvēlētās instances no datu bāzes.

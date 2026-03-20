@@ -1,0 +1,59 @@
+---
+description: Verborgen velden slaan waarden op die nooit worden getoond aan de respondent
+  — gebruikt om context door te geven, gegevens voor te vullen of tussenresultaten
+  op te slaan.
+icon: eye-slash
+title: Verborgen
+---
+
+
+Een `hidden`-veld slaat een waarde op die **nooit wordt weergegeven aan de respondent**. In tegenstelling tot `calculate` (dat een waarde berekent), wordt `hidden` gebruikt om een **extern verstrekte waarde** te dragen — bijvoorbeeld een taak-ID, een huishoud-ID doorgegeven vanuit een ander systeem, of een enumeratorcode geïnjecteerd wanneer het formulier wordt gestart.
+
+## Basis XLSForm-specificatie
+
+| type | name | label |
+|------|------|-------|
+| hidden | household_id | |
+
+Labels zijn niet vereist voor verborgen velden omdat er niets op het scherm wordt weergegeven.
+
+## Toepassingen
+
+Verborgen velden worden veelgebruikt voor:
+
+1. Het doorgeven van een vooraf toegewezen ID vanuit het enquêtebeheersysteem (bijv. huishoud-ID, zaaknummer, taakveld)
+2. De formulierversie of implementatiemetagegevens opslaan
+3. Enumerator-specifieke configuratie injecteren bij het starten van het formulier
+4. Gegevens dragen van een bovenliggend formulier naar een onderliggend formulier in gekoppelde workflows
+5. Een waarde opslaan afgeleid van URL-parameters wanneer het formulier wordt geopend via een webkoppeling
+
+## Een standaardwaarde instellen
+
+Het meest voorkomende patroon is het gebruik van `hidden` met een `default`-expressie zodat de waarde wordt ingesteld wanneer het formulier opent:
+
+| type | name | default |
+|------|------|---------|
+| hidden | deployment_code | 'ZONE_A_2024' |
+| hidden | form_version | '3.1' |
+
+## Verwijzen naar een verborgen veld in berekeningen
+
+Verborgen waarden kunnen worden verwezen zoals elk ander veld met `${veldnaam}`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| hidden | zone_code | | |
+| calculate | label_prefix | | concat('[', ${zone_code}, '] ') |
+| note | intro | ${label_prefix} Welkom bij de huishoudenenquête | |
+
+## Aanbevolen werkwijzen
+
+1. Gebruik `hidden` (niet `calculate`) wanneer de waarde **extern wordt geïnjecteerd** en niet opnieuw moet worden berekend.
+2. Gebruik `calculate` wanneer de waarde **is afgeleid van andere velden** in het formulier.
+3. Stel altijd een `default` in als het verborgen veld een waarde moet hebben — een verborgen veld zonder standaard is leeg.
+
+## Beperkingen
+
+- Verborgen velden worden opgenomen in de geëxporteerde gegevens zoals elk ander veld.
+- Ze kunnen niet voorwaardelijk worden weergegeven — ze zijn altijd aanwezig (maar onzichtbaar).
+- Als u een veld nodig heeft dat dynamisch berekent, gebruik dan `calculate`.

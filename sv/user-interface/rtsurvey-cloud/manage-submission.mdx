@@ -1,0 +1,37 @@
+---
+description: Granska, hantera och exportera rådata och inlämningar.
+icon: cloud
+title: Hantera inlämningar
+---
+
+
+Modulen **Hantera inlämningar** (nås via knappen **Datavy** i avsnittet Formulärfamilj) låter projektledare och handledare direkt interagera med inkommande rådata. Den fungerar som en enhetlig arbetsyta för att granska intervjuarinlämningar, spåra enhetsidentifierare och utföra datakvalitetsoperationer.
+
+![Gränssnitt för hantera inlämningar](/images/manage_submissions.png)
+
+## Dataöversikt och kolumner
+
+Datarutnätet visar dynamiskt data som samlats in för ett specifikt formulär. Det fungerar i två huvudlägen: **Officiellt** (slutgiltiga poster) och **Pågående** (realtid, ej slutgiltiga poster).
+
+### Viktiga datakolumner
+
+Oavsett de anpassade frågor som definierats i formuläret inkluderar rutnätet flera standardmetadatakolumner för att hjälpa vid granskning:
+
+- **Inskickad av:** Identifierar ursprungsplattformen för inlämningen (t.ex. FA för fältapp, WEB för webbformulär, RS för fjärrsystem).
+- **Detalj:** Öppnar en fokuserad enstaka-post-vy (sökikon) för att inspektera varje variabel och svar som skickats för den instansen.
+- **iNote:** Låter handledare bifoga sidnoteringar eller interna kommentarer till en specifik post utan att ändra insamlade data (representerat av en pennikon).
+- **Datumfält:** Tidsstämplar som anger när posten initierades, slutfördes eller synkroniserades.
+- **Mediabilagor:** Direkta miniatyrbildslänkar till bilder, signaturer eller filer som samlats in under undersökningen.
+- **Upprepningsgrupper:** Dedikerade länkar för att komma åt kapslade tabeller för upprepade frågor inom det överordnade formuläret.
+
+## Inlämningsåtgärder
+
+För att underlätta aktiv datakvalitetskontroll tillhandahåller gränssnittet en rullgardinsmeny med åtgärdbara kommandon som kan utföras på valda poster:
+
+- **Skapa en ny instans:** Låter administratörer manuellt ange en ny undersökningspost direkt i databasen.
+- **Returnera instans:** Avvisar den inskickade posten och ger intervjuaren i uppgift att kontrollera eller samla in informationen på nytt.
+- **Följ upp instans:** Flaggar en post för ytterligare uppmärksamhet och skickar vanligtvis en avisering till fältteamet för klargörande.
+- **Exportera till returnerade kommandon / Uppföljningskommandopaket:** Genererar batchexporter (filer) som innehåller dataset specifikt markerade för returer eller uppföljningar.
+- **Konvertera till XML:** Omvandlar det strukturerade datasetet tillbaka till sitt råa XML-format för backend-analys eller systemintegration.
+- **Vidarebefordra instanser:** (Tillgängligt i *Pågående*-läge) Skickar ej slutgiltig data omedelbart till en annan enhet eller användare.
+- **Radera:** Tar permanent bort valda instanser från databasen.

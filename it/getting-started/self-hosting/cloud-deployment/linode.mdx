@@ -1,0 +1,102 @@
+---
+description: Distribuisci rtCloud su Linode usando StackScript con un'interfaccia
+  di configurazione basata su form.
+icon: dns
+title: Linode (Akamai Cloud)
+---
+
+
+Linode usa gli **StackScript** — script con un'interfaccia basata su form dove puoi compilare i campi di configurazione direttamente nel Linode Manager senza modificare alcun codice.
+
+> Gli StackScript di Linode sono il metodo di deployment più semplice. I campi appaiono come un form quando crei un Linode — non è richiesta la modifica dello script.
+
+---
+
+## Keycloak integrato (consigliato)
+
+### Passaggio 1 — Trova lo StackScript
+
+Lo StackScript è disponibile pubblicamente nella community Linode — non è necessaria alcuna configurazione manuale:
+
+1. Vai su **Linodes** → **Crea Linode**
+2. Sotto **Scegli una distribuzione**, seleziona **StackScript** → **StackScript della community**
+3. Cerca **`RTA rtSurvey - Self-Hosted with Keycloak SSO`**
+4. Selezionalo e compila il form di configurazione:
+
+> In alternativa, [scarica lo script](/scripts/linode-stackscript-keycloak-embed.sh) e crea il tuo StackScript sotto **StackScript** → **Crea StackScript**.
+
+| Campo | Obbligatorio | Descrizione |
+|-------|----------|-------------|
+| ID Progetto | No | Identificatore univoco (predefinito: `rtsurvey`). Usato come nome del database e ID client Keycloak. |
+| Password admin Keycloak | No | Password sia per la console admin Keycloak che per l'accesso admin dell'app. Predefinito a `admin` — **cambia dopo il primo accesso**. |
+| Dominio | Sì | Il tuo nome di dominio. Il record A DNS deve puntare all'IP di questo Linode. Richiesto per HTTPS e Keycloak. |
+| Email Let's Encrypt | Sì | Email per le notifiche del certificato Let's Encrypt. |
+| Tag immagine Docker | No | Immagine da distribuire (predefinito: `rtawebteam/rta-smartsurvey:survey-dockerize`). |
+
+> **Sicurezza:** Tutte le password hanno `admin` come valore predefinito. Cambiale immediatamente dopo il tuo primo accesso.
+
+5. Scegli **Ubuntu 22.04 LTS** come immagine
+6. Scegli il piano **Shared CPU 4 GB** o superiore
+7. Fai clic su **Crea Linode**
+
+### Passaggio 2 — Aggiungi il record DNS
+
+Mentre il Linode si avvia, aggiungi un **record A** nel tuo provider DNS:
+
+```
+Tipo  : A
+Nome  : myapp          (o @ per il dominio root)
+Valore : <linode-ip>
+TTL   : 300
+```
+
+### Passaggio 3 — Monitora l'avanzamento
+
+```bash
+ssh root@<linode-ip>
+tail -f /var/log/stackscript.log
+```
+
+Lo script stampa l'IP del tuo server all'inizio — aggiungi il record DNS non appena lo vedi.
+
+### Passaggio 4 — Accedi all'app
+
+Al completamento della configurazione, il log mostra un riepilogo:
+
+```
+============================================================
+ rtCloud deployment complete! (Embedded Keycloak)
+============================================================
+ App URL   : https://myapp.example.com
+ Admin     : admin / admin
+ Keycloak  : https://myapp.example.com/auth/admin
+
+ !! SECURITY: All passwords default to 'admin'.
+    Change them immediately after first login.
+============================================================
+```
+
+Accedi con nome utente `admin` e password `admin`, poi cambia subito la tua password.
+
+---
+
+## Dopo il deployment
+
+### Cambiare una password
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Visualizza tutti i container
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
+
+### Controlla il log
+
+```bash
+tail -200 /var/log/stackscript.log
+```

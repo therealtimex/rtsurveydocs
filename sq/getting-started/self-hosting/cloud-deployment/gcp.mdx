@@ -1,0 +1,140 @@
+---
+description: Vendosni rtCloud në Google Cloud Compute Engine duke përdorur skriptin
+  e nisjes gcp-compute.sh.
+icon: travel_explore
+title: Google Cloud (GCP)
+---
+
+
+Përdorni `gcp-compute.sh` si **Skriptin e Nisjes** kur krijoni një instancë VM Compute Engine. Skripti ekzekutohet automatikisht në nisjen e parë.
+
+**Shkarkoni skriptin:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+
+---
+
+## Hapi 1 — Plotësoni konfigurimin
+
+Hapni skriptin dhe editoni bllokun `CONFIGURATION` në krye:
+
+```bash
+# --- E detyrueshme ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # Ndryshojeni pas hyrjes së parë
+
+# --- Domeni + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- Keycloak i Integruar ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Parazgjedhja ADMIN_PASSWORD
+```
+
+| Fusha | E detyrueshme | Përshkrimi |
+|-------|----------|-------------|
+| `PROJECT_ID` | Po | Përdoret si emri i bazës së të dhënave dhe ID klientit Keycloak. Me shkronja të vogla, pa hapësira. |
+| `ADMIN_PASSWORD` | Jo | Fjalëkalimi i adminit të aplikacionit dhe fjalëkalimi admin Keycloak. Parazgjedhja `admin` — **ndryshojeni pas hyrjes së parë**. |
+| `DOMAIN` | Jo | Domeni juaj për HTTPS. Lini bosh për mënyrën vetëm HTTP. |
+| `LETSENCRYPT_EMAIL` | Po (nëse DOMAIN është caktuar) | Email për njoftimet Let's Encrypt. |
+| `EMBED_KEYCLOAK` | Jo | `true` për të vendosur Keycloak të integruar (kërkon 4 GB RAM). |
+
+> **Siguria:** Të gjitha fjalëkalimet parazgjidhen me `admin`. Ndryshojini menjëherë pas hyrjes suaj të parë.
+
+---
+
+## Hapi 2 — Krijoni një instancë VM
+
+Në [Konsolën Google Cloud](https://console.cloud.google.com/compute):
+
+1. Klikoni **Krijo instancë**
+2. **Konfigurimi i makinës:**
+   - Seria: `E2`
+   - Tipi i makinës: `e2-medium` (4 GB RAM) ose më i madh
+3. **Disku i nisjes:**
+   - Sistemi operativ: Ubuntu
+   - Versioni: Ubuntu 22.04 LTS
+   - Madhësia: 40 GB ose më shumë
+4. **Muret e zjarrit:** kontrolloni **Lejo trafikun HTTP** dhe **Lejo trafikun HTTPS**
+5. **Opsionet e avancuara** → **Menaxhimi** → **Automatizimi** → **Skripti i nisjes** → ngjitni të gjithë përmbajtjen e skriptit
+6. Klikoni **Krijo**
+
+---
+
+## Hapi 3 — Shtoni rekordin DNS
+
+Ndërkohë që VM-ja po niset, shtoni një **rekord A** te ofruesi juaj DNS:
+
+```
+Tipi  : A
+Emri  : myapp
+Vlera : <ip-e-jashtme-e-vm>
+TTL   : 300
+```
+
+Gjeni IP-n e jashtme në listën e instancave VM në konsolë.
+
+---
+
+## Hapi 4 — Monitoroni progresin
+
+Duke përdorur CLI-n `gcloud`:
+
+```bash
+gcloud compute ssh <emri-instancës> -- tail -f /var/log/rtcloud-setup.log
+```
+
+Ose SSH-oni direkt:
+
+```bash
+ssh <emri_përdoruesit>@<ip-e-jashtme-e-vm>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## Hapi 5 — Aksesoni aplikacionin
+
+Kur konfigurimi përfundon, regjistri tregon një përmbledhje me URL-n e aplikacionit dhe kredencialet. Hyni me emrin e përdoruesit `admin` dhe fjalëkalimin `admin`, pastaj ndryshoni fjalëkalimin menjëherë.
+
+---
+
+## Rregullat e Murit të Zjarrit
+
+Kutitë e kontrollit **Lejo HTTP/HTTPS** të GCP hapin portat 80 dhe 443. Për të lejuar gjithashtu aksesi direkt Shiny në portën 3838, shtoni një rregull muri zjarri:
+
+```bash
+gcloud compute firewall-rules create allow-shiny \
+  --allow tcp:3838 \
+  --target-tags http-server
+```
+
+Ose shtojeni nëpërmjet konsolës: **Rrjeti VPC** → **Muri i Zjarrit** → **Krijo rregull**.
+
+> **Mos** hapni portën 3306 (MySQL) — nuk duhet të jetë kurrë publikisht e aksesueshme.
+
+---
+
+## IP Statike (opsionale)
+
+Si parazgjedhje, GCP cakton një IP të jashtme kalimtare që ndryshon me rinisin VM. Për të mbajtur një IP të qëndrueshme:
+
+1. Shkoni te **Rrjeti VPC** → **Adresat IP**
+2. Klikoni **Rezervo adresë statike të jashtme**
+3. Caktojeni instancës suaj VM
+
+---
+
+## Pas Vendosjes
+
+### Ndryshoni një fjalëkalim
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Shikoni të gjithë kontejnerët
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```

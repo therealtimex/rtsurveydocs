@@ -1,0 +1,122 @@
+---
+description: ''
+icon: code
+title: Mbështetja shumëgjuhëshe
+---
+
+
+rtSurvey ofron mbështetje të fuqishme shumëgjuhëshe, duke ju lejuar të krijoni sondazhe në gjuhë të shumëfishta. Kjo veçori është thelbësore për kryerjen e kërkimeve nëpër popullatë të ndryshme gjuhësore ose në mjedise shumëgjuhëshe.
+
+## Konfigurimi i Sondazheve Shumëgjuhëshe
+
+Për të krijuar një sondazh shumëgjuhësor në rtSurvey, duhet të shtoni kolona specifike gjuhore në XLSForm tuaj. Ja si:
+
+1. **Përkthimet e Etiketave**: Shtoni kolona për çdo gjuhë duke përdorur formatin `label::Gjuha (kodi)`.
+2. **Përkthimet e Udhëzimeve**: Përdorni `hint::Gjuha (kodi)` për përkthimin e udhëzimeve.
+3. **Përkthimet e Skedarëve Media**: Për media specifike gjuhore, përdorni `media::Gjuha (kodi)`.
+
+Shembull:
+
+```
+| type    | name | label::Shqip (sq) | label::Español (es) | hint::Shqip (sq) | hint::Español (es) |
+|---------|------|---------------------|---------------------|---------------------|---------------------|
+| integer | age  | Sa vjeç jeni?       | ¿Cuántos años tienes?| Futni moshën tuaj  | Ingrese su edad     |
+```
+
+## Kodet e Gjuhëve
+
+Rekomandohet të përdorni kodet zyrtare 2-karakterëshe të gjuhëve (nënlokalizat) pas emrit të gjuhës. Kjo lehtëson përputhjen e gjuhës së formularit me gjuhën e ndërfaqes së përdoruesit. Mund të gjeni kodet zyrtare [këtu](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+
+## Caktimi i Gjuhës Parazgjedhëse
+
+Për të caktuar një gjuhë parazgjedhëse për mbledhjen e të dhënave, përdorni fletën e punës `settings` në XLSForm tuaj:
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | Shqip (sq)        |
+```
+
+## Veçoritë Specifike rtSurvey
+
+### Ndërrimi Dinamik i Gjuhëve
+
+rtSurvey lejon përdoruesit të ndërrojnë gjuhët dinamikisht gjatë mbledhjes së të dhënave:
+
+- Në ndërfaqen ueb, përdorni menunë rënëse të gjuhëve në shiritin e navigimit të sipërm.
+- Në aplikacionin celular, aksesoni opsionet e gjuhëve nëpërmjet menusë së cilësimeve.
+
+### Mesazhet e Validimit Specifike Gjuhore
+
+rtSurvey zgjeron mbështetjen shumëgjuhëshe ndaj mesazheve të validimit:
+
+```
+| type    | name | constraint | constraint_message::Shqip (sq) | constraint_message::Español (es) |
+|---------|------|------------|----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Mosha duhet të jetë 150 ose më pak | La edad debe ser 150 o menos  |
+```
+
+### Mbështetja e Gjuhëve RTL
+
+Për gjuhët e djathtas-majtas (RTL) si arabishtja ose hebraishtja, rtSurvey rregullon automatikisht paraqitjen:
+
+```
+| type | name | label::Shqip (sq) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Emri juaj           | اسمك                |
+```
+
+### Pamja Specifike Gjuhore
+
+rtSurvey ju lejon të specifikoni pamje të ndryshme për gjuhë të ndryshme:
+
+```
+| type | name | label::Shqip (sq) | label::Chinese (zh) | appearance::Shqip (sq) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Adresa         | 地址                 | multiline                | textarea                  |
+```
+
+## Praktikat Më të Mira për Sondazhet Shumëgjuhëshe
+
+1. **Emërtim i Qëndrueshëm**: Përdorni kode gjuhore të qëndrueshme nëpërmjet formularit tuaj.
+2. **Përkthim Profesional**: Angazhoni përkthyes profesionistë të njohur me kontekstin e sondazhit.
+3. **Shënime Konteksti**: Siguroni shënime konteksti për përkthyesit për të garantuar përkthime të sakta.
+4. **Testimi**: Testoni formularin tuaj në të gjitha gjuhët para vendosjes.
+5. **Mbështetja Unicode**: Sigurohuni që pajisjet tuaja të mbledhjes së të dhënave mbështesin Unicode për shkrime jo-latine.
+6. **Media Specifike Gjuhore**: Përdorni imazhe ose audio kulturalisht të përshtatshme për çdo gjuhë.
+7. **Shmangni Tekstin në Imazhe**: Nëse përdorni imazhe me tekst, krijoni imazhe të veçanta për çdo gjuhë.
+
+## Trajtimi i Rasteve Speciale
+
+### Përgjigjet me Gjuhë të Përziera
+
+rtSurvey lejon të anketuarit të fusin tekst në çdo shkrim, pavarësisht nga gjuha e zgjedhur e formularit. Kjo është e dobishme për kapjen e emrave ose adresave në shkrimin e tyre origjinal.
+
+### Llojet e Pyetjeve Specifike Gjuhore
+
+Disa lloje pyetjesh mund të jenë më të përshtatshme për gjuhë të caktuara. rtSurvey ju lejon të përdorni lloje të ndryshme pyetjesh për gjuhë të ndryshme:
+
+```
+| type::Shqip (sq) | type::Japanese (ja) | name | label::Shqip (sq) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Futni emrin tuaj    | 名前を選んでください    |
+```
+
+## Eksportimi i të Dhënave Shumëgjuhëshe
+
+Kur eksportoni të dhëna nga rtSurvey:
+
+- Zgjidhni eksportimin në një gjuhë specifike ose përfshini të gjitha versionet gjuhore.
+- Metadata e gjuhës përfshihet në eksport, duke treguar cilën gjuhë u përdor për çdo përgjigje.
+
+## Konsideratat e Aplikacionit Celular
+
+- Aplikacioni celular rtSurvey mbështet ndërrimin offline të gjuhëve.
+- Sigurohuni që të gjitha skedarët e gjuhëve të kërkuara janë shkarkuar para se të shkoni offline.
+
+## Kufizimet e Njohura
+
+- Disa veçori të avancuara mund të mos jenë të disponueshme në të gjitha gjuhët.
+- Përkthimet tepër të gjata mund të ndikojnë në paraqitje në ekrane të vogla.
+
+Duke shfrytëzuar aftësitë shumëgjuhëshe të rtSurvey, mund të krijoni sondazhe gjithëpërfshirëse, të aksesueshme që arrijnë popullatë të ndryshme dhe sigurojnë të dhëna të cilësisë së lartë, gjuhësisht të sakta.

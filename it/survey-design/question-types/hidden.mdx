@@ -1,0 +1,69 @@
+---
+description: I campi hidden memorizzano valori che non vengono mai mostrati al rispondente
+  — usati per passare contesto, pre-compilare dati o memorizzare risultati intermedi.
+icon: eye-slash
+title: Hidden
+---
+
+
+Un campo `hidden` memorizza un valore che **non viene mai visualizzato al rispondente**. A differenza di `calculate` (che calcola un valore), `hidden` viene usato per portare un **valore fornito esternamente** — ad esempio, un ID attività, un ID famiglia passato da un altro sistema, o un codice enumeratore iniettato quando il modulo viene avviato.
+
+## Specifica XLSForm di base
+
+| type | name | label |
+|------|------|-------|
+| hidden | household_id | |
+
+Le etichette non sono richieste per i campi hidden poiché nulla viene visualizzato sullo schermo.
+
+## Utilizzi
+
+I campi hidden sono comunemente usati per:
+
+1. Passare un ID pre-assegnato dal sistema di gestione dei sondaggi (es. ID famiglia, numero del caso, codice attività)
+2. Memorizzare la versione del modulo o i metadati di deployment
+3. Iniettare la configurazione specifica dell'enumeratore all'avvio del modulo
+4. Portare dati da un modulo padre a un modulo figlio in flussi di lavoro collegati
+5. Memorizzare un valore derivato dai parametri URL quando il modulo viene aperto tramite un link web
+
+## Impostazione di un valore predefinito
+
+Il pattern più comune è usare `hidden` con un'espressione `default` in modo che il valore venga impostato quando il modulo si apre:
+
+| type | name | default |
+|------|------|---------|
+| hidden | deployment_code | 'ZONE_A_2024' |
+| hidden | form_version | '3.1' |
+
+## Riferimento a un campo hidden nei calcoli
+
+I valori hidden possono essere referenziati come qualsiasi altro campo usando `${fieldname}`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| hidden | zone_code | | |
+| calculate | label_prefix | | concat('[', ${zone_code}, '] ') |
+| note | intro | ${label_prefix} Benvenuto nel sondaggio familiare | |
+
+## Utilizzo di hidden con pre-compilazione / parametri URL
+
+Quando si avvia un modulo web tramite URL, puoi passare parametri che popolano i campi hidden. Questo permette di precaricare un ID famiglia o un codice attività senza che l'enumeratore debba digitarlo:
+
+```
+https://your-server.com/form/FORMID?household_id=H00123&zone_code=NORTH
+```
+
+Il campo denominato `household_id` verrà automaticamente popolato con `H00123`.
+
+## Best practice
+
+1. Usa `hidden` (non `calculate`) quando il valore è **iniettato esternamente** e non dovrebbe essere ricalcolato.
+2. Usa `calculate` quando il valore è **derivato da altri campi** nel modulo.
+3. Imposta sempre un `default` se il campo hidden deve avere un valore — un campo hidden senza default sarà vuoto.
+4. Denomina i campi hidden chiaramente per distinguerli (es. con il prefisso `_hidden_` o usa una convenzione di denominazione coerente).
+
+## Limitazioni
+
+- I campi hidden sono inclusi nei dati esportati come qualsiasi altro campo.
+- Non possono essere visualizzati condizionalmente — sono sempre presenti (ma invisibili).
+- Se hai bisogno di un campo che si calcola dinamicamente, usa `calculate` invece.

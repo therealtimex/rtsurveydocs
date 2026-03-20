@@ -1,0 +1,141 @@
+---
+description: Kërkimi dinamik ngarkon zgjedhjet nga API në distancë në kohë reale ndërsa
+  numëruesi shkruan, duke mundësuar bashkësi të dhënash të mëdha ose të përditësuara
+  shpesh.
+icon: manage_search
+title: Kërkim dinamik
+---
+
+
+**Kërkimi dinamik** (i quajtur gjithashtu Search API) lejon fushën `select_one`, `select_multiple`, ose `text` të ngarkojë zgjedhjet nga shërbim web në distancë **gjatë ekzekutimit** ndërsa numëruesi shkruan. Kjo është qasja e duhur kur lista e zgjedhjeve është tepër e madhe për të paketuar në skedar CSV, përditësohet shpesh, ose vjen nga bazë e dhënave e drejtpërdrejtë.
+
+---
+
+## Pamja `search-api()`
+
+Kërkimi dinamik konfigurohet nëpërmjet kolonës `appearance` duke përdorur funksionin `search-api()`:
+
+```
+search-api(method, url, post_body, value_column, display, data_path, save_path)
+```
+
+### Parametrat
+
+| Parametri | Përshkrimi |
+|-----------|------------|
+| `method` | Gjithmonë përdorni `'POST'` |
+| `url` | Pika fundore API për t'u pyetur |
+| `post_body` | Trupi JSON i dërguar te API. Përdorni `%__input__%` si mbajtës vendin për tekstin aktual të kërkimit të numëruesit |
+| `value_column` | Çelësi në objektin e përgjigjes për t'u përdorur si **vlerë** e ruajtur |
+| `display` | Çelësi (ose modeli) për t'u përdorur si **etiketa** e treguar në listën rënëse. Mbështet mbajtëse vend `##key##` dhe shprehje `@{func}` |
+| `data_path` | JSONPath te grupi i objekteve të rezultateve në përgjigje (p.sh., `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Emri nën të cilin përgjigja e paperpunuar ruhet për t'u përdorur nga fusha të tjera |
+
+---
+
+## Shembull bazë
+
+Kërkimi i objektit shëndetësor ku numëruesi shkruan pjesë të emrit të objektit:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Zgjidhni objektin shëndetësor | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+
+API merr `{"query": "nair"}` kur numëruesi shkruan "nair" dhe kthen:
+
+```json
+{
+  "results": [
+    {"id": "HF001", "name": "Klinika Qendrore Nairobi"},
+    {"id": "HF002", "name": "Spitali Perëndimor Nairobi"}
+  ]
+}
+```
+
+Lista rënëse tregon `Klinika Qendrore Nairobi` dhe `Spitali Perëndimor Nairobi`; vlera e ruajtur është `HF001` ose `HF002`.
+
+---
+
+## Formatimi i avancuar i shfaqjes
+
+### Përdorimi i modeleve `##key##`
+
+Tregoni fusha të shumëfishta në etiketë:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
+```
+
+Shfaqur si: `Klinika Qendrore Nairobi (Nairobi)`.
+
+### Përdorimi i shprehjeve `@{func}`
+
+Zbatoni logjikë të kushtëzuar në etiketën e shfaqjes:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
+  '@{if_else(eq("##status##", "active"), "✓ ##name##", "✗ ##name##")}',
+  '$.data', 'res')
+```
+
+Rezultatet aktive tregojnë `✓ Emri i Klinikës`; joaktive tregojnë `✗ Emri i Klinikës`.
+
+---
+
+## Vendosja e vlerës parazgjedhëse: `search-default-api()`
+
+Përdorni `search-default-api()` pas `search-api()` për të parapopulluar fushën me zgjedhje parazgjedhëse të ngarkuar nga thirrje e veçantë API (p.sh., kur editoni rekordin ekzistues):
+
+```
+appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
+```
+
+---
+
+## Ndarësi i personalizuar për select_multiple: `search-default-separator()`
+
+Për fushat `select_multiple`, specifikoni se si bashkohen vlerat e shumëfishta të zgjedhura në vargun e ruajtur:
+
+```
+appearance: search-api(...) search-default-separator(' || ')
+```
+
+Ndarësi parazgjedhës është hapësirë.
+
+---
+
+## Llojet e pyetjeve të mbështetura
+
+| Lloji i pyetjes | Rasti i përdorimit |
+|----------------|-------------------|
+| `select_one` | Zgjedhje e vetme nga rezultatet e kërkimit |
+| `select_multiple` | Zgjedhje të shumëfishta nga rezultatet e kërkimit |
+| `text` | Plotësim automatik — numëruesi shkruan lirisht por mund të zgjedhë sugjerim |
+
+---
+
+## Përdorimi i të dhënave të ruajtura të përgjigjes
+
+`save_path` ruan objektin e plotë të përgjigjes API nën emrin e dhënë. Fushat e tjera mund ta referojnë me `pulldata()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one | facility | Zgjidhni objektin | `search-api(..., 'facility_data')` |
+| calculate | facility_district | | `pulldata('facility_data', 'district')` |
+| calculate | facility_type | | `pulldata('facility_data', 'type')` |
+
+---
+
+## Praktikat më të mira
+
+1. Sigurohuni që pika fundore API të përgjigjet brenda 1-2 sekondave — API-t e ngadalta e bëjnë kërkimin të duket jo të përgjegjshëm.
+2. Përdorni `%__input__%` në `post_body` kështu API kthen vetëm rezultatet përputhëse, jo bashkësinë e plotë të të dhënave.
+3. Indeksoni fushën e kërkimit nga ana e serverit (p.sh., Elasticsearch, indeks me tekst të plotë bazës së të dhënave) për përgjigje të shpejta.
+4. Kufizoni rezultatet në 20-50 artikuj për pyetje — kthimi i mijëra rezultateve mposhtë qëllimin e kërkimit.
+5. Përfshini kërkesë të gjatësisë minimale të hyrjes në API për të shmangur aktivizimin e pyetjeve të gjera mbi hyrjet me karaktere të vetëm.
+
+## Kufizimet
+
+- Kërkimi dinamik kërkon lidhje rrjeti — nuk funksionon offline.
+- Mbajtësi i vendit `%__input__%` injektohet siç është; dezinfektoni hyrjet nga ana e serverit për të parandaluar sulmet e injektimit.
+- Shprehjet komplekse të shfaqjes `@{func}` mund të kenë mbështetje të kufizuar nëpër të gjitha versionet e klientit rtSurvey.

@@ -1,0 +1,255 @@
+---
+description: 'స్వయం-హోస్ట్ చేయబడిన rtCloud ఇన్‌స్టాన్స్ కోసం రోజువారీ నిర్వహణ: అప్‌గ్రేడింగ్,
+  బ్యాకప్, పునరుద్ధరణ మరియు సాధారణ సమస్యల పరిష్కారం.'
+icon: build
+title: నిర్వహణ
+---
+
+
+## సాధారణ ఆదేశాలు
+
+మీ rtCloud కంటైనర్‌లు నిర్వహించడానికి ఈ ఆదేశాలు క్రమంగా ఉపయోగించండి. వాటిని `docker-compose.production.yml` కలిగిన డైరెక్టరీ నుండి నడిపించండి.
+
+```bash
+# అన్ని కంటైనర్‌ల స్థితి మరియు ఆరోగ్యం తనిఖీ చేయండి
+docker compose -f docker-compose.production.yml ps
+
+# లైవ్ లాగులు చూడండి (అన్ని సేవలు)
+docker compose -f docker-compose.production.yml logs -f
+
+# యాప్ లాగులు మాత్రమే చూడండి
+docker compose -f docker-compose.production.yml logs -f rtcloud
+
+# ఒక కంటైనర్ పునఃప్రారంభించండి
+docker compose -f docker-compose.production.yml restart rtcloud
+
+# అన్ని సేవలు ఆపండి
+docker compose -f docker-compose.production.yml down
+
+# అన్ని సేవలు ప్రారంభించండి
+docker compose -f docker-compose.production.yml up -d
+
+# యాప్ కంటైనర్ లోపల shell తెరవండి
+docker compose -f docker-compose.production.yml exec rtcloud bash
+```
+
+---
+
+## అప్‌గ్రేడింగ్
+
+rtCloud అప్‌డేట్‌లు కొత్త Docker ఇమేజ్ ట్యాగ్‌లుగా పంపిణీ చేయబడతాయి. అప్‌గ్రేడింగ్ తాజా ఇమేజ్ పుల్ చేసి యాప్ కంటైనర్ మళ్ళీ సృష్టిస్తుంది. స్టార్టప్‌లో డేటాబేస్ మైగ్రేషన్‌లు స్వయంచాలకంగా నడుస్తాయి.
+
+**1. తాజా ఇమేజ్ పుల్ చేయండి:**
+
+```bash
+docker compose -f docker-compose.production.yml pull
+```
+
+**2. యాప్ కంటైనర్ మళ్ళీ సృష్టించండి:**
+
+```bash
+docker compose -f docker-compose.production.yml up -d
+```
+
+Docker ఇమేజ్ మారిన కంటైనర్‌లు మాత్రమే భర్తీ చేస్తుంది. MySQL కంటైనర్ మరియు అన్ని పేరు పెట్టబడిన వాల్యూమ్‌లు ప్రభావితం కావు.
+
+### వెర్షన్ పిన్ చేయడం
+
+`latest` బదులు నిర్దిష్ట వెర్షన్‌కు అప్‌గ్రేడ్ చేయడానికి, `.env` లో `RTCLOUD_IMAGE` అప్‌డేట్ చేయండి:
+
+```dotenv
+RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
+```
+
+తర్వాత పైన చెప్పినట్లు `docker compose pull` మరియు `up -d` నడిపించండి.
+
+### డౌన్‌గ్రేడ్ చేయడం
+
+డేటాబేస్ మైగ్రేషన్‌లు రద్దు చేయబడలేవు కాబట్టి డౌన్‌గ్రేడ్ సాధారణంగా సిఫారసు చేయబడదు. డౌన్‌గ్రేడ్ అవసరమైతే, అప్‌గ్రేడ్‌కు ముందు తీసుకున్న డేటాబేస్ బ్యాకప్ నుండి పునరుద్ధరించండి.
+
+---
+
+## బ్యాకప్ మరియు పునరుద్ధరణ
+
+### డేటాబేస్ బ్యాకప్ చేయండి
+
+అప్లికేషన్ డేటాబేస్‌ను SQL ఫైల్‌కు ఎగుమతి చేయడానికి ఈ ఆదేశం నడిపించండి:
+
+```bash
+docker compose -f docker-compose.production.yml exec mysql \
+  mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
+  > backup-$(date +%Y%m%d-%H%M%S).sql
+```
+
+బ్యాకప్ ఫైల్ హోస్ట్‌లో మీ ప్రస్తుత డైరెక్టరీలో వ్రాయబడుతుంది.
+
+### డేటాబేస్ పునరుద్ధరించండి
+
+```bash
+docker compose -f docker-compose.production.yml exec -T mysql \
+  mysql -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
+  < backup-20240101-120000.sql
+```
+
+### అప్‌లోడ్ చేయబడిన ఫైల్‌లు బ్యాకప్ చేయండి
+
+సర్వే సమర్పణలు తరచుగా పేరు పెట్టబడిన Docker వాల్యూమ్‌లలో నిల్వ చేయబడిన అప్‌లోడ్ చేయబడిన ఫైల్‌లు (ఫోటోలు, ఆడియో, డాక్యుమెంట్లు) కలిగి ఉంటాయి. వాటిని డేటాబేస్ నుండి వేర్వేరుగా బ్యాకప్ చేయండి:
+
+```bash
+# అప్‌లోడ్‌లు బ్యాకప్ చేయండి
+docker run --rm \
+  -v rtcloud_uploads:/data \
+  -v "$(pwd):/backup" \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+
+# ఆడియో రికార్డింగులు బ్యాకప్ చేయండి
+docker run --rm \
+  -v rtcloud_audios:/data \
+  -v "$(pwd):/backup" \
+  alpine tar czf /backup/audios-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+డిఫాల్ట్ మార్చినట్లయితే `rtcloud_uploads` మరియు `rtcloud_audios` ని మీ అసలు వాల్యూమ్ పేర్లతో (`COMPOSE_PROJECT_NAME` ఉపసర్గ) భర్తీ చేయండి.
+
+### అప్‌లోడ్ చేయబడిన ఫైల్‌లు పునరుద్ధరించండి
+
+```bash
+docker run --rm \
+  -v rtcloud_uploads:/data \
+  -v "$(pwd):/backup" \
+  alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
+```
+
+### స్వయంచాలిత రోజువారీ బ్యాకప్‌లు
+
+బ్యాకప్‌లు స్వయంచాలకంగా నడిపించడానికి హోస్ట్‌లో cron జాబ్ జోడించండి. `crontab -e` తో రూట్ crontab సవరించండి:
+
+```cron
+# రాత్రి 2:00 గంటలకు రోజువారీ డేటాబేస్ బ్యాకప్, 30 రోజుల చరిత్ర ఉంచండి
+0 2 * * * cd /opt/rtcloud && docker compose -f docker-compose.production.yml exec -T mysql \
+  mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
+  > /backups/db-$(date +\%Y\%m\%d).sql && \
+  find /backups -name "db-*.sql" -mtime +30 -delete
+```
+
+---
+
+## ట్రబుల్‌షూటింగ్
+
+### యాప్ కంటైనర్ ప్రారంభమవడం లేదు
+
+లోపు సందేశాల కోసం కంటైనర్ లాగులు తనిఖీ చేయండి:
+
+```bash
+docker compose -f docker-compose.production.yml logs rtcloud
+```
+
+సాధారణ కారణాలు:
+- `.env` లో తప్పిపోయిన లేదా చెల్లని పర్యావరణ వేరియబుల్‌లు
+- MySQL ఇంకా సిద్ధంగా లేదు (60 సెకన్లు వేచి ఉండి మళ్ళీ తనిఖీ చేయండి)
+- పోర్ట్ వైరుధ్యం — మరొక ప్రక్రియ ఇప్పటికే `APP_PORT` ఉపయోగిస్తోంది
+
+### MySQL ఆరోగ్యంగా లేదు
+
+```bash
+docker compose -f docker-compose.production.yml logs mysql
+```
+
+సాధారణ కారణాలు:
+- `.env` లో `MYSQL_ROOT_PASSWORD` సెట్ చేయబడలేదు
+- పాడైన డేటా వాల్యూమ్ (అరుదు — `df -h` తో డిస్క్ స్పేస్ తనిఖీ చేయండి)
+
+MySQL చాలా మొదటి బూట్‌లో ఇనిషియలైజ్ కావడానికి 30–60 సెకన్లు పట్టవచ్చు. వైఫల్యం అని అనుకునే ముందు వేచి ఉండి మళ్ళీ తనిఖీ చేయండి.
+
+### పోర్ట్ ఇప్పటికే ఉపయోగంలో ఉంది
+
+`.env` లో `APP_PORT` లేదా `SHINY_PORT` ని ఉచిత పోర్ట్‌కు మార్చి, కంటైనర్‌లు మళ్ళీ సృష్టించండి:
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate
+```
+
+హోస్ట్‌లో ఒక పోర్ట్ ఏమి ఉపయోగిస్తుందో కనుగొనడానికి:
+
+```bash
+lsof -i :8080
+```
+
+### 400 CSRF Token ధృవీకరించబడలేదు
+
+ఈ లోపు స్థానిక లేదా రివర్స్-ప్రాక్సీ వాతావరణాలలో కనిపిస్తుంది, అక్కడ అభ్యర్థన మూలం ఆశించిన హోస్ట్‌తో మ్యాచ్ కాదు. స్థానిక అభివృద్ధికి మాత్రమే CSRF ధృవీకరణ నిలిపివేయండి:
+
+```dotenv
+CSRF_VALIDATION_ENABLED=false
+```
+
+తర్వాత యాప్ పునఃప్రారంభించండి:
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+> ప్రొడక్షన్‌లో CSRF ధృవీకరణ నిలిపివేయవద్దు. ప్రొడక్షన్‌లో ఈ లోపు కనిపిస్తే, మీ రివర్స్ ప్రాక్సీ సరైన `Host` మరియు `X-Forwarded-For` హెడర్‌లు ఫార్వార్డ్ చేస్తుందని నిర్ధారించుకోండి.
+
+### అడ్మిన్ పాస్‌వర్డ్ మర్చిపోయారు
+
+నేరుగా డేటాబేస్‌లో అడ్మిన్ పాస్‌వర్డ్ రీసెట్ చేయండి. MySQL కంటైనర్‌కు కనెక్ట్ అయి పాస్‌వర్డ్ హాష్ అప్‌డేట్ చేయండి:
+
+**దశ 1** — కొత్త పాస్‌వర్డ్ హాష్ జనరేట్ చేయండి. `newpassword` ని మీకు కావలసిన పాస్‌వర్డ్‌తో భర్తీ చేయండి:
+
+```bash
+docker compose -f docker-compose.production.yml exec rtcloud php -r "
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\"\"));
+  echo md5(\$salt . 'newpassword') . PHP_EOL;
+"
+```
+
+**దశ 2** — డేటాబేస్‌లో హాష్ అప్‌డేట్ చేయండి:
+
+```bash
+docker compose -f docker-compose.production.yml exec mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
+```
+
+### కంటైనర్ పదే పదే పునఃప్రారంభమవుతోంది
+
+హెల్త్ చెక్ వైఫల్యమవుతుందో తనిఖీ చేయండి:
+
+```bash
+docker compose -f docker-compose.production.yml ps
+docker inspect rtcloud-app --format '{{json .State.Health}}'
+```
+
+యాప్ హెల్త్ చెక్ `/health` ఎండ్‌పాయింట్ కాల్ చేస్తుంది. పదే పదే వైఫల్యమైతే, స్టార్టప్ లోపులకు అప్లికేషన్ లాగులు తనిఖీ చేయండి.
+
+### డిస్క్ స్పేస్ నిండిపోయింది
+
+స్పేస్ ఉపయోగించేది ఏమిటో గుర్తించండి:
+
+```bash
+# హోస్ట్ డిస్క్ వినియోగం తనిఖీ చేయండి
+df -h
+
+# Docker డిస్క్ వినియోగం తనిఖీ చేయండి (ఇమేజులు, కంటైనర్లు, వాల్యూమ్‌లు)
+docker system df
+
+# ఉపయోగించని ఇమేజులు మరియు ఆగిన కంటైనర్లు తొలగించండి (నడిపించడం సురక్షితం)
+docker system prune
+```
+
+`docker system prune --volumes` ఉపయోగించవద్దు, ఎందుకంటే ఇది అప్లికేషన్ డేటా తొలగిస్తుంది.
+
+---
+
+## హెల్త్ చెక్‌లు
+
+ప్రతి సేవకు స్వయంచాలిత హెల్త్ చెక్ ఉంది. కంటైనర్ స్థితి ఫలితాన్ని ప్రతిబింబిస్తుంది:
+
+| కంటైనర్ | చెక్ పద్ధతి | స్టార్ట్ పీరియడ్ | అంతరాలు |
+|-----------|-------------|-------------|----------|
+| `rtcloud-app` | HTTP GET `/health` | 90 సెకన్లు | 30 సెకన్లు |
+| `rtcloud-mysql` | `mysqladmin ping` | 30 సెకన్లు | 10 సెకన్లు |
+| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 సెకన్లు | 30 సెకన్లు |
+
+వైఫల్యమైన హెల్త్ చెక్ ఉన్న కంటైనర్‌లు `RESTART_POLICY` సెట్టింగు (డిఫాల్ట్: `unless-stopped`) ప్రకారం స్వయంచాలకంగా పునఃప్రారంభించబడతాయి.

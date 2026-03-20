@@ -1,0 +1,167 @@
+---
+description: ''
+icon: code
+title: Funkce
+---
+
+
+### Řetězcové funkce
+
+<Warning>
+Při práci s řetězci ve výrazech je důležité používat jednoduché uvozovky ('') pro uzavření literálních řetězců. Výjimka nastane, když chcete do literálního řetězce zahrnout jednoduché uvozovky. V takovém případě můžete použít dvojité uvozovky ("") k uzavření celého řetězce.
+
+Příklad:
+- Správně: if(${yesno} = 1, "řetězec s 'jednoduchými uvozovkami' v něm", "bez jednoduchých uvozovek")
+- Nesprávně: if(${yesno} = 1, 'řetězec s 'jednoduchými uvozovkami' v něm', 'bez jednoduchých uvozovek')
+
+Ohledně typografických uvozovek je důležité si uvědomit jejich přítomnost, protože mohou způsobit problémy ve výrazech. Mnohé editory formátovaného textu automaticky převádějí rovné uvozovky na typografické, což může způsobit syntaktické chyby nebo neočekávané chování.
+</Warning>
+
+rtSurvey podporuje různé funkce, včetně:
+
+1. `string(field)`: Převede pole na řetězec.
+   - Příklad: `string(34.8)` bude převedeno na `'34.8'`.
+
+2. `string-length(field)`: Vrátí délku řetězcového pole.
+   - Příklad: `string-length(.) > 3 and string-length(.) < 10` lze použít pro zajištění, že aktuální pole má 3 až 10 znaků.
+
+3. `substr(fieldorstring, startindex, endindex)`: Vrátí podřetězec začínající na `startindex` a končící těsně před `endindex`. Indexy začínají od 0 pro první znak v řetězci.
+   - Příklad: `substr(${phone}, 0, 3)` vrátí první tři číslice telefonního čísla.
+
+4. `concat(a, b, c, ...)`: Zřetězí pole (a/nebo řetězce) dohromady.
+   - Příklad: `concat(${firstname}, ' ', ${lastname})` vrátí celé jméno kombinací hodnot v polích `firstname` a `lastname`.
+
+5. `linebreak()`: Vrátí znak zalomení řádku.
+   - Příklad: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` vrátí seznam tří hodnot polí se zalomením řádků mezi nimi.
+
+6. `lower()`: Převede řetězec na malá písmena.
+   - Příklad: `lower('Název ulice')` vrátí "název ulice".
+
+7. `upper()`: Převede řetězec na velká písmena.
+   - Příklad: `upper('Název ulice')` vrátí "NÁZEV ULICE".
+
+### Funkce pro select_one a select_multiple
+
+1. `count-selected(field)`: Vrátí počet vybraných položek v poli select_multiple.
+   - Příklad: `count-selected(.) = 3` lze použít jako výraz omezení pro zajištění výběru přesně tří možností.
+
+2. `selected(field, value)`: Vrátí true nebo false v závislosti na tom, zda byla zadaná hodnota vybrána v poli select_one nebo select_multiple.
+   - Příklad: `selected(${color}, 'Blue')` lze použít jako výraz relevance pro zobrazení skupiny nebo pole pouze tehdy, pokud respondent vybral „Modrou" jako svou oblíbenou barvu.
+
+3. `selected-at(field, number)`: Vrátí vybranou položku na zadané pozici v poli select_multiple. Pokud je předáno číslo 0, vrátí první vybranou položku; číslo 1 vrátí druhou atd.
+
+4. `choice-label(field, value)`: Vrátí popisek pro volbu pole select_one nebo select_multiple, jak je definována v listu choices.
+
+### Funkce pro opakující se pole
+
+1. `join(string, repeatedfield)`: Pro pole uvnitř skupiny opakování generuje řetězcem oddělený seznam hodnot.
+   - Příklad: `join(', ', ${member_name})` vygeneruje jeden čárkami oddělený seznam ze všech zadaných jmen.
+
+2. `join-if(string, repeatedfield, expression)`: Funguje stejně jako `join()`, ale kontroluje každou instanci pomocí dodaného výrazu.
+
+3. `count(repeatgroup)`: Vrátí aktuální počet opakování skupiny opakování.
+
+4. `count-if(repeatgroup, expression)`: Funguje stejně jako `count()`, ale kontroluje každou instanci pomocí dodaného výrazu.
+
+5. `sum(repeatedfield)`: Pro pole uvnitř skupiny opakování vypočítá součet všech hodnot.
+
+6. `sum-if(repeatedfield, expression)`: Funguje stejně jako `sum()`, ale kontroluje každou instanci pomocí dodaného výrazu.
+
+7. `min(repeatedfield)`: Pro pole uvnitř skupiny opakování vypočítá minimum ze všech hodnot.
+
+8. `max(repeatedfield)`: Pro pole uvnitř skupiny opakování vypočítá maximum ze všech hodnot.
+
+9. `index()`: Volaná uvnitř skupiny opakování vrátí číslo indexu pro aktuální skupinu nebo instanci.
+
+10. `indexed-repeat(repeatedfield, repeatgroup, index)`: Odkazuje na pole nebo skupinu uvnitř skupiny opakování zvenku dané skupiny opakování.
+
+11. `rank-index(index, repeatedfield)`: Tato funkce vypočítá ordinální pořadí zadané instance opakovaného pole pro použití mimo skupinu opakování.
+
+12. `rank-index-if(index, repeatedfield, expression)`: Tato funkce funguje podobně jako `rank-index()`, ale kontroluje každou instanci pomocí dodaného výrazu.
+
+### Číselné funkce
+
+| Operátor | Operace | Příklad | Příklad výsledku |
+|----------|-----------|---------|----------------|
+| `+` | Sčítání | 1 + 1 | 2 |
+| `-` | Odčítání | 3 - 2 | 1 |
+| `*` | Násobení | 3 * 2 | 6 |
+| `div` | Dělení | 10 div 2 | 5 |
+| `mod` | Modulo | 9 mod 2 | 1 |
+
+rtSurvey podporuje číselné funkce, včetně:
+- `number(field)`: Převede hodnotu pole na číslo.
+- `int(field)`: Převede hodnotu pole na celé číslo.
+- `min(field1, ..., fieldx)`: Vrátí minimální hodnotu mezi předanými poli.
+- `max(field1, ..., fieldx)`: Vrátí maximální hodnotu mezi předanými poli.
+- `format-number(field)`: Formátuje hodnotu celého čísla nebo desetinného čísla podle nastavení národního prostředí uživatele.
+- `round(field, digits)`: Zaokrouhlí číselnou hodnotu pole na zadaný počet desetinných míst.
+- `abs(number)`: Vrátí absolutní hodnotu čísla.
+- `pow(base, exponent)`: Vrátí hodnotu prvního parametru umocněného na druhou mocninu druhého parametru.
+- `random()`: Vrátí náhodné desetinné číslo mezi 0.0 (včetně) a 1.0 (bez).
+
+### Funkce data a času
+
+<Warning>
+Hodnoty data v rtSurvey jsou ukládány jako řetězce ve formátu `YYYY-MM-DD`. Hodnoty datetime jsou ukládány jako řetězce ISO 8601 (`YYYY-MM-DDTHH:MM:SS`). Použijte `decimal-date-time()` pro převod na číslo pro aritmetiku (např. výpočet dob trvání).
+</Warning>
+
+1. `today()`: Vrátí dnešní datum jako řetězec ve formátu `YYYY-MM-DD`. Vyhodnotí se jednou při otevření formuláře.
+
+2. `now()`: Vrátí aktuální datum a čas jako řetězec ISO 8601. Vyhodnocuje se pokaždé, když je výraz vypočítán.
+
+3. `date(value)`: Převede hodnotu (řetězec nebo číslo) na řetězec data.
+
+4. `date-time(value)`: Převede hodnotu na řetězec datetime.
+
+5. `decimal-date-time(value)`: Převede řetězec data nebo datetime na desetinné číslo představující milisekundy od epochy Unix dělené 86400000.
+   - Příklad: Trvání ve dnech mezi dvěma daty:
+     `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
+
+6. `format-date(date, format)`: Formátuje hodnotu data pomocí formátovacího řetězce.
+   - Formátovací tokeny: `%Y` (4místný rok), `%m` (měsíc 01–12), `%d` (den 01–31)
+   - Příklad: `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+
+7. `format-date-time(datetime, format)`: Formátuje hodnotu datetime pomocí formátovacího řetězce.
+   - Příklad: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+
+### Logické funkce
+
+1. `boolean(value)`: Převede libovolnou hodnotu na boolean.
+2. `boolean-from-string(string)`: Vrátí `true`, pokud je řetězec `'1'` nebo `'true'`.
+3. `true()`: Vrátí logickou hodnotu `true`.
+4. `false()`: Vrátí logickou hodnotu `false`.
+5. `not(expression)`: Vrátí logickou negaci výrazu.
+
+### Geo funkce
+
+1. `area(geoshape_value)`: Vypočítá **plochu v čtverečních metrech** uzavřenou hodnotou geoshape (polygon).
+   - Příklad: `area(${field_boundary})` — vypočítá plochu průzkumného pole v m².
+
+2. `distance(coordinates)`: Vypočítá **celkovou délku cesty v metrech** geotrace (linie) nebo vzdálenost mezi dvěma geopoint.
+
+### Validační funkce
+
+1. `regex(value, pattern)`: Vrátí `true`, pokud `value` odpovídá regulárnímu výrazu `pattern`.
+   - Příklad: `regex(., '^[0-9]{10}$')` — ověří 10místné číslo.
+
+2. `checklist(min, max, v1, v2, ...)`: Vyhodnotí seznam boolean výrazů a vrátí `true`, pokud počet hodnot `true` je mezi `min` a `max`.
+
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Jako `checklist()`, ale každá hodnota má váhu.
+
+### Utility funkce
+
+1. `uuid()`: Generuje náhodný UUID (formát RFC 4122 v4) jako řetězec.
+   - Typicky se používá s `once()` pro generování stabilního jedinečného ID: `once(uuid())`
+
+2. `version()`: Vrátí hodnotu atributu `version` formuláře nastavenou v listu settings.
+
+3. `position()`: Při volání uvnitř **skupiny opakování** vrátí 1-based index aktuální instance opakování.
+
+4. `coalesce(a, b)`: Vrátí `a`, pokud `a` není prázdné; jinak vrátí `b`.
+   - Příklad: `coalesce(${preferred_name}, ${full_name})` — použije preferované jméno, pokud je nastaveno.
+
+5. `once(value)`: Vyhodnotí `value` a uloží ho, ale pouze pokud je aktuální pole **prázdné**.
+   - Příklad: `once(today())` v sloupci `default` nastaví dnešní datum jednou a neaktualizuje ho.
+
+6. `substr-jsonpath(value, jsonpath)`: Extrahuje podřetězec z JSON řetězce pomocí výrazu JSONPath.

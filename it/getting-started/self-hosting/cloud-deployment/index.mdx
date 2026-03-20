@@ -1,0 +1,123 @@
+---
+description: Distribuisci rtCloud sui principali provider cloud con script automatizzati
+  per DigitalOcean, AWS EC2, Google Cloud e Linode.
+icon: cloud_upload
+title: Deployment su cloud
+---
+
+
+Il repository di deployment include script di provisioning automatizzati per i principali provider cloud. Ogni script viene eseguito al primo avvio di un server **Ubuntu 22.04 LTS** e realizza una configurazione completamente automatica:
+
+- Installa Docker e Docker Compose
+- Genera password casuali sicure per tutti i servizi interni
+- Scrive `docker-compose.production.yml` e `.env`
+- Configura Nginx come reverse proxy
+- Ottiene un certificato TLS gratuito da Let's Encrypt (riprova automaticamente finché il DNS non si risolve)
+- Configura il firewall UFW
+- Distribuisce opzionalmente il server SSO Keycloak integrato
+- Produce un riepilogo completo del deployment con tutte le credenziali
+
+La configurazione si completa in **5–10 minuti** su un'istanza standard.
+
+---
+
+## Scegliere uno script
+
+Ci sono più varianti di script a seconda del tuo provider cloud e della configurazione SSO:
+
+| Script | Provider | Modalità SSO | Ideale per |
+|--------|----------|----------|----------|
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Keycloak integrato | SSO semplice e autonomo |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak o OIDC esterno | Controllo completo |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Keycloak integrato | Configurazione tramite form, più semplice |
+| `linode-stackscript-oidc.sh` | Linode | Solo OIDC esterno | Provider di identità esistente |
+| `linode-stackscript.sh` | Linode | Keycloak o OIDC esterno | Controllo completo |
+| `aws-ec2.sh` | AWS EC2 | Keycloak o OIDC esterno | Deployment AWS |
+| `gcp-compute.sh` | Google Cloud | Keycloak o OIDC esterno | Deployment GCP |
+
+> **Consigliato per la maggior parte degli utenti:** Usa la variante `keycloak-embed`. Include un server di identità Keycloak integrato e richiede il minor numero di campi di configurazione.
+
+---
+
+## Guida al dimensionamento del server
+
+| Caso d'uso | RAM | Disco | Esempio |
+|----------|-----|------|---------|
+| Valutazione / sviluppo | 2 GB | 25 GB | DO Basic $18/mese, t3.small, e2-small |
+| Team piccolo (< 50 utenti) | 4 GB | 40 GB | DO Basic $24/mese, t3.medium, e2-medium |
+| Produzione (> 50 utenti) | 8 GB | 80 GB | DO General $48/mese, t3.large, n2-standard-2 |
+
+> Keycloak integrato richiede almeno **4 GB di RAM**. Usa 2 GB solo per la valutazione senza Keycloak.
+
+---
+
+## Configurazione DNS
+
+Tutti gli script richiedono un dominio con un **record A che punta all'IP del tuo server** prima che Let's Encrypt possa emettere un certificato.
+
+Lo script stampa l'IP del tuo server all'inizio del processo di configurazione:
+
+```
+============================================================
+ Server IP : 139.162.51.85
+ Add this DNS A record now if you haven't already:
+   myapp.example.com  ->  139.162.51.85
+ The script will retry Certbot every 60s until DNS resolves.
+============================================================
+```
+
+Lo script **riprova automaticamente** Let's Encrypt ogni 60 secondi per un massimo di 1 ora. Aggiungi semplicemente il record DNS e aspetta — non è necessario riavviare.
+
+> **Limite di frequenza:** Let's Encrypt consente un massimo di **5 certificati per dominio ogni 7 giorni**. Evita di distribuire e distruggere server ripetutamente con lo stesso dominio. Se raggiungi il limite, lo script visualizzerà un timestamp `retry after` e si fermerà immediatamente.
+
+---
+
+## Checklist post-deployment
+
+- [ ] L'app si apre su `https://your-domain.com`
+- [ ] Accedi con `admin` e la password che hai configurato
+- [ ] Tutti i container sono sani: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Il rinnovo di Let's Encrypt funziona: `certbot renew --dry-run`
+- [ ] La porta MySQL 3306 **non** è esposta: `ufw status`
+- [ ] Configura un backup giornaliero del database (vedi [Manutenzione](../maintenance))
+
+---
+
+## Risoluzione dei problemi
+
+### Controlla il log completo di configurazione
+
+```bash
+# Linode
+tail -200 /var/log/stackscript.log
+
+# DigitalOcean / AWS / GCP
+tail -200 /var/log/rtcloud-setup.log
+```
+
+### Limite di frequenza Let's Encrypt
+
+Se vedi `too many certificates` nel log, hai raggiunto il limite di 5 certificati/7 giorni. Il log mostra l'ora esatta di nuovo tentativo:
+
+```
+[SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
+```
+
+Attendi fino a quell'ora, poi ridistribuisci.
+
+### Keycloak rimane non sano
+
+Assicurati che il server abbia almeno 4 GB di RAM, poi controlla i log:
+
+```bash
+docker logs rtcloud-keycloak --tail 50
+free -h
+```
+
+### Configurazione SSL non applicata dopo certbot
+
+Se il certificato è stato emesso ma Nginx mostra ancora solo HTTP, controlla il log per la riga di errore e ricarica manualmente Nginx:
+
+```bash
+nginx -t && systemctl reload nginx
+```

@@ -1,0 +1,83 @@
+---
+description: Geotrace-Fragen ermöglichen es den Befragten, eine Reihe verbundener
+  Punkte auf einer Karte zu erfassen und so Linien oder Pfade als Teil der Umfrage
+  zu erstellen.
+icon: timeline
+title: Geotrace
+---
+
+
+Der `geotrace`-Fragetyp in XLSForms und rtSurvey ermöglicht es Befragten, eine Reihe verbundener Punkte auf einer Karte zu erfassen und so Linien oder Pfade zu erstellen. Diese Funktion ist besonders nützlich für die Kartierung von Routen, Grenzen oder linearen Merkmalen in räumlichen Umfragen.
+
+## Grundlegende XLSForm-Spezifikation
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geotrace | river_path  | Zeichnen Sie den Verlauf des Flusses nach |
+
+Weitere Details zum grundlegenden `geotrace`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+
+## Anwendungen
+
+`Geotrace`-Fragen werden häufig verwendet für:
+
+1. Kartierung von Routen oder Pfaden, die während Außendiensteinsätzen zurückgelegt wurden
+2. Nachzeichnen linearer Merkmale wie Straßen, Flüsse oder Grenzen
+3. Erfassung der Ausdehnung linearer Infrastruktur (z. B. Pipelines, Stromleitungen)
+4. Aufzeichnung von Reisewegen in Transportstudien
+5. Definition von Transekten in ökologischen Untersuchungen
+
+## Best Practices
+
+1. Stellen Sie sicher, dass am Gerät die Ortungsdienste aktiviert und die entsprechenden Berechtigungen erteilt sind.
+2. Geben Sie klare Anweisungen dazu, wie der Pfad nachgezeichnet werden soll und welche Merkmale einbezogen werden sollen.
+3. Erwägen Sie die Verwendung von Satellitenbildern oder Basiskarten, um den Befragten zu helfen, Pfade genau nachzuzeichnen.
+4. Achten Sie auf die potenzielle Komplexität von Traces und deren Auswirkungen auf Datengröße und -verarbeitung.
+
+## Beispielhafte Verwendung
+
+Hier ist ein Beispiel dafür, wie Sie eine `geotrace`-Frage in einer Umfrage verwenden könnten:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geotrace | hiking_trail   | Zeichnen Sie den Verlauf des Wanderwegs nach | Beginnen Sie am Ausgangspunkt und enden Sie am Gipfel |
+
+## rtSurvey-Erweiterungen
+
+Während die grundlegende XLSForm-Spezifikation für `geotrace`-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen:
+
+1. Integration von Offline-Karten für abgelegene Gebiete
+2. Optionen zum Festlegen einer minimalen und maximalen Anzahl von Punkten für den Trace
+3. Möglichkeit, Traces nach dem ersten Zeichnen zu bearbeiten oder zu verfeinern
+4. Unterstützung für automatisches Tracing in festgelegten Intervallen während der Bewegung
+
+(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für `geotrace`-Fragen müssten hier bestätigt und detailliert werden.)
+
+## Datenformat
+
+Geotrace-Daten werden in der Regel als eine Zeichenfolge aus durch Leerzeichen getrennten Koordinatenpaaren gespeichert, ähnlich wie bei `geoshape`, aber ohne den schließenden Punkt:
+
+```
+lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
+```
+
+Beispiel:
+```
+38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
+```
+
+## Überlegungen zur Analyse
+
+Berücksichtigen Sie bei der Verwendung von `geotrace`-Fragen:
+
+1. Wie die geografischen Daten visualisiert und analysiert werden (z. B. GIS-Software)
+2. Den potenziellen Bedarf an Datenbereinigung oder Vereinfachung komplexer Traces
+3. Datenschutz- und Datensicherheitsmaßnahmen für den Umgang mit detaillierten räumlichen Daten
+4. Integration mit anderen räumlichen Datenquellen für eine umfassende Analyse
+
+## Einschränkungen
+
+- Das genaue Nachzeichnen von Pfaden auf kleinen mobilen Bildschirmen kann schwierig sein.
+- Komplexe Traces können erhebliche Speicher- und Verarbeitungskapazität erfordern.
+- Die kontinuierliche GPS-Nutzung für automatisches Tracing kann die Akkus der Geräte schnell entladen.
+- Bei der Erfassung detaillierter Pfaddaten können Datenschutzbedenken aufkommen.

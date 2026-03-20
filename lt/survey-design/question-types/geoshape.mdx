@@ -1,0 +1,64 @@
+---
+description: Geoshape klausimai leidžia respondentams piešti formas žemėlapyje, fiksuojant
+  sudėtingus geografinius duomenis kaip apklausos dalį.
+icon: map
+title: Geoshape
+---
+
+
+XLSForm ir rtSurvey geoshape klausimo tipas leidžia respondentams piešti formas (daugiakampius) žemėlapyje, fiksuojant sudėtingus geografinius duomenis. Ši funkcija ypač naudinga žemėlapių plotams sudaryti, riboms apibrėžti ar dominančių regionų žymėjimui erdvinėse apklausose.
+
+## Pagrindinė XLSForm specifikacija
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geoshape | field_area  | Nubrėžkite lauko ribą           |
+
+## Naudojimo atvejai
+
+Geoshape klausimai dažnai naudojami:
+
+1. Lauko ribų žemėlapiams sudaryti žemės ūkio apklausose
+2. Aplinkosauginio poveikio zonoms apibrėžti
+3. Miestų planavimo studijose zonoms žymėti
+4. Regionams nubrėžti geologiniams tyrimams
+5. Sudėtingiems geografiniams požymiams fiksuoti erdvinei analizei
+
+## Geriausios praktikos
+
+1. Užtikrinkite, kad įrenginyje yra įjungtos vietos paslaugos ir suteikti leidimai.
+2. Pateikite aiškias instrukcijas, kaip nubrėžti formą ir kokia sritis turėtų būti įtraukta.
+3. Apsvarstykite galimybę naudoti palydovinę nuotrauką ar pagrindus žemėlapius, kad padėtumėte respondentams tiksliai nubrėžti formas.
+4. Atkreipkite dėmesį į galimą formų sudėtingumą ir jo poveikį duomenų dydžiui ir apdorojimui.
+
+## Naudojimo pavyzdys
+
+Štai pavyzdys, kaip galima naudoti geoshape klausimą apklausoje:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geoshape | forest_area    | Nubrėžkite miško ploto ribą                | Naudokite bent 3 taškus uždarai formai sukurti |
+
+## Duomenų formatas
+
+Geoshape duomenys paprastai saugomi kaip tarpais atskirtų koordinačių porų eilutė, skliaustais uždarytos:
+
+```
+(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+```
+
+## Analizės svarstymai
+
+Naudojant geoshape klausimus, atsižvelkite į:
+
+1. Kaip geografiniai duomenys bus vizualizuojami ir analizuojami (pvz., GIS programinė įranga)
+2. Galimą poreikį valyti duomenis ar supaprastinti sudėtingas formas
+3. Privatumo ir duomenų apsaugos priemones tvarkant išsamius erdvinius duomenis
+4. Integraciją su kitais erdviniais duomenų šaltiniais išsamiai analizei
+
+## Apribojimai
+
+- Tikslių formų piešimas mažuose mobiliųjų ekranuose gali būti sudėtingas.
+- Sudėtingos formos gali reikalauti didelės saugyklos ir apdorojimo pajėgumų.
+- Geoshape klausimai gali būti netinkami visų tipų apklausoms ar respondentams.
+- Su išsamių erdvinių duomenų rinkimu gali būti susijusios privatumo problemos.

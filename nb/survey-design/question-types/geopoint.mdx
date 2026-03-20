@@ -1,0 +1,58 @@
+---
+description: Geopunktspørsmål registrerer geografiske koordinater (breddegrad, lengdegrad,
+  høyde og nøyaktighet) som en del av spørreundersøkelsen.
+icon: location_on
+title: Geopunkt
+---
+
+
+Geopunktspørsmålstypen i XLSForm og rtSurvey muliggjør innsamling av geografiske koordinater ved hjelp av enhetens GPS eller andre plasseringstjenester. Denne funksjonen er særlig nyttig for kartlegging av spørreundersøkelsessvar, sporing av feltaktiviteter eller koblingsdata med spesifikke steder.
+
+## Grunnleggende XLSForm-spesifikasjon
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geopoint | location    | Registrer gjeldende plassering  |
+
+## Brukstilfeller
+
+Geopunktspørsmål brukes vanligvis for:
+
+1. Kartlegge spørreundersøkelsessvar geografisk
+2. Verifisere plasseringen til feltaktiviteter
+3. Spore ruten til tellere
+4. Knytte miljø- eller sosiale data til spesifikke steder
+5. Beregne avstander eller arealer i geografiske analyser
+
+## Beste praksis
+
+1. Sørg for at enheten har plasseringstjenester aktivert og tillatelser gitt.
+2. Gi tilstrekkelig tid til at GPS-en kan skaffe en nøyaktig posisjon.
+3. Vurder personvernimplikasjoner og informer respondentene om innsamling av plasseringsdata.
+4. Bruk i kombinasjon med andre spørsmålstyper for å gi kontekst til plasseringsdataene.
+
+## Eksempelbruk
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geopoint | sample_location| Registrer plasseringen for prøveinnsamling | Stå i et åpent område for bedre GPS-signal |
+
+## Dataformat
+
+Geopunktdata lagres vanligvis som en streng med fire mellomrom-separerte verdier:
+
+```
+breddegrad lengdegrad høyde nøyaktighet
+```
+
+For eksempel:
+```
+41.40338 2.17403 30.5 10
+```
+
+## Begrensninger
+
+- Nøyaktigheten kan variere avhengig av enheten og miljøforholdene.
+- GPS-signaler kan være svake eller utilgjengelige innendørs eller i områder med hindringer.
+- Innsamling av plasseringsdata kan påvirke enhetsbatteriet betydelig.
+- Det kan være personvernbekymringer knyttet til innsamling av presise plasseringsdata.

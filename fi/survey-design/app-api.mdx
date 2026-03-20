@@ -1,0 +1,137 @@
+---
+description: ''
+icon: code
+title: Sovellus-API
+---
+
+
+AppAPI mahdollistaa järjestelmän metatietojen lataamisen sovelluksesta eri menetelmillä FormEnginessä ja DMViewissä. Se tarjoaa pääsyn erilaisiin datavaavinaimiin, joilla haetaan tiettyjä tietoja sovelluksesta.
+
+Xlsformissa voit käyttää `pulldata()`-funktiota seuraavalla syntaksilla:
+
+
+<Note>pulldata('app-api', 'data-key')</Note>
+
+- `'app-api'`: Tämä avainsana ilmoittaa FormEnginelle, että data ladataan App API:sta.
+- `'data-key'`: Tämä on ladattavan datan avain App API:sta.
+- Jos datavain on virheellinen tai sitä ei tueta, laskenta palauttaa "n/a".
+
+Tässä ovat tuetut datavaimet, joita voit käyttää App-API:n kanssa:
+
+`osPlatform`: Palauttaa nykyisen käyttöjärjestelmän nimen (Android tai iOS) ja käyttöjärjestelmäversion. Webalustat palauttavat tyhjän arvon.
+
+`appPlatform`: Palauttaa sovellusalustan nimen, joka on `rtSurvey`.
+
+`appVersion`: Palauttaa sovelluksen versionimen.
+
+`getDisplayWidth`: Palauttaa laitteen näytön leveyden pikseleinä.
+
+`getDisplayHeight`: Palauttaa laitteen näytön korkeuden pikseleinä.
+
+`getScreenSize`: Palauttaa laitteen näytön koon tuumina.
+
+`projectCode`: Palauttaa käyttäjän kirjautumiskohteen nykyisen projektin koodin.
+
+`projectURL`: Palauttaa käyttäjän kirjautumiskohteen nykyisen projektin URL-osoitteen. Oletusarvo/varavalinta on tyhjä teksti ("").
+
+`startingPoint`: Palauttaa lomakkeen aloittavan pisteen polun.
+
+`serverTime`: Palauttaa parhaan saatavilla olevan arvion palvelimen päivämäärästä ja kellonajasta.
+
+`user.[attribute]`: Palauttaa nykyisen käyttäjän attribuutit määritetyn attribuuttiavaimen perusteella. Katso "Käyttäjäattribuutit"-taulukko käytettävissä olevista attribuuttiavaimista.
+
+Yhdistä alla olevat attribuuttiavaimet "user." kanssa `pulldata()`-parametreissa hakiaksesi nykyisen käyttäjän tietoja. Esimerkiksi käytä `user.username`, `user.email` jne.
+
+| Attribuuttiavain     | Kuvaus                                   |
+|----------------------|------------------------------------------|
+| username             | Käyttäjän käyttäjätunnus                  |
+| name                 | Käyttäjän koko nimi                       |
+| staffCode            | Käyttäjän henkilöstökoodi                 |
+| phone                | Käyttäjän puhelinnumero                   |
+| email                | Käyttäjän sähköpostiosoite                |
+| description          | Kuvailuteksti käyttäjätiedoissa           |
+| organization_id      | Organisaation tunnus, johon käyttäjä kuuluu|
+| organization_name    | Organisaation nimi, johon käyttäjä kuuluu |
+| team_id              | Tiimin tunnus, johon käyttäjä kuuluu      |
+| supervisor_id        | Käyttäjän esihenkilön tunnus              |
+| is_supervisor        | 1 jos käyttäjä on esihenkilö, 0 jos ei   |
+
+`instancePath`: Palauttaa nykyisen instanssikansion polun.
+
+`appLanguage`: Palauttaa sovelluksen nykyisen kielen, joka on asetettu sovelluksen asetuksissa (esim. fi, en).
+
+`openArgs.[attribute]`: Palauttaa ActionButtonilta (act_fill_form, act_get_instance) välitetyn avoimenlomakkeen argumentin. Oletusarvo/varavalinta on tyhjä teksti ("").
+
+`primaryAppColor`: Hakee sovelluksen ensisijaisen värin.
+
+---
+
+## Käyttöesimerkkejä
+
+### Tallenna luetteloijan käyttäjätunnus ja organisaatio
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Käytä näitä note-otsikoissa kirjanpitoa varten:
+```
+note | interviewer_info | Haastattelija: ${enumerator_name} (${enumerator_org})
+```
+
+### Laite- ja näyttötiedot
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+Hyödyllinen vianmääritykseen: vie `device_platform` ja `app_ver` yhdessä tietojesi kanssa tunnistamaan, mitä laiteversioita käytettiin kussakin lähetyksessä.
+
+### Palvelinaika laitteen ajan sijaan
+
+Laitteiden kellot voivat olla väärin. Käytä `serverTime`-arvoa luotettavampana aikaleimana:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Ehdollinen logiikka käyttäjäroolin perusteella
+
+Näytä vain esihenkilölle tarkoitettu osio vain esihenkilöille:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Esihenkilön tarkistus | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Esihenkilön muistiinpanot | |
+| end_group | | | |
+
+### Välitä argumentteja toimintopainikkeelta
+
+Kun lomake käynnistetään `act_fill_form`-toimintopainikkeelta mukautetuilla argumenteilla:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+Toimintopainikkeen on välitettävä argumentit vastaavilla avaimilla (esim. `household_id`, `task_code`).
+
+### Projektitietojen käyttö
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## Huomiot
+
+- Kaikki `pulldata('app-api', ...)`-kutsut arvioidaan lomakkeen avautuessa eikä niitä arvioida uudelleen dynaamisesti istunnon aikana (paitsi `serverTime` ja `now()`).
+- Jos avain ei ole tuettu tai data ei ole saatavilla, funktio palauttaa `'n/a'` (ei tyhjä merkkijono — testaa `!= 'n/a'`-ehdolla eikä `!= ''`-ehdolla).
+- `openArgs`-arvot ovat käytettävissä vain, kun lomake käynnistetään toimintopainikkeelta; muutoin ne palauttavat tyhjän merkkijonon.

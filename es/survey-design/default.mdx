@@ -1,0 +1,129 @@
+---
+description: ''
+icon: code
+title: Valor predeterminado
+---
+
+
+Los valores predeterminados en rtSurvey le permiten pre-llenar las preguntas con respuestas cuando un encuestado las encuentra por primera vez. Esta función puede mejorar significativamente la eficiencia de la encuesta y la calidad de los datos al proporcionar valores iniciales que son comúnmente seleccionados o sirven como ejemplos de entrada esperada.
+
+## Uso básico
+
+Para establecer un valor predeterminado, use la columna `default` en su XLSForm:
+
+```
+| type    | name        | label                         | default    |
+|---------|-------------|-------------------------------|------------|
+| date    | survey_date | Fecha de la encuesta          | 2024-07-04 |
+| decimal | weight      | ¿Peso del encuestado? (en kg) | 51.3       |
+```
+
+En este ejemplo, la fecha de la encuesta se llenará previamente con el 4 de julio de 2024, y el campo de peso comenzará con 51.3 kg.
+
+## Valores predeterminados dinámicos
+
+rtSurvey admite valores predeterminados dinámicos usando funciones:
+
+```
+| type | name | label                              | default  |
+|------|------|------------------------------------| ---------|
+| date | d    | Ingrese la fecha en que ocurrió el evento | today()  |
+```
+
+Aquí, la función `today()` establece automáticamente el valor predeterminado a la fecha actual.
+
+## Características específicas de rtSurvey
+
+### Valores predeterminados conscientes del contexto
+
+rtSurvey amplía la funcionalidad predeterminada con valores predeterminados conscientes del contexto:
+
+```
+| type    | name     | label           | default            |
+|---------|----------|-----------------|---------------------|
+| text    | location | Ubicación actual| ${current_location} |
+```
+
+Esto usa la variable `${current_location}` de rtSurvey para pre-llenar la ubicación basándose en el GPS del dispositivo.
+
+### Valores predeterminados en cascada
+
+rtSurvey permite valores predeterminados basados en respuestas anteriores:
+
+```
+| type    | name     | label           | default         |
+|---------|----------|-----------------|-----------------|
+| text    | city     | Ciudad          |                 |
+| text    | district | Distrito        | ${city}-district|
+```
+
+Aquí, el campo de distrito se pre-llena basándose en la ciudad ingresada.
+
+### Valor predeterminado en repeticiones
+
+Para preguntas dentro de un grupo repetitivo, el valor predeterminado se calcula cuando se agrega la repetición:
+
+```
+| type         | name      | label        | default                |
+|--------------|-----------|--------------|------------------------|
+| begin repeat | visits    | Visitas clínicas |                    |
+| date         | visit_date| Fecha de visita | ${previous_visit_date} |
+| end repeat   |           |              |                        |
+```
+
+Esto establece la fecha de visita predeterminada como la fecha de la visita anterior.
+
+## Mejores prácticas para usar valores predeterminados
+
+1. **Usar con moderación**: Use valores predeterminados solo donde mejoren significativamente la eficiencia o la calidad de los datos.
+2. **Garantizar la precisión**: Revise y actualice regularmente los valores predeterminados estáticos.
+3. **Probar exhaustivamente**: Especialmente cuando use valores predeterminados dinámicos o calculados.
+4. **Considerar la experiencia del usuario**: Asegúrese de que los valores predeterminados no induzcan a error a los encuestados ni introduzcan sesgos.
+5. **Documentar claramente**: Asegúrese de que todos los miembros del equipo entiendan la razón detrás de los valores predeterminados.
+
+## Técnicas avanzadas de valores predeterminados
+
+### Valores predeterminados aleatorios
+
+rtSurvey admite valores predeterminados aleatorios para ciertos tipos de preguntas:
+
+```
+| type              | name    | label        | default           |
+|-------------------|---------|--------------|-------------------|
+| select_one options| choice  | Seleccione uno: | random(options) |
+```
+
+Esto selecciona aleatoriamente una opción predeterminada de la lista 'options'.
+
+### Valores predeterminados condicionales
+
+Use la relevancia para establecer valores predeterminados condicionales:
+
+```
+| type    | name     | label    | default | relevant        |
+|---------|----------|----------|---------|-----------------|
+| text    | other    | Especifique | N/A | ${q1} = 'other' |
+```
+
+Aquí, 'N/A' es el valor predeterminado solo cuando se selecciona 'other' en una pregunta anterior.
+
+## Consideraciones de gestión de datos
+
+- Los valores predeterminados se incluyen en las exportaciones de datos, generalmente con una bandera que indica que eran valores predeterminados.
+- La función de rastro de auditoría de rtSurvey rastrea cuándo los encuestados cambian los valores predeterminados.
+
+## Comportamiento de la aplicación móvil
+
+- La aplicación móvil rtSurvey admite todas las funcionalidades predeterminadas, incluidos los valores predeterminados dinámicos y conscientes del contexto.
+- El modo sin conexión puede afectar algunos valores predeterminados dinámicos que dependen de datos en tiempo real.
+
+## Limitaciones conocidas
+
+- Los valores predeterminados calculados complejos pueden afectar el tiempo de carga del formulario, especialmente en dispositivos de gama baja.
+- Algunos valores predeterminados dinámicos pueden no funcionar como se espera en el modo de vista previa.
+
+## Solución de problemas de valores predeterminados
+
+1. **El valor predeterminado no aparece**: Verifique si hay errores de sintaxis en la expresión predeterminada.
+2. **Valores inesperados**: Verifique la lógica de cálculo y pruebe con varios escenarios.
+3. **Problemas de rendimiento**: Optimice los cálculos predeterminados complejos o considere enfoques alternativos.

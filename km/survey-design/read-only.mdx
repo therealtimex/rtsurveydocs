@@ -1,0 +1,24 @@
+---
+description: ''
+icon: code
+title: Read-only
+---
+
+
+Read-only fields បង្ហាញ ព័ ត ៌ ម ាន ដោយ មិន អនុញ្ញាតឱ្យ user input ។ ប្រើ `readonly` column ក្នុង XLSForm ។
+
+## Basic Usage
+
+```
+| type    | name | label | read_only |
+|---------|------|-------|-----------|
+| integer | age  | Age   | yes       |
+```
+
+## ការ ប្រើ ជាមួយ calculate
+
+```
+| type      | name | label | appearance | calculation          |
+|-----------|------|-------|------------|----------------------|
+| calculate | bmi  | BMI   | readonly   | ${weight} / (${height} * ${height}) |
+```

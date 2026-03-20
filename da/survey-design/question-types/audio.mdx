@@ -1,0 +1,96 @@
+---
+description: Lydspørgsmål giver respondenter mulighed for at optage og indsende lydfiler
+  som en del af undersøgelsen.
+icon: mic
+title: Lyd
+---
+
+
+Spørgsmålstypen `audio` giver respondenter mulighed for at **optage lyd** eller uploade en eksisterende lydfil som en del af deres undersøgelsessvar. Det er nyttigt til at fange mundtlige beretninger, miljølyde, vidnesbyrd eller enhver information, der bedre formidles via stemme end tekst.
+
+## Grundlæggende XLSForm-specifikation
+
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Optag venligst dine kommentarer  |
+
+For flere detaljer om standard lydspørgsmålstypen, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+
+## Anvendelser
+
+Lydspørgsmål bruges typisk til:
+
+1. At fange åbne mundtlige svar for at reducere interviewerens skrivebyrde
+2. At optage vidnesbyrd, personlige historier eller mundtlige historier
+3. At dokumentere miljølyde (f.eks. støjniveauer nær infrastruktur)
+4. At indsamle stemmestikprøver til sproglig eller sundhedsmæssig forskning
+5. At give respondenter mulighed for at tilføje mundtlige afklaringer til numeriske eller valgbaserede svar
+
+## Dataformat
+
+Lydfiler gemmes som binære vedhæftninger ved siden af formularindsendelsen, typisk:
+
+- **Format:** MP3 eller AAC (mobiloptagelse); WAV (høj kvalitet)
+- **Navngivning:** `{instanceID}-{feltnavn}.mp3` (eller tilsvarende)
+- **Lagring:** Uploadet til serverens mediemappe og knyttet til indsendelsesposten
+- **Adgang:** Kan afspilles og downloades fra indsendelseshåndteringsgrænsefladen
+
+## rtSurvey-udvidelser
+
+### Maksimal varighed
+
+Brug kolonnen `parameters` til at begrænse optagelseslængden:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | interview | Optag interviewet | `max-duration=120` |
+
+`max-duration` er i sekunder. Optageren stopper automatisk ved grænsen.
+
+### Kvalitetsindstillinger
+
+Optagekvaliteten kan indstilles via `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Optag feedback | `quality=normal` |
+
+Understøttede værdier: `low`, `normal` (standard), `voice-only`. `voice-only` optimerer til talt lyd med støjreduktion.
+
+### Afspilning inden indsendelse
+
+På mobil kan intervieweren afspille det optagne klip, inden de fortsætter. Dette er aktiveret som standard — ingen konfiguration er nødvendig.
+
+### Integration af native optagelsesprogrammer
+
+På Android og iOS starter `audio` enhedens native optagelsesapp. På web bruges browserens indbyggede MediaRecorder API.
+
+## Eksempler på brug
+
+### Med maksimal varighed og hint
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| audio | story | Fortæl os om hændelsen med egne ord | Tal tydeligt. Optagelsen stopper efter 3 minutter. | `max-duration=180` |
+
+### Betinget lyd — kun hvis et problem er rapporteret
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one janer | issue_found | Blev der fundet et problem? | | |
+| audio | issue_audio | Optag en beskrivelse af problemet | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+
+## Bedste praksis
+
+1. Angiv tydeligt i `label` eller `hint`, hvad intervieweren skal sige og i hvor lang tid.
+2. Brug `max-duration` til at forhindre for store filer i områder med langsom uploadhastighed.
+3. Informér respondenter inden optagelsen begynder — uventet optagelse kan rejse privatlivsbekymringer.
+4. Test optagelse på målenheden og netværksbetingelserne inden udrulning.
+5. Indstil `quality=voice-only` til interviewlignende optagelser for at reducere filstørrelsen uden at miste forståelighed.
+
+## Begrænsninger
+
+- Lydfiler kan være store (en 2-minutters optagelse ved normal kvalitet er ca. 2–4 MB) — tag højde for dette i dine dataplaner og uploadtidsestimater.
+- Ikke alle browsere understøtter MediaRecorder API — Chrome og Firefox fungerer pålideligt; Safari på ældre iOS-versioner kan have problemer.
+- Transskription af lydsvar kræver yderligere efterbehandling (manuel eller automatiseret tale-til-tekst).
+- Privatlivsregler kan begrænse optagelse af stemmer — verificer lokale databeskyttelseskrav.

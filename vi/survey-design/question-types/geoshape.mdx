@@ -1,0 +1,80 @@
+---
+description: Các câu hỏi kiểu Geoshape cho phép người trả lời vẽ các hình trên bản
+  đồ, thu thập dữ liệu địa lý phức tạp như một phần của cuộc khảo sát.
+icon: map
+title: Vùng địa lý (Geoshape)
+---
+
+
+Loại câu hỏi `geoshape` (vùng địa lý) trong XLSForm và rtSurvey cho phép người trả lời vẽ các hình dạng (đa giác) trên bản đồ, thu thập dữ liệu địa lý phức tạp. Tính năng này đặc biệt hữu ích để lập bản đồ các khu vực, xác định ranh giới hoặc đánh dấu các vùng quan tâm trong các khảo sát không gian.
+
+## Đặc tả XLSForm cơ bản
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geoshape | field_area  | Vẽ ranh giới của cánh đồng      |
+
+Để biết thêm chi tiết về loại câu hỏi geoshape cơ bản, hãy xem [đặc tả XLSForm](https://xlsform.org/en/#question-types).
+
+## Các trường hợp sử dụng
+
+Câu hỏi vùng địa lý thường được dùng cho:
+
+1. Lập bản đồ ranh giới cánh đồng trong các khảo sát nông nghiệp
+2. Xác định các khu vực bị ảnh hưởng bởi môi trường
+3. Đánh dấu các vùng trong các nghiên cứu quy hoạch đô thị
+4. Phác thảo các khu vực cho các khảo sát địa chất
+5. Thu thập các đối tượng địa lý phức tạp để phân tích không gian
+
+## Các phương pháp hay nhất
+
+1. Đảm bảo thiết bị đã bật dịch vụ vị trí và đã được cấp quyền truy cập.
+2. Cung cấp hướng dẫn rõ ràng về cách vẽ hình và khu vực nào nên được bao gồm.
+3. Cân nhắc sử dụng ảnh vệ tinh hoặc bản đồ nền để giúp người trả lời vẽ hình chính xác hơn.
+4. Lưu ý đến độ phức tạp tiềm tàng của các hình dạng và tác động của chúng đối với kích thước dữ liệu và quá trình xử lý.
+
+## Ví dụ sử dụng
+
+Dưới đây là một ví dụ về cách bạn có thể sử dụng câu hỏi geoshape trong một cuộc khảo sát:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geoshape | forest_area    | Phác thảo ranh giới của mảng rừng         | Sử dụng ít nhất 3 điểm để tạo thành một hình khép kín |
+
+## Các phần mở rộng của rtSurvey
+
+Mặc dù đặc tả XLSForm cơ bản cho câu hỏi vùng địa lý khá đơn giản, rtSurvey có thể cung cấp thêm các tính năng hoặc tùy chỉnh bổ sung:
+
+1. Tích hợp với bản đồ ngoại tuyến cho các khu vực vùng sâu vùng xa
+2. Tùy chọn thiết lập số điểm tối thiểu và tối đa cho hình vẽ
+3. Khả năng chỉnh sửa hoặc hoàn thiện các hình dạng sau khi đã vẽ ban đầu
+4. Hỗ trợ các loại hình dạng khác nhau (ví dụ: hình chữ nhật, hình tròn) bên cạnh các đa giác tự do
+
+## Định dạng dữ liệu
+
+Dữ liệu geoshape thường được lưu trữ dưới dạng một chuỗi các cặp tọa độ cách nhau bằng dấu cách, được đặt trong dấu ngoặc đơn:
+
+```
+(vĩ độ1 kinh độ1; vĩ độ2 kinh độ2; vĩ độ3 kinh độ3; ... vĩ độN kinh độN)
+```
+
+Ví dụ:
+```
+(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+```
+
+## Các lưu ý khi phân tích
+
+Khi sử dụng câu hỏi vùng địa lý, hãy cân nhắc:
+
+1. Cách dữ liệu địa lý sẽ được hiển thị trực quan và phân tích (ví dụ: phần mềm GIS)
+2. Nhu cầu tiềm năng về làm sạch dữ liệu hoặc đơn giản hóa các hình dạng phức tạp
+3. Các biện pháp bảo mật và bảo vệ dữ liệu khi xử lý dữ liệu không gian chi tiết
+4. Tích hợp với các nguồn dữ liệu không gian khác để phân tích toàn hiện
+
+## Hạn chế
+
+- Việc vẽ các hình dạng chính xác trên màn hình di động nhỏ có thể gặp khó khăn.
+- Các hình dạng phức tạp có thể yêu cầu khả năng lưu trữ và xử lý đáng kể.
+- Các câu hỏi geoshape có thể không phù hợp cho tất cả các loại khảo sát hoặc người trả lời.
+- Có thể có các lo ngại về quyền riêng tư liên quan đến việc thu thập dữ liệu không gian chi tiết.

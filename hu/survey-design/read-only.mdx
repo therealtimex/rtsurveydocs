@@ -1,0 +1,113 @@
+---
+description: ''
+icon: code
+title: Csak olvasható
+---
+
+
+Az rtSurvey csak olvasható mezői lehetővé teszik olyan információk megjelenítését, amelyeket a válaszadó nem szerkeszthet. Ez a funkció különösen hasznos előzetesen kitöltött adatok, számított eredmények vagy a felmérés során állandónak maradó információk megjelenítéséhez.
+
+## Alapvető használat
+
+A mező csak olvashatóvá tételéhez használja a `read_only` oszlopot az XLSForm-ban:
+
+```
+| type    | name | label                 | read_only | default |
+|---------|------|----------------------|-----------|---------|
+| integer | num  | Beteg sorszáma:       | yes       | 5       |
+```
+
+Ebben a példában a beteg sorszáma 5-re van beállítva, és a válaszadó nem változtathatja meg.
+
+## Csak olvasható és alapértelmezett értékek kombinálása
+
+A csak olvasható mezőket gyakran alapértelmezett értékekkel együtt használják az előre meghatározott vagy számított információk megjelenítéséhez:
+
+```
+| type    | name     | label               | read_only | default        |
+|---------|----------|---------------------|-----------|----------------|
+| text    | username | Bejelentkezett felhasználó: | yes | ${current_user}|
+| date    | today    | Mai dátum:          | yes       | today()        |
+```
+
+Itt a felhasználónév és az aktuális dátum megjelenik, de nem szerkeszthető.
+
+## rtSurvey-specifikus funkciók
+
+### Feltételes csak olvasható
+
+Az rtSurvey feltételes logikával egészíti ki a csak olvasható funkciót:
+
+```
+| type    | name     | label           | read_only                |
+|---------|----------|-----------------|--------------------------|
+| integer | age      | Kor:            | ${role} = 'viewer'       |
+| text    | comments | Megjegyzések:   | selected(${status}, 'closed') |
+```
+
+Ezekben a példákban:
+- Az 'age' mező csak akkor csak olvasható, ha a felhasználó szerepköre 'viewer'.
+- A 'comments' mező csak olvashatóvá válik, ha az állapot 'closed'.
+
+### Dinamikus csak olvasható állapot
+
+Az rtSurvey lehetővé teszi a csak olvasható állapot dinamikus megváltoztatását:
+
+```
+| type      | name     | label    | read_only              |
+|-----------|----------|----------| ----------------------|
+| text      | address  | Cím:     | ${edit_mode} = 'false' |
+```
+
+Ez lehetővé teszi a szerkeszthető és csak olvasható módok közötti váltást bizonyos feltételek vagy felhasználói műveletek alapján.
+
+## A csak olvasható mezők használatának bevált módszerei
+
+1. **Egyértelműség**: Vizuális jelzéssel vagy felirattal jelezze egyértelműen, hogy mely mezők csak olvashatók.
+2. **Következetesség**: Következetesen használja a csak olvasható mezőket az egész felmérésben.
+3. **Ellenőrzés**: Annak ellenére, hogy a csak olvasható mezők nem szerkeszthetők, vonja be őket az adatellenőrzési folyamatba.
+4. **Teljesítmény**: Legyen óvatos a csak olvasható mezőkben végzett összetett számításokkal, mivel azok befolyásolhatják az űrlap betöltési idejét.
+5. **Akadálymentesség**: Győződjön meg arról, hogy a csak olvasható mezők megfelelően meg vannak jelölve a képernyőolvasók számára.
+
+## Haladó technikák
+
+### Számított csak olvasható mezők
+
+Csak olvasható mezőkkel más válaszokon alapuló számításokat jeleníthet meg:
+
+```
+| type      | name     | label           | read_only | calculation            |
+|-----------|----------|-----------------|-----------|------------------------|
+| calculate | bmi      | BMI:            | yes       | ${weight} / (${height} * ${height}) |
+```
+
+### Korábbi adatok megjelenítése
+
+A csak olvasható mezők korábbi felmérések vagy külső források adatait jeleníthetik meg:
+
+```
+| type    | name           | label                  | read_only | default                    |
+|---------|----------------|------------------------|-----------|----------------------------|
+| text    | last_visit_date| Utolsó látogatás dátuma: | yes     | ${pulldata('visits', 'date', 'id', ${patient_id})} |
+```
+
+## Adatkezelési szempontok
+
+- A csak olvasható mezők szerepelnek az adatexportokban, általában egy jelzővel, amely mutatja a csak olvasható állapotot.
+- Meglévő rekordok frissítésekor a csak olvasható mezők megőrzik eredeti értékeiket, hacsak nem írja felül azokat explicit módon a háttérrendszerből.
+
+## Mobilalkalmazás viselkedése
+
+- Az rtSurvey mobilalkalmazás tiszteletben tartja a csak olvasható beállításokat, beleértve a feltételes csak olvasható logikát.
+- Az offline mód teljes mértékben támogatja a csak olvasható funkcionalitást, beleértve a dinamikus és számított csak olvasható mezőket.
+
+## Ismert korlátozások
+
+- Egyes összetett dinamikus csak olvasható feltételek kis teljesítményhatással lehetnek alacsony kategóriájú eszközökön.
+- A csak olvasható mezők esetleg nem akadályozzák meg az összes adatmanipulációs formát az exportált adatfájlokban, ezért kritikus adatoknál szerver oldali ellenőrzés ajánlott.
+
+## Csak olvasható mezők hibaelhárítása
+
+1. **Mező váratlanul szerkeszthető**: Ellenőrizze a `read_only` oszlopban lévő szintaktikai hibákat vagy a feltételes logikát.
+2. **A számított értékek nem frissülnek**: Ellenőrizze a számítási logikát, és győződjön meg arról, hogy az összes hivatkozott mező neve helyes.
+3. **Teljesítményproblémák**: Optimalizálja az összetett számításokat, vagy fontolja meg alternatív megközelítések alkalmazását a csak olvasható adatok megjelenítéséhez.

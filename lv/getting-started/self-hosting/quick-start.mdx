@@ -1,0 +1,174 @@
+---
+description: Palaidiet rtCloud savā serverī mazāk nekā 10 minūtēs, izmantojot Docker
+  Compose.
+icon: play_circle
+title: Ātrā sākšana
+---
+
+
+Šī rokasgrāmata palīdz izvietot pašmitinātu rtCloud instanci Linux serverī no nulles. Beigās jums būs darbojošs rtCloud, pieejams pārlūkprogrammā.
+
+## Priekšnoteikumi
+
+Pirms sākšanas pārliecinieties, ka jūsu serveris atbilst šīm prasībām:
+
+### Aparatūra
+
+| Resurss | Minimums | Ieteicamais |
+|----------|---------|-------------|
+| RAM | 2 GB | 4 GB |
+| Disks | 10 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPU |
+
+### Programmatūra
+
+| Programmatūra | Versija |
+|----------|---------|
+| OS | Ubuntu 20.04 LTS vai jaunāka (vai jebkura Linux ar Docker atbalstu) |
+| Docker | 20.10 vai jaunāka |
+| Docker Compose | v2.x (`docker compose`) vai v1.x (`docker-compose`) |
+
+**Docker instalēšana Ubuntu:**
+
+```bash
+curl -fsSL https://get.docker.com | sh
+```
+
+Pārbaudiet instalāciju:
+
+```bash
+docker --version
+docker compose version
+```
+
+---
+
+## 1. solis — Iegūstiet failus
+
+Klonējiet izvietošanas repozitoriju savā serverī:
+
+```bash
+git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
+cd rtcloud
+```
+
+---
+
+## 2. solis — Konfigurējiet vidi
+
+Kopējiet parauga konfigurācijas failu:
+
+```bash
+cp .env.production.sample .env
+```
+
+Atveriet `.env` teksta redaktorā un aizpildiet nepieciešamās vērtības:
+
+```dotenv
+# Unikāls identifikators šim izvietojumam (bez atstarpēm, bez speciālajām rakstzīmēm)
+PROJECT_ID=myproject
+
+# Domēns vai IP adrese, kur lietotāji piekļūs lietotnei
+# Piemērs: rtcloud.example.com  vai  192.168.1.100
+PROJECT_URL=rtcloud.example.com
+
+# Protokols: izmantojiet "https", ja jums ir domēns ar SSL, citādi "http"
+HTTP_PROTOCOL=https
+
+# Spēcīgas, unikālas paroles — mainiet visas trīs pirms sākšanas
+MYSQL_PASSWORD=change_me_strong_password
+MYSQL_ROOT_PASSWORD=change_me_root_password
+ADMIN_PASSWORD=change_me_admin_password
+```
+
+> **Svarīgi:** Docker Compose automātiski nolasa tikai `.env`. Neveidojiet failu ar nosaukumu `.env.production`, jo tas radītu apjukumu. `ADMIN_PASSWORD` tiek piemērots tikai **pirmajā palaišanā** ar jaunu datu bāzi.
+
+---
+
+## 3. solis — Palaidiet konteinerus
+
+Palaidiet visus pakalpojumus fonā:
+
+```bash
+docker compose -f docker-compose.production.yml up -d
+```
+
+Pirmā palaišana aizņem **3–5 minūtes**, kamēr Docker:
+
+1. Lejupielādē rtCloud lietojumprogrammas attēlu (~1 GB lejupielāde)
+2. Inicializē MySQL datu bāzi
+3. Ielādē pamata shēmu
+4. Izpilda visas gaidošās datu bāzes migrācijas
+
+Uzraugiet palaišanas progresu reāllaikā:
+
+```bash
+docker compose -f docker-compose.production.yml logs -f rtcloud
+```
+
+Pagaidiet, līdz redzat izvadi, kas norāda, ka lietojumprogramma ir gatava. Varat arī vērot konteineru veselības statusu:
+
+```bash
+watch docker compose -f docker-compose.production.yml ps
+```
+
+---
+
+## 4. solis — Piekļūstiet lietojumprogrammai
+
+Kad abi konteineri rāda `Up (healthy)`, atveriet pārlūkprogrammu:
+
+```
+http://<PROJECT_URL>:8080
+```
+
+Piesakieties, izmantojot administratora kontu:
+
+| Lauks | Vērtība |
+|-------|-------|
+| Lietotājvārds | `admin` |
+| Parole | Vērtība, ko iestatījāt `ADMIN_PASSWORD` failā `.env` |
+
+> Mainiet administratora paroli uzreiz pēc pirmās pieteikšanās no konta iestatījumu lapas.
+
+---
+
+## 5. solis — Pārbaudiet visus pakalpojumus
+
+Pārbaudiet, vai visi konteineri darbojas un ir veseli:
+
+```bash
+docker compose -f docker-compose.production.yml ps
+```
+
+Paredzamais izvads:
+
+```
+NAME                    IMAGE                                   STATUS
+rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
+rtcloud-mysql           mysql:8.0                               Up (healthy)
+```
+
+Ja konteiners rāda `Up (starting)` vai `Up (unhealthy)`, pagaidiet vēl 30–60 sekundes un pārbaudiet vēlreiz. MySQL pirmajā palaišanā var aizņemt līdz minūtei pilnai inicializācijai.
+
+---
+
+## Portu uzziņa
+
+| Ports | Pakalpojums | Apraksts |
+|------|---------|-------------|
+| `8080` | rtCloud lietotne | Galvenais tīmekļa UI (konfigurējams ar `APP_PORT`) |
+| `3838` | Shiny serveris | Analītika un R bāzētas vizualizācijas (konfigurējams ar `SHINY_PORT`) |
+
+MySQL (ports 3306) un visi papildu pakalpojumi (Keycloak) ir tikai iekšēji un pēc noklusējuma nav redzami saimniekdatoram.
+
+---
+
+## Nākamie soļi
+
+Jūsu rtCloud instance tagad darbojas. Apsveriet šos turpmākos uzdevumus:
+
+- **Iespējojiet HTTPS** — Norādiet domēnu uz savu serveri un konfigurējiet SSL ar Let's Encrypt. Skatiet [Mākoņa izvietošanu](cloud-deployment) automatizētai HTTPS iestatīšanai.
+- **Pārskatiet visus iestatījumus** — Pārlūkojiet [Konfigurācijas uzziņu](configuration), lai pielāgotu izvietojumu ražošanai.
+- **Iestatiet SSO** — Savienojiet identitātes nodrošinātāju centralizētai lietotāju autentifikācijai. Skatiet [SSO autentifikāciju](sso-authentication).
+- **Plānojiet dublēšanu** — Pārskatiet [Apkopes](maintenance) lapu, lai uzzinātu par dublēšanas un jaunināšanas procedūrām.

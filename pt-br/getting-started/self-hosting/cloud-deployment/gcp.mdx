@@ -1,0 +1,140 @@
+---
+description: Implante o rtCloud no Google Cloud Compute Engine usando o script de
+  inicialização gcp-compute.sh.
+icon: travel_explore
+title: Google Cloud (GCP)
+---
+
+
+Use `gcp-compute.sh` como **Script de inicialização** ao criar uma instância de VM do Compute Engine. O script é executado automaticamente na primeira inicialização.
+
+**Baixar script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+
+---
+
+## Etapa 1 — Preencha a configuração
+
+Abra o script e edite o bloco `CONFIGURATION` no início:
+
+```bash
+# --- Obrigatório ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # Altere após o primeiro login
+
+# --- Domínio + SSL ---
+DOMAIN="meuapp.exemplo.com.br"
+LETSENCRYPT_EMAIL="admin@exemplo.com.br"
+
+# --- Keycloak integrado ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Padrão para ADMIN_PASSWORD
+```
+
+| Campo | Obrigatório | Descrição |
+|-------|-------------|-----------|
+| `PROJECT_ID` | Sim | Usado como nome do banco de dados e ID do cliente Keycloak. Letras minúsculas, sem espaços. |
+| `ADMIN_PASSWORD` | Não | Senha do admin do aplicativo e do Keycloak. O padrão é `admin` — **altere após o primeiro login**. |
+| `DOMAIN` | Não | Seu domínio para HTTPS. Deixe em branco para modo somente HTTP. |
+| `LETSENCRYPT_EMAIL` | Sim (se DOMAIN definido) | E-mail para notificações do Let's Encrypt. |
+| `EMBED_KEYCLOAK` | Não | `true` para implantar o Keycloak integrado (requer 4 GB de RAM). |
+
+> **Segurança:** Todas as senhas têm `admin` como padrão. Altere-as imediatamente após o primeiro login.
+
+---
+
+## Etapa 2 — Crie uma instância de VM
+
+No [Console do Google Cloud](https://console.cloud.google.com/compute):
+
+1. Clique em **Criar instância**
+2. **Configuração da máquina:**
+   - Série: `E2`
+   - Tipo de máquina: `e2-medium` (4 GB de RAM) ou maior
+3. **Disco de inicialização:**
+   - Sistema operacional: Ubuntu
+   - Versão: Ubuntu 22.04 LTS
+   - Tamanho: 40 GB ou mais
+4. **Firewall:** marque **Permitir tráfego HTTP** e **Permitir tráfego HTTPS**
+5. **Opções avançadas** → **Gerenciamento** → **Automação** → **Script de inicialização** → cole o conteúdo completo do script
+6. Clique em **Criar**
+
+---
+
+## Etapa 3 — Adicione o registro DNS
+
+Enquanto a VM inicializa, adicione um **registro A** no seu provedor de DNS:
+
+```
+Tipo  : A
+Nome  : meuapp
+Valor : <ip-externo-da-vm>
+TTL   : 300
+```
+
+Encontre o IP externo na lista de instâncias de VM no console.
+
+---
+
+## Etapa 4 — Monitore o progresso
+
+Usando a CLI `gcloud`:
+
+```bash
+gcloud compute ssh <nome-da-instância> -- tail -f /var/log/rtcloud-setup.log
+```
+
+Ou conecte-se via SSH diretamente:
+
+```bash
+ssh <nome-de-usuário>@<ip-externo-da-vm>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## Etapa 5 — Acesse o aplicativo
+
+Quando a configuração estiver concluída, o log exibe um resumo com a URL do seu aplicativo e as credenciais. Entre com o nome de usuário `admin` e a senha `admin`, depois altere sua senha imediatamente.
+
+---
+
+## Regras de firewall
+
+As caixas de seleção **Permitir HTTP/HTTPS** do GCP abrem as portas 80 e 443. Para também permitir acesso direto ao Shiny na porta 3838, adicione uma regra de firewall:
+
+```bash
+gcloud compute firewall-rules create allow-shiny \
+  --allow tcp:3838 \
+  --target-tags http-server
+```
+
+Ou adicione pelo console: **Rede VPC** → **Firewall** → **Criar regra**.
+
+> **Não** abra a porta 3306 (MySQL) — ela nunca deve ser acessível publicamente.
+
+---
+
+## IP estático (opcional)
+
+Por padrão, o GCP atribui um IP externo temporário que muda ao reiniciar a VM. Para manter um IP estável:
+
+1. Vá para **Rede VPC** → **Endereços IP**
+2. Clique em **Reservar endereço estático externo**
+3. Atribua-o à sua instância de VM
+
+---
+
+## Após a implantação
+
+### Alterar uma senha
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Ver todos os contêineres
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```

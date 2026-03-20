@@ -1,0 +1,71 @@
+---
+description: Distribuisci e gestisci la tua istanza rtCloud usando Docker. Controllo
+  completo su dati, infrastruttura e configurazione.
+icon: dns
+title: Self-Hosting
+---
+
+
+Esegui rtCloud sulla tua infrastruttura usando Docker Compose. Il self-hosting ti offre la completa proprietà dei tuoi dati, della rete e dell'ambiente di deployment — ideale per organizzazioni con requisiti di residenza dei dati, reti air-gap o esigenze di infrastruttura personalizzata.
+
+## Cos'è il Self-Hosting di rtCloud?
+
+Il Self-Hosting di rtCloud è un'immagine Docker ufficiale che racchiude l'intera piattaforma rtCloud in uno stack di container portabili che puoi eseguire su qualsiasi server Linux. Lo stack include:
+
+| Servizio | Descrizione |
+|---------|-------------|
+| **rtCloud App** | Applicazione web Apache 2.4 + PHP 7.4 con coda in background integrata (Beanstalkd), server di analisi (Shiny) e attività pianificate |
+| **MySQL 8.0** | Database relazionale per tutti i dati applicativi e del sondaggio |
+| **Keycloak** *(opzionale)* | Server Single Sign-On integrato per la gestione delle identità aziendali |
+
+## Quando scegliere il Self-Hosting
+
+Il self-hosting è la scelta giusta quando:
+
+- Hai bisogno di **sovranità dei dati** — tutti i dati rimangono all'interno della tua infrastruttura
+- Operi in una **rete air-gap o limitata** senza accesso al cloud esterno
+- Hai **requisiti di conformità** (GDPR, HIPAA, politiche sui dati governativi) che richiedono l'archiviazione on-premise
+- Devi integrarti con un **provider di identità interno** (Active Directory, LDAP, SAML)
+- Vuoi **personalizzare le risorse** — allocazione di CPU, RAM e storage secondo le tue esigenze
+
+## In questa sezione
+
+| Pagina | Descrizione |
+|------|-------------|
+| [Avvio rapido](quick-start) | Metti in funzione rtCloud su un server in meno di 10 minuti |
+| [Riferimento configurazione](configuration) | Elenco completo di tutte le variabili d'ambiente e i loro valori predefiniti |
+| [Deployment su cloud](cloud-deployment) | Script automatizzati in un clic per DigitalOcean, AWS, GCP e Linode |
+| [Autenticazione SSO](sso-authentication) | Configura Keycloak, OIDC esterno o Azure AD |
+| [Manutenzione](maintenance) | Aggiorna, esegui backup, ripristina e risolvi i problemi della tua istanza |
+
+## Panoramica dell'architettura
+
+Il deployment funziona come un insieme di container Docker connessi su una rete interna:
+
+```
+┌────────────────────────────────────────┐
+│            rtcloud-app                 │
+│  Apache 2.4 (port 80)                  │
+│  PHP 7.4 application                   │
+│  Beanstalkd queue (internal)           │
+│  Shiny Server (port 3838)              │
+│  Cron scheduler                        │
+└─────────────────┬──────────────────────┘
+                  │ rtcloud-net (bridge)
+┌─────────────────▼──────────────────────┐
+│            rtcloud-mysql               │
+│  MySQL 8.0 (port 3306, internal only)  │
+└────────────────────────────────────────┘
+```
+
+Quando SSO è abilitato, un terzo container viene eseguito insieme:
+
+```
+┌─────────────────────────────────────────┐
+│            rtcloud-keycloak             │
+│  Keycloak (port 8080, internal only)    │
+│  Admin UI (port 9000, internal only)    │
+└─────────────────────────────────────────┘
+```
+
+Tutti i container comunicano su una rete bridge Docker isolata. Solo la porta dell'applicazione web e (opzionalmente) la porta di analisi Shiny sono esposte all'host.

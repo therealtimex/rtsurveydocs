@@ -1,0 +1,59 @@
+---
+description: Notitievragen tonen alleen-lezen tekst of media om informatie of instructies
+  te verstrekken in uw enquête.
+icon: info
+title: Notitie
+---
+
+
+Het notitievraagtype in XLSForms en rtSurvey wordt gebruikt om alleen-lezen tekst of media te tonen aan de enquêterespondent. Het is geen vraag die een antwoord vereist, maar een manier om informatie, instructies of context binnen de enquête te bieden.
+
+## Basis XLSForm-specificatie
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | Deze enquête gaat over uw leesgewoonten. |
+
+## Toepassingen
+
+Notitievragen worden veelgebruikt voor:
+
+1. Instructies of context geven voor aankomende vragen
+2. Berekende resultaten of samenvattingen weergeven
+3. Afbeeldingen of andere media tonen
+4. Secties van een enquête scheiden
+5. Feedback geven op basis van eerdere antwoorden
+
+## Aanbevolen werkwijzen
+
+1. Houd notitatietekst beknopt en duidelijk om de betrokkenheid van respondenten te behouden.
+2. Gebruik opmaak (vet, cursief) om belangrijke informatie te benadrukken.
+3. Overweeg media (afbeeldingen, audio) te gebruiken om het begrip te verbeteren wanneer van toepassing.
+4. Gebruik notities spaarzaam om de enquête niet te overbelasten.
+
+## Voorbeeldgebruik
+
+Hier is een voorbeeld van hoe u notitievragen kunt gebruiken in een enquête:
+
+| type | name | label |
+|------|------|-------|
+| note | intro | Welkom bij onze enquête over leesgewoonten. We stellen vragen over uw voorkeuren en leesfrequentie. |
+| ... | ... | ... |
+| calculate | books_per_month | ${fiction_books} + ${non_fiction_books} |
+| note | reading_summary | U leest ongeveer ${books_per_month} boeken per maand. |
+
+## Geavanceerd gebruik
+
+### Voorwaardelijke weergave
+
+U kunt relevantie-expressies gebruiken om notities voorwaardelijk te tonen:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | U bent een enthousiast lezer! | ${books_per_month} > 5 |
+
+## Beperkingen
+
+- Notities verzamelen geen gegevens, dus ze mogen niet worden gebruikt wanneer u informatie van respondenten moet verzamelen.
+- Overmatig gebruik van notities kan een enquête rommelig of te lang laten aanvoelen.
+- Sommige geavanceerde opmaak- of media-opties worden mogelijk niet ondersteund op alle apparaten of platforms.

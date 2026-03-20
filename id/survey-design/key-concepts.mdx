@@ -1,0 +1,266 @@
+---
+description: Ikhtisar desain formulir
+icon: code
+title: Konsep utama
+---
+
+
+## Apa itu XLSForm?
+rtSurvey menggunakan versi yang diperluas dari standar [XLSForm](https://xlsform.org/) untuk desain formulir, menawarkan fitur-fitur canggih untuk membuat survei yang kompleks. Panduan ini akan memperkenalkan Anda pada konsep-konsep utama desain formulir di rtSurvey, dari struktur XLSForm dasar hingga fitur khusus rtSurvey yang lebih lanjut.
+
+Dengan XLSForm, Anda dapat membuat formulir dalam format yang mudah dibaca manusia menggunakan alat Excel yang familiar, membuatnya dapat diakses oleh hampir semua orang.
+Standar ini memungkinkan berbagi dan kolaborasi yang mudah dalam pembuatan formulir.
+
+Meskipun XLSForm ramah bagi pemula, XLSForm juga memungkinkan pengguna berpengalaman membuat formulir yang kompleks.
+
+rtSurvey menyediakan cara yang konsisten untuk menggabungkan fungsionalitas lanjutan seperti logika lewati ke dalam formulir di berbagai platform pengumpulan data web dan mobile.
+
+## Struktur XLSForm
+XLSForm biasanya terdiri dari dua lembar kerja utama:
+
+1. **survey**: Mendefinisikan struktur dan konten formulir Anda.
+2. **choices**: Menentukan pilihan jawaban untuk pertanyaan pilihan ganda.
+
+Lembar kerja **settings** opsional dapat memberikan spesifikasi formulir tambahan.
+
+Penting untuk dicatat bahwa kolom wajib dalam lembar kerja survey dan choices harus ada agar formulir berfungsi dengan benar. Kolom opsional di kedua lembar kerja memberikan kontrol lebih lanjut atas perilaku setiap entri dalam formulir tetapi tidak penting.
+
+Kolom-kolom dalam buku kerja Excel Anda dapat muncul dalam urutan apa pun, dan kolom opsional dapat dibiarkan kosong. Namun, sangat penting untuk menggunakan sintaks dan konvensi penamaan yang tepat yang ditentukan dalam dokumentasi XLSForm agar formulir berfungsi dengan benar.
+
+### Lembar kerja survey
+Lembar kerja **survey** adalah tempat Anda mendefinisikan struktur formulir Anda dan menyediakan konten. Setiap baris dalam lembar kerja survey mewakili pertanyaan atau elemen dalam formulir Anda. Kolom-kolom berikut wajib ada dalam lembar kerja survey:
+
+- `type`: Menentukan jenis entri yang Anda harapkan untuk pertanyaan tersebut.
+- `name`: Menentukan nama variabel unik untuk entri tersebut. Nama harus dimulai dengan huruf atau garis bawah dan hanya dapat berisi huruf, angka, tanda hubung, garis bawah, dan titik. Nama peka huruf besar-kecil.
+- `label`: Berisi teks aktual yang Anda lihat untuk pertanyaan dalam formulir.
+
+| type                | name     | label                |
+| ------------------- | -------- | -------------------- |
+| today               | today    |                      |
+| select_one gender   | gender   | Jenis kelamin responden? |
+| integer             | age      | Usia responden?    |
+
+### Lembar kerja choices
+Lembar kerja **`choices`** digunakan untuk menentukan pilihan jawaban untuk pertanyaan pilihan ganda.
+Setiap baris mewakili pilihan jawaban. Kolom-kolom berikut wajib ada dalam lembar kerja choices:
+
+- **`list_name`**: Mengelompokkan sekumpulan pilihan jawaban yang terkait.
+- **`name`**: Menentukan nama variabel unik untuk pilihan jawaban tersebut.
+- **`label`**: Menampilkan pilihan jawaban persis seperti yang Anda inginkan muncul di formulir.
+
+| list_name           | name        | label                |
+| ------------------- | ----------- | -------------------- |
+| gender              | transgender | Transgender          |
+| gender              | female      | Perempuan            |
+| gender              | male        | Laki-laki            |
+| gender              | other       | Lainnya              |
+
+Kolom yang Anda tambahkan ke buku kerja Excel Anda, baik wajib maupun opsional, dapat muncul dalam urutan apa pun. Kolom opsional dapat dihilangkan sepenuhnya. Baris atau kolom dapat dibiarkan kosong untuk membantu keterbacaan, tetapi data setelah 20 kolom atau baris kosong yang berdekatan pada sebuah lembar tidak akan diproses. Semua format file .xlsx diabaikan, sehingga Anda dapat menggunakan garis pembagi, bayangan, dan format font lainnya untuk membuat formulir lebih mudah dibaca.
+
+Satu hal yang perlu diingat saat membuat formulir di Excel adalah bahwa sintaks yang Anda gunakan harus tepat. Misalnya, jika Anda menulis **Choices** atau **choice** alih-alih **choices**, formulir tidak akan berfungsi.
+
+### Lembar kerja settings
+
+Lembar kerja settings bersifat opsional tetapi memungkinkan Anda menentukan metadata dan perilaku tingkat formulir. Kolom umum dalam lembar kerja settings meliputi:
+
+| Kolom | Deskripsi |
+|-------|-----------|
+| form_title | Judul formulir seperti yang muncul kepada pengguna |
+| form_id | Pengidentifikasi unik untuk formulir, digunakan dalam manajemen data dan panggilan API |
+| default_language | Kode bahasa default untuk formulir multibahasa (misalnya, 'en' untuk Bahasa Inggris) |
+| version | Nomor versi formulir, berguna untuk melacak perubahan |
+| instance_name | Ekspresi untuk menghasilkan nama unik untuk setiap kiriman formulir |
+| generation | Integer yang menandai generasi formulir. Tambahkan untuk perubahan struktural |
+| family | Pengidentifikasi untuk mengelompokkan formulir terkait di seluruh perubahan struktural |
+
+Lembar kerja settings di rtSurvey juga dapat menyertakan konfigurasi tambahan yang spesifik untuk fungsionalitas yang diperluas rtSurvey. Lihat dokumentasi rtSurvey untuk daftar lengkap pengaturan yang didukung.
+
+## Komponen Utama Lembar Kerja Survey
+
+Lembar kerja survey adalah inti dari desain formulir Anda. Berikut adalah ikhtisar komponen utamanya:
+
+| Komponen | Deskripsi |
+|----------|-----------|
+| [type](#question-types) | Menentukan jenis pertanyaan (misalnya, text, integer, select_one) |
+| [name](#naming-conventions) | Pengidentifikasi unik untuk pertanyaan |
+| [label](#labels-and-translations) | Teks yang ditampilkan kepada responden |
+| [hint](#hints-and-help-text) | Panduan tambahan untuk responden |
+| [appearance](#appearance-options) | Memodifikasi cara pertanyaan ditampilkan |
+| [relevant](#relevance-and-skip-logic) | Menentukan kapan pertanyaan harus diajukan (logika lewati) |
+| [constraint](#constraints-and-validation) | Memvalidasi respons |
+| [calculation](#calculations) | Menghitung nilai berdasarkan respons lain |
+| [required](#required-fields) | Menentukan apakah pertanyaan harus dijawab |
+
+
+Setiap komponen ini memainkan peran penting dalam membuat survei yang efektif dan efisien. Klik tautan di kolom "Bagian Terperinci" untuk mempelajari lebih lanjut tentang setiap komponen.
+
+### Jenis pertanyaan
+XLSForm mendukung sejumlah jenis pertanyaan. Berikut adalah beberapa opsi yang dapat Anda masukkan di kolom **`type`** dalam lembar kerja **`survey`** di XLSForm Anda:
+
+| Jenis pertanyaan          | Masukan jawaban                                                                                 |
+| ------------------------- | ----------------------------------------------------------------------------------------------- |
+| integer                   | Masukan integer (yaitu, bilangan bulat).                                                        |
+| decimal                   | Masukan desimal.                                                                                |
+| range                     | Masukan [rentang](#range) (termasuk penilaian)                                                  |
+| text                      | Respons teks bebas.                                                                             |
+| select_one [options]      | Pertanyaan [pilihan ganda](#multiple-choice); hanya satu jawaban yang dapat dipilih.            |
+| select_multiple [options] | Pertanyaan [pilihan ganda](#multiple-choice); beberapa jawaban dapat dipilih.                   |
+| select_one_from_file [file]| [Pilihan ganda dari file](#multiple-choice-from-file); hanya satu jawaban yang dapat dipilih.   |
+| select_multiple_from_file [file]| [Pilihan ganda dari file](#multiple-choice-from-file); beberapa jawaban dapat dipilih.    |
+| rank [options]            | Pertanyaan [peringkat](#rank); urutkan daftar.                                                  |
+| note                      | Tampilkan catatan di layar, tidak menerima masukan. Singkatan untuk type=text dengan readonly=true. |
+| geopoint                  | Kumpulkan [satu koordinat GPS](#gps).                                                           |
+| geotrace                  | Rekam [garis dari dua atau lebih koordinat GPS](#gps).                                          |
+| geoshape                  | Rekam [poligon dari beberapa koordinat GPS](#gps); titik terakhir sama dengan titik pertama.    |
+| date                      | Masukan tanggal.                                                                                |
+| time                      | Masukan waktu.                                                                                  |
+| dateTime                  | Menerima masukan tanggal dan waktu.                                                             |
+| image                     | Ambil foto atau unggah [file gambar](#image).                                                   |
+| audio                     | Ambil rekaman audio atau unggah file audio.                                                     |
+| background-audio          | Audio direkam di latar belakang saat mengisi formulir.                                          |
+| video                     | Ambil rekaman video atau unggah file video.                                                     |
+| file                      | Masukan file generik (txt, pdf, xls, xlsx, doc, docx, rtf, zip)                                |
+| barcode                   | Pindai barcode, memerlukan aplikasi pemindai barcode yang dipasang.                             |
+| calculate                 | Lakukan kalkulasi; lihat bagian [Kalkulasi](#calculation) di bawah.                             |
+| acknowledge               | Prompt pengakuan yang menetapkan nilai ke "OK" jika dipilih.                                    |
+| hidden                    | Bidang tanpa elemen UI terkait yang dapat digunakan untuk menyimpan konstanta                   |
+| xml-external              | Menambahkan referensi ke file [data XML eksternal](#external-xml-data)                          |
+
+### Label
+
+Label adalah teks yang ditampilkan kepada responden untuk setiap pertanyaan. Label sangat penting untuk komunikasi yang jelas dalam survei.
+
+- **Penggunaan dasar**: Di kolom `label`, masukkan teks pertanyaan.
+- **Beberapa bahasa**: Gunakan kolom tambahan seperti `label::English` dan `label::French` untuk survei multibahasa.
+- **Pemformatan**: rtSurvey mendukung pemformatan HTML dasar dalam label untuk penekanan atau struktur.
+
+Contoh:
+```
+| type | name | label | label::French |
+|------|------|-------|---------------|
+| text | name | Siapa nama Anda? | Quel est votre nom? |
+```
+
+### Petunjuk (Hint)
+
+Petunjuk memberikan panduan tambahan kepada responden tanpa memenuhi teks pertanyaan utama.
+
+- **Penggunaan**: Tambahkan petunjuk di kolom `hint`.
+- **Visibilitas**: Petunjuk biasanya ditampilkan di bawah teks pertanyaan utama.
+- **Multibahasa**: Seperti label, petunjuk dapat ditentukan untuk beberapa bahasa menggunakan kolom `hint::Language`.
+
+Contoh:
+```
+| type | name | label | hint |
+|------|------|-------|------|
+| integer | age | Berapa usia Anda? | Masukkan usia Anda dalam tahun |
+```
+
+### Tampilan (Appearance)
+
+Kolom `appearance` di rtSurvey memungkinkan kustomisasi cara pertanyaan ditampilkan.
+
+- **Opsi standar**: Termasuk 'multiline' untuk teks, 'horizontal' untuk pertanyaan pilih.
+- **Ekstensi rtSurvey**:
+  - Masukan waktu: Berbagai opsi tampilan jam (misalnya, `inline`, `inline-1line`)
+  - Kustomisasi warna: Gunakan fungsi `colors()` untuk mengubah warna ikon
+
+Contoh:
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | time | Masukkan waktu | inline-[%H:%M] |
+```
+
+### Relevan (Relevant)
+
+Kolom `relevant` mengimplementasikan logika lewati, menentukan kapan pertanyaan harus ditampilkan.
+
+- **Sintaks**: Gunakan ekspresi XPath untuk mendefinisikan kondisi.
+- **Variabel**: Referensikan nama pertanyaan lain menggunakan `${question_name}`.
+
+Contoh:
+```
+| type | name | label | relevant |
+|------|------|-------|----------|
+| text | allergies | Daftar alergi | ${has_allergies} = 'yes' |
+```
+
+### Diperlukan (Required)
+
+Kolom `required` menentukan apakah pertanyaan harus dijawab.
+
+- **Penggunaan dasar**: Gunakan 'yes' atau 'true' untuk membuat pertanyaan wajib.
+- **Lanjutan**: Dapat menggunakan ekspresi untuk persyaratan kondisional.
+
+Contoh:
+```
+| type | name | label | required |
+|------|------|-------|----------|
+| text | email | Alamat email | yes |
+```
+
+### Pengulangan (Repeats)
+
+Pengulangan memungkinkan sekelompok pertanyaan dijawab beberapa kali.
+
+- **Penggunaan**: Gunakan baris `begin repeat` dan `end repeat` untuk mendefinisikan grup yang berulang.
+- **Penamaan**: Berikan setiap grup pengulangan nama yang unik.
+
+Contoh:
+```
+| type | name | label |
+|------|------|-------|
+| begin repeat | household_member | Anggota rumah tangga |
+| text | member_name | Nama |
+| integer | member_age | Usia |
+| end repeat | | |
+```
+
+### Media
+
+rtSurvey mendukung berbagai jenis media dalam survei, termasuk gambar, audio, dan video.
+
+- **Jenis pertanyaan**: Gunakan 'image', 'audio', atau 'video' di kolom type.
+- **Media dalam label**: Referensikan file media dalam label menggunakan tag HTML.
+
+Contoh:
+```
+| type | name | label |
+|------|------|-------|
+| image | house_photo | Ambil foto rumah |
+| note | | <img src="logo.jpg" /> Selamat datang di survei |
+```
+
+### Hanya-Baca (Read-only)
+
+Pertanyaan hanya-baca menampilkan informasi tanpa memungkinkan masukan pengguna.
+
+- **Penggunaan**: Tambahkan 'readonly' ke kolom `appearance`.
+- **Kalkulasi**: Sering digunakan dengan tipe calculate untuk menampilkan nilai yang dihitung.
+
+Contoh:
+```
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | bmi | BMI | readonly | ${weight} / (${height} * ${height}) |
+```
+
+## Ekstensi rtSurvey
+
+rtSurvey memperluas standar XLSForm dengan mendukung kemampuan tambahan seperti `tata letak grid`, `format html`, dan banyak `widget` baru.
+
+### Tata letak grid
+rtSurvey memungkinkan formulir Anda meniru tampilan survei kertas tradisional dengan memadatkan beberapa pertanyaan ke dalam satu baris.
+
+### Pengaturan formulir
+
+### Pengaturan data
+
+### Gaya Typeform
+
+### Ekstensi pulldata()
+
+### Ekstensi berbasis tampilan
+
+### Ekstensi Webbox

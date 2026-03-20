@@ -1,0 +1,113 @@
+---
+description: ''
+icon: code
+title: Somente leitura
+---
+
+
+Os campos somente leitura no rtSurvey permitem exibir informações que não podem ser editadas pelo respondente. Este recurso é particularmente útil para mostrar dados pré-preenchidos, resultados calculados ou informações que devem permanecer constantes durante toda a pesquisa.
+
+## Uso básico
+
+Para tornar um campo somente leitura, use a coluna `read_only` no seu XLSForm:
+
+```
+| type    | name | label                  | read_only | default |
+|---------|------|------------------------|-----------|---------|
+| integer | num  | O número do paciente é:| yes       | 5       |
+```
+
+Neste exemplo, o número do paciente está definido como 5 e não pode ser alterado pelo respondente.
+
+## Combinando somente leitura com valores padrão
+
+Os campos somente leitura são frequentemente usados em conjunto com valores padrão para exibir informações pré-determinadas ou calculadas:
+
+```
+| type    | name     | label                     | read_only | default         |
+|---------|----------|---------------------------|-----------|-----------------|
+| text    | username | Usuário conectado:        | yes       | ${current_user} |
+| date    | today    | Data de hoje:             | yes       | today()         |
+```
+
+Aqui, o nome de usuário e a data atual são exibidos, mas não podem ser editados.
+
+## Recursos específicos do rtSurvey
+
+### Somente leitura condicional
+
+O rtSurvey estende a funcionalidade somente leitura com lógica condicional:
+
+```
+| type    | name     | label    | read_only                 |
+|---------|----------|----------|---------------------------|
+| integer | age      | Idade:   | ${role} = 'viewer'        |
+| text    | comments | Comentários: | selected(${status}, 'closed') |
+```
+
+Nestes exemplos:
+- O campo 'age' é somente leitura apenas se a função do usuário for 'viewer'.
+- O campo 'comments' fica somente leitura se o status for 'closed'.
+
+### Status somente leitura dinâmico
+
+O rtSurvey permite alterar o status somente leitura dinamicamente:
+
+```
+| type      | name     | label     | read_only               |
+|-----------|----------|-----------|------------------------|
+| text      | address  | Endereço: | ${edit_mode} = 'false' |
+```
+
+Isso permite alternar entre modos editável e somente leitura com base em certas condições ou ações do usuário.
+
+## Práticas recomendadas para usar campos somente leitura
+
+1. **Clareza**: Indique claramente quais campos são somente leitura por meio de dicas visuais ou rótulos.
+2. **Consistência**: Use campos somente leitura de forma consistente em toda a sua pesquisa.
+3. **Validação**: Mesmo que os campos somente leitura não possam ser editados, inclua-os no seu processo de validação de dados.
+4. **Desempenho**: Tenha cuidado com cálculos complexos em campos somente leitura, pois podem impactar o tempo de carregamento do formulário.
+5. **Acessibilidade**: Garanta que os campos somente leitura sejam devidamente marcados para leitores de tela.
+
+## Técnicas avançadas
+
+### Campos somente leitura calculados
+
+Use campos somente leitura para exibir cálculos baseados em outras respostas:
+
+```
+| type      | name     | label  | read_only | calculation                             |
+|-----------|----------|--------|-----------|------------------------------------------|
+| calculate | bmi      | IMC:   | yes       | ${weight} / (${height} * ${height})     |
+```
+
+### Exibindo dados históricos
+
+Os campos somente leitura podem exibir dados de pesquisas anteriores ou fontes externas:
+
+```
+| type    | name           | label                         | read_only | default                    |
+|---------|----------------|-------------------------------|-----------|----------------------------|
+| text    | last_visit_date| Data da última visita:        | yes       | ${pulldata('visits', 'date', 'id', ${patient_id})} |
+```
+
+## Considerações de gerenciamento de dados
+
+- Os campos somente leitura são incluídos nas exportações de dados, normalmente com um sinalizador indicando seu status somente leitura.
+- Ao atualizar registros existentes, os campos somente leitura preservam seus valores originais, a menos que sejam explicitamente substituídos pelo backend.
+
+## Comportamento no aplicativo móvel
+
+- O aplicativo móvel rtSurvey respeita as configurações somente leitura, incluindo lógica somente leitura condicional.
+- O modo off-line suporta completamente a funcionalidade somente leitura, incluindo campos somente leitura dinâmicos e calculados.
+
+## Limitações conhecidas
+
+- Algumas condições somente leitura dinâmicas complexas podem ter um ligeiro impacto no desempenho em dispositivos de baixo custo.
+- Os campos somente leitura podem não impedir todas as formas de manipulação de dados em arquivos de dados exportados, portanto, a validação no lado do servidor é recomendada para dados críticos.
+
+## Solução de problemas de campos somente leitura
+
+1. **Campo inesperadamente editável**: Verifique erros de sintaxe na coluna `read_only` ou na lógica condicional.
+2. **Valores calculados não atualizando**: Verifique a lógica de cálculo e garanta que todos os campos referenciados estejam corretamente nomeados.
+3. **Problemas de desempenho**: Otimize cálculos complexos ou considere abordagens alternativas para exibir dados somente leitura.

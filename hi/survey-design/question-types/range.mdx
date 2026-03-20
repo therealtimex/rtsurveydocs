@@ -1,0 +1,76 @@
+---
+description: Range questions उत्तरदाताओं को defined minimum और maximum value के बीच
+  slider खींचकर एक number चुनने देते हैं।
+icon: sliders
+title: Range
+---
+
+
+`range` question type एक **slider** (या समकक्ष input) प्रदर्शित करता है जो उत्तरदाताओं को defined minimum और maximum के भीतर एक number चुनने देता है। यह ratings, satisfaction scores, या किसी भी numeric value एकत्र करने के लिए आदर्श है जहाँ आप text input के बजाय visually range को constrain करना चाहते हैं।
+
+## Basic XLSForm Specification
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | satisfaction | आप service से कितने संतुष्ट हैं? | start=1 end=5 step=1 |
+
+`parameters` column slider bounds और step size define करता है:
+
+| Parameter | विवरण | Default |
+|-----------|-------------|---------|
+| `start` | Minimum value (inclusive) | 0 |
+| `end` | Maximum value (inclusive) | 10 |
+| `step` | Valid values के बीच increment | 1 |
+
+Standard range question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+
+## उपयोग
+
+Range questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+
+1. Satisfaction या rating scales (जैसे 1–5 या 0–10)
+2. Likert-style numeric scales
+3. ऐसे measurements एकत्र करना जहाँ केवल discrete values valid हों
+4. Age brackets या score ranges जहाँ slider text field पर usability में सुधार करता है
+
+## Example Usage
+
+### Basic rating scale
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | overall_rating | Overall rating (0–10) | start=0 end=10 step=1 |
+
+### Decimal step
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | weight_kg | वजन (kg) | start=0 end=200 step=0.5 |
+
+### Calculation में value का उपयोग करना
+
+| type | name | label | parameters | calculation |
+|------|------|-------|------------|-------------|
+| range | score | Test score (0–100) | start=0 end=100 step=5 | |
+| calculate | grade | | | if(${score} >= 90, 'A', if(${score} >= 80, 'B', if(${score} >= 70, 'C', 'F'))) |
+| note | grade_note | आपका grade है: ${grade} | | |
+
+## Appearance
+
+`range` type default रूप से slider के रूप में render होता है। Basic usage के लिए कोई additional appearance values आवश्यक नहीं हैं। आप web forms पर wider layout के लिए इसे `horizontal` के साथ combine कर सकते हैं:
+
+| type | name | label | parameters | appearance |
+|------|------|-------|------------|------------|
+| range | nps | आप हमें recommend करने की कितनी संभावना रखते हैं? (0–10) | start=0 end=10 step=1 | horizontal |
+
+## Best Practices
+
+1. हमेशा meaningful `start`, `end`, और `step` values सेट करें — defaults पर निर्भर न रहें।
+2. उत्तरदाताओं को context देने के लिए `hint` column में अपने scale के ends को label करें (जैसे `hint: 0 = बहुत असंतुष्ट, 10 = बहुत संतुष्ट`)।
+3. 5-point Likert scales के लिए, 0–4 के बजाय `start=1 end=5 step=1` का उपयोग करें, क्योंकि उत्तरदाता "1" को lowest मानते हैं।
+4. `range` का उपयोग `integer` + constraint के बजाय करें जब input की bounded nature question design का हिस्सा हो।
+
+## सीमाएं
+
+- Slider widget बहुत wide ranges के लिए आदर्श नहीं हो सकता (जैसे 0–10000) — उन मामलों में constraints के साथ text `integer` अधिक user-friendly है।
+- Mobile devices पर, fine step values (जैसे `step=0.1`) को touch slider के साथ सटीक रूप से control करना कठिन हो सकता है।

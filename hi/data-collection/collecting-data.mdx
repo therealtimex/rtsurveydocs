@@ -1,0 +1,57 @@
+---
+description: rtSurvey के साथ survey चलाने के लिए एक quickstart guide
+icon: rocket_launch
+title: डेटा एकत्र करना
+---
+
+
+एक बार form deploy हो जाने और enumerators assign हो जाने के बाद, data collection शुरू हो सकती है। **rtSurvey** web browsers और dedicated mobile applications दोनों में seamless data gathering का समर्थन करता है, यह सुनिश्चित करते हुए कि आपकी team connected हो या remote, offline environments में काम कर रही हो, flexibility बनी रहे।
+
+## सही Collection Method चुनना
+
+आपके project की geography और connectivity के आधार पर, आप अपने enumerators के लिए optimal method चुन सकते हैं:
+
+- **Web Browser (Online):** Call centers, office-based data entry, या self-administered public surveys fill करने वाले respondents के लिए सबसे अच्छा।
+- **rtWork / rtSurvey Mobile App (Online और Offline):** Field operations, unstable internet वाले remote areas, और media attachments (photos, GPS coordinates, offline maps) की आवश्यकता वाले surveys के लिए सबसे अच्छा।
+
+---
+
+## Method 1: Web Browser के माध्यम से Data Collect करना
+
+Webform interface का उपयोग करने से enumerators किसी भी software install किए बिना तुरंत data collection शुरू कर सकते हैं।
+
+### 1. Webform URL Access करें
+Control Panel के **Manage Forms** dashboard से, अपना target form locate करें और एक secure link generate करने के लिए **Webform's URL** button पर click करें।
+
+### 2. Form Entry
+- किसी भी modern web browser में provided URL खोलें।
+- यदि form के लिए authentication की आवश्यकता है, तो गणनाकर्ता को अपने credentials का उपयोग करके log in करना होगा। यदि यह "Public Visibility" पर set है, तो वे directly proceed कर सकते हैं।
+- Survey questions fill करें। Interface automatically logic, skip patterns, और validation rules enforce करेगा।
+- **Media Capture:** यदि form में image, audio, या video questions शामिल हैं, तो web browser आपको अपने computer से file upload करने या यदि available हो तो device के webcam/microphone का उपयोग करने के लिए prompt करेगा।
+
+### 3. Submission
+Final page पर पहुँचने पर, **Submit** click करें। Browser को submission finalize करने के लिए active internet connection की आवश्यकता है। सफल होने पर, data तुरंत **Manage Submissions** interface में दिखाई देगा।
+
+---
+
+## Method 2: Mobile App के माध्यम से Data Collect करना (Offline)
+
+Robust field data collection के लिए, mobile applications full offline capabilities प्रदान करते हैं।
+
+### 1. Install और Authenticate करें
+- Google Play Store या Apple App Store से **rtWork** (या **rtSurvey**) application download करें।
+- App खोलें और assigned enumerator credentials का उपयोग करके log in करें।
+
+### 2. Forms Download करें (Internet की आवश्यकता है)
+- App में **Forms** या **Tasks** section पर navigate करें।
+- Server से latest questionnaire designs fetch करने के लिए **Sync** या **Download** icon tap करें। एक बार download होने के बाद, forms device पर locally stored होते हैं।
+
+### 3. Data Collect करें (Offline)
+- Downloaded form खोलें और interview शुरू करें।
+- आप पूरी तरह offline data collect कर सकते हैं।
+- **Media Capture:** Mobile app natively आपके device के hardware के साथ integrate होता है। आप internet connection के बिना भी, app के भीतर directly photos capture, audio record, video record, और precise GPS coordinates log कर सकते हैं।
+- जब आप एक interview finish करें, record को finalize करें। Finalized records app के outbox में safely queue हो जाते हैं।
+
+### 4. Submissions Sync करें (Internet की आवश्यकता है)
+- एक बार गणनाकर्ता internet access (Wi-Fi या cellular data) वाले area में वापस आने पर, उन्हें **Outbox** या **Sync** interface पर navigate करना होगा।
+- App को finalized forms send करने का निर्देश दें। App queued records और सभी attached media files को securely server पर transmit करेगा, जिसके बाद वे review के लिए data grid में दिखाई देंगे।

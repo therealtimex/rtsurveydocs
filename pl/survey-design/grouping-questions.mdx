@@ -1,0 +1,85 @@
+---
+description: ''
+icon: auto_awesome
+title: Grupowanie pytań
+---
+
+
+Grupy w XLSForm umożliwiają organizowanie powiązanych pytań razem, poprawiając strukturę ankiety i zwiększając możliwości analizy danych. rtSurvey w pełni obsługuje grupy XLSForm i rozszerza ich funkcjonalność o dodatkowe funkcje.
+
+## Podstawowa struktura grupy
+
+Aby utworzyć grupę pytań, użyj składni `begin_group` i `end_group`:
+
+```
+| type         | name       | label                                |
+|--------------|------------|--------------------------------------|
+| begin_group  | respondent | Informacje o respondencie            |
+| text         | name       | Wprowadź imię respondenta            |
+| text         | position   | Wprowadź stanowisko respondenta      |
+| end_group    |            |                                      |
+```
+
+Kluczowe punkty:
+- Wiersz `begin_group` wymaga `name` i `label`.
+- Wiersz `end_group` nie potrzebuje nazwy ani etykiety.
+- Pytania między `begin_group` a `end_group` są częścią grupy.
+
+## Wygląd grupy
+
+rtSurvey obsługuje różne opcje wyglądu dla grup:
+
+1. **field-list**: Wyświetla wiele pytań na tym samym ekranie.
+   ```
+   | type         | name       | label      | appearance |
+   |--------------|------------|------------|------------|
+   | begin_group  | respondent | Respondent | field-list |
+   | text         | name       | Imię       |            |
+   | text         | position   | Stanowisko |            |
+   | end_group    |            |            |            |
+   ```
+
+2. **grid**: Tworzy kompaktowy, tabelaryczny układ dla grup (specyficzny dla rtSurvey).
+   ```
+   | type         | name       | label              | appearance |
+   |--------------|------------|--------------------|------------|
+   | begin_group  | household  | Gospodarstwo domowe| grid       |
+   | text         | member_name| Imię               |            |
+   | integer      | member_age | Wiek               |            |
+   | end_group    |            |                    |            |
+   ```
+
+3. **collapsible**: Tworzy rozwijalne/zwijalne grupy (specyficzne dla rtSurvey).
+   ```
+   | type         | name    | label      | appearance  |
+   |--------------|---------|------------|-------------|
+   | begin_group  | details | Szczegóły  | collapsible |
+   | text         | address | Adres      |             |
+   | text         | phone   | Telefon    |             |
+   | end_group    |         |            |             |
+   ```
+
+## Logika pomijania dla grup
+
+Użyj kolumny `relevant`, aby zaimplementować logikę pomijania dla całych grup:
+
+```
+| type         | name  | label                                        | relevant        |
+|--------------|-------|----------------------------------------------|-----------------|
+| integer      | age   | Ile masz lat?                                |                 |
+| begin_group  | child | Dziecko                                      | ${age} <= 5     |
+| integer      | muac  | Zapisz obwód ramienia w połowie długości     |                 |
+| end_group    |       |                                              |                 |
+```
+
+W tym przykładzie grupa `child` pojawi się tylko jeśli wiek respondenta wynosi 5 lub mniej.
+
+## Najlepsze praktyki używania grup
+
+1. Używaj znaczących nazw dla grup, aby poprawić analizę danych.
+2. Utrzymuj grupy skoncentrowane na powiązanych pytaniach.
+3. Używaj zagnieżdżonych grup rozważnie, aby uniknąć nadmiernie złożonych struktur.
+4. Dokładnie testuj logikę pomijania przy używaniu `relevant` na grupach.
+5. Rozważ używanie wyglądu `field-list` dla krótkich grup, aby zmniejszyć przewijanie.
+6. Korzystaj z układu siatki rtSurvey dla kompaktowego wyświetlania powiązanych informacji.
+7. Używaj grup zwijanych dla długich formularzy, aby poprawić nawigację.

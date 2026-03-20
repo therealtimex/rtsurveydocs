@@ -1,0 +1,90 @@
+---
+description: ''
+icon: code
+title: Yanıtları Doğrulama
+---
+
+
+Veri kalitesini sağlamanın bir yolu, formunuzdaki veri alanlarına kısıtlamalar eklemektir. Kısıtlamalar, kullanıcıların geçersiz veya imkânsız cevaplar girmesini engellemeye yardımcı olur. Örneğin, bir kişinin gelirini sorarken negatif sayılar veya son derece yüksek değerler gibi gerçekçi olmayan değerleri önlemek istersiniz. Formunuza veri kısıtlamaları eklemek kolaydır. Aşağıdaki adımları takip edin:
+
+1. Formunuza "constraint" adlı yeni bir sütun ekleyin.
+2. "constraint" sütununa cevap üzerindeki sınırları belirten bir formül girin.
+
+### Örnek
+
+Kişinin geliri için bir kısıtlama eklemek istediğimiz bir örnek ele alalım. Kısıtlama, gelirin 0 ile 1.000.000 dolar arasında olmasını gerektirir. Kısıtlamayı nasıl ayarlayabileceğinizi aşağıda görebilirsiniz:
+
+| `name`      | `constraint`                  |
+|---------------|-----------------------------|
+| Gelir        | . >= 0 & . <= 1000000      |
+
+Yukarıdaki örnekte, formüldeki "." soru değişkenine geri döner ve kullanıcının "Gelir" sorusu için girdiği değeri temsil eder. ". >= 0 && . <= 1000000" kısıtlaması, girilen gelirin 0'dan büyük veya eşit ve 1.000.000'dan küçük veya eşit olmasını sağlar.
+
+
+### Sert kısıtlama
+
+Bir **sert kısıtlama**, girilen değer ifadeyi karşılamıyorsa form gönderimini tamamen engeller. Sayımcı geçerli bir değer girinceye kadar ilerleyemez.
+
+Sert kısıtlama eklemek için ifadenizi `constraint` sütununa girin. İsteğe bağlı olarak `constraint_message` alanına okunabilir bir mesaj ekleyin:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Katılımcının yaşı | `. > 0 and . <= 120` | Yaş 1 ile 120 arasında olmalıdır |
+| decimal | temperature | Vücut ısısı (°C) | `. >= 35 and . <= 42` | Sıcaklık 35°C ile 42°C arasında olmalıdır |
+| text | phone | Telefon numarası | `regex(., '^[0-9]{10}$')` | 10 haneli telefon numarası girin |
+
+#### Birden fazla koşul
+
+Koşulları `and` / `or` ile birleştirin:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Desen doğrulaması için `regex()` kullanımı
+
+`regex(value, pattern)` fonksiyonu bir değeri normal ifadeye karşı test eder:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | E-posta adresi | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Geçerli bir e-posta adresi girin |
+| text | zip_code | Posta kodu | `regex(., '^[0-9]{5}$')` | 5 haneli posta kodu girin |
+
+#### Kısıtlamada diğer alanlara referans verme
+
+Diğer sorulardan değerlere referans vermek için `${fieldname}` kullanın:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Bitiş yılı | `. >= ${start_year}` | Bitiş yılı başlangıç yılından sonra olmalıdır |
+| decimal | loan_repaid | Geri ödenen miktar | `. <= ${loan_amount}` | Kredi miktarından fazla geri ödenemez |
+
+### Yumuşak uyarı
+
+Bir **yumuşak uyarı** (aynı zamanda yumuşak kısıtlama veya uyarı olarak da adlandırılır), sayımcıyı bir değerin alışılmadık göründüğü konusunda uyarır, ancak yine de ilerlemesine izin verir. Bu, bir değer teknik olarak geçerli ama istatistiksel olarak düşük olasılıklı olduğunda kullanışlıdır.
+
+rtSurvey, özel bir `constraint_type` yaklaşımıyla `constraint` sütununu kullanarak veya bir not alanıyla `soft` görünümü kombinasyonu aracılığıyla yumuşak uyarıları destekler.
+
+En yaygın kalıp, şüpheli değeri işaretleyen bir `relevant` ifadesiyle birlikte **note** kullanmak ve onaylamak için bir **acknowledge** sorusu eklemektir:
+
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Çocuk sayısı | |
+| note | children_warning | Uyarı: ${children} çocuk girdiniz. Lütfen bunun doğru olduğunu onaylayın. | `. > 15` |
+| trigger | children_confirm | Çocuk sayısının doğru olduğunu onaylayın | `${children} > 15` |
+
+#### Yalnızca constraint_message ile yumuşak uyarı
+
+Daha basit bir yumuşak uyarı için kısıtlamayı aşırı değerleri uyaracak şekilde ama yine de geniş bir aralığa izin verecek şekilde ifade edebilirsiniz:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | children | Çocuk sayısı | `. >= 0 and . <= 30` | Bu değer çok yüksek görünüyor. Lütfen doğrulayın. |
+
+<Warning>
+Sert ve yumuşak kısıtlamalar arasındaki ayrım veri kalitesi için önemlidir. Mantıksal olarak imkânsız değerler (negatif yaşlar, 100°C üzerindeki sıcaklıklar) için **sert kısıtlamalar** kullanın. İstatistiksel olarak düşük olasılıklı ama imkânsız olmayan değerler için **yumuşak uyarılar** kullanın; meşru uç vakaları engellemek istemezsiniz.
+</Warning>

@@ -1,0 +1,129 @@
+---
+description: ''
+icon: code
+title: Vlerat Parazgjedhëse
+---
+
+
+Vlerat parazgjedhëse në rtSurvey ju lejojnë të parapopulloni pyetjet me përgjigje kur një i anketuar i has ato për herë të parë. Kjo veçori mund të rrisë ndjeshëm efikasitetin e sondazhit dhe cilësinë e të dhënave duke siguruar vlera fillestare që ose zgjidhen zakonisht ose shërbejnë si shembuj të hyrjes së pritur.
+
+## Përdorimi Bazë
+
+Për të caktuar një vlerë parazgjedhëse, përdorni kolonën `default` në XLSForm tuaj:
+
+```
+| type    | name        | label                         | default    |
+|---------|-------------|-------------------------------|------------|
+| date    | survey_date | Data e sondazhit              | 2024-07-04 |
+| decimal | weight      | Pesha e të anketuarit? (kg)   | 51.3       |
+```
+
+Në këtë shembull, data e sondazhit do të parapopullohet me 4 korrik 2024, dhe fusha e peshës do të fillojë me 51.3 kg.
+
+## Vlerat Parazgjedhëse Dinamike
+
+rtSurvey mbështet vlerat parazgjedhëse dinamike duke përdorur funksione:
+
+```
+| type | name | label                              | default  |
+|------|------|------------------------------------| ---------|
+| date | d    | Futni datën kur ndodhi ngjarja?    | today()  |
+```
+
+Këtu, funksioni `today()` cakton automatikisht parazgjedhjen në datën aktuale.
+
+## Veçoritë Specifike rtSurvey
+
+### Parazgjedhjet me Vetëdijen e Kontekstit
+
+rtSurvey zgjeron funksionalitetin parazgjedhës me parazgjedhje të vetëdijshme të kontekstit:
+
+```
+| type    | name     | label           | default            |
+|---------|----------|-----------------|---------------------|
+| text    | location | Vendndodhja aktuale | ${current_location} |
+```
+
+Kjo përdor variablin `${current_location}` të rtSurvey për të parapopulluar vendndodhjen bazuar në GPS-in e pajisjes.
+
+### Parazgjedhjet me Kaskadë
+
+rtSurvey lejon parazgjedhjet bazuar në përgjigjet e mëparshme:
+
+```
+| type    | name     | label           | default         |
+|---------|----------|-----------------|-----------------|
+| text    | city     | Qyteti          |                 |
+| text    | district | Rrethi          | ${city}-district|
+```
+
+Këtu, fusha e rrethit parapopullohet bazuar në qytetin e futur.
+
+### Parazgjedhja në Përsëritjet
+
+Për pyetjet brenda një grupi përsëritjeje, parazgjedhja llogaritet kur shtohet përsëritja:
+
+```
+| type         | name      | label        | default                |
+|--------------|-----------|--------------|------------------------|
+| begin repeat | visits    | Vizitat Klinike |                     |
+| date         | visit_date| Data e Vizitës | ${previous_visit_date} |
+| end repeat   |           |              |                        |
+```
+
+Kjo cakton datën parazgjedhëse të vizitës në datën e vizitës së mëparshme.
+
+## Praktikat Më të Mira për Përdorimin e Parazgjedhjeve
+
+1. **Përdorni me Kursim**: Përdorni parazgjedhjet vetëm kur ato rrisin ndjeshëm efikasitetin ose cilësinë e të dhënave.
+2. **Garantoni Saktësinë**: Rishikoni dhe përditësoni rregullisht vlerat statike parazgjedhëse.
+3. **Testoni Tërësisht**: Veçanërisht kur përdorni parazgjedhje dinamike ose të llogaritura.
+4. **Konsideroni Eksperiencën e Përdoruesit**: Sigurohuni që parazgjedhjet nuk i dezinformojnë të anketuarit ose nuk prezantojnë paragjykim.
+5. **Dokumentoni Qartë**: Sigurohuni që të gjithë anëtarët e ekipit të kuptojnë arsyen prapa vlerave parazgjedhëse.
+
+## Teknikat e Avancuara Parazgjedhëse
+
+### Parazgjedhjet e Randomizuara
+
+rtSurvey mbështet parazgjedhjet e randomizuara për lloje të caktuara pyetjesh:
+
+```
+| type              | name    | label        | default           |
+|-------------------|---------|--------------|-------------------|
+| select_one options| choice  | Zgjidhni një: | random(options)   |
+```
+
+Kjo zgjedh rastësisht një opsion parazgjedhës nga lista 'options'.
+
+### Parazgjedhjet me Kushte
+
+Përdorni relevant për të caktuar parazgjedhje me kushte:
+
+```
+| type    | name     | label    | default | relevant        |
+|---------|----------|----------|---------|-----------------|
+| text    | other    | Specifiko | N/A    | ${q1} = 'other' |
+```
+
+Këtu, 'N/A' është parazgjedhja vetëm kur 'other' zgjidhet në një pyetje të mëparshme.
+
+## Konsideratat e Menaxhimit të të Dhënave
+
+- Vlerat parazgjedhëse përfshihen në eksportet e të dhënave, zakonisht me një flamur që tregon se ishin vlera parazgjedhëse.
+- Veçoria e gjurmës audituese të rtSurvey gjurmon kur vlerat parazgjedhëse ndryshojnë nga të anketuarit.
+
+## Sjellja e Aplikacionit Celular
+
+- Aplikacioni celular rtSurvey mbështet të gjitha funksionalitetet parazgjedhëse, duke përfshirë parazgjedhjet dinamike dhe të vetëdijshme të kontekstit.
+- Mënyra offline mund të ndikojë në disa parazgjedhje dinamike që mbështeten në të dhënat në kohë reale.
+
+## Kufizimet e Njohura
+
+- Parazgjedhjet e llogaritura komplekse mund të ndikojnë në kohën e ngarkimit të formularit, veçanërisht në pajisje të nivelit të ulët.
+- Disa parazgjedhje dinamike mund të mos funksionojnë siç pritej në mënyrën paraprake.
+
+## Zgjidhja e Problemeve me Vlerat Parazgjedhëse
+
+1. **Parazgjedhja Nuk Shfaqet**: Kontrolloni gabimet sintaksore në shprehjen parazgjedhëse.
+2. **Vlera të Papritura**: Verifikoni logjikën e llogaritjes dhe testoni me skenarë të ndryshëm.
+3. **Probleme Performancë**: Optimizoni llogaritjet komplekse parazgjedhëse ose konsideroni qasje alternative.

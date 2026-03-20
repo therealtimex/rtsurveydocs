@@ -1,0 +1,69 @@
+---
+description: Os campos ocultos armazenam valores que nunca são mostrados ao respondente
+  — usados para passar contexto, pré-preencher dados ou armazenar resultados intermediários.
+icon: eye-slash
+title: Oculto
+---
+
+
+Um campo `hidden` armazena um valor que **nunca é exibido ao respondente**. Ao contrário de `calculate` (que computa um valor), `hidden` é usado para carregar um **valor fornecido externamente** — por exemplo, um ID de tarefa, um ID de domicílio passado de outro sistema, ou um código de entrevistador injetado quando o formulário é iniciado.
+
+## Especificação básica do XLSForm
+
+| type | name | label |
+|------|------|-------|
+| hidden | household_id | |
+
+Os rótulos não são obrigatórios para campos ocultos, pois nada é renderizado na tela.
+
+## Usos
+
+Os campos ocultos são comumente usados para:
+
+1. Passar um ID pré-atribuído do sistema de gerenciamento de pesquisa (por exemplo, ID de domicílio, número de caso, código de tarefa)
+2. Armazenar a versão do formulário ou metadados de implantação
+3. Injetar configuração específica do entrevistador no lançamento do formulário
+4. Carregar dados de um formulário pai para um formulário filho em fluxos de trabalho vinculados
+5. Armazenar um valor derivado dos parâmetros de URL quando o formulário é aberto via link web
+
+## Definindo um valor padrão
+
+O padrão mais comum é usar `hidden` com uma expressão `default` para que o valor seja definido quando o formulário abre:
+
+| type | name | default |
+|------|------|---------|
+| hidden | deployment_code | 'ZONE_A_2024' |
+| hidden | form_version | '3.1' |
+
+## Referenciando um campo oculto em cálculos
+
+Os valores ocultos podem ser referenciados como qualquer outro campo usando `${fieldname}`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| hidden | zone_code | | |
+| calculate | label_prefix | | concat('[', ${zone_code}, '] ') |
+| note | intro | ${label_prefix} Bem-vindo à pesquisa domiciliar | |
+
+## Usando hidden com preenchimento / parâmetros de URL
+
+Ao iniciar um formulário web via URL, você pode passar parâmetros que preenchem campos ocultos. Isso permite pré-carregar um ID de domicílio ou código de tarefa sem que o entrevistador precise digitá-lo:
+
+```
+https://your-server.com/form/FORMID?household_id=H00123&zone_code=NORTH
+```
+
+O campo chamado `household_id` será automaticamente preenchido com `H00123`.
+
+## Práticas recomendadas
+
+1. Use `hidden` (não `calculate`) quando o valor for **injetado externamente** e não deva ser recomputado.
+2. Use `calculate` quando o valor for **derivado de outros campos** no formulário.
+3. Sempre defina um `default` se o campo oculto precisar ter um valor — um campo oculto sem padrão estará vazio.
+4. Nomeie os campos ocultos claramente para distingui-los (por exemplo, prefixe com `_hidden_` ou use uma convenção de nomenclatura consistente).
+
+## Limitações
+
+- Os campos ocultos são incluídos nos dados exportados como qualquer outro campo.
+- Eles não podem ser exibidos condicionalmente — estão sempre presentes (mas invisíveis).
+- Se você precisa de um campo que calcule dinamicamente, use `calculate`.

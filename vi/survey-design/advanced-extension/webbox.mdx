@@ -1,0 +1,107 @@
+---
+description: Webbox nhúng trang web bên ngoài vào trong khảo sát dưới dạng modal iframe,
+  cho phép người điều tra xem tài liệu tham khảo hoặc tương tác với công cụ bên ngoài
+  mà không rời khỏi biểu mẫu.
+icon: manage_search
+title: Webbox
+---
+
+
+**Webbox** nhúng trang web bên ngoài vào trong khảo sát dưới dạng **popup modal** (iframe). Người điều tra nhấn nút trong nhãn hoặc trường note, trang mở ra dưới dạng overlay toàn màn hình bên trong biểu mẫu, và khi đóng lại họ trở về đúng nơi đang làm. Tính năng này cho phép hiển thị tài liệu tham khảo, bản đồ, bảng điều khiển hoặc công cụ tùy chỉnh mà không cần mở tab trình duyệt riêng.
+
+---
+
+## Cú pháp
+
+Chèn thẻ HTML `<webbox>` trực tiếp vào cột nhãn của `label` hoặc `note`:
+
+```html
+<webbox src='https://example.com/reference' title='Reference Guide'>Mở Hướng dẫn Tham khảo</webbox>
+```
+
+| Thuộc tính | Mô tả |
+|------------|-------|
+| `src` | URL để tải trong iframe. Hỗ trợ cả dấu nháy đơn và kép. |
+| `title` | Văn bản hiển thị trên thanh tiêu đề modal. Hỗ trợ văn bản thuần. |
+| *(nội dung)* | Nhãn nút có thể nhấp được hiển thị trong trường khảo sát |
+
+---
+
+## Ví dụ cơ bản
+
+| type | name | label |
+|------|------|-------|
+| note | ref_guide | `<webbox src='https://docs.example.com/field-guide' title='Field Guide'>📖 Mở Hướng dẫn Thực địa</webbox>` |
+
+Kết quả hiển thị nút có nhãn "📖 Mở Hướng dẫn Thực địa". Khi nhấn, modal mở hiển thị trang web hướng dẫn thực địa.
+
+---
+
+## Nhúng bản đồ
+
+| type | name | label |
+|------|------|-------|
+| note | area_map | `<webbox src='https://maps.example.com/survey-area' title='Survey Area Map'>🗺 Xem Bản đồ</webbox>` |
+
+---
+
+## Truyền giá trị biểu mẫu vào trang nhúng
+
+Nối các giá trị trường biểu mẫu vào URL bằng `concat()` trong cột `calculation` và tham chiếu kết quả trong nhãn:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | webbox_url | | `concat('https://dashboard.example.com/household?id=', ${household_id})` |
+| note | hh_dash | `<webbox src='${webbox_url}' title='Household Dashboard'>Mở Bảng điều khiển</webbox>` |
+
+<Warning>
+Thuộc tính `src` trong thẻ `<webbox>` hỗ trợ tham chiếu `${fieldname}` khi nhãn được tính toán từ trường `calculate`. Xây dựng URL đầy đủ trong trường `calculate` và tham chiếu nó.
+</Warning>
+
+---
+
+## Tương tác lặp: nút xóa
+
+Webbox cũng hỗ trợ các thẻ hành động đặc biệt để quản lý nhóm lặp bên trong nhãn:
+
+```html
+<delete-repeat-current>Xóa hàng này</delete-repeat-current>
+<delete-repeat-last>Xóa hàng cuối</delete-repeat-last>
+```
+
+Các thẻ này hiển thị dưới dạng nút xóa phiên bản lặp khi nhấn. Đặt chúng trong trường `note` bên trong (hoặc ngay sau) nhóm lặp:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | items | Mục |
+| text | item_name | Tên mục |
+| note | delete_btn | `<delete-repeat-current>✕ Xóa mục này</delete-repeat-current>` |
+| end_repeat | | |
+
+---
+
+## Giao tiếp với trang nhúng (postMessage)
+
+Iframe webbox và biểu mẫu cha có thể giao tiếp bằng API `postMessage` của trình duyệt. Cha gửi thông báo `init` đến iframe khi mở. Trang nhúng có thể phản hồi bằng:
+
+- `delete-repeat-current` — kích hoạt xóa phiên bản lặp hiện tại
+- `delete-repeat-last` — kích hoạt xóa phiên bản lặp cuối cùng
+
+Điều này cho phép các công cụ web tùy chỉnh (ví dụ: công cụ vẽ, bản đồ tương tác) kích hoạt các hành động biểu mẫu khi người dùng xác nhận một hành động bên trong iframe.
+
+---
+
+## Thực hành tốt
+
+1. Dùng webbox cho **tài liệu tham khảo** (hướng dẫn, bảng tra cứu, bản đồ) — không phải để thu thập dữ liệu cần có trong biểu mẫu.
+2. Đảm bảo URL nhúng có thể truy cập từ mạng của thiết bị — webbox yêu cầu kết nối mạng.
+3. Giữ trang nhúng thân thiện với thiết bị di động — modal rộng tối đa 800px và chiều cao 80% viewport.
+4. Dùng văn bản nút mô tả (ví dụ: "Xem Bản đồ Làng") thay vì nhãn chung chung ("Nhấp vào đây").
+5. Thông báo cho người điều tra rằng đóng modal sẽ trở về khảo sát — một số người dùng có thể không biết cách đóng overlay iframe.
+
+## Giới hạn
+
+- Webbox yêu cầu kết nối mạng để tải URL nhúng.
+- Một số trang web bên ngoài chặn nhúng trong iframe qua header `X-Frame-Options` hoặc `Content-Security-Policy` — các trang này không thể dùng với webbox.
+- Modal đóng khi người điều tra điều hướng khỏi câu hỏi — bất kỳ trạng thái chưa lưu nào trong iframe sẽ bị mất.
+- Webbox là phần mở rộng biểu mẫu web của rtSurvey và có thể không hoạt động trong các client tương thích ODK khác.

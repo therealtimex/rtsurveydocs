@@ -1,0 +1,110 @@
+---
+description: Ruudukkoasettelu mahdollistaa kenttien sijoittamisen CSS-ruudukkoon ryhmässä,
+  mahdollistaen monisarakkeiset lomakesuunnitelmat.
+icon: manage_search
+title: Ruudukkoasettelu
+---
+
+
+**Ruudukkoasettelu**-ominaisuus mahdollistaa kysymysten järjestämisen **monisarakkoiseen ruudukkoon** ryhmässä käyttämällä `gridformat<>`-ulkoasutunnistetta. Tämä on hyödyllinen tiheän tietojensyötön lomakkeissa, joissa useiden toisiinsa liittyvien kenttien tulisi esiintyä vierekkäin pystysuoran pinoamisen sijaan.
+
+---
+
+## Miten se toimii
+
+Ruudukkoasettelu sovelletaan kahdella tasolla:
+
+1. **Ryhmä** — aseta `appearance: field-list grid(weight=N)` määrittääksesi kuinka monta saraketta ruudukossa on
+2. **Jokainen ryhmän kenttä** — aseta `appearance: gridformat<row=R col=C colspan=S/>` sijoittaaksesi kentän
+
+Ruudukko käyttää 12-sarakkeista Bootstrap-tyylisystemsiä. `weight=N` määrittää loogisten sarakkeiden lukumäärän; jokainen sarake vie `12/N` Bootstrap-saraketta.
+
+---
+
+## Ryhmätason ulkoasu
+
+| Ulkoasu | Kuvaus |
+|---------|--------|
+| `field-list grid(weight=2)` | 2-sarakkinen ruudukko (jokainen sarake = 6 Bootstrap-saraketta) |
+| `field-list grid(weight=3)` | 3-sarakkinen ruudukko (jokainen sarake = 4 Bootstrap-saraketta) |
+| `field-list grid(weight=4)` | 4-sarakkinen ruudukko (jokainen sarake = 3 Bootstrap-saraketta) |
+| `field-list grid(weight=6)` | 6-sarakkinen ruudukko (jokainen sarake = 2 Bootstrap-saraketta) |
+
+---
+
+## Kenttätason `gridformat<>`-syntaksi
+
+```
+gridformat<row=R col=C colspan=S/>
+gridformat<row=R col=C colspan=S backgroundcolor=COLOR/>
+```
+
+| Attribuutti | Kuvaus |
+|-------------|--------|
+| `row` | Rivinumero (1-pohjainen) |
+| `col` | Sarakenumero (1-pohjainen, `weight`-määrityksen mukainen ruudukko) |
+| `colspan` | Tämän kentän kattamien sarakkeiden lukumäärä (oletus 1) |
+| `backgroundcolor` | Valinnainen CSS-väri kentän taustalle (esim. `#f0f0f0`, `lightblue`) |
+
+---
+
+## Esimerkki: 2-sarakkinen kotitaloustutkimuksen osio
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | demographics | Demografiatiedot | `field-list grid(weight=2)` |
+| text | first_name | Etunimi | `gridformat<row=1 col=1/>` |
+| text | last_name | Sukunimi | `gridformat<row=1 col=2/>` |
+| integer | age | Ikä | `gridformat<row=2 col=1/>` |
+| select_one gender | gender | Sukupuoli | `gridformat<row=2 col=2/>` |
+| text | address | Täysi osoite | `gridformat<row=3 col=1 colspan=2/>` |
+| end_group | | | |
+
+Tämä renderöidään seuraavasti:
+
+```
+[ Etunimi           ] [ Sukunimi           ]
+[ Ikä               ] [ Sukupuoli          ]
+[ Täysi osoite (kattaa molemmat sarakkeet) ]
+```
+
+---
+
+## Esimerkki: 3-sarakkinen peltodata-syöttö
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | plot_data | Pellon tiedot | `field-list grid(weight=3)` |
+| text | plot_id | Pellon tunnus | `gridformat<row=1 col=1/>` |
+| decimal | area_ha | Pinta-ala (ha) | `gridformat<row=1 col=2/>` |
+| select_one crop_type | crop | Kasvilaji | `gridformat<row=1 col=3/>` |
+| decimal | yield | Sato (kg) | `gridformat<row=2 col=1/>` |
+| decimal | revenue | Tuotto | `gridformat<row=2 col=2/>` |
+| text | notes | Muistiinpanot | `gridformat<row=2 col=3/>` |
+| end_group | | | |
+
+---
+
+## Taustavärit
+
+Käytä `backgroundcolor`:ia erottaaksesi osiot visuaalisesti:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | section_a | Osio A | `gridformat<row=1 col=1 colspan=2 backgroundcolor=#e8f4f8/>` |
+
+---
+
+## Parhaat käytännöt
+
+1. Käytä ruudukkoasettelua vain **tietojensyöttöintensiivisille** näytöille, joissa vierekkäiset kentät aidosti vähentävät vierittämistä.
+2. Pidä `colspan=1`-kentät lyhyinä (tunnukset, koodit, lyhyet valinnat) — leveät otsikot katkeavat huonosti kapeissa ruudukkosarakkeissa.
+3. Käytä `colspan=N` kentille, joilla on pitkät otsikot tai moniriviset tekstisyötteet.
+4. Testaa pienimmällä odotetulla luetteloijan käyttämällä näyttökoolla — 4-sarakkinen ruudukko on ahdas puhelimessa.
+5. Ruudukkoasettelu toimii parhaiten web- ja tablettiformaateissa; mobiilipuhelimilla 2-sarakkinen asettelu on yleensä maksimimukava leveys.
+
+## Rajoitukset
+
+- `gridformat<>` toimii vain ryhmässä, jossa on `grid(weight=N)`-ulkoasu — sillä ei ole vaikutusta ylätasolla.
+- Ruudukkoasettelu on rtSurvey-weblomakelaajennus, joka ei välttämättä renderöidy oikein muissa ODK-yhteensopivissa asiakkaissa.
+- Rivi- ja sarakepaikkoja ei validoida lomakkeen rakennusvaiheessa — päällekkäiset kentät renderöidään molemmat, mutta saattavat näyttää rikkinäisiltä.

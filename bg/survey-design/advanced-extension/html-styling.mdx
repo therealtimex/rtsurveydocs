@@ -1,0 +1,142 @@
+---
+description: rtSurvey поддържа HTML тагове в заглавия и подсказки, позволявайки богато
+  форматиране на текст, връзки и динамично задаване на теми с цветове.
+icon: manage_search
+title: HTML стилизиране
+---
+
+
+rtSurvey renders **label** and **hint** text as HTML on web forms. This means you can use standard HTML tags to format text, add line breaks, create links, and apply colors. This is particularly useful for note fields, section instructions, and dynamic summaries.
+
+<Warning>
+HTML in labels is rendered on the **web form** and rtSurvey mobile apps. It may not render in all ODK-compatible clients. Always test on your target platform.
+</Warning>
+
+---
+
+## Поддържани HTML тагове
+
+### Text formatting
+
+| Tag | Result |
+|-----|--------|
+| `<strong>text</strong>` or `<b>text</b>` | **Bold text** |
+| `<em>text</em>` or `<i>text</i>` | *Italic text* |
+| `<u>text</u>` | Underlined text |
+| `<br>` | Line break |
+| `<span style="...">text</span>` | Inline styling |
+
+### Links
+
+```html
+<a href="https://example.com" target="_blank">Click here</a>
+```
+
+Opens in a new tab. Use for reference documents, guidelines, or external resources the enumerator should consult.
+
+### Colors
+
+Use `<span>` with inline styles:
+
+```html
+<span style="color: red;">Warning: value is out of range</span>
+<span style="color: #009688;">Section completed</span>
+```
+
+---
+
+## Color theme variables
+
+rtSurvey supports **color theme tokens** that adapt to the app's configured theme. Use the `__COLOR_THEME_NAME__` syntax:
+
+```html
+<span style="color: var(--color-theme-primary);">Primary color text</span>
+```
+
+Or using the token shorthand in label text:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
+```
+
+This is automatically converted to the equivalent `<span>` with a CSS variable at render time.
+
+---
+
+## Multi-language labels
+
+Wrap content in language tags to support multiple languages in a single label cell:
+
+```
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey extracts the content matching the current app language. If no matching language tag is found, the full string is shown as-is.
+
+---
+
+## Примерs in note fields
+
+### Section instruction with bold and a line break
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
+
+### Dynamic summary with calculation reference
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
+
+### Warning in red
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
+
+### Link to a reference document
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Refer to the <a href="https://docs.example.com/guidelines" target="_blank">Field Guidelines</a> before starting this section.` |
+
+---
+
+## Special rtSurvey HTML tags
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+Embeds a button that opens a URL in an in-form modal. See [Webbox](webbox) for full details.
+
+### `<delete-repeat-current>label</delete-repeat-current>`
+
+Renders a button inside a repeat group that deletes the current repeat instance when tapped.
+
+### `<delete-repeat-last>label</delete-repeat-last>`
+
+Renders a button that deletes the last repeat instance.
+
+Example usage in a repeat group:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Remove this member</delete-repeat-current>` |
+
+---
+
+## Best Practices
+
+1. Use HTML sparingly — overformatted labels are harder to read, not easier.
+2. Prefer `<strong>` for bold and `<em>` for italics over deprecated `<b>` and `<i>`.
+3. Keep color usage meaningful — use red for warnings, not for decoration.
+4. Always test HTML rendering on both mobile app and web form, as rendering may differ slightly.
+5. Avoid `<table>` tags inside labels — they rarely render well on mobile screens.
+6. Do not use JavaScript (`<script>`) — it will be stripped or cause errors.
+
+## Limitations
+
+- Complex HTML (tables, forms, scripts) is not supported and may break rendering.
+- Some older mobile clients may display HTML tags as literal text — test on all target devices.
+- `<a>` links open in a browser or WebView — the enumerator leaves the form, which can be disruptive on mobile.

@@ -1,0 +1,129 @@
+---
+description: Call API ermöglicht es Ihrer Umfrage, Daten von einem externen Webdienst
+  abzurufen und die Antwort zu verwenden, um Felder zu befüllen oder Antworten zu
+  validieren.
+icon: manage_search
+title: API-Aufruf (Call API)
+---
+
+
+Die Funktion **Call API** ermöglicht es einem Umfragefeld, eine HTTP-Anfrage an einen externen Dienst zu senden und die Antwort zu verwenden, um einen berechneten Wert zu befüllen oder eine Benutzereingabe zu validieren. Dies ermöglicht Echtzeit-Nachschlageoperationen, ID-Verifizierung, Barcode-Nachschlageoperationen und andere serverseitige Prüfungen während der Datenerhebung.
+
+Es gibt zwei Funktionen:
+
+- `callapi()` — ruft einen Wert von einer API ab und speichert ihn in einem `calculate`- oder `text`-Feld
+- `callapi-verify()` — ruft eine API auf und blockiert den Fortschritt, wenn die Antwort nicht dem erwarteten Wert entspricht (wird in `constraint` verwendet)
+
+---
+
+## `callapi()` — API-Antwort abrufen und speichern
+
+### Syntax
+
+Platzieren Sie `callapi()` in der **`calculation`**-Spalte eines `calculate`- oder `text`-Feldes:
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### Parameter
+
+| # | Parameter | Beschreibung |
+|---|-----------|-------------|
+| 1 | `method` | HTTP-Methode: `'GET'` oder `'POST'` |
+| 2 | `url` | API-Endpunkt-URL |
+| 3 | `allowed_auto` | `1` für automatischen Aufruf beim Erreichen des Feldes; `0` für manuellen Auslöseknopf |
+| 4 | `max_retry` | Maximale Anzahl an Wiederholungsversuchen bei Fehler |
+| 5 | `no_overwrite` | `1`, um den vorhandenen Wert beizubehalten, wenn das Feld bereits einen hat; `0` zum Überschreiben |
+| 6 | `extract_expr` | JSONPath-Ausdruck zum Extrahieren des gewünschten Werts aus der Antwort (z. B. `$.data.name`) |
+| 7 | `timeout` | Anfrage-Zeitlimit in Millisekunden |
+| 8 | `lifetime` | Zeitspanne (ms), während der die zwischengespeicherte Antwort gültig bleibt, bevor erneut abgerufen wird |
+| 9 | `response_q` | Name eines Feldes zum Speichern des HTTP-Rohantwortstatus (z. B. `${response_status}`) |
+| 10 | `call_type` | *(Optional)* Spezieller Aufrufmodus: `'lazy-upload'` oder `'lazy-upload-multiple'` |
+| 11 | `post_body` | *(Optional)* POST-Body-Zeichenkette. Formularfelder mit `##fieldname##` referenzieren |
+
+### Beispiel: GET-Anfrage zum Nachschlagen eines Haushalts anhand der ID
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | Haushalts-ID | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+| note | hh_display | Haushalt: ${hh_name} | | |
+
+### Beispiel: POST-Anfrage mit JSON-Body
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+Im `post_body` verwenden Sie `##fieldname##`, um den aktuellen Wert eines Formularfeldes einzufügen.
+
+### Erscheinungsbild: `callapi`
+
+Fügen Sie `callapi` zur Spalte `appearance` des Feldes hinzu, um die API-Aufruf-Integration zu aktivieren:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | api_result | | callapi | `callapi('GET', ...)` |
+
+Wenn `allowed_auto` `0` ist, zeigt rtSurvey eine **"Abrufen"-Schaltfläche** an, die der Interviewer manuell antippen kann.
+
+---
+
+## `callapi-verify()` — Einen Wert gegen eine API validieren
+
+`callapi-verify()` blockiert die Übermittlung eines Feldes, bis eine API bestätigt, dass der eingegebene Wert gültig ist. Verwenden Sie es in der Spalte **`constraint`**.
+
+### Syntax
+
+```
+callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
+```
+
+### Parameter
+
+| # | Parameter | Beschreibung |
+|---|-----------|-------------|
+| 1 | `method` | HTTP-Methode: `'GET'` oder `'POST'` |
+| 2 | `url` | Verifizierungs-API-Endpunkt |
+| 3 | `extract_expr` | JSONPath zum Extrahieren des erwarteten Werts aus der Antwort |
+| 4 | `match_expr` | Ausdruck, der den extrahierten Wert mit dem Feldwert vergleicht (z. B. `$.status = 'valid'`) |
+| 5 | `timeout` | Anfrage-Zeitlimit in Millisekunden |
+| 6 | `constraint_mode` | `'soft'` nur für eine Warnung; `'hard'` zum Blockieren des Fortschritts |
+| 7 | `post_body` | *(Optional)* POST-Body mit `##fieldname##`-Substitutionen |
+| 8 | `message` | *(Optional)* Fehlermeldung. Unterstützt mehrere Sprachen: `<en>Invalid!</en><vi>Không hợp lệ!</vi>` |
+
+### Beispiel: Barcode gegen eine Asset-Registrierung verifizieren
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| barcode | asset_code | Asset-Barcode scannen | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` | Asset nicht in der Registrierung gefunden |
+
+### Erscheinungsbild: `callapi-verify(...)`
+
+Die Spalte `appearance` bei einem Feld mit `callapi-verify()` in der Einschränkung sollte `callapi-verify(params)` oder `callapi-verify(dynamicParams)` enthalten, um rtSurvey zu signalisieren, dass dieses Feld die API-Verifizierung verwendet.
+
+---
+
+## App-API-Daten zusammen mit callapi verwenden
+
+Kombinieren Sie `callapi()` mit `pulldata('app-api', 'user.token')`, um das Token des authentifizierten Benutzers in Ihre API-Anfrage einzufügen:
+
+```
+callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, '', '',
+  concat('{"token":"', pulldata('app-api','user.token'), '","id":"##item_id##"}'))
+```
+
+## Empfohlene Vorgehensweisen
+
+1. Setzen Sie immer ein vernünftiges `timeout` (5000–15000 ms) — verwenden Sie nicht 0 oder sehr hohe Werte.
+2. Setzen Sie `allowed_auto=0` für Verifizierungen, die der Interviewer bewusst auslösen sollte (z. B. ID-Prüfungen).
+3. Setzen Sie `no_overwrite=1`, wenn das Feld später bearbeitet werden könnte und Sie nicht möchten, dass ein erneuter Abruf manuelle Korrekturen überschreibt.
+4. Verwenden Sie `extract_expr` mit einem spezifischen JSONPath, anstatt sich auf den rohen Antworttext zu verlassen.
+5. Testen Sie API-Aufrufe im Offline-Modus — callapi scheitert kontrolliert und zeigt einen Fehler an, aber das Formular sollte für unkritische Felder weiterhin ausfüllbar sein.
+
+## Einschränkungen
+
+- Erfordert Netzwerkkonnektivität zum Zeitpunkt des Aufrufs — Aufrufe schlagen fehl, wenn das Gerät offline ist.
+- API-Antworten müssen JSON sein — XML- oder Klartextantworten erfordern zusätzliche Verarbeitung.
+- Hohe Aufrufhäufigkeit (z. B. ein API-Aufruf pro Wiederholungsinstanz) kann die Formularnavigation verlangsamen.

@@ -1,0 +1,114 @@
+---
+description: ''
+icon: code
+title: App API
+---
+
+
+AppAPI giver brugere mulighed for at indlæse systemmetadata fra appen ved hjælp af forskellige metoder i FormEngine og DMView. Det giver adgang til forskellige datanøgler til hentning af specifik information fra appen.
+
+I XLSForm kan du bruge funktionen `pulldata()` med følgende syntaks:
+
+<Note>pulldata('app-api', 'data-key')</Note>
+
+- `'app-api'`: Dette nøgleord informerer FormEngine om at indlæse data fra App API.
+- `'data-key'`: Dette er nøglen til de data, du vil indlæse fra App API.
+- Hvis datanøglen er ugyldig eller ikke understøttet, returnerer beregningen "n/a".
+
+Her er de understøttede datanøgler, du kan bruge med App-API:
+
+`osPlatform`: Returnerer det aktuelle OS-navn (Android eller iOS) og OS-versionen. Webplatforme returnerer en tom værdi.
+
+`appPlatform`: Returnerer appplatformnavnet, som er `rtSurvey`.
+
+`appVersion`: Returnerer appens versionsnavn.
+
+`getDisplayWidth`: Returnerer enhedsskærmens bredde i pixels.
+
+`getDisplayHeight`: Returnerer enhedsskærmens højde i pixels.
+
+`getScreenSize`: Returnerer enhedsskærmens størrelse i tommer.
+
+`projectCode`: Returnerer den aktuelle projektkode for det websted, brugeren logger ind på.
+
+`projectURL`: Returnerer den aktuelle projekt-URL for det websted, brugeren logger ind på. Standardfaldet er en tom tekst ("").
+
+`startingPoint`: Returnerer stien til det punkt, der starter formularen.
+
+`serverTime`: Returnerer den bedst tilgængelige tilnærmelse af dato og klokkeslæt på serveren.
+
+`user.[attribute]`: Returnerer de aktuelle brugerattributter baseret på den angivne attributnøgle.
+
+Kombiner nedenstående attributnøgler med "user." i `pulldata()`-parametrene for at hente aktuelle brugeroplysninger. For eksempel `user.username`, `user.email` osv.
+
+| Attributnøgle        | Beskrivelse                          |
+|----------------------|--------------------------------------|
+| username             | Brugerens brugernavn                 |
+| name                 | Brugerens fulde navn                 |
+| staffCode            | Brugerens medarbejderkode            |
+| phone                | Brugerens telefonnummer              |
+| email                | Brugerens e-mailadresse              |
+| description          | Beskrivelsestekst i brugeroplysninger|
+| organization_id      | Organisations-ID, som brugeren tilhører |
+| organization_name    | Organisationsnavn, som brugeren tilhører |
+| team_id              | Hold-ID, som brugeren tilhører       |
+| supervisor_id        | ID for brugerens supervisor          |
+| is_supervisor        | 1 hvis brugeren er supervisor, 0 hvis ikke |
+
+`instancePath`: Returnerer den aktuelle instansmappesti.
+
+`appLanguage`: Returnerer det aktuelle appsprog angivet i appens indstillinger (f.eks. da, en).
+
+`openArgs.[attribute]`: Returnerer det åbne-formular-argument sendt fra ActionButton. Standardfaldet er en tom tekst ("").
+
+`primaryAppColor`: Henter appens primærfarve.
+
+---
+
+## Brugseksempler
+
+### Gem interviewerens brugernavn og organisation
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Brug disse i note-labels til revisionsformål:
+```
+note | interviewer_info | Interviewer: ${enumerator_name} (${enumerator_org})
+```
+
+### Enhed og skærminfo
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+### Servertid i stedet for enhedstid
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Betinget logik baseret på brugerrolle
+
+Vis en supervisor-eksklusiv sektion kun til supervisorer:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Supervisorgennemgang | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Supervisornoter | |
+| end_group | | | |
+
+---
+
+## Noter
+
+- Alle `pulldata('app-api', ...)`-kald evalueres, når formularen åbnes, og genevalueres ikke dynamisk under sessionen (undtagen `serverTime` og `now()`).
+- Hvis en nøgle er ustøttet eller data er utilgængelige, returnerer funktionen `'n/a'` (ikke tom streng – test med `!= 'n/a'` frem for `!= ''`).
+- `openArgs`-værdier er kun tilgængelige, når formularen startes fra en handlingsknap; de returnerer ellers en tom streng.

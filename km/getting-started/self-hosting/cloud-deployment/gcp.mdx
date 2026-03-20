@@ -1,0 +1,128 @@
+---
+description: ដាក់ deployed rtCloud នៅ Google Cloud Compute Engine ដោយប្រើ gcp-compute.sh
+  startup script។
+icon: travel_explore
+title: Google Cloud (GCP)
+---
+
+
+ប្រើ `gcp-compute.sh` ជា **Startup script** នៅពេល បង្កើត Compute Engine VM instance។ Script ដំណើរការ ដោយ ស្វ័យប្រវត្តិ នៅ boot ដំបូង។
+
+**ទាញយក script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+
+---
+
+## ជំហានទី ១ — បំពេញ configuration
+
+```bash
+# --- ចាំបាច់ ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # ផ្លាស់ប្ដូរ បន្ទាប់ ចូល ដំបូង
+
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- Keycloak ភ្ជាប់ ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"
+```
+
+| Field | ចាំបាច់ | ការពិពណ៌នា |
+|-------|----------|-------------|
+| `PROJECT_ID` | បាទ | ប្រើ ជា ឈ្មោះ database និង Keycloak client ID។ Lowercase, គ្មាន ចន្លោះ។ |
+| `ADMIN_PASSWORD` | ទេ | ពាក្យ សម្ងាត់ app admin និង Keycloak admin។ Default `admin` — **ផ្លាស់ប្ដូរ បន្ទាប់ ចូល ដំបូង**។ |
+| `DOMAIN` | ទេ | Domain របស់អ្នក សម្រាប់ HTTPS។ ទុក blank សម្រាប់ HTTP mode ប៉ុណ្ណោះ។ |
+| `LETSENCRYPT_EMAIL` | បាទ (ប្រសិនបើ DOMAIN set) | Email សម្រាប់ Let's Encrypt notifications។ |
+| `EMBED_KEYCLOAK` | ទេ | `true` ដើម្បី deploy Keycloak ភ្ជាប់ (ត្រូវការ RAM 4 GB)។ |
+
+---
+
+## ជំហានទី ២ — បង្កើត VM instance
+
+នៅ [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. ចុច **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) ឬ ធំ ជាង
+3. **Boot disk:**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB ឬ ច្រើន ជាង
+4. **Firewall:** check **Allow HTTP traffic** និង **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste ខ្លឹមសារ script ពេញ
+6. ចុច **Create**
+
+---
+
+## ជំហានទី ៣ — បន្ថែម DNS record
+
+```
+Type  : A
+Name  : myapp
+Value : <vm-external-ip>
+TTL   : 300
+```
+
+---
+
+## ជំហានទី ៤ — តាមដានវឌ្ឍនភាព
+
+```bash
+gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
+```
+
+ឬ SSH ដោយ ផ្ទាល់:
+
+```bash
+ssh <username>@<vm-external-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## ជំហានទី ៥ — ចូលដំណើរការ app
+
+នៅពេល setup បញ្ចប់, ចូល ជាមួយ username `admin` និង password `admin`, ហើយ ផ្លាស់ប្ដូរ ពាក្យ សម្ងាត់ ភ្លាម ៗ។
+
+---
+
+## Firewall Rules
+
+**Allow HTTP/HTTPS** checkboxes របស់ GCP បើក ports 80 និង 443។ ដើម្បី allow direct Shiny access នៅ port 3838 ផង, បន្ថែម firewall rule:
+
+```bash
+gcloud compute firewall-rules create allow-shiny \
+  --allow tcp:3838 \
+  --target-tags http-server
+```
+
+> **កុំ** បើក port 3306 (MySQL) — វា មិន គួរ accessible publicly ទេ។
+
+---
+
+## Static IP (ស្រេចចិត្ត)
+
+ដោយ default, GCP assign ephemeral external IP ដែល ផ្លាស់ ប្ដូរ នៅ VM restart។ ដើម្បី រក្សា IP ស្ថិរ:
+
+1. ចូល **VPC Network** → **IP addresses**
+2. ចុច **Reserve external static address**
+3. Assign វា ទៅ VM instance
+
+---
+
+## បន្ទាប់ Deployment
+
+### ផ្លាស់ប្ដូរ ពាក្យ សម្ងាត់
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### ស្វែងមើល containers ទាំងអស់
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```

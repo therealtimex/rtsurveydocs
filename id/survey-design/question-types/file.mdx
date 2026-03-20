@@ -1,0 +1,102 @@
+---
+description: Pertanyaan file memungkinkan responden mengunggah dokumen dan file lainnya
+  sebagai bagian dari respons survei mereka.
+icon: upload_file
+title: File
+---
+
+
+Tipe pertanyaan `file` memungkinkan responden **mengunggah file apa pun** dari perangkat mereka — dokumen, spreadsheet, PDF, atau tipe file lainnya. Tidak seperti `image`, `audio`, dan `video` yang meluncurkan alat pengambilan tertentu, `file` membuka pemilih file tujuan umum.
+
+## Spesifikasi XLSForm Dasar
+
+| type | name      | label                        |
+|------|-----------|------------------------------|
+| file | document  | Harap unggah dokumen Anda    |
+
+Untuk detail lebih lanjut tentang tipe pertanyaan file standar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+
+## Penggunaan
+
+Pertanyaan file umum digunakan untuk:
+
+1. Mengumpulkan dokumen pendukung (kuitansi, sertifikat, kontrak, laporan)
+2. Mengunggah formulir kertas yang telah dipindai
+3. Mengumpulkan spreadsheet atau ekspor data dari sistem lain
+4. Tipe file digital apa pun yang tidak dicakup oleh image/audio/video
+
+## Format data
+
+File yang diunggah disimpan sebagai lampiran biner:
+
+- **Format:** Dipertahankan dalam format asli (PDF, XLSX, DOCX, dll.)
+- **Penamaan:** `{instanceID}-{fieldname}.{extension}`
+- **Penyimpanan:** Diunggah ke folder media server bersama pengiriman
+- **Akses:** Dapat diunduh dari antarmuka manajemen pengiriman
+
+## Ekstensi rtSurvey
+
+### Tipe file yang diterima
+
+Gunakan kolom `parameters` untuk membatasi tipe file mana yang dapat dipilih:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| file | report | Unggah laporan inspeksi | `accept=.pdf` |
+| file | spreadsheet | Unggah file data | `accept=.xlsx,.csv` |
+
+Parameter `accept` menggunakan sintaks ekstensi file standar (dipisahkan koma).
+
+### Panduan ukuran file
+
+rtSurvey tidak menegakkan batas ukuran file keras di tingkat pertanyaan, tetapi batas unggah server berlaku. Gunakan `hint` untuk mengkomunikasikan ekspektasi kepada enumerator:
+
+| type | name | label | hint |
+|------|------|-------|------|
+| file | receipt | Unggah kuitansi pembayaran | Diterima: PDF atau gambar. Ukuran file maksimum: 5 MB |
+
+### Integrasi dengan sistem file perangkat dan penyimpanan cloud
+
+Di Android dan iOS, pertanyaan `file` membuka pemilih file asli perangkat, yang mungkin menyertakan akses ke:
+- Penyimpanan lokal perangkat
+- Kartu SD (Android)
+- iCloud Drive (iOS)
+- Google Drive, Dropbox (jika terinstal)
+
+Di web, ini membuka dialog unggah file standar browser.
+
+## Contoh penggunaan
+
+### Unggahan PDF yang diperlukan
+
+| type | name | label | hint | required | required_message |
+|------|------|-------|------|----------|-----------------|
+| file | signed_consent | Unggah formulir persetujuan yang ditandatangani | Hanya PDF, maks 2MB | yes | Formulir persetujuan diperlukan |
+
+### Unggahan dokumen kondisional
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_land_title | Apakah rumah tangga memiliki sertifikat tanah? | |
+| file | land_title_doc | Unggah foto atau salinan sertifikat tanah | `${has_land_title} = 'yes'` |
+
+## Praktik Terbaik
+
+1. Gunakan `accept` untuk membatasi tipe file — ini mencegah enumerator secara tidak sengaja mengunggah file yang salah.
+2. Selalu sertakan panduan ukuran dan format dalam kolom `hint`.
+3. Untuk foto dan gambar, gunakan tipe `image` sebagai gantinya — ia menawarkan kompresi yang lebih baik dan penanganan format yang konsisten.
+4. Untuk survei besar dengan lampiran file, rencanakan penyimpanan data dan bandwidth unduhan Anda.
+5. Uji pemilih file pada tipe perangkat target (Android vs. iOS vs. web) sebelum penerapan — akses ke drive cloud bervariasi.
+
+## Pertimbangan penanganan data
+
+- File disimpan dalam format aslinya; tidak dikonversi atau dikompres oleh rtSurvey.
+- Analisis file setelah diunduh — rtSurvey tidak mengekstrak atau mengindeks konten file.
+- Lampiran file besar secara signifikan meningkatkan waktu yang diperlukan untuk mengunduh dataset lengkap.
+
+## Keterbatasan
+
+- Pertanyaan file tidak memvalidasi konten file — hanya pemeriksaan ekstensi file melalui `accept` yang ditegakkan di tingkat UI.
+- File yang sangat besar (100 MB+) mungkin kehabisan waktu saat diunggah di lingkungan dengan konektivitas rendah.
+- Enumerator offline dapat melampirkan file tetapi tidak akan diunggah sampai konektivitas pulih.
+- Beberapa konfigurasi perangkat membatasi akses ke lokasi penyimpanan tertentu (misalnya, kebijakan MDM perusahaan).

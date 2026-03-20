@@ -1,0 +1,77 @@
+---
+description: Pitanja tipa decimal dozvoljavaju numerički unos sa razlomačkim delovima
+  u anketi.
+icon: calculate
+title: Decimal
+---
+
+
+Tip pitanja decimal u XLSForm-u i rtSurvey-u se koristi za prikupljanje numeričkih odgovora koji mogu uključivati razlomačke delove. Ovaj tip pitanja je neophodan za prikupljanje preciznih numeričkih podataka kao što su merenja, cene ili procenti.
+
+## Osnovna XLSForm specifikacija
+
+| type    | name   | label                    |
+|---------|--------|--------------------------|
+| decimal | weight | Unesite telesnu težinu u kg |
+
+Za više detalja o osnovnom tipu pitanja decimal, pogledajte [XLSForm specifikaciju](https://xlsform.org/en/#question-types).
+
+## Upotrebe
+
+Pitanja tipa decimal se uobičajeno koriste za:
+
+1. Merenja (npr. težina, visina, udaljenost)
+2. Finansijske podatke (npr. cene, plate)
+3. Procente
+4. Naučno prikupljanje podataka
+5. Bilo koje numeričke podatke koji zahtevaju preciznost izvan celih brojeva
+
+## Najbolje prakse
+
+1. Koristite jasne i sažete oznake za specificiranje očekivanog unosa i mernih jedinica.
+2. Implementirajte ograničenja opsega za sprečavanje nerealnih ili pogrešnih unosa.
+3. Razmotrite korišćenje teksta napomene za pružanje primera ili razjašnjavanje očekivanog formata.
+4. Navedite željeni broj decimalnih mesta u oznaci ili napomeni ako je preciznost važna.
+
+## Ograničenja i validacija
+
+Možete dodati ograničenja da osigurate da unesena vrednost pada u određeni opseg:
+
+| type    | name   | label                    | constraint        | constraint_message                    |
+|---------|--------|--------------------------|-------------------|---------------------------------------|
+| decimal | height | Unesite visinu u metrima | .>0 and .<=3    | Visina mora biti između 0 i 3 metra |
+
+## Primer upotrebe
+
+Evo primera kako biste mogli koristiti pitanja tipa decimal u anketi o zdravlju:
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| decimal | weight         | Unesite telesnu težinu u kg               | .>0 and .<=500 | Težina mora biti između 0 i 500 kg |
+| decimal | height         | Unesite visinu u metrima                  | .>0 and .<=3 | Visina mora biti između 0 i 3 metra |
+| decimal | body_temp      | Unesite telesnu temperaturu u Celzijusima | .>=35 and .<=42 | Temperatura mora biti između 35°C i 42°C |
+| calculate | bmi          |                                           |            |                                   |
+
+U redu calculate za BMI možete koristiti:
+
+```
+calculation | ${weight} / (${height} * ${height})
+```
+
+Ovo će izračunati BMI koristeći unesenu težinu i visinu.
+
+## rtSurvey proširenja
+
+Dok je osnovna XLSForm specifikacija za pitanja tipa decimal jednostavna, rtSurvey može nuditi dodatne funkcije ili prilagođavanja:
+
+1. Kontrola preciznosti (broj decimalnih mesta)
+2. Prilagođeni formati unosa (npr. procenat, valuta)
+3. Napredna pravila validacije
+
+(Napomena: Specifična proširenja dostupna u rtSurvey-u za pitanja tipa decimal treba ovde potvrditi i detaljisati.)
+
+## Ograničenja
+
+- Preciznost decimalnih brojeva može biti ograničena od strane osnovnog sistema ili baze podataka.
+- Korisnicima može biti potrebna smernica o očekivanom decimalnom separatoru (tačka ili zarez) u zavisnosti od lokalizacije.
+- Veliki decimalni brojevi mogu biti teški za čitanje ili tačan unos na mobilnim uređajima.

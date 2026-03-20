@@ -1,0 +1,57 @@
+---
+description: A quickstart guide to running a survey with rtSurvey
+icon: rocket_launch
+title: Collecting Data
+---
+
+
+Once a form has been deployed and enumerators are assigned, data collection can begin. **rtSurvey** supports seamless data gathering across both web browsers and dedicated mobile applications, ensuring flexibility whether your team is connected to the internet or working in remote, offline environments.
+
+## Choosing the Right Collection Method
+
+Depending on your project's geography and connectivity, you can choose the optimal method for your enumerators:
+
+- **Web Browser (Online):** Best for call centers, office-based data entry, or respondents filling out self-administered public surveys.
+- **rtWork / rtSurvey Mobile App (Online & Offline):** Best for field operations, remote areas with unstable internet, and surveys requiring media attachments (photos, GPS coordinates, offline maps).
+
+---
+
+## Method 1: Collecting Data via Web Browser
+
+Using the Webform interface allows enumerators to begin collecting data immediately without installing any software.
+
+### 1. Access the Webform URL
+From the **Manage Forms** dashboard in the Control Panel, locate your target form and click the **Webform's URL** button to generate a secure link. 
+
+### 2. Form Entry
+- Open the provided URL in any modern web browser.
+- If the form requires authentication, the enumerator must log in using their credentials. If it's set to "Public Visibility," they can proceed directly.
+- Fill out the survey questions. The interface will automatically enforce logic, skip patterns, and validation rules.
+- **Media Capture:** If the form includes image, audio, or video questions, the web browser will prompt you to upload a file from your computer or use your device's webcam/microphone if available.
+
+### 3. Submission
+Upon reaching the final page, click **Submit**. The browser requires an active internet connection to finalize the submission. Once successful, the data will instantly reflect in the **Manage Submissions** interface.
+
+---
+
+## Method 2: Collecting Data via Mobile App (Offline)
+
+For robust field data collection, the mobile applications provide full offline capabilities.
+
+### 1. Install and Authenticate
+- Download the **rtWork** (or **rtSurvey**) application from the Google Play Store or Apple App Store.
+- Open the app and log in using the assigned enumerator credentials.
+
+### 2. Download Forms (Requires Internet)
+- Navigate to the **Forms** or **Tasks** section in the app.
+- Tap the **Sync** or **Download** icon to fetch the latest questionnaire designs from the server. Once downloaded, the forms are stored locally on the device.
+
+### 3. Collect Data (Offline)
+- Open the downloaded form and begin the interview. 
+- You can safely collect data entirely offline. 
+- **Media Capture:** The mobile app natively integrates with your device's hardware. You can capture photos, record audio, record video, and log precise GPS coordinates directly within the app, even without an internet connection.
+- When you finish an interview, finalize the record. Finalized records are queued safely in the app's outbox.
+
+### 4. Sync Submissions (Requires Internet)
+- Once the enumerator returns to an area with internet access (Wi-Fi or cellular data), they must navigate to the **Outbox** or **Sync** interface.
+- Instruct the app to send the finalized forms. The app will transmit the queued records and all attached media files securely to the server, after which they will appear in the data grid for review.

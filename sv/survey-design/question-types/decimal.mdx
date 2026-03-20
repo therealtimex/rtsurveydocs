@@ -1,0 +1,66 @@
+---
+description: Decimalfrågor tillåter numerisk inmatning med decimaler i din undersökning.
+icon: calculate
+title: Decimal
+---
+
+
+Frågtypen decimal i XLSForms och rtSurvey används för att samla in numeriska svar som kan inkludera decimaldelen. Denna frågtyp är viktig för att samla in exakta numeriska data som mätningar, priser eller procent.
+
+## Grundläggande XLSForm-specifikation
+
+| type    | name   | label                          |
+|---------|--------|--------------------------------|
+| decimal | weight | Ange din vikt i kg             |
+
+För mer detaljer om grundläggande frågtypen decimal, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+
+## Användningsområden
+
+Decimalfrågor används vanligtvis för:
+
+1. Mätningar (t.ex. vikt, längd, avstånd)
+2. Finansiella data (t.ex. priser, löner)
+3. Procent
+4. Vetenskaplig datainsamling
+5. Alla numeriska data som kräver precision utöver heltal
+
+## Bästa praxis
+
+1. Använd tydliga och kortfattade etiketter för att specificera förväntad inmatning och måttenhet.
+2. Implementera intervallbegränsningar för att förhindra orealistiska eller felaktiga inmatningar.
+3. Överväg att använda tipstext för att ge exempel eller förtydliga det förväntade formatet.
+4. Ange önskat antal decimaler i etiketten eller tipset om precision är viktigt.
+
+## Begränsningar och validering
+
+Du kan lägga till begränsningar för att säkerställa att det angivna värdet faller inom ett specifikt intervall:
+
+| type    | name   | label                          | constraint        | constraint_message                     |
+|---------|--------|--------------------------------|-------------------|----------------------------------------|
+| decimal | height | Ange din längd i meter         | .>0 and .<=3      | Längden måste vara mellan 0 och 3 meter |
+
+## Exempelanvändning
+
+Här är ett exempel på hur du kan använda decimalfrågor i en hälsoenkät:
+
+| type    | name           | label                                      | constraint      | constraint_message                          |
+|---------|----------------|--------------------------------------------|-----------------|--------------------------------------------|
+| decimal | weight         | Ange din vikt i kg                         | .>0 and .<=500  | Vikten måste vara mellan 0 och 500 kg      |
+| decimal | height         | Ange din längd i meter                     | .>0 and .<=3    | Längden måste vara mellan 0 och 3 meter    |
+| decimal | body_temp      | Ange din kroppstemperatur i Celsius        | .>=35 and .<=42 | Temperaturen måste vara mellan 35°C och 42°C |
+| calculate | bmi          |                                            |                 |                                            |
+
+I beräkningsraden för BMI kan du använda:
+
+```
+calculation | ${weight} / (${height} * ${height})
+```
+
+Detta beräknar BMI med hjälp av angiven vikt och längd.
+
+## Begränsningar
+
+- Precisionen för decimaltal kan begränsas av det underliggande systemet eller databasen.
+- Användare kan behöva vägledning om den förväntade decimalseparatorn (punkt eller komma) beroende på deras lokala inställningar.
+- Stora decimaltal kan vara svåra att läsa eller ange korrekt på mobila enheter.

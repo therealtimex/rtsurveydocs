@@ -1,0 +1,101 @@
+---
+description: 使用带有基于表单配置界面的 StackScript 在 Linode 上部署 rtCloud。
+icon: dns
+title: Linode（Akamai Cloud）
+---
+
+
+Linode 使用 **StackScript**——带有基于表单界面的脚本，您可以直接在 Linode Manager 中填写配置字段，无需编辑任何代码。
+
+> Linode StackScript 是最简单的部署方法。创建 Linode 时字段以表单形式显示——无需编辑脚本。
+
+---
+
+## 内嵌 Keycloak（推荐）
+
+### 第一步 — 查找 StackScript
+
+该 StackScript 在 Linode 社区中公开提供——无需手动设置：
+
+1. 转到 **Linodes** → **创建 Linode**
+2. 在**选择发行版**下，选择 **StackScripts** → **社区 StackScripts**
+3. 搜索 **`RTA rtSurvey - Self-Hosted with Keycloak SSO`**
+4. 选择它并填写配置表单：
+
+> 或者，[下载脚本](/scripts/linode-stackscript-keycloak-embed.sh)并在 **StackScripts** → **创建 StackScript** 下创建您自己的 StackScript。
+
+| 字段 | 必填 | 描述 |
+|-------|----------|-------------|
+| 项目 ID | 否 | 唯一标识符（默认：`rtsurvey`）。用作数据库名称和 Keycloak 客户端 ID。 |
+| Keycloak 管理员密码 | 否 | Keycloak 管理控制台和应用管理员登录的密码。默认为 `admin`——**首次登录后更改**。 |
+| 域名 | 是 | 您的域名。DNS A 记录必须指向此 Linode 的 IP。HTTPS 和 Keycloak 需要此项。 |
+| Let's Encrypt 邮箱 | 是 | Let's Encrypt 证书通知的邮箱。 |
+| Docker 镜像标签 | 否 | 要部署的镜像（默认：`rtawebteam/rta-smartsurvey:survey-dockerize`）。 |
+
+> **安全提示：** 所有密码默认为 `admin`。首次登录后立即更改它们。
+
+5. 选择 **Ubuntu 22.04 LTS** 作为镜像
+6. 选择 **Shared CPU 4 GB** 方案或更大
+7. 点击**创建 Linode**
+
+### 第二步 — 添加 DNS 记录
+
+Linode 启动时，在您的 DNS 提供商中添加 **A 记录**：
+
+```
+类型  : A
+名称  : myapp          （或根域名的 @）
+值    : <linode-ip>
+TTL   : 300
+```
+
+### 第三步 — 监控进度
+
+```bash
+ssh root@<linode-ip>
+tail -f /var/log/stackscript.log
+```
+
+脚本在开始时会打印您的服务器 IP——看到后立即添加 DNS 记录。
+
+### 第四步 — 访问应用
+
+设置完成时，日志会显示摘要：
+
+```
+============================================================
+ rtCloud deployment complete! (Embedded Keycloak)
+============================================================
+ App URL   : https://myapp.example.com
+ Admin     : admin / admin
+ Keycloak  : https://myapp.example.com/auth/admin
+
+ !! SECURITY: All passwords default to 'admin'.
+    Change them immediately after first login.
+============================================================
+```
+
+使用用户名 `admin` 和密码 `admin` 登录，然后立即更改密码。
+
+---
+
+## 部署后操作
+
+### 更改密码
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### 查看所有容器
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
+
+### 查看日志
+
+```bash
+tail -200 /var/log/stackscript.log
+```

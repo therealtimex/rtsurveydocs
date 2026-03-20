@@ -1,0 +1,74 @@
+---
+description: Pitanja tipa datetime dozvoljavaju ispitanicima da unesu i datum i vreme
+  u jednom polju.
+icon: event
+title: Datetime, date, time
+---
+
+
+Tip pitanja datetime u XLSForm-ovima i rtSurvey-u omogućava ispitanicima da unesu i datum i vreme u jednom polju. Ovaj tip pitanja je koristan kada trebate da zabeležite određeni trenutak u vremenu, uključujući i datum i tačno vreme.
+
+## Osnovna XLSForm specifikacija
+
+| type     | name           | label                           |
+|----------|----------------|--------------------------------|
+| datetime | event_datetime | Kada se desio događaj?          |
+
+Za više detalja o osnovnom tipu pitanja datetime, pogledajte [XLSForm specifikaciju](https://xlsform.org/en/#question-types).
+
+## Upotrebe
+
+Pitanja tipa datetime se uobičajeno koriste za:
+
+1. Beleženje vremenskih oznaka događaja ili posmatranja
+2. Zakazivanje termina ili sastanaka
+3. Beleženje vremena početka i završetka aktivnosti
+4. Hvatanje preciznih trenutaka za prikupljanje vremenski osetljivih podataka
+
+## rtSurvey proširenja
+
+rtSurvey proširuje funkcionalnost pitanja tipa datetime raznim izgledom i opcijama prilagođavanja:
+
+### Opcije izgleda
+
+- `(podrazumevano)`: Prikazuje kalendar i sat za odabir datuma i vremena
+- `inline`: Prikazuje kalendar i sat kao ikone
+- `inline-1line`: Prikazuje kalendar i sat za odabir u formatu jednog reda
+- `inline-onlyresult`: Prikazuje kalendar i sat kao ikone na kraju reda; ikone nestaju nakon odabira
+
+### Prilagođavanje boja
+
+Možete prilagoditi boju ikona kalendara i sata koristeći funkciju `colors()`:
+
+- `inline colors("0099FF")`: Prikazuje ikone sa prilagođenom bojom
+- `inline-1line-0000FF`: Prikazuje u formatu jednog reda sa prilagođenom bojom
+- `inline-1line colors("0000FF","FFFF00")`: Prikazuje u formatu jednog reda sa više prilagođenih boja
+- `inline-onlyresult colors("0099FF")`: Prikazuje ikone koje nestaju nakon odabira, sa prilagođenom bojom
+
+### Prilagođeni formati datuma i vremena
+
+rtSurvey dozvoljava prilagođene formate datuma i vremena koristeći posebnu sintaksu:
+
+- `inline-[%Y-%m-%d %H:%M:%S]`: Primer prilagođenog formata (Godina-Mesec-Dan Čas:Minut:Sekunda)
+- `inline-[%d/%m/%Y %I:%M %p]`: Primer prilagođenog formata (Dan/Mesec/Godina Čas:Minut AM/PM)
+
+## Primer upotrebe
+
+Evo primera kako biste mogli koristiti pitanje tipa datetime u anketi:
+
+| type     | name           | label                                      | appearance                    |
+|----------|----------------|--------------------------------------------|-----------------------------|
+| datetime | incident_time  | Kada se desio incident?                    | inline-[%d/%m/%Y %I:%M %p]  |
+
+## Najbolje prakse
+
+1. Pružite jasna uputstva o očekivanom formatu datuma i vremena.
+2. Razmotrite korišćenje izgleda `inline` za kompaktniji prikaz.
+3. Koristite prilagođene formate kada trebate specifične komponente ili formatiranje datuma i vremena.
+4. Budite svesni vremenskih zona kada prikupljate datetime podatke u različitim regionima.
+
+## Ograničenja
+
+- Neki izgledi ili prilagođeni formati možda nisu podržani na svim uređajima ili platformama.
+- Korisnici možda trebaju uputstvo za ispravno unošenje datuma i vremena, posebno sa prilagođenim formatima.
+- Razlike u vremenskim zonama mogu komplikovati analizu podataka ako nisu pravilno uzete u obzir.

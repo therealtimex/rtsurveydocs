@@ -1,0 +1,143 @@
+---
+description: ''
+icon: code
+title: Media
+---
+
+
+rtSurvey supporta l'integrazione ricca di media nei sondaggi, permettendoti di arricchire i tuoi questionari con immagini, audio e video. Questa funzionalità può migliorare significativamente l'esperienza del rispondente e la qualità dei dati raccolti.
+
+## Tipi di media supportati
+
+rtSurvey supporta i seguenti tipi di media:
+- Immagini (jpg, png, gif)
+- Audio (mp3, wav)
+- Video (mp4, webm)
+
+## Aggiungere media al tuo sondaggio
+
+Per includere media nel tuo modulo rtSurvey, usa le seguenti colonne nel tuo XLSForm:
+
+- `image`: Per la visualizzazione delle immagini
+- `audio`: Per la riproduzione dei file audio
+- `video`: Per la riproduzione dei file video
+
+Esempio:
+
+```
+| type | name          | label         | image        | audio       | video       |
+|------|---------------|---------------|--------------|-------------|-------------|
+| note | media_example | Esempio media | example.jpg  | sound.mp3   | clip.mp4    |
+```
+
+## Gestione dei file media
+
+### Sondaggi web
+Per i sondaggi basati su web, rtSurvey fornisce un'interfaccia di gestione media dove puoi caricare e organizzare i tuoi file media. Questi file sono poi automaticamente disponibili per l'uso nei tuoi sondaggi.
+
+### App mobile
+Quando si usa l'app mobile di rtSurvey:
+1. Posiziona i tuoi file media nella cartella `/rtSurvey/forms/[form-name]-media/` sul tuo dispositivo.
+2. Fai riferimento al nome del file esatto nel tuo XLSForm.
+
+## Funzionalità specifiche di rtSurvey
+
+### Caricamento dinamico dei media
+rtSurvey supporta il caricamento dinamico dei media basato sulle risposte al sondaggio:
+
+```
+| type         | name      | label              | image                    |
+|--------------|-----------|--------------------|--------------------------| 
+| select_one species | animal | Seleziona un animale | ${animal}.jpg          |
+```
+
+### Media nelle opzioni di scelta
+rtSurvey consente di usare media nelle opzioni di scelta per le domande di selezione:
+
+```
+| type                | name    | label           | media::image |
+|---------------------|---------|-----------------|--------------|
+| select_one_from_file animals | Scegli un animale |        |
+```
+
+Nel foglio choices:
+```
+| list_name | name  | label | media::image |
+|-----------|-------|-------|--------------|
+| animals   | dog   | Cane  | dog.jpg      |
+| animals   | cat   | Gatto | cat.jpg      |
+```
+
+### Acquisizione media
+rtSurvey estende XLSForm con capacità di acquisizione media:
+
+```
+| type  | name        | label                    |
+|-------|-------------|--------------------------|
+| image | photo       | Scatta una foto          |
+| audio | voice_note  | Registra una nota vocale |
+| video | video_clip  | Registra un video        |
+```
+
+## Best practice per l'uso dei media
+
+1. **Ottimizza le dimensioni dei file**: I file media di grandi dimensioni possono rallentare il caricamento e l'invio del sondaggio.
+2. **Usa formati appropriati**: Attieniti ai formati ampiamente supportati (jpg per le immagini, mp3 per l'audio, mp4 per il video).
+3. **Fornisci alternative**: Includi sempre alternative testuali per l'accessibilità.
+4. **Testa approfonditamente**: Assicurati che i media vengano visualizzati correttamente su tutti i dispositivi di destinazione.
+5. **Considera l'uso offline**: Per i sondaggi che potrebbero essere condotti offline, assicurati che tutti i media siano disponibili localmente.
+
+## Supporto media multilingua
+
+rtSurvey supporta media specifici della lingua. Usa il suffisso `::language`:
+
+```
+| type | name  | label    | image::Italian | image::English |
+|------|-------|----------|----------------|----------------|
+| note | intro | Benvenuto| welcome_it.jpg | welcome_en.jpg |
+```
+
+## Media nell'esportazione dei dati
+
+Quando si esportano dati da rtSurvey:
+- Per i sondaggi web, gli URL dei media sono inclusi nell'esportazione.
+- Per i sondaggi con l'app mobile, sono inclusi i percorsi dei file.
+
+## Considerazioni sull'app mobile
+
+- Assicurati che ci sia sufficiente spazio di archiviazione sui dispositivi per i sondaggi ricchi di media.
+- L'app mobile di rtSurvey supporta la riproduzione e l'acquisizione di media offline.
+- I file media di grandi dimensioni possono influire sulle prestazioni dell'app su dispositivi di fascia bassa.
+
+## Limitazioni note
+
+- Alcuni browser più vecchi potrebbero non supportare tutti i formati media.
+- I file video molto grandi possono causare problemi in situazioni con larghezza di banda limitata.
+
+## Risoluzione dei problemi con i media
+
+1. **Media non visualizzato**: Controlla i percorsi e i nomi dei file per verificarne l'accuratezza.
+2. **Problemi di riproduzione**: Assicurati che il formato media sia supportato dai dispositivi di destinazione.
+3. **Caricamento lento**: Considera l'ottimizzazione delle dimensioni dei file o il pre-caricamento dei media.
+
+## Funzionalità media avanzate
+
+### Geotagging
+rtSurvey può automaticamente aggiungere tag geografici ai media acquisiti durante i sondaggi:
+
+```
+| type  | name        | label              | appearance |
+|-------|-------------|--------------------|---------| 
+| image | photo       | Scatta una foto    | geotag   |
+```
+
+### Annotazioni media
+Consenti ai rispondenti di annotare le immagini:
+
+```
+| type  | name        | label                 | appearance |
+|-------|-------------|----------------------|------------|
+| image | photo       | Annota l'immagine    | annotate   |
+```
+
+Usando efficacemente i media nei tuoi moduli rtSurvey, puoi creare sondaggi più coinvolgenti, informativi e accurati. Ricorda di bilanciare i vantaggi dell'inclusione dei media con le considerazioni sulle prestazioni, specialmente per i sondaggi distribuiti in aree con connettività Internet limitata o su dispositivi di fascia bassa.

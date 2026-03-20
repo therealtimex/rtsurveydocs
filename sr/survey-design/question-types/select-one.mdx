@@ -1,0 +1,146 @@
+---
+description: Pitanja tipa select_one dozvoljavaju ispitanicima da izaberu tačno jednu
+  opciju sa unapred definisane liste izbora.
+icon: radio_button_checked
+title: Select_one
+---
+
+
+Tip pitanja `select_one` traži od ispitanika da izabere **tačno jednu opciju** sa unapred definisane liste. Podrazumevano, opcije se prikazuju kao radio dugmići, ali je dostupan širok spektar opcija izgleda za promenu rasporeda i ponašanja.
+
+## Osnovna XLSForm specifikacija
+
+**Radni list survey:**
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | consent | Da li je ispitanik dao saglasnost? |
+
+**Radni list choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| yesno | yes | Da |
+| yesno | no | Ne |
+
+`listname` u `select_one listname` mora odgovarati koloni `list_name` u radnom listu choices.
+
+Za više detalja pogledajte [XLSForm specifikaciju](https://xlsform.org/en/#question-types).
+
+## Upotrebe
+
+Pitanja tipa select_one se koriste za:
+
+1. Pitanja sa odgovorom Da/Ne
+2. Višestruki izbor sa jednim odgovorom (npr. nivo obrazovanja, pol, bračni status)
+3. Kategoričke ocene (npr. loše / fer / dobro / odlično)
+4. Kaskadni (povezani) izbori gde se opcije filtriraju na osnovu prethodnog odgovora
+5. Izbor države, regiona, okruga ili druge administrativne jedinice
+
+## Opcije izgleda
+
+Navedite vrednost u koloni `appearance` za promenu načina prikazivanja opcija:
+
+| Izgled | Opis |
+|--------|------|
+| *(ništa)* | Podrazumevani radio dugmići, jedan po redu |
+| `minimal` | Jedan padajući meni/spinner umesto radio dugmića |
+| `quick` | Automatski prelazi na sledeće pitanje odmah nakon izbora (samo mobilni) |
+| `compact` | Kompaktna mreža opcija — broj kolona se prilagođava širini ekrana |
+| `compact-N` | Kompaktna mreža primorana na N kolona (npr. `compact-3`) |
+| `quickcompact` | Kombinuje `quick` i `compact` |
+| `quickcompact-N` | Kombinuje `quick` i `compact` sa N primoranih kolona |
+| `horizontal` | Opcije raspoređene u horizontalni red (veb) |
+| `horizontal-compact` | Horizontalni, kompaktni razmaci (veb) |
+| `likert` | Red Likertove skale — oznake iznad, radio dugmići ispod |
+| `label` | Prikazuje samo oznake opcija bez unosa (koristiti uparen sa `list-nolabel`) |
+| `list-nolabel` | Prikazuje samo unose bez oznaka (koristiti uparen sa `label`) |
+| `columns(N)` | Prikazati u N kolona (rtSurvey proširenje, npr. `columns(3)`) |
+| `distress` | Widget sa emocionalnim ikonama Kesslerove skale psihološkog distresa (K10) |
+| `search-api(...)` | Dinamička pretraga — učitava opcije iz API-ja u vreme izvođenja |
+
+### Primer: Likertova skala
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one satisfaction | service_rating | Koliko ste zadovoljni uslugom? | likert |
+
+### Primer: Kompaktne 3 kolone
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one regions | region | Izaberite region | compact-3 |
+
+## Kaskadni izbori
+
+Kaskadni (povezani) izbor filtrira opcije na osnovu vrednosti izabrane u prethodnom pitanju. Koristite kolonu `choice_filter` sa imenom kolone iz radnog lista choices.
+
+**survey:**
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one province | province | Izaberite provinciju | |
+| select_one district | district | Izaberite okrug | province_name = ${province} |
+
+**choices:**
+
+| list_name | name | label | province_name |
+|-----------|------|-------|---------------|
+| province | nairobi | Nairobi | |
+| province | mombasa | Mombasa | |
+| district | westlands | Westlands | nairobi |
+| district | kasarani | Kasarani | nairobi |
+| district | nyali | Nyali | mombasa |
+| district | likoni | Likoni | mombasa |
+
+Kada ispitanik izabere `nairobi`, u listi okruga se pojavljuju samo `Westlands` i `Kasarani`.
+
+<Warning>
+Naziv kolone korišćen u `choice_filter` (npr. `province_name`) mora postojati u radnom listu choices. `${province}` referencira polje ankete nazvano `province`.
+</Warning>
+
+## Korišćenje izabrane vrednosti u izrazima
+
+Referencirajte izabranu **vrednost** (ne oznaku) sa `${ime_polja}`:
+
+```
+relevant: ${consent} = 'yes'
+```
+
+Za dobijanje oznake opcije umesto vrednosti, koristite `choice-label()`:
+
+```
+calculate: choice-label(${education_level}, ${education_level})
+```
+
+## Opcija "Drugo" sa slobodnim tekstom
+
+Uobičajeni obrazac je uključivanje opcije "drugo" koja otkriva tekstualno polje:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one occupation | job | Koje je vaše zanimanje? | |
+| text | job_other | Molimo navedite | `${job} = 'other'` |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| occupation | farmer | Farmer |
+| occupation | trader | Trader |
+| occupation | student | Student |
+| occupation | other | Drugo (molimo navedite) |
+
+## Najbolje prakse
+
+1. Zadržite liste kratke i međusobno isključive — ako ispitanici mogu hteti više od jednog, umesto toga koristite `select_multiple`.
+2. Stavite najčešći odgovor prvi, ili poredajte abecednim redom za dugačke liste.
+3. Uvek uključite opciju "Ne znam" ili "Radije ne odgovorim" gde je relevantno.
+4. Koristite `minimal` (padajući meni) za liste sa više od 7–8 opcija na mobilnim uređajima radi uštede prostora na ekranu.
+5. Za kaskadne izbore, dodajte sve kolone filtera u radnom listu choices pre izgradnje formulara.
+
+## Ograničenja
+
+- Ispitanik može izabrati samo jednu opciju — koristite `select_multiple` za pitanja sa više odgovora.
+- Izgled `likert` funkcioniše best sa 5–7 opcija koje staju u jedan red.
+- `quick` automatski prelaz je samo za mobilne — nema efekta na veb formulare.

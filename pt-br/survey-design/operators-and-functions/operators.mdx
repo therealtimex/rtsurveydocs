@@ -1,0 +1,40 @@
+---
+description: ''
+icon: code
+title: Operadores
+---
+
+
+### Operadores de comparação
+
+Operador | Operação      | Exemplo              | Resposta de exemplo
+-------- | -------------- | -------------------- | --------------
+`=`        | Igual          | ${age} = 25     | true ou false
+`!=`       | Diferente      | ${age} != 25    | true ou false
+`>`        | Maior que      | ${age} > 25     | true ou false
+`>=`       | Maior ou igual | ${age} >= 25    | true ou false
+`<`        | Menor que      | ${age} < 25     | true ou false
+`<=`       | Menor ou igual | ${age} <= 25    | true ou false
+
+Nos exemplos acima, ${age} representa o valor do campo atual, e o operador é usado para compará-lo com o valor 25. A restrição será avaliada como verdadeira ou falsa, dependendo se a comparação é satisfeita ou não.
+
+### Operadores lógicos
+
+Os operadores lógicos são usados para combinar múltiplas expressões em restrições. Aqui estão alguns operadores lógicos comumente usados juntamente com suas operações e exemplos:
+
+Operador | Operação      | Exemplo                                           
+-------- | -------------- | --------------------------------------------------
+`or`       | Retorna verdadeiro se qualquer expressão for verdadeira | ${age} = 3 or ${age} = 4
+`and`      | Retorna verdadeiro apenas se ambas as expressões forem verdadeiras | ${age} > 3 and ${age} < 5
+`not()`    | Retorna verdadeiro se a expressão não for verdadeira | not(${age} > 3 and ${age} < 5)
+
+Nos exemplos acima, ${age} representa o valor do campo atual, e os operadores lógicos são usados para combinar expressões. A restrição será avaliada como verdadeira ou falsa com base nas condições especificadas.
+
+Exemplo 1:
+<Info>`${age} = 3 or ${age} = 4` retornará `true` se a idade for 3 ou 4.</Info>
+
+Exemplo 2:
+<Info>`${age} > 3 and ${age} < 5` retornará `true` se a idade estiver entre 3 e 5.</Info>
+
+Exemplo 3:
+<Info>`not(${age} > 3 and ${age} < 5)` retornará `true` se a idade não estiver entre 3 e 5.</Info>

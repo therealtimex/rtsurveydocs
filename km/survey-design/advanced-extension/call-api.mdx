@@ -1,0 +1,92 @@
+---
+description: Call API ឱ្យ survey ទៅ fetch data ពី external web service ហើយ ប្រើ response
+  ដើម្បី populate fields ឬ validate ចម្លើយ។
+icon: manage_search
+title: Call API
+---
+
+
+**Call API** feature ឱ្យ survey field ធ្វើ HTTP request ទៅ external service ហើយ ប្រើ response ដើម្បី populate calculated value ឬ validate user input ។
+
+functions ពីរ:
+
+- `callapi()` — fetch value ពី API ហើយ store ក្នុង `calculate` ឬ `text` field
+- `callapi-verify()` — call API ហើយ block progress ប្រ សិ ន បើ response ខ ុ ស
+
+---
+
+## `callapi()` — Fetch and store an API response
+
+### Syntax
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### Parameters
+
+| # | Parameter | ការពិពណ៌នា |
+|---|-----------|-------------|
+| 1 | `method` | HTTP method: `'GET'` ឬ `'POST'` |
+| 2 | `url` | API endpoint URL |
+| 3 | `allowed_auto` | `1` call ដោយ ស្វ័យប្រវត្តិ; `0` manual trigger |
+| 4 | `max_retry` | Maximum retry attempts |
+| 5 | `no_overwrite` | `1` keep existing value |
+| 6 | `extract_expr` | JSONPath expression (ឧ. `$.data.name`) |
+| 7 | `timeout` | Request timeout milliseconds |
+| 8 | `lifetime` | Cache duration milliseconds |
+| 9 | `response_q` | Field ដើម្បី store HTTP response code |
+
+### Example: GET request
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | Household ID | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+
+### Example: POST request
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+---
+
+## `callapi-verify()` — Validate a value against an API
+
+### Syntax
+
+```
+callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
+```
+
+### Parameters
+
+| # | Parameter | ការពិពណ៌នា |
+|---|-----------|-------------|
+| 1 | `method` | HTTP method |
+| 2 | `url` | Verification API endpoint |
+| 3 | `extract_expr` | JSONPath ។ |
+| 4 | `match_expr` | Expression comparing extracted value |
+| 5 | `timeout` | Request timeout |
+| 6 | `constraint_mode` | `'soft'` warning; `'hard'` block |
+
+### Example: Verify barcode
+
+| type | name | label | appearance | constraint |
+|------|------|-------|------------|------------|
+| barcode | asset_code | Scan the asset barcode | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` |
+
+---
+
+## Best Practices
+
+1. Set `timeout` ត្រឹម ត្រូ វ (5000–15000 ms) ។
+2. Set `allowed_auto=0` សម្រាប់ verifications ។
+3. ប្រើ `extract_expr` ជ ា ម ួ យ specific JSONPath ។
+4. Test API calls ក្នុង offline mode ។
+
+## Limitations
+
+- ត ្ រ ូ វ ក ា រ network connectivity ។
+- API responses ត ្ រ ូ វ ត ែ ជ ា JSON ។

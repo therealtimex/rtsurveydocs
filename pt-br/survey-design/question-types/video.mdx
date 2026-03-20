@@ -1,0 +1,96 @@
+---
+description: As perguntas de vídeo permitem que os respondentes gravem e enviem arquivos
+  de vídeo como parte da pesquisa.
+icon: videocam
+title: Vídeo
+---
+
+
+O tipo de pergunta `video` permite que os respondentes **gravem vídeo** ou façam upload de um arquivo de vídeo existente como parte de sua resposta à pesquisa. É útil para capturar evidências visuais, demonstrações, condições ambientais ou qualquer informação que se beneficie de movimento e áudio juntos.
+
+## Especificação básica do XLSForm
+
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Por favor, grave uma demonstração curta |
+
+Para mais detalhes sobre o tipo padrão de pergunta video, consulte a [especificação do XLSForm](https://xlsform.org/en/#question-types).
+
+## Usos
+
+As perguntas de vídeo são comumente usadas para:
+
+1. Documentar condições de campo — danos em estradas, estado de infraestrutura, saúde das culturas
+2. Gravar demonstrações de produtos ou verificações de conformidade de procedimentos
+3. Coletar depoimentos em vídeo dos respondentes
+4. Capturar evidências que requerem contexto espacial (por exemplo, o tamanho e extensão de uma área problemática)
+5. Documentação antes/depois para pesquisas de monitoramento e avaliação
+
+## Formato de dados
+
+Os arquivos de vídeo são armazenados como anexos binários:
+
+- **Formato:** MP4 ou MOV (gravação móvel)
+- **Nomenclatura:** `{instanceID}-{fieldname}.mp4` (ou equivalente)
+- **Armazenamento:** Enviados para a pasta de mídia do servidor e vinculados ao registro de envio
+- **Acesso:** Reproduzíveis e baixáveis a partir da interface de gerenciamento de envios
+
+## Extensões do rtSurvey
+
+### Duração máxima
+
+Use a coluna `parameters` para limitar a duração da gravação:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Grave as condições do local | `max-duration=60` |
+
+`max-duration` está em segundos. A gravação para automaticamente no limite.
+
+### Qualidade / resolução
+
+Controle a resolução de gravação via `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Grave evidência em vídeo | `quality=low` |
+
+Valores suportados: `low` (upload mais rápido), `normal` (padrão), `high`. Use `low` em áreas com conectividade limitada.
+
+### Upload de vídeo existente
+
+No celular, o respondente pode optar por **fazer upload de um vídeo existente** da galeria do dispositivo em vez de gravar um novo. Isso é habilitado por padrão na integração nativa de câmera/galeria.
+
+### Reprodução antes do envio
+
+No celular, o clipe gravado pode ser revisado antes de prosseguir. Nenhuma configuração adicional é necessária.
+
+## Exemplo de uso
+
+### Vídeo de inspeção de local com limite
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Grave o ponto de água | Caminhe ao redor de toda a instalação. Máx. 90 segundos. | `max-duration=90 quality=normal` |
+
+### Vídeo condicional — apenas se dano for relatado
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | Foi encontrado dano? | | |
+| video | damage_video | Grave vídeo do dano | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+
+## Práticas recomendadas
+
+1. Defina `max-duration` — gravações de vídeo sem restrição podem facilmente exceder 100 MB e falhar no upload em conexões fracas.
+2. Use `quality=low` para pesquisas de monitoramento onde evidências visuais são necessárias, mas detalhes finos não — isso reduz drasticamente o tamanho do arquivo.
+3. Escreva instruções de gravação específicas na coluna `hint` (por exemplo, "Caminhe ao redor de todo o edifício, segure a câmera firme").
+4. Considere se o vídeo é necessário — uma foto (`image`) geralmente é suficiente para evidências estáticas e produz arquivos muito menores.
+5. Teste o desempenho de upload na rede de campo real antes da implantação.
+
+## Limitações
+
+- Os arquivos de vídeo são muito grandes — um vídeo de 1 minuto em qualidade normal é tipicamente de 20 a 60 MB dependendo do dispositivo.
+- Fazer upload de arquivos de vídeo grandes requer uma boa conexão de rede; considere exigir sincronização via Wi-Fi para formulários com muitos vídeos.
+- Nem todos os navegadores web suportam gravação de vídeo via MediaRecorder — o Chrome é o mais confiável.
+- A análise de respostas de vídeo é manual e demorada; use com moderação e apenas quando o conteúdo de vídeo adicionar valor único.

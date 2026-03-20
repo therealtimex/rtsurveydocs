@@ -1,0 +1,85 @@
+---
+description: Въпросите от тип rank позволяват на респондентите да наредят набор от
+  опции по предпочитание или приоритет.
+icon: list-ol
+title: Класиране
+---
+
+
+The `rank` question type presents a list of choices that the respondent must **drag into order** (or otherwise rank from first to last). It stores the result as a space-separated list of choice values in the order selected, with the highest-priority choice first.
+
+## Basic XLSForm Specification
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Rank these community needs from most to least important |
+
+The choices are defined in the **choices worksheet** just like `select_one`:
+
+**survey:**
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Rank these needs from most to least important |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| priorities | water | Clean water |
+| priorities | health | Healthcare |
+| priorities | education | Education |
+| priorities | roads | Roads |
+| priorities | electricity | Electricity |
+
+## Stored value format
+
+The stored value is a **space-separated list** of choice values in ranked order (first = highest priority):
+
+```
+water education health roads electricity
+```
+
+## Extracting ranked positions
+
+Use `selected-at()` to get the choice at a specific rank:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| rank priorities | main_priority | Rank community needs | |
+| calculate | top_priority | | selected-at(${main_priority}, 0) |
+| calculate | second_priority | | selected-at(${main_priority}, 1) |
+
+`selected-at(${main_priority}, 0)` returns the value placed **first** (index 0 = top rank).
+
+## Using `rank-index()` with repeat groups
+
+When `rank` is used inside a repeat group, `rank-index()` lets you reference the ordinal rank from outside the repeat:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_ranked | | rank-index(1, ${score}) |
+
+See [Functions — Repeated field functions](../operators-and-functions/functions#repeated-field-functions) for full details on `rank-index()` and `rank-index-if()`.
+
+## Uses
+
+Rank questions are commonly used for:
+
+1. **Priority ranking** — asking communities to rank development needs
+2. **Preference ordering** — ranking product features, service attributes, or policy options
+3. **Exam item ordering** — arranging steps in a process
+4. **Top-N selection** — combined with `selected-at()` to extract only the top 1, 2, or 3 choices
+
+## Best Practices
+
+1. Keep the list short (3–7 items) — ranking becomes cognitively taxing beyond 7–8 choices.
+2. Use clear, mutually exclusive choice labels to avoid confusion about what "first" means.
+3. Add hint text explaining the ranking direction (e.g., "Drag to order: first = most important").
+4. Validate using `count-selected(.) = x` if you need to ensure all choices are ranked.
+
+## Limitations
+
+- The drag-to-rank widget requires a touch screen or mouse — it may not work well in keyboard-only environments.
+- On some older mobile clients, the rank widget may fall back to a numbered input interface.
+- You cannot partially rank (i.e., rank only some choices) — all choices must be ordered.

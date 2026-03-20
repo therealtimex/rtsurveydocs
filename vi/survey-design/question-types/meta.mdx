@@ -1,0 +1,187 @@
+---
+description: Các loại câu hỏi meta tự động ghi lại thông tin thiết bị, người điều
+  tra và thời gian mà không cần người trả lời nhập liệu.
+icon: info
+title: Meta
+---
+
+
+Các loại câu hỏi meta là các trường đặc biệt được điền **tự động** — người trả lời không bao giờ thấy chúng. Chúng ghi lại ngữ cảnh về bản ghi gửi: thời gian thu thập, thiết bị nào được sử dụng và ai thu thập. Thêm chúng vào bảng tính `survey` như bất kỳ loại câu hỏi nào khác; chúng đơn giản là không xuất hiện trên màn hình.
+
+## Cấu hình XLSForm cơ bản
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| deviceid | deviceid | |
+
+Nhãn là tùy chọn cho các trường meta vì chúng không bao giờ được hiển thị.
+
+---
+
+## Trường meta thời gian
+
+### `start`
+
+Ghi lại **ngày và giờ khi biểu mẫu được mở**. Được lưu ở định dạng ISO 8601 (`YYYY-MM-DDTHH:MM:SS.sss+HH:MM`).
+
+```
+type    | name  | label
+start   | start |
+```
+
+### `end`
+
+Ghi lại **ngày và giờ khi biểu mẫu được gửi**. Kết hợp với `start`, bạn có thể tính toán thời gian điền biểu mẫu:
+
+```
+type      | name          | calculation
+calculate | duration_min  | (decimal-date-time(${end}) - decimal-date-time(${start})) * 1440
+```
+
+### `today`
+
+Ghi lại **ngày hiện tại** (không có thành phần thời gian). Được lưu dưới dạng `YYYY-MM-DD`. Hữu ích khi bạn chỉ cần ngày mà không cần dấu thời gian đầy đủ.
+
+```
+type  | name  | label
+today | today |
+```
+
+---
+
+## Trường meta thiết bị
+
+### `deviceid`
+
+Ghi lại **mã định danh duy nhất của thiết bị** được dùng để thu thập dữ liệu. Trên Android đây thường là IMEI hoặc Android ID. Hữu ích để theo dõi thiết bị nào gửi mỗi biểu mẫu và phát hiện bản gửi trùng lặp từ cùng một thiết bị.
+
+```
+type      | name     | label
+deviceid  | deviceid |
+```
+
+### `devicephonenum`
+
+Ghi lại **số điện thoại của SIM** trong thiết bị (nếu có). Có thể trống nếu thiết bị không có SIM hoặc số không được lưu trên SIM.
+
+```
+type           | name          | label
+devicephonenum | devicephonenum |
+```
+
+### `simserial`
+
+Ghi lại **số serial của SIM** (ICCID). Hữu ích để xác định SIM/nhà mạng nào được sử dụng.
+
+```
+type      | name      | label
+simserial | simserial |
+```
+
+### `subscriberid`
+
+Ghi lại **IMSI (International Mobile Subscriber Identity)** — mã định danh thuê bao duy nhất trên SIM.
+
+```
+type         | name        | label
+subscriberid | subscriberid |
+```
+
+---
+
+## Trường meta người điều tra
+
+### `username`
+
+Ghi lại **tên đăng nhập của người điều tra** (tài khoản dùng trong ứng dụng rtSurvey). Đây là cách đáng tin cậy nhất để theo dõi ai thu thập mỗi bản ghi gửi.
+
+```
+type     | name     | label
+username | username |
+```
+
+### `email`
+
+Ghi lại **địa chỉ email của người điều tra** đang đăng nhập.
+
+```
+type  | name  | label
+email | email |
+```
+
+### `phonenumber`
+
+Ghi lại **số điện thoại liên kết với tài khoản người điều tra** (nếu được cấu hình).
+
+```
+type        | name       | label
+phonenumber | phonenumber |
+```
+
+---
+
+## Nhật ký kiểm tra (Audit)
+
+### `audit`
+
+Trường meta `audit` bật **nhật ký kiểm tra chi tiết** — nó ghi lại nhật ký có dấu thời gian về mọi câu hỏi mà người điều tra đã truy cập, thời gian họ dành cho mỗi câu, và (tùy chọn) vị trí GPS của họ ở mỗi bước. Nhật ký kiểm tra được lưu dưới dạng tệp `audit.csv` riêng biệt cùng với mỗi bản ghi gửi.
+
+```
+type  | name  | parameters
+audit | audit | location-priority=balanced location-min-interval=30 location-max-age=60
+```
+
+#### Tham số Audit
+
+| Tham số | Mô tả |
+|---------|-------|
+| `location-priority` | Mức độ chính xác GPS: `no-gps`, `low-power`, `balanced`, `high-accuracy` |
+| `location-min-interval` | Số giây tối thiểu giữa các lần ghi vị trí |
+| `location-max-age` | Tuổi tối đa (giây) của vị trí được lưu trong cache để chấp nhận |
+
+Nhật ký audit ghi lại:
+- Tên câu hỏi và loại sự kiện (`question`, `form.start`, `form.exit`, `form.save`, `form.finalize`)
+- Dấu thời gian bắt đầu và kết thúc cho mỗi sự kiện
+- Tọa độ GPS (nếu `location-priority` được đặt)
+
+<Warning>
+Trường `audit` tạo ra một tệp riêng cho mỗi bản ghi gửi. Đảm bảo pipeline dữ liệu của bạn xử lý cả dữ liệu biểu mẫu chính và tệp CSV audit.
+</Warning>
+
+---
+
+## Ví dụ đầy đủ
+
+Một khảo sát hộ gia đình điển hình có thể bao gồm tất cả các trường meta về thời gian và người điều tra:
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| today | today | |
+| deviceid | deviceid | |
+| username | username | |
+| email | email | |
+| audit | audit | |
+| text | household_id | ID hộ gia đình |
+| ... | ... | ... |
+
+---
+
+## Thực hành tốt
+
+1. Luôn bao gồm `start` và `end` — chúng miễn phí, tự động và vô giá cho giám sát chất lượng.
+2. Luôn bao gồm `username` để theo dõi người điều tra.
+3. Bao gồm `deviceid` khi bạn muốn phát hiện bản ghi gửi trùng lặp hoặc theo dõi thiết bị thực địa.
+4. Dùng `audit` trong các khảo sát đòi hỏi trách nhiệm cao, nơi bạn cần xác minh rằng người điều tra thực sự đã truy cập mỗi câu hỏi.
+5. Các trường liên quan đến SIM (`simserial`, `subscriberid`, `devicephonenum`) chỉ đáng tin cậy trên thiết bị Android có SIM đang hoạt động — bỏ qua chúng cho các triển khai chỉ dùng máy tính bảng.
+
+---
+
+## Giới hạn
+
+- Tất cả các trường meta đều **chỉ đọc** — chúng không thể được tham chiếu hoặc sửa đổi bởi các phép tính khác.
+- `username` và `email` yêu cầu người điều tra đăng nhập; chúng sẽ trống cho các bản gửi ẩn danh.
+- Các trường meta SIM/điện thoại có thể trả về giá trị trống trên máy tính bảng chỉ dùng Wi-Fi và một số phiên bản Android do hạn chế quyền.

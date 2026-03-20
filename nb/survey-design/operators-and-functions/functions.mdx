@@ -1,0 +1,308 @@
+---
+description: ''
+icon: code
+title: Funksjoner
+---
+
+
+### Strengfunksjoner
+
+<Warning>
+Når du arbeider med strenger i uttrykk, er det viktig å bruke enkle anførselstegn ('') for å omslutte bokstavelige strenger. Et unntak oppstår imidlertid når du ønsker å inkludere enkle anførselstegn i en bokstavelig streng. I slike tilfeller kan du bruke doble anførselstegn ("") for å omslutte hele strengen.
+
+For eksempel:
+- Riktig: if(${yesno} = 1, "a string with 'single quotes' in it", "no single quotes here")
+- Feil: if(${yesno} = 1, 'a string with 'single quotes' in it', 'no single quotes here')
+
+Angående smarte anførselstegn er det avgjørende å være oppmerksom på deres tilstedeværelse, da de kan forårsake problemer i uttrykk. Mange tekstbehandlere konverterer automatisk rette anførselstegn ("" eller '') til smarte anførselstegn eller buede anførselstegn ("" eller ''), noe som kan resultere i syntaksfeil eller uventet adferd. For å unngå dette, sørg for at du bruker rette anførselstegn ('') konsekvent i uttrykkene dine.
+</Warning>
+
+rtSurvey støtter ulike funksjoner, inkludert:
+
+1. `string(field)`: Konverterer et felt til en streng.
+   - Eksempel: `string(34.8)` vil bli konvertert til `'34.8'`.
+
+2. `string-length(field)`: Returnerer lengden til et strengfelt.
+   - Eksempel: `string-length(.) > 3 and string-length(.) < 10` kan brukes for å sikre at gjeldende felt er mellom 3 og 10 tegn.
+
+3. `substr(fieldorstring, startindex, endindex)`: Returnerer en delstreng som starter ved `startindex` og slutter like før `endindex`. Indekser starter ved 0 for det første tegnet i strengen.
+   - Eksempel: `substr(${phone}, 0, 3)` vil returnere de tre første sifrene i et telefonnummer.
+
+4. `concat(a, b, c, ...)`: Slår sammen felt (og/eller strenger).
+   - Eksempel: `concat(${firstname}, ' ', ${lastname})` vil returnere et fullt navn ved å kombinere verdiene i feltene `firstname` og `lastname`.
+
+5. `linebreak()`: Returnerer et linjeskifttegn.
+   - Eksempel: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` vil returnere en liste over tre feltverdier med linjeskift mellom dem.
+
+6. `lower()`: Konverterer en streng til alle små bokstaver.
+   - Eksempel: `lower('Street Name')` vil returnere "street name".
+
+7. `upper()`: Konverterer en streng til alle store bokstaver.
+   - Eksempel: `upper('Street Name')` vil returnere "STREET NAME".
+
+### select_one- og select_multiple-funksjoner
+
+1. `count-selected(field)`: Returnerer antall elementer valgt i et select_multiple-felt.
+   - Eksempel: `count-selected(.) = 3` kan brukes som et begrensningsuttrykk for å sikre at nøyaktig tre valg er valgt.
+
+2. `selected(field, value)`: Returnerer sant eller usant avhengig av om den angitte verdien ble valgt i select_one- eller select_multiple-feltet.
+   - Eksempel: `selected(${color}, 'Blue')` kan brukes som et relevant-uttrykk for å vise en gruppe eller felt bare hvis respondenten valgte "Blue" som favorittkj.
+   - Merk: Den andre parameteren skal alltid angi valgets verdi, ikke valgets etikett.
+
+3. `selected-at(field, number)`: Returnerer det valgte elementet ved den angitte posisjonen i et select_multiple-felt. Når det sendte tallet er 0, returnerer det det første valgte elementet; når tallet er 1, returnerer det det andre valgte elementet, og så videre.
+   - Eksempel: `selected-at(${fruits}, 0) = 'Apple'` kan brukes som et relevant-uttrykk for å vise en gruppe eller felt bare hvis det første valgte alternativet er "Apple".
+
+4. `choice-label(field, value)`: Returnerer etiketten for et select_one- eller select_multiple-feltalternativ, som definert i choices-regnearket.
+   - Eksempel 1: `choice-label(${country}, ${country})` vil returnere valgetiketten for det valgte alternativet i feltet `country`.
+   - Eksempel 2: `choice-label(${languages}, selected-at(${languages}, 0))` vil returnere etiketten for det første valgte alternativet i feltet `languages`.
+
+### Repeterte feltfunksjoner
+
+I rtSurvey, hvis du ønsker å stille det samme spørsmålet (eller spørsmålene) flere ganger, kan du plassere et felt i en repeat-gruppe. Dette resulterer i flere instanser av det samme feltet. Følgende funksjoner kan hjelpe deg med å håndtere disse repeterte feltene og de repeterte dataene de produserer.
+
+1. `join(string, repeatedfield)`: For et felt innenfor en repeat-gruppe, genererer en strengseparert liste over verdier. Den første parameteren angir skilletegnet som skal brukes for å skille verdiene.
+   - Eksempel: `join(', ', ${member_name})` vil generere en enkelt kommaseparert liste fra alle angitte navn.
+
+2. `join-if(string, repeatedfield, expression)`: Fungerer nøyaktig som `join()`, bortsett fra at den sjekker hver instans i repeat-gruppen ved hjelp av det angitte uttrykket. Hvis uttrykket evalueres til usant, vil elementet utelates fra utdataene.
+   - Eksempel: `join-if(', ', ${member_name}, ${age} >= 18)` vil generere en kommaseparert liste over navn på bare voksne medlemmer (de med aldre 18 og over).
+
+3. `count(repeatgroup)`: Returnerer gjeldende antall ganger en repeat-gruppe har gjentatt.
+   - Eksempel: `count(${groupname})` vil returnere antall instanser av gruppen.
+
+4. `count-if(repeatgroup, expression)`: Fungerer nøyaktig som `count()`, bortsett fra at den sjekker hver instans i repeat-gruppen ved hjelp av det angitte uttrykket. Hvis uttrykket evalueres til usant, vil elementet utelates fra utdataene.
+   - Eksempel: `count-if(${members}, ${age} >= 18)` vil returnere antallet voksne medlemmer basert på aldersfeltet i "members" repeat-gruppen.
+
+5. `sum(repeatedfield)`: For et felt innenfor en repeat-gruppe, beregner summen av alle verdier.
+   - Eksempel: `sum(${loan_amount})` vil returnere den totale verdien av alle lån.
+
+6. `sum-if(repeatedfield, expression)`: Fungerer nøyaktig som `sum()`, bortsett fra at den sjekker hver instans i repeat-gruppen ved hjelp av det angitte uttrykket.
+   - Eksempel: `sum-if(${loan_amount}, ${loan_amount} > 500)` vil returnere den totale verdien av alle lån som er over 500.
+
+7. `min(repeatedfield)`: For et felt innenfor en repeat-gruppe, beregner minimumsverdien av alle verdier.
+   - Eksempel: `min(${member_age})` vil returnere alderen til det yngste medlemmet i gruppen.
+
+8. `min-if(repeatedfield, expression)`: Fungerer nøyaktig som `min()`, bortsett fra at den sjekker hver instans.
+   - Eksempel: `min-if(${member_age}, ${member_age} >= 18)` vil returnere alderen til den yngste voksne i gruppen.
+
+9. `max(repeatedfield)`: For et felt innenfor en repeat-gruppe, beregner maksimumsverdien av alle verdier.
+   - Eksempel: `max(${member_age})` vil returnere alderen til det eldste medlemmet i gruppen.
+
+10. `max-if(repeatedfield, expression)`: Fungerer nøyaktig som `max()`, bortsett fra at den sjekker hver instans.
+    - Eksempel: `max-if(${member_age}, ${member_age} >= 18)` vil returnere alderen til den eldste voksne i gruppen.
+
+11. `index()`: Kalt innenfor en repeat-gruppe, returnerer indeksnummeret for gjeldende gruppe eller instans.
+    - Eksempel: `index()` når brukt innenfor en repeat-gruppe vil returnere 1 for den første instansen, 2 for den andre, og så videre.
+
+12. `indexed-repeat(repeatedfield, repeatgroup, index)`: Refererer til et felt eller en gruppe som er innenfor en repeat-gruppe fra utenfor den repeat-gruppen.
+    - Eksempel 1: `indexed-repeat(${name}, ${names}, 1)` vil returnere det første navnet tilgjengelig når navnefeltet er innenfor en tidligere repeat-gruppe kalt "names".
+    - Eksempel 2: `indexed-repeat(${name}, ${names}, index())` vil hente navnet som tilsvarer instansnummeret til gjeldende repeat-gruppe.
+
+13. `rank-index(index, repeatedfield)`: Beregner den ordinale rangeringen til den angitte instansen av et repetert felt. Rangering 1 tildeles instansen med den høyeste verdien, rangering 2 til instansen med den nesthøyeste verdien, osv. Hvis du sender en ugyldig indeks, returneres en rangering på 999.
+    - Eksempel: `rank-index(1, ${random_draw})` beregner rangeringen til den første instansen basert på verdien av dens `random_draw`-felt sammenlignet med andre instansers verdier.
+
+14. `rank-index-if(index, repeatedfield, expression)`: Fungerer på samme måte som `rank-index()`, men sjekker hver instans ved hjelp av det angitte uttrykket.
+    - Eksempel: `rank-index-if(1, ${age}, ${age} >= 18)` beregner aldersrangeringen innenfor settet av voksne.
+
+### Tallfunksjoner
+
+| Operator | Operasjon | Eksempel | Eksempelsvar |
+|----------|-----------|---------|----------------|
+| `+` | Addisjon | 1 + 1 | 2 |
+| `-` | Subtraksjon | 3 - 2 | 1 |
+| `*` | Multiplikasjon | 3 * 2 | 6 |
+| `div` | Divisjon | 10 div 2 | 5 |
+| `mod` | Modulus | 9 mod 2 | 1 |
+
+rtSurvey støtter tallfunksjoner, inkludert:
+- `number(field)`: Konverterer verdien til feltet til et tall.
+  - Eksempel: `number('34.8')` = 34.8
+
+- `int(field)`: Konverterer verdien til feltet til et heltall.
+  - Eksempel: `int('39.2')` = 39
+
+- `min(field1, ..., fieldx)`: Returnerer minimumsverdien blant de sendte feltene.
+  - Eksempel: `min(${father_age}, ${mother_age})` vil returnere alderen til enten moren eller faren, den som er minst.
+
+- `max(field1, ..., fieldx)`: Returnerer maksimumsverdien blant de sendte feltene.
+  - Eksempel: `max(${father_age}, ${mother_age})` vil returnere alderen til enten moren eller faren, den som er størst.
+
+- `format-number(field)`: Formaterer verdien av et heltall eller desimalfelt i henhold til brukerens lokale innstillinger.
+  - Eksempel: `format-number(${income})` kan formatere "120000" som "120 000".
+
+- `round(field, digits)`: Avrunder den numeriske feltverdien til det angitte antallet sifre etter desimalpunktet.
+  - Eksempel: `round(${interest_rate}, 2)`
+
+- `abs(number)`: Returnerer absoluttverdien av et tall.
+
+- `pow(base, exponent)`: Returnerer verdien av den første parameteren opphøyd i potensen av den andre parameteren.
+
+- `log10(fieldorvalue)`: Returnerer base-ti-logaritmen til det sendte feltet eller verdien.
+
+- `sin(fieldorvalue)`: Returnerer sinusen til det sendte feltet eller verdien, uttrykt i radianer.
+
+- `cos(fieldorvalue)`: Returnerer cosinusen til det sendte feltet eller verdien, uttrykt i radianer.
+
+- `tan(fieldorvalue)`: Returnerer tangensen til det sendte feltet eller verdien, uttrykt i radianer.
+
+- `asin(fieldorvalue)`: Returnerer arcsinusen til det sendte feltet eller verdien, uttrykt i radianer.
+
+- `acos(fieldorvalue)`: Returnerer arccosenusen til det sendte feltet eller verdien, uttrykt i radianer.
+
+- `atan(fieldorvalue)`: Returnerer arctangensen til det sendte feltet eller verdien, uttrykt i radianer.
+
+- `atan2(x, y)`: Returnerer vinkelen i radianer mellom punktet med koordinater (x, y) og den positive x-aksen.
+
+- `sqrt(fieldorvalue)`: Returnerer den ikke-negative kvadratroten til det sendte feltet eller verdien.
+
+- `exp(x)`: Returnerer verdien av e^x.
+
+- `pi()`: Returnerer verdien av pi.
+
+### Dato og klokkeslettfunksjoner
+
+<Warning>
+Datoverdier i rtSurvey lagres som strenger i `YYYY-MM-DD`-format. Dato/klokkeslett-verdier lagres som ISO 8601-strenger (`YYYY-MM-DDTHH:MM:SS`). Bruk `decimal-date-time()` for å konvertere til et tall for aritmetikk (f.eks. beregning av varigheter).
+</Warning>
+
+1. `today()`: Returnerer dagens dato som en streng i `YYYY-MM-DD`-format. Evalueres én gang når skjemaet åpnes.
+   - Eksempel: `today()` → `'2024-03-15'`
+   - Vanlig bruk: `default`-kolonnen for å forhåndsutfylle dagens dato, eller i `relevant`/`constraint` for å sammenligne med et datofelt.
+
+2. `now()`: Returnerer gjeldende dato og klokkeslett som en ISO 8601-streng. Evalueres hver gang uttrykket beregnes.
+   - Eksempel: `now()` → `'2024-03-15T14:32:00.000+03:00'`
+   - Vanlig bruk: Registrere det nøyaktige tidsstempelet for en spesifikk hendelse under spørreundersøkelsen.
+
+3. `date(value)`: Konverterer en verdi (streng eller tall) til en datostreng.
+   - Eksempel: `date('2024-03-15')` → `'2024-03-15'`
+
+4. `date-time(value)`: Konverterer en verdi til en dato/klokkeslett-streng.
+   - Eksempel: `date-time(${event_timestamp})`
+
+5. `decimal-date-time(value)`: Konverterer en dato- eller dato/klokkeslett-streng til et desimaltall som representerer millisekunder siden Unix-epoken dividert med 86400000 (dvs. brøkdager siden 1970-01-01). Bruk dette for å utføre aritmetikk på datoer.
+   - Eksempel: Varighet i dager mellom to datoer:
+     `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
+   - Eksempel: Varighet i minutter mellom to dato/klokkeslett:
+     `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
+
+6. `format-date(date, format)`: Formaterer en datoverdi ved hjelp av en mønsterstreng.
+   - Formattokener: `%Y` (4-sifret år), `%y` (2-sifret år), `%m` (måned 01–12), `%d` (dag 01–31), `%a` (forkortet ukedag), `%b` (forkortet månedsnavn)
+   - Eksempel: `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+   - Eksempel: `format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
+
+7. `format-date-time(datetime, format)`: Formaterer en dato/klokkeslett-verdi ved hjelp av en mønsterstreng. Aksepterer alle `format-date`-tokener pluss:
+   - `%H` (time 00–23), `%h` (time 01–12), `%M` (minutter 00–59), `%S` (sekunder 00–59), `%3` (millisekunder), `%P` (AM/PM)
+   - Eksempel: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+   - Eksempel: `format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
+
+---
+
+### Boolske funksjoner
+
+1. `boolean(value)`: Konverterer en verdi til en boolsk verdi. Returnerer `sant` for ikke-tomme strenger, ikke-null tall og `sant`; returnerer `usant` for tomme strenger, `0` og `usant`.
+   - Eksempel: `boolean(${name})` returnerer `sant` hvis `name` ikke er tomt.
+
+2. `boolean-from-string(string)`: Returnerer `sant` hvis strengen er `'1'` eller `'true'` (skiftuavhengig); returnerer `usant` ellers.
+   - Eksempel: `boolean-from-string(${enabled_flag})` — nyttig når et felt lagrer `'true'`/`'false'` som tekst.
+
+3. `true()`: Returnerer den boolske verdien `sant`.
+   - Eksempel: I `required`-kolonnen er `true()` ekvivalent med `yes`.
+
+4. `false()`: Returnerer den boolske verdien `usant`.
+   - Eksempel: `if(${skip_section} = 'yes', false(), true())` — dynamisk angi required.
+
+5. `not(expression)`: Returnerer den logiske negasjonen av uttrykket. Returnerer `sant` hvis uttrykket er usant, og omvendt.
+   - Eksempel: `not(${consent} = 'yes')` — vis en advarsel når samtykke IKKE ble gitt.
+   - Eksempel: `not(selected(${issues}, 'none'))` — krev detalj bare hvis "ingen" ikke ble valgt.
+
+---
+
+### Ytterligere strengfunksjoner
+
+1. `starts-with(string, prefix)`: Returnerer `sant` hvis `string` begynner med `prefix`.
+   - Eksempel: `starts-with(${phone}, '+254')` sjekker om telefonnummeret begynner med Kenyas landskode.
+
+2. `contains(string, substring)`: Returnerer `sant` hvis `string` inneholder `substring`.
+   - Eksempel: `contains(${email}, '@')` sjekker at en e-postadresse har et `@`-tegn.
+
+3. `substring-before(string, needle)`: Returnerer delen av `string` som vises før første forekomst av `needle`.
+   - Eksempel: `substring-before(${full_name}, ' ')` henter det første ordet (fornavnet).
+
+4. `substring-after(string, needle)`: Returnerer delen av `string` som vises etter første forekomst av `needle`.
+   - Eksempel: `substring-after(${email}, '@')` henter domene-delen av en e-postadresse.
+
+5. `normalize-space(string)`: Fjerner ledende og etterfølgende mellomrom og komprimerer alle interne mellomromsekvenser til ett enkelt mellomrom.
+   - Eksempel: `normalize-space(${name})` — renser et navn som kan ha blitt skrevet med ekstra mellomrom.
+
+6. `translate(string, search_chars, replace_chars)`: Erstatter hvert tegn i `string` som vises i `search_chars` med det tilsvarende tegnet i `replace_chars`.
+   - Eksempel: `translate(${phone}, ' -()', '')` fjerner mellomrom, bindestreker og parenteser fra et telefonnummer.
+
+---
+
+### Ytterligere matematikkfunksjoner
+
+1. `floor(number)`: Returnerer det største heltallet som er mindre enn eller lik `number`.
+   - Eksempel: `floor(4.9)` = 4, `floor(-2.1)` = -3
+
+2. `ceiling(number)`: Returnerer det minste heltallet som er større enn eller lik `number`.
+   - Eksempel: `ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
+
+3. `random()`: Returnerer et tilfeldig desimaltall mellom 0,0 (inkludert) og 1,0 (ekskludert).
+   - Eksempel: `random()` → f.eks. `0.7341`
+   - Eksempel: `int(random() * 6) + 1` → tilfeldig tall 1–6 (terningkast)
+
+4. `coalesce(a, b)`: Returnerer `a` hvis `a` ikke er tomt; returnerer ellers `b`. Nyttig som en fallback når et felt kan være tomt.
+   - Eksempel: `coalesce(${preferred_name}, ${full_name})` — bruk foretrukket navn hvis angitt, ellers fall tilbake til fullt navn.
+
+5. `once(value)`: Evaluerer `value` og lagrer det, men bare hvis gjeldende felt er **tomt**. Hvis feltet allerede har en verdi, returnerer `once()` den eksisterende verdien uendret.
+   - Eksempel: `once(today())` i `default`-kolonnen setter dagens dato én gang og oppdateres ikke hvis telleren åpner skjemaet på nytt.
+   - Eksempel: `once(uuid())` genererer en UUID én gang og holder den stabil ved re-redigering.
+
+---
+
+### Geo-funksjoner
+
+1. `area(geoshape_value)`: Beregner **arealet i kvadratmeter** innenfor en geoshape (polygon) verdi.
+   - Eksempel: `area(${field_boundary})` — beregn arealet til et undersøkt felt i m².
+   - Eksempel: `round(area(${field_boundary}) div 10000, 2)` — konverter til hektar.
+
+2. `distance(coordinates)`: Beregner **total banelengde i meter** for en geotrace (linje), eller avstanden mellom to geopunkter.
+   - For en geotrace: `distance(${route})` returnerer total banelengde i meter.
+   - For to geopunkter: `distance(concat(${point_a}, ' ', ${point_b}))` returnerer avstanden mellom dem.
+   - Eksempel: `round(distance(${road_trace}) div 1000, 3)` — veglengde i kilometer.
+
+---
+
+### Valideringsfunksjoner
+
+1. `regex(value, pattern)`: Returnerer `sant` hvis `value` samsvarer med det regulære uttrykket `pattern`. Bruk i `constraint`-kolonnen for mønsterbasert validering.
+   - Eksempel: `regex(., '^[0-9]{10}$')` — valider et 10-sifret tall.
+   - Eksempel: `regex(., '^[A-Z]{2}[0-9]{6}$')` — valider et passnummerformat (2 store bokstaver etterfulgt av 6 sifre).
+   - Eksempel: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — grunnleggende e-postformatkontroll.
+
+2. `checklist(min, max, v1, v2, ...)`: Evaluerer en liste over boolske uttrykk og returnerer `sant` hvis antallet `sant`-verdier er mellom `min` og `max` (inkludert). Send `-1` for `min` eller `max` for å hoppe over den grensen.
+   - Eksempel: `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — består hvis nøyaktig 2 eller 3 av de tre betingelsene er sanne.
+
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Som `checklist()`, men hver verdi har en vekt. Summen av vekter for `sant`-verdier må være mellom `min` og `max`.
+   - Eksempel: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — sum av vekter for tilgjengelige fasiliteter må være minst 10.
+
+---
+
+### Nyttefunksjoner
+
+1. `uuid()`: Genererer en tilfeldig UUID (RFC 4122 v4-format) som en streng.
+   - Eksempel: `uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
+   - Brukes vanligvis med `once()` for å generere en stabil unik ID: `once(uuid())`
+
+2. `version()`: Returnerer verdien av skjemaets `version`-attributt som angitt i settings-regnearket.
+   - Eksempel: `version()` → `'3.1'`
+
+3. `position()`: Når kalt innenfor en **repeat-gruppe**, returnerer den 1-baserte indeksen til gjeldende repeat-instans.
+   - Eksempel: `position()` i den første instansen returnerer `1`, i den andre returnerer `2`, og så videre.
+
+4. `thousandsep(length, separator, value)`: Formaterer et tall med et tusenskilletegn.
+   - Eksempel: `thousandsep(0, ',', 1234567)` → `'1,234,567'`
+   - Eksempel: `thousandsep(0, '.', ${income})` → formaterer inntekt med punktum som tusenskilletegn.
+
+5. `substr-jsonpath(value, jsonpath)`: Henter en delstreng fra en JSON-streng ved hjelp av et JSONPath-uttrykk.
+   - Eksempel: `substr-jsonpath(${api_response}, '$.data.name')` — hent `name`-feltet fra en JSON-streng lagret i `api_response`.
+   - Brukes vanligvis sammen med `callapi()` for å hente spesifikke verdier fra API-svar.

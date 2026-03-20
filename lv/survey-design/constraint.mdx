@@ -1,0 +1,88 @@
+---
+description: ''
+icon: code
+title: Atbilžu validācija
+---
+
+
+Viens no veidiem, kā nodrošināt datu kvalitāti, ir pievienot ierobežojumus formas datu laukiem. Ierobežojumi palīdz novērst lietotāju ievadīt nederīgas vai neiespējamas atbildes. Piemēram, jautājot par personas ienākumiem, vēlaties izvairīties no nereālistiskām vērtībām, piemēram, negatīviem skaitļiem vai ārkārtīgi augstām vērtībām. Datu ierobežojumu pievienošana formā ir vienkārša. Vienkārši sekojiet zemāk norādītajiem soļiem:
+
+1. Pievienojiet formai jaunu kolonnu ar nosaukumu "constraint".
+2. Kolonnā "constraint" ievadiet formulu, kas norāda atbildes ierobežojumus.
+
+### Piemērs
+
+Apskatīsim piemēru, kurā vēlamies pievienot ierobežojumu personas ienākumiem. Ierobežojums prasa, lai ienākumi būtu no $0 līdz $1 000 000. Lūk, kā var iestatīt ierobežojumu:
+
+| `name`      | `constraint`                  |
+|---------------|-----------------------------|
+| Income        | . >= 0 & . <= 1000000      |
+
+Augstāk minētajā piemērā "." formulā atsaucas atpakaļ uz jautājuma mainīgo, kas apzīmē lietotāja ievadīto vērtību laukam "Income". Ierobežojums ". >= 0 && . <= 1000000" nodrošina, ka ievadītie ienākumi ir lielāki par vai vienādi ar 0 un mazāki par vai vienādi ar 1 000 000.
+
+
+### Stingrs ierobežojums
+
+**Stingrs ierobežojums** pilnībā bloķē formas iesniegšanu, ja ievadītā vērtība neapmierina izteiksmi. Enumerators nevar turpināt, kamēr neievada derīgu vērtību.
+
+Lai pievienotu stingru ierobežojumu, ievadiet izteiksmi kolonnā `constraint`. Pēc izvēles pievienojiet cilvēklasāmu ziņojumu kolonnā `constraint_message`:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Respondenta vecums | `. > 0 and . <= 120` | Vecumam jābūt no 1 līdz 120 |
+| decimal | temperature | Ķermeņa temperatūra (°C) | `. >= 35 and . <= 42` | Temperatūrai jābūt no 35°C līdz 42°C |
+| text | phone | Tālruņa numurs | `regex(., '^[0-9]{10}$')` | Ievadiet 10 ciparu tālruņa numuru |
+
+#### Vairāki nosacījumi
+
+Apvienojiet nosacījumus ar `and` / `or`:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### `regex()` izmantošana modeļa validācijai
+
+Funkcija `regex(value, pattern)` pārbauda vērtību pret regulāro izteiksmi:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | E-pasta adrese | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Ievadiet derīgu e-pasta adresi |
+| text | zip_code | Pasta indekss | `regex(., '^[0-9]{5}$')` | Ievadiet 5 ciparu pasta indeksu |
+
+#### Atsauces uz citiem laukiem ierobežojumā
+
+Izmantojiet `${fieldname}`, lai atsauktos uz vērtībām no citiem jautājumiem:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Beigu gads | `. >= ${start_year}` | Beigu gadam jābūt pēc sākuma gada |
+| decimal | loan_repaid | Atmaksātā summa | `. <= ${loan_amount}` | Nevar atmaksāt vairāk nekā aizdevuma summa |
+
+### Mīksts brīdinājums
+
+**Mīksts brīdinājums** (saukts arī par mīkstu ierobežojumu vai brīdinājumu) brīdina enumeratoru, ka vērtība izskatās neparasta, bet joprojām ļauj virzīties tālāk. Tas ir noderīgi, kad vērtība ir tehniski derīga, bet statistiski maz ticama.
+
+Visizplatītākais modelis ir izmantot **piezīmi** ar `relevant` izteiksmi, kas atzīmē aizdomīgo vērtību, kopā ar **apstiprinājuma** jautājumu:
+
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Bērnu skaits | |
+| note | children_warning | Brīdinājums: Jūs ievadījāt ${children} bērnus. Lūdzu apstipriniet, ka tas ir pareizi. | `. > 15` |
+| trigger | children_confirm | Apstipriniet, ka bērnu skaits ir pareizs | `${children} > 15` |
+
+#### Mīksts brīdinājums tikai ar constraint_message
+
+Vienkāršākam mīkstam brīdinājumam varat formulēt ierobežojumu, kas brīdina par ekstrēmām vērtībām, bet joprojām pieļauj plašu diapazonu:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | children | Bērnu skaits | `. >= 0 and . <= 30` | Šī vērtība šķiet ļoti augsta. Lūdzu pārbaudiet. |
+
+<Warning>
+Atšķirība starp stingriem un mīkstiem ierobežojumiem ir svarīga datu kvalitātei. Izmantojiet **stingrus ierobežojumus** loģiski neiespējamām vērtībām (negatīvs vecums, temperatūras virs 100°C). Izmantojiet **mīkstus brīdinājumus** statistiski maz ticamām, bet ne neiespējamām vērtībām — nevēlaties bloķēt likumīgus robežgadījumus.
+</Warning>

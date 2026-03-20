@@ -1,0 +1,67 @@
+---
+description: Integer-vragen staan gehele getalinvoer toe in uw enquête.
+icon: '123'
+title: Integer
+---
+
+
+Het integer-vraagtype in XLSForms en rtSurvey wordt gebruikt voor het verzamelen van gehele getalresponsen. Dit vraagtype is essentieel voor het verzamelen van numerieke gegevens zonder decimalen, zoals tellingen, leeftijden of jaren.
+
+## Basis XLSForm-specificatie
+
+| type    | name  | label                    |
+|---------|-------|--------------------------|
+| integer | age   | Voer uw leeftijd in jaren in |
+
+## Toepassingen
+
+Integer-vragen worden veelgebruikt voor:
+
+1. Leeftijdsinvoer
+2. Items tellen (bijv. aantal kinderen, huishoudleden)
+3. Jaarinvoer (bijv. geboortejaar)
+4. Beoordelingen op een numerieke schaal
+5. Elke verzameling van gehele getalgegevens
+
+## Aanbevolen werkwijzen
+
+1. Gebruik duidelijke en beknopte labels om de verwachte invoer te specificeren.
+2. Implementeer bereikbeperkingen om onrealistische of onjuiste invoer te voorkomen.
+3. Overweeg hinttekst te gebruiken om voorbeelden te geven of de verwachte indeling te verduidelijken.
+4. Voor grote getallen overweegt u komma's of spaties in het label te gebruiken voor betere leesbaarheid (bijv. "Voer de bevolking in (tot 1.000.000)").
+
+## Beperkingen en validatie
+
+U kunt beperkingen toevoegen om te zorgen dat de ingevoerde waarde binnen een specifiek bereik valt:
+
+| type    | name  | label                    | constraint        | constraint_message                      |
+|---------|-------|--------------------------|-------------------|-----------------------------------------|
+| integer | age   | Voer uw leeftijd in jaren in | .>0 and .<=120 | Leeftijd moet tussen 1 en 120 jaar zijn |
+
+## Voorbeeldgebruik
+
+Hier is een voorbeeld van hoe u integer-vragen kunt gebruiken in een huishoudenenquête:
+
+| type    | name           | label                                       | constraint | constraint_message                          |
+|---------|----------------|---------------------------------------------|------------|---------------------------------------------|
+| integer | household_size | Hoeveel mensen wonen er in uw huishouden?   | .>0        | De huishoudgrootte moet ten minste 1 zijn   |
+| integer | num_children   | Hoeveel kinderen onder 18 in het huishouden?| .>=0       | Aantal kinderen kan niet negatief zijn      |
+| integer | year_built     | In welk jaar is uw huis gebouwd?            | .>1800 and .<=2023 | Jaar moet tussen 1800 en 2023 zijn  |
+
+## Berekening met integer-waarden
+
+Integer-waarden kunnen worden gebruikt in berekeningen. Hier is een voorbeeld:
+
+| type    | name           | label                                |
+|---------|----------------|--------------------------------------|
+| integer | num_adults     | Aantal volwassenen in het huishouden |
+| integer | num_children   | Aantal kinderen in het huishouden    |
+| calculate | total_members | |
+
+In de berekeningsrij kunt u gebruiken:
+
+```
+calculation | ${num_adults} + ${num_children}
+```
+
+Dit telt het aantal volwassenen en kinderen op om het totaal aantal huishoudleden te berekenen.

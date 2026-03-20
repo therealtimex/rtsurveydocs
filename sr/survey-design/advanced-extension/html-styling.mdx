@@ -1,0 +1,142 @@
+---
+description: rtSurvey podržava HTML tagove u oznakama i naznakama, dozvoljavajući
+  formatiranje bogatog teksta, veze i dinamičku tematizaciju boja.
+icon: manage_search
+title: HTML stilizacija
+---
+
+
+rtSurvey prikazuje tekst **oznaka** i **naznaka** kao HTML na veb formularima. To znači da možete koristiti standardne HTML tagove za formatiranje teksta, dodavanje preloma redova, kreiranje veza i primenu boja. Ovo je posebno korisno za polja napomena, uputstva sekcija i dinamičke rezimee.
+
+<Warning>
+HTML u oznakama se prikazuje na **veb formularu** i rtSurvey mobilnim aplikacijama. Možda se neće prikazivati u svim ODK-kompatibilnim klijentima. Uvek testirajte na ciljnoj platformi.
+</Warning>
+
+---
+
+## Podržani HTML tagovi
+
+### Formatiranje teksta
+
+| Tag | Rezultat |
+|-----|---------|
+| `<strong>tekst</strong>` ili `<b>tekst</b>` | **Podebljani tekst** |
+| `<em>tekst</em>` ili `<i>tekst</i>` | *Tekst u kurzivu* |
+| `<u>tekst</u>` | Podvučeni tekst |
+| `<br>` | Prelom reda |
+| `<span style="...">tekst</span>` | Inline stilizacija |
+
+### Veze
+
+```html
+<a href="https://example.com" target="_blank">Kliknite ovde</a>
+```
+
+Otvara se u novoj kartici. Koristite za referentne dokumente, smernice ili spoljne resurse koje anketar treba da konsultuje.
+
+### Boje
+
+Koristite `<span>` sa inline stilovima:
+
+```html
+<span style="color: red;">Upozorenje: vrednost je van opsega</span>
+<span style="color: #009688;">Sekcija završena</span>
+```
+
+---
+
+## Promenljive teme boja
+
+rtSurvey podržava **tokene teme boja** koji se prilagođavaju konfigurisanoj temi aplikacije. Koristite sintaksu `__COLOR_THEME_NAME__`:
+
+```html
+<span style="color: var(--color-theme-primary);">Tekst u primarnoj boji</span>
+```
+
+Ili koristeći skraćenicu tokena u tekstu oznake:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Važna napomena</font>
+```
+
+Ovo se automatski konvertuje u ekvivalentni `<span>` sa CSS promenljivom u vreme prikaza.
+
+---
+
+## Oznake na više jezika
+
+Obuhvatite sadržaj u tagove jezika da biste podržali više jezika u jednoj ćeliji oznake:
+
+```
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey izvlači sadržaj koji odgovara trenutnom jeziku aplikacije. Ako se ne pronađe odgovarajući tag jezika, prikazuje se ceo string kao što jeste.
+
+---
+
+## Primeri u poljima napomena
+
+### Uputstvo sekcije sa podebljanjem i prelogm reda
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Sekcija 3: Korišćenje zemljišta</strong><br>Postavljajte sva pitanja u ovoj sekciji samo nosiocu domaćinstva.` |
+
+### Dinamički rezime sa referencom na proračun
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Ukupno članova domaćinstva: <strong>${total}</strong><br><span style="color: gray;">Odrasli: ${adults} · Deca: ${children}</span>` |
+
+### Upozorenje u crvenoj boji
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Upozorenje:</strong> Unete godine (${age}) su neobično visoke. Molimo verifikujte.</span>` | `${age} > 100` |
+
+### Veza ka referentnom dokumentu
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Pogledajte <a href="https://docs.example.com/guidelines" target="_blank">Terenska uputstva</a> pre početka ove sekcije.` |
+
+---
+
+## Specijalni rtSurvey HTML tagovi
+
+### `<webbox src='url' title='naslov'>...</webbox>`
+
+Ugrađuje dugme koje otvara URL u modalu unutar formulara. Pogledajte [Webbox](webbox) za pune detalje.
+
+### `<delete-repeat-current>oznaka</delete-repeat-current>`
+
+Prikazuje dugme unutar grupe ponavljanja koje briše trenutnu instancu ponavljanja kada se tapkne.
+
+### `<delete-repeat-last>oznaka</delete-repeat-last>`
+
+Prikazuje dugme koje briše poslednju instancu ponavljanja.
+
+Primer upotrebe u grupi ponavljanja:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Ukloni ovog člana</delete-repeat-current>` |
+
+---
+
+## Najbolje prakse
+
+1. Koristite HTML štedljivo — preformatovane oznake je teže čitati, a ne lakše.
+2. Preferujte `<strong>` za podebljanje i `<em>` za kurziv u odnosu na zastarele `<b>` i `<i>`.
+3. Koristite boje smisleno — crvena za upozorenja, ne za dekoraciju.
+4. Uvek testirajte HTML prikaz na mobilnoj aplikaciji i veb formularu, jer se prikaz može neznatno razlikovati.
+5. Izbegavajte tagove `<table>` unutar oznaka — retko se dobro prikazuju na mobilnim ekranima.
+6. Ne koristite JavaScript (`<script>`) — biće uklonjen ili izazvati greške.
+
+## Ograničenja
+
+- Složeni HTML (tabele, formulari, skripte) nije podržan i može pokvariti prikaz.
+- Neki stariji mobilni klijenti mogu prikazivati HTML tagove kao literalni tekst — testirajte na svim ciljnim uređajima.
+- Veze `<a>` se otvaraju u pregledaču ili WebView-u — anketar napušta formular, što može biti ometajuće na mobilnom.

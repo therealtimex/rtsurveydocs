@@ -1,0 +1,140 @@
+---
+description: សំណួរ select_multiple ឱ្យអ្នកឆ្លើយតបជ្រើសរើសជម្រើសមួយ ឬច្រើនពីបញ្ជីដែលបានកំណត់ជាមុន។
+icon: check_box
+title: Select_multiple
+---
+
+
+ប្រភេទសំណួរ `select_multiple` បង្ហាញបញ្ជីដែលអ្នកឆ្លើយតបអាចជ្រើសរើស **ជម្រើសមួយ ឬច្រើន**។ ជាលំនាំដើម ជម្រើសបង្ហាញជា checkboxes។ តម្លៃដែលរក្សាទុកគឺ **បញ្ជីដែលបំបែកដោយ space** នៃ values ជម្រើសដែលបានជ្រើសរើសទាំងអស់។
+
+## ការបញ្ជាក់ XLSForm មូលដ្ឋាន
+
+**survey worksheet:**
+
+| type | name | label |
+|------|------|-------|
+| select_multiple crops | crops_grown | Which crops does the household grow? |
+
+**choices worksheet:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| crops | maize | Maize |
+| crops | beans | Beans |
+| crops | rice | Rice |
+| crops | vegetables | Vegetables |
+| crops | other | Other |
+
+សម្រាប់ព័ត៌មានបន្ថែម សូមមើល [XLSForm specification](https://xlsform.org/en/#question-types)។
+
+## ទម្រង់ទិន្នន័យដែលបានរក្សាទុក
+
+ជួរដែលបានបន្ថែមអាចផ្ទុក values ដែលបានជ្រើសសរើសដែលបំបែកដោយ space:
+
+```
+maize beans vegetables
+```
+
+ប្រើ function `selected()` — មិនមែន `=` — នៅពេលធ្វើការតេស្ត values ក្នុង select_multiple ក្នុង expressions (មើលខាងក្រោម)។
+
+## ការប្រើប្រាស់
+
+សំណួរ select_multiple ប្រើសម្រាប់:
+
+1. ការប្រមូលចម្លើយដែលអាចប្រើបានច្រើន (ឧ. ប្រភពចំណូល ដំណាំ លក្ខណៈ)
+2. Items ការយល់ព្រម checkbox-style (ឧ. "Select all that apply")
+3. ការ inventories ភាសា ឬជំនាញ
+4. សំណួរណាដែលចម្លើយច្រើនត្រឹមត្រូវជាពេលណាមួយ
+
+## ជម្រើស appearance
+
+| Appearance | ការពិពណ៌នា |
+|------------|-------------|
+| *(none)* | Checkboxes លំនាំដើម មួយក្នុងមួយបន្ទាត់ |
+| `minimal` | Dropdown multi-select widget |
+| `compact` | Grid compact ជួរឈរ adjust ទៅ screen width |
+| `compact-N` | Grid compact ដែលបង្ខំ N ជួរឈរ |
+| `horizontal` | ជម្រើសដាក់ horizontal ក្នុងជួរ (web) |
+| `horizontal-compact` | Horizontal, compact spacing (web) |
+| `label` | បង្ហាញតែ labels គ្មាន checkboxes (ប្រើជាមួយ `list-nolabel`) |
+| `list-nolabel` | បង្ហាញតែ checkboxes គ្មាន labels (ប្រើជាមួយ `label`) |
+| `columns(N)` | បង្ហាញក្នុង N ជួរឈរ (ផ្នែកពង្រីករបស់ rtSurvey) |
+
+### ឧទាហរណ៍: Layout compact 3 ជួរឈរ
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple symptoms | symptoms | Select all symptoms observed | compact-3 |
+
+## ការប្រើ `selected()` ក្នុង expressions
+
+ដោយសារ value ដែលរក្សាទុកគឺ string ដែលបំបែកដោយ space អ្នក **ត្រូវ** ប្រើ `selected()` ដើម្បីធ្វើការតេស្តថាតើ choice ជាក់លាក់ណាមួយត្រូវបានជ្រើសរើស។ ការប្រើ `=` នឹងមិនធ្វើការត្រឹមត្រូវ។
+
+### ក្នុង `relevant`
+
+បង្ហាញ follow-up question តែប្រសិនបើ "other" ត្រូវបានជ្រើស:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_multiple crops | crops_grown | Which crops are grown? | |
+| text | crops_other | Please specify other crops | `selected(${crops_grown}, 'other')` |
+
+### ក្នុង `constraint`
+
+ចាំបាច់យ៉ាងហោចណាស់ 2 ជម្រើស:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple issues | issues | `count-selected(.) >= 2` | Select at least 2 issues |
+
+ដាក់ចំនួនកំហិតខ្ពស់បំផុត 3:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple priorities | priorities | `count-selected(.) <= 3` | Select no more than 3 priorities |
+
+### ក្នុង `calculate` — ភ្ជាប់ labels ដែលបានជ្រើស
+
+| type | name | calculation |
+|------|------|-------------|
+| calculate | crops_summary | join(', ', ${crops_grown}) |
+
+## ជម្រើស "None of the above" / exclusive
+
+Pattern ទូទៅគឺធ្វើឱ្យជម្រើសមួយ mutually exclusive ជាមួយអ្វីដទៃទៀត។ ប្រើ `constraint` ដើម្បីបង្ខំ:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| select_multiple issues | issues | Select all issues present | `not(selected(., 'none') and count-selected(.) > 1)` | "None" cannot be selected with other options |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| issues | water | Water shortage |
+| issues | roads | Poor roads |
+| issues | health | Lack of health services |
+| issues | none | None of the above |
+
+## ការរាប់ និងការសង្ខេបការជ្រើស
+
+| Function | ឧទាហរណ៍ | លទ្ធផល |
+|----------|---------|--------|
+| `count-selected(field)` | `count-selected(${crops_grown})` | ចំនួនជម្រើសដែលបានជ្រើស |
+| `selected(field, value)` | `selected(${crops_grown}, 'maize')` | true/false |
+| `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | value ដំបូងដែលបានជ្រើស |
+| `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | Label សម្រាប់ value |
+
+## ការអនុវត្តល្អ
+
+1. ប្រើ `selected()` ជានិច្ចក្នុង `relevant`, `constraint`, និង `calculate` — មិនដែល `=` ឬ `!=`។
+2. បន្ថែម constraint ដើម្បីដាក់ចំនួន selections ខ្ពស់បំផុត ប្រសិនបើការរចនាសំណួរទាមទារ។
+3. រួមបញ្ចូលជម្រើស "None" ឬ "Not applicable" នៅពេល zero selections គឺជាចម្លើយត្រឹមត្រូវ។
+4. សម្រាប់បញ្ជីវែង (15+ ជម្រើស) ប្រើ `minimal` (multi-select dropdown) ដើម្បីជៀសវាង scrolling ហួស។
+5. នាំចេញទិន្នន័យ ហើយប្រើការ splitting string ក្នុង analysis tool — ទម្រង់ space-separated ទាមទារការ splitting មុន pivoting។
+
+## ការដាក់កំហិត
+
+- Values select_multiple មិនអាចប្រៀបធៀបដោយ `=` ដោយផ្ទាល់ — ប្រើ `selected()` ជានិច្ច។
+- compact appearance ប្រហែលមិន render ល្អសម្រាប់ choice labels ខ្លីណាស់។
+- នៅពេល filter ជម្រើសជាមួយ `choice_filter` ការ filter អនុវត្តទៅជម្រើសបង្ហាញទាំងអស់ ដូចគ្នា `select_one`។

@@ -1,0 +1,95 @@
+---
+description: 音頻問題允許受訪者錄製並提交音頻文件作為問卷調查的一部分。
+icon: mic
+title: 音頻
+---
+
+
+`audio` 問題類型使受訪者能夠**錄製音頻**或上傳現有音頻文件作為問卷調查回應的一部分。它用於捕獲口頭陳述、環境聲音、證詞或任何透過聲音比文字更好傳達的資訊。
+
+## 基本 XLSForm 規格
+
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Please record your comments  |
+
+有關標準音頻問題類型的更多詳細資訊，請參閱 [XLSForm 規格](https://xlsform.org/en/#question-types)。
+
+## 用途
+
+音頻問題通常用於：
+
+1. 捕獲開放式口頭回應以減少調查員打字負擔
+2. 錄製證詞、個人故事或口述歷史
+3. 記錄環境聲音（例如基礎設施附近的噪音水準）
+4. 收集語音樣本用於語言或健康研究
+5. 允許受訪者對數字或選擇答案添加口頭澄清
+
+## 資料格式
+
+音頻文件作為二進位附件與表單提交一起儲存，通常：
+
+- **格式：** MP3 或 AAC（行動錄音）；WAV（高品質錄音）
+- **命名：** `{instanceID}-{fieldname}.mp3`（或等效格式）
+- **儲存：** 上傳至伺服器媒體資料夾並連結至提交記錄
+- **存取：** 可在提交管理介面中播放和下載
+
+## rtSurvey 擴展
+
+### 最大持續時間
+
+使用 `parameters` 欄限制錄音長度：
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | interview | Record the interview | `max-duration=120` |
+
+`max-duration` 以秒為單位。錄音在達到限制時自動停止。
+
+### 品質設定
+
+可以透過 `parameters` 設定錄音品質：
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Record feedback | `quality=normal` |
+
+支援的值：`low`、`normal`（預設）、`voice-only`。`voice-only` 使用降噪功能優化口語音頻。
+
+### 提交前回放
+
+在行動裝置上，調查員可以在繼續之前回放錄音。這是預設啟用的——不需要設定。
+
+### 原生錄音機整合
+
+在 Android 和 iOS 上，`audio` 啟動裝置的原生錄音應用程式。在網頁上，它使用瀏覽器內建的 MediaRecorder API。
+
+## 使用範例
+
+### 帶最大持續時間和提示
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| audio | story | Tell us about the incident in your own words | Speak clearly. Recording stops after 3 minutes. | `max-duration=180` |
+
+### 條件音頻——僅在報告問題時
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | issue_found | Was an issue found? | | |
+| audio | issue_audio | Record a description of the issue | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+
+## 最佳實踐
+
+1. 在 `label` 或 `hint` 中清楚說明調查員應說什麼以及說多長時間。
+2. 在網路上傳速度慢的地區使用 `max-duration` 防止文件過大。
+3. 開始錄音前告知受訪者——意外錄音可能引起隱私問題。
+4. 在部署前在目標裝置和網路條件下測試錄音。
+5. 對訪談式錄音設定 `quality=voice-only`，在不損失清晰度的前提下減少文件大小。
+
+## 限制
+
+- 音頻文件可能很大（普通品質的 2 分鐘錄音約 2–4 MB）——在您的資料計劃和上傳時間估算中考慮這一點。
+- 並非所有瀏覽器都支援 MediaRecorder API——Chrome 和 Firefox 可靠工作；較舊 iOS 版本的 Safari 可能有問題。
+- 音頻回應的轉錄需要額外的後處理（手動或自動語音識別）。
+- 隱私法規可能限制語音錄製——請驗證當地資料保護要求。

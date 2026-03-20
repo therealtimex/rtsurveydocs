@@ -1,0 +1,96 @@
+---
+description: Le domande video permettono ai rispondenti di registrare e inviare file
+  video come parte del sondaggio.
+icon: videocam
+title: Video
+---
+
+
+Il tipo di domanda `video` consente ai rispondenti di **registrare video** o caricare un file video esistente come parte della loro risposta al sondaggio. È utile per acquisire prove visive, dimostrazioni, condizioni ambientali, o qualsiasi informazione che beneficia di immagini in movimento e audio insieme.
+
+## Specifica XLSForm di base
+
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Si prega di registrare una breve dimostrazione |
+
+Per ulteriori dettagli sul tipo di domanda video standard, vedere la [specifica XLSForm](https://xlsform.org/en/#question-types).
+
+## Utilizzi
+
+Le domande video sono comunemente usate per:
+
+1. Documentare le condizioni sul campo — danni stradali, stato delle infrastrutture, salute delle colture
+2. Registrare dimostrazioni di prodotti o controlli di conformità procedurale
+3. Raccogliere testimonianze video dai rispondenti
+4. Acquisire prove che richiedono contesto spaziale (es. le dimensioni e l'estensione di un'area problematica)
+5. Documentazione prima/dopo per i sondaggi di monitoraggio e valutazione
+
+## Formato dei dati
+
+I file video vengono memorizzati come allegati binari:
+
+- **Formato:** MP4 o MOV (registrazione mobile)
+- **Denominazione:** `{instanceID}-{fieldname}.mp4` (o equivalente)
+- **Archiviazione:** Caricati nella cartella media del server e collegati al record di invio
+- **Accesso:** Riproducibili e scaricabili dall'interfaccia di gestione degli invii
+
+## Estensioni rtSurvey
+
+### Durata massima
+
+Usa la colonna `parameters` per limitare la lunghezza della registrazione:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Registra le condizioni del sito | `max-duration=60` |
+
+`max-duration` è in secondi. La registrazione si ferma automaticamente al limite.
+
+### Qualità / risoluzione
+
+Controlla la risoluzione di registrazione tramite `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Registra prove video | `quality=low` |
+
+Valori supportati: `low` (caricamento più veloce), `normal` (predefinito), `high`. Usa `low` in aree con connettività limitata.
+
+### Caricamento di un video esistente
+
+Sul mobile, il rispondente può scegliere di **caricare un video esistente** dalla galleria del dispositivo invece di registrarne uno nuovo. Questo è abilitato per impostazione predefinita nell'integrazione nativa fotocamera/galleria.
+
+### Riproduzione prima dell'invio
+
+Sul mobile, la clip registrata può essere rivista prima di procedere. Non è necessaria alcuna configurazione aggiuntiva.
+
+## Esempio di utilizzo
+
+### Video di ispezione del sito con limite
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Registra il punto d'acqua | Cammina intorno all'intera struttura. Max 90 secondi. | `max-duration=90 quality=normal` |
+
+### Video condizionale — solo se viene segnalato un danno
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | È stato trovato un danno? | | |
+| video | damage_video | Registra un video del danno | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+
+## Best practice
+
+1. Imposta `max-duration` — le registrazioni video senza limiti possono facilmente superare i 100 MB e non riuscire a caricarsi su connessioni deboli.
+2. Usa `quality=low` per i sondaggi di monitoraggio in cui sono necessarie prove visive ma non i dettagli fini — riduce drasticamente le dimensioni del file.
+3. Scrivi istruzioni di registrazione specifiche nella colonna `hint` (es. "Cammina intorno all'intero edificio, tieni la fotocamera ferma").
+4. Considera se il video è necessario — una foto (`image`) è di solito sufficiente per le prove statiche e produce file molto più piccoli.
+5. Testa le prestazioni di caricamento sulla rete di campo effettiva prima del deployment.
+
+## Limitazioni
+
+- I file video sono molto grandi — un video di 1 minuto a qualità normale è tipicamente di 20–60 MB a seconda del dispositivo.
+- Il caricamento di file video di grandi dimensioni richiede una buona connessione di rete; considera di richiedere la sincronizzazione Wi-Fi per i moduli ricchi di video.
+- Non tutti i browser web supportano la registrazione video tramite MediaRecorder — Chrome è il più affidabile.
+- L'analisi delle risposte video è manuale e richiede tempo; usale con parsimonia e solo quando il contenuto video aggiunge valore unico.

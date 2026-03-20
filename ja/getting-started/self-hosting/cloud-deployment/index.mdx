@@ -1,0 +1,122 @@
+---
+description: DigitalOcean、AWS EC2、Google Cloud、Linodeの自動化スクリプトでrtCloudを主要クラウドプロバイダーにデプロイする。
+icon: cloud_upload
+title: クラウドデプロイ
+---
+
+
+デプロイリポジトリには主要クラウドプロバイダー向けの自動化プロビジョニングスクリプトが含まれています。各スクリプトは新しい**Ubuntu 22.04 LTS**サーバーの初回起動時に実行され、完全な無人セットアップを実行します：
+
+- DockerとDocker Composeのインストール
+- すべての内部サービス用のランダムな安全なパスワードの生成
+- `docker-compose.production.yml`と`.env`の作成
+- リバースプロキシとしてのNginxの設定
+- Let's Encryptからの無料TLS証明書の取得（DNSが解決するまで自動リトライ）
+- UFWファイアウォールの設定
+- 組み込みKeycloak SSOサーバーのオプションデプロイ
+- すべての認証情報を含む完全なデプロイサマリーの出力
+
+標準インスタンスで**5〜10分**でセットアップが完了します。
+
+---
+
+## スクリプトの選択
+
+クラウドプロバイダーとSSO設定に応じて複数のスクリプトバリアントがあります：
+
+| スクリプト | プロバイダー | SSOモード | 最適な用途 |
+|--------|----------|----------|----------|
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | 組み込みKeycloak | シンプルで自己完結型のSSO |
+| `digitalocean-droplet.sh` | DigitalOcean | KeycloakまたはExternal OIDC | フルコントロール |
+| `linode-stackscript-keycloak-embed.sh` | Linode | 組み込みKeycloak | フォームベースのセットアップ、最もシンプル |
+| `linode-stackscript-oidc.sh` | Linode | 外部OIDCのみ | 既存IDプロバイダー |
+| `linode-stackscript.sh` | Linode | KeycloakまたはExternal OIDC | フルコントロール |
+| `aws-ec2.sh` | AWS EC2 | KeycloakまたはExternal OIDC | AWSデプロイ |
+| `gcp-compute.sh` | Google Cloud | KeycloakまたはExternal OIDC | GCPデプロイ |
+
+> **ほとんどのユーザーへの推奨：** `keycloak-embed`バリアントを使用してください。組み込みKeycloakアイデンティティサーバーが含まれており、設定フィールドが最も少なくて済みます。
+
+---
+
+## サーバーサイジングガイド
+
+| ユースケース | RAM | ディスク | 例 |
+|----------|-----|------|---------|
+| 評価/開発 | 2 GB | 25 GB | DO Basic $18/mo、t3.small、e2-small |
+| 小規模チーム（50ユーザー未満） | 4 GB | 40 GB | DO Basic $24/mo、t3.medium、e2-medium |
+| 本番環境（50ユーザー以上） | 8 GB | 80 GB | DO General $48/mo、t3.large、n2-standard-2 |
+
+> 組み込みKeycloakには少なくとも**4 GB RAM**が必要です。Keycloakなしの評価には2 GBのみ使用してください。
+
+---
+
+## DNSの設定
+
+すべてのスクリプトには、Let's Encryptが証明書を発行できるように、**サーバーのIPを指すAレコードを持つドメイン**が必要です。
+
+スクリプトはセットアッププロセスの早い段階でサーバーIPを出力します：
+
+```
+============================================================
+ Server IP : 139.162.51.85
+ Add this DNS A record now if you haven't already:
+   myapp.example.com  ->  139.162.51.85
+ The script will retry Certbot every 60s until DNS resolves.
+============================================================
+```
+
+スクリプトはDNSが解決するまで最大1時間、60秒ごとにLet's Encryptを**自動リトライ**します。DNSレコードを追加して待つだけです — 再起動は不要です。
+
+> **レート制限：** Let's Encryptでは**1ドメインにつき7日間で最大5枚の証明書**しか発行できません。同じドメインでサーバーを繰り返しデプロイ・削除することは避けてください。制限に達した場合、スクリプトは`retry after`のタイムスタンプを表示してすぐに停止します。
+
+---
+
+## デプロイ後チェックリスト
+
+- [ ] `https://your-domain.com`でアプリが開く
+- [ ] `admin`と設定したパスワードでログインできる
+- [ ] すべてのコンテナが正常：`docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encryptの更新が機能する：`certbot renew --dry-run`
+- [ ] MySQLポート3306が**公開されていない**：`ufw status`
+- [ ] 日次データベースバックアップの設定（[メンテナンス](../maintenance)を参照）
+
+---
+
+## トラブルシューティング
+
+### 完全なセットアップログを確認する
+
+```bash
+# Linode
+tail -200 /var/log/stackscript.log
+
+# DigitalOcean / AWS / GCP
+tail -200 /var/log/rtcloud-setup.log
+```
+
+### Let's Encryptレート制限
+
+ログに`too many certificates`が表示された場合、5枚/7日の制限に達しています。ログには正確なリトライ時間が表示されます：
+
+```
+[SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
+```
+
+その時間まで待ってから再デプロイしてください。
+
+### Keycloakが不健全なまま
+
+サーバーに少なくとも4 GB RAMがあることを確認してからログを確認する：
+
+```bash
+docker logs rtcloud-keycloak --tail 50
+free -h
+```
+
+### certbot後もSSL設定が適用されない
+
+証明書が発行されたがNginxがまだHTTPのみを表示している場合は、ログのエラー行を確認して手動でNginxをリロードする：
+
+```bash
+nginx -t && systemctl reload nginx
+```

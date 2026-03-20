@@ -1,0 +1,96 @@
+---
+description: A videókérdések lehetővé teszik a válaszadók számára, hogy videofájlokat
+  rögzítsenek és nyújtsanak be a felmérés részeként.
+icon: videocam
+title: Video
+---
+
+
+A `video` kérdéstípus lehetővé teszi a válaszadók számára, hogy **videót rögzítsenek** vagy egy meglévő videofájlt töltsenek fel felmérési válaszuk részeként. Hasznos vizuális bizonyítékok, bemutatók, környezeti körülmények vagy bármilyen olyan információ rögzítéséhez, amely mozgásból és hangból együttesen profitál.
+
+## Alapvető XLSForm-specifikáció
+
+| type  | name        | label                                   |
+|-------|-------------|------------------------------------------|
+| video | demo_video  | Kérjük, rögzítsen egy rövid bemutatót   |
+
+A standard video kérdéstípus részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+
+## Felhasználási területek
+
+A videókérdések általánosan használt területei:
+
+1. Terepi körülmények dokumentálása – útkárosodás, infrastruktúra állapota, növényzet egészsége
+2. Termékbemutatók vagy eljárási megfelelési ellenőrzések rögzítése
+3. Válaszadóktól videós beszámolók gyűjtése
+4. Térbeli kontextust igénylő bizonyítékok rögzítése (pl. egy problématerület mérete és kiterjedése)
+5. Előtte/utána dokumentáció monitoring és értékelési felmérésekhez
+
+## Adatformátum
+
+A videofájlok bináris mellékletekként kerülnek tárolásra:
+
+- **Formátum:** MP4 vagy MOV (mobil felvétel)
+- **Elnevezés:** `{instanceID}-{mezőnév}.mp4` (vagy egyenértékű)
+- **Tárolás:** Feltöltve a szerver médiamappájába és összekapcsolva a beküldési rekorddal
+- **Hozzáférés:** Lejátszható és letölthető a beküldések kezelési felületéről
+
+## rtSurvey-bővítések
+
+### Maximális időtartam
+
+A `parameters` oszlop segítségével korlátozhatja a felvétel hosszát:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Rögzítse a helyszín körülményeit | `max-duration=60` |
+
+A `max-duration` értéke másodpercben értendő. A felvétel automatikusan leáll a határidőnél.
+
+### Minőség / felbontás
+
+A felvételi felbontást a `parameters` segítségével szabályozhatja:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Rögzítsen videós bizonyítékot | `quality=low` |
+
+Támogatott értékek: `low` (gyorsabb feltöltés), `normal` (alapértelmezett), `high`. Korlátozott kapcsolattal rendelkező területeken használjon `low` értéket.
+
+### Meglévő videó feltöltése
+
+Mobilon a válaszadó dönthet úgy, hogy az eszköz galériájából **meglévő videót tölt fel** új felvétel helyett. Ez alapértelmezés szerint engedélyezve van a natív kamera/galéria integrációban.
+
+### Lejátszás beküldés előtt
+
+Mobilon a rögzített klip a folytatás előtt megtekinthető. Ehhez nincs szükség további konfigurációra.
+
+## Példa
+
+### Helyszíni ellenőrzési videó időkorláttal
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Rögzítse a vízpontot | Járja körbe a teljes létesítményt. Max. 90 másodperc. | `max-duration=90 quality=normal` |
+
+### Feltételes videó – csak ha károsodás kerül jelentésre
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | Találtak-e károsodást? | | |
+| video | damage_video | Rögzítse a károsodásról szóló videót | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+
+## Bevált módszerek
+
+1. Állítson be `max-duration` értéket – a korlátlan videofelvételek könnyen meghaladhatják a 100 MB-ot és gyenge kapcsolaton feltöltési hibát okozhatnak.
+2. Használjon `quality=low` értéket monitoring felmérésekben, ahol vizuális bizonyítékra van szükség, de finom részletek nem szükségesek – ez drasztikusan csökkenti a fájlméretet.
+3. Írjon konkrét felvételi utasításokat a `hint` oszlopba (pl. „Járja körbe az egész épületet, tartsa stabilan a kamerát").
+4. Fontolja meg, hogy valóban szükséges-e a videó – egy fotó (`image`) általában elegendő statikus bizonyítékhoz és sokkal kisebb fájlokat eredményez.
+5. A telepítés előtt tesztelje a feltöltési teljesítményt a tényleges terepi hálózaton.
+
+## Korlátozások
+
+- A videofájlok nagyon nagyok – 1 perces normál minőségű videó tipikusan 20–60 MB az eszköztől függően.
+- Nagy videofájlok feltöltéséhez jó hálózati kapcsolat szükséges; fontolja meg, hogy videóban gazdag felmérések esetén Wi-Fi-szinkronizálást tegyen kötelezővé.
+- Nem minden webböngésző támogatja a videórögzítést a MediaRecorder API-n keresztül – a Chrome a legmegbízhatóbb.
+- A videós válaszok elemzése manuális és időigényes; mértékletesen használja, csak ha a videótartalom egyedi értéket ad.

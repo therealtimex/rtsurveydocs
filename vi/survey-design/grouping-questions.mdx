@@ -1,0 +1,140 @@
+---
+description: ''
+icon: auto_awesome
+title: Nhóm câu hỏi (Grouping)
+---
+
+
+Các nhóm (`groups`) trong XLSForm cho phép bạn tổ chức các câu hỏi liên quan lại với nhau, cải thiện cấu trúc của bản khảo sát và nâng cao khả năng phân tích dữ liệu. rtSurvey hỗ trợ đầy đủ các nhóm XLSForm và mở rộng chức năng của chúng với các tính năng bổ sung.
+
+## Cấu trúc nhóm cơ bản
+
+Để tạo một nhóm các câu hỏi, hãy sử dụng cú pháp `begin_group` và `end_group`:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | respondent | Thông tin người trả lời                  |
+| text         | name       | Nhập tên người trả lời                   |
+| text         | position   | Nhập chức vụ người trả lời               |
+| end_group    |            |                                          |
+```
+
+Các điểm chính:
+- Hàng `begin_group` yêu cầu phải có `name` (tên) và `label` (nhãn).
+- Hàng `end_group` không cần tên hoặc nhãn.
+- Các câu hỏi nằm giữa `begin_group` và `end_group` là một phần của nhóm.
+
+## Hiển thị nhóm (Group Appearance)
+
+rtSurvey hỗ trợ nhiều tùy chọn hiển thị (`appearance`) cho các nhóm:
+
+1. **field-list**: Hiển thị nhiều câu hỏi trên cùng một màn hình.
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | respondent | Người trả lời| field-list |
+   | text         | name       | Tên       |            |
+   | text         | position   | Chức vụ   |            |
+   | end_group    |            |           |            |
+   ```
+
+2. **grid**: Tạo bố cục giống như bảng, nhỏ gọn cho các nhóm (dành riêng cho rtSurvey).
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | household  | Hộ gia đình | grid       |
+   | text         | member_name| Tên       |            |
+   | integer      | member_age | Tuổi      |            |
+   | end_group    |            |           |            |
+   ```
+
+3. **collapsible**: Tạo các nhóm có khả năng mở rộng/thu gọn (dành riêng cho rtSurvey).
+   ```
+   | type         | name       | label     | appearance  |
+   |--------------|------------|-----------|-------------|
+   | begin_group  | details    | Chi tiết  | collapsible |
+   | text         | address    | Địa chỉ   |             |
+   | text         | phone      | Điện thoại|             |
+   | end_group    |            |           |             |
+   ```
+
+## Nhóm lồng nhau (Nested Groups)
+
+Các nhóm có thể được lồng vào nhau để tạo ra các cấu trúc phức tạp hơn:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | hospital   | Thông tin bệnh viện                      |
+| text         | hosp_name  | Tên bệnh viện này là gì?                 |
+| begin_group  | medication | Sự sẵn có của thuốc                      |
+| select_one y_n| hiv_meds  | Bệnh viện này có thuốc HIV không?        |
+| end_group    |            |                                          |
+| end_group    |            |                                          |
+```
+
+**Lưu ý**: Luôn luôn kết thúc nhóm được bắt đầu gần nhất trước để duy trì việc lồng nhau đúng cách.
+
+## Điều kiện hiển thị cho nhóm (Skip Logic)
+
+Sử dụng cột `relevant` để triển khai `skip logic` cho toàn bộ nhóm:
+
+```
+| type         | name   | label                                        | relevant        |
+|--------------|--------|----------------------------------------------|-----------------|
+| integer      | age    | Bạn bao nhiêu tuổi?                          |                 |
+| begin_group  | child  | Trẻ em                                       | ${age} <= 5     |
+| integer      | muac   | Ghi lại vòng cánh tay của trẻ (MUAC)         |                 |
+| select_one y_n| mrdt  | Kết quả xét nghiệm nhanh của trẻ có dương tính không?|        |
+| end_group    |        |                                              |                 |
+```
+
+Trong ví dụ này, nhóm `child` sẽ chỉ xuất hiện nếu tuổi của người trả lời từ 5 trở xuống.
+
+## Các phương pháp hay nhất khi sử dụng nhóm
+
+1. Sử dụng tên có ý nghĩa cho các nhóm để thuận tiện cho việc phân tích dữ liệu.
+2. Giữ các nhóm tập trung vào các câu hỏi có liên quan với nhau.
+3. Sử dụng nhóm lồng nhau một cách hợp lý để tránh cấu trúc quá phức tạp.
+4. Kiểm tra kỹ lưỡng `skip logic` khi sử dụng `relevant` trên các nhóm.
+5. Cân nhắc sử dụng `field-list` cho các nhóm ngắn để giảm bớt việc cuộn trang.
+6. Tận dụng bố cục `grid` của rtSurvey để hiển thị nhỏ gọn các thông tin liên quan.
+7. Sử dụng nhóm `collapsible` (thu gọn) cho các biểu mẫu dài để cải thiện việc điều hướng.
+
+## Các tính năng dành riêng cho rtSurvey
+
+1. **Grid Layout**: Sử dụng appearance `grid` để hiển thị dạng bảng.
+2. **Collapsible Groups**: Triển khai appearance `collapsible` cho các phần có thể mở rộng.
+3. **Custom Styling**: Áp dụng CSS tùy chỉnh cho các nhóm để có thiết kế trực quan độc đáo.
+4. **Hành vi nhóm động**: Triển khai các `skip logic` và tính toán phức tạp bên trong các nhóm.
+
+## Hỗ trợ đa ngôn ngữ
+
+rtSurvey hỗ trợ các nhóm đa ngôn ngữ. Sử dụng các cột dành riêng cho ngôn ngữ cho nhãn:
+
+```
+| type         | name       | label::English | label::Vietnamese |
+|--------------|------------|----------------|-------------------|
+| begin_group  | personal   | Personal Info  | Thông tin cá nhân |
+| text         | name       | Name           | Tên               |
+| end_group    |            |                |                   |
+```
+
+## Lưu ý cho Ứng dụng di động
+
+- Các nhóm sử dụng appearance `field-list` sẽ được hiển thị trên một màn hình duy nhất trong ứng dụng di động.
+- Các nhóm `collapsible` có thể cải thiện việc điều hướng trên màn hình nhỏ.
+- Bố cục `grid` có thể tự điều chỉnh để hiển thị tốt hơn trên thiết bị di động.
+
+## Các hạn chế đã biết
+
+- Việc lồng các nhóm quá sâu có thể ảnh hưởng đến hiệu suất trên một số thiết bị.
+- Một số tùy chọn phong cách nâng cao có thể không khả dụng cho các nhóm trong ứng dụng di động.
+
+## Khắc phục sự cố về nhóm
+
+1. Đảm bảo mỗi `begin_group` đều có một `end_group` tương ứng.
+2. Kiểm tra để đảm bảo tên nhóm là duy nhất trong biểu mẫu.
+3. Xác minh rằng `skip logic` tham chiếu đến đúng tên câu hỏi.
+4. Kiểm tra kỹ các nhóm trên cả giao diện web và di động.

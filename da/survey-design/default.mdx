@@ -1,0 +1,87 @@
+---
+description: ''
+icon: code
+title: Standardværdi
+---
+
+
+Standardværdier i rtSurvey giver dig mulighed for at forudfylde spørgsmål med svar, når en respondent første gang møder dem. Denne funktion kan markant forbedre effektiviteten og datakvaliteten i undersøgelser ved at tilbyde indledende værdier, der enten er almindeligt valgte eller tjener som eksempler på forventet input.
+
+## Grundlæggende brug
+
+For at angive en standardværdi skal du bruge kolonnen `default` i din XLSForm:
+
+```
+| type    | name        | label                         | default    |
+|---------|-------------|-------------------------------|------------|
+| date    | survey_date | Undersøgelsesdato             | 2024-07-04 |
+| decimal | weight      | Respondentens vægt? (i kg)    | 51.3       |
+```
+
+I dette eksempel vil undersøgelsesdatoen være forudfyldt med den 4. juli 2024, og vægtfeltet starter med 51,3 kg.
+
+## Dynamiske standardværdier
+
+rtSurvey understøtter dynamiske standardværdier ved hjælp af funktioner:
+
+```
+| type | name | label                              | default  |
+|------|------|------------------------------------| ---------|
+| date | d    | Indtast datoen for begivenheden?   | today()  |
+```
+
+Her angiver funktionen `today()` automatisk standardværdien til den aktuelle dato.
+
+## rtSurvey-specifikke funktioner
+
+### Kontekstafhængige standardværdier
+
+rtSurvey udvider standardfunktionaliteten med kontekstafhængige standardværdier:
+
+```
+| type    | name     | label           | default            |
+|---------|----------|-----------------|---------------------|
+| text    | location | Aktuel placering| ${current_location} |
+```
+
+Dette bruger rtSurveys variabel `${current_location}` til at forudfylde lokationen baseret på enhedens GPS.
+
+### Kaskaderende standardværdier
+
+rtSurvey tillader standardværdier baseret på tidligere svar:
+
+```
+| type    | name     | label           | default         |
+|---------|----------|-----------------|-----------------|
+| text    | city     | By              |                 |
+| text    | district | Distrikt        | ${city}-distrikt|
+```
+
+Her forudfyldes distriktsfeltet baseret på den indtastede by.
+
+### Standardværdier i gentagelser
+
+For spørgsmål inden for en gentagelsesgruppe beregnes standardværdien, når gentagelsen tilføjes:
+
+```
+| type         | name      | label        | default                |
+|--------------|-----------|--------------|------------------------|
+| begin repeat | visits    | Klinikbesøg  |                        |
+| date         | visit_date| Besøgsdato   | ${previous_visit_date} |
+| end repeat   |           |              |                        |
+```
+
+Dette angiver standardbesøgsdatoen til det forrige besøgs dato.
+
+## Bedste praksis for brug af standardværdier
+
+1. **Brug sparsomt**: Brug kun standardværdier, hvor de markant forbedrer effektiviteten eller datakvaliteten.
+2. **Sikr nøjagtighed**: Gennemgå og opdater regelmæssigt statiske standardværdier.
+3. **Test grundigt**: Især ved brug af dynamiske eller beregnede standardværdier.
+4. **Overvej brugeroplevelsen**: Sikr, at standardværdier ikke vildleder respondenter eller introducerer bias.
+5. **Dokumentér tydeligt**: Sikr, at alle teammedlemmer forstår rationalet bag standardværdier.
+
+## Kendte begrænsninger
+
+- Komplekse beregnede standardværdier kan påvirke formularindlæsningstiden, især på lavklassede enheder.
+- Visse dynamiske standardværdier fungerer muligvis ikke som forventet i forhåndsvisningstilstand.

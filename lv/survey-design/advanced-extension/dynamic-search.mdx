@@ -1,0 +1,38 @@
+---
+description: Dinamiskā meklēšana ielādē izvēles no attāla API reāllaikā, kad enumerators
+  raksta, ļaujot lielas vai bieži atjauninātas datu kopas.
+icon: manage_search
+title: Dinamiskā meklēšana
+---
+
+
+**Dinamiskā meklēšana** (saukta arī Meklēšanas API) ļauj `select_one`, `select_multiple` vai `text` laukam ielādēt izvēles no attāla tīmekļa pakalpojuma **izpildlaikā**, kad enumerators raksta. Šī ir pareizā pieeja, ja izvēļu saraksts ir pārāk liels, lai to iekļautu CSV failā, tiek bieži atjaunināts vai nāk no dzīvas datu bāzes.
+
+---
+
+## `search-api()` izskats
+
+Dinamiskā meklēšana tiek konfigurēta, izmantojot kolonnu `appearance` ar funkciju `search-api()`:
+
+```
+search-api(method, url, post_body, value_column, display, data_path, save_path)
+```
+
+### Parametri
+
+| Parametrs | Apraksts |
+|-----------|-------------|
+| `method` | Vienmēr izmantojiet `'POST'` |
+| `url` | API galapunkts vaicājumam |
+| `post_body` | JSON pamatteksts, kas nosūtīts uz API. Izmantojiet `%__input__%` kā vietturi enumeratora pašreizējā meklēšanas tekstam |
+| `value_column` | API atbildes lauks, ko saglabāt kā izvēlēto vērtību |
+| `display` | API atbildes lauks, ko rādīt kā etiķeti |
+| `data_path` | JSONPath uz masīvu atbildē (piemēram, `$.data`) |
+| `save_path` | Papildu lauks saglabāšanai (neobligāts) |
+
+## Labākā prakse
+
+1. Iestatiet saprātīgus API taimautus — lēnas atbildes pasliktina enumeratoru pieredzi.
+2. Izmantojiet dinamisko meklēšanu tikai tad, kad saraksts patiešām ir pārāk liels CSV failam.
+3. Pārbaudiet bezsaistē — dinamiskā meklēšana prasa interneta savienojumu.
+4. Apsveriet filtrēšanu pēc iepriekšējiem lauka vērtībām, lai ierobežotu meklēšanas rezultātus.

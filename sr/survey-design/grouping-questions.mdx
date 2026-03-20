@@ -1,0 +1,142 @@
+---
+description: ''
+icon: auto_awesome
+title: Grupisanje pitanja
+---
+
+
+Grupe u XLSForm-u vam omogućavaju da organizujete srodna pitanja zajedno, poboljšavajući strukturu ankete i unapređujući mogućnosti analize podataka. rtSurvey u potpunosti podržava XLSForm grupe i proširuje njihovu funkcionalnost dodatnim funkcijama.
+
+## Osnovna struktura grupe
+
+Da biste kreirali grupu pitanja, koristite sintaksu `begin_group` i `end_group`:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | respondent | Informacije o ispitaniku                  |
+| text         | name       | Unesite ime ispitanika                   |
+| text         | position   | Unesite poziciju ispitanika              |
+| end_group    |            |                                          |
+```
+
+Ključne tačke:
+- Red `begin_group` zahteva `name` i `label`.
+- Red `end_group` ne treba ime ili oznaku.
+- Pitanja između `begin_group` i `end_group` su deo grupe.
+
+## Izgled grupe
+
+rtSurvey podržava razne opcije izgleda za grupe:
+
+1. **field-list**: Prikazuje više pitanja na istom ekranu.
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | respondent | Ispitanik | field-list |
+   | text         | name       | Ime       |            |
+   | text         | position   | Pozicija  |            |
+   | end_group    |            |           |            |
+   ```
+
+2. **grid**: Kreira kompaktan, tabelarni raspored za grupe (specifično za rtSurvey).
+   ```
+   | type         | name       | label         | appearance |
+   |--------------|------------|---------------|------------|
+   | begin_group  | household  | Domaćinstvo   | grid       |
+   | text         | member_name| Ime           |            |
+   | integer      | member_age | Starost       |            |
+   | end_group    |            |               |            |
+   ```
+
+3. **collapsible**: Kreira grupe koje se mogu proširiti/skupiti (specifično za rtSurvey).
+   ```
+   | type         | name       | label     | appearance  |
+   |--------------|------------|-----------|-------------|
+   | begin_group  | details    | Detalji   | collapsible |
+   | text         | address    | Adresa    |             |
+   | text         | phone      | Telefon   |             |
+   | end_group    |            |           |             |
+   ```
+
+## Ugniježđene grupe
+
+Grupe mogu biti ugniježđene unutar drugih grupa za složenije strukture:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | hospital   | Informacije o bolnici                    |
+| text         | hosp_name  | Koji je naziv ove bolnice?               |
+| begin_group  | medication | Dostupnost lekova                        |
+| select_one y_n| hiv_meds  | Da li ova bolnica ima HIV lekove?        |
+| end_group    |            |                                          |
+| end_group    |            |                                          |
+```
+
+**Napomena**: Uvek prvo završite grupu koja je poslednja počela kako biste održali pravilno ugniježđivanje.
+
+## Logika preskakanja za grupe
+
+Koristite kolonu `relevant` za implementaciju logike preskakanja za cele grupe:
+
+```
+| type         | name   | label                                        | relevant        |
+|--------------|--------|----------------------------------------------|-----------------|
+| integer      | age    | Koliko imate godina?                         |                 |
+| begin_group  | child  | Dete                                         | ${age} <= 5     |
+| integer      | muac   | Zabeležite obim nadlaktice deteta            |                 |
+| select_one y_n| mrdt  | Da li je brzi dijagnostički test deteta pozitivan? |           |
+| end_group    |        |                                              |                 |
+```
+
+U ovom primeru, grupa `child` će se pojaviti samo ako je starost ispitanika 5 ili mlađi.
+
+## Najbolje prakse za korišćenje grupa
+
+1. Koristite smislena imena za grupe radi poboljšanja analize podataka.
+2. Zadržite grupe fokusirane na srodna pitanja.
+3. Koristite ugniježđene grupe razborito kako biste izbegli previše složene strukture.
+4. Temeljno testirajte logiku preskakanja kada koristite `relevant` na grupama.
+5. Razmotrite korišćenje izgleda `field-list` za kratke grupe radi smanjenja skrolovanja.
+6. Koristite grid raspored rtSurvey-a za kompaktan prikaz srodnih informacija.
+7. Koristite grupe koje se mogu skupiti za dugačke formulare radi poboljšanja navigacije.
+
+## Funkcije specifične za rtSurvey
+
+1. **Grid raspored**: Koristite izgled `grid` za prikaze nalik tabelama.
+2. **Grupe koje se mogu skupiti**: Implementirajte izgled `collapsible` za proširive odeljke.
+3. **Prilagođeno stilizovanje**: Primenite prilagođeni CSS na grupe za jedinstvene vizuelne dizajne.
+4. **Dinamičko ponašanje grupe**: Implementirajte složenu logiku preskakanja i proračune unutar grupa.
+
+## Višejezična podrška
+
+rtSurvey podržava višejezične grupe. Koristite jezički-specifične kolone za oznake:
+
+```
+| type         | name       | label::English | label::French |
+|--------------|------------|----------------|---------------|
+| begin_group  | personal   | Personal Info  | Infos Personnelles |
+| text         | name       | Name           | Nom           |
+| end_group    |            |                |               |
+```
+
+## Razmatranja za mobilnu aplikaciju
+
+- Grupe sa izgledom `field-list` se prikazuju kao jedan ekran u mobilnoj aplikaciji.
+- Grupe koje se mogu skupiti mogu poboljšati navigaciju na manjim ekranima.
+- Grid rasporedi se mogu prilagoditi za bolju vidljivost na mobilnim uređajima.
+
+## Poznata ograničenja
+
+- Izuzetno duboko ugniježđivanje grupa može uticati na performanse na nekim uređajima.
+- Neke napredne opcije stilizovanja možda nisu dostupne za grupe u mobilnoj aplikaciji.
+
+## Rešavanje problema sa grupama
+
+1. Osigurajte da svaki `begin_group` ima odgovarajući `end_group`.
+2. Proverite da su nazivi grupa jedinstveni unutar formulara.
+3. Proverite da logika preskakanja referencuje ispravna imena pitanja.
+4. Temeljno testirajte grupe na veb i mobilnim interfejsima.
+
+Efikasnim korišćenjem grupa u vašim XLSForm formularima sa rtSurvey-om, možete kreirati dobro organizovane, efikasne ankete koje poboljšavaju i iskustvo prikupljanja podataka i kvalitet analize podataka.

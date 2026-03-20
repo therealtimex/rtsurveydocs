@@ -1,0 +1,140 @@
+---
+description: Izvietojiet rtCloud uz Google Cloud Compute Engine, izmantojot gcp-compute.sh
+  startēšanas skriptu.
+icon: travel_explore
+title: Google Cloud (GCP)
+---
+
+
+Izmantojiet `gcp-compute.sh` kā **Startup script**, veidojot Compute Engine VM instanci. Skripts automātiski darbojas pirmajā palaišanā.
+
+**Lejupielādēt skriptu:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+
+---
+
+## 1. solis — Aizpildiet konfigurāciju
+
+Atveriet skriptu un rediģējiet `CONFIGURATION` bloku augšpusē:
+
+```bash
+# --- Obligāts ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # Mainiet pēc pirmās pieteikšanās
+
+# --- Domēns + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- Iebūvētais Keycloak ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Noklusējums ir ADMIN_PASSWORD
+```
+
+| Lauks | Obligāts | Apraksts |
+|-------|----------|-------------|
+| `PROJECT_ID` | Jā | Izmanto kā datu bāzes nosaukumu un Keycloak klienta ID. Maziem burtiem, bez atstarpēm. |
+| `ADMIN_PASSWORD` | Nē | Lietotnes administratora parole un Keycloak administratora parole. Noklusējums ir `admin` — **mainiet pēc pirmās pieteikšanās**. |
+| `DOMAIN` | Nē | Jūsu domēns HTTPS. Atstājiet tukšu tikai HTTP režīmam. |
+| `LETSENCRYPT_EMAIL` | Jā (ja DOMAIN iestatīts) | E-pasts Let's Encrypt paziņojumiem. |
+| `EMBED_KEYCLOAK` | Nē | `true`, lai izvietotu iebūvēto Keycloak (nepieciešami 4 GB RAM). |
+
+> **Drošība:** Visas paroles pēc noklusējuma ir `admin`. Mainiet tās nekavējoties pēc pirmās pieteikšanās.
+
+---
+
+## 2. solis — Izveidojiet VM instanci
+
+[Google Cloud konsolē](https://console.cloud.google.com/compute):
+
+1. Noklikšķiniet uz **Create instance**
+2. **Mašīnas konfigurācija:**
+   - Sērija: `E2`
+   - Mašīnas tips: `e2-medium` (4 GB RAM) vai lielāks
+3. **Sākuma disks:**
+   - Operētājsistēma: Ubuntu
+   - Versija: Ubuntu 22.04 LTS
+   - Izmērs: 40 GB vai vairāk
+4. **Ugunsmūris:** atzīmējiet **Allow HTTP traffic** un **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → ielīmējiet pilno skripta saturu
+6. Noklikšķiniet uz **Create**
+
+---
+
+## 3. solis — Pievienojiet DNS ierakstu
+
+Kamēr VM sāknējas, pievienojiet **A ierakstu** sava DNS nodrošinātāja panelī:
+
+```
+Tips  : A
+Nosaukums  : myapp
+Vērtība : <vm-external-ip>
+TTL   : 300
+```
+
+Ārējo IP atrodiet VM instances sarakstā konsolē.
+
+---
+
+## 4. solis — Uzraugiet progresu
+
+Izmantojot `gcloud` CLI:
+
+```bash
+gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
+```
+
+Vai savienojieties tieši ar SSH:
+
+```bash
+ssh <username>@<vm-external-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## 5. solis — Piekļūstiet lietotnei
+
+Kad iestatīšana ir pabeigta, žurnāls rāda kopsavilkumu ar jūsu lietotnes URL un akreditācijas datiem. Piesakieties ar lietotājvārdu `admin` un paroli `admin`, pēc tam nekavējoties mainiet savu paroli.
+
+---
+
+## Ugunsmūra noteikumi
+
+GCP izvēles rūtiņas **Allow HTTP/HTTPS** atver portus 80 un 443. Lai arī atļautu tiešu Shiny piekļuvi portā 3838, pievienojiet ugunsmūra noteikumu:
+
+```bash
+gcloud compute firewall-rules create allow-shiny \
+  --allow tcp:3838 \
+  --target-tags http-server
+```
+
+Vai pievienojiet to caur konsoli: **VPC Network** → **Firewall** → **Create rule**.
+
+> **Neatveriet** portu 3306 (MySQL) — tam nekad nevajadzētu būt publiski pieejamam.
+
+---
+
+## Statiskā IP (neobligāts)
+
+Pēc noklusējuma GCP piešķir īslaicīgu ārējo IP, kas mainās pēc VM restartēšanas. Lai saglabātu stabilu IP:
+
+1. Dodieties uz **VPC Network** → **IP addresses**
+2. Noklikšķiniet uz **Reserve external static address**
+3. Piešķiriet to savai VM instancei
+
+---
+
+## Pēc izvietošanas
+
+### Paroles maiņa
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Visu konteineru skatīšana
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```

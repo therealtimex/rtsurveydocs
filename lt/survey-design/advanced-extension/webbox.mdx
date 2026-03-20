@@ -1,0 +1,107 @@
+---
+description: Webbox įterpia išorinį tinklalapį apklausos viduje kaip modalinį iframe,
+  leidžiantį surašytojams peržiūrėti atskaitos medžiagą ar sąveikauti su išoriniais
+  įrankiais nepaliekant formos.
+icon: manage_search
+title: Webbox
+---
+
+
+**Webbox** įterpia išorinį tinklalapį apklausos viduje kaip **modalinį iššokantį langą** (iframe). Surašytojas paspaudžia mygtuką etiketėje ar pastabos tekste, puslapis atsidaro pilno ekrano perdangoje formoje, o kai jie jį uždaro, grįžta tiksliai ten, kur buvo. Tai leidžia rodyti atskaitos medžiagą, žemėlapius, informacines priemones ar pasirinktinius įrankius neatidarant atskiro naršyklės skirtuko.
+
+---
+
+## Sintaksė
+
+Įdėkite `<webbox>` HTML žymę tiesiogiai į `label` arba pastabos etikečių stulpelį:
+
+```html
+<webbox src='https://example.com/reference' title='Atskaitos vadovas'>Atidaryti atskaitos vadovą</webbox>
+```
+
+| Atributas | Aprašymas |
+|-----------|-------------|
+| `src` | URL, kurį reikia įkelti iframe. Palaiko tiek viengubas, tiek dvigubas kabutės. |
+| `title` | Tekstas, rodomas modalinio lango antraštės juostoje. Palaiko paprastą tekstą. |
+| *(turinys)* | Paspaudžiamo mygtuko etiketė, rodoma apklausos lauke |
+
+---
+
+## Pagrindinis pavyzdys
+
+| type | name | label |
+|------|------|-------|
+| note | ref_guide | `<webbox src='https://docs.example.com/field-guide' title='Lauko vadovas'>Atidaryti lauko vadovą</webbox>` |
+
+Tai atvaizduoja mygtuką su etikete „Atidaryti lauko vadovą". Paspaudus, atsidaro modalas, rodantis lauko vadovo svetainę.
+
+---
+
+## Žemėlapio įterpimas
+
+| type | name | label |
+|------|------|-------|
+| note | area_map | `<webbox src='https://maps.example.com/survey-area' title='Apklausos srities žemėlapis'>Peržiūrėti žemėlapį</webbox>` |
+
+---
+
+## Formos reikšmių perdavimas į įterptą puslapį
+
+Pridėkite formos laukų reikšmes prie URL naudodami `concat()` stulpelyje `calculation` ir nurodykite rezultatą etiketėje:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | webbox_url | | `concat('https://dashboard.example.com/household?id=', ${household_id})` |
+| note | hh_dash | `<webbox src='${webbox_url}' title='Namų ūkio prietaisų skydelis'>Atidaryti prietaisų skydelį</webbox>` |
+
+<Warning>
+Atributas `src` žymoje `<webbox>` palaiko `${lauko_pavadinimas}` nuorodas, kai etiketė apskaičiuojama iš `calculate` lauko. Sukonstruokite pilną URL `calculate` lauke ir nurodykite jį.
+</Warning>
+
+---
+
+## Kartojimų sąveika: trynimo mygtukai
+
+Webbox taip pat palaiko specialias veiksmo žymas kartojimų grupių valdymui etiketėse:
+
+```html
+<delete-repeat-current>Pašalinti šią eilutę</delete-repeat-current>
+<delete-repeat-last>Pašalinti paskutinę eilutę</delete-repeat-last>
+```
+
+Jie atvaizduojami kaip mygtukai, kurie, paspaudus, ištrina kartojimų egzempliorius. Įdėkite juos į `note` lauką kartojimų grupės viduje (arba iš karto po jos):
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | items | Elementas |
+| text | item_name | Elemento pavadinimas |
+| note | delete_btn | `<delete-repeat-current>Pašalinti šį elementą</delete-repeat-current>` |
+| end_repeat | | |
+
+---
+
+## Ryšys su įterptyoju puslapiu (postMessage)
+
+Webbox iframe ir pirminė forma gali bendrauti naudodamos naršyklės `postMessage` API. Pirminė forma siunčia `init` pranešimą iframe, kai jis atsidaro. Įterptasis puslapis gali atsakyti:
+
+- `delete-repeat-current` — aktyvuoja dabartinio kartojimo egzemplioriaus trynimą
+- `delete-repeat-last` — aktyvuoja paskutinio kartojimo egzemplioriaus trynimą
+
+Tai leidžia pasirinktiniams žiniatinklio įrankiams (pvz., piešimo įrankiams, interaktyviems žemėlapiams) aktyvuoti formos veiksmus, kai naudotojas patvirtina veiksmą iframe viduje.
+
+---
+
+## Geriausios praktikos
+
+1. Naudokite webbox **atskaitos medžiagai** (rekomendacijos, paieškos lentelės, žemėlapiai) — ne duomenims, kurie turėtų būti pačioje formoje.
+2. Užtikrinkite, kad įterptasis URL yra pasiekiamas iš įrenginio tinklo — webbox reikalauja ryšio.
+3. Laikykite įterptą puslapį mobiliesiems draugišką — modalas yra ne daugiau kaip 800px plačio ir 80% ekrano aukščio.
+4. Naudokite aprašomus mygtukų tekstus (pvz., „Peržiūrėti kaimo žemėlapį"), o ne bendrus žymenis ("Spustelėkite čia").
+5. Informuokite surašytojus, kad uždarius modalą grįžtama į apklausą — kai kurie naudotojai gali nežinoti, kaip uždaryti iframe perdangą.
+
+## Apribojimai
+
+- Webbox reikalauja tinklo ryšio, kad įkeltų įterptąjį URL.
+- Kai kurios išorinės svetainės blokuoja įterpimą iframe naudodamos `X-Frame-Options` arba `Content-Security-Policy` antraštes — šių svetainių negalima naudoti su webbox.
+- Modalas užsidaro, kai surašytojas pereina nuo klausimo — bet kuri neišsaugota iframe būsena prarandama.
+- Webbox yra rtSurvey žiniatinklio formos plėtinys ir gali neveikti kituose ODK suderintuose klientuose.

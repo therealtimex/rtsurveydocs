@@ -1,0 +1,157 @@
+---
+description: 'రిపీట్ సమూహాల కోసం అధునాతన నమూనాలు: డైనమిక్ గణనలు, నెస్టెడ్ రిపీట్‌లు,
+  రిపీట్ డేటా సారాంశం మరియు రిపీట్‌లలో విలువలు సూచించడం.'
+icon: manage_search
+title: అధునాతన రిపీట్‌లు
+---
+
+
+ఈ పేజీ rtSurvey లో రిపీట్ సమూహాలతో పని చేయడానికి అధునాతన నమూనాలను కవర్ చేస్తుంది. రిపీట్ సమూహం సెటప్ చేయడంపై ప్రాథమికాల కోసం, [సమూహాలు మరియు రిపీట్‌లు](../repeats) చూడండి.
+
+---
+
+## డైనమిక్ రిపీట్ గణన
+
+డిఫాల్ట్‌గా, గణికుడు ఎన్నిసార్లు పునరావృతించాలో నిర్ణయిస్తాడు. `repeat_count` ఉపయోగించి పునరావృత సంఖ్యను స్థిరం చేయవచ్చు:
+
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Household member | `${num_members}` |
+| text | member_name | Member name | |
+| integer | member_age | Age | |
+| end_repeat | | | |
+
+ముందే సేకరించిన `num_members` ఆధారంగా రిపీట్ ఖచ్చితంగా `${num_members}` సార్లు నడుస్తుంది. గణికుడు instances జోడించలేరు లేదా తొలగించలేరు.
+
+---
+
+## ఇండెక్స్ చేయబడిన యాక్సెస్: `indexed-repeat()`
+
+`indexed-repeat(repeatedField, repeatGroup, index)` ఉపయోగించి రిపీట్ సమూహం **వెలుపల** నుండి నిర్దిష్ట రిపీట్ ఇన్‌స్టెన్స్ ఫీల్డ్ విలువ యాక్సెస్ చేయండి:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+సారాంశ ఫీల్డ్‌లు నిర్మించడానికి లేదా రిపీట్ తర్వాత "ప్రాథమిక" సభ్యుని డేటా సూచించడానికి ఇది ఉపయోగకరం.
+
+---
+
+## ప్రస్తుత ఇన్‌స్టెన్స్ స్థానం: `index()`
+
+రిపీట్ సమూహంలో, `index()` ప్రస్తుత ఇన్‌స్టెన్స్ యొక్క 1-ఆధారిత స్థానాన్ని తిరిగి ఇస్తుంది. ప్రతి పునరావృత లేబుల్ చేయడానికి లేదా unique identifiers సృష్టించడానికి ఉపయోగించండి:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Plot |
+| note | plot_label | Plot number ${index()} |
+| text | plot_id | Plot ID |
+| end_repeat | | |
+
+---
+
+## అదే ఇన్‌స్టెన్స్‌లో ఫీల్డ్‌లు సూచించడం
+
+రిపీట్ లోపల, **అదే రిపీట్ ఇన్‌స్టెన్స్** లోని మరొక ఫీల్డ్ సూచించడానికి `${fieldname}` ఉపయోగించండి. అదే loop లో `indexed-repeat()` అవసరం లేదు:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Member | |
+| text | member_name | Name | |
+| integer | member_age | Age | |
+| text | school_name | School name | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## రిపీట్ లోపల నుండి మాతృ ఫీల్డ్‌లు సూచించడం
+
+రిపీట్ సమూహం వెలుపల (పైన) ఉన్న ఫీల్డ్‌లు `${fieldname}` తో సాధారణంగా సూచించవచ్చు:
+
+| type | name | label |
+|------|------|-------|
+| text | village | Village name |
+| begin_repeat | plots | Agricultural plot |
+| note | plot_context | Plots in ${village} |
+| end_repeat | | |
+
+---
+
+## రిపీట్ డేటా సారాంశం
+
+రిపీట్ సమూహం **వెలుపల** రిపీట్ అగ్రిగేట్ ఫంక్షన్‌లు ఉపయోగించి సారాంశం:
+
+| ఫంక్షన్ | ఉదాహరణ | వివరణ |
+|---------|---------|--------|
+| `count(group)` | `count(${household_members})` | ఇన్‌స్టెన్స్‌ల సంఖ్య |
+| `sum(field)` | `sum(${loan_amount})` | సంఖ్య ఫీల్డ్ మొత్తం |
+| `min(field)` | `min(${member_age})` | కనిష్ట విలువ |
+| `max(field)` | `max(${member_age})` | గరిష్ట విలువ |
+| `join(sep, field)` | `join(', ', ${member_name})` | Comma-separated జాబితా |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | షరతులతో కూడిన గణన |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | షరతులతో కూడిన మొత్తం |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | షరతులతో కూడిన join |
+
+### ఉదాహరణ: గృహ సారాంశం
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | How many members? | |
+| begin_repeat | members | Member | `${num_members}` |
+| text | member_name | Name | |
+| integer | member_age | Age | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | ${total_members} members; ${children_count} under 18. Adults: ${adult_names} | |
+
+---
+
+## నెస్టెడ్ రిపీట్‌లు
+
+రిపీట్ సమూహం మరొక రిపీట్ సమూహాన్ని కలిగి ఉండవచ్చు. జాగ్రత్తగా ఉపయోగించండి — నెస్టెడ్ రిపీట్‌లు సంక్లిష్టత జోడిస్తాయి మరియు గణికులకు అయోమయంగా ఉండవచ్చు.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Household |
+| text | hh_id | Household ID |
+| begin_repeat | hh_members | Member |
+| text | member_name | Member name |
+| end_repeat | | |
+| end_repeat | | |
+
+లోపలి రిపీట్ నుండి బాహ్య రిపీట్‌లో ఫీల్డ్ సూచించడానికి, `${fieldname}` ఉపయోగించండి — ఇది సమీపిస్తున్న సరిపోలే ancestor కు resolve అవుతుంది:
+
+`hh_members` రిపీట్ లోపల, `${hh_id}` **ప్రస్తుత** గృహం యొక్క ID తిరిగి ఇస్తుంది, అన్ని గృహాల కాదు.
+
+---
+
+## రిపీట్ సమూహాలలో rank: `rank-index()`
+
+రిపీట్‌లో `rank` ఫీల్డ్ ఉన్నప్పుడు, `rank-index(instanceNumber, repeatedField)` ఉపయోగించి రిపీట్ వెలుపల నుండి నిర్దిష్ట ఇన్‌స్టెన్స్ యొక్క ordinal rank పొందండి:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` అత్యధిక score యొక్క ఇన్‌స్టెన్స్ index తిరిగి ఇస్తుంది.
+
+---
+
+## ఉత్తమ పద్ధతులు
+
+1. ముందే పునరావృత సంఖ్య తెలిసినప్పుడు ఎల్లప్పుడూ `repeat_count` ఉపయోగించండి — గణికులు instances యాదృచ్ఛికంగా జోడించడం లేదా తొలగించడం నివారిస్తుంది.
+2. రిపీట్ సమూహాలు దృష్టి కేంద్రీకరించి ఉంచండి — instance కు 20+ ప్రశ్నలతో రిపీట్ నావిగేట్ చేయడం కష్టం.
+3. రిపీట్ సమూహాలను స్పష్టంగా పేరు పెట్టండి (ఉదా. `household_members`, `repeat1` కాదు) — పేరు ఫంక్షన్ కాల్‌లు మరియు ఎగుమతి డేటాలో కనిపిస్తుంది.
+4. పనితీరు ధృవీకరించడానికి ఆశించిన గరిష్ట instance సంఖ్యతో పరీక్షించండి.
+5. mobile లో instance కు అన్ని ఫీల్డ్‌లు ఒక స్క్రీన్‌లో చూపించడానికి రిపీట్ సమూహంపై `field-list` అపీరెన్స్ ఉపయోగించండి.
+
+---
+
+## పరిమితులు
+
+- `indexed-repeat()` కు చెల్లుబాటయ్యే index అవసరం (1 నుండి instances గణన వరకు) — పరిధి వెలుపల indexes ఖాళీగా తిరిగి ఇస్తాయి.
+- 2 స్థాయిలకు మించిన నెస్టెడ్ రిపీట్‌లు సిఫారసు చేయబడవు మరియు కొన్ని క్లయింట్‌లలో ప్రదర్శన సమస్యలు కలిగించవచ్చు.
+- అగ్రిగేట్ ఫంక్షన్‌లు (`sum`, `count` మొదలైనవి) మొత్తం రిపీట్ సమూహంపై పని చేస్తాయి — `*-if` వేరియంట్‌లు లేకుండా instances subset ను అగ్రిగేట్ చేయలేరు.

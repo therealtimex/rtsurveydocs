@@ -1,0 +1,80 @@
+---
+description: Las preguntas de nota muestran texto o medios de solo lectura para proporcionar
+  información o instrucciones en su encuesta.
+icon: info
+title: Nota
+---
+
+
+El tipo de pregunta nota en XLSForms y rtSurvey se usa para mostrar texto o medios de solo lectura al encuestado. No es una pregunta que requiere respuesta, sino una forma de proporcionar información, instrucciones o contexto dentro de la encuesta.
+
+## Especificación básica de XLSForm
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | Esta encuesta trata sobre sus hábitos de lectura. |
+
+Para obtener más detalles sobre el tipo de pregunta nota básico, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
+
+## Usos
+
+Las preguntas de nota se usan comúnmente para:
+
+1. Proporcionar instrucciones o contexto para preguntas próximas
+2. Mostrar resultados calculados o resúmenes
+3. Mostrar imágenes u otros medios
+4. Separar secciones de una encuesta
+5. Dar retroalimentación basada en respuestas anteriores
+
+## Mejores prácticas
+
+1. Mantenga el texto de la nota conciso y claro para mantener el compromiso del encuestado.
+2. Use formato (negrita, cursiva) para enfatizar información importante.
+3. Considere usar medios (imágenes, audio) para mejorar la comprensión cuando sea apropiado.
+4. Use notas con moderación para evitar saturar la encuesta.
+
+## Ejemplo de uso
+
+He aquí un ejemplo de cómo podría usar preguntas de nota en una encuesta:
+
+| type | name | label |
+|------|------|-------|
+| note | intro | Bienvenido a nuestra encuesta de hábitos de lectura. Preguntaremos sobre sus preferencias y frecuencia de lectura. |
+| ... | ... | ... |
+| calculate | books_per_month | ${fiction_books} + ${non_fiction_books} |
+| note | reading_summary | Lee aproximadamente ${books_per_month} libros por mes. |
+
+En este ejemplo, usamos notas para presentar la encuesta y proporcionar un resumen de los resultados calculados.
+
+## Extensiones de rtSurvey
+
+Si bien la especificación básica de XLSForm para preguntas de nota es sencilla, rtSurvey puede ofrecer características o personalizaciones adicionales:
+
+1. Formato de texto enriquecido
+2. Soporte para medios incrustados (imágenes, audio, video)
+3. Contenido dinámico basado en respuestas anteriores
+4. Opciones de estilo personalizado
+
+## Uso avanzado
+
+### Visualización condicional
+
+Puede usar expresiones de relevancia para mostrar notas condicionalmente:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | ¡Es un lector ávido! | ${books_per_month} > 5 |
+
+### Incluir cálculos
+
+Las notas pueden incluir cálculos para proporcionar retroalimentación dinámica:
+
+| type | name | label |
+|------|------|-------|
+| note | reading_time | Según sus respuestas, pasa aproximadamente ${books_per_month * 5} horas leyendo cada mes. |
+
+## Limitaciones
+
+- Las notas no recopilan datos, por lo que no deben usarse cuando necesita recopilar información de los encuestados.
+- El uso excesivo de notas puede hacer que una encuesta parezca saturada o excesivamente larga.
+- Algunas opciones avanzadas de formato o medios pueden no ser compatibles con todos los dispositivos o plataformas.

@@ -1,0 +1,77 @@
+---
+description: Las preguntas de entero permiten entradas de números enteros en su encuesta.
+icon: '123'
+title: Entero
+---
+
+
+El tipo de pregunta entero en XLSForms y rtSurvey se usa para recopilar respuestas de números enteros. Este tipo de pregunta es esencial para recopilar datos numéricos sin decimales, como conteos, edades o años.
+
+## Especificación básica de XLSForm
+
+| type    | name  | label                      |
+|---------|-------|----------------------------|
+| integer | age   | Ingrese su edad en años     |
+
+Para obtener más detalles sobre el tipo de pregunta entero básico, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
+
+## Usos
+
+Las preguntas de entero se usan comúnmente para:
+
+1. Entradas de edad
+2. Contar elementos (p. ej., número de hijos, miembros del hogar)
+3. Entradas de año (p. ej., año de nacimiento)
+4. Calificaciones en una escala numérica
+5. Cualquier recopilación de datos de números enteros
+
+## Extensiones de rtSurvey
+
+Si bien la especificación básica de XLSForm para preguntas de entero es sencilla, rtSurvey puede ofrecer características o personalizaciones adicionales:
+
+1. Validación de rango
+2. Mensajes de error personalizados
+3. Opciones de apariencia para entrada numérica
+
+## Mejores prácticas
+
+1. Use etiquetas claras y concisas para especificar la entrada esperada.
+2. Implemente restricciones de rango para prevenir entradas no realistas o erróneas.
+3. Considere usar texto de indicación para proporcionar ejemplos o aclarar el formato esperado.
+4. Para números grandes, considere usar comas o espacios en la etiqueta para mejorar la legibilidad (p. ej., "Ingrese la población (hasta 1,000,000)").
+
+## Restricciones y validación
+
+Puede agregar restricciones para garantizar que el valor ingresado esté dentro de un rango específico:
+
+| type    | name  | label                      | constraint        | constraint_message                      |
+|---------|-------|----------------------------|-------------------|-----------------------------------------|
+| integer | age   | Ingrese su edad en años     | .>0 and .<=120    | La edad debe estar entre 1 y 120 años   |
+
+## Ejemplo de uso
+
+He aquí un ejemplo de cómo podría usar preguntas de entero en una encuesta de hogar:
+
+| type    | name           | label                                          | constraint | constraint_message                           |
+|---------|----------------|------------------------------------------------|------------|----------------------------------------------|
+| integer | household_size | ¿Cuántas personas viven en su hogar?           | .>0        | El tamaño del hogar debe ser al menos 1      |
+| integer | num_children   | ¿Cuántos niños menores de 18 años hay en el hogar? | .>=0   | El número de niños no puede ser negativo    |
+| integer | year_built     | ¿En qué año fue construida su casa?            | .>1800 and .<=2023 | El año debe estar entre 1800 y 2023  |
+
+## Cálculo con valores enteros
+
+Los valores enteros pueden usarse en cálculos. He aquí un ejemplo:
+
+| type    | name           | label                                          |
+|---------|----------------|------------------------------------------------|
+| integer | num_adults     | Número de adultos en el hogar                  |
+| integer | num_children   | Número de niños en el hogar                    |
+| calculate | total_members | |
+
+En la fila de cálculo, puede usar:
+
+```
+calculation | ${num_adults} + ${num_children}
+```
+
+Esto sumará el número de adultos y niños para obtener el total de miembros del hogar.

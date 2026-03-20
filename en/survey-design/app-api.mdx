@@ -1,0 +1,137 @@
+---
+description: ''
+icon: code
+title: App API
+---
+
+
+The AppAPI allows users to load system meta data from the app using different methods in the FormEngine and DMView. It provides access to various data keys for retrieving specific information from the app.
+
+In the xlsform, you can use the `pulldata()` function with the following syntax:
+
+
+<Note>pulldata('app-api', 'data-key')</Note>
+
+- `'app-api'`: This keyword informs the FormEngine to load the data from the App API.
+- `'data-key'`: This is the key of the data you want to load from the App API.
+- If the data key is invalid or not supported, the calculation will return "n/a".
+
+Here are the supported data keys that you can use with the App-API:
+
+`osPlatform`: Returns the current OS name (Android or iOS) and the OS version. Web platforms will return an empty value.
+
+`appPlatform`: Returns the app platform name, whichs is `rtSurvey`.
+
+`appVersion`: Returns the app's version name.
+
+`getDisplayWidth`: Returns the device screen width in pixels.
+
+`getDisplayHeight`: Returns the device screen height in pixels.
+
+`getScreenSize`: Returns the device screen size in inches.
+
+`projectCode`: Returns the current project code of the site the user is signing in to.
+
+`projectURL`: Returns the current project URL of the site the user is signing in to. The default/fallback value is an empty text ("").
+
+`startingPoint`: Returns the path of the point that starts the form. Refer to the "Form starting point" for more details.
+
+`serverTime`: Returns the best available approximation of the date and time on the server.
+
+`user.[attribute]`: Returns the current user attributes based on the specified attribute key. Refer to the "User attributes" table for available attribute keys.
+
+Combine the below attribute keys with "user." in the `pulldata()` params to retrieve the current user information. For example, use `user.username`, `user.email`, etc.
+
+| Attribute Key        | Description                          |
+|----------------------|--------------------------------------|
+| username             | Username of the user                  |
+| name                 | Full name of the user                 |
+| staffCode            | User's staff code                     |
+| phone                | Phone number of the user              |
+| email                | Email address of the user             |
+| description          | Description text in user information  |
+| organization_id      | Organization ID the user belongs to    |
+| organization_name    | Organization name the user belongs to  |
+| team_id              | Team ID the user belongs to            |
+| supervisor_id        | ID of the user's supervisor            |
+| is_supervisor        | 1 if the user is a supervisor, 0 if not|
+
+`instancePath`: Returns the current instance folder path.
+
+`appLanguage`: Returns the current app language set in the app's settings (e.g., vi, en).
+
+`openArgs.[attribute]`: Returns the open-form-argument passed from the ActionButton (act_fill_form, act_get_instance). The default/fallback value is an empty text ("").
+
+`primaryAppColor`: Retrieves the app's primary color.
+
+---
+
+## Usage examples
+
+### Store the enumerator's username and organisation
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Use these in note labels for audit purposes:
+```
+note | interviewer_info | Interviewer: ${enumerator_name} (${enumerator_org})
+```
+
+### Device and screen info
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+Useful for troubleshooting: export `device_platform` and `app_ver` alongside your data to identify which device version was used for each submission.
+
+### Server time instead of device time
+
+Device clocks can be wrong. Use `serverTime` for a more reliable timestamp:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Conditional logic based on user role
+
+Show a supervisor-only section only to supervisors:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Supervisor review | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Supervisor notes | |
+| end_group | | | |
+
+### Pass arguments from an action button
+
+When the form is launched from an `act_fill_form` action button with custom arguments:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+The action button must pass the arguments with matching keys (e.g., `household_id`, `task_code`).
+
+### Using project info
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## Notes
+
+- All `pulldata('app-api', ...)` calls are evaluated when the form is opened and are not re-evaluated dynamically during the session (except `serverTime` and `now()`).
+- If a key is unsupported or the data is unavailable, the function returns `'n/a'` (not empty string — test with `!= 'n/a'` rather than `!= ''`).
+- `openArgs` values are only available when the form is launched from an action button; they return empty string otherwise.

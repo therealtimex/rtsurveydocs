@@ -1,0 +1,75 @@
+---
+description: Pertanyaan desimal memungkinkan input numerik dengan bagian fraksional
+  dalam survei Anda.
+icon: calculate
+title: Desimal
+---
+
+
+Tipe pertanyaan desimal dalam XLSForm dan rtSurvey digunakan untuk mengumpulkan respons numerik yang mungkin mencakup bagian fraksional. Tipe pertanyaan ini penting untuk mengumpulkan data numerik yang tepat seperti pengukuran, harga, atau persentase.
+
+## Spesifikasi XLSForm Dasar
+
+| type    | name   | label                        |
+|---------|--------|------------------------------|
+| decimal | weight | Masukkan berat Anda dalam kg |
+
+Untuk detail lebih lanjut tentang tipe pertanyaan desimal dasar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+
+## Penggunaan
+
+Pertanyaan desimal umum digunakan untuk:
+
+1. Pengukuran (misalnya, berat, tinggi, jarak)
+2. Data keuangan (misalnya, harga, gaji)
+3. Persentase
+4. Pengumpulan data ilmiah
+5. Data numerik apa pun yang memerlukan presisi di luar bilangan bulat
+
+## Praktik Terbaik
+
+1. Gunakan label yang jelas dan ringkas untuk menentukan input yang diharapkan dan satuan pengukuran.
+2. Terapkan constraint rentang untuk mencegah input yang tidak realistis atau keliru.
+3. Pertimbangkan menggunakan teks petunjuk untuk memberikan contoh atau mengklarifikasi format yang diharapkan.
+4. Tentukan jumlah tempat desimal yang diinginkan dalam label atau petunjuk jika presisi penting.
+
+## Constraint dan Validasi
+
+Anda dapat menambahkan constraint untuk memastikan nilai yang dimasukkan berada dalam rentang tertentu:
+
+| type    | name   | label                        | constraint        | constraint_message                       |
+|---------|--------|------------------------------|-------------------|------------------------------------------|
+| decimal | height | Masukkan tinggi Anda dalam meter | .>0 and .<=3  | Tinggi harus antara 0 dan 3 meter        |
+
+## Contoh Penggunaan
+
+Berikut adalah contoh cara menggunakan pertanyaan desimal dalam survei kesehatan:
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| decimal | weight         | Masukkan berat Anda dalam kg              | .>0 and .<=500 | Berat harus antara 0 dan 500 kg |
+| decimal | height         | Masukkan tinggi Anda dalam meter          | .>0 and .<=3 | Tinggi harus antara 0 dan 3 meter |
+| decimal | body_temp      | Masukkan suhu tubuh Anda dalam Celsius    | .>=35 and .<=42 | Suhu harus antara 35°C dan 42°C |
+| calculate | bmi          |                                           |            |                                   |
+
+Dalam baris kalkulasi untuk BMI, Anda dapat menggunakan:
+
+```
+calculation | ${weight} / (${height} * ${height})
+```
+
+Ini akan menghitung BMI menggunakan berat dan tinggi yang dimasukkan.
+
+## Ekstensi rtSurvey
+
+Meskipun spesifikasi XLSForm dasar untuk pertanyaan desimal sederhana, rtSurvey mungkin menawarkan fitur atau kustomisasi tambahan:
+
+1. Kontrol presisi (jumlah tempat desimal)
+2. Format input kustom (misalnya, persentase, mata uang)
+3. Aturan validasi lanjutan
+
+## Keterbatasan
+
+- Presisi angka desimal mungkin dibatasi oleh sistem atau database yang mendasarinya.
+- Pengguna mungkin memerlukan panduan tentang pemisah desimal yang diharapkan (titik atau koma) tergantung pada lokal mereka.
+- Angka desimal besar mungkin sulit dibaca atau dimasukkan secara akurat pada perangkat mobile.

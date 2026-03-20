@@ -1,0 +1,155 @@
+---
+description: ការកំណត់ Single Sign-On សម្រាប់ rtCloud ដែល host ខ្លួនឯង ដោយប្រើ Keycloak
+  ភ្ជាប់, OIDC provider ខាងក្រៅ, ឬ Azure Active Directory។
+icon: lock
+title: ការផ្ទៀងផ្ទាត់ SSO
+---
+
+
+rtCloud គាំទ្រ វិធីសាស្ត្រ បី សម្រាប់ Single Sign-On (SSO):
+
+| ជម្រើស | ល្អ បំផុត សម្រាប់ |
+|--------|----------|
+| [Keycloak ភ្ជាប់](#embedded-keycloak) | អង្គការ ដែល ចង់ SSO server ដែល ដំណើរការ ខ្លួន ឯង ពេញ ដែល ភ្ជាប់ ជាមួយ rtCloud |
+| [External OIDC Provider](#external-oidc-provider) | អង្គការ ដែល ដំណើរការ identity provider ស្រាប់ (Auth0, Authentik, Okta, Supabase, ។ ល។) |
+| [Azure Active Directory](#azure-active-directory) | អង្គការ ដែលប្រើ Microsoft 365 ឬ Azure AD |
+
+ដោយ គ្មាន SSO ដែល configured, users ចូល ជាមួយ local rtCloud accounts ដែល គ្រប់គ្រង តាមរយៈ admin panel។
+
+---
+
+## Keycloak ភ្ជាប់ {#embedded-keycloak}
+
+ការ deployment រួមមាន Keycloak container ស្រេចចិត្ត ដែល ដំណើរការ ជាមួយ rtCloud។ Keycloak ត្រូវ បាន preconfigured ជាមួយ rtSurvey realm ហើយ ត្រួចប្រើ ។
+
+### លក្ខខណ្ឌ
+
+- ឈ្មោះ domain ជាមួយ HTTPS (Keycloak ត្រូវការ HTTPS ក្នុង production)
+- RAM យ៉ាងតិច 4 GB នៅ server (Keycloak បន្ថែម ~512 MB memory usage)
+
+### ការ Setup
+
+**១. Configure environment variables ក្នុង `.env`:**
+
+```dotenv
+EMBED_KEYCLOAK=true
+
+KEYCLOAK_URL=https://rtcloud.example.com/auth
+KC_HOSTNAME=https://rtcloud.example.com/auth
+KC_HOSTNAME_STRICT=false
+
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey-app
+KEYCLOAK_CLIENT_SECRET=your-client-secret-here
+
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change_me_keycloak_admin_password
+
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change_me_keycloak_db_password
+
+KEYCLOAK_PORT=8091
+```
+
+**២. ចាប់ផ្ដើម ជាមួយ Keycloak profile ភ្ជាប់:**
+
+```bash
+docker compose -f docker-compose.production.yml --profile embed-keycloak up -d
+```
+
+**៣. ផ្ទៀងផ្ទាត់ Keycloak healthy:**
+
+```bash
+docker compose -f docker-compose.production.yml ps
+```
+
+**៤. ចូលដំណើរការ Keycloak admin console:**
+
+```
+https://rtcloud.example.com/auth/admin
+```
+
+### អ្វី ដែល Preconfigured
+
+Keycloak ភ្ជាប់ ចាប់ផ្ដើម ជាមួយ `rtsurvey` realm ដែល imported ជាមុន ដែលរួមមាន:
+- ការ configure client សម្រាប់ web application
+- User roles default (`admin`, `project_manager`, `enumerator`, `analyst`)
+- Session និង token settings ដែល optimized សម្រាប់ rtSurvey
+
+---
+
+## External OIDC Provider {#external-oidc-provider}
+
+ភ្ជាប់ rtCloud ទៅ identity provider ណាមួយ ដែល ស្របគ្នា OpenID Connect។ វិធីសាស្ត្រ នេះ មិន ត្រូវការ Keycloak container ទេ។
+
+### Providers ដែល គាំទ្រ
+
+Provider ណា មួយ ដែល ស្របគ្នា OIDC ដំណើរការ, រួមមាន:
+- Authentik, Auth0, Okta, Keycloak (instance ខាងក្រៅ)
+- Supabase, Google (សម្រាប់ Google Workspace organizations)
+
+### ការ Setup
+
+**១. Register rtCloud ជា OIDC client ក្នុង identity provider:**
+
+អ្នក នឹង ត្រូវការ:
+- **client ID** និង **client secret**
+- ចុះ ឈ្មោះ **redirect URI**: `https://rtcloud.example.com/auth/callback`
+- សម្រាប់ mobile app support: `vn.rta.rtsurvey.auth://callback`
+
+**២. Configure environment variables ក្នុង `.env`:**
+
+```dotenv
+OIDC_ISSUER_URL=https://your-identity-provider.com
+OIDC_CLIENT_ID=rtcloud-app
+OIDC_CLIENT_SECRET=your-client-secret-here
+OIDC_SCOPE=openid profile email
+OIDC_REDIRECT_URI=https://rtcloud.example.com/auth/callback
+OIDC_MOBILE_CLIENT_ID=rtcloud-mobile
+OIDC_MOBILE_REDIRECT_URI=vn.rta.rtsurvey.auth://callback
+OPEN_REGISTRATION=false
+```
+
+**៣. Restart app container:**
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Auto-Provisioning Users
+
+នៅពេល `OPEN_REGISTRATION=true`, rtCloud បង្កើត local account ដោយ ស្វ័យប្រវត្តិ ជា លើក ដំបូង ដែល user ចូល តាម OIDC។
+
+---
+
+## Azure Active Directory {#azure-active-directory}
+
+### ការ Setup
+
+**១. Register app ថ្មី នៅ [Azure Portal](https://portal.azure.com):**
+   - ចូល **Azure Active Directory** → **App registrations** → **New registration**
+   - Redirect URI: `https://rtcloud.example.com/auth/callback`
+
+**២. Configure environment variables ក្នុង `.env`:**
+
+```dotenv
+AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+```
+
+**៣. Restart app container:**
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+---
+
+## បិទ SSO
+
+ដើម្បី ត្រឡប់ ទៅ local authentication, លុប ឬ comment out variables ទាំងអស់ ដែល ទាក់ ទង SSO ពី `.env`, ហើយ restart app container:
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
+```

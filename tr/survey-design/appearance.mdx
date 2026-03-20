@@ -1,0 +1,96 @@
+---
+description: ''
+icon: code
+title: Görünüm
+---
+
+
+rtSurvey'deki `appearance` sütunu, anketlerdeki soruların görsel sunumunu ve davranışını özelleştirmenize olanak tanır. Bu özellik kullanıcı deneyimini geliştirir ve veri toplama verimliliğini önemli ölçüde artırabilir. rtSurvey, standart XLSForm görünüm özniteliklerini destekler ve bunları ek seçeneklerle genişletir.
+
+## Standart XLSForm Görünüm Öznitelikleri
+
+rtSurvey aşağıdaki standart XLSForm görünüm özniteliklerini destekler:
+
+| Görünüm Özniteliği | Soru Türleri | Açıklama |
+|----------------------|----------------|-------------|
+| multiline | text | Çok satırlı metin kutusu oluşturur (web istemcileri için en uygun) |
+| minimal | select_one, select_multiple | Seçenekleri açılır menüde görüntüler |
+| quick | select_one | Seçimden sonra bir sonraki soruya otomatik ilerler (yalnızca mobil) |
+| no-calendar | date | Takvim görüntüsünü bastırır (yalnızca mobil) |
+| month-year | date | Yalnızca ay ve yıl seçimine izin verir |
+| year | date | Yalnızca yıl seçimine izin verir |
+| horizontal-compact | select_one, select_multiple | Seçenekleri yatay olarak görüntüler (yalnızca web) |
+| horizontal | select_one, select_multiple | Seçenekleri sütunlarda yatay olarak görüntüler (yalnızca web) |
+| likert | select_one | Seçenekleri Likert ölçeği olarak sunar |
+| compact | select_one, select_multiple | Seçenekleri minimum dolgu ile yan yana görüntüler |
+| quickcompact | select_one | Kompakt görünümü otomatik ilerlemeyle birleştirir (yalnızca mobil) |
+| field-list | groups | Tüm grubu tek ekranda görüntüler (yalnızca mobil) |
+| label | select_one, select_multiple | Girişler olmadan seçenek etiketlerini gösterir |
+| list-nolabel | select_one, select_multiple | Etiketler olmadan girişleri gösterir (`label` ile kullanın) |
+| table-list | groups | Soruları tablo biçiminde görüntüler |
+| signature | image | İmza yakalamayı etkinleştirir (yalnızca mobil) |
+| draw | image | Serbest çizime izin verir (yalnızca mobil) |
+| map, quick map | select_one, select_one_from_file | Harita özelliklerinden seçime olanak tanır |
+
+## Görünüm Kullanımı için En İyi Uygulamalar
+
+1. **Tutarlılık**: Tekdüze bir görünüm için anketiniz genelinde görünüm özniteliklerini tutarlı biçimde kullanın.
+2. **Mobil ve Web**: Görünümlerin farklı cihaz ve platformlarda nasıl görüneceğini göz önünde bulundurun.
+3. **Performans**: Form yüklemesini yavaşlatabilecek görünüm öznitelikleri konusunda dikkatli olun (örn. büyük gruplar için `table-list`).
+4. **Kullanıcı Deneyimi**: Katılımcılar için veri girişini daha kolay ve sezgisel hale getiren görünümleri seçin.
+5. **Test**: Görünümlerin beklendiği gibi çalıştığından emin olmak için formunuzu her zaman hedef cihazlarda test edin.
+
+## Gelişmiş Teknikler
+
+### Görünümleri Birleştirme
+
+Bazı görünüm öznitelikleri daha karmaşık düzenler için birleştirilebilir:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Birini seçin: | minimal compact |
+```
+
+### Dinamik Görünümler
+
+rtSurvey, form mantığına dayalı dinamik görünüm değişikliklerine izin verir:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Saati girin: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Mobil Uygulama Hususları
+
+- Bazı görünümler (örn. `quick`, `signature`) mobil cihazlara özgüdür.
+- Tutarlı davranışı sağlamak için hem Android hem de iOS'ta kapsamlı test yapın.
+
+## rtSurvey Genişletilmiş Görünüm Öznitelikleri
+
+Standart XLSForm görünümlerine ek olarak, rtSurvey aşağıdaki platforma özgü seçenekleri destekler:
+
+### Veri ve görüntüleme kontrolü
+
+| Görünüm Özniteliği | Soru Türleri | Açıklama |
+|----------------------|----------------|-------------|
+| `invisible` | herhangi | Alanı görünümden gizlerken değerini toplamaya veya hesaplamaya devam eder. `hidden` türünden farklı olarak alan hâlâ mantığa katılır. |
+| `displaytitle` | herhangi | Alanın etiketinin/başlığının aksi hâlde bastırılacağı durumlarda bile görüntülenmesini zorlar. |
+| `autopull` | select_one, select_multiple | Form yüklendiğinde veya tetikleyici alan değiştiğinde seçenekleri doldurmak için harici verileri otomatik olarak getirir. |
+| `floating_hint` | text, integer, decimal | İpucu metnini aşağıda değil, giriş alanının üzerinde yüzen bir etiket olarak gösterir. |
+| `calculate-button` | calculate | Otomatik hesaplamak yerine alanın isteğe bağlı olarak yeniden hesaplanmasını tetikleyen görünür bir düğme ekler. |
+
+### Düzen
+
+| Görünüm Özniteliği | Soru Türleri | Açıklama |
+|----------------------|----------------|-------------|
+| `1screen` | group | Grup boyutundan bağımsız olarak tüm grubun tek bir ekranda görüntülenmesini zorlar. |
+| `columns(n)` | select_one, select_multiple | Seçenekleri `n` sütunda görüntüler. Örnek: `columns(3)` üç sütun radyo düğmesi gösterir. |
+| `gridformat<row=R col=C colspan=S align=center>` | herhangi | Alanı `R` satır, `C` sütun konumunda `S` sütun kapsayan bir CSS ızgara düzenine yerleştirir. `advanced-extension/grid-layout` ile kullanılır. |
+| `ignore-simplify` | herhangi | Form oluşturucuya bu alanın düzeninin otomatik basitleştirilmesini veya sıkıştırılmasını atlamasını söyler. |
+
+### Widget'lar
+
+| Görünüm Özniteliği | Soru Türleri | Açıklama |
+|----------------------|----------------|-------------|

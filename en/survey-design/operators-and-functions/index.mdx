@@ -1,0 +1,55 @@
+---
+description: ''
+icon: code
+title: Operators and Functions
+---
+
+
+Expressions in rtSurvey are written in a subset of **XPath 1.0**, extended with JavaRosa/ODK functions and custom rtSurvey functions. You use expressions in the `calculate`, `constraint`, `relevant`, `required`, and `default` columns of your XLSForm.
+
+## Referencing field values
+
+Use `${fieldname}` to reference the value of another field:
+
+```
+${age} > 18
+```
+
+Use `.` (a single dot) to reference the **current field's value** — commonly used in `constraint` expressions:
+
+```
+. >= 0 and . <= 100
+```
+
+Use `..` to reference the parent group (advanced usage in repeats).
+
+## Expression syntax
+
+Expressions follow standard XPath rules:
+
+- **Strings** must be enclosed in single quotes: `'yes'`
+- **Numbers** are written as-is: `42`, `3.14`
+- **Boolean** results are used for `relevant`, `required`, and `constraint` — any non-empty, non-zero value is truthy
+- Whitespace is ignored around operators
+
+<Warning>
+Always use straight quotes (`'` or `"`) — never "smart quotes" (curly quotes). Rich text editors often convert quotes automatically and will break your expressions.
+</Warning>
+
+## Sections in this chapter
+
+- **[Operators](operators)** — comparison operators (`=`, `!=`, `>`, `<`, `>=`, `<=`) and logical operators (`and`, `or`, `not()`)
+- **[Functions](functions)** — string, selection, number, date/time, boolean, geo, and utility functions
+- **[References](references)** — how to reference fields and context values
+
+## Quick examples
+
+| Use case | Expression |
+|----------|------------|
+| Show if age is over 18 | `${age} > 18` |
+| Show only if "yes" was selected | `${consent} = 'yes'` |
+| Require if another field is not empty | `${name} != ''` |
+| Calculate total | `${adults} + ${children}` |
+| Concatenate name | `concat(${first_name}, ' ', ${last_name})` |
+| Today's date | `today()` |
+| Check if option was selected | `selected(${interests}, 'sports')` |

@@ -1,0 +1,117 @@
+---
+description: 考试功能为调查添加计时测验模式，并可选择为正确和错误答案提供音频反馈。
+icon: manage_search
+title: 考试
+---
+
+
+**考试**功能将调查变成计时测验。向受访者显示倒计时计时器，调查记录他们完成时剩余的时间。可选地，可以为正确和错误的答案播放音频声音。
+
+这对于知识评估、识字测试、现场工作人员能力检查，以及任何任务时间是有意义数据的调查都很有用。
+
+---
+
+## `check-exam()` 函数
+
+使用放置在表单开头的 `calculate` 字段的 **`calculation`** 列中的 `check-exam()` 配置考试：
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### 参数
+
+| # | 参数 | 描述 |
+|---|-----------|-------------|
+| 1 | `examTime` | 考试总时长（秒） |
+| 2 | `questionToStoreRemainingTime` | 将在考试结束时存储剩余时间的 `calculate` 或 `integer` 字段的 `name` |
+| 3 | `rightSound` | *（可选）* 给出正确答案时播放的音频文件名（作为媒体文件附加到表单） |
+| 4 | `wrongSound` | *（可选）* 给出错误答案时播放的音频文件名 |
+| 5 | `excludeQuestion` | *（可选）* 要从考试计时器中排除的字段名称的逗号分隔列表（例如，`'intro_note,consent'`） |
+
+---
+
+## 基本设置
+
+### 第一步：添加考试字段
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` 触发 600 秒（10 分钟）计时器。`remaining_time` 在受访者完成时自动填充。
+
+### 第二步：添加您的问题
+
+考试计时器覆盖表单中的所有问题，除了 `excludeQuestion` 中列出的问题。
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | 肯尼亚的首都是内罗毕。对还是错？ |
+| select_one choices | q2 | 哪个器官将血液泵送到全身？ |
+| select_one choices | q3 | 水在海平面 100°C 时沸腾。对还是错？ |
+
+### 第三步：存储剩余时间
+
+参数 2 中命名的字段（`remaining_time`）在受访者提交时自动设置为剩余秒数。值为 `0` 表示时间用完；高值表示他们完成得很快。
+
+---
+
+## 带音频反馈
+
+将音频文件作为媒体附件附加到表单，然后引用它们：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` 在受访者选择正确答案时播放
+- `wrong.mp3` 在受访者选择错误答案时播放
+
+<Warning>
+音频文件必须作为媒体文件附加到表单，文件名必须完全匹配（区分大小写），包括扩展名。
+</Warning>
+
+---
+
+## 将问题排除在计时器之外
+
+传递字段名称的逗号分隔列表，以将其排除在考试之外（例如，介绍性注释或同意问题）：
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+如果不需要音频但需要排除项，将 `rightSound` 和 `wrongSound` 留为空字符串 `''`。
+
+---
+
+## 完整示例
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | 欢迎参加健康知识评估。您有 5 分钟时间回答所有问题。 | |
+| trigger | start_ack | 准备好后点击确定。 | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | 洗手可以防止疾病传播。 | |
+| select_one yesno | q2 | 您每天应该至少喝 2 升水。 | |
+| select_one yesno | q3 | 疟疾是由病毒引起的。 | |
+
+---
+
+## 最佳实践
+
+1. 在开始之前始终告知受访者时间限制——在 `check-exam()` 字段之前使用 `note` 或 `trigger`。
+2. 使用 `excludeQuestion` 参数将介绍注释和同意问题排除在计时器之外。
+3. 在后续计算中使用 `remaining_time` 检测超时：`if(${remaining_time} = 0, '已超时', '已完成')`。
+4. 保持问题数量与允许时间成比例——对于大多数知识评估，每题 2–3 分钟是合理的基准。
+5. 在实际设备上部署之前使用音频文件进行测试——音频播放在不同 Android 版本和浏览器之间有所不同。
+
+## 限制
+
+- 计时器仅用于显示——表单在时间用完时不会自动提交；受访者仍必须手动提交。
+- 音频反馈要求设备音量开启且未静音。
+- 考试功能是 rtSurvey 扩展，不是标准 XLSForm 规范的一部分。

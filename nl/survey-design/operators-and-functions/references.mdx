@@ -1,0 +1,82 @@
+---
+description: ''
+icon: code
+title: Verwijzen naar waarden
+---
+
+
+De syntaxis `${veldnaam}` wordt gebruikt om te verwijzen naar de huidige waarde van een ander veld in uw formulier. Het kan de ingevoerde, geselecteerde of berekende waarde vertegenwoordigen, en wordt weergegeven precies zoals het in de ingediende gegevens verschijnt.
+
+Voorbeeld:
+Als u een veld met de naam "age" heeft en u de exacte waarde wilt ophalen die in dat veld is ingevoerd, kunt u `${age}` gebruiken.
+
+Bij beperkingen wordt het "."-symbool gebruikt om te verwijzen naar de voorgestelde invoer of selectie van de gebruiker voor het huidige veld. Hiermee kunt u voorwaarden of limieten toepassen op basis van de waarde die de gebruiker op dat moment invoert of selecteert.
+
+Voorbeeld:
+Als u wilt controleren of de voorgestelde waarde voor het huidige veld kleiner is dan 3, kunt u de beperking `. < 3` gebruiken.
+
+---
+
+## `..` — Verwijzing naar bovenliggende groep
+
+Binnen een groep of herhalingsgroep verwijst `..` naar de **bovenliggende context**. Dit is in de praktijk zelden nodig, maar wordt gebruikt in geavanceerde XPath-expressies om door de formulierhiërarchie te navigeren.
+
+---
+
+## Waar referenties worden gebruikt
+
+| Kolom | Referentietype | Voorbeeld |
+|-------|---------------|-----------|
+| `relevant` | `${veldnaam}` | `${consent} = 'yes'` |
+| `constraint` | `.` voor huidig veld, `${veldnaam}` voor anderen | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${veldnaam}` | `${adults} + ${children}` |
+| `required` | `${veldnaam}` | `${has_income} = 'yes'` |
+| `default` | `${veldnaam}` | `${previous_answer}` |
+| `label` | `${veldnaam}` in tekst | `"Uw leeftijd is ${age} jaar"` |
+| `choice_filter` | Kolomnaam (zonder `${}`) | `district = ${district}` |
+
+<Warning>
+Verwijs in de kolom `choice_filter` rechtstreeks naar **keuzekolom namen** (zonder `${}`), en verwijs naar **formuliervelden** met `${}`. Dit door elkaar halen is een veelvoorkomende bron van fouten.
+</Warning>
+
+---
+
+## Verwijzen naar waarden binnen herhalingsgroepen
+
+Binnen een herhaling verwijst `${veldnaam}` naar het veld in de **zelfde instantie** van de herhaling:
+
+```
+relevant: ${member_age} < 18
+```
+
+Dit gebruikt de waarde van `member_age` voor de huidige herhalingsinstantie, niet alle instanties.
+
+Om te verwijzen naar een veld in een **specifieke** herhalingsinstantie van buiten de herhaling, gebruikt u `indexed-repeat()`:
+
+```
+indexed-repeat(${member_name}, ${household_members}, 1)
+```
+
+Zie [Functies — Herhaalde veldfuncties](functions#repeated-field-functions) voor volledige details.
+
+---
+
+## Controles op lege waarden
+
+Test of een veld is beantwoord:
+
+```
+${veldnaam} != ''       (veld is niet leeg)
+${veldnaam} = ''        (veld is leeg)
+```
+
+Voor getallen kunt u ook controleren:
+```
+${age} > 0               (leeftijd heeft een positieve waarde — impliciet niet leeg in numerieke context)
+```
+
+---
+
+## Typeconversie in referenties
+
+Wanneer u `${veldnaam}` in een numerieke context gebruikt (bijv. `${age} + 1`), converteert rtSurvey de tekenreekswaarde automatisch naar een getal. Een leeg veld wordt geconverteerd naar `0` of `NaN` afhankelijk van de bewerking — gebruik `coalesce(${veld}, 0)` om een leeg numeriek veld veilig op nul te laten terugvallen.

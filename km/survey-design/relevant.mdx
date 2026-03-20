@@ -1,0 +1,36 @@
+---
+description: ''
+icon: code
+title: Relevant
+---
+
+
+column `relevant` implements skip logic, កំណត់ ពេល ណា question គួរ ត្រូវ display ។
+
+## Basic Usage
+
+```
+| type | name      | label                | relevant             |
+|------|-----------|----------------------|----------------------|
+| text | allergies | List your allergies  | ${has_allergies} = 'yes' |
+```
+
+## ការ ប្រើ ជ ា មួ យ Groups
+
+```
+| type        | name  | label                | relevant        |
+|-------------|-------|----------------------|-----------------|
+| integer     | age   | How old are you?     |                 |
+| begin_group | child | Child                | ${age} <= 5     |
+| integer     | muac  | MUAC measurement     |                 |
+| end_group   |       |                      |                 |
+```
+
+## Expressions ទូទៅ
+
+| Use case | Expression |
+|----------|------------|
+| ជ្រើស "yes" | `${field} = 'yes'` |
+| ខុ ស "" | `${field} != ''` |
+| លេ ខ ធំ ជ ាង | `${age} > 18` |
+| Multiple conditions | `${a} = 'yes' and ${b} > 0` |

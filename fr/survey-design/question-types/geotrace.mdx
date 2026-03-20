@@ -1,0 +1,83 @@
+---
+description: Les questions de type geotrace permettent aux répondants de capturer
+  une série de points connectés sur une carte, créant ainsi des lignes ou des tracés
+  dans le cadre de l'enquête.
+icon: timeline
+title: Geotrace
+---
+
+
+Le type de question `geotrace` dans XLSForms et rtSurvey permet aux répondants de capturer une série de points connectés sur une carte, créant ainsi des lignes ou des tracés. Cette fonctionnalité est particulièrement utile pour cartographier des itinéraires, des limites ou des caractéristiques linéaires dans le cadre d'enquêtes spatiales.
+
+## Spécification XLSForm de Base
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geotrace | river_path  | Tracer le cours de la rivière  |
+
+Pour plus de détails sur le type de question `geotrace` de base, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+
+## Utilisations
+
+Les questions `geotrace` sont couramment utilisées pour :
+
+1. Cartographier des itinéraires ou des trajets effectués lors d'enquêtes sur le terrain
+2. Tracer des caractéristiques linéaires comme des routes, des rivières ou des limites
+3. Capturer l'étendue d'infrastructures linéaires (ex : pipelines, lignes électriques)
+4. Enregistrer des trajets de déplacement dans les études de transport
+5. Définir des transects dans les enquêtes écologiques
+
+## Meilleures Pratiques
+
+1. Assurez-vous que l'appareil a activé les services de localisation et que les autorisations sont accordées.
+2. Fournissez des instructions claires sur la manière de tracer le chemin et sur les éléments à inclure.
+3. Envisagez d'utiliser l'imagerie satellite ou des cartes de base pour aider les répondants à tracer les chemins avec précision.
+4. Soyez conscient de la complexité potentielle des tracés et de leur impact sur la taille et le traitement des données.
+
+## Exemple d'Utilisation
+
+Voici un exemple de la manière dont vous pourriez utiliser une question `geotrace` dans une enquête :
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geotrace | hiking_trail   | Tracer le chemin du sentier de randonnée   | Commencez au point de départ et finissez au sommet |
+
+## Extensions rtSurvey
+
+Bien que la spécification XLSForm de base pour les questions `geotrace` soit simple, rtSurvey peut proposer des fonctionnalités ou des personnalisations supplémentaires :
+
+1. Intégration de cartes hors ligne pour les zones reculées
+2. Options pour définir un nombre minimum et maximum de points pour le tracé
+3. Possibilité de modifier ou d'affiner les tracés après le dessin initial
+4. Prise en charge du traçage automatique à des intervalles définis pendant le déplacement
+
+(Note : Les extensions spécifiques disponibles dans rtSurvey pour les questions `geotrace` devront être confirmées et détaillées ici.)
+
+## Format des Données
+
+Les données `geotrace` sont généralement stockées sous forme d'une chaîne de paires de coordonnées séparées par des espaces, similaire au `geoshape` mais sans le point de fermeture :
+
+```
+lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
+```
+
+Par exemple :
+```
+38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
+```
+
+## Considérations pour l'Analyse
+
+Lors de l'utilisation de questions `geotrace`, tenez compte de :
+
+1. La manière dont les données géographiques seront visualisées et analysées (ex : logiciel SIG)
+2. Le besoin potentiel de nettoyage ou de simplification des tracés complexes
+3. Les mesures de confidentialité et de protection des données pour la manipulation des données spatiales détaillées
+4. L'intégration avec d'autres sources de données spatiales pour une analyse complète
+
+## Limitations
+
+- Tracer des chemins précis sur de petits écrans mobiles peut être difficile.
+- Les tracés complexes peuvent nécessiter une capacité de stockage et de traitement importante.
+- L'utilisation continue du GPS pour le traçage automatique peut épuiser rapidement la batterie de l'appareil.
+- Des préoccupations en matière de confidentialité peuvent être associées à la collecte de données de trajet détaillées.

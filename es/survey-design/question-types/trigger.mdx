@@ -1,0 +1,94 @@
+---
+description: Las preguntas de trigger muestran una declaración que el encuestador
+  debe reconocer explícitamente antes de continuar.
+icon: check-circle
+title: Trigger / Reconocer
+---
+
+
+El tipo de pregunta `trigger` (también llamado `acknowledge`) muestra una **declaración con una casilla de verificación**. El encuestador debe marcar la casilla para confirmar que ha leído y comprendido la declaración antes de que el formulario le permita continuar. No se almacena ningún valor de datos — solo si la casilla fue marcada.
+
+## Especificación básica de XLSForm
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | El encuestado ha proporcionado consentimiento informado verbal. |
+
+O usando el alias `acknowledge`:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | El encuestado ha proporcionado consentimiento informado verbal. |
+
+Tanto `trigger` como `acknowledge` son equivalentes; use el que su plataforma documente.
+
+## Usos
+
+Las preguntas de trigger/reconocimiento se usan comúnmente para:
+
+1. **Consentimiento informado** — confirmar que el encuestador obtuvo el consentimiento antes de registrar datos sensibles
+2. **Alertas suaves** — advertir sobre un valor inusual y requerir confirmación explícita antes de continuar
+3. **Elementos de lista de verificación** — confirmar que se completó una observación física (p. ej., "He observado la fuente de agua directamente")
+4. **Instrucciones** — obligar al encuestador a reconocer una instrucción a nivel de sección antes de continuar
+5. **Controles de calidad** — marcar valores atípicos y requerir que el encuestador los verifique
+
+## Ejemplo de uso
+
+### Reconocimiento de consentimiento
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | El encuestado ha dado consentimiento informado verbal para participar en esta encuesta. | yes |
+
+### Alerta suave para valores atípicos
+
+Se usa junto con una expresión `relevant` para mostrar el trigger solo cuando se ingresa un valor sospechoso:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Número de hijos | | |
+| trigger | children_confirm | Ingresó ${children} hijos. Por favor verifique con el encuestado y toque OK para confirmar. | `${children} > 10` | `${children} > 10` |
+
+### Reconocimiento de instrucción al inicio de sección
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Sección B: Uso del suelo agrícola. Haga todas las preguntas de esta sección solo al jefe del hogar. |
+
+## Hacer el trigger requerido
+
+Agregue `required: yes` para evitar avanzar hasta que se marque la casilla:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | Todo el equipo de seguridad está presente y funcional. | yes | Debe confirmar antes de continuar. |
+
+## Visualización condicional
+
+Mostrar el trigger solo cuando se cumpla una condición:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | ¿El hogar tiene un pozo? | |
+| trigger | well_observation | Confirme que ha observado directamente el estado del pozo. | `${has_well} = 'yes'` |
+
+## Diferencia con `note`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Muestra texto | Sí | Sí |
+| Requiere interacción | No | Sí (debe marcar) |
+| Almacena datos | No | No (solo OK/marcado) |
+| Puede bloquear el progreso | No | Sí (con `required`) |
+
+## Mejores prácticas
+
+1. Mantenga las etiquetas del trigger concisas y accionables; el encuestador debe poder leer y confirmar en segundos.
+2. Siempre agregue `required: yes` cuando el reconocimiento sea obligatorio.
+3. Use triggers para consentimiento y controles de seguridad donde necesite un rastro de auditoría de que el encuestador confirmó.
+4. Combine con `relevant` para alertas suaves condicionales de modo que el trigger solo aparezca cuando un valor necesite verificación.
+
+## Limitaciones
+
+- Los campos trigger no almacenan un valor de datos significativo; solo registran que la casilla fue marcada.
+- El widget trigger se renderiza como una casilla de verificación/botón simple en la mayoría de los clientes; no es una firma electrónica completa.

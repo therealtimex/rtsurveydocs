@@ -1,0 +1,80 @@
+---
+description: Le domande geotrace permettono ai rispondenti di acquisire una serie
+  di punti collegati su una mappa, creando linee o percorsi come parte del sondaggio.
+icon: timeline
+title: Geotrace
+---
+
+
+Il tipo di domanda geotrace negli XLSForm e in rtSurvey consente ai rispondenti di acquisire una serie di punti collegati su una mappa, creando linee o percorsi. Questa funzionalità è particolarmente utile per mappare percorsi, confini o caratteristiche lineari nei sondaggi spaziali.
+
+## Specifica XLSForm di base
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geotrace | river_path  | Traccia il percorso del fiume     |
+
+Per ulteriori dettagli sul tipo di domanda geotrace di base, vedere la [specifica XLSForm](https://xlsform.org/en/#question-types).
+
+## Utilizzi
+
+Le domande geotrace sono comunemente usate per:
+
+1. Mappare percorsi o traiettorie durante i sondaggi sul campo
+2. Tracciare caratteristiche lineari come strade, fiumi o confini
+3. Acquisire l'estensione di infrastrutture lineari (es. condutture, linee elettriche)
+4. Registrare percorsi di viaggio negli studi sui trasporti
+5. Definire transetti nei sondaggi ecologici
+
+## Best practice
+
+1. Assicurarsi che il dispositivo abbia i servizi di localizzazione abilitati e i permessi concessi.
+2. Fornire istruzioni chiare su come tracciare il percorso e quali caratteristiche dovrebbero essere incluse.
+3. Considerare l'utilizzo di immagini satellitari o mappe di base per aiutare i rispondenti a tracciare accuratamente i percorsi.
+4. Essere consapevoli della potenziale complessità delle tracce e del loro impatto sulla dimensione e sull'elaborazione dei dati.
+
+## Esempio di utilizzo
+
+Ecco un esempio di come potresti usare una domanda geotrace in un sondaggio:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geotrace | hiking_trail   | Traccia il percorso del sentiero escursionistico         | Inizia al punto di partenza e termina alla vetta |
+
+## Estensioni rtSurvey
+
+Mentre la specifica XLSForm di base per le domande geotrace è semplice, rtSurvey può offrire funzionalità o personalizzazioni aggiuntive:
+
+1. Integrazione con mappe offline per aree remote
+2. Opzioni per impostare il numero minimo e massimo di punti per la traccia
+3. Capacità di modificare o raffinare le tracce dopo il disegno iniziale
+4. Supporto per la traccia automatica a intervalli prestabiliti durante il movimento
+
+## Formato dei dati
+
+I dati geotrace sono tipicamente memorizzati come una stringa di coppie di coordinate separate da spazi, simile a geoshape ma senza il punto di chiusura:
+
+```
+lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
+```
+
+Per esempio:
+```
+38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
+```
+
+## Considerazioni per l'analisi
+
+Quando usi le domande geotrace, considera:
+
+1. Come i dati geografici verranno visualizzati e analizzati (es. software GIS)
+2. La potenziale necessità di pulizia o semplificazione dei dati di tracce complesse
+3. Misure di privacy e protezione dei dati per la gestione di dati spaziali dettagliati
+4. Integrazione con altre fonti di dati spaziali per un'analisi completa
+
+## Limitazioni
+
+- Tracciare percorsi accurati su piccoli schermi mobili può essere difficile.
+- Le tracce complesse possono richiedere una significativa capacità di archiviazione e elaborazione.
+- L'uso continuo del GPS per la traccia automatica può scaricare rapidamente la batteria del dispositivo.
+- Potrebbero esserci preoccupazioni sulla privacy associate alla raccolta di dati dettagliati sui percorsi.

@@ -1,0 +1,82 @@
+---
+description: ''
+icon: code
+title: Werte referenzieren
+---
+
+
+Die Syntax `${fieldname}` wird verwendet, um auf den aktuellen Wert eines anderen Feldes in Ihrem Formular zu verweisen. Sie kann den eingegebenen, ausgewählten oder berechneten Wert darstellen und wird genau so angezeigt, wie er in den übermittelten Daten erscheint.
+
+Beispiel:
+Wenn Sie ein Feld namens "age" haben und den genauen eingegebenen Wert abrufen möchten, können Sie `${age}` verwenden.
+
+Bei Einschränkungen wird das Symbol "." verwendet, um auf den vom Benutzer vorgeschlagenen Eintrag oder die Auswahl für das aktuelle Feld zu verweisen. Es ermöglicht Ihnen, Bedingungen oder Grenzen basierend auf dem Wert anzuwenden, den der Benutzer gerade eingibt oder auswählt.
+
+Beispiel:
+Wenn Sie prüfen möchten, ob der vorgeschlagene Wert für das aktuelle Feld kleiner als 3 ist, können Sie die Einschränkung `. < 3` verwenden.
+
+---
+
+## `..` — Referenz auf die übergeordnete Gruppe
+
+Innerhalb einer Gruppe oder Wiederholungsgruppe bezieht sich `..` auf den **übergeordneten Kontext**. Dies wird in der Praxis selten benötigt, aber in fortgeschrittenen XPath-Ausdrücken verwendet, um die Formularhierarchie zu navigieren.
+
+---
+
+## Wo Referenzen verwendet werden
+
+| Spalte | Referenztyp | Beispiel |
+|--------|-------------|---------|
+| `relevant` | `${fieldname}` | `${consent} = 'yes'` |
+| `constraint` | `.` für das aktuelle Feld, `${fieldname}` für andere | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${fieldname}` | `${adults} + ${children}` |
+| `required` | `${fieldname}` | `${has_income} = 'yes'` |
+| `default` | `${fieldname}` | `${previous_answer}` |
+| `label` | `${fieldname}` im Text | `"Ihr Alter ist ${age} Jahre"` |
+| `choice_filter` | Spaltenname (ohne `${}`) | `district = ${district}` |
+
+<Warning>
+In der Spalte `choice_filter` referenzieren Sie **Spaltennamen der Auswahlmöglichkeiten** direkt (ohne `${}`), und **Formularfelder** mit `${}`. Diese zu verwechseln ist eine häufige Fehlerquelle.
+</Warning>
+
+---
+
+## Referenzierung von Werten innerhalb von Wiederholungsgruppen
+
+Innerhalb einer Wiederholung bezieht sich `${fieldname}` auf das Feld in **derselben Instanz** der Wiederholung:
+
+```
+relevant: ${member_age} < 18
+```
+
+Dies verwendet den `member_age`-Wert für die aktuelle Wiederholungsinstanz, nicht für alle Instanzen.
+
+Um ein Feld in einer **bestimmten** Wiederholungsinstanz von außerhalb der Wiederholung zu referenzieren, verwenden Sie `indexed-repeat()`:
+
+```
+indexed-repeat(${member_name}, ${household_members}, 1)
+```
+
+Vollständige Details finden Sie unter [Funktionen — Funktionen für Wiederholungsfelder](functions#repeated-field-functions).
+
+---
+
+## Prüfungen auf leere Werte
+
+Prüfen Sie, ob ein Feld beantwortet wurde:
+
+```
+${fieldname} != ''       (Feld ist nicht leer)
+${fieldname} = ''        (Feld ist leer)
+```
+
+Bei Zahlen auch prüfen:
+```
+${age} > 0               (Alter hat einen positiven Wert — implizit nicht leer im numerischen Kontext)
+```
+
+---
+
+## Typumwandlung bei Referenzen
+
+Wenn Sie `${fieldname}` in einem numerischen Kontext verwenden (z. B. `${age} + 1`), wandelt rtSurvey den Zeichenkettenwert automatisch in eine Zahl um. Ein leeres Feld wird je nach Operation zu `0` oder `NaN` umgewandelt — verwenden Sie `coalesce(${field}, 0)`, um ein leeres numerisches Feld sicher auf null zu setzen.

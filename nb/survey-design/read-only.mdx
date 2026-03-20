@@ -1,0 +1,79 @@
+---
+description: ''
+icon: code
+title: Skrivebeskyttede felt
+---
+
+
+Skrivebeskyttede felt i rtSurvey lar deg vise informasjon som ikke kan redigeres av respondenten. Denne funksjonen er særlig nyttig for å vise forhåndsutfylte data, beregnede resultater eller informasjon som skal forbli konstant gjennom hele spørreundersøkelsen.
+
+## Grunnleggende bruk
+
+For å gjøre et felt skrivebeskyttet, bruk `read_only`-kolonnen i XLSForm:
+
+```
+| type    | name | label                 | read_only | default |
+|---------|------|----------------------|-----------|---------|
+| integer | num  | Pasientnummer er:     | yes       | 5       |
+```
+
+I dette eksemplet er pasientnummeret satt til 5 og kan ikke endres av respondenten.
+
+## Kombinere skrivebeskyttet med standardverdier
+
+Skrivebeskyttede felt brukes ofte i kombinasjon med standardverdier for å vise forhåndsbestemt eller beregnet informasjon:
+
+```
+| type    | name     | label               | read_only | default        |
+|---------|----------|---------------------|-----------|----------------|
+| text    | username | Innlogget bruker:   | yes       | ${current_user}|
+| date    | today    | Dagens dato:        | yes       | today()        |
+```
+
+## rtSurvey-spesifikke funksjoner
+
+### Betinget skrivebeskyttelse
+
+rtSurvey utvider skrivebeskyttet-funksjonaliteten med betinget logikk:
+
+```
+| type    | name     | label           | read_only                |
+|---------|----------|-----------------|--------------------------|
+| integer | age      | Alder:          | ${role} = 'viewer'       |
+| text    | comments | Kommentarer:    | selected(${status}, 'closed') |
+```
+
+### Dynamisk skrivebeskyttet status
+
+rtSurvey lar deg endre skrivebeskyttet-status dynamisk:
+
+```
+| type      | name     | label    | read_only              |
+|-----------|----------|----------| ----------------------|
+| text      | address  | Adresse: | ${edit_mode} = 'false' |
+```
+
+## Beste praksis for bruk av skrivebeskyttede felt
+
+1. **Klarhet**: Angi tydelig hvilke felt som er skrivebeskyttede gjennom visuelle signaler eller etiketter.
+2. **Konsistens**: Bruk skrivebeskyttede felt konsekvent i hele spørreundersøkelsen.
+3. **Validering**: Selv om skrivebeskyttede felt ikke kan redigeres, inkluder dem i datavalideringsprosessen.
+4. **Ytelse**: Vær forsiktig med komplekse beregninger i skrivebeskyttede felt, da de kan påvirke skjemalastetiden.
+5. **Tilgjengelighet**: Sørg for at skrivebeskyttede felt er riktig merket for skjermlesere.
+
+## Avanserte teknikker
+
+### Beregnede skrivebeskyttede felt
+
+Bruk skrivebeskyttede felt for å vise beregninger basert på andre svar:
+
+```
+| type      | name     | label           | read_only | calculation            |
+|-----------|----------|-----------------|-----------|------------------------|
+| calculate | bmi      | KMI:            | yes       | ${weight} / (${height} * ${height}) |
+```
+
+## Kjente begrensninger
+
+- Noen komplekse dynamiske skrivebeskyttet-betingelser kan ha en liten ytelsespåvirkning på lavere-ends enheter.
+- Skrivebeskyttede felt forhindrer kanskje ikke alle former for datamanipulasjon i eksporterte datafiler, så serversidevalidering anbefales for kritiske data.

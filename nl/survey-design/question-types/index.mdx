@@ -1,0 +1,70 @@
+---
+description: ''
+icon: code
+title: Vraagtypen
+---
+
+
+rtSurvey ondersteunt alle standaard XLSForm-vraagtypen, plus diverse uitbreidingen. Elk vraagtype bepaalt welk soort gegevens worden verzameld en hoe de invoerwidget op het apparaat wordt weergegeven.
+
+Om het vraagtype in te stellen, voert u de typenaam in de kolom `type` van het werkblad **survey** in uw XLSForm in.
+
+## Tekstinvoer
+
+| Type | Beschrijving |
+|------|-------------|
+| [text](text) | Vrij tekstantwoord — alle tekens zijn toegestaan |
+| [integer](integer) | Geheel getal (geen decimalen) |
+| [decimal](decimal) | Getal met decimalen |
+| [range](range) | Getal geselecteerd via een schuifregelaar binnen een gedefinieerd min/max-bereik |
+
+## Selectie
+
+| Type | Beschrijving |
+|------|-------------|
+| [select_one lijstnaam](select-one) | Kies precies één optie uit een lijst |
+| [select_multiple lijstnaam](select-multiple) | Kies één of meer opties uit een lijst |
+| [select_one_from_file bestandsnaam](select-one-from-file) | Kies één optie geladen uit een extern CSV-bestand |
+| [rank lijstnaam](rank) | Orden keuzes op voorkeur of prioriteit |
+
+## Datum en tijd
+
+| Type | Beschrijving |
+|------|-------------|
+| [date](date) | Kalenderdatum (jaar, maand, dag) |
+| [time](time) | Tijdstip (uren, minuten) |
+| [datetime](datetime-date-time) | Gecombineerde datum en tijd |
+
+## Locatie
+
+| Type | Beschrijving |
+|------|-------------|
+| [geopoint](geopoint) | Enkelvoudige GPS-coördinaat (breedte, lengte, hoogte, nauwkeurigheid) |
+| [geotrace](geotrace) | Een pad — reeks GPS-punten die een lijn vormen |
+| [geoshape](geoshape) | Een gebied — gesloten veelhoek van GPS-punten |
+
+## Media
+
+| Type | Beschrijving |
+|------|-------------|
+| [image](image) | Fotovastlegging of afbeeldingsupload |
+| [audio](audio) | Audio-opname |
+| [video](video) | Video-opname |
+| [file](file) | Algemene bestandsupload (PDF, document, etc.) |
+
+## Overig
+
+| Type | Beschrijving |
+|------|-------------|
+| [barcode](barcode) | Scan een barcode of QR-code |
+| [note](note) | Alleen-lezen weergavetekst — toont instructies of berekende samenvattingen |
+| [calculate](calculate) | Verborgen veld dat een berekende waarde opslaat |
+| [hidden](hidden) | Verborgen veld dat een statische of vooraf ingevulde waarde opslaat |
+| [trigger / acknowledge](trigger) | Een selectievakje dat de enumerator moet aanvinken om te bevestigen dat ze een verklaring hebben gelezen |
+| [meta](meta) | Automatische metagegevens: tijdstempels, apparaat-ID, enumeratorinfo |
+
+## Hoe type en weergave samenwerken
+
+Het `type` bepaalt **welke gegevens worden verzameld**. De kolom `appearance` regelt **hoe de widget eruitziet**. Veel typen ondersteunen meerdere weergaven — `select_one` kan bijvoorbeeld worden weergegeven als keuzerondjes, een dropdownmenu, een Likert-schaal of een compact raster.
+
+Zie [Weergave](../appearance) voor de volledige lijst met opties.

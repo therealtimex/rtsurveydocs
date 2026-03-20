@@ -1,0 +1,90 @@
+---
+description: Lydspørsmål lar respondenter ta opp og sende inn lydfiler som en del
+  av spørreundersøkelsen.
+icon: mic
+title: Lyd
+---
+
+
+`audio`-spørsmålstypen lar respondenter **ta opp lyd** eller laste opp en eksisterende lydfil som en del av spørreundersøkelsessvaret. Det er nyttig for å fange verbale beretninger, miljølyder, vitnesbyrd eller informasjon som formidles bedre gjennom tale enn tekst.
+
+## Grunnleggende XLSForm-spesifikasjon
+
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Vennligst ta opp kommentarene dine |
+
+## Brukstilfeller
+
+Lydspørsmål brukes vanligvis for:
+
+1. Fange åpne verbale svar for å redusere tellerens skrivebyrde
+2. Ta opp vitnesbyrd, personlige historier eller muntlige historier
+3. Dokumentere miljølyder (f.eks. støynivåer nær infrastruktur)
+4. Samle inn stemmprøver for lingvistisk eller helsebasert forskning
+5. La respondenter legge til verbale avklaringer til numeriske eller valgbaserte svar
+
+## Dataformat
+
+Lydfiler lagres som binære vedlegg ved siden av skjemainnsendingen, vanligvis:
+
+- **Format:** MP3 eller AAC (mobilopptak); WAV (høykvalitetsopptak)
+- **Navngivning:** `{instanceID}-{feltnavn}.mp3` (eller tilsvarende)
+- **Lagring:** Lastet opp til servermediamappen og koblet til innsendingsposten
+- **Tilgang:** Avspillbar og nedlastbar fra innsendingsstyringsgrensesnittet
+
+## rtSurvey-utvidelser
+
+### Maksimal varighet
+
+Bruk `parameters`-kolonnen for å begrense opptakslengden:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | interview | Ta opp intervjuet | `max-duration=120` |
+
+`max-duration` er i sekunder. Opptakeren stopper automatisk ved grensen.
+
+### Kvalitetsinnstillinger
+
+Opptakskvaliteten kan angis via `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Ta opp tilbakemelding | `quality=normal` |
+
+Støttede verdier: `low`, `normal` (standard), `voice-only`. `voice-only` optimaliserer for talt lyd med støyreduksjon.
+
+### Avspilling før innsending
+
+På mobil kan telleren spille av det opptatte klippet før de fortsetter. Dette er aktivert som standard — ingen konfigurasjon er nødvendig.
+
+## Eksempelbruk
+
+### Med maksimal varighet og hint
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| audio | story | Fortell oss om hendelsen med egne ord | Snakk tydelig. Opptaket stopper etter 3 minutter. | `max-duration=180` |
+
+### Betinget lyd — bare hvis et problem ble rapportert
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | issue_found | Ble det funnet et problem? | | |
+| audio | issue_audio | Ta opp en beskrivelse av problemet | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+
+## Beste praksis
+
+1. Angi tydelig i `label` eller `hint` hva telleren bør si og for hvor lenge.
+2. Bruk `max-duration` for å forhindre altfor store filer i områder med treg opplastingshastighet.
+3. Informer respondentene før opptaket starter — uventet opptak kan vekke personvernbekymringer.
+4. Test opptak på målenheten og nettverksforholdene før distribusjon.
+5. Sett `quality=voice-only` for intervjustilopptak for å redusere filstørrelse uten å miste forståelighet.
+
+## Begrensninger
+
+- Lydfiler kan være store (et 2-minutters opptak ved normal kvalitet er ~2–4 MB) — ta dette med i beregningen for dataplan og opplastingstid.
+- Ikke alle nettlesere støtter MediaRecorder API — Chrome og Firefox fungerer pålitelig; Safari på eldre iOS-versjoner kan ha problemer.
+- Transkribering av lydrespons krever ytterligere etterbehandling (manuell eller automatisert tale-til-tekst).
+- Personvernregler kan begrense lydopptak av stemmer — verifiser lokale personvernkrav.

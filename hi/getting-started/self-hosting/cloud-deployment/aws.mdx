@@ -1,0 +1,119 @@
+---
+description: aws-ec2.sh user data स्क्रिप्ट का उपयोग करके AWS EC2 इंस्टेंस पर rtCloud
+  तैनात करें।
+icon: cloud
+title: AWS EC2
+---
+
+
+EC2 इंस्टेंस लॉन्च करते समय **User Data** स्क्रिप्ट के रूप में `aws-ec2.sh` का उपयोग करें। स्क्रिप्ट पहले बूट पर स्वचालित रूप से चलती है।
+
+**स्क्रिप्ट डाउनलोड करें:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+
+---
+
+## चरण 1 — कॉन्फ़िगरेशन भरें
+
+स्क्रिप्ट खोलें और शीर्ष पर `CONFIGURATION` ब्लॉक संपादित करें:
+
+```bash
+# --- आवश्यक ---
+PROJECT_ID="rtsurvey"
+ADMIN_PASSWORD="admin"                       # पहले लॉगिन के बाद बदलें
+
+# --- डोमेन + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
+
+# --- एम्बेडेड Keycloak ---
+EMBED_KEYCLOAK="true"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ADMIN_PASSWORD पर डिफ़ॉल्ट
+```
+
+| फ़ील्ड | आवश्यक | विवरण |
+|-------|----------|-------------|
+| `PROJECT_ID` | हां | डेटाबेस नाम और Keycloak क्लाइंट ID के रूप में उपयोग किया जाता है। लोअरकेस, कोई स्पेस नहीं। |
+| `ADMIN_PASSWORD` | नहीं | ऐप admin पासवर्ड और Keycloak admin पासवर्ड। डिफ़ॉल्ट `admin` — **पहले लॉगिन के बाद बदलें**। |
+| `DOMAIN` | नहीं | HTTPS के लिए आपका डोमेन। केवल HTTP मोड के लिए खाली छोड़ें। |
+| `LETSENCRYPT_EMAIL` | हां (यदि DOMAIN सेट है) | Let's Encrypt सूचनाओं के लिए ईमेल। |
+| `EMBED_KEYCLOAK` | नहीं | एम्बेडेड Keycloak तैनात करने के लिए `true` (4 GB RAM की आवश्यकता है)। |
+
+> **सुरक्षा:** सभी पासवर्ड डिफ़ॉल्ट रूप से `admin` हैं। पहले लॉगिन के तुरंत बाद उन्हें बदलें।
+
+---
+
+## चरण 2 — एक EC2 इंस्टेंस लॉन्च करें
+
+[AWS EC2 कंसोल](https://console.aws.amazon.com/ec2) में:
+
+1. **Launch instance** पर क्लिक करें
+2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
+3. **Instance type:** `t3.medium` (4 GB RAM) या बड़ा
+4. **Key pair:** SSH एक्सेस के लिए एक चुनें या बनाएं
+5. **Network settings:** एक Security Group बनाएं या चुनें (नीचे देखें)
+6. **Advanced details** → **User data** → पूरी स्क्रिप्ट सामग्री पेस्ट करें
+7. **Launch instance** पर क्लिक करें
+
+---
+
+## चरण 3 — Security Group कॉन्फ़िगर करें
+
+इंस्टेंस के Security Group में ये पोर्ट खोलें:
+
+| पोर्ट | प्रोटोकॉल | स्रोत | उद्देश्य |
+|------|----------|--------|---------|
+| 22 | TCP | आपका IP | SSH एक्सेस |
+| 80 | TCP | 0.0.0.0/0 | HTTP (Nginx द्वारा HTTPS पर रीडायरेक्ट) |
+| 443 | TCP | 0.0.0.0/0 | HTTPS |
+| 3838 | TCP | 0.0.0.0/0 | Shiny सीधी पहुँच |
+
+> पोर्ट 3306 (MySQL) **न खोलें** — यह कभी भी सार्वजनिक रूप से सुलभ नहीं होना चाहिए।
+
+---
+
+## चरण 4 — DNS रिकॉर्ड जोड़ें
+
+इंस्टेंस बूट होते समय, अपने DNS प्रदाता में एक **A रिकॉर्ड** जोड़ें:
+
+```
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
+TTL   : 300
+```
+
+---
+
+## चरण 5 — प्रगति मॉनिटर करें
+
+```bash
+ssh ubuntu@<instance-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## चरण 6 — ऐप एक्सेस करें
+
+सेटअप पूरी होने पर, लॉग आपके ऐप URL और क्रेडेंशियल के साथ एक सारांश दिखाता है। उपयोगकर्ता नाम `admin` और पासवर्ड `admin` से लॉग इन करें, फिर तुरंत अपना पासवर्ड बदलें।
+
+---
+
+## डिप्लॉयमेंट के बाद
+
+### पासवर्ड बदलें
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### सभी कंटेनर देखें
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
+
+### Elastic IP असाइन करें (वैकल्पिक)
+
+यदि आप इंस्टेंस को बंद और शुरू करते हैं, तो सार्वजनिक IP बदल जाता है। स्थिर IP बनाए रखने के लिए, EC2 कंसोल में एक **Elastic IP** आवंटित करें और उसे इंस्टेंस के साथ संबद्ध करें।

@@ -1,0 +1,112 @@
+---
+description: Loại câu hỏi trả lời bằng văn bản tự do trong rtSurvey
+icon: text_fields
+title: Text
+---
+
+
+Loại câu hỏi `text` thu thập câu trả lời văn bản tự do — bất kỳ chuỗi ký tự nào. Đây là loại nhập liệu linh hoạt nhất, dùng cho tên, địa chỉ, mô tả, mã số, và bất cứ thứ gì không phù hợp với một loại cụ thể hơn.
+
+rtSurvey cũng mở rộng `text` với các **widget nhập thời gian** cho phép nhập thời gian chính xác bằng đồng hồ chọn giờ.
+
+## Cấu hình XLSForm cơ bản
+
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | Họ và tên người trả lời |
+| text | address | Địa chỉ nhà |
+
+Để biết thêm chi tiết về loại text trong XLSForm tiêu chuẩn, xem [thông số kỹ thuật XLSForm](https://xlsform.org/en/#question-types).
+
+## Ứng dụng
+
+Câu hỏi văn bản được dùng cho:
+
+1. Tên, địa chỉ, mô tả tự do
+2. Nhận xét hoặc phản hồi mở
+3. Mã số, ID, hoặc số tham chiếu không phù hợp với integer/decimal
+4. Thu thập giá trị thời gian bằng các phần mở rộng nhập thời gian của rtSurvey
+5. Trường văn bản tự hoàn thành (qua `search-autocomplete-noedit-v2()`)
+
+## Tùy chọn hiển thị tiêu chuẩn
+
+| Appearance | Mô tả |
+|------------|-------|
+| *(không có)* | Ô nhập văn bản một dòng |
+| `multiline` | Vùng văn bản nhiều dòng — phù hợp nhất cho văn bản tự do dài trên web |
+
+## Phần mở rộng nhập thời gian của rtSurvey
+
+rtSurvey mở rộng `text` bằng **widget đồng hồ chọn giờ** để thu thập giá trị thời gian. Các tùy chọn hiển thị này hiển thị biểu tượng đồng hồ mà người điều tra có thể nhấn để chọn giờ, phút, giây hoặc mili giây.
+
+### Các biến thể hiển thị
+
+| Appearance | Mô tả |
+|------------|-------|
+| `inline` | Biểu tượng đồng hồ hiển thị bên cạnh trường |
+| `inline colors("RRGGBB")` | Biểu tượng đồng hồ với màu hex tùy chỉnh |
+| `inline-1line` | Đồng hồ hiển thị theo định dạng hàng đơn thu gọn |
+| `inline-1line-RRGGBB` | Hàng đơn với màu biểu tượng tùy chỉnh (hex, không có `#`) |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Hàng đơn với hai màu |
+| `inline-onlyresult` | Biểu tượng đồng hồ biến mất sau khi chọn; chỉ hiển thị giá trị |
+| `inline-onlyresult colors("RRGGBB")` | Giống trên, với màu biểu tượng tùy chỉnh |
+
+### Mã định dạng thời gian
+
+Thêm chuỗi định dạng trong ngoặc vuông để kiểm soát thành phần thời gian nào được hiển thị:
+
+| Chuỗi định dạng | Hiển thị |
+|-----------------|----------|
+| `inline-[%H:%M]` | Giờ và phút (24 giờ) |
+| `inline-[%h:%M]` | Giờ và phút (12 giờ) |
+| `inline-[%H:%M:%S]` | Giờ, phút, giây (24 giờ) |
+| `inline-[%h:%M:%S]` | Giờ, phút, giây (12 giờ) |
+| `inline-[%H:%M:%3]` | Giờ, phút, mili giây |
+| `inline-[%M:%S]` | Chỉ phút và giây |
+| `inline-[%M:%3]` | Chỉ phút và mili giây |
+| `inline-[%S]` | Chỉ giây |
+| `inline-[%3]` | Chỉ mili giây |
+| `inline-[%H]` | Chỉ giờ (24 giờ) |
+| `inline-[%h]` | Chỉ giờ (12 giờ) |
+
+### Ví dụ: Ghi lại thời gian thực hiện nhiệm vụ theo phút và giây
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | task_duration | Thời gian hoàn thành nhiệm vụ | `inline-[%M:%S]` |
+
+### Ví dụ: Ghi lại thời gian sự kiện theo định dạng 24 giờ với màu tùy chỉnh
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | event_time | Thời gian xảy ra sự kiện | `inline-1line colors("0099FF")` |
+
+## Định dạng dữ liệu
+
+Dữ liệu văn bản được lưu trữ và xuất dưới dạng chuỗi thuần. Với các input thời gian sử dụng widget đồng hồ inline, giá trị được lưu theo định dạng phù hợp với chuỗi định dạng đã chọn (ví dụ: `14:32` cho `%H:%M`).
+
+## Ràng buộc và xác thực
+
+Áp dụng constraint để thực thi định dạng, độ dài hoặc mẫu:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| text | name | Họ và tên | `string-length(.) >= 2` | Tên phải có ít nhất 2 ký tự |
+| text | code | Mã tham chiếu | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Nhập 2 chữ hoa tiếp theo là 4 chữ số |
+| text | phone | Số điện thoại | `regex(., '^[0-9]{9,15}$')` | Nhập số điện thoại hợp lệ |
+
+## Thực hành tốt
+
+1. Dùng các loại cụ thể hơn (`integer`, `decimal`, `date`) khi dữ liệu có cấu trúc đã biết — điều này ngăn nhập liệu không hợp lệ và đơn giản hóa phân tích.
+2. Thêm `constraint` với `string-length()` hoặc `regex()` để xác thực mã số hoặc ID.
+3. Dùng kiểu hiển thị `multiline` cho câu hỏi mở nơi người trả lời có thể viết nhiều câu.
+4. Với thu thập thời gian, chọn mã định dạng thời gian phù hợp với độ chính xác yêu cầu — thu thập mili giây khi chỉ cần phút sẽ lãng phí công sức người điều tra.
+
+## Hỗ trợ nền tảng
+
+Loại câu hỏi text và tất cả các kiểu hiển thị nhập thời gian đều được hỗ trợ trên iOS, Android và web.
+
+## Giới hạn
+
+- Câu trả lời văn bản là tự do — không có kiểm tra chính tả hoặc ràng buộc từ vựng tích hợp ngoài mẫu regex.
+- Widget đồng hồ inline là phần mở rộng của rtSurvey và không thuộc thông số kỹ thuật XLSForm tiêu chuẩn.

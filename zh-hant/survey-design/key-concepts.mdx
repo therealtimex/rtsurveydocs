@@ -1,0 +1,264 @@
+---
+description: 表單設計概覽
+icon: code
+title: 關鍵概念
+---
+
+
+## 什麼是 XLSForm？
+rtSurvey 使用 [XLSForm](https://xlsform.org/) 標準的擴展版本進行表單設計，提供強大的功能用於建立複雜的問卷調查。本指南將介紹 rtSurvey 表單設計的關鍵概念，從基本的 XLSForm 結構到 rtSurvey 特定的進階功能。
+
+透過 XLSForms，您可以使用熟悉的 Excel 工具以人類可讀的格式編寫表單，幾乎任何人都可以存取使用。此標準使表單編寫的輕鬆共享和協作成為可能。
+
+雖然 XLSForms 對初學者友好，但它們也讓有經驗的使用者能夠建立複雜的表單。
+
+rtSurvey 提供了一種一致的方式，在各種網頁和行動資料收集平台上將跳題邏輯等進階功能整合到表單中。
+
+## XLSForm 結構
+XLSForm 通常由兩個主要工作表組成：
+
+1. **survey（問卷）**：定義表單的結構和內容。
+2. **choices（選項）**：指定多選問題的答案選項。
+
+一個選用的 **settings（設定）**工作表可以提供額外的表單規格。
+
+需要注意的是，問卷和選項工作表中的必填欄位必須存在，表單才能正常運作。兩個工作表中的選用欄位提供對表單中每個條目行為的進一步控制，但並非必要。
+
+您的 Excel 工作簿中的欄位可以以任何順序出現，選用欄位可以留空。但是，必須使用 XLSForm 文件中指定的精確語法和命名慣例，表單才能正常運作。
+
+### 問卷工作表
+**問卷工作表**是您定義表單結構並提供內容的地方。問卷工作表中的每一行代表表單中的一個問題或元素。以下欄位在問卷工作表中是必填的：
+
+- `type`：指定您期望問題答案的條目類型。
+- `name`：指定該條目的唯一變數名稱。名稱必須以字母或底線開頭，只能包含字母、數字、連字符、底線和句點。名稱區分大小寫。
+- `label`：包含您在表單中看到的問題實際文字。
+
+| type                | name     | label                |
+| ------------------- | -------- | -------------------- |
+| today               | today    |                      |
+| select_one gender   | gender   | 受訪者的性別？ |
+| integer             | age      | 受訪者的年齡？    |
+
+### 選項工作表
+**`choices`**工作表用於指定多選問題的答案選項。每行代表一個答案選項。以下欄位在選項工作表中是必填的：
+
+- **`list_name`**：將一組相關的答案選項歸在一起。
+- **`name`**：指定該答案選項的唯一變數名稱。
+- **`label`**：以您希望在表單上顯示的方式顯示答案選項。
+
+| list_name           | name        | label                |
+| ------------------- | ----------- | -------------------- |
+| gender              | transgender | 跨性別          |
+| gender              | female      | 女性               |
+| gender              | male        | 男性                 |
+| gender              | other       | 其他                 |
+
+您新增到 Excel 工作簿的欄位，無論是必填還是選用，都可以以任何順序出現。選用欄位可以完全省略。行或列可以留空以幫助閱讀，但一張工作表上 20 個連續空白欄位或列之後的資料將不會被處理。所有 .xlsx 檔案格式都會被忽略，因此您可以使用分隔線、陰影和其他字體格式使表單更具可讀性。
+
+在 Excel 中編寫表單時需要注意的一點是，您使用的語法必須精確。例如，如果您寫的是 **Choices** 或 **choice** 而不是 **choices**，表單將無法運作。
+
+### 設定工作表
+
+設定工作表是選用的，但允許您指定表單級別的元資料和行為。設定工作表中常用的欄位包括：
+
+| 欄位 | 說明 |
+|--------|-------------|
+| form_title | 表單標題，如向使用者顯示的方式 |
+| form_id | 表單的唯一識別碼，用於資料管理和 API 呼叫 |
+| default_language | 多語言表單的預設語言代碼（例如 'en' 代表英語） |
+| version | 表單的版本號，用於追蹤更改 |
+| instance_name | 為每次表單提交生成唯一名稱的表達式 |
+| generation | 標記表單生成的整數。對於結構性更改遞增 |
+| family | 用於跨結構更改將相關表單分組的識別碼 |
+
+rtSurvey 中的設定工作表還可以包含 rtSurvey 擴展功能特定的附加設定。請參閱 rtSurvey 文件以取得支援設定的完整清單。
+
+## 問卷工作表的主要元件
+
+問卷工作表是表單設計的核心。以下是其主要元件的概覽：
+
+| 元件 | 說明 |
+|-----------|-------------|
+| [type](#question-types) | 指定問題類型（例如 text、integer、select_one） |
+| [name](#naming-conventions) | 問題的唯一識別碼 |
+| [label](#labels-and-translations) | 顯示給受訪者的文字 |
+| [hint](#hints-and-help-text) | 給受訪者的額外指導 |
+| [appearance](#appearance-options) | 修改問題的顯示方式 |
+| [relevant](#relevance-and-skip-logic) | 決定何時應詢問問題（跳題邏輯） |
+| [constraint](#constraints-and-validation) | 驗證回應 |
+| [calculation](#calculations) | 根據其他回應計算值 |
+| [required](#required-fields) | 指定問題是否必須回答 |
+
+
+這些元件在建立有效和高效的問卷調查中各自發揮關鍵作用。點選「詳細部分」欄中的連結以了解每個元件的更多資訊。
+
+### 問題類型
+XLSForm 支援多種問題類型。以下只是您可以在 XLSForm 的**`survey`**工作表的**`type`**欄中輸入的一些選項：
+
+| 問題類型             | 答案輸入                                                                                 |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| integer                   | 整數（即整數）輸入。                                                          |
+| decimal                   | 小數輸入。                                                               |
+| range                     | [範圍](#range) 輸入（包括評分）                                                     |
+| text                      | 自由文字回應。                                                                         |
+| select_one [options]      | [多選](#multiple-choice) 問題；只能選取一個答案。               |
+| select_multiple [options] | [多選](#multiple-choice) 問題；可以選取多個答案。              |
+| select_one_from_file [file]| [從文件多選](#multiple-choice-from-file)；只能選取一個答案。      |
+| select_multiple_from_file [file]| [從文件多選](#multiple-choice-from-file)；可以選取多個答案。|
+| rank [options]            | [排名](#rank) 問題；對清單排序。                                                        |
+| note                      | 在螢幕上顯示備注，不接受輸入。`type=text` 和 `readonly=true` 的簡寫。    |
+| geopoint                  | 收集[單一 GPS 座標](#gps)。                                                     |
+| geotrace                  | 記錄[兩個或更多 GPS 座標組成的線](#gps)。                                                |
+| geoshape                  | 記錄[多個 GPS 座標組成的多邊形](#gps)；最後一個點與第一個點相同。 |
+| date                      | 日期輸入。                                                                                  |
+| time                      | 時間輸入。                                                                                  |
+| dateTime                  | 接受日期和時間輸入。                                                             |
+| image                     | 拍照或上傳[圖像文件](#image)。                                            |
+| audio                     | 進行音頻錄音或上傳音頻文件。                                             |
+| background-audio          | 填寫表單時在背景錄製音頻。                                                  |
+| video                     | 進行視頻錄製或上傳視頻文件。                                               |
+| file                      | 通用文件輸入（txt、pdf、xls、xlsx、doc、docx、rtf、zip）                                |
+| barcode                   | 掃描條碼，需要安裝條碼掃描器應用程式。                            |
+| calculate                 | 執行計算；請參閱下方的[計算](#calculation)部分。                    |
+| acknowledge               | 確認提示，如果選取則將值設定為「OK」。                                                      |
+| hidden                    | 沒有關聯 UI 元素的字段，可用於儲存常數                  |
+| xml-external              | 添加對[外部 XML 資料](#external-xml-data)文件的參考                          |
+
+### 標籤
+
+標籤是顯示給受訪者的每個問題文字。它們對於問卷調查中的清晰溝通至關重要。
+
+- **基本用法**：在 `label` 欄中輸入問題文字。
+- **多語言**：使用如 `label::English` 和 `label::French` 的附加欄進行多語言問卷調查。
+- **格式化**：rtSurvey 支援標籤中的基本 HTML 格式化，用於強調或結構。
+
+範例：
+```
+| type | name | label | label::French |
+|------|------|-------|---------------|
+| text | name | What is your name? | Quel est votre nom? |
+```
+
+### 提示
+
+提示為受訪者提供額外指導，而不會使主要問題文字混亂。
+
+- **用法**：在 `hint` 欄中新增提示。
+- **可見性**：提示通常顯示在主要問題文字下方。
+- **多語言**：與標籤一樣，可以使用 `hint::Language` 欄為多種語言指定提示。
+
+範例：
+```
+| type | name | label | hint |
+|------|------|-------|------|
+| integer | age | How old are you? | Please enter your age in years |
+```
+
+### 外觀
+
+rtSurvey 中的 `appearance` 欄允許自訂問題的顯示方式。
+
+- **標準選項**：包含文字的 'multiline' 和選擇問題的 'horizontal'。
+- **rtSurvey 擴展**：
+  - 時間輸入：各種時鐘顯示選項（例如 `inline`、`inline-1line`）
+  - 顏色自訂：使用 `colors()` 函數更改圖示顏色
+
+範例：
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | time | Enter time | inline-[%H:%M] |
+```
+
+### 相關性
+
+`relevant` 欄實現跳題邏輯，決定何時顯示問題。
+
+- **語法**：使用 XPath 表達式定義條件。
+- **變數**：使用 `${question_name}` 參考其他問題名稱。
+
+範例：
+```
+| type | name | label | relevant |
+|------|------|-------|----------|
+| text | allergies | List allergies | ${has_allergies} = 'yes' |
+```
+
+### 必填
+
+`required` 欄指定問題是否必須回答。
+
+- **基本用法**：使用 'yes' 或 'true' 使問題成為必填。
+- **進階**：可以使用表達式進行條件式必填。
+
+範例：
+```
+| type | name | label | required |
+|------|------|-------|----------|
+| text | email | Email address | yes |
+```
+
+### 重複
+
+重複允許一組問題被多次回答。
+
+- **用法**：使用 `begin repeat` 和 `end repeat` 行定義重複群組。
+- **命名**：為每個重複群組指定唯一名稱。
+
+範例：
+```
+| type | name | label |
+|------|------|-------|
+| begin repeat | household_member | Household member |
+| text | member_name | Name |
+| integer | member_age | Age |
+| end repeat | | |
+```
+
+### 媒體
+
+rtSurvey 支援問卷調查中的各種媒體類型，包括圖像、音頻和視頻。
+
+- **問題類型**：在類型欄中使用 'image'、'audio' 或 'video'。
+- **標籤中的媒體**：使用 HTML 標籤在標籤中參考媒體文件。
+
+範例：
+```
+| type | name | label |
+|------|------|-------|
+| image | house_photo | Take a photo of the house |
+| note | | <img src="logo.jpg" /> Welcome to the survey |
+```
+
+### 唯讀
+
+唯讀問題顯示資訊而不允許使用者輸入。
+
+- **用法**：將 'readonly' 新增至 `appearance` 欄。
+- **計算**：通常與 calculate 類型一起使用以顯示計算值。
+
+範例：
+```
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | bmi | BMI | readonly | ${weight} / (${height} * ${height}) |
+```
+
+## rtSurvey 擴展
+
+rtSurvey 透過支援額外功能擴展 XLSForm 標準，例如 `grid layout`（網格佈局）、`html format`（HTML 格式）和許多新的 `widgets`（小工具）。
+
+### 網格佈局
+rtSurvey 允許您的表單透過將多個問題壓縮到一行來模仿傳統紙質問卷調查的外觀。
+
+### 表單設定 
+
+### 資料設定
+
+### Typeform 樣式
+
+### pulldata() 的擴展 
+
+### 基於外觀的擴展
+
+### Webbox 擴展

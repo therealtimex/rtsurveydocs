@@ -1,0 +1,142 @@
+---
+description: ''
+icon: auto_awesome
+title: Kysymysten ryhmittely
+---
+
+
+Ryhmät XLSFormissa mahdollistavat toisiinsa liittyvien kysymysten organisoinnin yhteen, parantaen kyselysi rakennetta ja tehostamalla data-analyysejä. rtSurvey tukee täysin XLSFormin ryhmiä ja laajentaa niiden toiminnallisuutta lisäominaisuuksilla.
+
+## Perus ryhmärakenne
+
+Kysymysryhmän luomiseksi käytä `begin_group`- ja `end_group`-syntaksia:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | respondent | Vastaajan tiedot                         |
+| text         | name       | Syötä vastaajan nimi                     |
+| text         | position   | Syötä vastaajan asema                    |
+| end_group    |            |                                          |
+```
+
+Tärkeimmät kohdat:
+- `begin_group`-rivillä on oltava `name` ja `label`.
+- `end_group`-rivi ei tarvitse nimeä tai otsikkoa.
+- `begin_group`:n ja `end_group`:n välillä olevat kysymykset ovat osa ryhmää.
+
+## Ryhmän ulkoasu
+
+rtSurvey tukee erilaisia ulkoasuvaihtoehtoja ryhmille:
+
+1. **field-list**: Näyttää useita kysymyksiä samalla näytöllä.
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | respondent | Vastaaja  | field-list |
+   | text         | name       | Nimi      |            |
+   | text         | position   | Asema     |            |
+   | end_group    |            |           |            |
+   ```
+
+2. **grid**: Luo kompaktin, taulukon kaltaisen asettelun ryhmille (rtSurvey-kohtainen).
+   ```
+   | type         | name       | label      | appearance |
+   |--------------|------------|------------|------------|
+   | begin_group  | household  | Kotitalous | grid       |
+   | text         | member_name| Nimi       |            |
+   | integer      | member_age | Ikä        |            |
+   | end_group    |            |            |            |
+   ```
+
+3. **collapsible**: Luo laajennettavia/tiivistettäviä ryhmiä (rtSurvey-kohtainen).
+   ```
+   | type         | name       | label     | appearance  |
+   |--------------|------------|-----------|-------------|
+   | begin_group  | details    | Tiedot    | collapsible |
+   | text         | address    | Osoite    |             |
+   | text         | phone      | Puhelin   |             |
+   | end_group    |            |           |             |
+   ```
+
+## Sisäkkäiset ryhmät
+
+Ryhmiä voidaan sijoittaa sisäkkäin monimutkaisempien rakenteiden luomiseksi:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | hospital   | Sairaalan tiedot                         |
+| text         | hosp_name  | Mikä on tämän sairaalan nimi?            |
+| begin_group  | medication | Lääketilanne                             |
+| select_one y_n| hiv_meds  | Onko tässä sairaalassa HIV-lääkitystä?  |
+| end_group    |            |                                          |
+| end_group    |            |                                          |
+```
+
+**Huomio**: Lopeta aina viimeksi aloitettu ryhmä ensin oikean sisäkkäisyyden ylläpitämiseksi.
+
+## Ohituslogiikka ryhmille
+
+Käytä `relevant`-saraketta ohituslogiikan toteuttamiseen koko ryhmille:
+
+```
+| type         | name   | label                                        | relevant        |
+|--------------|--------|----------------------------------------------|-----------------|
+| integer      | age    | Kuinka vanha olet?                           |                 |
+| begin_group  | child  | Lapsi                                        | ${age} <= 5     |
+| integer      | muac   | Kirjaa lapsen yläkäsivarren ympärysmitta     |                 |
+| select_one y_n| mrdt  | Onko lapsen pikanahkatesti positiivinen?     |                |
+| end_group    |        |                                              |                 |
+```
+
+Tässä esimerkissä `child`-ryhmä näytetään vain, jos vastaajan ikä on 5 tai alle.
+
+## Parhaat käytännöt ryhmien käytössä
+
+1. Käytä merkityksellisiä nimiä ryhmille data-analyysin parantamiseksi.
+2. Pidä ryhmät kohdistuneina toisiinsa liittyviin kysymyksiin.
+3. Käytä sisäkkäisiä ryhmiä harkiten liian monimutkaisten rakenteiden välttämiseksi.
+4. Testaa ohituslogiikka perusteellisesti käyttäessäsi `relevant`-ominaisuutta ryhmissä.
+5. Harkitse `field-list`-ulkoasun käyttämistä lyhyille ryhmille selaamisen vähentämiseksi.
+6. Hyödynnä rtSurveyn ruudukkoasettelua toisiinsa liittyvien tietojen kompaktiin esittämiseen.
+7. Käytä tiivistettäviä ryhmiä pitkissä lomakkeissa navigoinnin parantamiseksi.
+
+## rtSurvey-kohtaiset ominaisuudet
+
+1. **Ruudukkoasettelu**: Käytä `grid`-ulkoasua taulukon kaltaiseen esittämiseen.
+2. **Tiivistettävät ryhmät**: Toteuta `collapsible`-ulkoasu laajennettaville osioille.
+3. **Mukautettu tyyli**: Käytä mukautettua CSS:ää ryhmille ainutlaatuisiin visuaalisiin suunnitelmiin.
+4. **Dynaaminen ryhmätoiminta**: Toteuta monimutkainen ohituslogiikka ja laskelmat ryhmien sisällä.
+
+## Monikielinen tuki
+
+rtSurvey tukee monikielisiä ryhmiä. Käytä kielikohtaisia sarakkeita otsikoille:
+
+```
+| type         | name       | label::English | label::Finnish |
+|--------------|------------|----------------|----------------|
+| begin_group  | personal   | Personal Info  | Henkilötiedot  |
+| text         | name       | Name           | Nimi           |
+| end_group    |            |                |                |
+```
+
+## Mobiilisovelluksen huomioiminen
+
+- `field-list`-ulkoasulla varustetut ryhmät näytetään yhtenä näyttönä mobiilisovelluksessa.
+- Tiivistettävät ryhmät voivat parantaa navigointia pienemmillä näytöillä.
+- Ruudukkoasettelut saattavat mukautua paremman näkyvyyden vuoksi mobiililaitteilla.
+
+## Tunnetut rajoitukset
+
+- Erittäin syvä ryhmien sisäkkäisyys saattaa vaikuttaa suorituskykyyn joillakin laitteilla.
+- Jotkut edistyneet tyylitysvalinnat eivät välttämättä ole käytettävissä ryhmille mobiilisovelluksessa.
+
+## Ryhmien vianmääritys
+
+1. Varmista, että jokaisella `begin_group`:lla on vastaava `end_group`.
+2. Tarkista, että ryhmänimet ovat yksilöllisiä lomakkeessa.
+3. Tarkista, että ohituslogiikka viittaa oikeisiin kysymysnimiin.
+4. Testaa ryhmät perusteellisesti sekä web- että mobiililiittymissä.
+
+Käyttämällä ryhmiä tehokkaasti XLSFormeissa rtSurveyn kanssa voit luoda hyvin organisoituja, tehokkaita kyselyitä, jotka parantavat sekä tiedonkeruukokemusta että data-analyysin laatua.

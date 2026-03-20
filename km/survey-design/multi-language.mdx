@@ -1,0 +1,57 @@
+---
+description: ''
+icon: code
+title: ការ គាំទ្រ ច្រើន ភាសា
+---
+
+
+rtSurvey ផ្ដល់ multi-language support ដ៏ រឹង មា ំ, អនុញ្ញាតឱ្យ បង្កើត surveys ក្នុង ភាសា ជ ា ច ្ រ ើ ន ។
+
+## ការ Setup Multi-Language Surveys
+
+1. **Label Translations**: បន្ថែម columns ដោយ ប្រើ format `label::Language (code)` ។
+2. **Hint Translations**: ប្រើ `hint::Language (code)` ។
+3. **Media File Translations**: ប្រើ `media::Language (code)` ។
+
+```
+| type    | name | label::English (en) | label::Español (es) |
+|---------|------|---------------------|---------------------|
+| integer | age  | How old are you?    | ¿Cuántos años tienes?|
+```
+
+## Language Codes
+
+ណែ នា ំ ប្រើ official 2-character language codes ។
+
+## Setting a Default Language
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | French (fr)       |
+```
+
+## rtSurvey-Specific Features
+
+### Dynamic Language Switching
+
+rtSurvey អនុញ្ញាតឱ្យ users switch languages ដោយ dynamic ក្នុង ការ ប្រ មូ ល ទិន្ន ន័យ ។
+
+### Language-Specific Validation Messages
+
+```
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
+|---------|------|------------|----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
+```
+
+### RTL Language Support
+
+សម្រាប់ right-to-left (RTL) languages ដូចជា Arabic ឬ Hebrew, rtSurvey adjust layout ដោយ ស្វ័យប្រវត្តិ ។
+
+## Best Practices
+
+1. ប្រើ language codes ដោយ consistent ។
+2. ប្រើ professional translators ។
+3. Test form ក្នុង ភាសា ទ ា ំ ង អ ស ់ ។
+4. ធានា devices គ ា ំ ទ ្ រ Unicode ។

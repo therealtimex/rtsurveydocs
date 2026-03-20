@@ -1,0 +1,115 @@
+---
+description: ''
+icon: code
+title: Funkcje
+---
+
+
+### Funkcje ciągów znaków
+
+<Warning>
+Przy pracy z ciągami znaków w wyrażeniach ważne jest używanie pojedynczych cudzysłowów ('') do owijania dosłownych ciągów. Wyjątek pojawia się gdy chcesz dołączyć pojedyncze cudzysłowy w dosłownym ciągu — w takim przypadku możesz użyć podwójnych cudzysłowów ("") do owinięcia całego ciągu.
+</Warning>
+
+rtSurvey obsługuje różne funkcje, w tym:
+
+1. `string(pole)`: Konwertuje pole na ciąg znaków.
+   - Przykład: `string(34.8)` zostanie skonwertowane na `'34.8'`.
+
+2. `string-length(pole)`: Zwraca długość pola ciągu znaków.
+   - Przykład: `string-length(.) > 3 and string-length(.) < 10` może być używane do zapewnienia, że bieżące pole ma od 3 do 10 znaków.
+
+3. `substr(pole_lub_ciag, indeks_poczatkowy, indeks_koncowy)`: Zwraca podciąg zaczynający się od `indeks_poczatkowy` i kończący się tuż przed `indeks_koncowy`. Indeksy zaczynają się od 0 dla pierwszego znaku.
+   - Przykład: `substr(${phone}, 0, 3)` zwróci pierwsze trzy cyfry numeru telefonu.
+
+4. `concat(a, b, c, ...)`: Łączy pola (i/lub ciągi znaków) razem.
+   - Przykład: `concat(${firstname}, ' ', ${lastname})` zwróci pełne imię i nazwisko.
+
+5. `linebreak()`: Zwraca znak nowej linii.
+
+6. `lower()`: Konwertuje ciąg na małe litery.
+
+7. `upper()`: Konwertuje ciąg na wielkie litery.
+
+### Funkcje select_one i select_multiple
+
+1. `count-selected(pole)`: Zwraca liczbę elementów wybranych w polu select_multiple.
+
+2. `selected(pole, wartosc)`: Zwraca prawdę lub fałsz w zależności od tego, czy podana wartość została wybrana.
+   - Przykład: `selected(${color}, 'Blue')` — pokaż grupę jeśli respondent wybrał „Blue".
+
+3. `selected-at(pole, numer)`: Zwraca wybrany element na określonej pozycji w polu select_multiple.
+
+4. `choice-label(pole, wartosc)`: Zwraca etykietę dla wyboru w polu select_one lub select_multiple.
+
+### Funkcje pól powtarzanych
+
+1. `join(ciag, pole_powtarzane)`: Dla pola w grupie powtórzeń generuje listę wartości oddzieloną podanym separatorem.
+   - Przykład: `join(', ', ${member_name})` wygeneruje listę oddzieloną przecinkami.
+
+2. `count(grupa_powtorzen)`: Zwraca bieżącą liczbę powtórzeń grupy powtórzeń.
+
+3. `sum(pole_powtarzane)`: Dla pola w grupie powtórzeń oblicza sumę wszystkich wartości.
+
+4. `min(pole_powtarzane)`: Dla pola w grupie powtórzeń oblicza minimum wszystkich wartości.
+
+5. `max(pole_powtarzane)`: Dla pola w grupie powtórzeń oblicza maksimum wszystkich wartości.
+
+### Funkcje daty i czasu
+
+1. `today()`: Zwraca bieżącą datę.
+
+2. `now()`: Zwraca bieżącą datę i czas.
+
+3. `date(wartosc)`: Konwertuje wartość na datę.
+
+4. `date-time(wartosc)`: Konwertuje wartość na datę i czas.
+
+5. `decimal-date-time(wartosc)`: Konwertuje datę/czas na reprezentację dziesiętną.
+
+6. `format-date(data, wzorzec)`: Formatuje datę zgodnie z podanym wzorcem.
+
+### Funkcje numeryczne
+
+1. `int(wartosc)`: Konwertuje wartość na integer (obcina część dziesiętną).
+
+2. `number(wartosc)`: Konwertuje wartość na liczbę.
+
+3. `round(wartosc, miejsca)`: Zaokrągla liczbę do podanej liczby miejsc dziesiętnych.
+
+4. `floor(liczba)`: Zwraca największą liczbę całkowitą mniejszą lub równą `liczba`.
+
+5. `ceiling(liczba)`: Zwraca najmniejszą liczbę całkowitą większą lub równą `liczba`.
+
+6. `random()`: Zwraca losową liczbę dziesiętną od 0,0 (włącznie) do 1,0 (wyłącznie).
+
+7. `coalesce(a, b)`: Zwraca `a` jeśli `a` nie jest puste; w przeciwnym razie zwraca `b`.
+
+8. `once(wartosc)`: Ocenia `wartosc` i przechowuje ją, ale tylko jeśli bieżące pole jest **puste**.
+   - Przykład: `once(uuid())` generuje UUID raz i zachowuje go stabilnym podczas ponownych edycji.
+
+### Funkcje geo
+
+1. `area(wartosc_geoshape)`: Oblicza **powierzchnię w metrach kwadratowych** otoczoną przez geoshape (wielokąt).
+   - Przykład: `area(${field_boundary})` — oblicz powierzchnię ankietowanego pola w m².
+
+2. `distance(wspolrzedne)`: Oblicza **całkowitą długość ścieżki w metrach** geotrace (linii) lub odległość między dwoma geopointami.
+
+### Funkcje walidacji
+
+1. `regex(wartosc, wzorzec)`: Zwraca `prawdę` jeśli `wartosc` pasuje do wyrażenia regularnego `wzorzec`.
+   - Przykład: `regex(., '^[0-9]{10}$')` — sprawdź poprawność 10-cyfrowego numeru.
+
+2. `checklist(min, max, w1, w2, ...)`: Ocenia listę wyrażeń boolean i zwraca `prawdę` jeśli liczba wartości `prawda` mieści się w zakresie od `min` do `max`.
+
+### Funkcje narzędziowe
+
+1. `uuid()`: Generuje losowy UUID (format RFC 4122 v4) jako ciąg znaków.
+   - Zazwyczaj używany z `once()` do generowania stabilnego unikalnego ID: `once(uuid())`
+
+2. `version()`: Zwraca wartość atrybutu `version` formularza.
+
+3. `position()`: Gdy wywoływana wewnątrz **grupy powtórzeń**, zwraca 1-bazowany indeks bieżącej instancji powtórzenia.
+
+4. `substr-jsonpath(wartosc, jsonpath)`: Wyodrębnia podciąg z ciągu JSON używając wyrażenia JSONPath.
+   - Zazwyczaj używany wraz z `callapi()` do wyodrębniania konkretnych wartości z odpowiedzi API.

@@ -1,0 +1,59 @@
+---
+description: Pyetjet barcode lejojnë skanimin dhe kapjen e të dhënave barcode në sondazhin
+  tuaj.
+icon: qr_code_scanner
+title: Barcode
+---
+
+
+Lloji i pyetjes barcode në XLSForms dhe rtSurvey mundëson përdoruesve të skanojnë dhe kapin të dhëna barcode drejtpërdrejt brenda sondazhit. Kjo veçori është veçanërisht e dobishme për menaxhimin e inventarit, gjurmimin e produkteve, ose çdo skenar ku kërkohet hyrje e shpejtë dhe e saktë e të dhënave të koduara.
+
+## Specifikimi bazë XLSForm
+
+| type    | name          | label                   |
+|---------|---------------|-------------------------|
+| barcode | product_code  | Skanoni barcodin e produktit |
+
+Për më shumë detaje mbi llojin bazë të pyetjes barcode, shikoni [specifikimin XLSForm](https://xlsform.org/en/#question-types).
+
+## Përdorimet
+
+Pyetjet barcode përdoren zakonisht për:
+
+1. Identifikimi i produktit në sondazhet e inventarit
+2. Gjurmimi i aseteve në operacionet në terren
+3. Verifikimi i biletave ose ID në ngjarje
+4. Hyrja e shpejtë e të dhënave për informacionin e koduar
+
+## Zgjerime të rtSurvey
+
+Ndërsa specifikimi bazë XLSForm për pyetjet barcode është i thjeshtë, rtSurvey ofron veçori ose personalizime shtesë. Këto mund të përfshijnë:
+
+1. Mbështetje për formate të shumta barcode (p.sh., kode QR, UPC, EAN)
+2. Integrimi me kamerën e pajisjes për skanimin e barcode
+3. Opsioni i hyrjes manuale në rast se barcodi është dëmtuar ose nuk mund të skanohet
+
+## Praktikat më të mira
+
+1. Siguroni kushte të duhura ndriçimi për skanim të saktë barcode.
+2. Jepni udhëzime të qarta për përdoruesit se si të pozicionojnë pajisjen për skanim.
+3. Përfshini opsionin e hyrjes manuale si alternativë në rast të vështirësive me skanimin.
+4. Testoni veçorinë e skanimit barcode me pajisje të ndryshme dhe lloje barcode para vendosjes së sondazhit.
+
+## Kufizimet
+
+- Saktësia e skanimit barcode mund të ndryshojë në varësi të cilësisë së kamerës dhe kushteve mjedisore.
+- Disa pajisje të vjetra ose me nivel të ulët mund të mos mbështesin skanimin barcode.
+- Llojet e caktuara barcode mund të mos mbështeten, në varësi të zbatimit.
+
+## Shembull i përdorimit
+
+Ja një shembull se si mund të përdorni pyetjen barcode në sondazhin e inventarit:
+
+| type    | name          | label                   | hint                                      |
+|---------|---------------|-------------------------|-------------------------------------------|
+| barcode | product_code  | Skanoni barcodin e produktit | Poziciononi barcodin brenda kornizës |
+| integer | quantity      | Shkruani sasinë e produktit |                                           |
+| note    | confirmation  | Produkti i skanuar: ${product_code}. Sasia: ${quantity} | |
+
+Në këtë shembull, sondazhi kap barcodin e produktit, pyet për sasinë, dhe pastaj shfaq shënimin e konfirmimit me informacionin e skanuar.

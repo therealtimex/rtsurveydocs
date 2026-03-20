@@ -1,0 +1,94 @@
+---
+description: select_one_from_file et select_multiple_from_file chargent les choix
+  dynamiquement depuis un fichier CSV ou XML externe attaché au formulaire.
+icon: file-earmark-spreadsheet
+title: Select from file
+---
+
+
+`select_one_from_file` et `select_multiple_from_file` fonctionnent comme `select_one` et `select_multiple`, mais au lieu de définir les choix dans la **feuille choices**, les choix sont chargés depuis un **fichier CSV ou XML externe** attaché au formulaire. C'est utile lorsque votre liste de choix est très longue, change fréquemment, ou doit être mise à jour sans reconstruire l'intégralité du formulaire.
+
+## Spécification XLSForm de base
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | Sélectionner l'établissement de santé |
+| select_multiple_from_file crops.csv | crops | Quelles cultures le ménage cultive-t-il ? |
+
+Le nom de fichier après le nom du type doit correspondre exactement au nom du fichier que vous joignez lors du téléversement du formulaire.
+
+## Format du fichier CSV
+
+Votre fichier CSV doit avoir au moins deux colonnes : `name` (la valeur stockée) et `label` (le texte affiché). Vous pouvez ajouter autant de colonnes supplémentaires que nécessaire pour le filtrage.
+
+**health_facilities.csv :**
+
+```
+name,label,district,type
+HF001,Clinique centrale de Nairobi,Nairobi,clinic
+HF002,Centre de santé de Westlands,Nairobi,health_centre
+HF003,Hôpital de district de Kisumu,Kisumu,hospital
+```
+
+## Filtrer les choix
+
+Utilisez la colonne `choice_filter` pour n'afficher que les choix correspondant au contexte actuel. Référencez les colonnes CSV directement avec leur nom de colonne (sans `${}`) :
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | Sélectionner le district | |
+| select_one_from_file health_facilities.csv | facility | Sélectionner l'établissement | district = ${district} |
+
+Dans cet exemple, seuls les établissements du district sélectionné sont affichés. Le `district` dans `choice_filter` fait référence à la colonne `district` du fichier CSV ; `${district}` fait référence au champ du formulaire nommé `district`.
+
+## Utilisations
+
+Les questions select-from-file sont couramment utilisées pour :
+
+1. **Longues listes de choix** — établissements de santé, écoles, villages, listes d'espèces (des centaines ou des milliers d'éléments)
+2. **Listes fréquemment mises à jour** — lorsque la liste maître change entre les cycles d'enquête, mettez à jour uniquement le CSV sans reconstruire le formulaire
+3. **Données de référence partagées** — un fichier CSV utilisé dans plusieurs formulaires
+4. **Sélections en cascade filtrées** — charger toutes les régions/districts/villages dans un seul fichier, puis filtrer par la sélection parente
+
+## Joindre le fichier
+
+Lors du téléversement de votre formulaire dans rtSurvey, joignez le fichier CSV comme **pièce jointe média**. Le nom de fichier dans la définition du formulaire doit correspondre exactement au nom de fichier de la pièce jointe.
+
+<Warning>
+Les noms de fichiers sont sensibles à la casse. `Health_Facilities.csv` et `health_facilities.csv` sont traités comme des fichiers différents.
+</Warning>
+
+## Utiliser `choice-label()` avec from-file
+
+Pour afficher l'étiquette d'un choix sélectionné dans une note ou un champ calculate :
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | Sélectionner l'établissement | |
+| calculate | facility_label | | choice-label(${facility}, ${facility}) |
+| note | summary | Établissement sélectionné : ${facility_label} | |
+
+## Bonnes pratiques
+
+1. Maintenez vos fichiers CSV sous 5 000 lignes pour de bonnes performances sur les appareils mobiles.
+2. Incluez toujours une colonne `name` et `label` — les colonnes supplémentaires sont optionnelles.
+3. Pour les sélections en cascade, utilisez un seul CSV avec une colonne parente et filtrez avec `choice_filter`.
+4. Versionnez vos noms de fichiers CSV (ex. : `facilities_v3.csv`) lors de changements structurels de colonnes.
+5. Testez soigneusement les expressions de filtrage — une faute de frappe dans `choice_filter` affichera silencieusement aucun choix.
+
+## Limitations
+
+- Les fichiers CSV très volumineux (10 000+ lignes) peuvent ralentir le chargement du formulaire, surtout sur les appareils bas de gamme.
+- Les fichiers CSV doivent être téléversés avec le formulaire — ils ne peuvent pas être récupérés depuis une URL au moment de l'exécution (utilisez `search()` ou `pulldata()` pour les recherches dynamiques).
+- `select_multiple_from_file` est moins couramment pris en charge dans tous les clients — vérifiez la compatibilité avant de l'utiliser.
+
+## Comparaison avec `search()`
+
+| | `select_one_from_file` | Apparence `search()` |
+|--|----------------------|----------------------|
+| Source des choix | Fichier CSV/XML joint | Requête de base de données côté serveur |
+| Fonctionne hors ligne | Oui (fichier inclus) | Nécessite une connexion |
+| Nombre de choix | Limité par la mémoire de l'appareil | Illimité (paginé) |
+| Données en temps réel | Non | Oui |
+
+Pour les jeux de données volumineux, fréquemment modifiés ou côté serveur, consultez [Recherche dynamique](../advanced-extension/dynamic-search).
