@@ -7,7 +7,6 @@ Usage:
 
 import argparse
 import json
-import re
 from pathlib import Path
 
 try:
@@ -15,47 +14,35 @@ try:
 except ImportError:
     raise SystemExit("Missing dependency: pip install pyyaml")
 
-# Language code → display name (from hugo.toml)
-LANG_NAMES = {
-    "en": "English",
-    "vi": "Tiếng Việt",
-    "fr": "Français",
-    "de": "Deutsch",
-    "pt": "Português",
-    "es": "Español",
-    "zh-hans": "简体中文",
-    "ar": "العربية",
-    "th": "ไทย",
-    "id": "Bahasa Indonesia",
-    "km": "ភាសាខ្មែរ",
-    "hi": "हिन्दी",
-    "ru": "Русский",
-    "zh-hant": "繁體中文",
-    "ko": "한국어",
-    "ja": "日本語",
-    "it": "Italiano",
-    "nl": "Nederlands",
-    "tr": "Türkçe",
-    "uk": "Українська",
-    "nb": "Norsk Bokmål",
-    "da": "Dansk",
-    "sv": "Svenska",
-    "fi": "Suomi",
-    "el": "Ελληνικά",
-    "pl": "Polski",
-    "cs": "Čeština",
-    "sk": "Slovenčina",
-    "hu": "Magyar",
-    "bg": "Български",
-    "sr": "Srpski",
-    "sq": "Shqip",
-    "lv": "Latviešu",
-    "lt": "Lietuvių",
-    "te": "తెలుగు",
-    "pt-br": "Português (Brasil)",
+# Only language codes Mintlify actually supports (from their schema enum)
+# Maps directory name → Mintlify language code
+SUPPORTED_LANGS = {
+    "en":      "en",
+    "vi":      "vi",
+    "fr":      "fr",
+    "de":      "de",
+    "pt":      "pt",
+    "es":      "es",
+    "zh-Hans": "zh-Hans",
+    "ar":      "ar",
+    "id":      "id",
+    "hi":      "hi",
+    "ru":      "ru",
+    "zh-Hant": "zh-Hant",
+    "ko":      "ko",
+    "ja":      "ja",
+    "it":      "it",
+    "nl":      "nl",
+    "tr":      "tr",
+    "uk":      "uk",
+    "no":      "no",
+    "sv":      "sv",
+    "pl":      "pl",
+    "cs":      "cs",
+    "hu":      "hu",
+    "lv":      "lv",
+    "pt-BR":   "pt-BR",
 }
-
-RTL_LANGS = {"ar", "he", "fa", "ur"}
 
 # Placeholder folder to skip from navigation
 SKIP_DIRS = {"section-subfolder"}
@@ -79,49 +66,41 @@ def read_title(path: Path):
 
 
 def humanize(name: str) -> str:
-    """Convert a slug to a title."""
     return name.replace("-", " ").replace("_", " ").title()
 
 
-def build_pages(directory: Path, lang: str, root: Path) -> list:
+def build_pages(directory: Path, root: Path) -> list:
     """Recursively build a Mintlify pages array for a directory."""
     items = []
 
-    # Include index page first
+    # Index page first
     idx = directory / "index.mdx"
     if idx.exists():
-        rel = idx.relative_to(root)
-        page_path = str(rel).replace(".mdx", "")
-        items.append(page_path)
+        items.append(str(idx.relative_to(root)).replace(".mdx", ""))
 
-    # Then all non-index .mdx files, sorted
+    # Non-index .mdx files, sorted
     for f in sorted(directory.iterdir()):
         if f.is_file() and f.suffix == ".mdx" and f.stem != "index":
-            rel = f.relative_to(root)
-            page_path = str(rel).replace(".mdx", "")
-            items.append(page_path)
+            items.append(str(f.relative_to(root)).replace(".mdx", ""))
 
-    # Then subdirectories as nested groups
+    # Subdirectories as nested groups
     for d in sorted(directory.iterdir()):
         if d.is_dir() and d.name not in SKIP_DIRS:
             sub_idx = d / "index.mdx"
             title = read_title(sub_idx) or humanize(d.name)
-            sub_pages = build_pages(d, lang, root)
+            sub_pages = build_pages(d, root)
             if sub_pages:
                 items.append({"group": title, "pages": sub_pages})
 
     return items
 
 
-def build_lang_navigation(lang: str, root: Path) -> list:
-    """Build top-level navigation groups for one language."""
-    lang_dir = root / lang
-    if not lang_dir.exists():
+def build_lang_groups(lang_dir: str, root: Path) -> list:
+    """Build navigation groups for one language directory."""
+    base = root / lang_dir
+    if not base.exists():
         return []
 
-    groups = []
-
-    # Section order (matches original Hugo weight order)
     section_order = [
         "getting-started",
         "user-interface",
@@ -135,17 +114,16 @@ def build_lang_navigation(lang: str, root: Path) -> list:
         "release-update",
     ]
 
+    groups = []
     for section in section_order:
-        section_dir = lang_dir / section
+        section_dir = base / section
         if not section_dir.exists():
             continue
-
         idx = section_dir / "index.mdx"
-        title = read_title(idx) if lang == "en" else None
+        title = read_title(idx) if lang_dir == "en" else None
         if not title:
             title = humanize(section)
-
-        pages = build_pages(section_dir, lang, root)
+        pages = build_pages(section_dir, root)
         if pages:
             groups.append({"group": title, "pages": pages})
 
@@ -160,30 +138,25 @@ def main():
 
     root = Path(args.root).resolve()
 
-    # Build navigation for all languages
     languages = []
-    for lang_code in LANG_NAMES:
-        lang_dir = root / lang_code
-        if not lang_dir.exists():
-            continue
-
-        groups = build_lang_navigation(lang_code, root)
+    for lang_dir, lang_code in SUPPORTED_LANGS.items():
+        groups = build_lang_groups(lang_dir, root)
         if not groups:
+            print(f"  {lang_dir:<10} SKIPPED (no content)")
             continue
 
-        lang_entry = {
-            "language": lang_code,
-        }
+        # Each language entry needs "tabs" wrapping the groups
+        lang_entry = {"language": lang_code}
         if lang_code == "en":
             lang_entry["default"] = True
-
-        lang_entry["groups"] = groups
+        lang_entry["tabs"] = [{"tab": "Documentation", "groups": groups}]
         languages.append(lang_entry)
 
-        print(f"  {lang_code:<10} {sum(len(g['pages']) for g in groups):>4} nav items")
+        total_pages = sum(len(g["pages"]) for g in groups)
+        print(f"  {lang_dir:<10} {total_pages:>4} nav items")
 
-    # Build complete docs.json
     docs = {
+        "$schema": "https://mintlify.com/docs.json",
         "name": "rtSurvey Documentation",
         "theme": "mint",
         "logo": {
@@ -198,17 +171,10 @@ def main():
             "dark": "#1D4ED8"
         },
         "navbar": {
-            "links": [
-                {
-                    "label": "rtSurvey",
-                    "href": "https://rtsurvey.com"
-                }
-            ]
+            "links": [{"label": "rtSurvey", "href": "https://rtsurvey.com"}]
         },
         "footer": {
-            "socials": {
-                "github": "https://github.com/rtsurvey"
-            }
+            "socials": {"github": "https://github.com/rtsurvey"}
         },
         "navigation": {
             "languages": languages
@@ -217,8 +183,8 @@ def main():
 
     out_path = root / args.out
     out_path.write_text(json.dumps(docs, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\nWrote {out_path}")
-    print(f"Total languages: {len(languages)}")
+    print(f"\nWrote {out_path}  ({out_path.stat().st_size // 1024} KB)")
+    print(f"Languages: {len(languages)}")
 
 
 if __name__ == "__main__":
