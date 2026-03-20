@@ -1,4 +1,5 @@
 {
+  "$schema": "https://mintlify.com/docs.json",
   "name": "rtSurvey Documentation",
   "theme": "mint",
   "logo": {
