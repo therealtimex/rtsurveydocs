@@ -480,6 +480,8 @@ cat > /opt/rtcloud/keycloak-import/rtsurvey-realm.json << REALM_EOF
 {
   "realm": "rtsurvey",
   "enabled": true,
+  "ssoSessionIdleTimeout": 2592000,
+  "ssoSessionMaxLifespan": 31536000,
   "sslRequired": "external",
   "registrationAllowed": false,
   "loginWithEmailAllowed": true,

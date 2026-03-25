@@ -561,6 +561,8 @@ SQL_EOF
 {
   "realm": "rtsurvey",
   "enabled": true,
+  "ssoSessionIdleTimeout": 2592000,
+  "ssoSessionMaxLifespan": 31536000,
   "sslRequired": "external",
   "registrationAllowed": false,
   "loginWithEmailAllowed": true,
