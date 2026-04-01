@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## 방화벽 규칙 (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+이 서버에 Linode Cloud Firewall을 연결하는 경우 다음 규칙을 사용하세요:
 
-### Inbound
+### 인바운드 (수신)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| 레이블 | 작업 | 프로토콜 | 포트 | 소스 | 비고 |
+|-------|------|---------|------|------|------|
+| `accept-inbound-ssh` | 허용 | TCP | 22 | All IPv4, All IPv6 | SSH 접근 |
+| `accept-inbound-http` | 허용 | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME 챌린지) |
+| `accept-inbound-https` | 허용 | TCP | 443 | All IPv4, All IPv6 | Nginx (SSL 설정 후 HTTPS) |
+| `accept-inbound-shiny` | 허용 | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R 분석) |
+| `accept-inbound-icmp` | 허용 | ICMP | — | All IPv4, All IPv6 | Ping / 진단 |
+| 기본 인바운드 정책 | **차단** | | | | 나머지 모두 차단 |
 
-### Outbound
+### 아웃바운드 (송신)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| 레이블 | 작업 | 비고 |
+|-------|------|------|
+| 기본 아웃바운드 정책 | **허용** | 모든 아웃바운드 트래픽 허용 (Docker, certbot, GoDaddy API 등) |
 
-### Ports NOT needed externally
+### 외부에 불필요한 포트
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+이 포트들은 `127.0.0.1`에만 바인딩되어 외부에서 접근할 수 없습니다:
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| 포트 | 서비스 | 이유 |
+|------|--------|------|
+| 8080 | 앱 컨테이너 | Nginx가 내부에서 프록시 |
+| 8090 | Keycloak 컨테이너 | Nginx가 내부에서 프록시 |
+| 3306 | MySQL | Docker 내부 네트워크 전용 |
 
 ---
 

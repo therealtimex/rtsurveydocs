@@ -88,35 +88,35 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Palomuurisäännöt (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Jos liität Linode Cloud Firewallin tähän palvelimeen, käytä seuraavia sääntöjä:
 
-### Inbound
+### Saapuva liikenne (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
+| Tunniste | Toiminto | Protokolla | Portti | Lähteet | Huomiot |
 |-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| `accept-inbound-ssh` | Hyväksy | TCP | 22 | All IPv4, All IPv6 | SSH access |
+| `accept-inbound-http` | Hyväksy | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | Hyväksy | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
+| `accept-inbound-shiny` | Hyväksy | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Hyväksy | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
+| Default inbound policy | **Hylkää** | | | | Block everything else |
 
-### Outbound
+### Lähtevä liikenne (Outbound)
 
-| Label | Action | Notes |
+| Tunniste | Toiminto | Huomiot |
 |-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Default outbound policy | **Hyväksy** | Salli kaikki lähtevä liikenne (Docker, certbot, GoDaddy API, etc.) |
 
-### Ports NOT needed externally
+### Portit, joita EI tarvita ulkoisesti
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Nämä portit on sidottu vain osoitteeseen `127.0.0.1` eivätkä ne ole koskaan ulkoa käsin saavutettavissa:
 
-| Port | Service | Reason |
+| Portti | Palvelu | Syy |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
+| 8080 | App container | Nginx proxies internally |
+| 8090 | Keycloak container | Nginx proxies internally |
 | 3306 | MySQL | Internal Docker network only |
 
 ---

@@ -88,35 +88,35 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Tűzfalszabályok (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Ha Linode Cloud Firewall-t csatol ehhez a szerverhez, használja a következő szabályokat:
 
-### Inbound
+### Bejövő forgalom (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
+| Felirat | Művelet | Protokoll | Port | Források | Megjegyzések |
 |-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| `accept-inbound-ssh` | Elfogad | TCP | 22 | All IPv4, All IPv6 | SSH access |
+| `accept-inbound-http` | Elfogad | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | Elfogad | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
+| `accept-inbound-shiny` | Elfogad | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Elfogad | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
+| Default inbound policy | **Elvet** | | | | Block everything else |
 
-### Outbound
+### Kimenő forgalom (Outbound)
 
-| Label | Action | Notes |
+| Felirat | Művelet | Megjegyzések |
 |-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Default outbound policy | **Elfogad** | Minden kimenő forgalom engedélyezése (Docker, certbot, GoDaddy API, etc.) |
 
-### Ports NOT needed externally
+### Kívülről NEM szükséges portok
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Ezek a portok csak a következőhöz vannak kötve: `127.0.0.1` és soha nem érhetők el kívülről:
 
-| Port | Service | Reason |
+| Port | Szolgáltatás | Ok |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
+| 8080 | App container | Nginx proxies internally |
+| 8090 | Keycloak container | Nginx proxies internally |
 | 3306 | MySQL | Internal Docker network only |
 
 ---

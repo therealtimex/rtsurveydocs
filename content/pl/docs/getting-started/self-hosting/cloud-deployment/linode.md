@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Reguły zapory sieciowej (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Jeśli podłączasz Linode Cloud Firewall do tego serwera, użyj następujących reguł:
 
-### Inbound
+### Ruch przychodzący (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| Etykieta | Akcja | Protokół | Port | Źródła | Uwagi |
+|---------|-------|---------|------|--------|-------|
+| `accept-inbound-ssh` | Zezwól | TCP | 22 | All IPv4, All IPv6 | Dostęp SSH |
+| `accept-inbound-http` | Zezwól | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + wyzwanie ACME) |
+| `accept-inbound-https` | Zezwól | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS po konfiguracji SSL) |
+| `accept-inbound-shiny` | Zezwól | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (analityka R) |
+| `accept-inbound-icmp` | Zezwól | ICMP | — | All IPv4, All IPv6 | Ping / diagnostyka |
+| Domyślna polityka przychodzącą | **Odrzuć** | | | | Zablokuj wszystko inne |
 
-### Outbound
+### Ruch wychodzący (Outbound)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Etykieta | Akcja | Uwagi |
+|---------|-------|-------|
+| Domyślna polityka wychodząca | **Zezwól** | Zezwól na cały ruch wychodzący (Docker, certbot, GoDaddy API itp.) |
 
-### Ports NOT needed externally
+### Porty NIE wymagane zewnętrznie
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Te porty są powiązane tylko z `127.0.0.1` i nigdy nie są dostępne z zewnątrz:
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| Port | Usługa | Powód |
+|------|--------|-------|
+| 8080 | Kontener aplikacji | Nginx proxy wewnętrznie |
+| 8090 | Kontener Keycloak | Nginx proxy wewnętrznie |
+| 3306 | MySQL | Tylko wewnętrzna sieć Docker |
 
 ---
 

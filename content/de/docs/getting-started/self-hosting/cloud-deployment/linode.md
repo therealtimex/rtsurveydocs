@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Firewall-Regeln (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Wenn Sie eine Linode Cloud Firewall an diesen Server anhängen, verwenden Sie die folgenden Regeln:
 
-### Inbound
+### Eingehend (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| Bezeichnung | Aktion | Protokoll | Port | Quellen | Hinweise |
+|------------|--------|-----------|------|---------|---------|
+| `accept-inbound-ssh` | Akzeptieren | TCP | 22 | All IPv4, All IPv6 | SSH-Zugriff |
+| `accept-inbound-http` | Akzeptieren | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME-Challenge) |
+| `accept-inbound-https` | Akzeptieren | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS nach SSL-Einrichtung) |
+| `accept-inbound-shiny` | Akzeptieren | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R-Analyse) |
+| `accept-inbound-icmp` | Akzeptieren | ICMP | — | All IPv4, All IPv6 | Ping / Diagnose |
+| Standard-Eingangsrichtlinie | **Verwerfen** | | | | Alles andere blockieren |
 
-### Outbound
+### Ausgehend (Outbound)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Bezeichnung | Aktion | Hinweise |
+|------------|--------|---------|
+| Standard-Ausgangsrichtlinie | **Akzeptieren** | Alle ausgehenden Verbindungen erlauben (Docker, certbot, GoDaddy API usw.) |
 
-### Ports NOT needed externally
+### Ports, die extern NICHT benötigt werden
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Diese Ports sind nur an `127.0.0.1` gebunden und von außen nicht erreichbar:
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| Port | Dienst | Grund |
+|------|--------|-------|
+| 8080 | App-Container | Nginx leitet intern weiter |
+| 8090 | Keycloak-Container | Nginx leitet intern weiter |
+| 3306 | MySQL | Nur internes Docker-Netzwerk |
 
 ---
 

@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## 防火墙规则（Linode Cloud Firewall）
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+如果您将 Linode Cloud Firewall 附加到此服务器，请使用以下规则：
 
-### Inbound
+### 入站规则（Inbound）
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| 标签 | 操作 | 协议 | 端口 | 来源 | 备注 |
+|------|------|------|------|------|------|
+| `accept-inbound-ssh` | 接受 | TCP | 22 | All IPv4, All IPv6 | SSH 访问 |
+| `accept-inbound-http` | 接受 | TCP | 80 | All IPv4, All IPv6 | Nginx（HTTP + ACME 验证） |
+| `accept-inbound-https` | 接受 | TCP | 443 | All IPv4, All IPv6 | Nginx（SSL 配置后的 HTTPS） |
+| `accept-inbound-shiny` | 接受 | TCP | 3838 | All IPv4, All IPv6 | Shiny Server（R 分析） |
+| `accept-inbound-icmp` | 接受 | ICMP | — | All IPv4, All IPv6 | Ping / 诊断 |
+| 默认入站策略 | **丢弃** | | | | 阻止其他所有流量 |
 
-### Outbound
+### 出站规则（Outbound）
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| 标签 | 操作 | 备注 |
+|------|------|------|
+| 默认出站策略 | **接受** | 允许所有出站流量（Docker、certbot、GoDaddy API 等） |
 
-### Ports NOT needed externally
+### 无需对外开放的端口
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+这些端口仅绑定到 `127.0.0.1`，无法从外部访问：
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| 端口 | 服务 | 原因 |
+|------|------|------|
+| 8080 | 应用容器 | Nginx 在内部代理 |
+| 8090 | Keycloak 容器 | Nginx 在内部代理 |
+| 3306 | MySQL | 仅限 Docker 内部网络 |
 
 ---
 

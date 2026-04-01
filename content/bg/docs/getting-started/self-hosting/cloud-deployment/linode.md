@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Правила на защитната стена (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Ако прикачите Linode Cloud Firewall към този сървър, използвайте следните правила:
 
-### Inbound
+### Входящ трафик (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| Етикет | Действие | Протокол | Порт | Източници | Бележки |
+|--------|---------|---------|------|---------|--------|
+| `accept-inbound-ssh` | Разреши | TCP | 22 | All IPv4, All IPv6 | SSH достъп |
+| `accept-inbound-http` | Разреши | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME предизвикателство) |
+| `accept-inbound-https` | Разреши | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS след настройка на SSL) |
+| `accept-inbound-shiny` | Разреши | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R анализ) |
+| `accept-inbound-icmp` | Разреши | ICMP | — | All IPv4, All IPv6 | Ping / диагностика |
+| Политика за входящ трафик по подразбиране | **Откажи** | | | | Блокирай всичко останало |
 
-### Outbound
+### Изходящ трафик (Outbound)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Етикет | Действие | Бележки |
+|--------|---------|--------|
+| Политика за изходящ трафик по подразбиране | **Разреши** | Разреши целия изходящ трафик (Docker, certbot, GoDaddy API и др.) |
 
-### Ports NOT needed externally
+### Портове, НЕ необходими externally
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Тези портове са обвързани само с `127.0.0.1` и не са достъпни отвън:
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| Порт | Услуга | Причина |
+|------|--------|--------|
+| 8080 | App контейнер | Nginx проксира вътрешно |
+| 8090 | Keycloak контейнер | Nginx проксира вътрешно |
+| 3306 | MySQL | Само вътрешна Docker мрежа |
 
 ---
 

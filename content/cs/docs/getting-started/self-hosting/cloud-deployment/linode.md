@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Pravidla firewallu (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Pokud k tomuto serveru připojíte Linode Cloud Firewall, použijte následující pravidla:
 
-### Inbound
+### Příchozí provoz (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| Označení | Akce | Protokol | Port | Zdroje | Poznámky |
+|---------|------|---------|------|--------|--------|
+| `accept-inbound-ssh` | Přijmout | TCP | 22 | All IPv4, All IPv6 | Přístup SSH |
+| `accept-inbound-http` | Přijmout | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME výzva) |
+| `accept-inbound-https` | Přijmout | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS po konfiguraci SSL) |
+| `accept-inbound-shiny` | Přijmout | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytika) |
+| `accept-inbound-icmp` | Přijmout | ICMP | — | All IPv4, All IPv6 | Ping / diagnostika |
+| Výchozí příchozí politika | **Zahodit** | | | | Blokovat vše ostatní |
 
-### Outbound
+### Odchozí provoz (Outbound)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Označení | Akce | Poznámky |
+|---------|------|--------|
+| Výchozí odchozí politika | **Přijmout** | Povolit veškerý odchozí provoz (Docker, certbot, GoDaddy API atd.) |
 
-### Ports NOT needed externally
+### Porty nepotřebné externally
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Tyto porty jsou vázány pouze na `127.0.0.1` a nikdy nejsou dostupné zvenčí:
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| Port | Služba | Důvod |
+|------|--------|-------|
+| 8080 | App kontejner | Nginx interně proxuje |
+| 8090 | Keycloak kontejner | Nginx interně proxuje |
+| 3306 | MySQL | Pouze interní Docker síť |
 
 ---
 

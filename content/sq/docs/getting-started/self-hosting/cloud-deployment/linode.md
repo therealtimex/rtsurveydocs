@@ -88,35 +88,35 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Rregullat e murit të zjarrit (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Nëse lidhni një Linode Cloud Firewall me këtë server, përdorni rregullat e mëposhtme:
 
-### Inbound
+### Trafiku hyrës (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
+| Etiketa | Veprimi | Protokolli | Porta | Burimet | Shënime |
 |-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| `accept-inbound-ssh` | Pranoje | TCP | 22 | All IPv4, All IPv6 | SSH access |
+| `accept-inbound-http` | Pranoje | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | Pranoje | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
+| `accept-inbound-shiny` | Pranoje | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Pranoje | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
+| Default inbound policy | **Hidhe** | | | | Block everything else |
 
-### Outbound
+### Trafiku dalës (Outbound)
 
-| Label | Action | Notes |
+| Etiketa | Veprimi | Shënime |
 |-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Default outbound policy | **Pranoje** | Lejoni gjithë trafikun dalës (Docker, certbot, GoDaddy API, etc.) |
 
-### Ports NOT needed externally
+### Portat që NUK nevojiten jashtë
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Këto porta janë të lidhura vetëm me `127.0.0.1` dhe nuk janë kurrë të arritshme nga jashtë:
 
-| Port | Service | Reason |
+| Porta | Shërbimi | Arsyeja |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
+| 8080 | App container | Nginx proxies internally |
+| 8090 | Keycloak container | Nginx proxies internally |
 | 3306 | MySQL | Internal Docker network only |
 
 ---

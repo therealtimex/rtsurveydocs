@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Quy tắc tường lửa (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Nếu bạn gắn Linode Cloud Firewall vào máy chủ này, hãy sử dụng các quy tắc sau:
 
-### Inbound
+### Inbound (Lưu lượng vào)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| Nhãn | Hành động | Giao thức | Cổng | Nguồn | Ghi chú |
+|------|----------|----------|------|-------|---------|
+| `accept-inbound-ssh` | Chấp nhận | TCP | 22 | All IPv4, All IPv6 | Truy cập SSH |
+| `accept-inbound-http` | Chấp nhận | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | Chấp nhận | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS sau khi cài SSL) |
+| `accept-inbound-shiny` | Chấp nhận | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Chấp nhận | ICMP | — | All IPv4, All IPv6 | Ping / chẩn đoán |
+| Chính sách inbound mặc định | **Chặn** | | | | Chặn tất cả còn lại |
 
-### Outbound
+### Outbound (Lưu lượng ra)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Nhãn | Hành động | Ghi chú |
+|------|----------|---------|
+| Chính sách outbound mặc định | **Chấp nhận** | Cho phép tất cả lưu lượng ra (Docker, certbot, GoDaddy API, v.v.) |
 
-### Ports NOT needed externally
+### Các cổng KHÔNG cần mở ra ngoài
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Các cổng này chỉ được gắn với `127.0.0.1` và không thể truy cập từ bên ngoài:
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| Cổng | Dịch vụ | Lý do |
+|------|---------|-------|
+| 8080 | App container | Nginx proxy nội bộ |
+| 8090 | Keycloak container | Nginx proxy nội bộ |
+| 3306 | MySQL | Chỉ trong mạng Docker nội bộ |
 
 ---
 

@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## กฎไฟร์วอลล์ (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+หากคุณแนบ Linode Cloud Firewall กับเซิร์ฟเวอร์นี้ ให้ใช้กฎต่อไปนี้:
 
-### Inbound
+### การรับส่งข้อมูลขาเข้า (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| ป้ายกำกับ | การกระทำ | โปรโตคอล | พอร์ต | แหล่งที่มา | หมายเหตุ |
+|---------|---------|---------|------|----------|---------|
+| `accept-inbound-ssh` | ยอมรับ | TCP | 22 | All IPv4, All IPv6 | การเข้าถึง SSH |
+| `accept-inbound-http` | ยอมรับ | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | ยอมรับ | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS หลังตั้งค่า SSL) |
+| `accept-inbound-shiny` | ยอมรับ | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | ยอมรับ | ICMP | — | All IPv4, All IPv6 | Ping / การวินิจฉัย |
+| นโยบายขาเข้าเริ่มต้น | **ทิ้ง** | | | | บล็อกทุกอย่างที่เหลือ |
 
-### Outbound
+### การรับส่งข้อมูลขาออก (Outbound)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| ป้ายกำกับ | การกระทำ | หมายเหตุ |
+|---------|---------|---------|
+| นโยบายขาออกเริ่มต้น | **ยอมรับ** | อนุญาตการรับส่งข้อมูลขาออกทั้งหมด (Docker, certbot, GoDaddy API เป็นต้น) |
 
-### Ports NOT needed externally
+### พอร์ตที่ไม่ต้องการเปิดภายนอก
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+พอร์ตเหล่านี้ผูกกับ `127.0.0.1` เท่านั้น ไม่สามารถเข้าถึงได้จากภายนอก:
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| พอร์ต | บริการ | เหตุผล |
+|------|--------|--------|
+| 8080 | App container | Nginx proxy ภายใน |
+| 8090 | Keycloak container | Nginx proxy ภายใน |
+| 3306 | MySQL | เครือข่าย Docker ภายในเท่านั้น |
 
 ---
 

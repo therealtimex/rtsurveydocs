@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## ファイアウォールルール (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+このサーバーにLinode Cloud Firewallを適用する場合は、以下のルールを使用してください：
 
-### Inbound
+### インバウンド (受信)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| ラベル | アクション | プロトコル | ポート | ソース | 備考 |
+|-------|----------|----------|------|-------|------|
+| `accept-inbound-ssh` | 許可 | TCP | 22 | All IPv4, All IPv6 | SSHアクセス |
+| `accept-inbound-http` | 許可 | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACMEチャレンジ) |
+| `accept-inbound-https` | 許可 | TCP | 443 | All IPv4, All IPv6 | Nginx (SSL設定後のHTTPS) |
+| `accept-inbound-shiny` | 許可 | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R分析) |
+| `accept-inbound-icmp` | 許可 | ICMP | — | All IPv4, All IPv6 | Ping / 診断 |
+| デフォルトインバウンドポリシー | **拒否** | | | | それ以外をすべてブロック |
 
-### Outbound
+### アウトバウンド (送信)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| ラベル | アクション | 備考 |
+|-------|----------|------|
+| デフォルトアウトバウンドポリシー | **許可** | すべての送信トラフィックを許可 (Docker、certbot、GoDaddy API 等) |
 
-### Ports NOT needed externally
+### 外部に開放不要なポート
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+これらのポートは `127.0.0.1` のみにバインドされており、外部からアクセスできません：
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| ポート | サービス | 理由 |
+|------|--------|------|
+| 8080 | アプリコンテナ | Nginxが内部でプロキシ |
+| 8090 | Keycloakコンテナ | Nginxが内部でプロキシ |
+| 3306 | MySQL | Dockerの内部ネットワークのみ |
 
 ---
 

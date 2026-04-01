@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## फ़ायरवॉल नियम (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+यदि आप इस सर्वर से Linode Cloud Firewall जोड़ते हैं, तो निम्नलिखित नियमों का उपयोग करें:
 
-### Inbound
+### आने वाला ट्रैफ़िक (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| लेबल | कार्रवाई | प्रोटोकॉल | पोर्ट | स्रोत | नोट्स |
+|------|---------|---------|------|-------|-------|
+| `accept-inbound-ssh` | स्वीकार | TCP | 22 | All IPv4, All IPv6 | SSH पहुंच |
+| `accept-inbound-http` | स्वीकार | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME चुनौती) |
+| `accept-inbound-https` | स्वीकार | TCP | 443 | All IPv4, All IPv6 | Nginx (SSL सेटअप के बाद HTTPS) |
+| `accept-inbound-shiny` | स्वीकार | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R विश्लेषण) |
+| `accept-inbound-icmp` | स्वीकार | ICMP | — | All IPv4, All IPv6 | Ping / निदान |
+| डिफ़ॉल्ट इनबाउंड नीति | **ड्रॉप** | | | | बाकी सब ब्लॉक करें |
 
-### Outbound
+### जाने वाला ट्रैफ़िक (Outbound)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| लेबल | कार्रवाई | नोट्स |
+|------|---------|-------|
+| डिफ़ॉल्ट आउटबाउंड नीति | **स्वीकार** | सभी आउटबाउंड ट्रैफ़िक की अनुमति दें (Docker, certbot, GoDaddy API, आदि) |
 
-### Ports NOT needed externally
+### बाहरी रूप से आवश्यक नहीं पोर्ट
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+ये पोर्ट केवल `127.0.0.1` से बंधे हैं और बाहर से कभी पहुंच योग्य नहीं हैं:
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| पोर्ट | सेवा | कारण |
+|------|------|------|
+| 8080 | ऐप कंटेनर | Nginx आंतरिक रूप से प्रॉक्सी करता है |
+| 8090 | Keycloak कंटेनर | Nginx आंतरिक रूप से प्रॉक्सी करता है |
+| 3306 | MySQL | केवल आंतरिक Docker नेटवर्क |
 
 ---
 

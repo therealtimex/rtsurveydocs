@@ -88,35 +88,35 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## ఫైర్‌వాల్ నియమాలు (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+మీరు ఈ సర్వర్‌కు Linode Cloud Firewall జోడిస్తే, ఈ నియమాలను ఉపయోగించండి:
 
-### Inbound
+### ఇన్‌బౌండ్ ట్రాఫిక్
 
-| Label | Action | Protocol | Port | Sources | Notes |
+| లేబల్ | చర్య | ప్రోటోకాల్ | పోర్ట్ | మూలాలు | గమనికలు |
 |-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| `accept-inbound-ssh` | అంగీకరించు | TCP | 22 | All IPv4, All IPv6 | SSH access |
+| `accept-inbound-http` | అంగీకరించు | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | అంగీకరించు | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
+| `accept-inbound-shiny` | అంగీకరించు | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | అంగీకరించు | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
+| Default inbound policy | **వదలు** | | | | Block everything else |
 
-### Outbound
+### అవుట్‌బౌండ్ ట్రాఫిక్
 
-| Label | Action | Notes |
+| లేబల్ | చర్య | గమనికలు |
 |-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Default outbound policy | **అంగీకరించు** | అన్ని అవుట్‌బౌండ్ ట్రాఫిక్‌ని అనుమతించు (Docker, certbot, GoDaddy API, etc.) |
 
-### Ports NOT needed externally
+### బాహ్యంగా అవసరం లేని పోర్ట్‌లు
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+ఈ పోర్ట్‌లు కేవలం దీనికి మాత్రమే బంధించబడ్డాయి `127.0.0.1` మరియు బాహ్యంగా ఎప్పుడూ చేరుకోలేవు:
 
-| Port | Service | Reason |
+| పోర్ట్ | సేవ | కారణం |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
+| 8080 | App container | Nginx proxies internally |
+| 8090 | Keycloak container | Nginx proxies internally |
 | 3306 | MySQL | Internal Docker network only |
 
 ---

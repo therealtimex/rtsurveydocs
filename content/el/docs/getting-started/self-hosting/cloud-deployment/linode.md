@@ -88,35 +88,35 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Κανόνες τείχους προστασίας (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Αν συνδέσετε ένα Linode Cloud Firewall σε αυτόν τον διακομιστή, χρησιμοποιήστε τους παρακάτω κανόνες:
 
-### Inbound
+### Εισερχόμενη κίνηση (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
+| Ετικέτα | Ενέργεια | Πρωτόκολλο | Θύρα | Πηγές | Σημειώσεις |
 |-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| `accept-inbound-ssh` | Αποδοχή | TCP | 22 | All IPv4, All IPv6 | SSH access |
+| `accept-inbound-http` | Αποδοχή | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | Αποδοχή | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
+| `accept-inbound-shiny` | Αποδοχή | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Αποδοχή | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
+| Default inbound policy | **Απόρριψη** | | | | Block everything else |
 
-### Outbound
+### Εξερχόμενη κίνηση (Outbound)
 
-| Label | Action | Notes |
+| Ετικέτα | Ενέργεια | Σημειώσεις |
 |-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Default outbound policy | **Αποδοχή** | Επιτρέπεται όλη η εξερχόμενη κίνηση (Docker, certbot, GoDaddy API, etc.) |
 
-### Ports NOT needed externally
+### Θύρες ΔΕΝ απαιτούνται εξωτερικά
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Αυτές οι θύρες είναι δεσμευμένες μόνο στο `127.0.0.1` και δεν είναι ποτέ προσβάσιμες εξωτερικά:
 
-| Port | Service | Reason |
+| Θύρα | Υπηρεσία | Αιτία |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
+| 8080 | App container | Nginx proxies internally |
+| 8090 | Keycloak container | Nginx proxies internally |
 | 3306 | MySQL | Internal Docker network only |
 
 ---

@@ -88,35 +88,35 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Firewall-regler (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Hvis du tilknytter en Linode Cloud Firewall til denne server, skal du bruge følgende regler:
 
-### Inbound
+### Indgående trafik (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
+| Label | Handling | Protokol | Port | Kilder | Noter |
 |-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| `accept-inbound-ssh` | Accepter | TCP | 22 | All IPv4, All IPv6 | SSH access |
+| `accept-inbound-http` | Accepter | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | Accepter | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
+| `accept-inbound-shiny` | Accepter | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Accepter | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
+| Default inbound policy | **Afvis** | | | | Block everything else |
 
-### Outbound
+### Udgående trafik (Outbound)
 
-| Label | Action | Notes |
+| Label | Handling | Noter |
 |-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Default outbound policy | **Accepter** | Tillad al udgående trafik (Docker, certbot, GoDaddy API, etc.) |
 
-### Ports NOT needed externally
+### Porte der IKKE er nødvendige eksternt
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Disse porte er kun bundet til `127.0.0.1` og er aldrig tilgængelige udefra:
 
-| Port | Service | Reason |
+| Port | Tjeneste | Årsag |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
+| 8080 | App container | Nginx proxies internally |
+| 8090 | Keycloak container | Nginx proxies internally |
 | 3306 | MySQL | Internal Docker network only |
 
 ---

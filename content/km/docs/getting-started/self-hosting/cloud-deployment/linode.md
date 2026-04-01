@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## ច្បាប់ Firewall (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+ប្រសិនបើអ្នកភ្ជាប់ Linode Cloud Firewall ទៅម៉ាស៊ីនមេនេះ សូមប្រើច្បាប់ដូចខាងក្រោម:
 
-### Inbound
+### ចរាចរណ៍ចូល (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| ស្លាក | សកម្មភាព | ពិធីការ | ច្រក | ប្រភព | កំណត់ចំណាំ |
+|------|---------|---------|------|-------|-----------|
+| `accept-inbound-ssh` | ទទួល | TCP | 22 | All IPv4, All IPv6 | ការចូលប្រើ SSH |
+| `accept-inbound-http` | ទទួល | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | ទទួល | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS បន្ទាប់ពីដំឡើង SSL) |
+| `accept-inbound-shiny` | ទទួល | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | ទទួល | ICMP | — | All IPv4, All IPv6 | Ping / ការធ្វើរោគវិនិច្ឆ័យ |
+| គោលនយោបាយ inbound លំនាំដើម | **លុបចោល** | | | | រារាំងអ្វីៗផ្សេងទៀត |
 
-### Outbound
+### ចរាចរណ៍ចេញ (Outbound)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| ស្លាក | សកម្មភាព | កំណត់ចំណាំ |
+|------|---------|-----------|
+| គោលនយោបាយ outbound លំនាំដើម | **ទទួល** | អនុញ្ញាតចរាចរណ៍ចេញទាំងអស់ (Docker, certbot, GoDaddy API ។ល។) |
 
-### Ports NOT needed externally
+### ច្រកដែលមិនត្រូវការខាងក្រៅ
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+ច្រកទាំងនេះភ្ជាប់តែទៅ `127.0.0.1` ហើយមិនអាចចូលប្រើពីខាងក្រៅបានទេ:
 
-| Port | Service | Reason |
+| ច្រក | សេវាកម្ម | មូលហេតុ |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| 8080 | App container | Nginx proxy ខាងក្នុង |
+| 8090 | Keycloak container | Nginx proxy ខាងក្នុង |
+| 3306 | MySQL | បណ្តាញ Docker ខាងក្នុងតែប៉ុណ្ណោះ |
 
 ---
 

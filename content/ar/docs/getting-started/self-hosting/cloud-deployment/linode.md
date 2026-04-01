@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## قواعد جدار الحماية (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+إذا قمت بربط Linode Cloud Firewall بهذا الخادم، استخدم القواعد التالية:
 
-### Inbound
+### حركة المرور الواردة (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| التسمية | الإجراء | البروتوكول | المنفذ | المصادر | ملاحظات |
+|---------|--------|-----------|-------|---------|---------|
+| `accept-inbound-ssh` | قبول | TCP | 22 | All IPv4, All IPv6 | وصول SSH |
+| `accept-inbound-http` | قبول | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + تحدي ACME) |
+| `accept-inbound-https` | قبول | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS بعد إعداد SSL) |
+| `accept-inbound-shiny` | قبول | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (تحليلات R) |
+| `accept-inbound-icmp` | قبول | ICMP | — | All IPv4, All IPv6 | Ping / التشخيص |
+| السياسة الافتراضية للوارد | **إسقاط** | | | | حظر كل شيء آخر |
 
-### Outbound
+### حركة المرور الصادرة (Outbound)
 
-| Label | Action | Notes |
+| التسمية | الإجراء | ملاحظات |
+|---------|--------|---------|
+| السياسة الافتراضية للصادر | **قبول** | السماح بكل حركة المرور الصادرة (Docker، certbot، GoDaddy API، إلخ) |
+
+### المنافذ غير المطلوبة خارجياً
+
+هذه المنافذ مرتبطة بـ `127.0.0.1` فقط ولا يمكن الوصول إليها من الخارج:
+
+| المنفذ | الخدمة | السبب |
 |-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
-
-### Ports NOT needed externally
-
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
-
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| 8080 | حاوية التطبيق | Nginx يعمل كوسيط داخلياً |
+| 8090 | حاوية Keycloak | Nginx يعمل كوسيط داخلياً |
+| 3306 | MySQL | شبكة Docker الداخلية فقط |
 
 ---
 

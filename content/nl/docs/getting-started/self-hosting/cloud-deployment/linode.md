@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Firewallregels (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Als u een Linode Cloud Firewall aan deze server koppelt, gebruik dan de volgende regels:
 
-### Inbound
+### Inkomend verkeer (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| Label | Actie | Protocol | Poort | Bronnen | Opmerkingen |
+|-------|-------|---------|------|---------|------------|
+| `accept-inbound-ssh` | Accepteren | TCP | 22 | All IPv4, All IPv6 | SSH-toegang |
+| `accept-inbound-http` | Accepteren | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME-challenge) |
+| `accept-inbound-https` | Accepteren | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS na SSL-instelling) |
+| `accept-inbound-shiny` | Accepteren | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R-analyse) |
+| `accept-inbound-icmp` | Accepteren | ICMP | — | All IPv4, All IPv6 | Ping / diagnose |
+| Standaard inkomend beleid | **Weigeren** | | | | Al het overige blokkeren |
 
-### Outbound
+### Uitgaand verkeer (Outbound)
 
-| Label | Action | Notes |
+| Label | Actie | Opmerkingen |
+|-------|-------|------------|
+| Standaard uitgaand beleid | **Accepteren** | Al het uitgaande verkeer toestaan (Docker, certbot, GoDaddy API, enz.) |
+
+### Poorten die NIET extern nodig zijn
+
+Deze poorten zijn alleen gebonden aan `127.0.0.1` en zijn nooit bereikbaar van buitenaf:
+
+| Poort | Dienst | Reden |
 |-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
-
-### Ports NOT needed externally
-
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
-
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| 8080 | App-container | Nginx doet intern proxy |
+| 8090 | Keycloak-container | Nginx doet intern proxy |
+| 3306 | MySQL | Alleen intern Docker-netwerk |
 
 ---
 

@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Güvenlik Duvarı Kuralları (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Bu sunucuya bir Linode Cloud Firewall bağlarsanız, aşağıdaki kuralları kullanın:
 
-### Inbound
+### Gelen Trafik (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| Etiket | Eylem | Protokol | Port | Kaynaklar | Notlar |
+|--------|-------|---------|------|---------|-------|
+| `accept-inbound-ssh` | Kabul Et | TCP | 22 | All IPv4, All IPv6 | SSH erişimi |
+| `accept-inbound-http` | Kabul Et | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME doğrulaması) |
+| `accept-inbound-https` | Kabul Et | TCP | 443 | All IPv4, All IPv6 | Nginx (SSL kurulumundan sonra HTTPS) |
+| `accept-inbound-shiny` | Kabul Et | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analitik) |
+| `accept-inbound-icmp` | Kabul Et | ICMP | — | All IPv4, All IPv6 | Ping / tanılama |
+| Varsayılan gelen politikası | **Düşür** | | | | Diğer her şeyi engelle |
 
-### Outbound
+### Giden Trafik (Outbound)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Etiket | Eylem | Notlar |
+|--------|-------|-------|
+| Varsayılan giden politikası | **Kabul Et** | Tüm giden trafiğe izin ver (Docker, certbot, GoDaddy API vb.) |
 
-### Ports NOT needed externally
+### Harici Olarak Gerekmeyen Portlar
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Bu portlar yalnızca `127.0.0.1`'e bağlıdır ve dışarıdan hiçbir zaman erişilemez:
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| Port | Servis | Neden |
+|------|--------|-------|
+| 8080 | Uygulama konteyneri | Nginx dahili olarak proxy yapıyor |
+| 8090 | Keycloak konteyneri | Nginx dahili olarak proxy yapıyor |
+| 3306 | MySQL | Yalnızca dahili Docker ağı |
 
 ---
 

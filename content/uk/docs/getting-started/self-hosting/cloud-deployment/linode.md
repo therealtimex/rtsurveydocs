@@ -88,36 +88,36 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
-## Firewall rules (Linode Cloud Firewall)
+## Правила брандмауера (Linode Cloud Firewall)
 
-If you attach a Linode Cloud Firewall to this server, use the following rules:
+Якщо ви підключаєте Linode Cloud Firewall до цього сервера, використовуйте такі правила:
 
-### Inbound
+### Вхідний трафік (Inbound)
 
-| Label | Action | Protocol | Port | Sources | Notes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Drop** | | | | Block everything else |
+| Мітка | Дія | Протокол | Порт | Джерела | Примітки |
+|-------|-----|---------|------|---------|---------|
+| `accept-inbound-ssh` | Дозволити | TCP | 22 | All IPv4, All IPv6 | SSH-доступ |
+| `accept-inbound-http` | Дозволити | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME-перевірка) |
+| `accept-inbound-https` | Дозволити | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS після налаштування SSL) |
+| `accept-inbound-shiny` | Дозволити | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (аналітика R) |
+| `accept-inbound-icmp` | Дозволити | ICMP | — | All IPv4, All IPv6 | Ping / діагностика |
+| Стандартна політика вхідного трафіку | **Відхилити** | | | | Блокувати все інше |
 
-### Outbound
+### Вихідний трафік (Outbound)
 
-| Label | Action | Notes |
-|-------|--------|-------|
-| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+| Мітка | Дія | Примітки |
+|-------|-----|---------|
+| Стандартна політика вихідного трафіку | **Дозволити** | Дозволити весь вихідний трафік (Docker, certbot, GoDaddy API тощо) |
 
-### Ports NOT needed externally
+### Порти, що НЕ потребують зовнішнього доступу
 
-These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+Ці порти прив'язані лише до `127.0.0.1` і ніколи не доступні ззовні:
 
-| Port | Service | Reason |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies to it internally |
-| 8090 | Keycloak container | Nginx proxies to it internally |
-| 3306 | MySQL | Internal Docker network only |
+| Порт | Сервіс | Причина |
+|------|--------|--------|
+| 8080 | Контейнер застосунку | Nginx проксіює внутрішньо |
+| 8090 | Контейнер Keycloak | Nginx проксіює внутрішньо |
+| 3306 | MySQL | Лише внутрішня мережа Docker |
 
 ---
 
