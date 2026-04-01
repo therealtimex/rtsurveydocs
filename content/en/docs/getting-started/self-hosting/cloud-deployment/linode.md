@@ -77,8 +77,6 @@ Once setup is complete, open your browser at:
 http://<server-ip>
 ```
 
-The app is running over HTTP at this stage — SSL is configured in the next step.
-
 To log in with the default admin account, **long-press the "Log In or Register" button** for 1–2 seconds to reveal the username and password fields.
 
 | Field | Value |
@@ -90,21 +88,7 @@ See [First Login](../../first-login) for a detailed walkthrough with screenshots
 
 ---
 
-## Step 5 — Set up SSL
-
-SSL is configured from inside the app — no command line required.
-
-1. Log in as admin
-2. Go to **Configuration → System Properties → Domain & SSL**
-3. Enter your domain name (DNS A record must already point to your server IP)
-4. Choose SSL type: **Certbot** (Let's Encrypt, recommended) or **rtSurvey SSL**
-5. Click Save — the server obtains the certificate and switches to HTTPS automatically
-
-After this step your app is accessible at `https://your-domain.com`.
-
----
-
-## Step 6 — Change the default password
+## Step 5 — Change the default password
 
 All passwords default to `admin`. Change them immediately after your first login:
 
