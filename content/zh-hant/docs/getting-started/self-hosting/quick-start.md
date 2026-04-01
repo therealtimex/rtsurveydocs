@@ -1,58 +1,43 @@
 ---
 weight: 1
-title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
-lastmod: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
+title: "快速開始"
 icon: "play_circle"
 toc: true
-description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
+description: "使用自動化雲端腳本在幾分鐘內將 rtCloud 部署到您自己的伺服器上。"
 ---
 
-This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
+本指南幫助您在自己的伺服器上執行 rtCloud。自動化腳本處理所有事情 — Docker、SSL、資料庫、防火牆 — 一次執行即可完成。
 
-## Requirements
+## 要求
 
-### Server
+### 伺服器
 
-| Resource | Minimum | Recommended |
-|----------|---------|-------------|
-| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
-| Disk | 25 GB | 40 GB |
+| 資源 | 最低 | 建議 |
+|------|-----|-----|
+| RAM | 2 GB | 4 GB（使用 Keycloak SSO 時必需） |
+| 磁碟 | 25 GB | 40 GB |
 | CPU | 1 vCPU | 2 vCPUs |
-| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+| 作業系統 | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Domain
+### 網域
 
-You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
-
----
-
-## Choose Your Cloud Provider
-
-Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
-
-| Provider | Guide |
-|----------|-------|
-| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
-| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
-| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
-| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
-
-> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
+執行腳本前，您需要一個**A 記錄指向伺服器 IP** 的網域名稱。Let's Encrypt 需要 DNS 解析來頒發 SSL 憑證。
 
 ---
 
-## What the scripts do
+## 選擇您的雲端提供商
 
-Every cloud script performs a fully unattended setup:
+在下方選擇您的提供商。每個提供商都有一個在首次啟動時執行的自動化腳本，在 **5–10 分鐘**內完成設定。
 
-- Installs Docker and Docker Compose
-- Writes `.env` and `docker-compose.production.yml`
-- Configures Nginx as a reverse proxy
-- Obtains a free TLS certificate from Let's Encrypt
-- Configures the UFW firewall
-- Optionally deploys embedded Keycloak SSO
-- Outputs a deployment summary with all credentials
+| 提供商 | 指南 |
+|-------|-----|
+| Linode (Akamai) | [在 Linode 上部署](../cloud-deployment/linode) — 最簡單，透過 StackScript 進行基於表單的設定 |
+| DigitalOcean | [在 DigitalOcean 上部署](../cloud-deployment/digitalocean) |
+| AWS EC2 | [在 AWS 上部署](../cloud-deployment/aws) |
+| Google Cloud | [在 GCP 上部署](../cloud-deployment/gcp) |
 
+> **大多數使用者推薦：** 從 Linode 開始 — StackScript 提供基於表單的介面，無需手動編輯任何內容。

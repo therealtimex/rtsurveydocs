@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Επισκόπηση"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Τι είναι το rtSurvey, πώς λειτουργεί και τι χρειάζεστε πριν ξεκινήσετε."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+Το rtSurvey είναι μια πλατφόρμα αυτο-φιλοξενίας για σχεδιασμό φορμών, συλλογή δεδομένων στο πεδίο και ανάλυση αποτελεσμάτων σε πραγματικό χρόνο. Την εκτελείτε στον δικό σας διακομιστή — τα δεδομένα σας δεν φεύγουν ποτέ από την υποδομή σας.
 
 ---
 
-## Before you start
+## Πώς λειτουργεί
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Βήμα | Τι κάνετε |
+|------|-----------|
+| **1. Ανάπτυξη** | Εκκινήστε έναν διακομιστή και τρέξτε το stack rtSurvey με ένα αυτοματοποιημένο script |
+| **2. Σχεδιασμός** | Δημιουργήστε φόρμες με XLSForm ή τον οπτικό Form Builder |
+| **3. Συλλογή** | Οι ομάδες πεδίου υποβάλλουν δεδομένα μέσω της εφαρμογής ή του προγράμματος περιήγησης — online ή offline |
+| **4. Ανάλυση** | Ελέγξτε τις υποβολές στον πίνακα ελέγχου, εξάγετε σε CSV/Stata ή συνδεθείτε με Power BI / R |
 
 ---
 
-## Ready?
+## Πριν ξεκινήσετε
 
-**[Deploy your server →](self-hosting/quick-start)**
+Χρειάζεστε:
+
+- Έναν **διακομιστή Linux** (ή λογαριασμό cloud στο Linode, DigitalOcean, AWS ή GCP)
+- Ένα **όνομα τομέα** που δείχνει στον διακομιστή σας
+- Περίπου **10 λεπτά**
+
+Δεν απαιτείται προηγούμενη γνώση Docker — το script ανάπτυξης φροντίζει τα πάντα.
+
+---
+
+## Έτοιμοι;
+
+**[Αναπτύξτε τον διακομιστή σας →](self-hosting/quick-start)**

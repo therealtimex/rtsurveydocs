@@ -1,58 +1,43 @@
 ---
 weight: 1
-title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
-lastmod: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
+title: "เริ่มต้นอย่างรวดเร็ว"
 icon: "play_circle"
 toc: true
-description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
+description: "ติดตั้ง rtCloud บนเซิร์ฟเวอร์ของคุณในไม่กี่นาทีด้วยสคริปต์คลาวด์อัตโนมัติ"
 ---
 
-This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
+คู่มือนี้ช่วยให้คุณเรียกใช้ rtCloud บนเซิร์ฟเวอร์ของคุณเอง สคริปต์อัตโนมัติจัดการทุกอย่าง — Docker, SSL, ฐานข้อมูล, ไฟร์วอลล์ — ในการรันครั้งเดียว
 
-## Requirements
+## ข้อกำหนด
 
-### Server
+### เซิร์ฟเวอร์
 
-| Resource | Minimum | Recommended |
-|----------|---------|-------------|
-| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
-| Disk | 25 GB | 40 GB |
+| ทรัพยากร | ขั้นต่ำ | แนะนำ |
+|---------|--------|------|
+| RAM | 2 GB | 4 GB (จำเป็นเมื่อใช้ Keycloak SSO) |
+| ดิสก์ | 25 GB | 40 GB |
 | CPU | 1 vCPU | 2 vCPUs |
 | OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Domain
+### โดเมน
 
-You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
-
----
-
-## Choose Your Cloud Provider
-
-Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
-
-| Provider | Guide |
-|----------|-------|
-| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
-| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
-| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
-| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
-
-> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
+คุณต้องการชื่อโดเมนที่มี **A record ชี้ไปยัง IP ของเซิร์ฟเวอร์** ก่อนรันสคริปต์ Let's Encrypt ต้องการการแก้ไข DNS เพื่อออกใบรับรอง SSL
 
 ---
 
-## What the scripts do
+## เลือกผู้ให้บริการคลาวด์ของคุณ
 
-Every cloud script performs a fully unattended setup:
+เลือกผู้ให้บริการของคุณด้านล่าง แต่ละรายมีสคริปต์อัตโนมัติที่ทำงานเมื่อบูตครั้งแรกและเสร็จสิ้นการตั้งค่าใน **5–10 นาที**
 
-- Installs Docker and Docker Compose
-- Writes `.env` and `docker-compose.production.yml`
-- Configures Nginx as a reverse proxy
-- Obtains a free TLS certificate from Let's Encrypt
-- Configures the UFW firewall
-- Optionally deploys embedded Keycloak SSO
-- Outputs a deployment summary with all credentials
+| ผู้ให้บริการ | คู่มือ |
+|-----------|------|
+| Linode (Akamai) | [ติดตั้งบน Linode](../cloud-deployment/linode) — ง่ายที่สุด การตั้งค่าแบบฟอร์มผ่าน StackScript |
+| DigitalOcean | [ติดตั้งบน DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [ติดตั้งบน AWS](../cloud-deployment/aws) |
+| Google Cloud | [ติดตั้งบน GCP](../cloud-deployment/gcp) |
 
+> **แนะนำสำหรับผู้ใช้ส่วนใหญ่:** เริ่มต้นด้วย Linode — StackScript ให้ UI แบบฟอร์มดังนั้นไม่ต้องแก้ไขด้วยตนเอง

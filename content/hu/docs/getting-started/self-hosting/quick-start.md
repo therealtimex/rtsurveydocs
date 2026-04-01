@@ -1,58 +1,43 @@
 ---
 weight: 1
-title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
-lastmod: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
+title: "Gyors kezdés"
 icon: "play_circle"
 toc: true
-description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
+description: "Telepítse az rtCloud-ot saját szerverére percek alatt automatizált felhő-szkripttel."
 ---
 
-This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
+Ez az útmutató segít az rtCloud saját szerveren való elindításában. Az automatizált szkriptek mindent elvégeznek — Docker, SSL, adatbázis, tűzfal — egyetlen futtatással.
 
-## Requirements
+## Követelmények
 
-### Server
+### Szerver
 
-| Resource | Minimum | Recommended |
-|----------|---------|-------------|
-| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
-| Disk | 25 GB | 40 GB |
+| Erőforrás | Minimum | Ajánlott |
+|-----------|---------|---------|
+| RAM | 2 GB | 4 GB (szükséges Keycloak SSO esetén) |
+| Lemez | 25 GB | 40 GB |
 | CPU | 1 vCPU | 2 vCPUs |
 | OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
 ### Domain
 
-You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
+A szkript futtatása előtt szükség van egy domainnevre, amelynek **A rekordja a szerver IP-jére mutat**. A Let's Encrypt DNS-feloldást igényel az SSL-tanúsítvány kiállításához.
 
 ---
 
-## Choose Your Cloud Provider
+## Válasszon felhőszolgáltatót
 
-Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
+Válassza ki a szolgáltatóját alább. Mindegyiknek van automatizált szkriptje, amely az első indításkor fut le és **5–10 percen belül** befejezi a beállítást.
 
-| Provider | Guide |
-|----------|-------|
-| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
-| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
-| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
-| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
+| Szolgáltató | Útmutató |
+|------------|---------|
+| Linode (Akamai) | [Telepítés Linode-ra](../cloud-deployment/linode) — legegyszerűbb, StackScript alapú form-vezérelt beállítás |
+| DigitalOcean | [Telepítés DigitalOcean-ra](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Telepítés AWS-re](../cloud-deployment/aws) |
+| Google Cloud | [Telepítés GCP-re](../cloud-deployment/gcp) |
 
-> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
-
----
-
-## What the scripts do
-
-Every cloud script performs a fully unattended setup:
-
-- Installs Docker and Docker Compose
-- Writes `.env` and `docker-compose.production.yml`
-- Configures Nginx as a reverse proxy
-- Obtains a free TLS certificate from Let's Encrypt
-- Configures the UFW firewall
-- Optionally deploys embedded Keycloak SSO
-- Outputs a deployment summary with all credentials
-
+> **A legtöbb felhasználónak ajánlott:** Kezdje a Linode-dal — a StackScript form alapú felületet biztosít, így semmit sem kell manuálisan szerkeszteni.

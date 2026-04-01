@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Visão geral"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "O que é o rtSurvey, como funciona e o que você precisa antes de começar."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey é uma plataforma auto-hospedada para criar formulários, coletar dados em campo e analisar resultados em tempo real. Você a executa no seu próprio servidor — os seus dados nunca saem da sua infraestrutura.
 
 ---
 
-## Before you start
+## Como funciona
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Etapa | O que você faz |
+|-------|----------------|
+| **1. Implantar** | Inicie um servidor e execute a stack rtSurvey com um script automatizado |
+| **2. Criar** | Crie formulários usando XLSForm ou o Form Builder visual |
+| **3. Coletar** | As equipes de campo enviam dados pelo app móvel ou navegador — online ou offline |
+| **4. Analisar** | Revise os envios no painel, exporte para CSV/Stata ou conecte-se ao Power BI / R |
 
 ---
 
-## Ready?
+## Antes de começar
 
-**[Deploy your server →](self-hosting/quick-start)**
+Você precisa de:
+
+- Um **servidor Linux** (ou uma conta em nuvem no Linode, DigitalOcean, AWS ou GCP)
+- Um **nome de domínio** apontando para o seu servidor
+- Cerca de **10 minutos**
+
+Nenhum conhecimento prévio de Docker necessário — o script de implantação cuida de tudo.
+
+---
+
+## Pronto?
+
+**[Implante o seu servidor →](self-hosting/quick-start)**

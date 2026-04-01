@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Yleiskatsaus"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Mitä rtSurvey on, miten se toimii ja mitä tarvitset ennen aloittamista."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey on itse isännöity alusta lomakkeiden suunnitteluun, kenttätiedon keräämiseen ja tulosten analysointiin reaaliajassa. Pyörität sitä omalla palvelimellasi — tietosi eivät koskaan poistu infrastruktuuristasi.
 
 ---
 
-## Before you start
+## Miten se toimii
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Vaihe | Mitä teet |
+|-------|-----------|
+| **1. Käyttöönotto** | Käynnistä palvelin ja aja rtSurvey-pino yhdellä automaattiskripting |
+| **2. Suunnittelu** | Luo lomakkeita XLSFormilla tai visuaalisella Form Builderilla |
+| **3. Keruu** | Kenttätiimit lähettävät tietoja mobiilisovelluksen tai selaimen kautta — verkossa tai offline-tilassa |
+| **4. Analyysi** | Tarkastele lähetyksiä kojelaudalla, vie CSV/Stataan tai yhdistä Power BI:hin / R:ään |
 
 ---
 
-## Ready?
+## Ennen kuin aloitat
 
-**[Deploy your server →](self-hosting/quick-start)**
+Tarvitset:
+
+- **Linux-palvelimen** (tai pilvitilin Linodessa, DigitalOceanissa, AWS:ssä tai GCP:ssä)
+- **Verkkotunnuksen**, joka osoittaa palvelimellesi
+- Noin **10 minuuttia**
+
+Docker-osaamisesta ei tarvitse huolehtia — käyttöönottoskripti hoitaa kaiken.
+
+---
+
+## Valmis?
+
+**[Ota palvelimesi käyttöön →](self-hosting/quick-start)**

@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Panoramica"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Cos'è rtSurvey, come funziona e cosa occorre prima di iniziare."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey è una piattaforma self-hosted per progettare moduli, raccogliere dati sul campo e analizzare i risultati in tempo reale. La si esegue sul proprio server — i dati non lasciano mai la propria infrastruttura.
 
 ---
 
-## Before you start
+## Come funziona
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Passo | Cosa si fa |
+|-------|-----------|
+| **1. Distribuire** | Avviare un server ed eseguire lo stack rtSurvey con uno script automatizzato |
+| **2. Progettare** | Creare moduli con XLSForm o il Form Builder visivo |
+| **3. Raccogliere** | I team sul campo inviano dati tramite l'app mobile o il browser — online o offline |
+| **4. Analizzare** | Esaminare le risposte nel pannello, esportare in CSV/Stata o connettersi a Power BI / R |
 
 ---
 
-## Ready?
+## Prima di iniziare
 
-**[Deploy your server →](self-hosting/quick-start)**
+Occorre:
+
+- Un **server Linux** (o un account cloud su Linode, DigitalOcean, AWS o GCP)
+- Un **nome di dominio** puntato al proprio server
+- Circa **10 minuti**
+
+Non è richiesta alcuna conoscenza di Docker — lo script di distribuzione gestisce tutto.
+
+---
+
+## Pronti?
+
+**[Distribuire il server →](self-hosting/quick-start)**

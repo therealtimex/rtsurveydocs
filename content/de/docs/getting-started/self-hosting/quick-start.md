@@ -1,58 +1,43 @@
 ---
 weight: 1
-title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
-lastmod: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
+title: "Schnellstart"
 icon: "play_circle"
 toc: true
-description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
+description: "Stellen Sie rtCloud in Minuten auf Ihrem eigenen Server mit einem automatisierten Cloud-Skript bereit."
 ---
 
-This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
+Diese Anleitung hilft Ihnen, rtCloud auf Ihrem eigenen Server zum Laufen zu bringen. Die automatisierten Skripte erledigen alles — Docker, SSL, Datenbank, Firewall — in einem einzigen Durchlauf.
 
-## Requirements
+## Anforderungen
 
 ### Server
 
-| Resource | Minimum | Recommended |
-|----------|---------|-------------|
-| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
-| Disk | 25 GB | 40 GB |
+| Ressource | Minimum | Empfohlen |
+|-----------|---------|----------|
+| RAM | 2 GB | 4 GB (erforderlich bei Keycloak SSO) |
+| Festplatte | 25 GB | 40 GB |
 | CPU | 1 vCPU | 2 vCPUs |
-| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+| Betriebssystem | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
 ### Domain
 
-You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
+Sie benötigen einen Domainnamen mit einem **A-Eintrag, der auf die IP-Adresse des Servers zeigt**, bevor Sie das Skript ausführen. Let's Encrypt erfordert DNS-Auflösung für die SSL-Zertifikatsausstellung.
 
 ---
 
-## Choose Your Cloud Provider
+## Wählen Sie Ihren Cloud-Anbieter
 
-Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
+Wählen Sie Ihren Anbieter unten. Jeder hat ein automatisiertes Skript, das beim ersten Start ausgeführt wird und die Einrichtung in **5–10 Minuten** abschließt.
 
-| Provider | Guide |
-|----------|-------|
-| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
-| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
-| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
-| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
+| Anbieter | Anleitung |
+|----------|----------|
+| Linode (Akamai) | [Bereitstellen auf Linode](../cloud-deployment/linode) — am einfachsten, formularbasierte Einrichtung via StackScript |
+| DigitalOcean | [Bereitstellen auf DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Bereitstellen auf AWS](../cloud-deployment/aws) |
+| Google Cloud | [Bereitstellen auf GCP](../cloud-deployment/gcp) |
 
-> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
-
----
-
-## What the scripts do
-
-Every cloud script performs a fully unattended setup:
-
-- Installs Docker and Docker Compose
-- Writes `.env` and `docker-compose.production.yml`
-- Configures Nginx as a reverse proxy
-- Obtains a free TLS certificate from Let's Encrypt
-- Configures the UFW firewall
-- Optionally deploys embedded Keycloak SSO
-- Outputs a deployment summary with all credentials
-
+> **Empfohlen für die meisten Nutzer:** Beginnen Sie mit Linode — der StackScript bietet eine formularbasierte Benutzeroberfläche, sodass nichts manuell bearbeitet werden muss.

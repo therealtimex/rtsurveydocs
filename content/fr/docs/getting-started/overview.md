@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Vue d'ensemble"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Ce qu'est rtSurvey, comment il fonctionne et ce dont vous avez besoin avant de commencer."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey est une plateforme auto-hébergée pour concevoir des formulaires, collecter des données sur le terrain et analyser les résultats en temps réel. Vous l'exécutez sur votre propre serveur — vos données ne quittent jamais votre infrastructure.
 
 ---
 
-## Before you start
+## Comment ça fonctionne
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Étape | Ce que vous faites |
+|-------|-------------------|
+| **1. Déployer** | Démarrez un serveur et lancez la stack rtSurvey avec un script automatisé |
+| **2. Concevoir** | Créez des formulaires avec XLSForm ou le Form Builder visuel |
+| **3. Collecter** | Les équipes terrain soumettent des données via l'appli mobile ou le navigateur — en ligne ou hors ligne |
+| **4. Analyser** | Consultez les soumissions dans le tableau de bord, exportez en CSV/Stata ou connectez-vous à Power BI / R |
 
 ---
 
-## Ready?
+## Avant de commencer
 
-**[Deploy your server →](self-hosting/quick-start)**
+Vous avez besoin de :
+
+- Un **serveur Linux** (ou un compte cloud sur Linode, DigitalOcean, AWS ou GCP)
+- Un **nom de domaine** pointant vers votre serveur
+- Environ **10 minutes**
+
+Aucune connaissance de Docker requise — le script de déploiement s'occupe de tout.
+
+---
+
+## Prêt ?
+
+**[Déployez votre serveur →](self-hosting/quick-start)**

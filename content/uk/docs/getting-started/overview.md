@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Огляд"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Що таке rtSurvey, як це працює і що потрібно перед початком роботи."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
+rtSurvey — це самостійно розміщувана платформа для розробки форм, збору польових даних та аналізу результатів у режимі реального часу. Ви запускаєте її на власному сервері — ваші дані ніколи не залишають вашу інфраструктуру.
 
 ---
 
-## How it works
+## Як це працює
 
-| Step | What you do |
+| Крок | Що ви робите |
 |------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+| **1. Розгортання** | Запустіть сервер і розгорніть стек rtSurvey одним автоматизованим скриптом |
+| **2. Проектування** | Створюйте форми за допомогою XLSForm або візуального Form Builder |
+| **3. Збір даних** | Польові команди надсилають дані через мобільний додаток або браузер — онлайн або офлайн |
+| **4. Аналіз** | Переглядайте надіслані дані на панелі керування, експортуйте в CSV/Stata або підключайтеся до Power BI / R |
 
 ---
 
-## Before you start
+## Перед початком
 
-You need:
+Вам знадобиться:
 
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
+- **Сервер Linux** (або хмарний акаунт на Linode, DigitalOcean, AWS або GCP)
+- **Доменне ім'я**, що вказує на ваш сервер
+- Близько **10 хвилин**
 
-No prior Docker knowledge required — the deployment script handles everything.
+Попередні знання Docker не потрібні — скрипт розгортання зробить усе сам.
 
 ---
 
-## Ready?
+## Готові?
 
-**[Deploy your server →](self-hosting/quick-start)**
+**[Розгорніть ваш сервер →](self-hosting/quick-start)**

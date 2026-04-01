@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Pasqyrë"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Çfarë është rtSurvey, si funksionon dhe çfarë ju nevojitet para fillimit."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey është një platformë e vetë-strehuar për hartimin e formularëve, mbledhjen e të dhënave në terren dhe analizimin e rezultateve në kohë reale. E ekzekutoni në serverin tuaj — të dhënat tuaja nuk e lënë kurrë infrastrukturën tuaj.
 
 ---
 
-## Before you start
+## Si funksionon
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Hapi | Çfarë bëni |
+|------|-----------|
+| **1. Vendosja** | Nisni një server dhe ekzekutoni stek-un rtSurvey me një skript të automatizuar |
+| **2. Hartimi** | Krijoni formularë duke përdorur XLSForm ose Form Builder-in vizual |
+| **3. Mbledhja** | Ekipet në terren dërgojnë të dhëna nëpërmjet aplikacionit celular ose shfletuesit — online ose offline |
+| **4. Analiza** | Rishikoni dërgesat në panel, eksportoni në CSV/Stata ose lidhuni me Power BI / R |
 
 ---
 
-## Ready?
+## Para se të filloni
 
-**[Deploy your server →](self-hosting/quick-start)**
+Ju nevojitet:
+
+- Një **server Linux** (ose llogari cloud në Linode, DigitalOcean, AWS ose GCP)
+- Një **emër domeni** që tregon drejt serverit tuaj
+- Rreth **10 minuta**
+
+Nuk kërkohen njohuri paraprake të Docker — skripti i vendosjes menaxhon gjithçka.
+
+---
+
+## Gati?
+
+**[Vendosni serverin tuaj →](self-hosting/quick-start)**

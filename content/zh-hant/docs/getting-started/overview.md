@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "概述"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "rtSurvey 是什麼、如何運作以及開始前需要準備什麼。"
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey 是一個自託管平台，用於設計表單、在現場收集數據並即時分析結果。您在自己的伺服器上運行它——您的數據永遠不會離開您的基礎設施。
 
 ---
 
-## Before you start
+## 運作方式
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| 步驟 | 您要做的事 |
+|------|-----------|
+| **1. 部署** | 啟動伺服器並使用一個自動化腳本運行 rtSurvey 堆疊 |
+| **2. 設計** | 使用 XLSForm 或視覺化 Form Builder 建立表單 |
+| **3. 收集** | 現場團隊透過行動應用程式或瀏覽器提交數據——線上或離線 |
+| **4. 分析** | 在儀表板中查看提交內容，匯出為 CSV/Stata，或連接到 Power BI / R |
 
 ---
 
-## Ready?
+## 開始之前
 
-**[Deploy your server →](self-hosting/quick-start)**
+您需要：
+
+- 一台 **Linux 伺服器**（或 Linode、DigitalOcean、AWS 或 GCP 上的雲端帳戶）
+- 一個指向您伺服器的**網域名稱**
+- 大約 **10 分鐘**
+
+無需 Docker 基礎知識——部署腳本會處理一切。
+
+---
+
+## 準備好了嗎？
+
+**[部署您的伺服器 →](self-hosting/quick-start)**

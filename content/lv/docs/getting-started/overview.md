@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Pārskats"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Kas ir rtSurvey, kā tas darbojas un kas nepieciešams pirms sākšanas."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey ir pašmitināta platforma veidlapu projektēšanai, lauka datu vākšanai un rezultātu analīzei reāllaikā. Jūs to darbināt savā serverī — jūsu dati nekad nepamet jūsu infrastruktūru.
 
 ---
 
-## Before you start
+## Kā tas darbojas
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Solis | Ko jūs darāt |
+|-------|-------------|
+| **1. Izvietošana** | Startējiet serveri un palaidiet rtSurvey kopu ar automatizētu skriptu |
+| **2. Projektēšana** | Veidojiet veidlapas ar XLSForm vai vizuālo Form Builder |
+| **3. Vākšana** | Lauka komandas iesniedz datus, izmantojot mobilo lietotni vai pārlūku — tiešsaistē vai bezsaistē |
+| **4. Analīze** | Pārskatiet iesniegumus informācijas panelī, eksportējiet uz CSV/Stata vai savienojiet ar Power BI / R |
 
 ---
 
-## Ready?
+## Pirms sākšanas
 
-**[Deploy your server →](self-hosting/quick-start)**
+Jums nepieciešams:
+
+- **Linux serveris** (vai mākoņpakalpojumu konts Linode, DigitalOcean, AWS vai GCP)
+- **Domēna vārds**, kas norāda uz jūsu serveri
+- Aptuveni **10 minūtes**
+
+Iepriekšējas Docker zināšanas nav nepieciešamas — izvietošanas skripts visu nokārto.
+
+---
+
+## Gatavs?
+
+**[Izvietojiet savu serveri →](self-hosting/quick-start)**

@@ -1,58 +1,43 @@
 ---
 weight: 1
-title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
-lastmod: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
+title: "Брзи почетак"
 icon: "play_circle"
 toc: true
-description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
+description: "Поставите rtCloud на сопственом серверу за неколико минута помоћу аутоматизованог скрипта."
 ---
 
-This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
+Овај водич помаже вам да покренете rtCloud на сопственом серверу. Аутоматизоване скрипте бринуо о свему — Docker, SSL, бази података, заштитном зиду — у jedном покретању.
 
-## Requirements
+## Захтеви
 
-### Server
+### Сервер
 
-| Resource | Minimum | Recommended |
-|----------|---------|-------------|
-| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
-| Disk | 25 GB | 40 GB |
+| Ресурс | Минимум | Препоручено |
+|--------|---------|-----------|
+| RAM | 2 GB | 4 GB (потребно са Keycloak SSO) |
+| Диск | 25 GB | 40 GB |
 | CPU | 1 vCPU | 2 vCPUs |
 | OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Domain
+### Домен
 
-You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
-
----
-
-## Choose Your Cloud Provider
-
-Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
-
-| Provider | Guide |
-|----------|-------|
-| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
-| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
-| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
-| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
-
-> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
+Потребно је доменско ime са **A записом koji упућује на IP сервера** пре покретања скрипте. Let's Encrypt захтева DNS резолуцију за издавање SSL сертификата.
 
 ---
 
-## What the scripts do
+## Изаберите провајдера облака
 
-Every cloud script performs a fully unattended setup:
+Изаберите свог провајдера испод. Сваки има аутоматизовану скрипту која се покреће при prvом boot-у и завршава подешавање за **5–10 минута**.
 
-- Installs Docker and Docker Compose
-- Writes `.env` and `docker-compose.production.yml`
-- Configures Nginx as a reverse proxy
-- Obtains a free TLS certificate from Let's Encrypt
-- Configures the UFW firewall
-- Optionally deploys embedded Keycloak SSO
-- Outputs a deployment summary with all credentials
+| Провајдер | Водич |
+|---------|------|
+| Linode (Akamai) | [Постављање на Linode](../cloud-deployment/linode) — najlakše, podešavanje zasnovano na formi putem StackScript |
+| DigitalOcean | [Постављање на DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Постављање на AWS](../cloud-deployment/aws) |
+| Google Cloud | [Постављање на GCP](../cloud-deployment/gcp) |
 
+> **Препоручено за већину корисника:** Почните са Linode — StackScript пружа UI на основу форме, тако да нема ничега за ручно уређивање.

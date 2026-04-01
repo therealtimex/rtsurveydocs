@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Tổng quan"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "rtSurvey là gì, cách thức hoạt động và những gì bạn cần trước khi bắt đầu."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey là nền tảng tự lưu trữ để thiết kế biểu mẫu, thu thập dữ liệu thực địa và phân tích kết quả theo thời gian thực. Bạn chạy nó trên máy chủ của riêng mình — dữ liệu của bạn không bao giờ rời khỏi cơ sở hạ tầng của bạn.
 
 ---
 
-## Before you start
+## Cách thức hoạt động
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Bước | Bạn làm gì |
+|------|------------|
+| **1. Triển khai** | Khởi động máy chủ và chạy rtSurvey bằng một script tự động |
+| **2. Thiết kế** | Xây dựng biểu mẫu bằng XLSForm hoặc Form Builder trực quan |
+| **3. Thu thập** | Nhóm thực địa gửi dữ liệu qua ứng dụng di động hoặc trình duyệt — trực tuyến hoặc ngoại tuyến |
+| **4. Phân tích** | Xem xét dữ liệu trong bảng điều khiển, xuất sang CSV/Stata, hoặc kết nối với Power BI / R |
 
 ---
 
-## Ready?
+## Trước khi bắt đầu
 
-**[Deploy your server →](self-hosting/quick-start)**
+Bạn cần:
+
+- Một **máy chủ Linux** (hoặc tài khoản đám mây trên Linode, DigitalOcean, AWS hoặc GCP)
+- Một **tên miền** trỏ vào máy chủ của bạn
+- Khoảng **10 phút**
+
+Không cần kiến thức Docker trước — script triển khai xử lý tất cả mọi thứ.
+
+---
+
+## Sẵn sàng chưa?
+
+**[Triển khai máy chủ của bạn →](self-hosting/quick-start)**

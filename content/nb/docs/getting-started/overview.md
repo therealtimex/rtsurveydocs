@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Oversikt"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Hva rtSurvey er, hvordan det fungerer og hva du trenger før du starter."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey er en selvhostet plattform for å designe skjemaer, samle inn feltdata og analysere resultater i sanntid. Du kjører det på din egen server — dataene dine forlater aldri din infrastruktur.
 
 ---
 
-## Before you start
+## Slik fungerer det
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Trinn | Hva du gjør |
+|-------|-------------|
+| **1. Distribuer** | Start en server og kjør rtSurvey-stakken med ett automatisert skript |
+| **2. Utform** | Lag skjemaer med XLSForm eller den visuelle Form Builder |
+| **3. Samle inn** | Feltteam sender inn data via mobilappen eller nettleseren — online eller offline |
+| **4. Analyser** | Se gjennom innleveringer i dashbordet, eksporter til CSV/Stata eller koble til Power BI / R |
 
 ---
 
-## Ready?
+## Før du begynner
 
-**[Deploy your server →](self-hosting/quick-start)**
+Du trenger:
+
+- En **Linux-server** (eller en skykonto hos Linode, DigitalOcean, AWS eller GCP)
+- Et **domenenavn** som peker til serveren din
+- Omtrent **10 minutter**
+
+Ingen forkunnskaper om Docker kreves — distribusjonsskriptet tar seg av alt.
+
+---
+
+## Klar?
+
+**[Distribuer serveren din →](self-hosting/quick-start)**

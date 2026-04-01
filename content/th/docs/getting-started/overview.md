@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "ภาพรวม"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "rtSurvey คืออะไร ทำงานอย่างไร และสิ่งที่คุณต้องการก่อนเริ่มต้น"
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey คือแพลตฟอร์มโฮสต์เองสำหรับออกแบบแบบฟอร์ม รวบรวมข้อมูลภาคสนาม และวิเคราะห์ผลลัพธ์แบบเรียลไทม์ คุณเรียกใช้งานบนเซิร์ฟเวอร์ของคุณเอง — ข้อมูลของคุณไม่เคยออกจากโครงสร้างพื้นฐานของคุณ
 
 ---
 
-## Before you start
+## วิธีการทำงาน
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| ขั้นตอน | สิ่งที่คุณทำ |
+|---------|------------|
+| **1. ติดตั้ง** | เริ่มต้นเซิร์ฟเวอร์และรัน rtSurvey stack ด้วยสคริปต์อัตโนมัติ |
+| **2. ออกแบบ** | สร้างแบบฟอร์มโดยใช้ XLSForm หรือ Form Builder แบบภาพ |
+| **3. รวบรวม** | ทีมภาคสนามส่งข้อมูลผ่านแอปมือถือหรือเบราว์เซอร์ — ออนไลน์หรือออฟไลน์ |
+| **4. วิเคราะห์** | ตรวจสอบการส่งในแดชบอร์ด ส่งออกไปยัง CSV/Stata หรือเชื่อมต่อกับ Power BI / R |
 
 ---
 
-## Ready?
+## ก่อนเริ่มต้น
 
-**[Deploy your server →](self-hosting/quick-start)**
+คุณต้องการ:
+
+- **เซิร์ฟเวอร์ Linux** (หรือบัญชีคลาวด์บน Linode, DigitalOcean, AWS หรือ GCP)
+- **ชื่อโดเมน** ที่ชี้ไปยังเซิร์ฟเวอร์ของคุณ
+- ประมาณ **10 นาที**
+
+ไม่จำเป็นต้องมีความรู้ Docker ล่วงหน้า — สคริปต์การติดตั้งจัดการทุกอย่าง
+
+---
+
+## พร้อมหรือยัง?
+
+**[ติดตั้งเซิร์ฟเวอร์ของคุณ →](self-hosting/quick-start)**

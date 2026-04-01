@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Apžvalga"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Kas yra rtSurvey, kaip tai veikia ir ko reikia prieš pradedant."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey yra savarankiškai talpinama platforma formų kūrimui, lauko duomenų rinkimui ir rezultatų analizei realiuoju laiku. Ją leidžiate savo serveryje — jūsų duomenys niekada nepalieka jūsų infrastruktūros.
 
 ---
 
-## Before you start
+## Kaip tai veikia
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Žingsnis | Ką darote |
+|---------|-----------|
+| **1. Diegimas** | Paleiskite serverį ir vykdykite rtSurvey rinkinį naudodami automatizuotą scenarijų |
+| **2. Kūrimas** | Kurkite formas naudodami XLSForm arba vizualinį Form Builder |
+| **3. Rinkimas** | Lauko komandos pateikia duomenis per mobilią programėlę arba naršyklę — online arba offline |
+| **4. Analizė** | Peržiūrėkite pateiktus duomenis informaciniame skydelyje, eksportuokite į CSV/Stata arba prijunkite prie Power BI / R |
 
 ---
 
-## Ready?
+## Prieš pradedant
 
-**[Deploy your server →](self-hosting/quick-start)**
+Jums reikia:
+
+- **Linux serverio** (arba debesijos paskyros Linode, DigitalOcean, AWS ar GCP)
+- **Domeno vardo**, nukreipto į jūsų serverį
+- Maždaug **10 minučių**
+
+Nereikia išankstinių Docker žinių — diegimo scenarijus viską sutvarko.
+
+---
+
+## Pasiruošę?
+
+**[Diekite savo serverį →](self-hosting/quick-start)**

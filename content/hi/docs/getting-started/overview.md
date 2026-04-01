@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "अवलोकन"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "rtSurvey क्या है, यह कैसे काम करता है और शुरू करने से पहले आपको क्या चाहिए।"
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey फॉर्म डिज़ाइन करने, मैदानी डेटा एकत्र करने और रियल-टाइम में परिणामों का विश्लेषण करने के लिए एक स्व-होस्टेड प्लेटफ़ॉर्म है। आप इसे अपने स्वयं के सर्वर पर चलाते हैं — आपका डेटा कभी भी आपकी अवसंरचना नहीं छोड़ता।
 
 ---
 
-## Before you start
+## यह कैसे काम करता है
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| चरण | आप क्या करते हैं |
+|-----|----------------|
+| **1. तैनात करें** | एक सर्वर शुरू करें और एक स्वचालित स्क्रिप्ट के साथ rtSurvey स्टैक चलाएं |
+| **2. डिज़ाइन करें** | XLSForm या विज़ुअल Form Builder का उपयोग करके फॉर्म बनाएं |
+| **3. एकत्र करें** | मैदानी टीमें मोबाइल ऐप या ब्राउज़र के माध्यम से डेटा जमा करती हैं — ऑनलाइन या ऑफलाइन |
+| **4. विश्लेषण करें** | डैशबोर्ड में सबमिशन की समीक्षा करें, CSV/Stata में निर्यात करें, या Power BI / R से कनेक्ट करें |
 
 ---
 
-## Ready?
+## शुरू करने से पहले
 
-**[Deploy your server →](self-hosting/quick-start)**
+आपको चाहिए:
+
+- एक **Linux सर्वर** (या Linode, DigitalOcean, AWS या GCP पर क्लाउड अकाउंट)
+- एक **डोमेन नाम** जो आपके सर्वर की ओर इंगित करता हो
+- लगभग **10 मिनट**
+
+Docker का पूर्व ज्ञान आवश्यक नहीं — तैनाती स्क्रिप्ट सब कुछ संभालती है।
+
+---
+
+## तैयार हैं?
+
+**[अपना सर्वर तैनात करें →](self-hosting/quick-start)**

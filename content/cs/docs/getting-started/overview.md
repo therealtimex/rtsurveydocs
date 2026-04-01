@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Přehled"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Co je rtSurvey, jak funguje a co potřebujete před začátkem."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey je self-hosted platforma pro vytváření formulářů, sběr dat v terénu a analýzu výsledků v reálném čase. Provozujete ji na vlastním serveru — vaše data nikdy neopustí vaši infrastrukturu.
 
 ---
 
-## Before you start
+## Jak to funguje
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Krok | Co děláte |
+|------|-----------|
+| **1. Nasazení** | Spusťte server a spusťte stack rtSurvey jedním automatizovaným skriptem |
+| **2. Návrh** | Vytvořte formuláře pomocí XLSForm nebo vizuálního Form Builderu |
+| **3. Sběr** | Terénní týmy odesílají data přes mobilní aplikaci nebo prohlížeč — online nebo offline |
+| **4. Analýza** | Zkontrolujte odeslané údaje v dashboardu, exportujte do CSV/Stata nebo se připojte k Power BI / R |
 
 ---
 
-## Ready?
+## Než začnete
 
-**[Deploy your server →](self-hosting/quick-start)**
+Potřebujete:
+
+- **Linux server** (nebo cloudový účet u Linode, DigitalOcean, AWS nebo GCP)
+- **Doménové jméno** nasměrované na váš server
+- Přibližně **10 minut**
+
+Žádné předchozí znalosti Dockeru nejsou potřeba — o vše se postará nasazovací skript.
+
+---
+
+## Připraveni?
+
+**[Nasaďte svůj server →](self-hosting/quick-start)**

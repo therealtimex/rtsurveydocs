@@ -1,58 +1,43 @@
 ---
 weight: 1
-title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
-lastmod: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
+title: "Rýchly štart"
 icon: "play_circle"
 toc: true
-description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
+description: "Nasaďte rtCloud na vlastný server za pár minút pomocou automatizovaného cloudového skriptu."
 ---
 
-This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
+Tento sprievodca vám pomôže spustiť rtCloud na vlastnom serveri. Automatizované skripty sa postarajú o všetko — Docker, SSL, databázu, bránu firewall — jedným spustením.
 
-## Requirements
+## Požiadavky
 
 ### Server
 
-| Resource | Minimum | Recommended |
-|----------|---------|-------------|
-| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Zdroj | Minimum | Odporúčané |
+|-------|---------|-----------|
+| RAM | 2 GB | 4 GB (nutné pri Keycloak SSO) |
 | Disk | 25 GB | 40 GB |
 | CPU | 1 vCPU | 2 vCPUs |
 | OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Domain
+### Doména
 
-You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
-
----
-
-## Choose Your Cloud Provider
-
-Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
-
-| Provider | Guide |
-|----------|-------|
-| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
-| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
-| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
-| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
-
-> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
+Pred spustením skriptu potrebujete doménové meno s **A záznamom smerujúcim na IP servera**. Let's Encrypt vyžaduje DNS rozlíšenie pre vydanie SSL certifikátu.
 
 ---
 
-## What the scripts do
+## Vyberte si poskytovateľa cloudu
 
-Every cloud script performs a fully unattended setup:
+Vyberte svojho poskytovateľa nižšie. Každý má automatizovaný skript, ktorý sa spustí pri prvom štarte a dokončí nastavenie za **5–10 minút**.
 
-- Installs Docker and Docker Compose
-- Writes `.env` and `docker-compose.production.yml`
-- Configures Nginx as a reverse proxy
-- Obtains a free TLS certificate from Let's Encrypt
-- Configures the UFW firewall
-- Optionally deploys embedded Keycloak SSO
-- Outputs a deployment summary with all credentials
+| Poskytovateľ | Sprievodca |
+|-------------|----------|
+| Linode (Akamai) | [Nasadenie na Linode](../cloud-deployment/linode) — najjednoduchšie, formulárové nastavenie cez StackScript |
+| DigitalOcean | [Nasadenie na DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Nasadenie na AWS](../cloud-deployment/aws) |
+| Google Cloud | [Nasadenie na GCP](../cloud-deployment/gcp) |
 
+> **Odporúčané pre väčšinu používateľov:** Začnite s Linode — StackScript poskytuje formulárové UI, takže nie je potrebné nič ručne upravovať.

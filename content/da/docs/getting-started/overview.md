@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Oversigt"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Hvad rtSurvey er, hvordan det virker, og hvad du skal bruge inden du starter."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
+rtSurvey er en selvhostet platform til at designe formularer, indsamle data i felten og analysere resultater i realtid. Du kører det på din egen server — dine data forlader aldrig din infrastruktur.
 
 ---
 
-## How it works
+## Sådan fungerer det
 
-| Step | What you do |
+| Trin | Hvad du gør |
 |------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+| **1. Implementer** | Start en server og kør rtSurvey-stakken med ét automatiseret script |
+| **2. Design** | Opret formularer med XLSForm eller den visuelle Form Builder |
+| **3. Indsaml** | Feltteams indsender data via mobilappen eller browseren — online eller offline |
+| **4. Analysér** | Gennemgå indsendelser i dashboardet, eksportér til CSV/Stata eller forbind til Power BI / R |
 
 ---
 
-## Before you start
+## Inden du begynder
 
-You need:
+Du har brug for:
 
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
+- En **Linux-server** (eller en cloudkonto hos Linode, DigitalOcean, AWS eller GCP)
+- Et **domænenavn** der peger på din server
+- Cirka **10 minutter**
 
-No prior Docker knowledge required — the deployment script handles everything.
+Ingen forudgående Docker-viden påkrævet — implementeringsscriptet håndterer det hele.
 
 ---
 
-## Ready?
+## Klar?
 
-**[Deploy your server →](self-hosting/quick-start)**
+**[Implementér din server →](self-hosting/quick-start)**

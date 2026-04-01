@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Преглед"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "Шта је rtSurvey, како функционише и шта вам је потребно пре почетка."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey је самостално хостована платформа за пројектовање образаца, прикупљање теренских података и анализу резултата у реалном времену. Покрећете га на сопственом серверу — ваши подаци никада не напуштају вашу инфраструктуру.
 
 ---
 
-## Before you start
+## Kako функционише
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Корак | Шта радите |
+|-------|-----------|
+| **1. Постављање** | Покрените сервер и покрените rtSurvey стек једном аутоматизованом скриптом |
+| **2. Пројектовање** | Креирајте обрасце помоћу XLSForm или визуелног Form Builder-а |
+| **3. Прикупљање** | Теренски тимови шаљу податке путем мобилне апликације или претраживача — онлајн или офлајн |
+| **4. Анализа** | Прегледајте поднете podatke на контролној табли, извезите у CSV/Stata или се povežite са Power BI / R |
 
 ---
 
-## Ready?
+## Пре почетка
 
-**[Deploy your server →](self-hosting/quick-start)**
+Потребно вам је:
+
+- **Linux сервер** (или налог у облаку на Linode, DigitalOcean, AWS или GCP)
+- **Назив домена** усмерен на ваш сервер
+- Oko **10 минута**
+
+Није потребно претходно познавање Docker-а — скрипта за постављање се стара о свему.
+
+---
+
+## Спремни?
+
+**[Поставите свој сервер →](self-hosting/quick-start)**

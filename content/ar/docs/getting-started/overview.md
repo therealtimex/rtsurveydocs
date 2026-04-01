@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "نظرة عامة"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "ما هو rtSurvey، كيف يعمل، وما تحتاجه قبل البدء."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey هو منصة ذاتية الاستضافة لتصميم النماذج وجمع البيانات الميدانية وتحليل النتائج في الوقت الفعلي. تشغّله على خادمك الخاص — بياناتك لا تغادر بنيتك التحتية أبداً.
 
 ---
 
-## Before you start
+## كيف يعمل
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| الخطوة | ما تفعله |
+|--------|---------|
+| **١. النشر** | شغّل خادماً وأطلق مجموعة rtSurvey بسكريبت تلقائي واحد |
+| **٢. التصميم** | أنشئ نماذج باستخدام XLSForm أو Form Builder المرئي |
+| **٣. الجمع** | ترسل فرق الميدان البيانات عبر التطبيق المحمول أو المتصفح — عبر الإنترنت أو بدونه |
+| **٤. التحليل** | راجع الإدخالات في لوحة التحكم، وصدّر إلى CSV/Stata، أو اتصل بـ Power BI / R |
 
 ---
 
-## Ready?
+## قبل أن تبدأ
 
-**[Deploy your server →](self-hosting/quick-start)**
+تحتاج إلى:
+
+- **خادم Linux** (أو حساب سحابي على Linode أو DigitalOcean أو AWS أو GCP)
+- **اسم نطاق** يشير إلى خادمك
+- حوالي **١٠ دقائق**
+
+لا تحتاج إلى معرفة مسبقة بـ Docker — يتولى سكريبت النشر كل شيء.
+
+---
+
+## هل أنت مستعد؟
+
+**[انشر خادمك ←](self-hosting/quick-start)**

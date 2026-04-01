@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "概要"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "rtSurveyとは何か、どのように機能するか、開始前に必要なもの。"
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurveyは、フォームの設計、フィールドでのデータ収集、リアルタイムでの結果分析を行うためのセルフホスト型プラットフォームです。自分のサーバーで実行するため、データがインフラ外に出ることはありません。
 
 ---
 
-## Before you start
+## 仕組み
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| ステップ | 行うこと |
+|---------|---------|
+| **1. デプロイ** | サーバーを起動し、自動化スクリプトでrtSurveyスタックを実行する |
+| **2. 設計** | XLSFormまたはビジュアルForm Builderでフォームを作成する |
+| **3. 収集** | フィールドチームがモバイルアプリまたはブラウザでデータを送信する — オンラインまたはオフライン |
+| **4. 分析** | ダッシュボードで提出データを確認し、CSV/Stataにエクスポートするか、Power BI / Rに接続する |
 
 ---
 
-## Ready?
+## 始める前に
 
-**[Deploy your server →](self-hosting/quick-start)**
+必要なもの：
+
+- **Linuxサーバー**（またはLinode、DigitalOcean、AWS、GCPのクラウドアカウント）
+- サーバーに向けた**ドメイン名**
+- 約**10分**
+
+Dockerの事前知識は不要 — デプロイスクリプトがすべてを処理します。
+
+---
+
+## 準備はいいですか？
+
+**[サーバーをデプロイする →](self-hosting/quick-start)**

@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "Genel Bakış"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "rtSurvey nedir, nasıl çalışır ve başlamadan önce neye ihtiyacınız var."
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey, form tasarlamak, sahada veri toplamak ve sonuçları gerçek zamanlı olarak analiz etmek için kendi kendine barındırılan bir platformdur. Kendi sunucunuzda çalıştırırsınız — verileriniz hiçbir zaman altyapınızı terk etmez.
 
 ---
 
-## Before you start
+## Nasıl çalışır
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| Adım | Ne yaparsınız |
+|------|--------------|
+| **1. Dağıtım** | Bir sunucu başlatın ve otomatik bir komut dosyasıyla rtSurvey yığınını çalıştırın |
+| **2. Tasarım** | XLSForm veya görsel Form Builder kullanarak formlar oluşturun |
+| **3. Toplama** | Saha ekipleri mobil uygulama veya tarayıcı aracılığıyla veri gönderir — çevrimiçi veya çevrimdışı |
+| **4. Analiz** | Panelde gönderileri inceleyin, CSV/Stata'ya aktarın veya Power BI / R'ye bağlanın |
 
 ---
 
-## Ready?
+## Başlamadan önce
 
-**[Deploy your server →](self-hosting/quick-start)**
+İhtiyacınız olan:
+
+- Bir **Linux sunucusu** (veya Linode, DigitalOcean, AWS veya GCP'de bulut hesabı)
+- Sunucunuza işaret eden bir **alan adı**
+- Yaklaşık **10 dakika**
+
+Önceden Docker bilgisi gerekmez — dağıtım betiği her şeyi halleder.
+
+---
+
+## Hazır mısınız?
+
+**[Sunucunuzu dağıtın →](self-hosting/quick-start)**

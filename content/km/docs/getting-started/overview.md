@@ -4,39 +4,39 @@ date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
-title: "Overview"
+title: "ទិដ្ឋភាពទូទៅ"
 icon: "rocket_launch"
 toc: false
-description: "What rtSurvey is, how it works, and what you need before you start."
+description: "rtSurvey គឺជាអ្វី របៀបដំណើរការ និងអ្វីដែលអ្នកត្រូវការមុនពេលចាប់ផ្តើម។"
 ---
 
-rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
-
----
-
-## How it works
-
-| Step | What you do |
-|------|-------------|
-| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
-| **2. Design** | Build forms using XLSForm or the visual Form Builder |
-| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
-| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+rtSurvey គឺជាវេទិកា self-hosted សម្រាប់ការរចនាទម្រង់ ការប្រមូលទិន្នន័យនៅក្នុងវាល និងការវិភាគលទ្ធផលក្នុងពេលវេលាជាក់ស្តែង។ អ្នកដំណើរការវានៅលើម៉ាស៊ីនមេរបស់អ្នកផ្ទាល់ — ទិន្នន័យរបស់អ្នកមិនចាកចេញពីហេដ្ឋារចនាសម្ព័ន្ធរបស់អ្នកឡើយ។
 
 ---
 
-## Before you start
+## របៀបដំណើរការ
 
-You need:
-
-- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
-- A **domain name** pointed at your server
-- About **10 minutes**
-
-No prior Docker knowledge required — the deployment script handles everything.
+| ជំហាន | អ្វីដែលអ្នកធ្វើ |
+|-------|---------------|
+| **១. ដាក់ឱ្យប្រើប្រាស់** | ចាប់ផ្ដើមមា៉ស៊ីនមេ ហើយដំណើរការ rtSurvey stack ជាមួយស្គ្រីបស្វ័យប្រវត្តិ |
+| **២. រចនា** | បង្កើតទម្រង់ដោយប្រើ XLSForm ឬ Form Builder ដែលមើលឃើញ |
+| **៣.ប្រមូល** | ក្រុមការងារនៅវាលបញ្ជូនទិន្នន័យតាមមាតិការចល័ត ឬ browser — អនឡាញ ឬ ក្រៅបណ្ដាញ |
+| **៤. វិភាគ** | ពិនិត្យការបញ្ជូននៅក្នុង dashboard នាំចេញទៅ CSV/Stata ឬភ្ជាប់ទៅ Power BI / R |
 
 ---
 
-## Ready?
+## មុនពេលអ្នកចាប់ផ្ដើម
 
-**[Deploy your server →](self-hosting/quick-start)**
+អ្នកត្រូវការ៖
+
+- **ម៉ាស៊ីនមេ Linux** (ឬគណនី cloud នៅ Linode, DigitalOcean, AWS ឬ GCP)
+- **ឈ្មោះដែន** ដែលចង្អុលទៅម៉ាស៊ីនមេរបស់អ្នក
+- ប្រហែល **១០ នាទី**
+
+មិនចាំបាច់មានចំណេះដឹង Docker ជាមុន — ស្គ្រីបដាក់ឱ្យប្រើប្រាស់ដោះស្រាយអ្វីៗទាំងអស់។
+
+---
+
+## រួចរាល់ហើយឬ?
+
+**[ដាក់ម៉ាស៊ីនមេរបស់អ្នកឱ្យប្រើប្រាស់ →](self-hosting/quick-start)**
