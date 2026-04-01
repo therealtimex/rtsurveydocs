@@ -1,6 +1,7 @@
 ---
 weight: 100
 title: "Getting Started"
+slug: "getting-started"
 date: "2023-05-03T22:37:22+01:00"
 draft: false
 author: "rtSurvey"

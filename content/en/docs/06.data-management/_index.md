@@ -1,6 +1,7 @@
 ---
 weight: 150
 title: "Data Management"
+slug: "data-management"
 description: "Data management: storage, organization, cleaning, validation, security, privacy compliance, and backup procedures"
 icon: "storage"
 date: "2023-05-22T00:34:57+01:00"
