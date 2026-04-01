@@ -10,4 +10,4 @@ package-lock.json
 .hugo_build.lock
 public
 resources
-.agents/
+.agents/.claude/
