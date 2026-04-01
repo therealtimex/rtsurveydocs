@@ -1,6 +1,6 @@
 ---
-weight: 115
-title: "셀프 호스팅"
+weight: 2
+title: "배포"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false

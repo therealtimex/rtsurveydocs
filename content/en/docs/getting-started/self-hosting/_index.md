@@ -1,6 +1,6 @@
 ---
-weight: 1
-title: "Self-Hosting"
+weight: 2
+title: "Deployment"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
