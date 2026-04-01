@@ -1,5 +1,5 @@
 ---
-weight: 115
+weight: 1
 title: "Self-Hosting"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
