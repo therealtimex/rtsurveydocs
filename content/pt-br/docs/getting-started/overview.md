@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "Visão geral"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "Um guia de início rápido para realizar uma pesquisa com o rtSurvey"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Iniciantes"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-O rtSurvey é uma plataforma poderosa para criar formulários e fluxos de trabalho que permitem coletar dados de forma eficiente. Com o rtSurvey, você pode:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. Criar formulários sofisticados que incorporam fotos, localizações GPS, lógica de salto, cálculos, conjuntos de dados externos, múltiplos idiomas e muito mais.
-2. Coletar dados usando o aplicativo móvel ou a interface web, com sincronização automática quando uma conexão com a internet estiver disponível.
-3. Analisar dados facilmente exportando para CSV ou Stata, ou conectando o rtSurvey ao Excel, Power BI, Python ou R para painéis dinâmicos com atualização em tempo real.
+---
 
-Pesquisadores, equipes de campo e profissionais de diversas áreas dependem do rtSurvey para suas necessidades críticas de coleta de dados. Veja como começar:
+## How it works
 
-## 1. Acesse o rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-A maneira mais rápida de começar é usando o [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud), nosso serviço oficial de hospedagem gerenciada. Está acessível pelo site do rtSurvey e construído sobre uma infraestrutura robusta e segura. Como alternativa, você pode hospedar o rtSurvey em sua própria infraestrutura, se preferir.
+---
 
-## 2. Crie seu formulário de pesquisa {#getting-started-create-form}
+## Before you start
 
-1. Projete seu formulário usando `XLSForm` ou experimente nosso modelo de [formulário com todos os widgets](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0).
-2. Faça upload do seu XLSForm para o rtSurvey Cloud e publique-o, ou use nosso Form Builder (Beta) para uma experiência de design visual.
+You need:
 
-## 3. Instale o aplicativo rtSurvey {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-Baixe o aplicativo rtSurvey no seu dispositivo móvel:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### Para dispositivos Android:
-1. Acesse o [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
-2. Pesquise "rtSurvey" e toque no aplicativo com o logotipo do rtSurvey.
-3. Clique em "Instalar" para baixar e configurar o aplicativo.
+---
 
-### Para dispositivos iOS:
-1. Abra a [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) no seu dispositivo.
-2. Pesquise "rtSurvey" e localize o aplicativo com o logotipo do rtSurvey.
-3. Toque em "Obter" para baixar e instalar o aplicativo.
+## Ready?
 
-## 4. Conecte o aplicativo rtSurvey ao rtSurvey Cloud {#getting-started-connect}
-
-1. Crie uma conta:
-   - Um administrador do rtSurvey Cloud pode criar contas para entrevistadores.
-   - Como alternativa, o administrador pode gerar uma URL para que os entrevistadores criem suas próprias contas.
-2. Abra o aplicativo rtSurvey e entre com as credenciais da sua conta.
-
-## 5. Realize sua pesquisa {#getting-started-fill-form}
-
-1. No aplicativo, selecione "Preencher formulário em branco" para iniciar uma nova pesquisa.
-2. Preencha o formulário com os dados do respondente.
-3. Ao concluir, os dados do formulário serão sincronizados automaticamente com o rtSurvey Cloud quando uma conexão com a internet estiver disponível.
-
-## 6. Analise seus dados no rtSurvey Cloud {#getting-started-use-data}
-
-1. Entre no rtSurvey Cloud para acessar os dados coletados.
-2. Baixe seus dados em vários formatos, como CSV ou Stata, para análise posterior.
-3. Utilize as ferramentas de análise integradas ou integre com seu software de análise de dados preferido.
+**[Deploy your server →](self-hosting/quick-start)**

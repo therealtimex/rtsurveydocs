@@ -1,178 +1,58 @@
 ---
 weight: 1
-title: "Hızlı Başlangıç"
+title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "play_circle"
 toc: true
-description: "Docker Compose kullanarak rtCloud'u 10 dakikadan kısa sürede kendi sunucunuzda çalıştırın."
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
 ---
 
-Bu kılavuz, sıfırdan bir Linux sunucusuna kendi barındırdığınız rtCloud örneğini dağıtma sürecinde size yol gösterir. Sonunda tarayıcınızdan erişilebilen çalışan bir rtCloud'a sahip olacaksınız.
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
 
-## Ön Koşullar
+## Requirements
 
-Başlamadan önce sunucunuzun aşağıdaki gereksinimleri karşıladığından emin olun:
+### Server
 
-### Donanım
-
-| Kaynak | Minimum | Önerilen |
+| Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| RAM | 2 GB | 4 GB |
-| Disk | 10 GB | 40 GB |
-| CPU | 1 vCPU | 2 vCPU |
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Yazılım
+### Domain
 
-| Yazılım | Sürüm |
-|----------|---------|
-| İşletim Sistemi | Ubuntu 20.04 LTS veya üzeri (veya Docker desteği olan herhangi bir Linux) |
-| Docker | 20.10 veya üzeri |
-| Docker Compose | v2.x (`docker compose`) veya v1.x (`docker-compose`) |
-
-**Ubuntu'ya Docker Kurulumu:**
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-Kurulumu doğrulayın:
-
-```bash
-docker --version
-docker compose version
-```
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
 
 ---
 
-## Adım 1 — Dosyaları Edinin
+## Choose Your Cloud Provider
 
-Dağıtım deposunu sunucunuza klonlayın:
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
 
-```bash
-git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
-cd rtcloud
-```
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
----
-
-## Adım 2 — Ortamı Yapılandırın
-
-Örnek yapılandırma dosyasını kopyalayın:
-
-```bash
-cp .env.production.sample .env
-```
-
-`.env` dosyasını bir metin düzenleyicide açın ve gerekli değerleri doldurun:
-
-```dotenv
-# Bu dağıtım için benzersiz tanımlayıcı (boşluk yok, özel karakter yok)
-PROJECT_ID=myproject
-
-# Kullanıcıların uygulamaya erişeceği alan adı veya IP adresi
-# Örnek: rtcloud.example.com  veya  192.168.1.100
-PROJECT_URL=rtcloud.example.com
-
-# Protokol: SSL'li bir alan adınız varsa "https", aksi takdirde "http" kullanın
-HTTP_PROTOCOL=https
-
-# Güçlü, benzersiz şifreler — başlamadan önce üçünü de değiştirin
-MYSQL_PASSWORD=change_me_strong_password
-MYSQL_ROOT_PASSWORD=change_me_root_password
-ADMIN_PASSWORD=change_me_admin_password
-```
-
-> **Önemli:** Yalnızca `.env` Docker Compose tarafından otomatik olarak okunur. `.env.production` adında bir dosya oluşturmayın; bu karışıklığa neden olur. `ADMIN_PASSWORD` yalnızca yeni bir veritabanının **ilk açılışında** uygulanır.
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
 ---
 
-## Adım 3 — Konteynerleri Başlatın
+## What the scripts do
 
-Tüm hizmetleri arka planda başlatın:
+Every cloud script performs a fully unattended setup:
 
-```bash
-docker compose -f docker-compose.production.yml up -d
-```
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
 
-İlk başlatma Docker'ın şunları yapması sırasında **3–5 dakika** sürer:
-
-1. rtCloud uygulama görüntüsünü çeker (~1 GB indirme)
-2. MySQL veritabanını başlatır
-3. Temel şemayı yükler
-4. Bekleyen tüm veritabanı geçişlerini çalıştırır
-
-Başlatma ilerlemesini gerçek zamanlı olarak izleyin:
-
-```bash
-docker compose -f docker-compose.production.yml logs -f rtcloud
-```
-
-Uygulamanın hazır olduğunu gösteren çıktıyı görene kadar bekleyin. Konteyner sağlık durumunu da izleyebilirsiniz:
-
-```bash
-watch docker compose -f docker-compose.production.yml ps
-```
-
----
-
-## Adım 4 — Uygulamaya Erişin
-
-Her iki konteyner de `Up (healthy)` gösterdiğinde tarayıcınızı açın:
-
-```
-http://<PROJECT_URL>:8080
-```
-
-Yönetici hesabıyla giriş yapın:
-
-| Alan | Değer |
-|-------|-------|
-| Kullanıcı Adı | `admin` |
-| Şifre | `.env` dosyasında `ADMIN_PASSWORD` için ayarladığınız değer |
-
-> İlk girişinizin hemen ardından hesap ayarları sayfasından yönetici şifresini değiştirin.
-
----
-
-## Adım 5 — Tüm Hizmetleri Doğrulayın
-
-Tüm konteynerlerin çalışır ve sağlıklı olduğunu kontrol edin:
-
-```bash
-docker compose -f docker-compose.production.yml ps
-```
-
-Beklenen çıktı:
-
-```
-NAME                    IMAGE                                   STATUS
-rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
-rtcloud-mysql           mysql:8.0                               Up (healthy)
-```
-
-Bir konteyner `Up (starting)` veya `Up (unhealthy)` gösteriyorsa 30–60 saniye daha bekleyip tekrar kontrol edin. MySQL ilk açılışta tam olarak başlatılması bir dakikaya kadar sürebilir.
-
----
-
-## Port Referansı
-
-| Port | Hizmet | Açıklama |
-|------|---------|-------------|
-| `8080` | rtCloud Uygulaması | Ana web arayüzü (`APP_PORT` ile yapılandırılabilir) |
-| `3838` | Shiny Sunucusu | Analitik ve R tabanlı görselleştirmeler (`SHINY_PORT` ile yapılandırılabilir) |
-
-MySQL (port 3306) ve isteğe bağlı hizmetler (Keycloak) yalnızca dahili olup varsayılan olarak ana bilgisayara açık değildir.
-
----
-
-## Sonraki Adımlar
-
-rtCloud örneğiniz artık çalışıyor. Şu takip görevlerini göz önünde bulundurun:
-
-- **HTTPS'yi Etkinleştirin** — Bir alan adını sunucunuza yönlendirin ve Let's Encrypt ile SSL yapılandırın. Otomatik HTTPS kurulumu için [Bulut Dağıtımı](cloud-deployment) sayfasına bakın.
-- **Tüm ayarları gözden geçirin** — Dağıtımınızı üretim için ayarlamak üzere [Yapılandırma Referansı](configuration)'na göz atın.
-- **SSO'yu kurun** — Merkezi kullanıcı kimlik doğrulaması için bir kimlik sağlayıcısı bağlayın. [SSO Kimlik Doğrulama](sso-authentication) sayfasına bakın.
-- **Yedeklemelerinizi planlayın** — Yedekleme ve yükseltme prosedürleri için [Bakım](maintenance) sayfasını inceleyin.

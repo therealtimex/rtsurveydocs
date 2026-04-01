@@ -1,178 +1,58 @@
 ---
 weight: 1
-title: "Γρήγορη εκκίνηση"
+title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "play_circle"
 toc: true
-description: "Εκτελέστε το rtCloud στον δικό σας διακομιστή σε λιγότερο από 10 λεπτά χρησιμοποιώντας Docker Compose."
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
 ---
 
-Αυτός ο οδηγός σάς καθοδηγεί στην ανάπτυξη αυτο-φιλοξενούμενης εγκατάστασης rtCloud σε διακομιστή Linux από μηδενική βάση. Στο τέλος, θα έχετε ένα λειτουργικό rtCloud προσβάσιμο μέσω του προγράμματος περιήγησής σας.
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
 
-## Προαπαιτούμενα
+## Requirements
 
-Βεβαιωθείτε ότι ο διακομιστής σας πληροί τις ακόλουθες απαιτήσεις πριν ξεκινήσετε:
+### Server
 
-### Υλικό
-
-| Πόρος | Ελάχιστο | Συνιστώμενο |
+| Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| RAM | 2 GB | 4 GB |
-| Δίσκος | 10 GB | 40 GB |
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
 | CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Λογισμικό
+### Domain
 
-| Λογισμικό | Έκδοση |
-|----------|---------|
-| ΛΣ | Ubuntu 20.04 LTS ή νεότερο (ή οποιοδήποτε Linux με υποστήριξη Docker) |
-| Docker | 20.10 ή νεότερο |
-| Docker Compose | v2.x (`docker compose`) ή v1.x (`docker-compose`) |
-
-**Εγκατάσταση Docker στο Ubuntu:**
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-Επαλήθευση εγκατάστασης:
-
-```bash
-docker --version
-docker compose version
-```
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
 
 ---
 
-## Βήμα 1 — Λήψη αρχείων
+## Choose Your Cloud Provider
 
-Κλωνοποιήστε το αποθετήριο ανάπτυξης στον διακομιστή σας:
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
 
-```bash
-git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
-cd rtcloud
-```
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
----
-
-## Βήμα 2 — Διαμόρφωση περιβάλλοντος
-
-Αντιγράψτε το δείγμα αρχείου διαμόρφωσης:
-
-```bash
-cp .env.production.sample .env
-```
-
-Ανοίξτε το `.env` σε έναν επεξεργαστή κειμένου και συμπληρώστε τις απαιτούμενες τιμές:
-
-```dotenv
-# Μοναδικό αναγνωριστικό για αυτή την ανάπτυξη (χωρίς κενά ή ειδικούς χαρακτήρες)
-PROJECT_ID=myproject
-
-# Τομέας ή διεύθυνση IP όπου οι χρήστες θα έχουν πρόσβαση στην εφαρμογή
-# Παράδειγμα: rtcloud.example.com  ή  192.168.1.100
-PROJECT_URL=rtcloud.example.com
-
-# Πρωτόκολλο: χρησιμοποιήστε "https" εάν έχετε τομέα με SSL, αλλιώς "http"
-HTTP_PROTOCOL=https
-
-# Ισχυροί, μοναδικοί κωδικοί — αλλάξτε και τους τρεις πριν ξεκινήσετε
-MYSQL_PASSWORD=change_me_strong_password
-MYSQL_ROOT_PASSWORD=change_me_root_password
-ADMIN_PASSWORD=change_me_admin_password
-```
-
-> **Σημαντικό:** Μόνο το `.env` διαβάζεται αυτόματα από το Docker Compose. Μην δημιουργείτε αρχείο με όνομα `.env.production`. Το `ADMIN_PASSWORD` εφαρμόζεται μόνο κατά την **πρώτη εκκίνηση** σε νέα βάση δεδομένων.
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
 ---
 
-## Βήμα 3 — Εκκίνηση κοντέινερ
+## What the scripts do
 
-Εκκινήστε όλες τις υπηρεσίες στο παρασκήνιο:
+Every cloud script performs a fully unattended setup:
 
-```bash
-docker compose -f docker-compose.production.yml up -d
-```
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
 
-Η πρώτη εκκίνηση διαρκεί **3–5 λεπτά** ενώ το Docker:
-
-1. Κατεβάζει την εικόνα εφαρμογής rtCloud (~1 GB λήψη)
-2. Αρχικοποιεί τη βάση δεδομένων MySQL
-3. Φορτώνει το βασικό σχήμα
-4. Εκτελεί όλες τις εκκρεμείς μετεγκαταστάσεις βάσης δεδομένων
-
-Παρακολουθήστε την πρόοδο εκκίνησης σε πραγματικό χρόνο:
-
-```bash
-docker compose -f docker-compose.production.yml logs -f rtcloud
-```
-
-Αναμείνετε έως ότου δείτε αποτέλεσμα που υποδηλώνει ότι η εφαρμογή είναι έτοιμη. Μπορείτε επίσης να παρακολουθήσετε την κατάσταση υγείας κοντέινερ:
-
-```bash
-watch docker compose -f docker-compose.production.yml ps
-```
-
----
-
-## Βήμα 4 — Πρόσβαση στην εφαρμογή
-
-Μόλις και τα δύο κοντέινερ εμφανίσουν `Up (healthy)`, ανοίξτε το πρόγραμμα περιήγησής σας:
-
-```
-http://<PROJECT_URL>:8080
-```
-
-Συνδεθείτε χρησιμοποιώντας τον λογαριασμό διαχειριστή:
-
-| Πεδίο | Τιμή |
-|-------|-------|
-| Όνομα χρήστη | `admin` |
-| Κωδικός | Η τιμή που ορίσατε για `ADMIN_PASSWORD` στο `.env` |
-
-> Αλλάξτε τον κωδικό διαχειριστή αμέσως μετά την πρώτη σύνδεση από τη σελίδα ρυθμίσεων λογαριασμού.
-
----
-
-## Βήμα 5 — Επαλήθευση όλων των υπηρεσιών
-
-Ελέγξτε ότι όλα τα κοντέινερ εκτελούνται και είναι υγιή:
-
-```bash
-docker compose -f docker-compose.production.yml ps
-```
-
-Αναμενόμενο αποτέλεσμα:
-
-```
-NAME                    IMAGE                                   STATUS
-rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
-rtcloud-mysql           mysql:8.0                               Up (healthy)
-```
-
-Εάν ένα κοντέινερ εμφανίζει `Up (starting)` ή `Up (unhealthy)`, αναμείνετε 30–60 δευτερόλεπτα και ελέγξτε ξανά. Το MySQL μπορεί να χρειαστεί έως ένα λεπτό για πλήρη αρχικοποίηση κατά την πρώτη εκκίνηση.
-
----
-
-## Αναφορά θυρών
-
-| Θύρα | Υπηρεσία | Περιγραφή |
-|------|---------|-------------|
-| `8080` | Εφαρμογή rtCloud | Κύρια διεπαφή χρήστη web (ρυθμιζόμενη μέσω `APP_PORT`) |
-| `3838` | Διακομιστής Shiny | Αναλύσεις και οπτικοποιήσεις βασισμένες σε R (ρυθμιζόμενη μέσω `SHINY_PORT`) |
-
-Η MySQL (θύρα 3306) και τυχόν προαιρετικές υπηρεσίες (Keycloak) είναι μόνο εσωτερικές και δεν εκτίθενται στον κεντρικό υπολογιστή από προεπιλογή.
-
----
-
-## Επόμενα βήματα
-
-Η εγκατάσταση rtCloud εκτελείται τώρα. Εξετάστε αυτές τις επακόλουθες εργασίες:
-
-- **Ενεργοποίηση HTTPS** — Κατευθύνετε έναν τομέα στον διακομιστή σας και διαμορφώστε SSL με Let's Encrypt. Δείτε [Ανάπτυξη στο cloud](cloud-deployment) για αυτόματη ρύθμιση HTTPS.
-- **Έλεγχος όλων των ρυθμίσεων** — Περιηγηθείτε στην [Αναφορά διαμόρφωσης](configuration) για ρύθμιση ανάπτυξης παραγωγής.
-- **Ρύθμιση SSO** — Συνδέστε έναν πάροχο ταυτοτήτων για κεντρική ταυτοποίηση χρηστών. Δείτε [Ταυτοποίηση SSO](sso-authentication).
-- **Σχεδιασμός αντιγράφων ασφαλείας** — Ελέγξτε τη σελίδα [Συντήρηση](maintenance) για διαδικασίες αντιγράφων ασφαλείας και αναβάθμισης.

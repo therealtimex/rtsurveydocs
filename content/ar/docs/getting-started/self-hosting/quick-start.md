@@ -1,178 +1,58 @@
 ---
 weight: 1
-title: "البدء السريع"
+title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "play_circle"
 toc: true
-description: "تشغيل rtCloud على خادمك الخاص في أقل من 10 دقائق باستخدام Docker Compose."
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
 ---
 
-يرشدك هذا الدليل خلال نشر نسخة rtCloud مستضافة ذاتياً على خادم Linux من الصفر. بنهايته ستكون لديك نسخة rtCloud تعمل ويمكن الوصول إليها عبر المتصفح.
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
 
-## المتطلبات المسبقة
+## Requirements
 
-تأكد من استيفاء خادمك للمتطلبات التالية قبل البدء:
+### Server
 
-### الأجهزة
-
-| المورد | الحد الأدنى | الموصى به |
+| Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| ذاكرة الوصول العشوائي | 2 GB | 4 GB |
-| القرص | 10 GB | 40 GB |
-| المعالج | 1 vCPU | 2 vCPUs |
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### البرمجيات
+### Domain
 
-| البرنامج | الإصدار |
-|----------|---------|
-| نظام التشغيل | Ubuntu 20.04 LTS أو أحدث (أو أي Linux يدعم Docker) |
-| Docker | 20.10 أو أحدث |
-| Docker Compose | v2.x (`docker compose`) أو v1.x (`docker-compose`) |
-
-**تثبيت Docker على Ubuntu:**
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-التحقق من التثبيت:
-
-```bash
-docker --version
-docker compose version
-```
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
 
 ---
 
-## الخطوة 1 — الحصول على الملفات
+## Choose Your Cloud Provider
 
-استنسخ مستودع النشر على خادمك:
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
 
-```bash
-git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
-cd rtcloud
-```
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
----
-
-## الخطوة 2 — إعداد البيئة
-
-انسخ ملف الإعداد النموذجي:
-
-```bash
-cp .env.production.sample .env
-```
-
-افتح `.env` في محرر نصوص واملأ القيم المطلوبة:
-
-```dotenv
-# معرّف فريد لهذا النشر (بدون مسافات أو أحرف خاصة)
-PROJECT_ID=myproject
-
-# النطاق أو عنوان IP الذي سيصل المستخدمون عبره إلى التطبيق
-# مثال: rtcloud.example.com  أو  192.168.1.100
-PROJECT_URL=rtcloud.example.com
-
-# البروتوكول: استخدم "https" إن كان لديك نطاق مع SSL، وإلا "http"
-HTTP_PROTOCOL=https
-
-# كلمات مرور قوية وفريدة — غيّر الثلاث قبل البدء
-MYSQL_PASSWORD=change_me_strong_password
-MYSQL_ROOT_PASSWORD=change_me_root_password
-ADMIN_PASSWORD=change_me_admin_password
-```
-
-> **مهم:** يقرأ Docker Compose ملف `.env` تلقائياً فقط. لا تنشئ ملفاً باسم `.env.production`. تُطبَّق `ADMIN_PASSWORD` فقط عند **التشغيل الأول** لقاعدة بيانات جديدة.
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
 ---
 
-## الخطوة 3 — تشغيل الحاويات
+## What the scripts do
 
-شغّل جميع الخدمات في الخلفية:
+Every cloud script performs a fully unattended setup:
 
-```bash
-docker compose -f docker-compose.production.yml up -d
-```
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
 
-يستغرق التشغيل الأول **3–5 دقائق** بينما يقوم Docker بـ:
-
-1. سحب صورة تطبيق rtCloud (~1 GB تنزيل)
-2. تهيئة قاعدة بيانات MySQL
-3. تحميل المخطط الأساسي
-4. تشغيل جميع هجرات قاعدة البيانات المعلقة
-
-مراقبة تقدم التشغيل في الوقت الفعلي:
-
-```bash
-docker compose -f docker-compose.production.yml logs -f rtcloud
-```
-
-انتظر حتى تظهر مخرجات تشير إلى جاهزية التطبيق. يمكنك أيضاً مراقبة حالة صحة الحاوية:
-
-```bash
-watch docker compose -f docker-compose.production.yml ps
-```
-
----
-
-## الخطوة 4 — الوصول إلى التطبيق
-
-بمجرد أن تُظهر كلتا الحاويتين `Up (healthy)`، افتح متصفحك:
-
-```
-http://<PROJECT_URL>:8080
-```
-
-سجّل الدخول باستخدام حساب المسؤول:
-
-| الحقل | القيمة |
-|-------|-------|
-| اسم المستخدم | `admin` |
-| كلمة المرور | القيمة التي حددتها لـ `ADMIN_PASSWORD` في `.env` |
-
-> غيّر كلمة مرور المسؤول فوراً بعد تسجيل دخولك الأول من صفحة إعدادات الحساب.
-
----
-
-## الخطوة 5 — التحقق من جميع الخدمات
-
-تحقق من تشغيل جميع الحاويات وسلامتها:
-
-```bash
-docker compose -f docker-compose.production.yml ps
-```
-
-المخرجات المتوقعة:
-
-```
-NAME                    IMAGE                                   STATUS
-rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
-rtcloud-mysql           mysql:8.0                               Up (healthy)
-```
-
-إذا أظهرت حاوية `Up (starting)` أو `Up (unhealthy)`، انتظر 30–60 ثانية إضافية وتحقق مجدداً. قد يستغرق MySQL دقيقة كاملة للتهيئة الكاملة عند التشغيل الأول.
-
----
-
-## مرجع المنافذ
-
-| المنفذ | الخدمة | الوصف |
-|------|---------|-------------|
-| `8080` | تطبيق rtCloud | واجهة الويب الرئيسية (قابلة للتهيئة عبر `APP_PORT`) |
-| `3838` | خادم Shiny | التحليلات والتصورات المبنية على R (قابلة للتهيئة عبر `SHINY_PORT`) |
-
-MySQL (المنفذ 3306) والخدمات الاختيارية (Keycloak) داخلية فقط ولا تُكشف للمضيف بشكل افتراضي.
-
----
-
-## الخطوات التالية
-
-نسخة rtCloud تعمل الآن. فكّر في هذه المهام التالية:
-
-- **تفعيل HTTPS** — أشر نطاقاً إلى خادمك وهيّئ SSL مع Let's Encrypt. راجع [النشر السحابي](cloud-deployment) لإعداد HTTPS الآلي.
-- **مراجعة جميع الإعدادات** — تصفح [مرجع الإعداد](configuration) لضبط نشرك للإنتاج.
-- **إعداد SSO** — ربط مزود هوية للمصادقة المركزية للمستخدمين. راجع [مصادقة SSO](sso-authentication).
-- **التخطيط للنسخ الاحتياطية** — راجع صفحة [الصيانة](maintenance) لإجراءات النسخ الاحتياطي والترقية.

@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "Pamje e Përgjithshme"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "Një udhëzues i shpejtë për kryerjen e sondazheve me rtSurvey"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Fillestarë"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-rtSurvey është një platformë e fuqishme për ndërtimin e formularëve dhe flukseve të punës për mbledhjen efikase të të dhënave. Me rtSurvey, mund të:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. Krijoni formularë të sofistikuar që përfshijnë foto, koordinata GPS, logjikë kapërcimi, llogaritje, grupe të dhënash të jashtme, shumë gjuhë dhe shumë gjëra të tjera.
-2. Mblidhni të dhëna duke përdorur aplikacionin celular ose ndërfaqen ueb, me sinkronizim automatik kur ka lidhje me internetin.
-3. Analizoni të dhënat pa përpjekje duke eksportuar në CSV ose Stata, ose duke lidhur rtSurvey me Excel, Power BI, Python ose R për panele monitorimi dinamike me përditësim të drejtpërdrejtë.
+---
 
-Studiuesit, ekipet në terren dhe profesionistë nga industri të ndryshme mbështeten tek rtSurvey për nevojat e tyre kritike të mbledhjes së të dhënave. Ja si të filloni:
+## How it works
 
-## 1. Aksesoni rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-Mënyra më e shpejtë për të filluar është duke përdorur [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud), shërbimin tonë zyrtar të pritjes së menaxhuar. Është i aksesueshëm nëpërmjet faqes së internetit të rtSurvey dhe ndërtohet mbi një infrastrukturë të fuqishme dhe të sigurt. Përndryshe, mund ta pritni rtSurvey në infrastrukturën tuaj nëse preferoni.
+---
 
-## 2. Krijoni Formularin tuaj të Sondazhit {#getting-started-create-form}
+## Before you start
 
-1. Dizajnoni formularin tuaj duke përdorur `XLSForm` ose eksperimentoni me shabllonin tonë [Formulari me të gjitha Widget-et](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0).
-2. Ngarkoni XLSForm-in tuaj në rtSurvey Cloud dhe publikojeni, ose përdorni Ndërtuesin e Formularëve (Beta) për një eksperiencë dizajnimi vizual.
+You need:
 
-## 3. Instaloni Aplikacionin rtSurvey {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-Shkarkoni aplikacionin rtSurvey në pajisjen tuaj celulare:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### Për pajisjet Android:
-1. Vizitoni [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
-2. Kërkoni "rtSurvey" dhe trokitni në aplikacionin me logon e rtSurvey.
-3. Klikoni "Instalo" për të shkarkuar dhe konfiguruar aplikacionin.
+---
 
-### Për pajisjet iOS:
-1. Hapni [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) në pajisjen tuaj.
-2. Kërkoni "rtSurvey" dhe gjeni aplikacionin me logon e rtSurvey.
-3. Trokitni "Merr" për të shkarkuar dhe instaluar aplikacionin.
+## Ready?
 
-## 4. Lidhni Aplikacionin rtSurvey me rtSurvey Cloud {#getting-started-connect}
-
-1. Krijoni një llogari:
-   - Një Administrator i rtSurvey Cloud mund të krijojë llogari për numëruesit.
-   - Përndryshe, Administratori mund të gjenerojë një URL për numëruesit që të krijojnë llogaritë e tyre vetë.
-2. Hapni Aplikacionin rtSurvey dhe hyni me kredencialet e llogarisë suaj.
-
-## 5. Kryeni Sondazhin tuaj {#getting-started-fill-form}
-
-1. Në aplikacion, zgjidhni "Plotëso Formularin Bosh" për të filluar një sondazh të ri.
-2. Plotësoni formularin me të dhënat e të anketuarve.
-3. Me përfundimin, të dhënat e formularit do të sinkronizohen automatikisht me rtSurvey Cloud kur ka lidhje me internetin.
-
-## 6. Analizoni të Dhënat tuaja në rtSurvey Cloud {#getting-started-use-data}
-
-1. Hyni në rtSurvey Cloud për të aksesuar të dhënat e mbledhura.
-2. Shkarkoni të dhënat tuaja në formate të ndryshme si CSV ose Stata për analiza të mëtejshme.
-3. Përdorni mjetet e analizës të integruara ose integroni me softuerin tuaj preferuar të analizës së të dhënave.
+**[Deploy your server →](self-hosting/quick-start)**

@@ -1,178 +1,58 @@
 ---
 weight: 1
-title: "Greitas paleidimas"
+title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "play_circle"
 toc: true
-description: "Paleiskite rtCloud savo serveryje per mažiau nei 10 minučių naudodami Docker Compose."
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
 ---
 
-Šis vadovas supažindins jus su savarankiškai valdomos rtCloud instancijos diegimu „Linux" serveryje nuo nulio. Pabaigoje turėsite veikiančią rtCloud, pasiekiamą naršyklėje.
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
 
-## Išankstinės sąlygos
+## Requirements
 
-Prieš pradėdami įsitikinkite, kad jūsų serveris atitinka šiuos reikalavimus:
+### Server
 
-### Aparatinė įranga
-
-| Išteklius | Minimalus | Rekomenduojamas |
+| Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| RAM | 2 GB | 4 GB |
-| Disko vieta | 10 GB | 40 GB |
-| CPU | 1 vCPU | 2 vCPU |
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Programinė įranga
+### Domain
 
-| Programinė įranga | Versija |
-|----------|---------|
-| OS | Ubuntu 20.04 LTS arba naujesnė (arba bet kuris Linux su Docker palaikymu) |
-| Docker | 20.10 arba naujesnė |
-| Docker Compose | v2.x (`docker compose`) arba v1.x (`docker-compose`) |
-
-**Docker diegimas Ubuntu:**
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-Patikrinkite diegimą:
-
-```bash
-docker --version
-docker compose version
-```
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
 
 ---
 
-## 1 žingsnis — Gaukite failus
+## Choose Your Cloud Provider
 
-Klonuokite diegimo saugyklą į savo serverį:
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
 
-```bash
-git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
-cd rtcloud
-```
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
----
-
-## 2 žingsnis — Konfigūruokite aplinką
-
-Nukopijuokite pavyzdinę konfigūracijos bylą:
-
-```bash
-cp .env.production.sample .env
-```
-
-Atidarykite `.env` teksto redaktoriuje ir užpildykite reikiamas reikšmes:
-
-```dotenv
-# Unikalus šio diegimo identifikatorius (be tarpų, be specialių simbolių)
-PROJECT_ID=myproject
-
-# Domenų vardas arba IP adresas, kuriuo naudotojai pasieks programą
-# Pavyzdys: rtcloud.example.com  arba  192.168.1.100
-PROJECT_URL=rtcloud.example.com
-
-# Protokolas: naudokite "https", jei turite domeną su SSL, "http" kitu atveju
-HTTP_PROTOCOL=https
-
-# Stiprūs, unikalūs slaptažodžiai – pakeiskite visus tris prieš paleidžiant
-MYSQL_PASSWORD=change_me_strong_password
-MYSQL_ROOT_PASSWORD=change_me_root_password
-ADMIN_PASSWORD=change_me_admin_password
-```
-
-> **Svarbu:** tik `.env` automatiškai skaitoma „Docker Compose". Nekurkite failo pavadinimu `.env.production`, nes tai sukeltų painiavą. `ADMIN_PASSWORD` taikoma tik **pirmojo paleidimo** metu su nauja duomenų baze.
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
 ---
 
-## 3 žingsnis — Paleiskite konteinerius
+## What the scripts do
 
-Paleiskite visas paslaugas fone:
+Every cloud script performs a fully unattended setup:
 
-```bash
-docker compose -f docker-compose.production.yml up -d
-```
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
 
-Pirmasis paleidimas užtrunka **3–5 minutes**, kol Docker:
-
-1. Atsisiunčia rtCloud programos vaizdą (~1 GB parsisiuntimas)
-2. Inicializuoja MySQL duomenų bazę
-3. Įkelia pagrindinę schemą
-4. Paleidžia visas laukiančias duomenų bazės migracijas
-
-Stebėkite paleidimo eigą realiuoju laiku:
-
-```bash
-docker compose -f docker-compose.production.yml logs -f rtcloud
-```
-
-Palaukite, kol pamatysite išvestį, nurodančią, kad programa pasiruošusi. Taip pat galite stebėti konteinerio sveikatos būseną:
-
-```bash
-watch docker compose -f docker-compose.production.yml ps
-```
-
----
-
-## 4 žingsnis — Pasiekite programą
-
-Kai abu konteineriai rodo `Up (healthy)`, atidarykite naršyklę:
-
-```
-http://<PROJECT_URL>:8080
-```
-
-Prisijunkite naudodami administratoriaus paskyrą:
-
-| Laukas | Reikšmė |
-|-------|-------|
-| Naudotojo vardas | `admin` |
-| Slaptažodis | Reikšmė, kurią nustatėte `ADMIN_PASSWORD` `.env` faile |
-
-> Pirmą kartą prisijungę, pakeiskite administratoriaus slaptažodį paskyros nustatymų puslapyje.
-
----
-
-## 5 žingsnis — Patikrinkite visas paslaugas
-
-Patikrinkite, ar visi konteineriai veikia ir yra sveiki:
-
-```bash
-docker compose -f docker-compose.production.yml ps
-```
-
-Tikėtina išvestis:
-
-```
-NAME                    IMAGE                                   STATUS
-rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
-rtcloud-mysql           mysql:8.0                               Up (healthy)
-```
-
-Jei konteineris rodo `Up (starting)` arba `Up (unhealthy)`, palaukite dar 30–60 sekundžių ir patikrinkite dar kartą. MySQL pirmą kartą paleidžiant gali užtrukti iki minutės.
-
----
-
-## Prievadų nuoroda
-
-| Prievadas | Paslauga | Aprašymas |
-|------|---------|-------------|
-| `8080` | rtCloud programa | Pagrindinė žiniatinklio sąsaja (konfigūruojama per `APP_PORT`) |
-| `3838` | Shiny serveris | Analizė ir R pagrįstos vizualizacijos (konfigūruojama per `SHINY_PORT`) |
-
-MySQL (prievadas 3306) ir bet kurios papildomos paslaugos (Keycloak) yra tik vidinės ir pagal numatytuosius nustatymus neatidarytos pagrindiniame kompiuteryje.
-
----
-
-## Kiti žingsniai
-
-Jūsų rtCloud instancija dabar veikia. Apsvarstykite šias tolimesnes užduotis:
-
-- **Įjunkite HTTPS** – nukreipkite domeną į savo serverį ir konfigūruokite SSL su „Let's Encrypt". Automatinio HTTPS nustatymo informaciją rasite [Debesies diegime](cloud-deployment).
-- **Peržiūrėkite visus nustatymus** – naršykite [Konfigūracijos nuorodą](configuration), kad pritaikytumėte diegimą gamybai.
-- **Nustatykite SSO** – prijunkite tapatybės teikėją centralizuotai naudotojų autentifikacijai. Žr. [SSO autentifikavimą](sso-authentication).
-- **Planuokite atsargines kopijas** – peržiūrėkite [Priežiūros](maintenance) puslapį, kad sužinotumėte apie atsarginių kopijų kūrimo ir atnaujinimo procedūras.

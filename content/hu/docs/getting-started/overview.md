@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "Áttekintés"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "Gyorskezdési útmutató az rtSurvey segítségével végzett felmérésekhez"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Kezdők"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-Az rtSurvey egy hatékony platform az adatgyűjtési folyamatok megszervezésére szolgáló űrlapok és munkafolyamatok létrehozásához. Az rtSurvey segítségével:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. Kifinomult űrlapokat hozhat létre, amelyek fényképeket, GPS-helyszíneket, feltételes logikát, számításokat, külső adatkészleteket, több nyelvet és sok más funkciót tartalmaznak.
-2. Adatokat gyűjthet a mobilalkalmazással vagy a webes felületen, és az adatok automatikusan szinkronizálódnak, ha internetkapcsolat érhető el.
-3. Könnyedén elemezheti az adatokat CSV- vagy Stata-fájlba exportálással, vagy az rtSurvey Excelhez, Power BI-hoz, Pythonhoz vagy R-hez való csatlakoztatásával dinamikus, élő irányítópultok létrehozásához.
+---
 
-Kutatók, terepi csapatok és különböző iparágak szakemberei az rtSurvey-re támaszkodnak kritikus adatgyűjtési igényeik kielégítéséhez. Így kezdje el a használatot:
+## How it works
 
-## 1. Érje el az rtSurvey Cloud-ot {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-A leggyorsabb kezdési módszer az [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud) használata, amely a hivatalos, felügyelt tárhelyszolgáltatásunk. Elérhető az rtSurvey weboldalán, és robusztus, biztonságos infrastruktúrán alapul. Alternatív megoldásként saját infrastruktúrán is üzemeltetheti az rtSurvey-t, ha ezt preferálja.
+---
 
-## 2. Hozza létre felmérési űrlapját {#getting-started-create-form}
+## Before you start
 
-1. Tervezze meg űrlapját `XLSForm` segítségével, vagy kísérletezzen az [Összes widgetet tartalmazó űrlap](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0) sablonnal.
-2. Töltse fel XLSForm-ját az rtSurvey Cloud-ba, és tegye közzé, vagy használja a Form Buildert (Béta) vizuális tervezési élményhez.
+You need:
 
-## 3. Telepítse az rtSurvey alkalmazást {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-Töltse le az rtSurvey alkalmazást mobileszközére:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### Android-eszközökön:
-1. Látogasson el a [Google Play Áruházba](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
-2. Keresse az „rtSurvey" alkalmazást, és koppintson az rtSurvey logóval ellátott alkalmazásra.
-3. Kattintson a „Telepítés" gombra az alkalmazás letöltéséhez és beállításához.
+---
 
-### iOS-eszközökön:
-1. Nyissa meg az [App Store-t](https://apps.apple.com/vn/app/rtsurvey/id1178851547) eszközén.
-2. Keresse az „rtSurvey" alkalmazást, és keresse meg az rtSurvey logóval ellátott alkalmazást.
-3. Koppintson a „Letöltés" gombra az alkalmazás letöltéséhez és telepítéséhez.
+## Ready?
 
-## 4. Csatlakoztassa az rtSurvey alkalmazást az rtSurvey Cloud-hoz {#getting-started-connect}
-
-1. Hozzon létre fiókot:
-   - Az rtSurvey Cloud rendszergazdája fiókokat hozhat létre kérdezőbiztosok számára.
-   - Alternatív megoldásként a rendszergazda URL-t generálhat, amelynek segítségével a kérdezőbiztosok saját fiókjukat hozhatják létre.
-2. Nyissa meg az rtSurvey alkalmazást, és jelentkezzen be fiókjának hitelesítő adataival.
-
-## 5. Végezze el a felmérést {#getting-started-fill-form}
-
-1. Az alkalmazásban válassza az „Üres űrlap kitöltése" lehetőséget egy új felmérés megkezdéséhez.
-2. Töltse ki az űrlapot a válaszadó adataival.
-3. A kitöltés befejezésekor az űrlap adatai automatikusan szinkronizálódnak az rtSurvey Cloud-dal, ha internetkapcsolat érhető el.
-
-## 6. Elemezze adatait az rtSurvey Cloud-ban {#getting-started-use-data}
-
-1. Jelentkezzen be az rtSurvey Cloud-ba az összegyűjtött adatok eléréséhez.
-2. Töltse le adatait különböző formátumokban, például CSV-ben vagy Stata-ban, a további elemzéshez.
-3. Használja a beépített elemzőeszközöket, vagy integrálja a preferált adatelemző szoftverével.
+**[Deploy your server →](self-hosting/quick-start)**

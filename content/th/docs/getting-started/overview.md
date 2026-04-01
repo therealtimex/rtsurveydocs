@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "ภาพรวม"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "คู่มือเริ่มต้นอย่างรวดเร็วสำหรับการดำเนินการสำรวจด้วย rtSurvey"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Beginners"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-rtSurvey เป็นแพลตฟอร์มที่ทรงพลังสำหรับการสร้างแบบฟอร์มและกระบวนการทำงานเพื่อเก็บข้อมูลอย่างมีประสิทธิภาพ ด้วย rtSurvey คุณสามารถ:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. สร้างแบบฟอร์มที่ซับซ้อนซึ่งรวมถึงรูปภาพ ตำแหน่ง GPS ตรรกะการข้ามคำถาม การคำนวณ ชุดข้อมูลภายนอก หลายภาษา และอื่นๆ อีกมากมาย
-2. เก็บข้อมูลโดยใช้แอปมือถือหรืออินเทอร์เฟซเว็บ โดยมีการซิงโครไนซ์อัตโนมัติเมื่อมีการเชื่อมต่ออินเทอร์เน็ต
-3. วิเคราะห์ข้อมูลได้อย่างง่ายดายโดยการส่งออกเป็น CSV หรือ Stata หรือโดยการเชื่อมต่อ rtSurvey กับ Excel, Power BI, Python หรือ R สำหรับแดชบอร์ดที่อัปเดตสดแบบไดนามิก
+---
 
-นักวิจัย ทีมภาคสนาม และผู้เชี่ยวชาญในอุตสาหกรรมต่างๆ ใช้ rtSurvey สำหรับความต้องการเก็บข้อมูลสำคัญของพวกเขา นี่คือวิธีเริ่มต้น:
+## How it works
 
-## 1. เข้าถึง rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-วิธีที่เร็วที่สุดในการเริ่มต้นคือการใช้ [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud) ซึ่งเป็นบริการโฮสติ้งที่มีการจัดการอย่างเป็นทางการของเรา สามารถเข้าถึงได้ผ่านเว็บไซต์ rtSurvey และสร้างบนโครงสร้างพื้นฐานที่แข็งแกร่งและปลอดภัย หรือคุณสามารถโฮสต์ rtSurvey บนโครงสร้างพื้นฐานของคุณเองหากต้องการ
+---
 
-## 2. สร้างแบบฟอร์มสำรวจของคุณ {#getting-started-create-form}
+## Before you start
 
-1. ออกแบบแบบฟอร์มของคุณโดยใช้ `XLSForm` หรือทดลองใช้เทมเพลต [แบบฟอร์ม All Widgets](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0) ของเรา
-2. อัปโหลด XLSForm ของคุณไปยัง rtSurvey Cloud และเผยแพร่ หรือใช้ Form Builder (เบต้า) สำหรับประสบการณ์การออกแบบแบบภาพ
+You need:
 
-## 3. ติดตั้งแอป rtSurvey {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-ดาวน์โหลดแอป rtSurvey บนอุปกรณ์มือถือของคุณ:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### สำหรับอุปกรณ์ Android:
-1. ไปที่ [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey)
-2. ค้นหา "rtSurvey" และแตะที่แอปที่มีโลโก้ rtSurvey
-3. คลิก "ติดตั้ง" เพื่อดาวน์โหลดและตั้งค่าแอป
+---
 
-### สำหรับอุปกรณ์ iOS:
-1. เปิด [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) บนอุปกรณ์ของคุณ
-2. ค้นหา "rtSurvey" และค้นหาแอปที่มีโลโก้ rtSurvey
-3. แตะ "รับ" เพื่อดาวน์โหลดและติดตั้งแอป
+## Ready?
 
-## 4. เชื่อมต่อแอป rtSurvey กับ rtSurvey Cloud {#getting-started-connect}
-
-1. สร้างบัญชี:
-   - ผู้ดูแลระบบ rtSurvey Cloud สามารถสร้างบัญชีสำหรับผู้ถามแบบสอบถาม
-   - หรือผู้ดูแลระบบสามารถสร้าง URL สำหรับผู้ถามแบบสอบถามเพื่อสร้างบัญชีของตนเอง
-2. เปิดแอป rtSurvey และเข้าสู่ระบบด้วยข้อมูลประจำตัวของบัญชีของคุณ
-
-## 5. ดำเนินการสำรวจของคุณ {#getting-started-fill-form}
-
-1. ในแอป เลือก "กรอกแบบฟอร์มว่าง" เพื่อเริ่มการสำรวจใหม่
-2. กรอกแบบฟอร์มด้วยข้อมูลผู้ตอบ
-3. เมื่อเสร็จสิ้น ข้อมูลแบบฟอร์มจะซิงค์กับ rtSurvey Cloud โดยอัตโนมัติเมื่อมีการเชื่อมต่ออินเทอร์เน็ต
-
-## 6. วิเคราะห์ข้อมูลของคุณใน rtSurvey Cloud {#getting-started-use-data}
-
-1. เข้าสู่ระบบ rtSurvey Cloud เพื่อเข้าถึงข้อมูลที่เก็บรวบรวมของคุณ
-2. ดาวน์โหลดข้อมูลของคุณในรูปแบบต่างๆ เช่น CSV หรือ Stata สำหรับการวิเคราะห์เพิ่มเติม
-3. ใช้เครื่องมือวิเคราะห์ในตัวหรือผสานรวมกับซอฟต์แวร์วิเคราะห์ข้อมูลที่คุณต้องการ
+**[Deploy your server →](self-hosting/quick-start)**

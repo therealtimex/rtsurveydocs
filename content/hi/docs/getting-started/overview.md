@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "अवलोकन"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "rtSurvey के साथ सर्वेक्षण चलाने के लिए एक त्वरित प्रारंभ मार्गदर्शिका"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Beginners"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-rtSurvey डेटा को कुशलतापूर्वक संग्रह करने के लिए फ़ॉर्म और वर्कफ़्लो बनाने का एक शक्तिशाली प्लेटफ़ॉर्म है। rtSurvey के साथ आप यह कर सकते हैं:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. फ़ोटो, GPS स्थान, स्किप लॉजिक, गणनाएं, बाहरी डेटासेट, कई भाषाएं और बहुत कुछ शामिल करके परिष्कृत फ़ॉर्म बनाएं।
-2. मोबाइल ऐप या वेब इंटरफ़ेस का उपयोग करके डेटा एकत्र करें, इंटरनेट कनेक्शन उपलब्ध होने पर स्वचालित रूप से सिंक के साथ।
-3. CSV या Stata में निर्यात करके या rtSurvey को Excel, Power BI, Python या R से जोड़कर डायनामिक, लाइव-अपडेट होने वाले डैशबोर्ड के लिए डेटा का सरलता से विश्लेषण करें।
+---
 
-विभिन्न उद्योगों में शोधकर्ता, फील्ड टीमें और पेशेवर लोग अपनी महत्वपूर्ण डेटा संग्रह आवश्यकताओं के लिए rtSurvey पर निर्भर करते हैं। यहाँ बताया गया है कि कैसे शुरुआत करें:
+## How it works
 
-## 1. rtSurvey Cloud तक पहुँचें {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-शुरुआत करने का सबसे तेज़ तरीका [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud) का उपयोग करना है, जो हमारी आधिकारिक प्रबंधित होस्टिंग सेवा है। यह rtSurvey वेबसाइट के माध्यम से सुलभ है और एक मजबूत, सुरक्षित बुनियादी ढाँचे पर निर्मित है। वैकल्पिक रूप से, यदि पसंद हो तो आप अपने स्वयं के बुनियादी ढाँचे पर rtSurvey होस्ट कर सकते हैं।
+---
 
-## 2. अपना सर्वेक्षण फ़ॉर्म बनाएं {#getting-started-create-form}
+## Before you start
 
-1. `XLSForm` का उपयोग करके अपना फ़ॉर्म डिज़ाइन करें या हमारे [All Widgets form](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0) टेम्पलेट से प्रयोग करें।
-2. अपना XLSForm rtSurvey Cloud पर अपलोड करें और उसे प्रकाशित करें, या विज़ुअल डिज़ाइन अनुभव के लिए हमारे Form Builder (Beta) का उपयोग करें।
+You need:
 
-## 3. rtSurvey ऐप इंस्टॉल करें {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-अपने मोबाइल डिवाइस पर rtSurvey ऐप डाउनलोड करें:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### Android डिवाइस के लिए:
-1. [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey) पर जाएं।
-2. "rtSurvey" खोजें और rtSurvey लोगो वाले ऐप पर टैप करें।
-3. ऐप डाउनलोड और सेटअप करने के लिए "Install" पर क्लिक करें।
+---
 
-### iOS डिवाइस के लिए:
-1. अपने डिवाइस पर [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) खोलें।
-2. "rtSurvey" खोजें और rtSurvey लोगो वाले ऐप को ढूंढें।
-3. ऐप डाउनलोड और इंस्टॉल करने के लिए "Get" पर टैप करें।
+## Ready?
 
-## 4. rtSurvey ऐप को rtSurvey Cloud से जोड़ें {#getting-started-connect}
-
-1. एक खाता बनाएं:
-   - rtSurvey Cloud Admin गणनाकर्ताओं के लिए खाते बना सकता है।
-   - वैकल्पिक रूप से, Admin गणनाकर्ताओं के लिए एक URL जेनरेट कर सकता है ताकि वे अपने खाते स्वयं बना सकें।
-2. rtSurvey ऐप खोलें और अपने खाते की साख से लॉग इन करें।
-
-## 5. अपना सर्वेक्षण करें {#getting-started-fill-form}
-
-1. ऐप में, नया सर्वेक्षण शुरू करने के लिए "Fill Blank Form" चुनें।
-2. उत्तरदाता डेटा के साथ फ़ॉर्म पूरा करें।
-3. पूर्ण होने पर, इंटरनेट कनेक्शन उपलब्ध होने पर फ़ॉर्म डेटा स्वचालित रूप से rtSurvey Cloud के साथ सिंक हो जाएगा।
-
-## 6. rtSurvey Cloud में अपने डेटा का विश्लेषण करें {#getting-started-use-data}
-
-1. अपने एकत्र किए गए डेटा तक पहुँचने के लिए rtSurvey Cloud में लॉग इन करें।
-2. आगे के विश्लेषण के लिए CSV या Stata जैसे विभिन्न प्रारूपों में अपना डेटा डाउनलोड करें।
-3. अंतर्निहित विश्लेषण टूल का उपयोग करें या अपने पसंदीदा डेटा विश्लेषण सॉफ़्टवेयर के साथ एकीकृत करें।
+**[Deploy your server →](self-hosting/quick-start)**

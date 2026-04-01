@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "Επισκόπηση"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "Οδηγός γρήγορης εκκίνησης για τη διεξαγωγή ερευνών με το rtSurvey"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Beginners"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-Το rtSurvey είναι μια ισχυρή πλατφόρμα για τη δημιουργία φορμών και ροών εργασίας για αποδοτική συλλογή δεδομένων. Με το rtSurvey μπορείτε να:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. Δημιουργείτε εξελιγμένες φόρμες που ενσωματώνουν φωτογραφίες, τοποθεσίες GPS, λογική παράλειψης, υπολογισμούς, εξωτερικά σύνολα δεδομένων, πολλές γλώσσες και πολλά άλλα.
-2. Συλλέγετε δεδομένα μέσω εφαρμογής κινητού ή διεπαφής web, με αυτόματο συγχρονισμό όταν υπάρχει σύνδεση στο Διαδίκτυο.
-3. Αναλύετε δεδομένα εύκολα εξάγοντάς τα σε CSV ή Stata, ή συνδέοντας το rtSurvey με Excel, Power BI, Python ή R για δυναμικά ταμπλό με ζωντανή ενημέρωση.
+---
 
-Ερευνητές, ομάδες πεδίου και επαγγελματίες σε διάφορους κλάδους βασίζονται στο rtSurvey για τις κρίσιμες ανάγκες συλλογής δεδομένων τους. Δείτε πώς να ξεκινήσετε:
+## How it works
 
-## 1. Πρόσβαση στο rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-Ο γρηγορότερος τρόπος εκκίνησης είναι το [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud), η επίσημη υπηρεσία διαχειριζόμενης φιλοξενίας. Είναι προσβάσιμη μέσω του ιστότοπου rtSurvey και βασίζεται σε ισχυρή, ασφαλή υποδομή. Εναλλακτικά, μπορείτε να φιλοξενήσετε το rtSurvey στη δική σας υποδομή εάν προτιμάτε.
+---
 
-## 2. Δημιουργήστε τη φόρμα έρευνάς σας {#getting-started-create-form}
+## Before you start
 
-1. Σχεδιάστε τη φόρμα σας χρησιμοποιώντας `XLSForm` ή πειραματιστείτε με το πρότυπο [φόρμας All Widgets](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0).
-2. Ανεβάστε το XLSForm σας στο rtSurvey Cloud και δημοσιεύστε το, ή χρησιμοποιήστε τον Form Builder (Beta) για οπτικό σχεδιασμό.
+You need:
 
-## 3. Εγκαταστήστε την εφαρμογή rtSurvey {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-Κατεβάστε την εφαρμογή rtSurvey στην κινητή συσκευή σας:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### Για συσκευές Android:
-1. Επισκεφτείτε το [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
-2. Αναζητήστε "rtSurvey" και πατήστε στην εφαρμογή με το λογότυπο rtSurvey.
-3. Κάντε κλικ στο "Εγκατάσταση" για λήψη και ρύθμιση.
+---
 
-### Για συσκευές iOS:
-1. Ανοίξτε το [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) στη συσκευή σας.
-2. Αναζητήστε "rtSurvey" και εντοπίστε την εφαρμογή με το λογότυπο rtSurvey.
-3. Πατήστε "Λήψη" για λήψη και εγκατάσταση.
+## Ready?
 
-## 4. Συνδέστε την εφαρμογή rtSurvey με το rtSurvey Cloud {#getting-started-connect}
-
-1. Δημιουργήστε λογαριασμό:
-   - Ένας διαχειριστής rtSurvey Cloud μπορεί να δημιουργεί λογαριασμούς για απαριθμητές.
-   - Εναλλακτικά, ο Διαχειριστής μπορεί να δημιουργήσει URL ώστε οι απαριθμητές να δημιουργούν δικούς τους λογαριασμούς.
-2. Ανοίξτε την εφαρμογή rtSurvey και συνδεθείτε με τα διαπιστευτήρια λογαριασμού σας.
-
-## 5. Διεξαγάγετε την έρευνά σας {#getting-started-fill-form}
-
-1. Στην εφαρμογή, επιλέξτε "Συμπλήρωση κενής φόρμας" για να ξεκινήσετε μια νέα έρευνα.
-2. Συμπληρώστε τη φόρμα με τα δεδομένα των ερωτώμενων.
-3. Κατά την ολοκλήρωση, τα δεδομένα θα συγχρονιστούν αυτόματα με το rtSurvey Cloud όταν υπάρχει σύνδεση στο Διαδίκτυο.
-
-## 6. Αναλύστε τα δεδομένα σας στο rtSurvey Cloud {#getting-started-use-data}
-
-1. Συνδεθείτε στο rtSurvey Cloud για πρόσβαση στα συλλεγμένα δεδομένα σας.
-2. Κατεβάστε τα δεδομένα σας σε διάφορες μορφές όπως CSV ή Stata για περαιτέρω ανάλυση.
-3. Χρησιμοποιήστε τα ενσωματωμένα εργαλεία ανάλυσης ή ενσωματώστε με το λογισμικό ανάλυσης δεδομένων που προτιμάτε.
+**[Deploy your server →](self-hosting/quick-start)**

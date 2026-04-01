@@ -1,178 +1,58 @@
 ---
 weight: 1
-title: "Hurtigstart"
+title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "play_circle"
 toc: true
-description: "Få rtCloud kjørende på din egen server på under 10 minutter med Docker Compose."
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
 ---
 
-Denne veiledningen tar deg gjennom distribusjon av en selvdriftet rtCloud-instans på en Linux-server fra bunnen av. Når du er ferdig, har du en kjørende rtCloud tilgjengelig i nettleseren.
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
 
-## Forutsetninger
+## Requirements
 
-Kontroller at serveren din oppfyller følgende krav før du starter:
+### Server
 
-### Maskinvare
-
-| Ressurs | Minimum | Anbefalt |
+| Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| RAM | 2 GB | 4 GB |
-| Disk | 10 GB | 40 GB |
-| CPU | 1 vCPU | 2 vCPUer |
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Programvare
+### Domain
 
-| Programvare | Versjon |
-|----------|---------|
-| OS | Ubuntu 20.04 LTS eller nyere (eller en hvilken som helst Linux med Docker-støtte) |
-| Docker | 20.10 eller nyere |
-| Docker Compose | v2.x (`docker compose`) eller v1.x (`docker-compose`) |
-
-**Installer Docker på Ubuntu:**
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-Kontroller installasjonen:
-
-```bash
-docker --version
-docker compose version
-```
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
 
 ---
 
-## Trinn 1 — Hent filene
+## Choose Your Cloud Provider
 
-Klon distribusjonslageret til serveren:
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
 
-```bash
-git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
-cd rtcloud
-```
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
----
-
-## Trinn 2 — Konfigurer miljøet
-
-Kopier eksempelkonfigurasjonsfilen:
-
-```bash
-cp .env.production.sample .env
-```
-
-Åpne `.env` i en tekstredigerer og fyll inn de påkrevde verdiene:
-
-```dotenv
-# Unik identifikator for denne distribusjonen (ingen mellomrom, ingen spesialtegn)
-PROJECT_ID=myproject
-
-# Domene eller IP-adresse der brukere vil få tilgang til appen
-# Eksempel: rtcloud.example.com  eller  192.168.1.100
-PROJECT_URL=rtcloud.example.com
-
-# Protokoll: bruk "https" hvis du har et domene med SSL, "http" ellers
-HTTP_PROTOCOL=https
-
-# Sterke, unike passord — endre alle tre før oppstart
-MYSQL_PASSWORD=change_me_strong_password
-MYSQL_ROOT_PASSWORD=change_me_root_password
-ADMIN_PASSWORD=change_me_admin_password
-```
-
-> **Viktig:** Bare `.env` leses automatisk av Docker Compose. Ikke opprett en fil kalt `.env.production`, da det vil skape forvirring. `ADMIN_PASSWORD` brukes kun ved **første oppstart** av en fersk database.
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
 ---
 
-## Trinn 3 — Start containerne
+## What the scripts do
 
-Start alle tjenester i bakgrunnen:
+Every cloud script performs a fully unattended setup:
 
-```bash
-docker compose -f docker-compose.production.yml up -d
-```
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
 
-Den første oppstarten tar **3–5 minutter** mens Docker:
-
-1. Laster ned rtCloud-applikasjonsbildet (~1 GB nedlasting)
-2. Initialiserer MySQL-databasen
-3. Laster inn basisskjemaet
-4. Kjører alle ventende databasemigrasjoner
-
-Overvåk oppstartsfremgangen i sanntid:
-
-```bash
-docker compose -f docker-compose.production.yml logs -f rtcloud
-```
-
-Vent til du ser utdata som indikerer at applikasjonen er klar. Du kan også se på containerhelsestatusen:
-
-```bash
-watch docker compose -f docker-compose.production.yml ps
-```
-
----
-
-## Trinn 4 — Åpne applikasjonen
-
-Når begge containerne viser `Up (healthy)`, åpner du nettleseren:
-
-```
-http://<PROJECT_URL>:8080
-```
-
-Logg inn med administratorkontoen:
-
-| Felt | Verdi |
-|-------|-------|
-| Brukernavn | `admin` |
-| Passord | Verdien du angav for `ADMIN_PASSWORD` i `.env` |
-
-> Endre adminpassordet umiddelbart etter første innlogging fra kontoinnstillingssiden.
-
----
-
-## Trinn 5 — Kontroller alle tjenester
-
-Kontroller at alle containere kjører og er sunne:
-
-```bash
-docker compose -f docker-compose.production.yml ps
-```
-
-Forventet utdata:
-
-```
-NAME                    IMAGE                                   STATUS
-rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
-rtcloud-mysql           mysql:8.0                               Up (healthy)
-```
-
-Hvis en container viser `Up (starting)` eller `Up (unhealthy)`, vent 30–60 sekunder til og sjekk på nytt. MySQL kan ta opptil ett minutt å initialisere fullt ved første oppstart.
-
----
-
-## Portreferanse
-
-| Port | Tjeneste | Beskrivelse |
-|------|---------|-------------|
-| `8080` | rtCloud App | Hoved-nettgrensesnitt (kan konfigureres via `APP_PORT`) |
-| `3838` | Shiny Server | Analyse og R-baserte visualiseringer (kan konfigureres via `SHINY_PORT`) |
-
-MySQL (port 3306) og eventuelle valgfrie tjenester (Keycloak) er kun interne og eksponeres ikke til verten som standard.
-
----
-
-## Neste steg
-
-rtCloud-instansen din kjører nå. Vurder disse oppfølgingsoppgavene:
-
-- **Aktiver HTTPS** — Pek et domene til serveren din og konfigurer SSL med Let's Encrypt. Se [Skydistribusjon](cloud-deployment) for automatisert HTTPS-oppsett.
-- **Gjennomgå alle innstillinger** — Bla gjennom [Konfigurasjonsreferansen](configuration) for å finjustere distribusjonen for produksjon.
-- **Sett opp SSO** — Koble til en identitetsleverandør for sentralisert brukerautentisering. Se [SSO-autentisering](sso-authentication).
-- **Planlegg sikkerhetskopiene** — Gjennomgå [Vedlikehold](maintenance)-siden for sikkerhetskopierings- og oppgraderingsprosedyrer.

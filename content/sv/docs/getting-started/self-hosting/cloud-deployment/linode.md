@@ -2,105 +2,108 @@
 weight: 2
 title: "Linode (Akamai Cloud)"
 date: "2026-03-16T00:00:00+07:00"
-lastmod: "2026-03-17T01:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Driftsätt rtCloud på Linode med StackScripts och ett formulärbaserat konfigurationsgränssnitt."
+description: "Deploy rtCloud on Linode using a StackScript. No configuration needed — just create the server and follow the post-deployment steps."
 ---
 
-Linode använder **StackScripts** — skript med ett formulärbaserat gränssnitt där du fyller i konfigurationsfält direkt i Linode Manager utan att redigera någon kod.
+## Step 1 — Launch the StackScript
 
-> Linode StackScripts är den enklaste driftsättningsmetoden. Fält visas som ett formulär när du skapar en Linode — ingen skriptredigering krävs.
+**[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
+
+This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
 
 ---
 
-## Inbäddad Keycloak (rekommenderat)
+## Step 2 — Fill in Linode's form
 
-### Steg 1 — Hitta StackScript
+Fill in Linode's standard server creation form:
 
-StackScript är offentligt tillgängligt i Linode-communityn — ingen manuell konfiguration behövs:
+| Field | Recommended value |
+|-------|------------------|
+| **Image** | Ubuntu 22.04 LTS |
+| **Region** | Closest to your users |
+| **Plan** | Shared CPU 4 GB or larger |
+| **Root Password** | Set a strong password |
+| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
 
-1. Gå till **Linodes** → **Skapa Linode**
-2. Under **Välj en distribution**, välj **StackScripts** → **Community StackScripts**
-3. Sök efter **`RTA rtSurvey - Self-Hosted with Keycloak SSO`**
-4. Välj det och fyll i konfigurationsformuläret:
+Click **Create Linode** when done.
 
-> Alternativt kan du [ladda ned skriptet](/scripts/linode-stackscript-keycloak-embed.sh) och skapa ditt eget StackScript under **StackScripts** → **Skapa StackScript**.
+---
 
-| Fält | Obligatoriskt | Beskrivning |
-|-------|----------|-------------|
-| Projekt-ID | Nej | Unik identifierare (standard: `rtsurvey`). Används som databasnamn och Keycloak-klient-ID. |
-| Keycloak-adminlösenord | Nej | Lösenord för både Keycloak-adminkonsolen och appens adminlogin. Standardvärde är `admin` — **ändra efter första inloggningen**. |
-| Domän | Ja | Ditt domännamn. DNS A-post måste peka på denna Linodes IP. Krävs för HTTPS och Keycloak. |
-| Let's Encrypt-e-post | Ja | E-post för Let's Encrypt-certifikataviseringar. |
-| Docker-avbildstagg | Nej | Avbild att driftsätta (standard: `rtawebteam/rta-smartsurvey:survey-dockerize`). |
+## Step 3 — Wait for setup to complete
 
-> **Säkerhet:** Alla lösenord har standardvärdet `admin`. Ändra dem omedelbart efter din första inloggning.
+The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
 
-5. Välj **Ubuntu 22.04 LTS** som avbild
-6. Välj planen **Shared CPU 4 GB** eller större
-7. Klicka på **Skapa Linode**
+You can watch progress directly in **Linode Cloud Manager** — no SSH required:
 
-### Steg 2 — Lägg till DNS-posten
+1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
+2. Click on your newly created Linode
+3. Click **Launch LISH Console** (top right of the Linode detail page)
 
-Medan Linoden startar, lägg till en **A-post** hos din DNS-leverantör:
+A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
 
-```
-Typ  : A
-Namn : myapp          (eller @ för rotdomänen)
-Värde: <linode-ip>
-TTL  : 300
-```
+![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-### Steg 3 — Övervaka förloppet
-
-```bash
-ssh root@<linode-ip>
-tail -f /var/log/stackscript.log
-```
-
-Skriptet skriver ut din server-IP tidigt — lägg till DNS-posten så snart du ser den.
-
-### Steg 4 — Öppna appen
-
-När konfigurationen är klar visar loggen en sammanfattning:
+Wait until you see:
 
 ```
 ============================================================
- rtCloud-driftsättning klar! (Inbäddad Keycloak)
+ rtSurvey deployment complete!
 ============================================================
- App-URL   : https://myapp.example.com
+ Server IP : <your-server-ip>
+
+ App URL   : http://<your-server-ip>  (HTTP only until domain is set)
  Admin     : admin / admin
- Keycloak  : https://myapp.example.com/auth/admin
-
- !! SÄKERHET: Alla lösenord har standardvärdet 'admin'.
-    Ändra dem omedelbart efter första inloggningen.
 ============================================================
 ```
 
-Logga in med användarnamnet `admin` och lösenordet `admin`, och ändra sedan ditt lösenord omedelbart.
+The log also shows your server IP — you will need it for the next step.
 
 ---
 
-## Efter driftsättning
+## Step 4 — Set up SSL
 
-### Ändra ett lösenord
+Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-```bash
-nano /opt/rtcloud/.env
-docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
-```
+Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
 
-### Visa alla containrar
+---
 
-```bash
-docker compose -f /opt/rtcloud/docker-compose.production.yml ps
-```
+## Step 5 — First login
 
-### Kontrollera loggen
+Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+
+---
+
+## Step 6 — Change the default password
+
+All passwords default to `admin`. Change them immediately after your first login:
+
+- **App admin password** — account settings inside the app
+- **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
+
+---
+
+## Troubleshooting
+
+### Check the setup log
 
 ```bash
 tail -200 /var/log/stackscript.log
+```
+
+### Check the SSL log
+
+```bash
+tail -200 /var/log/rtsurvey-ssl.log
+```
+
+### View container status
+
+```bash
+docker compose -f /opt/rtsurvey/docker-compose.production.yml ps
 ```

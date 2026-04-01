@@ -1,178 +1,58 @@
 ---
 weight: 1
-title: "เริ่มต้นอย่างรวดเร็ว"
+title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "play_circle"
 toc: true
-description: "เรียกใช้ rtCloud บนเซิร์ฟเวอร์ของคุณเองภายใน 10 นาทีโดยใช้ Docker Compose"
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
 ---
 
-คู่มือนี้แนะนำคุณผ่านการติดตั้งอินสแตนซ์ rtCloud แบบโฮสต์ด้วยตนเองบนเซิร์ฟเวอร์ Linux ตั้งแต่ต้น เมื่อสิ้นสุด คุณจะมี rtCloud ที่ทำงานอยู่และสามารถเข้าถึงได้ในเบราว์เซอร์
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
 
-## ข้อกำหนดเบื้องต้น
+## Requirements
 
-ตรวจสอบให้แน่ใจว่าเซิร์ฟเวอร์ของคุณตรงตามข้อกำหนดต่อไปนี้ก่อนเริ่มต้น:
+### Server
 
-### ฮาร์ดแวร์
-
-| ทรัพยากร | ขั้นต่ำ | แนะนำ |
+| Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| RAM | 2 GB | 4 GB |
-| Disk | 10 GB | 40 GB |
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
 | CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### ซอฟต์แวร์
+### Domain
 
-| ซอฟต์แวร์ | เวอร์ชัน |
-|----------|---------|
-| OS | Ubuntu 20.04 LTS หรือใหม่กว่า (หรือ Linux ที่รองรับ Docker) |
-| Docker | 20.10 หรือใหม่กว่า |
-| Docker Compose | v2.x (`docker compose`) หรือ v1.x (`docker-compose`) |
-
-**ติดตั้ง Docker บน Ubuntu:**
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-ตรวจสอบการติดตั้ง:
-
-```bash
-docker --version
-docker compose version
-```
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
 
 ---
 
-## ขั้นตอนที่ 1 — รับไฟล์
+## Choose Your Cloud Provider
 
-โคลนที่เก็บการติดตั้งใช้งานไปยังเซิร์ฟเวอร์ของคุณ:
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
 
-```bash
-git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
-cd rtcloud
-```
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
----
-
-## ขั้นตอนที่ 2 — กำหนดค่าสภาพแวดล้อม
-
-คัดลอกไฟล์กำหนดค่าตัวอย่าง:
-
-```bash
-cp .env.production.sample .env
-```
-
-เปิด `.env` ในโปรแกรมแก้ไขข้อความและกรอกค่าที่จำเป็น:
-
-```dotenv
-# ตัวระบุเฉพาะสำหรับการติดตั้งนี้ (ไม่มีช่องว่าง ไม่มีอักขระพิเศษ)
-PROJECT_ID=myproject
-
-# โดเมนหรือที่อยู่ IP ที่ผู้ใช้จะเข้าถึงแอป
-# ตัวอย่าง: rtcloud.example.com  หรือ  192.168.1.100
-PROJECT_URL=rtcloud.example.com
-
-# โปรโตคอล: ใช้ "https" ถ้ามีโดเมนพร้อม SSL "http" หากไม่มี
-HTTP_PROTOCOL=https
-
-# รหัสผ่านที่แข็งแกร่งและเฉพาะ — เปลี่ยนทั้งสามก่อนเริ่มต้น
-MYSQL_PASSWORD=change_me_strong_password
-MYSQL_ROOT_PASSWORD=change_me_root_password
-ADMIN_PASSWORD=change_me_admin_password
-```
-
-> **สำคัญ:** มีเพียง `.env` เท่านั้นที่ Docker Compose อ่านโดยอัตโนมัติ อย่าสร้างไฟล์ชื่อ `.env.production` เพราะจะทำให้สับสน `ADMIN_PASSWORD` จะถูกใช้เฉพาะใน **การบูตครั้งแรก** ของฐานข้อมูลใหม่เท่านั้น
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
 ---
 
-## ขั้นตอนที่ 3 — เริ่มต้นคอนเทนเนอร์
+## What the scripts do
 
-เปิดใช้งานบริการทั้งหมดในพื้นหลัง:
+Every cloud script performs a fully unattended setup:
 
-```bash
-docker compose -f docker-compose.production.yml up -d
-```
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
 
-การเริ่มต้นครั้งแรกใช้เวลา **3–5 นาที** ขณะที่ Docker:
-
-1. ดึง image แอปพลิเคชัน rtCloud (~1 GB ดาวน์โหลด)
-2. เริ่มต้นฐานข้อมูล MySQL
-3. โหลดสคีมาฐาน
-4. รันการย้ายข้อมูลฐานข้อมูลทั้งหมดที่รอดำเนินการ
-
-ตรวจสอบความคืบหน้าการเริ่มต้นแบบเรียลไทม์:
-
-```bash
-docker compose -f docker-compose.production.yml logs -f rtcloud
-```
-
-รอจนกว่าคุณจะเห็นผลลัพธ์ที่ระบุว่าแอปพลิเคชันพร้อมแล้ว คุณยังสามารถดูสถานะความสมบูรณ์ของคอนเทนเนอร์ได้:
-
-```bash
-watch docker compose -f docker-compose.production.yml ps
-```
-
----
-
-## ขั้นตอนที่ 4 — เข้าถึงแอปพลิเคชัน
-
-เมื่อทั้งสองคอนเทนเนอร์แสดง `Up (healthy)` ให้เปิดเบราว์เซอร์:
-
-```
-http://<PROJECT_URL>:8080
-```
-
-เข้าสู่ระบบโดยใช้บัญชีผู้ดูแลระบบ:
-
-| ฟิลด์ | ค่า |
-|-------|-------|
-| Username | `admin` |
-| Password | ค่าที่คุณตั้งสำหรับ `ADMIN_PASSWORD` ใน `.env` |
-
-> เปลี่ยนรหัสผ่านผู้ดูแลระบบทันทีหลังจากเข้าสู่ระบบครั้งแรกจากหน้าการตั้งค่าบัญชี
-
----
-
-## ขั้นตอนที่ 5 — ตรวจสอบบริการทั้งหมด
-
-ตรวจสอบว่าคอนเทนเนอร์ทั้งหมดกำลังทำงานและมีสุขภาพดี:
-
-```bash
-docker compose -f docker-compose.production.yml ps
-```
-
-ผลลัพธ์ที่คาดหวัง:
-
-```
-NAME                    IMAGE                                   STATUS
-rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
-rtcloud-mysql           mysql:8.0                               Up (healthy)
-```
-
-หากคอนเทนเนอร์แสดง `Up (starting)` หรือ `Up (unhealthy)` ให้รออีก 30–60 วินาทีแล้วตรวจสอบอีกครั้ง MySQL อาจใช้เวลาถึงหนึ่งนาทีในการเริ่มต้นอย่างสมบูรณ์เมื่อบูตครั้งแรก
-
----
-
-## การอ้างอิงพอร์ต
-
-| พอร์ต | บริการ | คำอธิบาย |
-|------|---------|-------------|
-| `8080` | rtCloud App | UI เว็บหลัก (กำหนดค่าได้ผ่าน `APP_PORT`) |
-| `3838` | Shiny Server | การวิเคราะห์และการแสดงผลที่ใช้ R (กำหนดค่าได้ผ่าน `SHINY_PORT`) |
-
-MySQL (พอร์ต 3306) และบริการเสริมใดๆ (Keycloak) เป็นแบบภายในเท่านั้นและไม่ถูกเปิดเผยต่อโฮสต์ตามค่าเริ่มต้น
-
----
-
-## ขั้นตอนถัดไป
-
-อินสแตนซ์ rtCloud ของคุณกำลังทำงานอยู่แล้ว พิจารณางานติดตามเหล่านี้:
-
-- **เปิดใช้งาน HTTPS** — ชี้โดเมนไปยังเซิร์ฟเวอร์ของคุณและกำหนดค่า SSL ด้วย Let's Encrypt ดู [การติดตั้งบนคลาวด์](cloud-deployment) สำหรับการตั้งค่า HTTPS อัตโนมัติ
-- **ตรวจสอบการตั้งค่าทั้งหมด** — เรียกดู [การอ้างอิงการกำหนดค่า](configuration) เพื่อปรับแต่งการติดตั้งใช้งานสำหรับการผลิต
-- **ตั้งค่า SSO** — เชื่อมต่อผู้ให้บริการตัวตนสำหรับการยืนยันตัวตนผู้ใช้แบบรวมศูนย์ ดู [การยืนยันตัวตน SSO](sso-authentication)
-- **วางแผนการสำรองข้อมูล** — ตรวจสอบหน้า [การบำรุงรักษา](maintenance) สำหรับขั้นตอนการสำรองและอัปเกรด

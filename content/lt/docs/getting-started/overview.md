@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "Apžvalga"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "Greito paleidimo vadovas apklausai vykdyti su rtSurvey"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Pradedantiesiems"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-rtSurvey yra galinga platforma formoms kurti ir darbo eigoms valdyti, skirta duomenims efektyviai rinkti. Su rtSurvey galite:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. Kurti sudėtingas formas, kuriose yra nuotraukos, GPS vietos, praleistų klausimų logika, skaičiavimai, išoriniai duomenų rinkiniai, kelios kalbos ir dar daugiau.
-2. Rinkti duomenis naudodami mobilią programą arba žiniatinklio sąsają, su automatiniu sinchronizavimu, kai yra interneto ryšys.
-3. Lengvai analizuoti duomenis eksportuojant į CSV arba Stata, arba prijungiant rtSurvey prie „Excel", „Power BI", „Python" ar „R" dinaminėms, realiuoju laiku atnaujinamoms ataskaitoms kurti.
+---
 
-Tyrėjai, lauko komandos ir profesionalai įvairiose pramonės šakose pasitiki rtSurvey svarbių duomenų rinkimui. Štai kaip pradėti:
+## How it works
 
-## 1. Pasiekite rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-Greičiausias būdas pradėti – naudoti [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud), mūsų oficialią valdomą prieglobos paslaugą. Ji pasiekiama per rtSurvey svetainę ir sukurta ant patikimos, saugios infrastruktūros. Arba galite patalpinti rtSurvey savo infrastruktūroje, jei pageidaujate.
+---
 
-## 2. Sukurkite apklausos formą {#getting-started-create-form}
+## Before you start
 
-1. Suprojektuokite savo formą naudodami `XLSForm` arba eksperimentuokite su mūsų [Visų valdiklių forma](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0).
-2. Įkelkite XLSForm į rtSurvey Cloud ir paskelbkite, arba naudokite mūsų Formų kūrėją (Beta) vizualiai projektuoti.
+You need:
 
-## 3. Įdiekite rtSurvey programą {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-Atsisiųskite rtSurvey programą į savo mobilų įrenginį:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### „Android" įrenginiams:
-1. Apsilankykite [„Google Play" parduotuvėje](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
-2. Ieškokite „rtSurvey" ir bakstelėkite programą su rtSurvey logotipu.
-3. Spustelėkite „Įdiegti", kad atsisiųstumėte ir nustatytumėte programą.
+---
 
-### „iOS" įrenginiams:
-1. Atidarykite [„App Store"](https://apps.apple.com/vn/app/rtsurvey/id1178851547) savo įrenginyje.
-2. Ieškokite „rtSurvey" ir raskite programą su rtSurvey logotipu.
-3. Bakstelėkite „Gauti", kad atsisiųstumėte ir įdiegtumėte programą.
+## Ready?
 
-## 4. Prijunkite rtSurvey programą prie rtSurvey Cloud {#getting-started-connect}
-
-1. Sukurkite paskyrą:
-   - rtSurvey Cloud administratorius gali sukurti paskyras apklausų vykdytojams.
-   - Arba administratorius gali sugeneruoti URL, kad apklausų vykdytojai galėtų patys susikurti paskyras.
-2. Atidarykite rtSurvey programą ir prisijunkite naudodami savo paskyros prisijungimo duomenis.
-
-## 5. Vykdykite apklausą {#getting-started-fill-form}
-
-1. Programoje pasirinkite „Pildyti tuščią formą", kad pradėtumėte naują apklausą.
-2. Užpildykite formą respondento duomenimis.
-3. Užbaigus, formos duomenys automatiškai sinchronizuosis su rtSurvey Cloud, kai bus interneto ryšys.
-
-## 6. Analizuokite duomenis rtSurvey Cloud {#getting-started-use-data}
-
-1. Prisijunkite prie rtSurvey Cloud, kad pasiektumėte surinktus duomenis.
-2. Atsisiųskite duomenis įvairiais formatais, pvz., CSV arba Stata, tolesnei analizei.
-3. Naudokite integruotus analizės įrankius arba integruokite su pageidaujama duomenų analizės programine įranga.
+**[Deploy your server →](self-hosting/quick-start)**

@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "Přehled"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "Průvodce rychlým spuštěním průzkumu s rtSurvey"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Začátečníci"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-rtSurvey je výkonná platforma pro tvorbu formulářů a pracovních postupů pro efektivní sběr dat. S rtSurvey můžete:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. Vytvářet sofistikované formuláře zahrnující fotografie, GPS polohy, logiku přeskočení, výpočty, externí datové sady, více jazyků a mnoho dalšího.
-2. Shromažďovat data pomocí mobilní aplikace nebo webového rozhraní s automatickou synchronizací po připojení k internetu.
-3. Snadno analyzovat data exportem do CSV nebo Stata, nebo propojením rtSurvey s Excelem, Power BI, Pythonem nebo R pro dynamické, průběžně aktualizované přehledy.
+---
 
-Výzkumníci, terénní týmy a odborníci z různých odvětví spoléhají na rtSurvey pro svůj kritický sběr dat. Zde je návod, jak začít:
+## How it works
 
-## 1. Přístup do rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-Nejrychlejší způsob, jak začít, je použít [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud), naši oficiální spravovanou hostingovou službu. Je přístupná přes webové stránky rtSurvey a postavena na robustní a bezpečné infrastruktuře. Případně můžete rtSurvey hostovat na vlastní infrastruktuře.
+---
 
-## 2. Vytvořte svůj průzkumný formulář {#getting-started-create-form}
+## Before you start
 
-1. Navrhněte formulář pomocí `XLSForm` nebo vyzkoušejte šablonu [All Widgets](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0).
-2. Nahrajte svůj XLSForm do rtSurvey Cloud a publikujte ho, nebo použijte Form Builder (Beta) pro vizuální návrh.
+You need:
 
-## 3. Nainstalujte aplikaci rtSurvey {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-Stáhněte aplikaci rtSurvey do svého mobilního zařízení:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### Pro zařízení Android:
-1. Navštivte [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
-2. Vyhledejte „rtSurvey" a klepněte na aplikaci s logem rtSurvey.
-3. Klikněte na „Instalovat" pro stažení a nastavení aplikace.
+---
 
-### Pro zařízení iOS:
-1. Otevřete [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) na svém zařízení.
-2. Vyhledejte „rtSurvey" a najděte aplikaci s logem rtSurvey.
-3. Klepněte na „Získat" pro stažení a instalaci aplikace.
+## Ready?
 
-## 4. Připojte aplikaci rtSurvey k rtSurvey Cloud {#getting-started-connect}
-
-1. Vytvořte účet:
-   - Administrátor rtSurvey Cloud může vytvářet účty pro enumerátory.
-   - Případně může administrátor vygenerovat URL adresu, aby si enumerátoři vytvořili vlastní účty.
-2. Otevřete aplikaci rtSurvey a přihlaste se pomocí svých přihlašovacích údajů.
-
-## 5. Proveďte průzkum {#getting-started-fill-form}
-
-1. V aplikaci vyberte „Vyplnit prázdný formulář" pro zahájení nového průzkumu.
-2. Vyplňte formulář daty respondenta.
-3. Po dokončení se data formuláře automaticky synchronizují s rtSurvey Cloud při dostupném připojení k internetu.
-
-## 6. Analyzujte svá data v rtSurvey Cloud {#getting-started-use-data}
-
-1. Přihlaste se do rtSurvey Cloud pro přístup ke shromážděným datům.
-2. Stáhněte data v různých formátech jako CSV nebo Stata pro další analýzu.
-3. Využijte vestavěné analytické nástroje nebo integrujte s preferovaným softwarem pro analýzu dat.
+**[Deploy your server →](self-hosting/quick-start)**

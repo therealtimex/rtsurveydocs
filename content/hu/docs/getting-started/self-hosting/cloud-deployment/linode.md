@@ -2,105 +2,108 @@
 weight: 2
 title: "Linode (Akamai Cloud)"
 date: "2026-03-16T00:00:00+07:00"
-lastmod: "2026-03-17T01:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Az rtCloud telepítése Linode-on StackScriptekkel, amelyek űrlapalapú konfigurációs felhasználói felülettel rendelkeznek."
+description: "Deploy rtCloud on Linode using a StackScript. No configuration needed — just create the server and follow the post-deployment steps."
 ---
 
-A Linode **StackScripteket** használ — olyan szkripteket, amelyekhez űrlapalapú felhasználói felület tartozik, ahol a konfigurációs mezőket közvetlenül a Linode Managerben töltheti ki kód szerkesztése nélkül.
+## Step 1 — Launch the StackScript
 
-> A Linode StackScriptek a legegyszerűbb telepítési módszer. A mezők űrlapként jelennek meg egy Linode létrehozásakor — nincs szükség szkriptszerkesztésre.
+**[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
----
-
-## Beágyazott Keycloak (ajánlott)
-
-### 1. lépés — A StackScript megkeresése
-
-A StackScript nyilvánosan elérhető a Linode közösségben — nincs szükség kézi beállításra:
-
-1. Lépjen a **Linodes** → **Create Linode** menüpontra
-2. A **Choose a Distribution** alatt válassza a **StackScripts** → **Community StackScripts** lehetőséget
-3. Keresse az **`RTA rtSurvey - Self-Hosted with Keycloak SSO`** szkriptet
-4. Válassza ki, és töltse ki a konfigurációs űrlapot:
-
-> Alternatív megoldásként [töltse le a szkriptet](/scripts/linode-stackscript-keycloak-embed.sh), és hozzon létre saját StackScriptet a **StackScripts** → **Create StackScript** menüpont alatt.
-
-| Mező | Kötelező | Leírás |
-|-------|----------|-------------|
-| Project ID | Nem | Egyedi azonosító (alapértelmezett: `rtsurvey`). Adatbázis nevként és Keycloak kliens azonosítóként használatos. |
-| Keycloak Admin Password | Nem | Jelszó a Keycloak adminisztrátori konzolhoz és az alkalmazás rendszergazdai bejelentkezéséhez. Alapértéke `admin` — **az első bejelentkezés után változtassa meg**. |
-| Domain | Igen | Az Ön domain neve. A DNS A-rekordnak erre a Linode IP-jére kell mutatnia. HTTPS-hez és Keycloakhoz szükséges. |
-| Let's Encrypt Email | Igen | E-mail a Let's Encrypt tanúsítványértesítésekhez. |
-| Docker Image Tag | Nem | Telepítendő képfájl (alapértelmezett: `rtawebteam/rta-smartsurvey:survey-dockerize`). |
-
-> **Biztonság:** Minden jelszó alapértéke `admin`. Az első bejelentkezés után azonnal változtassa meg őket.
-
-5. Válassza az **Ubuntu 22.04 LTS** képfájlt
-6. Válassza a **Shared CPU 4 GB** csomagot vagy nagyobbat
-7. Kattintson a **Create Linode** lehetőségre
-
-### 2. lépés — A DNS-rekord hozzáadása
-
-Miközben a Linode elindul, adjon hozzá egy **A-rekordot** a DNS-szolgáltatójánál:
-
-```
-Típus  : A
-Név    : myapp          (vagy @ a gyökér domainhez)
-Érték  : <linode-ip>
-TTL    : 300
-```
-
-### 3. lépés — Folyamat figyelése
-
-```bash
-ssh root@<linode-ip>
-tail -f /var/log/stackscript.log
-```
-
-A szkript a kezdet közelében nyomtatja ki a kiszolgáló IP-jét — adja hozzá a DNS-rekordot, amint megjelenik.
-
-### 4. lépés — Az alkalmazás elérése
-
-A beállítás befejezésekor a napló összefoglalót mutat:
-
-```
-============================================================
- rtCloud telepítés kész! (Beágyazott Keycloak)
-============================================================
- Alkalmazás URL   : https://myapp.example.com
- Rendszergazda    : admin / admin
- Keycloak         : https://myapp.example.com/auth/admin
-
- !! BIZTONSÁG: Minden jelszó alapértéke 'admin'.
-    Az első bejelentkezés után azonnal változtassa meg őket.
-============================================================
-```
-
-Jelentkezzen be `admin` felhasználónévvel és `admin` jelszóval, majd azonnal változtassa meg jelszavát.
+This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
 
 ---
 
-## Telepítés után
+## Step 2 — Fill in Linode's form
 
-### Jelszó megváltoztatása
+Fill in Linode's standard server creation form:
 
-```bash
-nano /opt/rtcloud/.env
-docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+| Field | Recommended value |
+|-------|------------------|
+| **Image** | Ubuntu 22.04 LTS |
+| **Region** | Closest to your users |
+| **Plan** | Shared CPU 4 GB or larger |
+| **Root Password** | Set a strong password |
+| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+
+Click **Create Linode** when done.
+
+---
+
+## Step 3 — Wait for setup to complete
+
+The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+
+You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+
+1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
+2. Click on your newly created Linode
+3. Click **Launch LISH Console** (top right of the Linode detail page)
+
+A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+
+![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
+
+Wait until you see:
+
+```
+============================================================
+ rtSurvey deployment complete!
+============================================================
+ Server IP : <your-server-ip>
+
+ App URL   : http://<your-server-ip>  (HTTP only until domain is set)
+ Admin     : admin / admin
+============================================================
 ```
 
-### Az összes konténer megtekintése
+The log also shows your server IP — you will need it for the next step.
 
-```bash
-docker compose -f /opt/rtcloud/docker-compose.production.yml ps
-```
+---
 
-### A napló ellenőrzése
+## Step 4 — Set up SSL
+
+Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
+
+Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+
+---
+
+## Step 5 — First login
+
+Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+
+---
+
+## Step 6 — Change the default password
+
+All passwords default to `admin`. Change them immediately after your first login:
+
+- **App admin password** — account settings inside the app
+- **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
+
+---
+
+## Troubleshooting
+
+### Check the setup log
 
 ```bash
 tail -200 /var/log/stackscript.log
+```
+
+### Check the SSL log
+
+```bash
+tail -200 /var/log/rtsurvey-ssl.log
+```
+
+### View container status
+
+```bash
+docker compose -f /opt/rtsurvey/docker-compose.production.yml ps
 ```

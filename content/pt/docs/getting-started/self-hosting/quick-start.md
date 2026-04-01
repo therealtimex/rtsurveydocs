@@ -1,178 +1,58 @@
 ---
 weight: 1
-title: "Início Rápido"
+title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "play_circle"
 toc: true
-description: "Coloque o rtCloud a funcionar no seu próprio servidor em menos de 10 minutos usando Docker Compose."
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
 ---
 
-Este guia orienta-o através da implantação de uma instância rtCloud auto-alojada num servidor Linux a partir do zero. No final, terá um rtCloud acessível no seu navegador.
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
 
-## Pré-requisitos
+## Requirements
 
-Certifique-se de que o seu servidor cumpre os seguintes requisitos antes de começar:
+### Server
 
-### Hardware
-
-| Recurso | Mínimo | Recomendado |
-|---------|--------|-------------|
-| RAM | 2 GB | 4 GB |
-| Disco | 10 GB | 40 GB |
+| Resource | Minimum | Recommended |
+|----------|---------|-------------|
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
 | CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Software
+### Domain
 
-| Software | Versão |
-|----------|--------|
-| SO | Ubuntu 20.04 LTS ou mais recente (ou qualquer Linux com suporte Docker) |
-| Docker | 20.10 ou mais recente |
-| Docker Compose | v2.x (`docker compose`) ou v1.x (`docker-compose`) |
-
-**Instalar Docker no Ubuntu:**
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-Verifique a instalação:
-
-```bash
-docker --version
-docker compose version
-```
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
 
 ---
 
-## Passo 1 — Obter os Ficheiros
+## Choose Your Cloud Provider
 
-Clone o repositório de implantação para o seu servidor:
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
 
-```bash
-git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
-cd rtcloud
-```
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
----
-
-## Passo 2 — Configurar o Ambiente
-
-Copie o ficheiro de configuração de exemplo:
-
-```bash
-cp .env.production.sample .env
-```
-
-Abra o `.env` num editor de texto e preencha os valores necessários:
-
-```dotenv
-# Identificador único para esta implantação (sem espaços, sem caracteres especiais)
-PROJECT_ID=myproject
-
-# Domínio ou endereço IP onde os utilizadores acederão à aplicação
-# Exemplo: rtcloud.example.com  ou  192.168.1.100
-PROJECT_URL=rtcloud.example.com
-
-# Protocolo: use "https" se tiver um domínio com SSL, "http" caso contrário
-HTTP_PROTOCOL=https
-
-# Palavras-passe fortes e únicas — altere as três antes de iniciar
-MYSQL_PASSWORD=change_me_strong_password
-MYSQL_ROOT_PASSWORD=change_me_root_password
-ADMIN_PASSWORD=change_me_admin_password
-```
-
-> **Importante:** Apenas `.env` é lido automaticamente pelo Docker Compose. Não crie um ficheiro chamado `.env.production`, pois isso causaria confusão. O `ADMIN_PASSWORD` é aplicado apenas na **primeira inicialização** de uma base de dados nova.
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
 ---
 
-## Passo 3 — Iniciar os Contentores
+## What the scripts do
 
-Lance todos os serviços em segundo plano:
+Every cloud script performs a fully unattended setup:
 
-```bash
-docker compose -f docker-compose.production.yml up -d
-```
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
 
-A primeira inicialização demora **3–5 minutos** enquanto o Docker:
-
-1. Descarrega a imagem da aplicação rtCloud (~1 GB de download)
-2. Inicializa a base de dados MySQL
-3. Carrega o esquema base
-4. Executa todas as migrações de base de dados pendentes
-
-Monitorize o progresso de inicialização em tempo real:
-
-```bash
-docker compose -f docker-compose.production.yml logs -f rtcloud
-```
-
-Aguarde até ver a saída indicando que a aplicação está pronta. Também pode observar o estado de saúde do contentor:
-
-```bash
-watch docker compose -f docker-compose.production.yml ps
-```
-
----
-
-## Passo 4 — Aceder à Aplicação
-
-Assim que ambos os contentores mostrarem `Up (healthy)`, abra o seu navegador:
-
-```
-http://<PROJECT_URL>:8080
-```
-
-Inicie sessão usando a conta de administrador:
-
-| Campo | Valor |
-|-------|-------|
-| Nome de utilizador | `admin` |
-| Palavra-passe | O valor que definiu para `ADMIN_PASSWORD` em `.env` |
-
-> Altere a palavra-passe do administrador imediatamente após o seu primeiro início de sessão na página de configurações da conta.
-
----
-
-## Passo 5 — Verificar Todos os Serviços
-
-Verifique se todos os contentores estão a funcionar e saudáveis:
-
-```bash
-docker compose -f docker-compose.production.yml ps
-```
-
-Saída esperada:
-
-```
-NAME                    IMAGE                                   STATUS
-rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
-rtcloud-mysql           mysql:8.0                               Up (healthy)
-```
-
-Se um contentor mostrar `Up (starting)` ou `Up (unhealthy)`, aguarde 30–60 segundos adicionais e verifique novamente. O MySQL pode demorar até um minuto para inicializar completamente na primeira inicialização.
-
----
-
-## Referência de Portas
-
-| Porta | Serviço | Descrição |
-|-------|---------|-----------|
-| `8080` | Aplicação rtCloud | UI web principal (configurável via `APP_PORT`) |
-| `3838` | Servidor Shiny | Análises e visualizações baseadas em R (configurável via `SHINY_PORT`) |
-
-O MySQL (porta 3306) e quaisquer serviços opcionais (Keycloak) são apenas internos e não são expostos ao host por predefinição.
-
----
-
-## Próximos Passos
-
-A sua instância rtCloud está agora a funcionar. Considere estas tarefas de seguimento:
-
-- **Ativar HTTPS** — Aponte um domínio para o seu servidor e configure SSL com Let's Encrypt. Consulte [Implantação na Cloud](cloud-deployment) para configuração HTTPS automatizada.
-- **Rever todas as configurações** — Consulte a [Referência de Configuração](configuration) para ajustar a sua implantação para produção.
-- **Configurar SSO** — Ligue um fornecedor de identidade para autenticação centralizada de utilizadores. Consulte [Autenticação SSO](sso-authentication).
-- **Planear os seus backups** — Consulte a página de [Manutenção](maintenance) para procedimentos de backup e atualização.

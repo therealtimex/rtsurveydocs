@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "Overzicht"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "Een snelstartgids voor het uitvoeren van een enquête met rtSurvey"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Beginners"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-rtSurvey is een krachtig platform voor het bouwen van formulieren en workflows om gegevens efficiënt te verzamelen. Met rtSurvey kunt u:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. Geavanceerde formulieren maken met foto's, GPS-locaties, sla-logica, berekeningen, externe datasets, meerdere talen en meer.
-2. Gegevens verzamelen via de mobiele app of webinterface, met automatische synchronisatie zodra een internetverbinding beschikbaar is.
-3. Gegevens moeiteloos analyseren door te exporteren naar CSV of Stata, of door rtSurvey te koppelen aan Excel, Power BI, Python of R voor dynamische, live-bijwerkende dashboards.
+---
 
-Onderzoekers, veldteams en professionals in verschillende sectoren vertrouwen op rtSurvey voor hun kritieke behoeften op het gebied van gegevensverzameling. Zo kunt u aan de slag gaan:
+## How it works
 
-## 1. Toegang tot rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-De snelste manier om te beginnen is door gebruik te maken van [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud), onze officiële beheerde hostingservice. Het is toegankelijk via de rtSurvey-website en gebouwd op een robuuste, veilige infrastructuur. Als alternatief kunt u rtSurvey op uw eigen infrastructuur hosten.
+---
 
-## 2. Maak uw enquêteformulier {#getting-started-create-form}
+## Before you start
 
-1. Ontwerp uw formulier met `XLSForm` of experimenteer met ons [Alle Widgets formulier](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0)-sjabloon.
-2. Upload uw XLSForm naar rtSurvey Cloud en publiceer het, of gebruik onze Form Builder (Beta) voor een visuele ontwerpervaring.
+You need:
 
-## 3. Installeer de rtSurvey App {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-Download de rtSurvey-app op uw mobiele apparaat:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### Voor Android-apparaten:
-1. Bezoek de [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
-2. Zoek naar "rtSurvey" en tik op de app met het rtSurvey-logo.
-3. Klik op "Installeren" om de app te downloaden en in te stellen.
+---
 
-### Voor iOS-apparaten:
-1. Open de [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) op uw apparaat.
-2. Zoek naar "rtSurvey" en zoek de app met het rtSurvey-logo.
-3. Tik op "Ontvangen" om de app te downloaden en te installeren.
+## Ready?
 
-## 4. Verbind de rtSurvey App met rtSurvey Cloud {#getting-started-connect}
-
-1. Maak een account aan:
-   - Een rtSurvey Cloud-beheerder kan accounts aanmaken voor enquêteurs.
-   - Als alternatief kan de beheerder een URL genereren waarmee enquêteurs hun eigen accounts kunnen aanmaken.
-2. Open de rtSurvey App en log in met uw accountgegevens.
-
-## 5. Voer uw enquête uit {#getting-started-fill-form}
-
-1. Selecteer in de app "Leeg formulier invullen" om een nieuwe enquête te starten.
-2. Vul het formulier in met respondentgegevens.
-3. Na voltooiing worden de formuliergegevens automatisch gesynchroniseerd met rtSurvey Cloud zodra een internetverbinding beschikbaar is.
-
-## 6. Analyseer uw gegevens in rtSurvey Cloud {#getting-started-use-data}
-
-1. Log in op rtSurvey Cloud om toegang te krijgen tot uw verzamelde gegevens.
-2. Download uw gegevens in verschillende formaten zoals CSV of Stata voor verdere analyse.
-3. Gebruik ingebouwde analysetools of integreer met uw favoriete gegevensanalysesoftware.
+**[Deploy your server →](self-hosting/quick-start)**

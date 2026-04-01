@@ -1,178 +1,58 @@
 ---
 weight: 1
-title: "Pikaopas"
+title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "play_circle"
 toc: true
-description: "Käynnistä rtCloud omalla palvelimellasi alle 10 minuutissa Docker Composen avulla."
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
 ---
 
-Tämä opas opastaa sinua käyttöönottamaan itse isännöidyn rtCloud-instanssin Linux-palvelimelle alusta alkaen. Lopussa sinulla on toimiva rtCloud, johon pääset käsiksi selaimellasi.
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
 
-## Edellytykset
+## Requirements
 
-Varmista, että palvelimesi täyttää seuraavat vaatimukset ennen aloittamista:
+### Server
 
-### Laitteisto
-
-| Resurssi | Minimi | Suositeltu |
+| Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| RAM | 2 Gt | 4 Gt |
-| Levy | 10 Gt | 40 Gt |
-| CPU | 1 vCPU | 2 vCPU |
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Ohjelmisto
+### Domain
 
-| Ohjelmisto | Versio |
-|----------|---------|
-| Käyttöjärjestelmä | Ubuntu 20.04 LTS tai uudempi (tai mikä tahansa Linux Docker-tuella) |
-| Docker | 20.10 tai uudempi |
-| Docker Compose | v2.x (`docker compose`) tai v1.x (`docker-compose`) |
-
-**Asenna Docker Ubuntuun:**
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-Vahvista asennus:
-
-```bash
-docker --version
-docker compose version
-```
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
 
 ---
 
-## Vaihe 1 — Hanki tiedostot
+## Choose Your Cloud Provider
 
-Kloonaa käyttöönottotietovarasto palvelimellesi:
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
 
-```bash
-git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
-cd rtcloud
-```
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
----
-
-## Vaihe 2 — Konfiguroi ympäristö
-
-Kopioi näytekonfiguraatiotiedosto:
-
-```bash
-cp .env.production.sample .env
-```
-
-Avaa `.env` tekstieditorissa ja täytä vaaditut arvot:
-
-```dotenv
-# Tämän käyttöönoton yksilöllinen tunniste (ei välilyöntejä tai erikoismerkkejä)
-PROJECT_ID=myproject
-
-# Verkkotunnus tai IP-osoite, josta käyttäjät pääsevät sovellukseen
-# Esimerkki: rtcloud.example.com  tai  192.168.1.100
-PROJECT_URL=rtcloud.example.com
-
-# Protokolla: käytä "https" jos sinulla on verkkotunnus SSL:llä, muuten "http"
-HTTP_PROTOCOL=https
-
-# Vahvat, yksilölliset salasanat — vaihda kaikki kolme ennen käynnistystä
-MYSQL_PASSWORD=vaihda_vahva_salasana
-MYSQL_ROOT_PASSWORD=vaihda_root_salasana
-ADMIN_PASSWORD=vaihda_admin_salasana
-```
-
-> **Tärkeää:** Vain `.env` luetaan Docker Composen toimesta automaattisesti. Älä luo tiedostoa nimeltä `.env.production`, sillä se aiheuttaisi sekaannusta. `ADMIN_PASSWORD` otetaan käyttöön vain uuden tietokannan **ensimmäisellä käynnistyksellä**.
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
 ---
 
-## Vaihe 3 — Käynnistä kontit
+## What the scripts do
 
-Käynnistä kaikki palvelut taustalla:
+Every cloud script performs a fully unattended setup:
 
-```bash
-docker compose -f docker-compose.production.yml up -d
-```
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
 
-Ensimmäinen käynnistys kestää **3–5 minuuttia**, kun Docker:
-
-1. Hakee rtCloud-sovelluskuvan (~1 Gt lataus)
-2. Alustaa MySQL-tietokannan
-3. Lataa perusskeeman
-4. Ajaa kaikki odottavat tietokannan migraatiot
-
-Seuraa käynnistyksen edistymistä reaaliajassa:
-
-```bash
-docker compose -f docker-compose.production.yml logs -f rtcloud
-```
-
-Odota, kunnes näet tulosteen, joka osoittaa sovelluksen olevan valmis. Voit myös seurata kontin terveydentilaa:
-
-```bash
-watch docker compose -f docker-compose.production.yml ps
-```
-
----
-
-## Vaihe 4 — Käytä sovellusta
-
-Kun molemmat kontit näyttävät `Up (healthy)`, avaa selaimesi:
-
-```
-http://<PROJECT_URL>:8080
-```
-
-Kirjaudu sisään järjestelmänvalvojatilillä:
-
-| Kenttä | Arvo |
-|-------|-------|
-| Käyttäjätunnus | `admin` |
-| Salasana | `.env`-tiedostoon asettamasi `ADMIN_PASSWORD`-arvo |
-
-> Vaihda järjestelmänvalvojan salasana välittömästi ensimmäisen kirjautumisen jälkeen tiliasetuksista.
-
----
-
-## Vaihe 5 — Tarkista kaikki palvelut
-
-Varmista, että kaikki kontit toimivat ja ovat terveitä:
-
-```bash
-docker compose -f docker-compose.production.yml ps
-```
-
-Odotettu tulos:
-
-```
-NAME                    IMAGE                                   STATUS
-rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
-rtcloud-mysql           mysql:8.0                               Up (healthy)
-```
-
-Jos kontti näyttää `Up (starting)` tai `Up (unhealthy)`, odota 30–60 sekuntia ja tarkista uudelleen. MySQL voi kestää jopa minuutin täysin alustuakseen ensimmäisellä käynnistyksellä.
-
----
-
-## Porttien viite
-
-| Portti | Palvelu | Kuvaus |
-|------|---------|-------------|
-| `8080` | rtCloud-sovellus | Pääverkkokäyttöliittymä (konfiguroitavissa `APP_PORT`-muuttujalla) |
-| `3838` | Shiny Server | Analytiikka ja R-pohjaiset visualisoinnit (konfiguroitavissa `SHINY_PORT`-muuttujalla) |
-
-MySQL (portti 3306) ja mahdolliset valinnaiset palvelut (Keycloak) ovat vain sisäisiä eivätkä oletuksena näy isännälle.
-
----
-
-## Seuraavat vaiheet
-
-rtCloud-instanssisi toimii nyt. Harkitse näitä jatkotoimia:
-
-- **Ota HTTPS käyttöön** — Osoita verkkotunnus palvelimellesi ja konfiguroi SSL Let's Encryptillä. Katso automatisoitu HTTPS-asetukset kohdasta [Pilvikäyttöönotto](cloud-deployment).
-- **Tarkista kaikki asetukset** — Selaa [Konfigurointiviite](configuration) virittääksesi käyttöönottosi tuotantoon.
-- **Aseta SSO** — Yhdistä identiteetintarjoaja keskitettyä käyttäjätodennusta varten. Katso [SSO-todennus](sso-authentication).
-- **Suunnittele varmuuskopiointisi** — Tarkista varmuuskopiointi- ja päivitysmenettelyt kohdasta [Ylläpito](maintenance).

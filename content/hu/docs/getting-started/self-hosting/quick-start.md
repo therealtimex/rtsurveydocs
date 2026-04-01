@@ -1,178 +1,58 @@
 ---
 weight: 1
-title: "Gyors kezdés"
+title: "Quick Start"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "play_circle"
 toc: true
-description: "Az rtCloud futtatása saját kiszolgálón 10 percen belül Docker Compose segítségével."
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
 ---
 
-Ez az útmutató végigvezeti Önt egy saját rtCloud-példány nulláról való telepítésén egy Linux-kiszolgálón. A végére egy böngészőben elérhető, működő rtCloud-ja lesz.
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
 
-## Előfeltételek
+## Requirements
 
-A kezdés előtt győződjön meg arról, hogy a kiszolgáló megfelel a következő követelményeknek:
+### Server
 
-### Hardver
-
-| Erőforrás | Minimum | Ajánlott |
+| Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| RAM | 2 GB | 4 GB |
-| Lemez | 10 GB | 40 GB |
-| CPU | 1 vCPU | 2 vCPU |
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Szoftver
+### Domain
 
-| Szoftver | Verzió |
-|----------|---------|
-| OS | Ubuntu 20.04 LTS vagy újabb (vagy bármely Linux Docker-támogatással) |
-| Docker | 20.10 vagy újabb |
-| Docker Compose | v2.x (`docker compose`) vagy v1.x (`docker-compose`) |
-
-**A Docker telepítése Ubuntu-n:**
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-A telepítés ellenőrzése:
-
-```bash
-docker --version
-docker compose version
-```
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
 
 ---
 
-## 1. lépés — A fájlok letöltése
+## Choose Your Cloud Provider
 
-Klónozza a telepítési tárolót a kiszolgálóra:
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
 
-```bash
-git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
-cd rtcloud
-```
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
----
-
-## 2. lépés — A környezet konfigurálása
-
-Másolja a minta konfigurációs fájlt:
-
-```bash
-cp .env.production.sample .env
-```
-
-Nyissa meg a `.env` fájlt egy szövegszerkesztőben, és töltse ki a szükséges értékeket:
-
-```dotenv
-# Egyedi azonosító ehhez a telepítéshez (szóközök és különleges karakterek nélkül)
-PROJECT_ID=myproject
-
-# Domain vagy IP-cím, ahol a felhasználók elérik az alkalmazást
-# Példa: rtcloud.example.com  vagy  192.168.1.100
-PROJECT_URL=rtcloud.example.com
-
-# Protokoll: használjon "https"-t, ha van SSL-lel rendelkező domainje, egyébként "http"-t
-HTTP_PROTOCOL=https
-
-# Erős, egyedi jelszavak — mindhárom megváltoztatása az indítás előtt
-MYSQL_PASSWORD=change_me_strong_password
-MYSQL_ROOT_PASSWORD=change_me_root_password
-ADMIN_PASSWORD=change_me_admin_password
-```
-
-> **Fontos:** A Docker Compose csak a `.env` fájlt olvassa be automatikusan. Ne hozzon létre `.env.production` nevű fájlt, mert az zavart okozna. Az `ADMIN_PASSWORD` csak egy friss adatbázis **első indításakor** kerül alkalmazásra.
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
 ---
 
-## 3. lépés — A konténerek elindítása
+## What the scripts do
 
-Indítsa el az összes szolgáltatást a háttérben:
+Every cloud script performs a fully unattended setup:
 
-```bash
-docker compose -f docker-compose.production.yml up -d
-```
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
 
-Az első indítás **3–5 percet** vesz igénybe, míg a Docker:
-
-1. Letölti az rtCloud alkalmazás képfájlját (~1 GB letöltés)
-2. Inicializálja a MySQL adatbázist
-3. Betölti az alap sémát
-4. Lefuttatja az összes függőben lévő adatbázis-migrációt
-
-Az indítási folyamat valós idejű figyelése:
-
-```bash
-docker compose -f docker-compose.production.yml logs -f rtcloud
-```
-
-Várjon, amíg az alkalmazás készenlétét jelző kimenet meg nem jelenik. A konténer állapotát is figyelheti:
-
-```bash
-watch docker compose -f docker-compose.production.yml ps
-```
-
----
-
-## 4. lépés — Az alkalmazás elérése
-
-Ha mindkét konténer `Up (healthy)` állapotot mutat, nyissa meg a böngészőt:
-
-```
-http://<PROJECT_URL>:8080
-```
-
-Jelentkezzen be a rendszergazdai fiókkal:
-
-| Mező | Érték |
-|-------|-------|
-| Felhasználónév | `admin` |
-| Jelszó | A `.env` fájlban az `ADMIN_PASSWORD` értékéhez beállított érték |
-
-> Az első bejelentkezés után azonnal változtassa meg a rendszergazdai jelszót a fiókbeállítások oldalon.
-
----
-
-## 5. lépés — Az összes szolgáltatás ellenőrzése
-
-Ellenőrizze, hogy az összes konténer fut és egészséges-e:
-
-```bash
-docker compose -f docker-compose.production.yml ps
-```
-
-Várt kimenet:
-
-```
-NAME                    IMAGE                                   STATUS
-rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
-rtcloud-mysql           mysql:8.0                               Up (healthy)
-```
-
-Ha egy konténer `Up (starting)` vagy `Up (unhealthy)` állapotot mutat, várjon még 30–60 másodpercet, majd ellenőrizze újra. A MySQL akár egy percig is eltarthat, amíg az első indításkor teljesen inicializálódik.
-
----
-
-## Portok referenciája
-
-| Port | Szolgáltatás | Leírás |
-|------|---------|-------------|
-| `8080` | rtCloud alkalmazás | Fő webes felület (konfigurálható az `APP_PORT` segítségével) |
-| `3838` | Shiny Server | Elemzések és R-alapú vizualizációk (konfigurálható a `SHINY_PORT` segítségével) |
-
-A MySQL (3306-os port) és az opcionális szolgáltatások (Keycloak) csak belsők, alapértelmezés szerint nem érhetők el a gazdagépről.
-
----
-
-## Következő lépések
-
-Az rtCloud-példány most fut. Fontolja meg a következő feladatokat:
-
-- **HTTPS engedélyezése** — Irányítson egy domaint a kiszolgálójára, és konfigurálja az SSL-t a Let's Encrypt segítségével. Tekintse meg a [Felhőtelepítés](cloud-deployment) oldalt az automatizált HTTPS-beállításhoz.
-- **Az összes beállítás áttekintése** — Böngéssze a [Konfigurációs referencia](configuration) oldalt, hogy a telepítést éles környezethez hangolja.
-- **SSO beállítása** — Csatlakoztasson identitásszolgáltatót a centralizált felhasználói hitelesítéshez. Tekintse meg az [SSO-hitelesítés](sso-authentication) oldalt.
-- **Biztonsági mentések tervezése** — Tekintse meg a [Karbantartás](maintenance) oldalt a biztonsági mentési és frissítési eljárásokhoz.

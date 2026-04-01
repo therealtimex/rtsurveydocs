@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "Ikhtisar"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "Panduan cepat untuk menjalankan survei dengan rtSurvey"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Pemula"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-rtSurvey adalah platform yang canggih untuk membangun formulir dan alur kerja guna mengumpulkan data secara efisien. Dengan rtSurvey, Anda dapat:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. Membuat formulir yang canggih yang menggabungkan foto, lokasi GPS, logika lewati, kalkulasi, dataset eksternal, berbagai bahasa, dan banyak lagi.
-2. Mengumpulkan data menggunakan aplikasi mobile maupun antarmuka web, dengan sinkronisasi otomatis ketika koneksi internet tersedia.
-3. Menganalisis data dengan mudah dengan mengekspor ke CSV atau Stata, atau dengan menghubungkan rtSurvey ke Excel, Power BI, Python, atau R untuk dasbor yang diperbarui secara langsung.
+---
 
-Peneliti, tim lapangan, dan para profesional di berbagai industri mengandalkan rtSurvey untuk kebutuhan pengumpulan data kritis mereka. Berikut cara memulainya:
+## How it works
 
-## 1. Akses rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-Cara tercepat untuk memulai adalah dengan menggunakan [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud), layanan hosting terkelola resmi kami. Layanan ini dapat diakses melalui situs web rtSurvey dan dibangun di atas infrastruktur yang tangguh dan aman. Sebagai alternatif, Anda dapat meng-hosting rtSurvey di infrastruktur Anda sendiri jika diinginkan.
+---
 
-## 2. Buat Formulir Survei Anda {#getting-started-create-form}
+## Before you start
 
-1. Rancang formulir Anda menggunakan `XLSForm` atau bereksperimen dengan template [formulir Semua Widget](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0) kami.
-2. Unggah XLSForm Anda ke rtSurvey Cloud dan publikasikan, atau gunakan Form Builder (Beta) kami untuk pengalaman desain visual.
+You need:
 
-## 3. Pasang Aplikasi rtSurvey {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-Unduh aplikasi rtSurvey di perangkat mobile Anda:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### Untuk Perangkat Android:
-1. Kunjungi [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
-2. Cari "rtSurvey" dan ketuk aplikasi dengan logo rtSurvey.
-3. Klik "Instal" untuk mengunduh dan menyiapkan aplikasi.
+---
 
-### Untuk Perangkat iOS:
-1. Buka [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) di perangkat Anda.
-2. Cari "rtSurvey" dan temukan aplikasi dengan logo rtSurvey.
-3. Ketuk "Dapatkan" untuk mengunduh dan memasang aplikasi.
+## Ready?
 
-## 4. Hubungkan Aplikasi rtSurvey ke rtSurvey Cloud {#getting-started-connect}
-
-1. Buat akun:
-   - Admin rtSurvey Cloud dapat membuat akun untuk enumerator.
-   - Sebagai alternatif, Admin dapat membuat URL bagi enumerator untuk membuat akun mereka sendiri.
-2. Buka Aplikasi rtSurvey dan masuk dengan kredensial akun Anda.
-
-## 5. Lakukan Survei Anda {#getting-started-fill-form}
-
-1. Di aplikasi, pilih "Isi Formulir Kosong" untuk memulai survei baru.
-2. Lengkapi formulir dengan data responden.
-3. Setelah selesai, data formulir akan otomatis disinkronkan dengan rtSurvey Cloud ketika koneksi internet tersedia.
-
-## 6. Analisis Data Anda di rtSurvey Cloud {#getting-started-use-data}
-
-1. Masuk ke rtSurvey Cloud untuk mengakses data yang telah dikumpulkan.
-2. Unduh data Anda dalam berbagai format seperti CSV atau Stata untuk analisis lebih lanjut.
-3. Gunakan alat analisis bawaan atau integrasikan dengan perangkat lunak analisis data pilihan Anda.
+**[Deploy your server →](self-hosting/quick-start)**

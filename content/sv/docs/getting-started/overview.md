@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "Översikt"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "En snabbstartsguide för att genomföra en undersökning med rtSurvey"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Nybörjare"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-rtSurvey är en kraftfull plattform för att bygga formulär och arbetsflöden för att samla in data effektivt. Med rtSurvey kan du:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. Skapa sofistikerade formulär som inkluderar foton, GPS-platser, hopplogik, beräkningar, externa datauppsättningar, flera språk och mycket mer.
-2. Samla in data med antingen mobilappen eller webbgränssnittet, med automatisk synkronisering när en internetanslutning finns tillgänglig.
-3. Analysera data enkelt genom att exportera till CSV eller Stata, eller genom att ansluta rtSurvey till Excel, Power BI, Python eller R för dynamiska dashboardar med liveuppdateringar.
+---
 
-Forskare, fältteam och yrkesverksamma inom olika branscher förlitar sig på rtSurvey för sina kritiska datainsamlingsbehov. Så här kommer du igång:
+## How it works
 
-## 1. Få tillgång till rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-Det snabbaste sättet att börja är att använda [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud), vår officiella hanterade värdtjänst. Den är tillgänglig via rtSurveys webbplats och byggd på en robust, säker infrastruktur. Alternativt kan du själv hosta rtSurvey på din egen infrastruktur om du föredrar det.
+---
 
-## 2. Skapa ditt undersökningsformulär {#getting-started-create-form}
+## Before you start
 
-1. Designa ditt formulär med XLSForm eller experimentera med vår [All Widgets-formulärsmall](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0).
-2. Ladda upp ditt XLSForm till rtSurvey Cloud och publicera det, eller använd vår Form Builder (Beta) för en visuell designupplevelse.
+You need:
 
-## 3. Installera rtSurvey-appen {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-Ladda ned rtSurvey-appen på din mobila enhet:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### För Android-enheter:
-1. Besök [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
-2. Sök efter "rtSurvey" och tryck på appen med rtSurvey-logotypen.
-3. Klicka på "Installera" för att ladda ned och konfigurera appen.
+---
 
-### För iOS-enheter:
-1. Öppna [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) på din enhet.
-2. Sök efter "rtSurvey" och hitta appen med rtSurvey-logotypen.
-3. Tryck på "Hämta" för att ladda ned och installera appen.
+## Ready?
 
-## 4. Anslut rtSurvey-appen till rtSurvey Cloud {#getting-started-connect}
-
-1. Skapa ett konto:
-   - En rtSurvey Cloud-administratör kan skapa konton för intervjuare.
-   - Alternativt kan administratören generera en URL som intervjuare kan använda för att skapa egna konton.
-2. Öppna rtSurvey-appen och logga in med dina kontouppgifter.
-
-## 5. Genomför din undersökning {#getting-started-fill-form}
-
-1. I appen väljer du "Fyll i tomt formulär" för att starta en ny undersökning.
-2. Fyll i formuläret med respondentdata.
-3. När det är klart synkroniseras formulärdata automatiskt med rtSurvey Cloud när en internetanslutning finns tillgänglig.
-
-## 6. Analysera dina data i rtSurvey Cloud {#getting-started-use-data}
-
-1. Logga in på rtSurvey Cloud för att komma åt dina insamlade data.
-2. Ladda ned dina data i olika format, till exempel CSV eller Stata, för vidare analys.
-3. Använd inbyggda analysverktyg eller integrera med din föredragna dataanalysprogrukvara.
+**[Deploy your server →](self-hosting/quick-start)**

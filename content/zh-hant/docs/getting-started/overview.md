@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
-title: "概覽"
+author: "rtSurvey"
+title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "使用 rtSurvey 進行問卷調查的快速入門指南"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Beginners"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-rtSurvey 是一個強大的平台，可建立表單和工作流程，高效收集資料。使用 rtSurvey，您可以：
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. 建立包含照片、GPS 位置、跳題邏輯、計算功能、外部資料集、多種語言等功能的複雜表單。
-2. 使用行動應用程式或網頁介面收集資料，當有網際網路連線時自動同步。
-3. 透過匯出至 CSV 或 Stata，或將 rtSurvey 連接至 Excel、Power BI、Python 或 R，輕鬆進行資料分析，建立動態即時更新的儀表板。
+---
 
-研究人員、現場團隊及各行各業的專業人士都依賴 rtSurvey 進行關鍵資料收集。以下是入門步驟：
+## How it works
 
-## 1. 存取 rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-最快速的開始方式是使用 [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud)——我們的官方託管服務。可透過 rtSurvey 網站存取，建立於強健、安全的基礎架構之上。如果需要，您也可以選擇在自己的基礎架構上自行託管 rtSurvey。
+---
 
-## 2. 建立您的問卷表單 {#getting-started-create-form}
+## Before you start
 
-1. 使用 `XLSForm` 設計表單，或使用我們的[全部小工具表單](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0)模板進行實驗。
-2. 將您的 XLSForm 上傳至 rtSurvey Cloud 並發布，或使用我們的表單建立器（測試版）進行視覺化設計。
+You need:
 
-## 3. 安裝 rtSurvey 應用程式 {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-在您的行動裝置上下載 rtSurvey 應用程式：
+No prior Docker knowledge required — the deployment script handles everything.
 
-### 適用於 Android 裝置：
-1. 前往 [Google Play 商店](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey)。
-2. 搜尋「rtSurvey」並點選帶有 rtSurvey 標誌的應用程式。
-3. 點選「安裝」以下載並設定應用程式。
+---
 
-### 適用於 iOS 裝置：
-1. 在您的裝置上開啟 [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547)。
-2. 搜尋「rtSurvey」並找到帶有 rtSurvey 標誌的應用程式。
-3. 點選「取得」以下載並安裝應用程式。
+## Ready?
 
-## 4. 將 rtSurvey 應用程式連接至 rtSurvey Cloud {#getting-started-connect}
-
-1. 建立帳號：
-   - rtSurvey Cloud 管理員可為調查員建立帳號。
-   - 或者，管理員可以生成 URL 供調查員自行建立帳號。
-2. 開啟 rtSurvey 應用程式，使用您的帳號憑證登入。
-
-## 5. 進行問卷調查 {#getting-started-fill-form}
-
-1. 在應用程式中選取「填寫空白表單」以開始新的問卷調查。
-2. 填寫受訪者的資料。
-3. 完成後，當有網際網路連線時，表單資料將自動與 rtSurvey Cloud 同步。
-
-## 6. 在 rtSurvey Cloud 中分析您的資料 {#getting-started-use-data}
-
-1. 登入 rtSurvey Cloud 以存取您收集的資料。
-2. 將資料下載為各種格式（如 CSV 或 Stata）以進行進一步分析。
-3. 使用內建分析工具，或與您偏好的資料分析軟體整合。
+**[Deploy your server →](self-hosting/quick-start)**

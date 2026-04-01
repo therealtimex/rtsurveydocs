@@ -1,106 +1,109 @@
 ---
 weight: 2
-title: "Linode（Akamai Cloud）"
+title: "Linode (Akamai Cloud)"
 date: "2026-03-16T00:00:00+07:00"
-lastmod: "2026-03-17T01:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "フォームベースの設定UIを持つStackScriptsを使ってLinodeにrtCloudをデプロイする。"
+description: "Deploy rtCloud on Linode using a StackScript. No configuration needed — just create the server and follow the post-deployment steps."
 ---
 
-Linodeは**StackScripts**を使用します — コードを編集せずにLinodeマネージャーで直接設定フィールドを入力するフォームベースのUIを持つスクリプトです。
+## Step 1 — Launch the StackScript
 
-> Linode StackScriptsは最も簡単なデプロイ方法です。Linodeを作成する際にフィールドがフォームとして表示されます — スクリプトの編集は不要です。
+**[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
+
+This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
 
 ---
 
-## 組み込みKeycloak（推奨）
+## Step 2 — Fill in Linode's form
 
-### ステップ1 — StackScriptを見つける
+Fill in Linode's standard server creation form:
 
-StackScriptはLinodeコミュニティで公開されています — 手動セットアップは不要です：
+| Field | Recommended value |
+|-------|------------------|
+| **Image** | Ubuntu 22.04 LTS |
+| **Region** | Closest to your users |
+| **Plan** | Shared CPU 4 GB or larger |
+| **Root Password** | Set a strong password |
+| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
 
-1. **Linodes** → **Linodeを作成**に移動する
-2. **ディストリビューションを選択**で、**StackScripts** → **コミュニティStackScripts**を選択する
-3. **`RTA rtSurvey - Self-Hosted with Keycloak SSO`**を検索する
-4. 選択して設定フォームを入力する：
+Click **Create Linode** when done.
 
-> または、[スクリプトをダウンロード](/scripts/linode-stackscript-keycloak-embed.sh)して**StackScripts** → **StackScriptを作成**から独自のStackScriptを作成することもできます。
+---
 
-| フィールド | 必須 | 説明 |
-|-------|----------|-------------|
-| プロジェクトID | いいえ | 一意の識別子（デフォルト：`rtsurvey`）。データベース名とKeycloakクライアントIDとして使用される。 |
-| Keycloak管理者パスワード | いいえ | Keycloak管理コンソールとアプリ管理者ログインの両方のパスワード。デフォルトは`admin` — **初回ログイン後すぐに変更すること**。 |
-| ドメイン | はい | ドメイン名。DNSのAレコードがこのLinodeのIPを指している必要がある。HTTPSとKeycloakに必要。 |
-| Let's Encryptメール | はい | Let's Encrypt証明書通知用メール。 |
-| Dockerイメージタグ | いいえ | デプロイするイメージ（デフォルト：`rtawebteam/rta-smartsurvey:survey-dockerize`）。 |
+## Step 3 — Wait for setup to complete
 
-> **セキュリティ：** すべてのパスワードはデフォルトで`admin`です。初回ログイン後すぐに変更してください。
+The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
 
-5. イメージとして**Ubuntu 22.04 LTS**を選択する
-6. **Shared CPU 4 GB**プラン以上を選択する
-7. **Linodeを作成**をクリックする
+You can watch progress directly in **Linode Cloud Manager** — no SSH required:
 
-### ステップ2 — DNSレコードを追加する
+1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
+2. Click on your newly created Linode
+3. Click **Launch LISH Console** (top right of the Linode detail page)
 
-Linodeが起動している間に、DNSプロバイダーに**Aレコード**を追加する：
+A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
 
-```
-Type  : A
-Name  : myapp          (またはルートドメインには@)
-Value : <linode-ip>
-TTL   : 300
-```
+![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-### ステップ3 — 進捗を監視する
-
-```bash
-ssh root@<linode-ip>
-tail -f /var/log/stackscript.log
-```
-
-スクリプトは最初の方でサーバーIPを出力します — それが表示されたらすぐにDNSレコードを追加してください。
-
-### ステップ4 — アプリにアクセスする
-
-セットアップが完了すると、ログにサマリーが表示されます：
+Wait until you see:
 
 ```
 ============================================================
- rtCloud deployment complete! (Embedded Keycloak)
+ rtSurvey deployment complete!
 ============================================================
- App URL   : https://myapp.example.com
+ Server IP : <your-server-ip>
+
+ App URL   : http://<your-server-ip>  (HTTP only until domain is set)
  Admin     : admin / admin
- Keycloak  : https://myapp.example.com/auth/admin
-
- !! SECURITY: All passwords default to 'admin'.
-    Change them immediately after first login.
 ============================================================
 ```
 
-ユーザー名`admin`、パスワード`admin`でログインし、すぐにパスワードを変更してください。
+The log also shows your server IP — you will need it for the next step.
 
 ---
 
-## デプロイ後
+## Step 4 — Set up SSL
 
-### パスワードを変更する
+Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-```bash
-nano /opt/rtcloud/.env
-docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
-```
+Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
 
-### すべてのコンテナを確認する
+---
 
-```bash
-docker compose -f /opt/rtcloud/docker-compose.production.yml ps
-```
+## Step 5 — First login
 
-### ログを確認する
+Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+
+---
+
+## Step 6 — Change the default password
+
+All passwords default to `admin`. Change them immediately after your first login:
+
+- **App admin password** — account settings inside the app
+- **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
+
+---
+
+## Troubleshooting
+
+### Check the setup log
 
 ```bash
 tail -200 /var/log/stackscript.log
+```
+
+### Check the SSL log
+
+```bash
+tail -200 /var/log/rtsurvey-ssl.log
+```
+
+### View container status
+
+```bash
+docker compose -f /opt/rtsurvey/docker-compose.production.yml ps
 ```

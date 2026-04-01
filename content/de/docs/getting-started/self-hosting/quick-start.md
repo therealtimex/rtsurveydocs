@@ -7,172 +7,52 @@ draft: false
 author: "rtSurvey"
 icon: "play_circle"
 toc: true
-description: "Get rtCloud running on your own server in under 10 minutes using Docker Compose."
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
 ---
 
-This guide walks you through deploying a self-hosted rtCloud instance on a Linux server from scratch. By the end, you will have a running rtCloud accessible in your browser.
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
 
-## Prerequisites
+## Requirements
 
-Ensure your server meets the following requirements before starting:
-
-### Hardware
+### Server
 
 | Resource | Minimum | Recommended |
 |----------|---------|-------------|
-| RAM | 2 GB | 4 GB |
-| Disk | 10 GB | 40 GB |
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
 | CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
 
-### Software
+### Domain
 
-| Software | Version |
-|----------|---------|
-| OS | Ubuntu 20.04 LTS or newer (or any Linux with Docker support) |
-| Docker | 20.10 or newer |
-| Docker Compose | v2.x (`docker compose`) or v1.x (`docker-compose`) |
-
-**Install Docker on Ubuntu:**
-
-```bash
-curl -fsSL https://get.docker.com | sh
-```
-
-Verify the installation:
-
-```bash
-docker --version
-docker compose version
-```
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
 
 ---
 
-## Step 1 — Get the Files
+## Choose Your Cloud Provider
 
-Clone the deployment repository to your server:
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
 
-```bash
-git clone ssh://git@rtgit.rta.vn:2224/rtlab/rtwebteam/rta-smart-survey-docker.git rtcloud
-cd rtcloud
-```
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
----
-
-## Step 2 — Configure the Environment
-
-Copy the sample configuration file:
-
-```bash
-cp .env.production.sample .env
-```
-
-Open `.env` in a text editor and fill in the required values:
-
-```dotenv
-# Unique identifier for this deployment (no spaces, no special characters)
-PROJECT_ID=myproject
-
-# Domain or IP address where users will access the app
-# Example: rtcloud.example.com  or  192.168.1.100
-PROJECT_URL=rtcloud.example.com
-
-# Protocol: use "https" if you have a domain with SSL, "http" otherwise
-HTTP_PROTOCOL=https
-
-# Strong, unique passwords — change all three before starting
-MYSQL_PASSWORD=change_me_strong_password
-MYSQL_ROOT_PASSWORD=change_me_root_password
-ADMIN_PASSWORD=change_me_admin_password
-```
-
-> **Important:** Only `.env` is read by Docker Compose automatically. Do not create a file named `.env.production`, as that would cause confusion. The `ADMIN_PASSWORD` is applied only on the **first boot** of a fresh database.
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
 ---
 
-## Step 3 — Start the Containers
+## What the scripts do
 
-Launch all services in the background:
+Every cloud script performs a fully unattended setup:
 
-```bash
-docker compose -f docker-compose.production.yml up -d
-```
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
 
-The first startup takes **3–5 minutes** while Docker:
-
-1. Pulls the rtCloud application image (~1 GB download)
-2. Initializes the MySQL database
-3. Loads the base schema
-4. Runs all pending database migrations
-
-Monitor startup progress in real time:
-
-```bash
-docker compose -f docker-compose.production.yml logs -f rtcloud
-```
-
-Wait until you see output indicating the application is ready. You can also watch the container health status:
-
-```bash
-watch docker compose -f docker-compose.production.yml ps
-```
-
----
-
-## Step 4 — Access the Application
-
-Once both containers show `Up (healthy)`, open your browser:
-
-```
-http://<PROJECT_URL>:8080
-```
-
-Log in using the administrator account:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | The value you set for `ADMIN_PASSWORD` in `.env` |
-
-> Change the admin password immediately after your first login from the account settings page.
-
----
-
-## Step 5 — Verify All Services
-
-Check that all containers are running and healthy:
-
-```bash
-docker compose -f docker-compose.production.yml ps
-```
-
-Expected output:
-
-```
-NAME                    IMAGE                                   STATUS
-rtcloud-app             rtawebteam/rta-smartsurvey:...          Up (healthy)
-rtcloud-mysql           mysql:8.0                               Up (healthy)
-```
-
-If a container shows `Up (starting)` or `Up (unhealthy)`, wait 30–60 more seconds and check again. MySQL can take up to a minute to fully initialize on first boot.
-
----
-
-## Port Reference
-
-| Port | Service | Description |
-|------|---------|-------------|
-| `8080` | rtCloud App | Main web UI (configurable via `APP_PORT`) |
-| `3838` | Shiny Server | Analytics and R-based visualizations (configurable via `SHINY_PORT`) |
-
-MySQL (port 3306) and any optional services (Keycloak) are internal-only and not exposed to the host by default.
-
----
-
-## Next Steps
-
-Your rtCloud instance is now running. Consider these follow-up tasks:
-
-- **Enable HTTPS** — Point a domain to your server and configure SSL with Let's Encrypt. See [Cloud Deployment](cloud-deployment) for automated HTTPS setup.
-- **Review all settings** — Browse the [Configuration Reference](configuration) to tune your deployment for production.
-- **Set up SSO** — Connect an identity provider for centralized user authentication. See [SSO Authentication](sso-authentication).
-- **Plan your backups** — Review the [Maintenance](maintenance) page for backup and upgrade procedures.

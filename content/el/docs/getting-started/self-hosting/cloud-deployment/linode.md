@@ -2,88 +2,108 @@
 weight: 2
 title: "Linode (Akamai Cloud)"
 date: "2026-03-16T00:00:00+07:00"
-lastmod: "2026-03-17T01:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Αναπτύξτε το rtCloud στο Linode χρησιμοποιώντας StackScripts με διεπαφή διαμόρφωσης βάσει φόρμας."
+description: "Deploy rtCloud on Linode using a StackScript. No configuration needed — just create the server and follow the post-deployment steps."
 ---
 
-Το Linode χρησιμοποιεί **StackScripts** — σενάρια με διεπαφή βάσει φόρμας όπου συμπληρώνετε τα πεδία διαμόρφωσης απευθείας στο Linode Manager χωρίς επεξεργασία κώδικα.
+## Step 1 — Launch the StackScript
 
-> Τα StackScripts Linode είναι η ευκολότερη μέθοδος ανάπτυξης. Τα πεδία εμφανίζονται ως φόρμα κατά τη δημιουργία Linode — δεν απαιτείται επεξεργασία σεναρίου.
+**[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
----
-
-## Ενσωματωμένο Keycloak (Συνιστάται)
-
-### Βήμα 1 — Εύρεση του StackScript
-
-Το StackScript είναι δημόσια διαθέσιμο στην κοινότητα Linode — δεν απαιτείται χειροκίνητη ρύθμιση:
-
-1. Μεταβείτε στο **Linodes** → **Δημιουργία Linode**
-2. Στο **Επιλογή διανομής**, επιλέξτε **StackScripts** → **StackScripts κοινότητας**
-3. Αναζητήστε **`RTA rtSurvey - Self-Hosted with Keycloak SSO`**
-4. Επιλέξτε το και συμπληρώστε τη φόρμα διαμόρφωσης:
-
-> Εναλλακτικά, [κατεβάστε το σενάριο](/scripts/linode-stackscript-keycloak-embed.sh) και δημιουργήστε δικό σας StackScript στο **StackScripts** → **Δημιουργία StackScript**.
-
-| Πεδίο | Απαιτείται | Περιγραφή |
-|-------|----------|-------------|
-| Project ID | Όχι | Μοναδικό αναγνωριστικό (προεπιλογή: `rtsurvey`). Χρησιμοποιείται ως όνομα βάσης δεδομένων και ID πελάτη Keycloak. |
-| Κωδικός διαχειριστή Keycloak | Όχι | Κωδικός για κονσόλα διαχείρισης Keycloak και σύνδεση διαχειριστή εφαρμογής. Προεπιλογή `admin` — **αλλάξτε μετά την πρώτη σύνδεση**. |
-| Domain | Ναι | Το όνομα τομέα σας. Η εγγραφή DNS A πρέπει να δείχνει στη διεύθυνση IP αυτού του Linode. Απαιτείται για HTTPS και Keycloak. |
-| Email Let's Encrypt | Ναι | Email για ειδοποιήσεις πιστοποιητικού Let's Encrypt. |
-| Docker Image Tag | Όχι | Εικόνα για ανάπτυξη (προεπιλογή: `rtawebteam/rta-smartsurvey:survey-dockerize`). |
-
-> **Ασφάλεια:** Όλοι οι κωδικοί ορίζονται σε `admin` από προεπιλογή. Αλλάξτε τους αμέσως μετά την πρώτη σύνδεση.
-
-5. Επιλέξτε **Ubuntu 22.04 LTS** ως εικόνα
-6. Επιλέξτε πλάνο **Shared CPU 4 GB** ή μεγαλύτερο
-7. Κάντε κλικ στο **Δημιουργία Linode**
-
-### Βήμα 2 — Προσθήκη εγγραφής DNS
-
-Ενώ το Linode εκκινεί, προσθέστε **εγγραφή A** στον πάροχο DNS σας:
-
-```
-Τύπος  : A
-Όνομα  : myapp          (ή @ για ριζικό τομέα)
-Τιμή   : <linode-ip>
-TTL    : 300
-```
-
-### Βήμα 3 — Παρακολούθηση προόδου
-
-```bash
-ssh root@<linode-ip>
-tail -f /var/log/stackscript.log
-```
-
-### Βήμα 4 — Πρόσβαση στην εφαρμογή
-
-Όταν η ρύθμιση ολοκληρωθεί, το αρχείο καταγραφής εμφανίζει σύνοψη. Συνδεθείτε με όνομα χρήστη `admin` και κωδικό `admin`, στη συνέχεια αλλάξτε τον κωδικό σας αμέσως.
+This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
 
 ---
 
-## Μετά την ανάπτυξη
+## Step 2 — Fill in Linode's form
 
-### Αλλαγή κωδικού
+Fill in Linode's standard server creation form:
 
-```bash
-nano /opt/rtcloud/.env
-docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+| Field | Recommended value |
+|-------|------------------|
+| **Image** | Ubuntu 22.04 LTS |
+| **Region** | Closest to your users |
+| **Plan** | Shared CPU 4 GB or larger |
+| **Root Password** | Set a strong password |
+| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+
+Click **Create Linode** when done.
+
+---
+
+## Step 3 — Wait for setup to complete
+
+The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+
+You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+
+1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
+2. Click on your newly created Linode
+3. Click **Launch LISH Console** (top right of the Linode detail page)
+
+A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+
+![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
+
+Wait until you see:
+
+```
+============================================================
+ rtSurvey deployment complete!
+============================================================
+ Server IP : <your-server-ip>
+
+ App URL   : http://<your-server-ip>  (HTTP only until domain is set)
+ Admin     : admin / admin
+============================================================
 ```
 
-### Προβολή όλων των κοντέινερ
+The log also shows your server IP — you will need it for the next step.
 
-```bash
-docker compose -f /opt/rtcloud/docker-compose.production.yml ps
-```
+---
 
-### Έλεγχος αρχείου καταγραφής
+## Step 4 — Set up SSL
+
+Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
+
+Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+
+---
+
+## Step 5 — First login
+
+Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+
+---
+
+## Step 6 — Change the default password
+
+All passwords default to `admin`. Change them immediately after your first login:
+
+- **App admin password** — account settings inside the app
+- **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
+
+---
+
+## Troubleshooting
+
+### Check the setup log
 
 ```bash
 tail -200 /var/log/stackscript.log
+```
+
+### Check the SSL log
+
+```bash
+tail -200 /var/log/rtsurvey-ssl.log
+```
+
+### View container status
+
+```bash
+docker compose -f /opt/rtsurvey/docker-compose.production.yml ps
 ```
