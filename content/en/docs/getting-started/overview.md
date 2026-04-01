@@ -1,62 +1,42 @@
 ---
 weight: 1
-date: "2024-07-01T12:00:00+01:00"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
-author: "RealTimeX"
+author: "rtSurvey"
 title: "Overview"
 icon: "rocket_launch"
-toc: true
-description: "A quickstart guide to running a survey with rtSurvey"
-publishdate: "2024-07-01T12:00:00+01:00"
-tags: ["Beginners"]
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
 ---
 
-rtSurvey is a powerful platform for building forms and workflows to collect data efficiently. With rtSurvey, you can:
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
 
-1. Create sophisticated forms incorporating photos, GPS locations, skip logic, calculations, external datasets, multiple languages, and more.
-2. Gather data using either the mobile app or web interface, with automatic synchronization when an internet connection is available.
-3. Analyze data effortlessly by exporting to CSV or Stata, or by connecting rtSurvey to Excel, Power BI, Python, or R for dynamic, live-updating dashboards.
+---
 
-Researchers, field teams, and professionals across various industries rely on rtSurvey for their critical data collection needs. Here's how to get started:
+## How it works
 
-## 1. Access rtSurvey Cloud {#getting-started-get-rtCloud}
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
 
-The fastest way to begin is by using [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud), our official managed hosting service. It's accessible via the rtSurvey website and built on a robust, secure infrastructure. Alternatively, you can host rtSurvey on your own infrastructure if preferred.
+---
 
-## 2. Create Your Survey Form {#getting-started-create-form}
+## Before you start
 
-1. Design your form using `XLSForm` or experiment with our [All Widgets form](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0) template.
-2. Upload your XLSForm to rtSurvey Cloud and publish it, or use our Form Builder (Beta) for a visual design experience.
+You need:
 
-## 3. Install the rtSurvey App {#getting-started-get-collect}
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
 
-Download the rtSurvey app on your mobile device:
+No prior Docker knowledge required — the deployment script handles everything.
 
-### For Android Devices:
-1. Visit the [Google Play Store](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey).
-2. Search for "rtSurvey" and tap on the app with the rtSurvey logo.
-3. Click "Install" to download and set up the app.
+---
 
-### For iOS Devices:
-1. Open the [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547) on your device.
-2. Search for "rtSurvey" and locate the app with the rtSurvey logo.
-3. Tap "Get" to download and install the app.
+## Ready?
 
-## 4. Connect rtSurvey App to rtSurvey Cloud {#getting-started-connect}
-
-1. Create an account:
-   - An rtSurvey Cloud Admin can create accounts for enumerators.
-   - Alternatively, the Admin can generate a URL for enumerators to create their own accounts.
-2. Open the rtSurvey App and log in with your account credentials.
-
-## 5. Conduct Your Survey {#getting-started-fill-form}
-
-1. In the app, select "Fill Blank Form" to start a new survey.
-2. Complete the form with respondent data.
-3. Upon completion, the form data will automatically sync with rtSurvey Cloud when an internet connection is available.
-
-## 6. Analyze Your Data in rtSurvey Cloud {#getting-started-use-data}
-
-1. Log into rtSurvey Cloud to access your collected data.
-2. Download your data in various formats such as CSV or Stata for further analysis.
-3. Utilize built-in analysis tools or integrate with your preferred data analysis software.
+**[Deploy your server →](self-hosting/quick-start)**
