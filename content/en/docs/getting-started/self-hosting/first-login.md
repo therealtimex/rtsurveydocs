@@ -10,7 +10,9 @@ toc: true
 description: "How to log in to your rtCloud instance for the first time after deployment."
 ---
 
-After deployment completes, open your browser and navigate to your domain:
+> **SSL must be configured before you can log in.** If you access the app without SSL, you will see a warning and cannot proceed. Complete the [SSL setup step](cloud-deployment/linode#step-4--set-up-ssl) first.
+
+After SSL is active, open your browser and navigate to your domain:
 
 ```
 https://your-domain.com

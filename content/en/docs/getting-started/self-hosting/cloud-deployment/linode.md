@@ -69,13 +69,41 @@ The log also shows your server IP — you will need it for the next step.
 
 ---
 
-## Step 4 — First login
+## Step 4 — Set up SSL
 
-Once setup is complete, open your browser at:
+**You must configure SSL before you can log in.** If you try to access the app without SSL, you will see a warning and cannot proceed.
+
+Open your browser at:
 
 ```
 http://<server-ip>
 ```
+
+The app will redirect you to the SSL setup screen.
+
+![SSL setup options screen](/img/ssl-setup/ssl-setup-options.png)
+
+Choose one of three options:
+
+| Option | When to use |
+|--------|-------------|
+| **Free rtsurvey.com subdomain** *(Recommended)* | Fastest — no DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
+| **My own domain** | You have a domain and its DNS already points to this server. |
+| **Install certificate manually** | Enterprise or custom CA. Requires SSH access. |
+
+### Using the free rtsurvey.com subdomain
+
+1. Enter your desired subdomain name (e.g. `myproject` → `myproject.rtsurvey.com`)
+2. Click **Create https://[subdomain].rtsurvey.com**
+3. Wait 2–5 minutes for the certificate to be issued
+
+This is the quickest option — no domain registration or DNS changes required.
+
+---
+
+## Step 5 — First login
+
+Once SSL is active, open your browser at your new URL (e.g. `https://myproject.rtsurvey.com`).
 
 To log in with the default admin account, **long-press the "Log In or Register" button** for 1–2 seconds to reveal the username and password fields.
 
@@ -88,7 +116,7 @@ See [First Login](../../first-login) for a detailed walkthrough with screenshots
 
 ---
 
-## Step 5 — Change the default password
+## Step 6 — Change the default password
 
 All passwords default to `admin`. Change them immediately after your first login:
 
