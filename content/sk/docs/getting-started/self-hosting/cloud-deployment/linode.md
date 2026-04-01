@@ -88,6 +88,39 @@ All passwords default to `admin`. Change them immediately after your first login
 
 ---
 
+## Firewall rules (Linode Cloud Firewall)
+
+If you attach a Linode Cloud Firewall to this server, use the following rules:
+
+### Inbound
+
+| Label | Action | Protocol | Port | Sources | Notes |
+|-------|--------|----------|------|---------|-------|
+| `accept-inbound-ssh` | Accept | TCP | 22 | All IPv4, All IPv6 | SSH access |
+| `accept-inbound-http` | Accept | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
+| `accept-inbound-shiny` | Accept | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Accept | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
+| Default inbound policy | **Drop** | | | | Block everything else |
+
+### Outbound
+
+| Label | Action | Notes |
+|-------|--------|-------|
+| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
+
+### Ports NOT needed externally
+
+These ports are bound to `127.0.0.1` only and never reachable from outside the server:
+
+| Port | Service | Reason |
+|------|---------|--------|
+| 8080 | App container | Nginx proxies to it internally |
+| 8090 | Keycloak container | Nginx proxies to it internally |
+| 3306 | MySQL | Internal Docker network only |
+
+---
+
 ## Troubleshooting
 
 ### Check the setup log
