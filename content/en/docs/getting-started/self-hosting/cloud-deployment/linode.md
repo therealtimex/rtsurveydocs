@@ -10,10 +10,6 @@ toc: true
 description: "Deploy rtCloud on Linode using a StackScript. No configuration needed — just create the server and follow the post-deployment steps."
 ---
 
-The rtSurvey StackScript provisions a fresh Ubuntu 22.04 server with everything pre-installed: Docker, Nginx, Keycloak SSO, and the rtSurvey application. You do not need to edit any files or run any commands manually.
-
----
-
 ## Step 1 — Launch the StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
