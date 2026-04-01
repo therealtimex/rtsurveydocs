@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Login Pertama"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Cara masuk ke instance rtSurvey Anda untuk pertama kali setelah deployment."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **SSL harus dikonfigurasi sebelum masuk.** Jika Anda mengakses aplikasi melalui HTTP, Anda akan melihat peringatan keamanan dan SSO akan diblokir. Selesaikan [Pengaturan SSL](ssl-setup) terlebih dahulu.
 
-After SSL is active, open your browser at your HTTPS URL:
+Setelah SSL aktif, buka browser Anda di URL HTTPS Anda:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Layar login
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Halaman login menampilkan:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
+- Kolom **Nama Pengguna** dan **Kata Sandi**
+- Tombol **Masuk**
+- Tombol **Masuk dengan SSO** (di bawah pemisah) — untuk anggota tim dengan akun SSO
 
 ---
 
-## Default admin credentials
+## Kredensial admin default
 
-Enter the default credentials and click **Sign In**:
+Masukkan kredensial default dan klik **Masuk**:
 
-| Field | Value |
+| Kolom | Nilai |
 |-------|-------|
-| Username | `admin` |
-| Password | `admin` |
+| Nama Pengguna | `admin` |
+| Kata Sandi | `admin` |
 
-> **Change your password immediately after your first login.**
+> **Segera ubah kata sandi Anda setelah login pertama.**
 
 ---
 
-## If you see a security warning
+## Jika Anda melihat peringatan keamanan
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Jika Anda mengakses aplikasi melalui HTTP (sebelum SSL dikonfigurasi), Anda akan melihat:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+- Spanduk peringatan kuning di bagian atas halaman login
+- Modal saat mengklik **Masuk**, memperingatkan bahwa kredensial akan dikirim tidak terenkripsi
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Klik **Atur SSL** untuk mengonfigurasi HTTPS, atau **Lanjutkan saja** untuk masuk tanpa SSL (tidak disarankan).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+Login SSO sepenuhnya diblokir melalui HTTP — mengklik **Masuk dengan SSO** akan menampilkan pemberitahuan alih-alih mengalihkan.
 
 ---
 
-## After logging in
+## Setelah login
 
-Once inside, you will land on the dashboard. From here:
+Setelah masuk, Anda akan berada di dasbor. Dari sini:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Ubah kata sandi admin** — pengaturan akun → ubah kata sandi
+2. **Buat proyek pertama Anda** — Proyek → Proyek Baru
+3. **Unggah atau buat formulir** — Formulir → Unggah XLSForm atau buka Form Builder
+4. **Tambahkan pengguna** — Pengguna → Undang atau buat akun untuk tim Anda

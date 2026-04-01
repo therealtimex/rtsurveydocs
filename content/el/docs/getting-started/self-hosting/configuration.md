@@ -7,181 +7,215 @@ draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "Πλήρης αναφορά για όλες τις μεταβλητές περιβάλλοντος που χρησιμοποιούνται για τη διαμόρφωση αυτο-φιλοξενούμενης ανάπτυξης rtCloud."
+description: "Πλήρης αναφορά για όλες τις μεταβλητές περιβάλλοντος που χρησιμοποιούνται για τη διαμόρφωση μιας αυτο-φιλοξενούμενης ανάπτυξης rtCloud."
 ---
 
-Όλη η διαμόρφωση γίνεται μέσω μεταβλητών περιβάλλοντος στο αρχείο `.env` στο ριζικό κατάλογο της ανάπτυξής σας. Το Docker Compose διαβάζει αυτό το αρχείο αυτόματα — δεν απαιτείται σημαία `--env-file`.
+Όλη η διαμόρφωση γίνεται μέσω μεταβλητών περιβάλλοντος στο αρχείο `.env` στη ρίζα του καταλόγου ανάπτυξης. Το Docker Compose διαβάζει αυτό το αρχείο αυτόματα — δεν χρειάζεται σημαία `--env-file`.
 
-Οι μεταβλητές που επισημαίνονται ως **απαιτούμενες** πρέπει να οριστούν πριν εκκινήσετε τα κοντέινερ. Όλες οι άλλες έχουν προεπιλογές και είναι προαιρετικές.
+Οι μεταβλητές που σημειώνονται ως **υποχρεωτικές** πρέπει να οριστούν πριν την εκκίνηση των containers. Όλες οι άλλες έχουν προεπιλεγμένες τιμές και είναι προαιρετικές.
 
 ---
 
-## Έργο
+## Project
 
-Αυτές οι μεταβλητές ορίζουν την ταυτότητα και το σημείο πρόσβασης της εγκατάστασης rtCloud.
+These variables define the identity and access point of your rtCloud instance.
 
-| Μεταβλητή | Προεπιλογή | Απαιτείται | Περιγραφή |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **Ναι** | Μοναδικό αναγνωριστικό για αυτή την ανάπτυξη. Χωρίς κενά ή ειδικούς χαρακτήρες. |
-| `PROJECT_URL` | — | **Ναι** | Όνομα τομέα ή διεύθυνση IP όπου οι χρήστες έχουν πρόσβαση στην εφαρμογή (π.χ. `rtcloud.example.com` ή `192.168.1.100`). |
-| `PROJECT_TYPE` | `rtsurvey` | Όχι | Παραλλαγή πλατφόρμας. Επιλογές: `rtwork`, `rtsurvey`, `rthome`. |
-| `PROJECT_PORT` | `80` | Όχι | Θύρα που ακούει η εφαρμογή εντός του κοντέινερ. Μην αλλάζετε εκτός αν γνωρίζετε τι κάνετε. |
-| `HTTP_PROTOCOL` | `https` | Όχι | Πρωτόκολλο για κατασκευή εσωτερικών URL. Ορίστε σε `http` εάν δεν χρησιμοποιείτε SSL. |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## Βάση δεδομένων
+## Database
 
-Διαπιστευτήρια σύνδεσης MySQL. Η βάση δεδομένων διαχειρίζεται αυτόματα από το κοντέινερ MySQL — χρειάζεται μόνο να ορίσετε ισχυρούς κωδικούς.
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| Μεταβλητή | Προεπιλογή | Απαιτείται | Περιγραφή |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | Όχι | Όνομα βάσης δεδομένων εφαρμογής. |
-| `MYSQL_USER` | `smartsurvey` | Όχι | Χρήστης MySQL για την εφαρμογή. |
-| `MYSQL_PASSWORD` | — | **Ναι** | Κωδικός για `MYSQL_USER`. Χρησιμοποιήστε ισχυρή, μοναδική τιμή. |
-| `MYSQL_ROOT_PASSWORD` | — | **Ναι** | Κωδικός root MySQL. Απαιτείται για αρχικοποίηση βάσης δεδομένων και λειτουργίες διαχείρισης. |
-| `MYSQL_HOST` | `mysql` | Όχι | Κεντρικός υπολογιστής MySQL. Χρησιμοποιήστε την προεπιλογή εκτός αν συνδέεστε σε εξωτερική βάση δεδομένων. |
-| `MYSQL_PORT` | `3306` | Όχι | Θύρα MySQL. |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## Λογαριασμός διαχειριστή
+## Admin Account
 
-Ο λογαριασμός διαχειριστή δημιουργείται αυτόματα κατά την πρώτη εκκίνηση σε νέα βάση δεδομένων.
+The admin account is created automatically on the first boot of a fresh database.
 
-| Μεταβλητή | Προεπιλογή | Απαιτείται | Περιγραφή |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **Ναι** | Κωδικός για τον ενσωματωμένο χρήστη `admin`. Ορίστε πριν από την πρώτη εκκίνηση. Δεν έχει εφέ εάν η βάση δεδομένων υπάρχει ήδη. |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> Μετά την πρώτη σύνδεση, αλλάξτε τον κωδικό διαχειριστή από τη σελίδα **Ρυθμίσεις λογαριασμού** στη διεπαφή χρήστη web.
-
----
-
-## Θύρες
-
-Ελέγξτε ποιες θύρες κεντρικού υπολογιστή δεσμεύει η εφαρμογή.
-
-| Μεταβλητή | Προεπιλογή | Περιγραφή |
-|----------|---------|-------------|
-| `APP_PORT` | `8080` | Θύρα κεντρικού υπολογιστή για την κύρια διεπαφή χρήστη web. |
-| `SHINY_PORT` | `3838` | Θύρα κεντρικού υπολογιστή για τον διακομιστή αναλύσεων Shiny. |
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## Χρόνος εκτέλεσης
+## Ports
 
-| Μεταβλητή | Προεπιλογή | Περιγραφή |
+Control which host ports the application binds to.
+
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | Περιβάλλον εκτέλεσης. Χρησιμοποιήστε `prod` για παραγωγή, `dev` για τοπική ανάπτυξη. |
-| `RUN_MODE` | `admin` | Ρόλος κοντέινερ. Το `admin` εκτελεί την πλήρη στοίβα (web + ουρά + cron). Το `worker` εκτελεί μόνο επεξεργασία παρασκηνίου. |
-| `TZ` | `Asia/Ho_Chi_Minh` | Ζώνη ώρας διακομιστή. Επηρεάζει χρονοσφραγίδες καταγραφής, χρονοδιαγράμματα cron και εμφάνιση ημερομηνίας. |
-| `LOG_LEVEL` | `info` | Επίπεδο λεπτομέρειας καταγραφής εφαρμογής. Επιλογές: `debug`, `info`, `warning`, `error`. |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | Πρόθεμα σε όλα τα ονόματα κοντέινερ και τόμων Docker. |
-| `RESTART_POLICY` | `unless-stopped` | Συμπεριφορά επανεκκίνησης κοντέινερ Docker. |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Εικόνα Docker για χρήση. |
-| `REQUIRE_LICENSE` | `false` | Ενεργοποίηση επικύρωσης κλειδιού άδειας κατά την εκκίνηση. |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
-## Ασφάλεια
+## Runtime
 
-| Μεταβλητή | Προεπιλογή | Περιγραφή |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | Ενεργοποίηση επικύρωσης διακριτικού CSRF. Διατηρήστε σε `true` στην παραγωγή. |
-| `GII_ENABLED` | `false` | Ενεργοποίηση εργαλείου γεννήτριας κώδικα Yii. **Ποτέ μην ενεργοποιείτε στην παραγωγή.** |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## SSO — Ενσωματωμένο Keycloak
+## Security
 
-Ενεργοποιήστε το ομαδοποιημένο κοντέινερ Keycloak για πλήρες εταιρικό SSO. Απαιτεί τομέα με HTTPS.
-
-| Μεταβλητή | Προεπιλογή | Περιγραφή |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | Ορίστε σε `true` για εκκίνηση ενσωματωμένου κοντέινερ Keycloak. |
-| `KEYCLOAK_URL` | — | Πλήρες URL του διακομιστή Keycloak (π.χ. `https://rtcloud.example.com/auth`). |
-| `KEYCLOAK_REALM` | — | Όνομα realm Keycloak (π.χ. `rtsurvey`). |
-| `KEYCLOAK_CLIENT_ID` | — | ID πελάτη Keycloak για την εφαρμογή rtCloud. |
-| `KEYCLOAK_CLIENT_SECRET` | — | Μυστικό πελάτη Keycloak. |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Όνομα χρήστη διαχειριστή Keycloak. |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Κωδικός διαχειριστή Keycloak. |
-| `KEYCLOAK_DB` | `keycloak` | Όνομα βάσης δεδομένων για Keycloak. |
-| `KEYCLOAK_DB_USER` | `keycloak` | Χρήστης βάσης δεδομένων για Keycloak. |
-| `KEYCLOAK_DB_PASSWORD` | — | Κωδικός βάσης δεδομένων για τον χρήστη Keycloak. |
-| `KC_HOSTNAME` | — | URL εμπρόσθιου άκρου Keycloak. |
-| `KC_HOSTNAME_STRICT` | `false` | Επιβολή αυστηρής αντιστοίχισης ονόματος κεντρικού υπολογιστή. |
-
-Ανατρέξτε στο [Ταυτοποίηση SSO](sso-authentication#embedded-keycloak) για τον πλήρη οδηγό ρύθμισης.
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — Εξωτερικός πάροχος OIDC
+## SSO — Embedded Keycloak
 
-Σύνδεση με υπάρχοντα πάροχο ταυτοτήτων συμβατό με OIDC (Supabase, Auth0, Authentik, Okta κ.λπ.).
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| Μεταβλητή | Προεπιλογή | Περιγραφή |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | URL ανακάλυψης εκδότη OIDC. |
-| `OIDC_CLIENT_ID` | — | ID πελάτη καταχωρημένου στον πάροχο ταυτοτήτων. |
-| `OIDC_CLIENT_SECRET` | — | Μυστικό πελάτη από τον πάροχο ταυτοτήτων. |
-| `OIDC_SCOPE` | `openid profile email` | Διαχωρισμένη με κενά λίστα εύρους OIDC για αίτηση. |
-| `OIDC_REDIRECT_URI` | — | URL επιστροφής για την εφαρμογή web. |
-| `OIDC_MOBILE_CLIENT_ID` | — | Ξεχωριστό ID πελάτη για την εφαρμογή κινητού rtSurvey. |
-| `OIDC_MOBILE_REDIRECT_URI` | — | URI επιστροφής εφαρμογής κινητού. |
-| `OPEN_REGISTRATION` | `false` | Αυτόματη δημιουργία λογαριασμών rtCloud για χρήστες που ταυτοποιούνται μέσω OIDC για πρώτη φορά. |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| Μεταβλητή | Περιγραφή |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | ID εφαρμογής Azure AD (πελάτης). |
-| `AZURE_TENANT_ID` | ID καταλόγου Azure AD (μισθωτής). |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## Προαιρετικές ενσωματώσεις
+## Optional Integrations
 
 ### Stata
 
-| Μεταβλητή | Προεπιλογή | Περιγραφή |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | Ενεργοποίηση ενσωμάτωσης Stata για ανάλυση δεδομένων. |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | Απόλυτη διαδρομή στο εκτελέσιμο Stata εντός του κοντέινερ. |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| Μεταβλητή | Περιγραφή |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Κεντρικός υπολογιστής Elasticsearch. |
-| `ES_PORT` | Θύρα Elasticsearch. |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
 ### Matomo Analytics
 
-| Μεταβλητή | Περιγραφή |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | URL διακομιστή Matomo (Piwik). |
-| `PIWIK_ID` | ID ιστοτόπου Matomo. |
-| `PIWIK_SECRET` | Διακριτικό ταυτοποίησης Matomo. |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
+
+### OpenCPU (R Computation)
+
+| Variable | Description |
+|----------|-------------|
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
+
+### RtBox Integration
+
+| Variable | Description |
+|----------|-------------|
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
+
+### Matrix Messaging
+
+| Variable | Description |
+|----------|-------------|
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## Τόμοι δεδομένων
+## Data Volumes
 
-Όλα τα δεδομένα εφαρμογής αποθηκεύονται σε ονομαστικούς τόμους Docker. Οι τόμοι δημιουργούνται αυτόματα κατά την πρώτη εκκίνηση και παραμένουν σε επανεκκινήσεις και ενημερώσεις κοντέινερ.
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| Τόμος | Σημείο προσάρτησης | Περιεχόμενα |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | Αρχεία βάσης δεδομένων MySQL |
-| `rtcloud_uploads` | `…/uploads` | Αρχεία που μεταφορτώθηκαν από ερωτώμενους |
-| `rtcloud_audios` | `…/audios` | Ηχογραφήσεις |
-| `rtcloud_downloads` | `…/downloads` | Δημιουργημένα αρχεία εξαγωγής |
-| `rtcloud_gallery` | `…/gallery` | Εικόνες γκαλερί |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Σενάρια R διακομιστή Shiny |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Αρχεία καταγραφής διακομιστή Shiny |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-Παραθέστε όλους τους τόμους για την ανάπτυξή σας:
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
+
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

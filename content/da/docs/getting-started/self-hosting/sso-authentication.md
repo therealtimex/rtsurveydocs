@@ -1,5 +1,5 @@
 ---
-weight: 4
+weight: 5
 title: "SSO-godkendelse"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -12,208 +12,208 @@ description: "Konfigurer Single Sign-On til selvhostet rtCloud ved hjælp af ind
 
 rtCloud understøtter tre tilgange til Single Sign-On (SSO):
 
-| Valgmulighed | Bedst til |
+| Option | Best For |
 |--------|----------|
-| [Indlejret Keycloak](#embedded-keycloak) | Organisationer, der ønsker en fuldt selvstændig SSO-server bundlet med rtCloud |
-| [Ekstern OIDC-udbyder](#external-oidc-provider) | Organisationer, der allerede kører en identitetsudbyder (Auth0, Authentik, Okta, Supabase osv.) |
-| [Azure Active Directory](#azure-active-directory) | Organisationer, der bruger Microsoft 365 eller Azure AD |
+| [Embedded Keycloak](#embedded-keycloak) | Organizations that want a fully self-contained SSO server bundled with rtCloud |
+| [External OIDC Provider](#external-oidc-provider) | Organizations already running an identity provider (Auth0, Authentik, Okta, Supabase, etc.) |
+| [Azure Active Directory](#azure-active-directory) | Organizations using Microsoft 365 or Azure AD |
 
-Uden SSO konfigureret logger brugere ind med lokale rtCloud-konti administreret via adminpanelet.
+Without SSO configured, users log in with local rtCloud accounts managed through the admin panel.
 
 ---
 
-## Indlejret Keycloak
+## Embedded Keycloak
 
-Implementeringen inkluderer en valgfri Keycloak-container, der kører sideløbende med rtCloud. Keycloak er forudkonfigureret med et rtSurvey-realm og klar til brug.
+The deployment includes an optional Keycloak container that runs alongside rtCloud. Keycloak is pre-configured with an rtSurvey realm and ready to use.
 
-### Krav
+### Requirements
 
-- Et domænenavn med HTTPS (Keycloak kræver HTTPS i produktion)
-- Mindst 4 GB RAM på serveren (Keycloak tilføjer ~512 MB hukommelsesforbrug)
+- A domain name with HTTPS (Keycloak requires HTTPS in production)
+- At least 4 GB RAM on the server (Keycloak adds ~512 MB memory usage)
 
-### Opsætning
+### Setup
 
-**1. Konfigurer miljøvariabler i `.env`:**
+**1. Configure environment variables in `.env`:**
 
 ```dotenv
-# Aktivér den indlejrede Keycloak-container
+# Enable the embedded Keycloak container
 EMBED_KEYCLOAK=true
 
-# Keycloak-URL'er – brug dit faktiske domæne
+# Keycloak URLs — use your actual domain
 KEYCLOAK_URL=https://rtcloud.example.com/auth
 KC_HOSTNAME=https://rtcloud.example.com/auth
 KC_HOSTNAME_STRICT=false
 
-# Realm- og klientindstillinger (match det importerede realm-JSON)
+# Realm and client settings (match the imported realm JSON)
 KEYCLOAK_REALM=rtsurvey
 KEYCLOAK_CLIENT_ID=rtsurvey-app
-KEYCLOAK_CLIENT_SECRET=din-klienthemmelighed-her
+KEYCLOAK_CLIENT_SECRET=your-client-secret-here
 
-# Keycloak-administratoroplysninger
+# Keycloak admin credentials
 KEYCLOAK_ADMIN_USER=admin
-KEYCLOAK_ADMIN_PASSWORD=skift_mig_keycloak_admin_adgangskode
+KEYCLOAK_ADMIN_PASSWORD=change_me_keycloak_admin_password
 
-# Keycloak-database (oprettes automatisk)
+# Keycloak database (created automatically)
 KEYCLOAK_DB=keycloak
 KEYCLOAK_DB_USER=keycloak
-KEYCLOAK_DB_PASSWORD=skift_mig_keycloak_db_adgangskode
+KEYCLOAK_DB_PASSWORD=change_me_keycloak_db_password
 
-# Port Keycloak lytter på (host-side, proxyet af Nginx)
+# Port Keycloak listens on (host-side, proxied by Nginx)
 KEYCLOAK_PORT=8091
 ```
 
-**2. Start med den indlejrede Keycloak-profil:**
+**2. Start with the embedded Keycloak profile:**
 
 ```bash
 docker compose -f docker-compose.production.yml --profile embed-keycloak up -d
 ```
 
-**3. Bekræft, at Keycloak er sund:**
+**3. Verify Keycloak is healthy:**
 
 ```bash
 docker compose -f docker-compose.production.yml ps
 ```
 
-Containeren `rtcloud-keycloak` bør vise `Up (healthy)` efter 2–3 minutter.
+The `rtcloud-keycloak` container should show `Up (healthy)` after 2–3 minutes.
 
-**4. Tilgå Keycloak-administratorkonsollen:**
+**4. Access the Keycloak admin console:**
 
 ```
 https://rtcloud.example.com/auth/admin
 ```
 
-Log ind med `KEYCLOAK_ADMIN_USER` og `KEYCLOAK_ADMIN_PASSWORD`.
+Log in with `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD`.
 
-### Hvad er forudkonfigureret
+### What Is Pre-Configured
 
-Den indlejrede Keycloak starter med et forudimporteret `rtsurvey`-realm, der inkluderer:
+The embedded Keycloak starts with a pre-imported `rtsurvey` realm that includes:
 
-- Klientkonfiguration til webapplikationen
-- Standardbrugerroller (`admin`, `project_manager`, `enumerator`, `analyst`)
-- Sessions- og tokenindstillinger optimeret til rtSurvey
+- Client configuration for the web application
+- Default user roles (`admin`, `project_manager`, `enumerator`, `analyst`)
+- Session and token settings optimized for rtSurvey
 
-Du kan tilføje brugere direkte i Keycloak-administratorkonsollen eller forbinde Keycloak til en upstream-identitetsudbyder (LDAP, SAML).
+You can add users directly in the Keycloak admin console or connect Keycloak to an upstream identity provider (LDAP, SAML).
 
-### Nginx-routing
+### Nginx Routing
 
-Når cloud-implementeringsscripts bruges, konfigureres Nginx til at proxye begge tjenester:
+When using the cloud deployment scripts, Nginx is configured to proxy both services:
 
-| Sti | Backend |
+| Path | Backend |
 |------|---------|
-| `/` | rtCloud-appen på `127.0.0.1:8080` |
-| `/auth/` | Keycloak på `127.0.0.1:8090` |
+| `/` | rtCloud app on `127.0.0.1:8080` |
+| `/auth/` | Keycloak on `127.0.0.1:8090` |
 
 ---
 
-## Ekstern OIDC-udbyder
+## External OIDC Provider
 
-Forbind rtCloud til enhver OpenID Connect-kompatibel identitetsudbyder. Denne tilgang kræver ikke Keycloak-containeren.
+Connect rtCloud to any OpenID Connect-compatible identity provider. This approach does not require the Keycloak container.
 
-### Understøttede udbydere
+### Supported Providers
 
-Enhver OIDC-kompatibel udbyder fungerer, herunder:
+Any OIDC-compliant provider works, including:
 - Authentik
 - Auth0
 - Okta
-- Keycloak (ekstern instans)
+- Keycloak (external instance)
 - Supabase
-- Google (til Google Workspace-organisationer)
-- GitHub (via OAuth-apps med OIDC-udvidelse)
+- Google (for Google Workspace organizations)
+- GitHub (via OAuth apps with OIDC extension)
 
-### Opsætning
+### Setup
 
-**1. Registrér rtCloud som en OIDC-klient hos din identitetsudbyder.**
+**1. Register rtCloud as an OIDC client in your identity provider.**
 
-Du skal bruge:
-- Et **klient-ID** og en **klienthemmelighed**
-- At registrere **omdirigerings-URI'en**: `https://rtcloud.example.com/auth/callback`
-- Til mobilappsupport, registrér også: `vn.rta.rtsurvey.auth://callback`
+You will need:
+- A **client ID** and **client secret**
+- To register the **redirect URI**: `https://rtcloud.example.com/auth/callback`
+- For mobile app support, also register: `vn.rta.rtsurvey.auth://callback`
 
-**2. Konfigurer miljøvariabler i `.env`:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
-# OIDC-opdagelses-URL (udbyderspecifik – tjek din IdP-dokumentation)
-OIDC_ISSUER_URL=https://din-identitetsudbyder.com
+# OIDC discovery URL (provider-specific — check your IdP documentation)
+OIDC_ISSUER_URL=https://your-identity-provider.com
 
-# Klientoplysninger fra din identitetsudbyder
+# Client credentials from your identity provider
 OIDC_CLIENT_ID=rtcloud-app
-OIDC_CLIENT_SECRET=din-klienthemmelighed-her
+OIDC_CLIENT_SECRET=your-client-secret-here
 
-# Scopes der anmodes om (openid, profile og email er typisk tilstrækkeligt)
+# Scopes to request (openid, profile, and email are typically sufficient)
 OIDC_SCOPE=openid profile email
 
-# Omdirigerings-URI registreret hos din identitetsudbyder
+# Redirect URI registered in your identity provider
 OIDC_REDIRECT_URI=https://rtcloud.example.com/auth/callback
 
-# Valgfrit: separat mobilappklient
+# Optional: separate mobile app client
 OIDC_MOBILE_CLIENT_ID=rtcloud-mobile
 OIDC_MOBILE_REDIRECT_URI=vn.rta.rtsurvey.auth://callback
 
-# Sæt til true for automatisk at oprette rtCloud-konti til nye OIDC-brugere
+# Set to true to auto-create rtCloud accounts for new OIDC users
 OPEN_REGISTRATION=false
 ```
 
-**3. Genstart app-containeren for at anvende ændringerne:**
+**3. Restart the app container to apply the changes:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Automatisk oprettelse af brugere
+### Auto-Provisioning Users
 
-Når `OPEN_REGISTRATION=true`, opretter rtCloud automatisk en lokal konto, første gang en bruger logger ind via OIDC. Kontoen udfyldes med brugerens navn og e-mail fra ID-tokenet.
+When `OPEN_REGISTRATION=true`, rtCloud automatically creates a local account the first time a user signs in via OIDC. The account is populated with the user's name and email from the ID token.
 
-Når `OPEN_REGISTRATION=false` (standard), skal en rtCloud-administrator oprette brugerkontoen først, og OIDC-identiteten knyttes ved første login.
+When `OPEN_REGISTRATION=false` (default), an rtCloud administrator must create the user account first, and the OIDC identity is linked on first login.
 
-### Brugerdefinerede endepunkter
+### Custom Endpoints
 
-Hvis din udbyder ikke understøtter OIDC-opdagelse (`.well-known/openid-configuration`), kan du angive endepunkter manuelt:
+If your provider does not support OIDC discovery (`.well-known/openid-configuration`), you can set endpoints manually:
 
 ```dotenv
-OIDC_AUTHORIZATION_ENDPOINT=https://din-udbyder.com/oauth2/authorize
-OIDC_TOKEN_ENDPOINT=https://din-udbyder.com/oauth2/token
-OIDC_USERINFO_ENDPOINT=https://din-udbyder.com/oauth2/userinfo
+OIDC_AUTHORIZATION_ENDPOINT=https://your-provider.com/oauth2/authorize
+OIDC_TOKEN_ENDPOINT=https://your-provider.com/oauth2/token
+OIDC_USERINFO_ENDPOINT=https://your-provider.com/oauth2/userinfo
 ```
 
 ---
 
 ## Azure Active Directory
 
-Integrer rtCloud med din organisations Microsoft Azure AD-lejer.
+Integrate rtCloud with your organization's Microsoft Azure AD tenant.
 
-### Opsætning
+### Setup
 
-**1. Registrér en ny app i [Azure Portal](https://portal.azure.com):**
+**1. Register a new app in the [Azure Portal](https://portal.azure.com):**
 
-   - Gå til **Azure Active Directory** → **Appregistreringer** → **Ny registrering**
-   - Navn: `rtCloud`
-   - Omdirigerings-URI: `https://rtcloud.example.com/auth/callback` (Web-type)
-   - Efter oprettelse skal du notere **Applikations(klient)-ID** og **Mappe(lejer)-ID**
-   - Under **Certifikater og hemmeligheder** skal du oprette en ny klienthemmelighed
+   - Go to **Azure Active Directory** → **App registrations** → **New registration**
+   - Name: `rtCloud`
+   - Redirect URI: `https://rtcloud.example.com/auth/callback` (Web type)
+   - After creation, note the **Application (client) ID** and **Directory (tenant) ID**
+   - Under **Certificates & secrets**, create a new client secret
 
-**2. Konfigurer miljøvariabler i `.env`:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
 AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-**3. Genstart app-containeren:**
+**3. Restart the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Brugere i din Azure AD-lejer kan nu logge ind på rtCloud med deres Microsoft-legitimationsoplysninger.
+Users in your Azure AD tenant can now log in to rtCloud using their Microsoft credentials.
 
 ---
 
-## Deaktivering af SSO
+## Disabling SSO
 
-For at vende tilbage til lokal godkendelse skal du fjerne eller kommentere ud alle SSO-relaterede variabler i `.env` og derefter genstarte app-containeren:
+To revert to local authentication, remove or comment out all SSO-related variables from `.env`, then restart the app container:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Hvis du brugte indlejret Keycloak, skal du stoppe det ved at udelade flaget `--profile embed-keycloak` og køre `docker compose down` efterfulgt af `up -d` uden profilen.
+If you were using embedded Keycloak, stop it by omitting the `--profile embed-keycloak` flag and running `docker compose down` followed by `up -d` without the profile.

@@ -1,173 +1,173 @@
 ---
-weight: 4
-title: "SSO autentifikavimas"
+weight: 5
+title: "SSO autentifikacija"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Konfigūruokite vieningo prisijungimo (SSO) funkciją savarankiškai valdomam rtCloud naudodami integruotą Keycloak, išorinį OIDC teikėją arba Azure Active Directory."
+description: "Konfigūruokite Single Sign-On savastiškai patalpintam rtCloud naudojant integruotą Keycloak, išorinį OIDC teikėją arba Azure Active Directory."
 ---
 
-rtCloud palaiko tris vieningo prisijungimo (SSO) metodus:
+rtCloud palaiko tris vieningojo prisijungimo (SSO) metodus:
 
-| Parinktis | Geriausiai tinka |
+| Option | Best For |
 |--------|----------|
-| [Integruotas Keycloak](#embedded-keycloak) | Organizacijoms, norinčioms visiškai savarankiško SSO serverio, susieto su rtCloud |
-| [Išorinis OIDC teikėjas](#external-oidc-provider) | Organizacijoms, jau naudojančioms tapatybės teikėją (Auth0, Authentik, Okta, Supabase ir kt.) |
-| [Azure Active Directory](#azure-active-directory) | Organizacijoms, naudojančioms Microsoft 365 arba Azure AD |
+| [Embedded Keycloak](#embedded-keycloak) | Organizations that want a fully self-contained SSO server bundled with rtCloud |
+| [External OIDC Provider](#external-oidc-provider) | Organizations already running an identity provider (Auth0, Authentik, Okta, Supabase, etc.) |
+| [Azure Active Directory](#azure-active-directory) | Organizations using Microsoft 365 or Azure AD |
 
-Nekonfigūravus SSO, naudotojai prisijungia su vietinėmis rtCloud paskyromis, valdomis per administravimo skydelį.
+Without SSO configured, users log in with local rtCloud accounts managed through the admin panel.
 
 ---
 
-## Integruotas Keycloak
+## Embedded Keycloak
 
-Diegimas apima neprivalomą Keycloak konteinerį, veikiantį kartu su rtCloud. Keycloak iš anksto sukonfigūruotas su rtSurvey sritimi ir paruoštas naudoti.
+The deployment includes an optional Keycloak container that runs alongside rtCloud. Keycloak is pre-configured with an rtSurvey realm and ready to use.
 
-### Reikalavimai
+### Requirements
 
-- Domeno vardas su HTTPS (gamyboje Keycloak reikalauja HTTPS)
-- Mažiausiai 4 GB RAM serveryje (Keycloak naudoja ~512 MB atminties)
+- A domain name with HTTPS (Keycloak requires HTTPS in production)
+- At least 4 GB RAM on the server (Keycloak adds ~512 MB memory usage)
 
-### Sąranka
+### Setup
 
-**1. Konfigūruokite aplinkos kintamuosius `.env` faile:**
+**1. Configure environment variables in `.env`:**
 
 ```dotenv
-# Įjunkite integruotą Keycloak konteinerį
+# Enable the embedded Keycloak container
 EMBED_KEYCLOAK=true
 
-# Keycloak URL – naudokite savo tikrąjį domeną
+# Keycloak URLs — use your actual domain
 KEYCLOAK_URL=https://rtcloud.example.com/auth
 KC_HOSTNAME=https://rtcloud.example.com/auth
 KC_HOSTNAME_STRICT=false
 
-# Srities ir kliento nustatymai (atitinka importuotą srities JSON)
+# Realm and client settings (match the imported realm JSON)
 KEYCLOAK_REALM=rtsurvey
 KEYCLOAK_CLIENT_ID=rtsurvey-app
 KEYCLOAK_CLIENT_SECRET=your-client-secret-here
 
-# Keycloak administratoriaus prisijungimo duomenys
+# Keycloak admin credentials
 KEYCLOAK_ADMIN_USER=admin
 KEYCLOAK_ADMIN_PASSWORD=change_me_keycloak_admin_password
 
-# Keycloak duomenų bazė (sukuriama automatiškai)
+# Keycloak database (created automatically)
 KEYCLOAK_DB=keycloak
 KEYCLOAK_DB_USER=keycloak
 KEYCLOAK_DB_PASSWORD=change_me_keycloak_db_password
 
-# Prievadas, kuriame Keycloak klauso (pagrindinio kompiuterio pusė, tarpininkaujama Nginx)
+# Port Keycloak listens on (host-side, proxied by Nginx)
 KEYCLOAK_PORT=8091
 ```
 
-**2. Paleiskite su integruotu Keycloak profiliu:**
+**2. Start with the embedded Keycloak profile:**
 
 ```bash
 docker compose -f docker-compose.production.yml --profile embed-keycloak up -d
 ```
 
-**3. Patikrinkite, ar Keycloak sveikas:**
+**3. Verify Keycloak is healthy:**
 
 ```bash
 docker compose -f docker-compose.production.yml ps
 ```
 
-Po 2–3 minučių `rtcloud-keycloak` konteineris turėtų rodyti `Up (healthy)`.
+The `rtcloud-keycloak` container should show `Up (healthy)` after 2–3 minutes.
 
-**4. Pasiekite Keycloak administravimo konsolę:**
+**4. Access the Keycloak admin console:**
 
 ```
 https://rtcloud.example.com/auth/admin
 ```
 
-Prisijunkite naudodami `KEYCLOAK_ADMIN_USER` ir `KEYCLOAK_ADMIN_PASSWORD`.
+Log in with `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD`.
 
-### Kas iš anksto sukonfigūruota
+### What Is Pre-Configured
 
-Integruotas Keycloak paleidžiamas su iš anksto importuota `rtsurvey` sritimi, kurioje yra:
+The embedded Keycloak starts with a pre-imported `rtsurvey` realm that includes:
 
-- Kliento konfigūracija žiniatinklio programai
-- Numatytieji naudotojų vaidmenys (`admin`, `project_manager`, `enumerator`, `analyst`)
-- Seanso ir žetono nustatymai, optimizuoti rtSurvey
+- Client configuration for the web application
+- Default user roles (`admin`, `project_manager`, `enumerator`, `analyst`)
+- Session and token settings optimized for rtSurvey
 
-Galite pridėti naudotojus tiesiogiai Keycloak administravimo konsolėje arba prijungti Keycloak prie aukštesnio lygio tapatybės teikėjo (LDAP, SAML).
+You can add users directly in the Keycloak admin console or connect Keycloak to an upstream identity provider (LDAP, SAML).
 
-### Nginx maršrutizavimas
+### Nginx Routing
 
-Naudojant debesies diegimo scenarijus, Nginx sukonfigūruotas tarpininkauti abiem paslaugoms:
+When using the cloud deployment scripts, Nginx is configured to proxy both services:
 
-| Kelias | Galinė paslauga |
+| Path | Backend |
 |------|---------|
-| `/` | rtCloud programa `127.0.0.1:8080` |
-| `/auth/` | Keycloak `127.0.0.1:8090` |
+| `/` | rtCloud app on `127.0.0.1:8080` |
+| `/auth/` | Keycloak on `127.0.0.1:8090` |
 
 ---
 
-## Išorinis OIDC teikėjas
+## External OIDC Provider
 
-Prijunkite rtCloud prie bet kurio OpenID Connect suderinamojo tapatybės teikėjo. Šiam metodui Keycloak konteinerio nereikia.
+Connect rtCloud to any OpenID Connect-compatible identity provider. This approach does not require the Keycloak container.
 
-### Palaikomi teikėjai
+### Supported Providers
 
-Veikia bet kuris OIDC suderinamasis teikėjas, įskaitant:
+Any OIDC-compliant provider works, including:
 - Authentik
 - Auth0
 - Okta
-- Keycloak (išorinė instancija)
+- Keycloak (external instance)
 - Supabase
-- Google (Google Workspace organizacijoms)
-- GitHub (per OAuth programas su OIDC plėtiniu)
+- Google (for Google Workspace organizations)
+- GitHub (via OAuth apps with OIDC extension)
 
-### Sąranka
+### Setup
 
-**1. Registruokite rtCloud kaip OIDC klientą savo tapatybės teikėjuje.**
+**1. Register rtCloud as an OIDC client in your identity provider.**
 
-Jums reikės:
-- **Kliento ID** ir **kliento paslapties**
-- Registruoti **nukreipimo URI**: `https://rtcloud.example.com/auth/callback`
-- Mobilios programos palaikymui taip pat registruoti: `vn.rta.rtsurvey.auth://callback`
+You will need:
+- A **client ID** and **client secret**
+- To register the **redirect URI**: `https://rtcloud.example.com/auth/callback`
+- For mobile app support, also register: `vn.rta.rtsurvey.auth://callback`
 
-**2. Konfigūruokite aplinkos kintamuosius `.env` faile:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
-# OIDC atradimo URL (priklauso nuo teikėjo – tikrinkite savo IdP dokumentaciją)
+# OIDC discovery URL (provider-specific — check your IdP documentation)
 OIDC_ISSUER_URL=https://your-identity-provider.com
 
-# Kliento prisijungimo duomenys iš jūsų tapatybės teikėjo
+# Client credentials from your identity provider
 OIDC_CLIENT_ID=rtcloud-app
 OIDC_CLIENT_SECRET=your-client-secret-here
 
-# Prašomos sritys (openid, profile ir email paprastai pakanka)
+# Scopes to request (openid, profile, and email are typically sufficient)
 OIDC_SCOPE=openid profile email
 
-# Nukreipimo URI, registruotas jūsų tapatybės teikėjuje
+# Redirect URI registered in your identity provider
 OIDC_REDIRECT_URI=https://rtcloud.example.com/auth/callback
 
-# Neprivaloma: atskiras mobilios programos klientas
+# Optional: separate mobile app client
 OIDC_MOBILE_CLIENT_ID=rtcloud-mobile
 OIDC_MOBILE_REDIRECT_URI=vn.rta.rtsurvey.auth://callback
 
-# Nustatykite į true, kad automatiškai kurtumėte rtCloud paskyras naujiems OIDC naudotojams
+# Set to true to auto-create rtCloud accounts for new OIDC users
 OPEN_REGISTRATION=false
 ```
 
-**3. Iš naujo paleiskite programos konteinerį, kad pritaikytumėte pakeitimus:**
+**3. Restart the app container to apply the changes:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Automatinis naudotojų parengimas
+### Auto-Provisioning Users
 
-Kai `OPEN_REGISTRATION=true`, rtCloud automatiškai sukuria vietinę paskyrą pirmą kartą naudotojui prisijungus per OIDC. Paskyra užpildoma naudotojo vardu ir el. paštu iš ID žetono.
+When `OPEN_REGISTRATION=true`, rtCloud automatically creates a local account the first time a user signs in via OIDC. The account is populated with the user's name and email from the ID token.
 
-Kai `OPEN_REGISTRATION=false` (numatytasis), rtCloud administratorius pirmiausia turi sukurti naudotojo paskyrą, o OIDC tapatybė susieta pirmojo prisijungimo metu.
+When `OPEN_REGISTRATION=false` (default), an rtCloud administrator must create the user account first, and the OIDC identity is linked on first login.
 
-### Pasirinktiniai galiniai taškai
+### Custom Endpoints
 
-Jei jūsų teikėjas nepalaiko OIDC atradimo (`.well-known/openid-configuration`), galite nustatyti galinių taškų adresus neautomatiniu būdu:
+If your provider does not support OIDC discovery (`.well-known/openid-configuration`), you can set endpoints manually:
 
 ```dotenv
 OIDC_AUTHORIZATION_ENDPOINT=https://your-provider.com/oauth2/authorize
@@ -179,41 +179,41 @@ OIDC_USERINFO_ENDPOINT=https://your-provider.com/oauth2/userinfo
 
 ## Azure Active Directory
 
-Integruokite rtCloud su savo organizacijos Microsoft Azure AD nuomotoju.
+Integrate rtCloud with your organization's Microsoft Azure AD tenant.
 
-### Sąranka
+### Setup
 
-**1. Registruokite naują programą [Azure portale](https://portal.azure.com):**
+**1. Register a new app in the [Azure Portal](https://portal.azure.com):**
 
-   - Eikite į **Azure Active Directory** → **Programų registracijos** → **Nauja registracija**
-   - Pavadinimas: `rtCloud`
-   - Nukreipimo URI: `https://rtcloud.example.com/auth/callback` (žiniatinklio tipas)
-   - Sukūrus, užsirašykite **Programos (kliento) ID** ir **Katalogo (nuomotojo) ID**
-   - Skiltyje **Sertifikatai ir paslaptys** sukurkite naują kliento paslaptį
+   - Go to **Azure Active Directory** → **App registrations** → **New registration**
+   - Name: `rtCloud`
+   - Redirect URI: `https://rtcloud.example.com/auth/callback` (Web type)
+   - After creation, note the **Application (client) ID** and **Directory (tenant) ID**
+   - Under **Certificates & secrets**, create a new client secret
 
-**2. Konfigūruokite aplinkos kintamuosius `.env` faile:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
 AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-**3. Iš naujo paleiskite programos konteinerį:**
+**3. Restart the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Jūsų Azure AD nuomotojo naudotojai dabar gali prisijungti prie rtCloud naudodami savo Microsoft prisijungimo duomenis.
+Users in your Azure AD tenant can now log in to rtCloud using their Microsoft credentials.
 
 ---
 
-## SSO išjungimas
+## Disabling SSO
 
-Norėdami grįžti prie vietinės autentifikacijos, pašalinkite arba pakomentuokite visus SSO susijusius kintamuosius iš `.env`, tada iš naujo paleiskite programos konteinerį:
+To revert to local authentication, remove or comment out all SSO-related variables from `.env`, then restart the app container:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Jei naudojote integruotą Keycloak, sustabdykite jį praleisdami `--profile embed-keycloak` žymą ir paleisdami `docker compose down`, po to `up -d` be profilio.
+If you were using embedded Keycloak, stop it by omitting the `--profile embed-keycloak` flag and running `docker compose down` followed by `up -d` without the profile.

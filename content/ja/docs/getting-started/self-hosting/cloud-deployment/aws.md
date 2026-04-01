@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "aws-ec2.shユーザーデータスクリプトを使ってAWS EC2インスタンスにrtCloudをデプロイする。"
+description: "aws-ec2.shユーザーデータスクリプトを使用してAWS EC2インスタンスにrtCloudをデプロイします。"
 ---
 
-EC2インスタンスを起動する際に`aws-ec2.sh`を**ユーザーデータ**スクリプトとして使用します。スクリプトは初回起動時に自動的に実行されます。
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**スクリプトのダウンロード：** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## ステップ1 — 設定を入力する
+## Step 1 — Fill in the configuration
 
-スクリプトを開き、先頭の`CONFIGURATION`ブロックを編集する：
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- 必須 ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # 初回ログイン後変更すること
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- ドメイン + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- 組み込みKeycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ADMIN_PASSWORDにデフォルト設定
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| フィールド | 必須 | 説明 |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | はい | データベース名とKeycloakクライアントIDとして使用される。小文字、スペースなし。 |
-| `ADMIN_PASSWORD` | いいえ | アプリ管理者パスワードとKeycloak管理者パスワード。デフォルトは`admin` — **初回ログイン後すぐに変更すること**。 |
-| `DOMAIN` | いいえ | HTTPS用のドメイン。HTTPのみのモードには空白のまま。 |
-| `LETSENCRYPT_EMAIL` | はい（DOMAINが設定されている場合） | Let's Encrypt通知用メール。 |
-| `EMBED_KEYCLOAK` | いいえ | 組み込みKeycloakをデプロイするには`true`（4 GB RAMが必要）。 |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **セキュリティ：** すべてのパスワードはデフォルトで`admin`です。初回ログイン後すぐに変更してください。
-
----
-
-## ステップ2 — EC2インスタンスを起動する
-
-[AWS EC2コンソール](https://console.aws.amazon.com/ec2)で：
-
-1. **インスタンスを起動**をクリックする
-2. **AMI：** Ubuntu Server 22.04 LTS（64-bit x86）
-3. **インスタンスタイプ：** `t3.medium`（4 GB RAM）以上
-4. **キーペア：** SSHアクセス用のものを選択または作成する
-5. **ネットワーク設定：** セキュリティグループを作成または選択する（下記参照）
-6. **詳細** → **ユーザーデータ** → スクリプト全体の内容を貼り付ける
-7. **インスタンスを起動**をクリックする
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## ステップ3 — セキュリティグループを設定する
+## Step 2 — Launch an EC2 instance
 
-インスタンスのセキュリティグループで以下のポートを開く：
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-| ポート | プロトコル | 送信元 | 目的 |
+1. Click **Launch instance**
+2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
+
+---
+
+## Step 3 — Configure the Security Group
+
+Open these ports in the instance's Security Group:
+
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | 自分のIP | SSHアクセス |
-| 80 | TCP | 0.0.0.0/0 | HTTP（NginxによりHTTPSにリダイレクト） |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Shiny直接アクセス |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> ポート3306（MySQL）は**開かないでください** — 公開アクセスは絶対に禁止です。
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## ステップ4 — DNSレコードを追加する
+## Step 4 — Add the DNS record
 
-インスタンスが起動している間に、DNSプロバイダーに**Aレコード**を追加する：
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -88,7 +88,7 @@ TTL   : 300
 
 ---
 
-## ステップ5 — 進捗を監視する
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## ステップ6 — アプリにアクセスする
+## Step 6 — Access the app
 
-セットアップが完了すると、ログにアプリのURLと認証情報のサマリーが表示されます。ユーザー名`admin`、パスワード`admin`でログインし、すぐにパスワードを変更してください。
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## デプロイ後
+## After Deployment
 
-### パスワードを変更する
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### すべてのコンテナを確認する
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Elastic IPを割り当てる（オプション）
+### Assign an Elastic IP (optional)
 
-インスタンスを停止・起動すると、パブリックIPが変わります。安定したIPを保持するには、EC2コンソールで**Elastic IP**を割り当ててインスタンスに関連付けてください。
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

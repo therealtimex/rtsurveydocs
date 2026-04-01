@@ -7,88 +7,88 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Izvietojiet rtCloud uz AWS EC2 instances, izmantojot aws-ec2.sh user data skriptu."
+description: "Izvietojiet rtCloud AWS EC2 instancē, izmantojot lietotāja datu skriptu aws-ec2.sh."
 ---
 
-Izmantojiet `aws-ec2.sh` kā **User Data** skriptu, palaižot EC2 instanci. Skripts automātiski darbojas pirmajā palaišanā.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Lejupielādēt skriptu:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## 1. solis — Aizpildiet konfigurāciju
+## Step 1 — Fill in the configuration
 
-Atveriet skriptu un rediģējiet `CONFIGURATION` bloku augšpusē:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Obligāts ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Mainiet pēc pirmās pieteikšanās
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Domēns + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Iebūvētais Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Noklusējums ir ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Lauks | Obligāts | Apraksts |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Jā | Izmanto kā datu bāzes nosaukumu un Keycloak klienta ID. Maziem burtiem, bez atstarpēm. |
-| `ADMIN_PASSWORD` | Nē | Lietotnes administratora parole un Keycloak administratora parole. Noklusējums ir `admin` — **mainiet pēc pirmās pieteikšanās**. |
-| `DOMAIN` | Nē | Jūsu domēns HTTPS. Atstājiet tukšu tikai HTTP režīmam. |
-| `LETSENCRYPT_EMAIL` | Jā (ja DOMAIN iestatīts) | E-pasts Let's Encrypt paziņojumiem. |
-| `EMBED_KEYCLOAK` | Nē | `true`, lai izvietotu iebūvēto Keycloak (nepieciešami 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Drošība:** Visas paroles pēc noklusējuma ir `admin`. Mainiet tās nekavējoties pēc pirmās pieteikšanās.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## 2. solis — Palaidiet EC2 instanci
+## Step 2 — Launch an EC2 instance
 
-[AWS EC2 konsolē](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Noklikšķiniet uz **Launch instance**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Instances tips:** `t3.medium` (4 GB RAM) vai lielāks
-4. **Atslēgu pāris:** Atlasiet vai izveidojiet SSH piekļuvei
-5. **Tīkla iestatījumi:** Izveidojiet vai atlasiet drošības grupu (skatiet zemāk)
-6. **Advanced details** → **User data** → ielīmējiet pilno skripta saturu
-7. Noklikšķiniet uz **Launch instance**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## 3. solis — Konfigurējiet drošības grupu
+## Step 3 — Configure the Security Group
 
-Atveriet šos portus instances drošības grupā:
+Open these ports in the instance's Security Group:
 
-| Ports | Protokols | Avots | Mērķis |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | Jūsu IP | SSH piekļuve |
-| 80 | TCP | 0.0.0.0/0 | HTTP (Nginx novirza uz HTTPS) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Tieša Shiny piekļuve |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **Neatveriet** portu 3306 (MySQL) — tam nekad nevajadzētu būt publiski pieejamam.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## 4. solis — Pievienojiet DNS ierakstu
+## Step 4 — Add the DNS record
 
-Kamēr instance sāknējas, pievienojiet **A ierakstu** sava DNS nodrošinātāja panelī:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
-Tips  : A
-Nosaukums  : myapp
-Vērtība : <instance-public-ip>
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
 TTL   : 300
 ```
 
 ---
 
-## 5. solis — Uzraugiet progresu
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## 6. solis — Piekļūstiet lietotnei
+## Step 6 — Access the app
 
-Kad iestatīšana ir pabeigta, žurnāls rāda kopsavilkumu ar jūsu lietotnes URL un akreditācijas datiem. Piesakieties ar lietotājvārdu `admin` un paroli `admin`, pēc tam nekavējoties mainiet savu paroli.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Pēc izvietošanas
+## After Deployment
 
-### Paroles maiņa
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Visu konteineru skatīšana
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Elastīgā IP piešķiršana (neobligāts)
+### Assign an Elastic IP (optional)
 
-Ja apturēsiet un palaidīsiet instanci, publiskā IP mainīsies. Lai saglabātu stabilu IP, piešķiriet **Elastic IP** un saistiet to ar instanci EC2 konsolē.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

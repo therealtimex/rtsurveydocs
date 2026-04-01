@@ -7,215 +7,215 @@ draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "Kendi sunucunuzda barındırılan rtCloud dağıtımını yapılandırmak için kullanılan tüm ortam değişkenlerinin tam referansı."
+description: "Kendi barındırdığınız rtCloud dağıtımını yapılandırmak için kullanılan tüm ortam değişkenlerine yönelik tam referans."
 ---
 
-Tüm yapılandırma, dağıtım dizininizin kökündeki `.env` dosyasındaki ortam değişkenleri aracılığıyla yapılır. Docker Compose bu dosyayı otomatik olarak okur — `--env-file` bayrağına gerek yoktur.
+Tüm yapılandırma, dağıtım dizininizin kökündeki `.env` dosyasındaki ortam değişkenleri aracılığıyla yapılır. Docker Compose bu dosyayı otomatik olarak okur — `--env-file` bayrağı gerekli değildir.
 
-**Gerekli** olarak işaretlenen değişkenler, konteynerleri başlatmadan önce ayarlanmalıdır. Diğerlerinin varsayılanları vardır ve isteğe bağlıdır.
+**Zorunlu** olarak işaretlenen değişkenler, kapsayıcılar başlatılmadan önce ayarlanmalıdır. Diğerlerinin varsayılan değerleri vardır ve isteğe bağlıdır.
 
 ---
 
-## Proje
+## Project
 
-Bu değişkenler, rtCloud örneğinizin kimliğini ve erişim noktasını tanımlar.
+These variables define the identity and access point of your rtCloud instance.
 
-| Değişken | Varsayılan | Gerekli | Açıklama |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **Evet** | Bu dağıtım için benzersiz tanımlayıcı. Boşluk veya özel karakter yok. Dahili adlandırma için ön ek olarak kullanılır. |
-| `PROJECT_URL` | — | **Evet** | Kullanıcıların uygulamaya eriştiği alan adı veya IP adresi (örn. `rtcloud.example.com` veya `192.168.1.100`). |
-| `PROJECT_TYPE` | `rtsurvey` | Hayır | Etkinleştirilecek platform varyantı. Seçenekler: `rtwork`, `rtsurvey`, `rthome`. |
-| `PROJECT_PORT` | `80` | Hayır | Uygulamanın konteyner içinde dinlediği port. Ne yaptığınızı bilmiyorsanız değiştirmeyin. |
-| `HTTP_PROTOCOL` | `https` | Hayır | Dahili URL'leri oluşturmak için kullanılan protokol. SSL kullanmıyorsanız `http` olarak ayarlayın. |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## Veritabanı
+## Database
 
-MySQL bağlantı kimlik bilgileri. Veritabanı MySQL konteyneri tarafından otomatik olarak yönetilir — yalnızca güçlü şifreler ayarlamanız gerekir.
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| Değişken | Varsayılan | Gerekli | Açıklama |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | Hayır | Uygulama veritabanının adı. |
-| `MYSQL_USER` | `smartsurvey` | Hayır | Uygulama için MySQL kullanıcısı. |
-| `MYSQL_PASSWORD` | — | **Evet** | `MYSQL_USER` için şifre. Güçlü ve benzersiz bir değer kullanın. |
-| `MYSQL_ROOT_PASSWORD` | — | **Evet** | MySQL root şifresi. Veritabanı başlatma ve yönetici işlemleri için gereklidir. |
-| `MYSQL_HOST` | `mysql` | Hayır | MySQL ana bilgisayar adı. Harici bir veritabanına bağlanmıyorsanız varsayılanı kullanın. |
-| `MYSQL_PORT` | `3306` | Hayır | MySQL portu. |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## Yönetici Hesabı
+## Admin Account
 
-Yönetici hesabı, yeni bir veritabanının ilk açılışında otomatik olarak oluşturulur.
+The admin account is created automatically on the first boot of a fresh database.
 
-| Değişken | Varsayılan | Gerekli | Açıklama |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **Evet** | Yerleşik `admin` kullanıcısının şifresi. İlk açılıştan önce bunu ayarlayın. Veritabanı zaten mevcutsa etkisi yoktur. |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> İlk girişten sonra web arayüzündeki **Hesap Ayarları** sayfasından yönetici şifresini değiştirin.
-
----
-
-## Portlar
-
-Uygulamanın hangi ana bilgisayar portlarına bağlandığını kontrol edin.
-
-| Değişken | Varsayılan | Açıklama |
-|----------|---------|-------------|
-| `APP_PORT` | `8080` | Ana web arayüzü için ana bilgisayar portu. Sunucunuzda 8080 portu zaten kullanılıyorsa bunu değiştirin. |
-| `SHINY_PORT` | `3838` | Shiny analitik sunucusu için ana bilgisayar portu. |
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## Çalışma Zamanı
+## Ports
 
-| Değişken | Varsayılan | Açıklama |
+Control which host ports the application binds to.
+
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | Çalışma zamanı ortamı. Üretim dağıtımları için `prod`, yerel geliştirme için `dev` kullanın. |
-| `RUN_MODE` | `admin` | Konteyner rolü. `admin` tam yığını (web + kuyruk + cron) çalıştırır. `worker` yalnızca arka plan işlemini çalıştırır (yatay ölçekleme için). |
-| `TZ` | `Asia/Ho_Chi_Minh` | Sunucu saat dilimi. Günlük zaman damgalarını, cron zamanlamalarını ve tarih görüntüsünü etkiler. [TZ veritabanı adı](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) kullanın (örn. `UTC`, `America/New_York`, `Europe/London`). |
-| `LOG_LEVEL` | `info` | Uygulama günlük ayrıntı düzeyi. Seçenekler: `debug`, `info`, `warning`, `error`. |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | Tüm Docker konteyner ve birim adlarına uygulanan ön ek. Aynı ana bilgisayarda birden fazla rtCloud örneği çalıştırırken bunu değiştirin. |
-| `RESTART_POLICY` | `unless-stopped` | Docker konteyner yeniden başlatma davranışı. Seçenekler: `no`, `always`, `on-failure`, `unless-stopped`. |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Kullanılacak Docker görüntüsü. Belirli bir sürümü sabitlemek için etiketi değiştirin. |
-| `REQUIRE_LICENSE` | `false` | Başlangıçta lisans anahtarı doğrulamasını etkinleştirin. Lisans bilgileri için RTA ile iletişime geçin. |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
-## Güvenlik
+## Runtime
 
-| Değişken | Varsayılan | Açıklama |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | CSRF belirteci doğrulamasını etkinleştirin. Üretimde `true` tutun. Yalnızca `400 CSRF token could not be verified` hataları alırsanız yerel geliştirmede `false` olarak ayarlayın. |
-| `GII_ENABLED` | `false` | Yii çerçevesi kod oluşturma aracını etkinleştirin. **Üretimde asla etkinleştirmeyin.** |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## SSO — Yerleşik Keycloak
+## Security
 
-Tam özellikli kurumsal SSO için paketlenmiş Keycloak konteynerini etkinleştirin. HTTPS'li bir alan adı gerektirir.
-
-| Değişken | Varsayılan | Açıklama |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | Yerleşik Keycloak konteynerini başlatmak için `true` olarak ayarlayın. `embed-keycloak` Docker Compose profilini etkinleştirir. |
-| `KEYCLOAK_URL` | — | Keycloak sunucusunun tam URL'si (örn. `https://rtcloud.example.com/auth`). |
-| `KEYCLOAK_REALM` | — | Keycloak realm adı (örn. `rtsurvey`). |
-| `KEYCLOAK_CLIENT_ID` | — | rtCloud uygulaması için Keycloak istemci kimliği. |
-| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak istemci sırrı. Bunu Keycloak yönetici konsolundan oluşturun. |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak yönetici kullanıcı adı. |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak yönetici şifresi. |
-| `KEYCLOAK_DB` | `keycloak` | Keycloak için veritabanı adı. İlk açılışta otomatik olarak oluşturulur. |
-| `KEYCLOAK_DB_USER` | `keycloak` | Keycloak için veritabanı kullanıcısı. |
-| `KEYCLOAK_DB_PASSWORD` | — | Keycloak kullanıcısı için veritabanı şifresi. |
-| `KC_HOSTNAME` | — | Keycloak ön uç URL'si (örn. `https://rtcloud.example.com/auth`). |
-| `KC_HOSTNAME_STRICT` | `false` | Katı ana bilgisayar adı eşleşmesini zorunlu kılın. Sabit bir alan adıyla üretimde `true` olarak ayarlayın. |
-
-Tam kurulum kılavuzu için [SSO Kimlik Doğrulama](sso-authentication#embedded-keycloak) sayfasına bakın.
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — Harici OIDC Sağlayıcısı
+## SSO — Embedded Keycloak
 
-Mevcut bir OIDC uyumlu kimlik sağlayıcısına (Supabase, Auth0, Authentik, Okta vb.) bağlanın.
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| Değişken | Varsayılan | Açıklama |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | OIDC veren keşif URL'si (örn. `https://accounts.google.com`). |
-| `OIDC_CLIENT_ID` | — | Kimlik sağlayıcınızda kayıtlı istemci kimliği. |
-| `OIDC_CLIENT_SECRET` | — | Kimlik sağlayıcınızdan alınan istemci sırrı. |
-| `OIDC_SCOPE` | `openid profile email` | İstek için boşlukla ayrılmış OIDC kapsam listesi. |
-| `OIDC_REDIRECT_URI` | — | Web uygulaması için geri arama URL'si (örn. `https://rtcloud.example.com/auth/callback`). |
-| `OIDC_MOBILE_CLIENT_ID` | — | rtSurvey mobil uygulaması için ayrı istemci kimliği. |
-| `OIDC_MOBILE_REDIRECT_URI` | — | Mobil uygulama geri arama URI'si (örn. `vn.rta.rtsurvey.auth://callback`). |
-| `OPEN_REGISTRATION` | `false` | İlk kez OIDC aracılığıyla kimlik doğrulayan kullanıcılar için otomatik olarak rtCloud hesabı oluşturun. |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | Yetkilendirme uç nokta URL'sini geçersiz kılın (keşif kullanmak için boş bırakın). |
-| `OIDC_TOKEN_ENDPOINT` | — | Belirteç uç nokta URL'sini geçersiz kılın (keşif kullanmak için boş bırakın). |
-| `OIDC_USERINFO_ENDPOINT` | — | Kullanıcı bilgisi uç nokta URL'sini geçersiz kılın (keşif kullanmak için boş bırakın). |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| Değişken | Açıklama |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | Azure AD uygulama (istemci) kimliği. |
-| `AZURE_TENANT_ID` | Azure AD dizin (kiracı) kimliği. |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## İsteğe Bağlı Entegrasyonlar
+## Optional Integrations
 
 ### Stata
 
-| Değişken | Varsayılan | Açıklama |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | Veri analizi için Stata istatistiksel yazılım entegrasyonunu etkinleştirin. |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | Konteyner içindeki Stata ikili dosyasının mutlak yolu. |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| Değişken | Açıklama |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Elasticsearch ana bilgisayarı (örn. `http://elasticsearch:9200`). |
-| `ES_PORT` | Elasticsearch portu. |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
-### Matomo Analitik
+### Matomo Analytics
 
-| Değişken | Açıklama |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | Matomo (Piwik) sunucu URL'si. |
-| `PIWIK_ID` | Matomo site kimliği. |
-| `PIWIK_SECRET` | Matomo kimlik doğrulama belirteci. |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (R Hesaplama)
+### OpenCPU (R Computation)
 
-| Değişken | Açıklama |
+| Variable | Description |
 |----------|-------------|
-| `OCPU_HOST` | R tabanlı istatistiksel hesaplama için OpenCPU sunucu URL'si. |
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox Entegrasyonu
+### RtBox Integration
 
-| Değişken | Açıklama |
+| Variable | Description |
 |----------|-------------|
-| `RTBOX_HOST` | RtBox hizmet ana bilgisayar URL'si. |
-| `RTBOX_USER_API` | RtBox kullanıcı API anahtarı. |
-| `RTBOX_BASIC_AUTH` | RtBox için temel kimlik doğrulama kimlik bilgileri. |
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix Mesajlaşma
+### Matrix Messaging
 
-| Değişken | Açıklama |
+| Variable | Description |
 |----------|-------------|
-| `MATRIX_HOMESERVER_HOST` | Matrix ana sunucu. |
-| `MATRIX_HOMESERVER_PORT` | Matrix ana sunucu portu. |
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## Veri Birimleri
+## Data Volumes
 
-Tüm uygulama verileri adlandırılmış Docker birimlerinde saklanır. Birimler ilk başlatmada otomatik olarak oluşturulur ve konteyner yeniden başlatmaları ile güncellemeler arasında kalıcıdır.
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| Birim | Bağlama Noktası | İçerik |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL veritabanı dosyaları |
-| `rtcloud_uploads` | `…/uploads` | Anket katılımcıları tarafından yüklenen dosyalar |
-| `rtcloud_audios` | `…/audios` | Ses kayıtları |
-| `rtcloud_downloads` | `…/downloads` | Oluşturulan dışa aktarma dosyaları |
-| `rtcloud_gallery` | `…/gallery` | Galeri görüntüleri |
-| `rtcloud_voicemail` | `…/voicemail` | Sesli mesaj kayıtları |
-| `rtcloud_analytics` | `…/analytics` | Analitik verileri |
-| `rtcloud_aggregate` | `…/aggregate` | Toplu anket sonuçları |
-| `rtcloud_converter` | `…/converter` | Veri dönüştürme çıktıları |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny sunucusu R betikleri |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny sunucusu günlükleri |
-| `rtcloud_assets` | `…/assets` | Web varlıkları (CSS, JS) |
-| `rtcloud_runtime` | `…/protected/runtime` | Uygulama çalışma zamanı önbelleği |
-| `rtcloud_cache` | `…/cache` | Uygulama önbelleği |
-| `rtcloud_tmp` | `…/tmp` | Geçici dosyalar |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-Birim adları `COMPOSE_PROJECT_NAME` değeriyle (varsayılan: `rtcloud`) ön eklenmiştir.
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-Dağıtımınız için tüm birimleri listeleyin:
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

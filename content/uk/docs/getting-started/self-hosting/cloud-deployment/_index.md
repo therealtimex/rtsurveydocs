@@ -7,59 +7,59 @@ draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "Розгортайте rtCloud у основних хмарних провайдерів за допомогою автоматизованих скриптів для DigitalOcean, AWS EC2, Google Cloud та Linode."
+description: "Розгортання rtCloud у великих хмарних провайдерів за допомогою автоматизованих скриптів для DigitalOcean, AWS EC2, Google Cloud та Linode."
 ---
 
-Репозиторій розгортання включає автоматизовані скрипти провізіонування для основних хмарних провайдерів. Кожен скрипт запускається при першому завантаженні нового сервера **Ubuntu 22.04 LTS** та виконує повністю автоматизоване налаштування:
+Репозиторій розгортання включає автоматизовані скрипти провізіонування для основних хмарних провайдерів. Кожен скрипт запускається при першому завантаженні нового сервера Ubuntu 22.04 LTS і виконує повністю автоматичне налаштування:
 
-- Встановлює Docker та Docker Compose
-- Генерує надійні випадкові паролі для всіх внутрішніх сервісів
-- Записує `docker-compose.production.yml` та `.env`
-- Налаштовує Nginx як зворотний проксі
-- Отримує безкоштовний TLS-сертифікат від Let's Encrypt (автоматичні повторні спроби до вирішення DNS)
-- Налаштовує брандмауер UFW
-- За бажанням розгортає вбудований SSO-сервер Keycloak
-- Виводить повний підсумок розгортання з усіма обліковими даними
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-Налаштування завершується за **5–10 хвилин** на стандартному екземплярі.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## Вибір скрипту
+## Choosing a Script
 
-Є кілька варіантів скриптів залежно від вашого хмарного провайдера та налаштування SSO:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| Скрипт | Провайдер | Режим SSO | Найкраще для |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Вбудований Keycloak | Простий, автономний SSO |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak або зовнішній OIDC | Повний контроль |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Вбудований Keycloak | Налаштування через форму, найпростіше |
-| `linode-stackscript-oidc.sh` | Linode | Тільки зовнішній OIDC | Наявний постачальник ідентифікаційних даних |
-| `linode-stackscript.sh` | Linode | Keycloak або зовнішній OIDC | Повний контроль |
-| `aws-ec2.sh` | AWS EC2 | Keycloak або зовнішній OIDC | Розгортання AWS |
-| `gcp-compute.sh` | Google Cloud | Keycloak або зовнішній OIDC | Розгортання GCP |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **Рекомендовано для більшості користувачів:** Використовуйте варіант `keycloak-embed`. Він включає вбудований сервер ідентифікаційних даних Keycloak і потребує мінімальної кількості полів конфігурації.
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## Посібник з вибору розміру сервера
+## Server Sizing Guide
 
-| Варіант використання | RAM | Диск | Приклад |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| Оцінка / розробка | 2 ГБ | 25 ГБ | DO Basic $18/міс, t3.small, e2-small |
-| Невелика команда (< 50 користувачів) | 4 ГБ | 40 ГБ | DO Basic $24/міс, t3.medium, e2-medium |
-| Виробництво (> 50 користувачів) | 8 ГБ | 80 ГБ | DO General $48/міс, t3.large, n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> Вбудований Keycloak потребує щонайменше **4 ГБ RAM**. Використовуйте 2 ГБ лише для оцінки без Keycloak.
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## Налаштування DNS
+## DNS Setup
 
-Усі скрипти потребують домену з **A-записом, що вказує на IP-адресу вашого сервера**, перш ніж Let's Encrypt зможе видати сертифікат.
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-Скрипт виводить IP вашого сервера на початку процесу налаштування:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
@@ -70,26 +70,26 @@ description: "Розгортайте rtCloud у основних хмарних 
 ============================================================
 ```
 
-Скрипт **автоматично повторює спроби** Let's Encrypt кожні 60 секунд протягом до 1 години. Просто додайте DNS-запис і чекайте — перезапуск не потрібен.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Ліміт запитів:** Let's Encrypt дозволяє максимум **5 сертифікатів на домен на 7 днів**. Уникайте повторного розгортання та видалення серверів з одним і тим самим доменом. При досягненні ліміту скрипт відобразить мітку часу `retry after` і негайно зупиниться.
-
----
-
-## Контрольний список після розгортання
-
-- [ ] Застосунок відкривається за адресою `https://your-domain.com`
-- [ ] Вхід з `admin` та паролем, який ви налаштували
-- [ ] Усі контейнери здорові: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] Поновлення Let's Encrypt працює: `certbot renew --dry-run`
-- [ ] Порт MySQL 3306 **не відкритий**: `ufw status`
-- [ ] Налаштуйте щоденне резервне копіювання бази даних (дивіться [Технічне обслуговування](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## Усунення несправностей
+## Post-Deployment Checklist
 
-### Перегляд повного журналу налаштування
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Ліміт запитів Let's Encrypt
+### Let's Encrypt rate limit
 
-Якщо у журналі відображається `too many certificates`, ви досягли ліміту 5 сертифікатів/7 днів. Журнал показує точний час повторної спроби:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
 [SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-Зачекайте до цього часу, потім повторно розгорніть.
+Wait until that time, then redeploy.
 
-### Keycloak залишається нездоровим
+### Keycloak stays unhealthy
 
-Переконайтеся, що сервер має щонайменше 4 ГБ RAM, потім перевірте журнали:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### Конфігурація SSL не застосована після certbot
+### SSL config not applied after certbot
 
-Якщо сертифікат видано, але Nginx все ще показує лише HTTP, перевірте журнал на наявність рядку помилки та вручну перезавантажте Nginx:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

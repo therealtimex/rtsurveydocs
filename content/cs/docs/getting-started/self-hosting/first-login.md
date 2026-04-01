@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "První přihlášení"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Jak se přihlásit do vaší instance rtSurvey poprvé po nasazení."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **Před přihlášením musí být nakonfigurován SSL.** Pokud přistupujete k aplikaci přes HTTP, zobrazí se bezpečnostní upozornění a SSO bude zablokováno. Nejprve dokončete [Nastavení SSL](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Po aktivaci SSL otevřete prohlížeč na své HTTPS adrese:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Přihlašovací obrazovka
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Přihlašovací stránka zobrazuje:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- Pole **Uživatelské jméno** a **Heslo**
+- Tlačítko **Přihlásit se**
+- Tlačítko **Přihlásit se přes SSO** (pod oddělovačem) — pro členy týmu s SSO účty
 
 ---
 
-## If you see a security warning
+## Výchozí přihlašovací údaje správce
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Zadejte výchozí přihlašovací údaje a klikněte na **Přihlásit se**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Pole | Hodnota |
+|------|---------|
+| Uživatelské jméno | `admin` |
+| Heslo | `admin` |
+
+> **Změňte heslo ihned po prvním přihlášení.**
+
+---
+
+## Pokud se zobrazí bezpečnostní upozornění
+
+Pokud přistupujete k aplikaci přes HTTP (před konfigurací SSL), zobrazí se:
+
+- Žlutý varovný banner v horní části přihlašovací stránky
+- Modální okno při kliknutí na **Přihlásit se**, upozorňující, že přihlašovací údaje budou odeslány nešifrovaně
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Klikněte na **Nastavit SSL** pro konfiguraci HTTPS, nebo **Přesto pokračovat** pro přihlášení bez SSL (nedoporučeno).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+Přihlášení přes SSO je přes HTTP zcela blokováno — kliknutí na **Přihlásit se přes SSO** zobrazí oznámení místo přesměrování.
 
 ---
 
-## After logging in
+## Po přihlášení
 
-Once inside, you will land on the dashboard. From here:
+Po přihlášení se ocitnete na nástěnce. Odtud:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Změňte heslo správce** — nastavení účtu → změna hesla
+2. **Vytvořte svůj první projekt** — Projekty → Nový projekt
+3. **Nahrajte nebo vytvořte formulář** — Formuláře → Nahrát XLSForm nebo otevřít Form Builder
+4. **Přidejte uživatele** — Uživatelé → Pozvat nebo vytvořit účty pro váš tým

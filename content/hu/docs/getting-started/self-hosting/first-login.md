@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Első bejelentkezés"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Hogyan jelentkezzen be az rtSurvey példányába az üzembe helyezés utáni első alkalommal."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **Az SSL-t be kell állítani a bejelentkezés előtt.** Ha HTTP-n keresztül éri el az alkalmazást, biztonsági figyelmeztetést fog látni, és az SSO le lesz tiltva. Először fejezze be az [SSL beállítást](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Miután az SSL aktív, nyissa meg böngészőjét a HTTPS URL-jén:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## A bejelentkezési képernyő
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+A bejelentkezési oldal mutatja:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- **Felhasználónév** és **Jelszó** mezők
+- Egy **Bejelentkezés** gomb
+- Egy **Bejelentkezés SSO-val** gomb (elválasztó alatt) — SSO-fiókkal rendelkező csapattagok számára
 
 ---
 
-## If you see a security warning
+## Alapértelmezett adminisztrátori hitelesítő adatok
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Adja meg az alapértelmezett hitelesítő adatokat, és kattintson a **Bejelentkezés** gombra:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Mező | Érték |
+|------|-------|
+| Felhasználónév | `admin` |
+| Jelszó | `admin` |
+
+> **Azonnal változtassa meg jelszavát az első bejelentkezés után.**
+
+---
+
+## Ha biztonsági figyelmeztetést lát
+
+Ha HTTP-n keresztül éri el az alkalmazást (az SSL konfigurálása előtt), a következőket fogja látni:
+
+- Sárga figyelmeztető szalag a bejelentkezési oldal tetején
+- Egy modális ablak a **Bejelentkezés** kattintásakor, amely figyelmeztet, hogy a hitelesítő adatokat titkosítás nélkül küldi el
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Kattintson az **SSL beállítása** gombra a HTTPS konfigurálásához, vagy a **Folytatás mindenképpen** gombra az SSL nélküli bejelentkezéshez (nem ajánlott).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+Az SSO-bejelentkezés teljesen le van tiltva HTTP-n keresztül — az **SSO-val bejelentkezés** gombra kattintva értesítés jelenik meg az átirányítás helyett.
 
 ---
 
-## After logging in
+## Bejelentkezés után
 
-Once inside, you will land on the dashboard. From here:
+Bejelentkezés után az irányítópulton landol. Innen:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Adminisztrátori jelszó módosítása** — fiókbeállítások → jelszó módosítása
+2. **Első projekt létrehozása** — Projektek → Új projekt
+3. **Űrlap feltöltése vagy készítése** — Űrlapok → XLSForm feltöltése vagy Form Builder megnyitása
+4. **Felhasználók hozzáadása** — Felhasználók → Meghívás vagy fiókok létrehozása csapatának

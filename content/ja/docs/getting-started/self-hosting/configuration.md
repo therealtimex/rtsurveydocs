@@ -7,215 +7,215 @@ draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "セルフホストrtCloudデプロイの設定に使用するすべての環境変数の完全なリファレンス。"
+description: "セルフホスト型rtCloudデプロイメントを設定するために使用されるすべての環境変数の完全なリファレンス。"
 ---
 
-すべての設定はデプロイディレクトリのルートにある`.env`ファイル内の環境変数で行います。Docker Composeはこのファイルを自動的に読み込みます — `--env-file`フラグは不要です。
+すべての設定は、デプロイメントディレクトリのルートにある`.env`ファイルの環境変数を通じて行います。Docker Composeはこのファイルを自動的に読み込みます — `--env-file`フラグは不要です。
 
-**必須**と記載された変数はコンテナを起動する前に設定する必要があります。その他はデフォルト値があり、オプションです。
+**必須**と記載された変数はコンテナ起動前に設定する必要があります。それ以外はすべてデフォルト値があり、任意です。
 
 ---
 
-## プロジェクト
+## Project
 
-これらの変数はrtCloudインスタンスのIDとアクセスポイントを定義します。
+These variables define the identity and access point of your rtCloud instance.
 
-| 変数 | デフォルト | 必須 | 説明 |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **はい** | このデプロイの一意の識別子。スペースや特殊文字は不可。内部命名のプレフィックスとして使用される。 |
-| `PROJECT_URL` | — | **はい** | ユーザーがアプリにアクセスするドメイン名またはIPアドレス（例：`rtcloud.example.com`または`192.168.1.100`）。 |
-| `PROJECT_TYPE` | `rtsurvey` | いいえ | 有効にするプラットフォームのバリアント。オプション：`rtwork`、`rtsurvey`、`rthome`。 |
-| `PROJECT_PORT` | `80` | いいえ | コンテナ内でアプリケーションがリッスンするポート。理解している場合を除き変更しないこと。 |
-| `HTTP_PROTOCOL` | `https` | いいえ | 内部URLの構築に使用するプロトコル。SSLを使用しない場合は`http`に設定する。 |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## データベース
+## Database
 
-MySQL接続の認証情報。データベースはMySQLコンテナによって自動的に管理されます — 強力なパスワードを設定するだけです。
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| 変数 | デフォルト | 必須 | 説明 |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | いいえ | アプリケーションデータベースの名前。 |
-| `MYSQL_USER` | `smartsurvey` | いいえ | アプリケーション用のMySQLユーザー。 |
-| `MYSQL_PASSWORD` | — | **はい** | `MYSQL_USER`のパスワード。強力で一意の値を使用する。 |
-| `MYSQL_ROOT_PASSWORD` | — | **はい** | MySQLのrootパスワード。データベースの初期化と管理操作に必要。 |
-| `MYSQL_HOST` | `mysql` | いいえ | MySQLのホスト名。外部データベースに接続する場合を除き、デフォルトを使用する。 |
-| `MYSQL_PORT` | `3306` | いいえ | MySQLのポート。 |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## 管理者アカウント
+## Admin Account
 
-管理者アカウントは新しいデータベースの初回起動時に自動的に作成されます。
+The admin account is created automatically on the first boot of a fresh database.
 
-| 変数 | デフォルト | 必須 | 説明 |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **はい** | 組み込みの`admin`ユーザーのパスワード。初回起動前に設定する。データベースがすでに存在する場合は効果がない。 |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> 初回ログイン後、Web UIの**アカウント設定**ページから管理者パスワードを変更してください。
-
----
-
-## ポート
-
-アプリケーションがバインドするホストポートを制御します。
-
-| 変数 | デフォルト | 説明 |
-|----------|---------|-------------|
-| `APP_PORT` | `8080` | メインWeb UI用のホストポート。ポート8080がサーバーで既に使用されている場合は変更する。 |
-| `SHINY_PORT` | `3838` | Shiny分析サーバー用のホストポート。 |
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## ランタイム
+## Ports
 
-| 変数 | デフォルト | 説明 |
+Control which host ports the application binds to.
+
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | ランタイム環境。本番デプロイには`prod`、ローカル開発には`dev`を使用する。 |
-| `RUN_MODE` | `admin` | コンテナのロール。`admin`はフルスタック（Web + キュー + cron）を実行する。`worker`はバックグラウンド処理のみを実行する（水平スケーリング用）。 |
-| `TZ` | `Asia/Ho_Chi_Minh` | サーバーのタイムゾーン。ログのタイムスタンプ、cronスケジュール、日付表示に影響する。[TZデータベース名](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)を使用する（例：`UTC`、`America/New_York`、`Europe/London`）。 |
-| `LOG_LEVEL` | `info` | アプリケーションログの詳細度。オプション：`debug`、`info`、`warning`、`error`。 |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | すべてのDockerコンテナとボリューム名に付けられるプレフィックス。同じホストで複数のrtCloudインスタンスを実行する場合に変更する。 |
-| `RESTART_POLICY` | `unless-stopped` | Dockerコンテナの再起動動作。オプション：`no`、`always`、`on-failure`、`unless-stopped`。 |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | 使用するDockerイメージ。特定のバージョンに固定するにはタグを変更する。 |
-| `REQUIRE_LICENSE` | `false` | 起動時のライセンスキー検証を有効にする。ライセンス情報についてはRTAに連絡する。 |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
-## セキュリティ
+## Runtime
 
-| 変数 | デフォルト | 説明 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | CSRFトークン検証を有効にする。本番環境では`true`のままにする。`400 CSRF token could not be verified`エラーが発生する場合のみ、ローカル開発では`false`に設定する。 |
-| `GII_ENABLED` | `false` | Yiiフレームワークのコードジェネレーターツールを有効にする。**本番環境では絶対に有効にしないこと。** |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## SSO — 組み込みKeycloak
+## Security
 
-エンタープライズSSOのフル機能のための組み込みKeycloakコンテナを有効にする。HTTPSを持つドメインが必要。
-
-| 変数 | デフォルト | 説明 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | 組み込みKeycloakコンテナを起動するには`true`に設定する。`embed-keycloak` Docker Composeプロファイルを有効にする。 |
-| `KEYCLOAK_URL` | — | KeycloakサーバーのフルURL（例：`https://rtcloud.example.com/auth`）。 |
-| `KEYCLOAK_REALM` | — | Keycloakレルム名（例：`rtsurvey`）。 |
-| `KEYCLOAK_CLIENT_ID` | — | rtCloudアプリケーション用のKeycloakクライアントID。 |
-| `KEYCLOAK_CLIENT_SECRET` | — | Keycloakクライアントシークレット。Keycloak管理コンソールから生成する。 |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak管理者ユーザー名。 |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak管理者パスワード。 |
-| `KEYCLOAK_DB` | `keycloak` | Keycloak用のデータベース名。初回起動時に自動作成される。 |
-| `KEYCLOAK_DB_USER` | `keycloak` | Keycloak用のデータベースユーザー。 |
-| `KEYCLOAK_DB_PASSWORD` | — | Keycloakユーザー用のデータベースパスワード。 |
-| `KC_HOSTNAME` | — | KeycloakフロントエンドURL（例：`https://rtcloud.example.com/auth`）。 |
-| `KC_HOSTNAME_STRICT` | `false` | 厳密なホスト名マッチングを適用する。固定ドメインを持つ本番環境では`true`に設定する。 |
-
-完全なセットアップガイドについては[SSO認証](sso-authentication#embedded-keycloak)を参照してください。
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — 外部OIDCプロバイダー
+## SSO — Embedded Keycloak
 
-既存のOIDC互換IDプロバイダー（Supabase、Auth0、Authentik、Oktaなど）にrtCloudを接続する。
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| 変数 | デフォルト | 説明 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | OIDCイシュアー検出URL（例：`https://accounts.google.com`）。 |
-| `OIDC_CLIENT_ID` | — | IDプロバイダーに登録されたクライアントID。 |
-| `OIDC_CLIENT_SECRET` | — | IDプロバイダーのクライアントシークレット。 |
-| `OIDC_SCOPE` | `openid profile email` | 要求するOIDCスコープのスペース区切りリスト。 |
-| `OIDC_REDIRECT_URI` | — | Webアプリのコールバック URL（例：`https://rtcloud.example.com/auth/callback`）。 |
-| `OIDC_MOBILE_CLIENT_ID` | — | rtSurveyモバイルアプリ用の個別クライアントID。 |
-| `OIDC_MOBILE_REDIRECT_URI` | — | モバイルアプリのコールバックURI（例：`vn.rta.rtsurvey.auth://callback`）。 |
-| `OPEN_REGISTRATION` | `false` | OIDCを通じて初めて認証したユーザーのrtCloudアカウントを自動作成する。 |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | 認証エンドポイントURLを上書きする（検出を使用する場合は空白）。 |
-| `OIDC_TOKEN_ENDPOINT` | — | トークンエンドポイントURLを上書きする（検出を使用する場合は空白）。 |
-| `OIDC_USERINFO_ENDPOINT` | — | ユーザー情報エンドポイントURLを上書きする（検出を使用する場合は空白）。 |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| 変数 | 説明 |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | Azure ADアプリケーション（クライアント）ID。 |
-| `AZURE_TENANT_ID` | Azure ADディレクトリ（テナント）ID。 |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## オプション統合
+## Optional Integrations
 
 ### Stata
 
-| 変数 | デフォルト | 説明 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | データ分析のためのStata統計ソフトウェア統合を有効にする。 |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | コンテナ内のStataバイナリへの絶対パス。 |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| 変数 | 説明 |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Elasticsearchのホスト（例：`http://elasticsearch:9200`）。 |
-| `ES_PORT` | Elasticsearchのポート。 |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
-### Matomo分析
+### Matomo Analytics
 
-| 変数 | 説明 |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | Matomo（Piwik）サーバーURL。 |
-| `PIWIK_ID` | MatomoサイトID。 |
-| `PIWIK_SECRET` | Matomo認証トークン。 |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU（R計算）
+### OpenCPU (R Computation)
 
-| 変数 | 説明 |
+| Variable | Description |
 |----------|-------------|
-| `OCPU_HOST` | Rベースの統計計算用OpenCPUサーバーURL。 |
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox統合
+### RtBox Integration
 
-| 変数 | 説明 |
+| Variable | Description |
 |----------|-------------|
-| `RTBOX_HOST` | RtBoxサービスのホストURL。 |
-| `RTBOX_USER_API` | RtBoxユーザーAPIキー。 |
-| `RTBOX_BASIC_AUTH` | RtBoxの基本認証情報。 |
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrixメッセージング
+### Matrix Messaging
 
-| 変数 | 説明 |
+| Variable | Description |
 |----------|-------------|
-| `MATRIX_HOMESERVER_HOST` | Matrixホームサーバーのホスト。 |
-| `MATRIX_HOMESERVER_PORT` | Matrixホームサーバーのポート。 |
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## データボリューム
+## Data Volumes
 
-すべてのアプリケーションデータは名前付きDockerボリュームに保存されます。ボリュームは初回起動時に自動的に作成され、コンテナの再起動や更新を通じて保持されます。
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| ボリューム | マウントポイント | 内容 |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQLデータベースファイル |
-| `rtcloud_uploads` | `…/uploads` | 調査回答者がアップロードしたファイル |
-| `rtcloud_audios` | `…/audios` | 音声録音 |
-| `rtcloud_downloads` | `…/downloads` | 生成されたエクスポートファイル |
-| `rtcloud_gallery` | `…/gallery` | ギャラリー画像 |
-| `rtcloud_voicemail` | `…/voicemail` | ボイスメール録音 |
-| `rtcloud_analytics` | `…/analytics` | 分析データ |
-| `rtcloud_aggregate` | `…/aggregate` | 集計された調査結果 |
-| `rtcloud_converter` | `…/converter` | データ変換出力 |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shinyサーバー Rスクリプト |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shinyサーバーログ |
-| `rtcloud_assets` | `…/assets` | Webアセット（CSS、JS） |
-| `rtcloud_runtime` | `…/protected/runtime` | アプリケーションランタイムキャッシュ |
-| `rtcloud_cache` | `…/cache` | アプリケーションキャッシュ |
-| `rtcloud_tmp` | `…/tmp` | 一時ファイル |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-ボリューム名は`COMPOSE_PROJECT_NAME`の値（デフォルト：`rtcloud`）でプレフィックスされます。
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-デプロイのすべてのボリュームを一覧表示する：
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

@@ -7,86 +7,86 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "స్వయంచాలిత user-data స్క్రిప్ట్‌లు ఉపయోగించి DigitalOcean Droplet లో rtCloud డిప్లాయ్ చేయండి."
+description: "స్వయంచాలక యూజర్-డేటా స్క్రిప్ట్‌లు ఉపయోగించి DigitalOcean Droplet లో rtCloud విన్యసించండి."
 ---
 
-DigitalOcean **User Data** స్క్రిప్ట్‌లు ఉపయోగిస్తుంది, ఇవి మొదటి బూట్‌లో స్వయంచాలకంగా నడుస్తాయి. స్క్రిప్ట్ పైభాగంలో కాన్ఫిగరేషన్ వేరియబుల్‌లు నింపి, Droplet సృష్టించేటప్పుడు మొత్తం స్క్రిప్ట్ పేస్ట్ చేయండి.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> Linode StackScripts వలా కాకుండా, DigitalOcean లో ఫారం UI లేదు — పేస్ట్ చేయడానికి ముందు స్క్రిప్ట్‌ను నేరుగా సవరించాలి.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**స్క్రిప్ట్ డౌన్‌లోడ్ చేయండి:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## ఎంబెడెడ్ Keycloak (సిఫారసు)
+## Embedded Keycloak (Recommended)
 
-అంతర్నిర్మిత SSO తో అత్యంత సరళమైన సెటప్ కోసం `digitalocean-droplet-keycloak-embed.sh` ఉపయోగించండి.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### దశ 1 — కాన్ఫిగరేషన్ నింపండి
+### Step 1 — Fill in the configuration
 
-స్క్రిప్ట్ తెరవండి మరియు పైభాగంలో `CONFIGURATION` బ్లాక్ సవరించండి:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- అవసరమైనవి ---
-PROJECT_ID="rtsurvey"                  # మీ ప్రాజెక్ట్ కోసం ప్రత్యేక గుర్తింపు (ఖాళీలు లేవు)
-ADMIN_PASSWORD="admin"                 # యాప్ అడ్మిన్ మరియు Keycloak కోసం పాస్‌వర్డ్ — మొదటి లాగిన్ తర్వాత మార్చండి
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
-# --- డొమైన్ + SSL ---
-DOMAIN="myapp.example.com"            # మీ డొమైన్ — DNS A రికార్డ్ ఇక్కడ పాయింట్ చేయాలి
-PROJECT_URL=""                         # Cloudflare/proxy వెనుక ఉంటే తప్ప ఖాళీగా వదిలండి
-LETSENCRYPT_EMAIL="admin@example.com" # Let's Encrypt నోటిఫికేషన్‌ల కోసం ఇమెయిల్
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- ఐచ్ఛికం ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| ఫీల్డ్ | అవసరమైనదా | వివరణ |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | అవును | డేటాబేస్ పేరు మరియు Keycloak క్లైంట్ ID గా ఉపయోగించబడుతుంది. చిన్న అక్షరాలు, ఖాళీలు లేవు. |
-| `ADMIN_PASSWORD` | లేదు | యాప్ అడ్మిన్ లాగిన్ మరియు Keycloak అడ్మిన్ కన్సోల్ కోసం పాస్‌వర్డ్. `admin` కి డిఫాల్ట్ — **మొదటి లాగిన్ తర్వాత మార్చండి**. |
-| `DOMAIN` | అవును | మీ డొమైన్ పేరు. DNS A రికార్డ్ Droplet IP కి పాయింట్ చేయాలి. |
-| `LETSENCRYPT_EMAIL` | అవును | Let's Encrypt సర్టిఫికేట్ నోటిఫికేషన్‌ల కోసం ఇమెయిల్ చిరునామా. |
-| `PROJECT_URL` | లేదు | పబ్లిక్ URL ఓవర్‌రైడ్ చేయండి. `DOMAIN` ఉపయోగించాలంటే ఖాళీగా వదిలండి. Cloudflare వెనుక ఉపయోగకరం. |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **భద్రత:** అన్ని పాస్‌వర్డ్‌లు `admin` కి డిఫాల్ట్. మీ మొదటి లాగిన్ తర్వాత వాటిని వెంటనే మార్చండి.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### దశ 2 — Droplet సృష్టించండి
+### Step 2 — Create a Droplet
 
-[DigitalOcean కంట్రోల్ ప్యానెల్](https://cloud.digitalocean.com) లో:
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. **Create** → **Droplets** క్లిక్ చేయండి
-2. ఇమేజ్‌గా **Ubuntu 22.04 LTS** ఎంచుకోండి
-3. **Basic, 4 GB RAM / 2 vCPUs** లేదా పెద్దది ఎంచుకోండి
-4. **Advanced Options** వరకు స్క్రోల్ చేయండి → **Add Initialization scripts** చెక్ చేయండి
-5. టెక్స్ట్ ఏరియాలో పూర్తి స్క్రిప్ట్ కంటెంట్ పేస్ట్ చేయండి
-6. **Create Droplet** క్లిక్ చేయండి
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### దశ 3 — DNS రికార్డ్ జోడించండి
+### Step 3 — Add the DNS record
 
-Droplet బూట్ అవుతున్నప్పుడు, మీ DNS ప్రొవైడర్‌లో **A రికార్డ్** జోడించండి:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
-Name  : myapp          (లేదా రూట్ డొమైన్ కోసం @)
+Name  : myapp          (or @ for root domain)
 Value : <droplet-ip>
 TTL   : 300
 ```
 
-### దశ 4 — పురోగతి పర్యవేక్షించండి
+### Step 4 — Monitor progress
 
-Droplet లో SSH చేసి లాగ్ చూడండి:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-స్క్రిప్ట్ ప్రారంభంలో మీ సర్వర్ IP ప్రింట్ చేస్తుంది — మీరు దాన్ని చూడగానే DNS రికార్డ్ జోడించండి.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### దశ 5 — యాప్ యాక్సెస్ చేయండి
+### Step 5 — Access the app
 
-సెటప్ పూర్తయినప్పుడు, లాగ్ సారాంశం చూపిస్తుంది:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
@@ -101,33 +101,33 @@ tail -f /var/log/rtcloud-setup.log
 ============================================================
 ```
 
-మీ బ్రౌజర్‌లో `https://myapp.example.com` తెరవండి మరియు వినియోగదారు పేరు `admin` మరియు పాస్‌వర్డ్ `admin` తో లాగిన్ అవండి.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> లాగిన్ తర్వాత వెంటనే పైకుడి మెనులో **Settings** ద్వారా **మీ పాస్‌వర్డ్ మార్చండి**.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## డిప్లాయ్‌మెంట్ తర్వాత
+## After Deployment
 
-### పాస్‌వర్డ్ మార్చండి
+### Change a password
 
-Droplet లో SSH చేయండి, `.env` సవరించండి మరియు ప్రభావితమైన కంటైనర్‌ను పునఃప్రారంభించండి:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### డొమైన్ అప్‌డేట్ చేయండి
+### Update the domain
 
-డిప్లాయ్‌మెంట్ తర్వాత వేర్వేరు డొమైన్ కేటాయిస్తే, `.env` లో `PROJECT_URL` అప్‌డేట్ చేయండి:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # PROJECT_URL= అప్‌డేట్ చేయండి
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### అన్ని కంటైనర్‌లు చూడండి
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

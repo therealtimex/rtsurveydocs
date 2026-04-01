@@ -1,5 +1,5 @@
 ---
-weight: 4
+weight: 5
 title: "Autenticação SSO"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,167 +7,167 @@ draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Configure o Single Sign-On para o rtCloud auto-alojado usando Keycloak incorporado, um fornecedor OIDC externo ou Azure Active Directory."
+description: "Configure o início de sessão único para rtCloud auto-hospedado usando Keycloak incorporado, um fornecedor OIDC externo ou Azure Active Directory."
 ---
 
-O rtCloud suporta três abordagens para Single Sign-On (SSO):
+O rtCloud suporta três abordagens para o início de sessão único (SSO):
 
-| Opção | Ideal Para |
-|-------|-----------|
-| [Keycloak Incorporado](#embedded-keycloak) | Organizações que querem um servidor SSO totalmente autónomo integrado com o rtCloud |
-| [Fornecedor OIDC Externo](#external-oidc-provider) | Organizações que já executam um fornecedor de identidade (Auth0, Authentik, Okta, Supabase, etc.) |
-| [Azure Active Directory](#azure-active-directory) | Organizações que usam Microsoft 365 ou Azure AD |
+| Option | Best For |
+|--------|----------|
+| [Embedded Keycloak](#embedded-keycloak) | Organizations that want a fully self-contained SSO server bundled with rtCloud |
+| [External OIDC Provider](#external-oidc-provider) | Organizations already running an identity provider (Auth0, Authentik, Okta, Supabase, etc.) |
+| [Azure Active Directory](#azure-active-directory) | Organizations using Microsoft 365 or Azure AD |
 
-Sem SSO configurado, os utilizadores iniciam sessão com contas rtCloud locais geridas através do painel de administração.
+Without SSO configured, users log in with local rtCloud accounts managed through the admin panel.
 
 ---
 
-## Keycloak Incorporado
+## Embedded Keycloak
 
-A implantação inclui um contentor Keycloak opcional que corre junto com o rtCloud. O Keycloak é pré-configurado com um realm rtSurvey e pronto a usar.
+The deployment includes an optional Keycloak container that runs alongside rtCloud. Keycloak is pre-configured with an rtSurvey realm and ready to use.
 
-### Requisitos
+### Requirements
 
-- Um nome de domínio com HTTPS (o Keycloak requer HTTPS em produção)
-- Pelo menos 4 GB RAM no servidor (o Keycloak adiciona ~512 MB de uso de memória)
+- A domain name with HTTPS (Keycloak requires HTTPS in production)
+- At least 4 GB RAM on the server (Keycloak adds ~512 MB memory usage)
 
-### Configuração
+### Setup
 
-**1. Configure as variáveis de ambiente em `.env`:**
+**1. Configure environment variables in `.env`:**
 
 ```dotenv
-# Ativar o contentor Keycloak incorporado
+# Enable the embedded Keycloak container
 EMBED_KEYCLOAK=true
 
-# URLs Keycloak — use o seu domínio real
+# Keycloak URLs — use your actual domain
 KEYCLOAK_URL=https://rtcloud.example.com/auth
 KC_HOSTNAME=https://rtcloud.example.com/auth
 KC_HOSTNAME_STRICT=false
 
-# Configurações de realm e cliente (correspondem ao JSON de realm importado)
+# Realm and client settings (match the imported realm JSON)
 KEYCLOAK_REALM=rtsurvey
 KEYCLOAK_CLIENT_ID=rtsurvey-app
 KEYCLOAK_CLIENT_SECRET=your-client-secret-here
 
-# Credenciais de admin Keycloak
+# Keycloak admin credentials
 KEYCLOAK_ADMIN_USER=admin
 KEYCLOAK_ADMIN_PASSWORD=change_me_keycloak_admin_password
 
-# Base de dados Keycloak (criada automaticamente)
+# Keycloak database (created automatically)
 KEYCLOAK_DB=keycloak
 KEYCLOAK_DB_USER=keycloak
 KEYCLOAK_DB_PASSWORD=change_me_keycloak_db_password
 
-# Porta em que o Keycloak escuta (lado do host, proxiado pelo Nginx)
+# Port Keycloak listens on (host-side, proxied by Nginx)
 KEYCLOAK_PORT=8091
 ```
 
-**2. Inicie com o perfil Keycloak incorporado:**
+**2. Start with the embedded Keycloak profile:**
 
 ```bash
 docker compose -f docker-compose.production.yml --profile embed-keycloak up -d
 ```
 
-**3. Verifique se o Keycloak está saudável:**
+**3. Verify Keycloak is healthy:**
 
 ```bash
 docker compose -f docker-compose.production.yml ps
 ```
 
-O contentor `rtcloud-keycloak` deve mostrar `Up (healthy)` após 2–3 minutos.
+The `rtcloud-keycloak` container should show `Up (healthy)` after 2–3 minutes.
 
-**4. Aceda à consola de admin Keycloak:**
+**4. Access the Keycloak admin console:**
 
 ```
 https://rtcloud.example.com/auth/admin
 ```
 
-Inicie sessão com `KEYCLOAK_ADMIN_USER` e `KEYCLOAK_ADMIN_PASSWORD`.
+Log in with `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD`.
 
-### O que Está Pré-Configurado
+### What Is Pre-Configured
 
-O Keycloak incorporado inicia com um realm `rtsurvey` pré-importado que inclui:
+The embedded Keycloak starts with a pre-imported `rtsurvey` realm that includes:
 
-- Configuração de cliente para a aplicação web
-- Funções de utilizador predefinidas (`admin`, `project_manager`, `enumerator`, `analyst`)
-- Configurações de sessão e token otimizadas para o rtSurvey
+- Client configuration for the web application
+- Default user roles (`admin`, `project_manager`, `enumerator`, `analyst`)
+- Session and token settings optimized for rtSurvey
 
-Pode adicionar utilizadores diretamente na consola de admin Keycloak ou ligar o Keycloak a um fornecedor de identidade upstream (LDAP, SAML).
+You can add users directly in the Keycloak admin console or connect Keycloak to an upstream identity provider (LDAP, SAML).
 
-### Encaminhamento Nginx
+### Nginx Routing
 
-Ao usar os scripts de implantação na cloud, o Nginx é configurado para fazer proxy de ambos os serviços:
+When using the cloud deployment scripts, Nginx is configured to proxy both services:
 
-| Caminho | Backend |
-|---------|---------|
-| `/` | Aplicação rtCloud em `127.0.0.1:8080` |
-| `/auth/` | Keycloak em `127.0.0.1:8090` |
+| Path | Backend |
+|------|---------|
+| `/` | rtCloud app on `127.0.0.1:8080` |
+| `/auth/` | Keycloak on `127.0.0.1:8090` |
 
 ---
 
-## Fornecedor OIDC Externo
+## External OIDC Provider
 
-Ligue o rtCloud a qualquer fornecedor de identidade compatível com OpenID Connect. Esta abordagem não requer o contentor Keycloak.
+Connect rtCloud to any OpenID Connect-compatible identity provider. This approach does not require the Keycloak container.
 
-### Fornecedores Suportados
+### Supported Providers
 
-Qualquer fornecedor compatível com OIDC funciona, incluindo:
+Any OIDC-compliant provider works, including:
 - Authentik
 - Auth0
 - Okta
-- Keycloak (instância externa)
+- Keycloak (external instance)
 - Supabase
-- Google (para organizações Google Workspace)
-- GitHub (via aplicações OAuth com extensão OIDC)
+- Google (for Google Workspace organizations)
+- GitHub (via OAuth apps with OIDC extension)
 
-### Configuração
+### Setup
 
-**1. Registe o rtCloud como cliente OIDC no seu fornecedor de identidade.**
+**1. Register rtCloud as an OIDC client in your identity provider.**
 
-Vai precisar de:
-- Um **ID de cliente** e **segredo de cliente**
-- Registar o **URI de redirecionamento**: `https://rtcloud.example.com/auth/callback`
-- Para suporte a aplicações móveis, registe também: `vn.rta.rtsurvey.auth://callback`
+You will need:
+- A **client ID** and **client secret**
+- To register the **redirect URI**: `https://rtcloud.example.com/auth/callback`
+- For mobile app support, also register: `vn.rta.rtsurvey.auth://callback`
 
-**2. Configure as variáveis de ambiente em `.env`:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
-# URL de descoberta OIDC (específico do fornecedor — consulte a documentação do seu IdP)
+# OIDC discovery URL (provider-specific — check your IdP documentation)
 OIDC_ISSUER_URL=https://your-identity-provider.com
 
-# Credenciais de cliente do seu fornecedor de identidade
+# Client credentials from your identity provider
 OIDC_CLIENT_ID=rtcloud-app
 OIDC_CLIENT_SECRET=your-client-secret-here
 
-# Scopes a solicitar (openid, profile e email são tipicamente suficientes)
+# Scopes to request (openid, profile, and email are typically sufficient)
 OIDC_SCOPE=openid profile email
 
-# URI de redirecionamento registado no seu fornecedor de identidade
+# Redirect URI registered in your identity provider
 OIDC_REDIRECT_URI=https://rtcloud.example.com/auth/callback
 
-# Opcional: cliente separado para a aplicação móvel
+# Optional: separate mobile app client
 OIDC_MOBILE_CLIENT_ID=rtcloud-mobile
 OIDC_MOBILE_REDIRECT_URI=vn.rta.rtsurvey.auth://callback
 
-# Defina como true para criar automaticamente contas rtCloud para novos utilizadores OIDC
+# Set to true to auto-create rtCloud accounts for new OIDC users
 OPEN_REGISTRATION=false
 ```
 
-**3. Reinicie o contentor da aplicação para aplicar as alterações:**
+**3. Restart the app container to apply the changes:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Provisionamento Automático de Utilizadores
+### Auto-Provisioning Users
 
-Quando `OPEN_REGISTRATION=true`, o rtCloud cria automaticamente uma conta local na primeira vez que um utilizador inicia sessão via OIDC. A conta é preenchida com o nome e email do utilizador provenientes do token de ID.
+When `OPEN_REGISTRATION=true`, rtCloud automatically creates a local account the first time a user signs in via OIDC. The account is populated with the user's name and email from the ID token.
 
-Quando `OPEN_REGISTRATION=false` (predefinição), um administrador do rtCloud deve criar primeiro a conta de utilizador e a identidade OIDC é ligada no primeiro início de sessão.
+When `OPEN_REGISTRATION=false` (default), an rtCloud administrator must create the user account first, and the OIDC identity is linked on first login.
 
-### Endpoints Personalizados
+### Custom Endpoints
 
-Se o seu fornecedor não suportar descoberta OIDC (`.well-known/openid-configuration`), pode definir endpoints manualmente:
+If your provider does not support OIDC discovery (`.well-known/openid-configuration`), you can set endpoints manually:
 
 ```dotenv
 OIDC_AUTHORIZATION_ENDPOINT=https://your-provider.com/oauth2/authorize
@@ -179,41 +179,41 @@ OIDC_USERINFO_ENDPOINT=https://your-provider.com/oauth2/userinfo
 
 ## Azure Active Directory
 
-Integre o rtCloud com o tenant Microsoft Azure AD da sua organização.
+Integrate rtCloud with your organization's Microsoft Azure AD tenant.
 
-### Configuração
+### Setup
 
-**1. Registe uma nova aplicação no [Portal Azure](https://portal.azure.com):**
+**1. Register a new app in the [Azure Portal](https://portal.azure.com):**
 
-   - Vá a **Azure Active Directory** → **Registos de aplicações** → **Novo registo**
-   - Nome: `rtCloud`
-   - URI de redirecionamento: `https://rtcloud.example.com/auth/callback` (tipo Web)
-   - Após a criação, anote o **ID da Aplicação (cliente)** e o **ID do Diretório (inquilino)**
-   - Em **Certificados e segredos**, crie um novo segredo de cliente
+   - Go to **Azure Active Directory** → **App registrations** → **New registration**
+   - Name: `rtCloud`
+   - Redirect URI: `https://rtcloud.example.com/auth/callback` (Web type)
+   - After creation, note the **Application (client) ID** and **Directory (tenant) ID**
+   - Under **Certificates & secrets**, create a new client secret
 
-**2. Configure as variáveis de ambiente em `.env`:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
 AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-**3. Reinicie o contentor da aplicação:**
+**3. Restart the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Os utilizadores no seu tenant Azure AD podem agora iniciar sessão no rtCloud usando as suas credenciais Microsoft.
+Users in your Azure AD tenant can now log in to rtCloud using their Microsoft credentials.
 
 ---
 
-## Desativar SSO
+## Disabling SSO
 
-Para reverter para autenticação local, remova ou comente todas as variáveis relacionadas com SSO em `.env`, depois reinicie o contentor da aplicação:
+To revert to local authentication, remove or comment out all SSO-related variables from `.env`, then restart the app container:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Se estava a usar o Keycloak incorporado, pare-o omitindo o sinalizador `--profile embed-keycloak` e executando `docker compose down` seguido de `up -d` sem o perfil.
+If you were using embedded Keycloak, stop it by omitting the `--profile embed-keycloak` flag and running `docker compose down` followed by `up -d` without the profile.

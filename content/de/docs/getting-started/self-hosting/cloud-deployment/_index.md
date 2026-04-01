@@ -1,16 +1,16 @@
 ---
 weight: 3
-title: "Cloud Deployment"
+title: "Cloud-Bereitstellung"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "Deploy rtCloud to major cloud providers with automated scripts for DigitalOcean, AWS EC2, Google Cloud, and Linode."
+description: "rtCloud bei großen Cloud-Anbietern mit automatisierten Skripten für DigitalOcean, AWS EC2, Google Cloud und Linode bereitstellen."
 ---
 
-The deployment repository includes automated provisioning scripts for major cloud providers. Each script runs on first boot of a fresh **Ubuntu 22.04 LTS** server and performs a fully unattended setup:
+Das Bereitstellungs-Repository enthält automatisierte Provisionierungsskripte für wichtige Cloud-Anbieter. Jedes Skript wird beim ersten Start eines neuen Ubuntu 22.04 LTS-Servers ausgeführt und führt eine vollständig unbeaufsichtigte Einrichtung durch:
 
 - Installs Docker and Docker Compose
 - Generates secure random passwords for all internal services

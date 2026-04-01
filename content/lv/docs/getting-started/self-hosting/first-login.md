@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Pirmā pieteikšanās"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Kā pirmo reizi pieteikties savā rtSurvey instancē pēc izvietošanas."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **Pirms pieteikšanās jākonfigurē SSL.** Ja piekļūstat lietotnei caur HTTP, tiks parādīts drošības brīdinājums un SSO tiks bloķēts. Vispirms pabeidziet [SSL iestatīšanu](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Kad SSL ir aktīvs, atveriet pārlūkprogrammu savā HTTPS URL:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Pieteikšanās ekrāns
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Pieteikšanās lapā redzams:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- **Lietotājvārds** un **Parole** lauki
+- **Pierakstīties** poga
+- **Pierakstīties ar SSO** poga (zem atdalītāja) — komandas locekļiem ar SSO kontiem
 
 ---
 
-## If you see a security warning
+## Noklusējuma administratora akreditācijas dati
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Ievadiet noklusējuma akreditācijas datus un noklikšķiniet uz **Pierakstīties**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Lauks | Vērtība |
+|-------|---------|
+| Lietotājvārds | `admin` |
+| Parole | `admin` |
+
+> **Nomainiet paroli uzreiz pēc pirmās pieteikšanās.**
+
+---
+
+## Ja tiek parādīts drošības brīdinājums
+
+Ja piekļūstat lietotnei caur HTTP (pirms SSL konfigurēšanas), redzēsit:
+
+- Dzeltenu brīdinājuma joslu pieteikšanās lapas augšā
+- Modālo logu, noklikšķinot uz **Pierakstīties**, brīdinot, ka akreditācijas dati tiks nosūtīti nešifrēti
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Noklikšķiniet uz **Iestatīt SSL**, lai konfigurētu HTTPS, vai uz **Turpināt tāpat** pieteikšanās bez SSL (nav ieteicams).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+SSO pieteikšanās caur HTTP ir pilnībā bloķēta — noklikšķinot uz **Pierakstīties ar SSO**, tiks parādīts paziņojums, nevis novirzīšana.
 
 ---
 
-## After logging in
+## Pēc pieteikšanās
 
-Once inside, you will land on the dashboard. From here:
+Pēc pieteikšanās nokļūsit informācijas panelī. No šejienes:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Mainīt administratora paroli** — konta iestatījumi → mainīt paroli
+2. **Izveidot pirmo projektu** — Projekti → Jauns projekts
+3. **Augšupielādēt vai izveidot veidlapu** — Veidlapas → Augšupielādēt XLSForm vai atvērt Form Builder
+4. **Pievienot lietotājus** — Lietotāji → Uzaicināt vai izveidot kontus jūsu komandai

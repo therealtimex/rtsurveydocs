@@ -7,127 +7,127 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Vendosni rtCloud në një Droplet DigitalOcean duke përdorur skripte të automatizuara user-data."
+description: "Vendosni rtCloud në DigitalOcean Droplet duke përdorur skripte automatike të të dhënave të përdoruesit."
 ---
 
-DigitalOcean përdor skripte **User Data** që ekzekutohen automatikisht në nisjen e parë. Plotësoni variablat e konfigurimit në krye të skriptit, pastaj ngjitni të gjithë skriptin kur krijoni një Droplet.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> Ndryshe nga StackScripts të Linode, DigitalOcean nuk ka UI formulari — duhet ta editoni skriptin direkt para se ta ngjitni.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**Shkarkoni skriptin:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Keycloak i Integruar (I Rekomanduar)
+## Embedded Keycloak (Recommended)
 
-Përdorni `digitalocean-droplet-keycloak-embed.sh` për konfigurim më të thjeshtë me SSO të integruar.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### Hapi 1 — Plotësoni konfigurimin
+### Step 1 — Fill in the configuration
 
-Hapni skriptin dhe editoni bllokun `CONFIGURATION` në krye:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- E detyrueshme ---
-PROJECT_ID="rtsurvey"                  # Identifikues unik për projektin tuaj (pa hapësira)
-ADMIN_PASSWORD="admin"                 # Fjalëkalimi për admin aplikacioni dhe Keycloak — ndryshojeni pas hyrjes së parë
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
-# --- Domeni + SSL ---
-DOMAIN="myapp.example.com"            # Domeni juaj — rekord DNS A duhet të tregojë këtu
-PROJECT_URL=""                         # Lini bosh nëse nuk jeni pas Cloudflare/proxy
-LETSENCRYPT_EMAIL="admin@example.com" # Email për njoftimet Let's Encrypt
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- Opsionale ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Fusha | E detyrueshme | Përshkrimi |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Po | Përdoret si emri i bazës së të dhënave dhe ID klientit Keycloak. Me shkronja të vogla, pa hapësira. |
-| `ADMIN_PASSWORD` | Jo | Fjalëkalimi për hyrjen e adminit të aplikacionit dhe konsolën administrative Keycloak. Parazgjedhja `admin` — **ndryshojeni pas hyrjes së parë**. |
-| `DOMAIN` | Po | Emri i domenit tuaj. Rekord DNS A duhet të tregojë IP-në e Droplet. |
-| `LETSENCRYPT_EMAIL` | Po | Adresa email për njoftimet e certifikatave Let's Encrypt. |
-| `PROJECT_URL` | Jo | Anashkaloni URL-n publike. Lini bosh për të përdorur `DOMAIN`. I dobishëm pas Cloudflare. |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **Siguria:** Të gjitha fjalëkalimet parazgjidhen me `admin`. Ndryshojini menjëherë pas hyrjes suaj të parë.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### Hapi 2 — Krijoni një Droplet
+### Step 2 — Create a Droplet
 
-Në [panelin e kontrollit DigitalOcean](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Klikoni **Krijo** → **Droplets**
-2. Zgjidhni **Ubuntu 22.04 LTS** si imazhin
-3. Zgjidhni **Basic, 4 GB RAM / 2 vCPU** ose më të madh
-4. Lëvizni te **Opsionet e Avancuara** → kontrolloni **Shto Skripte Inicializimi**
-5. Ngjitni të gjithë përmbajtjen e skriptit në fushën e tekstit
-6. Klikoni **Krijo Droplet**
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### Hapi 3 — Shtoni rekordin DNS
+### Step 3 — Add the DNS record
 
-Ndërkohë që Droplet-i po niset, shtoni një **rekord A** te ofruesi juaj DNS:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
-Tipi  : A
-Emri  : myapp          (ose @ për domenin rrënjë)
-Vlera : <droplet-ip>
+Type  : A
+Name  : myapp          (or @ for root domain)
+Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Hapi 4 — Monitoroni progresin
+### Step 4 — Monitor progress
 
-SSH-oni në Droplet dhe shikoni regjistrin:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-Skripti printon IP-në e serverit tuaj afër fillimit — shtoni rekordin DNS sapo ta shihni.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### Hapi 5 — Aksesoni aplikacionin
+### Step 5 — Access the app
 
-Kur konfigurimi përfundon, regjistri tregon një përmbledhje:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
- Vendosja rtCloud u kompletua! (Keycloak i Integruar)
+ rtCloud deployment complete! (Embedded Keycloak)
 ============================================================
- URL Aplikacioni   : https://myapp.example.com
+ App URL   : https://myapp.example.com
  Admin     : admin / admin
  Keycloak  : https://myapp.example.com/auth/admin
 
- !! SIGURIA: Të gjitha fjalëkalimet parazgjidhen me 'admin'.
-    Ndryshojini menjëherë pas hyrjes së parë.
+ !! SECURITY: All passwords default to 'admin'.
+    Change them immediately after first login.
 ============================================================
 ```
 
-Hapni `https://myapp.example.com` në shfletuesin tuaj dhe hyni me emrin e përdoruesit `admin` dhe fjalëkalimin `admin`.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Ndryshoni fjalëkalimin tuaj** menjëherë pas hyrjes nëpërmjet **Cilësimet** në menunë e sipërme të djathtë.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## Pas Vendosjes
+## After Deployment
 
-### Ndryshoni një fjalëkalim
+### Change a password
 
-SSH-oni në Droplet, editoni `.env` dhe rinisni kontejnerin e ndikuar:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Përditësoni domenin
+### Update the domain
 
-Nëse caktoni një domen të ndryshëm pas vendosjes, përditësoni `PROJECT_URL` në `.env`:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # përditësoni PROJECT_URL=
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Shikoni të gjithë kontejnerët
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

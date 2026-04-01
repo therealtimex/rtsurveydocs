@@ -1,65 +1,65 @@
 ---
 weight: 3
-title: "Ανάπτυξη στο cloud"
+title: "Ανάπτυξη σε Cloud"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "Αναπτύξτε το rtCloud σε κύριους παρόχους cloud με αυτόματα σενάρια για DigitalOcean, AWS EC2, Google Cloud και Linode."
+description: "Ανάπτυξη rtCloud σε μεγάλους παρόχους cloud με αυτοματοποιημένα scripts για DigitalOcean, AWS EC2, Google Cloud και Linode."
 ---
 
-Το αποθετήριο ανάπτυξης περιλαμβάνει αυτόματα σενάρια παροχής για κύριους παρόχους cloud. Κάθε σενάριο εκτελείται κατά την πρώτη εκκίνηση ενός νέου διακομιστή **Ubuntu 22.04 LTS** και εκτελεί πλήρως αυτόματη ρύθμιση:
+Το αποθετήριο ανάπτυξης περιλαμβάνει αυτοματοποιημένα σκριπτ παροχής για τους κύριους παρόχους cloud. Κάθε σκριπτ εκτελείται κατά την πρώτη εκκίνηση ενός νέου διακομιστή Ubuntu 22.04 LTS και πραγματοποιεί πλήρως αυτόματη ρύθμιση:
 
-- Εγκατάσταση Docker και Docker Compose
-- Δημιουργία τυχαίων ισχυρών κωδικών για όλες τις εσωτερικές υπηρεσίες
-- Εγγραφή `docker-compose.production.yml` και `.env`
-- Διαμόρφωση Nginx ως αντίστροφου διακομιστή μεσολάβησης
-- Απόκτηση δωρεάν πιστοποιητικού TLS από Let's Encrypt
-- Διαμόρφωση τείχους προστασίας UFW
-- Προαιρετική ανάπτυξη ενσωματωμένου διακομιστή SSO Keycloak
-- Εξαγωγή πλήρους σύνοψης ανάπτυξης με όλα τα διαπιστευτήρια
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-Η ρύθμιση ολοκληρώνεται σε **5–10 λεπτά** σε τυπική εγκατάσταση.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## Επιλογή σεναρίου
+## Choosing a Script
 
-Υπάρχουν πολλαπλές παραλλαγές σεναρίων ανάλογα με τον πάροχο cloud και τη ρύθμιση SSO:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| Σενάριο | Πάροχος | Λειτουργία SSO | Κατάλληλο για |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Ενσωματωμένο Keycloak | Απλό, αυτάρκες SSO |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak ή Εξωτερικό OIDC | Πλήρης έλεγχος |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Ενσωματωμένο Keycloak | Ρύθμιση βάσει φόρμας, απλούστατο |
-| `linode-stackscript-oidc.sh` | Linode | Μόνο εξωτερικό OIDC | Υπάρχων πάροχος ταυτοτήτων |
-| `linode-stackscript.sh` | Linode | Keycloak ή Εξωτερικό OIDC | Πλήρης έλεγχος |
-| `aws-ec2.sh` | AWS EC2 | Keycloak ή Εξωτερικό OIDC | Αναπτύξεις AWS |
-| `gcp-compute.sh` | Google Cloud | Keycloak ή Εξωτερικό OIDC | Αναπτύξεις GCP |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **Συνιστάται για τους περισσότερους χρήστες:** Χρησιμοποιήστε την παραλλαγή `keycloak-embed`. Περιλαμβάνει ενσωματωμένο διακομιστή ταυτοτήτων Keycloak και απαιτεί τα λιγότερα πεδία διαμόρφωσης.
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## Οδηγός μεγέθους διακομιστή
+## Server Sizing Guide
 
-| Περίπτωση χρήσης | RAM | Δίσκος | Παράδειγμα |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| Αξιολόγηση / ανάπτυξη | 2 GB | 25 GB | DO Basic $18/μήνα, t3.small, e2-small |
-| Μικρή ομάδα (< 50 χρήστες) | 4 GB | 40 GB | DO Basic $24/μήνα, t3.medium, e2-medium |
-| Παραγωγή (> 50 χρήστες) | 8 GB | 80 GB | DO General $48/μήνα, t3.large, n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> Το ενσωματωμένο Keycloak απαιτεί τουλάχιστον **4 GB RAM**. Χρησιμοποιήστε 2 GB μόνο για αξιολόγηση χωρίς Keycloak.
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## Ρύθμιση DNS
+## DNS Setup
 
-Όλα τα σενάρια απαιτούν τομέα με **εγγραφή A που να δείχνει στη διεύθυνση IP του διακομιστή σας** πριν το Let's Encrypt μπορέσει να εκδώσει πιστοποιητικό.
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-Το σενάριο εκτυπώνει τη διεύθυνση IP του διακομιστή σας νωρίς κατά τη διαδικασία ρύθμισης:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
@@ -70,26 +70,26 @@ description: "Αναπτύξτε το rtCloud σε κύριους παρόχου
 ============================================================
 ```
 
-Το σενάριο **επαναδοκιμάζει αυτόματα** το Let's Encrypt κάθε 60 δευτερόλεπτα για έως 1 ώρα. Απλώς προσθέστε την εγγραφή DNS και αναμείνετε — δεν απαιτείται επανεκκίνηση.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Όριο ρυθμού:** Το Let's Encrypt επιτρέπει μέγιστο **5 πιστοποιητικά ανά τομέα ανά 7 ημέρες**. Αποφύγετε επαναλαμβανόμενη ανάπτυξη και καταστροφή διακομιστών με τον ίδιο τομέα.
-
----
-
-## Λίστα ελέγχου μετά την ανάπτυξη
-
-- [ ] Η εφαρμογή ανοίγει στη διεύθυνση `https://your-domain.com`
-- [ ] Σύνδεση με `admin` και τον κωδικό που διαμορφώσατε
-- [ ] Όλα τα κοντέινερ είναι υγιή: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] Η ανανέωση Let's Encrypt λειτουργεί: `certbot renew --dry-run`
-- [ ] Η θύρα MySQL 3306 **δεν** εκτίθεται: `ufw status`
-- [ ] Ρύθμιση ημερήσιου αντιγράφου ασφαλείας βάσης δεδομένων (βλ. [Συντήρηση](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## Αντιμετώπιση προβλημάτων
+## Post-Deployment Checklist
 
-### Έλεγχος πλήρους αρχείου καταγραφής ρύθμισης
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,20 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Όριο ρυθμού Let's Encrypt
+### Let's Encrypt rate limit
 
-Εάν δείτε `too many certificates` στο αρχείο καταγραφής, έχετε φτάσει το όριο 5 πιστοποιητικών/7 ημερών. Αναμείνετε μέχρι εκείνη την ώρα και αναπτύξτε ξανά.
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
-### Το Keycloak παραμένει ανθυγιές
+```
+[SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
+```
 
-Βεβαιωθείτε ότι ο διακομιστής έχει τουλάχιστον 4 GB RAM, στη συνέχεια ελέγξτε τα αρχεία καταγραφής:
+Wait until that time, then redeploy.
+
+### Keycloak stays unhealthy
+
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### Η διαμόρφωση SSL δεν εφαρμόστηκε μετά το certbot
+### SSL config not applied after certbot
+
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

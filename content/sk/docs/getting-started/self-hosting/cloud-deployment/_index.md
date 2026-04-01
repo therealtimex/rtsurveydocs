@@ -7,59 +7,59 @@ draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "Nasadenie rtCloud na hlavných poskytovateľoch cloudu pomocou automatizovaných skriptov pre DigitalOcean, AWS EC2, Google Cloud a Linode."
+description: "Nasaďte rtCloud u hlavných poskytovateľov cloudu pomocou automatizovaných skriptov pre DigitalOcean, AWS EC2, Google Cloud a Linode."
 ---
 
-Repozitár nasadenia obsahuje automatizované skripty zriaďovania pre hlavných poskytovateľov cloudu. Každý skript beží pri prvom spustení čerstvého servera **Ubuntu 22.04 LTS** a vykonáva plne bezobslužné nastavenie:
+Úložisko nasadenia obsahuje automatizované provisioningové skripty pre hlavných poskytovateľov cloudu. Každý skript sa spustí pri prvom štarte nového servera Ubuntu 22.04 LTS a vykoná plne automatické nastavenie:
 
-- Inštaluje Docker a Docker Compose
-- Generuje bezpečné náhodné heslá pre všetky interné služby
-- Zapisuje `docker-compose.production.yml` a `.env`
-- Konfiguruje Nginx ako reverzný proxy
-- Získava bezplatný TLS certifikát od Let's Encrypt (automaticky opakuje pokus, kým sa DNS nevyrieši)
-- Konfiguruje firewall UFW
-- Voliteľne nasadí vstavaný server SSO Keycloak
-- Vypisuje úplný súhrn nasadenia so všetkými prihlasovacími údajmi
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-Nastavenie sa dokončí za **5–10 minút** na štandardnej inštancii.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## Výber skriptu
+## Choosing a Script
 
-Existuje viacero variantov skriptov v závislosti od vášho poskytovateľa cloudu a nastavenia SSO:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| Skript | Poskytovateľ | Režim SSO | Najvhodnejší pre |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Vstavaný Keycloak | Jednoduché, samostatné SSO |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak alebo externý OIDC | Plná kontrola |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Vstavaný Keycloak | Nastavenie cez formulár, najjednoduchšie |
-| `linode-stackscript-oidc.sh` | Linode | Iba externý OIDC | Existujúci poskytovateľ identity |
-| `linode-stackscript.sh` | Linode | Keycloak alebo externý OIDC | Plná kontrola |
-| `aws-ec2.sh` | AWS EC2 | Keycloak alebo externý OIDC | Nasadenia AWS |
-| `gcp-compute.sh` | Google Cloud | Keycloak alebo externý OIDC | Nasadenia GCP |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **Odporúčané pre väčšinu používateľov:** Použite variant `keycloak-embed`. Obsahuje vstavaný server identity Keycloak a vyžaduje najmenej konfiguračných polí.
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## Sprievodca dimenzovaním servera
+## Server Sizing Guide
 
-| Prípad použitia | RAM | Disk | Príklad |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| Hodnotenie / vývoj | 2 GB | 25 GB | DO Basic $18/mes., t3.small, e2-small |
-| Malý tím (< 50 používateľov) | 4 GB | 40 GB | DO Basic $24/mes., t3.medium, e2-medium |
-| Produkcia (> 50 používateľov) | 8 GB | 80 GB | DO General $48/mes., t3.large, n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> Vstavaný Keycloak vyžaduje aspoň **4 GB RAM**. Používajte 2 GB iba na hodnotenie bez Keycloak.
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## Nastavenie DNS
+## DNS Setup
 
-Všetky skripty vyžadujú doménu so **záznamom A smerujúcim na IP adresu vášho servera** predtým, ako Let's Encrypt môže vydať certifikát.
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-Skript vypíše IP adresu vášho servera na začiatku procesu nastavenia:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
@@ -70,26 +70,26 @@ Skript vypíše IP adresu vášho servera na začiatku procesu nastavenia:
 ============================================================
 ```
 
-Skript **automaticky opakuje pokus** Let's Encrypt každých 60 sekúnd až do 1 hodiny. Stačí pridať záznam DNS a počkať — nie je potrebné reštartovanie.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Limit frekvencie:** Let's Encrypt umožňuje maximum **5 certifikátov na doménu za 7 dní**. Vyhnite sa opakovanému nasadzovaniu a ničeniu serverov s rovnakou doménou. Ak dosiahnete limit, skript zobrazí časovú pečiatku `retry after` a okamžite sa zastaví.
-
----
-
-## Kontrolný zoznam po nasadení
-
-- [ ] Aplikácia sa otvára na `https://vaša-doména.com`
-- [ ] Prihláste sa s `admin` a heslom, ktoré ste nakonfigurovali
-- [ ] Všetky kontajnery sú zdravé: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] Obnova Let's Encrypt funguje: `certbot renew --dry-run`
-- [ ] Port MySQL 3306 **nie je** vystavený: `ufw status`
-- [ ] Nastavte dennú zálohu databázy (pozrite si [Údržba](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## Riešenie problémov
+## Post-Deployment Checklist
 
-### Skontrolujte úplný protokol nastavenia
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Limit frekvencie Let's Encrypt
+### Let's Encrypt rate limit
 
-Ak v protokole vidíte `too many certificates`, dosiahli ste limit 5 certifikátov/7 dní. Protokol zobrazuje presný čas opätovného pokusu:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
 [SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-Počkajte do tohto času, potom znova nasaďte.
+Wait until that time, then redeploy.
 
-### Keycloak zostáva nezdravý
+### Keycloak stays unhealthy
 
-Uistite sa, že server má aspoň 4 GB RAM, potom skontrolujte protokoly:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### Konfigurácia SSL sa neaplikuje po certbot
+### SSL config not applied after certbot
 
-Ak bol certifikát vydaný, ale Nginx stále zobrazuje iba HTTP, skontrolujte riadok chyby v protokole a manuálne znova načítajte Nginx:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

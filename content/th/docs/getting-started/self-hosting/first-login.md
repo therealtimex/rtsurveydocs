@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "การเข้าสู่ระบบครั้งแรก"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "วิธีเข้าสู่ระบบ rtSurvey instance ของคุณเป็นครั้งแรกหลังการติดตั้ง"
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **ต้องกำหนดค่า SSL ก่อนเข้าสู่ระบบ** หากคุณเข้าถึงแอปผ่าน HTTP คุณจะเห็นคำเตือนด้านความปลอดภัยและ SSO จะถูกบล็อก ให้ทำ [การตั้งค่า SSL](ssl-setup) ให้เสร็จก่อน
 
-After SSL is active, open your browser at your HTTPS URL:
+หลังจาก SSL ใช้งานได้แล้ว เปิดเบราว์เซอร์ที่ URL HTTPS ของคุณ:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## หน้าจอเข้าสู่ระบบ
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+หน้าเข้าสู่ระบบแสดง:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- ช่อง **ชื่อผู้ใช้** และ **รหัสผ่าน**
+- ปุ่ม **ลงชื่อเข้าใช้**
+- ปุ่ม **เข้าสู่ระบบด้วย SSO** (ด้านล่างตัวคั่น) — สำหรับสมาชิกทีมที่มีบัญชี SSO
 
 ---
 
-## If you see a security warning
+## ข้อมูลรับรองผู้ดูแลระบบเริ่มต้น
 
-If you access the app over HTTP (before SSL is configured), you will see:
+ป้อนข้อมูลรับรองเริ่มต้นและคลิก **ลงชื่อเข้าใช้**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| ฟิลด์ | ค่า |
+|-------|-----|
+| ชื่อผู้ใช้ | `admin` |
+| รหัสผ่าน | `admin` |
+
+> **เปลี่ยนรหัสผ่านของคุณทันทีหลังจากเข้าสู่ระบบครั้งแรก**
+
+---
+
+## หากคุณเห็นคำเตือนด้านความปลอดภัย
+
+หากคุณเข้าถึงแอปผ่าน HTTP (ก่อนกำหนดค่า SSL) คุณจะเห็น:
+
+- แบนเนอร์คำเตือนสีเหลืองที่ด้านบนของหน้าเข้าสู่ระบบ
+- หน้าต่างป๊อปอัปเมื่อคลิก **ลงชื่อเข้าใช้** เตือนว่าข้อมูลรับรองจะถูกส่งโดยไม่เข้ารหัส
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+คลิก **ตั้งค่า SSL** เพื่อกำหนดค่า HTTPS หรือ **ดำเนินการต่อไปอยู่ดี** เพื่อเข้าสู่ระบบโดยไม่มี SSL (ไม่แนะนำ)
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+การเข้าสู่ระบบ SSO ถูกบล็อกทั้งหมดผ่าน HTTP — การคลิก **เข้าสู่ระบบด้วย SSO** จะแสดงการแจ้งเตือนแทนการเปลี่ยนเส้นทาง
 
 ---
 
-## After logging in
+## หลังจากเข้าสู่ระบบ
 
-Once inside, you will land on the dashboard. From here:
+เมื่อเข้ามาแล้ว คุณจะอยู่ที่แดชบอร์ด จากที่นี่:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **เปลี่ยนรหัสผ่านผู้ดูแลระบบ** — การตั้งค่าบัญชี → เปลี่ยนรหัสผ่าน
+2. **สร้างโปรเจกต์แรกของคุณ** — โปรเจกต์ → โปรเจกต์ใหม่
+3. **อัปโหลดหรือสร้างแบบฟอร์ม** — แบบฟอร์ม → อัปโหลด XLSForm หรือเปิด Form Builder
+4. **เพิ่มผู้ใช้** — ผู้ใช้ → เชิญหรือสร้างบัญชีสำหรับทีมของคุณ

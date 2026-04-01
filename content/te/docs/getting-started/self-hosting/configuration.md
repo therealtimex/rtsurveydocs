@@ -7,215 +7,215 @@ draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "స్వయం-హోస్ట్ చేయబడిన rtCloud డిప్లాయ్‌మెంట్ కాన్ఫిగర్ చేయడానికి ఉపయోగించే అన్ని పర్యావరణ వేరియబుల్‌ల పూర్తి రిఫరెన్స్."
+description: "స్వీయ-హోస్ట్ చేయబడిన rtCloud విన్యాసాన్ని కాన్ఫిగర్ చేయడానికి ఉపయోగించే అన్ని పర్యావరణ వేరియబుల్స్ కోసం పూర్తి సూచన."
 ---
 
-అన్ని కాన్ఫిగరేషన్ మీ డిప్లాయ్‌మెంట్ డైరెక్టరీ రూట్‌లోని `.env` ఫైల్‌లో పర్యావరణ వేరియబుల్‌ల ద్వారా చేయబడుతుంది. Docker Compose ఈ ఫైల్‌ను స్వయంచాలకంగా చదువుతుంది — `--env-file` ఫ్లాగ్ అవసరం లేదు.
+అన్ని కాన్ఫిగరేషన్ మీ విన్యాస డైరెక్టరీ రూట్‌లో `.env` ఫైల్‌లో పర్యావరణ వేరియబుల్స్ ద్వారా చేయబడుతుంది. Docker Compose ఈ ఫైల్‌ను స్వయంచాలకంగా చదువుతుంది — `--env-file` ఫ్లాగ్ అవసరం లేదు.
 
-**అవసరమైన** వేరియబుల్‌లను కంటైనర్‌లు ప్రారంభించే ముందు సెట్ చేయాలి. మిగిలిన వాటికి డిఫాల్ట్‌లు ఉన్నాయి మరియు అవి ఐచ్ఛికం.
+**అవసరమైన** అని గుర్తించబడిన వేరియబుల్స్ కంటైనర్‌లు ప్రారంభించే ముందు సెట్ చేయబడాలి. మిగతా అన్నింటికీ డిఫాల్ట్ విలువలు ఉన్నాయి మరియు ఐచ్ఛికం.
 
 ---
 
-## ప్రాజెక్ట్
+## Project
 
-ఈ వేరియబుల్‌లు మీ rtCloud ఇన్‌స్టాన్స్ యొక్క గుర్తింపు మరియు యాక్సెస్ పాయింట్ నిర్వచిస్తాయి.
+These variables define the identity and access point of your rtCloud instance.
 
-| వేరియబుల్ | డిఫాల్ట్ | అవసరం | వివరణ |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **అవును** | ఈ డిప్లాయ్‌మెంట్ కోసం ప్రత్యేక గుర్తింపు. ఖాళీలు లేదా ప్రత్యేక అక్షరాలు లేవు. అంతర్గత నామకరణ కోసం ఉపసర్గగా ఉపయోగించబడుతుంది. |
-| `PROJECT_URL` | — | **అవును** | వినియోగదారులు యాప్ యాక్సెస్ చేసే డొమైన్ పేరు లేదా IP చిరునామా (ఉదా., `rtcloud.example.com` లేదా `192.168.1.100`). |
-| `PROJECT_TYPE` | `rtsurvey` | లేదు | యాక్టివేట్ చేయవలసిన వేదిక వేరియంట్. ఎంపికలు: `rtwork`, `rtsurvey`, `rthome`. |
-| `PROJECT_PORT` | `80` | లేదు | కంటైనర్ లోపల అప్లికేషన్ వినే పోర్ట్. మీకు ఏమి చేస్తున్నారో తెలియకుండా మార్చవద్దు. |
-| `HTTP_PROTOCOL` | `https` | లేదు | అంతర్గత URLs నిర్మించడానికి ఉపయోగించే ప్రోటోకాల్. SSL ఉపయోగించకపోతే `http` కి సెట్ చేయండి. |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## డేటాబేస్
+## Database
 
-MySQL కనెక్షన్ ఆధారపత్రాలు. డేటాబేస్ MySQL కంటైనర్ ద్వారా స్వయంచాలకంగా నిర్వహించబడుతుంది — మీరు బలమైన పాస్‌వర్డ్‌లు మాత్రమే సెట్ చేయాలి.
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| వేరియబుల్ | డిఫాల్ట్ | అవసరం | వివరణ |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | లేదు | అప్లికేషన్ డేటాబేస్ పేరు. |
-| `MYSQL_USER` | `smartsurvey` | లేదు | అప్లికేషన్ కోసం MySQL వినియోగదారు. |
-| `MYSQL_PASSWORD` | — | **అవును** | `MYSQL_USER` కోసం పాస్‌వర్డ్. బలమైన, ప్రత్యేక విలువ ఉపయోగించండి. |
-| `MYSQL_ROOT_PASSWORD` | — | **అవును** | MySQL రూట్ పాస్‌వర్డ్. డేటాబేస్ ఇనిషియలైజేషన్ మరియు అడ్మిన్ ఆపరేషన్‌లకు అవసరం. |
-| `MYSQL_HOST` | `mysql` | లేదు | MySQL హోస్ట్‌నేమ్. బాహ్య డేటాబేస్‌కు కనెక్ట్ చేస్తున్నప్పుడు తప్ప డిఫాల్ట్ ఉపయోగించండి. |
-| `MYSQL_PORT` | `3306` | లేదు | MySQL పోర్ట్. |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## అడ్మిన్ ఖాతా
+## Admin Account
 
-తాజా డేటాబేస్ మొదటి బూట్‌లో అడ్మిన్ ఖాతా స్వయంచాలకంగా సృష్టించబడుతుంది.
+The admin account is created automatically on the first boot of a fresh database.
 
-| వేరియబుల్ | డిఫాల్ట్ | అవసరం | వివరణ |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **అవును** | అంతర్నిర్మిత `admin` వినియోగదారుకు పాస్‌వర్డ్. మొదటి బూట్‌కు ముందు సెట్ చేయండి. డేటాబేస్ ఇప్పటికే ఉంటే ప్రభావం లేదు. |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> మొదటి లాగిన్ తర్వాత వెబ్ UI లో **Account Settings** పేజీ నుండి అడ్మిన్ పాస్‌వర్డ్ మార్చండి.
-
----
-
-## పోర్ట్‌లు
-
-అప్లికేషన్ ఏ హోస్ట్ పోర్ట్‌లకు బైండ్ అవుతుందో నియంత్రించండి.
-
-| వేరియబుల్ | డిఫాల్ట్ | వివరణ |
-|----------|---------|-------------|
-| `APP_PORT` | `8080` | ప్రధాన వెబ్ UI కోసం హోస్ట్ పోర్ట్. మీ సర్వర్‌లో పోర్ట్ 8080 ఇప్పటికే ఉపయోగంలో ఉంటే దీన్ని మార్చండి. |
-| `SHINY_PORT` | `3838` | Shiny విశ్లేషణ సర్వర్ కోసం హోస్ట్ పోర్ట్. |
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## రన్‌టైమ్
+## Ports
 
-| వేరియబుల్ | డిఫాల్ట్ | వివరణ |
+Control which host ports the application binds to.
+
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | రన్‌టైమ్ పర్యావరణం. ప్రొడక్షన్ డిప్లాయ్‌మెంట్‌లకు `prod`, స్థానిక అభివృద్ధికి `dev` ఉపయోగించండి. |
-| `RUN_MODE` | `admin` | కంటైనర్ పాత్ర. `admin` పూర్తి స్టాక్ (వెబ్ + క్యూ + cron) నడిపిస్తుంది. `worker` బ్యాక్‌గ్రౌండ్ ప్రాసెసింగ్ మాత్రమే నడిపిస్తుంది (హారిజాంటల్ స్కేలింగ్ కోసం). |
-| `TZ` | `Asia/Ho_Chi_Minh` | సర్వర్ టైమ్‌జోన్. లాగ్ టైమ్‌స్టాంప్‌లు, cron షెడ్యూల్‌లు మరియు తేదీ ప్రదర్శనను ప్రభావితం చేస్తుంది. [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) ఉపయోగించండి (ఉదా., `UTC`, `America/New_York`, `Europe/London`). |
-| `LOG_LEVEL` | `info` | అప్లికేషన్ లాగ్ వెర్బోసిటీ. ఎంపికలు: `debug`, `info`, `warning`, `error`. |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | అన్ని Docker కంటైనర్ మరియు వాల్యూమ్ పేర్లకు వర్తించే ఉపసర్గ. ఒకే హోస్ట్‌లో బహుళ rtCloud ఇన్‌స్టాన్స్‌లు నడిపేటప్పుడు దీన్ని మార్చండి. |
-| `RESTART_POLICY` | `unless-stopped` | Docker కంటైనర్ పునఃప్రారంభ ప్రవర్తన. ఎంపికలు: `no`, `always`, `on-failure`, `unless-stopped`. |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | ఉపయోగించవలసిన Docker ఇమేజ్. నిర్దిష్ట వెర్షన్ పిన్ చేయడానికి ట్యాగ్ మార్చండి. |
-| `REQUIRE_LICENSE` | `false` | స్టార్టప్‌లో లైసెన్స్ కీ ధృవీకరణ ప్రారంభించండి. లైసెన్స్ సమాచారం కోసం RTA సంప్రదించండి. |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
-## భద్రత
+## Runtime
 
-| వేరియబుల్ | డిఫాల్ట్ | వివరణ |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | CSRF టోకెన్ ధృవీకరణ ప్రారంభించండి. ప్రొడక్షన్‌లో దీన్ని `true` గా ఉంచండి. `400 CSRF token could not be verified` లోపాలు ఎదుర్కొంటే స్థానిక అభివృద్ధిలో మాత్రమే `false` కి సెట్ చేయండి. |
-| `GII_ENABLED` | `false` | Yii ఫ్రేమ్‌వర్క్ కోడ్ జనరేటర్ సాధనాన్ని ప్రారంభించండి. **ప్రొడక్షన్‌లో ఎప్పుడూ ప్రారంభించవద్దు.** |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## SSO — ఎంబెడెడ్ Keycloak
+## Security
 
-పూర్తి-ఫీచర్ ఎంటర్‌ప్రైజ్ SSO కోసం బండిల్ చేయబడిన Keycloak కంటైనర్ ప్రారంభించండి. HTTPS తో డొమైన్ అవసరం.
-
-| వేరియబుల్ | డిఫాల్ట్ | వివరణ |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | ఎంబెడెడ్ Keycloak కంటైనర్ ప్రారంభించడానికి `true` కి సెట్ చేయండి. `embed-keycloak` Docker Compose ప్రొఫైల్ యాక్టివేట్ చేస్తుంది. |
-| `KEYCLOAK_URL` | — | Keycloak సర్వర్ పూర్తి URL (ఉదా., `https://rtcloud.example.com/auth`). |
-| `KEYCLOAK_REALM` | — | Keycloak realm పేరు (ఉదా., `rtsurvey`). |
-| `KEYCLOAK_CLIENT_ID` | — | rtCloud అప్లికేషన్ కోసం Keycloak క్లైంట్ ID. |
-| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak క్లైంట్ సీక్రెట్. Keycloak అడ్మిన్ కన్సోల్ నుండి జనరేట్ చేయండి. |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak అడ్మినిస్ట్రేటర్ వినియోగదారు పేరు. |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak అడ్మినిస్ట్రేటర్ పాస్‌వర్డ్. |
-| `KEYCLOAK_DB` | `keycloak` | Keycloak కోసం డేటాబేస్ పేరు. మొదటి బూట్‌లో స్వయంచాలకంగా సృష్టించబడుతుంది. |
-| `KEYCLOAK_DB_USER` | `keycloak` | Keycloak కోసం డేటాబేస్ వినియోగదారు. |
-| `KEYCLOAK_DB_PASSWORD` | — | Keycloak వినియోగదారు కోసం డేటాబేస్ పాస్‌వర్డ్. |
-| `KC_HOSTNAME` | — | Keycloak ఫ్రంటెండ్ URL (ఉదా., `https://rtcloud.example.com/auth`). |
-| `KC_HOSTNAME_STRICT` | `false` | కఠోర హోస్ట్‌నేమ్ మ్యాచింగ్ అమలు చేయండి. స్థిర డొమైన్ తో ప్రొడక్షన్‌లో `true` కి సెట్ చేయండి. |
-
-పూర్తి సెటప్ గైడ్ కోసం [SSO Authentication](sso-authentication#embedded-keycloak) చూడండి.
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — బాహ్య OIDC ప్రొవైడర్
+## SSO — Embedded Keycloak
 
-ఇప్పటికే ఉన్న OIDC-అనుకూల గుర్తింపు ప్రదాత (Supabase, Auth0, Authentik, Okta, మొదలైనవి) కనెక్ట్ చేయండి.
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| వేరియబుల్ | డిఫాల్ట్ | వివరణ |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (ఉదా., `https://accounts.google.com`). |
-| `OIDC_CLIENT_ID` | — | మీ గుర్తింపు ప్రదాతలో నమోదు చేయబడిన క్లైంట్ ID. |
-| `OIDC_CLIENT_SECRET` | — | మీ గుర్తింపు ప్రదాత నుండి క్లైంట్ సీక్రెట్. |
-| `OIDC_SCOPE` | `openid profile email` | అభ్యర్థించవలసిన OIDC స్కోప్‌ల ఖాళీ-వేరు చేయబడిన జాబితా. |
-| `OIDC_REDIRECT_URI` | — | వెబ్ యాప్ కోసం కాల్‌బ్యాక్ URL (ఉదా., `https://rtcloud.example.com/auth/callback`). |
-| `OIDC_MOBILE_CLIENT_ID` | — | rtSurvey మొబైల్ యాప్ కోసం వేర్వేరు క్లైంట్ ID. |
-| `OIDC_MOBILE_REDIRECT_URI` | — | మొబైల్ యాప్ కాల్‌బ్యాక్ URI (ఉదా., `vn.rta.rtsurvey.auth://callback`). |
-| `OPEN_REGISTRATION` | `false` | OIDC ద్వారా మొదటిసారి సైన్ ఇన్ చేసే వినియోగదారులకు rtCloud ఖాతాలు స్వయంచాలకంగా సృష్టించడం. |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | అధికార ఎండ్‌పాయింట్ URL ఓవర్‌రైడ్ చేయండి (discovery ఉపయోగించాలంటే ఖాళీగా వదిలండి). |
-| `OIDC_TOKEN_ENDPOINT` | — | టోకెన్ ఎండ్‌పాయింట్ URL ఓవర్‌రైడ్ చేయండి (discovery ఉపయోగించాలంటే ఖాళీగా వదిలండి). |
-| `OIDC_USERINFO_ENDPOINT` | — | userinfo ఎండ్‌పాయింట్ URL ఓవర్‌రైడ్ చేయండి (discovery ఉపయోగించాలంటే ఖాళీగా వదిలండి). |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| వేరియబుల్ | వివరణ |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | Azure AD అప్లికేషన్ (క్లైంట్) ID. |
-| `AZURE_TENANT_ID` | Azure AD డైరెక్టరీ (టెనెంట్) ID. |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## ఐచ్ఛిక అనుసంధానాలు
+## Optional Integrations
 
 ### Stata
 
-| వేరియబుల్ | డిఫాల్ట్ | వివరణ |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | డేటా విశ్లేషణ కోసం Stata స్టాటిస్టికల్ సాఫ్ట్‌వేర్ అనుసంధానం ప్రారంభించండి. |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | కంటైనర్ లోపల Stata బైనరీ యొక్క నిరపేక్ష మార్గం. |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| వేరియబుల్ | వివరణ |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Elasticsearch హోస్ట్ (ఉదా., `http://elasticsearch:9200`). |
-| `ES_PORT` | Elasticsearch పోర్ట్. |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
 ### Matomo Analytics
 
-| వేరియబుల్ | వివరణ |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | Matomo (Piwik) సర్వర్ URL. |
-| `PIWIK_ID` | Matomo సైట్ ID. |
-| `PIWIK_SECRET` | Matomo ప్రమాణీకరణ టోకెన్. |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
 ### OpenCPU (R Computation)
 
-| వేరియబుల్ | వివరణ |
+| Variable | Description |
 |----------|-------------|
-| `OCPU_HOST` | R-ఆధారిత స్టాటిస్టికల్ కంప్యూటేషన్ కోసం OpenCPU సర్వర్ URL. |
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox అనుసంధానం
+### RtBox Integration
 
-| వేరియబుల్ | వివరణ |
+| Variable | Description |
 |----------|-------------|
-| `RTBOX_HOST` | RtBox సేవ హోస్ట్ URL. |
-| `RTBOX_USER_API` | RtBox వినియోగదారు API కీ. |
-| `RTBOX_BASIC_AUTH` | RtBox కోసం Basic authentication ఆధారపత్రాలు. |
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
 ### Matrix Messaging
 
-| వేరియబుల్ | వివరణ |
+| Variable | Description |
 |----------|-------------|
-| `MATRIX_HOMESERVER_HOST` | Matrix homeserver హోస్ట్. |
-| `MATRIX_HOMESERVER_PORT` | Matrix homeserver పోర్ట్. |
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## డేటా వాల్యూమ్‌లు
+## Data Volumes
 
-అన్ని అప్లికేషన్ డేటా పేరు పెట్టబడిన Docker వాల్యూమ్‌లలో నిల్వ చేయబడుతుంది. వాల్యూమ్‌లు మొదటి స్టార్టప్‌లో స్వయంచాలకంగా సృష్టించబడతాయి మరియు కంటైనర్ పునఃప్రారంభాలు మరియు అప్‌డేట్‌ల అంతటా కొనసాగుతాయి.
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| వాల్యూమ్ | మౌంట్ పాయింట్ | కంటెంట్‌లు |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL డేటాబేస్ ఫైల్‌లు |
-| `rtcloud_uploads` | `…/uploads` | సర్వే ప్రతిస్పందించే వారు అప్‌లోడ్ చేసిన ఫైల్‌లు |
-| `rtcloud_audios` | `…/audios` | ఆడియో రికార్డింగులు |
-| `rtcloud_downloads` | `…/downloads` | జనరేట్ చేయబడిన ఎగుమతి ఫైల్‌లు |
-| `rtcloud_gallery` | `…/gallery` | గ్యాలరీ చిత్రాలు |
-| `rtcloud_voicemail` | `…/voicemail` | వాయిస్‌మెయిల్ రికార్డింగులు |
-| `rtcloud_analytics` | `…/analytics` | విశ్లేషణ డేటా |
-| `rtcloud_aggregate` | `…/aggregate` | సమీకృత సర్వే ఫలితాలు |
-| `rtcloud_converter` | `…/converter` | డేటా మార్పిడి అవుట్‌పుట్‌లు |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny సర్వర్ R స్క్రిప్ట్‌లు |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny సర్వర్ లాగులు |
-| `rtcloud_assets` | `…/assets` | వెబ్ ఆస్తులు (CSS, JS) |
-| `rtcloud_runtime` | `…/protected/runtime` | అప్లికేషన్ రన్‌టైమ్ కాష్ |
-| `rtcloud_cache` | `…/cache` | అప్లికేషన్ కాష్ |
-| `rtcloud_tmp` | `…/tmp` | తాత్కాలిక ఫైల్‌లు |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-వాల్యూమ్ పేర్లు `COMPOSE_PROJECT_NAME` విలువ (డిఫాల్ట్: `rtcloud`) ద్వారా ఉపసర్గ పెట్టబడతాయి.
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-మీ డిప్లాయ్‌మెంట్ కోసం అన్ని వాల్యూమ్‌లు జాబితా చేయండి:
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

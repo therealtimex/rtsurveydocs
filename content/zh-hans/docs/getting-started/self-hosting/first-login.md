@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "首次登录"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "如何在部署后首次登录您的 rtSurvey 实例。"
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **登录前必须配置 SSL。** 如果您通过 HTTP 访问应用，将看到安全警告且 SSO 将被阻止。请先完成 [SSL 设置](ssl-setup)。
 
-After SSL is active, open your browser at your HTTPS URL:
+SSL 激活后，在您的 HTTPS 地址打开浏览器：
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## 登录界面
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+登录页面显示：
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- **用户名**和**密码**字段
+- **登录**按钮
+- **使用 SSO 登录**按钮（分隔线下方）— 供拥有 SSO 账户的团队成员使用
 
 ---
 
-## If you see a security warning
+## 默认管理员凭据
 
-If you access the app over HTTP (before SSL is configured), you will see:
+输入默认凭据并点击**登录**：
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| 字段 | 值 |
+|------|----|
+| 用户名 | `admin` |
+| 密码 | `admin` |
+
+> **首次登录后立即更改密码。**
+
+---
+
+## 如果看到安全警告
+
+如果您通过 HTTP 访问应用（SSL 配置前），将看到：
+
+- 登录页面顶部的黄色警告横幅
+- 点击**登录**时弹出的模态框，警告凭据将以未加密形式发送
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+点击**设置 SSL** 来配置 HTTPS，或点击**无论如何继续**以不使用 SSL 登录（不推荐）。
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+HTTP 上的 SSO 登录被完全阻止——点击**使用 SSO 登录**将显示通知而非重定向。
 
 ---
 
-## After logging in
+## 登录后
 
-Once inside, you will land on the dashboard. From here:
+登录后，您将进入仪表板。从这里：
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **更改管理员密码** — 账户设置 → 更改密码
+2. **创建第一个项目** — 项目 → 新建项目
+3. **上传或构建表单** — 表单 → 上传 XLSForm 或打开表单构建器
+4. **添加用户** — 用户 → 邀请或为您的团队创建账户

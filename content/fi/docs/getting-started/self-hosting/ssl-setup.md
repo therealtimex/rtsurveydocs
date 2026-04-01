@@ -1,128 +1,128 @@
 ---
 weight: 4
-title: "Set Up SSL"
+title: "SSL:n asennus"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Configure HTTPS for your rtSurvey server. Required before you can log in."
+description: "Määritä HTTPS rtSurvey-palvelimellesi. Vaaditaan ennen kirjautumista."
 ---
 
-SSL must be configured before you can log in. When you open the app for the first time, you will be redirected to the SSL setup screen automatically.
-
----
-
-## SSL setup options
-
-![SSL setup options](/img/ssl-setup/ssl-setup-options.png)
-
-Choose one of three options:
-
-| Option | When to use |
-|--------|-------------|
-| **Free rtsurvey.com subdomain** *(Recommended)* | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **My own domain** | You already have a domain and its DNS points to this server. |
-| **Install certificate manually** | Enterprise or custom CA. Requires SSH access. |
+SSL on määritettävä ennen kuin voit kirjautua sisään. Kun avaat sovelluksen ensimmäistä kertaa, sinut ohjataan automaattisesti SSL-asennusnäytölle.
 
 ---
 
-## Option 1 — Free rtsurvey.com subdomain *(Recommended)*
+## SSL-asennusvaihtoehdot
 
-This is the fastest option. No domain registration or DNS changes required.
+![SSL-asennusvaihtoehdot](/img/ssl-setup/ssl-setup-options.png)
 
-1. Click **Free rtsurvey.com subdomain** to expand the section
-2. Type your desired subdomain name in the input field
+Valitse yksi kolmesta vaihtoehdosta:
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+| Vaihtoehto | Milloin käyttää |
+|------------|----------------|
+| **Ilmainen rtsurvey.com-alidomaini** *(Suositeltu)* | DNS-asetuksia ei tarvita. Luomme tietueen puolestasi. Valmis 2–5 minuutissa. |
+| **Oma domain** | Sinulla on jo domain ja sen DNS osoittaa tähän palvelimeen. |
+| **Asenna sertifikaatti manuaalisesti** | Yritys tai mukautettu CA. Vaatii SSH-yhteyden. |
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+---
+
+## Vaihtoehto 1 — Ilmainen rtsurvey.com-alidomaini *(Suositeltu)*
+
+Tämä on nopein vaihtoehto. Domainin rekisteröintiä tai DNS-muutoksia ei tarvita.
+
+1. Napsauta **Ilmainen rtsurvey.com-alidomaini** laajentaaksesi osiota
+2. Kirjoita haluamasi alidomainin nimi syöttökenttään
+
+   > Käytä pieniä kirjaimia, numeroita ja väliviivoja. 3–30 merkkiä.
+   > Esimerkki: `myproject` → `myproject.rtsurvey.com`
+
+3. Napsauta **Luo https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. Odota 2–5 minuuttia, kun sertifikaattia myönnetään
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. Kun sertifikaatti on valmis, sinut ohjataan automaattisesti uuteen HTTPS-osoitteeseen
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — My own domain
+## Vaihtoehto 2 — Oma domain
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+Käytä tätä, jos sinulla on olemassa oleva domain ja sen DNS `A`-tietue osoittaa jo tämän palvelimen IP-osoitteeseen.
 
-1. Click **My own domain** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. Napsauta **Oma domain** laajentaaksesi osion
+2. Syötä koko domainin nimi (esim. `survey.myorganization.org`)
+3. Napsauta **Luo sertifikaatti**
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt vahvistaa domainisi ja myöntää sertifikaatin. DNS täytyy olla oikein osoitettu ensin — muuten pyyntö epäonnistuu.
 
 ---
 
-## Option 3 — Install certificate manually
+## Vaihtoehto 3 — Asenna sertifikaatti manuaalisesti
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+Yritysympäristöille, joissa on mukautettu tai sisäinen CA. Sijoitat sertifikaattitiedostot palvelimelle SSH:n kautta, sitten syötät domainisi sovellukseen.
 
-### Prerequisites
+### Edellytykset
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- SSH-yhteys palvelimeen
+- Kelvollinen sertifikaatti ja yksityinen avain domainillesi (PEM-muoto)
 
-### Step 1 — SSH into the server
+### Vaihe 1 — SSH palvelimelle
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### Vaihe 2 — Sijoita sertifikaattitiedostot
 
-Create the directory and copy your files:
+Luo hakemisto ja kopioi tiedostosi:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+Kopioi tiedostosi näillä tarkkoilla nimillä:
 
-| File | Description |
-|------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| Tiedosto | Kuvaus |
+|----------|--------|
+| `fullchain.pem` | Sertifikaattisi + mahdolliset väli-CA-sertifikaatit (yhdistetty) |
+| `privkey.pem` | Yksityinen avaimesi |
 
-Example:
+Esimerkki:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# Kopioi paikalliselta koneeltasi (suorita paikallisesti, ei palvelimella)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+Aseta oikeat käyttöoikeudet:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### Vaihe 3 — Syötä domain sovellukseen
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Install certificate manually**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. SSL-asennusnäytöllä napsauta **Asenna sertifikaatti manuaalisesti**
+2. Syötä domainin nimi (täytyy vastata sertifikaatin Common Name tai SAN)
+3. Napsauta **Käytä**
 
-The server will configure Nginx with your certificate and reload automatically.
+Palvelin konfiguroi Nginxin sertifikaatillasi ja lataa automaattisesti uudelleen.
 
 ---
 
-## Next step
+## Seuraava vaihe
 
-Once SSL is active, proceed to [First Login](first-login).
+Kun SSL on aktiivinen, siirry kohtaan [Ensimmäinen kirjautuminen](first-login).

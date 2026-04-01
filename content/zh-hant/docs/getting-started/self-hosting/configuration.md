@@ -1,221 +1,221 @@
 ---
 weight: 2
-title: "設定參考"
+title: "配置參考"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "用於設定自行託管 rtCloud 部署的所有環境變數的完整參考。"
+description: "用於設定自託管 rtCloud 部署的所有環境變數的完整參考。"
 ---
 
-所有設定均透過部署目錄根目錄中的 `.env` 檔案內的環境變數完成。Docker Compose 會自動讀取此檔案——不需要 `--env-file` 標記。
+所有配置透過部署目錄根目錄中的 `.env` 文件中的環境變數完成。Docker Compose 自動讀取此文件 — 不需要 `--env-file` 標誌。
 
-標記為**必填**的變數必須在啟動容器前設定。其他變數都有預設值，為選用。
+標記為**必填**的變數必須在啟動容器前設定。其他所有變數都有預設值，是可選的。
 
 ---
 
-## 專案
+## Project
 
-這些變數定義您的 rtCloud 實例的身份和存取點。
+These variables define the identity and access point of your rtCloud instance.
 
-| 變數 | 預設值 | 必填 | 說明 |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **是** | 此部署的唯一識別碼。不得有空格或特殊字符。用作內部命名的前綴。 |
-| `PROJECT_URL` | — | **是** | 使用者存取應用程式的域名或 IP 位址（例如 `rtcloud.example.com` 或 `192.168.1.100`）。 |
-| `PROJECT_TYPE` | `rtsurvey` | 否 | 要啟動的平台變體。選項：`rtwork`、`rtsurvey`、`rthome`。 |
-| `PROJECT_PORT` | `80` | 否 | 應用程式在容器內監聽的連接埠。除非您知道自己在做什麼，否則請勿更改。 |
-| `HTTP_PROTOCOL` | `https` | 否 | 用於構建內部 URL 的協定。如果不使用 SSL，請設定為 `http`。 |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## 資料庫
+## Database
 
-MySQL 連線憑證。資料庫由 MySQL 容器自動管理——您只需要設定強健的密碼。
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| 變數 | 預設值 | 必填 | 說明 |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | 否 | 應用程式資料庫的名稱。 |
-| `MYSQL_USER` | `smartsurvey` | 否 | 應用程式的 MySQL 使用者。 |
-| `MYSQL_PASSWORD` | — | **是** | `MYSQL_USER` 的密碼。使用強健、唯一的值。 |
-| `MYSQL_ROOT_PASSWORD` | — | **是** | MySQL root 密碼。資料庫初始化和管理操作必需。 |
-| `MYSQL_HOST` | `mysql` | 否 | MySQL 主機名稱。除非連接至外部資料庫，否則使用預設值。 |
-| `MYSQL_PORT` | `3306` | 否 | MySQL 連接埠。 |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## 管理員帳號
+## Admin Account
 
-管理員帳號在全新資料庫的首次啟動時自動建立。
+The admin account is created automatically on the first boot of a fresh database.
 
-| 變數 | 預設值 | 必填 | 說明 |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **是** | 內建 `admin` 使用者的密碼。首次啟動前請設定此值。如果資料庫已存在，則無效。 |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> 首次登入後，請從網頁 UI 的**帳號設定**頁面更改管理員密碼。
-
----
-
-## 連接埠
-
-控制應用程式綁定到哪些主機連接埠。
-
-| 變數 | 預設值 | 說明 |
-|----------|---------|-------------|
-| `APP_PORT` | `8080` | 主要網頁 UI 的主機連接埠。如果伺服器上的連接埠 8080 已被使用，請更改此值。 |
-| `SHINY_PORT` | `3838` | Shiny 分析伺服器的主機連接埠。 |
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## 執行環境
+## Ports
 
-| 變數 | 預設值 | 說明 |
+Control which host ports the application binds to.
+
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | 執行環境。生產部署使用 `prod`，本地開發使用 `dev`。 |
-| `RUN_MODE` | `admin` | 容器角色。`admin` 執行完整堆疊（網頁 + 佇列 + cron）。`worker` 僅執行背景處理（用於水平擴展）。 |
-| `TZ` | `Asia/Ho_Chi_Minh` | 伺服器時區。影響日誌時間戳、cron 排程和日期顯示。使用 [TZ 資料庫名稱](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)（例如 `UTC`、`America/New_York`、`Europe/London`）。 |
-| `LOG_LEVEL` | `info` | 應用程式日誌詳細程度。選項：`debug`、`info`、`warning`、`error`。 |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | 應用於所有 Docker 容器和磁碟區名稱的前綴。在同一主機上執行多個 rtCloud 實例時請更改此值。 |
-| `RESTART_POLICY` | `unless-stopped` | Docker 容器重啟行為。選項：`no`、`always`、`on-failure`、`unless-stopped`。 |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | 要使用的 Docker 映像。更改標籤以固定特定版本。 |
-| `REQUIRE_LICENSE` | `false` | 在啟動時啟用授權金鑰驗證。如需授權資訊，請聯繫 RTA。 |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
-## 安全性
+## Runtime
 
-| 變數 | 預設值 | 說明 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | 啟用 CSRF 令牌驗證。在生產環境中保持 `true`。如果在本地開發中遇到 `400 CSRF token could not be verified` 錯誤，才設定為 `false`。 |
-| `GII_ENABLED` | `false` | 啟用 Yii 框架代碼生成器工具。**絕對不要在生產環境中啟用。** |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## SSO — 嵌入式 Keycloak
+## Security
 
-啟用捆綁的 Keycloak 容器以實現全功能企業 SSO。需要帶有 HTTPS 的域名。
-
-| 變數 | 預設值 | 說明 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | 設定為 `true` 以啟動嵌入式 Keycloak 容器。啟動 `embed-keycloak` Docker Compose 設定檔。 |
-| `KEYCLOAK_URL` | — | Keycloak 伺服器的完整 URL（例如 `https://rtcloud.example.com/auth`）。 |
-| `KEYCLOAK_REALM` | — | Keycloak realm 名稱（例如 `rtsurvey`）。 |
-| `KEYCLOAK_CLIENT_ID` | — | rtCloud 應用程式的 Keycloak 客戶端 ID。 |
-| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak 客戶端密鑰。從 Keycloak 管理控制台生成。 |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak 管理員使用者名稱。 |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak 管理員密碼。 |
-| `KEYCLOAK_DB` | `keycloak` | Keycloak 的資料庫名稱。首次啟動時自動建立。 |
-| `KEYCLOAK_DB_USER` | `keycloak` | Keycloak 的資料庫使用者。 |
-| `KEYCLOAK_DB_PASSWORD` | — | Keycloak 使用者的資料庫密碼。 |
-| `KC_HOSTNAME` | — | Keycloak 前端 URL（例如 `https://rtcloud.example.com/auth`）。 |
-| `KC_HOSTNAME_STRICT` | `false` | 強制嚴格的主機名稱匹配。在具有固定域名的生產環境中設定為 `true`。 |
-
-請參閱 [SSO 驗證](sso-authentication#embedded-keycloak)以取得完整設定指南。
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — 外部 OIDC 提供者
+## SSO — Embedded Keycloak
 
-連接至現有的 OIDC 相容身份提供者（Supabase、Auth0、Authentik、Okta 等）。
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| 變數 | 預設值 | 說明 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | OIDC 發行者探索 URL（例如 `https://accounts.google.com`）。 |
-| `OIDC_CLIENT_ID` | — | 在您的身份提供者中註冊的客戶端 ID。 |
-| `OIDC_CLIENT_SECRET` | — | 您的身份提供者的客戶端密鑰。 |
-| `OIDC_SCOPE` | `openid profile email` | 以空格分隔的 OIDC 範圍請求清單。 |
-| `OIDC_REDIRECT_URI` | — | 網頁應用程式的回調 URL（例如 `https://rtcloud.example.com/auth/callback`）。 |
-| `OIDC_MOBILE_CLIENT_ID` | — | rtSurvey 行動應用程式的獨立客戶端 ID。 |
-| `OIDC_MOBILE_REDIRECT_URI` | — | 行動應用程式回調 URI（例如 `vn.rta.rtsurvey.auth://callback`）。 |
-| `OPEN_REGISTRATION` | `false` | 自動為首次透過 OIDC 驗證的使用者建立 rtCloud 帳號。 |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | 覆寫授權端點 URL（留空以使用探索）。 |
-| `OIDC_TOKEN_ENDPOINT` | — | 覆寫令牌端點 URL（留空以使用探索）。 |
-| `OIDC_USERINFO_ENDPOINT` | — | 覆寫使用者資訊端點 URL（留空以使用探索）。 |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| 變數 | 說明 |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | Azure AD 應用程式（客戶端）ID。 |
-| `AZURE_TENANT_ID` | Azure AD 目錄（租戶）ID。 |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## 選用整合
+## Optional Integrations
 
 ### Stata
 
-| 變數 | 預設值 | 說明 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | 啟用 Stata 統計軟體整合以進行資料分析。 |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | 容器內 Stata 二進位檔案的絕對路徑。 |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| 變數 | 說明 |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Elasticsearch 主機（例如 `http://elasticsearch:9200`）。 |
-| `ES_PORT` | Elasticsearch 連接埠。 |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
-### Matomo 分析
+### Matomo Analytics
 
-| 變數 | 說明 |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | Matomo（Piwik）伺服器 URL。 |
-| `PIWIK_ID` | Matomo 網站 ID。 |
-| `PIWIK_SECRET` | Matomo 驗證令牌。 |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU（R 計算）
+### OpenCPU (R Computation)
 
-| 變數 | 說明 |
+| Variable | Description |
 |----------|-------------|
-| `OCPU_HOST` | 用於基於 R 的統計計算的 OpenCPU 伺服器 URL。 |
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox 整合
+### RtBox Integration
 
-| 變數 | 說明 |
+| Variable | Description |
 |----------|-------------|
-| `RTBOX_HOST` | RtBox 服務主機 URL。 |
-| `RTBOX_USER_API` | RtBox 使用者 API 金鑰。 |
-| `RTBOX_BASIC_AUTH` | RtBox 的基本驗證憑證。 |
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix 訊息
+### Matrix Messaging
 
-| 變數 | 說明 |
+| Variable | Description |
 |----------|-------------|
-| `MATRIX_HOMESERVER_HOST` | Matrix 主伺服器主機。 |
-| `MATRIX_HOMESERVER_PORT` | Matrix 主伺服器連接埠。 |
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## 資料磁碟區
+## Data Volumes
 
-所有應用程式資料儲存在命名的 Docker 磁碟區中。磁碟區在首次啟動時自動建立，並在容器重啟和更新後持續存在。
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| 磁碟區 | 掛載點 | 內容 |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL 資料庫檔案 |
-| `rtcloud_uploads` | `…/uploads` | 問卷調查受訪者上傳的檔案 |
-| `rtcloud_audios` | `…/audios` | 音頻錄音 |
-| `rtcloud_downloads` | `…/downloads` | 生成的匯出檔案 |
-| `rtcloud_gallery` | `…/gallery` | 相簿圖片 |
-| `rtcloud_voicemail` | `…/voicemail` | 語音郵件錄音 |
-| `rtcloud_analytics` | `…/analytics` | 分析資料 |
-| `rtcloud_aggregate` | `…/aggregate` | 彙總的問卷調查結果 |
-| `rtcloud_converter` | `…/converter` | 資料轉換輸出 |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny 伺服器 R 腳本 |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny 伺服器日誌 |
-| `rtcloud_assets` | `…/assets` | 網頁資產（CSS、JS） |
-| `rtcloud_runtime` | `…/protected/runtime` | 應用程式執行時快取 |
-| `rtcloud_cache` | `…/cache` | 應用程式快取 |
-| `rtcloud_tmp` | `…/tmp` | 臨時檔案 |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-磁碟區名稱以 `COMPOSE_PROJECT_NAME` 的值為前綴（預設：`rtcloud`）。
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-列出您部署的所有磁碟區：
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

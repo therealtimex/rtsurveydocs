@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Ensimmäinen kirjautuminen"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Kuinka kirjautua rtSurvey-instanssiisi ensimmäistä kertaa käyttöönoton jälkeen."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **SSL täytyy määrittää ennen kirjautumista.** Jos käytät sovellusta HTTP:n kautta, näet tietoturvawarauksen ja SSO estetään. Suorita ensin [SSL:n asennus](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Kun SSL on aktiivinen, avaa selain HTTPS-osoitteessasi:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Kirjautumissivu
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Kirjautumissivulla näkyy:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- **Käyttäjänimi** ja **Salasana** -kentät
+- **Kirjaudu sisään** -painike
+- **Kirjaudu SSO:lla** -painike (jakajan alla) — tiimin jäsenille, joilla on SSO-tilit
 
 ---
 
-## If you see a security warning
+## Oletusarvoinen ylläpitäjän tunniste
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Anna oletustunnisteet ja napsauta **Kirjaudu sisään**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Kenttä | Arvo |
+|--------|------|
+| Käyttäjänimi | `admin` |
+| Salasana | `admin` |
+
+> **Vaihda salasanasi välittömästi ensimmäisen kirjautumisen jälkeen.**
+
+---
+
+## Jos näet tietoturvawarauksen
+
+Jos käytät sovellusta HTTP:n kautta (ennen SSL:n määrittämistä), näet:
+
+- Keltainen varoitusbanneri kirjautumissivun yläosassa
+- Modaali-ikkuna, kun napsautat **Kirjaudu sisään**, varoittaen, että tunnisteet lähetetään salaamattomina
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Napsauta **Asenna SSL** määrittääksesi HTTPS tai **Jatka joka tapauksessa** kirjautuaksesi ilman SSL:ää (ei suositella).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+SSO-kirjautuminen on täysin estetty HTTP:n kautta — **Kirjaudu SSO:lla** -painikkeen napsauttaminen näyttää ilmoituksen uudelleenohjauksen sijaan.
 
 ---
 
-## After logging in
+## Kirjautumisen jälkeen
 
-Once inside, you will land on the dashboard. From here:
+Kirjautumisen jälkeen pääset kojelautaan. Sieltä:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Vaihda ylläpitäjän salasana** — tilin asetukset → vaihda salasana
+2. **Luo ensimmäinen projektisi** — Projektit → Uusi projekti
+3. **Lataa tai luo lomake** — Lomakkeet → Lataa XLSForm tai avaa Form Builder
+4. **Lisää käyttäjiä** — Käyttäjät → Kutsu tai luo tiimisi jäsenille tilit

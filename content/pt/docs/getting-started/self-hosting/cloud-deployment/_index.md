@@ -1,95 +1,95 @@
 ---
 weight: 3
-title: "Implantação na Cloud"
+title: "Implementação na nuvem"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "Implante o rtCloud nos principais fornecedores de cloud com scripts automatizados para DigitalOcean, AWS EC2, Google Cloud e Linode."
+description: "Implemente rtCloud nos principais fornecedores de nuvem com scripts automatizados para DigitalOcean, AWS EC2, Google Cloud e Linode."
 ---
 
-O repositório de implantação inclui scripts de provisionamento automatizados para os principais fornecedores de cloud. Cada script é executado na primeira inicialização de um servidor **Ubuntu 22.04 LTS** novo e realiza uma configuração completamente autónoma:
+O repositório de implementação inclui scripts de aprovisionamento automatizados para os principais fornecedores de nuvem. Cada script é executado no primeiro arranque de um novo servidor Ubuntu 22.04 LTS e realiza uma configuração completamente automática:
 
-- Instala Docker e Docker Compose
-- Gera palavras-passe aleatórias seguras para todos os serviços internos
-- Escreve `docker-compose.production.yml` e `.env`
-- Configura o Nginx como proxy reverso
-- Obtém um certificado TLS gratuito da Let's Encrypt (tenta novamente automaticamente até o DNS resolver)
-- Configura o firewall UFW
-- Opcionalmente implanta o servidor SSO Keycloak incorporado
-- Exibe um resumo completo da implantação com todas as credenciais
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-A configuração é concluída em **5–10 minutos** numa instância standard.
-
----
-
-## Escolher um Script
-
-Existem múltiplas variantes de script dependendo do seu fornecedor de cloud e configuração SSO:
-
-| Script | Fornecedor | Modo SSO | Ideal Para |
-|--------|-----------|----------|------------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Keycloak Incorporado | SSO simples e autónomo |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak ou OIDC Externo | Controlo total |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Keycloak Incorporado | Configuração por formulário, mais simples |
-| `linode-stackscript-oidc.sh` | Linode | Apenas OIDC Externo | Fornecedor de identidade existente |
-| `linode-stackscript.sh` | Linode | Keycloak ou OIDC Externo | Controlo total |
-| `aws-ec2.sh` | AWS EC2 | Keycloak ou OIDC Externo | Implantações AWS |
-| `gcp-compute.sh` | Google Cloud | Keycloak ou OIDC Externo | Implantações GCP |
-
-> **Recomendado para a maioria dos utilizadores:** Use a variante `keycloak-embed`. Inclui um servidor de identidade Keycloak incorporado e requer o menor número de campos de configuração.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## Guia de Dimensionamento do Servidor
+## Choosing a Script
 
-| Caso de Uso | RAM | Disco | Exemplo |
-|-------------|-----|-------|---------|
-| Avaliação / desenvolvimento | 2 GB | 25 GB | DO Basic $18/mês, t3.small, e2-small |
-| Pequena equipa (< 50 utilizadores) | 4 GB | 40 GB | DO Basic $24/mês, t3.medium, e2-medium |
-| Produção (> 50 utilizadores) | 8 GB | 80 GB | DO General $48/mês, t3.large, n2-standard-2 |
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-> O Keycloak incorporado requer pelo menos **4 GB RAM**. Use 2 GB apenas para avaliação sem Keycloak.
+| Script | Provider | SSO Mode | Best For |
+|--------|----------|----------|----------|
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
+
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## Configuração DNS
+## Server Sizing Guide
 
-Todos os scripts requerem um domínio com um **registo A apontando para o IP do seu servidor** antes de a Let's Encrypt poder emitir um certificado.
+| Use Case | RAM | Disk | Example |
+|----------|-----|------|---------|
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-O script imprime o IP do seu servidor no início do processo de configuração:
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
+
+---
+
+## DNS Setup
+
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
+
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
- IP do Servidor : 139.162.51.85
- Adicione este registo DNS A agora se ainda não o fez:
+ Server IP : 139.162.51.85
+ Add this DNS A record now if you haven't already:
    myapp.example.com  ->  139.162.51.85
- O script tentará novamente o Certbot a cada 60s até o DNS resolver.
+ The script will retry Certbot every 60s until DNS resolves.
 ============================================================
 ```
 
-O script **tenta automaticamente** a Let's Encrypt a cada 60 segundos durante até 1 hora. Basta adicionar o registo DNS e aguardar — não é necessário reiniciar.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Limite de frequência:** A Let's Encrypt permite um máximo de **5 certificados por domínio por 7 dias**. Evite implantar e destruir servidores repetidamente com o mesmo domínio. Se atingir o limite, o script exibirá um timestamp `retry after` e parará imediatamente.
-
----
-
-## Lista de Verificação Pós-Implantação
-
-- [ ] A aplicação abre em `https://seu-dominio.com`
-- [ ] Inicie sessão com `admin` e a palavra-passe que configurou
-- [ ] Todos os contentores estão saudáveis: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] A renovação da Let's Encrypt funciona: `certbot renew --dry-run`
-- [ ] A porta MySQL 3306 **não** está exposta: `ufw status`
-- [ ] Configure um backup diário da base de dados (consulte [Manutenção](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## Resolução de Problemas
+## Post-Deployment Checklist
 
-### Verificar o log de configuração completo
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Limite de frequência da Let's Encrypt
+### Let's Encrypt rate limit
 
-Se vir `too many certificates` no log, atingiu o limite de 5 certificados/7 dias. O log mostra o tempo exato de nova tentativa:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
 [SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-Aguarde até esse momento e reimplante.
+Wait until that time, then redeploy.
 
-### O Keycloak permanece em estado não saudável
+### Keycloak stays unhealthy
 
-Certifique-se de que o servidor tem pelo menos 4 GB RAM e verifique os logs:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### Configuração SSL não aplicada após o certbot
+### SSL config not applied after certbot
 
-Se o certificado foi emitido mas o Nginx ainda mostra apenas HTTP, verifique a linha de erro no log e recarregue manualmente o Nginx:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

@@ -1,5 +1,5 @@
 ---
-weight: 4
+weight: 5
 title: "SSO認証"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,167 +7,167 @@ draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "組み込みKeycloak、外部OIDCプロバイダー、またはAzure Active Directoryを使ってセルフホストrtCloudのシングルサインオンを設定する。"
+description: "組み込みKeycloak、外部OIDCプロバイダー、またはAzure Active Directoryを使用して、セルフホスト型rtCloudのシングルサインオンを設定します。"
 ---
 
 rtCloudはシングルサインオン（SSO）の3つのアプローチをサポートしています：
 
-| オプション | 最適な用途 |
+| Option | Best For |
 |--------|----------|
-| [組み込みKeycloak](#embedded-keycloak) | rtCloudにバンドルされた完全自己完結型SSOサーバーを求める組織 |
-| [外部OIDCプロバイダー](#external-oidc-provider) | 既存のIDプロバイダー（Auth0、Authentik、Okta、Supabaseなど）を運用している組織 |
-| [Azure Active Directory](#azure-active-directory) | Microsoft 365またはAzure ADを使用している組織 |
+| [Embedded Keycloak](#embedded-keycloak) | Organizations that want a fully self-contained SSO server bundled with rtCloud |
+| [External OIDC Provider](#external-oidc-provider) | Organizations already running an identity provider (Auth0, Authentik, Okta, Supabase, etc.) |
+| [Azure Active Directory](#azure-active-directory) | Organizations using Microsoft 365 or Azure AD |
 
-SSO未設定の場合、ユーザーは管理パネルで管理されるローカルrtCloudアカウントでログインします。
+Without SSO configured, users log in with local rtCloud accounts managed through the admin panel.
 
 ---
 
-## 組み込みKeycloak {#embedded-keycloak}
+## Embedded Keycloak
 
-デプロイにはrtCloudと並行して実行するオプションのKeycloakコンテナが含まれています。KeycloakはrtSurveyレルムで事前設定されており、すぐに使用できます。
+The deployment includes an optional Keycloak container that runs alongside rtCloud. Keycloak is pre-configured with an rtSurvey realm and ready to use.
 
-### 要件
+### Requirements
 
-- HTTPSを持つドメイン名（Keycloakは本番環境でHTTPSが必要）
-- サーバーに少なくとも4 GB RAM（Keycloakは約512 MBのメモリを追加使用）
+- A domain name with HTTPS (Keycloak requires HTTPS in production)
+- At least 4 GB RAM on the server (Keycloak adds ~512 MB memory usage)
 
-### セットアップ
+### Setup
 
-**1. `.env`で環境変数を設定する：**
+**1. Configure environment variables in `.env`:**
 
 ```dotenv
-# 組み込みKeycloakコンテナを有効にする
+# Enable the embedded Keycloak container
 EMBED_KEYCLOAK=true
 
-# KeycloakのURL — 実際のドメインを使用する
+# Keycloak URLs — use your actual domain
 KEYCLOAK_URL=https://rtcloud.example.com/auth
 KC_HOSTNAME=https://rtcloud.example.com/auth
 KC_HOSTNAME_STRICT=false
 
-# レルムとクライアント設定（インポートされたレルムJSONと一致させる）
+# Realm and client settings (match the imported realm JSON)
 KEYCLOAK_REALM=rtsurvey
 KEYCLOAK_CLIENT_ID=rtsurvey-app
 KEYCLOAK_CLIENT_SECRET=your-client-secret-here
 
-# Keycloak管理者認証情報
+# Keycloak admin credentials
 KEYCLOAK_ADMIN_USER=admin
 KEYCLOAK_ADMIN_PASSWORD=change_me_keycloak_admin_password
 
-# Keycloakデータベース（自動作成）
+# Keycloak database (created automatically)
 KEYCLOAK_DB=keycloak
 KEYCLOAK_DB_USER=keycloak
 KEYCLOAK_DB_PASSWORD=change_me_keycloak_db_password
 
-# KeycloakがリッスンするポートNginxによりプロキシ）
+# Port Keycloak listens on (host-side, proxied by Nginx)
 KEYCLOAK_PORT=8091
 ```
 
-**2. 組み込みKeycloakプロファイルで起動する：**
+**2. Start with the embedded Keycloak profile:**
 
 ```bash
 docker compose -f docker-compose.production.yml --profile embed-keycloak up -d
 ```
 
-**3. Keycloakが正常であることを確認する：**
+**3. Verify Keycloak is healthy:**
 
 ```bash
 docker compose -f docker-compose.production.yml ps
 ```
 
-`rtcloud-keycloak`コンテナは2〜3分後に`Up (healthy)`と表示されるはずです。
+The `rtcloud-keycloak` container should show `Up (healthy)` after 2–3 minutes.
 
-**4. Keycloak管理コンソールにアクセスする：**
+**4. Access the Keycloak admin console:**
 
 ```
 https://rtcloud.example.com/auth/admin
 ```
 
-`KEYCLOAK_ADMIN_USER`と`KEYCLOAK_ADMIN_PASSWORD`でログインします。
+Log in with `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD`.
 
-### 事前設定済みの内容
+### What Is Pre-Configured
 
-組み込みKeycloakは事前インポートされた`rtsurvey`レルムで起動します：
+The embedded Keycloak starts with a pre-imported `rtsurvey` realm that includes:
 
-- Webアプリケーション用のクライアント設定
-- デフォルトのユーザーロール（`admin`、`project_manager`、`enumerator`、`analyst`）
-- rtSurvey向けに最適化されたセッションとトークン設定
+- Client configuration for the web application
+- Default user roles (`admin`, `project_manager`, `enumerator`, `analyst`)
+- Session and token settings optimized for rtSurvey
 
-Keycloak管理コンソールで直接ユーザーを追加するか、Keycloakを上位IDプロバイダー（LDAP、SAML）に接続することができます。
+You can add users directly in the Keycloak admin console or connect Keycloak to an upstream identity provider (LDAP, SAML).
 
-### Nginxルーティング
+### Nginx Routing
 
-クラウドデプロイスクリプトを使用する場合、Nginxは両方のサービスをプロキシするように設定されます：
+When using the cloud deployment scripts, Nginx is configured to proxy both services:
 
-| パス | バックエンド |
+| Path | Backend |
 |------|---------|
-| `/` | `127.0.0.1:8080`のrtCloudアプリ |
-| `/auth/` | `127.0.0.1:8090`のKeycloak |
+| `/` | rtCloud app on `127.0.0.1:8080` |
+| `/auth/` | Keycloak on `127.0.0.1:8090` |
 
 ---
 
-## 外部OIDCプロバイダー {#external-oidc-provider}
+## External OIDC Provider
 
-OpenID Connect互換のIDプロバイダーにrtCloudを接続します。このアプローチではKeycloakコンテナは必要ありません。
+Connect rtCloud to any OpenID Connect-compatible identity provider. This approach does not require the Keycloak container.
 
-### サポートされるプロバイダー
+### Supported Providers
 
-OIDC準拠のプロバイダーはどれでも動作します：
+Any OIDC-compliant provider works, including:
 - Authentik
 - Auth0
 - Okta
-- Keycloak（外部インスタンス）
+- Keycloak (external instance)
 - Supabase
-- Google（Google Workspace組織向け）
-- GitHub（OIDCエクステンション付きOAuthアプリ経由）
+- Google (for Google Workspace organizations)
+- GitHub (via OAuth apps with OIDC extension)
 
-### セットアップ
+### Setup
 
-**1. IDプロバイダーにrtCloudをOIDCクライアントとして登録する。**
+**1. Register rtCloud as an OIDC client in your identity provider.**
 
-必要なもの：
-- **クライアントID**と**クライアントシークレット**
-- **リダイレクトURI**の登録：`https://rtcloud.example.com/auth/callback`
-- モバイルアプリのサポートには、さらに登録する：`vn.rta.rtsurvey.auth://callback`
+You will need:
+- A **client ID** and **client secret**
+- To register the **redirect URI**: `https://rtcloud.example.com/auth/callback`
+- For mobile app support, also register: `vn.rta.rtsurvey.auth://callback`
 
-**2. `.env`で環境変数を設定する：**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
-# OIDC検出URL（プロバイダー固有 — IdPのドキュメントを確認すること）
+# OIDC discovery URL (provider-specific — check your IdP documentation)
 OIDC_ISSUER_URL=https://your-identity-provider.com
 
-# IDプロバイダーからのクライアント認証情報
+# Client credentials from your identity provider
 OIDC_CLIENT_ID=rtcloud-app
 OIDC_CLIENT_SECRET=your-client-secret-here
 
-# 要求するスコープ（openid、profile、emailで通常は十分）
+# Scopes to request (openid, profile, and email are typically sufficient)
 OIDC_SCOPE=openid profile email
 
-# IDプロバイダーに登録したリダイレクトURI
+# Redirect URI registered in your identity provider
 OIDC_REDIRECT_URI=https://rtcloud.example.com/auth/callback
 
-# オプション：個別のモバイルアプリクライアント
+# Optional: separate mobile app client
 OIDC_MOBILE_CLIENT_ID=rtcloud-mobile
 OIDC_MOBILE_REDIRECT_URI=vn.rta.rtsurvey.auth://callback
 
-# 新しいOIDCユーザーのrtCloudアカウントを自動作成するにはtrueに設定する
+# Set to true to auto-create rtCloud accounts for new OIDC users
 OPEN_REGISTRATION=false
 ```
 
-**3. 変更を適用するためにアプリコンテナを再起動する：**
+**3. Restart the app container to apply the changes:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### ユーザーの自動プロビジョニング
+### Auto-Provisioning Users
 
-`OPEN_REGISTRATION=true`の場合、rtCloudはOIDC経由でユーザーが初めてサインインする際にローカルアカウントを自動的に作成します。アカウントにはIDトークンからユーザーの名前とメールが入力されます。
+When `OPEN_REGISTRATION=true`, rtCloud automatically creates a local account the first time a user signs in via OIDC. The account is populated with the user's name and email from the ID token.
 
-`OPEN_REGISTRATION=false`（デフォルト）の場合、rtCloudの管理者が先にユーザーアカウントを作成する必要があり、OIDCのIDは初回ログイン時にリンクされます。
+When `OPEN_REGISTRATION=false` (default), an rtCloud administrator must create the user account first, and the OIDC identity is linked on first login.
 
-### カスタムエンドポイント
+### Custom Endpoints
 
-プロバイダーがOIDC検出（`.well-known/openid-configuration`）をサポートしていない場合は、エンドポイントを手動で設定できます：
+If your provider does not support OIDC discovery (`.well-known/openid-configuration`), you can set endpoints manually:
 
 ```dotenv
 OIDC_AUTHORIZATION_ENDPOINT=https://your-provider.com/oauth2/authorize
@@ -177,43 +177,43 @@ OIDC_USERINFO_ENDPOINT=https://your-provider.com/oauth2/userinfo
 
 ---
 
-## Azure Active Directory {#azure-active-directory}
+## Azure Active Directory
 
-組織のMicrosoft Azure ADテナントとrtCloudを統合します。
+Integrate rtCloud with your organization's Microsoft Azure AD tenant.
 
-### セットアップ
+### Setup
 
-**1. [Azureポータル](https://portal.azure.com)で新しいアプリを登録する：**
+**1. Register a new app in the [Azure Portal](https://portal.azure.com):**
 
-   - **Azure Active Directory** → **アプリの登録** → **新規登録**に移動する
-   - 名前：`rtCloud`
-   - リダイレクトURI：`https://rtcloud.example.com/auth/callback`（Webタイプ）
-   - 作成後、**アプリケーション（クライアント）ID**と**ディレクトリ（テナント）ID**をメモする
-   - **証明書とシークレット**で新しいクライアントシークレットを作成する
+   - Go to **Azure Active Directory** → **App registrations** → **New registration**
+   - Name: `rtCloud`
+   - Redirect URI: `https://rtcloud.example.com/auth/callback` (Web type)
+   - After creation, note the **Application (client) ID** and **Directory (tenant) ID**
+   - Under **Certificates & secrets**, create a new client secret
 
-**2. `.env`で環境変数を設定する：**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
 AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-**3. アプリコンテナを再起動する：**
+**3. Restart the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Azure ADテナントのユーザーはMicrosoftの認証情報を使ってrtCloudにログインできるようになります。
+Users in your Azure AD tenant can now log in to rtCloud using their Microsoft credentials.
 
 ---
 
-## SSOの無効化
+## Disabling SSO
 
-ローカル認証に戻すには、`.env`からすべてのSSO関連の変数を削除またはコメントアウトしてから、アプリコンテナを再起動します：
+To revert to local authentication, remove or comment out all SSO-related variables from `.env`, then restart the app container:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-組み込みKeycloakを使用していた場合は、`--profile embed-keycloak`フラグを省略し、`docker compose down`を実行してからプロファイルなしで`up -d`を実行することで停止できます。
+If you were using embedded Keycloak, stop it by omitting the `--profile embed-keycloak` flag and running `docker compose down` followed by `up -d` without the profile.

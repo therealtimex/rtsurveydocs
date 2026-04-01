@@ -10,84 +10,84 @@ toc: true
 description: "Nasazení rtCloud na Google Cloud Compute Engine pomocí spouštěcího skriptu gcp-compute.sh."
 ---
 
-Použijte `gcp-compute.sh` jako **Startup script** při vytváření instance VM Compute Engine. Skript se automaticky spustí při prvním spuštění.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**Stáhnout skript:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## Krok 1 — Vyplňte konfiguraci
+## Step 1 — Fill in the configuration
 
-Otevřete skript a upravte blok `CONFIGURATION` v horní části:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Povinné ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Změňte po prvním přihlášení
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Doména + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Vložený Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Výchozí je ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Pole | Povinné | Popis |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Ano | Používá se jako název databáze a ID klienta Keycloak. Malá písmena, bez mezer. |
-| `ADMIN_PASSWORD` | Ne | Heslo admin aplikace a heslo admin Keycloak. Výchozí je `admin` — **změňte po prvním přihlášení**. |
-| `DOMAIN` | Ne | Vaše doména pro HTTPS. Ponechte prázdné pro pouze HTTP režim. |
-| `LETSENCRYPT_EMAIL` | Ano (pokud je nastavena DOMAIN) | E-mail pro oznámení Let's Encrypt. |
-| `EMBED_KEYCLOAK` | Ne | `true` pro nasazení vloženého Keycloak (vyžaduje 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Bezpečnost:** Všechna hesla mají výchozí hodnotu `admin`. Změňte je ihned po prvním přihlášení.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Krok 2 — Vytvořte instanci VM
+## Step 2 — Create a VM instance
 
-V [Google Cloud Console](https://console.cloud.google.com/compute):
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
 
-1. Klikněte na **Vytvořit instanci**
-2. **Konfigurace stroje:**
-   - Série: `E2`
-   - Typ stroje: `e2-medium` (4 GB RAM) nebo větší
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
 3. **Boot disk:**
-   - Operační systém: Ubuntu
-   - Verze: Ubuntu 22.04 LTS
-   - Velikost: 40 GB nebo více
-4. **Firewall:** zaškrtněte **Povolit HTTP provoz** a **Povolit HTTPS provoz**
-5. **Pokročilé možnosti** → **Správa** → **Automatizace** → **Startup script** → vložte celý obsah skriptu
-6. Klikněte na **Vytvořit**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
 
 ---
 
-## Krok 3 — Přidejte DNS záznam
+## Step 3 — Add the DNS record
 
-Zatímco VM startuje, přidejte **A záznam** u vašeho poskytovatele DNS:
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
-Typ  : A
-Název: myapp
-Hodnota: <vm-external-ip>
-TTL  : 300
+Type  : A
+Name  : myapp
+Value : <vm-external-ip>
+TTL   : 300
 ```
 
-Najděte externí IP v seznamu VM instancí v konzoli.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## Krok 4 — Sledujte průběh
+## Step 4 — Monitor progress
 
-Pomocí CLI `gcloud`:
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-Nebo přes SSH přímo:
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Krok 5 — Přístup k aplikaci
+## Step 5 — Access the app
 
-Po dokončení nastavení protokol zobrazí souhrn s URL aplikace a přihlašovacími údaji. Přihlaste se uživatelským jménem `admin` a heslem `admin`, poté ihned změňte heslo.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Pravidla firewallu
+## Firewall Rules
 
-Zaškrtávací políčka GCP **Povolit HTTP/HTTPS** otevírají porty 80 a 443. Pro povolení přímého přístupu Shiny na portu 3838 přidejte pravidlo firewallu:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-Nebo přidejte přes konzoli: **VPC Network** → **Firewall** → **Vytvořit pravidlo**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> **Neotevírejte** port 3306 (MySQL) — nikdy by neměl být veřejně přístupný.
-
----
-
-## Statická IP (volitelné)
-
-GCP ve výchozím nastavení přiřazuje dočasnou externí IP, která se mění při restartu VM. Pro zachování stabilní IP:
-
-1. Přejděte na **VPC Network** → **IP adresy**
-2. Klikněte na **Rezervovat externí statickou adresu**
-3. Přiřaďte ji vaší instanci VM
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Po nasazení
+## Static IP (optional)
 
-### Změna hesla
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Zobrazení všech kontejnerů
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

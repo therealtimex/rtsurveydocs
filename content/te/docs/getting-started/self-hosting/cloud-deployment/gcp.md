@@ -7,66 +7,66 @@ draft: false
 author: "rtSurvey"
 icon: "travel_explore"
 toc: true
-description: "gcp-compute.sh స్టార్టప్ స్క్రిప్ట్ ఉపయోగించి Google Cloud Compute Engine లో rtCloud డిప్లాయ్ చేయండి."
+description: "gcp-compute.sh స్టార్టప్ స్క్రిప్ట్ ఉపయోగించి Google Cloud Compute Engine లో rtCloud విన్యసించండి."
 ---
 
-Compute Engine VM ఇన్‌స్టాన్స్ సృష్టించేటప్పుడు `gcp-compute.sh` ని **Startup script** గా ఉపయోగించండి. స్క్రిప్ట్ మొదటి బూట్‌లో స్వయంచాలకంగా నడుస్తుంది.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**స్క్రిప్ట్ డౌన్‌లోడ్ చేయండి:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## దశ 1 — కాన్ఫిగరేషన్ నింపండి
+## Step 1 — Fill in the configuration
 
-స్క్రిప్ట్ తెరవండి మరియు పైభాగంలో `CONFIGURATION` బ్లాక్ సవరించండి:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- అవసరమైనవి ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # మొదటి లాగిన్ తర్వాత మార్చండి
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- డొమైన్ + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- ఎంబెడెడ్ Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ADMIN_PASSWORD కి డిఫాల్ట్
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| ఫీల్డ్ | అవసరమైనదా | వివరణ |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | అవును | డేటాబేస్ పేరు మరియు Keycloak క్లైంట్ ID గా ఉపయోగించబడుతుంది. చిన్న అక్షరాలు, ఖాళీలు లేవు. |
-| `ADMIN_PASSWORD` | లేదు | యాప్ అడ్మిన్ పాస్‌వర్డ్ మరియు Keycloak అడ్మిన్ పాస్‌వర్డ్. `admin` కి డిఫాల్ట్ — **మొదటి లాగిన్ తర్వాత మార్చండి**. |
-| `DOMAIN` | లేదు | HTTPS కోసం మీ డొమైన్. HTTP-only మోడ్ కోసం ఖాళీగా వదిలండి. |
-| `LETSENCRYPT_EMAIL` | అవును (DOMAIN సెట్ చేస్తే) | Let's Encrypt నోటిఫికేషన్‌ల కోసం ఇమెయిల్. |
-| `EMBED_KEYCLOAK` | లేదు | ఎంబెడెడ్ Keycloak డిప్లాయ్ చేయడానికి `true` (4 GB RAM అవసరం). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **భద్రత:** అన్ని పాస్‌వర్డ్‌లు `admin` కి డిఫాల్ట్. మీ మొదటి లాగిన్ తర్వాత వాటిని వెంటనే మార్చండి.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## దశ 2 — VM ఇన్‌స్టాన్స్ సృష్టించండి
+## Step 2 — Create a VM instance
 
-[Google Cloud Console](https://console.cloud.google.com/compute) లో:
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
 
-1. **Create instance** క్లిక్ చేయండి
+1. Click **Create instance**
 2. **Machine configuration:**
    - Series: `E2`
-   - Machine type: `e2-medium` (4 GB RAM) లేదా పెద్దది
+   - Machine type: `e2-medium` (4 GB RAM) or larger
 3. **Boot disk:**
    - Operating system: Ubuntu
    - Version: Ubuntu 22.04 LTS
-   - Size: 40 GB లేదా ఎక్కువ
-4. **Firewall:** **Allow HTTP traffic** మరియు **Allow HTTPS traffic** చెక్ చేయండి
-5. **Advanced options** → **Management** → **Automation** → **Startup script** → పూర్తి స్క్రిప్ట్ కంటెంట్ పేస్ట్ చేయండి
-6. **Create** క్లిక్ చేయండి
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
 
 ---
 
-## దశ 3 — DNS రికార్డ్ జోడించండి
+## Step 3 — Add the DNS record
 
-VM బూట్ అవుతున్నప్పుడు, మీ DNS ప్రొవైడర్‌లో **A రికార్డ్** జోడించండి:
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -75,19 +75,19 @@ Value : <vm-external-ip>
 TTL   : 300
 ```
 
-కన్సోల్‌లో VM ఇన్‌స్టాన్స్‌ల జాబితాలో బాహ్య IP కనుగొనండి.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## దశ 4 — పురోగతి పర్యవేక్షించండి
+## Step 4 — Monitor progress
 
-`gcloud` CLI ఉపయోగించి:
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-లేదా నేరుగా SSH:
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## దశ 5 — యాప్ యాక్సెస్ చేయండి
+## Step 5 — Access the app
 
-సెటప్ పూర్తయినప్పుడు, లాగ్ మీ యాప్ URL మరియు ఆధారపత్రాలతో సారాంశం చూపిస్తుంది. వినియోగదారు పేరు `admin` మరియు పాస్‌వర్డ్ `admin` తో లాగిన్ అవండి, తర్వాత వెంటనే మీ పాస్‌వర్డ్ మార్చండి.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## ఫైర్‌వాల్ నియమాలు
+## Firewall Rules
 
-GCP యొక్క **Allow HTTP/HTTPS** చెక్‌బాక్స్‌లు పోర్ట్‌లు 80 మరియు 443 తెరుస్తాయి. పోర్ట్ 3838 లో నేరుగా Shiny యాక్సెస్ అనుమతించడానికి కూడా, ఫైర్‌వాల్ నియమం జోడించండి:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-లేదా కన్సోల్ ద్వారా జోడించండి: **VPC Network** → **Firewall** → **Create rule**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> పోర్ట్ 3306 (MySQL) **తెరవకండి** — ఇది ఎప్పుడూ పబ్లిక్‌గా యాక్సెస్ చేయబడకూడదు.
-
----
-
-## స్టాటిక్ IP (ఐచ్ఛికం)
-
-డిఫాల్ట్‌గా, GCP VM పునఃప్రారంభంపై మారే అస్థిర బాహ్య IP కేటాయిస్తుంది. స్థిరమైన IP ఉంచుకోవడానికి:
-
-1. **VPC Network** → **IP addresses** వెళ్ళండి
-2. **Reserve external static address** క్లిక్ చేయండి
-3. మీ VM ఇన్‌స్టాన్స్‌కు కేటాయించండి
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## డిప్లాయ్‌మెంట్ తర్వాత
+## Static IP (optional)
 
-### పాస్‌వర్డ్ మార్చండి
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### అన్ని కంటైనర్‌లు చూడండి
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

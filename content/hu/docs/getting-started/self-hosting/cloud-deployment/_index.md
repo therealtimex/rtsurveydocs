@@ -1,95 +1,95 @@
 ---
 weight: 3
-title: "Felhőtelepítés"
+title: "Felhős telepítés"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "Az rtCloud telepítése a főbb felhőszolgáltatókhoz automatizált szkriptekkel DigitalOcean, AWS EC2, Google Cloud és Linode platformokon."
+description: "Az rtCloud telepítése fő felhőszolgáltatóknál automatizált szkriptekkel DigitalOcean, AWS EC2, Google Cloud és Linode számára."
 ---
 
-A telepítési tároló automatizált üzembehelyezési szkripteket tartalmaz a főbb felhőszolgáltatókhoz. Minden szkript egy friss **Ubuntu 22.04 LTS** kiszolgáló első indításakor fut, és teljesen felügyelet nélküli beállítást végez:
+A telepítési tár automatizált provisionálási szkripteket tartalmaz a főbb felhőszolgáltatókhoz. Minden szkript egy új Ubuntu 22.04 LTS szerver első indításakor fut és teljesen felügyelet nélküli beállítást végez:
 
-- Telepíti a Dockert és a Docker Compose-t
-- Biztonságos véletlenszerű jelszavakat generál az összes belső szolgáltatáshoz
-- Létrehozza a `docker-compose.production.yml` és `.env` fájlokat
-- Konfigurációja Nginxet fordított proxyként
-- Ingyenes TLS-tanúsítványt szerez be a Let's Encrypt-től (automatikusan újrapróbálkozik, amíg a DNS fel nem oldódik)
-- Konfigurálja az UFW tűzfalat
-- Opcionálisan telepíti a beágyazott Keycloak SSO-szervert
-- Kimenete egy teljes telepítési összefoglalót az összes hitelesítő adattal
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-A beállítás **5–10 percen** belül befejeződik egy szabványos példányon.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## Szkript kiválasztása
+## Choosing a Script
 
-A felhőszolgáltatótól és az SSO-beállítástól függően több szkriptváltozat áll rendelkezésre:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| Szkript | Szolgáltató | SSO mód | A legjobb |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Beépített Keycloak | Egyszerű, önálló SSO |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak vagy külső OIDC | Teljes irányítás |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Beépített Keycloak | Űrlapalapú beállítás, legegyszerűbb |
-| `linode-stackscript-oidc.sh` | Linode | Csak külső OIDC | Meglévő identitásszolgáltató |
-| `linode-stackscript.sh` | Linode | Keycloak vagy külső OIDC | Teljes irányítás |
-| `aws-ec2.sh` | AWS EC2 | Keycloak vagy külső OIDC | AWS-telepítések |
-| `gcp-compute.sh` | Google Cloud | Keycloak vagy külső OIDC | GCP-telepítések |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **A legtöbb felhasználónak ajánlott:** Használja a `keycloak-embed` változatot. Tartalmaz egy beépített Keycloak identitásszervert, és a legkevesebb konfigurációs mezőt igényli.
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## Kiszolgálóméretezési útmutató
+## Server Sizing Guide
 
-| Felhasználási eset | RAM | Lemez | Példa |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| Értékelés / fejlesztés | 2 GB | 25 GB | DO Basic $18/hó, t3.small, e2-small |
-| Kis csapat (< 50 felhasználó) | 4 GB | 40 GB | DO Basic $24/hó, t3.medium, e2-medium |
-| Éles (> 50 felhasználó) | 8 GB | 80 GB | DO General $48/hó, t3.large, n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> A beágyazott Keycloak legalább **4 GB RAM-ot** igényel. A 2 GB-ot csak Keycloak nélküli értékeléshez használja.
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## DNS-beállítás
+## DNS Setup
 
-Minden szkript egy **A-rekordot igényel, amely a kiszolgáló IP-címére mutat**, mielőtt a Let's Encrypt tanúsítványt tud kiállítani.
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-A szkript a beállítási folyamat elején kinyomtatja a kiszolgáló IP-címét:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
- Kiszolgáló IP : 139.162.51.85
- Adja hozzá ezt a DNS A-rekordot most, ha még nem tette meg:
+ Server IP : 139.162.51.85
+ Add this DNS A record now if you haven't already:
    myapp.example.com  ->  139.162.51.85
- A szkript 60 másodpercenként újrapróbálkozik a Certbot-tal, amíg a DNS fel nem oldódik.
+ The script will retry Certbot every 60s until DNS resolves.
 ============================================================
 ```
 
-A szkript **automatikusan újrapróbálkozik** a Let's Encrypt-tel 60 másodpercenként, legfeljebb 1 óráig. Csak adja hozzá a DNS-rekordot és várjon — nincs szükség újraindításra.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Sebességkorlát:** A Let's Encrypt legfeljebb **5 tanúsítványt engedélyez domainenként 7 napon belül**. Ne telepítse és törölje a kiszolgálókat ismételten ugyanazzal a domainnel. Ha eléri a korlátot, a szkript megjelenít egy `retry after` időbélyeget és azonnal leáll.
-
----
-
-## Telepítés utáni ellenőrzőlista
-
-- [ ] Az alkalmazás megnyílik a `https://your-domain.com` címen
-- [ ] Bejelentkezés `admin` felhasználóval és a konfigurált jelszóval
-- [ ] Minden konténer egészséges: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] A Let's Encrypt megújítás működik: `certbot renew --dry-run`
-- [ ] A MySQL 3306-os port **nem** érhető el: `ufw status`
-- [ ] Napi adatbázis-biztonsági mentés beállítása (lásd [Karbantartás](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## Hibaelhárítás
+## Post-Deployment Checklist
 
-### A teljes beállítási napló ellenőrzése
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Let's Encrypt sebességkorlát
+### Let's Encrypt rate limit
 
-Ha a naplóban `too many certificates` üzenetet lát, elérte az 5 tanúsítvány/7 nap korlátot. A napló mutatja a pontos újrapróbálkozási időt:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
 [SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-Várjon addig az időpontig, majd telepítse újra.
+Wait until that time, then redeploy.
 
-### A Keycloak nem egészséges állapotban marad
+### Keycloak stays unhealthy
 
-Győződjön meg arról, hogy a kiszolgálónak legalább 4 GB RAM-ja van, majd ellenőrizze a naplókat:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### Az SSL-konfiguráció nem kerül alkalmazásra a certbot után
+### SSL config not applied after certbot
 
-Ha a tanúsítvány kiállításra kerül, de az Nginx még mindig csak HTTP-t mutat, ellenőrizze a naplóban a hibasort, és töltse be manuálisan az Nginxet:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

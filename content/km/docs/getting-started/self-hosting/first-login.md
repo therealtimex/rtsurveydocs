@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "ការចូលលើកដំបូង"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "របៀបចូលទៅក្នុង rtSurvey instance របស់អ្នកជាលើកដំបូងបន្ទាប់ពីការដំឡើង។"
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **SSL ត្រូវតែកំណត់រចនាសម្ព័ន្ធមុនពេលចូល។** ប្រសិនបើអ្នកចូលប្រើកម្មវិធីតាម HTTP អ្នកនឹងឃើញការព្រមានសុវត្ថិភាព ហើយ SSO នឹងត្រូវបិទ។ សូមបំពេញ [ការដំឡើង SSL](ssl-setup) ជាមុនសិន។
 
-After SSL is active, open your browser at your HTTPS URL:
+បន្ទាប់ពី SSL ដំណើរការ សូមបើកកម្មវិធីរុករករបស់អ្នកនៅ URL HTTPS របស់អ្នក:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## អេក្រង់ចូល
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+ទំព័រចូលបង្ហាញ:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- វាល **ឈ្មោះអ្នកប្រើ** និង **លេខសម្ងាត់**
+- ប៊ូតុង **ចូល**
+- ប៊ូតុង **ចូលដោយ SSO** (នៅក្រោមមែក) — សម្រាប់សមាជិកក្រុមដែលមានគណនី SSO
 
 ---
 
-## If you see a security warning
+## លិខិតបញ្ជាក់អ្នកគ្រប់គ្រងលំនាំដើម
 
-If you access the app over HTTP (before SSL is configured), you will see:
+បញ្ចូលលិខិតបញ្ជាក់លំនាំដើម ហើយចុច **ចូល**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| វាល | តម្លៃ |
+|-----|-------|
+| ឈ្មោះអ្នកប្រើ | `admin` |
+| លេខសម្ងាត់ | `admin` |
+
+> **ផ្លាស់ប្តូរលេខសម្ងាត់របស់អ្នកភ្លាមៗបន្ទាប់ពីការចូលលើកដំបូង។**
+
+---
+
+## ប្រសិនបើអ្នកឃើញការព្រមានសុវត្ថិភាព
+
+ប្រសិនបើអ្នកចូលប្រើកម្មវិធីតាម HTTP (មុនពេលកំណត់រចនាសម្ព័ន្ធ SSL) អ្នកនឹងឃើញ:
+
+- ផ្ទាំងព្រមានពណ៌លឿងនៅផ្នែកខាងលើនៃទំព័រចូល
+- បង្អួចលេចឡើងនៅពេលចុច **ចូល** ដែលព្រមានថាព័ត៌មានសម្ងាត់នឹងត្រូវបញ្ជូនដោយមិនបានអ៊ិនគ្រីប
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+ចុច **ដំឡើង SSL** ដើម្បីកំណត់រចនាសម្ព័ន្ធ HTTPS ឬ **បន្តទោះជាយ៉ាងណា** ដើម្បីចូលដោយគ្មាន SSL (មិនត្រូវបានណែនាំ)។
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+ការចូល SSO ត្រូវបានបិទទាំងស្រុងតាម HTTP — ការចុច **ចូលដោយ SSO** នឹងបង្ហាញការជូនដំណឹងជំនួសការបញ្ជូន។
 
 ---
 
-## After logging in
+## បន្ទាប់ពីចូល
 
-Once inside, you will land on the dashboard. From here:
+នៅពេលចូល អ្នកនឹងបង្ហាញនៅផ្ទាំងគ្រប់គ្រង។ ពីទីនេះ:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **ផ្លាស់ប្តូរលេខសម្ងាត់អ្នកគ្រប់គ្រង** — ការកំណត់គណនី → ផ្លាស់ប្តូរលេខសម្ងាត់
+2. **បង្កើតគម្រោងដំបូងរបស់អ្នក** — គម្រោង → គម្រោងថ្មី
+3. **បង្ហោះឬបង្កើតទម្រង់** — ទម្រង់ → បង្ហោះ XLSForm ឬបើក Form Builder
+4. **បន្ថែមអ្នកប្រើ** — អ្នកប្រើ → អញ្ជើញឬបង្កើតគណនីសម្រាប់ក្រុមរបស់អ្នក

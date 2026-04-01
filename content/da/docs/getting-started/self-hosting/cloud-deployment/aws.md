@@ -7,117 +7,117 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Implementér rtCloud på en AWS EC2-instans ved hjælp af aws-ec2.sh user data-scriptet."
+description: "Installer rtCloud på en AWS EC2-instans ved hjælp af user data-scriptet aws-ec2.sh."
 ---
 
-Brug `aws-ec2.sh` som **User Data**-script, når du starter en EC2-instans. Scriptet kører automatisk ved første opstart.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
 **Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Trin 1 — Udfyld konfigurationen
+## Step 1 — Fill in the configuration
 
-Åbn scriptet og rediger `CONFIGURATION`-blokken øverst:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Påkrævet ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Skift efter første login
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Domæne + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Indlejret Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Standard er ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Felt | Påkrævet | Beskrivelse |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Ja | Bruges som databasenavn og Keycloak-klient-ID. Små bogstaver, ingen mellemrum. |
-| `ADMIN_PASSWORD` | Nej | App-admin-adgangskode og Keycloak-administratoradgangskode. Standard er `admin` – **skift efter første login**. |
-| `DOMAIN` | Nej | Dit domæne til HTTPS. Lad stå tom til kun HTTP-tilstand. |
-| `LETSENCRYPT_EMAIL` | Ja (hvis DOMAIN er angivet) | E-mail til Let's Encrypt-notifikationer. |
-| `EMBED_KEYCLOAK` | Nej | `true` for at implementere indlejret Keycloak (kræver 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Sikkerhed:** Alle adgangskoder er som standard `admin`. Skift dem øjeblikkeligt efter dit første login.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Trin 2 — Start en EC2-instans
+## Step 2 — Launch an EC2 instance
 
-I [AWS EC2-konsollen](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Klik på **Start instans**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Instanstype:** `t3.medium` (4 GB RAM) eller større
-4. **Nøglepar:** Vælg eller opret et til SSH-adgang
-5. **Netværksindstillinger:** Opret eller vælg en sikkerhedsgruppe (se nedenfor)
-6. **Avancerede detaljer** → **Brugerdata** → indsæt det fulde scriptindhold
-7. Klik på **Start instans**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Trin 3 — Konfigurer sikkerhedsgruppen
+## Step 3 — Configure the Security Group
 
-Åbn disse porte i instansens sikkerhedsgruppe:
+Open these ports in the instance's Security Group:
 
-| Port | Protokol | Kilde | Formål |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | Din IP | SSH-adgang |
-| 80 | TCP | 0.0.0.0/0 | HTTP (omdirigeret til HTTPS af Nginx) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Direkte Shiny-adgang |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> Åbn **ikke** port 3306 (MySQL) – den bør aldrig være offentligt tilgængelig.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Trin 4 — Tilføj DNS-posten
+## Step 4 — Add the DNS record
 
-Mens instansen starter, tilføj en **A-post** hos din DNS-udbyder:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
-Navn  : myapp
-Værdi : <instansens offentlige IP>
+Name  : myapp
+Value : <instance-public-ip>
 TTL   : 300
 ```
 
 ---
 
-## Trin 5 — Overvåg fremgangen
+## Step 5 — Monitor progress
 
 ```bash
-ssh ubuntu@<instansens-ip>
+ssh ubuntu@<instance-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
 ---
 
-## Trin 6 — Tilgå appen
+## Step 6 — Access the app
 
-Når opsætningen er færdig, viser loggen en oversigt med din app-URL og legitimationsoplysninger. Log ind med brugernavnet `admin` og adgangskoden `admin`, og skift derefter din adgangskode øjeblikkeligt.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Efter implementering
+## After Deployment
 
-### Skift en adgangskode
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Vis alle containere
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Tildel en Elastic IP (valgfrit)
+### Assign an Elastic IP (optional)
 
-Hvis du stopper og starter instansen, ændres den offentlige IP. For at beholde en stabil IP skal du allokere en **Elastic IP** og knytte den til instansen i EC2-konsollen.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

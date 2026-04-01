@@ -7,88 +7,88 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Nasadenie rtCloud na inštanciu AWS EC2 pomocou skriptu user data aws-ec2.sh."
+description: "Nasaďte rtCloud na AWS EC2 inštancii pomocou user data skriptu aws-ec2.sh."
 ---
 
-Použite `aws-ec2.sh` ako skript **User Data** pri spúšťaní inštancie EC2. Skript sa automaticky spustí pri prvom spustení.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Stiahnuť skript:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Krok 1 — Vyplňte konfiguráciu
+## Step 1 — Fill in the configuration
 
-Otvorte skript a upravte blok `CONFIGURATION` v hornej časti:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Povinné ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Zmeňte po prvom prihlásení
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Doména + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Vstavaný Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Predvolené na ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Pole | Povinné | Popis |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Áno | Používa sa ako názov databázy a ID klienta Keycloak. Malými písmenami, bez medzier. |
-| `ADMIN_PASSWORD` | Nie | Heslo správcu aplikácie a Keycloak. Predvolené na `admin` — **zmeňte po prvom prihlásení**. |
-| `DOMAIN` | Nie | Vaša doména pre HTTPS. Ponechajte prázdne pre režim iba HTTP. |
-| `LETSENCRYPT_EMAIL` | Áno (ak je nastavená DOMAIN) | Email pre oznámenia Let's Encrypt. |
-| `EMBED_KEYCLOAK` | Nie | `true` na nasadenie vstavaného Keycloak (vyžaduje 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Bezpečnosť:** Všetky heslá majú predvolenú hodnotu `admin`. Zmeňte ich ihneď po prvom prihlásení.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Krok 2 — Spustite inštanciu EC2
+## Step 2 — Launch an EC2 instance
 
-V [konzole AWS EC2](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Kliknite na **Launch instance**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Typ inštancie:** `t3.medium` (4 GB RAM) alebo väčší
-4. **Kľúčový pár:** Vyberte alebo vytvorte pre SSH prístup
-5. **Nastavenia siete:** Vytvorte alebo vyberte skupinu zabezpečenia (pozrite nižšie)
-6. **Rozšírené podrobnosti** → **User data** → vložte celý obsah skriptu
-7. Kliknite na **Launch instance**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Krok 3 — Nakonfigurujte skupinu zabezpečenia
+## Step 3 — Configure the Security Group
 
-Otvorte tieto porty v skupine zabezpečenia inštancie:
+Open these ports in the instance's Security Group:
 
-| Port | Protokol | Zdroj | Účel |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | Vaša IP | SSH prístup |
-| 80 | TCP | 0.0.0.0/0 | HTTP (presmerovaný na HTTPS pomocou Nginx) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Priamy prístup k Shiny |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **Neotvárajte** port 3306 (MySQL) — nikdy by nemal byť verejne prístupný.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Krok 4 — Pridajte záznam DNS
+## Step 4 — Add the DNS record
 
-Kým sa inštancia spúšťa, pridajte **záznam A** u vášho poskytovateľa DNS:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
-Typ   : A
-Názov : myapp
-Hodnota: <instance-public-ip>
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
 TTL   : 300
 ```
 
 ---
 
-## Krok 5 — Monitorujte postup
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Krok 6 — Prístup k aplikácii
+## Step 6 — Access the app
 
-Po dokončení nastavenia protokol zobrazí súhrn s URL vašej aplikácie a prihlasovacími údajmi. Prihláste sa s menom `admin` a heslom `admin`, potom ihneď zmeňte heslo.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Po nasadení
+## After Deployment
 
-### Zmeňte heslo
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Zobrazte všetky kontajnery
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Priraďte Elastic IP (voliteľné)
+### Assign an Elastic IP (optional)
 
-Ak inštanciu zastavíte a spustíte, verejná IP sa zmení. Na zachovanie stabilnej IP alokujte **Elastic IP** a priraďte ju k inštancii v konzole EC2.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

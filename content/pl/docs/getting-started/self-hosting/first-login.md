@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Pierwsze logowanie"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Jak zalogować się do swojej instancji rtSurvey po raz pierwszy po wdrożeniu."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **SSL musi być skonfigurowany przed zalogowaniem.** Jeśli uzyskasz dostęp do aplikacji przez HTTP, zobaczysz ostrzeżenie bezpieczeństwa i SSO zostanie zablokowane. Najpierw ukończ [Konfigurację SSL](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Po aktywowaniu SSL otwórz przeglądarkę pod adresem HTTPS:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Ekran logowania
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Strona logowania pokazuje:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- Pola **Nazwa użytkownika** i **Hasło**
+- Przycisk **Zaloguj się**
+- Przycisk **Zaloguj się przez SSO** (poniżej separatora) — dla członków zespołu z kontami SSO
 
 ---
 
-## If you see a security warning
+## Domyślne dane logowania administratora
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Wprowadź domyślne dane i kliknij **Zaloguj się**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Pole | Wartość |
+|------|---------|
+| Nazwa użytkownika | `admin` |
+| Hasło | `admin` |
+
+> **Zmień hasło natychmiast po pierwszym logowaniu.**
+
+---
+
+## Jeśli pojawi się ostrzeżenie bezpieczeństwa
+
+Jeśli uzyskasz dostęp do aplikacji przez HTTP (przed konfiguracją SSL), zobaczysz:
+
+- Żółty baner ostrzegawczy na górze strony logowania
+- Okno modalne po kliknięciu **Zaloguj się**, ostrzegające, że dane zostaną wysłane niezaszyfrowane
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Kliknij **Skonfiguruj SSL**, aby skonfigurować HTTPS, lub **Kontynuuj mimo to** aby zalogować się bez SSL (niezalecane).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+Logowanie SSO jest całkowicie zablokowane przez HTTP — kliknięcie **Zaloguj się przez SSO** wyświetli powiadomienie zamiast przekierowania.
 
 ---
 
-## After logging in
+## Po zalogowaniu
 
-Once inside, you will land on the dashboard. From here:
+Po zalogowaniu znajdziesz się na pulpicie nawigacyjnym. Stąd:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Zmień hasło administratora** — ustawienia konta → zmień hasło
+2. **Utwórz swój pierwszy projekt** — Projekty → Nowy projekt
+3. **Prześlij lub utwórz formularz** — Formularze → Prześlij XLSForm lub otwórz Form Builder
+4. **Dodaj użytkowników** — Użytkownicy → Zaproś lub utwórz konta dla swojego zespołu

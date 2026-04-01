@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Первый вход"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Как войти в экземпляр rtSurvey в первый раз после развёртывания."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **Перед входом необходимо настроить SSL.** Если вы обращаетесь к приложению через HTTP, вы увидите предупреждение безопасности, и SSO будет заблокирован. Сначала выполните [Настройку SSL](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+После активации SSL откройте браузер по вашему HTTPS-адресу:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Экран входа
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Страница входа показывает:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- Поля **Имя пользователя** и **Пароль**
+- Кнопку **Войти**
+- Кнопку **Войти через SSO** (под разделителем) — для членов команды с SSO-аккаунтами
 
 ---
 
-## If you see a security warning
+## Учётные данные администратора по умолчанию
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Введите учётные данные по умолчанию и нажмите **Войти**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Поле | Значение |
+|------|---------|
+| Имя пользователя | `admin` |
+| Пароль | `admin` |
+
+> **Смените пароль сразу после первого входа.**
+
+---
+
+## Если появляется предупреждение безопасности
+
+Если вы обращаетесь к приложению через HTTP (до настройки SSL), вы увидите:
+
+- Жёлтый баннер предупреждения в верхней части страницы входа
+- Модальное окно при нажатии **Войти**, предупреждающее, что учётные данные будут отправлены незашифрованными
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Нажмите **Настроить SSL** для настройки HTTPS или **Продолжить в любом случае** для входа без SSL (не рекомендуется).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+Вход через SSO полностью заблокирован по HTTP — нажатие **Войти через SSO** покажет уведомление вместо перенаправления.
 
 ---
 
-## After logging in
+## После входа
 
-Once inside, you will land on the dashboard. From here:
+После входа вы окажетесь на панели управления. Отсюда:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Сменить пароль администратора** — настройки аккаунта → сменить пароль
+2. **Создать первый проект** — Проекты → Новый проект
+3. **Загрузить или создать форму** — Формы → Загрузить XLSForm или открыть Form Builder
+4. **Добавить пользователей** — Пользователи → Пригласить или создать аккаунты для команды

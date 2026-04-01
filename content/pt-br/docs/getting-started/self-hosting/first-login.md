@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Primeiro login"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Como fazer login na sua instância do rtSurvey pela primeira vez após a implantação."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **O SSL deve ser configurado antes de fazer login.** Se você acessar o aplicativo via HTTP, verá um aviso de segurança e o SSO será bloqueado. Conclua a [Configuração de SSL](ssl-setup) primeiro.
 
-After SSL is active, open your browser at your HTTPS URL:
+Depois que o SSL estiver ativo, abra seu navegador na URL HTTPS:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## A tela de login
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+A página de login mostra:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
+- Campos de **Usuário** e **Senha**
+- Um botão **Entrar**
+- Um botão **Entrar com SSO** (abaixo de um divisor) — para membros da equipe com contas SSO
 
 ---
 
-## Default admin credentials
+## Credenciais padrão do administrador
 
-Enter the default credentials and click **Sign In**:
+Insira as credenciais padrão e clique em **Entrar**:
 
-| Field | Value |
+| Campo | Valor |
 |-------|-------|
-| Username | `admin` |
-| Password | `admin` |
+| Usuário | `admin` |
+| Senha | `admin` |
 
-> **Change your password immediately after your first login.**
+> **Altere sua senha imediatamente após o primeiro login.**
 
 ---
 
-## If you see a security warning
+## Se você vir um aviso de segurança
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Se você acessar o aplicativo via HTTP (antes de o SSL ser configurado), verá:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+- Um banner de aviso amarelo no topo da página de login
+- Um modal ao clicar em **Entrar**, avisando que as credenciais serão enviadas sem criptografia
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Clique em **Configurar SSL** para configurar HTTPS ou em **Continuar assim mesmo** para fazer login sem SSL (não recomendado).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+O login SSO está completamente bloqueado via HTTP — clicar em **Entrar com SSO** mostrará um aviso em vez de redirecionar.
 
 ---
 
-## After logging in
+## Após o login
 
-Once inside, you will land on the dashboard. From here:
+Depois de entrar, você chegará ao painel. Daqui:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Alterar a senha do administrador** — configurações de conta → alterar senha
+2. **Criar seu primeiro projeto** — Projetos → Novo projeto
+3. **Fazer upload ou criar um formulário** — Formulários → Fazer upload de XLSForm ou abrir o Form Builder
+4. **Adicionar usuários** — Usuários → Convidar ou criar contas para sua equipe

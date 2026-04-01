@@ -1,38 +1,36 @@
 ---
 weight: 4
-title: "Set Up SSL"
+title: "SSL 설정"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Configure HTTPS for your rtSurvey server. Required before you can log in."
+description: "rtSurvey 서버에 HTTPS를 구성합니다. 로그인 전에 필요합니다."
 ---
 
-SSL must be configured before you can log in. When you open the app for the first time, you will be redirected to the SSL setup screen automatically.
+SSL은 로그인하기 전에 구성해야 합니다. 앱을 처음 열면 SSL 설정 화면으로 자동 리다이렉션됩니다.
 
 ---
 
-## SSL setup options
+## SSL 설정 옵션
 
-![SSL setup options](/img/ssl-setup/ssl-setup-options.png)
-
-Choose one of three options:
+![SSL 설정 옵션](/img/ssl-setup/ssl-setup-options.png)
 
 | Option | When to use |
 |--------|-------------|
-| **Free rtsurvey.com subdomain** *(Recommended)* | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **My own domain** | You already have a domain and its DNS points to this server. |
-| **Install certificate manually** | Enterprise or custom CA. Requires SSH access. |
+| **무료 rtsurvey.com 서브도메인 *(권장)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
+| **내 도메인** | You already have a domain and its DNS points to this server. |
+| **인증서 수동 설치** | Enterprise or custom CA. Requires SSH access. |
 
 ---
 
-## Option 1 — Free rtsurvey.com subdomain *(Recommended)*
+## Option 1 — 무료 rtsurvey.com 서브도메인 *(권장)*
 
 This is the fastest option. No domain registration or DNS changes required.
 
-1. Click **Free rtsurvey.com subdomain** to expand the section
+1. Click **무료 rtsurvey.com 서브도메인 *(권장)*** to expand the section
 2. Type your desired subdomain name in the input field
 
    > Use lowercase letters, numbers, and hyphens. 3–30 characters.
@@ -52,11 +50,11 @@ This is the fastest option. No domain registration or DNS changes required.
 
 ---
 
-## Option 2 — My own domain
+## Option 2 — 내 도메인
 
 Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
 
-1. Click **My own domain** to expand the section
+1. Click **내 도메인** to expand the section
 2. Enter your full domain name (e.g. `survey.myorganization.org`)
 3. Click **Create certificate**
 
@@ -66,7 +64,7 @@ Let's Encrypt will verify your domain and issue a certificate. This requires DNS
 
 ---
 
-## Option 3 — Install certificate manually
+## Option 3 — 인증서 수동 설치
 
 For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
 
@@ -115,7 +113,7 @@ chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Install certificate manually**
+1. In the SSL setup screen, click **인증서 수동 설치**
 2. Enter your domain name (must match the certificate's Common Name or SAN)
 3. Click **Apply**
 
@@ -123,6 +121,6 @@ The server will configure Nginx with your certificate and reload automatically.
 
 ---
 
-## Next step
+## 다음 단계
 
-Once SSL is active, proceed to [First Login](first-login).
+SSL이 활성화되면 [첫 번째 로그인](first-login)으로 이동하세요.

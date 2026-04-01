@@ -7,7 +7,7 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Deploy rtCloud on an AWS EC2 instance using the aws-ec2.sh user data script."
+description: "Triển khai rtCloud trên một phiên bản AWS EC2 bằng script dữ liệu người dùng aws-ec2.sh."
 ---
 
 Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.

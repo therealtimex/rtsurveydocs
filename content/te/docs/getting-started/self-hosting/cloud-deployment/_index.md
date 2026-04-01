@@ -1,65 +1,65 @@
 ---
 weight: 3
-title: "క్లౌడ్ డిప్లాయ్‌మెంట్"
+title: "క్లౌడ్ విన్యాసం"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "DigitalOcean, AWS EC2, Google Cloud మరియు Linode కోసం స్వయంచాలిత స్క్రిప్ట్‌లతో ప్రధాన క్లౌడ్ ప్రొవైడర్‌లకు rtCloud డిప్లాయ్ చేయండి."
+description: "DigitalOcean, AWS EC2, Google Cloud మరియు Linode కోసం స్వయంచాలక స్క్రిప్ట్‌లతో ప్రధాన క్లౌడ్ ప్రొవైడర్‌లలో rtCloud విన్యసించండి."
 ---
 
-డిప్లాయ్‌మెంట్ రిపోజిటరీ ప్రధాన క్లౌడ్ ప్రొవైడర్‌ల కోసం స్వయంచాలిత ప్రొవిజనింగ్ స్క్రిప్ట్‌లను కలిగి ఉంది. ప్రతి స్క్రిప్ట్ తాజా **Ubuntu 22.04 LTS** సర్వర్ మొదటి బూట్‌లో నడుస్తుంది మరియు పూర్తిగా అటెండెన్స్ లేని సెటప్ నిర్వహిస్తుంది:
+విన్యాస రిపోజిటరీలో ప్రధాన క్లౌడ్ ప్రొవైడర్‌ల కోసం స్వయంచాలక ప్రొవిజనింగ్ స్క్రిప్ట్‌లు ఉన్నాయి. ప్రతి స్క్రిప్ట్ కొత్త Ubuntu 22.04 LTS సర్వర్ యొక్క మొదటి బూట్‌లో అమలవుతుంది మరియు పూర్తిగా స్వయంచాలక సెటప్ చేస్తుంది:
 
-- Docker మరియు Docker Compose ఇన్‌స్టాల్ చేస్తుంది
-- అన్ని అంతర్గత సేవలకు సురక్షితమైన యాదృచ్ఛిక పాస్‌వర్డ్‌లు జనరేట్ చేస్తుంది
-- `docker-compose.production.yml` మరియు `.env` వ్రాస్తుంది
-- Nginx ని రివర్స్ ప్రాక్సీగా కాన్ఫిగర్ చేస్తుంది
-- Let's Encrypt నుండి ఉచిత TLS సర్టిఫికేట్ పొందుతుంది (DNS రిజోల్వ్ అయ్యే వరకు స్వయంచాలకంగా పునః ప్రయత్నిస్తుంది)
-- UFW ఫైర్‌వాల్ కాన్ఫిగర్ చేస్తుంది
-- ఐచ్ఛికంగా ఎంబెడెడ్ Keycloak SSO సర్వర్ డిప్లాయ్ చేస్తుంది
-- అన్ని ఆధారపత్రాలతో పూర్తి డిప్లాయ్‌మెంట్ సారాంశం అవుట్‌పుట్ చేస్తుంది
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-సెటప్ ప్రమాణ ఇన్‌స్టాన్స్‌లో **5–10 నిమిషాల్లో** పూర్తవుతుంది.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## స్క్రిప్ట్ ఎంచుకోవడం
+## Choosing a Script
 
-మీ క్లౌడ్ ప్రొవైడర్ మరియు SSO సెటప్ ఆధారంగా బహుళ స్క్రిప్ట్ వేరియంట్‌లు ఉన్నాయి:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| స్క్రిప్ట్ | ప్రొవైడర్ | SSO మోడ్ | అత్యుత్తమంగా |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | అంతర్నిర్మిత Keycloak | సరళమైన, స్వయం-సమాహిత SSO |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak లేదా బాహ్య OIDC | పూర్తి నియంత్రణ |
-| `linode-stackscript-keycloak-embed.sh` | Linode | అంతర్నిర్మిత Keycloak | ఫారం-ఆధారిత సెటప్, అత్యంత సరళం |
-| `linode-stackscript-oidc.sh` | Linode | బాహ్య OIDC మాత్రమే | ఇప్పటికే ఉన్న గుర్తింపు ప్రదాత |
-| `linode-stackscript.sh` | Linode | Keycloak లేదా బాహ్య OIDC | పూర్తి నియంత్రణ |
-| `aws-ec2.sh` | AWS EC2 | Keycloak లేదా బాహ్య OIDC | AWS డిప్లాయ్‌మెంట్‌లు |
-| `gcp-compute.sh` | Google Cloud | Keycloak లేదా బాహ్య OIDC | GCP డిప్లాయ్‌మెంట్‌లు |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **చాలా వినియోగదారులకు సిఫారసు:** `keycloak-embed` వేరియంట్ ఉపయోగించండి. ఇది అంతర్నిర్మిత Keycloak గుర్తింపు సర్వర్‌ను కలిగి ఉంది మరియు అత్యంత తక్కువ కాన్ఫిగరేషన్ ఫీల్డ్‌లు అవసరం.
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## సర్వర్ సైజింగ్ గైడ్
+## Server Sizing Guide
 
-| వినియోగ సందర్భం | RAM | డిస్క్ | ఉదాహరణ |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| మూల్యాంకనం / అభివృద్ధి | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
-| చిన్న బృందం (< 50 వినియోగదారులు) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
-| ప్రొడక్షన్ (> 50 వినియోగదారులు) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> ఎంబెడెడ్ Keycloak కనీసం **4 GB RAM** అవసరం. Keycloak లేకుండా మూల్యాంకనానికి మాత్రమే 2 GB ఉపయోగించండి.
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## DNS సెటప్
+## DNS Setup
 
-Let's Encrypt సర్టిఫికేట్ జారీ చేయగలిగే ముందు అన్ని స్క్రిప్ట్‌లకు **మీ సర్వర్ IP కి పాయింట్ చేసే A రికార్డ్ ఉన్న డొమైన్** అవసరం.
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-స్క్రిప్ట్ సెటప్ ప్రక్రియలో ముందుగా మీ సర్వర్ IP ప్రింట్ చేస్తుంది:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
@@ -70,26 +70,26 @@ Let's Encrypt సర్టిఫికేట్ జారీ చేయగలి�
 ============================================================
 ```
 
-స్క్రిప్ట్ DNS రిజోల్వ్ అయ్యే వరకు ప్రతి 60 సెకన్లకు Let's Encrypt **స్వయంచాలకంగా పునః ప్రయత్నిస్తుంది**. DNS రికార్డ్ జోడించి వేచి ఉండండి — పునఃప్రారంభం అవసరం లేదు.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **రేట్ లిమిట్:** Let's Encrypt గరిష్టంగా **ఒక్కో డొమైన్‌కు 7 రోజులలో 5 సర్టిఫికేట్‌లు** అనుమతిస్తుంది. ఒకే డొమైన్‌తో పదే పదే సర్వర్‌లు డిప్లాయ్ మరియు నాశనం చేయకండి. లిమిట్ చేరుకుంటే స్క్రిప్ట్ `retry after` టైమ్‌స్టాంప్ ప్రదర్శించి వెంటనే ఆగిపోతుంది.
-
----
-
-## డిప్లాయ్‌మెంట్ తర్వాత చెక్‌లిస్ట్
-
-- [ ] యాప్ `https://your-domain.com` లో తెరుచుకుంటుంది
-- [ ] `admin` మరియు మీరు కాన్ఫిగర్ చేసిన పాస్‌వర్డ్‌తో లాగిన్ అవండి
-- [ ] అన్ని కంటైనర్‌లు ఆరోగ్యంగా ఉన్నాయి: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] Let's Encrypt రెన్యువల్ పని చేస్తుంది: `certbot renew --dry-run`
-- [ ] MySQL పోర్ట్ 3306 బహిరంగపరచబడలేదు: `ufw status`
-- [ ] రోజువారీ డేటాబేస్ బ్యాకప్ సెటప్ చేయండి ([Maintenance](../maintenance) చూడండి)
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## ట్రబుల్‌షూటింగ్
+## Post-Deployment Checklist
 
-### పూర్తి సెటప్ లాగ్ తనిఖీ చేయండి
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Let's Encrypt రేట్ లిమిట్
+### Let's Encrypt rate limit
 
-లాగ్‌లో `too many certificates` కనిపిస్తే, మీరు 5 సర్టిఫికేట్‌లు/7 రోజుల లిమిట్ చేరుకున్నారు. లాగ్ ఖచ్చితమైన పునః ప్రయత్న సమయం చూపిస్తుంది:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
 [SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-ఆ సమయం వరకు వేచి ఉండి, తర్వాత మళ్ళీ డిప్లాయ్ చేయండి.
+Wait until that time, then redeploy.
 
-### Keycloak అనారోగ్యంగా ఉంది
+### Keycloak stays unhealthy
 
-సర్వర్‌లో కనీసం 4 GB RAM ఉందని నిర్ధారించి, లాగ్‌లు తనిఖీ చేయండి:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### Certbot తర్వాత SSL కాన్ఫిగ్ వర్తించలేదు
+### SSL config not applied after certbot
 
-సర్టిఫికేట్ జారీ చేయబడి Nginx ఇంకా HTTP మాత్రమే చూపిస్తే, లోపు లైన్ కోసం లాగ్ తనిఖీ చేసి మాన్యువల్‌గా Nginx రీలోడ్ చేయండి:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

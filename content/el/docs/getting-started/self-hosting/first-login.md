@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Πρώτη Σύνδεση"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Πώς να συνδεθείτε στην εγκατάσταση rtSurvey για πρώτη φορά μετά την ανάπτυξη."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **Το SSL πρέπει να διαμορφωθεί πριν από τη σύνδεση.** Εάν αποκτάτε πρόσβαση στην εφαρμογή μέσω HTTP, θα δείτε μια προειδοποίηση ασφαλείας και το SSO θα αποκλειστεί. Ολοκληρώστε πρώτα την [Εγκατάσταση SSL](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Μετά την ενεργοποίηση του SSL, ανοίξτε τον περιηγητή σας στη διεύθυνση HTTPS:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Η οθόνη σύνδεσης
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Η σελίδα σύνδεσης εμφανίζει:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- Πεδία **Όνομα χρήστη** και **Κωδικός πρόσβασης**
+- Κουμπί **Σύνδεση**
+- Κουμπί **Σύνδεση με SSO** (κάτω από διαχωριστικό) — για μέλη ομάδας με λογαριασμούς SSO
 
 ---
 
-## If you see a security warning
+## Προεπιλεγμένα διαπιστευτήρια διαχειριστή
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Εισαγάγετε τα προεπιλεγμένα διαπιστευτήρια και κάντε κλικ στο **Σύνδεση**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Πεδίο | Τιμή |
+|-------|------|
+| Όνομα χρήστη | `admin` |
+| Κωδικός πρόσβασης | `admin` |
+
+> **Αλλάξτε τον κωδικό πρόσβασής σας αμέσως μετά την πρώτη σύνδεση.**
+
+---
+
+## Εάν εμφανιστεί προειδοποίηση ασφαλείας
+
+Εάν αποκτάτε πρόσβαση στην εφαρμογή μέσω HTTP (πριν από τη διαμόρφωση SSL), θα δείτε:
+
+- Ένα κίτρινο banner προειδοποίησης στην κορυφή της σελίδας σύνδεσης
+- Ένα modal κατά το κλικ στο **Σύνδεση**, που προειδοποιεί ότι τα διαπιστευτήρια θα αποσταλούν μη κρυπτογραφημένα
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Κάντε κλικ στο **Εγκατάσταση SSL** για να διαμορφώσετε HTTPS ή **Συνέχεια ούτως ή άλλως** για σύνδεση χωρίς SSL (δεν συνιστάται).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+Η σύνδεση SSO αποκλείεται εντελώς μέσω HTTP — το κλικ στο **Σύνδεση με SSO** θα εμφανίσει ειδοποίηση αντί για ανακατεύθυνση.
 
 ---
 
-## After logging in
+## Μετά τη σύνδεση
 
-Once inside, you will land on the dashboard. From here:
+Μόλις μπείτε, θα βρεθείτε στον πίνακα ελέγχου. Από εκεί:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Αλλαγή κωδικού διαχειριστή** — ρυθμίσεις λογαριασμού → αλλαγή κωδικού
+2. **Δημιουργία πρώτου έργου** — Έργα → Νέο έργο
+3. **Ανέβασμα ή δημιουργία φόρμας** — Φόρμες → Ανέβασμα XLSForm ή άνοιγμα Form Builder
+4. **Προσθήκη χρηστών** — Χρήστες → Πρόσκληση ή δημιουργία λογαριασμών για την ομάδα σας

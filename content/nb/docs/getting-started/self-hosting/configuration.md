@@ -7,215 +7,215 @@ draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "Fullstendig referanse for alle miljøvariabler som brukes til å konfigurere en selvdriftet rtCloud-distribusjon."
+description: "Komplett referanse for alle miljøvariabler som brukes til å konfigurere en selvhostet rtCloud-distribusjon."
 ---
 
-All konfigurasjon gjøres gjennom miljøvariabler i `.env`-filen i roten av distribusjonskatalogen. Docker Compose leser denne filen automatisk — ingen `--env-file`-flagg er nødvendig.
+All konfigurasjon gjøres via miljøvariabler i `.env`-filen i roten av distribusjonskatalogen. Docker Compose leser denne filen automatisk — ingen `--env-file`-flagg er nødvendig.
 
-Variabler merket **påkrevd** må angis før containerne startes. Alle andre har standardverdier og er valgfrie.
+Variabler merket **påkrevd** må settes før containerne startes. Alle andre har standardverdier og er valgfrie.
 
 ---
 
-## Prosjekt
+## Project
 
-Disse variablene definerer identiteten og tilgangspunktet til rtCloud-instansen din.
+These variables define the identity and access point of your rtCloud instance.
 
-| Variabel | Standard | Påkrevd | Beskrivelse |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **Ja** | Unik identifikator for denne distribusjonen. Ingen mellomrom eller spesialtegn. Brukes som prefiks for intern navngiving. |
-| `PROJECT_URL` | — | **Ja** | Domenenavn eller IP-adresse der brukere får tilgang til appen (f.eks. `rtcloud.example.com` eller `192.168.1.100`). |
-| `PROJECT_TYPE` | `rtsurvey` | Nei | Plattformvariant som skal aktiveres. Alternativer: `rtwork`, `rtsurvey`, `rthome`. |
-| `PROJECT_PORT` | `80` | Nei | Port applikasjonen lytter på inni containeren. Ikke endre med mindre du vet hva du gjør. |
-| `HTTP_PROTOCOL` | `https` | Nei | Protokoll som brukes til å konstruere interne URL-er. Sett til `http` hvis du ikke bruker SSL. |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
 ## Database
 
-MySQL-tilkoblingslegitimasjon. Databasen administreres automatisk av MySQL-containeren — du trenger bare å angi sterke passord.
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| Variabel | Standard | Påkrevd | Beskrivelse |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | Nei | Navn på applikasjonsdatabasen. |
-| `MYSQL_USER` | `smartsurvey` | Nei | MySQL-bruker for applikasjonen. |
-| `MYSQL_PASSWORD` | — | **Ja** | Passord for `MYSQL_USER`. Bruk en sterk, unik verdi. |
-| `MYSQL_ROOT_PASSWORD` | — | **Ja** | MySQL root-passord. Påkrevd for databaseinitialisering og adminoperasjoner. |
-| `MYSQL_HOST` | `mysql` | Nei | MySQL-vertsnavn. Bruk standard med mindre du kobler til en ekstern database. |
-| `MYSQL_PORT` | `3306` | Nei | MySQL-port. |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## Adminkonto
+## Admin Account
 
-Adminkontoen opprettes automatisk ved første oppstart av en fersk database.
+The admin account is created automatically on the first boot of a fresh database.
 
-| Variabel | Standard | Påkrevd | Beskrivelse |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **Ja** | Passord for den innebygde `admin`-brukeren. Angi dette før første oppstart. Har ingen effekt hvis databasen allerede eksisterer. |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> Etter første innlogging, endre adminpassordet fra **Kontoinnstillinger**-siden i nettgrensesnittet.
-
----
-
-## Porter
-
-Kontroller hvilke vertsporter applikasjonen binder seg til.
-
-| Variabel | Standard | Beskrivelse |
-|----------|---------|-------------|
-| `APP_PORT` | `8080` | Vertsport for hoved-nettgrensesnittet. Endre dette hvis port 8080 allerede er i bruk på serveren. |
-| `SHINY_PORT` | `3838` | Vertsport for Shiny-analyseserveren. |
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## Kjøretid
+## Ports
 
-| Variabel | Standard | Beskrivelse |
+Control which host ports the application binds to.
+
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | Kjøretidsmiljø. Bruk `prod` for produksjonsdistribusjoner, `dev` for lokal utvikling. |
-| `RUN_MODE` | `admin` | Containerrolle. `admin` kjører hele stabelen (nett + kø + cron). `worker` kjører kun bakgrunnsbehandling (for horisontal skalering). |
-| `TZ` | `Asia/Ho_Chi_Minh` | Servertidssone. Påvirker logg-tidsstempler, cron-planer og datovisning. Bruk et [TZ-databasenavn](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (f.eks. `UTC`, `Europe/Oslo`). |
-| `LOG_LEVEL` | `info` | Utførlighet for applikasjonslogger. Alternativer: `debug`, `info`, `warning`, `error`. |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefiks brukt på alle Docker-container- og volumnavn. Endre dette ved kjøring av flere rtCloud-instanser på samme vert. |
-| `RESTART_POLICY` | `unless-stopped` | Docker-containers omstartsatferd. Alternativer: `no`, `always`, `on-failure`, `unless-stopped`. |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker-bilde som skal brukes. Endre taggen for å feste en bestemt versjon. |
-| `REQUIRE_LICENSE` | `false` | Aktiver validering av lisensnøkkel ved oppstart. Kontakt RTA for lisensinformasjon. |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
-## Sikkerhet
+## Runtime
 
-| Variabel | Standard | Beskrivelse |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | Aktiver CSRF-tokenvalidering. Hold denne på `true` i produksjon. Sett til `false` kun i lokal utvikling hvis du møter `400 CSRF token could not be verified`-feil. |
-| `GII_ENABLED` | `false` | Aktiver Yii-rammeverkets kodegeneratorverktøy. **Aldri aktiver i produksjon.** |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## SSO — Innebygd Keycloak
+## Security
 
-Aktiver den medfølgende Keycloak-containeren for full-funksjon bedrifts-SSO. Krever et domene med HTTPS.
-
-| Variabel | Standard | Beskrivelse |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | Sett til `true` for å starte den innebygde Keycloak-containeren. Aktiverer `embed-keycloak` Docker Compose-profilen. |
-| `KEYCLOAK_URL` | — | Full URL til Keycloak-serveren (f.eks. `https://rtcloud.example.com/auth`). |
-| `KEYCLOAK_REALM` | — | Keycloak realm-navn (f.eks. `rtsurvey`). |
-| `KEYCLOAK_CLIENT_ID` | — | Keycloak klient-ID for rtCloud-applikasjonen. |
-| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak klienthemmelighet. Generer denne fra Keycloak admin-konsollen. |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak-administratorbrukernavn. |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak-administratorpassord. |
-| `KEYCLOAK_DB` | `keycloak` | Databasenavn for Keycloak. Opprettes automatisk ved første oppstart. |
-| `KEYCLOAK_DB_USER` | `keycloak` | Databasebruker for Keycloak. |
-| `KEYCLOAK_DB_PASSWORD` | — | Databasepassord for Keycloak-brukeren. |
-| `KC_HOSTNAME` | — | Keycloak frontend-URL (f.eks. `https://rtcloud.example.com/auth`). |
-| `KC_HOSTNAME_STRICT` | `false` | Håndhev strengt vertsnavn-samsvar. Sett til `true` i produksjon med et fast domene. |
-
-Se [SSO-autentisering](sso-authentication#embedded-keycloak) for den fullstendige oppsettsveiledningen.
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — Ekstern OIDC-leverandør
+## SSO — Embedded Keycloak
 
-Koble til en eksisterende OIDC-kompatibel identitetsleverandør (Supabase, Auth0, Authentik, Okta, osv.).
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| Variabel | Standard | Beskrivelse |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | OIDC-utstedersoppdagings-URL (f.eks. `https://accounts.google.com`). |
-| `OIDC_CLIENT_ID` | — | Klient-ID registrert hos identitetsleverandøren. |
-| `OIDC_CLIENT_SECRET` | — | Klienthemmelighet fra identitetsleverandøren. |
-| `OIDC_SCOPE` | `openid profile email` | Mellomrom-separert liste over OIDC-omfang som skal be om. |
-| `OIDC_REDIRECT_URI` | — | Tilbakekallingsadresse for nettappen (f.eks. `https://rtcloud.example.com/auth/callback`). |
-| `OIDC_MOBILE_CLIENT_ID` | — | Separat klient-ID for rtSurvey-mobilappen. |
-| `OIDC_MOBILE_REDIRECT_URI` | — | Mobilappens tilbakekallingsadresse (f.eks. `vn.rta.rtsurvey.auth://callback`). |
-| `OPEN_REGISTRATION` | `false` | Opprett automatisk rtCloud-kontoer for brukere som autentiserer via OIDC for første gang. |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | Overstyr autorisasjonsendepunkt-URL (la stå tomt for å bruke oppdagelse). |
-| `OIDC_TOKEN_ENDPOINT` | — | Overstyr token-endepunkt-URL (la stå tomt for å bruke oppdagelse). |
-| `OIDC_USERINFO_ENDPOINT` | — | Overstyr brukerinformasjons-endepunkt-URL (la stå tomt for å bruke oppdagelse). |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| Variabel | Beskrivelse |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | Azure AD-applikasjons-(klient-)ID. |
-| `AZURE_TENANT_ID` | Azure AD-katalog-(leietaker-)ID. |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## Valgfrie integrasjoner
+## Optional Integrations
 
 ### Stata
 
-| Variabel | Standard | Beskrivelse |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | Aktiver Stata-statistikkprogramvareintegrasjon for dataanalyse. |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolutt sti til Stata-binæren inni containeren. |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| Variabel | Beskrivelse |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Elasticsearch-vert (f.eks. `http://elasticsearch:9200`). |
-| `ES_PORT` | Elasticsearch-port. |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
 ### Matomo Analytics
 
-| Variabel | Beskrivelse |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | Matomo (Piwik) server-URL. |
-| `PIWIK_ID` | Matomo nettsted-ID. |
-| `PIWIK_SECRET` | Matomo autentiseringstoken. |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (R-beregning)
+### OpenCPU (R Computation)
 
-| Variabel | Beskrivelse |
+| Variable | Description |
 |----------|-------------|
-| `OCPU_HOST` | OpenCPU server-URL for R-basert statistisk beregning. |
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox-integrasjon
+### RtBox Integration
 
-| Variabel | Beskrivelse |
+| Variable | Description |
 |----------|-------------|
-| `RTBOX_HOST` | RtBox tjeneste-vert-URL. |
-| `RTBOX_USER_API` | RtBox bruker-API-nøkkel. |
-| `RTBOX_BASIC_AUTH` | Grunnleggende autentiseringslegitimasjon for RtBox. |
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix-meldinger
+### Matrix Messaging
 
-| Variabel | Beskrivelse |
+| Variable | Description |
 |----------|-------------|
-| `MATRIX_HOMESERVER_HOST` | Matrix hjemserver-vert. |
-| `MATRIX_HOMESERVER_PORT` | Matrix hjemserver-port. |
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## Datavolumer
+## Data Volumes
 
-Alle applikasjonsdata lagres i navngitte Docker-volumer. Volumer opprettes automatisk ved første oppstart og vedvarer på tvers av containeromstarter og oppdateringer.
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| Volum | Monteringspunkt | Innhold |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL-databasefiler |
-| `rtcloud_uploads` | `…/uploads` | Filer lastet opp av undersøkelsesrespondenter |
-| `rtcloud_audios` | `…/audios` | Lydopptak |
-| `rtcloud_downloads` | `…/downloads` | Genererte eksportfiler |
-| `rtcloud_gallery` | `…/gallery` | Galleribilder |
-| `rtcloud_voicemail` | `…/voicemail` | Talepostopptak |
-| `rtcloud_analytics` | `…/analytics` | Analysedata |
-| `rtcloud_aggregate` | `…/aggregate` | Aggregerte undersøkelsesresultater |
-| `rtcloud_converter` | `…/converter` | Datakonverteringsutdata |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R-skript |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server-logger |
-| `rtcloud_assets` | `…/assets` | Nettressurser (CSS, JS) |
-| `rtcloud_runtime` | `…/protected/runtime` | Applikasjonens kjøretidsbuffer |
-| `rtcloud_cache` | `…/cache` | Applikasjonsbuffer |
-| `rtcloud_tmp` | `…/tmp` | Midlertidige filer |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-Volumnavn har prefikset fra verdien av `COMPOSE_PROJECT_NAME` (standard: `rtcloud`).
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-List alle volumer for distribusjonen din:
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

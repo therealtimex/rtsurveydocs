@@ -1,38 +1,36 @@
 ---
 weight: 4
-title: "Set Up SSL"
+title: "SSL iestatīšana"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Configure HTTPS for your rtSurvey server. Required before you can log in."
+description: "Konfigurējiet HTTPS savam rtSurvey serverim. Nepieciešams pirms pieteikšanās."
 ---
 
-SSL must be configured before you can log in. When you open the app for the first time, you will be redirected to the SSL setup screen automatically.
+SSL ir jākonfigurē pirms pieteikšanās. Atverot lietotni pirmo reizi, jūs automātiski tiksiet novirzīts uz SSL iestatīšanas ekrānu.
 
 ---
 
-## SSL setup options
+## SSL iestatīšanas opcijas
 
-![SSL setup options](/img/ssl-setup/ssl-setup-options.png)
-
-Choose one of three options:
+![SSL iestatīšanas opcijas](/img/ssl-setup/ssl-setup-options.png)
 
 | Option | When to use |
 |--------|-------------|
-| **Free rtsurvey.com subdomain** *(Recommended)* | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **My own domain** | You already have a domain and its DNS points to this server. |
-| **Install certificate manually** | Enterprise or custom CA. Requires SSH access. |
+| **Bezmaksas rtsurvey.com apakšdomēns *(Ieteicams)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
+| **Mans domēns** | You already have a domain and its DNS points to this server. |
+| **Instalēt sertifikātu manuāli** | Enterprise or custom CA. Requires SSH access. |
 
 ---
 
-## Option 1 — Free rtsurvey.com subdomain *(Recommended)*
+## Option 1 — Bezmaksas rtsurvey.com apakšdomēns *(Ieteicams)*
 
 This is the fastest option. No domain registration or DNS changes required.
 
-1. Click **Free rtsurvey.com subdomain** to expand the section
+1. Click **Bezmaksas rtsurvey.com apakšdomēns *(Ieteicams)*** to expand the section
 2. Type your desired subdomain name in the input field
 
    > Use lowercase letters, numbers, and hyphens. 3–30 characters.
@@ -52,11 +50,11 @@ This is the fastest option. No domain registration or DNS changes required.
 
 ---
 
-## Option 2 — My own domain
+## Option 2 — Mans domēns
 
 Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
 
-1. Click **My own domain** to expand the section
+1. Click **Mans domēns** to expand the section
 2. Enter your full domain name (e.g. `survey.myorganization.org`)
 3. Click **Create certificate**
 
@@ -66,7 +64,7 @@ Let's Encrypt will verify your domain and issue a certificate. This requires DNS
 
 ---
 
-## Option 3 — Install certificate manually
+## Option 3 — Instalēt sertifikātu manuāli
 
 For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
 
@@ -115,7 +113,7 @@ chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Install certificate manually**
+1. In the SSL setup screen, click **Instalēt sertifikātu manuāli**
 2. Enter your domain name (must match the certificate's Common Name or SAN)
 3. Click **Apply**
 
@@ -123,6 +121,6 @@ The server will configure Nginx with your certificate and reload automatically.
 
 ---
 
-## Next step
+## Nākamais solis
 
-Once SSL is active, proceed to [First Login](first-login).
+Kad SSL ir aktīvs, turpiniet ar [Pirmo pieteikšanos](first-login).

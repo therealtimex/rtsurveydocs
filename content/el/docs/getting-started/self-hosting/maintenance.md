@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 6
 title: "Συντήρηση"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,67 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "build"
 toc: true
-description: "Καθημερινή συντήρηση αυτο-φιλοξενούμενης εγκατάστασης rtCloud: αναβάθμιση, δημιουργία αντιγράφων ασφαλείας, επαναφορά και αντιμετώπιση κοινών προβλημάτων."
+description: "Καθημερινή συντήρηση αυτο-φιλοξενούμενης rtCloud: αναβαθμίσεις, αντίγραφα ασφαλείας, επαναφορά και αντιμετώπιση προβλημάτων."
 ---
 
-## Κοινές εντολές
+## Κοινές Εντολές
 
-Χρησιμοποιήστε αυτές τις εντολές τακτικά για τη διαχείριση των κοντέινερ rtCloud. Εκτελέστε τις από τον κατάλογο που περιέχει το `docker-compose.production.yml`.
+Χρησιμοποιήστε αυτές τις εντολές τακτικά για να διαχειριστείτε τα containers rtCloud. Εκτελέστε τες από τον κατάλογο που περιέχει `docker-compose.production.yml`.
 
 ```bash
-# Έλεγχος κατάστασης και υγείας όλων των κοντέινερ
+# Check status and health of all containers
 docker compose -f docker-compose.production.yml ps
 
-# Προβολή live αρχείων καταγραφής (όλες οι υπηρεσίες)
+# View live logs (all services)
 docker compose -f docker-compose.production.yml logs -f
 
-# Προβολή αρχείων καταγραφής μόνο εφαρμογής
+# View logs for the app only
 docker compose -f docker-compose.production.yml logs -f rtcloud
 
-# Επανεκκίνηση ενός κοντέινερ
+# Restart a single container
 docker compose -f docker-compose.production.yml restart rtcloud
 
-# Διακοπή όλων των υπηρεσιών
+# Stop all services
 docker compose -f docker-compose.production.yml down
 
-# Εκκίνηση όλων των υπηρεσιών
+# Start all services
 docker compose -f docker-compose.production.yml up -d
 
-# Άνοιγμα κέλυφους εντός κοντέινερ εφαρμογής
+# Open a shell inside the app container
 docker compose -f docker-compose.production.yml exec rtcloud bash
 ```
 
 ---
 
-## Αναβάθμιση
+## Upgrading
 
-Οι ενημερώσεις rtCloud διανέμονται ως νέες ετικέτες εικόνας Docker. Η αναβάθμιση ανακτά την τελευταία εικόνα και ανδημιουργεί το κοντέινερ εφαρμογής. Οι μετεγκαταστάσεις βάσης δεδομένων εκτελούνται αυτόματα κατά την εκκίνηση.
+rtCloud updates are distributed as new Docker image tags. Upgrading pulls the latest image and recreates the app container. Database migrations run automatically on startup.
 
-**1. Ανάκτηση τελευταίας εικόνας:**
+**1. Pull the latest image:**
 
 ```bash
 docker compose -f docker-compose.production.yml pull
 ```
 
-**2. Ανδημιουργία κοντέινερ εφαρμογής:**
+**2. Recreate the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d
 ```
 
-### Καρφίτσωμα έκδοσης
+Docker replaces only the containers whose image has changed. The MySQL container and all named volumes are unaffected.
 
-Για αναβάθμιση σε συγκεκριμένη έκδοση αντί για `latest`, ενημερώστε το `RTCLOUD_IMAGE` στο `.env`:
+### Pinning a Version
+
+To upgrade to a specific version instead of `latest`, update `RTCLOUD_IMAGE` in `.env`:
 
 ```dotenv
 RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
 ```
 
+Then run `docker compose pull` and `up -d` as above.
+
+### Downgrading
+
+Downgrading is generally not recommended, as database migrations cannot be reversed. If a downgrade is necessary, restore from a database backup taken before the upgrade.
+
 ---
 
-## Δημιουργία αντιγράφων ασφαλείας και επαναφορά
+## Backup and Restore
 
-### Δημιουργία αντιγράφου ασφαλείας βάσης δεδομένων
+### Backup the Database
+
+Run this command to export the application database to a SQL file:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -75,7 +85,9 @@ docker compose -f docker-compose.production.yml exec mysql \
   > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-### Επαναφορά βάσης δεδομένων
+The backup file is written to your current directory on the host.
+
+### Restore the Database
 
 ```bash
 docker compose -f docker-compose.production.yml exec -T mysql \
@@ -83,23 +95,27 @@ docker compose -f docker-compose.production.yml exec -T mysql \
   < backup-20240101-120000.sql
 ```
 
-### Δημιουργία αντιγράφου ασφαλείας μεταφορτωμένων αρχείων
+### Backup Uploaded Files
+
+Survey submissions often include uploaded files (photos, audio, documents) stored in named Docker volumes. Back them up separately from the database:
 
 ```bash
-# Δημιουργία αντιγράφου ασφαλείας μεταφορτώσεων
+# Backup uploads
 docker run --rm \
   -v rtcloud_uploads:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
 
-# Δημιουργία αντιγράφου ασφαλείας ηχογραφήσεων
+# Backup audio recordings
 docker run --rm \
   -v rtcloud_audios:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/audios-$(date +%Y%m%d).tar.gz -C /data .
 ```
 
-### Επαναφορά μεταφορτωμένων αρχείων
+Replace `rtcloud_uploads` and `rtcloud_audios` with your actual volume names (prefixed by `COMPOSE_PROJECT_NAME`) if you changed the default.
+
+### Restore Uploaded Files
 
 ```bash
 docker run --rm \
@@ -108,12 +124,12 @@ docker run --rm \
   alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
 ```
 
-### Αυτόματα ημερήσια αντίγραφα ασφαλείας
+### Automated Daily Backups
 
-Προσθέστε εργασία cron στον κεντρικό υπολογιστή. Επεξεργαστείτε το root crontab με `crontab -e`:
+Add a cron job on the host to run backups automatically. Edit the root crontab with `crontab -e`:
 
 ```cron
-# Ημερήσιο αντίγραφο ασφαλείας βάσης δεδομένων στις 2:00 π.μ., διατήρηση 30 ημερών ιστορικού
+# Daily database backup at 2:00 AM, keep 30 days of history
 0 2 * * * cd /opt/rtcloud && docker compose -f docker-compose.production.yml exec -T mysql \
   mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
   > /backups/db-$(date +\%Y\%m\%d).sql && \
@@ -122,86 +138,122 @@ docker run --rm \
 
 ---
 
-## Αντιμετώπιση προβλημάτων
+## Troubleshooting
 
-### Το κοντέινερ εφαρμογής δεν εκκινεί
+### App container not starting
 
-Ελέγξτε τα αρχεία καταγραφής κοντέινερ για μηνύματα σφάλματος:
+Check the container logs for error messages:
 
 ```bash
 docker compose -f docker-compose.production.yml logs rtcloud
 ```
 
-Κοινές αιτίες:
-- Ελλείπουσες ή μη έγκυρες μεταβλητές περιβάλλοντος στο `.env`
-- Η MySQL δεν είναι ακόμα έτοιμη (αναμείνετε 60 δευτερόλεπτα και ελέγξτε ξανά)
-- Σύγκρουση θύρας — άλλη διαδικασία χρησιμοποιεί ήδη το `APP_PORT`
+Common causes:
+- Missing or invalid environment variables in `.env`
+- MySQL not yet ready (wait 60 seconds and check again)
+- Port conflict — another process is already using `APP_PORT`
 
-### Η MySQL δεν είναι υγιής
+### MySQL not healthy
 
 ```bash
 docker compose -f docker-compose.production.yml logs mysql
 ```
 
-Κοινές αιτίες:
-- `MYSQL_ROOT_PASSWORD` δεν έχει οριστεί στο `.env`
-- Κατεστραμμένος τόμος δεδομένων (σπάνιο — ελέγξτε χώρο δίσκου με `df -h`)
+Common causes:
+- `MYSQL_ROOT_PASSWORD` not set in `.env`
+- Corrupted data volume (rare — check disk space with `df -h`)
 
-### Θύρα ήδη σε χρήση
+MySQL can take 30–60 seconds to initialize on the very first boot. Wait and check again before assuming failure.
 
-Αλλάξτε `APP_PORT` ή `SHINY_PORT` στο `.env` σε ελεύθερη θύρα, στη συνέχεια ανδημιουργήστε τα κοντέινερ:
+### Port already in use
+
+Change `APP_PORT` or `SHINY_PORT` in `.env` to a free port, then recreate the containers:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate
 ```
 
-### 400 Αδυναμία επαλήθευσης CSRF Token
+To find what is using a port on the host:
 
-Απενεργοποιήστε την επαλήθευση CSRF μόνο για τοπική ανάπτυξη:
+```bash
+lsof -i :8080
+```
+
+### 400 CSRF Token Could Not Be Verified
+
+This error appears in local or reverse-proxy environments where the request origin does not match the expected host. Disable CSRF validation for local development only:
 
 ```dotenv
 CSRF_VALIDATION_ENABLED=false
 ```
 
-Στη συνέχεια επανεκκινήστε την εφαρμογή:
+Then restart the app:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-> Μην απενεργοποιείτε την επαλήθευση CSRF στην παραγωγή.
+> Do not disable CSRF validation in production. If this error occurs in production, ensure your reverse proxy is forwarding the correct `Host` and `X-Forwarded-For` headers.
 
-### Ξεχάσατε τον κωδικό διαχειριστή
+### Forgot the Admin Password
 
-Επαναφέρετε τον κωδικό διαχειριστή απευθείας στη βάση δεδομένων. Συνδεθείτε στο κοντέινερ MySQL και ενημερώστε το hash κωδικού.
+Reset the admin password directly in the database. Connect to the MySQL container and update the password hash:
 
-### Το κοντέινερ επανεκκινείται συνεχώς
+**Step 1** — Generate the new password hash. Replace `newpassword` with your desired password:
 
-Ελέγξτε εάν ο έλεγχος υγείας αποτυγχάνει:
+```bash
+docker compose -f docker-compose.production.yml exec rtcloud php -r "
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\""));
+  echo md5(\$salt . 'newpassword') . PHP_EOL;
+"
+```
+
+**Step 2** — Update the hash in the database:
+
+```bash
+docker compose -f docker-compose.production.yml exec mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
+```
+
+### Container keeps restarting
+
+Check if the health check is failing:
 
 ```bash
 docker compose -f docker-compose.production.yml ps
-docker inspect rtcloud-app --format '{{json .State.Health}}'
+docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
 ```
 
-### Ο δίσκος είναι γεμάτος
+The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.
 
-Εντοπίστε τι καταναλώνει χώρο:
+### Disk space full
+
+Identify what is consuming space:
 
 ```bash
+# Check host disk usage
 df -h
+
+# Check Docker disk usage (images, containers, volumes)
 docker system df
+
+# Remove unused images and stopped containers (safe to run)
 docker system prune
 ```
 
-Μην χρησιμοποιείτε `docker system prune --volumes` καθώς θα διαγράψει δεδομένα εφαρμογής.
+Do not use `docker system prune --volumes` as this will delete application data.
 
 ---
 
-## Έλεγχοι υγείας
+## Health Checks
 
-| Κοντέινερ | Μέθοδος ελέγχου | Περίοδος εκκίνησης | Διάστημα |
+Each service has an automatic health check. Container status reflects the result:
+
+| Container | Check Method | Start Period | Interval |
 |-----------|-------------|-------------|----------|
-| `rtcloud-app` | HTTP GET `/health` | 90 δευτερόλεπτα | 30 δευτερόλεπτα |
-| `rtcloud-mysql` | `mysqladmin ping` | 30 δευτερόλεπτα | 10 δευτερόλεπτα |
-| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 δευτερόλεπτα | 30 δευτερόλεπτα |
+| `rtcloud-app` | HTTP GET `/health` | 90 seconds | 30 seconds |
+| `rtcloud-mysql` | `mysqladmin ping` | 30 seconds | 10 seconds |
+| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 seconds | 30 seconds |
+
+Containers with a failing health check are automatically restarted according to the `RESTART_POLICY` setting (default: `unless-stopped`).

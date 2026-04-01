@@ -7,86 +7,86 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "نشر rtCloud على Droplet في DigitalOcean باستخدام سكريبتات بيانات المستخدم الآلية."
+description: "نشر rtCloud على Droplet من DigitalOcean باستخدام سكريبتات بيانات المستخدم الآلية."
 ---
 
-تستخدم DigitalOcean سكريبتات **User Data** التي تعمل تلقائياً عند التشغيل الأول. تملأ متغيرات الإعداد في أعلى السكريبت، ثم تلصق السكريبت بالكامل عند إنشاء Droplet.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> على عكس Linode StackScripts، لا توجد واجهة نموذج في DigitalOcean — يجب تعديل السكريبت مباشرةً قبل اللصق.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**تنزيل السكريبت:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Keycloak المدمج (موصى به)
+## Embedded Keycloak (Recommended)
 
-استخدم `digitalocean-droplet-keycloak-embed.sh` للإعداد الأبسط مع SSO مدمج.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### الخطوة 1 — ملء الإعداد
+### Step 1 — Fill in the configuration
 
-افتح السكريبت وعدّل كتلة `CONFIGURATION` في الأعلى:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- مطلوب ---
-PROJECT_ID="rtsurvey"                  # معرّف فريد لمشروعك (بدون مسافات)
-ADMIN_PASSWORD="admin"                 # كلمة مرور مسؤول التطبيق وKeycloak — غيّرها بعد تسجيل الدخول الأول
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
-# --- النطاق + SSL ---
-DOMAIN="myapp.example.com"            # نطاقك — يجب أن يشير سجل DNS A هنا
-PROJECT_URL=""                         # اتركه فارغاً ما لم يكن خلف Cloudflare/وكيل
-LETSENCRYPT_EMAIL="admin@example.com" # البريد الإلكتروني لإشعارات Let's Encrypt
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- اختياري ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| الحقل | مطلوب | الوصف |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | نعم | يُستخدم كاسم قاعدة البيانات ومعرّف عميل Keycloak. أحرف صغيرة، بدون مسافات. |
-| `ADMIN_PASSWORD` | لا | كلمة مرور تسجيل الدخول الإداري للتطبيق ووحدة تحكم Keycloak الإدارية. الافتراضي `admin` — **غيّرها بعد تسجيل الدخول الأول**. |
-| `DOMAIN` | نعم | اسم نطاقك. يجب أن يشير سجل DNS A إلى IP الـ Droplet. |
-| `LETSENCRYPT_EMAIL` | نعم | عنوان البريد الإلكتروني لإشعارات شهادة Let's Encrypt. |
-| `PROJECT_URL` | لا | تجاوز عنوان URL العام. اتركه فارغاً لاستخدام `DOMAIN`. مفيد خلف Cloudflare. |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **الأمان:** جميع كلمات المرور افتراضها `admin`. غيّرها فوراً بعد تسجيل دخولك الأول.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### الخطوة 2 — إنشاء Droplet
+### Step 2 — Create a Droplet
 
-في [لوحة تحكم DigitalOcean](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. انقر **Create** ← **Droplets**
-2. اختر **Ubuntu 22.04 LTS** كصورة
-3. اختر **Basic، 4 GB RAM / 2 vCPUs** أو أعلى
-4. انتقل إلى **Advanced Options** ← ضع علامة على **Add Initialization scripts**
-5. الصق محتوى السكريبت الكامل في منطقة النص
-6. انقر **Create Droplet**
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### الخطوة 3 — إضافة سجل DNS
+### Step 3 — Add the DNS record
 
-بينما يعمل Droplet على التشغيل، أضف **سجل A** في مزود DNS الخاص بك:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
-Name  : myapp          (أو @ للنطاق الجذر)
+Name  : myapp          (or @ for root domain)
 Value : <droplet-ip>
 TTL   : 300
 ```
 
-### الخطوة 4 — مراقبة التقدم
+### Step 4 — Monitor progress
 
-اتصل بـ Droplet عبر SSH وشاهد السجل:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-تطبع السكريبت IP الخادم في البداية — أضف سجل DNS فور رؤيته.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### الخطوة 5 — الوصول إلى التطبيق
+### Step 5 — Access the app
 
-عند اكتمال الإعداد، يعرض السجل ملخصاً:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
@@ -101,33 +101,33 @@ tail -f /var/log/rtcloud-setup.log
 ============================================================
 ```
 
-افتح `https://myapp.example.com` في متصفحك وسجّل الدخول باسم المستخدم `admin` وكلمة المرور `admin`.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **غيّر كلمة مرورك** فوراً بعد تسجيل الدخول عبر **Settings** في القائمة العلوية اليمنى.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## بعد النشر
+## After Deployment
 
-### تغيير كلمة مرور
+### Change a password
 
-اتصل بـ Droplet عبر SSH، وعدّل `.env`، وأعد تشغيل الحاوية المتأثرة:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### تحديث النطاق
+### Update the domain
 
-إذا عيّنت نطاقاً مختلفاً بعد النشر، حدّث `PROJECT_URL` في `.env`:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # حدّث PROJECT_URL=
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### عرض جميع الحاويات
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

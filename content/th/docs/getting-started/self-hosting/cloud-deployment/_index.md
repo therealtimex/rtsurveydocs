@@ -10,56 +10,56 @@ toc: true
 description: "ติดตั้ง rtCloud บนผู้ให้บริการคลาวด์หลักด้วยสคริปต์อัตโนมัติสำหรับ DigitalOcean, AWS EC2, Google Cloud และ Linode"
 ---
 
-ที่เก็บการติดตั้งใช้งานมีสคริปต์จัดเตรียมอัตโนมัติสำหรับผู้ให้บริการคลาวด์หลัก สคริปต์แต่ละตัวทำงานเมื่อบูตครั้งแรกของเซิร์ฟเวอร์ **Ubuntu 22.04 LTS** ใหม่และดำเนินการตั้งค่าแบบไม่มีการดูแลอย่างสมบูรณ์:
+ที่เก็บการติดตั้งประกอบด้วยสคริปต์จัดเตรียมอัตโนมัติสำหรับผู้ให้บริการคลาวด์หลัก สคริปต์แต่ละตัวทำงานในการบูตครั้งแรกของเซิร์ฟเวอร์ Ubuntu 22.04 LTS ใหม่ และดำเนินการตั้งค่าโดยอัตโนมัติ:
 
-- ติดตั้ง Docker และ Docker Compose
-- สร้างรหัสผ่านสุ่มที่ปลอดภัยสำหรับบริการภายในทั้งหมด
-- เขียน `docker-compose.production.yml` และ `.env`
-- กำหนดค่า Nginx เป็น reverse proxy
-- ขอใบรับรอง TLS ฟรีจาก Let's Encrypt (ลองใหม่อัตโนมัติจนกว่า DNS จะ resolve)
-- กำหนดค่าไฟร์วอลล์ UFW
-- ติดตั้งเซิร์ฟเวอร์ Keycloak SSO แบบฝังไม่บังคับ
-- แสดงผลสรุปการติดตั้งพร้อมข้อมูลประจำตัวทั้งหมด
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-การตั้งค่าเสร็จสิ้นใน **5–10 นาที** บนอินสแตนซ์มาตรฐาน
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## การเลือกสคริปต์
+## Choosing a Script
 
-มีหลายตัวแปรสคริปต์ขึ้นอยู่กับผู้ให้บริการคลาวด์และการตั้งค่า SSO ของคุณ:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| สคริปต์ | ผู้ให้บริการ | โหมด SSO | เหมาะสำหรับ |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Keycloak ในตัว | SSO แบบง่ายและครบในตัวเอง |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak หรือ External OIDC | ควบคุมเต็มรูปแบบ |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Keycloak ในตัว | การตั้งค่าแบบฟอร์ม ง่ายที่สุด |
-| `linode-stackscript-oidc.sh` | Linode | External OIDC เท่านั้น | ผู้ให้บริการตัวตนที่มีอยู่ |
-| `linode-stackscript.sh` | Linode | Keycloak หรือ External OIDC | ควบคุมเต็มรูปแบบ |
-| `aws-ec2.sh` | AWS EC2 | Keycloak หรือ External OIDC | การติดตั้ง AWS |
-| `gcp-compute.sh` | Google Cloud | Keycloak หรือ External OIDC | การติดตั้ง GCP |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **แนะนำสำหรับผู้ใช้ส่วนใหญ่:** ใช้ตัวแปร `keycloak-embed` มีเซิร์ฟเวอร์ตัวตน Keycloak ในตัวและต้องการฟิลด์การกำหนดค่าน้อยที่สุด
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## คู่มือการกำหนดขนาดเซิร์ฟเวอร์
+## Server Sizing Guide
 
-| กรณีการใช้งาน | RAM | Disk | ตัวอย่าง |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| การประเมิน / การพัฒนา | 2 GB | 25 GB | DO Basic $18/เดือน, t3.small, e2-small |
-| ทีมขนาดเล็ก (< 50 ผู้ใช้) | 4 GB | 40 GB | DO Basic $24/เดือน, t3.medium, e2-medium |
-| การผลิต (> 50 ผู้ใช้) | 8 GB | 80 GB | DO General $48/เดือน, t3.large, n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> Keycloak แบบฝังต้องการ RAM อย่างน้อย **4 GB** ใช้ 2 GB เฉพาะสำหรับการประเมินโดยไม่มี Keycloak
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## การตั้งค่า DNS
+## DNS Setup
 
-สคริปต์ทั้งหมดต้องการโดเมนที่มี **A record ชี้ไปยัง IP ของเซิร์ฟเวอร์** ก่อนที่ Let's Encrypt จะออกใบรับรองได้
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-สคริปต์แสดง IP ของเซิร์ฟเวอร์ในช่วงต้นของกระบวนการตั้งค่า:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
@@ -70,26 +70,26 @@ description: "ติดตั้ง rtCloud บนผู้ให้บริก
 ============================================================
 ```
 
-สคริปต์ **ลองใหม่โดยอัตโนมัติ** กับ Let's Encrypt ทุก 60 วินาทีเป็นเวลาถึง 1 ชั่วโมง เพียงเพิ่ม DNS record และรอ — ไม่จำเป็นต้องรีสตาร์ท
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Rate limit:** Let's Encrypt อนุญาตสูงสุด **5 ใบรับรองต่อโดเมนต่อ 7 วัน** หลีกเลี่ยงการติดตั้งและทำลายเซิร์ฟเวอร์ซ้ำๆ ด้วยโดเมนเดียวกัน หากถึงขีดจำกัด สคริปต์จะแสดง timestamp `retry after` และหยุดทันที
-
----
-
-## รายการตรวจสอบหลังการติดตั้ง
-
-- [ ] แอปเปิดที่ `https://your-domain.com`
-- [ ] เข้าสู่ระบบด้วย `admin` และรหัสผ่านที่คุณกำหนดค่า
-- [ ] คอนเทนเนอร์ทั้งหมดมีสุขภาพดี: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] การต่ออายุ Let's Encrypt ทำงาน: `certbot renew --dry-run`
-- [ ] พอร์ต MySQL 3306 **ไม่** ถูกเปิดเผย: `ufw status`
-- [ ] ตั้งค่าการสำรองข้อมูลรายวัน (ดู [การบำรุงรักษา](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## การแก้ไขปัญหา
+## Post-Deployment Checklist
 
-### ตรวจสอบล็อกการตั้งค่าเต็ม
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Rate limit ของ Let's Encrypt
+### Let's Encrypt rate limit
 
-หากเห็น `too many certificates` ในล็อก แสดงว่าถึงขีดจำกัด 5 ใบรับรอง/7 วัน ล็อกแสดงเวลาลองใหม่ที่แน่นอน:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
 [SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-รอจนถึงเวลานั้น แล้วติดตั้งใหม่
+Wait until that time, then redeploy.
 
-### Keycloak ไม่มีสุขภาพ
+### Keycloak stays unhealthy
 
-ตรวจสอบให้แน่ใจว่าเซิร์ฟเวอร์มี RAM อย่างน้อย 4 GB แล้วตรวจสอบล็อก:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### การกำหนดค่า SSL ไม่ถูกใช้หลัง certbot
+### SSL config not applied after certbot
 
-หากมีการออกใบรับรองแล้วแต่ Nginx ยังแสดง HTTP เท่านั้น ให้ตรวจสอบล็อกสำหรับบรรทัดข้อผิดพลาดและโหลด Nginx ด้วยตนเอง:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

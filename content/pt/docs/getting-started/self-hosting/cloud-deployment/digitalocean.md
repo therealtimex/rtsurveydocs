@@ -7,86 +7,86 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Implante o rtCloud num Droplet DigitalOcean usando scripts de dados de utilizador automatizados."
+description: "Implemente rtCloud num Droplet DigitalOcean usando scripts de dados de utilizador automatizados."
 ---
 
-O DigitalOcean usa scripts de **Dados de Utilizador** que são executados automaticamente na primeira inicialização. Preenche as variáveis de configuração no topo do script e depois cola o script completo ao criar um Droplet.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> Ao contrário dos StackScripts Linode, o DigitalOcean não tem UI de formulário — deve editar o script diretamente antes de colar.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**Descarregar script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Keycloak Incorporado (Recomendado)
+## Embedded Keycloak (Recommended)
 
-Use `digitalocean-droplet-keycloak-embed.sh` para a configuração mais simples com SSO incorporado.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### Passo 1 — Preencher a configuração
+### Step 1 — Fill in the configuration
 
-Abra o script e edite o bloco `CONFIGURAÇÃO` no topo:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Obrigatório ---
-PROJECT_ID="rtsurvey"                  # Identificador único para o seu projeto (sem espaços)
-ADMIN_PASSWORD="admin"                 # Palavra-passe para o admin da aplicação e Keycloak — altere após o primeiro início de sessão
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
-# --- Domínio + SSL ---
-DOMAIN="myapp.example.com"            # O seu domínio — o registo DNS A deve apontar aqui
-PROJECT_URL=""                         # Deixe em branco a menos que esteja atrás do Cloudflare/proxy
-LETSENCRYPT_EMAIL="admin@example.com" # Email para notificações da Let's Encrypt
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- Opcional ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Campo | Obrigatório | Descrição |
-|-------|-------------|-----------|
-| `PROJECT_ID` | Sim | Usado como nome de base de dados e ID de cliente Keycloak. Minúsculas, sem espaços. |
-| `ADMIN_PASSWORD` | Não | Palavra-passe para início de sessão de admin da aplicação e consola de admin Keycloak. Predefinição `admin` — **altere após o primeiro início de sessão**. |
-| `DOMAIN` | Sim | O seu nome de domínio. O registo DNS A deve apontar para o IP do Droplet. |
-| `LETSENCRYPT_EMAIL` | Sim | Endereço de email para notificações de certificado da Let's Encrypt. |
-| `PROJECT_URL` | Não | Substituir o URL público. Deixe em branco para usar `DOMAIN`. Útil atrás do Cloudflare. |
+| Field | Required | Description |
+|-------|----------|-------------|
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **Segurança:** Todas as palavras-passe têm como predefinição `admin`. Altere-as imediatamente após o seu primeiro início de sessão.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### Passo 2 — Criar um Droplet
+### Step 2 — Create a Droplet
 
-No [painel de controlo DigitalOcean](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Clique em **Criar** → **Droplets**
-2. Escolha **Ubuntu 22.04 LTS** como imagem
-3. Selecione **Basic, 4 GB RAM / 2 vCPUs** ou maior
-4. Role até **Opções Avançadas** → marque **Adicionar scripts de inicialização**
-5. Cole o conteúdo completo do script na área de texto
-6. Clique em **Criar Droplet**
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### Passo 3 — Adicionar o registo DNS
+### Step 3 — Add the DNS record
 
-Enquanto o Droplet inicia, adicione um **registo A** no seu fornecedor DNS:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
-Tipo  : A
-Nome  : myapp          (ou @ para domínio raiz)
-Valor : <droplet-ip>
+Type  : A
+Name  : myapp          (or @ for root domain)
+Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Passo 4 — Monitorizar o progresso
+### Step 4 — Monitor progress
 
-Aceda ao Droplet via SSH e observe o log:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-O script imprime o IP do seu servidor perto do início — adicione o registo DNS assim que o vir.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### Passo 5 — Aceder à aplicação
+### Step 5 — Access the app
 
-Quando a configuração estiver concluída, o log mostra um resumo:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
@@ -101,33 +101,33 @@ Quando a configuração estiver concluída, o log mostra um resumo:
 ============================================================
 ```
 
-Abra `https://myapp.example.com` no seu navegador e inicie sessão com o nome de utilizador `admin` e a palavra-passe `admin`.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Altere a sua palavra-passe** imediatamente após o início de sessão em **Configurações** no menu superior direito.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## Após a Implantação
+## After Deployment
 
-### Alterar uma palavra-passe
+### Change a password
 
-Aceda ao Droplet via SSH, edite `.env` e reinicie o contentor afetado:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Atualizar o domínio
+### Update the domain
 
-Se atribuir um domínio diferente após a implantação, atualize `PROJECT_URL` em `.env`:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # atualize PROJECT_URL=
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Ver todos os contentores
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

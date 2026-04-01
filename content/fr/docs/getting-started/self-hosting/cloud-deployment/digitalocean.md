@@ -7,7 +7,7 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Deploy rtCloud on a DigitalOcean Droplet using automated user-data scripts."
+description: "Déployez rtCloud sur un Droplet DigitalOcean à l'aide de scripts de données utilisateur automatisés."
 ---
 
 DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.

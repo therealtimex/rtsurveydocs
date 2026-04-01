@@ -10,63 +10,63 @@ toc: true
 description: "gcp-compute.sh 시작 스크립트를 사용하여 Google Cloud Compute Engine에 rtCloud를 배포합니다."
 ---
 
-Compute Engine VM 인스턴스를 만들 때 `gcp-compute.sh`를 **시작 스크립트**로 사용합니다. 스크립트는 첫 번째 부팅 시 자동으로 실행됩니다.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**스크립트 다운로드:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## 1단계 — 구성 입력
+## Step 1 — Fill in the configuration
 
-스크립트를 열고 상단의 `CONFIGURATION` 블록을 편집합니다:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- 필수 ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # 첫 로그인 후 변경
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- 도메인 + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- 내장 Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ADMIN_PASSWORD로 기본 설정
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| 필드 | 필수 | 설명 |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | 예 | 데이터베이스 이름 및 Keycloak 클라이언트 ID로 사용됩니다. 소문자, 공백 없음. |
-| `ADMIN_PASSWORD` | 아니오 | 앱 관리자 비밀번호 및 Keycloak 관리자 비밀번호. 기본값은 `admin` — **첫 로그인 후 변경**. |
-| `DOMAIN` | 아니오 | HTTPS용 도메인. HTTP 전용 모드는 공백으로 두세요. |
-| `LETSENCRYPT_EMAIL` | 예 (DOMAIN 설정 시) | Let's Encrypt 알림용 이메일. |
-| `EMBED_KEYCLOAK` | 아니오 | 내장 Keycloak 배포는 `true` (4 GB RAM 필요). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **보안:** 모든 비밀번호는 기본적으로 `admin`입니다. 첫 번째 로그인 후 즉시 변경하세요.
-
----
-
-## 2단계 — VM 인스턴스 만들기
-
-[Google Cloud Console](https://console.cloud.google.com/compute)에서:
-
-1. **인스턴스 만들기** 클릭
-2. **머신 구성:**
-   - 시리즈: `E2`
-   - 머신 유형: `e2-medium` (4 GB RAM) 이상
-3. **부팅 디스크:**
-   - 운영 체제: Ubuntu
-   - 버전: Ubuntu 22.04 LTS
-   - 크기: 40 GB 이상
-4. **방화벽:** **HTTP 트래픽 허용** 및 **HTTPS 트래픽 허용** 체크
-5. **고급 옵션** → **관리** → **자동화** → **시작 스크립트** → 전체 스크립트 내용 붙여넣기
-6. **만들기** 클릭
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## 3단계 — DNS 레코드 추가
+## Step 2 — Create a VM instance
 
-VM이 부팅되는 동안 DNS 공급자에 **A 레코드**를 추가합니다:
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
+3. **Boot disk:**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
+
+---
+
+## Step 3 — Add the DNS record
+
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -75,19 +75,19 @@ Value : <vm-external-ip>
 TTL   : 300
 ```
 
-콘솔의 VM 인스턴스 목록에서 외부 IP를 확인하세요.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## 4단계 — 진행 상황 모니터링
+## Step 4 — Monitor progress
 
-`gcloud` CLI 사용:
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-또는 직접 SSH:
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## 5단계 — 앱 접속
+## Step 5 — Access the app
 
-설정이 완료되면 로그에 앱 URL 및 자격 증명이 포함된 요약이 표시됩니다. 사용자명 `admin`, 비밀번호 `admin`으로 로그인한 후 즉시 비밀번호를 변경하세요.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## 방화벽 규칙
+## Firewall Rules
 
-GCP의 **HTTP/HTTPS 허용** 체크박스는 포트 80 및 443을 엽니다. 포트 3838에서 Shiny 직접 접근도 허용하려면 방화벽 규칙을 추가합니다:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-또는 콘솔을 통해 추가: **VPC 네트워크** → **방화벽** → **규칙 만들기**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> 포트 3306 (MySQL)을 **열지 마세요** — 절대 공개적으로 접근 가능해서는 안 됩니다.
-
----
-
-## 고정 IP (선택 사항)
-
-GCP는 기본적으로 VM 재시작 시 변경되는 임시 외부 IP를 할당합니다. 안정적인 IP를 유지하려면:
-
-1. **VPC 네트워크** → **IP 주소** 이동
-2. **외부 고정 주소 예약** 클릭
-3. VM 인스턴스에 할당
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## 배포 후
+## Static IP (optional)
 
-### 비밀번호 변경
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### 모든 컨테이너 보기
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

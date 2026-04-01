@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 6
 title: "ការថែទាំ"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,71 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "build"
 toc: true
-description: "ការថែទាំ ប្រចាំ ថ្ងៃ សម្រាប់ rtCloud instance ដែល host ខ្លួនឯង: ការ upgrade, backup, restore, និង ការ ដោះស្រាយ បញ្ហា ទូទៅ។"
+description: "ការថែទាំប្រចាំថ្ងៃសម្រាប់ rtCloud instance ដែលបង្ហោះខ្លួនឯង: ការដំឡើងកំណែ, ការបម្រុងទុក, ការស្ដារ, និងការដោះស្រាយបញ្ហាទូទៅ។"
 ---
 
-## Commands ទូទៅ
+## ពាក្យបញ្ជាទូទៅ
 
-ប្រើ commands ទាំងនេះ ជា ប្រចាំ ដើម្បី គ្រប់គ្រង rtCloud containers របស់អ្នក។ Run ពួកវា ពី directory ដែល មាន `docker-compose.production.yml`។
+ប្រើពាក្យបញ្ជាទាំងនេះជាប្រចាំដើម្បីគ្រប់គ្រងកំប៉ុង rtCloud របស់អ្នក។ រត់ពួកវាពីថតឯកសារដែលមាន `docker-compose.production.yml`។
 
 ```bash
-# ពិនិត្យ status និង health នៃ containers ទាំងអស់
+# Check status and health of all containers
 docker compose -f docker-compose.production.yml ps
 
-# ស្វែងមើល logs ជាក់ស្ដែង (services ទាំងអស់)
+# View live logs (all services)
 docker compose -f docker-compose.production.yml logs -f
 
-# ស្វែងមើល logs សម្រាប់ app តែប៉ុណ្ណោះ
+# View logs for the app only
 docker compose -f docker-compose.production.yml logs -f rtcloud
 
-# Restart container ម្ដង
+# Restart a single container
 docker compose -f docker-compose.production.yml restart rtcloud
 
-# Stop services ទាំងអស់
+# Stop all services
 docker compose -f docker-compose.production.yml down
 
-# Start services ទាំងអស់
+# Start all services
 docker compose -f docker-compose.production.yml up -d
 
-# បើក shell ក្នុង app container
+# Open a shell inside the app container
 docker compose -f docker-compose.production.yml exec rtcloud bash
 ```
 
 ---
 
-## ការ Upgrade
+## Upgrading
 
-rtCloud updates ត្រូវបាន distribute ជា Docker image tags ថ្មី។ ការ Upgrade pull image ចុងក្រោយ ហើយ recreate app container។ Database migrations run ដោយ ស្វ័យប្រវត្តិ នៅ startup។
+rtCloud updates are distributed as new Docker image tags. Upgrading pulls the latest image and recreates the app container. Database migrations run automatically on startup.
 
-**១. Pull image ចុងក្រោយ:**
+**1. Pull the latest image:**
 
 ```bash
 docker compose -f docker-compose.production.yml pull
 ```
 
-**២. Recreate app container:**
+**2. Recreate the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d
 ```
 
-### Pinning Version
+Docker replaces only the containers whose image has changed. The MySQL container and all named volumes are unaffected.
 
-ដើម្បី upgrade ទៅ version ជាក់លាក់ ជំនួស `latest`, update `RTCLOUD_IMAGE` ក្នុង `.env`:
+### Pinning a Version
+
+To upgrade to a specific version instead of `latest`, update `RTCLOUD_IMAGE` in `.env`:
 
 ```dotenv
 RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
 ```
 
-### ការ Downgrade
+Then run `docker compose pull` and `up -d` as above.
 
-ការ Downgrade ជាទូទៅ មិន ត្រូវ ណែនាំ ទេ ព្រោះ database migrations មិន អាច ត្រឡប់ទៅ ។ ប្រសិនបើ ការ downgrade ចាំបាច់, restore ពី database backup ដែលថ ដែលបាន យក មុន ការ upgrade។
+### Downgrading
+
+Downgrading is generally not recommended, as database migrations cannot be reversed. If a downgrade is necessary, restore from a database backup taken before the upgrade.
 
 ---
 
-## Backup និង Restore
+## Backup and Restore
 
-### Backup Database
+### Backup the Database
+
+Run this command to export the application database to a SQL file:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -79,7 +85,9 @@ docker compose -f docker-compose.production.yml exec mysql \
   > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-### Restore Database
+The backup file is written to your current directory on the host.
+
+### Restore the Database
 
 ```bash
 docker compose -f docker-compose.production.yml exec -T mysql \
@@ -87,7 +95,9 @@ docker compose -f docker-compose.production.yml exec -T mysql \
   < backup-20240101-120000.sql
 ```
 
-### Backup ឯកសារ ដែល Upload
+### Backup Uploaded Files
+
+Survey submissions often include uploaded files (photos, audio, documents) stored in named Docker volumes. Back them up separately from the database:
 
 ```bash
 # Backup uploads
@@ -103,7 +113,9 @@ docker run --rm \
   alpine tar czf /backup/audios-$(date +%Y%m%d).tar.gz -C /data .
 ```
 
-### Restore ឯកសារ ដែល Upload
+Replace `rtcloud_uploads` and `rtcloud_audios` with your actual volume names (prefixed by `COMPOSE_PROJECT_NAME`) if you changed the default.
+
+### Restore Uploaded Files
 
 ```bash
 docker run --rm \
@@ -112,12 +124,12 @@ docker run --rm \
   alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
 ```
 
-### Backup ប្រចាំ ថ្ងៃ ស្វ័យប្រវត្តិ
+### Automated Daily Backups
 
-បន្ថែម cron job នៅ host ដើម្បី run backups ដោយ ស្វ័យប្រវត្តិ។ កែ root crontab ជាមួយ `crontab -e`:
+Add a cron job on the host to run backups automatically. Edit the root crontab with `crontab -e`:
 
 ```cron
-# Daily database backup នៅ 2:00 AM, រក្សា 30 ថ្ងៃ
+# Daily database backup at 2:00 AM, keep 30 days of history
 0 2 * * * cd /opt/rtcloud && docker compose -f docker-compose.production.yml exec -T mysql \
   mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
   > /backups/db-$(date +\%Y\%m\%d).sql && \
@@ -126,53 +138,77 @@ docker run --rm \
 
 ---
 
-## ការ ដោះស្រាយ បញ្ហា
+## Troubleshooting
 
-### App container មិន ចាប់ ផ្ដើម
+### App container not starting
+
+Check the container logs for error messages:
 
 ```bash
 docker compose -f docker-compose.production.yml logs rtcloud
 ```
 
-មូលហេតុ ទូទៅ:
-- Environment variables ដែល ខ្វះ ឬ invalid ក្នុង `.env`
-- MySQL មិន ទាន់ ready (រង់ចាំ ៦០ វិនាទី ហើយ ពិនិត្យ ម្ដង ទៀត)
-- Port conflict — process ផ្សេង ដំណើរការ ស្រាប់ ជាមួយ `APP_PORT`
+Common causes:
+- Missing or invalid environment variables in `.env`
+- MySQL not yet ready (wait 60 seconds and check again)
+- Port conflict — another process is already using `APP_PORT`
 
-### MySQL មិន healthy
+### MySQL not healthy
 
 ```bash
 docker compose -f docker-compose.production.yml logs mysql
 ```
 
-MySQL អាចចំណាយ ៣០–៦០ វិនាទី ដើម្បី initialize នៅ boot ដំបូង ។ រង់ចាំ ហើយ ពិនិត្យ ម្ដង ទៀត មុន ចាត់ ទុក ថា failure។
+Common causes:
+- `MYSQL_ROOT_PASSWORD` not set in `.env`
+- Corrupted data volume (rare — check disk space with `df -h`)
+
+MySQL can take 30–60 seconds to initialize on the very first boot. Wait and check again before assuming failure.
+
+### Port already in use
+
+Change `APP_PORT` or `SHINY_PORT` in `.env` to a free port, then recreate the containers:
+
+```bash
+docker compose -f docker-compose.production.yml up -d --force-recreate
+```
+
+To find what is using a port on the host:
+
+```bash
+lsof -i :8080
+```
 
 ### 400 CSRF Token Could Not Be Verified
 
-Error នេះ លេចឡើង ក្នុង local ឬ reverse-proxy environments ។ Disable CSRF validation សម្រាប់ local development ប៉ុណ្ណោះ:
+This error appears in local or reverse-proxy environments where the request origin does not match the expected host. Disable CSRF validation for local development only:
 
 ```dotenv
 CSRF_VALIDATION_ENABLED=false
 ```
 
-ហើយ restart app:
+Then restart the app:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### ភ្លេច Admin Password
+> Do not disable CSRF validation in production. If this error occurs in production, ensure your reverse proxy is forwarding the correct `Host` and `X-Forwarded-For` headers.
 
-**ជំហានទី ១** — Generate hash ពាក្យ សម្ងាត់ ថ្មី:
+### Forgot the Admin Password
+
+Reset the admin password directly in the database. Connect to the MySQL container and update the password hash:
+
+**Step 1** — Generate the new password hash. Replace `newpassword` with your desired password:
 
 ```bash
 docker compose -f docker-compose.production.yml exec rtcloud php -r "
-  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\"\"));
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\""));
   echo md5(\$salt . 'newpassword') . PHP_EOL;
 "
 ```
 
-**ជំហានទី ២** — Update hash ក្នុង database:
+**Step 2** — Update the hash in the database:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -180,12 +216,44 @@ docker compose -f docker-compose.production.yml exec mysql \
   -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
 ```
 
+### Container keeps restarting
+
+Check if the health check is failing:
+
+```bash
+docker compose -f docker-compose.production.yml ps
+docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
+```
+
+The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.
+
+### Disk space full
+
+Identify what is consuming space:
+
+```bash
+# Check host disk usage
+df -h
+
+# Check Docker disk usage (images, containers, volumes)
+docker system df
+
+# Remove unused images and stopped containers (safe to run)
+docker system prune
+```
+
+Do not use `docker system prune --volumes` as this will delete application data.
+
 ---
 
 ## Health Checks
 
-| Container | វិធី Check | Start Period | Interval |
+Each service has an automatic health check. Container status reflects the result:
+
+| Container | Check Method | Start Period | Interval |
 |-----------|-------------|-------------|----------|
-| `rtcloud-app` | HTTP GET `/health` | ៩០ វិនាទី | ៣០ វិនាទី |
-| `rtcloud-mysql` | `mysqladmin ping` | ៣០ វិនាទី | ១០ វិនាទី |
-| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | ១២០ វិនាទី | ៣០ វិនាទី |
+| `rtcloud-app` | HTTP GET `/health` | 90 seconds | 30 seconds |
+| `rtcloud-mysql` | `mysqladmin ping` | 30 seconds | 10 seconds |
+| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 seconds | 30 seconds |
+
+Containers with a failing health check are automatically restarted according to the `RESTART_POLICY` setting (default: `unless-stopped`).

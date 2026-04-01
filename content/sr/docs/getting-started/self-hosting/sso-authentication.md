@@ -1,173 +1,173 @@
 ---
-weight: 4
-title: "SSO autentifikacija"
+weight: 5
+title: "SSO аутентификација"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Konfigurišite jedinstvenu prijavu za sopstveno hostovani rtCloud koristeći ugrađeni Keycloak, spoljni OIDC pružalac ili Azure Active Directory."
+description: "Конфигуришите Single Sign-On за самостално хостовани rtCloud користећи уграђени Keycloak, спољни OIDC провајдер или Azure Active Directory."
 ---
 
-rtCloud podržava tri pristupa za jedinstvenu prijavu (SSO):
+rtCloud подржава три приступа за Single Sign-On (SSO):
 
-| Opcija | Najpogodnije za |
-|--------|-----------------|
-| [Ugrađeni Keycloak](#embedded-keycloak) | Organizacije koje žele potpuno samoobuhvatan SSO server priložen sa rtCloud-om |
-| [Spoljni OIDC pružalac](#external-oidc-provider) | Organizacije koje već koriste pružaoca identiteta (Auth0, Authentik, Okta, Supabase, itd.) |
-| [Azure Active Directory](#azure-active-directory) | Organizacije koje koriste Microsoft 365 ili Azure AD |
+| Option | Best For |
+|--------|----------|
+| [Embedded Keycloak](#embedded-keycloak) | Organizations that want a fully self-contained SSO server bundled with rtCloud |
+| [External OIDC Provider](#external-oidc-provider) | Organizations already running an identity provider (Auth0, Authentik, Okta, Supabase, etc.) |
+| [Azure Active Directory](#azure-active-directory) | Organizations using Microsoft 365 or Azure AD |
 
-Bez konfigurisanog SSO sistema, korisnici se prijavljuju lokalnim rtCloud nalozima upravljanim putem administratorskog panela.
+Without SSO configured, users log in with local rtCloud accounts managed through the admin panel.
 
 ---
 
-## Ugrađeni Keycloak {#embedded-keycloak}
+## Embedded Keycloak
 
-Primena uključuje opcioni Keycloak kontejner koji radi paralelno sa rtCloud-om. Keycloak je unapred konfigurisan sa rtSurvey realmom i spreman za upotrebu.
+The deployment includes an optional Keycloak container that runs alongside rtCloud. Keycloak is pre-configured with an rtSurvey realm and ready to use.
 
-### Zahtevi
+### Requirements
 
-- Naziv domena sa HTTPS-om (Keycloak zahteva HTTPS u produkciji)
-- Najmanje 4 GB RAM na serveru (Keycloak dodaje ~512 MB potrošnje memorije)
+- A domain name with HTTPS (Keycloak requires HTTPS in production)
+- At least 4 GB RAM on the server (Keycloak adds ~512 MB memory usage)
 
-### Podešavanje
+### Setup
 
-**1. Konfigurišite promenljive okruženja u `.env`:**
+**1. Configure environment variables in `.env`:**
 
 ```dotenv
-# Aktivirajte ugrađeni Keycloak kontejner
+# Enable the embedded Keycloak container
 EMBED_KEYCLOAK=true
 
-# Keycloak URL-ovi — koristite vaš stvarni domen
+# Keycloak URLs — use your actual domain
 KEYCLOAK_URL=https://rtcloud.example.com/auth
 KC_HOSTNAME=https://rtcloud.example.com/auth
 KC_HOSTNAME_STRICT=false
 
-# Podešavanja realma i klijenta (odgovaraju uvezenom realm JSON-u)
+# Realm and client settings (match the imported realm JSON)
 KEYCLOAK_REALM=rtsurvey
 KEYCLOAK_CLIENT_ID=rtsurvey-app
 KEYCLOAK_CLIENT_SECRET=your-client-secret-here
 
-# Keycloak administratorski akreditivi
+# Keycloak admin credentials
 KEYCLOAK_ADMIN_USER=admin
 KEYCLOAK_ADMIN_PASSWORD=change_me_keycloak_admin_password
 
-# Keycloak baza podataka (automatski se kreira)
+# Keycloak database (created automatically)
 KEYCLOAK_DB=keycloak
 KEYCLOAK_DB_USER=keycloak
 KEYCLOAK_DB_PASSWORD=change_me_keycloak_db_password
 
-# Port na kome Keycloak sluša (na strani hosta, proksirano od strane Nginx-a)
+# Port Keycloak listens on (host-side, proxied by Nginx)
 KEYCLOAK_PORT=8091
 ```
 
-**2. Pokrenite sa ugrađenim Keycloak profilom:**
+**2. Start with the embedded Keycloak profile:**
 
 ```bash
 docker compose -f docker-compose.production.yml --profile embed-keycloak up -d
 ```
 
-**3. Proverite da je Keycloak zdrav:**
+**3. Verify Keycloak is healthy:**
 
 ```bash
 docker compose -f docker-compose.production.yml ps
 ```
 
-Kontejner `rtcloud-keycloak` treba da prikaže `Up (healthy)` nakon 2–3 minuta.
+The `rtcloud-keycloak` container should show `Up (healthy)` after 2–3 minutes.
 
-**4. Pristupite Keycloak administratorskoj konzoli:**
+**4. Access the Keycloak admin console:**
 
 ```
 https://rtcloud.example.com/auth/admin
 ```
 
-Prijavite se sa `KEYCLOAK_ADMIN_USER` i `KEYCLOAK_ADMIN_PASSWORD`.
+Log in with `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD`.
 
-### Šta je unapred konfigurisano
+### What Is Pre-Configured
 
-Ugrađeni Keycloak počinje sa unapred uvezenim realmom `rtsurvey` koji uključuje:
+The embedded Keycloak starts with a pre-imported `rtsurvey` realm that includes:
 
-- Konfiguraciju klijenta za veb aplikaciju
-- Podrazumevane korisničke uloge (`admin`, `project_manager`, `enumerator`, `analyst`)
-- Podešavanja sesija i tokena optimizovana za rtSurvey
+- Client configuration for the web application
+- Default user roles (`admin`, `project_manager`, `enumerator`, `analyst`)
+- Session and token settings optimized for rtSurvey
 
-Možete dodavati korisnike direktno u Keycloak administratorskoj konzoli ili povezati Keycloak sa upstream pružaocem identiteta (LDAP, SAML).
+You can add users directly in the Keycloak admin console or connect Keycloak to an upstream identity provider (LDAP, SAML).
 
-### Nginx rutiranje
+### Nginx Routing
 
-Kada koristite skripte za primenu u oblaku, Nginx je konfigurisan da proksira oba servisa:
+When using the cloud deployment scripts, Nginx is configured to proxy both services:
 
-| Putanja | Pozadinski servis |
-|---------|------------------|
-| `/` | rtCloud aplikacija na `127.0.0.1:8080` |
-| `/auth/` | Keycloak na `127.0.0.1:8090` |
+| Path | Backend |
+|------|---------|
+| `/` | rtCloud app on `127.0.0.1:8080` |
+| `/auth/` | Keycloak on `127.0.0.1:8090` |
 
 ---
 
-## Spoljni OIDC pružalac {#external-oidc-provider}
+## External OIDC Provider
 
-Povežite rtCloud sa bilo kojim OpenID Connect-kompatibilnim pružaocem identiteta. Ovaj pristup ne zahteva Keycloak kontejner.
+Connect rtCloud to any OpenID Connect-compatible identity provider. This approach does not require the Keycloak container.
 
-### Podržani pružaoci
+### Supported Providers
 
-Svaki OIDC-usklađeni pružalac funkcioniše, uključujući:
+Any OIDC-compliant provider works, including:
 - Authentik
 - Auth0
 - Okta
-- Keycloak (eksterna instanca)
+- Keycloak (external instance)
 - Supabase
-- Google (za Google Workspace organizacije)
-- GitHub (putem OAuth aplikacija sa OIDC ekstenzijom)
+- Google (for Google Workspace organizations)
+- GitHub (via OAuth apps with OIDC extension)
 
-### Podešavanje
+### Setup
 
-**1. Registrujte rtCloud kao OIDC klijenta kod vašeg pružaoca identiteta.**
+**1. Register rtCloud as an OIDC client in your identity provider.**
 
-Biće vam potrebni:
-- **ID klijenta** i **tajna klijenta**
-- Registracija **URI za preusmeravanje**: `https://rtcloud.example.com/auth/callback`
-- Za podršku mobilne aplikacije, takođe registrujte: `vn.rta.rtsurvey.auth://callback`
+You will need:
+- A **client ID** and **client secret**
+- To register the **redirect URI**: `https://rtcloud.example.com/auth/callback`
+- For mobile app support, also register: `vn.rta.rtsurvey.auth://callback`
 
-**2. Konfigurišite promenljive okruženja u `.env`:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
-# OIDC URL za otkrivanje (specifičan za pružaoca — proverite dokumentaciju vašeg IdP-a)
+# OIDC discovery URL (provider-specific — check your IdP documentation)
 OIDC_ISSUER_URL=https://your-identity-provider.com
 
-# Akreditivi klijenta od vašeg pružaoca identiteta
+# Client credentials from your identity provider
 OIDC_CLIENT_ID=rtcloud-app
 OIDC_CLIENT_SECRET=your-client-secret-here
 
-# Opsezi za zahtevanje (openid, profile i email su obično dovoljni)
+# Scopes to request (openid, profile, and email are typically sufficient)
 OIDC_SCOPE=openid profile email
 
-# URI za preusmeravanje registrovan kod vašeg pružaoca identiteta
+# Redirect URI registered in your identity provider
 OIDC_REDIRECT_URI=https://rtcloud.example.com/auth/callback
 
-# Opciono: poseban klijent mobilne aplikacije
+# Optional: separate mobile app client
 OIDC_MOBILE_CLIENT_ID=rtcloud-mobile
 OIDC_MOBILE_REDIRECT_URI=vn.rta.rtsurvey.auth://callback
 
-# Postavite na true da automatski kreirate rtCloud naloge za nove OIDC korisnike
+# Set to true to auto-create rtCloud accounts for new OIDC users
 OPEN_REGISTRATION=false
 ```
 
-**3. Ponovo pokrenite kontejner aplikacije da primenite izmene:**
+**3. Restart the app container to apply the changes:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Automatsko obezbeđivanje korisnika
+### Auto-Provisioning Users
 
-Kada je `OPEN_REGISTRATION=true`, rtCloud automatski kreira lokalni nalog prvi put kada se korisnik prijavi putem OIDC-a. Nalog se popunjava imenom i email adresom korisnika iz ID tokena.
+When `OPEN_REGISTRATION=true`, rtCloud automatically creates a local account the first time a user signs in via OIDC. The account is populated with the user's name and email from the ID token.
 
-Kada je `OPEN_REGISTRATION=false` (podrazumevano), rtCloud administrator mora najpre kreirati korisnički nalog, a OIDC identitet se povezuje pri prvoj prijavi.
+When `OPEN_REGISTRATION=false` (default), an rtCloud administrator must create the user account first, and the OIDC identity is linked on first login.
 
-### Prilagođene krajnje tačke
+### Custom Endpoints
 
-Ako vaš pružalac ne podržava OIDC otkrivanje (`.well-known/openid-configuration`), možete ručno postaviti krajnje tačke:
+If your provider does not support OIDC discovery (`.well-known/openid-configuration`), you can set endpoints manually:
 
 ```dotenv
 OIDC_AUTHORIZATION_ENDPOINT=https://your-provider.com/oauth2/authorize
@@ -177,43 +177,43 @@ OIDC_USERINFO_ENDPOINT=https://your-provider.com/oauth2/userinfo
 
 ---
 
-## Azure Active Directory {#azure-active-directory}
+## Azure Active Directory
 
-Integrirajte rtCloud sa Azure AD zakupcem vaše organizacije.
+Integrate rtCloud with your organization's Microsoft Azure AD tenant.
 
-### Podešavanje
+### Setup
 
-**1. Registrujte novu aplikaciju na [Azure portalu](https://portal.azure.com):**
+**1. Register a new app in the [Azure Portal](https://portal.azure.com):**
 
-   - Idite na **Azure Active Directory** → **Registracije aplikacija** → **Nova registracija**
-   - Ime: `rtCloud`
-   - URI za preusmeravanje: `https://rtcloud.example.com/auth/callback` (Veb tip)
-   - Nakon kreiranja, zabeležite **ID aplikacije (klijenta)** i **ID direktorijuma (zakupca)**
-   - Pod **Sertifikati i tajne**, kreirajte novu tajnu klijenta
+   - Go to **Azure Active Directory** → **App registrations** → **New registration**
+   - Name: `rtCloud`
+   - Redirect URI: `https://rtcloud.example.com/auth/callback` (Web type)
+   - After creation, note the **Application (client) ID** and **Directory (tenant) ID**
+   - Under **Certificates & secrets**, create a new client secret
 
-**2. Konfigurišite promenljive okruženja u `.env`:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
 AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-**3. Ponovo pokrenite kontejner aplikacije:**
+**3. Restart the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Korisnici u vašem Azure AD zakupcu sada se mogu prijaviti na rtCloud koristeći Microsoft akreditive.
+Users in your Azure AD tenant can now log in to rtCloud using their Microsoft credentials.
 
 ---
 
-## Deaktiviranje SSO sistema
+## Disabling SSO
 
-Da biste se vratili na lokalnu autentifikaciju, uklonite ili zakomentarišite sve SSO-vezane promenljive iz `.env`, zatim ponovo pokrenite kontejner aplikacije:
+To revert to local authentication, remove or comment out all SSO-related variables from `.env`, then restart the app container:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Ako ste koristili ugrađeni Keycloak, zaustavite ga izostavljanjem oznake `--profile embed-keycloak` i pokretanjem `docker compose down` praćenog sa `up -d` bez profila.
+If you were using embedded Keycloak, stop it by omitting the `--profile embed-keycloak` flag and running `docker compose down` followed by `up -d` without the profile.

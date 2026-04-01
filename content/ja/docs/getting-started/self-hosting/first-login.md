@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "初回ログイン"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "デプロイ後、初めてrtSurveyインスタンスにログインする方法。"
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **ログイン前にSSLを設定する必要があります。** HTTPでアプリにアクセスすると、セキュリティ警告が表示され、SSOがブロックされます。まず[SSLのセットアップ](ssl-setup)を完了してください。
 
-After SSL is active, open your browser at your HTTPS URL:
+SSLが有効になったら、HTTPS URLでブラウザを開いてください：
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## ログイン画面
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+ログインページには以下が表示されます：
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- **ユーザー名**と**パスワード**フィールド
+- **サインイン**ボタン
+- **SSOでログイン**ボタン（区切り線の下）— SSOアカウントを持つチームメンバー向け
 
 ---
 
-## If you see a security warning
+## デフォルトの管理者認証情報
 
-If you access the app over HTTP (before SSL is configured), you will see:
+デフォルトの認証情報を入力し、**サインイン**をクリックしてください：
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| フィールド | 値 |
+|-----------|-----|
+| ユーザー名 | `admin` |
+| パスワード | `admin` |
+
+> **初回ログイン後、すぐにパスワードを変更してください。**
+
+---
+
+## セキュリティ警告が表示された場合
+
+HTTPでアプリにアクセスした場合（SSL設定前）、以下が表示されます：
+
+- ログインページ上部の黄色い警告バナー
+- **サインイン**をクリックすると、認証情報が暗号化されずに送信されることを警告するモーダル
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+HTTPSを設定するには**SSLをセットアップ**をクリック、またはSSLなしでログインするには**とにかく続ける**をクリックしてください（推奨しません）。
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+HTTP経由のSSOログインは完全にブロックされています—**SSOでログイン**をクリックすると、リダイレクトの代わりに通知が表示されます。
 
 ---
 
-## After logging in
+## ログイン後
 
-Once inside, you will land on the dashboard. From here:
+ログインするとダッシュボードが表示されます。ここから：
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **管理者パスワードの変更** — アカウント設定 → パスワード変更
+2. **最初のプロジェクトの作成** — プロジェクト → 新規プロジェクト
+3. **フォームのアップロードまたは作成** — フォーム → XLSFormのアップロードまたはForm Builderを開く
+4. **ユーザーの追加** — ユーザー → チームのアカウントを招待または作成

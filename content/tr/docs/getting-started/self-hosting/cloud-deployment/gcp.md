@@ -7,87 +7,87 @@ draft: false
 author: "rtSurvey"
 icon: "travel_explore"
 toc: true
-description: "gcp-compute.sh başlangıç betiğini kullanarak Google Cloud Compute Engine üzerine rtCloud dağıtın."
+description: "gcp-compute.sh başlangıç scriptini kullanarak rtCloud'u Google Cloud Compute Engine üzerinde dağıtın."
 ---
 
-Compute Engine VM örneği oluştururken `gcp-compute.sh` dosyasını **Başlangıç betiği** olarak kullanın. Betik, ilk açılışta otomatik olarak çalışır.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**Betiği indirin:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## Adım 1 — Yapılandırmayı doldurun
+## Step 1 — Fill in the configuration
 
-Betiği açın ve üstteki `CONFIGURATION` bloğunu düzenleyin:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Gerekli ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # İlk girişten sonra değiştirin
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Alan Adı + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Yerleşik Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ADMIN_PASSWORD varsayılan değerine sahiptir
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Alan | Gerekli | Açıklama |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Evet | Veritabanı adı ve Keycloak istemci kimliği olarak kullanılır. Küçük harf, boşluk yok. |
-| `ADMIN_PASSWORD` | Hayır | Uygulama yöneticisi şifresi ve Keycloak yönetici şifresi. Varsayılan `admin` — **ilk girişten sonra değiştirin**. |
-| `DOMAIN` | Hayır | HTTPS için alan adınız. Yalnızca HTTP modu için boş bırakın. |
-| `LETSENCRYPT_EMAIL` | Evet (DOMAIN ayarlanmışsa) | Let's Encrypt bildirimleri için e-posta. |
-| `EMBED_KEYCLOAK` | Hayır | Yerleşik Keycloak dağıtmak için `true` (4 GB RAM gerektirir). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Güvenlik:** Tüm şifreler varsayılan olarak `admin`'dir. İlk girişinizden hemen sonra değiştirin.
-
----
-
-## Adım 2 — VM örneği oluşturun
-
-[Google Cloud Konsolunda](https://console.cloud.google.com/compute):
-
-1. **Örnek oluştur**'a tıklayın
-2. **Makine yapılandırması:**
-   - Seri: `E2`
-   - Makine türü: `e2-medium` (4 GB RAM) veya daha büyük
-3. **Başlangıç diski:**
-   - İşletim sistemi: Ubuntu
-   - Sürüm: Ubuntu 22.04 LTS
-   - Boyut: 40 GB veya daha fazla
-4. **Güvenlik duvarı:** **HTTP trafiğine izin ver** ve **HTTPS trafiğine izin ver** seçeneklerini işaretleyin
-5. **Gelişmiş seçenekler** → **Yönetim** → **Otomasyon** → **Başlangıç betiği** → betiğin tam içeriğini yapıştırın
-6. **Oluştur**'a tıklayın
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Adım 3 — DNS kaydını ekleyin
+## Step 2 — Create a VM instance
 
-VM açılırken DNS sağlayıcınıza bir **A kaydı** ekleyin:
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
+3. **Boot disk:**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
+
+---
+
+## Step 3 — Add the DNS record
+
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
-Tür  : A
-Ad   : myapp
-Değer: <vm-harici-ip>
-TTL  : 300
+Type  : A
+Name  : myapp
+Value : <vm-external-ip>
+TTL   : 300
 ```
 
-Harici IP'yi konsolda VM örnekleri listesinde bulabilirsiniz.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## Adım 4 — İlerlemeyi izleyin
+## Step 4 — Monitor progress
 
-`gcloud` CLI kullanarak:
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-Veya doğrudan SSH ile:
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Adım 5 — Uygulamaya erişin
+## Step 5 — Access the app
 
-Kurulum tamamlandığında günlük, uygulama URL'nizi ve kimlik bilgilerinizi içeren bir özet gösterir. `admin` kullanıcı adı ve `admin` şifresiyle giriş yapın, ardından hemen şifrenizi değiştirin.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Güvenlik Duvarı Kuralları
+## Firewall Rules
 
-GCP'nin **HTTP/HTTPS'ye izin ver** onay kutuları 80 ve 443 portlarını açar. 3838 portu üzerinden doğrudan Shiny erişimine de izin vermek için bir güvenlik duvarı kuralı ekleyin:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-Veya konsol üzerinden ekleyin: **VPC Ağı** → **Güvenlik Duvarı** → **Kural oluştur**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> Port 3306'yı (MySQL) **açmayın** — asla genel erişime açık olmamalıdır.
-
----
-
-## Statik IP (isteğe bağlı)
-
-Varsayılan olarak GCP, VM yeniden başlatmada değişen geçici bir harici IP atar. Kararlı bir IP tutmak için:
-
-1. **VPC Ağı** → **IP adresleri**'ne gidin
-2. **Harici statik adres ayır**'a tıklayın
-3. VM örneğinize atayın
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Dağıtım Sonrası
+## Static IP (optional)
 
-### Şifre değiştirme
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Tüm konteynerleri görüntüleme
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

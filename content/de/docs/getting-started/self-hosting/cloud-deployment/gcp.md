@@ -7,7 +7,7 @@ draft: false
 author: "rtSurvey"
 icon: "travel_explore"
 toc: true
-description: "Deploy rtCloud on Google Cloud Compute Engine using the gcp-compute.sh startup script."
+description: "rtCloud auf Google Cloud Compute Engine mit dem Startup-Skript gcp-compute.sh bereitstellen."
 ---
 
 Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.

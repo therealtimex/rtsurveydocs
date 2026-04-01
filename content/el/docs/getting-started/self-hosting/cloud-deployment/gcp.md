@@ -7,87 +7,87 @@ draft: false
 author: "rtSurvey"
 icon: "travel_explore"
 toc: true
-description: "Αναπτύξτε το rtCloud στο Google Cloud Compute Engine χρησιμοποιώντας το σενάριο εκκίνησης gcp-compute.sh."
+description: "Ανάπτυξη rtCloud στο Google Cloud Compute Engine χρησιμοποιώντας το startup script gcp-compute.sh."
 ---
 
-Χρησιμοποιήστε το `gcp-compute.sh` ως **σενάριο εκκίνησης** κατά τη δημιουργία εικονικής μηχανής Compute Engine. Το σενάριο εκτελείται αυτόματα κατά την πρώτη εκκίνηση.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**Λήψη σεναρίου:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## Βήμα 1 — Συμπλήρωση της διαμόρφωσης
+## Step 1 — Fill in the configuration
 
-Ανοίξτε το σενάριο και επεξεργαστείτε το μπλοκ `CONFIGURATION` στην κορυφή:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Απαιτούμενα ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Αλλάξτε μετά την πρώτη σύνδεση
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Τομέας + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Ενσωματωμένο Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Προεπιλογή στο ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Πεδίο | Απαιτείται | Περιγραφή |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Ναι | Χρησιμοποιείται ως όνομα βάσης δεδομένων και ID πελάτη Keycloak. Πεζά, χωρίς κενά. |
-| `ADMIN_PASSWORD` | Όχι | Κωδικός διαχειριστή εφαρμογής και Keycloak. Προεπιλογή `admin` — **αλλάξτε μετά την πρώτη σύνδεση**. |
-| `DOMAIN` | Όχι | Ο τομέας σας για HTTPS. Αφήστε κενό για λειτουργία μόνο HTTP. |
-| `LETSENCRYPT_EMAIL` | Ναι (εάν ορίστηκε DOMAIN) | Email για ειδοποιήσεις Let's Encrypt. |
-| `EMBED_KEYCLOAK` | Όχι | `true` για ανάπτυξη ενσωματωμένου Keycloak (απαιτεί 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Ασφάλεια:** Όλοι οι κωδικοί ορίζονται σε `admin` από προεπιλογή. Αλλάξτε τους αμέσως μετά την πρώτη σύνδεση.
-
----
-
-## Βήμα 2 — Δημιουργία εγκατάστασης VM
-
-Στην [Κονσόλα Google Cloud](https://console.cloud.google.com/compute):
-
-1. Κάντε κλικ στο **Δημιουργία εγκατάστασης**
-2. **Διαμόρφωση μηχανής:**
-   - Σειρά: `E2`
-   - Τύπος μηχανής: `e2-medium` (4 GB RAM) ή μεγαλύτερο
-3. **Δίσκος εκκίνησης:**
-   - Λειτουργικό σύστημα: Ubuntu
-   - Έκδοση: Ubuntu 22.04 LTS
-   - Μέγεθος: 40 GB ή περισσότερο
-4. **Τείχος προστασίας:** επιλέξτε **Να επιτρέπεται HTTP** και **Να επιτρέπεται HTTPS**
-5. **Προχωρημένες επιλογές** → **Διαχείριση** → **Αυτοματισμός** → **Σενάριο εκκίνησης** → επικολλήστε το πλήρες περιεχόμενο σεναρίου
-6. Κάντε κλικ στο **Δημιουργία**
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Βήμα 3 — Προσθήκη εγγραφής DNS
+## Step 2 — Create a VM instance
 
-Ενώ η VM εκκινεί, προσθέστε **εγγραφή A** στον πάροχο DNS σας:
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
+3. **Boot disk:**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
+
+---
+
+## Step 3 — Add the DNS record
+
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
-Τύπος  : A
-Όνομα  : myapp
-Τιμή   : <vm-external-ip>
-TTL    : 300
+Type  : A
+Name  : myapp
+Value : <vm-external-ip>
+TTL   : 300
 ```
 
-Βρείτε την εξωτερική IP στη λίστα εγκαταστάσεων VM στην κονσόλα.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## Βήμα 4 — Παρακολούθηση προόδου
+## Step 4 — Monitor progress
 
-Χρησιμοποιώντας το CLI `gcloud`:
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-Ή απευθείας SSH:
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Βήμα 5 — Πρόσβαση στην εφαρμογή
+## Step 5 — Access the app
 
-Όταν η ρύθμιση ολοκληρωθεί, το αρχείο καταγραφής εμφανίζει σύνοψη με URL εφαρμογής και διαπιστευτήρια. Συνδεθείτε με όνομα χρήστη `admin` και κωδικό `admin`, στη συνέχεια αλλάξτε τον κωδικό σας αμέσως.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Κανόνες τείχους προστασίας
+## Firewall Rules
 
-Τα πλαίσια ελέγχου **Να επιτρέπεται HTTP/HTTPS** του GCP ανοίγουν τις θύρες 80 και 443. Για να επιτρέψετε επίσης άμεση πρόσβαση Shiny στη θύρα 3838, προσθέστε κανόνα τείχους προστασίας:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-Ή προσθέστε το μέσω κονσόλας: **Δίκτυο VPC** → **Τείχος προστασίας** → **Δημιουργία κανόνα**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> **Μην** ανοίγετε τη θύρα 3306 (MySQL) — δεν πρέπει ποτέ να είναι δημόσια προσβάσιμη.
-
----
-
-## Στατική IP (προαιρετικό)
-
-Από προεπιλογή, το GCP εκχωρεί εφήμερη εξωτερική IP που αλλάζει κατά την επανεκκίνηση VM. Για διατήρηση σταθερής IP:
-
-1. Μεταβείτε στο **Δίκτυο VPC** → **Διευθύνσεις IP**
-2. Κάντε κλικ στο **Δέσμευση εξωτερικής στατικής διεύθυνσης**
-3. Αναθέστε την στην εγκατάσταση VM
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Μετά την ανάπτυξη
+## Static IP (optional)
 
-### Αλλαγή κωδικού
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Προβολή όλων των κοντέινερ
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

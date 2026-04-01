@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Primer inicio de sesión"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Cómo iniciar sesión en su instancia de rtSurvey por primera vez después de la implementación."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **El SSL debe configurarse antes de iniciar sesión.** Si accede a la aplicación por HTTP, verá una advertencia de seguridad y el SSO quedará bloqueado. Complete primero [Configurar SSL](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Una vez que SSL esté activo, abra su navegador en su URL HTTPS:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## La pantalla de inicio de sesión
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+La página de inicio de sesión muestra:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
+- Campos de **Usuario** y **Contraseña**
+- Un botón **Iniciar sesión**
+- Un botón **Iniciar sesión con SSO** (debajo de un divisor) — para miembros del equipo con cuentas SSO
 
 ---
 
-## Default admin credentials
+## Credenciales de administrador predeterminadas
 
-Enter the default credentials and click **Sign In**:
+Ingrese las credenciales predeterminadas y haga clic en **Iniciar sesión**:
 
-| Field | Value |
+| Campo | Valor |
 |-------|-------|
-| Username | `admin` |
-| Password | `admin` |
+| Usuario | `admin` |
+| Contraseña | `admin` |
 
-> **Change your password immediately after your first login.**
+> **Cambie su contraseña inmediatamente después de su primer inicio de sesión.**
 
 ---
 
-## If you see a security warning
+## Si ve una advertencia de seguridad
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Si accede a la aplicación por HTTP (antes de configurar SSL), verá:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+- Un banner de advertencia amarillo en la parte superior de la página de inicio de sesión
+- Un modal al hacer clic en **Iniciar sesión**, advirtiendo que las credenciales se enviarán sin cifrar
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Haga clic en **Configurar SSL** para configurar HTTPS, o en **Continuar de todos modos** para iniciar sesión sin SSL (no recomendado).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+El inicio de sesión SSO está completamente bloqueado a través de HTTP — hacer clic en **Iniciar sesión con SSO** mostrará un aviso en lugar de redirigir.
 
 ---
 
-## After logging in
+## Después de iniciar sesión
 
-Once inside, you will land on the dashboard. From here:
+Una vez dentro, llegará al panel de control. Desde aquí:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Cambiar la contraseña de administrador** — configuración de cuenta → cambiar contraseña
+2. **Crear su primer proyecto** — Proyectos → Nuevo proyecto
+3. **Subir o construir un formulario** — Formularios → Subir XLSForm o abrir Form Builder
+4. **Agregar usuarios** — Usuarios → Invitar o crear cuentas para su equipo

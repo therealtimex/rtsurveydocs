@@ -1,18 +1,18 @@
 ---
 weight: 2
-title: "Configuration Reference"
+title: "Tài liệu tham khảo cấu hình"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "Complete reference for all environment variables used to configure a self-hosted rtCloud deployment."
+description: "Tài liệu tham khảo đầy đủ về tất cả biến môi trường được sử dụng để cấu hình triển khai rtCloud tự lưu trữ."
 ---
 
-All configuration is done through environment variables in the `.env` file at the root of your deployment directory. Docker Compose reads this file automatically — no `--env-file` flag is needed.
+Tất cả cấu hình được thực hiện thông qua các biến môi trường trong tệp `.env` ở thư mục gốc của thư mục triển khai. Docker Compose đọc tệp này tự động — không cần cờ `--env-file`.
 
-Variables marked **required** must be set before starting the containers. All others have defaults and are optional.
+Các biến được đánh dấu **bắt buộc** phải được đặt trước khi khởi động các container. Tất cả các biến khác có giá trị mặc định và là tùy chọn.
 
 ---
 

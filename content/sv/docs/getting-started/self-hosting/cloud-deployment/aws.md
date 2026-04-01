@@ -10,114 +10,114 @@ toc: true
 description: "Driftsätt rtCloud på en AWS EC2-instans med user data-skriptet aws-ec2.sh."
 ---
 
-Använd `aws-ec2.sh` som **User Data**-skript när du startar en EC2-instans. Skriptet körs automatiskt vid första starten.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Ladda ned skript:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Steg 1 — Fyll i konfigurationen
+## Step 1 — Fill in the configuration
 
-Öppna skriptet och redigera `CONFIGURATION`-blocket överst:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Obligatoriskt ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Ändra efter första inloggningen
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Domän + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Inbäddad Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Standardvärdet är ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Fält | Obligatoriskt | Beskrivning |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Ja | Används som databasnamn och Keycloak-klient-ID. Gemener, inga mellanslag. |
-| `ADMIN_PASSWORD` | Nej | Appens adminlösenord och Keycloak-adminlösenord. Standardvärde är `admin` — **ändra efter första inloggningen**. |
-| `DOMAIN` | Nej | Din domän för HTTPS. Lämna tomt för HTTP-only-läge. |
-| `LETSENCRYPT_EMAIL` | Ja (om DOMAIN anges) | E-post för Let's Encrypt-aviseringar. |
-| `EMBED_KEYCLOAK` | Nej | `true` för att driftsätta inbäddad Keycloak (kräver 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Säkerhet:** Alla lösenord har standardvärdet `admin`. Ändra dem omedelbart efter din första inloggning.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Steg 2 — Starta en EC2-instans
+## Step 2 — Launch an EC2 instance
 
-I [AWS EC2-konsolen](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Klicka på **Starta instans**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Instanstyp:** `t3.medium` (4 GB RAM) eller större
-4. **Nyckelpar:** Välj eller skapa ett för SSH-åtkomst
-5. **Nätverksinställningar:** Skapa eller välj en säkerhetsgrupp (se nedan)
-6. **Avancerade detaljer** → **Användardata** → klistra in hela skriptinnehållet
-7. Klicka på **Starta instans**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Steg 3 — Konfigurera säkerhetsgruppen
+## Step 3 — Configure the Security Group
 
-Öppna dessa portar i instansens säkerhetsgrupp:
+Open these ports in the instance's Security Group:
 
-| Port | Protokoll | Källa | Syfte |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | Din IP | SSH-åtkomst |
-| 80 | TCP | 0.0.0.0/0 | HTTP (omdirigeras till HTTPS av Nginx) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Direkt Shiny-åtkomst |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> Öppna **inte** port 3306 (MySQL) — den ska aldrig vara offentligt tillgänglig.
-
----
-
-## Steg 4 — Lägg till DNS-posten
-
-Medan instansen startar, lägg till en **A-post** hos din DNS-leverantör:
-
-```
-Typ  : A
-Namn : myapp
-Värde: <instansens publika IP>
-TTL  : 300
-```
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Steg 5 — Övervaka förloppet
+## Step 4 — Add the DNS record
+
+While the instance boots, add an **A record** in your DNS provider:
+
+```
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
+TTL   : 300
+```
+
+---
+
+## Step 5 — Monitor progress
 
 ```bash
-ssh ubuntu@<instans-ip>
+ssh ubuntu@<instance-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
 ---
 
-## Steg 6 — Öppna appen
+## Step 6 — Access the app
 
-När konfigurationen är klar visar loggen en sammanfattning med din app-URL och inloggningsuppgifter. Logga in med användarnamnet `admin` och lösenordet `admin`, och ändra sedan ditt lösenord omedelbart.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Efter driftsättning
+## After Deployment
 
-### Ändra ett lösenord
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Visa alla containrar
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Tilldela en Elastic IP (valfritt)
+### Assign an Elastic IP (optional)
 
-Om du stoppar och startar instansen ändras den publika IP-adressen. För att behålla en stabil IP, allokera en **Elastic IP** och associera den med instansen i EC2-konsolen.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

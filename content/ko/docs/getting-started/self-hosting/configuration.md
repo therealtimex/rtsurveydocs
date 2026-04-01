@@ -7,215 +7,215 @@ draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "셀프 호스팅 rtCloud 배포를 구성하는 데 사용되는 모든 환경 변수에 대한 전체 참조."
+description: "자체 호스팅 rtCloud 배포를 구성하는 데 사용되는 모든 환경 변수에 대한 완전한 참조."
 ---
 
-모든 구성은 배포 디렉토리 루트의 `.env` 파일에 있는 환경 변수를 통해 수행됩니다. Docker Compose는 이 파일을 자동으로 읽으므로 `--env-file` 플래그가 필요 없습니다.
+모든 구성은 배포 디렉터리 루트의 `.env` 파일에 있는 환경 변수를 통해 수행됩니다. Docker Compose가 이 파일을 자동으로 읽습니다 — `--env-file` 플래그가 필요하지 않습니다.
 
-**필수**로 표시된 변수는 컨테이너를 시작하기 전에 설정해야 합니다. 나머지는 기본값이 있으며 선택 사항입니다.
+**필수**로 표시된 변수는 컨테이너 시작 전에 설정해야 합니다. 나머지는 모두 기본값이 있고 선택 사항입니다.
 
 ---
 
-## 프로젝트
+## Project
 
-이 변수들은 rtCloud 인스턴스의 ID와 접근 지점을 정의합니다.
+These variables define the identity and access point of your rtCloud instance.
 
-| 변수 | 기본값 | 필수 | 설명 |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **예** | 이 배포의 고유 식별자. 공백 또는 특수 문자 없음. 내부 이름 지정의 접두사로 사용. |
-| `PROJECT_URL` | — | **예** | 사용자가 앱에 접근하는 도메인 이름 또는 IP 주소 (예: `rtcloud.example.com` 또는 `192.168.1.100`). |
-| `PROJECT_TYPE` | `rtsurvey` | 아니오 | 활성화할 플랫폼 변형. 옵션: `rtwork`, `rtsurvey`, `rthome`. |
-| `PROJECT_PORT` | `80` | 아니오 | 컨테이너 내부에서 애플리케이션이 수신 대기하는 포트. 내용을 알지 못하면 변경하지 마세요. |
-| `HTTP_PROTOCOL` | `https` | 아니오 | 내부 URL을 구성하는 데 사용되는 프로토콜. SSL을 사용하지 않는 경우 `http`로 설정. |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## 데이터베이스
+## Database
 
-MySQL 연결 자격 증명. 데이터베이스는 MySQL 컨테이너에서 자동으로 관리됩니다 — 강력한 비밀번호만 설정하면 됩니다.
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| 변수 | 기본값 | 필수 | 설명 |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | 아니오 | 애플리케이션 데이터베이스 이름. |
-| `MYSQL_USER` | `smartsurvey` | 아니오 | 애플리케이션의 MySQL 사용자. |
-| `MYSQL_PASSWORD` | — | **예** | `MYSQL_USER`의 비밀번호. 강력하고 고유한 값을 사용하세요. |
-| `MYSQL_ROOT_PASSWORD` | — | **예** | MySQL 루트 비밀번호. 데이터베이스 초기화 및 관리 작업에 필요. |
-| `MYSQL_HOST` | `mysql` | 아니오 | MySQL 호스트명. 외부 데이터베이스에 연결하지 않는 한 기본값을 사용하세요. |
-| `MYSQL_PORT` | `3306` | 아니오 | MySQL 포트. |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## 관리자 계정
+## Admin Account
 
-관리자 계정은 새 데이터베이스의 첫 번째 부팅 시 자동으로 생성됩니다.
+The admin account is created automatically on the first boot of a fresh database.
 
-| 변수 | 기본값 | 필수 | 설명 |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **예** | 내장 `admin` 사용자의 비밀번호. 첫 번째 부팅 전에 설정하세요. 데이터베이스가 이미 존재하는 경우 효과 없음. |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> 첫 번째 로그인 후 웹 UI의 **계정 설정** 페이지에서 관리자 비밀번호를 변경하세요.
-
----
-
-## 포트
-
-애플리케이션이 바인딩하는 호스트 포트를 제어합니다.
-
-| 변수 | 기본값 | 설명 |
-|----------|---------|-------------|
-| `APP_PORT` | `8080` | 메인 웹 UI의 호스트 포트. 서버에서 포트 8080이 이미 사용 중인 경우 변경하세요. |
-| `SHINY_PORT` | `3838` | Shiny 분석 서버의 호스트 포트. |
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## 런타임
+## Ports
 
-| 변수 | 기본값 | 설명 |
+Control which host ports the application binds to.
+
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | 런타임 환경. 프로덕션 배포에는 `prod`, 로컬 개발에는 `dev`를 사용하세요. |
-| `RUN_MODE` | `admin` | 컨테이너 역할. `admin`은 전체 스택(웹 + 큐 + 크론)을 실행합니다. `worker`는 백그라운드 처리만 실행합니다(수평 확장용). |
-| `TZ` | `Asia/Ho_Chi_Minh` | 서버 시간대. 로그 타임스탬프, 크론 스케줄 및 날짜 표시에 영향을 줍니다. [TZ 데이터베이스 이름](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)을 사용하세요(예: `UTC`, `America/New_York`, `Europe/London`). |
-| `LOG_LEVEL` | `info` | 애플리케이션 로그 상세도. 옵션: `debug`, `info`, `warning`, `error`. |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | 모든 Docker 컨테이너 및 볼륨 이름에 적용되는 접두사. 동일한 호스트에서 여러 rtCloud 인스턴스를 실행할 때 변경하세요. |
-| `RESTART_POLICY` | `unless-stopped` | Docker 컨테이너 재시작 동작. 옵션: `no`, `always`, `on-failure`, `unless-stopped`. |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | 사용할 Docker 이미지. 특정 버전을 고정하려면 태그를 변경하세요. |
-| `REQUIRE_LICENSE` | `false` | 시작 시 라이선스 키 유효성 검사 활성화. 라이선스 정보는 RTA에 문의하세요. |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
-## 보안
+## Runtime
 
-| 변수 | 기본값 | 설명 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | CSRF 토큰 유효성 검사 활성화. 프로덕션에서는 `true`로 유지하세요. `400 CSRF token could not be verified` 오류가 발생하는 경우 로컬 개발에서만 `false`로 설정하세요. |
-| `GII_ENABLED` | `false` | Yii 프레임워크 코드 생성기 도구 활성화. **프로덕션에서 절대 활성화하지 마세요.** |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## SSO — 내장 Keycloak
+## Security
 
-전체 기능의 엔터프라이즈 SSO를 위한 번들 Keycloak 컨테이너를 활성화합니다. HTTPS가 있는 도메인이 필요합니다.
-
-| 변수 | 기본값 | 설명 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | 내장 Keycloak 컨테이너를 시작하려면 `true`로 설정. `embed-keycloak` Docker Compose 프로파일을 활성화합니다. |
-| `KEYCLOAK_URL` | — | Keycloak 서버의 전체 URL (예: `https://rtcloud.example.com/auth`). |
-| `KEYCLOAK_REALM` | — | Keycloak 렐름 이름 (예: `rtsurvey`). |
-| `KEYCLOAK_CLIENT_ID` | — | rtCloud 애플리케이션의 Keycloak 클라이언트 ID. |
-| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak 클라이언트 시크릿. Keycloak 관리 콘솔에서 생성하세요. |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak 관리자 사용자명. |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak 관리자 비밀번호. |
-| `KEYCLOAK_DB` | `keycloak` | Keycloak의 데이터베이스 이름. 첫 번째 부팅 시 자동으로 생성됩니다. |
-| `KEYCLOAK_DB_USER` | `keycloak` | Keycloak의 데이터베이스 사용자. |
-| `KEYCLOAK_DB_PASSWORD` | — | Keycloak 사용자의 데이터베이스 비밀번호. |
-| `KC_HOSTNAME` | — | Keycloak 프론트엔드 URL (예: `https://rtcloud.example.com/auth`). |
-| `KC_HOSTNAME_STRICT` | `false` | 엄격한 호스트명 매칭 적용. 고정된 도메인이 있는 프로덕션에서는 `true`로 설정. |
-
-전체 설정 가이드는 [SSO 인증](sso-authentication#embedded-keycloak)을 참조하세요.
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — 외부 OIDC 공급자
+## SSO — Embedded Keycloak
 
-기존 OIDC 호환 ID 공급자(Supabase, Auth0, Authentik, Okta 등)에 연결합니다.
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| 변수 | 기본값 | 설명 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | OIDC 발급자 검색 URL (예: `https://accounts.google.com`). |
-| `OIDC_CLIENT_ID` | — | ID 공급자에 등록된 클라이언트 ID. |
-| `OIDC_CLIENT_SECRET` | — | ID 공급자의 클라이언트 시크릿. |
-| `OIDC_SCOPE` | `openid profile email` | 요청할 OIDC 스코프의 공백으로 구분된 목록. |
-| `OIDC_REDIRECT_URI` | — | 웹 앱의 콜백 URL (예: `https://rtcloud.example.com/auth/callback`). |
-| `OIDC_MOBILE_CLIENT_ID` | — | rtSurvey 모바일 앱을 위한 별도 클라이언트 ID. |
-| `OIDC_MOBILE_REDIRECT_URI` | — | 모바일 앱 콜백 URI (예: `vn.rta.rtsurvey.auth://callback`). |
-| `OPEN_REGISTRATION` | `false` | OIDC를 통해 처음 인증하는 사용자를 위해 rtCloud 계정을 자동으로 생성. |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | 인증 엔드포인트 URL 재정의 (검색 사용은 공백). |
-| `OIDC_TOKEN_ENDPOINT` | — | 토큰 엔드포인트 URL 재정의 (검색 사용은 공백). |
-| `OIDC_USERINFO_ENDPOINT` | — | 사용자 정보 엔드포인트 URL 재정의 (검색 사용은 공백). |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| 변수 | 설명 |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | Azure AD 애플리케이션 (클라이언트) ID. |
-| `AZURE_TENANT_ID` | Azure AD 디렉토리 (테넌트) ID. |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## 선택적 통합
+## Optional Integrations
 
 ### Stata
 
-| 변수 | 기본값 | 설명 |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | 데이터 분석을 위한 Stata 통계 소프트웨어 통합 활성화. |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | 컨테이너 내부 Stata 바이너리의 절대 경로. |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| 변수 | 설명 |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Elasticsearch 호스트 (예: `http://elasticsearch:9200`). |
-| `ES_PORT` | Elasticsearch 포트. |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
-### Matomo 분석
+### Matomo Analytics
 
-| 변수 | 설명 |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | Matomo(Piwik) 서버 URL. |
-| `PIWIK_ID` | Matomo 사이트 ID. |
-| `PIWIK_SECRET` | Matomo 인증 토큰. |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (R 계산)
+### OpenCPU (R Computation)
 
-| 변수 | 설명 |
+| Variable | Description |
 |----------|-------------|
-| `OCPU_HOST` | R 기반 통계 계산을 위한 OpenCPU 서버 URL. |
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox 통합
+### RtBox Integration
 
-| 변수 | 설명 |
+| Variable | Description |
 |----------|-------------|
-| `RTBOX_HOST` | RtBox 서비스 호스트 URL. |
-| `RTBOX_USER_API` | RtBox 사용자 API 키. |
-| `RTBOX_BASIC_AUTH` | RtBox의 기본 인증 자격 증명. |
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix 메시징
+### Matrix Messaging
 
-| 변수 | 설명 |
+| Variable | Description |
 |----------|-------------|
-| `MATRIX_HOMESERVER_HOST` | Matrix 홈서버 호스트. |
-| `MATRIX_HOMESERVER_PORT` | Matrix 홈서버 포트. |
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## 데이터 볼륨
+## Data Volumes
 
-모든 애플리케이션 데이터는 명명된 Docker 볼륨에 저장됩니다. 볼륨은 첫 번째 시작 시 자동으로 생성되며 컨테이너 재시작 및 업데이트에도 유지됩니다.
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| 볼륨 | 마운트 지점 | 내용 |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL 데이터베이스 파일 |
-| `rtcloud_uploads` | `…/uploads` | 설문 응답자가 업로드한 파일 |
-| `rtcloud_audios` | `…/audios` | 오디오 녹음 |
-| `rtcloud_downloads` | `…/downloads` | 생성된 내보내기 파일 |
-| `rtcloud_gallery` | `…/gallery` | 갤러리 이미지 |
-| `rtcloud_voicemail` | `…/voicemail` | 음성 메일 녹음 |
-| `rtcloud_analytics` | `…/analytics` | 분석 데이터 |
-| `rtcloud_aggregate` | `…/aggregate` | 집계된 설문 결과 |
-| `rtcloud_converter` | `…/converter` | 데이터 변환 출력 |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny 서버 R 스크립트 |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny 서버 로그 |
-| `rtcloud_assets` | `…/assets` | 웹 자산 (CSS, JS) |
-| `rtcloud_runtime` | `…/protected/runtime` | 애플리케이션 런타임 캐시 |
-| `rtcloud_cache` | `…/cache` | 애플리케이션 캐시 |
-| `rtcloud_tmp` | `…/tmp` | 임시 파일 |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-볼륨 이름은 `COMPOSE_PROJECT_NAME` 값(기본값: `rtcloud`)으로 접두사가 붙습니다.
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-배포의 모든 볼륨 나열:
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

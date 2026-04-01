@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Pirmasis prisijungimas"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Kaip prisijungti prie savo rtSurvey egzemplioriaus pirmą kartą po diegimo."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **Prieš prisijungimą turi būti sukonfigūruotas SSL.** Jei pasiekiate programą per HTTP, pamatysite saugos įspėjimą ir SSO bus užblokuotas. Pirmiausia užbaikite [SSL nustatymą](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Kai SSL aktyvus, atidarykite naršyklę savo HTTPS URL:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Prisijungimo ekranas
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Prisijungimo puslapis rodo:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- **Vartotojo vardas** ir **Slaptažodis** laukai
+- **Prisijungti** mygtukas
+- **Prisijungti per SSO** mygtukas (žemiau skyriklio) — komandos nariams su SSO paskyromis
 
 ---
 
-## If you see a security warning
+## Numatytieji administratoriaus duomenys
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Įveskite numatytuosius duomenis ir spustelėkite **Prisijungti**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Laukas | Reikšmė |
+|--------|---------|
+| Vartotojo vardas | `admin` |
+| Slaptažodis | `admin` |
+
+> **Nedelsdami pakeiskite slaptažodį po pirmojo prisijungimo.**
+
+---
+
+## Jei matote saugos įspėjimą
+
+Jei pasiekiate programą per HTTP (prieš SSL konfigūraciją), pamatysite:
+
+- Geltoną įspėjimo juostą prisijungimo puslapio viršuje
+- Modalinį langą paspaudus **Prisijungti**, įspėjantį, kad duomenys bus siunčiami nešifruoti
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Spustelėkite **Nustatyti SSL** HTTPS konfigūravimui arba **Tęsti bet kokiu atveju** prisijungimui be SSL (nerekomenduojama).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+SSO prisijungimas visiškai užblokuotas per HTTP — paspaudus **Prisijungti per SSO** bus rodomas pranešimas vietoj nukreipimo.
 
 ---
 
-## After logging in
+## Po prisijungimo
 
-Once inside, you will land on the dashboard. From here:
+Prisijungę pateksite į prietaisų skydelį. Iš čia:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Keisti administratoriaus slaptažodį** — paskyros nustatymai → keisti slaptažodį
+2. **Kurti pirmąjį projektą** — Projektai → Naujas projektas
+3. **Įkelti arba kurti formą** — Formos → Įkelti XLSForm arba atidaryti Form Builder
+4. **Pridėti vartotojus** — Vartotojai → Pakviesti arba sukurti paskyras jūsų komandai

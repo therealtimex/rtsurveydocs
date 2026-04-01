@@ -10,63 +10,63 @@ toc: true
 description: "Terapkan rtCloud di Google Cloud Compute Engine menggunakan skrip startup gcp-compute.sh."
 ---
 
-Gunakan `gcp-compute.sh` sebagai **Startup script** saat membuat instans VM Compute Engine. Skrip berjalan secara otomatis pada booting pertama.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**Unduh skrip:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## Langkah 1 — Isi konfigurasi
+## Step 1 — Fill in the configuration
 
-Buka skrip dan edit blok `CONFIGURATION` di bagian atas:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Diperlukan ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Ubah setelah login pertama
+ADMIN_PASSWORD="admin"                       # Change after first login
 
 # --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Keycloak Tertanam ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Default ke ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Bidang | Diperlukan | Deskripsi |
-|--------|-----------|-----------|
-| `PROJECT_ID` | Ya | Digunakan sebagai nama database dan ID klien Keycloak. Huruf kecil, tanpa spasi. |
-| `ADMIN_PASSWORD` | Tidak | Kata sandi admin aplikasi dan kata sandi admin Keycloak. Default ke `admin` — **ubah setelah login pertama**. |
-| `DOMAIN` | Tidak | Domain Anda untuk HTTPS. Biarkan kosong untuk mode HTTP saja. |
-| `LETSENCRYPT_EMAIL` | Ya (jika DOMAIN ditetapkan) | Email untuk notifikasi Let's Encrypt. |
-| `EMBED_KEYCLOAK` | Tidak | `true` untuk menerapkan Keycloak tertanam (memerlukan 4 GB RAM). |
+| Field | Required | Description |
+|-------|----------|-------------|
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Keamanan:** Semua kata sandi default ke `admin`. Ubah segera setelah login pertama Anda.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Langkah 2 — Buat instans VM
+## Step 2 — Create a VM instance
 
-Di [Google Cloud Console](https://console.cloud.google.com/compute):
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
 
-1. Klik **Create instance**
-2. **Konfigurasi mesin:**
-   - Seri: `E2`
-   - Jenis mesin: `e2-medium` (4 GB RAM) atau lebih besar
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
 3. **Boot disk:**
-   - Sistem operasi: Ubuntu
-   - Versi: Ubuntu 22.04 LTS
-   - Ukuran: 40 GB atau lebih
-4. **Firewall:** centang **Allow HTTP traffic** dan **Allow HTTPS traffic**
-5. **Opsi lanjutan** → **Management** → **Automation** → **Startup script** → tempel konten skrip lengkap
-6. Klik **Create**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
 
 ---
 
-## Langkah 3 — Tambahkan A record DNS
+## Step 3 — Add the DNS record
 
-Sementara VM melakukan booting, tambahkan **A record** di penyedia DNS Anda:
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -75,19 +75,19 @@ Value : <vm-external-ip>
 TTL   : 300
 ```
 
-Temukan IP eksternal di daftar instans VM di konsol.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## Langkah 4 — Pantau kemajuan
+## Step 4 — Monitor progress
 
-Menggunakan CLI `gcloud`:
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-Atau SSH langsung:
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Langkah 5 — Akses aplikasi
+## Step 5 — Access the app
 
-Ketika pengaturan selesai, log menampilkan ringkasan dengan URL aplikasi dan kredensial Anda. Masuk dengan nama pengguna `admin` dan kata sandi `admin`, lalu ubah kata sandi Anda segera.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Aturan Firewall
+## Firewall Rules
 
-Kotak centang **Allow HTTP/HTTPS** GCP membuka port 80 dan 443. Untuk juga mengizinkan akses Shiny langsung di port 3838, tambahkan aturan firewall:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-Atau tambahkan melalui konsol: **VPC Network** → **Firewall** → **Create rule**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> **Jangan** buka port 3306 (MySQL) — tidak boleh dapat diakses secara publik.
-
----
-
-## IP Statis (opsional)
-
-Secara default, GCP menetapkan IP eksternal sementara yang berubah saat VM di-restart. Untuk mempertahankan IP yang stabil:
-
-1. Buka **VPC Network** → **IP addresses**
-2. Klik **Reserve external static address**
-3. Tetapkan ke instans VM Anda
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Setelah Penerapan
+## Static IP (optional)
 
-### Ubah kata sandi
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Lihat semua container
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

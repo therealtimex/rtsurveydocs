@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Първо влизане"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Как да влезете в своя rtSurvey за първи път след разгръщането."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **SSL трябва да е конфигуриран преди влизане.** Ако достъпвате приложението по HTTP, ще видите предупреждение за сигурност и SSO ще бъде блокиран. Завършете [Настройка на SSL](ssl-setup) първо.
 
-After SSL is active, open your browser at your HTTPS URL:
+След като SSL е активен, отворете браузъра на вашия HTTPS адрес:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Екранът за влизане
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Страницата за влизане показва:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- Полета за **потребителско име** и **парола**
+- Бутон **Влизане**
+- Бутон **Влизане чрез SSO** (под разделител) — за членове на екипа с SSO акаунти
 
 ---
 
-## If you see a security warning
+## Идентификационни данни на администратора по подразбиране
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Въведете идентификационните данни по подразбиране и натиснете **Влизане**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Поле | Стойност |
+|------|---------|
+| Потребителско име | `admin` |
+| Парола | `admin` |
+
+> **Сменете паролата си веднага след първото влизане.**
+
+---
+
+## Ако видите предупреждение за сигурност
+
+Ако достъпвате приложението по HTTP (преди конфигуриране на SSL), ще видите:
+
+- Жълт банер за предупреждение в горната част на страницата за влизане
+- Модален прозорец при натискане на **Влизане**, предупреждаващ, че идентификационните данни ще бъдат изпратени некриптирани
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Натиснете **Настройка на SSL**, за да конфигурирате HTTPS, или **Продължи така**, за да влезете без SSL (не се препоръчва).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+Влизането чрез SSO е напълно блокирано по HTTP — натискането на **Влизане чрез SSO** ще покаже известие вместо пренасочване.
 
 ---
 
-## After logging in
+## След влизане
 
-Once inside, you will land on the dashboard. From here:
+Веднъж вътре, ще попаднете на таблото. Оттам:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Сменете паролата на администратора** — настройки на акаунта → смяна на парола
+2. **Създайте първия си проект** — Проекти → Нов проект
+3. **Качете или създайте формуляр** — Формуляри → Качване на XLSForm или отваряне на Form Builder
+4. **Добавете потребители** — Потребители → Покана или създаване на акаунти за вашия екип

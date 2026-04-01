@@ -1,5 +1,5 @@
 ---
-weight: 4
+weight: 5
 title: "SSO ప్రమాణీకరణ"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,167 +7,167 @@ draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "ఎంబెడెడ్ Keycloak, బాహ్య OIDC ప్రొవైడర్ లేదా Azure Active Directory ఉపయోగించి స్వయం-హోస్ట్ చేయబడిన rtCloud కోసం Single Sign-On కాన్ఫిగర్ చేయండి."
+description: "ఎంబెడెడ్ Keycloak, బాహ్య OIDC ప్రొవైడర్ లేదా Azure Active Directory ఉపయోగించి స్వీయ-హోస్ట్ చేయబడిన rtCloud కోసం Single Sign-On కాన్ఫిగర్ చేయండి."
 ---
 
-rtCloud Single Sign-On (SSO) కోసం మూడు విధానాలు మద్దతు ఇస్తుంది:
+rtCloud Single Sign-On (SSO) కోసం మూడు విధానాలకు మద్దతు ఇస్తుంది:
 
-| ఎంపిక | అత్యుత్తమంగా |
+| Option | Best For |
 |--------|----------|
-| [ఎంబెడెడ్ Keycloak](#embedded-keycloak) | rtCloud తో కలిపి పూర్తిగా స్వయం-సమాహిత SSO సర్వర్ కోరుకునే సంస్థలు |
-| [బాహ్య OIDC ప్రొవైడర్](#external-oidc-provider) | ఇప్పటికే గుర్తింపు ప్రదాత (Auth0, Authentik, Okta, Supabase, మొదలైనవి) నడుపుతున్న సంస్థలు |
-| [Azure Active Directory](#azure-active-directory) | Microsoft 365 లేదా Azure AD ఉపయోగిస్తున్న సంస్థలు |
+| [Embedded Keycloak](#embedded-keycloak) | Organizations that want a fully self-contained SSO server bundled with rtCloud |
+| [External OIDC Provider](#external-oidc-provider) | Organizations already running an identity provider (Auth0, Authentik, Okta, Supabase, etc.) |
+| [Azure Active Directory](#azure-active-directory) | Organizations using Microsoft 365 or Azure AD |
 
-SSO కాన్ఫిగర్ చేయకుండా, వినియోగదారులు అడ్మిన్ ప్యానెల్ ద్వారా నిర్వహించబడిన స్థానిక rtCloud ఖాతాలతో లాగిన్ అవుతారు.
+Without SSO configured, users log in with local rtCloud accounts managed through the admin panel.
 
 ---
 
-## ఎంబెడెడ్ Keycloak {#embedded-keycloak}
+## Embedded Keycloak
 
-డిప్లాయ్‌మెంట్ rtCloud తో పక్కన నడిచే ఐచ్ఛిక Keycloak కంటైనర్‌ను కలిగి ఉంది. Keycloak rtSurvey realm తో ముందే కాన్ఫిగర్ చేయబడి ఉంటుంది మరియు ఉపయోగించడానికి సిద్ధంగా ఉంటుంది.
+The deployment includes an optional Keycloak container that runs alongside rtCloud. Keycloak is pre-configured with an rtSurvey realm and ready to use.
 
-### అవసరాలు
+### Requirements
 
-- HTTPS తో డొమైన్ పేరు (Keycloak ప్రొడక్షన్‌లో HTTPS అవసరం)
-- సర్వర్‌లో కనీసం 4 GB RAM (~512 MB మెమరీ వినియోగం Keycloak కి అదనంగా)
+- A domain name with HTTPS (Keycloak requires HTTPS in production)
+- At least 4 GB RAM on the server (Keycloak adds ~512 MB memory usage)
 
-### సెటప్
+### Setup
 
-**1. `.env` లో పర్యావరణ వేరియబుల్‌లు కాన్ఫిగర్ చేయండి:**
+**1. Configure environment variables in `.env`:**
 
 ```dotenv
-# ఎంబెడెడ్ Keycloak కంటైనర్ ప్రారంభించండి
+# Enable the embedded Keycloak container
 EMBED_KEYCLOAK=true
 
-# Keycloak URLs — మీ అసలు డొమైన్ ఉపయోగించండి
+# Keycloak URLs — use your actual domain
 KEYCLOAK_URL=https://rtcloud.example.com/auth
 KC_HOSTNAME=https://rtcloud.example.com/auth
 KC_HOSTNAME_STRICT=false
 
-# Realm మరియు క్లైంట్ సెట్టింగులు (దిగుమతి చేసిన realm JSON తో మ్యాచ్ చేయండి)
+# Realm and client settings (match the imported realm JSON)
 KEYCLOAK_REALM=rtsurvey
 KEYCLOAK_CLIENT_ID=rtsurvey-app
 KEYCLOAK_CLIENT_SECRET=your-client-secret-here
 
-# Keycloak అడ్మిన్ ఆధారపత్రాలు
+# Keycloak admin credentials
 KEYCLOAK_ADMIN_USER=admin
 KEYCLOAK_ADMIN_PASSWORD=change_me_keycloak_admin_password
 
-# Keycloak డేటాబేస్ (స్వయంచాలకంగా సృష్టించబడుతుంది)
+# Keycloak database (created automatically)
 KEYCLOAK_DB=keycloak
 KEYCLOAK_DB_USER=keycloak
 KEYCLOAK_DB_PASSWORD=change_me_keycloak_db_password
 
-# Keycloak వినే పోర్ట్ (హోస్ట్-సైడ్, Nginx ద్వారా proxied)
+# Port Keycloak listens on (host-side, proxied by Nginx)
 KEYCLOAK_PORT=8091
 ```
 
-**2. ఎంబెడెడ్ Keycloak ప్రొఫైల్‌తో ప్రారంభించండి:**
+**2. Start with the embedded Keycloak profile:**
 
 ```bash
 docker compose -f docker-compose.production.yml --profile embed-keycloak up -d
 ```
 
-**3. Keycloak ఆరోగ్యంగా ఉందని ధృవీకరించండి:**
+**3. Verify Keycloak is healthy:**
 
 ```bash
 docker compose -f docker-compose.production.yml ps
 ```
 
-2–3 నిమిషాల తర్వాత `rtcloud-keycloak` కంటైనర్ `Up (healthy)` చూపించాలి.
+The `rtcloud-keycloak` container should show `Up (healthy)` after 2–3 minutes.
 
-**4. Keycloak అడ్మిన్ కన్సోల్ యాక్సెస్ చేయండి:**
+**4. Access the Keycloak admin console:**
 
 ```
 https://rtcloud.example.com/auth/admin
 ```
 
-`KEYCLOAK_ADMIN_USER` మరియు `KEYCLOAK_ADMIN_PASSWORD` తో లాగిన్ అవండి.
+Log in with `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD`.
 
-### ముందే కాన్ఫిగర్ చేయబడినది
+### What Is Pre-Configured
 
-ఎంబెడెడ్ Keycloak ముందే దిగుమతి చేయబడిన `rtsurvey` realm తో ప్రారంభమవుతుంది:
+The embedded Keycloak starts with a pre-imported `rtsurvey` realm that includes:
 
-- వెబ్ అప్లికేషన్ కోసం క్లైంట్ కాన్ఫిగరేషన్
-- డిఫాల్ట్ వినియోగదారు పాత్రలు (`admin`, `project_manager`, `enumerator`, `analyst`)
-- rtSurvey కోసం ఆప్టిమైజ్ చేయబడిన సెషన్ మరియు టోకెన్ సెట్టింగులు
+- Client configuration for the web application
+- Default user roles (`admin`, `project_manager`, `enumerator`, `analyst`)
+- Session and token settings optimized for rtSurvey
 
-మీరు నేరుగా Keycloak అడ్మిన్ కన్సోల్‌లో వినియోగదారులను జోడించవచ్చు లేదా Keycloak ని అప్‌స్ట్రీమ్ గుర్తింపు ప్రదాతకు (LDAP, SAML) కనెక్ట్ చేయవచ్చు.
+You can add users directly in the Keycloak admin console or connect Keycloak to an upstream identity provider (LDAP, SAML).
 
-### Nginx రౌటింగ్
+### Nginx Routing
 
-క్లౌడ్ డిప్లాయ్‌మెంట్ స్క్రిప్ట్‌లు ఉపయోగించేటప్పుడు, Nginx రెండు సేవలు proxy చేయడానికి కాన్ఫిగర్ చేయబడుతుంది:
+When using the cloud deployment scripts, Nginx is configured to proxy both services:
 
-| మార్గం | బ్యాకెండ్ |
+| Path | Backend |
 |------|---------|
-| `/` | `127.0.0.1:8080` లో rtCloud యాప్ |
-| `/auth/` | `127.0.0.1:8090` లో Keycloak |
+| `/` | rtCloud app on `127.0.0.1:8080` |
+| `/auth/` | Keycloak on `127.0.0.1:8090` |
 
 ---
 
-## బాహ్య OIDC ప్రొవైడర్ {#external-oidc-provider}
+## External OIDC Provider
 
-ఏ OpenID Connect-అనుకూల గుర్తింపు ప్రదాతకైనా rtCloud కనెక్ట్ చేయండి. ఈ విధానానికి Keycloak కంటైనర్ అవసరం లేదు.
+Connect rtCloud to any OpenID Connect-compatible identity provider. This approach does not require the Keycloak container.
 
-### మద్దతు ఉన్న ప్రొవైడర్‌లు
+### Supported Providers
 
-OIDC-అనుకూల ప్రొవైడర్ పని చేస్తుంది, ఇవి కలిగి ఉంటాయి:
+Any OIDC-compliant provider works, including:
 - Authentik
 - Auth0
 - Okta
-- Keycloak (బాహ్య ఇన్‌స్టాన్స్)
+- Keycloak (external instance)
 - Supabase
-- Google (Google Workspace సంస్థల కోసం)
-- GitHub (OIDC extension తో OAuth యాప్‌ల ద్వారా)
+- Google (for Google Workspace organizations)
+- GitHub (via OAuth apps with OIDC extension)
 
-### సెటప్
+### Setup
 
-**1. మీ గుర్తింపు ప్రదాతలో rtCloud ని OIDC క్లైంట్‌గా నమోదు చేయండి.**
+**1. Register rtCloud as an OIDC client in your identity provider.**
 
-మీకు ఇవి అవసరం:
-- **క్లైంట్ ID** మరియు **క్లైంట్ సీక్రెట్**
-- **రీడైరెక్ట్ URI** నమోదు చేయడం: `https://rtcloud.example.com/auth/callback`
-- మొబైల్ యాప్ మద్దతు కోసం, కూడా నమోదు చేయండి: `vn.rta.rtsurvey.auth://callback`
+You will need:
+- A **client ID** and **client secret**
+- To register the **redirect URI**: `https://rtcloud.example.com/auth/callback`
+- For mobile app support, also register: `vn.rta.rtsurvey.auth://callback`
 
-**2. `.env` లో పర్యావరణ వేరియబుల్‌లు కాన్ఫిగర్ చేయండి:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
-# OIDC discovery URL (ప్రొవైడర్-నిర్దిష్టం — మీ IdP డాక్యుమెంటేషన్ తనిఖీ చేయండి)
+# OIDC discovery URL (provider-specific — check your IdP documentation)
 OIDC_ISSUER_URL=https://your-identity-provider.com
 
-# మీ గుర్తింపు ప్రదాత నుండి క్లైంట్ ఆధారపత్రాలు
+# Client credentials from your identity provider
 OIDC_CLIENT_ID=rtcloud-app
 OIDC_CLIENT_SECRET=your-client-secret-here
 
-# అభ్యర్థించవలసిన స్కోప్‌లు (openid, profile మరియు email సాధారణంగా సరిపోతాయి)
+# Scopes to request (openid, profile, and email are typically sufficient)
 OIDC_SCOPE=openid profile email
 
-# మీ గుర్తింపు ప్రదాతలో నమోదు చేయబడిన రీడైరెక్ట్ URI
+# Redirect URI registered in your identity provider
 OIDC_REDIRECT_URI=https://rtcloud.example.com/auth/callback
 
-# ఐచ్ఛికం: వేర్వేరు మొబైల్ యాప్ క్లైంట్
+# Optional: separate mobile app client
 OIDC_MOBILE_CLIENT_ID=rtcloud-mobile
 OIDC_MOBILE_REDIRECT_URI=vn.rta.rtsurvey.auth://callback
 
-# కొత్త OIDC వినియోగదారులకు rtCloud ఖాతాలు స్వయంచాలకంగా సృష్టించడానికి true కి సెట్ చేయండి
+# Set to true to auto-create rtCloud accounts for new OIDC users
 OPEN_REGISTRATION=false
 ```
 
-**3. మార్పులు వర్తించడానికి యాప్ కంటైనర్ పునఃప్రారంభించండి:**
+**3. Restart the app container to apply the changes:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### వినియోగదారులు స్వయంచాలకంగా నిబంధించడం
+### Auto-Provisioning Users
 
-`OPEN_REGISTRATION=true` అయినప్పుడు, వినియోగదారు OIDC ద్వారా మొదటిసారి సైన్ ఇన్ చేసినప్పుడు rtCloud స్వయంచాలకంగా స్థానిక ఖాతా సృష్టిస్తుంది. ఖాతా ID టోకెన్ నుండి వినియోగదారు పేరు మరియు ఇమెయిల్‌తో నింపబడుతుంది.
+When `OPEN_REGISTRATION=true`, rtCloud automatically creates a local account the first time a user signs in via OIDC. The account is populated with the user's name and email from the ID token.
 
-`OPEN_REGISTRATION=false` (డిఫాల్ట్) అయినప్పుడు, rtCloud అడ్మినిస్ట్రేటర్ ముందుగా వినియోగదారు ఖాతా సృష్టించాలి, మరియు OIDC గుర్తింపు మొదటి లాగిన్‌లో లింక్ చేయబడుతుంది.
+When `OPEN_REGISTRATION=false` (default), an rtCloud administrator must create the user account first, and the OIDC identity is linked on first login.
 
-### అనుకూల ఎండ్‌పాయింట్‌లు
+### Custom Endpoints
 
-మీ ప్రొవైడర్ OIDC discovery (`.well-known/openid-configuration`) మద్దతు ఇవ్వకపోతే, మీరు ఎండ్‌పాయింట్‌లు మాన్యువల్‌గా సెట్ చేయవచ్చు:
+If your provider does not support OIDC discovery (`.well-known/openid-configuration`), you can set endpoints manually:
 
 ```dotenv
 OIDC_AUTHORIZATION_ENDPOINT=https://your-provider.com/oauth2/authorize
@@ -177,43 +177,43 @@ OIDC_USERINFO_ENDPOINT=https://your-provider.com/oauth2/userinfo
 
 ---
 
-## Azure Active Directory {#azure-active-directory}
+## Azure Active Directory
 
-మీ సంస్థ యొక్క Microsoft Azure AD టెనెంట్‌తో rtCloud అనుసంధానించండి.
+Integrate rtCloud with your organization's Microsoft Azure AD tenant.
 
-### సెటప్
+### Setup
 
-**1. [Azure Portal](https://portal.azure.com) లో కొత్త యాప్ నమోదు చేయండి:**
+**1. Register a new app in the [Azure Portal](https://portal.azure.com):**
 
-   - **Azure Active Directory** → **App registrations** → **New registration** వెళ్ళండి
-   - పేరు: `rtCloud`
-   - Redirect URI: `https://rtcloud.example.com/auth/callback` (Web రకం)
-   - సృష్టించిన తర్వాత **Application (client) ID** మరియు **Directory (tenant) ID** గమనించండి
-   - **Certificates & secrets** కింద, కొత్త క్లైంట్ సీక్రెట్ సృష్టించండి
+   - Go to **Azure Active Directory** → **App registrations** → **New registration**
+   - Name: `rtCloud`
+   - Redirect URI: `https://rtcloud.example.com/auth/callback` (Web type)
+   - After creation, note the **Application (client) ID** and **Directory (tenant) ID**
+   - Under **Certificates & secrets**, create a new client secret
 
-**2. `.env` లో పర్యావరణ వేరియబుల్‌లు కాన్ఫిగర్ చేయండి:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
 AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-**3. యాప్ కంటైనర్ పునఃప్రారంభించండి:**
+**3. Restart the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-మీ Azure AD టెనెంట్‌లోని వినియోగదారులు ఇప్పుడు తమ Microsoft ఆధారపత్రాలు ఉపయోగించి rtCloud లో లాగిన్ అవగలరు.
+Users in your Azure AD tenant can now log in to rtCloud using their Microsoft credentials.
 
 ---
 
-## SSO నిలిపివేయడం
+## Disabling SSO
 
-స్థానిక ప్రమాణీకరణకు తిరిగి వెళ్ళడానికి, `.env` నుండి అన్ని SSO-సంబంధిత వేరియబుల్‌లు తొలగించండి లేదా కమెంట్ చేయండి, తర్వాత యాప్ కంటైనర్ పునఃప్రారంభించండి:
+To revert to local authentication, remove or comment out all SSO-related variables from `.env`, then restart the app container:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-ఎంబెడెడ్ Keycloak ఉపయోగిస్తున్న అయితే, `--profile embed-keycloak` ఫ్లాగ్ వదిలిపెట్టి `docker compose down` నడిపించి ప్రొఫైల్ లేకుండా `up -d` నడిపించడం ద్వారా దాన్ని ఆపండి.
+If you were using embedded Keycloak, stop it by omitting the `--profile embed-keycloak` flag and running `docker compose down` followed by `up -d` without the profile.

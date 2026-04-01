@@ -7,104 +7,104 @@ draft: false
 author: "rtSurvey"
 icon: "travel_explore"
 toc: true
-description: "Az rtCloud telepítése Google Cloud Compute Engine-en a gcp-compute.sh indítási szkript segítségével."
+description: "Telepítse az rtCloudot a Google Cloud Compute Engine-be a gcp-compute.sh indítószkripttel."
 ---
 
-A `gcp-compute.sh` szkriptet **Startup script** (indítási szkript) ként használja egy Compute Engine VM-példány létrehozásakor. A szkript automatikusan fut az első indításkor.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**Szkript letöltése:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## 1. lépés — A konfiguráció kitöltése
+## Step 1 — Fill in the configuration
 
-Nyissa meg a szkriptet, és szerkessze a tetején lévő `CONFIGURATION` blokkot:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Kötelező ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Az első bejelentkezés után változtassa meg
+ADMIN_PASSWORD="admin"                       # Change after first login
 
 # --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Beágyazott Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Alapértéke ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Mező | Kötelező | Leírás |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Igen | Adatbázis nevként és Keycloak kliens azonosítóként használatos. Kisbetűs, szóközök nélkül. |
-| `ADMIN_PASSWORD` | Nem | Alkalmazás rendszergazda jelszó és Keycloak rendszergazda jelszó. Alapértéke `admin` — **az első bejelentkezés után változtassa meg**. |
-| `DOMAIN` | Nem | A domain neve HTTPS-hez. Hagyja üresen csak HTTP módhoz. |
-| `LETSENCRYPT_EMAIL` | Igen (ha DOMAIN be van állítva) | E-mail a Let's Encrypt értesítésekhez. |
-| `EMBED_KEYCLOAK` | Nem | `true` a beágyazott Keycloak telepítéséhez (4 GB RAM szükséges). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Biztonság:** Minden jelszó alapértéke `admin`. Az első bejelentkezés után azonnal változtassa meg őket.
-
----
-
-## 2. lépés — VM-példány létrehozása
-
-A [Google Cloud Konzolon](https://console.cloud.google.com/compute):
-
-1. Kattintson a **Create instance** lehetőségre
-2. **Gépkonfiguráció:**
-   - Sorozat: `E2`
-   - Gép típusa: `e2-medium` (4 GB RAM) vagy nagyobb
-3. **Rendszerlemez:**
-   - Operációs rendszer: Ubuntu
-   - Verzió: Ubuntu 22.04 LTS
-   - Méret: 40 GB vagy több
-4. **Tűzfal:** jelölje be az **Allow HTTP traffic** és **Allow HTTPS traffic** lehetőségeket
-5. **Speciális beállítások** → **Kezelés** → **Automatizálás** → **Startup script** → illessze be a szkript teljes tartalmát
-6. Kattintson a **Create** lehetőségre
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## 3. lépés — A DNS-rekord hozzáadása
+## Step 2 — Create a VM instance
 
-Miközben a VM elindul, adjon hozzá egy **A-rekordot** a DNS-szolgáltatójánál:
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
+3. **Boot disk:**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
+
+---
+
+## Step 3 — Add the DNS record
+
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
-Típus  : A
-Név    : myapp
-Érték  : <vm-külső-ip>
-TTL    : 300
+Type  : A
+Name  : myapp
+Value : <vm-external-ip>
+TTL   : 300
 ```
 
-Keresse meg a külső IP-t a konzol VM-példányok listájában.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## 4. lépés — Folyamat figyelése
+## Step 4 — Monitor progress
 
-A `gcloud` CLI segítségével:
+Using the `gcloud` CLI:
 
 ```bash
-gcloud compute ssh <példány-neve> -- tail -f /var/log/rtcloud-setup.log
+gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-Vagy SSH-val közvetlenül:
+Or SSH directly:
 
 ```bash
-ssh <felhasználónév>@<vm-külső-ip>
+ssh <username>@<vm-external-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
 ---
 
-## 5. lépés — Az alkalmazás elérése
+## Step 5 — Access the app
 
-A beállítás befejezésekor a napló összefoglalót mutat az alkalmazás URL-jével és hitelesítő adataival. Jelentkezzen be `admin` felhasználónévvel és `admin` jelszóval, majd azonnal változtassa meg jelszavát.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Tűzfalszabályok
+## Firewall Rules
 
-A GCP **Allow HTTP/HTTPS** jelölőnégyzetei megnyitják a 80-as és 443-as portokat. A Shiny közvetlen hozzáférésének engedélyezéséhez a 3838-as porton adjon hozzá egy tűzfalszabályt:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-Vagy adja hozzá a konzolon keresztül: **VPC Network** → **Firewall** → **Create rule**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> **Ne** nyissa meg a 3306-os portot (MySQL) — soha ne legyen nyilvánosan elérhető.
-
----
-
-## Statikus IP (opcionális)
-
-Alapértelmezés szerint a GCP egy efemer külső IP-t rendel hozzá, amely a VM újraindításakor megváltozik. Stabil IP megtartásához:
-
-1. Lépjen a **VPC Network** → **IP addresses** menüpontra
-2. Kattintson a **Reserve external static address** lehetőségre
-3. Rendelje hozzá a VM-példányhoz
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Telepítés után
+## Static IP (optional)
 
-### Jelszó megváltoztatása
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Az összes konténer megtekintése
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

@@ -1,128 +1,128 @@
 ---
 weight: 4
-title: "Set Up SSL"
+title: "Ρύθμιση SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Configure HTTPS for your rtSurvey server. Required before you can log in."
+description: "Διαμορφώστε HTTPS για τον διακομιστή rtSurvey. Απαιτείται πριν από τη σύνδεση."
 ---
 
-SSL must be configured before you can log in. When you open the app for the first time, you will be redirected to the SSL setup screen automatically.
-
----
-
-## SSL setup options
-
-![SSL setup options](/img/ssl-setup/ssl-setup-options.png)
-
-Choose one of three options:
-
-| Option | When to use |
-|--------|-------------|
-| **Free rtsurvey.com subdomain** *(Recommended)* | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **My own domain** | You already have a domain and its DNS points to this server. |
-| **Install certificate manually** | Enterprise or custom CA. Requires SSH access. |
+Το SSL πρέπει να διαμορφωθεί πριν μπορέσετε να συνδεθείτε. Όταν ανοίγετε την εφαρμογή για πρώτη φορά, θα ανακατευθυνθείτε αυτόματα στην οθόνη ρύθμισης SSL.
 
 ---
 
-## Option 1 — Free rtsurvey.com subdomain *(Recommended)*
+## Επιλογές ρύθμισης SSL
 
-This is the fastest option. No domain registration or DNS changes required.
+![Επιλογές ρύθμισης SSL](/img/ssl-setup/ssl-setup-options.png)
 
-1. Click **Free rtsurvey.com subdomain** to expand the section
-2. Type your desired subdomain name in the input field
+Επιλέξτε μία από τρεις επιλογές:
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+| Επιλογή | Πότε να χρησιμοποιηθεί |
+|---------|----------------------|
+| **Δωρεάν υποτομέας rtsurvey.com** *(Συνιστάται)* | Δεν απαιτείται ρύθμιση DNS. Δημιουργούμε την εγγραφή για εσάς. Έτοιμο σε 2–5 λεπτά. |
+| **Δικός μου τομέας** | Έχετε ήδη έναν τομέα και το DNS του δείχνει σε αυτόν τον διακομιστή. |
+| **Χειροκίνητη εγκατάσταση πιστοποιητικού** | Επιχείρηση ή προσαρμοσμένη CA. Απαιτεί πρόσβαση SSH. |
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+---
+
+## Επιλογή 1 — Δωρεάν υποτομέας rtsurvey.com *(Συνιστάται)*
+
+Αυτή είναι η πιο γρήγορη επιλογή. Δεν απαιτείται εγγραφή τομέα ή αλλαγές DNS.
+
+1. Κάντε κλικ στο **Δωρεάν υποτομέας rtsurvey.com** για να αναπτύξετε την ενότητα
+2. Πληκτρολογήστε το επιθυμητό όνομα υποτομέα
+
+   > Χρησιμοποιήστε πεζά γράμματα, αριθμούς και παύλες. 3–30 χαρακτήρες.
+   > Παράδειγμα: `myproject` → `myproject.rtsurvey.com`
+
+3. Κάντε κλικ στο **Δημιουργία https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. Αναμείνετε 2–5 λεπτά ενώ εκδίδεται το πιστοποιητικό
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. Μόλις το πιστοποιητικό είναι έτοιμο, θα ανακατευθυνθείτε αυτόματα στη νέα HTTPS διεύθυνση
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — My own domain
+## Επιλογή 2 — Δικός μου τομέας
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+Χρησιμοποιήστε εάν έχετε υπάρχοντα τομέα και η εγγραφή DNS `A` δείχνει ήδη στην IP αυτού του διακομιστή.
 
-1. Click **My own domain** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. Κάντε κλικ στο **Δικός μου τομέας** για ανάπτυξη
+2. Εισαγάγετε το πλήρες όνομα τομέα (π.χ. `survey.myorganization.org`)
+3. Κάντε κλικ στο **Δημιουργία πιστοποιητικού**
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Το Let's Encrypt θα επαληθεύσει τον τομέα σας και θα εκδώσει πιστοποιητικό. Απαιτείται σωστή ρύθμιση DNS εκ των προτέρων — διαφορετικά η αίτηση θα αποτύχει.
 
 ---
 
-## Option 3 — Install certificate manually
+## Επιλογή 3 — Χειροκίνητη εγκατάσταση πιστοποιητικού
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+Για εταιρικά περιβάλλοντα με προσαρμοσμένη ή εσωτερική CA. Τοποθετείτε τα αρχεία πιστοποιητικού στον διακομιστή μέσω SSH και στη συνέχεια εισάγετε τον τομέα σας στην εφαρμογή.
 
-### Prerequisites
+### Προαπαιτούμενα
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- SSH πρόσβαση στον διακομιστή
+- Έγκυρο πιστοποιητικό και ιδιωτικό κλειδί για τον τομέα σας (μορφή PEM)
 
-### Step 1 — SSH into the server
+### Βήμα 1 — SSH στον διακομιστή
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### Βήμα 2 — Τοποθετήστε τα αρχεία πιστοποιητικού
 
-Create the directory and copy your files:
+Δημιουργήστε τον κατάλογο και αντιγράψτε τα αρχεία:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+Αντιγράψτε τα αρχεία με ακριβώς αυτά τα ονόματα:
 
-| File | Description |
-|------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| Αρχείο | Περιγραφή |
+|--------|----------|
+| `fullchain.pem` | Πιστοποιητικό + ενδιάμεσα CA πιστοποιητικά (ενοποιημένα) |
+| `privkey.pem` | Ιδιωτικό κλειδί |
 
-Example:
+Παράδειγμα:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# Αντιγραφή από τοπικό μηχάνημα (εκτελέστε τοπικά, όχι στον διακομιστή)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+Ορίστε σωστά δικαιώματα:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### Βήμα 3 — Εισαγάγετε τον τομέα στην εφαρμογή
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Install certificate manually**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. Στην οθόνη ρύθμισης SSL, κάντε κλικ στο **Χειροκίνητη εγκατάσταση πιστοποιητικού**
+2. Εισαγάγετε το όνομα τομέα (πρέπει να ταιριάζει με το Common Name ή SAN του πιστοποιητικού)
+3. Κάντε κλικ στο **Εφαρμογή**
 
-The server will configure Nginx with your certificate and reload automatically.
+Ο διακομιστής θα διαμορφώσει το Nginx με το πιστοποιητικό σας και θα επανεκκινήσει αυτόματα.
 
 ---
 
-## Next step
+## Επόμενο βήμα
 
-Once SSL is active, proceed to [First Login](first-login).
+Μόλις το SSL είναι ενεργό, προχωρήστε στην [Πρώτη Σύνδεση](first-login).

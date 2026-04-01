@@ -1,16 +1,16 @@
 ---
-weight: 4
-title: "SSO Authentication"
+weight: 5
+title: "SSO-Authentifizierung"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Configure Single Sign-On for self-hosted rtCloud using embedded Keycloak, an external OIDC provider, or Azure Active Directory."
+description: "Single Sign-On für selbst gehostetes rtCloud konfigurieren mit eingebettetem Keycloak, einem externen OIDC-Anbieter oder Azure Active Directory."
 ---
 
-rtCloud supports three approaches for Single Sign-On (SSO):
+rtCloud unterstützt drei Ansätze für Single Sign-On (SSO):
 
 | Option | Best For |
 |--------|----------|

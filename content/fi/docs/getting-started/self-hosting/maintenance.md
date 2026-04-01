@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 6
 title: "Ylläpito"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "build"
 toc: true
-description: "Itse isännöidyn rtCloud-instanssin päivittäinen ylläpito: päivittäminen, varmuuskopiointi, palauttaminen ja yleisten ongelmien vianmääritys."
+description: "Itse isännöidyn rtCloud-instanssin päivittäinen ylläpito: päivitykset, varmuuskopiot, palautus ja yleisten ongelmien vianmääritys."
 ---
 
 ## Yleiset komennot
 
-Käytä näitä komentoja säännöllisesti rtCloud-konttien hallintaan. Aja ne hakemistosta, joka sisältää `docker-compose.production.yml`:n.
+Käytä näitä komentoja säännöllisesti rtCloud-konttien hallintaan. Suorita ne `docker-compose.production.yml`-tiedoston sisältävästä hakemistosta.
 
 ```bash
-# Tarkista kaikkien konttien tila ja terveys
+# Check status and health of all containers
 docker compose -f docker-compose.production.yml ps
 
-# Tarkastele reaaliaikaisia lokeja (kaikki palvelut)
+# View live logs (all services)
 docker compose -f docker-compose.production.yml logs -f
 
-# Tarkastele vain sovelluksen lokeja
+# View logs for the app only
 docker compose -f docker-compose.production.yml logs -f rtcloud
 
-# Käynnistä yksittäinen kontti uudelleen
+# Restart a single container
 docker compose -f docker-compose.production.yml restart rtcloud
 
-# Pysäytä kaikki palvelut
+# Stop all services
 docker compose -f docker-compose.production.yml down
 
-# Käynnistä kaikki palvelut
+# Start all services
 docker compose -f docker-compose.production.yml up -d
 
-# Avaa komentotulkki sovelluskontissa
+# Open a shell inside the app container
 docker compose -f docker-compose.production.yml exec rtcloud bash
 ```
 
 ---
 
-## Päivittäminen
+## Upgrading
 
-rtCloud-päivitykset jaetaan uusina Docker-kuvatunnisteina. Päivittäminen hakee uusimman kuvan ja luo sovelluskonttin uudelleen. Tietokantamigraatiot ajetaan automaattisesti käynnistyksen yhteydessä.
+rtCloud updates are distributed as new Docker image tags. Upgrading pulls the latest image and recreates the app container. Database migrations run automatically on startup.
 
-**1. Hae uusin kuva:**
+**1. Pull the latest image:**
 
 ```bash
 docker compose -f docker-compose.production.yml pull
 ```
 
-**2. Luo sovelluskontit uudelleen:**
+**2. Recreate the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d
 ```
 
-Docker korvaa vain ne kontit, joiden kuva on muuttunut. MySQL-kontti ja kaikki nimetyt taltiot pysyvät muuttumattomina.
+Docker replaces only the containers whose image has changed. The MySQL container and all named volumes are unaffected.
 
-### Version kiinnittäminen
+### Pinning a Version
 
-Päivittääksesi tiettyyn versioon `latest`-version sijaan, päivitä `RTCLOUD_IMAGE` `.env`-tiedostossa:
+To upgrade to a specific version instead of `latest`, update `RTCLOUD_IMAGE` in `.env`:
 
 ```dotenv
 RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
 ```
 
-Sitten aja `docker compose pull` ja `up -d` kuten yllä.
+Then run `docker compose pull` and `up -d` as above.
 
-### Alentaminen
+### Downgrading
 
-Alentamista ei yleensä suositella, koska tietokantamigraatioita ei voi peruuttaa. Jos alentaminen on välttämätöntä, palauta ennen päivitystä otetusta tietokantavarmuuskopiosta.
+Downgrading is generally not recommended, as database migrations cannot be reversed. If a downgrade is necessary, restore from a database backup taken before the upgrade.
 
 ---
 
-## Varmuuskopiointi ja palauttaminen
+## Backup and Restore
 
-### Varmuuskopioi tietokanta
+### Backup the Database
 
-Aja tämä komento viedäksesi sovellustietokannan SQL-tiedostoon:
+Run this command to export the application database to a SQL file:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -85,9 +85,9 @@ docker compose -f docker-compose.production.yml exec mysql \
   > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-Varmuuskopiotiedosto kirjoitetaan nykyiseen hakemistoosi isännällä.
+The backup file is written to your current directory on the host.
 
-### Palauta tietokanta
+### Restore the Database
 
 ```bash
 docker compose -f docker-compose.production.yml exec -T mysql \
@@ -95,27 +95,27 @@ docker compose -f docker-compose.production.yml exec -T mysql \
   < backup-20240101-120000.sql
 ```
 
-### Varmuuskopioi ladatut tiedostot
+### Backup Uploaded Files
 
-Kyselyn lähetykset sisältävät usein ladattuja tiedostoja (kuvia, ääntä, asiakirjoja), jotka on tallennettu nimettyihin Docker-taltioihin. Varmuuskopioi ne erikseen tietokannasta:
+Survey submissions often include uploaded files (photos, audio, documents) stored in named Docker volumes. Back them up separately from the database:
 
 ```bash
-# Varmuuskopioi lataukset
+# Backup uploads
 docker run --rm \
   -v rtcloud_uploads:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
 
-# Varmuuskopioi ääninauhotteet
+# Backup audio recordings
 docker run --rm \
   -v rtcloud_audios:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/audios-$(date +%Y%m%d).tar.gz -C /data .
 ```
 
-Korvaa `rtcloud_uploads` ja `rtcloud_audios` todellisilla taltioiden nimillä (joiden etuliitteenä on `COMPOSE_PROJECT_NAME`), jos olet muuttanut oletusta.
+Replace `rtcloud_uploads` and `rtcloud_audios` with your actual volume names (prefixed by `COMPOSE_PROJECT_NAME`) if you changed the default.
 
-### Palauta ladatut tiedostot
+### Restore Uploaded Files
 
 ```bash
 docker run --rm \
@@ -124,12 +124,12 @@ docker run --rm \
   alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
 ```
 
-### Automaattiset päivittäiset varmuuskopiot
+### Automated Daily Backups
 
-Lisää cron-tehtävä isännälle ajamaan varmuuskopiot automaattisesti. Muokkaa root-crontabia komennolla `crontab -e`:
+Add a cron job on the host to run backups automatically. Edit the root crontab with `crontab -e`:
 
 ```cron
-# Päivittäinen tietokantavarmuuskopio klo 2:00, säilytä 30 päivän historia
+# Daily database backup at 2:00 AM, keep 30 days of history
 0 2 * * * cd /opt/rtcloud && docker compose -f docker-compose.production.yml exec -T mysql \
   mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
   > /backups/db-$(date +\%Y\%m\%d).sql && \
@@ -138,122 +138,122 @@ Lisää cron-tehtävä isännälle ajamaan varmuuskopiot automaattisesti. Muokka
 
 ---
 
-## Vianmääritys
+## Troubleshooting
 
-### Sovelluskontit ei käynnisty
+### App container not starting
 
-Tarkista kontin lokit virheilmoitusten varalta:
+Check the container logs for error messages:
 
 ```bash
 docker compose -f docker-compose.production.yml logs rtcloud
 ```
 
-Yleiset syyt:
-- Puuttuvat tai virheelliset ympäristömuuttujat `.env`-tiedostossa
-- MySQL ei ole vielä valmis (odota 60 sekuntia ja tarkista uudelleen)
-- Porttikonflikti — toinen prosessi käyttää jo `APP_PORT`-porttia
+Common causes:
+- Missing or invalid environment variables in `.env`
+- MySQL not yet ready (wait 60 seconds and check again)
+- Port conflict — another process is already using `APP_PORT`
 
-### MySQL ei ole terve
+### MySQL not healthy
 
 ```bash
 docker compose -f docker-compose.production.yml logs mysql
 ```
 
-Yleiset syyt:
-- `MYSQL_ROOT_PASSWORD` ei ole asetettu `.env`-tiedostossa
-- Vioittunut datataltio (harvinainen — tarkista levytila komennolla `df -h`)
+Common causes:
+- `MYSQL_ROOT_PASSWORD` not set in `.env`
+- Corrupted data volume (rare — check disk space with `df -h`)
 
-MySQL voi kestää 30–60 sekuntia alustuakseen ensimmäisellä käynnistyksellä. Odota ja tarkista uudelleen ennen kuin olettaa epäonnistumisen.
+MySQL can take 30–60 seconds to initialize on the very first boot. Wait and check again before assuming failure.
 
-### Portti on jo käytössä
+### Port already in use
 
-Muuta `APP_PORT` tai `SHINY_PORT` `.env`-tiedostossa vapaalle portille, sitten luo kontit uudelleen:
+Change `APP_PORT` or `SHINY_PORT` in `.env` to a free port, then recreate the containers:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate
 ```
 
-Selvittääksesi, mikä käyttää porttia isännällä:
+To find what is using a port on the host:
 
 ```bash
 lsof -i :8080
 ```
 
-### 400 CSRF-tunnusta ei voitu vahvistaa
+### 400 CSRF Token Could Not Be Verified
 
-Tämä virhe esiintyy paikallisissa tai käänteisenvälityspalvelimen ympäristöissä, joissa pyynnön alkuperä ei vastaa odotettua isäntää. Poista CSRF-vahvistus käytöstä vain paikallisessa kehityksessä:
+This error appears in local or reverse-proxy environments where the request origin does not match the expected host. Disable CSRF validation for local development only:
 
 ```dotenv
 CSRF_VALIDATION_ENABLED=false
 ```
 
-Sitten käynnistä sovellus uudelleen:
+Then restart the app:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-> Älä poista CSRF-vahvistusta käytöstä tuotannossa. Jos tämä virhe esiintyy tuotannossa, varmista, että käänteinen välityspalvelimesi välittää oikeat `Host`- ja `X-Forwarded-For`-otsikot.
+> Do not disable CSRF validation in production. If this error occurs in production, ensure your reverse proxy is forwarding the correct `Host` and `X-Forwarded-For` headers.
 
-### Järjestelmänvalvojan salasana unohtunut
+### Forgot the Admin Password
 
-Nollaa järjestelmänvalvojan salasana suoraan tietokannassa. Yhdistä MySQL-konttiin ja päivitä salasanan hash:
+Reset the admin password directly in the database. Connect to the MySQL container and update the password hash:
 
-**Vaihe 1** — Luo uusi salasanan hash. Korvaa `newpassword` haluamallasi salasanalla:
+**Step 1** — Generate the new password hash. Replace `newpassword` with your desired password:
 
 ```bash
 docker compose -f docker-compose.production.yml exec rtcloud php -r "
-  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\"\"));
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\""));
   echo md5(\$salt . 'newpassword') . PHP_EOL;
 "
 ```
 
-**Vaihe 2** — Päivitä hash tietokantaan:
+**Step 2** — Update the hash in the database:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
   mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
-  -e "UPDATE ss_user SET password='<hash_vaiheesta_1>' WHERE username='admin';"
+  -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
 ```
 
-### Kontti käynnistyy jatkuvasti uudelleen
+### Container keeps restarting
 
-Tarkista, epäonnistuuko terveystarkistus:
+Check if the health check is failing:
 
 ```bash
 docker compose -f docker-compose.production.yml ps
-docker inspect rtcloud-app --format '{{json .State.Health}}'
+docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
 ```
 
-Sovelluksen terveystarkistus kutsuu `/health`-päätepistettä. Jos se epäonnistuu toistuvasti, tarkista sovelluslokit käynnistysvirheiden varalta.
+The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.
 
-### Levy on täynnä
+### Disk space full
 
-Selvitä, mikä kuluttaa tilaa:
+Identify what is consuming space:
 
 ```bash
-# Tarkista isännän levyn käyttö
+# Check host disk usage
 df -h
 
-# Tarkista Dockerin levyn käyttö (kuvat, kontit, taltiot)
+# Check Docker disk usage (images, containers, volumes)
 docker system df
 
-# Poista käyttämättömät kuvat ja pysäytetyt kontit (turvallista ajaa)
+# Remove unused images and stopped containers (safe to run)
 docker system prune
 ```
 
-Älä käytä `docker system prune --volumes`, sillä se poistaa sovellustiedot.
+Do not use `docker system prune --volumes` as this will delete application data.
 
 ---
 
-## Terveystarkistukset
+## Health Checks
 
-Jokaisella palvelulla on automaattinen terveystarkistus. Kontin tila heijastaa tulosta:
+Each service has an automatic health check. Container status reflects the result:
 
-| Kontti | Tarkistusmenetelmä | Käynnistysaika | Intervalli |
+| Container | Check Method | Start Period | Interval |
 |-----------|-------------|-------------|----------|
-| `rtcloud-app` | HTTP GET `/health` | 90 sekuntia | 30 sekuntia |
-| `rtcloud-mysql` | `mysqladmin ping` | 30 sekuntia | 10 sekuntia |
-| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 sekuntia | 30 sekuntia |
+| `rtcloud-app` | HTTP GET `/health` | 90 seconds | 30 seconds |
+| `rtcloud-mysql` | `mysqladmin ping` | 30 seconds | 10 seconds |
+| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 seconds | 30 seconds |
 
-Kontit, joiden terveystarkistus epäonnistuu, käynnistetään automaattisesti uudelleen `RESTART_POLICY`-asetuksen mukaisesti (oletus: `unless-stopped`).
+Containers with a failing health check are automatically restarted according to the `RESTART_POLICY` setting (default: `unless-stopped`).

@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Wdrażaj rtCloud na instancji AWS EC2 przy użyciu skryptu user data aws-ec2.sh."
+description: "Wdróż rtCloud na instancji AWS EC2 za pomocą skryptu danych użytkownika aws-ec2.sh."
 ---
 
-Użyj `aws-ec2.sh` jako skryptu **User Data** podczas uruchamiania instancji EC2. Skrypt uruchamia się automatycznie przy pierwszym rozruchu.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Pobierz skrypt:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Krok 1 — Wypełnij konfigurację
+## Step 1 — Fill in the configuration
 
-Otwórz skrypt i edytuj blok `CONFIGURATION` na górze:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Wymagane ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Zmień po pierwszym logowaniu
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Domena + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Wbudowany Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Domyślnie ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Pole | Wymagane | Opis |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Tak | Używane jako nazwa bazy danych i ID klienta Keycloak. Małe litery, bez spacji. |
-| `ADMIN_PASSWORD` | Nie | Hasło administratora aplikacji i Keycloak. Domyślnie `admin` — **zmień po pierwszym logowaniu**. |
-| `DOMAIN` | Nie | Twoja domena dla HTTPS. Zostaw puste dla trybu tylko HTTP. |
-| `LETSENCRYPT_EMAIL` | Tak (jeśli ustawiono DOMAIN) | Email do powiadomień Let's Encrypt. |
-| `EMBED_KEYCLOAK` | Nie | `true`, aby wdrożyć wbudowany Keycloak (wymaga 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Bezpieczeństwo:** Wszystkie hasła domyślnie mają wartość `admin`. Zmień je natychmiast po pierwszym logowaniu.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Krok 2 — Uruchom instancję EC2
+## Step 2 — Launch an EC2 instance
 
-W [konsoli AWS EC2](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Kliknij **Launch instance**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Typ instancji:** `t3.medium` (4 GB RAM) lub większy
-4. **Para kluczy:** Wybierz lub utwórz dla dostępu SSH
-5. **Ustawienia sieci:** Utwórz lub wybierz grupę zabezpieczeń (zob. poniżej)
-6. **Szczegóły zaawansowane** → **Dane użytkownika** → wklej pełną zawartość skryptu
-7. Kliknij **Launch instance**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Krok 3 — Skonfiguruj grupę zabezpieczeń
+## Step 3 — Configure the Security Group
 
-Otwórz te porty w grupie zabezpieczeń instancji:
+Open these ports in the instance's Security Group:
 
-| Port | Protokół | Źródło | Cel |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | Twoje IP | Dostęp SSH |
-| 80 | TCP | 0.0.0.0/0 | HTTP (przekierowany do HTTPS przez Nginx) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Bezpośredni dostęp do Shiny |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **Nie** otwieraj portu 3306 (MySQL) — nigdy nie powinien być publicznie dostępny.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Krok 4 — Dodaj rekord DNS
+## Step 4 — Add the DNS record
 
-Podczas uruchamiania instancji dodaj **rekord A** u dostawcy DNS:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -88,7 +88,7 @@ TTL   : 300
 
 ---
 
-## Krok 5 — Monitoruj postęp
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Krok 6 — Dostęp do aplikacji
+## Step 6 — Access the app
 
-Po zakończeniu konfiguracji dziennik pokazuje podsumowanie z URL aplikacji i danymi uwierzytelniającymi. Zaloguj się używając nazwy użytkownika `admin` i hasła `admin`, a następnie natychmiast zmień hasło.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Po wdrożeniu
+## After Deployment
 
-### Zmień hasło
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Wyświetl wszystkie kontenery
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Przypisz Elastic IP (opcjonalnie)
+### Assign an Elastic IP (optional)
 
-Jeśli zatrzymasz i uruchomisz instancję, publiczne IP zmieni się. Aby zachować stabilne IP, przydziel **Elastic IP** i powiąż go z instancją w konsoli EC2.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

@@ -1,72 +1,72 @@
 ---
 weight: 4
-title: "Google Cloud（GCP）"
+title: "Google Cloud (GCP)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "travel_explore"
 toc: true
-description: "gcp-compute.shスタートアップスクリプトを使ってGoogle Cloud Compute EngineにrtCloudをデプロイする。"
+description: "gcp-compute.shスタートアップスクリプトを使用してGoogle Cloud Compute EngineにrtCloudをデプロイします。"
 ---
 
-Compute Engine VMインスタンスを作成する際に`gcp-compute.sh`を**スタートアップスクリプト**として使用します。スクリプトは初回起動時に自動的に実行されます。
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**スクリプトのダウンロード：** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## ステップ1 — 設定を入力する
+## Step 1 — Fill in the configuration
 
-スクリプトを開き、先頭の`CONFIGURATION`ブロックを編集する：
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- 必須 ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # 初回ログイン後変更すること
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- ドメイン + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- 組み込みKeycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ADMIN_PASSWORDにデフォルト設定
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| フィールド | 必須 | 説明 |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | はい | データベース名とKeycloakクライアントIDとして使用される。小文字、スペースなし。 |
-| `ADMIN_PASSWORD` | いいえ | アプリ管理者パスワードとKeycloak管理者パスワード。デフォルトは`admin` — **初回ログイン後すぐに変更すること**。 |
-| `DOMAIN` | いいえ | HTTPS用のドメイン。HTTPのみのモードには空白のまま。 |
-| `LETSENCRYPT_EMAIL` | はい（DOMAINが設定されている場合） | Let's Encrypt通知用メール。 |
-| `EMBED_KEYCLOAK` | いいえ | 組み込みKeycloakをデプロイするには`true`（4 GB RAMが必要）。 |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **セキュリティ：** すべてのパスワードはデフォルトで`admin`です。初回ログイン後すぐに変更してください。
-
----
-
-## ステップ2 — VMインスタンスを作成する
-
-[Google Cloudコンソール](https://console.cloud.google.com/compute)で：
-
-1. **インスタンスを作成**をクリックする
-2. **マシン設定：**
-   - シリーズ：`E2`
-   - マシンタイプ：`e2-medium`（4 GB RAM）以上
-3. **ブートディスク：**
-   - オペレーティングシステム：Ubuntu
-   - バージョン：Ubuntu 22.04 LTS
-   - サイズ：40 GB以上
-4. **ファイアウォール：** **HTTPトラフィックを許可**と**HTTPSトラフィックを許可**にチェックを入れる
-5. **詳細オプション** → **管理** → **自動化** → **スタートアップスクリプト** → スクリプト全体の内容を貼り付ける
-6. **作成**をクリックする
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## ステップ3 — DNSレコードを追加する
+## Step 2 — Create a VM instance
 
-VMが起動している間に、DNSプロバイダーに**Aレコード**を追加する：
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
+3. **Boot disk:**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
+
+---
+
+## Step 3 — Add the DNS record
+
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -75,19 +75,19 @@ Value : <vm-external-ip>
 TTL   : 300
 ```
 
-コンソールのVMインスタンスリストで外部IPを確認できます。
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## ステップ4 — 進捗を監視する
+## Step 4 — Monitor progress
 
-`gcloud` CLIを使用する：
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-または直接SSHする：
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## ステップ5 — アプリにアクセスする
+## Step 5 — Access the app
 
-セットアップが完了すると、ログにアプリのURLと認証情報のサマリーが表示されます。ユーザー名`admin`、パスワード`admin`でログインし、すぐにパスワードを変更してください。
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## ファイアウォールルール
+## Firewall Rules
 
-GCPの**HTTP/HTTPSを許可**チェックボックスでポート80と443が開きます。ポート3838でShinyへの直接アクセスも許可するには、ファイアウォールルールを追加する：
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-またはコンソールから追加する：**VPCネットワーク** → **ファイアウォール** → **ルールを作成**。
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> ポート3306（MySQL）は**開かないでください** — 公開アクセスは絶対に禁止です。
-
----
-
-## 静的IP（オプション）
-
-デフォルトでは、GCPはVM再起動時に変わるエフェメラル外部IPを割り当てます。安定したIPを保持するには：
-
-1. **VPCネットワーク** → **IPアドレス**に移動する
-2. **外部静的アドレスを予約**をクリックする
-3. VMインスタンスに割り当てる
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## デプロイ後
+## Static IP (optional)
 
-### パスワードを変更する
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### すべてのコンテナを確認する
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

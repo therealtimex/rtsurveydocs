@@ -7,84 +7,86 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Αναπτύξτε το rtCloud σε DigitalOcean Droplet χρησιμοποιώντας αυτοματοποιημένα σενάρια user-data."
+description: "Αναπτύξτε rtCloud σε DigitalOcean Droplet χρησιμοποιώντας αυτοματοποιημένα scripts δεδομένων χρήστη."
 ---
 
-Το DigitalOcean χρησιμοποιεί σενάρια **User Data** που εκτελούνται αυτόματα κατά την πρώτη εκκίνηση. Συμπληρώνετε τις μεταβλητές διαμόρφωσης στην κορυφή του σεναρίου, στη συνέχεια επικολλάτε ολόκληρο το σενάριο κατά τη δημιουργία ενός Droplet.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> Σε αντίθεση με τα StackScripts Linode, το DigitalOcean δεν έχει διεπαφή φόρμας — πρέπει να επεξεργαστείτε το σενάριο απευθείας πριν την επικόλληση.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**Λήψη σεναρίου:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Ενσωματωμένο Keycloak (Συνιστάται)
+## Embedded Keycloak (Recommended)
 
-Χρησιμοποιήστε το `digitalocean-droplet-keycloak-embed.sh` για την απλούστερη ρύθμιση με ενσωματωμένο SSO.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### Βήμα 1 — Συμπλήρωση της διαμόρφωσης
+### Step 1 — Fill in the configuration
 
-Ανοίξτε το σενάριο και επεξεργαστείτε το μπλοκ `CONFIGURATION` στην κορυφή:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Απαιτούμενα ---
-PROJECT_ID="rtsurvey"                  # Μοναδικό αναγνωριστικό για το έργο σας (χωρίς κενά)
-ADMIN_PASSWORD="admin"                 # Κωδικός για διαχειριστή εφαρμογής και Keycloak — αλλάξτε μετά την πρώτη σύνδεση
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
-# --- Τομέας + SSL ---
-DOMAIN="myapp.example.com"            # Ο τομέας σας — η εγγραφή DNS A πρέπει να δείχνει εδώ
-PROJECT_URL=""                         # Αφήστε κενό εκτός αν βρίσκεστε πίσω από Cloudflare/proxy
-LETSENCRYPT_EMAIL="admin@example.com" # Email για ειδοποιήσεις Let's Encrypt
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- Προαιρετικά ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Πεδίο | Απαιτείται | Περιγραφή |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Ναι | Χρησιμοποιείται ως όνομα βάσης δεδομένων και ID πελάτη Keycloak. Πεζά, χωρίς κενά. |
-| `ADMIN_PASSWORD` | Όχι | Κωδικός σύνδεσης διαχειριστή εφαρμογής και κονσόλας διαχείρισης Keycloak. Προεπιλογή `admin` — **αλλάξτε μετά την πρώτη σύνδεση**. |
-| `DOMAIN` | Ναι | Το όνομα τομέα σας. Η εγγραφή DNS A πρέπει να δείχνει στη διεύθυνση IP του Droplet. |
-| `LETSENCRYPT_EMAIL` | Ναι | Διεύθυνση email για ειδοποιήσεις πιστοποιητικού Let's Encrypt. |
-| `PROJECT_URL` | Όχι | Παράκαμψη δημόσιου URL. Αφήστε κενό για χρήση `DOMAIN`. Χρήσιμο πίσω από Cloudflare. |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **Ασφάλεια:** Όλοι οι κωδικοί ορίζονται σε `admin` από προεπιλογή. Αλλάξτε τους αμέσως μετά την πρώτη σύνδεση.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### Βήμα 2 — Δημιουργία Droplet
+### Step 2 — Create a Droplet
 
-Στον [πίνακα ελέγχου DigitalOcean](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Κάντε κλικ στο **Δημιουργία** → **Droplets**
-2. Επιλέξτε **Ubuntu 22.04 LTS** ως εικόνα
-3. Επιλέξτε **Basic, 4 GB RAM / 2 vCPUs** ή μεγαλύτερο
-4. Μεταβείτε στις **Επιλογές για προχωρημένους** → επιλέξτε **Προσθήκη σεναρίων αρχικοποίησης**
-5. Επικολλήστε το πλήρες περιεχόμενο σεναρίου στο πεδίο κειμένου
-6. Κάντε κλικ στο **Δημιουργία Droplet**
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### Βήμα 3 — Προσθήκη εγγραφής DNS
+### Step 3 — Add the DNS record
 
-Ενώ το Droplet εκκινεί, προσθέστε **εγγραφή A** στον πάροχο DNS σας:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
-Τύπος  : A
-Όνομα  : myapp          (ή @ για ριζικό τομέα)
-Τιμή   : <droplet-ip>
-TTL    : 300
+Type  : A
+Name  : myapp          (or @ for root domain)
+Value : <droplet-ip>
+TTL   : 300
 ```
 
-### Βήμα 4 — Παρακολούθηση προόδου
+### Step 4 — Monitor progress
 
-Συνδεθείτε μέσω SSH στο Droplet και παρακολουθήστε το αρχείο καταγραφής:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-### Βήμα 5 — Πρόσβαση στην εφαρμογή
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-Όταν η ρύθμιση ολοκληρωθεί, το αρχείο καταγραφής εμφανίζει σύνοψη:
+### Step 5 — Access the app
+
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
@@ -99,31 +101,33 @@ tail -f /var/log/rtcloud-setup.log
 ============================================================
 ```
 
-Ανοίξτε `https://myapp.example.com` στο πρόγραμμα περιήγησής σας και συνδεθείτε με όνομα χρήστη `admin` και κωδικό `admin`.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Αλλάξτε τον κωδικό σας** αμέσως μετά τη σύνδεση μέσω **Ρυθμίσεων** στο μενού επάνω δεξιά.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## Μετά την ανάπτυξη
+## After Deployment
 
-### Αλλαγή κωδικού
+### Change a password
 
-Συνδεθείτε μέσω SSH στο Droplet, επεξεργαστείτε το `.env` και επανεκκινήστε το επηρεαζόμενο κοντέινερ:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Ενημέρωση τομέα
+### Update the domain
+
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # ενημερώστε PROJECT_URL=
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Προβολή όλων των κοντέινερ
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

@@ -10,83 +10,83 @@ toc: true
 description: "Terapkan rtCloud di DigitalOcean Droplet menggunakan skrip user-data otomatis."
 ---
 
-DigitalOcean menggunakan skrip **User Data** yang berjalan otomatis pada booting pertama. Anda mengisi variabel konfigurasi di bagian atas skrip, lalu menempel seluruh skrip saat membuat Droplet.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> Tidak seperti StackScript Linode, DigitalOcean tidak memiliki UI formulir — Anda harus mengedit skrip secara langsung sebelum menempel.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**Unduh skrip:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Keycloak Tertanam (Direkomendasikan)
+## Embedded Keycloak (Recommended)
 
-Gunakan `digitalocean-droplet-keycloak-embed.sh` untuk pengaturan paling sederhana dengan SSO bawaan.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### Langkah 1 — Isi konfigurasi
+### Step 1 — Fill in the configuration
 
-Buka skrip dan edit blok `CONFIGURATION` di bagian atas:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Diperlukan ---
-PROJECT_ID="rtsurvey"                  # Pengidentifikasi unik untuk proyek Anda (tanpa spasi)
-ADMIN_PASSWORD="admin"                 # Kata sandi untuk admin aplikasi dan Keycloak — ubah setelah login pertama
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
 # --- Domain + SSL ---
-DOMAIN="myapp.example.com"            # Domain Anda — A record DNS harus mengarah ke sini
-PROJECT_URL=""                         # Biarkan kosong kecuali di belakang Cloudflare/proxy
-LETSENCRYPT_EMAIL="admin@example.com" # Email untuk notifikasi Let's Encrypt
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- Opsional ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Bidang | Diperlukan | Deskripsi |
-|--------|-----------|-----------|
-| `PROJECT_ID` | Ya | Digunakan sebagai nama database dan ID klien Keycloak. Huruf kecil, tanpa spasi. |
-| `ADMIN_PASSWORD` | Tidak | Kata sandi untuk login admin aplikasi dan konsol admin Keycloak. Default ke `admin` — **ubah setelah login pertama**. |
-| `DOMAIN` | Ya | Nama domain Anda. A record DNS harus mengarah ke IP Droplet. |
-| `LETSENCRYPT_EMAIL` | Ya | Alamat email untuk notifikasi sertifikat Let's Encrypt. |
-| `PROJECT_URL` | Tidak | Timpa URL publik. Biarkan kosong untuk menggunakan `DOMAIN`. Berguna di belakang Cloudflare. |
+| Field | Required | Description |
+|-------|----------|-------------|
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **Keamanan:** Semua kata sandi default ke `admin`. Ubah segera setelah login pertama Anda.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### Langkah 2 — Buat Droplet
+### Step 2 — Create a Droplet
 
-Di [panel kontrol DigitalOcean](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Klik **Create** → **Droplets**
-2. Pilih **Ubuntu 22.04 LTS** sebagai image
-3. Pilih **Basic, 4 GB RAM / 2 vCPU** atau lebih besar
-4. Gulir ke **Advanced Options** → centang **Add Initialization scripts**
-5. Tempel konten skrip lengkap ke area teks
-6. Klik **Create Droplet**
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### Langkah 3 — Tambahkan A record DNS
+### Step 3 — Add the DNS record
 
-Sementara Droplet melakukan booting, tambahkan **A record** di penyedia DNS Anda:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
-Name  : myapp          (atau @ untuk domain root)
+Name  : myapp          (or @ for root domain)
 Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Langkah 4 — Pantau kemajuan
+### Step 4 — Monitor progress
 
-SSH ke Droplet dan pantau log:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-Skrip mencetak IP server Anda di dekat awal — tambahkan A record DNS segera setelah Anda melihatnya.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### Langkah 5 — Akses aplikasi
+### Step 5 — Access the app
 
-Ketika pengaturan selesai, log menampilkan ringkasan:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
@@ -101,33 +101,33 @@ Ketika pengaturan selesai, log menampilkan ringkasan:
 ============================================================
 ```
 
-Buka `https://myapp.example.com` di browser Anda dan masuk dengan nama pengguna `admin` dan kata sandi `admin`.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Ubah kata sandi Anda** segera setelah login melalui **Pengaturan** di menu kanan atas.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## Setelah Penerapan
+## After Deployment
 
-### Ubah kata sandi
+### Change a password
 
-SSH ke Droplet, edit `.env`, dan restart container yang terpengaruh:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Perbarui domain
+### Update the domain
 
-Jika Anda menetapkan domain yang berbeda setelah penerapan, perbarui `PROJECT_URL` di `.env`:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # perbarui PROJECT_URL=
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Lihat semua container
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

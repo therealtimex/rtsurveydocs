@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Розгортайте rtCloud на екземплярі AWS EC2 за допомогою скрипту user data aws-ec2.sh."
+description: "Розгорніть rtCloud на екземплярі AWS EC2 за допомогою сценарію даних користувача aws-ec2.sh."
 ---
 
-Використовуйте `aws-ec2.sh` як скрипт **User Data** при запуску екземпляру EC2. Скрипт запускається автоматично при першому завантаженні.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Завантажити скрипт:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Крок 1 — Заповніть конфігурацію
+## Step 1 — Fill in the configuration
 
-Відкрийте скрипт та відредагуйте блок `CONFIGURATION` у верхній частині:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Обов'язково ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Змініть після першого входу
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Домен + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Вбудований Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # За замовчуванням ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Поле | Обов'язково | Опис |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Так | Використовується як назва бази даних та ідентифікатор клієнта Keycloak. Лише малі літери, без пробілів. |
-| `ADMIN_PASSWORD` | Ні | Пароль адміністратора застосунку та пароль адміністратора Keycloak. За замовчуванням `admin` — **змініть після першого входу**. |
-| `DOMAIN` | Ні | Ваш домен для HTTPS. Залиште порожнім для режиму лише HTTP. |
-| `LETSENCRYPT_EMAIL` | Так (якщо DOMAIN встановлено) | Email для сповіщень Let's Encrypt. |
-| `EMBED_KEYCLOAK` | Ні | `true` для розгортання вбудованого Keycloak (потребує 4 ГБ RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Безпека:** Усі паролі за замовчуванням `admin`. Змініть їх негайно після першого входу.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Крок 2 — Запустіть екземпляр EC2
+## Step 2 — Launch an EC2 instance
 
-У [консолі AWS EC2](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Натисніть **Launch instance**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Instance type:** `t3.medium` (4 ГБ RAM) або більший
-4. **Key pair:** Виберіть або створіть для доступу через SSH
-5. **Network settings:** Створіть або виберіть Security Group (дивіться нижче)
-6. **Advanced details** → **User data** → вставте повний вміст скрипту
-7. Натисніть **Launch instance**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Крок 3 — Налаштуйте Security Group
+## Step 3 — Configure the Security Group
 
-Відкрийте ці порти в Security Group екземпляру:
+Open these ports in the instance's Security Group:
 
-| Порт | Протокол | Джерело | Призначення |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | Ваш IP | Доступ через SSH |
-| 80 | TCP | 0.0.0.0/0 | HTTP (перенаправляється на HTTPS через Nginx) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Прямий доступ до Shiny |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **Не відкривайте** порт 3306 (MySQL) — він ніколи не повинен бути публічно доступним.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Крок 4 — Додайте DNS-запис
+## Step 4 — Add the DNS record
 
-Поки екземпляр завантажується, додайте **A-запис** у вашому постачальнику DNS:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -88,7 +88,7 @@ TTL   : 300
 
 ---
 
-## Крок 5 — Відстежуйте прогрес
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Крок 6 — Отримайте доступ до застосунку
+## Step 6 — Access the app
 
-Коли налаштування завершиться, журнал покаже підсумок з URL вашого застосунку та обліковими даними. Увійдіть з іменем користувача `admin` та паролем `admin`, потім негайно змініть свій пароль.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Після розгортання
+## After Deployment
 
-### Змінити пароль
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Переглянути всі контейнери
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Призначити Elastic IP (необов'язково)
+### Assign an Elastic IP (optional)
 
-Якщо ви зупиняєте та запускаєте екземпляр, публічний IP змінюється. Щоб зберегти стабільний IP, виділіть **Elastic IP** та зв'яжіть його з екземпляром у консолі EC2.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

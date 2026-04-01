@@ -7,66 +7,66 @@ draft: false
 author: "rtSurvey"
 icon: "travel_explore"
 toc: true
-description: "Розгортайте rtCloud на Google Cloud Compute Engine за допомогою стартового скрипту gcp-compute.sh."
+description: "Розгорніть rtCloud на Google Cloud Compute Engine за допомогою стартового сценарію gcp-compute.sh."
 ---
 
-Використовуйте `gcp-compute.sh` як **Startup script** при створенні екземпляру VM Compute Engine. Скрипт запускається автоматично при першому завантаженні.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**Завантажити скрипт:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## Крок 1 — Заповніть конфігурацію
+## Step 1 — Fill in the configuration
 
-Відкрийте скрипт та відредагуйте блок `CONFIGURATION` у верхній частині:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Обов'язково ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Змініть після першого входу
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Домен + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Вбудований Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # За замовчуванням ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Поле | Обов'язково | Опис |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Так | Використовується як назва бази даних та ідентифікатор клієнта Keycloak. Лише малі літери, без пробілів. |
-| `ADMIN_PASSWORD` | Ні | Пароль адміністратора застосунку та пароль адміністратора Keycloak. За замовчуванням `admin` — **змініть після першого входу**. |
-| `DOMAIN` | Ні | Ваш домен для HTTPS. Залиште порожнім для режиму лише HTTP. |
-| `LETSENCRYPT_EMAIL` | Так (якщо DOMAIN встановлено) | Email для сповіщень Let's Encrypt. |
-| `EMBED_KEYCLOAK` | Ні | `true` для розгортання вбудованого Keycloak (потребує 4 ГБ RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Безпека:** Усі паролі за замовчуванням `admin`. Змініть їх негайно після першого входу.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Крок 2 — Створіть екземпляр VM
+## Step 2 — Create a VM instance
 
-У [Google Cloud Console](https://console.cloud.google.com/compute):
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
 
-1. Натисніть **Create instance**
+1. Click **Create instance**
 2. **Machine configuration:**
-   - Серія: `E2`
-   - Тип машини: `e2-medium` (4 ГБ RAM) або більший
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
 3. **Boot disk:**
-   - Операційна система: Ubuntu
-   - Версія: Ubuntu 22.04 LTS
-   - Розмір: 40 ГБ або більше
-4. **Firewall:** відмітьте **Allow HTTP traffic** та **Allow HTTPS traffic**
-5. **Advanced options** → **Management** → **Automation** → **Startup script** → вставте повний вміст скрипту
-6. Натисніть **Create**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
 
 ---
 
-## Крок 3 — Додайте DNS-запис
+## Step 3 — Add the DNS record
 
-Поки VM завантажується, додайте **A-запис** у вашому постачальнику DNS:
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -75,19 +75,19 @@ Value : <vm-external-ip>
 TTL   : 300
 ```
 
-Знайдіть зовнішній IP у списку екземплярів VM у консолі.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## Крок 4 — Відстежуйте прогрес
+## Step 4 — Monitor progress
 
-За допомогою CLI `gcloud`:
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-Або підключіться через SSH безпосередньо:
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Крок 5 — Отримайте доступ до застосунку
+## Step 5 — Access the app
 
-Коли налаштування завершиться, журнал покаже підсумок з URL вашого застосунку та обліковими даними. Увійдіть з іменем користувача `admin` та паролем `admin`, потім негайно змініть свій пароль.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Правила брандмауера
+## Firewall Rules
 
-Прапорці GCP **Allow HTTP/HTTPS** відкривають порти 80 та 443. Щоб також дозволити прямий доступ до Shiny на порту 3838, додайте правило брандмауера:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-Або додайте через консоль: **VPC Network** → **Firewall** → **Create rule**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> **Не відкривайте** порт 3306 (MySQL) — він ніколи не повинен бути публічно доступним.
-
----
-
-## Статичний IP (необов'язково)
-
-За замовчуванням GCP призначає ефемерний зовнішній IP, що змінюється при перезапуску VM. Щоб зберегти стабільний IP:
-
-1. Перейдіть до **VPC Network** → **IP addresses**
-2. Натисніть **Reserve external static address**
-3. Призначте його вашому екземпляру VM
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Після розгортання
+## Static IP (optional)
 
-### Змінити пароль
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Переглянути всі контейнери
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Primeiro início de sessão"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Como iniciar sessão na sua instância rtSurvey pela primeira vez após a implementação."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **O SSL tem de ser configurado antes de iniciar sessão.** Se aceder à aplicação via HTTP, verá um aviso de segurança e o SSO será bloqueado. Complete primeiro a [Configuração de SSL](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Depois de o SSL estar ativo, abra o seu browser no URL HTTPS:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## O ecrã de início de sessão
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+A página de início de sessão mostra:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
+- Campos de **Nome de utilizador** e **Palavra-passe**
+- Um botão **Iniciar sessão**
+- Um botão **Iniciar sessão com SSO** (abaixo de um separador) — para membros da equipa com contas SSO
 
 ---
 
-## Default admin credentials
+## Credenciais de administrador predefinidas
 
-Enter the default credentials and click **Sign In**:
+Introduza as credenciais predefinidas e clique em **Iniciar sessão**:
 
-| Field | Value |
+| Campo | Valor |
 |-------|-------|
-| Username | `admin` |
-| Password | `admin` |
+| Nome de utilizador | `admin` |
+| Palavra-passe | `admin` |
 
-> **Change your password immediately after your first login.**
+> **Altere a sua palavra-passe imediatamente após o primeiro início de sessão.**
 
 ---
 
-## If you see a security warning
+## Se vir um aviso de segurança
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Se aceder à aplicação via HTTP (antes de o SSL estar configurado), verá:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+- Um banner de aviso amarelo no topo da página de início de sessão
+- Um modal ao clicar em **Iniciar sessão**, avisando que as credenciais serão enviadas sem encriptação
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Clique em **Configurar SSL** para configurar HTTPS, ou em **Continuar mesmo assim** para iniciar sessão sem SSL (não recomendado).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+O início de sessão SSO está completamente bloqueado via HTTP — clicar em **Iniciar sessão com SSO** mostrará um aviso em vez de redirecionar.
 
 ---
 
-## After logging in
+## Após o início de sessão
 
-Once inside, you will land on the dashboard. From here:
+Depois de entrar, chegará ao painel de controlo. Daqui:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Alterar a palavra-passe do administrador** — definições de conta → alterar palavra-passe
+2. **Criar o primeiro projeto** — Projetos → Novo projeto
+3. **Carregar ou criar um formulário** — Formulários → Carregar XLSForm ou abrir Form Builder
+4. **Adicionar utilizadores** — Utilizadores → Convidar ou criar contas para a sua equipa

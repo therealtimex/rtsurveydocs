@@ -7,7 +7,7 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Deploy rtCloud on Linode using a StackScript. No configuration needed — just create the server and follow the post-deployment steps."
+description: "ដំឡើង rtCloud នៅ Linode ដោយប្រើ StackScript។ មិនត្រូវការការកំណត់រចនាសម្ព័ន្ធ — គ្រាន់តែបង្កើតម៉ាស៊ីនបម្រើ ហើយធ្វើតាមជំហានក្រោយការដំឡើង។"
 ---
 
 ## Step 1 — Launch the StackScript

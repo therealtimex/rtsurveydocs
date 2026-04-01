@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 6
 title: "Priežiūra"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "build"
 toc: true
-description: "Kasdienė savarankiškai valdomos rtCloud instancijos priežiūra: atnaujinimas, atsarginių kopijų kūrimas, atkūrimas ir įprastų problemų šalinimas."
+description: "Kasdienė savastiškai patalpinto rtCloud egzemplioriaus priežiūra: naujinimai, atsarginės kopijos, atkūrimas ir bendrų problemų šalinimas."
 ---
 
-## Dažniausiai naudojamos komandos
+## Dažniausios komandos
 
-Reguliariai naudokite šias komandas savo rtCloud konteineriams valdyti. Paleiskite jas iš katalogo, kuriame yra `docker-compose.production.yml`.
+Naudokite šias komandas reguliariai rtCloud konteinerių valdymui. Vykdykite jas iš katalogo, kuriame yra `docker-compose.production.yml`.
 
 ```bash
-# Patikrinkite visų konteinerių būseną ir sveikatą
+# Check status and health of all containers
 docker compose -f docker-compose.production.yml ps
 
-# Peržiūrėkite gyvus žurnalus (visos paslaugos)
+# View live logs (all services)
 docker compose -f docker-compose.production.yml logs -f
 
-# Peržiūrėkite tik programos žurnalus
+# View logs for the app only
 docker compose -f docker-compose.production.yml logs -f rtcloud
 
-# Iš naujo paleiskite vieną konteinerį
+# Restart a single container
 docker compose -f docker-compose.production.yml restart rtcloud
 
-# Sustabdykite visas paslaugas
+# Stop all services
 docker compose -f docker-compose.production.yml down
 
-# Paleiskite visas paslaugas
+# Start all services
 docker compose -f docker-compose.production.yml up -d
 
-# Atidarykite apvalkalą programos konteinerio viduje
+# Open a shell inside the app container
 docker compose -f docker-compose.production.yml exec rtcloud bash
 ```
 
 ---
 
-## Atnaujinimas
+## Upgrading
 
-rtCloud atnaujinimai platinami kaip naujos Docker vaizdo žymos. Atnaujinant ištraukiamas naujausias vaizdas ir iš naujo sukuriamas programos konteineris. Duomenų bazės migracijos paleidžiamos automatiškai paleidžiant.
+rtCloud updates are distributed as new Docker image tags. Upgrading pulls the latest image and recreates the app container. Database migrations run automatically on startup.
 
-**1. Ištraukite naujausią vaizdą:**
+**1. Pull the latest image:**
 
 ```bash
 docker compose -f docker-compose.production.yml pull
 ```
 
-**2. Iš naujo sukurkite programos konteinerį:**
+**2. Recreate the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d
 ```
 
-Docker pakeičia tik tuos konteinerius, kurių vaizdas pasikeitė. MySQL konteineris ir visi pavadinti tomai nepaliekami.
+Docker replaces only the containers whose image has changed. The MySQL container and all named volumes are unaffected.
 
-### Versijos fiksavimas
+### Pinning a Version
 
-Norėdami atnaujinti į konkrečią versiją, o ne į `latest`, atnaujinkite `RTCLOUD_IMAGE` `.env` faile:
+To upgrade to a specific version instead of `latest`, update `RTCLOUD_IMAGE` in `.env`:
 
 ```dotenv
 RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
 ```
 
-Tada paleiskite `docker compose pull` ir `up -d` kaip nurodyta aukščiau.
+Then run `docker compose pull` and `up -d` as above.
 
-### Versijos grąžinimas
+### Downgrading
 
-Paprastai versijos grąžinimas nerekomenduojamas, nes duomenų bazės migracijų negalima atšaukti. Jei versijos grąžinimas būtinas, atkurkite iš prieš atnaujinimą sukurtos duomenų bazės atsarginės kopijos.
+Downgrading is generally not recommended, as database migrations cannot be reversed. If a downgrade is necessary, restore from a database backup taken before the upgrade.
 
 ---
 
-## Atsarginių kopijų kūrimas ir atkūrimas
+## Backup and Restore
 
-### Duomenų bazės atsarginė kopija
+### Backup the Database
 
-Paleiskite šią komandą, kad eksportuotumėte programos duomenų bazę į SQL failą:
+Run this command to export the application database to a SQL file:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -85,9 +85,9 @@ docker compose -f docker-compose.production.yml exec mysql \
   > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-Atsarginės kopijos failas įrašomas į jūsų dabartinį katalogą pagrindiniame kompiuteryje.
+The backup file is written to your current directory on the host.
 
-### Duomenų bazės atkūrimas
+### Restore the Database
 
 ```bash
 docker compose -f docker-compose.production.yml exec -T mysql \
@@ -95,27 +95,27 @@ docker compose -f docker-compose.production.yml exec -T mysql \
   < backup-20240101-120000.sql
 ```
 
-### Įkeltų failų atsarginė kopija
+### Backup Uploaded Files
 
-Apklausos pateikimuose dažnai yra įkeltų failų (nuotraukų, garso, dokumentų), saugomų pavadintuose Docker tomuose. Kurkite jų atsargines kopijas atskirai nuo duomenų bazės:
+Survey submissions often include uploaded files (photos, audio, documents) stored in named Docker volumes. Back them up separately from the database:
 
 ```bash
-# Įkėlimų atsarginė kopija
+# Backup uploads
 docker run --rm \
   -v rtcloud_uploads:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
 
-# Garso įrašų atsarginė kopija
+# Backup audio recordings
 docker run --rm \
   -v rtcloud_audios:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/audios-$(date +%Y%m%d).tar.gz -C /data .
 ```
 
-Pakeiskite `rtcloud_uploads` ir `rtcloud_audios` tikrais tomų pavadinimais (su `COMPOSE_PROJECT_NAME` priešdėliu), jei pakeitėte numatytąjį.
+Replace `rtcloud_uploads` and `rtcloud_audios` with your actual volume names (prefixed by `COMPOSE_PROJECT_NAME`) if you changed the default.
 
-### Įkeltų failų atkūrimas
+### Restore Uploaded Files
 
 ```bash
 docker run --rm \
@@ -124,12 +124,12 @@ docker run --rm \
   alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
 ```
 
-### Automatizuotos kasdienės atsarginės kopijos
+### Automated Daily Backups
 
-Pridėkite cron užduotį pagrindiniame kompiuteryje, kad atsarginės kopijos būtų kuriamos automatiškai. Redaguokite root crontab naudodami `crontab -e`:
+Add a cron job on the host to run backups automatically. Edit the root crontab with `crontab -e`:
 
 ```cron
-# Kasdienė duomenų bazės atsarginė kopija 2:00, saugokite 30 dienų istoriją
+# Daily database backup at 2:00 AM, keep 30 days of history
 0 2 * * * cd /opt/rtcloud && docker compose -f docker-compose.production.yml exec -T mysql \
   mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
   > /backups/db-$(date +\%Y\%m\%d).sql && \
@@ -138,77 +138,77 @@ Pridėkite cron užduotį pagrindiniame kompiuteryje, kad atsarginės kopijos b�
 
 ---
 
-## Trikčių šalinimas
+## Troubleshooting
 
-### Programos konteineris nepaleidžiamas
+### App container not starting
 
-Patikrinkite konteinerio žurnalus dėl klaidų pranešimų:
+Check the container logs for error messages:
 
 ```bash
 docker compose -f docker-compose.production.yml logs rtcloud
 ```
 
-Dažniausios priežastys:
-- Trūkstami arba neteisingi aplinkos kintamieji `.env` faile
-- MySQL dar nepasiruošęs (palaukite 60 sekundžių ir patikrinkite vėl)
-- Prievado konfliktas – kitas procesas jau naudoja `APP_PORT`
+Common causes:
+- Missing or invalid environment variables in `.env`
+- MySQL not yet ready (wait 60 seconds and check again)
+- Port conflict — another process is already using `APP_PORT`
 
-### MySQL nesveika
+### MySQL not healthy
 
 ```bash
 docker compose -f docker-compose.production.yml logs mysql
 ```
 
-Dažniausios priežastys:
-- `.env` faile nenustatytas `MYSQL_ROOT_PASSWORD`
-- Sugadintas duomenų tomas (retai – patikrinkite disko vietą su `df -h`)
+Common causes:
+- `MYSQL_ROOT_PASSWORD` not set in `.env`
+- Corrupted data volume (rare — check disk space with `df -h`)
 
-MySQL pirmą kartą paleidžiant gali užtrukti 30–60 sekundžių inicializuotis. Palaukite ir patikrinkite vėl prieš dariuosi išvadą, kad nepavyko.
+MySQL can take 30–60 seconds to initialize on the very first boot. Wait and check again before assuming failure.
 
-### Prievadas jau naudojamas
+### Port already in use
 
-Pakeiskite `APP_PORT` arba `SHINY_PORT` `.env` faile į laisvą prievadą, tada iš naujo sukurkite konteinerius:
+Change `APP_PORT` or `SHINY_PORT` in `.env` to a free port, then recreate the containers:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate
 ```
 
-Norėdami sužinoti, kas naudoja prievadą pagrindiniame kompiuteryje:
+To find what is using a port on the host:
 
 ```bash
 lsof -i :8080
 ```
 
-### 400 CSRF žetonas negalėjo būti patikrintas
+### 400 CSRF Token Could Not Be Verified
 
-Ši klaida rodoma vietinėje arba atvirkštinio tarpinio serverio aplinkoje, kur užklausos kilmė neatitinka tikėtamo pagrindinio kompiuterio. Išjunkite CSRF tikrinimą tik vietiniam kūrimui:
+This error appears in local or reverse-proxy environments where the request origin does not match the expected host. Disable CSRF validation for local development only:
 
 ```dotenv
 CSRF_VALIDATION_ENABLED=false
 ```
 
-Tada iš naujo paleiskite programą:
+Then restart the app:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-> Gamyboje neišjunkite CSRF tikrinimo. Jei ši klaida kyla gamyboje, įsitikinkite, kad jūsų atvirkštinis tarpinis serveris persiunčia teisingus `Host` ir `X-Forwarded-For` antraščius.
+> Do not disable CSRF validation in production. If this error occurs in production, ensure your reverse proxy is forwarding the correct `Host` and `X-Forwarded-For` headers.
 
-### Pamirštas administratoriaus slaptažodis
+### Forgot the Admin Password
 
-Iš naujo nustatykite administratoriaus slaptažodį tiesiogiai duomenų bazėje. Prisijunkite prie MySQL konteinerio ir atnaujinkite slaptažodžio maišą:
+Reset the admin password directly in the database. Connect to the MySQL container and update the password hash:
 
-**1 žingsnis** – sugeneruokite naują slaptažodžio maišą. Pakeiskite `newpassword` pageidaujamu slaptažodžiu:
+**Step 1** — Generate the new password hash. Replace `newpassword` with your desired password:
 
 ```bash
 docker compose -f docker-compose.production.yml exec rtcloud php -r "
-  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\"\"));
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\""));
   echo md5(\$salt . 'newpassword') . PHP_EOL;
 "
 ```
 
-**2 žingsnis** – atnaujinkite maišą duomenų bazėje:
+**Step 2** — Update the hash in the database:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -216,44 +216,44 @@ docker compose -f docker-compose.production.yml exec mysql \
   -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
 ```
 
-### Konteineris nuolat paleidžiamas iš naujo
+### Container keeps restarting
 
-Patikrinkite, ar nepavyksta sveikatos tikrinimas:
+Check if the health check is failing:
 
 ```bash
 docker compose -f docker-compose.production.yml ps
-docker inspect rtcloud-app --format '{{json .State.Health}}'
+docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
 ```
 
-Programos sveikatos tikrinimas iškviečia `/health` galinio taško. Jei jis nuolat nepavyksta, patikrinkite programos žurnalus dėl paleidimo klaidų.
+The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.
 
-### Disko vieta baigėsi
+### Disk space full
 
-Nustatykite, kas sunaudoja vietą:
+Identify what is consuming space:
 
 ```bash
-# Patikrinkite pagrindinio kompiuterio disko naudojimą
+# Check host disk usage
 df -h
 
-# Patikrinkite Docker disko naudojimą (vaizdai, konteineriai, tomai)
+# Check Docker disk usage (images, containers, volumes)
 docker system df
 
-# Pašalinkite nenaudojamus vaizdus ir sustabdytus konteinerius (saugu vykdyti)
+# Remove unused images and stopped containers (safe to run)
 docker system prune
 ```
 
-Nenaudokite `docker system prune --volumes`, nes tai ištrins programos duomenis.
+Do not use `docker system prune --volumes` as this will delete application data.
 
 ---
 
-## Sveikatos tikrinimai
+## Health Checks
 
-Kiekviena paslauga turi automatinį sveikatos tikrinimą. Konteinerio būsena atspindi rezultatą:
+Each service has an automatic health check. Container status reflects the result:
 
-| Konteineris | Tikrinimo metodas | Pradžios laikotarpis | Intervalas |
+| Container | Check Method | Start Period | Interval |
 |-----------|-------------|-------------|----------|
-| `rtcloud-app` | HTTP GET `/health` | 90 sekundžių | 30 sekundžių |
-| `rtcloud-mysql` | `mysqladmin ping` | 30 sekundžių | 10 sekundžių |
-| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 sekundžių | 30 sekundžių |
+| `rtcloud-app` | HTTP GET `/health` | 90 seconds | 30 seconds |
+| `rtcloud-mysql` | `mysqladmin ping` | 30 seconds | 10 seconds |
+| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 seconds | 30 seconds |
 
-Konteineriai su nepavykusiu sveikatos tikrinimu automatiškai paleidžiami iš naujo pagal `RESTART_POLICY` nustatymą (numatytasis: `unless-stopped`).
+Containers with a failing health check are automatically restarted according to the `RESTART_POLICY` setting (default: `unless-stopped`).

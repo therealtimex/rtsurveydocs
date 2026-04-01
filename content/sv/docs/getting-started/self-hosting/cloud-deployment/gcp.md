@@ -10,101 +10,101 @@ toc: true
 description: "Driftsätt rtCloud på Google Cloud Compute Engine med startskriptet gcp-compute.sh."
 ---
 
-Använd `gcp-compute.sh` som **Startskript** när du skapar en Compute Engine VM-instans. Skriptet körs automatiskt vid första starten.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**Ladda ned skript:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## Steg 1 — Fyll i konfigurationen
+## Step 1 — Fill in the configuration
 
-Öppna skriptet och redigera `CONFIGURATION`-blocket överst:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Obligatoriskt ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Ändra efter första inloggningen
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Domän + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Inbäddad Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Standardvärdet är ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Fält | Obligatoriskt | Beskrivning |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Ja | Används som databasnamn och Keycloak-klient-ID. Gemener, inga mellanslag. |
-| `ADMIN_PASSWORD` | Nej | Appens adminlösenord och Keycloak-adminlösenord. Standardvärde är `admin` — **ändra efter första inloggningen**. |
-| `DOMAIN` | Nej | Din domän för HTTPS. Lämna tomt för HTTP-only-läge. |
-| `LETSENCRYPT_EMAIL` | Ja (om DOMAIN anges) | E-post för Let's Encrypt-aviseringar. |
-| `EMBED_KEYCLOAK` | Nej | `true` för att driftsätta inbäddad Keycloak (kräver 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Säkerhet:** Alla lösenord har standardvärdet `admin`. Ändra dem omedelbart efter din första inloggning.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Steg 2 — Skapa en VM-instans
+## Step 2 — Create a VM instance
 
-I [Google Cloud Console](https://console.cloud.google.com/compute):
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
 
-1. Klicka på **Skapa instans**
-2. **Maskinkonfiguration:**
-   - Serie: `E2`
-   - Maskintyp: `e2-medium` (4 GB RAM) eller större
-3. **Startdisk:**
-   - Operativsystem: Ubuntu
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
+3. **Boot disk:**
+   - Operating system: Ubuntu
    - Version: Ubuntu 22.04 LTS
-   - Storlek: 40 GB eller mer
-4. **Brandvägg:** markera **Tillåt HTTP-trafik** och **Tillåt HTTPS-trafik**
-5. **Avancerade alternativ** → **Hantering** → **Automatisering** → **Startskript** → klistra in hela skriptinnehållet
-6. Klicka på **Skapa**
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
 
 ---
 
-## Steg 3 — Lägg till DNS-posten
+## Step 3 — Add the DNS record
 
-Medan VM:n startar, lägg till en **A-post** hos din DNS-leverantör:
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
-Typ  : A
-Namn : myapp
-Värde: <vm-extern-ip>
-TTL  : 300
+Type  : A
+Name  : myapp
+Value : <vm-external-ip>
+TTL   : 300
 ```
 
-Hitta den externa IP:n i listan över VM-instanser i konsolen.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## Steg 4 — Övervaka förloppet
+## Step 4 — Monitor progress
 
-Med `gcloud` CLI:
+Using the `gcloud` CLI:
 
 ```bash
-gcloud compute ssh <instansnamn> -- tail -f /var/log/rtcloud-setup.log
+gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-Eller SSH direkt:
+Or SSH directly:
 
 ```bash
-ssh <användarnamn>@<vm-extern-ip>
+ssh <username>@<vm-external-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
 ---
 
-## Steg 5 — Öppna appen
+## Step 5 — Access the app
 
-När konfigurationen är klar visar loggen en sammanfattning med din app-URL och inloggningsuppgifter. Logga in med användarnamnet `admin` och lösenordet `admin`, och ändra sedan ditt lösenord omedelbart.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Brandväggsregler
+## Firewall Rules
 
-GCPs **Tillåt HTTP/HTTPS**-kryssrutor öppnar portarna 80 och 443. För att även tillåta direkt Shiny-åtkomst på port 3838, lägg till en brandväggsregel:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-Eller lägg till den via konsolen: **VPC-nätverk** → **Brandvägg** → **Skapa regel**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> Öppna **inte** port 3306 (MySQL) — den ska aldrig vara offentligt tillgänglig.
-
----
-
-## Statisk IP (valfritt)
-
-Som standard tilldelar GCP en tillfällig extern IP som ändras vid VM-omstart. För att behålla en stabil IP:
-
-1. Gå till **VPC-nätverk** → **IP-adresser**
-2. Klicka på **Reservera extern statisk adress**
-3. Tilldela den till din VM-instans
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Efter driftsättning
+## Static IP (optional)
 
-### Ändra ett lösenord
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Visa alla containrar
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

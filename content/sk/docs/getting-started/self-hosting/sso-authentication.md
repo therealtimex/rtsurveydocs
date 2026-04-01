@@ -1,5 +1,5 @@
 ---
-weight: 4
+weight: 5
 title: "SSO autentifikácia"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,167 +7,167 @@ draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Konfigurácia Single Sign-On pre vlastný hosting rtCloud pomocou vstavaného Keycloak, externého poskytovateľa OIDC alebo Azure Active Directory."
+description: "Nakonfigurujte Single Sign-On pre self-hosted rtCloud pomocou vstavaného Keycloak, externého poskytovateľa OIDC alebo Azure Active Directory."
 ---
 
-rtCloud podporuje tri prístupy pre Single Sign-On (SSO):
+rtCloud podporuje tri prístupy k jednotnému prihláseniu (SSO):
 
-| Možnosť | Najvhodnejšie pre |
+| Option | Best For |
 |--------|----------|
-| [Vstavaný Keycloak](#embedded-keycloak) | Organizácie, ktoré chcú plne samostatný server SSO bundlovaný s rtCloud |
-| [Externý poskytovateľ OIDC](#external-oidc-provider) | Organizácie, ktoré už prevádzkujú poskytovateľa identity (Auth0, Authentik, Okta, Supabase atď.) |
-| [Azure Active Directory](#azure-active-directory) | Organizácie používajúce Microsoft 365 alebo Azure AD |
+| [Embedded Keycloak](#embedded-keycloak) | Organizations that want a fully self-contained SSO server bundled with rtCloud |
+| [External OIDC Provider](#external-oidc-provider) | Organizations already running an identity provider (Auth0, Authentik, Okta, Supabase, etc.) |
+| [Azure Active Directory](#azure-active-directory) | Organizations using Microsoft 365 or Azure AD |
 
-Bez nakonfigurovaného SSO sa používatelia prihlasujú pomocou lokálnych účtov rtCloud spravovaných cez administrátorský panel.
+Without SSO configured, users log in with local rtCloud accounts managed through the admin panel.
 
 ---
 
-## Vstavaný Keycloak
+## Embedded Keycloak
 
-Nasadenie obsahuje voliteľný kontajner Keycloak, ktorý beží vedľa rtCloud. Keycloak je vopred nakonfigurovaný s realmom rtSurvey a pripravený na použitie.
+The deployment includes an optional Keycloak container that runs alongside rtCloud. Keycloak is pre-configured with an rtSurvey realm and ready to use.
 
-### Požiadavky
+### Requirements
 
-- Doménové meno s HTTPS (Keycloak vyžaduje HTTPS v produkcii)
-- Aspoň 4 GB RAM na serveri (Keycloak pridáva ~512 MB využitia pamäte)
+- A domain name with HTTPS (Keycloak requires HTTPS in production)
+- At least 4 GB RAM on the server (Keycloak adds ~512 MB memory usage)
 
-### Nastavenie
+### Setup
 
-**1. Nakonfigurujte premenné prostredia v `.env`:**
+**1. Configure environment variables in `.env`:**
 
 ```dotenv
-# Aktivovanie vstavaného kontajnera Keycloak
+# Enable the embedded Keycloak container
 EMBED_KEYCLOAK=true
 
-# URL Keycloak — použite vašu skutočnú doménu
+# Keycloak URLs — use your actual domain
 KEYCLOAK_URL=https://rtcloud.example.com/auth
 KC_HOSTNAME=https://rtcloud.example.com/auth
 KC_HOSTNAME_STRICT=false
 
-# Nastavenia realmu a klienta (zodpovedajú importovanému JSON realmu)
+# Realm and client settings (match the imported realm JSON)
 KEYCLOAK_REALM=rtsurvey
 KEYCLOAK_CLIENT_ID=rtsurvey-app
 KEYCLOAK_CLIENT_SECRET=your-client-secret-here
 
-# Prihlasovacie údaje správcu Keycloak
+# Keycloak admin credentials
 KEYCLOAK_ADMIN_USER=admin
 KEYCLOAK_ADMIN_PASSWORD=change_me_keycloak_admin_password
 
-# Databáza Keycloak (vytvorí sa automaticky)
+# Keycloak database (created automatically)
 KEYCLOAK_DB=keycloak
 KEYCLOAK_DB_USER=keycloak
 KEYCLOAK_DB_PASSWORD=change_me_keycloak_db_password
 
-# Port, na ktorom počúva Keycloak (na strane hostiteľa, proxované Nginx)
+# Port Keycloak listens on (host-side, proxied by Nginx)
 KEYCLOAK_PORT=8091
 ```
 
-**2. Spustite s profilom vstavaného Keycloak:**
+**2. Start with the embedded Keycloak profile:**
 
 ```bash
 docker compose -f docker-compose.production.yml --profile embed-keycloak up -d
 ```
 
-**3. Overte, že Keycloak je zdravý:**
+**3. Verify Keycloak is healthy:**
 
 ```bash
 docker compose -f docker-compose.production.yml ps
 ```
 
-Kontajner `rtcloud-keycloak` by mal po 2–3 minútach zobrazovať `Up (healthy)`.
+The `rtcloud-keycloak` container should show `Up (healthy)` after 2–3 minutes.
 
-**4. Prístup k administrátorskej konzole Keycloak:**
+**4. Access the Keycloak admin console:**
 
 ```
 https://rtcloud.example.com/auth/admin
 ```
 
-Prihláste sa s `KEYCLOAK_ADMIN_USER` a `KEYCLOAK_ADMIN_PASSWORD`.
+Log in with `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD`.
 
-### Čo je vopred nakonfigurované
+### What Is Pre-Configured
 
-Vstavaný Keycloak sa spúšťa s vopred importovaným realmom `rtsurvey`, ktorý zahŕňa:
+The embedded Keycloak starts with a pre-imported `rtsurvey` realm that includes:
 
-- Konfiguráciu klienta pre webovú aplikáciu
-- Predvolené role používateľov (`admin`, `project_manager`, `enumerator`, `analyst`)
-- Nastavenia relácie a tokenu optimalizované pre rtSurvey
+- Client configuration for the web application
+- Default user roles (`admin`, `project_manager`, `enumerator`, `analyst`)
+- Session and token settings optimized for rtSurvey
 
-Používateľov môžete pridávať priamo v administrátorskej konzole Keycloak alebo pripojiť Keycloak k upstream poskytovateľovi identity (LDAP, SAML).
+You can add users directly in the Keycloak admin console or connect Keycloak to an upstream identity provider (LDAP, SAML).
 
-### Smerovanie Nginx
+### Nginx Routing
 
-Pri použití skriptov cloudového nasadenia je Nginx nakonfigurovaný na proxy oboch služieb:
+When using the cloud deployment scripts, Nginx is configured to proxy both services:
 
-| Cesta | Backend |
+| Path | Backend |
 |------|---------|
-| `/` | Aplikácia rtCloud na `127.0.0.1:8080` |
-| `/auth/` | Keycloak na `127.0.0.1:8090` |
+| `/` | rtCloud app on `127.0.0.1:8080` |
+| `/auth/` | Keycloak on `127.0.0.1:8090` |
 
 ---
 
-## Externý poskytovateľ OIDC
+## External OIDC Provider
 
-Prepojte rtCloud s akýmkoľvek poskytovateľom identity kompatibilným s OpenID Connect. Tento prístup nevyžaduje kontajner Keycloak.
+Connect rtCloud to any OpenID Connect-compatible identity provider. This approach does not require the Keycloak container.
 
-### Podporovaní poskytovatelia
+### Supported Providers
 
-Funguje akýkoľvek poskytovateľ kompatibilný s OIDC, vrátane:
+Any OIDC-compliant provider works, including:
 - Authentik
 - Auth0
 - Okta
-- Keycloak (externá inštancia)
+- Keycloak (external instance)
 - Supabase
-- Google (pre organizácie Google Workspace)
-- GitHub (cez OAuth aplikácie s rozšírením OIDC)
+- Google (for Google Workspace organizations)
+- GitHub (via OAuth apps with OIDC extension)
 
-### Nastavenie
+### Setup
 
-**1. Zaregistrujte rtCloud ako klienta OIDC u vášho poskytovateľa identity.**
+**1. Register rtCloud as an OIDC client in your identity provider.**
 
-Budete potrebovať:
-- **ID klienta** a **tajomstvo klienta**
-- Registráciu **URI presmerovania**: `https://rtcloud.example.com/auth/callback`
-- Pre podporu mobilnej aplikácie tiež zaregistrujte: `vn.rta.rtsurvey.auth://callback`
+You will need:
+- A **client ID** and **client secret**
+- To register the **redirect URI**: `https://rtcloud.example.com/auth/callback`
+- For mobile app support, also register: `vn.rta.rtsurvey.auth://callback`
 
-**2. Nakonfigurujte premenné prostredia v `.env`:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
-# URL na objavenie OIDC (špecifické pre poskytovateľa — skontrolujte dokumentáciu vášho IdP)
+# OIDC discovery URL (provider-specific — check your IdP documentation)
 OIDC_ISSUER_URL=https://your-identity-provider.com
 
-# Prihlasovacie údaje klienta od vášho poskytovateľa identity
+# Client credentials from your identity provider
 OIDC_CLIENT_ID=rtcloud-app
 OIDC_CLIENT_SECRET=your-client-secret-here
 
-# Rozsahy na žiadosť (openid, profile a email sú zvyčajne dostatočné)
+# Scopes to request (openid, profile, and email are typically sufficient)
 OIDC_SCOPE=openid profile email
 
-# URI presmerovania zaregistrované u vášho poskytovateľa identity
+# Redirect URI registered in your identity provider
 OIDC_REDIRECT_URI=https://rtcloud.example.com/auth/callback
 
-# Voliteľné: samostatný klient pre mobilnú aplikáciu
+# Optional: separate mobile app client
 OIDC_MOBILE_CLIENT_ID=rtcloud-mobile
 OIDC_MOBILE_REDIRECT_URI=vn.rta.rtsurvey.auth://callback
 
-# Nastavte na true na automatické vytváranie účtov rtCloud pre nových používateľov OIDC
+# Set to true to auto-create rtCloud accounts for new OIDC users
 OPEN_REGISTRATION=false
 ```
 
-**3. Reštartujte kontajner aplikácie na aplikovanie zmien:**
+**3. Restart the app container to apply the changes:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Automatické zriaďovanie používateľov
+### Auto-Provisioning Users
 
-Keď je `OPEN_REGISTRATION=true`, rtCloud automaticky vytvorí lokálny účet pri prvom prihlásení používateľa cez OIDC. Účet sa naplní menom a emailom používateľa z ID tokenu.
+When `OPEN_REGISTRATION=true`, rtCloud automatically creates a local account the first time a user signs in via OIDC. The account is populated with the user's name and email from the ID token.
 
-Keď je `OPEN_REGISTRATION=false` (predvolené), správca rtCloud musí najprv vytvoriť používateľský účet a identita OIDC sa prepojí pri prvom prihlásení.
+When `OPEN_REGISTRATION=false` (default), an rtCloud administrator must create the user account first, and the OIDC identity is linked on first login.
 
-### Vlastné koncové body
+### Custom Endpoints
 
-Ak váš poskytovateľ nepodporuje objavenie OIDC (`.well-known/openid-configuration`), môžete nastaviť koncové body manuálne:
+If your provider does not support OIDC discovery (`.well-known/openid-configuration`), you can set endpoints manually:
 
 ```dotenv
 OIDC_AUTHORIZATION_ENDPOINT=https://your-provider.com/oauth2/authorize
@@ -179,41 +179,41 @@ OIDC_USERINFO_ENDPOINT=https://your-provider.com/oauth2/userinfo
 
 ## Azure Active Directory
 
-Integrujte rtCloud s tenantom Microsoft Azure AD vašej organizácie.
+Integrate rtCloud with your organization's Microsoft Azure AD tenant.
 
-### Nastavenie
+### Setup
 
-**1. Zaregistrujte novú aplikáciu na [Azure Portal](https://portal.azure.com):**
+**1. Register a new app in the [Azure Portal](https://portal.azure.com):**
 
-   - Prejdite na **Azure Active Directory** → **App registrations** → **New registration**
-   - Názov: `rtCloud`
-   - URI presmerovania: `https://rtcloud.example.com/auth/callback` (typ Web)
-   - Po vytvorení poznamenajte **Application (client) ID** a **Directory (tenant) ID**
-   - Pod **Certificates & secrets** vytvorte nové tajomstvo klienta
+   - Go to **Azure Active Directory** → **App registrations** → **New registration**
+   - Name: `rtCloud`
+   - Redirect URI: `https://rtcloud.example.com/auth/callback` (Web type)
+   - After creation, note the **Application (client) ID** and **Directory (tenant) ID**
+   - Under **Certificates & secrets**, create a new client secret
 
-**2. Nakonfigurujte premenné prostredia v `.env`:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
 AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-**3. Reštartujte kontajner aplikácie:**
+**3. Restart the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Používatelia vo vašom tenante Azure AD sa teraz môžu prihlásiť do rtCloud pomocou svojich Microsoft prihlasovacích údajov.
+Users in your Azure AD tenant can now log in to rtCloud using their Microsoft credentials.
 
 ---
 
-## Deaktivácia SSO
+## Disabling SSO
 
-Na vrátenie k lokálnej autentifikácii odstráňte alebo zakomentujte všetky premenné súvisiace s SSO v `.env`, potom reštartujte kontajner aplikácie:
+To revert to local authentication, remove or comment out all SSO-related variables from `.env`, then restart the app container:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-Ak ste používali vstavaný Keycloak, zastavte ho vynechaním príznaku `--profile embed-keycloak` a spustením `docker compose down` nasledovaného `up -d` bez profilu.
+If you were using embedded Keycloak, stop it by omitting the `--profile embed-keycloak` flag and running `docker compose down` followed by `up -d` without the profile.

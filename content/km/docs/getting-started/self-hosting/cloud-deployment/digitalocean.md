@@ -7,84 +7,86 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "ដាក់ deployed rtCloud នៅ DigitalOcean Droplet ដោយប្រើ user-data scripts ស្វ័យប្រវត្តិ។"
+description: "ដំឡើង rtCloud នៅ DigitalOcean Droplet ដោយប្រើស្ក្រីប user-data ដោយស្វ័យប្រវត្តិ។"
 ---
 
-DigitalOcean ប្រើ **User Data** scripts ដែល ដំណើរការ ដោយ ស្វ័យប្រវត្តិ នៅ boot ដំបូង។ អ្នក បំពេញ configuration variables នៅ ខាងលើ script ហើយ paste script ពេញ នៅពេល បង្កើត Droplet។
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> មិនដូច Linode StackScripts, DigitalOcean មិន មាន form UI — អ្នក ត្រូវ កែ script ដោយ ផ្ទាល់ មុននឹង paste។
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**ទាញយក script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Keycloak ភ្ជាប់ (ណែនាំ)
+## Embedded Keycloak (Recommended)
 
-ប្រើ `digitalocean-droplet-keycloak-embed.sh` សម្រាប់ ការ setup ងាយ បំផុត ជាមួយ SSO ភ្ជាប់។
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### ជំហានទី ១ — បំពេញ configuration
+### Step 1 — Fill in the configuration
 
-បើក script ហើយ កែ block `CONFIGURATION` នៅ ខាងលើ:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- ចាំបាច់ ---
-PROJECT_ID="rtsurvey"                  # អត្តសញ្ញាណតែមួយគត់ សម្រាប់ project (គ្មានចន្លោះ)
-ADMIN_PASSWORD="admin"                 # ពាក្យសម្ងាត់ app admin និង Keycloak — ផ្លាស់ប្ដូរ បន្ទាប់ ចូល ដំបូង
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
 # --- Domain + SSL ---
-DOMAIN="myapp.example.com"            # Domain របស់អ្នក — DNS A record ត្រូវ ចង្អុល ទីនេះ
-PROJECT_URL=""                         # ទុក blank លុះត្រាតែ នៅ ក្រោម Cloudflare/proxy
-LETSENCRYPT_EMAIL="admin@example.com" # Email សម្រាប់ ការ ជូនដំណឹង Let's Encrypt
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- ស្រេចចិត្ត ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Field | ចាំបាច់ | ការពិពណ៌នា |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | បាទ | ប្រើ ជា ឈ្មោះ database និង Keycloak client ID។ Lowercase, គ្មានចន្លោះ។ |
-| `ADMIN_PASSWORD` | ទេ | ពាក្យសម្ងាត់ app admin login និង Keycloak admin console។ Default `admin` — **ផ្លាស់ប្ដូរ បន្ទាប់ ចូលដំបូង**។ |
-| `DOMAIN` | បាទ | ឈ្មោះ domain របស់អ្នក។ DNS A record ត្រូវ ចង្អុល ទៅ Droplet IP។ |
-| `LETSENCRYPT_EMAIL` | បាទ | Email address សម្រាប់ Let's Encrypt certificate notifications។ |
-| `PROJECT_URL` | ទេ | Override public URL។ ទុក blank ដើម្បី ប្រើ `DOMAIN`។ ល្អ នៅ ក្រោម Cloudflare។ |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **សុវត្ថិភាព:** ពាក្យសម្ងាត់ ទាំងអស់ default ទៅ `admin`។ ផ្លាស់ប្ដូរ ពួកវា ភ្លាមៗ បន្ទាប់ ពី ការ ចូល ដំបូង។
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### ជំហានទី ២ — បង្កើត Droplet
+### Step 2 — Create a Droplet
 
-នៅ [DigitalOcean control panel](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. ចុច **Create** → **Droplets**
-2. ជ្រើស **Ubuntu 22.04 LTS** ជា image
-3. ជ្រើស **Basic, 4 GB RAM / 2 vCPUs** ឬ ធំ ជាង
-4. Scroll ទៅ **Advanced Options** → check **Add Initialization scripts**
-5. Paste ខ្លឹមសារ script ពេញ ទៅ text area
-6. ចុច **Create Droplet**
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### ជំហានទី ៣ — បន្ថែម DNS record
+### Step 3 — Add the DNS record
 
-ខណៈ Droplet boot, បន្ថែម **A record** ក្នុង DNS provider របស់អ្នក:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
-Name  : myapp          (ឬ @ សម្រាប់ root domain)
+Name  : myapp          (or @ for root domain)
 Value : <droplet-ip>
 TTL   : 300
 ```
 
-### ជំហានទី ៤ — តាមដានវឌ្ឍនភាព
+### Step 4 — Monitor progress
 
-SSH ចូល Droplet ហើយ watch log:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-### ជំហានទី ៥ — ចូលដំណើរការ app
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-នៅពេល setup បញ្ចប់, log បង្ហាញ summary:
+### Step 5 — Access the app
+
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
@@ -99,24 +101,33 @@ tail -f /var/log/rtcloud-setup.log
 ============================================================
 ```
 
-បើក `https://myapp.example.com` ក្នុង browser ហើយ ចូលជាមួយ username `admin` និង password `admin`។
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **ផ្លាស់ប្ដូរ ពាក្យសម្ងាត់** ភ្លាមៗ បន្ទាប់ ចូល តាមរយៈ **Settings** ក្នុង menu ខាងស្ដាំ ខាង លើ។
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## បន្ទាប់ Deployment
+## After Deployment
 
-### ផ្លាស់ប្ដូរ ពាក្យសម្ងាត់
+### Change a password
 
-SSH ចូល Droplet, កែ `.env`, ហើយ restart container ដែលប៉ះ:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### ស្វែងមើល containers ទាំងអស់
+### Update the domain
+
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
+
+```bash
+nano /opt/rtcloud/.env   # update PROJECT_URL=
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

@@ -7,117 +7,117 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Primenite rtCloud na AWS EC2 instanci koristeći aws-ec2.sh user data skriptu."
+description: "Распоредите rtCloud на AWS EC2 инстанци користећи user data скрипт aws-ec2.sh."
 ---
 
-Koristite `aws-ec2.sh` kao **User Data** skriptu pri pokretanju EC2 instance. Skripta se automatski izvršava pri prvom pokretanju.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Preuzmite skriptu:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Korak 1 — Popunite konfiguraciju
+## Step 1 — Fill in the configuration
 
-Otvorite skriptu i uredite blok `CONFIGURATION` na vrhu:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Obavezno ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Promenite nakon prve prijave
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Domen + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Ugrađeni Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Podrazumevano na ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Polje | Obavezno | Opis |
-|-------|----------|------|
-| `PROJECT_ID` | Da | Koristi se kao naziv baze podataka i Keycloak ID klijenta. Mala slova, bez razmaka. |
-| `ADMIN_PASSWORD` | Ne | Lozinka administratora aplikacije i Keycloak administratora. Podrazumevano `admin` — **promenite nakon prve prijave**. |
-| `DOMAIN` | Ne | Vaš domen za HTTPS. Ostavite prazno za HTTP-only režim. |
-| `LETSENCRYPT_EMAIL` | Da (ako je DOMAIN postavljen) | Email za Let's Encrypt obaveštenja. |
-| `EMBED_KEYCLOAK` | Ne | `true` da primenite ugrađeni Keycloak (zahteva 4 GB RAM). |
+| Field | Required | Description |
+|-------|----------|-------------|
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Bezbednost:** Sve lozinke su podrazumevano `admin`. Promenite ih odmah nakon prve prijave.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Korak 2 — Pokrenite EC2 instancu
+## Step 2 — Launch an EC2 instance
 
-Na [AWS EC2 konzoli](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Kliknite **Pokreni instancu**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Tip instance:** `t3.medium` (4 GB RAM) ili veći
-4. **Par ključeva:** Izaberite ili kreirajte par za SSH pristup
-5. **Mrežna podešavanja:** Kreirajte ili izaberite Security Group (pogledajte ispod)
-6. **Napredni detalji** → **User data** → nalepite kompletan sadržaj skripte
-7. Kliknite **Pokreni instancu**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Korak 3 — Konfigurišite Security Group
+## Step 3 — Configure the Security Group
 
-Otvorite ove portove u Security Group instance:
+Open these ports in the instance's Security Group:
 
-| Port | Protokol | Izvor | Svrha |
-|------|----------|-------|-------|
-| 22 | TCP | Vaša IP | SSH pristup |
-| 80 | TCP | 0.0.0.0/0 | HTTP (preusmereno na HTTPS od strane Nginx-a) |
+| Port | Protocol | Source | Purpose |
+|------|----------|--------|---------|
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Direktan pristup Shiny-u |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **Ne** otvarajte port 3306 (MySQL) — nikada ne sme biti javno dostupan.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Korak 4 — Dodajte DNS zapis
+## Step 4 — Add the DNS record
 
-Dok se instanca pokreće, dodajte **A zapis** kod vašeg DNS pružaoca:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
-Tip   : A
-Ime   : myapp
-Vrednost : <javna-ip-instance>
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
 TTL   : 300
 ```
 
 ---
 
-## Korak 5 — Pratite napredak
+## Step 5 — Monitor progress
 
 ```bash
-ssh ubuntu@<ip-instance>
+ssh ubuntu@<instance-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
 ---
 
-## Korak 6 — Pristupite aplikaciji
+## Step 6 — Access the app
 
-Kada se podešavanje završi, evidencija prikazuje rezime sa URL-om vaše aplikacije i akreditivima. Prijavite se sa korisničkim imenom `admin` i lozinkom `admin`, zatim odmah promenite lozinku.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Nakon primene
+## After Deployment
 
-### Promenite lozinku
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Pogledajte sve kontejnere
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Dodelite Elastic IP (opciono)
+### Assign an Elastic IP (optional)
 
-Ako zaustavite i pokrenete instancu, javna IP adresa se menja. Da biste zadržali stabilnu IP adresu, dodelite **Elastic IP** i povežite je sa instancom u EC2 konzoli.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

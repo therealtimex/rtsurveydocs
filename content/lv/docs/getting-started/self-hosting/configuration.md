@@ -7,215 +7,215 @@ draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "Pilna uzziņa par visiem vides mainīgajiem, ko izmanto pašmitināta rtCloud izvietojuma konfigurēšanai."
+description: "Pilna uzziņa par visiem vides mainīgajiem, ko izmanto pašu mitinātā rtCloud izvietojuma konfigurēšanai."
 ---
 
-Visa konfigurācija tiek veikta, izmantojot vides mainīgos failā `.env` jūsu izvietošanas direktorija saknē. Docker Compose automātiski nolasa šo failu — nav nepieciešams karodziņš `--env-file`.
+Visa konfigurācija tiek veikta caur vides mainīgajiem `.env` failā jūsu izvietošanas direktorijas saknē. Docker Compose automātiski lasa šo failu — nav nepieciešams `--env-file` karodziņš.
 
-Mainīgie, kas atzīmēti kā **obligāti**, ir jāiestata pirms konteineru palaišanas. Visiem pārējiem ir noklusējumi un tie nav obligāti.
+Mainīgie, kas atzīmēti kā **obligāti**, jāiestata pirms konteineru palaišanas. Visiem pārējiem ir noklusējuma vērtības un tie ir neobligāti.
 
 ---
 
-## Projekts
+## Project
 
-Šie mainīgie nosaka jūsu rtCloud instances identitāti un piekļuves punktu.
+These variables define the identity and access point of your rtCloud instance.
 
-| Mainīgais | Noklusējums | Obligāts | Apraksts |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **Jā** | Unikāls identifikators šim izvietojumam. Bez atstarpēm vai speciālajām rakstzīmēm. Izmanto kā prefiksu iekšējai nosaukšanai. |
-| `PROJECT_URL` | — | **Jā** | Domēna nosaukums vai IP adrese, kur lietotāji piekļūst lietotnei (piemēram, `rtcloud.example.com` vai `192.168.1.100`). |
-| `PROJECT_TYPE` | `rtsurvey` | Nē | Aktivizējamais platformas variants. Iespējas: `rtwork`, `rtsurvey`, `rthome`. |
-| `PROJECT_PORT` | `80` | Nē | Ports, uz kura lietojumprogramma klausās konteinerā. Nemainiet, ja nezināt, ko darāt. |
-| `HTTP_PROTOCOL` | `https` | Nē | Protokols, kas tiek izmantots iekšējo URL veidošanai. Iestatiet uz `http`, ja neizmantojat SSL. |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## Datu bāze
+## Database
 
-MySQL savienojuma akreditācijas dati. Datu bāzi automātiski pārvalda MySQL konteiners — jums tikai jāiestata spēcīgas paroles.
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| Mainīgais | Noklusējums | Obligāts | Apraksts |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | Nē | Lietojumprogrammas datu bāzes nosaukums. |
-| `MYSQL_USER` | `smartsurvey` | Nē | MySQL lietotājs lietojumprogrammai. |
-| `MYSQL_PASSWORD` | — | **Jā** | `MYSQL_USER` parole. Izmantojiet spēcīgu, unikālu vērtību. |
-| `MYSQL_ROOT_PASSWORD` | — | **Jā** | MySQL saknes parole. Nepieciešama datu bāzes inicializācijai un administratīvām operācijām. |
-| `MYSQL_HOST` | `mysql` | Nē | MySQL saimniekdatora nosaukums. Izmantojiet noklusējumu, ja vien nepievienojaties ārējai datu bāzei. |
-| `MYSQL_PORT` | `3306` | Nē | MySQL ports. |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## Administratora konts
+## Admin Account
 
-Administratora konts tiek automātiski izveidots pirmajā palaišanā ar jaunu datu bāzi.
+The admin account is created automatically on the first boot of a fresh database.
 
-| Mainīgais | Noklusējums | Obligāts | Apraksts |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **Jā** | Iebūvētā `admin` lietotāja parole. Iestatiet to pirms pirmās palaišanas. Nav ietekmes, ja datu bāze jau pastāv. |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> Pēc pirmās pieteikšanās mainiet administratora paroli no lapas **Konta iestatījumi** tīmekļa UI.
-
----
-
-## Porti
-
-Kontrolējiet, kuriem saimniekdatora portiem lietojumprogramma saistās.
-
-| Mainīgais | Noklusējums | Apraksts |
-|----------|---------|-------------|
-| `APP_PORT` | `8080` | Saimniekdatora ports galvenajam tīmekļa UI. Mainiet to, ja ports 8080 jau ir aizņemts jūsu serverī. |
-| `SHINY_PORT` | `3838` | Saimniekdatora ports Shiny analītikas serverim. |
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## Izpildlaiks
+## Ports
 
-| Mainīgais | Noklusējums | Apraksts |
+Control which host ports the application binds to.
+
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | Izpildlaika vide. Izmantojiet `prod` ražošanas izvietojumiem, `dev` lokālai izstrādei. |
-| `RUN_MODE` | `admin` | Konteinera loma. `admin` palaiž pilnu steku (tīmeklis + rinda + cron). `worker` palaiž tikai fona apstrādi (horizontālai mērogošanai). |
-| `TZ` | `Asia/Ho_Chi_Minh` | Servera laika josla. Ietekmē žurnālu laika zīmogus, cron grafikus un datuma attēlojumu. Izmantojiet [TZ datu bāzes nosaukumu](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (piemēram, `UTC`, `America/New_York`, `Europe/London`). |
-| `LOG_LEVEL` | `info` | Lietojumprogrammas žurnāla detalizācija. Iespējas: `debug`, `info`, `warning`, `error`. |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefikss, kas tiek piemērots visiem Docker konteineru un sējumu nosaukumiem. Mainiet to, ja vienā saimniekdatorā darbojas vairākas rtCloud instances. |
-| `RESTART_POLICY` | `unless-stopped` | Docker konteineru restartēšanas uzvedība. Iespējas: `no`, `always`, `on-failure`, `unless-stopped`. |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Izmantojamais Docker attēls. Mainiet tagu, lai fiksētu konkrētu versiju. |
-| `REQUIRE_LICENSE` | `false` | Iespējojiet licences atslēgas validāciju startēšanas laikā. Sazinieties ar RTA, lai iegūtu licences informāciju. |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
-## Drošība
+## Runtime
 
-| Mainīgais | Noklusējums | Apraksts |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | Iespējojiet CSRF žetona validāciju. Saglabājiet `true` ražošanā. Iestatiet uz `false` tikai lokālā izstrādē, ja rodas kļūdas `400 CSRF token could not be verified`. |
-| `GII_ENABLED` | `false` | Iespējojiet Yii ietvara koda ģeneratora rīku. **Nekad neiespējojiet ražošanā.** |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## SSO — Iebūvētais Keycloak
+## Security
 
-Iespējojiet komplektēto Keycloak konteineru pilnvērtīgam uzņēmuma SSO. Nepieciešams domēns ar HTTPS.
-
-| Mainīgais | Noklusējums | Apraksts |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | Iestatiet uz `true`, lai palaistu iebūvēto Keycloak konteineru. Aktivizē Docker Compose profilu `embed-keycloak`. |
-| `KEYCLOAK_URL` | — | Pilns Keycloak servera URL (piemēram, `https://rtcloud.example.com/auth`). |
-| `KEYCLOAK_REALM` | — | Keycloak reālma nosaukums (piemēram, `rtsurvey`). |
-| `KEYCLOAK_CLIENT_ID` | — | Keycloak klienta ID rtCloud lietojumprogrammai. |
-| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak klienta noslēpums. Ģenerējiet to no Keycloak administratora konsoles. |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administratora lietotājvārds. |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administratora parole. |
-| `KEYCLOAK_DB` | `keycloak` | Datu bāzes nosaukums Keycloak. Tiek automātiski izveidots pirmajā palaišanā. |
-| `KEYCLOAK_DB_USER` | `keycloak` | Datu bāzes lietotājs Keycloak. |
-| `KEYCLOAK_DB_PASSWORD` | — | Datu bāzes parole Keycloak lietotājam. |
-| `KC_HOSTNAME` | — | Keycloak priekšgala URL (piemēram, `https://rtcloud.example.com/auth`). |
-| `KC_HOSTNAME_STRICT` | `false` | Uzspiežiet stingru saimniekdatora nosaukuma atbilstību. Iestatiet uz `true` ražošanā ar fiksētu domēnu. |
-
-Skatiet [SSO autentifikāciju](sso-authentication#embedded-keycloak), lai iegūtu pilnīgu iestatīšanas rokasgrāmatu.
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — Ārējais OIDC nodrošinātājs
+## SSO — Embedded Keycloak
 
-Savienojiet ar esošu OIDC saderīgu identitātes nodrošinātāju (Supabase, Auth0, Authentik, Okta utt.).
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| Mainīgais | Noklusējums | Apraksts |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | OIDC izdevēja atklāšanas URL (piemēram, `https://accounts.google.com`). |
-| `OIDC_CLIENT_ID` | — | Klienta ID, reģistrēts jūsu identitātes nodrošinātājā. |
-| `OIDC_CLIENT_SECRET` | — | Klienta noslēpums no jūsu identitātes nodrošinātāja. |
-| `OIDC_SCOPE` | `openid profile email` | Atstarpes atdalīts OIDC tvērumu saraksts. |
-| `OIDC_REDIRECT_URI` | — | Atzvana URL tīmekļa lietotnei (piemēram, `https://rtcloud.example.com/auth/callback`). |
-| `OIDC_MOBILE_CLIENT_ID` | — | Atsevišķs klienta ID rtSurvey mobilajai lietotnei. |
-| `OIDC_MOBILE_REDIRECT_URI` | — | Mobilās lietotnes atzvana URI (piemēram, `vn.rta.rtsurvey.auth://callback`). |
-| `OPEN_REGISTRATION` | `false` | Automātiski izveidojiet rtCloud kontus lietotājiem, kuri pirmo reizi autentificējas, izmantojot OIDC. |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | Pārrakstiet autorizācijas galapunkta URL (atstājiet tukšu, lai izmantotu atklāšanu). |
-| `OIDC_TOKEN_ENDPOINT` | — | Pārrakstiet žetona galapunkta URL (atstājiet tukšu, lai izmantotu atklāšanu). |
-| `OIDC_USERINFO_ENDPOINT` | — | Pārrakstiet lietotāja informācijas galapunkta URL (atstājiet tukšu, lai izmantotu atklāšanu). |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| Mainīgais | Apraksts |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | Azure AD lietojumprogrammas (klienta) ID. |
-| `AZURE_TENANT_ID` | Azure AD direktorija (nomnieka) ID. |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## Neobligātās integrācijas
+## Optional Integrations
 
 ### Stata
 
-| Mainīgais | Noklusējums | Apraksts |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | Iespējojiet Stata statistikas programmatūras integrāciju datu analīzei. |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolūtais ceļš uz Stata bināro failu konteinerā. |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| Mainīgais | Apraksts |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Elasticsearch saimniekdators (piemēram, `http://elasticsearch:9200`). |
-| `ES_PORT` | Elasticsearch ports. |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
-### Matomo analītika
+### Matomo Analytics
 
-| Mainīgais | Apraksts |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | Matomo (Piwik) servera URL. |
-| `PIWIK_ID` | Matomo vietnes ID. |
-| `PIWIK_SECRET` | Matomo autentifikācijas žetons. |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (R aprēķini)
+### OpenCPU (R Computation)
 
-| Mainīgais | Apraksts |
+| Variable | Description |
 |----------|-------------|
-| `OCPU_HOST` | OpenCPU servera URL R bāzētiem statistikas aprēķiniem. |
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox integrācija
+### RtBox Integration
 
-| Mainīgais | Apraksts |
+| Variable | Description |
 |----------|-------------|
-| `RTBOX_HOST` | RtBox pakalpojuma saimniekdatora URL. |
-| `RTBOX_USER_API` | RtBox lietotāja API atslēga. |
-| `RTBOX_BASIC_AUTH` | Pamata autentifikācijas akreditācijas dati RtBox. |
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix ziņapmaiņa
+### Matrix Messaging
 
-| Mainīgais | Apraksts |
+| Variable | Description |
 |----------|-------------|
-| `MATRIX_HOMESERVER_HOST` | Matrix mājas servera saimniekdators. |
-| `MATRIX_HOMESERVER_PORT` | Matrix mājas servera ports. |
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## Datu sējumi
+## Data Volumes
 
-Visi lietojumprogrammas dati tiek glabāti nosauktos Docker sējumos. Sējumi tiek automātiski izveidoti pirmajā palaišanā un saglabājas pāri konteineru restartēšanai un atjauninājumiem.
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| Sējums | Montāžas punkts | Saturs |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL datu bāzes faili |
-| `rtcloud_uploads` | `…/uploads` | Aptaujas respondentu augšupielādētie faili |
-| `rtcloud_audios` | `…/audios` | Audio ieraksti |
-| `rtcloud_downloads` | `…/downloads` | Ģenerētie eksporta faili |
-| `rtcloud_gallery` | `…/gallery` | Galerijas attēli |
-| `rtcloud_voicemail` | `…/voicemail` | Balss pasta ieraksti |
-| `rtcloud_analytics` | `…/analytics` | Analītikas dati |
-| `rtcloud_aggregate` | `…/aggregate` | Apkopotie aptaujas rezultāti |
-| `rtcloud_converter` | `…/converter` | Datu konversijas izvadi |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny servera R skripti |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny servera žurnāli |
-| `rtcloud_assets` | `…/assets` | Tīmekļa aktīvi (CSS, JS) |
-| `rtcloud_runtime` | `…/protected/runtime` | Lietojumprogrammas izpildlaika kešatmiņa |
-| `rtcloud_cache` | `…/cache` | Lietojumprogrammas kešatmiņa |
-| `rtcloud_tmp` | `…/tmp` | Pagaidu faili |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-Sējumu nosaukumi tiek prefiksēti ar `COMPOSE_PROJECT_NAME` vērtību (noklusējums: `rtcloud`).
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-Uzskaitiet visus sava izvietojuma sējumus:
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Đăng nhập lần đầu"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Cách đăng nhập vào phiên bản rtSurvey của bạn lần đầu tiên sau khi triển khai."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **SSL phải được cấu hình trước khi đăng nhập.** Nếu bạn truy cập ứng dụng qua HTTP, bạn sẽ thấy cảnh báo bảo mật và SSO sẽ bị chặn. Hãy hoàn thành [Cài đặt SSL](ssl-setup) trước.
 
-After SSL is active, open your browser at your HTTPS URL:
+Sau khi SSL hoạt động, mở trình duyệt tại URL HTTPS của bạn:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Màn hình đăng nhập
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Trang đăng nhập hiển thị:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- Các trường **Tên người dùng** và **Mật khẩu**
+- Nút **Đăng nhập**
+- Nút **Đăng nhập bằng SSO** (bên dưới đường phân cách) — cho thành viên nhóm có tài khoản SSO
 
 ---
 
-## If you see a security warning
+## Thông tin đăng nhập quản trị viên mặc định
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Nhập thông tin đăng nhập mặc định và nhấp **Đăng nhập**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Trường | Giá trị |
+|--------|---------|
+| Tên người dùng | `admin` |
+| Mật khẩu | `admin` |
+
+> **Hãy đổi mật khẩu ngay sau lần đăng nhập đầu tiên.**
+
+---
+
+## Nếu bạn thấy cảnh báo bảo mật
+
+Nếu bạn truy cập ứng dụng qua HTTP (trước khi SSL được cấu hình), bạn sẽ thấy:
+
+- Biểu ngữ cảnh báo màu vàng ở đầu trang đăng nhập
+- Hộp thoại khi nhấp **Đăng nhập**, cảnh báo rằng thông tin đăng nhập sẽ được gửi không mã hóa
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Nhấp **Cài đặt SSL** để cấu hình HTTPS, hoặc **Tiếp tục dù sao** để đăng nhập không có SSL (không khuyến nghị).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+Đăng nhập SSO bị chặn hoàn toàn qua HTTP — nhấp **Đăng nhập bằng SSO** sẽ hiển thị thông báo thay vì chuyển hướng.
 
 ---
 
-## After logging in
+## Sau khi đăng nhập
 
-Once inside, you will land on the dashboard. From here:
+Khi vào trong, bạn sẽ thấy bảng điều khiển. Từ đây:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Đổi mật khẩu quản trị viên** — cài đặt tài khoản → đổi mật khẩu
+2. **Tạo dự án đầu tiên** — Dự án → Dự án mới
+3. **Tải lên hoặc xây dựng biểu mẫu** — Biểu mẫu → Tải lên XLSForm hoặc mở Form Builder
+4. **Thêm người dùng** — Người dùng → Mời hoặc tạo tài khoản cho nhóm của bạn

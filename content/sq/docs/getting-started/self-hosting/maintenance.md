@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 6
 title: "Mirëmbajtja"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,129 +7,129 @@ draft: false
 author: "rtSurvey"
 icon: "build"
 toc: true
-description: "Mirëmbajtja e përditshme për një instancë vetjake rtCloud: përditësimi, rezervimi, restaurimi dhe zgjidhja e problemeve të zakonshme."
+description: "Mirëmbajtja ditore e një instanze rtCloud të vetë-hostuar: përditësime, kopje rezervë, rivendosje dhe zgjidhje e problemeve të zakonshme."
 ---
 
-## Komandat e Zakonshme
+## Komandat e zakonshme
 
-Përdorni këto komanda rregullisht për të menaxhuar kontejnerët tuaj rtCloud. Ekzekutoni ato nga drejtoria që përmban `docker-compose.production.yml`.
+Përdorni këto komanda rregullisht për të menaxhuar kontejnerët tuaj rtCloud. Ekzekutojini nga drejtoria që përmban `docker-compose.production.yml`.
 
 ```bash
-# Kontrolloni statusin dhe shëndetin e të gjithë kontejnerëve
+# Check status and health of all containers
 docker compose -f docker-compose.production.yml ps
 
-# Shikoni regjistrat e drejtpërdrejta (të gjitha shërbimet)
+# View live logs (all services)
 docker compose -f docker-compose.production.yml logs -f
 
-# Shikoni regjistrat vetëm të aplikacionit
+# View logs for the app only
 docker compose -f docker-compose.production.yml logs -f rtcloud
 
-# Rinisni një kontejner të vetëm
+# Restart a single container
 docker compose -f docker-compose.production.yml restart rtcloud
 
-# Ndaloni të gjitha shërbimet
+# Stop all services
 docker compose -f docker-compose.production.yml down
 
-# Nisni të gjitha shërbimet
+# Start all services
 docker compose -f docker-compose.production.yml up -d
 
-# Hapni një predhë brenda kontejnerit të aplikacionit
+# Open a shell inside the app container
 docker compose -f docker-compose.production.yml exec rtcloud bash
 ```
 
 ---
 
-## Përditësimi
+## Upgrading
 
-Përditësimet rtCloud shpërndahen si etiketa të reja imazhi Docker. Përditësimi tërheq imazhin e fundit dhe rikrijon kontejnerin e aplikacionit. Migrimet e bazës së të dhënave ekzekutohen automatikisht në nisje.
+rtCloud updates are distributed as new Docker image tags. Upgrading pulls the latest image and recreates the app container. Database migrations run automatically on startup.
 
-**1. Tërhiqni imazhin e fundit:**
+**1. Pull the latest image:**
 
 ```bash
 docker compose -f docker-compose.production.yml pull
 ```
 
-**2. Rikrijoni kontejnerin e aplikacionit:**
+**2. Recreate the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d
 ```
 
-Docker zëvendëson vetëm kontejnerët imazhi i të cilëve ka ndryshuar. Kontejneri MySQL dhe të gjitha volumet e emëruara nuk preken.
+Docker replaces only the containers whose image has changed. The MySQL container and all named volumes are unaffected.
 
-### Fiksimi i një Versioni
+### Pinning a Version
 
-Për të përditësuar në një version specifik në vend të `latest`, përditësoni `RTCLOUD_IMAGE` në `.env`:
+To upgrade to a specific version instead of `latest`, update `RTCLOUD_IMAGE` in `.env`:
 
 ```dotenv
 RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
 ```
 
-Pastaj ekzekutoni `docker compose pull` dhe `up -d` si më sipër.
+Then run `docker compose pull` and `up -d` as above.
 
-### Degradimi
+### Downgrading
 
-Degradimi zakonisht nuk rekomandohet, pasi migrimet e bazës së të dhënave nuk mund të kthehen. Nëse nevojitet degradim, restauroni nga një rezervim i bazës së të dhënave i marrë para përditësimit.
+Downgrading is generally not recommended, as database migrations cannot be reversed. If a downgrade is necessary, restore from a database backup taken before the upgrade.
 
 ---
 
-## Rezervimi dhe Restaurimi
+## Backup and Restore
 
-### Rezervoni Bazën e të Dhënave
+### Backup the Database
 
-Ekzekutoni këtë komandë për të eksportuar bazën e të dhënave të aplikacionit në një skedar SQL:
+Run this command to export the application database to a SQL file:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
   mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
-  > rezervimi-$(date +%Y%m%d-%H%M%S).sql
+  > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-Skedari i rezervimit shkruhet në drejtorinë tuaj aktuale në host.
+The backup file is written to your current directory on the host.
 
-### Restauroni Bazën e të Dhënave
+### Restore the Database
 
 ```bash
 docker compose -f docker-compose.production.yml exec -T mysql \
   mysql -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
-  < rezervimi-20240101-120000.sql
+  < backup-20240101-120000.sql
 ```
 
-### Rezervoni Skedarët e Ngarkuar
+### Backup Uploaded Files
 
-Dërgimet e sondazhit shpesh përfshijnë skedarë të ngarkuar (foto, audio, dokumente) të ruajtur në volume të emëruara Docker. Rezervojini ato veçmas nga baza e të dhënave:
+Survey submissions often include uploaded files (photos, audio, documents) stored in named Docker volumes. Back them up separately from the database:
 
 ```bash
-# Rezervoni ngarkimet
+# Backup uploads
 docker run --rm \
   -v rtcloud_uploads:/data \
   -v "$(pwd):/backup" \
-  alpine tar czf /backup/ngarkimet-$(date +%Y%m%d).tar.gz -C /data .
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
 
-# Rezervoni regjistrat audio
+# Backup audio recordings
 docker run --rm \
   -v rtcloud_audios:/data \
   -v "$(pwd):/backup" \
-  alpine tar czf /backup/audio-$(date +%Y%m%d).tar.gz -C /data .
+  alpine tar czf /backup/audios-$(date +%Y%m%d).tar.gz -C /data .
 ```
 
-Zëvendësoni `rtcloud_uploads` dhe `rtcloud_audios` me emrat aktualë të volumeve tuaja (prefiksuar nga `COMPOSE_PROJECT_NAME`) nëse keni ndryshuar parazgjedhjen.
+Replace `rtcloud_uploads` and `rtcloud_audios` with your actual volume names (prefixed by `COMPOSE_PROJECT_NAME`) if you changed the default.
 
-### Restauroni Skedarët e Ngarkuar
+### Restore Uploaded Files
 
 ```bash
 docker run --rm \
   -v rtcloud_uploads:/data \
   -v "$(pwd):/backup" \
-  alpine tar xzf /backup/ngarkimet-20240101.tar.gz -C /data
+  alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
 ```
 
-### Rezervimet e Automatizuara Ditore
+### Automated Daily Backups
 
-Shtoni një detyrë cron në host për të ekzekutuar rezervimet automatikisht. Editoni crontab-in rrënjësor me `crontab -e`:
+Add a cron job on the host to run backups automatically. Edit the root crontab with `crontab -e`:
 
 ```cron
-# Rezervim ditor i bazës së të dhënave në 2:00 paradite, mbajini 30 ditë historik
+# Daily database backup at 2:00 AM, keep 30 days of history
 0 2 * * * cd /opt/rtcloud && docker compose -f docker-compose.production.yml exec -T mysql \
   mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
   > /backups/db-$(date +\%Y\%m\%d).sql && \
@@ -138,122 +138,122 @@ Shtoni një detyrë cron në host për të ekzekutuar rezervimet automatikisht. 
 
 ---
 
-## Zgjidhja e Problemeve
+## Troubleshooting
 
-### Kontejneri i aplikacionit nuk niset
+### App container not starting
 
-Kontrolloni regjistrat e kontejnerit për mesazhe gabimi:
+Check the container logs for error messages:
 
 ```bash
 docker compose -f docker-compose.production.yml logs rtcloud
 ```
 
-Shkaqet e zakonshme:
-- Variabla të mjedisit të munguar ose të pavlefshme në `.env`
-- MySQL ende jo gati (prisni 60 sekonda dhe kontrolloni sërish)
-- Konflikt porte — një proces tjetër tashmë po përdor `APP_PORT`
+Common causes:
+- Missing or invalid environment variables in `.env`
+- MySQL not yet ready (wait 60 seconds and check again)
+- Port conflict — another process is already using `APP_PORT`
 
-### MySQL jo i shëndetshëm
+### MySQL not healthy
 
 ```bash
 docker compose -f docker-compose.production.yml logs mysql
 ```
 
-Shkaqet e zakonshme:
-- `MYSQL_ROOT_PASSWORD` nuk është caktuar në `.env`
-- Volume i dhënash i korruptuar (i rrallë — kontrolloni hapësirën e diskut me `df -h`)
+Common causes:
+- `MYSQL_ROOT_PASSWORD` not set in `.env`
+- Corrupted data volume (rare — check disk space with `df -h`)
 
-MySQL mund të marrë 30–60 sekonda për t'u inicializuar gjatë nisjes shumë të parë. Prisni dhe kontrolloni sërish para se të supozoni dështim.
+MySQL can take 30–60 seconds to initialize on the very first boot. Wait and check again before assuming failure.
 
-### Porta tashmë në përdorim
+### Port already in use
 
-Ndryshoni `APP_PORT` ose `SHINY_PORT` në `.env` në një portë të lirë, pastaj rikrijoni kontejnerët:
+Change `APP_PORT` or `SHINY_PORT` in `.env` to a free port, then recreate the containers:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate
 ```
 
-Për të gjetur çfarë po përdor një portë në host:
+To find what is using a port on the host:
 
 ```bash
 lsof -i :8080
 ```
 
-### 400 Shenja CSRF Nuk Mund të Verifikohet
+### 400 CSRF Token Could Not Be Verified
 
-Ky gabim shfaqet në mjedise lokale ose reverse-proxy ku origjina e kërkesës nuk përputhet me hostin e pritur. Çaktivizoni validimin CSRF vetëm për zhvillim lokal:
+This error appears in local or reverse-proxy environments where the request origin does not match the expected host. Disable CSRF validation for local development only:
 
 ```dotenv
 CSRF_VALIDATION_ENABLED=false
 ```
 
-Pastaj rinisni aplikacionin:
+Then restart the app:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-> Mos çaktivizoni validimin CSRF në prodhim. Nëse ky gabim ndodh në prodhim, sigurohuni që reverse proxy juaj po dërgon korrektet kokëzat `Host` dhe `X-Forwarded-For`.
+> Do not disable CSRF validation in production. If this error occurs in production, ensure your reverse proxy is forwarding the correct `Host` and `X-Forwarded-For` headers.
 
-### Harruat Fjalëkalimin e Administratorit
+### Forgot the Admin Password
 
-Rivendosni fjalëkalimin e administratorit direkt në bazën e të dhënave. Lidhuni me kontejnerin MySQL dhe përditësoni hash-in e fjalëkalimit:
+Reset the admin password directly in the database. Connect to the MySQL container and update the password hash:
 
-**Hapi 1** — Gjeneroni hash-in e fjalëkalimit të ri. Zëvendësoni `fjalëkalimi_i_ri` me fjalëkalimin tuaj të dëshiruar:
+**Step 1** — Generate the new password hash. Replace `newpassword` with your desired password:
 
 ```bash
 docker compose -f docker-compose.production.yml exec rtcloud php -r "
-  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\"\"));
-  echo md5(\$salt . 'fjalëkalimi_i_ri') . PHP_EOL;
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\""));
+  echo md5(\$salt . 'newpassword') . PHP_EOL;
 "
 ```
 
-**Hapi 2** — Përditësoni hash-in në bazën e të dhënave:
+**Step 2** — Update the hash in the database:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
   mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
-  -e "UPDATE ss_user SET password='<hash_nga_hapi_1>' WHERE username='admin';"
+  -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
 ```
 
-### Kontejneri vazhdon të riniset
+### Container keeps restarting
 
-Kontrolloni nëse kontrolli i shëndetit po dështon:
+Check if the health check is failing:
 
 ```bash
 docker compose -f docker-compose.production.yml ps
-docker inspect rtcloud-app --format '{{json .State.Health}}'
+docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
 ```
 
-Kontrolli i shëndetit të aplikacionit thërret pikën fundore `/health`. Nëse dështon vazhdimisht, kontrolloni regjistrat e aplikacionit për gabime nisje.
+The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.
 
-### Hapësira e diskut e mbushur
+### Disk space full
 
-Identifikoni çfarë po konsumon hapësirë:
+Identify what is consuming space:
 
 ```bash
-# Kontrolloni përdorimin e diskut të hostit
+# Check host disk usage
 df -h
 
-# Kontrolloni përdorimin e diskut Docker (imazhe, kontejnerë, volume)
+# Check Docker disk usage (images, containers, volumes)
 docker system df
 
-# Hiqni imazhet e papërdorura dhe kontejnerët e ndaluar (të sigurt për ekzekutim)
+# Remove unused images and stopped containers (safe to run)
 docker system prune
 ```
 
-Mos përdorni `docker system prune --volumes` pasi kjo do të fshijë të dhënat e aplikacionit.
+Do not use `docker system prune --volumes` as this will delete application data.
 
 ---
 
-## Kontrollet e Shëndetit
+## Health Checks
 
-Çdo shërbim ka një kontroll automatik shëndetit. Statusi i kontejnerit pasqyron rezultatin:
+Each service has an automatic health check. Container status reflects the result:
 
-| Kontejneri | Metoda e Kontrollit | Periudha e Nisjes | Intervali |
+| Container | Check Method | Start Period | Interval |
 |-----------|-------------|-------------|----------|
-| `rtcloud-app` | HTTP GET `/health` | 90 sekonda | 30 sekonda |
-| `rtcloud-mysql` | `mysqladmin ping` | 30 sekonda | 10 sekonda |
-| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 sekonda | 30 sekonda |
+| `rtcloud-app` | HTTP GET `/health` | 90 seconds | 30 seconds |
+| `rtcloud-mysql` | `mysqladmin ping` | 30 seconds | 10 seconds |
+| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 seconds | 30 seconds |
 
-Kontejnerët me kontroll shëndetit që dështon riniset automatikisht sipas cilësimit `RESTART_POLICY` (parazgjedhja: `unless-stopped`).
+Containers with a failing health check are automatically restarted according to the `RESTART_POLICY` setting (default: `unless-stopped`).

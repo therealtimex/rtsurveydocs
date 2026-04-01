@@ -7,59 +7,59 @@ draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "نشر rtCloud على مزودي السحابة الرئيسيين بسكريبتات آلية لـ DigitalOcean وAWS EC2 وGoogle Cloud وLinode."
+description: "نشر rtCloud على مزودي السحابة الرئيسيين باستخدام سكريبتات آلية لـ DigitalOcean و AWS EC2 و Google Cloud و Linode."
 ---
 
-يتضمن مستودع النشر سكريبتات توفير آلية لمزودي السحابة الرئيسيين. كل سكريبت يعمل عند التشغيل الأول لخادم **Ubuntu 22.04 LTS** جديد ويُنفذ إعداداً كاملاً دون تدخل بشري:
+يتضمن مستودع النشر سكريبتات توفير آلية لمزودي السحابة الرئيسيين. يعمل كل سكريبت عند أول تشغيل لخادم Ubuntu 22.04 LTS جديد ويقوم بإعداد كامل غير مراقب:
 
-- تثبيت Docker وDocker Compose
-- إنشاء كلمات مرور عشوائية آمنة لجميع الخدمات الداخلية
-- كتابة `docker-compose.production.yml` و`.env`
-- إعداد Nginx كوكيل عكسي
-- الحصول على شهادة TLS مجانية من Let's Encrypt (مع إعادة محاولة تلقائية حتى يُحل DNS)
-- إعداد جدار الحماية UFW
-- نشر خادم Keycloak SSO المدمج اختياريا
-- عرض ملخص كامل للنشر مع جميع بيانات الاعتماد
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-يكتمل الإعداد في **5–10 دقائق** على نسخة قياسية.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## اختيار السكريبت
+## Choosing a Script
 
-توجد نسخ متعددة من السكريبت تبعاً لمزود السحابة وإعداد SSO:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| السكريبت | المزود | وضع SSO | الأنسب لـ |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Keycloak مدمج | SSO مستقل وبسيط |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak أو OIDC خارجي | تحكم كامل |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Keycloak مدمج | إعداد بنموذج، الأبسط |
-| `linode-stackscript-oidc.sh` | Linode | OIDC خارجي فقط | مزود هوية موجود |
-| `linode-stackscript.sh` | Linode | Keycloak أو OIDC خارجي | تحكم كامل |
-| `aws-ec2.sh` | AWS EC2 | Keycloak أو OIDC خارجي | نشر AWS |
-| `gcp-compute.sh` | Google Cloud | Keycloak أو OIDC خارجي | نشر GCP |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **موصى به لمعظم المستخدمين:** استخدم نسخة `keycloak-embed`. تتضمن خادم هوية Keycloak مدمجاً وتتطلب أقل عدد من حقول الإعداد.
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## دليل حجم الخادم
+## Server Sizing Guide
 
-| حالة الاستخدام | ذاكرة الوصول العشوائي | القرص | مثال |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| تقييم / تطوير | 2 GB | 25 GB | DO Basic $18/شهر، t3.small، e2-small |
-| فريق صغير (< 50 مستخدم) | 4 GB | 40 GB | DO Basic $24/شهر، t3.medium، e2-medium |
-| إنتاج (> 50 مستخدم) | 8 GB | 80 GB | DO General $48/شهر، t3.large، n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> يتطلب Keycloak المدمج **4 GB RAM** على الأقل. استخدم 2 GB فقط للتقييم دون Keycloak.
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## إعداد DNS
+## DNS Setup
 
-تتطلب جميع السكريبتات نطاقاً بـ **سجل A يشير إلى IP خادمك** قبل أن يتمكن Let's Encrypt من إصدار شهادة.
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-تطبع السكريبت عنوان IP الخادم في وقت مبكر من عملية الإعداد:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
@@ -70,26 +70,26 @@ description: "نشر rtCloud على مزودي السحابة الرئيسيين
 ============================================================
 ```
 
-تُعيد السكريبت **المحاولة تلقائياً** مع Let's Encrypt كل 60 ثانية لمدة تصل إلى ساعة واحدة. فقط أضف سجل DNS وانتظر — لا حاجة لإعادة التشغيل.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **حد المعدل:** يسمح Let's Encrypt بحد أقصى **5 شهادات لكل نطاق كل 7 أيام**. تجنب نشر الخوادم وتدميرها بشكل متكرر بنفس النطاق. إذا وصلت إلى الحد، ستعرض السكريبت طابع زمني `retry after` وتتوقف فوراً.
-
----
-
-## قائمة تحقق ما بعد النشر
-
-- [ ] التطبيق يفتح على `https://your-domain.com`
-- [ ] تسجيل الدخول بـ `admin` وكلمة المرور التي أعددتها
-- [ ] جميع الحاويات سليمة: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] تجديد Let's Encrypt يعمل: `certbot renew --dry-run`
-- [ ] منفذ MySQL 3306 **غير مكشوف**: `ufw status`
-- [ ] إعداد نسخة احتياطية يومية لقاعدة البيانات (راجع [الصيانة](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## استكشاف الأخطاء
+## Post-Deployment Checklist
 
-### التحقق من سجل الإعداد الكامل
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### حد معدل Let's Encrypt
+### Let's Encrypt rate limit
 
-إذا رأيت `too many certificates` في السجل، فقد وصلت إلى حد 5 شهادات/7 أيام. يعرض السجل وقت إعادة المحاولة الدقيق:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
 [SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-انتظر حتى ذلك الوقت، ثم أعد النشر.
+Wait until that time, then redeploy.
 
-### Keycloak يبقى في حالة غير سليمة
+### Keycloak stays unhealthy
 
-تأكد من أن الخادم لديه 4 GB RAM على الأقل، ثم تحقق من السجلات:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### إعداد SSL لم يُطبَّق بعد certbot
+### SSL config not applied after certbot
 
-إذا صدرت الشهادة لكن Nginx لا يزال يعرض HTTP فقط، تحقق من سجل الخطأ وأعد تحميل Nginx يدوياً:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

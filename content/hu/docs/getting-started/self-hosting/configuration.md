@@ -7,215 +7,215 @@ draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "Az összes környezeti változó teljes referenciája, amelyek a saját üzemeltetésű rtCloud-telepítés konfigurálásához használhatók."
+description: "Teljes referencia az önállóan üzemeltetett rtCloud telepítés konfigurálásához használt összes környezeti változóhoz."
 ---
 
-Minden konfiguráció a telepítési könyvtár gyökerében lévő `.env` fájlban lévő környezeti változókon keresztül történik. A Docker Compose automatikusan olvassa be ezt a fájlt — nincs szükség `--env-file` jelzőre.
+Minden konfiguráció a telepítési könyvtár gyökerében lévő `.env` fájlban lévő környezeti változókon keresztül történik. A Docker Compose automatikusan olvassa ezt a fájlt — nincs szükség `--env-file` jelölőre.
 
-A **kötelező** jelöléssel ellátott változókat a konténerek indítása előtt be kell állítani. A többinek alapértékei vannak, és opcionálisak.
+A **kötelező** jelöléssel ellátott változókat a konténerek indítása előtt kell beállítani. Minden más változónak van alapértéke és nem kötelező.
 
 ---
 
-## Projekt
+## Project
 
-Ezek a változók az rtCloud-példány identitását és hozzáférési pontját határozzák meg.
+These variables define the identity and access point of your rtCloud instance.
 
-| Változó | Alapérték | Kötelező | Leírás |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **Igen** | A telepítés egyedi azonosítója. Szóközök és különleges karakterek nélkül. Belső elnevezési előtagként használatos. |
-| `PROJECT_URL` | — | **Igen** | Domainné vagy IP-cím, ahol a felhasználók elérik az alkalmazást (pl. `rtcloud.example.com` vagy `192.168.1.100`). |
-| `PROJECT_TYPE` | `rtsurvey` | Nem | Aktiválandó platformváltozat. Lehetőségek: `rtwork`, `rtsurvey`, `rthome`. |
-| `PROJECT_PORT` | `80` | Nem | A konténeren belül az alkalmazás által figyelt port. Ne változtassa meg, hacsak nem tudja, mit csinál. |
-| `HTTP_PROTOCOL` | `https` | Nem | A belső URL-ek felépítéséhez használt protokoll. Állítsa `http`-re, ha nem használ SSL-t. |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## Adatbázis
+## Database
 
-MySQL-kapcsolati hitelesítő adatok. Az adatbázist automatikusan kezeli a MySQL-konténer — csak erős jelszavakat kell beállítania.
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| Változó | Alapérték | Kötelező | Leírás |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | Nem | Az alkalmazás adatbázisának neve. |
-| `MYSQL_USER` | `smartsurvey` | Nem | MySQL-felhasználó az alkalmazáshoz. |
-| `MYSQL_PASSWORD` | — | **Igen** | A `MYSQL_USER` jelszava. Használjon erős, egyedi értéket. |
-| `MYSQL_ROOT_PASSWORD` | — | **Igen** | MySQL root jelszó. Szükséges az adatbázis inicializálásához és a rendszergazdai műveletekhez. |
-| `MYSQL_HOST` | `mysql` | Nem | MySQL-állomásnév. Használja az alapértéket, hacsak nem csatlakozik külső adatbázishoz. |
-| `MYSQL_PORT` | `3306` | Nem | MySQL-port. |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## Rendszergazdai fiók
+## Admin Account
 
-A rendszergazdai fiók automatikusan jön létre a friss adatbázis első indításakor.
+The admin account is created automatically on the first boot of a fresh database.
 
-| Változó | Alapérték | Kötelező | Leírás |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **Igen** | A beépített `admin` felhasználó jelszava. Az első indítás előtt állítsa be. Nincs hatása, ha az adatbázis már létezik. |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> Az első bejelentkezés után változtassa meg a rendszergazdai jelszót a webes felület **Fiókbeállítások** oldalán.
-
----
-
-## Portok
-
-Szabályozza, hogy az alkalmazás mely gazdaportokhoz kötődik.
-
-| Változó | Alapérték | Leírás |
-|----------|---------|-------------|
-| `APP_PORT` | `8080` | Gazdaport a fő webes felülethez. Változtassa meg, ha a 8080-as port már használatban van a kiszolgálón. |
-| `SHINY_PORT` | `3838` | Gazdaport a Shiny elemzési szerverhez. |
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## Futtatókörnyezet
+## Ports
 
-| Változó | Alapérték | Leírás |
+Control which host ports the application binds to.
+
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | Futtatókörnyezet. Éles telepítésekhez használja a `prod`-ot, helyi fejlesztéshez a `dev`-et. |
-| `RUN_MODE` | `admin` | Konténer szerepkör. Az `admin` az összes összetevőt futtatja (web + sor + cron). A `worker` csak háttérfeldolgozást futtat (vízszintes skálázáshoz). |
-| `TZ` | `Asia/Ho_Chi_Minh` | Kiszolgáló időzónája. Befolyásolja a napló időbélyegeit, a cron-ütemezéseket és a dátummegjelenítést. Használjon [TZ adatbázis nevet](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (pl. `UTC`, `America/New_York`, `Europe/London`). |
-| `LOG_LEVEL` | `info` | Az alkalmazásnapló részletessége. Lehetőségek: `debug`, `info`, `warning`, `error`. |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | Az összes Docker-konténer és kötet nevére alkalmazott előtag. Változtassa meg, ha ugyanazon a gazdagépen több rtCloud-példányt futtat. |
-| `RESTART_POLICY` | `unless-stopped` | Docker-konténer újraindítási viselkedése. Lehetőségek: `no`, `always`, `on-failure`, `unless-stopped`. |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Használandó Docker-képfájl. Változtassa meg a címkét egy adott verzió rögzítéséhez. |
-| `REQUIRE_LICENSE` | `false` | Licenckulcs-ellenőrzés engedélyezése az indításkor. A licencinformációkért forduljon az RTA-hoz. |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
-## Biztonság
+## Runtime
 
-| Változó | Alapérték | Leírás |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | CSRF-token ellenőrzés engedélyezése. Éles környezetben tartsa `true` értéken. Csak helyi fejlesztésnél állítsa `false`-ra, ha `400 CSRF token could not be verified` hibával találkozik. |
-| `GII_ENABLED` | `false` | A Yii keretrendszer kódgenerátor eszközének engedélyezése. **Soha ne engedélyezze éles környezetben.** |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## SSO — Beágyazott Keycloak
+## Security
 
-Engedélyezze a csomagolt Keycloak-konténert a teljes funkcionalitású vállalati SSO-hoz. HTTPS-sel rendelkező domaint igényel.
-
-| Változó | Alapérték | Leírás |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | A beágyazott Keycloak-konténer elindításához állítsa `true`-ra. Aktiválja az `embed-keycloak` Docker Compose profilt. |
-| `KEYCLOAK_URL` | — | A Keycloak-szerver teljes URL-je (pl. `https://rtcloud.example.com/auth`). |
-| `KEYCLOAK_REALM` | — | Keycloak realm neve (pl. `rtsurvey`). |
-| `KEYCLOAK_CLIENT_ID` | — | Keycloak kliens azonosítója az rtCloud alkalmazáshoz. |
-| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak kliens titka. Generálja a Keycloak adminisztrátori konzolból. |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak adminisztrátori felhasználónév. |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak adminisztrátori jelszó. |
-| `KEYCLOAK_DB` | `keycloak` | A Keycloak adatbázisának neve. Az első indításkor automatikusan létrejön. |
-| `KEYCLOAK_DB_USER` | `keycloak` | A Keycloak adatbázis-felhasználója. |
-| `KEYCLOAK_DB_PASSWORD` | — | A Keycloak-felhasználó adatbázis-jelszava. |
-| `KC_HOSTNAME` | — | Keycloak frontend URL (pl. `https://rtcloud.example.com/auth`). |
-| `KC_HOSTNAME_STRICT` | `false` | Szigorú állomásnév-egyeztetés kényszerítése. Éles környezetben rögzített domainnel állítsa `true`-ra. |
-
-A teljes beállítási útmutatóért tekintse meg az [SSO-hitelesítés](sso-authentication#embedded-keycloak) oldalt.
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — Külső OIDC-szolgáltató
+## SSO — Embedded Keycloak
 
-Csatlakoztasson egy meglévő OIDC-kompatibilis identitásszolgáltatóhoz (Supabase, Auth0, Authentik, Okta stb.).
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| Változó | Alapérték | Leírás |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | OIDC kibocsátó felderítési URL-je (pl. `https://accounts.google.com`). |
-| `OIDC_CLIENT_ID` | — | Az identitásszolgáltatónál regisztrált kliens azonosítója. |
-| `OIDC_CLIENT_SECRET` | — | Az identitásszolgáltatótól kapott kliens titka. |
-| `OIDC_SCOPE` | `openid profile email` | Szóközzel elválasztott OIDC hatókörök listája. |
-| `OIDC_REDIRECT_URI` | — | A webalkalmazás visszahívási URL-je (pl. `https://rtcloud.example.com/auth/callback`). |
-| `OIDC_MOBILE_CLIENT_ID` | — | Külön kliens azonosítója az rtSurvey mobilalkalmazáshoz. |
-| `OIDC_MOBILE_REDIRECT_URI` | — | Mobilalkalmazás visszahívási URI-ja (pl. `vn.rta.rtsurvey.auth://callback`). |
-| `OPEN_REGISTRATION` | `false` | rtCloud-fiókok automatikus létrehozása az OIDC-n keresztül először bejelentkező felhasználóknak. |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | Az engedélyezési végpont URL-jének felülírása (hagyja üresen a felderítés használatához). |
-| `OIDC_TOKEN_ENDPOINT` | — | A token-végpont URL-jének felülírása (hagyja üresen a felderítés használatához). |
-| `OIDC_USERINFO_ENDPOINT` | — | A felhasználóinformáció-végpont URL-jének felülírása (hagyja üresen a felderítés használatához). |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| Változó | Leírás |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | Azure AD alkalmazás (kliens) azonosítója. |
-| `AZURE_TENANT_ID` | Azure AD könyvtár (bérlő) azonosítója. |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## Opcionális integrációk
+## Optional Integrations
 
 ### Stata
 
-| Változó | Alapérték | Leírás |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | Stata statisztikai szoftver integrációjának engedélyezése az adatelemzéshez. |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | A Stata bináris fájl abszolút elérési útja a konténeren belül. |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| Változó | Leírás |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Elasticsearch-gazdagép (pl. `http://elasticsearch:9200`). |
-| `ES_PORT` | Elasticsearch-port. |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
-### Matomo elemzés
+### Matomo Analytics
 
-| Változó | Leírás |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | Matomo (Piwik) szerver URL-je. |
-| `PIWIK_ID` | Matomo webhely azonosítója. |
-| `PIWIK_SECRET` | Matomo hitelesítési token. |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (R számítás)
+### OpenCPU (R Computation)
 
-| Változó | Leírás |
+| Variable | Description |
 |----------|-------------|
-| `OCPU_HOST` | OpenCPU szerver URL-je R-alapú statisztikai számításokhoz. |
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox integráció
+### RtBox Integration
 
-| Változó | Leírás |
+| Variable | Description |
 |----------|-------------|
-| `RTBOX_HOST` | RtBox szolgáltatás gazdagép URL-je. |
-| `RTBOX_USER_API` | RtBox felhasználói API-kulcs. |
-| `RTBOX_BASIC_AUTH` | Alapszintű hitelesítési hitelesítő adatok az RtBox-hoz. |
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix üzenetküldés
+### Matrix Messaging
 
-| Változó | Leírás |
+| Variable | Description |
 |----------|-------------|
-| `MATRIX_HOMESERVER_HOST` | Matrix homeserver gazdagép. |
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
 | `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## Adatkötetek
+## Data Volumes
 
-Az összes alkalmazásadat elnevezett Docker-kötetekben tárolódik. A kötetek az első indításkor automatikusan létrejönnek, és a konténerek újraindítása és frissítése után is megmaradnak.
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| Kötet | Csatlakozási pont | Tartalom |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL adatbázisfájlok |
-| `rtcloud_uploads` | `…/uploads` | Felmérési válaszadók által feltöltött fájlok |
-| `rtcloud_audios` | `…/audios` | Hangfelvételek |
-| `rtcloud_downloads` | `…/downloads` | Generált exportfájlok |
-| `rtcloud_gallery` | `…/gallery` | Galéria képei |
-| `rtcloud_voicemail` | `…/voicemail` | Hangposta felvételei |
-| `rtcloud_analytics` | `…/analytics` | Elemzési adatok |
-| `rtcloud_aggregate` | `…/aggregate` | Összesített felmérési eredmények |
-| `rtcloud_converter` | `…/converter` | Adatkonverziós kimenetek |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny szerver R-szkriptjei |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny szerver naplói |
-| `rtcloud_assets` | `…/assets` | Webes erőforrások (CSS, JS) |
-| `rtcloud_runtime` | `…/protected/runtime` | Alkalmazás futásidejű gyorsítótára |
-| `rtcloud_cache` | `…/cache` | Alkalmazás gyorsítótára |
-| `rtcloud_tmp` | `…/tmp` | Ideiglenes fájlok |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-A kötetnevek a `COMPOSE_PROJECT_NAME` értékével vannak előtagolva (alapértelmezett: `rtcloud`).
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-A telepítéshez tartozó összes kötet listázása:
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

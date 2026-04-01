@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Terapkan rtCloud di instans AWS EC2 menggunakan skrip user data aws-ec2.sh."
+description: "Terapkan rtCloud pada instans AWS EC2 menggunakan skrip user data aws-ec2.sh."
 ---
 
-Gunakan `aws-ec2.sh` sebagai skrip **User Data** saat meluncurkan instans EC2. Skrip berjalan secara otomatis pada booting pertama.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Unduh skrip:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Langkah 1 — Isi konfigurasi
+## Step 1 — Fill in the configuration
 
-Buka skrip dan edit blok `CONFIGURATION` di bagian atas:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Diperlukan ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Ubah setelah login pertama
+ADMIN_PASSWORD="admin"                       # Change after first login
 
 # --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Keycloak Tertanam ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Default ke ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Bidang | Diperlukan | Deskripsi |
-|--------|-----------|-----------|
-| `PROJECT_ID` | Ya | Digunakan sebagai nama database dan ID klien Keycloak. Huruf kecil, tanpa spasi. |
-| `ADMIN_PASSWORD` | Tidak | Kata sandi admin aplikasi dan kata sandi admin Keycloak. Default ke `admin` — **ubah setelah login pertama**. |
-| `DOMAIN` | Tidak | Domain Anda untuk HTTPS. Biarkan kosong untuk mode HTTP saja. |
-| `LETSENCRYPT_EMAIL` | Ya (jika DOMAIN ditetapkan) | Email untuk notifikasi Let's Encrypt. |
-| `EMBED_KEYCLOAK` | Tidak | `true` untuk menerapkan Keycloak tertanam (memerlukan 4 GB RAM). |
+| Field | Required | Description |
+|-------|----------|-------------|
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Keamanan:** Semua kata sandi default ke `admin`. Ubah segera setelah login pertama Anda.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Langkah 2 — Luncurkan instans EC2
+## Step 2 — Launch an EC2 instance
 
-Di [konsol AWS EC2](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Klik **Launch instance**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Jenis instans:** `t3.medium` (4 GB RAM) atau lebih besar
-4. **Pasangan kunci:** Pilih atau buat satu untuk akses SSH
-5. **Pengaturan jaringan:** Buat atau pilih Security Group (lihat di bawah)
-6. **Detail lanjutan** → **User data** → tempel konten skrip lengkap
-7. Klik **Launch instance**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Langkah 3 — Konfigurasikan Security Group
+## Step 3 — Configure the Security Group
 
-Buka port berikut di Security Group instans:
+Open these ports in the instance's Security Group:
 
-| Port | Protokol | Sumber | Tujuan |
-|------|----------|--------|--------|
-| 22 | TCP | IP Anda | Akses SSH |
-| 80 | TCP | 0.0.0.0/0 | HTTP (dialihkan ke HTTPS oleh Nginx) |
+| Port | Protocol | Source | Purpose |
+|------|----------|--------|---------|
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Akses langsung Shiny |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **Jangan** buka port 3306 (MySQL) — tidak boleh dapat diakses secara publik.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Langkah 4 — Tambahkan A record DNS
+## Step 4 — Add the DNS record
 
-Sementara instans melakukan booting, tambahkan **A record** di penyedia DNS Anda:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -88,7 +88,7 @@ TTL   : 300
 
 ---
 
-## Langkah 5 — Pantau kemajuan
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Langkah 6 — Akses aplikasi
+## Step 6 — Access the app
 
-Ketika pengaturan selesai, log menampilkan ringkasan dengan URL aplikasi dan kredensial Anda. Masuk dengan nama pengguna `admin` dan kata sandi `admin`, lalu ubah kata sandi Anda segera.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Setelah Penerapan
+## After Deployment
 
-### Ubah kata sandi
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Lihat semua container
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Tetapkan Elastic IP (opsional)
+### Assign an Elastic IP (optional)
 
-Jika Anda menghentikan dan memulai instans, IP publik akan berubah. Untuk mempertahankan IP yang stabil, alokasikan **Elastic IP** dan kaitkan dengan instans di konsol EC2.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

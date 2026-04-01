@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "ติดตั้ง rtCloud บนอินสแตนซ์ AWS EC2 โดยใช้สคริปต์ user data aws-ec2.sh"
+description: "ติดตั้ง rtCloud บน AWS EC2 instance โดยใช้สคริปต์ user data aws-ec2.sh"
 ---
 
-ใช้ `aws-ec2.sh` เป็นสคริปต์ **User Data** เมื่อเปิดใช้งานอินสแตนซ์ EC2 สคริปต์ทำงานอัตโนมัติเมื่อบูตครั้งแรก
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**ดาวน์โหลดสคริปต์:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## ขั้นตอนที่ 1 — กรอกการกำหนดค่า
+## Step 1 — Fill in the configuration
 
-เปิดสคริปต์และแก้ไขบล็อก `CONFIGURATION` ที่ด้านบน:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- ต้องมี ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # เปลี่ยนหลังเข้าสู่ระบบครั้งแรก
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- โดเมน + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Keycloak แบบฝัง ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ค่าเริ่มต้นเป็น ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| ฟิลด์ | ต้องมี | คำอธิบาย |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | ใช่ | ใช้เป็นชื่อฐานข้อมูลและ Keycloak client ID ตัวเล็ก ไม่มีช่องว่าง |
-| `ADMIN_PASSWORD` | ไม่ | รหัสผ่านผู้ดูแลระบบแอปและ Keycloak ค่าเริ่มต้นเป็น `admin` — **เปลี่ยนหลังเข้าสู่ระบบครั้งแรก** |
-| `DOMAIN` | ไม่ | โดเมนของคุณสำหรับ HTTPS เว้นว่างสำหรับโหมด HTTP เท่านั้น |
-| `LETSENCRYPT_EMAIL` | ใช่ (ถ้าตั้ง DOMAIN) | อีเมลสำหรับการแจ้งเตือน Let's Encrypt |
-| `EMBED_KEYCLOAK` | ไม่ | `true` เพื่อติดตั้ง Keycloak แบบฝัง (ต้องการ RAM 4 GB) |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **ความปลอดภัย:** รหัสผ่านทั้งหมดเริ่มต้นเป็น `admin` เปลี่ยนทันทีหลังจากเข้าสู่ระบบครั้งแรก
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## ขั้นตอนที่ 2 — เปิดใช้งานอินสแตนซ์ EC2
+## Step 2 — Launch an EC2 instance
 
-ใน [AWS EC2 console](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. คลิก **Launch instance**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Instance type:** `t3.medium` (4 GB RAM) หรือใหญ่กว่า
-4. **Key pair:** เลือกหรือสร้างสำหรับการเข้าถึง SSH
-5. **Network settings:** สร้างหรือเลือก Security Group (ดูด้านล่าง)
-6. **Advanced details** → **User data** → วางเนื้อหาสคริปต์ทั้งหมด
-7. คลิก **Launch instance**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## ขั้นตอนที่ 3 — กำหนดค่า Security Group
+## Step 3 — Configure the Security Group
 
-เปิดพอร์ตเหล่านี้ใน Security Group ของอินสแตนซ์:
+Open these ports in the instance's Security Group:
 
-| พอร์ต | โปรโตคอล | ต้นทาง | วัตถุประสงค์ |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | IP ของคุณ | การเข้าถึง SSH |
-| 80 | TCP | 0.0.0.0/0 | HTTP (เปลี่ยนเส้นทางไปยัง HTTPS โดย Nginx) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | การเข้าถึง Shiny โดยตรง |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **อย่า** เปิดพอร์ต 3306 (MySQL) — ไม่ควรเข้าถึงได้สาธารณะ
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## ขั้นตอนที่ 4 — เพิ่ม DNS record
+## Step 4 — Add the DNS record
 
-ขณะที่อินสแตนซ์บูต ให้เพิ่ม **A record** ในผู้ให้บริการ DNS ของคุณ:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -88,7 +88,7 @@ TTL   : 300
 
 ---
 
-## ขั้นตอนที่ 5 — ตรวจสอบความคืบหน้า
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## ขั้นตอนที่ 6 — เข้าถึงแอป
+## Step 6 — Access the app
 
-เมื่อการตั้งค่าเสร็จสิ้น ล็อกแสดงสรุปพร้อม URL แอปและข้อมูลประจำตัว เข้าสู่ระบบด้วยชื่อผู้ใช้ `admin` และรหัสผ่าน `admin` แล้วเปลี่ยนรหัสผ่านทันที
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## หลังการติดตั้ง
+## After Deployment
 
-### เปลี่ยนรหัสผ่าน
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### ดูคอนเทนเนอร์ทั้งหมด
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### กำหนด Elastic IP (ไม่บังคับ)
+### Assign an Elastic IP (optional)
 
-หากคุณหยุดและเริ่มอินสแตนซ์ IP สาธารณะจะเปลี่ยน เพื่อรักษา IP ที่เสถียร ให้จัดสรร **Elastic IP** และเชื่อมโยงกับอินสแตนซ์ใน EC2 console
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

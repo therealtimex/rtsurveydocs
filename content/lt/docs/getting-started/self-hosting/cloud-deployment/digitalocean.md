@@ -7,86 +7,86 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Diekite rtCloud DigitalOcean Droplet naudodami automatizuotus naudotojo duomenų scenarijus."
+description: "Diekite rtCloud DigitalOcean Droplet naudodami automatizuotus user-data skriptus."
 ---
 
-DigitalOcean naudoja **Naudotojo duomenų** scenarijus, kurie automatiškai paleidžiami pirmąjį kartą. Jūs užpildote konfigūracijos kintamuosius scenarijaus viršuje, tada įklijuojate visą scenarijų kuriant Droplet.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> Skirtingai nuo Linode StackScripts, DigitalOcean neturi formos sąsajos – prieš įklijuodami turite tiesiogiai redaguoti scenarijų.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**Atsisiųsti scenarijų:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Integruotas Keycloak (rekomenduojama)
+## Embedded Keycloak (Recommended)
 
-Naudokite `digitalocean-droplet-keycloak-embed.sh` paprasčiausiai sąrankai su integruotu SSO.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### 1 žingsnis — Užpildykite konfigūraciją
+### Step 1 — Fill in the configuration
 
-Atidarykite scenarijų ir redaguokite `CONFIGURATION` bloką viršuje:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Privaloma ---
-PROJECT_ID="rtsurvey"                  # Unikalus jūsų projekto identifikatorius (be tarpų)
-ADMIN_PASSWORD="admin"                 # Slaptažodis programos admin ir Keycloak – pakeiskite po pirmojo prisijungimo
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
-# --- Domenas + SSL ---
-DOMAIN="myapp.example.com"            # Jūsų domenas – DNS A įrašas turi nukreipti čia
-PROJECT_URL=""                         # Palikite tuščią, nebent yra už Cloudflare/tarpinio serverio
-LETSENCRYPT_EMAIL="admin@example.com" # El. paštas „Let's Encrypt" pranešimams
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- Neprivaloma ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Laukas | Privalomas | Aprašymas |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Taip | Naudojamas kaip duomenų bazės pavadinimas ir Keycloak kliento ID. Mažosios raidės, be tarpų. |
-| `ADMIN_PASSWORD` | Ne | Slaptažodis programos admin prisijungimui ir Keycloak administratoriaus konsolei. Numatytasis – `admin` – **pakeiskite po pirmojo prisijungimo**. |
-| `DOMAIN` | Taip | Jūsų domeno vardas. DNS A įrašas turi nukreipti į Droplet IP. |
-| `LETSENCRYPT_EMAIL` | Taip | El. pašto adresas „Let's Encrypt" sertifikato pranešimams. |
-| `PROJECT_URL` | Ne | Perrašykite viešąjį URL. Palikite tuščią, kad naudotumėte `DOMAIN`. Naudinga už Cloudflare. |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **Saugumas:** visi slaptažodžiai pagal numatytuosius nustatymus yra `admin`. Pakeiskite juos iš karto po pirmojo prisijungimo.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### 2 žingsnis — Sukurkite Droplet
+### Step 2 — Create a Droplet
 
-[DigitalOcean valdymo skydelyje](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Spustelėkite **Kurti** → **Droplets**
-2. Pasirinkite **Ubuntu 22.04 LTS** kaip vaizdą
-3. Pasirinkite **Basic, 4 GB RAM / 2 vCPU** arba daugiau
-4. Slinkite iki **Išplėstinių parinkčių** → pažymėkite **Pridėti inicializacijos scenarijus**
-5. Įklijuokite visą scenarijaus turinį į teksto lauką
-6. Spustelėkite **Kurti Droplet**
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### 3 žingsnis — Pridėkite DNS įrašą
+### Step 3 — Add the DNS record
 
-Kol Droplet paleidžiamas, pridėkite **A įrašą** savo DNS teikėjuje:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
-Tipas  : A
-Vardas : myapp          (arba @ šakniniam domenui)
-Reikšmė: <droplet-ip>
-TTL    : 300
+Type  : A
+Name  : myapp          (or @ for root domain)
+Value : <droplet-ip>
+TTL   : 300
 ```
 
-### 4 žingsnis — Stebėkite eigą
+### Step 4 — Monitor progress
 
-Prisijunkite per SSH prie Droplet ir stebėkite žurnalą:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-Scenarijus išveda jūsų serverio IP pradžioje – pridėkite DNS įrašą, kai tik jį pamatysite.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### 5 žingsnis — Pasiekite programą
+### Step 5 — Access the app
 
-Kai sąranka baigiama, žurnale rodoma santrauka:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
@@ -101,33 +101,33 @@ Kai sąranka baigiama, žurnale rodoma santrauka:
 ============================================================
 ```
 
-Naršyklėje atidarykite `https://myapp.example.com` ir prisijunkite naudodami naudotojo vardą `admin` ir slaptažodį `admin`.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Pakeiskite slaptažodį** iš karto po prisijungimo per **Nustatymus** viršutiniame dešiniajame meniu.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## Po diegimo
+## After Deployment
 
-### Slaptažodžio keitimas
+### Change a password
 
-Prisijunkite prie Droplet per SSH, redaguokite `.env` ir iš naujo paleiskite paveiktą konteinerį:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Domeno atnaujinimas
+### Update the domain
 
-Jei po diegimo priskyrėte kitą domeną, atnaujinkite `PROJECT_URL` `.env` faile:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # atnaujinkite PROJECT_URL=
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Visų konteinerių peržiūra
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

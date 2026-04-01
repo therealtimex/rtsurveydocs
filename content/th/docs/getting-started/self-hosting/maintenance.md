@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 6
 title: "การบำรุงรักษา"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,7 +7,7 @@ draft: false
 author: "rtSurvey"
 icon: "build"
 toc: true
-description: "การบำรุงรักษาประจำวันสำหรับอินสแตนซ์ rtCloud แบบโฮสต์ด้วยตนเอง: การอัปเกรด การสำรองข้อมูล การกู้คืน และการแก้ไขปัญหาทั่วไป"
+description: "การบำรุงรักษาประจำวันสำหรับ rtCloud instance ที่โฮสต์เอง: การอัพเกรด, การสำรองข้อมูล, การกู้คืน และการแก้ไขปัญหาทั่วไป"
 ---
 
 ## คำสั่งทั่วไป
@@ -15,69 +15,69 @@ description: "การบำรุงรักษาประจำวันส
 ใช้คำสั่งเหล่านี้เป็นประจำเพื่อจัดการคอนเทนเนอร์ rtCloud ของคุณ รันจากไดเรกทอรีที่มี `docker-compose.production.yml`
 
 ```bash
-# ตรวจสอบสถานะและความสมบูรณ์ของคอนเทนเนอร์ทั้งหมด
+# Check status and health of all containers
 docker compose -f docker-compose.production.yml ps
 
-# ดูล็อกสด (ทุกบริการ)
+# View live logs (all services)
 docker compose -f docker-compose.production.yml logs -f
 
-# ดูล็อกเฉพาะแอป
+# View logs for the app only
 docker compose -f docker-compose.production.yml logs -f rtcloud
 
-# รีสตาร์ทคอนเทนเนอร์เดียว
+# Restart a single container
 docker compose -f docker-compose.production.yml restart rtcloud
 
-# หยุดบริการทั้งหมด
+# Stop all services
 docker compose -f docker-compose.production.yml down
 
-# เริ่มบริการทั้งหมด
+# Start all services
 docker compose -f docker-compose.production.yml up -d
 
-# เปิด shell ภายในคอนเทนเนอร์แอป
+# Open a shell inside the app container
 docker compose -f docker-compose.production.yml exec rtcloud bash
 ```
 
 ---
 
-## การอัปเกรด
+## Upgrading
 
-การอัปเดต rtCloud แจกจ่ายเป็น Docker image tag ใหม่ การอัปเกรดดึง image ล่าสุดและสร้างคอนเทนเนอร์แอปใหม่ การย้ายฐานข้อมูลทำงานโดยอัตโนมัติเมื่อเริ่มต้น
+rtCloud updates are distributed as new Docker image tags. Upgrading pulls the latest image and recreates the app container. Database migrations run automatically on startup.
 
-**1. ดึง image ล่าสุด:**
+**1. Pull the latest image:**
 
 ```bash
 docker compose -f docker-compose.production.yml pull
 ```
 
-**2. สร้างคอนเทนเนอร์แอปใหม่:**
+**2. Recreate the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d
 ```
 
-Docker จะแทนที่เฉพาะคอนเทนเนอร์ที่ image เปลี่ยนแปลง คอนเทนเนอร์ MySQL และ volumes ที่มีชื่อทั้งหมดไม่ได้รับผลกระทบ
+Docker replaces only the containers whose image has changed. The MySQL container and all named volumes are unaffected.
 
-### การปักหมุดเวอร์ชัน
+### Pinning a Version
 
-เพื่ออัปเกรดไปยังเวอร์ชันเฉพาะแทนที่จะเป็น `latest` ให้อัปเดต `RTCLOUD_IMAGE` ใน `.env`:
+To upgrade to a specific version instead of `latest`, update `RTCLOUD_IMAGE` in `.env`:
 
 ```dotenv
 RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
 ```
 
-แล้วรัน `docker compose pull` และ `up -d` ตามด้านบน
+Then run `docker compose pull` and `up -d` as above.
 
-### การดาวน์เกรด
+### Downgrading
 
-โดยทั่วไปไม่แนะนำการดาวน์เกรด เนื่องจากไม่สามารถย้อนกลับการย้ายฐานข้อมูลได้ หากจำเป็นต้องดาวน์เกรด ให้กู้คืนจากการสำรองข้อมูลฐานข้อมูลที่ทำก่อนการอัปเกรด
+Downgrading is generally not recommended, as database migrations cannot be reversed. If a downgrade is necessary, restore from a database backup taken before the upgrade.
 
 ---
 
-## การสำรองข้อมูลและการกู้คืน
+## Backup and Restore
 
-### สำรองข้อมูลฐานข้อมูล
+### Backup the Database
 
-รันคำสั่งนี้เพื่อส่งออกฐานข้อมูลแอปพลิเคชันเป็นไฟล์ SQL:
+Run this command to export the application database to a SQL file:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -85,9 +85,9 @@ docker compose -f docker-compose.production.yml exec mysql \
   > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-ไฟล์สำรองข้อมูลถูกเขียนไปยังไดเรกทอรีปัจจุบันของคุณบนโฮสต์
+The backup file is written to your current directory on the host.
 
-### กู้คืนฐานข้อมูล
+### Restore the Database
 
 ```bash
 docker compose -f docker-compose.production.yml exec -T mysql \
@@ -95,25 +95,27 @@ docker compose -f docker-compose.production.yml exec -T mysql \
   < backup-20240101-120000.sql
 ```
 
-### สำรองข้อมูลไฟล์ที่อัปโหลด
+### Backup Uploaded Files
 
-การส่งแบบสำรวจมักรวมถึงไฟล์ที่อัปโหลด (รูปภาพ เสียง เอกสาร) ที่จัดเก็บใน Docker volumes ที่มีชื่อ สำรองข้อมูลแยกจากฐานข้อมูล:
+Survey submissions often include uploaded files (photos, audio, documents) stored in named Docker volumes. Back them up separately from the database:
 
 ```bash
-# สำรองข้อมูล uploads
+# Backup uploads
 docker run --rm \
   -v rtcloud_uploads:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
 
-# สำรองข้อมูลการบันทึกเสียง
+# Backup audio recordings
 docker run --rm \
   -v rtcloud_audios:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/audios-$(date +%Y%m%d).tar.gz -C /data .
 ```
 
-### กู้คืนไฟล์ที่อัปโหลด
+Replace `rtcloud_uploads` and `rtcloud_audios` with your actual volume names (prefixed by `COMPOSE_PROJECT_NAME`) if you changed the default.
+
+### Restore Uploaded Files
 
 ```bash
 docker run --rm \
@@ -122,12 +124,12 @@ docker run --rm \
   alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
 ```
 
-### การสำรองข้อมูลรายวันอัตโนมัติ
+### Automated Daily Backups
 
-เพิ่มงาน cron บนโฮสต์เพื่อรันการสำรองข้อมูลโดยอัตโนมัติ แก้ไข root crontab ด้วย `crontab -e`:
+Add a cron job on the host to run backups automatically. Edit the root crontab with `crontab -e`:
 
 ```cron
-# สำรองข้อมูลฐานข้อมูลรายวันเวลา 2:00 AM เก็บประวัติ 30 วัน
+# Daily database backup at 2:00 AM, keep 30 days of history
 0 2 * * * cd /opt/rtcloud && docker compose -f docker-compose.production.yml exec -T mysql \
   mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
   > /backups/db-$(date +\%Y\%m\%d).sql && \
@@ -136,42 +138,42 @@ docker run --rm \
 
 ---
 
-## การแก้ไขปัญหา
+## Troubleshooting
 
-### คอนเทนเนอร์แอปไม่เริ่มต้น
+### App container not starting
 
-ตรวจสอบล็อกคอนเทนเนอร์สำหรับข้อความข้อผิดพลาด:
+Check the container logs for error messages:
 
 ```bash
 docker compose -f docker-compose.production.yml logs rtcloud
 ```
 
-สาเหตุทั่วไป:
-- ตัวแปรสภาพแวดล้อมที่หายไปหรือไม่ถูกต้องใน `.env`
-- MySQL ยังไม่พร้อม (รอ 60 วินาทีและตรวจสอบอีกครั้ง)
-- ความขัดแย้งของพอร์ต — กระบวนการอื่นใช้ `APP_PORT` อยู่แล้ว
+Common causes:
+- Missing or invalid environment variables in `.env`
+- MySQL not yet ready (wait 60 seconds and check again)
+- Port conflict — another process is already using `APP_PORT`
 
-### MySQL ไม่มีสุขภาพ
+### MySQL not healthy
 
 ```bash
 docker compose -f docker-compose.production.yml logs mysql
 ```
 
-สาเหตุทั่วไป:
-- `MYSQL_ROOT_PASSWORD` ไม่ได้ตั้งค่าใน `.env`
-- data volume เสียหาย (หายาก — ตรวจสอบพื้นที่ดิสก์ด้วย `df -h`)
+Common causes:
+- `MYSQL_ROOT_PASSWORD` not set in `.env`
+- Corrupted data volume (rare — check disk space with `df -h`)
 
-MySQL อาจใช้เวลา 30–60 วินาทีในการเริ่มต้นบูตครั้งแรก รอและตรวจสอบอีกครั้งก่อนสรุปว่าล้มเหลว
+MySQL can take 30–60 seconds to initialize on the very first boot. Wait and check again before assuming failure.
 
-### พอร์ตถูกใช้งานอยู่แล้ว
+### Port already in use
 
-เปลี่ยน `APP_PORT` หรือ `SHINY_PORT` ใน `.env` เป็นพอร์ตที่ว่าง แล้วสร้างคอนเทนเนอร์ใหม่:
+Change `APP_PORT` or `SHINY_PORT` in `.env` to a free port, then recreate the containers:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate
 ```
 
-เพื่อหาว่าอะไรกำลังใช้พอร์ตบนโฮสต์:
+To find what is using a port on the host:
 
 ```bash
 lsof -i :8080
@@ -179,34 +181,34 @@ lsof -i :8080
 
 ### 400 CSRF Token Could Not Be Verified
 
-ข้อผิดพลาดนี้ปรากฏในสภาพแวดล้อมภายในเครื่องหรือ reverse-proxy ที่ origin ของคำขอไม่ตรงกับโฮสต์ที่คาดหวัง ปิดใช้งานการตรวจสอบ CSRF สำหรับการพัฒนาภายในเครื่องเท่านั้น:
+This error appears in local or reverse-proxy environments where the request origin does not match the expected host. Disable CSRF validation for local development only:
 
 ```dotenv
 CSRF_VALIDATION_ENABLED=false
 ```
 
-แล้วรีสตาร์ทแอป:
+Then restart the app:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-> อย่าปิดใช้งานการตรวจสอบ CSRF ในการผลิต หากข้อผิดพลาดนี้เกิดขึ้นในการผลิต ให้ตรวจสอบว่า reverse proxy ของคุณส่ง header `Host` และ `X-Forwarded-For` ที่ถูกต้อง
+> Do not disable CSRF validation in production. If this error occurs in production, ensure your reverse proxy is forwarding the correct `Host` and `X-Forwarded-For` headers.
 
-### ลืมรหัสผ่านผู้ดูแลระบบ
+### Forgot the Admin Password
 
-รีเซ็ตรหัสผ่านผู้ดูแลระบบโดยตรงในฐานข้อมูล เชื่อมต่อกับคอนเทนเนอร์ MySQL และอัปเดต hash รหัสผ่าน:
+Reset the admin password directly in the database. Connect to the MySQL container and update the password hash:
 
-**ขั้นตอนที่ 1** — สร้าง hash รหัสผ่านใหม่ แทนที่ `newpassword` ด้วยรหัสผ่านที่ต้องการ:
+**Step 1** — Generate the new password hash. Replace `newpassword` with your desired password:
 
 ```bash
 docker compose -f docker-compose.production.yml exec rtcloud php -r "
-  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\"\")); 
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\""));
   echo md5(\$salt . 'newpassword') . PHP_EOL;
 "
 ```
 
-**ขั้นตอนที่ 2** — อัปเดต hash ในฐานข้อมูล:
+**Step 2** — Update the hash in the database:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -214,44 +216,44 @@ docker compose -f docker-compose.production.yml exec mysql \
   -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
 ```
 
-### คอนเทนเนอร์รีสตาร์ทซ้ำๆ
+### Container keeps restarting
 
-ตรวจสอบว่า health check ล้มเหลวหรือไม่:
+Check if the health check is failing:
 
 ```bash
 docker compose -f docker-compose.production.yml ps
-docker inspect rtcloud-app --format '{{json .State.Health}}'
+docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
 ```
 
-health check ของแอปเรียก endpoint `/health` หากล้มเหลวซ้ำๆ ให้ตรวจสอบล็อกแอปพลิเคชันสำหรับข้อผิดพลาดการเริ่มต้น
+The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.
 
-### พื้นที่ดิสก์เต็ม
+### Disk space full
 
-ระบุว่าอะไรกำลังใช้พื้นที่:
+Identify what is consuming space:
 
 ```bash
-# ตรวจสอบการใช้ดิสก์โฮสต์
+# Check host disk usage
 df -h
 
-# ตรวจสอบการใช้ดิสก์ Docker (images, containers, volumes)
+# Check Docker disk usage (images, containers, volumes)
 docker system df
 
-# ลบ images ที่ไม่ได้ใช้และคอนเทนเนอร์ที่หยุดแล้ว (ปลอดภัยที่จะรัน)
+# Remove unused images and stopped containers (safe to run)
 docker system prune
 ```
 
-อย่าใช้ `docker system prune --volumes` เพราะจะลบข้อมูลแอปพลิเคชัน
+Do not use `docker system prune --volumes` as this will delete application data.
 
 ---
 
 ## Health Checks
 
-แต่ละบริการมี health check อัตโนมัติ สถานะคอนเทนเนอร์สะท้อนผลลัพธ์:
+Each service has an automatic health check. Container status reflects the result:
 
-| คอนเทนเนอร์ | วิธีการตรวจสอบ | ระยะเวลาเริ่มต้น | ช่วงเวลา |
+| Container | Check Method | Start Period | Interval |
 |-----------|-------------|-------------|----------|
-| `rtcloud-app` | HTTP GET `/health` | 90 วินาที | 30 วินาที |
-| `rtcloud-mysql` | `mysqladmin ping` | 30 วินาที | 10 วินาที |
-| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 วินาที | 30 วินาที |
+| `rtcloud-app` | HTTP GET `/health` | 90 seconds | 30 seconds |
+| `rtcloud-mysql` | `mysqladmin ping` | 30 seconds | 10 seconds |
+| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 seconds | 30 seconds |
 
-คอนเทนเนอร์ที่มี health check ล้มเหลวจะถูกรีสตาร์ทโดยอัตโนมัติตามการตั้งค่า `RESTART_POLICY` (ค่าเริ่มต้น: `unless-stopped`)
+Containers with a failing health check are automatically restarted according to the `RESTART_POLICY` setting (default: `unless-stopped`).

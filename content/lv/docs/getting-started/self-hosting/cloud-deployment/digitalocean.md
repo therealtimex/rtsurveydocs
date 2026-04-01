@@ -7,127 +7,127 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Izvietojiet rtCloud uz DigitalOcean Droplet, izmantojot automatizētus user-data skriptus."
+description: "Izvietojiet rtCloud DigitalOcean Droplet, izmantojot automatizētus lietotāja datu skriptus."
 ---
 
-DigitalOcean izmanto **User Data** skriptus, kas automātiski darbojas pirmajā palaišanā. Jūs aizpildāt konfigurācijas mainīgos skripta augšpusē, pēc tam ielīmējat visu skriptu, veidojot Droplet.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> Atšķirībā no Linode StackScripts, DigitalOcean nav formas UI — skripts ir jārediģē tieši pirms ielīmēšanas.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**Lejupielādēt skriptu:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Iebūvētais Keycloak (Ieteicams)
+## Embedded Keycloak (Recommended)
 
-Izmantojiet `digitalocean-droplet-keycloak-embed.sh` vienkāršākajai iestatīšanai ar iebūvētu SSO.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### 1. solis — Aizpildiet konfigurāciju
+### Step 1 — Fill in the configuration
 
-Atveriet skriptu un rediģējiet `CONFIGURATION` bloku augšpusē:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Obligāts ---
-PROJECT_ID="rtsurvey"                  # Unikāls jūsu projekta identifikators (bez atstarpēm)
-ADMIN_PASSWORD="admin"                 # Lietotnes administratora un Keycloak parole — mainiet pēc pirmās pieteikšanās
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
-# --- Domēns + SSL ---
-DOMAIN="myapp.example.com"            # Jūsu domēns — DNS A ierakstam jānorāda šeit
-PROJECT_URL=""                         # Atstājiet tukšu, ja nav aiz Cloudflare/starpniekservera
-LETSENCRYPT_EMAIL="admin@example.com" # E-pasts Let's Encrypt paziņojumiem
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- Neobligāts ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Lauks | Obligāts | Apraksts |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Jā | Izmanto kā datu bāzes nosaukumu un Keycloak klienta ID. Maziem burtiem, bez atstarpēm. |
-| `ADMIN_PASSWORD` | Nē | Parole lietotnes administratora pieteikšanās un Keycloak administratora konsolei. Noklusējums ir `admin` — **mainiet pēc pirmās pieteikšanās**. |
-| `DOMAIN` | Jā | Jūsu domēna nosaukums. DNS A ierakstam jānorāda uz Droplet IP. |
-| `LETSENCRYPT_EMAIL` | Jā | E-pasta adrese Let's Encrypt sertifikātu paziņojumiem. |
-| `PROJECT_URL` | Nē | Pārrakstiet publisko URL. Atstājiet tukšu, lai izmantotu `DOMAIN`. Noderīgi aiz Cloudflare. |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **Drošība:** Visas paroles pēc noklusējuma ir `admin`. Mainiet tās nekavējoties pēc pirmās pieteikšanās.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### 2. solis — Izveidojiet Droplet
+### Step 2 — Create a Droplet
 
-[DigitalOcean vadības panelī](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Noklikšķiniet uz **Create** → **Droplets**
-2. Atlasiet **Ubuntu 22.04 LTS** kā attēlu
-3. Atlasiet **Basic, 4 GB RAM / 2 vCPU** vai lielāku
-4. Ritiniet uz leju līdz **Advanced Options** → atzīmējiet **Add Initialization scripts**
-5. Ielīmējiet pilno skripta saturu teksta laukā
-6. Noklikšķiniet uz **Create Droplet**
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### 3. solis — Pievienojiet DNS ierakstu
+### Step 3 — Add the DNS record
 
-Kamēr Droplet sāknējas, pievienojiet **A ierakstu** sava DNS nodrošinātāja panelī:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
-Tips  : A
-Nosaukums  : myapp          (vai @ saknes domēnam)
-Vērtība : <droplet-ip>
+Type  : A
+Name  : myapp          (or @ for root domain)
+Value : <droplet-ip>
 TTL   : 300
 ```
 
-### 4. solis — Uzraugiet progresu
+### Step 4 — Monitor progress
 
-Savienojieties ar Droplet, izmantojot SSH, un vērojiet žurnālu:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-Skripts drīz pēc sākuma izdrukā jūsu servera IP — pievienojiet DNS ierakstu, tiklīdz to redzat.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### 5. solis — Piekļūstiet lietotnei
+### Step 5 — Access the app
 
-Kad iestatīšana ir pabeigta, žurnāls rāda kopsavilkumu:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
- rtCloud izvietošana pabeigta! (Iebūvētais Keycloak)
+ rtCloud deployment complete! (Embedded Keycloak)
 ============================================================
- Lietotnes URL   : https://myapp.example.com
- Administrators     : admin / admin
+ App URL   : https://myapp.example.com
+ Admin     : admin / admin
  Keycloak  : https://myapp.example.com/auth/admin
 
- !! DROŠĪBA: Visas paroles pēc noklusējuma ir 'admin'.
-    Mainiet tās nekavējoties pēc pirmās pieteikšanās.
+ !! SECURITY: All passwords default to 'admin'.
+    Change them immediately after first login.
 ============================================================
 ```
 
-Atveriet `https://myapp.example.com` pārlūkprogrammā un piesakieties ar lietotājvārdu `admin` un paroli `admin`.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Mainiet savu paroli** nekavējoties pēc pieteikšanās, izmantojot **Iestatījumus** augšējā labajā izvēlnē.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## Pēc izvietošanas
+## After Deployment
 
-### Paroles maiņa
+### Change a password
 
-Savienojieties ar Droplet, izmantojot SSH, rediģējiet `.env` un restartējiet ietekmēto konteineru:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Domēna atjaunināšana
+### Update the domain
 
-Ja pēc izvietošanas piešķirat citu domēnu, atjauniniet `PROJECT_URL` failā `.env`:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # atjauniniet PROJECT_URL=
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Visu konteineru skatīšana
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

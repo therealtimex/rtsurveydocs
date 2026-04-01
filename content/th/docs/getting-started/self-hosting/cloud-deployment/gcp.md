@@ -10,63 +10,63 @@ toc: true
 description: "ติดตั้ง rtCloud บน Google Cloud Compute Engine โดยใช้สคริปต์เริ่มต้น gcp-compute.sh"
 ---
 
-ใช้ `gcp-compute.sh` เป็น **Startup script** เมื่อสร้างอินสแตนซ์ VM ของ Compute Engine สคริปต์ทำงานอัตโนมัติเมื่อบูตครั้งแรก
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**ดาวน์โหลดสคริปต์:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## ขั้นตอนที่ 1 — กรอกการกำหนดค่า
+## Step 1 — Fill in the configuration
 
-เปิดสคริปต์และแก้ไขบล็อก `CONFIGURATION` ที่ด้านบน:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- ต้องมี ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # เปลี่ยนหลังเข้าสู่ระบบครั้งแรก
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- โดเมน + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Keycloak แบบฝัง ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ค่าเริ่มต้นเป็น ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| ฟิลด์ | ต้องมี | คำอธิบาย |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | ใช่ | ใช้เป็นชื่อฐานข้อมูลและ Keycloak client ID ตัวเล็ก ไม่มีช่องว่าง |
-| `ADMIN_PASSWORD` | ไม่ | รหัสผ่านผู้ดูแลระบบแอปและ Keycloak ค่าเริ่มต้นเป็น `admin` — **เปลี่ยนหลังเข้าสู่ระบบครั้งแรก** |
-| `DOMAIN` | ไม่ | โดเมนของคุณสำหรับ HTTPS เว้นว่างสำหรับโหมด HTTP เท่านั้น |
-| `LETSENCRYPT_EMAIL` | ใช่ (ถ้าตั้ง DOMAIN) | อีเมลสำหรับการแจ้งเตือน Let's Encrypt |
-| `EMBED_KEYCLOAK` | ไม่ | `true` เพื่อติดตั้ง Keycloak แบบฝัง (ต้องการ RAM 4 GB) |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **ความปลอดภัย:** รหัสผ่านทั้งหมดเริ่มต้นเป็น `admin` เปลี่ยนทันทีหลังจากเข้าสู่ระบบครั้งแรก
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## ขั้นตอนที่ 2 — สร้างอินสแตนซ์ VM
+## Step 2 — Create a VM instance
 
-ใน [Google Cloud Console](https://console.cloud.google.com/compute):
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
 
-1. คลิก **Create instance**
+1. Click **Create instance**
 2. **Machine configuration:**
    - Series: `E2`
-   - Machine type: `e2-medium` (4 GB RAM) หรือใหญ่กว่า
+   - Machine type: `e2-medium` (4 GB RAM) or larger
 3. **Boot disk:**
    - Operating system: Ubuntu
    - Version: Ubuntu 22.04 LTS
-   - Size: 40 GB หรือมากกว่า
-4. **Firewall:** ทำเครื่องหมาย **Allow HTTP traffic** และ **Allow HTTPS traffic**
-5. **Advanced options** → **Management** → **Automation** → **Startup script** → วางเนื้อหาสคริปต์ทั้งหมด
-6. คลิก **Create**
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
 
 ---
 
-## ขั้นตอนที่ 3 — เพิ่ม DNS record
+## Step 3 — Add the DNS record
 
-ขณะที่ VM บูต ให้เพิ่ม **A record** ในผู้ให้บริการ DNS ของคุณ:
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -75,19 +75,19 @@ Value : <vm-external-ip>
 TTL   : 300
 ```
 
-ค้นหา external IP ในรายการ VM instances ใน console
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## ขั้นตอนที่ 4 — ตรวจสอบความคืบหน้า
+## Step 4 — Monitor progress
 
-ใช้ `gcloud` CLI:
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-หรือ SSH โดยตรง:
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## ขั้นตอนที่ 5 — เข้าถึงแอป
+## Step 5 — Access the app
 
-เมื่อการตั้งค่าเสร็จสิ้น ล็อกแสดงสรุปพร้อม URL แอปและข้อมูลประจำตัว เข้าสู่ระบบด้วยชื่อผู้ใช้ `admin` และรหัสผ่าน `admin` แล้วเปลี่ยนรหัสผ่านทันที
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## กฎไฟร์วอลล์
+## Firewall Rules
 
-ช่องทำเครื่องหมาย **Allow HTTP/HTTPS** ของ GCP เปิดพอร์ต 80 และ 443 เพื่ออนุญาตการเข้าถึง Shiny โดยตรงบนพอร์ต 3838 ให้เพิ่มกฎไฟร์วอลล์:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-หรือเพิ่มผ่าน console: **VPC Network** → **Firewall** → **Create rule**
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> **อย่า** เปิดพอร์ต 3306 (MySQL) — ไม่ควรเข้าถึงได้สาธารณะ
-
----
-
-## Static IP (ไม่บังคับ)
-
-ตามค่าเริ่มต้น GCP กำหนด external IP แบบชั่วคราวที่เปลี่ยนเมื่อรีสตาร์ท VM เพื่อรักษา IP ที่เสถียร:
-
-1. ไปที่ **VPC Network** → **IP addresses**
-2. คลิก **Reserve external static address**
-3. กำหนดให้กับอินสแตนซ์ VM ของคุณ
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## หลังการติดตั้ง
+## Static IP (optional)
 
-### เปลี่ยนรหัสผ่าน
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### ดูคอนเทนเนอร์ทั้งหมด
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

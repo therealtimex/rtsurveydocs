@@ -1,179 +1,221 @@
 ---
 weight: 2
-title: "ឯកសារការកំណត់"
+title: "ឯកសារយោងការកំណត់រចនាសម្ព័ន្ធ"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "ឯកសារពេញលេញ សម្រាប់ environment variables ទាំងអស់ ដែលប្រើ configure ការដាក់ deployed rtCloud ខ្លួនឯង។"
+description: "ឯកសារយោងពេញលេញសម្រាប់អថេរបរិស្ថានទាំងអស់ដែលប្រើដើម្បីកំណត់រចនាសម្ព័ន្ធ rtCloud ដែលបង្ហោះខ្លួនឯង។"
 ---
 
-ការកំណត់ទាំងអស់ ត្រូវបានធ្វើ តាមរយៈ environment variables នៅក្នុងឯកសារ `.env` នៅ root នៃ directory ដាក់ deployed របស់អ្នក។ Docker Compose អានឯកសារនេះ ដោយស្វ័យប្រវត្តិ — មិនត្រូវការ flag `--env-file` ទេ។
+ការកំណត់រចនាសម្ព័ន្ធទាំងអស់ត្រូវបានធ្វើឡើងតាមរយៈអថេរបរិស្ថានក្នុងឯកសារ `.env` នៅ root នៃថតឯកសារដំឡើងរបស់អ្នក។ Docker Compose អានឯកសារនេះដោយស្វ័យប្រវត្តិ — មិនត្រូវការ flag `--env-file`។
 
-Variables ដែលសម្គាល់ **ចាំបាច់** ត្រូវតែ set មុន ចាប់ផ្ដើម containers។ ផ្សេងទៀត ទាំងអស់ មានលំនាំដើម ហើយ ស្រេចចិត្ត។
+អថេរដែលមានទំហំ **ចាំបាច់** ត្រូវតែកំណត់មុនពេលចាប់ផ្តើមកំប៉ុង។ ផ្សេងទៀតទាំងអស់មានតម្លៃលំនាំដើម ហើយជាជម្រើស។
 
 ---
 
-## គម្រោង
+## Project
 
-Variables ទាំងនេះ កំណត់អត្តសញ្ញាណ និងចំណុចចូលដំណើរការ នៃ rtCloud instance របស់អ្នក។
+These variables define the identity and access point of your rtCloud instance.
 
-| Variable | លំនាំដើម | ចាំបាច់ | ការពិពណ៌នា |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **បាទ** | អត្តសញ្ញាណតែមួយគត់ សម្រាប់ការដាក់ deployed នេះ។ គ្មានចន្លោះ ឬ តួអក្សរពិសេស ។ ប្រើ ជា prefix សម្រាប់ការដាក់ឈ្មោះខាងក្នុង។ |
-| `PROJECT_URL` | — | **បាទ** | ឈ្មោះ domain ឬ IP address ដែលអ្នកប្រើ ចូលដំណើរការ app (ឧ. `rtcloud.example.com` ឬ `192.168.1.100`)។ |
-| `PROJECT_TYPE` | `rtsurvey` | ទេ | កំណែ platform ដើម្បីបើកដំណើរការ។ Options: `rtwork`, `rtsurvey`, `rthome`។ |
-| `PROJECT_PORT` | `80` | ទេ | Port ដែល application ស្ដាប់ ក្នុង container។ កុំ ផ្លាស់ប្ដូរ លុះត្រាតែ អ្នកដឹង ថាអ្នកកំពុងធ្វើអ្វី។ |
-| `HTTP_PROTOCOL` | `https` | ទេ | Protocol ដែល ប្រើ ដើម្បីស្ថាបនា URLs ខាងក្នុង។ Set ទៅ `http` ប្រសិនបើ អ្នកមិន ប្រើ SSL។ |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## មូលដ្ឋានទិន្នន័យ
+## Database
 
-ព័ត៌មានសម្ងាត់ connection MySQL។ មូលដ្ឋានទិន្នន័យ ត្រូវបានគ្រប់គ្រង ដោយស្វ័យប្រវត្តិ ដោយ MySQL container — អ្នក ត្រូវការ set តែ ពាក្យសម្ងាត់ ខ្លាំង ប៉ុណ្ណោះ។
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| Variable | លំនាំដើម | ចាំបាច់ | ការពិពណ៌នា |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | ទេ | ឈ្មោះ application database។ |
-| `MYSQL_USER` | `smartsurvey` | ទេ | MySQL user សម្រាប់ application។ |
-| `MYSQL_PASSWORD` | — | **បាទ** | ពាក្យសម្ងាត់ សម្រាប់ `MYSQL_USER`។ ប្រើ តម្លៃ ខ្លាំង តែមួយគត់។ |
-| `MYSQL_ROOT_PASSWORD` | — | **បាទ** | ពាក្យសម្ងាត់ MySQL root។ ចាំបាច់ សម្រាប់ initialization មូលដ្ឋានទិន្នន័យ និង admin operations។ |
-| `MYSQL_HOST` | `mysql` | ទេ | MySQL hostname។ ប្រើ default លុះត្រាតែ អ្នក ភ្ជាប់ ទៅ database ខាងក្រៅ។ |
-| `MYSQL_PORT` | `3306` | ទេ | MySQL port។ |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## គណនី Admin
+## Admin Account
 
-គណនី admin ត្រូវបានបង្កើត ដោយស្វ័យប្រវត្តិ នៅ boot ដំបូង នៃ database ថ្មី។
+The admin account is created automatically on the first boot of a fresh database.
 
-| Variable | លំនាំដើម | ចាំបាច់ | ការពិពណ៌នា |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **បាទ** | ពាក្យសម្ងាត់ សម្រាប់ `admin` user ដែលភ្ជាប់។ Set វា មុន boot ដំបូង។ គ្មានប្រសិទ្ធភាព ប្រសិនបើ database មានស្រាប់។ |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> បន្ទាប់ពី ចូលដំបូង ផ្លាស់ប្ដូរ ពាក្យសម្ងាត់ admin ពី **Account Settings** page ក្នុង web UI។
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
 ## Ports
 
-ត្រួតពិនិត្យ host ports ដែល application ភ្ជាប់ ជាមួយ។
+Control which host ports the application binds to.
 
-| Variable | លំនាំដើម | ការពិពណ៌នា |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `APP_PORT` | `8080` | Host port សម្រាប់ web UI ចម្បង។ ផ្លាស់ប្ដូរ ប្រសិនបើ port 8080 ត្រូវបានប្រើ ស្រាប់ នៅលើ server របស់អ្នក។ |
-| `SHINY_PORT` | `3838` | Host port សម្រាប់ Shiny analytics server។ |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
 ## Runtime
 
-| Variable | លំនាំដើម | ការពិពណ៌នា |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | Runtime environment។ ប្រើ `prod` សម្រាប់ production deployments, `dev` សម្រាប់ local development។ |
-| `RUN_MODE` | `admin` | Container role។ `admin` ដំណើរការ full stack (web + queue + cron)។ `worker` ដំណើរការ background processing (សម្រាប់ horizontal scaling)។ |
-| `TZ` | `Asia/Ho_Chi_Minh` | Timezone ម៉ាស៊ីនមេ។ ប៉ះពាល់ timestamps log, schedules cron, និងការបង្ហាញ date។ ប្រើ [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (ឧ. `UTC`, `America/New_York`, `Europe/London`)។ |
-| `LOG_LEVEL` | `info` | ភាពរលំអានតក្ក log Application។ Options: `debug`, `info`, `warning`, `error`។ |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix ដែលអនុវត្ត ទៅ container Docker ទាំងអស់ និងឈ្មោះ volume។ ផ្លាស់ប្ដូរ នៅពេល ដំណើរការ rtCloud instances ច្រើន នៅ host តែមួយ។ |
-| `RESTART_POLICY` | `unless-stopped` | ឥរិយាបទ restart container Docker។ Options: `no`, `always`, `on-failure`, `unless-stopped`។ |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image ដើម្បី ប្រើ។ ផ្លាស់ប្ដូរ tag ដើម្បី pin version ជាក់លាក់។ |
-| `REQUIRE_LICENSE` | `false` | បើក ការ validate license key នៅ startup។ ទាក់ទង RTA សម្រាប់ ព័ត៌មាន license។ |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## សុវត្ថិភាព
+## Security
 
-| Variable | លំនាំដើម | ការពិពណ៌នា |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | បើក CSRF token validation។ រក្សា `true` ក្នុង production។ Set ទៅ `false` មានតែ ក្នុង local development ប្រសិនបើ អ្នកជួបប្រទះ `400 CSRF token could not be verified` errors។ |
-| `GII_ENABLED` | `false` | បើក Yii framework code generator tool។ **កុំ បើក ក្នុង production ។** |
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — Keycloak ភ្ជាប់
+## SSO — Embedded Keycloak
 
-បើក Keycloak container ដែលភ្ជាប់ សម្រាប់ SSO សហគ្រាស ដែលពោរពេញ feature។ ត្រូវការ domain ជាមួយ HTTPS។
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| Variable | លំនាំដើម | ការពិពណ៌នា |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | Set ទៅ `true` ដើម្បី ចាប់ផ្ដើម Keycloak container ភ្ជាប់។ |
-| `KEYCLOAK_URL` | — | URL ពេញ នៃ Keycloak server (ឧ. `https://rtcloud.example.com/auth`)។ |
-| `KEYCLOAK_REALM` | — | ឈ្មោះ Keycloak realm (ឧ. `rtsurvey`)។ |
-| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID សម្រាប់ rtCloud application។ |
-| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret។ Generate ពី Keycloak admin console។ |
-| `KEYCLOAK_ADMIN_USER` | `admin` | ឈ្មោះអ្នកប្រើ administrator Keycloak។ |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | ពាក្យសម្ងាត់ administrator Keycloak។ |
-| `KEYCLOAK_DB` | `keycloak` | ឈ្មោះ database សម្រាប់ Keycloak។ |
-| `KEYCLOAK_DB_USER` | `keycloak` | Database user សម្រាប់ Keycloak។ |
-| `KEYCLOAK_DB_PASSWORD` | — | ពាក្យសម្ងាត់ database សម្រាប់ Keycloak user។ |
-| `KC_HOSTNAME` | — | Keycloak frontend URL (ឧ. `https://rtcloud.example.com/auth`)។ |
-| `KC_HOSTNAME_STRICT` | `false` | Enforce hostname matching ដ៏តឹងរ៉ឹង។ Set ទៅ `true` ក្នុង production ជាមួយ domain ថេរ។ |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
 
 ---
 
 ## SSO — External OIDC Provider
 
-ភ្ជាប់ ទៅ identity provider ដែលស្របគ្នា OIDC ដែលមានស្រាប់ (Supabase, Auth0, Authentik, Okta, ។ ល។)។
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
 
-| Variable | លំនាំដើម | ការពិពណ៌នា |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (ឧ. `https://accounts.google.com`)។ |
-| `OIDC_CLIENT_ID` | — | Client ID ដែលបានចុះឈ្មោះ ក្នុង identity provider របស់អ្នក។ |
-| `OIDC_CLIENT_SECRET` | — | Client secret ពី identity provider របស់អ្នក។ |
-| `OIDC_SCOPE` | `openid profile email` | បញ្ជី OIDC scopes ដែលចែក ដោយ space ដើម្បី request។ |
-| `OIDC_REDIRECT_URI` | — | Callback URL សម្រាប់ web app (ឧ. `https://rtcloud.example.com/auth/callback`)។ |
-| `OIDC_MOBILE_CLIENT_ID` | — | Client ID ដាច់ ដោយ ឡែក សម្រាប់ rtSurvey mobile app។ |
-| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (ឧ. `vn.rta.rtsurvey.auth://callback`)។ |
-| `OPEN_REGISTRATION` | `false` | បង្កើត rtCloud accounts ដោយស្វ័យប្រវត្តិ សម្រាប់ users ដែល authenticate តាមរយៈ OIDC ជាលើកដំបូង។ |
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| Variable | ការពិពណ៌នា |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | Azure AD application (client) ID។ |
-| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID។ |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## ការរួមបញ្ចូល ស្រេចចិត្ត
+## Optional Integrations
 
 ### Stata
 
-| Variable | លំនាំដើម | ការពិពណ៌នា |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | បើក Stata statistical software integration សម្រាប់ ការ វិភាគ ទិន្នន័យ។ |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | Path ដាច់ ខាត ទៅ Stata binary ក្នុង container។ |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| Variable | ការពិពណ៌នា |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Elasticsearch host (ឧ. `http://elasticsearch:9200`)។ |
-| `ES_PORT` | Elasticsearch port។ |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
+
+### Matomo Analytics
+
+| Variable | Description |
+|----------|-------------|
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
+
+### OpenCPU (R Computation)
+
+| Variable | Description |
+|----------|-------------|
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
+
+### RtBox Integration
+
+| Variable | Description |
+|----------|-------------|
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
+
+### Matrix Messaging
+
+| Variable | Description |
+|----------|-------------|
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
 ## Data Volumes
 
-ទិន្នន័យ application ទាំងអស់ ត្រូវបានរក្សាទុក ក្នុង named Docker volumes។ Volumes ត្រូវបានបង្កើតដោយស្វ័យប្រវត្តិ នៅ startup ដំបូង ហើយ persist នៅទូទាំង container restarts និង updates។
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| Volume | Mount Point | ខ្លឹមសារ |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | ឯកសារ MySQL database |
-| `rtcloud_uploads` | `…/uploads` | ឯកសារ ដែលបញ្ចូល ដោយ អ្នកឆ្លើយតប ស្ទង់មតិ |
-| `rtcloud_audios` | `…/audios` | ការថតសូរ |
-| `rtcloud_downloads` | `…/downloads` | ឯកសារ export ដែលបង្កើត |
-| `rtcloud_gallery` | `…/gallery` | រូបភាព gallery |
-| `rtcloud_voicemail` | `…/voicemail` | ការថត voicemail |
-| `rtcloud_analytics` | `…/analytics` | ទិន្នន័យ analytics |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | R scripts Shiny server |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
 | `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-ឈ្មោះ Volume ត្រូវបាន prefix ដោយ តម្លៃ `COMPOSE_PROJECT_NAME` (default: `rtcloud`)។
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
+
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

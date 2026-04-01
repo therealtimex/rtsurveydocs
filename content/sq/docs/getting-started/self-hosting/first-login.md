@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Hyrja e parë"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Si të identifikoheni në instancën tuaj rtSurvey për herë të parë pas vendosjes."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **SSL duhet konfiguruar para hyrjes.** Nëse aksesoni aplikacionin nëpërmjet HTTP, do të shihni një paralajmërim sigurie dhe SSO do të bllokohet. Plotësoni fillimisht [Konfigurimin e SSL](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Pasi SSL të jetë aktiv, hapni shfletuesin tuaj në URL-in HTTPS:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Ekrani i hyrjes
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Faqja e hyrjes shfaq:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
+- Fushat **Emri i përdoruesit** dhe **Fjalëkalimi**
+- Butonin **Hyr**
+- Butonin **Hyr me SSO** (nën një ndarës) — për anëtarët e ekipit me llogari SSO
 
 ---
 
-## Default admin credentials
+## Kredencialet e paracaktuara të administratorit
 
-Enter the default credentials and click **Sign In**:
+Vendosni kredencialet e paracaktuara dhe klikoni **Hyr**:
 
-| Field | Value |
+| Fusha | Vlera |
 |-------|-------|
-| Username | `admin` |
-| Password | `admin` |
+| Emri i përdoruesit | `admin` |
+| Fjalëkalimi | `admin` |
 
-> **Change your password immediately after your first login.**
+> **Ndryshoni fjalëkalimin tuaj menjëherë pas hyrjes së parë.**
 
 ---
 
-## If you see a security warning
+## Nëse shihni një paralajmërim sigurie
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Nëse aksesoni aplikacionin nëpërmjet HTTP (para konfigurimit të SSL), do të shihni:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+- Një baner paralajmërimi të verdhë në krye të faqes së hyrjes
+- Një modal kur klikoni **Hyr**, që paralajmëron se kredencialet do të dërgohen të pashifruara
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Klikoni **Konfiguro SSL** për të konfiguruar HTTPS, ose **Vazhdoni gjithsesi** për të hyrë pa SSL (nuk rekomandohet).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+Hyrja SSO është bllokuar plotësisht nëpërmjet HTTP — klikimi i **Hyr me SSO** do të shfaqë një njoftim në vend të ridrejtimit.
 
 ---
 
-## After logging in
+## Pas hyrjes
 
-Once inside, you will land on the dashboard. From here:
+Pasi të jeni brenda, do të arrini në panel. Nga këtu:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Ndryshoni fjalëkalimin e administratorit** — cilësimet e llogarisë → ndrysho fjalëkalimin
+2. **Krijoni projektin tuaj të parë** — Projektet → Projekt i ri
+3. **Ngarkoni ose ndërtoni një formular** — Formularët → Ngarko XLSForm ose hapni Form Builder
+4. **Shtoni përdorues** — Përdoruesit → Ftoni ose krijoni llogari për ekipin tuaj

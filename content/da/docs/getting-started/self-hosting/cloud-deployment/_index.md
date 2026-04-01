@@ -1,95 +1,95 @@
 ---
 weight: 3
-title: "Cloud-implementering"
+title: "Skyinstallation"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "Implementér rtCloud hos større cloud-udbydere med automatiserede scripts til DigitalOcean, AWS EC2, Google Cloud og Linode."
+description: "Installer rtCloud hos store cloududbydere med automatiserede scripts til DigitalOcean, AWS EC2, Google Cloud og Linode."
 ---
 
-Implementeringslageret indeholder automatiserede provisioneringsscripts til større cloud-udbydere. Hvert script kører ved første opstart af en ny **Ubuntu 22.04 LTS**-server og udfører en fuldt automatiseret opsætning:
+Installationslageret indeholder automatiserede provisioneringsscripts til større cloududbydere. Hvert script kører ved første opstart af en ny Ubuntu 22.04 LTS-server og udfører en fuldt automatiseret opsætning:
 
-- Installerer Docker og Docker Compose
-- Genererer sikre tilfældige adgangskoder til alle interne tjenester
-- Skriver `docker-compose.production.yml` og `.env`
-- Konfigurerer Nginx som en omvendt proxy
-- Henter et gratis TLS-certifikat fra Let's Encrypt (prøver automatisk igen, til DNS er løst)
-- Konfigurerer UFW-firewallen
-- Implementerer valgfrit den indlejrede Keycloak SSO-server
-- Udskriver en komplet implementeringsoversigt med alle legitimationsoplysninger
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-Opsætningen afsluttes på **5–10 minutter** på en standardinstans.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## Valg af script
+## Choosing a Script
 
-Der er flere scriptvarianter afhængigt af din cloud-udbyder og SSO-opsætning:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| Script | Udbyder | SSO-tilstand | Bedst til |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Indbygget Keycloak | Simpelt, selvstændigt SSO |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak eller ekstern OIDC | Fuld kontrol |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Indbygget Keycloak | Formularbaseret opsætning, enklest |
-| `linode-stackscript-oidc.sh` | Linode | Kun ekstern OIDC | Eksisterende identitetsudbyder |
-| `linode-stackscript.sh` | Linode | Keycloak eller ekstern OIDC | Fuld kontrol |
-| `aws-ec2.sh` | AWS EC2 | Keycloak eller ekstern OIDC | AWS-implementeringer |
-| `gcp-compute.sh` | Google Cloud | Keycloak eller ekstern OIDC | GCP-implementeringer |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **Anbefalet til de fleste brugere:** Brug varianten `keycloak-embed`. Den inkluderer en indbygget Keycloak-identitetsserver og kræver færrest konfigurationsfelter.
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## Vejledning til serverstørrelse
+## Server Sizing Guide
 
-| Anvendelsestilfælde | RAM | Disk | Eksempel |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| Evaluering / udvikling | 2 GB | 25 GB | DO Basic $18/md., t3.small, e2-small |
-| Lille team (< 50 brugere) | 4 GB | 40 GB | DO Basic $24/md., t3.medium, e2-medium |
-| Produktion (> 50 brugere) | 8 GB | 80 GB | DO General $48/md., t3.large, n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> Indlejret Keycloak kræver mindst **4 GB RAM**. Brug kun 2 GB til evaluering uden Keycloak.
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## DNS-opsætning
+## DNS Setup
 
-Alle scripts kræver et domæne med en **A-post, der peger på din servers IP**, inden Let's Encrypt kan udstede et certifikat.
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-Scriptet udskriver din servers IP tidligt i opsætningsprocessen:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
  Server IP : 139.162.51.85
- Tilføj denne DNS A-post nu, hvis du ikke allerede har:
+ Add this DNS A record now if you haven't already:
    myapp.example.com  ->  139.162.51.85
- Scriptet prøver Certbot igen hvert 60. sekund, til DNS er løst.
+ The script will retry Certbot every 60s until DNS resolves.
 ============================================================
 ```
 
-Scriptet **prøver automatisk igen** Let's Encrypt hvert 60. sekund i op til 1 time. Tilføj blot DNS-posten og vent – ingen genstart nødvendig.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Hastighedsbegrænsning:** Let's Encrypt tillader maksimalt **5 certifikater pr. domæne pr. 7 dage**. Undgå at implementere og ødelægge servere gentagne gange med det samme domæne. Hvis du rammer grænsen, viser scriptet et tidsstempel for `prøv igen` og stopper øjeblikkeligt.
-
----
-
-## Tjekliste efter implementering
-
-- [ ] App åbner på `https://dit-domæne.com`
-- [ ] Log ind med `admin` og den adgangskode, du konfigurerede
-- [ ] Alle containere er sunde: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] Let's Encrypt-fornyelse virker: `certbot renew --dry-run`
-- [ ] MySQL-port 3306 er **ikke** eksponeret: `ufw status`
-- [ ] Opsæt en daglig database-sikkerhedskopi (se [Vedligeholdelse](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## Fejlfinding
+## Post-Deployment Checklist
 
-### Kontrollér den fulde opsætningslog
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Let's Encrypt-hastighedsbegrænsning
+### Let's Encrypt rate limit
 
-Hvis du ser `too many certificates` i loggen, har du ramt grænsen på 5 certifikater/7 dage. Loggen viser den præcise tid for næste forsøg:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
-[SSL] FEJL: Let's Encrypt-hastighedsbegrænsning ramt. prøv igen efter 2026-03-15 16:22 UTC.
+[SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-Vent til det tidspunkt, og implementér derefter igen.
+Wait until that time, then redeploy.
 
-### Keycloak forbliver usund
+### Keycloak stays unhealthy
 
-Sørg for, at serveren har mindst 4 GB RAM, og kontrollér derefter logs:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### SSL-konfiguration ikke anvendt efter certbot
+### SSL config not applied after certbot
 
-Hvis certifikatet blev udstedt, men Nginx stadig viser kun HTTP, kontrollér loggen for fejllinjen og genindlæs Nginx manuelt:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

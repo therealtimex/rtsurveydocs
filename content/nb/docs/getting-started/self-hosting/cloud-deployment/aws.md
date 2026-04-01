@@ -7,117 +7,117 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Distribuer rtCloud på en AWS EC2-instans med aws-ec2.sh User Data-skriptet."
+description: "Distribuer rtCloud på en AWS EC2-instans ved hjelp av user data-scriptet aws-ec2.sh."
 ---
 
-Bruk `aws-ec2.sh` som **User Data**-skript når du starter en EC2-instans. Skriptet kjøres automatisk ved første oppstart.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Last ned skript:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Trinn 1 — Fyll inn konfigurasjonen
+## Step 1 — Fill in the configuration
 
-Åpne skriptet og rediger `CONFIGURATION`-blokken øverst:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Påkrevd ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Endre etter første innlogging
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Domene + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Innebygd Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Standard er ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Felt | Påkrevd | Beskrivelse |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Ja | Brukes som databasenavn og Keycloak klient-ID. Kun små bokstaver, ingen mellomrom. |
-| `ADMIN_PASSWORD` | Nei | App-adminpassord og Keycloak-adminpassord. Standard er `admin` — **endre etter første innlogging**. |
-| `DOMAIN` | Nei | Domenet ditt for HTTPS. La stå tomt for kun HTTP-modus. |
-| `LETSENCRYPT_EMAIL` | Ja (hvis DOMAIN er satt) | E-post for Let's Encrypt-varsler. |
-| `EMBED_KEYCLOAK` | Nei | `true` for å distribuere innebygd Keycloak (krever 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Sikkerhet:** Alle passord er standard `admin`. Endre dem umiddelbart etter første innlogging.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Trinn 2 — Start en EC2-instans
+## Step 2 — Launch an EC2 instance
 
-I [AWS EC2-konsollen](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Klikk **Start instans**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Instanstype:** `t3.medium` (4 GB RAM) eller større
-4. **Nøkkelpar:** Velg eller opprett ett for SSH-tilgang
-5. **Nettverksinnstillinger:** Opprett eller velg en sikkerhetsgruppe (se nedenfor)
-6. **Avanserte detaljer** → **User data** → lim inn hele skriptinnholdet
-7. Klikk **Start instans**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Trinn 3 — Konfigurer sikkerhetsgruppen
+## Step 3 — Configure the Security Group
 
-Åpne disse portene i instansens sikkerhetsgruppe:
+Open these ports in the instance's Security Group:
 
-| Port | Protokoll | Kilde | Formål |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | Din IP | SSH-tilgang |
-| 80 | TCP | 0.0.0.0/0 | HTTP (omdirigert til HTTPS av Nginx) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Shiny direkte tilgang |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **Ikke** åpne port 3306 (MySQL) — den bør aldri være offentlig tilgjengelig.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Trinn 4 — Legg til DNS-posten
+## Step 4 — Add the DNS record
 
-Mens instansen starter opp, legg til en **A-post** hos DNS-leverandøren din:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
-Navn  : myapp
-Verdi : <instans-offentlig-ip>
+Name  : myapp
+Value : <instance-public-ip>
 TTL   : 300
 ```
 
 ---
 
-## Trinn 5 — Overvåk fremdriften
+## Step 5 — Monitor progress
 
 ```bash
-ssh ubuntu@<instans-ip>
+ssh ubuntu@<instance-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
 ---
 
-## Trinn 6 — Åpne appen
+## Step 6 — Access the app
 
-Når oppsettet er ferdig, viser loggen et sammendrag med app-URL og legitimasjonsopplysninger. Logg inn med brukernavn `admin` og passord `admin`, og endre passordet umiddelbart.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Etter distribusjon
+## After Deployment
 
-### Endre et passord
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Se alle containere
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Tildel en Elastic IP (valgfritt)
+### Assign an Elastic IP (optional)
 
-Hvis du stopper og starter instansen, endres den offentlige IP-en. For å beholde en stabil IP, tildel en **Elastic IP** og knytt den til instansen i EC2-konsollen.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

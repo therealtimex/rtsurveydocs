@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 6
 title: "维护"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "build"
 toc: true
-description: "自托管 rtCloud 实例的日常维护：升级、备份、恢复和常见问题故障排除。"
+description: "自托管 rtCloud 实例的日常维护：升级、备份、恢复以及常见问题排查。"
 ---
 
 ## 常用命令
 
-定期使用这些命令管理您的 rtCloud 容器。请在包含 `docker-compose.production.yml` 的目录中运行它们。
+定期使用这些命令管理您的 rtCloud 容器。在包含 `docker-compose.production.yml` 的目录中运行。
 
 ```bash
-# 检查所有容器的状态和健康
+# Check status and health of all containers
 docker compose -f docker-compose.production.yml ps
 
-# 查看实时日志（所有服务）
+# View live logs (all services)
 docker compose -f docker-compose.production.yml logs -f
 
-# 仅查看应用日志
+# View logs for the app only
 docker compose -f docker-compose.production.yml logs -f rtcloud
 
-# 重启单个容器
+# Restart a single container
 docker compose -f docker-compose.production.yml restart rtcloud
 
-# 停止所有服务
+# Stop all services
 docker compose -f docker-compose.production.yml down
 
-# 启动所有服务
+# Start all services
 docker compose -f docker-compose.production.yml up -d
 
-# 在应用容器内打开 shell
+# Open a shell inside the app container
 docker compose -f docker-compose.production.yml exec rtcloud bash
 ```
 
 ---
 
-## 升级
+## Upgrading
 
-rtCloud 更新以新的 Docker 镜像标签分发。升级会拉取最新镜像并重新创建应用容器。数据库迁移在启动时自动运行。
+rtCloud updates are distributed as new Docker image tags. Upgrading pulls the latest image and recreates the app container. Database migrations run automatically on startup.
 
-**1. 拉取最新镜像：**
+**1. Pull the latest image:**
 
 ```bash
 docker compose -f docker-compose.production.yml pull
 ```
 
-**2. 重新创建应用容器：**
+**2. Recreate the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d
 ```
 
-Docker 仅替换镜像已更改的容器。MySQL 容器和所有命名卷不受影响。
+Docker replaces only the containers whose image has changed. The MySQL container and all named volumes are unaffected.
 
-### 固定版本
+### Pinning a Version
 
-要升级到特定版本而不是 `latest`，请在 `.env` 中更新 `RTCLOUD_IMAGE`：
+To upgrade to a specific version instead of `latest`, update `RTCLOUD_IMAGE` in `.env`:
 
 ```dotenv
 RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
 ```
 
-然后按上述方式运行 `docker compose pull` 和 `up -d`。
+Then run `docker compose pull` and `up -d` as above.
 
-### 降级
+### Downgrading
 
-通常不建议降级，因为数据库迁移无法撤销。如果必须降级，请从升级前的数据库备份中恢复。
+Downgrading is generally not recommended, as database migrations cannot be reversed. If a downgrade is necessary, restore from a database backup taken before the upgrade.
 
 ---
 
-## 备份和恢复
+## Backup and Restore
 
-### 备份数据库
+### Backup the Database
 
-运行此命令将应用数据库导出到 SQL 文件：
+Run this command to export the application database to a SQL file:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -85,9 +85,9 @@ docker compose -f docker-compose.production.yml exec mysql \
   > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-备份文件写入主机上的当前目录。
+The backup file is written to your current directory on the host.
 
-### 恢复数据库
+### Restore the Database
 
 ```bash
 docker compose -f docker-compose.production.yml exec -T mysql \
@@ -95,27 +95,27 @@ docker compose -f docker-compose.production.yml exec -T mysql \
   < backup-20240101-120000.sql
 ```
 
-### 备份上传的文件
+### Backup Uploaded Files
 
-调查提交通常包含存储在命名 Docker 卷中的上传文件（照片、音频、文档）。请单独备份，与数据库备份分开：
+Survey submissions often include uploaded files (photos, audio, documents) stored in named Docker volumes. Back them up separately from the database:
 
 ```bash
-# 备份上传文件
+# Backup uploads
 docker run --rm \
   -v rtcloud_uploads:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
 
-# 备份音频录音
+# Backup audio recordings
 docker run --rm \
   -v rtcloud_audios:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/audios-$(date +%Y%m%d).tar.gz -C /data .
 ```
 
-如果您更改了默认值，请将 `rtcloud_uploads` 和 `rtcloud_audios` 替换为实际卷名称（以 `COMPOSE_PROJECT_NAME` 为前缀）。
+Replace `rtcloud_uploads` and `rtcloud_audios` with your actual volume names (prefixed by `COMPOSE_PROJECT_NAME`) if you changed the default.
 
-### 恢复上传的文件
+### Restore Uploaded Files
 
 ```bash
 docker run --rm \
@@ -124,12 +124,12 @@ docker run --rm \
   alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
 ```
 
-### 自动每日备份
+### Automated Daily Backups
 
-在主机上添加 cron 任务以自动运行备份。使用 `crontab -e` 编辑 root crontab：
+Add a cron job on the host to run backups automatically. Edit the root crontab with `crontab -e`:
 
 ```cron
-# 每天凌晨 2:00 进行数据库备份，保留 30 天历史
+# Daily database backup at 2:00 AM, keep 30 days of history
 0 2 * * * cd /opt/rtcloud && docker compose -f docker-compose.production.yml exec -T mysql \
   mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
   > /backups/db-$(date +\%Y\%m\%d).sql && \
@@ -138,77 +138,77 @@ docker run --rm \
 
 ---
 
-## 故障排除
+## Troubleshooting
 
-### 应用容器无法启动
+### App container not starting
 
-检查容器日志中的错误消息：
+Check the container logs for error messages:
 
 ```bash
 docker compose -f docker-compose.production.yml logs rtcloud
 ```
 
-常见原因：
-- `.env` 中缺少或无效的环境变量
-- MySQL 尚未就绪（等待 60 秒后再次检查）
-- 端口冲突——另一个进程已在使用 `APP_PORT`
+Common causes:
+- Missing or invalid environment variables in `.env`
+- MySQL not yet ready (wait 60 seconds and check again)
+- Port conflict — another process is already using `APP_PORT`
 
-### MySQL 不健康
+### MySQL not healthy
 
 ```bash
 docker compose -f docker-compose.production.yml logs mysql
 ```
 
-常见原因：
-- `.env` 中未设置 `MYSQL_ROOT_PASSWORD`
-- 数据卷损坏（罕见——使用 `df -h` 检查磁盘空间）
+Common causes:
+- `MYSQL_ROOT_PASSWORD` not set in `.env`
+- Corrupted data volume (rare — check disk space with `df -h`)
 
-MySQL 在首次启动时可能需要 30–60 秒才能初始化。在认定失败前请等待并再次检查。
+MySQL can take 30–60 seconds to initialize on the very first boot. Wait and check again before assuming failure.
 
-### 端口已被占用
+### Port already in use
 
-在 `.env` 中将 `APP_PORT` 或 `SHINY_PORT` 更改为空闲端口，然后重新创建容器：
+Change `APP_PORT` or `SHINY_PORT` in `.env` to a free port, then recreate the containers:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate
 ```
 
-查找主机上占用某端口的进程：
+To find what is using a port on the host:
 
 ```bash
 lsof -i :8080
 ```
 
-### 400 CSRF 令牌无法验证
+### 400 CSRF Token Could Not Be Verified
 
-此错误出现在本地或反向代理环境中，请求来源与预期主机不匹配。仅在本地开发中禁用 CSRF 验证：
+This error appears in local or reverse-proxy environments where the request origin does not match the expected host. Disable CSRF validation for local development only:
 
 ```dotenv
 CSRF_VALIDATION_ENABLED=false
 ```
 
-然后重启应用：
+Then restart the app:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-> 不要在生产环境中禁用 CSRF 验证。如果此错误在生产中出现，请确保您的反向代理正确转发 `Host` 和 `X-Forwarded-For` 头。
+> Do not disable CSRF validation in production. If this error occurs in production, ensure your reverse proxy is forwarding the correct `Host` and `X-Forwarded-For` headers.
 
-### 忘记管理员密码
+### Forgot the Admin Password
 
-直接在数据库中重置管理员密码。连接到 MySQL 容器并更新密码哈希：
+Reset the admin password directly in the database. Connect to the MySQL container and update the password hash:
 
-**第一步** — 生成新密码哈希。将 `newpassword` 替换为您期望的密码：
+**Step 1** — Generate the new password hash. Replace `newpassword` with your desired password:
 
 ```bash
 docker compose -f docker-compose.production.yml exec rtcloud php -r "
-  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\"\"));
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\""));
   echo md5(\$salt . 'newpassword') . PHP_EOL;
 "
 ```
 
-**第二步** — 在数据库中更新哈希：
+**Step 2** — Update the hash in the database:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -216,44 +216,44 @@ docker compose -f docker-compose.production.yml exec mysql \
   -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
 ```
 
-### 容器持续重启
+### Container keeps restarting
 
-检查健康检查是否失败：
+Check if the health check is failing:
 
 ```bash
 docker compose -f docker-compose.production.yml ps
-docker inspect rtcloud-app --format '{{json .State.Health}}'
+docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
 ```
 
-应用健康检查调用 `/health` 端点。如果多次失败，请检查应用日志中的启动错误。
+The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.
 
-### 磁盘空间已满
+### Disk space full
 
-找出占用空间的内容：
+Identify what is consuming space:
 
 ```bash
-# 检查主机磁盘使用情况
+# Check host disk usage
 df -h
 
-# 检查 Docker 磁盘使用情况（镜像、容器、卷）
+# Check Docker disk usage (images, containers, volumes)
 docker system df
 
-# 删除未使用的镜像和已停止的容器（安全执行）
+# Remove unused images and stopped containers (safe to run)
 docker system prune
 ```
 
-不要使用 `docker system prune --volumes`，这会删除应用数据。
+Do not use `docker system prune --volumes` as this will delete application data.
 
 ---
 
-## 健康检查
+## Health Checks
 
-每个服务都有自动健康检查。容器状态反映结果：
+Each service has an automatic health check. Container status reflects the result:
 
-| 容器 | 检查方法 | 启动周期 | 间隔 |
+| Container | Check Method | Start Period | Interval |
 |-----------|-------------|-------------|----------|
-| `rtcloud-app` | HTTP GET `/health` | 90 秒 | 30 秒 |
-| `rtcloud-mysql` | `mysqladmin ping` | 30 秒 | 10 秒 |
-| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 秒 | 30 秒 |
+| `rtcloud-app` | HTTP GET `/health` | 90 seconds | 30 seconds |
+| `rtcloud-mysql` | `mysqladmin ping` | 30 seconds | 10 seconds |
+| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 seconds | 30 seconds |
 
-健康检查失败的容器根据 `RESTART_POLICY` 设置（默认：`unless-stopped`）自动重启。
+Containers with a failing health check are automatically restarted according to the `RESTART_POLICY` setting (default: `unless-stopped`).

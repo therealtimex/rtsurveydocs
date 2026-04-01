@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 6
 title: "Maintenance"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,12 +7,12 @@ draft: false
 author: "rtSurvey"
 icon: "build"
 toc: true
-description: "Day-to-day maintenance for a self-hosted rtCloud instance: upgrading, backing up, restoring, and troubleshooting common issues."
+description: "Maintenance quotidienne d'une instance rtCloud auto-hébergée : mises à niveau, sauvegardes, restauration et dépannage des problèmes courants."
 ---
 
-## Common Commands
+## Commandes courantes
 
-Use these commands regularly to manage your rtCloud containers. Run them from the directory containing `docker-compose.production.yml`.
+Utilisez ces commandes régulièrement pour gérer vos conteneurs rtCloud. Exécutez-les depuis le répertoire contenant `docker-compose.production.yml`.
 
 ```bash
 # Check status and health of all containers
@@ -203,7 +203,7 @@ Reset the admin password directly in the database. Connect to the MySQL containe
 
 ```bash
 docker compose -f docker-compose.production.yml exec rtcloud php -r "
-  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\"\"));
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\""));
   echo md5(\$salt . 'newpassword') . PHP_EOL;
 "
 ```
@@ -222,7 +222,7 @@ Check if the health check is failing:
 
 ```bash
 docker compose -f docker-compose.production.yml ps
-docker inspect rtcloud-app --format '{{json .State.Health}}'
+docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
 ```
 
 The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.

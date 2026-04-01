@@ -7,66 +7,66 @@ draft: false
 author: "rtSurvey"
 icon: "travel_explore"
 toc: true
-description: "نشر rtCloud على Google Cloud Compute Engine باستخدام سكريبت التشغيل gcp-compute.sh."
+description: "نشر rtCloud على Google Cloud Compute Engine باستخدام سكريبت بدء التشغيل gcp-compute.sh."
 ---
 
-استخدم `gcp-compute.sh` كـ **Startup script** عند إنشاء نسخة VM في Compute Engine. تعمل السكريبت تلقائياً عند التشغيل الأول.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**تنزيل السكريبت:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## الخطوة 1 — ملء الإعداد
+## Step 1 — Fill in the configuration
 
-افتح السكريبت وعدّل كتلة `CONFIGURATION` في الأعلى:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- مطلوب ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # غيّرها بعد تسجيل الدخول الأول
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- النطاق + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Keycloak المدمج ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # الافتراضي ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| الحقل | مطلوب | الوصف |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | نعم | يُستخدم كاسم قاعدة البيانات ومعرّف عميل Keycloak. أحرف صغيرة، بدون مسافات. |
-| `ADMIN_PASSWORD` | لا | كلمة مرور مسؤول التطبيق وكلمة مرور مسؤول Keycloak. الافتراضي `admin` — **غيّرها بعد تسجيل الدخول الأول**. |
-| `DOMAIN` | لا | نطاقك لـ HTTPS. اتركه فارغاً للوضع HTTP فقط. |
-| `LETSENCRYPT_EMAIL` | نعم (إذا ضُبط DOMAIN) | البريد الإلكتروني لإشعارات Let's Encrypt. |
-| `EMBED_KEYCLOAK` | لا | `true` لنشر Keycloak المدمج (يتطلب 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **الأمان:** جميع كلمات المرور افتراضها `admin`. غيّرها فوراً بعد تسجيل دخولك الأول.
-
----
-
-## الخطوة 2 — إنشاء نسخة VM
-
-في [وحدة تحكم Google Cloud](https://console.cloud.google.com/compute):
-
-1. انقر **Create instance**
-2. **إعداد الجهاز:**
-   - السلسلة: `E2`
-   - نوع الجهاز: `e2-medium` (4 GB RAM) أو أعلى
-3. **قرص التشغيل:**
-   - نظام التشغيل: Ubuntu
-   - الإصدار: Ubuntu 22.04 LTS
-   - الحجم: 40 GB أو أكثر
-4. **جدار الحماية:** ضع علامة على **Allow HTTP traffic** و**Allow HTTPS traffic**
-5. **الخيارات المتقدمة** ← **Management** ← **Automation** ← **Startup script** ← الصق محتوى السكريبت الكامل
-6. انقر **Create**
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## الخطوة 3 — إضافة سجل DNS
+## Step 2 — Create a VM instance
 
-بينما تعمل الـ VM على التشغيل، أضف **سجل A** في مزود DNS الخاص بك:
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
+3. **Boot disk:**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
+
+---
+
+## Step 3 — Add the DNS record
+
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -75,19 +75,19 @@ Value : <vm-external-ip>
 TTL   : 300
 ```
 
-ابحث عن IP الخارجي في قائمة نسخ VM في وحدة التحكم.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## الخطوة 4 — مراقبة التقدم
+## Step 4 — Monitor progress
 
-باستخدام أداة سطر الأوامر `gcloud`:
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-أو الاتصال مباشرةً عبر SSH:
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## الخطوة 5 — الوصول إلى التطبيق
+## Step 5 — Access the app
 
-عند اكتمال الإعداد، يعرض السجل ملخصاً مع عنوان URL التطبيق وبيانات الاعتماد. سجّل الدخول باسم المستخدم `admin` وكلمة المرور `admin`، ثم غيّر كلمة مرورك فوراً.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## قواعد جدار الحماية
+## Firewall Rules
 
-تفتح مربعات اختيار **Allow HTTP/HTTPS** في GCP المنافذ 80 و443. للسماح أيضاً بوصول مباشر لـ Shiny على المنفذ 3838، أضف قاعدة جدار حماية:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-أو أضفها عبر وحدة التحكم: **VPC Network** ← **Firewall** ← **Create rule**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> **لا** تفتح المنفذ 3306 (MySQL) — يجب ألا يكون متاحاً للعموم أبداً.
-
----
-
-## IP ثابت (اختياري)
-
-بشكل افتراضي، تُعيّن GCP عنوان IP خارجياً مؤقتاً يتغير عند إعادة تشغيل الـ VM. للحفاظ على IP ثابت:
-
-1. اذهب إلى **VPC Network** ← **IP addresses**
-2. انقر **Reserve external static address**
-3. عيّنه لنسخة الـ VM الخاصة بك
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## بعد النشر
+## Static IP (optional)
 
-### تغيير كلمة مرور
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### عرض جميع الحاويات
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

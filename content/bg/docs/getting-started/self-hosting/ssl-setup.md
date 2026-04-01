@@ -1,128 +1,128 @@
 ---
 weight: 4
-title: "Set Up SSL"
+title: "Настройка на SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Configure HTTPS for your rtSurvey server. Required before you can log in."
+description: "Конфигуриране на HTTPS за вашия сървър rtSurvey. Необходимо преди влизане."
 ---
 
-SSL must be configured before you can log in. When you open the app for the first time, you will be redirected to the SSL setup screen automatically.
-
----
-
-## SSL setup options
-
-![SSL setup options](/img/ssl-setup/ssl-setup-options.png)
-
-Choose one of three options:
-
-| Option | When to use |
-|--------|-------------|
-| **Free rtsurvey.com subdomain** *(Recommended)* | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **My own domain** | You already have a domain and its DNS points to this server. |
-| **Install certificate manually** | Enterprise or custom CA. Requires SSH access. |
+SSL трябва да е конфигуриран преди да можете да влезете. Когато отворите приложението за първи път, ще бъдете автоматично пренасочени към екрана за настройка на SSL.
 
 ---
 
-## Option 1 — Free rtsurvey.com subdomain *(Recommended)*
+## Опции за настройка на SSL
 
-This is the fastest option. No domain registration or DNS changes required.
+![Опции за настройка на SSL](/img/ssl-setup/ssl-setup-options.png)
 
-1. Click **Free rtsurvey.com subdomain** to expand the section
-2. Type your desired subdomain name in the input field
+Изберете една от трите опции:
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+| Опция | Кога да използвате |
+|-------|-------------------|
+| **Безплатен поддомейн rtsurvey.com** *(Препоръчително)* | Не е необходима настройка на DNS. Ние създаваме записа вместо вас. Готово за 2–5 минути. |
+| **Мой собствен домейн** | Вече имате домейн и DNS му сочи към този сървър. |
+| **Ръчно инсталиране на сертификат** | Корпоративна или персонализирана CA. Изисква SSH достъп. |
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+---
+
+## Опция 1 — Безплатен поддомейн rtsurvey.com *(Препоръчително)*
+
+Това е най-бързата опция. Не се изисква регистрация на домейн или промени в DNS.
+
+1. Кликнете върху **Безплатен поддомейн rtsurvey.com** за разширяване на секцията
+2. Въведете желаното име на поддомейн в полето за въвеждане
+
+   > Използвайте малки букви, цифри и тирета. 3–30 символа.
+   > Пример: `myproject` → `myproject.rtsurvey.com`
+
+3. Кликнете на **Създай https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. Изчакайте 2–5 минути, докато се издаде сертификатът
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. Веднъж готов, ще бъдете автоматично пренасочени към новия HTTPS адрес
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — My own domain
+## Опция 2 — Мой собствен домейн
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+Използвайте, ако имате съществуващ домейн и DNS `A` записът вече сочи към IP-то на сървъра.
 
-1. Click **My own domain** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. Кликнете върху **Мой собствен домейн** за разширяване
+2. Въведете пълното си домейн име (напр. `survey.myorganization.org`)
+3. Кликнете на **Създай сертификат**
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt ще провери домейна ви и ще издаде сертификат. Изисква DNS да е правилно насочен — иначе заявката ще се провали.
 
 ---
 
-## Option 3 — Install certificate manually
+## Опция 3 — Ръчно инсталиране на сертификат
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+За корпоративни среди с персонализиран или вътрешен CA. Поставяте файловете на сертификата на сървъра чрез SSH, след което въвеждате домейна си в приложението.
 
-### Prerequisites
+### Предварителни изисквания
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- SSH достъп до сървъра
+- Валиден сертификат и частен ключ за вашия домейн (PEM формат)
 
-### Step 1 — SSH into the server
+### Стъпка 1 — SSH към сървъра
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### Стъпка 2 — Поставете файловете на сертификата
 
-Create the directory and copy your files:
+Създайте директорията и копирайте файловете:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+Копирайте файловете с точните имена:
 
-| File | Description |
-|------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| Файл | Описание |
+|------|---------|
+| `fullchain.pem` | Вашият сертификат + всички междинни CA сертификати (конкатенирани) |
+| `privkey.pem` | Вашият частен ключ |
 
-Example:
+Пример:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# Копирайте от локалната машина (изпълнете локално, не на сървъра)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+Задайте правилни разрешения:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### Стъпка 3 — Въведете домейна в приложението
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Install certificate manually**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. В екрана за настройка на SSL кликнете върху **Ръчно инсталиране на сертификат**
+2. Въведете вашето домейн име (трябва да съответства на Common Name или SAN на сертификата)
+3. Кликнете на **Приложи**
 
-The server will configure Nginx with your certificate and reload automatically.
+Сървърът ще конфигурира Nginx с вашия сертификат и ще се презареди автоматично.
 
 ---
 
-## Next step
+## Следваща стъпка
 
-Once SSL is active, proceed to [First Login](first-login).
+Веднъж активен SSL, преминете към [Първо влизане](first-login).

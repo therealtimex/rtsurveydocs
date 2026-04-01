@@ -7,215 +7,215 @@ draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "Referência completa de todas as variáveis de ambiente usadas para configurar uma implantação do rtCloud com hospedagem própria."
+description: "Referência completa de todas as variáveis de ambiente usadas para configurar uma implantação rtCloud auto-hospedada."
 ---
 
-Toda a configuração é feita por meio de variáveis de ambiente no arquivo `.env` na raiz do seu diretório de implantação. O Docker Compose lê este arquivo automaticamente — não é necessário o sinalizador `--env-file`.
+Toda a configuração é feita através de variáveis de ambiente no arquivo `.env` na raiz do diretório de implantação. O Docker Compose lê esse arquivo automaticamente — nenhum sinalizador `--env-file` é necessário.
 
-Variáveis marcadas como **obrigatórias** devem ser definidas antes de iniciar os contêineres. Todas as outras têm padrões e são opcionais.
-
----
-
-## Projeto
-
-Essas variáveis definem a identidade e o ponto de acesso da sua instância do rtCloud.
-
-| Variável | Padrão | Obrigatória | Descrição |
-|----------|--------|-------------|-----------|
-| `PROJECT_ID` | — | **Sim** | Identificador único para esta implantação. Sem espaços ou caracteres especiais. Usado como prefixo para nomenclatura interna. |
-| `PROJECT_URL` | — | **Sim** | Nome de domínio ou endereço IP onde os usuários acessam o aplicativo (por exemplo, `rtcloud.exemplo.com.br` ou `192.168.1.100`). |
-| `PROJECT_TYPE` | `rtsurvey` | Não | Variante da plataforma a ativar. Opções: `rtwork`, `rtsurvey`, `rthome`. |
-| `PROJECT_PORT` | `80` | Não | Porta em que o aplicativo escuta dentro do contêiner. Não altere a menos que saiba o que está fazendo. |
-| `HTTP_PROTOCOL` | `https` | Não | Protocolo usado para construir URLs internas. Defina como `http` se não estiver usando SSL. |
+Variáveis marcadas como **obrigatórias** devem ser definidas antes de iniciar os contêineres. Todas as outras têm valores padrão e são opcionais.
 
 ---
 
-## Banco de dados
+## Project
 
-Credenciais de conexão do MySQL. O banco de dados é gerenciado automaticamente pelo contêiner MySQL — você só precisa definir senhas fortes.
+These variables define the identity and access point of your rtCloud instance.
 
-| Variável | Padrão | Obrigatória | Descrição |
-|----------|--------|-------------|-----------|
-| `MYSQL_DATABASE` | `smartsurvey` | Não | Nome do banco de dados do aplicativo. |
-| `MYSQL_USER` | `smartsurvey` | Não | Usuário MySQL para o aplicativo. |
-| `MYSQL_PASSWORD` | — | **Sim** | Senha para `MYSQL_USER`. Use um valor forte e único. |
-| `MYSQL_ROOT_PASSWORD` | — | **Sim** | Senha root do MySQL. Necessária para inicialização e operações administrativas do banco de dados. |
-| `MYSQL_HOST` | `mysql` | Não | Nome do host MySQL. Use o padrão a menos que esteja conectando a um banco de dados externo. |
-| `MYSQL_PORT` | `3306` | Não | Porta do MySQL. |
-
----
-
-## Conta de administrador
-
-A conta de administrador é criada automaticamente na primeira inicialização de um banco de dados novo.
-
-| Variável | Padrão | Obrigatória | Descrição |
-|----------|--------|-------------|-----------|
-| `ADMIN_PASSWORD` | `admin` | **Sim** | Senha para o usuário `admin` integrado. Defina antes da primeira inicialização. Não tem efeito se o banco de dados já existir. |
-
-> Após o primeiro login, altere a senha do administrador na página **Configurações da conta** na interface web.
+| Variable | Default | Required | Description |
+|----------|---------|----------|-------------|
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## Portas
+## Database
 
-Controle quais portas do host o aplicativo vincula.
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| Variável | Padrão | Descrição |
-|----------|--------|-----------|
-| `APP_PORT` | `8080` | Porta do host para a interface web principal. Altere se a porta 8080 já estiver em uso no seu servidor. |
-| `SHINY_PORT` | `3838` | Porta do host para o servidor de análise Shiny. |
-
----
-
-## Tempo de execução
-
-| Variável | Padrão | Descrição |
-|----------|--------|-----------|
-| `RUN_ENV` | `prod` | Ambiente de execução. Use `prod` para implantações de produção, `dev` para desenvolvimento local. |
-| `RUN_MODE` | `admin` | Função do contêiner. `admin` executa a pilha completa (web + fila + cron). `worker` executa apenas o processamento em segundo plano (para escalonamento horizontal). |
-| `TZ` | `Asia/Ho_Chi_Minh` | Fuso horário do servidor. Afeta registros de data/hora dos logs, agendamentos cron e exibição de datas. Use um [nome de fuso horário do banco de dados TZ](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (por exemplo, `UTC`, `America/Sao_Paulo`, `Europe/Lisbon`). |
-| `LOG_LEVEL` | `info` | Verbosidade do log do aplicativo. Opções: `debug`, `info`, `warning`, `error`. |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefixo aplicado a todos os nomes de contêineres e volumes Docker. Altere ao executar várias instâncias do rtCloud no mesmo host. |
-| `RESTART_POLICY` | `unless-stopped` | Comportamento de reinicialização do contêiner Docker. Opções: `no`, `always`, `on-failure`, `unless-stopped`. |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Imagem Docker a ser usada. Altere a tag para fixar uma versão específica. |
-| `REQUIRE_LICENSE` | `false` | Habilitar validação de chave de licença na inicialização. Entre em contato com a RTA para informações sobre licença. |
+| Variable | Default | Required | Description |
+|----------|---------|----------|-------------|
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## Segurança
+## Admin Account
 
-| Variável | Padrão | Descrição |
-|----------|--------|-----------|
-| `CSRF_VALIDATION_ENABLED` | `true` | Habilitar validação de token CSRF. Mantenha como `true` em produção. Defina como `false` apenas em desenvolvimento local se encontrar erros `400 CSRF token could not be verified`. |
-| `GII_ENABLED` | `false` | Habilitar a ferramenta geradora de código do framework Yii. **Nunca habilite em produção.** |
+The admin account is created automatically on the first boot of a fresh database.
 
----
+| Variable | Default | Required | Description |
+|----------|---------|----------|-------------|
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-## SSO — Keycloak integrado
-
-Habilite o contêiner Keycloak integrado para SSO empresarial completo. Requer um domínio com HTTPS.
-
-| Variável | Padrão | Descrição |
-|----------|--------|-----------|
-| `EMBED_KEYCLOAK` | `false` | Defina como `true` para iniciar o contêiner Keycloak integrado. Ativa o perfil `embed-keycloak` do Docker Compose. |
-| `KEYCLOAK_URL` | — | URL completa do servidor Keycloak (por exemplo, `https://rtcloud.exemplo.com.br/auth`). |
-| `KEYCLOAK_REALM` | — | Nome do realm do Keycloak (por exemplo, `rtsurvey`). |
-| `KEYCLOAK_CLIENT_ID` | — | ID do cliente Keycloak para o aplicativo rtCloud. |
-| `KEYCLOAK_CLIENT_SECRET` | — | Segredo do cliente Keycloak. Gere-o no console de administração do Keycloak. |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Nome de usuário do administrador do Keycloak. |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Senha do administrador do Keycloak. |
-| `KEYCLOAK_DB` | `keycloak` | Nome do banco de dados para o Keycloak. Criado automaticamente na primeira inicialização. |
-| `KEYCLOAK_DB_USER` | `keycloak` | Usuário do banco de dados para o Keycloak. |
-| `KEYCLOAK_DB_PASSWORD` | — | Senha do banco de dados para o usuário Keycloak. |
-| `KC_HOSTNAME` | — | URL de frontend do Keycloak (por exemplo, `https://rtcloud.exemplo.com.br/auth`). |
-| `KC_HOSTNAME_STRICT` | `false` | Aplicar correspondência estrita de nome de host. Defina como `true` em produção com um domínio fixo. |
-
-Consulte [Autenticação SSO](sso-authentication#embedded-keycloak) para o guia completo de configuração.
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## SSO — Provedor OIDC externo
+## Ports
 
-Conecte-se a um provedor de identidade compatível com OIDC existente (Supabase, Auth0, Authentik, Okta, etc.).
+Control which host ports the application binds to.
 
-| Variável | Padrão | Descrição |
-|----------|--------|-----------|
-| `OIDC_ISSUER_URL` | — | URL de descoberta do emissor OIDC (por exemplo, `https://accounts.google.com`). |
-| `OIDC_CLIENT_ID` | — | ID do cliente registrado no seu provedor de identidade. |
-| `OIDC_CLIENT_SECRET` | — | Segredo do cliente do seu provedor de identidade. |
-| `OIDC_SCOPE` | `openid profile email` | Lista de escopos OIDC separados por espaço para solicitar. |
-| `OIDC_REDIRECT_URI` | — | URL de retorno de chamada para o aplicativo web (por exemplo, `https://rtcloud.exemplo.com.br/auth/callback`). |
-| `OIDC_MOBILE_CLIENT_ID` | — | ID de cliente separado para o aplicativo móvel rtSurvey. |
-| `OIDC_MOBILE_REDIRECT_URI` | — | URI de retorno de chamada do aplicativo móvel (por exemplo, `vn.rta.rtsurvey.auth://callback`). |
-| `OPEN_REGISTRATION` | `false` | Criar automaticamente contas rtCloud para usuários que se autenticam via OIDC pela primeira vez. |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | Substituir a URL do endpoint de autorização (deixe em branco para usar a descoberta). |
-| `OIDC_TOKEN_ENDPOINT` | — | Substituir a URL do endpoint de token (deixe em branco para usar a descoberta). |
-| `OIDC_USERINFO_ENDPOINT` | — | Substituir a URL do endpoint de informações do usuário (deixe em branco para usar a descoberta). |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
+
+---
+
+## Runtime
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
+
+---
+
+## Security
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
+
+---
+
+## SSO — Embedded Keycloak
+
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| Variável | Descrição |
-|----------|-----------|
-| `AZURE_CLIENT_ID` | ID do aplicativo (cliente) do Azure AD. |
-| `AZURE_TENANT_ID` | ID do diretório (tenant) do Azure AD. |
+| Variable | Description |
+|----------|-------------|
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## Integrações opcionais
+## Optional Integrations
 
 ### Stata
 
-| Variável | Padrão | Descrição |
-|----------|--------|-----------|
-| `STATA_ENABLED` | `false` | Habilitar integração com o software estatístico Stata para análise de dados. |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | Caminho absoluto para o binário do Stata dentro do contêiner. |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| Variável | Descrição |
-|----------|-----------|
-| `ES_HOST` | Host do Elasticsearch (por exemplo, `http://elasticsearch:9200`). |
-| `ES_PORT` | Porta do Elasticsearch. |
+| Variable | Description |
+|----------|-------------|
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
 ### Matomo Analytics
 
-| Variável | Descrição |
-|----------|-----------|
-| `PIWIK_URL` | URL do servidor Matomo (Piwik). |
-| `PIWIK_ID` | ID do site do Matomo. |
-| `PIWIK_SECRET` | Token de autenticação do Matomo. |
+| Variable | Description |
+|----------|-------------|
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (Computação R)
+### OpenCPU (R Computation)
 
-| Variável | Descrição |
-|----------|-----------|
-| `OCPU_HOST` | URL do servidor OpenCPU para computação estatística baseada em R. |
+| Variable | Description |
+|----------|-------------|
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### Integração RtBox
+### RtBox Integration
 
-| Variável | Descrição |
-|----------|-----------|
-| `RTBOX_HOST` | URL do host do serviço RtBox. |
-| `RTBOX_USER_API` | Chave API do usuário RtBox. |
-| `RTBOX_BASIC_AUTH` | Credenciais de autenticação básica para o RtBox. |
+| Variable | Description |
+|----------|-------------|
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Mensagens Matrix
+### Matrix Messaging
 
-| Variável | Descrição |
-|----------|-----------|
-| `MATRIX_HOMESERVER_HOST` | Host do servidor Matrix. |
-| `MATRIX_HOMESERVER_PORT` | Porta do servidor Matrix. |
+| Variable | Description |
+|----------|-------------|
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## Volumes de dados
+## Data Volumes
 
-Todos os dados do aplicativo são armazenados em volumes Docker nomeados. Os volumes são criados automaticamente na primeira inicialização e persistem entre reinicializações e atualizações de contêineres.
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| Volume | Ponto de montagem | Conteúdo |
-|--------|-------------------|---------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | Arquivos do banco de dados MySQL |
-| `rtcloud_uploads` | `…/uploads` | Arquivos enviados por respondentes da pesquisa |
-| `rtcloud_audios` | `…/audios` | Gravações de áudio |
-| `rtcloud_downloads` | `…/downloads` | Arquivos de exportação gerados |
-| `rtcloud_gallery` | `…/gallery` | Imagens da galeria |
-| `rtcloud_voicemail` | `…/voicemail` | Gravações de correio de voz |
-| `rtcloud_analytics` | `…/analytics` | Dados de análise |
-| `rtcloud_aggregate` | `…/aggregate` | Resultados agregados da pesquisa |
-| `rtcloud_converter` | `…/converter` | Saídas de conversão de dados |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Scripts R do servidor Shiny |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Logs do servidor Shiny |
-| `rtcloud_assets` | `…/assets` | Ativos web (CSS, JS) |
-| `rtcloud_runtime` | `…/protected/runtime` | Cache de tempo de execução do aplicativo |
-| `rtcloud_cache` | `…/cache` | Cache do aplicativo |
-| `rtcloud_tmp` | `…/tmp` | Arquivos temporários |
+| Volume | Mount Point | Contents |
+|--------|-------------|----------|
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-Os nomes dos volumes são prefixados pelo valor de `COMPOSE_PROJECT_NAME` (padrão: `rtcloud`).
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-Liste todos os volumes da sua implantação:
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

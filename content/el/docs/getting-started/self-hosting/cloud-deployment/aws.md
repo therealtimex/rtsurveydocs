@@ -7,88 +7,88 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Αναπτύξτε το rtCloud σε εγκατάσταση AWS EC2 χρησιμοποιώντας το σενάριο user data aws-ec2.sh."
+description: "Ανάπτυξη rtCloud σε AWS EC2 instance χρησιμοποιώντας το script δεδομένων χρήστη aws-ec2.sh."
 ---
 
-Χρησιμοποιήστε το `aws-ec2.sh` ως σενάριο **User Data** κατά την εκκίνηση εγκατάστασης EC2. Το σενάριο εκτελείται αυτόματα κατά την πρώτη εκκίνηση.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Λήψη σεναρίου:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Βήμα 1 — Συμπλήρωση της διαμόρφωσης
+## Step 1 — Fill in the configuration
 
-Ανοίξτε το σενάριο και επεξεργαστείτε το μπλοκ `CONFIGURATION` στην κορυφή:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Απαιτούμενα ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Αλλάξτε μετά την πρώτη σύνδεση
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Τομέας + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Ενσωματωμένο Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Προεπιλογή στο ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Πεδίο | Απαιτείται | Περιγραφή |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Ναι | Χρησιμοποιείται ως όνομα βάσης δεδομένων και ID πελάτη Keycloak. Πεζά, χωρίς κενά. |
-| `ADMIN_PASSWORD` | Όχι | Κωδικός διαχειριστή εφαρμογής και Keycloak. Προεπιλογή `admin` — **αλλάξτε μετά την πρώτη σύνδεση**. |
-| `DOMAIN` | Όχι | Ο τομέας σας για HTTPS. Αφήστε κενό για λειτουργία μόνο HTTP. |
-| `LETSENCRYPT_EMAIL` | Ναι (εάν ορίστηκε DOMAIN) | Email για ειδοποιήσεις Let's Encrypt. |
-| `EMBED_KEYCLOAK` | Όχι | `true` για ανάπτυξη ενσωματωμένου Keycloak (απαιτεί 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Ασφάλεια:** Όλοι οι κωδικοί ορίζονται σε `admin` από προεπιλογή. Αλλάξτε τους αμέσως μετά την πρώτη σύνδεση.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Βήμα 2 — Εκκίνηση εγκατάστασης EC2
+## Step 2 — Launch an EC2 instance
 
-Στην [κονσόλα AWS EC2](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Κάντε κλικ στο **Εκκίνηση εγκατάστασης**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Τύπος εγκατάστασης:** `t3.medium` (4 GB RAM) ή μεγαλύτερο
-4. **Ζεύγος κλειδιών:** Επιλέξτε ή δημιουργήστε ένα για πρόσβαση SSH
-5. **Ρυθμίσεις δικτύου:** Δημιουργήστε ή επιλέξτε Ομάδα ασφαλείας (δείτε παρακάτω)
-6. **Προχωρημένες λεπτομέρειες** → **Δεδομένα χρήστη** → επικολλήστε το πλήρες περιεχόμενο σεναρίου
-7. Κάντε κλικ στο **Εκκίνηση εγκατάστασης**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Βήμα 3 — Διαμόρφωση Ομάδας ασφαλείας
+## Step 3 — Configure the Security Group
 
-Ανοίξτε αυτές τις θύρες στην Ομάδα ασφαλείας της εγκατάστασης:
+Open these ports in the instance's Security Group:
 
-| Θύρα | Πρωτόκολλο | Πηγή | Σκοπός |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | Η IP σας | Πρόσβαση SSH |
-| 80 | TCP | 0.0.0.0/0 | HTTP (ανακατεύθυνση στο HTTPS μέσω Nginx) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Άμεση πρόσβαση Shiny |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **Μην** ανοίγετε τη θύρα 3306 (MySQL) — δεν πρέπει ποτέ να είναι δημόσια προσβάσιμη.
-
----
-
-## Βήμα 4 — Προσθήκη εγγραφής DNS
-
-Ενώ η εγκατάσταση εκκινεί, προσθέστε **εγγραφή A** στον πάροχο DNS σας:
-
-```
-Τύπος  : A
-Όνομα  : myapp
-Τιμή   : <instance-public-ip>
-TTL    : 300
-```
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Βήμα 5 — Παρακολούθηση προόδου
+## Step 4 — Add the DNS record
+
+While the instance boots, add an **A record** in your DNS provider:
+
+```
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
+TTL   : 300
+```
+
+---
+
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Βήμα 6 — Πρόσβαση στην εφαρμογή
+## Step 6 — Access the app
 
-Όταν η ρύθμιση ολοκληρωθεί, το αρχείο καταγραφής εμφανίζει σύνοψη με URL εφαρμογής και διαπιστευτήρια. Συνδεθείτε με όνομα χρήστη `admin` και κωδικό `admin`, στη συνέχεια αλλάξτε τον κωδικό σας αμέσως.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Μετά την ανάπτυξη
+## After Deployment
 
-### Αλλαγή κωδικού
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Προβολή όλων των κοντέινερ
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Εκχώρηση Elastic IP (προαιρετικό)
+### Assign an Elastic IP (optional)
 
-Εάν διακόψετε και εκκινήσετε την εγκατάσταση, η δημόσια IP αλλάζει. Για διατήρηση σταθερής IP, εκχωρήστε **Elastic IP** και συσχετίστε την με την εγκατάσταση στην κονσόλα EC2.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "aws-ec2.sh user data 스크립트를 사용하여 AWS EC2 인스턴스에 rtCloud를 배포합니다."
+description: "aws-ec2.sh 사용자 데이터 스크립트를 사용하여 AWS EC2 인스턴스에 rtCloud를 배포합니다."
 ---
 
-EC2 인스턴스를 시작할 때 `aws-ec2.sh`를 **User Data** 스크립트로 사용합니다. 스크립트는 첫 번째 부팅 시 자동으로 실행됩니다.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**스크립트 다운로드:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## 1단계 — 구성 입력
+## Step 1 — Fill in the configuration
 
-스크립트를 열고 상단의 `CONFIGURATION` 블록을 편집합니다:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- 필수 ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # 첫 로그인 후 변경
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- 도메인 + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- 내장 Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ADMIN_PASSWORD로 기본 설정
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| 필드 | 필수 | 설명 |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | 예 | 데이터베이스 이름 및 Keycloak 클라이언트 ID로 사용됩니다. 소문자, 공백 없음. |
-| `ADMIN_PASSWORD` | 아니오 | 앱 관리자 비밀번호 및 Keycloak 관리자 비밀번호. 기본값은 `admin` — **첫 로그인 후 변경**. |
-| `DOMAIN` | 아니오 | HTTPS용 도메인. HTTP 전용 모드는 공백으로 두세요. |
-| `LETSENCRYPT_EMAIL` | 예 (DOMAIN 설정 시) | Let's Encrypt 알림용 이메일. |
-| `EMBED_KEYCLOAK` | 아니오 | 내장 Keycloak 배포는 `true` (4 GB RAM 필요). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **보안:** 모든 비밀번호는 기본적으로 `admin`입니다. 첫 번째 로그인 후 즉시 변경하세요.
-
----
-
-## 2단계 — EC2 인스턴스 시작
-
-[AWS EC2 콘솔](https://console.aws.amazon.com/ec2)에서:
-
-1. **인스턴스 시작** 클릭
-2. **AMI:** Ubuntu Server 22.04 LTS (64비트 x86)
-3. **인스턴스 유형:** `t3.medium` (4 GB RAM) 이상
-4. **키 페어:** SSH 접근을 위한 키 페어 선택 또는 생성
-5. **네트워크 설정:** 보안 그룹 생성 또는 선택 (아래 참조)
-6. **고급 세부 정보** → **User data** → 전체 스크립트 내용 붙여넣기
-7. **인스턴스 시작** 클릭
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## 3단계 — 보안 그룹 구성
+## Step 2 — Launch an EC2 instance
 
-인스턴스의 보안 그룹에서 다음 포트를 엽니다:
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-| 포트 | 프로토콜 | 소스 | 목적 |
+1. Click **Launch instance**
+2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
+
+---
+
+## Step 3 — Configure the Security Group
+
+Open these ports in the instance's Security Group:
+
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | 사용자 IP | SSH 접근 |
-| 80 | TCP | 0.0.0.0/0 | HTTP (Nginx에서 HTTPS로 리디렉션) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Shiny 직접 접근 |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> 포트 3306 (MySQL)을 **열지 마세요** — 절대 공개적으로 접근 가능해서는 안 됩니다.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## 4단계 — DNS 레코드 추가
+## Step 4 — Add the DNS record
 
-인스턴스가 부팅되는 동안 DNS 공급자에 **A 레코드**를 추가합니다:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -88,7 +88,7 @@ TTL   : 300
 
 ---
 
-## 5단계 — 진행 상황 모니터링
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## 6단계 — 앱 접속
+## Step 6 — Access the app
 
-설정이 완료되면 로그에 앱 URL 및 자격 증명이 포함된 요약이 표시됩니다. 사용자명 `admin`, 비밀번호 `admin`으로 로그인한 후 즉시 비밀번호를 변경하세요.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## 배포 후
+## After Deployment
 
-### 비밀번호 변경
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### 모든 컨테이너 보기
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Elastic IP 할당 (선택 사항)
+### Assign an Elastic IP (optional)
 
-인스턴스를 중지했다가 시작하면 공개 IP가 변경됩니다. 안정적인 IP를 유지하려면 **Elastic IP**를 할당하고 EC2 콘솔에서 인스턴스에 연결하세요.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

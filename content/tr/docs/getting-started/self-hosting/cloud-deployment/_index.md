@@ -7,59 +7,59 @@ draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "DigitalOcean, AWS EC2, Google Cloud ve Linode için otomatik betiklerle rtCloud'u büyük bulut sağlayıcılarına dağıtın."
+description: "DigitalOcean, AWS EC2, Google Cloud ve Linode için otomatik scriptlerle rtCloud'u büyük bulut sağlayıcılarına dağıtın."
 ---
 
-Dağıtım deposu, büyük bulut sağlayıcıları için otomatik sağlama betikleri içermektedir. Her betik, yeni bir **Ubuntu 22.04 LTS** sunucusunun ilk açılışında çalışır ve tamamen katılımsız bir kurulum gerçekleştirir:
+Dağıtım deposu, büyük bulut sağlayıcıları için otomatik sağlama scriptleri içerir. Her script, yeni bir Ubuntu 22.04 LTS sunucusunun ilk önyüklemesinde çalışır ve tamamen katılımsız bir kurulum gerçekleştirir:
 
-- Docker ve Docker Compose'u yükler
-- Tüm dahili hizmetler için güvenli rastgele şifreler oluşturur
-- `docker-compose.production.yml` ve `.env` dosyalarını yazar
-- Nginx'i ters proxy olarak yapılandırır
-- Let's Encrypt'ten ücretsiz TLS sertifikası alır (DNS çözümlenene kadar otomatik olarak yeniden dener)
-- UFW güvenlik duvarını yapılandırır
-- İsteğe bağlı olarak yerleşik Keycloak SSO sunucusunu dağıtır
-- Tüm kimlik bilgileriyle birlikte tam dağıtım özeti çıktılar
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-Kurulum, standart bir örnekte **5–10 dakika** içinde tamamlanır.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## Betik Seçimi
+## Choosing a Script
 
-Bulut sağlayıcınıza ve SSO kurulumunuza bağlı olarak birden fazla betik varyantı mevcuttur:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| Betik | Sağlayıcı | SSO Modu | En İyi Kullanım |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Yerleşik Keycloak | Basit, kendi kendine yeten SSO |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak veya Harici OIDC | Tam kontrol |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Yerleşik Keycloak | Form tabanlı kurulum, en basit |
-| `linode-stackscript-oidc.sh` | Linode | Yalnızca Harici OIDC | Mevcut kimlik sağlayıcısı |
-| `linode-stackscript.sh` | Linode | Keycloak veya Harici OIDC | Tam kontrol |
-| `aws-ec2.sh` | AWS EC2 | Keycloak veya Harici OIDC | AWS dağıtımları |
-| `gcp-compute.sh` | Google Cloud | Keycloak veya Harici OIDC | GCP dağıtımları |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **Çoğu kullanıcı için öneri:** `keycloak-embed` varyantını kullanın. Yerleşik bir Keycloak kimlik sunucusu içerir ve en az yapılandırma alanı gerektirir.
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## Sunucu Boyutlandırma Kılavuzu
+## Server Sizing Guide
 
-| Kullanım Durumu | RAM | Disk | Örnek |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| Değerlendirme / geliştirme | 2 GB | 25 GB | DO Basic $18/ay, t3.small, e2-small |
-| Küçük ekip (< 50 kullanıcı) | 4 GB | 40 GB | DO Basic $24/ay, t3.medium, e2-medium |
-| Üretim (> 50 kullanıcı) | 8 GB | 80 GB | DO General $48/ay, t3.large, n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> Yerleşik Keycloak en az **4 GB RAM** gerektirir. Keycloak olmadan değerlendirme için yalnızca 2 GB kullanın.
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## DNS Kurulumu
+## DNS Setup
 
-Tüm betikler, Let's Encrypt'in sertifika verebilmesi için **sunucunuzun IP'sine işaret eden bir A kaydına sahip** bir alan adı gerektirir.
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-Betik, kurulum sürecinin başlarında sunucu IP'nizi yazdırır:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
@@ -70,26 +70,26 @@ Betik, kurulum sürecinin başlarında sunucu IP'nizi yazdırır:
 ============================================================
 ```
 
-Betik, 1 saate kadar her 60 saniyede bir Let's Encrypt'i **otomatik olarak yeniden dener**. DNS kaydını ekleyin ve bekleyin — yeniden başlatma gerekmez.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Oran sınırı:** Let's Encrypt, alan adı başına 7 günde en fazla **5 sertifikaya** izin verir. Aynı alan adıyla sunucuları tekrar tekrar dağıtıp yok etmekten kaçının. Sınıra ulaşırsanız betik bir `yeniden deneme sonrası` zaman damgası görüntüler ve hemen durur.
-
----
-
-## Dağıtım Sonrası Kontrol Listesi
-
-- [ ] Uygulama `https://your-domain.com` adresinde açılıyor
-- [ ] `admin` ve yapılandırdığınız şifreyle giriş yapın
-- [ ] Tüm konteynerler sağlıklı: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] Let's Encrypt yenileme çalışıyor: `certbot renew --dry-run`
-- [ ] MySQL portu 3306 **açık değil**: `ufw status`
-- [ ] Günlük veritabanı yedeklemesi kurun (bkz. [Bakım](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## Sorun Giderme
+## Post-Deployment Checklist
 
-### Tam kurulum günlüğünü kontrol edin
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Let's Encrypt oran sınırı
+### Let's Encrypt rate limit
 
-Günlükte `too many certificates` görürseniz, 5 sertifika/7 gün sınırına ulaştınız. Günlük tam yeniden deneme süresini gösterir:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
 [SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-O zamana kadar bekleyin, ardından yeniden dağıtın.
+Wait until that time, then redeploy.
 
-### Keycloak sağlıksız kalıyor
+### Keycloak stays unhealthy
 
-Sunucunun en az 4 GB RAM'e sahip olduğundan emin olun, ardından günlükleri kontrol edin:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### Certbot'tan sonra SSL yapılandırması uygulanmadı
+### SSL config not applied after certbot
 
-Sertifika verildi ancak Nginx hâlâ yalnızca HTTP gösteriyorsa, günlükte hata satırını kontrol edin ve Nginx'i manuel olarak yeniden yükleyin:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

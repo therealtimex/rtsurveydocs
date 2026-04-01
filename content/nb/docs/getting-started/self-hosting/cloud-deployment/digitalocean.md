@@ -7,86 +7,86 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Distribuer rtCloud på en DigitalOcean Droplet med automatiserte User Data-skript."
+description: "Distribuer rtCloud på en DigitalOcean Droplet ved hjelp av automatiserte user-data-scripts."
 ---
 
-DigitalOcean bruker **User Data**-skript som kjøres automatisk ved første oppstart. Du fyller inn konfigurasjonsvariabler øverst i skriptet, og limer deretter inn hele skriptet når du oppretter en Droplet.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> I motsetning til Linode StackScripts har DigitalOcean ingen skjema-UI — du må redigere skriptet direkte før du limer inn.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**Last ned skript:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Innebygd Keycloak (anbefalt)
+## Embedded Keycloak (Recommended)
 
-Bruk `digitalocean-droplet-keycloak-embed.sh` for det enkleste oppsettet med innebygd SSO.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### Trinn 1 — Fyll inn konfigurasjonen
+### Step 1 — Fill in the configuration
 
-Åpne skriptet og rediger `CONFIGURATION`-blokken øverst:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Påkrevd ---
-PROJECT_ID="rtsurvey"                  # Unik identifikator for prosjektet (ingen mellomrom)
-ADMIN_PASSWORD="admin"                 # Passord for app-admin og Keycloak — endre etter første innlogging
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
-# --- Domene + SSL ---
-DOMAIN="myapp.example.com"            # Ditt domene — DNS A-post må peke hit
-PROJECT_URL=""                         # La stå tomt med mindre du er bak Cloudflare/proxy
-LETSENCRYPT_EMAIL="admin@example.com" # E-post for Let's Encrypt-varsler
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- Valgfritt ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Felt | Påkrevd | Beskrivelse |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Ja | Brukes som databasenavn og Keycloak klient-ID. Kun små bokstaver, ingen mellomrom. |
-| `ADMIN_PASSWORD` | Nei | Passord for app-admininnlogging og Keycloak admin-konsoll. Standard er `admin` — **endre etter første innlogging**. |
-| `DOMAIN` | Ja | Domenenavnet ditt. DNS A-post må peke til Droplet-IP-en. |
-| `LETSENCRYPT_EMAIL` | Ja | E-postadresse for Let's Encrypt-sertifikatvarsler. |
-| `PROJECT_URL` | Nei | Overstyr den offentlige URL-en. La stå tomt for å bruke `DOMAIN`. Nyttig bak Cloudflare. |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **Sikkerhet:** Alle passord er standard `admin`. Endre dem umiddelbart etter første innlogging.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### Trinn 2 — Opprett en Droplet
+### Step 2 — Create a Droplet
 
-I [DigitalOcean-kontrollpanelet](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Klikk **Opprett** → **Droplets**
-2. Velg **Ubuntu 22.04 LTS** som bilde
-3. Velg **Basic, 4 GB RAM / 2 vCPUer** eller større
-4. Rull ned til **Avanserte alternativer** → merk av for **Legg til initialiseringsskript**
-5. Lim inn hele skriptinnholdet i tekstfeltet
-6. Klikk **Opprett Droplet**
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### Trinn 3 — Legg til DNS-posten
+### Step 3 — Add the DNS record
 
-Mens Droplet-en starter opp, legg til en **A-post** hos DNS-leverandøren din:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
-Navn  : myapp          (eller @ for rotdomene)
-Verdi : <droplet-ip>
+Name  : myapp          (or @ for root domain)
+Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Trinn 4 — Overvåk fremdriften
+### Step 4 — Monitor progress
 
-SSH inn i Droplet-en og se loggen:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-Skriptet skriver ut server-IP-en i begynnelsen — legg til DNS-posten så snart du ser den.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### Trinn 5 — Åpne appen
+### Step 5 — Access the app
 
-Når oppsettet er ferdig, viser loggen et sammendrag:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
@@ -101,33 +101,33 @@ Når oppsettet er ferdig, viser loggen et sammendrag:
 ============================================================
 ```
 
-Åpne `https://myapp.example.com` i nettleseren og logg inn med brukernavn `admin` og passord `admin`.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Endre passordet** umiddelbart etter innlogging via **Innstillinger** i toppmenyen til høyre.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## Etter distribusjon
+## After Deployment
 
-### Endre et passord
+### Change a password
 
-SSH inn i Droplet-en, rediger `.env`, og start den berørte containeren på nytt:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Oppdater domenet
+### Update the domain
 
-Hvis du tildeler et annet domene etter distribusjon, oppdater `PROJECT_URL` i `.env`:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # oppdater PROJECT_URL=
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Se alle containere
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

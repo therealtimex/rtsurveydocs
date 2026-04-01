@@ -7,60 +7,66 @@ draft: false
 author: "rtSurvey"
 icon: "travel_explore"
 toc: true
-description: "ដាក់ deployed rtCloud នៅ Google Cloud Compute Engine ដោយប្រើ gcp-compute.sh startup script។"
+description: "ដំឡើង rtCloud នៅ Google Cloud Compute Engine ដោយប្រើស្ក្រីបចាប់ផ្ដើម gcp-compute.sh ។"
 ---
 
-ប្រើ `gcp-compute.sh` ជា **Startup script** នៅពេល បង្កើត Compute Engine VM instance។ Script ដំណើរការ ដោយ ស្វ័យប្រវត្តិ នៅ boot ដំបូង។
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**ទាញយក script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## ជំហានទី ១ — បំពេញ configuration
+## Step 1 — Fill in the configuration
+
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- ចាំបាច់ ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # ផ្លាស់ប្ដូរ បន្ទាប់ ចូល ដំបូង
+ADMIN_PASSWORD="admin"                       # Change after first login
 
 # --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Keycloak ភ្ជាប់ ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Field | ចាំបាច់ | ការពិពណ៌នា |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | បាទ | ប្រើ ជា ឈ្មោះ database និង Keycloak client ID។ Lowercase, គ្មាន ចន្លោះ។ |
-| `ADMIN_PASSWORD` | ទេ | ពាក្យ សម្ងាត់ app admin និង Keycloak admin។ Default `admin` — **ផ្លាស់ប្ដូរ បន្ទាប់ ចូល ដំបូង**។ |
-| `DOMAIN` | ទេ | Domain របស់អ្នក សម្រាប់ HTTPS។ ទុក blank សម្រាប់ HTTP mode ប៉ុណ្ណោះ។ |
-| `LETSENCRYPT_EMAIL` | បាទ (ប្រសិនបើ DOMAIN set) | Email សម្រាប់ Let's Encrypt notifications។ |
-| `EMBED_KEYCLOAK` | ទេ | `true` ដើម្បី deploy Keycloak ភ្ជាប់ (ត្រូវការ RAM 4 GB)។ |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
+
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## ជំហានទី ២ — បង្កើត VM instance
+## Step 2 — Create a VM instance
 
-នៅ [Google Cloud Console](https://console.cloud.google.com/compute):
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
 
-1. ចុច **Create instance**
+1. Click **Create instance**
 2. **Machine configuration:**
    - Series: `E2`
-   - Machine type: `e2-medium` (4 GB RAM) ឬ ធំ ជាង
+   - Machine type: `e2-medium` (4 GB RAM) or larger
 3. **Boot disk:**
    - Operating system: Ubuntu
    - Version: Ubuntu 22.04 LTS
-   - Size: 40 GB ឬ ច្រើន ជាង
-4. **Firewall:** check **Allow HTTP traffic** និង **Allow HTTPS traffic**
-5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste ខ្លឹមសារ script ពេញ
-6. ចុច **Create**
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
 
 ---
 
-## ជំហានទី ៣ — បន្ថែម DNS record
+## Step 3 — Add the DNS record
+
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
@@ -69,15 +75,19 @@ Value : <vm-external-ip>
 TTL   : 300
 ```
 
+Find the external IP in the VM instances list in the console.
+
 ---
 
-## ជំហានទី ៤ — តាមដានវឌ្ឍនភាព
+## Step 4 — Monitor progress
+
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-ឬ SSH ដោយ ផ្ទាល់:
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -86,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## ជំហានទី ៥ — ចូលដំណើរការ app
+## Step 5 — Access the app
 
-នៅពេល setup បញ្ចប់, ចូល ជាមួយ username `admin` និង password `admin`, ហើយ ផ្លាស់ប្ដូរ ពាក្យ សម្ងាត់ ភ្លាម ៗ។
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
 ## Firewall Rules
 
-**Allow HTTP/HTTPS** checkboxes របស់ GCP បើក ports 80 និង 443។ ដើម្បី allow direct Shiny access នៅ port 3838 ផង, បន្ថែម firewall rule:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -102,30 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-> **កុំ** បើក port 3306 (MySQL) — វា មិន គួរ accessible publicly ទេ។
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
+
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Static IP (ស្រេចចិត្ត)
+## Static IP (optional)
 
-ដោយ default, GCP assign ephemeral external IP ដែល ផ្លាស់ ប្ដូរ នៅ VM restart។ ដើម្បី រក្សា IP ស្ថិរ:
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
 
-1. ចូល **VPC Network** → **IP addresses**
-2. ចុច **Reserve external static address**
-3. Assign វា ទៅ VM instance
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
 
 ---
 
-## បន្ទាប់ Deployment
+## After Deployment
 
-### ផ្លាស់ប្ដូរ ពាក្យ សម្ងាត់
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### ស្វែងមើល containers ទាំងអស់
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

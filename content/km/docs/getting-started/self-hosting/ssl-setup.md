@@ -1,38 +1,36 @@
 ---
 weight: 4
-title: "Set Up SSL"
+title: "ការដំឡើង SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Configure HTTPS for your rtSurvey server. Required before you can log in."
+description: "កំណត់រចនាសម្ព័ន្ធ HTTPS សម្រាប់ម៉ាស៊ីនបម្រើ rtSurvey របស់អ្នក។ ត្រូវការមុនពេលចូល។"
 ---
 
-SSL must be configured before you can log in. When you open the app for the first time, you will be redirected to the SSL setup screen automatically.
+SSL ត្រូវតែកំណត់រចនាសម្ព័ន្ធមុនពេលអ្នកអាចចូលបាន។ នៅពេលអ្នកបើកកម្មវិធីជាលើកដំបូង អ្នកនឹងត្រូវបានបញ្ជូនទៅអេក្រង់ដំឡើង SSL ដោយស្វ័យប្រវត្តិ។
 
 ---
 
-## SSL setup options
+## ជម្រើសដំឡើង SSL
 
-![SSL setup options](/img/ssl-setup/ssl-setup-options.png)
-
-Choose one of three options:
+![ជម្រើសដំឡើង SSL](/img/ssl-setup/ssl-setup-options.png)
 
 | Option | When to use |
 |--------|-------------|
-| **Free rtsurvey.com subdomain** *(Recommended)* | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **My own domain** | You already have a domain and its DNS points to this server. |
-| **Install certificate manually** | Enterprise or custom CA. Requires SSH access. |
+| **ដែនរងឥតគិតថ្លៃ rtsurvey.com *(ណែនាំ)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
+| **ដែនផ្ទាល់ខ្លួនរបស់ខ្ញុំ** | You already have a domain and its DNS points to this server. |
+| **ដំឡើងវិញ្ញាបនបត្រដោយដៃ** | Enterprise or custom CA. Requires SSH access. |
 
 ---
 
-## Option 1 — Free rtsurvey.com subdomain *(Recommended)*
+## Option 1 — ដែនរងឥតគិតថ្លៃ rtsurvey.com *(ណែនាំ)*
 
 This is the fastest option. No domain registration or DNS changes required.
 
-1. Click **Free rtsurvey.com subdomain** to expand the section
+1. Click **ដែនរងឥតគិតថ្លៃ rtsurvey.com *(ណែនាំ)*** to expand the section
 2. Type your desired subdomain name in the input field
 
    > Use lowercase letters, numbers, and hyphens. 3–30 characters.
@@ -52,11 +50,11 @@ This is the fastest option. No domain registration or DNS changes required.
 
 ---
 
-## Option 2 — My own domain
+## Option 2 — ដែនផ្ទាល់ខ្លួនរបស់ខ្ញុំ
 
 Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
 
-1. Click **My own domain** to expand the section
+1. Click **ដែនផ្ទាល់ខ្លួនរបស់ខ្ញុំ** to expand the section
 2. Enter your full domain name (e.g. `survey.myorganization.org`)
 3. Click **Create certificate**
 
@@ -66,7 +64,7 @@ Let's Encrypt will verify your domain and issue a certificate. This requires DNS
 
 ---
 
-## Option 3 — Install certificate manually
+## Option 3 — ដំឡើងវិញ្ញាបនបត្រដោយដៃ
 
 For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
 
@@ -115,7 +113,7 @@ chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Install certificate manually**
+1. In the SSL setup screen, click **ដំឡើងវិញ្ញាបនបត្រដោយដៃ**
 2. Enter your domain name (must match the certificate's Common Name or SAN)
 3. Click **Apply**
 
@@ -123,6 +121,6 @@ The server will configure Nginx with your certificate and reload automatically.
 
 ---
 
-## Next step
+## ជំហានបន្ទាប់
 
-Once SSL is active, proceed to [First Login](first-login).
+នៅពេល SSL ដំណើរការ បន្តទៅ [ការចូលលើកដំបូង](first-login)។

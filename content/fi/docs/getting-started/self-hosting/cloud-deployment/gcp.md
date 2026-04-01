@@ -7,104 +7,104 @@ draft: false
 author: "rtSurvey"
 icon: "travel_explore"
 toc: true
-description: "Ota rtCloud käyttöön Google Cloud Compute Enginellä käyttämällä gcp-compute.sh-käynnistysskriptiä."
+description: "Ota rtCloud käyttöön Google Cloud Compute Enginessä käyttämällä käynnistysskriptiä gcp-compute.sh."
 ---
 
-Käytä `gcp-compute.sh`-skriptiä **Startup script** -skriptinä Compute Engine -virtuaalikoneinstanssia luotaessa. Skripti ajetaan automaattisesti ensimmäisellä käynnistyksellä.
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**Lataa skripti:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## Vaihe 1 — Täytä konfiguraatio
+## Step 1 — Fill in the configuration
 
-Avaa skripti ja muokkaa yläosassa olevaa `CONFIGURATION`-lohkoa:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Pakolliset ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Vaihda ensimmäisen kirjautumisen jälkeen
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Verkkotunnus + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Upotettu Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Oletuksena ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Kenttä | Pakollinen | Kuvaus |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Kyllä | Käytetään tietokannan nimenä ja Keycloakin asiakastunnuksena. Pienet kirjaimet, ei välilyöntejä. |
-| `ADMIN_PASSWORD` | Ei | Sovelluksen järjestelmänvalvojan ja Keycloakin salasana. Oletuksena `admin` — **vaihda ensimmäisen kirjautumisen jälkeen**. |
-| `DOMAIN` | Ei | Verkkotunnuksesi HTTPS:lle. Jätä tyhjäksi vain HTTP-tilaan. |
-| `LETSENCRYPT_EMAIL` | Kyllä (jos DOMAIN asetettu) | Sähköposti Let's Encryptin ilmoituksia varten. |
-| `EMBED_KEYCLOAK` | Ei | `true` ottaa käyttöön upotetun Keycloakin (vaatii 4 Gt RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Turvallisuus:** Kaikki salasanat ovat oletuksena `admin`. Vaihda ne välittömästi ensimmäisen kirjautumisen jälkeen.
-
----
-
-## Vaihe 2 — Luo virtuaalikoneinstanssi
-
-[Google Cloud Consolessa](https://console.cloud.google.com/compute):
-
-1. Napsauta **Luo instanssi**
-2. **Konekonfiguraatio:**
-   - Sarja: `E2`
-   - Konetyyppi: `e2-medium` (4 Gt RAM) tai suurempi
-3. **Käynnistyslevy:**
-   - Käyttöjärjestelmä: Ubuntu
-   - Versio: Ubuntu 22.04 LTS
-   - Koko: 40 Gt tai enemmän
-4. **Palomuuri:** valitse **Salli HTTP-liikenne** ja **Salli HTTPS-liikenne**
-5. **Lisäasetukset** → **Hallinta** → **Automaatio** → **Käynnistysskripti** → liitä koko skriptin sisältö
-6. Napsauta **Luo**
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Vaihe 3 — Lisää DNS-tietue
+## Step 2 — Create a VM instance
 
-Virtuaalikoneen käynnistyessä lisää **A-tietue** DNS-palveluntarjoajallesi:
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
+3. **Boot disk:**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
+
+---
+
+## Step 3 — Add the DNS record
+
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
-Tyyppi  : A
-Nimi    : myapp
-Arvo    : <vm-ulkoinen-ip>
-TTL     : 300
+Type  : A
+Name  : myapp
+Value : <vm-external-ip>
+TTL   : 300
 ```
 
-Etsi ulkoinen IP-osoite virtuaalikonelistasta konsolissa.
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## Vaihe 4 — Seuraa edistymistä
+## Step 4 — Monitor progress
 
-`gcloud` CLI:n avulla:
+Using the `gcloud` CLI:
 
 ```bash
-gcloud compute ssh <instanssin-nimi> -- tail -f /var/log/rtcloud-setup.log
+gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-Tai SSH suoraan:
+Or SSH directly:
 
 ```bash
-ssh <käyttäjätunnus>@<vm-ulkoinen-ip>
+ssh <username>@<vm-external-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
 ---
 
-## Vaihe 5 — Käytä sovellusta
+## Step 5 — Access the app
 
-Kun asennus on valmis, loki näyttää yhteenvedon sovelluksesi URL-osoitteella ja tunnistetiedoilla. Kirjaudu sisään käyttäjätunnuksella `admin` ja salasanalla `admin`, vaihda sitten salasanasi välittömästi.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Palomuurisäännöt
+## Firewall Rules
 
-GCP:n **Salli HTTP/HTTPS** -valintaruudut avaavat portit 80 ja 443. Salliaksesi suoran Shiny-pääsyn portissa 3838, lisää palomuurisääntö:
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-Tai lisää se konsolin kautta: **VPC Network** → **Firewall** → **Luo sääntö**.
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> **Älä** avaa porttia 3306 (MySQL) — sen ei pitäisi olla julkisesti käytettävissä.
-
----
-
-## Staattinen IP (valinnainen)
-
-GCP määrittää oletuksena lyhytaikaisen ulkoisen IP-osoitteen, joka muuttuu virtuaalikoneen uudelleenkäynnistyksen yhteydessä. Säilyttääksesi vakaan IP-osoitteen:
-
-1. Siirry kohtaan **VPC Network** → **IP-osoitteet**
-2. Napsauta **Varaa ulkoinen staattinen osoite**
-3. Liitä se virtuaalikoneinstanssiisi
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Käyttöönoton jälkeen
+## Static IP (optional)
 
-### Vaihda salasana
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Tarkastele kaikkia kontteja
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

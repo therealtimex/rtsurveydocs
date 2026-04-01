@@ -1,6 +1,6 @@
 ---
 weight: 4
-title: "Google Cloud（GCP）"
+title: "Google Cloud (GCP)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
@@ -10,84 +10,84 @@ toc: true
 description: "使用 gcp-compute.sh 启动脚本在 Google Cloud Compute Engine 上部署 rtCloud。"
 ---
 
-创建 Compute Engine 虚拟机实例时，将 `gcp-compute.sh` 用作**启动脚本**。脚本在首次启动时自动运行。
+Use `gcp-compute.sh` as the **Startup script** when creating a Compute Engine VM instance. The script runs automatically on first boot.
 
-**下载脚本：** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
 
 ---
 
-## 第一步 — 填写配置
+## Step 1 — Fill in the configuration
 
-打开脚本并编辑顶部的 `CONFIGURATION` 块：
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- 必填 ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # 首次登录后更改
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- 域名 + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- 内嵌 Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # 默认为 ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| 字段 | 必填 | 描述 |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | 是 | 用作数据库名称和 Keycloak 客户端 ID。小写，无空格。 |
-| `ADMIN_PASSWORD` | 否 | 应用管理员密码和 Keycloak 管理员密码。默认为 `admin`——**首次登录后更改**。 |
-| `DOMAIN` | 否 | HTTPS 使用的域名。留空以仅使用 HTTP。 |
-| `LETSENCRYPT_EMAIL` | 是（如设置了 DOMAIN） | Let's Encrypt 通知邮箱。 |
-| `EMBED_KEYCLOAK` | 否 | `true` 以部署内嵌 Keycloak（需要 4 GB RAM）。 |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **安全提示：** 所有密码默认为 `admin`。首次登录后立即更改它们。
-
----
-
-## 第二步 — 创建虚拟机实例
-
-在 [Google Cloud 控制台](https://console.cloud.google.com/compute)：
-
-1. 点击**创建实例**
-2. **机器配置：**
-   - 系列：`E2`
-   - 机器类型：`e2-medium`（4 GB RAM）或更大
-3. **启动磁盘：**
-   - 操作系统：Ubuntu
-   - 版本：Ubuntu 22.04 LTS
-   - 大小：40 GB 或更多
-4. **防火墙：** 勾选**允许 HTTP 流量**和**允许 HTTPS 流量**
-5. **高级选项** → **管理** → **自动化** → **启动脚本** → 粘贴完整脚本内容
-6. 点击**创建**
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## 第三步 — 添加 DNS 记录
+## Step 2 — Create a VM instance
 
-虚拟机启动时，在您的 DNS 提供商中添加 **A 记录**：
+In the [Google Cloud Console](https://console.cloud.google.com/compute):
+
+1. Click **Create instance**
+2. **Machine configuration:**
+   - Series: `E2`
+   - Machine type: `e2-medium` (4 GB RAM) or larger
+3. **Boot disk:**
+   - Operating system: Ubuntu
+   - Version: Ubuntu 22.04 LTS
+   - Size: 40 GB or more
+4. **Firewall:** check **Allow HTTP traffic** and **Allow HTTPS traffic**
+5. **Advanced options** → **Management** → **Automation** → **Startup script** → paste the full script content
+6. Click **Create**
+
+---
+
+## Step 3 — Add the DNS record
+
+While the VM boots, add an **A record** in your DNS provider:
 
 ```
-类型  : A
-名称  : myapp
-值    : <vm-external-ip>
+Type  : A
+Name  : myapp
+Value : <vm-external-ip>
 TTL   : 300
 ```
 
-在控制台的虚拟机实例列表中查找外部 IP。
+Find the external IP in the VM instances list in the console.
 
 ---
 
-## 第四步 — 监控进度
+## Step 4 — Monitor progress
 
-使用 `gcloud` CLI：
+Using the `gcloud` CLI:
 
 ```bash
 gcloud compute ssh <instance-name> -- tail -f /var/log/rtcloud-setup.log
 ```
 
-或直接 SSH：
+Or SSH directly:
 
 ```bash
 ssh <username>@<vm-external-ip>
@@ -96,15 +96,15 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## 第五步 — 访问应用
+## Step 5 — Access the app
 
-设置完成时，日志会显示包含应用 URL 和凭据的摘要。使用用户名 `admin` 和密码 `admin` 登录，然后立即更改密码。
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## 防火墙规则
+## Firewall Rules
 
-GCP 的**允许 HTTP/HTTPS** 复选框开放了端口 80 和 443。要同时允许在端口 3838 上直接访问 Shiny，请添加防火墙规则：
+GCP's **Allow HTTP/HTTPS** checkboxes open ports 80 and 443. To also allow direct Shiny access on port 3838, add a firewall rule:
 
 ```bash
 gcloud compute firewall-rules create allow-shiny \
@@ -112,32 +112,32 @@ gcloud compute firewall-rules create allow-shiny \
   --target-tags http-server
 ```
 
-或通过控制台添加：**VPC 网络** → **防火墙** → **创建规则**。
+Or add it via the console: **VPC Network** → **Firewall** → **Create rule**.
 
-> **不要**开放端口 3306（MySQL）——它不应该公开访问。
-
----
-
-## 静态 IP（可选）
-
-默认情况下，GCP 分配临时外部 IP，虚拟机重启时会改变。要保持稳定的 IP：
-
-1. 转到 **VPC 网络** → **IP 地址**
-2. 点击**保留外部静态地址**
-3. 将其分配给您的虚拟机实例
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## 部署后操作
+## Static IP (optional)
 
-### 更改密码
+By default, GCP assigns an ephemeral external IP that changes on VM restart. To keep a stable IP:
+
+1. Go to **VPC Network** → **IP addresses**
+2. Click **Reserve external static address**
+3. Assign it to your VM instance
+
+---
+
+## After Deployment
+
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### 查看所有容器
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

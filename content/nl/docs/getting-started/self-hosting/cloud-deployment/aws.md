@@ -7,117 +7,117 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Implementeer rtCloud op een AWS EC2-instantie met het aws-ec2.sh user data script."
+description: "Implementeer rtCloud op een AWS EC2-instantie met behulp van het user data-script aws-ec2.sh."
 ---
 
-Gebruik `aws-ec2.sh` als het **User Data**-script bij het starten van een EC2-instantie. Het script wordt automatisch uitgevoerd bij de eerste start.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
 **Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Stap 1 — Vul de configuratie in
+## Step 1 — Fill in the configuration
 
-Open het script en bewerk het `CONFIGURATIE`-blok bovenaan:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Vereist ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Wijzigen na eerste login
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Domein + SSL ---
-DOMAIN="mijnapp.example.com"
-LETSENCRYPT_EMAIL="beheerder@example.com"
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"
+LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Ingebedde Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Standaard ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Veld | Vereist | Beschrijving |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Ja | Gebruikt als databasenaam en Keycloak-client-ID. Kleine letters, geen spaties. |
-| `ADMIN_PASSWORD` | Nee | App-beheerderswachtwoord en Keycloak-beheerderswachtwoord. Standaard `admin` — **wijzigen na eerste login**. |
-| `DOMAIN` | Nee | Uw domein voor HTTPS. Leeg laten voor alleen HTTP-modus. |
-| `LETSENCRYPT_EMAIL` | Ja (als DOMAIN ingesteld) | E-mail voor Let's Encrypt-meldingen. |
-| `EMBED_KEYCLOAK` | Nee | `true` om ingebedde Keycloak te implementeren (vereist 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Beveiliging:** Alle wachtwoorden zijn standaard `admin`. Wijzig ze onmiddellijk na uw eerste login.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Stap 2 — Start een EC2-instantie
+## Step 2 — Launch an EC2 instance
 
-In de [AWS EC2-console](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Klik op **Instantie starten**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Instantietype:** `t3.medium` (4 GB RAM) of groter
-4. **Sleutelpaar:** Selecteer of maak er een aan voor SSH-toegang
-5. **Netwerkinstellingen:** Maak of selecteer een Beveiligingsgroep (zie hieronder)
-6. **Geavanceerde details** → **User data** → plak de volledige scriptinhoud
-7. Klik op **Instantie starten**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Stap 3 — Configureer de Beveiligingsgroep
+## Step 3 — Configure the Security Group
 
-Open deze poorten in de Beveiligingsgroep van de instantie:
+Open these ports in the instance's Security Group:
 
-| Poort | Protocol | Bron | Doel |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | Uw IP | SSH-toegang |
-| 80 | TCP | 0.0.0.0/0 | HTTP (doorgestuurd naar HTTPS door Nginx) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Directe Shiny-toegang |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> Open **niet** poort 3306 (MySQL) — die mag nooit publiek toegankelijk zijn.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Stap 4 — Voeg het DNS-record toe
+## Step 4 — Add the DNS record
 
-Terwijl de instantie opstart, voegt u een **A-record** toe bij uw DNS-provider:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
-Naam  : mijnapp
-Waarde: <instantie-openbaar-ip>
+Name  : myapp
+Value : <instance-public-ip>
 TTL   : 300
 ```
 
 ---
 
-## Stap 5 — Monitor de voortgang
+## Step 5 — Monitor progress
 
 ```bash
-ssh ubuntu@<instantie-ip>
+ssh ubuntu@<instance-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
 ---
 
-## Stap 6 — Toegang tot de app
+## Step 6 — Access the app
 
-Wanneer de installatie is voltooid, toont het logboek een samenvatting met uw app-URL en gegevens. Log in met gebruikersnaam `admin` en wachtwoord `admin`, en wijzig uw wachtwoord onmiddellijk.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Na implementatie
+## After Deployment
 
-### Een wachtwoord wijzigen
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Alle containers weergeven
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Een Elastic IP toewijzen (optioneel)
+### Assign an Elastic IP (optional)
 
-Als u de instantie stopt en start, verandert het openbare IP. Om een stabiel IP te behouden, wijst u een **Elastic IP** toe en koppelt u dit aan de instantie in de EC2-console.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

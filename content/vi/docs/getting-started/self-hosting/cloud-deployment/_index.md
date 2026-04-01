@@ -1,16 +1,16 @@
 ---
 weight: 3
-title: "Cloud Deployment"
+title: "Triển khai đám mây"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "Deploy rtCloud to major cloud providers with automated scripts for DigitalOcean, AWS EC2, Google Cloud, and Linode."
+description: "Triển khai rtCloud trên các nhà cung cấp đám mây lớn với các script tự động cho DigitalOcean, AWS EC2, Google Cloud và Linode."
 ---
 
-The deployment repository includes automated provisioning scripts for major cloud providers. Each script runs on first boot of a fresh **Ubuntu 22.04 LTS** server and performs a fully unattended setup:
+Kho lưu trữ triển khai bao gồm các script cung cấp tự động cho các nhà cung cấp đám mây lớn. Mỗi script chạy khi khởi động lần đầu của máy chủ Ubuntu 22.04 LTS mới và thực hiện thiết lập hoàn toàn tự động:
 
 - Installs Docker and Docker Compose
 - Generates secure random passwords for all internal services

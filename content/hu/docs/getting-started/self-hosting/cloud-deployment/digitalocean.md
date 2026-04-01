@@ -7,127 +7,127 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Az rtCloud telepítése DigitalOcean Droplet-en automatizált user-data szkriptekkel."
+description: "Telepítse az rtCloudot egy DigitalOcean Dropletbe automatizált felhasználói adatok szkriptekkel."
 ---
 
-A DigitalOcean **User Data** szkripteket használ, amelyek az első indításkor automatikusan futnak. Töltse ki a konfigurációs változókat a szkript tetején, majd illessze be a teljes szkriptet egy Droplet létrehozásakor.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> A Linode StackScriptekkel ellentétben a DigitalOcean-nek nincs űrlap felhasználói felülete — a szkriptet közvetlenül kell szerkeszteni beillesztés előtt.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**Szkript letöltése:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Beágyazott Keycloak (ajánlott)
+## Embedded Keycloak (Recommended)
 
-A `digitalocean-droplet-keycloak-embed.sh` szkriptet használja a beépített SSO-val rendelkező legegyszerűbb beállításhoz.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### 1. lépés — A konfiguráció kitöltése
+### Step 1 — Fill in the configuration
 
-Nyissa meg a szkriptet, és szerkessze a tetején lévő `CONFIGURATION` blokkot:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Kötelező ---
-PROJECT_ID="rtsurvey"                  # A projekt egyedi azonosítója (szóközök nélkül)
-ADMIN_PASSWORD="admin"                 # Jelszó az alkalmazás rendszergazdájához és a Keycloakhoz — az első bejelentkezés után változtassa meg
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
 # --- Domain + SSL ---
-DOMAIN="myapp.example.com"            # Az Ön domainje — a DNS A-rekordnak ide kell mutatnia
-PROJECT_URL=""                         # Hagyja üresen, hacsak nincs Cloudflare/proxy mögött
-LETSENCRYPT_EMAIL="admin@example.com" # E-mail a Let's Encrypt értesítésekhez
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- Opcionális ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Mező | Kötelező | Leírás |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Igen | Adatbázis nevként és Keycloak kliens azonosítóként használatos. Kisbetűs, szóközök nélkül. |
-| `ADMIN_PASSWORD` | Nem | Jelszó az alkalmazás rendszergazdájához és a Keycloak adminisztrátori konzolhoz. Alapértéke `admin` — **az első bejelentkezés után változtassa meg**. |
-| `DOMAIN` | Igen | Az Ön domain neve. A DNS A-rekordnak a Droplet IP-jére kell mutatnia. |
-| `LETSENCRYPT_EMAIL` | Igen | E-mail cím a Let's Encrypt tanúsítványértesítésekhez. |
-| `PROJECT_URL` | Nem | A nyilvános URL felülírása. Hagyja üresen a `DOMAIN` használatához. Cloudflare mögött hasznos. |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **Biztonság:** Minden jelszó alapértéke `admin`. Az első bejelentkezés után azonnal változtassa meg őket.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### 2. lépés — Droplet létrehozása
+### Step 2 — Create a Droplet
 
-A [DigitalOcean vezérlőpanelen](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Kattintson a **Create** → **Droplets** lehetőségre
-2. Válassza az **Ubuntu 22.04 LTS** képfájlt
-3. Válassza a **Basic, 4 GB RAM / 2 vCPU** vagy nagyobb lehetőséget
-4. Görgessen az **Advanced Options** → jelölje be az **Add Initialization scripts** lehetőséget
-5. Illessze be a szkript teljes tartalmát a szövegmezőbe
-6. Kattintson a **Create Droplet** lehetőségre
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### 3. lépés — A DNS-rekord hozzáadása
+### Step 3 — Add the DNS record
 
-Miközben a Droplet elindul, adjon hozzá egy **A-rekordot** a DNS-szolgáltatójánál:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
-Típus  : A
-Név    : myapp          (vagy @ a gyökér domainhez)
-Érték  : <droplet-ip>
-TTL    : 300
+Type  : A
+Name  : myapp          (or @ for root domain)
+Value : <droplet-ip>
+TTL   : 300
 ```
 
-### 4. lépés — Folyamat figyelése
+### Step 4 — Monitor progress
 
-SSH-val csatlakozzon a Droplet-hez, és figyelje a naplót:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-A szkript a kezdet közelében nyomtatja ki a kiszolgáló IP-jét — adja hozzá a DNS-rekordot, amint megjelenik.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### 5. lépés — Az alkalmazás elérése
+### Step 5 — Access the app
 
-A beállítás befejezésekor a napló összefoglalót mutat:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
- rtCloud telepítés kész! (Beágyazott Keycloak)
+ rtCloud deployment complete! (Embedded Keycloak)
 ============================================================
- Alkalmazás URL   : https://myapp.example.com
- Rendszergazda    : admin / admin
- Keycloak         : https://myapp.example.com/auth/admin
+ App URL   : https://myapp.example.com
+ Admin     : admin / admin
+ Keycloak  : https://myapp.example.com/auth/admin
 
- !! BIZTONSÁG: Minden jelszó alapértéke 'admin'.
-    Az első bejelentkezés után azonnal változtassa meg őket.
+ !! SECURITY: All passwords default to 'admin'.
+    Change them immediately after first login.
 ============================================================
 ```
 
-Nyissa meg a `https://myapp.example.com` oldalt a böngészőjében, és jelentkezzen be `admin` felhasználónévvel és `admin` jelszóval.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Változtassa meg jelszavát** azonnal a bejelentkezés után a jobb felső sarokban lévő **Beállítások** menüponton keresztül.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## Telepítés után
+## After Deployment
 
-### Jelszó megváltoztatása
+### Change a password
 
-SSH-val csatlakozzon a Droplet-hez, szerkessze a `.env` fájlt, és indítsa újra az érintett konténert:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### A domain frissítése
+### Update the domain
 
-Ha a telepítés után más domaint rendel hozzá, frissítse a `PROJECT_URL` értékét a `.env` fájlban:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # frissítse a PROJECT_URL= értéket
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Az összes konténer megtekintése
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

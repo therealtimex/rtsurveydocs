@@ -1,5 +1,5 @@
 ---
-weight: 4
+weight: 5
 title: "ការផ្ទៀងផ្ទាត់ SSO"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,115 +7,153 @@ draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "ការកំណត់ Single Sign-On សម្រាប់ rtCloud ដែល host ខ្លួនឯង ដោយប្រើ Keycloak ភ្ជាប់, OIDC provider ខាងក្រៅ, ឬ Azure Active Directory។"
+description: "កំណត់រចនាសម្ព័ន្ធ Single Sign-On សម្រាប់ rtCloud ដែលបង្ហោះខ្លួនឯង ដោយប្រើ Keycloak ដែលបានបញ្ចូល, អ្នកផ្តល់ OIDC ខាងក្រៅ, ឬ Azure Active Directory។"
 ---
 
-rtCloud គាំទ្រ វិធីសាស្ត្រ បី សម្រាប់ Single Sign-On (SSO):
+rtCloud គាំទ្របីវិធីសម្រាប់ Single Sign-On (SSO):
 
-| ជម្រើស | ល្អ បំផុត សម្រាប់ |
+| Option | Best For |
 |--------|----------|
-| [Keycloak ភ្ជាប់](#embedded-keycloak) | អង្គការ ដែល ចង់ SSO server ដែល ដំណើរការ ខ្លួន ឯង ពេញ ដែល ភ្ជាប់ ជាមួយ rtCloud |
-| [External OIDC Provider](#external-oidc-provider) | អង្គការ ដែល ដំណើរការ identity provider ស្រាប់ (Auth0, Authentik, Okta, Supabase, ។ ល។) |
-| [Azure Active Directory](#azure-active-directory) | អង្គការ ដែលប្រើ Microsoft 365 ឬ Azure AD |
+| [Embedded Keycloak](#embedded-keycloak) | Organizations that want a fully self-contained SSO server bundled with rtCloud |
+| [External OIDC Provider](#external-oidc-provider) | Organizations already running an identity provider (Auth0, Authentik, Okta, Supabase, etc.) |
+| [Azure Active Directory](#azure-active-directory) | Organizations using Microsoft 365 or Azure AD |
 
-ដោយ គ្មាន SSO ដែល configured, users ចូល ជាមួយ local rtCloud accounts ដែល គ្រប់គ្រង តាមរយៈ admin panel។
+Without SSO configured, users log in with local rtCloud accounts managed through the admin panel.
 
 ---
 
-## Keycloak ភ្ជាប់ {#embedded-keycloak}
+## Embedded Keycloak
 
-ការ deployment រួមមាន Keycloak container ស្រេចចិត្ត ដែល ដំណើរការ ជាមួយ rtCloud។ Keycloak ត្រូវ បាន preconfigured ជាមួយ rtSurvey realm ហើយ ត្រួចប្រើ ។
+The deployment includes an optional Keycloak container that runs alongside rtCloud. Keycloak is pre-configured with an rtSurvey realm and ready to use.
 
-### លក្ខខណ្ឌ
+### Requirements
 
-- ឈ្មោះ domain ជាមួយ HTTPS (Keycloak ត្រូវការ HTTPS ក្នុង production)
-- RAM យ៉ាងតិច 4 GB នៅ server (Keycloak បន្ថែម ~512 MB memory usage)
+- A domain name with HTTPS (Keycloak requires HTTPS in production)
+- At least 4 GB RAM on the server (Keycloak adds ~512 MB memory usage)
 
-### ការ Setup
+### Setup
 
-**១. Configure environment variables ក្នុង `.env`:**
+**1. Configure environment variables in `.env`:**
 
 ```dotenv
+# Enable the embedded Keycloak container
 EMBED_KEYCLOAK=true
 
+# Keycloak URLs — use your actual domain
 KEYCLOAK_URL=https://rtcloud.example.com/auth
 KC_HOSTNAME=https://rtcloud.example.com/auth
 KC_HOSTNAME_STRICT=false
 
+# Realm and client settings (match the imported realm JSON)
 KEYCLOAK_REALM=rtsurvey
 KEYCLOAK_CLIENT_ID=rtsurvey-app
 KEYCLOAK_CLIENT_SECRET=your-client-secret-here
 
+# Keycloak admin credentials
 KEYCLOAK_ADMIN_USER=admin
 KEYCLOAK_ADMIN_PASSWORD=change_me_keycloak_admin_password
 
+# Keycloak database (created automatically)
 KEYCLOAK_DB=keycloak
 KEYCLOAK_DB_USER=keycloak
 KEYCLOAK_DB_PASSWORD=change_me_keycloak_db_password
 
+# Port Keycloak listens on (host-side, proxied by Nginx)
 KEYCLOAK_PORT=8091
 ```
 
-**២. ចាប់ផ្ដើម ជាមួយ Keycloak profile ភ្ជាប់:**
+**2. Start with the embedded Keycloak profile:**
 
 ```bash
 docker compose -f docker-compose.production.yml --profile embed-keycloak up -d
 ```
 
-**៣. ផ្ទៀងផ្ទាត់ Keycloak healthy:**
+**3. Verify Keycloak is healthy:**
 
 ```bash
 docker compose -f docker-compose.production.yml ps
 ```
 
-**៤. ចូលដំណើរការ Keycloak admin console:**
+The `rtcloud-keycloak` container should show `Up (healthy)` after 2–3 minutes.
+
+**4. Access the Keycloak admin console:**
 
 ```
 https://rtcloud.example.com/auth/admin
 ```
 
-### អ្វី ដែល Preconfigured
+Log in with `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD`.
 
-Keycloak ភ្ជាប់ ចាប់ផ្ដើម ជាមួយ `rtsurvey` realm ដែល imported ជាមុន ដែលរួមមាន:
-- ការ configure client សម្រាប់ web application
-- User roles default (`admin`, `project_manager`, `enumerator`, `analyst`)
-- Session និង token settings ដែល optimized សម្រាប់ rtSurvey
+### What Is Pre-Configured
+
+The embedded Keycloak starts with a pre-imported `rtsurvey` realm that includes:
+
+- Client configuration for the web application
+- Default user roles (`admin`, `project_manager`, `enumerator`, `analyst`)
+- Session and token settings optimized for rtSurvey
+
+You can add users directly in the Keycloak admin console or connect Keycloak to an upstream identity provider (LDAP, SAML).
+
+### Nginx Routing
+
+When using the cloud deployment scripts, Nginx is configured to proxy both services:
+
+| Path | Backend |
+|------|---------|
+| `/` | rtCloud app on `127.0.0.1:8080` |
+| `/auth/` | Keycloak on `127.0.0.1:8090` |
 
 ---
 
-## External OIDC Provider {#external-oidc-provider}
+## External OIDC Provider
 
-ភ្ជាប់ rtCloud ទៅ identity provider ណាមួយ ដែល ស្របគ្នា OpenID Connect។ វិធីសាស្ត្រ នេះ មិន ត្រូវការ Keycloak container ទេ។
+Connect rtCloud to any OpenID Connect-compatible identity provider. This approach does not require the Keycloak container.
 
-### Providers ដែល គាំទ្រ
+### Supported Providers
 
-Provider ណា មួយ ដែល ស្របគ្នា OIDC ដំណើរការ, រួមមាន:
-- Authentik, Auth0, Okta, Keycloak (instance ខាងក្រៅ)
-- Supabase, Google (សម្រាប់ Google Workspace organizations)
+Any OIDC-compliant provider works, including:
+- Authentik
+- Auth0
+- Okta
+- Keycloak (external instance)
+- Supabase
+- Google (for Google Workspace organizations)
+- GitHub (via OAuth apps with OIDC extension)
 
-### ការ Setup
+### Setup
 
-**១. Register rtCloud ជា OIDC client ក្នុង identity provider:**
+**1. Register rtCloud as an OIDC client in your identity provider.**
 
-អ្នក នឹង ត្រូវការ:
-- **client ID** និង **client secret**
-- ចុះ ឈ្មោះ **redirect URI**: `https://rtcloud.example.com/auth/callback`
-- សម្រាប់ mobile app support: `vn.rta.rtsurvey.auth://callback`
+You will need:
+- A **client ID** and **client secret**
+- To register the **redirect URI**: `https://rtcloud.example.com/auth/callback`
+- For mobile app support, also register: `vn.rta.rtsurvey.auth://callback`
 
-**២. Configure environment variables ក្នុង `.env`:**
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
+# OIDC discovery URL (provider-specific — check your IdP documentation)
 OIDC_ISSUER_URL=https://your-identity-provider.com
+
+# Client credentials from your identity provider
 OIDC_CLIENT_ID=rtcloud-app
 OIDC_CLIENT_SECRET=your-client-secret-here
+
+# Scopes to request (openid, profile, and email are typically sufficient)
 OIDC_SCOPE=openid profile email
+
+# Redirect URI registered in your identity provider
 OIDC_REDIRECT_URI=https://rtcloud.example.com/auth/callback
+
+# Optional: separate mobile app client
 OIDC_MOBILE_CLIENT_ID=rtcloud-mobile
 OIDC_MOBILE_REDIRECT_URI=vn.rta.rtsurvey.auth://callback
+
+# Set to true to auto-create rtCloud accounts for new OIDC users
 OPEN_REGISTRATION=false
 ```
 
-**៣. Restart app container:**
+**3. Restart the app container to apply the changes:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
@@ -123,37 +161,59 @@ docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 
 ### Auto-Provisioning Users
 
-នៅពេល `OPEN_REGISTRATION=true`, rtCloud បង្កើត local account ដោយ ស្វ័យប្រវត្តិ ជា លើក ដំបូង ដែល user ចូល តាម OIDC។
+When `OPEN_REGISTRATION=true`, rtCloud automatically creates a local account the first time a user signs in via OIDC. The account is populated with the user's name and email from the ID token.
+
+When `OPEN_REGISTRATION=false` (default), an rtCloud administrator must create the user account first, and the OIDC identity is linked on first login.
+
+### Custom Endpoints
+
+If your provider does not support OIDC discovery (`.well-known/openid-configuration`), you can set endpoints manually:
+
+```dotenv
+OIDC_AUTHORIZATION_ENDPOINT=https://your-provider.com/oauth2/authorize
+OIDC_TOKEN_ENDPOINT=https://your-provider.com/oauth2/token
+OIDC_USERINFO_ENDPOINT=https://your-provider.com/oauth2/userinfo
+```
 
 ---
 
-## Azure Active Directory {#azure-active-directory}
+## Azure Active Directory
 
-### ការ Setup
+Integrate rtCloud with your organization's Microsoft Azure AD tenant.
 
-**១. Register app ថ្មី នៅ [Azure Portal](https://portal.azure.com):**
-   - ចូល **Azure Active Directory** → **App registrations** → **New registration**
-   - Redirect URI: `https://rtcloud.example.com/auth/callback`
+### Setup
 
-**២. Configure environment variables ក្នុង `.env`:**
+**1. Register a new app in the [Azure Portal](https://portal.azure.com):**
+
+   - Go to **Azure Active Directory** → **App registrations** → **New registration**
+   - Name: `rtCloud`
+   - Redirect URI: `https://rtcloud.example.com/auth/callback` (Web type)
+   - After creation, note the **Application (client) ID** and **Directory (tenant) ID**
+   - Under **Certificates & secrets**, create a new client secret
+
+**2. Configure environment variables in `.env`:**
 
 ```dotenv
 AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-**៣. Restart app container:**
+**3. Restart the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
+
+Users in your Azure AD tenant can now log in to rtCloud using their Microsoft credentials.
 
 ---
 
-## បិទ SSO
+## Disabling SSO
 
-ដើម្បី ត្រឡប់ ទៅ local authentication, លុប ឬ comment out variables ទាំងអស់ ដែល ទាក់ ទង SSO ពី `.env`, ហើយ restart app container:
+To revert to local authentication, remove or comment out all SSO-related variables from `.env`, then restart the app container:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
+
+If you were using embedded Keycloak, stop it by omitting the `--profile embed-keycloak` flag and running `docker compose down` followed by `up -d` without the profile.

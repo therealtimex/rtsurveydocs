@@ -1,6 +1,6 @@
 ---
 weight: 3
-title: "Cloudimplementatie"
+title: "Cloud-implementatie"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
@@ -10,86 +10,86 @@ toc: true
 description: "Implementeer rtCloud bij grote cloudproviders met geautomatiseerde scripts voor DigitalOcean, AWS EC2, Google Cloud en Linode."
 ---
 
-De implementatierepository bevat geautomatiseerde provisioneringsscripts voor grote cloudproviders. Elk script wordt uitgevoerd bij de eerste start van een verse **Ubuntu 22.04 LTS**-server en voert een volledig onbeheerde installatie uit:
+Het implementatie-repository bevat geautomatiseerde provisioningscripts voor grote cloudproviders. Elk script wordt uitgevoerd bij de eerste start van een nieuwe Ubuntu 22.04 LTS-server en voert een volledig onbeheerde installatie uit:
 
-- Installeert Docker en Docker Compose
-- Genereert veilige willekeurige wachtwoorden voor alle interne services
-- Schrijft `docker-compose.production.yml` en `.env`
-- Configureert Nginx als een reverse proxy
-- Verkrijgt een gratis TLS-certificaat van Let's Encrypt (automatisch opnieuw proberen totdat DNS is opgelost)
-- Configureert de UFW-firewall
-- Implementeert optioneel de ingebedde Keycloak SSO-server
-- Geeft een volledige implementatiesamenvatting met alle gegevens
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-De installatie is voltooid in **5–10 minuten** op een standaardinstantie.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## Een script kiezen
+## Choosing a Script
 
-Er zijn meerdere scriptvarianten afhankelijk van uw cloudprovider en SSO-instelling:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| Script | Provider | SSO-modus | Meest geschikt voor |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Ingebouwde Keycloak | Eenvoudige, op zichzelf staande SSO |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak of externe OIDC | Volledige controle |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Ingebouwde Keycloak | Formuliergebaseerde installatie, eenvoudigst |
-| `linode-stackscript-oidc.sh` | Linode | Alleen externe OIDC | Bestaande identiteitsprovider |
-| `linode-stackscript.sh` | Linode | Keycloak of externe OIDC | Volledige controle |
-| `aws-ec2.sh` | AWS EC2 | Keycloak of externe OIDC | AWS-implementaties |
-| `gcp-compute.sh` | Google Cloud | Keycloak of externe OIDC | GCP-implementaties |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **Aanbevolen voor de meeste gebruikers:** Gebruik de `keycloak-embed`-variant. Deze bevat een ingebouwde Keycloak-identiteitsserver en vereist de minste configuratievelden.
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## Servergroottehandleiding
+## Server Sizing Guide
 
-| Gebruiksgeval | RAM | Schijf | Voorbeeld |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| Evaluatie / ontwikkeling | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
-| Klein team (< 50 gebruikers) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
-| Productie (> 50 gebruikers) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> Ingebedde Keycloak vereist minimaal **4 GB RAM**. Gebruik 2 GB alleen voor evaluatie zonder Keycloak.
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## DNS-instelling
+## DNS Setup
 
-Alle scripts vereisen een domein met een **A-record dat naar het IP van uw server wijst** voordat Let's Encrypt een certificaat kan uitgeven.
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-Het script drukt vroeg in het installatieproces uw server-IP af:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
  Server IP : 139.162.51.85
- Voeg nu dit DNS A-record toe als u dat nog niet heeft gedaan:
+ Add this DNS A record now if you haven't already:
    myapp.example.com  ->  139.162.51.85
- Het script herprobeert Certbot elke 60s totdat DNS is opgelost.
+ The script will retry Certbot every 60s until DNS resolves.
 ============================================================
 ```
 
-Het script **herprobeert automatisch** Let's Encrypt elke 60 seconden gedurende maximaal 1 uur. Voeg gewoon het DNS-record toe en wacht — geen herstart nodig.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Tariefslimiet:** Let's Encrypt staat maximaal **5 certificaten per domein per 7 dagen** toe. Vermijd herhaald implementeren en verwijderen van servers met hetzelfde domein. Als u de limiet bereikt, toont het script een tijdstempel `opnieuw proberen na` en stopt het onmiddellijk.
-
----
-
-## Controlelijst na implementatie
-
-- [ ] App opent op `https://uw-domein.nl`
-- [ ] Log in met `admin` en het wachtwoord dat u heeft geconfigureerd
-- [ ] Alle containers zijn gezond: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] Let's Encrypt-verlenging werkt: `certbot renew --dry-run`
-- [ ] MySQL-poort 3306 is **niet** blootgesteld: `ufw status`
-- [ ] Stel een dagelijkse database-back-up in (zie [Onderhoud](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## Probleemoplossing
+## Post-Deployment Checklist
 
-### Controleer het volledige installatielogboek
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Let's Encrypt-tariefslimiet
+### Let's Encrypt rate limit
 
-Als u `too many certificates` in het logboek ziet, heeft u de limiet van 5 certificaten/7 dagen bereikt. Het logboek toont de exacte herprobeertijd:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
 [SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-Wacht tot die tijd en implementeer opnieuw.
+Wait until that time, then redeploy.
 
-### Keycloak blijft ongezond
+### Keycloak stays unhealthy
 
-Zorg ervoor dat de server minimaal 4 GB RAM heeft en controleer dan de logboeken:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### SSL-configuratie niet toegepast na certbot
+### SSL config not applied after certbot
 
-Als het certificaat is uitgegeven maar Nginx nog steeds alleen HTTP toont, controleer dan het logboek op de foutmelding en laad Nginx handmatig opnieuw:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

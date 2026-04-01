@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Första inloggning"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Hur du loggar in på din rtSurvey-instans för första gången efter driftsättning."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **SSL måste konfigureras innan du loggar in.** Om du öppnar appen via HTTP kommer du att se en säkerhetsvarning och SSO blockeras. Slutför [SSL-konfiguration](ssl-setup) först.
 
-After SSL is active, open your browser at your HTTPS URL:
+När SSL är aktivt, öppna din webbläsare på din HTTPS-URL:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Inloggningsskärmen
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+Inloggningssidan visar:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- Fält för **Användarnamn** och **Lösenord**
+- En **Logga in** knapp
+- En **Logga in med SSO** knapp (under en avdelare) — för teammedlemmar med SSO-konton
 
 ---
 
-## If you see a security warning
+## Standardadministratörsinloggning
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Ange standarduppgifterna och klicka på **Logga in**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Fält | Värde |
+|------|-------|
+| Användarnamn | `admin` |
+| Lösenord | `admin` |
+
+> **Byt lösenord omedelbart efter din första inloggning.**
+
+---
+
+## Om du ser en säkerhetsvarning
+
+Om du öppnar appen via HTTP (innan SSL är konfigurerat) kommer du att se:
+
+- En gul varningsbanner högst upp på inloggningssidan
+- En modal när du klickar på **Logga in**, som varnar för att inloggningsuppgifter skickas okrypterade
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Klicka på **Konfigurera SSL** för att konfigurera HTTPS, eller **Fortsätt ändå** för att logga in utan SSL (rekommenderas inte).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+SSO-inloggning är helt blockerad via HTTP — att klicka på **Logga in med SSO** visar ett meddelande istället för att omdirigera.
 
 ---
 
-## After logging in
+## Efter inloggning
 
-Once inside, you will land on the dashboard. From here:
+När du är inne landas du på dashboarden. Härifrån:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Byt administratörslösenord** — kontoinställningar → byt lösenord
+2. **Skapa ditt första projekt** — Projekt → Nytt projekt
+3. **Ladda upp eller bygg ett formulär** — Formulär → Ladda upp XLSForm eller öppna Form Builder
+4. **Lägg till användare** — Användare → Bjud in eller skapa konton för ditt team

@@ -7,88 +7,88 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Vendosni rtCloud në një instancë AWS EC2 duke përdorur skriptin user data aws-ec2.sh."
+description: "Vendosni rtCloud në një instancë AWS EC2 duke përdorur skriptin e të dhënave të përdoruesit aws-ec2.sh."
 ---
 
-Përdorni `aws-ec2.sh` si skriptin **User Data** kur hapni një instancë EC2. Skripti ekzekutohet automatikisht në nisjen e parë.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Shkarkoni skriptin:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Hapi 1 — Plotësoni konfigurimin
+## Step 1 — Fill in the configuration
 
-Hapni skriptin dhe editoni bllokun `CONFIGURATION` në krye:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- E detyrueshme ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Ndryshojeni pas hyrjes së parë
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Domeni + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Keycloak i Integruar ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Parazgjedhja ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Fusha | E detyrueshme | Përshkrimi |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Po | Përdoret si emri i bazës së të dhënave dhe ID klientit Keycloak. Me shkronja të vogla, pa hapësira. |
-| `ADMIN_PASSWORD` | Jo | Fjalëkalimi i adminit të aplikacionit dhe fjalëkalimi admin Keycloak. Parazgjedhja `admin` — **ndryshojeni pas hyrjes së parë**. |
-| `DOMAIN` | Jo | Domeni juaj për HTTPS. Lini bosh për mënyrën vetëm HTTP. |
-| `LETSENCRYPT_EMAIL` | Po (nëse DOMAIN është caktuar) | Email për njoftimet Let's Encrypt. |
-| `EMBED_KEYCLOAK` | Jo | `true` për të vendosur Keycloak të integruar (kërkon 4 GB RAM). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Siguria:** Të gjitha fjalëkalimet parazgjidhen me `admin`. Ndryshojini menjëherë pas hyrjes suaj të parë.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Hapi 2 — Hapni një instancë EC2
+## Step 2 — Launch an EC2 instance
 
-Në [konsolën AWS EC2](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. Klikoni **Hap instancë**
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Tipi i instancës:** `t3.medium` (4 GB RAM) ose më i madh
-4. **Çifti i çelësave:** Zgjidhni ose krijoni një për akses SSH
-5. **Cilësimet e rrjetit:** Krijoni ose zgjidhni një Grup Sigurie (shikoni më poshtë)
-6. **Detajet e avancuara** → **Të dhënat e përdoruesit** → ngjitni të gjithë përmbajtjen e skriptit
-7. Klikoni **Hap instancë**
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Hapi 3 — Konfiguroni Grupin e Sigurisë
+## Step 3 — Configure the Security Group
 
-Hapni këto porta në Grupin e Sigurisë të instancës:
+Open these ports in the instance's Security Group:
 
-| Porta | Protokolli | Burimi | Qëllimi |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | IP-ja juaj | Aksesi SSH |
-| 80 | TCP | 0.0.0.0/0 | HTTP (ridrejtuar në HTTPS nga Nginx) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Aksesi direkt Shiny |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **Mos** hapni portën 3306 (MySQL) — nuk duhet të jetë kurrë publikisht e aksesueshme.
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Hapi 4 — Shtoni rekordin DNS
+## Step 4 — Add the DNS record
 
-Ndërkohë që instanca po niset, shtoni një **rekord A** te ofruesi juaj DNS:
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
-Tipi  : A
-Emri  : myapp
-Vlera : <ip-publike-e-instancës>
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
 TTL   : 300
 ```
 
 ---
 
-## Hapi 5 — Monitoroni progresin
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Hapi 6 — Aksesoni aplikacionin
+## Step 6 — Access the app
 
-Kur konfigurimi përfundon, regjistri tregon një përmbledhje me URL-n e aplikacionit dhe kredencialet. Hyni me emrin e përdoruesit `admin` dhe fjalëkalimin `admin`, pastaj ndryshoni fjalëkalimin menjëherë.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Pas Vendosjes
+## After Deployment
 
-### Ndryshoni një fjalëkalim
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Shikoni të gjithë kontejnerët
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Caktoni një IP Elastic (opsionale)
+### Assign an Elastic IP (optional)
 
-Nëse ndaloni dhe nisni instancën, IP-ja publike ndryshon. Për të mbajtur një IP të qëndrueshme, alokoni një **IP Elastic** dhe asociojeni me instancën në konsolën EC2.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

@@ -7,215 +7,215 @@ draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "Kompletní reference pro všechny proměnné prostředí používané ke konfiguraci vlastního nasazení rtCloud."
+description: "Kompletní přehled všech proměnných prostředí používaných ke konfiguraci self-hosted nasazení rtCloud."
 ---
 
-Veškerá konfigurace se provádí prostřednictvím proměnných prostředí v souboru `.env` v kořeni adresáře nasazení. Docker Compose tento soubor načítá automaticky — žádný příznak `--env-file` není potřeba.
+Veškerá konfigurace se provádí prostřednictvím proměnných prostředí v souboru `.env` v kořenovém adresáři nasazení. Docker Compose čte tento soubor automaticky — není potřeba příznak `--env-file`.
 
 Proměnné označené jako **povinné** musí být nastaveny před spuštěním kontejnerů. Všechny ostatní mají výchozí hodnoty a jsou volitelné.
 
 ---
 
-## Projekt
+## Project
 
-Tyto proměnné definují identitu a přístupový bod vaší instance rtCloud.
+These variables define the identity and access point of your rtCloud instance.
 
-| Proměnná | Výchozí | Povinné | Popis |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **Ano** | Jedinečný identifikátor tohoto nasazení. Bez mezer nebo speciálních znaků. Používá se jako předpona pro interní pojmenování. |
-| `PROJECT_URL` | — | **Ano** | Název domény nebo IP adresa, kde uživatelé přistupují k aplikaci (např. `rtcloud.example.com` nebo `192.168.1.100`). |
-| `PROJECT_TYPE` | `rtsurvey` | Ne | Varianta platformy k aktivaci. Možnosti: `rtwork`, `rtsurvey`, `rthome`. |
-| `PROJECT_PORT` | `80` | Ne | Port, na kterém aplikace naslouchá uvnitř kontejneru. Neměňte, pokud nevíte, co děláte. |
-| `HTTP_PROTOCOL` | `https` | Ne | Protokol používaný k sestavení interních URL adres. Nastavte na `http`, pokud nepoužíváte SSL. |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## Databáze
+## Database
 
-Přihlašovací údaje pro připojení MySQL. Databáze je automaticky spravována kontejnerem MySQL — stačí nastavit silná hesla.
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| Proměnná | Výchozí | Povinné | Popis |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | Ne | Název databáze aplikace. |
-| `MYSQL_USER` | `smartsurvey` | Ne | Uživatel MySQL pro aplikaci. |
-| `MYSQL_PASSWORD` | — | **Ano** | Heslo pro `MYSQL_USER`. Použijte silnou, jedinečnou hodnotu. |
-| `MYSQL_ROOT_PASSWORD` | — | **Ano** | Heslo root pro MySQL. Vyžadováno pro inicializaci databáze a operace správce. |
-| `MYSQL_HOST` | `mysql` | Ne | Název hostitele MySQL. Použijte výchozí, pokud se nepřipojujete k externí databázi. |
-| `MYSQL_PORT` | `3306` | Ne | Port MySQL. |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## Účet administrátora
+## Admin Account
 
-Účet administrátora je automaticky vytvořen při prvním spuštění s čerstvou databází.
+The admin account is created automatically on the first boot of a fresh database.
 
-| Proměnná | Výchozí | Povinné | Popis |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **Ano** | Heslo pro vestavěného uživatele `admin`. Nastavte před prvním spuštěním. Nemá žádný vliv, pokud databáze již existuje. |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> Po prvním přihlášení změňte heslo administrátora na stránce **Nastavení účtu** ve webovém UI.
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## Porty
+## Ports
 
-Kontrola, na které hostitelské porty se aplikace váže.
+Control which host ports the application binds to.
 
-| Proměnná | Výchozí | Popis |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `APP_PORT` | `8080` | Hostitelský port pro hlavní webové UI. Změňte, pokud je port 8080 již na vašem serveru obsazen. |
-| `SHINY_PORT` | `3838` | Hostitelský port pro analytický server Shiny. |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
 ## Runtime
 
-| Proměnná | Výchozí | Popis |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | Runtime prostředí. Použijte `prod` pro produkční nasazení, `dev` pro lokální vývoj. |
-| `RUN_MODE` | `admin` | Role kontejneru. `admin` spouští celý zásobník (web + fronta + cron). `worker` spouští pouze zpracování na pozadí (pro horizontální škálování). |
-| `TZ` | `Asia/Ho_Chi_Minh` | Časové pásmo serveru. Ovlivňuje časová razítka protokolů, plány cron a zobrazení dat. Použijte [název databáze TZ](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (např. `UTC`, `America/New_York`, `Europe/London`). |
-| `LOG_LEVEL` | `info` | Podrobnost protokolu aplikace. Možnosti: `debug`, `info`, `warning`, `error`. |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | Předpona aplikovaná na všechny názvy kontejnerů a svazků Docker. Změňte při spuštění více instancí rtCloud na stejném hostiteli. |
-| `RESTART_POLICY` | `unless-stopped` | Chování restartu kontejneru Docker. Možnosti: `no`, `always`, `on-failure`, `unless-stopped`. |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker obraz k použití. Změňte tag pro připnutí konkrétní verze. |
-| `REQUIRE_LICENSE` | `false` | Povolení ověření licenčního klíče při spuštění. Pro informace o licenci kontaktujte RTA. |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## Bezpečnost
+## Security
 
-| Proměnná | Výchozí | Popis |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | Povolení ověření CSRF tokenu. V produkci nechte `true`. Nastavte na `false` pouze při lokálním vývoji, pokud se vyskytují chyby `400 CSRF token could not be verified`. |
-| `GII_ENABLED` | `false` | Povolení nástroje generátoru kódu Yii frameworku. **Nikdy nepovolujte v produkci.** |
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — Vložený Keycloak
+## SSO — Embedded Keycloak
 
-Povolte přibalený kontejner Keycloak pro plnohodnotné podnikové SSO. Vyžaduje doménu s HTTPS.
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| Proměnná | Výchozí | Popis |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | Nastavte na `true` pro spuštění vloženého kontejneru Keycloak. Aktivuje profil Docker Compose `embed-keycloak`. |
-| `KEYCLOAK_URL` | — | Úplná URL Keycloak serveru (např. `https://rtcloud.example.com/auth`). |
-| `KEYCLOAK_REALM` | — | Název realm Keycloak (např. `rtsurvey`). |
-| `KEYCLOAK_CLIENT_ID` | — | ID klienta Keycloak pro aplikaci rtCloud. |
-| `KEYCLOAK_CLIENT_SECRET` | — | Tajný klíč klienta Keycloak. Vygenerujte z administrátorské konzole Keycloak. |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Uživatelské jméno administrátora Keycloak. |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Heslo administrátora Keycloak. |
-| `KEYCLOAK_DB` | `keycloak` | Název databáze pro Keycloak. Vytvoří se automaticky při prvním spuštění. |
-| `KEYCLOAK_DB_USER` | `keycloak` | Uživatel databáze pro Keycloak. |
-| `KEYCLOAK_DB_PASSWORD` | — | Heslo databáze pro uživatele Keycloak. |
-| `KC_HOSTNAME` | — | Frontend URL Keycloak (např. `https://rtcloud.example.com/auth`). |
-| `KC_HOSTNAME_STRICT` | `false` | Vynutí striktní shodu názvu hostitele. V produkci s pevnou doménou nastavte na `true`. |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
 
-Viz [SSO autentizace](sso-authentication#embedded-keycloak) pro kompletního průvodce nastavením.
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
 
 ---
 
-## SSO — Externí OIDC poskytovatel
+## SSO — External OIDC Provider
 
-Připojte se k existujícímu poskytovateli identit kompatibilnímu s OIDC (Supabase, Auth0, Authentik, Okta atd.).
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
 
-| Proměnná | Výchozí | Popis |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | URL pro discovery OIDC issuer (např. `https://accounts.google.com`). |
-| `OIDC_CLIENT_ID` | — | ID klienta zaregistrované u vašeho poskytovatele identit. |
-| `OIDC_CLIENT_SECRET` | — | Tajný klíč klienta od vašeho poskytovatele identit. |
-| `OIDC_SCOPE` | `openid profile email` | Mezerou oddělený seznam OIDC rozsahů k požadování. |
-| `OIDC_REDIRECT_URI` | — | Callback URL pro webovou aplikaci (např. `https://rtcloud.example.com/auth/callback`). |
-| `OIDC_MOBILE_CLIENT_ID` | — | Samostatné ID klienta pro mobilní aplikaci rtSurvey. |
-| `OIDC_MOBILE_REDIRECT_URI` | — | Callback URI mobilní aplikace (např. `vn.rta.rtsurvey.auth://callback`). |
-| `OPEN_REGISTRATION` | `false` | Automatické vytvoření rtCloud účtů pro uživatele, kteří se poprvé ověřují přes OIDC. |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | Přepsání URL autorizačního endpointu (ponechte prázdné pro použití discovery). |
-| `OIDC_TOKEN_ENDPOINT` | — | Přepsání URL token endpointu (ponechte prázdné pro použití discovery). |
-| `OIDC_USERINFO_ENDPOINT` | — | Přepsání URL userinfo endpointu (ponechte prázdné pro použití discovery). |
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| Proměnná | Popis |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | ID aplikace (klienta) Azure AD. |
-| `AZURE_TENANT_ID` | ID adresáře (tenanta) Azure AD. |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## Volitelné integrace
+## Optional Integrations
 
 ### Stata
 
-| Proměnná | Výchozí | Popis |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | Povolení integrace statistického softwaru Stata pro analýzu dat. |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolutní cesta k binárnímu souboru Stata uvnitř kontejneru. |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| Proměnná | Popis |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Hostitel Elasticsearch (např. `http://elasticsearch:9200`). |
-| `ES_PORT` | Port Elasticsearch. |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
 ### Matomo Analytics
 
-| Proměnná | Popis |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | URL serveru Matomo (Piwik). |
-| `PIWIK_ID` | ID webu Matomo. |
-| `PIWIK_SECRET` | Autentizační token Matomo. |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (výpočty R)
+### OpenCPU (R Computation)
 
-| Proměnná | Popis |
+| Variable | Description |
 |----------|-------------|
-| `OCPU_HOST` | URL serveru OpenCPU pro statistické výpočty v R. |
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### Integrace RtBox
+### RtBox Integration
 
-| Proměnná | Popis |
+| Variable | Description |
 |----------|-------------|
-| `RTBOX_HOST` | URL hostitele služby RtBox. |
-| `RTBOX_USER_API` | API klíč uživatele RtBox. |
-| `RTBOX_BASIC_AUTH` | Přihlašovací údaje pro základní autentizaci RtBox. |
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Zasílání zpráv Matrix
+### Matrix Messaging
 
-| Proměnná | Popis |
+| Variable | Description |
 |----------|-------------|
-| `MATRIX_HOMESERVER_HOST` | Hostitel homeserveru Matrix. |
-| `MATRIX_HOMESERVER_PORT` | Port homeserveru Matrix. |
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## Datové svazky
+## Data Volumes
 
-Veškerá data aplikace jsou uložena v pojmenovaných Docker svazcích. Svazky jsou automaticky vytvořeny při prvním spuštění a přetrvávají po restartování kontejnerů a aktualizacích.
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| Svazek | Bod připojení | Obsah |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | Soubory databáze MySQL |
-| `rtcloud_uploads` | `…/uploads` | Soubory nahrané respondenty průzkumu |
-| `rtcloud_audios` | `…/audios` | Zvukové nahrávky |
-| `rtcloud_downloads` | `…/downloads` | Generované exportní soubory |
-| `rtcloud_gallery` | `…/gallery` | Obrázky galerie |
-| `rtcloud_voicemail` | `…/voicemail` | Hlasové zprávy |
-| `rtcloud_analytics` | `…/analytics` | Analytická data |
-| `rtcloud_aggregate` | `…/aggregate` | Agregované výsledky průzkumu |
-| `rtcloud_converter` | `…/converter` | Výstupy konverze dat |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | R skripty Shiny serveru |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Protokoly Shiny serveru |
-| `rtcloud_assets` | `…/assets` | Webové prostředky (CSS, JS) |
-| `rtcloud_runtime` | `…/protected/runtime` | Mezipaměť runtime aplikace |
-| `rtcloud_cache` | `…/cache` | Mezipaměť aplikace |
-| `rtcloud_tmp` | `…/tmp` | Dočasné soubory |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-Názvy svazků jsou předponou hodnotou `COMPOSE_PROJECT_NAME` (výchozí: `rtcloud`).
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-Výpis všech svazků pro vaše nasazení:
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

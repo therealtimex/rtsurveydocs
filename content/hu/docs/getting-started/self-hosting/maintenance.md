@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 6
 title: "Karbantartás"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "build"
 toc: true
-description: "Napi karbantartás saját üzemeltetésű rtCloud-példányhoz: frissítés, biztonsági mentés, visszaállítás és általános problémák hibaelhárítása."
+description: "Önállóan üzemeltetett rtCloud példány napi karbantartása: frissítések, biztonsági mentések, visszaállítás és hibaelhárítás."
 ---
 
 ## Általános parancsok
 
-Ezeket a parancsokat rendszeresen használja az rtCloud-konténerek kezeléséhez. Futtassa őket a `docker-compose.production.yml` fájlt tartalmazó könyvtárból.
+Használja ezeket a parancsokat rendszeresen az rtCloud konténerek kezeléséhez. Futtassa őket a `docker-compose.production.yml` fájlt tartalmazó könyvtárból.
 
 ```bash
-# Az összes konténer állapotának és egészségének ellenőrzése
+# Check status and health of all containers
 docker compose -f docker-compose.production.yml ps
 
-# Élő naplók megtekintése (összes szolgáltatás)
+# View live logs (all services)
 docker compose -f docker-compose.production.yml logs -f
 
-# Csak az alkalmazás naplóinak megtekintése
+# View logs for the app only
 docker compose -f docker-compose.production.yml logs -f rtcloud
 
-# Egyetlen konténer újraindítása
+# Restart a single container
 docker compose -f docker-compose.production.yml restart rtcloud
 
-# Az összes szolgáltatás leállítása
+# Stop all services
 docker compose -f docker-compose.production.yml down
 
-# Az összes szolgáltatás elindítása
+# Start all services
 docker compose -f docker-compose.production.yml up -d
 
-# Shell megnyitása az alkalmazáskonténeren belül
+# Open a shell inside the app container
 docker compose -f docker-compose.production.yml exec rtcloud bash
 ```
 
 ---
 
-## Frissítés
+## Upgrading
 
-Az rtCloud frissítéseit új Docker-képfájl-címkékként terjesztik. A frissítés lekéri a legújabb képfájlt, és újra létrehozza az alkalmazáskonténert. Az adatbázis-migrációk automatikusan futnak az indításkor.
+rtCloud updates are distributed as new Docker image tags. Upgrading pulls the latest image and recreates the app container. Database migrations run automatically on startup.
 
-**1. A legújabb képfájl lekérése:**
+**1. Pull the latest image:**
 
 ```bash
 docker compose -f docker-compose.production.yml pull
 ```
 
-**2. Az alkalmazáskonténer újra létrehozása:**
+**2. Recreate the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d
 ```
 
-A Docker csak azokat a konténereket cseréli le, amelyek képfájlja megváltozott. A MySQL-konténer és az összes elnevezett kötet nem érintett.
+Docker replaces only the containers whose image has changed. The MySQL container and all named volumes are unaffected.
 
-### Verzió rögzítése
+### Pinning a Version
 
-Egy adott verzióra való frissítéshez a `latest` helyett frissítse az `RTCLOUD_IMAGE` értékét a `.env` fájlban:
+To upgrade to a specific version instead of `latest`, update `RTCLOUD_IMAGE` in `.env`:
 
 ```dotenv
 RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
 ```
 
-Majd futtassa a `docker compose pull` és `up -d` parancsokat a fentiek szerint.
+Then run `docker compose pull` and `up -d` as above.
 
-### Visszaminősítés
+### Downgrading
 
-A visszaminősítés általában nem ajánlott, mivel az adatbázis-migrációk nem vonhatók vissza. Ha visszaminősítésre van szükség, állítsa vissza a frissítés előtt készített adatbázis-biztonsági mentésből.
+Downgrading is generally not recommended, as database migrations cannot be reversed. If a downgrade is necessary, restore from a database backup taken before the upgrade.
 
 ---
 
-## Biztonsági mentés és visszaállítás
+## Backup and Restore
 
-### Az adatbázis biztonsági mentése
+### Backup the Database
 
-Futtassa ezt a parancsot az alkalmazás adatbázisának SQL-fájlba való exportálásához:
+Run this command to export the application database to a SQL file:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -85,9 +85,9 @@ docker compose -f docker-compose.production.yml exec mysql \
   > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-A biztonsági mentési fájl a gazdagép aktuális könyvtárába kerül.
+The backup file is written to your current directory on the host.
 
-### Az adatbázis visszaállítása
+### Restore the Database
 
 ```bash
 docker compose -f docker-compose.production.yml exec -T mysql \
@@ -95,27 +95,27 @@ docker compose -f docker-compose.production.yml exec -T mysql \
   < backup-20240101-120000.sql
 ```
 
-### A feltöltött fájlok biztonsági mentése
+### Backup Uploaded Files
 
-A felmérési beküldések gyakran tartalmaznak feltöltött fájlokat (fényképek, hangfájlok, dokumentumok), amelyek elnevezett Docker-kötetekben tárolódnak. Ezeket külön kell biztonsági másolatot készíteni az adatbázistól:
+Survey submissions often include uploaded files (photos, audio, documents) stored in named Docker volumes. Back them up separately from the database:
 
 ```bash
-# Feltöltések biztonsági mentése
+# Backup uploads
 docker run --rm \
   -v rtcloud_uploads:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
 
-# Hangfelvételek biztonsági mentése
+# Backup audio recordings
 docker run --rm \
   -v rtcloud_audios:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/audios-$(date +%Y%m%d).tar.gz -C /data .
 ```
 
-Cserélje az `rtcloud_uploads` és `rtcloud_audios` értékeket a tényleges kötetnevekre (a `COMPOSE_PROJECT_NAME` értékével előtagolva), ha megváltoztatta az alapértelmezett értékeket.
+Replace `rtcloud_uploads` and `rtcloud_audios` with your actual volume names (prefixed by `COMPOSE_PROJECT_NAME`) if you changed the default.
 
-### A feltöltött fájlok visszaállítása
+### Restore Uploaded Files
 
 ```bash
 docker run --rm \
@@ -124,12 +124,12 @@ docker run --rm \
   alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
 ```
 
-### Automatizált napi biztonsági mentések
+### Automated Daily Backups
 
-Adjon hozzá egy cron-feladatot a gazdagépen az automatikus biztonsági mentések futtatásához. Szerkessze a root crontab-ot a `crontab -e` paranccsal:
+Add a cron job on the host to run backups automatically. Edit the root crontab with `crontab -e`:
 
 ```cron
-# Napi adatbázis-biztonsági mentés reggel 2-kor, 30 napos előzmények megőrzésével
+# Daily database backup at 2:00 AM, keep 30 days of history
 0 2 * * * cd /opt/rtcloud && docker compose -f docker-compose.production.yml exec -T mysql \
   mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
   > /backups/db-$(date +\%Y\%m\%d).sql && \
@@ -138,42 +138,42 @@ Adjon hozzá egy cron-feladatot a gazdagépen az automatikus biztonsági mentés
 
 ---
 
-## Hibaelhárítás
+## Troubleshooting
 
-### Az alkalmazáskonténer nem indul el
+### App container not starting
 
-Ellenőrizze a konténer naplóit a hibaüzenetekért:
+Check the container logs for error messages:
 
 ```bash
 docker compose -f docker-compose.production.yml logs rtcloud
 ```
 
-Általános okok:
-- Hiányzó vagy érvénytelen környezeti változók a `.env` fájlban
-- A MySQL még nem áll készen (várjon 60 másodpercet, majd ellenőrizze újra)
-- Port-ütközés — egy másik folyamat már használja az `APP_PORT`-ot
+Common causes:
+- Missing or invalid environment variables in `.env`
+- MySQL not yet ready (wait 60 seconds and check again)
+- Port conflict — another process is already using `APP_PORT`
 
-### A MySQL nem egészséges
+### MySQL not healthy
 
 ```bash
 docker compose -f docker-compose.production.yml logs mysql
 ```
 
-Általános okok:
-- A `MYSQL_ROOT_PASSWORD` nincs beállítva a `.env` fájlban
-- Sérült adatkötet (ritka — ellenőrizze a lemezterületet a `df -h` paranccsal)
+Common causes:
+- `MYSQL_ROOT_PASSWORD` not set in `.env`
+- Corrupted data volume (rare — check disk space with `df -h`)
 
-A MySQL akár 30–60 másodpercig is eltarthat az első indításkor való inicializálásig. Várjon, és ellenőrizze újra a hiba feltételezése előtt.
+MySQL can take 30–60 seconds to initialize on the very first boot. Wait and check again before assuming failure.
 
-### A port már használatban van
+### Port already in use
 
-Változtassa meg az `APP_PORT`-ot vagy a `SHINY_PORT`-ot a `.env` fájlban egy szabad portra, majd hozza létre újra a konténereket:
+Change `APP_PORT` or `SHINY_PORT` in `.env` to a free port, then recreate the containers:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate
 ```
 
-A gazdagépen egy portot használó folyamat megkeresése:
+To find what is using a port on the host:
 
 ```bash
 lsof -i :8080
@@ -181,79 +181,79 @@ lsof -i :8080
 
 ### 400 CSRF Token Could Not Be Verified
 
-Ez a hiba helyi vagy fordított proxy környezetekben jelenik meg, ahol a kérés eredete nem egyezik a várt gazdagéppel. Tiltsa le a CSRF-ellenőrzést csak helyi fejlesztéshez:
+This error appears in local or reverse-proxy environments where the request origin does not match the expected host. Disable CSRF validation for local development only:
 
 ```dotenv
 CSRF_VALIDATION_ENABLED=false
 ```
 
-Majd indítsa újra az alkalmazást:
+Then restart the app:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-> Ne tiltsa le a CSRF-ellenőrzést éles környezetben. Ha ez a hiba éles környezetben fordul elő, győződjön meg arról, hogy a fordított proxy a helyes `Host` és `X-Forwarded-For` fejléceket továbbítja.
+> Do not disable CSRF validation in production. If this error occurs in production, ensure your reverse proxy is forwarding the correct `Host` and `X-Forwarded-For` headers.
 
-### Elfelejtette a rendszergazdai jelszót
+### Forgot the Admin Password
 
-Állítsa vissza a rendszergazdai jelszót közvetlenül az adatbázisban. Csatlakozzon a MySQL-konténerhez, és frissítse a jelszó-hash-t:
+Reset the admin password directly in the database. Connect to the MySQL container and update the password hash:
 
-**1. lépés** — Generálja az új jelszó hash-ét. Cserélje a `newpassword` értéket a kívánt jelszóra:
+**Step 1** — Generate the new password hash. Replace `newpassword` with your desired password:
 
 ```bash
 docker compose -f docker-compose.production.yml exec rtcloud php -r "
-  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\"\"));
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\""));
   echo md5(\$salt . 'newpassword') . PHP_EOL;
 "
 ```
 
-**2. lépés** — Frissítse a hash-t az adatbázisban:
+**Step 2** — Update the hash in the database:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
   mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
-  -e "UPDATE ss_user SET password='<hash_az_1_lepesbol>' WHERE username='admin';"
+  -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
 ```
 
-### A konténer folyamatosan újraindul
+### Container keeps restarting
 
-Ellenőrizze, hogy az állapotellenőrzés nem sikertelen-e:
+Check if the health check is failing:
 
 ```bash
 docker compose -f docker-compose.production.yml ps
-docker inspect rtcloud-app --format '{{json .State.Health}}'
+docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
 ```
 
-Az alkalmazás állapotellenőrzése a `/health` végpontot hívja meg. Ha ez ismételten sikertelen, ellenőrizze az alkalmazás naplóit az indítási hibákért.
+The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.
 
-### A lemezterület megtelt
+### Disk space full
 
-Azonosítsa, mi foglalja el a területet:
+Identify what is consuming space:
 
 ```bash
-# Gazdagép lemezhasználatának ellenőrzése
+# Check host disk usage
 df -h
 
-# Docker lemezhasználatának ellenőrzése (képfájlok, konténerek, kötetek)
+# Check Docker disk usage (images, containers, volumes)
 docker system df
 
-# Nem használt képfájlok és leállított konténerek eltávolítása (biztonságos futtatni)
+# Remove unused images and stopped containers (safe to run)
 docker system prune
 ```
 
-Ne használja a `docker system prune --volumes` parancsot, mert az törli az alkalmazásadatokat.
+Do not use `docker system prune --volumes` as this will delete application data.
 
 ---
 
-## Állapotellenőrzések
+## Health Checks
 
-Minden szolgáltatásnak automatikus állapotellenőrzése van. A konténer állapota tükrözi az eredményt:
+Each service has an automatic health check. Container status reflects the result:
 
-| Konténer | Ellenőrzési módszer | Indítási időszak | Intervallum |
+| Container | Check Method | Start Period | Interval |
 |-----------|-------------|-------------|----------|
-| `rtcloud-app` | HTTP GET `/health` | 90 másodperc | 30 másodperc |
-| `rtcloud-mysql` | `mysqladmin ping` | 30 másodperc | 10 másodperc |
-| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 másodperc | 30 másodperc |
+| `rtcloud-app` | HTTP GET `/health` | 90 seconds | 30 seconds |
+| `rtcloud-mysql` | `mysqladmin ping` | 30 seconds | 10 seconds |
+| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 seconds | 30 seconds |
 
-A sikertelen állapotellenőrzéssel rendelkező konténerek automatikusan újraindulnak a `RESTART_POLICY` beállítás szerint (alapértelmezett: `unless-stopped`).
+Containers with a failing health check are automatically restarted according to the `RESTART_POLICY` setting (default: `unless-stopped`).

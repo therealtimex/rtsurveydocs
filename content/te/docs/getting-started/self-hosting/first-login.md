@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "మొదటి లాగిన్"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "విన్యాసం తర్వాత మొదటిసారి మీ rtSurvey ఇన్‌స్టాన్స్‌లో లాగిన్ అవ్వడం ఎలా."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **లాగిన్ కావడానికి ముందు SSL కాన్ఫిగర్ చేయబడాలి.** మీరు HTTP ద్వారా యాప్‌ను యాక్సెస్ చేస్తే, మీరు భద్రతా హెచ్చరికను చూస్తారు మరియు SSO నిరోధించబడుతుంది. ముందు [SSL సెటప్](ssl-setup) పూర్తి చేయండి.
 
-After SSL is active, open your browser at your HTTPS URL:
+SSL యాక్టివ్ అయిన తర్వాత, మీ HTTPS URL లో బ్రౌజర్ తెరవండి:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## లాగిన్ స్క్రీన్
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+లాగిన్ పేజీ చూపిస్తుంది:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- **వినియోగదారు పేరు** మరియు **పాస్‌వర్డ్** ఫీల్డ్‌లు
+- ఒక **సైన్ ఇన్** బటన్
+- ఒక **SSO తో లాగిన్** బటన్ (విభజకం క్రింద) — SSO ఖాతాలు ఉన్న జట్టు సభ్యుల కోసం
 
 ---
 
-## If you see a security warning
+## డిఫాల్ట్ అడ్మిన్ క్రెడెన్షియల్స్
 
-If you access the app over HTTP (before SSL is configured), you will see:
+డిఫాల్ట్ క్రెడెన్షియల్స్ నమోదు చేసి **సైన్ ఇన్** క్లిక్ చేయండి:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| ఫీల్డ్ | విలువ |
+|--------|-------|
+| వినియోగదారు పేరు | `admin` |
+| పాస్‌వర్డ్ | `admin` |
+
+> **మీ మొదటి లాగిన్ తర్వాత వెంటనే పాస్‌వర్డ్ మార్చండి.**
+
+---
+
+## మీరు భద్రతా హెచ్చరిక చూస్తే
+
+మీరు HTTP ద్వారా యాప్‌ను యాక్సెస్ చేస్తే (SSL కాన్ఫిగర్ కావడానికి ముందు), మీరు చూస్తారు:
+
+- లాగిన్ పేజీ పైభాగంలో పసుపు హెచ్చరిక బ్యానర్
+- **సైన్ ఇన్** క్లిక్ చేసినప్పుడు ఒక మోడల్, క్రెడెన్షియల్స్ గుప్తీకరించకుండా పంపబడతాయని హెచ్చరిస్తుంది
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+HTTPS కాన్ఫిగర్ చేయడానికి **SSL సెటప్ చేయండి** క్లిక్ చేయండి, లేదా SSL లేకుండా లాగిన్ అవడానికి **అయినా కొనసాగించండి** క్లిక్ చేయండి (సిఫార్సు చేయబడలేదు).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+HTTP ద్వారా SSO లాగిన్ పూర్తిగా నిరోధించబడింది — **SSO తో లాగిన్** క్లిక్ చేయడం రీడైరెక్ట్ కాకుండా నోటీసు చూపిస్తుంది.
 
 ---
 
-## After logging in
+## లాగిన్ తర్వాత
 
-Once inside, you will land on the dashboard. From here:
+లోపలికి వెళ్ళిన తర్వాత, మీరు డాష్‌బోర్డ్‌కు చేరుకుంటారు. ఇక్కడ నుండి:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **అడ్మిన్ పాస్‌వర్డ్ మార్చండి** — ఖాతా సెట్టింగులు → పాస్‌వర్డ్ మార్చండి
+2. **మీ మొదటి ప్రాజెక్ట్ సృష్టించండి** — ప్రాజెక్ట్‌లు → కొత్త ప్రాజెక్ట్
+3. **ఫారమ్ అప్‌లోడ్ చేయండి లేదా నిర్మించండి** — ఫారమ్‌లు → XLSForm అప్‌లోడ్ చేయండి లేదా Form Builder తెరవండి
+4. **వినియోగదారులను జోడించండి** — వినియోగదారులు → మీ జట్టు కోసం ఖాతాలు ఆహ్వానించండి లేదా సృష్టించండి

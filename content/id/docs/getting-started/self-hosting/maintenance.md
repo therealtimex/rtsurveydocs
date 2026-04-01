@@ -1,5 +1,5 @@
 ---
-weight: 5
+weight: 6
 title: "Pemeliharaan"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
@@ -7,77 +7,77 @@ draft: false
 author: "rtSurvey"
 icon: "build"
 toc: true
-description: "Pemeliharaan sehari-hari untuk instans rtCloud yang di-hosting sendiri: peningkatan, pencadangan, pemulihan, dan pemecahan masalah umum."
+description: "Pemeliharaan sehari-hari untuk instans rtCloud yang dihosting sendiri: pembaruan, pencadangan, pemulihan, dan pemecahan masalah umum."
 ---
 
 ## Perintah Umum
 
-Gunakan perintah ini secara rutin untuk mengelola container rtCloud Anda. Jalankan dari direktori yang berisi `docker-compose.production.yml`.
+Gunakan perintah-perintah ini secara teratur untuk mengelola container rtCloud Anda. Jalankan dari direktori yang berisi `docker-compose.production.yml`.
 
 ```bash
-# Periksa status dan kesehatan semua container
+# Check status and health of all containers
 docker compose -f docker-compose.production.yml ps
 
-# Lihat log langsung (semua layanan)
+# View live logs (all services)
 docker compose -f docker-compose.production.yml logs -f
 
-# Lihat log hanya untuk aplikasi
+# View logs for the app only
 docker compose -f docker-compose.production.yml logs -f rtcloud
 
-# Restart satu container
+# Restart a single container
 docker compose -f docker-compose.production.yml restart rtcloud
 
-# Hentikan semua layanan
+# Stop all services
 docker compose -f docker-compose.production.yml down
 
-# Mulai semua layanan
+# Start all services
 docker compose -f docker-compose.production.yml up -d
 
-# Buka shell di dalam container aplikasi
+# Open a shell inside the app container
 docker compose -f docker-compose.production.yml exec rtcloud bash
 ```
 
 ---
 
-## Peningkatan
+## Upgrading
 
-Pembaruan rtCloud didistribusikan sebagai tag image Docker baru. Peningkatan menarik image terbaru dan membuat ulang container aplikasi. Migrasi database berjalan secara otomatis saat startup.
+rtCloud updates are distributed as new Docker image tags. Upgrading pulls the latest image and recreates the app container. Database migrations run automatically on startup.
 
-**1. Tarik image terbaru:**
+**1. Pull the latest image:**
 
 ```bash
 docker compose -f docker-compose.production.yml pull
 ```
 
-**2. Buat ulang container aplikasi:**
+**2. Recreate the app container:**
 
 ```bash
 docker compose -f docker-compose.production.yml up -d
 ```
 
-Docker hanya mengganti container yang imagenya telah berubah. Container MySQL dan semua volume bernama tidak terpengaruh.
+Docker replaces only the containers whose image has changed. The MySQL container and all named volumes are unaffected.
 
-### Menyematkan Versi
+### Pinning a Version
 
-Untuk meningkatkan ke versi tertentu alih-alih `latest`, perbarui `RTCLOUD_IMAGE` di `.env`:
+To upgrade to a specific version instead of `latest`, update `RTCLOUD_IMAGE` in `.env`:
 
 ```dotenv
 RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
 ```
 
-Kemudian jalankan `docker compose pull` dan `up -d` seperti di atas.
+Then run `docker compose pull` and `up -d` as above.
 
-### Penurunan Versi
+### Downgrading
 
-Penurunan versi umumnya tidak direkomendasikan, karena migrasi database tidak dapat dibalik. Jika penurunan versi diperlukan, pulihkan dari cadangan database yang diambil sebelum peningkatan.
+Downgrading is generally not recommended, as database migrations cannot be reversed. If a downgrade is necessary, restore from a database backup taken before the upgrade.
 
 ---
 
-## Pencadangan dan Pemulihan
+## Backup and Restore
 
-### Cadangkan Database
+### Backup the Database
 
-Jalankan perintah ini untuk mengekspor database aplikasi ke file SQL:
+Run this command to export the application database to a SQL file:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -85,9 +85,9 @@ docker compose -f docker-compose.production.yml exec mysql \
   > backup-$(date +%Y%m%d-%H%M%S).sql
 ```
 
-File cadangan ditulis ke direktori saat ini di host.
+The backup file is written to your current directory on the host.
 
-### Pulihkan Database
+### Restore the Database
 
 ```bash
 docker compose -f docker-compose.production.yml exec -T mysql \
@@ -95,27 +95,27 @@ docker compose -f docker-compose.production.yml exec -T mysql \
   < backup-20240101-120000.sql
 ```
 
-### Cadangkan File yang Diunggah
+### Backup Uploaded Files
 
-Kiriman survei sering menyertakan file yang diunggah (foto, audio, dokumen) yang disimpan dalam volume Docker bernama. Cadangkan secara terpisah dari database:
+Survey submissions often include uploaded files (photos, audio, documents) stored in named Docker volumes. Back them up separately from the database:
 
 ```bash
-# Cadangkan unggahan
+# Backup uploads
 docker run --rm \
   -v rtcloud_uploads:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
 
-# Cadangkan rekaman audio
+# Backup audio recordings
 docker run --rm \
   -v rtcloud_audios:/data \
   -v "$(pwd):/backup" \
   alpine tar czf /backup/audios-$(date +%Y%m%d).tar.gz -C /data .
 ```
 
-Ganti `rtcloud_uploads` dan `rtcloud_audios` dengan nama volume Anda yang sebenarnya (diawali oleh `COMPOSE_PROJECT_NAME`) jika Anda mengubah default.
+Replace `rtcloud_uploads` and `rtcloud_audios` with your actual volume names (prefixed by `COMPOSE_PROJECT_NAME`) if you changed the default.
 
-### Pulihkan File yang Diunggah
+### Restore Uploaded Files
 
 ```bash
 docker run --rm \
@@ -124,12 +124,12 @@ docker run --rm \
   alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
 ```
 
-### Pencadangan Harian Otomatis
+### Automated Daily Backups
 
-Tambahkan cron job di host untuk menjalankan cadangan secara otomatis. Edit crontab root dengan `crontab -e`:
+Add a cron job on the host to run backups automatically. Edit the root crontab with `crontab -e`:
 
 ```cron
-# Cadangan database harian pukul 02.00, simpan 30 hari riwayat
+# Daily database backup at 2:00 AM, keep 30 days of history
 0 2 * * * cd /opt/rtcloud && docker compose -f docker-compose.production.yml exec -T mysql \
   mysqldump -u root -p"$(grep MYSQL_ROOT_PASSWORD .env | cut -d= -f2)" smartsurvey \
   > /backups/db-$(date +\%Y\%m\%d).sql && \
@@ -138,42 +138,42 @@ Tambahkan cron job di host untuk menjalankan cadangan secara otomatis. Edit cron
 
 ---
 
-## Pemecahan Masalah
+## Troubleshooting
 
-### Container aplikasi tidak dapat dimulai
+### App container not starting
 
-Periksa log container untuk pesan kesalahan:
+Check the container logs for error messages:
 
 ```bash
 docker compose -f docker-compose.production.yml logs rtcloud
 ```
 
-Penyebab umum:
-- Variabel lingkungan yang hilang atau tidak valid di `.env`
-- MySQL belum siap (tunggu 60 detik dan periksa lagi)
-- Konflik port — proses lain sudah menggunakan `APP_PORT`
+Common causes:
+- Missing or invalid environment variables in `.env`
+- MySQL not yet ready (wait 60 seconds and check again)
+- Port conflict — another process is already using `APP_PORT`
 
-### MySQL tidak sehat
+### MySQL not healthy
 
 ```bash
 docker compose -f docker-compose.production.yml logs mysql
 ```
 
-Penyebab umum:
-- `MYSQL_ROOT_PASSWORD` tidak ditetapkan di `.env`
-- Volume data rusak (jarang — periksa ruang disk dengan `df -h`)
+Common causes:
+- `MYSQL_ROOT_PASSWORD` not set in `.env`
+- Corrupted data volume (rare — check disk space with `df -h`)
 
-MySQL dapat membutuhkan waktu 30–60 detik untuk diinisialisasi pada booting pertama. Tunggu dan periksa lagi sebelum menganggap gagal.
+MySQL can take 30–60 seconds to initialize on the very first boot. Wait and check again before assuming failure.
 
-### Port sudah digunakan
+### Port already in use
 
-Ubah `APP_PORT` atau `SHINY_PORT` di `.env` ke port yang bebas, lalu buat ulang container:
+Change `APP_PORT` or `SHINY_PORT` in `.env` to a free port, then recreate the containers:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate
 ```
 
-Untuk menemukan apa yang menggunakan port di host:
+To find what is using a port on the host:
 
 ```bash
 lsof -i :8080
@@ -181,34 +181,34 @@ lsof -i :8080
 
 ### 400 CSRF Token Could Not Be Verified
 
-Kesalahan ini muncul di lingkungan lokal atau reverse-proxy di mana asal permintaan tidak cocok dengan host yang diharapkan. Nonaktifkan validasi CSRF hanya untuk pengembangan lokal:
+This error appears in local or reverse-proxy environments where the request origin does not match the expected host. Disable CSRF validation for local development only:
 
 ```dotenv
 CSRF_VALIDATION_ENABLED=false
 ```
 
-Kemudian restart aplikasi:
+Then restart the app:
 
 ```bash
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-> Jangan nonaktifkan validasi CSRF di produksi. Jika kesalahan ini terjadi di produksi, pastikan reverse proxy Anda meneruskan header `Host` dan `X-Forwarded-For` yang benar.
+> Do not disable CSRF validation in production. If this error occurs in production, ensure your reverse proxy is forwarding the correct `Host` and `X-Forwarded-For` headers.
 
-### Lupa Kata Sandi Admin
+### Forgot the Admin Password
 
-Reset kata sandi admin langsung di database. Hubungkan ke container MySQL dan perbarui hash kata sandi:
+Reset the admin password directly in the database. Connect to the MySQL container and update the password hash:
 
-**Langkah 1** — Buat hash kata sandi baru. Ganti `newpassword` dengan kata sandi yang Anda inginkan:
+**Step 1** — Generate the new password hash. Replace `newpassword` with your desired password:
 
 ```bash
 docker compose -f docker-compose.production.yml exec rtcloud php -r "
-  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\"\"));
+  \$salt = trim(shell_exec(\"mysql -h mysql -u root -p\\\"\${MYSQL_ROOT_PASSWORD}\\\" \${MYSQL_DATABASE} -se \\\"SELECT salt FROM ss_user WHERE username='admin';\\\""));
   echo md5(\$salt . 'newpassword') . PHP_EOL;
 "
 ```
 
-**Langkah 2** — Perbarui hash di database:
+**Step 2** — Update the hash in the database:
 
 ```bash
 docker compose -f docker-compose.production.yml exec mysql \
@@ -216,44 +216,44 @@ docker compose -f docker-compose.production.yml exec mysql \
   -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
 ```
 
-### Container terus me-restart
+### Container keeps restarting
 
-Periksa apakah pemeriksaan kesehatan gagal:
+Check if the health check is failing:
 
 ```bash
 docker compose -f docker-compose.production.yml ps
-docker inspect rtcloud-app --format '{{json .State.Health}}'
+docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
 ```
 
-Pemeriksaan kesehatan aplikasi memanggil endpoint `/health`. Jika gagal berulang kali, periksa log aplikasi untuk kesalahan startup.
+The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.
 
-### Ruang disk penuh
+### Disk space full
 
-Identifikasi apa yang menggunakan ruang:
+Identify what is consuming space:
 
 ```bash
-# Periksa penggunaan disk host
+# Check host disk usage
 df -h
 
-# Periksa penggunaan disk Docker (image, container, volume)
+# Check Docker disk usage (images, containers, volumes)
 docker system df
 
-# Hapus image yang tidak digunakan dan container yang dihentikan (aman untuk dijalankan)
+# Remove unused images and stopped containers (safe to run)
 docker system prune
 ```
 
-Jangan gunakan `docker system prune --volumes` karena ini akan menghapus data aplikasi.
+Do not use `docker system prune --volumes` as this will delete application data.
 
 ---
 
-## Pemeriksaan Kesehatan
+## Health Checks
 
-Setiap layanan memiliki pemeriksaan kesehatan otomatis. Status container mencerminkan hasilnya:
+Each service has an automatic health check. Container status reflects the result:
 
-| Container | Metode Pemeriksaan | Periode Mulai | Interval |
-|-----------|-------------------|---------------|----------|
-| `rtcloud-app` | HTTP GET `/health` | 90 detik | 30 detik |
-| `rtcloud-mysql` | `mysqladmin ping` | 30 detik | 10 detik |
-| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 detik | 30 detik |
+| Container | Check Method | Start Period | Interval |
+|-----------|-------------|-------------|----------|
+| `rtcloud-app` | HTTP GET `/health` | 90 seconds | 30 seconds |
+| `rtcloud-mysql` | `mysqladmin ping` | 30 seconds | 10 seconds |
+| `rtcloud-keycloak` | HTTP GET `:9000/health/live` | 120 seconds | 30 seconds |
 
-Container dengan pemeriksaan kesehatan yang gagal secara otomatis di-restart sesuai pengaturan `RESTART_POLICY` (default: `unless-stopped`).
+Containers with a failing health check are automatically restarted according to the `RESTART_POLICY` setting (default: `unless-stopped`).

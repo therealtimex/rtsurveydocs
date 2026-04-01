@@ -7,127 +7,127 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Ota rtCloud käyttöön DigitalOcean Dropletilla automaattisten user-data-skriptien avulla."
+description: "Ota rtCloud käyttöön DigitalOcean Dropletissa automaattisilla käyttäjätietoskripteillä."
 ---
 
-DigitalOcean käyttää **User Data** -skriptejä, jotka ajetaan automaattisesti ensimmäisellä käynnistyksellä. Täytät konfiguraatiomuuttujat skriptin yläosassa ja liität sitten koko skriptin Dropletin luomisen yhteydessä.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> Toisin kuin Linode StackScripts -skripteissa, DigitalOceanissa ei ole lomakekäyttöliittymää — sinun on muokattava skriptiä suoraan ennen liittämistä.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**Lataa skripti:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Upotettu Keycloak (suositeltu)
+## Embedded Keycloak (Recommended)
 
-Käytä `digitalocean-droplet-keycloak-embed.sh`-skriptiä yksinkertaisimpaan asennukseen sisäänrakennetulla SSO:lla.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### Vaihe 1 — Täytä konfiguraatio
+### Step 1 — Fill in the configuration
 
-Avaa skripti ja muokkaa yläosassa olevaa `CONFIGURATION`-lohkoa:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Pakolliset ---
-PROJECT_ID="rtsurvey"                  # Projektin yksilöllinen tunniste (ei välilyöntejä)
-ADMIN_PASSWORD="admin"                 # Sovelluksen järjestelmänvalvojan ja Keycloakin salasana — vaihda ensimmäisen kirjautumisen jälkeen
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
-# --- Verkkotunnus + SSL ---
-DOMAIN="myapp.example.com"            # Verkkotunnuksesi — DNS A-tietueen täytyy osoittaa tähän
-PROJECT_URL=""                         # Jätä tyhjäksi, ellet ole Cloudflaren/välityspalvelimen takana
-LETSENCRYPT_EMAIL="admin@example.com" # Sähköposti Let's Encryptin ilmoituksia varten
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- Valinnaiset ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Kenttä | Pakollinen | Kuvaus |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Kyllä | Käytetään tietokannan nimenä ja Keycloakin asiakastunnuksena. Pienet kirjaimet, ei välilyöntejä. |
-| `ADMIN_PASSWORD` | Ei | Sovelluksen järjestelmänvalvojan ja Keycloakin hallintakonsolin salasana. Oletuksena `admin` — **vaihda ensimmäisen kirjautumisen jälkeen**. |
-| `DOMAIN` | Kyllä | Verkkotunnuksesi. DNS A-tietueen täytyy osoittaa Dropletin IP-osoitteeseen. |
-| `LETSENCRYPT_EMAIL` | Kyllä | Sähköpostiosoite Let's Encryptin sertifikaatti-ilmoituksia varten. |
-| `PROJECT_URL` | Ei | Ohita julkinen URL. Jätä tyhjäksi käyttääksesi `DOMAIN`-arvoa. Hyödyllinen Cloudflaren takana. |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **Turvallisuus:** Kaikki salasanat ovat oletuksena `admin`. Vaihda ne välittömästi ensimmäisen kirjautumisen jälkeen.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### Vaihe 2 — Luo Droplet
+### Step 2 — Create a Droplet
 
-[DigitalOceanin ohjauspaneelissa](https://cloud.digitalocean.com):
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Napsauta **Luo** → **Dropletit**
-2. Valitse **Ubuntu 22.04 LTS** kuvaksi
-3. Valitse **Perus, 4 Gt RAM / 2 vCPU** tai suurempi
-4. Vieritä kohtaan **Lisäasetukset** → valitse **Lisää alustuksskriptejä**
-5. Liitä koko skriptin sisältö tekstialueelle
-6. Napsauta **Luo Droplet**
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### Vaihe 3 — Lisää DNS-tietue
+### Step 3 — Add the DNS record
 
-Dropletin käynnistyessä lisää **A-tietue** DNS-palveluntarjoajallesi:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
-Tyyppi  : A
-Nimi    : myapp          (tai @ juuriverkkotunnukselle)
-Arvo    : <droplet-ip>
-TTL     : 300
+Type  : A
+Name  : myapp          (or @ for root domain)
+Value : <droplet-ip>
+TTL   : 300
 ```
 
-### Vaihe 4 — Seuraa edistymistä
+### Step 4 — Monitor progress
 
-SSH Dropletiin ja katso lokia:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-Skripti tulostaa palvelimesi IP-osoitteen alussa — lisää DNS-tietue heti, kun näet sen.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### Vaihe 5 — Käytä sovellusta
+### Step 5 — Access the app
 
-Kun asennus on valmis, loki näyttää yhteenvedon:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
- rtCloud-käyttöönotto valmis! (Upotettu Keycloak)
+ rtCloud deployment complete! (Embedded Keycloak)
 ============================================================
- Sovelluksen URL   : https://myapp.example.com
- Järjestelmänvalvoja     : admin / admin
+ App URL   : https://myapp.example.com
+ Admin     : admin / admin
  Keycloak  : https://myapp.example.com/auth/admin
 
- !! TURVALLISUUS: Kaikki salasanat ovat oletuksena 'admin'.
-    Vaihda ne välittömästi ensimmäisen kirjautumisen jälkeen.
+ !! SECURITY: All passwords default to 'admin'.
+    Change them immediately after first login.
 ============================================================
 ```
 
-Avaa `https://myapp.example.com` selaimessasi ja kirjaudu sisään käyttäjätunnuksella `admin` ja salasanalla `admin`.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Vaihda salasanasi** välittömästi kirjautumisen jälkeen yläreunan **Asetukset**-valikon kautta.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## Käyttöönoton jälkeen
+## After Deployment
 
-### Vaihda salasana
+### Change a password
 
-SSH Dropletiin, muokkaa `.env`-tiedostoa ja käynnistä asianomainen kontti uudelleen:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Päivitä verkkotunnus
+### Update the domain
 
-Jos määrität eri verkkotunnuksen käyttöönoton jälkeen, päivitä `PROJECT_URL` `.env`-tiedostossa:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # päivitä PROJECT_URL=
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Tarkastele kaikkia kontteja
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

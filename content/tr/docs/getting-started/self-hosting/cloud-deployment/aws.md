@@ -7,88 +7,88 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "aws-ec2.sh kullanıcı veri betiğini kullanarak AWS EC2 örneğine rtCloud dağıtın."
+description: "aws-ec2.sh kullanıcı verisi scriptini kullanarak rtCloud'u bir AWS EC2 örneğine dağıtın."
 ---
 
-Bir EC2 örneği başlatırken `aws-ec2.sh` dosyasını **Kullanıcı Verisi** betiği olarak kullanın. Betik, ilk açılışta otomatik olarak çalışır.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Betiği indirin:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## Adım 1 — Yapılandırmayı doldurun
+## Step 1 — Fill in the configuration
 
-Betiği açın ve üstteki `CONFIGURATION` bloğunu düzenleyin:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Gerekli ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # İlk girişten sonra değiştirin
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- Alan Adı + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Yerleşik Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # ADMIN_PASSWORD varsayılan değerine sahiptir
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Alan | Gerekli | Açıklama |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Evet | Veritabanı adı ve Keycloak istemci kimliği olarak kullanılır. Küçük harf, boşluk yok. |
-| `ADMIN_PASSWORD` | Hayır | Uygulama yöneticisi şifresi ve Keycloak yönetici şifresi. Varsayılan `admin` — **ilk girişten sonra değiştirin**. |
-| `DOMAIN` | Hayır | HTTPS için alan adınız. Yalnızca HTTP modu için boş bırakın. |
-| `LETSENCRYPT_EMAIL` | Evet (DOMAIN ayarlanmışsa) | Let's Encrypt bildirimleri için e-posta. |
-| `EMBED_KEYCLOAK` | Hayır | Yerleşik Keycloak dağıtmak için `true` (4 GB RAM gerektirir). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Güvenlik:** Tüm şifreler varsayılan olarak `admin`'dir. İlk girişinizden hemen sonra değiştirin.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## Adım 2 — EC2 örneği başlatın
+## Step 2 — Launch an EC2 instance
 
-[AWS EC2 konsolunda](https://console.aws.amazon.com/ec2):
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-1. **Örnek başlat**'a tıklayın
+1. Click **Launch instance**
 2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
-3. **Örnek türü:** `t3.medium` (4 GB RAM) veya daha büyük
-4. **Anahtar çifti:** SSH erişimi için bir tane seçin veya oluşturun
-5. **Ağ ayarları:** Güvenlik Grubu oluşturun veya seçin (aşağıya bakın)
-6. **Gelişmiş ayrıntılar** → **Kullanıcı verisi** → betiğin tam içeriğini yapıştırın
-7. **Örneği başlat**'a tıklayın
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
 
 ---
 
-## Adım 3 — Güvenlik Grubunu yapılandırın
+## Step 3 — Configure the Security Group
 
-Örneğin Güvenlik Grubunda bu portları açın:
+Open these ports in the instance's Security Group:
 
-| Port | Protokol | Kaynak | Amaç |
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | IP'niz | SSH erişimi |
-| 80 | TCP | 0.0.0.0/0 | HTTP (Nginx tarafından HTTPS'ye yönlendirilir) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Shiny doğrudan erişim |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> Port 3306'yı (MySQL) **açmayın** — asla genel erişime açık olmamalıdır.
-
----
-
-## Adım 4 — DNS kaydını ekleyin
-
-Örnek açılırken DNS sağlayıcınıza bir **A kaydı** ekleyin:
-
-```
-Tür  : A
-Ad   : myapp
-Değer: <örnek-genel-ip>
-TTL  : 300
-```
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## Adım 5 — İlerlemeyi izleyin
+## Step 4 — Add the DNS record
+
+While the instance boots, add an **A record** in your DNS provider:
+
+```
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
+TTL   : 300
+```
+
+---
+
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## Adım 6 — Uygulamaya erişin
+## Step 6 — Access the app
 
-Kurulum tamamlandığında günlük, uygulama URL'nizi ve kimlik bilgilerinizi içeren bir özet gösterir. `admin` kullanıcı adı ve `admin` şifresiyle giriş yapın, ardından hemen şifrenizi değiştirin.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Dağıtım Sonrası
+## After Deployment
 
-### Şifre değiştirme
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Tüm konteynerleri görüntüleme
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Elastik IP atama (isteğe bağlı)
+### Assign an Elastic IP (optional)
 
-Örneği durdurup başlatırsanız genel IP değişir. Kararlı bir IP tutmak için EC2 konsolunda bir **Elastik IP** tahsis edin ve örneğe atayın.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

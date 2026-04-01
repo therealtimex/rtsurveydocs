@@ -7,117 +7,117 @@ draft: false
 author: "rtSurvey"
 icon: "cloud"
 toc: true
-description: "Az rtCloud telepítése AWS EC2-példányon az aws-ec2.sh user data szkript segítségével."
+description: "Telepítse az rtCloudot AWS EC2 példányra az aws-ec2.sh felhasználói adatok szkripttel."
 ---
 
-Az `aws-ec2.sh` szkriptet **User Data** szkriptként használja egy EC2-példány indításakor. A szkript automatikusan fut az első indításkor.
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**Szkript letöltése:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## 1. lépés — A konfiguráció kitöltése
+## Step 1 — Fill in the configuration
 
-Nyissa meg a szkriptet, és szerkessze a tetején lévő `CONFIGURATION` blokkot:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- Kötelező ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # Az első bejelentkezés után változtassa meg
+ADMIN_PASSWORD="admin"                       # Change after first login
 
 # --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- Beágyazott Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Alapértéke ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| Mező | Kötelező | Leírás |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | Igen | Adatbázis nevként és Keycloak kliens azonosítóként használatos. Kisbetűs, szóközök nélkül. |
-| `ADMIN_PASSWORD` | Nem | Alkalmazás rendszergazda jelszó és Keycloak rendszergazda jelszó. Alapértéke `admin` — **az első bejelentkezés után változtassa meg**. |
-| `DOMAIN` | Nem | A domain neve HTTPS-hez. Hagyja üresen csak HTTP módhoz. |
-| `LETSENCRYPT_EMAIL` | Igen (ha DOMAIN be van állítva) | E-mail a Let's Encrypt értesítésekhez. |
-| `EMBED_KEYCLOAK` | Nem | `true` a beágyazott Keycloak telepítéséhez (4 GB RAM szükséges). |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **Biztonság:** Minden jelszó alapértéke `admin`. Az első bejelentkezés után azonnal változtassa meg őket.
-
----
-
-## 2. lépés — EC2-példány indítása
-
-Az [AWS EC2 konzolon](https://console.aws.amazon.com/ec2):
-
-1. Kattintson a **Launch instance** lehetőségre
-2. **AMI:** Ubuntu Server 22.04 LTS (64 bites x86)
-3. **Példány típusa:** `t3.medium` (4 GB RAM) vagy nagyobb
-4. **Kulcspár:** Válasszon vagy hozzon létre egyet SSH-hozzáféréshez
-5. **Hálózati beállítások:** Hozzon létre vagy válasszon egy Security Groupot (lásd alább)
-6. **Speciális részletek** → **User data** → illessze be a szkript teljes tartalmát
-7. Kattintson a **Launch instance** lehetőségre
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## 3. lépés — A Security Group konfigurálása
+## Step 2 — Launch an EC2 instance
 
-Nyissa meg ezeket a portokat a példány Security Groupjában:
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-| Port | Protokoll | Forrás | Cél |
+1. Click **Launch instance**
+2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
+
+---
+
+## Step 3 — Configure the Security Group
+
+Open these ports in the instance's Security Group:
+
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | Az Ön IP-je | SSH-hozzáférés |
-| 80 | TCP | 0.0.0.0/0 | HTTP (az Nginx HTTPS-re irányítja át) |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Shiny közvetlen hozzáférés |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **Ne** nyissa meg a 3306-os portot (MySQL) — soha ne legyen nyilvánosan elérhető.
-
----
-
-## 4. lépés — A DNS-rekord hozzáadása
-
-Miközben a példány elindul, adjon hozzá egy **A-rekordot** a DNS-szolgáltatójánál:
-
-```
-Típus  : A
-Név    : myapp
-Érték  : <példány-nyilvános-ip>
-TTL    : 300
-```
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## 5. lépés — Folyamat figyelése
+## Step 4 — Add the DNS record
+
+While the instance boots, add an **A record** in your DNS provider:
+
+```
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
+TTL   : 300
+```
+
+---
+
+## Step 5 — Monitor progress
 
 ```bash
-ssh ubuntu@<példány-ip>
+ssh ubuntu@<instance-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
 ---
 
-## 6. lépés — Az alkalmazás elérése
+## Step 6 — Access the app
 
-A beállítás befejezésekor a napló összefoglalót mutat az alkalmazás URL-jével és hitelesítő adataival. Jelentkezzen be `admin` felhasználónévvel és `admin` jelszóval, majd azonnal változtassa meg jelszavát.
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## Telepítés után
+## After Deployment
 
-### Jelszó megváltoztatása
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Az összes konténer megtekintése
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### Rugalmas IP hozzárendelése (opcionális)
+### Assign an Elastic IP (optional)
 
-Ha leállítja és újraindítja a példányt, a nyilvános IP megváltozik. Stabil IP megtartásához foglaljon le egy **Elastic IP-t**, és rendelje hozzá a példányhoz az EC2 konzolon.
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

@@ -1,221 +1,221 @@
 ---
 weight: 2
-title: "Konfigurointiviite"
+title: "Konfiguraatioviite"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "Täydellinen viite kaikille ympäristömuuttujille, joita käytetään itse isännöidyn rtCloud-käyttöönoton konfigurointiin."
+description: "Täydellinen viite kaikista ympäristömuuttujista, joita käytetään itseisännöidyn rtCloud-asennuksen määrittämiseen."
 ---
 
-Kaikki konfigurointi tehdään ympäristömuuttujien kautta käyttöönottohakemistosi juuressa olevassa `.env`-tiedostossa. Docker Compose lukee tämän tiedoston automaattisesti — `--env-file`-lippua ei tarvita.
+Kaikki konfigurointi tehdään ympäristömuuttujien avulla `.env`-tiedostossa käyttöönottohakemiston juuressa. Docker Compose lukee tämän tiedoston automaattisesti — `--env-file`-lippua ei tarvita.
 
-**Pakollisiksi** merkityt muuttujat on asetettava ennen konttien käynnistämistä. Kaikki muut ovat valinnaisia oletusarvoillaan.
+Muuttujat, jotka on merkitty **pakollisiksi**, on asetettava ennen konttien käynnistämistä. Kaikilla muilla on oletusarvot ja ne ovat valinnaisia.
 
 ---
 
-## Projekti
+## Project
 
-Nämä muuttujat määrittävät rtCloud-instanssisi identiteetin ja pääsypisteen.
+These variables define the identity and access point of your rtCloud instance.
 
-| Muuttuja | Oletus | Pakollinen | Kuvaus |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `PROJECT_ID` | — | **Kyllä** | Tämän käyttöönoton yksilöllinen tunniste. Ei välilyöntejä tai erikoismerkkejä. Käytetään sisäisen nimeämisen etuliitteenä. |
-| `PROJECT_URL` | — | **Kyllä** | Verkkotunnus tai IP-osoite, josta käyttäjät pääsevät sovellukseen (esim. `rtcloud.example.com` tai `192.168.1.100`). |
-| `PROJECT_TYPE` | `rtsurvey` | Ei | Aktivoitava alustavariantti. Vaihtoehdot: `rtwork`, `rtsurvey`, `rthome`. |
-| `PROJECT_PORT` | `80` | Ei | Portti, jota sovellus kuuntelee kontin sisällä. Älä muuta, ellet tiedä mitä teet. |
-| `HTTP_PROTOCOL` | `https` | Ei | Sisäisten URL-osoitteiden rakentamiseen käytetty protokolla. Aseta `http`, jos et käytä SSL:ää. |
+| `PROJECT_ID` | — | **Yes** | Unique identifier for this deployment. No spaces or special characters. Used as a prefix for internal naming. |
+| `PROJECT_URL` | — | **Yes** | Domain name or IP address where users access the app (e.g., `rtcloud.example.com` or `192.168.1.100`). |
+| `PROJECT_TYPE` | `rtsurvey` | No | Platform variant to activate. Options: `rtwork`, `rtsurvey`, `rthome`. |
+| `PROJECT_PORT` | `80` | No | Port the application listens on inside the container. Do not change unless you know what you are doing. |
+| `HTTP_PROTOCOL` | `https` | No | Protocol used to construct internal URLs. Set to `http` if you are not using SSL. |
 
 ---
 
-## Tietokanta
+## Database
 
-MySQL-yhteyden tunnistetiedot. Tietokantaa hallitsee automaattisesti MySQL-kontti — sinun tarvitsee vain asettaa vahvat salasanat.
+MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
-| Muuttuja | Oletus | Pakollinen | Kuvaus |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `MYSQL_DATABASE` | `smartsurvey` | Ei | Sovellustietokannan nimi. |
-| `MYSQL_USER` | `smartsurvey` | Ei | MySQL-käyttäjä sovellukselle. |
-| `MYSQL_PASSWORD` | — | **Kyllä** | `MYSQL_USER`-käyttäjän salasana. Käytä vahvaa, yksilöllistä arvoa. |
-| `MYSQL_ROOT_PASSWORD` | — | **Kyllä** | MySQL:n root-salasana. Vaaditaan tietokannan alustukseen ja ylläpito-operaatioihin. |
-| `MYSQL_HOST` | `mysql` | Ei | MySQL-isäntänimi. Käytä oletusarvoa, ellet yhdistä ulkoiseen tietokantaan. |
-| `MYSQL_PORT` | `3306` | Ei | MySQL-portti. |
+| `MYSQL_DATABASE` | `smartsurvey` | No | Name of the application database. |
+| `MYSQL_USER` | `smartsurvey` | No | MySQL user for the application. |
+| `MYSQL_PASSWORD` | — | **Yes** | Password for `MYSQL_USER`. Use a strong, unique value. |
+| `MYSQL_ROOT_PASSWORD` | — | **Yes** | MySQL root password. Required for database initialization and admin operations. |
+| `MYSQL_HOST` | `mysql` | No | MySQL hostname. Use the default unless you are connecting to an external database. |
+| `MYSQL_PORT` | `3306` | No | MySQL port. |
 
 ---
 
-## Järjestelmänvalvojatili
+## Admin Account
 
-Järjestelmänvalvojatili luodaan automaattisesti uuden tietokannan ensimmäisellä käynnistyksellä.
+The admin account is created automatically on the first boot of a fresh database.
 
-| Muuttuja | Oletus | Pakollinen | Kuvaus |
+| Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `ADMIN_PASSWORD` | `admin` | **Kyllä** | Sisäänrakennetun `admin`-käyttäjän salasana. Aseta tämä ennen ensimmäistä käynnistystä. Ei vaikuta, jos tietokanta on jo olemassa. |
+| `ADMIN_PASSWORD` | `admin` | **Yes** | Password for the built-in `admin` user. Set this before first boot. Has no effect if the database already exists. |
 
-> Ensimmäisen kirjautumisen jälkeen vaihda järjestelmänvalvojan salasana verkkokäyttöliittymän **Tiliasetukset**-sivulta.
-
----
-
-## Portit
-
-Hallitse, mihin isäntäportteihin sovellus sitoutuu.
-
-| Muuttuja | Oletus | Kuvaus |
-|----------|---------|-------------|
-| `APP_PORT` | `8080` | Isäntäportti pääverkkokäyttöliittymälle. Muuta, jos portti 8080 on jo käytössä palvelimellasi. |
-| `SHINY_PORT` | `3838` | Isäntäportti Shiny-analytiikkapalvelimelle. |
+> After first login, change the admin password from the **Account Settings** page in the web UI.
 
 ---
 
-## Suoritusympäristö
+## Ports
 
-| Muuttuja | Oletus | Kuvaus |
+Control which host ports the application binds to.
+
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `RUN_ENV` | `prod` | Suoritusympäristö. Käytä `prod` tuotantokäyttöönotoissa, `dev` paikallisessa kehityksessä. |
-| `RUN_MODE` | `admin` | Konttirooli. `admin` ajaa koko pinon (verkko + jono + cron). `worker` ajaa vain taustatyöskentelyn (horisontaaliseen skaalaukseen). |
-| `TZ` | `Asia/Ho_Chi_Minh` | Palvelinaikavyöhyke. Vaikuttaa lokien aikaleimioihin, cron-aikatauluihin ja päivämäärän näyttöön. Käytä [TZ-tietokannan nimeä](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (esim. `UTC`, `America/New_York`, `Europe/London`). |
-| `LOG_LEVEL` | `info` | Sovelluksen lokin yksityiskohtaisuus. Vaihtoehdot: `debug`, `info`, `warning`, `error`. |
-| `COMPOSE_PROJECT_NAME` | `rtcloud` | Kaikkiin Docker-konttien ja -taltioiden nimiin lisätty etuliite. Muuta tätä, kun ajat useita rtCloud-instansseja samalla isännällä. |
-| `RESTART_POLICY` | `unless-stopped` | Docker-konttien uudelleenkäynnistyksen toiminta. Vaihtoehdot: `no`, `always`, `on-failure`, `unless-stopped`. |
-| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Käytettävä Docker-kuva. Muuta tunnistetta kiinnittääksesi tiettyyn versioon. |
-| `REQUIRE_LICENSE` | `false` | Ota lisenssitunnuksen vahvistus käyttöön käynnistyksen yhteydessä. Ota yhteyttä RTA:han lisenssitietoja varten. |
+| `APP_PORT` | `8080` | Host port for the main web UI. Change this if port 8080 is already in use on your server. |
+| `SHINY_PORT` | `3838` | Host port for the Shiny analytics server. |
 
 ---
 
-## Turvallisuus
+## Runtime
 
-| Muuttuja | Oletus | Kuvaus |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `CSRF_VALIDATION_ENABLED` | `true` | Ota CSRF-tunnuksen vahvistus käyttöön. Pidä tämä `true` tuotannossa. Aseta `false` vain paikallisessa kehityksessä, jos kohtaat `400 CSRF-tunnusta ei voitu vahvistaa` -virheitä. |
-| `GII_ENABLED` | `false` | Ota Yii-kehyksen koodigeneroinnin työkalu käyttöön. **Älä koskaan ota käyttöön tuotannossa.** |
+| `RUN_ENV` | `prod` | Runtime environment. Use `prod` for production deployments, `dev` for local development. |
+| `RUN_MODE` | `admin` | Container role. `admin` runs the full stack (web + queue + cron). `worker` runs background processing only (for horizontal scaling). |
+| `TZ` | `Asia/Ho_Chi_Minh` | Server timezone. Affects log timestamps, cron schedules, and date display. Use a [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) (e.g., `UTC`, `America/New_York`, `Europe/London`). |
+| `LOG_LEVEL` | `info` | Application log verbosity. Options: `debug`, `info`, `warning`, `error`. |
+| `COMPOSE_PROJECT_NAME` | `rtcloud` | Prefix applied to all Docker container and volume names. Change this when running multiple rtCloud instances on the same host. |
+| `RESTART_POLICY` | `unless-stopped` | Docker container restart behavior. Options: `no`, `always`, `on-failure`, `unless-stopped`. |
+| `RTCLOUD_IMAGE` | `rtawebteam/rta-smartsurvey:survey-dockerize` | Docker image to use. Change the tag to pin a specific version. |
+| `REQUIRE_LICENSE` | `false` | Enable license key validation on startup. Contact RTA for license information. |
 
 ---
 
-## SSO — Upotettu Keycloak
+## Security
 
-Ota käyttöön pakattu Keycloak-kontti täysin toimivaa yritysten SSO:ta varten. Vaatii verkkotunnuksen HTTPS:llä.
-
-| Muuttuja | Oletus | Kuvaus |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `EMBED_KEYCLOAK` | `false` | Aseta `true` käynnistääksesi upotetun Keycloak-kontin. Aktivoi `embed-keycloak` Docker Compose -profiilin. |
-| `KEYCLOAK_URL` | — | Keycloak-palvelimen täydellinen URL (esim. `https://rtcloud.example.com/auth`). |
-| `KEYCLOAK_REALM` | — | Keycloak-realm-nimi (esim. `rtsurvey`). |
-| `KEYCLOAK_CLIENT_ID` | — | Keycloak-asiakastunnus rtCloud-sovellukselle. |
-| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak-asiakassalaisuus. Luo tämä Keycloak-hallintakonsolista. |
-| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak-järjestelmänvalvojan käyttäjätunnus. |
-| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak-järjestelmänvalvojan salasana. |
-| `KEYCLOAK_DB` | `keycloak` | Keycloakin tietokannan nimi. Luodaan automaattisesti ensimmäisellä käynnistyksellä. |
-| `KEYCLOAK_DB_USER` | `keycloak` | Tietokannan käyttäjä Keycloakille. |
-| `KEYCLOAK_DB_PASSWORD` | — | Tietokannan salasana Keycloak-käyttäjälle. |
-| `KC_HOSTNAME` | — | Keycloakin käyttöliittymän URL (esim. `https://rtcloud.example.com/auth`). |
-| `KC_HOSTNAME_STRICT` | `false` | Pakota tiukka isäntänimen tarkistus. Aseta `true` tuotannossa kiinteällä verkkotunnuksella. |
-
-Katso täydellinen asennusopas kohdasta [SSO-todennus](sso-authentication#embedded-keycloak).
+| `CSRF_VALIDATION_ENABLED` | `true` | Enable CSRF token validation. Keep this `true` in production. Set to `false` only in local development if you encounter `400 CSRF token could not be verified` errors. |
+| `GII_ENABLED` | `false` | Enable the Yii framework code generator tool. **Never enable in production.** |
 
 ---
 
-## SSO — Ulkoinen OIDC-tarjoaja
+## SSO — Embedded Keycloak
 
-Yhdistä olemassa olevaan OIDC-yhteensopivaan identiteetintarjoajaan (Supabase, Auth0, Authentik, Okta jne.).
+Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
-| Muuttuja | Oletus | Kuvaus |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `OIDC_ISSUER_URL` | — | OIDC-myöntäjän löytö-URL (esim. `https://accounts.google.com`). |
-| `OIDC_CLIENT_ID` | — | Identiteetintarjoajaan rekisteröity asiakastunnus. |
-| `OIDC_CLIENT_SECRET` | — | Asiakassalaisuus identiteetintarjoajaltasi. |
-| `OIDC_SCOPE` | `openid profile email` | Välilyönnillä erotettu luettelo pyydettävistä OIDC-laajuuksista. |
-| `OIDC_REDIRECT_URI` | — | Verkkosovelluksen takaisinsoitto-URL (esim. `https://rtcloud.example.com/auth/callback`). |
-| `OIDC_MOBILE_CLIENT_ID` | — | Erillinen asiakastunnus rtSurvey-mobiilisovellukselle. |
-| `OIDC_MOBILE_REDIRECT_URI` | — | Mobiilisovelluksen takaisinsoitto-URI (esim. `vn.rta.rtsurvey.auth://callback`). |
-| `OPEN_REGISTRATION` | `false` | Luo automaattisesti rtCloud-tilit käyttäjille, jotka todentautuvat OIDC:n kautta ensimmäistä kertaa. |
-| `OIDC_AUTHORIZATION_ENDPOINT` | — | Ohita valtuutuspisteen URL (jätä tyhjäksi käyttääksesi löytöä). |
-| `OIDC_TOKEN_ENDPOINT` | — | Ohita tunnistepisteen URL (jätä tyhjäksi käyttääksesi löytöä). |
-| `OIDC_USERINFO_ENDPOINT` | — | Ohita käyttäjätietopisteen URL (jätä tyhjäksi käyttääksesi löytöä). |
+| `EMBED_KEYCLOAK` | `false` | Set to `true` to start the embedded Keycloak container. Activates the `embed-keycloak` Docker Compose profile. |
+| `KEYCLOAK_URL` | — | Full URL of the Keycloak server (e.g., `https://rtcloud.example.com/auth`). |
+| `KEYCLOAK_REALM` | — | Keycloak realm name (e.g., `rtsurvey`). |
+| `KEYCLOAK_CLIENT_ID` | — | Keycloak client ID for the rtCloud application. |
+| `KEYCLOAK_CLIENT_SECRET` | — | Keycloak client secret. Generate this from the Keycloak admin console. |
+| `KEYCLOAK_ADMIN_USER` | `admin` | Keycloak administrator username. |
+| `KEYCLOAK_ADMIN_PASSWORD` | — | Keycloak administrator password. |
+| `KEYCLOAK_DB` | `keycloak` | Database name for Keycloak. Created automatically on first boot. |
+| `KEYCLOAK_DB_USER` | `keycloak` | Database user for Keycloak. |
+| `KEYCLOAK_DB_PASSWORD` | — | Database password for the Keycloak user. |
+| `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
+| `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
+
+See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+
+---
+
+## SSO — External OIDC Provider
+
+Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OIDC_ISSUER_URL` | — | OIDC issuer discovery URL (e.g., `https://accounts.google.com`). |
+| `OIDC_CLIENT_ID` | — | Client ID registered in your identity provider. |
+| `OIDC_CLIENT_SECRET` | — | Client secret from your identity provider. |
+| `OIDC_SCOPE` | `openid profile email` | Space-separated list of OIDC scopes to request. |
+| `OIDC_REDIRECT_URI` | — | Callback URL for the web app (e.g., `https://rtcloud.example.com/auth/callback`). |
+| `OIDC_MOBILE_CLIENT_ID` | — | Separate client ID for the rtSurvey mobile app. |
+| `OIDC_MOBILE_REDIRECT_URI` | — | Mobile app callback URI (e.g., `vn.rta.rtsurvey.auth://callback`). |
+| `OPEN_REGISTRATION` | `false` | Automatically create rtCloud accounts for users who authenticate via OIDC for the first time. |
+| `OIDC_AUTHORIZATION_ENDPOINT` | — | Override the authorization endpoint URL (leave blank to use discovery). |
+| `OIDC_TOKEN_ENDPOINT` | — | Override the token endpoint URL (leave blank to use discovery). |
+| `OIDC_USERINFO_ENDPOINT` | — | Override the userinfo endpoint URL (leave blank to use discovery). |
 
 ---
 
 ## SSO — Azure Active Directory
 
-| Muuttuja | Kuvaus |
+| Variable | Description |
 |----------|-------------|
-| `AZURE_CLIENT_ID` | Azure AD -sovelluksen (asiakas) tunnus. |
-| `AZURE_TENANT_ID` | Azure AD -hakemiston (vuokralainen) tunnus. |
+| `AZURE_CLIENT_ID` | Azure AD application (client) ID. |
+| `AZURE_TENANT_ID` | Azure AD directory (tenant) ID. |
 
 ---
 
-## Valinnaiset integraatiot
+## Optional Integrations
 
 ### Stata
 
-| Muuttuja | Oletus | Kuvaus |
+| Variable | Default | Description |
 |----------|---------|-------------|
-| `STATA_ENABLED` | `false` | Ota Stata-tilastoohjelmiston integraatio käyttöön data-analyysia varten. |
-| `STATA_BIN_PATH` | `/usr/bin/stata` | Absoluuttinen polku Stata-binääriin kontin sisällä. |
+| `STATA_ENABLED` | `false` | Enable Stata statistical software integration for data analysis. |
+| `STATA_BIN_PATH` | `/usr/bin/stata` | Absolute path to the Stata binary inside the container. |
 
 ### Elasticsearch
 
-| Muuttuja | Kuvaus |
+| Variable | Description |
 |----------|-------------|
-| `ES_HOST` | Elasticsearch-isäntä (esim. `http://elasticsearch:9200`). |
-| `ES_PORT` | Elasticsearch-portti. |
+| `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
+| `ES_PORT` | Elasticsearch port. |
 
 ### Matomo Analytics
 
-| Muuttuja | Kuvaus |
+| Variable | Description |
 |----------|-------------|
-| `PIWIK_URL` | Matomo (Piwik) -palvelimen URL. |
-| `PIWIK_ID` | Matomo-sivuston tunnus. |
-| `PIWIK_SECRET` | Matomo-todennustunnus. |
+| `PIWIK_URL` | Matomo (Piwik) server URL. |
+| `PIWIK_ID` | Matomo site ID. |
+| `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (R-laskenta)
+### OpenCPU (R Computation)
 
-| Muuttuja | Kuvaus |
+| Variable | Description |
 |----------|-------------|
-| `OCPU_HOST` | OpenCPU-palvelimen URL R-pohjaiseen tilastolliseen laskentaan. |
+| `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox-integraatio
+### RtBox Integration
 
-| Muuttuja | Kuvaus |
+| Variable | Description |
 |----------|-------------|
-| `RTBOX_HOST` | RtBox-palvelun isäntä-URL. |
-| `RTBOX_USER_API` | RtBox-käyttäjän API-avain. |
-| `RTBOX_BASIC_AUTH` | Perustodennus-tunnistetiedot RtBoxille. |
+| `RTBOX_HOST` | RtBox service host URL. |
+| `RTBOX_USER_API` | RtBox user API key. |
+| `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix-viestintä
+### Matrix Messaging
 
-| Muuttuja | Kuvaus |
+| Variable | Description |
 |----------|-------------|
-| `MATRIX_HOMESERVER_HOST` | Matrix-kotipalvelimen isäntä. |
-| `MATRIX_HOMESERVER_PORT` | Matrix-kotipalvelimen portti. |
+| `MATRIX_HOMESERVER_HOST` | Matrix homeserver host. |
+| `MATRIX_HOMESERVER_PORT` | Matrix homeserver port. |
 
 ---
 
-## Datataltiot
+## Data Volumes
 
-Kaikki sovellusdata tallennetaan nimettyihin Docker-taltioihin. Taltiot luodaan automaattisesti ensimmäisellä käynnistyksellä ja säilyvät konttien uudelleenkäynnistyksissä ja päivityksissä.
+All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 
-| Taltio | Liitospiste | Sisältö |
+| Volume | Mount Point | Contents |
 |--------|-------------|----------|
-| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL-tietokantatiedostot |
-| `rtcloud_uploads` | `…/uploads` | Kyselyn vastaajien lataamat tiedostot |
-| `rtcloud_audios` | `…/audios` | Ääninauhotteet |
-| `rtcloud_downloads` | `…/downloads` | Generoidut vientitiedostot |
-| `rtcloud_gallery` | `…/gallery` | Gallerian kuvat |
-| `rtcloud_voicemail` | `…/voicemail` | Puhepostinauhotteet |
-| `rtcloud_analytics` | `…/analytics` | Analytiikkadata |
-| `rtcloud_aggregate` | `…/aggregate` | Kootut kyselytulokset |
-| `rtcloud_converter` | `…/converter` | Datamuunnostuotokset |
-| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny-palvelimen R-skriptit |
-| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny-palvelimen lokit |
-| `rtcloud_assets` | `…/assets` | Verkkoresurssit (CSS, JS) |
-| `rtcloud_runtime` | `…/protected/runtime` | Sovelluksen suoritusaikainen välimuisti |
-| `rtcloud_cache` | `…/cache` | Sovelluksen välimuisti |
-| `rtcloud_tmp` | `…/tmp` | Väliaikaiset tiedostot |
+| `rtcloud_mysql_data` | `/var/lib/mysql` | MySQL database files |
+| `rtcloud_uploads` | `…/uploads` | Files uploaded by survey respondents |
+| `rtcloud_audios` | `…/audios` | Audio recordings |
+| `rtcloud_downloads` | `…/downloads` | Generated export files |
+| `rtcloud_gallery` | `…/gallery` | Gallery images |
+| `rtcloud_voicemail` | `…/voicemail` | Voicemail recordings |
+| `rtcloud_analytics` | `…/analytics` | Analytics data |
+| `rtcloud_aggregate` | `…/aggregate` | Aggregated survey results |
+| `rtcloud_converter` | `…/converter` | Data conversion outputs |
+| `rtcloud_shiny_data` | `/srv/shiny-server/smartsurvey` | Shiny server R scripts |
+| `rtcloud_shiny_logs` | `/var/log/shiny-server` | Shiny server logs |
+| `rtcloud_assets` | `…/assets` | Web assets (CSS, JS) |
+| `rtcloud_runtime` | `…/protected/runtime` | Application runtime cache |
+| `rtcloud_cache` | `…/cache` | Application cache |
+| `rtcloud_tmp` | `…/tmp` | Temporary files |
 
-Taltioiden nimien etuliite on `COMPOSE_PROJECT_NAME`-muuttujan arvo (oletus: `rtcloud`).
+Volume names are prefixed by the value of `COMPOSE_PROJECT_NAME` (default: `rtcloud`).
 
-Listaa kaikki käyttöönottosi taltiot:
+List all volumes for your deployment:
 
 ```bash
 docker volume ls | grep rtcloud

@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Première connexion"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Comment se connecter à votre instance rtSurvey pour la première fois après le déploiement."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **Le SSL doit être configuré avant de vous connecter.** Si vous accédez à l'application via HTTP, vous verrez un avertissement de sécurité et le SSO sera bloqué. Terminez d'abord la [configuration SSL](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Une fois SSL actif, ouvrez votre navigateur à votre URL HTTPS :
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## L'écran de connexion
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+La page de connexion affiche :
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- Les champs **Nom d'utilisateur** et **Mot de passe**
+- Un bouton **Se connecter**
+- Un bouton **Se connecter avec SSO** (sous un séparateur) — pour les membres de l'équipe avec des comptes SSO
 
 ---
 
-## If you see a security warning
+## Identifiants administrateur par défaut
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Entrez les identifiants par défaut et cliquez sur **Se connecter** :
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Champ | Valeur |
+|-------|--------|
+| Nom d'utilisateur | `admin` |
+| Mot de passe | `admin` |
+
+> **Changez votre mot de passe immédiatement après votre première connexion.**
+
+---
+
+## Si vous voyez un avertissement de sécurité
+
+Si vous accédez à l'application via HTTP (avant la configuration SSL), vous verrez :
+
+- Une bannière d'avertissement jaune en haut de la page de connexion
+- Un modal en cliquant sur **Se connecter**, avertissant que les identifiants seront envoyés non chiffrés
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Cliquez sur **Configurer SSL** pour configurer HTTPS, ou sur **Continuer quand même** pour vous connecter sans SSL (non recommandé).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+La connexion SSO est entièrement bloquée via HTTP — cliquer sur **Se connecter avec SSO** affichera un avis au lieu de rediriger.
 
 ---
 
-## After logging in
+## Après la connexion
 
-Once inside, you will land on the dashboard. From here:
+Une fois connecté, vous arriverez sur le tableau de bord. De là :
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Changer le mot de passe administrateur** — paramètres du compte → changer le mot de passe
+2. **Créer votre premier projet** — Projets → Nouveau projet
+3. **Télécharger ou créer un formulaire** — Formulaires → Télécharger XLSForm ou ouvrir Form Builder
+4. **Ajouter des utilisateurs** — Utilisateurs → Inviter ou créer des comptes pour votre équipe

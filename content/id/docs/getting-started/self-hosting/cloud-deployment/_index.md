@@ -10,86 +10,86 @@ toc: true
 description: "Terapkan rtCloud ke penyedia cloud utama dengan skrip otomatis untuk DigitalOcean, AWS EC2, Google Cloud, dan Linode."
 ---
 
-Repositori penerapan mencakup skrip provisi otomatis untuk penyedia cloud utama. Setiap skrip berjalan pada booting pertama server **Ubuntu 22.04 LTS** yang baru dan melakukan pengaturan tanpa pengawasan sepenuhnya:
+Repositori deployment menyertakan skrip provisi otomatis untuk penyedia cloud utama. Setiap skrip berjalan saat boot pertama server Ubuntu 22.04 LTS baru dan melakukan pengaturan yang sepenuhnya otomatis:
 
-- Memasang Docker dan Docker Compose
-- Membuat kata sandi acak yang aman untuk semua layanan internal
-- Menulis `docker-compose.production.yml` dan `.env`
-- Mengonfigurasi Nginx sebagai reverse proxy
-- Mendapatkan sertifikat TLS gratis dari Let's Encrypt (mencoba ulang otomatis hingga DNS terselesaikan)
-- Mengonfigurasi firewall UFW
-- Secara opsional menerapkan server SSO Keycloak tertanam
-- Menampilkan ringkasan penerapan lengkap dengan semua kredensial
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-Pengaturan selesai dalam **5–10 menit** pada instans standar.
-
----
-
-## Memilih Skrip
-
-Ada beberapa varian skrip tergantung pada penyedia cloud dan pengaturan SSO Anda:
-
-| Skrip | Penyedia | Mode SSO | Terbaik Untuk |
-|-------|----------|----------|---------------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Keycloak Bawaan | SSO mandiri yang sederhana |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak atau OIDC Eksternal | Kendali penuh |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Keycloak Bawaan | Pengaturan berbasis formulir, paling sederhana |
-| `linode-stackscript-oidc.sh` | Linode | OIDC Eksternal saja | Penyedia identitas yang sudah ada |
-| `linode-stackscript.sh` | Linode | Keycloak atau OIDC Eksternal | Kendali penuh |
-| `aws-ec2.sh` | AWS EC2 | Keycloak atau OIDC Eksternal | Penerapan AWS |
-| `gcp-compute.sh` | Google Cloud | Keycloak atau OIDC Eksternal | Penerapan GCP |
-
-> **Direkomendasikan untuk sebagian besar pengguna:** Gunakan varian `keycloak-embed`. Ini mencakup server identitas Keycloak bawaan dan memerlukan paling sedikit bidang konfigurasi.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## Panduan Ukuran Server
+## Choosing a Script
 
-| Kasus Penggunaan | RAM | Disk | Contoh |
-|-----------------|-----|------|--------|
-| Evaluasi / pengembangan | 2 GB | 25 GB | DO Basic $18/bln, t3.small, e2-small |
-| Tim kecil (< 50 pengguna) | 4 GB | 40 GB | DO Basic $24/bln, t3.medium, e2-medium |
-| Produksi (> 50 pengguna) | 8 GB | 80 GB | DO General $48/bln, t3.large, n2-standard-2 |
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-> Keycloak tertanam memerlukan setidaknya **4 GB RAM**. Gunakan 2 GB hanya untuk evaluasi tanpa Keycloak.
+| Script | Provider | SSO Mode | Best For |
+|--------|----------|----------|----------|
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
+
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## Pengaturan DNS
+## Server Sizing Guide
 
-Semua skrip memerlukan domain dengan **A record yang mengarah ke IP server** sebelum Let's Encrypt dapat menerbitkan sertifikat.
+| Use Case | RAM | Disk | Example |
+|----------|-----|------|---------|
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-Skrip mencetak IP server Anda lebih awal dalam proses pengaturan:
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
+
+---
+
+## DNS Setup
+
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
+
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
  Server IP : 139.162.51.85
- Tambahkan A record DNS ini sekarang jika belum:
+ Add this DNS A record now if you haven't already:
    myapp.example.com  ->  139.162.51.85
- Skrip akan mencoba ulang Certbot setiap 60 detik hingga DNS terselesaikan.
+ The script will retry Certbot every 60s until DNS resolves.
 ============================================================
 ```
 
-Skrip **secara otomatis mencoba ulang** Let's Encrypt setiap 60 detik hingga 1 jam. Cukup tambahkan A record DNS dan tunggu — tidak diperlukan restart.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Batas kecepatan:** Let's Encrypt mengizinkan maksimum **5 sertifikat per domain per 7 hari**. Hindari menerapkan dan menghancurkan server berulang kali dengan domain yang sama. Jika Anda mencapai batas, skrip akan menampilkan cap waktu `retry after` dan berhenti segera.
-
----
-
-## Daftar Periksa Pasca-Penerapan
-
-- [ ] Aplikasi terbuka di `https://your-domain.com`
-- [ ] Masuk dengan `admin` dan kata sandi yang Anda konfigurasikan
-- [ ] Semua container sehat: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] Pembaruan Let's Encrypt berfungsi: `certbot renew --dry-run`
-- [ ] Port MySQL 3306 **tidak** terekspos: `ufw status`
-- [ ] Siapkan cadangan database harian (lihat [Pemeliharaan](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## Pemecahan Masalah
+## Post-Deployment Checklist
 
-### Periksa log pengaturan lengkap
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Batas kecepatan Let's Encrypt
+### Let's Encrypt rate limit
 
-Jika Anda melihat `too many certificates` di log, Anda telah mencapai batas 5 sertifikat/7 hari. Log menampilkan waktu percobaan ulang yang tepat:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
 [SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-Tunggu hingga waktu tersebut, lalu terapkan ulang.
+Wait until that time, then redeploy.
 
-### Keycloak tetap tidak sehat
+### Keycloak stays unhealthy
 
-Pastikan server memiliki setidaknya 4 GB RAM, lalu periksa log:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### Konfigurasi SSL tidak diterapkan setelah certbot
+### SSL config not applied after certbot
 
-Jika sertifikat diterbitkan tetapi Nginx masih menampilkan HTTP saja, periksa log untuk baris kesalahan dan muat ulang Nginx secara manual:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx

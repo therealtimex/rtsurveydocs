@@ -7,86 +7,86 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "자동화된 user-data 스크립트를 사용하여 DigitalOcean Droplet에 rtCloud를 배포합니다."
+description: "자동화된 사용자 데이터 스크립트를 사용하여 DigitalOcean Droplet에 rtCloud를 배포합니다."
 ---
 
-DigitalOcean은 첫 번째 부팅 시 자동으로 실행되는 **User Data** 스크립트를 사용합니다. 스크립트 상단의 구성 변수를 입력한 후 Droplet 생성 시 전체 스크립트를 붙여넣습니다.
+DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
 
-> Linode StackScript와 달리 DigitalOcean에는 양식 UI가 없습니다 — 붙여넣기 전에 스크립트를 직접 편집해야 합니다.
+> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
 
-**스크립트 다운로드:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## 내장 Keycloak (권장)
+## Embedded Keycloak (Recommended)
 
-내장 SSO를 통한 가장 단순한 설정을 위해 `digitalocean-droplet-keycloak-embed.sh`를 사용하세요.
+Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
 
-### 1단계 — 구성 입력
+### Step 1 — Fill in the configuration
 
-스크립트를 열고 상단의 `CONFIGURATION` 블록을 편집합니다:
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- 필수 ---
-PROJECT_ID="rtsurvey"                  # 프로젝트의 고유 식별자 (공백 없음)
-ADMIN_PASSWORD="admin"                 # 앱 관리자 및 Keycloak 비밀번호 — 첫 로그인 후 변경
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
 
-# --- 도메인 + SSL ---
-DOMAIN="myapp.example.com"            # 도메인 — DNS A 레코드가 여기를 가리켜야 함
-PROJECT_URL=""                         # Cloudflare/프록시 뒤에 있지 않으면 공백으로 두세요
-LETSENCRYPT_EMAIL="admin@example.com" # Let's Encrypt 알림용 이메일
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
 
-# --- 선택 사항 ---
+# --- Optional ---
 STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| 필드 | 필수 | 설명 |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | 예 | 데이터베이스 이름 및 Keycloak 클라이언트 ID로 사용됩니다. 소문자, 공백 없음. |
-| `ADMIN_PASSWORD` | 아니오 | 앱 관리자 로그인 및 Keycloak 관리 콘솔 비밀번호. 기본값은 `admin` — **첫 로그인 후 변경**. |
-| `DOMAIN` | 예 | 도메인 이름. DNS A 레코드가 Droplet IP를 가리켜야 합니다. |
-| `LETSENCRYPT_EMAIL` | 예 | Let's Encrypt 인증서 알림용 이메일 주소. |
-| `PROJECT_URL` | 아니오 | 공개 URL 재정의. `DOMAIN`을 사용하려면 공백으로 두세요. Cloudflare 뒤에서 유용합니다. |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
+| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
+| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
 
-> **보안:** 모든 비밀번호는 기본적으로 `admin`입니다. 첫 번째 로그인 후 즉시 변경하세요.
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
-### 2단계 — Droplet 생성
+### Step 2 — Create a Droplet
 
-[DigitalOcean 제어 패널](https://cloud.digitalocean.com)에서:
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. **만들기** → **Droplets** 클릭
-2. 이미지로 **Ubuntu 22.04 LTS** 선택
-3. **Basic, 4 GB RAM / 2 vCPUs** 이상 선택
-4. **고급 옵션** 스크롤 → **초기화 스크립트 추가** 체크
-5. 텍스트 영역에 전체 스크립트 내용 붙여넣기
-6. **Droplet 만들기** 클릭
+1. Click **Create** → **Droplets**
+2. Choose **Ubuntu 22.04 LTS** as the image
+3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
+4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+5. Paste the full script content into the text area
+6. Click **Create Droplet**
 
-### 3단계 — DNS 레코드 추가
+### Step 3 — Add the DNS record
 
-Droplet이 부팅되는 동안 DNS 공급자에 **A 레코드**를 추가합니다:
+While the Droplet boots, add an **A record** in your DNS provider:
 
 ```
 Type  : A
-Name  : myapp          (또는 루트 도메인의 경우 @)
+Name  : myapp          (or @ for root domain)
 Value : <droplet-ip>
 TTL   : 300
 ```
 
-### 4단계 — 진행 상황 모니터링
+### Step 4 — Monitor progress
 
-Droplet에 SSH로 접속하여 로그를 봅니다:
+SSH into the Droplet and watch the log:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-스크립트는 시작 부분에 서버 IP를 출력합니다 — 표시되자마자 DNS 레코드를 추가하세요.
+The script prints your server IP near the start — add the DNS record as soon as you see it.
 
-### 5단계 — 앱 접속
+### Step 5 — Access the app
 
-설정이 완료되면 로그에 요약이 표시됩니다:
+When setup completes, the log shows a summary:
 
 ```
 ============================================================
@@ -101,33 +101,33 @@ tail -f /var/log/rtcloud-setup.log
 ============================================================
 ```
 
-브라우저에서 `https://myapp.example.com`을 열고 사용자명 `admin`, 비밀번호 `admin`으로 로그인합니다.
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> 로그인 후 즉시 오른쪽 상단 메뉴의 **설정**을 통해 **비밀번호를 변경**하세요.
+> **Change your password** immediately after login via **Settings** in the top-right menu.
 
 ---
 
-## 배포 후
+## After Deployment
 
-### 비밀번호 변경
+### Change a password
 
-Droplet에 SSH로 접속하여 `.env`를 편집하고 영향받는 컨테이너를 재시작합니다:
+SSH into the Droplet, edit `.env`, and restart the affected container:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### 도메인 업데이트
+### Update the domain
 
-배포 후 다른 도메인을 할당하는 경우 `.env`의 `PROJECT_URL`을 업데이트합니다:
+If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
 
 ```bash
-nano /opt/rtcloud/.env   # PROJECT_URL= 업데이트
+nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### 모든 컨테이너 보기
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

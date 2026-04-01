@@ -1,18 +1,18 @@
 ---
 weight: 2
-title: "Configuration Reference"
+title: "Référence de configuration"
 date: "2026-03-12T00:00:00+07:00"
 lastmod: "2026-03-12T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "settings"
 toc: true
-description: "Complete reference for all environment variables used to configure a self-hosted rtCloud deployment."
+description: "Référence complète de toutes les variables d'environnement utilisées pour configurer un déploiement rtCloud auto-hébergé."
 ---
 
-All configuration is done through environment variables in the `.env` file at the root of your deployment directory. Docker Compose reads this file automatically — no `--env-file` flag is needed.
+Toute la configuration se fait via des variables d'environnement dans le fichier `.env` à la racine de votre répertoire de déploiement. Docker Compose lit ce fichier automatiquement — aucun indicateur `--env-file` n'est nécessaire.
 
-Variables marked **required** must be set before starting the containers. All others have defaults and are optional.
+Les variables marquées **obligatoires** doivent être définies avant de démarrer les conteneurs. Toutes les autres ont des valeurs par défaut et sont optionnelles.
 
 ---
 

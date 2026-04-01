@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "पहली बार लॉगिन"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "तैनाती के बाद पहली बार अपने rtSurvey इंस्टेंस में लॉगिन करने का तरीका।"
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **लॉगिन से पहले SSL कॉन्फ़िगर करना आवश्यक है।** यदि आप HTTP के माध्यम से ऐप एक्सेस करते हैं, तो आपको सुरक्षा चेतावनी दिखेगी और SSO ब्लॉक हो जाएगा। पहले [SSL सेटअप](ssl-setup) पूरा करें।
 
-After SSL is active, open your browser at your HTTPS URL:
+SSL सक्रिय होने के बाद, अपने HTTPS URL पर ब्राउज़र खोलें:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## लॉगिन स्क्रीन
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+लॉगिन पेज दिखाता है:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- **उपयोगकर्ता नाम** और **पासवर्ड** फ़ील्ड
+- एक **साइन इन** बटन
+- एक **SSO से लॉगिन** बटन (विभाजक के नीचे) — SSO खातों वाले टीम सदस्यों के लिए
 
 ---
 
-## If you see a security warning
+## डिफ़ॉल्ट एडमिन क्रेडेंशियल
 
-If you access the app over HTTP (before SSL is configured), you will see:
+डिफ़ॉल्ट क्रेडेंशियल दर्ज करें और **साइन इन** पर क्लिक करें:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| फ़ील्ड | मान |
+|--------|-----|
+| उपयोगकर्ता नाम | `admin` |
+| पासवर्ड | `admin` |
+
+> **पहली बार लॉगिन के तुरंत बाद अपना पासवर्ड बदलें।**
+
+---
+
+## यदि सुरक्षा चेतावनी दिखे
+
+यदि आप HTTP के माध्यम से ऐप एक्सेस करते हैं (SSL कॉन्फ़िगर होने से पहले), तो आप देखेंगे:
+
+- लॉगिन पेज के ऊपर एक पीला चेतावनी बैनर
+- **साइन इन** पर क्लिक करने पर एक मोडल, जो चेतावनी देता है कि क्रेडेंशियल अनएन्क्रिप्टेड भेजे जाएंगे
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+HTTPS कॉन्फ़िगर करने के लिए **SSL सेट करें** पर क्लिक करें, या SSL के बिना लॉगिन के लिए **फिर भी जारी रखें** पर क्लिक करें (अनुशंसित नहीं)।
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+HTTP पर SSO लॉगिन पूरी तरह ब्लॉक है — **SSO से लॉगिन** पर क्लिक करने से रीडायरेक्ट की बजाय एक सूचना दिखाई देगी।
 
 ---
 
-## After logging in
+## लॉगिन के बाद
 
-Once inside, you will land on the dashboard. From here:
+अंदर आने पर आप डैशबोर्ड पर पहुंचेंगे। यहाँ से:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **एडमिन पासवर्ड बदलें** — खाता सेटिंग → पासवर्ड बदलें
+2. **अपना पहला प्रोजेक्ट बनाएं** — प्रोजेक्ट → नया प्रोजेक्ट
+3. **फ़ॉर्म अपलोड करें या बनाएं** — फ़ॉर्म → XLSForm अपलोड करें या Form Builder खोलें
+4. **उपयोगकर्ता जोड़ें** — उपयोगकर्ता → अपनी टीम के लिए खाते आमंत्रित करें या बनाएं

@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "Eerste aanmelding"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "Hoe u voor het eerst inlogt op uw rtSurvey-instantie na de implementatie."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **SSL moet worden geconfigureerd voordat u kunt inloggen.** Als u de app via HTTP benadert, ziet u een beveiligingswaarschuwing en wordt SSO geblokkeerd. Voltooi eerst de [SSL-instelling](ssl-setup).
 
-After SSL is active, open your browser at your HTTPS URL:
+Nadat SSL actief is, open uw browser op uw HTTPS URL:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## Het aanmeldscherm
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+De aanmeldpagina toont:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- Velden voor **Gebruikersnaam** en **Wachtwoord**
+- Een **Aanmelden** knop
+- Een **Aanmelden met SSO** knop (onder een scheidslijn) — voor teamleden met SSO-accounts
 
 ---
 
-## If you see a security warning
+## Standaard beheerdersgegevens
 
-If you access the app over HTTP (before SSL is configured), you will see:
+Voer de standaardgegevens in en klik op **Aanmelden**:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| Veld | Waarde |
+|------|--------|
+| Gebruikersnaam | `admin` |
+| Wachtwoord | `admin` |
+
+> **Wijzig uw wachtwoord onmiddellijk na uw eerste aanmelding.**
+
+---
+
+## Als u een beveiligingswaarschuwing ziet
+
+Als u de app via HTTP benadert (voordat SSL is geconfigureerd), ziet u:
+
+- Een gele waarschuwingsbanner bovenaan de aanmeldpagina
+- Een modaal venster bij het klikken op **Aanmelden**, dat waarschuwt dat gegevens onversleuteld worden verzonden
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+Klik op **SSL instellen** om HTTPS te configureren, of op **Toch doorgaan** om in te loggen zonder SSL (niet aanbevolen).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+SSO-aanmelding is volledig geblokkeerd via HTTP — klikken op **Aanmelden met SSO** toont een melding in plaats van door te verwijzen.
 
 ---
 
-## After logging in
+## Na het aanmelden
 
-Once inside, you will land on the dashboard. From here:
+Eenmaal binnen landt u op het dashboard. Van hieruit:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **Beheerderwachtwoord wijzigen** — accountinstellingen → wachtwoord wijzigen
+2. **Uw eerste project aanmaken** — Projecten → Nieuw project
+3. **Formulier uploaden of bouwen** — Formulieren → XLSForm uploaden of Form Builder openen
+4. **Gebruikers toevoegen** — Gebruikers → Uitnodigen of accounts aanmaken voor uw team

@@ -1,18 +1,18 @@
 ---
 weight: 5
-title: "First Login"
+title: "첫 번째 로그인"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "login"
 toc: true
-description: "How to log in to your rtSurvey instance for the first time after deployment."
+description: "배포 후 처음으로 rtSurvey 인스턴스에 로그인하는 방법."
 ---
 
-> **SSL must be configured before logging in.** If you access the app over HTTP, you will see a security warning and SSO will be blocked. Complete [Set Up SSL](ssl-setup) first.
+> **로그인하기 전에 SSL을 구성해야 합니다.** HTTP로 앱에 접근하면 보안 경고가 표시되고 SSO가 차단됩니다. 먼저 [SSL 설정](ssl-setup)을 완료하세요.
 
-After SSL is active, open your browser at your HTTPS URL:
+SSL이 활성화된 후 HTTPS URL로 브라우저를 여세요:
 
 ```
 https://your-domain.com
@@ -20,52 +20,52 @@ https://your-domain.com
 
 ---
 
-## The login screen
+## 로그인 화면
 
 <!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
 
-The login page shows:
+로그인 페이지에는 다음이 표시됩니다:
 
-- **Username** and **Password** fields
-- A **Sign In** button
-- A **Log In with SSO** button (below a divider) — for team members with SSO accounts
-
----
-
-## Default admin credentials
-
-Enter the default credentials and click **Sign In**:
-
-| Field | Value |
-|-------|-------|
-| Username | `admin` |
-| Password | `admin` |
-
-> **Change your password immediately after your first login.**
+- **사용자 이름** 및 **비밀번호** 필드
+- **로그인** 버튼
+- **SSO로 로그인** 버튼 (구분선 아래) — SSO 계정이 있는 팀 구성원을 위해
 
 ---
 
-## If you see a security warning
+## 기본 관리자 자격 증명
 
-If you access the app over HTTP (before SSL is configured), you will see:
+기본 자격 증명을 입력하고 **로그인**을 클릭하세요:
 
-- A yellow warning banner at the top of the login page
-- A modal when you click **Sign In**, warning that credentials will be sent unencrypted
+| 필드 | 값 |
+|------|----|
+| 사용자 이름 | `admin` |
+| 비밀번호 | `admin` |
+
+> **첫 번째 로그인 후 즉시 비밀번호를 변경하세요.**
+
+---
+
+## 보안 경고가 표시되는 경우
+
+HTTP로 앱에 접근할 경우 (SSL 구성 전) 다음이 표시됩니다:
+
+- 로그인 페이지 상단의 노란색 경고 배너
+- **로그인**을 클릭하면 자격 증명이 암호화되지 않고 전송된다는 경고 모달
 
 <!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
 <!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
 
-Click **Set up SSL** to configure HTTPS, or **Continue anyway** to log in without SSL (not recommended).
+HTTPS를 구성하려면 **SSL 설정**을 클릭하거나, SSL 없이 로그인하려면 **그래도 계속**을 클릭하세요 (권장하지 않음).
 
-SSO login is blocked entirely over HTTP — clicking **Log In with SSO** will show a notice instead of redirecting.
+HTTP를 통한 SSO 로그인은 완전히 차단됩니다 — **SSO로 로그인**을 클릭하면 리다이렉션 대신 알림이 표시됩니다.
 
 ---
 
-## After logging in
+## 로그인 후
 
-Once inside, you will land on the dashboard. From here:
+로그인하면 대시보드로 이동합니다. 여기서:
 
-1. **Change the admin password** — account settings → change password
-2. **Create your first project** — Projects → New Project
-3. **Upload or build a form** — Forms → Upload XLSForm or open Form Builder
-4. **Add users** — Users → Invite or create accounts for your team
+1. **관리자 비밀번호 변경** — 계정 설정 → 비밀번호 변경
+2. **첫 번째 프로젝트 만들기** — 프로젝트 → 새 프로젝트
+3. **양식 업로드 또는 빌드** — 양식 → XLSForm 업로드 또는 Form Builder 열기
+4. **사용자 추가** — 사용자 → 팀 계정 초대 또는 생성

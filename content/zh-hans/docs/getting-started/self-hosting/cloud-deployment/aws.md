@@ -10,85 +10,85 @@ toc: true
 description: "使用 aws-ec2.sh 用户数据脚本在 AWS EC2 实例上部署 rtCloud。"
 ---
 
-启动 EC2 实例时，将 `aws-ec2.sh` 用作**用户数据**脚本。脚本在首次启动时自动运行。
+Use `aws-ec2.sh` as the **User Data** script when launching an EC2 instance. The script runs automatically on first boot.
 
-**下载脚本：** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
 
 ---
 
-## 第一步 — 填写配置
+## Step 1 — Fill in the configuration
 
-打开脚本并编辑顶部的 `CONFIGURATION` 块：
+Open the script and edit the `CONFIGURATION` block at the top:
 
 ```bash
-# --- 必填 ---
+# --- Required ---
 PROJECT_ID="rtsurvey"
-ADMIN_PASSWORD="admin"                       # 首次登录后更改
+ADMIN_PASSWORD="admin"                       # Change after first login
 
-# --- 域名 + SSL ---
+# --- Domain + SSL ---
 DOMAIN="myapp.example.com"
 LETSENCRYPT_EMAIL="admin@example.com"
 
-# --- 内嵌 Keycloak ---
+# --- Embedded Keycloak ---
 EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # 默认为 ADMIN_PASSWORD
+KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # Defaults to ADMIN_PASSWORD
 ```
 
-| 字段 | 必填 | 描述 |
+| Field | Required | Description |
 |-------|----------|-------------|
-| `PROJECT_ID` | 是 | 用作数据库名称和 Keycloak 客户端 ID。小写，无空格。 |
-| `ADMIN_PASSWORD` | 否 | 应用管理员密码和 Keycloak 管理员密码。默认为 `admin`——**首次登录后更改**。 |
-| `DOMAIN` | 否 | HTTPS 使用的域名。留空以仅使用 HTTP。 |
-| `LETSENCRYPT_EMAIL` | 是（如设置了 DOMAIN） | Let's Encrypt 通知邮箱。 |
-| `EMBED_KEYCLOAK` | 否 | `true` 以部署内嵌 Keycloak（需要 4 GB RAM）。 |
+| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
+| `ADMIN_PASSWORD` | No | App admin password and Keycloak admin password. Defaults to `admin` — **change after first login**. |
+| `DOMAIN` | No | Your domain for HTTPS. Leave blank for HTTP-only mode. |
+| `LETSENCRYPT_EMAIL` | Yes (if DOMAIN set) | Email for Let's Encrypt notifications. |
+| `EMBED_KEYCLOAK` | No | `true` to deploy embedded Keycloak (requires 4 GB RAM). |
 
-> **安全提示：** 所有密码默认为 `admin`。首次登录后立即更改它们。
-
----
-
-## 第二步 — 启动 EC2 实例
-
-在 [AWS EC2 控制台](https://console.aws.amazon.com/ec2)：
-
-1. 点击**启动实例**
-2. **AMI：** Ubuntu Server 22.04 LTS（64 位 x86）
-3. **实例类型：** `t3.medium`（4 GB RAM）或更大
-4. **密钥对：** 选择或创建一个用于 SSH 访问
-5. **网络设置：** 创建或选择安全组（见下文）
-6. **高级详情** → **用户数据** → 粘贴完整脚本内容
-7. 点击**启动实例**
+> **Security:** All passwords default to `admin`. Change them immediately after your first login.
 
 ---
 
-## 第三步 — 配置安全组
+## Step 2 — Launch an EC2 instance
 
-在实例的安全组中开放以下端口：
+In the [AWS EC2 console](https://console.aws.amazon.com/ec2):
 
-| 端口 | 协议 | 来源 | 用途 |
+1. Click **Launch instance**
+2. **AMI:** Ubuntu Server 22.04 LTS (64-bit x86)
+3. **Instance type:** `t3.medium` (4 GB RAM) or larger
+4. **Key pair:** Select or create one for SSH access
+5. **Network settings:** Create or select a Security Group (see below)
+6. **Advanced details** → **User data** → paste the full script content
+7. Click **Launch instance**
+
+---
+
+## Step 3 — Configure the Security Group
+
+Open these ports in the instance's Security Group:
+
+| Port | Protocol | Source | Purpose |
 |------|----------|--------|---------|
-| 22 | TCP | 您的 IP | SSH 访问 |
-| 80 | TCP | 0.0.0.0/0 | HTTP（由 Nginx 重定向到 HTTPS） |
+| 22 | TCP | Your IP | SSH access |
+| 80 | TCP | 0.0.0.0/0 | HTTP (redirected to HTTPS by Nginx) |
 | 443 | TCP | 0.0.0.0/0 | HTTPS |
-| 3838 | TCP | 0.0.0.0/0 | Shiny 直接访问 |
+| 3838 | TCP | 0.0.0.0/0 | Shiny direct access |
 
-> **不要**开放端口 3306（MySQL）——它不应该公开访问。
+> Do **not** open port 3306 (MySQL) — it should never be publicly accessible.
 
 ---
 
-## 第四步 — 添加 DNS 记录
+## Step 4 — Add the DNS record
 
-实例启动时，在您的 DNS 提供商中添加 **A 记录**：
+While the instance boots, add an **A record** in your DNS provider:
 
 ```
-类型  : A
-名称  : myapp
-值    : <instance-public-ip>
+Type  : A
+Name  : myapp
+Value : <instance-public-ip>
 TTL   : 300
 ```
 
 ---
 
-## 第五步 — 监控进度
+## Step 5 — Monitor progress
 
 ```bash
 ssh ubuntu@<instance-ip>
@@ -97,27 +97,27 @@ tail -f /var/log/rtcloud-setup.log
 
 ---
 
-## 第六步 — 访问应用
+## Step 6 — Access the app
 
-设置完成时，日志会显示包含应用 URL 和凭据的摘要。使用用户名 `admin` 和密码 `admin` 登录，然后立即更改密码。
+When setup completes, the log shows a summary with your app URL and credentials. Log in with username `admin` and password `admin`, then change your password immediately.
 
 ---
 
-## 部署后操作
+## After Deployment
 
-### 更改密码
+### Change a password
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### 查看所有容器
+### View all containers
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
 ```
 
-### 分配弹性 IP（可选）
+### Assign an Elastic IP (optional)
 
-如果您停止并启动实例，公共 IP 会改变。为保持稳定的 IP，请在 EC2 控制台中分配**弹性 IP** 并将其与实例关联。
+If you stop and start the instance, the public IP changes. To keep a stable IP, allocate an **Elastic IP** and associate it with the instance in the EC2 console.

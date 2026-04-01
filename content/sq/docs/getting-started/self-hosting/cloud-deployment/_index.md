@@ -1,95 +1,95 @@
 ---
 weight: 3
-title: "Vendosja në Cloud"
+title: "Vendosja në cloud"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "cloud_upload"
 toc: true
-description: "Vendosni rtCloud te ofruesit kryesorë cloud me skripte të automatizuara për DigitalOcean, AWS EC2, Google Cloud dhe Linode."
+description: "Vendosni rtCloud tek ofruesit kryesorë të cloud me skripte të automatizuara për DigitalOcean, AWS EC2, Google Cloud dhe Linode."
 ---
 
-Depozita e vendosjes përfshin skripte të automatizuara të aprovizionimit për ofruesit kryesorë cloud. Çdo skript ekzekutohet në nisjen e parë të një serveri të ri **Ubuntu 22.04 LTS** dhe kryen një konfigurim plotësisht pa mbikëqyrje:
+Depoja e vendosjes përfshin skripte automatike të provizionimit për ofruesit kryesorë të cloud. Çdo skript ekzekutohet në nisjen e parë të një serveri të ri Ubuntu 22.04 LTS dhe kryen një konfigurim plotësisht automatik:
 
-- Instalimt Docker dhe Docker Compose
-- Gjeneron fjalëkalime të rastësishme të sigurta për të gjitha shërbimet e brendshme
-- Shkruan `docker-compose.production.yml` dhe `.env`
-- Konfiguron Nginx si proxy të kundërt
-- Merr një certifikatë TLS falas nga Let's Encrypt (riprovon automatikisht derisa DNS të zgjidhet)
-- Konfiguron murin e zjarrit UFW
-- Opsionalisht vendos serverin e integruar Keycloak SSO
-- Nxjerr një përmbledhje të plotë vendosjeje me të gjitha kredencialet
+- Installs Docker and Docker Compose
+- Generates secure random passwords for all internal services
+- Writes `docker-compose.production.yml` and `.env`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt (auto-retries until DNS resolves)
+- Configures the UFW firewall
+- Optionally deploys the embedded Keycloak SSO server
+- Outputs a full deployment summary with all credentials
 
-Konfigurimi përfundon brenda **5–10 minutave** në një instancë standarde.
+Setup completes in **5–10 minutes** on a standard instance.
 
 ---
 
-## Zgjedhja e një Skripti
+## Choosing a Script
 
-Ka variante të shumta skripti varësisht nga ofruesi cloud dhe konfigurimi SSO:
+There are multiple script variants depending on your cloud provider and SSO setup:
 
-| Skripti | Ofruesi | Mënyra SSO | Më i Mirë Për |
+| Script | Provider | SSO Mode | Best For |
 |--------|----------|----------|----------|
-| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Keycloak i integruar | SSO i thjeshtë, i vetë-mjaftueshëm |
-| `digitalocean-droplet.sh` | DigitalOcean | Keycloak ose OIDC i jashtëm | Kontroll i plotë |
-| `linode-stackscript-keycloak-embed.sh` | Linode | Keycloak i integruar | Konfigurim bazuar në formular, më i thjeshtë |
-| `linode-stackscript-oidc.sh` | Linode | Vetëm OIDC i jashtëm | Ofrues ekzistues identiteti |
-| `linode-stackscript.sh` | Linode | Keycloak ose OIDC i jashtëm | Kontroll i plotë |
-| `aws-ec2.sh` | AWS EC2 | Keycloak ose OIDC i jashtëm | Vendosjet AWS |
-| `gcp-compute.sh` | Google Cloud | Keycloak ose OIDC i jashtëm | Vendosjet GCP |
+| `digitalocean-droplet-keycloak-embed.sh` | DigitalOcean | Built-in Keycloak | Simple, self-contained SSO |
+| `digitalocean-droplet.sh` | DigitalOcean | Keycloak or External OIDC | Full control |
+| `linode-stackscript-keycloak-embed.sh` | Linode | Built-in Keycloak | Form-based setup, simplest |
+| `linode-stackscript-oidc.sh` | Linode | External OIDC only | Existing identity provider |
+| `linode-stackscript.sh` | Linode | Keycloak or External OIDC | Full control |
+| `aws-ec2.sh` | AWS EC2 | Keycloak or External OIDC | AWS deployments |
+| `gcp-compute.sh` | Google Cloud | Keycloak or External OIDC | GCP deployments |
 
-> **I rekomanduar për shumicën e përdoruesve:** Përdorni variantin `keycloak-embed`. Përfshin një server të integruar identiteti Keycloak dhe kërkon fushat më të pakëta të konfigurimit.
+> **Recommended for most users:** Use the `keycloak-embed` variant. It includes a built-in Keycloak identity server and requires the fewest configuration fields.
 
 ---
 
-## Udhëzuesi i Madhësisë së Serverit
+## Server Sizing Guide
 
-| Rasti i Përdorimit | RAM | Disku | Shembull |
+| Use Case | RAM | Disk | Example |
 |----------|-----|------|---------|
-| Vlerësim / zhvillim | 2 GB | 25 GB | DO Basic $18/muaj, t3.small, e2-small |
-| Ekip i vogël (< 50 përdorues) | 4 GB | 40 GB | DO Basic $24/muaj, t3.medium, e2-medium |
-| Prodhim (> 50 përdorues) | 8 GB | 80 GB | DO General $48/muaj, t3.large, n2-standard-2 |
+| Evaluation / development | 2 GB | 25 GB | DO Basic $18/mo, t3.small, e2-small |
+| Small team (< 50 users) | 4 GB | 40 GB | DO Basic $24/mo, t3.medium, e2-medium |
+| Production (> 50 users) | 8 GB | 80 GB | DO General $48/mo, t3.large, n2-standard-2 |
 
-> Keycloak i integruar kërkon të paktën **4 GB RAM**. Përdorni 2 GB vetëm për vlerësim pa Keycloak.
+> Embedded Keycloak requires at least **4 GB RAM**. Use 2 GB only for evaluation without Keycloak.
 
 ---
 
-## Konfigurimi DNS
+## DNS Setup
 
-Të gjitha skriptet kërkojnë një domen me një **rekord A që tregon IP-në e serverit tuaj** para se Let's Encrypt të mund të lëshojë një certifikatë.
+All scripts require a domain with an **A record pointing to your server's IP** before Let's Encrypt can issue a certificate.
 
-Skripti printon IP-në e serverit tuaj herët në procesin e konfigurimit:
+The script prints your server IP early in the setup process:
 
 ```
 ============================================================
- IP e Serverit : 139.162.51.85
- Shtoni tani këtë rekord DNS A nëse nuk e keni bërë ende:
+ Server IP : 139.162.51.85
+ Add this DNS A record now if you haven't already:
    myapp.example.com  ->  139.162.51.85
- Skripti do të riprovojë Certbot çdo 60 sekonda derisa DNS të zgjidhet.
+ The script will retry Certbot every 60s until DNS resolves.
 ============================================================
 ```
 
-Skripti **riprovohet automatikisht** Let's Encrypt çdo 60 sekonda për deri në 1 orë. Thjesht shtoni rekordin DNS dhe prisni — nuk nevojitet rinis.
+The script **automatically retries** Let's Encrypt every 60 seconds for up to 1 hour. Just add the DNS record and wait — no restart needed.
 
-> **Kufiri i shkallës:** Let's Encrypt lejon maksimalisht **5 certifikata për domen në 7 ditë**. Shmangni vendosjen dhe shkatërrimin e serverëve vazhdimisht me të njëjtin domen. Nëse arrini kufirin, skripti do të shfaqë një shenjë kohore `riprovo pas` dhe do të ndalojë menjëherë.
-
----
-
-## Lista e Kontrollit Pas Vendosjes
-
-- [ ] Aplikacioni hapet te `https://domeni-juaj.com`
-- [ ] Hyni me `admin` dhe fjalëkalimin që konfiguruat
-- [ ] Të gjithë kontejnerët janë të shëndetshëm: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
-- [ ] Rinovimi i Let's Encrypt funksionon: `certbot renew --dry-run`
-- [ ] Porta MySQL 3306 **nuk** është e ekspozuar: `ufw status`
-- [ ] Konfiguroni një rezervim ditor të bazës së të dhënave (shikoni [Mirëmbajtja](../maintenance))
+> **Rate limit:** Let's Encrypt allows a maximum of **5 certificates per domain per 7 days**. Avoid deploying and destroying servers repeatedly with the same domain. If you hit the limit, the script will display a `retry after` timestamp and stop immediately.
 
 ---
 
-## Zgjidhja e Problemeve
+## Post-Deployment Checklist
 
-### Kontrolloni regjistrin e plotë të konfigurimit
+- [ ] App opens at `https://your-domain.com`
+- [ ] Log in with `admin` and the password you configured
+- [ ] All containers are healthy: `docker compose -f /opt/rtcloud/docker-compose.production.yml ps`
+- [ ] Let's Encrypt renewal works: `certbot renew --dry-run`
+- [ ] MySQL port 3306 is **not** exposed: `ufw status`
+- [ ] Set up a daily database backup (see [Maintenance](../maintenance))
+
+---
+
+## Troubleshooting
+
+### Check the full setup log
 
 ```bash
 # Linode
@@ -99,28 +99,28 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtcloud-setup.log
 ```
 
-### Kufiri i shkallës Let's Encrypt
+### Let's Encrypt rate limit
 
-Nëse shihni `shumë certifikata` në regjistër, keni arritur kufirin prej 5 certifikatash / 7 ditë. Regjistri tregon kohën e saktë të riprovimit:
+If you see `too many certificates` in the log, you have hit the 5 certificates/7 days limit. The log shows the exact retry time:
 
 ```
-[SSL] GABIM: Arritur kufiri i shkallës Let's Encrypt. riprovo pas 2026-03-15 16:22 UTC.
+[SSL] ERROR: Let's Encrypt rate limit hit. retry after 2026-03-15 16:22 UTC.
 ```
 
-Prisni deri në atë kohë, pastaj ri-vendosni.
+Wait until that time, then redeploy.
 
-### Keycloak mbetet jo i shëndetshëm
+### Keycloak stays unhealthy
 
-Sigurohuni që serveri ka të paktën 4 GB RAM, pastaj kontrolloni regjistrat:
+Ensure the server has at least 4 GB RAM, then check logs:
 
 ```bash
 docker logs rtcloud-keycloak --tail 50
 free -h
 ```
 
-### Konfigurimi SSL nuk aplikohet pas certbot
+### SSL config not applied after certbot
 
-Nëse certifikata u lëshua por Nginx ende tregon vetëm HTTP, kontrolloni regjistrin për rreshtin e gabimit dhe ringarkoni Nginx manualisht:
+If the certificate was issued but Nginx still shows HTTP only, check the log for the error line and manually reload Nginx:
 
 ```bash
 nginx -t && systemctl reload nginx
