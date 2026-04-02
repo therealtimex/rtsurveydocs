@@ -14,13 +14,13 @@ description: "Triển khai rtCloud trên Linode bằng StackScript. Không cần
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Thao tác này sẽ mở trang StackScript trong Linode Cloud Manager. Nhấp vào **Triển khai Linode mới**.
+Thao tác này sẽ mở trang StackScript trong Trình quản lý đám mây Linode. Nhấp vào **Triển khai Linode mới**.
 
 ---
 
 ## Bước 2 - Điền vào biểu mẫu của Linode
 
-Điền vào form tạo server chuẩn của Linode:
+Điền vào mẫu tạo máy chủ tiêu chuẩn của Linode:
 
 | Lĩnh vực | Giá trị đề xuất |
 |-------|-------------------|
@@ -28,7 +28,10 @@ Thao tác này sẽ mở trang StackScript trong Linode Cloud Manager. Nhấp v�
 | **Vùng** | Gần gũi nhất với người dùng của bạn |
 | **Kế hoạch** | CPU dùng chung 4 GB trở lên |
 | **Mật khẩu gốc** | Đặt mật khẩu mạnh |
+| **Tường lửa** | Không có tường lửa *(được khuyến nghị)* |
 | **Múi giờ** *(trường duy nhất của chúng tôi)* | Múi giờ máy chủ của bạn (mặc định: `Châu Á/Ho_Chi_Minh`) |
+
+> **Tại sao không có tường lửa?** Tập lệnh thiết lập cần truy cập internet bên ngoài (Docker kéo, Let's Encrypt). Chặn các cổng trong lần khởi động đầu tiên có thể khiến quá trình triển khai không thành công. Bạn có thể đính kèm tường lửa sau khi thiết lập xong — xem [Quy tắc tường lửa](#firewall-rules-linode-cloud-firewall) bên dưới để biết các quy tắc chính xác.
 
 Nhấp vào **Tạo Linode** khi hoàn tất.
 
@@ -42,9 +45,9 @@ Bạn có thể xem tiến trình trực tiếp trong **Linode Cloud Manager** �
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
 2. Nhấp vào Linode mới tạo của bạn
-3. Nhấp vào **Khởi chạy LISH Console** (trên cùng bên phải của trang chi tiết Linode)
+3. Nhấp vào **Khởi chạy Bảng điều khiển LISH** (trên cùng bên phải của trang chi tiết Linode)
 
-Một thiết bị đầu cuối của trình duyệt mở ra hiển thị nhật ký khởi động trực tiếp — tab **Weblish** hoạt động trực tiếp trong trình duyệt của bạn, không cần ứng dụng khách SSH.
+Một thiết bị đầu cuối trình duyệt mở ra hiển thị nhật ký khởi động trực tiếp — tab **Weblish** hoạt động trực tiếp trong trình duyệt của bạn, không cần ứng dụng khách SSH.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
@@ -73,13 +76,7 @@ Làm theo **[Hướng dẫn thiết lập SSL →](../ssl-setup)** để định
 
 ---
 
-## Bước 5 - Đăng nhập lần đầu
-
-Khi SSL được kích hoạt, hãy làm theo **[Hướng dẫn đăng nhập lần đầu →](../first-login)** để truy cập tài khoản quản trị viên.
-
----
-
-## Bước 6 - Thay đổi mật khẩu mặc định
+## Bước 5 - Thay đổi mật khẩu mặc định
 
 Tất cả mật khẩu mặc định là `admin`. Thay đổi chúng ngay sau lần đăng nhập đầu tiên của bạn:
 
@@ -107,7 +104,7 @@ Nếu bạn đính kèm Tường lửa đám mây Linode vào máy chủ này, h
 
 | Nhãn | Hành động | Ghi chú |
 |-------|--------|-------|
-| Chính sách gửi đi mặc định | **Chấp nhận** | Cho phép tất cả các dữ liệu gửi đi (Docker pull, certbot, GoDaddy API, v.v.) |
+| Chính sách gửi đi mặc định | **Chấp nhận** | Cho phép tất cả các lệnh gửi đi (kéo Docker, certbot, API GoDaddy, v.v.) |
 
 ### Cổng KHÔNG cần thiết bên ngoài
 
@@ -115,8 +112,8 @@ Các cổng này chỉ được liên kết với `127.0.0.1` và không bao gi�
 
 | Cảng | Dịch vụ | Lý do |
 |------|----------|--------|
-| 8080 | Vùng chứa ứng dụng | Proxy Nginx cho nó trong nội bộ |
-| 8090 | Hộp đựng chìa khóa | Proxy Nginx cho nó trong nội bộ |
+| 8080 | Vùng chứa ứng dụng | Nginx ủy quyền cho nó trong nội bộ |
+| 8090 | Thùng chứa Keycloak | Nginx ủy quyền cho nó trong nội bộ |
 | 3306 | MySQL | Chỉ mạng Docker nội bộ |
 
 ---

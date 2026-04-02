@@ -7,7 +7,7 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Nasaďte rtCloud na Linode pomocí skriptu StackScript. Není potřeba žádná konfigurace – stačí vytvořit server a postupovat podle kroků po nasazení."
+description: "Nasaďte rtCloud na Linode pomocí StackScript. Není potřeba žádná konfigurace – stačí vytvořit server a postupovat podle kroků po nasazení."
 ---
 
 ## Krok 1 — Spusťte StackScript
@@ -28,7 +28,10 @@ Vyplňte standardní formulář pro vytvoření serveru Linode:
 | **Region** | Nejblíže vašim uživatelům |
 | **Plán** | Sdílený CPU 4 GB nebo větší |
 | **Heslo root** | Nastavte silné heslo |
+| **Firewall** | Žádný firewall *(doporučeno)* |
 | **Časové pásmo** *(naše jediné pole)* | Vaše časové pásmo serveru (výchozí: `Asia/Ho_Chi_Minh`) |
+
+> **Proč žádný firewall?** Instalační skript potřebuje odchozí přístup k internetu (Docker pulls, Let's Encrypt). Blokování portů během prvního spuštění může způsobit selhání nasazení. Po dokončení nastavení můžete připojit bránu firewall — správná pravidla naleznete níže v části [Pravidla brány firewall](#firewall-rules-linode-cloud-firewall).
 
 Po dokončení klikněte na **Vytvořit Linode**.
 
@@ -38,13 +41,13 @@ Po dokončení klikněte na **Vytvořit Linode**.
 
 Skript se automaticky spustí při prvním spuštění. Nainstaluje Docker, stáhne obraz rtSurvey, inicializuje databázi a spustí všechny služby. To trvá **5–10 minut**.
 
-Průběh můžete sledovat přímo v **Linode Cloud Manager** — není potřeba SSH:
+Průběh můžete sledovat přímo v **Linode Cloud Manager** – není potřeba SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
 2. Klikněte na svůj nově vytvořený Linode
-3. Klikněte na **Spustit konzolu LISH** (vpravo nahoře na stránce podrobností Linode)
+3. Klikněte na **Spustit konzolu LISH** (vpravo nahoře na stránce s podrobnostmi o Linode)
 
-Otevře se terminál prohlížeče a zobrazí se živý protokol spouštění – karta **Weblish** funguje přímo ve vašem prohlížeči, není potřeba žádný klient SSH.
+Otevře se terminál prohlížeče se záznamem živého spouštění – karta **Weblish** funguje přímo ve vašem prohlížeči, není potřeba žádný klient SSH.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
@@ -73,13 +76,7 @@ Při konfiguraci HTTPS postupujte podle **[Průvodce nastavením SSL →](../ssl
 
 ---
 
-## Krok 5 — První přihlášení
-
-Jakmile je SSL aktivní, postupujte podle **[Průvodce prvním přihlášením →](../first-login)** pro přístup k účtu správce.
-
----
-
-## Krok 6 — Změňte výchozí heslo
+## Krok 5 — Změňte výchozí heslo
 
 Výchozí nastavení všech hesel je `admin`. Změňte je ihned po prvním přihlášení:
 
@@ -116,7 +113,7 @@ Tyto porty jsou vázány pouze na `127.0.0.1` a nejsou nikdy dosažitelné zven�
 | Přístav | Služba | Důvod |
 |------|---------|--------|
 | 8080 | Kontejner aplikace | Nginx k němu interně proxy |
-| 8090 | Nádoba na klíčenky | Nginx k němu interně proxy |
+| 8090 | Keycloak kontejner | Nginx k němu interně proxy |
 | 3306 | MySQL | Pouze interní síť Docker |
 
 ---

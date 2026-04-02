@@ -7,7 +7,7 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Nasaďte rtCloud na Linode pomocou skriptu StackScript. Nie je potrebná žiadna konfigurácia – stačí vytvoriť server a postupovať podľa krokov po nasadení."
+description: "Nasaďte rtCloud na Linode pomocou StackScript. Nie je potrebná žiadna konfigurácia – stačí vytvoriť server a postupovať podľa krokov po nasadení."
 ---
 
 ## Krok 1 — Spustite StackScript
@@ -24,11 +24,14 @@ Vyplňte štandardný formulár na vytvorenie servera Linode:
 
 | Pole | Odporúčaná hodnota |
 |-------|------------------|
-| **Obrázok** | Ubuntu 22.04 LTS |
+| **Obrázok** | Ubuntu 22,04 LTS |
 | **Región** | Najbližšie k vašim používateľom |
 | **Plán** | Zdieľaný CPU 4 GB alebo viac |
 | **Heslo root** | Nastavte si silné heslo |
+| **Firewall** | Žiadna brána firewall *(odporúča sa)* |
 | **Časové pásmo** *(naše jediné pole)* | Časové pásmo vášho servera (predvolené: `Asia/Ho_Chi_Minh`) |
+
+> **Prečo nie firewall?** Inštalačný skript potrebuje výstupný prístup na internet (Docker ťahá, Let's Encrypt). Blokovanie portov počas prvého zavádzania môže spôsobiť zlyhanie nasadenia. Po dokončení nastavenia môžete pripojiť bránu firewall – správne pravidlá nájdete v časti [Pravidlá brány firewall](#firewall-rules-linode-cloud-firewall) nižšie.
 
 Po dokončení kliknite na **Vytvoriť Linode**.
 
@@ -38,11 +41,11 @@ Po dokončení kliknite na **Vytvoriť Linode**.
 
 Skript sa spustí automaticky pri prvom spustení. Nainštaluje Docker, stiahne obraz rtSurvey, inicializuje databázu a spustí všetky služby. Trvá to **5–10 minút**.
 
-Priebeh môžete sledovať priamo v **Linode Cloud Manager** — nevyžaduje sa SSH:
+Priebeh môžete sledovať priamo v **Linode Cloud Manager** – nevyžaduje sa SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
 2. Kliknite na svoj novovytvorený Linode
-3. Kliknite na **Spustiť konzolu LISH** (vpravo hore na stránke podrobností Linode)
+3. Kliknite na **Spustiť konzolu LISH** (vpravo hore na stránke s podrobnosťami o Linode)
 
 Otvorí sa terminál prehliadača so záznamom živého zavádzania – karta **Weblish** funguje priamo vo vašom prehliadači, nie je potrebný žiadny klient SSH.
 
@@ -73,13 +76,7 @@ Pri konfigurácii HTTPS postupujte podľa **[Sprievodca nastavením SSL →](../
 
 ---
 
-## Krok 5 — Prvé prihlásenie
-
-Keď je SSL aktívny, postupujte podľa **[Príručky prvého prihlásenia →](../first-login)**, aby ste získali prístup k účtu správcu.
-
----
-
-## Krok 6 — Zmeňte predvolené heslo
+## Krok 5 — Zmeňte predvolené heslo
 
 Všetky heslá sú štandardne nastavené na `admin`. Zmeňte ich ihneď po prvom prihlásení:
 
@@ -116,7 +113,7 @@ Tieto porty sú viazané iba na `127.0.0.1` a nikdy nie sú dosiahnuteľné mimo
 | Prístav | Služba | Dôvod |
 |------|---------|--------|
 | 8080 | Kontajner aplikácie | Nginx sa k nemu interne pripája |
-| 8090 | Zásobník na kľúčenky | Nginx sa k nemu interne pripája |
+| 8090 | Keycloak kontajner | Nginx sa k nemu interne pripája |
 | 3306 | MySQL | Len interná sieť Docker |
 
 ---

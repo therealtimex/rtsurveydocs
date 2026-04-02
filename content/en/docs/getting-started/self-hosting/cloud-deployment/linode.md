@@ -28,7 +28,10 @@ Fill in Linode's standard server creation form:
 | **Region** | Closest to your users |
 | **Plan** | Shared CPU 4 GB or larger |
 | **Root Password** | Set a strong password |
+| **Firewall** | No Firewall *(recommended)* |
 | **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+
+> **Why no firewall?** The setup script needs outbound internet access (Docker pulls, Let's Encrypt). Blocking ports during first boot can cause the deployment to fail. You can attach a firewall after setup is complete — see [Firewall rules](#firewall-rules-linode-cloud-firewall) below for the correct rules.
 
 Click **Create Linode** when done.
 
@@ -73,13 +76,7 @@ Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free
 
 ---
 
-## Step 5 — First login
-
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
-
----
-
-## Step 6 — Change the default password
+## Step 5 — Change the default password
 
 All passwords default to `admin`. Change them immediately after your first login:
 

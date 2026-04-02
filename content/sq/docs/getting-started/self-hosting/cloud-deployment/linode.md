@@ -20,7 +20,7 @@ Kjo hap faqen StackScript në Linode Cloud Manager. Klikoni **Deploy New Linode*
 
 ## Hapi 2 - Plotësoni formularin e Linode
 
-Plotësoni formularin standard të krijimit të serverit Linode:
+Plotësoni formularin standard të krijimit të serverit të Linode:
 
 | Fusha | Vlera e rekomanduar |
 |-------|------------------|
@@ -28,7 +28,10 @@ Plotësoni formularin standard të krijimit të serverit Linode:
 | **Rajoni ** | Më afër përdoruesve tuaj |
 | **Plani ** | CPU e përbashkët 4 GB ose më e madhe |
 | **Fjalëkalimi rrënjë** | Vendosni një fjalëkalim të fortë |
+| **Firewall** | Nuk ka Firewall *(rekomandohet)* |
 | **Zona kohore** *(fusha jonë e vetme)* | Zona kohore e serverit tuaj (e parazgjedhur: `Asia/Ho_Chi_Minh`) |
+
+> **Pse nuk ka mur zjarri?** Skripti i konfigurimit ka nevojë për qasje në internet në dalje (Docker tërheq, Let's Encrypt). Bllokimi i porteve gjatë nisjes së parë mund të shkaktojë dështimin e vendosjes. Mund të bashkëngjitni një mur zjarri pasi të ketë përfunduar konfigurimi - shihni [Rregullat e murit të zjarrit] (#firewall-rules-linode-cloud-firewall) më poshtë për rregullat e sakta.
 
 Klikoni **Krijo Linode** kur të keni mbaruar.
 
@@ -36,7 +39,7 @@ Klikoni **Krijo Linode** kur të keni mbaruar.
 
 ## Hapi 3 - Prisni që konfigurimi të përfundojë
 
-Skripti funksionon automatikisht në nisjen e parë. Ai instalon Docker, tërheq imazhin rtSurvey, inicializon bazën e të dhënave dhe nis të gjitha shërbimet. Kjo zgjat **5–10 minuta**.
+Skripti funksionon automatikisht në nisjen e parë. Instalon Docker, tërheq imazhin rtSurvey, inicializon bazën e të dhënave dhe nis të gjitha shërbimet. Kjo zgjat **5–10 minuta**.
 
 Mund të shikoni progresin drejtpërdrejt në **Linode Cloud Manager** — nuk kërkohet SSH:
 
@@ -44,7 +47,7 @@ Mund të shikoni progresin drejtpërdrejt në **Linode Cloud Manager** — nuk k
 2. Klikoni në Linode tuaj të sapokrijuar
 3. Klikoni **Launch LISH Console** (lart djathtas i faqes së detajeve Linode)
 
-Hapet një terminal shfletuesi që tregon regjistrin e drejtpërdrejtë të nisjes - skeda **Weblish** funksionon drejtpërdrejt në shfletuesin tuaj, nuk nevojitet klient SSH.
+Hapet një terminal shfletuesi që tregon regjistrin e drejtpërdrejtë të nisjes — skeda **Weblish** funksionon drejtpërdrejt në shfletuesin tuaj, nuk nevojitet klient SSH.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
@@ -88,26 +91,26 @@ Të gjitha fjalëkalimet e paracaktuara janë "admin". Ndryshoni ato menjëherë
 
 ---
 
-## Rregullat e Firewall-it (Linode Cloud Firewall)
+## Rregullat e Firewallit (Linode Cloud Firewall)
 
 Nëse bashkëngjitni një Linode Cloud Firewall në këtë server, përdorni rregullat e mëposhtme:
 
-### Inbound
+### Përbrenda
 
-| Label | Action | Protocol | Port | Sources | Notes |
+| Etiketa | Veprimi | Protokolli | Port | Burimet | Shënime |
 |-------|--------|----------|------|---------|-------|
 | `pranoj-inbound-ssh` | Prano | TCP | 22 | Të gjitha IPv4, Të gjitha IPv6 | Qasja SSH |
 | "pranoj-përbrenda-http" | Prano | TCP | 80 | Të gjitha IPv4, Të gjitha IPv6 | Nginx (Sfida HTTP + ACME) |
 | "pranoj-përbrenda-https" | Prano | TCP | 443 | Të gjitha IPv4, Të gjitha IPv6 | Nginx (HTTPS pas konfigurimit SSL) |
 | `pranoj-përbrenda-shkëlqim` | Prano | TCP | 3838 | Të gjitha IPv4, Të gjitha IPv6 | Serveri i ndritshëm (analitika R) |
 | "pranoj-inbound-icmp" | Prano | ICMP | — | Të gjitha IPv4, Të gjitha IPv6 | Ping / diagnostikim |
-| Default inbound policy | **Drop** | | | | Blloko gjithçka tjetër |
+| Politika e parazgjedhur hyrëse | **Hije** | | | | Blloko gjithçka tjetër |
 
 ### Jashtë
 
-| Label | Veprimi | Shënime |
+| Etiketa | Veprimi | Shënime |
 |-------|--------|-------|
-| Politika e parazgjedhur e daljes | **Prano ** | Lejo të gjitha jashtë (Docker pulls, certbot, GoDaddy API, etj.) |
+| Politika e parazgjedhur e daljes | **Prano ** | Lejo të gjitha daljet (tërheqjet Docker, certbot, GoDaddy API, etj.) |
 
 ### Portet NUK nevojiten nga jashtë
 
@@ -116,8 +119,8 @@ Këto porte janë të lidhura vetëm me "127.0.0.1" dhe nuk mund të arrihen kur
 | Port | Shërbimi | Arsyeja |
 |------|---------|--------|
 | 8080 | Kontejneri i aplikacionit | Nginx proxies për të brenda |
-| 8090 | Enë me mantel | Nginx proxies për të brenda |
-| 3306 | MySQL | Internal Docker network only |
+| 8090 | Enë Keycloak | Nginx proxies për të brenda |
+| 3306 | MySQL | Vetëm rrjeti i brendshëm Docker |
 
 ---
 

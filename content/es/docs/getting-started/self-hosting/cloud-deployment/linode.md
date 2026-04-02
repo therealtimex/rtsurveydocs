@@ -7,7 +7,7 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Implemente rtCloud en Linode usando StackScript. No se necesita configuración: simplemente cree el servidor y siga los pasos posteriores a la implementación."
+description: "Implemente rtCloud en Linode usando un StackScript. No se necesita configuración: simplemente cree el servidor y siga los pasos posteriores a la implementación."
 ---
 
 ## Paso 1: Inicie StackScript
@@ -24,11 +24,14 @@ Complete el formulario de creación de servidor estándar de Linode:
 
 | Campo | Valor recomendado |
 |-------|------------------|
-| **Imagen** | Ubuntu 22.04 LTS |
+| **Imagen** | Ubuntu 22.04LTS |
 | **Región** | Más cerca de tus usuarios |
 | **Planificar** | CPU compartida de 4 GB o más |
 | **Contraseña raíz** | Establecer una contraseña segura |
+| **Cortafuegos** | Sin firewall *(recomendado)* |
 | **Zona horaria** *(nuestro único campo)* | La zona horaria de su servidor (predeterminada: `Asia/Ho_Chi_Minh`) |
+
+> **¿Por qué no hay firewall?** El script de configuración necesita acceso saliente a Internet (Docker extrae, Let's Encrypt). El bloqueo de puertos durante el primer arranque puede provocar que falle la implementación. Puede conectar un firewall una vez completada la configuración; consulte [Reglas de firewall](#firewall-rules-linode-cloud-firewall) a continuación para conocer las reglas correctas.
 
 Haga clic en **Crear Linode** cuando haya terminado.
 
@@ -36,12 +39,12 @@ Haga clic en **Crear Linode** cuando haya terminado.
 
 ## Paso 3: Espere a que se complete la configuración
 
-El script se ejecuta automáticamente en el primer arranque. Instala Docker, extrae la imagen de rtSurvey, inicializa la base de datos e inicia todos los servicios. Esto lleva **entre 5 y 10 minutos**.
+El script se ejecuta automáticamente en el primer arranque. Instala Docker, extrae la imagen rtSurvey, inicializa la base de datos e inicia todos los servicios. Esto lleva **entre 5 y 10 minutos**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Puede ver el progreso directamente en **Linode Cloud Manager**; no se requiere SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Haga clic en su Linode recién creado.
+2. Haga clic en su Linode recién creado
 3. Haga clic en **Iniciar consola LISH** (arriba a la derecha de la página de detalles de Linode)
 
 Se abre una terminal del navegador que muestra el registro de inicio en vivo: la pestaña **Weblish** funciona directamente en su navegador, no se necesita un cliente SSH.
@@ -73,13 +76,7 @@ Siga la **[Guía de configuración de SSL →](../ssl-setup)** para configurar H
 
 ---
 
-## Paso 5: primer inicio de sesión
-
-Una vez que SSL esté activo, siga la **[Guía de primer inicio de sesión →](../primer inicio de sesión)** para acceder a la cuenta de administrador.
-
----
-
-## Paso 6: cambiar la contraseña predeterminada
+## Paso 5: cambiar la contraseña predeterminada
 
 Todas las contraseñas predeterminadas son "admin". Cámbielos inmediatamente después de su primer inicio de sesión:
 
@@ -107,7 +104,7 @@ Si adjunta un Linode Cloud Firewall a este servidor, utilice las siguientes regl
 
 | Etiqueta | Acción | Notas |
 |-------|--------|-------|
-| Política de salida predeterminada | **Aceptar** | Permitir todas las salidas (docker pulls, certbot, API de GoDaddy, etc.) |
+| Política de salida predeterminada | **Aceptar** | Permitir todas las salidas (extracciones de Docker, certbot, API de GoDaddy, etc.) |
 
 ### Puertos NO necesarios externamente
 
@@ -116,8 +113,8 @@ Estos puertos están vinculados únicamente a `127.0.0.1` y nunca se puede acced
 | Puerto | Servicio | Razón |
 |------|---------|--------|
 | 8080 | Contenedor de aplicaciones | Nginx lo proxy internamente |
-| 8090 | Contenedor de capa de llaves | Nginx lo proxy internamente |
-| 3306 | MySQL | Solo red Docker interna |
+| 8090 | Contenedor Keycloak | Nginx lo proxy internamente |
+| 3306 | MySQL | Sólo red interna Docker |
 
 ---
 

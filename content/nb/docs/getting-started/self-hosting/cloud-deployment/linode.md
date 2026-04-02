@@ -7,7 +7,7 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Distribuer rtCloud på Linode ved hjelp av et StackScript. Ingen konfigurasjon nødvendig – bare opprett serveren og følg trinnene etter distribusjon."
+description: "Distribuer rtCloud på Linode ved hjelp av en StackScript. Ingen konfigurasjon nødvendig – bare opprett serveren og følg trinnene etter distribusjon."
 ---
 
 ## Trinn 1 — Start StackScript
@@ -28,7 +28,10 @@ Fyll ut Linodes standard serveropprettingsskjema:
 | **Region** | Nærmest brukerne dine |
 | **Plan** | Delt CPU 4 GB eller større |
 | **Root-passord** | Angi et sterkt passord |
-| **Tidssone** *(vårt eneste felt)* | Serverens tidssone (standard: `Asia/Ho_Chi_Minh`) |
+| **Brannmur** | Ingen brannmur *(anbefalt)* |
+| **Tidssone** *(vår eneste felt)* | Serverens tidssone (standard: `Asia/Ho_Chi_Minh`) |
+
+> **Hvorfor ingen brannmur?** Oppsettsskriptet trenger utgående internettilgang (Docker pulls, Let's Encrypt). Blokkering av porter under første oppstart kan føre til at distribusjonen mislykkes. Du kan koble til en brannmur etter at oppsettet er fullført - se [Brannmurregler](#firewall-rules-linode-cloud-firewall) nedenfor for de riktige reglene.
 
 Klikk på **Create Linode** når du er ferdig.
 
@@ -42,9 +45,9 @@ Du kan se fremdriften direkte i **Linode Cloud Manager** – ingen SSH kreves:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
 2. Klikk på din nyopprettede Linode
-3. Klikk på **Start LISH Console** (øverst til høyre på Linode-detaljsiden)
+3. Klikk på **Start LISH-konsoll** (øverst til høyre på Linode-detaljsiden)
 
-En nettleserterminal åpnes og viser live oppstartsloggen - fanen **Weblish** fungerer direkte i nettleseren din, ingen SSH-klient er nødvendig.
+En nettleserterminal åpnes og viser live oppstartsloggen - fanen **Weblish** fungerer direkte i nettleseren din, ingen SSH-klient nødvendig.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
@@ -73,13 +76,7 @@ Følg **[Sett opp SSL-veiledningen →](../ssl-setup)** for å konfigurere HTTPS
 
 ---
 
-## Trinn 5 — Første pålogging
-
-Når SSL er aktiv, følger du **[First Login Guide →](../first-login)** for å få tilgang til admin-kontoen.
-
----
-
-## Trinn 6 — Endre standardpassordet
+## Trinn 5 — Endre standardpassordet
 
 Alle passord er som standard "admin". Endre dem umiddelbart etter din første pålogging:
 
@@ -97,7 +94,7 @@ Hvis du kobler en Linode Cloud Firewall til denne serveren, bruk følgende regle
 | Etikett | Handling | Protokoll | Port | Kilder | Merknader |
 |-------|--------|--------|------|--------|-------|
 | `accept-inbound-ssh` | Godta | TCP | 22 | Alle IPv4, Alle IPv6 | SSH-tilgang |
-| `accept-inbound-http` | Godta | TCP | 80 | Alle IPv4, Alle IPv6 | Nginx (HTTP + ACME utfordring) |
+| `accept-inbound-http` | Godta | TCP | 80 | Alle IPv4, Alle IPv6 | Nginx (HTTP + ACME-utfordring) |
 | `accept-inbound-https` | Godta | TCP | 443 | Alle IPv4, Alle IPv6 | Nginx (HTTPS etter SSL-oppsett) |
 | `accept-inbound-shiny` | Godta | TCP | 3838 | Alle IPv4, Alle IPv6 | Shiny Server (R analytics) |
 | `accept-inbound-icmp` | Godta | ICMP | — | Alle IPv4, Alle IPv6 | Ping / diagnostikk |
@@ -115,8 +112,8 @@ Disse portene er bare bundet til «127.0.0.1» og kan aldri nås fra utenfor ser
 
 | Port | Service | Grunn |
 |------|--------|--------|
-| 8080 | Appbeholder | Nginx proxyer til det internt |
-| 8090 | Keycloak container | Nginx proxyer til det internt |
+| 8080 | Appbeholder | Nginx proxyer til den internt |
+| 8090 | Keycloak beholder | Nginx proxyer til den internt |
 | 3306 | MySQL | Kun internt Docker-nettverk |
 
 ---

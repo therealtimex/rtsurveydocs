@@ -59,6 +59,12 @@ SOURCE_FILES = [
     "docs/getting-started/self-hosting/cloud-deployment/linode.md",
 ]
 
+# Override via env: PAGES=linode  or  PAGES=digitalocean,linode
+import os as _os
+_pages_env = _os.environ.get("PAGES", "")
+if _pages_env:
+    SOURCE_FILES = [f for f in SOURCE_FILES if any(p in f for p in _pages_env.split(","))]
+
 # Lines/patterns that must never be translated
 SKIP_PATTERNS = [
     re.compile(r'^!\['),                          # images

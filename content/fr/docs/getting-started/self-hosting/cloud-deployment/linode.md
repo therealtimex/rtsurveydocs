@@ -14,7 +14,7 @@ description: "Déployez rtCloud sur Linode à l'aide d'un StackScript. Aucune co
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Cela ouvre la page StackScript dans Linode Cloud Manager. Cliquez sur **Déployer un nouveau Linode**.
+Cela ouvre la page StackScript dans Linode Cloud Manager. Cliquez sur **Déployer le nouveau Linode**.
 
 ---
 
@@ -28,7 +28,10 @@ Remplissez le formulaire standard de création de serveur de Linode :
 | **Région** | Au plus proche de vos utilisateurs |
 | **Plan** | CPU partagé 4 Go ou plus |
 | **Mot de passe racine** | Définir un mot de passe fort |
+| **Pare-feu** | Pas de pare-feu *(recommandé)* |
 | **Fuseau horaire** *(notre seul champ)* | Le fuseau horaire de votre serveur (par défaut : `Asia/Ho_Chi_Minh`) |
+
+> **Pourquoi pas de pare-feu ?** Le script d'installation nécessite un accès Internet sortant (extractions Docker, Let's Encrypt). Le blocage des ports lors du premier démarrage peut entraîner l'échec du déploiement. Vous pouvez attacher un pare-feu une fois la configuration terminée — voir [Règles de pare-feu](#firewall-rules-linode-cloud-firewall) ci-dessous pour les règles correctes.
 
 Cliquez sur **Créer Linode** lorsque vous avez terminé.
 
@@ -42,7 +45,7 @@ Vous pouvez suivre la progression directement dans **Linode Cloud Manager** — 
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
 2. Cliquez sur votre Linode nouvellement créé
-3. Cliquez sur **Lancer la console LISH** (en haut à droite de la page de détails de Linode)
+3. Cliquez sur **Lancer la console LISH** (en haut à droite de la page de détails Linode)
 
 Un terminal de navigateur s'ouvre et affiche le journal de démarrage en direct : l'onglet **Weblish** fonctionne directement dans votre navigateur, aucun client SSH n'est nécessaire.
 
@@ -73,13 +76,7 @@ Suivez le **[Guide de configuration SSL →](../ssl-setup)** pour configurer HTT
 
 ---
 
-## Étape 5 — Première connexion
-
-Une fois SSL actif, suivez le **[Guide de première connexion →](../first-login)** pour accéder au compte administrateur.
-
----
-
-## Étape 6 — Changer le mot de passe par défaut
+## Étape 5 — Changer le mot de passe par défaut
 
 Tous les mots de passe par défaut sont « admin ». Modifiez-les immédiatement après votre première connexion :
 
@@ -90,7 +87,7 @@ Tous les mots de passe par défaut sont « admin ». Modifiez-les immédiateme
 
 ## Règles de pare-feu (Linode Cloud Firewall)
 
-Si vous attachez un pare-feu Linode Cloud à ce serveur, utilisez les règles suivantes :
+Si vous attachez un pare-feu cloud Linode à ce serveur, utilisez les règles suivantes :
 
 ### Entrant
 
@@ -107,7 +104,7 @@ Si vous attachez un pare-feu Linode Cloud à ce serveur, utilisez les règles su
 
 | Étiquette | Actions | Remarques |
 |-------|--------|-------|
-| Politique sortante par défaut | **Accepter** | Autoriser tous les appels sortants (Docker pulls, certbot, GoDaddy API, etc.) |
+| Politique sortante par défaut | **Accepter** | Autoriser tous les appels sortants (extractions Docker, certbot, API GoDaddy, etc.) |
 
 ### Ports NON nécessaires en externe
 
@@ -116,7 +113,7 @@ Ces ports sont liés à « 127.0.0.1 » uniquement et ne sont jamais accessibl
 | Port | Services | Raison |
 |------|---------|--------|
 | 8080 | Conteneur d'applications | Nginx le proxy en interne |
-| 8090 | Conteneur de clés | Nginx le proxy en interne |
+| 8090 | Conteneur Keycloak | Nginx le proxy en interne |
 | 3306 | MySQL | Réseau Docker interne uniquement |
 
 ---

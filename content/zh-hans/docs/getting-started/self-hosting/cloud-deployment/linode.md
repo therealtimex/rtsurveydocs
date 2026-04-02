@@ -14,37 +14,40 @@ description: "使用 StackScript 在 Linode 上部署 rtCloud。无需配置 - �
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-这将打开 Linode Cloud Manager 中的 StackScript 页面。单击**部署新的 Linode**。
+这将在 Linode Cloud Manager 中打开 StackScript 页面。单击“**部署新的 Linode**”。
 
 ---
 
-## 第 2 步 — 填写 Linode 的表格
+## 步骤 2 — 填写 Linode 的表格
 
 填写Linode的标准服务器创建表单：
 
 |领域 |推荐值|
 |--------|------------------|
-| **图片** | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS
+| **图片** | Ubuntu 22.04 LTS |
 | **地区** |最贴近您的用户 |
 | **计划** |共享 CPU 4 GB 或更大 |
 | **根密码** |设置强密码 |
+| **防火墙** |无防火墙*（推荐）* |
 | **时区** *（我们唯一的字段）* |您的服务器时区（默认值：`Asia/Ho_Chi_Minh`）|
 
-完成后点击 **创建 Linode**。
+> **为什么没有防火墙？** 安装脚本需要出站互联网访问（Docker 拉动，Let's Encrypt）。首次启动期间阻止端口可能会导致部署失败。设置完成后，您可以附加防火墙 - 请参阅下面的[防火墙规则](#firewall-rules-linode-cloud-firewall) 了解正确的规则。
+
+完成后单击 **创建 Linode**。
 
 ---
 
 ## 步骤 3 — 等待设置完成
 
-该脚本在首次启动时自动运行。它会安装 Docker、拉取 rtSurvey 映像、初始化数据库并启动所有服务。这需要 **5-10 分钟**。
+该脚本在首次启动时自动运行。它安装 Docker、拉取 rtSurvey 映像、初始化数据库并启动所有服务。这需要 **5-10 分钟**。
 
 您可以直接在 **Linode Cloud Manager** 中查看进度 - 无需 SSH：
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. 点击您新创建的Linode
+2.点击您新创建的Linode
 3. 单击**启动 LISH 控制台**（Linode 详细信息页面右上角）
 
-将打开一个浏览器终端，显示实时启动日志 - **Weblish** 选项卡直接在浏览器中运行，无需 SSH 客户端。
+将打开浏览器终端，显示实时启动日志 - **Weblish** 选项卡直接在浏览器中运行，无需 SSH 客户端。
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
@@ -73,13 +76,7 @@ Open your browser at `http://<server-ip>`. The app will redirect you to the SSL 
 
 ---
 
-## 步骤 5 — 首次登录
-
-SSL 激活后，请按照 **[首次登录指南 →](../first-login)** 访问管理员帐户。
-
----
-
-## 步骤 6 — 更改默认密码
+## 步骤 5 — 更改默认密码
 
 所有密码默认为“admin”。首次登录后立即更改它们：
 
@@ -103,7 +100,7 @@ SSL 激活后，请按照 **[首次登录指南 →](../first-login)** 访问管
 | `接受入站 icmp` |接受 | ICMP | — |所有 IPv4、所有 IPv6 | Ping / 诊断 |
 |默认入站策略 | **掉落** | | | |阻止其他所有内容 |
 
-### 出境
+### 出站
 
 |标签|行动|笔记|
 |--------|--------|--------|
@@ -116,7 +113,7 @@ SSL 激活后，请按照 **[首次登录指南 →](../first-login)** 访问管
 |港口|服务 |原因 |
 |------|---------|--------|
 | 8080|应用容器 | Nginx 在内部代理它 |
-| 8090|钥匙斗篷容器| Nginx 在内部代理它 |
+| 8090| Keycloak 容器 | Nginx 内部代理 |
 | 3306| MySQL |仅限内部 Docker 网络 |
 
 ---

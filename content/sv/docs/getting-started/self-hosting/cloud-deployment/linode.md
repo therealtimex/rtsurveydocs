@@ -7,14 +7,14 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Distribuera rtCloud på Linode med ett StackScript. Ingen konfiguration behövs – skapa bara servern och följ stegen efter distributionen."
+description: "Distribuera rtCloud på Linode med en StackScript. Ingen konfiguration behövs – skapa bara servern och följ stegen efter distributionen."
 ---
 
 ## Steg 1 — Starta StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Detta öppnar StackScript-sidan i Linode Cloud Manager. Klicka på **Distribuera ny Linode**.
+Detta öppnar StackScript-sidan i Linode Cloud Manager. Klicka på **Deploy New Linode**.
 
 ---
 
@@ -28,7 +28,10 @@ Fyll i Linodes standardformulär för skapande av server:
 | **Region** | Närmast dina användare |
 | **Planera** | Delad CPU 4 GB eller större |
 | **Root-lösenord** | Ange ett starkt lösenord |
+| **Brandvägg** | Ingen brandvägg *(rekommenderas)* |
 | **Tidszon** *(vårt enda fält)* | Din servertidszon (standard: `Asia/Ho_Chi_Minh`) |
+
+> **Varför ingen brandvägg?** Installationsskriptet behöver utgående internetåtkomst (Docker pulls, Let's Encrypt). Blockering av portar under första uppstart kan göra att distributionen misslyckas. Du kan ansluta en brandvägg efter att installationen är klar — se [Brandväggsregler](#firewall-rules-linode-cloud-firewall) nedan för de korrekta reglerna.
 
 Klicka på **Skapa Linode** när du är klar.
 
@@ -36,15 +39,15 @@ Klicka på **Skapa Linode** när du är klar.
 
 ## Steg 3 — Vänta tills installationen är klar
 
-Skriptet körs automatiskt vid första uppstart. Den installerar Docker, hämtar rtSurvey-bilden, initierar databasen och startar alla tjänster. Detta tar **5–10 minuter**.
+Skriptet körs automatiskt vid första uppstart. Den installerar Docker, hämtar rtSurvey-avbildningen, initierar databasen och startar alla tjänster. Detta tar **5–10 minuter**.
 
 Du kan se framstegen direkt i **Linode Cloud Manager** — ingen SSH krävs:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
 2. Klicka på din nyskapade Linode
-3. Klicka på **Starta LISH Console** (överst till höger på Linodes detaljsida)
+3. Klicka på **Starta LISH Console** (överst till höger på Linode detaljsida)
 
-En webbläsarterminal öppnas och visar livestartloggen — fliken **Weblish** fungerar direkt i din webbläsare, ingen SSH-klient behövs.
+En webbläsarterminal öppnas och visar live-startloggen — fliken **Weblish** fungerar direkt i din webbläsare, ingen SSH-klient behövs.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
@@ -73,13 +76,7 @@ Följ **[Set Up SSL guide →](../ssl-setup)** för att konfigurera HTTPS. Den k
 
 ---
 
-## Steg 5 — Första inloggningen
-
-När SSL är aktivt, följ **[First Login Guide →](../first-login)** för att komma åt administratörskontot.
-
----
-
-## Steg 6 — Ändra standardlösenordet
+## Steg 5 — Ändra standardlösenordet
 
 Alla lösenord är som standard "admin". Ändra dem direkt efter din första inloggning:
 
@@ -115,8 +112,8 @@ Dessa portar är endast bundna till "127.0.0.1" och kan aldrig nås utanför ser
 
 | Hamn | Service | Anledning |
 |------|--------|--------|
-| 8080 | Appbehållare | Nginx fullmakter till det internt |
-| 8090 | Keycloak container | Nginx fullmakter till det internt |
+| 8080 | Appbehållare | Nginx proxyar till den internt |
+| 8090 | Keycloak behållare | Nginx proxyar till den internt |
 | 3306 | MySQL | Endast internt Docker-nätverk |
 
 ---

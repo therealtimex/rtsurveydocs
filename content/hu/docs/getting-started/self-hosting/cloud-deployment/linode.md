@@ -7,20 +7,20 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Telepítse az rtCloud-ot a Linode-on StackScript használatával. Nincs szükség konfigurációra – csak hozza létre a kiszolgálót, és kövesse a telepítés utáni lépéseket."
+description: "Telepítse az rtCloud-et Linode-en StackScript használatával. Nincs szükség konfigurációra – csak hozza létre a kiszolgálót, és kövesse a telepítés utáni lépéseket."
 ---
 
-## 1. lépés – Indítsa el a StackScriptet
+## 1. lépés – Indítsa el az StackScript-et
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Ezzel megnyílik a StackScript oldal a Linode Cloud Managerben. Kattintson az **Új Linode telepítése** lehetőségre.
+Ezzel megnyílik az StackScript oldal az Linode Cloud Managerben. Kattintson az **Új Linode telepítése** lehetőségre.
 
 ---
 
-## 2. lépés – Töltse ki a Linode űrlapját
+## 2. lépés – Töltse ki az Linode űrlapját
 
-Töltse ki a Linode szabványos szerverlétrehozási űrlapját:
+Töltse ki az Linode szabványos szerverlétrehozási űrlapját:
 
 | Mező | Ajánlott érték |
 |-------|-------------------|
@@ -28,23 +28,26 @@ Töltse ki a Linode szabványos szerverlétrehozási űrlapját:
 | **Régió** | Legközelebb a felhasználókhoz |
 | **Terv** | Megosztott CPU 4 GB vagy nagyobb |
 | **Root jelszó** | Állítson be erős jelszót |
+| **Tűzfal** | Nincs tűzfal *(ajánlott)* |
 | **Időzóna** *(egyetlen mezőnk)* | A szerver időzónája (alapértelmezett: `Ázsia/Ho_Chi_Minh`) |
 
-Ha elkészült, kattintson a **Linode létrehozása** gombra.
+> **Miért nincs tűzfal?** A telepítő szkriptnek kimenő internet-hozzáférésre van szüksége (Docker pulls, Let's Encrypt). A portok blokkolása az első rendszerindítás során a központi telepítés meghiúsulását okozhatja. A telepítés befejezése után tűzfalat csatolhat – a megfelelő szabályokért lásd alább a [Tűzfalszabályokat] (#firewall-rules-linode-cloud-firewall).
+
+Ha elkészült, kattintson a **Create Linode** gombra.
 
 ---
 
 ## 3. lépés – Várja meg, amíg a beállítás befejeződik
 
-A szkript automatikusan lefut az első rendszerindításkor. Telepíti a Dockert, lekéri az rtSurvey képfájlt, inicializálja az adatbázist, és elindítja az összes szolgáltatást. Ez **5–10 percet** vesz igénybe.
+A szkript automatikusan lefut az első rendszerindításkor. Telepíti az Docker-et, lekéri az rtSurvey lemezképet, inicializálja az adatbázist, és elindítja az összes szolgáltatást. Ez **5–10 percet** vesz igénybe.
 
-Közvetlenül a **Linode Cloud Managerben** követheti a folyamatot – nincs szükség SSH-ra:
+Közvetlenül az **Linode Cloud Managerben** követheti a folyamatot – nincs szükség SSH-ra:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Kattintson az újonnan létrehozott Linode-jára
-3. Kattintson a **A LISH Console indítása** elemre (a Linode részletes oldalának jobb felső sarkában).
+2. Kattintson az újonnan létrehozott Linode-re
+3. Kattintson az **Launch LISH Console** elemre (az Linode részletes oldalának jobb felső sarkában).
 
-Megnyílik egy böngészőterminál, amely az élő rendszerindítási naplót mutatja – a **Weblish** lap közvetlenül a böngészőben működik, nincs szükség SSH-kliensre.
+Megnyílik egy böngészőterminál, amely az élő rendszerindítási naplót mutatja – az **Weblish** lap közvetlenül a böngészőben működik, nincs szükség SSH-kliensre.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
@@ -88,9 +91,9 @@ Minden jelszó alapértelmezés szerint "admin". Módosítsa őket közvetlenül
 
 ---
 
-## Tűzfalszabályok (Linode Cloud Firewall)
+## Firewall rules (Linode Cloud Firewall)
 
-Ha Linode Cloud Firewall-t csatol ehhez a szerverhez, kövesse a következő szabályokat:
+Ha Linode felhő tűzfalat csatol ehhez a szerverhez, kövesse a következő szabályokat:
 
 ### Bejövő
 
@@ -107,7 +110,7 @@ Ha Linode Cloud Firewall-t csatol ehhez a szerverhez, kövesse a következő sza
 
 | Címke | Akció | Megjegyzések |
 |-------|---------|-------|
-| Alapértelmezett kimenő szabályzat | **Elfogadás** | Minden kimenő engedélyezése (Docker lehívások, certbot, GoDaddy API stb.) |
+| Alapértelmezett kimenő szabályzat | **Elfogadás** | Minden kimenő engedélyezése (Docker lehívás, certbot, GoDaddy API stb.) |
 
 ### Külsőleg NINCS szükség portokra
 
@@ -115,9 +118,9 @@ Ezek a portok csak a "127.0.0.1"-hez vannak kötve, és soha nem érhetők el a 
 
 | Kikötő | Szolgáltatás | Ok |
 |------|---------|--------|
-| 8080 | Alkalmazástároló | Az Nginx belsőleg proxyt használ hozzá |
-| 8090 | Kulcsköpeny konténer | Az Nginx belsőleg proxyt használ hozzá |
-| 3306 | MySQL | Csak belső Docker-hálózat |
+| 8080 | Alkalmazástároló | Az Nginx belsőleg proxyzik hozzá |
+| 8090 | Keycloak konténer | Az Nginx belsőleg proxyzik hozzá |
+| 3306 | MySQL | Csak belső Docker hálózat |
 
 ---
 

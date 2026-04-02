@@ -10,17 +10,17 @@ toc: true
 description: "Izvietojiet rtCloud uz Linode, izmantojot StackScript. Nav nepieciešama konfigurācija — vienkārši izveidojiet serveri un veiciet darbības pēc izvietošanas."
 ---
 
-## 1. darbība — palaidiet StackScript
+## 1. darbība — palaidiet StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Tādējādi Linode Cloud Manager tiek atvērta StackScript lapa. Noklikšķiniet uz **Izvietot jaunu Linode**.
+Tādējādi tiek atvērta StackScript lapa Linode mākoņu pārvaldniekā. Noklikšķiniet uz **Izvietot jaunu Linode**.
 
 ---
 
-## 2. solis — aizpildiet Linodes veidlapu
+## 2. darbība — aizpildiet Linode veidlapu
 
-Aizpildiet Linodes standarta servera izveides veidlapu:
+Aizpildiet Linode standarta servera izveides veidlapu:
 
 | Lauks | Ieteicamā vērtība |
 |-------|-------------------|
@@ -28,21 +28,24 @@ Aizpildiet Linodes standarta servera izveides veidlapu:
 | **Reģions** | Vistuvāk jūsu lietotājiem |
 | **Plāns** | Koplietots CPU 4 GB vai lielāks |
 | **Saknes parole** | Iestatiet spēcīgu paroli |
+| **Ugunsmūris** | Nav ugunsmūra *(ieteicams)* |
 | **Laika josla** *(mūsu vienīgais lauks)* | Jūsu servera laika josla (noklusējums: Asia/Ho_Chi_Minh) |
+
+> **Kāpēc nav ugunsmūra?** Iestatīšanas skriptam ir nepieciešama piekļuve internetam (Docker pulls, Let's Encrypt). Portu bloķēšana pirmās sāknēšanas laikā var izraisīt izvietošanas neizdošanos. Pēc iestatīšanas varat pievienot ugunsmūri — pareizos noteikumus skatiet tālāk [Ugunsmūra noteikumi] (#firewall-rules-linode-cloud-firewall).
 
 Kad esat pabeidzis, noklikšķiniet uz **Izveidot Linode**.
 
 ---
 
-## 3. darbība. Pagaidiet, līdz iestatīšana ir pabeigta
+## 3. darbība. Pagaidiet, līdz iestatīšana ir pabeigta
 
 Skripts tiek palaists automātiski pirmajā sāknēšanas reizē. Tas instalē Docker, izvelk rtSurvey attēlu, inicializē datu bāzi un startē visus pakalpojumus. Tas aizņem **5–10 minūtes**.
 
-Jūs varat vērot progresu tieši programmā **Linode Cloud Manager** — nav nepieciešams SSH:
+Varat vērot progresu tieši programmā **Linode Cloud Manager** — nav nepieciešams SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Noklikšķiniet uz jaunizveidotās Linodes
-3. Noklikšķiniet uz **Palaist LISH konsoli** (Linode detalizētās informācijas lapas augšējā labajā stūrī).
+2. Noklikšķiniet uz jaunizveidotā Linode
+3. Noklikšķiniet uz **Launch LISH Console** (Linode detalizētās informācijas lapas augšējā labajā stūrī).
 
 Tiek atvērts pārlūkprogrammas terminālis, kurā tiek rādīts tiešraides sāknēšanas žurnāls — cilne **Weblish** darbojas tieši jūsu pārlūkprogrammā, nav nepieciešams SSH klients.
 
@@ -73,13 +76,7 @@ Lai konfigurētu HTTPS, izpildiet **[SSL iestatīšanas rokasgrāmatu →](../ss
 
 ---
 
-## 5. darbība — pirmā pieteikšanās
-
-Kad SSL ir aktīvs, izpildiet **[Pirmās pieteikšanās rokasgrāmatu →](../first-login)**, lai piekļūtu administratora kontam.
-
----
-
-## 6. darbība — mainiet noklusējuma paroli
+## 5. darbība — mainiet noklusējuma paroli
 
 Visām parolēm pēc noklusējuma ir “admin”. Mainiet tos uzreiz pēc pirmās pieteikšanās:
 
@@ -88,9 +85,9 @@ Visām parolēm pēc noklusējuma ir “admin”. Mainiet tos uzreiz pēc pirmā
 
 ---
 
-## Ugunsmūra noteikumi (Linode Cloud Firewall)
+## Ugunsmūra noteikumi (Linode mākoņa ugunsmūris)
 
-Ja šim serverim pievienojat Linode Cloud Firewall, izmantojiet šādus noteikumus:
+Ja šim serverim pievienojat Linode mākoņa ugunsmūri, izmantojiet šādus noteikumus:
 
 ### Ienākošais
 
@@ -107,7 +104,7 @@ Ja šim serverim pievienojat Linode Cloud Firewall, izmantojiet šādus noteikum
 
 | Etiķete | Darbība | Piezīmes |
 |-------|---------|-------|
-| Noklusējuma izejošā politika | **Pieņemt** | Atļaut visu izejošo (Docker pulls, certbot, GoDaddy API utt.) |
+| Noklusējuma izejošā politika | **Pieņemt** | Atļaut visus izejošos (Docker pull, certbot, GoDaddy API utt.) |
 
 ### Porti NAV nepieciešami ārēji
 
@@ -116,7 +113,7 @@ Ja šim serverim pievienojat Linode Cloud Firewall, izmantojiet šādus noteikum
 | Osta | Pakalpojums | Iemesls |
 |------|---------|--------|
 | 8080 | Lietotņu konteiners | Nginx starpniekserveri tam iekšēji |
-| 8090 | Atslēgvārpa konteiners | Nginx starpniekserveri tam iekšēji |
+| 8090 | Keycloak konteiners | Nginx starpniekserveri tam iekšēji |
 | 3306 | MySQL | Tikai iekšējais Docker tīkls |
 
 ---

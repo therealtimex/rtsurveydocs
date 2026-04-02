@@ -7,28 +7,31 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "StackScript kullanarak rtCloud'u Linode'a dağıtın. Yapılandırma gerekmez; yalnızca sunucuyu oluşturun ve dağıtım sonrası adımları izleyin."
+description: "StackScript kullanarak rtCloud'i Linode'e dağıtın. Yapılandırma gerekmez; yalnızca sunucuyu oluşturun ve dağıtım sonrası adımları izleyin."
 ---
 
 ## Adım 1 — StackScript'i başlatın
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Bu, Linode Bulut Yöneticisinde StackScript sayfasını açar. **Yeni Linode'u Dağıt**'ı tıklayın.
+Bu, Linode Bulut Yöneticisinde StackScript sayfasını açar. **Yeni Linode Dağıt**'a tıklayın.
 
 ---
 
-## Adım 2 — Linode'un formunu doldurun
+## Adım 2 — Linode formunu doldurun
 
-Linode'un standart sunucu oluşturma formunu doldurun:
+Linode'in standart sunucu oluşturma formunu doldurun:
 
 | Alan | Önerilen değer |
 |----------|----------|
-| **Resim** | Ubuntu 22.04LTS |
+| **Resim** | Ubuntu 22,04 LTS |
 | **Bölge** | Kullanıcılarınıza en yakın |
 | **Plan** | Paylaşılan CPU 4 GB veya daha büyük |
 | **Kök Şifresi** | Güçlü bir şifre belirleyin |
-| **Saat Dilimi** *(tek alanımız)* | Sunucunuzun saat dilimi (varsayılan: `Asia/Ho_Chi_Minh`) |
+| **Firewall** | No Firewall *(recommended)* |
+| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+
+> **Neden güvenlik duvarı yok?** Kurulum komut dosyasının giden internet erişimine ihtiyacı vardır (Docker çeker, Let's Encrypt). İlk önyükleme sırasında bağlantı noktalarının engellenmesi dağıtımın başarısız olmasına neden olabilir. Kurulum tamamlandıktan sonra bir güvenlik duvarı ekleyebilirsiniz. Doğru kurallar için aşağıdaki [Güvenlik duvarı kuralları](#firewall-rules-linode-cloud-firewall) konusuna bakın.
 
 İşiniz bittiğinde **Linode Oluştur**'a tıklayın.
 
@@ -36,12 +39,12 @@ Linode'un standart sunucu oluşturma formunu doldurun:
 
 ## Adım 3 — Kurulumun tamamlanmasını bekleyin
 
-Komut dosyası ilk açılışta otomatik olarak çalışır. Docker'ı yükler, rtSurvey imajını çeker, veritabanını başlatır ve tüm hizmetleri başlatır. Bu **5–10 dakika** sürer.
+Komut dosyası ilk açılışta otomatik olarak çalışır. Docker'i yükler, rtSurvey görüntüsünü çeker, veritabanını başlatır ve tüm hizmetleri başlatır. Bu **5–10 dakika** sürer.
 
 İlerlemeyi doğrudan **Linode Bulut Yöneticisi**'nde izleyebilirsiniz; SSH gerekmez:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Yeni oluşturduğunuz Linode'a tıklayın
+2. Yeni oluşturulan Linode'inize tıklayın
 3. **LISH Konsolunu Başlat**'a tıklayın (Linode ayrıntı sayfasının sağ üst kısmında)
 
 Canlı önyükleme günlüğünü gösteren bir tarayıcı terminali açılır — **Weblish** sekmesi doğrudan tarayıcınızda çalışır, SSH istemcisine gerek yoktur.
@@ -79,7 +82,7 @@ SSL etkinleştirildikten sonra yönetici hesabına erişmek için **[İlk Giriş
 
 ---
 
-## Step 6 — Change the default password
+## Adım 6 — Varsayılan şifreyi değiştirin
 
 Tüm şifreler varsayılan olarak "admin"dir. İlk girişinizden hemen sonra bunları değiştirin:
 
@@ -94,7 +97,7 @@ Bu sunucuya bir Linode Bulut Güvenlik Duvarı eklerseniz aşağıdaki kurallar�
 
 ### Gelen
 
-| Label | Action | Protocol | Port | Sources | Notes |
+| Etiket | Eylem | Protokol | Liman | Kaynaklar | Notlar |
 |----------|-----------|----------|------|------------|-------|
 | `gelen-ssh'yi kabul et' | Kabul et | TCP | 22 | Tüm IPv4, Tüm IPv6 | SSH erişimi |
 | 'gelen-http'yi kabul et' | Kabul et | TCP | 80 | Tüm IPv4, Tüm IPv6 | Nginx (HTTP + ACME mücadelesi) |
@@ -103,11 +106,11 @@ Bu sunucuya bir Linode Bulut Güvenlik Duvarı eklerseniz aşağıdaki kurallar�
 | 'gelen-icmp'yi kabul et' | Kabul et | ICMP | — | Tüm IPv4, Tüm IPv6 | Ping / teşhis |
 | Varsayılan gelen politikası | **Bırak** | | | | Diğer her şeyi engelle |
 
-### Outbound
+### Giden
 
 | Etiket | Eylem | Notlar |
 |----------|-----------|-------|
-| Varsayılan giden politikası | **Kabul et** | Tüm gidenlere izin ver (Docker çekmeleri, sertifika botu, GoDaddy API vb.) |
+| Varsayılan giden politikası | **Kabul et** | Tüm gidenlere izin ver (Docker çekmeleri, sertifika botu, GoDaddy API, vb.) |
 
 ### Bağlantı noktalarına harici olarak gerek DEĞİLDİR
 
@@ -116,7 +119,7 @@ Bu bağlantı noktaları yalnızca "127.0.0.1"e bağlıdır ve sunucunun dışı
 | Liman | Hizmet | Nedeni |
 |------|------------|--------|
 | 8080 | Uygulama kapsayıcısı | Nginx dahili olarak proxy'ler |
-| 8090 | Anahtarlık konteyneri | Nginx dahili olarak proxy'ler |
+| 8090 | Keycloak konteyneri | Nginx dahili olarak proxy'ler |
 | 3306 | MySQL | Yalnızca dahili Docker ağı |
 
 ---

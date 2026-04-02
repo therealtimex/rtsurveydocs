@@ -7,14 +7,14 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Wdróż rtCloud na Linode za pomocą StackScript. Nie jest wymagana żadna konfiguracja — po prostu utwórz serwer i postępuj zgodnie z instrukcjami po wdrożeniu."
+description: "Wdróż rtCloud na Linode przy użyciu StackScript. Nie jest wymagana żadna konfiguracja — po prostu utwórz serwer i postępuj zgodnie z instrukcjami po wdrożeniu."
 ---
 
 ## Krok 1 — Uruchom StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Kliknij **Wdróż nowy Linode**.
+Spowoduje to otwarcie strony StackScript w Linode Cloud Manager. Kliknij **Wdróż nowy Linode**.
 
 ---
 
@@ -22,13 +22,16 @@ This opens the StackScript page in Linode Cloud Manager. Kliknij **Wdróż nowy 
 
 Wypełnij standardowy formularz tworzenia serwera Linode:
 
-| Pole | Recommended value |
+| Pole | Zalecana wartość |
 |-------|----------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Wspólny procesor 4 GB lub większy |
+| **Obraz** | Ubuntu 22.04 LTS |
+| **Region** | Najbliżej Twoich użytkowników |
+| **Planuj** | Wspólny procesor 4 GB lub większy |
 | **Hasło roota** | Ustaw silne hasło |
+| **Zapora sieciowa** | Brak zapory sieciowej *(zalecane)* |
 | **Strefa czasowa** *(nasze jedyne pole)* | Twoja strefa czasowa serwera (domyślnie: `Asia/Ho_Chi_Minh`) |
+
+> **Dlaczego nie ma zapory ogniowej?** Skrypt instalacyjny wymaga wychodzącego dostępu do Internetu (pobieranie Docker, Let's Encrypt). Blokowanie portów podczas pierwszego rozruchu może spowodować niepowodzenie wdrożenia. Zaporę sieciową możesz podłączyć po zakończeniu konfiguracji — zobacz [Reguły zapory sieciowej](#firewall-rules-linode-cloud-firewall) poniżej, aby poznać prawidłowe reguły.
 
 Po zakończeniu kliknij **Utwórz Linode**.
 
@@ -36,7 +39,7 @@ Po zakończeniu kliknij **Utwórz Linode**.
 
 ## Krok 3 — Poczekaj na zakończenie instalacji
 
-Skrypt uruchamia się automatycznie przy pierwszym uruchomieniu. Instaluje Dockera, pobiera obraz rtSurvey, inicjuje bazę danych i uruchamia wszystkie usługi. Zajmuje to **5–10 minut**.
+Skrypt uruchamia się automatycznie przy pierwszym uruchomieniu. Instaluje Docker, pobiera obraz rtSurvey, inicjuje bazę danych i uruchamia wszystkie usługi. Zajmuje to **5–10 minut**.
 
 Możesz śledzić postęp bezpośrednio w **Linode Cloud Manager** — nie jest wymagane SSH:
 
@@ -65,7 +68,7 @@ Dziennik pokazuje również adres IP Twojego serwera — będziesz go potrzebowa
 
 ---
 
-## Step 4 — Set up SSL
+## Krok 4 — Skonfiguruj SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
@@ -88,9 +91,9 @@ Wszystkie hasła domyślnie ustawione są na „admin”. Zmień je natychmiast 
 
 ---
 
-## Reguły zapory sieciowej (zapora sieciowa Linode Cloud)
+## Reguły zapory sieciowej (zapora sieciowa Linode w chmurze)
 
-Jeśli podłączysz zaporę sieciową Linode Cloud do tego serwera, zastosuj następujące zasady:
+Jeśli podłączysz do tego serwera zaporę sieciową Linode Cloud Firewall, zastosuj następujące zasady:
 
 ### Przychodzące
 
@@ -98,16 +101,16 @@ Jeśli podłączysz zaporę sieciową Linode Cloud do tego serwera, zastosuj nas
 |-------|--------|----------|------|---------|-------|
 | `zaakceptuj-przychodzący-ssh` | Zaakceptuj | TCP | 22 | Wszystkie IPv4, wszystkie IPv6 | Dostęp SSH |
 | `zaakceptuj-przychodzący-http` | Zaakceptuj | TCP | 80 | Wszystkie IPv4, wszystkie IPv6 | Nginx (wyzwanie HTTP + ACME) |
-| `accept-inbound-https` | Accept | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
+| `zaakceptuj-przychodzący-https` | Zaakceptuj | TCP | 443 | Wszystkie IPv4, wszystkie IPv6 | Nginx (HTTPS po konfiguracji SSL) |
 | `akceptuj-przychodzące-błyszczące` | Zaakceptuj | TCP | 3838 | Wszystkie IPv4, wszystkie IPv6 | Shiny Server (analiza R) |
 | `zaakceptuj-przychodzący-icmp` | Zaakceptuj | ICMP | — | Wszystkie IPv4, wszystkie IPv6 | Ping / diagnostyka |
 | Domyślna polityka przychodząca | **Upuść** | | | | Zablokuj wszystko inne |
 
 ### Wychodzące
 
-| Etykieta | Akcja | Notatki |
+| Label | Action | Notes |
 |-------|------------|------|
-| Domyślna polityka wychodząca | **Zaakceptuj** | Zezwalaj na wszystkie połączenia wychodzące (ściągnięcia Dockera, certbot, GoDaddy API itp.) |
+| Domyślna polityka wychodząca | **Zaakceptuj** | Zezwalaj na wszystkie połączenia wychodzące (ściąganie Docker, certbot, GoDaddy API itp.) |
 
 ### Porty NIE są potrzebne zewnętrznie
 
@@ -115,9 +118,9 @@ Te porty są powiązane tylko z `127.0.0.1` i nigdy nie są osiągalne spoza ser
 
 | Port | Usługa | Powód |
 |------|---------|--------|
-| 8080 | Kontener aplikacji | Nginx proxy do niego wewnętrznie |
-| 8090 | Pojemnik na klucze | Nginx proxy do niego wewnętrznie |
-| 3306 | MySQL | Tylko wewnętrzna sieć Docker |
+| 8080 | Kontener aplikacji | Wewnętrzne proxy Nginx |
+| 8090 | Pojemnik Keycloak | Wewnętrzne proxy Nginx |
+| 3306 | MySQL | Internal Docker network only |
 
 ---
 
@@ -135,7 +138,7 @@ tail -200 /var/log/stackscript.log
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### Wyświetl status kontenera
+### Wyświetl stan kontenera
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

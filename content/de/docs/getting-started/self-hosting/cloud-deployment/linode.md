@@ -7,20 +7,20 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Stellen Sie rtCloud mit einem StackScript auf Linode bereit. Keine Konfiguration erforderlich – erstellen Sie einfach den Server und befolgen Sie die Schritte nach der Bereitstellung."
+description: "Stellen Sie rtCloud auf Linode mithilfe eines StackScript bereit. Keine Konfiguration erforderlich – erstellen Sie einfach den Server und befolgen Sie die Schritte nach der Bereitstellung."
 ---
 
-## Schritt 1 – Starten Sie StackScript
+## Schritt 1 – Starten Sie den StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Dadurch wird die StackScript-Seite im Linode Cloud Manager geöffnet. Klicken Sie auf **Neuen Linode bereitstellen**.
+Dadurch wird die StackScript-Seite im Linode Cloud Manager geöffnet. Klicken Sie auf **Neues Linode bereitstellen**.
 
 ---
 
-## Schritt 2 – Füllen Sie das Linode-Formular aus
+## Schritt 2 – Füllen Sie das Formular von Linode aus
 
-Füllen Sie das Standardformular zur Servererstellung von Linode aus:
+Füllen Sie das Standard-Servererstellungsformular von Linode aus:
 
 | Feld | Empfohlener Wert |
 |-------|----|
@@ -28,7 +28,10 @@ Füllen Sie das Standardformular zur Servererstellung von Linode aus:
 | **Region** | Am nächsten an Ihren Benutzern |
 | **Plan** | Gemeinsam genutzte CPU 4 GB oder mehr |
 | **Root-Passwort** | Legen Sie ein sicheres Passwort fest |
+| **Firewall** | Keine Firewall *(empfohlen)* |
 | **Zeitzone** *(unser einziges Feld)* | Ihre Server-Zeitzone (Standard: „Asia/Ho_Chi_Minh“) |
+
+> **Warum keine Firewall?** Das Setup-Skript benötigt ausgehenden Internetzugriff (Docker zieht, Let's Encrypt). Das Blockieren von Ports beim ersten Start kann dazu führen, dass die Bereitstellung fehlschlägt. Sie können eine Firewall hinzufügen, nachdem die Einrichtung abgeschlossen ist. Die richtigen Regeln finden Sie weiter unten unter [Firewall-Regeln](#firewall-rules-linode-cloud-firewall).
 
 Klicken Sie abschließend auf **Linode erstellen**.
 
@@ -41,7 +44,7 @@ Das Skript wird beim ersten Start automatisch ausgeführt. Es installiert Docker
 Sie können den Fortschritt direkt im **Linode Cloud Manager** verfolgen – kein SSH erforderlich:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Klicken Sie auf Ihren neu erstellten Linode
+2. Klicken Sie auf Ihr neu erstelltes Linode
 3. Klicken Sie auf **LISH-Konsole starten** (oben rechts auf der Linode-Detailseite).
 
 Es öffnet sich ein Browser-Terminal mit dem Live-Boot-Protokoll – die Registerkarte **Weblish** funktioniert direkt in Ihrem Browser, kein SSH-Client erforderlich.
@@ -73,13 +76,7 @@ Befolgen Sie die **[Anleitung zum Einrichten von SSL →](../ssl-setup)**, um HT
 
 ---
 
-## Schritt 5 – Erster Login
-
-Sobald SSL aktiv ist, folgen Sie der **[Anleitung zur ersten Anmeldung →](../first-login)**, um auf das Administratorkonto zuzugreifen.
-
----
-
-## Schritt 6 – Ändern Sie das Standardkennwort
+## Schritt 5 – Ändern Sie das Standardkennwort
 
 Alle Passwörter lauten standardmäßig „admin“. Ändern Sie diese sofort nach Ihrem ersten Login:
 
@@ -97,7 +94,7 @@ Wenn Sie eine Linode Cloud Firewall an diesen Server anschließen, verwenden Sie
 | Etikett | Aktion | Protokoll | Hafen | Quellen | Notizen |
 |-------|--------|----------|------|---------|-------|
 | `accept-inbound-ssh` | Akzeptieren | TCP | 22 | Alle IPv4, Alle IPv6 | SSH-Zugriff |
-| `accept-inbound-http` | Akzeptieren | TCP | 80 | Alle IPv4, Alle IPv6 | Nginx (HTTP + ACME-Herausforderung) |
+| `accept-inbound-http` | Akzeptieren | TCP | 80 | Alle IPv4, Alle IPv6 | Nginx (HTTP + ACME-Challenge) |
 | `accept-inbound-https` | Akzeptieren | TCP | 443 | Alle IPv4, Alle IPv6 | Nginx (HTTPS nach SSL-Einrichtung) |
 | `accept-inbound-shiny` | Akzeptieren | TCP | 3838 | Alle IPv4, Alle IPv6 | Shiny Server (R-Analyse) |
 | `accept-inbound-icmp` | Akzeptieren | ICMP | — | Alle IPv4, Alle IPv6 | Ping / Diagnose |
@@ -116,7 +113,7 @@ Diese Ports sind nur an „127.0.0.1“ gebunden und niemals von außerhalb des 
 | Hafen | Service | Grund |
 |------|---------|--------|
 | 8080 | App-Container | Nginx stellt intern einen Proxy her |
-| 8090 | Keycloak-Behälter | Nginx stellt intern einen Proxy her |
+| 8090 | Keycloak-Container | Nginx stellt intern einen Proxy her |
 | 3306 | MySQL | Nur internes Docker-Netzwerk |
 
 ---

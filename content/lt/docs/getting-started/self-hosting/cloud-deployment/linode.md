@@ -7,14 +7,14 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Įdiekite „rtCloud“ „Linode“ naudodami „StackScript“. Nereikia jokios konfigūracijos – tiesiog sukurkite serverį ir atlikite veiksmus po įdiegimo."
+description: "Įdiekite rtCloud Linode naudodami StackScript. Nereikia jokios konfigūracijos – tiesiog sukurkite serverį ir atlikite veiksmus po įdiegimo."
 ---
 
-## 1 veiksmas – paleiskite „StackScript“.
+## 1 veiksmas – paleiskite StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Tai atidaro „StackScript“ puslapį „Linode Cloud Manager“. Spustelėkite **Deploy New Linode**.
+Tai atidaro StackScript puslapį Linode Cloud Manager. Spustelėkite **Įdiegti naują Linode**.
 
 ---
 
@@ -28,21 +28,24 @@ Užpildykite Linode standartinę serverio kūrimo formą:
 | **Regionas** | Arčiausiai jūsų naudotojų |
 | **Planas** | Bendras CPU 4 GB ar didesnis |
 | **Root slaptažodis** | Nustatykite tvirtą slaptažodį |
+| **Ugniasienė** | Nėra ugniasienės *(rekomenduojama)* |
 | **Laiko juosta** *(mūsų vienintelis laukas)* | Jūsų serverio laiko juosta (numatytasis: „Asia/Ho_Chi_Minh“) |
 
-Baigę spustelėkite **Sukurti linodą**.
+> **Kodėl nėra ugniasienės?** Sąrankos scenarijui reikia išeinančios interneto prieigos (Docker traukia, Let's Encrypt). Užblokavus prievadus pirmojo įkrovimo metu, diegimas gali nepavykti. Užkardą galite pridėti, kai sąranka bus baigta – teisingų taisyklių ieškokite toliau [Ugniasienės taisyklės](#firewall-rules-linode-cloud-firewall).
+
+Baigę spustelėkite **Sukurti Linode**.
 
 ---
 
 ## 3 veiksmas – palaukite, kol sąranka bus baigta
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Scenarijus paleidžiamas automatiškai pirmą kartą paleidžiant. Jis įdiegia Docker, ištraukia rtSurvey vaizdą, inicijuoja duomenų bazę ir paleidžia visas paslaugas. Tai trunka **5–10 minučių**.
 
 Pažangą galite stebėti tiesiogiai naudodami **Linode Cloud Manager** – nereikia SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Spustelėkite savo naujai sukurtą Linode
-3. Spustelėkite **Paleisti LISH konsolę** (išsamios Linode puslapio viršuje, dešinėje)
+2. Spustelėkite naujai sukurtą Linode
+3. Spustelėkite **Paleisti LISH konsolę** (Linode išsamios informacijos puslapio viršuje, dešinėje)
 
 Atsidaro naršyklės terminalas, kuriame rodomas tiesioginis įkrovos žurnalas – skirtukas **Weblish** veikia tiesiogiai jūsų naršyklėje, nereikia SSH kliento.
 
@@ -81,16 +84,16 @@ Kai SSL bus aktyvus, vadovaukitės **[Pirmojo prisijungimo vadovas →](../first
 
 ## 6 veiksmas – pakeiskite numatytąjį slaptažodį
 
-All passwords default to `admin`. Change them immediately after your first login:
+Pagal numatytuosius nustatymus visi slaptažodžiai yra „admin“. Pakeiskite juos iškart po pirmojo prisijungimo:
 
 - **Programos administratoriaus slaptažodis** – paskyros nustatymai programoje
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## Ugniasienės taisyklės (Linode Cloud Firewall)
+## Ugniasienės taisyklės (Linode debesies užkarda)
 
-Jei prie šio serverio prijungiate Linode Cloud Firewall, vadovaukitės šiomis taisyklėmis:
+Jei prie šio serverio prijungiate Linode debesies užkardą, vadovaukitės šiomis taisyklėmis:
 
 ### Atvyksta
 
@@ -107,7 +110,7 @@ Jei prie šio serverio prijungiate Linode Cloud Firewall, vadovaukitės šiomis 
 
 | Etiketė | Veiksmas | Pastabos |
 |-------|---------|-------|
-| Numatytoji siuntimo politika | **Priimti** | Leisti visus išeinančius („Docker“ ištraukimus, „certbot“, „GoDaddy“ API ir kt.) |
+| Numatytoji siuntimo politika | **Priimti** | Leisti visus siunčiamus (Docker ištraukimus, certbot, GoDaddy API ir kt.) |
 
 ### Prievadai NĖRA reikalingi išoriškai
 
@@ -115,8 +118,8 @@ Jei prie šio serverio prijungiate Linode Cloud Firewall, vadovaukitės šiomis 
 
 | Uostas | Paslauga | Priežastis |
 |------|---------|--------|
-| 8080 | Programos konteineris | „Nginx“ tarpinis serveris jam naudojamas viduje |
-| 8090 | Keycloak konteineris | „Nginx“ tarpinis serveris jam naudojamas viduje |
+| 8080 | Programos konteineris | Nginx tarpinis serveris prie jo viduje |
+| 8090 | Keycloak konteineris | Nginx tarpinis serveris yra jo viduje |
 | 3306 | MySQL | Tik vidinis Docker tinklas |
 
 ---

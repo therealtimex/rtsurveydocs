@@ -7,20 +7,20 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Ota rtCloud käyttöön Linodessa StackScriptin avulla. Määrityksiä ei tarvita – luo vain palvelin ja seuraa käyttöönoton jälkeisiä vaiheita."
+description: "Ota rtCloud käyttöön Linode:ssä StackScript:n avulla. Määrityksiä ei tarvita – luo vain palvelin ja seuraa käyttöönoton jälkeisiä vaiheita."
 ---
 
 ## Vaihe 1 – Käynnistä StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Tämä avaa StackScript-sivun Linode Cloud Managerissa. Napsauta **Ota uusi Linode käyttöön**.
+Tämä avaa StackScript-sivun Linode Cloud Managerissa. Napsauta **Ota käyttöön uusi Linode**.
 
 ---
 
-## Vaihe 2 – Täytä Linoden lomake
+## Vaihe 2 – Täytä Linode:n lomake
 
-Täytä Linoden vakiopalvelimen luontilomake:
+Täytä Linode:n vakiopalvelimen luontilomake:
 
 | Kenttä | Suositeltu arvo |
 |-------|-------------------|
@@ -28,20 +28,23 @@ Täytä Linoden vakiopalvelimen luontilomake:
 | **Alue** | Lähimpänä käyttäjiäsi |
 | **Suunnitelma** | Jaettu CPU 4 Gt tai suurempi |
 | **Root-salasana** | Aseta vahva salasana |
+| **Palomuuri** | Ei palomuuria *(suositus)* |
 | **Aikavyöhyke** *(ainoa kenttämme)* | Palvelimesi aikavyöhyke (oletus: Aasia/Ho_Chi_Minh) |
 
-Napsauta **Luo linode**, kun olet valmis.
+> **Miksi ei palomuuria?** Asennusskripti tarvitsee lähtevän Internet-yhteyden (Docker vetää, Let's Encrypt). Porttien estäminen ensimmäisen käynnistyksen aikana voi aiheuttaa käyttöönoton epäonnistumisen. Voit liittää palomuurin asennuksen jälkeen – katso oikeat säännöt alta [Palomuurisäännöt](#firewall-rules-linode-cloud-firewall).
+
+Napsauta **Luo Linode**, kun olet valmis.
 
 ---
 
 ## Vaihe 3 – Odota, että asennus on valmis
 
-Skripti suoritetaan automaattisesti ensimmäisen käynnistyksen yhteydessä. Se asentaa Dockerin, vetää rtSurvey-kuvan, alustaa tietokannan ja käynnistää kaikki palvelut. Tämä kestää **5–10 minuuttia**.
+Skripti suoritetaan automaattisesti ensimmäisen käynnistyksen yhteydessä. Se asentaa Docker:n, vetää rtSurvey-kuvan, alustaa tietokannan ja käynnistää kaikki palvelut. Tämä kestää **5–10 minuuttia**.
 
-Voit seurata edistymistä suoraan **Linode Cloud Managerissa** – SSH:ta ei tarvita:
+Voit seurata edistymistä suoraan **Linode Cloud Managerissa** – SSH:ta ei vaadita:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Napsauta äskettäin luotua Linodiasi
+2. Napsauta äskettäin luotua Linode:ää
 3. Napsauta **Käynnistä LISH-konsoli** (Linode-tietosivun oikeassa yläkulmassa).
 
 Selainpääte avautuu ja näyttää live-käynnistyslokin – **Weblish**-välilehti toimii suoraan selaimessasi, eikä SSH-asiakasta tarvita.
@@ -73,13 +76,7 @@ Määritä HTTPS noudattamalla **[SSL-asetusopas →](../ssl-setup)**. Ilmainen 
 
 ---
 
-## Vaihe 5 – Ensimmäinen kirjautuminen
-
-Kun SSL on käytössä, seuraa **[Ensimmäisen kirjautumisoppaan →](../first-login)** ohjeita päästäksesi järjestelmänvalvojan tiliin.
-
----
-
-## Vaihe 6 – Vaihda oletussalasana
+## Vaihe 5 – Vaihda oletussalasana
 
 Kaikki salasanat ovat oletuksena "admin". Vaihda ne heti ensimmäisen kirjautumisen jälkeen:
 
@@ -107,16 +104,16 @@ Jos liität Linode Cloud Firewallin tähän palvelimeen, käytä seuraavia sää
 
 | Etiketti | Toiminta | Huomautuksia |
 |-------|---------|-------|
-| Default outbound policy | **Hyväksy** | Salli kaikki lähtevät (Docker-vedot, certbot, GoDaddy API jne.) |
+| Lähtevien viestien oletuskäytäntö | **Hyväksy** | Salli kaikki lähtevät (Docker-vedot, certbot, GoDaddy API jne.) |
 
 ### Portteja EI tarvita ulkoisesti
 
 Nämä portit on sidottu vain porttiin "127.0.0.1", eivätkä ne ole koskaan tavoitettavissa palvelimen ulkopuolelta:
 
 | Portti | Palvelu | Syy |
-|------|---------|--------|
+|------|----------|--------|
 | 8080 | Sovellussäiliö | Nginx välityspalvelimet siihen sisäisesti |
-| 8090 | Avaimenperä | Nginx välityspalvelimet siihen sisäisesti |
+| 8090 | Keycloak kontti | Nginx välityspalvelimet siihen sisäisesti |
 | 3306 | MySQL | Vain sisäinen Docker-verkko |
 
 ---

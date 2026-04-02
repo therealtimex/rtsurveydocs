@@ -14,21 +14,24 @@ description: "使用 StackScript 在 Linode 上部署 rtCloud。無需配置 - �
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-這將開啟 Linode Cloud Manager 中的 StackScript 頁面。按一下**部署新的 Linode**。
+這將在 Linode Cloud Manager 中開啟 StackScript 頁面。按一下“**部署新的 Linode**”。
 
 ---
 
-## 第 2 步 — 填寫 Linode 的表格
+## 步驟 2 — 填寫 Linode 的表格
 
 填寫Linode的標準伺服器建立表單：
 
 |領域 |建議值|
 |--------|------------------|
-| **圖片** | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS
+| **圖片** | Ubuntu 22.04 LTS |
 | **地區** |最貼近您的使用者 |
 | **方案** |共享 CPU 4 GB 或更大 |
 | **根密碼** |設定強密碼 |
+| **防火牆** |無防火牆*（建議）* |
 | **時區** *（我們唯一的欄位）* |您的伺服器時區（預設值：`Asia/Ho_Chi_Minh`）|
+
+> **為什麼沒有防火牆？ ** 安裝腳本需要出站網路存取（Docker 拉動，Let's Encrypt）。首次啟動期間封鎖連接埠可能會導致部署失敗。設定完成後，您可以附加防火牆 - 請參閱下方的[防火牆規則](#firewall-rules-linode-cloud-firewall) 以了解正確的規則。
 
 完成後點選 **建立 Linode**。
 
@@ -36,15 +39,15 @@ description: "使用 StackScript 在 Linode 上部署 rtCloud。無需配置 - �
 
 ## 步驟 3 — 等待設定完成
 
-該腳本在首次啟動時自動運行。它會安裝 Docker、拉取 rtSurvey 映像、初始化資料庫並啟動所有服務。這需要 **5-10 分鐘**。
+該腳本在首次啟動時自動運行。它安裝 Docker、拉取 rtSurvey 映像、初始化資料庫並啟動所有服務。這需要 **5-10 分鐘**。
 
 您可以直接在 **Linode Cloud Manager** 中查看進度 - 無需 SSH：
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. 點選您新建立的Linode
+2.點擊您新建立的Linode
 3. 點選**啟動 LISH 控制台**（Linode 詳細資料頁面右上角）
 
-將開啟一個瀏覽器終端，顯示即時啟動日誌 - **Weblish** 標籤直接在瀏覽器中執行，無需 SSH 用戶端。
+將開啟瀏覽器終端，顯示即時啟動日誌 - **Weblish** 標籤直接在瀏覽器中執行，無需 SSH 用戶端。
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
@@ -65,7 +68,7 @@ description: "使用 StackScript 在 Linode 上部署 rtCloud。無需配置 - �
 
 ---
 
-## Step 4 — Set up SSL
+## 步驟 4 — 設定 SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
@@ -73,13 +76,7 @@ Open your browser at `http://<server-ip>`. The app will redirect you to the SSL 
 
 ---
 
-## 步驟 5 — 首次登入
-
-SSL 啟動後，請依照 **[首次登入指南 →](../first-login)** 存取管理員帳號。
-
----
-
-## 步驟 6 — 更改預設密碼
+## 步驟 5 — 更改預設密碼
 
 所有密碼預設為“admin”。首次登入後立即更改它們：
 
@@ -103,7 +100,7 @@ SSL 啟動後，請依照 **[首次登入指南 →](../first-login)** 存取管
 | `接受入站 icmp` |接受 | ICMP | — |所有 IPv4、所有 IPv6 | Ping / 診斷 |
 |預設入站策略 | **掉落** | | | |阻止其他所有內容 |
 
-### 出境
+### 出站
 
 |標籤|行動|筆記|
 |--------|--------|--------|
@@ -115,8 +112,8 @@ SSL 啟動後，請依照 **[首次登入指南 →](../first-login)** 存取管
 
 |港口|服務 |原因 |
 |------|---------|--------|
-| 8080|應用容器| Nginx 在內部代理它 |
-| 8090|鑰匙斗篷容器| Nginx 在內部代理它 |
+| 8080|應用容器 | Nginx 在內部代理它 |
+| 8090| Keycloak 容器 | Nginx 內部代理程式 |
 | 3306| MySQL |僅限內部 Docker 網路 |
 
 ---

@@ -7,14 +7,14 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Terapkan rtCloud di Linode menggunakan StackScript. Tidak diperlukan konfigurasi — cukup buat server dan ikuti langkah-langkah pasca penerapan."
+description: "Terapkan rtCloud pada Linode menggunakan StackScript. Tidak diperlukan konfigurasi — cukup buat server dan ikuti langkah-langkah pasca penerapan."
 ---
 
 ## Langkah 1 — Luncurkan StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Ini akan membuka halaman StackScript di Linode Cloud Manager. Klik **Sebarkan Linode Baru**.
+Ini akan membuka halaman StackScript di Linode Cloud Manager. Klik **Terapkan Linode Baru**.
 
 ---
 
@@ -28,9 +28,12 @@ Isi formulir pembuatan server standar Linode:
 | **Wilayah** | Paling dekat dengan pengguna Anda |
 | **Rencana** | CPU Bersama 4 GB atau lebih besar |
 | **Kata Sandi Akar** | Tetapkan kata sandi yang kuat |
+| **Firewall** | Tanpa Firewall *(disarankan)* |
 | **Zona Waktu** *(satu-satunya bidang kami)* | Zona waktu server Anda (default: `Asia/Ho_Chi_Minh`) |
 
-Klik **Buat Linode** setelah selesai.
+> **Mengapa tidak ada firewall?** Skrip pengaturan memerlukan akses internet keluar (tarikan Docker, Let's Encrypt). Memblokir port saat boot pertama dapat menyebabkan penerapan gagal. Anda dapat memasang firewall setelah penyiapan selesai — lihat [Aturan firewall](#firewall-rules-linode-cloud-firewall) di bawah untuk mengetahui aturan yang benar.
+
+Click **Create Linode** when done.
 
 ---
 
@@ -41,8 +44,8 @@ Skrip berjalan secara otomatis pada boot pertama. Ia menginstal Docker, menarik 
 Anda dapat melihat kemajuannya langsung di **Linode Cloud Manager** — tidak memerlukan SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Klik pada Linode yang baru Anda buat
-3. Klik **Luncurkan LISH Console** (kanan atas halaman detail Linode)
+2. Klik Linode yang baru Anda buat
+3. Klik **Luncurkan Konsol LISH** (kanan atas halaman detail Linode)
 
 Terminal browser terbuka dan menampilkan log boot langsung — tab **Weblish** berfungsi langsung di browser Anda, tidak diperlukan klien SSH.
 
@@ -73,13 +76,7 @@ Ikuti **[Panduan Konfigurasi SSL →](../ssl-setup)** untuk mengonfigurasi HTTPS
 
 ---
 
-## Langkah 5 — Login pertama
-
-Setelah SSL aktif, ikuti **[Panduan Login Pertama →](../login pertama)** untuk mengakses akun admin.
-
----
-
-## Langkah 6 — Ubah kata sandi default
+## Langkah 5 — Ubah kata sandi default
 
 Semua kata sandi default adalah `admin`. Ubah segera setelah login pertama Anda:
 
@@ -107,7 +104,7 @@ Jika Anda memasang Linode Cloud Firewall ke server ini, gunakan aturan berikut:
 
 | Label | Aksi | Catatan |
 |-------|--------|-------|
-| Kebijakan keluar default | **Terima** | Izinkan semua keluar (Docker pulls, certbot, GoDaddy API, dll.) |
+| Kebijakan keluar default | **Terima** | Izinkan semua keluar (tarikan Docker, certbot, GoDaddy API, dll.) |
 
 ### Port TIDAK diperlukan secara eksternal
 
@@ -116,8 +113,8 @@ Port ini terikat hanya pada `127.0.0.1` dan tidak pernah dapat dijangkau dari lu
 | Pelabuhan | Layanan | Alasan |
 |------|---------|--------|
 | 8080 | Wadah aplikasi | Nginx memproksinya secara internal |
-| 8090 | Wadah jubah kunci | Nginx memproksinya secara internal |
-| 3306 | MySQL | Hanya jaringan Docker internal |
+| 8090 | Wadah Keycloak | Nginx memproksinya secara internal |
+| 3306 | MySQL | Hanya jaringan internal Docker |
 
 ---
 

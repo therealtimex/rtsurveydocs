@@ -10,11 +10,11 @@ toc: true
 description: "Implementeer rtCloud op Linode met behulp van een StackScript. Geen configuratie nodig: maak gewoon de server aan en volg de stappen na de implementatie."
 ---
 
-## Stap 1 — Start StackScript
+## Stap 1 — Start de StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-Hiermee wordt de StackScript-pagina in Linode Cloud Manager geopend. Klik op **Nieuwe Linode implementeren**.
+Hiermee wordt de StackScript-pagina geopend in Linode Cloud Manager. Klik op **Nieuwe Linode implementeren**.
 
 ---
 
@@ -24,11 +24,14 @@ Vul het standaard servercreatieformulier van Linode in:
 
 | Veld | Aanbevolen waarde |
 |-------|------------------|
-| **Afbeelding** | Ubuntu 22.04LTS |
+| **Afbeelding** | Ubuntu 22.04 LTS |
 | **Regio** | Het dichtst bij uw gebruikers |
 | **Plannen** | Gedeelde CPU 4 GB of groter |
 | **Rootwachtwoord** | Stel een sterk wachtwoord in |
+| **Firewall** | Geen firewall *(aanbevolen)* |
 | **Tijdzone** *(ons enige veld)* | De tijdzone van uw server (standaard: `Azië/Ho_Chi_Minh`) |
+
+> **Waarom geen firewall?** Het installatiescript heeft uitgaande internettoegang nodig (Docker pulls, Let's Encrypt). Als u poorten blokkeert tijdens de eerste keer opstarten, kan de implementatie mislukken. U kunt een firewall aansluiten nadat de installatie is voltooid. Zie [Firewallregels](#firewall-rules-linode-cloud-firewall) hieronder voor de juiste regels.
 
 Klik op **Linode maken** als u klaar bent.
 
@@ -38,11 +41,11 @@ Klik op **Linode maken** als u klaar bent.
 
 Het script wordt automatisch uitgevoerd bij de eerste keer opstarten. Het installeert Docker, haalt de rtSurvey-image op, initialiseert de database en start alle services. Dit duurt **5–10 minuten**.
 
-Je kunt de voortgang rechtstreeks bekijken in **Linode Cloud Manager** – geen SSH vereist:
+U kunt de voortgang rechtstreeks bekijken in **Linode Cloud Manager** – geen SSH vereist:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Klik op je nieuw gemaakte Linode
-3. Klik op **LISH Console starten** (rechtsboven op de Linode-detailpagina)
+2. Klik op uw nieuw gemaakte Linode
+3. Klik op **LISH-console starten** (rechtsboven op de Linode-detailpagina)
 
 Er wordt een browserterminal geopend met het live opstartlogboek. Het tabblad **Weblish** werkt rechtstreeks in uw browser, er is geen SSH-client nodig.
 
@@ -61,7 +64,7 @@ Wacht tot je ziet:
 ============================================================
 ```
 
-Het log toont ook het IP-adres van uw server; u heeft dit nodig voor de volgende stap.
+Het log toont ook het IP-adres van uw server; u hebt dit nodig voor de volgende stap.
 
 ---
 
@@ -73,13 +76,7 @@ Volg de **[SSL-handleiding instellen →](../ssl-setup)** om HTTPS te configurer
 
 ---
 
-## Stap 5 — Eerste login
-
-Zodra SSL actief is, volgt u de **[Handleiding voor eerste aanmelding →](../eerste aanmelding)** om toegang te krijgen tot het beheerdersaccount.
-
----
-
-## Stap 6 — Wijzig het standaardwachtwoord
+## Stap 5 — Wijzig het standaardwachtwoord
 
 Alle wachtwoorden zijn standaard 'admin'. Wijzig ze onmiddellijk na uw eerste login:
 
@@ -90,7 +87,7 @@ Alle wachtwoorden zijn standaard 'admin'. Wijzig ze onmiddellijk na uw eerste lo
 
 ## Firewallregels (Linode Cloud Firewall)
 
-Als u een Linode Cloud Firewall aan deze server koppelt, hanteer dan de volgende regels:
+Als u een Linode Cloud Firewall aan deze server koppelt, gebruik dan de volgende regels:
 
 ### Binnenkomend
 
@@ -107,7 +104,7 @@ Als u een Linode Cloud Firewall aan deze server koppelt, hanteer dan de volgende
 
 | Etiket | Actie | Opmerkingen |
 |-------|--------|-------|
-| Standaardbeleid voor uitgaand verkeer | **Accepteren** | Alle uitgaande berichten toestaan ​​(Docker-pulls, certbot, GoDaddy API, etc.) |
+| Standaardbeleid voor uitgaand verkeer | **Accepteren** | Alle uitgaande berichten toestaan ​​(Docker-pulls, certbot, GoDaddy API, enz.) |
 
 ### Poorten NIET extern nodig
 
@@ -115,8 +112,8 @@ Deze poorten zijn alleen gebonden aan `127.0.0.1` en zijn nooit bereikbaar van b
 
 | Haven | Dienst | Reden |
 |------|---------|--------|
-| 8080 | App-container | Nginx proxies to it internally |
-| 8090 | Sleutelmantelcontainer | Nginx-proxy's intern |
+| 8080 | App-container | Nginx-proxy's intern |
+| 8090 | Keycloak-container | Nginx-proxy's intern |
 | 3306 | MySQL | Alleen intern Docker-netwerk |
 
 ---
