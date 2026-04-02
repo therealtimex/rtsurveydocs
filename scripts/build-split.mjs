@@ -46,9 +46,13 @@ function copyDir(src, dest) {
   }
 }
 
-// Move directory (copy + delete) — works across filesystem boundaries in Docker
-function moveDir(src, dest) {
-  copyDir(src, dest);
+// Move file or directory (copy + delete) — works across filesystem boundaries in Docker
+function move(src, dest) {
+  if (statSync(src).isDirectory()) {
+    copyDir(src, dest);
+  } else {
+    copyFileSync(src, dest);
+  }
   rmSync(src, { recursive: true, force: true });
 }
 
@@ -71,7 +75,7 @@ async function buildLocale(locale) {
   // Stash English root structure (copy+delete to handle Docker overlay fs)
   for (const d of ENGLISH_DIRS) {
     const p = join(PAGES, d);
-    if (existsSync(p)) moveDir(p, join(STASH, `en_${d}`));
+    if (existsSync(p)) move(p, join(STASH, `en_${d}`));
   }
   for (const f of ENGLISH_FILES) {
     const p = join(PAGES, f);
@@ -109,13 +113,13 @@ async function buildLocale(locale) {
     if (SKIP_RESTORE.has(entry) || entry.startsWith('.')) continue;
     const ext = entry.includes('.') ? entry.substring(entry.lastIndexOf('.')) : '';
     if (SKIP_EXTENSIONS.has(ext) || SKIP_FILES.has(entry)) continue;
-    moveDir(join(PAGES, entry), join(localeDir, entry));
+    move(join(PAGES, entry), join(localeDir, entry));
   }
 
   // Restore English root
   for (const d of ENGLISH_DIRS) {
     const stashed = join(STASH, `en_${d}`);
-    if (existsSync(stashed)) moveDir(stashed, join(PAGES, d));
+    if (existsSync(stashed)) move(stashed, join(PAGES, d));
   }
   for (const f of ENGLISH_FILES) {
     const stashed = join(STASH, `en_${f}`);
