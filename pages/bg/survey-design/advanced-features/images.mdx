@@ -1,0 +1,89 @@
+---
+title: "Разширени изображения"
+description: "Разширени функции за изображения в rtSurvey: воден знак, показване в медийна мрежа и анотации на изображения."
+---
+
+Beyond the standard `image` question type, rtSurvey provides extensions for **watermarking** captured photos and displaying multiple images in a **media grid**. These are useful for evidence-based surveys where photos need to be marked with enumerator identity or survey metadata, and for visual review interfaces.
+
+---
+
+## Watermark
+
+The watermark feature overlays text or an image onto a captured photo before it is stored. This is used to brand field photos with the date, enumerator name, GPS location, or any other survey data — making it harder to pass off pre-existing photos as freshly captured evidence.
+
+### Setup
+
+Use `watermark()` in the **`calculation`** column of an `image` field, combined with `callapi` appearance:
+
+```
+watermark(type, size, distance, color, shadow, rotate, blur)
+```
+
+| Parameter | Description |
+|-----------|-------------|
+| `type` | `'text'` for a text watermark; `'file'` for an image watermark |
+| `size` | Font size in pixels (text) or watermark size as % of image width (file) |
+| `distance` | Spacing between repeated watermark tiles (pixels) |
+| `color` | Text color (CSS color or hex). Not used for `file` type |
+| `shadow` | Shadow color (CSS color or hex) |
+| `rotate` | Rotation angle in degrees (e.g., `45` for diagonal) |
+| `blur` | Opacity of the watermark (0 = invisible, 100 = fully opaque) |
+
+### Text watermark example
+
+Overlay the enumerator's name and today's date diagonally across each captured photo:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | wm_text | | | `concat(pulldata('app-api', 'user.name'), ' | ', format-date(today(), '%d/%m/%Y'))` |
+| image | site_photo | Take a photo of the site | watermark | `watermark('text', 20, 60, '#ffffff', '#000000', 45, 40)` |
+
+The watermark text is taken from `${wm_text}`. Set the watermark text field **before** the image field in the form.
+
+### Image/logo watermark example
+
+Overlay an organisation logo (attached as a media file named `logo.png`):
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| image | evidence_photo | Take photo of evidence | watermark | `watermark('file', 25, 80, '', '#000000', 0, 50)` |
+
+### Undo/redo
+
+The watermark editor supports undo and redo — enumerators can step back through editing history before confirming the photo.
+
+### Watermark tiling
+
+The watermark repeats (tiles) across the entire image automatically. The `distance` parameter controls spacing between tiles; `rotate` controls the angle of each tile.
+
+---
+
+## Media grid widget
+
+The media grid widget displays a collection of media files (images, audio, video) in a grid layout, allowing reviewers or enumerators to browse captured files visually.
+
+This widget is activated by the `mediagridwidget` appearance and is typically used on `note` or `calculate` fields to display previously captured media from a repeat group.
+
+### Пример: Show all photos from a repeat as a grid
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | photo_list | | | `join(' ', ${site_photo})` |
+| note | photo_review | Review captured photos | mediagridwidget | |
+
+---
+
+## Best Practices for watermarked photos
+
+1. Always compute the watermark text in a `calculate` field **above** the image field so it is available when the photo is taken.
+2. Use a rotation angle (e.g., 45°) to make watermarks harder to crop out.
+3. Set opacity (`blur`) between 30–60% — high enough to be readable, low enough not to obscure the photo subject.
+4. Include the enumerator name, date, and GPS coordinates in the watermark text to maximise audit value.
+5. Test watermark rendering on the lowest-spec device in your fleet — canvas-based watermarking can be slow on older hardware.
+
+## Limitations
+
+- Watermarking is applied client-side using the HTML5 Canvas API — it requires a capable browser or mobile WebView.
+- Very high-resolution photos may take several seconds to watermark on low-end devices.
+- Watermarks are baked into the image file — they cannot be removed after submission without image editing.
+- The `file` watermark type requires the logo image to be attached as a media file with exactly the expected filename.

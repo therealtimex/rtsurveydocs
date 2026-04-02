@@ -1,0 +1,77 @@
+---
+title: "Note"
+description: "Note questions आपके survey में information या instructions प्रदान करने के लिए read-only text या media प्रदर्शित करते हैं।"
+---
+
+XLSForms और rtSurvey में note question type का उपयोग survey उत्तरदाता को read-only text या media प्रदर्शित करने के लिए किया जाता है। यह एक ऐसा प्रश्न नहीं है जिसके लिए उत्तर की आवश्यकता है, बल्कि survey के भीतर जानकारी, instructions, या context प्रदान करने का एक तरीका है।
+
+## Basic XLSForm Specification
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | यह survey आपकी पढ़ने की आदतों के बारे में है। |
+
+Basic note question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+
+## उपयोग
+
+Note questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+
+1. आगामी प्रश्नों के लिए instructions या context प्रदान करना
+2. Calculated results या summaries प्रदर्शित करना
+3. Images या अन्य media दिखाना
+4. Survey के sections को अलग करना
+5. पिछले responses के आधार पर feedback देना
+
+## Best Practices
+
+1. Respondent engagement बनाए रखने के लिए note text को concise और clear रखें।
+2. महत्वपूर्ण जानकारी पर emphasis करने के लिए formatting (bold, italics) का उपयोग करें।
+3. जहाँ उचित हो समझ बढ़ाने के लिए media (images, audio) का उपयोग करने पर विचार करें।
+4. Survey को cluttered करने से बचने के लिए notes का कम उपयोग करें।
+
+## Example Usage
+
+यहाँ बताया गया है कि आप survey में note questions का उपयोग कैसे कर सकते हैं:
+
+| type | name | label |
+|------|------|-------|
+| note | intro | हमारे reading habits survey में आपका स्वागत है। हम आपकी preferences और reading frequency के बारे में पूछेंगे। |
+| ... | ... | ... |
+| calculate | books_per_month | `${fiction_books}` + `${non_fiction_books}` |
+| note | reading_summary | आप लगभग `${books_per_month}` books प्रति माह पढ़ते हैं। |
+
+इस उदाहरण में, हम survey introduce करने और calculated results का summary प्रदान करने के लिए notes का उपयोग करते हैं।
+
+## rtSurvey Extensions
+
+rtSurvey note questions के लिए अतिरिक्त सुविधाएं या customizations प्रदान कर सकता है:
+
+1. Rich text formatting
+2. Embedded media का समर्थन (images, audio, video)
+3. पिछले responses के आधार पर dynamic content
+4. Custom styling options
+
+## Advanced Usage
+
+### Conditional Display
+
+Notes को conditionally दिखाने के लिए relevance expressions का उपयोग करें:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | आप एक avid reader हैं! | `${books_per_month}` > 5 |
+
+### Calculations शामिल करना
+
+Notes dynamic feedback प्रदान करने के लिए calculations शामिल कर सकते हैं:
+
+| type | name | label |
+|------|------|-------|
+| note | reading_time | आपके responses के आधार पर, आप प्रत्येक माह लगभग `${books_per_month * 5}` घंटे पढ़ने में बिताते हैं। |
+
+## सीमाएं
+
+- Notes डेटा एकत्र नहीं करते, इसलिए उनका उपयोग तब नहीं किया जाना चाहिए जब आपको उत्तरदाताओं से जानकारी gather करने की आवश्यकता हो।
+- Notes का अत्यधिक उपयोग survey को cluttered या बहुत लंबा महसूस करा सकता है।
+- कुछ advanced formatting या media options सभी devices या platforms पर supported नहीं हो सकते।

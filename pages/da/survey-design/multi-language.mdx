@@ -1,0 +1,75 @@
+---
+title: "Flersproget understøttelse"
+description: ""
+---
+
+rtSurvey giver robust flersproget understøttelse, der giver dig mulighed for at oprette undersøgelser på flere sprog. Denne funktion er afgørende til forskning på tværs af forskellige sproglige befolkninger eller i flersprogede miljøer.
+
+## Opsætning af flersprogede undersøgelser
+
+For at oprette en flersproget undersøgelse i rtSurvey skal du tilføje sprogspecifikke kolonner til din XLSForm. Sådan gør du:
+
+1. **Labelsvarsoversættelser**: Tilføj kolonner for hvert sprog ved hjælp af formatet `label::Sprog (kode)`.
+2. **Hintsvarsoversættelser**: Brug `hint::Sprog (kode)` til oversættelse af hints.
+3. **Mediefil-oversættelser**: Til sprogspecifikke medier skal du bruge `media::Sprog (kode)`.
+
+Eksempel:
+
+```
+| type    | name | label::Dansk (da) | label::Engelsk (en) | hint::Dansk (da) | hint::Engelsk (en) |
+|---------|------|-------------------|---------------------|------------------|---------------------|
+| integer | age  | Hvor gammel er du?| How old are you?    | Angiv din alder  | Enter your age      |
+```
+
+## Sprogkoder
+
+Det anbefales at bruge de officielle 2-tegns sprogkoder (subtags) efter sprognavnet. Dette letter matchning af formularsprog med brugergrænsefladsesproget. Du kan finde de officielle koder [her](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+
+## Angivelse af et standardsprog
+
+For at angive et standardsprog til dataindsamling skal du bruge regnearket `settings` i din XLSForm:
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | Dansk (da)        |
+```
+
+## rtSurvey-specifikke funktioner
+
+### Dynamisk sprogskift
+
+rtSurvey giver brugere mulighed for at skifte sprog dynamisk under dataindsamlingen:
+
+- I webgrænsefladen kan du bruge sprogmenuen i den øverste navigationsbjælke.
+- I mobilappen kan du tilgå sproglmuligheder via indstillingsmenuen.
+
+### Sprogspecifikke valideringsmeddelelser
+
+rtSurvey udvider flersproget understøttelse til valideringsmeddelelser:
+
+```
+| type    | name | constraint | constraint_message::Dansk (da) | constraint_message::Engelsk (en) |
+|---------|------|------------|--------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Alderen skal være 150 eller derunder | Age must be 150 or less     |
+```
+
+### RTL-sprogunderstøttelse
+
+Til højre-til-venstre (RTL) sprog som arabisk eller hebraisk justerer rtSurvey automatisk layoutet.
+
+## Bedste praksis for flersprogede undersøgelser
+
+1. **Konsistent navngivning**: Brug konsistente sprogkoder i hele din formular.
+2. **Professionel oversættelse**: Anvend professionelle oversættere med kendskab til undersøgelseskonteksten.
+3. **Kontekstoversigter**: Giv kontekstoversigter til oversættere for at sikre nøjagtige oversættelser.
+4. **Test**: Test din formular på alle sprog inden implementering.
+5. **Unicode-understøttelse**: Sørg for, at dine dataindsamlingsenheder understøtter Unicode for ikke-latinske skriftsystemer.
+6. **Sprogspecifikke medier**: Brug kulturelt passende billeder eller lyd for hvert sprog.
+
+## Eksportér flersprogede data
+
+Når du eksporterer data fra rtSurvey:
+
+- Vælg at eksportere på et bestemt sprog eller inkluder alle sprogversioner.
+- Sprogmetadata inkluderes i eksporten og angiver, hvilket sprog der blev brugt for hvert svar.

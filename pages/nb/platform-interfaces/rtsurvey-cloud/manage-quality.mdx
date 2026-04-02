@@ -1,0 +1,30 @@
+---
+title: "Administrere kvalitet"
+description: "Overvåk datainnsamlingsfremdrift, se intervjukart og analyser feltarbeiderytelse."
+---
+
+**Administrer kvalitet**-modulen (tilgjengelig via dashbordet) gir sanntidsanalyse og romlige visualiseringer for å overvåke datainnsamlingsfremdrift og feltarbeiderytelse. Den tilbyr prosjektledere et delt visningsgrensesnitt for å raskt veksle mellom individuelle spørreskjemaer og tilpassede analytiske rapporter.
+
+![Dashbord for kvalitetsadministrasjon](/images/manage_quality.png)
+
+## Dashbordoversikt
+
+Dashbordet for kvalitetsadministrasjon er delt inn i to primære navigasjonsfaner: **Skjemaer** og **Rapporter**. Denne laterale menyen lar brukere effektivt søke etter og velge det spesifikke datasettet eller rapporten de ønsker å analysere.
+
+### Skjemaanalyse
+
+Når du velger et spesifikt skjema fra listen, gir dashbordet flere innebygde visualiseringsverktøy for å spore innsendingskvalitet og frekvens:
+
+- **Antall etter starttid:** Et søylediagram som visualiserer frekvensen av intervjuer initiert over en tidslinje.
+- **Antall etter sluttid:** Et søylediagram som visualiserer når intervjuer ble fullført.
+- **Antall etter innsendingsdato:** Sporer det daglige volumet av data synkronisert til serveren.
+- **Antall etter brukernavn:** Et søylediagram som identifiserer de best presterende feltarbeiderne basert på totalt antall innsendinger.
+- **Kart over intervjuer:** Et geografisk spredningsplott (drevet av Leaflet) som viser GPS-koordinatene for hvor hver innsending fant sted, slik at ledere kan verifisere feltarbeidslokasjoner.
+
+### Egendefinerte rapporter
+
+**Rapporter**-fanen gir tilgang til forhåndskonfigurerte R Markdown-analysedesign og annen tilpasset statistikk. Når en rapport er valgt, laster hovedvisningsområdet dynamisk inn den genererte analysen via en innebygd visningsenhet, noe som muliggjør dypere statistisk verifisering av de innsamlede dataene.
+
+## Søk og filtrering
+
+Et hurtigsøkfelt er tilgjengelig over sidefeltelisten, slik at brukere raskt kan finne spesifikke skjemaer eller rapporter etter navn.

@@ -1,0 +1,111 @@
+---
+title: "Samo za čitanje"
+description: ""
+---
+
+Polja samo za čitanje u rtSurvey-u vam omogućavaju da prikazujete informacije koje ispitanik ne može da uređuje. Ova funkcija je posebno korisna za prikazivanje unapred popunjenih podataka, izračunatih rezultata ili informacija koje treba da ostanu konstantne tokom ankete.
+
+## Osnovna upotreba
+
+Da biste polje učinili samo za čitanje, koristite kolonu `read_only` u vašem XLSForm-u:
+
+```
+| type    | name | label                 | read_only | default |
+|---------|------|----------------------|-----------|---------|
+| integer | num  | Broj pacijenta je:    | yes       | 5       |
+```
+
+U ovom primeru, broj pacijenta je postavljen na 5 i ispitanik ga ne može promeniti.
+
+## Kombinovanje samo za čitanje sa podrazumevanim vrednostima
+
+Polja samo za čitanje se često koriste u kombinaciji sa podrazumevanim vrednostima za prikaz unapred određenih ili izračunatih informacija:
+
+```
+| type    | name     | label               | read_only | default        |
+|---------|----------|---------------------|-----------|----------------|
+| text    | username | Prijavljeni korisnik: | yes     | ${current_user}|
+| date    | today    | Današnji datum:     | yes       | today()        |
+```
+
+Ovde, korisničko ime i trenutni datum su prikazani, ali se ne mogu urediti.
+
+## Funkcije specifične za rtSurvey
+
+### Uslovni samo za čitanje
+
+rtSurvey proširuje funkcionalnost samo za čitanje sa uslovnom logikom:
+
+```
+| type    | name     | label           | read_only                |
+|---------|----------|-----------------|--------------------------|
+| integer | age      | Starost:        | ${role} = 'viewer'       |
+| text    | comments | Komentari:      | selected(${status}, 'closed') |
+```
+
+U ovim primerima:
+- Polje 'age' je samo za čitanje samo ako je uloga korisnika 'viewer'.
+- Polje 'comments' postaje samo za čitanje ako je status 'closed'.
+
+### Dinamički status samo za čitanje
+
+rtSurvey vam dozvoljava da dinamički menjate status samo za čitanje:
+
+```
+| type      | name     | label    | read_only              |
+|-----------|----------|----------| ----------------------|
+| text      | address  | Adresa:  | ${edit_mode} = 'false' |
+```
+
+Ovo vam dozvoljava da prebacujete između režima za uređivanje i samo za čitanje na osnovu određenih uslova ili korisničkih akcija.
+
+## Najbolje prakse za korišćenje polja samo za čitanje
+
+1. **Jasnost**: Jasno naznačite koja polja su samo za čitanje kroz vizuelne znakove ili oznake.
+2. **Konzistentnost**: Konzistentno koristite polja samo za čitanje u celoj anketi.
+3. **Validacija**: Iako polja samo za čitanje ne mogu biti uređivana, uključite ih u proces validacije podataka.
+4. **Performanse**: Budite oprezni sa složenim proračunima u poljima samo za čitanje, jer mogu uticati na vreme učitavanja formulara.
+5. **Pristupačnost**: Osigurajte da su polja samo za čitanje pravilno označena za čitače ekrana.
+
+## Napredne tehnike
+
+### Izračunata polja samo za čitanje
+
+Koristite polja samo za čitanje za prikaz proračuna zasnovanih na drugim odgovorima:
+
+```
+| type      | name     | label           | read_only | calculation            |
+|-----------|----------|-----------------|-----------|------------------------|
+| calculate | bmi      | BMI:            | yes       | ${weight} / (${height} * ${height}) |
+```
+
+### Prikazivanje istorijskih podataka
+
+Polja samo za čitanje mogu prikazivati podatke iz prethodnih anketa ili spoljnih izvora:
+
+```
+| type    | name           | label                  | read_only | default                    |
+|---------|----------------|------------------------|-----------|----------------------------|
+| text    | last_visit_date| Datum poslednje posete: | yes      | ${pulldata('visits', 'date', 'id', ${patient_id})} |
+```
+
+## Razmatranja upravljanja podacima
+
+- Polja samo za čitanje su uključena u izvoze podataka, obično sa oznakom koja ukazuje na status samo za čitanje.
+- Kada ažurirate postojeće zapise, polja samo za čitanje čuvaju originalne vrednosti osim ako nisu eksplicitno prepisana putem pozadinskog sistema.
+
+## Ponašanje mobilne aplikacije
+
+- rtSurvey mobilna aplikacija poštuje podešavanja samo za čitanje, uključujući uslovnu logiku samo za čitanje.
+- Režim van mreže u potpunosti podržava funkcionalnost samo za čitanje, uključujući dinamička i izračunata polja samo za čitanje.
+
+## Poznata ograničenja
+
+- Neki složeni dinamički uslovi samo za čitanje mogu imati mali uticaj na performanse na uređajima nižeg ranga.
+- Polja samo za čitanje možda ne sprečavaju sve oblike manipulacije podacima u izvezenim datotekama podataka, pa se preporučuje validacija na strani servera za kritične podatke.
+
+## Rešavanje problema sa poljima samo za čitanje
+
+1. **Polje je neočekivano dostupno za uređivanje**: Proverite da nema grešaka u sintaksi u koloni `read_only` ili uslovnoj logici.
+2. **Izračunate vrednosti se ne ažuriraju**: Proverite logiku proračuna i osigurajte da su sva referencirana polja pravilno nazvana.
+3. **Problemi sa performansama**: Optimizujte složene proračune ili razmotrite alternativne pristupe za prikaz podataka samo za čitanje.

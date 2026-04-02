@@ -1,0 +1,55 @@
+---
+title: "Geopoint"
+description: "Otázky geopoint zachycují geografické souřadnice (zeměpisnou šířku, délku, nadmořskou výšku a přesnost) jako součást průzkumu."
+---
+
+Typ otázky geopoint v XLSForms a rtSurvey umožňuje sběr geografických souřadnic pomocí GPS zařízení nebo jiných lokalizačních služeb. Tato funkce je zvláště užitečná pro geografické mapování odpovědí na průzkumy, sledování terénních aktivit nebo přiřazování dat ke konkrétním místům.
+
+## Základní specifikace XLSForm
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geopoint | location    | Zaznamenejte aktuální polohu     |
+
+## Použití
+
+Otázky geopoint se běžně používají pro:
+
+1. Geografické mapování odpovědí na průzkumy
+2. Ověřování polohy terénních aktivit
+3. Sledování trasy enumerátorů
+4. Přiřazování environmentálních nebo sociálních dat ke konkrétním místům
+5. Výpočet vzdáleností nebo ploch v geografických analýzách
+
+## Osvědčené postupy
+
+1. Zajistěte, aby bylo na zařízení povoleno určování polohy a udělena oprávnění.
+2. Ponechte dostatek času pro GPS k získání přesné polohy.
+3. Zvažte důsledky pro soukromí a informujte respondenty o sběru dat o poloze.
+4. Používejte v kombinaci s jinými typy otázek pro poskytnutí kontextu k datům o poloze.
+
+## Příklad použití
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geopoint | sample_location| Zaznamenejte místo odběru vzorku | Stůjte v otevřeném prostoru pro lepší signál GPS |
+
+## Formát dat
+
+Data geopoint jsou obvykle uložena jako řetězec čtyř hodnot oddělených mezerou:
+
+```
+zeměpisná_šířka zeměpisná_délka nadmořská_výška přesnost
+```
+
+Například:
+```
+41.40338 2.17403 30.5 10
+```
+
+## Omezení
+
+- Přesnost se může lišit v závislosti na zařízení a podmínkách prostředí.
+- GPS signály mohou být slabé nebo nedostupné v interiérech nebo v oblastech s překážkami.
+- Sběr dat o poloze může výrazně ovlivnit výdrž baterie zařízení.
+- Mohou existovat obavy o soukromí spojené se sběrem přesných dat o poloze.

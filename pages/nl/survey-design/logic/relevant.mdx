@@ -1,0 +1,120 @@
+---
+title: "Vragen overslaan"
+description: ""
+---
+
+Sla-logica, ook bekend als vertakking of voorwaardelijke logica, stelt u in staat dynamische enquêtes te maken die zich aanpassen aan de antwoorden van respondenten. In rtSurvey wordt sla-logica geïmplementeerd met behulp van de kolom `relevant` in uw XLSForm.
+
+## Basis sla-logica
+
+Om basis sla-logica te implementeren, gebruikt u de kolom `relevant` om een voorwaarde te specificeren:
+
+```
+| type           | name          | label                        | relevant               |
+|----------------|---------------|------------------------------|------------------------|
+| select_one y_n | likes_pizza   | Houdt u van pizza?           |                        |
+| select_multiple pizza_toppings | favorite_topping | Favoriete toppings | ${likes_pizza} = 'yes' |
+```
+
+In dit voorbeeld verschijnt de vraag "Favoriete toppings" alleen als de respondent "yes" antwoordt op het houden van pizza.
+
+## Syntaxis voor relevante expressies
+
+- Gebruik `${ }` om te verwijzen naar andere vraagvariabelen.
+- Voor `select_one`-vragen vergelijkt u direct: `${vraagnaam} = 'antwoord'`
+- Voor `select_multiple`-vragen gebruikt u de functie `selected()`.
+
+## Geavanceerde sla-logica
+
+### Meerdere voorwaarden
+
+U kunt meerdere voorwaarden combineren met `and`, `or` en haakjes:
+
+```
+| type    | name   | label                    | relevant                                                    |
+|---------|--------|--------------------------|-------------------------------------------------------------|
+| integer | age    | Hoe oud bent u?          |                                                             |
+| text    | school | Naar welke school gaat u?| ${age} < 18 and (${location} = 'urban' or ${location} = 'suburban') |
+```
+
+### Gebruik van select_multiple-vragen
+
+Voor `select_multiple`-vragen gebruikt u de functie `selected()`:
+
+```
+| type           | name          | label                        | relevant                               |
+|----------------|---------------|------------------------------|----------------------------------------|
+| select_multiple pizza_toppings | favorite_topping | Favoriete toppings |                                         |
+| text           | cheese_type   | Favoriete soort kaas         | selected(${favorite_topping}, 'cheese')|
+```
+
+### "Anders"-optie bij meerkeuze
+
+Implementeer een vrij tekst "Anders"-optie met `relevant`:
+
+```
+| type           | name                    | label                                   | relevant                                  |
+|----------------|-------------------------|-----------------------------------------|-------------------------------------------|
+| select_multiple pizza_toppings | favorite_toppings | Wat zijn uw favoriete pizzatoppings? |                                           |
+| text           | favorite_toppings_other | Welke andere toppings vindt u lekker?   | selected(${favorite_toppings}, 'other')   |
+```
+
+Vergeet niet 'other' als optie op te nemen in uw choices-werkblad.
+
+## rtSurvey-specifieke functies
+
+### Dynamische relevantie
+
+rtSurvey maakt dynamische relevantie mogelijk op basis van berekende velden:
+
+```
+| type      | name        | label        | calculation                            |
+|-----------|-------------|--------------|----------------------------------------|
+| calculate | total_score | Totaalscore  | ${score1} + ${score2} + ${score3}      |
+| text      | feedback    | Feedback     | ${total_score} > 75                    |
+```
+
+### Relevantie in herhalingen
+
+rtSurvey ondersteunt relevantie binnen herhalingsgroepen:
+
+```
+| type         | name        | label                  | relevant          |
+|--------------|-------------|------------------------|-------------------|
+| begin repeat | child_info  | Kindinformatie         |                   |
+| integer      | child_age   | Leeftijd van het kind  |                   |
+| text         | school_name | Schoolnaam             | ${child_age} >= 5 |
+| end repeat   |             |                        |                   |
+```
+
+### Cascaderende relevantie
+
+rtSurvey verwerkt cascaderende relevantie efficiënt, waarbij de relevantie van één vraag afhankelijk is van een andere, die op zijn beurt afhankelijk is van een derde:
+
+```
+| type           | name     | label                   | relevant           |
+|----------------|----------|-------------------------|---------------------|
+| select_one y_n | has_car  | Heeft u een auto?       |                     |
+| select_one car_type | car_type | Welk type auto?    | ${has_car} = 'yes'  |
+| text           | model    | Specifiek model         | ${car_type} = 'sedan'|
+```
+
+## Aanbevolen werkwijzen voor sla-logica in rtSurvey
+
+1. **Houd het eenvoudig**: Vermijd waar mogelijk overly complexe relevantievoorwaarden.
+2. **Test grondig**: Gebruik de voorbeeldfunctie van rtSurvey om alle mogelijke paden door uw enquête te testen.
+3. **Overweeg prestaties**: Zeer complexe sla-logica kan de enquêteprestaties beïnvloeden, vooral op mobiele apparaten.
+4. **Gebruik duidelijke variabelenamen**: Dit maakt uw relevantie-expressies gemakkelijker te lezen en te onderhouden.
+5. **Documenteer uw logica**: Voeg notities toe om complexe slapatronen te verklaren, vooral voor teamsamenwerking.
+6. **Houd rekening met gegevensanalyse**: Overgeslagen vragen resulteren in ontbrekende gegevens. Plan uw analyse dienovereenkomstig.
+
+## Problemen met sla-logica oplossen
+
+- **Syntaxfouten**: Zorg dat alle `${ }` correct zijn gesloten en gespeld.
+- **Circulaire verwijzingen**: Vermijd het maken van lussen waarbij vragen van elkaar afhankelijk zijn.
+- **Hoofdlettergevoeligheid**: Onthoud dat antwoordkeuzes hoofdlettergevoelig zijn in relevantie-expressies.
+- **Numerieke vergelijkingen**: Gebruik geschikte operatoren (`<`, `>`, `=`) voor numerieke vergelijkingen.
+
+## Conclusie
+
+Effectief gebruik van sla-logica kan de respondentervaring en gegevenskwaliteit in uw rtSurvey-projecten aanzienlijk verbeteren. Door gebruik te maken van de geavanceerde functies van rtSurvey en de aanbevolen werkwijzen te volgen, kunt u dynamische, efficiënte enquêtes maken die zich aanpassen aan de unieke situatie van elke respondent.

@@ -1,0 +1,30 @@
+---
+title: "Managing Quality"
+description: "Monitor data collection progress, view interview maps, and analyze enumerator performance."
+---
+
+The **Manage Quality** module (accessible via the Dashboard) provides real-time analytics and spatial visualizations to monitor data collection progress and enumerator performance. It offers project managers a split-view interface to quickly switch between individual questionnaires and customized analytical reports.
+
+![Manage Quality Dashboard](/images/manage_quality.png)
+
+## Dashboard Overview
+
+The Manage Quality dashboard is divided into two primary navigation tabs: **Forms** and **Reports**. This lateral menu allows users to efficiently search and select the specific dataset or report they wish to analyze. 
+
+### Forms Analysis
+
+When selecting a specific form from the list, the dashboard provides multiple built-in visualization tools to track submission quality and frequency:
+
+- **Count by start time:** A bar chart visualizing the frequency of interviews initiated over a timeline.
+- **Count by end time:** A bar chart visualizing when interviews were completed.
+- **Count by submission date:** Tracks the daily volume of data synced to the server.
+- **Count by username:** A bar chart identifying the top-performing enumerators based on their total submission counts.
+- **Map of interviews:** A geographic scatter plot (powered by Leaflet) displaying the GPS coordinates of where each submission took place, allowing managers to verify fieldwork locations.
+
+### Custom Reports
+
+The **Reports** tab grants access to pre-configured R Markdown analytical designs and other customized statistics. Once a report is selected, the main view area dynamically loads the generated analysis via an embedded viewer, enabling deeper statistical verification of the collected data.
+
+## Search and Filtering
+
+A quick-search bar is available above the sidebar list, allowing users to rapidly find specific forms or reports by name.

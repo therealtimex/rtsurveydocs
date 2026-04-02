@@ -1,0 +1,93 @@
+---
+title: "Video"
+description: "Video questions उत्तरदाताओं को survey के हिस्से के रूप में video files record और submit करने देते हैं।"
+---
+
+`video` question type उत्तरदाताओं को अपने survey response के हिस्से के रूप में **video record** करने या एक existing video file upload करने की अनुमति देता है। यह visual evidence, demonstrations, environmental conditions, या कोई भी जानकारी capture करने के लिए उपयोगी है जो motion और audio एक साथ होने से benefit करती है।
+
+## Basic XLSForm Specification
+
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | कृपया एक short demonstration record करें |
+
+Standard video question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+
+## उपयोग
+
+Video questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+
+1. Field conditions document करना — road damage, infrastructure state, crop health
+2. Product demonstrations या procedural compliance checks record करना
+3. उत्तरदाताओं से video testimonials एकत्र करना
+4. ऐसी evidence capture करना जिसके लिए spatial context की आवश्यकता हो
+5. Monitoring और evaluation surveys के लिए before/after documentation
+
+## Data format
+
+Video files binary attachments के रूप में store होती हैं:
+
+- **Format:** MP4 या MOV (mobile recording)
+- **Naming:** `{instanceID}-{fieldname}.mp4` (या equivalent)
+- **Storage:** Server media folder में upload होती हैं और submission record से linked होती हैं
+- **Access:** Submission management interface से playable और downloadable
+
+## rtSurvey extensions
+
+### Maximum duration
+
+Recording length सीमित करने के लिए `parameters` column का उपयोग करें:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Site conditions record करें | `max-duration=60` |
+
+`max-duration` seconds में है। Recording limit पर automatically रुकती है।
+
+### Quality / resolution
+
+`parameters` के माध्यम से recording resolution control करें:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Video evidence record करें | `quality=low` |
+
+Supported values: `low` (faster upload), `normal` (default), `high`। Limited connectivity वाले areas में `low` का उपयोग करें।
+
+### Existing video upload करना
+
+Mobile पर, उत्तरदाता नई recording करने के बजाय device gallery से **existing video upload** करना चुन सकता है। यह native camera/gallery integration में default रूप से enabled है।
+
+### Submission से पहले Playback
+
+Mobile पर, recorded clip को आगे बढ़ने से पहले review किया जा सकता है। कोई additional configuration आवश्यक नहीं।
+
+## Example usage
+
+### Duration limit के साथ Site inspection video
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Water point record करें | पूरी facility के चारों ओर walk करें। Maximum 90 seconds। | `max-duration=90 quality=normal` |
+
+### Conditional video — केवल तभी जब damage report किया गया हो
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | क्या damage पाया गया? | | |
+| video | damage_video | Damage का video record करें | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+
+## Best Practices
+
+1. `max-duration` सेट करें — unrestricted video recordings आसानी से 100 MB से अधिक हो सकती हैं और weak connections पर upload fail हो सकती हैं।
+2. Monitoring surveys के लिए `quality=low` का उपयोग करें जहाँ visual evidence आवश्यक हो लेकिन fine detail नहीं — यह file size को dramatically कम करता है।
+3. `hint` column में specific recording instructions लिखें।
+4. विचार करें कि क्या video आवश्यक है — एक photo (`image`) आमतौर पर static evidence के लिए पर्याप्त है और बहुत छोटी files produce करती है।
+5. Deployment से पहले actual field network पर upload performance test करें।
+
+## सीमाएं
+
+- Video files बहुत बड़ी होती हैं — normal quality पर 1-minute video आमतौर पर 20–60 MB होती है।
+- Large video files upload करने के लिए अच्छे network connection की आवश्यकता है।
+- सभी web browsers MediaRecorder के माध्यम से video recording का समर्थन नहीं करते — Chrome सबसे reliable है।
+- Video responses का analysis manual और time-consuming है; कम उपयोग करें और केवल तभी जब video content unique value add करे।

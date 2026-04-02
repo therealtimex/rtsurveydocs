@@ -1,0 +1,89 @@
+---
+title: "Imágenes avanzadas"
+description: "Funciones avanzadas de imagen en rtSurvey: marcas de agua, visualización en cuadrícula de medios y anotaciones de imágenes."
+---
+
+Más allá del tipo de pregunta `image` estándar, rtSurvey proporciona extensiones para **marcar con marca de agua** las fotos capturadas y mostrar múltiples imágenes en una **cuadrícula multimedia**. Estas son útiles para encuestas basadas en evidencia donde las fotos deben marcarse con la identidad del encuestador o metadatos de la encuesta, y para interfaces de revisión visual.
+
+---
+
+## Marca de agua
+
+La función de marca de agua superpone texto o una imagen sobre una foto capturada antes de que se almacene. Se usa para marcar las fotos de campo con la fecha, el nombre del encuestador, la ubicación GPS u otros datos de la encuesta, lo que dificulta presentar fotos preexistentes como evidencia recién capturada.
+
+### Configuración
+
+Use `watermark()` en la columna **`calculation`** de un campo `image`, combinado con la apariencia `callapi`:
+
+```
+watermark(type, size, distance, color, shadow, rotate, blur)
+```
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| `type` | `'text'` para una marca de agua de texto; `'file'` para una marca de agua de imagen |
+| `size` | Tamaño de fuente en píxeles (texto) o tamaño de la marca de agua como % del ancho de la imagen (archivo) |
+| `distance` | Espaciado entre mosaicos repetidos de la marca de agua (píxeles) |
+| `color` | Color del texto (color CSS o hex). No se usa para el tipo `file` |
+| `shadow` | Color de sombra (color CSS o hex) |
+| `rotate` | Ángulo de rotación en grados (p. ej., `45` para diagonal) |
+| `blur` | Opacidad de la marca de agua (0 = invisible, 100 = completamente opaco) |
+
+### Ejemplo de marca de agua de texto
+
+Superponer el nombre del encuestador y la fecha de hoy en diagonal sobre cada foto capturada:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | wm_text | | | `concat(pulldata('app-api', 'user.name'), ' | ', format-date(today(), '%d/%m/%Y'))` |
+| image | site_photo | Tome una foto del sitio | watermark | `watermark('text', 20, 60, '#ffffff', '#000000', 45, 40)` |
+
+El texto de la marca de agua se toma de `${wm_text}`. Establezca el campo de texto de marca de agua **antes** del campo de imagen en el formulario.
+
+### Ejemplo de marca de agua de imagen/logotipo
+
+Superponer el logotipo de una organización (adjunto como archivo multimedia llamado `logo.png`):
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| image | evidence_photo | Tome foto de la evidencia | watermark | `watermark('file', 25, 80, '', '#000000', 0, 50)` |
+
+### Deshacer/rehacer
+
+El editor de marcas de agua admite deshacer y rehacer; los encuestadores pueden retroceder en el historial de edición antes de confirmar la foto.
+
+### Mosaico de marcas de agua
+
+La marca de agua se repite (en mosaico) en toda la imagen automáticamente. El parámetro `distance` controla el espaciado entre mosaicos; `rotate` controla el ángulo de cada mosaico.
+
+---
+
+## Widget de cuadrícula multimedia
+
+El widget de cuadrícula multimedia muestra una colección de archivos multimedia (imágenes, audio, video) en un diseño de cuadrícula, permitiendo que los revisores o encuestadores naveguen los archivos capturados visualmente.
+
+Este widget se activa mediante la apariencia `mediagridwidget` y se usa típicamente en campos `note` o `calculate` para mostrar medios previamente capturados de un grupo de repetición.
+
+### Ejemplo: Mostrar todas las fotos de una repetición como cuadrícula
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | photo_list | | | `join(' ', ${site_photo})` |
+| note | photo_review | Revisar fotos capturadas | mediagridwidget | |
+
+---
+
+## Mejores prácticas para fotos con marca de agua
+
+1. Siempre compute el texto de la marca de agua en un campo `calculate` **por encima** del campo de imagen para que esté disponible cuando se tome la foto.
+2. Use un ángulo de rotación (p. ej., 45°) para que las marcas de agua sean más difíciles de recortar.
+3. Establezca la opacidad (`blur`) entre 30–60%: lo suficientemente alta para ser legible, lo suficientemente baja para no oscurecer el sujeto de la foto.
+4. Incluya el nombre del encuestador, la fecha y las coordenadas GPS en el texto de la marca de agua para maximizar el valor de auditoría.
+5. Pruebe el renderizado de la marca de agua en el dispositivo de menor especificación de su flota; la marca de agua basada en canvas puede ser lenta en hardware más antiguo.
+
+## Limitaciones
+
+- La marca de agua se aplica del lado del cliente usando la API Canvas de HTML5; requiere un navegador capaz o WebView móvil.
+- Las fotos de muy alta resolución pueden tardar varios segundos en marcarse con agua en dispositivos de gama baja.
+- Las marcas de agua se integran en el archivo de imagen; no se pueden eliminar después de la presentación sin edición de imagen.
+- El tipo de marca de agua `file` requiere que la imagen del logotipo esté adjunta como un archivo multimedia con exactamente el nombre de archivo esperado.

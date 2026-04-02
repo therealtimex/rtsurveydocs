@@ -1,0 +1,82 @@
+---
+title: "Değerlere Referans Verme"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+`${fieldname}` sözdizimi, formunuzdaki farklı bir alanın geçerli değerine atıfta bulunmak için kullanılır. Girilen, seçilen veya hesaplanan değeri temsil edebilir ve gönderilen verilerde tam olarak göründüğü gibi görüntülenecektir.
+
+Örnek:
+"age" adlı bir alanınız varsa ve bu alana girilen tam değeri almak istiyorsanız `${age}` kullanabilirsiniz.
+
+Kısıtlamalar söz konusu olduğunda, "." sembolü geçerli alan için kullanıcının önerilen girdisine veya seçimine atıfta bulunmak için kullanılır. O anda kullanıcının girdiği veya seçtiği değere göre koşullar veya sınırlar uygulamanıza olanak tanır.
+
+Örnek:
+Geçerli alan için önerilen değerin 3'ten küçük olup olmadığını kontrol etmek istiyorsanız `. < 3` kısıtlamasını kullanabilirsiniz.
+
+---
+
+## `..` — Üst grup referansı
+
+Bir grup veya tekrar grubu içinde `..`, **üst bağlama** atıfta bulunur. Bu pratikte nadiren gereklidir ama form hiyerarşisinde gezinmek için gelişmiş XPath ifadelerinde kullanılır.
+
+---
+
+## Referansların kullanıldığı yerler
+
+| Sütun | Referans türü | Örnek |
+|--------|---------------|---------|
+| `relevant` | `${fieldname}` | `${consent} = 'yes'` |
+| `constraint` | Geçerli alan için `.`, diğerleri için `${fieldname}` | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${fieldname}` | `${adults} + ${children}` |
+| `required` | `${fieldname}` | `${has_income} = 'yes'` |
+| `default` | `${fieldname}` | `${previous_answer}` |
+| `label` | Metinde `${fieldname}` | `"Yaşınız ${age} yıl"` |
+| `choice_filter` | Sütun adı (`${}` olmadan) | `district = ${district}` |
+
+<Callout type="warning">
+`choice_filter` sütununda, **seçenek sütun adlarına** doğrudan (`${}` olmadan) ve **form alanlarına** `${}` ile referans verin. Bunları karıştırmak yaygın bir hata kaynağıdır.
+</Callout>
+
+---
+
+## Tekrar gruplarındaki değerlere referans verme
+
+Bir tekrar içinde `${fieldname}`, tekrardaki **aynı örneğin** alanına atıfta bulunur:
+
+```
+relevant: ${member_age} < 18
+```
+
+Bu, tüm örneklerin `member_age` değerini değil, geçerli tekrar örneğinin `member_age` değerini kullanır.
+
+Tekrar dışından **belirli** bir tekrar örneğindeki bir alana atıfta bulunmak için `indexed-repeat()` kullanın:
+
+```
+indexed-repeat(${member_name}, ${household_members}, 1)
+```
+
+Tam ayrıntılar için [Fonksiyonlar — Tekrarlanan alan fonksiyonları](functions#repeated-field-functions) bölümüne bakın.
+
+---
+
+## Boş değer kontrolleri
+
+Bir alanın yanıtlanıp yanıtlanmadığını test edin:
+
+```
+${fieldname} != ''       (alan boş değil)
+${fieldname} = ''        (alan boş)
+```
+
+Sayılar için şunu da kontrol edin:
+```
+${age} > 0               (yaşın pozitif bir değeri var — sayısal bağlam için örtük olarak boş değil)
+```
+
+---
+
+## Referanslarda tür dönüştürme
+
+Sayısal bir bağlamda `${fieldname}` kullandığınızda (örn. `${age} + 1`), rtSurvey dize değerini otomatik olarak sayıya dönüştürür. Boş bir alan, işleme bağlı olarak `0` veya `NaN`'a dönüştürülür — boş bir sayısal alanı güvenle sıfıra varsayılan yapmak için `coalesce(${field}, 0)` kullanın.

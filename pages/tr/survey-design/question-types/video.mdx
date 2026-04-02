@@ -1,0 +1,93 @@
+---
+title: "Video"
+description: "Video soruları, katılımcıların anketin bir parçası olarak video dosyaları kaydetmesine ve göndermesine olanak tanır."
+---
+
+`video` soru türü, katılımcıların anket yanıtlarının bir parçası olarak **video kaydetmesine** veya mevcut bir video dosyası yüklemesine olanak tanır. Görsel kanıtları, gösterileri, çevre koşullarını veya hareket ve sesin bir arada daha iyi aktardığı bilgileri yakalamak için kullanışlıdır.
+
+## Temel XLSForm Tanımı
+
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Lütfen kısa bir gösteri kaydedin    |
+
+Standart video soru türü hakkında daha fazla ayrıntı için [XLSForm spesifikasyonuna](https://xlsform.org/en/#question-types) bakın.
+
+## Kullanım Alanları
+
+Video soruları yaygın olarak şunlar için kullanılır:
+
+1. Saha koşullarını belgeleme — yol hasarı, altyapı durumu, mahsul sağlığı
+2. Ürün gösterimlerini veya prosedür uyumluluk kontrollerini kaydetme
+3. Katılımcılardan video tanıklıkları toplama
+4. Mekânsal bağlam gerektiren kanıt yakalama (örn. bir sorunun boyutu ve kapsamı)
+5. İzleme ve değerlendirme anketleri için önce/sonra belgeleme
+
+## Veri biçimi
+
+Video dosyaları ikili ek olarak saklanır:
+
+- **Biçim:** MP4 veya MOV (mobil kayıt)
+- **Adlandırma:** `{instanceID}-{fieldname}.mp4` (veya eşdeğeri)
+- **Depolama:** Sunucu medya klasörüne yüklenir ve gönderim kaydına bağlanır
+- **Erişim:** Gönderim yönetimi arayüzünden oynatılabilir ve indirilebilir
+
+## rtSurvey uzantıları
+
+### Maksimum süre
+
+Kayıt uzunluğunu sınırlamak için `parameters` sütununu kullanın:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Saha koşullarını kaydedin | `max-duration=60` |
+
+`max-duration` saniye cinsindendir. Kayıt sınıra ulaştığında otomatik olarak durur.
+
+### Kalite / çözünürlük
+
+`parameters` ile kayıt çözünürlüğünü kontrol edin:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Video kanıtı kaydedin | `quality=low` |
+
+Desteklenen değerler: `low` (daha hızlı yükleme), `normal` (varsayılan), `high`. Sınırlı bağlantı olan bölgelerde `low` kullanın.
+
+### Mevcut videoyu yükleme
+
+Mobilde katılımcı yeni kayıt yapmak yerine cihaz galerisinden **mevcut bir videoyu yüklemeyi** seçebilir. Bu, yerel kamera/galeri entegrasyonunda varsayılan olarak etkindir.
+
+### Göndermeden önce oynatma
+
+Mobilde kaydedilen klip ilerlemeden önce incelenebilir. Ek yapılandırma gerekmez.
+
+## Örnek kullanım
+
+### Sınırlı saha incelemesi videosu
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Su noktasını kaydedin | Tüm tesisin etrafında yürüyün. Maks 90 saniye. | `max-duration=90 quality=normal` |
+
+### Koşullu video — yalnızca hasar bildirilmişse
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | Hasar bulundu mu? | | |
+| video | damage_video | Hasarın videosunu kaydedin | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+
+## En İyi Uygulamalar
+
+1. `max-duration` ayarlayın — kısıtlama olmaksızın video kayıtları kolayca 100 MB'ı aşabilir ve zayıf bağlantılarda yükleme başarısız olabilir.
+2. Görsel kanıtın gerekli olduğu ancak ince detayların gerekmediği izleme anketleri için `quality=low` kullanın — dosya boyutunu önemli ölçüde azaltır.
+3. `hint` sütununa belirli kayıt talimatları yazın (örn. "Binanın tüm çevresinde yürüyün, kamerayı sabit tutun").
+4. Videonun gerekli olup olmadığını düşünün — statik kanıtlar için bir fotoğraf (`image`) genellikle yeterlidir ve çok daha küçük dosyalar üretir.
+5. Dağıtımdan önce gerçek saha ağında yükleme performansını test edin.
+
+## Sınırlamalar
+
+- Video dosyaları çok büyüktür — normal kalitede 1 dakikalık video cihaza bağlı olarak genellikle 20–60 MB'tır.
+- Büyük video dosyaları yüklemek iyi bir ağ bağlantısı gerektirir; video yoğun formlar için Wi-Fi senkronizasyonunu zorunlu kılmayı düşünün.
+- Tüm web tarayıcıları MediaRecorder aracılığıyla video kaydını desteklemez — Chrome en güvenilir olanıdır.
+- Video yanıtlarını analiz etmek manuel ve zaman alıcıdır; yalnızca video içeriğinin benzersiz değer kattığı durumlarda kullanın.

@@ -1,0 +1,59 @@
+---
+title: "Geopoint"
+description: "Geopointfrågor fångar geografiska koordinater (latitud, longitud, altitud och noggrannhet) som en del av undersökningen."
+---
+
+Frågtypen geopoint i XLSForms och rtSurvey möjliggör insamling av geografiska koordinater med enhetens GPS eller andra platstjänster. Den här funktionen är särskilt användbar för att kartlägga undersökningssvar, spåra fältaktiviteter eller associera data med specifika platser.
+
+## Grundläggande XLSForm-specifikation
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geopoint | location    | Registrera den aktuella platsen |
+
+För mer detaljer om grundläggande frågtypen geopoint, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+
+## Användningsområden
+
+Geopointfrågor används vanligtvis för:
+
+1. Kartlägga undersökningssvar geografiskt
+2. Verifiera platsen för fältaktiviteter
+3. Spåra räknarens rutt
+4. Associera miljö- eller sociala data med specifika platser
+5. Beräkna avstånd eller ytor i geografiska analyser
+
+## Bästa praxis
+
+1. Se till att enheten har platstjänster aktiverade och behörigheter beviljade.
+2. Ge tillräcklig tid för GPS:en att skaffa en korrekt fix.
+3. Tänk på integritetsfrågor och informera respondenter om insamling av platsdata.
+4. Använd tillsammans med andra frågtyper för att ge sammanhang för platsdata.
+
+## Exempelanvändning
+
+Här är ett exempel på hur du kan använda en geopointfråga i en undersökning:
+
+| type     | name           | label                                      | hint                                              |
+|----------|----------------|--------------------------------------------|----------------------------------------------------|
+| geopoint | sample_location| Registrera platsen för provtagningen       | Stå i ett öppet område för bättre GPS-signal       |
+
+## Dataformat
+
+Geopointdata lagras vanligtvis som en sträng med fyra mellanslagsseparerade värden:
+
+```
+latitud longitud altitud noggrannhet
+```
+
+Till exempel:
+```
+41.40338 2.17403 30.5 10
+```
+
+## Begränsningar
+
+- Noggrannheten kan variera beroende på enhet och miljöförhållanden.
+- GPS-signaler kan vara svaga eller otillgängliga inomhus eller i områden med hinder.
+- Insamling av platsdata kan avsevärt påverka enhetens batteritid.
+- Det kan finnas integritetsfrågor förknippade med insamling av exakta platsdata.

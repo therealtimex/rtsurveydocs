@@ -1,0 +1,82 @@
+---
+title: "Rank"
+description: "សំណួរ rank ឱ្យអ្នកឆ្លើយតបតម្រៀបជម្រើសតាមចំណង់ចំណូលចិត្ត ឬអាទិភាព។"
+---
+
+ប្រភេទសំណួរ `rank` បង្ហាញបញ្ជីជម្រើសដែលអ្នកឆ្លើយតបត្រូវ **drag ដើម្បីតម្រៀប** (ឬ rank ពី first ដល់ last)។ វារក្សាទុកលទ្ធផលជា space-separated list នៃ choice values ក្នុង order ដែលបានជ្រើស ជម្រើស highest-priority ដំបូង។
+
+## ការបញ្ជាក់ XLSForm មូលដ្ឋាន
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Rank these community needs from most to least important |
+
+ជម្រើសត្រូវបានកំណត់ក្នុង **choices worksheet** ដូចគ្នា `select_one`:
+
+**survey:**
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Rank these needs from most to least important |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| priorities | water | Clean water |
+| priorities | health | Healthcare |
+| priorities | education | Education |
+| priorities | roads | Roads |
+| priorities | electricity | Electricity |
+
+## ទម្រង់ value ដែលរក្សាទុក
+
+value ដែលរក្សាទុកគឺ **space-separated list** នៃ choice values ក្នុង ranked order (first = highest priority):
+
+```
+water education health roads electricity
+```
+
+## ការស្រង់ positions ដែលបាន rank
+
+ប្រើ `selected-at()` ដើម្បីទទួលបាន choice ក្នុង rank ជាក់លាក់:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| rank priorities | main_priority | Rank community needs | |
+| calculate | top_priority | | selected-at(`${main_priority}`, 0) |
+| calculate | second_priority | | selected-at(`${main_priority}`, 1) |
+
+`selected-at(${main_priority}, 0)` returns value ដែលដាក់ **ដំបូង** (index 0 = top rank)។
+
+## ការប្រើ `rank-index()` ជាមួយ repeat groups
+
+នៅពេល `rank` ប្រើក្នុង repeat group `rank-index()` ឱ្យ reference ordinal rank ពីខាងក្រៅ repeat:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_ranked | | rank-index(1, `${score}`) |
+
+មើល [Functions — Repeated field functions](../operators-and-functions/functions#repeated-field-functions) សម្រាប់ព័ត៌មានបន្ថែមអំពី `rank-index()` និង `rank-index-if()`។
+
+## ការប្រើប្រាស់
+
+សំណួរ rank ប្រើជាទូទៅសម្រាប់:
+
+1. **ការ ranking អាទិភាព** — សួរ communities ឱ្យ rank development needs
+2. **ការ ordering ចំណូលចិត្ត** — ranking product features, service attributes, ឬ policy options
+3. **ការ ordering items exam** — ការ arranging ជំហានក្នុងដំណើរការ
+4. **Top-N selection** — ជាមួយ `selected-at()` ដើម្បីស្រង់តែ choices ខ្ពស់ 1, 2, ឬ 3
+
+## ការអនុវត្តល្អ
+
+1. រក្សាបញ្ជីខ្លី (3–7 items) — ការ ranking មានការខំប្រឹង cognitively ហួស 7–8 ជម្រើស។
+2. ប្រើ choice labels ច្បាស់ mutually exclusive ដើម្បីជៀសវាងការច្រឡំអំពីអ្វីដែល "first" មានន័យ។
+3. បន្ថែម hint text ដោយពន្យល់ ranking direction (ឧ. "Drag to order: first = most important")។
+4. Validate ដោយប្រើ `count-selected(.) = x` ប្រសិនបើអ្នកត្រូវការធានាថា choices ទាំងអស់ត្រូវបាន rank។
+
+## ការដាក់កំហិត
+
+- Drag-to-rank widget ត្រូវការ touch screen ឬ mouse — វាអាចមិនដំណើរការល្អក្នុង keyboard-only environments។
+- លើ mobile clients ចាស់ rank widget ប្រហែលធ្លាក់ទៅ numbered input interface។
+- អ្នកមិនអាច rank ដោយ partial (ឧ. rank តែ choices ខ្លះ) — choices ទាំងអស់ត្រូវតែ ordered។

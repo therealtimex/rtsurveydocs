@@ -1,0 +1,186 @@
+---
+title: "Meta"
+description: "Meta-Fragetypen erfassen automatisch Geräte-, Interviewer- und Zeitinformationen ohne jegliche Eingabe durch den Befragten."
+---
+
+import { Callout } from 'nextra/components'
+
+Meta-Fragetypen sind spezielle Felder, die **automatisch** ausgefüllt werden — der Befragte sieht sie nie. Sie erfassen Kontextinformationen zur Übermittlung: wann sie erfasst wurde, welches Gerät verwendet wurde und wer sie erfasst hat. Fügen Sie sie im `survey`-Arbeitsblatt wie jeden anderen Fragetyp hinzu; sie erscheinen einfach nicht auf dem Bildschirm.
+
+## Grundlegende XLSForm-Spezifikation
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| deviceid | deviceid | |
+
+Beschriftungen sind für Meta-Felder optional, da sie nie angezeigt werden.
+
+---
+
+## Zeitliche Meta-Felder
+
+### `start`
+
+Zeichnet **Datum und Uhrzeit der Formularöffnung** auf. Gespeichert im ISO 8601-Format (`YYYY-MM-DDTHH:MM:SS.sss+HH:MM`).
+
+```
+type    | name  | label
+start   | start |
+```
+
+### `end`
+
+Zeichnet **Datum und Uhrzeit der Formularübermittlung** auf. Zusammen mit `start` können Sie die für das Ausfüllen des Formulars benötigte Zeit berechnen:
+
+```
+type      | name          | calculation
+calculate | duration_min  | (decimal-date-time(${end}) - decimal-date-time(${start})) * 1440
+```
+
+### `today`
+
+Zeichnet das **aktuelle Datum** auf (keine Zeitkomponente). Gespeichert als `YYYY-MM-DD`. Nützlich, wenn nur das Datum ohne den vollständigen Zeitstempel benötigt wird.
+
+```
+type  | name  | label
+today | today |
+```
+
+---
+
+## Geräte-Meta-Felder
+
+### `deviceid`
+
+Zeichnet die **eindeutige Kennung des Geräts** auf, das zur Datenerhebung verwendet wird. Auf Android ist dies typischerweise die IMEI oder Android-ID. Nützlich für die Verfolgung, welches Gerät jedes Formular übermittelt hat, und zur Erkennung doppelter Übermittlungen vom selben Gerät.
+
+```
+type      | name     | label
+deviceid  | deviceid |
+```
+
+### `devicephonenum`
+
+Zeichnet die **Telefonnummer der SIM-Karte** im Gerät auf (falls verfügbar). Kann leer sein, wenn das Gerät keine SIM hat oder die Nummer nicht auf der SIM gespeichert ist.
+
+```
+type           | name          | label
+devicephonenum | devicephonenum |
+```
+
+### `simserial`
+
+Zeichnet die **Seriennummer der SIM-Karte** (ICCID) auf. Nützlich zur Identifizierung, welche SIM/welcher Anbieter verwendet wurde.
+
+```
+type      | name      | label
+simserial | simserial |
+```
+
+### `subscriberid`
+
+Zeichnet die **IMSI (International Mobile Subscriber Identity)** auf — die eindeutige Teilnehmerkennung auf der SIM-Karte.
+
+```
+type         | name        | label
+subscriberid | subscriberid |
+```
+
+---
+
+## Interviewer-Meta-Felder
+
+### `username`
+
+Zeichnet den **Benutzernamen des angemeldeten Interviewers** auf (das in der rtSurvey-App verwendete Konto). Dies ist die zuverlässigste Methode, um zu verfolgen, wer jede Übermittlung erfasst hat.
+
+```
+type     | name     | label
+username | username |
+```
+
+### `email`
+
+Zeichnet die **E-Mail-Adresse des angemeldeten Interviewers** auf.
+
+```
+type  | name  | label
+email | email |
+```
+
+### `phonenumber`
+
+Zeichnet die **dem Konto des Interviewers zugeordnete Telefonnummer** auf (falls konfiguriert).
+
+```
+type        | name       | label
+phonenumber | phonenumber |
+```
+
+---
+
+## Prüfprotokoll
+
+### `audit`
+
+Das Meta-Feld `audit` aktiviert **detailliertes Prüfprotokollieren** — es zeichnet ein zeitgestempeltes Protokoll jeder Frage auf, die der Interviewer besucht hat, wie lange er bei jeder Frage war und (optional) seinen GPS-Standort bei jedem Schritt. Das Prüfprotokoll wird als separate `audit.csv`-Datei neben jeder Übermittlung gespeichert.
+
+```
+type  | name  | parameters
+audit | audit | location-priority=balanced location-min-interval=30 location-max-age=60
+```
+
+#### Prüfprotokoll-Parameter
+
+| Parameter | Beschreibung |
+|-----------|-------------|
+| `location-priority` | GPS-Genauigkeitsstufe: `no-gps`, `low-power`, `balanced`, `high-accuracy` |
+| `location-min-interval` | Mindestabstand in Sekunden zwischen Standorterfassungen |
+| `location-max-age` | Maximales Alter (Sekunden) eines zwischengespeicherten Standorts, der akzeptiert wird |
+
+Das Prüfprotokoll erfasst:
+- Fragenanme und Ereignistyp (`question`, `form.start`, `form.exit`, `form.save`, `form.finalize`)
+- Start- und Endzeitstempel für jedes Ereignis
+- GPS-Koordinaten (falls `location-priority` gesetzt ist)
+
+<Callout type="warning">
+Das `audit`-Feld erzeugt eine separate Datei pro Übermittlung. Stellen Sie sicher, dass Ihre Datenpipeline sowohl die Hauptformulardaten als auch die Prüfprotokoll-CSV verarbeitet.
+</Callout>
+
+---
+
+## Vollständiges Beispiel
+
+Eine typische Haushaltsumfrage könnte alle zeitlichen und Interviewer-Meta-Felder enthalten:
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| today | today | |
+| deviceid | deviceid | |
+| username | username | |
+| email | email | |
+| audit | audit | |
+| text | household_id | Haushalts-ID |
+| ... | ... | ... |
+
+---
+
+## Empfohlene Vorgehensweisen
+
+1. Fügen Sie immer `start` und `end` hinzu — sie sind kostenlos, automatisch und von unschätzbarem Wert für die Qualitätskontrolle.
+2. Fügen Sie immer `username` hinzu, um Interviewer zu verfolgen.
+3. Fügen Sie `deviceid` hinzu, wenn Sie doppelte Übermittlungen erkennen oder Feldgeräte verfolgen möchten.
+4. Verwenden Sie `audit` in Umfragen mit hoher Rechenschaftspflicht, bei denen Sie überprüfen müssen, ob Interviewer tatsächlich jede Frage besucht haben.
+5. SIM-bezogene Felder (`simserial`, `subscriberid`, `devicephonenum`) sind nur auf Android-Geräten mit aktiven SIM-Karten zuverlässig — lassen Sie sie bei reinen Tablet-Einsätzen weg.
+
+---
+
+## Einschränkungen
+
+- Alle Meta-Felder sind **schreibgeschützt** — sie können nicht von anderen Berechnungen referenziert oder verändert werden.
+- `username` und `email` erfordern, dass der Interviewer angemeldet ist; sie sind bei anonymen Übermittlungen leer.
+- SIM-/Telefon-Meta-Felder können bei WLAN-only-Tablets und einigen Android-Versionen aufgrund von Berechtigungsbeschränkungen leere Werte zurückgeben.

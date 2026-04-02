@@ -1,0 +1,158 @@
+---
+title: "Perguntas repetidas"
+description: ""
+---
+
+As repetições são um recurso poderoso no rtSurvey que permite coletar o mesmo conjunto de informações várias vezes em uma única pesquisa. Isso é particularmente útil para cenários como pesquisas domiciliares, onde você pode precisar coletar dados sobre vários membros do domicílio.
+
+## Estrutura básica de repetição
+
+Para criar uma repetição no rtSurvey, use a construção `begin repeat` e `end repeat`:
+
+```
+| type         | name         | label                   |
+|--------------|--------------|-------------------------|
+| begin repeat | child_repeat |                         |
+| text         | name         | Nome da criança         |
+| decimal      | birthweight  | Peso ao nascer da criança|
+| select_one male_female | sex | Sexo da criança       |
+| end repeat   |              |                         |
+```
+
+Neste exemplo, o usuário pode coletar informações sobre várias crianças adicionando novas repetições no formulário.
+
+## Rotulando repetições
+
+Embora a coluna `label` seja opcional para `begin repeat`, adicionar um rótulo pode melhorar a navegação:
+
+```
+| type         | name         | label                   |
+|--------------|--------------|-------------------------|
+| begin repeat | child_repeat | Informações da criança  |
+| text         | name         | Nome da criança         |
+| decimal      | birthweight  | Peso ao nascer da criança|
+| select_one male_female | sex | Sexo da criança       |
+| end repeat   |              |                         |
+```
+
+O rtSurvey exibirá "Informações da criança" como título para cada instância de repetição.
+
+## Contagens de repetição fixas
+
+Para especificar um número fixo de repetições, use a coluna `repeat_count`:
+
+```
+| type         | name         | label                   | repeat_count |
+|--------------|--------------|-------------------------|--------------|
+| begin repeat | child_repeat | Informações da criança  | 3            |
+| text         | name         | Nome da criança         |              |
+| decimal      | birthweight  | Peso ao nascer da criança|             |
+| end repeat   |              |                         |              |
+```
+
+Isso criará exatamente 3 repetições de criança.
+
+## Contagens de repetição dinâmicas
+
+O rtSurvey suporta contagens de repetição dinâmicas com base em respostas anteriores:
+
+```
+| type     | name           | label                              | repeat_count       |
+|----------|----------------|------------------------------------|--------------------|
+| integer  | num_hh_members | Número de membros do domicílio?    |                    |
+| begin repeat | hh_member  | Membro do domicílio                | ${num_hh_members}  |
+| text     | name           | Nome                               |                    |
+| integer  | age            | Idade                              |                    |
+| end repeat |              |                                    |                    |
+```
+
+## Repetições condicionais
+
+Você pode usar a coluna `relevant` para exibir condicionalmente repetições:
+
+```
+| type              | name        | label                          | relevant           |
+|-------------------|-------------|--------------------------------|---------------------|
+| select_one yes_no | has_child   | Alguma criança mora aqui?      |                     |
+| begin repeat      | child_repeat| Informações da criança         | ${has_child} = 'yes'|
+| text              | name        | Nome da criança                |                     |
+| decimal           | birthweight | Peso ao nascer da criança      |                     |
+| end repeat        |             |                                |                     |
+```
+
+## Recursos específicos do rtSurvey
+
+### Resumo de repetição
+
+O rtSurvey fornece uma visualização de resumo das repetições. Para personalizar o resumo, use um grupo dentro da repetição:
+
+```
+| type         | name         | label                                    |
+|--------------|--------------|------------------------------------------|
+| begin repeat | person_repeat|                                          |
+| begin group  | person       | ${first_name} ${last_name} - ${age}      |
+| text         | first_name   | Primeiro nome                            |
+| text         | last_name    | Sobrenome                                |
+| integer      | age          | Idade                                    |
+| end group    |              |                                          |
+| end repeat   |              |                                          |
+```
+
+### Opções de aparência de repetição
+
+O rtSurvey oferece opções adicionais de aparência para repetições:
+
+- `appearance: field-list` - Exibe todas as perguntas em uma repetição em uma única tela
+- `appearance: table-list` - Apresenta repetições em formato tabular
+
+```
+| type         | name         | label                   | appearance  |
+|--------------|--------------|-------------------------|-------------|
+| begin repeat | child_repeat | Informações da criança  | table-list  |
+| text         | name         | Nome                    |             |
+| integer      | age          | Idade                   |             |
+| end repeat   |              |                         |             |
+```
+
+### Repetições aninhadas
+
+O rtSurvey suporta repetições aninhadas para estruturas de dados complexas:
+
+```
+| type         | name           | label                   |
+|--------------|----------------|-------------------------|
+| begin repeat | household      | Domicílio               |
+| text         | hh_name        | Nome do domicílio       |
+| begin repeat | hh_member      | Membro do domicílio     |
+| text         | member_name    | Nome do membro          |
+| integer      | member_age     | Idade do membro         |
+| end repeat   |                |                         |
+| end repeat   |                |                         |
+```
+
+## Práticas recomendadas para usar repetições no rtSurvey
+
+1. Use nomes e rótulos significativos para repetições para melhorar a análise de dados.
+2. Considere usar contagens de repetição dinâmicas para reduzir erros de entrada de dados.
+3. Teste seu formulário minuciosamente, especialmente ao usar repetições aninhadas complexas.
+4. Use o recurso de resumo para ajudar os entrevistadores a navegar em longas listas de repetições.
+5. Tenha cuidado com grandes números de repetições, pois elas podem impactar o desempenho do formulário.
+
+## Tratando zero repetições
+
+Para representar zero repetições no rtSurvey:
+
+1. Treine os entrevistadores para excluir a primeira repetição se não for necessária.
+2. Use contagens de repetição dinâmicas quando o número exato for conhecido.
+3. Use `relevant` para exibir condicionalmente repetições.
+
+## Considerações de exportação de dados
+
+Ao exportar dados do rtSurvey, os dados de repetição são normalmente achatados. Cada instância de repetição torna-se uma linha separada nos dados exportados, com os dados do formulário pai repetidos para cada instância.
+
+## Considerações sobre aplicativo móvel
+
+- As repetições no aplicativo móvel rtSurvey suportam coleta de dados off-line.
+- Grandes números de repetições podem impactar o desempenho do aplicativo em dispositivos de baixo custo.
+
+Ao usar repetições efetivamente no rtSurvey, você pode criar pesquisas flexíveis e poderosas capazes de capturar estruturas de dados complexas e hierárquicas, mantendo uma interface amigável para os entrevistadores.

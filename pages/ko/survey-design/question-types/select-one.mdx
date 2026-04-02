@@ -1,0 +1,145 @@
+---
+title: "Select_one"
+description: "Select_one 질문은 응답자가 미리 정의된 선택지 목록에서 정확히 하나의 옵션을 선택할 수 있게 합니다."
+---
+
+import { Callout } from 'nextra/components'
+
+`select_one` 질문 유형은 응답자에게 미리 정의된 목록에서 **정확히 하나의 옵션**을 선택하도록 요청합니다. 기본적으로 선택지는 라디오 버튼으로 렌더링되지만, 레이아웃과 동작을 변경하기 위해 다양한 appearance 옵션을 사용할 수 있습니다.
+
+## 기본 XLSForm 사양
+
+**survey 워크시트:**
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | consent | 응답자가 동의를 제공했습니까? |
+
+**choices 워크시트:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| yesno | yes | 예 |
+| yesno | no | 아니오 |
+
+`select_one listname`의 `listname`은 choices 워크시트의 `list_name` 열과 일치해야 합니다.
+
+자세한 내용은 [XLSForm 사양](https://xlsform.org/en/#question-types)을 참조하세요.
+
+## 용도
+
+Select_one 질문은 다음 용도로 사용됩니다:
+
+1. 예/아니오 질문
+2. 단일 답변 객관식 (예: 학력 수준, 성별, 혼인 상태)
+3. 범주형 평점 (예: 나쁨 / 보통 / 좋음 / 매우 좋음)
+4. 이전 답변에 따라 선택지가 필터링되는 계단식 (연결된) 선택
+5. 국가, 지역, 구 또는 기타 행정 단위 선택
+
+## Appearance 옵션
+
+`appearance` 열에 값을 지정하여 선택지가 표시되는 방식을 변경합니다:
+
+| Appearance | 설명 |
+|------------|-------------|
+| *(없음)* | 기본 라디오 버튼, 한 줄에 하나 |
+| `minimal` | 라디오 버튼 대신 단일 드롭다운/스피너 |
+| `quick` | 선택 직후 자동으로 다음 질문으로 이동 (모바일 전용) |
+| `compact` | 선택지의 컴팩트 그리드 — 화면 너비에 맞게 열 수 조정 |
+| `compact-N` | N열로 강제된 컴팩트 그리드 (예: `compact-3`) |
+| `quickcompact` | `quick`과 `compact` 결합 |
+| `quickcompact-N` | `quick`과 `compact`를 결합하고 N열 강제 |
+| `horizontal` | 가로 행으로 배열된 선택지 (웹) |
+| `horizontal-compact` | 가로, 컴팩트 간격 (웹) |
+| `likert` | Likert 척도 행 — 위에 레이블, 아래에 라디오 버튼 |
+| `label` | 입력 없이 선택지 레이블만 표시 (`list-nolabel`과 함께 사용) |
+| `list-nolabel` | 레이블 없이 입력만 표시 (`label`과 함께 사용) |
+| `columns(N)` | N열로 표시 (rtSurvey 확장, 예: `columns(3)`) |
+| `distress` | Kessler 심리적 고통 (K10) 감정 아이콘 위젯 |
+| `search-api(...)` | 동적 검색 — 런타임에 API에서 선택지 로드 |
+
+### 예시: Likert 척도
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one satisfaction | service_rating | 서비스에 얼마나 만족하십니까? | likert |
+
+### 예시: 컴팩트 3열
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one regions | region | 지역을 선택하세요 | compact-3 |
+
+## 계단식 선택
+
+계단식 (연결된) 선택은 이전 질문에서 선택한 값에 따라 선택지를 필터링합니다. choices 워크시트의 열 이름과 함께 `choice_filter` 열을 사용합니다.
+
+**survey:**
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one province | province | 도를 선택하세요 | |
+| select_one district | district | 구를 선택하세요 | province_name = `${province}` |
+
+**choices:**
+
+| list_name | name | label | province_name |
+|-----------|------|-------|---------------|
+| province | nairobi | Nairobi | |
+| province | mombasa | Mombasa | |
+| district | westlands | Westlands | nairobi |
+| district | kasarani | Kasarani | nairobi |
+| district | nyali | Nyali | mombasa |
+| district | likoni | Likoni | mombasa |
+
+응답자가 `nairobi`를 선택하면 구 목록에 `Westlands`와 `Kasarani`만 표시됩니다.
+
+<Callout type="warning">
+`choice_filter`에 사용된 열 이름 (예: `province_name`)은 choices 워크시트에 있어야 합니다. `${province}`는 `province`라는 이름의 설문 필드를 참조합니다.
+</Callout>
+
+## 표현식에서 선택된 값 사용
+
+선택된 **값** (레이블이 아닌)을 `${fieldname}`으로 참조합니다:
+
+```
+relevant: ${consent} = 'yes'
+```
+
+값 대신 선택지 레이블을 가져오려면 `choice-label()`을 사용합니다:
+
+```
+calculate: choice-label(${education_level}, ${education_level})
+```
+
+## 자유 텍스트가 있는 "기타" 옵션
+
+일반적인 패턴은 텍스트 필드를 표시하는 "기타" 옵션을 포함하는 것입니다:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one occupation | job | 직업이 무엇입니까? | |
+| text | job_other | 명시해 주세요 | `${job} = 'other'` |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| occupation | farmer | 농부 |
+| occupation | trader | 상인 |
+| occupation | student | 학생 |
+| occupation | other | 기타 (명시하세요) |
+
+## 모범 사례
+
+1. 목록을 짧고 상호 배타적으로 유지합니다 — 응답자가 하나 이상을 원할 수 있으면 대신 `select_multiple`을 사용합니다.
+2. 가장 일반적인 답변을 먼저 배치하거나 긴 목록의 경우 알파벳 순으로 정렬합니다.
+3. 관련이 있는 경우 항상 "모름" 또는 "답변하기 싫음" 옵션을 포함합니다.
+4. 화면 공간을 절약하기 위해 모바일에서 7–8개 이상의 선택지가 있는 목록에 `minimal` (드롭다운)을 사용합니다.
+5. 계단식 선택의 경우 양식을 만들기 전에 choices 워크시트에 모든 필터 열을 추가합니다.
+
+## 제한 사항
+
+- 응답자는 하나의 선택지만 선택할 수 있습니다 — 다중 답변 질문에는 `select_multiple`을 사용합니다.
+- `likert` appearance는 한 줄에 맞는 5–7개의 선택지와 가장 잘 작동합니다.
+- `quick` 자동 이동은 모바일 전용입니다; 웹 양식에서는 영향이 없습니다.

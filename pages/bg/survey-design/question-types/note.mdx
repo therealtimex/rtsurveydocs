@@ -1,0 +1,80 @@
+---
+title: "Бележка"
+description: "Въпросите от тип note показват текст само за четене или медия за предоставяне на информация или инструкции в анкетата."
+---
+
+The note question type in XLSForms and rtSurvey is used to display read-only text or media to the survey respondent. It's not a question that requires an answer, but rather a way to provide information, instructions, or context within the survey.
+
+## Basic XLSForm Specification
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | This survey is about your reading habits. |
+
+For more details on the basic note question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+
+## Uses
+
+Note questions are commonly used for:
+
+1. Providing instructions or context for upcoming questions
+2. Displaying calculated results or summaries
+3. Showing images or other media
+4. Separating sections of a survey
+5. Giving feedback based on previous responses
+
+## Best Practices
+
+1. Keep note text concise and clear to maintain respondent engagement.
+2. Use formatting (bold, italics) to emphasize important information.
+3. Consider using media (images, audio) to enhance understanding when appropriate.
+4. Use notes sparingly to avoid cluttering the survey.
+
+## Example Usage
+
+Here's an example of how you might use note questions in a survey:
+
+| type | name | label |
+|------|------|-------|
+| note | intro | Welcome to our reading habits survey. We'll ask about your preferences and reading frequency. |
+| ... | ... | ... |
+| calculate | books_per_month | `${fiction_books}` + `${non_fiction_books}` |
+| note | reading_summary | You read approximately `${books_per_month}` books per month. |
+
+In this example, we use notes to introduce the survey and provide a summary of calculated results.
+
+## rtSurvey Extensions
+
+While the basic XLSForm specification for note questions is straightforward, rtSurvey may offer additional features or customizations:
+
+1. Rich text formatting
+2. Support for embedded media (images, audio, video)
+3. Dynamic content based on previous responses
+4. Custom styling options
+
+(Note: The specific extensions available in rtSurvey for note questions would need to be confirmed and detailed here.)
+
+## Advanced Usage
+
+### Conditional Display
+
+You can use relevance expressions to show notes conditionally:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | You're an avid reader! | `${books_per_month}` > 5 |
+
+### Including Calculations
+
+Notes can include calculations to provide dynamic feedback:
+
+| type | name | label |
+|------|------|-------|
+| note | reading_time | Based on your responses, you spend approximately `${books_per_month * 5}` hours reading each month. |
+
+## Limitations
+
+- Notes do not collect data, so they should not be used when you need to gather information from respondents.
+- Overuse of notes can make a survey feel cluttered or overly long.
+- Some advanced formatting or media options may not be supported on all devices or platforms.
+

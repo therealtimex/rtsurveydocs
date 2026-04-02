@@ -1,0 +1,68 @@
+---
+title: "Not"
+description: "Notfrågor visar skrivskyddad text eller media för att ge information eller instruktioner i din undersökning."
+---
+
+Frågtypen note i XLSForms och rtSurvey används för att visa skrivskyddad text eller media för undersökningsrespondenten. Det är inte en fråga som kräver ett svar, utan snarare ett sätt att ge information, instruktioner eller sammanhang inom undersökningen.
+
+## Grundläggande XLSForm-specifikation
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | Den här undersökningen handlar om dina läsvanor. |
+
+För mer detaljer om grundläggande frågtypen note, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+
+## Användningsområden
+
+Notfrågor används vanligtvis för:
+
+1. Ge instruktioner eller sammanhang för kommande frågor
+2. Visa beräknade resultat eller sammanfattningar
+3. Visa bilder eller annan media
+4. Separera sektioner i en undersökning
+5. Ge återkoppling baserat på tidigare svar
+
+## Bästa praxis
+
+1. Håll nottexten kortfattad och tydlig för att behålla respondenternas engagemang.
+2. Använd formatering (fetstil, kursiv) för att betona viktig information.
+3. Överväg att använda media (bilder, ljud) för att förbättra förståelsen när det är lämpligt.
+4. Använd noter sparsamt för att undvika att göra undersökningen rörig.
+
+## Exempelanvändning
+
+Här är ett exempel på hur du kan använda notfrågor i en undersökning:
+
+| type | name | label |
+|------|------|-------|
+| note | intro | Välkommen till vår undersökning om läsvanor. Vi frågar om dina preferenser och läsfrekvens. |
+| ... | ... | ... |
+| calculate | books_per_month | `${fiction_books}` + `${non_fiction_books}` |
+| note | reading_summary | Du läser ungefär `${books_per_month}` böcker per månad. |
+
+I det här exemplet använder vi noter för att presentera undersökningen och ge en sammanfattning av beräknade resultat.
+
+## Avancerad användning
+
+### Villkorlig visning
+
+Du kan använda relevansuttryck för att visa noter villkorligt:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | Du är en hängiven läsare! | `${books_per_month}` > 5 |
+
+### Inkludera beräkningar
+
+Noter kan inkludera beräkningar för att ge dynamisk återkoppling:
+
+| type | name | label |
+|------|------|-------|
+| note | reading_time | Baserat på dina svar spenderar du ungefär `${books_per_month * 5}` timmar på att läsa varje månad. |
+
+## Begränsningar
+
+- Noter samlar inte in data, så de bör inte användas när du behöver samla in information från respondenter.
+- Överanvändning av noter kan göra en undersökning rörig eller onödigt lång.
+- Vissa avancerade formaterings- eller mediaalternativ kanske inte stöds på alla enheter eller plattformar.

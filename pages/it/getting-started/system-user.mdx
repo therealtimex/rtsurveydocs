@@ -1,0 +1,46 @@
+---
+title: "Utente di sistema"
+description: "Gestisci ruoli, permessi e procedure di onboarding per tutti i partecipanti alla piattaforma."
+tags: ["Users", "Access Control", "Onboarding", "Roles"]
+---
+
+# Gestione degli utenti di sistema
+
+Il modulo **Utente di sistema** (`/cpms/cpmsSystemUser/admin`) è un'interfaccia di gestione completa per controllare chi ha accesso alla piattaforma Real-Time Survey (RT-CPMS) e quali azioni può eseguire.
+
+![Interfaccia utente di sistema](/images/system_user.png)
+
+## Approccio di gestione unificato
+
+In RT-CPMS, un **Intervistatore** è semplicemente un Ruolo specifico assegnato a un Utente di sistema. Non esiste un database separato per gli "Intervistatori". Che un utente sia un Amministratore di alto livello che monitora il portale web o un Intervistatore sul campo che raccoglie dati tramite l'app mobile, tutti vengono gestiti all'interno di questo unico framework unificato.
+
+## Funzionalità principali
+
+### 1. Directory utenti e visualizzazione griglia
+L'interfaccia principale mostra un elenco paginato di tutti gli utenti connessi allo spazio di lavoro. Gli attributi chiave includono:
+* **ID e nome organizzazione**: Raggruppamento logico degli utenti sotto entità organizzative specifiche (es. `rta`, `partner_org`).
+* **Ruolo**: Specifica il livello di permesso dell'utente (es. `Amministratore`, `Responsabile team`, `Intervistatore`).
+* **Gruppo**: Assegnazioni di raggruppamento spaziale o logico (es. distretti specifici o team operativi).
+* **È sincronizzato**: Indica se l'account è integrato con successo con il sistema centrale Single Sign-On (SSO).
+* **Stato**: Indicatori visivi che confermano se un account è `Attivo`, `Inattivo`, `Eliminato` o `Bloccato`.
+
+**Azioni globali:**
+* **Aggiungi utente di sistema**: Crea manualmente un profilo individuale.
+* **Importa utenti di sistema**: Carica account in blocco usando un modello Excel. Puoi risolvere i conflitti usando le modalità `Salta` o `Sostituisci` e sincronizzare direttamente con il SSO.
+* **Eliminazione in blocco**: Supporto alla selezione multipla per la rimozione di account in blocco.
+
+### 2. Controllo degli accessi e sicurezza
+Quando si crea o modifica un profilo utente, sono disponibili diversi campi critici per la sicurezza e il flusso di lavoro:
+* **Codice utente**: Un identificatore univoco che collega l'account CPMS locale al repository SSO centrale.
+* **Codice cambio dispositivo**: Un token di sicurezza robusto richiesto quando un intervistatore deve cambiare il dispositivo mobile che usa per la raccolta dati.
+* **Livello di potere**: Una scala di priorità/accesso granulare che va da 0 (minimo) a 20 (massimo).
+* **Attivazione supervisione**: Una casella di controllo che eleva immediatamente un utente standard allo stato di gestione.
+* **Automazione del flusso di lavoro**: Un'opzione per "Approvare automaticamente le richieste di modifica", che semplifica il processo di pulizia e verifica dei dati per gli utenti fidati.
+
+### 3. Gestione codici (Onboarding automatizzato)
+Trovato nella sotto-scheda "Codice", questa funzionalità gestisce i link di registrazione e invito basati su hash, semplificando il processo di onboarding per team numerosi.
+
+* **Registrazione vs. Invito**: Scegli se gli utenti possono auto-registrarsi utilizzando un link distribuito o se richiedono un invito diretto dall'amministratore.
+* **Date di scadenza**: Limita l'onboarding a finestre temporali specifiche.
+* **Limiti di utilizzo**: Limita il numero di utenti che possono iscriversi usando un singolo codice generato.
+* **Ruoli pre-assegnati**: Gli utenti che si iscrivono tramite questi codici ereditano automaticamente il ruolo predefinito e il livello di potere, assicurando che siano pronti a lavorare immediatamente senza l'intervento manuale dell'amministratore.

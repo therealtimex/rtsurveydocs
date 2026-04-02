@@ -1,0 +1,154 @@
+---
+title: "Avancerade upprepningar"
+description: "Avancerade mönster för upprepningsgrupper: dynamiska antal, kapslade upprepningar, sammanfattning av upprepningsdata och referering till värden mellan upprepningar."
+---
+
+Den här sidan täcker avancerade mönster för att arbeta med upprepningsgrupper i rtSurvey. För grunderna i att konfigurera en upprepningsgrupp, se [Gruppering och upprepningar](../repeats).
+
+---
+
+## Dynamiskt antal upprepningar
+
+Som standard bestämmer räknaren hur många gånger att upprepa. Du kan bestämma antalet upprepningar med `repeat_count`:
+
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Hushållsmedlem | `${num_members}` |
+| text | member_name | Medlemmens namn | |
+| integer | member_age | Ålder | |
+| end_repeat | | | |
+
+Upprepningen körs exakt `${num_members}` gånger, där `num_members` samlades in tidigare i formuläret. Räknaren kan inte lägga till eller ta bort instanser.
+
+---
+
+## Indexerad åtkomst: `indexed-repeat()`
+
+Komma åt ett specifikt upprepningsinstanskältvärde **utanför** upprepningsgruppen med `indexed-repeat(repeatedField, repeatGroup, index)`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+Detta är användbart för att bygga sammanfattningsfält eller referera till "primär"-medlemmens data efter upprepningen.
+
+---
+
+## Aktuell instansposition: `index()`
+
+Inne i en upprepningsgrupp returnerar `index()` den 1-baserade positionen för den aktuella instansen. Använd det för att märka varje upprepning eller skapa unika identifierare:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Parcel |
+| note | plot_label | Parcelnummer `${index()}` |
+| text | plot_id | Parcel-ID |
+| end_repeat | | |
+
+---
+
+## Referera till fält i samma instans
+
+Inom en upprepning, använd `${fieldname}` för att referera till ett annat fält **i samma upprepningsinstans**. Det finns inget behov av `indexed-repeat()` inom samma slinga:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Medlem | |
+| text | member_name | Namn | |
+| integer | member_age | Ålder | |
+| text | school_name | Skolans namn | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## Referera till överordnade fält inifrån en upprepning
+
+Fält utanför (ovanför) upprepningsgruppen kan refereras normalt med `${fieldname}`:
+
+| type | name | label |
+|------|------|-------|
+| text | village | Byns namn |
+| begin_repeat | plots | Jordbruksparcel |
+| note | plot_context | Parceller i `${village}` |
+| end_repeat | | |
+
+---
+
+## Sammanfatta upprepningsdata
+
+Använd aggregeringsfunktioner för upprepningar **utanför** upprepningsgruppen för att sammanfatta:
+
+| Funktion | Exempel | Beskrivning |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | Antal instanser |
+| `sum(field)` | `sum(${loan_amount})` | Summa av ett numeriskt fält |
+| `min(field)` | `min(${member_age})` | Minimivärde |
+| `max(field)` | `max(${member_age})` | Maximivärde |
+| `join(sep, field)` | `join(', ', ${member_name})` | Kommaseparerad lista |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Villkorligt antal |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Villkorlig summa |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Villkorlig sammanslagning |
+
+### Exempel: Hushållssammanfattning
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | Hur många medlemmar? | |
+| begin_repeat | members | Medlem | `${num_members}` |
+| text | member_name | Namn | |
+| integer | member_age | Ålder | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | `${total_members}` medlemmar; `${children_count}` under 18. Vuxna: `${adult_names}` | |
+
+---
+
+## Kapslade upprepningar
+
+En upprepningsgrupp kan innehålla en annan upprepningsgrupp. Använd detta varsamt — kapslade upprepningar lägger till komplexitet och kan vara förvirrande för räknare.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Hushåll |
+| text | hh_id | Hushålls-ID |
+| begin_repeat | hh_members | Medlem |
+| text | member_name | Medlemmens namn |
+| end_repeat | | |
+| end_repeat | | |
+
+För att referera till ett fält i en yttre upprepning inifrån den inre upprepningen, använd `${fieldname}` — det löser sig till den närmaste matchande förfadern:
+
+Inne i `hh_members`-upprepningen returnerar `${hh_id}` ID:t för det **aktuella** hushållet, inte alla hushåll.
+
+---
+
+## Rang inom upprepningsgrupper: `rank-index()`
+
+När ett `rank`-fält finns inuti en upprepning, använd `rank-index(instanceNumber, repeatedField)` utifrån för att få den ordinala rangen för en specifik instans:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` returnerar instansindexet med det högsta poängtalet.
+
+---
+
+## Bästa praxis
+
+1. Använd alltid `repeat_count` när antalet upprepningar är känt i förväg — det förhindrar räknare från att oavsiktligt lägga till eller ta bort instanser.
+2. Håll upprepningsgrupper fokuserade — en upprepning med 20+ frågor per instans är svår att navigera.
+3. Namnge upprepningsgrupper tydligt (t.ex. `household_members`, inte `repeat1`) — namnet visas i funktionsanrop och exporterade data.
+4. Testa med det maximalt förväntade antalet instanser för att verifiera prestanda.
+5. Använd `field-list`-utseende på upprepningsgruppen för att visa alla fält på en skärm per instans (mobil).
+
+---
+
+## Begränsningar
+
+- `indexed-repeat()` kräver ett giltigt index (1 till antal instanser) — index utanför intervallet returnerar tom.
+- Kapslade upprepningar bortom 2 nivåer rekommenderas inte och kan orsaka visningsproblem på vissa klienter.
+- Aggregeringsfunktioner (`sum`, `count` osv.) arbetar på hela upprepningsgruppen — du kan inte aggregera en delmängd av instanser utan `*-if`-varianter.

@@ -1,0 +1,55 @@
+---
+title: "Operadores y funciones"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+Las expresiones en rtSurvey se escriben en un subconjunto de **XPath 1.0**, extendido con funciones de JavaRosa/ODK y funciones personalizadas de rtSurvey. Utilice expresiones en las columnas `calculate`, `constraint`, `relevant`, `required` y `default` de su XLSForm.
+
+## Referencia a valores de campo
+
+Use `${fieldname}` para referenciar el valor de otro campo:
+
+```
+${age} > 18
+```
+
+Use `.` (un solo punto) para referenciar el **valor del campo actual** — comúnmente usado en expresiones `constraint`:
+
+```
+. >= 0 and . <= 100
+```
+
+Use `..` para referenciar el grupo padre (uso avanzado en repeticiones).
+
+## Sintaxis de expresiones
+
+Las expresiones siguen las reglas estándar de XPath:
+
+- Las **cadenas** deben estar entre comillas simples: `'yes'`
+- Los **números** se escriben tal cual: `42`, `3.14`
+- Los resultados **booleanos** se usan para `relevant`, `required` y `constraint`; cualquier valor no vacío y no cero es verdadero
+- El espacio en blanco se ignora alrededor de los operadores
+
+<Callout type="warning">
+Siempre use comillas rectas (`'` o `"`) — nunca "comillas tipográficas" (comillas curvas). Los editores de texto enriquecido a menudo convierten las comillas automáticamente y romperán sus expresiones.
+</Callout>
+
+## Secciones de este capítulo
+
+- **[Operadores](operators)** — operadores de comparación (`=`, `!=`, `>`, `<`, `>=`, `<=`) y operadores lógicos (`and`, `or`, `not()`)
+- **[Funciones](functions)** — funciones de cadena, selección, número, fecha/hora, booleanas, geográficas y de utilidad
+- **[Referencias](references)** — cómo referenciar campos y valores de contexto
+
+## Ejemplos rápidos
+
+| Caso de uso | Expresión |
+|-------------|-----------|
+| Mostrar si la edad es mayor de 18 | `${age} > 18` |
+| Mostrar solo si se seleccionó "sí" | `${consent} = 'yes'` |
+| Requerir si otro campo no está vacío | `${name} != ''` |
+| Calcular total | `${adults} + ${children}` |
+| Concatenar nombre | `concat(${first_name}, ' ', ${last_name})` |
+| Fecha de hoy | `today()` |
+| Verificar si se seleccionó una opción | `selected(${interests}, 'sports')` |

@@ -1,0 +1,68 @@
+---
+title: "Deployment"
+description: "Pokrenite i upravljajte sopstvenom rtCloud instancom koristeći Docker. Potpuna kontrola nad vašim podacima, infrastrukturom i konfiguracijom."
+---
+
+Pokrenite rtCloud na sopstvenoj infrastrukturi koristeći Docker Compose. Sopstveno hostovanje vam daje potpuno vlasništvo nad vašim podacima, mrežom i okruženjem za primenu — idealno za organizacije sa zahtevima za rezidenciju podataka, mreže bez spoljnog pristupa ili prilagođene infrastrukturne potrebe.
+
+## Šta je rtCloud sopstveno hostovanje?
+
+rtCloud sopstveno hostovanje je zvanična Docker slika koja pakuje celu rtCloud platformu u prenosivi kontejnerski stek koji možete pokrenuti na bilo kom Linux serveru. Stek uključuje:
+
+| Servis | Opis |
+|--------|------|
+| **rtCloud aplikacija** | Apache 2.4 + PHP 7.4 veb aplikacija sa ugrađenim pozadinskim redom (Beanstalkd), analitičkim serverom (Shiny) i zakazanim zadacima |
+| **MySQL 8.0** | Relaciona baza podataka za sve aplikativne i anketne podatke |
+| **Keycloak** *(opciono)* | Ugrađeni server za jedinstvenu prijavu za upravljanje identitetom na nivou preduzeća |
+
+## Kada odabrati sopstveno hostovanje
+
+Sopstveno hostovanje je pravi izbor kada:
+
+- Zahtevate **suverenitet podataka** — svi podaci ostaju unutar vaše sopstvene infrastrukture
+- Radite u **mreži bez spoljnog pristupa ili ograničenoj mreži** bez pristupa spoljnom oblaku
+- Imate **zahteve usklađenosti** (GDPR, HIPAA, vladine politike podataka) koji nalažu lokalno skladištenje
+- Treba da se integrišete sa **internim pružaocem identiteta** (Active Directory, LDAP, SAML)
+- Želite da **prilagodite resurse** — alokaciju CPU-a, RAM-a i skladišnog prostora prema vašim uslovima
+
+## U ovom odeljku
+
+| Stranica | Opis |
+|----------|------|
+| [Brzi start](quick-start) | Pokrenite rtCloud na serveru za manje od 10 minuta |
+| [Referenca konfiguracije](configuration) | Kompletna lista svih promenljivih okruženja i njihovih podrazumevanih vrednosti |
+| [Primena u oblaku](cloud-deployment) | Automatizovane skripte jednim klikom za DigitalOcean, AWS, GCP i Linode |
+| [SSO autentifikacija](sso-authentication) | Konfigurišite Keycloak, spoljni OIDC ili Azure AD |
+| [Održavanje](maintenance) | Nadogradnja, pravljenje rezervnih kopija, obnavljanje i rešavanje problema vaše instance |
+
+## Pregled arhitekture
+
+Primena se izvršava kao skup Docker kontejnera povezanih na internoj mreži:
+
+```
+┌────────────────────────────────────────┐
+│            rtcloud-app                 │
+│  Apache 2.4 (port 80)                  │
+│  PHP 7.4 aplikacija                    │
+│  Beanstalkd red (interni)              │
+│  Shiny Server (port 3838)              │
+│  Cron planer                           │
+└─────────────────┬──────────────────────┘
+                  │ rtcloud-net (bridge)
+┌─────────────────▼──────────────────────┐
+│            rtcloud-mysql               │
+│  MySQL 8.0 (port 3306, samo interno)   │
+└────────────────────────────────────────┘
+```
+
+Kada je SSO aktiviran, treći kontejner radi paralelno:
+
+```
+┌─────────────────────────────────────────┐
+│            rtcloud-keycloak             │
+│  Keycloak (port 8080, samo interno)     │
+│  Admin UI (port 9000, samo interno)     │
+└─────────────────────────────────────────┘
+```
+
+Svi kontejneri komuniciraju putem izolovane Docker bridge mreže. Samo port veb aplikacije i (opciono) port Shiny analitike su izloženi hostu.

@@ -1,0 +1,92 @@
+---
+title: "Média"
+description: ""
+---
+
+rtSurvey podporuje integraci bohatých médií v průzkumech, což vám umožňuje vylepšit dotazníky obrázky, zvukem a videem. Tato funkce může výrazně zlepšit zážitek respondenta a kvalitu shromážděných dat.
+
+## Typy médií podporované rtSurvey
+
+rtSurvey podporuje následující typy médií:
+- Obrázky (jpg, png, gif)
+- Zvuk (mp3, wav)
+- Video (mp4, webm)
+
+## Přidávání médií do průzkumu
+
+Pro zahrnutí médií do formuláře rtSurvey použijte následující sloupce ve vašem XLSForm:
+
+- `image`: Pro zobrazení obrázků
+- `audio`: Pro přehrávání zvukových souborů
+- `video`: Pro přehrávání videosouborů
+
+Příklad:
+
+```
+| type | name          | label         | image        | audio       | video       |
+|------|---------------|---------------|--------------|-------------|-------------|
+| note | media_example | Příklad médií | example.jpg  | sound.mp3   | clip.mp4    |
+```
+
+## Správa mediálních souborů
+
+### Webové průzkumy
+Pro webové průzkumy rtSurvey poskytuje rozhraní pro správu médií, kde můžete nahrávat a organizovat mediální soubory. Tyto soubory jsou pak automaticky dostupné pro použití ve vašich průzkumech.
+
+### Mobilní aplikace
+Při používání mobilní aplikace rtSurvey:
+1. Umístěte mediální soubory do složky `/rtSurvey/forms/[form-name]-media/` na svém zařízení.
+2. Odkazujte na přesný název souboru ve vašem XLSForm.
+
+## Funkce specifické pro rtSurvey
+
+### Dynamické načítání médií
+rtSurvey podporuje dynamické načítání médií na základě odpovědí průzkumu:
+
+```
+| type         | name      | label              | image                    |
+|--------------|-----------|--------------------|--------------------------| 
+| select_one species | animal | Vyberte zvíře  | ${animal}.jpg            |
+```
+
+### Média v možnostech volby
+rtSurvey umožňuje používat média v možnostech volby pro otázky s výběrem:
+
+```
+| type                | name    | label           | media::image |
+|---------------------|---------|-----------------|--------------|
+| select_one_from_file animals | Vyberte zvíře |             |
+```
+
+V listu choices:
+```
+| list_name | name  | label | media::image |
+|-----------|-------|-------|--------------|
+| animals   | dog   | Pes   | dog.jpg      |
+| animals   | cat   | Kočka | cat.jpg      |
+```
+
+### Zachycení médií
+rtSurvey rozšiřuje XLSForm o možnosti zachycení médií:
+
+```
+| type  | name        | label               |
+|-------|-------------|---------------------|
+| image | photo       | Vyfotografujte      |
+| audio | voice_note  | Nahrajte hlasovou zprávu |
+| video | video_clip  | Nahrajte video      |
+```
+
+## Osvědčené postupy pro používání médií
+
+1. **Optimalizujte velikosti souborů**: Velké mediální soubory mohou zpomalit načítání a odevzdávání průzkumu.
+2. **Používejte vhodné formáty**: Držte se široce podporovaných formátů (jpg pro obrázky, mp3 pro zvuk, mp4 pro video).
+3. **Poskytujte alternativy**: Vždy zahrňte textové alternativy pro přístupnost.
+4. **Důkladně testujte**: Testujte mediální obsah na cílových zařízeních před nasazením.
+5. **Zvažte offline scénáře**: Zajistěte, aby mediální soubory byly staženy před offline sběrem dat.
+
+## Omezení
+
+- Velké mediální soubory mohou výrazně zvýšit velikost formuláře a dobu stahování.
+- Některé mediální formáty nemusí být podporovány na všech zařízeních nebo platformách.
+- Offline použití vyžaduje předchozí stažení všech mediálních souborů.

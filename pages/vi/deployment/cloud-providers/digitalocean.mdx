@@ -1,0 +1,127 @@
+---
+title: "DigitalOcean"
+description: "Triển khai rtCloud trên DigitalOcean Droplet bằng cách sử dụng tập lệnh dữ liệu người dùng tự động."
+---
+
+DigitalOcean sử dụng tập lệnh **Dữ liệu người dùng** chạy tự động trong lần khởi động đầu tiên. Bạn điền các biến cấu hình ở đầu script, sau đó dán toàn bộ script khi tạo Droplet.
+
+> Không giống như Linode StackScripts, DigitalOcean không có giao diện người dùng biểu mẫu — bạn phải chỉnh sửa tập lệnh trực tiếp trước khi dán.
+
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+
+---
+
+## Keycloak nhúng (Được khuyến nghị)
+
+Sử dụng `digitalocean-droplet-keycloak-embed.sh` để thiết lập đơn giản nhất với SSO tích hợp sẵn.
+
+### Bước 1 - Điền cấu hình
+
+Mở tập lệnh và chỉnh sửa khối `CẤU HÌNH` ở trên cùng:
+
+```bash
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
+
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
+
+# --- Optional ---
+STATA_ENABLED="false"
+TZ="Asia/Ho_Chi_Minh"
+```
+
+| Lĩnh vực | Bắt buộc | Mô tả |
+|-------|----------|-------------|
+| `DỰ ÁN_ID` | Có | Được sử dụng làm tên cơ sở dữ liệu và ID khách hàng Keycloak. Chữ thường, không có dấu cách. |
+| `ADMIN_PASSWORD` | Không | Mật khẩu để đăng nhập quản trị viên ứng dụng và bảng điều khiển quản trị Keycloak. Mặc định là `quản trị viên` — **thay đổi sau lần đăng nhập đầu tiên**. |
+| `TÊN MIỀN` | Có | Tên miền của bạn. DNS Một bản ghi phải trỏ đến IP Droplet. |
+| `LETSENCRYPT_EMAIL` | Có | Địa chỉ email để nhận thông báo chứng chỉ Let's Encrypt. |
+| `DỰ ÁN_URL` | Không | Ghi đè URL công khai. Để trống để sử dụng `DOMAIN`. Hữu ích đằng sau Cloudflare. |
+
+> **Bảo mật:** Tất cả mật khẩu mặc định là `quản trị viên`. Thay đổi chúng ngay sau lần đăng nhập đầu tiên của bạn.
+
+### Bước 2 - Tạo một giọt
+
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
+
+1. Nhấp vào **Tạo** → **Giọt**
+2. Chọn **Ubuntu 22.04 LTS** làm hình ảnh
+3. Chọn **Cơ bản, RAM 4 GB / 2 vCPU** hoặc lớn hơn
+4. Cuộn đến **Tùy chọn nâng cao** → chọn **Thêm tập lệnh khởi tạo**
+5. Dán toàn bộ nội dung script vào vùng văn bản
+6. Nhấp vào **Tạo giọt**
+
+### Bước 3 - Thêm bản ghi DNS
+
+Trong khi Droplet khởi động, hãy thêm **A record** vào nhà cung cấp DNS của bạn:
+
+```
+Type  : A
+Name  : myapp          (or @ for root domain)
+Value : <droplet-ip>
+TTL   : 300
+```
+
+### Bước 4 - Theo dõi tiến trình
+
+SSH vào Droplet và xem nhật ký:
+
+```bash
+ssh root@<droplet-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+Tập lệnh in IP máy chủ của bạn ở gần đầu - thêm bản ghi DNS ngay khi bạn nhìn thấy nó.
+
+### Bước 5 - Truy cập ứng dụng
+
+Khi quá trình thiết lập hoàn tất, nhật ký sẽ hiển thị tóm tắt:
+
+```
+============================================================
+ rtCloud deployment complete! (Embedded Keycloak)
+============================================================
+ App URL   : https://myapp.example.com
+ Admin     : admin / admin
+ Keycloak  : https://myapp.example.com/auth/admin
+
+ !! SECURITY: All passwords default to 'admin'.
+    Change them immediately after first login.
+============================================================
+```
+
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
+
+> **Thay đổi mật khẩu** ngay sau khi đăng nhập qua **Cài đặt** ở menu trên cùng bên phải.
+
+---
+
+## Sau khi triển khai
+
+### Đổi mật khẩu
+
+SSH vào Droplet, chỉnh sửa `.env` và khởi động lại vùng chứa bị ảnh hưởng:
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Cập nhật tên miền
+
+Nếu bạn chỉ định một miền khác sau khi triển khai, hãy cập nhật `PROJECT_URL` trong `.env`:
+
+```bash
+nano /opt/rtcloud/.env   # update PROJECT_URL=
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### Xem tất cả các container
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```

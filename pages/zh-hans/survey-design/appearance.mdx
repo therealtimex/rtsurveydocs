@@ -1,0 +1,133 @@
+---
+title: "外观"
+description: ""
+---
+
+rtSurvey 中的 `appearance` 列允许您自定义调查中问题的视觉呈现和行为。此功能增强了用户体验，可以显著提高数据收集效率。rtSurvey 支持标准的 XLSForm 外观属性，并用额外选项加以扩展。
+
+## 标准 XLSForm 外观属性
+
+rtSurvey 支持以下标准 XLSForm 外观属性：
+
+| 外观属性 | 问题类型 | 描述 |
+|----------------------|----------------|-------------|
+| multiline | text | 创建多行文本框（最适合网页客户端） |
+| minimal | select_one, select_multiple | 在下拉菜单中显示选项 |
+| quick | select_one | 选择后自动前进到下一个问题（仅限移动端） |
+| no-calendar | date | 隐藏日历显示（仅限移动端） |
+| month-year | date | 只允许选择月份和年份 |
+| year | date | 只允许选择年份 |
+| horizontal-compact | select_one, select_multiple | 水平显示选项（仅限网页） |
+| horizontal | select_one, select_multiple | 按列水平显示选项（仅限网页） |
+| likert | select_one | 以李克特量表呈现选项 |
+| compact | select_one, select_multiple | 以最小填充并排显示选项 |
+| quickcompact | select_one | 将紧凑显示与自动前进结合（仅限移动端） |
+| field-list | groups | 在一个屏幕上显示整个组（仅限移动端） |
+| label | select_one, select_multiple | 显示选项标签但不显示输入框 |
+| list-nolabel | select_one, select_multiple | 显示输入框但不显示标签（与 `label` 一起使用） |
+| table-list | groups | 以表格格式显示问题 |
+| signature | image | 启用签名捕获（仅限移动端） |
+| draw | image | 允许手绘（仅限移动端） |
+| map, quick map | select_one, select_one_from_file | 从地图功能中启用选择 |
+
+## 使用外观的最佳实践
+
+1. **一致性**：在整个调查中一致地使用外观属性，保持统一的外观。
+2. **移动端与网页**：考虑外观在不同设备和平台上的渲染效果。
+3. **性能**：对可能减慢表单加载的外观属性要谨慎（例如大型组的 `table-list`）。
+4. **用户体验**：选择使受访者数据输入更轻松、更直观的外观。
+5. **测试**：始终在目标设备上测试表单，确保外观按预期工作。
+
+## 高级技术
+
+### 组合外观
+
+某些外观属性可以组合以实现更复杂的布局：
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | 选择一项： | minimal compact |
+```
+
+### 动态外观
+
+rtSurvey 允许基于表单逻辑的动态外观变化：
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | 输入时间： | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## 移动应用注意事项
+
+- 某些外观（例如 `quick`、`signature`）特定于移动设备。
+- 在 Android 和 iOS 上全面测试以确保一致的行为。
+
+## rtSurvey 扩展外观属性
+
+除标准 XLSForm 外观外，rtSurvey 还支持以下平台特有选项：
+
+### 数据和显示控制
+
+| 外观属性 | 问题类型 | 描述 |
+|----------------------|----------------|-------------|
+| `invisible` | 任意 | 在视图中隐藏字段，同时仍收集或计算其值。与 `hidden` 类型不同——字段仍参与逻辑。 |
+| `displaytitle` | 任意 | 强制显示字段的标签/标题，即使它通常会被隐藏。 |
+| `autopull` | select_one, select_multiple | 在表单加载或触发字段更改时自动获取外部数据以填充选项。 |
+| `floating_hint` | text, integer, decimal | 将提示文本显示为输入字段上方的浮动标签，而不是显示在下方。 |
+| `calculate-button` | calculate | 添加一个可见按钮，按需触发字段重新计算，而不是自动计算。 |
+
+### 布局
+
+| 外观属性 | 问题类型 | 描述 |
+|----------------------|----------------|-------------|
+| `1screen` | group | 强制整个组显示在单个屏幕上，无论组的大小。 |
+| `columns(n)` | select_one, select_multiple | 以 `n` 列显示选项。例如：`columns(3)` 显示三列单选按钮。 |
+| `gridformat<row=R col=C colspan=S align=center>` | 任意 | 将字段定位在 CSS 网格布局中的第 R 行、第 C 列，跨越 S 列。与 `advanced-extension/grid-layout` 一起使用。 |
+| `ignore-simplify` | 任意 | 指示表单渲染器跳过此字段布局的自动简化或压缩。 |
+
+### 小部件
+
+| 外观属性 | 问题类型 | 描述 |
+|----------------------|----------------|-------------|
+| `likert` | select_one | 以李克特量表行呈现选项（标准表格中已确认支持）。 |
+| `distress` | select_one | 将选项渲染为 Kessler 心理困扰量表（K10）带情感图标的可视小部件。 |
+
+### API 集成
+
+| 外观属性 | 问题类型 | 描述 |
+|----------------------|----------------|-------------|
+| `callapi` | text, integer, decimal, select_one | 为此字段启用 API 调用集成。calculation 列应包含 `callapi()` 表达式。参见 [Call API](advanced-extension/call-api)。 |
+| `callapi-verify(params)` | text, integer, decimal | 使用静态参数触发 API 验证调用。表单会阻止进度，直到 API 确认该值。 |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | 与 `callapi-verify` 相同，但参数来自运行时的其他字段值。 |
+
+### 内联日期/时间格式
+
+对于 `date`、`time` 和 `datetime` 字段，您可以使用附加到外观的格式字符串指定自定义显示格式：
+
+```
+inline-[%d/%m/%Y]
+inline-1line-[%d/%m/%Y %H:%M]
+```
+
+格式标记与 `format-date()` 和 `format-date-time()` 相同。参见[函数 — 日期和时间函数](operators-and-functions/functions#date-and-time-functions)。
+
+示例：
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| datetime | event_time | 事件日期和时间 | inline-[%d/%m/%Y %I:%M %p] |
+| date | birth_date | 出生日期 | inline-[%d/%m/%Y] |
+
+## 已知限制
+
+- 复杂的外观在所有平台上的渲染可能不完全相同。
+- 某些高级的 rtSurvey 外观在离线模式下可能不受支持。
+
+## 外观问题故障排除
+
+1. **外观未应用**：检查外观列中的拼写错误。
+2. **渲染不一致**：验证与问题类型和平台的兼容性。
+3. **性能问题**：考虑简化复杂的外观，尤其是对于大型调查。

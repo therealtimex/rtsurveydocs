@@ -1,0 +1,127 @@
+---
+title: "Alapértelmezett értékek"
+description: ""
+---
+
+Az rtSurvey alapértelmezett értékei lehetővé teszik a kérdések előzetes kitöltését a válaszadó első találkozásakor. Ez a funkció jelentősen növelheti a felmérés hatékonyságát és az adatok minőségét azáltal, hogy kezdeti értékeket biztosít – amelyek vagy a leggyakrabban kiválasztottak, vagy a várt bevitel példái.
+
+## Alapvető használat
+
+Az alapértelmezett értékek beállításához használja a `default` oszlopot az XLSForm-ban:
+
+```
+| type    | name        | label                         | default    |
+|---------|-------------|-------------------------------|------------|
+| date    | survey_date | Felmérés dátuma               | 2024-07-04 |
+| decimal | weight      | Válaszadó súlya? (kg)         | 51.3       |
+```
+
+Ebben a példában a felmérés dátuma előre kitöltve 2024. július 4-vel, a súlymező 51,3 kg értékkel indul.
+
+## Dinamikus alapértelmezések
+
+Az rtSurvey dinamikus alapértelmezett értékeket is támogat függvények segítségével:
+
+```
+| type | name | label                              | default  |
+|------|------|------------------------------------| ---------|
+| date | d    | Adja meg az esemény dátumát?       | today()  |
+```
+
+Itt a `today()` függvény automatikusan az aktuális dátumra állítja be az alapértelmezést.
+
+## rtSurvey-specifikus funkciók
+
+### Kontextus-tudatos alapértelmezések
+
+Az rtSurvey kiterjeszti az alapértelmezési funkciót kontextus-tudatos alapértelmezésekkel:
+
+```
+| type    | name     | label           | default            |
+|---------|----------|-----------------|---------------------|
+| text    | location | Jelenlegi helyszín | ${current_location} |
+```
+
+Ez az rtSurvey `${current_location}` változóját használja a helyszín előzetes kitöltéséhez az eszköz GPS-e alapján.
+
+### Kaszkádos alapértelmezések
+
+Az rtSurvey lehetővé teszi az előző válaszokon alapuló alapértelmezéseket:
+
+```
+| type    | name     | label           | default         |
+|---------|----------|-----------------|-----------------|
+| text    | city     | Város           |                 |
+| text    | district | Kerület         | ${city}-district|
+```
+
+Itt a kerület mező előre kitöltve a megadott városon alapul.
+
+### Alapértelmezés ismétlésekben
+
+Az ismétlőcsoporton belüli kérdéseknél az alapértelmezés az ismétlés hozzáadásakor kerül kiszámításra:
+
+```
+| type         | name      | label        | default                |
+|--------------|-----------|--------------|------------------------|
+| begin repeat | visits    | Klinikai látogatások |                  |
+| date         | visit_date| Látogatás dátuma | ${previous_visit_date} |
+| end repeat   |           |              |                        |
+```
+
+Ez az alapértelmezett látogatási dátumot az előző látogatás dátumára állítja.
+
+## Az alapértelmezések használatának bevált módszerei
+
+1. **Takarékosan használja**: Csak ott alkalmazzon alapértelmezéseket, ahol azok valóban növelik a hatékonyságot vagy az adatminőséget.
+2. **Biztosítsa a pontosságot**: Rendszeresen felülvizsgálja és frissítse a statikus alapértelmezett értékeket.
+3. **Alaposan tesztelje**: Különösen dinamikus vagy számított alapértelmezések esetén.
+4. **Vegye figyelembe a felhasználói élményt**: Biztosítsa, hogy az alapértelmezések ne vezessék félre a válaszadókat, és ne okozzanak torzítást.
+5. **Dokumentáljon egyértelműen**: Győződjön meg arról, hogy minden csapattag érti az alapértelmezett értékek mögötti indokokat.
+
+## Haladó alapértelmezési technikák
+
+### Véletlenszerű alapértelmezések
+
+Az rtSurvey bizonyos kérdéstípusoknál véletlenszerű alapértelmezéseket is támogat:
+
+```
+| type              | name    | label        | default           |
+|-------------------|---------|--------------|-------------------|
+| select_one options| choice  | Válasszon egyet: | random(options) |
+```
+
+Ez véletlenszerűen választ egy alapértelmezett lehetőséget az 'options' listából.
+
+### Feltételes alapértelmezések
+
+A relevancia segítségével feltételes alapértelmezések állíthatók be:
+
+```
+| type    | name     | label    | default | relevant        |
+|---------|----------|----------|---------|-----------------|
+| text    | other    | Pontosítsa | N/A   | ${q1} = 'other' |
+```
+
+Itt az 'N/A' csak akkor az alapértelmezés, ha egy korábbi kérdésben 'other' lett kiválasztva.
+
+## Adatkezelési szempontok
+
+- Az alapértelmezett értékek szerepelnek az adatexportokban, általában egy jelzővel, amely mutatja, hogy alapértelmezett volt.
+- Az rtSurvey audit-trail funkciója nyomon követi, mikor változtatnak a válaszadók az alapértelmezett értékeken.
+
+## Mobilalkalmazás viselkedése
+
+- Az rtSurvey mobilalkalmazás az összes alapértelmezési funkciót támogatja, beleértve a dinamikus és kontextus-tudatos alapértelmezéseket.
+- Az offline mód egyes, valós idejű adatoktól függő dinamikus alapértelmezéseket befolyásolhat.
+
+## Ismert korlátozások
+
+- Az összetett számított alapértelmezések befolyásolhatják az űrlap betöltési idejét, különösen alacsony teljesítményű eszközökön.
+- Egyes dinamikus alapértelmezések esetleg nem működnek megfelelően előnézeti módban.
+
+## Az alapértelmezett értékek hibaelhárítása
+
+1. **Az alapértelmezés nem jelenik meg**: Ellenőrizze a default kifejezés szintaxisát.
+2. **Váratlan értékek**: Ellenőrizze a számítási logikát, és tesztelje különféle forgatókönyvekkel.
+3. **Teljesítményproblémák**: Optimalizálja az összetett alapértelmezett számításokat, vagy fontolja meg alternatív megközelítések alkalmazását.

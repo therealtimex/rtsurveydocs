@@ -1,0 +1,73 @@
+---
+title: "Note"
+description: "សំណួរ note បង្ហាញ read-only text ឬ media ដើម្បីផ្តល់ information ឬ instructions ក្នុងការស្ទង់មតិ។"
+---
+
+ប្រភេទ question `note` ក្នុង XLSForms និង rtSurvey ប្រើ ដើម្បីបង្ហាញ read-only text ឬ media ដល់ respondent ។ វាមិនមែន question ដែលតម្រូវចម្លើយ ប៉ុន្តែជាវិធី ផ្តល់ information, instructions, ឬ context ក្នុងការស្ទង់មតិ។
+
+## ការបញ្ជាក់ XLSForm មូលដ្ឋាន
+
+| type | name | label |
+|------|------|-------|
+| note | info_text | This survey is about your reading habits. |
+
+សម្រាប់ព័ត៌មានបន្ថែម សូមមើល [XLSForm specification](https://xlsform.org/en/#question-types)។
+
+## ការប្រើប្រាស់
+
+សំណួរ note ប្រើជាទូទៅសម្រាប់:
+
+1. ការ providing instructions ឬ context សម្រាប់ questions ខាងក្រោម
+2. ការ displaying calculated results ឬ summaries
+3. ការ showing images ឬ media ផ្សេងទៀត
+4. ការ separating sections នៃការស្ទង់មតិ
+5. ការ giving feedback ផ្អែកលើ responses ពីមុន
+
+## ការអនុវត្តល្អ
+
+1. រក្សា note text ខ្លី និងច្បាស់ ដើម្បីរក្សា respondent engagement។
+2. ប្រើ formatting (bold, italics) ដើម្បី emphasize information សំខាន់។
+3. ពិចារណាប្រើ media (images, audio) ដើម្បី enhance understanding ក្នុងករណីចាំបាច់។
+4. ប្រើ notes sparingly ដើម្បីជៀសវាង clutter ការស្ទង់មតិ។
+
+## ឧទាហរណ៍ការប្រើប្រាស់
+
+| type | name | label |
+|------|------|-------|
+| note | intro | Welcome to our reading habits survey. We'll ask about your preferences and reading frequency. |
+| ... | ... | ... |
+| calculate | books_per_month | `${fiction_books}` + `${non_fiction_books}` |
+| note | reading_summary | You read approximately `${books_per_month}` books per month. |
+
+## ផ្នែកពង្រីករបស់ rtSurvey
+
+ខណៈដែល XLSForm specification មូលដ្ឋានសម្រាប់ note គឺ straightforward rtSurvey អាចផ្តល់:
+
+1. Rich text formatting
+2. ការ Support embedded media (images, audio, video)
+3. Dynamic content ផ្អែកលើ responses ពីមុន
+4. Custom styling options
+
+## ការប្រើប្រាស់ขั้ High
+
+### Conditional Display
+
+អ្នកអាចប្រើ relevance expressions ដើម្បីបង្ហាញ notes ដោយ conditional:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | high_reader_note | You're an avid reader! | `${books_per_month}` > 5 |
+
+### Including Calculations
+
+Notes អាចរួមបញ្ចូល calculations ដើម្បីផ្តល់ dynamic feedback:
+
+| type | name | label |
+|------|------|-------|
+| note | reading_time | Based on your responses, you spend approximately `${books_per_month * 5}` hours reading each month. |
+
+## ការដាក់កំហិត
+
+- Notes មិន collect data ដូច្នេះ ពួកវាមិនគួរប្រើ នៅពេលអ្នកត្រូវការ gather information ពី respondents។
+- ការ overuse notes អាចធ្វើឱ្យការស្ទង់មតិ cluttered ឬ overly long។
+- Advanced formatting ឬ media options ខ្លះ ប្រហែលមិនត្រូវបានគាំទ្រ លើ devices ឬ platforms ទាំងអស់។

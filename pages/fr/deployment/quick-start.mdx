@@ -1,0 +1,36 @@
+---
+title: "Démarrage rapide"
+description: "Déployez rtCloud sur votre propre serveur en quelques minutes avec un script cloud automatisé."
+---
+
+Ce guide vous aide à faire fonctionner rtCloud sur votre propre serveur. Les scripts automatisés s'occupent de tout — Docker, SSL, base de données, pare-feu — en une seule exécution.
+
+## Prérequis
+
+### Serveur
+
+| Ressource | Minimum | Recommandé |
+|-----------|---------|-----------|
+| RAM | 2 Go | 4 Go (requis avec Keycloak SSO) |
+| Disque | 25 Go | 40 Go |
+| CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Domaine
+
+Vous avez besoin d'un nom de domaine avec un **enregistrement A pointant vers l'IP du serveur** avant d'exécuter le script. Let's Encrypt nécessite une résolution DNS pour émettre le certificat SSL.
+
+---
+
+## Choisissez votre fournisseur cloud
+
+Sélectionnez votre fournisseur ci-dessous. Chacun dispose d'un script automatisé qui s'exécute au premier démarrage et finalise la configuration en **5–10 minutes**.
+
+| Fournisseur | Guide |
+|------------|-------|
+| Linode (Akamai) | [Déployer sur Linode](../cloud-deployment/linode) — le plus simple, configuration par formulaire via StackScript |
+| DigitalOcean | [Déployer sur DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Déployer sur AWS](../cloud-deployment/aws) |
+| Google Cloud | [Déployer sur GCP](../cloud-deployment/gcp) |
+
+> **Recommandé pour la plupart des utilisateurs :** Commencez par Linode — le StackScript offre une interface basée sur un formulaire, donc rien à modifier manuellement.

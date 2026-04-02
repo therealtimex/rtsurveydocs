@@ -1,0 +1,120 @@
+---
+title: "Mehrsprachige Unterstützung"
+description: ""
+---
+
+rtSurvey bietet eine robuste mehrsprachige Unterstützung, die es Ihnen ermöglicht, Umfragen in mehreren Sprachen zu erstellen. Diese Funktion ist entscheidend für die Durchführung von Forschung in verschiedenen sprachlichen Populationen oder in mehrsprachigen Umgebungen.
+
+## Einrichten mehrsprachiger Umfragen
+
+Um eine mehrsprachige Umfrage in rtSurvey zu erstellen, müssen Sie sprachspezifische Spalten zu Ihrer XLSForm hinzufügen. So geht's:
+
+1. **Übersetzung von Beschriftungen (Labels)**: Fügen Sie Spalten für jede Sprache im Format `label::Sprache (code)` hinzu.
+2. **Übersetzung von Hinweisen (Hints)**: Verwenden Sie `hint::Sprache (code)` für die Übersetzung von Hinweisen.
+3. **Übersetzung von Mediendateien**: Für sprachspezifische Medien verwenden Sie `media::Sprache (code)`.
+
+Beispiel:
+
+```
+| type    | name | label::English (en) | label::Deutsch (de) | hint::English (en) | hint::Deutsch (de) |
+|---------|------|---------------------|---------------------|---------------------|---------------------|
+| integer | age  | How old are you?    | Wie alt sind Sie?   | Enter your age      | Geben Sie Ihr Alter ein |
+```
+
+## Sprachcodes
+
+Es wird empfohlen, die offiziellen 2-Zeichen-Sprachcodes (Subtags) nach dem Sprachnamen zu verwenden. Dies erleichtert den Abgleich der Formularsprache mit der Sprache der Benutzeroberfläche. Die offiziellen Codes finden Sie [hier](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+
+## Festlegen einer Standardsprache
+
+Um eine Standardsprache für die Datenerfassung festzulegen, verwenden Sie das Arbeitsblatt `settings` in Ihrer XLSForm:
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | German (de)       |
+```
+
+## rtSurvey-spezifische Funktionen
+
+### Dynamischer Sprachwechsel
+
+rtSurvey ermöglicht es Benutzern, die Sprache während der Datenerfassung dynamisch zu wechseln:
+
+- Verwenden Sie in der Web-Oberfläche das Sprach-Dropdown in der oberen Navigationsleiste.
+- Greifen Sie in der Mobil-App über das Einstellungsmenü auf die Sprachoptionen zu.
+
+### Sprachspezifische Validierungsmeldungen
+
+rtSurvey erweitert die mehrsprachige Unterstützung auf Validierungsmeldungen:
+
+```
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Deutsch (de) |
+|---------|------|------------|----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Age must be 150 or less          | Das Alter muss 150 oder weniger sein |
+```
+
+### RTL-Sprachunterstützung
+
+Für von rechts nach links (RTL) geschriebene Sprachen wie Arabisch oder Hebräisch passt rtSurvey das Layout automatisch an:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Your name           | اسمك                |
+```
+
+### Sprachspezifisches Erscheinungsbild
+
+rtSurvey ermöglicht es Ihnen, unterschiedliche Darstellungsformen für verschiedene Sprachen festzulegen:
+
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Address          | 地址                 | multiline                | textarea                  |
+```
+
+## Best Practices für mehrsprachige Umfragen
+
+1. **Konsistente Benennung**: Verwenden Sie konsistente Sprachcodes in Ihrem gesamten Formular.
+2. **Professionelle Übersetzung**: Beauftragen Sie professionelle Übersetzer, die mit dem Kontext der Umfrage vertraut sind.
+3. **Kontexthinweise**: Geben Sie den Übersetzern Kontexthinweise, um genaue Übersetzungen zu gewährleisten.
+4. **Testen**: Testen Sie Ihr Formular in allen Sprachen vor dem Einsatz.
+5. **Unicode-Unterstützung**: Stellen Sie sicher, dass Ihre Datenerfassungsgeräte Unicode für nicht-lateinische Schriften unterstützen.
+6. **Sprachspezifische Medien**: Verwenden Sie kulturell angemessene Bilder oder Audio für jede Sprache.
+7. **Text in Bildern vermeiden**: Wenn Sie Bilder mit Text verwenden, erstellen Sie separate Bilder für jede Sprache.
+
+## Umgang mit Sonderfällen
+
+### Gemischtsprachige Antworten
+
+rtSurvey ermöglicht es Befragten, Text in jedem beliebigen Alphabet einzugeben, unabhängig von der gewählten Formularsprache. Dies ist nützlich für die Erfassung von Namen oder Adressen in ihrer Originalschrift.
+
+### Sprachspezifische Fragetypen
+
+Einige Fragetypen sind für bestimmte Sprachen möglicherweise besser geeignet. rtSurvey ermöglicht es Ihnen, je nach Sprache unterschiedliche Fragetypen zu verwenden:
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
+```
+
+## Exportieren mehrsprachiger Daten
+
+Beim Exportieren von Daten aus rtSurvey:
+
+- Wählen Sie den Export in einer bestimmten Sprache oder schließen Sie alle Sprachversionen ein.
+- Sprachmetadaten sind im Export enthalten und geben an, welche Sprache für jede Antwort verwendet wurde.
+
+## Überlegungen zur mobilen App
+
+- Die rtSurvey-Mobil-App unterstützt den Offline-Sprachwechsel.
+- Stellen Sie sicher, dass alle erforderlichen Sprachdateien vor dem Offline-Gang heruntergeladen wurden.
+
+## Bekannte Einschränkungen
+
+- Einige fortgeschrittene Funktionen sind möglicherweise nicht in allen Sprachen verfügbar.
+- Extrem lange Übersetzungen können das Layout auf kleinen Bildschirmen beeinträchtigen.
+
+Durch die Nutzung der mehrsprachigen Funktionen von rtSurvey können Sie inklusive, barrierefreie Umfragen erstellen, die diverse Bevölkerungsgruppen erreichen und qualitativ hochwertige, linguistisch präzise Daten liefern.

@@ -1,0 +1,141 @@
+---
+title: "HTML-Styling"
+description: "rtSurvey unterstützt HTML-Tags in Beschriftungen und Hinweisen und ermöglicht so Rich-Text-Formatierung, Links und dynamische Farbthemen."
+---
+
+import { Callout } from 'nextra/components'
+
+rtSurvey rendert **Beschriftungs**- und **Hinweis**-Text als HTML in Webformularen. Das bedeutet, dass Sie Standard-HTML-Tags verwenden können, um Text zu formatieren, Zeilenumbrüche hinzuzufügen, Links zu erstellen und Farben anzuwenden. Dies ist besonders nützlich für Notizfelder, Abschnittsanweisungen und dynamische Zusammenfassungen.
+
+<Callout type="warning">
+HTML in Beschriftungen wird im **Webformular** und in den mobilen rtSurvey-Apps gerendert. Es wird möglicherweise nicht in allen ODK-kompatiblen Clients gerendert. Testen Sie immer auf Ihrer Zielplattform.
+</Callout>
+
+---
+
+## Unterstützte HTML-Tags
+
+### Textformatierung
+
+| Tag | Ergebnis |
+|-----|--------|
+| `<strong>Text</strong>` oder `<b>Text</b>` | **Fettgedruckter Text** |
+| `<em>Text</em>` oder `<i>Text</i>` | *Kursiver Text* |
+| `<u>Text</u>` | Unterstrichener Text |
+| `<br>` | Zeilenumbruch |
+| `<span style="...">Text</span>` | Inline-Styling |
+
+### Links
+
+```html
+<a href="https://example.com" target="_blank">Hier klicken</a>
+```
+
+Öffnet in einem neuen Tab. Verwenden Sie dies für Referenzdokumente, Leitlinien oder externe Ressourcen, die der Interviewer konsultieren soll.
+
+### Farben
+
+Verwenden Sie `<span>` mit Inline-Styles:
+
+```html
+<span style="color: red;">Warnung: Wert liegt außerhalb des Bereichs</span>
+<span style="color: #009688;">Abschnitt abgeschlossen</span>
+```
+
+---
+
+## Farbthema-Variablen
+
+rtSurvey unterstützt **Farbthema-Token**, die sich an das konfigurierte Thema der App anpassen. Verwenden Sie die `__COLOR_THEME_NAME__`-Syntax:
+
+```html
+<span style="color: var(--color-theme-primary);">Text in Primärfarbe</span>
+```
+
+Oder mit dem Token-Kürzel im Beschriftungstext:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Wichtiger Hinweis</font>
+```
+
+Dies wird beim Rendern automatisch in das entsprechende `<span>` mit einer CSS-Variable umgewandelt.
+
+---
+
+## Mehrsprachige Beschriftungen
+
+Wickeln Sie Inhalte in Sprach-Tags ein, um mehrere Sprachen in einer einzigen Beschriftungszelle zu unterstützen:
+
+```
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey extrahiert den Inhalt, der der aktuellen App-Sprache entspricht. Wenn kein passender Sprach-Tag gefunden wird, wird die gesamte Zeichenkette unverändert angezeigt.
+
+---
+
+## Beispiele in Notizfeldern
+
+### Abschnittsanweisung mit Fettschrift und Zeilenumbruch
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Abschnitt 3: Flächennutzung</strong><br>Alle Fragen in diesem Abschnitt nur dem Haushaltsvorstand stellen.` |
+
+### Dynamische Zusammenfassung mit Berechnungsreferenz
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Gesamtzahl der Haushaltsmitglieder: <strong>${total}</strong><br><span style="color: gray;">Erwachsene: ${adults} · Kinder: ${children}</span>` |
+
+### Warnung in Rot
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Warnung:</strong> Eingegebenes Alter (${age}) ist ungewöhnlich hoch. Bitte überprüfen.</span>` | `${age} > 100` |
+
+### Link zu einem Referenzdokument
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Lesen Sie die <a href="https://docs.example.com/guidelines" target="_blank">Feldleitlinien</a>, bevor Sie diesen Abschnitt beginnen.` |
+
+---
+
+## Besondere rtSurvey-HTML-Tags
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+Bettet eine Schaltfläche ein, die eine URL in einem Formular-internen Modal öffnet. Vollständige Details unter [Webbox](webbox).
+
+### `<delete-repeat-current>Beschriftung</delete-repeat-current>`
+
+Rendert eine Schaltfläche innerhalb einer Wiederholungsgruppe, die die aktuelle Wiederholungsinstanz löscht, wenn sie angetippt wird.
+
+### `<delete-repeat-last>Beschriftung</delete-repeat-last>`
+
+Rendert eine Schaltfläche, die die letzte Wiederholungsinstanz löscht.
+
+Verwendungsbeispiel in einer Wiederholungsgruppe:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Dieses Mitglied entfernen</delete-repeat-current>` |
+
+---
+
+## Empfohlene Vorgehensweisen
+
+1. Verwenden Sie HTML sparsam — übermäßig formatierte Beschriftungen sind schwerer zu lesen, nicht leichter.
+2. Bevorzugen Sie `<strong>` für Fettschrift und `<em>` für Kursivschrift gegenüber den veralteten `<b>` und `<i>`.
+3. Verwenden Sie Farben bedeutungstragend — Rot für Warnungen, nicht für Dekoration.
+4. Testen Sie das HTML-Rendering immer auf der mobilen App und dem Webformular, da das Rendering leicht abweichen kann.
+5. Vermeiden Sie `<table>`-Tags in Beschriftungen — sie werden auf mobilen Bildschirmen selten gut gerendert.
+6. Verwenden Sie kein JavaScript (`<script>`) — es wird entfernt oder verursacht Fehler.
+
+## Einschränkungen
+
+- Komplexes HTML (Tabellen, Formulare, Skripte) wird nicht unterstützt und kann das Rendering zerstören.
+- Einige ältere mobile Clients zeigen möglicherweise HTML-Tags als wörtlichen Text an — testen Sie auf allen Zielgeräten.
+- `<a>`-Links öffnen sich in einem Browser oder WebView — der Interviewer verlässt das Formular, was auf mobilen Geräten störend sein kann.

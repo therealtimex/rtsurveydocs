@@ -1,0 +1,107 @@
+---
+title: "Layout em grade"
+description: "O layout em grade permite posicionar campos em uma grade CSS dentro de um grupo, habilitando designs de formulário com múltiplas colunas."
+---
+
+O recurso **Layout em grade** permite organizar perguntas em uma **grade com múltiplas colunas** dentro de um grupo, usando a tag de aparência `gridformat<>`. Isso é útil para formulários de entrada de dados densos onde vários campos relacionados devem aparecer lado a lado em vez de empilhados verticalmente.
+
+---
+
+## Como funciona
+
+O layout em grade é aplicado em dois níveis:
+
+1. **O grupo** — defina `appearance: field-list grid(weight=N)` para definir quantas colunas a grade tem
+2. **Cada campo dentro do grupo** — defina `appearance: gridformat<row=R col=C colspan=S/>` para posicionar o campo
+
+A grade usa um sistema de 12 colunas no estilo Bootstrap. `weight=N` define quantas colunas lógicas sua grade tem; cada coluna ocupa `12/N` colunas Bootstrap.
+
+---
+
+## Aparência no nível do grupo
+
+| Aparência | Descrição |
+|-----------|-----------|
+| `field-list grid(weight=2)` | Grade de 2 colunas (cada coluna = 6 colunas Bootstrap) |
+| `field-list grid(weight=3)` | Grade de 3 colunas (cada coluna = 4 colunas Bootstrap) |
+| `field-list grid(weight=4)` | Grade de 4 colunas (cada coluna = 3 colunas Bootstrap) |
+| `field-list grid(weight=6)` | Grade de 6 colunas (cada coluna = 2 colunas Bootstrap) |
+
+---
+
+## Sintaxe `gridformat<>` no nível do campo
+
+```
+gridformat<row=R col=C colspan=S/>
+gridformat<row=R col=C colspan=S backgroundcolor=COLOR/>
+```
+
+| Atributo | Descrição |
+|----------|-----------|
+| `row` | Número da linha (base 1) |
+| `col` | Número da coluna (base 1, dentro da grade definida por `weight`) |
+| `colspan` | Número de colunas que este campo abrange (padrão 1) |
+| `backgroundcolor` | Cor CSS opcional para o fundo do campo (por exemplo, `#f0f0f0`, `lightblue`) |
+
+---
+
+## Exemplo: Seção de pesquisa domiciliar com 2 colunas
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | demographics | Dados demográficos | `field-list grid(weight=2)` |
+| text | first_name | Primeiro nome | `gridformat<row=1 col=1/>` |
+| text | last_name | Sobrenome | `gridformat<row=1 col=2/>` |
+| integer | age | Idade | `gridformat<row=2 col=1/>` |
+| select_one gender | gender | Gênero | `gridformat<row=2 col=2/>` |
+| text | address | Endereço completo | `gridformat<row=3 col=1 colspan=2/>` |
+| end_group | | | |
+
+Isso é renderizado como:
+
+```
+[ Primeiro nome     ] [ Sobrenome          ]
+[ Idade             ] [ Gênero             ]
+[ Endereço completo (abrange ambas as colunas) ]
+```
+
+---
+
+## Exemplo: Entrada de dados de lote com 3 colunas
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | plot_data | Detalhes do lote | `field-list grid(weight=3)` |
+| text | plot_id | ID do lote | `gridformat<row=1 col=1/>` |
+| decimal | area_ha | Área (ha) | `gridformat<row=1 col=2/>` |
+| select_one crop_type | crop | Tipo de cultura | `gridformat<row=1 col=3/>` |
+| decimal | yield | Produção (kg) | `gridformat<row=2 col=1/>` |
+| decimal | revenue | Receita | `gridformat<row=2 col=2/>` |
+| text | notes | Observações | `gridformat<row=2 col=3/>` |
+| end_group | | | |
+
+---
+
+## Cores de fundo
+
+Use `backgroundcolor` para distinguir visualmente as seções:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | section_a | Seção A | `gridformat<row=1 col=1 colspan=2 backgroundcolor=#e8f4f8/>` |
+
+---
+
+## Práticas recomendadas
+
+1. Use o layout em grade apenas para telas com **entrada de dados intensiva** onde campos lado a lado genuinamente reduzem a rolagem.
+2. Mantenha os campos `colspan=1` curtos (IDs, códigos, seleções curtas) — rótulos largos ficam truncados em colunas de grade estreitas.
+3. Use `colspan=N` para campos com rótulos longos ou entradas de texto de várias linhas.
+4. Teste no menor tamanho de tela que você espera que os entrevistadores usem — uma grade de 4 colunas fica apertada em um telefone.
+5. O layout em grade funciona melhor em fatores de forma web e tablet; em celulares, um layout de 2 colunas é geralmente a largura máxima confortável.
+
+## Limitações
+
+- `gridformat<>` só funciona dentro de um grupo com aparência `grid(weight=N)` — não tem efeito no nível superior.
+- O layout em grade é uma extensão do formulário web rtSurvey e pode não ser renderizado corretamente em outros clientes compatíveis com ODK.
+- O posicionamento por linha e coluna não é validado no momento da construção do formulário — campos sobrepostos serão renderizados ambos, mas podem parecer quebrados.

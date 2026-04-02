@@ -1,0 +1,41 @@
+---
+title: "Operators"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+### Comparison operators
+
+Operator | Operation      | Example              | Example Answer
+-------- | -------------- | -------------------- | --------------
+`=`        | Equal          | `${age}` = 25     | true or false
+`!=`       | Not equal      | `${age}` != 25    | true or false
+`>`        | Greater-than   | `${age}` > 25     | true or false
+`>=`       | Greater-than or equal | `${age}` >= 25 | true or false
+`<`        | Less-than      | `${age}` < 25     | true or false
+`<=`       | Less-than or equal | `${age}` &lt;= 25  | true or false
+
+In the examples above, `${age}` represents the current field's value, and the operator is used to compare it with the value 25. The constraint will evaluate to either true or false, depending on whether the comparison is satisfied or not.
+
+### Logical operators
+
+Logical operators are used to combine multiple expressions in constraints. Here are some commonly used logical operators along with their operations and examples:
+
+Operator | Operation      | Example                                           
+-------- | -------------- | --------------------------------------------------
+`or`       | Returns true if either expression is true          | `${age}` = 3 or `${age}` = 4
+`and`      | Returns true only if both expressions are true    | `${age}` > 3 and `${age}` < 5
+`not()`    | Returns true if the expression is not true        | not(`${age}` > 3 and `${age}` < 5)
+
+In the examples above, `${age}` represents the current field's value, and the logical operators are used to combine expressions. The constraint will evaluate to true or false based on the conditions specified.
+
+Example 1:
+<Callout type="info">`${age} = 3 or ${age} = 4` will return `true` if the age is either 3 or 4.</Callout>
+
+Example 2:
+<Callout type="info">`${age} > 3 and ${age} < 5` will return `true` if the age is between 3 and 5.</Callout>
+
+Example 3:
+<Callout type="info">`not(${age} > 3 and ${age} < 5)` will return `true` if the age is not between 3 and 5.</Callout>
+

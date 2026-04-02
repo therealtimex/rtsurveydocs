@@ -1,0 +1,137 @@
+---
+title: "App API"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+AppAPI를 사용하면 사용자가 FormEngine 및 DMView에서 다양한 메서드를 사용하여 앱의 시스템 메타데이터를 로드할 수 있습니다. 앱에서 특정 정보를 검색하기 위한 다양한 데이터 키에 대한 액세스를 제공합니다.
+
+XLSForm에서 다음 구문으로 `pulldata()` 함수를 사용할 수 있습니다:
+
+
+<Callout>pulldata('app-api', 'data-key')</Callout>
+
+- `'app-api'`: 이 키워드는 FormEngine에 App API에서 데이터를 로드하도록 알립니다.
+- `'data-key'`: App API에서 로드하려는 데이터의 키입니다.
+- 데이터 키가 유효하지 않거나 지원되지 않으면 계산이 "n/a"를 반환합니다.
+
+다음은 App-API와 함께 사용할 수 있는 지원되는 데이터 키입니다:
+
+`osPlatform`: 현재 OS 이름 (Android 또는 iOS)과 OS 버전을 반환합니다. 웹 플랫폼은 빈 값을 반환합니다.
+
+`appPlatform`: 앱 플랫폼 이름인 `rtSurvey`를 반환합니다.
+
+`appVersion`: 앱의 버전 이름을 반환합니다.
+
+`getDisplayWidth`: 픽셀 단위의 기기 화면 너비를 반환합니다.
+
+`getDisplayHeight`: 픽셀 단위의 기기 화면 높이를 반환합니다.
+
+`getScreenSize`: 인치 단위의 기기 화면 크기를 반환합니다.
+
+`projectCode`: 사용자가 로그인한 사이트의 현재 프로젝트 코드를 반환합니다.
+
+`projectURL`: 사용자가 로그인한 사이트의 현재 프로젝트 URL을 반환합니다. 기본값/폴백은 빈 텍스트 ("")입니다.
+
+`startingPoint`: 양식을 시작하는 지점의 경로를 반환합니다. 자세한 내용은 "양식 시작점"을 참조하세요.
+
+`serverTime`: 서버의 날짜 및 시간에 대한 최선의 근사값을 반환합니다.
+
+`user.[attribute]`: 지정된 속성 키에 따라 현재 사용자 속성을 반환합니다. 사용 가능한 속성 키는 "사용자 속성" 표를 참조하세요.
+
+현재 사용자 정보를 검색하려면 `pulldata()` 매개변수에서 "user."와 아래 속성 키를 결합합니다. 예를 들어 `user.username`, `user.email` 등을 사용합니다.
+
+| 속성 키        | 설명                          |
+|----------------------|--------------------------------------|
+| username             | 사용자의 사용자명                  |
+| name                 | 사용자의 전체 이름                 |
+| staffCode            | 사용자의 직원 코드                     |
+| phone                | 사용자의 전화번호              |
+| email                | 사용자의 이메일 주소             |
+| description          | 사용자 정보의 설명 텍스트  |
+| organization_id      | 사용자가 속한 조직 ID    |
+| organization_name    | 사용자가 속한 조직 이름  |
+| team_id              | 사용자가 속한 팀 ID            |
+| supervisor_id        | 사용자의 감독자 ID            |
+| is_supervisor        | 사용자가 감독자이면 1, 아니면 0|
+
+`instancePath`: 현재 인스턴스 폴더 경로를 반환합니다.
+
+`appLanguage`: 앱 설정에서 설정된 현재 앱 언어를 반환합니다 (예: vi, en).
+
+`openArgs.[attribute]`: ActionButton에서 전달된 open-form-argument를 반환합니다 (act_fill_form, act_get_instance). 기본값/폴백은 빈 텍스트 ("")입니다.
+
+`primaryAppColor`: 앱의 기본 색상을 검색합니다.
+
+---
+
+## 사용 예시
+
+### 조사원의 사용자명 및 조직 저장
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+감사 목적으로 메모 레이블에서 사용합니다:
+```
+note | interviewer_info | 면접자: ${enumerator_name} (${enumerator_org})
+```
+
+### 기기 및 화면 정보
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+문제 해결에 유용합니다: 각 제출에 어떤 기기 버전이 사용되었는지 식별하기 위해 데이터와 함께 `device_platform` 및 `app_ver`를 내보냅니다.
+
+### 기기 시간 대신 서버 시간
+
+기기 시계는 틀릴 수 있습니다. 더 신뢰할 수 있는 타임스탬프를 위해 `serverTime`을 사용합니다:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### 사용자 역할에 따른 조건부 논리
+
+감독자에게만 감독자 전용 섹션을 표시합니다:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | 감독자 검토 | `${is_supervisor} = '1'` |
+| text | supervisor_notes | 감독자 메모 | |
+| end_group | | | |
+
+### 액션 버튼에서 인수 전달
+
+사용자 정의 인수가 있는 `act_fill_form` 액션 버튼에서 양식이 실행될 때:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+액션 버튼은 일치하는 키로 인수를 전달해야 합니다 (예: `household_id`, `task_code`).
+
+### 프로젝트 정보 사용
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## 참고 사항
+
+- 모든 `pulldata('app-api', ...)` 호출은 양식이 열릴 때 평가되며 세션 중에 동적으로 재평가되지 않습니다 (`serverTime`과 `now()` 제외).
+- 키가 지원되지 않거나 데이터를 사용할 수 없는 경우 함수는 `'n/a'`를 반환합니다 (빈 문자열이 아닙니다 — `!= ''` 대신 `!= 'n/a'`로 테스트합니다).
+- `openArgs` 값은 액션 버튼에서 양식이 실행될 때만 사용 가능합니다; 그렇지 않으면 빈 문자열을 반환합니다.

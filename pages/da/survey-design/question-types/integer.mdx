@@ -1,0 +1,75 @@
+---
+title: "Heltal"
+description: "Heltalsspørgsmål giver mulighed for hele tals input i din undersøgelse."
+---
+
+Spørgsmålstypen integer i XLSForms og rtSurvey bruges til at indsamle heltalssvar. Denne spørgsmålstype er essentiel til at indsamle numeriske data uden decimaler, såsom tæller, aldre eller år.
+
+## Grundlæggende XLSForm-specifikation
+
+| type    | name  | label                 |
+|---------|-------|------------------------|
+| integer | age   | Indtast din alder i år|
+
+For flere detaljer om den grundlæggende integer-spørgsmålstype, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+
+## Anvendelser
+
+Heltalsspørgsmål bruges typisk til:
+
+1. Aldersinput
+2. Tælling af elementer (f.eks. antal børn, husholdningsmedlemmer)
+3. Årstals input (f.eks. fødselsår)
+4. Bedømmelse på en numerisk skala
+5. Enhver indsamling af hele tals data
+
+## rtSurvey-udvidelser
+
+Mens den grundlæggende XLSForm-specifikation for integer-spørgsmål er enkel, kan rtSurvey tilbyde yderligere funktioner eller tilpasninger:
+
+1. Intervalvalidering
+2. Brugerdefinerede fejlmeddelelser
+3. Appearance-muligheder for tals input
+
+## Bedste praksis
+
+1. Brug klare og præcise labels til at angive det forventede input.
+2. Implementer intervalrestriktioner for at forhindre urealistiske eller fejlagtige input.
+3. Overvej at bruge hinttekst til at give eksempler eller præcisere det forventede format.
+4. For store tal bør du overveje at bruge kommaer eller mellemrum i labelen for at forbedre læsbarheden (f.eks. "Indtast befolkningstallet (op til 1.000.000)").
+
+## Restriktioner og validering
+
+Du kan tilføje restriktioner for at sikre, at den indtastede værdi falder inden for et bestemt interval:
+
+| type    | name  | label                 | constraint        | constraint_message                    |
+|---------|-------|------------------------|-------------------|---------------------------------------|
+| integer | age   | Indtast din alder i år| .>0 and .&lt;=120    | Alder skal være mellem 1 og 120 år   |
+
+## Eksempel på brug
+
+Her er et eksempel på, hvordan du kan bruge heltalsspørgsmål i en husholdningsundersøgelse:
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| integer | household_size | Hvor mange personer bor i din husstand?   | .>0        | Husstandsstørrelse skal være mindst 1 |
+| integer | num_children   | Hvor mange børn under 18 er der i husstanden? | .>=0    | Antal børn kan ikke være negativt |
+| integer | year_built     | I hvilket år blev dit hus bygget?        | .>1800 and .&lt;=2024 | Årstallet skal være mellem 1800 og 2024 |
+
+## Beregning med heltalværdier
+
+Heltalværdier kan bruges i beregninger. Her er et eksempel:
+
+| type    | name           | label                                     |
+|---------|----------------|-------------------------------------------|
+| integer | num_adults     | Antal voksne i husstanden         |
+| integer | num_children   | Antal børn i husstanden       |
+| calculate | total_members | | 
+
+I beregningsrækken kan du bruge:
+
+```
+calculation | ${num_adults} + ${num_children}
+```
+
+Dette summerer antallet af voksne og børn for at få det samlede antal husholdningsmedlemmer.

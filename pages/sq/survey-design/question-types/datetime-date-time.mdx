@@ -1,0 +1,71 @@
+---
+title: "Data, data-ora, ora"
+description: "Pyetjet datetime lejojnë të anketuarit të futin si datën ashtu edhe orën në një fushë të vetme."
+---
+
+Lloji i pyetjes datetime në XLSForms dhe rtSurvey mundëson të anketuarit të futin si datën ashtu edhe orën në një fushë të vetme. Ky lloj pyetjeje është i dobishëm kur keni nevojë të kapni një moment specifik në kohë, duke përfshirë si datën ashtu edhe orën e saktë.
+
+## Specifikimi bazë XLSForm
+
+| type     | name           | label                           |
+|----------|----------------|--------------------------------|
+| datetime | event_datetime | Kur ndodhi ngjarja?             |
+
+Për më shumë detaje mbi llojin bazë të pyetjes datetime, shikoni [specifikimin XLSForm](https://xlsform.org/en/#question-types).
+
+## Përdorimet
+
+Pyetjet datetime përdoren zakonisht për:
+
+1. Regjistrimi i timestamps të ngjarjeve ose vëzhgimeve
+2. Planifikimi i takimeve ose mbledhjeve
+3. Regjistrimi i kohëve të fillimit dhe mbarimit të aktiviteteve
+4. Kapja e momenteve të sakta për mbledhjen e të dhënave të ndjeshme ndaj kohës
+
+## Zgjerime të rtSurvey
+
+rtSurvey zgjet funksionalitetin e pyetjeve datetime me pamje të ndryshme dhe opsione personalizimi:
+
+### Opsionet e pamjes
+
+- `(parazgjedhje)`: Shfaqni kalendarin dhe orën për zgjedhjen e datës dhe orës
+- `inline`: Shfaqni kalendarin dhe orën si ikona
+- `inline-1line`: Shfaqni kalendarin dhe orën për zgjedhje në format me një rresht
+- `inline-onlyresult`: Shfaqni kalendarin dhe orën si ikona në fund të rreshtit; ikonat zhduken pas zgjedhjes
+
+### Personalizimi i ngjyrës
+
+Mund të personalizoni ngjyrën e ikonave të kalendarit dhe orës duke përdorur funksionin `colors()`:
+
+- `inline colors("0099FF")`: Shfaqni ikonat me ngjyrë të personalizuar
+- `inline-1line-0000FF`: Shfaqni në format me rresht të vetëm me ngjyrë të personalizuar
+- `inline-1line colors("0000FF","FFFF00")`: Shfaqni në format me rresht të vetëm me ngjyra të shumëfishta të personalizuara
+- `inline-onlyresult colors("0099FF")`: Shfaqni ikonat që zhduken pas zgjedhjes, me ngjyrë të personalizuar
+
+### Formatet e personalizuara të datës dhe orës
+
+rtSurvey lejon formate të personalizuara të datës dhe orës duke përdorur sintaksë speciale:
+
+- `inline-[%Y-%m-%d %H:%M:%S]`: Shembull i formatit të personalizuar (Vit-Muaj-Ditë Orë:Minutë:Sekondë)
+- `inline-[%d/%m/%Y %I:%M %p]`: Shembull i formatit të personalizuar (Ditë/Muaj/Vit Orë:Minutë AM/PM)
+
+## Shembull i përdorimit
+
+Ja një shembull se si mund të përdorni pyetjen datetime në sondazh:
+
+| type     | name           | label                                      | appearance                    |
+|----------|----------------|--------------------------------------------|-----------------------------|
+| datetime | incident_time  | Kur ndodhi incidenti?                      | inline-[%d/%m/%Y %I:%M %p]  |
+
+## Praktikat më të mira
+
+1. Jepni udhëzime të qarta mbi formatin e pritur të datës dhe orës.
+2. Konsideroni përdorimin e pamjes `inline` për një shfaqje më kompakte.
+3. Përdorni formate të personalizuara kur keni nevojë për komponente ose formatim specifik të datës dhe orës.
+4. Kini parasysh zonat kohore kur mbledhni të dhëna datetime nëpër rajone të ndryshme.
+
+## Kufizimet
+
+- Disa pamje ose formate të personalizuara mund të mos mbështeten në të gjitha pajisjet ose platformat.
+- Përdoruesit mund të kenë nevojë për udhëzime mbi hyrjen e saktë të datës dhe orës, veçanërisht me formate të personalizuara.
+- Dallimet e zonave kohore mund të komplikojnë analizën e të dhënave nëse nuk merren parasysh siç duhet.

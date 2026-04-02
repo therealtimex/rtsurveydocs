@@ -1,0 +1,79 @@
+---
+title: "Validace odpovědí"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+Jedním ze způsobů, jak zajistit kvalitu dat, je přidat omezení k datovým polím ve formuláři. Omezení pomáhají zabránit uživatelům v zadávání neplatných nebo nemožných odpovědí. Například při dotazování na příjem osoby chcete zabránit nerealistickým hodnotám, jako jsou záporná čísla nebo extrémně vysoké hodnoty. Přidání datových omezení do formuláře je snadné. Postupujte podle níže uvedených kroků:
+
+1. Přidejte nový sloupec s názvem „constraint" do formuláře.
+2. Ve sloupci „constraint" zadejte vzorec, který specifikuje limity odpovědi.
+
+### Příklad
+
+Uvažujme příklad, kde chceme přidat omezení pro příjem osoby. Omezení vyžaduje, aby příjem byl mezi 0 a 1 000 000 Kč. Zde je nastavení omezení:
+
+| `name`      | `constraint`                  |
+|---------------|-----------------------------|
+| Příjem        | . >= 0 & . &lt;= 1000000      |
+
+Ve výše uvedeném příkladu „." ve vzorci odkazuje zpět na proměnnou otázky, která představuje hodnotu zadanou uživatelem pro otázku „Příjem". Omezení `. >= 0 && . <= 1000000` zajistí, že zadaný příjem je větší nebo roven 0 a menší nebo roven 1 000 000.
+
+### Pevné omezení
+
+**Pevné omezení** zablokuje odevzdání formuláře, pokud zadaná hodnota nesplňuje výraz. Enumerátor nemůže pokračovat, dokud nezadá platnou hodnotu.
+
+Pro přidání pevného omezení zadejte výraz do sloupce `constraint`. Volitelně přidejte zprávu čitelnou pro člověka do `constraint_message`:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Věk respondenta | `. > 0 and . <= 120` | Věk musí být mezi 1 a 120 |
+| decimal | temperature | Tělesná teplota (°C) | `. >= 35 and . <= 42` | Teplota musí být mezi 35°C a 42°C |
+| text | phone | Telefonní číslo | `regex(., '^[0-9]{10}$')` | Zadejte 10místné telefonní číslo |
+
+#### Více podmínek
+
+Kombinujte podmínky pomocí `and` / `or`:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Použití `regex()` pro validaci vzoru
+
+Funkce `regex(value, pattern)` testuje hodnotu oproti regulárnímu výrazu:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | E-mailová adresa | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Zadejte platnou e-mailovou adresu |
+| text | zip_code | PSČ | `regex(., '^[0-9]{5}$')` | Zadejte 5místné PSČ |
+
+#### Odkazování na jiná pole v omezení
+
+Použijte `${fieldname}` pro odkazování na hodnoty z jiných otázek:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Rok ukončení | `. >= ${start_year}` | Rok ukončení musí být po roku zahájení |
+| decimal | loan_repaid | Splacená částka | `. <= ${loan_amount}` | Nelze splatit více, než je výše půjčky |
+
+### Měkké upozornění
+
+**Měkké upozornění** (také nazývané měkké omezení nebo varování) varuje enumerátora, že hodnota vypadá neobvyklá, ale stále mu umožňuje pokračovat. To je užitečné, když je hodnota technicky platná, ale statisticky nepravděpodobná.
+
+Nejběžnějším vzorem je použití **poznámky** s výrazem `relevant`, který označí podezřelou hodnotu, v kombinaci s otázkou **potvrzení**:
+
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Počet dětí | |
+| note | children_warning | Varování: Zadali jste `${children}` dětí. Potvrďte prosím, že je to správně. | `. > 15` |
+| trigger | children_confirm | Potvrďte, že počet dětí je správný | `${children} > 15` |
+
+<Callout type="warning">
+Rozdíl mezi pevnými a měkkými omezeními je důležitý pro kvalitu dat. Používejte **pevná omezení** pro logicky nemožné hodnoty (záporné věky, teploty nad 100°C). Používejte **měkká upozornění** pro statisticky nepravděpodobné, ale ne nemožné hodnoty — nechcete blokovat legitimní hraniční případy.
+</Callout>

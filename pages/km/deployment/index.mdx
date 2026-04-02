@@ -1,0 +1,68 @@
+---
+title: "ការដំឡើង"
+description: "ដាក់ deployed និងគ្រប់គ្រង rtCloud instance ផ្ទាល់ខ្លួនរបស់អ្នក ដោយប្រើ Docker។ ការគ្រប់គ្រងពេញលេញលើទិន្នន័យ ហេដ្ឋារចនាសម្ព័ន្ធ និងការកំណត់រចនាសម្ព័ន្ធ។"
+---
+
+ដំណើរការ rtCloud នៅលើហេដ្ឋារចនាសម្ព័ន្ធផ្ទាល់ខ្លួនរបស់អ្នក ដោយប្រើ Docker Compose។ ការ Hosting ខ្លួនឯង ផ្ដល់ការកាន់កាប់ ទិន្នន័យ បណ្ដាញ និងបរិស្ថានដាក់ deployed ពេញលេញ — ល្អសម្រាប់អង្គការ ដែលមានតម្រូវការ data residency បណ្ដាញដាច់ ឬតម្រូវការ infrastructure ផ្ទាល់ខ្លួន។
+
+## តើ rtCloud Self-Hosting ជាអ្វី?
+
+rtCloud Self-Hosting គឺជា Docker image ផ្លូវការ ដែលបញ្ចូល rtCloud platform ទាំងមូល ជា container stack ចល័ត ដែលអ្នកអាចដំណើរការ នៅលើ Linux server ណាមួយ។ stack រួមមាន៖
+
+| សេវា | ការពិពណ៌នា |
+|---------|-------------|
+| **rtCloud App** | Apache 2.4 + PHP 7.4 កម្មវិធី Web ជាមួយ background queue ភ្ជាប់ (Beanstalkd), ម៉ាស៊ីន analytics (Shiny) និងកិច្ចការដំណើរការ |
+| **MySQL 8.0** | មូលដ្ឋានទិន្នន័យ Relational សម្រាប់ទិន្នន័យ application និងស្ទង់មតិទាំងអស់ |
+| **Keycloak** *(ស្រេចចិត្ត)* | ម៉ាស៊ីន Single Sign-On ភ្ជាប់ សម្រាប់ការគ្រប់គ្រង identity សហគ្រាស |
+
+## ពេលណាត្រូវ Host ខ្លួនឯង
+
+ការ Hosting ខ្លួនឯង គឺជាជម្រើសត្រឹមត្រូវ នៅពេលអ្នក៖
+
+- ត្រូវការ **data sovereignty** — ទិន្នន័យទាំងអស់ ស្ថិតនៅក្នុងហេដ្ឋារចនាសម្ព័ន្ធផ្ទាល់ខ្លួនរបស់អ្នក
+- ប្រតិបត្តិការ នៅក្នុង **បណ្ដាញ air-gapped ឬដាក់កំហិត** ដោយគ្មានការចូលដំណើរការ cloud ខាងក្រៅ
+- មាន **តម្រូវការការអនុលោម** (GDPR, HIPAA, គោលការណ៍ទិន្នន័យរដ្ឋាភិបាល) ដែលបង្គាប់ការរក្សាទុក on-premise
+- ត្រូវការ រួមបញ្ចូល ជាមួយ **identity provider ខាងក្នុង** (Active Directory, LDAP, SAML)
+- ចង់ **ប្ដូររចនាសម្ព័ន្ធ** — ការចាត់ចែង CPU, RAM, និងទំហំផ្ទុក តាមលក្ខខណ្ឌរបស់អ្នក
+
+## នៅក្នុងផ្នែកនេះ
+
+| ទំព័រ | ការពិពណ៌នា |
+|------|-------------|
+| [ចាប់ផ្ដើមរហ័ស](quick-start) | ដំណើរការ rtCloud លើម៉ាស៊ីនមេ ក្នុងរយៈពេលតិចជាង ១០ នាទី |
+| [ឯកសារការកំណត់](configuration) | បញ្ជីពេញលេញ នៃ environment variables ទាំងអស់ និងលំនាំដើមរបស់វា |
+| [ការដាក់ Cloud](cloud-deployment) | Script ស្វ័យប្រវត្តិ one-click សម្រាប់ DigitalOcean, AWS, GCP, និង Linode |
+| [ការផ្ទៀងផ្ទាត់ SSO](sso-authentication) | ការកំណត់ Keycloak, OIDC ខាងក្រៅ ឬ Azure AD |
+| [ការថែទាំ](maintenance) | ការ upgrade, backup, restore, និងការដោះស្រាយបញ្ហា instance របស់អ្នក |
+
+## ទិដ្ឋភាពស្ថាបត្យកម្ម
+
+ការដាក់ deployed ដំណើរការជា set Docker containers ដែលភ្ជាប់គ្នា នៅលើបណ្ដាញខាងក្នុង៖
+
+```
+┌────────────────────────────────────────┐
+│            rtcloud-app                 │
+│  Apache 2.4 (port 80)                  │
+│  PHP 7.4 application                   │
+│  Beanstalkd queue (internal)           │
+│  Shiny Server (port 3838)              │
+│  Cron scheduler                        │
+└─────────────────┬──────────────────────┘
+                  │ rtcloud-net (bridge)
+┌─────────────────▼──────────────────────┐
+│            rtcloud-mysql               │
+│  MySQL 8.0 (port 3306, internal only)  │
+└────────────────────────────────────────┘
+```
+
+នៅពេល SSO ត្រូវបានបើក container ទីបីដំណើរការជាមួយ៖
+
+```
+┌─────────────────────────────────────────┐
+│            rtcloud-keycloak             │
+│  Keycloak (port 8080, internal only)    │
+│  Admin UI (port 9000, internal only)    │
+└─────────────────────────────────────────┘
+```
+
+Containers ទាំងអស់ទំនាក់ទំនងគ្នា តាមរយៈ Docker bridge network ដែលដាច់ដោយឡែក។ មានតែ port កម្មវិធីវេប និង (ស្រេចចិត្ត) port analytics Shiny ប៉ុណ្ណោះ ដែលបង្ហាញទៅ host។

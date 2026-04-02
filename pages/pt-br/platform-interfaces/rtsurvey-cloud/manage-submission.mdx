@@ -1,0 +1,35 @@
+---
+title: "Gerenciando envios"
+description: "Revise, gerencie e exporte entradas e envios de dados brutos."
+---
+
+O módulo **Gerenciar envios** (acessado pelo botão **Visualização de dados** na seção Família de formulários) permite que gerentes de projeto e supervisores interajam diretamente com os dados brutos recebidos. Ele serve como um espaço de trabalho unificado para revisar os envios dos entrevistadores, rastrear identificadores de dispositivos e realizar operações de qualidade de dados.
+
+![Interface de gerenciamento de envios](/images/manage_submissions.png)
+
+## Visão geral dos dados e colunas
+
+A grade de dados exibe dinamicamente os dados coletados para um formulário específico. Ela opera em dois modos principais: **Oficial** (registros finalizados) e **Em andamento** (em tempo real, registros não finalizados).
+
+### Colunas de dados principais
+
+Independentemente das perguntas personalizadas definidas no formulário, a grade inclui várias colunas de metadados padrão para auxiliar na auditoria:
+
+- **Enviado por:** Identifica a plataforma de origem do envio (por exemplo, FA para Aplicativo de campo, WEB para Formulário web, RS para sistemas remotos).
+- **Detalhe:** Abre uma visualização focada de registro único (ícone de lupa) para inspecionar cada variável e resposta enviada para aquela instância.
+- **iNota:** Permite que supervisores anexem notas laterais ou comentários internos a um registro específico sem alterar os dados coletados (representado por um ícone de lápis).
+- **Campos de data:** Registros de data/hora indicando quando o registro foi iniciado, concluído ou sincronizado.
+- **Anexos de mídia:** Links de miniatura direta para imagens, assinaturas ou arquivos coletados durante a pesquisa.
+- **Grupos de repetição:** Links dedicados para acessar tabelas aninhadas de perguntas repetidas dentro do formulário pai.
+
+## Ações de envio
+
+Para facilitar o controle de qualidade de dados ativo, a interface fornece um menu suspenso de comandos acionáveis que podem ser executados em registros selecionados:
+
+- **Criar nova instância:** Permite que administradores insiram manualmente um novo registro de pesquisa diretamente no banco de dados.
+- **Retornar instância:** Rejeita o registro enviado e solicita ao entrevistador que verifique ou colete novamente as informações.
+- **Acompanhar instância:** Sinaliza um registro para atenção adicional, geralmente enviando um alerta para a equipe de campo para esclarecimento.
+- **Exportar para arquivo de comandos retornados / pacote de comandos de acompanhamento:** Gera exportações em lote (arquivos) contendo conjuntos de dados especificamente marcados para retornos ou acompanhamentos.
+- **Converter para XML:** Transforma o conjunto de dados estruturado de volta ao seu formato XML bruto para análise de backend ou integração de sistema.
+- **Encaminhar instâncias:** (Disponível no modo *Em andamento*) Envia dados não finalizados imediatamente para outro dispositivo ou usuário.
+- **Excluir:** Remove permanentemente as instâncias selecionadas do banco de dados.

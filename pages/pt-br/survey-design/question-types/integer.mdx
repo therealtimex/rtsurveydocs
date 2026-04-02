@@ -1,0 +1,75 @@
+---
+title: "Inteiro"
+description: "As perguntas de inteiro permitem entradas de números inteiros na sua pesquisa."
+---
+
+O tipo de pergunta integer em XLSForms e rtSurvey é usado para coletar respostas de números inteiros. Este tipo de pergunta é essencial para reunir dados numéricos sem casas decimais, como contagens, idades ou anos.
+
+## Especificação básica do XLSForm
+
+| type    | name  | label                 |
+|---------|-------|------------------------|
+| integer | age   | Digite sua idade em anos |
+
+Para mais detalhes sobre o tipo básico de pergunta integer, consulte a [especificação do XLSForm](https://xlsform.org/en/#question-types).
+
+## Usos
+
+As perguntas de inteiro são comumente usadas para:
+
+1. Entradas de idade
+2. Contagem de itens (por exemplo, número de filhos, membros do domicílio)
+3. Entradas de ano (por exemplo, ano de nascimento)
+4. Classificações em uma escala numérica
+5. Qualquer coleta de dados de números inteiros
+
+## Extensões do rtSurvey
+
+Embora a especificação básica do XLSForm para perguntas integer seja direta, o rtSurvey pode oferecer recursos ou personalizações adicionais:
+
+1. Validação de intervalo
+2. Mensagens de erro personalizadas
+3. Opções de aparência para entrada numérica
+
+## Práticas recomendadas
+
+1. Use rótulos claros e concisos para especificar a entrada esperada.
+2. Implemente restrições de intervalo para evitar entradas não realistas ou errôneas.
+3. Considere usar texto de dica para fornecer exemplos ou esclarecer o formato esperado.
+4. Para números grandes, considere usar vírgulas ou espaços no rótulo para melhorar a legibilidade (por exemplo, "Digite a população (até 1.000.000)").
+
+## Restrições e validação
+
+Você pode adicionar restrições para garantir que o valor inserido esteja dentro de um intervalo específico:
+
+| type    | name  | label                 | constraint        | constraint_message                    |
+|---------|-------|------------------------|-------------------|---------------------------------------|
+| integer | age   | Digite sua idade em anos | .>0 and .&lt;=120    | A idade deve estar entre 1 e 120 anos |
+
+## Exemplo de uso
+
+Aqui está um exemplo de como você pode usar perguntas integer em uma pesquisa domiciliar:
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| integer | household_size | Quantas pessoas moram no seu domicílio?   | .>0        | O tamanho do domicílio deve ser pelo menos 1 |
+| integer | num_children   | Quantas crianças menores de 18 anos no domicílio? | .>=0 | O número de crianças não pode ser negativo |
+| integer | year_built     | Em que ano sua casa foi construída?       | .>1800 and .&lt;=2023 | O ano deve estar entre 1800 e 2023 |
+
+## Cálculo com valores inteiros
+
+Os valores inteiros podem ser usados em cálculos. Aqui está um exemplo:
+
+| type    | name           | label                                     |
+|---------|----------------|-------------------------------------------|
+| integer | num_adults     | Número de adultos no domicílio            |
+| integer | num_children   | Número de crianças no domicílio           |
+| calculate | total_members | |
+
+Na linha de cálculo, você pode usar:
+
+```
+calculation | ${num_adults} + ${num_children}
+```
+
+Isso somará o número de adultos e crianças para obter o total de membros do domicílio.

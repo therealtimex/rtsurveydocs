@@ -1,0 +1,99 @@
+---
+title: "File"
+description: "Pitanja tipa file dozvoljavaju ispitanicima da otpreme dokumente i druge datoteke kao deo svojih odgovora na anketu."
+---
+
+Tip pitanja `file` dozvoljava ispitanicima da **otpreme bilo koju datoteku** sa svog uređaja — dokumente, tabele, PDF-ove ili druge tipove datoteka. Za razliku od `image`, `audio` i `video` koji pokreću specifične alate za snimanje, `file` otvara birač datoteka opšte namene.
+
+## Osnovna XLSForm specifikacija
+
+| type | name      | label                        |
+|------|-----------|------------------------------|
+| file | document  | Molimo otpremite vaš dokument |
+
+Za više detalja o standardnom tipu pitanja file, pogledajte [XLSForm specifikaciju](https://xlsform.org/en/#question-types).
+
+## Upotrebe
+
+Pitanja tipa file se uobičajeno koriste za:
+
+1. Prikupljanje pratećih dokumenata (računi, sertifikati, ugovori, izveštaji)
+2. Otpremanje popunjenih papirnih formulara koji su skenirani
+3. Prikupljanje tabela ili izvoza podataka iz drugih sistema
+4. Bilo koji digitalni tip datoteke koji image/audio/video ne pokriva
+
+## Format podataka
+
+Otpremljene datoteke se čuvaju kao binarne privitke:
+
+- **Format:** Sačuvan u originalnom formatu (PDF, XLSX, DOCX, itd.)
+- **Imenovanje:** `{instanceID}-{ime_polja}.{ekstenzija}`
+- **Skladište:** Otpremljeno na serversku medijsku fasciklu zajedno sa slanjem
+- **Pristup:** Dostupno za preuzimanje iz interfejsa za upravljanje slanjima
+
+## rtSurvey proširenja
+
+### Prihvaćeni tipovi datoteka
+
+Koristite kolonu `parameters` za ograničavanje koji tipovi datoteka mogu biti izabrani:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| file | report | Otpremite izveštaj o inspekciji | `accept=.pdf` |
+| file | spreadsheet | Otpremite datoteku podataka | `accept=.xlsx,.csv` |
+
+Parametar `accept` koristi standardnu sintaksu ekstenzija datoteka (razdvojenu zarezima).
+
+### Smernice za veličinu datoteke
+
+rtSurvey ne primenjuje tvrdo ograničenje veličine datoteke na nivou pitanja, ali se primenjuje ograničenje otpremanja servera. Koristite `hint` da saopštite očekivanja anketaru:
+
+| type | name | label | hint |
+|------|------|-------|------|
+| file | receipt | Otpremite potvrdu o plaćanju | Prihvaćeno: PDF ili slika. Maksimalna veličina datoteke: 5 MB |
+
+### Integracija sa sistemom datoteka uređaja i skladištem u oblaku
+
+Na Android-u i iOS-u, pitanje `file` otvara nativni birač datoteka uređaja, koji može uključivati pristup:
+- Lokalni prostor za skladištenje uređaja
+- SD kartica (Android)
+- iCloud Drive (iOS)
+- Google Drive, Dropbox (ako su instalirani)
+
+Na vebu, otvara standardni dijalog za otpremanje datoteka preglednika.
+
+## Primer upotrebe
+
+### Obavezno otpremanje PDF-a
+
+| type | name | label | hint | required | required_message |
+|------|------|-------|------|----------|-----------------|
+| file | signed_consent | Otpremite potpisani formular saglasnosti | Samo PDF, maks. 2MB | yes | Formular saglasnosti je obavezan |
+
+### Uslovano otpremanje dokumenta
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_land_title | Da li domaćinstvo ima pravo na zemlju? | |
+| file | land_title_doc | Otpremite fotografiju ili sken vlasničkog lista | `${has_land_title} = 'yes'` |
+
+## Najbolje prakse
+
+1. Koristite `accept` za ograničavanje tipova datoteka — ovo sprečava anketare da slučajno otpreme pogrešne datoteke.
+2. Uvek uključite smernice o veličini i formatu u kolonu `hint`.
+3. Za fotografije i slike, koristite tip `image` umesto toga — nudi bolje kompresovanje i dosledan format.
+4. Za velike ankete sa priloženima datotekama, planirajte prostor za skladištenje podataka i propusnost za preuzimanje.
+5. Testirajte birač datoteka na ciljnom tipu uređaja (Android vs. iOS vs. veb) pre primene — pristup cloud diskovima varira.
+
+## Razmatranja za rukovanje podacima
+
+- Datoteke se čuvaju u originalnom formatu; rtSurvey ih ne konvertuje niti kompresuje.
+- Analizirajte datoteke nakon preuzimanja — rtSurvey ne izvlači niti indeksira sadržaj datoteka.
+- Veliki privitci datoteka značajno povećavaju vreme potrebno za preuzimanje kompletnog skupa podataka.
+
+## Ograničenja
+
+- Pitanja tipa file ne validiraju sadržaj datoteke — samo provjera ekstenzije datoteke putem `accept` se primjenjuje na nivou korisničkog sučelja.
+- Veoma velike datoteke (100 MB+) mogu isteći tokom otpremanja u okruženjima sa lošom vezom.
+- Anketari van mreže mogu priložiti datoteke, ali se neće otpremiti dok se veza ne uspostavi.
+- Neke konfiguracije uređaja ograničavaju pristup određenim lokacijama za skladištenje (npr. korporativne MDM politike).

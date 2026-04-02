@@ -1,0 +1,145 @@
+---
+title: "Select_one"
+description: "Select_one soruları, katılımcıların önceden tanımlanmış seçenek listesinden tam olarak bir seçenek seçmesine olanak tanır."
+---
+
+import { Callout } from 'nextra/components'
+
+`select_one` soru türü, katılımcıdan önceden tanımlanmış bir listeden **tam olarak bir seçenek** seçmesini ister. Varsayılan olarak seçenekler radyo düğmesi olarak görüntülenir, ancak düzeni ve davranışı değiştirmek için geniş bir görünüm seçeneği yelpazesi mevcuttur.
+
+## Temel XLSForm Tanımı
+
+**survey çalışma sayfası:**
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | consent | Katılımcı onay verdi mi? |
+
+**choices çalışma sayfası:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| yesno | yes | Evet |
+| yesno | no | Hayır |
+
+`select_one listname` içindeki `listname`, choices çalışma sayfasındaki `list_name` sütunuyla eşleşmelidir.
+
+Daha fazla ayrıntı için [XLSForm spesifikasyonuna](https://xlsform.org/en/#question-types) bakın.
+
+## Kullanım Alanları
+
+Select_one soruları şunlar için kullanılır:
+
+1. Evet/Hayır soruları
+2. Tek yanıtlı çoktan seçmeli (örn. eğitim seviyesi, cinsiyet, medeni durum)
+3. Kategorik derecelendirmeler (örn. zayıf / orta / iyi / mükemmel)
+4. Seçeneklerin önceki yanıta göre filtrelendiği basamaklı (bağlantılı) seçimler
+5. Ülke, bölge, ilçe veya diğer idari birim seçimi
+
+## Görünüm seçenekleri
+
+Seçeneklerin nasıl görüntülendiğini değiştirmek için `appearance` sütununa bir değer belirtin:
+
+| Görünüm | Açıklama |
+|------------|-------------|
+| *(yok)* | Varsayılan radyo düğmeleri, her satırda bir tane |
+| `minimal` | Radyo düğmeleri yerine tek açılır/döner liste |
+| `quick` | Seçimden hemen sonra bir sonraki soruya otomatik ilerler (yalnızca mobil) |
+| `compact` | Kompakt seçenek ızgarası — sütun sayısı ekran genişliğine göre ayarlanır |
+| `compact-N` | N sütuna zorlanmış kompakt ızgara (örn. `compact-3`) |
+| `quickcompact` | `quick` ve `compact` birleşimi |
+| `quickcompact-N` | N zorlanmış sütunla `quick` ve `compact` birleşimi |
+| `horizontal` | Yatay sırada düzenlenmiş seçenekler (web) |
+| `horizontal-compact` | Yatay, kompakt aralık (web) |
+| `likert` | Likert ölçeği satırı — üstte etiketler, altta radyo düğmeleri |
+| `label` | Yalnızca seçenek etiketlerini gösterir, giriş yok (`list-nolabel` ile birlikte kullanın) |
+| `list-nolabel` | Yalnızca girdileri gösterir, etiket yok (`label` ile birlikte kullanın) |
+| `columns(N)` | N sütunda görüntüle (rtSurvey uzantısı, örn. `columns(3)`) |
+| `distress` | Kessler Psikolojik Sıkıntı (K10) duygusal simge widget'ı |
+| `search-api(...)` | Dinamik arama — çalışma zamanında bir API'den seçenekleri yükler |
+
+### Örnek: Likert ölçeği
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one satisfaction | service_rating | Hizmettten ne kadar memnunsunuz? | likert |
+
+### Örnek: 3 sütunlu kompakt
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one regions | region | Bölge seçin | compact-3 |
+
+## Basamaklı seçimler
+
+Basamaklı (bağlantılı) bir seçim, önceki soruda seçilen değere göre seçenekleri filtreler. Choices çalışma sayfanızdaki bir sütun adıyla `choice_filter` sütununu kullanın.
+
+**survey:**
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one province | province | İl seçin | |
+| select_one district | district | İlçe seçin | province_name = `${province}` |
+
+**choices:**
+
+| list_name | name | label | province_name |
+|-----------|------|-------|---------------|
+| province | nairobi | Nairobi | |
+| province | mombasa | Mombasa | |
+| district | westlands | Westlands | nairobi |
+| district | kasarani | Kasarani | nairobi |
+| district | nyali | Nyali | mombasa |
+| district | likoni | Likoni | mombasa |
+
+Katılımcı `nairobi` seçtiğinde, ilçe listesinde yalnızca `Westlands` ve `Kasarani` görünür.
+
+<Callout type="warning">
+`choice_filter` içinde kullanılan sütun adı (örn. `province_name`) choices çalışma sayfasında mevcut olmalıdır. `${province}`, `province` adlı survey alanına başvurur.
+</Callout>
+
+## Seçilen değeri ifadelerde kullanma
+
+Seçilen **değere** (etikete değil) `${fieldname}` ile başvurun:
+
+```
+relevant: ${consent} = 'yes'
+```
+
+Değer yerine seçenek etiketini almak için `choice-label()` kullanın:
+
+```
+calculate: choice-label(${education_level}, ${education_level})
+```
+
+## Serbest metin ile "Diğer" seçeneği
+
+Yaygın bir kalıp, bir metin alanı ortaya çıkaran "diğer" seçeneği eklemektir:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one occupation | job | Mesleğiniz nedir? | |
+| text | job_other | Lütfen belirtin | `${job} = 'other'` |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| occupation | farmer | Çiftçi |
+| occupation | trader | Tüccar |
+| occupation | student | Öğrenci |
+| occupation | other | Diğer (lütfen belirtin) |
+
+## En İyi Uygulamalar
+
+1. Listeleri kısa ve birbirini dışlayıcı tutun — katılımcılar birden fazla seçmek isteyebilirse `select_multiple` kullanın.
+2. En yaygın yanıtı başa koyun veya uzun listeler için alfabetik sıralayın.
+3. Uygun olduğunda her zaman "Bilmiyorum" veya "Cevaplamak istemiyorum" seçeneği ekleyin.
+4. Mobil cihazlarda ekran alanından tasarruf etmek için 7–8'den fazla seçenek olan listeler için `minimal` (açılır liste) kullanın.
+5. Basamaklı seçimler için formu oluşturmadan önce choices çalışma sayfasına tüm filtre sütunlarını ekleyin.
+
+## Sınırlamalar
+
+- Katılımcı yalnızca bir seçenek belirleyebilir — çok yanıtlı sorular için `select_multiple` kullanın.
+- `likert` görünümü, tek satıra sığan 5–7 seçenekle en iyi çalışır.
+- `quick` otomatik ilerleme yalnızca mobil içindir; web formlarında etkisi yoktur.

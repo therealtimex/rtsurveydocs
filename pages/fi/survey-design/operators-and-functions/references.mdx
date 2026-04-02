@@ -1,0 +1,82 @@
+---
+title: "Arvoihin viittaaminen"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+`${fieldname}`-syntaksia käytetään viittaamaan toisen kentän nykyiseen arvoon lomakkeessasi. Se voi edustaa syötettyä, valittua tai laskettua arvoa, ja se näytetään täsmälleen sellaisena kuin se esiintyy lähetetyissä tiedoissa.
+
+Esimerkki:
+Jos sinulla on kenttä nimeltä "age" ja haluat hakea tarkan siinä syötetyn arvon, voit käyttää `${age}`.
+
+Rajoitteissa "." symbolia käytetään viittaamaan käyttäjän nykyiselle kentälle ehdotettuun merkintään tai valintaan. Se mahdollistaa ehtojen tai rajojen soveltamisen perustuen arvoon, jonka käyttäjä on syöttämässä tai valitsemassa juuri sillä hetkellä.
+
+Esimerkki:
+Jos haluat tarkistaa, onko nykyiselle kentälle ehdotettu arvo alle 3, voit käyttää rajoitetta `. < 3`.
+
+---
+
+## `..` — Yläryhmäviittaus
+
+Ryhmän tai toistoryhmän sisällä `..` viittaa **yläkontekstiin**. Tätä tarvitaan harvoin käytännössä, mutta sitä käytetään edistyneissä XPath-lausekkeissa lomakehierarkian navigoimiseen.
+
+---
+
+## Missä viittauksia käytetään
+
+| Sarake | Viittaustyyppi | Esimerkki |
+|--------|----------------|---------|
+| `relevant` | `${fieldname}` | `${consent} = 'yes'` |
+| `constraint` | `.` nykyiselle kentälle, `${fieldname}` muille | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${fieldname}` | `${adults} + ${children}` |
+| `required` | `${fieldname}` | `${has_income} = 'yes'` |
+| `default` | `${fieldname}` | `${previous_answer}` |
+| `label` | `${fieldname}` tekstissä | `"Ikäsi on ${age} vuotta"` |
+| `choice_filter` | Sarakkeen nimi (ei `${}`) | `district = ${district}` |
+
+<Callout type="warning">
+`choice_filter`-sarakkeessa viittaa **valintojen sarakkeiden nimiin** suoraan (ilman `${}`), ja **lomakekenttiin** `${}`:lla. Näiden sekoittaminen on yleinen virheiden lähde.
+</Callout>
+
+---
+
+## Arvoihin viittaaminen toistoryhmien sisällä
+
+Toiston sisällä `${fieldname}` viittaa kenttään **samassa toistotapauksessa**:
+
+```
+relevant: ${member_age} < 18
+```
+
+Tämä käyttää `member_age`-arvoa nykyisessä toistotapauksessa, ei kaikissa tapauksissa.
+
+Viittaaksesi kenttään **tietyssä** toistotapauksessa toiston ulkopuolelta, käytä `indexed-repeat()`:
+
+```
+indexed-repeat(${member_name}, ${household_members}, 1)
+```
+
+Katso täydelliset tiedot [Funktiot — Toistettujen kenttien funktiot](functions#repeated-field-functions).
+
+---
+
+## Tyhjäarvo-tarkistukset
+
+Testaa onko kenttä vastattu:
+
+```
+${fieldname} != ''       (kenttä ei ole tyhjä)
+${fieldname} = ''        (kenttä on tyhjä)
+```
+
+Numeroille tarkista myös:
+```
+${age} > 0               (ikä on positiivinen — implisiittisesti ei tyhjä numeerisessa kontekstissa)
+```
+
+---
+
+## Tyypin muunnos viittauksissa
+
+Käyttäessäsi `${fieldname}`:tä numeerisessa kontekstissa (esim. `${age} + 1`), rtSurvey muuntaa automaattisesti merkkijonoarvon numeroksi. Tyhjä kenttä muuntuu `0`:ksi tai `NaN`:ksi riippuen operaatiosta — käytä `coalesce(${field}, 0)` varmistaaksesi turvallisesti, että tyhjä numeerinen kenttä oletusarvona on nolla.

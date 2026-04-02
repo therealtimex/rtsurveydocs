@@ -1,0 +1,165 @@
+---
+title: "Nyckelbegrepp"
+description: "Översikt av formulärdesign"
+---
+
+## Vad är ett XLSForm?
+rtSurvey använder en utökad version av standarden [XLSForm](https://xlsform.org/) för formulärdesign, som erbjuder kraftfulla funktioner för att skapa sofistikerade undersökningar. Den här guiden introducerar dig till nyckelbegreppen i formulärdesign i rtSurvey, från grundläggande XLSForm-struktur till avancerade rtSurvey-specifika funktioner.
+
+Med XLSForms kan du skapa formulär i ett läsbart format med det välbekanta Excel-verktyget, vilket gör det tillgängligt för nästan alla.
+Denna standard möjliggör enkel delning och samarbete kring formulärframtagning.
+
+Även om XLSForms är nybörjarvänliga, låter de också erfarna användare skapa komplexa formulär.
+
+rtSurvey ger ett konsekvent sätt att inkorporera avancerade funktioner som hopplogik i formulär på olika webb- och mobila datainsamlingsplattformar.
+
+## XLSForm-struktur
+Ett XLSForm består vanligtvis av två huvud-kalkylblad:
+
+1. **survey**: Definierar strukturen och innehållet i ditt formulär.
+2. **choices**: Specificerar svarsalternativ för flervalsfrågor.
+
+Ett valfritt **settings**-kalkylblad kan ge ytterligare formulärspecifikationer.
+
+Det är viktigt att notera att de obligatoriska kolumnerna i kalkylbladen survey och choices måste finnas för att formuläret ska fungera korrekt. Valfria kolumner i båda kalkylbladen ger ytterligare kontroll över beteendet hos varje post i formuläret men är inte nödvändiga.
+
+Kolumnerna i din Excel-arbetsbok kan visas i valfri ordning, och valfria kolumner kan lämnas tomma. Det är dock avgörande att använda den exakta syntax och namngivningskonventioner som specificeras i XLSForm-dokumentationen för att formuläret ska fungera korrekt.
+
+### Kalkylbladet survey
+**Kalkylbladet survey** är där du definierar strukturen och innehållet i ditt formulär. Varje rad i survey-kalkylbladet representerar en fråga eller ett element i ditt formulär. Följande kolumner är obligatoriska i survey-kalkylbladet:
+
+- `type`: Specificerar typen av post du förväntar dig för frågan.
+- `name`: Specificerar det unika variabelnamnet för den posten. Namn måste börja med en bokstav eller ett understreck och kan bara innehålla bokstäver, siffror, bindestreck, understreck och punkter. Namn är skiftlägeskänsliga.
+- `label`: Innehåller den faktiska texten du ser för frågan i formuläret.
+
+| type                | name     | label                |
+| ------------------- | -------- | -------------------- |
+| today               | today    |                      |
+| select_one gender   | gender   | Respondentens kön?   |
+| integer             | age      | Respondentens ålder? |
+
+### Kalkylbladet choices
+**Kalkylbladet `choices`** används för att specificera svarsalternativen för flervalsfrågor.
+Varje rad representerar ett svarsalternativ. Följande kolumner är obligatoriska i choices-kalkylbladet:
+
+- **`list_name`**: Grupperar ihop en uppsättning relaterade svarsalternativ.
+- **`name`**: Specificerar det unika variabelnamnet för det svarsalternativet.
+- **`label`**: Visar svarsalternativet exakt som du vill att det ska visas i formuläret.
+
+| list_name           | name        | label                |
+| ------------------- | ----------- | -------------------- |
+| gender              | transgender | Transperson          |
+| gender              | female      | Kvinna               |
+| gender              | male        | Man                  |
+| gender              | other       | Övrigt               |
+
+Kolumnerna du lägger till i din Excel-arbetsbok, oavsett om de är obligatoriska eller valfria, kan visas i valfri ordning. Valfria kolumner kan utelämnas helt. Rader eller kolumner kan lämnas tomma för att underlätta läsbarhet, men data efter 20 angränsande tomma kolumner eller rader på ett blad kommer inte att bearbetas. All .xlsx-filformatering ignoreras, så du kan använda skiljelinjer, skuggning och annan teckensnittsformatering för att göra formuläret mer läsbart.
+
+En sak att ha i åtanke när du skapar formulär i Excel är att syntaxen du använder måste vara exakt. Om du till exempel skriver **Choices** eller **choice** istället för **choices** kommer formuläret inte att fungera.
+
+### Kalkylbladet settings
+
+Settings-kalkylbladet är valfritt men låter dig specificera metadata och beteende på formulärnivå. Vanliga kolumner i settings-kalkylbladet inkluderar:
+
+| Kolumn | Beskrivning |
+|--------|-------------|
+| form_title | Formulärets titel som den visas för användare |
+| form_id | En unik identifierare för formuläret, används i datahantering och API-anrop |
+| default_language | Standardspråkkoden för flerspråkiga formulär (t.ex. 'sv' för svenska) |
+| version | Formulärets versionsnummer, användbart för att spåra ändringar |
+| instance_name | Uttryck för att generera ett unikt namn för varje formulärinlämning |
+| generation | Heltal som markerar formulärets generation. Öka för strukturella ändringar |
+| family | Identifierare för att gruppera relaterade formulär över strukturella ändringar |
+
+Settings-kalkylbladet i rtSurvey kan också inkludera ytterligare konfigurationer specifika för rtSurveys utökade funktioner. Se rtSurvey-dokumentationen för en fullständig lista över stödda inställningar.
+
+## Nyckelkomponenter i survey-kalkylbladet
+
+Survey-kalkylbladet är kärnan i din formulärdesign. Här är en översikt av dess nyckelkomponenter:
+
+| Komponent | Beskrivning |
+|-----------|-------------|
+| [type](#question-types) | Specificerar frågetypen (t.ex. text, integer, select_one) |
+| [name](#naming-conventions) | Unik identifierare för frågan |
+| [label](#labels-and-translations) | Texten som visas för respondenten |
+| [hint](#hints-and-help-text) | Ytterligare vägledning för respondenten |
+| [appearance](#appearance-options) | Ändrar hur frågan visas |
+| [relevant](#relevance-and-skip-logic) | Bestämmer när frågan ska ställas (hopplogik) |
+| [constraint](#constraints-and-validation) | Validerar svaret |
+| [calculation](#calculations) | Beräknar värden baserat på andra svar |
+| [required](#required-fields) | Specificerar om frågan måste besvaras |
+
+### Frågetyper
+XLSForm stöder ett antal frågetyper. Här är några av alternativen du kan ange i kolumnen **`type`** i kalkylbladet **`survey`** i ditt XLSForm:
+
+| Frågetyp                  | Svarstyp                                                                                 |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| integer                   | Heltalsinmatning (dvs. helt nummer utan decimaler).                                          |
+| decimal                   | Decimalinmatning.                                                                            |
+| range                     | Omfångsinmatning (inklusive betygsättning)                                                   |
+| text                      | Fritextsvar.                                                                                 |
+| select_one [options]      | Flervalsfråga; bara ett svar kan väljas.                                                    |
+| select_multiple [options] | Flervalsfråga; flera svar kan väljas.                                                       |
+| select_one_from_file [file]| Flerval från fil; bara ett svar kan väljas.                                                |
+| select_multiple_from_file [file]| Flerval från fil; flera svar kan väljas.                                             |
+| rank [options]            | Rangordningsfråga; rangordna en lista.                                                       |
+| note                      | Visa en anteckning på skärmen, tar ingen inmatning.                                          |
+| geopoint                  | Samla in en enstaka GPS-koordinat.                                                           |
+| geotrace                  | Registrera en linje med två eller fler GPS-koordinater.                                      |
+| geoshape                  | Registrera en polygon med flera GPS-koordinater; den sista punkten är samma som den första.  |
+| date                      | Datuminmatning.                                                                              |
+| time                      | Tidsinmatning.                                                                               |
+| dateTime                  | Accepterar en datum- och tidsinmatning.                                                      |
+| image                     | Ta ett foto eller ladda upp en bildfil.                                                      |
+| audio                     | Ta en ljudinspelning eller ladda upp en ljudfil.                                             |
+| background-audio          | Ljud spelas in i bakgrunden medan formuläret fylls i.                                        |
+| video                     | Ta en videoinspelning eller ladda upp en videofil.                                           |
+| file                      | Generell filinmatning (txt, pdf, xls, xlsx, doc, docx, rtf, zip)                            |
+| barcode                   | Skanna en streckkod, kräver att streckkodsläsarappen är installerad.                        |
+| calculate                 | Utför en beräkning.                                                                          |
+| acknowledge               | Bekräftelseprompt som anger värdet till "OK" om valt.                                       |
+| hidden                    | Ett fält utan associerat UI-element som kan användas för att lagra en konstant               |
+| xml-external              | Lägger till en referens till en extern XML-datafil                                           |
+
+### Etiketter
+
+Etiketter är texten som visas för respondenter för varje fråga. De är avgörande för tydlig kommunikation i undersökningar.
+
+- **Grundläggande användning**: I kolumnen `label`, ange frågetexten.
+- **Flera språk**: Använd ytterligare kolumner som `label::Swedish` och `label::English` för flerspråkiga undersökningar.
+- **Formatering**: rtSurvey stöder grundläggande HTML-formatering i etiketter för betoning eller struktur.
+
+### Tips
+
+Tips ger ytterligare vägledning för respondenter utan att överbelasta huvudfrågetexten.
+
+- **Användning**: Lägg till tips i kolumnen `hint`.
+- **Synlighet**: Tips visas vanligtvis under huvudfrågetexten.
+- **Flerspråkiga**: Precis som etiketter kan tips specificeras för flera språk med kolumnerna `hint::Language`.
+
+### Utseende
+
+Kolumnen `appearance` i rtSurvey möjliggör anpassning av hur frågor visas.
+
+- **Standardalternativ**: Inkluderar 'multiline' för text, 'horizontal' för urvalsfrågor.
+- **rtSurvey-tillägg**:
+  - Tidsinmatning: Olika klockdisplayalternativ (t.ex. `inline`, `inline-1line`)
+  - Färganpassning: Använd funktionen `colors()` för att ändra ikonfärger
+
+### Relevant
+
+Kolumnen `relevant` implementerar hopplogik och bestämmer när en fråga ska visas.
+
+- **Syntax**: Använd XPath-uttryck för att definiera villkor.
+- **Variabler**: Referera till andra frågenamn med `${question_name}`.
+
+### Obligatorisk
+
+Kolumnen `required` specificerar om en fråga måste besvaras.
+
+- **Grundläggande användning**: Använd 'yes' eller 'true' för att göra en fråga obligatorisk.
+- **Avancerat**: Kan använda uttryck för villkorlig obligatorisk status.
+
+## rtSurvey-tillägg
+
+rtSurvey utökar XLSForm-standarden genom att stödja ytterligare kapabiliteter som `rutnätslayout`, `HTML-format` och många nya `widgetar`.

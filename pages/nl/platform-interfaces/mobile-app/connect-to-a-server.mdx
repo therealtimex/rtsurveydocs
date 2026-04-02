@@ -1,0 +1,106 @@
+---
+title: "Verbinding maken met een server"
+description: "Leer hoe u de rtSurvey mobiele app verbindt met uw projectserver, toegang krijgt tot rolspecifieke functionaliteiten en begint samen te werken aan enquêtes over meerdere projecten."
+---
+
+Het verbinden van de rtSurvey-app met een server is een cruciale stap om de app te gaan gebruiken voor gegevensverzameling, -beheer en -analyse. Dit proces zorgt ervoor dat alle enquêterollen in realtime toegang hebben tot de benodigde functionaliteiten en gegevens.
+
+## Belangrijkste verschillen met ODK Collect
+
+rtSurvey biedt verbeterde functionaliteiten vergeleken met ODK Collect, gericht op verschillende enquêterollen:
+- **Beheerder**: Berichten, meldingen voor updates (gegevensinzending, nieuwe rapporten, nieuwe accounts), formulieren invullen en analyserapporten bekijken.
+- **Projectmanager**: Vergelijkbare functionaliteiten als beheerders, inclusief projectopzet en -beheer.
+- **Enquêteontwerper**: Berichten, meldingen, formulieren invullen en analyserapporten bekijken.
+- **Veldenquêteur**: Formulieren invullen, berichten, meldingen en voortgangsrapporten.
+- **Data-analist**: Berichten, meldingen en toegang tot analyserapporten.
+
+## Stappen om de rtSurvey App te verbinden met een server
+
+### 1. Zorg ervoor dat u een account heeft
+
+Om verbinding te maken met de server, heeft u een account nodig. Accounts kunnen worden aangemaakt door een Beheerder of door personeel via een accountaanmaak-URL die is ingesteld door de Beheerder.
+
+### 2. Open de rtSurvey App
+
+Start de rtSurvey-app op uw mobiele apparaat. Als u deze nog niet heeft geïnstalleerd, raadpleeg dan de pagina [rtSurvey App installeren](#installing-rtsurvey-app).
+
+### 3. Toegang tot de serververbindingsinstellingen
+
+1. Open de app en navigeer naar het instellingenmenu.
+2. Selecteer de optie om verbinding te maken met een server.
+
+### 4. Accountgegevens invoeren en project selecteren
+
+Bij het verbinden met rtSurvey is het proces gestroomlijnd op basis van uw accountconfiguratie:
+
+- **Gebruikersnaam**: Voer uw accountgebruikersnaam in.
+- **Wachtwoord**: Voer uw accountwachtwoord in.
+
+Na het invoeren van uw gegevens:
+
+- Als uw account is gekoppeld aan slechts één enquêteproject:
+  - De app logt u automatisch in op de server van dat project.
+  - U hoeft geen server-URL in te voeren of een project handmatig te selecteren.
+
+- Als uw account is gekoppeld aan meerdere enquêteprojecten:
+  - Na succesvolle authenticatie ziet u een lijst met projecten waartoe u toegang heeft.
+  - Selecteer het project waaraan u wilt werken uit deze lijst.
+
+### 5. Authenticeren
+
+Na het invoeren van de servergegevens tikt u op de knop "Verbinden" of "Inloggen". De app authenticeert uw gegevens en maakt verbinding met de server.
+
+```mermaid
+flowchart TD
+    A["📱 Start rtSurvey App"] --> B["🔑 Enter Username<br>and Password"]
+    style A fill:#4CAF50,stroke:#666666,stroke-width:3px,color:white
+    style B fill:#2196F3,stroke:#666666,stroke-width:3px,color:white
+
+    B --> C{"🌳 Multiple<br>projects?"}
+    style C fill:#FFC107,stroke:#666666,stroke-width:3px,color:black
+
+    C -->|Yes| D["📋 Display list<br>of projects"]
+    C -->|No| E["🔄 Auto-connect to<br>single project"]
+    style D fill:#FF9800,stroke:#666666,stroke-width:3px,color:white
+    style E fill:#009688,stroke:#666666,stroke-width:3px,color:white
+
+    D --> F["👆 User selects<br>a project"]
+    style F fill:#FF5722,stroke:#666666,stroke-width:3px,color:white
+
+    E --> G["☁️ Connect to server"]
+    F --> G
+    style G fill:#3F51B5,stroke:#666666,stroke-width:3px,color:white
+    G --> H["👥 Access role-specific<br>functionalities"]
+    style H fill:#9C27B0,stroke:#666666,stroke-width:3px,color:white
+
+    H --> I["👨‍💼 Administrator/<br>Project Manager"]
+    H --> J["🎨 Survey Designer"]
+    H --> K["📝 Field Enumerator"]
+    H --> L["📊 Data Analyst"]
+    style I fill:#E91E63,stroke:#666666,stroke-width:3px,color:white
+    style J fill:#795548,stroke:#666666,stroke-width:3px,color:white
+    style K fill:#607D8B,stroke:#666666,stroke-width:3px,color:white
+    style L fill:#8BC34A,stroke:#666666,stroke-width:3px,color:white
+
+    I --> M["💬 Messaging<br>🔔 Notifications<br>📄 Form Filling<br>📈 Viewing Reports"]
+    J --> N["💬 Messaging<br>🔔 Notifications<br>🧪 Form Testing<br>📈 Viewing Reports"]
+    K --> O["📝 Form Filling<br>💬 Messaging<br>🔔 Notifications<br>📊 Progress Reports"]
+    L --> P["💬 Messaging<br>🔔 Notifications<br>📊 Analytics Reports"]
+    style M fill:#FF4081,stroke:#666666,stroke-width:3px,color:white
+    style N fill:#9E9E9E,stroke:#666666,stroke-width:3px,color:white
+    style O fill:#00BCD4,stroke:#666666,stroke-width:3px,color:white
+    style P fill:#CDDC39,stroke:#666666,stroke-width:3px,color:white
+```
+
+## Verbindingsproblemen oplossen
+
+Als u problemen ondervindt bij het verbinden met de server:
+
+1. **Controleer de internetverbinding**: Zorg ervoor dat uw apparaat is verbonden met het internet.
+2. **Bevestig gegevens**: Zorg ervoor dat uw gebruikersnaam en wachtwoord correct zijn.
+3. **Herstart de app**: Sluit de rtSurvey-app en open deze opnieuw.
+4. **Neem contact op met ondersteuning**: Als problemen aanhouden, neem dan contact op met uw systeembeheerder of rtSurvey-ondersteuning voor hulp.
+
+## Conclusie
+
+Het verbinden van de rtSurvey-app met een server is een eenvoudig proces dat u in staat stelt de volledige mogelijkheden van de app te benutten. Door de bovenstaande stappen te volgen, zorgt u voor naadloze gegevensverzameling, -beheer en -analyse afgestemd op uw specifieke enquêterol.

@@ -1,0 +1,111 @@
+---
+title: "Lecture seule"
+description: ""
+---
+
+Les champs en lecture seule (read-only) dans rtSurvey vous permettent d'afficher des informations qui ne peuvent pas être modifiées par le répondant. Cette fonctionnalité est particulièrement utile pour montrer des données pré-remplies, des résultats calculés ou des informations qui doivent rester constantes tout au long de l'enquête.
+
+## Utilisation de Base
+
+Pour rendre un champ en lecture seule, utilisez la colonne `read_only` dans votre XLSForm :
+
+```
+| type    | name | label                 | read_only | default |
+|---------|------|----------------------|-----------|---------|
+| integer | num  | Le numéro du patient est : | yes       | 5       |
+```
+
+Dans cet exemple, le numéro du patient est fixé à 5 et ne peut pas être modifié par le répondant.
+
+## Combiner Lecture seule et Valeurs par défaut
+
+Les champs en lecture seule sont souvent utilisés en conjonction avec des valeurs par défaut pour afficher des informations prédéterminées ou calculées :
+
+```
+| type    | name     | label               | read_only | default        |
+|---------|----------|---------------------|-----------|----------------|
+| text    | username | Utilisateur connecté : | yes       | ${current_user}|
+| date    | today    | Date d'aujourd'hui :  | yes       | today()        |
+```
+
+Ici, le nom d'utilisateur et la date actuelle sont affichés mais ne peuvent pas être modifiés.
+
+## Fonctionnalités Spécifiques à rtSurvey
+
+### Lecture seule Conditionnelle
+
+rtSurvey étend la fonctionnalité de lecture seule avec une logique conditionnelle :
+
+```
+| type    | name     | label           | read_only                |
+|---------|----------|-----------------|--------------------------|
+| integer | age      | Âge :           | ${role} = 'viewer'       |
+| text    | comments | Commentaires :  | selected(${status}, 'closed') |
+```
+
+Dans ces exemples :
+- Le champ 'age' est en lecture seule uniquement si le rôle de l'utilisateur est 'viewer'.
+- Le champ 'comments' devient en lecture seule si le statut est 'closed'.
+
+### Statut de Lecture seule Dynamique
+
+rtSurvey vous permet de modifier le statut de lecture seule dynamiquement :
+
+```
+| type      | name     | label    | read_only              |
+|-----------|----------|----------| ----------------------|
+| text      | address  | Adresse :| ${edit_mode} = 'false' |
+```
+
+Ceci vous permet de basculer entre les modes modifiable et lecture seule en fonction de certaines conditions ou actions de l'utilisateur.
+
+## Meilleures Pratiques pour l'Utilisation des Champs en Lecture seule
+
+1. **Clarté** : Indiquez clairement quels champs sont en lecture seule grâce à des indices visuels ou des étiquettes.
+2. **Cohérence** : Utilisez les champs en lecture seule de manière cohérente tout au long de votre enquête.
+3. **Validation** : Même si les champs en lecture seule ne peuvent pas être modifiés, incluez-les dans votre processus de validation des données.
+4. **Performance** : Soyez prudent avec les calculs complexes dans les champs en lecture seule, car ils peuvent impacter le temps de chargement du formulaire.
+5. **Accessibilité** : Assurez-vous que les champs en lecture seule sont correctement marqués pour les lecteurs d'écran.
+
+## Techniques Avancées
+
+### Champs de Calcul en Lecture seule
+
+Utilisez des champs en lecture seule pour afficher des calculs basés sur d'autres réponses :
+
+```
+| type      | name     | label           | read_only | calculation            |
+|-----------|----------|-----------------|-----------|------------------------|
+| calculate | bmi      | IMC :           | yes       | ${weight} / (${height} * ${height}) |
+```
+
+### Affichage de Données Historiques
+
+Les champs en lecture seule peuvent afficher des données provenant d'enquêtes précédentes ou de sources externes :
+
+```
+| type    | name           | label                  | read_only | default                    |
+|---------|----------------|------------------------|-----------|----------------------------|
+| text    | last_visit_date| Date de la dernière visite : | yes  | ${pulldata('visits', 'date', 'id', ${patient_id})} |
+```
+
+## Considérations sur la Gestion des Données
+
+- Les champs en lecture seule sont inclus dans les exportations de données, généralement avec un indicateur signalant leur statut de lecture seule.
+- Lors de la mise à jour d'enregistrements existants, les champs en lecture seule conservent leurs valeurs d'origine, sauf s'ils sont explicitement écrasés via le backend.
+
+## Comportement de l'Application Mobile
+
+- L'application mobile rtSurvey respecte les paramètres de lecture seule, y compris la logique de lecture seule conditionnelle.
+- Le mode hors ligne prend entièrement en charge la fonctionnalité de lecture seule, y compris les champs de lecture seule dynamiques et calculés.
+
+## Limitations Connues
+
+- Certaines conditions de lecture seule dynamiques complexes peuvent avoir un léger impact sur les performances des appareils bas de gamme.
+- Les champs en lecture seule peuvent ne pas empêcher toutes les formes de manipulation de données dans les fichiers de données exportés, une validation côté serveur est donc recommandée pour les données critiques.
+
+## Dépannage des Champs en Lecture seule
+
+1. **Champ modifiable de manière inattendue** : Vérifiez les erreurs de syntaxe dans la colonne `read_only` ou la logique conditionnelle.
+2. **Valeurs calculées ne se mettant pas à jour** : Vérifiez la logique de calcul et assurez-vous que tous les champs référencés sont correctement nommés.
+3. **Problèmes de performance** : Optimisez les calculs complexes ou envisagez d'autres approches pour afficher les données en lecture seule.

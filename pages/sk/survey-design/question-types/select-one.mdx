@@ -1,0 +1,145 @@
+---
+title: "Select_one"
+description: "Otázky typu select_one umožňujú respondentom vybrať práve jednu možnosť z preddefinovaného zoznamu volieb."
+---
+
+import { Callout } from 'nextra/components'
+
+Typ otázky `select_one` vyzýva respondenta, aby si vybral **práve jednu možnosť** z preddefinovaného zoznamu. Predvolene sa voľby renderujú ako prepínače, ale je k dispozícii široká škála možností vzhľadu na zmenu rozloženia a správania.
+
+## Základná špecifikácia XLSForm
+
+**Hárok survey:**
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | consent | Dal respondent súhlas? |
+
+**Hárok choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| yesno | yes | Áno |
+| yesno | no | Nie |
+
+`listname` v `select_one listname` musí zodpovedať stĺpcu `list_name` v hárku choices.
+
+Pre viac podrobností pozrite si [špecifikáciu XLSForm](https://xlsform.org/en/#question-types).
+
+## Použitia
+
+Otázky select_one sa používajú pre:
+
+1. Otázky Áno/Nie
+2. Jednoduché výberové otázky (napr. úroveň vzdelania, pohlavie, rodinný stav)
+3. Kategoriálne hodnotenia (napr. slabý / priemerný / dobrý / výborný)
+4. Kaskádové (prepojené) výbery, kde sa voľby filtrujú na základe predchádzajúcej odpovede
+5. Výber krajiny, regiónu, okresu alebo inej administratívnej jednotky
+
+## Možnosti vzhľadu
+
+Zadajte hodnotu v stĺpci `appearance` na zmenu zobrazenia volieb:
+
+| Vzhľad | Popis |
+|------------|-------------|
+| *(žiadny)* | Predvolené prepínače, jeden na riadok |
+| `minimal` | Jeden rozbaľovací zoznam namiesto prepínačov |
+| `quick` | Automatický postup na ďalšiu otázku ihneď po výbere (len mobilné) |
+| `compact` | Kompaktná mriežka volieb — počet stĺpcov sa prispôsobuje šírke obrazovky |
+| `compact-N` | Kompaktná mriežka nútená do N stĺpcov (napr. `compact-3`) |
+| `quickcompact` | Kombinuje `quick` a `compact` |
+| `quickcompact-N` | Kombinuje `quick` a `compact` s N nútenými stĺpcami |
+| `horizontal` | Voľby usporiadané v horizontálnom rade (web) |
+| `horizontal-compact` | Horizontálne, kompaktné rozostupy (web) |
+| `likert` | Rad Likertovej škály — popisky hore, prepínače dole |
+| `label` | Zobrazuje iba popisky volieb bez vstupov (použite spolu s `list-nolabel`) |
+| `list-nolabel` | Zobrazuje iba vstupy bez popiskov (použite spolu s `label`) |
+| `columns(N)` | Zobrazenie v N stĺpcoch (rozšírenie rtSurvey, napr. `columns(3)`) |
+| `distress` | Widget emocionálnej ikony Kesslerovej psychologickej tiesne (K10) |
+| `search-api(...)` | Dynamické vyhľadávanie — načítava voľby z API za behu |
+
+### Príklad: Likertova škála
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one satisfaction | service_rating | Ako ste spokojní so službou? | likert |
+
+### Príklad: Kompaktné 3 stĺpce
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one regions | region | Vyberte región | compact-3 |
+
+## Kaskádové výbery
+
+Kaskádový (prepojený) výber filtruje voľby na základe hodnoty vybranej v predchádzajúcej otázke. Použite stĺpec `choice_filter` s názvom stĺpca z vášho hárku choices.
+
+**survey:**
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one province | province | Vyberte kraj | |
+| select_one district | district | Vyberte okres | province_name = `${province}` |
+
+**choices:**
+
+| list_name | name | label | province_name |
+|-----------|------|-------|---------------|
+| province | bratislava | Bratislava | |
+| province | kosice | Košice | |
+| district | stare_mesto | Staré Mesto | bratislava |
+| district | ruzinov | Ružinov | bratislava |
+| district | zapad | Západ | kosice |
+| district | vychod | Východ | kosice |
+
+Keď respondent vyberie `bratislava`, v zozname okresov sa zobrazia iba `Staré Mesto` a `Ružinov`.
+
+<Callout type="warning">
+Názov stĺpca použitý v `choice_filter` (napr. `province_name`) musí existovať v hárku choices. `${province}` odkazuje na pole formulára s názvom `province`.
+</Callout>
+
+## Použitie vybranej hodnoty vo výrazoch
+
+Odkazujte na vybranú **hodnotu** (nie popisok) pomocou `${fieldname}`:
+
+```
+relevant: ${consent} = 'yes'
+```
+
+Na získanie popisku voľby namiesto hodnoty použite `choice-label()`:
+
+```
+calculate: choice-label(${education_level}, ${education_level})
+```
+
+## Možnosť „Iné" s voľným textom
+
+Bežným vzorom je zahrnutie možnosti „iné", ktorá odhalí textové pole:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one occupation | job | Aké je vaše povolanie? | |
+| text | job_other | Prosím uveďte | `${job} = 'other'` |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| occupation | farmer | Roľník |
+| occupation | trader | Obchodník |
+| occupation | student | Študent |
+| occupation | other | Iné (prosím uveďte) |
+
+## Najlepšie postupy
+
+1. Udržujte zoznamy krátke a vzájomne sa vylučujúce — ak by respondenti mohli chcieť viac ako jednu, použite namiesto toho `select_multiple`.
+2. Umiestňujte najčastejšiu odpoveď na prvé miesto alebo zoraďujte abecedne pre dlhé zoznamy.
+3. Vždy zahrňte možnosti „Neviem" alebo „Radšej neodpoviem", kde je to relevantné.
+4. Používajte `minimal` (rozbaľovací zoznam) pre zoznamy s viac ako 7–8 voľbami na mobile, aby ste ušetrili miesto na obrazovke.
+5. Pre kaskádové výbery pridajte všetky filtrovacie stĺpce do hárku choices pred zostavením formulára.
+
+## Obmedzenia
+
+- Respondent môže vybrať iba jednu voľbu — pre otázky s viacerými odpoveďami použite `select_multiple`.
+- Vzhľad `likert` funguje najlepšie s 5–7 voľbami, ktoré sa zmestia na jeden riadok.
+- Automatický postup `quick` je len pre mobilné zariadenia; na webové formuláre nemá žiadny efekt.

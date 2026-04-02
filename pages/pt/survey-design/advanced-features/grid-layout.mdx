@@ -1,0 +1,107 @@
+---
+title: "Grid-layout"
+description: "O layout em grelha permite posicionar campos numa grelha CSS dentro de um grupo, possibilitando designs de formulário com múltiplas colunas."
+---
+
+A funcionalidade **Layout em Grelha** permite organizar perguntas numa **grelha de múltiplas colunas** dentro de um grupo, usando a etiqueta de aparência `gridformat<>`. Isto é útil para formulários de entrada de dados densos onde múltiplos campos relacionados devem aparecer lado a lado em vez de empilhados verticalmente.
+
+---
+
+## Como funciona
+
+O layout em grelha é aplicado em dois níveis:
+
+1. **O grupo** — defina `appearance: field-list grid(weight=N)` para definir quantas colunas a grelha tem
+2. **Cada campo dentro do grupo** — defina `appearance: gridformat<row=R col=C colspan=S/>` para posicionar o campo
+
+A grelha usa um sistema de 12 colunas estilo Bootstrap. `weight=N` define quantas colunas lógicas a sua grelha tem; cada coluna ocupa `12/N` colunas Bootstrap.
+
+---
+
+## Aparência ao nível do grupo
+
+| Aparência | Descrição |
+|-----------|-----------|
+| `field-list grid(weight=2)` | Grelha de 2 colunas (cada coluna = 6 colunas Bootstrap) |
+| `field-list grid(weight=3)` | Grelha de 3 colunas (cada coluna = 4 colunas Bootstrap) |
+| `field-list grid(weight=4)` | Grelha de 4 colunas (cada coluna = 3 colunas Bootstrap) |
+| `field-list grid(weight=6)` | Grelha de 6 colunas (cada coluna = 2 colunas Bootstrap) |
+
+---
+
+## Sintaxe `gridformat<>` ao nível do campo
+
+```
+gridformat<row=R col=C colspan=S/>
+gridformat<row=R col=C colspan=S backgroundcolor=COLOR/>
+```
+
+| Atributo | Descrição |
+|----------|-----------|
+| `row` | Número de linha (baseado em 1) |
+| `col` | Número de coluna (baseado em 1, dentro da grelha definida por `weight`) |
+| `colspan` | Número de colunas que este campo ocupa (padrão 1) |
+| `backgroundcolor` | Cor CSS opcional para o fundo do campo (por ex., `#f0f0f0`, `lightblue`) |
+
+---
+
+## Exemplo: Secção de inquérito a agregados familiares com 2 colunas
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | demographics | Dados demográficos | `field-list grid(weight=2)` |
+| text | first_name | Primeiro nome | `gridformat<row=1 col=1/>` |
+| text | last_name | Apelido | `gridformat<row=1 col=2/>` |
+| integer | age | Idade | `gridformat<row=2 col=1/>` |
+| select_one gender | gender | Género | `gridformat<row=2 col=2/>` |
+| text | address | Morada completa | `gridformat<row=3 col=1 colspan=2/>` |
+| end_group | | | |
+
+Isto é renderizado como:
+
+```
+[ Primeiro nome     ] [ Apelido            ]
+[ Idade             ] [ Género             ]
+[ Morada completa (ocupa ambas as colunas) ]
+```
+
+---
+
+## Exemplo: Entrada de dados de parcela com 3 colunas
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | plot_data | Detalhes da parcela | `field-list grid(weight=3)` |
+| text | plot_id | ID da parcela | `gridformat<row=1 col=1/>` |
+| decimal | area_ha | Área (ha) | `gridformat<row=1 col=2/>` |
+| select_one crop_type | crop | Tipo de cultura | `gridformat<row=1 col=3/>` |
+| decimal | yield | Produção (kg) | `gridformat<row=2 col=1/>` |
+| decimal | revenue | Receita | `gridformat<row=2 col=2/>` |
+| text | notes | Notas | `gridformat<row=2 col=3/>` |
+| end_group | | | |
+
+---
+
+## Cores de fundo
+
+Use `backgroundcolor` para distinguir visualmente secções:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | section_a | Secção A | `gridformat<row=1 col=1 colspan=2 backgroundcolor=#e8f4f8/>` |
+
+---
+
+## Melhores Práticas
+
+1. Use o layout em grelha apenas para ecrãs **intensivos em entrada de dados** onde campos lado a lado reduzem genuinamente a rolagem.
+2. Mantenha os campos `colspan=1` curtos (IDs, códigos, seleções curtas) — etiquetas largas ficam mal cortadas em colunas de grelha estreitas.
+3. Use `colspan=N` para campos com etiquetas longas ou entradas de texto de múltiplas linhas.
+4. Teste no menor tamanho de ecrã que espera que os enumeradores usem — uma grelha de 4 colunas é comprimida num telemóvel.
+5. O layout em grelha funciona melhor em formulários web e formatos de tablet; em telemóveis um layout de 2 colunas é geralmente a largura máxima confortável.
+
+## Limitações
+
+- `gridformat<>` apenas funciona dentro de um grupo com aparência `grid(weight=N)` — não tem efeito ao nível superior.
+- O layout em grelha é uma extensão de formulário web do rtSurvey e pode não ser renderizado corretamente noutros clientes compatíveis com ODK.
+- O posicionamento de linhas e colunas não é validado no momento de construção do formulário — campos sobrepostos serão ambos renderizados mas podem parecer quebrados.

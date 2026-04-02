@@ -1,0 +1,127 @@
+---
+title: "DigitalOcean"
+description: "स्वचालित उपयोगकर्ता-डेटा स्क्रिप्ट का उपयोग करके DigitalOcean ड्रॉपलेट पर rtCloud तैनात करें।"
+---
+
+DigitalOcean **उपयोगकर्ता डेटा** स्क्रिप्ट का उपयोग करता है जो पहले बूट पर स्वचालित रूप से चलती है। आप स्क्रिप्ट के शीर्ष पर कॉन्फ़िगरेशन वैरिएबल भरते हैं, फिर ड्रॉपलेट बनाते समय पूरी स्क्रिप्ट को पेस्ट करते हैं।
+
+> लिनोड स्टैकस्क्रिप्ट्स के विपरीत, DigitalOcean का कोई फॉर्म UI नहीं है - आपको पेस्ट करने से पहले स्क्रिप्ट को सीधे संपादित करना होगा।
+
+**Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
+
+---
+
+## एंबेडेड कीक्लोक (अनुशंसित)
+
+अंतर्निहित SSO के साथ सरलतम सेटअप के लिए `digitalocean-droplet-keycloak-embed.sh` का उपयोग करें।
+
+### चरण 1 - कॉन्फ़िगरेशन भरें
+
+स्क्रिप्ट खोलें और शीर्ष पर `कॉन्फिगरेशन` ब्लॉक को संपादित करें:
+
+```bash
+# --- Required ---
+PROJECT_ID="rtsurvey"                  # Unique identifier for your project (no spaces)
+ADMIN_PASSWORD="admin"                 # Password for app admin and Keycloak — change after first login
+
+# --- Domain + SSL ---
+DOMAIN="myapp.example.com"            # Your domain — DNS A record must point here
+PROJECT_URL=""                         # Leave blank unless behind Cloudflare/proxy
+LETSENCRYPT_EMAIL="admin@example.com" # Email for Let's Encrypt notifications
+
+# --- Optional ---
+STATA_ENABLED="false"
+TZ="Asia/Ho_Chi_Minh"
+```
+
+| फ़ील्ड | आवश्यक | विवरण |
+|-------|-------|---|
+| `प्रोजेक्ट_आईडी` | हाँ | डेटाबेस नाम और कीक्लोक क्लाइंट आईडी के रूप में उपयोग किया जाता है। लोअरकेस, कोई रिक्त स्थान नहीं. |
+| `एडमिन_पासवर्ड` | नहीं | ऐप एडमिन लॉगिन और कीक्लोक एडमिन कंसोल के लिए पासवर्ड। डिफ़ॉल्ट रूप से `एडमिन` - **पहले लॉगिन के बाद बदलें**। |
+| 'डोमेन' | हाँ | आपका डोमेन नाम. DNS A रिकॉर्ड को ड्रॉपलेट आईपी की ओर इंगित करना चाहिए। |
+| `LETSENCRYPT_EMAIL` | हाँ | Let's Encrypt प्रमाणपत्र सूचनाओं के लिए ईमेल पता। |
+| `प्रोजेक्ट_यूआरएल` | नहीं | सार्वजनिक URL को ओवरराइड करें. `डोमेन` का उपयोग करने के लिए खाली छोड़ें। Cloudflare के पीछे उपयोगी. |
+
+> **सुरक्षा:** सभी पासवर्ड डिफ़ॉल्ट रूप से `एडमिन` होते हैं। अपने प्रथम लॉगिन के तुरंत बाद उन्हें बदलें।
+
+### चरण 2 - एक ड्रॉपलेट बनाएं
+
+In the [DigitalOcean control panel](https://cloud.digitalocean.com):
+
+1. **बनाएं** → **बूंदें** पर क्लिक करें
+2. छवि के रूप में **उबंटू 22.04 एलटीएस** चुनें
+3. **बेसिक, 4 जीबी रैम/2 वीसीपीयू** या इससे बड़ा चुनें
+4. **उन्नत विकल्प** तक स्क्रॉल करें → जांचें **आरंभिक स्क्रिप्ट जोड़ें**
+5. संपूर्ण स्क्रिप्ट सामग्री को टेक्स्ट क्षेत्र में चिपकाएँ
+6. **ड्रॉपलेट बनाएं** पर क्लिक करें
+
+### चरण 3 — डीएनएस रिकॉर्ड जोड़ें
+
+ड्रॉपलेट बूट होने पर, अपने DNS प्रदाता में एक **एक रिकॉर्ड** जोड़ें:
+
+```
+Type  : A
+Name  : myapp          (or @ for root domain)
+Value : <droplet-ip>
+TTL   : 300
+```
+
+### चरण 4 - प्रगति की निगरानी करें
+
+ड्रॉपलेट में SSH डालें और लॉग देखें:
+
+```bash
+ssh root@<droplet-ip>
+tail -f /var/log/rtcloud-setup.log
+```
+
+स्क्रिप्ट आपके सर्वर आईपी को शुरुआत में ही प्रिंट कर देती है - जैसे ही आप इसे देखें, DNS रिकॉर्ड जोड़ें।
+
+### चरण 5 - ऐप तक पहुंचें
+
+जब सेटअप पूरा हो जाता है, तो लॉग एक सारांश दिखाता है:
+
+```
+============================================================
+ rtCloud deployment complete! (Embedded Keycloak)
+============================================================
+ App URL   : https://myapp.example.com
+ Admin     : admin / admin
+ Keycloak  : https://myapp.example.com/auth/admin
+
+ !! SECURITY: All passwords default to 'admin'.
+    Change them immediately after first login.
+============================================================
+```
+
+Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
+
+> **लॉगिन करने के तुरंत बाद ऊपरी दाएं मेनू में **सेटिंग्स** के माध्यम से अपना पासवर्ड बदलें**।
+
+---
+
+## तैनाती के बाद
+
+### पासवर्ड बदलें
+
+ड्रॉपलेट में SSH, `.env` संपादित करें, और प्रभावित कंटेनर को पुनरारंभ करें:
+
+```bash
+nano /opt/rtcloud/.env
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### डोमेन अपडेट करें
+
+यदि आप परिनियोजन के बाद एक अलग डोमेन निर्दिष्ट करते हैं, तो `PROJECT_URL` को `.env` में अपडेट करें:
+
+```bash
+nano /opt/rtcloud/.env   # update PROJECT_URL=
+docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
+```
+
+### सभी कंटेनर देखें
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```

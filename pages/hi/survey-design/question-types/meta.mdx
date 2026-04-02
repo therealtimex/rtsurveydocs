@@ -1,0 +1,186 @@
+---
+title: "Meta"
+description: "Meta question types उत्तरदाता से किसी भी input के बिना device, enumerator, और timing information को automatically capture करते हैं।"
+---
+
+import { Callout } from 'nextra/components'
+
+Meta question types special fields हैं जो **automatically** fill होती हैं — उत्तरदाता उन्हें कभी नहीं देखता। वे submission के बारे में context capture करती हैं: कब collect किया गया, किस device का उपयोग किया गया, और किसने collect किया। उन्हें `survey` worksheet में किसी भी अन्य question type की तरह जोड़ें; वे simply screen पर दिखाई नहीं देतीं।
+
+## Basic XLSForm Specification
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| deviceid | deviceid | |
+
+Meta fields के लिए Labels optional हैं क्योंकि वे कभी display नहीं होतीं।
+
+---
+
+## Timing meta fields
+
+### `start`
+
+**Form खुलने की date और time** record करती है। ISO 8601 format (`YYYY-MM-DDTHH:MM:SS.sss+HH:MM`) में stored।
+
+```
+type    | name  | label
+start   | start |
+```
+
+### `end`
+
+**Form submit होने की date और time** record करती है। `start` के साथ मिलकर, आप form fill करने में बिताए गए समय की calculate कर सकते हैं:
+
+```
+type      | name          | calculation
+calculate | duration_min  | (decimal-date-time(${end}) - decimal-date-time(${start})) * 1440
+```
+
+### `today`
+
+**वर्तमान date** record करती है (कोई time component नहीं)। `YYYY-MM-DD` के रूप में stored। तब उपयोगी जब आपको full timestamp के बिना केवल date की आवश्यकता हो।
+
+```
+type  | name  | label
+today | today |
+```
+
+---
+
+## Device meta fields
+
+### `deviceid`
+
+Data collection के लिए उपयोग किए गए **device का unique identifier** record करती है। Android पर यह आमतौर पर IMEI या Android ID होता है। यह track करने के लिए उपयोगी है कि कौन सा device प्रत्येक form submit किया और उसी device से duplicate submissions detect करने के लिए।
+
+```
+type      | name     | label
+deviceid  | deviceid |
+```
+
+### `devicephonenum`
+
+Device में **SIM card का phone number** record करती है (यदि available हो)। यदि device में SIM नहीं है या SIM पर number stored नहीं है तो empty हो सकती है।
+
+```
+type           | name          | label
+devicephonenum | devicephonenum |
+```
+
+### `simserial`
+
+**SIM card का serial number** (ICCID) record करती है। यह identify करने के लिए उपयोगी है कि कौन सा SIM/carrier उपयोग किया गया था।
+
+```
+type      | name      | label
+simserial | simserial |
+```
+
+### `subscriberid`
+
+**IMSI (International Mobile Subscriber Identity)** record करती है — SIM card पर unique subscriber identifier।
+
+```
+type         | name        | label
+subscriberid | subscriberid |
+```
+
+---
+
+## Enumerator meta fields
+
+### `username`
+
+**Logged-in enumerator का username** (rtSurvey app में उपयोग किया गया account) record करती है। यह track करने का सबसे reliable तरीका है कि प्रत्येक submission किसने collect की।
+
+```
+type     | name     | label
+username | username |
+```
+
+### `email`
+
+**Logged-in enumerator का email address** record करती है।
+
+```
+type  | name  | label
+email | email |
+```
+
+### `phonenumber`
+
+**Enumerator के account से associated phone number** (यदि configured हो) record करती है।
+
+```
+type        | name       | label
+phonenumber | phonenumber |
+```
+
+---
+
+## Audit log
+
+### `audit`
+
+`audit` meta field **detailed audit logging** enable करती है — यह प्रत्येक प्रश्न का timestamped log record करती है जिसे गणनाकर्ता ने visit किया, उन्होंने प्रत्येक पर कितना समय बिताया, और (optionally) प्रत्येक step पर उनकी GPS location। Audit log प्रत्येक submission के साथ एक separate `audit.csv` file के रूप में save होती है।
+
+```
+type  | name  | parameters
+audit | audit | location-priority=balanced location-min-interval=30 location-max-age=60
+```
+
+#### Audit parameters
+
+| Parameter | विवरण |
+|-----------|-------------|
+| `location-priority` | GPS accuracy level: `no-gps`, `low-power`, `balanced`, `high-accuracy` |
+| `location-min-interval` | Location captures के बीच minimum seconds |
+| `location-max-age` | Accept करने के लिए cached location की maximum age (seconds) |
+
+Audit log capture करती है:
+- Question name और event type (`question`, `form.start`, `form.exit`, `form.save`, `form.finalize`)
+- प्रत्येक event के लिए start और end timestamps
+- GPS coordinates (यदि `location-priority` set है)
+
+<Callout type="warning">
+`audit` field प्रति submission एक separate file generate करती है। सुनिश्चित करें कि आपकी data pipeline main form data और audit CSV दोनों को process करे।
+</Callout>
+
+---
+
+## Complete example
+
+एक typical household survey में सभी timing और enumerator meta fields शामिल हो सकती हैं:
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| today | today | |
+| deviceid | deviceid | |
+| username | username | |
+| email | email | |
+| audit | audit | |
+| text | household_id | Household ID |
+| ... | ... | ... |
+
+---
+
+## Best Practices
+
+1. हमेशा `start` और `end` शामिल करें — वे free, automatic, और quality monitoring के लिए invaluable हैं।
+2. Enumerators track करने के लिए हमेशा `username` शामिल करें।
+3. `deviceid` शामिल करें जब आप duplicate submissions detect करना चाहते हों या field devices track करना चाहते हों।
+4. High-accountability surveys में `audit` का उपयोग करें जहाँ आपको verify करने की आवश्यकता हो कि enumerators ने actually प्रत्येक प्रश्न visit किया।
+5. SIM-related fields (`simserial`, `subscriberid`, `devicephonenum`) केवल active SIM cards वाले Android devices पर reliable हैं — tablet-only deployments के लिए उन्हें skip करें।
+
+---
+
+## सीमाएं
+
+- सभी meta fields **read-only** हैं — उन्हें अन्य calculations द्वारा referenced या modified नहीं किया जा सकता।
+- `username` और `email` के लिए enumerator को logged in होना आवश्यक है; anonymous submissions के लिए वे empty होंगी।
+- SIM/phone meta fields Wi-Fi-only tablets और कुछ Android versions पर empty values return कर सकती हैं।

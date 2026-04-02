@@ -1,0 +1,61 @@
+---
+title: "Heltall"
+description: "Heltallsspørsmål tillater inndata av hele tall i spørreundersøkelsen."
+---
+
+Heltallsspørsmålstypen i XLSForm og rtSurvey brukes til å samle inn heltallssvar. Denne spørsmålstypen er nødvendig for å samle numeriske data uten desimaler, som tellinger, aldre eller år.
+
+## Grunnleggende XLSForm-spesifikasjon
+
+| type    | name  | label                  |
+|---------|-------|------------------------|
+| integer | age   | Skriv inn alderen din i år|
+
+## Brukstilfeller
+
+Heltallsspørsmål brukes vanligvis for:
+
+1. Aldersinput
+2. Telling av elementer (f.eks. antall barn, husholdningsmedlemmer)
+3. Årstallsinput (f.eks. fødselsår)
+4. Vurderinger på en numerisk skala
+5. Innsamling av hele tall generelt
+
+## Beste praksis
+
+1. Bruk klare og konsise etiketter for å angi forventet inndata.
+2. Implementer områdespesifiseringer for å forhindre urealistiske eller feilaktige inndataer.
+3. Vurder å bruke hinttekst for å gi eksempler eller tydeliggjøre forventet format.
+4. For store tall, vurder å bruke komma eller mellomrom i etiketten for å forbedre lesbarheten.
+
+## Begrensninger og validering
+
+Du kan legge til begrensninger for å sikre at den angitte verdien faller innenfor et spesifikt område:
+
+| type    | name  | label                  | constraint        | constraint_message                    |
+|---------|-------|------------------------|-------------------|---------------------------------------|
+| integer | age   | Skriv inn alderen din i år| .>0 and .&lt;=120    | Alderen må være mellom 1 og 120 år   |
+
+## Eksempelbruk
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| integer | household_size | Hvor mange bor i husholdningen?           | .>0        | Husholdningsstørrelsen må være minst 1 |
+| integer | num_children   | Hvor mange barn under 18 i husholdningen? | .>=0    | Antall barn kan ikke være negativt |
+| integer | year_built     | I hvilket år ble huset bygget?            | .>1800 and .&lt;=2023 | År må være mellom 1800 og 2023 |
+
+## Beregning med heltallsverdier
+
+Heltallsverdier kan brukes i beregninger:
+
+| type    | name           | label                                     |
+|---------|----------------|-------------------------------------------|
+| integer | num_adults     | Antall voksne i husholdningen             |
+| integer | num_children   | Antall barn i husholdningen               |
+| calculate | total_members | |
+
+I calculate-raden kan du bruke:
+
+```
+calculation | ${num_adults} + ${num_children}
+```

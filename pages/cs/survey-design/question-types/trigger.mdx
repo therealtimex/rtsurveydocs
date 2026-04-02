@@ -1,0 +1,91 @@
+---
+title: "Trigger / Potvrzení"
+description: "Otázky trigger zobrazují prohlášení, které musí enumerátor explicitně potvrdit před pokračováním."
+---
+
+Typ otázky `trigger` (také nazývaný `acknowledge`) zobrazuje **prohlášení se zaškrtávacím políčkem**. Enumerátor musí zaškrtnout políčko pro potvrzení, že prohlášení přečetl a pochopil, před tím, než formulář umožní pokračovat. Není uložena žádná datová hodnota — pouze to, zda bylo políčko zaškrtnuto.
+
+## Základní specifikace XLSForm
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | Respondent poskytl ústní informovaný souhlas. |
+
+Nebo pomocí aliasu `acknowledge`:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | Respondent poskytl ústní informovaný souhlas. |
+
+Oba typy `trigger` a `acknowledge` jsou ekvivalentní — použijte ten, který vaše platforma dokumentuje.
+
+## Použití
+
+Otázky trigger/acknowledge se běžně používají pro:
+
+1. **Informovaný souhlas** — potvrzení, že enumerátor získal souhlas před zaznamenáváním citlivých dat
+2. **Měkká upozornění** — varování před neobvyklou hodnotou a vyžadování explicitního potvrzení před pokračováním
+3. **Položky kontrolního seznamu** — potvrzení, že bylo provedeno fyzické pozorování (např. „Přímo jsem pozoroval zdroj vody")
+4. **Pokyny** — vynucení potvrzení pokynů na úrovni sekce před pokračováním
+5. **Kontroly kvality** — označení odlehlých hodnot a vyžadování jejich ověření enumerátorem
+
+## Příklad použití
+
+### Potvrzení souhlasu
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | Respondent dal ústní informovaný souhlas k účasti v tomto průzkumu. | yes |
+
+### Měkké upozornění pro odlehlé hodnoty
+
+Používá se spolu s výrazem `relevant` pro zobrazení triggeru pouze při zadání podezřelé hodnoty:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Počet dětí | | |
+| trigger | children_confirm | Zadali jste `${children}` dětí. Prosím ověřte u respondenta a klepněte OK pro potvrzení. | `${children} > 10` | `${children} > 10` |
+
+### Potvrzení pokynů na začátku sekce
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Sekce B: Využití zemědělské půdy. Všechny otázky v této sekci pokládejte pouze vedoucímu domácnosti. |
+
+## Vyžadování triggeru
+
+Přidejte `required: yes` pro zamezení posunu vpřed, dokud není políčko zaškrtnuto:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | Veškeré bezpečnostní vybavení je přítomno a funkční. | yes | Před pokračováním musíte potvrdit. |
+
+## Podmíněné zobrazení
+
+Zobrazení triggeru pouze při splnění podmínky:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | Má domácnost studnu? | |
+| trigger | well_observation | Potvrďte, že jste přímo pozorovali stav studny. | `${has_well} = 'yes'` |
+
+## Rozdíl od `note`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Zobrazuje text | Ano | Ano |
+| Vyžaduje interakci | Ne | Ano (musí zaškrtnout) |
+| Ukládá data | Ne | Ne (pouze OK/zaškrtnuto) |
+| Může blokovat postup | Ne | Ano (s `required`) |
+
+## Osvědčené postupy
+
+1. Udržujte popisky triggeru stručné a akční — enumerátor by měl být schopen přečíst a potvrdit během sekund.
+2. Vždy přidejte `required: yes`, když je potvrzení povinné.
+3. Používejte triggery pro souhlas a bezpečnostní kontroly, kde potřebujete auditní stopu, že enumerátor potvrdil.
+4. Kombinujte s `relevant` pro podmíněná měkká upozornění, aby se trigger zobrazoval pouze v případě potřeby ověření hodnoty.
+
+## Omezení
+
+- Pole trigger neukládají smysluplnou datovou hodnotu — zaznamenávají pouze, že políčko bylo zaškrtnuto.
+- Widget trigger se vykresluje jako jednoduché zaškrtávací políčko/tlačítko na většině klientů; není to plný elektronický podpis.

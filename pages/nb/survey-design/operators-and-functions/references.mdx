@@ -1,0 +1,82 @@
+---
+title: "Referere til verdier"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+`${feltnavn}`-syntaksen brukes til å referere til gjeldende verdi av et annet felt i skjemaet. Den kan representere verdien som ble angitt, valgt eller beregnet, og vil vises nøyaktig slik det vises i de innsendte dataene.
+
+Eksempel:
+Hvis du har et felt kalt "age" og ønsker å hente den nøyaktige verdien som ble angitt i det feltet, kan du bruke `${age}`.
+
+Når det gjelder begrensninger, brukes "."-symbolet for å referere til brukerens foreslåtte innlegg eller valg for gjeldende felt. Det lar deg bruke betingelser eller grenser basert på verdien brukeren skriver inn eller velger på det tidspunktet.
+
+Eksempel:
+Hvis du vil sjekke om den foreslåtte verdien for gjeldende felt er mindre enn 3, kan du bruke begrensningen `. < 3`.
+
+---
+
+## `..` — Referanse til overordnet gruppe
+
+Inne i en gruppe eller repeat-gruppe refererer `..` til den **overordnede konteksten**. Dette er sjelden nødvendig i praksis, men brukes i avanserte XPath-uttrykk for å navigere i skjemahierarkiet.
+
+---
+
+## Hvor referanser brukes
+
+| Kolonne | Referansetype | Eksempel |
+|---------|---------------|---------|
+| `relevant` | `${feltnavn}` | `${consent} = 'yes'` |
+| `constraint` | `.` for gjeldende felt, `${feltnavn}` for andre | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${feltnavn}` | `${adults} + ${children}` |
+| `required` | `${feltnavn}` | `${has_income} = 'yes'` |
+| `default` | `${feltnavn}` | `${previous_answer}` |
+| `label` | `${feltnavn}` i tekst | `"Din alder er ${age} år"` |
+| `choice_filter` | Kolonnenavn (uten `${}`) | `district = ${district}` |
+
+<Callout type="warning">
+I `choice_filter`-kolonnen, referer til **valg-kolonnenavn** direkte (uten `${}`), og referer til **skjemafelt** med `${}`. Å blande disse er en vanlig feilkilde.
+</Callout>
+
+---
+
+## Referere til verdier inne i repeat-grupper
+
+Inne i en repeat refererer `${feltnavn}` til feltet i den **samme instansen** av repeat-en:
+
+```
+relevant: ${member_age} < 18
+```
+
+Dette bruker `member_age`-verdien for den gjeldende repeat-instansen, ikke alle instanser.
+
+For å referere til et felt i en **spesifikk** repeat-instans fra utenfor repeat-en, bruk `indexed-repeat()`:
+
+```
+indexed-repeat(${member_name}, ${household_members}, 1)
+```
+
+Se [Funksjoner — Repeterte feltfunksjoner](functions#repeterte-feltfunksjoner) for fullstendige detaljer.
+
+---
+
+## Sjekk av tomme verdier
+
+Test om et felt er besvart:
+
+```
+${feltnavn} != ''       (feltet er ikke tomt)
+${feltnavn} = ''        (feltet er tomt)
+```
+
+For tall, sjekk også:
+```
+${age} > 0               (alderen har en positiv verdi — implisitt ikke tom for numerisk kontekst)
+```
+
+---
+
+## Typetvang i referanser
+
+Når du bruker `${feltnavn}` i en numerisk kontekst (f.eks. `${age} + 1`), tvinger rtSurvey automatisk strengverdien til et tall. Et tomt felt tvinges til `0` eller `NaN` avhengig av operasjonen — bruk `coalesce(${felt}, 0)` for å sikkert sette et tomt numerisk felt til null.

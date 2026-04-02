@@ -1,0 +1,55 @@
+---
+title: "Toán tử và Hàm"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+Các biểu thức trong rtSurvey được viết theo một tập con của **XPath 1.0**, được mở rộng với các hàm JavaRosa/ODK và các hàm tùy chỉnh của rtSurvey. Bạn dùng biểu thức trong các cột `calculate`, `constraint`, `relevant`, `required`, và `default` của XLSForm.
+
+## Tham chiếu giá trị trường
+
+Dùng `${fieldname}` để tham chiếu giá trị của trường khác:
+
+```
+${age} > 18
+```
+
+Dùng `.` (dấu chấm đơn) để tham chiếu **giá trị của trường hiện tại** — thường dùng trong biểu thức `constraint`:
+
+```
+. >= 0 and . <= 100
+```
+
+Dùng `..` để tham chiếu nhóm cha (cách dùng nâng cao trong repeats).
+
+## Cú pháp biểu thức
+
+Biểu thức tuân theo quy tắc XPath tiêu chuẩn:
+
+- **Chuỗi** phải được đặt trong dấu ngoặc đơn: `'yes'`
+- **Số** được viết nguyên văn: `42`, `3.14`
+- **Boolean** được dùng cho `relevant`, `required`, và `constraint` — bất kỳ giá trị không rỗng, khác không đều là truthy
+- Khoảng trắng được bỏ qua quanh toán tử
+
+<Callout type="warning">
+Luôn dùng dấu ngoặc thẳng (`'` hoặc `"`) — không bao giờ dùng "dấu ngoặc thông minh" (dấu ngoặc cong). Trình soạn thảo văn bản phong phú thường tự động chuyển đổi dấu ngoặc và sẽ làm hỏng biểu thức.
+</Callout>
+
+## Các phần trong chương này
+
+- **[Toán tử](operators)** — toán tử so sánh (`=`, `!=`, `>`, `<`, `>=`, `<=`) và toán tử logic (`and`, `or`, `not()`)
+- **[Hàm](functions)** — hàm chuỗi, lựa chọn, số, ngày/giờ, boolean, địa lý và tiện ích
+- **[Tham chiếu](references)** — cách tham chiếu trường và giá trị ngữ cảnh
+
+## Ví dụ nhanh
+
+| Trường hợp sử dụng | Biểu thức |
+|--------------------|-----------|
+| Hiển thị nếu tuổi trên 18 | `${age} > 18` |
+| Chỉ hiển thị khi "yes" được chọn | `${consent} = 'yes'` |
+| Bắt buộc nếu trường khác không rỗng | `${name} != ''` |
+| Tính tổng | `${adults} + ${children}` |
+| Ghép tên | `concat(${first_name}, ' ', ${last_name})` |
+| Ngày hôm nay | `today()` |
+| Kiểm tra nếu tùy chọn được chọn | `selected(${interests}, 'sports')` |

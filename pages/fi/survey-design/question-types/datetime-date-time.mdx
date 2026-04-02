@@ -1,0 +1,71 @@
+---
+title: "Datetime, date, time"
+description: "Datetime-kysymykset antavat vastaajille mahdollisuuden syöttää sekä päivämäärä että aika yhdessä kentässä."
+---
+
+XLSFormien ja rtSurveyn datetime-kysymystyyppi mahdollistaa vastaajien syöttää sekä päivämäärän että kellonajan yhdessä kentässä. Tämä kysymystyyppi on hyödyllinen, kun tarvitset tallentaa tietyn hetken aikana, mukaan lukien sekä päivämäärä että tarkka aika.
+
+## XLSForm-perusmäärittely
+
+| type     | name           | label                           |
+|----------|----------------|--------------------------------|
+| datetime | event_datetime | Milloin tapahtuma tapahtui?     |
+
+Lisätietoja datetime-kysymystyypin perusteista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+
+## Käyttötarkoitukset
+
+Datetime-kysymyksiä käytetään yleisesti:
+
+1. Tapahtumien tai havaintojen aikaleimien tallentamiseen
+2. Tapaamisten tai kokouksien aikatauluttamiseen
+3. Aktiviteettien alku- ja loppuaikojen kirjaamiseen
+4. Täsmällisten hetkien tallentamiseen aikaherkkää tiedonkeruuta varten
+
+## rtSurveyn laajennukset
+
+rtSurvey laajentaa datetime-kysymysten toiminnallisuutta erilaisilla ulkoasuilla ja muokkausvaihtoehdoilla:
+
+### Ulkoasuvaihtoehdot
+
+- `(oletus)`: Näyttää kalenterin ja kellon päivämäärän ja ajan valitsemiseen
+- `inline`: Näyttää kalenterin ja kellon ikoneina
+- `inline-1line`: Näyttää kalenterin ja kellon valitsemiseen yhdellä rivillä
+- `inline-onlyresult`: Näyttää kalenterin ja kellon ikoneina rivin lopussa; ikonit katoavat valinnan jälkeen
+
+### Värein mukauttaminen
+
+Voit mukauttaa kalenterin ja kellon ikonien väriä `colors()`-funktion avulla:
+
+- `inline colors("0099FF")`: Näyttää ikonit mukautetulla värillä
+- `inline-1line-0000FF`: Näyttää yhdellä rivillä mukautetulla värillä
+- `inline-1line colors("0000FF","FFFF00")`: Näyttää yhdellä rivillä useilla mukautetuilla väreillä
+- `inline-onlyresult colors("0099FF")`: Näyttää ikonit, jotka katoavat valinnan jälkeen, mukautetulla värillä
+
+### Mukautetut päivämäärä- ja aikamuodot
+
+rtSurvey mahdollistaa mukautetut päivämäärä- ja aikamuodot erityisellä syntaksilla:
+
+- `inline-[%Y-%m-%d %H:%M:%S]`: Mukautettu muotoesimerkki (Vuosi-Kuukausi-Päivä Tunti:Minuutti:Sekunti)
+- `inline-[%d/%m/%Y %I:%M %p]`: Mukautettu muotoesimerkki (Päivä/Kuukausi/Vuosi Tunti:Minuutti AM/PM)
+
+## Esimerkkikäyttö
+
+Esimerkki kyselyssä:
+
+| type     | name           | label                                      | appearance                    |
+|----------|----------------|--------------------------------------------|-------------------------------|
+| datetime | incident_time  | Milloin tapahtuma sattui?                  | inline-[%d/%m/%Y %I:%M %p]  |
+
+## Parhaat käytännöt
+
+1. Anna selkeät ohjeet odotetusta päivämäärä- ja aikamuodosta.
+2. Harkitse `inline`-ulkoasun käyttämistä kompaktimpaan näyttöön.
+3. Käytä mukautettuja muotoja, kun tarvitset tiettyjä päivämäärä- ja aikakomponentteja tai muotoilua.
+4. Ota aikavyöhykkeet huomioon, kun kerätään datetime-tietoja eri alueilta.
+
+## Rajoitukset
+
+- Jotkut ulkoasut tai mukautetut muodot eivät välttämättä ole tuettuja kaikilla laitteilla tai alustoilla.
+- Käyttäjät saattavat tarvita ohjausta päivämäärän ja ajan oikeaan syöttämiseen, erityisesti mukautetuilla muodoilla.
+- Aikavyöhykeerot voivat vaikeuttaa data-analyysiä, jos niitä ei oteta asianmukaisesti huomioon.

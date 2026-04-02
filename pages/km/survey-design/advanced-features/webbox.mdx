@@ -1,0 +1,67 @@
+---
+title: "Webbox"
+description: "Webbox embed external web page ក្នុង survey ជា modal iframe, អនុញ្ញាតឱ្យ enumerators មើល references ដោយ មិន ចាក ចេញ form។"
+---
+
+**Webbox** embed external web page ក ្ ន ុ ង survey ជ ា **modal popup** (iframe) ។ Enumerator ចុ ច button ក ្ ន ុ ង label, page បើ ក ក ្ ន ុ ង full-screen overlay ។
+
+---
+
+## Syntax
+
+```html
+<webbox src='https://example.com/reference' title='Reference Guide'>Open Reference Guide</webbox>
+```
+
+| Attribute | ការពិពណ៌នា |
+|-----------|-------------|
+| `src` | URL ដ ើ ម ្ ប ី load ក ្ ន ុ ង iframe |
+| `title` | Text ក ្ ន ុ ង modal header bar |
+| *(content)* | Button label ដ ែ ល clickable |
+
+---
+
+## Basic example
+
+| type | name | label |
+|------|------|-------|
+| note | ref_guide | `<webbox src='https://docs.example.com/field-guide' title='Field Guide'>Open Field Guide</webbox>` |
+
+---
+
+## Passing form values to embedded page
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | webbox_url | | `concat('https://dashboard.example.com/household?id=', ${household_id})` |
+| note | hh_dash | `<webbox src='${webbox_url}' title='Household Dashboard'>Open Dashboard</webbox>` |
+
+---
+
+## Repeat interaction: delete buttons
+
+```html
+<delete-repeat-current>Remove this row</delete-repeat-current>
+<delete-repeat-last>Remove last row</delete-repeat-last>
+```
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | items | Item |
+| text | item_name | Item name |
+| note | delete_btn | `<delete-repeat-current>Remove this item</delete-repeat-current>` |
+| end_repeat | | |
+
+---
+
+## Best Practices
+
+1. ប ្ រ ើ webbox ស ម ្ រ ា ប ់ **reference material** ។
+2. ធ ា ន ា embedded URL accessible ។
+3. Keep embedded page mobile-friendly ។
+
+## Limitations
+
+- Webbox ត ្ រ ូ វ ក ា រ network connectivity ។
+- Some sites block embedding ។
+- Webbox ជ ា rtSurvey web form extension ។

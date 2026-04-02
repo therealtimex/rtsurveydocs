@@ -1,0 +1,110 @@
+---
+title: "Teks"
+description: "Tipe pertanyaan respons teks bebas di rtSurvey"
+---
+
+Tipe pertanyaan `text` mengumpulkan respons teks bebas — string karakter apa pun. Ini adalah tipe input yang paling fleksibel dan digunakan untuk nama, alamat, deskripsi, kode, dan apa pun yang tidak sesuai dengan tipe yang lebih spesifik.
+
+rtSurvey juga memperluas `text` dengan **widget input waktu** yang memungkinkan entri waktu yang tepat dengan pemilih jam.
+
+## Spesifikasi XLSForm Dasar
+
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | Nama lengkap responden |
+| text | address | Alamat rumah |
+
+Untuk detail lebih lanjut tentang tipe teks XLSForm standar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+
+## Penggunaan
+
+Pertanyaan teks digunakan untuk:
+
+1. Nama, alamat, deskripsi bebas
+2. Komentar atau umpan balik terbuka
+3. Kode, ID, atau nomor referensi yang tidak sesuai dengan integer/decimal
+4. Mengumpulkan nilai waktu dengan ekstensi input waktu rtSurvey
+5. Bidang teks pelengkap otomatis (melalui `search-autocomplete-noedit-v2()`)
+
+## Opsi appearance standar
+
+| Appearance | Deskripsi |
+|------------|-----------|
+| *(tidak ada)* | Input teks satu baris |
+| `multiline` | Area teks multi-baris — terbaik untuk teks bebas yang lebih panjang di web |
+
+## Ekstensi input waktu rtSurvey
+
+rtSurvey memperluas `text` dengan **widget pemilih jam** untuk mengumpulkan nilai waktu. Opsi appearance ini menampilkan ikon jam yang dapat diketuk enumerator untuk memilih jam, menit, detik, atau milidetik.
+
+### Varian appearance
+
+| Appearance | Deskripsi |
+|------------|-----------|
+| `inline` | Ikon jam ditampilkan di sebelah bidang |
+| `inline colors("RRGGBB")` | Ikon jam dengan warna hex kustom |
+| `inline-1line` | Jam ditampilkan dalam format satu baris yang kompak |
+| `inline-1line-RRGGBB` | Satu baris dengan warna ikon kustom (hex, tanpa `#`) |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Satu baris dengan dua warna |
+| `inline-onlyresult` | Ikon jam menghilang setelah dipilih; hanya nilai yang ditampilkan |
+| `inline-onlyresult colors("RRGGBB")` | Sama, dengan warna ikon kustom |
+
+### Token format waktu
+
+Tambahkan string format dalam tanda kurung untuk mengontrol komponen waktu mana yang ditampilkan:
+
+| String format | Menampilkan |
+|---------------|-------------|
+| `inline-[%H:%M]` | Jam dan menit (24 jam) |
+| `inline-[%h:%M]` | Jam dan menit (12 jam) |
+| `inline-[%H:%M:%S]` | Jam, menit, detik (24 jam) |
+| `inline-[%h:%M:%S]` | Jam, menit, detik (12 jam) |
+| `inline-[%H:%M:%3]` | Jam, menit, milidetik |
+| `inline-[%M:%S]` | Menit dan detik saja |
+| `inline-[%M:%3]` | Menit dan milidetik saja |
+| `inline-[%S]` | Detik saja |
+| `inline-[%3]` | Milidetik saja |
+| `inline-[%H]` | Jam saja (24 jam) |
+| `inline-[%h]` | Jam saja (12 jam) |
+
+### Contoh: Rekam durasi tugas dalam menit dan detik
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | task_duration | Waktu yang diperlukan untuk menyelesaikan tugas | `inline-[%M:%S]` |
+
+### Contoh: Rekam waktu peristiwa dalam format 24 jam dengan warna kustom
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | event_time | Waktu peristiwa | `inline-1line colors("0099FF")` |
+
+## Format data
+
+Data teks disimpan dan diekspor sebagai string biasa. Untuk input berbasis waktu menggunakan widget jam inline, nilainya disimpan dalam format yang sesuai dengan string format yang dipilih (misalnya, `14:32` untuk `%H:%M`).
+
+## Constraint dan validasi
+
+Terapkan constraint untuk menegakkan format, panjang, atau pola:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| text | name | Nama lengkap | `string-length(.) >= 2` | Nama harus minimal 2 karakter |
+| text | code | Kode referensi | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Masukkan 2 huruf besar diikuti 4 digit |
+| text | phone | Nomor telepon | `regex(., '^[0-9]{9,15}$')` | Masukkan nomor telepon yang valid |
+
+## Praktik Terbaik
+
+1. Gunakan tipe yang lebih spesifik (`integer`, `decimal`, `date`) kapan pun data memiliki struktur yang diketahui — ini mencegah entri yang tidak valid dan menyederhanakan analisis.
+2. Tambahkan `constraint` dengan `string-length()` atau `regex()` untuk memvalidasi kode atau ID.
+3. Gunakan appearance `multiline` untuk pertanyaan terbuka di mana responden mungkin menulis beberapa kalimat.
+4. Untuk pengumpulan waktu, pilih token format waktu yang sesuai dengan presisi yang dibutuhkan analisis Anda — mengumpulkan milidetik ketika Anda hanya memerlukan menit membuang usaha enumerator.
+
+## Dukungan platform
+
+Tipe pertanyaan teks dan semua appearance input waktu didukung di platform iOS, Android, dan web.
+
+## Keterbatasan
+
+- Respons teks adalah teks bebas — tidak ada pemeriksaan ejaan atau constraint kosakata bawaan di luar pola regex.
+- Widget waktu inline adalah ekstensi rtSurvey dan bukan bagian dari spesifikasi XLSForm standar.

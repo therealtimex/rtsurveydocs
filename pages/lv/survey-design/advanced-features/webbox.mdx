@@ -1,0 +1,43 @@
+---
+title: "Webbox"
+description: "Webbox iegulda ārēju tīmekļa lapu aptaujā kā modālu iframe, ļaujot enumeratoriem skatīt atsauces vai mijiedarboties ar ārējiem rīkiem, neatstājot formu."
+---
+
+**Webbox** iegulda ārēju tīmekļa lapu aptaujā kā **modālu uznirstošo logu** (iframe). Enumerators pieskar pogai etiķetes vai piezīmes tekstā, lapa atveras pilnekrāna pārklājumā formā, un, aizverot to, viņi atgriežas tieši tur, kur bija. Tas ļauj rādīt atsauces materiālus, kartes, informācijas paneļus vai pielāgotus rīkus, neatverot atsevišķu pārlūkprogrammas cilni.
+
+---
+
+## Konfigurācija
+
+Webbox tiek konfigurēts, izmantojot `note` lauku ar speciālu etiķeti, kas satur webbox HTML:
+
+```html
+<a class="btn webbox" href="https://example.com/reference">Atvērt atsauces lapu</a>
+```
+
+### Parametri
+
+| Parametrs | Apraksts |
+|-----------|-------------|
+| `href` | Ārējās lapas URL |
+| `class="btn webbox"` | Aktivizē webbox uzvedību |
+
+## Lietojums
+
+Webbox ir noderīgs:
+- Atsauces rokasgrāmatu vai definīciju rādīšanai
+- Interaktīvas kartes rādīšanai aptaujas aizpildīšanas laikā
+- Ārējas validācijas rīku saskarnei
+- Informatīvu paneļu rādīšanai
+
+## Piezīmes
+
+- Webbox prasa aktīvu interneta savienojumu.
+- Pārbaudiet, vai ārējā lapa ir mobilajam redzama.
+- Apsveriet drošību — iegulstiet tikai uzticamas lapas.
+
+## Labākā prakse
+
+1. Nodrošiniet, ka ārējā lapa ātri ielādējas.
+2. Testējiet mobilajās ierīcēs ar dažādiem ekrāna izmēriem.
+3. Nodrošiniet rezerves norādījumus gadījumam, ja webbox lapa nav pieejama.

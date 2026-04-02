@@ -1,0 +1,45 @@
+---
+title: "Dashboardöversikt"
+description: "Förstå RT-CPMS systemdashboard och verktyg för projektövervakning."
+tags: ["Dashboard", "Översikt", "Övervakning"]
+---
+
+# Systemdashboard
+
+Dashboarden (`/cpms/cpmsDashBoard/indexNew`) fungerar som det administrativa kommandocentret och den primära landningssidan för Real-Time Survey-plattformen (RT-CPMS).
+
+![Förhandsvisning av systemdashboard](/images/dashboard_overview.png)
+
+Den är utformad för att ge undersökningschefer en omedelbar översikt över aktiva projekt, snabblänkar till viktiga verktyg och ett centraliserat nav för att navigera i alla viktiga plattformsmoduler.
+
+## Nyckelfunktioner
+
+### 1. Projekt- och formulärval
+Den vänstra panelen innehåller navigatorn **Formulär och rapporter**. Det här området listar alla aktiva undersökningar i din arbetsyta.
+* Genom att välja en specifik undersökning (t.ex. *RTA - UNDERSÖKNING 02*) riktar du dashboarden att fokusera övervakning och mätvärden enbart på det projektet.
+
+### 2. Visualiserings- och mätvärdesdfilter
+Ovanför projektlistan kan du växla mellan flera kritiska dataperspektiv för att övervaka realtidsframsteg i fältarbetet:
+* **Antal efter starttid / sluttid**: Spåra när intervjuare börjar och avslutar sina undersökningssessioner.
+* **Antal efter inlämningsdatum**: Övervaka den totala dagliga volymen av data som når servern.
+* **Antal efter användarnamn**: Utvärdera enskilda intervjuares produktivitet och prestanda.
+* **Karta över intervjuer**: Visa en geografisk (GIS) distribution av var undersökningssvar samlas in för att säkerställa att krav på rumslig täckning uppfylls.
+
+### 3. Applikationsportaler
+Centrum på dashboarden ger omedelbar åtkomst till datainsamlingsgränssnitten. Beroende på intervjuarnas hårdvara kan du starta eller hänvisa dem till:
+* **Webbapp**: För webbläsarbaserad datainsamling.
+* **Android-app**: Länk till Google Play Store eller APK.
+* **iOS-app**: Länk till Apple App Store.
+
+### 4. Direktgenvägsknappar till moduler
+Tre framträdande åtgärdsknappar möjliggör snabb övergång till de mest frekvent använda operativa modulerna:
+* **Formulär och datainmatning**: Gå direkt till manuell hantering av insamlade data.
+* **Analys och rapporter**: Öppna Business Intelligence (BI)-sviten för att korstabulera och visualisera undersökningssvar.
+* **Behörighetskonfiguration**: Justera vem som har åtkomst till den aktiva undersökningen och vilka roller de har.
+
+### 5. Global navigeringssidofält
+Det hopfällbara vänstra sidofältet ger åtkomst till hela ekosystemet av RT-CPMS backend-moduler. Härifrån kan du fördjupa dig i:
+* **Konfiguration**: Hantera personal och aktiva enheter.
+* **Fältarbetshantering**: Spåra intervjuares dagliga aktivitet.
+* **Kvalitetssäkring**: Implementera och granska QA-regler och -flaggor.
+* **Slutliga leverabler**: Exportera dina rensade dataset till CSV, PDF eller Stata.
