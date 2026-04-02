@@ -1,0 +1,66 @@
+---
+title: "Rank"
+description: "Otázky rank umožňují respondentům seřadit sadu voleb podle preference nebo priority."
+---
+
+Typ otázky `rank` prezentuje seznam voleb, které respondent musí **přetáhnout do pořadí** (nebo jinak seřadit od prvního po poslední). Výsledek ukládá jako seznam hodnot voleb oddělených mezerami v pořadí výběru, s volbou s nejvyšší prioritou na prvním místě.
+
+## Základní specifikace XLSForm
+
+**survey:**
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Seřaďte tyto potřeby komunity od nejdůležitějších po nejméně důležité |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| priorities | water | Čistá voda |
+| priorities | health | Zdravotní péče |
+| priorities | education | Vzdělání |
+| priorities | roads | Silnice |
+| priorities | electricity | Elektřina |
+
+## Formát uložených dat
+
+Uložená hodnota je **seznam oddělený mezerami** hodnot voleb v seřazeném pořadí (první = nejvyšší priorita):
+
+```
+water education health roads electricity
+```
+
+## Extrakce seřazených pozic
+
+Použijte `selected-at()` pro získání volby na konkrétním pořadí:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| rank priorities | main_priority | Seřaďte potřeby komunity | |
+| calculate | top_priority | | selected-at(`${main_priority}`, 0) |
+| calculate | second_priority | | selected-at(`${main_priority}`, 1) |
+
+`selected-at(${main_priority}, 0)` vrátí hodnotu umístěnou **na první místě** (index 0 = nejvyšší pořadí).
+
+## Použití
+
+Otázky rank se běžně používají pro:
+
+1. **Seřazení priorit** — žádost komunit o seřazení potřeb rozvoje
+2. **Seřazení preferencí** — seřazení funkcí produktu, atributů služby nebo možností politiky
+3. **Seřazení položek zkoušky** — uspořádání kroků v procesu
+4. **Výběr Top-N** — kombinace s `selected-at()` pro extrakci pouze top 1, 2 nebo 3 voleb
+
+## Osvědčené postupy
+
+1. Udržujte seznam krátký (3–7 položek) — seřazování se stává kognitivně náročným nad 7–8 voleb.
+2. Používejte jasné, vzájemně se vylučující popisky voleb, abyste se vyhnuli nejasnostem ohledně toho, co „první" znamená.
+3. Přidejte text nápovědy vysvětlující směr seřazení (např. „Přetáhněte k seřazení: první = nejdůležitější").
+4. Validujte pomocí `count-selected(.) = x`, pokud potřebujete zajistit, že jsou seřazeny všechny volby.
+
+## Omezení
+
+- Widget přetažení k seřazení vyžaduje dotykovou obrazovku nebo myš — nemusí dobře fungovat v prostředích pouze s klávesnicí.
+- Na některých starších mobilních klientech může widget rank přejít na rozhraní číselného vstupu.
+- Nelze částečně seřadit (tj. seřadit pouze některé volby) — všechny volby musí být seřazeny.

@@ -1,0 +1,111 @@
+---
+title: "Salt Okunur"
+description: ""
+---
+
+rtSurvey'deki salt okunur alanlar, katılımcı tarafından düzenlenemeyen bilgileri görüntülemenize olanak tanır. Bu özellik, önceden doldurulmuş verileri, hesaplanmış sonuçları veya anket boyunca sabit kalması gereken bilgileri göstermek için özellikle kullanışlıdır.
+
+## Temel Kullanım
+
+Bir alanı salt okunur yapmak için XLSForm'unuzdaki `read_only` sütununu kullanın:
+
+```
+| type    | name | label                 | read_only | default |
+|---------|------|----------------------|-----------|---------|
+| integer | num  | Hasta numarası:       | yes       | 5       |
+```
+
+Bu örnekte, hasta numarası 5 olarak ayarlanmıştır ve katılımcı tarafından değiştirilemez.
+
+## Salt Okunuru Varsayılan Değerlerle Birleştirme
+
+Salt okunur alanlar genellikle önceden belirlenmiş veya hesaplanmış bilgileri görüntülemek için varsayılan değerlerle birlikte kullanılır:
+
+```
+| type    | name     | label               | read_only | default        |
+|---------|----------|---------------------|-----------|----------------|
+| text    | username | Giriş yapan kullanıcı:  | yes       | ${current_user}|
+| date    | today    | Bugünün tarihi:      | yes       | today()        |
+```
+
+Burada kullanıcı adı ve geçerli tarih görüntülenir ancak düzenlenemez.
+
+## rtSurvey'e Özgü Özellikler
+
+### Koşullu Salt Okunur
+
+rtSurvey, salt okunur işlevselliği koşullu mantıkla genişletir:
+
+```
+| type    | name     | label           | read_only                |
+|---------|----------|-----------------|--------------------------|
+| integer | age      | Yaş:            | ${role} = 'viewer'       |
+| text    | comments | Yorumlar:        | selected(${status}, 'closed') |
+```
+
+Bu örneklerde:
+- 'age' alanı yalnızca kullanıcının rolü 'viewer' ise salt okunurdur.
+- 'comments' alanı durum 'closed' ise salt okunur hale gelir.
+
+### Dinamik Salt Okunur Durumu
+
+rtSurvey, salt okunur durumunu dinamik olarak değiştirmenize izin verir:
+
+```
+| type      | name     | label    | read_only              |
+|-----------|----------|----------| ----------------------|
+| text      | address  | Adres:   | ${edit_mode} = 'false' |
+```
+
+Bu, belirli koşullara veya kullanıcı eylemlerine bağlı olarak düzenlenebilir ve salt okunur modlar arasında geçiş yapmanıza olanak tanır.
+
+## Salt Okunur Alanları Kullanmak için En İyi Uygulamalar
+
+1. **Netlik**: Salt okunur alanları görsel ipuçları veya etiketler aracılığıyla açıkça belirtin.
+2. **Tutarlılık**: Salt okunur alanları anketiniz genelinde tutarlı biçimde kullanın.
+3. **Doğrulama**: Salt okunur alanlar düzenlenemese de, bunları veri doğrulama sürecinize dahil edin.
+4. **Performans**: Salt okunur alanlardaki karmaşık hesaplamalar konusunda dikkatli olun; form yükleme süresini etkileyebilir.
+5. **Erişilebilirlik**: Salt okunur alanların ekran okuyucular için düzgün işaretlendiğinden emin olun.
+
+## Gelişmiş Teknikler
+
+### Hesaplanmış Salt Okunur Alanlar
+
+Diğer yanıtlara dayalı hesaplamaları görüntülemek için salt okunur alanları kullanın:
+
+```
+| type      | name     | label           | read_only | calculation            |
+|-----------|----------|-----------------|-----------|------------------------|
+| calculate | bmi      | VKİ:            | yes       | ${weight} / (${height} * ${height}) |
+```
+
+### Geçmiş Verileri Görüntüleme
+
+Salt okunur alanlar, önceki anketlerden veya harici kaynaklardan alınan verileri görüntüleyebilir:
+
+```
+| type    | name           | label                  | read_only | default                    |
+|---------|----------------|------------------------|-----------|----------------------------|
+| text    | last_visit_date| Son ziyaret tarihi:    | yes       | ${pulldata('visits', 'date', 'id', ${patient_id})} |
+```
+
+## Veri Yönetimi Hususları
+
+- Salt okunur alanlar, genellikle salt okunur durumlarını gösteren bir bayrakla birlikte veri dışa aktarmalarına dahil edilir.
+- Mevcut kayıtlar güncellenirken, salt okunur alanlar açıkça arka uç üzerinden üzerine yazılmadıkça orijinal değerlerini korur.
+
+## Mobil Uygulama Davranışı
+
+- rtSurvey mobil uygulaması, koşullu salt okunur mantık dahil salt okunur ayarlara uyar.
+- Çevrimdışı mod, dinamik ve hesaplanmış salt okunur alanlar dahil salt okunur işlevselliği tam olarak destekler.
+
+## Bilinen Sınırlamalar
+
+- Bazı karmaşık dinamik salt okunur koşullar düşük özellikli cihazlarda hafif bir performans etkisine sahip olabilir.
+- Salt okunur alanlar, dışa aktarılan veri dosyalarındaki tüm veri manipülasyon biçimlerini engellemeyebilir; bu nedenle kritik veriler için sunucu taraflı doğrulama önerilir.
+
+## Salt Okunur Alanlarda Sorun Giderme
+
+1. **Alan Beklenmedik Şekilde Düzenlenebilir**: `read_only` sütununda veya koşullu mantıkta sözdizimi hatalarını kontrol edin.
+2. **Hesaplanan Değerler Güncellenmiyor**: Hesaplama mantığını doğrulayın ve tüm referans alanların doğru adlandırıldığından emin olun.
+3. **Performans Sorunları**: Karmaşık hesaplamalarını optimize edin veya salt okunur verileri görüntülemek için alternatif yaklaşımları düşünün.

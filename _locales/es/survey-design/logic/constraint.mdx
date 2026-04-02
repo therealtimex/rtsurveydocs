@@ -1,0 +1,90 @@
+---
+title: "Validación de respuestas"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+Una forma de garantizar la calidad de los datos es agregar restricciones a los campos de datos en su formulario. Las restricciones ayudan a evitar que los usuarios ingresen respuestas no válidas o imposibles. Por ejemplo, al preguntar sobre los ingresos de una persona, desea evitar valores poco realistas, como números negativos o valores extremadamente altos. Agregar restricciones de datos en su formulario es fácil. Simplemente siga los pasos a continuación:
+
+1. Agregue una nueva columna llamada "constraint" a su formulario.
+2. En la columna "constraint", ingrese una fórmula que especifique los límites de la respuesta.
+
+### Ejemplo
+
+Consideremos un ejemplo donde queremos agregar una restricción para los ingresos de la persona. La restricción requiere que los ingresos estén entre $0 y $1,000,000. A continuación se muestra cómo puede configurar la restricción:
+
+| `name`      | `constraint`                  |
+|---------------|-----------------------------|
+| Income        | . >= 0 & . &lt;= 1000000      |
+
+En el ejemplo anterior, el "." en la fórmula hace referencia a la variable de pregunta, que representa el valor ingresado por el usuario para la pregunta "Ingresos". La restricción ". >= 0 && . &lt;= 1000000" garantiza que los ingresos ingresados sean mayores o iguales a 0 y menores o iguales a 1,000,000.
+
+
+### Restricción estricta
+
+Una **restricción estricta** bloquea completamente el envío del formulario si el valor ingresado no satisface la expresión. El encuestador no puede continuar hasta que ingrese un valor válido.
+
+Para agregar una restricción estricta, ingrese su expresión en la columna `constraint`. Opcionalmente, agregue un mensaje legible por humanos en `constraint_message`:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Edad del encuestado | `. > 0 and . <= 120` | La edad debe estar entre 1 y 120 |
+| decimal | temperature | Temperatura corporal (°C) | `. >= 35 and . <= 42` | La temperatura debe estar entre 35°C y 42°C |
+| text | phone | Número de teléfono | `regex(., '^[0-9]{10}$')` | Ingrese un número de teléfono de 10 dígitos |
+
+#### Condiciones múltiples
+
+Combine condiciones con `and` / `or`:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Uso de `regex()` para la validación de patrones
+
+La función `regex(value, pattern)` prueba un valor contra una expresión regular:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | Correo electrónico | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Ingrese una dirección de correo electrónico válida |
+| text | zip_code | Código postal | `regex(., '^[0-9]{5}$')` | Ingrese un código postal de 5 dígitos |
+
+#### Referencia a otros campos en una restricción
+
+Use `${fieldname}` para hacer referencia a valores de otras preguntas:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Año de finalización | `. >= ${start_year}` | El año de finalización debe ser posterior al año de inicio |
+| decimal | loan_repaid | Monto reembolsado | `. <= ${loan_amount}` | No puede reembolsar más del monto del préstamo |
+
+### Alerta suave
+
+Una **alerta suave** (también llamada restricción suave o advertencia) advierte al encuestador que un valor parece inusual, pero aún le permite continuar. Esto es útil cuando un valor es técnicamente válido pero estadísticamente improbable.
+
+rtSurvey admite alertas suaves usando la columna `constraint` con un enfoque especial de `constraint_type`, o a través de la apariencia `soft` combinada con un campo de nota.
+
+El patrón más común es usar una **nota** con una expresión `relevant` que marca el valor sospechoso, junto con una pregunta de **acknowledge** para confirmar:
+
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Número de hijos | |
+| note | children_warning | Advertencia: Ingresó `${children}` hijos. Por favor confirme que es correcto. | `. > 15` |
+| trigger | children_confirm | Confirme que el número de hijos es correcto | `${children} > 15` |
+
+#### Alerta suave solo con constraint_message
+
+Para una advertencia suave más simple, puede formular la restricción para advertir sobre valores extremos pero aún permitir un rango amplio:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | children | Número de hijos | `. >= 0 and . <= 30` | Este valor parece muy alto. Por favor verifique. |
+
+<Callout type="warning">
+La distinción entre restricciones estrictas y suaves es importante para la calidad de los datos. Use **restricciones estrictas** para valores lógicamente imposibles (edades negativas, temperaturas superiores a 100°C). Use **alertas suaves** para valores estadísticamente improbables pero no imposibles — no desea bloquear casos límite legítimos.
+</Callout>

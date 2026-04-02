@@ -1,0 +1,69 @@
+---
+title: "Exams"
+description: "exam feature បន្ថែម timed quiz mode ទៅ survey, ជ ា ម ួ យ audio feedback ស្រ ើ ច ចិ ត ្ ត ។"
+---
+
+import { Callout } from 'nextra/components'
+
+**Exam** feature ប្ដូរ survey ទ ៅ ជ ា timed quiz ។ countdown timer ត ្ រ ូ វ display ដ ល ់ respondent ។
+
+---
+
+## `check-exam()` function
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Parameters
+
+| # | Parameter | ការពិពណ៌នា |
+|---|-----------|-------------|
+| 1 | `examTime` | Total exam duration ជ ា seconds |
+| 2 | `questionToStoreRemainingTime` | `name` ន ៃ field ដ ើ ម ្ ប ី store remaining time |
+| 3 | `rightSound` | Audio file ចំ ល ើ យ ត ្ រ ូ វ |
+| 4 | `wrongSound` | Audio file ចំ ល ើ យ ខ ុ ស |
+| 5 | `excludeQuestion` | Comma-separated field names ដ ើ ម ្ ប ី exclude |
+
+---
+
+## Basic setup
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+---
+
+## With audio feedback
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+<Callout type="warning">
+Sound files ត ្ រ ូ វ ត ែ ភ ្ ជ ា ប ់ ជ ា media files ហ ើ យ filename ត ្ រ ូ វ ត ែ ត ្ រ ង ់ (case-sensitive) ។
+</Callout>
+
+---
+
+## Excluding questions ពី timer
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+---
+
+## Best Practices
+
+1. ជ ា ន ិ ច ្ ច inform respondents អំ ព ី time limit ។
+2. Exclude intro notes ហ ើ យ consent questions ។
+3. ប ្ រ ើ `remaining_time` ដ ើ ម ្ ប ី detect time-outs ។
+
+## Limitations
+
+- Timer display-only — form ដ ោ យ ស ្ វ ័ យ ប ្ រ វ ត ្ ត ិ submit ម ិ ន ។
+- Exam feature ជ ា rtSurvey extension ។

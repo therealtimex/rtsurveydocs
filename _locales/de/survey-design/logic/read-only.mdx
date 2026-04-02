@@ -1,0 +1,111 @@
+---
+title: "Nur Lesezugriff"
+description: ""
+---
+
+Nur-Lese-Felder (Read-only) in rtSurvey ermöglichen es Ihnen, Informationen anzuzeigen, die vom Befragten nicht bearbeitet werden können. Diese Funktion ist besonders nützlich für die Anzeige von vorbefüllten Daten, berechneten Ergebnissen oder Informationen, die während der gesamten Umfrage konstant bleiben sollen.
+
+## Grundlegende Verwendung
+
+Um ein Feld auf "nur Lesezugriff" zu setzen, verwenden Sie die Spalte `read_only` in Ihrem XLSForm:
+
+```
+| type    | name | label                 | read_only | default |
+|---------|------|----------------------|-----------|---------|
+| integer | num  | Patientennummer ist:  | yes       | 5       |
+```
+
+In diesem Beispiel ist die Patientennummer auf 5 festgelegt und kann vom Befragten nicht geändert werden.
+
+## Kombinieren von Nur Lesezugriff mit Standardwerten
+
+Nur-Lese-Felder werden oft in Verbindung mit Standardwerten verwendet, um feststehende oder berechnete Informationen anzuzeigen:
+
+```
+| type    | name     | label               | read_only | default        |
+|---------|----------|---------------------|-----------|----------------|
+| text    | username | Angemeldeter Benutzer: | yes    | ${current_user}|
+| date    | today    | Heutiges Datum:     | yes       | today()        |
+```
+
+Hier werden der Benutzername und das aktuelle Datum angezeigt, können aber nicht bearbeitet werden.
+
+## rtSurvey-spezifische Funktionen
+
+### Bedingter Lesezugriff
+
+rtSurvey erweitert die Nur-Lese-Funktionalität um bedingte Logik:
+
+```
+| type    | name     | label           | read_only                |
+|---------|----------|-----------------|--------------------------|
+| integer | age      | Alter:          | ${role} = 'viewer'       |
+| text    | comments | Kommentare:     | selected(${status}, 'closed') |
+```
+
+In diesen Beispielen:
+- Das Feld 'age' ist nur dann lesegeschützt, wenn die Rolle des Benutzers 'viewer' ist.
+- Das Feld 'comments' wird lesegeschützt, wenn der Status auf 'closed' steht.
+
+### Dynamischer Nur-Lese-Status
+
+rtSurvey ermöglicht es Ihnen, den Nur-Lese-Status dynamisch zu ändern:
+
+```
+| type      | name     | label    | read_only              |
+|-----------|----------|----------| ----------------------|
+| text      | address  | Adresse: | ${edit_mode} = 'false' |
+```
+
+Dies erlaubt den Wechsel zwischen bearbeitbaren und schreibgeschützten Modi basierend auf bestimmten Bedingungen oder Benutzeraktionen.
+
+## Best Practices für die Verwendung von Nur-Lese-Feldern
+
+1. **Klarheit**: Kennzeichnen Sie lesegeschützte Felder deutlich durch visuelle Hinweise oder Beschriftungen.
+2. **Konsistenz**: Verwenden Sie Nur-Lese-Felder konsistent in Ihrer gesamten Umfrage.
+3. **Validierung**: Auch wenn Nur-Lese-Felder nicht bearbeitet werden können, sollten sie in Ihren Datenvalidierungsprozess einbezogen werden.
+4. **Leistung**: Seien Sie vorsichtig mit komplexen Berechnungen in Nur-Lese-Feldern, da diese die Ladezeit des Formulars beeinflussen können.
+5. **Barrierefreiheit**: Stellen Sie sicher, dass Nur-Lese-Felder für Screenreader korrekt gekennzeichnet sind.
+
+## Fortgeschrittene Techniken
+
+### Berechnete Nur-Lese-Felder
+
+Verwenden Sie Nur-Lese-Felder, um Berechnungen basierend auf anderen Antworten anzuzeigen:
+
+```
+| type      | name     | label           | read_only | calculation            |
+|-----------|----------|-----------------|-----------|------------------------|
+| calculate | bmi      | BMI:            | yes       | ${gewicht} / (${groesse} * ${groesse}) |
+```
+
+### Anzeige historischer Daten
+
+Nur-Lese-Felder können Daten aus früheren Umfragen oder externen Quellen anzeigen:
+
+```
+| type    | name           | label                  | read_only | default                    |
+|---------|----------------|------------------------|-----------|----------------------------|
+| text    | last_visit_date| Datum des letzten Besuchs: | yes    | ${pulldata('visits', 'date', 'id', ${patient_id})} |
+```
+
+## Überlegungen zur Datenverwaltung
+
+- Nur-Lese-Felder sind in Datenexporten enthalten, normalerweise mit einem Flag, das ihren schreibgeschützten Status kennzeichnet.
+- Beim Aktualisieren bestehender Datensätze behalten Nur-Lese-Felder ihre ursprünglichen Werte bei, sofern sie nicht explizit über das Backend überschrieben werden.
+
+## Verhalten der mobilen App
+
+- Die rtSurvey-Mobil-App berücksichtigt die Nur-Lese-Einstellungen, einschließlich der bedingten Nur-Lese-Logik.
+- Der Offline-Modus unterstützt die Nur-Lese-Funktionalität vollständig, einschließlich dynamischer und berechneter Nur-Lese-Felder.
+
+## Bekannte Einschränkungen
+
+- Einige komplexe dynamische Nur-Lese-Bedingungen können einen leichten Einfluss auf die Leistung leistungsschwacher Geräte haben.
+- Nur-Lese-Felder verhindern möglicherweise nicht alle Formen der Datenmanipulation in exportierten Datendateien, daher wird eine serverseitige Validierung für kritische Daten empfohlen.
+
+## Fehlerbehebung bei Nur-Lese-Feldern
+
+1. **Feld unerwartet bearbeitbar**: Überprüfen Sie die Spalte `read_only` oder die bedingte Logik auf Syntaxfehler.
+2. **Berechnete Werte aktualisieren sich nicht**: Überprüfen Sie die Berechnungslogik und stellen Sie sicher, dass alle referenzierten Felder korrekt benannt sind.
+3. **Leistungsprobleme**: Optimieren Sie komplexe Berechnungen oder erwägen Sie alternative Ansätze zur Anzeige schreibgeschützter Daten.

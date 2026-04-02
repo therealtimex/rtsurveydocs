@@ -1,0 +1,106 @@
+---
+title: "Připojení k serveru"
+description: "Zjistěte, jak připojit mobilní aplikaci rtSurvey k serveru projektu, přistupovat k funkcím specifickým pro role a začít spolupracovat na průzkumech přes více projektů."
+---
+
+Připojení aplikace rtSurvey k serveru je klíčovým krokem pro zahájení používání aplikace pro sběr dat, správu a analýzu. Tento proces zajišťuje, že všechny průzkumné role mohou přistupovat k nezbytným funkcím a datům v reálném čase.
+
+## Klíčové rozdíly od ODK Collect
+
+rtSurvey nabízí vylepšené funkce oproti ODK Collect pro různé průzkumné role:
+- **Administrátor**: Zasílání zpráv, oznámení pro aktualizace (odevzdání dat, nové sestavy, nové účty), vyplňování formulářů a prohlížení analytických sestav.
+- **Projektový manažer**: Podobné funkce jako administrátoři, včetně nastavení a správy projektů.
+- **Návrhář průzkumu**: Zasílání zpráv, oznámení, vyplňování formulářů a prohlížení analytických sestav.
+- **Terénní enumerátor**: Vyplňování formulářů, zasílání zpráv, oznámení a zprávy o průběhu.
+- **Datový analytik**: Zasílání zpráv, oznámení a přístup k analytickým sestavám.
+
+## Kroky pro připojení aplikace rtSurvey k serveru
+
+### 1. Ujistěte se, že máte účet
+
+Pro připojení k serveru potřebujete účet. Účty může vytvořit administrátor nebo zaměstnanci pomocí URL pro vytvoření účtu nastavené administrátorem.
+
+### 2. Otevřete aplikaci rtSurvey
+
+Spusťte aplikaci rtSurvey na svém mobilním zařízení. Pokud jste ji ještě nenainstalovali, přejděte na stránku [Instalace aplikace rtSurvey](#installing-rtsurvey-app).
+
+### 3. Přístup k nastavení připojení k serveru
+
+1. Otevřete aplikaci a přejděte do nabídky nastavení.
+2. Vyberte možnost připojení k serveru.
+
+### 4. Zadejte údaje účtu a vyberte projekt
+
+Při připojování k rtSurvey je proces zjednodušen na základě konfigurace vašeho účtu:
+
+- **Uživatelské jméno**: Zadejte uživatelské jméno svého účtu.
+- **Heslo**: Zadejte heslo svého účtu.
+
+Po zadání přihlašovacích údajů:
+
+- Pokud je váš účet přidružen k pouze jednomu průzkumnému projektu:
+  - Aplikace vás automaticky přihlásí na server tohoto projektu.
+  - Nemusíte zadávat URL serveru nebo ručně vybírat projekt.
+
+- Pokud je váš účet přidružen k více průzkumným projektům:
+  - Po úspěšném ověření uvidíte seznam projektů, ke kterým máte přístup.
+  - Ze seznamu vyberte projekt, na kterém chcete pracovat.
+
+### 5. Ověřte se
+
+Po zadání údajů serveru klepněte na tlačítko „Připojit" nebo „Přihlásit". Aplikace ověří vaše přihlašovací údaje a naváže připojení k serveru.
+
+```mermaid
+flowchart TD
+    A["📱 Spuštění aplikace rtSurvey"] --> B["🔑 Zadejte uživatelské jméno<br>a heslo"]
+    style A fill:#4CAF50,stroke:#666666,stroke-width:3px,color:white
+    style B fill:#2196F3,stroke:#666666,stroke-width:3px,color:white
+
+    B --> C{"🌳 Více<br>projektů?"}
+    style C fill:#FFC107,stroke:#666666,stroke-width:3px,color:black
+
+    C -->|Ano| D["📋 Zobrazit seznam<br>projektů"]
+    C -->|Ne| E["🔄 Automatické připojení k<br>jednomu projektu"]
+    style D fill:#FF9800,stroke:#666666,stroke-width:3px,color:white
+    style E fill:#009688,stroke:#666666,stroke-width:3px,color:white
+
+    D --> F["👆 Uživatel vybere<br>projekt"]
+    style F fill:#FF5722,stroke:#666666,stroke-width:3px,color:white
+
+    E --> G["☁️ Připojení k serveru"]
+    F --> G
+    style G fill:#3F51B5,stroke:#666666,stroke-width:3px,color:white
+    G --> H["👥 Přístup k funkcím<br>specifickým pro roli"]
+    style H fill:#9C27B0,stroke:#666666,stroke-width:3px,color:white
+
+    H --> I["👨‍💼 Administrátor/<br>Projektový manažer"]
+    H --> J["🎨 Návrhář průzkumu"]
+    H --> K["📝 Terénní enumerátor"]
+    H --> L["📊 Datový analytik"]
+    style I fill:#E91E63,stroke:#666666,stroke-width:3px,color:white
+    style J fill:#795548,stroke:#666666,stroke-width:3px,color:white
+    style K fill:#607D8B,stroke:#666666,stroke-width:3px,color:white
+    style L fill:#8BC34A,stroke:#666666,stroke-width:3px,color:white
+
+    I --> M["💬 Zasílání zpráv<br>🔔 Oznámení<br>📄 Vyplňování formulářů<br>📈 Prohlížení sestav"]
+    J --> N["💬 Zasílání zpráv<br>🔔 Oznámení<br>🧪 Testování formulářů<br>📈 Prohlížení sestav"]
+    K --> O["📝 Vyplňování formulářů<br>💬 Zasílání zpráv<br>🔔 Oznámení<br>📊 Zprávy o průběhu"]
+    L --> P["💬 Zasílání zpráv<br>🔔 Oznámení<br>📊 Analytické sestavy"]
+    style M fill:#FF4081,stroke:#666666,stroke-width:3px,color:white
+    style N fill:#9E9E9E,stroke:#666666,stroke-width:3px,color:white
+    style O fill:#00BCD4,stroke:#666666,stroke-width:3px,color:white
+    style P fill:#CDDC39,stroke:#666666,stroke-width:3px,color:white
+```
+
+## Řešení problémů s připojením
+
+Pokud narazíte na problémy při připojování k serveru:
+
+1. **Zkontrolujte připojení k internetu**: Ujistěte se, že zařízení je připojeno k internetu.
+2. **Ověřte přihlašovací údaje**: Ujistěte se, že uživatelské jméno a heslo jsou správné.
+3. **Restartujte aplikaci**: Zavřete a znovu otevřete aplikaci rtSurvey.
+4. **Kontaktujte podporu**: Pokud problémy přetrvávají, kontaktujte správce systému nebo podporu rtSurvey.
+
+## Závěr
+
+Připojení aplikace rtSurvey k serveru je přímočarý proces, který vám umožní využít plné schopnosti aplikace. Dodržením výše uvedených kroků zajistíte bezproblémový sběr dat, správu a analýzu přizpůsobenou vaší konkrétní průzkumné roli.

@@ -1,0 +1,110 @@
+---
+title: "Text"
+description: "rtSurvey में Free text response question type"
+---
+
+`text` question type एक free-text response — characters की कोई भी string — एकत्र करता है। यह सबसे flexible input type है और नामों, पतों, विवरणों, codes, और किसी भी ऐसी चीज़ के लिए उपयोग किया जाता है जो अधिक specific type में fit नहीं होती।
+
+rtSurvey `text` को **time input widgets** के साथ भी विस्तारित करता है जो clock picker के साथ सटीक time entry की अनुमति देते हैं।
+
+## Basic XLSForm Specification
+
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | उत्तरदाता का पूरा नाम |
+| text | address | घर का पता |
+
+Standard XLSForm text type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+
+## उपयोग
+
+Text questions का उपयोग इनके लिए किया जाता है:
+
+1. नाम, पते, free descriptions
+2. Open-ended comments या feedback
+3. Codes, IDs, या reference numbers जो integer/decimal में fit नहीं होते
+4. rtSurvey के time input extensions के साथ time values एकत्र करना
+5. Autocomplete text fields (`search-autocomplete-noedit-v2()` के माध्यम से)
+
+## Standard appearance options
+
+| Appearance | विवरण |
+|------------|-------------|
+| *(none)* | Single-line text input |
+| `multiline` | Multi-line text area — web पर longer free text के लिए सबसे अच्छा |
+
+## rtSurvey time input extensions
+
+rtSurvey `text` को time values एकत्र करने के लिए **clock picker widget** के साथ विस्तारित करता है। ये appearance options एक clock icon प्रदर्शित करते हैं जिसे गणनाकर्ता hours, minutes, seconds, या milliseconds चुनने के लिए tap कर सकता है।
+
+### Appearance variants
+
+| Appearance | विवरण |
+|------------|-------------|
+| `inline` | Field के बगल में Clock icon प्रदर्शित |
+| `inline colors("RRGGBB")` | Custom hex color के साथ Clock icon |
+| `inline-1line` | Clock को compact single-row format में प्रदर्शित करता है |
+| `inline-1line-RRGGBB` | Custom icon color (hex, बिना `#`) के साथ single-row |
+| `inline-1line colors("RRGGBB","RRGGBB")` | दो colors के साथ single-row |
+| `inline-onlyresult` | चयन के बाद Clock icon गायब हो जाता है; केवल value दिखाई देती है |
+| `inline-onlyresult colors("RRGGBB")` | Same, custom icon color के साथ |
+
+### Time format tokens
+
+यह नियंत्रित करने के लिए कि कौन से time components दिखाए जाएं, brackets में format string जोड़ें:
+
+| Format string | प्रदर्शित करता है |
+|---------------|----------|
+| `inline-[%H:%M]` | Hours और minutes (24-hour) |
+| `inline-[%h:%M]` | Hours और minutes (12-hour) |
+| `inline-[%H:%M:%S]` | Hours, minutes, seconds (24-hour) |
+| `inline-[%h:%M:%S]` | Hours, minutes, seconds (12-hour) |
+| `inline-[%H:%M:%3]` | Hours, minutes, milliseconds |
+| `inline-[%M:%S]` | केवल Minutes और seconds |
+| `inline-[%M:%3]` | केवल Minutes और milliseconds |
+| `inline-[%S]` | केवल Seconds |
+| `inline-[%3]` | केवल Milliseconds |
+| `inline-[%H]` | केवल Hours (24-hour) |
+| `inline-[%h]` | केवल Hours (12-hour) |
+
+### उदाहरण: Minutes और seconds में एक task duration record करना
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | task_duration | कार्य पूरा करने में लगा समय | `inline-[%M:%S]` |
+
+### उदाहरण: Custom color के साथ 24-hour format में event time record करना
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | event_time | घटना का समय | `inline-1line colors("0099FF")` |
+
+## Data format
+
+Text data को plain string के रूप में संग्रहीत और export किया जाता है। Inline clock widget का उपयोग करके time-based inputs के लिए, मूल्य चुने गए format string से match करते format में संग्रहीत होता है (जैसे `%H:%M` के लिए `14:32`)।
+
+## Constraints और validation
+
+Format, length, या pattern enforce करने के लिए constraints लागू करें:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| text | name | पूरा नाम | `string-length(.) >= 2` | नाम कम से कम 2 characters का होना चाहिए |
+| text | code | Reference code | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 uppercase letters और फिर 4 digits दर्ज करें |
+| text | phone | Phone number | `regex(., '^[0-9]{9,15}$')` | एक valid phone number दर्ज करें |
+
+## Best Practices
+
+1. जब भी डेटा की एक known structure हो, अधिक specific types (`integer`, `decimal`, `date`) का उपयोग करें — यह invalid entries को रोकता है और analysis को सरल बनाता है।
+2. Codes या IDs को validate करने के लिए `string-length()` या `regex()` के साथ `constraint` जोड़ें।
+3. Open-ended questions के लिए `multiline` appearance का उपयोग करें जहाँ उत्तरदाता कई वाक्य लिख सकते हैं।
+4. Time collection के लिए, वे time format tokens चुनें जो आपके analysis के लिए आवश्यक precision से match करते हों।
+
+## Platform support
+
+Text question type और सभी time input appearances iOS, Android, और web platforms पर समर्थित हैं।
+
+## सीमाएं
+
+- Text responses free-form हैं — regex patterns से परे कोई built-in spell check या vocabulary constraint नहीं है।
+- Inline time widget एक rtSurvey extension है और standard XLSForm specification का हिस्सा नहीं है।

@@ -1,0 +1,73 @@
+---
+title: "Intervalo"
+description: "As perguntas de intervalo permitem que os respondentes selecionem um número arrastando um controle deslizante entre um valor mínimo e máximo definido."
+---
+
+O tipo de pergunta `range` exibe um **controle deslizante** (ou entrada equivalente) que permite que os respondentes escolham um número dentro de um mínimo e máximo definido. É ideal para coletar classificações, pontuações de satisfação ou qualquer valor numérico onde você quer restringir o intervalo visualmente em vez de depender de uma entrada de texto com restrições.
+
+## Especificação básica do XLSForm
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | satisfaction | Quão satisfeito você está com o serviço? | start=1 end=5 step=1 |
+
+A coluna `parameters` define os limites do controle deslizante e o tamanho do passo:
+
+| Parâmetro | Descrição | Padrão |
+|-----------|-----------|--------|
+| `start` | Valor mínimo (inclusivo) | 0 |
+| `end` | Valor máximo (inclusivo) | 10 |
+| `step` | Incremento entre valores válidos | 1 |
+
+Para mais detalhes sobre o tipo padrão de pergunta range, consulte a [especificação do XLSForm](https://xlsform.org/en/#question-types).
+
+## Usos
+
+As perguntas de intervalo são comumente usadas para:
+
+1. Escalas de satisfação ou classificação (por exemplo, 1–5 ou 0–10)
+2. Escalas numéricas no estilo Likert
+3. Coletar medidas onde apenas valores discretos são válidos
+4. Faixas de idade ou intervalos de pontuação onde um controle deslizante melhora a usabilidade em relação a um campo de texto
+
+## Exemplo de uso
+
+### Escala de classificação básica
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | overall_rating | Classificação geral (0–10) | start=0 end=10 step=1 |
+
+### Passo decimal
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | weight_kg | Peso (kg) | start=0 end=200 step=0.5 |
+
+### Usando o valor em um cálculo
+
+| type | name | label | parameters | calculation |
+|------|------|-------|------------|-------------|
+| range | score | Pontuação do teste (0–100) | start=0 end=100 step=5 | |
+| calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
+| note | grade_note | Sua nota é: `${grade}` | | |
+
+## Aparência
+
+O tipo `range` é renderizado como um controle deslizante por padrão. Nenhum valor de aparência adicional é necessário para uso básico. Você pode combiná-lo com `horizontal` para um layout mais amplo em formulários web:
+
+| type | name | label | parameters | appearance |
+|------|------|-------|------------|------------|
+| range | nps | Qual a probabilidade de você nos recomendar? (0–10) | start=0 end=10 step=1 | horizontal |
+
+## Práticas recomendadas
+
+1. Sempre defina valores significativos de `start`, `end` e `step` — não dependa dos padrões.
+2. Rotule as extremidades da escala na coluna `hint` (por exemplo, `hint: 0 = Muito insatisfeito, 10 = Muito satisfeito`) para dar contexto aos respondentes.
+3. Para escalas Likert de 5 pontos, use `start=1 end=5 step=1` em vez de 0–4, pois os respondentes esperam que "1" signifique o mais baixo.
+4. Use `range` em vez de `integer` + restrição quando a natureza limitada da entrada faz parte do design da pergunta (o controle deslizante comunica a escala visualmente).
+
+## Limitações
+
+- O widget de controle deslizante pode não ser ideal para intervalos muito amplos (por exemplo, 0–10000) — um `integer` de texto com restrições é mais amigável ao usuário nesses casos.
+- Em dispositivos móveis, valores de passo fino (por exemplo, `step=0.1`) podem ser difíceis de controlar com precisão com um controle deslizante de toque.

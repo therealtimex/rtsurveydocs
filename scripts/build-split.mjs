@@ -17,6 +17,7 @@ import { fileURLToPath } from 'url';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '../../');
 const PAGES = join(ROOT, 'pages');
+const LOCALES_DIR = join(ROOT, '_locales'); // locale content lives here, not in pages/
 const OUT = join(ROOT, 'out');
 const COMBINED = join(ROOT, 'combined');
 
@@ -47,9 +48,9 @@ function copyDir(src, dest) {
 // Locale build: swap pages/{locale}/ to pages/ root, build with basePath, restore
 async function buildLocale(locale) {
   console.log(`\n=== Building locale: ${locale} ===`);
-  const localeDir = join(PAGES, locale);
+  const localeDir = join(LOCALES_DIR, locale); // read from _locales/, not pages/
   if (!existsSync(localeDir)) {
-    console.log(`  No pages/${locale}/ found, skipping.`);
+    console.log(`  No _locales/${locale}/ found, skipping.`);
     return;
   }
 
@@ -59,13 +60,6 @@ async function buildLocale(locale) {
   // English root page files/dirs to stash
   const ENGLISH_DIRS = ['getting-started','deployment','survey-design','platform-interfaces'];
   const ENGLISH_FILES = ['index.mdx','contact.mdx','support.mdx','sponsor.mdx','_meta.json'];
-
-  // Stash all OTHER locale dirs
-  const otherLocales = ALL_LOCALES.filter(l => l !== locale);
-  for (const l of otherLocales) {
-    const p = join(PAGES, l);
-    if (existsSync(p)) renameSync(p, join(STASH, `loc_${l}`));
-  }
 
   // Stash English root structure
   for (const d of ENGLISH_DIRS) {
@@ -77,11 +71,10 @@ async function buildLocale(locale) {
     if (existsSync(p)) renameSync(p, join(STASH, `en_${f}`));
   }
 
-  // Move locale content to pages root
+  // Copy locale content to pages root (copy, not move — source stays in _locales/)
   for (const entry of readdirSync(localeDir)) {
     renameSync(join(localeDir, entry), join(PAGES, entry));
   }
-  rmSync(localeDir, { recursive: true, force: true });
 
   if (existsSync(OUT)) rmSync(OUT, { recursive: true, force: true });
 
@@ -93,13 +86,11 @@ async function buildLocale(locale) {
     console.error(`  Build failed for ${locale}: ${e.message}`);
   }
 
-  // Restore: move pages root entries back to locale dir
+  // Restore: move pages root entries back to _locales/{locale}/
   const SKIP_RESTORE = new Set([
-    'node_modules','.next','out','.build-stash','combined','scripts',
+    'node_modules','.next','out','.build-stash','combined','_locales','scripts',
     'public','content','layouts','assets','static','data','i18n',
     'exampleSite','resources','images',
-    locale,  // skip the locale dir itself (just created empty)
-    ...ALL_LOCALES,  // skip all locale dirs (they are stashed)
   ]);
   const SKIP_EXTENSIONS = new Set(['.js','.ts','.tsx','.toml','.mod','.sum','.lock','.yml','.yaml','.mjs']);
   const SKIP_FILES = new Set(['package.json','tsconfig.json','.prettierrc','yarn.lock','CNAME']);
@@ -120,12 +111,6 @@ async function buildLocale(locale) {
   for (const f of ENGLISH_FILES) {
     const stashed = join(STASH, `en_${f}`);
     if (existsSync(stashed)) renameSync(stashed, join(PAGES, f));
-  }
-
-  // Restore other locales
-  for (const l of otherLocales) {
-    const stashed = join(STASH, `loc_${l}`);
-    if (existsSync(stashed)) renameSync(stashed, join(PAGES, l));
   }
 
   rmSync(STASH, { recursive: true, force: true });

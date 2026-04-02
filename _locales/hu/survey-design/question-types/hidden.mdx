@@ -1,0 +1,66 @@
+---
+title: "Hidden"
+description: "A hidden mezők olyan értékeket tárolnak, amelyeket soha nem mutatnak a válaszadónak – kontextus átadására, adatok előre kitöltésére vagy közbülső eredmények tárolására használják."
+---
+
+A `hidden` mező olyan értéket tárol, amely **soha nem jelenik meg a válaszadónak**. A `calculate` kérdéstípustól eltérően (amely értéket számít ki), a `hidden` mező **kívülről megadott értéket** hordoz – például feladatazonosítót, más rendszerből átadott háztartásazonosítót, vagy az űrlap indításakor befecskendezett kérdezőbiztosi kódot.
+
+## Alapvető XLSForm-specifikáció
+
+| type | name | label |
+|------|------|-------|
+| hidden | household_id | |
+
+A hidden mezőknél nem szükséges felirat, mivel semmi sem jelenik meg a képernyőn.
+
+## Felhasználási területek
+
+A hidden mezők általánosan használt területei:
+
+1. Előre hozzárendelt azonosító átadása a felméréskezelő rendszerből (pl. háztartásazonosító, esetszám, feladatkód)
+2. Az űrlap verziójának vagy telepítési metaadatainak tárolása
+3. Kérdezőbiztosi konfigurációk befecskendezése az űrlap indításakor
+4. Adatok átadása szülő űrlapból gyermek űrlapba összekapcsolt munkafolyamatokban
+5. URL-paraméterekből származó értékek tárolása, amikor az űrlapot webes hivatkozáson keresztül nyitják meg
+
+## Alapértelmezett érték beállítása
+
+A leggyakoribb minta a `hidden` és a `default` kifejezés együttes használata, hogy az érték az űrlap megnyitásakor beálljon:
+
+| type | name | default |
+|------|------|---------|
+| hidden | deployment_code | 'ZONE_A_2024' |
+| hidden | form_version | '3.1' |
+
+## Hidden mező hivatkozása számításokban
+
+A hidden értékekre ugyanúgy lehet hivatkozni, mint bármely más mezőre, a `${mezőnév}` szintaxissal:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| hidden | zone_code | | |
+| calculate | label_prefix | | concat('[', `${zone_code}`, '] ') |
+| note | intro | `${label_prefix}` Üdvözöljük a háztartási felmérésben | |
+
+## Hidden mező előre kitöltéssel / URL-paraméterekkel
+
+Webes űrlap URL-en keresztüli indításakor paramétereket adhat át, amelyek a hidden mezőket töltik ki. Ez lehetővé teszi a háztartásazonosító vagy feladatkód előzetes betöltését anélkül, hogy a kérdező begépelné:
+
+```
+https://your-server.com/form/FORMID?household_id=H00123&zone_code=NORTH
+```
+
+A `household_id` nevű mező automatikusan `H00123` értékkel kerül kitöltésre.
+
+## Bevált módszerek
+
+1. Használjon `hidden` mezőt (ne `calculate`-et), ha az érték **kívülről kerül befecskendezésre** és nem számítható újra.
+2. Használjon `calculate`-et, ha az érték **az űrlap más mezőiből vezethető le**.
+3. Mindig állítson be `default` értéket, ha a hidden mezőnek kötelezően értékkel kell rendelkeznie – alapértelmezett értéket nem tartalmazó hidden mező üres lesz.
+4. Nevezze el egyértelműen a hidden mezőket, hogy megkülönböztesse őket (pl. `_hidden_` előtag használata vagy egységes elnevezési konvenció).
+
+## Korlátozások
+
+- A hidden mezők ugyanúgy szerepelnek az exportált adatokban, mint bármely más mező.
+- Feltételesen nem mutathatók – mindig jelen vannak (de láthatatlanok).
+- Ha dinamikusan számoló mezőre van szükség, használjon `calculate` típust.

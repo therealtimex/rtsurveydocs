@@ -1,0 +1,181 @@
+---
+title: "Metadata"
+description: "Metadatafrågtyper fångar automatiskt enhets-, räknar- och tidinformation utan någon inmatning från respondenten."
+---
+
+import { Callout } from 'nextra/components'
+
+Metadatafrågtyper är specialfält som fylls i **automatiskt** — respondenten ser dem aldrig. De fångar sammanhang om inlämningen: när den samlades in, vilken enhet som användes och vem som samlade in den. Lägg till dem i kalkylbladet `survey` precis som andra frågtyper; de visas helt enkelt inte på skärmen.
+
+## Grundläggande XLSForm-specifikation
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| deviceid | deviceid | |
+
+Etiketter är valfria för metadatafält eftersom de aldrig visas.
+
+---
+
+## Tidbaserade metadatafält
+
+### `start`
+
+Registrerar **datum och tid när formuläret öppnades**. Lagras i ISO 8601-format (`YYYY-MM-DDTHH:MM:SS.sss+HH:MM`).
+
+```
+type    | name  | label
+start   | start |
+```
+
+### `end`
+
+Registrerar **datum och tid när formuläret skickades in**. Tillsammans med `start` kan du beräkna den tid som spenderades på att fylla i formuläret:
+
+```
+type      | name          | calculation
+calculate | duration_min  | (decimal-date-time(${end}) - decimal-date-time(${start})) * 1440
+```
+
+### `today`
+
+Registrerar **aktuellt datum** (ingen tidskomponent). Lagras som `YYYY-MM-DD`.
+
+```
+type  | name  | label
+today | today |
+```
+
+---
+
+## Enhetsmetadatafält
+
+### `deviceid`
+
+Registrerar **enhetens unika identifierare** som används för datainsamling. På Android är detta vanligtvis IMEI eller Android-ID.
+
+```
+type      | name     | label
+deviceid  | deviceid |
+```
+
+### `devicephonenum`
+
+Registrerar **SIM-kortets telefonnummer** i enheten (om tillgängligt).
+
+```
+type           | name          | label
+devicephonenum | devicephonenum |
+```
+
+### `simserial`
+
+Registrerar **SIM-kortets serienummer** (ICCID).
+
+```
+type      | name      | label
+simserial | simserial |
+```
+
+### `subscriberid`
+
+Registrerar **IMSI (International Mobile Subscriber Identity)** — den unika prenumerantidentifieraren på SIM-kortet.
+
+```
+type         | name        | label
+subscriberid | subscriberid |
+```
+
+---
+
+## Räknarmetadatafält
+
+### `username`
+
+Registrerar **den inloggade räknarens användarnamn** (kontot som används i rtSurvey-appen).
+
+```
+type     | name     | label
+username | username |
+```
+
+### `email`
+
+Registrerar **e-postadressen för den inloggade räknaren**.
+
+```
+type  | name  | label
+email | email |
+```
+
+### `phonenumber`
+
+Registrerar **telefonnumret kopplat till räknarens konto** (om konfigurerat).
+
+```
+type        | name       | label
+phonenumber | phonenumber |
+```
+
+---
+
+## Revisionslogg
+
+### `audit`
+
+Metadatafältet `audit` möjliggör **detaljerad revisionsloggning** — det registrerar en tidsstämplad logg över varje fråga räknaren besökte, hur lång tid de spenderade på varje och (valfritt) deras GPS-plats vid varje steg.
+
+```
+type  | name  | parameters
+audit | audit | location-priority=balanced location-min-interval=30 location-max-age=60
+```
+
+#### Revisionsparametrar
+
+| Parameter | Beskrivning |
+|-----------|-------------|
+| `location-priority` | GPS-noggrannhetsnivå: `no-gps`, `low-power`, `balanced`, `high-accuracy` |
+| `location-min-interval` | Minsta sekunder mellan platsinsamlingar |
+| `location-max-age` | Maximal ålder (sekunder) för en cachad plats att acceptera |
+
+<Callout type="warning">
+Fältet `audit` genererar en separat fil per inlämning. Se till att din datapipeline behandlar både de primära formulärdata och revisions-CSV:n.
+</Callout>
+
+---
+
+## Fullständigt exempel
+
+En typisk hushållsundersökning kan inkludera alla tids- och räknarmetadatafält:
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| today | today | |
+| deviceid | deviceid | |
+| username | username | |
+| email | email | |
+| audit | audit | |
+| text | household_id | Hushålls-ID |
+| ... | ... | ... |
+
+---
+
+## Bästa praxis
+
+1. Inkludera alltid `start` och `end` — de är gratis, automatiska och ovärderliga för kvalitetsövervakning.
+2. Inkludera alltid `username` för att spåra räknare.
+3. Inkludera `deviceid` när du vill detektera dubblettinlämningar eller spåra fältenheter.
+4. Använd `audit` i ansvarighetskrävande undersökningar där du behöver verifiera att räknare faktiskt besökte varje fråga.
+5. SIM-relaterade fält (`simserial`, `subscriberid`, `devicephonenum`) är bara tillförlitliga på Android-enheter med aktiva SIM-kort — hoppa över dem för surfplattebaserade driftsättningar.
+
+---
+
+## Begränsningar
+
+- Alla metadatafält är **skrivskyddade** — de kan inte refereras eller ändras av andra beräkningar.
+- `username` och `email` kräver att räknaren är inloggad; de är tomma för anonyma inlämningar.
+- SIM/telefon-metadatafält kan returnera tomma värden på Wi-Fi-only-surfplattor och vissa Android-versioner.

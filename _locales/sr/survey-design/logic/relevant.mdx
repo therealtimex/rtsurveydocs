@@ -1,0 +1,120 @@
+---
+title: "Preskakanje pitanja"
+description: ""
+---
+
+Logika preskakanja, poznata i kao razgranavanje ili uslovna logika, vam dozvoljava da kreirate dinamičke ankete koje se prilagođavaju odgovorima ispitanika. U rtSurvey-u, logika preskakanja se implementira koristeći kolonu `relevant` u vašem XLSForm-u.
+
+## Osnovna logika preskakanja
+
+Za implementaciju osnovne logike preskakanja, koristite kolonu `relevant` za specificiranje uslova:
+
+```
+| type           | name          | label                       | relevant            |
+|----------------|---------------|-----------------------------|--------------------|
+| select_one y_n | likes_pizza   | Da li volite picu?          |                    |
+| select_multiple pizza_toppings | favorite_topping | Omiljeni prelivi | ${likes_pizza} = 'yes' |
+```
+
+U ovom primeru, pitanje "Omiljeni prelivi" se pojavljuje samo ako ispitanik odgovori "da" na pitanje o pizzi.
+
+## Sintaksa za relevantne izraze
+
+- Koristite `${ }` za referencing других promenljivih pitanja.
+- Za pitanja `select_one`, direktno poredite: `${ime_pitanja} = 'odgovor'`
+- Za pitanja `select_multiple`, koristite funkciju `selected()`.
+
+## Napredna logika preskakanja
+
+### Više uslova
+
+Možete kombinovati više uslova koristeći `and`, `or` i zagrade:
+
+```
+| type    | name  | label                   | relevant                                  |
+|---------|-------|-------------------------|-------------------------------------------|
+| integer | age   | Koliko imate godina?    |                                           |
+| text    | school| Koju školu pohađate?    | ${age} < 18 and (${location} = 'urban' or ${location} = 'suburban') |
+```
+
+### Korišćenje pitanja select_multiple
+
+Za pitanja `select_multiple`, koristite funkciju `selected()`:
+
+```
+| type           | name          | label                       | relevant                               |
+|----------------|---------------|-----------------------------|-----------------------------------------|
+| select_multiple pizza_toppings | favorite_topping | Omiljeni prelivi |                                         |
+| text           | cheese_type   | Omiljeni tip sira           | selected(${favorite_topping}, 'cheese') |
+```
+
+### Opcija "Drugo" u višestrukom izboru
+
+Implementirajte opciju slobodnog teksta "Drugo" koristeći `relevant`:
+
+```
+| type           | name                  | label                               | relevant                               |
+|----------------|----------------------|-------------------------------------|---------------------------------------|
+| select_multiple pizza_toppings | favorite_toppings | Koji su vaši omiljeni prelivi za picu? |                                       |
+| text           | favorite_toppings_other | Koje druge prelivе volite?         | selected(${favorite_toppings}, 'other') |
+```
+
+Ne zaboravite da uključite 'other' kao opciju u radnom listu choices.
+
+## Funkcije specifične za rtSurvey
+
+### Dinamička relevantnost
+
+rtSurvey dozvoljava dinamičku relevantnost zasnovanu na izračunatim poljima:
+
+```
+| type      | name       | label              | calculation                   |
+|-----------|------------|--------------------|-----------------------------|
+| calculate | total_score| Ukupan skor        | ${score1} + ${score2} + ${score3} |
+| text      | feedback   | Povratne informacije | ${total_score} > 75         |
+```
+
+### Relevantnost u ponavljanjima
+
+rtSurvey podržava relevantnost unutar grupa ponavljanja:
+
+```
+| type         | name         | label            | relevant               |
+|--------------|--------------|------------------|------------------------|
+| begin repeat | child_info   | Informacije o detetu |                    |
+| integer      | child_age    | Starost deteta   |                        |
+| text         | school_name  | Naziv škole      | ${child_age} >= 5      |
+| end repeat   |              |                  |                        |
+```
+
+### Kaskadna relevantnost
+
+rtSurvey efikasno rukuje kaskadnom relevantnošću, gde relevantnost jednog pitanja zavisi od drugog, koje zauzvrat zavisi od trećeg:
+
+```
+| type           | name        | label                  | relevant               |
+|----------------|-------------|------------------------|------------------------|
+| select_one y_n | has_car     | Da li posedujete auto? |                        |
+| select_one car_type | car_type | Koji tip auta?       | ${has_car} = 'yes'     |
+| text           | model       | Specifični model       | ${car_type} = 'sedan'  |
+```
+
+## Najbolje prakse za logiku preskakanja u rtSurvey-u
+
+1. **Zadržite jednostavnost**: Izbegavajte previše složene uslove relevantnosti kada je moguće.
+2. **Temeljno testirajte**: Koristite funkciju pregleda rtSurvey-a za testiranje svih mogućih putanja kroz anketu.
+3. **Razmatrajte performanse**: Veoma složena logika preskakanja može uticati na performanse ankete, posebno na mobilnim uređajima.
+4. **Koristite jasna imena promenljivih**: Ovo čini vaše izraze relevantnosti lakšim za čitanje i održavanje.
+5. **Dokumentujte logiku**: Dodajte napomene za objašnjavanje složenih obrazaca preskakanja, posebno za saradnju u timu.
+6. **Budite svesni analize podataka**: Preskočena pitanja će rezultirati nedostajućim podacima. Planirajte analizu u skladu s tim.
+
+## Rešavanje problema sa logikom preskakanja
+
+- **Greške u sintaksi**: Osigurajte da su svi `${ }` pravilno zatvoreni i ispravno napisani.
+- **Kružne reference**: Izbegavajte kreiranje petlji gde pitanja zavise jedno od drugog.
+- **Osetljivost na velika/mala slova**: Zapamtite da su opcije odgovora osetljive na velika/mala slova u izrazima relevantnosti.
+- **Numerička poređenja**: Koristite odgovarajuće operatore (`<`, `>`, `=`) za numerička poređenja.
+
+## Zaključak
+
+Efikasna upotreba logike preskakanja može značajno poboljšati iskustvo ispitanika i kvalitet podataka u vašim rtSurvey projektima. Koristeći napredne funkcije rtSurvey-a i prateći najbolje prakse, možete kreirati dinamičke, efikasne ankete koje se prilagođavaju jedinstvenoj situaciji svakog ispitanika.

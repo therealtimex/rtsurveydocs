@@ -1,0 +1,40 @@
+---
+title: "Operaattorit"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+### Vertailuoperaattorit
+
+Operaattori | Toiminta      | Esimerkki              | Esimerkkivastaus
+-------- | -------------- | -------------------- | --------------
+`=`        | Yhtä suuri          | `${age}` = 25     | tosi tai epätosi
+`!=`       | Eri suuri      | `${age}` != 25    | tosi tai epätosi
+`>`        | Suurempi kuin   | `${age}` > 25     | tosi tai epätosi
+`>=`       | Suurempi tai yhtä suuri | `${age}` >= 25 | tosi tai epätosi
+`<`        | Pienempi kuin      | `${age}` < 25     | tosi tai epätosi
+`<=`       | Pienempi tai yhtä suuri | `${age}` &lt;= 25  | tosi tai epätosi
+
+Yllä olevissa esimerkeissä `${age}` edustaa nykyisen kentän arvoa, ja operaattoria käytetään vertaamaan sitä arvoon 25. Rajoite arvioidaan joko todeksi tai epätodeksi riippuen siitä, täyttyykö ehto vai ei.
+
+### Loogiset operaattorit
+
+Loogisia operaattoreita käytetään yhdistämään useita lausekkeita rajoitteissa. Tässä joitakin yleisesti käytettyjä loogisia operaattoreita sekä niiden toiminnot ja esimerkit:
+
+Operaattori | Toiminta      | Esimerkki                                           
+-------- | -------------- | --------------------------------------------------
+`or`       | Palauttaa tosi, jos jompi kumpi lauseke on tosi | `${age}` = 3 or `${age}` = 4
+`and`      | Palauttaa tosi vain jos molemmat lausekkeet ovat tosia | `${age}` > 3 and `${age}` < 5
+`not()`    | Palauttaa tosi, jos lauseke ei ole tosi | not(`${age}` > 3 and `${age}` < 5)
+
+Yllä olevissa esimerkeissä `${age}` edustaa nykyisen kentän arvoa, ja loogisia operaattoreita käytetään yhdistämään lausekkeita. Rajoite arvioidaan todeksi tai epätodeksi määriteltyjen ehtojen perusteella.
+
+Esimerkki 1:
+<Callout type="info">`${age} = 3 or ${age} = 4` palauttaa `tosi`, jos ikä on joko 3 tai 4.</Callout>
+
+Esimerkki 2:
+<Callout type="info">`${age} > 3 and ${age} < 5` palauttaa `tosi`, jos ikä on välillä 3 ja 5.</Callout>
+
+Esimerkki 3:
+<Callout type="info">`not(${age} > 3 and ${age} < 5)` palauttaa `tosi`, jos ikä ei ole välillä 3 ja 5.</Callout>

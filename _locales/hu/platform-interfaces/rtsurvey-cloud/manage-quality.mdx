@@ -1,0 +1,30 @@
+---
+title: "Minőség kezelése"
+description: "Az adatgyűjtési folyamat nyomon követése, interjútérképek megtekintése és kérdezőbiztos teljesítményének elemzése."
+---
+
+A **Minőség kezelése** modul (az irányítópultról érhető el) valós idejű elemzéseket és térbeli vizualizációkat biztosít az adatgyűjtési folyamat és a kérdezőbiztos teljesítményének nyomon követéséhez. Osztott nézetű felületet kínál a projektmenedzsereknek, amellyel gyorsan válthatnak az egyes kérdőívek és testreszabott elemzési jelentések között.
+
+![Minőség kezelése irányítópult](/images/manage_quality.png)
+
+## Irányítópult áttekintése
+
+A Minőség kezelése irányítópult két elsődleges navigációs fülre oszlik: **Űrlapok** és **Jelentések**. Ez az oldalsó menü lehetővé teszi a felhasználóknak az elemezni kívánt adatkészlet vagy jelentés hatékony keresését és kiválasztását.
+
+### Űrlapok elemzése
+
+Egy adott űrlap kiválasztásakor a listából az irányítópult több beépített vizualizációs eszközt biztosít a beküldési minőség és gyakoriság nyomon követéséhez:
+
+- **Darabszám kezdési idő szerint:** Egy sávdiagram, amely az elindított interjúk gyakoriságát vizualizálja egy idővonalán.
+- **Darabszám befejezési idő szerint:** Egy sávdiagram, amely azt vizualizálja, mikor fejeződtek be az interjúk.
+- **Darabszám beküldési dátum szerint:** Nyomon követi a szerverre szinkronizált adatok napi volumenét.
+- **Darabszám felhasználónév szerint:** Egy sávdiagram, amely a legjobb teljesítményt nyújtó kérdezőbiztosokat azonosítja az összes beküldési számaik alapján.
+- **Interjúk térképe:** Egy földrajzi szórásdiagram (Leaflet-alapú), amely megjeleníti az egyes beküldések GPS-koordinátáit, lehetővé téve a menedzsereknek a terepi munkavégzési helyszínek ellenőrzését.
+
+### Egyéni jelentések
+
+A **Jelentések** fül hozzáférést biztosít az előre konfigurált R Markdown elemzési tervekhez és más testreszabott statisztikákhoz. Egy jelentés kiválasztásakor a fő nézeti terület dinamikusan betölti a generált elemzést egy beágyazott megjelenítőn keresztül, lehetővé téve az összegyűjtött adatok mélyebb statisztikai ellenőrzését.
+
+## Keresés és szűrés
+
+Gyorskeresési sáv áll rendelkezésre az oldalsáv lista felett, lehetővé téve a felhasználóknak az adott űrlapok vagy jelentések név szerinti gyors megkeresését.

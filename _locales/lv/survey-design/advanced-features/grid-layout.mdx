@@ -1,0 +1,42 @@
+---
+title: "Režģa izkārtojums"
+description: "Režģa izkārtojums ļauj pozicionēt laukus CSS režģī grupā, iespējojot vairāku kolonnu formu dizainus."
+---
+
+Funkcija **Režģa izkārtojums** ļauj sakārtot jautājumus **vairāku kolonnu režģī** grupā, izmantojot izskata tagu `gridformat<>`. Tas ir noderīgi blīvas datu ievades formām, kur vairāki saistīti lauki jāparāda blakus, nevis kaudzēti vertikāli.
+
+---
+
+## Sintakse
+
+Grupas laukam iestatiet izskata atribūtu `gridformat` ar pozicionēšanas parametriem:
+
+```
+gridformat<row=R col=C colspan=S align=center>
+```
+
+| Parametrs | Apraksts |
+|-----------|-------------|
+| `row` | Rindas pozīcija CSS režģī |
+| `col` | Kolonnas pozīcija CSS režģī |
+| `colspan` | Cik kolonnas šis lauks aizņem |
+| `align` | Teksta līdzinājums (`left`, `center`, `right`) |
+
+## Piemērs
+
+```
+| type        | name     | label          | appearance                              |
+|-------------|----------|----------------|-----------------------------------------|
+| begin_group | header   | Personas dati  | grid                                    |
+| text        | name     | Vārds          | gridformat<row=1 col=1 colspan=1>       |
+| text        | surname  | Uzvārds        | gridformat<row=1 col=2 colspan=1>       |
+| integer     | age      | Vecums         | gridformat<row=2 col=1 colspan=1>       |
+| text        | phone    | Tālrunis       | gridformat<row=2 col=2 colspan=1>       |
+| end_group   |          |                |                                         |
+```
+
+## Labākā prakse
+
+1. Pārbaudiet režģa izkārtojumus gan tīmekļa, gan mobilajās ierīcēs.
+2. Apsveriet mazākus ekrānus — režģis var tikt pārklājots uz vertikālu steku.
+3. Izmantojiet `colspan` gudri, lai labāk izmantotu plašākus laukus.

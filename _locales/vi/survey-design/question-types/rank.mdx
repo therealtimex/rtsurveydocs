@@ -1,0 +1,82 @@
+---
+title: "Rank"
+description: "Câu hỏi rank cho phép người trả lời sắp xếp thứ tự một tập hợp lựa chọn theo ưu tiên hoặc mức độ quan trọng."
+---
+
+Loại câu hỏi `rank` hiển thị danh sách lựa chọn mà người trả lời phải **kéo vào thứ tự** (hoặc sắp xếp từ đầu đến cuối theo cách khác). Kết quả được lưu dưới dạng danh sách các giá trị lựa chọn phân cách nhau bởi dấu cách theo thứ tự đã chọn, với lựa chọn ưu tiên cao nhất ở đầu.
+
+## Cấu hình XLSForm cơ bản
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Xếp hạng các nhu cầu cộng đồng này từ quan trọng nhất đến ít quan trọng nhất |
+
+Các lựa chọn được định nghĩa trong **bảng tính choices** giống như `select_one`:
+
+**survey:**
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Xếp hạng các nhu cầu này từ quan trọng nhất đến ít quan trọng nhất |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| priorities | water | Nước sạch |
+| priorities | health | Chăm sóc y tế |
+| priorities | education | Giáo dục |
+| priorities | roads | Đường sá |
+| priorities | electricity | Điện |
+
+## Định dạng giá trị được lưu
+
+Giá trị được lưu là **danh sách phân cách bởi dấu cách** của các giá trị lựa chọn theo thứ tự xếp hạng (đầu tiên = ưu tiên cao nhất):
+
+```
+water education health roads electricity
+```
+
+## Trích xuất vị trí xếp hạng
+
+Dùng `selected-at()` để lấy lựa chọn ở một thứ hạng cụ thể:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| rank priorities | main_priority | Xếp hạng nhu cầu cộng đồng | |
+| calculate | top_priority | | selected-at(`${main_priority}`, 0) |
+| calculate | second_priority | | selected-at(`${main_priority}`, 1) |
+
+`selected-at(${main_priority}, 0)` trả về giá trị được đặt **đầu tiên** (chỉ số 0 = thứ hạng cao nhất).
+
+## Dùng `rank-index()` với nhóm lặp
+
+Khi `rank` được dùng trong nhóm lặp, `rank-index()` cho phép bạn tham chiếu thứ hạng từ bên ngoài vòng lặp:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_ranked | | rank-index(1, `${score}`) |
+
+Xem [Hàm — Hàm cho trường lặp](../operators-and-functions/functions#repeated-field-functions) để biết chi tiết đầy đủ về `rank-index()` và `rank-index-if()`.
+
+## Ứng dụng
+
+Câu hỏi rank thường được dùng cho:
+
+1. **Xếp hạng ưu tiên** — yêu cầu cộng đồng xếp hạng các nhu cầu phát triển
+2. **Sắp xếp ưu tiên** — xếp hạng tính năng sản phẩm, thuộc tính dịch vụ hoặc lựa chọn chính sách
+3. **Sắp xếp mục thi** — sắp xếp các bước trong một quy trình
+4. **Lựa chọn Top-N** — kết hợp với `selected-at()` để chỉ trích xuất 1, 2 hoặc 3 lựa chọn hàng đầu
+
+## Thực hành tốt
+
+1. Giữ danh sách ngắn (3–7 mục) — xếp hạng trở nên mệt mỏi về nhận thức khi vượt quá 7–8 lựa chọn.
+2. Dùng nhãn lựa chọn rõ ràng, loại trừ lẫn nhau để tránh nhầm lẫn về ý nghĩa của "đầu tiên".
+3. Thêm gợi ý giải thích hướng xếp hạng (ví dụ: "Kéo để sắp xếp: đầu tiên = quan trọng nhất").
+4. Xác thực bằng `count-selected(.) = x` nếu bạn cần đảm bảo tất cả lựa chọn đã được xếp hạng.
+
+## Giới hạn
+
+- Widget kéo để xếp hạng yêu cầu màn hình cảm ứng hoặc chuột — có thể không hoạt động tốt trong môi trường chỉ dùng bàn phím.
+- Trên một số client mobile cũ hơn, widget rank có thể chuyển về giao diện nhập số.
+- Bạn không thể xếp hạng một phần (tức là chỉ xếp hạng một số lựa chọn) — tất cả lựa chọn phải được sắp xếp thứ tự.

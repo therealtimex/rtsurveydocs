@@ -6,116 +6,32 @@
       "toc": false
     }
   },
-  "getting-started": "Getting Started",
-  "deployment": "Deployment",
-  "survey-design": "Survey Design",
-  "platform-interfaces": "Platform Interfaces",
-  "contact": "Contact Us",
-  "support": "Support",
-  "sponsor": "Sponsor",
-  "vi": {
-    "display": "hidden"
+  "getting-started": {
+    "title": "Getting Started",
+    "type": "page"
   },
-  "fr": {
-    "display": "hidden"
+  "deployment": {
+    "title": "Deployment",
+    "type": "page"
   },
-  "de": {
-    "display": "hidden"
+  "survey-design": {
+    "title": "Survey Design",
+    "type": "page"
   },
-  "pt": {
-    "display": "hidden"
+  "platform-interfaces": {
+    "title": "Platform Interfaces",
+    "type": "page"
   },
-  "es": {
-    "display": "hidden"
+  "contact": {
+    "title": "Contact Us",
+    "type": "page"
   },
-  "zh-hans": {
-    "display": "hidden"
+  "support": {
+    "title": "Support",
+    "type": "page"
   },
-  "ar": {
-    "display": "hidden"
-  },
-  "th": {
-    "display": "hidden"
-  },
-  "id": {
-    "display": "hidden"
-  },
-  "km": {
-    "display": "hidden"
-  },
-  "hi": {
-    "display": "hidden"
-  },
-  "ru": {
-    "display": "hidden"
-  },
-  "zh-hant": {
-    "display": "hidden"
-  },
-  "ko": {
-    "display": "hidden"
-  },
-  "ja": {
-    "display": "hidden"
-  },
-  "it": {
-    "display": "hidden"
-  },
-  "nl": {
-    "display": "hidden"
-  },
-  "tr": {
-    "display": "hidden"
-  },
-  "uk": {
-    "display": "hidden"
-  },
-  "nb": {
-    "display": "hidden"
-  },
-  "da": {
-    "display": "hidden"
-  },
-  "sv": {
-    "display": "hidden"
-  },
-  "fi": {
-    "display": "hidden"
-  },
-  "el": {
-    "display": "hidden"
-  },
-  "pl": {
-    "display": "hidden"
-  },
-  "cs": {
-    "display": "hidden"
-  },
-  "sk": {
-    "display": "hidden"
-  },
-  "hu": {
-    "display": "hidden"
-  },
-  "bg": {
-    "display": "hidden"
-  },
-  "sr": {
-    "display": "hidden"
-  },
-  "sq": {
-    "display": "hidden"
-  },
-  "lv": {
-    "display": "hidden"
-  },
-  "lt": {
-    "display": "hidden"
-  },
-  "te": {
-    "display": "hidden"
-  },
-  "pt-br": {
-    "display": "hidden"
+  "sponsor": {
+    "title": "Sponsor",
+    "type": "page"
   }
 }

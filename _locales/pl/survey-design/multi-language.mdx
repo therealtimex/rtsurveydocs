@@ -1,0 +1,65 @@
+---
+title: "Obsługa wielu języków"
+description: ""
+---
+
+rtSurvey zapewnia solidną obsługę wielu języków, umożliwiając tworzenie ankiet w wielu językach. Ta funkcja jest kluczowa dla prowadzenia badań w różnych populacjach językowych lub w środowiskach wielojęzycznych.
+
+## Konfigurowanie ankiet wielojęzycznych
+
+Aby utworzyć ankietę wielojęzyczną w rtSurvey, musisz dodać kolumny specyficzne dla języka do XLSForm. Oto jak:
+
+1. **Tłumaczenia etykiet**: Dodaj kolumny dla każdego języka używając formatu `label::Język (kod)`.
+2. **Tłumaczenia wskazówek**: Użyj `hint::Język (kod)` do tłumaczenia wskazówek.
+3. **Tłumaczenia plików mediów**: Dla mediów specyficznych dla języka użyj `media::Język (kod)`.
+
+Przykład:
+
+```
+| type    | name | label::English (en) | label::Polski (pl)     | hint::English (en) | hint::Polski (pl) |
+|---------|------|---------------------|------------------------|---------------------|-------------------|
+| integer | age  | How old are you?    | Ile masz lat?          | Enter your age      | Podaj swój wiek   |
+```
+
+## Kody języków
+
+Zaleca się używanie oficjalnych 2-znakowych kodów języków (subtags) po nazwie języka. Ułatwia to dopasowanie języka formularza z językiem interfejsu użytkownika. Oficjalne kody można znaleźć [tutaj](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+
+## Ustawianie domyślnego języka
+
+Aby ustawić domyślny język dla zbierania danych, użyj arkusza `settings` w XLSForm:
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | Polski (pl)       |
+```
+
+## Funkcje specyficzne dla rtSurvey
+
+### Dynamiczne przełączanie języka
+
+rtSurvey umożliwia użytkownikom dynamiczne przełączanie języków podczas zbierania danych:
+
+- W interfejsie webowym użyj listy rozwijanej języka w górnym pasku nawigacji.
+- W aplikacji mobilnej dostęp do opcji języka przez menu ustawień.
+
+### Wiadomości walidacji specyficzne dla języka
+
+rtSurvey rozszerza obsługę wielu języków na wiadomości walidacji:
+
+```
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Polski (pl)     |
+|---------|------|------------|----------------------------------|-------------------------------------|
+| integer | age  | . <= 150   | Age must be 150 or less          | Wiek musi wynosić 150 lub mniej     |
+```
+
+## Najlepsze praktyki dla ankiet wielojęzycznych
+
+1. **Spójne nazewnictwo**: Używaj spójnych kodów języków w całym formularzu.
+2. **Profesjonalne tłumaczenie**: Zatrudniaj profesjonalnych tłumaczy znających kontekst ankiety.
+3. **Notatki kontekstowe**: Dostarczaj tłumaczom notatki kontekstowe, aby zapewnić dokładne tłumaczenia.
+4. **Testowanie**: Testuj formularz we wszystkich językach przed wdrożeniem.
+5. **Obsługa Unicode**: Upewnij się, że urządzenia do zbierania danych obsługują Unicode dla skryptów nielacińskich.
+6. **Media specyficzne dla języka**: Używaj kulturowo odpowiednich obrazów lub audio dla każdego języka.
+7. **Unikaj tekstu na obrazach**: Jeśli używasz obrazów z tekstem, twórz oddzielne obrazy dla każdego języka.

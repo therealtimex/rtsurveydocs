@@ -1,0 +1,120 @@
+---
+title: "Suporte a múltiplos idiomas"
+description: ""
+---
+
+O rtSurvey fornece suporte robusto a múltiplos idiomas, permitindo criar pesquisas em vários idiomas. Este recurso é crucial para conduzir pesquisas em populações linguisticamente diversas ou em ambientes multilíngues.
+
+## Configurando pesquisas em múltiplos idiomas
+
+Para criar uma pesquisa em múltiplos idiomas no rtSurvey, você precisa adicionar colunas específicas de idioma ao seu XLSForm. Veja como:
+
+1. **Traduções de rótulos**: Adicione colunas para cada idioma usando o formato `label::Idioma (código)`.
+2. **Traduções de dicas**: Use `hint::Idioma (código)` para traduzir dicas.
+3. **Traduções de arquivos de mídia**: Para mídia específica por idioma, use `media::Idioma (código)`.
+
+Exemplo:
+
+```
+| type    | name | label::Português (pt) | label::English (en) | hint::Português (pt) | hint::English (en) |
+|---------|------|----------------------|---------------------|---------------------|---------------------|
+| integer | age  | Quantos anos você tem?| How old are you?    | Insira sua idade     | Enter your age      |
+```
+
+## Códigos de idioma
+
+É recomendável usar os códigos de idioma oficiais de 2 caracteres (subtags) após o nome do idioma. Isso facilita a correspondência do idioma do formulário com o idioma da interface do usuário. Você pode encontrar os códigos oficiais [aqui](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+
+## Definindo um idioma padrão
+
+Para definir um idioma padrão para coleta de dados, use a planilha `settings` no seu XLSForm:
+
+```
+| form_id   | version | default_language    |
+|-----------|---------|---------------------|
+| test_form | 101     | Português (pt)      |
+```
+
+## Recursos específicos do rtSurvey
+
+### Troca dinâmica de idioma
+
+O rtSurvey permite que os usuários troquem de idioma dinamicamente durante a coleta de dados:
+
+- Na interface web, use o menu suspenso de idioma na barra de navegação superior.
+- No aplicativo móvel, acesse as opções de idioma pelo menu de configurações.
+
+### Mensagens de validação específicas por idioma
+
+O rtSurvey estende o suporte multilíngue às mensagens de validação:
+
+```
+| type    | name | constraint | constraint_message::Português (pt) | constraint_message::English (en) |
+|---------|------|------------|-----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | A idade deve ser 150 ou menos     | Age must be 150 or less          |
+```
+
+### Suporte a idiomas da direita para esquerda (RTL)
+
+Para idiomas da direita para esquerda (RTL) como árabe ou hebraico, o rtSurvey ajusta automaticamente o layout:
+
+```
+| type | name | label::Português (pt) | label::Arabic (ar) |
+|------|------|----------------------|--------------------|
+| text | name | Seu nome             | اسمك               |
+```
+
+### Aparência específica por idioma
+
+O rtSurvey permite que você especifique diferentes aparências para diferentes idiomas:
+
+```
+| type | name | label::Português (pt) | label::Chinese (zh) | appearance::Português (pt) | appearance::Chinese (zh) |
+|------|------|----------------------|---------------------|--------------------------|--------------------------|
+| text | address | Endereço          | 地址                 | multiline                | textarea                  |
+```
+
+## Práticas recomendadas para pesquisas multilíngues
+
+1. **Nomenclatura consistente**: Use códigos de idioma consistentes em todo o formulário.
+2. **Tradução profissional**: Empregue tradutores profissionais familiarizados com o contexto da pesquisa.
+3. **Notas de contexto**: Forneça notas de contexto para os tradutores garantirem traduções precisas.
+4. **Teste**: Teste seu formulário em todos os idiomas antes da implantação.
+5. **Suporte a Unicode**: Garanta que seus dispositivos de coleta de dados suportem Unicode para scripts não latinos.
+6. **Mídia específica por idioma**: Use imagens ou áudio culturalmente apropriados para cada idioma.
+7. **Evite texto em imagens**: Se usar imagens com texto, crie imagens separadas para cada idioma.
+
+## Tratando casos especiais
+
+### Respostas em idiomas mistos
+
+O rtSurvey permite que os respondentes insiram texto em qualquer script, independentemente do idioma do formulário selecionado. Isso é útil para capturar nomes ou endereços em seu script original.
+
+### Tipos de perguntas específicos por idioma
+
+Alguns tipos de perguntas podem ser mais apropriados para determinados idiomas. O rtSurvey permite usar diferentes tipos de perguntas para diferentes idiomas:
+
+```
+| type::Português (pt) | type::Japanese (ja) | name | label::Português (pt) | label::Japanese (ja) |
+|----------------------|---------------------|------|----------------------|----------------------|
+| text                 | select_one kanji    | name | Insira seu nome      | 名前を選んでください   |
+```
+
+## Exportando dados multilíngues
+
+Ao exportar dados do rtSurvey:
+
+- Escolha exportar em um idioma específico ou incluir todas as versões de idioma.
+- Os metadados de idioma são incluídos na exportação, indicando qual idioma foi usado para cada resposta.
+
+## Considerações sobre aplicativo móvel
+
+- O aplicativo móvel rtSurvey suporta troca de idioma off-line.
+- Garanta que todos os arquivos de idioma necessários sejam baixados antes de ficar off-line.
+
+## Limitações conhecidas
+
+- Alguns recursos avançados podem não estar disponíveis em todos os idiomas.
+- Traduções extremamente longas podem afetar o layout em telas menores.
+
+Ao aproveitar as capacidades multilíngues do rtSurvey, você pode criar pesquisas inclusivas e acessíveis que alcançam populações diversas e fornecem dados linguisticamente precisos e de alta qualidade.

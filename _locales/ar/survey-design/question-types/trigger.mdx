@@ -1,0 +1,91 @@
+---
+title: "التأكيد / الإقرار"
+description: "تعرض أسئلة التأكيد عبارة يجب على المعداد الإقرار بها صراحةً قبل المتابعة."
+---
+
+يعرض نوع سؤال `trigger` (المعروف أيضاً بـ `acknowledge`) **عبارة مع خانة اختيار**. يجب على المعداد تحديد خانة الاختيار لتأكيد أنه قرأ وفهم العبارة قبل أن يسمح النموذج بالمتابعة. لا تُخزَّن أي قيمة بيانات — فقط ما إذا كانت خانة الاختيار قد حُدِّدت.
+
+## مواصفة XLSForm الأساسية
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | The respondent has provided verbal informed consent. |
+
+أو باستخدام الاسم المستعار `acknowledge`:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | The respondent has provided verbal informed consent. |
+
+كل من `trigger` و`acknowledge` متكافئان — استخدم أيهما توثقه منصتك.
+
+## الاستخدامات
+
+تُستخدم أسئلة التأكيد/الإقرار بشكل شائع لـ:
+
+1. **الموافقة المستنيرة** — تأكيد حصول المعداد على الموافقة قبل تسجيل البيانات الحساسة
+2. **التنبيهات اللطيفة** — التحذير من قيمة غير معتادة والمطالبة بتأكيد صريح قبل المتابعة
+3. **عناصر قائمة التحقق** — تأكيد اكتمال ملاحظة جسدية (مثل "لقد لاحظت مصدر المياه مباشرة")
+4. **التعليمات** — إجبار المعداد على الإقرار بتعليمات مستوى القسم قبل المتابعة
+5. **فحوصات الجودة** — الإشارة إلى القيم الشاذة وطلب تحقق المعداد منها
+
+## أمثلة الاستخدام
+
+### إقرار الموافقة
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | The respondent has given verbal informed consent to participate in this survey. | yes |
+
+### تنبيه لطيف لقيم شاذة
+
+يُستخدم مع تعبير `relevant` لعرض التأكيد فقط عند إدخال قيمة مشبوهة:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Number of children | | |
+| trigger | children_confirm | You entered `${children}` children. Please verify with the respondent and tap OK to confirm. | `${children} > 10` | `${children} > 10` |
+
+### إقرار التعليمات في بداية القسم
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Section B: Agricultural Land Use. Ask all questions in this section to the household head only. |
+
+## جعل التأكيد إلزامياً
+
+أضف `required: yes` لمنع التقدم حتى يتم تحديد خانة الاختيار:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | All safety equipment is present and functional. | yes | You must confirm before proceeding. |
+
+## العرض الشرطي
+
+اعرض التأكيد فقط عند استيفاء شرط معين:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | Does the household have a well? | |
+| trigger | well_observation | Confirm you have directly observed the well condition. | `${has_well} = 'yes'` |
+
+## الفرق بين `note` و`trigger`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| يعرض نصاً | نعم | نعم |
+| يتطلب تفاعلاً | لا | نعم (يجب التحديد) |
+| يخزن بيانات | لا | لا (فقط موافق/محدد) |
+| يمكنه حجب التقدم | لا | نعم (مع `required`) |
+
+## أفضل الممارسات
+
+1. اجعل نصوص التأكيد موجزة وقابلة للتنفيذ — يجب أن يتمكن المعداد من القراءة والتأكيد في ثوانٍ.
+2. أضف دائماً `required: yes` عندما يكون الإقرار إلزامياً.
+3. استخدم التأكيدات لفحوصات الموافقة والسلامة حيث تحتاج إلى مسار تدقيق يؤكد موافقة المعداد.
+4. اجمع مع `relevant` للتنبيهات اللطيفة الشرطية بحيث يظهر التأكيد فقط عندما تحتاج قيمة إلى التحقق منها.
+
+## القيود
+
+- لا تخزن حقول التأكيد قيمة بيانات ذات معنى — فقط تسجل أن خانة الاختيار قد حُدِّدت.
+- تُقدَّم أداة التأكيد كخانة اختيار/زر بسيط على معظم العملاء؛ وليست توقيعاً إلكترونياً كاملاً.

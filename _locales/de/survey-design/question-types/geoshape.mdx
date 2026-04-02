@@ -1,0 +1,79 @@
+---
+title: "Geoshape"
+description: "Geoshape-Fragen ermöglichen es den Befragten, Formen auf einer Karte zu zeichnen und so komplexe geografische Daten als Teil der Umfrage zu erfassen."
+---
+
+Der `geoshape`-Fragetyp in XLSForms und rtSurvey ermöglicht es Befragten, Formen (Polygone) auf einer Karte zu zeichnen und so komplexe geografische Daten zu erfassen. Diese Funktion ist besonders nützlich für die Kartierung von Flächen, die Festlegung von Grenzen oder die Markierung von Regionen von Interesse in räumlichen Umfragen.
+
+## Grundlegende XLSForm-Spezifikation
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geoshape | field_area  | Zeichnen Sie die Grenze des Feldes |
+
+Weitere Details zum grundlegenden `geoshape`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+
+## Anwendungen
+
+`Geoshape`-Fragen werden häufig verwendet für:
+
+1. Kartierung von Feldgrenzen in landwirtschaftlichen Umfragen
+2. Festlegung von Gebieten mit Umweltauswirkungen
+3. Markierung von Zonen in Stadtplanungsstudien
+4. Umreißung von Regionen für geologische Untersuchungen
+5. Erfassung komplexer geografischer Merkmale für die räumliche Analyse
+
+## Best Practices
+
+1. Stellen Sie sicher, dass am Gerät die Ortungsdienste aktiviert und die entsprechenden Berechtigungen erteilt sind.
+2. Geben Sie klare Anweisungen dazu, wie die Form gezeichnet werden soll und welcher Bereich einbezogen werden soll.
+3. Erwägen Sie die Verwendung von Satellitenbildern oder Basiskarten, um den Befragten zu helfen, Formen genau zu zeichnen.
+4. Achten Sie auf die potenzielle Komplexität von Formen und deren Auswirkungen auf Datengröße und -verarbeitung.
+
+## Beispielhafte Verwendung
+
+Hier ist ein Beispiel dafür, wie Sie eine `geoshape`-Frage in einer Umfrage verwenden könnten:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geoshape | forest_area    | Umreißen Sie die Grenze des Waldstücks     | Verwenden Sie mindestens 3 Punkte, um eine geschlossene Form zu erstellen |
+
+## rtSurvey-Erweiterungen
+
+Während die grundlegende XLSForm-Spezifikation für `geoshape`-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen:
+
+1. Integration von Offline-Karten für abgelegene Gebiete
+2. Optionen zum Festlegen einer minimalen und maximalen Anzahl von Punkten für die Form
+3. Möglichkeit, Formen nach dem ersten Zeichnen zu bearbeiten oder zu verfeinern
+4. Unterstützung verschiedener Formtypen (z. J. Rechtecke, Kreise) zusätzlich zu Freiform-Polygonen
+
+(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für `geoshape`-Fragen müssten hier bestätigt und detailliert werden.)
+
+## Datenformat
+
+Geoshape-Daten werden in der Regel als eine Zeichenfolge aus durch Leerzeichen getrennten Koordinatenpaaren gespeichert, die in Klammern eingeschlossen sind:
+
+```
+(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+```
+
+Beispiel:
+```
+(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+```
+
+## Überlegungen zur Analyse
+
+Berücksichtigen Sie bei der Verwendung von `geoshape`-Fragen:
+
+1. Wie die geografischen Daten visualisiert und analysiert werden (z. B. GIS-Software)
+2. Den potenziellen Bedarf an Datenbereinigung oder Vereinfachung komplexer Formen
+3. Datenschutz- und Datensicherheitsmaßnahmen für den Umgang mit detaillierten räumlichen Daten
+4. Integration mit anderen räumlichen Datenquellen für eine umfassende Analyse
+
+## Einschränkungen
+
+- Das genaue Zeichnen von Formen auf kleinen mobilen Bildschirmen kann schwierig sein.
+- Komplexe Formen können erhebliche Speicher- und Verarbeitungskapazität erfordern.
+- `Geoshape`-Fragen sind möglicherweise nicht für alle Arten von Umfragen oder Befragten geeignet.
+- Bei der Erfassung detaillierter räumlicher Daten können Datenschutzbedenken aufkommen.

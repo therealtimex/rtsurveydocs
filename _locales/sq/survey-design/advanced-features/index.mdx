@@ -1,0 +1,83 @@
+---
+title: "Zgjerime të avancuara"
+description: ""
+---
+
+Kolona `appearance` në rtSurvey ju lejon të personalizoni prezantimin vizual dhe sjelljen e pyetjeve në sondazhet tuaja. Kjo veçori rrit përvojën e përdoruesit dhe mund të përmirësojë ndjeshëm efikasitetin e mbledhjes së të dhënave. rtSurvey mbështet atributet standarde të pamjes XLSForm dhe i zgjet ato me opsione shtesë.
+
+## Zgjerime të pamjes specifike të rtSurvey
+
+rtSurvey zgjet opsionet standarde të pamjes me sa vijon:
+
+### Personalizimi i hyrjes kohe
+
+Për pyetjet e llojit `text` të përdorura për hyrje kohe:
+
+- `appearance:` - Shfaq orën për zgjedhjen e orëve dhe minutave
+- `appearance: inline` - Shfaq orën si ikonë
+- `appearance: inline-1line` - Shfaq orën në format me rresht të vetëm
+- `appearance: inline-onlyresult` - Shfaq ikonën e orës, zhduket pas zgjedhjes
+- `appearance: inline-[FORMAT]` - Personalizon shfaqjen e formatit të kohës (p.sh., `[%H:%M]`, `[%h:%M:%S]`)
+
+### Personalizimi i ngjyrës
+
+rtSurvey lejon personalizimin e ngjyrës për pamje të ndryshme:
+
+- `appearance: inline colors("0099FF")` - Personalizon ngjyrën e ikonës
+- `appearance: inline-1line colors("0000FF","FFFF00")` - Personalizon ngjyrat në format me rresht të vetëm
+
+### Paraqitja rrjetë
+
+rtSurvey prezanton paraqitje rrjetë për shfaqje kompakte, si tabela:
+
+- `appearance: grid` - Zbatohet në grupe për të krijuar paraqitje rrjetë
+
+### Grupet e palosshme
+
+- `appearance: collapsible` - Krijon grupe të zgjerueshme/të palosshme
+
+## Praktikat më të mira për përdorimin e pamjes
+
+1. **Konsistenca**: Përdorni atributet e pamjes në mënyrë konsistente nëpër sondazhin tuaj për pamje uniforme.
+2. **Mobile vs. Web**: Konsideroni se si pamjet do të paraqiten në pajisje dhe platforma të ndryshme.
+3. **Performanca**: Kini kujdes me atributet e pamjes që mund të ngadalësojnë ngarkimin e formularit (p.sh., `table-list` për grupe të mëdha).
+4. **Përvoja e përdoruesit**: Zgjidhni pamjet që e bëjnë hyrjen e të dhënave më të lehtë dhe intuitive për të anketuarit.
+5. **Testimi**: Gjithmonë testoni formularin tuaj në pajisjet e synuara për të siguruar që pamjet funksionojnë siç pritet.
+
+## Teknikat e avancuara
+
+### Kombinimi i pamjeve
+
+Disa atribute pamjeje mund të kombinohen për paraqitje më komplekse:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Zgjidhni njërin: | minimal compact |
+```
+
+### Pamjet dinamike
+
+rtSurvey lejon ndryshime dinamike të pamjes bazuar në logjikën e formularit:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Shkruani orën: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Konsideratat për aplikacionin mobile
+
+- Disa pamje (p.sh., `quick`, `signature`) janë specifike për pajisjet mobile.
+- Testoni tërësisht si në Android ashtu edhe iOS për të siguruar sjellje konsistente.
+
+## Kufizimet e njohura
+
+- Pamjet komplekse mund të mos paraqiten identikisht nëpër të gjitha platformat.
+- Disa pamje të avancuara rtSurvey mund të mos mbështeten në modalitetin offline.
+
+## Zgjidhja e problemeve të pamjes
+
+1. **Pamja nuk është zbatuar**: Kontrolloni gabime shkrimi në kolonën e pamjes.
+2. **Paraqitje inconsistente**: Verifikoni përputhshmërinë me llojin e pyetjes dhe platformën.
+3. **Problemet e performancës**: Konsideroni thjeshtëzimin e pamjeve komplekse, veçanërisht për sondazhet e mëdha.

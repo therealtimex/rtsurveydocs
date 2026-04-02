@@ -1,0 +1,96 @@
+---
+title: "Dynamisk frågetype"
+description: "Dynamisk frågetype låter ett fälts frågetype och widget bestämmas vid körning baserat på ett API-svar eller beräknat värde."
+---
+
+Funktionen **Dynamisk frågetype** låter ett fälts inmatningswidget och valideringsbeteende bestämmas **vid körning** snarare än vid formulärdesigntillfället. Detta är ett avancerat rtSurvey-tillägg som används när typen av data som ska samlas in beror på en serversideskonfiguration, ett API-svar eller ett föregående fältvärde.
+
+Ett vanligt användningsfall är en konfigurerbar inspektionschecklista där servern definierar vilka fält som krävs, vilken typ de är (text, integer, select osv.) och vilka alternativ som är tillgängliga — utan att behöva bygga om formuläret för varje konfiguration.
+
+---
+
+## Hur det fungerar
+
+Ett fält som är markerat som dynamisk frågetype använder `callapi()` för att hämta sin konfiguration från ett API. API-svaret definierar:
+
+- Den inmatningstyp som ska renderas (text, integer, select_one osv.)
+- Tillgängliga val (för select-typer)
+- Valideringsregler
+
+Fältet är internt markerat med `specialFeature: isDynamicQuestionType`, vilket talar om för formulärmotorn att använda API-svaret för att konstruera widgeten snarare än den statiska formulärdefinitionen.
+
+---
+
+## Konfiguration
+
+### Steg 1: Hämta fältkonfigurationen
+
+Använd ett `calculate`-fält med `callapi()` för att hämta den dynamiska konfigurationen:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | field_config | | callapi | `callapi('POST', 'https://api.example.com/field-config', 1, 2, 0, '$.config', 10000, 0, '', '', '{"form_id": "##form_id##", "field_id": "inspection_result"}')` |
+
+### Steg 2: Referera till konfigurationen i det dynamiska fältet
+
+Det dynamiska fältet använder `callapi-verify()` i sin `appearance` eller `constraint` för att länka till den hämtade konfigurationen:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | inspection_result | Inspektionsresultat | `callapi-verify(dynamicParams)` |
+
+Formulärmotorn läser `field_config` och bestämmer dynamiskt om `inspection_result` ska renderas som ett `text`-, `integer`- eller `select_one`-fält.
+
+---
+
+## API-svarsformat
+
+API:et bör returnera ett JSON-objekt som beskriver fältkonfigurationen. Ett typiskt svar:
+
+```json
+{
+  "config": {
+    "type": "select_one",
+    "choices": [
+      {"value": "pass", "label": "Godkänd"},
+      {"value": "fail", "label": "Underkänd"},
+      {"value": "na", "label": "Ej tillämpligt"}
+    ],
+    "required": true,
+    "constraint": ". != ''"
+  }
+}
+```
+
+---
+
+## Exempel: Konfigurerbart inspektionsformulär
+
+Ett inspektionsformulär där checklistepunkterna och deras svarstyper hämtas från en server baserat på inspektionskategorin:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| select_one inspection_type | insp_type | Typ av inspektion | | |
+| calculate | checklist_config | | callapi | `callapi('POST', 'https://api.example.com/checklist', 1, 2, 0, '$.items', 10000, 0, '', '', '{"type": "##insp_type##"}')` |
+| text | item_1 | Punkt 1 | `callapi-verify(dynamicParams)` | |
+| text | item_2 | Punkt 2 | `callapi-verify(dynamicParams)` | |
+| text | item_3 | Punkt 3 | `callapi-verify(dynamicParams)` | |
+
+Servern returnerar korrekt widgettyp, etikett, val och validering för varje punkt baserat på `insp_type`.
+
+---
+
+## Bästa praxis
+
+1. Använd dynamiska frågetyper bara när fältstrukturen genuint varierar vid körning — för statiska formulär, använd standardfrågetyper.
+2. Se till att konfigurations-API:et svarar snabbt (under 2 sekunder) och är tillgängligt på fältets nätverk.
+3. Definiera alltid ett rimligt reservalternativ i formuläret för det fall att API:et är onåbart — ett vanligt `text`-fält med en notering är bättre än en trasig widget.
+4. Versionera ditt API-svarsschema — ändringar i svarsformatet kommer att påverka alla aktiva formulär som använder den slutpunkten.
+5. Testa varje kombination av fälttyper som API:et kan returnera innan driftsättning.
+
+## Begränsningar
+
+- Dynamiska frågetyper kräver nätverksanslutning för att hämta konfigurationen.
+- Det fullständiga utbudet av widget-typer som är tillgängliga dynamiskt beror på rtSurvey-klientversionen — testa din målversion.
+- Detta är ett avancerat rtSurvey-tillägg utan motsvarighet i standardspecifikationen för XLSForm.
+- Felsökningsfel är svårare att spåra eftersom fältdefinitionen delvis finns i formuläret och delvis i API-svaret.

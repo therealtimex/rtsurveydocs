@@ -1,0 +1,83 @@
+---
+title: "Pokročilé rozšírenia"
+description: ""
+---
+
+Stĺpec `appearance` v rtSurvey umožňuje prispôsobiť vizuálnu prezentáciu a správanie otázok vo vašich prieskumoch. Táto funkcia zlepšuje používateľský zážitok a môže výrazne zlepšiť efektivitu zberu dát. rtSurvey podporuje štandardné atribúty vzhľadu XLSForm a rozširuje ich o ďalšie možnosti.
+
+## Rozšírenia vzhľadu špecifické pre rtSurvey
+
+rtSurvey rozširuje štandardné možnosti vzhľadu o nasledujúce:
+
+### Prispôsobenie vstupu času
+
+Pre otázky typu `text` používané na vstup času:
+
+- `appearance:` - Zobrazí hodiny pre výber hodín a minút
+- `appearance: inline` - Zobrazí hodiny ako ikonu
+- `appearance: inline-1line` - Zobrazí hodiny v jednoradovom formáte
+- `appearance: inline-onlyresult` - Zobrazí ikonu hodín, zmizne po výbere
+- `appearance: inline-[FORMAT]` - Prispôsobí zobrazenie formátu času (napr. `[%H:%M]`, `[%h:%M:%S]`)
+
+### Prispôsobenie farieb
+
+rtSurvey umožňuje prispôsobenie farieb pre rôzne vzhľady:
+
+- `appearance: inline colors("0099FF")` - Prispôsobí farbu ikony
+- `appearance: inline-1line colors("0000FF","FFFF00")` - Prispôsobí farby v jednoradovom formáte
+
+### Rozloženie mriežky
+
+rtSurvey predstavuje rozloženie mriežky pre kompaktné, tabuľkové zobrazenia:
+
+- `appearance: grid` - Aplikuje na skupiny na vytvorenie rozloženia mriežky
+
+### Zbaľovacie skupiny
+
+- `appearance: collapsible` - Vytvorí rozbaľovacie/zbaľovacie skupiny
+
+## Najlepšie postupy pre používanie vzhľadu
+
+1. **Konzistentnosť**: Používajte atribúty vzhľadu konzistentne v celom prieskume pre jednotný vzhľad.
+2. **Mobilné vs. web**: Zvážte, ako sa vzhľady budú renderovať na rôznych zariadeniach a platformách.
+3. **Výkon**: Buďte opatrní s atribútmi vzhľadu, ktoré môžu spomaliť načítavanie formulára.
+4. **Používateľský zážitok**: Vyberte vzhľady, ktoré uľahčujú zadávanie dát a sú intuitívnejšie pre respondentov.
+5. **Testovanie**: Vždy testujte váš formulár na cieľových zariadeniach.
+
+## Pokročilé techniky
+
+### Kombinácia vzhľadov
+
+Niektoré atribúty vzhľadu môžu byť kombinované pre zložitejšie rozloženia:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Vyberte jednu: | minimal compact |
+```
+
+### Dynamické vzhľady
+
+rtSurvey umožňuje dynamické zmeny vzhľadu na základe logiky formulára:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Zadajte čas: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Úvahy pre mobilnú aplikáciu
+
+- Niektoré vzhľady (napr. `quick`, `signature`) sú špecifické pre mobilné zariadenia.
+- Dôkladne testujte na Androide aj iOS.
+
+## Známe obmedzenia
+
+- Komplexné vzhľady sa nemusia renderovať identicky naprieč všetkými platformami.
+- Niektoré pokročilé vzhľady rtSurvey nemusia byť podporované v offline režime.
+
+## Riešenie problémov so vzhľadom
+
+1. **Vzhľad nie je aplikovaný**: Skontrolujte preklepy v stĺpci appearance.
+2. **Nekonzistentné renderovanie**: Overte kompatibilitu s typom otázky a platformou.
+3. **Problémy s výkonom**: Zvážte zjednodušenie komplexných vzhľadov, najmä pre veľké prieskumy.

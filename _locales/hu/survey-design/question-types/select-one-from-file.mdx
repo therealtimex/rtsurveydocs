@@ -1,0 +1,93 @@
+---
+title: "Select from file"
+description: "A select_one_from_file és a select_multiple_from_file dinamikusan tölti be a lehetőségeket egy, az űrlaphoz csatolt külső CSV vagy XML fájlból."
+---
+
+import { Callout } from 'nextra/components'
+
+A `select_one_from_file` és a `select_multiple_from_file` típusok a `select_one` és `select_multiple` típusokhoz hasonlóan működnek, de a lehetőségek meghatározása helyett a **choices munkalapon** azokat egy **az űrlaphoz csatolt külső CSV vagy XML fájlból** töltik be. Ez akkor hasznos, ha a lehetőséglista nagyon hosszú, sűrűn változik, vagy az egész űrlap újraépítése nélkül kell frissíteni.
+
+## Alapvető XLSForm-specifikáció
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | Válassza ki az egészségügyi intézményt |
+| select_multiple_from_file crops.csv | crops | Milyen növényeket termeszt a háztartás? |
+
+A típusnév utáni fájlnévnek pontosan egyeznie kell az űrlap feltöltésekor csatolt fájl nevével.
+
+## CSV fájlformátum
+
+A CSV fájlnak legalább két oszlopot kell tartalmaznia: `name` (a tárolt érték) és `label` (a megjelenített szöveg). Tetszőleges számú extra oszlopot hozzáadhat szűréshez.
+
+**health_facilities.csv:**
+
+```
+name,label,district,type
+HF001,Nairobi Central Clinic,Nairobi,clinic
+HF002,Westlands Health Centre,Nairobi,health_centre
+HF003,Kisumu District Hospital,Kisumu,hospital
+```
+
+## Lehetőségek szűrése
+
+A `choice_filter` oszloppal csak azokat a lehetőségeket jelenítheti meg, amelyek megfelelnek az aktuális kontextusnak. Hivatkozzon a CSV-oszlopokra közvetlen névvel (`${}` nélkül):
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | Válasszon körzetet | |
+| select_one_from_file health_facilities.csv | facility | Válasszon intézményt | district = `${district}` |
+
+Ebben a példában csak a kiválasztott körzetben lévő intézmények jelennek meg. A `choice_filter` `district` értéke a CSV-fájl `district` oszlopára utal; a `${district}` a `district` nevű űrlapmezőre utal.
+
+## Felhasználási területek
+
+A fájlból való kiválasztás kérdések általánosan használt területei:
+
+1. **Hosszú lehetőséglisták** – egészségügyi intézmények, iskolák, falvak, fajlisták (száz vagy ezer elem)
+2. **Sűrűn frissített listák** – ha az alaplista felmérési körök között változik, csak a CSV-t kell frissíteni az űrlap újraépítése nélkül
+3. **Megosztott referenciaadatok** – egy CSV-fájl több űrlapon is használható
+4. **Szűrt kaszkád kiválasztók** – az összes régió/körzet/falu betöltése egy fájlba, majd szűrés a szülőkiválasztás alapján
+
+## A fájl csatolása
+
+Amikor feltölti az űrlapot az rtSurvey-be, csatolja a CSV-fájlt **média mellékletként**. Az űrlap definíciójában szereplő fájlnévnek pontosan egyeznie kell a melléklet fájlnevével.
+
+<Callout type="warning">
+A fájlnevek kis- és nagybetű érzékenyek. A `Health_Facilities.csv` és a `health_facilities.csv` különböző fájlként kezelt.
+</Callout>
+
+## A `choice-label()` használata fájlból való kiválasztásnál
+
+Egy kiválasztott lehetőség feliratának megjelenítéséhez note vagy calculate mezőben:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | Válasszon intézményt | |
+| calculate | facility_label | | choice-label(`${facility}`, `${facility}`) |
+| note | summary | Kiválasztott intézmény: `${facility_label}` | |
+
+## Bevált módszerek
+
+1. Tartsa a CSV-fájlokat 5 000 sor alatt a mobileszközök megfelelő teljesítménye érdekében.
+2. Mindig foglalja bele a `name` és `label` oszlopot – a többi oszlop opcionális.
+3. Kaszkád kiválasztókhoz használjon egyetlen CSV-fájlt szülő oszloppal, és szűrjön a `choice_filter` segítségével.
+4. Verziókövetéssel lássa el a CSV-fájlneveket (pl. `facilities_v3.csv`) az oszlopszerkezet lényegi módosításakor.
+5. Alaposan tesztelje a szűrési kifejezéseket – a `choice_filter` elírása csendesen üres lehetőséglistát eredményez.
+
+## Korlátozások
+
+- Nagyon nagy CSV-fájlok (10 000+ sor) lelassíthatják az űrlap betöltését, különösen alacsony kategóriájú eszközökön.
+- A CSV-fájlokat az űrlappal együtt kell feltölteni – futásidőben nem tölthetők le URL-ről (dinamikus kereséshez használjon `search()` vagy `pulldata()` függvényt).
+- A `select_multiple_from_file` kevésbé támogatott különféle klienseknél – használat előtt ellenőrizze a kompatibilitást.
+
+## Összehasonlítás a `search()` függvénnyel
+
+| | `select_one_from_file` | `search()` megjelenés |
+|--|----------------------|----------------------|
+| Lehetőségek forrása | Csatolt CSV/XML fájl | Szerveroldali adatbázis-lekérdezés |
+| Offline működés | Igen (fájl be van csomagolva) | Kapcsolatot igényel |
+| Lehetőségek száma | Eszközmemóriával korlátozott | Korlátlan (lapozással) |
+| Valós idejű adatok | Nem | Igen |
+
+Nagy, sűrűn változó vagy szerveroldali adatkészletek esetén lásd a [Dinamikus keresés](../advanced-extension/dynamic-search) részt.

@@ -1,0 +1,91 @@
+---
+title: "Trigger / Acknowledge"
+description: "Trigger ప్రశ్నలు continue చేయడానికి ముందు enumerator తప్పనిసరిగా స్పష్టంగా acknowledge చేయాల్సిన statement చూపిస్తాయి."
+---
+
+`trigger` (అలాగే `acknowledge` అని కూడా పిలుస్తారు) ప్రశ్న రకం **checkbox తో statement** చూపిస్తుంది. Form వారికి continue చేయడానికి అనుమతించే ముందు enumerator statement చదివి అర్థం చేసుకున్నారని confirm చేయడానికి checkbox tick చేయాలి. Data value నిల్వ చేయబడదు — checkbox tick చేయబడిందో లేదో మాత్రమే.
+
+## ప్రాథమిక XLSForm స్పెసిఫికేషన్
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | The respondent has provided verbal informed consent. |
+
+లేదా `acknowledge` alias ఉపయోగించి:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | The respondent has provided verbal informed consent. |
+
+`trigger` మరియు `acknowledge` రెండూ equivalent — మీ platform documents చేసిన దాన్ని ఉపయోగించండి.
+
+## వినియోగాలు
+
+Trigger/acknowledge ప్రశ్నలు సాధారణంగా వీటికి ఉపయోగిస్తారు:
+
+1. **Informed consent** — sensitive డేటా record చేయడానికి ముందు enumerator consent పొందారని confirm చేయడం
+2. **Soft alerts** — unusual విలువ గురించి హెచ్చరించడం మరియు continue చేయడానికి ముందు స్పష్టమైన confirmation అవసరం
+3. **Checklist items** — physical పరిశీలన పూర్తయిందని confirm చేయడం (ఉదా. "నేను నేరుగా water source పరిశీలించాను")
+4. **Instructions** — section-level instruction acknowledge చేయడానికి continue చేయడానికి ముందు enumerator ని force చేయడం
+5. **Quality checks** — outlier values flag చేయడం మరియు enumerator వాటిని verify చేయమని అడగడం
+
+## ఉదాహరణ వినియోగం
+
+### Consent acknowledgement
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | The respondent has given verbal informed consent to participate in this survey. | yes |
+
+### Outlier విలువలకు soft alert
+
+Suspicious విలువ enter చేయబడినప్పుడు మాత్రమే trigger చూపించడానికి `relevant` expression తో కలిపి ఉపయోగించడం:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Number of children | | |
+| trigger | children_confirm | You entered `${children}` children. Please verify with the respondent and tap OK to confirm. | `${children} > 10` | `${children} > 10` |
+
+### Section start వద్ద instruction acknowledgement
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Section B: Agricultural Land Use. Ask all questions in this section to the household head only. |
+
+## Trigger ని required చేయడం
+
+Box tick చేయడానికి ముందు advance అవ్వకుండా ఆపడానికి `required: yes` జోడించండి:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | All safety equipment is present and functional. | yes | You must confirm before proceeding. |
+
+## షరతులతో కూడిన display
+
+Condition meet అయినప్పుడు మాత్రమే trigger చూపించడం:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | Does the household have a well? | |
+| trigger | well_observation | Confirm you have directly observed the well condition. | `${has_well} = 'yes'` |
+
+## `note` తో తేడా
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Text చూపిస్తుంది | అవును | అవును |
+| Interaction అవసరం | లేదు | అవును (tick చేయాలి) |
+| డేటా నిల్వ చేస్తుంది | లేదు | లేదు (OK/ticked మాత్రమే) |
+| Progress block చేయగలదు | లేదు | అవును (`required` తో) |
+
+## ఉత్తమ పద్ధతులు
+
+1. Trigger labels సంక్షిప్తంగా మరియు actionable గా ఉంచండి — enumerator సెకన్లలో చదివి confirm చేయగలగాలి.
+2. Acknowledgement తప్పనిసరి అయినప్పుడు ఎల్లప్పుడూ `required: yes` జోడించండి.
+3. Enumerator confirm చేశారనే audit trail అవసరమైన consent మరియు safety checks కు triggers ఉపయోగించండి.
+4. Conditional soft alerts కు `relevant` తో కలిపండి తద్వారా trigger విలువ verification అవసరమైనప్పుడు మాత్రమే కనిపిస్తుంది.
+
+## పరిమితులు
+
+- Trigger fields meaningful data value నిల్వ చేయవు — box tick చేయబడిందని మాత్రమే records చేస్తాయి.
+- Trigger widget చాలా clients పై simple checkbox/button గా render అవుతుంది; ఇది పూర్తి e-signature కాదు.

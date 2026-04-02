@@ -1,0 +1,117 @@
+---
+title: "Ispiti"
+description: "Funkcija ispita dodaje mod kviza sa tajmerom anketi, sa opcionim audio povratnim informacijama za tačne i netačne odgovore."
+---
+
+import { Callout } from 'nextra/components'
+
+Funkcija **Ispit** pretvara anketu u kviz sa tajmerom. Odbrojavač se prikazuje ispitaniku, a anketa beleži koliko vremena preostaje kada završe. Opciono, audio zvukovi mogu se reprodukovati za tačne i netačne odgovore.
+
+Ovo je korisno za proveru znanja, testove pismenosti, provere kompetencija terenskog osoblja i bilo koje ankete gde je vreme na zadatku značajan podatak.
+
+---
+
+## Funkcija `check-exam()`
+
+Konfigurirajte ispit koristeći `check-exam()` u koloni **`calculation`** polja `calculate` postavljenog na početku formulara:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Parametri
+
+| # | Parametar | Opis |
+|---|-----------|------|
+| 1 | `examTime` | Ukupno trajanje ispita u sekundama |
+| 2 | `questionToStoreRemainingTime` | `name` polja `calculate` ili `integer` koje će čuvati preostalo vreme kada ispit završi |
+| 3 | `rightSound` | *(Opciono)* Naziv audio datoteke za reprodukciju pri tačnom odgovoru (priložite formularu kao medijsku datoteku) |
+| 4 | `wrongSound` | *(Opciono)* Naziv audio datoteke za reprodukciju pri netačnom odgovoru |
+| 5 | `excludeQuestion` | *(Opciono)* Lista naziva polja odvojenih zarezima za isključivanje iz tajmera ispita (npr. `'intro_note,consent'`) |
+
+---
+
+## Osnovno podešavanje
+
+### Korak 1: Dodavanje polja ispita
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` pokreće tajmer od 600 sekundi (10 minuta). `remaining_time` se automatski popunjava kada ispitanik završi.
+
+### Korak 2: Dodavanje pitanja
+
+Tajmer ispita pokriva sva pitanja u formularu osim onih navedenih u `excludeQuestion`.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | Glavni grad Kenje je Najrobi. Tačno ili netačno? |
+| select_one choices | q2 | Koji organ pumpa krv kroz telo? |
+| select_one choices | q3 | Voda ključa na 100°C pri nivou mora. Tačno ili netačno? |
+
+### Korak 3: Čuvanje preostalog vremena
+
+Polje navedeno u parametru 2 (`remaining_time`) automatski se postavlja na broj sekundi preostalog vremena kada ispitanik pošalje. Vrednost `0` znači da je vreme isteklo; visoka vrednost znači da su brzo završili.
+
+---
+
+## Sa audio povratnim informacijama
+
+Priložite zvučne datoteke formularu (kao medijske privitke), zatim ih referencirajte:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` se reprodukuje kada ispitanik izabere tačan odgovor
+- `wrong.mp3` se reprodukuje kada ispitanik izabere netačan odgovor
+
+<Callout type="warning">
+Zvučne datoteke moraju biti priložene formularu kao medijske datoteke i naziv datoteke mora tačno odgovarati (osetljivo na velika/mala slova) uključujući ekstenziju.
+</Callout>
+
+---
+
+## Isključivanje pitanja iz tajmera
+
+Prosledite listu naziva polja odvojenih zarezima za isključivanje iz ispita (npr. uvodni tekst ili pitanja saglasnosti):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+Ostavite `rightSound` i `wrongSound` kao prazne stringove `''` ako ne trebate audio ali trebate isključivanja.
+
+---
+
+## Kompletan primer
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | Dobrodošli na proveru znanja o zdravlju. Imate 5 minuta da odgovorite na sva pitanja. | |
+| trigger | start_ack | Tapnite OK kada ste spremi za početak. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | Pranje ruku sprečava širenje bolesti. | |
+| select_one yesno | q2 | Trebalo bi da pijete najmanje 2 litra vode dnevno. | |
+| select_one yesno | q3 | Malariju uzrokuje virus. | |
+
+---
+
+## Najbolje prakse
+
+1. Uvek informišite ispitanike o vremenskom ograničenju pre početka — koristite `note` ili `trigger` pre polja `check-exam()`.
+2. Isključite uvodne napomene i pitanja saglasnosti iz tajmera koristeći parametar `excludeQuestion`.
+3. Koristite `remaining_time` u naknadnom proračunu za otkrivanje isteka vremena: `if(${remaining_time} = 0, 'Vreme isteklo', 'Završeno')`.
+4. Zadržite broj pitanja proporcionalan dozovljenom vremenu — 2–3 minuta po pitanju je razumna osnova za većinu provera znanja.
+5. Testirajte sa audio datotekama na stvarnom uređaju pre primene — reprodukcija zvuka varira na različitim Android verzijama i preglednicima.
+
+## Ograničenja
+
+- Tajmer je samo za prikaz — formular se ne šalje automatski kada vreme istekne; ispitanik i dalje mora ručno da pošalje.
+- Audio povratne informacije zahtevaju da je zvuk uređaja uključen i nije isključen.
+- Funkcija ispita je rtSurvey proširenje i nije deo standardne XLSForm specifikacije.

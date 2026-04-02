@@ -1,0 +1,158 @@
+---
+title: "질문 반복"
+description: ""
+---
+
+반복은 rtSurvey의 강력한 기능으로, 단일 설문 내에서 동일한 정보 세트를 여러 번 수집할 수 있게 합니다. 이는 여러 가구 구성원에 대한 데이터를 수집해야 하는 가구 설문과 같은 시나리오에 특히 유용합니다.
+
+## 기본 반복 구조
+
+rtSurvey에서 반복을 만들려면 `begin repeat` 및 `end repeat` 구조를 사용합니다:
+
+```
+| type         | name         | label                |
+|--------------|--------------|----------------------|
+| begin repeat | child_repeat |                      |
+| text         | name         | 아동 이름         |
+| decimal      | birthweight  | 아동 출생 체중  |
+| select_one male_female | sex | 아동 성별         |
+| end repeat   |              |                      |
+```
+
+이 예시에서는 양식에 새 반복을 추가하여 여러 아동에 대한 정보를 수집할 수 있습니다.
+
+## 반복 레이블 지정
+
+`begin repeat`의 `label` 열은 선택 사항이지만, 레이블을 추가하면 탐색이 향상됩니다:
+
+```
+| type         | name         | label                |
+|--------------|--------------|----------------------|
+| begin repeat | child_repeat | 아동 정보    |
+| text         | name         | 아동 이름         |
+| decimal      | birthweight  | 아동 출생 체중  |
+| select_one male_female | sex | 아동 성별         |
+| end repeat   |              |                      |
+```
+
+rtSurvey는 각 반복 인스턴스의 제목으로 "아동 정보"를 표시합니다.
+
+## 고정 반복 횟수
+
+고정된 반복 횟수를 지정하려면 `repeat_count` 열을 사용합니다:
+
+```
+| type         | name         | label                | repeat_count |
+|--------------|--------------|----------------------|--------------|
+| begin repeat | child_repeat | 아동 정보    | 3            |
+| text         | name         | 아동 이름         |              |
+| decimal      | birthweight  | 아동 출생 체중  |              |
+| end repeat   |              |                      |              |
+```
+
+이렇게 하면 정확히 3개의 아동 반복이 생성됩니다.
+
+## 동적 반복 횟수
+
+rtSurvey는 이전 답변에 따른 동적 반복 횟수를 지원합니다:
+
+```
+| type     | name           | label                          | repeat_count       |
+|----------|----------------|--------------------------------|--------------------|
+| integer  | num_hh_members | 가구 구성원 수?   |                    |
+| begin repeat | hh_member  | 가구 구성원               | ${num_hh_members}  |
+| text     | name           | 이름                           |                    |
+| integer  | age            | 나이                            |                    |
+| end repeat |              |                                |                    |
+```
+
+## 조건부 반복
+
+`relevant` 열을 사용하여 반복을 조건부로 표시할 수 있습니다:
+
+```
+| type              | name        | label                     | relevant           |
+|-------------------|-------------|---------------------------|---------------------|
+| select_one yes_no | has_child   | 이 곳에 아동이 살고 있습니까?|                     |
+| begin repeat      | child_repeat| 아동 정보         | ${has_child} = 'yes'|
+| text              | name        | 아동 이름              |                     |
+| decimal           | birthweight | 아동 출생 체중       |                     |
+| end repeat        |             |                           |                     |
+```
+
+## rtSurvey 특정 기능
+
+### 반복 요약
+
+rtSurvey는 반복의 요약 보기를 제공합니다. 요약을 사용자 정의하려면 반복 내에 그룹을 사용합니다:
+
+```
+| type         | name         | label                                    |
+|--------------|--------------|------------------------------------------|
+| begin repeat | person_repeat|                                          |
+| begin group  | person       | ${first_name} ${last_name} - ${age}      |
+| text         | first_name   | 이름                               |
+| text         | last_name    | 성                                |
+| integer      | age          | 나이                                      |
+| end group    |              |                                          |
+| end repeat   |              |                                          |
+```
+
+### 반복 Appearance 옵션
+
+rtSurvey는 반복에 대한 추가 appearance 옵션을 제공합니다:
+
+- `appearance: field-list` - 반복의 모든 질문을 한 화면에 표시
+- `appearance: table-list` - 반복을 표 형식으로 표시
+
+```
+| type         | name         | label            | appearance  |
+|--------------|--------------|-------------------|-------------|
+| begin repeat | child_repeat | 아동 정보 | table-list  |
+| text         | name         | 이름              |             |
+| integer      | age          | 나이              |             |
+| end repeat   |              |                   |             |
+```
+
+### 중첩 반복
+
+rtSurvey는 복잡한 데이터 구조를 위한 중첩 반복을 지원합니다:
+
+```
+| type         | name           | label                |
+|--------------|----------------|----------------------|
+| begin repeat | household      | 가구            |
+| text         | hh_name        | 가구 이름       |
+| begin repeat | hh_member      | 가구 구성원     |
+| text         | member_name    | 구성원 이름    |
+| integer      | member_age     | 구성원 나이     |
+| end repeat   |                |                      |
+| end repeat   |                |                      |
+```
+
+## rtSurvey에서 반복 사용 모범 사례
+
+1. 데이터 분석을 향상시키기 위해 반복에 의미 있는 이름과 레이블을 사용합니다.
+2. 데이터 입력 오류를 줄이기 위해 동적 반복 횟수 사용을 고려합니다.
+3. 복잡한 중첩 반복을 사용할 때는 양식을 철저히 테스트합니다.
+4. 조사원이 긴 반복 목록을 탐색할 수 있도록 요약 기능을 사용합니다.
+5. 반복 수가 많으면 양식 성능에 영향을 줄 수 있으므로 주의합니다.
+
+## 반복 없음 처리
+
+rtSurvey에서 반복이 없음을 나타내려면:
+
+1. 필요하지 않은 경우 첫 번째 반복을 삭제하도록 조사원을 훈련합니다.
+2. 정확한 수를 알고 있는 경우 동적 반복 횟수를 사용합니다.
+3. 반복을 조건부로 표시하기 위해 `relevant`를 사용합니다.
+
+## 데이터 내보내기 고려 사항
+
+rtSurvey에서 데이터를 내보낼 때 반복 데이터는 일반적으로 평탄화됩니다. 각 반복 인스턴스는 내보낸 데이터에서 별도의 행이 되며, 각 인스턴스에 대해 부모 양식의 데이터가 반복됩니다.
+
+## 모바일 앱 고려 사항
+
+- rtSurvey 모바일 앱에서 반복은 오프라인 데이터 수집을 지원합니다.
+- 반복 수가 많으면 저사양 기기에서 앱 성능에 영향을 줄 수 있습니다.
+
+rtSurvey에서 반복을 효과적으로 사용하면 조사원에게 사용자 친화적인 인터페이스를 유지하면서 복잡한 계층적 데이터 구조를 캡처할 수 있는 유연하고 강력한 설문을 만들 수 있습니다.

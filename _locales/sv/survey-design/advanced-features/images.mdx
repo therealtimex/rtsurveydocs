@@ -1,0 +1,89 @@
+---
+title: "Avancerade bilder"
+description: "Avancerade bildfunktioner i rtSurvey: vattenstämplar, visning av mediarutnät och bildkommentarer."
+---
+
+Utöver standardfrågetypen `image` tillhandahåller rtSurvey tillägg för **vattenstämplar** på tagna foton och visning av flera bilder i ett **mediarutnät**. Dessa är användbara för evidensbaserade undersökningar där foton behöver märkas med räknarens identitet eller undersökningsmetadata, och för visuella granskningsgränssnitt.
+
+---
+
+## Vattenstämpel
+
+Vattenstämpelfunktionen lägger en text eller bild ovanpå ett taget foto innan det lagras. Detta används för att märka fältfoton med datum, räknarnamn, GPS-plats eller andra undersökningsdata — vilket gör det svårare att presentera befintliga foton som nyligen tagna bevis.
+
+### Konfiguration
+
+Använd `watermark()` i **`calculation`**-kolumnen för ett `image`-fält, kombinerat med `callapi`-utseende:
+
+```
+watermark(type, size, distance, color, shadow, rotate, blur)
+```
+
+| Parameter | Beskrivning |
+|-----------|-------------|
+| `type` | `'text'` för en textvattenstämpel; `'file'` för en bildvattenstämpel |
+| `size` | Teckenstorlek i pixlar (text) eller vattenstämpelstorlek som % av bildbredden (fil) |
+| `distance` | Avstånd mellan upprepade vattenstämpelplattor (pixlar) |
+| `color` | Textfärg (CSS-färg eller hex). Används inte för `file`-typen |
+| `shadow` | Skuggfärg (CSS-färg eller hex) |
+| `rotate` | Rotationsvinkel i grader (t.ex. `45` för diagonal) |
+| `blur` | Vattenstämpelns opacitet (0 = osynlig, 100 = helt ogenomskinlig) |
+
+### Exempel på textvattenstämpel
+
+Lägg räknarens namn och dagens datum diagonalt över varje taget foto:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | wm_text | | | `concat(pulldata('app-api', 'user.name'), ' | ', format-date(today(), '%d/%m/%Y'))` |
+| image | site_photo | Ta ett foto av platsen | watermark | `watermark('text', 20, 60, '#ffffff', '#000000', 45, 40)` |
+
+Vattenstämpeltexten hämtas från `${wm_text}`. Sätt vattenstämpeltextfältet **före** bildfältet i formuläret.
+
+### Exempel på bild/logotypvattenstämpel
+
+Lägg en organisationslogotyp (bifogad som en mediefil med namnet `logo.png`):
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| image | evidence_photo | Ta foto av beviset | watermark | `watermark('file', 25, 80, '', '#000000', 0, 50)` |
+
+### Ångra/gör om
+
+Vattenstämpelredigeraren stöder ångra och gör om — räknare kan gå tillbaka genom redigeringshistoriken innan de bekräftar fotot.
+
+### Vattenstämpelplattering
+
+Vattenstämpeln upprepas (plattas) automatiskt över hela bilden. Parametern `distance` styr avstånd mellan plattor; `rotate` styr vinkeln på varje platta.
+
+---
+
+## Mediarutnätswidget
+
+Mediarutnätswidgeten visar en samling mediafiler (bilder, ljud, video) i en rutnätslayout, vilket gör det möjligt för granskare eller räknare att bläddra bland tagna filer visuellt.
+
+Den här widgeten aktiveras av utseendet `mediagridwidget` och används vanligtvis på `note`- eller `calculate`-fält för att visa tidigare tagna medier från en upprepningsgrupp.
+
+### Exempel: Visa alla foton från en upprepning som ett rutnät
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | photo_list | | | `join(' ', ${site_photo})` |
+| note | photo_review | Granska tagna foton | mediagridwidget | |
+
+---
+
+## Bästa praxis för vattenstämplade foton
+
+1. Beräkna alltid vattenstämpeltexten i ett `calculate`-fält **ovanför** bildfältet så att den är tillgänglig när fotot tas.
+2. Använd en rotationsvinkel (t.ex. 45°) för att göra vattenstämplar svårare att beskära bort.
+3. Sätt opaciteten (`blur`) mellan 30–60% — tillräckligt hög för att vara läsbar, tillräckligt låg för att inte dölja fotoobjektet.
+4. Inkludera räknarens namn, datum och GPS-koordinater i vattenstämpeltexten för maximalt revisionsvärde.
+5. Testa vattenstämpelrendering på den lägst specade enheten i din flotta — canvasbaserad vattenstämpelläggning kan vara långsam på äldre hårdvara.
+
+## Begränsningar
+
+- Vattenstämpelläggning görs på klientsidan med HTML5 Canvas API — det kräver en kapabel webbläsare eller mobil WebView.
+- Mycket högupplösta foton kan ta flera sekunder att vattenstämpla på lågkapacitetsenheter.
+- Vattenstämplar bakas in i bildfilen — de kan inte tas bort efter inlämning utan bildredigering.
+- Vattenstämpeltypen `file` kräver att logotypbilden bifogas som en mediefil med exakt det förväntade filnamnet.

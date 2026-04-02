@@ -1,0 +1,43 @@
+---
+title: "Geoshape"
+description: "Otázky geoshape umožňují respondentům kreslit tvary na mapě, zachycovat složitá geografická data jako součást průzkumu."
+---
+
+Typ otázky geoshape v XLSForms a rtSurvey umožňuje respondentům kreslit tvary (polygony) na mapě a zachycovat složitá geografická data. Tato funkce je zvláště užitečná pro mapování oblastí, definování hranic nebo označování oblastí zájmu v prostorových průzkumech.
+
+## Základní specifikace XLSForm
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geoshape | field_area  | Nakreslete hranici pole  |
+
+## Použití
+
+Otázky geoshape se běžně používají pro:
+
+1. Mapování hranic polí v zemědělských průzkumech
+2. Definování oblastí environmentálního dopadu
+3. Označování zón v studiích urbanistického plánování
+4. Ohraničování regionů pro geologické průzkumy
+5. Zachycování složitých geografických prvků pro prostorovou analýzu
+
+## Osvědčené postupy
+
+1. Zajistěte, aby bylo na zařízení povoleno určování polohy a udělena oprávnění.
+2. Poskytněte jasné pokyny, jak nakreslit tvar a jakou oblast by měl zahrnovat.
+3. Zvažte použití satelitních snímků nebo základních map pro pomoc respondentům přesně nakreslit tvary.
+4. Buďte obeznámeni s potenciální složitostí tvarů a jejich dopadem na velikost dat a zpracování.
+
+## Formát dat
+
+Data geoshape jsou obvykle uložena jako řetězec dvojic souřadnic oddělených středníky, s uzavíracím bodem rovnajícím se počátečnímu:
+
+```
+z.š1 z.d1; z.š2 z.d2; z.š3 z.d3; ... z.šN z.dN; z.š1 z.d1
+```
+
+## Omezení
+
+- Kreslení přesných polygonů na malých mobilních obrazovkách může být náročné.
+- Složité tvary mohou vyžadovat značnou kapacitu úložiště a zpracování.
+- Mohou existovat obavy o soukromí spojené se sběrem podrobných dat o poloze.

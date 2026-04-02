@@ -1,0 +1,105 @@
+---
+title: "Webbox"
+description: "Webbox bygger inn en ekstern nettside inne i spørreundersøkelsen som en modal iframe, slik at tellere kan se referanser eller samhandle med eksterne verktøy uten å forlate skjemaet."
+---
+
+import { Callout } from 'nextra/components'
+
+**Webbox** bygger inn en ekstern nettside inne i spørreundersøkelsen som en **modal sprettoppvindu** (iframe). Telleren trykker på en knapp i etiketten eller notateteksten, siden åpnes i et fullskjermoverlegg inne i skjemaet, og når de lukker det returnerer de til nøyaktig der de var. Dette lar deg vise referansemateriale, kart, dashbord eller tilpassede verktøy uten å åpne en separat nettleserfane.
+
+---
+
+## Syntaks
+
+Sett inn en `<webbox>`-HTML-kode direkte i en `label`- eller `note`-etikettekolonne:
+
+```html
+<webbox src='https://example.com/reference' title='Referanseguide'>Åpne referanseguide</webbox>
+```
+
+| Attributt | Beskrivelse |
+|-----------|-------------|
+| `src` | URL-en som skal lastes i iframe-en. Støtter både enkle og doble anførselstegn. |
+| `title` | Tekst som vises i modal-overskriftslinjen. Støtter vanlig tekst. |
+| *(innhold)* | Den klikkbare knappteksten som vises i spørreundersøkelsesfeltet |
+
+---
+
+## Grunnleggende eksempel
+
+| type | name | label |
+|------|------|-------|
+| note | ref_guide | `<webbox src='https://docs.example.com/field-guide' title='Feltveiledning'>Åpne feltveiledning</webbox>` |
+
+Dette gjengir en knapp merket "Åpne feltveiledning". Når den trykkes, åpnes en modal som viser feltveiledningsnettstedet.
+
+---
+
+## Bygge inn et kart
+
+| type | name | label |
+|------|------|-------|
+| note | area_map | `<webbox src='https://maps.example.com/survey-area' title='Undersøkelsesområdekart'>Vis kart</webbox>` |
+
+---
+
+## Sende skjemaverdier til den innebygde siden
+
+Legg til skjemafelt-verdier til URL-en ved hjelp av `concat()` i `calculation`-kolonnen og referer til resultatet i etiketten:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | webbox_url | | `concat('https://dashboard.example.com/household?id=', ${household_id})` |
+| note | hh_dash | `<webbox src='${webbox_url}' title='Husholdningsdashbord'>Åpne dashbord</webbox>` |
+
+<Callout type="warning">
+`src`-attributtet i `<webbox>`-koden støtter `${feltnavn}`-referanser når etiketten er beregnet fra et `calculate`-felt. Bygg den fulle URL-en i et `calculate`-felt og referer til den.
+</Callout>
+
+---
+
+## Repeat-interaksjon: sletteknapper
+
+Webbox støtter også spesielle handlingskoder for å administrere repeat-grupper inne i etiketter:
+
+```html
+<delete-repeat-current>Fjern denne raden</delete-repeat-current>
+<delete-repeat-last>Fjern siste rad</delete-repeat-last>
+```
+
+Disse gjengis som knapper som sletter repeat-instanser når de trykkes. Plasser dem i et `note`-felt inne i (eller rett etter) repeat-gruppen:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | items | Element |
+| text | item_name | Elementnavn |
+| note | delete_btn | `<delete-repeat-current>Fjern dette elementet</delete-repeat-current>` |
+| end_repeat | | |
+
+---
+
+## Kommunikasjon med den innebygde siden (postMessage)
+
+Webbox-iframe-en og det overordnede skjemaet kan kommunisere ved hjelp av nettleserens `postMessage`-API. Overordnet sender en `init`-melding til iframe-en når den åpnes. Den innebygde siden kan svare med:
+
+- `delete-repeat-current` — utløser sletting av gjeldende repeat-instans
+- `delete-repeat-last` — utløser sletting av siste repeat-instans
+
+Dette gjør det mulig for tilpassede nettverktøy (f.eks. tegningsverktøy, interaktive kart) å utløse skjemahandlinger når brukeren bekrefter en handling inne i iframe-en.
+
+---
+
+## Beste praksis
+
+1. Bruk webbox for **referansemateriale** (retningslinjer, oppslagstabeller, kart) — ikke for å samle inn data som bør være i selve skjemaet.
+2. Sørg for at den innebygde URL-en er tilgjengelig fra enhetens nettverk — webbox krever tilkobling.
+3. Hold den innebygde siden mobilegnet — modalen er maksimalt 800px bred og 80% av visningsportshøyden.
+4. Bruk beskrivende knapptekst (f.eks. "Vis landsbykart") i stedet for generiske etiketter ("Klikk her").
+5. Informer tellere om at lukking av modalen returnerer dem til spørreundersøkelsen — noen brukere vet kanskje ikke hvordan man lukker et iframe-overlegg.
+
+## Begrensninger
+
+- Webbox krever nettverkstilkobling for å laste den innebygde URL-en.
+- Noen eksterne nettsteder blokkerer innbygging i iframes via `X-Frame-Options`- eller `Content-Security-Policy`-overskrifter — disse nettstedene kan ikke brukes med webbox.
+- Modalen lukkes når telleren navigerer bort fra spørsmålet — eventuell ulagret tilstand i iframe-en går tapt.
+- Webbox er en rtSurvey webskjema-utvidelse og fungerer kanskje ikke i andre ODK-kompatible klienter.

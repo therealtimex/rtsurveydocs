@@ -1,0 +1,120 @@
+---
+title: "Jautājumu izlaišana"
+description: ""
+---
+
+Izlaišanas loģika, ko sauc arī par zaru loģiku vai nosacījuma loģiku, ļauj izveidot dinamiskās aptaujas, kas pielāgojas respondentu atbildēm. rtSurvey izlaišanas loģika tiek ieviesta, izmantojot XLSForm kolonnu `relevant`.
+
+## Pamata izlaišanas loģika
+
+Lai ieviestu pamata izlaišanas loģiku, izmantojiet kolonnu `relevant`, lai norādītu nosacījumu:
+
+```
+| type           | name          | label                       | relevant            |
+|----------------|---------------|-----------------------------|--------------------|
+| select_one y_n | likes_pizza   | Vai jums patīk pica?        |                    |
+| select_multiple pizza_toppings | favorite_topping | Iecienītākie piedevas | ${likes_pizza} = 'yes' |
+```
+
+Šajā piemērā jautājums "Iecienītākās piedevas" parādās tikai tad, ja respondents atbild "yes" uz to, vai viņam patīk pica.
+
+## Relevances izteiksmju sintakse
+
+- Izmantojiet `${ }`, lai atsauktos uz citiem jautājumu mainīgajiem.
+- `select_one` jautājumiem salīdziniet tieši: `${question_name} = 'answer'`
+- `select_multiple` jautājumiem izmantojiet funkciju `selected()`.
+
+## Uzlabotā izlaišanas loģika
+
+### Vairāki nosacījumi
+
+Varat apvienot vairākus nosacījumus, izmantojot `and`, `or` un iekavas:
+
+```
+| type    | name  | label                   | relevant                                  |
+|---------|-------|-------------------------|-------------------------------------------|
+| integer | age   | Kāds ir jūsu vecums?    |                                           |
+| text    | school| Kuru skolu jūs apmeklējat? | ${age} < 18 and (${location} = 'urban' or ${location} = 'suburban') |
+```
+
+### select_multiple jautājumu izmantošana
+
+`select_multiple` jautājumiem izmantojiet funkciju `selected()`:
+
+```
+| type           | name          | label                       | relevant                               |
+|----------------|---------------|-----------------------------|-----------------------------------------|
+| select_multiple pizza_toppings | favorite_topping | Iecienītākās piedevas |                                        |
+| text           | cheese_type   | Iecienītākais siera veids   | selected(${favorite_topping}, 'cheese') |
+```
+
+### Opcija "Cits" izvēles jautājumos
+
+Ieviesiet brīva teksta opciju "Cits", izmantojot `relevant`:
+
+```
+| type           | name                  | label                               | relevant                               |
+|----------------|----------------------|-------------------------------------|---------------------------------------|
+| select_multiple pizza_toppings | favorite_toppings | Kādas ir jūsu iecienītākās picas piedevas? |                                    |
+| text           | favorite_toppings_other | Kādas citas piedevas jums patīk?   | selected(${favorite_toppings}, 'other') |
+```
+
+Atcerieties iekļaut 'other' kā opciju izvēļu darblappā.
+
+## rtSurvey specifiskās funkcijas
+
+### Dinamiskā relevance
+
+rtSurvey ļauj dinamisku relevanci, pamatojoties uz aprēķinātajiem laukiem:
+
+```
+| type      | name       | label              | calculation                   |
+|-----------|------------|--------------------|-----------------------------|
+| calculate | total_score| Kopējais punktu skaits | ${score1} + ${score2} + ${score3} |
+| text      | feedback   | Atsauksmes         | ${total_score} > 75             |
+```
+
+### Relevance atkārtojumos
+
+rtSurvey atbalsta relevanci atkārtojumu grupās:
+
+```
+| type         | name         | label            | relevant               |
+|--------------|--------------|------------------|------------------------|
+| begin repeat | child_info   | Bērna informācija|                        |
+| integer      | child_age    | Bērna vecums     |                        |
+| text         | school_name  | Skolas nosaukums | ${child_age} >= 5      |
+| end repeat   |              |                  |                        |
+```
+
+### Kaskādes relevance
+
+rtSurvey efektīvi apstrādā kaskādes relevanci, kur viena jautājuma relevance ir atkarīga no cita, kas savukārt atkarīgs no trešā:
+
+```
+| type           | name        | label                  | relevant               |
+|----------------|-------------|------------------------|------------------------|
+| select_one y_n | has_car     | Vai jums pieder automašīna? |                   |
+| select_one car_type | car_type | Kāda veida automašīna? | ${has_car} = 'yes'   |
+| text           | model       | Konkrētais modelis     | ${car_type} = 'sedan'  |
+```
+
+## Labākā prakse izlaišanas loģikai rtSurvey
+
+1. **Saglabājiet vienkāršu**: Ja iespējams, izvairieties no pārmērīgi sarežģītiem relevances nosacījumiem.
+2. **Rūpīgi testējiet**: Izmantojiet rtSurvey priekšskatījuma funkciju, lai testētu visus iespējamos ceļus aptaujā.
+3. **Ņemiet vērā veiktspēju**: Ļoti sarežģīta izlaišanas loģika var ietekmēt aptaujas veiktspēju, īpaši mobilajās ierīcēs.
+4. **Izmantojiet skaidrus mainīgo nosaukumus**: Tas padara relevances izteiksmes vieglāk lasāmas un uzturejamas.
+5. **Dokumentējiet loģiku**: Pievienojiet piezīmes, lai izskaidrotu sarežģītus izlaišanas modeļus, īpaši komandas sadarbībā.
+6. **Ņemiet vērā datu analīzi**: Izlaistie jautājumi radīs trūkstošus datus. Plānojiet analīzi atbilstoši.
+
+## Izlaišanas loģikas problēmu novēršana
+
+- **Sintakses kļūdas**: Nodrošiniet, ka visi `${ }` ir pareizi aizvērti un pareizi uzrakstīti.
+- **Apļveida atsauces**: Izvairieties veidot cilpas, kur jautājumi ir atkarīgi viens no otra.
+- **Reģistrjutība**: Atcerieties, ka atbilžu izvēles ir reģistrjutīgas relevances izteiksmēs.
+- **Skaitliskās salīdzināšanas**: Izmantojiet atbilstošus operatorus (`<`, `>`, `=`) skaitliskām salīdzināšanām.
+
+## Secinājums
+
+Efektīva izlaišanas loģikas izmantošana var ievērojami uzlabot respondentu pieredzi un datu kvalitāti jūsu rtSurvey projektos. Izmantojot rtSurvey uzlabotās funkcijas un sekojot labākajai praksei, varat izveidot dinamiskās, efektīvas aptaujas, kas pielāgojas katra respondenta unikālajai situācijai.

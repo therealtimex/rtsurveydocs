@@ -1,0 +1,137 @@
+---
+title: "Dynamisch zoeken"
+description: "Dynamisch zoeken laadt keuzes uit een externe API in realtime terwijl de enumerator typt, waardoor grote of frequent bijgewerkte datasets mogelijk zijn."
+---
+
+**Dynamisch zoeken** (ook wel Search API genoemd) stelt een `select_one`-, `select_multiple`- of `text`-veld in staat om zijn keuzes te laden uit een externe webservice **bij uitvoering** terwijl de enumerator typt. Dit is de juiste aanpak wanneer uw keuzelijst te groot is om in een CSV-bestand te bundelen, frequent wordt bijgewerkt, of afkomstig is uit een live database.
+
+---
+
+## `search-api()`-weergave
+
+Het dynamisch zoeken wordt geconfigureerd via de kolom `appearance` met behulp van de functie `search-api()`:
+
+```
+search-api(method, url, post_body, value_column, display, data_path, save_path)
+```
+
+### Parameters
+
+| Parameter | Beschrijving |
+|-----------|-------------|
+| `method` | Gebruik altijd `'POST'` |
+| `url` | Het API-endpoint om te bevragen |
+| `post_body` | JSON-body verzonden naar de API. Gebruik `%__input__%` als plaatshouder voor de huidige zoektekst van de enumerator |
+| `value_column` | De sleutel in het responsobject om te gebruiken als opgeslagen **waarde** |
+| `display` | De sleutel (of sjabloon) om te gebruiken als het **label** dat in het dropdownmenu wordt weergegeven. Ondersteunt `##sleutel##`-plaatshouders en `@{func}`-expressies |
+| `data_path` | JSONPath naar de array van resultaatobjecten in de respons (bijv. `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Een naam waaronder de ruwe respons wordt opgeslagen voor gebruik door andere velden |
+
+---
+
+## Basisvoorbeeld
+
+Een zorginstelling-opzoekactie waarbij de enumerator een deel van de naam van de instelling typt:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Selecteer zorginstelling | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+
+De API ontvangt `{"query": "nair"}` wanneer de enumerator "nair" typt en retourneert:
+
+```json
+{
+  "results": [
+    {"id": "HF001", "name": "Nairobi Central Clinic"},
+    {"id": "HF002", "name": "Nairobi West Hospital"}
+  ]
+}
+```
+
+Het dropdownmenu toont `Nairobi Central Clinic` en `Nairobi West Hospital`; de opgeslagen waarde is `HF001` of `HF002`.
+
+---
+
+## Geavanceerde weergaveopmaak
+
+### `##sleutel##`-sjablonen gebruiken
+
+Toon meerdere velden in het label:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
+```
+
+Weergegeven als: `Nairobi Central Clinic (Nairobi)`.
+
+### `@{func}`-expressies gebruiken
+
+Pas voorwaardelijke logica toe in het weergavelabel:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
+  '@{if_else(eq("##status##", "active"), "✓ ##name##", "✗ ##name##")}',
+  '$.data', 'res')
+```
+
+Actieve resultaten tonen `✓ Klinieksnaam`; inactieve tonen `✗ Klinieksnaam`.
+
+---
+
+## Een standaardwaarde instellen: `search-default-api()`
+
+Gebruik `search-default-api()` na `search-api()` om het veld vooraf in te vullen met een standaardkeuze die is geladen vanuit een aparte API-aanroep (bijv. bij het bewerken van een bestaand record):
+
+```
+appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
+```
+
+---
+
+## Aangepast scheidingsteken voor select_multiple: `search-default-separator()`
+
+Voor `select_multiple`-velden specificeert u hoe meerdere geselecteerde waarden worden samengevoegd in de opgeslagen tekenreeks:
+
+```
+appearance: search-api(...) search-default-separator(' || ')
+```
+
+Standaard scheidingsteken is een spatie.
+
+---
+
+## Ondersteunde vraagtypen
+
+| Vraagtype | Gebruiksgeval |
+|-----------|---------------|
+| `select_one` | Enkelvoudige selectie uit zoekresultaten |
+| `select_multiple` | Meervoudige selecties uit zoekresultaten |
+| `text` | Automatisch aanvullen — enumerator typt vrij maar kan een suggestie selecteren |
+
+---
+
+## Opgeslagen responsgegevens gebruiken
+
+Het `save_path` slaat het volledige API-responsobject op onder de opgegeven naam. Andere velden kunnen ernaar verwijzen met `pulldata()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one | facility | Selecteer instelling | `search-api(..., 'facility_data')` |
+| calculate | facility_district | | `pulldata('facility_data', 'district')` |
+| calculate | facility_type | | `pulldata('facility_data', 'type')` |
+
+---
+
+## Aanbevolen werkwijzen
+
+1. Zorg ervoor dat uw API-endpoint binnen 1–2 seconden reageert — trage API's maken het zoeken traag aanvoelen.
+2. Gebruik `%__input__%` in de `post_body` zodat de API alleen overeenkomende resultaten retourneert, niet de gehele dataset.
+3. Indexeer het zoekveld aan de serverzijde (bijv. Elasticsearch, database full-text index) voor snelle responsen.
+4. Beperk resultaten tot 20–50 items per query — het retourneren van duizenden resultaten verslaat het doel van zoeken.
+5. Neem een minimale invoerlengtevereiste op in de API om het activeren van brede queries op invoer van één teken te vermijden.
+
+## Beperkingen
+
+- Dynamisch zoeken vereist netwerkconnectiviteit — het werkt niet offline.
+- De plaatshouder `%__input__%` wordt zo ingevoegd; maak invoer aan de serverzijde schoon om injectieaanvallen te voorkomen.
+- Complexe `@{func}`-weergave-expressies kunnen beperkte ondersteuning hebben in alle rtSurvey-clientversies.

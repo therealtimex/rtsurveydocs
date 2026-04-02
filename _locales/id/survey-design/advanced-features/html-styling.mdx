@@ -1,0 +1,141 @@
+---
+title: "Penataan HTML"
+description: "rtSurvey mendukung tag HTML dalam label dan petunjuk, memungkinkan format teks kaya, tautan, dan tema warna dinamis."
+---
+
+import { Callout } from 'nextra/components'
+
+rtSurvey merender teks **label** dan **hint** sebagai HTML pada formulir web. Ini berarti Anda dapat menggunakan tag HTML standar untuk memformat teks, menambahkan jeda baris, membuat tautan, dan menerapkan warna. Ini sangat berguna untuk bidang catatan, instruksi bagian, dan ringkasan dinamis.
+
+<Callout type="warning">
+HTML dalam label dirender di **formulir web** dan aplikasi mobile rtSurvey. Mungkin tidak dirender di semua klien yang kompatibel dengan ODK. Selalu uji di platform target Anda.
+</Callout>
+
+---
+
+## Tag HTML yang didukung
+
+### Format teks
+
+| Tag | Hasil |
+|-----|-------|
+| `<strong>text</strong>` atau `<b>text</b>` | **Teks tebal** |
+| `<em>text</em>` atau `<i>text</i>` | *Teks miring* |
+| `<u>text</u>` | Teks bergaris bawah |
+| `<br>` | Jeda baris |
+| `<span style="...">text</span>` | Penataan inline |
+
+### Tautan
+
+```html
+<a href="https://example.com" target="_blank">Klik di sini</a>
+```
+
+Membuka di tab baru. Gunakan untuk dokumen referensi, panduan, atau sumber daya eksternal yang harus dikonsultasikan enumerator.
+
+### Warna
+
+Gunakan `<span>` dengan gaya inline:
+
+```html
+<span style="color: red;">Peringatan: nilai di luar rentang</span>
+<span style="color: #009688;">Bagian selesai</span>
+```
+
+---
+
+## Variabel tema warna
+
+rtSurvey mendukung **token tema warna** yang beradaptasi dengan tema yang dikonfigurasi aplikasi. Gunakan sintaks `__COLOR_THEME_NAME__`:
+
+```html
+<span style="color: var(--color-theme-primary);">Teks warna utama</span>
+```
+
+Atau menggunakan singkatan token dalam teks label:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Catatan penting</font>
+```
+
+Ini secara otomatis dikonversi ke `<span>` yang setara dengan variabel CSS saat dirender.
+
+---
+
+## Label multi-bahasa
+
+Bungkus konten dalam tag bahasa untuk mendukung beberapa bahasa dalam satu sel label:
+
+```
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey mengekstrak konten yang cocok dengan bahasa aplikasi saat ini. Jika tidak ada tag bahasa yang cocok ditemukan, string lengkap ditampilkan apa adanya.
+
+---
+
+## Contoh dalam bidang catatan
+
+### Instruksi bagian dengan teks tebal dan jeda baris
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Bagian 3: Penggunaan Lahan</strong><br>Ajukan semua pertanyaan dalam bagian ini hanya kepada kepala rumah tangga.` |
+
+### Ringkasan dinamis dengan referensi perhitungan
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Total anggota rumah tangga: <strong>${total}</strong><br><span style="color: gray;">Dewasa: ${adults} · Anak-anak: ${children}</span>` |
+
+### Peringatan dalam warna merah
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Peringatan:</strong> Usia yang dimasukkan (${age}) sangat tinggi. Harap verifikasi.</span>` | `${age} > 100` |
+
+### Tautan ke dokumen referensi
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Lihat <a href="https://docs.example.com/guidelines" target="_blank">Panduan Lapangan</a> sebelum memulai bagian ini.` |
+
+---
+
+## Tag HTML khusus rtSurvey
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+Menyematkan tombol yang membuka URL dalam modal dalam formulir. Lihat [Webbox](webbox) untuk detail lengkap.
+
+### `<delete-repeat-current>label</delete-repeat-current>`
+
+Merender tombol di dalam grup pengulangan yang menghapus instans pengulangan saat ini saat diketuk.
+
+### `<delete-repeat-last>label</delete-repeat-last>`
+
+Merender tombol yang menghapus instans pengulangan terakhir.
+
+Contoh penggunaan dalam grup pengulangan:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Hapus anggota ini</delete-repeat-current>` |
+
+---
+
+## Praktik Terbaik
+
+1. Gunakan HTML secukupnya — label yang terlalu diformat lebih sulit dibaca, bukan lebih mudah.
+2. Pilih `<strong>` untuk tebal dan `<em>` untuk miring daripada `<b>` dan `<i>` yang sudah usang.
+3. Jaga penggunaan warna bermakna — gunakan merah untuk peringatan, bukan untuk dekorasi.
+4. Selalu uji rendering HTML di aplikasi mobile dan formulir web, karena rendering mungkin sedikit berbeda.
+5. Hindari tag `<table>` di dalam label — jarang dirender dengan baik di layar mobile.
+6. Jangan gunakan JavaScript (`<script>`) — akan dihapus atau menyebabkan kesalahan.
+
+## Keterbatasan
+
+- HTML yang kompleks (tabel, formulir, skrip) tidak didukung dan mungkin merusak rendering.
+- Beberapa klien mobile yang lebih lama mungkin menampilkan tag HTML sebagai teks literal — uji di semua perangkat target.
+- Tautan `<a>` dibuka di browser atau WebView — enumerator meninggalkan formulir, yang bisa mengganggu di mobile.

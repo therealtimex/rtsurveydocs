@@ -1,0 +1,55 @@
+---
+title: "Opérateurs et fonctions"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+Les expressions dans rtSurvey sont rédigées dans un sous-ensemble de **XPath 1.0**, étendu avec les fonctions JavaRosa/ODK et des fonctions rtSurvey personnalisées. Vous utilisez des expressions dans les colonnes `calculate`, `constraint`, `relevant`, `required` et `default` de votre XLSForm.
+
+## Référencer des valeurs de champs
+
+Utilisez `${fieldname}` pour référencer la valeur d'un autre champ :
+
+```
+${age} > 18
+```
+
+Utilisez `.` (un seul point) pour référencer la **valeur du champ actuel** — couramment utilisé dans les expressions `constraint` :
+
+```
+. >= 0 and . <= 100
+```
+
+Utilisez `..` pour référencer le groupe parent (utilisation avancée dans les répétitions).
+
+## Syntaxe des expressions
+
+Les expressions suivent les règles XPath standard :
+
+- Les **chaînes de caractères** doivent être entre guillemets simples : `'yes'`
+- Les **nombres** s'écrivent tels quels : `42`, `3.14`
+- Les résultats **booléens** sont utilisés pour `relevant`, `required` et `constraint` — toute valeur non vide et non nulle est vraie
+- Les espaces autour des opérateurs sont ignorés
+
+<Callout type="warning">
+Utilisez toujours des guillemets droits (`'` ou `"`) — jamais des guillemets courbes ("guillemets typographiques"). Les éditeurs de texte enrichi convertissent souvent les guillemets automatiquement et cassent vos expressions.
+</Callout>
+
+## Sections de ce chapitre
+
+- **[Opérateurs](operators)** — opérateurs de comparaison (`=`, `!=`, `>`, `<`, `>=`, `<=`) et opérateurs logiques (`and`, `or`, `not()`)
+- **[Fonctions](functions)** — fonctions de chaîne, de sélection, de nombre, de date/heure, booléennes, géographiques et utilitaires
+- **[Références](references)** — comment référencer les champs et les valeurs de contexte
+
+## Exemples rapides
+
+| Cas d'usage | Expression |
+|----------|------------|
+| Afficher si l'âge dépasse 18 | `${age} > 18` |
+| Afficher uniquement si "oui" a été sélectionné | `${consent} = 'yes'` |
+| Obligatoire si un autre champ n'est pas vide | `${name} != ''` |
+| Calculer le total | `${adults} + ${children}` |
+| Concaténer un nom | `concat(${first_name}, ' ', ${last_name})` |
+| Date du jour | `today()` |
+| Vérifier si une option a été sélectionnée | `selected(${interests}, 'sports')` |

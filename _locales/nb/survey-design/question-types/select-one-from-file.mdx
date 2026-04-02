@@ -1,0 +1,93 @@
+---
+title: "Velg fra fil"
+description: "select_one_from_file og select_multiple_from_file laster alternativer dynamisk fra en ekstern CSV- eller XML-fil som er vedlagt skjemaet."
+---
+
+import { Callout } from 'nextra/components'
+
+`select_one_from_file` og `select_multiple_from_file` fungerer som `select_one` og `select_multiple`, men i stedet for å definere valg i **choices-regnearket**, lastes valgene fra en **ekstern CSV- eller XML-fil** vedlagt skjemaet. Dette er nyttig når valglisten er veldig lang, endres hyppig, eller må oppdateres uten å bygge om hele skjemaet.
+
+## Grunnleggende XLSForm-spesifikasjon
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | Velg helseinstitusjonen |
+| select_multiple_from_file crops.csv | crops | Hvilke vekster dyrker husholdningen? |
+
+Filnavnet etter typenavnet må samsvare med navnet på filen du legger ved når du laster opp skjemaet.
+
+## CSV-filformat
+
+CSV-filen din må ha minst to kolonner: `name` (den lagrede verdien) og `label` (den viste teksten). Du kan legge til et ubegrenset antall ekstrakolonner for filtrering.
+
+**health_facilities.csv:**
+
+```
+name,label,district,type
+HF001,Nairobi Central Clinic,Nairobi,clinic
+HF002,Westlands Health Centre,Nairobi,health_centre
+HF003,Kisumu District Hospital,Kisumu,hospital
+```
+
+## Filtrere valg
+
+Bruk `choice_filter`-kolonnen for å bare vise valgene som samsvarer med gjeldende kontekst. Referer til CSV-kolonner med kolonnenavnet direkte (uten `${}`):
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | Velg distrikt | |
+| select_one_from_file health_facilities.csv | facility | Velg institusjon | district = `${district}` |
+
+I dette eksemplet vises bare institusjoner i det valgte distriktet. `district` i `choice_filter` refererer til `district`-kolonnen i CSV-filen; `${district}` refererer til skjemafeltet kalt `district`.
+
+## Brukstilfeller
+
+Velg-fra-fil-spørsmål brukes vanligvis for:
+
+1. **Lange valglister** — helseinstitusjoner, skoler, landsbyer, artslisteer (hundrevis eller tusenvis av elementer)
+2. **Hyppig oppdaterte lister** — når masterlisten endres mellom undersøkelsesrunder, oppdater bare CSV-en uten å bygge om skjemaet
+3. **Delte referansedata** — én CSV-fil brukt på tvers av flere skjemaer
+4. **Filtrerte kaskaderende select-er** — last inn alle regioner/distrikter/landsbyer i én fil, filtrer deretter etter overordnet valg
+
+## Vedlegge filen
+
+Når du laster opp skjemaet til rtSurvey, legg ved CSV-filen som et **medievedlegg**. Filnavnet i skjemadefinisjonen må nøyaktig samsvare med filnavnet til vedlegget.
+
+<Callout type="warning">
+Filnavn er skiftsensitive. `Health_Facilities.csv` og `health_facilities.csv` behandles som forskjellige filer.
+</Callout>
+
+## Bruke `choice-label()` med from-file
+
+For å vise etiketten til et valgt alternativ i et note- eller calculate-felt:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | Velg institusjon | |
+| calculate | facility_label | | choice-label(`${facility}`, `${facility}`) |
+| note | summary | Valgt institusjon: `${facility_label}` | |
+
+## Beste praksis
+
+1. Hold CSV-filene under 5 000 rader for god ytelse på mobile enheter.
+2. Inkluder alltid en `name`- og `label`-kolonne — ekstrakolonner er valgfrie.
+3. For kaskaderende select-er, bruk én CSV med en overordnet kolonne og filtrer med `choice_filter`.
+4. Versjonsstyr CSV-filnavnene (f.eks. `facilities_v3.csv`) når du gjør endringer i kolonnestrukturen.
+5. Test filteruttrykk nøye — en skrivefeil i `choice_filter` vil stille vise ingen valg.
+
+## Begrensninger
+
+- Svært store CSV-filer (10 000+ rader) kan bremse skjemalasting, spesielt på lavere-ends enheter.
+- CSV-filer må lastes opp sammen med skjemaet — de kan ikke hentes fra en URL ved kjøretid (bruk `search()` eller `pulldata()` for dynamiske oppslag).
+- `select_multiple_from_file` støttes i mindre grad på tvers av klienter — verifiser kompatibilitet før bruk.
+
+## Sammenligning med `search()`
+
+| | `select_one_from_file` | `search()`-utseende |
+|--|----------------------|----------------------|
+| Kilde for valg | Vedlagt CSV/XML-fil | Serversidebasert databasespørring |
+| Fungerer frakoblet | Ja (filen er buntet) | Krever tilkobling |
+| Antall valg | Begrenset av enhetsminne | Ubegrenset (paginert) |
+| Sanntidsdata | Nei | Ja |
+
+For store, hyppig oppdaterte eller serversidebaserte datasett, se [Dynamisk søk](../advanced-extension/dynamic-search).

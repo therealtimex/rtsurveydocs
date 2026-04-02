@@ -1,0 +1,82 @@
+---
+title: "Values का संदर्भ लेना"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+`${fieldname}` syntax का उपयोग आपके form में किसी भिन्न field के वर्तमान मूल्य को refer करने के लिए किया जाता है। यह दर्ज किए गए, चुने गए, या calculated मूल्य को represent कर सकता है, और यह submitted data में ठीक वैसे ही प्रदर्शित होगा।
+
+उदाहरण:
+यदि आपके पास "age" नामक एक field है और आप उस field में दर्ज किए गए exact मूल्य को retrieve करना चाहते हैं, तो आप `${age}` का उपयोग कर सकते हैं।
+
+Constraints के संबंध में, "." symbol का उपयोग current field के लिए user के proposed entry या selection को refer करने के लिए किया जाता है। यह आपको उस मूल्य के आधार पर conditions या limits लागू करने की अनुमति देता है जो user उस moment में दर्ज कर रहा है या चुन रहा है।
+
+उदाहरण:
+यदि आप यह check करना चाहते हैं कि current field के लिए proposed मूल्य 3 से कम है, तो आप constraint `. < 3` का उपयोग कर सकते हैं।
+
+---
+
+## `..` — Parent group reference
+
+किसी group या repeat group के अंदर, `..` **parent context** को refer करता है। यह व्यवहार में शायद ही कभी आवश्यक होता है लेकिन form hierarchy को navigate करने के लिए advanced XPath expressions में उपयोग किया जाता है।
+
+---
+
+## References का उपयोग कहाँ होता है
+
+| Column | Reference type | Example |
+|--------|---------------|---------|
+| `relevant` | `${fieldname}` | `${consent} = 'yes'` |
+| `constraint` | current field के लिए `.`, अन्य के लिए `${fieldname}` | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${fieldname}` | `${adults} + ${children}` |
+| `required` | `${fieldname}` | `${has_income} = 'yes'` |
+| `default` | `${fieldname}` | `${previous_answer}` |
+| `label` | text में `${fieldname}` | `"आपकी आयु ${age} वर्ष है"` |
+| `choice_filter` | Column name (बिना `${}` के) | `district = ${district}` |
+
+<Callout type="warning">
+`choice_filter` column में, **choice column names** को directly refer करें (बिना `${}`), और **form fields** को `${}` के साथ refer करें। इन्हें mix करना errors का एक सामान्य source है।
+</Callout>
+
+---
+
+## Repeat groups के अंदर Values का संदर्भ लेना
+
+एक repeat के अंदर, `${fieldname}` repeat के **same instance** में field को refer करता है:
+
+```
+relevant: ${member_age} < 18
+```
+
+यह सभी instances का नहीं, current repeat instance के लिए `member_age` मूल्य का उपयोग करता है।
+
+Repeat के बाहर से **specific** repeat instance में field को reference करने के लिए, `indexed-repeat()` का उपयोग करें:
+
+```
+indexed-repeat(${member_name}, ${household_members}, 1)
+```
+
+पूरे विवरण के लिए [Functions — Repeated field functions](functions#repeated-field-functions) देखें।
+
+---
+
+## Empty value checks
+
+जांचें कि कोई field answered है या नहीं:
+
+```
+${fieldname} != ''       (field empty नहीं है)
+${fieldname} = ''        (field empty है)
+```
+
+Numbers के लिए, यह भी check करें:
+```
+${age} > 0               (age में positive value है — numeric context के लिए implicitly not empty)
+```
+
+---
+
+## References में Type coercion
+
+जब आप `${fieldname}` को numeric context में उपयोग करते हैं (जैसे `${age} + 1`), rtSurvey स्वचालित रूप से string value को एक number में coerce करता है। एक empty field operation के आधार पर `0` या `NaN` में coerce होती है — एक empty numeric field को safely zero पर default करने के लिए `coalesce(${field}, 0)` का उपयोग करें।

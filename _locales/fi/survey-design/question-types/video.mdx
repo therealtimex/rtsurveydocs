@@ -1,0 +1,93 @@
+---
+title: "Video"
+description: "Video-kysymykset antavat vastaajille mahdollisuuden nauhoittaa ja lähettää videotiedostoja osana kyselyä."
+---
+
+`video`-kysymystyyppi mahdollistaa vastaajien **nauhoittaa videota** tai ladata olemassa olevan videotiedoston osana kyselyvastaustaan. Se on hyödyllinen visuaalisten todisteiden, demonstraatioiden, ympäristöolosuhteiden tai minkä tahansa tiedon tallentamiseen, josta hyötyy liike ja ääni yhdessä.
+
+## XLSForm-perusmäärittely
+
+| type  | name        | label                               |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Nauhoita lyhyt demonstraatio        |
+
+Lisätietoja video-kysymystyypin standardista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+
+## Käyttötarkoitukset
+
+Video-kysymyksiä käytetään yleisesti:
+
+1. Kenttäolosuhteiden dokumentointiin — tievauriot, infrastruktuurin tila, sadon kunto
+2. Tuotedemonstraatioiden tai menettelytapojen noudattamisen tarkistusten nauhoittamiseen
+3. Vastaajilta videosuositusten keräämiseen
+4. Todisteiden tallentamiseen, joka vaatii spatiaalisuuden (esim. ongelmakohteen koko ja laajuus)
+5. Ennen/jälkeen-dokumentaatio seuranta- ja arviointikyselyissä
+
+## Tietomuoto
+
+Videotiedostot tallennetaan binääriliitteinä:
+
+- **Muoto:** MP4 tai MOV (mobiilinauhiointi)
+- **Nimeäminen:** `{instanceID}-{fieldname}.mp4` (tai vastaava)
+- **Tallennus:** Ladataan palvelimen mediahakemistoon ja yhdistetään lähetystietueeseen
+- **Käyttö:** Toistettavissa ja ladattavissa lähetysten hallintaliittymästä
+
+## rtSurveyn laajennukset
+
+### Enimmäiskesto
+
+Käytä `parameters`-saraketta nauhoituksen pituuden rajoittamiseen:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Nauhoita kohteen olosuhteet | `max-duration=60` |
+
+`max-duration` on sekunneissa. Nauhoitus pysähtyy automaattisesti rajalla.
+
+### Laatu / resoluutio
+
+Ohjaa nauhoituksen resoluutiota `parameters`-sarakkeen kautta:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Nauhoita videotodisteita | `quality=low` |
+
+Tuetut arvot: `low` (nopeampi lataus), `normal` (oletus), `high`. Käytä `low` alueilla, joilla on rajoitettu yhteys.
+
+### Olemassa olevan videon lataaminen
+
+Mobiililla vastaaja voi valita **ladata olemassa olevan videon** laitteen galleriasta uuden nauhoittamisen sijaan. Tämä on käytössä oletuksena natiivin kamera-/galleria-integraatiossa.
+
+### Toisto ennen lähettämistä
+
+Mobiililla nauhoitettu klippi voidaan tarkistaa ennen jatkamista. Lisäkonfigurointia ei tarvita.
+
+## Esimerkkikäyttö
+
+### Kohteen tarkastusvideo rajalla
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Nauhoita vesipiste | Kävele koko laitoksen ympäri. Enintään 90 sekuntia. | `max-duration=90 quality=normal` |
+
+### Ehdollinen video — vain jos vaurio on raportoitu
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | Löytyikö vauriota? | | |
+| video | damage_video | Nauhoita video vauriosta | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+
+## Parhaat käytännöt
+
+1. Aseta `max-duration` — rajoittamattomat videonauhioinnit voivat helposti ylittää 100 Mt ja epäonnistua latauksessa heikkojen yhteyksien vuoksi.
+2. Käytä `quality=low` seurantakyselyissä, joissa visuaalinen todiste vaaditaan mutta hienot yksityiskohdat eivät — se pienentää tiedostokokoa merkittävästi.
+3. Kirjoita erityiset nauhoitusohjeet `hint`-sarakkeeseen (esim. "Kävele koko rakennuksen ympäri, pidä kamera vakaana").
+4. Harkitse, onko video tarpeellinen — valokuva (`image`) riittää yleensä staattisille todisteille ja tuottaa paljon pienempiä tiedostoja.
+5. Testaa lataussuorituskyky todellisessa kenttäverkossa ennen käyttöönottoa.
+
+## Rajoitukset
+
+- Videotiedostot ovat erittäin suuria — 1 minuutin video normaalilla laadulla on tyypillisesti 20–60 Mt laitteesta riippuen.
+- Suurten videotiedostojen lataaminen vaatii hyvän verkkoyhteyden; harkitse Wi-Fi-synkronoinnin vaatimista videopainotteisille lomakkeille.
+- Kaikki verkkoselaimet eivät tue videonauhiointia MediaRecorder-API:n kautta — Chrome on luotettavin.
+- Videovastaausten analyysi on manuaalista ja aikaa vievää; käytä säästeliäästi ja vain silloin, kun videoiden sisältö lisää ainutlaatuista arvoa.

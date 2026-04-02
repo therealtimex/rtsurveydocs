@@ -1,0 +1,264 @@
+---
+title: "Conceptos clave"
+description: "Descripción general del diseño de formularios"
+---
+
+## ¿Qué es un XLSForm?
+rtSurvey usa una versión extendida del estándar [XLSForm](https://xlsform.org/) para el diseño de formularios, ofreciendo potentes características para crear encuestas sofisticadas. Esta guía le introducirá a los conceptos clave del diseño de formularios en rtSurvey, desde la estructura básica de XLSForm hasta las características avanzadas específicas de rtSurvey.
+
+Con XLSForms, puede crear formularios en un formato legible por humanos usando la familiar herramienta Excel, haciéndolo accesible para casi cualquier persona.
+Este estándar facilita el intercambio y la colaboración en la creación de formularios.
+
+Aunque los XLSForms son amigables para principiantes, también permiten a los usuarios experimentados crear formularios complejos.
+
+rtSurvey proporciona una forma consistente de incorporar funcionalidades avanzadas como la lógica de salto en formularios a través de varias plataformas de recopilación de datos web y móviles.
+
+## Estructura de XLSForm
+Un XLSForm generalmente consiste en dos hojas de trabajo principales:
+
+1. **survey**: Define la estructura y el contenido de su formulario.
+2. **choices**: Especifica las opciones de respuesta para las preguntas de opción múltiple.
+
+Una hoja de trabajo **settings** opcional puede proporcionar especificaciones adicionales del formulario.
+
+Es importante tener en cuenta que las columnas obligatorias en las hojas de trabajo survey y choices deben estar presentes para que el formulario funcione correctamente. Las columnas opcionales en ambas hojas de trabajo proporcionan mayor control sobre el comportamiento de cada entrada en el formulario, pero no son esenciales.
+
+Las columnas en su libro de Excel pueden aparecer en cualquier orden, y las columnas opcionales pueden dejarse en blanco. Sin embargo, es crucial usar la sintaxis exacta y las convenciones de nomenclatura especificadas en la documentación de XLSForm para que el formulario funcione correctamente.
+
+### La hoja de trabajo survey
+La **hoja de trabajo survey** es donde define la estructura de su formulario y proporciona el contenido. Cada fila en la hoja de trabajo survey representa una pregunta o elemento en su formulario. Las siguientes columnas son obligatorias en la hoja de trabajo survey:
+
+- `type`: Especifica el tipo de entrada que espera para la pregunta.
+- `name`: Especifica el nombre de variable único para esa entrada. Los nombres deben comenzar con una letra o un guion bajo y solo pueden contener letras, dígitos, guiones, guiones bajos y puntos. Los nombres distinguen entre mayúsculas y minúsculas.
+- `label`: Contiene el texto real que ve para la pregunta en el formulario.
+
+| type                | name     | label                |
+| ------------------- | -------- | -------------------- |
+| today               | today    |                      |
+| select_one gender   | gender   | ¿Género del encuestado? |
+| integer             | age      | ¿Edad del encuestado?    |
+
+### La hoja de trabajo choices
+La **`hoja de trabajo choices`** se usa para especificar las opciones de respuesta para las preguntas de opción múltiple.
+Cada fila representa una opción de respuesta. Las siguientes columnas son obligatorias en la hoja de trabajo choices:
+
+- **`list_name`**: Agrupa un conjunto de opciones de respuesta relacionadas.
+- **`name`**: Especifica el nombre de variable único para esa opción de respuesta.
+- **`label`**: Muestra la opción de respuesta exactamente como desea que aparezca en el formulario.
+
+| list_name           | name        | label                |
+| ------------------- | ----------- | -------------------- |
+| gender              | transgender | Transgénero          |
+| gender              | female      | Femenino             |
+| gender              | male        | Masculino            |
+| gender              | other       | Otro                 |
+
+Las columnas que agregue a su libro de Excel, ya sean obligatorias u opcionales, pueden aparecer en cualquier orden. Las columnas opcionales pueden omitirse por completo. Las filas o columnas pueden dejarse en blanco para mejorar la legibilidad, pero los datos después de 20 columnas o filas en blanco adyacentes en una hoja no serán procesados. Todo el formato de archivos .xlsx se ignora, por lo que puede usar líneas divisorias, sombreado y otro formato de fuente para hacer el formulario más legible.
+
+Una cosa a tener en cuenta al crear formularios en Excel es que la sintaxis que use debe ser precisa. Por ejemplo, si escribe **Choices** o **choice** en lugar de **choices**, el formulario no funcionará.
+
+### La hoja de trabajo settings
+
+La hoja de trabajo settings es opcional pero le permite especificar metadatos y comportamiento a nivel de formulario. Las columnas comunes en la hoja de trabajo settings incluyen:
+
+| Columna | Descripción |
+|--------|-------------|
+| form_title | El título del formulario tal como aparece para los usuarios |
+| form_id | Un identificador único para el formulario, usado en la gestión de datos y llamadas API |
+| default_language | El código de idioma predeterminado para formularios multilingües (p. ej., 'en' para inglés) |
+| version | El número de versión del formulario, útil para rastrear cambios |
+| instance_name | Expresión para generar un nombre único para cada envío del formulario |
+| generation | Número entero que marca la generación del formulario. Incremente para cambios estructurales |
+| family | Identificador para agrupar formularios relacionados a través de cambios estructurales |
+
+La hoja de trabajo settings en rtSurvey también puede incluir configuraciones adicionales específicas de las funcionalidades extendidas de rtSurvey. Consulte la documentación de rtSurvey para obtener una lista completa de las configuraciones admitidas.
+
+## Componentes clave de la hoja de trabajo survey
+
+La hoja de trabajo survey es el núcleo de su diseño de formulario. Aquí hay una descripción general de sus componentes clave:
+
+| Componente | Descripción |
+|-----------|-------------|
+| [type](#question-types) | Especifica el tipo de pregunta (p. ej., text, integer, select_one) |
+| [name](#naming-conventions) | Identificador único para la pregunta |
+| [label](#labels-and-translations) | El texto mostrado al encuestado |
+| [hint](#hints-and-help-text) | Orientación adicional para el encuestado |
+| [appearance](#appearance-options) | Modifica cómo se muestra la pregunta |
+| [relevant](#relevance-and-skip-logic) | Determina cuándo debe hacerse la pregunta (lógica de salto) |
+| [constraint](#constraints-and-validation) | Valida la respuesta |
+| [calculation](#calculations) | Calcula valores basados en otras respuestas |
+| [required](#required-fields) | Especifica si la pregunta debe responderse |
+
+
+Cada uno de estos componentes juega un papel crucial en la creación de encuestas efectivas y eficientes. Haga clic en los enlaces en la columna "Sección detallada" para aprender más sobre cada componente.
+
+### Tipos de preguntas
+XLSForm admite varios tipos de preguntas. Estas son solo algunas de las opciones que puede ingresar en la columna **`type`** en la hoja de trabajo **`survey`** de su XLSForm:
+
+| Tipo de pregunta             | Entrada de respuesta                                                                                 |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| integer                   | Entrada de número entero (es decir, número sin decimales).                                                          |
+| decimal                   | Entrada decimal.                                                                               |
+| range                     | Entrada de [rango](#range) (incluida la calificación)                                                     |
+| text                      | Respuesta de texto libre.                                                                          |
+| select_one [options]      | Pregunta de [opción múltiple](#multiple-choice); solo se puede seleccionar una respuesta.               |
+| select_multiple [options] | Pregunta de [opción múltiple](#multiple-choice); se pueden seleccionar múltiples respuestas.              |
+| select_one_from_file [file]| [Opción múltiple desde archivo](#multiple-choice-from-file); solo se puede seleccionar una respuesta.      |
+| select_multiple_from_file [file]| [Opción múltiple desde archivo](#multiple-choice-from-file); se pueden seleccionar múltiples respuestas.|
+| rank [options]            | Pregunta de [clasificación](#rank); ordene una lista.                                                        |
+| note                      | Muestra una nota en la pantalla, no acepta entrada. Abreviatura de type=text con readonly=true.    |
+| geopoint                  | Recopile una [única coordenada GPS](#gps).                                                     |
+| geotrace                  | Registre una [línea de dos o más coordenadas GPS](#gps).                                                |
+| geoshape                  | Registre un [polígono de múltiples coordenadas GPS](#gps); el último punto es igual al primero. |
+| date                      | Entrada de fecha.                                                                                  |
+| time                      | Entrada de hora.                                                                                  |
+| dateTime                  | Acepta una entrada de fecha y hora.                                                             |
+| image                     | Tome una foto o suba un [archivo de imagen](#image).                                            |
+| audio                     | Realice una grabación de audio o suba un archivo de audio.                                             |
+| background-audio          | El audio se graba en segundo plano mientras se completa el formulario.                                  |
+| video                     | Realice una grabación de video o suba un archivo de video.                                               |
+| file                      | Entrada de archivo genérica (txt, pdf, xls, xlsx, doc, docx, rtf, zip)                                |
+| barcode                   | Escanee un código de barras, requiere que la aplicación de escáner de código de barras esté instalada.                            |
+| calculate                 | Realice un cálculo; consulte la sección de [Cálculo](#calculation) a continuación.                    |
+| acknowledge               | Solicitud de confirmación que establece el valor en "OK" si se selecciona.                                      |
+| hidden                    | Un campo sin elemento de interfaz de usuario asociado que se puede usar para almacenar una constante                  |
+| xml-external              | Agrega una referencia a un archivo de [datos XML externos](#external-xml-data)                         |
+
+### Etiquetas
+
+Las etiquetas son el texto mostrado a los encuestados para cada pregunta. Son cruciales para una comunicación clara en las encuestas.
+
+- **Uso básico**: En la columna `label`, ingrese el texto de la pregunta.
+- **Múltiples idiomas**: Use columnas adicionales como `label::English` y `label::French` para encuestas multilingües.
+- **Formato**: rtSurvey admite formato HTML básico en las etiquetas para énfasis o estructura.
+
+Ejemplo:
+```
+| type | name | label | label::French |
+|------|------|-------|---------------|
+| text | name | ¿Cuál es su nombre? | Quel est votre nom? |
+```
+
+### Sugerencias
+
+Las sugerencias proporcionan orientación adicional a los encuestados sin saturar el texto principal de la pregunta.
+
+- **Uso**: Agregue sugerencias en la columna `hint`.
+- **Visibilidad**: Las sugerencias generalmente se muestran debajo del texto principal de la pregunta.
+- **Multilingüe**: Al igual que las etiquetas, las sugerencias se pueden especificar para múltiples idiomas usando columnas `hint::Language`.
+
+Ejemplo:
+```
+| type | name | label | hint |
+|------|------|-------|------|
+| integer | age | ¿Cuántos años tiene? | Por favor ingrese su edad en años |
+```
+
+### Apariencia
+
+La columna `appearance` en rtSurvey permite personalizar cómo se muestran las preguntas.
+
+- **Opciones estándar**: Incluyen 'multiline' para texto, 'horizontal' para preguntas de selección.
+- **Extensiones de rtSurvey**:
+  - Entrada de hora: Varias opciones de visualización del reloj (p. ej., `inline`, `inline-1line`)
+  - Personalización de color: Use la función `colors()` para cambiar los colores de los iconos
+
+Ejemplo:
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | time | Ingrese la hora | inline-[%H:%M] |
+```
+
+### Relevante
+
+La columna `relevant` implementa la lógica de salto, determinando cuándo debe mostrarse una pregunta.
+
+- **Sintaxis**: Use expresiones XPath para definir condiciones.
+- **Variables**: Haga referencia a otros nombres de preguntas usando `${question_name}`.
+
+Ejemplo:
+```
+| type | name | label | relevant |
+|------|------|-------|----------|
+| text | allergies | Liste las alergias | ${has_allergies} = 'yes' |
+```
+
+### Requerido
+
+La columna `required` especifica si una pregunta debe responderse.
+
+- **Uso básico**: Use 'yes' o 'true' para hacer que una pregunta sea requerida.
+- **Avanzado**: Puede usar expresiones para requerimiento condicional.
+
+Ejemplo:
+```
+| type | name | label | required |
+|------|------|-------|----------|
+| text | email | Correo electrónico | yes |
+```
+
+### Repeticiones
+
+Las repeticiones permiten que un grupo de preguntas se responda múltiples veces.
+
+- **Uso**: Use filas `begin repeat` y `end repeat` para definir un grupo repetitivo.
+- **Nomenclatura**: Dé a cada grupo de repetición un nombre único.
+
+Ejemplo:
+```
+| type | name | label |
+|------|------|-------|
+| begin repeat | household_member | Miembro del hogar |
+| text | member_name | Nombre |
+| integer | member_age | Edad |
+| end repeat | | |
+```
+
+### Medios
+
+rtSurvey admite varios tipos de medios en las encuestas, incluyendo imágenes, audio y video.
+
+- **Tipos de preguntas**: Use 'image', 'audio' o 'video' en la columna type.
+- **Medios en etiquetas**: Haga referencia a archivos multimedia en las etiquetas usando etiquetas HTML.
+
+Ejemplo:
+```
+| type | name | label |
+|------|------|-------|
+| image | house_photo | Tome una foto de la casa |
+| note | | <img src="logo.jpg" /> Bienvenido a la encuesta |
+```
+
+### Solo lectura
+
+Las preguntas de solo lectura muestran información sin permitir la entrada del usuario.
+
+- **Uso**: Agregue 'readonly' a la columna `appearance`.
+- **Cálculos**: A menudo se usa con el tipo calculate para mostrar valores calculados.
+
+Ejemplo:
+```
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | bmi | IMC | readonly | ${weight} / (${height} * ${height}) |
+```
+
+## Extensiones de rtSurvey
+
+rtSurvey amplía el estándar XLSForm al admitir capacidades adicionales como `grid layout`, `html format` y muchos nuevos `widgets`.
+
+### Diseño de cuadrícula
+rtSurvey permite que su formulario imite el aspecto de las encuestas en papel tradicionales al condensar múltiples preguntas en una fila.
+
+### Configuración del formulario
+
+### Configuración de datos
+
+### Estilo Typeform
+
+### Extensión de pulldata()
+
+### Extensiones basadas en apariencia
+
+### Extensiones de Webbox

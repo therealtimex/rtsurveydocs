@@ -1,0 +1,83 @@
+---
+title: "Geavanceerde uitbreidingen"
+description: ""
+---
+
+De kolom `appearance` in rtSurvey stelt u in staat de visuele presentatie en het gedrag van vragen in uw enquêtes aan te passen. Deze functie verbetert de gebruikerservaring en kan de efficiëntie van gegevensverzameling aanzienlijk verbeteren. rtSurvey ondersteunt standaard XLSForm-weergaveattributen en breidt ze uit met aanvullende opties.
+
+## rtSurvey-specifieke weergave-uitbreidingen
+
+rtSurvey breidt de standaard weergaveopties uit met het volgende:
+
+### Aanpassing tijdinvoer
+
+Voor `text`-typevragen gebruikt voor tijdinvoer:
+
+- `appearance:` - Toont een klok voor het selecteren van uren en minuten
+- `appearance: inline` - Toont de klok als een pictogram
+- `appearance: inline-1line` - Toont de klok in een enkelerij-formaat
+- `appearance: inline-onlyresult` - Toont klokpictogram, verdwijnt na selectie
+- `appearance: inline-[FORMAAT]` - Past de weergave van het tijdformaat aan (bijv. `[%H:%M]`, `[%h:%M:%S]`)
+
+### Kleurcustomisatie
+
+rtSurvey maakt kleurcustomisatie mogelijk voor verschillende weergaven:
+
+- `appearance: inline colors("0099FF")` - Past de pictogramkleur aan
+- `appearance: inline-1line colors("0000FF","FFFF00")` - Past kleuren aan in enkelerij-formaat
+
+### Rasterindeling
+
+rtSurvey introduceert een rasterindeling voor compacte, tabelachtige weergaven:
+
+- `appearance: grid` - Past toe op groepen om een rasterindeling te maken
+
+### Inklapbare groepen
+
+- `appearance: collapsible` - Maakt uitvouwbare/inklapbare groepen
+
+## Aanbevolen werkwijzen voor het gebruik van weergave
+
+1. **Consistentie**: Gebruik weergaveattributen consistent door uw enquête voor een uniforme uitstraling.
+2. **Mobiel vs. Web**: Overweeg hoe weergaven worden weergegeven op verschillende apparaten en platforms.
+3. **Prestaties**: Wees voorzichtig met weergaveattributen die het laden van formulieren kunnen vertragen (bijv. `table-list` voor grote groepen).
+4. **Gebruikerservaring**: Kies weergaven die gegevensinvoer gemakkelijker en intuïtiever maken voor respondenten.
+5. **Testen**: Test uw formulier altijd op doelappara ten om te controleren of weergaven werken zoals verwacht.
+
+## Geavanceerde technieken
+
+### Weergaven combineren
+
+Sommige weergaveattributen kunnen worden gecombineerd voor complexere indelingen:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Selecteer één: | minimal compact |
+```
+
+### Dynamische weergaven
+
+rtSurvey maakt dynamische weergavewijzigingen mogelijk op basis van formulierlogica:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Voer tijd in: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Overwegingen voor de mobiele app
+
+- Sommige weergaven (bijv. `quick`, `signature`) zijn specifiek voor mobiele apparaten.
+- Test grondig op zowel Android als iOS om consistent gedrag te waarborgen.
+
+## Bekende beperkingen
+
+- Complexe weergaven worden mogelijk niet identiek weergegeven op alle platforms.
+- Sommige geavanceerde rtSurvey-weergaven worden mogelijk niet ondersteund in de offlinemodus.
+
+## Weergaveproblemen oplossen
+
+1. **Weergave niet toegepast**: Controleer op typfouten in de weergavekolom.
+2. **Inconsistente weergave**: Verifieer compatibiliteit met het vraagtype en het platform.
+3. **Prestatieproblemen**: Overweeg het vereenvoudigen van complexe weergaven, met name voor grote enquêtes.

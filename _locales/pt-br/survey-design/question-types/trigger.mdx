@@ -1,0 +1,91 @@
+---
+title: "Trigger / Acknowledge"
+description: "As perguntas trigger exibem uma declaração que o entrevistador deve reconhecer explicitamente antes de continuar."
+---
+
+O tipo de pergunta `trigger` (também chamado de `acknowledge`) exibe uma **declaração com uma caixa de seleção**. O entrevistador deve marcar a caixa de seleção para confirmar que leu e entendeu a declaração antes que o formulário permita que ele continue. Nenhum valor de dado é armazenado — apenas se a caixa de seleção foi marcada.
+
+## Especificação básica do XLSForm
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | O respondente forneceu consentimento informado verbal. |
+
+Ou usando o alias `acknowledge`:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | O respondente forneceu consentimento informado verbal. |
+
+Tanto `trigger` quanto `acknowledge` são equivalentes — use o que a sua plataforma documenta.
+
+## Usos
+
+As perguntas trigger/acknowledge são comumente usadas para:
+
+1. **Consentimento informado** — confirmar que o entrevistador obteve consentimento antes de registrar dados sensíveis
+2. **Alertas suaves** — avisar sobre um valor incomum e exigir confirmação explícita antes de prosseguir
+3. **Itens de lista de verificação** — confirmar que uma observação física foi concluída (por exemplo, "Observei diretamente a fonte de água")
+4. **Instruções** — forçar o entrevistador a reconhecer uma instrução de nível de seção antes de continuar
+5. **Verificações de qualidade** — sinalizar valores discrepantes e exigir que o entrevistador os verifique
+
+## Exemplo de uso
+
+### Reconhecimento de consentimento
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | O respondente deu consentimento informado verbal para participar desta pesquisa. | yes |
+
+### Alerta suave para valores discrepantes
+
+Usado junto com uma expressão `relevant` para mostrar o trigger apenas quando um valor suspeito é inserido:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Número de filhos | | |
+| trigger | children_confirm | Você inseriu `${children}` filhos. Por favor, verifique com o respondente e toque em OK para confirmar. | `${children} > 10` | `${children} > 10` |
+
+### Reconhecimento de instrução no início da seção
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Seção B: Uso da Terra Agrícola. Faça todas as perguntas desta seção apenas ao chefe do domicílio. |
+
+## Tornando o trigger obrigatório
+
+Adicione `required: yes` para evitar avançar até que a caixa seja marcada:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | Todo o equipamento de segurança está presente e funcional. | yes | Você deve confirmar antes de prosseguir. |
+
+## Exibição condicional
+
+Mostre o trigger apenas quando uma condição for atendida:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | O domicílio tem um poço? | |
+| trigger | well_observation | Confirme que você observou diretamente a condição do poço. | `${has_well} = 'yes'` |
+
+## Diferença de `note`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Exibe texto | Sim | Sim |
+| Requer interação | Não | Sim (deve marcar) |
+| Armazena dados | Não | Não (apenas OK/marcado) |
+| Pode bloquear progresso | Não | Sim (com `required`) |
+
+## Práticas recomendadas
+
+1. Mantenha os rótulos do trigger concisos e orientados para ação — o entrevistador deve ser capaz de ler e confirmar em segundos.
+2. Sempre adicione `required: yes` quando o reconhecimento for obrigatório.
+3. Use triggers para consentimento e verificações de segurança onde você precisa de uma trilha de auditoria de que o entrevistador confirmou.
+4. Combine com `relevant` para alertas suaves condicionais para que o trigger apareça apenas quando um valor precisar de verificação.
+
+## Limitações
+
+- Os campos trigger não armazenam um valor de dados significativo — eles apenas registram que a caixa foi marcada.
+- O widget trigger é renderizado como uma caixa de seleção/botão simples na maioria dos clientes; não é uma assinatura eletrônica completa.

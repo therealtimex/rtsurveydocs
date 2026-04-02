@@ -1,0 +1,64 @@
+---
+title: "Primeiro início de sessão"
+description: "Como iniciar sessão na sua instância rtSurvey pela primeira vez após a implementação."
+---
+
+> **O SSL tem de ser configurado antes de iniciar sessão.** Se aceder à aplicação via HTTP, verá um aviso de segurança e o SSO será bloqueado. Complete primeiro a [Configuração de SSL](ssl-setup).
+
+Depois de o SSL estar ativo, abra o seu browser no URL HTTPS:
+
+```
+https://your-domain.com
+```
+
+---
+
+## O ecrã de início de sessão
+
+
+
+A página de início de sessão mostra:
+
+- Campos de **Nome de utilizador** e **Palavra-passe**
+- Um botão **Iniciar sessão**
+- Um botão **Iniciar sessão com SSO** (abaixo de um separador) — para membros da equipa com contas SSO
+
+---
+
+## Credenciais de administrador predefinidas
+
+Introduza as credenciais predefinidas e clique em **Iniciar sessão**:
+
+| Campo | Valor |
+|-------|-------|
+| Nome de utilizador | `admin` |
+| Palavra-passe | `admin` |
+
+> **Altere a sua palavra-passe imediatamente após o primeiro início de sessão.**
+
+---
+
+## Se vir um aviso de segurança
+
+Se aceder à aplicação via HTTP (antes de o SSL estar configurado), verá:
+
+- Um banner de aviso amarelo no topo da página de início de sessão
+- Um modal ao clicar em **Iniciar sessão**, avisando que as credenciais serão enviadas sem encriptação
+
+
+
+
+Clique em **Configurar SSL** para configurar HTTPS, ou em **Continuar mesmo assim** para iniciar sessão sem SSL (não recomendado).
+
+O início de sessão SSO está completamente bloqueado via HTTP — clicar em **Iniciar sessão com SSO** mostrará um aviso em vez de redirecionar.
+
+---
+
+## Após o início de sessão
+
+Depois de entrar, chegará ao painel de controlo. Daqui:
+
+1. **Alterar a palavra-passe do administrador** — definições de conta → alterar palavra-passe
+2. **Criar o primeiro projeto** — Projetos → Novo projeto
+3. **Carregar ou criar um formulário** — Formulários → Carregar XLSForm ou abrir Form Builder
+4. **Adicionar utilizadores** — Utilizadores → Convidar ou criar contas para a sua equipa

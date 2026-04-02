@@ -1,0 +1,54 @@
+---
+title: "Geotrace"
+description: "Geotracefrågor gör det möjligt för respondenter att fånga en serie sammankopplade punkter på en karta och skapa linjer eller vägar som en del av undersökningen."
+---
+
+Frågtypen geotrace i XLSForms och rtSurvey gör det möjligt för respondenter att fånga en serie sammankopplade punkter på en karta och skapa linjer eller vägar. Den här funktionen är särskilt användbar för att kartlägga rutter, gränser eller linjära objekt i rumsliga undersökningar.
+
+## Grundläggande XLSForm-specifikation
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geotrace | river_path  | Spåra flodens förlopp          |
+
+För mer detaljer om grundläggande frågtypen geotrace, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+
+## Användningsområden
+
+Geotracefrågor används vanligtvis för:
+
+1. Kartlägga rutter eller vägar under fältundersökningar
+2. Spåra linjära objekt som vägar, floder eller gränser
+3. Fånga utbredningen av linjär infrastruktur (t.ex. rörledningar, kraftledningar)
+4. Registrera resrutter i transportstudier
+5. Definiera transekter i ekologiska undersökningar
+
+## Bästa praxis
+
+1. Se till att enheten har platstjänster aktiverade och behörigheter beviljade.
+2. Ge tydliga instruktioner om hur man spårar vägen och vilka objekt som ska inkluderas.
+3. Överväg att använda satellitbilder eller grundkartor för att hjälpa respondenter att spåra vägar korrekt.
+4. Var uppmärksam på den potentiella komplexiteten hos spår och deras påverkan på datastorlek och bearbetning.
+
+## Exempelanvändning
+
+Här är ett exempel på hur du kan använda en geotracefråga i en undersökning:
+
+| type     | name           | label                                      | hint                                              |
+|----------|----------------|--------------------------------------------|----------------------------------------------------|
+| geotrace | hiking_trail   | Spåra vandringsleden                       | Börja vid startpunkten och avsluta vid toppen      |
+
+## Dataformat
+
+Geotrace-data lagras vanligtvis som en sträng med mellanslagsseparerade koordinatpar, liknande geoshape men utan avslutningspunkten:
+
+```
+lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
+```
+
+## Begränsningar
+
+- Att spåra exakta vägar på små mobilskärmar kan vara utmanande.
+- Komplexa spår kan kräva betydande lagrings- och bearbetningskapacitet.
+- Kontinuerlig GPS-användning för automatiskt spårande kan snabbt tömma enhetens batteri.
+- Det kan finnas integritetsfrågor förknippade med insamling av detaljerade vägdata.

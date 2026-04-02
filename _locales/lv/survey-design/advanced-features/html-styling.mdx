@@ -1,0 +1,58 @@
+---
+title: "HTML stils"
+description: "rtSurvey atbalsta HTML tagus etiķetēs un norādēs, ļaujot bagātīgu teksta formatēšanu, saites un dinamisko krāsu tematiku."
+---
+
+import { Callout } from 'nextra/components'
+
+rtSurvey renderē **etiķešu** un **norāžu** tekstu kā HTML tīmekļa formās. Tas nozīmē, ka varat izmantot standarta HTML tagus, lai formatētu tekstu, pievienotu rindiņu pārtraukumus, izveidotu saites un piemērotu krāsas. Tas ir īpaši noderīgi piezīmju laukiem, sadaļu norādījumiem un dinamiskiem kopsavilkumiem.
+
+<Callout type="warning">
+HTML etiķetēs tiek renderēts **tīmekļa formā** un rtSurvey mobilajās lietotnēs. Tas var netikt renderēts visos ODK saderīgajos klientos. Vienmēr pārbaudiet mērķa platformā.
+</Callout>
+
+## Atbalstītie HTML tagi
+
+| Tags | Mērķis |
+|------|---------|
+| `<b>`, `<strong>` | Treknraksts |
+| `<i>`, `<em>` | Slīpraksts |
+| `<u>` | Pasvītrojums |
+| `<br>` | Rindiņas pārtraukums |
+| `<a href="...">` | Hipersaite |
+| `<span style="color:...">` | Teksta krāsa |
+| `<img src="...">` | Iegulti attēli |
+| `<ul>`, `<li>` | Nesakārtots saraksts |
+| `<ol>`, `<li>` | Sakārtots saraksts |
+
+## Piemēri
+
+### Treknraksts un krāsa
+
+```html
+<b>Svarīgi:</b> Lūdzu, atbildiet uz visiem obligātajiem jautājumiem.
+```
+
+### Dinamiska vērtību parādīšana
+
+```html
+Jūsu aprēķinātais BMI ir <b>${bmi}</b>. 
+<span style="color: red;">Lūdzu pārbaudiet šo vērtību.</span>
+```
+
+### Instrukcijas ar sarakstu
+
+```html
+Pirms turpināšanas, lūdzu:<br>
+<ul>
+<li>Verificējiet respondenta identitāti</li>
+<li>Paskaidrojiet aptaujas mērķi</li>
+<li>Iegūstiet mutvārdu piekrišanu</li>
+</ul>
+```
+
+## Labākā prakse
+
+1. Izvairieties no sarežģīta HTML, kas var nekonsekventi renderēties.
+2. Pārbaudiet HTML etiķetes tīmekļa formā pirms izvietošanas.
+3. Izmantojiet `<br>` rindiņu pārtraukumiem, nevis jaunas rindas.

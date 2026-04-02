@@ -1,0 +1,56 @@
+---
+title: "Barcode"
+description: "Le domande barcode permettono la scansione e l'acquisizione di dati barcode nel sondaggio."
+---
+
+Il tipo di domanda barcode negli XLSForm e in rtSurvey consente agli utenti di scansionare e acquisire dati barcode direttamente all'interno del sondaggio. Questa funzionalità è particolarmente utile per la gestione dell'inventario, il tracciamento dei prodotti, o qualsiasi scenario in cui sia necessaria un'immissione rapida e accurata di informazioni codificate.
+
+## Specifica XLSForm di base
+
+| type    | name          | label                   |
+|---------|---------------|-------------------------|
+| barcode | product_code  | Scansiona il codice a barre del prodotto|
+
+Per ulteriori dettagli sul tipo di domanda barcode di base, vedere la [specifica XLSForm](https://xlsform.org/en/#question-types).
+
+## Utilizzi
+
+Le domande barcode sono comunemente usate per:
+
+1. Identificazione dei prodotti nei sondaggi di inventario
+2. Tracciamento delle risorse nelle operazioni sul campo
+3. Verifica di biglietti o ID agli eventi
+4. Immissione rapida di dati per informazioni codificate
+
+## Estensioni rtSurvey
+
+Mentre la specifica XLSForm di base per le domande barcode è semplice, rtSurvey può offrire funzionalità o personalizzazioni aggiuntive. Queste potrebbero includere:
+
+1. Supporto per più formati di barcode (es. codici QR, UPC, EAN)
+2. Integrazione con la fotocamera del dispositivo per la scansione di barcode
+3. Opzione di inserimento manuale nel caso in cui il barcode sia danneggiato o non possa essere scansionato
+
+## Best practice
+
+1. Assicurarsi di avere condizioni di illuminazione adeguate per una scansione accurata del barcode.
+2. Fornire istruzioni chiare agli utenti su come posizionare il dispositivo per la scansione.
+3. Includere un'opzione di inserimento manuale come fallback in caso di difficoltà di scansione.
+4. Testare la funzionalità di scansione del barcode con vari dispositivi e tipi di barcode prima di distribuire il sondaggio.
+
+## Limitazioni
+
+- L'accuratezza della scansione del barcode può variare a seconda della qualità della fotocamera del dispositivo e delle condizioni ambientali.
+- Alcuni dispositivi più vecchi o di fascia bassa potrebbero non supportare la scansione di barcode.
+- Determinati tipi di barcode potrebbero non essere supportati, a seconda dell'implementazione.
+
+## Esempio di utilizzo
+
+Ecco un esempio di come potresti utilizzare una domanda barcode in un sondaggio di inventario:
+
+| type    | name          | label                   | hint                                      |
+|---------|---------------|-------------------------|-------------------------------------------|
+| barcode | product_code  | Scansiona il codice a barre del prodotto| Posiziona il barcode all'interno del riquadro     |
+| integer | quantity      | Inserisci la quantità del prodotto  |                                           |
+| note    | confirmation  | Prodotto scansionato: `${product_code}`. Quantità: `${quantity}` |           |
+
+In questo esempio, il sondaggio acquisisce il barcode di un prodotto, chiede la quantità e poi mostra una nota di conferma con le informazioni scansionate.

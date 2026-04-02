@@ -1,0 +1,106 @@
+---
+title: "Sunucuya Bağlanma"
+description: "rtSurvey mobil uygulamasını proje sunucunuza nasıl bağlayacağınızı, role özgü işlevlere nasıl erişeceğinizi ve birden fazla proje üzerinde anket çalışmalarına nasıl başlayacağınızı öğrenin."
+---
+
+rtSurvey uygulamasını bir sunucuya bağlamak, uygulamayı veri toplama, yönetim ve analiz için kullanmaya başlamanın kritik bir adımıdır. Bu süreç, tüm anket rollerinin gerekli işlevlere ve verilere gerçek zamanlı olarak erişebilmesini sağlar.
+
+## ODK Collect ile Temel Farklar
+
+rtSurvey, çeşitli anket rollerine hitap ederek ODK Collect'e kıyasla gelişmiş işlevler sunar:
+- **Yönetici**: Mesajlaşma, güncelleme bildirimleri (veri gönderimi, yeni raporlar, yeni hesaplar), form doldurma ve analiz raporlarını görüntüleme.
+- **Proje Yöneticisi**: Proje kurulum ve yönetimi dahil yöneticilere benzer işlevler.
+- **Anket Tasarımcısı**: Mesajlaşma, bildirimler, form doldurma ve analiz raporlarını görüntüleme.
+- **Saha Sayımcısı**: Form doldurma, mesajlaşma, bildirimler ve ilerleme raporları.
+- **Veri Analisti**: Mesajlaşma, bildirimler ve analitik raporlara erişim.
+
+## rtSurvey Uygulamasını Sunucuya Bağlama Adımları
+
+### 1. Hesabınız Olduğundan Emin Olun
+
+Sunucuya bağlanmak için bir hesaba ihtiyacınız var. Hesaplar bir Yönetici tarafından veya Yönetici tarafından oluşturulan bir hesap oluşturma URL'si aracılığıyla personel tarafından oluşturulabilir.
+
+### 2. rtSurvey Uygulamasını Açın
+
+Mobil cihazınızda rtSurvey uygulamasını başlatın. Henüz yüklemediyseniz, [rtSurvey Uygulamasını Yükleme](#installing-rtsurvey-app) sayfasına bakın.
+
+### 3. Sunucu Bağlantı Ayarlarına Erişin
+
+1. Uygulamayı açın ve ayarlar menüsüne gidin.
+2. Bir sunucuya bağlanma seçeneğini belirleyin.
+
+### 4. Hesap Ayrıntılarını Girin ve Proje Seçin
+
+rtSurvey'e bağlanırken süreç, hesap yapılandırmanıza göre kolaylaştırılmıştır:
+
+- **Kullanıcı Adı**: Hesap kullanıcı adınızı girin.
+- **Şifre**: Hesap şifrenizi girin.
+
+Kimlik bilgilerinizi girdikten sonra:
+
+- Hesabınız yalnızca bir anket projesiyle ilişkilendirilmişse:
+  - Uygulama sizi otomatik olarak o projenin sunucusuna bağlar.
+  - Bir sunucu URL'si girmenize veya manuel olarak bir proje seçmenize gerek yoktur.
+
+- Hesabınız birden fazla anket projesiyle ilişkilendirilmişse:
+  - Başarılı kimlik doğrulamanın ardından, erişiminizin olduğu projelerin listesini göreceksiniz.
+  - Bu listeden çalışmak istediğiniz projeyi seçin.
+
+### 5. Kimlik Doğrulama
+
+Sunucu ayrıntılarını girdikten sonra "Bağlan" veya "Giriş Yap" düğmesine dokunun. Uygulama kimlik bilgilerinizi doğrulayacak ve sunucuyla bağlantı kuracaktır.
+
+```mermaid
+flowchart TD
+    A["📱 rtSurvey Uygulamasını Başlat"] --> B["🔑 Kullanıcı Adı<br>ve Şifre Gir"]
+    style A fill:#4CAF50,stroke:#666666,stroke-width:3px,color:white
+    style B fill:#2196F3,stroke:#666666,stroke-width:3px,color:white
+
+    B --> C{"🌳 Birden fazla<br>proje?"}
+    style C fill:#FFC107,stroke:#666666,stroke-width:3px,color:black
+
+    C -->|Evet| D["📋 Proje listesini<br>görüntüle"]
+    C -->|Hayır| E["🔄 Tek projeye<br>otomatik bağlan"]
+    style D fill:#FF9800,stroke:#666666,stroke-width:3px,color:white
+    style E fill:#009688,stroke:#666666,stroke-width:3px,color:white
+
+    D --> F["👆 Kullanıcı bir<br>proje seçer"]
+    style F fill:#FF5722,stroke:#666666,stroke-width:3px,color:white
+
+    E --> G["☁️ Sunucuya bağlan"]
+    F --> G
+    style G fill:#3F51B5,stroke:#666666,stroke-width:3px,color:white
+    G --> H["👥 Role özgü<br>işlevlere eriş"]
+    style H fill:#9C27B0,stroke:#666666,stroke-width:3px,color:white
+
+    H --> I["👨‍💼 Yönetici/<br>Proje Yöneticisi"]
+    H --> J["🎨 Anket Tasarımcısı"]
+    H --> K["📝 Saha Sayımcısı"]
+    H --> L["📊 Veri Analisti"]
+    style I fill:#E91E63,stroke:#666666,stroke-width:3px,color:white
+    style J fill:#795548,stroke:#666666,stroke-width:3px,color:white
+    style K fill:#607D8B,stroke:#666666,stroke-width:3px,color:white
+    style L fill:#8BC34A,stroke:#666666,stroke-width:3px,color:white
+
+    I --> M["💬 Mesajlaşma<br>🔔 Bildirimler<br>📄 Form Doldurma<br>📈 Raporları Görüntüleme"]
+    J --> N["💬 Mesajlaşma<br>🔔 Bildirimler<br>🧪 Form Testi<br>📈 Raporları Görüntüleme"]
+    K --> O["📝 Form Doldurma<br>💬 Mesajlaşma<br>🔔 Bildirimler<br>📊 İlerleme Raporları"]
+    L --> P["💬 Mesajlaşma<br>🔔 Bildirimler<br>📊 Analitik Raporlar"]
+    style M fill:#FF4081,stroke:#666666,stroke-width:3px,color:white
+    style N fill:#9E9E9E,stroke:#666666,stroke-width:3px,color:white
+    style O fill:#00BCD4,stroke:#666666,stroke-width:3px,color:white
+    style P fill:#CDDC39,stroke:#666666,stroke-width:3px,color:white
+```
+
+## Bağlantı Sorunlarını Giderme
+
+Sunucuya bağlanırken sorunlarla karşılaşırsanız:
+
+1. **İnternet Bağlantısını Kontrol Edin**: Cihazınızın internete bağlı olduğundan emin olun.
+2. **Kimlik Bilgilerini Doğrulayın**: Kullanıcı adı ve şifrenizin doğru olduğundan emin olun.
+3. **Uygulamayı Yeniden Başlatın**: rtSurvey uygulamasını kapatın ve yeniden açın.
+4. **Destek ile İletişime Geçin**: Sorunlar devam ederse, sistem yöneticinizle veya rtSurvey desteğiyle iletişime geçin.
+
+## Sonuç
+
+rtSurvey uygulamasını bir sunucuya bağlamak, uygulamanın tam kapasitesinden yararlanmanızı sağlayan basit bir süreçtir. Yukarıda özetlenen adımları izleyerek, belirli anket rolünüze göre uyarlanmış kesintisiz veri toplama, yönetim ve analizi sağlayabilirsiniz.
