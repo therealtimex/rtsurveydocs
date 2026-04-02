@@ -10,7 +10,7 @@
 import { execSync } from 'child_process';
 import {
   existsSync, mkdirSync, rmSync, readdirSync, copyFileSync,
-  renameSync, statSync
+  statSync
 } from 'fs';
 import { join, resolve } from 'path';
 import { fileURLToPath } from 'url';
@@ -35,6 +35,7 @@ function run(cmd) {
   execSync(cmd, { cwd: ROOT, stdio: 'inherit' });
 }
 
+// Copy directory recursively
 function copyDir(src, dest) {
   if (!existsSync(dest)) mkdirSync(dest, { recursive: true });
   for (const entry of readdirSync(src)) {
@@ -43,6 +44,12 @@ function copyDir(src, dest) {
     if (statSync(s).isDirectory()) copyDir(s, d);
     else copyFileSync(s, d);
   }
+}
+
+// Move directory (copy + delete) — works across filesystem boundaries in Docker
+function moveDir(src, dest) {
+  copyDir(src, dest);
+  rmSync(src, { recursive: true, force: true });
 }
 
 // Locale build: swap pages/{locale}/ to pages/ root, build with basePath, restore
@@ -61,20 +68,21 @@ async function buildLocale(locale) {
   const ENGLISH_DIRS = ['getting-started','deployment','survey-design','platform-interfaces'];
   const ENGLISH_FILES = ['index.mdx','contact.mdx','support.mdx','sponsor.mdx','_meta.json'];
 
-  // Stash English root structure
+  // Stash English root structure (copy+delete to handle Docker overlay fs)
   for (const d of ENGLISH_DIRS) {
     const p = join(PAGES, d);
-    if (existsSync(p)) renameSync(p, join(STASH, `en_${d}`));
+    if (existsSync(p)) moveDir(p, join(STASH, `en_${d}`));
   }
   for (const f of ENGLISH_FILES) {
     const p = join(PAGES, f);
-    if (existsSync(p)) renameSync(p, join(STASH, `en_${f}`));
+    if (existsSync(p)) {
+      copyFileSync(p, join(STASH, `en_${f}`));
+      rmSync(p);
+    }
   }
 
   // Copy locale content to pages root (copy, not move — source stays in _locales/)
-  for (const entry of readdirSync(localeDir)) {
-    renameSync(join(localeDir, entry), join(PAGES, entry));
-  }
+  copyDir(localeDir, PAGES);
 
   if (existsSync(OUT)) rmSync(OUT, { recursive: true, force: true });
 
@@ -88,6 +96,7 @@ async function buildLocale(locale) {
 
   // Restore: move pages root entries back to _locales/{locale}/
   const SKIP_RESTORE = new Set([
+    locale,
     'node_modules','.next','out','.build-stash','combined','_locales','scripts',
     'public','content','layouts','assets','static','data','i18n',
     'exampleSite','resources','images',
@@ -100,17 +109,20 @@ async function buildLocale(locale) {
     if (SKIP_RESTORE.has(entry) || entry.startsWith('.')) continue;
     const ext = entry.includes('.') ? entry.substring(entry.lastIndexOf('.')) : '';
     if (SKIP_EXTENSIONS.has(ext) || SKIP_FILES.has(entry)) continue;
-    renameSync(join(PAGES, entry), join(localeDir, entry));
+    moveDir(join(PAGES, entry), join(localeDir, entry));
   }
 
   // Restore English root
   for (const d of ENGLISH_DIRS) {
     const stashed = join(STASH, `en_${d}`);
-    if (existsSync(stashed)) renameSync(stashed, join(PAGES, d));
+    if (existsSync(stashed)) moveDir(stashed, join(PAGES, d));
   }
   for (const f of ENGLISH_FILES) {
     const stashed = join(STASH, `en_${f}`);
-    if (existsSync(stashed)) renameSync(stashed, join(PAGES, f));
+    if (existsSync(stashed)) {
+      copyFileSync(stashed, join(PAGES, f));
+      rmSync(stashed);
+    }
   }
 
   rmSync(STASH, { recursive: true, force: true });
