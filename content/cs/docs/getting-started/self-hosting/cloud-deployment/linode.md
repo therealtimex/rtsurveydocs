@@ -7,48 +7,48 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Nasaďte rtCloud na Linode pomocí StackScriptu. Není potřeba žádná konfigurace — stačí vytvořit server a postupovat podle kroků po nasazení."
+description: "Nasaďte rtCloud na Linode pomocí skriptu StackScript. Není potřeba žádná konfigurace – stačí vytvořit server a postupovat podle kroků po nasazení."
 ---
 
-## Step 1 — Launch the StackScript
+## Krok 1 — Spusťte StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Tím se otevře stránka StackScript v Linode Cloud Manager. Klikněte na **Nasadit nový Linode**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Krok 2 — Vyplňte formulář Linode
 
-Fill in Linode's standard server creation form:
+Vyplňte standardní formulář pro vytvoření serveru Linode:
 
-| Field | Recommended value |
+| Pole | Doporučená hodnota |
 |-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| **Obrázek** | Ubuntu 22.04 LTS |
+| **Region** | Nejblíže vašim uživatelům |
+| **Plán** | Sdílený CPU 4 GB nebo větší |
+| **Heslo root** | Nastavte silné heslo |
+| **Časové pásmo** *(naše jediné pole)* | Vaše časové pásmo serveru (výchozí: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+Po dokončení klikněte na **Vytvořit Linode**.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Krok 3 — Počkejte na dokončení nastavení
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Skript se automaticky spustí při prvním spuštění. Nainstaluje Docker, stáhne obraz rtSurvey, inicializuje databázi a spustí všechny služby. To trvá **5–10 minut**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Průběh můžete sledovat přímo v **Linode Cloud Manager** — není potřeba SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Klikněte na svůj nově vytvořený Linode
+3. Klikněte na **Spustit konzolu LISH** (vpravo nahoře na stránce podrobností Linode)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Otevře se terminál prohlížeče a zobrazí se živý protokol spouštění – karta **Weblish** funguje přímo ve vašem prohlížeči, není potřeba žádný klient SSH.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Počkejte, až uvidíte:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Protokol také zobrazuje IP adresu vašeho serveru – budete ji potřebovat pro další krok.
 
 ---
 
-## Step 4 — Set up SSL
+## Krok 4 — Nastavte SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Při konfiguraci HTTPS postupujte podle **[Průvodce nastavením SSL →](../ssl-setup)**. Bezplatná subdoména **rtsurvey.com** je nejrychlejší možností – není potřeba žádné nastavení DNS.
 
 ---
 
-## Step 5 — First login
+## Krok 5 — První přihlášení
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Jakmile je SSL aktivní, postupujte podle **[Průvodce prvním přihlášením →](../first-login)** pro přístup k účtu správce.
 
 ---
 
-## Step 6 — Change the default password
+## Krok 6 — Změňte výchozí heslo
 
-All passwords default to `admin`. Change them immediately after your first login:
+Výchozí nastavení všech hesel je `admin`. Změňte je ihned po prvním přihlášení:
 
-- **App admin password** — account settings inside the app
+- **Heslo správce aplikace** – nastavení účtu v aplikaci
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## Pravidla firewallu (Linode Cloud Firewall)
+## Pravidla brány firewall (Linode Cloud Firewall)
 
 Pokud k tomuto serveru připojíte Linode Cloud Firewall, použijte následující pravidla:
 
-### Příchozí provoz (Inbound)
+### Příchozí
 
-| Označení | Akce | Protokol | Port | Zdroje | Poznámky |
-|---------|------|---------|------|--------|--------|
-| `accept-inbound-ssh` | Přijmout | TCP | 22 | All IPv4, All IPv6 | Přístup SSH |
-| `accept-inbound-http` | Přijmout | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME výzva) |
-| `accept-inbound-https` | Přijmout | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS po konfiguraci SSL) |
-| `accept-inbound-shiny` | Přijmout | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytika) |
-| `accept-inbound-icmp` | Přijmout | ICMP | — | All IPv4, All IPv6 | Ping / diagnostika |
-| Výchozí příchozí politika | **Zahodit** | | | | Blokovat vše ostatní |
+| Štítek | Akce | Protokol | Přístav | Zdroje | Poznámky |
+|-------|--------|----------|------|---------|-------|
+| `accept-inbound-ssh` | Přijmout | TCP | 22 | Všechny IPv4, všechny IPv6 | SSH přístup |
+| `accept-inbound-http` | Přijmout | TCP | 80 | Všechny IPv4, všechny IPv6 | Nginx (výzva HTTP + ACME) |
+| `přijmout-příchozí-https` | Přijmout | TCP | 443 | Všechny IPv4, všechny IPv6 | Nginx (HTTPS po nastavení SSL) |
+| `přijmout-příchozí-lesklý` | Přijmout | TCP | 3838 | Všechny IPv4, všechny IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Přijmout | ICMP | — | Všechny IPv4, všechny IPv6 | Ping / diagnostika |
+| Výchozí zásady pro příchozí hovory | **Drop** | | | | Blokovat vše ostatní |
 
-### Odchozí provoz (Outbound)
+### Odchozí
 
-| Označení | Akce | Poznámky |
-|---------|------|--------|
-| Výchozí odchozí politika | **Přijmout** | Povolit veškerý odchozí provoz (Docker, certbot, GoDaddy API atd.) |
+| Štítek | Akce | Poznámky |
+|-------|--------|-------|
+| Výchozí odchozí politika | **Přijmout** | Povolit všechny odchozí (Docker pulls, certbot, GoDaddy API atd.) |
 
-### Porty nepotřebné externally
+### Porty nejsou potřeba externě
 
-Tyto porty jsou vázány pouze na `127.0.0.1` a nikdy nejsou dostupné zvenčí:
+Tyto porty jsou vázány pouze na `127.0.0.1` a nejsou nikdy dosažitelné zvenčí serveru:
 
-| Port | Služba | Důvod |
-|------|--------|-------|
-| 8080 | App kontejner | Nginx interně proxuje |
-| 8090 | Keycloak kontejner | Nginx interně proxuje |
-| 3306 | MySQL | Pouze interní Docker síť |
+| Přístav | Služba | Důvod |
+|------|---------|--------|
+| 8080 | Kontejner aplikace | Nginx k němu interně proxy |
+| 8090 | Nádoba na klíčenky | Nginx k němu interně proxy |
+| 3306 | MySQL | Pouze interní síť Docker |
 
 ---
 
-## Troubleshooting
+## Odstraňování problémů
 
-### Check the setup log
+### Zkontrolujte protokol nastavení
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Zkontrolujte protokol SSL
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Zobrazit stav kontejneru
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

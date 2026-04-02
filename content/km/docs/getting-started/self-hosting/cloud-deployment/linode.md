@@ -7,48 +7,48 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "ដំឡើង rtCloud នៅ Linode ដោយប្រើ StackScript។ មិនត្រូវការការកំណត់រចនាសម្ព័ន្ធ — គ្រាន់តែបង្កើតម៉ាស៊ីនបម្រើ ហើយធ្វើតាមជំហានក្រោយការដំឡើង។"
+description: "ដាក់ពង្រាយ rtCloud នៅលើ Linode ដោយប្រើ StackScript ។ មិនត្រូវការការកំណត់រចនាសម្ព័ន្ធទេ គ្រាន់តែបង្កើតម៉ាស៊ីនមេ ហើយធ្វើតាមជំហានក្រោយការដាក់ឱ្យប្រើប្រាស់។"
 ---
 
-## Step 1 — Launch the StackScript
+## ជំហានទី 1 — ចាប់ផ្ដើម StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+វាបើកទំព័រ StackScript នៅក្នុង Linode Cloud Manager ។ ចុច ** ដាក់ពង្រាយ Linode ថ្មី ** ។
 
 ---
 
-## Step 2 — Fill in Linode's form
+## ជំហានទី 2 — បំពេញទម្រង់របស់ Linode
 
-Fill in Linode's standard server creation form:
+បំពេញទម្រង់បង្កើតម៉ាស៊ីនមេស្តង់ដាររបស់ Linode៖
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| វាល | តម្លៃដែលបានណែនាំ |
+|--------|------------------|
+| **រូបភាព** | អ៊ូប៊ុនទូ 22.04 LTS |
+| **តំបន់** | នៅជិតអ្នកប្រើប្រាស់របស់អ្នកបំផុត |
+| **ផែនការ** | ស៊ីភីយូដែលបានចែករំលែក 4 GB ឬធំជាងនេះ |
+| **Root Password** | កំណត់ពាក្យសម្ងាត់ខ្លាំង |
+| ** តំបន់ពេលវេលា ** * (វាលតែមួយគត់របស់យើង)* | តំបន់ពេលវេលាម៉ាស៊ីនមេរបស់អ្នក (លំនាំដើម៖ `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+ចុច ** បង្កើត Linode ** នៅពេលរួចរាល់។
 
 ---
 
-## Step 3 — Wait for setup to complete
+## ជំហានទី 3 — រង់ចាំការដំឡើងដើម្បីបញ្ចប់
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+ស្គ្រីបដំណើរការដោយស្វ័យប្រវត្តិនៅពេលចាប់ផ្ដើមដំបូង។ វាដំឡើង Docker ទាញរូបភាព rtSurvey ចាប់ផ្តើមមូលដ្ឋានទិន្នន័យ និងចាប់ផ្តើមសេវាកម្មទាំងអស់។ វាចំណាយពេល ** 5-10 នាទី ** ។
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+អ្នកអាចមើលវឌ្ឍនភាពដោយផ្ទាល់នៅក្នុង **កម្មវិធីគ្រប់គ្រងពពក Linode** — មិនត្រូវការ SSH៖
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. ចុចលើ Linode ដែលទើបបង្កើតថ្មីរបស់អ្នក។
+3. ចុច **បើក LISH Console** (ផ្នែកខាងលើខាងស្តាំនៃទំព័រព័ត៌មានលម្អិត Linode)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+ស្ថានីយកម្មវិធីរុករកតាមអ៊ីនធឺណិតបើកបង្ហាញកំណត់ហេតុចាប់ផ្ដើមផ្ទាល់ — ផ្ទាំង **Weblish** ដំណើរការដោយផ្ទាល់នៅក្នុងកម្មវិធីរុករកតាមអ៊ីនធឺណិតរបស់អ្នក មិនត្រូវការម៉ាស៊ីនភ្ញៀវ SSH ទេ។
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+រង់ចាំរហូតដល់អ្នកឃើញ៖
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+កំណត់ហេតុក៏បង្ហាញ IP ម៉ាស៊ីនមេរបស់អ្នកផងដែរ — អ្នកនឹងត្រូវការវាសម្រាប់ជំហានបន្ទាប់។
 
 ---
 
-## Step 4 — Set up SSL
+## ជំហានទី 4 — ដំឡើង SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+សូមអនុវត្តតាម **[Set Up SSL guide →](../ssl-setup)** ដើម្បីកំណត់រចនាសម្ព័ន្ធ HTTPS។ ដែនរង **rtsurvey.com ឥតគិតថ្លៃ** គឺជាជម្រើសលឿនបំផុត — មិនត្រូវការការដំឡើង DNS ទេ។
 
 ---
 
-## Step 5 — First login
+## ជំហានទី 5 - ចូលដំបូង
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+នៅពេលដែល SSL សកម្ម សូមអនុវត្តតាម **[ការណែនាំការចូលដំបូង →] (../first-login)** ដើម្បីចូលប្រើគណនីអ្នកគ្រប់គ្រង។
 
 ---
 
-## Step 6 — Change the default password
+## ជំហានទី 6 — ផ្លាស់ប្តូរពាក្យសម្ងាត់លំនាំដើម
 
-All passwords default to `admin`. Change them immediately after your first login:
+ពាក្យ​សម្ងាត់​ទាំង​អស់​មាន​លំនាំ​ដើម​ទៅ​ជា `admin`។ ផ្លាស់ប្តូរពួកវាភ្លាមៗបន្ទាប់ពីការចូលដំបូងរបស់អ្នក៖
 
-- **App admin password** — account settings inside the app
+- ** ពាក្យសម្ងាត់អ្នកគ្រប់គ្រងកម្មវិធី ** — ការកំណត់គណនីនៅក្នុងកម្មវិធី
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## ច្បាប់ Firewall (Linode Cloud Firewall)
+## ច្បាប់ជញ្ជាំងភ្លើង (Linode Cloud Firewall)
 
-ប្រសិនបើអ្នកភ្ជាប់ Linode Cloud Firewall ទៅម៉ាស៊ីនមេនេះ សូមប្រើច្បាប់ដូចខាងក្រោម:
+ប្រសិនបើអ្នកភ្ជាប់ Linode Cloud Firewall ទៅម៉ាស៊ីនមេនេះ សូមប្រើច្បាប់ខាងក្រោម៖
 
-### ចរាចរណ៍ចូល (Inbound)
+### ចូល
 
-| ស្លាក | សកម្មភាព | ពិធីការ | ច្រក | ប្រភព | កំណត់ចំណាំ |
-|------|---------|---------|------|-------|-----------|
-| `accept-inbound-ssh` | ទទួល | TCP | 22 | All IPv4, All IPv6 | ការចូលប្រើ SSH |
-| `accept-inbound-http` | ទទួល | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | ទទួល | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS បន្ទាប់ពីដំឡើង SSL) |
-| `accept-inbound-shiny` | ទទួល | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | ទទួល | ICMP | — | All IPv4, All IPv6 | Ping / ការធ្វើរោគវិនិច្ឆ័យ |
-| គោលនយោបាយ inbound លំនាំដើម | **លុបចោល** | | | | រារាំងអ្វីៗផ្សេងទៀត |
+| ស្លាក | សកម្មភាព | ពិធីការ | ច្រក | ប្រភព | កំណត់សម្គាល់ |
+|---------|--------|----------|------|--------|---------|
+| `accept-inbound-ssh` | ទទួលយក | TCP | ២២ | IPv4 ទាំងអស់, IPv6 ទាំងអស់ | ការចូលប្រើ SSH |
+| `accept-inbound-http` | ទទួលយក | TCP | ៨០ | IPv4 ទាំងអស់, IPv6 ទាំងអស់ | Nginx (HTTP + ACME challenge) |
+| `accept-inbound-https` | ទទួលយក | TCP | ៤៤៣ | IPv4 ទាំងអស់, IPv6 ទាំងអស់ | Nginx (HTTPS បន្ទាប់ពីការដំឡើង SSL) |
+| `យល់ព្រម-ចូល-ភ្លឺ` | ទទួលយក | TCP | ៣៨៣៨ | IPv4 ទាំងអស់, IPv6 ទាំងអស់ | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | ទទួលយក | ICMP | — | IPv4 ទាំងអស់, IPv6 ទាំងអស់ | ភីង / រោគវិនិច្ឆ័យ |
+| គោលការណ៍​ចូល​លំនាំដើម | **ទម្លាក់** | | | | រារាំងអ្វីៗផ្សេងទៀត |
 
-### ចរាចរណ៍ចេញ (Outbound)
+### ចេញដំណើរ
 
-| ស្លាក | សកម្មភាព | កំណត់ចំណាំ |
-|------|---------|-----------|
-| គោលនយោបាយ outbound លំនាំដើម | **ទទួល** | អនុញ្ញាតចរាចរណ៍ចេញទាំងអស់ (Docker, certbot, GoDaddy API ។ល។) |
+| ស្លាក | សកម្មភាព | កំណត់សម្គាល់ |
+|---------|--------|-------|
+| គោលនយោបាយចេញក្រៅលំនាំដើម | **ទទួលយក** | អនុញ្ញាតឱ្យចេញក្រៅទាំងអស់ (Docker pulls, certbot, GoDaddy API ។ល។) |
 
-### ច្រកដែលមិនត្រូវការខាងក្រៅ
+### ច្រកមិនចាំបាច់ខាងក្រៅទេ។
 
-ច្រកទាំងនេះភ្ជាប់តែទៅ `127.0.0.1` ហើយមិនអាចចូលប្រើពីខាងក្រៅបានទេ:
+ច្រកទាំងនេះត្រូវបានចងភ្ជាប់ទៅនឹង `127.0.0.1` តែប៉ុណ្ណោះ ហើយមិនអាចទៅដល់ពីខាងក្រៅម៉ាស៊ីនមេបានទេ៖
 
-| ច្រក | សេវាកម្ម | មូលហេតុ |
-|------|---------|--------|
-| 8080 | App container | Nginx proxy ខាងក្នុង |
-| 8090 | Keycloak container | Nginx proxy ខាងក្នុង |
+| ច្រក | សេវាកម្ម | ហេតុផល |
+|--------|---------|--------|
+| 8080 | ឧបករណ៍ផ្ទុកកម្មវិធី | Nginx ប្រូកស៊ីទៅវាខាងក្នុង |
+| 8090 | ធុងសោរ | Nginx ប្រូកស៊ីទៅវានៅខាងក្នុង |
 | 3306 | MySQL | បណ្តាញ Docker ខាងក្នុងតែប៉ុណ្ណោះ |
 
 ---
 
-## Troubleshooting
+## ការដោះស្រាយបញ្ហា
 
-### Check the setup log
+### ពិនិត្យមើលកំណត់ហេតុនៃការដំឡើង
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### ពិនិត្យមើលកំណត់ហេតុ SSL
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### មើលស្ថានភាពធុង
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

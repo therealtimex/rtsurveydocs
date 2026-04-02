@@ -1,30 +1,30 @@
 ---
 weight: 1
-title: "DigitalOcean"
+title: "المحيط الرقمي"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-17T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "نشر rtCloud على Droplet من DigitalOcean باستخدام سكريبتات بيانات المستخدم الآلية."
+description: "انشر rtCloud على DigitalOcean Droplet باستخدام البرامج النصية الآلية لبيانات المستخدم."
 ---
 
-DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
+يستخدم DigitalOcean البرامج النصية **بيانات المستخدم** التي تعمل تلقائيًا عند التشغيل الأول. تقوم بملء متغيرات التكوين في الجزء العلوي من البرنامج النصي، ثم تلصق البرنامج النصي بأكمله عند إنشاء Droplet.
 
-> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
+> على عكس Linode StackScripts، لا يحتوي DigitalOcean على واجهة مستخدم نموذجية — يجب عليك تحرير البرنامج النصي مباشرة قبل اللصق.
 
 **Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Embedded Keycloak (Recommended)
+## Keycloak المضمن (مستحسن)
 
-Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
+استخدم "digitalocean-droplet-keycloak-embed.sh" لأبسط عملية إعداد باستخدام تسجيل الدخول الموحد (SSO) المدمج.
 
-### Step 1 — Fill in the configuration
+### الخطوة 1 — املأ التكوين
 
-Open the script and edit the `CONFIGURATION` block at the top:
+افتح البرنامج النصي وقم بتحرير كتلة `CONFIGURATION` في الأعلى:
 
 ```bash
 # --- Required ---
@@ -41,30 +41,30 @@ STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Field | Required | Description |
+| المجال | مطلوب | الوصف |
 |-------|----------|-------------|
-| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
-| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
-| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
-| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
-| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
+| `معرف_المشروع` | نعم | يستخدم كاسم قاعدة البيانات ومعرف عميل Keycloak. أحرف صغيرة، بدون مسافات. |
+| `ADMIN_PASSWORD` | لا | كلمة المرور لتسجيل دخول مسؤول التطبيق ووحدة تحكم مسؤول Keycloak. الإعدادات الافتراضية هي `admin` — **التغيير بعد تسجيل الدخول الأول**. |
+| "المجال" | نعم | اسم المجال الخاص بك. يجب أن يشير سجل DNS إلى Droplet IP. |
+| `LETSENCRYPT_EMAIL` | نعم | عنوان البريد الإلكتروني لإشعارات شهادة Let's Encrypt. |
+| `PROJECT_URL` | لا | تجاوز عنوان URL العام. اتركه فارغًا لاستخدام "DOMAIN". مفيد خلف Cloudflare. |
 
-> **Security:** All passwords default to `admin`. Change them immediately after your first login.
+> **الأمان:** جميع كلمات المرور الافتراضية هي `admin`. قم بتغييرها مباشرة بعد تسجيل الدخول الأول.
 
-### Step 2 — Create a Droplet
+### الخطوة الثانية — إنشاء قطرة
 
 In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Click **Create** → **Droplets**
-2. Choose **Ubuntu 22.04 LTS** as the image
-3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
-4. Scroll to **Advanced Options** → check **Add Initialization scripts**
-5. Paste the full script content into the text area
-6. Click **Create Droplet**
+1. انقر **إنشاء** → **قطرات**
+2. اختر **Ubuntu 22.04 LTS** كصورة
+3. حدد **أساسي، ذاكرة وصول عشوائي (RAM) سعة 4 جيجابايت / وحدتي معالجة مركزية افتراضية** أو أكبر
+4. قم بالتمرير إلى **الخيارات المتقدمة** → حدد **إضافة البرامج النصية للتهيئة**
+5. الصق محتوى البرنامج النصي الكامل في منطقة النص
+6. انقر **إنشاء قطرات**
 
-### Step 3 — Add the DNS record
+### الخطوة 3 - إضافة سجل DNS
 
-While the Droplet boots, add an **A record** in your DNS provider:
+أثناء تشغيل Droplet، قم بإضافة **سجل A** في مزود DNS الخاص بك:
 
 ```
 Type  : A
@@ -73,20 +73,20 @@ Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Step 4 — Monitor progress
+### الخطوة الرابعة — مراقبة التقدم
 
-SSH into the Droplet and watch the log:
+SSH في Droplet وشاهد السجل:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-The script prints your server IP near the start — add the DNS record as soon as you see it.
+يقوم البرنامج النصي بطباعة عنوان IP الخاص بخادمك بالقرب من البداية — أضف سجل DNS بمجرد رؤيته.
 
-### Step 5 — Access the app
+### الخطوة 5 - الوصول إلى التطبيق
 
-When setup completes, the log shows a summary:
+عند اكتمال الإعداد، يعرض السجل ملخصًا:
 
 ```
 ============================================================
@@ -103,31 +103,31 @@ When setup completes, the log shows a summary:
 
 Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Change your password** immediately after login via **Settings** in the top-right menu.
+> **قم بتغيير كلمة المرور الخاصة بك** مباشرة بعد تسجيل الدخول عبر **الإعدادات** في القائمة العلوية اليمنى.
 
 ---
 
-## After Deployment
+## بعد النشر
 
-### Change a password
+### تغيير كلمة المرور
 
-SSH into the Droplet, edit `.env`, and restart the affected container:
+أدخل SSH في Droplet، وقم بتحرير `.env`، وأعد تشغيل الحاوية المتأثرة:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Update the domain
+### تحديث المجال
 
-If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
+إذا قمت بتعيين نطاق مختلف بعد النشر، فقم بتحديث `PROJECT_URL` في `.env`:
 
 ```bash
 nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### View all containers
+### عرض كافة الحاويات
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

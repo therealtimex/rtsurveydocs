@@ -7,48 +7,48 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Ota rtCloud käyttöön Linodessa StackScriptin avulla. Konfigurointia ei tarvita — luo vain palvelin ja seuraa käyttöönoton jälkeisiä vaiheita."
+description: "Ota rtCloud käyttöön Linodessa StackScriptin avulla. Määrityksiä ei tarvita – luo vain palvelin ja seuraa käyttöönoton jälkeisiä vaiheita."
 ---
 
-## Step 1 — Launch the StackScript
+## Vaihe 1 – Käynnistä StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Tämä avaa StackScript-sivun Linode Cloud Managerissa. Napsauta **Ota uusi Linode käyttöön**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Vaihe 2 – Täytä Linoden lomake
 
-Fill in Linode's standard server creation form:
+Täytä Linoden vakiopalvelimen luontilomake:
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| Kenttä | Suositeltu arvo |
+|-------|-------------------|
+| **Kuva** | Ubuntu 22.04 LTS |
+| **Alue** | Lähimpänä käyttäjiäsi |
+| **Suunnitelma** | Jaettu CPU 4 Gt tai suurempi |
+| **Root-salasana** | Aseta vahva salasana |
+| **Aikavyöhyke** *(ainoa kenttämme)* | Palvelimesi aikavyöhyke (oletus: Aasia/Ho_Chi_Minh) |
 
-Click **Create Linode** when done.
+Napsauta **Luo linode**, kun olet valmis.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Vaihe 3 – Odota, että asennus on valmis
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Skripti suoritetaan automaattisesti ensimmäisen käynnistyksen yhteydessä. Se asentaa Dockerin, vetää rtSurvey-kuvan, alustaa tietokannan ja käynnistää kaikki palvelut. Tämä kestää **5–10 minuuttia**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Voit seurata edistymistä suoraan **Linode Cloud Managerissa** – SSH:ta ei tarvita:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Napsauta äskettäin luotua Linodiasi
+3. Napsauta **Käynnistä LISH-konsoli** (Linode-tietosivun oikeassa yläkulmassa).
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Selainpääte avautuu ja näyttää live-käynnistyslokin – **Weblish**-välilehti toimii suoraan selaimessasi, eikä SSH-asiakasta tarvita.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Odota kunnes näet:
 
 ```
 ============================================================
@@ -61,29 +61,29 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Loki näyttää myös palvelimesi IP-osoitteen – tarvitset sitä seuraavassa vaiheessa.
 
 ---
 
-## Step 4 — Set up SSL
+## Vaihe 4 – Määritä SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Määritä HTTPS noudattamalla **[SSL-asetusopas →](../ssl-setup)**. Ilmainen **rsurvey.com-aliverkkotunnus** on nopein vaihtoehto – DNS-asetuksia ei tarvita.
 
 ---
 
-## Step 5 — First login
+## Vaihe 5 – Ensimmäinen kirjautuminen
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Kun SSL on käytössä, seuraa **[Ensimmäisen kirjautumisoppaan →](../first-login)** ohjeita päästäksesi järjestelmänvalvojan tiliin.
 
 ---
 
-## Step 6 — Change the default password
+## Vaihe 6 – Vaihda oletussalasana
 
-All passwords default to `admin`. Change them immediately after your first login:
+Kaikki salasanat ovat oletuksena "admin". Vaihda ne heti ensimmäisen kirjautumisen jälkeen:
 
-- **App admin password** — account settings inside the app
+- **Sovelluksen järjestelmänvalvojan salasana** — tilin asetukset sovelluksen sisällä
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
@@ -92,50 +92,50 @@ All passwords default to `admin`. Change them immediately after your first login
 
 Jos liität Linode Cloud Firewallin tähän palvelimeen, käytä seuraavia sääntöjä:
 
-### Saapuva liikenne (Inbound)
+### Saapuva
 
-| Tunniste | Toiminto | Protokolla | Portti | Lähteet | Huomiot |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Hyväksy | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Hyväksy | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Hyväksy | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Hyväksy | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Hyväksy | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Hylkää** | | | | Block everything else |
+| Etiketti | Toiminta | Pöytäkirja | Portti | Lähteet | Huomautuksia |
+|-------|--------|----------|------|----------|--------|
+| `accept-inbound-ssh` | Hyväksy | TCP | 22 | Kaikki IPv4, kaikki IPv6 | SSH-yhteys |
+| `accept-inbound-http` | Hyväksy | TCP | 80 | Kaikki IPv4, kaikki IPv6 | Nginx (HTTP + ACME-haaste) |
+| `accept-inbound-https` | Hyväksy | TCP | 443 | Kaikki IPv4, kaikki IPv6 | Nginx (HTTPS SSL-asennuksen jälkeen) |
+| `accept-inbound-shiny` | Hyväksy | TCP | 3838 | Kaikki IPv4, kaikki IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Hyväksy | ICMP | — | Kaikki IPv4, kaikki IPv6 | Ping / diagnostiikka |
+| Saapuvien saapuvien viestien oletuskäytäntö | **Drop** | | | | Estä kaikki muu |
 
-### Lähtevä liikenne (Outbound)
+### Lähtevä
 
-| Tunniste | Toiminto | Huomiot |
-|-------|--------|-------|
-| Default outbound policy | **Hyväksy** | Salli kaikki lähtevä liikenne (Docker, certbot, GoDaddy API, etc.) |
+| Etiketti | Toiminta | Huomautuksia |
+|-------|---------|-------|
+| Default outbound policy | **Hyväksy** | Salli kaikki lähtevät (Docker-vedot, certbot, GoDaddy API jne.) |
 
-### Portit, joita EI tarvita ulkoisesti
+### Portteja EI tarvita ulkoisesti
 
-Nämä portit on sidottu vain osoitteeseen `127.0.0.1` eivätkä ne ole koskaan ulkoa käsin saavutettavissa:
+Nämä portit on sidottu vain porttiin "127.0.0.1", eivätkä ne ole koskaan tavoitettavissa palvelimen ulkopuolelta:
 
 | Portti | Palvelu | Syy |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies internally |
-| 8090 | Keycloak container | Nginx proxies internally |
-| 3306 | MySQL | Internal Docker network only |
+| 8080 | Sovellussäiliö | Nginx välityspalvelimet siihen sisäisesti |
+| 8090 | Avaimenperä | Nginx välityspalvelimet siihen sisäisesti |
+| 3306 | MySQL | Vain sisäinen Docker-verkko |
 
 ---
 
-## Troubleshooting
+## Vianetsintä
 
-### Check the setup log
+### Tarkista asennusloki
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Tarkista SSL-loki
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Näytä säilön tila
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

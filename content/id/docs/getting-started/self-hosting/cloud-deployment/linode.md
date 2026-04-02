@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "Linode (Awan Akamai)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Terapkan rtCloud di Linode menggunakan StackScript. Tidak perlu konfigurasi — cukup buat server dan ikuti langkah-langkah pasca-deployment."
+description: "Terapkan rtCloud di Linode menggunakan StackScript. Tidak diperlukan konfigurasi — cukup buat server dan ikuti langkah-langkah pasca penerapan."
 ---
 
-## Step 1 — Launch the StackScript
+## Langkah 1 — Luncurkan StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Ini akan membuka halaman StackScript di Linode Cloud Manager. Klik **Sebarkan Linode Baru**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Langkah 2 — Isi formulir Linode
 
-Fill in Linode's standard server creation form:
+Isi formulir pembuatan server standar Linode:
 
-| Field | Recommended value |
+| Bidang | Nilai yang direkomendasikan |
 |-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| **Gambar** | Ubuntu 22.04 LTS |
+| **Wilayah** | Paling dekat dengan pengguna Anda |
+| **Rencana** | CPU Bersama 4 GB atau lebih besar |
+| **Kata Sandi Akar** | Tetapkan kata sandi yang kuat |
+| **Zona Waktu** *(satu-satunya bidang kami)* | Zona waktu server Anda (default: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+Klik **Buat Linode** setelah selesai.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Langkah 3 — Tunggu hingga penyiapan selesai
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Skrip berjalan secara otomatis pada boot pertama. Ia menginstal Docker, menarik image rtSurvey, menginisialisasi database, dan memulai semua layanan. Proses ini memerlukan waktu **5–10 menit**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Anda dapat melihat kemajuannya langsung di **Linode Cloud Manager** — tidak memerlukan SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Klik pada Linode yang baru Anda buat
+3. Klik **Luncurkan LISH Console** (kanan atas halaman detail Linode)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Terminal browser terbuka dan menampilkan log boot langsung — tab **Weblish** berfungsi langsung di browser Anda, tidak diperlukan klien SSH.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Tunggu sampai Anda melihat:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Log juga menunjukkan IP server Anda — Anda akan memerlukannya untuk langkah berikutnya.
 
 ---
 
-## Step 4 — Set up SSL
+## Langkah 4 — Siapkan SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Ikuti **[Panduan Konfigurasi SSL →](../ssl-setup)** untuk mengonfigurasi HTTPS. **Subdomain rtsurvey.com** gratis adalah opsi tercepat — tidak perlu penyiapan DNS.
 
 ---
 
-## Step 5 — First login
+## Langkah 5 — Login pertama
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Setelah SSL aktif, ikuti **[Panduan Login Pertama →](../login pertama)** untuk mengakses akun admin.
 
 ---
 
-## Step 6 — Change the default password
+## Langkah 6 — Ubah kata sandi default
 
-All passwords default to `admin`. Change them immediately after your first login:
+Semua kata sandi default adalah `admin`. Ubah segera setelah login pertama Anda:
 
-- **App admin password** — account settings inside the app
+- **Kata sandi admin aplikasi** — pengaturan akun di dalam aplikasi
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
 ## Aturan Firewall (Linode Cloud Firewall)
 
-Jika Anda menghubungkan Linode Cloud Firewall ke server ini, gunakan aturan berikut:
+Jika Anda memasang Linode Cloud Firewall ke server ini, gunakan aturan berikut:
 
-### Lalu Lintas Masuk (Inbound)
+### Masuk
 
-| Label | Tindakan | Protokol | Port | Sumber | Catatan |
-|-------|---------|---------|------|--------|--------|
-| `accept-inbound-ssh` | Izinkan | TCP | 22 | All IPv4, All IPv6 | Akses SSH |
-| `accept-inbound-http` | Izinkan | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + tantangan ACME) |
-| `accept-inbound-https` | Izinkan | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS setelah setup SSL) |
-| `accept-inbound-shiny` | Izinkan | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (analitik R) |
-| `accept-inbound-icmp` | Izinkan | ICMP | — | All IPv4, All IPv6 | Ping / diagnostik |
-| Kebijakan masuk default | **Tolak** | | | | Blokir semua yang lain |
+| Label | Aksi | Protokol | Pelabuhan | Sumber | Catatan |
+|-------|--------|----------|------|---------|-------|
+| `terima-masuk-ssh` | Terima | TCP | 22 | Semua IPv4, Semua IPv6 | Akses SSH |
+| `terima-masuk-http` | Terima | TCP | 80 | Semua IPv4, Semua IPv6 | Nginx (tantangan HTTP + ACME) |
+| `terima-masuk-https` | Terima | TCP | 443 | Semua IPv4, Semua IPv6 | Nginx (HTTPS setelah pengaturan SSL) |
+| `terima-masuk-mengkilap` | Terima | TCP | 3838 | Semua IPv4, Semua IPv6 | Server Mengkilap (analisis R) |
+| `terima-masuk-icmp` | Terima | ICMP | — | Semua IPv4, Semua IPv6 | Ping / diagnostik |
+| Kebijakan masuk default | **Jatuhkan** | | | | Blokir yang lainnya |
 
-### Lalu Lintas Keluar (Outbound)
+### Keluar
 
-| Label | Tindakan | Catatan |
-|-------|---------|--------|
-| Kebijakan keluar default | **Izinkan** | Izinkan semua lalu lintas keluar (Docker, certbot, GoDaddy API, dll.) |
+| Label | Aksi | Catatan |
+|-------|--------|-------|
+| Kebijakan keluar default | **Terima** | Izinkan semua keluar (Docker pulls, certbot, GoDaddy API, dll.) |
 
-### Port yang TIDAK Diperlukan Secara Eksternal
+### Port TIDAK diperlukan secara eksternal
 
-Port-port ini hanya terikat ke `127.0.0.1` dan tidak pernah dapat diakses dari luar:
+Port ini terikat hanya pada `127.0.0.1` dan tidak pernah dapat dijangkau dari luar server:
 
-| Port | Layanan | Alasan |
+| Pelabuhan | Layanan | Alasan |
 |------|---------|--------|
-| 8080 | Container aplikasi | Nginx melakukan proxy secara internal |
-| 8090 | Container Keycloak | Nginx melakukan proxy secara internal |
+| 8080 | Wadah aplikasi | Nginx memproksinya secara internal |
+| 8090 | Wadah jubah kunci | Nginx memproksinya secara internal |
 | 3306 | MySQL | Hanya jaringan Docker internal |
 
 ---
 
-## Troubleshooting
+## Pemecahan masalah
 
-### Check the setup log
+### Periksa log pengaturan
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Periksa log SSL
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Lihat status penampung
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

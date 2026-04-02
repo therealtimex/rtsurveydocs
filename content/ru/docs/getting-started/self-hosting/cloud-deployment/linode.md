@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "Линод (Облако Акамай)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Разверните rtCloud на Linode с помощью StackScript. Настройка не требуется — просто создайте сервер и следуйте шагам после развёртывания."
+description: "Разверните rtCloud на Linode с помощью StackScript. Никакой настройки не требуется — просто создайте сервер и следуйте инструкциям после развертывания."
 ---
 
-## Step 1 — Launch the StackScript
+## Шаг 1 — Запустите StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Откроется страница StackScript в Linode Cloud Manager. Нажмите **Развернуть новый Linode**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Шаг 2 — Заполните форму Linode
 
-Fill in Linode's standard server creation form:
+Заполните стандартную форму создания сервера Linode:
 
-| Field | Recommended value |
+| Поле | Рекомендуемое значение |
 |-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| **Изображение** | Убунту 22.04 ЛТС |
+| **Регион** | Ближе всего к вашим пользователям |
+| **План** | Общий процессор 4 ГБ или больше |
+| **Корневой пароль** | Установите надежный пароль |
+| **Часовой пояс** *(наше единственное поле)* | Часовой пояс вашего сервера (по умолчанию: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+Когда закончите, нажмите **Создать Linode**.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Шаг 3. Дождитесь завершения установки.
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Скрипт запускается автоматически при первой загрузке. Он устанавливает Docker, извлекает образ rtSurvey, инициализирует базу данных и запускает все службы. Это занимает **5–10 минут**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Вы можете наблюдать за прогрессом непосредственно в **Linode Cloud Manager** — SSH не требуется:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Нажмите на только что созданный Linode.
+3. Нажмите **Запустить консоль LISH** (в правом верхнем углу страницы сведений о Linode).
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Откроется терминал браузера, показывающий журнал загрузки в реальном времени — вкладка **Weblish** работает непосредственно в вашем браузере, SSH-клиент не требуется.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Подождите, пока не увидите:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+В журнале также указан IP-адрес вашего сервера — он понадобится вам для следующего шага.
 
 ---
 
-## Step 4 — Set up SSL
+## Шаг 4 — Настройка SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Следуйте **[Руководству по настройке SSL →](../ssl-setup)** для настройки HTTPS. Бесплатный субдомен **rtsurvey.com** — самый быстрый вариант — настройка DNS не требуется.
 
 ---
 
-## Step 5 — First login
+## Шаг 5 — Первый вход в систему
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+После активации SSL следуйте **[Руководству по первому входу →](../first-login)**, чтобы получить доступ к учетной записи администратора.
 
 ---
 
-## Step 6 — Change the default password
+## Шаг 6 — Измените пароль по умолчанию
 
-All passwords default to `admin`. Change them immediately after your first login:
+Все пароли по умолчанию — `admin`. Измените их сразу после первого входа в систему:
 
-- **App admin password** — account settings inside the app
+- **Пароль администратора приложения** — настройки учетной записи внутри приложения.
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
 ## Правила брандмауэра (Linode Cloud Firewall)
 
-Если вы подключаете Linode Cloud Firewall к этому серверу, используйте следующие правила:
+Если вы подключаете облачный брандмауэр Linode к этому серверу, используйте следующие правила:
 
-### Входящий трафик (Inbound)
+### Входящий
 
-| Метка | Действие | Протокол | Порт | Источники | Примечания |
-|-------|---------|---------|------|---------|----------|
-| `accept-inbound-ssh` | Разрешить | TCP | 22 | All IPv4, All IPv6 | Доступ по SSH |
-| `accept-inbound-http` | Разрешить | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME-проверка) |
-| `accept-inbound-https` | Разрешить | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS после настройки SSL) |
-| `accept-inbound-shiny` | Разрешить | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (аналитика R) |
-| `accept-inbound-icmp` | Разрешить | ICMP | — | All IPv4, All IPv6 | Ping / диагностика |
-| Политика входящего трафика по умолчанию | **Отклонить** | | | | Блокировать всё остальное |
+| Этикетка | Действие | Протокол | Порт | Источники | Заметки |
+|-------|--------|----------|------|---------|-------|
+| `принять-входящий-ssh` | Принять | TCP | 22 | Все IPv4, Все IPv6 | SSH-доступ |
+| `accept-inbound-http` | Принять | TCP | 80 | Все IPv4, Все IPv6 | Nginx (вызов HTTP + ACME) |
+| `принять-входящий-https` | Принять | TCP | 443 | Все IPv4, Все IPv6 | Nginx (HTTPS после настройки SSL) |
+| `принять-входящий-блестящий` | Принять | TCP | 3838 | Все IPv4, Все IPv6 | Shiny Server (R-аналитика) |
+| `принять-входящий-icmp` | Принять | ICMP | — | Все IPv4, Все IPv6 | Пинг/диагностика |
+| Политика входящего трафика по умолчанию | **Выбросить** | | | | Заблокировать все остальное |
 
-### Исходящий трафик (Outbound)
+### Исходящий
 
-| Метка | Действие | Примечания |
-|-------|---------|----------|
-| Политика исходящего трафика по умолчанию | **Разрешить** | Разрешить весь исходящий трафик (Docker, certbot, GoDaddy API и т.д.) |
+| Этикетка | Действие | Заметки |
+|-------|--------|-------|
+| Default outbound policy | **Accept** | Allow all outbound (Docker pulls, certbot, GoDaddy API, etc.) |
 
-### Порты, НЕ требующие внешнего доступа
+### Порты НЕ нужны снаружи
 
-Эти порты привязаны только к `127.0.0.1` и недоступны снаружи:
+Эти порты привязаны только к 127.0.0.1 и никогда не доступны из-за пределов сервера:
 
 | Порт | Сервис | Причина |
-|------|--------|--------|
-| 8080 | Контейнер приложения | Nginx проксирует внутренне |
-| 8090 | Контейнер Keycloak | Nginx проксирует внутренне |
+|------|---------|--------|
+| 8080 | Контейнер приложений | Nginx использует внутренние прокси |
+| 8090 | Контейнер Keycloak | Nginx использует внутренние прокси |
 | 3306 | MySQL | Только внутренняя сеть Docker |
 
 ---
 
-## Troubleshooting
+## Поиск неисправностей
 
-### Check the setup log
+### Проверьте журнал установки
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Проверьте журнал SSL
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Просмотр состояния контейнера
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

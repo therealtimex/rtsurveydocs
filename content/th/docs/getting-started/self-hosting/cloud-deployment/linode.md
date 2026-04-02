@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "Linode (อาคาไม คลาวด์)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "ติดตั้ง rtCloud บน Linode โดยใช้ StackScript ไม่ต้องกำหนดค่า — เพียงสร้างเซิร์ฟเวอร์และทำตามขั้นตอนหลังการติดตั้ง"
+description: "ปรับใช้ rtCloud บน Linode โดยใช้ StackScript ไม่จำเป็นต้องกำหนดค่า เพียงแค่สร้างเซิร์ฟเวอร์และทำตามขั้นตอนหลังการติดตั้งใช้งาน"
 ---
 
-## Step 1 — Launch the StackScript
+## ขั้นตอนที่ 1 — เปิด StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+ซึ่งจะเปิดหน้า StackScript ใน Linode Cloud Manager คลิก **ปรับใช้ Linode ใหม่**
 
 ---
 
-## Step 2 — Fill in Linode's form
+## ขั้นตอนที่ 2 — กรอกแบบฟอร์มของ Linode
 
-Fill in Linode's standard server creation form:
+กรอกแบบฟอร์มการสร้างเซิร์ฟเวอร์มาตรฐานของ Linode:
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| สนาม | ค่าแนะนำ |
+|----------------------|-----------------|
+| **รูปภาพ** | อูบุนตู 22.04 LTS |
+| **ภูมิภาค** | ใกล้กับผู้ใช้ของคุณมากที่สุด |
+| **แผน** | CPU ที่ใช้ร่วมกัน 4 GB หรือใหญ่กว่า |
+| **รหัสผ่านรูท** | ตั้งรหัสผ่านที่รัดกุม |
+| **เขตเวลา** *(ช่องเดียวของเรา)* | เขตเวลาเซิร์ฟเวอร์ของคุณ (ค่าเริ่มต้น: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+คลิก **สร้าง Linode** เมื่อเสร็จสิ้น
 
 ---
 
-## Step 3 — Wait for setup to complete
+## ขั้นตอนที่ 3 — รอให้การตั้งค่าเสร็จสิ้น
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+The script runs automatically on first boot. โดยจะติดตั้ง Docker ดึงอิมเมจ rtSurvey เริ่มต้นฐานข้อมูล และเริ่มบริการทั้งหมด This takes **5–10 minutes**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+คุณสามารถรับชมความคืบหน้าได้โดยตรงใน **Linode Cloud Manager** — ไม่ต้องใช้ SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. คลิกที่ Linode ที่คุณสร้างขึ้นใหม่
+3. คลิก **เปิด LISH Console** (ด้านบนขวาของหน้ารายละเอียด Linode)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+เทอร์มินัลของเบราว์เซอร์จะเปิดขึ้นเพื่อแสดงบันทึกการบูตแบบเรียลไทม์ — แท็บ **Weblish** ทำงานในเบราว์เซอร์ของคุณโดยตรง โดยไม่ต้องใช้ไคลเอ็นต์ SSH
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+รอจนกว่าคุณจะเห็น:
 
 ```
 ============================================================
@@ -61,29 +61,29 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+บันทึกยังแสดง IP เซิร์ฟเวอร์ของคุณอีกด้วย — คุณจะต้องใช้มันสำหรับขั้นตอนต่อไป
 
 ---
 
-## Step 4 — Set up SSL
+## ขั้นตอนที่ 4 — ตั้งค่า SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+ปฏิบัติตาม **[ตั้งค่าคู่มือ SSL →](../ssl-setup)** เพื่อกำหนดค่า HTTPS โดเมนย่อย **rtsurvey.com** ฟรีคือตัวเลือกที่เร็วที่สุด — ไม่จำเป็นต้องตั้งค่า DNS
 
 ---
 
-## Step 5 — First login
+## ขั้นตอนที่ 5 — เข้าสู่ระบบครั้งแรก
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+เมื่อ SSL เปิดใช้งานแล้ว ให้ปฏิบัติตาม **[คู่มือการเข้าสู่ระบบครั้งแรก →](../first-login)** เพื่อเข้าถึงบัญชีผู้ดูแลระบบ
 
 ---
 
-## Step 6 — Change the default password
+## ขั้นตอนที่ 6 — เปลี่ยนรหัสผ่านเริ่มต้น
 
-All passwords default to `admin`. Change them immediately after your first login:
+รหัสผ่านทั้งหมดมีค่าเริ่มต้นเป็น 'ผู้ดูแลระบบ' เปลี่ยนทันทีหลังจากเข้าสู่ระบบครั้งแรก:
 
-- **App admin password** — account settings inside the app
+- **รหัสผ่านผู้ดูแลระบบแอป** — การตั้งค่าบัญชีภายในแอป
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
@@ -92,50 +92,50 @@ All passwords default to `admin`. Change them immediately after your first login
 
 หากคุณแนบ Linode Cloud Firewall กับเซิร์ฟเวอร์นี้ ให้ใช้กฎต่อไปนี้:
 
-### การรับส่งข้อมูลขาเข้า (Inbound)
+###ขาเข้า
 
 | ป้ายกำกับ | การกระทำ | โปรโตคอล | พอร์ต | แหล่งที่มา | หมายเหตุ |
-|---------|---------|---------|------|----------|---------|
-| `accept-inbound-ssh` | ยอมรับ | TCP | 22 | All IPv4, All IPv6 | การเข้าถึง SSH |
-| `accept-inbound-http` | ยอมรับ | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | ยอมรับ | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS หลังตั้งค่า SSL) |
-| `accept-inbound-shiny` | ยอมรับ | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | ยอมรับ | ICMP | — | All IPv4, All IPv6 | Ping / การวินิจฉัย |
-| นโยบายขาเข้าเริ่มต้น | **ทิ้ง** | | | | บล็อกทุกอย่างที่เหลือ |
+|-------|--------|-----------|-|---------|-------|
+| `ยอมรับขาเข้า-ssh` | ยอมรับ | TCP | 22 | IPv4 ทั้งหมด, IPv6 ทั้งหมด | การเข้าถึง SSH |
+| `ยอมรับขาเข้า-http` | ยอมรับ | TCP | 80 | IPv4 ทั้งหมด, IPv6 ทั้งหมด | Nginx (ความท้าทาย HTTP + ACME) |
+| `ยอมรับ-ขาเข้า-https` | ยอมรับ | TCP | 443 | IPv4 ทั้งหมด, IPv6 ทั้งหมด | Nginx (HTTPS หลังจากการตั้งค่า SSL) |
+| `ยอมรับขาเข้าเงา` | ยอมรับ | TCP | 3838 | IPv4 ทั้งหมด, IPv6 ทั้งหมด | Shiny Server (การวิเคราะห์ R) |
+| `ยอมรับขาเข้า-icmp` | ยอมรับ | ไอซีเอ็มพี | — | IPv4 ทั้งหมด, IPv6 ทั้งหมด | ปิง / การวินิจฉัย |
+| นโยบายขาเข้าเริ่มต้น | **วาง** | | | | บล็อกทุกสิ่งทุกอย่าง |
 
-### การรับส่งข้อมูลขาออก (Outbound)
+### ขาออก
 
 | ป้ายกำกับ | การกระทำ | หมายเหตุ |
-|---------|---------|---------|
-| นโยบายขาออกเริ่มต้น | **ยอมรับ** | อนุญาตการรับส่งข้อมูลขาออกทั้งหมด (Docker, certbot, GoDaddy API เป็นต้น) |
+|-------|--------|-------|
+| นโยบายขาออกเริ่มต้น | **ยอมรับ** | อนุญาตขาออกทั้งหมด (Docker pulls, certbot, GoDaddy API ฯลฯ) |
 
-### พอร์ตที่ไม่ต้องการเปิดภายนอก
+### ไม่จำเป็นต้องใช้พอร์ตภายนอก
 
-พอร์ตเหล่านี้ผูกกับ `127.0.0.1` เท่านั้น ไม่สามารถเข้าถึงได้จากภายนอก:
+พอร์ตเหล่านี้เชื่อมโยงกับ `127.0.0.1` เท่านั้น และไม่สามารถเข้าถึงได้จากภายนอกเซิร์ฟเวอร์:
 
 | พอร์ต | บริการ | เหตุผล |
-|------|--------|--------|
-| 8080 | App container | Nginx proxy ภายใน |
-| 8090 | Keycloak container | Nginx proxy ภายใน |
+|------|---------|--------|
+| 8080 | คอนเทนเนอร์แอป | พร็อกซี Nginx ภายใน |
+| 8090 | ภาชนะใส่กุญแจ | พร็อกซี Nginx ภายใน |
 | 3306 | MySQL | เครือข่าย Docker ภายในเท่านั้น |
 
 ---
 
-## Troubleshooting
+## การแก้ไขปัญหา
 
-### Check the setup log
+### ตรวจสอบบันทึกการตั้งค่า
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### ตรวจสอบบันทึก SSL
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### ดูสถานะคอนเทนเนอร์
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

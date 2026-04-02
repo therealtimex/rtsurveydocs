@@ -7,24 +7,24 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Ota rtCloud käyttöön DigitalOcean Dropletissa automaattisilla käyttäjätietoskripteillä."
+description: "Ota rtCloud käyttöön DigitalOcean Dropletissa käyttämällä automaattisia käyttäjätietoskriptejä."
 ---
 
-DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
+DigitalOcean käyttää **User Data** -skriptejä, jotka suoritetaan automaattisesti ensimmäisessä käynnistyksessä. Täytät konfigurointimuuttujat skriptin yläosassa ja liität sitten koko skriptin luodessasi pisaran.
 
-> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
+> Toisin kuin Linode StackScripts, DigitalOceanilla ei ole lomakekäyttöliittymää – sinun on muokattava komentosarjaa suoraan ennen liittämistä.
 
 **Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Embedded Keycloak (Recommended)
+## Upotettu avaimenperä (suositus)
 
-Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
+Käytä "digitalocean-droplet-keycloak-embed.sh" yksinkertaisinta asennusta sisäänrakennetulla SSO:lla.
 
-### Step 1 — Fill in the configuration
+### Vaihe 1 – Täytä määritykset
 
-Open the script and edit the `CONFIGURATION` block at the top:
+Avaa komentosarja ja muokkaa yläreunassa olevaa "CONFIGURATION"-lohkoa:
 
 ```bash
 # --- Required ---
@@ -41,30 +41,30 @@ STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
-| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
-| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
-| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
-| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
+| Kenttä | Pakollinen | Kuvaus |
+|-------|----------|--------------|
+| `PROJECT_ID` | Kyllä | Käytetään tietokannan nimenä ja Keycloak-asiakastunnuksena. Pienet kirjaimet, ei välilyöntejä. |
+| `ADMIN_PASSWORD` | Ei | Salasana sovelluksen järjestelmänvalvojan kirjautumiseen ja Keycloak-hallintakonsoliin. Oletus on "admin" — **muutos ensimmäisen kirjautumisen jälkeen**. |
+| "DOMAIN" | Kyllä | Verkkotunnuksesi nimi. DNS Tietueen on osoitettava pisara-IP:hen. |
+| `LETSENCRYPT_EMAIL` | Kyllä | Sähköpostiosoite Let's Encrypt -sertifikaattiilmoituksia varten. |
+| `PROJECT_URL` | Ei | Ohita julkinen URL-osoite. Jätä tyhjäksi, jos haluat käyttää verkkotunnusta "DOMAIN". Hyödyllinen Cloudflaren takana. |
 
-> **Security:** All passwords default to `admin`. Change them immediately after your first login.
+> **Turvallisuus:** Kaikki salasanat oletuksena "admin". Vaihda ne heti ensimmäisen kirjautumisen jälkeen.
 
-### Step 2 — Create a Droplet
+### Vaihe 2 – Luo pisara
 
 In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Click **Create** → **Droplets**
-2. Choose **Ubuntu 22.04 LTS** as the image
-3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
-4. Scroll to **Advanced Options** → check **Add Initialization scripts**
-5. Paste the full script content into the text area
-6. Click **Create Droplet**
+1. Napsauta **Luo** → **Pisarat**
+2. Valitse kuvaksi **Ubuntu 22.04 LTS**
+3. Valitse **Perus, 4 Gt RAM / 2 vCPUs** tai suurempi
+4. Vieritä kohtaan **Lisäasetukset** → valitse **Lisää alustuskomentosarjat**
+5. Liitä skriptin koko sisältö tekstialueelle
+6. Napsauta **Luo pisara**
 
-### Step 3 — Add the DNS record
+### Vaihe 3 – Lisää DNS-tietue
 
-While the Droplet boots, add an **A record** in your DNS provider:
+Kun Droplet käynnistyy, lisää **A-tietue** DNS-palveluntarjoajaasi:
 
 ```
 Type  : A
@@ -73,20 +73,20 @@ Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Step 4 — Monitor progress
+### Vaihe 4 – Seuraa edistymistä
 
-SSH into the Droplet and watch the log:
+SSH Dropletiin ja katso loki:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-The script prints your server IP near the start — add the DNS record as soon as you see it.
+Skripti tulostaa palvelimesi IP-osoitteen lähellä alkua – lisää DNS-tietue heti, kun näet sen.
 
-### Step 5 — Access the app
+### Vaihe 5 – Käytä sovellusta
 
-When setup completes, the log shows a summary:
+Kun asennus on valmis, lokissa näkyy yhteenveto:
 
 ```
 ============================================================
@@ -103,31 +103,31 @@ When setup completes, the log shows a summary:
 
 Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Change your password** immediately after login via **Settings** in the top-right menu.
+> **Vaihda salasanasi** heti sisäänkirjautumisen jälkeen oikean yläkulman valikon **Asetukset** kautta.
 
 ---
 
-## After Deployment
+## Käyttöönoton jälkeen
 
-### Change a password
+### Vaihda salasana
 
-SSH into the Droplet, edit `.env`, and restart the affected container:
+SSH Dropletiin, muokkaa .env-tiedostoa ja käynnistä vahingoittunut säilö uudelleen:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Update the domain
+### Päivitä verkkotunnus
 
-If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
+Jos määrität toisen verkkotunnuksen käyttöönoton jälkeen, päivitä PROJECT_URL .env:ssä:
 
 ```bash
 nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### View all containers
+### Näytä kaikki säilöt
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

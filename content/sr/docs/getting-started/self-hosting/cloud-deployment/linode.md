@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "Линоде (Акамаи Цлоуд)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Распоредите rtCloud на Linode-у користећи StackScript. Није потребна конфигурација — само направите сервер и пратите кораке после распоређивања."
+description: "Поставите ртЦлоуд на Линоде користећи СтацкСцрипт. Није потребна конфигурација — само креирајте сервер и пратите кораке након постављања."
 ---
 
-## Step 1 — Launch the StackScript
+## Корак 1 — Покрените СтацкСцрипт
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Ово отвара СтацкСцрипт страницу у Линоде Цлоуд Манагер-у. Кликните на **Деплои Нев Линоде**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Корак 2 — Попуните Линодеов образац
 
-Fill in Linode's standard server creation form:
+Попуните стандардни Линоде образац за креирање сервера:
 
-| Field | Recommended value |
-|-------|------------------|
+| Поље | Препоручена вредност |
+|-------|-----------------|
 | **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| **Регион** | Најближи вашим корисницима |
+| **План** | Дељени ЦПУ 4 ГБ или већи |
+| **Роот Пассворд** | Поставите јаку лозинку |
+| **Временска зона** *(наше једино поље)* | Временска зона вашег сервера (подразумевано: `Асиа/Хо_Цхи_Минх`) |
 
-Click **Create Linode** when done.
+Кликните на **Креирај Линоде** када завршите.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Корак 3 — Сачекајте да се подешавање заврши
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Скрипта се покреће аутоматски при првом покретању. Инсталира Доцкер, извлачи ртСурвеи слику, иницијализује базу података и покреће све услуге. Ово траје **5–10 минута**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Можете да гледате напредак директно у **Линоде Цлоуд Манагер-у** — није потребан ССХ:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Кликните на ваш новокреирани Линоде
+3. Кликните на **Покрени ЛИСХ конзолу** (горе десно на Линоде страници са детаљима)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Отвара се терминал претраживача који приказује дневник покретања уживо — картица **Веблисх** ради директно у вашем претраживачу, није потребан ССХ клијент.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Сачекајте док не видите:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Дневник такође приказује ИП вашег сервера — биће вам потребан за следећи корак.
 
 ---
 
-## Step 4 — Set up SSL
+## Корак 4 — Подесите ССЛ
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Пратите **[Водич за подешавање ССЛ-а →](../ссл-сетуп)** да бисте конфигурисали ХТТПС. Бесплатни поддомен **ртсурвеи.цом** је најбржа опција — није потребно подешавање ДНС-а.
 
 ---
 
-## Step 5 — First login
+## Корак 5 — Прво пријављивање
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Када је ССЛ активан, пратите **[Водич за прво пријављивање →](../фирст-логин)** да бисте приступили администраторском налогу.
 
 ---
 
-## Step 6 — Change the default password
+## Корак 6 — Промените подразумевану лозинку
 
-All passwords default to `admin`. Change them immediately after your first login:
+Све лозинке су подразумеване на `админ`. Промените их одмах након првог пријављивања:
 
-- **App admin password** — account settings inside the app
+- **Администраторска лозинка за апликацију** — подешавања налога унутар апликације
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## Правила заштитног зида (Linode Cloud Firewall)
+## Правила заштитног зида (Линоде Цлоуд заштитни зид)
 
-Ако повежете Linode Cloud Firewall са овим сервером, користите следећа правила:
+Ако прикључите Линоде Цлоуд заштитни зид на овај сервер, користите следећа правила:
 
-### Долазни саобраћај (Inbound)
+### Долазни
 
-| Ознака | Радња | Протокол | Порт | Извори | Белешке |
+| Лабел | Акција | Протокол | Порт | Извори | Нотес |
 |-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Прихвати | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Прихвати | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Прихвати | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Прихвати | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Прихвати | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Odbaci** | | | | Block everything else |
+| `аццепт-инбоунд-ссх` | Прихвати | ТЦП | 22 | Сав ИПв4, Сав ИПв6 | ССХ приступ |
+| `аццепт-инбоунд-хттп` | Прихвати | ТЦП | 80 | Сав ИПв4, Сав ИПв6 | Нгинк (ХТТП + АЦМЕ изазов) |
+| `аццепт-инбоунд-хттпс` | Прихвати | ТЦП | 443 | Сав ИПв4, Сав ИПв6 | Нгинк (ХТТПС након подешавања ССЛ-а) |
+| `аццепт-инбоунд-схини` | Прихвати | ТЦП | 3838 | Сав ИПв4, Сав ИПв6 | Схини Сервер (Р аналитицс) |
+| `аццепт-инбоунд-ицмп` | Прихвати | ИЦМП | — | Сав ИПв4, Сав ИПв6 | Пинг / дијагностика |
+| Подразумевана улазна политика | **Дроп** | | | | Блокирај све остало |
 
-### Одлазни саобраћај (Outbound)
+### Одлазни
 
-| Ознака | Радња | Белешке |
-|-------|--------|-------|
-| Default outbound policy | **Прихвати** | Dozvoliti sav odlazni saobraćaj (Docker, certbot, GoDaddy API, etc.) |
+| Лабел | Акција | Нотес |
+|-------|-------|-------|
+| Подразумевана одлазна политика | **Прихватам** | Дозволи све одлазне (Доцкер пуллс, цертбот, ГоДадди АПИ, итд.) |
 
-### Портови који НИСУ потребни споља
+### Портови НИСУ потребни екстерно
 
-Ови портови су везани само за `127.0.0.1` и никада нису доступни споља:
+Ови портови су везани само за `127.0.0.1` и никада нису доступни изван сервера:
 
 | Порт | Услуга | Разлог |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies internally |
-| 8090 | Keycloak container | Nginx proxies internally |
-| 3306 | MySQL | Internal Docker network only |
+|------|---------|-------|
+| 8080 | Контејнер апликације | Нгинк прокси за њега интерно |
+| 8090 | Кеицлоак контејнер | Нгинк прокси за њега интерно |
+| 3306 | МиСКЛ | Само интерна Доцкер мрежа |
 
 ---
 
-## Troubleshooting
+## Решавање проблема
 
-### Check the setup log
+### Проверите дневник подешавања
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Проверите ССЛ дневник
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Погледајте статус контејнера
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

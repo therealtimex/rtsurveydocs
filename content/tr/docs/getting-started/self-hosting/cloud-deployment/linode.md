@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "Linode (Akamai Bulutu)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "StackScript kullanarak rtCloud'u Linode üzerinde dağıtın. Yapılandırma gerekmez — sadece sunucuyu oluşturun ve dağıtım sonrası adımları takip edin."
+description: "StackScript kullanarak rtCloud'u Linode'a dağıtın. Yapılandırma gerekmez; yalnızca sunucuyu oluşturun ve dağıtım sonrası adımları izleyin."
 ---
 
-## Step 1 — Launch the StackScript
+## Adım 1 — StackScript'i başlatın
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Bu, Linode Bulut Yöneticisinde StackScript sayfasını açar. **Yeni Linode'u Dağıt**'ı tıklayın.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Adım 2 — Linode'un formunu doldurun
 
-Fill in Linode's standard server creation form:
+Linode'un standart sunucu oluşturma formunu doldurun:
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| Alan | Önerilen değer |
+|----------|----------|
+| **Resim** | Ubuntu 22.04LTS |
+| **Bölge** | Kullanıcılarınıza en yakın |
+| **Plan** | Paylaşılan CPU 4 GB veya daha büyük |
+| **Kök Şifresi** | Güçlü bir şifre belirleyin |
+| **Saat Dilimi** *(tek alanımız)* | Sunucunuzun saat dilimi (varsayılan: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+İşiniz bittiğinde **Linode Oluştur**'a tıklayın.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Adım 3 — Kurulumun tamamlanmasını bekleyin
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Komut dosyası ilk açılışta otomatik olarak çalışır. Docker'ı yükler, rtSurvey imajını çeker, veritabanını başlatır ve tüm hizmetleri başlatır. Bu **5–10 dakika** sürer.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+İlerlemeyi doğrudan **Linode Bulut Yöneticisi**'nde izleyebilirsiniz; SSH gerekmez:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Yeni oluşturduğunuz Linode'a tıklayın
+3. **LISH Konsolunu Başlat**'a tıklayın (Linode ayrıntı sayfasının sağ üst kısmında)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Canlı önyükleme günlüğünü gösteren bir tarayıcı terminali açılır — **Weblish** sekmesi doğrudan tarayıcınızda çalışır, SSH istemcisine gerek yoktur.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Şunu görene kadar bekleyin:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Günlük aynı zamanda sunucu IP'nizi de gösterir; bir sonraki adım için buna ihtiyacınız olacak.
 
 ---
 
-## Step 4 — Set up SSL
+## Adım 4 — SSL'yi ayarlayın
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+HTTPS'yi yapılandırmak için **[SSL Kurulum kılavuzunu →](../ssl-setup)** izleyin. Ücretsiz **rtsurvey.com alt alan adı** en hızlı seçenektir; DNS kurulumu gerekmez.
 
 ---
 
-## Step 5 — First login
+## Adım 5 — İlk oturum açma
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+SSL etkinleştirildikten sonra yönetici hesabına erişmek için **[İlk Giriş kılavuzu →](../first-login)** kılavuzunu izleyin.
 
 ---
 
 ## Step 6 — Change the default password
 
-All passwords default to `admin`. Change them immediately after your first login:
+Tüm şifreler varsayılan olarak "admin"dir. İlk girişinizden hemen sonra bunları değiştirin:
 
-- **App admin password** — account settings inside the app
+- **Uygulama yöneticisi şifresi** — uygulama içindeki hesap ayarları
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## Güvenlik Duvarı Kuralları (Linode Cloud Firewall)
+## Güvenlik duvarı kuralları (Linode Bulut Güvenlik Duvarı)
 
-Bu sunucuya bir Linode Cloud Firewall bağlarsanız, aşağıdaki kuralları kullanın:
+Bu sunucuya bir Linode Bulut Güvenlik Duvarı eklerseniz aşağıdaki kuralları kullanın:
 
-### Gelen Trafik (Inbound)
+### Gelen
 
-| Etiket | Eylem | Protokol | Port | Kaynaklar | Notlar |
-|--------|-------|---------|------|---------|-------|
-| `accept-inbound-ssh` | Kabul Et | TCP | 22 | All IPv4, All IPv6 | SSH erişimi |
-| `accept-inbound-http` | Kabul Et | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME doğrulaması) |
-| `accept-inbound-https` | Kabul Et | TCP | 443 | All IPv4, All IPv6 | Nginx (SSL kurulumundan sonra HTTPS) |
-| `accept-inbound-shiny` | Kabul Et | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analitik) |
-| `accept-inbound-icmp` | Kabul Et | ICMP | — | All IPv4, All IPv6 | Ping / tanılama |
-| Varsayılan gelen politikası | **Düşür** | | | | Diğer her şeyi engelle |
+| Label | Action | Protocol | Port | Sources | Notes |
+|----------|-----------|----------|------|------------|-------|
+| `gelen-ssh'yi kabul et' | Kabul et | TCP | 22 | Tüm IPv4, Tüm IPv6 | SSH erişimi |
+| 'gelen-http'yi kabul et' | Kabul et | TCP | 80 | Tüm IPv4, Tüm IPv6 | Nginx (HTTP + ACME mücadelesi) |
+| `gelen-https'yi kabul et` | Kabul et | TCP | 443 | Tüm IPv4, Tüm IPv6 | Nginx (SSL kurulumundan sonra HTTPS) |
+| `gelen-parlak kabul' | Kabul et | TCP | 3838 | Tüm IPv4, Tüm IPv6 | Parlak Sunucu (R analitiği) |
+| 'gelen-icmp'yi kabul et' | Kabul et | ICMP | — | Tüm IPv4, Tüm IPv6 | Ping / teşhis |
+| Varsayılan gelen politikası | **Bırak** | | | | Diğer her şeyi engelle |
 
-### Giden Trafik (Outbound)
+### Outbound
 
 | Etiket | Eylem | Notlar |
-|--------|-------|-------|
-| Varsayılan giden politikası | **Kabul Et** | Tüm giden trafiğe izin ver (Docker, certbot, GoDaddy API vb.) |
+|----------|-----------|-------|
+| Varsayılan giden politikası | **Kabul et** | Tüm gidenlere izin ver (Docker çekmeleri, sertifika botu, GoDaddy API vb.) |
 
-### Harici Olarak Gerekmeyen Portlar
+### Bağlantı noktalarına harici olarak gerek DEĞİLDİR
 
-Bu portlar yalnızca `127.0.0.1`'e bağlıdır ve dışarıdan hiçbir zaman erişilemez:
+Bu bağlantı noktaları yalnızca "127.0.0.1"e bağlıdır ve sunucunun dışından hiçbir zaman erişilemez:
 
-| Port | Servis | Neden |
-|------|--------|-------|
-| 8080 | Uygulama konteyneri | Nginx dahili olarak proxy yapıyor |
-| 8090 | Keycloak konteyneri | Nginx dahili olarak proxy yapıyor |
+| Liman | Hizmet | Nedeni |
+|------|------------|--------|
+| 8080 | Uygulama kapsayıcısı | Nginx dahili olarak proxy'ler |
+| 8090 | Anahtarlık konteyneri | Nginx dahili olarak proxy'ler |
 | 3306 | MySQL | Yalnızca dahili Docker ağı |
 
 ---
 
-## Troubleshooting
+## Sorun Giderme
 
-### Check the setup log
+### Kurulum günlüğünü kontrol edin
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### SSL günlüğünü kontrol edin
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Konteyner durumunu görüntüle
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

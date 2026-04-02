@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "లినోడ్ (అకామై క్లౌడ్)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "StackScript ఉపయోగించి Linode లో rtCloud విన్యసించండి. కాన్ఫిగరేషన్ అవసరం లేదు — కేవలం సర్వర్ సృష్టించి విన్యాసం తర్వాత దశలు అనుసరించండి."
+description: "StackScriptని ఉపయోగించి Linodeలో rtCloudని అమలు చేయండి. కాన్ఫిగరేషన్ అవసరం లేదు - సర్వర్‌ని సృష్టించి, పోస్ట్-డిప్లాయ్‌మెంట్ దశలను అనుసరించండి."
 ---
 
-## Step 1 — Launch the StackScript
+## దశ 1 — StackScriptను ప్రారంభించండి
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+ఇది లినోడ్ క్లౌడ్ మేనేజర్‌లో స్టాక్‌స్క్రిప్ట్ పేజీని తెరుస్తుంది. **కొత్త లినోడ్‌ని అమలు చేయి** క్లిక్ చేయండి.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## దశ 2 — లినోడ్ ఫారమ్‌ను పూరించండి
 
-Fill in Linode's standard server creation form:
+లినోడ్ యొక్క ప్రామాణిక సర్వర్ సృష్టి ఫారమ్‌ను పూరించండి:
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| ఫీల్డ్ | సిఫార్సు విలువ |
+|------|------------------|
+| **చిత్రం** | ఉబుంటు 22.04 LTS |
+| **ప్రాంతం** | మీ వినియోగదారులకు దగ్గరగా |
+| **ప్రణాళిక** | షేర్డ్ CPU 4 GB లేదా అంతకంటే ఎక్కువ |
+| **రూట్ పాస్‌వర్డ్** | బలమైన పాస్‌వర్డ్‌ని సెట్ చేయండి |
+| **టైమ్‌జోన్** *(మా ఏకైక ఫీల్డ్)* | మీ సర్వర్ సమయమండలి (డిఫాల్ట్: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+పూర్తయిన తర్వాత **Linodeని సృష్టించు** క్లిక్ చేయండి.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## దశ 3 - సెటప్ పూర్తయ్యే వరకు వేచి ఉండండి
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+స్క్రిప్ట్ మొదటి బూట్‌లో స్వయంచాలకంగా నడుస్తుంది. ఇది డాకర్‌ను ఇన్‌స్టాల్ చేస్తుంది, rtSurvey ఇమేజ్‌ని లాగుతుంది, డేటాబేస్‌ను ప్రారంభిస్తుంది మరియు అన్ని సేవలను ప్రారంభిస్తుంది. దీనికి **5-10 నిమిషాలు** పడుతుంది.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+మీరు నేరుగా **Linode Cloud Manager**లో పురోగతిని చూడవచ్చు — SSH అవసరం లేదు:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. మీరు కొత్తగా సృష్టించిన లినోడ్‌పై క్లిక్ చేయండి
+3. ** LISH కన్సోల్‌ని ప్రారంభించు** క్లిక్ చేయండి (లినోడ్ వివరాల పేజీ ఎగువ కుడివైపు)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+ప్రత్యక్ష బూట్ లాగ్‌ను చూపుతూ బ్రౌజర్ టెర్మినల్ తెరుచుకుంటుంది — **వెబ్లిష్** ట్యాబ్ నేరుగా మీ బ్రౌజర్‌లో పని చేస్తుంది, SSH క్లయింట్ అవసరం లేదు.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+మీరు చూసే వరకు వేచి ఉండండి:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+లాగ్ మీ సర్వర్ IPని కూడా చూపుతుంది - తదుపరి దశ కోసం మీకు ఇది అవసరం.
 
 ---
 
-## Step 4 — Set up SSL
+## దశ 4 — SSLని సెటప్ చేయండి
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+HTTPSని కాన్ఫిగర్ చేయడానికి **[SSL గైడ్‌ని సెటప్ చేయండి →](../ssl-setup)**ని అనుసరించండి. ఉచిత **rtsurvey.com సబ్‌డొమైన్** వేగవంతమైన ఎంపిక — DNS సెటప్ అవసరం లేదు.
 
 ---
 
-## Step 5 — First login
+## దశ 5 — మొదటి లాగిన్
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+SSL సక్రియం అయిన తర్వాత, నిర్వాహక ఖాతాను యాక్సెస్ చేయడానికి **[మొదటి లాగిన్ గైడ్ →](../first-login)**ని అనుసరించండి.
 
 ---
 
-## Step 6 — Change the default password
+## దశ 6 — డిఫాల్ట్ పాస్‌వర్డ్‌ను మార్చండి
 
-All passwords default to `admin`. Change them immediately after your first login:
+అన్ని పాస్‌వర్డ్‌లు డిఫాల్ట్‌గా `అడ్మిన్`. మీ మొదటి లాగిన్ తర్వాత వెంటనే వాటిని మార్చండి:
 
-- **App admin password** — account settings inside the app
+- **యాప్ అడ్మిన్ పాస్‌వర్డ్** — యాప్‌లోని ఖాతా సెట్టింగ్‌లు
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## ఫైర్‌వాల్ నియమాలు (Linode Cloud Firewall)
+## ఫైర్‌వాల్ నియమాలు (లినోడ్ క్లౌడ్ ఫైర్‌వాల్)
 
-మీరు ఈ సర్వర్‌కు Linode Cloud Firewall జోడిస్తే, ఈ నియమాలను ఉపయోగించండి:
+మీరు ఈ సర్వర్‌కు లినోడ్ క్లౌడ్ ఫైర్‌వాల్‌ను జోడించినట్లయితే, కింది నియమాలను ఉపయోగించండి:
 
-### ఇన్‌బౌండ్ ట్రాఫిక్
+### ఇన్‌బౌండ్
 
-| లేబల్ | చర్య | ప్రోటోకాల్ | పోర్ట్ | మూలాలు | గమనికలు |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | అంగీకరించు | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | అంగీకరించు | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | అంగీకరించు | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | అంగీకరించు | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | అంగీకరించు | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **వదలు** | | | | Block everything else |
+| లేబుల్ | చర్య | ప్రోటోకాల్ | పోర్ట్ | మూలాలు | గమనికలు |
+|------|---------|---------|------|---------|------|
+| `అంగీకరించు-ఇన్‌బౌండ్-ssh` | అంగీకరించు | TCP | 22 | అన్ని IPv4, అన్ని IPv6 | SSH యాక్సెస్ |
+| `అంగీకరించు-ఇన్‌బౌండ్-http` | అంగీకరించు | TCP | 80 | అన్ని IPv4, అన్ని IPv6 | Nginx (HTTP + ACME ఛాలెంజ్) |
+| `అంగీకరించు-ఇన్‌బౌండ్-https` | అంగీకరించు | TCP | 443 | అన్ని IPv4, అన్ని IPv6 | Nginx (SSL సెటప్ తర్వాత HTTPS) |
+| `అంగీకరించు-ఇన్‌బౌండ్-షైనీ` | అంగీకరించు | TCP | 3838 | అన్ని IPv4, అన్ని IPv6 | షైనీ సర్వర్ (R అనలిటిక్స్) |
+| `accept-inbound-icmp` | అంగీకరించు | ICMP | — | అన్ని IPv4, అన్ని IPv6 | పింగ్ / డయాగ్నస్టిక్స్ |
+| Default inbound policy | **Drop** | | | | Block everything else |
 
-### అవుట్‌బౌండ్ ట్రాఫిక్
+### అవుట్‌బౌండ్
 
-| లేబల్ | చర్య | గమనికలు |
-|-------|--------|-------|
-| Default outbound policy | **అంగీకరించు** | అన్ని అవుట్‌బౌండ్ ట్రాఫిక్‌ని అనుమతించు (Docker, certbot, GoDaddy API, etc.) |
+| లేబుల్ | చర్య | గమనికలు |
+|------|---------|------|
+| డిఫాల్ట్ అవుట్‌బౌండ్ విధానం | **అంగీకరించు** | అన్ని అవుట్‌బౌండ్‌లను అనుమతించు (డాకర్ లాగుతుంది, సర్ట్‌బాట్, GoDaddy API, మొదలైనవి) |
 
-### బాహ్యంగా అవసరం లేని పోర్ట్‌లు
+### పోర్ట్‌లు బాహ్యంగా అవసరం లేదు
 
-ఈ పోర్ట్‌లు కేవలం దీనికి మాత్రమే బంధించబడ్డాయి `127.0.0.1` మరియు బాహ్యంగా ఎప్పుడూ చేరుకోలేవు:
+ఈ పోర్ట్‌లు `127.0.0.1`కి మాత్రమే కట్టుబడి ఉంటాయి మరియు సర్వర్ వెలుపలి నుండి ఎప్పటికీ చేరుకోలేవు:
 
 | పోర్ట్ | సేవ | కారణం |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies internally |
-| 8090 | Keycloak container | Nginx proxies internally |
-| 3306 | MySQL | Internal Docker network only |
+|------|---------|---------|
+| 8080 | యాప్ కంటైనర్ | Nginx అంతర్గతంగా దానికి ప్రాక్సీ చేస్తుంది |
+| 8090 | కీక్లాక్ కంటైనర్ | Nginx అంతర్గతంగా దానికి ప్రాక్సీ చేస్తుంది |
+| 3306 | MySQL | అంతర్గత డాకర్ నెట్‌వర్క్ మాత్రమే |
 
 ---
 
-## Troubleshooting
+## ట్రబుల్షూటింగ్
 
-### Check the setup log
+### సెటప్ లాగ్‌ని తనిఖీ చేయండి
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### SSL లాగ్‌ను తనిఖీ చేయండి
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### కంటైనర్ స్థితిని వీక్షించండి
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

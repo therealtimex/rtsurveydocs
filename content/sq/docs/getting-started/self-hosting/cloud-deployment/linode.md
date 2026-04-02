@@ -7,48 +7,48 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Vendosni rtCloud në Linode duke përdorur StackScript. Nuk nevojitet konfigurim — thjesht krijoni serverin dhe ndiqni hapat pas vendosjes."
+description: "Vendosni rtCloud në Linode duke përdorur një StackScript. Nuk nevojitet konfigurim - thjesht krijoni serverin dhe ndiqni hapat pas vendosjes."
 ---
 
-## Step 1 — Launch the StackScript
+## Hapi 1 - Nisni StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Kjo hap faqen StackScript në Linode Cloud Manager. Klikoni **Deploy New Linode**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Hapi 2 - Plotësoni formularin e Linode
 
-Fill in Linode's standard server creation form:
+Plotësoni formularin standard të krijimit të serverit Linode:
 
-| Field | Recommended value |
+| Fusha | Vlera e rekomanduar |
 |-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| **Imazhi** | Ubuntu 22.04 LTS |
+| **Rajoni ** | Më afër përdoruesve tuaj |
+| **Plani ** | CPU e përbashkët 4 GB ose më e madhe |
+| **Fjalëkalimi rrënjë** | Vendosni një fjalëkalim të fortë |
+| **Zona kohore** *(fusha jonë e vetme)* | Zona kohore e serverit tuaj (e parazgjedhur: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+Klikoni **Krijo Linode** kur të keni mbaruar.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Hapi 3 - Prisni që konfigurimi të përfundojë
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Skripti funksionon automatikisht në nisjen e parë. Ai instalon Docker, tërheq imazhin rtSurvey, inicializon bazën e të dhënave dhe nis të gjitha shërbimet. Kjo zgjat **5–10 minuta**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Mund të shikoni progresin drejtpërdrejt në **Linode Cloud Manager** — nuk kërkohet SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Klikoni në Linode tuaj të sapokrijuar
+3. Klikoni **Launch LISH Console** (lart djathtas i faqes së detajeve Linode)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Hapet një terminal shfletuesi që tregon regjistrin e drejtpërdrejtë të nisjes - skeda **Weblish** funksionon drejtpërdrejt në shfletuesin tuaj, nuk nevojitet klient SSH.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Prisni derisa të shihni:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Regjistri gjithashtu tregon IP-në e serverit tuaj - do t'ju duhet për hapin tjetër.
 
 ---
 
-## Step 4 — Set up SSL
+## Hapi 4 - Konfiguro SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Ndiqni **[Konfiguro udhëzuesin SSL →](../ssl-setup)** për të konfiguruar HTTPS. Nëndomeni falas **rtsurvey.com** është opsioni më i shpejtë – nuk nevojitet konfigurim DNS.
 
 ---
 
-## Step 5 — First login
+## Hapi 5 - Hyrja e parë
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Pasi SSL të jetë aktiv, ndiqni **[Udhëzuesin e hyrjes së parë →](../first-login)** për të hyrë në llogarinë e administratorit.
 
 ---
 
-## Step 6 — Change the default password
+## Hapi 6 - Ndryshoni fjalëkalimin e paracaktuar
 
-All passwords default to `admin`. Change them immediately after your first login:
+Të gjitha fjalëkalimet e paracaktuara janë "admin". Ndryshoni ato menjëherë pas hyrjes tuaj të parë:
 
-- **App admin password** — account settings inside the app
+- **Fjalëkalimi i administratorit të aplikacionit** — cilësimet e llogarisë brenda aplikacionit
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## Rregullat e murit të zjarrit (Linode Cloud Firewall)
+## Rregullat e Firewall-it (Linode Cloud Firewall)
 
-Nëse lidhni një Linode Cloud Firewall me këtë server, përdorni rregullat e mëposhtme:
+Nëse bashkëngjitni një Linode Cloud Firewall në këtë server, përdorni rregullat e mëposhtme:
 
-### Trafiku hyrës (Inbound)
+### Inbound
 
-| Etiketa | Veprimi | Protokolli | Porta | Burimet | Shënime |
+| Label | Action | Protocol | Port | Sources | Notes |
 |-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Pranoje | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Pranoje | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Pranoje | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Pranoje | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Pranoje | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Hidhe** | | | | Block everything else |
+| `pranoj-inbound-ssh` | Prano | TCP | 22 | Të gjitha IPv4, Të gjitha IPv6 | Qasja SSH |
+| "pranoj-përbrenda-http" | Prano | TCP | 80 | Të gjitha IPv4, Të gjitha IPv6 | Nginx (Sfida HTTP + ACME) |
+| "pranoj-përbrenda-https" | Prano | TCP | 443 | Të gjitha IPv4, Të gjitha IPv6 | Nginx (HTTPS pas konfigurimit SSL) |
+| `pranoj-përbrenda-shkëlqim` | Prano | TCP | 3838 | Të gjitha IPv4, Të gjitha IPv6 | Serveri i ndritshëm (analitika R) |
+| "pranoj-inbound-icmp" | Prano | ICMP | — | Të gjitha IPv4, Të gjitha IPv6 | Ping / diagnostikim |
+| Default inbound policy | **Drop** | | | | Blloko gjithçka tjetër |
 
-### Trafiku dalës (Outbound)
+### Jashtë
 
-| Etiketa | Veprimi | Shënime |
+| Label | Veprimi | Shënime |
 |-------|--------|-------|
-| Default outbound policy | **Pranoje** | Lejoni gjithë trafikun dalës (Docker, certbot, GoDaddy API, etc.) |
+| Politika e parazgjedhur e daljes | **Prano ** | Lejo të gjitha jashtë (Docker pulls, certbot, GoDaddy API, etj.) |
 
-### Portat që NUK nevojiten jashtë
+### Portet NUK nevojiten nga jashtë
 
-Këto porta janë të lidhura vetëm me `127.0.0.1` dhe nuk janë kurrë të arritshme nga jashtë:
+Këto porte janë të lidhura vetëm me "127.0.0.1" dhe nuk mund të arrihen kurrë nga jashtë serverit:
 
-| Porta | Shërbimi | Arsyeja |
+| Port | Shërbimi | Arsyeja |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies internally |
-| 8090 | Keycloak container | Nginx proxies internally |
+| 8080 | Kontejneri i aplikacionit | Nginx proxies për të brenda |
+| 8090 | Enë me mantel | Nginx proxies për të brenda |
 | 3306 | MySQL | Internal Docker network only |
 
 ---
 
-## Troubleshooting
+## Zgjidhja e problemeve
 
-### Check the setup log
+### Kontrollo regjistrin e konfigurimit
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Kontrollo regjistrin SSL
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Shiko statusin e kontejnerit
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

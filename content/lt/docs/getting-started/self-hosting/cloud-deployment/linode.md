@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "Linode (Akamai debesis)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Diekite rtCloud Linode naudodami StackScript. Nereikia konfigūravimo — tiesiog sukurkite serverį ir atlikite veiksmus po diegimo."
+description: "Įdiekite „rtCloud“ „Linode“ naudodami „StackScript“. Nereikia jokios konfigūracijos – tiesiog sukurkite serverį ir atlikite veiksmus po įdiegimo."
 ---
 
-## Step 1 — Launch the StackScript
+## 1 veiksmas – paleiskite „StackScript“.
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Tai atidaro „StackScript“ puslapį „Linode Cloud Manager“. Spustelėkite **Deploy New Linode**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## 2 veiksmas – užpildykite Linode formą
 
-Fill in Linode's standard server creation form:
+Užpildykite Linode standartinę serverio kūrimo formą:
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| Laukas | Rekomenduojama vertė |
+|-------|-------------------|
+| **Vaizdas** | Ubuntu 22.04 LTS |
+| **Regionas** | Arčiausiai jūsų naudotojų |
+| **Planas** | Bendras CPU 4 GB ar didesnis |
+| **Root slaptažodis** | Nustatykite tvirtą slaptažodį |
+| **Laiko juosta** *(mūsų vienintelis laukas)* | Jūsų serverio laiko juosta (numatytasis: „Asia/Ho_Chi_Minh“) |
 
-Click **Create Linode** when done.
+Baigę spustelėkite **Sukurti linodą**.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## 3 veiksmas – palaukite, kol sąranka bus baigta
 
 The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Pažangą galite stebėti tiesiogiai naudodami **Linode Cloud Manager** – nereikia SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Spustelėkite savo naujai sukurtą Linode
+3. Spustelėkite **Paleisti LISH konsolę** (išsamios Linode puslapio viršuje, dešinėje)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Atsidaro naršyklės terminalas, kuriame rodomas tiesioginis įkrovos žurnalas – skirtukas **Weblish** veikia tiesiogiai jūsų naršyklėje, nereikia SSH kliento.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Palaukite, kol pamatysite:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Žurnalas taip pat rodo jūsų serverio IP – jums jo reikės kitam veiksmui.
 
 ---
 
-## Step 4 — Set up SSL
+## 4 veiksmas – nustatykite SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Norėdami sukonfigūruoti HTTPS, vadovaukitės **[SSL sąrankos vadovas →](../ssl-setup)**. Nemokamas **rsurvey.com padomenis** yra greičiausia parinktis – nereikia nustatyti DNS.
 
 ---
 
-## Step 5 — First login
+## 5 veiksmas – pirmasis prisijungimas
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Kai SSL bus aktyvus, vadovaukitės **[Pirmojo prisijungimo vadovas →](../first-login)**, kad pasiektumėte administratoriaus paskyrą.
 
 ---
 
-## Step 6 — Change the default password
+## 6 veiksmas – pakeiskite numatytąjį slaptažodį
 
 All passwords default to `admin`. Change them immediately after your first login:
 
-- **App admin password** — account settings inside the app
+- **Programos administratoriaus slaptažodis** – paskyros nustatymai programoje
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
 ## Ugniasienės taisyklės (Linode Cloud Firewall)
 
-Jei prie šio serverio priskiriate Linode Cloud Firewall, naudokite šias taisykles:
+Jei prie šio serverio prijungiate Linode Cloud Firewall, vadovaukitės šiomis taisyklėmis:
 
-### Gaunamasis srautas (Inbound)
+### Atvyksta
 
-| Etiketė | Veiksmas | Protokolas | Prievadas | Šaltiniai | Pastabos |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Priimti | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Priimti | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Priimti | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Priimti | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Priimti | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Atmesti** | | | | Block everything else |
+| Etiketė | Veiksmas | Protokolas | Uostas | Šaltiniai | Pastabos |
+|-------|--------|----------|------|----------|--------|
+| `accept-inbound-ssh` | Priimti | TCP | 22 | Visi IPv4, visi IPv6 | SSH prieiga |
+| `priimti-įeinantį-http` | Priimti | TCP | 80 | Visi IPv4, visi IPv6 | Nginx (HTTP + ACME iššūkis) |
+| `priimti-įeinantį-https` | Priimti | TCP | 443 | Visi IPv4, visi IPv6 | Nginx (HTTPS po SSL sąrankos) |
+| `priimti-įeinantis-blizgantis` | Priimti | TCP | 3838 | Visi IPv4, visi IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Priimti | ICMP | — | Visi IPv4, visi IPv6 | Ping / diagnostika |
+| Numatytoji atvykimo politika | **Lašas** | | | | Blokuoti visa kita |
 
-### Siunčiamas srautas (Outbound)
+### Išeinantis
 
 | Etiketė | Veiksmas | Pastabos |
-|-------|--------|-------|
-| Default outbound policy | **Priimti** | Leisti visą siunčiamą srautą (Docker, certbot, GoDaddy API, etc.) |
+|-------|---------|-------|
+| Numatytoji siuntimo politika | **Priimti** | Leisti visus išeinančius („Docker“ ištraukimus, „certbot“, „GoDaddy“ API ir kt.) |
 
-### Prievadai, kurių išoriškai NEREIKIA
+### Prievadai NĖRA reikalingi išoriškai
 
-Šie prievadai susieti tik su `127.0.0.1` ir niekada nepasiekiami iš išorės:
+Šie prievadai yra susieti tik su „127.0.0.1“ ir niekada nepasiekiami iš išorės:
 
-| Prievadas | Paslauga | Priežastis |
+| Uostas | Paslauga | Priežastis |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies internally |
-| 8090 | Keycloak container | Nginx proxies internally |
-| 3306 | MySQL | Internal Docker network only |
+| 8080 | Programos konteineris | „Nginx“ tarpinis serveris jam naudojamas viduje |
+| 8090 | Keycloak konteineris | „Nginx“ tarpinis serveris jam naudojamas viduje |
+| 3306 | MySQL | Tik vidinis Docker tinklas |
 
 ---
 
-## Troubleshooting
+## Trikčių šalinimas
 
-### Check the setup log
+### Patikrinkite sąrankos žurnalą
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Patikrinkite SSL žurnalą
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Peržiūrėkite konteinerio būseną
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

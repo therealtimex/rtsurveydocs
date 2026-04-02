@@ -1,30 +1,30 @@
 ---
 weight: 1
-title: "DigitalOcean"
+title: "數位海洋"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-17T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "使用自動化用戶數據腳本在 DigitalOcean Droplet 上部署 rtCloud。"
+description: "Deploy rtCloud on a DigitalOcean Droplet using automated user-data scripts."
 ---
 
-DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
+DigitalOcean 使用在首次啟動時自動執行的 **使用者資料** 腳本。您在腳本頂部填寫配置變量，然後在創建 Droplet 時貼上整個腳本。
 
-> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
+> 與 Linode StackScripts 不同，DigitalOcean 沒有表單 UI — 您必須在貼上之前直接編輯腳本。
 
 **Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Embedded Keycloak (Recommended)
+## 嵌入式鑰匙斗篷（建議）
 
-Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
+使用“digitalocean-droplet-keycloak-embed.sh”透過內建 SSO 進行最簡單的設定。
 
-### Step 1 — Fill in the configuration
+### 第 1 步 — 填入配置
 
-Open the script and edit the `CONFIGURATION` block at the top:
+打開腳本並編輯頂部的“CONFIGURATION”區塊：
 
 ```bash
 # --- Required ---
@@ -41,30 +41,30 @@ STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
-| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
-| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
-| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
-| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
+|領域 |必填|描述 |
+|--------|----------|-------------|
+| `項目_ID` |是的 |用作資料庫名稱和 Keycloak 用戶端 ID。小寫，無空格。 |
+| `管理員密碼` |沒有 |應用程式管理員登入和 Keycloak 管理控制台的密碼。預設為“admin”——**首次登入後更改**。 |
+| `域` |是的 |您的網域。 DNS A 記錄必須指向 Droplet IP。 |
+| `LETSENCRYPT_EMAIL` |是的 | Let's Encrypt 憑證通知的電子郵件地址。 |
+| `PROJECT_URL` |沒有 |覆寫公用 URL。留空以使用“DOMAIN”。在 Cloudflare 背後很有用。 |
 
-> **Security:** All passwords default to `admin`. Change them immediately after your first login.
+> **安全性：** 所有密碼預設為「admin」。首次登入後立即更改它們。
 
-### Step 2 — Create a Droplet
+### 步驟 2 — 建立 Droplet
 
 In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Click **Create** → **Droplets**
-2. Choose **Ubuntu 22.04 LTS** as the image
-3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
-4. Scroll to **Advanced Options** → check **Add Initialization scripts**
-5. Paste the full script content into the text area
-6. Click **Create Droplet**
+1. 按一下 **建立** → **Droplets**
+2.選擇**Ubuntu 22.04 LTS**作為鏡像
+3. 選擇 **基本、4 GB RAM / 2 vCPU** 或更大
+4. 捲動至 **進階選項** → 選取 **新增初始化腳本**
+5. 將完整的腳本內容貼到文字區域
+6. 按一下“**建立 Droplet**”
 
-### Step 3 — Add the DNS record
+### 步驟 3 — 新增 DNS 記錄
 
-While the Droplet boots, add an **A record** in your DNS provider:
+當 Droplet 啟動時，在您的 DNS 提供者中新增 **A 記錄**：
 
 ```
 Type  : A
@@ -73,20 +73,20 @@ Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Step 4 — Monitor progress
+### 第 4 步 — 監控進度
 
-SSH into the Droplet and watch the log:
+透過 SSH 進入 Droplet 並觀察日誌：
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-The script prints your server IP near the start — add the DNS record as soon as you see it.
+該腳本在開頭附近列印您的伺服器 IP — 一旦您看到它就會新增 DNS 記錄。
 
-### Step 5 — Access the app
+### 第 5 步 — 存取應用程式
 
-When setup completes, the log shows a summary:
+設定完成後，日誌會顯示摘要：
 
 ```
 ============================================================
@@ -103,31 +103,31 @@ When setup completes, the log shows a summary:
 
 Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Change your password** immediately after login via **Settings** in the top-right menu.
+> 透過右上角選單中的**設定**登入後立即**更改您的密碼**。
 
 ---
 
-## After Deployment
+## 部署後
 
-### Change a password
+### 更改密碼
 
-SSH into the Droplet, edit `.env`, and restart the affected container:
+透過 SSH 連接到 Droplet，編輯 `.env`，然後重新啟動受影響的容器：
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Update the domain
+### 更新域名
 
-If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
+如果您在部署後指派不同的網域，請更新「.env」中的「PROJECT_URL」：
 
 ```bash
 nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### View all containers
+### 查看所有容器
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

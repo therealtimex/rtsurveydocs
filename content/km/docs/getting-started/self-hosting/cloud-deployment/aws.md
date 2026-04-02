@@ -3,7 +3,7 @@ weight: 3
 title: "AWS EC2"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-16T00:00:00+07:00"
-draft: false
+draft: true
 author: "rtSurvey"
 icon: "cloud"
 toc: true

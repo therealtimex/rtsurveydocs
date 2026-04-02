@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "Linode (Akamai-wolk)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Implementeer rtCloud op Linode met een StackScript. Geen configuratie nodig — maak gewoon de server aan en volg de stappen na de implementatie."
+description: "Implementeer rtCloud op Linode met behulp van een StackScript. Geen configuratie nodig: maak gewoon de server aan en volg de stappen na de implementatie."
 ---
 
-## Step 1 — Launch the StackScript
+## Stap 1 — Start StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Hiermee wordt de StackScript-pagina in Linode Cloud Manager geopend. Klik op **Nieuwe Linode implementeren**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Stap 2 — Vul het formulier van Linode in
 
-Fill in Linode's standard server creation form:
+Vul het standaard servercreatieformulier van Linode in:
 
-| Field | Recommended value |
+| Veld | Aanbevolen waarde |
 |-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| **Afbeelding** | Ubuntu 22.04LTS |
+| **Regio** | Het dichtst bij uw gebruikers |
+| **Plannen** | Gedeelde CPU 4 GB of groter |
+| **Rootwachtwoord** | Stel een sterk wachtwoord in |
+| **Tijdzone** *(ons enige veld)* | De tijdzone van uw server (standaard: `Azië/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+Klik op **Linode maken** als u klaar bent.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Stap 3 — Wacht tot de installatie is voltooid
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Het script wordt automatisch uitgevoerd bij de eerste keer opstarten. Het installeert Docker, haalt de rtSurvey-image op, initialiseert de database en start alle services. Dit duurt **5–10 minuten**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Je kunt de voortgang rechtstreeks bekijken in **Linode Cloud Manager** – geen SSH vereist:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Klik op je nieuw gemaakte Linode
+3. Klik op **LISH Console starten** (rechtsboven op de Linode-detailpagina)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Er wordt een browserterminal geopend met het live opstartlogboek. Het tabblad **Weblish** werkt rechtstreeks in uw browser, er is geen SSH-client nodig.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Wacht tot je ziet:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Het log toont ook het IP-adres van uw server; u heeft dit nodig voor de volgende stap.
 
 ---
 
-## Step 4 — Set up SSL
+## Stap 4 — SSL instellen
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Volg de **[SSL-handleiding instellen →](../ssl-setup)** om HTTPS te configureren. Het gratis **rtsurvey.com-subdomein** is de snelste optie: er is geen DNS-installatie nodig.
 
 ---
 
-## Step 5 — First login
+## Stap 5 — Eerste login
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Zodra SSL actief is, volgt u de **[Handleiding voor eerste aanmelding →](../eerste aanmelding)** om toegang te krijgen tot het beheerdersaccount.
 
 ---
 
-## Step 6 — Change the default password
+## Stap 6 — Wijzig het standaardwachtwoord
 
-All passwords default to `admin`. Change them immediately after your first login:
+Alle wachtwoorden zijn standaard 'admin'. Wijzig ze onmiddellijk na uw eerste login:
 
-- **App admin password** — account settings inside the app
+- **App-beheerderswachtwoord** — accountinstellingen in de app
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
 ## Firewallregels (Linode Cloud Firewall)
 
-Als u een Linode Cloud Firewall aan deze server koppelt, gebruik dan de volgende regels:
+Als u een Linode Cloud Firewall aan deze server koppelt, hanteer dan de volgende regels:
 
-### Inkomend verkeer (Inbound)
+### Binnenkomend
 
-| Label | Actie | Protocol | Poort | Bronnen | Opmerkingen |
-|-------|-------|---------|------|---------|------------|
-| `accept-inbound-ssh` | Accepteren | TCP | 22 | All IPv4, All IPv6 | SSH-toegang |
-| `accept-inbound-http` | Accepteren | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME-challenge) |
-| `accept-inbound-https` | Accepteren | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS na SSL-instelling) |
-| `accept-inbound-shiny` | Accepteren | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R-analyse) |
-| `accept-inbound-icmp` | Accepteren | ICMP | — | All IPv4, All IPv6 | Ping / diagnose |
-| Standaard inkomend beleid | **Weigeren** | | | | Al het overige blokkeren |
+| Etiket | Actie | Protocol | Haven | Bronnen | Opmerkingen |
+|-------|--------|----------|------|---------|-------|
+| `accepteer-inkomende-ssh` | Accepteren | TCP | 22 | Alles IPv4, Alles IPv6 | SSH-toegang |
+| `accepteren-inkomend-http` | Accepteren | TCP | 80 | Alles IPv4, Alles IPv6 | Nginx (HTTP + ACME-uitdaging) |
+| `accepteren-inkomend-https` | Accepteren | TCP | 443 | Alles IPv4, Alles IPv6 | Nginx (HTTPS na SSL-installatie) |
+| `accepteren-inkomend-glanzend` | Accepteren | TCP | 3838 | Alles IPv4, Alles IPv6 | Glanzende server (R-analyse) |
+| `accepteren-inkomend-icmp` | Accepteren | ICMP | — | Alles IPv4, Alles IPv6 | Ping / diagnostiek |
+| Standaardbeleid voor inkomend verkeer | **Laat vallen** | | | | Al het andere blokkeren |
 
-### Uitgaand verkeer (Outbound)
+### Uitgaand
 
-| Label | Actie | Opmerkingen |
-|-------|-------|------------|
-| Standaard uitgaand beleid | **Accepteren** | Al het uitgaande verkeer toestaan (Docker, certbot, GoDaddy API, enz.) |
-
-### Poorten die NIET extern nodig zijn
-
-Deze poorten zijn alleen gebonden aan `127.0.0.1` en zijn nooit bereikbaar van buitenaf:
-
-| Poort | Dienst | Reden |
+| Etiket | Actie | Opmerkingen |
 |-------|--------|-------|
-| 8080 | App-container | Nginx doet intern proxy |
-| 8090 | Keycloak-container | Nginx doet intern proxy |
+| Standaardbeleid voor uitgaand verkeer | **Accepteren** | Alle uitgaande berichten toestaan ​​(Docker-pulls, certbot, GoDaddy API, etc.) |
+
+### Poorten NIET extern nodig
+
+Deze poorten zijn alleen gebonden aan `127.0.0.1` en zijn nooit bereikbaar van buiten de server:
+
+| Haven | Dienst | Reden |
+|------|---------|--------|
+| 8080 | App-container | Nginx proxies to it internally |
+| 8090 | Sleutelmantelcontainer | Nginx-proxy's intern |
 | 3306 | MySQL | Alleen intern Docker-netwerk |
 
 ---
 
-## Troubleshooting
+## Problemen oplossen
 
-### Check the setup log
+### Controleer het installatielogboek
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Controleer het SSL-logboek
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Bekijk de containerstatus
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

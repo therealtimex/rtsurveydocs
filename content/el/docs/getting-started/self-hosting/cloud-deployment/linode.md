@@ -7,48 +7,48 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Αναπτύξτε το rtCloud στο Linode χρησιμοποιώντας StackScript. Δεν απαιτείται διαμόρφωση — απλώς δημιουργήστε τον διακομιστή και ακολουθήστε τα βήματα μετά την ανάπτυξη."
+description: "Αναπτύξτε το rtCloud στο Linode χρησιμοποιώντας ένα StackScript. Δεν απαιτείται διαμόρφωση — απλώς δημιουργήστε τον διακομιστή και ακολουθήστε τα βήματα μετά την ανάπτυξη."
 ---
 
-## Step 1 — Launch the StackScript
+## Βήμα 1 — Εκκινήστε το StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Αυτό ανοίγει τη σελίδα StackScript στο Linode Cloud Manager. Κάντε κλικ στο **Deploy New Linode**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Βήμα 2 — Συμπληρώστε τη φόρμα του Linode
 
-Fill in Linode's standard server creation form:
+Συμπληρώστε την τυπική φόρμα δημιουργίας διακομιστή της Linode:
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| Πεδίο | Προτεινόμενη τιμή |
+|-------|-------------------|
+| **Εικόνα** | Ubuntu 22.04 LTS |
+| **Περιοχή** | Πιο κοντά στους χρήστες σας |
+| **Σχέδιο** | Κοινόχρηστη CPU 4 GB ή μεγαλύτερη |
+| **Κωδικός πρόσβασης ρίζας** | Ορίστε έναν ισχυρό κωδικό πρόσβασης |
+| **Ζώνη ώρας** *(το μόνο μας πεδίο)* | Η ζώνη ώρας του διακομιστή σας (προεπιλογή: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+Κάντε κλικ στο **Δημιουργία Linode** όταν τελειώσετε.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Βήμα 3 — Περιμένετε να ολοκληρωθεί η εγκατάσταση
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Το σενάριο εκτελείται αυτόματα κατά την πρώτη εκκίνηση. Εγκαθιστά το Docker, τραβάει την εικόνα rtSurvey, αρχικοποιεί τη βάση δεδομένων και ξεκινά όλες τις υπηρεσίες. Αυτό διαρκεί **5–10 λεπτά**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Μπορείτε να παρακολουθήσετε την πρόοδο απευθείας στο **Linode Cloud Manager** — δεν απαιτείται SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Κάντε κλικ στο Linode που μόλις δημιουργήσατε
+3. Κάντε κλικ στην **Εκκίνηση LISH Console** (επάνω δεξιά στη σελίδα λεπτομερειών Linode)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Ανοίγει ένα τερματικό προγράμματος περιήγησης που δείχνει το ζωντανό αρχείο καταγραφής εκκίνησης — η καρτέλα **Weblish** λειτουργεί απευθείας στο πρόγραμμα περιήγησής σας, δεν χρειάζεται πρόγραμμα-πελάτης SSH.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Περιμένετε μέχρι να δείτε:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Το αρχείο καταγραφής εμφανίζει επίσης την IP του διακομιστή σας — θα τη χρειαστείτε για το επόμενο βήμα.
 
 ---
 
-## Step 4 — Set up SSL
+## Βήμα 4 — Ρύθμιση SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Ακολουθήστε τον **[Ρύθμιση του οδηγού SSL →](../ssl-setup)** για να διαμορφώσετε το HTTPS. Ο δωρεάν υποτομέας **rtsurvey.com** είναι η ταχύτερη επιλογή — δεν απαιτείται ρύθμιση DNS.
 
 ---
 
-## Step 5 — First login
+## Βήμα 5 — Πρώτη σύνδεση
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Μόλις ενεργοποιηθεί το SSL, ακολουθήστε τον **[Οδηγός Πρώτης σύνδεσης →](../first-login)** για να αποκτήσετε πρόσβαση στον λογαριασμό διαχειριστή.
 
 ---
 
-## Step 6 — Change the default password
+## Βήμα 6 — Αλλάξτε τον προεπιλεγμένο κωδικό πρόσβασης
 
-All passwords default to `admin`. Change them immediately after your first login:
+Όλοι οι κωδικοί πρόσβασης από προεπιλογή είναι "admin". Αλλάξτε τα αμέσως μετά την πρώτη σας σύνδεση:
 
-- **App admin password** — account settings inside the app
+- **Κωδικός πρόσβασης διαχειριστή εφαρμογής** — ρυθμίσεις λογαριασμού μέσα στην εφαρμογή
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
 ## Κανόνες τείχους προστασίας (Linode Cloud Firewall)
 
-Αν συνδέσετε ένα Linode Cloud Firewall σε αυτόν τον διακομιστή, χρησιμοποιήστε τους παρακάτω κανόνες:
+Εάν επισυνάψετε ένα Linode Cloud Firewall σε αυτόν τον διακομιστή, χρησιμοποιήστε τους ακόλουθους κανόνες:
 
-### Εισερχόμενη κίνηση (Inbound)
+### Εισερχόμενα
 
-| Ετικέτα | Ενέργεια | Πρωτόκολλο | Θύρα | Πηγές | Σημειώσεις |
+| Ετικέτα | Δράση | Πρωτόκολλο | Λιμάνι | Πηγές | Σημειώσεις |
 |-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Αποδοχή | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Αποδοχή | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Αποδοχή | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Αποδοχή | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Αποδοχή | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Απόρριψη** | | | | Block everything else |
+| `accept-inbound-ssh` | Αποδοχή | TCP | 22 | Όλα τα IPv4, όλα τα IPv6 | Πρόσβαση SSH |
+| `accept-inbound-http` | Αποδοχή | TCP | 80 | Όλα τα IPv4, όλα τα IPv6 | Nginx (πρόκληση HTTP + ACME) |
+| "accept-inbound-https" | Αποδοχή | TCP | 443 | Όλα τα IPv4, όλα τα IPv6 | Nginx (HTTPS μετά τη ρύθμιση SSL) |
+| «αποδοχή-εισερχόμενο-γυαλιστερό» | Αποδοχή | TCP | 3838 | Όλα τα IPv4, όλα τα IPv6 | Shiny Server (R analytics) |
+| "accept-inbound-icmp" | Αποδοχή | ICMP | — | Όλα τα IPv4, όλα τα IPv6 | Ping / διαγνωστικά |
+| Προεπιλεγμένη πολιτική εισερχομένων | **Πτώση** | | | | Αποκλείστε όλα τα άλλα |
 
-### Εξερχόμενη κίνηση (Outbound)
+### Εξερχόμενη
 
-| Ετικέτα | Ενέργεια | Σημειώσεις |
+| Ετικέτα | Δράση | Σημειώσεις |
 |-------|--------|-------|
-| Default outbound policy | **Αποδοχή** | Επιτρέπεται όλη η εξερχόμενη κίνηση (Docker, certbot, GoDaddy API, etc.) |
+| Προεπιλεγμένη εξερχόμενη πολιτική | **Αποδοχή** | Να επιτρέπονται όλα τα εξερχόμενα (Docker pulls, certbot, GoDaddy API, κ.λπ.) |
 
-### Θύρες ΔΕΝ απαιτούνται εξωτερικά
+### Θύρες ΔΕΝ χρειάζονται εξωτερικά
 
-Αυτές οι θύρες είναι δεσμευμένες μόνο στο `127.0.0.1` και δεν είναι ποτέ προσβάσιμες εξωτερικά:
+Αυτές οι θύρες είναι δεσμευμένες μόνο σε `127.0.0.1` και δεν είναι ποτέ προσβάσιμες εκτός του διακομιστή:
 
-| Θύρα | Υπηρεσία | Αιτία |
+| Λιμάνι | Υπηρεσία | Λόγος |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies internally |
-| 8090 | Keycloak container | Nginx proxies internally |
-| 3306 | MySQL | Internal Docker network only |
+| 8080 | Κοντέινερ εφαρμογών | Το Nginx διαμεσολαβεί σε αυτό εσωτερικά |
+| 8090 | Δοχείο κλειδαριάς | Το Nginx διαμεσολαβεί σε αυτό εσωτερικά |
+| 3306 | MySQL | Μόνο εσωτερικό δίκτυο Docker |
 
 ---
 
-## Troubleshooting
+## Αντιμετώπιση προβλημάτων
 
-### Check the setup log
+### Ελέγξτε το αρχείο καταγραφής εγκατάστασης
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Ελέγξτε το αρχείο καταγραφής SSL
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Προβολή κατάστασης κοντέινερ
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

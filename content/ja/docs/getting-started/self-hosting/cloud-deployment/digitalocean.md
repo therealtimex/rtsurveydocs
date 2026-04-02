@@ -1,30 +1,30 @@
 ---
 weight: 1
-title: "DigitalOcean"
+title: "デジタルオーシャン"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-17T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "自動化されたユーザーデータスクリプトを使用してDigitalOcean DropletにrtCloudをデプロイします。"
+description: "自動化されたユーザー データ スクリプトを使用して、DigitalOcean Droplet に rtCloud をデプロイします。"
 ---
 
-DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
+DigitalOcean は、初回起動時に自動的に実行される **ユーザー データ** スクリプトを使用します。スクリプトの先頭で構成変数を入力し、ドロップレットの作成時にスクリプト全体を貼り付けます。
 
-> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
+> Linode StackScripts とは異なり、DigitalOcean にはフォーム UI がありません。貼り付ける前にスクリプトを直接編集する必要があります。
 
 **Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Embedded Keycloak (Recommended)
+## 埋め込み Keycloak (推奨)
 
-Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
+組み込み SSO を使用した最も簡単なセットアップには、「digitalocean-droplet-keycloak-embed.sh」を使用します。
 
-### Step 1 — Fill in the configuration
+### ステップ 1 — 構成を入力します
 
-Open the script and edit the `CONFIGURATION` block at the top:
+スクリプトを開いて、上部の「CONFIGURATION」ブロックを編集します。
 
 ```bash
 # --- Required ---
@@ -41,30 +41,30 @@ STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
-| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
-| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
-| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
-| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
+|フィールド |必須 |説明 |
+|----------|----------|---------------|
+| `プロジェクトID` |はい |データベース名およびKeycloakクライアントIDとして使用されます。小文字、スペースなし。 |
+| `ADMIN_PASSWORD` |いいえ |アプリ管理者ログインとKeycloak管理コンソールのパスワード。デフォルトは「admin」です — **最初のログイン後に変更します**。 |
+| `ドメイン` |はい |あなたのドメイン名。 DNS A レコードはドロップレット IP を指す必要があります。 |
+| `LETSENCRYPT_EMAIL` |はい | Let's Encrypt 証明書通知用の電子メール アドレス。 |
+| `プロジェクト_URL` |いいえ |パブリック URL をオーバーライドします。 「DOMAIN」を使用するには空白のままにします。 Cloudflare の背後で役立ちます。 |
 
-> **Security:** All passwords default to `admin`. Change them immediately after your first login.
+> **セキュリティ:** すべてのパスワードのデフォルトは「admin」です。最初のログイン後すぐに変更してください。
 
-### Step 2 — Create a Droplet
+### ステップ 2 — ドロップレットの作成
 
 In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Click **Create** → **Droplets**
-2. Choose **Ubuntu 22.04 LTS** as the image
-3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
-4. Scroll to **Advanced Options** → check **Add Initialization scripts**
-5. Paste the full script content into the text area
-6. Click **Create Droplet**
+1. [**作成**] → [**ドロップレット**] をクリックします。
+2. イメージとして **Ubuntu 22.04 LTS** を選択します
+3. **ベーシック、4 GB RAM / 2 vCPU** 以上を選択します
+4. **[詳細オプション**] までスクロールし、[**初期化スクリプトの追加**] をチェックします。
+5. スクリプトの完全な内容をテキスト領域に貼り付けます。
+6. [**ドロップレットの作成**] をクリックします。
 
-### Step 3 — Add the DNS record
+### ステップ 3 — DNS レコードを追加する
 
-While the Droplet boots, add an **A record** in your DNS provider:
+ドロップレットの起動中に、DNS プロバイダーに **A レコード** を追加します。
 
 ```
 Type  : A
@@ -73,20 +73,20 @@ Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Step 4 — Monitor progress
+### ステップ 4 — 進行状況を監視する
 
-SSH into the Droplet and watch the log:
+ドロップレットに SSH で接続し、ログを確認します。
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-The script prints your server IP near the start — add the DNS record as soon as you see it.
+スクリプトは先頭近くにサーバー IP を出力します。表示されたらすぐに DNS レコードを追加します。
 
-### Step 5 — Access the app
+### ステップ 5 — アプリにアクセスする
 
-When setup completes, the log shows a summary:
+セットアップが完了すると、ログに概要が表示されます。
 
 ```
 ============================================================
@@ -103,31 +103,31 @@ When setup completes, the log shows a summary:
 
 Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Change your password** immediately after login via **Settings** in the top-right menu.
+> ログイン後すぐに、右上のメニューの **設定** から **パスワードを変更**してください。
 
 ---
 
-## After Deployment
+## デプロイ後
 
-### Change a password
+### パスワードを変更する
 
-SSH into the Droplet, edit `.env`, and restart the affected container:
+ドロップレットに SSH で接続し、「.env」を編集して、影響を受けるコンテナを再起動します。
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Update the domain
+### ドメインを更新する
 
-If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
+デプロイ後に別のドメインを割り当てる場合は、「.env」の「PROJECT_URL」を更新します。
 
 ```bash
 nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### View all containers
+### すべてのコンテナを表示
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

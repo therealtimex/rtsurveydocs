@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "Linode (Akamai クラウド)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "StackScriptを使用してLinodeにrtCloudをデプロイします。設定不要 — サーバーを作成してデプロイ後の手順に従うだけです。"
+description: "StackScript を使用して Linode に rtCloud をデプロイします。構成は必要ありません。サーバーを作成し、展開後の手順に従うだけです。"
 ---
 
-## Step 1 — Launch the StackScript
+## ステップ 1 — StackScript を起動する
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+これにより、Linode Cloud Manager で StackScript ページが開きます。 [**新しい Linode のデプロイ**] をクリックします。
 
 ---
 
-## Step 2 — Fill in Linode's form
+## ステップ 2 — Linode のフォームに記入する
 
-Fill in Linode's standard server creation form:
+Linode の標準サーバー作成フォームに記入します。
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+|フィールド |推奨値 |
+|------|------|
+| **画像** | Ubuntu 22.04 LTS |
+| **地域** |ユーザーに最も近い |
+| **計画** |共有CPU 4GB以上 |
+| **ルートパスワード** |強力なパスワードを設定する |
+| **タイムゾーン** *(唯一のフィールド)* |サーバーのタイムゾーン (デフォルト: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+完了したら、[**Linode の作成**] をクリックします。
 
 ---
 
-## Step 3 — Wait for setup to complete
+## ステップ 3 — セットアップが完了するまで待ちます
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+スクリプトは最初の起動時に自動的に実行されます。 Docker をインストールし、rtSurvey イメージを取得し、データベースを初期化し、すべてのサービスを開始します。これには **5 ～ 10 分**かかります。
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+**Linode Cloud Manager** で進行状況を直接確認できます。SSH は必要ありません。
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. 新しく作成した Linode をクリックします。
+3. **LISH コンソールの起動** (Linode の詳細ページの右上) をクリックします。
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+ブラウザ ターミナルが開き、ライブ ブート ログが表示されます。[**Weblish**] タブはブラウザで直接動作し、SSH クライアントは必要ありません。
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+次の内容が表示されるまで待ちます。
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+ログにはサーバー IP も表示されます。これは次のステップで必要になります。
 
 ---
 
-## Step 4 — Set up SSL
+## ステップ 4 — SSL をセットアップする
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+**[SSL セットアップ ガイド →](../ssl-setup)** に従って HTTPS を設定します。無料の **rsurvey.com サブドメイン** が最も速いオプションであり、DNS セットアップは必要ありません。
 
 ---
 
-## Step 5 — First login
+## ステップ 5 — 最初のログイン
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+SSL が有効になったら、**[初回ログイン ガイド →](../first-login)** に従って管理者アカウントにアクセスします。
 
 ---
 
-## Step 6 — Change the default password
+## ステップ 6 — デフォルトのパスワードを変更する
 
-All passwords default to `admin`. Change them immediately after your first login:
+すべてのパスワードのデフォルトは「admin」です。最初のログイン後すぐに変更します。
 
-- **App admin password** — account settings inside the app
+- **アプリ管理者パスワード** — アプリ内のアカウント設定
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## ファイアウォールルール (Linode Cloud Firewall)
+## ファイアウォール ルール (Linode クラウド ファイアウォール)
 
-このサーバーにLinode Cloud Firewallを適用する場合は、以下のルールを使用してください：
+Linode Cloud ファイアウォールをこのサーバーに接続する場合は、次のルールを使用します。
 
-### インバウンド (受信)
+### インバウンド
 
-| ラベル | アクション | プロトコル | ポート | ソース | 備考 |
-|-------|----------|----------|------|-------|------|
-| `accept-inbound-ssh` | 許可 | TCP | 22 | All IPv4, All IPv6 | SSHアクセス |
-| `accept-inbound-http` | 許可 | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACMEチャレンジ) |
-| `accept-inbound-https` | 許可 | TCP | 443 | All IPv4, All IPv6 | Nginx (SSL設定後のHTTPS) |
-| `accept-inbound-shiny` | 許可 | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R分析) |
-| `accept-inbound-icmp` | 許可 | ICMP | — | All IPv4, All IPv6 | Ping / 診断 |
-| デフォルトインバウンドポリシー | **拒否** | | | | それ以外をすべてブロック |
+|ラベル |アクション |プロトコル |ポート |情報源 |メモ |
+|----------|----------|----------|------|-----------|----------|
+| `accept-inbound-ssh` |同意する | TCP | 22 |すべての IPv4、すべての IPv6 | SSHアクセス |
+| `accept-inbound-http` |同意する | TCP | 80 |すべての IPv4、すべての IPv6 | Nginx (HTTP + ACME チャレンジ) |
+| `accept-inbound-https` |同意する | TCP | 443 |すべての IPv4、すべての IPv6 | Nginx (SSL セットアップ後の HTTPS) |
+| `accept-inbound-shiny` |同意する | TCP | 3838 |すべての IPv4、すべての IPv6 |シャイニーサーバー (R アナリティクス) |
+| `accept-inbound-icmp` |同意する | ICMP | — |すべての IPv4、すべての IPv6 | Ping / 診断 |
+|デフォルトの受信ポリシー | **ドロップ** | | | |それ以外はすべてブロック |
 
-### アウトバウンド (送信)
+### アウトバウンド
 
-| ラベル | アクション | 備考 |
-|-------|----------|------|
-| デフォルトアウトバウンドポリシー | **許可** | すべての送信トラフィックを許可 (Docker、certbot、GoDaddy API 等) |
-
-### 外部に開放不要なポート
-
-これらのポートは `127.0.0.1` のみにバインドされており、外部からアクセスできません：
-
-| ポート | サービス | 理由 |
+|ラベル |アクション |メモ |
 |------|--------|------|
-| 8080 | アプリコンテナ | Nginxが内部でプロキシ |
-| 8090 | Keycloakコンテナ | Nginxが内部でプロキシ |
-| 3306 | MySQL | Dockerの内部ネットワークのみ |
+|デフォルトの送信ポリシー | **同意します** |すべてのアウトバウンドを許可する (Docker プル、certbot、GoDaddy API など) |
+
+### ポートは外部には必要ありません
+
+これらのポートは「127.0.0.1」のみにバインドされており、サーバーの外部からは決して到達できません。
+
+|ポート |サービス |理由 |
+|------|--------|----------|
+| 8080 |アプリコンテナ | Nginx は内部的にプロキシします。
+| 8090 | Keycloakコンテナ | Nginx は内部的にプロキシします。
+| 3306 | MySQL |内部 Docker ネットワークのみ |
 
 ---
 
-## Troubleshooting
+## トラブルシューティング
 
-### Check the setup log
+### セットアップログを確認してください
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### SSL ログを確認する
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### コンテナのステータスを表示する
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

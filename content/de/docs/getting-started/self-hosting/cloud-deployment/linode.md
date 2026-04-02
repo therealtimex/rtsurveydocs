@@ -7,48 +7,48 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Stellen Sie rtCloud auf Linode mit einem StackScript bereit. Keine Konfiguration erforderlich — erstellen Sie einfach den Server und folgen Sie den Schritten nach der Bereitstellung."
+description: "Stellen Sie rtCloud mit einem StackScript auf Linode bereit. Keine Konfiguration erforderlich – erstellen Sie einfach den Server und befolgen Sie die Schritte nach der Bereitstellung."
 ---
 
-## Step 1 — Launch the StackScript
+## Schritt 1 – Starten Sie StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Dadurch wird die StackScript-Seite im Linode Cloud Manager geöffnet. Klicken Sie auf **Neuen Linode bereitstellen**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Schritt 2 – Füllen Sie das Linode-Formular aus
 
-Fill in Linode's standard server creation form:
+Füllen Sie das Standardformular zur Servererstellung von Linode aus:
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| Feld | Empfohlener Wert |
+|-------|----|
+| **Bild** | Ubuntu 22.04 LTS |
+| **Region** | Am nächsten an Ihren Benutzern |
+| **Plan** | Gemeinsam genutzte CPU 4 GB oder mehr |
+| **Root-Passwort** | Legen Sie ein sicheres Passwort fest |
+| **Zeitzone** *(unser einziges Feld)* | Ihre Server-Zeitzone (Standard: „Asia/Ho_Chi_Minh“) |
 
-Click **Create Linode** when done.
+Klicken Sie abschließend auf **Linode erstellen**.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Schritt 3 – Warten Sie, bis die Einrichtung abgeschlossen ist
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Das Skript wird beim ersten Start automatisch ausgeführt. Es installiert Docker, ruft das rtSurvey-Image ab, initialisiert die Datenbank und startet alle Dienste. Dies dauert **5–10 Minuten**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Sie können den Fortschritt direkt im **Linode Cloud Manager** verfolgen – kein SSH erforderlich:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Klicken Sie auf Ihren neu erstellten Linode
+3. Klicken Sie auf **LISH-Konsole starten** (oben rechts auf der Linode-Detailseite).
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Es öffnet sich ein Browser-Terminal mit dem Live-Boot-Protokoll – die Registerkarte **Weblish** funktioniert direkt in Ihrem Browser, kein SSH-Client erforderlich.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Warten Sie, bis Sie Folgendes sehen:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Das Protokoll zeigt auch Ihre Server-IP – Sie benötigen sie für den nächsten Schritt.
 
 ---
 
-## Step 4 — Set up SSL
+## Schritt 4 – SSL einrichten
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Befolgen Sie die **[Anleitung zum Einrichten von SSL →](../ssl-setup)**, um HTTPS zu konfigurieren. Die kostenlose Subdomain **rtsurvey.com** ist die schnellste Option – es ist keine DNS-Einrichtung erforderlich.
 
 ---
 
-## Step 5 — First login
+## Schritt 5 – Erster Login
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Sobald SSL aktiv ist, folgen Sie der **[Anleitung zur ersten Anmeldung →](../first-login)**, um auf das Administratorkonto zuzugreifen.
 
 ---
 
-## Step 6 — Change the default password
+## Schritt 6 – Ändern Sie das Standardkennwort
 
-All passwords default to `admin`. Change them immediately after your first login:
+Alle Passwörter lauten standardmäßig „admin“. Ändern Sie diese sofort nach Ihrem ersten Login:
 
-- **App admin password** — account settings inside the app
+- **App-Administratorkennwort** – Kontoeinstellungen innerhalb der App
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
 ## Firewall-Regeln (Linode Cloud Firewall)
 
-Wenn Sie eine Linode Cloud Firewall an diesen Server anhängen, verwenden Sie die folgenden Regeln:
+Wenn Sie eine Linode Cloud Firewall an diesen Server anschließen, verwenden Sie die folgenden Regeln:
 
-### Eingehend (Inbound)
+### Eingehend
 
-| Bezeichnung | Aktion | Protokoll | Port | Quellen | Hinweise |
-|------------|--------|-----------|------|---------|---------|
-| `accept-inbound-ssh` | Akzeptieren | TCP | 22 | All IPv4, All IPv6 | SSH-Zugriff |
-| `accept-inbound-http` | Akzeptieren | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME-Challenge) |
-| `accept-inbound-https` | Akzeptieren | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS nach SSL-Einrichtung) |
-| `accept-inbound-shiny` | Akzeptieren | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R-Analyse) |
-| `accept-inbound-icmp` | Akzeptieren | ICMP | — | All IPv4, All IPv6 | Ping / Diagnose |
-| Standard-Eingangsrichtlinie | **Verwerfen** | | | | Alles andere blockieren |
+| Etikett | Aktion | Protokoll | Hafen | Quellen | Notizen |
+|-------|--------|----------|------|---------|-------|
+| `accept-inbound-ssh` | Akzeptieren | TCP | 22 | Alle IPv4, Alle IPv6 | SSH-Zugriff |
+| `accept-inbound-http` | Akzeptieren | TCP | 80 | Alle IPv4, Alle IPv6 | Nginx (HTTP + ACME-Herausforderung) |
+| `accept-inbound-https` | Akzeptieren | TCP | 443 | Alle IPv4, Alle IPv6 | Nginx (HTTPS nach SSL-Einrichtung) |
+| `accept-inbound-shiny` | Akzeptieren | TCP | 3838 | Alle IPv4, Alle IPv6 | Shiny Server (R-Analyse) |
+| `accept-inbound-icmp` | Akzeptieren | ICMP | — | Alle IPv4, Alle IPv6 | Ping / Diagnose |
+| Standard-Eingangsrichtlinie | **Tropfen** | | | | Alles andere blockieren |
 
-### Ausgehend (Outbound)
+### Ausgehend
 
-| Bezeichnung | Aktion | Hinweise |
-|------------|--------|---------|
-| Standard-Ausgangsrichtlinie | **Akzeptieren** | Alle ausgehenden Verbindungen erlauben (Docker, certbot, GoDaddy API usw.) |
+| Etikett | Aktion | Notizen |
+|-------|--------|-------|
+| Standard-Ausgangsrichtlinie | **Akzeptieren** | Alle ausgehenden Daten zulassen (Docker-Pulls, Certbot, GoDaddy-API usw.) |
 
-### Ports, die extern NICHT benötigt werden
+### Ports werden extern NICHT benötigt
 
-Diese Ports sind nur an `127.0.0.1` gebunden und von außen nicht erreichbar:
+Diese Ports sind nur an „127.0.0.1“ gebunden und niemals von außerhalb des Servers erreichbar:
 
-| Port | Dienst | Grund |
-|------|--------|-------|
-| 8080 | App-Container | Nginx leitet intern weiter |
-| 8090 | Keycloak-Container | Nginx leitet intern weiter |
+| Hafen | Service | Grund |
+|------|---------|--------|
+| 8080 | App-Container | Nginx stellt intern einen Proxy her |
+| 8090 | Keycloak-Behälter | Nginx stellt intern einen Proxy her |
 | 3306 | MySQL | Nur internes Docker-Netzwerk |
 
 ---
 
-## Troubleshooting
+## Fehlerbehebung
 
-### Check the setup log
+### Überprüfen Sie das Setup-Protokoll
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Überprüfen Sie das SSL-Protokoll
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Containerstatus anzeigen
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "लिनोड (अकामाई बादल)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "StackScript का उपयोग करके Linode पर rtCloud तैनात करें। कोई कॉन्फ़िगरेशन नहीं — बस सर्वर बनाएं और तैनाती के बाद के चरणों का पालन करें।"
+description: "स्टैकस्क्रिप्ट का उपयोग करके लिनोड पर rtCloud तैनात करें। किसी कॉन्फ़िगरेशन की आवश्यकता नहीं है - बस सर्वर बनाएं और तैनाती के बाद के चरणों का पालन करें।"
 ---
 
-## Step 1 — Launch the StackScript
+## चरण 1 - स्टैकस्क्रिप्ट लॉन्च करें
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+यह लिनोड क्लाउड मैनेजर में स्टैकस्क्रिप्ट पेज खोलता है। **नया लिनोड परिनियोजित करें** पर क्लिक करें।
 
 ---
 
-## Step 2 — Fill in Linode's form
+## चरण 2 - लिनोड का फॉर्म भरें
 
-Fill in Linode's standard server creation form:
+लिनोड का मानक सर्वर निर्माण फॉर्म भरें:
 
-| Field | Recommended value |
+| फ़ील्ड | अनुशंसित मूल्य |
 |-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| **छवि** | उबंटू 22.04 एलटीएस |
+| **क्षेत्र** | आपके उपयोगकर्ताओं के सबसे करीब |
+| **योजना** | साझा सीपीयू 4 जीबी या बड़ा |
+| **रूट पासवर्ड** | एक मजबूत पासवर्ड सेट करें |
+| **समय क्षेत्र** *(हमारा एकमात्र क्षेत्र)* | आपका सर्वर समयक्षेत्र (डिफ़ॉल्ट: `एशिया/हो_ची_मिन्ह') |
 
-Click **Create Linode** when done.
+पूरा होने पर **लिनोड बनाएं** पर क्लिक करें।
 
 ---
 
-## Step 3 — Wait for setup to complete
+## चरण 3 - सेटअप पूरा होने तक प्रतीक्षा करें
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+स्क्रिप्ट पहले बूट पर स्वचालित रूप से चलती है। यह डॉकर स्थापित करता है, rtSurvey छवि खींचता है, डेटाबेस प्रारंभ करता है, और सभी सेवाएँ प्रारंभ करता है। इसमें **5-10 मिनट** लगते हैं।
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+आप सीधे **लिनोड क्लाउड मैनेजर** में प्रगति देख सकते हैं - किसी एसएसएच की आवश्यकता नहीं है:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. अपने नव निर्मित लिनोड पर क्लिक करें
+3. **LISH कंसोल लॉन्च करें** पर क्लिक करें (लिनोड विवरण पृष्ठ के ऊपर दाईं ओर)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+एक ब्राउज़र टर्मिनल लाइव बूट लॉग दिखाते हुए खुलता है - **वेब्लिश** टैब सीधे आपके ब्राउज़र में काम करता है, किसी एसएसएच क्लाइंट की आवश्यकता नहीं है।
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+जब तक आप न देख लें तब तक प्रतीक्षा करें:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+लॉग आपके सर्वर आईपी को भी दिखाता है - आपको अगले चरण के लिए इसकी आवश्यकता होगी।
 
 ---
 
-## Step 4 — Set up SSL
+## चरण 4 - एसएसएल सेट करें
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+HTTPS को कॉन्फ़िगर करने के लिए **[SSL गाइड सेट करें →](../ssl-setup)** का पालन करें। मुफ़्त **rtsurvey.com उपडोमेन** सबसे तेज़ विकल्प है - किसी DNS सेटअप की आवश्यकता नहीं है।
 
 ---
 
-## Step 5 — First login
+## चरण 5 - सबसे पहले लॉगिन करें
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+एक बार एसएसएल सक्रिय हो जाने पर, व्यवस्थापक खाते तक पहुंचने के लिए **[प्रथम लॉगिन गाइड →](../पहला-लॉगिन)** का पालन करें।
 
 ---
 
-## Step 6 — Change the default password
+## चरण 6 - डिफ़ॉल्ट पासवर्ड बदलें
 
-All passwords default to `admin`. Change them immediately after your first login:
+सभी पासवर्ड डिफ़ॉल्ट रूप से `एडमिन` होते हैं। अपने प्रथम लॉगिन के तुरंत बाद उन्हें बदलें:
 
-- **App admin password** — account settings inside the app
+- **ऐप एडमिन पासवर्ड** - ऐप के अंदर खाता सेटिंग्स
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## फ़ायरवॉल नियम (Linode Cloud Firewall)
+## फ़ायरवॉल नियम (लिनोड क्लाउड फ़ायरवॉल)
 
-यदि आप इस सर्वर से Linode Cloud Firewall जोड़ते हैं, तो निम्नलिखित नियमों का उपयोग करें:
+यदि आप इस सर्वर पर लिनोड क्लाउड फ़ायरवॉल संलग्न करते हैं, तो निम्नलिखित नियमों का उपयोग करें:
 
-### आने वाला ट्रैफ़िक (Inbound)
+### आवक
 
-| लेबल | कार्रवाई | प्रोटोकॉल | पोर्ट | स्रोत | नोट्स |
-|------|---------|---------|------|-------|-------|
-| `accept-inbound-ssh` | स्वीकार | TCP | 22 | All IPv4, All IPv6 | SSH पहुंच |
-| `accept-inbound-http` | स्वीकार | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME चुनौती) |
-| `accept-inbound-https` | स्वीकार | TCP | 443 | All IPv4, All IPv6 | Nginx (SSL सेटअप के बाद HTTPS) |
-| `accept-inbound-shiny` | स्वीकार | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R विश्लेषण) |
-| `accept-inbound-icmp` | स्वीकार | ICMP | — | All IPv4, All IPv6 | Ping / निदान |
-| डिफ़ॉल्ट इनबाउंड नीति | **ड्रॉप** | | | | बाकी सब ब्लॉक करें |
+| लेबल | कार्रवाई | प्रोटोकॉल | बंदरगाह | सूत्र | नोट्स |
+|-------|--------|-------|------|------|-------|
+| `स्वीकार-इनबाउंड-एसएसएच` | स्वीकार करें | टीसीपी | 22 | सभी IPv4, सभी IPv6 | एसएसएच पहुंच |
+| `स्वीकार-इनबाउंड-http` | स्वीकार करें | टीसीपी | 80 | सभी IPv4, सभी IPv6 | Nginx (HTTP + ACME चुनौती) |
+| `स्वीकार-इनबाउंड-https` | स्वीकार करें | टीसीपी | 443 | सभी IPv4, सभी IPv6 | Nginx (एसएसएल सेटअप के बाद HTTPS) |
+| `स्वीकार-इनबाउंड-चमकदार` | स्वीकार करें | टीसीपी | 3838 | सभी IPv4, सभी IPv6 | शाइनी सर्वर (आर एनालिटिक्स) |
+| `स्वीकार-इनबाउंड-आईसीएमपी` | स्वीकार करें | आईसीएमपी | — | सभी IPv4, सभी IPv6 | पिंग / डायग्नोस्टिक्स |
+| डिफ़ॉल्ट इनबाउंड नीति | **बूंद** | | | | बाकी सब कुछ ब्लॉक करें |
 
-### जाने वाला ट्रैफ़िक (Outbound)
+### आउटबाउंड
 
 | लेबल | कार्रवाई | नोट्स |
-|------|---------|-------|
-| डिफ़ॉल्ट आउटबाउंड नीति | **स्वीकार** | सभी आउटबाउंड ट्रैफ़िक की अनुमति दें (Docker, certbot, GoDaddy API, आदि) |
+|-------|--------|-------|
+| डिफ़ॉल्ट आउटबाउंड नीति | **स्वीकार** | सभी आउटबाउंड की अनुमति दें (डॉकर पुल, सर्टिफिकेट, गोडैडी एपीआई, आदि) |
 
-### बाहरी रूप से आवश्यक नहीं पोर्ट
+### बंदरगाहों की बाहरी आवश्यकता नहीं है
 
-ये पोर्ट केवल `127.0.0.1` से बंधे हैं और बाहर से कभी पहुंच योग्य नहीं हैं:
+ये पोर्ट केवल `127.0.0.1` से बंधे हैं और सर्वर के बाहर से कभी भी पहुंच योग्य नहीं हैं:
 
-| पोर्ट | सेवा | कारण |
-|------|------|------|
-| 8080 | ऐप कंटेनर | Nginx आंतरिक रूप से प्रॉक्सी करता है |
-| 8090 | Keycloak कंटेनर | Nginx आंतरिक रूप से प्रॉक्सी करता है |
-| 3306 | MySQL | केवल आंतरिक Docker नेटवर्क |
+| बंदरगाह | सेवा | कारण |
+|------|------|--------|
+| 8080 | ऐप कंटेनर | Nginx इसे आंतरिक रूप से प्रॉक्सी करता है |
+| 8090 | कीक्लोक कंटेनर | Nginx इसे आंतरिक रूप से प्रॉक्सी करता है |
+| 3306 | MySQL | केवल आंतरिक डॉकर नेटवर्क |
 
 ---
 
-## Troubleshooting
+## समस्या निवारण
 
-### Check the setup log
+### सेटअप लॉग जांचें
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### एसएसएल लॉग की जांच करें
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### कंटेनर स्थिति देखें
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

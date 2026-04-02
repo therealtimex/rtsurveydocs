@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "Linode (Akamai mākonis)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Izvietojiet rtCloud Linode, izmantojot StackScript. Nav nepieciešama konfigurācija — vienkārši izveidojiet serveri un sekojiet pēc izvietošanas veicamajām darbībām."
+description: "Izvietojiet rtCloud uz Linode, izmantojot StackScript. Nav nepieciešama konfigurācija — vienkārši izveidojiet serveri un veiciet darbības pēc izvietošanas."
 ---
 
-## Step 1 — Launch the StackScript
+## 1. darbība — palaidiet StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Tādējādi Linode Cloud Manager tiek atvērta StackScript lapa. Noklikšķiniet uz **Izvietot jaunu Linode**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## 2. solis — aizpildiet Linodes veidlapu
 
-Fill in Linode's standard server creation form:
+Aizpildiet Linodes standarta servera izveides veidlapu:
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| Lauks | Ieteicamā vērtība |
+|-------|-------------------|
+| **Attēls** | Ubuntu 22.04 LTS |
+| **Reģions** | Vistuvāk jūsu lietotājiem |
+| **Plāns** | Koplietots CPU 4 GB vai lielāks |
+| **Saknes parole** | Iestatiet spēcīgu paroli |
+| **Laika josla** *(mūsu vienīgais lauks)* | Jūsu servera laika josla (noklusējums: Asia/Ho_Chi_Minh) |
 
-Click **Create Linode** when done.
+Kad esat pabeidzis, noklikšķiniet uz **Izveidot Linode**.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## 3. darbība. Pagaidiet, līdz iestatīšana ir pabeigta
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Skripts tiek palaists automātiski pirmajā sāknēšanas reizē. Tas instalē Docker, izvelk rtSurvey attēlu, inicializē datu bāzi un startē visus pakalpojumus. Tas aizņem **5–10 minūtes**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Jūs varat vērot progresu tieši programmā **Linode Cloud Manager** — nav nepieciešams SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Noklikšķiniet uz jaunizveidotās Linodes
+3. Noklikšķiniet uz **Palaist LISH konsoli** (Linode detalizētās informācijas lapas augšējā labajā stūrī).
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Tiek atvērts pārlūkprogrammas terminālis, kurā tiek rādīts tiešraides sāknēšanas žurnāls — cilne **Weblish** darbojas tieši jūsu pārlūkprogrammā, nav nepieciešams SSH klients.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Pagaidiet, līdz redzat:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Žurnālā ir redzams arī jūsu servera IP — tas būs nepieciešams nākamajai darbībai.
 
 ---
 
-## Step 4 — Set up SSL
+## 4. darbība — iestatiet SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Lai konfigurētu HTTPS, izpildiet **[SSL iestatīšanas rokasgrāmatu →](../ssl-setup)**. Bezmaksas **rsurvey.com apakšdomēns** ir ātrākā iespēja — nav nepieciešama DNS iestatīšana.
 
 ---
 
-## Step 5 — First login
+## 5. darbība — pirmā pieteikšanās
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Kad SSL ir aktīvs, izpildiet **[Pirmās pieteikšanās rokasgrāmatu →](../first-login)**, lai piekļūtu administratora kontam.
 
 ---
 
-## Step 6 — Change the default password
+## 6. darbība — mainiet noklusējuma paroli
 
-All passwords default to `admin`. Change them immediately after your first login:
+Visām parolēm pēc noklusējuma ir “admin”. Mainiet tos uzreiz pēc pirmās pieteikšanās:
 
-- **App admin password** — account settings inside the app
+- **Lietotnes administratora parole** — konta iestatījumi lietotnē
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
 ## Ugunsmūra noteikumi (Linode Cloud Firewall)
 
-Ja pievienojat Linode Cloud Firewall šim serverim, izmantojiet šādus noteikumus:
+Ja šim serverim pievienojat Linode Cloud Firewall, izmantojiet šādus noteikumus:
 
-### Ienākošā satiksme (Inbound)
+### Ienākošais
 
-| Etiķete | Darbība | Protokols | Ports | Avoti | Piezīmes |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Pieņemt | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Pieņemt | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Pieņemt | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Pieņemt | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Pieņemt | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Nomest** | | | | Block everything else |
+| Etiķete | Darbība | Protokols | Osta | Avoti | Piezīmes |
+|-------|--------|----------|------|----------|-------|
+| `accept-inbound-ssh` | Pieņemt | TCP | 22 | Visi IPv4, visi IPv6 | SSH piekļuve |
+| `accept-inbound-http` | Pieņemt | TCP | 80 | Visi IPv4, visi IPv6 | Nginx (HTTP + ACME izaicinājums) |
+| `accept-inbound-https` | Pieņemt | TCP | 443 | Visi IPv4, visi IPv6 | Nginx (HTTPS pēc SSL iestatīšanas) |
+| `pieņemt-ienākošos-spīdīgo` | Pieņemt | TCP | 3838 | Visi IPv4, visi IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Pieņemt | ICMP | — | Visi IPv4, visi IPv6 | Ping / diagnostika |
+| Noklusējuma ienākošā politika | **Piliens** | | | | Bloķēt visu pārējo |
 
-### Izejošā satiksme (Outbound)
+### Izejošais
 
 | Etiķete | Darbība | Piezīmes |
-|-------|--------|-------|
-| Default outbound policy | **Pieņemt** | Atļaut visu izejošo satiksmi (Docker, certbot, GoDaddy API, etc.) |
+|-------|---------|-------|
+| Noklusējuma izejošā politika | **Pieņemt** | Atļaut visu izejošo (Docker pulls, certbot, GoDaddy API utt.) |
 
-### Porti, kas NAV nepieciešami ārēji
+### Porti NAV nepieciešami ārēji
 
-Šie porti ir piesaistīti tikai `127.0.0.1` un nekad nav pieejami no ārpuses:
+Šie porti ir saistīti tikai ar '127.0.0.1' un nekad nav sasniedzami no ārpuses servera:
 
-| Ports | Pakalpojums | Iemesls |
+| Osta | Pakalpojums | Iemesls |
 |------|---------|--------|
-| 8080 | App container | Nginx proxies internally |
-| 8090 | Keycloak container | Nginx proxies internally |
-| 3306 | MySQL | Internal Docker network only |
+| 8080 | Lietotņu konteiners | Nginx starpniekserveri tam iekšēji |
+| 8090 | Atslēgvārpa konteiners | Nginx starpniekserveri tam iekšēji |
+| 3306 | MySQL | Tikai iekšējais Docker tīkls |
 
 ---
 
-## Troubleshooting
+## Traucējummeklēšana
 
-### Check the setup log
+### Pārbaudiet iestatīšanas žurnālu
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Pārbaudiet SSL žurnālu
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Skatīt konteinera statusu
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

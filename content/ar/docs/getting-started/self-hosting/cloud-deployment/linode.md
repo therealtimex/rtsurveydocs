@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "لينود (سحابة أكاماي)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "نشر rtCloud على Linode باستخدام StackScript. لا حاجة للتكوين — فقط أنشئ الخادم واتبع خطوات ما بعد النشر."
+description: "انشر rtCloud على Linode باستخدام StackScript. ليست هناك حاجة إلى تكوين — ما عليك سوى إنشاء الخادم واتباع خطوات ما بعد النشر."
 ---
 
-## Step 1 — Launch the StackScript
+## الخطوة الأولى — تشغيل StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+يؤدي هذا إلى فتح صفحة StackScript في Linode Cloud Manager. انقر **نشر Linode جديد**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## الخطوة الثانية — املأ نموذج لينود
 
-Fill in Linode's standard server creation form:
+املأ نموذج إنشاء خادم Linode القياسي:
 
-| Field | Recommended value |
+| المجال | القيمة الموصى بها |
 |-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| **صورة** | أوبونتو 22.04 LTS |
+| **المنطقة** | الأقرب لمستخدميك |
+| **الخطة** | وحدة المعالجة المركزية المشتركة 4 جيجابايت أو أكبر |
+| **كلمة مرور الجذر** | تعيين كلمة مرور قوية |
+| **المنطقة الزمنية** *(مجالنا الوحيد)* | المنطقة الزمنية لخادمك (الافتراضي: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+انقر **إنشاء Linode** عند الانتهاء.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## الخطوة 3 - انتظر حتى يكتمل الإعداد
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+يعمل البرنامج النصي تلقائيًا عند التمهيد الأول. يقوم بتثبيت Docker، وسحب صورة rtSurvey، وتهيئة قاعدة البيانات، وبدء تشغيل جميع الخدمات. يستغرق هذا **5-10 دقائق**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+يمكنك مشاهدة التقدم مباشرة في **Linode Cloud Manager** — لا يتطلب SSH:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. انقر على Linode الذي تم إنشاؤه حديثًا
+3. انقر **تشغيل وحدة تحكم LISH** (أعلى يمين صفحة تفاصيل Linode)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+يتم فتح محطة المتصفح لتعرض سجل التمهيد المباشر — تعمل علامة التبويب **Weblish** مباشرة في متصفحك، دون الحاجة إلى عميل SSH.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+انتظر حتى ترى:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+يعرض السجل أيضًا عنوان IP الخاص بخادمك، والذي ستحتاج إليه في الخطوة التالية.
 
 ---
 
-## Step 4 — Set up SSL
+## الخطوة الرابعة — إعداد SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+اتبع **[دليل إعداد SSL →](../ssl-setup)** لتكوين HTTPS. يعد النطاق الفرعي **rtsurvey.com** المجاني هو الخيار الأسرع — ولا حاجة إلى إعداد DNS.
 
 ---
 
-## Step 5 — First login
+## الخطوة 5 – تسجيل الدخول لأول مرة
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+بمجرد تنشيط SSL، اتبع **[دليل تسجيل الدخول الأول →](../تسجيل الدخول الأول)** للوصول إلى حساب المسؤول.
 
 ---
 
-## Step 6 — Change the default password
+## الخطوة 6 — تغيير كلمة المرور الافتراضية
 
-All passwords default to `admin`. Change them immediately after your first login:
+جميع كلمات المرور الافتراضية هي "admin". قم بتغييرها مباشرة بعد تسجيل الدخول الأول:
 
-- **App admin password** — account settings inside the app
+- **كلمة مرور مسؤول التطبيق** — إعدادات الحساب داخل التطبيق
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## قواعد جدار الحماية (Linode Cloud Firewall)
+## قواعد جدار الحماية (جدار الحماية السحابي Linode)
 
-إذا قمت بربط Linode Cloud Firewall بهذا الخادم، استخدم القواعد التالية:
+إذا قمت بإرفاق جدار حماية Linode Cloud بهذا الخادم، فاستخدم القواعد التالية:
 
-### حركة المرور الواردة (Inbound)
+### الوارد
 
-| التسمية | الإجراء | البروتوكول | المنفذ | المصادر | ملاحظات |
-|---------|--------|-----------|-------|---------|---------|
-| `accept-inbound-ssh` | قبول | TCP | 22 | All IPv4, All IPv6 | وصول SSH |
-| `accept-inbound-http` | قبول | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + تحدي ACME) |
-| `accept-inbound-https` | قبول | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS بعد إعداد SSL) |
-| `accept-inbound-shiny` | قبول | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (تحليلات R) |
-| `accept-inbound-icmp` | قبول | ICMP | — | All IPv4, All IPv6 | Ping / التشخيص |
-| السياسة الافتراضية للوارد | **إسقاط** | | | | حظر كل شيء آخر |
+| التسمية | العمل | البروتوكول | ميناء | المصادر | ملاحظات |
+|-------|--------|---------|---------|-------|
+| `قبول-الداخل-ssh` | قبول | برنامج التعاون الفني | 22 | كل IPv4، كل IPv6 | وصول SSH |
+| `قبول-الوارد-http` | قبول | برنامج التعاون الفني | 80 | كل IPv4، كل IPv6 | إنجينكس (تحدي HTTP + ACME) |
+| `قبول-الوارد-https` | قبول | برنامج التعاون الفني | 443 | كل IPv4، كل IPv6 | Nginx (HTTPS بعد إعداد SSL) |
+| `قبول-وارد-لامع` | قبول | برنامج التعاون الفني | 3838 | كل IPv4، كل IPv6 | الخادم اللامع (تحليلات R) |
+| `قبول-الوارد-icmp` | قبول | آي سي إم بي | — | كل IPv4، كل IPv6 | بينغ / التشخيص |
+| السياسة الواردة الافتراضية | **قطرة** | | | | منع كل شيء آخر |
 
-### حركة المرور الصادرة (Outbound)
+###الصادرة
 
-| التسمية | الإجراء | ملاحظات |
-|---------|--------|---------|
-| السياسة الافتراضية للصادر | **قبول** | السماح بكل حركة المرور الصادرة (Docker، certbot، GoDaddy API، إلخ) |
+| التسمية | العمل | ملاحظات |
+|-------|--------|------|
+| السياسة الصادرة الافتراضية | **قبول** | السماح بجميع العمليات الصادرة (عمليات Docker، وcertbot، وGoDaddy API، وما إلى ذلك) |
 
-### المنافذ غير المطلوبة خارجياً
+### المنافذ غير مطلوبة خارجيًا
 
-هذه المنافذ مرتبطة بـ `127.0.0.1` فقط ولا يمكن الوصول إليها من الخارج:
+ترتبط هذه المنافذ بـ `127.0.0.1` فقط ولا يمكن الوصول إليها مطلقًا من خارج الخادم:
 
-| المنفذ | الخدمة | السبب |
-|-------|--------|-------|
-| 8080 | حاوية التطبيق | Nginx يعمل كوسيط داخلياً |
-| 8090 | حاوية Keycloak | Nginx يعمل كوسيط داخلياً |
-| 3306 | MySQL | شبكة Docker الداخلية فقط |
+| ميناء | الخدمة | السبب |
+|------|---------|--------|
+| 8080 | حاوية التطبيق | وكلاء Nginx إليه داخليًا |
+| 8090 | حاوية Keycloak | وكلاء Nginx إليه داخليًا |
+| 3306 | ماي إس كيو إل | شبكة دوكر داخلية فقط |
 
 ---
 
-## Troubleshooting
+## استكشاف الأخطاء وإصلاحها
 
-### Check the setup log
+### تحقق من سجل الإعداد
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### تحقق من سجل SSL
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### عرض حالة الحاوية
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

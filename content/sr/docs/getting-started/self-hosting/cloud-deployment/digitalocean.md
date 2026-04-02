@@ -1,30 +1,30 @@
 ---
 weight: 1
-title: "DigitalOcean"
+title: "ДигиталОцеан"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-17T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Распоредите rtCloud на DigitalOcean Droplet користећи аутоматизоване user-data скриптове."
+description: "Примените ртЦлоуд на ДигиталОцеан Дроплет користећи аутоматизоване скрипте за корисничке податке."
 ---
 
-DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
+ДигиталОцеан користи **Корисничке податке** скрипте које се покрећу аутоматски при првом покретању. Попуните променљиве конфигурације на врху скрипте, а затим налепите целу скрипту када креирате Дроплет.
 
-> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
+> За разлику од Линоде СтацкСцриптс-а, ДигиталОцеан нема корисничко сучеље обрасца — морате да уредите скрипту директно пре лепљења.
 
 **Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Embedded Keycloak (Recommended)
+## Ембеддед Кеицлоак (препоручено)
 
-Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
+Користите `дигиталоцеан-дроплет-кеицлоак-ембед.сх` за најједноставније подешавање са уграђеним ССО-ом.
 
-### Step 1 — Fill in the configuration
+### Корак 1 — Попуните конфигурацију
 
-Open the script and edit the `CONFIGURATION` block at the top:
+Отворите скрипту и уредите блок `ЦОНФИГУРАТИОН` на врху:
 
 ```bash
 # --- Required ---
@@ -41,30 +41,30 @@ STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
-| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
-| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
-| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
-| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
+| Поље | Обавезно | Опис |
+|-------|----------|------------|
+| `ПРОЈЕЦТ_ИД` | Да | Користи се као име базе података и ИД клијента Кеицлоак. Мала слова, без размака. |
+| `АДМИН_ПАССВОРД` | Не | Лозинка за пријаву администратора апликације и администраторску конзолу Кеицлоак. Подразумевано је `админ` — **промена након првог пријављивања**. |
+| `ДОМАИН` | Да | Име вашег домена. ДНС Запис мора да указује на ИП адресу капљице. |
+| `ЛЕТСЕНЦРИПТ_ЕМАИЛ` | Да | Адреса е-поште за обавештења о сертификатима Лет'с Енцрипт. |
+| `ПРОЈЕЦТ_УРЛ` | Не | Замени јавни УРЛ. Оставите празно да бисте користили `ДОМАИН`. Корисно иза Цлоудфлареа. |
 
-> **Security:** All passwords default to `admin`. Change them immediately after your first login.
+> **Безбедност:** Све лозинке су подразумеване на `админ`. Промените их одмах након првог пријављивања.
 
-### Step 2 — Create a Droplet
+### Корак 2 — Креирајте капљицу
 
 In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Click **Create** → **Droplets**
-2. Choose **Ubuntu 22.04 LTS** as the image
-3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
-4. Scroll to **Advanced Options** → check **Add Initialization scripts**
+1. Кликните на **Креирај** → **Капљице**
+2. Изаберите **Убунту 22.04 ЛТС** као слику
+3. Изаберите **Основни, 4 ГБ РАМ-а / 2 вЦПУ-а** или већи
+4. Померите се до **Напредне опције** → означите **Додај скрипте за иницијализацију**
 5. Paste the full script content into the text area
-6. Click **Create Droplet**
+6. Кликните на **Креирај капљицу**
 
-### Step 3 — Add the DNS record
+### Корак 3 — Додајте ДНС запис
 
-While the Droplet boots, add an **A record** in your DNS provider:
+Док се Дроплет покреће, додајте **А запис** у свој ДНС провајдер:
 
 ```
 Type  : A
@@ -73,20 +73,20 @@ Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Step 4 — Monitor progress
+### Корак 4 — Пратите напредак
 
-SSH into the Droplet and watch the log:
+ССХ у Дроплет и погледајте дневник:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-The script prints your server IP near the start — add the DNS record as soon as you see it.
+Скрипта штампа ИП вашег сервера близу почетка — додајте ДНС запис чим га видите.
 
-### Step 5 — Access the app
+### Корак 5 — Приступите апликацији
 
-When setup completes, the log shows a summary:
+Када се подешавање заврши, дневник приказује резиме:
 
 ```
 ============================================================
@@ -103,31 +103,31 @@ When setup completes, the log shows a summary:
 
 Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Change your password** immediately after login via **Settings** in the top-right menu.
+> **Промените своју лозинку** одмах након пријављивања преко **Подешавања** у горњем десном менију.
 
 ---
 
-## After Deployment
+## Након распоређивања
 
-### Change a password
+### Промените лозинку
 
-SSH into the Droplet, edit `.env`, and restart the affected container:
+ССХ у Дроплет, уредите `.енв` и поново покрените погођени контејнер:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Update the domain
+### Ажурирајте домен
 
-If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
+Ако доделите други домен након примене, ажурирајте `ПРОЈЕЦТ_УРЛ` у `.енв`:
 
 ```bash
 nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### View all containers
+### Погледај све контејнере
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

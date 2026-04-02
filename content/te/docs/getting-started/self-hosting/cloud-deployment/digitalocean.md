@@ -1,30 +1,30 @@
 ---
 weight: 1
-title: "DigitalOcean"
+title: "డిజిటల్ ఓషన్"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-17T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "స్వయంచాలక యూజర్-డేటా స్క్రిప్ట్‌లు ఉపయోగించి DigitalOcean Droplet లో rtCloud విన్యసించండి."
+description: "ఆటోమేటెడ్ యూజర్-డేటా స్క్రిప్ట్‌లను ఉపయోగించి డిజిటల్ ఓషన్ డ్రాప్‌లెట్‌లో rtCloudని అమలు చేయండి."
 ---
 
-DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
+DigitalOcean మొదటి బూట్‌లో స్వయంచాలకంగా రన్ అయ్యే **యూజర్ డేటా** స్క్రిప్ట్‌లను ఉపయోగిస్తుంది. మీరు స్క్రిప్ట్ ఎగువన కాన్ఫిగరేషన్ వేరియబుల్‌లను పూరించండి, ఆపై ఒక బిందువును సృష్టించేటప్పుడు మొత్తం స్క్రిప్ట్‌ను అతికించండి.
 
-> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
+> లినోడ్ స్టాక్‌స్క్రిప్ట్‌ల వలె కాకుండా, డిజిటల్ ఓషన్‌కు ఫారమ్ UI లేదు - మీరు స్క్రిప్ట్‌ను అతికించే ముందు నేరుగా సవరించాలి.
 
 **Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Embedded Keycloak (Recommended)
+## ఎంబెడెడ్ కీక్లాక్ (సిఫార్సు చేయబడింది)
 
-Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
+అంతర్నిర్మిత SSOతో సరళమైన సెటప్ కోసం `digitalocean-droplet-keycloak-embed.sh`ని ఉపయోగించండి.
 
-### Step 1 — Fill in the configuration
+### దశ 1 — ఆకృతీకరణను పూరించండి
 
-Open the script and edit the `CONFIGURATION` block at the top:
+స్క్రిప్ట్‌ని తెరిచి, ఎగువన ఉన్న `కాన్ఫిగరేషన్` బ్లాక్‌ని సవరించండి:
 
 ```bash
 # --- Required ---
@@ -41,30 +41,30 @@ STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
-| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
-| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
-| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
-| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
+| ఫీల్డ్ | అవసరం | వివరణ |
+|------|---------|------------|
+| `PROJECT_ID` | అవును | డేటాబేస్ పేరు మరియు కీక్లోక్ క్లయింట్ IDగా ఉపయోగించబడుతుంది. చిన్న అక్షరం, ఖాళీలు లేవు. |
+| `ADMIN_PASSWORD` | కాదు | యాప్ అడ్మిన్ లాగిన్ మరియు కీక్లోక్ అడ్మిన్ కన్సోల్ కోసం పాస్‌వర్డ్. డిఫాల్ట్‌గా `అడ్మిన్` — **మొదటి లాగిన్ తర్వాత మార్చండి**. |
+| `డొమైన్` | అవును | మీ డొమైన్ పేరు. DNS A రికార్డ్ తప్పనిసరిగా చుక్క IPని సూచించాలి. |
+| `LETSENCRYPT_EMAIL` | అవును | లెట్స్ ఎన్‌క్రిప్ట్ సర్టిఫికేట్ నోటిఫికేషన్‌ల కోసం ఇమెయిల్ చిరునామా. |
+| `PROJECT_URL` | కాదు | పబ్లిక్ URLని భర్తీ చేయండి. `DOMAIN`ని ఉపయోగించడానికి ఖాళీగా ఉంచండి. క్లౌడ్‌ఫ్లేర్ వెనుక ఉపయోగకరమైనది. |
 
-> **Security:** All passwords default to `admin`. Change them immediately after your first login.
+> **భద్రత:** అన్ని పాస్‌వర్డ్‌లు డిఫాల్ట్ `అడ్మిన్`కి. మీ మొదటి లాగిన్ అయిన వెంటనే వాటిని మార్చండి.
 
-### Step 2 — Create a Droplet
+### దశ 2 — ఒక బిందువును సృష్టించండి
 
 In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Click **Create** → **Droplets**
-2. Choose **Ubuntu 22.04 LTS** as the image
-3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
-4. Scroll to **Advanced Options** → check **Add Initialization scripts**
-5. Paste the full script content into the text area
-6. Click **Create Droplet**
+1. **సృష్టించు** → **చుక్కలు** క్లిక్ చేయండి
+2. చిత్రంగా **ఉబుంటు 22.04 LTS**ని ఎంచుకోండి
+3. **బేసిక్, 4 GB RAM / 2 vCPUలు** లేదా అంతకంటే పెద్దవి ఎంచుకోండి
+4. **అధునాతన ఎంపికలు** → తనిఖీకి స్క్రోల్ చేయండి **ఇనిషియలైజేషన్ స్క్రిప్ట్‌లను జోడించు**
+5. పూర్తి స్క్రిప్ట్ కంటెంట్‌ను టెక్స్ట్ ఏరియాలో అతికించండి
+6. క్లిక్ చేయండి ** బిందువు సృష్టించు**
 
-### Step 3 — Add the DNS record
+### దశ 3 — DNS రికార్డును జోడించండి
 
-While the Droplet boots, add an **A record** in your DNS provider:
+చుక్క బూట్ అవుతున్నప్పుడు, మీ DNS ప్రొవైడర్‌లో **A రికార్డ్**ని జోడించండి:
 
 ```
 Type  : A
@@ -73,20 +73,20 @@ Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Step 4 — Monitor progress
+### దశ 4 — పురోగతిని పర్యవేక్షించండి
 
-SSH into the Droplet and watch the log:
+చుక్కలోకి SSH చేసి, లాగ్‌ను చూడండి:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-The script prints your server IP near the start — add the DNS record as soon as you see it.
+స్క్రిప్ట్ ప్రారంభానికి సమీపంలో మీ సర్వర్ IPని ప్రింట్ చేస్తుంది - మీరు చూసిన వెంటనే DNS రికార్డ్‌ను జోడించండి.
 
-### Step 5 — Access the app
+### దశ 5 — యాప్‌ని యాక్సెస్ చేయండి
 
-When setup completes, the log shows a summary:
+సెటప్ పూర్తయినప్పుడు, లాగ్ సారాంశాన్ని చూపుతుంది:
 
 ```
 ============================================================
@@ -103,31 +103,31 @@ When setup completes, the log shows a summary:
 
 Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Change your password** immediately after login via **Settings** in the top-right menu.
+ఎగువ-కుడి మెనులో **సెట్టింగ్‌లు** ద్వారా లాగిన్ అయిన వెంటనే > **మీ పాస్‌వర్డ్**ని మార్చండి.
 
 ---
 
-## After Deployment
+## విస్తరణ తర్వాత
 
-### Change a password
+### పాస్‌వర్డ్ మార్చండి
 
-SSH into the Droplet, edit `.env`, and restart the affected container:
+చుక్కలోకి SSH, `.env`ని సవరించండి మరియు ప్రభావితమైన కంటైనర్‌ను పునఃప్రారంభించండి:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Update the domain
+### డొమైన్‌ను నవీకరించండి
 
-If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
+విస్తరణ తర్వాత మీరు వేరే డొమైన్‌ను కేటాయించినట్లయితే, `.env`లో `PROJECT_URL`ని అప్‌డేట్ చేయండి:
 
 ```bash
 nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### View all containers
+### అన్ని కంటైనర్‌లను వీక్షించండి
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

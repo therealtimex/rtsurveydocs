@@ -1,30 +1,30 @@
 ---
 weight: 1
-title: "DigitalOcean"
+title: "Đại dương kỹ thuật số"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-03-17T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Triển khai rtCloud trên DigitalOcean Droplet bằng các script dữ liệu người dùng tự động."
+description: "Triển khai rtCloud trên DigitalOcean Droplet bằng cách sử dụng tập lệnh dữ liệu người dùng tự động."
 ---
 
-DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
+DigitalOcean sử dụng tập lệnh **Dữ liệu người dùng** chạy tự động trong lần khởi động đầu tiên. Bạn điền các biến cấu hình ở đầu script, sau đó dán toàn bộ script khi tạo Droplet.
 
-> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
+> Không giống như Linode StackScripts, DigitalOcean không có giao diện người dùng biểu mẫu — bạn phải chỉnh sửa tập lệnh trực tiếp trước khi dán.
 
 **Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Embedded Keycloak (Recommended)
+## Keycloak nhúng (Được khuyến nghị)
 
-Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
+Sử dụng `digitalocean-droplet-keycloak-embed.sh` để thiết lập đơn giản nhất với SSO tích hợp sẵn.
 
-### Step 1 — Fill in the configuration
+### Bước 1 - Điền cấu hình
 
-Open the script and edit the `CONFIGURATION` block at the top:
+Mở tập lệnh và chỉnh sửa khối `CẤU HÌNH` ở trên cùng:
 
 ```bash
 # --- Required ---
@@ -41,30 +41,30 @@ STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Field | Required | Description |
+| Lĩnh vực | Bắt buộc | Mô tả |
 |-------|----------|-------------|
-| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
-| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
-| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
-| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
-| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
+| `DỰ ÁN_ID` | Có | Được sử dụng làm tên cơ sở dữ liệu và ID khách hàng Keycloak. Chữ thường, không có dấu cách. |
+| `ADMIN_PASSWORD` | Không | Mật khẩu để đăng nhập quản trị viên ứng dụng và bảng điều khiển quản trị Keycloak. Mặc định là `quản trị viên` — **thay đổi sau lần đăng nhập đầu tiên**. |
+| `TÊN MIỀN` | Có | Tên miền của bạn. DNS Một bản ghi phải trỏ đến IP Droplet. |
+| `LETSENCRYPT_EMAIL` | Có | Địa chỉ email để nhận thông báo chứng chỉ Let's Encrypt. |
+| `DỰ ÁN_URL` | Không | Ghi đè URL công khai. Để trống để sử dụng `DOMAIN`. Hữu ích đằng sau Cloudflare. |
 
-> **Security:** All passwords default to `admin`. Change them immediately after your first login.
+> **Bảo mật:** Tất cả mật khẩu mặc định là `quản trị viên`. Thay đổi chúng ngay sau lần đăng nhập đầu tiên của bạn.
 
-### Step 2 — Create a Droplet
+### Bước 2 - Tạo một giọt
 
 In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Click **Create** → **Droplets**
-2. Choose **Ubuntu 22.04 LTS** as the image
-3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
-4. Scroll to **Advanced Options** → check **Add Initialization scripts**
-5. Paste the full script content into the text area
-6. Click **Create Droplet**
+1. Nhấp vào **Tạo** → **Giọt**
+2. Chọn **Ubuntu 22.04 LTS** làm hình ảnh
+3. Chọn **Cơ bản, RAM 4 GB / 2 vCPU** hoặc lớn hơn
+4. Cuộn đến **Tùy chọn nâng cao** → chọn **Thêm tập lệnh khởi tạo**
+5. Dán toàn bộ nội dung script vào vùng văn bản
+6. Nhấp vào **Tạo giọt**
 
-### Step 3 — Add the DNS record
+### Bước 3 - Thêm bản ghi DNS
 
-While the Droplet boots, add an **A record** in your DNS provider:
+Trong khi Droplet khởi động, hãy thêm **A record** vào nhà cung cấp DNS của bạn:
 
 ```
 Type  : A
@@ -73,20 +73,20 @@ Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Step 4 — Monitor progress
+### Bước 4 - Theo dõi tiến trình
 
-SSH into the Droplet and watch the log:
+SSH vào Droplet và xem nhật ký:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-The script prints your server IP near the start — add the DNS record as soon as you see it.
+Tập lệnh in IP máy chủ của bạn ở gần đầu - thêm bản ghi DNS ngay khi bạn nhìn thấy nó.
 
-### Step 5 — Access the app
+### Bước 5 - Truy cập ứng dụng
 
-When setup completes, the log shows a summary:
+Khi quá trình thiết lập hoàn tất, nhật ký sẽ hiển thị tóm tắt:
 
 ```
 ============================================================
@@ -103,31 +103,31 @@ When setup completes, the log shows a summary:
 
 Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Change your password** immediately after login via **Settings** in the top-right menu.
+> **Thay đổi mật khẩu** ngay sau khi đăng nhập qua **Cài đặt** ở menu trên cùng bên phải.
 
 ---
 
-## After Deployment
+## Sau khi triển khai
 
-### Change a password
+### Đổi mật khẩu
 
-SSH into the Droplet, edit `.env`, and restart the affected container:
+SSH vào Droplet, chỉnh sửa `.env` và khởi động lại vùng chứa bị ảnh hưởng:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Update the domain
+### Cập nhật tên miền
 
-If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
+Nếu bạn chỉ định một miền khác sau khi triển khai, hãy cập nhật `PROJECT_URL` trong `.env`:
 
 ```bash
 nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### View all containers
+### Xem tất cả các container
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps

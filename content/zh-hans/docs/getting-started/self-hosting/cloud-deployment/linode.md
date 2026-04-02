@@ -1,54 +1,54 @@
 ---
 weight: 2
-title: "Linode (Akamai Cloud)"
+title: "Linode（阿卡迈云）"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "使用 StackScript 在 Linode 上部署 rtCloud。无需配置 — 只需创建服务器并按照部署后步骤操作。"
+description: "使用 StackScript 在 Linode 上部署 rtCloud。无需配置 - 只需创建服务器并遵循部署后步骤即可。"
 ---
 
-## Step 1 — Launch the StackScript
+## 步骤 1 — 启动 StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+这将打开 Linode Cloud Manager 中的 StackScript 页面。单击**部署新的 Linode**。
 
 ---
 
-## Step 2 — Fill in Linode's form
+## 第 2 步 — 填写 Linode 的表格
 
-Fill in Linode's standard server creation form:
+填写Linode的标准服务器创建表单：
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+|领域 |推荐值|
+|--------|------------------|
+| **图片** | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS
+| **地区** |最贴近您的用户 |
+| **计划** |共享 CPU 4 GB 或更大 |
+| **根密码** |设置强密码 |
+| **时区** *（我们唯一的字段）* |您的服务器时区（默认值：`Asia/Ho_Chi_Minh`）|
 
-Click **Create Linode** when done.
+完成后点击 **创建 Linode**。
 
 ---
 
-## Step 3 — Wait for setup to complete
+## 步骤 3 — 等待设置完成
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+该脚本在首次启动时自动运行。它会安装 Docker、拉取 rtSurvey 映像、初始化数据库并启动所有服务。这需要 **5-10 分钟**。
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+您可以直接在 **Linode Cloud Manager** 中查看进度 - 无需 SSH：
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. 点击您新创建的Linode
+3. 单击**启动 LISH 控制台**（Linode 详细信息页面右上角）
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+将打开一个浏览器终端，显示实时启动日志 - **Weblish** 选项卡直接在浏览器中运行，无需 SSH 客户端。
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+等到你看到：
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+该日志还显示您的服务器 IP — 您将在下一步中需要它。
 
 ---
 
-## Step 4 — Set up SSL
+## 步骤 4 — 设置 SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+按照 **[设置 SSL 指南 →](../ssl-setup)** 配置 HTTPS。免费的**rtsurvey.com 子域**是最快的选择 - 无需 DNS 设置。
 
 ---
 
-## Step 5 — First login
+## 步骤 5 — 首次登录
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+SSL 激活后，请按照 **[首次登录指南 →](../first-login)** 访问管理员帐户。
 
 ---
 
-## Step 6 — Change the default password
+## 步骤 6 — 更改默认密码
 
-All passwords default to `admin`. Change them immediately after your first login:
+所有密码默认为“admin”。首次登录后立即更改它们：
 
-- **App admin password** — account settings inside the app
+- **应用程序管理员密码** — 应用程序内的帐户设置
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
-## 防火墙规则（Linode Cloud Firewall）
+## 防火墙规则（Linode云防火墙）
 
-如果您将 Linode Cloud Firewall 附加到此服务器，请使用以下规则：
+如果您将 Linode 云防火墙附加到此服务器，请使用以下规则：
 
-### 入站规则（Inbound）
+### 入境
 
-| 标签 | 操作 | 协议 | 端口 | 来源 | 备注 |
-|------|------|------|------|------|------|
-| `accept-inbound-ssh` | 接受 | TCP | 22 | All IPv4, All IPv6 | SSH 访问 |
-| `accept-inbound-http` | 接受 | TCP | 80 | All IPv4, All IPv6 | Nginx（HTTP + ACME 验证） |
-| `accept-inbound-https` | 接受 | TCP | 443 | All IPv4, All IPv6 | Nginx（SSL 配置后的 HTTPS） |
-| `accept-inbound-shiny` | 接受 | TCP | 3838 | All IPv4, All IPv6 | Shiny Server（R 分析） |
-| `accept-inbound-icmp` | 接受 | ICMP | — | All IPv4, All IPv6 | Ping / 诊断 |
-| 默认入站策略 | **丢弃** | | | | 阻止其他所有流量 |
+|标签|行动|协议|港口|来源 |笔记|
+|--------|--------|----------|--------|---------|--------|
+| `接受入站 ssh` |接受 | TCP | 22 | 22所有 IPv4、所有 IPv6 | SSH 访问 |
+| `接受入站http` |接受 | TCP | 80|所有 IPv4、所有 IPv6 | Nginx（HTTP + ACME 挑战）|
+| `接受入站-https` |接受 | TCP | 443 | 443所有 IPv4、所有 IPv6 | Nginx（SSL 设置后的 HTTPS）|
+| `接受入站闪亮` |接受 | TCP | 3838|所有 IPv4、所有 IPv6 |闪亮的服务器（R 分析）|
+| `接受入站 icmp` |接受 | ICMP | — |所有 IPv4、所有 IPv6 | Ping / 诊断 |
+|默认入站策略 | **掉落** | | | |阻止其他所有内容 |
 
-### 出站规则（Outbound）
+### 出境
 
-| 标签 | 操作 | 备注 |
-|------|------|------|
-| 默认出站策略 | **接受** | 允许所有出站流量（Docker、certbot、GoDaddy API 等） |
+|标签|行动|笔记|
+|--------|--------|--------|
+|默认出站策略 | **接受** |允许所有出站（Docker 拉取、certbot、GoDaddy API 等）|
 
-### 无需对外开放的端口
+### 外部不需要的端口
 
-这些端口仅绑定到 `127.0.0.1`，无法从外部访问：
+这些端口仅绑定到“127.0.0.1”，并且永远无法从服务器外部访问：
 
-| 端口 | 服务 | 原因 |
-|------|------|------|
-| 8080 | 应用容器 | Nginx 在内部代理 |
-| 8090 | Keycloak 容器 | Nginx 在内部代理 |
-| 3306 | MySQL | 仅限 Docker 内部网络 |
+|港口|服务 |原因 |
+|------|---------|--------|
+| 8080|应用容器 | Nginx 在内部代理它 |
+| 8090|钥匙斗篷容器| Nginx 在内部代理它 |
+| 3306| MySQL |仅限内部 Docker 网络 |
 
 ---
 
-## Troubleshooting
+## 故障排除
 
-### Check the setup log
+### 检查设置日志
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### 检查 SSL 日志
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### 查看容器状态
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

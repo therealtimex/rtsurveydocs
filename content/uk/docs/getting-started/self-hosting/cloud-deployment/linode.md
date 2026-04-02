@@ -7,10 +7,10 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Розгорніть rtCloud на Linode за допомогою StackScript. Налаштування не потрібне — просто створіть сервер і дотримуйтесь кроків після розгортання."
+description: "Розгорніть rtCloud на Linode за допомогою StackScript. Конфігурація не потрібна — просто створіть сервер і виконайте кроки після розгортання."
 ---
 
-## Step 1 — Launch the StackScript
+## Крок 1 — Запустіть StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
@@ -18,37 +18,37 @@ This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Lino
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Крок 2 — Заповніть форму Linode
 
-Fill in Linode's standard server creation form:
+Заповніть стандартну форму створення сервера Linode:
 
-| Field | Recommended value |
+| Поле | Рекомендоване значення |
 |-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| **Зображення** | Ubuntu 22.04 LTS |
+| **Регіон** | Найближче до ваших користувачів |
+| **План** | Спільний ЦП 4 ГБ або більше |
+| **Пароль root** | Встановити надійний пароль |
+| **Часовий пояс** *(наше єдине поле)* | Часовий пояс вашого сервера (за замовчуванням: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+Після завершення натисніть **Створити Linode**.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Крок 3 — Дочекайтеся завершення налаштування
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Сценарій запускається автоматично під час першого завантаження. Він встановлює Docker, отримує зображення rtSurvey, ініціалізує базу даних і запускає всі служби. Це займає **5–10 хвилин**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Ви можете спостерігати за прогресом безпосередньо в **Linode Cloud Manager** — SSH не потрібен:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Клацніть щойно створений Linode
+3. Натисніть **Launch LISH Console** (верхній правий кут сторінки деталей Linode)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+Відкриється термінал браузера з журналом завантаження в режимі реального часу — вкладка **Weblish** працює безпосередньо у вашому браузері, клієнт SSH не потрібен.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Зачекайте, поки ви побачите:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Журнал також показує IP-адресу вашого сервера — вона вам знадобиться для наступного кроку.
 
 ---
 
-## Step 4 — Set up SSL
+## Крок 4 — Налаштуйте SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Дотримуйтеся **[Посібника з налаштування SSL →](../ssl-setup)**, щоб налаштувати HTTPS. Безкоштовний субдомен **rtsurvey.com** є найшвидшим варіантом — налаштування DNS не потрібне.
 
 ---
 
 ## Step 5 — First login
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+Після активації SSL дотримуйтеся **[посібника з першого входу →](../first-login)**, щоб отримати доступ до облікового запису адміністратора.
 
 ---
 
-## Step 6 — Change the default password
+## Крок 6 — Змініть пароль за умовчанням
 
-All passwords default to `admin`. Change them immediately after your first login:
+Усі паролі за замовчуванням `admin`. Змініть їх одразу після першого входу:
 
-- **App admin password** — account settings inside the app
+- **Пароль адміністратора програми** — налаштування облікового запису всередині програми
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
 ## Правила брандмауера (Linode Cloud Firewall)
 
-Якщо ви підключаєте Linode Cloud Firewall до цього сервера, використовуйте такі правила:
+Якщо ви підключаєте Linode Cloud Firewall до цього сервера, дотримуйтеся таких правил:
 
-### Вхідний трафік (Inbound)
+### Вхідний
 
 | Мітка | Дія | Протокол | Порт | Джерела | Примітки |
-|-------|-----|---------|------|---------|---------|
-| `accept-inbound-ssh` | Дозволити | TCP | 22 | All IPv4, All IPv6 | SSH-доступ |
-| `accept-inbound-http` | Дозволити | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME-перевірка) |
-| `accept-inbound-https` | Дозволити | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS після налаштування SSL) |
-| `accept-inbound-shiny` | Дозволити | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (аналітика R) |
-| `accept-inbound-icmp` | Дозволити | ICMP | — | All IPv4, All IPv6 | Ping / діагностика |
-| Стандартна політика вхідного трафіку | **Відхилити** | | | | Блокувати все інше |
+|-------|--------|----------|------|---------|-------|
+| `accept-inbound-ssh` | Прийняти | TCP | 22 | Усі IPv4, усі IPv6 | SSH доступ |
+| `accept-inbound-http` | Прийняти | TCP | 80 | Усі IPv4, усі IPv6 | Nginx (завдання HTTP + ACME) |
+| `accept-inbound-https` | Прийняти | TCP | 443 | Усі IPv4, усі IPv6 | Nginx (HTTPS після налаштування SSL) |
+| `accept-inbound-shiny` | Прийняти | TCP | 3838 | Усі IPv4, усі IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Прийняти | ICMP | — | Усі IPv4, усі IPv6 | Пінг / діагностика |
+| Стандартна вхідна політика | **Падіння** | | | | Заблокувати все інше |
 
-### Вихідний трафік (Outbound)
+### Вихідний
 
 | Мітка | Дія | Примітки |
-|-------|-----|---------|
-| Стандартна політика вихідного трафіку | **Дозволити** | Дозволити весь вихідний трафік (Docker, certbot, GoDaddy API тощо) |
+|-------|--------|-------|
+| Вихідна політика за умовчанням | **Прийняти** | Дозволити всі вихідні (завантаження Docker, certbot, GoDaddy API тощо) |
 
-### Порти, що НЕ потребують зовнішнього доступу
+### Зовнішні порти НЕ потрібні
 
-Ці порти прив'язані лише до `127.0.0.1` і ніколи не доступні ззовні:
+Ці порти прив’язані лише до `127.0.0.1` і ніколи не доступні ззовні сервера:
 
 | Порт | Сервіс | Причина |
-|------|--------|--------|
-| 8080 | Контейнер застосунку | Nginx проксіює внутрішньо |
-| 8090 | Контейнер Keycloak | Nginx проксіює внутрішньо |
+|------|---------|--------|
+| 8080 | Контейнер програми | Nginx внутрішні проксі до нього |
+| 8090 | Контейнер Keycloak | Nginx внутрішні проксі до нього |
 | 3306 | MySQL | Лише внутрішня мережа Docker |
 
 ---
 
-## Troubleshooting
+## Усунення несправностей
 
-### Check the setup log
+### Перевірте журнал налаштування
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Перевірте журнал SSL
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Переглянути статус контейнера
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

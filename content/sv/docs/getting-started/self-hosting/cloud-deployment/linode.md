@@ -7,48 +7,48 @@ draft: false
 author: "rtSurvey"
 icon: "dns"
 toc: true
-description: "Driftsätt rtCloud på Linode med hjälp av ett StackScript. Ingen konfiguration behövs — skapa bara servern och följ stegen efter driftsättning."
+description: "Distribuera rtCloud på Linode med ett StackScript. Ingen konfiguration behövs – skapa bara servern och följ stegen efter distributionen."
 ---
 
-## Step 1 — Launch the StackScript
+## Steg 1 — Starta StackScript
 
 **[Deploy rtSurvey on Linode →](https://cloud.linode.com/stackscripts/2049143)**
 
-This opens the StackScript page in Linode Cloud Manager. Click **Deploy New Linode**.
+Detta öppnar StackScript-sidan i Linode Cloud Manager. Klicka på **Distribuera ny Linode**.
 
 ---
 
-## Step 2 — Fill in Linode's form
+## Steg 2 — Fyll i Linodes formulär
 
-Fill in Linode's standard server creation form:
+Fyll i Linodes standardformulär för skapande av server:
 
-| Field | Recommended value |
-|-------|------------------|
-| **Image** | Ubuntu 22.04 LTS |
-| **Region** | Closest to your users |
-| **Plan** | Shared CPU 4 GB or larger |
-| **Root Password** | Set a strong password |
-| **Timezone** *(our only field)* | Your server timezone (default: `Asia/Ho_Chi_Minh`) |
+| Fält | Rekommenderat värde |
+|-------|------------------------|
+| **Bild** | Ubuntu 22.04 LTS |
+| **Region** | Närmast dina användare |
+| **Planera** | Delad CPU 4 GB eller större |
+| **Root-lösenord** | Ange ett starkt lösenord |
+| **Tidszon** *(vårt enda fält)* | Din servertidszon (standard: `Asia/Ho_Chi_Minh`) |
 
-Click **Create Linode** when done.
+Klicka på **Skapa Linode** när du är klar.
 
 ---
 
-## Step 3 — Wait for setup to complete
+## Steg 3 — Vänta tills installationen är klar
 
-The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
+Skriptet körs automatiskt vid första uppstart. Den installerar Docker, hämtar rtSurvey-bilden, initierar databasen och startar alla tjänster. Detta tar **5–10 minuter**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+Du kan se framstegen direkt i **Linode Cloud Manager** — ingen SSH krävs:
 
 1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+2. Klicka på din nyskapade Linode
+3. Klicka på **Starta LISH Console** (överst till höger på Linodes detaljsida)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+En webbläsarterminal öppnas och visar livestartloggen — fliken **Weblish** fungerar direkt i din webbläsare, ingen SSH-klient behövs.
 
 ![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
 
-Wait until you see:
+Vänta tills du ser:
 
 ```
 ============================================================
@@ -61,81 +61,81 @@ Wait until you see:
 ============================================================
 ```
 
-The log also shows your server IP — you will need it for the next step.
+Loggen visar också din server-IP - du behöver den för nästa steg.
 
 ---
 
-## Step 4 — Set up SSL
+## Steg 4 — Konfigurera SSL
 
 Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
 
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Följ **[Set Up SSL guide →](../ssl-setup)** för att konfigurera HTTPS. Den kostnadsfria **rtsurvey.com-underdomänen** är det snabbaste alternativet – ingen DNS-installation behövs.
 
 ---
 
-## Step 5 — First login
+## Steg 5 — Första inloggningen
 
-Once SSL is active, follow the **[First Login guide →](../first-login)** to access the admin account.
+När SSL är aktivt, följ **[First Login Guide →](../first-login)** för att komma åt administratörskontot.
 
 ---
 
-## Step 6 — Change the default password
+## Steg 6 — Ändra standardlösenordet
 
-All passwords default to `admin`. Change them immediately after your first login:
+Alla lösenord är som standard "admin". Ändra dem direkt efter din första inloggning:
 
-- **App admin password** — account settings inside the app
+- **Appadministratörslösenord** — kontoinställningar i appen
 - **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
 
 ---
 
 ## Brandväggsregler (Linode Cloud Firewall)
 
-Om du kopplar en Linode Cloud Firewall till den här servern, använd följande regler:
+Om du ansluter en Linode Cloud Firewall till den här servern, använd följande regler:
 
-### Inkommande trafik (Inbound)
+### Inkommande
 
-| Etikett | Åtgärd | Protokoll | Port | Källor | Anteckningar |
-|-------|--------|----------|------|---------|-------|
-| `accept-inbound-ssh` | Acceptera | TCP | 22 | All IPv4, All IPv6 | SSH access |
-| `accept-inbound-http` | Acceptera | TCP | 80 | All IPv4, All IPv6 | Nginx (HTTP + ACME challenge) |
-| `accept-inbound-https` | Acceptera | TCP | 443 | All IPv4, All IPv6 | Nginx (HTTPS after SSL setup) |
-| `accept-inbound-shiny` | Acceptera | TCP | 3838 | All IPv4, All IPv6 | Shiny Server (R analytics) |
-| `accept-inbound-icmp` | Acceptera | ICMP | — | All IPv4, All IPv6 | Ping / diagnostics |
-| Default inbound policy | **Avvisa** | | | | Block everything else |
+| Etikett | Åtgärd | Protokoll | Hamn | Källor | Anteckningar |
+|-------|--------|--------|------|--------|-------|
+| `accept-inbound-ssh` | Acceptera | TCP | 22 | Alla IPv4, Alla IPv6 | SSH-åtkomst |
+| `acceptera-inkommande-http` | Acceptera | TCP | 80 | Alla IPv4, Alla IPv6 | Nginx (HTTP + ACME utmaning) |
+| `acceptera-inkommande-https` | Acceptera | TCP | 443 | Alla IPv4, Alla IPv6 | Nginx (HTTPS efter SSL-installation) |
+| `acceptera-inkommande-glänsande` | Acceptera | TCP | 3838 | Alla IPv4, Alla IPv6 | Shiny Server (R analytics) |
+| `accept-inbound-icmp` | Acceptera | ICMP | — | Alla IPv4, Alla IPv6 | Ping / diagnostik |
+| Standard inkommande policy | **Släpp** | | | | Blockera allt annat |
 
-### Utgående trafik (Outbound)
+### Utgående
 
 | Etikett | Åtgärd | Anteckningar |
 |-------|--------|-------|
-| Default outbound policy | **Acceptera** | Tillåt all utgående trafik (Docker, certbot, GoDaddy API, etc.) |
+| Standard utgående policy | **Acceptera** | Tillåt alla utgående (Docker pulls, certbot, GoDaddy API, etc.) |
 
-### Portar som INTE behövs externt
+### Portar behövs INTE externt
 
-Dessa portar är enbart bundna till `127.0.0.1` och kan aldrig nås utifrån:
+Dessa portar är endast bundna till "127.0.0.1" och kan aldrig nås utanför servern:
 
-| Port | Tjänst | Anledning |
-|------|---------|--------|
-| 8080 | App container | Nginx proxies internally |
-| 8090 | Keycloak container | Nginx proxies internally |
-| 3306 | MySQL | Internal Docker network only |
+| Hamn | Service | Anledning |
+|------|--------|--------|
+| 8080 | Appbehållare | Nginx fullmakter till det internt |
+| 8090 | Keycloak container | Nginx fullmakter till det internt |
+| 3306 | MySQL | Endast internt Docker-nätverk |
 
 ---
 
-## Troubleshooting
+## Felsökning
 
-### Check the setup log
+### Kontrollera inställningsloggen
 
 ```bash
 tail -200 /var/log/stackscript.log
 ```
 
-### Check the SSL log
+### Kontrollera SSL-loggen
 
 ```bash
 tail -200 /var/log/rtsurvey-ssl.log
 ```
 
-### View container status
+### Visa containerstatus
 
 ```bash
 docker compose -f /opt/rtsurvey/docker-compose.production.yml ps

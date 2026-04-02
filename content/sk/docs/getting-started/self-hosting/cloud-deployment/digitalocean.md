@@ -7,24 +7,24 @@ draft: false
 author: "rtSurvey"
 icon: "water_drop"
 toc: true
-description: "Nasaďte rtCloud na DigitalOcean Droplet pomocou automatizovaných user-data skriptov."
+description: "Nasaďte rtCloud na DigitalOcean Droplet pomocou automatických skriptov používateľských údajov."
 ---
 
-DigitalOcean uses **User Data** scripts that run automatically on first boot. You fill in the configuration variables at the top of the script, then paste the entire script when creating a Droplet.
+DigitalOcean používa skripty **User Data**, ktoré sa automaticky spúšťajú pri prvom spustení. Konfiguračné premenné vyplníte v hornej časti skriptu a pri vytváraní kvapôčky prilepíte celý skript.
 
-> Unlike Linode StackScripts, DigitalOcean has no form UI — you must edit the script directly before pasting.
+> Na rozdiel od Linode StackScripts nemá DigitalOcean používateľské rozhranie formulára – skript musíte upraviť priamo pred vložením.
 
 **Download script:** [digitalocean-droplet-keycloak-embed.sh](/scripts/digitalocean-droplet-keycloak-embed.sh)
 
 ---
 
-## Embedded Keycloak (Recommended)
+## Vstavaný kryt na kľúče (odporúča sa)
 
-Use `digitalocean-droplet-keycloak-embed.sh` for the simplest setup with built-in SSO.
+Pre najjednoduchšie nastavenie so vstavaným SSO použite `digitalocean-droplet-keycloak-embed.sh`.
 
-### Step 1 — Fill in the configuration
+### Krok 1 — Vyplňte konfiguráciu
 
-Open the script and edit the `CONFIGURATION` block at the top:
+Otvorte skript a upravte blok `CONFIGURATION` v hornej časti:
 
 ```bash
 # --- Required ---
@@ -41,30 +41,30 @@ STATA_ENABLED="false"
 TZ="Asia/Ho_Chi_Minh"
 ```
 
-| Field | Required | Description |
+| Pole | povinné | Popis |
 |-------|----------|-------------|
-| `PROJECT_ID` | Yes | Used as database name and Keycloak client ID. Lowercase, no spaces. |
-| `ADMIN_PASSWORD` | No | Password for app admin login and Keycloak admin console. Defaults to `admin` — **change after first login**. |
-| `DOMAIN` | Yes | Your domain name. DNS A record must point to the Droplet IP. |
-| `LETSENCRYPT_EMAIL` | Yes | Email address for Let's Encrypt certificate notifications. |
-| `PROJECT_URL` | No | Override the public URL. Leave blank to use `DOMAIN`. Useful behind Cloudflare. |
+| `PROJECT_ID` | áno | Používa sa ako názov databázy a ID klienta Keycloak. Malé písmená, žiadne medzery. |
+| `ADMIN_PASSWORD` | Nie | Heslo pre prihlásenie správcu aplikácie a správcovskú konzolu Keycloak. Predvolená hodnota je `admin` — **zmena po prvom prihlásení**. |
+| "DOMÉNA" | áno | Názov vašej domény. DNS Záznam musí ukazovať na IP droplet. |
+| "LETSENCRYPT_EMAIL" | áno | E-mailová adresa pre upozornenia na certifikát Let's Encrypt. |
+| "PROJECT_URL" | Nie | Prepísať verejnú adresu URL. Ak chcete použiť „DOMAIN“, ponechajte pole prázdne. Užitočné pre Cloudflare. |
 
-> **Security:** All passwords default to `admin`. Change them immediately after your first login.
+> **Zabezpečenie:** Všetky heslá sú štandardne nastavené na `admin`. Zmeňte ich ihneď po prvom prihlásení.
 
-### Step 2 — Create a Droplet
+### Krok 2 — Vytvorte kvapôčku
 
 In the [DigitalOcean control panel](https://cloud.digitalocean.com):
 
-1. Click **Create** → **Droplets**
-2. Choose **Ubuntu 22.04 LTS** as the image
-3. Select **Basic, 4 GB RAM / 2 vCPUs** or larger
-4. Scroll to **Advanced Options** → check **Add Initialization scripts**
-5. Paste the full script content into the text area
-6. Click **Create Droplet**
+1. Kliknite na **Vytvoriť** → **Kvapky**
+2. Ako obrázok vyberte **Ubuntu 22.04 LTS**
+3. Vyberte **Základné, 4 GB RAM / 2 vCPU** alebo väčšie
+4. Prejdite na **Rozšírené možnosti** → začiarknite **Pridať inicializačné skripty**
+5. Prilepte celý obsah skriptu do textovej oblasti
+6. Kliknite na **Vytvoriť kvapôčku**
 
-### Step 3 — Add the DNS record
+### Krok 3 — Pridajte záznam DNS
 
-While the Droplet boots, add an **A record** in your DNS provider:
+Počas zavádzania kvapôčky pridajte do svojho poskytovateľa DNS záznam **A**:
 
 ```
 Type  : A
@@ -73,20 +73,20 @@ Value : <droplet-ip>
 TTL   : 300
 ```
 
-### Step 4 — Monitor progress
+### Krok 4 – Sledujte pokrok
 
-SSH into the Droplet and watch the log:
+SSH do kvapôčky a sledujte denník:
 
 ```bash
 ssh root@<droplet-ip>
 tail -f /var/log/rtcloud-setup.log
 ```
 
-The script prints your server IP near the start — add the DNS record as soon as you see it.
+Skript vytlačí IP vášho servera blízko začiatku – pridajte záznam DNS hneď, ako ho uvidíte.
 
-### Step 5 — Access the app
+### Krok 5 — Prístup k aplikácii
 
-When setup completes, the log shows a summary:
+Po dokončení nastavenia sa v denníku zobrazí súhrn:
 
 ```
 ============================================================
@@ -103,31 +103,31 @@ When setup completes, the log shows a summary:
 
 Open `https://myapp.example.com` in your browser and log in with username `admin` and password `admin`.
 
-> **Change your password** immediately after login via **Settings** in the top-right menu.
+> **Zmeňte si heslo** ihneď po prihlásení cez **Nastavenia** v menu vpravo hore.
 
 ---
 
-## After Deployment
+## Po nasadení
 
-### Change a password
+### Zmeňte heslo
 
-SSH into the Droplet, edit `.env`, and restart the affected container:
+SSH do Droplet, upravte `.env` a reštartujte ovplyvnený kontajner:
 
 ```bash
 nano /opt/rtcloud/.env
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Update the domain
+### Aktualizujte doménu
 
-If you assign a different domain after deployment, update `PROJECT_URL` in `.env`:
+Ak po nasadení priradíte inú doménu, aktualizujte `PROJECT_URL` v `.env`:
 
 ```bash
 nano /opt/rtcloud/.env   # update PROJECT_URL=
 docker compose -f /opt/rtcloud/docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### View all containers
+### Zobraziť všetky kontajnery
 
 ```bash
 docker compose -f /opt/rtcloud/docker-compose.production.yml ps
