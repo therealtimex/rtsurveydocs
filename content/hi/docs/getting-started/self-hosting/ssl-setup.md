@@ -1,126 +1,128 @@
 ---
 weight: 4
-title: "SSL सेटअप करें"
+title: "एसएसएल सेट करें"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "अपने rtSurvey सर्वर के लिए HTTPS कॉन्फ़िगर करें। लॉगिन से पहले आवश्यक।"
+description: "अपने rtSurvey सर्वर के लिए HTTPS कॉन्फ़िगर करें। आपके लॉग इन करने से पहले आवश्यक है."
 ---
 
-SSL लॉगिन करने से पहले कॉन्फ़िगर होना चाहिए। जब आप पहली बार ऐप खोलते हैं, तो आप स्वचालित रूप से SSL सेटअप स्क्रीन पर रीडायरेक्ट हो जाएंगे।
+लॉग इन करने से पहले एसएसएल को कॉन्फ़िगर किया जाना चाहिए। जब ​​आप पहली बार ऐप खोलेंगे, तो आपको स्वचालित रूप से एसएसएल सेटअप स्क्रीन पर रीडायरेक्ट कर दिया जाएगा।
 
 ---
 
-## SSL सेटअप विकल्प
+## एसएसएल सेटअप विकल्प
 
-![SSL सेटअप विकल्प](/img/ssl-setup/ssl-setup-options.png)
+![एसएसएल सेटअप विकल्प](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+तीन विकल्पों में से एक चुनें:
+
+| विकल्प | कब उपयोग करें |
 |--------|-------------|
-| **मुफ़्त rtsurvey.com सबडोमेन *(अनुशंसित)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **मेरा अपना डोमेन** | You already have a domain and its DNS points to this server. |
-| **प्रमाणपत्र मैन्युअल रूप से स्थापित करें** | Enterprise or custom CA. Requires SSH access. |
+| **मुफ़्त rtsurvey.com उपडोमेन** *(अनुशंसित)* | किसी DNS सेटअप की आवश्यकता नहीं है. हम आपके लिए रिकॉर्ड बनाते हैं. 2-5 मिनट में तैयार। |
+| **मेरा अपना डोमेन** | आपके पास पहले से ही एक डोमेन है और उसका DNS इस सर्वर पर इंगित करता है। |
+| **प्रमाणपत्र मैन्युअल रूप से स्थापित करें** | एंटरप्राइज़ या कस्टम सीए. SSH पहुंच की आवश्यकता है. |
 
 ---
 
-## Option 1 — मुफ़्त rtsurvey.com सबडोमेन *(अनुशंसित)*
+## विकल्प 1 - मुफ़्त rtsurvey.com उपडोमेन (अनुशंसित)
 
-This is the fastest option. No domain registration or DNS changes required.
+यह सबसे तेज़ विकल्प है. किसी डोमेन पंजीकरण या DNS परिवर्तन की आवश्यकता नहीं है।
 
-1. Click **मुफ़्त rtsurvey.com सबडोमेन *(अनुशंसित)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. अनुभाग का विस्तार करने के लिए निःशुल्क rtsurvey.com उपडोमेन पर क्लिक करें
+2. इनपुट फ़ील्ड में अपना इच्छित उपडोमेन नाम टाइप करें
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > छोटे अक्षरों, संख्याओं और हाइफ़न का उपयोग करें। 3-30 अक्षर.
+   > उदाहरण: `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. बनाएँ पर क्लिक करें **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. प्रमाणपत्र जारी होने तक 2-5 मिनट प्रतीक्षा करें
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. एक बार प्रमाणपत्र तैयार हो जाने पर, आपको स्वचालित रूप से आपके नए HTTPS URL पर पुनः निर्देशित कर दिया जाएगा
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — मेरा अपना डोमेन
+## विकल्प 2 - मेरा अपना डोमेन
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+यदि आपके पास कोई मौजूदा डोमेन है और उसका DNS A रिकॉर्ड पहले से ही इस सर्वर के आईपी को इंगित करता है तो इसका उपयोग करें।
 
-1. Click **मेरा अपना डोमेन** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. अनुभाग का विस्तार करने के लिए मेरा अपना डोमेन क्लिक करें
+2. अपना पूरा डोमेन नाम दर्ज करें (e.g. `survey.myorganization.org`)
+3. प्रमाणपत्र बनाएं पर क्लिक करें
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt आपके डोमेन को सत्यापित करेगा और एक प्रमाणपत्र जारी करेगा। इसके लिए पहले DNS को सही ढंग से इंगित करना आवश्यक है - अन्यथा अनुरोध विफल हो जाएगा।
 
 ---
 
-## Option 3 — प्रमाणपत्र मैन्युअल रूप से स्थापित करें
+## विकल्प 3 - प्रमाणपत्र मैन्युअल रूप से स्थापित करें
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+कस्टम या आंतरिक CA का उपयोग करके एंटरप्राइज़ परिवेश के लिए। आप अपनी प्रमाणपत्र फ़ाइलें SSH के माध्यम से सर्वर पर रखेंगे, फिर ऐप में अपना डोमेन दर्ज करेंगे।
 
-### Prerequisites
+### आवश्यक शर्तें
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- सर्वर तक एसएसएच पहुंच
+- आपके डोमेन के लिए एक वैध प्रमाणपत्र और निजी कुंजी (पीईएम प्रारूप)
 
-### Step 1 — SSH into the server
+### चरण 1 - सर्वर में एसएसएच
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### चरण 2 - अपनी प्रमाणपत्र फ़ाइलें रखें
 
-Create the directory and copy your files:
+निर्देशिका बनाएं और अपनी फ़ाइलें कॉपी करें:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+अपनी फ़ाइलों को इन सटीक नामों के साथ उस निर्देशिका में कॉपी करें:
 
-| File | Description |
+| फ़ाइल | विवरण |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | आपका प्रमाणपत्र + कोई मध्यवर्ती सीए प्रमाणपत्र (संक्षिप्त) |
+| `privkey.pem` | आपकी निजी कुंजी |
 
-Example:
+उदाहरण:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# अपनी स्थानीय मशीन से कॉपी करें (इसे स्थानीय रूप से चलाएं, सर्वर पर नहीं)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+सही अनुमतियाँ सेट करें:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### चरण 3 - ऐप में अपना डोमेन दर्ज करें
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **प्रमाणपत्र मैन्युअल रूप से स्थापित करें**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. एसएसएल सेटअप स्क्रीन में, मैन्युअल रूप से प्रमाणपत्र स्थापित करें पर क्लिक करें
+2. अपना डोमेन नाम दर्ज करें (प्रमाणपत्र के सामान्य नाम या SAN से मेल खाना चाहिए)
+3. लागू करें पर क्लिक करें
 
-The server will configure Nginx with your certificate and reload automatically.
+सर्वर आपके प्रमाणपत्र के साथ Nginx को कॉन्फ़िगर करेगा और स्वचालित रूप से पुनः लोड करेगा।
 
 ---
 
 ## अगला कदम
 
-SSL सक्रिय होने के बाद, [पहली बार लॉगिन](first-login) पर जाएं।
+एक बार एसएसएल सक्रिय होने पर, पहले लॉगिन के लिए आगे बढ़ें। [first-login](first-login).

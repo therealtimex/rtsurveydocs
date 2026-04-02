@@ -7,120 +7,122 @@ draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Configureer HTTPS voor uw rtSurvey-server. Vereist voor aanmelden."
+description: "Configureer HTTPS voor uw rtSurvey-server. Vereist voordat u kunt inloggen."
 ---
 
-SSL moet worden geconfigureerd voordat u kunt inloggen. Wanneer u de app voor het eerst opent, wordt u automatisch doorgestuurd naar het SSL-instellingsscherm.
+SSL moet worden geconfigureerd voordat u kunt inloggen. Wanneer u de app voor de eerste keer opent, wordt u automatisch doorgestuurd naar het SSL-configuratiescherm.
 
 ---
 
-## SSL-instellingsopties
+## SSL-installatieopties
 
-![SSL-instellingsopties](/img/ssl-setup/ssl-setup-options.png)
+![SSL-installatieopties](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+Kies een van de drie opties:
+
+| Optie | Wanneer te gebruiken |
 |--------|-------------|
-| **Gratis rtsurvey.com-subdomein *(Aanbevolen)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **Mijn eigen domein** | You already have a domain and its DNS points to this server. |
-| **Certificaat handmatig installeren** | Enterprise or custom CA. Requires SSH access. |
+| **Gratis rtsurvey.com-subdomein** *(Aanbevolen)* | Geen DNS-installatie nodig. Wij maken het record voor u aan. Klaar in 2-5 minuten. |
+| **Mijn eigen domein** | U heeft al een domein en de DNS ervan verwijst naar deze server. |
+| **Certificaat handmatig installeren** | Enterprise of aangepaste CA. Vereist SSH-toegang. |
 
 ---
 
-## Option 1 — Gratis rtsurvey.com-subdomein *(Aanbevolen)*
+## Optie 1 — Gratis rtsurvey.com-subdomein (aanbevolen)
 
-This is the fastest option. No domain registration or DNS changes required.
+Dit is de snelste optie. Geen domeinregistratie of DNS-wijzigingen vereist.
 
-1. Click **Gratis rtsurvey.com-subdomein *(Aanbevolen)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. Klik op Gratis rtsurvey.com-subdomein om de sectie uit te vouwen
+2. Typ de gewenste subdomeinnaam in het invoerveld
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > Gebruik kleine letters, cijfers en koppeltekens. 3–30 tekens.
+   > Voorbeeld: `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. Klik op Maken **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. Wacht 2 tot 5 minuten terwijl het certificaat wordt uitgegeven
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. Zodra het certificaat klaar is, wordt u automatisch doorgestuurd naar uw nieuwe HTTPS-URL
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — Mijn eigen domein
+## Optie 2 — Mijn eigen domein
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+Gebruik dit als u een bestaand domein heeft en het DNS A-record ervan verwijst al naar het IP-adres van deze server.
 
-1. Click **Mijn eigen domein** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. Klik op Mijn eigen domein om de sectie uit te vouwen
+2. Voer uw volledige domeinnaam in (e.g. `survey.myorganization.org`)
+3. Klik op Certificaat maken
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt verifieert uw domein en geeft een certificaat uit. Hiervoor moet DNS eerst correct worden aangewezen; anders mislukt het verzoek.
 
 ---
 
-## Option 3 — Certificaat handmatig installeren
+## Optie 3 — Certificaat handmatig installeren
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+Voor bedrijfsomgevingen die een aangepaste of interne CA gebruiken. U plaatst uw certificaatbestanden via SSH op de server en voert vervolgens uw domein in de app in.
 
-### Prerequisites
+### Vereisten
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- SSH-toegang tot de server
+- Een geldig certificaat en privésleutel voor uw domein (PEM-formaat)
 
-### Step 1 — SSH into the server
+### Stap 1 — SSH naar de server
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### Stap 2 — Plaats uw certificaatbestanden
 
-Create the directory and copy your files:
+Maak de map aan en kopieer uw bestanden:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+Kopieer uw bestanden naar die map met de exacte namen:
 
-| File | Description |
+| Bestand | Beschrijving |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | Uw certificaat + eventuele tussenliggende CA-certificaten (aaneengeschakeld) |
+| `privkey.pem` | Uw privésleutel |
 
-Example:
+Voorbeeld:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# Kopieer vanaf uw lokale computer (voer dit lokaal uit, niet op de server)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+Stel de juiste rechten in:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### Stap 3 — Voer uw domein in de app in
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Certificaat handmatig installeren**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. Klik in het SSL-installatiescherm op Certificaat handmatig installeren
+2. Voer uw domeinnaam in (moet overeenkomen met de Common Name of SAN van het certificaat)
+3. Klik op Toepassen
 
-The server will configure Nginx with your certificate and reload automatically.
+De server zal Nginx configureren met uw certificaat en automatisch opnieuw laden.
 
 ---
 
 ## Volgende stap
 
-Zodra SSL actief is, ga naar [Eerste aanmelding](first-login).
+Zodra SSL actief is, gaat u verder naar Eerste aanmelding [first-login](first-login).

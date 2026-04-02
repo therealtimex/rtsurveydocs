@@ -7,10 +7,10 @@ draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Konfigurálja a HTTPS-t az rtSurvey szerverhez. Bejelentkezés előtt szükséges."
+description: "Konfigurálja a HTTPS-t az rtSurvey szerverhez. A bejelentkezés előtt kötelező."
 ---
 
-Az SSL-t be kell állítani, mielőtt bejelentkezhet. Amikor először megnyitja az alkalmazást, automatikusan az SSL beállítási képernyőre irányítja át.
+Az SSL-t be kell állítani, mielőtt bejelentkezhetne. Amikor először nyitja meg az alkalmazást, a rendszer automatikusan átirányítja az SSL beállítási képernyőjére.
 
 ---
 
@@ -18,109 +18,111 @@ Az SSL-t be kell állítani, mielőtt bejelentkezhet. Amikor először megnyitja
 
 ![SSL beállítási lehetőségek](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+Válasszon egyet a három lehetőség közül:
+
+| Opció | Mikor kell használni |
 |--------|-------------|
-| **Ingyenes rtsurvey.com aldomainen *(Ajánlott)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **Saját domainem** | You already have a domain and its DNS points to this server. |
-| **Tanúsítvány manuális telepítése** | Enterprise or custom CA. Requires SSH access. |
+| **Ingyenes rsurvey.com aldomain** *(Ajánlott)* | Nincs szükség DNS beállításra. Mi elkészítjük Önnek a rekordot. 2-5 perc alatt kész. |
+| **Saját domain** | Már van egy tartománya, és annak DNS-e erre a szerverre mutat. |
+| **Telepítse a tanúsítványt manuálisan** | Vállalati vagy egyéni CA. SSH hozzáférést igényel. |
 
 ---
 
-## Option 1 — Ingyenes rtsurvey.com aldomainen *(Ajánlott)*
+## 1. lehetőség – Ingyenes rsurvey.com aldomain (ajánlott)
 
-This is the fastest option. No domain registration or DNS changes required.
+Ez a leggyorsabb lehetőség. Nincs szükség domain regisztrációra vagy DNS módosításra.
 
-1. Click **Ingyenes rtsurvey.com aldomainen *(Ajánlott)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. Kattintson a Free rsurvey.com aldomain elemre a szakasz kibontásához
+2. Írja be a kívánt aldomain nevét a beviteli mezőbe
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > Használjon kisbetűket, számokat és kötőjeleket. 3-30 karakter.
+   > Példa: `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. Kattintson a Létrehozás gombra **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. Várjon 2-5 percet, amíg a tanúsítvány kiadásra kerül
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. Amint a tanúsítvány elkészült, automatikusan átirányítjuk az új HTTPS URL-címére
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — Saját domainem
+## 2. lehetőség – Saját domain
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+Használja ezt, ha van már meglévő tartománya, és annak DNS-rekordja már a kiszolgáló IP-címére mutat.
 
-1. Click **Saját domainem** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. Kattintson a Saját domain elemre a szakasz kibontásához
+2. Adja meg teljes domain nevét (e.g. `survey.myorganization.org`)
+3. Kattintson a Tanúsítvány létrehozása elemre
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+A Let's Encrypt ellenőrzi a domainjét, és tanúsítványt állít ki. Ehhez először a DNS-t kell megfelelően irányítani – ellenkező esetben a kérés sikertelen lesz.
 
 ---
 
-## Option 3 — Tanúsítvány manuális telepítése
+## 3. lehetőség – Tanúsítvány manuális telepítése
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+Egyéni vagy belső CA-t használó vállalati környezetekhez. A tanúsítványfájlokat SSH-n keresztül helyezi el a szerveren, majd adja meg domainjét az alkalmazásban.
 
-### Prerequisites
+### Előfeltételek
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- SSH hozzáférés a szerverhez
+- Érvényes tanúsítvány és privát kulcs a domainjéhez (PEM formátum)
 
-### Step 1 — SSH into the server
+### 1. lépés – SSH a szerverre
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### 2. lépés – Helyezze el a tanúsítványfájlokat
 
-Create the directory and copy your files:
+Hozza létre a könyvtárat, és másolja a fájljait:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+Másolja be a fájljait ebbe a könyvtárba pontosan ezekkel a nevekkel:
 
-| File | Description |
+| Fájl | Leírás |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | Az Ön tanúsítványa + minden közbenső CA-tanúsítvány (összefűzve) |
+| `privkey.pem` | Az Ön privát kulcsa |
 
-Example:
+Példa:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# Másolás a helyi gépről (helyben futtassa, ne a szerveren)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+Állítsa be a megfelelő engedélyeket:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### 3. lépés – Adja meg domainjét az alkalmazásban
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Tanúsítvány manuális telepítése**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. Az SSL beállítási képernyőn kattintson a Tanúsítvány manuális telepítése lehetőségre
+2. Adja meg a domain nevét (meg kell egyeznie a tanúsítvány közös nevével vagy SAN-jával)
+3. Kattintson az Alkalmaz gombra
 
-The server will configure Nginx with your certificate and reload automatically.
+A szerver konfigurálja az Nginxet a tanúsítványával, és automatikusan újratölti.
 
 ---
 
 ## Következő lépés
 
-Miután az SSL aktív, folytassa az [Első bejelentkezéssel](first-login).
+Ha az SSL aktív, folytassa az Első bejelentkezés funkcióval [first-login](first-login).

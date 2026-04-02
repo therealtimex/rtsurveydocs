@@ -1,126 +1,128 @@
 ---
 weight: 4
-title: "SSL సెటప్"
+title: "SSLని సెటప్ చేయండి"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "మీ rtSurvey సర్వర్ కోసం HTTPS కాన్ఫిగర్ చేయండి. లాగిన్ కు ముందు అవసరం."
+description: "మీ rtSurvey సర్వర్ కోసం HTTPSని కాన్ఫిగర్ చేయండి. మీరు లాగిన్ చేయడానికి ముందు అవసరం."
 ---
 
-SSL లాగిన్ అవ్వడానికి ముందు కాన్ఫిగర్ చేయబడాలి. మీరు మొదటిసారి యాప్ తెరిచినప్పుడు, మీరు స్వయంచాలకంగా SSL సెటప్ స్క్రీన్‌కు మళ్ళించబడతారు.
+మీరు లాగిన్ చేయడానికి ముందు SSL తప్పనిసరిగా కాన్ఫిగర్ చేయబడాలి. మీరు మొదటిసారి యాప్‌ను తెరిచినప్పుడు, మీరు స్వయంచాలకంగా SSL సెటప్ స్క్రీన్‌కి మళ్లించబడతారు.
 
 ---
 
-## SSL సెటప్ ఆప్షన్లు
+## SSL సెటప్ ఎంపికలు
 
-![SSL సెటప్ ఆప్షన్లు](/img/ssl-setup/ssl-setup-options.png)
+![SSL setup options](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+మూడు ఎంపికలలో ఒకదాన్ని ఎంచుకోండి:
+
+| ఎంపిక | ఎప్పుడు ఉపయోగించాలి |
 |--------|-------------|
-| **ఉచిత rtsurvey.com సబ్‌డొమైన్ *(సిఫార్సు చేయబడింది)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **నా స్వంత డొమైన్** | You already have a domain and its DNS points to this server. |
-| **సర్టిఫికేట్ మాన్యువల్‌గా ఇన్‌స్టాల్ చేయండి** | Enterprise or custom CA. Requires SSH access. |
+| **ఉచిత rtsurvey.com సబ్‌డొమైన్** *(సిఫార్సు చేయబడింది)* | DNS సెటప్ అవసరం లేదు. మేము మీ కోసం రికార్డ్ సృష్టిస్తాము. 2-5 నిమిషాల్లో సిద్ధంగా ఉంటుంది. |
+| **My own domain** | You already have a domain and its DNS points to this server. |
+| **సర్టిఫికేట్‌ను మాన్యువల్‌గా ఇన్‌స్టాల్ చేయండి** | ఎంటర్‌ప్రైజ్ లేదా కస్టమ్ CA. SSH యాక్సెస్ అవసరం. |
 
 ---
 
-## Option 1 — ఉచిత rtsurvey.com సబ్‌డొమైన్ *(సిఫార్సు చేయబడింది)*
+## ఎంపిక 1 — ఉచిత rtsurvey.com సబ్‌డొమైన్ (సిఫార్సు చేయబడింది)
 
-This is the fastest option. No domain registration or DNS changes required.
+ఇది వేగవంతమైన ఎంపిక. డొమైన్ నమోదు లేదా DNS మార్పులు అవసరం లేదు.
 
-1. Click **ఉచిత rtsurvey.com సబ్‌డొమైన్ *(సిఫార్సు చేయబడింది)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. విభాగాన్ని విస్తరించడానికి ఉచిత rtsurvey.com సబ్‌డొమైన్‌ని క్లిక్ చేయండి
+2. ఇన్‌పుట్ ఫీల్డ్‌లో మీకు కావలసిన సబ్‌డొమైన్ పేరును టైప్ చేయండి
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > చిన్న అక్షరాలు, సంఖ్యలు మరియు హైఫన్‌లను ఉపయోగించండి. 3-30 అక్షరాలు.
+   > ఉదాహరణ: `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. సృష్టించు క్లిక్ చేయండి **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. సర్టిఫికేట్ జారీ చేయబడినప్పుడు 2-5 నిమిషాలు వేచి ఉండండి
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. సర్టిఫికేట్ సిద్ధమైన తర్వాత, మీరు స్వయంచాలకంగా మీ కొత్త HTTPS URLకి మళ్లించబడతారు
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — నా స్వంత డొమైన్
+## ఎంపిక 2 — నా స్వంత డొమైన్
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+మీకు ఇప్పటికే ఉన్న డొమైన్ మరియు దాని DNS A రికార్డ్ ఇప్పటికే ఈ సర్వర్ యొక్క IPకి పాయింట్లు కలిగి ఉంటే దీన్ని ఉపయోగించండి.
 
-1. Click **నా స్వంత డొమైన్** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. విభాగాన్ని విస్తరించడానికి నా స్వంత డొమైన్‌ని క్లిక్ చేయండి
+2. మీ పూర్తి డొమైన్ పేరును నమోదు చేయండి (e.g. `survey.myorganization.org`)
+3. సర్టిఫికేట్ సృష్టించు క్లిక్ చేయండి
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+లెట్స్ ఎన్‌క్రిప్ట్ మీ డొమైన్‌ను ధృవీకరిస్తుంది మరియు సర్టిఫికేట్‌ను జారీ చేస్తుంది. దీనికి ముందుగా DNS సరిగ్గా సూచించబడాలి - లేకపోతే అభ్యర్థన విఫలమవుతుంది.
 
 ---
 
-## Option 3 — సర్టిఫికేట్ మాన్యువల్‌గా ఇన్‌స్టాల్ చేయండి
+## ఎంపిక 3 - సర్టిఫికేట్‌ను మాన్యువల్‌గా ఇన్‌స్టాల్ చేయండి
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+కస్టమ్ లేదా అంతర్గత CAని ఉపయోగించే ఎంటర్‌ప్రైజ్ పరిసరాల కోసం. మీరు మీ సర్టిఫికేట్ ఫైల్‌లను SSH ద్వారా సర్వర్‌లో ఉంచుతారు, ఆపై యాప్‌లో మీ డొమైన్‌ను నమోదు చేయండి.
 
-### Prerequisites
+### ముందస్తు అవసరాలు
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- సర్వర్‌కి SSH యాక్సెస్
+- మీ డొమైన్ కోసం చెల్లుబాటు అయ్యే ప్రమాణపత్రం మరియు ప్రైవేట్ కీ (PEM ఫార్మాట్)
 
-### Step 1 — SSH into the server
+### దశ 1 - సర్వర్‌లోకి SSH
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### దశ 2 - మీ సర్టిఫికేట్ ఫైల్‌లను ఉంచండి
 
-Create the directory and copy your files:
+డైరెక్టరీని సృష్టించండి మరియు మీ ఫైల్‌లను కాపీ చేయండి:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+ఈ ఖచ్చితమైన పేర్లతో మీ ఫైల్‌లను ఆ డైరెక్టరీలోకి కాపీ చేయండి:
 
-| File | Description |
+| ఫైల్ | వివరణ |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | మీ సర్టిఫికేట్ + ఏదైనా ఇంటర్మీడియట్ CA సర్టిఫికేట్‌లు (కలిపారు) |
+| `privkey.pem` | మీ ప్రైవేట్ కీ |
 
-Example:
+ఉదాహరణ:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# మీ స్థానిక మెషీన్ నుండి కాపీ చేయండి (దీన్ని సర్వర్‌లో కాకుండా స్థానికంగా అమలు చేయండి)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+సరైన అనుమతులను సెట్ చేయండి:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### దశ 3 - యాప్‌లో మీ డొమైన్‌ను నమోదు చేయండి
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **సర్టిఫికేట్ మాన్యువల్‌గా ఇన్‌స్టాల్ చేయండి**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. SSL సెటప్ స్క్రీన్‌లో, సర్టిఫికెట్‌ను మాన్యువల్‌గా ఇన్‌స్టాల్ చేయి క్లిక్ చేయండి
+2. మీ డొమైన్ పేరును నమోదు చేయండి (తప్పక సర్టిఫికెట్ యొక్క సాధారణ పేరు లేదా SANతో సరిపోలాలి)
+3. వర్తించు క్లిక్ చేయండి
 
-The server will configure Nginx with your certificate and reload automatically.
+సర్వర్ మీ సర్టిఫికేట్‌తో Nginxని కాన్ఫిగర్ చేస్తుంది మరియు స్వయంచాలకంగా రీలోడ్ చేస్తుంది.
 
 ---
 
 ## తదుపరి దశ
 
-SSL యాక్టివ్ అయిన తర్వాత, [మొదటి లాగిన్](first-login) కి వెళ్ళండి.
+SSL సక్రియం అయిన తర్వాత, మొదటి లాగిన్‌కి వెళ్లండి [first-login](first-login).

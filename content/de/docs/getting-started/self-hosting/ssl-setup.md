@@ -7,38 +7,38 @@ draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Konfigurieren Sie HTTPS für Ihren rtSurvey-Server. Erforderlich vor der Anmeldung."
+description: "Konfigurieren Sie HTTPS für Ihren rtSurvey-Server. Erforderlich, bevor Sie sich anmelden können."
 ---
 
-SSL muss konfiguriert werden, bevor Sie sich anmelden können. Wenn Sie die App zum ersten Mal öffnen, werden Sie automatisch zum SSL-Einrichtungsbildschirm weitergeleitet.
+Bevor Sie sich anmelden können, muss SSL konfiguriert werden. Wenn Sie die App zum ersten Mal öffnen, werden Sie automatisch zum SSL-Einrichtungsbildschirm weitergeleitet.
 
 ---
 
-## SSL-Einrichtungsoptionen
+## SSL-Setup-Optionen
 
-![SSL-Einrichtungsoptionen](/img/ssl-setup/ssl-setup-options.png)
+![SSL-Setup-Optionen](/img/ssl-setup/ssl-setup-options.png)
 
 Wählen Sie eine von drei Optionen:
 
 | Option | Wann zu verwenden |
-|--------|------------------|
-| **Kostenlose rtsurvey.com-Subdomain** *(Empfohlen)* | Keine DNS-Einrichtung erforderlich. Wir erstellen den Eintrag für Sie. In 2–5 Minuten bereit. |
-| **Eigene Domain** | Sie haben bereits eine Domain und deren DNS zeigt auf diesen Server. |
-| **Zertifikat manuell installieren** | Unternehmen oder benutzerdefinierte CA. Erfordert SSH-Zugang. |
+|--------|-------------|
+| **Kostenlose rtsurvey.com-Subdomain** *(Empfohlen)* | Keine DNS-Einrichtung erforderlich. Wir erstellen die Platte für Sie. Fertig in 2–5 Minuten. |
+| **Meine eigene Domain** | Sie haben bereits eine Domain und deren DNS verweist auf diesen Server. |
+| **Zertifikat manuell installieren** | Unternehmenszertifizierungsstelle oder benutzerdefinierte Zertifizierungsstelle. Erfordert SSH-Zugriff. |
 
 ---
 
-## Option 1 — Kostenlose rtsurvey.com-Subdomain *(Empfohlen)*
+## Option 1 – Kostenlose rtsurvey.com-Subdomain (empfohlen)
 
-Dies ist die schnellste Option. Keine Domain-Registrierung oder DNS-Änderungen erforderlich.
+Dies ist die schnellste Option. Keine Domänenregistrierung oder DNS-Änderungen erforderlich.
 
-1. Klicken Sie auf **Kostenlose rtsurvey.com-Subdomain**, um den Abschnitt zu erweitern
-2. Geben Sie den gewünschten Subdomain-Namen im Eingabefeld ein
+1. Klicken Sie auf Kostenlose rtsurvey.com-Subdomain, um den Abschnitt zu erweitern
+2. Geben Sie Ihren gewünschten Subdomainnamen in das Eingabefeld ein
 
    > Verwenden Sie Kleinbuchstaben, Zahlen und Bindestriche. 3–30 Zeichen.
    > Beispiel: `myproject` → `myproject.rtsurvey.com`
 
-3. Klicken Sie auf **https://[subdomain].rtsurvey.com erstellen**
+3. Klicken Sie auf Erstellen **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
@@ -46,83 +46,83 @@ Dies ist die schnellste Option. Keine Domain-Registrierung oder DNS-Änderungen 
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Sobald das Zertifikat bereit ist, werden Sie automatisch zur neuen HTTPS-URL weitergeleitet
+5. Sobald das Zertifikat fertig ist, werden Sie automatisch zu Ihrer neuen HTTPS-URL weitergeleitet
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — Eigene Domain
+## Option 2 – Meine eigene Domain
 
-Verwenden Sie dies, wenn Sie eine vorhandene Domain haben und deren DNS `A`-Eintrag bereits auf die IP dieses Servers zeigt.
+Verwenden Sie diese Option, wenn Sie über eine bestehende Domäne verfügen und deren DNS-A-Eintrag bereits auf die IP dieses Servers verweist.
 
-1. Klicken Sie auf **Eigene Domain**, um den Abschnitt zu erweitern
-2. Geben Sie Ihren vollständigen Domainnamen ein (z.B. `survey.myorganization.org`)
-3. Klicken Sie auf **Zertifikat erstellen**
+1. Klicken Sie auf Meine eigene Domain, um den Abschnitt zu erweitern
+2. Geben Sie Ihren vollständigen Domainnamen ein (e.g. `survey.myorganization.org`)
+3. Klicken Sie auf Zertifikat erstellen
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt verifiziert Ihre Domain und stellt ein Zertifikat aus. DNS muss vorher korrekt eingerichtet sein — sonst schlägt die Anfrage fehl.
+Let's Encrypt verifiziert Ihre Domain und stellt ein Zertifikat aus. Dazu muss zuerst auf den DNS verwiesen werden – andernfalls schlägt die Anfrage fehl.
 
 ---
 
-## Option 3 — Zertifikat manuell installieren
+## Option 3 – Zertifikat manuell installieren
 
-Für Unternehmensumgebungen mit einer benutzerdefinierten oder internen CA. Sie platzieren Ihre Zertifikatsdateien per SSH auf dem Server und geben dann Ihre Domain in der App ein.
+Für Unternehmensumgebungen mit einer benutzerdefinierten oder internen Zertifizierungsstelle. Sie legen Ihre Zertifikatsdateien per SSH auf dem Server ab und geben dann Ihre Domain in der App ein.
 
 ### Voraussetzungen
 
-- SSH-Zugang zum Server
-- Gültiges Zertifikat und privater Schlüssel für Ihre Domain (PEM-Format)
+- SSH-Zugriff auf den Server
+- Ein gültiges Zertifikat und einen privaten Schlüssel für Ihre Domain (PEM-Format)
 
-### Schritt 1 — SSH auf den Server
+### Schritt 1 – SSH-Verbindung zum Server
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Schritt 2 — Zertifikatsdateien platzieren
+### Schritt 2 – Platzieren Sie Ihre Zertifikatsdateien
 
-Verzeichnis erstellen und Dateien kopieren:
+Erstellen Sie das Verzeichnis und kopieren Sie Ihre Dateien:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Dateien mit diesen genauen Namen kopieren:
+Kopieren Sie Ihre Dateien mit genau diesen Namen in dieses Verzeichnis:
 
 | Datei | Beschreibung |
-|-------|-------------|
+|------|-------------|
 | `fullchain.pem` | Ihr Zertifikat + alle Zwischen-CA-Zertifikate (verkettet) |
 | `privkey.pem` | Ihr privater Schlüssel |
 
 Beispiel:
 
 ```bash
-# Von Ihrem lokalen Rechner kopieren (lokal ausführen, nicht auf dem Server)
+# Von Ihrem lokalen Computer kopieren (lokal ausführen, nicht auf dem Server)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Korrekte Berechtigungen setzen:
+Legen Sie die richtigen Berechtigungen fest:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Schritt 3 — Domain in der App eingeben
+### Schritt 3 – Geben Sie Ihre Domain in der App ein
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. Klicken Sie auf dem SSL-Einrichtungsbildschirm auf **Zertifikat manuell installieren**
-2. Geben Sie Ihren Domainnamen ein (muss mit dem Common Name oder SAN des Zertifikats übereinstimmen)
-3. Klicken Sie auf **Anwenden**
+1. Klicken Sie im SSL-Setup-Bildschirm auf Zertifikat manuell installieren
+2. Geben Sie Ihren Domänennamen ein (muss mit dem Common Name oder SAN des Zertifikats übereinstimmen)
+3. Klicken Sie auf Übernehmen
 
-Der Server konfiguriert Nginx mit Ihrem Zertifikat und lädt automatisch neu.
+Der Server konfiguriert Nginx mit Ihrem Zertifikat und lädt es automatisch neu.
 
 ---
 
 ## Nächster Schritt
 
-Sobald SSL aktiv ist, fahren Sie mit der [Ersten Anmeldung](first-login) fort.
+Sobald SSL aktiv ist, fahren Sie mit der ersten Anmeldung fort [first-login](first-login).

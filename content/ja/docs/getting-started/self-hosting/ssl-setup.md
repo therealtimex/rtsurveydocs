@@ -1,126 +1,128 @@
 ---
 weight: 4
-title: "SSLのセットアップ"
+title: "SSLを設定する"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "rtSurveyサーバーのHTTPSを設定します。ログイン前に必要です。"
+description: "rtSurvey サーバーの HTTPS を構成します。ログインする前に必要です。"
 ---
 
-SSL はログインする前に設定する必要があります。アプリを初めて開くと、SSL セットアップ画面に自動的にリダイレクトされます。
+ログインする前に SSL を設定する必要があります。初めてアプリを開くと、SSL 設定画面に自動的にリダイレクトされます。
 
 ---
 
-## SSL セットアップオプション
+## SSL設定オプション
 
-![SSL セットアップオプション](/img/ssl-setup/ssl-setup-options.png)
+![SSL設定オプション](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+3 つのオプションのいずれかを選択します。
+
+| オプション | いつ使用するか |
 |--------|-------------|
-| **無料の rtsurvey.com サブドメイン *(推奨)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **独自ドメイン** | You already have a domain and its DNS points to this server. |
-| **証明書を手動でインストール** | Enterprise or custom CA. Requires SSH access. |
+| **無料の rsurvey.com サブドメイン** *(推奨)* | DNS設定は必要ありません。私たちはあなたのために記録を作成します。 2 ～ 5 分で準備が完了します。 |
+| **自分のドメイン** | すでにドメインがあり、その DNS がこのサーバーを指しています。 |
+| **証明書を手動でインストールする** | エンタープライズまたはカスタム CA。 SSH アクセスが必要です。 |
 
 ---
 
-## Option 1 — 無料の rtsurvey.com サブドメイン *(推奨)*
+## オプション 1 — 無料の rsurvey.com サブドメイン (推奨)
 
-This is the fastest option. No domain registration or DNS changes required.
+これが最も速いオプションです。ドメイン登録やDNS変更は必要ありません。
 
-1. Click **無料の rtsurvey.com サブドメイン *(推奨)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. 「Free rsurvey.com サブドメイン」をクリックしてセクションを展開します
+2. 入力フィールドに希望のサブドメイン名を入力します。
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > 小文字、数字、ハイフンを使用してください。 3 ～ 30 文字。
+   > 例： `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. 「作成」をクリックします **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. 証明書が発行されるまで 2 ～ 5 分待ちます
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. 証明書の準備が完了すると、新しい HTTPS URL に自動的にリダイレクトされます。
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — 独自ドメイン
+## オプション 2 — 自分のドメイン
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+既存のドメインがあり、その DNS A レコードがすでにこのサーバーの IP を指している場合は、これを使用します。
 
-1. Click **独自ドメイン** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. [自分のドメイン] をクリックしてセクションを展開します
+2. 完全なドメイン名を入力してください (e.g. `survey.myorganization.org`)
+3. Click Create certificate
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt はドメインを検証し、証明書を発行します。これには、最初に DNS が正しく指定されている必要があります。そうでないと、リクエストは失敗します。
 
 ---
 
-## Option 3 — 証明書を手動でインストール
+## オプション 3 — 証明書を手動でインストールする
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+カスタムまたは内部 CA を使用するエンタープライズ環境の場合。 SSH 経由で証明書ファイルをサーバーに配置し、アプリにドメインを入力します。
 
-### Prerequisites
+### 前提条件
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- サーバーへのSSHアクセス
+- ドメインの有効な証明書と秘密キー (PEM 形式)
 
-### Step 1 — SSH into the server
+### ステップ 1 — サーバーに SSH で接続する
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### ステップ 2 — 証明書ファイルを配置する
 
-Create the directory and copy your files:
+ディレクトリを作成し、ファイルをコピーします。
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+ファイルを次の正確な名前でそのディレクトリにコピーします。
 
-| File | Description |
+| ファイル | 説明 |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | 証明書 + 中間 CA 証明書 (連結) |
+| `privkey.pem` | あなたの秘密鍵 |
 
-Example:
+例：
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# ローカル マシンからコピーします (これをサーバー上ではなくローカルで実行します)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+正しい権限を設定します。
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### ステップ 3 — アプリにドメインを入力します
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **証明書を手動でインストール**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. SSL セットアップ画面で、「証明書を手動でインストール」をクリックします。
+2. ドメイン名を入力します (証明書の共通名または SAN と一致する必要があります)
+3. 「適用」をクリックします
 
-The server will configure Nginx with your certificate and reload automatically.
+サーバーは証明書を使用して Nginx を構成し、自動的にリロードします。
 
 ---
 
 ## 次のステップ
 
-SSL が有効になったら、[初回ログイン](first-login) に進んでください。
+SSL が有効になったら、「初回ログイン」に進みます。 [first-login](first-login).

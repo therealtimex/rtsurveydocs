@@ -1,126 +1,128 @@
 ---
 weight: 4
-title: "SSL-konfiguration"
+title: "Konfigurera SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Konfigurera HTTPS för din rtSurvey-server. Krävs innan inloggning."
+description: "Konfigurera HTTPS för din rtSurvey-server. Krävs innan du kan logga in."
 ---
 
-SSL måste konfigureras innan du kan logga in. När du öppnar appen för första gången omdirigeras du automatiskt till SSL-konfigurationsskärmen.
+SSL måste konfigureras innan du kan logga in. När du öppnar appen för första gången omdirigeras du automatiskt till SSL-inställningsskärmen.
 
 ---
 
-## SSL-konfigurationsalternativ
+## SSL-inställningar
 
-![SSL-konfigurationsalternativ](/img/ssl-setup/ssl-setup-options.png)
+![SSL-inställningar](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+Välj ett av tre alternativ:
+
+| Alternativ | När du ska använda |
 |--------|-------------|
-| **Gratis rtsurvey.com-underdomän *(Rekommenderas)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **Min egen domän** | You already have a domain and its DNS points to this server. |
-| **Installera certifikat manuellt** | Enterprise or custom CA. Requires SSH access. |
+| **Gratis rtsurvey.com underdomän** *(Rekommenderad)* | Ingen DNS-installation behövs. Vi skapar skivan åt dig. Klar på 2–5 minuter. |
+| **Min egen domän** | Du har redan en domän och dess DNS pekar på den här servern. |
+| **Installera certifikat manuellt** | Enterprise eller anpassad CA. Kräver SSH-åtkomst. |
 
 ---
 
-## Option 1 — Gratis rtsurvey.com-underdomän *(Rekommenderas)*
+## Alternativ 1 — Gratis rtsurvey.com-underdomän (rekommenderas)
 
-This is the fastest option. No domain registration or DNS changes required.
+Detta är det snabbaste alternativet. Ingen domänregistrering eller DNS-ändringar krävs.
 
-1. Click **Gratis rtsurvey.com-underdomän *(Rekommenderas)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. Klicka på Gratis rtsurvey.com-underdomän för att expandera avsnittet
+2. Skriv ditt önskade underdomännamn i inmatningsfältet
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > Använd små bokstäver, siffror och bindestreck. 3–30 tecken.
+   > Exempel: `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. Klicka på Skapa **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. Vänta 2–5 minuter medan certifikatet utfärdas
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. När certifikatet är klart omdirigeras du automatiskt till din nya HTTPS-URL
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — Min egen domän
+## Alternativ 2 — Min egen domän
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+Använd detta om du har en befintlig domän och dess DNS A-post redan pekar på denna servers IP.
 
-1. Click **Min egen domän** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. Klicka på Min egen domän för att expandera avsnittet
+2. Ange ditt fullständiga domännamn (e.g. `survey.myorganization.org`)
+3. Klicka på Skapa certifikat
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt kommer att verifiera din domän och utfärda ett certifikat. Detta kräver att DNS pekas korrekt först – begäran misslyckas annars.
 
 ---
 
-## Option 3 — Installera certifikat manuellt
+## Alternativ 3 — Installera certifikat manuellt
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+För företagsmiljöer som använder en anpassad eller intern CA. Du placerar dina certifikatfiler på servern via SSH och anger sedan din domän i appen.
 
-### Prerequisites
+### Förutsättningar
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- SSH-åtkomst till servern
+- Ett giltigt certifikat och privat nyckel för din domän (PEM-format)
 
-### Step 1 — SSH into the server
+### Steg 1 — SSH till servern
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### Steg 2 — Placera dina certifikatfiler
 
-Create the directory and copy your files:
+Skapa katalogen och kopiera dina filer:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+Kopiera dina filer till den katalogen med dessa exakta namn:
 
-| File | Description |
+| Fil | Beskrivning |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | Ditt certifikat + eventuella mellanliggande CA-certifikat (sammankopplade) |
+| `privkey.pem` | Din privata nyckel |
 
-Example:
+Exempel:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# Kopiera från din lokala dator (kör detta lokalt, inte på servern)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+Ange korrekta behörigheter:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### Steg 3 — Ange din domän i appen
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Installera certifikat manuellt**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. Klicka på Installera certifikat manuellt på SSL-inställningsskärmen
+2. Ange ditt domännamn (måste matcha certifikatets Common Name eller SAN)
+3. Klicka på Använd
 
-The server will configure Nginx with your certificate and reload automatically.
+Servern konfigurerar Nginx med ditt certifikat och laddar om automatiskt.
 
 ---
 
 ## Nästa steg
 
-När SSL är aktivt, gå till [Första inloggning](first-login).
+När SSL är aktivt, fortsätt till Första inloggningen [first-login](first-login).

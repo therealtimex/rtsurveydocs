@@ -1,87 +1,87 @@
 ---
 weight: 4
-title: "SSL:n asennus"
+title: "Määritä SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Määritä HTTPS rtSurvey-palvelimellesi. Vaaditaan ennen kirjautumista."
+description: "Määritä HTTPS rtSurvey-palvelimellesi. Pakollinen ennen kuin voit kirjautua sisään."
 ---
 
-SSL on määritettävä ennen kuin voit kirjautua sisään. Kun avaat sovelluksen ensimmäistä kertaa, sinut ohjataan automaattisesti SSL-asennusnäytölle.
+SSL on määritettävä ennen kuin voit kirjautua sisään. Kun avaat sovelluksen ensimmäisen kerran, sinut ohjataan automaattisesti SSL-asetusnäyttöön.
 
 ---
 
-## SSL-asennusvaihtoehdot
+## SSL-asetusvaihtoehdot
 
-![SSL-asennusvaihtoehdot](/img/ssl-setup/ssl-setup-options.png)
+![SSL-asetusvaihtoehdot](/img/ssl-setup/ssl-setup-options.png)
 
 Valitse yksi kolmesta vaihtoehdosta:
 
 | Vaihtoehto | Milloin käyttää |
-|------------|----------------|
-| **Ilmainen rtsurvey.com-alidomaini** *(Suositeltu)* | DNS-asetuksia ei tarvita. Luomme tietueen puolestasi. Valmis 2–5 minuutissa. |
-| **Oma domain** | Sinulla on jo domain ja sen DNS osoittaa tähän palvelimeen. |
-| **Asenna sertifikaatti manuaalisesti** | Yritys tai mukautettu CA. Vaatii SSH-yhteyden. |
+|--------|-------------|
+| **Ilmainen rsurvey.com-aliverkkotunnus** *(Suositeltava)* | DNS-asetuksia ei tarvita. Luomme tietueen sinulle. Valmis 2-5 minuutissa. |
+| **Oma domain** | Sinulla on jo verkkotunnus ja sen DNS osoittaa tähän palvelimeen. |
+| **Asenna varmenne manuaalisesti** | Enterprise tai mukautettu CA. Vaatii SSH-yhteyden. |
 
 ---
 
-## Vaihtoehto 1 — Ilmainen rtsurvey.com-alidomaini *(Suositeltu)*
+## Vaihtoehto 1 – ilmainen rsurvey.com-aliverkkotunnus (suositus)
 
-Tämä on nopein vaihtoehto. Domainin rekisteröintiä tai DNS-muutoksia ei tarvita.
+Tämä on nopein vaihtoehto. Verkkotunnuksen rekisteröintiä tai DNS-muutoksia ei vaadita.
 
-1. Napsauta **Ilmainen rtsurvey.com-alidomaini** laajentaaksesi osiota
-2. Kirjoita haluamasi alidomainin nimi syöttökenttään
+1. Laajenna osio napsauttamalla Ilmainen rsurvey.com-aliverkkotunnus
+2. Kirjoita haluamasi aliverkkotunnus syöttökenttään
 
-   > Käytä pieniä kirjaimia, numeroita ja väliviivoja. 3–30 merkkiä.
+   > Käytä pieniä kirjaimia, numeroita ja yhdysmerkkejä. 3-30 merkkiä.
    > Esimerkki: `myproject` → `myproject.rtsurvey.com`
 
-3. Napsauta **Luo https://[subdomain].rtsurvey.com**
+3. Napsauta Luo **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Odota 2–5 minuuttia, kun sertifikaattia myönnetään
+4. Odota 2–5 minuuttia, kun todistus myönnetään
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Kun sertifikaatti on valmis, sinut ohjataan automaattisesti uuteen HTTPS-osoitteeseen
+5. Kun varmenne on valmis, sinut ohjataan automaattisesti uuteen HTTPS-URL-osoitteeseen
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Vaihtoehto 2 — Oma domain
+## Vaihtoehto 2 – Oma verkkotunnus
 
-Käytä tätä, jos sinulla on olemassa oleva domain ja sen DNS `A`-tietue osoittaa jo tämän palvelimen IP-osoitteeseen.
+Käytä tätä, jos sinulla on olemassa oleva toimialue ja sen DNS-tietue A osoittaa jo tämän palvelimen IP-osoitteeseen.
 
-1. Napsauta **Oma domain** laajentaaksesi osion
-2. Syötä koko domainin nimi (esim. `survey.myorganization.org`)
-3. Napsauta **Luo sertifikaatti**
+1. Laajenna osio napsauttamalla Oma verkkotunnus
+2. Kirjoita koko verkkotunnuksesi nimi (e.g. `survey.myorganization.org`)
+3. Napsauta Luo varmenne
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt vahvistaa domainisi ja myöntää sertifikaatin. DNS täytyy olla oikein osoitettu ensin — muuten pyyntö epäonnistuu.
+Let's Encrypt vahvistaa verkkotunnuksesi ja myöntää varmenteen. Tämä edellyttää, että DNS osoitetaan ensin oikein - pyyntö epäonnistuu muuten.
 
 ---
 
-## Vaihtoehto 3 — Asenna sertifikaatti manuaalisesti
+## Vaihtoehto 3 — Asenna varmenne manuaalisesti
 
-Yritysympäristöille, joissa on mukautettu tai sisäinen CA. Sijoitat sertifikaattitiedostot palvelimelle SSH:n kautta, sitten syötät domainisi sovellukseen.
+Yritysympäristöihin, joissa käytetään mukautettua tai sisäistä CA:ta. Asetat varmennetiedostot palvelimelle SSH:n kautta ja kirjoitat sitten verkkotunnuksesi sovellukseen.
 
 ### Edellytykset
 
 - SSH-yhteys palvelimeen
-- Kelvollinen sertifikaatti ja yksityinen avain domainillesi (PEM-muoto)
+- Kelvollinen varmenne ja yksityinen avain verkkotunnuksellesi (PEM-muoto)
 
-### Vaihe 1 — SSH palvelimelle
+### Vaihe 1 – SSH palvelimelle
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Vaihe 2 — Sijoita sertifikaattitiedostot
+### Vaihe 2 – Aseta varmennetiedostot
 
 Luo hakemisto ja kopioi tiedostosi:
 
@@ -89,17 +89,17 @@ Luo hakemisto ja kopioi tiedostosi:
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Kopioi tiedostosi näillä tarkkoilla nimillä:
+Kopioi tiedostosi kyseiseen hakemistoon tarkalla nimellä:
 
 | Tiedosto | Kuvaus |
-|----------|--------|
-| `fullchain.pem` | Sertifikaattisi + mahdolliset väli-CA-sertifikaatit (yhdistetty) |
+|------|-------------|
+| `fullchain.pem` | Varmenteesi + mahdolliset CA-välivarmenteet (ketjutettu) |
 | `privkey.pem` | Yksityinen avaimesi |
 
 Esimerkki:
 
 ```bash
-# Kopioi paikalliselta koneeltasi (suorita paikallisesti, ei palvelimella)
+# Kopioi paikalliselta koneeltasi (suorita tämä paikallisesti, ei palvelimella)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
@@ -111,18 +111,18 @@ chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Vaihe 3 — Syötä domain sovellukseen
+### Vaihe 3 – Kirjoita verkkotunnuksesi sovellukseen
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. SSL-asennusnäytöllä napsauta **Asenna sertifikaatti manuaalisesti**
-2. Syötä domainin nimi (täytyy vastata sertifikaatin Common Name tai SAN)
-3. Napsauta **Käytä**
+1. Napsauta SSL-asetusnäytössä Asenna varmenne manuaalisesti
+2. Anna verkkotunnuksesi nimi (täytyy vastata varmenteen yleisnimeä tai SAN-tunnusta)
+3. Napsauta Käytä
 
-Palvelin konfiguroi Nginxin sertifikaatillasi ja lataa automaattisesti uudelleen.
+Palvelin määrittää Nginxin varmenteesi kanssa ja lataa sen uudelleen automaattisesti.
 
 ---
 
-## Seuraava vaihe
+## Seuraava askel
 
-Kun SSL on aktiivinen, siirry kohtaan [Ensimmäinen kirjautuminen](first-login).
+Kun SSL on aktiivinen, siirry kohtaan Ensimmäinen kirjautuminen [first-login](first-login).

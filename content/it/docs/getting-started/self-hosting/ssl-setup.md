@@ -1,16 +1,16 @@
 ---
 weight: 4
-title: "Configurazione SSL"
+title: "Configura SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Configura HTTPS per il tuo server rtSurvey. Richiesto prima di accedere."
+description: "Configura HTTPS per il tuo server rtSurvey. Obbligatorio prima di poter accedere."
 ---
 
-SSL deve essere configurato prima di poter accedere. Quando si apre l'applicazione per la prima volta, verrà reindirizzato automaticamente alla schermata di configurazione SSL.
+SSL deve essere configurato prima di poter accedere. Quando apri l'app per la prima volta, verrai reindirizzato automaticamente alla schermata di configurazione SSL.
 
 ---
 
@@ -18,109 +18,111 @@ SSL deve essere configurato prima di poter accedere. Quando si apre l'applicazio
 
 ![Opzioni di configurazione SSL](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+Scegli una delle tre opzioni:
+
+| Opzione | Quando usarlo |
 |--------|-------------|
-| **Sottodominio gratuito rtsurvey.com *(Consigliato)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **Il mio dominio** | You already have a domain and its DNS points to this server. |
-| **Installa certificato manualmente** | Enterprise or custom CA. Requires SSH access. |
+| **Sottodominio rtsurvey.com gratuito** *(Raccomandato)* | No DNS setup needed. Creiamo il record per te. Ready in 2–5 minutes. |
+| **Il mio dominio** | Hai già un dominio e i suoi DNS puntano a questo server. |
+| **Installa il certificato manualmente** | CA aziendale o personalizzata. Richiede l'accesso SSH. |
 
 ---
 
-## Option 1 — Sottodominio gratuito rtsurvey.com *(Consigliato)*
+## Opzione 1: sottodominio rtsurvey.com gratuito (consigliato)
 
-This is the fastest option. No domain registration or DNS changes required.
+Questa è l'opzione più veloce. Non è richiesta la registrazione del dominio o la modifica del DNS.
 
-1. Click **Sottodominio gratuito rtsurvey.com *(Consigliato)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. Fai clic su Sottodominio rtsurvey.com gratuito per espandere la sezione
+2. Digita il nome del sottodominio desiderato nel campo di immissione
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > Utilizza lettere minuscole, numeri e trattini. 3-30 caratteri.
+   > Esempio: `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. Fare clic su Crea **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. Attendi 2-5 minuti durante l'emissione del certificato
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. Una volta che il certificato è pronto, verrai reindirizzato automaticamente al tuo nuovo URL HTTPS
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — Il mio dominio
+## Opzione 2: il mio dominio
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+Usalo se hai un dominio esistente e il suo record DNS A punta già all'IP di questo server.
 
-1. Click **Il mio dominio** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. Fai clic su Il mio dominio per espandere la sezione
+2. Inserisci il nome del tuo dominio completo (e.g. `survey.myorganization.org`)
+3. Fare clic su Crea certificato
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt verificherà il tuo dominio ed emetterà un certificato. Ciò richiede che il DNS venga prima indirizzato correttamente: altrimenti la richiesta fallirà.
 
 ---
 
-## Option 3 — Installa certificato manualmente
+## Opzione 3: installa il certificato manualmente
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+Per ambienti aziendali che utilizzano una CA personalizzata o interna. Collocherai i file del certificato sul server tramite SSH, quindi inserirai il tuo dominio nell'app.
 
-### Prerequisites
+### Prerequisiti
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- Accesso SSH al server
+- Un certificato valido e una chiave privata per il tuo dominio (formato PEM)
 
-### Step 1 — SSH into the server
+### Passaggio 1: SSH nel server
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### Passaggio 2: inserisci i file del certificato
 
-Create the directory and copy your files:
+Crea la directory e copia i tuoi file:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+Copia i tuoi file in quella directory con questi nomi esatti:
 
-| File | Description |
+| File | Descrizione |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | Il tuo certificato + eventuali certificati CA intermedi (concatenati) |
+| `privkey.pem` | La tua chiave privata |
 
-Example:
+Esempio:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# Copia dal tuo computer locale (eseguilo localmente, non sul server)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+Imposta le autorizzazioni corrette:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### Passaggio 3: inserisci il tuo dominio nell'app
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Installa certificato manualmente**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. Nella schermata di configurazione SSL, fare clic su Installa certificato manualmente
+2. Inserisci il tuo nome di dominio (deve corrispondere al nome comune o SAN del certificato)
+3. Fare clic su Applica
 
-The server will configure Nginx with your certificate and reload automatically.
+Il server configurerà Nginx con il tuo certificato e ricaricherà automaticamente.
 
 ---
 
-## Passo successivo
+## Prossimo passo
 
-Una volta SSL attivo, procedere al [Primo accesso](first-login).
+Una volta attivo SSL, procedi al primo accesso [first-login](first-login).

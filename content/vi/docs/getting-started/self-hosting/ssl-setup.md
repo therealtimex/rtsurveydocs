@@ -1,126 +1,128 @@
 ---
 weight: 4
-title: "Cài đặt SSL"
+title: "Thiết lập SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Cấu hình HTTPS cho máy chủ rtSurvey của bạn. Bắt buộc trước khi đăng nhập."
+description: "Định cấu hình HTTPS cho máy chủ rtSurvey của bạn. Cần thiết trước khi bạn có thể đăng nhập."
 ---
 
-SSL phải được cấu hình trước khi bạn có thể đăng nhập. Khi mở ứng dụng lần đầu tiên, bạn sẽ được tự động chuyển hướng đến màn hình cài đặt SSL.
+SSL phải được cấu hình trước khi bạn có thể đăng nhập. Khi mở ứng dụng lần đầu tiên, bạn sẽ tự động được chuyển hướng đến màn hình thiết lập SSL.
 
 ---
 
-## Tùy chọn cài đặt SSL
+## Tùy chọn thiết lập SSL
 
-![Tùy chọn cài đặt SSL](/img/ssl-setup/ssl-setup-options.png)
+![Tùy chọn thiết lập SSL](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+Chọn một trong ba tùy chọn:
+
+| Lựa chọn | Khi nào nên sử dụng |
 |--------|-------------|
-| **Tên miền phụ rtsurvey.com miễn phí *(Khuyến nghị)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **Tên miền của tôi** | You already have a domain and its DNS points to this server. |
-| **Cài đặt chứng chỉ thủ công** | Enterprise or custom CA. Requires SSH access. |
+| **Tên miền phụ rtsurvey.com miễn phí** *(Khuyến khích)* | Không cần thiết lập DNS. Chúng tôi tạo hồ sơ cho bạn. Sẵn sàng trong 2–5 phút. |
+| **Tên miền của riêng tôi** | Bạn đã có một miền và DNS của nó trỏ đến máy chủ này. |
+| **Cài đặt chứng chỉ theo cách thủ công** | CA doanh nghiệp hoặc tùy chỉnh. Yêu cầu quyền truy cập SSH. |
 
 ---
 
-## Option 1 — Tên miền phụ rtsurvey.com miễn phí *(Khuyến nghị)*
+## Tùy chọn 1 — Tên miền phụ rtsurvey.com miễn phí (Được khuyến nghị)
 
-This is the fastest option. No domain registration or DNS changes required.
+This is the fastest option. Không cần đăng ký tên miền hoặc thay đổi DNS.
 
-1. Click **Tên miền phụ rtsurvey.com miễn phí *(Khuyến nghị)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. Nhấp vào Tên miền phụ rtsurvey.com miễn phí để mở rộng phần này
+2. Nhập tên miền phụ bạn muốn vào trường nhập
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > Sử dụng chữ thường, số và dấu gạch nối. 3–30 characters.
+   > Ví dụ: `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. Nhấp vào Tạo **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. Đợi 2–5 phút trong khi chứng chỉ được cấp
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. Khi chứng chỉ đã sẵn sàng, bạn sẽ tự động được chuyển hướng đến URL HTTPS mới của mình
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — Tên miền của tôi
+## Tùy chọn 2 - Tên miền của riêng tôi
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+Hãy sử dụng tùy chọn này nếu bạn có một miền hiện có và bản ghi DNS A của nó đã trỏ đến IP của máy chủ này.
 
-1. Click **Tên miền của tôi** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. Nhấp vào Miền của riêng tôi để mở rộng phần này
+2. Nhập tên miền đầy đủ của bạn (e.g. `survey.myorganization.org`)
+3. Nhấp vào Tạo chứng chỉ
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt sẽ xác minh miền của bạn và cấp chứng chỉ. Điều này yêu cầu DNS phải được trỏ chính xác trước tiên — nếu không thì yêu cầu sẽ không thành công.
 
 ---
 
-## Option 3 — Cài đặt chứng chỉ thủ công
+## Tùy chọn 3 - Cài đặt chứng chỉ theo cách thủ công
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+Dành cho môi trường doanh nghiệp sử dụng CA tùy chỉnh hoặc CA nội bộ. Bạn sẽ đặt các tệp chứng chỉ của mình trên máy chủ thông qua SSH, sau đó nhập tên miền của bạn vào ứng dụng.
 
-### Prerequisites
+### Điều kiện tiên quyết
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- Truy cập SSH vào máy chủ
+- Chứng chỉ hợp lệ và khóa riêng cho miền của bạn (định dạng PEM)
 
-### Step 1 — SSH into the server
+### Bước 1 - SSH vào máy chủ
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### Bước 2 - Đặt tệp chứng chỉ của bạn
 
-Create the directory and copy your files:
+Tạo thư mục và sao chép các tập tin của bạn:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+Sao chép các tập tin của bạn vào thư mục đó với các tên chính xác sau:
 
-| File | Description |
+| Tài liệu | Sự miêu tả |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | Chứng chỉ của bạn + mọi chứng chỉ CA trung gian (được nối) |
+| `privkey.pem` | Khóa riêng của bạn |
 
-Example:
+Ví dụ:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# Sao chép từ máy cục bộ của bạn (chạy cục bộ, không phải trên máy chủ)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+Đặt quyền chính xác:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### Bước 3 — Nhập tên miền của bạn vào ứng dụng
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Cài đặt chứng chỉ thủ công**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. Trong màn hình thiết lập SSL, nhấp vào Cài đặt chứng chỉ theo cách thủ công
+2. Nhập tên miền của bạn (phải khớp với Common Name hoặc SAN của chứng chỉ)
+3. Nhấp vào Áp dụng
 
-The server will configure Nginx with your certificate and reload automatically.
+Máy chủ sẽ định cấu hình Nginx với chứng chỉ của bạn và tự động tải lại.
 
 ---
 
 ## Bước tiếp theo
 
-Sau khi SSL hoạt động, tiến hành [Đăng nhập lần đầu](first-login).
+Khi SSL được kích hoạt, hãy tiến hành Đăng nhập lần đầu [first-login](first-login).

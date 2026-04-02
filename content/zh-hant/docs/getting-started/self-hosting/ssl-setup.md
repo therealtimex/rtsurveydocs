@@ -7,10 +7,10 @@ draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "為您的 rtSurvey 伺服器設定 HTTPS。登入前必須完成。"
+description: "為您的 rtSurvey 伺服器設定 HTTPS。需要先登入才能登入。"
 ---
 
-SSL 必須在登入前設定。首次開啟應用程式時，您將自動重新導向至 SSL 設定畫面。
+登入之前必須配置 SSL。首次開啟應用程式時，您將自動重定向到 SSL 設定畫面。
 
 ---
 
@@ -18,70 +18,72 @@ SSL 必須在登入前設定。首次開啟應用程式時，您將自動重新�
 
 ![SSL 設定選項](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+選擇以下三個選項之一：
+
+| 選項 | 何時使用 |
 |--------|-------------|
-| **免費 rtsurvey.com 子網域 *(建議)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **我自己的網域** | You already have a domain and its DNS points to this server. |
-| **手動安裝憑證** | Enterprise or custom CA. Requires SSH access. |
+| **免費 rtsurvey.com 子域** *(受到推崇的)* | 無需 DNS 設定。我們為您創造記錄。 2-5 分鐘內準備就緒。 |
+| **我自己的域名** | You already have a domain and its DNS points to this server. |
+| **手動安裝證書** | 企業或自訂 CA。需要 SSH 訪問。 |
 
 ---
 
-## Option 1 — 免費 rtsurvey.com 子網域 *(建議)*
+## Option 1 — Free rtsurvey.com subdomain *(受到推崇的)*
 
-This is the fastest option. No domain registration or DNS changes required.
+這是最快的選擇。无需域名注册或 DNS 更改。
 
-1. Click **免費 rtsurvey.com 子網域 *(建議)*** to expand the section
+1. 點擊免費 rtsurvey.com 子網域以展開該部分
 2. Type your desired subdomain name in the input field
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > Use lowercase letters, numbers, and hyphens. 3–30 個字元。
+   > 例子： `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. 點擊創建 **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. 頒發證書時等待 2-5 分鐘
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. 憑證準備就緒後，您將自動重新導向到新的 HTTPS URL
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — 我自己的網域
+## 選項 2 — 我自己的網域
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+如果您有現有網域且其 DNS A 記錄已指向該伺服器的 IP，請使用此選項。
 
-1. Click **我自己的網域** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. 點擊我自己的網域以展開該部分
+2. 輸入您的完整域名 (e.g. `survey.myorganization.org`)
+3. 按一下建立證書
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt 將驗證您的網域並頒發憑證。這需要先正確指向 DNS，否則請求將會失敗。
 
 ---
 
-## Option 3 — 手動安裝憑證
+## 選項 3 — 手動安裝證書
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+適用於使用自訂或內部 CA 的企業環境。您將透過 SSH 將憑證檔案放置在伺服器上，然後在應用程式中輸入您的網域名稱。
 
-### Prerequisites
+### 先決條件
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- 透過 SSH 存取伺服器
+- 您的網域的有效憑證和私鑰（PEM 格式）
 
-### Step 1 — SSH into the server
+### 第 1 步 — 透過 SSH 連接到伺服器
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### 步驟 2 — 放置您的憑證文件
 
-Create the directory and copy your files:
+建立目錄並複製檔案：
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
@@ -89,38 +91,38 @@ mkdir -p /etc/letsencrypt/live/<your-domain>
 
 Copy your files into that directory with these exact names:
 
-| File | Description |
+| 文件 | 描述 |
 |------|-------------|
 | `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `privkey.pem` | 你的私鑰 |
 
-Example:
+例子：
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# 從本機電腦複製（在本機運行，而不是在伺服器上運行）
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+設定正確的權限：
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### 步驟 3 — 在應用程式中輸入您的域名
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **手動安裝憑證**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. 在 SSL 設定畫面中，按一下手動安裝憑證
+2. 輸入您的網域名稱（必須與憑證的公用名稱或 SAN 相符）
+3. 點擊“應用”
 
-The server will configure Nginx with your certificate and reload automatically.
+伺服器將使用您的憑證設定 Nginx 並自動重新載入。
 
 ---
 
 ## 下一步
 
-SSL 啟用後，繼續進行[首次登入](first-login)。
+SSL 啟動後，繼續首次登入。 [first-login](first-login).

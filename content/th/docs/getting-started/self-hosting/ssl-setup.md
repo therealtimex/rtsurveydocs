@@ -1,16 +1,16 @@
 ---
 weight: 4
-title: "การตั้งค่า SSL"
+title: "ตั้งค่า SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "กำหนดค่า HTTPS สำหรับเซิร์ฟเวอร์ rtSurvey ของคุณ จำเป็นก่อนเข้าสู่ระบบ"
+description: "กำหนดค่า HTTPS สำหรับเซิร์ฟเวอร์ rtSurvey ของคุณ จำเป็นก่อนจึงจะสามารถเข้าสู่ระบบได้"
 ---
 
-ต้องกำหนดค่า SSL ก่อนที่จะสามารถเข้าสู่ระบบได้ เมื่อคุณเปิดแอปเป็นครั้งแรก คุณจะถูกเปลี่ยนเส้นทางโดยอัตโนมัติไปยังหน้าจอตั้งค่า SSL
+ต้องกำหนดค่า SSL ก่อนจึงจะสามารถเข้าสู่ระบบได้ เมื่อคุณเปิดแอปเป็นครั้งแรก คุณจะถูกนำไปยังหน้าจอการตั้งค่า SSL โดยอัตโนมัติ
 
 ---
 
@@ -18,109 +18,111 @@ description: "กำหนดค่า HTTPS สำหรับเซิร์�
 
 ![ตัวเลือกการตั้งค่า SSL](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+เลือกหนึ่งในสามตัวเลือก:
+
+| ตัวเลือก | เมื่อจะใช้ |
 |--------|-------------|
-| **ซับโดเมน rtsurvey.com ฟรี *(แนะนำ)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **โดเมนของฉัน** | You already have a domain and its DNS points to this server. |
-| **ติดตั้งใบรับรองด้วยตนเอง** | Enterprise or custom CA. Requires SSH access. |
+| **ฟรีโดเมนย่อย rtsurvey.com** *(ที่แนะนำ)* | ไม่จำเป็นต้องตั้งค่า DNS เราสร้างบันทึกสำหรับคุณ พร้อมภายใน 2-5 นาที |
+| **โดเมนของฉันเอง** | คุณมีโดเมนอยู่แล้วและ DNS ของโดเมนชี้ไปที่เซิร์ฟเวอร์นี้ |
+| **ติดตั้งใบรับรองด้วยตนเอง** | องค์กรหรือ CA แบบกำหนดเอง ต้องมีการเข้าถึง SSH |
 
 ---
 
-## Option 1 — ซับโดเมน rtsurvey.com ฟรี *(แนะนำ)*
+## ตัวเลือกที่ 1 — โดเมนย่อย rtsurvey.com ฟรี (แนะนำ)
 
-This is the fastest option. No domain registration or DNS changes required.
+นี่คือตัวเลือกที่เร็วที่สุด ไม่จำเป็นต้องจดทะเบียนโดเมนหรือเปลี่ยนแปลง DNS
 
-1. Click **ซับโดเมน rtsurvey.com ฟรี *(แนะนำ)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. คลิกโดเมนย่อยฟรี rtsurvey.com เพื่อขยายส่วนนี้
+2. พิมพ์ชื่อโดเมนย่อยที่คุณต้องการในช่องป้อนข้อมูล
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > ใช้ตัวอักษรพิมพ์เล็ก ตัวเลข และขีดกลาง 3–30 อักขระ
+   > ตัวอย่าง: `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. คลิกสร้าง **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. รอประมาณ 2-5 นาทีขณะออกใบรับรอง
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. เมื่อใบรับรองพร้อม คุณจะถูกนำไปยัง HTTPS URL ใหม่ของคุณโดยอัตโนมัติ
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — โดเมนของฉัน
+## ตัวเลือก 2 — โดเมนของฉันเอง
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+ใช้สิ่งนี้หากคุณมีโดเมนอยู่แล้วและระเบียน DNS A ชี้ไปที่ IP ของเซิร์ฟเวอร์นี้แล้ว
 
-1. Click **โดเมนของฉัน** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. คลิกโดเมนของฉันเองเพื่อขยายส่วนนี้
+2. ป้อนชื่อโดเมนเต็มของคุณ (e.g. `survey.myorganization.org`)
+3. คลิกสร้างใบรับรอง
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt จะตรวจสอบโดเมนของคุณและออกใบรับรอง สิ่งนี้จำเป็นต้องชี้ DNS อย่างถูกต้องก่อน - มิฉะนั้นคำขอจะล้มเหลว
 
 ---
 
-## Option 3 — ติดตั้งใบรับรองด้วยตนเอง
+## ตัวเลือก 3 — ติดตั้งใบรับรองด้วยตนเอง
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+สำหรับสภาพแวดล้อมองค์กรที่ใช้ CA แบบกำหนดเองหรือภายใน คุณจะวางไฟล์ใบรับรองของคุณบนเซิร์ฟเวอร์ผ่าน SSH จากนั้นป้อนโดเมนของคุณในแอป
 
-### Prerequisites
+### ข้อกำหนดเบื้องต้น
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- การเข้าถึง SSH ไปยังเซิร์ฟเวอร์
+- ใบรับรองที่ถูกต้องและคีย์ส่วนตัวสำหรับโดเมนของคุณ (รูปแบบ PEM)
 
-### Step 1 — SSH into the server
+### ขั้นตอนที่ 1 — SSH เข้าสู่เซิร์ฟเวอร์
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### ขั้นตอนที่ 2 — วางไฟล์ใบรับรองของคุณ
 
-Create the directory and copy your files:
+สร้างไดเร็กทอรีและคัดลอกไฟล์ของคุณ:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+คัดลอกไฟล์ของคุณลงในไดเร็กทอรีนั้นด้วยชื่อที่ถูกต้องเหล่านี้:
 
-| File | Description |
+| ไฟล์ | คำอธิบาย |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | ใบรับรองของคุณ + ใบรับรอง CA ระดับกลางใด ๆ (ต่อกัน) |
+| `privkey.pem` | รหัสส่วนตัวของคุณ |
 
-Example:
+ตัวอย่าง:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# คัดลอกจากเครื่องท้องถิ่นของคุณ (รันสิ่งนี้ในเครื่อง ไม่ใช่บนเซิร์ฟเวอร์)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+ตั้งค่าการอนุญาตที่ถูกต้อง:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### ขั้นตอนที่ 3 — ป้อนโดเมนของคุณในแอป
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **ติดตั้งใบรับรองด้วยตนเอง**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. ในหน้าจอการตั้งค่า SSL คลิกติดตั้งใบรับรองด้วยตนเอง
+2. ป้อนชื่อโดเมนของคุณ (ต้องตรงกับชื่อสามัญหรือ SAN ของใบรับรอง)
+3. คลิกสมัคร
 
-The server will configure Nginx with your certificate and reload automatically.
+เซิร์ฟเวอร์จะกำหนดค่า Nginx ด้วยใบรับรองของคุณและโหลดซ้ำโดยอัตโนมัติ
 
 ---
 
-## ขั้นตอนถัดไป
+## ขั้นตอนต่อไป
 
-เมื่อ SSL ใช้งานได้แล้ว ดำเนินการต่อที่ [การเข้าสู่ระบบครั้งแรก](first-login)
+เมื่อ SSL ทำงานแล้ว ให้ไปที่การเข้าสู่ระบบครั้งแรก [first-login](first-login).

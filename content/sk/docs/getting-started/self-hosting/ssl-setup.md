@@ -1,16 +1,16 @@
 ---
 weight: 4
-title: "Nastavenie SSL"
+title: "Nastavte SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Nakonfigurujte HTTPS pre váš server rtSurvey. Vyžaduje sa pred prihlásením."
+description: "Nakonfigurujte HTTPS pre váš server rtSurvey. Povinné pred prihlásením."
 ---
 
-SSL musí byť nakonfigurovaný pred prihlásením. Keď otvoríte aplikáciu po prvýkrát, budete automaticky presmerovaní na obrazovku nastavenia SSL.
+Pred prihlásením je potrebné nakonfigurovať SSL. Pri prvom otvorení aplikácie budete automaticky presmerovaní na obrazovku nastavenia SSL.
 
 ---
 
@@ -18,109 +18,111 @@ SSL musí byť nakonfigurovaný pred prihlásením. Keď otvoríte aplikáciu po
 
 ![Možnosti nastavenia SSL](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+Vyberte si jednu z troch možností:
+
+| Možnosť | Kedy použiť |
 |--------|-------------|
-| **Bezplatná subdoména rtsurvey.com *(Odporúčané)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **Moja vlastná doména** | You already have a domain and its DNS points to this server. |
-| **Ručná inštalácia certifikátu** | Enterprise or custom CA. Requires SSH access. |
+| **Bezplatná subdoména rtsurvey.com** *(Odporúčané)* | Nie je potrebné žiadne nastavenie DNS. Záznam vytvoríme za vás. Pripravené za 2-5 minút. |
+| **Moja vlastná doména** | Už máte doménu a jej DNS body na tento server. |
+| **Nainštalujte certifikát manuálne** | Podniková alebo zákazková CA. Vyžaduje prístup SSH. |
 
 ---
 
-## Option 1 — Bezplatná subdoména rtsurvey.com *(Odporúčané)*
+## Možnosť 1 – bezplatná subdoména rtsurvey.com (odporúča sa)
 
-This is the fastest option. No domain registration or DNS changes required.
+Toto je najrýchlejšia možnosť. Nevyžaduje sa žiadna registrácia domény ani zmeny DNS.
 
-1. Click **Bezplatná subdoména rtsurvey.com *(Odporúčané)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. Kliknutím na Free rtsurvey.com subdoména rozbaľte sekciu
+2. Do vstupného poľa zadajte požadovaný názov subdomény
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > Používajte malé písmená, čísla a spojovníky. 3 – 30 znakov.
+   > Príklad: `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. Kliknite na Vytvoriť **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. Počkajte 2–5 minút, kým sa certifikát vydá
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. Keď bude certifikát pripravený, budete automaticky presmerovaní na vašu novú HTTPS URL
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — Moja vlastná doména
+## Možnosť 2 – Moja vlastná doména
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+Použite to, ak máte existujúcu doménu a jej DNS A záznam už ukazuje na IP tohto servera.
 
-1. Click **Moja vlastná doména** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. Kliknutím na položku Moja vlastná doména rozbaľte sekciu
+2. Zadajte celý názov svojej domény (e.g. `survey.myorganization.org`)
+3. Kliknite na Vytvoriť certifikát
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt overí vašu doménu a vydá certifikát. To si vyžaduje, aby bol DNS správne nasmerovaný ako prvý – inak požiadavka zlyhá.
 
 ---
 
-## Option 3 — Ručná inštalácia certifikátu
+## 3. možnosť — Manuálna inštalácia certifikátu
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+Pre podnikové prostredia používajúce vlastnú alebo internú CA. Súbory certifikátov umiestnite na server cez SSH a potom do aplikácie zadajte svoju doménu.
 
-### Prerequisites
+### Predpoklady
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- SSH prístup na server
+- Platný certifikát a súkromný kľúč pre vašu doménu (formát PEM)
 
-### Step 1 — SSH into the server
+### Krok 1 — SSH na server
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### Krok 2 — Umiestnite súbory certifikátov
 
-Create the directory and copy your files:
+Vytvorte adresár a skopírujte súbory:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+Skopírujte svoje súbory do tohto adresára s týmito presnými názvami:
 
-| File | Description |
+| Súbor | Popis |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | Váš certifikát + akékoľvek sprostredkujúce certifikáty CA (spojené) |
+| `privkey.pem` | Váš súkromný kľúč |
 
-Example:
+Príklad:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# Skopírujte z vášho lokálneho počítača (spustite to lokálne, nie na serveri)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+Nastavte správne povolenia:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### Krok 3 — Zadajte svoju doménu do aplikácie
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Ručná inštalácia certifikátu**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. Na obrazovke nastavenia SSL kliknite na Inštalovať certifikát manuálne
+2. Zadajte názov svojej domény (musí sa zhodovať s bežným názvom certifikátu alebo SAN)
+3. Kliknite na tlačidlo Použiť
 
-The server will configure Nginx with your certificate and reload automatically.
+Server nakonfiguruje Nginx s vaším certifikátom a automaticky sa znova načíta.
 
 ---
 
 ## Ďalší krok
 
-Keď je SSL aktívny, pokračujte na [Prvé prihlásenie](first-login).
+Keď je SSL aktívny, prejdite na prvé prihlásenie [first-login](first-login).

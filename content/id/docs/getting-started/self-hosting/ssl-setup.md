@@ -1,16 +1,16 @@
 ---
 weight: 4
-title: "Pengaturan SSL"
+title: "Siapkan SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "Konfigurasikan HTTPS untuk server rtSurvey Anda. Diperlukan sebelum login."
+description: "Konfigurasikan HTTPS untuk server rtSurvey Anda. Diperlukan sebelum Anda dapat masuk."
 ---
 
-SSL harus dikonfigurasi sebelum Anda dapat masuk. Saat membuka aplikasi untuk pertama kali, Anda akan otomatis diarahkan ke layar pengaturan SSL.
+SSL harus dikonfigurasi sebelum Anda dapat masuk. Saat Anda membuka aplikasi untuk pertama kali, Anda akan diarahkan ke layar pengaturan SSL secara otomatis.
 
 ---
 
@@ -18,109 +18,111 @@ SSL harus dikonfigurasi sebelum Anda dapat masuk. Saat membuka aplikasi untuk pe
 
 ![Opsi pengaturan SSL](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+Pilih salah satu dari tiga opsi:
+
+| Pilihan | Kapan harus digunakan |
 |--------|-------------|
-| **Subdomain rtsurvey.com gratis *(Direkomendasikan)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **Domain saya sendiri** | You already have a domain and its DNS points to this server. |
-| **Instal sertifikat secara manual** | Enterprise or custom CA. Requires SSH access. |
+| **Subdomain rtsurvey.com gratis** *(Direkomendasikan)* | Tidak diperlukan pengaturan DNS. Kami membuatkan rekor untuk Anda. Siap dalam 2–5 menit. |
+| **Domain saya sendiri** | Anda sudah memiliki domain dan DNS-nya mengarah ke server ini. |
+| **Instal sertifikat secara manual** | CA perusahaan atau kustom. Membutuhkan akses SSH. |
 
 ---
 
-## Option 1 — Subdomain rtsurvey.com gratis *(Direkomendasikan)*
+## Opsi 1 — Subdomain rtsurvey.com gratis (Disarankan)
 
-This is the fastest option. No domain registration or DNS changes required.
+Ini adalah opsi tercepat. Tidak diperlukan registrasi domain atau perubahan DNS.
 
-1. Click **Subdomain rtsurvey.com gratis *(Direkomendasikan)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. Klik Subdomain rtsurvey.com gratis untuk memperluas bagian tersebut
+2. Ketik nama subdomain yang Anda inginkan di kolom input
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > Gunakan huruf kecil, angka, dan tanda hubung. 3–30 karakter.
+   > Contoh: `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. Klik Buat **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. Tunggu 2–5 menit hingga sertifikat diterbitkan
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. Setelah sertifikat siap, Anda akan diarahkan ke URL HTTPS baru Anda secara otomatis
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — Domain saya sendiri
+## Opsi 2 — Domain saya sendiri
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+Gunakan ini jika Anda sudah memiliki domain dan data DNS-nya sudah mengarah ke IP server ini.
 
-1. Click **Domain saya sendiri** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. Klik Domain saya sendiri untuk memperluas bagian tersebut
+2. Masukkan nama domain lengkap Anda (e.g. `survey.myorganization.org`)
+3. Klik Buat sertifikat
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt akan memverifikasi domain Anda dan menerbitkan sertifikat. Hal ini mengharuskan DNS diarahkan dengan benar terlebih dahulu — jika tidak, permintaan akan gagal.
 
 ---
 
-## Option 3 — Instal sertifikat secara manual
+## Opsi 3 — Instal sertifikat secara manual
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+Untuk lingkungan perusahaan yang menggunakan CA kustom atau internal. Anda akan menempatkan file sertifikat Anda di server melalui SSH, lalu memasukkan domain Anda di aplikasi.
 
-### Prerequisites
+### Prasyarat
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- Akses SSH ke server
+- Sertifikat dan kunci pribadi yang valid untuk domain Anda (format PEM)
 
-### Step 1 — SSH into the server
+### Langkah 1 — SSH ke server
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### Langkah 2 — Tempatkan file sertifikat Anda
 
-Create the directory and copy your files:
+Buat direktori dan salin file Anda:
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+Salin file Anda ke direktori itu dengan nama persis berikut:
 
-| File | Description |
+| Mengajukan | Keterangan |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | Sertifikat Anda + semua sertifikat CA perantara (digabungkan) |
+| `privkey.pem` | Kunci pribadi Anda |
 
-Example:
+Contoh:
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# Salin dari mesin lokal Anda (jalankan ini secara lokal, bukan di server)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+Tetapkan izin yang benar:
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### Langkah 3 — Masukkan domain Anda di aplikasi
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **Instal sertifikat secara manual**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. Di layar pengaturan SSL, klik Instal sertifikat secara manual
+2. Masukkan nama domain Anda (harus sesuai dengan Nama Umum atau SAN sertifikat)
+3. Click Apply
 
-The server will configure Nginx with your certificate and reload automatically.
+Server akan mengkonfigurasi Nginx dengan sertifikat Anda dan memuat ulang secara otomatis.
 
 ---
 
-## Langkah berikutnya
+## Langkah selanjutnya
 
-Setelah SSL aktif, lanjutkan ke [Login Pertama](first-login).
+Setelah SSL aktif, lanjutkan ke Login Pertama [first-login](first-login).

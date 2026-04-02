@@ -1,126 +1,128 @@
 ---
 weight: 4
-title: "ការដំឡើង SSL"
+title: "ដំឡើង SSL"
 date: "2026-04-01T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
 author: "rtSurvey"
 icon: "lock"
 toc: true
-description: "កំណត់រចនាសម្ព័ន្ធ HTTPS សម្រាប់ម៉ាស៊ីនបម្រើ rtSurvey របស់អ្នក។ ត្រូវការមុនពេលចូល។"
+description: "កំណត់រចនាសម្ព័ន្ធ HTTPS សម្រាប់ម៉ាស៊ីនមេ rtSurvey របស់អ្នក។ ទាមទារមុនពេលអ្នកអាចចូល។"
 ---
 
-SSL ត្រូវតែកំណត់រចនាសម្ព័ន្ធមុនពេលអ្នកអាចចូលបាន។ នៅពេលអ្នកបើកកម្មវិធីជាលើកដំបូង អ្នកនឹងត្រូវបានបញ្ជូនទៅអេក្រង់ដំឡើង SSL ដោយស្វ័យប្រវត្តិ។
+ត្រូវតែកំណត់រចនាសម្ព័ន្ធ SSL មុនពេលអ្នកអាចចូលបាន។ នៅពេលអ្នកបើកកម្មវិធីជាលើកដំបូង អ្នកនឹងត្រូវបានបញ្ជូនបន្តទៅអេក្រង់ដំឡើង SSL ដោយស្វ័យប្រវត្តិ។
 
 ---
 
-## ជម្រើសដំឡើង SSL
+## ជម្រើសនៃការដំឡើង SSL
 
-![ជម្រើសដំឡើង SSL](/img/ssl-setup/ssl-setup-options.png)
+![ជម្រើសនៃការដំឡើង SSL](/img/ssl-setup/ssl-setup-options.png)
 
-| Option | When to use |
+ជ្រើសរើសជម្រើសមួយក្នុងចំណោមជម្រើសទាំងបី៖
+
+| ជម្រើស | ពេលណាត្រូវប្រើ |
 |--------|-------------|
-| **ដែនរងឥតគិតថ្លៃ rtsurvey.com *(ណែនាំ)*** | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **ដែនផ្ទាល់ខ្លួនរបស់ខ្ញុំ** | You already have a domain and its DNS points to this server. |
-| **ដំឡើងវិញ្ញាបនបត្រដោយដៃ** | Enterprise or custom CA. Requires SSH access. |
+| **ដែនរង rtsurvey.com ឥតគិតថ្លៃ** *(បានណែនាំ)* | មិនត្រូវការការដំឡើង DNS ទេ។ យើងបង្កើតកំណត់ត្រាសម្រាប់អ្នក។ រួចរាល់ក្នុងរយៈពេល 2-5 នាទី។ |
+| **ដែនផ្ទាល់ខ្លួនរបស់ខ្ញុំ** | អ្នក​មាន​ដែន​ហើយ DNS របស់វា​ចង្អុល​ទៅ​ម៉ាស៊ីន​មេ​នេះ។ |
+| **ដំឡើងវិញ្ញាបនបត្រដោយដៃ** | សហគ្រាស ឬ CA ផ្ទាល់ខ្លួន។ ទាមទារការចូលប្រើ SSH ។ |
 
 ---
 
-## Option 1 — ដែនរងឥតគិតថ្លៃ rtsurvey.com *(ណែនាំ)*
+## ជម្រើសទី 1 — ដែនរង rtsurvey.com ឥតគិតថ្លៃ (បានណែនាំ)
 
-This is the fastest option. No domain registration or DNS changes required.
+នេះគឺជាជម្រើសលឿនបំផុត។ មិនតម្រូវឱ្យមានការចុះឈ្មោះដែន ឬការផ្លាស់ប្តូរ DNS ទេ។
 
-1. Click **ដែនរងឥតគិតថ្លៃ rtsurvey.com *(ណែនាំ)*** to expand the section
-2. Type your desired subdomain name in the input field
+1. ចុច Free rtsurvey.com subdomain ដើម្បីពង្រីកផ្នែក
+2. វាយបញ្ចូលឈ្មោះដែនរងដែលអ្នកចង់បានក្នុងវាលបញ្ចូល
 
-   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
-   > Example: `myproject` → `myproject.rtsurvey.com`
+   > ប្រើអក្សរតូច លេខ និងសហសញ្ញា។ 3-30 តួអក្សរ។
+   > ឧទាហរណ៍៖ `myproject` → `myproject.rtsurvey.com`
 
-3. Click **Create https://[subdomain].rtsurvey.com**
+3. ចុចបង្កើត **https://[subdomain].rtsurvey.com**
 
 <!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
 
-4. Wait 2–5 minutes while the certificate is issued
+4. រង់ចាំ 2-5 នាទីខណៈពេលដែលវិញ្ញាបនបត្រត្រូវបានចេញ
 
 <!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
 
-5. Once the certificate is ready, you will be redirected to your new HTTPS URL automatically
+5. នៅពេលដែលវិញ្ញាបនបត្ររួចរាល់ អ្នកនឹងត្រូវបានបញ្ជូនបន្តទៅកាន់ HTTPS URL ថ្មីរបស់អ្នកដោយស្វ័យប្រវត្តិ
 
 <!-- SCREENSHOT NEEDED: success state / redirect to login -->
 
 ---
 
-## Option 2 — ដែនផ្ទាល់ខ្លួនរបស់ខ្ញុំ
+## ជម្រើសទី 2 - ដែនផ្ទាល់ខ្លួនរបស់ខ្ញុំ
 
-Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
+ប្រើវាប្រសិនបើអ្នកមានដែនដែលមានស្រាប់ ហើយកំណត់ត្រា DNS A របស់វាចង្អុលទៅ IP របស់ម៉ាស៊ីនមេនេះរួចហើយ។
 
-1. Click **ដែនផ្ទាល់ខ្លួនរបស់ខ្ញុំ** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
+1. ចុច My own own domain ដើម្បីពង្រីកផ្នែក
+2. បញ្ចូលឈ្មោះដែនពេញរបស់អ្នក។ (e.g. `survey.myorganization.org`)
+3. ចុចបង្កើតវិញ្ញាបនបត្រ
 
 <!-- SCREENSHOT NEEDED: own domain input form -->
 
-Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
+Let's Encrypt នឹងផ្ទៀងផ្ទាត់ដែនរបស់អ្នក និងចេញវិញ្ញាបនបត្រ។ នេះតម្រូវឱ្យ DNS ត្រូវបានចង្អុលបង្ហាញឱ្យបានត្រឹមត្រូវជាមុនសិន - សំណើនឹងបរាជ័យបើមិនដូច្នេះទេ។
 
 ---
 
-## Option 3 — ដំឡើងវិញ្ញាបនបត្រដោយដៃ
+## ជម្រើសទី 3 — ដំឡើងវិញ្ញាបនបត្រដោយដៃ
 
-For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
+សម្រាប់បរិស្ថានសហគ្រាសដោយប្រើ CA ផ្ទាល់ខ្លួន ឬខាងក្នុង។ អ្នកនឹងដាក់ឯកសារវិញ្ញាបនបត្ររបស់អ្នកនៅលើម៉ាស៊ីនមេតាមរយៈ SSH បន្ទាប់មកបញ្ចូលដែនរបស់អ្នកនៅក្នុងកម្មវិធី។
 
-### Prerequisites
+### តម្រូវការជាមុន
 
-- SSH access to the server
-- A valid certificate and private key for your domain (PEM format)
+- ការចូលប្រើ SSH ទៅកាន់ម៉ាស៊ីនមេ
+- វិញ្ញាបនបត្រត្រឹមត្រូវ និងសោឯកជនសម្រាប់ដែនរបស់អ្នក (ទម្រង់ PEM)
 
-### Step 1 — SSH into the server
+### ជំហានទី 1 - SSH ចូលទៅក្នុងម៉ាស៊ីនមេ
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Step 2 — Place your certificate files
+### ជំហានទី 2 - ដាក់ឯកសារវិញ្ញាបនបត្ររបស់អ្នក។
 
-Create the directory and copy your files:
+បង្កើតថតឯកសារ និងចម្លងឯកសាររបស់អ្នក៖
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Copy your files into that directory with these exact names:
+ចម្លងឯកសាររបស់អ្នកទៅក្នុងថតនោះដោយប្រើឈ្មោះពិតប្រាកដទាំងនេះ៖
 
-| File | Description |
+| ឯកសារ | ការពិពណ៌នា |
 |------|-------------|
-| `fullchain.pem` | Your certificate + any intermediate CA certificates (concatenated) |
-| `privkey.pem` | Your private key |
+| `fullchain.pem` | វិញ្ញាបនបត្ររបស់អ្នក + វិញ្ញាបនបត្រ CA កម្រិតមធ្យមណាមួយ (ភ្ជាប់) |
+| `privkey.pem` | សោឯកជនរបស់អ្នក។ |
 
-Example:
+ឧទាហរណ៍៖
 
 ```bash
-# Copy from your local machine (run this locally, not on the server)
+# ចម្លងពីម៉ាស៊ីនមូលដ្ឋានរបស់អ្នក (ដំណើរការវានៅក្នុងមូលដ្ឋាន មិនមែននៅលើម៉ាស៊ីនមេទេ)
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-Set correct permissions:
+កំណត់ការអនុញ្ញាតត្រឹមត្រូវ៖
 
 ```bash
 chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### Step 3 — Enter your domain in the app
+### ជំហានទី 3 - បញ្ចូលដែនរបស់អ្នកនៅក្នុងកម្មវិធី
 
 <!-- SCREENSHOT NEEDED: manual certificate form -->
 
-1. In the SSL setup screen, click **ដំឡើងវិញ្ញាបនបត្រដោយដៃ**
-2. Enter your domain name (must match the certificate's Common Name or SAN)
-3. Click **Apply**
+1. នៅក្នុងអេក្រង់ដំឡើង SSL ចុចដំឡើងវិញ្ញាបនបត្រដោយដៃ
+2. បញ្ចូលឈ្មោះដែនរបស់អ្នក (ត្រូវតែផ្គូផ្គងឈ្មោះទូទៅ ឬ SAN របស់វិញ្ញាបនបត្រ)
+3. ចុចអនុវត្ត
 
-The server will configure Nginx with your certificate and reload automatically.
+ម៉ាស៊ីនមេនឹងកំណត់រចនាសម្ព័ន្ធ Nginx ជាមួយនឹងវិញ្ញាបនបត្ររបស់អ្នក ហើយផ្ទុកឡើងវិញដោយស្វ័យប្រវត្តិ។
 
 ---
 
 ## ជំហានបន្ទាប់
 
-នៅពេល SSL ដំណើរការ បន្តទៅ [ការចូលលើកដំបូង](first-login)។
+នៅពេលដែល SSL សកម្ម សូមបន្តទៅកាន់ First Login ។ [first-login](first-login).
