@@ -74,22 +74,47 @@ SKIP_PATTERNS = [
 
 FRONTMATTER_TRANSLATE_KEYS = {"title", "description"}
 
+# Brand/product names that must never be translated
+PROTECTED_NAMES = [
+    "DigitalOcean", "Linode", "Akamai Cloud", "Akamai",
+    "rtSurvey", "rtCloud", "Keycloak",
+    "Docker", "Nginx", "Ubuntu", "Let's Encrypt",
+    "Droplet", "StackScript", "Weblish", "LISH",
+]
+
+def protect(text):
+    """Replace brand names with stable placeholders before translation."""
+    tokens = {}
+    for name in PROTECTED_NAMES:
+        placeholder = f"XPROTX{len(tokens)}X"
+        if name in text:
+            tokens[placeholder] = name
+            text = text.replace(name, placeholder)
+    return text, tokens
+
+def restore(text, tokens):
+    """Restore brand name placeholders after translation."""
+    for placeholder, name in tokens.items():
+        text = text.replace(placeholder, name)
+    return text
+
 
 def safe_translate(text, translator):
-    """Translate text, returning original on failure."""
+    """Translate text, returning original on failure. Protects brand names."""
     stripped = text.strip()
     if not stripped:
         return text
+    protected, tokens = protect(stripped)
     try:
-        result = translator.translate(stripped)
+        result = translator.translate(protected)
         time.sleep(0.05)
-        if result and result != stripped:
-            # Preserve leading whitespace
+        if result:
+            result = restore(result, tokens)
             leading = len(text) - len(text.lstrip())
             return text[:leading] + result
         return text
     except Exception:
-        return text
+        return restore(text, tokens)
 
 
 def translate_frontmatter(fm_text, translator):

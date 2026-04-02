@@ -111,17 +111,36 @@ EN_STRINGS = {
 }
 
 
+PROTECTED_NAMES = ["rtSurvey", "Nginx", "Let's Encrypt"]
+
+def _protect(text):
+    tokens = {}
+    for name in PROTECTED_NAMES:
+        ph = f"XPROTX{len(tokens)}X"
+        if name in text:
+            tokens[ph] = name
+            text = text.replace(name, ph)
+    return text, tokens
+
+def _restore(text, tokens):
+    for ph, name in tokens.items():
+        text = text.replace(ph, name)
+    return text
+
+
 def translate_all(google_lang):
     """Translate all EN_STRINGS into google_lang. Returns dict with same keys."""
     translator = GoogleTranslator(source="en", target=google_lang)
     result = {}
     for key, text in EN_STRINGS.items():
+        protected, tokens = _protect(text)
         try:
-            result[key] = translator.translate(text)
-            time.sleep(0.05)   # gentle rate limit
+            translated = translator.translate(protected)
+            time.sleep(0.05)
+            result[key] = _restore(translated or text, tokens)
         except Exception as e:
             print(f"    WARNING: failed to translate '{key}': {e} — using English fallback")
-            result[key] = text
+            result[key] = _restore(text, tokens)
     return result
 
 

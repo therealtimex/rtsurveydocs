@@ -1,6 +1,6 @@
 ---
 weight: 2
-title: "Linode (Đám mây Akamai)"
+title: "Linode (Akamai Cloud)"
 date: "2026-03-16T00:00:00+07:00"
 lastmod: "2026-04-01T00:00:00+07:00"
 draft: false
