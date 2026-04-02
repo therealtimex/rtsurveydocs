@@ -6,32 +6,11 @@
       "toc": false
     }
   },
-  "getting-started": {
-    "title": "Getting Started",
-    "type": "page"
-  },
-  "deployment": {
-    "title": "Deployment",
-    "type": "page"
-  },
-  "survey-design": {
-    "title": "Survey Design",
-    "type": "page"
-  },
-  "platform-interfaces": {
-    "title": "Platform Interfaces",
-    "type": "page"
-  },
-  "contact": {
-    "title": "Contact Us",
-    "type": "page"
-  },
-  "support": {
-    "title": "Support",
-    "type": "page"
-  },
-  "sponsor": {
-    "title": "Sponsor",
-    "type": "page"
-  }
+  "getting-started": "Getting Started",
+  "deployment": "Deployment",
+  "survey-design": "Survey Design",
+  "platform-interfaces": "Platform Interfaces",
+  "contact": "Contact Us",
+  "support": "Support",
+  "sponsor": "Sponsor"
 }

@@ -1,5 +1,7 @@
 {
   "index": { "display": "hidden" },
+  "dashboard-overview": "Dashboard Overview",
+  "system-user": "System & User",
   "rtsurvey-cloud": "rtSurvey Cloud",
   "mobile-app": "Mobile App",
   "web-app": "Web App",
