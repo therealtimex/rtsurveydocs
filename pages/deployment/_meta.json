@@ -1,4 +1,5 @@
 {
+  "index": { "display": "hidden" },
   "quick-start": "Quick Start",
   "configuration": "Configuration",
   "first-login": "First Login",
