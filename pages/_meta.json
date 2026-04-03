@@ -10,7 +10,11 @@
   "deployment": "Deployment",
   "survey-design": "Survey Design",
   "platform-interfaces": "Platform Interfaces",
-  "contact": "Contact Us",
+  "-- community --": {
+    "type": "separator",
+    "title": "Community"
+  },
   "support": "Support",
+  "contact": "Contact Us",
   "sponsor": "Sponsor"
 }
