@@ -30,7 +30,7 @@ jobs:
         with:
           path: .next/cache
           key: nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('pages/**') }}
-          restore-keys: nextjs-
+          restore-keys: nextjs-${{ hashFiles('**/yarn.lock') }}-
       - name: Build English
         run: NODE_OPTIONS='--max-old-space-size=6144' yarn build
       - uses: actions/upload-artifact@v4
