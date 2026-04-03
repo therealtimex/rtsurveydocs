@@ -2,6 +2,7 @@
   "index": { "display": "hidden" },
   "quick-start": "Quick Start",
   "cloud-providers": "Cloud Providers",
+  "self-host-docker": "Self-Host with Docker",
   "configuration": "Configuration",
   "maintenance": "Maintenance",
   "ssl-setup": "SSL Setup",
