@@ -19,4 +19,4 @@ combined/
 node_modules/
 .locale-stash/
 .build-stash/
-next-env.d.ts
+.claude/
