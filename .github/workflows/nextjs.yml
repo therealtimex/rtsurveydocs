@@ -15,6 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Build English — also produces .next/cache for locale jobs to reuse
   build-en:
     runs-on: ubuntu-latest
     steps:
@@ -24,12 +25,12 @@ jobs:
           node-version: 20
           cache: yarn
       - run: yarn install --frozen-lockfile
-      - name: Cache Next.js build
+      - name: Restore Next.js cache
         uses: actions/cache@v4
         with:
           path: .next/cache
-          key: nextjs-en-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('pages/**') }}
-          restore-keys: nextjs-en-
+          key: nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('pages/**') }}
+          restore-keys: nextjs-
       - name: Build English
         run: NODE_OPTIONS='--max-old-space-size=6144' yarn build
       - uses: actions/upload-artifact@v4
@@ -37,32 +38,56 @@ jobs:
           name: out-en
           path: out
           retention-days: 1
-
-  build-locales-1:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: yarn
-      - run: yarn install --frozen-lockfile
-      - name: Cache Next.js build
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: nextjs-loc1-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('_locales/vi/**', '_locales/fr/**', '_locales/de/**', '_locales/pt/**', '_locales/es/**', '_locales/zh-hans/**', '_locales/ar/**') }}
-          restore-keys: nextjs-loc1-
-      - name: Build locales batch 1
-        run: node scripts/build-split.mjs vi fr de pt es zh-hans ar
+      # Share the warm webpack cache with all locale jobs
       - uses: actions/upload-artifact@v4
         with:
-          name: out-locales-1
-          path: combined
+          name: nextjs-cache
+          path: .next/cache
           retention-days: 1
 
-  build-locales-2:
+  # One job per locale — all run in parallel (free tier: ~20 concurrent)
+  build-locale:
+    needs: build-en
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        locale:
+          - vi
+          - fr
+          - de
+          - pt
+          - es
+          - zh-hans
+          - ar
+          - th
+          - id
+          - km
+          - hi
+          - ru
+          - zh-hant
+          - ko
+          - ja
+          - it
+          - nl
+          - tr
+          - uk
+          - nb
+          - da
+          - sv
+          - fi
+          - el
+          - pl
+          - cs
+          - sk
+          - hu
+          - bg
+          - sr
+          - sq
+          - lv
+          - lt
+          - te
+          - pt-br
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -70,91 +95,21 @@ jobs:
           node-version: 20
           cache: yarn
       - run: yarn install --frozen-lockfile
-      - name: Cache Next.js build
-        uses: actions/cache@v4
+      # Warm webpack cache from English build — skips framework recompilation
+      - uses: actions/download-artifact@v4
         with:
+          name: nextjs-cache
           path: .next/cache
-          key: nextjs-loc2-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('_locales/th/**', '_locales/id/**', '_locales/km/**', '_locales/hi/**', '_locales/ru/**', '_locales/zh-hant/**', '_locales/ko/**') }}
-          restore-keys: nextjs-loc2-
-      - name: Build locales batch 2
-        run: node scripts/build-split.mjs th id km hi ru zh-hant ko
+      - name: Build locale ${{ matrix.locale }}
+        run: node scripts/build-split.mjs ${{ matrix.locale }}
       - uses: actions/upload-artifact@v4
         with:
-          name: out-locales-2
-          path: combined
-          retention-days: 1
-
-  build-locales-3:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: yarn
-      - run: yarn install --frozen-lockfile
-      - name: Cache Next.js build
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: nextjs-loc3-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('_locales/ja/**', '_locales/it/**', '_locales/nl/**', '_locales/tr/**', '_locales/uk/**', '_locales/nb/**', '_locales/da/**') }}
-          restore-keys: nextjs-loc3-
-      - name: Build locales batch 3
-        run: node scripts/build-split.mjs ja it nl tr uk nb da
-      - uses: actions/upload-artifact@v4
-        with:
-          name: out-locales-3
-          path: combined
-          retention-days: 1
-
-  build-locales-4:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: yarn
-      - run: yarn install --frozen-lockfile
-      - name: Cache Next.js build
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: nextjs-loc4-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('_locales/sv/**', '_locales/fi/**', '_locales/el/**', '_locales/pl/**', '_locales/cs/**', '_locales/sk/**', '_locales/hu/**') }}
-          restore-keys: nextjs-loc4-
-      - name: Build locales batch 4
-        run: node scripts/build-split.mjs sv fi el pl cs sk hu
-      - uses: actions/upload-artifact@v4
-        with:
-          name: out-locales-4
-          path: combined
-          retention-days: 1
-
-  build-locales-5:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: yarn
-      - run: yarn install --frozen-lockfile
-      - name: Cache Next.js build
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: nextjs-loc5-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('_locales/bg/**', '_locales/sr/**', '_locales/sq/**', '_locales/lv/**', '_locales/lt/**', '_locales/te/**', '_locales/pt-br/**') }}
-          restore-keys: nextjs-loc5-
-      - name: Build locales batch 5
-        run: node scripts/build-split.mjs bg sr sq lv lt te pt-br
-      - uses: actions/upload-artifact@v4
-        with:
-          name: out-locales-5
-          path: combined
+          name: out-locale-${{ matrix.locale }}
+          path: combined/${{ matrix.locale }}
           retention-days: 1
 
   deploy:
-    needs: [build-en, build-locales-1, build-locales-2, build-locales-3, build-locales-4, build-locales-5]
+    needs: [build-en, build-locale]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -165,30 +120,16 @@ jobs:
         with:
           name: out-en
           path: out
-      - uses: actions/download-artifact@v4
+      - name: Download all locale artifacts
+        uses: actions/download-artifact@v4
         with:
-          name: out-locales-1
+          pattern: out-locale-*
           path: combined
-      - uses: actions/download-artifact@v4
-        with:
-          name: out-locales-2
-          path: combined
-      - uses: actions/download-artifact@v4
-        with:
-          name: out-locales-3
-          path: combined
-      - uses: actions/download-artifact@v4
-        with:
-          name: out-locales-4
-          path: combined
-      - uses: actions/download-artifact@v4
-        with:
-          name: out-locales-5
-          path: combined
+          merge-multiple: false
       - name: Merge locale outputs into out/
         run: |
-          for dir in combined/*/; do
-            loc=$(basename "$dir")
+          for dir in combined/out-locale-*/; do
+            loc=$(basename "$dir" | sed 's/^out-locale-//')
             echo "Merging locale: $loc"
             mkdir -p "out/$loc"
             cp -r "$dir"* "out/$loc/" 2>/dev/null || true
