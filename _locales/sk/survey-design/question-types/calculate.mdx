@@ -1,0 +1,111 @@
+---
+title: "Calculate"
+description: ""
+---
+
+Otázky calculate v XLSForms a rtSurvey sa používajú na vykonávanie výpočtov na základe iných polí alebo hodnôt vo vašom formulári. Tieto otázky sa nezobrazujú používateľovi, ale namiesto toho bežia na pozadí a ukladajú svoje výsledky na neskoršie použitie alebo odoslanie.
+
+## Syntax
+
+V XLSForm je otázka calculate definovaná nasledovne:
+
+| type      | name     | label | calculation |
+|-----------|----------|-------|-------------|
+| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+
+- **type**: Vždy „calculate" pre tento typ otázky.
+- **name**: Jedinečný názov pre otázku calculate.
+- **label**: Zvyčajne prázdne, keďže otázky calculate sa nezobrazujú používateľom.
+- **calculation**: Vzorec, ktorý sa má vyhodnotiť.
+
+## Použitia
+
+Otázky calculate sa bežne používajú pre:
+
+1. Vykonávanie aritmetických operácií
+2. Spájanie reťazcov
+3. Aplikovanie komplexnej logiky alebo funkcií
+4. Ukladanie medzivýsledkov na neskoršie použitie
+
+## Príklady
+
+### Základná aritmetika
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | total    | ${price} * ${quantity} |
+```
+
+### Spájanie reťazcov
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
+```
+
+### Použitie funkcií
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
+```
+
+## Pokročilé použitie v rtSurvey
+
+### Funkcia pulldata()
+
+rtSurvey podporuje funkciu `pulldata()` v poliach calculate, čo vám umožňuje načítavať dáta z externých CSV súborov:
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
+```
+
+#### Syntax
+
+Základná syntax pre pulldata() je:
+
+```
+pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
+```
+
+- 'csv_filename': Názov CSV súboru (bez prípony .csv)
+- 'column_to_return': Názov stĺpca obsahujúceho dáta, ktoré chcete načítať
+- 'key_column': Názov stĺpca, s ktorým sa má zhodovať
+- `${matching_value}`: Hodnota, ktorú treba vyhľadať v kľúčovom stĺpci (často premenná z formulára)
+
+#### Dôležité poznámky
+
+1. CSV súbor musí byť nahraný spolu s vaším XLSForm pri nasadení prieskumu.
+2. V CSV súbore používajte čiarky ako oddeľovače, nie bodkočiarky.
+3. Vyhnite sa čiarkam vo vnútri dátových polí vášho CSV, keďže môžu spôsobiť problémy s parsovaním.
+4. pulldata() podporuje iba vzťahy 1-k-1. Ak sa nájde viacero zhôd, vráti iba prvú.
+5. Môžu existovať obmedzenia dĺžky textu, ktorý možno načítať (približne 76 znakov).
+6. pulldata() môžete použiť v obmedzeniach na overenie záznamov voči dátam CSV.
+
+### Podmienené výpočty
+
+Pre podmienené výpočty môžete použiť príkazy if():
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+```
+
+## Najlepšie postupy
+
+1. Používajte zmysluplné názvy pre polia calculate na zlepšenie čitateľnosti formulára.
+2. Vyhýbajte sa príliš zložitým výpočtom v jednom poli; v prípade potreby ich rozdeľte.
+3. Dôkladne testujte svoje výpočty, najmä pri použití komplexných vzorcov alebo externých dát.
+4. Pamätajte, že polia calculate sa spúšťajú pri každom vyhodnotení formulára, čo môže ovplyvniť výkon pri veľmi zložitých alebo početných výpočtoch.
+5. Pri použití pulldata() uistite sa, že vaše CSV súbory sú správne naformátované a dôkladne testujte s vašou konkrétnou štruktúrou dát a formulára.
+
+## Obmedzenia
+
+- Polia calculate nie sú priamo editovateľné používateľmi.
+- Výsledok poľa calculate nie je okamžite viditeľný, pokiaľ nie je odkazovaný v zobrazovacom poli alebo použitý v logike formulára.

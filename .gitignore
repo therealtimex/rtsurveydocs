@@ -11,3 +11,12 @@ package-lock.json
 public
 resources
 .agents/.claude/
+.next/
+out/
+.yarn/cache
+.yarn/install-state.gz
+combined/
+node_modules/
+.locale-stash/
+.build-stash/
+.claude/

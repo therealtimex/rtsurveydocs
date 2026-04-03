@@ -1,0 +1,110 @@
+---
+title: "Tekst"
+description: "Tip pitanja za slobodan tekstualni odgovor u rtSurvey-u"
+---
+
+Tip pitanja `text` prikuplja odgovor slobodnim tekstom — bilo koji niz znakova. To je najfleksibilniji tip unosa i koristi se za imena, adrese, opise, kodove i sve što ne odgovara specifičnijem tipu.
+
+rtSurvey takođe proširuje `text` sa **widgetima za unos vremena** koji dozvoljavaju precizni unos vremena sa biranjem sata.
+
+## Osnovna XLSForm specifikacija
+
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | Puno ime ispitanika |
+| text | address | Kućna adresa |
+
+Za više detalja o standardnom XLSForm tipu teksta, pogledajte [XLSForm specifikaciju](https://xlsform.org/en/#question-types).
+
+## Upotrebe
+
+Pitanja tipa tekst se koriste za:
+
+1. Imena, adrese, slobodne opise
+2. Otvorene komentare ili povratne informacije
+3. Kodove, ID-ove ili referentne brojeve koji ne odgovaraju integer/decimal tipu
+4. Prikupljanje vremenskih vrednosti sa rtSurvey proširenjima za unos vremena
+5. Tekstualna polja sa automatskim dovršavanjem (putem `search-autocomplete-noedit-v2()`)
+
+## Standardne opcije izgleda
+
+| Izgled | Opis |
+|--------|------|
+| *(ništa)* | Jednoredno tekstualno polje |
+| `multiline` | Višeredno tekstualno polje — best za duži slobodan tekst na vebu |
+
+## rtSurvey proširenja za unos vremena
+
+rtSurvey proširuje `text` sa **widgetom za biranje sata** za prikupljanje vremenskih vrednosti. Ove opcije izgleda prikazuju ikonu sata koju anketar može dodirnuti za izbor sati, minuta, sekundi ili milisekundi.
+
+### Varijante izgleda
+
+| Izgled | Opis |
+|--------|------|
+| `inline` | Ikona sata prikazana pored polja |
+| `inline colors("RRGGBB")` | Ikona sata sa prilagođenom hex bojom |
+| `inline-1line` | Sat prikazan u kompaktnom jednorednom formatu |
+| `inline-1line-RRGGBB` | Jednored sa prilagođenom bojom ikone (hex, bez `#`) |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Jednored sa dve boje |
+| `inline-onlyresult` | Ikona sata nestaje nakon izbora; prikazuje se samo vrednost |
+| `inline-onlyresult colors("RRGGBB")` | Isto, sa prilagođenom bojom ikone |
+
+### Tokeni formata vremena
+
+Dodajte format string u zagradama za kontrolu koji se vremenski komponenti prikazuju:
+
+| Format string | Prikazuje |
+|---------------|-----------|
+| `inline-[%H:%M]` | Sati i minuti (24-satni) |
+| `inline-[%h:%M]` | Sati i minuti (12-satni) |
+| `inline-[%H:%M:%S]` | Sati, minuti, sekunde (24-satni) |
+| `inline-[%h:%M:%S]` | Sati, minuti, sekunde (12-satni) |
+| `inline-[%H:%M:%3]` | Sati, minuti, milisekunde |
+| `inline-[%M:%S]` | Samo minuti i sekunde |
+| `inline-[%M:%3]` | Samo minuti i milisekunde |
+| `inline-[%S]` | Samo sekunde |
+| `inline-[%3]` | Samo milisekunde |
+| `inline-[%H]` | Samo sati (24-satni) |
+| `inline-[%h]` | Samo sati (12-satni) |
+
+### Primer: Beleženje trajanja zadatka u minutima i sekundama
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | task_duration | Vreme potrebno za izvršenje zadatka | `inline-[%M:%S]` |
+
+### Primer: Beleženje vremena događaja u 24-satnom formatu sa prilagođenom bojom
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | event_time | Vreme događaja | `inline-1line colors("0099FF")` |
+
+## Format podataka
+
+Podaci tipa tekst se čuvaju i izvoze kao obični string. Za unose zasnovane na vremenu koji koriste inline widget za sat, vrednost se čuva u formatu koji odgovara izabranom format stringu (npr. `14:32` za `%H:%M`).
+
+## Ograničenja i validacija
+
+Primenite ograničenja za nametanje formata, dužine ili obrasca:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| text | name | Puno ime | `string-length(.) >= 2` | Ime mora imati najmanje 2 znaka |
+| text | code | Referentni kod | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Unesite 2 velika slova praćena sa 4 cifre |
+| text | phone | Broj telefona | `regex(., '^[0-9]{9,15}$')` | Unesite važeći broj telefona |
+
+## Najbolje prakse
+
+1. Koristite specifičnije tipove (`integer`, `decimal`, `date`) kad god podaci imaju poznatu strukturu — ovo sprečava nevažeće unose i pojednostavljuje analizu.
+2. Dodajte `constraint` sa `string-length()` ili `regex()` za validaciju kodova ili ID-ova.
+3. Koristite izgled `multiline` za otvorena pitanja gde ispitanici mogu pisati nekoliko rečenica.
+4. Za prikupljanje vremena, odaberite tokene formata koji odgovaraju preciznosti vašoj analizi — prikupljanje milisekundi kada vam trebaju samo minuti troši napor anketara.
+
+## Podrška platformi
+
+Tip pitanja text i svi izgledi za unos vremena podržani su na iOS, Android i veb platformama.
+
+## Ograničenja
+
+- Odgovori tipa tekst su slobodnog oblika — ne postoji ugrađena provera pravopisa ili ograničenje vokabulara osim regex obrazaca.
+- Inline widget za vreme je rtSurvey proširenje i nije deo standardne XLSForm specifikacije.

@@ -1,0 +1,154 @@
+---
+title: "Pokročilá opakování"
+description: "Pokročilé vzory pro skupiny opakování: dynamické počty, vnořená opakování, sumarizace dat opakování a odkazování hodnot napříč opakováními."
+---
+
+Tato stránka pokrývá pokročilé vzory pro práci se skupinami opakování v rtSurvey. Pro základy nastavení skupiny opakování viz [Seskupování a opakování](../repeats).
+
+---
+
+## Dynamický počet opakování
+
+Ve výchozím nastavení enumerátor rozhoduje, kolikrát opakovat. Počet opakování lze zafixovat pomocí `repeat_count`:
+
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Člen domácnosti | `${num_members}` |
+| text | member_name | Jméno člena | |
+| integer | member_age | Věk | |
+| end_repeat | | | |
+
+Opakování proběhne přesně `${num_members}` krát, kde `num_members` byl sebrán dříve ve formuláři. Enumerátor nemůže přidávat ani odebírat instance.
+
+---
+
+## Indexovaný přístup: `indexed-repeat()`
+
+Přistupte k hodnotě pole konkrétní instance opakování **zvenku** skupiny opakování pomocí `indexed-repeat(repeatedField, repeatGroup, index)`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+To je užitečné pro vytváření souhrnných polí nebo odkazování na data „primárního" člena po opakování.
+
+---
+
+## Aktuální pozice instance: `index()`
+
+Uvnitř skupiny opakování vrací `index()` 1-based pozici aktuální instance. Použijte ji pro označení každého opakování nebo vytvoření jedinečných identifikátorů:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Parcela |
+| note | plot_label | Číslo parcely `${index()}` |
+| text | plot_id | ID parcely |
+| end_repeat | | |
+
+---
+
+## Odkazování polí ve stejné instanci
+
+V rámci opakování použijte `${fieldname}` pro odkazování na jiné pole **ve stejné instanci opakování**. Není třeba `indexed-repeat()` v rámci stejné smyčky:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Člen | |
+| text | member_name | Jméno | |
+| integer | member_age | Věk | |
+| text | school_name | Název školy | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## Odkazování nadřazených polí zevnitř opakování
+
+Pole mimo (nad) skupinu opakování lze normálně odkazovat pomocí `${fieldname}`:
+
+| type | name | label |
+|------|------|-------|
+| text | village | Název vesnice |
+| begin_repeat | plots | Zemědělská parcela |
+| note | plot_context | Parcely ve `${village}` |
+| end_repeat | | |
+
+---
+
+## Sumarizace dat opakování
+
+Použijte agregační funkce opakování **mimo** skupinu opakování pro sumarizaci:
+
+| Funkce | Příklad | Popis |
+|--------|---------|-------|
+| `count(group)` | `count(${household_members})` | Počet instancí |
+| `sum(field)` | `sum(${loan_amount})` | Součet číselného pole |
+| `min(field)` | `min(${member_age})` | Minimální hodnota |
+| `max(field)` | `max(${member_age})` | Maximální hodnota |
+| `join(sep, field)` | `join(', ', ${member_name})` | Seznam oddělený čárkami |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Podmíněný počet |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Podmíněný součet |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Podmíněné spojení |
+
+### Příklad: Souhrn domácnosti
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | Kolik členů? | |
+| begin_repeat | members | Člen | `${num_members}` |
+| text | member_name | Jméno | |
+| integer | member_age | Věk | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | `${total_members}` členů; `${children_count}` do 18 let. Dospělí: `${adult_names}` | |
+
+---
+
+## Vnořená opakování
+
+Skupina opakování může obsahovat další skupinu opakování. Používejte toto opatrně — vnořená opakování přidávají složitost a mohou být matoucí pro enumerátory.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Domácnost |
+| text | hh_id | ID domácnosti |
+| begin_repeat | hh_members | Člen |
+| text | member_name | Jméno člena |
+| end_repeat | | |
+| end_repeat | | |
+
+Pro odkazování pole ve vnějším opakování zevnitř vnitřního opakování použijte `${fieldname}` — překládá se na nejbližšího odpovídajícího předka:
+
+Uvnitř opakování `hh_members` vrací `${hh_id}` ID **aktuální** domácnosti, nikoli všech domácností.
+
+---
+
+## Pořadí uvnitř skupin opakování: `rank-index()`
+
+Když pole `rank` existuje uvnitř opakování, použijte `rank-index(instanceNumber, repeatedField)` zvenku pro získání ordinálního pořadí konkrétní instance:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` vrátí index instance s nejvyšším skóre.
+
+---
+
+## Osvědčené postupy
+
+1. Vždy používejte `repeat_count`, když je počet opakování předem znám — zabraňuje enumerátorům v náhodném přidávání nebo odebírání instancí.
+2. Udržujte skupiny opakování zaměřené — opakování s 20+ otázkami na instanci je obtížné navigovat.
+3. Pojmenovávejte skupiny opakování jasně (např. `household_members`, nikoli `repeat1`) — název se objevuje ve voláních funkcí a exportovaných datech.
+4. Testujte s maximálním očekávaným počtem instancí pro ověření výkonu.
+5. Používejte vzhled `field-list` na skupině opakování pro zobrazení všech polí na jedné obrazovce na instanci (mobil).
+
+---
+
+## Omezení
+
+- `indexed-repeat()` vyžaduje platný index (1 až počet instancí) — indexy mimo rozsah vrátí prázdnou hodnotu.
+- Vnořená opakování nad 2 úrovně nejsou doporučena a mohou způsobit problémy se zobrazením na některých klientech.
+- Agregační funkce (`sum`, `count` atd.) operují na celé skupině opakování — nemůžete agregovat podmnožinu instancí bez variant `*-if`.

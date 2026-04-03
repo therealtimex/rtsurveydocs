@@ -1,0 +1,96 @@
+---
+title: "Dynaaminen kysymystyyppi"
+description: "Dynaaminen kysymystyyppi mahdollistaa kentän kysymystyypin ja widgetin määrittelyn suorituksenaikaisesti API-vastauksen tai lasketun arvon perusteella."
+---
+
+**Dynaaminen kysymystyyppi** -ominaisuus mahdollistaa kentän syöttöwidgetin ja validoinnin toiminnan määrittämisen **suorituksenaikaisesti** eikä lomakkeen suunnitteluvaiheessa. Tämä on edistynyt rtSurvey-laajennus, jota käytetään, kun kerättävän datan tyyppi riippuu palvelinpuolen konfiguraatiosta, API-vastauksesta tai edeltävästä kenttäarvosta.
+
+Yleinen käyttötapaus on konfiguroitava tarkistuslista, jossa palvelin määrittää, mitkä kentät ovat pakollisia, minkä tyyppisiä ne ovat (teksti, kokonaisluku, valinta jne.) ja mitä vaihtoehtoja on saatavilla — ilman lomakkeen uudelleenrakentamista jokaista konfiguraatiota varten.
+
+---
+
+## Miten se toimii
+
+Dynaamiseksi kysymystyypiksi merkitty kenttä käyttää `callapi()`:tä konfiguraation hakemiseen API:sta. API-vastaus määrittelee:
+
+- Renderöitävän syöttötyypin (text, integer, select_one jne.)
+- Käytettävissä olevat valinnat (valinttyypeille)
+- Validointisäännöt
+
+Kenttä merkitään sisäisesti `specialFeature: isDynamicQuestionType`, mikä kertoo lomakemoottorille käyttää API-vastausta widgetin rakentamiseen staattisen lomakemäärittelyn sijaan.
+
+---
+
+## Asetus
+
+### Vaihe 1: Hae kenttäkonfiguraatio
+
+Käytä `calculate`-kenttää ja `callapi()`:tä dynaamisen konfiguraation hakemiseen:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | field_config | | callapi | `callapi('POST', 'https://api.example.com/field-config', 1, 2, 0, '$.config', 10000, 0, '', '', '{"form_id": "##form_id##", "field_id": "inspection_result"}')` |
+
+### Vaihe 2: Viittaa konfiguraatioon dynaamisessa kentässä
+
+Dynaaminen kenttä käyttää `callapi-verify()`:tä `appearance`- tai `constraint`-kohdassaan linkittääkseen haettuun konfiguraatioon:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | inspection_result | Tarkistustulos | `callapi-verify(dynamicParams)` |
+
+Lomakemoottori lukee `field_config`:n ja määrittää dynaamisesti, renderöidäänkö `inspection_result` `text`-, `integer`- vai `select_one`-kenttänä.
+
+---
+
+## API-vastauksen muoto
+
+API:n tulisi palauttaa JSON-objekti, joka kuvaa kenttäkonfiguraation. Tyypillinen vastaus:
+
+```json
+{
+  "config": {
+    "type": "select_one",
+    "choices": [
+      {"value": "pass", "label": "Hyväksytty"},
+      {"value": "fail", "label": "Hylätty"},
+      {"value": "na", "label": "Ei sovellettavissa"}
+    ],
+    "required": true,
+    "constraint": ". != ''"
+  }
+}
+```
+
+---
+
+## Esimerkki: Konfiguroituva tarkistuslomake
+
+Tarkistuslomake, jossa tarkistuslistojen kohdat ja niiden vastaustypit haetaan palvelimelta tarkistusluokan perusteella:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| select_one inspection_type | insp_type | Tarkistuksen tyyppi | | |
+| calculate | checklist_config | | callapi | `callapi('POST', 'https://api.example.com/checklist', 1, 2, 0, '$.items', 10000, 0, '', '', '{"type": "##insp_type##"}')` |
+| text | item_1 | Kohta 1 | `callapi-verify(dynamicParams)` | |
+| text | item_2 | Kohta 2 | `callapi-verify(dynamicParams)` | |
+| text | item_3 | Kohta 3 | `callapi-verify(dynamicParams)` | |
+
+Palvelin palauttaa oikean widgetin tyypin, otsikon, valinnat ja validoinnin kullekin kohdalle `insp_type`:n perusteella.
+
+---
+
+## Parhaat käytännöt
+
+1. Käytä dynaamisia kysymystyyppejä vain, kun kentän rakenne aidosti vaihtelee suorituksenaikaisesti — staattisille lomakkeille käytä vakiokysymystyyppejä.
+2. Varmista, että konfiguraatio-API vastaa nopeasti (alle 2 sekuntia) ja on saatavilla kenttäverkossa.
+3. Määrittele aina järkevä varavalinta lomakkeessa siltä varalta, että API ei ole saavutettavissa — yksinkertainen `text`-kenttä huomautuksella on parempi kuin rikki oleva widget.
+4. Versio API-vastauksesi skeema — vastamusmuodon muutokset vaikuttavat kaikkiin aktiivisiin lomakkeisiin, jotka käyttävät kyseistä päätepistettä.
+5. Testaa jokainen kenttätyyppikombinaatio, jonka API saattaa palauttaa ennen käyttöönottoa.
+
+## Rajoitukset
+
+- Dynaamiset kysymystyypit vaativat verkkoyhteyden konfiguraation hakemiseen.
+- Dynaamisesti saatavilla olevien widgetin tyyppien täysi valikoima riippuu rtSurvey-asiakasversiosta — testaa kohdeversio.
+- Tämä on edistynyt rtSurvey-laajennus, johon ei ole vastaavuutta vakio XLSForm-spesifikaatiossa.
+- Virheiden jäljittäminen on vaikeampaa, koska kenttämäärittely sijaitsee osittain lomakkeessa ja osittain API-vastauksessa.

@@ -1,0 +1,125 @@
+---
+title: "Call API"
+description: "Call API lets your survey fetch data from an external web service and use the response to populate fields or validate answers."
+---
+
+The **Call API** feature lets a survey field make an HTTP request to an external service and use the response to populate a calculated value or validate user input. This enables real-time lookups, ID verification, barcode lookups, and any other server-side check during data collection.
+
+There are two functions:
+
+- `callapi()` — fetches a value from an API and stores it in a `calculate` or `text` field
+- `callapi-verify()` — calls an API and blocks progress if the response does not match the expected value (used in `constraint`)
+
+---
+
+## `callapi()` — Fetch and store an API response
+
+### Syntax
+
+Place `callapi()` in the **`calculation`** column of a `calculate` or `text` field:
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### Parameters
+
+| # | Parameter | Description |
+|---|-----------|-------------|
+| 1 | `method` | HTTP method: `'GET'` or `'POST'` |
+| 2 | `url` | API endpoint URL |
+| 3 | `allowed_auto` | `1` to call automatically when the field is reached; `0` to require a manual trigger button |
+| 4 | `max_retry` | Maximum number of retry attempts on failure |
+| 5 | `no_overwrite` | `1` to keep the existing value if the field already has one; `0` to always overwrite |
+| 6 | `extract_expr` | JSONPath expression to extract the desired value from the response (e.g., `$.data.name`) |
+| 7 | `timeout` | Request timeout in milliseconds |
+| 8 | `lifetime` | How long (ms) the cached response remains valid before re-fetching |
+| 9 | `response_q` | Name of a field to store the raw HTTP response code (e.g., `${response_status}`) |
+| 10 | `call_type` | *(Optional)* Special call mode: `'lazy-upload'` or `'lazy-upload-multiple'` |
+| 11 | `post_body` | *(Optional)* POST body string. Reference form fields with `##fieldname##` |
+
+### Example: GET request to look up a household by ID
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | Household ID | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+| note | hh_display | Household: `${hh_name}` | | |
+
+### Example: POST request with a JSON body
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+In the `post_body`, use `##fieldname##` to inject the current value of any form field.
+
+### Appearance: `callapi`
+
+Add `callapi` to the `appearance` column of the field to enable the API call integration:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | api_result | | callapi | `callapi('GET', ...)` |
+
+When `allowed_auto` is `0`, rtSurvey shows a **"Fetch" button** that the enumerator taps manually.
+
+---
+
+## `callapi-verify()` — Validate a value against an API
+
+`callapi-verify()` blocks submission of a field until an API confirms the entered value is valid. Use it in the **`constraint`** column.
+
+### Syntax
+
+```
+callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
+```
+
+### Parameters
+
+| # | Parameter | Description |
+|---|-----------|-------------|
+| 1 | `method` | HTTP method: `'GET'` or `'POST'` |
+| 2 | `url` | Verification API endpoint |
+| 3 | `extract_expr` | JSONPath to extract the expected value from the response |
+| 4 | `match_expr` | Expression comparing extracted value to the field value (e.g., `$.status = 'valid'`) |
+| 5 | `timeout` | Request timeout in milliseconds |
+| 6 | `constraint_mode` | `'soft'` for a warning only; `'hard'` to block progression |
+| 7 | `post_body` | *(Optional)* POST body with `##fieldname##` substitutions |
+| 8 | `message` | *(Optional)* Error message. Supports multi-language: `<en>Invalid!</en><vi>Không hợp lệ!</vi>` |
+
+### Example: Verify a barcode against an asset registry
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| barcode | asset_code | Scan the asset barcode | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` | Asset not found in registry |
+
+### Appearance: `callapi-verify(...)`
+
+The `appearance` column on a field with `callapi-verify()` in constraint should contain `callapi-verify(params)` or `callapi-verify(dynamicParams)` to signal to rtSurvey that this field uses API verification.
+
+---
+
+## Using App API data alongside callapi
+
+Combine `callapi()` with `pulldata('app-api', 'user.token')` to inject the authenticated user's token into your API request:
+
+```
+callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, '', '',
+  concat('{"token":"', pulldata('app-api','user.token'), '","id":"##item_id##"}'))
+```
+
+## Best Practices
+
+1. Always set a reasonable `timeout` (5000–15000 ms) — do not use 0 or very high values.
+2. Set `allowed_auto=0` for verifications the enumerator should trigger consciously (e.g., ID checks).
+3. Set `no_overwrite=1` when the field may be edited later and you do not want re-fetching to overwrite manual corrections.
+4. Use `extract_expr` with a specific JSONPath rather than relying on raw response text.
+5. Test API calls in offline mode — callapi will fail gracefully and show an error, but the form should still be completable for non-critical fields.
+
+## Limitations
+
+- Requires network connectivity at the time of the call — calls will fail when the device is offline.
+- API responses must be JSON — XML or plain-text responses require additional parsing.
+- High call frequency (e.g., one API call per repeat instance) can slow down form navigation.

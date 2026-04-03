@@ -1,0 +1,138 @@
+---
+title: "Gruppering av spørsmål"
+description: ""
+---
+
+Grupper i XLSForm lar deg organisere relaterte spørsmål sammen, noe som forbedrer strukturen til spørreundersøkelsen og øker mulighetene for dataanalyse. rtSurvey støtter fullt ut XLSForm-grupper og utvider funksjonaliteten deres med ytterligere funksjoner.
+
+## Grunnleggende gruppestruktur
+
+For å lage en gruppe spørsmål, bruk `begin_group`- og `end_group`-syntaksen:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | respondent | Respondentinformasjon                    |
+| text         | name       | Skriv inn respondentens navn             |
+| text         | position   | Skriv inn respondentens stilling         |
+| end_group    |            |                                          |
+```
+
+Viktige punkter:
+- `begin_group`-raden krever et `name` og en `label`.
+- `end_group`-raden trenger ikke navn eller etikett.
+- Spørsmål mellom `begin_group` og `end_group` er del av gruppen.
+
+## Gruppevisning
+
+rtSurvey støtter ulike utseendealternativer for grupper:
+
+1. **field-list**: Viser flere spørsmål på samme skjerm.
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | respondent | Respondent| field-list |
+   | text         | name       | Navn      |            |
+   | text         | position   | Stilling  |            |
+   | end_group    |            |           |            |
+   ```
+
+2. **grid**: Oppretter et kompakt, tabellignende oppsett for grupper (rtSurvey-spesifikt).
+   ```
+   | type         | name       | label     | appearance |
+   |--------------|------------|-----------|------------|
+   | begin_group  | household  | Hushold   | grid       |
+   | text         | member_name| Navn      |            |
+   | integer      | member_age | Alder     |            |
+   | end_group    |            |           |            |
+   ```
+
+3. **collapsible**: Oppretter sammenleggbare/utvidbare grupper (rtSurvey-spesifikt).
+   ```
+   | type         | name       | label     | appearance  |
+   |--------------|------------|-----------|-------------|
+   | begin_group  | details    | Detaljer  | collapsible |
+   | text         | address    | Adresse   |             |
+   | text         | phone      | Telefon   |             |
+   | end_group    |            |           |             |
+   ```
+
+## Nestede grupper
+
+Grupper kan nestes inne i andre grupper for mer komplekse strukturer:
+
+```
+| type         | name       | label                                    |
+|--------------|------------|------------------------------------------|
+| begin_group  | hospital   | Sykehusinformasjon                       |
+| text         | hosp_name  | Hva er navnet på dette sykehuset?        |
+| begin_group  | medication | Tilgjengelighet av medisiner             |
+| select_one y_n| hiv_meds  | Har dette sykehuset HIV-medisin?         |
+| end_group    |            |                                          |
+| end_group    |            |                                          |
+```
+
+**Merk**: Avslutt alltid den sist startede gruppen først for å opprettholde riktig nesting.
+
+## Hopplogikk for grupper
+
+Bruk `relevant`-kolonnen for å implementere hopplogikk for hele grupper:
+
+```
+| type         | name   | label                                        | relevant        |
+|--------------|--------|----------------------------------------------|-----------------|
+| integer      | age    | Hvor gammel er du?                           |                 |
+| begin_group  | child  | Barn                                         | ${age} <= 5     |
+| integer      | muac   | Registrer barnets midtre overarmsomkrets     |                 |
+| select_one y_n| mrdt  | Er barnets hurtigdiagnosetest positiv?       |                 |
+| end_group    |        |                                              |                 |
+```
+
+I dette eksemplet vil `child`-gruppen bare vises hvis respondentens alder er 5 år eller yngre.
+
+## Beste praksis for bruk av grupper
+
+1. Bruk meningsfulle navn for grupper for å forbedre dataanalysen.
+2. Hold grupper fokusert på relaterte spørsmål.
+3. Bruk nestede grupper med forsiktighet for å unngå for komplekse strukturer.
+4. Test hopplogikken grundig når du bruker `relevant` på grupper.
+5. Vurder å bruke `field-list`-utseendet for korte grupper for å redusere rulling.
+6. Bruk rtSurveys grid-oppsett for kompakt visning av relatert informasjon.
+7. Bruk sammenleggbare grupper for lange skjemaer for å forbedre navigasjonen.
+
+## rtSurvey-spesifikke funksjoner
+
+1. **Grid-oppsett**: Bruk `grid`-utseendet for tabellignende visninger.
+2. **Sammenleggbare grupper**: Implementer `collapsible`-utseendet for utvidbare seksjoner.
+3. **Tilpasset styling**: Bruk tilpasset CSS på grupper for unike visuelle design.
+4. **Dynamisk gruppeadferd**: Implementer kompleks hopplogikk og beregninger i grupper.
+
+## Flerspråklig støtte
+
+rtSurvey støtter flerspråklige grupper. Bruk språkspesifikke kolonner for etiketter:
+
+```
+| type         | name       | label::English | label::French |
+|--------------|------------|----------------|---------------|
+| begin_group  | personal   | Personal Info  | Infos Personnelles |
+| text         | name       | Name           | Nom           |
+| end_group    |            |                |               |
+```
+
+## Hensyn til mobilapp
+
+- Grupper med `field-list`-utseendet vises som én skjerm i mobilappen.
+- Sammenleggbare grupper kan forbedre navigasjonen på mindre skjermer.
+- Grid-oppsett kan justeres for bedre synlighet på mobile enheter.
+
+## Kjente begrensninger
+
+- Ekstremt dyp nesting av grupper kan påvirke ytelsen på noen enheter.
+- Noen avanserte stylingalternativer er kanskje ikke tilgjengelig for grupper i mobilappen.
+
+## Feilsøking av grupper
+
+1. Sørg for at hver `begin_group` har en tilsvarende `end_group`.
+2. Sjekk at gruppenavn er unike i skjemaet.
+3. Verifiser at hopplogikken refererer til riktige spørsmålsnavn.
+4. Test grupper grundig på både nett- og mobilgrensesnitt.

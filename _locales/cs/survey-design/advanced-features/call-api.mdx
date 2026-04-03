@@ -1,0 +1,125 @@
+---
+title: "Volání API"
+description: "Volání API umožňuje průzkumu načíst data z externího webového servisu a použít odpověď pro vyplnění polí nebo validaci odpovědí."
+---
+
+Funkce **Volání API** umožňuje poli průzkumu provést HTTP požadavek na externí službu a použít odpověď pro vyplnění vypočítané hodnoty nebo validaci uživatelského vstupu. To umožňuje vyhledávání v reálném čase, ověřování ID, vyhledávání čárových kódů a jakékoli jiné ověření na straně serveru během sběru dat.
+
+Existují dvě funkce:
+
+- `callapi()` — načte hodnotu z API a uloží ji do pole `calculate` nebo `text`
+- `callapi-verify()` — zavolá API a zablokuje postup, pokud odpověď neodpovídá očekávané hodnotě (používá se v `constraint`)
+
+---
+
+## `callapi()` — Načtení a uložení odpovědi API
+
+### Syntaxe
+
+Umístěte `callapi()` do sloupce **`calculation`** pole `calculate` nebo `text`:
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### Parametry
+
+| # | Parametr | Popis |
+|---|----------|-------|
+| 1 | `method` | HTTP metoda: `'GET'` nebo `'POST'` |
+| 2 | `url` | URL koncového bodu API |
+| 3 | `allowed_auto` | `1` pro automatické volání při dosažení pole; `0` pro vyžadování ručního spouštěče |
+| 4 | `max_retry` | Maximální počet pokusů o opakování při selhání |
+| 5 | `no_overwrite` | `1` pro zachování existující hodnoty, pokud pole již má hodnotu; `0` pro vždy přepsat |
+| 6 | `extract_expr` | Výraz JSONPath pro extrakci požadované hodnoty z odpovědi (např. `$.data.name`) |
+| 7 | `timeout` | Timeout požadavku v milisekundách |
+| 8 | `lifetime` | Jak dlouho (ms) zůstane odpověď v mezipaměti platná před opětovným načtením |
+| 9 | `response_q` | Název pole pro uložení nezpracovaného HTTP kódu odpovědi (např. `${response_status}`) |
+| 10 | `call_type` | *(Volitelné)* Speciální režim volání: `'lazy-upload'` nebo `'lazy-upload-multiple'` |
+| 11 | `post_body` | *(Volitelné)* Řetězec těla POST. Odkazujte pole formuláře pomocí `##fieldname##` |
+
+### Příklad: GET požadavek pro vyhledání domácnosti podle ID
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | ID domácnosti | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+| note | hh_display | Domácnost: `${hh_name}` | | |
+
+### Příklad: POST požadavek s tělem JSON
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+V `post_body` použijte `##fieldname##` pro vložení aktuální hodnoty libovolného pole formuláře.
+
+### Vzhled: `callapi`
+
+Přidejte `callapi` do sloupce `appearance` pole pro povolení integrace volání API:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | api_result | | callapi | `callapi('GET', ...)` |
+
+Když je `allowed_auto` `0`, rtSurvey zobrazí **tlačítko „Načíst"**, které enumerátor ručně klepne.
+
+---
+
+## `callapi-verify()` — Validace hodnoty proti API
+
+`callapi-verify()` blokuje odeslání pole, dokud API nepotvrdí, že zadaná hodnota je platná. Použijte ji ve sloupci **`constraint`**.
+
+### Syntaxe
+
+```
+callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
+```
+
+### Parametry
+
+| # | Parametr | Popis |
+|---|----------|-------|
+| 1 | `method` | HTTP metoda: `'GET'` nebo `'POST'` |
+| 2 | `url` | URL verifikačního koncového bodu API |
+| 3 | `extract_expr` | JSONPath pro extrakci očekávané hodnoty z odpovědi |
+| 4 | `match_expr` | Výraz porovnávající extrahovanou hodnotu s hodnotou pole (např. `$.status = 'valid'`) |
+| 5 | `timeout` | Timeout požadavku v milisekundách |
+| 6 | `constraint_mode` | `'soft'` pouze pro varování; `'hard'` pro zablokování postupu |
+| 7 | `post_body` | *(Volitelné)* Tělo POST s nahrazením `##fieldname##` |
+| 8 | `message` | *(Volitelné)* Chybová zpráva. Podporuje více jazyků: `<en>Invalid!</en><vi>Không hợp lệ!</vi>` |
+
+### Příklad: Ověření čárového kódu proti registru majetku
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| barcode | asset_code | Naskenujte čárový kód majetku | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` | Majetek nebyl nalezen v registru |
+
+### Vzhled: `callapi-verify(...)`
+
+Sloupec `appearance` na poli s `callapi-verify()` v constraint by měl obsahovat `callapi-verify(params)` nebo `callapi-verify(dynamicParams)` pro signalizaci rtSurvey, že toto pole používá API verifikaci.
+
+---
+
+## Používání dat App API spolu s callapi
+
+Kombinujte `callapi()` s `pulldata('app-api', 'user.token')` pro vložení tokenu ověřeného uživatele do vašeho API požadavku:
+
+```
+callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, '', '',
+  concat('{"token":"', pulldata('app-api','user.token'), '","id":"##item_id##"}'))
+```
+
+## Osvědčené postupy
+
+1. Vždy nastavte přiměřený `timeout` (5000–15000 ms) — nepoužívejte 0 nebo velmi vysoké hodnoty.
+2. Nastavte `allowed_auto=0` pro verifikace, které by měl enumerátor spustit vědomě (např. kontroly ID).
+3. Nastavte `no_overwrite=1`, když může být pole později editováno a nechcete, aby opětovné načtení přepsalo ruční opravy.
+4. Používejte `extract_expr` s konkrétním JSONPath spíše než spoléhání na nezpracovaný text odpovědi.
+5. Testujte volání API v offline režimu — callapi selže korektně a zobrazí chybu, ale formulář by měl být stále dokončitelný pro nekritická pole.
+
+## Omezení
+
+- Vyžaduje připojení k síti v době volání — volání selže, když je zařízení offline.
+- Odpovědi API musí být JSON — odpovědi XML nebo prostý text vyžadují dodatečné parsování.
+- Vysoká frekvence volání (např. jedno volání API na instanci opakování) může zpomalit navigaci formuláře.

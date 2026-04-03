@@ -1,0 +1,137 @@
+---
+title: "Uygulama API"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+AppAPI, kullanıcıların FormEngine ve DMView'da farklı yöntemler kullanarak uygulamadan sistem meta verilerini yüklemesine olanak tanır. Uygulamadan belirli bilgileri almak için çeşitli veri anahtarlarına erişim sağlar.
+
+XLSForm'da aşağıdaki sözdizimini kullanarak `pulldata()` fonksiyonunu kullanabilirsiniz:
+
+
+<Callout>pulldata('app-api', 'data-key')</Callout>
+
+- `'app-api'`: Bu anahtar kelime FormEngine'e verilerin App API'sinden yüklenmesi gerektiğini bildirir.
+- `'data-key'`: App API'sinden yüklemek istediğiniz verinin anahtarıdır.
+- Veri anahtarı geçersiz veya desteklenmiyorsa, hesaplama "n/a" döndürür.
+
+App-API ile kullanabileceğiniz desteklenen veri anahtarları aşağıda verilmiştir:
+
+`osPlatform`: Geçerli işletim sistemi adını (Android veya iOS) ve işletim sistemi sürümünü döndürür. Web platformları boş bir değer döndürür.
+
+`appPlatform`: Uygulama platform adını döndürür; bu `rtSurvey`'dir.
+
+`appVersion`: Uygulamanın sürüm adını döndürür.
+
+`getDisplayWidth`: Cihaz ekran genişliğini piksel cinsinden döndürür.
+
+`getDisplayHeight`: Cihaz ekran yüksekliğini piksel cinsinden döndürür.
+
+`getScreenSize`: Cihaz ekran boyutunu inç cinsinden döndürür.
+
+`projectCode`: Kullanıcının giriş yaptığı sitenin geçerli proje kodunu döndürür.
+
+`projectURL`: Kullanıcının giriş yaptığı sitenin geçerli proje URL'sini döndürür. Varsayılan/yedek değer boş metindir ("").
+
+`startingPoint`: Formu başlatan noktanın yolunu döndürür. Daha fazla ayrıntı için "Form başlangıç noktası"na bakın.
+
+`serverTime`: Sunucudaki tarih ve saatin mevcut en iyi yaklaşımını döndürür.
+
+`user.[attribute]`: Belirtilen öznitelik anahtarına dayalı olarak geçerli kullanıcı özniteliklerini döndürür. Mevcut öznitelik anahtarları için "Kullanıcı öznitelikleri" tablosuna bakın.
+
+Geçerli kullanıcı bilgilerini almak için aşağıdaki öznitelik anahtarlarını `pulldata()` parametrelerinde "user." ile birleştirin. Örneğin, `user.username`, `user.email` vb. kullanın.
+
+| Öznitelik Anahtarı   | Açıklama                          |
+|----------------------|--------------------------------------|
+| username             | Kullanıcının kullanıcı adı            |
+| name                 | Kullanıcının tam adı                  |
+| staffCode            | Kullanıcının personel kodu            |
+| phone                | Kullanıcının telefon numarası         |
+| email                | Kullanıcının e-posta adresi           |
+| description          | Kullanıcı bilgisindeki açıklama metni |
+| organization_id      | Kullanıcının ait olduğu kuruluş kimliği |
+| organization_name    | Kullanıcının ait olduğu kuruluş adı    |
+| team_id              | Kullanıcının ait olduğu takım kimliği  |
+| supervisor_id        | Kullanıcının denetçisinin kimliği      |
+| is_supervisor        | Kullanıcı denetçiyse 1, değilse 0      |
+
+`instancePath`: Geçerli örnek klasör yolunu döndürür.
+
+`appLanguage`: Uygulama ayarlarında ayarlanan geçerli uygulama dilini döndürür (örn. vi, en).
+
+`openArgs.[attribute]`: ActionButton'dan geçirilen open-form-argument'ı döndürür (act_fill_form, act_get_instance). Varsayılan/yedek değer boş metindir ("").
+
+`primaryAppColor`: Uygulamanın birincil rengini alır.
+
+---
+
+## Kullanım örnekleri
+
+### Sayımcının kullanıcı adını ve kuruluşunu depolama
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Denetim amaçları için bunları not etiketlerinde kullanın:
+```
+note | interviewer_info | Görüşmeci: ${enumerator_name} (${enumerator_org})
+```
+
+### Cihaz ve ekran bilgisi
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+Sorun giderme için kullanışlı: Her gönderim için hangi cihaz sürümünün kullanıldığını belirlemek amacıyla `device_platform` ve `app_ver`'i verilerinizin yanında dışa aktarın.
+
+### Cihaz saati yerine sunucu saati
+
+Cihaz saatleri hatalı olabilir. Daha güvenilir bir zaman damgası için `serverTime` kullanın:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Kullanıcı rolüne dayalı koşullu mantık
+
+Denetçiye özgü bir bölümü yalnızca denetçilere göster:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Denetçi incelemesi | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Denetçi notları | |
+| end_group | | | |
+
+### Eylem düğmesinden argüman aktarma
+
+Form özel argümanlarla bir `act_fill_form` eylem düğmesinden başlatıldığında:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+Eylem düğmesi, argümanları eşleşen anahtarlarla geçirmelidir (örn. `household_id`, `task_code`).
+
+### Proje bilgisini kullanma
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## Notlar
+
+- Tüm `pulldata('app-api', ...)` çağrıları form açıldığında değerlendirilir ve oturum sırasında dinamik olarak yeniden değerlendirilmez (`serverTime` ve `now()` hariç).
+- Bir anahtar desteklenmiyorsa veya veri mevcut değilse, fonksiyon `'n/a'` döndürür (boş dize değil — `!= ''` yerine `!= 'n/a'` ile test edin).
+- `openArgs` değerleri yalnızca form bir eylem düğmesinden başlatıldığında mevcuttur; aksi hâlde boş dize döndürürler.

@@ -1,0 +1,125 @@
+---
+title: "API skambutis"
+description: "API skambutis leidžia jūsų apklausai gauti duomenis iš išorinės žiniatinklio paslaugos ir naudoti atsakymą laukams užpildyti ar atsakymams patvirtinti."
+---
+
+Funkcija **API skambutis** leidžia apklausos laukui atlikti HTTP užklausą į išorinę paslaugą ir naudoti atsakymą apskaičiuotai reikšmei užpildyti arba naudotojo įvesties patvirtinimui. Tai įgalina realiojo laiko paieškas, ID patvirtinimą, brūkšninių kodų paieškas ir bet kokius kitus serverio pusės patikrinimus duomenų rinkimo metu.
+
+Yra dvi funkcijos:
+
+- `callapi()` — gauna reikšmę iš API ir saugo ją `calculate` ar `text` lauke
+- `callapi-verify()` — iškviečia API ir blokuoja pažangą, jei atsakymas neatitinka tikėtinos reikšmės (naudojama `constraint`)
+
+---
+
+## `callapi()` — API atsakymo gavimas ir saugojimas
+
+### Sintaksė
+
+Įdėkite `callapi()` į `calculate` ar `text` lauko stulpelį **`calculation`**:
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### Parametrai
+
+| # | Parametras | Aprašymas |
+|---|-----------|-------------|
+| 1 | `method` | HTTP metodas: `'GET'` arba `'POST'` |
+| 2 | `url` | API galiuklio URL |
+| 3 | `allowed_auto` | `1` automatiškai iškviesti, kai pasiekiamas laukas; `0` reikalauti rankinio mygtuko |
+| 4 | `max_retry` | Maksimalus pakartotinių bandymų skaičius nesėkmės atveju |
+| 5 | `no_overwrite` | `1` išlaikyti esamą reikšmę, jei laukas jau ją turi; `0` visada perrašyti |
+| 6 | `extract_expr` | JSONPath išraiška norimą reikšmę išskirti iš atsakymo (pvz., `$.data.name`) |
+| 7 | `timeout` | Užklausos skirtasis laikas milisekundėmis |
+| 8 | `lifetime` | Kiek laiko (ms) talpykloje saugomas atsakymas lieka galiojantis prieš pakartotinį gavimą |
+| 9 | `response_q` | Lauko pavadinimas neapdorotam HTTP atsakymo kodui saugoti (pvz., `${response_status}`) |
+| 10 | `call_type` | *(Neprivaloma)* Specialus skambučio režimas: `'lazy-upload'` arba `'lazy-upload-multiple'` |
+| 11 | `post_body` | *(Neprivaloma)* POST turinio eilutė. Formos laukus nurodykite su `##fieldname##` |
+
+### Pavyzdys: GET užklausa namų ūkiui ieškoti pagal ID
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | Namų ūkio ID | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+| note | hh_display | Namų ūkis: `${hh_name}` | | |
+
+### Pavyzdys: POST užklausa su JSON turiniu
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+`post_body` naudokite `##fieldname##`, kad įterptumėte dabartinę bet kurio formos lauko reikšmę.
+
+### Išvaizda: `callapi`
+
+Pridėkite `callapi` prie lauko stulpelio `appearance`, kad įgalintumėte API skambučio integraciją:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | api_result | | callapi | `callapi('GET', ...)` |
+
+Kai `allowed_auto` yra `0`, rtSurvey rodo **„Gauti" mygtuką**, kurį surašytojas rankiniu būdu paspaudžia.
+
+---
+
+## `callapi-verify()` — Reikšmės patvirtinimas per API
+
+`callapi-verify()` blokuoja lauko pateikimą, kol API nepatvirtins, kad įvesta reikšmė yra galiojanti. Naudokite ją stulpelyje **`constraint`**.
+
+### Sintaksė
+
+```
+callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
+```
+
+### Parametrai
+
+| # | Parametras | Aprašymas |
+|---|-----------|-------------|
+| 1 | `method` | HTTP metodas: `'GET'` arba `'POST'` |
+| 2 | `url` | Patvirtinimo API galiuklio URL |
+| 3 | `extract_expr` | JSONPath tikėtinai reikšmei išskirti iš atsakymo |
+| 4 | `match_expr` | Išraiška, lygindama išskirtą reikšmę su lauko reikšme (pvz., `$.status = 'valid'`) |
+| 5 | `timeout` | Užklausos skirtasis laikas milisekundėmis |
+| 6 | `constraint_mode` | `'soft'` tik perspėjimui; `'hard'` blokuoti pažangą |
+| 7 | `post_body` | *(Neprivaloma)* POST turinys su `##fieldname##` pakeitimais |
+| 8 | `message` | *(Neprivaloma)* Klaidos pranešimas. Palaiko kelias kalbas: `<en>Invalid!</en><vi>Không hợp lệ!</vi>` |
+
+### Pavyzdys: Brūkšninio kodo patvirtinimas pagal turto registrą
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| barcode | asset_code | Nuskenuokite turto brūkšninį kodą | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` | Turtas nerastas registre |
+
+### Išvaizda: `callapi-verify(...)`
+
+Lauko stulpelyje `appearance` su `callapi-verify()` apribojime turėtų būti `callapi-verify(params)` arba `callapi-verify(dynamicParams)`, kad rtSurvey žinotų, jog šis laukas naudoja API patvirtinimą.
+
+---
+
+## App API duomenų naudojimas kartu su callapi
+
+Derinkite `callapi()` su `pulldata('app-api', 'user.token')`, kad įterptumėte autentifikuoto naudotojo žetoną į API užklausą:
+
+```
+callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, '', '',
+  concat('{"token":"', pulldata('app-api','user.token'), '","id":"##item_id##"}'))
+```
+
+## Geriausios praktikos
+
+1. Visada nustatykite pagrįstą `timeout` (5000–15000 ms) — nenaudokite 0 arba labai didelių reikšmių.
+2. Nustatykite `allowed_auto=0` patvirtinimams, kuriuos surašytojas turėtų aktyvinti sąmoningai (pvz., ID patikrinimai).
+3. Nustatykite `no_overwrite=1`, kai laukas gali būti redaguojamas vėliau ir nenorite, kad pakartotinis gavimas perrašytų rankinius taisymus.
+4. Naudokite `extract_expr` su konkrečiu JSONPath, o ne remkitės neapdorotu atsakymo tekstu.
+5. Patikrinkite API skambučius neprisijungusio veikimo režimu — callapi žlugs tvarkingai ir parodys klaidą, tačiau forma turėtų būti vis tiek užpildoma nekritiniams laukams.
+
+## Apribojimai
+
+- Reikalingas tinklo ryšys skambučio metu — skambučiai žlugs, kai įrenginys neprisijungęs.
+- API atsakymai turi būti JSON — XML arba paprastam teksto atsakymams reikia papildomo apdorojimo.
+- Didelis skambučių dažnis (pvz., vienas API skambutis kiekvienam kartojimo egzemplioriui) gali sulėtinti formos naršymą.

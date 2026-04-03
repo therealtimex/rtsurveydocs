@@ -1,0 +1,186 @@
+---
+title: "Meta"
+description: "Meta ప్రశ్న రకాలు ప్రతిస్పందించే వ్యక్తి నుండి ఏ input లేకుండా device, enumerator మరియు timing సమాచారాన్ని స్వయంచాలకంగా capture చేస్తాయి."
+---
+
+import { Callout } from 'nextra/components'
+
+Meta ప్రశ్న రకాలు **స్వయంచాలకంగా** fill అయ్యే ప్రత్యేక fields — ప్రతిస్పందించే వ్యక్తి వాటిని చూడడు. Submission గురించి సందర్భం capture చేస్తాయి: ఎప్పుడు సేకరించబడిందో, ఏ device ఉపయోగించబడిందో, ఎవరు సేకరించారో. ఏ ఇతర ప్రశ్న రకం వలెనే `survey` worksheet లో చేర్చండి; అవి screen పై కనిపించవు.
+
+## ప్రాథమిక XLSForm స్పెసిఫికేషన్
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| deviceid | deviceid | |
+
+Meta fields ఎప్పుడూ display అవ్వవు కాబట్టి labels optional.
+
+---
+
+## Timing meta fields
+
+### `start`
+
+**Form తెరవబడిన తేది మరియు సమయాన్ని** records చేస్తుంది. ISO 8601 format లో నిల్వ చేయబడుతుంది (`YYYY-MM-DDTHH:MM:SS.sss+HH:MM`).
+
+```
+type    | name  | label
+start   | start |
+```
+
+### `end`
+
+**Form submit చేయబడిన తేది మరియు సమయాన్ని** records చేస్తుంది. `start` తో కలిపి, form fill చేయడానికి గడిపిన సమయాన్ని లెక్కించవచ్చు:
+
+```
+type      | name          | calculation
+calculate | duration_min  | (decimal-date-time(${end}) - decimal-date-time(${start})) * 1440
+```
+
+### `today`
+
+**ప్రస్తుత తేదీని** records చేస్తుంది (time component లేదు). `YYYY-MM-DD` గా నిల్వ చేయబడుతుంది. Full timestamp లేకుండా కేవలం తేది మాత్రమే అవసరమైనప్పుడు ఉపయోగకరం.
+
+```
+type  | name  | label
+today | today |
+```
+
+---
+
+## Device meta fields
+
+### `deviceid`
+
+Data collection కోసం ఉపయోగించిన **device యొక్క unique identifier** records చేస్తుంది. Android లో ఇది సాధారణంగా IMEI లేదా Android ID. ఏ device ప్రతి form submit చేసిందో ట్రాక్ చేయడానికి మరియు ఒకే device నుండి duplicate submissions గుర్తించడానికి ఉపయోగకరం.
+
+```
+type      | name     | label
+deviceid  | deviceid |
+```
+
+### `devicephonenum`
+
+Device లోని **SIM card యొక్క phone number** records చేస్తుంది (అందుబాటులో ఉంటే). Device కు SIM లేకపోతే లేదా number SIM లో store చేయబడకపోతే empty అవ్వవచ్చు.
+
+```
+type           | name          | label
+devicephonenum | devicephonenum |
+```
+
+### `simserial`
+
+**SIM card యొక్క serial number** (ICCID) records చేస్తుంది. ఏ SIM/carrier ఉపయోగించబడిందో గుర్తించడానికి ఉపయోగకరం.
+
+```
+type      | name      | label
+simserial | simserial |
+```
+
+### `subscriberid`
+
+**IMSI (International Mobile Subscriber Identity)** records చేస్తుంది — SIM card పై unique subscriber identifier.
+
+```
+type         | name        | label
+subscriberid | subscriberid |
+```
+
+---
+
+## Enumerator meta fields
+
+### `username`
+
+**Login అయిన enumerator యొక్క username** records చేస్తుంది (rtSurvey app లో ఉపయోగించిన account). ప్రతి submission ఎవరు సేకరించారో ట్రాక్ చేయడానికి ఇది అత్యంత నమ్మదగిన మార్గం.
+
+```
+type     | name     | label
+username | username |
+```
+
+### `email`
+
+**Login అయిన enumerator యొక్క email address** records చేస్తుంది.
+
+```
+type  | name  | label
+email | email |
+```
+
+### `phonenumber`
+
+**Enumerator account తో అనుసంధానిత phone number** records చేస్తుంది (configure చేయబడి ఉంటే).
+
+```
+type        | name       | label
+phonenumber | phonenumber |
+```
+
+---
+
+## Audit log
+
+### `audit`
+
+`audit` meta field **వివరణాత్మక audit logging** enable చేస్తుంది — enumerator visit చేసిన ప్రతి ప్రశ్న, ప్రతి దానిపై గడిపిన సమయం, మరియు (optionally) ప్రతి దశలో వారి GPS location యొక్క timestamped log records చేస్తుంది. Audit log ప్రతి submission తో పాటు వేరే `audit.csv` file గా save చేయబడుతుంది.
+
+```
+type  | name  | parameters
+audit | audit | location-priority=balanced location-min-interval=30 location-max-age=60
+```
+
+#### Audit parameters
+
+| Parameter | వివరణ |
+|-----------|-------|
+| `location-priority` | GPS accuracy level: `no-gps`, `low-power`, `balanced`, `high-accuracy` |
+| `location-min-interval` | Location captures మధ్య కనీస సెకన్లు |
+| `location-max-age` | Accept చేయడానికి cached location యొక్క గరిష్ట వయస్సు (సెకన్లు) |
+
+Audit log capture చేస్తుంది:
+- ప్రశ్న పేరు మరియు event type (`question`, `form.start`, `form.exit`, `form.save`, `form.finalize`)
+- ప్రతి event కు start మరియు end timestamps
+- GPS coordinates (`location-priority` సెట్ అయి ఉంటే)
+
+<Callout type="warning">
+`audit` field ప్రతి submission కు వేరే file generate చేస్తుంది. మీ data pipeline main form data మరియు audit CSV రెండూ process చేస్తుందని నిర్ధారించుకోండి.
+</Callout>
+
+---
+
+## పూర్తి ఉదాహరణ
+
+ఒక సాధారణ household survey అన్ని timing మరియు enumerator meta fields చేర్చవచ్చు:
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| today | today | |
+| deviceid | deviceid | |
+| username | username | |
+| email | email | |
+| audit | audit | |
+| text | household_id | Household ID |
+| ... | ... | ... |
+
+---
+
+## ఉత్తమ పద్ధతులు
+
+1. ఎల్లప్పుడూ `start` మరియు `end` చేర్చండి — అవి ఉచితం, స్వయంచాలకం, మరియు quality monitoring కు అమూల్యమైనవి.
+2. Enumerators ట్రాక్ చేయడానికి ఎల్లప్పుడూ `username` చేర్చండి.
+3. Duplicate submissions గుర్తించాలనుకున్నప్పుడు లేదా field devices ట్రాక్ చేయాలనుకున్నప్పుడు `deviceid` చేర్చండి.
+4. Enumerators నిజంగా ప్రతి ప్రశ్న visit చేశారని verify చేయాల్సిన high-accountability surveys లో `audit` ఉపయోగించండి.
+5. SIM-related fields (`simserial`, `subscriberid`, `devicephonenum`) active SIM cards ఉన్న Android devices పై మాత్రమే నమ్మదగినవి — tablet-only deployments కు skip చేయండి.
+
+---
+
+## పరిమితులు
+
+- అన్ని meta fields **read-only** — ఇతర calculations ద్వారా reference లేదా modify చేయలేరు.
+- `username` మరియు `email` enumerator login అయి ఉండాలి; anonymous submissions కు అవి empty గా ఉంటాయి.
+- SIM/phone meta fields Wi-Fi-only tablets మరియు కొన్ని Android versions పై permission restrictions వల్ల empty values return చేయవచ్చు.

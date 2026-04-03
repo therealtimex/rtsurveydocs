@@ -1,0 +1,142 @@
+name: Deploy rtSurvey Docs to GitHub Pages
+
+on:
+  push:
+    branches: [release]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build English — also produces .next/cache for locale jobs to reuse
+  build-en:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - name: Restore Next.js cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('pages/**') }}
+          restore-keys: nextjs-
+      - name: Build English
+        run: NODE_OPTIONS='--max-old-space-size=6144' yarn build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: out-en
+          path: out
+          retention-days: 1
+      # Share the warm webpack cache with all locale jobs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-cache
+          path: .next/cache
+          retention-days: 1
+
+  # One job per locale — all run in parallel (free tier: ~20 concurrent)
+  build-locale:
+    needs: build-en
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        locale:
+          - vi
+          - fr
+          - de
+          - pt
+          - es
+          - zh-hans
+          - ar
+          - th
+          - id
+          - km
+          - hi
+          - ru
+          - zh-hant
+          - ko
+          - ja
+          - it
+          - nl
+          - tr
+          - uk
+          - nb
+          - da
+          - sv
+          - fi
+          - el
+          - pl
+          - cs
+          - sk
+          - hu
+          - bg
+          - sr
+          - sq
+          - lv
+          - lt
+          - te
+          - pt-br
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      # Warm webpack cache from English build — skips framework recompilation
+      - uses: actions/download-artifact@v4
+        with:
+          name: nextjs-cache
+          path: .next/cache
+      - name: Build locale ${{ matrix.locale }}
+        run: node scripts/build-split.mjs ${{ matrix.locale }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: out-locale-${{ matrix.locale }}
+          path: combined/${{ matrix.locale }}
+          retention-days: 1
+
+  deploy:
+    needs: [build-en, build-locale]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: out-en
+          path: out
+      - name: Download all locale artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: out-locale-*
+          path: combined
+          merge-multiple: false
+      - name: Merge locale outputs into out/
+        run: |
+          for dir in combined/out-locale-*/; do
+            loc=$(basename "$dir" | sed 's/^out-locale-//')
+            echo "Merging locale: $loc"
+            mkdir -p "out/$loc"
+            cp -r "$dir"* "out/$loc/" 2>/dev/null || true
+          done
+      - uses: actions/configure-pages@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+      - id: deployment
+        uses: actions/deploy-pages@v4

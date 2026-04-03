@@ -1,0 +1,137 @@
+---
+title: "Dynamisk søgning"
+description: "Dynamisk søgning indlæser valgmuligheder fra et eksternt API i realtid, mens intervieweren skriver, hvilket muliggør store eller hyppigt opdaterede datasæt."
+---
+
+**Dynamisk søgning** (også kaldet Search API) giver et `select_one`-, `select_multiple`- eller `text`-felt mulighed for at indlæse sine valgmuligheder fra en ekstern webtjeneste **ved kørselstid**, mens intervieweren skriver. Dette er den rette tilgang, når din valgliste er for stor til at bundte i en CSV-fil, opdateres hyppigt, eller stammer fra en live-database.
+
+---
+
+## `search-api()` appearance
+
+Den dynamiske søgning konfigureres via kolonnen `appearance` ved brug af funktionen `search-api()`:
+
+```
+search-api(method, url, post_body, value_column, display, data_path, save_path)
+```
+
+### Parametre
+
+| Parameter | Beskrivelse |
+|-----------|-------------|
+| `method` | Brug altid `'POST'` |
+| `url` | API-endepunktet, der forespørges |
+| `post_body` | JSON-tekst sendt til API'et. Brug `%__input__%` som pladsholder for interviewerens aktuelle søgetekst |
+| `value_column` | Den nøgle i svaret, der bruges som den gemte **værdi** |
+| `display` | Den nøgle (eller skabelon), der bruges som den **label**, der vises i rullemenuen. Understøtter `##nøgle##`-pladsholdere og `@{func}`-udtryk |
+| `data_path` | JSONPath til arrayet af resultatobjekter i svaret (f.eks. `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Et navn, under hvilket det rå svar gemmes til brug af andre felter |
+
+---
+
+## Grundlæggende eksempel
+
+Et sundhedsfacilitetsopslag, hvor intervieweren skriver en del af facilitetens navn:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Vælg sundhedsfacilitet | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+
+API'et modtager `{"query": "kobe"}`, når intervieweren skriver "kobe" og returnerer:
+
+```json
+{
+  "results": [
+    {"id": "HF001", "name": "Kobenhavn Central Klinik"},
+    {"id": "HF002", "name": "Kobenhavn Vest Hospital"}
+  ]
+}
+```
+
+Rullemenuen viser `Kobenhavn Central Klinik` og `Kobenhavn Vest Hospital`; den gemte værdi er `HF001` eller `HF002`.
+
+---
+
+## Avanceret visningsformatering
+
+### Brug af `##nøgle##`-skabeloner
+
+Vis flere felter i labelen:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
+```
+
+Vises som: `Kobenhavn Central Klinik (Kobenhavn)`.
+
+### Brug af `@{func}`-udtryk
+
+Anvend betinget logik i visningslabelen:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
+  '@{if_else(eq("##status##", "active"), "✓ ##name##", "✗ ##name##")}',
+  '$.data', 'res')
+```
+
+Aktive resultater vises som `✓ Klinikens navn`; inaktive vises som `✗ Klinikens navn`.
+
+---
+
+## Angivelse af en standardværdi: `search-default-api()`
+
+Brug `search-default-api()` efter `search-api()` til at forudfylde feltet med et standardvalg indlæst fra et separat API-kald (f.eks. ved redigering af en eksisterende post):
+
+```
+appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
+```
+
+---
+
+## Brugerdefineret separator for select_multiple: `search-default-separator()`
+
+For `select_multiple`-felter angives, hvordan flere valgte værdier sammenføjes i den gemte streng:
+
+```
+appearance: search-api(...) search-default-separator(' || ')
+```
+
+Standardseparatoren er et mellemrum.
+
+---
+
+## Understøttede spørgsmålstyper
+
+| Spørgsmålstype | Anvendelsestilfælde |
+|----------------|---------------------|
+| `select_one` | Enkeltvalg fra søgeresultater |
+| `select_multiple` | Flervalg fra søgeresultater |
+| `text` | Autofuldførelse — intervieweren skriver frit, men kan vælge et forslag |
+
+---
+
+## Brug af gemt svardata
+
+`save_path` gemmer det fulde API-svar under det angivne navn. Andre felter kan referere til det med `pulldata()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one | facility | Vælg facilitet | `search-api(..., 'facility_data')` |
+| calculate | facility_district | | `pulldata('facility_data', 'district')` |
+| calculate | facility_type | | `pulldata('facility_data', 'type')` |
+
+---
+
+## Bedste praksis
+
+1. Sørg for, at dit API-endepunkt svarer inden for 1–2 sekunder — langsomme API'er får søgningen til at føles uresponsiv.
+2. Brug `%__input__%` i `post_body`, så API'et kun returnerer matchende resultater og ikke hele datasættet.
+3. Indekser søgefeltet på serversiden (f.eks. Elasticsearch, database-fuldtekstsøgeindeks) for hurtige svar.
+4. Begræns resultater til 20–50 elementer pr. forespørgsel — at returnere tusindvis af resultater modvirker formålet med søgning.
+5. Inkluder et minimumsinputlængdekrav i API'et for at undgå brede forespørgsler på enkeltkarakteriminput.
+
+## Begrænsninger
+
+- Dynamisk søgning kræver netværksforbindelse — det fungerer ikke offline.
+- Pladsholderen `%__input__%` indsættes som den er; rens input på serversiden for at forhindre injektionsangreb.
+- Komplekse `@{func}`-visningsudtryk kan have begrænset understøttelse på tværs af alle rtSurvey-klientversioner.

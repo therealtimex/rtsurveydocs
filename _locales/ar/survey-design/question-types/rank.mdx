@@ -1,0 +1,53 @@
+---
+title: "الترتيب"
+description: "تتيح أسئلة الترتيب للمستجيبين تصنيف مجموعة من الخيارات حسب التفضيل أو الأولوية."
+---
+
+يعرض نوع سؤال `rank` قائمة من الخيارات يجب على المستجيب **سحبها ترتيباً** (أو ترتيبها بطريقة أخرى من الأول إلى الأخير). يخزن النتيجة كقائمة مفصولة بمسافات من قيم الخيارات بالترتيب المحدد، مع الخيار ذي الأولوية الأعلى أولاً.
+
+## مواصفة XLSForm الأساسية
+
+**survey:**
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Rank these needs from most to least important |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| priorities | water | Clean water |
+| priorities | health | Healthcare |
+| priorities | education | Education |
+| priorities | roads | Roads |
+| priorities | electricity | Electricity |
+
+## تنسيق القيمة المخزنة
+
+القيمة المخزنة هي **قائمة مفصولة بمسافات** من قيم الخيارات بالترتيب المرتَّب (الأول = الأولوية الأعلى):
+
+```
+water education health roads electricity
+```
+
+## استخراج المراكز المرتَّبة
+
+استخدم `selected-at()` للحصول على الخيار في مرتبة محددة:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| rank priorities | main_priority | Rank community needs | |
+| calculate | top_priority | | selected-at(`${main_priority}`, 0) |
+| calculate | second_priority | | selected-at(`${main_priority}`, 1) |
+
+## أفضل الممارسات
+
+1. اجعل القائمة قصيرة (3–7 عناصر) — الترتيب يصبح مرهقاً ذهنياً بعد 7–8 خيارات.
+2. أضف نص تلميح يشرح اتجاه الترتيب.
+3. تحقق باستخدام `count-selected(.) = x` إذا كنت بحاجة للتأكد من ترتيب جميع الخيارات.
+
+## القيود
+
+- تتطلب أداة السحب للترتيب شاشة لمس أو ماوس.
+- لا يمكنك الترتيب الجزئي — يجب ترتيب جميع الخيارات.

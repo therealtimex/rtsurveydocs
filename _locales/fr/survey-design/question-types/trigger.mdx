@@ -1,0 +1,91 @@
+---
+title: "Trigger / Acknowledge"
+description: "Les questions trigger affichent une déclaration que l'enquêteur doit explicitement confirmer avant de continuer."
+---
+
+Le type de question `trigger` (également appelé `acknowledge`) affiche une **déclaration avec une case à cocher**. L'enquêteur doit cocher la case pour confirmer qu'il a lu et compris la déclaration avant que le formulaire lui permette de continuer. Aucune valeur de données n'est stockée — uniquement le fait que la case a été cochée.
+
+## Spécification XLSForm de base
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | Le répondant a fourni un consentement éclairé verbal. |
+
+Ou en utilisant l'alias `acknowledge` :
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | Le répondant a fourni un consentement éclairé verbal. |
+
+`trigger` et `acknowledge` sont équivalents — utilisez celui que votre plateforme documente.
+
+## Utilisations
+
+Les questions trigger/acknowledge sont couramment utilisées pour :
+
+1. **Consentement éclairé** — confirmer que l'enquêteur a obtenu le consentement avant d'enregistrer des données sensibles
+2. **Alertes souples** — avertir d'une valeur inhabituelle et exiger une confirmation explicite avant de continuer
+3. **Éléments de liste de contrôle** — confirmer qu'une observation physique a été effectuée (ex. : "J'ai observé la source d'eau directement")
+4. **Instructions** — forcer l'enquêteur à confirmer une instruction de niveau section avant de continuer
+5. **Contrôles de qualité** — signaler des valeurs aberrantes et demander à l'enquêteur de les vérifier
+
+## Exemple d'utilisation
+
+### Confirmation de consentement
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | Le répondant a donné son consentement éclairé verbal pour participer à cette enquête. | yes |
+
+### Alerte souple pour des valeurs aberrantes
+
+Utilisé avec une expression `relevant` pour n'afficher le trigger que lorsqu'une valeur suspecte est saisie :
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Nombre d'enfants | | |
+| trigger | children_confirm | Vous avez saisi `${children}` enfants. Veuillez vérifier avec le répondant et appuyer sur OK pour confirmer. | `${children} > 10` | `${children} > 10` |
+
+### Confirmation d'instruction en début de section
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Section B : Utilisation des terres agricoles. Posez toutes les questions de cette section uniquement au chef de ménage. |
+
+## Rendre le trigger obligatoire
+
+Ajoutez `required: yes` pour empêcher d'avancer tant que la case n'est pas cochée :
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | Tout l'équipement de sécurité est présent et fonctionnel. | yes | Vous devez confirmer avant de continuer. |
+
+## Affichage conditionnel
+
+Afficher le trigger uniquement lorsqu'une condition est remplie :
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | Le ménage a-t-il un puits ? | |
+| trigger | well_observation | Confirmez que vous avez directement observé l'état du puits. | `${has_well} = 'yes'` |
+
+## Différence avec `note`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Affiche du texte | Oui | Oui |
+| Nécessite une interaction | Non | Oui (doit cocher) |
+| Stocke des données | Non | Non (uniquement OK/coché) |
+| Peut bloquer la progression | Non | Oui (avec `required`) |
+
+## Bonnes pratiques
+
+1. Rédigez des étiquettes de trigger concises et orientées vers l'action — l'enquêteur doit pouvoir lire et confirmer en quelques secondes.
+2. Ajoutez toujours `required: yes` lorsque la confirmation est obligatoire.
+3. Utilisez les triggers pour les confirmations de consentement et les vérifications de sécurité où vous avez besoin d'une piste d'audit confirmant que l'enquêteur a bien confirmé.
+4. Combinez avec `relevant` pour les alertes souples conditionnelles afin que le trigger n'apparaisse que lorsqu'une valeur nécessite vérification.
+
+## Limitations
+
+- Les champs trigger ne stockent pas de valeur de données significative — ils enregistrent uniquement que la case a été cochée.
+- Le widget trigger s'affiche comme une simple case à cocher/bouton sur la plupart des clients ; ce n'est pas une signature électronique complète.

@@ -1,0 +1,27 @@
+{
+  "index": {
+    "display": "hidden"
+  },
+  "text": "text",
+  "integer": "integer",
+  "decimal": "decimal",
+  "select-one": "select_one",
+  "select-multiple": "select_multiple",
+  "select-one-from-file": "select_one_from_file",
+  "datetime-date-time": "date / time / datetime",
+  "image": "image",
+  "audio": "audio",
+  "video": "video",
+  "file": "file",
+  "geopoint": "geopoint",
+  "geotrace": "geotrace",
+  "geoshape": "geoshape",
+  "barcode": "barcode",
+  "range": "range",
+  "rank": "rank",
+  "note": "note",
+  "hidden": "hidden",
+  "calculate": "calculate",
+  "trigger": "trigger",
+  "meta": "meta"
+}

@@ -1,0 +1,73 @@
+---
+title: "Range"
+description: "Pitanja tipa range dozvoljavaju ispitanicima da izaberu broj prevlačenjem klizača između definisane minimalne i maksimalne vrednosti."
+---
+
+Tip pitanja `range` prikazuje **klizač** koji dozvoljava ispitanicima da izaberu broj u okviru definisanog minimuma i maksimuma. Idealan je za prikupljanje ocena, skorova zadovoljstva ili bilo kojih numeričkih vrednosti gde želite da vizuelno ograničite opseg.
+
+## Osnovna XLSForm specifikacija
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | satisfaction | Koliko ste zadovoljni uslugom? | start=1 end=5 step=1 |
+
+Kolona `parameters` definiše granice klizača i veličinu koraka:
+
+| Parametar | Opis | Podrazumevano |
+|-----------|------|---------------|
+| `start` | Minimalna vrednost (uključivo) | 0 |
+| `end` | Maksimalna vrednost (uključivo) | 10 |
+| `step` | Priraštaj između važećih vrednosti | 1 |
+
+Za više detalja pogledajte [XLSForm specifikaciju](https://xlsform.org/en/#question-types).
+
+## Upotrebe
+
+Pitanja tipa range se uobičajeno koriste za:
+
+1. Skale zadovoljstva ili ocene (npr. 1–5 ili 0–10)
+2. Numeričke skale u Likertovom stilu
+3. Prikupljanje merenja gde su valjane samo diskretne vrednosti
+4. Starosne grupe ili opsege skorova gde klizač poboljšava upotrebljivost u poređenju sa tekstualnim poljem
+
+## Primer upotrebe
+
+### Osnovna skala ocene
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | overall_rating | Ukupna ocena (0–10) | start=0 end=10 step=1 |
+
+### Decimalni korak
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | weight_kg | Težina (kg) | start=0 end=200 step=0.5 |
+
+### Korišćenje vrednosti u proračunu
+
+| type | name | label | parameters | calculation |
+|------|------|-------|------------|-------------|
+| range | score | Skor testa (0–100) | start=0 end=100 step=5 | |
+| calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
+| note | grade_note | Vaša ocena je: `${grade}` | | |
+
+## Izgled
+
+Tip `range` se podrazumevano prikazuje kao klizač. Za širi raspored na veb formularima:
+
+| type | name | label | parameters | appearance |
+|------|------|-------|------------|------------|
+| range | nps | Koliko je verovatno da ćete nas preporučiti? (0–10) | start=0 end=10 step=1 | horizontal |
+
+## Najbolje prakse
+
+1. Uvek postavite smislene vrednosti `start`, `end` i `step` — ne oslanjajte se na podrazumevane vrednosti.
+2. Označite krajeve skale u koloni `hint` (npr. `hint: 0 = Veoma nezadovoljan, 10 = Veoma zadovoljan`).
+3. Za 5-poene Likertove skale, koristite `start=1 end=5 step=1`.
+4. Koristite `range` umesto `integer` + ograničenje kada je ograničena priroda unosa deo dizajna pitanja.
+
+## Ograničenja
+
+- Widget klizača možda nije idealan za veoma široke opsege (npr. 0–10000).
+- Na mobilnim uređajima, fine vrednosti koraka (npr. `step=0.1`) mogu biti teške za precizno kontrolisanje dodirom.

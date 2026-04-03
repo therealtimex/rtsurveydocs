@@ -1,0 +1,154 @@
+---
+title: "التكرارات المتقدمة"
+description: "أنماط متقدمة لمجموعات التكرار: الأعداد الديناميكية والتكرارات المتداخلة وتلخيص بيانات التكرار والإشارة إلى القيم عبر التكرارات."
+---
+
+تغطي هذه الصفحة الأنماط المتقدمة للعمل مع مجموعات التكرار في rtSurvey. للاطلاع على أساسيات إعداد مجموعة التكرار، راجع [التجميع والتكرارات](../repeats).
+
+---
+
+## عدد التكرارات الديناميكي
+
+بشكل افتراضي، يقرر المعدِّد عدد مرات التكرار. يمكنك تثبيت عدد التكرارات باستخدام `repeat_count`:
+
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Household member | `${num_members}` |
+| text | member_name | Member name | |
+| integer | member_age | Age | |
+| end_repeat | | | |
+
+يعمل التكرار بالضبط `${num_members}` مرة، حيث تم جمع `num_members` مسبقاً في النموذج. لا يمكن للمعدِّد إضافة أو إزالة مثيلات.
+
+---
+
+## الوصول بالفهرس: `indexed-repeat()`
+
+الوصول إلى قيمة حقل مثيل تكرار محدد من **خارج** مجموعة التكرار باستخدام `indexed-repeat(repeatedField, repeatGroup, index)`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+هذا مفيد لبناء حقول الملخص أو الإشارة إلى بيانات العضو "الرئيسي" بعد التكرار.
+
+---
+
+## موضع المثيل الحالي: `index()`
+
+داخل مجموعة تكرار، تُعيد `index()` موضع المثيل الحالي يبدأ من 1. استخدمها لتسمية كل تكرار أو إنشاء معرّفات فريدة:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Plot |
+| note | plot_label | Plot number `${index()}` |
+| text | plot_id | Plot ID |
+| end_repeat | | |
+
+---
+
+## الإشارة إلى الحقول في نفس المثيل
+
+داخل تكرار، استخدم `${fieldname}` للإشارة إلى حقل آخر **في نفس مثيل التكرار**. لا حاجة إلى `indexed-repeat()` داخل نفس الحلقة:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Member | |
+| text | member_name | Name | |
+| integer | member_age | Age | |
+| text | school_name | School name | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## الإشارة إلى الحقول الأصلية من داخل التكرار
+
+يمكن الإشارة إلى الحقول الخارجية (أعلاه) من مجموعة التكرار عادةً بـ `${fieldname}`:
+
+| type | name | label |
+|------|------|-------|
+| text | village | Village name |
+| begin_repeat | plots | Agricultural plot |
+| note | plot_context | Plots in `${village}` |
+| end_repeat | | |
+
+---
+
+## تلخيص بيانات التكرار
+
+استخدم دوال تجميع التكرار **خارج** مجموعة التكرار للتلخيص:
+
+| الدالة | المثال | الوصف |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | عدد المثيلات |
+| `sum(field)` | `sum(${loan_amount})` | مجموع حقل رقمي |
+| `min(field)` | `min(${member_age})` | القيمة الدنيا |
+| `max(field)` | `max(${member_age})` | القيمة القصوى |
+| `join(sep, field)` | `join(', ', ${member_name})` | قائمة مفصولة بفواصل |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | عدد شرطي |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | مجموع شرطي |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | ضم شرطي |
+
+### مثال: ملخص أسرة
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | How many members? | |
+| begin_repeat | members | Member | `${num_members}` |
+| text | member_name | Name | |
+| integer | member_age | Age | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | `${total_members}` members; `${children_count}` under 18. Adults: `${adult_names}` | |
+
+---
+
+## التكرارات المتداخلة
+
+يمكن أن تحتوي مجموعة التكرار على مجموعة تكرار أخرى. استخدم هذا بحذر — تُضيف التكرارات المتداخلة تعقيداً ويمكن أن تكون مُربكة للمعدِّدين.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Household |
+| text | hh_id | Household ID |
+| begin_repeat | hh_members | Member |
+| text | member_name | Member name |
+| end_repeat | | |
+| end_repeat | | |
+
+للإشارة إلى حقل في تكرار خارجي من التكرار الداخلي، استخدم `${fieldname}` — يتحلل إلى أقرب أصل مطابق:
+
+داخل تكرار `hh_members`، يُعيد `${hh_id}` معرّف الأسرة **الحالية**، وليس جميع الأسر.
+
+---
+
+## الترتيب داخل مجموعات التكرار: `rank-index()`
+
+عندما يوجد حقل `rank` داخل تكرار، استخدم `rank-index(instanceNumber, repeatedField)` من الخارج للحصول على الترتيب الترتيبي لمثيل محدد:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` يُعيد فهرس المثيل ذي أعلى نتيجة.
+
+---
+
+## أفضل الممارسات
+
+1. استخدم دائماً `repeat_count` عندما يكون عدد التكرارات معروفاً مسبقاً — يمنع هذا المعدِّدين من إضافة أو إزالة مثيلات عن طريق الخطأ.
+2. اجعل مجموعات التكرار مركّزة — تكرار يحتوي على أكثر من 20 سؤالاً لكل مثيل صعب التنقل.
+3. سمّ مجموعات التكرار بوضوح (مثل `household_members`، وليس `repeat1`) — يظهر الاسم في استدعاءات الدوال والبيانات المصدّرة.
+4. اختبر بالحد الأقصى من المثيلات المتوقعة للتحقق من الأداء.
+5. استخدم مظهر `field-list` على مجموعة التكرار لعرض جميع الحقول على شاشة واحدة لكل مثيل (على الجوال).
+
+---
+
+## القيود
+
+- تتطلب `indexed-repeat()` فهرساً صالحاً (من 1 إلى عدد المثيلات) — الفهارس خارج النطاق تُعيد فارغاً.
+- لا يُنصح بالتكرارات المتداخلة أكثر من مستويين وقد تسبب مشاكل في العرض على بعض العملاء.
+- تعمل دوال التجميع (`sum`، `count`، إلخ) على مجموعة التكرار بأكملها — لا يمكنك تجميع مجموعة فرعية من المثيلات بدون متغيرات `*-if`.

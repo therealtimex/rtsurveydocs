@@ -1,0 +1,111 @@
+---
+title: "Calculate"
+description: ""
+---
+
+Pyetjet calculate në XLSForms dhe rtSurvey përdoren për të kryer llogaritje bazuar në fusha të tjera ose vlera në formularin tuaj. Këto pyetje nuk shfaqen për përdoruesin por ekzekutohen në sfond, duke ruajtur rezultatet e tyre për përdorim të mëvonshëm ose dorëzim.
+
+## Sintaksa
+
+Në XLSForm, pyetja calculate përcaktohet si më poshtë:
+
+| type      | name     | label | calculation |
+|-----------|----------|-------|-------------|
+| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+
+- **type**: Gjithmonë "calculate" për këtë lloj pyetjeje.
+- **name**: Emër unik për pyetjen calculate.
+- **label**: Zakonisht lihet bosh pasi pyetjet calculate nuk shfaqen për përdoruesit.
+- **calculation**: Formula për t'u vlerësuar.
+
+## Përdorimet
+
+Pyetjet calculate përdoren zakonisht për:
+
+1. Kryerja e operacioneve aritmetike
+2. Bashkimi i vargjeve
+3. Zbatimi i logjikës ose funksioneve komplekse
+4. Ruajtja e rezultateve ndërmjetëse për përdorim të mëvonshëm
+
+## Shembuj
+
+### Aritmetika bazë
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | total    | ${price} * ${quantity} |
+```
+
+### Bashkimi i vargjeve
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
+```
+
+### Përdorimi i funksioneve
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
+```
+
+## Përdorimi i avancuar në rtSurvey
+
+### Funksioni pulldata()
+
+rtSurvey mbështet funksionin `pulldata()` në fushat calculate, duke ju lejuar të merrni të dhëna nga skedarët e jashtëm CSV:
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
+```
+
+#### Sintaksa
+
+Sintaksa bazë për pulldata() është:
+
+```
+pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
+```
+
+- `'csv_filename'`: Emri i skedarit CSV (pa shtesën .csv)
+- `'column_to_return'`: Emri i kolonës që përmban të dhënat që dëshironi të merrni
+- `'key_column'`: Emri i kolonës për t'u krahasuar
+- `${matching_value}`: Vlera për të kërkuar në kolonën çelës (shpesh një variabël nga formulari)
+
+#### Shënime të rëndësishme
+
+1. Skedari CSV duhet të ngarkohet bashkë me XLSForm-in tuaj kur vendosni sondazhin.
+2. Përdorni presja si ndarës në skedarin tuaj CSV, jo pikëpresja.
+3. Shmangni presjet brenda fushave të të dhënave tuaja CSV, pasi mund të shkaktojnë probleme analize.
+4. pulldata() mbështet vetëm marrëdhënie 1-me-1. Nëse gjenden disa përputhje, kthen vetëm të parën.
+5. Mund të ketë kufizime në gjatësinë e tekstit që mund të merret (rreth 76 karaktere).
+6. Mund të përdorni pulldata() në kufizime për të validuar hyrjet kundrejt të dhënave CSV.
+
+### Llogaritjet e kushtëzuara
+
+Mund të përdorni deklaratat if() për llogaritjet e kushtëzuara:
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+```
+
+## Praktikat më të mira
+
+1. Përdorni emra kuptimplotë për fushat calculate për të përmirësuar lexueshmërinë e formularit.
+2. Shmangni llogaritjet tepër komplekse në një fushë të vetme; ndajini ato nëse është e nevojshme.
+3. Testoni llogaritjet tuaja tërësisht, veçanërisht kur përdorni formula komplekse ose të dhëna të jashtme.
+4. Mbani mend se fushat calculate ekzekutohen sa herë që formulari vlerësohet, gjë që mund të ndikojë performancën për llogaritje shumë komplekse ose të shumta.
+5. Kur përdorni pulldata(), sigurohuni që skedarët tuaj CSV janë formatuar saktë dhe testoni tërësisht me strukturën tuaj specifike të të dhënave dhe formularit.
+
+## Kufizimet
+
+- Fushat calculate nuk janë të editushme drejtpërdrejt nga përdoruesit.
+- Rezultati i fushës calculate nuk është menjëherë i dukshëm nëse nuk referohet në fushën e shfaqjes ose nuk përdoret në logjikën e formularit.

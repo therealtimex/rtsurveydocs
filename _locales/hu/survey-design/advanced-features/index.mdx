@@ -1,0 +1,83 @@
+---
+title: "Haladó bővítések"
+description: ""
+---
+
+Az rtSurvey `appearance` oszlopa lehetővé teszi a kérdések vizuális megjelenítésének és viselkedésének testreszabását a felmérésekben. Ez a funkció javítja a felhasználói élményt és jelentősen növelheti az adatgyűjtés hatékonyságát. Az rtSurvey támogatja az XLSForm szabványos megjelenési attribútumait, és azokat további lehetőségekkel egészíti ki.
+
+## rtSurvey-specifikus megjelenési bővítések
+
+Az rtSurvey a következő bővítményekkel egészíti ki a szabványos megjelenési lehetőségeket:
+
+### Időbevitel testreszabása
+
+Időbevitelhez használt `text` típusú kérdéseknél:
+
+- `appearance:` - Óra- és percválasztó megjelenítése
+- `appearance: inline` - Az óramegjelenítő ikonként jelenik meg
+- `appearance: inline-1line` - Az óramegjelenítő egysorban jelenik meg
+- `appearance: inline-onlyresult` - Óraikon, amely kiválasztás után eltűnik
+- `appearance: inline-[FORMÁTUM]` - Testreszabott időformátum (pl. `[%H:%M]`, `[%h:%M:%S]`)
+
+### Szín testreszabása
+
+Az rtSurvey lehetővé teszi a színek testreszabását különféle megjelenéseknél:
+
+- `appearance: inline colors("0099FF")` - Ikonszín testreszabása
+- `appearance: inline-1line colors("0000FF","FFFF00")` - Egysoros formátum testreszabott színekkel
+
+### Rácsszerű elrendezés
+
+Az rtSurvey rácselrendezést vezet be kompakt, táblázatszerű megjelenítéshez:
+
+- `appearance: grid` - Csoportokra alkalmazva rácselrendezést hoz létre
+
+### Összecsukható csoportok
+
+- `appearance: collapsible` - Kinyitható/becsukható csoportokat hoz létre
+
+## A megjelenés használatának bevált módszerei
+
+1. **Következetesség**: Következetesen használja a megjelenési attribútumokat az egész felmérésben.
+2. **Mobil vs. web**: Vegye figyelembe, hogyan jelennek meg különböző eszközökön és platformokon.
+3. **Teljesítmény**: Legyen óvatos a betöltést esetleg lelassító megjelenési attribútumokkal.
+4. **Felhasználói élmény**: Válasszon olyan megjelenést, ami megkönnyíti az adatbevitelt.
+5. **Tesztelés**: Mindig tesztelje az űrlapot a céleszközökön.
+
+## Haladó technikák
+
+### Megjelenési beállítások kombinálása
+
+Egyes megjelenési attribútumok kombinálhatók összetettebb elrendezésekhez:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Válasszon egyet: | minimal compact |
+```
+
+### Dinamikus megjelenés
+
+Az rtSurvey lehetővé teszi az űrlap logikáján alapuló dinamikus megjelenési változtatásokat:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Adja meg az időpontot: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Mobilalkalmazás szempontjai
+
+- Egyes megjelenési beállítások (pl. `quick`, `signature`) csak mobileszközökre vonatkoznak.
+- Tesztelje alaposan Android és iOS rendszereken az egységes viselkedés érdekében.
+
+## Ismert korlátozások
+
+- Az összetett megjelenési beállítások nem feltétlenül jelennek meg egyformán minden platformon.
+- Egyes haladó rtSurvey-megjelenések offline módban esetleg nem támogatottak.
+
+## Megjelenési problémák hibaelhárítása
+
+1. **Megjelenés nem érvényesül**: Ellenőrizze a megjelenési oszlop elírásait.
+2. **Következetlen megjelenítés**: Ellenőrizze a kompatibilitást a kérdéstípussal és a platformmal.
+3. **Teljesítményproblémák**: Fontolja meg az összetett megjelenési beállítások egyszerűsítését, különösen nagy felmérések esetén.

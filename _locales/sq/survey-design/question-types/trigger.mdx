@@ -1,0 +1,91 @@
+---
+title: "Trigger / Acknowledge"
+description: "Pyetjet trigger shfaqin deklaratë që numëruesi duhet ta pranojë në mënyrë eksplicite para se të vazhdojë."
+---
+
+Lloji i pyetjes `trigger` (i quajtur gjithashtu `acknowledge`) shfaq **deklaratë me kutia zgjedhjeje**. Numëruesi duhet ta shënojë kutinë e zgjedhjes për të konfirmuar se ka lexuar dhe kuptuar deklaratën para se formulari t'i lejojë të vazhdojë. Asnjë vlerë e të dhënave nuk ruhet — vetëm nëse kutia e zgjedhjes u shënua.
+
+## Specifikimi bazë XLSForm
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | Të anketuari ka dhënë pëlqim të informuar verbal. |
+
+Ose duke përdorur pseudonimin `acknowledge`:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | Të anketuari ka dhënë pëlqim të informuar verbal. |
+
+Të dy `trigger` dhe `acknowledge` janë ekuivalentë — përdorni cilitdo që dokumenton platforma juaj.
+
+## Përdorimet
+
+Pyetjet trigger/acknowledge përdoren zakonisht për:
+
+1. **Pëlqimi i informuar** — konfirmoni se numëruesi mori pëlqim para se të regjistrojë të dhëna të ndjeshme
+2. **Alarme të buta** — paralajmërojnë për vlerë të pazakontë dhe kërkojnë konfirmim eksplicit para se të vazhdojë
+3. **Artikujt e listës kontrolluese** — konfirmojnë se vëzhgimi fizik u krye (p.sh., "E kam vëzhguar burimin e ujit drejtpërdrejt")
+4. **Udhëzimet** — detyroni numëruesin të pranojë udhëzimin e nivelit të seksionit para se të vazhdojë
+5. **Kontrollet e cilësisë** — shënoni vlerat e jashtme dhe kërkoni nga numëruesi t'i verifikojë
+
+## Shembull i përdorimit
+
+### Pranimi i pëlqimit
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | Të anketuari ka dhënë pëlqim të informuar verbal për të marrë pjesë në këtë sondazh. | yes |
+
+### Alarm i butë për vlera të jashtme
+
+Përdoret bashkë me shprehje `relevant` për të treguar trigger-in vetëm kur futet vlerë e dyshimtë:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Numri i fëmijëve | | |
+| trigger | children_confirm | Keni futur `${children}` fëmijë. Ju lutemi verifikoni me të anketuarin dhe trokitni OK për të konfirmuar. | `${children} > 10` | `${children} > 10` |
+
+### Pranimi i udhëzimit në fillim të seksionit
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Seksioni B: Përdorimi i Tokës Bujqësore. Bëni të gjitha pyetjet në këtë seksion vetëm kryetarit të familjes. |
+
+## Detyrimi i trigger-it si i detyrueshëm
+
+Shtoni `required: yes` për të parandaluar avancimin deri sa kutia të shënohet:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | Të gjitha pajisjet e sigurisë janë të pranishme dhe funksionale. | yes | Duhet të konfirmoni para se të vazhdoni. |
+
+## Shfaqja e kushtëzuar
+
+Tregoni trigger-in vetëm kur plotësohet kushti:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | A ka familja pus? | |
+| trigger | well_observation | Konfirmoni që keni vëzhguar drejtpërdrejt gjendjen e pusit. | `${has_well} = 'yes'` |
+
+## Dallimi nga `note`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Shfaq tekst | Po | Po |
+| Kërkon ndërveprim | Jo | Po (duhet shënuar) |
+| Ruan të dhëna | Jo | Jo (vetëm OK/shënuar) |
+| Mund të bllokojë progresin | Jo | Po (me `required`) |
+
+## Praktikat më të mira
+
+1. Mbajeni etiketat trigger të shkurtra dhe vepruese — numëruesi duhet të jetë në gjendje të lexojë dhe konfirmojë në sekonda.
+2. Gjithmonë shtoni `required: yes` kur pranimi është i detyrueshëm.
+3. Përdorni trigger-ët për kontrollet e pëlqimit dhe sigurisë ku keni nevojë për gjurmë auditimi që numëruesi konfirmoi.
+4. Kombinoni me `relevant` për alarme të buta kushtëzuara kështu trigger-i shfaqet vetëm kur vlera duhet verifikuar.
+
+## Kufizimet
+
+- Fushat trigger nuk ruajnë vlerë kuptimplote të të dhënave — ato regjistrojnë vetëm se kutia u shënua.
+- Widget-i trigger paraqitet si kutia zgjedhjeje/buton e thjeshtë në shumicën e klientëve; nuk është nënshkrim elektronik i plotë.

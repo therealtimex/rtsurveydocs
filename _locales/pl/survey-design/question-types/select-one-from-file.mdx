@@ -1,0 +1,93 @@
+---
+title: "Select from file"
+description: "select_one_from_file i select_multiple_from_file dynamicznie ładują opcje z zewnętrznego pliku CSV lub XML dołączonego do formularza."
+---
+
+import { Callout } from 'nextra/components'
+
+`select_one_from_file` i `select_multiple_from_file` działają jak `select_one` i `select_multiple`, ale zamiast definiowania opcji w **arkuszu choices**, opcje są ładowane z **zewnętrznego pliku CSV lub XML** dołączonego do formularza. Jest to przydatne, gdy lista opcji jest bardzo długa, często się zmienia lub wymaga aktualizacji bez przebudowywania całego formularza.
+
+## Podstawowa specyfikacja XLSForm
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | Wybierz placówkę ochrony zdrowia |
+| select_multiple_from_file crops.csv | crops | Jakie uprawy prowadzi gospodarstwo? |
+
+Nazwa pliku po nazwie typu musi odpowiadać nazwie pliku dołączonego podczas przesyłania formularza.
+
+## Format pliku CSV
+
+Plik CSV musi zawierać co najmniej dwie kolumny: `name` (przechowywana wartość) i `label` (wyświetlany tekst). Możesz dodać dowolną liczbę dodatkowych kolumn do filtrowania.
+
+**health_facilities.csv:**
+
+```
+name,label,district,type
+HF001,Nairobi Central Clinic,Nairobi,clinic
+HF002,Westlands Health Centre,Nairobi,health_centre
+HF003,Kisumu District Hospital,Kisumu,hospital
+```
+
+## Filtrowanie opcji
+
+Użyj kolumny `choice_filter`, aby wyświetlać tylko opcje pasujące do bieżącego kontekstu. Odwołuj się do kolumn CSV bezpośrednio po ich nazwie (bez `${}`):
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | Wybierz powiat | |
+| select_one_from_file health_facilities.csv | facility | Wybierz placówkę | district = `${district}` |
+
+W tym przykładzie wyświetlane są tylko placówki w wybranym powiecie. `district` w `choice_filter` odnosi się do kolumny `district` w pliku CSV; `${district}` odnosi się do pola formularza o nazwie `district`.
+
+## Zastosowania
+
+Pytania select-from-file są powszechnie stosowane do:
+
+1. **Długich list opcji** — placówki ochrony zdrowia, szkoły, wsie, listy gatunków (setki lub tysiące pozycji)
+2. **Często aktualizowanych list** — gdy lista główna zmienia się między rundami badań, aktualizuj tylko plik CSV bez przebudowywania formularza
+3. **Wspólnych danych referencyjnych** — jeden plik CSV używany w wielu formularzach
+4. **Filtrowanych kaskadowych list** — ładuj wszystkie regiony/powiaty/wsie w jednym pliku, a następnie filtruj według wyboru nadrzędnego
+
+## Dołączanie pliku
+
+Podczas przesyłania formularza do rtSurvey dołącz plik CSV jako **załącznik multimedialny**. Nazwa pliku w definicji formularza musi dokładnie odpowiadać nazwie pliku załącznika.
+
+<Callout type="warning">
+Nazwy plików są rozróżniające wielkość liter. `Health_Facilities.csv` i `health_facilities.csv` są traktowane jako różne pliki.
+</Callout>
+
+## Używanie `choice-label()` z from-file
+
+Aby wyświetlić etykietę wybranej opcji w polu note lub calculate:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | Wybierz placówkę | |
+| calculate | facility_label | | choice-label(`${facility}`, `${facility}`) |
+| note | summary | Wybrana placówka: `${facility_label}` | |
+
+## Najlepsze praktyki
+
+1. Utrzymuj pliki CSV poniżej 5 000 wierszy dla dobrej wydajności na urządzeniach mobilnych.
+2. Zawsze uwzględniaj kolumny `name` i `label` — dodatkowe kolumny są opcjonalne.
+3. W przypadku kaskadowych list użyj jednego pliku CSV z kolumną nadrzędną i filtruj za pomocą `choice_filter`.
+4. Wersjonuj nazwy plików CSV (np. `facilities_v3.csv`) przy wprowadzaniu przełomowych zmian w strukturze kolumn.
+5. Starannie testuj wyrażenia filtrujące — literówka w `choice_filter` spowoduje ciche nie wyświetlanie żadnych opcji.
+
+## Ograniczenia
+
+- Bardzo duże pliki CSV (ponad 10 000 wierszy) mogą spowolnić ładowanie formularza, szczególnie na słabszych urządzeniach.
+- Pliki CSV muszą być przesyłane razem z formularzem — nie mogą być pobierane z adresu URL w czasie rzeczywistym (do dynamicznych wyszukiwań użyj `search()` lub `pulldata()`).
+- `select_multiple_from_file` jest mniej powszechnie obsługiwany w różnych klientach — przed użyciem zweryfikuj kompatybilność.
+
+## Porównanie z `search()`
+
+| | `select_one_from_file` | Wygląd `search()` |
+|--|----------------------|----------------------|
+| Źródło opcji | Dołączony plik CSV/XML | Zapytanie do bazy danych po stronie serwera |
+| Działa offline | Tak (plik jest dołączony) | Wymaga połączenia |
+| Liczba opcji | Ograniczona pamięcią urządzenia | Nieograniczona (stronicowanie) |
+| Dane w czasie rzeczywistym | Nie | Tak |
+
+W przypadku dużych, często zmienianych lub serwerowych zestawów danych zapoznaj się z [Dynamicznym wyszukiwaniem](../advanced-extension/dynamic-search).

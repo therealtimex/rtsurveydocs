@@ -1,0 +1,77 @@
+---
+title: "Geopoint"
+description: "Geopoint soruları, anketin bir parçası olarak coğrafi koordinatları (enlem, boylam, irtifa ve doğruluk) yakalar."
+---
+
+XLSForm'larda ve rtSurvey'de geopoint soru türü, cihazın GPS'ini veya diğer konum hizmetlerini kullanarak coğrafi koordinat toplamayı sağlar. Bu özellik, anket yanıtlarını haritada göstermek, saha faaliyetlerini takip etmek veya verileri belirli konumlarla ilişkilendirmek için özellikle kullanışlıdır.
+
+## Temel XLSForm Tanımı
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geopoint | location    | Mevcut konumu kaydedin          |
+
+Temel geopoint soru türü hakkında daha fazla ayrıntı için [XLSForm spesifikasyonuna](https://xlsform.org/en/#question-types) bakın.
+
+## Kullanım Alanları
+
+Geopoint soruları yaygın olarak şunlar için kullanılır:
+
+1. Anket yanıtlarını coğrafi olarak haritalama
+2. Saha faaliyetlerinin konumunu doğrulama
+3. Sayımcıların rotasını takip etme
+4. Çevresel veya sosyal verileri belirli konumlarla ilişkilendirme
+5. Coğrafi analizlerde mesafe veya alan hesaplama
+
+## En İyi Uygulamalar
+
+1. Cihazda konum hizmetlerinin etkin olduğundan ve izinlerin verildiğinden emin olun.
+2. GPS'in doğru konum alması için yeterli süre bekleyin.
+3. Gizlilik etkilerini göz önünde bulundurun ve katılımcıları konum verisi toplama konusunda bilgilendirin.
+4. Konum verisi için bağlam sağlamak amacıyla diğer soru türleriyle birlikte kullanın.
+
+## Örnek Kullanım
+
+Bir ankette geopoint sorusunu nasıl kullanabileceğinize dair bir örnek:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geopoint | sample_location| Numune alma konumunu kaydedin              | Daha iyi GPS sinyali için açık alanda durun |
+
+## rtSurvey Uzantıları
+
+XLSForm için temel geopoint soru tanımı basit olmakla birlikte, rtSurvey ek özellikler veya özelleştirmeler sunabilir:
+
+1. Yakalanan konumun görsel doğrulaması için harita entegrasyonu
+2. Doğruluk eşik ayarları
+3. Koordinatları manuel olarak girme seçeneği
+4. Uzak bölgeler için çevrimdışı haritalarla entegrasyon
+
+## Veri Biçimi
+
+Geopoint verisi genellikle dört boşlukla ayrılmış değer dizisi olarak saklanır:
+
+```
+enlem boylam irtifa dogruluk
+```
+
+Örneğin:
+```
+41.40338 2.17403 30.5 10
+```
+
+## Analiz için Değerlendirmeler
+
+Geopoint soruları kullanırken şunları göz önünde bulundurun:
+
+1. Coğrafi verilerin nasıl görselleştirileceği (örn. haritalama yazılımı)
+2. Toplanan koordinatların doğruluğu ve bunun analiz üzerindeki etkisi
+3. Konum verilerinin işlenmesi için gizlilik ve veri koruma önlemleri
+4. GIS (Coğrafi Bilgi Sistemi) araçlarıyla potansiyel entegrasyon
+
+## Sınırlamalar
+
+- Doğruluk cihaza ve çevre koşullarına bağlı olarak değişebilir.
+- GPS sinyalleri iç mekanlarda veya engeller olan bölgelerde zayıf veya kullanılamaz olabilir.
+- Konum verisi toplamak cihazın pil ömrünü önemli ölçüde etkileyebilir.
+- Kesin konum verisi toplamayla ilgili gizlilik endişeleri olabilir.

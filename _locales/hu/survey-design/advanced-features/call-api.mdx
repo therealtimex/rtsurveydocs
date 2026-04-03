@@ -1,0 +1,125 @@
+---
+title: "API hívása"
+description: "Az API-hívás lehetővé teszi, hogy a felmérés adatokat kérjen le egy külső webszolgáltatástól, és a választ mezők feltöltésére vagy válaszok ellenőrzésére használja."
+---
+
+Az **API-hívás** funkció lehetővé teszi, hogy egy felmérési mező HTTP-kérést küldjön egy külső szolgáltatásnak, és a választ számított érték tárolására vagy felhasználói bevitel ellenőrzésére használja. Ez lehetővé teszi a valós idejű kereséseket, azonosító ellenőrzését, vonalkód-lekéréseket és bármilyen egyéb szerver oldali ellenőrzést az adatgyűjtés során.
+
+Két függvény érhető el:
+
+- `callapi()` — értéket kér le egy API-ból, és egy `calculate` vagy `text` mezőben tárolja
+- `callapi-verify()` — API-t hív meg, és megakadályozza a továbblépést, ha a válasz nem felel meg a várt értéknek (a `constraint` mezőben használatos)
+
+---
+
+## `callapi()` — API-válasz lekérése és tárolása
+
+### Szintaxis
+
+Helyezze a `callapi()` függvényt egy `calculate` vagy `text` mező **`calculation`** oszlopába:
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### Paraméterek
+
+| # | Paraméter | Leírás |
+|---|-----------|--------|
+| 1 | `method` | HTTP-metódus: `'GET'` vagy `'POST'` |
+| 2 | `url` | API-végpont URL-je |
+| 3 | `allowed_auto` | `1` automatikus híváshoz a mező elérésekor; `0` manuális trigger gombhoz |
+| 4 | `max_retry` | Maximális újrapróbálkozási kísérletek száma hiba esetén |
+| 5 | `no_overwrite` | `1` a meglévő érték megtartásához, ha a mező már rendelkezik értékkel; `0` az állandó felülíráshoz |
+| 6 | `extract_expr` | JSONPath-kifejezés a kívánt érték kinyeréséhez a válaszból (pl. `$.data.name`) |
+| 7 | `timeout` | Kérés időtúllépése milliszekundumban |
+| 8 | `lifetime` | Mennyi ideig (ms) érvényes a gyorsítótárazott válasz újralekérés előtt |
+| 9 | `response_q` | Mező neve a nyers HTTP-válaszkód tárolásához (pl. `${response_status}`) |
+| 10 | `call_type` | *(Opcionális)* Speciális hívási mód: `'lazy-upload'` vagy `'lazy-upload-multiple'` |
+| 11 | `post_body` | *(Opcionális)* POST törzs-karakterlánc. Hivatkozzon űrlapmezőkre `##mezőnév##` formátumban |
+
+### Példa: GET-kérés háztartás ID alapján
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | Háztartás ID | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+| note | hh_display | Háztartás: `${hh_name}` | | |
+
+### Példa: POST-kérés JSON törzzsel
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+A `post_body`-ban a `##mezőnév##` jelölés segítségével illesztheti be bármely űrlapmező aktuális értékét.
+
+### Megjelenés: `callapi`
+
+Adja hozzá a `callapi` értéket a mező `appearance` oszlopához az API-hívás integrációjának engedélyezéséhez:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | api_result | | callapi | `callapi('GET', ...)` |
+
+Ha az `allowed_auto` értéke `0`, az rtSurvey egy **"Lekérés" gombot** jelenít meg, amelyet a kérdező manuálisan nyom meg.
+
+---
+
+## `callapi-verify()` — Érték ellenőrzése API-val
+
+A `callapi-verify()` megakadályozza egy mező beküldését, amíg az API meg nem erősíti a megadott érték érvényességét. Használja a **`constraint`** oszlopban.
+
+### Szintaxis
+
+```
+callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
+```
+
+### Paraméterek
+
+| # | Paraméter | Leírás |
+|---|-----------|--------|
+| 1 | `method` | HTTP-metódus: `'GET'` vagy `'POST'` |
+| 2 | `url` | Ellenőrző API-végpont |
+| 3 | `extract_expr` | JSONPath a várt érték kinyeréséhez a válaszból |
+| 4 | `match_expr` | Kifejezés, amely összehasonlítja a kinyert értéket a mező értékével (pl. `$.status = 'valid'`) |
+| 5 | `timeout` | Kérés időtúllépése milliszekundumban |
+| 6 | `constraint_mode` | `'soft'` csak figyelmeztetéshez; `'hard'` a továbblépés blokkolásához |
+| 7 | `post_body` | *(Opcionális)* POST törzs `##mezőnév##` helyettesítésekkel |
+| 8 | `message` | *(Opcionális)* Hibaüzenet. Támogatja a többnyelvűséget: `<en>Invalid!</en><vi>Không hợp lệ!</vi>` |
+
+### Példa: Vonalkód ellenőrzése eszköznyilvántartással szemben
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| barcode | asset_code | Olvassa be az eszköz vonalkódját | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` | Az eszköz nem található a nyilvántartásban |
+
+### Megjelenés: `callapi-verify(...)`
+
+A `callapi-verify()` korlátot tartalmazó mező `appearance` oszlopának `callapi-verify(params)` vagy `callapi-verify(dynamicParams)` értéket kell tartalmaznia, hogy jelezze az rtSurvey-nek, hogy ez a mező API-ellenőrzést használ.
+
+---
+
+## App API-adatok használata callapi-val együtt
+
+Kombinálja a `callapi()`-t és a `pulldata('app-api', 'user.token')` függvényt, hogy a hitelesített felhasználó tokenét beilleszthesse az API-kérésbe:
+
+```
+callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, '', '',
+  concat('{"token":"', pulldata('app-api','user.token'), '","id":"##item_id##"}'))
+```
+
+## Bevált módszerek
+
+1. Mindig állítson be ésszerű `timeout` értéket (5000–15000 ms) – ne használjon 0-t vagy nagyon magas értékeket.
+2. Az `allowed_auto=0` értéket alkalmazza olyan ellenőrzéseknél, amelyeket a kérdezőnek tudatosan kell elindítania (pl. személyazonosság-ellenőrzések).
+3. Állítsa be a `no_overwrite=1` értéket, ha a mezőt esetleg később szerkesztik, és nem szeretné, hogy az újralekérés felülírja a manuális javításokat.
+4. Használjon `extract_expr` értéket specifikus JSONPath-szal, ahelyett hogy a nyers válasszövegre támaszkodna.
+5. Tesztelje az API-hívásokat offline módban – a callapi elegánsan meghibásodik és hibaüzenetet jelenít meg, de az űrlapot a nem kritikus mezőknél mégis ki kell tudni tölteni.
+
+## Korlátozások
+
+- Hálózati kapcsolatot igényel a hívás időpontjában – kapcsolat nélkül a hívások meghiúsulnak.
+- Az API-válaszoknak JSON formátumban kell lenniük – az XML- vagy egyszerű szöveges válaszok további feldolgozást igényelnek.
+- Nagy hívásgyakoriság (pl. ismétlési példányonként egy API-hívás) lelassíthatja az űrlap navigációját.

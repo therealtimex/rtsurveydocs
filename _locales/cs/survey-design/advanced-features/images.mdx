@@ -1,0 +1,89 @@
+---
+title: "Pokročilé obrázky"
+description: "Pokročilé funkce obrázků v rtSurvey: vodoznaky, zobrazení mediální mřížky a anotace obrázků."
+---
+
+Kromě standardního typu otázky `image` poskytuje rtSurvey rozšíření pro **vodoznaky** pořízených fotografií a zobrazování více obrázků v **mediální mřížce**. To je užitečné pro průzkumy založené na důkazech, kde fotografie musí být označeny identitou enumerátora nebo metadaty průzkumu, a pro vizuální kontrolní rozhraní.
+
+---
+
+## Vodoznak
+
+Funkce vodoznaku překryje text nebo obrázek na pořízené fotografii před jejím uložením. Používá se pro označení terénních fotografií datem, jménem enumerátora, GPS polohou nebo jinými daty průzkumu — čímž je obtížnější vydávat předem existující fotografie za čerstvě pořízené důkazy.
+
+### Nastavení
+
+Použijte `watermark()` ve sloupci **`calculation`** pole `image` v kombinaci se vzhledem `callapi`:
+
+```
+watermark(type, size, distance, color, shadow, rotate, blur)
+```
+
+| Parametr | Popis |
+|----------|-------|
+| `type` | `'text'` pro textový vodoznak; `'file'` pro obrázkový vodoznak |
+| `size` | Velikost písma v pixelech (text) nebo velikost vodoznaku jako % šířky obrázku (soubor) |
+| `distance` | Mezera mezi opakujícími se dlaždicemi vodoznaku (pixely) |
+| `color` | Barva textu (CSS barva nebo hex). Nepoužívá se pro typ `file` |
+| `shadow` | Barva stínu (CSS barva nebo hex) |
+| `rotate` | Úhel otočení ve stupních (např. `45` pro diagonální) |
+| `blur` | Neprůhlednost vodoznaku (0 = neviditelný, 100 = plně neprůhledný) |
+
+### Příklad textového vodoznaku
+
+Překrýt jméno enumerátora a dnešní datum diagonálně přes každou pořízenou fotografii:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | wm_text | | | `concat(pulldata('app-api', 'user.name'), ' | ', format-date(today(), '%d/%m/%Y'))` |
+| image | site_photo | Vyfotografujte místo | watermark | `watermark('text', 20, 60, '#ffffff', '#000000', 45, 40)` |
+
+Text vodoznaku je převzat z `${wm_text}`. Nastavte pole textu vodoznaku **před** polem obrázku ve formuláři.
+
+### Příklad vodoznaku obrázku/loga
+
+Překrýt logo organizace (přiložené jako mediální soubor pojmenovaný `logo.png`):
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| image | evidence_photo | Vyfotografujte důkaz | watermark | `watermark('file', 25, 80, '', '#000000', 0, 50)` |
+
+### Zpět/vpřed
+
+Editor vodoznaku podporuje zpět a vpřed — enumerátoři mohou procházet historii úprav před potvrzením fotografie.
+
+### Dlaždice vodoznaku
+
+Vodoznak se automaticky opakuje (dlaždice) přes celý obrázek. Parametr `distance` řídí mezeru mezi dlaždicemi; `rotate` řídí úhel každé dlaždice.
+
+---
+
+## Widget mediální mřížky
+
+Widget mediální mřížky zobrazuje kolekci mediálních souborů (obrázky, zvuk, video) v mřížkovém rozvržení, což umožňuje recenzentům nebo enumerátorům vizuálně procházet zachycené soubory.
+
+Tento widget je aktivován vzhledem `mediagridwidget` a obvykle se používá na polích `note` nebo `calculate` pro zobrazení dříve zachycených médií ze skupiny opakování.
+
+### Příklad: Zobrazení všech fotografií z opakování jako mřížky
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | photo_list | | | `join(' ', ${site_photo})` |
+| note | photo_review | Zkontrolujte pořízené fotografie | mediagridwidget | |
+
+---
+
+## Osvědčené postupy pro fotografie s vodoznakem
+
+1. Vždy vypočítejte text vodoznaku v poli `calculate` **nad** polem obrázku, aby byl dostupný při pořizování fotografie.
+2. Použijte úhel otočení (např. 45°) pro ztížení oříznutí vodoznaku.
+3. Nastavte neprůhlednost (`blur`) mezi 30–60% — dostatečně vysokou pro čitelnost, dostatečně nízkou, aby nezakrýval objekt fotografie.
+4. Zahrňte jméno enumerátora, datum a GPS souřadnice do textu vodoznaku pro maximalizaci auditní hodnoty.
+5. Testujte vykreslování vodoznaku na nejslabším zařízení ve vaší flotile — vodoznakování založené na canvas může být pomalé na starším hardwaru.
+
+## Omezení
+
+- Vodoznakování je prováděno na straně klienta pomocí HTML5 Canvas API — vyžaduje schopný prohlížeč nebo mobilní WebView.
+- Velmi vysokorozlišovací fotografie mohou trvat několik sekund pro vodoznakování na zařízeních nižší třídy.
+- Vodoznaky jsou začleněny do souboru obrázku — nelze je po odeslání odebrat bez editace obrázku.
+- Typ vodoznaku `file` vyžaduje přiložení obrázku loga jako mediálního souboru s přesně očekávaným názvem souboru.

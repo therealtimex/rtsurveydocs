@@ -1,0 +1,83 @@
+---
+title: "Edistyneet laajennukset"
+description: ""
+---
+
+`appearance`-sarake rtSurveyssa mahdollistaa kysymysten visuaalisen esittämistavan ja toiminnan mukauttamisen kyselyissäsi. Tämä ominaisuus parantaa käyttökokemusta ja voi merkittävästi tehostaa tiedonkeruuta. rtSurvey tukee XLSFormin vakioulkoasuattribuutteja ja laajentaa niitä lisäasetuksilla.
+
+## rtSurvey-kohtaiset ulkoasulaajennukset
+
+rtSurvey laajentaa vakioulkoasuvaihtoehtoja seuraavilla:
+
+### Aikasyötteen mukauttaminen
+
+Aikasyötteeseen käytetyille `text`-tyyppisille kysymyksille:
+
+- `appearance:` - Näyttää kellon tuntien ja minuuttien valintaan
+- `appearance: inline` - Näyttää kellon ikonina
+- `appearance: inline-1line` - Näyttää kellon yksirivisessä muodossa
+- `appearance: inline-onlyresult` - Näyttää kello-ikonin, katoaa valinnan jälkeen
+- `appearance: inline-[FORMAT]` - Mukauttaa aikamuodon näyttämistä (esim. `[%H:%M]`, `[%h:%M:%S]`)
+
+### Värin mukauttaminen
+
+rtSurvey mahdollistaa eri ulkoasujen värin mukauttamisen:
+
+- `appearance: inline colors("0099FF")` - Mukauttaa ikonin värin
+- `appearance: inline-1line colors("0000FF","FFFF00")` - Mukauttaa värit yksirivisessä muodossa
+
+### Ruudukkoasettelu
+
+rtSurvey esittelee ruudukkoasettelun kompaktille, taulukon kaltaiselle esittämiselle:
+
+- `appearance: grid` - Sovelletaan ryhmiin ruudukkoasettelun luomiseksi
+
+### Tiivistettävät ryhmät
+
+- `appearance: collapsible` - Luo laajennettavia/tiivistettäviä ryhmiä
+
+## Parhaat käytännöt ulkoasun käytössä
+
+1. **Johdonmukaisuus**: Käytä ulkoasuattribuutteja johdonmukaisesti koko kyselyssä yhtenäisen ulkoasun saavuttamiseksi.
+2. **Mobiili vs. web**: Harkitse miten ulkoasut renderöityvät eri laitteilla ja alustoilla.
+3. **Suorituskyky**: Ole varovainen ulkoasuattribuuttien kanssa, jotka saattavat hidastaa lomakkeen latautumista (esim. `table-list` suurille ryhmille).
+4. **Käyttökokemus**: Valitse ulkoasut, jotka tekevät tietojensyötöstä helpompaa ja intuitiivisempaa vastaajille.
+5. **Testaus**: Testaa aina lomakkeesi kohdejaitteilla varmistaaksesi ulkoasujen toimivuuden.
+
+## Edistyneet tekniikat
+
+### Ulkoasujen yhdistäminen
+
+Joitain ulkoasuattribuutteja voidaan yhdistää monimutkaisempien asettelujen saavuttamiseksi:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Valitse yksi: | minimal compact |
+```
+
+### Dynaamiset ulkoasut
+
+rtSurvey mahdollistaa dynaamiset ulkoasumuutokset lomakelogiikan perusteella:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Anna aika: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Mobiilisovelluksen huomioiminen
+
+- Jotkut ulkoasut (esim. `quick`, `signature`) ovat mobiililaitekohtaisia.
+- Testaa perusteellisesti sekä Androidilla että iOS:llä yhdenmukaisen toiminnan varmistamiseksi.
+
+## Tunnetut rajoitukset
+
+- Monimutkaiset ulkoasut eivät välttämättä renderöidy identtisesti kaikilla alustoilla.
+- Jotkut edistyneet rtSurvey-ulkoasut eivät välttämättä tue offline-tilaa.
+
+## Ulkoasuongelmien vianmääritys
+
+1. **Ulkoasua ei sovelleta**: Tarkista ulkoasu-sarakkeessa olevat kirjoitusvirheet.
+2. **Epäjohdonmukainen renderöinti**: Tarkista yhteensopivuus kysymystyypin ja alustan kanssa.
+3. **Suorituskykyongelmat**: Harkitse monimutkaisten ulkoasujen yksinkertaistamista erityisesti suurille kyselyille.

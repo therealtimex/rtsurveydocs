@@ -1,0 +1,154 @@
+---
+title: "Përsëritjet e avancuara"
+description: "Modele të avancuara për grupet e përsëritjes: numërime dinamike, përsëritje të ndërfutura, përmbledhja e të dhënave të përsëritjes dhe referimi i vlerave nëpër përsëritje."
+---
+
+Kjo faqe mbulon modelet e avancuara për të punuar me grupet e përsëritjes në rtSurvey. Për bazat e konfigurimit të grupit të përsëritjes, shikoni [Grupimi dhe Përsëritjet](../repeats).
+
+---
+
+## Numërimi dinamik i përsëritjes
+
+Si parazgjedhje, numëruesi vendos sa herë të përsëritet. Mund të fiksoni numrin e përsëritjeve duke përdorur `repeat_count`:
+
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Anëtari i familjes | `${num_members}` |
+| text | member_name | Emri i anëtarit | |
+| integer | member_age | Mosha | |
+| end_repeat | | | |
+
+Përsëritja ekzekutohet saktësisht `${num_members}` herë, ku `num_members` u mblodh më herët në formular. Numëruesi nuk mund të shtojë ose heqë instanca.
+
+---
+
+## Aksesi me indeks: `indexed-repeat()`
+
+Aksesoni vlerën e fushës së instancës specifike të përsëritjes nga **jashtë** grupit të përsëritjes duke përdorur `indexed-repeat(repeatedField, repeatGroup, index)`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+Kjo është e dobishme për ndërtimin e fushave përmbledhëse ose referimin e të dhënave të anëtarit "kryesor" pas përsëritjes.
+
+---
+
+## Pozicioni aktual i instancës: `index()`
+
+Brenda grupit të përsëritjes, `index()` kthen pozicionin e instancës aktuale bazuar në 1. Përdoreni për të etiketuar çdo përsëritje ose krijuar identifikues unikë:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Parcela |
+| note | plot_label | Numri i parcelës `${index()}` |
+| text | plot_id | ID e parcelës |
+| end_repeat | | |
+
+---
+
+## Referimi i fushave në të njëjtën instancë
+
+Brenda përsëritjes, përdorni `${fieldname}` për të referuar fushën tjetër **në të njëjtën instancë të përsëritjes**. Nuk nevojitet `indexed-repeat()` brenda të njëjtës lak:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Anëtari | |
+| text | member_name | Emri | |
+| integer | member_age | Mosha | |
+| text | school_name | Emri i shkollës | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## Referimi i fushave prind nga brenda përsëritjes
+
+Fushat jashtë (mbi) grupin e përsëritjes mund të referohen normalisht me `${fieldname}`:
+
+| type | name | label |
+|------|------|-------|
+| text | village | Emri i fshatit |
+| begin_repeat | plots | Parcelë bujqësore |
+| note | plot_context | Parcela në `${village}` |
+| end_repeat | | |
+
+---
+
+## Përmbledhja e të dhënave të përsëritjes
+
+Përdorni funksionet e agregatit të përsëritjes **jashtë** grupit të përsëritjes për të përmbledhur:
+
+| Funksioni | Shembulli | Përshkrimi |
+|-----------|-----------|------------|
+| `count(group)` | `count(${household_members})` | Numri i instancave |
+| `sum(field)` | `sum(${loan_amount})` | Shuma e fushës numerike |
+| `min(field)` | `min(${member_age})` | Vlera minimale |
+| `max(field)` | `max(${member_age})` | Vlera maksimale |
+| `join(sep, field)` | `join(', ', ${member_name})` | Lista e ndarë me presje |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Numërim i kushtëzuar |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Shumë e kushtëzuar |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Bashkim i kushtëzuar |
+
+### Shembull: Përmbledhje familje
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | Sa anëtarë? | |
+| begin_repeat | members | Anëtari | `${num_members}` |
+| text | member_name | Emri | |
+| integer | member_age | Mosha | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | `${total_members}` anëtarë; `${children_count}` nën 18. Të rritur: `${adult_names}` | |
+
+---
+
+## Përsëritjet e ndërfutura
+
+Grupi i përsëritjes mund të përmbajë grupin tjetër të përsëritjes. Përdoreni me kujdes — përsëritjet e ndërfutura shtojnë kompleksitet dhe mund të jenë konfuze për numëruesit.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Familja |
+| text | hh_id | ID e familjes |
+| begin_repeat | hh_members | Anëtari |
+| text | member_name | Emri i anëtarit |
+| end_repeat | | |
+| end_repeat | | |
+
+Për të referuar fushën në përsëritjen e jashtme nga përsëritja e brendshme, përdorni `${fieldname}` — zgjidhet te paraardhësi më i afërt përputhës:
+
+Brenda përsëritjes `hh_members`, `${hh_id}` kthen ID e familjes **aktuale**, jo të gjitha familjet.
+
+---
+
+## Rank brenda grupeve të përsëritjes: `rank-index()`
+
+Kur fusha `rank` ekziston brenda përsëritjes, përdorni `rank-index(instanceNumber, repeatedField)` nga jashtë për të marrë rangun ordinal të instancës specifike:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` kthen indeksin e instancës të rezultatit më të lartë.
+
+---
+
+## Praktikat më të mira
+
+1. Gjithmonë përdorni `repeat_count` kur numri i përsëritjeve është i njohur paraprakisht — kjo parandalon numëruesit të shtojnë ose heqin aksidentalisht instanca.
+2. Mbajeni grupet e përsëritjes të fokusuara — përsëritja me 20+ pyetje për instancë është e vështirë për t'u naviguar.
+3. Emërtoni grupet e përsëritjes qartë (p.sh., `household_members`, jo `repeat1`) — emri shfaqet në thirrjet e funksioneve dhe të dhënat e eksportuara.
+4. Testoni me numrin maksimal të pritur të instancave për të verifikuar performancën.
+5. Përdorni pamjen `field-list` në grupin e përsëritjes për të treguar të gjitha fushat në një ekran për instancë (mobile).
+
+---
+
+## Kufizimet
+
+- `indexed-repeat()` kërkon indeks të vlefshëm (1 deri te numri i instancave) — indekset jashtë diapazonit kthejnë bosh.
+- Përsëritjet e ndërfutura përtej 2 niveleve nuk rekomandohen dhe mund të shkaktojnë probleme shfaqjeje në disa klientë.
+- Funksionet e agregatit (`sum`, `count`, etj.) operojnë në të gjithë grupin e përsëritjes — nuk mund të agregatoni nëngrupet e instancave pa variantet `*-if`.

@@ -1,0 +1,99 @@
+---
+title: "File"
+description: "File-kysymykset antavat vastaajille mahdollisuuden ladata asiakirjoja ja muita tiedostoja osana kyselyvastaustaan."
+---
+
+`file`-kysymystyyppi antaa vastaajille mahdollisuuden **ladata minkä tahansa tiedoston** laitteeltaan — asiakirjoja, taulukoita, PDF-tiedostoja tai muita tiedostotyyppejä. Toisin kuin `image`, `audio` ja `video`, jotka käynnistävät erityiset tallennustyökalut, `file` avaa yleiskäyttöisen tiedostonvalitsimen.
+
+## XLSForm-perusmäärittely
+
+| type | name      | label                          |
+|------|-----------|--------------------------------|
+| file | document  | Lataa asiakirjasi              |
+
+Lisätietoja file-kysymystyypin standardista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+
+## Käyttötarkoitukset
+
+File-kysymyksiä käytetään yleisesti:
+
+1. Tukiasiakirjojen keräämiseen (kuitit, todistukset, sopimukset, raportit)
+2. Skannattujen paperilomakkeiden lataamiseen
+3. Taulukoiden tai tietovientienhakemiseen muista järjestelmistä
+4. Kaikkien digitaalisten tiedostotyyppien kohdalla, joita image/audio/video ei kata
+
+## Tietomuoto
+
+Ladatut tiedostot tallennetaan binääriliitteinä:
+
+- **Muoto:** Säilytetään alkuperäisessä muodossa (PDF, XLSX, DOCX jne.)
+- **Nimeäminen:** `{instanceID}-{fieldname}.{extension}`
+- **Tallennus:** Ladataan palvelimen mediahakemistoon lähetyksen ohessa
+- **Käyttö:** Ladattavissa lähetysten hallintaliittymästä
+
+## rtSurveyn laajennukset
+
+### Hyväksytyt tiedostotyypit
+
+Käytä `parameters`-saraketta rajoittaaksesi, mitkä tiedostotyypit voidaan valita:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| file | report | Lataa tarkastusraportti | `accept=.pdf` |
+| file | spreadsheet | Lataa datatiedosto | `accept=.xlsx,.csv` |
+
+`accept`-parametri käyttää vakiotiedostopäätesyntaksia (pilkuilla erotettu).
+
+### Tiedostokoon ohjaus
+
+rtSurvey ei pakota tiukkaa tiedostokokorajoitusta kysymystasolla, mutta palvelimen lataamisraja koskee. Käytä `hint`-saraketta kommunikoidaksesi odotukset luetteloijalle:
+
+| type | name | label | hint |
+|------|------|-------|------|
+| file | receipt | Lataa maksukuitti | Hyväksytty: PDF tai kuva. Enimmäistiedostokoko: 5 Mt |
+
+### Integraatio laitteen tiedostojärjestelmän ja pilvipalveluiden kanssa
+
+Androidilla ja iOS:llä `file`-kysymys avaa laitteen natiivin tiedostonvalitsimen, joka voi sisältää pääsyn:
+- Laitteen paikalliseen tallennukseen
+- SD-kortille (Android)
+- iCloud Drive -palveluun (iOS)
+- Google Drive, Dropbox (jos asennettu)
+
+Verkossa se avaa selaimen vakiomuotoisen tiedostonlatausdialogin.
+
+## Esimerkkikäyttö
+
+### Pakollinen PDF-lataus
+
+| type | name | label | hint | required | required_message |
+|------|------|-------|------|----------|-----------------|
+| file | signed_consent | Lataa allekirjoitettu suostumuslomake | Vain PDF, enintään 2 Mt | yes | Suostumuslomake vaaditaan |
+
+### Ehdollinen asiakirjan lataus
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_land_title | Onko kotitaloudella maatodistus? | |
+| file | land_title_doc | Lataa valokuva tai skannattu kuva maatodistuksesta | `${has_land_title} = 'yes'` |
+
+## Parhaat käytännöt
+
+1. Käytä `accept`-parametria tiedostotyyppien rajoittamiseen — tämä estää luetteloijia vahingossa lataamasta vääriä tiedostoja.
+2. Sisällytä aina koko ja muoto-ohjeet `hint`-sarakkeessa.
+3. Valokuville ja kuville käytä `image`-tyyppiä — se tarjoaa paremman pakkauksen ja yhtenäisen muotokäsittelyn.
+4. Suurille kyselyille, joissa on tiedostoliitteitä, suunnittele tietovarasto ja latausbandwidth vastaavasti.
+5. Testaa tiedostonvalitsin kohdelaitetyypillä (Android vs. iOS vs. verkko) ennen käyttöönottoa — pääsy pilviasemiin vaihtelee.
+
+## Tietojenkäsittelyn näkökohtia
+
+- Tiedostot tallennetaan alkuperäisessä muodossaan; rtSurvey ei muunna tai pakkaa niitä.
+- Analysoi tiedostot lataamisen jälkeen — rtSurvey ei poimia tai indeksoi tiedostojen sisältöä.
+- Suuret tiedostoliitteet lisäävät merkittävästi koko datatietokannan lataamiseen tarvittavaa aikaa.
+
+## Rajoitukset
+
+- File-kysymykset eivät validoi tiedostojen sisältöä — vain tiedostopäätteen tarkistus `accept`:n kautta pakotetaan käyttöliittymätasolla.
+- Erittäin suuret tiedostot (100 Mt+) voivat aikakatkaista latauksen heikkoyhteyksisissä ympäristöissä.
+- Offline-luetteloijat voivat liittää tiedostoja, mutta ne eivät lataudu ennen kuin yhteys palautuu.
+- Jotkut laitekonfiguraatiot rajoittavat pääsyä tiettyihin tallennussijainteihin (esim. yrityksen MDM-käytännöt).

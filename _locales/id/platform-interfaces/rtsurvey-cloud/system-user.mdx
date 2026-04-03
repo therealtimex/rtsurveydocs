@@ -1,0 +1,46 @@
+---
+title: "Pengguna Sistem"
+description: "Kelola peran, izin, dan orientasi untuk semua peserta platform."
+tags: ["Pengguna", "Kontrol Akses", "Orientasi", "Peran"]
+---
+
+# Manajemen Pengguna Sistem
+
+Modul **Pengguna Sistem** (`/cpms/cpmsSystemUser/admin`) adalah antarmuka manajemen komprehensif untuk mengontrol siapa yang memiliki akses ke platform Real-Time Survey (RT-CPMS) dan tindakan apa yang dapat mereka lakukan.
+
+![Antarmuka Pengguna Sistem](/images/system_user.png)
+
+## Pendekatan Manajemen Terpadu
+
+Di RT-CPMS, seorang **Enumerator** adalah Peran spesifik yang ditetapkan kepada Pengguna Sistem. Tidak ada database "Enumerator" yang terpisah. Baik pengguna adalah Administrator tingkat tinggi yang memantau portal web maupun Enumerator lapangan yang mengumpulkan data melalui aplikasi mobile, semuanya dikelola dalam kerangka tunggal yang terpadu ini.
+
+## Fitur Utama
+
+### 1. Direktori Pengguna & Tampilan Grid
+Antarmuka utama menampilkan daftar paginasi dari semua pengguna yang terhubung ke ruang kerja. Atribut utama meliputi:
+* **ID & Nama Organisasi**: Pengelompokan logis pengguna di bawah entitas organisasi tertentu (misalnya, `rta`, `partner_org`).
+* **Peran**: Menentukan tingkat izin pengguna (misalnya, `Administrator`, `Leadteam`, `Enumerator`).
+* **Grup**: Penugasan pengelompokan spasial atau logis (misalnya, distrik tertentu atau tim operasional).
+* **Telah Disinkronkan**: Menunjukkan apakah akun berhasil diintegrasikan dengan sistem Single Sign-On (SSO) pusat.
+* **Status**: Indikator visual yang mengonfirmasi apakah akun `Aktif`, `Tidak Aktif`, `Dihapus`, atau `Diblokir`.
+
+**Tindakan Global:**
+* **Tambah Pengguna Sistem**: Buat profil individual secara manual.
+* **Impor Pengguna Sistem**: Unggah akun secara massal menggunakan template Excel. Anda dapat menyelesaikan konflik menggunakan mode `Lewati` atau `Ganti` dan sinkronkan langsung dengan SSO.
+* **Hapus Massal**: Dukungan multi-pilih untuk penghapusan akun massal.
+
+### 2. Kontrol Akses & Keamanan
+Saat membuat atau mengedit profil pengguna, beberapa bidang keamanan dan alur kerja kritis tersedia:
+* **Kode Pengguna**: Pengidentifikasi unik yang menghubungkan akun CPMS lokal ke repositori SSO pusat.
+* **Kode Ganti-Perangkat**: Token keamanan yang kuat yang diperlukan ketika enumerator perlu mengganti perangkat mobile yang mereka gunakan untuk pengumpulan data.
+* **Tingkat Kekuatan**: Skala prioritas/akses yang detail mulai dari 0 (terendah) hingga 20 (tertinggi).
+* **Toggle Pengawasan**: Kotak centang yang langsung meningkatkan pengguna standar ke status manajemen.
+* **Otomasi Alur Kerja**: Opsi untuk "Menyetujui Permintaan Edit secara Otomatis," yang menyederhanakan proses pembersihan dan verifikasi data untuk pengguna tepercaya.
+
+### 3. Manajemen Kode (Orientasi Otomatis)
+Ditemukan di sub-tab "Kode", fitur ini mengelola tautan pendaftaran dan undangan berbasis hash, menyederhanakan proses orientasi untuk tim besar.
+
+* **Pendaftaran vs. Undangan**: Pilih apakah pengguna dapat mendaftar sendiri menggunakan tautan yang didistribusikan atau apakah mereka memerlukan undangan admin langsung.
+* **Tanggal Kedaluwarsa**: Batasi orientasi ke jendela waktu tertentu.
+* **Batas Penggunaan**: Batasi jumlah pengguna yang dapat bergabung menggunakan satu kode yang dibuat.
+* **Peran yang Ditetapkan Sebelumnya**: Pengguna yang bergabung melalui kode-kode ini secara otomatis mewarisi peran dan tingkat kekuatan yang telah ditentukan, memastikan mereka siap bekerja segera tanpa intervensi admin manual.

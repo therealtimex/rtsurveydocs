@@ -1,0 +1,89 @@
+---
+title: "Napredne slike"
+description: "Napredne funkcije slika u rtSurvey-u: vodeni žig, prikaz medijske mreže i anotacije slika."
+---
+
+Pored standardnog tipa pitanja `image`, rtSurvey pruža proširenja za **stavljanje vodenog žiga** na snimljene fotografije i prikazivanje više slika u **medijskoj mreži**. Ovo je korisno za ankete zasnovane na dokazima gde fotografije treba biti označene identitetom anketara ili metapodacima ankete, i za vizuelne interfejse za pregled.
+
+---
+
+## Vodeni žig
+
+Funkcija vodenog žiga prekriva tekst ili sliku na snimljenu fotografiju pre njenog čuvanja. Ovo se koristi za brendiranje terenskih fotografija datumom, imenom anketara, GPS lokacijom ili bilo kojim drugim podacima ankete — što otežava predstavljanje već postojećih fotografija kao sveže snimljenih dokaza.
+
+### Podešavanje
+
+Koristite `watermark()` u koloni **`calculation`** polja `image`, kombinovano sa izgledom `callapi`:
+
+```
+watermark(type, size, distance, color, shadow, rotate, blur)
+```
+
+| Parametar | Opis |
+|-----------|------|
+| `type` | `'text'` za tekstualni vodeni žig; `'file'` za vodeni žig sa slikom |
+| `size` | Veličina fonta u pikselima (tekst) ili veličina vodenog žiga kao % širine slike (datoteka) |
+| `distance` | Razmak između ponovljenih pločica vodenog žiga (pikseli) |
+| `color` | Boja teksta (CSS boja ili hex). Ne koristi se za tip `file` |
+| `shadow` | Boja senke (CSS boja ili hex) |
+| `rotate` | Ugao rotacije u stepenima (npr. `45` za dijagonalu) |
+| `blur` | Neprozirnost vodenog žiga (0 = nevidljivo, 100 = potpuno neprozirno) |
+
+### Primer tekstualnog vodenog žiga
+
+Prekrivanje imena anketara i današnjeg datuma dijagonalno preko svake snimljene fotografije:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | wm_text | | | `concat(pulldata('app-api', 'user.name'), ' | ', format-date(today(), '%d/%m/%Y'))` |
+| image | site_photo | Fotografišite lokaciju | watermark | `watermark('text', 20, 60, '#ffffff', '#000000', 45, 40)` |
+
+Tekst vodenog žiga se preuzima iz `${wm_text}`. Postavite polje teksta vodenog žiga **pre** polja slike u formularu.
+
+### Primer vodenog žiga sa slikom/logom
+
+Prekrivanje loga organizacije (priloženog kao medijska datoteka nazvana `logo.png`):
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| image | evidence_photo | Fotografišite dokaz | watermark | `watermark('file', 25, 80, '', '#000000', 0, 50)` |
+
+### Poništi/ponovi
+
+Uređivač vodenog žiga podržava poništavanje i ponavljanje — anketari mogu koračati unazad kroz istoriju uređivanja pre potvrde fotografije.
+
+### Pločice vodenog žiga
+
+Vodeni žig se automatski ponavlja (pločice) po celoj slici. Parametar `distance` kontroliše razmak između pločica; `rotate` kontroliše ugao svake pločice.
+
+---
+
+## Widget medijske mreže
+
+Widget medijske mreže prikazuje kolekciju medijskih datoteka (slike, audio, video) u rasporedu mreže, dozvoljavajući recenzentima ili anketarima da vizuelno pregledaju snimljene datoteke.
+
+Ovaj widget je aktiviran izgledom `mediagridwidget` i obično se koristi na poljima `note` ili `calculate` za prikaz prethodno snimljenih medija iz grupe ponavljanja.
+
+### Primer: Prikazivanje svih fotografija iz ponavljanja kao mreže
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | photo_list | | | `join(' ', ${site_photo})` |
+| note | photo_review | Pregledajte snimljene fotografije | mediagridwidget | |
+
+---
+
+## Najbolje prakse za fotografije sa vodenim žigom
+
+1. Uvek izračunavajte tekst vodenog žiga u polju `calculate` **iznad** polja slike da bi bio dostupan kada se fotografija snimi.
+2. Koristite ugao rotacije (npr. 45°) da otežate isecanje vodenih žigova.
+3. Postavite neprozirnost (`blur`) između 30–60% — dovoljno visoko da bude čitljivo, dovoljno nisko da ne zaklanja predmet fotografije.
+4. Uključite ime anketara, datum i GPS koordinate u tekst vodenog žiga da biste maksimalizovali vrednost revizije.
+5. Testirajte prikaz vodenog žiga na uređaju s najnižim specifikacijama u vašoj floti — vodeni žig zasnovan na canvas-u može biti spor na starijem hardveru.
+
+## Ograničenja
+
+- Stavljanje vodenog žiga se primenjuje na strani klijenta koristeći HTML5 Canvas API — zahteva sposoban pregledač ili mobilni WebView.
+- Fotografije veoma visoke rezolucije mogu potrajati nekoliko sekundi za stavljanje vodenog žiga na uređajima nižeg ranga.
+- Vodeni žigovi su ugrađeni u datoteku slike — ne mogu se ukloniti nakon slanja bez uređivanja slike.
+- Tip vodenog žiga `file` zahteva da slika loga bude priložena kao medijska datoteka sa tačno očekivanim nazivom datoteke.

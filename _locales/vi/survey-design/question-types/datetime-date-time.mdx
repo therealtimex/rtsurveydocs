@@ -1,0 +1,71 @@
+---
+title: "Ngày, Giờ (Datetime, date, time)"
+description: "Các câu hỏi kiểu Datetime cho phép người trả lời nhập cả ngày và giờ vào một trường duy nhất."
+---
+
+Loại câu hỏi `datetime` trong XLSForms và rtSurvey cho phép người trả lời nhập cả ngày và giờ trong cùng một trường. Loại câu hỏi này hữu ích khi bạn cần ghi lại một thời điểm cụ thể, bao gồm cả ngày và giờ chính xác.
+
+## Đặc tả XLSForm cơ bản
+
+| type     | name           | label                           |
+|----------|----------------|--------------------------------|
+| datetime | event_datetime | Sự kiện xảy ra khi nào?        |
+
+Để biết thêm chi tiết về loại câu hỏi datetime cơ bản, hãy xem [đặc tả XLSForm](https://xlsform.org/en/#question-types).
+
+## Các trường hợp sử dụng
+
+Câu hỏi datetime thường được dùng cho:
+
+1. Ghi lại mốc thời gian của các sự kiện hoặc quan sát
+2. Lên lịch hẹn hoặc các cuộc họp
+3. Ghi nhật ký thời gian bắt đầu và kết thúc của các hoạt động
+4. Ghi lại các thời điểm chính xác cho việc thu thập dữ liệu nhạy cảm về thời gian
+
+## Các phần mở rộng của rtSurvey
+
+rtSurvey mở rộng chức năng của các câu hỏi datetime với nhiều tùy chọn hiển thị (`appearance`) và tùy chỉnh khác nhau:
+
+### Các tùy chọn hiển thị (Appearance Options)
+
+- `(mặc định)`: Hiển thị lịch và đồng hồ để chọn ngày và giờ
+- `appearance: inline`: Hiển thị lịch và đồng hồ dưới dạng biểu tượng
+- `appearance: inline-1line`: Hiển thị lịch và đồng hồ để chọn theo định dạng hàng đơn
+- `appearance: inline-onlyresult`: Hiển thị lịch và đồng hồ dưới dạng biểu tượng ở cuối dòng; các biểu tượng biến mất sau khi chọn
+
+### Tùy chỉnh màu sắc
+
+Bạn có thể tùy chỉnh màu sắc của các biểu tượng lịch và đồng hồ bằng hàm `colors()`:
+
+- `appearance: inline colors("0099FF")`: Hiển thị biểu tượng với màu tùy chỉnh
+- `appearance: inline-1line-0000FF`: Hiển thị định dạng hàng đơn với màu tùy chỉnh
+- `appearance: inline-1line colors("0000FF","FFFF00")`: Hiển thị định dạng hàng đơn với nhiều màu tùy chỉnh
+- `appearance: inline-onlyresult colors("0099FF")`: Hiển thị các biểu tượng biến mất sau khi chọn, với màu tùy chỉnh
+
+### Định dạng Ngày và Giờ tùy chỉnh
+
+rtSurvey cho phép các định dạng ngày và giờ tùy chỉnh bằng cú pháp đặc biệt:
+
+- `appearance: inline-[%Y-%m-%d %H:%M:%S]`: Ví dụ định dạng tùy chỉnh (Năm-Tháng-Ngày Giờ:Phút:Giây)
+- `appearance: inline-[%d/%m/%Y %I:%M %p]`: Ví dụ định dạng tùy chỉnh (Ngày/Tháng/Năm Giờ:Phút AM/PM)
+
+## Ví dụ sử dụng
+
+Dưới đây là một ví dụ về cách bạn có thể sử dụng câu hỏi datetime trong một cuộc khảo sát:
+
+| type     | name           | label                                      | appearance                    |
+|----------|----------------|--------------------------------------------|-----------------------------|
+| datetime | incident_time  | Sự cố xảy ra khi nào?                      | inline-[%d/%m/%Y %I:%M %p]  |
+
+## Các phương pháp hay nhất
+
+1. Cung cấp hướng dẫn rõ ràng về định dạng ngày và giờ mong muốn.
+2. Cân nhắc sử dụng kiểu hiển thị `inline` để màn hình gọn gàng hơn.
+3. Sử dụng định dạng tùy chỉnh khi bạn cần các thành phần ngày hoặc giờ cụ thể.
+4. Lưu ý đến múi giờ khi thu thập dữ liệu datetime ở các khu vực khác nhau.
+
+## Hạn chế
+
+- Một số kiểu hiển thị hoặc định dạng tùy chỉnh có thể không được hỗ trợ trên tất cả các thiết bị hoặc nền tảng.
+- Người dùng có thể cần hướng dẫn để nhập ngày và giờ chính xác, đặc biệt là với các định dạng tùy chỉnh.
+- Sự khác biệt về múi giờ có thể làm phức tạp việc phân tích dữ liệu nếu không được tính đến một cách hợp lý.

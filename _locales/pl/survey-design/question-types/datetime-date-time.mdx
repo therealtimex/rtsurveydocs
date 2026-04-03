@@ -1,0 +1,71 @@
+---
+title: "Datetime, date, time"
+description: "Pytania datetime umożliwiają respondentom wprowadzenie zarówno daty, jak i godziny w jednym polu."
+---
+
+Typ pytania datetime w XLSForm i rtSurvey umożliwia respondentom wprowadzenie zarówno daty, jak i godziny w jednym polu. Ten typ pytania jest przydatny, gdy trzeba uchwycić konkretny moment w czasie, obejmujący zarówno datę, jak i dokładną godzinę.
+
+## Podstawowa specyfikacja XLSForm
+
+| type     | name           | label                           |
+|----------|----------------|--------------------------------|
+| datetime | event_datetime | Kiedy nastąpiło zdarzenie?      |
+
+Więcej szczegółów na temat podstawowego typu pytania datetime znajdziesz w [specyfikacji XLSForm](https://xlsform.org/en/#question-types).
+
+## Zastosowania
+
+Pytania datetime są powszechnie stosowane do:
+
+1. Rejestrowania znaczników czasu zdarzeń lub obserwacji
+2. Planowania spotkań
+3. Rejestrowania godzin rozpoczęcia i zakończenia czynności
+4. Przechwytywania dokładnych momentów przy zbieraniu danych wrażliwych na czas
+
+## Rozszerzenia rtSurvey
+
+rtSurvey rozszerza funkcjonalność pytań datetime o różne opcje wyglądu i dostosowania:
+
+### Opcje wyglądu
+
+- `(domyślny)`: Wyświetla kalendarz i zegar do wyboru daty i godziny
+- `inline`: Wyświetla kalendarz i zegar jako ikony
+- `inline-1line`: Wyświetla kalendarz i zegar do wyboru w formacie jednego wiersza
+- `inline-onlyresult`: Wyświetla kalendarz i zegar jako ikony na końcu linii; ikony znikają po wyborze
+
+### Dostosowanie kolorów
+
+Możesz dostosować kolor ikon kalendarza i zegara za pomocą funkcji `colors()`:
+
+- `inline colors("0099FF")`: Wyświetla ikony z niestandardowym kolorem
+- `inline-1line-0000FF`: Wyświetla w formacie jednego wiersza z niestandardowym kolorem
+- `inline-1line colors("0000FF","FFFF00")`: Wyświetla w formacie jednego wiersza z wieloma niestandardowymi kolorami
+- `inline-onlyresult colors("0099FF")`: Wyświetla ikony znikające po wyborze, z niestandardowym kolorem
+
+### Niestandardowe formaty daty i godziny
+
+rtSurvey umożliwia niestandardowe formaty daty i godziny przy użyciu specjalnej składni:
+
+- `inline-[%Y-%m-%d %H:%M:%S]`: Przykład niestandardowego formatu (Rok-Miesiąc-Dzień Godzina:Minuta:Sekunda)
+- `inline-[%d/%m/%Y %I:%M %p]`: Przykład niestandardowego formatu (Dzień/Miesiąc/Rok Godzina:Minuta AM/PM)
+
+## Przykład użycia
+
+Oto przykład użycia pytania datetime w ankiecie:
+
+| type     | name           | label                                      | appearance                    |
+|----------|----------------|--------------------------------------------|-----------------------------|
+| datetime | incident_time  | Kiedy doszło do zdarzenia?                 | inline-[%d/%m/%Y %I:%M %p]  |
+
+## Najlepsze praktyki
+
+1. Podaj jasne instrukcje dotyczące oczekiwanego formatu daty i godziny.
+2. Rozważ użycie wyglądu `inline` dla bardziej zwartego wyświetlania.
+3. Używaj niestandardowych formatów, gdy potrzebujesz określonych składników lub formatowania daty i godziny.
+4. Pamiętaj o strefach czasowych podczas zbierania danych datetime w różnych regionach.
+
+## Ograniczenia
+
+- Niektóre wyglądy lub niestandardowe formaty mogą nie być obsługiwane na wszystkich urządzeniach lub platformach.
+- Użytkownicy mogą potrzebować wskazówek dotyczących prawidłowego wprowadzania daty i godziny, szczególnie przy niestandardowych formatach.
+- Różnice stref czasowych mogą komplikować analizę danych, jeśli nie zostaną odpowiednio uwzględnione.

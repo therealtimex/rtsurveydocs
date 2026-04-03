@@ -1,0 +1,75 @@
+---
+title: "Integer"
+description: "Integer-kysymykset mahdollistavat kokonaisluvun syöttämisen kyselyyn."
+---
+
+XLSFormien ja rtSurveyn integer-kysymystyyppiä käytetään kokonaislukuvastausten keräämiseen. Tämä kysymystyyppi on välttämätön numeerisen tiedon keräämiseen ilman desimaaleja, kuten lukumääriin, ikiin tai vuosiin.
+
+## XLSForm-perusmäärittely
+
+| type    | name  | label                  |
+|---------|-------|------------------------|
+| integer | age   | Syötä ikäsi vuosina    |
+
+Lisätietoja integer-kysymystyypin perusteista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+
+## Käyttötarkoitukset
+
+Integer-kysymyksiä käytetään yleisesti:
+
+1. Ikäsyötteisiin
+2. Esineiden laskemiseen (esim. lasten tai kotitalouden jäsenten lukumäärä)
+3. Vuosisyötteisiin (esim. syntymävuosi)
+4. Numeerisiin arviointiasteikkoihin
+5. Mihin tahansa kokonaislukutiedon keräämiseen
+
+## rtSurveyn laajennukset
+
+Vaikka XLSForm-standardin integer-kysymysten perusmäärittely on suoraviivainen, rtSurvey voi tarjota lisäominaisuuksia tai mukautuksia:
+
+1. Aluevalidointi
+2. Mukautetut virheilmoitukset
+3. Numeerisen syötteen ulkoasuvaihtoehdot
+
+## Parhaat käytännöt
+
+1. Käytä selkeitä ja ytimekkäitä otsikoita odotetun syötteen määrittelemiseksi.
+2. Toteuta aluerajoitteet epärealististen tai virheellisten syötteiden estämiseksi.
+3. Harkitse ohjetekstin käyttöä esimerkkien antamiseksi tai odotetun muodon selventämiseksi.
+4. Suurille luvuille harkitse pilkkujen tai välilyöntien käyttöä otsikossa luettavuuden parantamiseksi (esim. "Syötä väestö (enintään 1 000 000)").
+
+## Rajoitteet ja validointi
+
+Voit lisätä rajoitteita varmistaaksesi, että syötetty arvo on tietyllä alueella:
+
+| type    | name  | label                  | constraint        | constraint_message                    |
+|---------|-------|------------------------|-------------------|---------------------------------------|
+| integer | age   | Syötä ikäsi vuosina    | .>0 and .&lt;=120    | Iän on oltava 1 ja 120 vuoden välillä |
+
+## Esimerkkikäyttö
+
+Esimerkki kotitalouskyselyssä:
+
+| type    | name           | label                                          | constraint | constraint_message                          |
+|---------|----------------|------------------------------------------------|------------|---------------------------------------------|
+| integer | household_size | Kuinka monta henkilöä kotitaloudessa asuu?     | .>0        | Kotitalouden koon on oltava vähintään 1      |
+| integer | num_children   | Kuinka monta alle 18-vuotiasta lasta kotitaloudessa on? | .>=0 | Lasten lukumäärä ei voi olla negatiivinen |
+| integer | year_built     | Minä vuonna talo rakennettiin?                 | .>1800 and .&lt;=2023 | Vuoden on oltava välillä 1800 ja 2023 |
+
+## Laskeminen integer-arvoilla
+
+Integer-arvoja voidaan käyttää laskuissa. Esimerkki:
+
+| type    | name           | label                               |
+|---------|----------------|-------------------------------------|
+| integer | num_adults     | Aikuisten lukumäärä kotitaloudessa  |
+| integer | num_children   | Lasten lukumäärä kotitaloudessa     |
+| calculate | total_members | |
+
+calculate-rivillä voidaan käyttää:
+
+```
+calculation | ${num_adults} + ${num_children}
+```
+
+Tämä laskee yhteen aikuisten ja lasten lukumäärän kotitalouden kokonaismäärän saamiseksi.

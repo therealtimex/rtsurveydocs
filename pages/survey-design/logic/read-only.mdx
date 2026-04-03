@@ -1,0 +1,112 @@
+---
+title: "Read-only"
+description: ""
+---
+
+Read-only fields in rtSurvey allow you to display information that cannot be edited by the respondent. This feature is particularly useful for showing pre-filled data, calculated results, or information that should remain constant throughout the survey.
+
+## Basic Usage
+
+To make a field read-only, use the `read_only` column in your XLSForm:
+
+```
+| type    | name | label                 | read_only | default |
+|---------|------|----------------------|-----------|---------|
+| integer | num  | Patient number is:    | yes       | 5       |
+```
+
+In this example, the patient number is set to 5 and cannot be changed by the respondent.
+
+## Combining Read-only with Default Values
+
+Read-only fields are often used in conjunction with default values to display pre-determined or calculated information:
+
+```
+| type    | name     | label               | read_only | default        |
+|---------|----------|---------------------|-----------|----------------|
+| text    | username | Logged in user:     | yes       | ${current_user}|
+| date    | today    | Today's date:       | yes       | today()        |
+```
+
+Here, the username and current date are displayed but cannot be edited.
+
+## rtSurvey-Specific Features
+
+### Conditional Read-only
+
+rtSurvey extends the read-only functionality with conditional logic:
+
+```
+| type    | name     | label           | read_only                |
+|---------|----------|-----------------|--------------------------|
+| integer | age      | Age:            | ${role} = 'viewer'       |
+| text    | comments | Comments:       | selected(${status}, 'closed') |
+```
+
+In these examples:
+- The 'age' field is read-only only if the user's role is 'viewer'.
+- The 'comments' field becomes read-only if the status is 'closed'.
+
+### Dynamic Read-only Status
+
+rtSurvey allows you to change the read-only status dynamically:
+
+```
+| type      | name     | label    | read_only              |
+|-----------|----------|----------| ----------------------|
+| text      | address  | Address: | ${edit_mode} = 'false' |
+```
+
+This allows you to switch between editable and read-only modes based on certain conditions or user actions.
+
+## Best Practices for Using Read-only Fields
+
+1. **Clarity**: Clearly indicate which fields are read-only through visual cues or labels.
+2. **Consistency**: Use read-only fields consistently throughout your survey.
+3. **Validation**: Even though read-only fields can't be edited, include them in your data validation process.
+4. **Performance**: Be cautious with complex calculations in read-only fields, as they may impact form loading time.
+5. **Accessibility**: Ensure read-only fields are properly marked for screen readers.
+
+## Advanced Techniques
+
+### Calculated Read-only Fields
+
+Use read-only fields to display calculations based on other responses:
+
+```
+| type      | name     | label           | read_only | calculation            |
+|-----------|----------|-----------------|-----------|------------------------|
+| calculate | bmi      | BMI:            | yes       | ${weight} / (${height} * ${height}) |
+```
+
+### Displaying Historical Data
+
+Read-only fields can display data from previous surveys or external sources:
+
+```
+| type    | name           | label                  | read_only | default                    |
+|---------|----------------|------------------------|-----------|----------------------------|
+| text    | last_visit_date| Date of last visit:    | yes       | ${pulldata('visits', 'date', 'id', ${patient_id})} |
+```
+
+## Data Management Considerations
+
+- Read-only fields are included in data exports, typically with a flag indicating their read-only status.
+- When updating existing records, read-only fields preserve their original values unless explicitly overwritten through the backend.
+
+## Mobile App Behavior
+
+- The rtSurvey mobile app respects read-only settings, including conditional read-only logic.
+- Offline mode fully supports read-only functionality, including dynamic and calculated read-only fields.
+
+## Known Limitations
+
+- Some complex dynamic read-only conditions may have a slight performance impact on low-end devices.
+- Read-only fields may not prevent all forms of data manipulation in exported data files, so server-side validation is recommended for critical data.
+
+## Troubleshooting Read-only Fields
+
+1. **Field Unexpectedly Editable**: Check for syntax errors in the `read_only` column or conditional logic.
+2. **Calculated Values Not Updating**: Verify the calculation logic and ensure all referenced fields are correctly named.
+3. **Performance Issues**: Optimize complex calculations or consider alternative approaches for displaying read-only data.
+

@@ -1,0 +1,107 @@
+---
+title: "Gitter-Layout (Grid-layout)"
+description: "Das Gitter-Layout ermöglicht die Anordnung von Feldern in einem CSS-Raster innerhalb einer Gruppe und ermöglicht mehrspaltiges Formulardesign."
+---
+
+Die Funktion **Gitter-Layout** ermöglicht es Ihnen, Fragen in einem **mehrspaltigem Raster** innerhalb einer Gruppe mithilfe des Erscheinungsattributs `gridformat<>` anzuordnen. Dies ist nützlich für dateneingabeintensive Formulare, bei denen mehrere verwandte Felder nebeneinander statt übereinander angezeigt werden sollen.
+
+---
+
+## Funktionsweise
+
+Das Gitter-Layout wird auf zwei Ebenen angewendet:
+
+1. **Die Gruppe** — setzen Sie `appearance: field-list grid(weight=N)`, um festzulegen, wie viele Spalten das Raster hat
+2. **Jedes Feld innerhalb der Gruppe** — setzen Sie `appearance: gridformat<row=R col=C colspan=S/>`, um das Feld zu positionieren
+
+Das Raster verwendet ein 12-spaltiges Bootstrap-ähnliches System. `weight=N` definiert, wie viele logische Spalten Ihr Raster hat; jede Spalte belegt `12/N` Bootstrap-Spalten.
+
+---
+
+## Erscheinungsbild auf Gruppenebene
+
+| Erscheinungsbild | Beschreibung |
+|-----------------|-------------|
+| `field-list grid(weight=2)` | 2-Spalten-Raster (jede Spalte = 6 Bootstrap-Spalten) |
+| `field-list grid(weight=3)` | 3-Spalten-Raster (jede Spalte = 4 Bootstrap-Spalten) |
+| `field-list grid(weight=4)` | 4-Spalten-Raster (jede Spalte = 3 Bootstrap-Spalten) |
+| `field-list grid(weight=6)` | 6-Spalten-Raster (jede Spalte = 2 Bootstrap-Spalten) |
+
+---
+
+## `gridformat<>`-Syntax auf Feldebene
+
+```
+gridformat<row=R col=C colspan=S/>
+gridformat<row=R col=C colspan=S backgroundcolor=COLOR/>
+```
+
+| Attribut | Beschreibung |
+|----------|-------------|
+| `row` | Zeilennummer (1-basiert) |
+| `col` | Spaltennummer (1-basiert, innerhalb des durch `weight` definierten Rasters) |
+| `colspan` | Anzahl der Spalten, die dieses Feld überspannt (Standard 1) |
+| `backgroundcolor` | Optionale CSS-Farbe für den Feldhintergrund (z. B. `#f0f0f0`, `lightblue`) |
+
+---
+
+## Beispiel: 2-spaltige Haushaltsumfrage-Sektion
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | demographics | Demografische Daten | `field-list grid(weight=2)` |
+| text | first_name | Vorname | `gridformat<row=1 col=1/>` |
+| text | last_name | Nachname | `gridformat<row=1 col=2/>` |
+| integer | age | Alter | `gridformat<row=2 col=1/>` |
+| select_one gender | gender | Geschlecht | `gridformat<row=2 col=2/>` |
+| text | address | Vollständige Adresse | `gridformat<row=3 col=1 colspan=2/>` |
+| end_group | | | |
+
+Dies wird dargestellt als:
+
+```
+[ Vorname           ] [ Nachname           ]
+[ Alter             ] [ Geschlecht         ]
+[ Vollständige Adresse (überspannt beide Spalten)  ]
+```
+
+---
+
+## Beispiel: 3-spaltige Parzellendateneingabe
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | plot_data | Parzellendetails | `field-list grid(weight=3)` |
+| text | plot_id | Parzellen-ID | `gridformat<row=1 col=1/>` |
+| decimal | area_ha | Fläche (ha) | `gridformat<row=1 col=2/>` |
+| select_one crop_type | crop | Kulturtyp | `gridformat<row=1 col=3/>` |
+| decimal | yield | Ertrag (kg) | `gridformat<row=2 col=1/>` |
+| decimal | revenue | Einnahmen | `gridformat<row=2 col=2/>` |
+| text | notes | Notizen | `gridformat<row=2 col=3/>` |
+| end_group | | | |
+
+---
+
+## Hintergrundfarben
+
+Verwenden Sie `backgroundcolor`, um Abschnitte visuell zu unterscheiden:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | section_a | Abschnitt A | `gridformat<row=1 col=1 colspan=2 backgroundcolor=#e8f4f8/>` |
+
+---
+
+## Empfohlene Vorgehensweisen
+
+1. Verwenden Sie das Gitter-Layout nur für **dateneingabeintensive** Bildschirme, bei denen nebeneinanderliegende Felder das Scrollen wirklich reduzieren.
+2. Halten Sie Felder mit `colspan=1` kurz (IDs, Codes, kurze Auswahlmöglichkeiten) — breite Beschriftungen werden in schmalen Rasterspalten schlecht abgeschnitten.
+3. Verwenden Sie `colspan=N` für Felder mit langen Beschriftungen oder mehrzeiligen Texteingaben.
+4. Testen Sie auf der kleinsten Bildschirmgröße, die Sie bei Interviewern erwarten — ein 4-Spalten-Raster ist auf einem Telefon eng.
+5. Das Gitter-Layout funktioniert am besten auf Web- und Tablet-Formfaktoren; auf Mobiltelefonen ist ein 2-Spalten-Layout in der Regel das Maximum für komfortablen Gebrauch.
+
+## Einschränkungen
+
+- `gridformat<>` funktioniert nur innerhalb einer Gruppe mit `grid(weight=N)`-Erscheinungsbild — es hat keine Wirkung auf der obersten Ebene.
+- Das Gitter-Layout ist eine rtSurvey-Webformular-Erweiterung und wird möglicherweise in anderen ODK-kompatiblen Clients nicht korrekt gerendert.
+- Zeilen- und Spaltenpositionierung wird beim Formularbau nicht validiert — überlappende Felder werden beide gerendert, können aber fehlerhaft aussehen.

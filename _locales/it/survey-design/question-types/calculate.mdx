@@ -1,0 +1,111 @@
+---
+title: "Calculate"
+description: ""
+---
+
+Le domande calculate negli XLSForm e in rtSurvey vengono usate per eseguire calcoli basati su altri campi o valori nel modulo. Queste domande non vengono visualizzate all'utente, ma vengono eseguite in background, memorizzando i loro risultati per uso successivo o per l'invio.
+
+## Sintassi
+
+Nell'XLSForm, una domanda calculate è definita come segue:
+
+| type      | name     | label | calculation |
+|-----------|----------|-------|-------------|
+| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+
+- **type**: Sempre "calculate" per questo tipo di domanda.
+- **name**: Un nome univoco per la domanda calculate.
+- **label**: Di solito lasciato vuoto poiché le domande calculate non vengono mostrate agli utenti.
+- **calculation**: La formula da valutare.
+
+## Utilizzi
+
+Le domande calculate sono comunemente usate per:
+
+1. Eseguire operazioni aritmetiche
+2. Concatenare stringhe
+3. Applicare logica o funzioni complesse
+4. Memorizzare risultati intermedi per uso successivo
+
+## Esempi
+
+### Aritmetica di base
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | total    | ${price} * ${quantity} |
+```
+
+### Concatenazione di stringhe
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
+```
+
+### Utilizzo di funzioni
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
+```
+
+## Utilizzo avanzato in rtSurvey
+
+### Funzione pulldata()
+
+rtSurvey supporta la funzione `pulldata()` nei campi calculate, permettendoti di recuperare dati da file CSV esterni:
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
+```
+
+#### Sintassi
+
+La sintassi di base per pulldata() è:
+
+```
+pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
+```
+
+- 'csv_filename': Nome del file CSV (senza estensione .csv)
+- 'column_to_return': Nome della colonna contenente i dati che vuoi recuperare
+- 'key_column': Nome della colonna da confrontare
+- `${matching_value}`: Valore da cercare nella colonna chiave (spesso una variabile del modulo)
+
+#### Note importanti
+
+1. Il file CSV deve essere caricato insieme al tuo XLSForm quando si distribuisce il sondaggio.
+2. Usa le virgole come separatori nel tuo file CSV, non i punto e virgola.
+3. Evita le virgole all'interno dei campi dati del tuo CSV, poiché possono causare problemi di parsing.
+4. pulldata() supporta solo relazioni 1-a-1. Se vengono trovate più corrispondenze, restituisce solo la prima.
+5. Potrebbero esserci limitazioni sulla lunghezza del testo che può essere recuperato (circa 76 caratteri).
+6. Puoi usare pulldata() nei vincoli per validare le voci rispetto ai dati CSV.
+
+### Calcoli condizionali
+
+Puoi usare le istruzioni if() per i calcoli condizionali:
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+```
+
+## Best practice
+
+1. Usa nomi significativi per i campi calculate per migliorare la leggibilità del modulo.
+2. Evita calcoli eccessivamente complessi in un singolo campo; suddividili se necessario.
+3. Testa accuratamente i tuoi calcoli, specialmente quando usi formule complesse o dati esterni.
+4. Ricorda che i campi calculate vengono eseguiti ogni volta che il modulo viene valutato, il che può influire sulle prestazioni per calcoli molto complessi o numerosi.
+5. Quando usi pulldata(), assicurati che i tuoi file CSV siano formattati correttamente e testa accuratamente con i tuoi dati specifici e la struttura del modulo.
+
+## Limitazioni
+
+- I campi calculate non sono direttamente modificabili dagli utenti.
+- Il risultato di un campo calculate non è immediatamente visibile a meno che non venga referenziato in un campo di visualizzazione o usato nella logica del modulo.

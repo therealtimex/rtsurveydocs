@@ -1,0 +1,90 @@
+---
+title: "Validacija odgovora"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+Jedan od načina za obezbeđivanje kvaliteta podataka je dodavanje ograničenja poljima podataka u formularu. Ograničenja pomažu sprečavanju korisnika da unose nevažeće ili nemoguće odgovore. Na primer, kada pitamo o prihodima osobe, želimo da izbegnemo nerealne vrednosti, kao što su negativni brojevi ili izuzetno visoke vrednosti. Dodavanje ograničenja podataka u formular je lako. Jednostavno pratite korake ispod:
+
+1. Dodajte novu kolonu pod nazivom "constraint" u formular.
+2. U kolonu "constraint" unesite formulu koja specificira ograničenja odgovora.
+
+### Primer
+
+Razmotrimo primer gde želimo da dodamo ograničenje za prihode osobe. Ograničenje zahteva da prihodi budu između $0 i $1.000.000. Evo kako možete podesiti ograničenje:
+
+| `name`      | `constraint`                  |
+|---------------|-----------------------------|
+| Income        | . >= 0 & . &lt;= 1000000      |
+
+U gornjem primeru, "." u formuli se vraća na promenljivu pitanja, koja predstavlja vrednost koju je korisnik uneo za pitanje "Prihodi". Ograničenje ". >= 0 && . &lt;= 1000000" osigurava da su uneseni prihodi veći od ili jednaki 0 i manji od ili jednaki 1.000.000.
+
+
+### Tvrdo ograničenje
+
+**Tvrdo ograničenje** u potpunosti blokira slanje formulara ako unesena vrednost ne zadovoljava izraz. Anketar ne može da napreduje dok ne unese važeću vrednost.
+
+Da biste dodali tvrdo ograničenje, unesite izraz u kolonu `constraint`. Opciono dodajte poruku čitljivu za ljude u `constraint_message`:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Starost ispitanika | `. > 0 and . <= 120` | Starost mora biti između 1 i 120 |
+| decimal | temperature | Telesna temperatura (°C) | `. >= 35 and . <= 42` | Temperatura mora biti između 35°C i 42°C |
+| text | phone | Broj telefona | `regex(., '^[0-9]{10}$')` | Unesite 10-cifreni broj telefona |
+
+#### Više uslova
+
+Kombinirajte uslove sa `and` / `or`:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Korišćenje `regex()` za validaciju obrasca
+
+Funkcija `regex(value, pattern)` testira vrednost prema regularnom izrazu:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | Email adresa | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Unesite važeću email adresu |
+| text | zip_code | Poštanski broj | `regex(., '^[0-9]{5}$')` | Unesite 5-cifreni poštanski broj |
+
+#### Referencing других polja u ograničenju
+
+Koristite `${ime_polja}` da referencirate vrednosti iz других pitanja:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Godina završetka | `. >= ${start_year}` | Godina završetka mora biti posle godine početka |
+| decimal | loan_repaid | Plaćeni iznos | `. <= ${loan_amount}` | Ne može se platiti više od iznosa zajma |
+
+### Meko upozorenje
+
+**Meko upozorenje** (poznato i kao meko ograničenje ili upozorenje) upozorava anketara da vrednost izgleda neobično, ali mu i dalje dozvoljava nastavak. Ovo je korisno kada je vrednost tehnički važeća, ali statistički malo verovatna.
+
+rtSurvey podržava meka upozorenja koristeći kolonu `constraint` sa posebnim pristupom `constraint_type`, ili putem izgleda `soft` u kombinaciji sa poljem za napomenu.
+
+Najčešći obrazac je korišćenje **note** sa izrazom `relevant` koji označava sumnjičavu vrednost, uparen sa pitanjem **acknowledge** za potvrdu:
+
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Broj dece | |
+| note | children_warning | Upozorenje: Uneli ste `${children}` dece. Molimo potvrdite da je ovo tačno. | `. > 15` |
+| trigger | children_confirm | Potvrdite da je broj dece tačan | `${children} > 15` |
+
+#### Meko upozorenje samo sa constraint_message
+
+Za jednostavnije meko upozorenje, možete formulisati ograničenje koje upozorava na ekstremne vrednosti, ali i dalje dozvoljava širok opseg:
+
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | children | Broj dece | `. >= 0 and . <= 30` | Ova vrednost izgleda veoma visoka. Molimo proverite. |
+
+<Callout type="warning">
+Razlika između tvrdih i mekih ograničenja je važna za kvalitet podataka. Koristite **tvrda ograničenja** za logički nemoguće vrednosti (negativne starosti, temperature iznad 100°C). Koristite **meka upozorenja** za statistički malo verovatne, ali ne nemoguće vrednosti — ne želite da blokirate legitimne granične slučajeve.
+</Callout>

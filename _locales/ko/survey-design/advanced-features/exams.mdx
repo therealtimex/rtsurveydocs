@@ -1,0 +1,117 @@
+---
+title: "시험"
+description: "시험 기능은 설문에 타이머가 있는 퀴즈 모드를 추가하며, 정답과 오답에 대한 선택적 오디오 피드백을 제공합니다."
+---
+
+import { Callout } from 'nextra/components'
+
+**시험** 기능은 설문을 타이머가 있는 퀴즈로 전환합니다. 응답자에게 카운트다운 타이머가 표시되고, 설문은 응답자가 완료할 때 남은 시간을 기록합니다. 선택적으로 정답과 오답에 대한 오디오 사운드를 재생할 수 있습니다.
+
+이는 지식 평가, 문해력 테스트, 현장 직원 역량 검사, 작업에 소요되는 시간이 의미 있는 데이터인 모든 설문에 유용합니다.
+
+---
+
+## `check-exam()` 함수
+
+양식 시작 부분에 배치된 `calculate` 필드의 **`calculation`** 열에서 `check-exam()`을 사용하여 시험을 구성합니다:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### 매개변수
+
+| # | 매개변수 | 설명 |
+|---|-----------|-------------|
+| 1 | `examTime` | 총 시험 시간 (초) |
+| 2 | `questionToStoreRemainingTime` | 시험 종료 시 남은 시간을 저장할 `calculate` 또는 `integer` 필드의 `name` |
+| 3 | `rightSound` | *(선택 사항)* 정답 시 재생할 오디오 파일명 (양식에 미디어 파일로 첨부) |
+| 4 | `wrongSound` | *(선택 사항)* 오답 시 재생할 오디오 파일명 |
+| 5 | `excludeQuestion` | *(선택 사항)* 시험 타이머에서 제외할 필드 이름의 쉼표로 구분된 목록 (예: `'intro_note,consent'`) |
+
+---
+
+## 기본 설정
+
+### 1단계: 시험 필드 추가
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config`는 600초 (10분) 타이머를 시작합니다. `remaining_time`은 응답자가 완료할 때 자동으로 채워집니다.
+
+### 2단계: 질문 추가
+
+시험 타이머는 `excludeQuestion`에 나열된 질문을 제외한 양식의 모든 질문을 포함합니다.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | 케냐의 수도는 나이로비입니다. 맞습니까 틀립니까? |
+| select_one choices | q2 | 어느 기관이 혈액을 체내에 순환시킵니까? |
+| select_one choices | q3 | 물은 해수면에서 100°C에서 끓습니다. 맞습니까 틀립니까? |
+
+### 3단계: 남은 시간 저장
+
+매개변수 2에 지정된 필드 (`remaining_time`)는 응답자가 제출할 때 남은 초 수로 자동으로 설정됩니다. `0` 값은 시간이 다 되었음을 의미하고, 높은 값은 빠르게 완료했음을 의미합니다.
+
+---
+
+## 오디오 피드백 포함
+
+양식에 사운드 파일을 첨부 (미디어 첨부 파일로)한 다음 참조합니다:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3`는 응답자가 정답을 선택하면 재생됩니다
+- `wrong.mp3`는 응답자가 오답을 선택하면 재생됩니다
+
+<Callout type="warning">
+사운드 파일은 양식에 미디어 파일로 첨부되어야 하며 파일명이 정확히 일치해야 합니다 (확장자를 포함하여 대소문자 구분).
+</Callout>
+
+---
+
+## 타이머에서 질문 제외
+
+시험에서 제외할 필드 이름의 쉼표로 구분된 목록을 전달합니다 (예: 소개 메모 또는 동의 질문):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+오디오가 필요 없지만 제외가 필요한 경우 `rightSound`와 `wrongSound`를 빈 문자열 `''`로 남겨둡니다.
+
+---
+
+## 완전한 예시
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | 건강 지식 평가에 오신 것을 환영합니다. 모든 질문에 답하는 데 5분이 있습니다. | |
+| trigger | start_ack | 시작할 준비가 되면 확인을 탭하세요. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | 손 씻기는 질병 전파를 예방합니다. | |
+| select_one yesno | q2 | 하루에 최소 2리터의 물을 마셔야 합니다. | |
+| select_one yesno | q3 | 말라리아는 바이러스에 의해 유발됩니다. | |
+
+---
+
+## 모범 사례
+
+1. 시작 전에 응답자에게 시간 제한을 항상 알립니다 — `check-exam()` 필드 앞에 `note` 또는 `trigger`를 사용합니다.
+2. `excludeQuestion` 매개변수를 사용하여 타이머에서 소개 메모와 동의 질문을 제외합니다.
+3. 시간 초과를 감지하기 위해 후속 계산에서 `remaining_time`을 사용합니다: `if(${remaining_time} = 0, '시간 초과', '완료됨')`.
+4. 허용된 시간에 비례하여 질문 수를 유지합니다 — 대부분의 지식 평가에서 질문당 2–3분이 합리적인 기준선입니다.
+5. 배포 전에 실제 기기에서 오디오 파일을 테스트합니다 — 오디오 재생은 Android 버전 및 브라우저에 따라 다릅니다.
+
+## 제한 사항
+
+- 타이머는 표시용입니다 — 시간이 다 되어도 양식이 자동으로 제출되지 않습니다; 응답자가 여전히 수동으로 제출해야 합니다.
+- 오디오 피드백은 기기 볼륨이 켜져 있고 음소거가 아닌 상태여야 합니다.
+- 시험 기능은 rtSurvey 확장으로 표준 XLSForm 사양의 일부가 아닙니다.

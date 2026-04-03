@@ -1,0 +1,37 @@
+---
+title: "Geoshape"
+description: "Geoshape-vragen staan respondenten toe vormen op een kaart te tekenen, waarmee complexe geografische gegevens worden vastgelegd als onderdeel van de enquête."
+---
+
+Het geoshape-vraagtype in XLSForms en rtSurvey stelt respondenten in staat vormen (veelhoeken) op een kaart te tekenen, waarmee complexe geografische gegevens worden vastgelegd. Deze functie is bijzonder nuttig voor het in kaart brengen van gebieden, het definiëren van grenzen of het markeren van interessegebieden in ruimtelijke enquêtes.
+
+## Basis XLSForm-specificatie
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geoshape | field_area  | Teken de grens van het veld     |
+
+## Toepassingen
+
+Geoshape-vragen worden veelgebruikt voor:
+
+1. Veldbegrenzing in kaart brengen in landbouwenquêtes
+2. Gebieden van milieuimpact definiëren
+3. Zones markeren in stadsplanningsstudies
+4. Regio's omlijnen voor geologische surveys
+5. Complexe geografische kenmerken vastleggen voor ruimtelijke analyse
+
+## Gegevensformaat
+
+Geoshapegegevens worden doorgaans opgeslagen als een tekenreeks van door spaties gescheiden coördinatenparen, omsloten door haakjes:
+
+```
+(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+```
+
+## Beperkingen
+
+- Nauwkeurige vormen tekenen op kleine mobiele schermen kan uitdagend zijn.
+- Complexe vormen kunnen aanzienlijke opslag- en verwerkingscapaciteit vereisen.
+- Geoshape-vragen zijn mogelijk niet geschikt voor alle typen enquêtes of respondenten.
+- Er kunnen privacyproblemen zijn bij het verzamelen van gedetailleerde ruimtelijke gegevens.

@@ -1,0 +1,72 @@
+---
+title: "Số thập phân (Decimal)"
+description: "Các câu hỏi kiểu số thập phân cho phép nhập số có phần phân số vào bản khảo sát của bạn."
+---
+
+Loại câu hỏi `decimal` (số thập phân) trong XLSForm và rtSurvey được sử dụng để thu thập các câu trả lời dạng số có thể bao gồm phần phân số. Loại câu hỏi này rất cần thiết để thu thập dữ liệu số chính xác như các phép đo, giá cả hoặc tỷ lệ phần trăm.
+
+## Đặc tả XLSForm cơ bản
+
+| type    | name   | label                    |
+|---------|--------|--------------------------|
+| decimal | weight | Nhập cân nặng của bạn (kg) |
+
+Để biết thêm chi tiết về loại câu hỏi số thập phân cơ bản, hãy xem [đặc tả XLSForm](https://xlsform.org/en/#question-types).
+
+## Các trường hợp sử dụng
+
+Câu hỏi số thập phân thường được dùng cho:
+
+1. Các phép đo (ví dụ: cân nặng, chiều cao, khoảng cách)
+2. Dữ liệu tài chính (ví dụ: giá cả, tiền lương)
+3. Tỷ lệ phần trăm
+4. Thu thập dữ liệu khoa học
+5. Bất kỳ dữ liệu số nào yêu cầu độ chính xác cao hơn số nguyên
+
+## Các phương pháp hay nhất
+
+1. Sử dụng nhãn rõ ràng và súc tích để chỉ định đầu vào mong muốn và đơn vị đo lường.
+2. Triển khai các ràng buộc phạm vi (`range constraints`) để ngăn chặn các dữ liệu nhập không thực tế hoặc sai sót.
+3. Cân nhắc sử dụng văn bản gợi ý (`hint`) để cung cấp ví dụ hoặc làm rõ định dạng mong muốn.
+4. Chỉ định số chữ số thập phân mong muốn trong nhãn hoặc gợi ý nếu độ chính xác là quan trọng.
+
+## Ràng buộc và Xác thực (Constraints and Validation)
+
+Bạn có thể thêm các ràng buộc để đảm bảo giá trị đã nhập nằm trong một phạm vi cụ thể:
+
+| type    | name   | label                    | constraint        | constraint_message                    |
+|---------|--------|--------------------------|-------------------|---------------------------------------|
+| decimal | height | Nhập chiều cao của bạn (mét) | .>0 and .&lt;=3    | Chiều cao phải nằm trong khoảng từ 0 đến 3 mét |
+
+## Ví dụ sử dụng
+
+Dưới đây là một ví dụ về cách bạn có thể sử dụng các câu hỏi số thập phân trong một cuộc khảo sát sức khỏe:
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| decimal | weight         | Nhập cân nặng của bạn (kg)                | .>0 and .&lt;=500 | Cân nặng phải nằm trong khoảng từ 0 đến 500 kg |
+| decimal | height         | Nhập chiều cao của bạn (mét)              | .>0 and .&lt;=3 | Chiều cao phải nằm trong khoảng từ 0 đến 3 mét |
+| decimal | body_temp      | Nhập nhiệt độ cơ thể bằng độ C            | .>=35 and .&lt;=42 | Nhiệt độ phải nằm trong khoảng từ 35°C đến 42°C |
+| calculate | bmi          |                                           |            |                                   |
+
+Trong hàng `calculate` cho BMI, bạn có thể sử dụng:
+
+```
+calculation | ${weight} / (${height} * ${height})
+```
+
+Phép tính này sẽ tính chỉ số BMI dựa trên cân nặng và chiều cao đã nhập.
+
+## Các phần mở rộng của rtSurvey
+
+Mặc dù đặc tả XLSForm cơ bản cho các câu hỏi số thập phân khá đơn giản, rtSurvey có thể cung cấp thêm các tính năng hoặc tùy chỉnh bổ sung:
+
+1. Kiểm soát độ chính xác (số chữ số sau dấu thập phân)
+2. Định dạng nhập tùy chỉnh (ví dụ: phần trăm, đơn vị tiền tệ)
+3. Các quy tắc xác thực nâng cao
+
+## Hạn chế
+
+- Độ chính xác của số thập phân có thể bị hạn chế bởi hệ thống hoặc cơ sở dữ liệu bên dưới.
+- Người dùng có thể cần hướng dẫn về dấu phân cách thập phân (dấu chấm hoặc dấu phẩy) tùy thuộc vào ngôn ngữ của họ.
+- Các số thập phân lớn có thể khó đọc hoặc nhập chính xác trên các thiết bị di động.

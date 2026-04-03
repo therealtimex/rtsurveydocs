@@ -1,0 +1,66 @@
+---
+title: "Geopoint"
+description: "Geopoint klausimai fiksuoja geografines koordinates (platumą, ilgumą, aukštį ir tikslumą) kaip apklausos dalį."
+---
+
+XLSForm ir rtSurvey geopoint klausimo tipas leidžia rinkti geografines koordinates naudojant įrenginio GPS ar kitas vietos nustatymo paslaugas. Ši funkcija ypač naudinga apklausos atsakymų geografiniam žemėlapiui sudaryti, lauko veiklos sekimui ar duomenų susiejimui su konkrečiomis vietomis.
+
+## Pagrindinė XLSForm specifikacija
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geopoint | location    | Įrašykite dabartinę vietą       |
+
+## Naudojimo atvejai
+
+Geopoint klausimai dažnai naudojami:
+
+1. Apklausos atsakymų geografiniam atvaizdavimui
+2. Lauko veiklos vietų tikrinimui
+3. Surašytojų maršrutų sekimui
+4. Aplinkos ar socialinių duomenų susiejimui su konkrečiomis vietomis
+5. Atstumų ar plotų skaičiavimui geografinėse analizėse
+
+## Geriausios praktikos
+
+1. Užtikrinkite, kad įrenginyje yra įjungtos vietos paslaugos ir suteikti leidimai.
+2. Suteikite pakankamai laiko GPS tiksliam fiksavimui.
+3. Atsižvelkite į privatumo pasekmes ir informuokite respondentus apie vietos duomenų rinkimą.
+4. Naudokite kartu su kitais klausimų tipais, kad suteiktumėte kontekstą vietos duomenims.
+
+## Naudojimo pavyzdys
+
+Štai pavyzdys, kaip galima naudoti geopoint klausimą apklausoje:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geopoint | sample_location| Įrašykite mėginio paėmimo vietą | Stovėkite atviroje vietoje geresniam GPS signalui |
+
+## Duomenų formatas
+
+Geopoint duomenys paprastai saugomi kaip keturių tarpais atskirtų reikšmių eilutė:
+
+```
+platuma ilguma aukštis tikslumas
+```
+
+Pavyzdžiui:
+```
+41.40338 2.17403 30.5 10
+```
+
+## Analizės svarstymai
+
+Naudojant geopoint klausimus, atsižvelkite į:
+
+1. Kaip geografiniai duomenys bus vizualizuojami (pvz., žemėlapių programinė įranga)
+2. Surinktų koordinačių tikslumą ir jo poveikį analizei
+3. Privatumo ir duomenų apsaugos priemones tvarkant vietos duomenis
+4. Galimą integraciją su GIS (Geografinės informacijos sistemos) įrankiais
+
+## Apribojimai
+
+- Tikslumas gali skirtis priklausomai nuo įrenginio ir aplinkos sąlygų.
+- GPS signalai gali būti silpni ar nepasiekiami patalpose ar vietovėse su kliūtimis.
+- Vietos duomenų rinkimas gali žymiai paveikti įrenginio baterijos gyvavimo laiką.
+- Su tikslių vietos duomenų rinkimu gali būti susijusios privatumo problemos.

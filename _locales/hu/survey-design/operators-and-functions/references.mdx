@@ -1,0 +1,82 @@
+---
+title: "Értékekre való hivatkozás"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+A `${mezőnév}` szintaxis az űrlap egy másik mezőjének aktuális értékére hivatkozik. Megjelenítheti a megadott, kiválasztott vagy számított értéket, és pontosan úgy jelenik meg, ahogy az elküldött adatokban szerepel.
+
+Példa:
+Ha van egy "age" nevű mezőjük, és le szeretné kérni az abba beírt pontos értéket, használja a `${age}` hivatkozást.
+
+A korlátok esetén a "." szimbólum az aktuális mező javasolt bevitelére vagy kiválasztására hivatkozik. Lehetővé teszi feltételek vagy korlátok alkalmazását a felhasználó által éppen beírt vagy kiválasztott értéken alapulva.
+
+Példa:
+Ha azt szeretné ellenőrizni, hogy az aktuális mező javasolt értéke kisebb-e 3-nál, használhatja a `. < 3` korlátot.
+
+---
+
+## `..` — Szülőcsoport hivatkozás
+
+Egy csoporton vagy ismétlőcsoporton belül a `..` a **szülőkontextusra** hivatkozik. A gyakorlatban ritkán szükséges, de haladó XPath-kifejezésekben az űrlaphierarchia bejárásához használatos.
+
+---
+
+## Hivatkozások felhasználási területei
+
+| Oszlop | Hivatkozás típusa | Példa |
+|--------|---------------|---------|
+| `relevant` | `${mezőnév}` | `${consent} = 'yes'` |
+| `constraint` | `.` az aktuális mezőhöz, `${mezőnév}` másokhoz | `. > 0 and . <= ${max_value}` |
+| `calculation` | `${mezőnév}` | `${adults} + ${children}` |
+| `required` | `${mezőnév}` | `${has_income} = 'yes'` |
+| `default` | `${mezőnév}` | `${previous_answer}` |
+| `label` | `${mezőnév}` a szövegben | `"A kora ${age} év"` |
+| `choice_filter` | Oszlopnév (nem `${}`) | `district = ${district}` |
+
+<Callout type="warning">
+A `choice_filter` oszlopban a **lehetőség oszlopneveket** közvetlenül (nem `${}`-vel) hivatkozza, az **űrlapmezőket** pedig `${}`-vel. Ezek összekeverése a hibák gyakori forrása.
+</Callout>
+
+---
+
+## Ismétlőcsoportokon belüli értékekre való hivatkozás
+
+Egy ismétlésen belül a `${mezőnév}` az **ugyanazon ismétlési példányban** lévő mezőre hivatkozik:
+
+```
+relevant: ${member_age} < 18
+```
+
+Ez az aktuális ismétlési példány `member_age` értékét használja, nem az összes példányét.
+
+Egy **adott** ismétlési példány mezőjére való hivatkozáshoz az ismétlésen kívülről használja az `indexed-repeat()` függvényt:
+
+```
+indexed-repeat(${member_name}, ${household_members}, 1)
+```
+
+Teljes részletekért lásd: [Függvények — Ismétlődő mezők függvényei](functions#repeated-field-functions).
+
+---
+
+## Üres értékek ellenőrzése
+
+Annak tesztelése, hogy egy mezőt megválaszoltak-e:
+
+```
+${mezőnév} != ''       (a mező nem üres)
+${mezőnév} = ''        (a mező üres)
+```
+
+Számok esetén az is ellenőrizhető:
+```
+${age} > 0               (az életkor pozitív – implicit módon nem üres numerikus kontextusban)
+```
+
+---
+
+## Típuskényszer a hivatkozásokban
+
+Ha a `${mezőnév}` értéket numerikus kontextusban használja (pl. `${age} + 1`), az rtSurvey automatikusan számmá alakítja a karakterlánc értéket. Egy üres mező `0`-ra vagy `NaN`-ra alakul a művelettől függően – használja a `coalesce(${field}, 0)` értéket az üres numerikus mező biztonságos nullává alakításához.

@@ -1,0 +1,304 @@
+---
+title: "Funkcijos"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+### Eilutės funkcijos
+
+<Callout type="warning">
+Dirbdami su eilutėmis išraiškose, svarbu naudoti viengubas kabutes ('') literalinėms eilutėms uždaryti. Tačiau yra išimtis, kai norite įtraukti viengubas kabutes literalinėje eilutėje. Tokiais atvejais galite naudoti dvigubas kabutes ("") visai eilutei uždaryti.
+
+Pavyzdžiui:
+- Teisingai: if(`${yesno}` = 1, "eilutė su 'viengubomis kabutėmis' joje", "čia nėra viengubų kabučių")
+- Neteisingai: if(`${yesno}` = 1, 'eilutė su 'viengubomis kabutėmis' joje', 'čia nėra viengubų kabučių')
+
+Dėl išmaniųjų kabučių svarbu žinoti apie jų buvimą, nes jos gali sukelti problemų išraiškose. Daugelis turtingo teksto redaktorių automatiškai konvertuoja tiesias kabutes ("" arba '') į išmaniąsias arba garbanojančias kabutes ("" arba ''), kurios gali sukelti sintaksės klaidas arba netikėtą elgseną. Norėdami to išvengti, įsitikinkite, kad nuosekliai naudojate tiesias kabutes ('') savo išraiškose.
+</Callout>
+
+rtSurvey palaiko įvairias funkcijas, įskaitant:
+
+1. `string(field)`: Konvertuoja lauką į eilutę.
+   - Pavyzdys: `string(34.8)` bus konvertuotas į `'34.8'`.
+
+2. `string-length(field)`: Grąžina eilutės lauko ilgį.
+   - Pavyzdys: `string-length(.) > 3 and string-length(.) < 10` gali būti naudojamas, kad užtikrintumėte, jog dabartinis laukas yra nuo 3 iki 10 simbolių.
+
+3. `substr(fieldorstring, startindex, endindex)`: Grąžina poeilutę, prasidedančią nuo `startindex` ir besibaigančią prieš `endindex`. Indeksai prasideda nuo 0 pirmam eilutės simboliui.
+   - Pavyzdys: `substr(${phone}, 0, 3)` grąžins pirmus tris telefono numerio skaitmenis.
+
+4. `concat(a, b, c, ...)`: Sujungia laukus (ir/arba eilutes) kartu.
+   - Pavyzdys: `concat(${firstname}, ' ', ${lastname})` grąžins pilną vardą sujungdamas reikšmes laukuose `firstname` ir `lastname`.
+
+5. `linebreak()`: Grąžina eilutės lūžio simbolį.
+   - Pavyzdys: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` grąžins trijų laukų reikšmių sąrašą su eilutės lūžiais tarp jų.
+
+6. `lower()`: Konvertuoja eilutę į visas mažąsias raides.
+   - Pavyzdys: `lower('Gatvės pavadinimas')` grąžins „gatvės pavadinimas".
+
+7. `upper()`: Konvertuoja eilutę į visas didžiąsias raides.
+   - Pavyzdys: `upper('Gatvės pavadinimas')` grąžins „GATVĖS PAVADINIMAS".
+
+### select_one ir select_multiple funkcijos
+
+1. `count-selected(field)`: Grąžina pasirinkimų skaičių select_multiple lauke.
+   - Pavyzdys: `count-selected(.) = 3` gali būti naudojamas kaip apribojimo išraiška, kad užtikrintumėte, jog tiksliai trys pasirinkimai yra pasirinkti.
+
+2. `selected(field, value)`: Grąžina tiesa arba melas, priklausomai nuo to, ar nurodyta reikšmė buvo pasirinkta select_one ar select_multiple lauke.
+   - Pavyzdys: `selected(${color}, 'Blue')` gali būti naudojamas kaip aktualumo išraiška grupei ar laukui rodyti tik jei respondentas pasirinko „Mėlyna" kaip mėgstamiausią spalvą.
+   - Pastaba: antrasis parametras visada turėtų nurodyti pasirinkimo reikšmę, o ne pasirinkimo etiketę. Naudokite reikšmę iš reikšmių stulpelio formos apibrėžties pasirinkimų darbalapyje.
+
+3. `selected-at(field, number)`: Grąžina pasirinktą elementą nurodytoje pozicijoje select_multiple lauke. Kai perduotas skaičius yra 0, grąžina pirmą pasirinktą elementą; kai skaičius yra 1, grąžina antrą pasirinktą elementą ir t.t.
+   - Pavyzdys: `selected-at(${fruits}, 0) = 'Apple'` gali būti naudojamas kaip aktualumo išraiška grupei ar laukui rodyti tik jei pirmasis pasirinktas pasirinkimas yra „Apple".
+   - Pastaba: grąžinama reikšmė bus pasirinkimo reikšmė, o ne pasirinkimo etiketė.
+
+4. `choice-label(field, value)`: Grąžina select_one ar select_multiple lauko pasirinkimo etiketę, kaip apibrėžta formos apibrėžties pasirinkimų darbalapyje.
+   - 1 pavyzdys: `choice-label(${country}, ${country})` grąžins pasirinkimo etiketę dabartiniam pasirinktam pasirinkimui lauke `country`.
+   - 2 pavyzdys: `choice-label(${languages}, selected-at(${languages}, 0))` grąžins pirmojo pasirinkto pasirinkimo etiketę lauke `languages`.
+   - Pastaba: ši funkcija nuskaito pasirinkimo etiketę, o ne reikšmę.
+
+### Kartotų laukų funkcijos
+
+rtSurvey sistemoje, jei norite klausti tų pačių klausimų kelis kartus, galite įdėti lauką į kartojimų grupę. Tai sukuria kelis tų pačių laukų egzempliorius. Šios funkcijos gali padėti dirbti su šiais kartotais laukais ir jų sukurtais duomenimis.
+
+1. `join(string, repeatedfield)`: Kartojimų grupės viduje esančiam laukui generuoja eilute atskirtyną reikšmių sąrašą. Pirmasis parametras nurodo naudojamą skyriklį reikšmėms atskirti.
+   - Pavyzdys: `join(', ', ${member_name})` sugeneruos vieną kableliais atskirtą sąrašą iš visų įvestų vardų.
+
+2. `join-if(string, repeatedfield, expression)`: Veikia lygiai kaip `join()`, tačiau patikrina kiekvieną kartojimų grupės egzempliorių naudodamas pateiktą išraišką. Jei išraiška įvertinama kaip melas, elementas bus praleistas.
+   - Pavyzdys: `join-if(', ', ${member_name}, ${age} >= 18)` sugeneruos kableliais atskirtą tik suaugusių narių vardų sąrašą.
+
+3. `count(repeatgroup)`: Grąžina dabartinį kartojimų grupės kartojimų skaičių.
+   - Pavyzdys: `count(${groupname})` grąžins grupės egzempliorių skaičių.
+
+4. `count-if(repeatgroup, expression)`: Veikia lygiai kaip `count()`, tačiau patikrina kiekvieną kartojimų grupės egzempliorių naudodamas pateiktą išraišką.
+   - Pavyzdys: `count-if(${members}, ${age} >= 18)` grąžins suaugusių narių skaičių pagal amžiaus lauką „members" kartojimų grupėje.
+
+5. `sum(repeatedfield)`: Kartojimų grupės viduje esančiam laukui apskaičiuoja visų reikšmių sumą.
+   - Pavyzdys: `sum(${loan_amount})` grąžins bendrą visų paskolų vertę.
+
+6. `sum-if(repeatedfield, expression)`: Veikia lygiai kaip `sum()`, tačiau patikrina kiekvieną egzempliorių naudodamas pateiktą išraišką.
+   - Pavyzdys: `sum-if(${loan_amount}, ${loan_amount} > 500)` grąžins visų paskolų, viršijančių 500, bendrą vertę.
+
+7. `min(repeatedfield)`: Kartojimų grupės viduje esančiam laukui apskaičiuoja minimalią visų reikšmių reikšmę.
+   - Pavyzdys: `min(${member_age})` grąžins jauniausio nario amžių grupėje.
+
+8. `min-if(repeatedfield, expression)`: Veikia lygiai kaip `min()`, tačiau patikrina kiekvieną egzempliorių naudodamas pateiktą išraišką.
+   - Pavyzdys: `min-if(${member_age}, ${member_age} >= 18)` grąžins jauniausio suaugusiojo amžių grupėje.
+
+9. `max(repeatedfield)`: Kartojimų grupės viduje esančiam laukui apskaičiuoja maksimalią visų reikšmių reikšmę.
+   - Pavyzdys: `max(${member_age})` grąžins vyriausio nario amžių grupėje.
+
+10. `max-if(repeatedfield, expression)`: Veikia lygiai kaip `max()`, tačiau patikrina kiekvieną egzempliorių naudodamas pateiktą išraišką.
+    - Pavyzdys: `max-if(${member_age}, ${member_age} >= 18)` grąžins vyriausio suaugusiojo amžių grupėje.
+
+11. `index()`: Iškviesta kartojimų grupės viduje, grąžina dabartinės grupės ar egzemplioriaus indekso numerį.
+    - Pavyzdys: `index()` naudojamas kartojimų grupės viduje grąžins 1 pirmam egzemplioriui, 2 antram ir t.t.
+
+12. `indexed-repeat(repeatedfield, repeatgroup, index)`: Nurodo lauką ar grupę, esančią kartojimų grupės viduje, iš tos kartojimų grupės išorės.
+    - 1 pavyzdys: `indexed-repeat(${name}, ${names}, 1)` grąžins pirmą vardą, kai vardo laukas yra ankstesnėje kartojimų grupėje „names".
+    - 2 pavyzdys: `indexed-repeat(${name}, ${names}, index())` trauks vardą, atitinkantį dabartinės kartojimų grupės egzemplioriaus numerį.
+
+13. `rank-index(index, repeatedfield)`: Ši funkcija apskaičiuoja eilinį reitingą nurodyto kartoto lauko egzemplioriaus naudojimui už kartojimų grupės ribų.
+    - Pavyzdys: `rank-index(1, ${random_draw})` apskaičiuoja pirmojo egzemplioriaus reitingą pagal jo `random_draw` lauko reikšmę, lyginant su kitų egzempliorių reikšmėmis.
+
+14. `rank-index-if(index, repeatedfield, expression)`: Ši funkcija veikia panašiai kaip `rank-index()`, tačiau patikrina kiekvieną kartoto lauko kartojimų grupės egzempliorių naudodamas pateiktą išraišką.
+    - Pavyzdys: `rank-index-if(1, ${age}, ${age} >= 18)` apskaičiuoja amžiaus reitingą suaugusiųjų aibėje.
+
+### Skaičių funkcijos
+
+| Operatorius | Operacija | Pavyzdys | Atsakymo pavyzdys |
+|----------|-----------|---------|----------------|
+| `+` | Sudėtis | 1 + 1 | 2 |
+| `-` | Atimtis | 3 - 2 | 1 |
+| `*` | Daugyba | 3 * 2 | 6 |
+| `div` | Dalyba | 10 div 2 | 5 |
+| `mod` | Modulis | 9 mod 2 | 1 |
+
+rtSurvey palaiko skaičių funkcijas, įskaitant:
+- `number(field)`: Konvertuoja lauko reikšmę į skaičių.
+  - Pavyzdys: `number('34.8')` = 34.8
+
+- `int(field)`: Konvertuoja lauko reikšmę į sveikąjį skaičių.
+  - Pavyzdys: `int('39.2')` = 39
+
+- `min(field1, ..., fieldx)`: Grąžina minimalią reikšmę tarp perduotų laukų.
+  - Pavyzdys: `min(${father_age}, ${mother_age})` grąžins tėvo arba motinos amžių, kuris mažesnis.
+
+- `max(field1, ..., fieldx)`: Grąžina maksimalią reikšmę tarp perduotų laukų.
+  - Pavyzdys: `max(${father_age}, ${mother_age})` grąžins tėvo arba motinos amžių, kuris didesnis.
+
+- `format-number(field)`: Formatuoja sveikojo skaičiaus arba decimal lauko reikšmę pagal naudotojo vietinės rinkos nustatymus.
+  - Pavyzdys: `format-number(${income})` ši išraiška gali formatuoti „120000" kaip „120,000".
+
+- `round(field, digits)`: Suapvalina skaitinio lauko reikšmę iki nurodyto skaitmenų skaičiaus po dešimtainio skyriklio.
+  - Pavyzdys: `round(${interest_rate}, 2)`
+
+- `abs(number)`: Grąžina absoliučiąją skaičiaus reikšmę.
+  
+- `pow(base, exponent)`: Grąžina pirmojo parametro reikšmę, pakeltos į antrojo parametro laipsnį.
+
+- `log10(fieldorvalue)`: Grąžina perduoto lauko arba reikšmės dešimtainį logaritmą.
+
+- `sin(fieldorvalue)`: Grąžina perduoto lauko arba reikšmės sinusą, išreikštą radianais.
+  
+- `cos(fieldorvalue)`: Grąžina perduoto lauko arba reikšmės kosinusą, išreikštą radianais.
+
+- `tan(fieldorvalue)`: Grąžina perduoto lauko arba reikšmės tangentą, išreikštą radianais.
+
+- `asin(fieldorvalue)`: Grąžina perduoto lauko arba reikšmės arksinusą, išreikštą radianais.
+
+- `acos(fieldorvalue)`: Grąžina perduoto lauko arba reikšmės arkkosinusą, išreikštą radianais.
+
+- `atan(fieldorvalue)`: Grąžina perduoto lauko arba reikšmės arktangentą, išreikštą radianais.
+
+- `atan2(x, y)`: Grąžina kampą radianais tarp koordinačių (x, y) taško ir teigiamos x ašies. Rezultatas yra diapazone nuo -pi() iki pi().
+
+- `sqrt(fieldorvalue)`: Grąžina perduoto lauko arba reikšmės neigiamąją kvadratinę šaknį.
+
+- `exp(x)`: Grąžina e^x reikšmę.
+
+- `pi()`: Grąžina pi reikšmę.
+
+### Datos ir laiko funkcijos
+
+<Callout type="warning">
+Datos reikšmės rtSurvey sistemoje saugomos kaip eilutės `YYYY-MM-DD` formatu. Datos ir laiko reikšmės saugomos kaip ISO 8601 eilutės (`YYYY-MM-DDTHH:MM:SS`). Naudokite `decimal-date-time()`, kad konvertuotumėte į skaičių aritmetinėms operacijoms (pvz., trukmių skaičiavimui).
+</Callout>
+
+1. `today()`: Grąžina šiandienos datą kaip eilutę `YYYY-MM-DD` formatu. Įvertinama vieną kartą, kai atidaroma forma.
+   - Pavyzdys: `today()` → `'2024-03-15'`
+   - Dažnas naudojimas: stulpelyje `default` šiandienos datai iš anksto užpildyti, arba `relevant`/`constraint` datų laukams lyginti.
+
+2. `now()`: Grąžina dabartinę datą ir laiką kaip ISO 8601 eilutę. Įvertinama kiekvieną kartą, kai išraiška apskaičiuojama.
+   - Pavyzdys: `now()` → `'2024-03-15T14:32:00.000+03:00'`
+   - Dažnas naudojimas: tikslaus konkretaus apklausos metu įvykusio įvykio laiko žymos įrašymui.
+
+3. `date(value)`: Konvertuoja reikšmę (eilutę ar skaičių) į datos eilutę.
+   - Pavyzdys: `date('2024-03-15')` → `'2024-03-15'`
+
+4. `date-time(value)`: Konvertuoja reikšmę į datos ir laiko eilutę.
+   - Pavyzdys: `date-time(${event_timestamp})`
+
+5. `decimal-date-time(value)`: Konvertuoja datos ar datos ir laiko eilutę į dešimtainį skaičių, atspindintį milisekundes nuo Unix epochos, padalintas iš 86400000 (t.y., trupmeninės dienos nuo 1970-01-01). Naudokite šią funkciją datos aritmetinėms operacijoms.
+   - Pavyzdys: trukmė dienomis tarp dviejų datų:
+     `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
+   - Pavyzdys: trukmė minutėmis tarp dviejų datos ir laiko:
+     `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
+
+6. `format-date(date, format)`: Formatuoja datos reikšmę naudodamas šablono eilutę.
+   - Formato žymės: `%Y` (4 skaitmenų metai), `%y` (2 skaitmenų metai), `%m` (mėnuo 01–12), `%d` (diena 01–31), `%a` (sutrumpintas savaitės dienos pavadinimas), `%b` (sutrumpintas mėnesio pavadinimas)
+   - Pavyzdys: `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+
+7. `format-date-time(datetime, format)`: Formatuoja datos ir laiko reikšmę naudodamas šablono eilutę. Priima visas `format-date` žymas ir dar:
+   - `%H` (valanda 00–23), `%h` (valanda 01–12), `%M` (minutės 00–59), `%S` (sekundės 00–59), `%3` (milisekundės), `%P` (AM/PM)
+   - Pavyzdys: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+
+---
+
+### Loginės funkcijos
+
+1. `boolean(value)`: Konvertuoja bet kokią reikšmę į loginę. Grąžina `tiesa` netuščioms eilutėms, ne nulinėms reikšmėms ir `tiesa`; grąžina `melas` tuščioms eilutėms, `0` ir `melas`.
+   - Pavyzdys: `boolean(${name})` grąžina `tiesa`, jei `name` nėra tuščias.
+
+2. `boolean-from-string(string)`: Grąžina `tiesa`, jei eilutė yra `'1'` arba `'true'` (neskiria didžiųjų ir mažųjų raidžių); kitu atveju grąžina `melas`.
+   - Pavyzdys: `boolean-from-string(${enabled_flag})` — naudinga, kai laukas saugo `'true'`/`'false'` kaip tekstą.
+
+3. `true()`: Grąžina loginę reikšmę `tiesa`.
+   - Pavyzdys: stulpelyje `required`, `true()` yra lygiavertis `yes`.
+
+4. `false()`: Grąžina loginę reikšmę `melas`.
+   - Pavyzdys: `if(${skip_section} = 'yes', false(), true())` — dinamiškai nustatykite privalomumą.
+
+5. `not(expression)`: Grąžina loginį išraiškos neigimą. Grąžina `tiesa`, jei išraiška yra melas, ir atvirkščiai.
+   - Pavyzdys: `not(${consent} = 'yes')` — rodyti perspėjimą, kai sutikimas NEBUVO duotas.
+   - Pavyzdys: `not(selected(${issues}, 'none'))` — reikalauti detalių tik jei „nė vienas" nebuvo pasirinktas.
+
+---
+
+### Papildomos eilutės funkcijos
+
+1. `starts-with(string, prefix)`: Grąžina `tiesa`, jei `string` prasideda `prefix`.
+   - Pavyzdys: `starts-with(${phone}, '+254')` patikrina, ar telefono numeris prasideda Kenijos šalies kodu.
+
+2. `contains(string, substring)`: Grąžina `tiesa`, jei `string` turi `substring`.
+   - Pavyzdys: `contains(${email}, '@')` patikrina, ar el. pašto adresas turi `@` ženklą.
+
+3. `substring-before(string, needle)`: Grąžina `string` dalį, einančią prieš pirmą `needle` pasitaikymą.
+   - Pavyzdys: `substring-before(${full_name}, ' ')` išskiria pirmą žodį (vardą).
+
+4. `substring-after(string, needle)`: Grąžina `string` dalį, einančią po pirmo `needle` pasitaikymo.
+   - Pavyzdys: `substring-after(${email}, '@')` išskiria el. pašto adreso domeno dalį.
+
+5. `normalize-space(string)`: Pašalina pradines ir galūnines tarpų vietas ir sutraukia visas vidines tarpų sekas iki vieno tarpo.
+   - Pavyzdys: `normalize-space(${name})` — išvalo vardą, kuris galėjo būti įvestas su papildomais tarpais.
+
+6. `translate(string, search_chars, replace_chars)`: Pakeičia kiekvieną `string` simbolį, esantį `search_chars`, atitinkamu simboliu `replace_chars`. Simboliai `search_chars`, neturintys atitinkamo simbolio `replace_chars`, ištrinami.
+   - Pavyzdys: `translate(${phone}, ' -()', '')` pašalina tarpus, brūkšnelius ir skliaustus iš telefono numerio.
+
+---
+
+### Papildomos matematinės funkcijos
+
+1. `floor(number)`: Grąžina didžiausią sveikąjį skaičių, mažesnį arba lygų `number` (apvalina link neigiamos begalybės).
+   - Pavyzdys: `floor(4.9)` = 4, `floor(-2.1)` = -3
+
+2. `ceiling(number)`: Grąžina mažiausią sveikąjį skaičių, didesnį arba lygų `number` (apvalina link teigiamos begalybės).
+   - Pavyzdys: `ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
+
+3. `random()`: Grąžina atsitiktinį dešimtainį skaičių nuo 0.0 (įskaitant) iki 1.0 (neįskaitant). Paprastai naudojamas `calculate` laukuose atsitiktinėms reikšmėms priskirti.
+   - Pavyzdys: `int(random() * 6) + 1` → atsitiktinis skaičius 1–6 (kauliuko metimas)
+
+4. `coalesce(a, b)`: Grąžina `a`, jei `a` nėra tuščias; kitu atveju grąžina `b`. Naudinga kaip atsarginis variantas, kai laukas gali būti tuščias.
+   - Pavyzdys: `coalesce(${preferred_name}, ${full_name})` — naudoti pageidaujamą vardą, jei nustatytas, kitu atveju grįžti prie pilno vardo.
+
+5. `once(value)`: Įvertina `value` ir saugo jį, tačiau tik jei dabartinis laukas yra **tuščias**. Jei laukas jau turi reikšmę, `once()` grąžina esamą reikšmę nepakeistą. Tai neleidžia perskaičiavimui perrašyti naudotojo įvesties.
+   - Pavyzdys: `once(today())` stulpelyje `default` nustato šiandienos datą vieną kartą ir neatnaujinama, jei surašytojas iš naujo atidaro formą.
+   - Pavyzdys: `once(uuid())` generuoja UUID vieną kartą ir išlaiko jį stabilų per perredigiavimus.
+
+---
+
+### Geografinės funkcijos
+
+1. `area(geoshape_value)`: Apskaičiuoja **plotą kvadratiniais metrais**, uždaro pagal geoshape (daugiaeilinės) reikšmę.
+   - Parametras yra geoshape lauko reikšmė formatu `lat1 lon1 0 0; lat2 lon2 0 0; ...`
+   - Pavyzdys: `area(${field_boundary})` — apskaičiuoti apklausto lauko plotą m².
+   - Pavyzdys: `round(area(${field_boundary}) div 10000, 2)` — konvertuoti į hektarus.
+
+2. `distance(coordinates)`: Apskaičiuoja **bendrą maršruto ilgį metrais** geotrace (linijos), arba atstumą tarp dviejų geopoint.
+   - Geotrace atveju: `distance(${route})` grąžina bendrą maršruto ilgį metrais.
+   - Dviem geopoint atveju: `distance(concat(${point_a}, ' ', ${point_b}))` grąžina atstumą tarp jų.
+   - Pavyzdys: `round(distance(${road_trace}) div 1000, 3)` — kelio ilgis kilometrais.
+
+---
+
+### Tikrinimo funkcijos
+
+1. `regex(value, pattern)`: Grąžina `tiesa`, jei `value` atitinka reguliariąją išraišką `pattern`. Naudokite stulpelyje `constraint` šablonu grindžiamam tikrinimui.
+   - Pavyzdys: `regex(., '^[0-9]{10}$')` — tikrinti 10 skaitmenų numerį.
+   - Pavyzdys: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — pagrindinis el. pašto formato patikrinimas.
+
+2. `checklist(min, max, v1, v2, ...)`: Įvertina loginių išraiškų sąrašą ir grąžina `tiesa`, jei `tiesa` reikšmių skaičius yra nuo `min` iki `max` (imtinai). Perduokite `-1` `min` arba `max`, kad praleistumėte tą ribą.
+   - Pavyzdys: `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — praeina, jei tiksliai 2 arba 3 iš trijų sąlygų yra teisingos.
+
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Kaip `checklist()`, tačiau kiekviena reikšmė turi svorį. Svorių suma `tiesa` reikšmėms turi būti nuo `min` iki `max`.
+   - Pavyzdys: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — esamų įrenginių svorių suma turi būti bent 10.
+
+---
+
+### Pagalbinės funkcijos
+
+1. `uuid()`: Generuoja atsitiktinį UUID (RFC 4122 v4 formatas) kaip eilutę.
+   - Paprastai naudojamas su `once()` stabiliam unikaliam ID generuoti: `once(uuid())`
+
+2. `version()`: Grąžina formos `version` atributo reikšmę, nustatytą nustatymų darbalapyje.
+   - Naudinga `calculate` laukuose formos versijos įterpimui į eksportuojamus duomenis.
+
+3. `position()`: Iškviesta kartojimų grupės viduje, grąžina dabartinio kartojimo egzemplioriaus 1 nuo pradžios skaičiuojamą indeksą.
+   - Taip pat žr.: `index()` (pseudonimas), `indexed-repeat()` kartojimų reikšmėms nurodyti iš grupės išorės.
+
+4. `thousandsep(length, separator, value)`: Formatuoja skaičių su tūkstančių skyrikliuu. `length` yra minimali bendra eilutės ilgis (užpildytas tarpais, jei trumpesnis), `separator` yra naudojamas simbolis (pvz., `','`), o `value` yra formatuojamas skaičius.
+   - Pavyzdys: `thousandsep(0, ',', 1234567)` → `'1,234,567'`
+
+5. `substr-jsonpath(value, jsonpath)`: Išskiria poeilutę iš JSON eilutės naudodamas JSONPath išraišką.
+   - Paprastai naudojamas kartu su `callapi()`, kad išskirtų konkrečias reikšmes iš API atsakymų.

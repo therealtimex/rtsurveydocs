@@ -1,0 +1,117 @@
+---
+title: "Esami"
+description: "La funzionalità esame aggiunge una modalità quiz a tempo a un sondaggio, con feedback audio opzionale per le risposte corrette e errate."
+---
+
+import { Callout } from 'nextra/components'
+
+La funzionalità **Esame** trasforma un sondaggio in un quiz a tempo. Un timer a conto alla rovescia viene mostrato al rispondente, e il sondaggio registra quanto tempo rimane quando finisce. Facoltativamente, possono suonare effetti audio per le risposte corrette e errate.
+
+Questo è utile per valutazioni delle conoscenze, test di alfabetizzazione, verifiche delle competenze del personale sul campo e qualsiasi sondaggio in cui il tempo impiegato sia un dato significativo.
+
+---
+
+## Funzione `check-exam()`
+
+Configura l'esame usando `check-exam()` nella colonna **`calculation`** di un campo `calculate` posto all'inizio del modulo:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Parametri
+
+| # | Parametro | Descrizione |
+|---|-----------|-------------|
+| 1 | `examTime` | Durata totale dell'esame in secondi |
+| 2 | `questionToStoreRemainingTime` | Il `name` di un campo `calculate` o `integer` che memorizzerà il tempo rimanente quando l'esame termina |
+| 3 | `rightSound` | *(Opzionale)* Nome del file audio da riprodurre quando viene data una risposta corretta (allegato al modulo come file multimediale) |
+| 4 | `wrongSound` | *(Opzionale)* Nome del file audio da riprodurre quando viene data una risposta errata |
+| 5 | `excludeQuestion` | *(Opzionale)* Elenco separato da virgole di nomi di campo da escludere dal timer dell'esame (es. `'intro_note,consent'`) |
+
+---
+
+## Configurazione di base
+
+### Passaggio 1: Aggiungi i campi dell'esame
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` attiva il timer di 600 secondi (10 minuti). `remaining_time` viene popolato automaticamente quando il rispondente finisce.
+
+### Passaggio 2: Aggiungi le tue domande
+
+Il timer dell'esame copre tutte le domande nel modulo eccetto quelle elencate in `excludeQuestion`.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | La capitale del Kenya è Nairobi. Vero o falso? |
+| select_one choices | q2 | Quale organo pompa il sangue nel corpo? |
+| select_one choices | q3 | L'acqua bolle a 100°C a livello del mare. Vero o falso? |
+
+### Passaggio 3: Memorizza il tempo rimanente
+
+Il campo nominato nel parametro 2 (`remaining_time`) viene impostato automaticamente al numero di secondi rimanenti quando il rispondente invia. Un valore di `0` significa che il tempo è scaduto; un valore alto significa che hanno finito rapidamente.
+
+---
+
+## Con feedback audio
+
+Allega file audio al modulo (come allegati multimediali), poi fai riferimento a essi:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` viene riprodotto quando il rispondente seleziona la risposta giusta
+- `wrong.mp3` viene riprodotto quando il rispondente seleziona una risposta sbagliata
+
+<Callout type="warning">
+I file audio devono essere allegati al modulo come file multimediali e il nome del file deve corrispondere esattamente (sensibile alle maiuscole) inclusa l'estensione.
+</Callout>
+
+---
+
+## Escludere domande dal timer
+
+Passa un elenco separato da virgole di nomi di campo da escludere dall'esame (es. note introduttive o domande di consenso):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+Lascia `rightSound` e `wrongSound` come stringhe vuote `''` se non hai bisogno di audio ma hai bisogno di esclusioni.
+
+---
+
+## Esempio completo
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | Benvenuto nella valutazione delle conoscenze sulla salute. Hai 5 minuti per rispondere a tutte le domande. | |
+| trigger | start_ack | Tocca OK quando sei pronto per iniziare. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | Il lavaggio delle mani previene la diffusione delle malattie. | |
+| select_one yesno | q2 | Dovresti bere almeno 2 litri d'acqua al giorno. | |
+| select_one yesno | q3 | La malaria è causata da un virus. | |
+
+---
+
+## Best practice
+
+1. Informa sempre i rispondenti del limite di tempo prima di iniziare — usa una `note` o un `trigger` prima del campo `check-exam()`.
+2. Escludi le note introduttive e le domande di consenso dal timer usando il parametro `excludeQuestion`.
+3. Usa `remaining_time` in un calcolo successivo per rilevare i timeout: `if(${remaining_time} = 0, 'Tempo scaduto', 'Completato')`.
+4. Mantieni il numero di domande proporzionale al tempo consentito — 2–3 minuti per domanda è una base ragionevole per la maggior parte delle valutazioni delle conoscenze.
+5. Testa con i file audio sul dispositivo effettivo prima del deployment — la riproduzione audio varia tra le versioni Android e i browser.
+
+## Limitazioni
+
+- Il timer è solo visivo — il modulo non si invia automaticamente quando scade il tempo; il rispondente deve comunque inviarlo manualmente.
+- Il feedback audio richiede che il volume del dispositivo sia attivo e non disattivato.
+- La funzionalità esame è un'estensione di rtSurvey e non fa parte della specifica XLSForm standard.

@@ -1,0 +1,111 @@
+---
+title: "Calculate"
+description: ""
+---
+
+Questions calculate ក្នុង XLSForms និង rtSurvey ប្រើ ដើម្បី perform computations ផ្អែកលើ fields ឬ values ផ្សេងទៀតក្នុង form ។ Questions ទាំងនេះមិន display ដល់ user ប៉ុន្តែ run ក្នុង background ដោយ storing results សម្រាប់ later use ឬ submission។
+
+## Syntax
+
+ក្នុង XLSForm, calculate question ត្រូវបានកំណត់ដូចខាងក្រោម:
+
+| type      | name     | label | calculation |
+|-----------|----------|-------|-------------|
+| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+
+- **type**: ជានិច្ច "calculate" សម្រាប់ប្រភេទ question នេះ។
+- **name**: ឈ្មោះ unique សម្រាប់ calculate question។
+- **label**: ជាធម្មតា blank ដោយសារ calculate questions មិន display ដល់ users។
+- **calculation**: formula ដើម្បី evaluate។
+
+## ការប្រើប្រាស់
+
+Calculate questions ប្រើជាទូទៅសម្រាប់:
+
+1. ការ performing arithmetic operations
+2. ការ concatenating strings
+3. ការ applying complex logic ឬ functions
+4. ការ storing intermediate results សម្រាប់ later use
+
+## ឧទាហរណ៍
+
+### Arithmetic មូលដ្ឋាន
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | total    | ${price} * ${quantity} |
+```
+
+### String Concatenation
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
+```
+
+### ការប្រើ Functions
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
+```
+
+## ការប្រើប្រាស់ High ក្នុង rtSurvey
+
+### Function pulldata()
+
+rtSurvey គាំទ្រ function `pulldata()` ក្នុង calculate fields ដោយអនុញ្ញាតឱ្យ retrieve data ពី CSV files ខាងក្រៅ:
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
+```
+
+#### Syntax
+
+syntax មូលដ្ឋានសម្រាប់ pulldata() គឺ:
+
+```
+pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
+```
+
+- 'csv_filename': ឈ្មោះ CSV file (គ្មាន .csv extension)
+- 'column_to_return': ឈ្មោះជួរដែលផ្ទុក data ដែលអ្នកចង់ pull
+- 'key_column': ឈ្មោះជួរ ដើម្បី match against
+- `${matching_value}`: Value ដើម្បី look up ក្នុង key column (ជាញឹកញាប់ variable ពី form)
+
+#### Notes សំខាន់
+
+1. CSV file ត្រូវតែ upload ជាមួយ XLSForm នៅពេល deploy ការស្ទង់មតិ។
+2. ប្រើ commas ជា separators ក្នុង CSV file, មិនមែន semicolons។
+3. ជៀសវាង commas ក្នុង data fields CSV, ដោយ ពួកវាអាចបណ្តាល parsing issues។
+4. pulldata() គាំទ្រ 1-to-1 relationships តែប៉ុណ្ណោះ។ ប្រសិនបើ matches ច្រើននត្រូវបានរកឃើញ វា returns មួយដំបូងតែប៉ុណ្ណោះ។
+5. ប្រហែលមាន limitations លើ text length ដែលអាច pull (ប្រហែល 76 characters)។
+6. អ្នកអាចប្រើ pulldata() ក្នុង constraints ដើម្បី validate entries against CSV data។
+
+### Conditional Calculations
+
+អ្នកអាចប្រើ if() statements សម្រាប់ conditional calculations:
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+```
+
+## ការអនុវត្តល្អ
+
+1. ប្រើ meaningful names សម្រាប់ calculate fields ដើម្បីធ្វើឱ្យ form readability ប្រសើរ។
+2. ជៀសវាង calculations ស្មុគ្រស្មាញ ហួសហេតុ ក្នុង field តែមួយ; break them down ប្រសិនបើចាំបាច់។
+3. Test calculations ហ្មត់ចត់ ជាពិសេសពេលប្រើ formulas ស្មុគ្រស្មាញ ឬ external data។
+4. ចងចាំ calculate fields run រៀងរាល់ពេល form ត្រូវបាន evaluated ដែលអាច impact performance សម្រាប់ calculations ស្មុគ្រស្មាញ ឬ ច្រើនណាស់។
+5. ពេលប្រើ pulldata() ធានា CSV files format ត្រឹមត្រូវ ហើយ test ហ្មត់ចត់ ជាមួយ data ជាក់ស្តែង ហើយ form structure ។
+
+## ការដាក់កំហិត
+
+- Calculate fields មិនអាច edit ដោយ users ដោយផ្ទាល់។
+- លទ្ធផល calculate field មិន visible ភ្លាមៗ លើក លែងតែ referenced ក្នុង display field ឬ ប្រើក្នុង form logic។

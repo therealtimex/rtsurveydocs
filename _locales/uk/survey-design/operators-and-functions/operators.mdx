@@ -1,0 +1,40 @@
+---
+title: "Оператори"
+description: ""
+---
+
+import { Callout } from 'nextra/components'
+
+### Оператори порівняння
+
+Operator | Operation      | Example              | Example Answer
+-------- | -------------- | -------------------- | --------------
+`=`        | Equal          | `${age}` = 25     | true or false
+`!=`       | Not equal      | `${age}` != 25    | true or false
+`>`        | Greater-than   | `${age}` > 25     | true or false
+`>=`       | Greater-than or equal | `${age}` >= 25 | true or false
+`<`        | Less-than      | `${age}` < 25     | true or false
+`<=`       | Less-than or equal | `${age}` &lt;= 25  | true or false
+
+У наведених прикладах `${age}` представляє значення поточного поля, а оператор використовується для порівняння його зі значенням 25. Обмеження оцінюватиметься як true або false залежно від того, чи виконується порівняння чи ні.
+
+### Логічні оператори
+
+Логічні оператори використовуються для об'єднання кількох виразів в обмеженнях. Ось деякі часто використовувані логічні оператори разом з їх операціями та прикладами:
+
+Operator | Operation      | Example                                           
+-------- | -------------- | --------------------------------------------------
+`or`       | Returns true if either expression is true          | `${age}` = 3 or `${age}` = 4
+`and`      | Returns true only if both expressions are true    | `${age}` > 3 and `${age}` < 5
+`not()`    | Returns true if the expression is not true        | not(`${age}` > 3 and `${age}` < 5)
+
+У наведених прикладах `${age}` представляє значення поточного поля, а логічні оператори використовуються для об'єднання виразів. Обмеження оцінюватиметься як true або false на основі зазначених умов.
+
+Приклад 1:
+<Callout type="info">`${age} = 3 or ${age} = 4` поверне `true`, якщо вік дорівнює 3 або 4.</Callout>
+
+Приклад 2:
+<Callout type="info">`${age} > 3 and ${age} < 5` поверне `true`, якщо вік між 3 і 5.</Callout>
+
+Приклад 3:
+<Callout type="info">`not(${age} > 3 and ${age} < 5)` поверне `true`, якщо вік не між 3 і 5.</Callout>

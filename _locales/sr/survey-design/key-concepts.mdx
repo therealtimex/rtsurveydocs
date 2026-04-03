@@ -1,0 +1,264 @@
+---
+title: "Ključni koncepti"
+description: "Pregled dizajna formulara"
+---
+
+## Šta je XLSForm?
+rtSurvey koristi proširenu verziju [XLSForm](https://xlsform.org/) standarda za dizajn formulara, nudeći moćne funkcije za kreiranje sofisticiranih anketa. Ovaj vodič će vas upoznati sa ključnim konceptima dizajniranja formulara u rtSurvey-u, od osnovne XLSForm strukture do naprednih funkcija specifičnih za rtSurvey.
+
+Sa XLSForm-om možete praviti formulare u formatu čitljivom za ljude koristeći poznati Excel alat, čineći ga dostupnim skoro svima.
+Ovaj standard omogućava lako deljenje i saradnju na izradi formulara.
+
+Dok su XLSForms prijazni početnicima, oni takođe omogućavaju iskusnim korisnicima kreiranje složenih formulara.
+
+rtSurvey pruža konzistentan način ugradnje naprednih funkcionalnosti poput logike preskakanja u formulare na različitim veb i mobilnim platformama za prikupljanje podataka.
+
+## Struktura XLSForm-a
+XLSForm obično se sastoji od dva glavna radna lista:
+
+1. **survey**: Definiše strukturu i sadržaj vašeg formulara.
+2. **choices**: Specificira opcije odgovora za pitanja sa višestrukim izborom.
+
+Opcioni radni list **settings** može pružiti dodatne specifikacije formulara.
+
+Važno je napomenuti da obavezne kolone u radnim listovima survey i choices moraju biti prisutne da bi formular pravilno funkcionisao. Opcione kolone u oba radna lista pružaju dalju kontrolu nad ponašanjem svakog unosa u formularu, ali nisu neophodne.
+
+Kolone u vašoj Excel radnoj svesci mogu se pojaviti u bilo kom redosledu, a opcione kolone mogu biti prazne. Međutim, ključno je koristiti preciznu sintaksu i konvencije imenovanja navedene u XLSForm dokumentaciji da bi formular ispravno funkcionisao.
+
+### Radni list survey
+**Radni list survey** je mesto gde definišete strukturu formulara i pružate sadržaj. Svaki red u radnom listu survey predstavlja pitanje ili element u vašem formularu. Sledeće kolone su obavezne u radnom listu survey:
+
+- `type`: Specificira tip unosa koji se očekuje za pitanje.
+- `name`: Specificira jedinstveno ime promenljive za taj unos. Imena moraju početi slovom ili podvlakom i mogu sadržati samo slova, cifre, crtice, podvlake i tačke. Imena razlikuju velika i mala slova.
+- `label`: Sadrži stvarni tekst koji vidite za pitanje u formularu.
+
+| type                | name     | label                |
+| ------------------- | -------- | -------------------- |
+| today               | today    |                      |
+| select_one gender   | gender   | Pol ispitanika? |
+| integer             | age      | Starost ispitanika?    |
+
+### Radni list choices
+**Radni list `choices`** se koristi za specificiranje opcija odgovora za pitanja sa višestrukim izborom.
+Svaki red predstavlja opciju odgovora. Sledeće kolone su obavezne u radnom listu choices:
+
+- **`list_name`**: Grupiše skup povezanih opcija odgovora.
+- **`name`**: Specificira jedinstveno ime promenljive za tu opciju odgovora.
+- **`label`**: Prikazuje opciju odgovora tačno onako kako želite da se pojavi na formularu.
+
+| list_name           | name        | label                |
+| ------------------- | ----------- | -------------------- |
+| gender              | transgender | Transrodni           |
+| gender              | female      | Ženski               |
+| gender              | male        | Muški                |
+| gender              | other       | Drugo                |
+
+Kolone koje dodate u Excel radnu svesku, bilo obavezne ili opcione, mogu se pojaviti u bilo kom redosledu. Opcione kolone mogu biti potpuno izostavljene. Redovi ili kolone mogu biti prazni radi čitljivosti, ali podaci posle 20 susednih praznih kolona ili redova na listu neće biti obrađeni. Sve .xlsx formatiranje datoteke se ignoriše, pa možete koristiti razdvojne linije, senčenje i drugo formatiranje fonta da biste formular učinili čitljivijim.
+
+Jedna stvar koju treba imati na umu pri izradi formulara u Excel-u je da sintaksa mora biti precizna. Na primer, ako napišete **Choices** ili **choice** umesto **choices**, formular neće raditi.
+
+### Radni list settings
+
+Radni list settings je opcionalan, ali vam dozvoljava da specificirate metapodatke i ponašanje na nivou formulara. Uobičajene kolone u radnom listu settings uključuju:
+
+| Kolona | Opis |
+|--------|------|
+| form_title | Naslov formulara kako se pojavljuje korisnicima |
+| form_id | Jedinstveni identifikator za formular, koji se koristi u upravljanju podacima i API pozivima |
+| default_language | Podrazumevani jezički kod za višejezične formulare (npr. 'en' za engleski) |
+| version | Broj verzije formulara, koristan za praćenje promena |
+| instance_name | Izraz za generisanje jedinstvenog naziva za svako slanje formulara |
+| generation | Ceo broj koji označava generaciju formulara. Povećajte za strukturalne promene |
+| family | Identifikator za grupisanje srodnih formulara kroz strukturalne promene |
+
+Radni list settings u rtSurvey-u može uključivati i dodatne konfiguracije specifične za proširene funkcionalnosti rtSurvey-a. Pogledajte rtSurvey dokumentaciju za kompletnu listu podržanih podešavanja.
+
+## Ključne komponente radnog lista survey
+
+Radni list survey je jezgro vašeg dizajna formulara. Evo pregleda njegovih ključnih komponenti:
+
+| Komponenta | Opis |
+|------------|------|
+| [type](#question-types) | Specificira tip pitanja (npr. text, integer, select_one) |
+| [name](#naming-conventions) | Jedinstveni identifikator za pitanje |
+| [label](#labels-and-translations) | Tekst prikazan ispitaniku |
+| [hint](#hints-and-help-text) | Dodatne smernice za ispitanika |
+| [appearance](#appearance-options) | Modifikuje način prikazivanja pitanja |
+| [relevant](#relevance-and-skip-logic) | Određuje kada pitanje treba da bude postavljeno (logika preskakanja) |
+| [constraint](#constraints-and-validation) | Validira odgovor |
+| [calculation](#calculations) | Izračunava vrednosti na osnovu drugih odgovora |
+| [required](#required-fields) | Specificira da li pitanje mora biti odgovoreno |
+
+
+Svaka od ovih komponenti igra ključnu ulogu u kreiranju efikasnih anketa. Kliknite na veze u koloni "Detaljan odeljak" da saznate više o svakoj komponenti.
+
+### Tipovi pitanja
+XLSForm podržava niz tipova pitanja. Ovo su samo neke od opcija koje možete uneti u kolonu **`type`** u radnom listu **`survey`** vašeg XLSForm-a:
+
+| Tip pitanja             | Unos odgovora                                                                                 |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| integer                   | Unos celog broja (tj. bez decimala).                                                          |
+| decimal                   | Decimalni unos.                                                                               |
+| range                     | Unos [opsega](#range) (uključujući ocenjivanje)                                                     |
+| text                      | Odgovor slobodnim tekstom.                                                                          |
+| select_one [options]      | Pitanje sa [višestrukim izborom](#multiple-choice); može se izabrati samo jedan odgovor.               |
+| select_multiple [options] | Pitanje sa [višestrukim izborom](#multiple-choice); može se izabrati više odgovora.              |
+| select_one_from_file [file]| [Višestruki izbor iz datoteke](#multiple-choice-from-file); može se izabrati samo jedan odgovor.      |
+| select_multiple_from_file [file]| [Višestruki izbor iz datoteke](#multiple-choice-from-file); može se izabrati više odgovora.|
+| rank [options]            | Pitanje [rangiranja](#rank); poređaj listu.                                                        |
+| note                      | Prikazuje napomenu na ekranu, ne prima unos. Skraćenica za type=text sa readonly=true.    |
+| geopoint                  | Prikupi [jednu GPS koordinatu](#gps).                                                     |
+| geotrace                  | Zabeleži [liniju od dve ili više GPS koordinata](#gps).                                                |
+| geoshape                  | Zabeleži [poligon od više GPS koordinata](#gps); poslednja tačka je ista kao prva. |
+| date                      | Unos datuma.                                                                                  |
+| time                      | Unos vremena.                                                                                  |
+| dateTime                  | Prima unos datuma i vremena.                                                             |
+| image                     | Slikajte ili otpremite [sliku](#image).                                            |
+| audio                     | Snimite audio ili otpremite audio datoteku.                                             |
+| background-audio          | Audio se snima u pozadini tokom popunjavanja formulara.                                  |
+| video                     | Snimite video ili otpremite video datoteku.                                               |
+| file                      | Generički unos datoteke (txt, pdf, xls, xlsx, doc, docx, rtf, zip)                                |
+| barcode                   | Skenirajte barcode, zahteva instaliranu aplikaciju za skeniranje barcode-a.                            |
+| calculate                 | Izvedite proračun; pogledajte odeljak [Proračun](#calculation) ispod.                    |
+| acknowledge               | Potvrda prompta koja postavlja vrednost na "OK" ako je izabrana.                                      |
+| hidden                    | Polje bez pridruženog UI elementa koje se može koristiti za čuvanje konstante                  |
+| xml-external              | Dodaje referencu na [spoljnu XML datoteku](#external-xml-data)                          |
+
+### Oznake
+
+Oznake su tekst prikazan ispitanicima za svako pitanje. Ključne su za jasnu komunikaciju u anketama.
+
+- **Osnovna upotreba**: U koloni `label`, unesite tekst pitanja.
+- **Više jezika**: Koristite dodatne kolone poput `label::English` i `label::French` za višejezične ankete.
+- **Formatiranje**: rtSurvey podržava osnovno HTML formatiranje u oznakama za naglašavanje ili strukturu.
+
+Primer:
+```
+| type | name | label | label::French |
+|------|------|-------|---------------|
+| text | name | Kako se zovete? | Quel est votre nom? |
+```
+
+### Napomene
+
+Napomene pružaju dodatne smernice ispitanicima bez zatrpavanja glavnog teksta pitanja.
+
+- **Upotreba**: Dodajte napomene u kolonu `hint`.
+- **Vidljivost**: Napomene se obično prikazuju ispod glavnog teksta pitanja.
+- **Višejezično**: Kao i oznake, napomene mogu biti specificirane za više jezika koristeći kolone `hint::Jezik`.
+
+Primer:
+```
+| type | name | label | hint |
+|------|------|-------|------|
+| integer | age | Koliko imate godina? | Unesite godine starosti |
+```
+
+### Izgled
+
+Kolona `appearance` u rtSurvey-u dozvoljava prilagođavanje načina prikazivanja pitanja.
+
+- **Standardne opcije**: Uključuju 'multiline' za tekst, 'horizontal' za pitanja sa izborom.
+- **rtSurvey proširenja**:
+  - Unos vremena: Razne opcije prikaza sata (npr. `inline`, `inline-1line`)
+  - Prilagođavanje boja: Koristite funkciju `colors()` za promenu boja ikona
+
+Primer:
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | time | Unesite vreme | inline-[%H:%M] |
+```
+
+### Relevantnost
+
+Kolona `relevant` implementira logiku preskakanja, određujući kada pitanje treba biti prikazano.
+
+- **Sintaksa**: Koristite XPath izraze za definisanje uslova.
+- **Promenljive**: Referencujte druga imena pitanja koristeći `${ime_pitanja}`.
+
+Primer:
+```
+| type | name | label | relevant |
+|------|------|-------|----------|
+| text | allergies | Navedite alergije | ${has_allergies} = 'yes' |
+```
+
+### Obavezno
+
+Kolona `required` specificira da li pitanje mora biti odgovoreno.
+
+- **Osnovna upotreba**: Koristite 'yes' ili 'true' da označite pitanje kao obavezno.
+- **Napredno**: Može koristiti izraze za uslovnu obaveznost.
+
+Primer:
+```
+| type | name | label | required |
+|------|------|-------|----------|
+| text | email | Email adresa | yes |
+```
+
+### Ponavljanja
+
+Ponavljanja dozvoljavaju da se grupa pitanja odgovori više puta.
+
+- **Upotreba**: Koristite redove `begin repeat` i `end repeat` za definisanje grupe sa ponavljanjem.
+- **Imenovanje**: Dajte svakoj grupi ponavljanja jedinstveno ime.
+
+Primer:
+```
+| type | name | label |
+|------|------|-------|
+| begin repeat | household_member | Član domaćinstva |
+| text | member_name | Ime |
+| integer | member_age | Starost |
+| end repeat | | |
+```
+
+### Mediji
+
+rtSurvey podržava razne tipove medija u anketama, uključujući slike, audio i video.
+
+- **Tipovi pitanja**: Koristite 'image', 'audio' ili 'video' u koloni type.
+- **Mediji u oznakama**: Referencujte medijske datoteke u oznakama koristeći HTML tagove.
+
+Primer:
+```
+| type | name | label |
+|------|------|-------|
+| image | house_photo | Slikajte kuću |
+| note | | <img src="logo.jpg" /> Dobrodošli u anketu |
+```
+
+### Samo za čitanje
+
+Pitanja samo za čitanje prikazuju informacije bez dozvoljavanja korisničkog unosa.
+
+- **Upotreba**: Dodajte 'readonly' u kolonu `appearance`.
+- **Proračuni**: Često se koriste sa tipom calculate za prikaz izračunatih vrednosti.
+
+Primer:
+```
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | bmi | BMI | readonly | ${weight} / (${height} * ${height}) |
+```
+
+## rtSurvey proširenja
+
+rtSurvey proširuje XLSForm standard podržavajući dodatne mogućnosti kao što su `grid layout`, `html format` i mnogi novi `widgeti`.
+
+### Grid layout
+rtSurvey dozvoljava da vaš formular oponaša izgled tradicionalnih papirnih anketa kompaktovanjem više pitanja u jedan red.
+
+### Podešavanja formulara
+
+### Podešavanja podataka
+
+### Typeform stil
+
+### Proširenje pulldata()
+
+### Proširenja zasnovana na izgledu
+
+### Webbox proširenja

@@ -1,0 +1,117 @@
+---
+title: "Ujian"
+description: "Fitur ujian menambahkan mode kuis berwaktu ke survei, dengan umpan balik audio opsional untuk jawaban yang benar dan salah."
+---
+
+import { Callout } from 'nextra/components'
+
+Fitur **Ujian** mengubah survei menjadi kuis berwaktu. Penghitung waktu mundur ditampilkan kepada responden, dan survei mencatat berapa banyak waktu yang tersisa ketika mereka selesai. Secara opsional, suara audio dapat diputar untuk jawaban yang benar dan salah.
+
+Ini berguna untuk penilaian pengetahuan, tes literasi, pemeriksaan kompetensi staf lapangan, dan survei apa pun di mana waktu pengerjaan adalah data yang bermakna.
+
+---
+
+## Fungsi `check-exam()`
+
+Konfigurasikan ujian menggunakan `check-exam()` dalam kolom **`calculation`** dari bidang `calculate` yang ditempatkan di awal formulir:
+
+```
+check-exam(examTime, questionToStoreRemainingTime)
+check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
+```
+
+### Parameter
+
+| # | Parameter | Deskripsi |
+|---|-----------|-----------|
+| 1 | `examTime` | Total durasi ujian dalam detik |
+| 2 | `questionToStoreRemainingTime` | `name` dari bidang `calculate` atau `integer` yang akan menyimpan waktu tersisa ketika ujian berakhir |
+| 3 | `rightSound` | *(Opsional)* Nama file audio yang diputar ketika jawaban yang benar diberikan (lampirkan ke formulir sebagai file media) |
+| 4 | `wrongSound` | *(Opsional)* Nama file audio yang diputar ketika jawaban yang salah diberikan |
+| 5 | `excludeQuestion` | *(Opsional)* Daftar nama bidang yang dipisahkan koma untuk dikecualikan dari timer ujian (misalnya, `'intro_note,consent'`) |
+
+---
+
+## Pengaturan dasar
+
+### Langkah 1: Tambahkan bidang ujian
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(600, 'remaining_time')` |
+| calculate | remaining_time | | |
+
+`exam_config` memicu timer 600 detik (10 menit). `remaining_time` diisi secara otomatis ketika responden selesai.
+
+### Langkah 2: Tambahkan pertanyaan Anda
+
+Timer ujian mencakup semua pertanyaan dalam formulir kecuali yang tercantum dalam `excludeQuestion`.
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | q1 | Ibu kota Kenya adalah Nairobi. Benar atau salah? |
+| select_one choices | q2 | Organ mana yang memompa darah ke seluruh tubuh? |
+| select_one choices | q3 | Air mendidih pada 100°C di permukaan laut. Benar atau salah? |
+
+### Langkah 3: Simpan waktu yang tersisa
+
+Bidang yang dinamai dalam parameter 2 (`remaining_time`) secara otomatis diatur ke jumlah detik yang tersisa ketika responden mengirimkan. Nilai `0` berarti waktu habis; nilai tinggi berarti mereka selesai dengan cepat.
+
+---
+
+## Dengan umpan balik audio
+
+Lampirkan file suara ke formulir (sebagai lampiran media), kemudian referensikan:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3')` |
+
+- `correct.mp3` diputar ketika responden memilih jawaban yang benar
+- `wrong.mp3` diputar ketika responden memilih jawaban yang salah
+
+<Callout type="warning">
+File suara harus dilampirkan ke formulir sebagai file media dan nama file harus cocok persis (peka huruf besar-kecil) termasuk ekstensinya.
+</Callout>
+
+---
+
+## Mengecualikan pertanyaan dari timer
+
+Berikan daftar nama bidang yang dipisahkan koma untuk dikecualikan dari ujian (misalnya, catatan pengantar atau pertanyaan persetujuan):
+
+```
+check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
+```
+
+Biarkan `rightSound` dan `wrongSound` sebagai string kosong `''` jika Anda tidak memerlukan audio tetapi memerlukan pengecualian.
+
+---
+
+## Contoh lengkap
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| note | intro | Selamat datang di penilaian pengetahuan kesehatan. Anda memiliki 5 menit untuk menjawab semua pertanyaan. | |
+| trigger | start_ack | Ketuk OK ketika Anda siap untuk memulai. | |
+| calculate | exam_config | | `check-exam(300, 'remaining_time', 'correct.mp3', 'wrong.mp3', 'intro,start_ack')` |
+| calculate | remaining_time | | |
+| select_one yesno | q1 | Mencuci tangan mencegah penyebaran penyakit. | |
+| select_one yesno | q2 | Anda harus minum setidaknya 2 liter air per hari. | |
+| select_one yesno | q3 | Malaria disebabkan oleh virus. | |
+
+---
+
+## Praktik Terbaik
+
+1. Selalu informasikan responden tentang batas waktu sebelum memulai — gunakan `note` atau `trigger` sebelum bidang `check-exam()`.
+2. Kecualikan catatan pengantar dan pertanyaan persetujuan dari timer menggunakan parameter `excludeQuestion`.
+3. Gunakan `remaining_time` dalam perhitungan tindak lanjut untuk mendeteksi batas waktu: `if(${remaining_time} = 0, 'Waktu habis', 'Selesai')`.
+4. Jaga jumlah pertanyaan proporsional dengan waktu yang diberikan — 2–3 menit per pertanyaan adalah acuan yang wajar untuk sebagian besar penilaian pengetahuan.
+5. Uji dengan file audio pada perangkat yang sebenarnya sebelum penerapan — pemutaran audio bervariasi di berbagai versi Android dan browser.
+
+## Keterbatasan
+
+- Timer hanya tampilan — formulir tidak otomatis dikirimkan ketika waktu habis; responden harus tetap mengirimkan secara manual.
+- Umpan balik audio memerlukan volume perangkat aktif dan tidak dibisukan.
+- Fitur ujian adalah ekstensi rtSurvey dan bukan bagian dari spesifikasi XLSForm standar.

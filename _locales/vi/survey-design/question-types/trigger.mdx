@@ -1,0 +1,91 @@
+---
+title: "Trigger / Acknowledge"
+description: "Câu hỏi trigger hiển thị một phát biểu mà người điều tra phải xác nhận tường minh trước khi tiếp tục."
+---
+
+Loại câu hỏi `trigger` (còn gọi là `acknowledge`) hiển thị một **phát biểu kèm hộp kiểm**. Người điều tra phải đánh dấu vào hộp kiểm để xác nhận đã đọc và hiểu phát biểu trước khi biểu mẫu cho phép tiếp tục. Không có giá trị dữ liệu nào được lưu — chỉ ghi nhận việc hộp kiểm đã được đánh dấu.
+
+## Cấu hình XLSForm cơ bản
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | Người trả lời đã cung cấp sự đồng ý bằng miệng được thông báo đầy đủ. |
+
+Hoặc dùng bí danh `acknowledge`:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | Người trả lời đã cung cấp sự đồng ý bằng miệng được thông báo đầy đủ. |
+
+Cả `trigger` và `acknowledge` đều tương đương — dùng tùy theo tài liệu của nền tảng bạn dùng.
+
+## Ứng dụng
+
+Câu hỏi trigger/acknowledge thường được dùng cho:
+
+1. **Đồng ý có thông báo** — xác nhận người điều tra đã có được sự đồng ý trước khi ghi dữ liệu nhạy cảm
+2. **Cảnh báo mềm** — cảnh báo về giá trị bất thường và yêu cầu xác nhận tường minh trước khi tiếp tục
+3. **Mục kiểm tra** — xác nhận đã hoàn thành quan sát thực tế (ví dụ: "Tôi đã quan sát trực tiếp nguồn nước")
+4. **Hướng dẫn** — buộc người điều tra xác nhận hướng dẫn cấp phần trước khi tiếp tục
+5. **Kiểm tra chất lượng** — gắn cờ giá trị ngoại lệ và yêu cầu người điều tra xác minh chúng
+
+## Ví dụ sử dụng
+
+### Xác nhận đồng ý
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | Người trả lời đã đồng ý bằng miệng tham gia vào cuộc khảo sát này. | yes |
+
+### Cảnh báo mềm cho giá trị ngoại lệ
+
+Kết hợp với biểu thức `relevant` để chỉ hiển thị trigger khi nhập giá trị đáng ngờ:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Số trẻ em | | |
+| trigger | children_confirm | Bạn đã nhập `${children}` trẻ em. Vui lòng xác nhận với người trả lời và nhấn OK. | `${children} > 10` | `${children} > 10` |
+
+### Xác nhận hướng dẫn đầu phần
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Phần B: Sử dụng đất nông nghiệp. Đặt tất cả câu hỏi trong phần này chỉ cho chủ hộ. |
+
+## Làm cho trigger bắt buộc
+
+Thêm `required: yes` để ngăn tiến thêm cho đến khi hộp được đánh dấu:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | Tất cả thiết bị an toàn đều có mặt và hoạt động bình thường. | yes | Bạn phải xác nhận trước khi tiếp tục. |
+
+## Hiển thị có điều kiện
+
+Chỉ hiển thị trigger khi một điều kiện được đáp ứng:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | Hộ gia đình có giếng không? | |
+| trigger | well_observation | Xác nhận bạn đã trực tiếp quan sát tình trạng giếng. | `${has_well} = 'yes'` |
+
+## Sự khác biệt với `note`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Hiển thị văn bản | Có | Có |
+| Yêu cầu tương tác | Không | Có (phải đánh dấu) |
+| Lưu dữ liệu | Không | Không (chỉ OK/đã đánh dấu) |
+| Có thể chặn tiến độ | Không | Có (với `required`) |
+
+## Thực hành tốt
+
+1. Giữ nhãn trigger ngắn gọn và có thể thực hiện — người điều tra phải đọc và xác nhận trong vài giây.
+2. Luôn thêm `required: yes` khi xác nhận là bắt buộc.
+3. Dùng trigger cho đồng ý và kiểm tra an toàn nơi bạn cần dấu vết kiểm tra rằng người điều tra đã xác nhận.
+4. Kết hợp với `relevant` cho cảnh báo mềm có điều kiện để trigger chỉ xuất hiện khi một giá trị cần xác minh.
+
+## Giới hạn
+
+- Trường trigger không lưu giá trị dữ liệu có ý nghĩa — chúng chỉ ghi lại việc hộp đã được đánh dấu.
+- Widget trigger hiển thị dưới dạng hộp kiểm/nút đơn giản trên hầu hết các client; đây không phải là chữ ký điện tử đầy đủ.

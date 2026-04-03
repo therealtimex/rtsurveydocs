@@ -1,0 +1,77 @@
+---
+title: "Geopoint"
+description: "Geopoint-spørgsmål fanger geografiske koordinater (breddegrad, længdegrad, højde og nøjagtighed) som en del af undersøgelsen."
+---
+
+Spørgsmålstypen geopoint i XLSForms og rtSurvey muliggør indsamling af geografiske koordinater ved hjælp af enhedens GPS eller andre placeringstjenester. Denne funktion er særligt nyttig til kortlægning af undersøgelsessvar, sporing af feltaktiviteter eller tilknytning af data til specifikke placeringer.
+
+## Grundlæggende XLSForm-specifikation
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geopoint | location    | Registrer den aktuelle placering     |
+
+For flere detaljer om den grundlæggende geopoint-spørgsmålstype, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+
+## Anvendelser
+
+Geopoint-spørgsmål bruges typisk til:
+
+1. Geografisk kortlægning af undersøgelsessvar
+2. Verificering af feltaktiviteters placering
+3. Sporing af intervieweres ruter
+4. Tilknytning af miljø- eller sociale data til specifikke placeringer
+5. Beregning af afstande eller arealer i geografiske analyser
+
+## Bedste praksis
+
+1. Sørg for, at enheden har placeringstjenester aktiveret og tilladelser givet.
+2. Giv tilstrækkelig tid til, at GPS kan opnå et præcist signal.
+3. Overvej privatlivsimplikationer og informér respondenter om indsamling af placeringsdata.
+4. Brug i kombination med andre spørgsmålstyper for at give kontekst til placeringsdata.
+
+## Eksempel på brug
+
+Her er et eksempel på, hvordan du kan bruge et geopoint-spørgsmål i en undersøgelse:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geopoint | sample_location| Registrer placeringen for prøveindsamlingen | Stå på et åbent område for bedre GPS-signal |
+
+## rtSurvey-udvidelser
+
+Mens den grundlæggende XLSForm-specifikation for geopoint-spørgsmål er enkel, kan rtSurvey tilbyde yderligere funktioner eller tilpasninger:
+
+1. Kortintegration til visuel bekræftelse af den registrerede placering
+2. Nøjagtighedsgrænseindstillinger
+3. Mulighed for manuel indtastning af koordinater
+4. Integration med offline-kort til fjerne områder
+
+## Dataformat
+
+Geopoint-data gemmes typisk som en streng med fire mellemrumsadskilte værdier:
+
+```
+breddegrad længdegrad højde nøjagtighed
+```
+
+For eksempel:
+```
+41.40338 2.17403 30.5 10
+```
+
+## Overvejelser for analyse
+
+Når du bruger geopoint-spørgsmål, bør du overveje:
+
+1. Hvordan de geografiske data vil blive visualiseret (f.eks. kortlægningssoftware)
+2. Nøjagtigheden af de indsamlede koordinater og dens indvirkning på analysen
+3. Privatlivs- og databeskyttelsesforanstaltninger til håndtering af placeringsdata
+4. Potentiel integration med GIS-værktøjer (Geografisk Informationssystem)
+
+## Begrænsninger
+
+- Nøjagtighed kan variere afhængigt af enheden og miljøforholdene.
+- GPS-signaler kan være svage eller utilgængelige på indendørs placeringer eller i områder med forhindringer.
+- Indsamling af placeringsdata kan påvirke enhedens batterilevetid betydeligt.
+- Der kan være privatlivsbekymringer forbundet med indsamling af præcise placeringsdata.

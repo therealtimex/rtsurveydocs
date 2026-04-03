@@ -1,0 +1,154 @@
+---
+title: "Ripetizioni avanzate"
+description: "Pattern avanzati per i gruppi di ripetizione: conteggi dinamici, ripetizioni annidate, riepilogo dei dati di ripetizione e riferimento ai valori tra le ripetizioni."
+---
+
+Questa pagina copre i pattern avanzati per lavorare con i gruppi di ripetizione in rtSurvey. Per le nozioni di base sulla configurazione di un gruppo di ripetizione, vedi [Raggruppamento e ripetizioni](../repeats).
+
+---
+
+## Conteggio dinamico delle ripetizioni
+
+Per impostazione predefinita, l'intervistatore decide quante volte ripetere. Puoi fissare il numero di ripetizioni usando `repeat_count`:
+
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Membro del nucleo familiare | `${num_members}` |
+| text | member_name | Nome del membro | |
+| integer | member_age | Età | |
+| end_repeat | | | |
+
+La ripetizione viene eseguita esattamente `${num_members}` volte, dove `num_members` è stato raccolto in precedenza nel modulo. L'intervistatore non può aggiungere o rimuovere istanze.
+
+---
+
+## Accesso indicizzato: `indexed-repeat()`
+
+Accedi al valore di un campo di un'istanza di ripetizione specifica dall'**esterno** del gruppo di ripetizione usando `indexed-repeat(repeatedField, repeatGroup, index)`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+Questo è utile per costruire campi di riepilogo o fare riferimento ai dati del membro "primario" dopo la ripetizione.
+
+---
+
+## Posizione dell'istanza corrente: `index()`
+
+All'interno di un gruppo di ripetizione, `index()` restituisce la posizione basata su 1 dell'istanza corrente. Usala per etichettare ogni ripetizione o creare identificatori univoci:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Appezzamento |
+| note | plot_label | Appezzamento numero `${index()}` |
+| text | plot_id | ID appezzamento |
+| end_repeat | | |
+
+---
+
+## Riferimento ai campi nella stessa istanza
+
+All'interno di una ripetizione, usa `${fieldname}` per fare riferimento a un altro campo **nella stessa istanza di ripetizione**. Non è necessario `indexed-repeat()` all'interno dello stesso ciclo:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Membro | |
+| text | member_name | Nome | |
+| integer | member_age | Età | |
+| text | school_name | Nome della scuola | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## Riferimento ai campi padre dall'interno di una ripetizione
+
+I campi fuori (sopra) del gruppo di ripetizione possono essere referenziati normalmente con `${fieldname}`:
+
+| type | name | label |
+|------|------|-------|
+| text | village | Nome del villaggio |
+| begin_repeat | plots | Appezzamento agricolo |
+| note | plot_context | Appezzamenti in `${village}` |
+| end_repeat | | |
+
+---
+
+## Riepilogo dei dati di ripetizione
+
+Usa le funzioni aggregate di ripetizione **fuori** dal gruppo di ripetizione per riassumere:
+
+| Funzione | Esempio | Descrizione |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | Numero di istanze |
+| `sum(field)` | `sum(${loan_amount})` | Somma di un campo numerico |
+| `min(field)` | `min(${member_age})` | Valore minimo |
+| `max(field)` | `max(${member_age})` | Valore massimo |
+| `join(sep, field)` | `join(', ', ${member_name})` | Elenco separato da virgole |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Conteggio condizionale |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Somma condizionale |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Unione condizionale |
+
+### Esempio: Riepilogo del nucleo familiare
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | Quanti membri? | |
+| begin_repeat | members | Membro | `${num_members}` |
+| text | member_name | Nome | |
+| integer | member_age | Età | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | `${total_members}` membri; `${children_count}` sotto i 18 anni. Adulti: `${adult_names}` | |
+
+---
+
+## Ripetizioni annidate
+
+Un gruppo di ripetizione può contenere un altro gruppo di ripetizione. Usalo con attenzione — le ripetizioni annidate aggiungono complessità e possono confondere gli intervistatori.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Nucleo familiare |
+| text | hh_id | ID nucleo familiare |
+| begin_repeat | hh_members | Membro |
+| text | member_name | Nome del membro |
+| end_repeat | | |
+| end_repeat | | |
+
+Per fare riferimento a un campo in una ripetizione esterna dall'interno di quella interna, usa `${fieldname}` — si risolve all'antenato corrispondente più vicino:
+
+All'interno della ripetizione `hh_members`, `${hh_id}` restituisce l'ID del nucleo familiare **corrente**, non di tutti i nuclei familiari.
+
+---
+
+## Rank all'interno dei gruppi di ripetizione: `rank-index()`
+
+Quando un campo `rank` esiste all'interno di una ripetizione, usa `rank-index(instanceNumber, repeatedField)` dall'esterno per ottenere il rank ordinale di un'istanza specifica:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` restituisce l'indice di istanza del punteggio più alto.
+
+---
+
+## Best practice
+
+1. Usa sempre `repeat_count` quando il numero di ripetizioni è noto in anticipo — impedisce agli intervistatori di aggiungere o rimuovere accidentalmente istanze.
+2. Mantieni i gruppi di ripetizione focalizzati — una ripetizione con più di 20 domande per istanza è difficile da navigare.
+3. Nomina chiaramente i gruppi di ripetizione (es. `household_members`, non `repeat1`) — il nome appare nelle chiamate di funzione e nei dati esportati.
+4. Testa con il numero massimo atteso di istanze per verificare le prestazioni.
+5. Usa l'appearance `field-list` sul gruppo di ripetizione per mostrare tutti i campi su un'unica schermata per istanza (mobile).
+
+---
+
+## Limitazioni
+
+- `indexed-repeat()` richiede un indice valido (da 1 al conteggio delle istanze) — gli indici fuori range restituiscono vuoto.
+- Le ripetizioni annidate oltre 2 livelli non sono raccomandate e possono causare problemi di visualizzazione su alcuni client.
+- Le funzioni aggregate (`sum`, `count`, ecc.) operano sull'intero gruppo di ripetizione — non puoi aggregare un sottoinsieme di istanze senza le varianti `*-if`.
