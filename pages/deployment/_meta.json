@@ -3,8 +3,8 @@
   "quick-start": "Quick Start",
   "cloud-providers": "Cloud Providers",
   "self-host-docker": "Self-Host with Docker",
+  "ssl-setup": "SSL Setup",
   "configuration": "Configuration",
   "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
   "sso-authentication": "SSO Authentication"
 }
