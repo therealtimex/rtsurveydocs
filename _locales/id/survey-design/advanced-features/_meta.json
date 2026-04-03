@@ -1,5 +1,7 @@
 {
-  "index": "Overview",
+  "index": {
+    "display": "hidden"
+  },
   "call-api": "Call API",
   "dynamic-question-type": "Dynamic Question Type",
   "dynamic-search": "Dynamic Search",

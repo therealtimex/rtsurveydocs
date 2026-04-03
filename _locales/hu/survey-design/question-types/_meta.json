@@ -1,5 +1,7 @@
 {
-  "index": "Question Types",
+  "index": {
+    "display": "hidden"
+  },
   "text": "text",
   "integer": "integer",
   "decimal": "decimal",

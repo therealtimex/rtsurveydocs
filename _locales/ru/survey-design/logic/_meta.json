@@ -1,4 +1,7 @@
 {
+  "index": {
+    "display": "hidden"
+  },
   "relevant": "Relevant (Skip Logic)",
   "constraint": "Constraint",
   "calculate": "Calculate",

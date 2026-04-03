@@ -1,5 +1,7 @@
 {
-  "index": "Survey Design",
+  "index": {
+    "display": "hidden"
+  },
   "key-concepts": "Key Concepts",
   "app-api": "Application API",
   "appearance": "Appearance",

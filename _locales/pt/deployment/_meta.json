@@ -1,10 +1,11 @@
 {
-  "index": "Deployment",
+  "index": {
+    "display": "hidden"
+  },
   "quick-start": "Quick Start",
+  "cloud-providers": "Cloud Providers",
   "configuration": "Configuration",
-  "first-login": "First Login",
   "maintenance": "Maintenance",
   "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication",
-  "cloud-providers": "Cloud Providers"
+  "sso-authentication": "SSO Authentication"
 }

@@ -1,5 +1,7 @@
 {
-  "index": "Overview",
+  "index": {
+    "display": "hidden"
+  },
   "operators": "Operators",
   "functions": "Functions",
   "references": "References"

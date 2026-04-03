@@ -1,6 +1,7 @@
 {
-  "index": "Overview",
   "overview": "Overview",
+  "dashboard-overview": "Dashboard Overview",
+  "system-user": "System & User",
   "manage-forms": "Manage Forms",
   "manage-submission": "Manage Submissions",
   "manage-analysis": "Analysis",
