@@ -2,7 +2,6 @@
   "index": { "display": "hidden" },
   "quick-start": "Quick Start",
   "configuration": "Configuration",
-  "first-login": "First Login",
   "maintenance": "Maintenance",
   "ssl-setup": "SSL Setup",
   "sso-authentication": "SSO Authentication",
