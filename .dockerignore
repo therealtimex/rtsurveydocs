@@ -2,5 +2,5 @@ node_modules
 .next
 out
 combined
-dist
+combined
 .claude
