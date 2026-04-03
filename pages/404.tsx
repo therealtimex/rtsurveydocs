@@ -4,10 +4,10 @@ export default function NotFound() {
 
   useEffect(() => {
     const path = window.location.pathname;
-    // Redirect old Hugo /docs/* URLs to new root paths
-    if (path.startsWith('/docs/')) {
-      const newPath = path.replace(/^\/docs/, '');
-      window.location.replace(newPath || '/');
+    // Redirect old Hugo /docs and /docs/* URLs to new root paths
+    if (path === '/docs' || path.startsWith('/docs/')) {
+      const newPath = path.replace(/^\/docs/, '') || '/';
+      window.location.replace(newPath);
     }
   }, []);
 
