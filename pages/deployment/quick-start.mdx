@@ -30,22 +30,7 @@ Pick your provider below. Each has an automated script that runs on first boot a
 |----------|-------|
 | Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
 | DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
-| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
-| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
 
 > **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
 
----
-
-## What the scripts do
-
-Every cloud script performs a fully unattended setup:
-
-- Installs Docker and Docker Compose
-- Writes `.env` and `docker-compose.production.yml`
-- Configures Nginx as a reverse proxy
-- Obtains a free TLS certificate from Let's Encrypt
-- Configures the UFW firewall
-- Optionally deploys embedded Keycloak SSO
-- Outputs a deployment summary with all credentials
 
