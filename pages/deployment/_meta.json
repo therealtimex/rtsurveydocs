@@ -1,9 +1,9 @@
 {
   "index": { "display": "hidden" },
   "quick-start": "Quick Start",
+  "cloud-providers": "Cloud Providers",
   "configuration": "Configuration",
   "maintenance": "Maintenance",
   "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication",
-  "cloud-providers": "Cloud Providers"
+  "sso-authentication": "SSO Authentication"
 }
