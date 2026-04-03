@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebSearch",
-      "Bash(git -C /Volumes/ExDisk/rtLab/webapp/doc.rtsurvey.com remote -v)",
-      "Bash(pip3 show:*)"
-    ]
-  }
-}
