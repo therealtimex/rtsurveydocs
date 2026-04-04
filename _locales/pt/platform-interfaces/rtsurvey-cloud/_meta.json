@@ -1,4 +1,7 @@
 {
+  "index": {
+    "display": "hidden"
+  },
   "overview": "Overview",
   "dashboard-overview": "Dashboard Overview",
   "system-user": "System & User",

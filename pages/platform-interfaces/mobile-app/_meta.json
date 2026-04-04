@@ -1,4 +1,7 @@
 {
+  "index": {
+    "display": "hidden"
+  },
   "overview": "Overview",
   "installing-rtsurvey": "Installation",
   "connect-to-a-server": "Connect to Server",
