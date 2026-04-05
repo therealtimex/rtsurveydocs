@@ -1,0 +1,10 @@
+{
+  "index": {
+    "display": "hidden"
+  },
+  "overview": "Overview",
+  "installation": "Installation",
+  "connection": "Connecting to Server",
+  "configuration": "Configuration",
+  "functionalities": "Functionalities"
+}

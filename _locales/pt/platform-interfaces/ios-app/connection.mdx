@@ -1,0 +1,106 @@
+---
+title: "Ligar a um servidor"
+description: "Saiba como ligar a aplicação móvel rtSurvey ao servidor do seu projeto, aceder a funcionalidades específicas de função e começar a colaborar em inquéritos em múltiplos projetos."
+---
+
+Ligar a aplicação rtSurvey a um servidor é um passo crucial para começar a usar a aplicação para recolha, gestão e análise de dados. Este processo garante que todas as funções de inquérito podem aceder às funcionalidades e dados necessários em tempo real.
+
+## Diferenças Principais em Relação ao ODK Collect
+
+O rtSurvey oferece funcionalidades melhoradas em comparação com o ODK Collect, atendendo a várias funções de inquérito:
+- **Administrador**: Mensagens, notificações de atualizações (submissão de dados, novos relatórios, novas contas), preenchimento de formulários e visualização de relatórios de análise.
+- **Gestor de Projeto**: Funcionalidades semelhantes às dos Administradores, incluindo configuração e gestão de projetos.
+- **Designer de Inquérito**: Mensagens, notificações, preenchimento de formulários e visualização de relatórios de análise.
+- **Enumerador de Campo**: Preenchimento de formulários, mensagens, notificações e relatórios de progresso.
+- **Analista de Dados**: Mensagens, notificações e acesso a relatórios de análise.
+
+## Passos para Ligar a Aplicação rtSurvey a um Servidor
+
+### 1. Certifique-se de que Tem uma Conta
+
+Para ligar ao servidor, precisa de uma conta. As contas podem ser criadas por um Administrador ou pelo pessoal usando um URL de criação de conta configurado pelo Administrador.
+
+### 2. Abrir a Aplicação rtSurvey
+
+Lance a aplicação rtSurvey no seu dispositivo móvel. Se ainda não a instalou, consulte a página [Instalar a Aplicação rtSurvey](#installing-rtsurvey-app).
+
+### 3. Aceder às Configurações de Ligação ao Servidor
+
+1. Abra a aplicação e navegue até ao menu de configurações.
+2. Selecione a opção para ligar a um servidor.
+
+### 4. Introduzir Detalhes da Conta e Selecionar Projeto
+
+Ao ligar ao rtSurvey, o processo é simplificado com base na configuração da sua conta:
+
+- **Nome de utilizador**: Introduza o nome de utilizador da sua conta.
+- **Palavra-passe**: Introduza a palavra-passe da sua conta.
+
+Após introduzir as suas credenciais:
+
+- Se a sua conta estiver associada a apenas um projeto de inquérito:
+  - A aplicação iniciará sessão automaticamente no servidor desse projeto.
+  - Não precisa de introduzir um URL de servidor ou selecionar um projeto manualmente.
+
+- Se a sua conta estiver associada a múltiplos projetos de inquérito:
+  - Após autenticação com sucesso, verá uma lista dos projetos a que tem acesso.
+  - Selecione o projeto em que pretende trabalhar a partir desta lista.
+
+### 5. Autenticar
+
+Após introduzir os detalhes do servidor, toque no botão "Ligar" ou "Iniciar sessão". A aplicação autenticará as suas credenciais e estabelecerá uma ligação ao servidor.
+
+```mermaid
+flowchart TD
+    A["📱 Iniciar Aplicação rtSurvey"] --> B["🔑 Introduzir Nome de Utilizador<br>e Palavra-passe"]
+    style A fill:#4CAF50,stroke:#666666,stroke-width:3px,color:white
+    style B fill:#2196F3,stroke:#666666,stroke-width:3px,color:white
+
+    B --> C{"🌳 Múltiplos<br>projetos?"}
+    style C fill:#FFC107,stroke:#666666,stroke-width:3px,color:black
+
+    C -->|Sim| D["📋 Exibir lista<br>de projetos"]
+    C -->|Não| E["🔄 Ligar automaticamente ao<br>projeto único"]
+    style D fill:#FF9800,stroke:#666666,stroke-width:3px,color:white
+    style E fill:#009688,stroke:#666666,stroke-width:3px,color:white
+
+    D --> F["👆 Utilizador seleciona<br>um projeto"]
+    style F fill:#FF5722,stroke:#666666,stroke-width:3px,color:white
+
+    E --> G["☁️ Ligar ao servidor"]
+    F --> G
+    style G fill:#3F51B5,stroke:#666666,stroke-width:3px,color:white
+    G --> H["👥 Aceder a funcionalidades<br>específicas de função"]
+    style H fill:#9C27B0,stroke:#666666,stroke-width:3px,color:white
+
+    H --> I["👨‍💼 Administrador/<br>Gestor de Projeto"]
+    H --> J["🎨 Designer de Inquérito"]
+    H --> K["📝 Enumerador de Campo"]
+    H --> L["📊 Analista de Dados"]
+    style I fill:#E91E63,stroke:#666666,stroke-width:3px,color:white
+    style J fill:#795548,stroke:#666666,stroke-width:3px,color:white
+    style K fill:#607D8B,stroke:#666666,stroke-width:3px,color:white
+    style L fill:#8BC34A,stroke:#666666,stroke-width:3px,color:white
+
+    I --> M["💬 Mensagens<br>🔔 Notificações<br>📄 Preenchimento de Formulários<br>📈 Visualização de Relatórios"]
+    J --> N["💬 Mensagens<br>🔔 Notificações<br>🧪 Teste de Formulários<br>📈 Visualização de Relatórios"]
+    K --> O["📝 Preenchimento de Formulários<br>💬 Mensagens<br>🔔 Notificações<br>📊 Relatórios de Progresso"]
+    L --> P["💬 Mensagens<br>🔔 Notificações<br>📊 Relatórios de Análise"]
+    style M fill:#FF4081,stroke:#666666,stroke-width:3px,color:white
+    style N fill:#9E9E9E,stroke:#666666,stroke-width:3px,color:white
+    style O fill:#00BCD4,stroke:#666666,stroke-width:3px,color:white
+    style P fill:#CDDC39,stroke:#666666,stroke-width:3px,color:white
+```
+
+## Resolução de Problemas de Ligação
+
+Se encontrar problemas ao ligar ao servidor:
+
+1. **Verificar Ligação à Internet**: Certifique-se de que o seu dispositivo está ligado à internet.
+2. **Confirmar Credenciais**: Certifique-se de que o seu nome de utilizador e palavra-passe estão corretos.
+3. **Reiniciar a Aplicação**: Feche e reabra a aplicação rtSurvey.
+4. **Contactar Suporte**: Se os problemas persistirem, contacte o seu administrador de sistema ou o suporte do rtSurvey para assistência.
+
+## Conclusão
+
+Ligar a aplicação rtSurvey a um servidor é um processo simples que lhe permite aproveitar as capacidades completas da aplicação. Seguindo os passos descritos acima, pode garantir uma recolha, gestão e análise de dados sem problemas, adaptada à sua função específica de inquérito.
