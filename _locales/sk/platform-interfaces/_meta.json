@@ -3,7 +3,6 @@
     "display": "hidden"
   },
   "rtsurvey-cloud": "rtSurvey Cloud",
-  "android-app": "Android App",
-  "ios-app": "iOS App",
+  "mobile-app": "Mobile App",
   "web-form": "Web Form"
 }

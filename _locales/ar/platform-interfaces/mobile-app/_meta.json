@@ -1,0 +1,10 @@
+{
+  "index": {
+    "display": "hidden"
+  },
+  "android": "Android",
+  "ios": "iOS",
+  "connection": "Connecting to Server",
+  "configuration": "Configuration",
+  "functionalities": "Functionalities"
+}
