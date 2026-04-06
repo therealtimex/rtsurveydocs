@@ -1,0 +1,275 @@
+---
+title: "Key concepts"
+description: "Overview of form design"
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 210
+---
+
+## What is an XLSForm?
+rtSurvey uses an extended version of the [XLSForm](https://xlsform.org/) standard for form design, offering powerful features for creating sophisticated surveys. This guide will introduce you to the key concepts of form design in rtSurvey, from basic XLSForm structure to advanced rtSurvey-specific features.  
+
+With XLSForms, you can author forms in a human-readable format using the familiar Excel tool, making it accessible to almost everyone. 
+This standard enables easy sharing and collaboration on form authoring. 
+
+While XLSForms are beginner-friendly, they also allow experienced users to create complex forms. 
+
+rtSurvey provides a consistent way to incorporate advanced functionalities such as skip logic into forms across various web and mobile data collection platforms.
+
+## XLSForm Structure
+An XLSForm typically consists of two main worksheets:
+
+1. **survey**: Defines the structure and content of your form.
+2. **choices**: Specifies answer choices for multiple-choice questions.
+
+An optional **settings** worksheet can provide additional form specifications.
+
+It's important to note that the mandatory columns in the survey and choices worksheets must be present for the form to work properly. Optional columns in both worksheets provide further control over the behavior of each entry in the form but are not essential.
+
+The columns in your Excel workbook can appear in any order, and optional columns can be left blank. However, it's crucial to use the precise syntax and naming conventions specified in the XLSForm documentation for the form to work correctly.
+
+### The survey worksheet
+The **survey worksheet** is where you define the structure of your form and provide the content. Each row in the survey worksheet represents a question or element in your form. The following columns are mandatory in the survey worksheet:
+
+- `type`: Specifies the type of entry you are expecting for the question.
+- `name`: Specifies the unique variable name for that entry. Names must start with a letter or an underscore and can only contain letters, digits, hyphens, underscores, and periods. Names are case-sensitive.
+- `label`: Contains the actual text you see for the question in the form.
+
+| type                | name     | label                |
+| ------------------- | -------- | -------------------- |
+| today               | today    |                      |
+| select_one gender   | gender   | Respondent's gender? |
+| integer             | age      | Respondent's age?    |
+
+### The choices worksheet
+The **`choices`** worksheet is used to specify the answer choices for multiple-choice questions. 
+Each row represents an answer choice. The following columns are mandatory in the choices worksheet:
+
+- **`list_name`**: Groups together a set of related answer choices.
+- **`name`**: Specifies the unique variable name for that answer choice.
+- **`label`**: Shows the answer choice exactly as you want it to appear on the form.
+
+| list_name           | name        | label                |
+| ------------------- | ----------- | -------------------- |
+| gender              | transgender | Transgender          |
+| gender              | female      | Female               |
+| gender              | male        | Male                 |
+| gender              | other       | Other                |
+
+The columns you add to your Excel workbook, whether they are mandatory or optional, may appear in any order. Optional columns may be left out completely. Rows or columns may be left blank to aid readability, but data after 20 adjacent blank columns or rows on a sheet will not be processed. All .xlsx file formatting is ignored, so you can use dividing lines, shading, and other font formatting to make the form more readable.
+
+One thing to keep in mind when authoring forms in Excel is that the syntax you use must be precise. For example, if you write **Choices** or **choice** instead of **choices**, the form won't work.
+
+### The settings worksheet
+
+The settings worksheet is optional but allows you to specify form-level metadata and behavior. Common columns in the settings worksheet include:
+
+| Column | Description |
+|--------|-------------|
+| form_title | The title of the form as it appears to users |
+| form_id | A unique identifier for the form, used in data management and API calls |
+| default_language | The default language code for multilingual forms (e.g., 'en' for English) |
+| version | The version number of the form, useful for tracking changes |
+| instance_name | Expression to generate a unique name for each form submission |
+| generation | Integer marking the generation of the form. Increment for structural changes |
+| family | Identifier to group related forms across structural changes |
+
+The settings worksheet in rtSurvey can also include additional configurations specific to rtSurvey's extended functionalities. Refer to the rtSurvey documentation for a full list of supported settings.
+
+## Key Components of the Survey Worksheet
+
+The survey worksheet is the core of your form design. Here's an overview of its key components:
+
+| Component | Description |
+|-----------|-------------|
+| [type](#question-types) | Specifies the question type (e.g., text, integer, select_one) |
+| [name](#naming-conventions) | Unique identifier for the question |
+| [label](#labels-and-translations) | The text displayed to the respondent |
+| [hint](#hints-and-help-text) | Additional guidance for the respondent |
+| [appearance](#appearance-options) | Modifies how the question is displayed |
+| [relevant](#relevance-and-skip-logic) | Determines when the question should be asked (skip logic) |
+| [constraint](#constraints-and-validation) | Validates the response |
+| [calculation](#calculations) | Computes values based on other responses |
+| [required](#required-fields) | Specifies if the question must be answered |
+
+
+Each of these components plays a crucial role in creating effective and efficient surveys. Click on the links in the "Detailed Section" column to learn more about each component.
+
+### Question types
+XLSForm supports a number of question types. These are just some of the options you can enter in the **`type`** column in the **`survey`** worksheet in your XLSForm:
+
+| Question type             | Answer input                                                                                 |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| integer                   | Integer (i.e., whole number) input.                                                          |
+| decimal                   | Decimal input.                                                                               |
+| range                     | [Range](#range) input (including rating)                                                     |
+| text                      | Free text response.                                                                          |
+| select_one [options]      | [Multiple choice](#multiple-choice) question; only one answer can be selected.               |
+| select_multiple [options] | [Multiple choice](#multiple-choice) question; multiple answers can be selected.              |
+| select_one_from_file [file]| [Multiple choice from file](#multiple-choice-from-file); only one answer can be selected.      |
+| select_multiple_from_file [file]| [Multiple choice from file](#multiple-choice-from-file); multiple answers can be selected.|
+| rank [options]            | [Rank](#rank) question; order a list.                                                        |
+| note                      | Display a note on the screen, takes no input. Shorthand for type=text with readonly=true.    |
+| geopoint                  | Collect a [single GPS coordinate](#gps).                                                     |
+| geotrace                  | Record a [line of two or more GPS coordinates](#gps).                                                |
+| geoshape                  | Record a [polygon of multiple GPS coordinates](#gps); the last point is the same as the first point. |
+| date                      | Date input.                                                                                  |
+| time                      | Time input.                                                                                  |
+| dateTime                  | Accepts a date and a time input.                                                             |
+| image                     | Take a picture or upload an [image file](#image).                                            |
+| audio                     | Take an audio recording or upload an audio file.                                             |
+| background-audio          | Audio is recorded in the background while filling the form.                                  |
+| video                     | Take a video recording or upload a video file.                                               |
+| file                      | Generic file input (txt, pdf, xls, xlsx, doc, docx, rtf, zip)                                |
+| barcode                   | Scan a barcode, requires the barcode scanner app to be installed.                            |
+| calculate                 | Perform a calculation; see the [Calculation](#calculation) section below.                    |
+| acknowledge               | Acknowledge prompt that sets value to "OK" if selected.                                      |
+| hidden                    | A field with no associated UI element which can be used to store a constant                  |
+| xml-external              | Adds a reference to an [external XML data](#external-xml-data) file                          |
+
+### Labels
+
+Labels are the text displayed to respondents for each question. They are crucial for clear communication in surveys.
+
+- **Basic usage**: In the `label` column, enter the question text.
+- **Multiple languages**: Use additional columns like `label::English` and `label::French` for multilingual surveys.
+- **Formatting**: rtSurvey supports basic HTML formatting in labels for emphasis or structure.
+
+Example:
+```
+| type | name | label | label::French |
+|------|------|-------|---------------|
+| text | name | What is your name? | Quel est votre nom? |
+```
+
+### Hints
+
+Hints provide additional guidance to respondents without cluttering the main question text.
+
+- **Usage**: Add hints in the `hint` column.
+- **Visibility**: Hints are typically displayed below the main question text.
+- **Multilingual**: Like labels, hints can be specified for multiple languages using `hint::Language` columns.
+
+Example:
+```
+| type | name | label | hint |
+|------|------|-------|------|
+| integer | age | How old are you? | Please enter your age in years |
+```
+
+### Appearance
+
+The `appearance` column in rtSurvey allows customization of how questions are displayed.
+
+- **Standard options**: Include 'multiline' for text, 'horizontal' for select questions.
+- **rtSurvey extensions**: 
+  - Time input: Various clock display options (e.g., `inline`, `inline-1line`)
+  - Color customization: Use `colors()` function to change icon colors
+
+Example:
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | time | Enter time | inline-[%H:%M] |
+```
+
+### Relevant
+
+The `relevant` column implements skip logic, determining when a question should be displayed.
+
+- **Syntax**: Use XPath expressions to define conditions.
+- **Variables**: Reference other question names using `${question_name}`.
+
+Example:
+```
+| type | name | label | relevant |
+|------|------|-------|----------|
+| text | allergies | List allergies | ${has_allergies} = 'yes' |
+```
+
+### Required
+
+The `required` column specifies whether a question must be answered.
+
+- **Basic usage**: Use 'yes' or 'true' to make a question required.
+- **Advanced**: Can use expressions for conditional requirement.
+
+Example:
+```
+| type | name | label | required |
+|------|------|-------|----------|
+| text | email | Email address | yes |
+```
+
+### Repeats
+
+Repeats allow a group of questions to be answered multiple times.
+
+- **Usage**: Use `begin repeat` and `end repeat` rows to define a repeating group.
+- **Naming**: Give each repeat group a unique name.
+
+Example:
+```
+| type | name | label |
+|------|------|-------|
+| begin repeat | household_member | Household member |
+| text | member_name | Name |
+| integer | member_age | Age |
+| end repeat | | |
+```
+
+### Media
+
+rtSurvey supports various media types in surveys, including images, audio, and video.
+
+- **Question types**: Use 'image', 'audio', or 'video' in the type column.
+- **Media in labels**: Reference media files in labels using HTML tags.
+
+Example:
+```
+| type | name | label |
+|------|------|-------|
+| image | house_photo | Take a photo of the house |
+| note | | <img src="logo.jpg" /> Welcome to the survey |
+```
+
+### Read-only
+
+Read-only questions display information without allowing user input.
+
+- **Usage**: Add 'readonly' to the `appearance` column.
+- **Calculations**: Often used with calculate type for displaying computed values.
+
+Example:
+```
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | bmi | BMI | readonly | ${weight} / (${height} * ${height}) |
+```
+
+
+
+
+
+## rtSurvey Extensions
+
+rtSurvey expands the XLSForm standard by supporting additional capabilities such as `grid layout`, `html format`, and many new `widgets`.
+
+### Grid layout
+rtSurvey allows your form to mimic the look of traditional paper surveys by compacting multiple questions into one row.
+
+### Form settings 
+
+### Data settings
+
+### Typeform Style
+
+### Extension of pulldata() 
+
+### Appearance-based extensions
+
+### Webbox Extensions
+

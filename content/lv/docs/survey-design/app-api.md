@@ -1,0 +1,141 @@
+---
+title: "Lietotnes API"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 300
+---
+
+AppAPI ļauj lietotājiem ielādēt sistēmas metadatus no lietotnes, izmantojot dažādas metodes FormEngine un DMView. Tas nodrošina piekļuvi dažādām datu atslēgām, lai iegūtu konkrētu informāciju no lietotnes.
+
+XLSForm var izmantot funkciju `pulldata()` ar šādu sintaksi:
+
+
+{{< alert context="light" text="pulldata('app-api', 'data-key')" />}}
+
+- `'app-api'`: Šis atslēgvārds informē FormEngine, ka jāielādē dati no lietotnes API.
+- `'data-key'`: Šī ir datu atslēga, kuru vēlaties ielādēt no lietotnes API.
+- Ja datu atslēga ir nederīga vai netiek atbalstīta, aprēķins atgriezīs "n/a".
+
+Šeit ir atbalstītās datu atslēgas, ko var izmantot ar App-API:
+
+`osPlatform`: Atgriež pašreizējo OS nosaukumu (Android vai iOS) un OS versiju. Tīmekļa platformas atgriezīs tukšu vērtību.
+
+`appPlatform`: Atgriež lietotnes platformas nosaukumu, kas ir `rtSurvey`.
+
+`appVersion`: Atgriež lietotnes versijas nosaukumu.
+
+`getDisplayWidth`: Atgriež ierīces ekrāna platumu pikseļos.
+
+`getDisplayHeight`: Atgriež ierīces ekrāna augstumu pikseļos.
+
+`getScreenSize`: Atgriež ierīces ekrāna izmēru collās.
+
+`projectCode`: Atgriež pašreizējo projekta kodu vietnē, kurā lietotājs ir pieteicies.
+
+`projectURL`: Atgriež pašreizējo projekta URL vietnē, kurā lietotājs ir pieteicies. Noklusējuma/rezerves vērtība ir tukšs teksts ("").
+
+`startingPoint`: Atgriež punkta ceļu, kas sāk formu. Sīkāk skatiet sadaļā "Formas sākumpunkts".
+
+`serverTime`: Atgriež labāko pieejamo servera datuma un laika aptuveno vērtību.
+
+`user.[attribute]`: Atgriež pašreizējos lietotāja atribūtus, pamatojoties uz norādīto atribūta atslēgu. Pieejamās atribūtu atslēgas skatiet tabulā "Lietotāja atribūti".
+
+Apvienojiet zemāk norādītās atribūtu atslēgas ar "user." parametros `pulldata()`, lai iegūtu pašreizējo lietotāja informāciju. Piemēram, izmantojiet `user.username`, `user.email` utt.
+
+| Atribūta atslēga     | Apraksts                             |
+|----------------------|--------------------------------------|
+| username             | Lietotāja lietotājvārds              |
+| name                 | Lietotāja pilns vārds                |
+| staffCode            | Lietotāja personāla kods             |
+| phone                | Lietotāja tālruņa numurs             |
+| email                | Lietotāja e-pasta adrese             |
+| description          | Apraksta teksts lietotāja informācijā |
+| organization_id      | Organizācijas ID, kurai pieder lietotājs |
+| organization_name    | Organizācijas nosaukums, kurai pieder lietotājs |
+| team_id              | Komandas ID, kurai pieder lietotājs  |
+| supervisor_id        | Lietotāja uzraudzītāja ID            |
+| is_supervisor        | 1, ja lietotājs ir uzraudzītājs, 0 ja nē |
+
+`instancePath`: Atgriež pašreizējo instances mapes ceļu.
+
+`appLanguage`: Atgriež pašreizējo lietotnes valodu, kas iestatīta lietotnes iestatījumos (piem., vi, en).
+
+`openArgs.[attribute]`: Atgriež no ActionButton (act_fill_form, act_get_instance) padoto formas atvēršanas argumentu. Noklusējuma/rezerves vērtība ir tukšs teksts ("").
+
+`primaryAppColor`: Izgūst lietotnes primāro krāsu.
+
+---
+
+## Lietojuma piemēri
+
+### Enumeratora lietotājvārda un organizācijas saglabāšana
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Izmantojiet tos piezīmju etiķetēs audita mērķiem:
+```
+note | interviewer_info | Intervētājs: ${enumerator_name} (${enumerator_org})
+```
+
+### Ierīces un ekrāna informācija
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+Noderīgs problēmu novēršanai: eksportējiet `device_platform` un `app_ver` kopā ar datiem, lai identificētu, kura ierīces versija tika izmantota katram iesniegumam.
+
+### Servera laiks vietā ierīces laika
+
+Ierīces pulksteņi var būt neprecīzi. Izmantojiet `serverTime` uzticamākam laika zīmogam:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Nosacījuma loģika, pamatojoties uz lietotāja lomu
+
+Rādīt tikai uzraudzītājiem paredzētu sadaļu tikai uzraudzītājiem:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Uzraudzītāja pārskats | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Uzraudzītāja piezīmes | |
+| end_group | | | |
+
+### Argumentu padošana no darbības pogas
+
+Kad forma tiek palaista no darbības pogas `act_fill_form` ar pielāgotiem argumentiem:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+Darbības pogai jāpadod argumenti ar atbilstošajām atslēgām (piem., `household_id`, `task_code`).
+
+### Projekta informācijas izmantošana
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## Piezīmes
+
+- Visi `pulldata('app-api', ...)` izsaukumi tiek novērtēti, kad forma tiek atvērta, un sesijas laikā netiek pārvērtēti dinamiski (izņemot `serverTime` un `now()`).
+- Ja atslēga netiek atbalstīta vai dati nav pieejami, funkcija atgriež `'n/a'` (nevis tukšu virkni — pārbaudiet ar `!= 'n/a'`, nevis `!= ''`).
+- `openArgs` vērtības ir pieejamas tikai tad, kad forma tiek palaista no darbības pogas; citādi tās atgriež tukšu virkni.

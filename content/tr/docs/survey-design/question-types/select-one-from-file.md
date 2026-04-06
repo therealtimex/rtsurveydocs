@@ -1,0 +1,97 @@
+---
+title: "Dosyadan Seçim"
+description: "select_one_from_file ve select_multiple_from_file, forma eklenen harici bir CSV veya XML dosyasından dinamik olarak seçenek yükler."
+icon: "file-earmark-spreadsheet"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 241
+---
+
+`select_one_from_file` ve `select_multiple_from_file`, `select_one` ve `select_multiple` gibi çalışır; ancak seçenekleri **choices çalışma sayfasında** tanımlamak yerine forma eklenen **harici bir CSV veya XML dosyasından** yükler. Bu, seçenek listesi çok uzun olduğunda, sık sık değiştiğinde veya formun tamamını yeniden oluşturmadan güncellenmesi gerektiğinde kullanışlıdır.
+
+## Temel XLSForm Tanımı
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | Sağlık tesisini seçin |
+| select_multiple_from_file crops.csv | crops | Hane hangi ürünleri yetiştiriyor? |
+
+Tür adından sonra gelen dosya adı, formu yüklerken eklediğiniz dosyanın adıyla eşleşmelidir.
+
+## CSV dosya biçimi
+
+CSV dosyanızın en az iki sütunu olmalıdır: `name` (saklanan değer) ve `label` (görüntülenen metin). Filtreleme için istediğiniz sayıda ek sütun ekleyebilirsiniz.
+
+**health_facilities.csv:**
+
+```
+name,label,district,type
+HF001,Nairobi Central Clinic,Nairobi,clinic
+HF002,Westlands Health Centre,Nairobi,health_centre
+HF003,Kisumu District Hospital,Kisumu,hospital
+```
+
+## Seçenekleri filtreleme
+
+Yalnızca geçerli bağlamla eşleşen seçenekleri göstermek için `choice_filter` sütununu kullanın. CSV sütunlarına doğrudan sütun adlarıyla başvurun (`${}` olmadan):
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | İlçe seçin | |
+| select_one_from_file health_facilities.csv | facility | Tesis seçin | district = ${district} |
+
+Bu örnekte yalnızca seçilen ilçedeki tesisler görüntülenir. `choice_filter` içindeki `district`, CSV dosyasındaki `district` sütununa başvurur; `${district}` ise `district` adlı form alanına başvurur.
+
+## Kullanım Alanları
+
+Dosyadan seçim soruları yaygın olarak şunlar için kullanılır:
+
+1. **Uzun seçenek listeleri** — sağlık tesisleri, okullar, köyler, tür listeleri (yüzlerce veya binlerce öğe)
+2. **Sık güncellenen listeler** — ana liste anket turları arasında değiştiğinde yalnızca CSV'yi güncelleyin, formu yeniden oluşturmaya gerek yok
+3. **Paylaşılan referans verileri** — birden fazla formda kullanılan tek bir CSV dosyası
+4. **Filtreli basamaklı seçimler** — tüm bölge/ilçe/köyleri tek dosyada yükleyin, ardından üst seçime göre filtreleyin
+
+## Dosyayı ekleme
+
+Formunuzu rtSurvey'e yüklediğinizde, CSV dosyasını **medya eki** olarak ekleyin. Form tanımındaki dosya adı, ekin dosya adıyla tam olarak eşleşmelidir.
+
+{{% alert icon=" " context="warning" %}}
+Dosya adları büyük/küçük harfe duyarlıdır. `Health_Facilities.csv` ve `health_facilities.csv` farklı dosyalar olarak değerlendirilir.
+{{% /alert %}}
+
+## Dosyadan seçim ile `choice-label()` kullanımı
+
+Bir not veya hesaplama alanında seçilen seçeneğin etiketini görüntülemek için:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | Tesis seçin | |
+| calculate | facility_label | | choice-label(${facility}, ${facility}) |
+| note | summary | Seçilen tesis: ${facility_label} | |
+
+## En İyi Uygulamalar
+
+1. Mobil cihazlarda iyi performans için CSV dosyalarınızı 5.000 satırın altında tutun.
+2. Her zaman `name` ve `label` sütununu ekleyin — ek sütunlar isteğe bağlıdır.
+3. Basamaklı seçimler için üst sütunu olan tek bir CSV kullanın ve `choice_filter` ile filtreleyin.
+4. Sütun yapısında önemli değişiklikler yaparken CSV dosya adlarını sürümlendirin (örn. `facilities_v3.csv`).
+5. Filtreleme ifadelerini dikkatlice test edin — `choice_filter` içindeki bir yazım hatası sessizce hiçbir seçenek göstermez.
+
+## Sınırlamalar
+
+- Çok büyük CSV dosyaları (10.000+ satır), özellikle düşük kaliteli cihazlarda form yüklemeyi yavaşlatabilir.
+- CSV dosyaları formla birlikte yüklenmelidir — çalışma zamanında bir URL'den getirilemezler (dinamik aramalar için `search()` veya `pulldata()` kullanın).
+- `select_multiple_from_file` istemciler arasında daha az yaygın desteklenir — kullanmadan önce uyumluluğu doğrulayın.
+
+## `search()` ile karşılaştırma
+
+| | `select_one_from_file` | `search()` görünümü |
+|--|----------------------|----------------------|
+| Seçenek kaynağı | Ekli CSV/XML dosyası | Sunucu tarafı veritabanı sorgusu |
+| Çevrimdışı çalışır | Evet (dosya paketlenmiş) | Bağlantı gerektirir |
+| Seçenek sayısı | Cihaz belleğiyle sınırlı | Sınırsız (sayfalanmış) |
+| Gerçek zamanlı veri | Hayır | Evet |
+
+Büyük, sık değişen veya sunucu taraflı veri kümeleri için [Dinamik Arama](../advanced-extension/dynamic-search) bölümüne bakın.

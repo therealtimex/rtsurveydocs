@@ -1,0 +1,107 @@
+---
+title: "Pomijanie pytań"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 280
+---
+
+Logika pomijania, znana również jako rozgałęzianie lub logika warunkowa, pozwala tworzyć dynamiczne ankiety dostosowujące się do odpowiedzi respondentów. W rtSurvey logika pomijania jest implementowana przy użyciu kolumny `relevant` w XLSForm.
+
+## Podstawowa logika pomijania
+
+Aby zaimplementować podstawową logikę pomijania, użyj kolumny `relevant`, aby określić warunek:
+
+```
+| type           | name          | label                       | relevant            |
+|----------------|---------------|-----------------------------|--------------------|
+| select_one y_n | likes_pizza   | Czy lubisz pizzę?           |                    |
+| select_multiple pizza_toppings | favorite_topping | Ulubione dodatki | ${likes_pizza} = 'yes' |
+```
+
+W tym przykładzie pytanie „Ulubione dodatki" pojawia się tylko jeśli respondent odpowiada „tak" na pytanie o lubienie pizzy.
+
+## Składnia wyrażeń relevant
+
+- Używaj `${ }` do odwoływania się do innych zmiennych pytań.
+- Dla pytań `select_one` porównuj bezpośrednio: `${nazwa_pytania} = 'odpowiedź'`
+- Dla pytań `select_multiple` użyj funkcji `selected()`.
+
+## Zaawansowana logika pomijania
+
+### Wiele warunków
+
+Możesz łączyć wiele warunków używając `and`, `or` i nawiasów:
+
+```
+| type    | name  | label                    | relevant                                          |
+|---------|-------|--------------------------|---------------------------------------------------|
+| integer | age   | Ile masz lat?            |                                                   |
+| text    | school| Do jakiej szkoły chodzisz? | ${age} < 18 and (${location} = 'urban' or ${location} = 'suburban') |
+```
+
+### Używanie pytań select_multiple
+
+Dla pytań `select_multiple` użyj funkcji `selected()`:
+
+```
+| type           | name          | label                       | relevant                               |
+|----------------|---------------|-----------------------------|-----------------------------------------|
+| select_multiple pizza_toppings | favorite_topping | Ulubione dodatki |                                         |
+| text           | cheese_type   | Ulubiony rodzaj sera        | selected(${favorite_topping}, 'cheese') |
+```
+
+### Opcja „Inne" w pytaniach wielokrotnego wyboru
+
+Zaimplementuj opcję wolnego tekstu „Inne" używając `relevant`:
+
+```
+| type           | name                     | label                             | relevant                               |
+|----------------|--------------------------|-----------------------------------|-----------------------------------------|
+| select_multiple pizza_toppings | favorite_toppings | Jakie są Twoje ulubione dodatki do pizzy? |                          |
+| text           | favorite_toppings_other | Jakie inne dodatki lubisz?        | selected(${favorite_toppings}, 'other') |
+```
+
+Pamiętaj, aby uwzględnić 'other' jako opcję w arkuszu choices.
+
+## Funkcje specyficzne dla rtSurvey
+
+### Dynamiczna relewantność
+
+rtSurvey umożliwia dynamiczną relewantność opartą na obliczanych polach:
+
+```
+| type      | name        | label           | calculation                        |
+|-----------|-------------|-----------------|-----------------------------------|
+| calculate | total_score | Łączny wynik    | ${score1} + ${score2} + ${score3} |
+| text      | feedback    | Opinia          | ${total_score} > 75               |
+```
+
+### Relewantność w powtórzeniach
+
+rtSurvey obsługuje relewantność w grupach powtórzeń:
+
+```
+| type         | name        | label              | relevant               |
+|--------------|-------------|--------------------|-----------------------|
+| begin repeat | child_info  | Informacje o dziecku|                      |
+| integer      | child_age   | Wiek dziecka        |                       |
+| text         | school_name | Nazwa szkoły        | ${child_age} >= 5     |
+| end repeat   |             |                     |                       |
+```
+
+## Najlepsze praktyki dotyczące logiki pomijania w rtSurvey
+
+1. **Zachowaj prostotę**: Unikaj nadmiernie złożonych warunków relewantności, gdy to możliwe.
+2. **Testuj dokładnie**: Używaj funkcji podglądu rtSurvey do testowania wszystkich możliwych ścieżek przez ankietę.
+3. **Rozważ wydajność**: Bardzo złożona logika pomijania może wpływać na wydajność ankiety, szczególnie na urządzeniach mobilnych.
+4. **Używaj jasnych nazw zmiennych**: To ułatwia czytanie i utrzymanie wyrażeń relewantności.
+5. **Dokumentuj logikę**: Dodawaj notatki wyjaśniające złożone wzorce pomijania, szczególnie przy współpracy zespołowej.
+6. **Pamiętaj o analizie danych**: Pominięte pytania spowodują brakujące dane. Planuj analizę odpowiednio.
+
+## Podsumowanie
+
+Efektywne korzystanie z logiki pomijania może znacznie poprawić doświadczenie respondenta i jakość danych w projektach rtSurvey. Wykorzystując zaawansowane funkcje rtSurvey i przestrzegając najlepszych praktyk, możesz tworzyć dynamiczne, efektywne ankiety dostosowujące się do unikalnej sytuacji każdego respondenta.

@@ -1,0 +1,141 @@
+---
+title: "App API"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 300
+---
+
+AppAPI cho phép người dùng tải siêu dữ liệu hệ thống từ ứng dụng bằng các phương thức khác nhau trong FormEngine và DMView. Nó cung cấp quyền truy cập vào các khóa dữ liệu khác nhau để lấy thông tin cụ thể từ ứng dụng.
+
+Trong XLSForm, bạn có thể dùng hàm `pulldata()` với cú pháp sau:
+
+
+{{< alert context="light" text="pulldata('app-api', 'data-key')" />}}
+
+- `'app-api'`: Từ khóa này thông báo cho FormEngine tải dữ liệu từ App API.
+- `'data-key'`: Đây là khóa của dữ liệu bạn muốn tải từ App API.
+- Nếu khóa dữ liệu không hợp lệ hoặc không được hỗ trợ, phép tính sẽ trả về "n/a".
+
+Dưới đây là các khóa dữ liệu được hỗ trợ khi dùng với App-API:
+
+`osPlatform`: Trả về tên hệ điều hành hiện tại (Android hoặc iOS) và phiên bản hệ điều hành. Các nền tảng web sẽ trả về giá trị trống.
+
+`appPlatform`: Trả về tên nền tảng ứng dụng, là `rtSurvey`.
+
+`appVersion`: Trả về tên phiên bản ứng dụng.
+
+`getDisplayWidth`: Trả về chiều rộng màn hình thiết bị tính bằng pixel.
+
+`getDisplayHeight`: Trả về chiều cao màn hình thiết bị tính bằng pixel.
+
+`getScreenSize`: Trả về kích thước màn hình thiết bị tính bằng inch.
+
+`projectCode`: Trả về mã dự án hiện tại của trang người dùng đang đăng nhập.
+
+`projectURL`: Trả về URL dự án hiện tại của trang người dùng đang đăng nhập. Giá trị mặc định/dự phòng là chuỗi rỗng ("").
+
+`startingPoint`: Trả về đường dẫn của điểm bắt đầu biểu mẫu. Tham khảo "Form starting point" để biết thêm chi tiết.
+
+`serverTime`: Trả về ước tính tốt nhất có thể về ngày và giờ trên server.
+
+`user.[attribute]`: Trả về các thuộc tính người dùng hiện tại dựa trên khóa thuộc tính được chỉ định. Tham khảo bảng "Thuộc tính người dùng" để biết các khóa thuộc tính có sẵn.
+
+Kết hợp các khóa thuộc tính bên dưới với "user." trong tham số `pulldata()` để lấy thông tin người dùng hiện tại. Ví dụ, dùng `user.username`, `user.email`, v.v.
+
+| Khóa thuộc tính        | Mô tả                                  |
+|------------------------|----------------------------------------|
+| username               | Tên đăng nhập của người dùng            |
+| name                   | Tên đầy đủ của người dùng              |
+| staffCode              | Mã nhân viên của người dùng            |
+| phone                  | Số điện thoại của người dùng           |
+| email                  | Địa chỉ email của người dùng           |
+| description            | Văn bản mô tả trong thông tin người dùng |
+| organization_id        | ID tổ chức mà người dùng thuộc về      |
+| organization_name      | Tên tổ chức mà người dùng thuộc về     |
+| team_id                | ID đội nhóm mà người dùng thuộc về     |
+| supervisor_id          | ID của giám sát viên của người dùng    |
+| is_supervisor          | 1 nếu là giám sát viên, 0 nếu không   |
+
+`instancePath`: Trả về đường dẫn thư mục bản ghi hiện tại.
+
+`appLanguage`: Trả về ngôn ngữ ứng dụng hiện tại được đặt trong cài đặt ứng dụng (ví dụ: vi, en).
+
+`openArgs.[attribute]`: Trả về đối số mở biểu mẫu được truyền từ ActionButton (act_fill_form, act_get_instance). Giá trị mặc định/dự phòng là chuỗi rỗng ("").
+
+`primaryAppColor`: Lấy màu chính của ứng dụng.
+
+---
+
+## Ví dụ sử dụng
+
+### Lưu tên người dùng và tổ chức của người điều tra
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Dùng trong nhãn note cho mục đích kiểm tra:
+```
+note | interviewer_info | Người phỏng vấn: ${enumerator_name} (${enumerator_org})
+```
+
+### Thông tin thiết bị và màn hình
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+Hữu ích cho khắc phục sự cố: xuất `device_platform` và `app_ver` cùng với dữ liệu để xác định phiên bản thiết bị được dùng cho mỗi bản ghi gửi.
+
+### Thời gian server thay vì thời gian thiết bị
+
+Đồng hồ thiết bị có thể sai. Dùng `serverTime` để có dấu thời gian đáng tin cậy hơn:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Logic có điều kiện dựa trên vai trò người dùng
+
+Chỉ hiển thị phần dành cho giám sát viên với người là giám sát viên:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Xem xét của giám sát viên | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Ghi chú của giám sát viên | |
+| end_group | | | |
+
+### Truyền đối số từ nút action
+
+Khi biểu mẫu được khởi chạy từ nút action `act_fill_form` với đối số tùy chỉnh:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+Nút action phải truyền đối số với các khóa tương ứng (ví dụ: `household_id`, `task_code`).
+
+### Sử dụng thông tin dự án
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## Lưu ý
+
+- Tất cả lời gọi `pulldata('app-api', ...)` được đánh giá khi biểu mẫu mở và không được đánh giá lại động trong phiên (ngoại trừ `serverTime` và `now()`).
+- Nếu một khóa không được hỗ trợ hoặc dữ liệu không khả dụng, hàm trả về `'n/a'` (không phải chuỗi rỗng — kiểm tra bằng `!= 'n/a'` thay vì `!= ''`).
+- Giá trị `openArgs` chỉ khả dụng khi biểu mẫu được khởi chạy từ nút action; chúng trả về chuỗi rỗng trong các trường hợp khác.

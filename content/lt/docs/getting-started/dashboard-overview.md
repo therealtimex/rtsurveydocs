@@ -1,0 +1,50 @@
+---
+weight: 10
+date: "2026-03-04T00:00:00+00:00"
+draft: false
+title: "Prietaisų skydelio apžvalga"
+icon: "home"
+toc: true
+description: "RT-CPMS sistemos prietaisų skydelio ir projekto priežiūros įrankių supratimas."
+tags: ["Prietaisų skydelis", "Apžvalga", "Stebėjimas"]
+---
+
+# Sistemos prietaisų skydelis
+
+Prietaisų skydelis (`/cpms/cpmsDashBoard/indexNew`) yra administravimo komandų centras ir pagrindinis „Real-Time Survey" platformos (RT-CPMS) pradinis puslapis.
+
+![Sistemos prietaisų skydelio peržiūra](/images/dashboard_overview.png)
+
+Jis skirtas suteikti apklausų vadovams greitą aktyvių projektų apžvalgą, sparčiuosius nuorodų saitus prie esminių įrankių ir centralizuotą centrą naršymui per visus pagrindinius platformos modulius.
+
+## Pagrindinės funkcijos
+
+### 1. Projekto ir formos pasirinkimas
+Kairiajame skydelyje yra **Formų ir ataskaitų** naršyklė. Šioje srityje išvardytos visos aktyvios jūsų darbo srities apklausos.
+* Pasirinkę konkrečią apklausą (pvz., *RTA – APKLAUSA 02*), nukreipiate prietaisų skydelį stebėti ir rodyti metrikas tik tam projektui.
+
+### 2. Vizualizacijos ir metrikų filtrai
+Virš projektų sąrašo galite perjungti kelias svarbias duomenų perspektyvas, skirtas stebėti lauko darbo eigą realiuoju laiku:
+* **Skaičius pagal pradžios laiką / pabaigos laiką**: stebėkite, kada apklausų vykdytojai pradeda ir baigia apklausų sesijas.
+* **Skaičius pagal pateikimo datą**: stebėkite bendrą kasdienį duomenų, pasiekiančių serverį, kiekį.
+* **Skaičius pagal naudotojo vardą**: vertinkite atskirų apklausų vykdytojų produktyvumą ir veiklos rezultatus.
+* **Interviu žemėlapis**: peržiūrėkite geografinį (GIS) pasiskirstymą, kur renkami apklausos atsakymai, siekiant užtikrinti erdvės aprėpties reikalavimų vykdymą.
+
+### 3. Programų portalai
+Prietaisų skydelio centras suteikia greitą prieigą prie duomenų rinkimo sąsajų. Priklausomai nuo jūsų apklausų vykdytojų įrangos, galite paleisti arba nukreipti juos į:
+* **Žiniatinklio programa**: naršyklėje pagrįstas duomenų rinkimas.
+* **„Android" programa**: nuoroda į „Google Play" parduotuvę arba APK.
+* **„iOS" programa**: nuoroda į „Apple App Store".
+
+### 4. Tiesioginiai modulių spartieji klavišai
+Trys ryškūs veiksmų mygtukai leidžia greitai pereiti prie dažniausiai naudojamų operatyvinių modulių:
+* **Formos ir duomenų įvedimas**: pereikite tiesiai prie neautomatinio surinktų duomenų valdymo.
+* **Analizė ir ataskaitos**: atidarykite verslo žvalgybos (BI) rinkinį apklausos atsakymams kryžmiškai lentelinti ir grafiškai atvaizduoti.
+* **Leidimų konfigūracija**: koreguokite, kas turi prieigą prie aktyvios apklausos ir kokius vaidmenis jie atlieka.
+
+### 5. Pasaulinis naršymo šoninis skydelis
+Sutraukiamas kairysis šoninis skydelis suteikia prieigą prie viso RT-CPMS serverio modulių ekosistemos. Iš čia galite gilintis į:
+* **Nustatymai**: darbuotojų ir aktyvių įrenginių valdymas.
+* **Lauko darbų valdymas**: apklausų vykdytojų kasdienės veiklos stebėjimas.
+* **Kokybės užtikrinimas**: KU taisyklių ir žymių diegimas ir peržiūra.
+* **Galutiniai rezultatai**: išvalytų duomenų rinkinių eksportavimas į CSV, PDF arba Stata.

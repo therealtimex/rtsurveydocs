@@ -1,0 +1,145 @@
+---
+title: "Style HTML"
+description: "rtSurvey prend en charge les balises HTML dans les étiquettes et conseils, permettant une mise en forme de texte enrichi, des liens et une personnalisation des couleurs."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 297
+---
+
+rtSurvey affiche le texte des **label** et **hint** en HTML sur les formulaires web. Cela signifie que vous pouvez utiliser des balises HTML standard pour formater le texte, ajouter des sauts de ligne, créer des liens et appliquer des couleurs. C'est particulièrement utile pour les champs note, les instructions de section et les résumés dynamiques.
+
+{{% alert icon=" " context="warning" %}}
+Le HTML dans les étiquettes est rendu sur le **formulaire web** et les applications mobiles rtSurvey. Il peut ne pas s'afficher dans tous les clients compatibles ODK. Testez toujours sur votre plateforme cible.
+{{% /alert %}}
+
+---
+
+## Balises HTML prises en charge
+
+### Mise en forme du texte
+
+| Balise | Résultat |
+|-----|--------|
+| `<strong>texte</strong>` ou `<b>texte</b>` | **Texte en gras** |
+| `<em>texte</em>` ou `<i>texte</i>` | *Texte en italique* |
+| `<u>texte</u>` | Texte souligné |
+| `<br>` | Saut de ligne |
+| `<span style="...">texte</span>` | Style en ligne |
+
+### Liens
+
+```html
+<a href="https://example.com" target="_blank">Cliquez ici</a>
+```
+
+S'ouvre dans un nouvel onglet. À utiliser pour les documents de référence, les lignes directrices ou les ressources externes que l'enquêteur doit consulter.
+
+### Couleurs
+
+Utilisez `<span>` avec des styles en ligne :
+
+```html
+<span style="color: red;">Avertissement : la valeur est hors plage</span>
+<span style="color: #009688;">Section complétée</span>
+```
+
+---
+
+## Variables de thème de couleur
+
+rtSurvey prend en charge les **jetons de thème de couleur** qui s'adaptent au thème configuré de l'application. Utilisez la syntaxe `__COLOR_THEME_NAME__` :
+
+```html
+<span style="color: var(--color-theme-primary);">Texte en couleur principale</span>
+```
+
+Ou en utilisant l'abréviation de jeton dans le texte de l'étiquette :
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Note importante</font>
+```
+
+Ceci est automatiquement converti en `<span>` équivalent avec une variable CSS au moment du rendu.
+
+---
+
+## Étiquettes multi-langues
+
+Encadrez le contenu dans des balises de langue pour prendre en charge plusieurs langues dans une seule cellule d'étiquette :
+
+```
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey extrait le contenu correspondant à la langue actuelle de l'application. Si aucune balise de langue correspondante n'est trouvée, la chaîne complète est affichée telle quelle.
+
+---
+
+## Exemples dans les champs note
+
+### Instruction de section avec gras et saut de ligne
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Section 3 : Utilisation des terres</strong><br>Posez toutes les questions de cette section uniquement au chef de ménage.` |
+
+### Résumé dynamique avec référence de calcul
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Total des membres du ménage : <strong>${total}</strong><br><span style="color: gray;">Adultes : ${adults} · Enfants : ${children}</span>` |
+
+### Avertissement en rouge
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Avertissement :</strong> L'âge saisi (${age}) est inhabituellement élevé. Veuillez vérifier.</span>` | `${age} > 100` |
+
+### Lien vers un document de référence
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Consultez le <a href="https://docs.example.com/guidelines" target="_blank">Guide de terrain</a> avant de commencer cette section.` |
+
+---
+
+## Balises HTML spéciales rtSurvey
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+Intègre un bouton qui ouvre une URL dans une fenêtre modale dans le formulaire. Consultez [Webbox](webbox) pour les détails complets.
+
+### `<delete-repeat-current>label</delete-repeat-current>`
+
+Affiche un bouton dans un groupe de répétition qui supprime l'instance de répétition actuelle lorsqu'il est tapé.
+
+### `<delete-repeat-last>label</delete-repeat-last>`
+
+Affiche un bouton qui supprime la dernière instance de répétition.
+
+Exemple d'utilisation dans un groupe de répétition :
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Supprimer ce membre</delete-repeat-current>` |
+
+---
+
+## Bonnes pratiques
+
+1. Utilisez le HTML avec parcimonie — les étiquettes trop formatées sont plus difficiles à lire, pas plus faciles.
+2. Préférez `<strong>` pour le gras et `<em>` pour l'italique plutôt que les balises dépréciées `<b>` et `<i>`.
+3. Gardez l'utilisation des couleurs significative — utilisez le rouge pour les avertissements, pas pour la décoration.
+4. Testez toujours le rendu HTML sur l'application mobile et le formulaire web, car le rendu peut légèrement différer.
+5. Évitez les balises `<table>` dans les étiquettes — elles s'affichent rarement bien sur les écrans mobiles.
+6. N'utilisez pas JavaScript (`<script>`) — il sera supprimé ou causera des erreurs.
+
+## Limitations
+
+- Le HTML complexe (tableaux, formulaires, scripts) n'est pas pris en charge et peut casser le rendu.
+- Certains clients mobiles plus anciens peuvent afficher les balises HTML sous forme de texte littéral — testez sur tous les appareils cibles.
+- Les liens `<a>` s'ouvrent dans un navigateur ou WebView — l'enquêteur quitte le formulaire, ce qui peut être perturbant sur mobile.

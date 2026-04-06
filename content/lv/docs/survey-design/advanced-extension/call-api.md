@@ -1,0 +1,68 @@
+---
+title: "API izsaukums"
+description: "API izsaukums ļauj aptaujai iegūt datus no ārēja tīmekļa pakalpojuma un izmantot atbildi lauku aizpildīšanai vai atbilžu validācijai."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 294
+---
+
+Funkcija **API izsaukums** ļauj aptaujas laukam veikt HTTP pieprasījumu ārējam pakalpojumam un izmantot atbildi, lai aizpildītu aprēķinātu vērtību vai validētu lietotāja ievadi. Tas ļauj veikt reāllaika uzmeklēšanu, ID verifikāciju, svītrkoda uzmeklēšanu un jebkuru citu servera puses pārbaudi datu vākšanas laikā.
+
+Ir divas funkcijas:
+
+- `callapi()` — iegūst vērtību no API un glabā to laukā `calculate` vai `text`
+- `callapi-verify()` — izsauc API un bloķē progresu, ja atbilde neatbilst paredzētajai vērtībai (izmanto `constraint`)
+
+---
+
+## `callapi()` — API atbildes iegūšana un glabāšana
+
+### Sintakse
+
+Ievietojiet `callapi()` kolonnā **`calculation`** `calculate` vai `text` laukam:
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### Parametri
+
+| Nr. | Parametrs | Apraksts |
+|---|-----------|-------------|
+| 1 | `method` | HTTP metode: `'GET'` vai `'POST'` |
+| 2 | `url` | API galapunkta URL |
+| 3 | `allowed_auto` | `1`, lai izsauktu automātiski, kad lauks ir sasniegts; `0`, lai prasītu manuālu pogas aktivizāciju |
+| 4 | `max_retry` | Maksimālais atkārtojumu mēģinājumu skaits kļūmes gadījumā |
+| 5 | `no_overwrite` | `1`, lai saglabātu esošo vērtību, ja laukā jau ir vērtība; `0`, lai vienmēr pārrakstītu |
+| 6 | `extract_expr` | JSONPath izteiksme vēlamās vērtības iegūšanai no atbildes (piemēram, `$.data.name`) |
+| 7 | `timeout` | Pieprasījuma taimauts milisekundēs |
+| 8 | `lifetime` | Cik ilgi (ms) kešotā atbilde paliek derīga pirms atkārtotas iegūšanas |
+| 9 | `response_q` | Lauka nosaukums neapstrādātā HTTP atbildes koda glabāšanai (piemēram, `${response_status}`) |
+| 10 | `call_type` | *(Neobligāts)* Speciāls izsaukuma režīms: `'lazy-upload'` vai `'lazy-upload-multiple'` |
+| 11 | `post_body` | *(Neobligāts)* POST pamatteksta virkne. Atsaucieties uz formas laukiem ar `##fieldname##` |
+
+### Piemērs: GET pieprasījums mājsaimniecības uzmeklēšanai pēc ID
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | Mājsaimniecības ID | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+| note | hh_display | Mājsaimniecība: ${hh_name} | | |
+
+### Piemērs: POST pieprasījums ar JSON pamattekstu
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+---
+
+## Labākā prakse
+
+1. Pārbaudiet API izsaukumus gan tiešsaistē, gan bezsaistē.
+2. Izmantojiet `no_overwrite = 1`, lai saglabātu manuāli ievadītas vērtības.
+3. Iestatiet saprātīgus taimautus — pārāk īsi taimauti var radīt kļūmes lauka apstākļos.
+4. Glabājiet HTTP atbildes kodus, lai diagnosticētu kļūmes.

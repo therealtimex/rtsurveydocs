@@ -1,0 +1,117 @@
+---
+title: "Beräkna"
+description: ""
+icon: "calculate"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 235
+---
+
+Beräkningsfrågor i XLSForms och rtSurvey används för att utföra beräkningar baserade på andra fält eller värden i ditt formulär. Dessa frågor visas inte för användaren utan körs i bakgrunden och lagrar sina resultat för senare användning eller inlämning.
+
+## Syntax
+
+I XLSForm definieras en beräkningsfråga enligt följande:
+
+| type      | name     | label | calculation |
+|-----------|----------|-------|-------------|
+| calculate | calc_q1  |       | ${q1} + ${q2} |
+
+- **type**: Alltid "calculate" för denna frågtyp.
+- **name**: Ett unikt namn för beräkningsfrågan.
+- **label**: Lämnas vanligtvis tomt eftersom beräkningsfrågor inte visas för användarna.
+- **calculation**: Formeln som ska utvärderas.
+
+## Användningsområden
+
+Beräkningsfrågor används vanligtvis för:
+
+1. Utföra aritmetiska operationer
+2. Sammanfoga strängar
+3. Tillämpa komplex logik eller funktioner
+4. Lagra mellanliggande resultat för senare användning
+
+## Exempel
+
+### Grundläggande aritmetik
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | total    | ${price} * ${quantity} |
+```
+
+### Strängsammansättning
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
+```
+
+### Använda funktioner
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
+```
+
+## Avancerad användning i rtSurvey
+
+### Funktionen pulldata()
+
+rtSurvey stöder funktionen `pulldata()` i beräkningsfält, vilket gör det möjligt att hämta data från externa CSV-filer:
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
+```
+
+#### Syntax
+
+Den grundläggande syntaxen för pulldata() är:
+
+```
+pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
+```
+
+- 'csv_filename': Namn på CSV-filen (utan .csv-tillägg)
+- 'column_to_return': Kolumnnamn som innehåller de data du vill hämta
+- 'key_column': Kolumnnamn att matcha mot
+- ${matching_value}: Värde att söka upp i nyckelkolumnen
+
+#### Viktiga anmärkningar
+
+1. CSV-filen måste laddas upp tillsammans med ditt XLSForm när undersökningen driftsätts.
+2. Använd kommatecken som separatorer i din CSV-fil, inte semikolon.
+3. Undvik kommatecken i datafälten i din CSV, eftersom de kan orsaka tolkningsproblem.
+4. pulldata() stöder bara 1-till-1-relationer. Om flera matchningar hittas returneras bara den första.
+5. Det kan finnas begränsningar för textlängd som kan hämtas (ca 76 tecken).
+6. Du kan använda pulldata() i begränsningar för att validera poster mot CSV-data.
+
+### Villkorliga beräkningar
+
+Du kan använda if()-satser för villkorliga beräkningar:
+
+```
+| type      | name     | calculation |
+|-----------|----------|-------------|
+| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+```
+
+## Bästa praxis
+
+1. Använd meningsfulla namn för beräkningsfält för att förbättra formulärläsbarheten.
+2. Undvik alltför komplexa beräkningar i ett enda fält; bryt ner dem om nödvändigt.
+3. Testa dina beräkningar noggrant, särskilt när du använder komplexa formler eller externa data.
+4. Kom ihåg att beräkningsfält körs varje gång formuläret utvärderas, vilket kan påverka prestandan för mycket komplexa eller många beräkningar.
+5. När du använder pulldata(), se till att dina CSV-filer är korrekt formaterade och testa noggrant.
+
+## Begränsningar
+
+- Beräkningsfält kan inte redigeras direkt av användare.
+- Resultatet av ett beräkningsfält är inte omedelbart synligt om det inte refereras i ett visningsfält eller används i formulärlogik.

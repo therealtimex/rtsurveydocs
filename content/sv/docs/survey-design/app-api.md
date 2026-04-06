@@ -1,0 +1,141 @@
+---
+title: "App API"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 300
+---
+
+AppAPI låter användare läsa in systemmetadata från appen med hjälp av olika metoder i FormEngine och DMView. Den ger åtkomst till diverse datanycklar för att hämta specifik information från appen.
+
+I xlsform kan du använda funktionen `pulldata()` med följande syntax:
+
+
+{{< alert context="light" text="pulldata('app-api', 'data-key')" />}}
+
+- `'app-api'`: Detta nyckelord informerar FormEngine om att data ska laddas från App API.
+- `'data-key'`: Detta är nyckeln för de data du vill hämta från App API.
+- Om datanyckeln är ogiltig eller inte stöds returnerar beräkningen "n/a".
+
+Här är de datanycklar som stöds och kan användas med App-API:
+
+`osPlatform`: Returnerar det aktuella operativsystemets namn (Android eller iOS) och OS-versionen. Webbplattformar returnerar ett tomt värde.
+
+`appPlatform`: Returnerar appens plattformsnamn, vilket är `rtSurvey`.
+
+`appVersion`: Returnerar appens versionsnummer.
+
+`getDisplayWidth`: Returnerar enhetens skärmbredd i pixlar.
+
+`getDisplayHeight`: Returnerar enhetens skärmhöjd i pixlar.
+
+`getScreenSize`: Returnerar enhetens skärmstorlek i tum.
+
+`projectCode`: Returnerar det aktuella projektkoden för den webbplats som användaren loggar in på.
+
+`projectURL`: Returnerar den aktuella projektadressen (URL) för den webbplats som användaren loggar in på. Standardvärdet är en tom sträng ("").
+
+`startingPoint`: Returnerar sökvägen för den startpunkt som startar formuläret. Se "Formulärets startpunkt" för mer information.
+
+`serverTime`: Returnerar den bästa tillgängliga uppskattningen av datum och tid på servern.
+
+`user.[attribute]`: Returnerar den aktuella användarens attribut baserat på den angivna attributnyckeln. Se tabellen "Användarattribut" för tillgängliga attributnycklar.
+
+Kombinera nedanstående attributnycklar med "user." i `pulldata()`-parametrarna för att hämta den aktuella användarens information. Använd till exempel `user.username`, `user.email` osv.
+
+| Attributnyckel       | Beskrivning                               |
+|----------------------|-------------------------------------------|
+| username             | Användarnamn                              |
+| name                 | Användarens fullständiga namn             |
+| staffCode            | Användarens personalkod                   |
+| phone                | Användarens telefonnummer                 |
+| email                | Användarens e-postadress                  |
+| description          | Beskrivningstext i användarinformation    |
+| organization_id      | ID för den organisation användaren tillhör |
+| organization_name    | Namn på den organisation användaren tillhör |
+| team_id              | ID för det team användaren tillhör        |
+| supervisor_id        | ID för användarens handledare             |
+| is_supervisor        | 1 om användaren är handledare, 0 om inte  |
+
+`instancePath`: Returnerar den aktuella instansmappens sökväg.
+
+`appLanguage`: Returnerar det aktuella appspråket inställt i appens inställningar (t.ex. sv, en).
+
+`openArgs.[attribute]`: Returnerar det öppna-formulär-argumentet som skickats från ActionButton (act_fill_form, act_get_instance). Standardvärdet är en tom sträng ("").
+
+`primaryAppColor`: Hämtar appens primärfärg.
+
+---
+
+## Användningsexempel
+
+### Spara räknarens användarnamn och organisation
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Använd dessa i notetiketter för revisionssyften:
+```
+note | interviewer_info | Intervjuare: ${enumerator_name} (${enumerator_org})
+```
+
+### Enhets- och skärminformation
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+Användbart för felsökning: exportera `device_platform` och `app_ver` tillsammans med dina data för att identifiera vilken enhetsversion som användes för varje inlämning.
+
+### Servertid istället för enhetstid
+
+Enhetsklockor kan vara felaktiga. Använd `serverTime` för en mer tillförlitlig tidsstämpel:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Villkorlig logik baserad på användarroll
+
+Visa ett avsnitt som bara är synligt för handledare:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Handledarens granskning | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Handledarens anteckningar | |
+| end_group | | | |
+
+### Skicka argument från en åtgärdsknapp
+
+När formuläret startas från en `act_fill_form`-åtgärdsknapp med anpassade argument:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+Åtgärdsknappen måste skicka argumenten med matchande nycklar (t.ex. `household_id`, `task_code`).
+
+### Använda projektinformation
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## Noteringar
+
+- Alla `pulldata('app-api', ...)`-anrop utvärderas när formuläret öppnas och utvärderas inte dynamiskt under sessionen (förutom `serverTime` och `now()`).
+- Om en nyckel inte stöds eller data är otillgängliga returnerar funktionen `'n/a'` (inte en tom sträng — testa med `!= 'n/a'` snarare än `!= ''`).
+- `openArgs`-värden är bara tillgängliga när formuläret startas från en åtgärdsknapp; annars returneras en tom sträng.

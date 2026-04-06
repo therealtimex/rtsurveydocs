@@ -1,0 +1,83 @@
+---
+title: "Geotrace"
+description: "Geotrace-kysymykset antavat vastaajille mahdollisuuden tallentaa sarja toisiinsa liitettyjä pisteitä kartalla, luoden viivoja tai polkuja osana kyselyä."
+icon: "timeline"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 234
+---
+
+XLSFormien ja rtSurveyn geotrace-kysymystyyppi mahdollistaa vastaajien tallentaa sarja toisiinsa liitettyjä pisteitä kartalla, luoden viivoja tai polkuja. Tämä ominaisuus on erityisen hyödyllinen reittien, rajojen tai lineaaristen piirteiden kartoittamiseen paikalliskyselyissä.
+
+## XLSForm-perusmäärittely
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geotrace | river_path  | Jäljitä joen polku              |
+
+Lisätietoja geotrace-kysymystyypin perusteista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+
+## Käyttötarkoitukset
+
+Geotrace-kysymyksiä käytetään yleisesti:
+
+1. Kenttätutkimusten aikana kuljettujen reittien tai polkujen kartoittamiseen
+2. Lineaaristen piirteiden, kuten teiden, jokien tai rajojen jäljittämiseen
+3. Lineaarisen infrastruktuurin laajuuden tallentamiseen (esim. putkistot, voimalinjat)
+4. Kulkureittien tallentamiseen liikennetutkimuksissa
+5. Transektien määrittelemiseen ekologisissa tutkimuksissa
+
+## Parhaat käytännöt
+
+1. Varmista, että laitteen sijaintipalvelut ovat käytössä ja luvat myönnetty.
+2. Anna selkeät ohjeet polun jäljittämiseen ja mitkä piirteet tulee sisällyttää.
+3. Harkitse satelliittikuvien tai pohjakarttojen käyttöä vastaajien auttamiseksi jäljittämään polut tarkasti.
+4. Kiinnitä huomiota jälkien mahdolliseen monimutkaisuuteen ja sen vaikutukseen tiedon kokoon ja käsittelyyn.
+
+## Esimerkkikäyttö
+
+Esimerkki kyselyssä:
+
+| type     | name           | label                                       | hint                                              |
+|----------|----------------|---------------------------------------------|---------------------------------------------------|
+| geotrace | hiking_trail   | Jäljitä vaellusreitin polku                 | Aloita reitin alusta ja lopeta huipulle            |
+
+## rtSurveyn laajennukset
+
+Vaikka XLSForm-standardin geotrace-kysymysten perusmäärittely on suoraviivainen, rtSurvey voi tarjota lisäominaisuuksia tai mukautuksia:
+
+1. Integraatio offline-karttojen kanssa syrjäisillä alueilla
+2. Vaihtoehdot jäljityksen pisteiden vähimmäis- ja enimmäismäärän asettamiseen
+3. Mahdollisuus muokata tai tarkentaa jäljityksiä alkuperäisen piirtämisen jälkeen
+4. Tuki automaattiselle jäljitykselle asetetuilla ajanjaksoilla liikkumisen aikana
+
+## Tietomuoto
+
+Geotrace-tiedot tallennetaan tyypillisesti välilyönnillä erotettuina koordinaattiparien merkkijonona, samankaltaisesti kuin geoshape, mutta ilman sulkupistettä:
+
+```
+lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
+```
+
+Esimerkiksi:
+```
+38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
+```
+
+## Analyysin näkökohtia
+
+Geotrace-kysymyksiä käytettäessä harkitse:
+
+1. Miten maantieteelliset tiedot visualisoidaan ja analysoidaan (esim. GIS-ohjelmisto)
+2. Mahdollinen tarve tietojen puhdistamiseen tai monimutkaisten jälkien yksinkertaistamiseen
+3. Yksityisyys ja tietosuojatoimenpiteet yksityiskohtaisten paikkatietojen käsittelyyn
+4. Integraatio muiden paikkatietolähteiden kanssa kattavaa analyysia varten
+
+## Rajoitukset
+
+- Tarkkoja polkuja voi olla vaikea jäljittää pienillä mobiiliruuduilla.
+- Monimutkaiset jäljet voivat vaatia merkittävästi tallennustilaa ja käsittelykapasiteettia.
+- Jatkuva GPS-käyttö automaattista jäljitystä varten voi kuluttaa laitteen akkua nopeasti.
+- Yksityiskohtaisten polkutietojen keräämiseen liittyy yksityisyyshuolenaiheita.

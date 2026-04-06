@@ -1,0 +1,95 @@
+---
+title: "Avancerede billeder"
+description: "Avancerede billedfunktioner i rtSurvey: vandmærkning, mediegriddisplay og billedannotationer."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 300
+---
+
+Ud over standard `image`-spørgsmålstypen tilbyder rtSurvey udvidelser til **vandmærkning** af optagede billeder og visning af flere billeder i et **mediagrid**. Dette er nyttigt til evidensbaserede undersøgelser, hvor fotos skal markeres med interviewerens identitet eller undersøgelsesmetadata, og til visuelle gennemgangsgrænseflader.
+
+---
+
+## Vandmærke
+
+Vandmærkefunktionen lægger tekst eller et billede oven på et optagede foto, inden det gemmes. Dette bruges til at brande feltfotos med dato, interviewernavn, GPS-placering eller andre undersøgelsesdata — hvilket gør det sværere at sende eksisterende fotos af som nyoptaget bevis.
+
+### Opsætning
+
+Brug `watermark()` i kolonnen **`calculation`** på et `image`-felt kombineret med `callapi` appearance:
+
+```
+watermark(type, size, distance, color, shadow, rotate, blur)
+```
+
+| Parameter | Beskrivelse |
+|-----------|-------------|
+| `type` | `'text'` for et tekstvandmærke; `'file'` for et billedvandmærke |
+| `size` | Skriftstørrelse i pixels (tekst) eller vandmærkestørrelse som % af billedbredden (fil) |
+| `distance` | Afstand mellem gentagne vandmærkefelter (pixels) |
+| `color` | Tekstfarve (CSS-farve eller hex). Bruges ikke for `file`-typen |
+| `shadow` | Skyggefarve (CSS-farve eller hex) |
+| `rotate` | Rotationsvinkel i grader (f.eks. `45` for diagonal) |
+| `blur` | Vandmærkets uigennemsigtighed (0 = usynlig, 100 = fuldt uigennemsigtig) |
+
+### Eksempel på tekstvandmærke
+
+Læg interviewerens navn og dagens dato diagonalt hen over hvert optagede foto:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | wm_text | | | `concat(pulldata('app-api', 'user.name'), ' | ', format-date(today(), '%d/%m/%Y'))` |
+| image | site_photo | Tag et foto af stedet | watermark | `watermark('text', 20, 60, '#ffffff', '#000000', 45, 40)` |
+
+Vandmærketeksten tages fra `${wm_text}`. Indstil vandmærketekstfeltet **før** billedfeltet i formularen.
+
+### Eksempel på billede/logo-vandmærke
+
+Læg et organisationslogo (vedhæftet som en mediefil navngivet `logo.png`) ovenpå:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| image | evidence_photo | Tag foto af bevis | watermark | `watermark('file', 25, 80, '', '#000000', 0, 50)` |
+
+### Fortryd/gentag
+
+Vandmærkeeditoren understøtter fortryd og gentag — interviewere kan gå tilbage i redigeringshistorikken, inden de bekræfter fotoet.
+
+### Vandmærkeflisning
+
+Vandmærket gentages (flises) hen over hele billedet automatisk. Parameteren `distance` styrer afstanden mellem fliser; `rotate` styrer vinklen på hver flise.
+
+---
+
+## Mediagrid-widget
+
+Mediagrid-widgetten viser en samling af mediefiler (billeder, lyd, video) i et grid-layout, hvilket giver anmeldere eller interviewere mulighed for visuelt at gennemse optagne filer.
+
+Denne widget aktiveres af `mediagridwidget` appearance og bruges typisk på `note`- eller `calculate`-felter til at vise tidligere optagede medier fra en gentagelsesgruppe.
+
+### Eksempel: Vis alle fotos fra en gentagelse som et grid
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | photo_list | | | `join(' ', ${site_photo})` |
+| note | photo_review | Gennemse optagne fotos | mediagridwidget | |
+
+---
+
+## Bedste praksis for vandmærkede fotos
+
+1. Beregn altid vandmærketeksten i et `calculate`-felt **over** billedfeltet, så det er tilgængeligt, når fotoet tages.
+2. Brug en rotationsvinkel (f.eks. 45°) for at gøre vandmærker sværere at beskære.
+3. Indstil uigennemsigtighed (`blur`) mellem 30–60% — høj nok til at være læselig, lav nok til ikke at skjule fotoets motiv.
+4. Inkluder interviewernavn, dato og GPS-koordinater i vandmærketeksten for at maksimere revisionsværdien.
+5. Test vandmærkegengivelse på den lavest specifikke enhed i din flåde — canvas-baseret vandmærkning kan være langsom på ældre hardware.
+
+## Begrænsninger
+
+- Vandmærkning udføres på klientsiden ved hjælp af HTML5 Canvas API — det kræver en kapabel browser eller mobil WebView.
+- Meget højtopløselige fotos kan tage flere sekunder at vandmærke på lavspecifikke enheder.
+- Vandmærker er bagt ind i billedfilen — de kan ikke fjernes efter indsendelse uden billedredigering.
+- `file`-vandmærketypen kræver, at logobilledet er vedhæftet som en mediefil med præcist det forventede filnavn.

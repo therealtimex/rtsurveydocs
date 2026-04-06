@@ -1,0 +1,151 @@
+---
+title: "Select_one"
+description: "Select_one questions उत्तरदाताओं को predefined choices की list से ठीक एक विकल्प चुनने देते हैं।"
+icon: "radio_button_checked"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 224
+---
+
+`select_one` question type उत्तरदाता को predefined list से **ठीक एक विकल्प** चुनने के लिए prompt करता है। Default रूप से choices radio buttons के रूप में render होती हैं, लेकिन layout और behavior बदलने के लिए appearance options की एक wide range उपलब्ध है।
+
+## Basic XLSForm Specification
+
+**survey worksheet:**
+
+| type | name | label |
+|------|------|-------|
+| select_one yesno | consent | क्या उत्तरदाता ने consent दी? |
+
+**choices worksheet:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| yesno | yes | हाँ |
+| yesno | no | नहीं |
+
+`select_one listname` में `listname` choices worksheet के `list_name` column से match होना चाहिए।
+
+अधिक जानकारी के लिए [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+
+## उपयोग
+
+Select_one questions का उपयोग इनके लिए किया जाता है:
+
+1. हाँ/नहीं प्रश्न
+2. Single-answer multiple choice (जैसे education level, gender, marital status)
+3. Categorical ratings (जैसे poor / fair / good / excellent)
+4. Cascading (linked) selects जहाँ पिछले उत्तर के आधार पर choices filter होती हैं
+5. Country, region, district, या अन्य administrative unit selection
+
+## Appearance options
+
+Choices कैसे प्रदर्शित होती हैं यह बदलने के लिए `appearance` column में एक value निर्दिष्ट करें:
+
+{{< table >}}
+| Appearance | विवरण |
+|------------|-------------|
+| *(none)* | Default radio buttons, प्रति line एक |
+| `minimal` | Radio buttons के बजाय Single dropdown/spinner |
+| `quick` | चयन के तुरंत बाद अगले प्रश्न पर auto-advance (केवल mobile) |
+| `compact` | Choices का Compact grid — columns screen width के अनुसार adjust होते हैं |
+| `compact-N` | N columns (जैसे `compact-3`) पर forced Compact grid |
+| `quickcompact` | `quick` और `compact` को combine करता है |
+| `quickcompact-N` | N forced columns के साथ `quick` और `compact` को combine करता है |
+| `horizontal` | Horizontal row में arranged Choices (web) |
+| `horizontal-compact` | Horizontal, compact spacing (web) |
+| `likert` | Likert scale row — ऊपर labels, नीचे radio buttons |
+| `label` | केवल choice labels दिखाता है, कोई inputs नहीं (`list-nolabel` के साथ उपयोग करें) |
+| `list-nolabel` | केवल inputs दिखाता है, कोई labels नहीं (`label` के साथ उपयोग करें) |
+| `columns(N)` | N columns में प्रदर्शित करें (rtSurvey extension, जैसे `columns(3)`) |
+| `distress` | Kessler Psychological Distress (K10) emotional icon widget |
+| `search-api(...)` | Dynamic search — runtime पर API से choices load करता है |
+{{< /table >}}
+
+### उदाहरण: Likert scale
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one satisfaction | service_rating | आप service से कितने संतुष्ट हैं? | likert |
+
+### उदाहरण: Compact 3 columns
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one regions | region | Region चुनें | compact-3 |
+
+## Cascading selects
+
+एक cascading (linked) select पिछले प्रश्न में चुने गए value के आधार पर choices filter करता है। अपनी choices worksheet से किसी column के नाम के साथ `choice_filter` column का उपयोग करें।
+
+**survey:**
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one province | province | Province चुनें | |
+| select_one district | district | District चुनें | province_name = ${province} |
+
+**choices:**
+
+| list_name | name | label | province_name |
+|-----------|------|-------|---------------|
+| province | nairobi | Nairobi | |
+| province | mombasa | Mombasa | |
+| district | westlands | Westlands | nairobi |
+| district | kasarani | Kasarani | nairobi |
+| district | nyali | Nyali | mombasa |
+| district | likoni | Likoni | mombasa |
+
+जब उत्तरदाता `nairobi` चुनता है, तो district list में केवल `Westlands` और `Kasarani` दिखाई देते हैं।
+
+{{% alert icon=" " context="warning" %}}
+`choice_filter` में उपयोग किया गया column name (जैसे `province_name`) choices worksheet में exist होना चाहिए। `${province}` `province` नामक survey field को refer करता है।
+{{% /alert %}}
+
+## Expressions में selected value का उपयोग करना
+
+`${fieldname}` के साथ selected **value** (label नहीं) को reference करें:
+
+```
+relevant: ${consent} = 'yes'
+```
+
+Value के बजाय choice label प्राप्त करने के लिए, `choice-label()` का उपयोग करें:
+
+```
+calculate: choice-label(${education_level}, ${education_level})
+```
+
+## Free text के साथ "Other" विकल्प
+
+एक सामान्य pattern "other" विकल्प शामिल करना है जो एक text field प्रकट करता है:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one occupation | job | आपका व्यवसाय क्या है? | |
+| text | job_other | कृपया निर्दिष्ट करें | `${job} = 'other'` |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| occupation | farmer | किसान |
+| occupation | trader | व्यापारी |
+| occupation | student | छात्र |
+| occupation | other | अन्य (कृपया निर्दिष्ट करें) |
+
+## Best Practices
+
+1. Lists को short और mutually exclusive रखें — यदि उत्तरदाता एक से अधिक चाहते हों, तो `select_multiple` का उपयोग करें।
+2. सबसे सामान्य उत्तर पहले रखें, या लंबी lists के लिए alphabetically order करें।
+3. जहाँ relevant हो हमेशा "Don't know" या "Prefer not to answer" विकल्प शामिल करें।
+4. Screen space बचाने के लिए mobile पर 7–8 से अधिक choices वाली lists के लिए `minimal` (dropdown) का उपयोग करें।
+5. Cascading selects के लिए, form बनाने से पहले choices worksheet में सभी filter columns जोड़ें।
+
+## सीमाएं
+
+- एक उत्तरदाता केवल एक choice चुन सकता है — multi-answer questions के लिए `select_multiple` का उपयोग करें।
+- `likert` appearance 5–7 choices के साथ सबसे अच्छी तरह काम करती है जो एक line पर fit हों।
+- `quick` auto-advance केवल mobile है; web forms पर इसका कोई effect नहीं है।

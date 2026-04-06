@@ -1,0 +1,61 @@
+---
+title: "rtSurvey installeren"
+description: "Leer hoe u de rtSurvey mobiele app downloadt en installeert op Android- en iOS-apparaten, met stapsgewijze instructies en probleemoplossingstips voor een soepel installatieproces"
+icon: "get_app"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 312
+---
+
+rtSurvey is beschikbaar voor zowel Android- als iOS-apparaten, zodat u enquêtes kunt uitvoeren en gegevens kunt verzamelen op een breed scala aan mobiele platforms. Volg deze stappen om rtSurvey op uw apparaat te installeren.
+
+## Systeemvereisten
+
+Controleer voordat u installeert of uw apparaat aan de volgende vereisten voldoet:
+
+- Voor Android: Android 7.0 of hoger
+- Voor iOS: iOS 11.0 of hoger
+- Stabiele internetverbinding voor de initiële download en updates
+
+## Installeren op Android
+
+1. Open de Google Play Store op uw Android-apparaat.
+2. Typ in de zoekbalk "rtSurvey" of gebruik deze directe link: [rtSurvey op Google Play](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey&hl=ln&gl=US)
+3. Tik op de rtSurvey-app in de zoekresultaten.
+4. Druk op de knop "Installeren".
+5. Wacht tot de download en installatie zijn voltooid.
+6. Na installatie kunt u de app openen vanuit het startscherm of de applade van uw apparaat.
+
+## Installeren op iOS
+
+1. Open de App Store op uw iOS-apparaat.
+2. Tik op het zoekpictogram en typ "rtSurvey" of gebruik deze directe link: [rtSurvey in de App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547)
+3. Tik op de rtSurvey-app in de zoekresultaten.
+4. Druk op "Ontvangen" of het wolkpictogram om het downloaden te starten.
+5. Mogelijk moet u zich authenticeren met Face ID, Touch ID of uw Apple ID-wachtwoord.
+6. Wacht tot de download en installatie zijn voltooid.
+7. Na installatie verschijnt het app-pictogram op uw startscherm.
+
+## Installatieproblemen oplossen
+
+Als u problemen ondervindt tijdens de installatie:
+
+1. Controleer uw internetverbinding en probeer het opnieuw.
+2. Zorg ervoor dat er voldoende opslagruimte is op uw apparaat.
+3. Herstart uw apparaat en probeer de installatie opnieuw.
+4. Voor Android: Wis de cache en gegevens van de Google Play Store in uw apparaatinstellingen.
+5. Voor iOS: Log uit bij uw Apple ID en log opnieuw in.
+
+Als de problemen aanhouden, bezoek dan de rtSurvey-ondersteuningswebsite of neem contact op met uw systeembeheerder voor hulp.
+
+## rtSurvey bijwerken
+
+Om ervoor te zorgen dat u over de nieuwste functies en bugfixes beschikt:
+
+- Op Android: Schakel automatische updates in de Google Play Store in of werk de app handmatig bij.
+- Op iOS: Schakel automatische updates in de App Store-instellingen in of werk handmatig bij.
+
+Regelmatige updates helpen de prestaties en beveiliging van de app te handhaven.
+
+Nu u rtSurvey succesvol heeft geïnstalleerd, bent u klaar om het te gebruiken voor uw gegevensverzamelingsbehoeften. In de volgende sectie wordt uitgelegd hoe u de app verbindt met een server.

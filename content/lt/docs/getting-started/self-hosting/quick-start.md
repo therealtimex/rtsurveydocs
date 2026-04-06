@@ -1,0 +1,43 @@
+---
+weight: 1
+date: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+title: "Greitas pradžios vadovas"
+icon: "play_circle"
+toc: true
+description: "Įdiekite rtCloud savo serveryje per kelias minutes naudodami automatizuotą debesies scenarijų."
+---
+
+Šis vadovas padeda paleisti rtCloud savo serveryje. Automatizuoti scenarijai pasirūpina viskuo — Docker, SSL, duomenų baze, ugniasiene — vienu paleidimo metu.
+
+## Reikalavimai
+
+### Serveris
+
+| Resursas | Minimum | Rekomenduojama |
+|---------|---------|---------------|
+| RAM | 2 GB | 4 GB (būtina su Keycloak SSO) |
+| Diskas | 25 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Domenas
+
+Prieš paleidžiant scenarijų reikalingas domeno vardas su **A įrašu, nurodančiu į serverio IP**. Let's Encrypt reikalauja DNS raiškos SSL sertifikatui išduoti.
+
+---
+
+## Pasirinkite debesies tiekėją
+
+Pasirinkite savo tiekėją žemiau. Kiekvienas turi automatizuotą scenarijų, kuris paleidžiamas pirmą kartą įkraunant ir baigia sąranką per **5–10 minučių**.
+
+| Tiekėjas | Vadovas |
+|---------|--------|
+| Linode (Akamai) | [Diegimas Linode](../cloud-deployment/linode) — paprasčiausias, formomis pagrįsta sąranka per StackScript |
+| DigitalOcean | [Diegimas DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Diegimas AWS](../cloud-deployment/aws) |
+| Google Cloud | [Diegimas GCP](../cloud-deployment/gcp) |
+
+> **Rekomenduojama daugumai vartotojų:** Pradėkite su Linode — StackScript suteikia formomis pagrįstą UI, todėl nereikia nieko redaguoti rankiniu būdu.

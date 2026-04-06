@@ -1,0 +1,73 @@
+---
+title: "Bereik"
+description: "Bereik-vragen laten respondenten een getal selecteren door een schuifregelaar te slepen tussen een gedefinieerde minimum- en maximumwaarde."
+icon: "sliders"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 238
+---
+
+Het vraagtype `range` toont een **schuifregelaar** (of equivalente invoer) waarmee respondenten een getal kunnen kiezen binnen een gedefinieerd minimum en maximum. Het is ideaal voor het verzamelen van beoordelingen, tevredenheidsscores of elke numerieke waarde waarbij u het bereik visueel wilt beperken in plaats van te vertrouwen op een tekstinvoer met beperkingen.
+
+## Basis XLSForm-specificatie
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | satisfaction | Hoe tevreden bent u met de dienst? | start=1 end=5 step=1 |
+
+De kolom `parameters` definieert de schuifregelaargrenzen en stapgrootte:
+
+| Parameter | Beschrijving | Standaard |
+|-----------|-------------|----------|
+| `start` | Minimumwaarde (inclusief) | 0 |
+| `end` | Maximumwaarde (inclusief) | 10 |
+| `step` | Increment tussen geldige waarden | 1 |
+
+## Toepassingen
+
+Bereik-vragen worden veelgebruikt voor:
+
+1. Tevredenheids- of beoordelingsschalen (bijv. 1–5 of 0–10)
+2. Likert-stijl numerieke schalen
+3. Het verzamelen van metingen waarbij alleen discrete waarden geldig zijn
+4. Leeftijdscategorieën of scorebereiken waarbij een schuifregelaar de bruikbaarheid verbetert ten opzichte van een tekstveld
+
+## Voorbeeldgebruik
+
+### Basis beoordelingsschaal
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | overall_rating | Algemene beoordeling (0–10) | start=0 end=10 step=1 |
+
+### Decimale stap
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | weight_kg | Gewicht (kg) | start=0 end=200 step=0.5 |
+
+### De waarde gebruiken in een berekening
+
+| type | name | label | parameters | calculation |
+|------|------|-------|------------|-------------|
+| range | score | Testscore (0–100) | start=0 end=100 step=5 | |
+| calculate | grade | | | if(${score} >= 90, 'A', if(${score} >= 80, 'B', if(${score} >= 70, 'C', 'F'))) |
+| note | grade_note | Uw cijfer is: ${grade} | | |
+
+## Weergave
+
+Het type `range` wordt standaard weergegeven als een schuifregelaar. Er zijn geen aanvullende weergavewaarden vereist voor basisgebruik.
+
+## Aanbevolen werkwijzen
+
+1. Stel altijd betekenisvolle `start`-, `end`- en `step`-waarden in — vertrouw niet op standaarden.
+2. Label de uiteinden van uw schaal in de kolom `hint` (bijv. `hint: 0 = Zeer ontevreden, 10 = Zeer tevreden`) om respondenten context te geven.
+3. Gebruik voor 5-punts Likert-schalen `start=1 end=5 step=1` in plaats van 0–4, omdat respondenten verwachten dat "1" het laagste betekent.
+4. Gebruik `range` in plaats van `integer` + beperking wanneer de begrensde aard van de invoer deel uitmaakt van het vraagontwerp.
+
+## Beperkingen
+
+- De schuifregelaar-widget is mogelijk niet ideaal voor zeer brede bereiken (bijv. 0–10000) — een tekst `integer` met beperkingen is in die gevallen gebruiksvriendelijker.
+- Op mobiele apparaten kunnen fijne stapwaarden (bijv. `step=0.1`) moeilijk nauwkeurig te bedienen zijn met een aanraakschuifregelaar.

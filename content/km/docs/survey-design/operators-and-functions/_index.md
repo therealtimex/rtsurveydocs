@@ -1,0 +1,54 @@
+---
+title: "Operators and Functions"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 290
+---
+
+Expressions ក ្ ន ុ ង rtSurvey ត ្ រ ូ វ ប ា ន សរ សេ រ ក ្ ន ុ ង subset ន ៃ **XPath 1.0**, ដ ែ ល extended ជ ា ម ួ យ JavaRosa/ODK functions ។ អ ្ ន ក ប ្ រ ើ expressions ក ្ ន ុ ង `calculate`, `constraint`, `relevant`, `required`, ហ ើ យ `default` columns ។
+
+## Referencing field values
+
+ប ្ រ ើ `${fieldname}` ដើ ម ្ ប ី reference value ន ៃ field ផ ្ ស េ ង :
+
+```
+${age} > 18
+```
+
+ប ្ រ ើ `.` ដើ ម ្ ប ី reference **value ន ៃ field current** — ប ្ រ ើ ញ ឹ ក ញ ាប ់ ក ្ ន ុ ង `constraint`:
+
+```
+. >= 0 and . <= 100
+```
+
+## Expression syntax
+
+- **Strings** ត ្ រ ូ វ ត ែ enclosed ក ្ ន ុ ង single quotes: `'yes'`
+- **Numbers**: `42`, `3.14`
+- **Boolean** results ប ្ រ ើ ស ម ្ រ ា ប ់ `relevant`, `required`, ហ ើ យ `constraint`
+
+{{% alert icon=" " context="warning" %}}
+ជ ា ន ិ ច ្ ច ប ្ រ ើ straight quotes (`'` ឬ `"`) — មិ ន ប ្ រ ើ "smart quotes" ។ Rich text editors ច ្ រ ើ ន convert quotes ដ ោ យ ស ្ វ ័ យ ប ្ រ វ ត ្ ត ិ ។
+{{% /alert %}}
+
+## Sections ក ្ ន ុ ង chapter នេ ះ
+
+- **[Operators](operators)** — comparison operators (`=`, `!=`, `>`, `<`, `>=`, `<=`) ហ ើ យ logical operators
+- **[Functions](functions)** — string, selection, number, date/time, boolean, geo functions
+- **[References](references)** — ការ reference fields
+
+## Quick examples
+
+| Use case | Expression |
+|----------|------------|
+| ប ង ្ ហ ាញ ប ្ រ ស ិ ន ប ើ age ធ ំ ជ ា ង 18 | `${age} > 18` |
+| ប ង ្ ហ ាញ ប ្ រ ស ិ ន ប ើ "yes" ត ្ រ ូ វ ប ា ន ជ ្ រ ើ ស | `${consent} = 'yes'` |
+| Require ប ្ រ ស ិ ន ប ើ field ផ ្ ស េ ង ម ិ ន ទ ទ េ | `${name} != ''` |
+| គ ណ ន ា total | `${adults} + ${children}` |
+| Concatenate name | `concat(${first_name}, ' ', ${last_name})` |
+| Today's date | `today()` |
+| ពិ ន ិ ត ្ យ option ដ ែ ល ជ ្ រ ើ ស | `selected(${interests}, 'sports')` |

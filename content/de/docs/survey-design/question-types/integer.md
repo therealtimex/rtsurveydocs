@@ -1,0 +1,84 @@
+---
+title: "Integer (Ganzzahl)"
+description: "Integer-Fragen ermöglichen Ganzzahleingaben in Ihrer Umfrage."
+icon: "123"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+# Translation provided by AI.
+draft: false
+toc: true
+weight: 222
+---
+
+Der `integer`-Fragetyp in XLSForms und rtSurvey wird verwendet, um Ganzzahlantworten zu sammeln. Dieser Fragetyp ist für die Erfassung numerischer Daten ohne Nachkommastellen unerlässlich, wie z. B. Zählungen, Alter oder Jahreszahlen.
+
+## Grundlegende XLSForm-Spezifikation
+
+| type    | name  | label                 |
+|---------|-------|------------------------|
+| integer | age   | Geben Sie Ihr Alter in Jahren ein|
+
+Weitere Details zum grundlegenden `integer`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+
+## Anwendungen
+
+`Integer`-Fragen werden häufig verwendet für:
+
+1. Alterseingaben
+2. Zählen von Elementen (z. B. Anzahl der Kinder, Haushaltsmitglieder)
+3. Jahreszahlen (z. B. Geburtsjahr)
+4. Bewertungen auf einer numerischen Skala
+5. Jede Art von Ganzzahl-Datenerhebung
+
+## rtSurvey-Erweiterungen
+
+Während die grundlegende XLSForm-Spezifikation für `integer`-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen:
+
+1. Bereichsvalidierung
+2. Benutzerdefinierte Fehlermeldungen
+3. Darstellungsoptionen für Zahleneingaben
+
+(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für `integer`-Fragen müssten hier bestätigt und detailliert werden.)
+
+## Best Practices
+
+1. Verwenden Sie klare und prägnante Beschriftungen, um die erwartete Eingabe anzugeben.
+2. Implementieren Sie Bereichsbeschränkungen (Constraints), um unrealistische oder fehlerhafte Eingaben zu verhindern.
+3. Erwägen Sie die Verwendung von Hinweistexten (Hints), um Beispiele zu geben oder das erwartete Format zu klären.
+4. Erwägen Sie bei großen Zahlen die Verwendung von Kommas oder Leerzeichen in der Beschriftung, um die Lesbarkeit zu verbessern (z. B. "Geben Sie die Einwohnerzahl ein (bis zu 1.000.000)").
+
+## Einschränkungen und Validierung
+
+Sie können Einschränkungen (Constraints) hinzufügen, um sicherzustellen, dass der eingegebene Wert innerhalb eines bestimmten Bereichs liegt:
+
+| type    | name  | label                 | constraint        | constraint_message                    |
+|---------|-------|------------------------|-------------------|---------------------------------------|
+| integer | age   | Geben Sie Ihr Alter in Jahren ein| .>0 and .<=120    | Das Alter muss zwischen 1 und 120 Jahren liegen |
+
+## Beispielhafte Verwendung
+
+Hier ist ein Beispiel dafür, wie Sie `integer`-Fragen in einer Haushaltsumfrage verwenden könnten:
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| integer | household_size | Wie viele Personen leben in Ihrem Haushalt? | .>0        | Die Haushaltsgröße muss mindestens 1 sein |
+| integer | num_children   | Wie viele Kinder unter 18 Jahren leben im Haushalt? | .>=0    | Die Anzahl der Kinder kann nicht negativ sein |
+| integer | year_built     | In welchem Jahr wurde Ihr Haus gebaut?    | .>1800 and .<=2023 | Das Jahr muss zwischen 1800 und 2023 liegen |
+
+## Berechnung mit Ganzzahlwerten
+
+Ganzzahlwerte können in Berechnungen verwendet werden. Hier ist ein Beispiel:
+
+| type    | name           | label                                     |
+|---------|----------------|-------------------------------------------|
+| integer | num_adults     | Anzahl der Erwachsenen im Haushalt        |
+| integer | num_children   | Anzahl der Kinder im Haushalt            |
+| calculate | total_members | | 
+
+In der `calculate`-Zeile können Sie verwenden:
+
+```
+calculation | ${num_adults} + ${num_children}
+```
+
+Dies summiert die Anzahl der Erwachsenen und Kinder, um die Gesamtzahl der Haushaltsmitglieder zu erhalten.

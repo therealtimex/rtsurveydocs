@@ -1,0 +1,79 @@
+---
+title: "Range"
+description: "Pyetjet range lejojnë të anketuarit të zgjedhin një numër duke tërhequr rrëshqitësin midis vlerës minimale dhe maksimale të definuar."
+icon: "sliders"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 238
+---
+
+Lloji i pyetjes `range` shfaq **rrëshqitësin** (ose hyrje ekuivalente) që lejon të anketuarët të zgjedhin një numër brenda minimumit dhe maksimumit të definuar. Është ideal për mbledhjen e vlerësimeve, notave të kënaqësisë, ose çdo vlere numerike ku dëshironi të kufizoni diapazonin vizualisht në vend se të mbështeteni në hyrjen e tekstit me kufizime.
+
+## Specifikimi bazë XLSForm
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | satisfaction | Sa të kënaqur jeni me shërbimin? | start=1 end=5 step=1 |
+
+Kolona `parameters` përcakton kufijtë e rrëshqitësit dhe madhësinë e hapit:
+
+| Parametri | Përshkrimi | Parazgjedhja |
+|-----------|------------|--------------|
+| `start` | Vlera minimale (gjithëpërfshirëse) | 0 |
+| `end` | Vlera maksimale (gjithëpërfshirëse) | 10 |
+| `step` | Rritja midis vlerave të vlefshme | 1 |
+
+Për më shumë detaje mbi llojin standard të pyetjes range, shikoni [specifikimin XLSForm](https://xlsform.org/en/#question-types).
+
+## Përdorimet
+
+Pyetjet range përdoren zakonisht për:
+
+1. Shkallet e kënaqësisë ose vlerësimit (p.sh., 1-5 ose 0-10)
+2. Shkallet numerike në stil Likert
+3. Mbledhja e matjeve ku vetëm vlerat diskrete janë të vlefshme
+4. Kategoritë e moshës ose diapazoni i notave ku rrëshqitësi përmirëson përdorshmërinë ndaj fushës tekst
+
+## Shembull i përdorimit
+
+### Shkalla bazë e vlerësimit
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | overall_rating | Vlerësimi i përgjithshëm (0-10) | start=0 end=10 step=1 |
+
+### Hap decimal
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | weight_kg | Pesha (kg) | start=0 end=200 step=0.5 |
+
+### Përdorimi i vlerës në llogaritje
+
+| type | name | label | parameters | calculation |
+|------|------|-------|------------|-------------|
+| range | score | Nota e testit (0-100) | start=0 end=100 step=5 | |
+| calculate | grade | | | if(${score} >= 90, 'A', if(${score} >= 80, 'B', if(${score} >= 70, 'C', 'F'))) |
+| note | grade_note | Nota juaj është: ${grade} | | |
+
+## Pamja
+
+Lloji `range` paraqitet si rrëshqitës si parazgjedhje. Asnjë vlerë shtesë pamjeje nuk kërkohet për përdorim bazik. Mund ta kombinoni me `horizontal` për paraqitje më të gjerë në formularët web:
+
+| type | name | label | parameters | appearance |
+|------|------|-------|------------|------------|
+| range | nps | Sa ka gjasa të na rekomandoni? (0-10) | start=0 end=10 step=1 | horizontal |
+
+## Praktikat më të mira
+
+1. Gjithmonë vendosni vlera kuptimplota `start`, `end`, dhe `step` — mos u mbështetni tek parazgjedhjet.
+2. Etiketoni skajet e shkallës suaj në kolonën `hint` (p.sh., `hint: 0 = Shumë i pakënaqur, 10 = Shumë i kënaqur`) për t'u dhënë kontekst të anketuarve.
+3. Për shkallet Likert me 5 pika, përdorni `start=1 end=5 step=1` në vend të 0-4, pasi të anketuarit presin që "1" të nënkuptojë minimalen.
+4. Përdorni `range` në vend të `integer` + kufizim kur natyra e kufizuar e hyrjes është pjesë e dizajnit të pyetjes (rrëshqitësi komunikon vizualisht shkallën).
+
+## Kufizimet
+
+- Widget-i i rrëshqitësit mund të mos jetë ideal për diapazoni shumë të gjerë (p.sh., 0-10000) — tekst `integer` me kufizime është më miqësor me përdoruesin në ato raste.
+- Në pajisjet mobile, vlerat e holla të hapit (p.sh., `step=0.1`) mund të jenë të vështira për t'u kontrolluar me saktësi me rrëshqitësin me prekje.

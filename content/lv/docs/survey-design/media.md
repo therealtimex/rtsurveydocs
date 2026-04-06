@@ -1,0 +1,147 @@
+---
+title: "Multivide"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 286
+---
+
+rtSurvey atbalsta bagātu multivides integrāciju aptaujās, ļaujot uzlabot anketas ar attēliem, audio un video. Šī funkcija var ievērojami uzlabot respondentu pieredzi un vākto datu kvalitāti.
+
+## Atbalstītie multivides tipi
+
+rtSurvey atbalsta šādus multivides tipus:
+- Attēli (jpg, png, gif)
+- Audio (mp3, wav)
+- Video (mp4, webm)
+
+## Multivides pievienošana aptaujai
+
+Lai iekļautu multividi rtSurvey formā, izmantojiet šādas kolonnas XLSForm:
+
+- `image`: Attēlu attēlošanai
+- `audio`: Audio failu atskaņošanai
+- `video`: Video failu atskaņošanai
+
+Piemērs:
+
+```
+| type | name          | label         | image        | audio       | video       |
+|------|---------------|---------------|--------------|-------------|-------------|
+| note | media_example | Multivides piemērs | example.jpg | sound.mp3  | clip.mp4    |
+```
+
+## Multivides failu pārvaldība
+
+### Tīmekļa aptaujas
+Tīmekļa aptaujām rtSurvey nodrošina multivides pārvaldības saskarni, kurā varat augšupielādēt un organizēt multivides failus. Šie faili pēc tam ir automātiski pieejami aptaujās.
+
+### Mobilā lietotne
+Izmantojot rtSurvey mobilo lietotni:
+1. Ievietojiet multivides failus ierīcē mapē `/rtSurvey/forms/[form-name]-media/`.
+2. Atsaucieties uz precīzo faila nosaukumu XLSForm.
+
+## rtSurvey specifiskās funkcijas
+
+### Dinamiskā multivides ielāde
+rtSurvey atbalsta dinamisko multivides ielādi, pamatojoties uz aptaujas atbildēm:
+
+```
+| type         | name      | label              | image                    |
+|--------------|-----------|--------------------|--------------------------| 
+| select_one species | animal | Atlasiet dzīvnieku | ${animal}.jpg           |
+```
+
+### Multivide izvēļu opcijās
+rtSurvey ļauj izmantot multividi atlases jautājumu izvēļu opcijās:
+
+```
+| type                | name    | label           | media::image |
+|---------------------|---------|-----------------|--------------|
+| select_one_from_file animals | Izvēlieties dzīvnieku |      |
+```
+
+Izvēļu lapā:
+```
+| list_name | name  | label   | media::image |
+|-----------|-------|---------|--------------|
+| animals   | dog   | Suns    | dog.jpg      |
+| animals   | cat   | Kaķis   | cat.jpg      |
+```
+
+### Multivides tveršana
+rtSurvey paplašina XLSForm ar multivides tveršanas iespējām:
+
+```
+| type  | name        | label               |
+|-------|-------------|---------------------|
+| image | photo       | Uzņemiet fotoattēlu |
+| audio | voice_note  | Ierakstiet balss piezīmi |
+| video | video_clip  | Ierakstiet video    |
+```
+
+## Labākā prakse multivides izmantošanā
+
+1. **Optimizējiet failu izmērus**: Lieli multivides faili var palēnināt aptaujas ielādi un iesniegšanu.
+2. **Izmantojiet piemērotus formātus**: Turieties pie plaši atbalstītiem formātiem (jpg attēliem, mp3 audio, mp4 video).
+3. **Nodrošiniet alternatīvas**: Vienmēr iekļaujiet teksta alternatīvas pieejamībai.
+4. **Rūpīgi testējiet**: Nodrošiniet, ka multivide pareizi attēlojas visās mērķierīcēs.
+5. **Apsveriet bezsaistes lietojumu**: Aptaujām, kas var tikt veiktas bezsaistē, nodrošiniet, ka visa multivide ir pieejama lokāli.
+
+## Daudzvalodu multivides atbalsts
+
+rtSurvey atbalsta valodai specifisko multividi. Izmantojiet sufiksu `::language`:
+
+```
+| type | name  | label    | image::English | image::Spanish |
+|------|-------|----------|----------------|----------------|
+| note | intro | Laipni lūdzam | welcome_en.jpg | welcome_es.jpg |
+```
+
+## Multivide datu eksportā
+
+Eksportējot datus no rtSurvey:
+- Tīmekļa aptaujām eksportā tiek iekļauti multivides URL.
+- Mobilās lietotnes aptaujām tiek iekļauti failu ceļi.
+
+## Mobilās lietotnes apsvērumi
+
+- Nodrošiniet pietiekami daudz vietas ierīcēs multivides intensīvām aptaujām.
+- rtSurvey mobilā lietotne atbalsta bezsaistes multivides atskaņošanu un tveršanu.
+- Lieli multivides faili var ietekmēt lietotnes veiktspēju zemākas klases ierīcēs.
+
+## Zināmie ierobežojumi
+
+- Daži vecāki pārlūkprogrammas var neatbalstīt visus multivides formātus.
+- Ļoti lieli video faili var radīt problēmas situācijās ar zemu joslas platumu.
+
+## Multivides problēmu novēršana
+
+1. **Multivide netiek rādīta**: Pārbaudiet failu ceļus un nosaukumus precizitātei.
+2. **Atskaņošanas problēmas**: Nodrošiniet, ka multivides formāts ir atbalstīts mērķierīcēs.
+3. **Lēna ielāde**: Apsveriet failu izmēru optimizāciju vai multivides iepriekšielādi.
+
+## Uzlabotas multivides funkcijas
+
+### Ģeomarķēšana
+rtSurvey var automātiski ģeomarķēt aptaujas laikā uzņemto multividi:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Uzņemiet fotoattēlu | geotag |
+```
+
+### Multivides anotācijas
+Ļaujiet respondentiem anotēt attēlus:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Anotējiet attēlu | annotate |
+```
+
+Efektīvi izmantojot multividi rtSurvey formās, varat izveidot saistošākas, informatīvākas un precīzākas aptaujas. Atcerieties līdzsvarot multivides iekļaušanas priekšrocības ar veiktspējas apsvērumiem, īpaši aptaujām, kas tiek veiktas apgabalos ar ierobežotu interneta savienojumu vai zemākas klases ierīcēs.

@@ -1,0 +1,148 @@
+---
+title: "Select_multiple"
+description: "Pertanyaan select_multiple memungkinkan responden memilih satu atau lebih opsi dari daftar yang telah ditentukan."
+icon: "check_box"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 225
+---
+
+Tipe pertanyaan `select_multiple` menampilkan daftar di mana responden dapat memilih **satu atau lebih opsi**. Secara default pilihan dirender sebagai kotak centang. Nilai yang disimpan adalah **daftar nilai pilihan yang dipilih yang dipisahkan spasi**.
+
+## Spesifikasi XLSForm Dasar
+
+**Lembar kerja survey:**
+
+| type | name | label |
+|------|------|-------|
+| select_multiple crops | crops_grown | Tanaman apa yang ditanam rumah tangga? |
+
+**Lembar kerja choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| crops | maize | Jagung |
+| crops | beans | Kacang-kacangan |
+| crops | rice | Beras |
+| crops | vegetables | Sayuran |
+| crops | other | Lainnya |
+
+Untuk detail lebih lanjut lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+
+## Format data yang tersimpan
+
+Kolom yang diekspor berisi daftar nilai yang dipilih yang dipisahkan spasi:
+
+```
+maize beans vegetables
+```
+
+Gunakan fungsi `selected()` — bukan `=` — saat menguji nilai select_multiple dalam ekspresi (lihat di bawah).
+
+## Penggunaan
+
+Pertanyaan select_multiple digunakan untuk:
+
+1. Mengumpulkan beberapa jawaban yang berlaku (misalnya, sumber pendapatan, tanaman yang ditanam, gejala)
+2. Item perjanjian gaya kotak centang (misalnya, "Pilih semua yang berlaku")
+3. Inventaris bahasa atau keterampilan
+4. Pertanyaan apa pun di mana beberapa jawaban secara bersamaan valid
+
+## Opsi appearance
+
+{{< table >}}
+| Appearance | Deskripsi |
+|------------|-----------|
+| *(tidak ada)* | Kotak centang default, satu per baris |
+| `minimal` | Widget multi-pilih dropdown |
+| `compact` | Grid kompak, kolom menyesuaikan lebar layar |
+| `compact-N` | Grid kompak dipaksakan ke N kolom |
+| `horizontal` | Pilihan disusun secara horizontal dalam baris (web) |
+| `horizontal-compact` | Horizontal, jarak kompak (web) |
+| `label` | Hanya menampilkan label, tanpa kotak centang (gunakan dengan `list-nolabel`) |
+| `list-nolabel` | Hanya menampilkan kotak centang, tanpa label (gunakan dengan `label`) |
+| `columns(N)` | Tampilkan dalam N kolom (ekstensi rtSurvey) |
+{{< /table >}}
+
+### Contoh: Tata letak kompak 3 kolom
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple symptoms | symptoms | Pilih semua gejala yang diamati | compact-3 |
+
+## Menggunakan `selected()` dalam ekspresi
+
+Karena nilai yang disimpan adalah string yang dipisahkan spasi, Anda **harus** menggunakan `selected()` untuk menguji apakah pilihan tertentu dipilih. Menggunakan `=` tidak akan bekerja dengan benar.
+
+### Dalam `relevant`
+
+Tampilkan pertanyaan tindak lanjut hanya jika "other" dipilih:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_multiple crops | crops_grown | Tanaman apa yang ditanam? | |
+| text | crops_other | Harap tentukan tanaman lainnya | `selected(${crops_grown}, 'other')` |
+
+### Dalam `constraint`
+
+Wajibkan setidaknya 2 pilihan:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple issues | issues | `count-selected(.) >= 2` | Pilih setidaknya 2 masalah |
+
+Batasi maksimum 3:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple priorities | priorities | `count-selected(.) <= 3` | Pilih tidak lebih dari 3 prioritas |
+
+### Dalam `calculate` — menggabungkan label yang dipilih
+
+Gabungkan `selected-at()`, `count-selected()`, dan `choice-label()` untuk membangun ringkasan yang mudah dibaca:
+
+| type | name | calculation |
+|------|------|-------------|
+| calculate | crops_summary | join(', ', ${crops_grown}) |
+
+## Opsi "Tidak ada di atas" / opsi eksklusif
+
+Pola umum adalah membuat satu opsi saling eksklusif dengan semua opsi lainnya. Gunakan `constraint` untuk menegakkannya:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| select_multiple issues | issues | Pilih semua masalah yang ada | `not(selected(., 'none') and count-selected(.) > 1)` | "Tidak ada" tidak dapat dipilih bersamaan dengan opsi lain |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| issues | water | Kekurangan air |
+| issues | roads | Jalan yang buruk |
+| issues | health | Kurangnya layanan kesehatan |
+| issues | none | Tidak ada di atas |
+
+## Menghitung dan meringkas pilihan
+
+| Fungsi | Contoh | Hasil |
+|--------|--------|-------|
+| `count-selected(field)` | `count-selected(${crops_grown})` | Jumlah pilihan yang dipilih |
+| `selected(field, value)` | `selected(${crops_grown}, 'maize')` | true/false |
+| `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | Nilai yang dipilih pertama |
+| `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | Label untuk suatu nilai |
+
+## Praktik Terbaik
+
+1. Selalu gunakan `selected()` dalam `relevant`, `constraint`, dan `calculate` — jangan pernah `=` atau `!=`.
+2. Tambahkan constraint untuk membatasi jumlah pilihan maksimum jika desain pertanyaan memerlukannya.
+3. Sertakan opsi "Tidak ada" atau "Tidak berlaku" ketika nol pilihan adalah jawaban yang valid.
+4. Untuk daftar panjang (15+ pilihan), gunakan `minimal` (dropdown multi-pilih) untuk menghindari pengguliran yang berlebihan.
+5. Ekspor data dan gunakan pemisahan string dalam alat analisis Anda — format yang dipisahkan spasi memerlukan pemisahan sebelum pivoting.
+
+## Keterbatasan
+
+- Nilai select_multiple tidak dapat dibandingkan langsung dengan `=`. Selalu gunakan `selected()`.
+- Appearance kompak mungkin tidak dirender dengan baik untuk label pilihan yang sangat panjang.
+- Saat memfilter pilihan dengan `choice_filter`, pemfilteran berlaku untuk semua pilihan yang ditampilkan, sama seperti `select_one`.

@@ -1,0 +1,131 @@
+---
+title: "Call API"
+description: "Call API, anketinizin harici bir web hizmetinden veri almasına ve alanları doldurmak veya yanıtları doğrulamak için yanıtı kullanmasına olanak tanır."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 294
+---
+
+**Call API** özelliği, bir anket alanının harici bir servise HTTP isteği göndermesine ve hesaplanmış bir değeri doldurmak veya kullanıcı girişini doğrulamak için yanıtı kullanmasına olanak tanır. Bu, veri toplama sırasında gerçek zamanlı aramalar, kimlik doğrulama, barkod aramaları ve diğer sunucu tarafı kontrolleri yapılmasını sağlar.
+
+İki fonksiyon mevcuttur:
+
+- `callapi()` — bir API'den değer getirir ve onu bir `calculate` veya `text` alanında depolar
+- `callapi-verify()` — bir API çağırır ve yanıt beklenen değerle eşleşmezse ilerlemeyi engeller (`constraint` içinde kullanılır)
+
+---
+
+## `callapi()` — API yanıtı getir ve depola
+
+### Sözdizimi
+
+`callapi()`'yi bir `calculate` veya `text` alanının **`calculation`** sütununa yerleştirin:
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### Parametreler
+
+| # | Parametre | Açıklama |
+|---|-----------|-------------|
+| 1 | `method` | HTTP yöntemi: `'GET'` veya `'POST'` |
+| 2 | `url` | API uç nokta URL'si |
+| 3 | `allowed_auto` | Alan ulaşıldığında otomatik çağırmak için `1`; manuel tetikleme düğmesi için `0` |
+| 4 | `max_retry` | Başarısızlık durumunda maksimum yeniden deneme sayısı |
+| 5 | `no_overwrite` | Alanda zaten değer varsa mevcut değeri korumak için `1`; her zaman üzerine yazmak için `0` |
+| 6 | `extract_expr` | Yanıttan istenilen değeri çıkarmak için JSONPath ifadesi (örn. `$.data.name`) |
+| 7 | `timeout` | Milisaniye cinsinden istek zaman aşımı |
+| 8 | `lifetime` | Önbelleğe alınan yanıtın yeniden getirmeden önce geçerli kaldığı süre (ms) |
+| 9 | `response_q` | Ham HTTP yanıt kodunu depolamak için bir alan adı (örn. `${response_status}`) |
+| 10 | `call_type` | *(İsteğe bağlı)* Özel çağrı modu: `'lazy-upload'` veya `'lazy-upload-multiple'` |
+| 11 | `post_body` | *(İsteğe bağlı)* POST gövde dizisi. Form alanlarını `##fieldname##` ile referans alın |
+
+### Örnek: Kimliğe göre hane arama GET isteği
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | Hane Kimliği | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+| note | hh_display | Hane: ${hh_name} | | |
+
+### Örnek: JSON gövdeli POST isteği
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+`post_body`'de, herhangi bir form alanının geçerli değerini eklemek için `##fieldname##` kullanın.
+
+### Görünüm: `callapi`
+
+API çağrısı entegrasyonunu etkinleştirmek için alanın `appearance` sütununa `callapi` ekleyin:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | api_result | | callapi | `callapi('GET', ...)` |
+
+`allowed_auto` `0` olduğunda, rtSurvey sayımcının manuel olarak dokunduğu bir **"Getir" düğmesi** gösterir.
+
+---
+
+## `callapi-verify()` — Bir değeri API'ye karşı doğrula
+
+`callapi-verify()`, bir API girilen değerin geçerli olduğunu onaylayana kadar alan gönderimini engeller. **`constraint`** sütununda kullanın.
+
+### Sözdizimi
+
+```
+callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
+```
+
+### Parametreler
+
+| # | Parametre | Açıklama |
+|---|-----------|-------------|
+| 1 | `method` | HTTP yöntemi: `'GET'` veya `'POST'` |
+| 2 | `url` | Doğrulama API uç noktası |
+| 3 | `extract_expr` | Yanıttan beklenen değeri çıkarmak için JSONPath |
+| 4 | `match_expr` | Çıkarılan değeri alan değeriyle karşılaştıran ifade (örn. `$.status = 'valid'`) |
+| 5 | `timeout` | Milisaniye cinsinden istek zaman aşımı |
+| 6 | `constraint_mode` | Yalnızca uyarı için `'soft'`; ilerlemeyi engellemek için `'hard'` |
+| 7 | `post_body` | *(İsteğe bağlı)* `##fieldname##` ikamelerini içeren POST gövdesi |
+| 8 | `message` | *(İsteğe bağlı)* Hata mesajı. Çok dil desteği: `<en>Invalid!</en><vi>Không hợp lệ!</vi>` |
+
+### Örnek: Varlık kayıt defterine karşı barkod doğrulama
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| barcode | asset_code | Varlık barkodunu tarayın | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` | Varlık kayıt defterinde bulunamadı |
+
+### Görünüm: `callapi-verify(...)`
+
+`callapi-verify()` içeren bir alandaki constraint sütununda `appearance` sütunu, bu alanın API doğrulaması kullandığını rtSurvey'e bildirmek için `callapi-verify(params)` veya `callapi-verify(dynamicParams)` içermelidir.
+
+---
+
+## App API verilerini callapi ile birlikte kullanma
+
+API isteğinize kimliği doğrulanmış kullanıcının jetonunu eklemek için `callapi()`'yi `pulldata('app-api', 'user.token')` ile birleştirin:
+
+```
+callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, '', '',
+  concat('{"token":"', pulldata('app-api','user.token'), '","id":"##item_id##"}'))
+```
+
+## En İyi Uygulamalar
+
+1. Her zaman makul bir `timeout` ayarlayın (5000–15000 ms) — 0 veya çok yüksek değerler kullanmayın.
+2. Sayımcının bilinçli olarak tetiklemesi gereken doğrulamalar için `allowed_auto=0` ayarlayın (örn. kimlik kontrolleri).
+3. Alan daha sonra düzenlenebilirse ve yeniden getirmenin manuel düzeltmelerin üzerine yazmasını istemiyorsanız `no_overwrite=1` kullanın.
+4. Ham yanıt metnine güvenmek yerine belirli bir JSONPath ile `extract_expr` kullanın.
+5. API çağrılarını çevrimdışı modda test edin — callapi zarif biçimde başarısız olacak ve hata gösterecek, ancak kritik olmayan alanlar için form yine de tamamlanabilir olmalıdır.
+
+## Sınırlamalar
+
+- Çağrı anında ağ bağlantısı gerektirir — cihaz çevrimdışıyken çağrılar başarısız olur.
+- API yanıtları JSON olmalıdır — XML veya düz metin yanıtlar ek ayrıştırma gerektirir.
+- Yüksek çağrı sıklığı (örn. her tekrar örneği başına bir API çağrısı) form gezinmesini yavaşlatabilir.

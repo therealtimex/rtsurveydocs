@@ -1,0 +1,95 @@
+---
+title: "Trigger / Acknowledge"
+description: "Trigger-spørsmål viser en uttalelse som telleren eksplisitt må bekrefte før de fortsetter."
+icon: "check-circle"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 240
+---
+
+`trigger`-spørsmålstypen (også kalt `acknowledge`) viser en **uttalelse med en avkrysningsboks**. Telleren må huke av avkrysningsboksen for å bekrefte at de har lest og forstått uttalelsen før skjemaet lar dem fortsette. Ingen dataverdi lagres — bare om avkrysningsboksen ble huket av.
+
+## Grunnleggende XLSForm-spesifikasjon
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | Respondenten har gitt muntlig informert samtykke. |
+
+Eller ved bruk av `acknowledge`-aliaset:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | Respondenten har gitt muntlig informert samtykke. |
+
+Både `trigger` og `acknowledge` er ekvivalente — bruk det som plattformen din dokumenterer.
+
+## Brukstilfeller
+
+Trigger/acknowledge-spørsmål brukes vanligvis for:
+
+1. **Informert samtykke** — bekreft at telleren innhentet samtykke før registrering av sensitive data
+2. **Myke varsler** — advar om en uvanlig verdi og krev eksplisitt bekreftelse før du fortsetter
+3. **Sjekklisteelementer** — bekreft at en fysisk observasjon ble fullført (f.eks. "Jeg har observert vannkilden direkte")
+4. **Instruksjoner** — tvinge telleren til å bekrefte en instruksjon på seksjonsnivå før de fortsetter
+5. **Kvalitetskontroller** — flagg avvikerverdier og krev at telleren verifiserer dem
+
+## Eksempelbruk
+
+### Samtykkebekreftelse
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | Respondenten har gitt muntlig informert samtykke til å delta i denne undersøkelsen. | yes |
+
+### Myk varsling for avvikerverdier
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Antall barn | | |
+| trigger | children_confirm | Du angav ${children} barn. Vennligst verifiser med respondenten og trykk OK for å bekrefte. | `${children} > 10` | `${children} > 10` |
+
+### Instruksjonsbekreftelse ved seksjonstart
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Seksjon B: Jordbruksland. Still alle spørsmål i denne seksjonen bare til husholdningslederen. |
+
+## Gjøre triggeren obligatorisk
+
+Legg til `required: yes` for å forhindre fremgang til boksen er huket av:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | Alt sikkerhetsutstyr er til stede og funksjonelt. | yes | Du må bekrefte før du fortsetter. |
+
+## Betinget visning
+
+Vis triggeren bare når en betingelse er oppfylt:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | Har husholdningen en brønn? | |
+| trigger | well_observation | Bekreft at du har observert brønnens tilstand direkte. | `${has_well} = 'yes'` |
+
+## Forskjell fra `note`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Viser tekst | Ja | Ja |
+| Krever interaksjon | Nei | Ja (må huke av) |
+| Lagrer data | Nei | Nei (bare OK/huket av) |
+| Kan blokkere fremgang | Nei | Ja (med `required`) |
+
+## Beste praksis
+
+1. Hold triggertekster kortfattede og handlingsorienterte — telleren bør kunne lese og bekrefte på sekunder.
+2. Legg alltid til `required: yes` når bekreftelsen er obligatorisk.
+3. Bruk triggers for samtykke og sikkerhetskontroller der du trenger et revisjonsspor for at telleren bekreftet.
+4. Kombiner med `relevant` for betingede myke varsler slik at triggeren bare vises når en verdi trenger verifisering.
+
+## Begrensninger
+
+- Triggerfelt lagrer ikke en meningsfull dataverdi — de registrerer bare at boksen ble huket av.
+- Trigger-widgeten gjengis som en enkel avkrysningsboks/knapp på de fleste klienter; det er ikke en full e-signatur.

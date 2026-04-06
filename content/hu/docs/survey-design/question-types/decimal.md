@@ -1,0 +1,78 @@
+---
+title: "Tizedes szám"
+description: "A tizedes szám kérdések lehetővé teszik a töredékes részeket tartalmazó numerikus bevitelt a felmérésben."
+icon: "calculate"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 223
+---
+
+Az XLSForm és az rtSurvey decimal kérdéstípusa töredékes részeket tartalmazó numerikus válaszok gyűjtésére szolgál. Ez a kérdéstípus elengedhetetlen pontos numerikus adatok – például mérések, árak vagy százalékos értékek – gyűjtéséhez.
+
+## Alapvető XLSForm-specifikáció
+
+| type    | name   | label                    |
+|---------|--------|--------------------------|
+| decimal | weight | Adja meg súlyát kg-ban   |
+
+A decimal kérdéstípus alapvető részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+
+## Felhasználási területek
+
+A tizedes szám kérdések általánosan használt területei:
+
+1. Mérések (pl. súly, magasság, távolság)
+2. Pénzügyi adatok (pl. árak, fizetések)
+3. Százalékos értékek
+4. Tudományos adatgyűjtés
+5. Bármilyen egész számon túli pontosságot igénylő numerikus adat
+
+## Bevált módszerek
+
+1. Adjon egyértelmű és tömör feliratokat a várt bevitel és mértékegység megjelöléséhez.
+2. Tartomány-korlátokat alkalmazzon az irreális vagy hibás bevitelek megelőzéséhez.
+3. Fontolja meg súgó szöveg hozzáadását a várt formátum példáinak megadásához.
+4. Ha a pontosság fontos, adja meg a kívánt tizedesjegyek számát a feliratban vagy a súgóban.
+
+## Korlátok és ellenőrzés
+
+Korlátokat adhat hozzá, hogy biztosítsa, hogy a megadott érték egy adott tartományba essen:
+
+| type    | name   | label                    | constraint        | constraint_message                    |
+|---------|--------|--------------------------|-------------------|---------------------------------------|
+| decimal | height | Adja meg magasságát méterben | .>0 and .<=3    | A magasságnak 0 és 3 méter közé kell esnie |
+
+## Példa
+
+Íme egy példa arra, hogyan lehet tizedes szám kérdéseket felhasználni egy egészségügyi felmérésben:
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| decimal | weight         | Adja meg súlyát kg-ban                    | .>0 and .<=500 | A súlynak 0 és 500 kg közé kell esnie |
+| decimal | height         | Adja meg magasságát méterben              | .>0 and .<=3 | A magasságnak 0 és 3 méter közé kell esnie |
+| decimal | body_temp      | Adja meg testhőmérsékletét Celsius-ban    | .>=35 and .<=42 | A hőmérsékletnek 35°C és 42°C közé kell esnie |
+| calculate | bmi          |                                           |            |                                   |
+
+A BMI számítás sorban a következőt használhatja:
+
+```
+calculation | ${weight} / (${height} * ${height})
+```
+
+Ez a beírt súly és magasság segítségével kiszámítja a BMI-t.
+
+## rtSurvey-bővítések
+
+Bár az alapvető XLSForm-specifikáció egyszerű a decimal kérdéseknél, az rtSurvey további funkciókat és testreszabási lehetőségeket kínálhat:
+
+1. Pontosság-szabályozás (tizedesjegyek száma)
+2. Egyedi beviteli formátumok (pl. százalék, pénznem)
+3. Haladó érvényesítési szabályok
+
+## Korlátozások
+
+- A tizedes számok pontossága korlátozott lehet az alapul szolgáló rendszer vagy adatbázis miatt.
+- A felhasználóknak útmutatásra lehet szükségük a várt tizedes elválasztóval kapcsolatban (pont vagy vessző) a területi beállításuktól függően.
+- A nagy tizedes számok nehéznek tűnhetnek mobileszközökön olvasni vagy megadni pontosan.

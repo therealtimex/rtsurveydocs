@@ -1,0 +1,35 @@
+---
+title: "Kwaliteit beheren"
+description: "Voortgang van gegevensverzameling monitoren, interviewkaarten bekijken en prestaties van enquêteurs analyseren."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 316
+---
+
+De module **Kwaliteit beheren** (toegankelijk via het Dashboard) biedt realtime analyses en ruimtelijke visualisaties om de voortgang van gegevensverzameling en de prestaties van enquêteurs te monitoren. Het biedt projectmanagers een gesplitste weergave om snel te schakelen tussen individuele vragenlijsten en aangepaste analytische rapporten.
+
+![Kwaliteitsbeheer Dashboard](/images/manage_quality.png)
+
+## Dashboard-overzicht
+
+Het dashboard Kwaliteit beheren is verdeeld in twee primaire navigatietabbladen: **Formulieren** en **Rapporten**. Dit laterale menu stelt gebruikers in staat om de specifieke dataset of het rapport dat ze willen analyseren efficiënt te zoeken en te selecteren.
+
+### Formulieranalyse
+
+Bij het selecteren van een specifiek formulier uit de lijst biedt het dashboard meerdere ingebouwde visualisatiehulpmiddelen om de kwaliteit en frequentie van inzendingen bij te houden:
+
+- **Tellen op starttijd:** Een staafdiagram dat de frequentie van gestarte interviews over een tijdlijn visualiseert.
+- **Tellen op eindtijd:** Een staafdiagram dat visualiseert wanneer interviews zijn voltooid.
+- **Tellen op inzenddatum:** Bijhouden van het dagelijkse volume van gegevens gesynchroniseerd naar de server.
+- **Tellen op gebruikersnaam:** Een staafdiagram dat de best presterende enquêteurs identificeert op basis van hun totale aantal inzendingen.
+- **Kaart van interviews:** Een geografische spreidingsplot (aangedreven door Leaflet) die de GPS-coördinaten toont van waar elke inzending heeft plaatsgevonden, waardoor managers veldwerklocaties kunnen verifiëren.
+
+### Aangepaste rapporten
+
+Het tabblad **Rapporten** biedt toegang tot vooraf geconfigureerde R Markdown-analyseontwerpen en andere aangepaste statistieken. Zodra een rapport is geselecteerd, laadt het hoofdweergavegebied dynamisch de gegenereerde analyse via een ingebedde viewer, waardoor diepere statistische verificatie van de verzamelde gegevens mogelijk is.
+
+## Zoeken en filteren
+
+Een snelzoekbalk is beschikbaar boven de zijbalklijst, waardoor gebruikers snel specifieke formulieren of rapporten op naam kunnen vinden.

@@ -1,0 +1,80 @@
+---
+title: "Decimal (Dezimalzahl)"
+description: "Decimal-Fragen ermöglichen numerische Eingaben mit Nachkommastellen in Ihrer Umfrage."
+icon: "calculate"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 223
+---
+
+Der `decimal`-Fragetyp in XLSForms und rtSurvey wird verwendet, um numerische Antworten zu sammeln, die Nachkommastellen enthalten können. Dieser Fragetyp ist für die Erfassung präziser numerischer Daten wie Messwerte, Preise oder Prozentsätze unerlässlich.
+
+## Grundlegende XLSForm-Spezifikation
+
+| type    | name   | label                    |
+|---------|--------|--------------------------|
+| decimal | weight | Geben Sie Ihr Gewicht in kg ein |
+
+Weitere Details zum grundlegenden `decimal`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+
+## Anwendungen
+
+`Decimal`-Fragen werden häufig verwendet für:
+
+1. Messungen (z. B. Gewicht, Größe, Entfernung)
+2. Finanzdaten (z. B. Preise, Gehälter)
+3. Prozentsätze
+4. Wissenschaftliche Datenerhebung
+5. Alle numerischen Daten, die eine Genauigkeit über ganze Zahlen hinaus erfordern
+
+## Best Practices
+
+1. Verwenden Sie klare und prägnante Beschriftungen, um die erwartete Eingabe und die Maßeinheit anzugeben.
+2. Implementieren Sie Bereichsbeschränkungen (Constraints), um unrealistische oder fehlerhafte Eingaben zu verhindern.
+3. Erwägen Sie die Verwendung von Hinweistexten (Hints), um Beispiele zu geben oder das erwartete Format zu klären.
+4. Geben Sie die gewünschte Anzahl der Dezimalstellen in der Beschriftung oder im Hinweis an, wenn Präzision wichtig ist.
+
+## Einschränkungen und Validierung
+
+Sie können Einschränkungen (Constraints) hinzufügen, um sicherzustellen, dass der eingegebene Wert innerhalb eines bestimmten Bereichs liegt:
+
+| type    | name   | label                    | constraint        | constraint_message                    |
+|---------|--------|--------------------------|-------------------|---------------------------------------|
+| decimal | height | Geben Sie Ihre Größe in Metern ein | .>0 and .<=3    | Die Größe muss zwischen 0 und 3 Metern liegen |
+
+## Beispielhafte Verwendung
+
+Hier ist ein Beispiel dafür, wie Sie `decimal`-Fragen in einer Gesundheitsumfrage verwenden könnten:
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| decimal | weight         | Geben Sie Ihr Gewicht in kg ein           | .>0 and .<=500 | Das Gewicht muss zwischen 0 und 500 kg liegen |
+| decimal | height         | Geben Sie Ihre Größe in Metern ein        | .>0 and .<=3 | Die Größe muss zwischen 0 und 3 Metern liegen |
+| decimal | body_temp      | Geben Sie Ihre Körpertemperatur in Celsius ein | .>=35 and .<=42 | Die Temperatur muss zwischen 35°C und 42°C liegen |
+| calculate | bmi          |                                           |            |                                   |
+
+In der `calculate`-Zeile für den BMI können Sie verwenden:
+
+```
+calculation | ${weight} / (${height} * ${height})
+```
+
+Dies berechnet den BMI unter Verwendung des eingegebenen Gewichts und der Größe.
+
+## rtSurvey-Erweiterungen
+
+Während die grundlegende XLSForm-Spezifikation für `decimal`-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen:
+
+1. Kontrolle der Präzision (Anzahl der Dezimalstellen)
+2. Benutzerdefinierte Eingabeformate (z. B. Prozentsatz, Währung)
+3. Erweiterte Validierungsregeln
+
+(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für `decimal`-Fragen müssten hier bestätigt und detailliert werden.)
+
+## Einschränkungen
+
+- Die Präzision von Dezimalzahlen kann durch das zugrunde liegende System oder die Datenbank begrenzt sein.
+- Benutzer benötigen möglicherweise Hinweise zum erwarteten Dezimaltrennzeichen (Punkt oder Komma), abhängig von ihrem Gebietsschema.
+- Große Dezimalzahlen können auf mobilen Geräten schwierig zu lesen oder genau einzugeben sein.

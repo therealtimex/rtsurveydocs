@@ -1,0 +1,110 @@
+---
+title: "Text"
+description: "Typ otázky pro volnou textovou odpověď v rtSurvey"
+icon: "text_fields"
+date: "2024-07-01T12:00:00+01:00"
+lastmod: "2024-07-01T12:00:00+01:00"
+draft: false
+toc: true
+weight: 221
+---
+
+Typ otázky `text` sbírá volnou textovou odpověď — jakýkoli řetězec znaků. Je to nejflexibilnější typ vstupu a používá se pro jména, adresy, popisy, kódy a vše, co se nevejde do specifičtějšího typu.
+
+rtSurvey také rozšiřuje `text` o **widgety pro zadávání času**, které umožňují přesné zadávání času pomocí výběru hodin.
+
+## Základní specifikace XLSForm
+
+| type | name | label |
+|------|------|-------|
+| text | respondent_name | Celé jméno respondenta |
+| text | address | Domácí adresa |
+
+## Použití
+
+Textové otázky se používají pro:
+
+1. Jména, adresy, volné popisy
+2. Otevřené komentáře nebo zpětnou vazbu
+3. Kódy, ID nebo referenční čísla, která se nevejdou do integer/decimal
+4. Sběr časových hodnot pomocí rozšíření pro zadávání času rtSurvey
+5. Textová pole s automatickým doplňováním (přes `search-autocomplete-noedit-v2()`)
+
+## Standardní možnosti vzhledu
+
+| Vzhled | Popis |
+|--------|-------|
+| *(žádný)* | Jednořádkové textové pole |
+| `multiline` | Víceřádková textová oblast — nejlepší pro delší volný text na webu |
+
+## Rozšíření rtSurvey pro zadávání času
+
+rtSurvey rozšiřuje `text` o **widget výběru hodin** pro sběr časových hodnot. Tyto možnosti vzhledu zobrazují ikonu hodin, na kterou enumerátor klepne pro výběr hodin, minut, sekund nebo milisekund.
+
+### Varianty vzhledu
+
+| Vzhled | Popis |
+|--------|-------|
+| `inline` | Ikona hodin zobrazena vedle pole |
+| `inline colors("RRGGBB")` | Ikona hodin s vlastní hexadecimální barvou |
+| `inline-1line` | Hodiny zobrazeny v kompaktním jednořádkovém formátu |
+| `inline-1line-RRGGBB` | Jednořádkový s vlastní barvou ikony (hex, bez `#`) |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Jednořádkový se dvěma barvami |
+| `inline-onlyresult` | Ikona hodin zmizí po výběru; zobrazena je pouze hodnota |
+| `inline-onlyresult colors("RRGGBB")` | Stejné, s vlastní barvou ikony |
+
+### Formátovací tokeny času
+
+Přidejte formátovací řetězec v závorkách pro řízení zobrazených časových složek:
+
+| Formátovací řetězec | Zobrazuje |
+|---------------------|-----------|
+| `inline-[%H:%M]` | Hodiny a minuty (24hodinový) |
+| `inline-[%h:%M]` | Hodiny a minuty (12hodinový) |
+| `inline-[%H:%M:%S]` | Hodiny, minuty, sekundy (24hodinový) |
+| `inline-[%h:%M:%S]` | Hodiny, minuty, sekundy (12hodinový) |
+| `inline-[%H:%M:%3]` | Hodiny, minuty, milisekundy |
+| `inline-[%M:%S]` | Pouze minuty a sekundy |
+| `inline-[%M:%3]` | Pouze minuty a milisekundy |
+| `inline-[%S]` | Pouze sekundy |
+| `inline-[%3]` | Pouze milisekundy |
+| `inline-[%H]` | Pouze hodiny (24hodinový) |
+| `inline-[%h]` | Pouze hodiny (12hodinový) |
+
+### Příklad: Záznam doby trvání úkolu v minutách a sekundách
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | task_duration | Čas potřebný k dokončení úkolu | `inline-[%M:%S]` |
+
+### Příklad: Záznam času události ve 24hodinovém formátu s vlastní barvou
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | event_time | Čas události | `inline-1line colors("0099FF")` |
+
+## Formát dat
+
+Textová data jsou uložena a exportována jako prostý řetězec. Pro vstupy na základě času pomocí inline widgetu hodin je hodnota uložena ve formátu odpovídajícím zvolenému formátovacímu řetězci (např. `14:32` pro `%H:%M`).
+
+## Omezení a validace
+
+Aplikujte omezení pro vynucení formátu, délky nebo vzoru:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| text | name | Celé jméno | `string-length(.) >= 2` | Jméno musí mít alespoň 2 znaky |
+| text | code | Referenční kód | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Zadejte 2 velká písmena následovaná 4 číslicemi |
+| text | phone | Telefonní číslo | `regex(., '^[0-9]{9,15}$')` | Zadejte platné telefonní číslo |
+
+## Osvědčené postupy
+
+1. Používejte specifičtější typy (`integer`, `decimal`, `date`), kdykoli mají data známou strukturu — to zabraňuje neplatným záznamům a zjednodušuje analýzu.
+2. Přidejte `constraint` s `string-length()` nebo `regex()` pro validaci kódů nebo ID.
+3. Používejte vzhled `multiline` pro otevřené otázky, kde respondenti mohou napsat několik vět.
+4. Pro sběr času zvolte formátovací tokeny odpovídající přesnosti požadované analýzou — sběr milisekund, když potřebujete pouze minuty, plýtvá úsilím enumerátora.
+
+## Omezení
+
+- Textové odpovědi jsou volné — neexistuje žádná vestavěná kontrola pravopisu ani omezení slovní zásoby nad rámec vzorů regex.
+- Inline widget hodin je rozšíření rtSurvey a není součástí standardní specifikace XLSForm.

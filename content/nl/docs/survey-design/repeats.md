@@ -1,0 +1,164 @@
+---
+title: "Herhalende vragen"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 260
+---
+
+Herhalingen zijn een krachtige functie in rtSurvey waarmee u dezelfde set informatie meerdere keren kunt verzamelen binnen één enquête. Dit is bijzonder nuttig voor scenario's zoals huishoudenenquêtes, waarbij u mogelijk gegevens moet verzamelen over meerdere huishoudleden.
+
+## Basisherhalingsstructuur
+
+Om een herhaling in rtSurvey te maken, gebruikt u de constructie `begin repeat` en `end repeat`:
+
+```
+| type         | name         | label                  |
+|--------------|--------------|------------------------|
+| begin repeat | child_repeat |                        |
+| text         | name         | Naam van het kind      |
+| decimal      | birthweight  | Geboortegewicht kind   |
+| select_one male_female | sex | Geslacht van het kind |
+| end repeat   |              |                        |
+```
+
+In dit voorbeeld kan de gebruiker informatie over meerdere kinderen verzamelen door nieuwe herhalingen aan het formulier toe te voegen.
+
+## Herhalingen labelen
+
+Hoewel de kolom `label` optioneel is voor `begin repeat`, kan het toevoegen van een label de navigatie verbeteren:
+
+```
+| type         | name         | label               |
+|--------------|--------------|---------------------|
+| begin repeat | child_repeat | Kindinformatie      |
+| text         | name         | Naam van het kind   |
+| decimal      | birthweight  | Geboortegewicht kind|
+| select_one male_female | sex | Geslacht van het kind |
+| end repeat   |              |                     |
+```
+
+rtSurvey toont "Kindinformatie" als titel voor elke herhalingsinstantie.
+
+## Vaste herhalingstelling
+
+Om een vast aantal herhalingen te specificeren, gebruikt u de kolom `repeat_count`:
+
+```
+| type         | name         | label           | repeat_count |
+|--------------|--------------|-----------------|--------------|
+| begin repeat | child_repeat | Kindinformatie  | 3            |
+| text         | name         | Naam van het kind|              |
+| decimal      | birthweight  | Geboortegewicht |              |
+| end repeat   |              |                 |              |
+```
+
+Dit maakt precies 3 kindherhalingen aan.
+
+## Dynamische herhalingstelling
+
+rtSurvey ondersteunt dynamische herhalingstellingen op basis van eerdere antwoorden:
+
+```
+| type     | name           | label                            | repeat_count      |
+|----------|----------------|----------------------------------|-------------------|
+| integer  | num_hh_members | Aantal huishoudleden?            |                   |
+| begin repeat | hh_member  | Huishoudlid                      | ${num_hh_members} |
+| text     | name           | Naam                             |                   |
+| integer  | age            | Leeftijd                         |                   |
+| end repeat |              |                                  |                   |
+```
+
+## Voorwaardelijke herhalingen
+
+U kunt de kolom `relevant` gebruiken om herhalingen voorwaardelijk weer te geven:
+
+```
+| type              | name        | label                         | relevant            |
+|-------------------|-------------|-------------------------------|---------------------|
+| select_one yes_no | has_child   | Wonen hier kinderen?          |                     |
+| begin repeat      | child_repeat| Kindinformatie                | ${has_child} = 'yes'|
+| text              | name        | Naam van het kind             |                     |
+| decimal           | birthweight | Geboortegewicht kind          |                     |
+| end repeat        |             |                               |                     |
+```
+
+## rtSurvey-specifieke functies
+
+### Herhalingssamenvatting
+
+rtSurvey biedt een samenvattingsweergave van herhalingen. Om de samenvatting aan te passen, gebruikt u een groep binnen de herhaling:
+
+```
+| type         | name          | label                                    |
+|--------------|---------------|------------------------------------------|
+| begin repeat | person_repeat |                                          |
+| begin group  | person        | ${first_name} ${last_name} - ${age}      |
+| text         | first_name    | Voornaam                                 |
+| text         | last_name     | Achternaam                               |
+| integer      | age           | Leeftijd                                 |
+| end group    |               |                                          |
+| end repeat   |               |                                          |
+```
+
+### Herhalingsweergaveopties
+
+rtSurvey biedt aanvullende weergaveopties voor herhalingen:
+
+- `appearance: field-list` - Toont alle vragen in een herhaling op één scherm
+- `appearance: table-list` - Presenteert herhalingen in een tabelindeling
+
+```
+| type         | name         | label           | appearance  |
+|--------------|--------------|-----------------|-------------|
+| begin repeat | child_repeat | Kindinformatie  | table-list  |
+| text         | name         | Naam            |             |
+| integer      | age          | Leeftijd        |             |
+| end repeat   |              |                 |             |
+```
+
+### Geneste herhalingen
+
+rtSurvey ondersteunt geneste herhalingen voor complexe gegevensstructuren:
+
+```
+| type         | name        | label              |
+|--------------|-------------|--------------------|
+| begin repeat | household   | Huishouden         |
+| text         | hh_name     | Naam huishouden    |
+| begin repeat | hh_member   | Huishoudlid        |
+| text         | member_name | Naam van lid       |
+| integer      | member_age  | Leeftijd van lid   |
+| end repeat   |             |                    |
+| end repeat   |             |                    |
+```
+
+## Aanbevolen werkwijzen voor het gebruik van herhalingen in rtSurvey
+
+1. Gebruik betekenisvolle namen en labels voor herhalingen om gegevensanalyse te verbeteren.
+2. Overweeg dynamische herhalingstellingen te gebruiken om gegevensinvoerfouten te verminderen.
+3. Test uw formulier grondig, vooral bij gebruik van complexe geneste herhalingen.
+4. Gebruik de samenvattingsfunctie om enumeratoren te helpen bij het navigeren door lange lijsten van herhalingen.
+5. Wees voorzichtig met grote aantallen herhalingen, omdat ze de formulierprestaties kunnen beïnvloeden.
+
+## Omgaan met nul herhalingen
+
+Om nul herhalingen in rtSurvey te vertegenwoordigen:
+
+1. Train enumeratoren om de eerste herhaling te verwijderen als deze niet nodig is.
+2. Gebruik dynamische herhalingstellingen wanneer het exacte aantal bekend is.
+3. Gebruik `relevant` om herhalingen voorwaardelijk weer te geven.
+
+## Overwegingen voor gegevensexport
+
+Bij het exporteren van gegevens uit rtSurvey worden herhalingsgegevens doorgaans afgevlakt. Elke herhalingsinstantie wordt een aparte rij in de geëxporteerde gegevens, waarbij de gegevens van het hoofdformulier worden herhaald voor elke instantie.
+
+## Overwegingen voor de mobiele app
+
+- Herhalingen in de mobiele app van rtSurvey ondersteunen offline gegevensverzameling.
+- Grote aantallen herhalingen kunnen de app-prestaties beïnvloeden op apparaten aan de onderkant van de markt.
+
+Door herhalingen effectief te gebruiken in rtSurvey kunt u flexibele en krachtige enquêtes maken die in staat zijn complexe, hiërarchische gegevensstructuren vast te leggen en tegelijkertijd een gebruiksvriendelijke interface voor enumeratoren te behouden.

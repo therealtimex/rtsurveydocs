@@ -1,0 +1,43 @@
+---
+weight: 1
+date: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+title: "Ātrā sākšana"
+icon: "play_circle"
+toc: true
+description: "Izvietojiet rtCloud savā serverī dažu minūšu laikā ar automatizētu mākoņskriptu."
+---
+
+Šī rokasgrāmata palīdz palaist rtCloud savā serverī. Automatizētie skripti rūpējas par visu — Docker, SSL, datu bāzi, ugunsmūri — vienā palaišanas reizē.
+
+## Prasības
+
+### Serveris
+
+| Resurss | Minimums | Ieteicamais |
+|---------|---------|------------|
+| RAM | 2 GB | 4 GB (nepieciešams ar Keycloak SSO) |
+| Disks | 25 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Domēns
+
+Pirms skripta palaišanas nepieciešams domēna vārds ar **A ierakstu, kas norāda uz servera IP**. Let's Encrypt prasa DNS izšķirtspēju SSL sertifikāta izsniegšanai.
+
+---
+
+## Izvēlieties savu mākoņpakalpojumu sniedzēju
+
+Izvēlieties savu sniedzēju zemāk. Katram ir automatizēts skripts, kas darbojas pirmajā sāknēšanas reizē un pabeidz iestatīšanu **5–10 minūtēs**.
+
+| Sniedzējs | Rokasgrāmata |
+|---------|------------|
+| Linode (Akamai) | [Izvietošana Linode](../cloud-deployment/linode) — vieglākais, veidlapas iestatīšana caur StackScript |
+| DigitalOcean | [Izvietošana DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Izvietošana AWS](../cloud-deployment/aws) |
+| Google Cloud | [Izvietošana GCP](../cloud-deployment/gcp) |
+
+> **Ieteicams lielākajai daļai:** Sāciet ar Linode — StackScript nodrošina veidlapas UI, tāpēc nekas nav manuāli jārediģē.

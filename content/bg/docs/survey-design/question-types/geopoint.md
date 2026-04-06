@@ -1,0 +1,86 @@
+---
+title: "Геоточка"
+description: "Въпросите от тип geopoint заснемат географски координати (ширина, дължина, височина и точност) като част от анкетата."
+icon: "location_on"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 232
+---
+
+The geopoint question type in XLSForms and rtSurvey enables the collection of geographic coordinates using the device's GPS or other location services. This feature is particularly useful for mapping survey responses, tracking field activities, or associating data with specific locations.
+
+## Basic XLSForm Specification
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geopoint | location    | Record the current location     |
+
+For more details on the basic geopoint question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+
+## Uses
+
+Geopoint questions are commonly used for:
+
+1. Mapping survey responses geographically
+2. Verifying the location of field activities
+3. Tracking the route of enumerators
+4. Associating environmental or social data with specific locations
+5. Calculating distances or areas in geographical analyses
+
+## Best Practices
+
+1. Ensure the device has location services enabled and permissions granted.
+2. Allow sufficient time for the GPS to acquire an accurate fix.
+3. Consider privacy implications and inform respondents about location data collection.
+4. Use in conjunction with other question types to provide context for the location data.
+
+## Example Usage
+
+Here's an example of how you might use a geopoint question in a survey:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geopoint | sample_location| Record the location of the sample collection | Stand in an open area for better GPS signal |
+
+## rtSurvey Extensions
+
+While the basic XLSForm specification for geopoint questions is straightforward, rtSurvey may offer additional features or customizations:
+
+1. Map integration for visual confirmation of the captured location
+2. Accuracy threshold settings
+3. Option to manually input coordinates
+4. Integration with offline maps for remote areas
+
+(Note: The specific extensions available in rtSurvey for geopoint questions would need to be confirmed and detailed here.)
+
+## Data Format
+
+Geopoint data is typically stored as a string of four space-separated values:
+
+```
+latitude longitude altitude accuracy
+```
+
+For example:
+```
+41.40338 2.17403 30.5 10
+```
+
+## Considerations for Analysis
+
+When using geopoint questions, consider:
+
+1. How the geographic data will be visualized (e.g., mapping software)
+2. The accuracy of the collected coordinates and its impact on analysis
+3. Privacy and data protection measures for handling location data
+4. Potential integration with GIS (Geographic Information System) tools
+
+## Limitations
+
+- Accuracy can vary depending on the device and environmental conditions.
+- GPS signals may be weak or unavailable in indoor locations or areas with obstructions.
+- Collecting location data may significantly impact device battery life.
+- There may be privacy concerns associated with collecting precise location data.
+

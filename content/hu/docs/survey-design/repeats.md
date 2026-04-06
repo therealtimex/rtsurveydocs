@@ -1,0 +1,164 @@
+---
+title: "Ismétlő kérdések"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 260
+---
+
+Az ismétlések az rtSurvey hatékony funkciói, amelyek lehetővé teszik ugyanazon kérdéskészlet többszöri megválaszolását egyetlen felmérésben. Ez különösen hasznos olyan helyzetekben, mint a háztartásfelmérések, ahol több háztartástagról kell adatokat gyűjteni.
+
+## Alapvető ismétlésstruktúra
+
+Az rtSurvey-ben ismétlés létrehozásához használja a `begin repeat` és `end repeat` szerkezetet:
+
+```
+| type         | name         | label                |
+|--------------|--------------|----------------------|
+| begin repeat | child_repeat |                      |
+| text         | name         | Gyermek neve         |
+| decimal      | birthweight  | Gyermek születési súlya |
+| select_one male_female | sex | Gyermek neme        |
+| end repeat   |              |                      |
+```
+
+Ebben a példában a felhasználó több gyermekről gyűjthet adatokat az ismétlések hozzáadásával.
+
+## Ismétlések felcímkézése
+
+Bár a `label` oszlop opcionális a `begin repeat` esetén, egy felirat hozzáadása javíthatja a navigációt:
+
+```
+| type         | name         | label                |
+|--------------|--------------|----------------------|
+| begin repeat | child_repeat | Gyermek adatai       |
+| text         | name         | Gyermek neve         |
+| decimal      | birthweight  | Gyermek születési súlya |
+| select_one male_female | sex | Gyermek neme        |
+| end repeat   |              |                      |
+```
+
+Az rtSurvey a "Gyermek adatai" szöveget jeleníti meg az egyes ismétlési példányok címeként.
+
+## Rögzített ismétlésszám
+
+Rögzített számú ismétlés megadásához használja a `repeat_count` oszlopot:
+
+```
+| type         | name         | label                | repeat_count |
+|--------------|--------------|----------------------|--------------|
+| begin repeat | child_repeat | Gyermek adatai       | 3            |
+| text         | name         | Gyermek neve         |              |
+| decimal      | birthweight  | Gyermek születési súlya |           |
+| end repeat   |              |                      |              |
+```
+
+Ez pontosan 3 gyermekismétlést hoz létre.
+
+## Dinamikus ismétlésszám
+
+Az rtSurvey dinamikus ismétlésszámokat is támogat az előző válaszok alapján:
+
+```
+| type     | name           | label                          | repeat_count       |
+|----------|----------------|--------------------------------|--------------------|
+| integer  | num_hh_members | Háztartástagok száma?          |                    |
+| begin repeat | hh_member  | Háztartástag                   | ${num_hh_members}  |
+| text     | name           | Név                            |                    |
+| integer  | age            | Kor                            |                    |
+| end repeat |              |                                |                    |
+```
+
+## Feltételes ismétlések
+
+A `relevant` oszlop segítségével feltételesen jeleníthet meg ismétléseket:
+
+```
+| type              | name        | label                     | relevant           |
+|-------------------|-------------|---------------------------|---------------------|
+| select_one yes_no | has_child   | Él itt gyermek?           |                     |
+| begin repeat      | child_repeat| Gyermek adatai            | ${has_child} = 'yes'|
+| text              | name        | Gyermek neve              |                     |
+| decimal           | birthweight | Gyermek születési súlya   |                     |
+| end repeat        |             |                           |                     |
+```
+
+## rtSurvey-specifikus funkciók
+
+### Ismétlés-összefoglalás
+
+Az rtSurvey összefoglaló nézetet biztosít az ismétlésekhez. Az összefoglaló testreszabásához használjon csoportot az ismétlésen belül:
+
+```
+| type         | name         | label                                    |
+|--------------|--------------|------------------------------------------|
+| begin repeat | person_repeat|                                          |
+| begin group  | person       | ${first_name} ${last_name} - ${age}      |
+| text         | first_name   | Utónév                                   |
+| text         | last_name    | Vezetéknév                               |
+| integer      | age          | Kor                                      |
+| end group    |              |                                          |
+| end repeat   |              |                                          |
+```
+
+### Ismétlési megjelenési lehetőségek
+
+Az rtSurvey további megjelenési lehetőségeket kínál az ismétlésekhez:
+
+- `appearance: field-list` - Egyetlen képernyőn jeleníti meg az összes kérdést
+- `appearance: table-list` - Táblázatos formátumban jeleníti meg az ismétléseket
+
+```
+| type         | name         | label            | appearance  |
+|--------------|--------------|-------------------|-------------|
+| begin repeat | child_repeat | Gyermek adatai    | table-list  |
+| text         | name         | Név               |             |
+| integer      | age          | Kor               |             |
+| end repeat   |              |                   |             |
+```
+
+### Beágyazott ismétlések
+
+Az rtSurvey összetett adatstruktúrákhoz beágyazott ismétléseket is támogat:
+
+```
+| type         | name           | label                |
+|--------------|----------------|----------------------|
+| begin repeat | household      | Háztartás            |
+| text         | hh_name        | Háztartás neve       |
+| begin repeat | hh_member      | Háztartástag         |
+| text         | member_name    | Tag neve             |
+| integer      | member_age     | Tag kora             |
+| end repeat   |                |                      |
+| end repeat   |                |                      |
+```
+
+## Az ismétlések használatának bevált módszerei
+
+1. Használjon értelmes neveket és feliratokat az ismétlésekhez az adatelemzés javítása érdekében.
+2. Fontolja meg a dinamikus ismétlésszámok használatát az adatbeviteli hibák csökkentése érdekében.
+3. Alaposan tesztelje az űrlapot, különösen összetett beágyazott ismétlések esetén.
+4. Az összefoglaló funkció segítségével segítse a kérdezők navigálását az ismétlések hosszú listáin.
+5. Legyen óvatos a nagy számú ismétléssel, mivel azok befolyásolhatják az űrlap teljesítményét.
+
+## Nulla ismétlés kezelése
+
+A nulla ismétlések kezeléséhez az rtSurvey-ben:
+
+1. Tanítsa meg a kérdezőket, hogy töröljék az első ismétlést, ha nincs rá szükség.
+2. Használjon dinamikus ismétlésszámokat, ha az exact szám ismert.
+3. Használja a `relevant` beállítást az ismétlések feltételes megjelenítéséhez.
+
+## Adatexport szempontjai
+
+Az rtSurvey-ből exportált adatokban az ismétlési adatok általában egyenletesen eloszlanak. Minden ismétlési példány külön sorként szerepel az exportált adatokban, az elsődleges űrlap adataival minden példánynál megismételve.
+
+## Mobilalkalmazás szempontjai
+
+- Az rtSurvey mobilalkalmazásban lévő ismétlések támogatják az offline adatgyűjtést.
+- Nagy számú ismétlés befolyásolhatja az alkalmazás teljesítményét alacsony kategóriájú eszközökön.
+
+Az ismétlések hatékony alkalmazásával az rtSurvey-ben rugalmas és hatékony felméréseket hozhat létre, amelyek összetett, hierarchikus adatstruktúrák rögzítésére is képesek, miközben felhasználóbarát felületet biztosítanak a kérdezők számára.

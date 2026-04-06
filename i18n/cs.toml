@@ -1,0 +1,38 @@
+[lang_select_title]
+    other = "Vyberte svůj jazyk"
+
+[search_title]
+    other = "Hledat"
+
+[search_navigate]
+    other = "pro navigaci"
+
+[search_select]
+    other = "pro výběr"
+
+[search_close]
+    other = "pro zavření"
+
+[search_cancel]
+    other = "zrušit"
+
+[search_no_results]
+    other = "Žádné výsledky pro"
+
+[feedback_yes]
+    other = "Ano"
+
+[feedback_no]
+    other = "Ne"
+
+[feedback_helpful]
+    other = "Byla tato stránka užitečná?"
+
+[feedback_submit]
+    other = "Odeslat"
+
+[enable_light_mode]
+    other = "Zapnout světlý režim"
+
+[enable_dark_mode]
+    other = "Zapnout tmavý režim"

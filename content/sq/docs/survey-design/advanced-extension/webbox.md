@@ -1,0 +1,109 @@
+---
+title: "Webbox"
+description: "Webbox ngulitë faqen e jashtme web brenda sondazhit si modal iframe, duke lejuar numëruesit të shikojnë referencat ose ndërveprojnë me mjete të jashtme pa e lënë formularin."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 299
+---
+
+**Webbox** ngulitë faqen e jashtme web brenda sondazhit si **popup modal** (iframe). Numëruesi shtyn butonin në etiketën ose tekstin note, faqja hapet në shtresë të plotë-ekranit brenda formularit, dhe kur e mbyllin kthehen saktësisht aty ku ishin. Kjo ju lejon të tregoni materialin e referencës, hartat, panelet, ose mjetet e personalizuara pa hapur skedën e veçantë të shfletuesit.
+
+---
+
+## Sintaksa
+
+Futni etiketën HTML `<webbox>` drejtpërdrejt në kolonën e etiketës `label` ose `note`:
+
+```html
+<webbox src='https://example.com/reference' title='Udhëzuesi i Referencës'>Hap Udhëzuesin e Referencës</webbox>
+```
+
+| Atributi | Përshkrimi |
+|----------|------------|
+| `src` | URL-ja për të ngarkuar në iframe. Mbështet thonjëzat e vetme dhe të dyfishta. |
+| `title` | Teksti i shfaqur në shiritin e header-it modal. Mbështet tekst të thjeshtë. |
+| *(përmbajtja)* | Etiketa e butonit të klikueshëm e treguar në fushën e sondazhit |
+
+---
+
+## Shembull bazë
+
+| type | name | label |
+|------|------|-------|
+| note | ref_guide | `<webbox src='https://docs.example.com/field-guide' title='Udhëzuesi i Terrenit'>📖 Hap Udhëzuesin e Terrenit</webbox>` |
+
+Kjo paraqet butonin e etiketuar "📖 Hap Udhëzuesin e Terrenit". Kur shtyp, hapet modal që shfaq faqen e udhëzuesit të terrenit.
+
+---
+
+## Ngulitja e hartës
+
+| type | name | label |
+|------|------|-------|
+| note | area_map | `<webbox src='https://maps.example.com/survey-area' title='Harta e Zonës Sondazh'>🗺 Shiko Hartën</webbox>` |
+
+---
+
+## Kalimi i vlerave të formularit te faqja e ngulur
+
+Shtoni vlerat e fushave të formularit te URL duke përdorur `concat()` në kolonën `calculation` dhe referoni rezultatin në etiketë:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | webbox_url | | `concat('https://dashboard.example.com/household?id=', ${household_id})` |
+| note | hh_dash | `<webbox src='${webbox_url}' title='Paneli i Familjes'>Hap Panelin</webbox>` |
+
+{{% alert icon=" " context="warning" %}}
+Atributi `src` në etiketën `<webbox>` mbështet referencat `${fieldname}` kur etiketa llogaritet nga fusha `calculate`. Ndërtoni URL-n e plotë në fushën `calculate` dhe referojeni.
+{{% /alert %}}
+
+---
+
+## Ndërveprimi me përsëritjet: butonat e fshirjes
+
+Webbox gjithashtu mbështet etiketat e veçanta të aksionit për menaxhimin e grupeve të përsëritjes brenda etiketave:
+
+```html
+<delete-repeat-current>Hiq këtë rresht</delete-repeat-current>
+<delete-repeat-last>Hiq rreshtin e fundit</delete-repeat-last>
+```
+
+Këto paraqiten si butona që fshijnë instancat e përsëritjes kur shtypet. Vendosini në fushën `note` brenda (ose menjëherë pas) grupit të përsëritjes:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | items | Artikulli |
+| text | item_name | Emri i artikullit |
+| note | delete_btn | `<delete-repeat-current>✕ Hiq këtë artikull</delete-repeat-current>` |
+| end_repeat | | |
+
+---
+
+## Komunikimi me faqen e ngulur (postMessage)
+
+Iframe-i webbox dhe formulari prind mund të komunikojnë duke përdorur API `postMessage` të shfletuesit. Prindi dërgon mesazhin `init` te iframe kur hapet. Faqja e ngulur mund t'i përgjigjet me:
+
+- `delete-repeat-current` — aktivizon fshirjen e instancës aktuale të përsëritjes
+- `delete-repeat-last` — aktivizon fshirjen e instancës së fundit të përsëritjes
+
+Kjo mundëson mjetet e personalizuara web (p.sh., mjetet e vizatimit, hartat ndërvepruese) të aktivizojnë aksionet e formularit kur përdoruesi konfirmon aksionin brenda iframe-it.
+
+---
+
+## Praktikat më të mira
+
+1. Përdorni webbox për **materialin e referencës** (udhëzimet, tabelat e kërkimit, hartat) — jo për mbledhjen e të dhënave që duhet të jenë në vetë formularin.
+2. Sigurohuni që URL-ja e ngulur është e arritshme nga rrjeti i pajisjes — webbox kërkon lidhje.
+3. Mbajeni faqen e ngulur të përshtatshme për mobile — modal-i është maksimum 800px i gjerë dhe 80% e lartësisë së viewport.
+4. Përdorni tekst të përshkruar të butonit (p.sh., "Shiko Hartën e Fshatit") në vend të etiketave generike ("Klikoni këtu").
+5. Informoni numëruesit që mbyllja e modal-it i kthen në sondazh — disa përdorues mund të mos dinë si të mbyllin shtresën iframe.
+
+## Kufizimet
+
+- Webbox kërkon lidhje rrjeti për të ngarkuar URL-n e ngulur.
+- Disa faqe të jashtme bllokojnë ngulitjen në iframe nëpërmjet header-ëve `X-Frame-Options` ose `Content-Security-Policy` — këto faqe nuk mund të përdoren me webbox.
+- Modal-i mbyllet kur numëruesi largohet nga pyetja — çdo gjendje e pa ruajtur në iframe humbet.
+- Webbox është zgjerim i formularit web rtSurvey dhe mund të mos funksionojë në klientë të tjerë të përputhshëm me ODK.

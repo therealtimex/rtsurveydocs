@@ -1,0 +1,58 @@
+---
+weight: 1
+title: "Quick Start"
+date: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-03-12T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+icon: "play_circle"
+toc: true
+description: "Deploy rtCloud on your own server in minutes using an automated cloud script."
+---
+
+This guide gets rtCloud running on your own server. The automated scripts handle everything — Docker, SSL, database, firewall — in a single run.
+
+## Requirements
+
+### Server
+
+| Resource | Minimum | Recommended |
+|----------|---------|-------------|
+| RAM | 2 GB | 4 GB (required if using Keycloak SSO) |
+| Disk | 25 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Domain
+
+You need a domain name with an **A record pointing to your server's IP** before running the script. Let's Encrypt requires DNS to resolve for SSL certificate issuance.
+
+---
+
+## Choose Your Cloud Provider
+
+Pick your provider below. Each has an automated script that runs on first boot and completes setup in **5–10 minutes**.
+
+| Provider | Guide |
+|----------|-------|
+| Linode (Akamai) | [Deploy on Linode](../cloud-deployment/linode) — easiest, form-based setup via StackScript |
+| DigitalOcean | [Deploy on DigitalOcean](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Deploy on AWS](../cloud-deployment/aws) |
+| Google Cloud | [Deploy on GCP](../cloud-deployment/gcp) |
+
+> **Recommended for most users:** Start with Linode — the StackScript gives you a form-based UI so there's nothing to edit manually.
+
+---
+
+## What the scripts do
+
+Every cloud script performs a fully unattended setup:
+
+- Installs Docker and Docker Compose
+- Writes `.env` and `docker-compose.production.yml`
+- Configures Nginx as a reverse proxy
+- Obtains a free TLS certificate from Let's Encrypt
+- Configures the UFW firewall
+- Optionally deploys embedded Keycloak SSO
+- Outputs a deployment summary with all credentials
+

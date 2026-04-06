@@ -1,0 +1,190 @@
+---
+title: "Meta"
+description: "Metaの質問タイプは回答者からの入力なしにデバイス、調査員、タイミングの情報を自動的に取得します。"
+icon: "info"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 237
+---
+
+Metaの質問タイプは**自動的に**記入される特別なフィールドです — 回答者には表示されません。送信に関するコンテキスト（いつ収集されたか、どのデバイスが使用されたか、誰が収集したか）を取得します。他の質問タイプと同様に`survey`ワークシートに追加しますが、画面には表示されません。
+
+## 基本XLSForm仕様
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| deviceid | deviceid | |
+
+ラベルはmetaフィールドには任意です（表示されないため）。
+
+---
+
+## タイミングmetaフィールド
+
+### `start`
+
+**フォームが開かれた日時**を記録します。ISO 8601形式（`YYYY-MM-DDTHH:MM:SS.sss+HH:MM`）で保存されます。
+
+```
+type    | name  | label
+start   | start |
+```
+
+### `end`
+
+**フォームが送信された日時**を記録します。`start`と組み合わせて、フォームの記入に費やした時間を計算できます：
+
+```
+type      | name          | calculation
+calculate | duration_min  | (decimal-date-time(${end}) - decimal-date-time(${start})) * 1440
+```
+
+### `today`
+
+**現在の日付**（時刻コンポーネントなし）を記録します。`YYYY-MM-DD`として保存されます。完全なタイムスタンプなしで日付だけが必要な場合に便利です。
+
+```
+type  | name  | label
+today | today |
+```
+
+---
+
+## デバイスmetaフィールド
+
+### `deviceid`
+
+データ収集に使用された**デバイスの一意の識別子**を記録します。AndroidではIMEIまたはAndroid IDが一般的です。各フォームを送信したデバイスを追跡し、同じデバイスからの重複送信を検出するのに便利です。
+
+```
+type      | name     | label
+deviceid  | deviceid |
+```
+
+### `devicephonenum`
+
+デバイスのSIMカードの**電話番号**を記録します（利用可能な場合）。デバイスにSIMがないか、番号がSIMに保存されていない場合は空になる場合があります。
+
+```
+type           | name          | label
+devicephonenum | devicephonenum |
+```
+
+### `simserial`
+
+**SIMカードのシリアル番号**（ICCID）を記録します。使用されたSIM/キャリアを識別するのに便利です。
+
+```
+type      | name      | label
+simserial | simserial |
+```
+
+### `subscriberid`
+
+**IMSI（国際移動体加入者識別子）**を記録します — SIMカード上の一意の加入者識別子です。
+
+```
+type         | name        | label
+subscriberid | subscriberid |
+```
+
+---
+
+## 調査員metaフィールド
+
+### `username`
+
+ログインした**調査員のユーザー名**（rtSurveyアプリで使用されたアカウント）を記録します。各送信を収集した人を追跡する最も信頼性の高い方法です。
+
+```
+type     | name     | label
+username | username |
+```
+
+### `email`
+
+ログインした**調査員のメールアドレス**を記録します。
+
+```
+type  | name  | label
+email | email |
+```
+
+### `phonenumber`
+
+**調査員のアカウントに関連付けられた電話番号**（設定されている場合）を記録します。
+
+```
+type        | name       | label
+phonenumber | phonenumber |
+```
+
+---
+
+## 監査ログ
+
+### `audit`
+
+`audit`metaフィールドは**詳細な監査ログ**を有効にします — 調査員が訪問したすべての質問、各質問での所要時間、（オプションで）各ステップでのGPS位置のタイムスタンプ付きログを記録します。監査ログは各送信と一緒に別の`audit.csv`ファイルとして保存されます。
+
+```
+type  | name  | parameters
+audit | audit | location-priority=balanced location-min-interval=30 location-max-age=60
+```
+
+#### 監査パラメーター
+
+| パラメーター | 説明 |
+|-----------|-------------|
+| `location-priority` | GPS精度レベル：`no-gps`、`low-power`、`balanced`、`high-accuracy` |
+| `location-min-interval` | 位置取得の最小間隔（秒） |
+| `location-max-age` | 受け入れるキャッシュされた位置の最大経過時間（秒） |
+
+監査ログが取得するもの：
+- 質問名とイベントタイプ（`question`、`form.start`、`form.exit`、`form.save`、`form.finalize`）
+- 各イベントの開始と終了のタイムスタンプ
+- GPS座標（`location-priority`が設定されている場合）
+
+{{% alert icon=" " context="warning" %}}
+`audit`フィールドは送信ごとに別のファイルを生成します。データパイプラインがメインフォームデータと監査CSVの両方を処理することを確認してください。
+{{% /alert %}}
+
+---
+
+## 完全な例
+
+典型的な世帯調査には、すべてのタイミングと調査員metaフィールドが含まれる場合があります：
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| today | today | |
+| deviceid | deviceid | |
+| username | username | |
+| email | email | |
+| audit | audit | |
+| text | household_id | 世帯ID |
+| ... | ... | ... |
+
+---
+
+## ベストプラクティス
+
+1. 常に`start`と`end`を含めてください — 無料で自動的であり、品質モニタリングに非常に価値があります。
+2. 調査員を追跡するために常に`username`を含めてください。
+3. 重複送信を検出またはフィールドデバイスを追跡したい場合は`deviceid`を含めてください。
+4. 各質問を実際に訪問したことを確認する必要がある高度な責任調査では`audit`を使用してください。
+5. SIM関連フィールド（`simserial`、`subscriberid`、`devicephonenum`）はアクティブなSIMカードを持つAndroidデバイスでのみ信頼性があります — タブレットのみのデプロイでは省略してください。
+
+---
+
+## 制限事項
+
+- すべてのmetaフィールドは**読み取り専用**です — 他の計算によって参照または変更することはできません。
+- `username`と`email`は調査員がログインしていることを必要とします；匿名送信では空になります。
+- SIM/電話metaフィールドは、Wi-Fiのみのタブレットと一部のAndroidバージョンでは権限の制限によって空の値を返す場合があります。

@@ -1,0 +1,47 @@
+---
+title: "Zarządzanie użytkownikami"
+description: "Tworzenie, organizowanie i zarządzanie użytkownikami systemu i personelem terenowym."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 314
+---
+
+Moduł **Zarządzania użytkownikami** (często oznaczany jako **Zarządzaj personelem** w menu Konfiguracja) to scentralizowany katalog do obsługi wszystkich kont w środowisku CPMS. Zapewnia administratorom projektów narzędzia potrzebne do wprowadzania personelu, przypisywania ról i dyktowania poziomów dostępu geograficznego.
+
+![Interfejs zarządzania użytkownikami](/images/manage_users.png)
+
+## Przegląd siatki użytkowników
+
+Główny interfejs posiada kompleksową siatkę wyświetlającą wszystkich zarejestrowanych pracowników. Ten widok pozwala administratorom szybko wyszukiwać, filtrować i przeglądać statusy kont.
+
+### Kluczowe kolumny danych
+
+Siatka zawiera następujące podstawowe szczegóły dla każdego użytkownika:
+
+- **Nazwa użytkownika i pełne imię:** Podstawowe identyfikatory pracownika.
+- **Email:** Adres email kontaktowy powiązany z kontem.
+- **Rola użytkownika:** Wskazuje uprawnienia systemowe przyznane użytkownikowi (np. Administrator, Pracownik, Monitor, Gość).
+- **Grupa:** Wyświetla konkretną grupę lub zespół, do którego należy pracownik.
+- **Status:** Wskazuje, czy konto jest aktualnie **Aktywne** czy **Nieaktywne**.
+- **Data utworzenia:** Znacznik czasu rejestracji konta.
+
+## Akcje zarządzania personelem
+
+Administratorzy mają dostęp do zestawu narzędzi do wprowadzania i utrzymywania kont użytkowników, dostępnych z górnego panelu sterowania:
+
+- **Dodaj pracownika:** Otwiera szczegółowy formularz tworzenia do ręcznego wprowadzania profilu nowego użytkownika, w tym jego roli, przypisanych regionów i danych kontaktowych.
+- **Importuj pracowników:** Umożliwia masowe tworzenie kont przez przesłanie arkusza kalkulacyjnego Excel. Jest to szczególnie przydatne do szybkiego tworzenia dużych zespołów terenowych.
+- **Pobierz szablon importu:** Udostępnia standardowy szablon `.xlsx` wymagany do procesu importu masowego.
+- **Eksportuj do Excel:** Generuje pobieralny raport zawierający bieżącą przefiltrowaną listę użytkowników z siatki i ich szczegółami.
+- **Usuń:** Trwale usuwa wybrane konta użytkowników z systemu.
+
+## Profile użytkowników i przypisania
+
+Podczas tworzenia lub edytowania konkretnego użytkownika (przez przycisk **Dodaj pracownika** lub klikając na nazwę użytkownika), administratorzy mogą konfigurować szczegółowe profile:
+
+- **Dane osobowe:** Pola dotyczące daty urodzenia, płci, numeru identyfikacyjnego i awatara.
+- **Dane kontaktowe:** Numer telefonu komórkowego i szczegółowe informacje o lokalizacji (województwo, powiat, gmina, adres).
+- **Przypisania systemowe:** Kluczowe dla bezpieczeństwa danych — administratorzy mogą łączyć użytkowników z konkretnymi **Regionami** i przypisywać precyzyjne **Role użytkowników**.
+- **Konfiguracja nadzoru:** W zaawansowanych konfiguracjach użytkownicy mogą mieć przypisane konkretne kody nadzoru lub być powiązani z konkretnymi tabletami (urządzeniami).

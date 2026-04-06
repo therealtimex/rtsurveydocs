@@ -1,0 +1,38 @@
+[lang_select_title]
+    other = "Velg språk"
+
+[search_title]
+    other = "Søk"
+
+[search_navigate]
+    other = "for å navigere"
+
+[search_select]
+    other = "for å velge"
+
+[search_close]
+    other = "for å lukke"
+
+[search_cancel]
+    other = "avbryt"
+
+[search_no_results]
+    other = "Ingen resultater for"
+
+[feedback_yes]
+    other = "Ja"
+
+[feedback_no]
+    other = "Nei"
+
+[feedback_helpful]
+    other = "Var denne siden nyttig?"
+
+[feedback_submit]
+    other = "Send inn"
+
+[enable_light_mode]
+    other = "Aktiver lys modus"
+
+[enable_dark_mode]
+    other = "Aktiver mørk modus"

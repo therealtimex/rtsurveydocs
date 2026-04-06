@@ -1,0 +1,147 @@
+---
+title: "Media"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 286
+---
+
+rtSurvey podporuje bohatú integráciu médií v prieskumoch, čo vám umožňuje vylepšiť vaše dotazníky obrázkami, zvukom a videom. Táto funkcia môže výrazne zlepšiť skúsenosť respondentov a kvalitu zozbieraných dát.
+
+## Podporované typy médií
+
+rtSurvey podporuje nasledujúce typy médií:
+- Obrázky (jpg, png, gif)
+- Zvuk (mp3, wav)
+- Video (mp4, webm)
+
+## Pridávanie médií do prieskumu
+
+Na zahrnutie médií do formulára rtSurvey použite nasledujúce stĺpce vo vašom XLSForm:
+
+- `image`: Na zobrazenie obrázkov
+- `audio`: Na prehrávanie zvukových súborov
+- `video`: Na prehrávanie video súborov
+
+Príklad:
+
+```
+| type | name          | label         | image        | audio       | video       |
+|------|---------------|---------------|--------------|-------------|-------------|
+| note | media_example | Príklad médií | example.jpg  | sound.mp3   | clip.mp4    |
+```
+
+## Správa mediálnych súborov
+
+### Webové prieskumy
+Pre webové prieskumy rtSurvey poskytuje rozhranie na správu médií, kde môžete nahrávať a organizovať mediálne súbory. Tieto súbory sú potom automaticky dostupné na použitie vo vašich prieskumoch.
+
+### Mobilná aplikácia
+Pri používaní mobilnej aplikácie rtSurvey:
+1. Umiestnite vaše mediálne súbory do priečinka `/rtSurvey/forms/[form-name]-media/` na vašom zariadení.
+2. Odkazujte presný názov súboru vo vašom XLSForm.
+
+## Funkcie špecifické pre rtSurvey
+
+### Dynamické načítavanie médií
+rtSurvey podporuje dynamické načítavanie médií na základe odpovedí prieskumu:
+
+```
+| type         | name      | label              | image                    |
+|--------------|-----------|--------------------|--------------------------| 
+| select_one species | animal | Vyberte zviera | ${animal}.jpg            |
+```
+
+### Médiá v možnostiach výberu
+rtSurvey umožňuje používať médiá v možnostiach výberu pre otázky s výberom:
+
+```
+| type                | name    | label           | media::image |
+|---------------------|---------|-----------------|--------------|
+| select_one_from_file animals | Vyberte zviera |              |
+```
+
+V hárku choices:
+```
+| list_name | name  | label | media::image |
+|-----------|-------|-------|--------------|
+| animals   | dog   | Pes   | dog.jpg      |
+| animals   | cat   | Mačka   | cat.jpg      |
+```
+
+### Zachytávanie médií
+rtSurvey rozširuje XLSForm o možnosti zachytávania médií:
+
+```
+| type  | name        | label               |
+|-------|-------------|---------------------|
+| image | photo       | Odfotografujte        |
+| audio | voice_note  | Nahrajte hlasovú poznámku |
+| video | video_clip  | Nahrajte video      |
+```
+
+## Najlepšie postupy pre používanie médií
+
+1. **Optimalizujte veľkosti súborov**: Veľké mediálne súbory môžu spomaliť načítavanie a odosielanie prieskumu.
+2. **Používajte vhodné formáty**: Držte sa široko podporovaných formátov (jpg pre obrázky, mp3 pre zvuk, mp4 pre video).
+3. **Poskytujte alternatívy**: Vždy zahrňte textové alternatívy pre prístupnosť.
+4. **Dôkladne testujte**: Uistite sa, že médiá sa správne zobrazujú na všetkých cieľových zariadeniach.
+5. **Zvážte offline použitie**: Pre prieskumy, ktoré sa môžu vykonávať offline, uistite sa, že všetky médiá sú dostupné lokálne.
+
+## Podpora médií pre viacero jazykov
+
+rtSurvey podporuje jazykovo špecifické médiá. Použite suffix `::language`:
+
+```
+| type | name  | label    | image::English | image::Slovak |
+|------|-------|----------|----------------|----------------|
+| note | intro | Vitajte  | welcome_en.jpg | welcome_sk.jpg |
+```
+
+## Médiá pri exporte dát
+
+Pri exporte dát z rtSurvey:
+- Pre webové prieskumy sú URL médií zahrnuté v exporte.
+- Pre prieskumy mobilnej aplikácie sú zahrnuté cesty k súborom.
+
+## Úvahy pre mobilnú aplikáciu
+
+- Uistite sa, že zariadenia majú dostatočné úložné miesto pre prieskumy s množstvom médií.
+- Mobilná aplikácia rtSurvey podporuje prehrávanie médií a zachytávanie offline.
+- Veľké mediálne súbory môžu ovplyvniť výkon aplikácie na zariadeniach nižšej triedy.
+
+## Známe obmedzenia
+
+- Niektoré staršie prehliadače nemusia podporovať všetky mediálne formáty.
+- Veľmi veľké video súbory môžu spôsobovať problémy v situáciách s nízkou šírkou pásma.
+
+## Riešenie problémov s médiami
+
+1. **Médiá sa nezobrazujú**: Skontrolujte cesty k súborom a názvy pre presnosť.
+2. **Problémy s prehrávaním**: Uistite sa, že mediálny formát je podporovaný cieľovými zariadeniami.
+3. **Pomalé načítavanie**: Zvážte optimalizáciu veľkostí súborov alebo prednačítanie médií.
+
+## Pokročilé mediálne funkcie
+
+### Geotagovanie
+rtSurvey môže automaticky geotagovať médiá zachytené počas prieskumov:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Odfotografujte | geotag     |
+```
+
+### Anotácie médií
+Umožnite respondentom anotovať obrázky:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Anotujte obrázok | annotate |
+```
+
+Efektívnym používaním médií vo vašich formulároch rtSurvey môžete vytvárať pútavejšie, informatívnejšie a presnejšie prieskumy. Nezabudnite vyvážiť výhody zahrnutia médií s výkonovými úvahami, najmä pre prieskumy nasadené v oblastiach s obmedzenou konektivitou alebo na zariadeniach nižšej triedy.

@@ -1,0 +1,128 @@
+---
+weight: 4
+title: "Thiết lập SSL"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+icon: "lock"
+toc: true
+description: "Định cấu hình HTTPS cho máy chủ rtSurvey của bạn. Cần thiết trước khi bạn có thể đăng nhập."
+---
+
+SSL phải được cấu hình trước khi bạn có thể đăng nhập. Khi mở ứng dụng lần đầu tiên, bạn sẽ tự động được chuyển hướng đến màn hình thiết lập SSL.
+
+---
+
+## Tùy chọn thiết lập SSL
+
+![Tùy chọn thiết lập SSL](/img/ssl-setup/ssl-setup-options.png)
+
+Chọn một trong ba tùy chọn:
+
+| Lựa chọn | Khi nào nên sử dụng |
+|--------|-------------|
+| **Tên miền phụ rtsurvey.com miễn phí** *(Khuyến khích)* | Không cần thiết lập DNS. Chúng tôi tạo hồ sơ cho bạn. Sẵn sàng trong 2–5 phút. |
+| **Tên miền của riêng tôi** | Bạn đã có một miền và DNS của nó trỏ đến máy chủ này. |
+| **Cài đặt chứng chỉ theo cách thủ công** | CA doanh nghiệp hoặc tùy chỉnh. Yêu cầu quyền truy cập SSH. |
+
+---
+
+## Tùy chọn 1 — Tên miền phụ rtsurvey.com miễn phí (Được khuyến nghị)
+
+This is the fastest option. Không cần đăng ký tên miền hoặc thay đổi DNS.
+
+1. Nhấp vào Tên miền phụ rtsurvey.com miễn phí để mở rộng phần này
+2. Nhập tên miền phụ bạn muốn vào trường nhập
+
+   > Sử dụng chữ thường, số và dấu gạch nối. 3–30 characters.
+   > Ví dụ: `myproject` → `myproject.rtsurvey.com`
+
+3. Nhấp vào Tạo **https://[subdomain].rtsurvey.com**
+
+<!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
+
+4. Đợi 2–5 phút trong khi chứng chỉ được cấp
+
+<!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
+
+5. Khi chứng chỉ đã sẵn sàng, bạn sẽ tự động được chuyển hướng đến URL HTTPS mới của mình
+
+<!-- SCREENSHOT NEEDED: success state / redirect to login -->
+
+---
+
+## Tùy chọn 2 - Tên miền của riêng tôi
+
+Hãy sử dụng tùy chọn này nếu bạn có một miền hiện có và bản ghi DNS A của nó đã trỏ đến IP của máy chủ này.
+
+1. Nhấp vào Miền của riêng tôi để mở rộng phần này
+2. Nhập tên miền đầy đủ của bạn (e.g. `survey.myorganization.org`)
+3. Nhấp vào Tạo chứng chỉ
+
+<!-- SCREENSHOT NEEDED: own domain input form -->
+
+Let's Encrypt sẽ xác minh miền của bạn và cấp chứng chỉ. Điều này yêu cầu DNS phải được trỏ chính xác trước tiên — nếu không thì yêu cầu sẽ không thành công.
+
+---
+
+## Tùy chọn 3 - Cài đặt chứng chỉ theo cách thủ công
+
+Dành cho môi trường doanh nghiệp sử dụng CA tùy chỉnh hoặc CA nội bộ. Bạn sẽ đặt các tệp chứng chỉ của mình trên máy chủ thông qua SSH, sau đó nhập tên miền của bạn vào ứng dụng.
+
+### Điều kiện tiên quyết
+
+- Truy cập SSH vào máy chủ
+- Chứng chỉ hợp lệ và khóa riêng cho miền của bạn (định dạng PEM)
+
+### Bước 1 - SSH vào máy chủ
+
+```bash
+ssh root@<server-ip>
+```
+
+### Bước 2 - Đặt tệp chứng chỉ của bạn
+
+Tạo thư mục và sao chép các tập tin của bạn:
+
+```bash
+mkdir -p /etc/letsencrypt/live/<your-domain>
+```
+
+Sao chép các tập tin của bạn vào thư mục đó với các tên chính xác sau:
+
+| Tài liệu | Sự miêu tả |
+|------|-------------|
+| `fullchain.pem` | Chứng chỉ của bạn + mọi chứng chỉ CA trung gian (được nối) |
+| `privkey.pem` | Khóa riêng của bạn |
+
+Ví dụ:
+
+```bash
+# Sao chép từ máy cục bộ của bạn (chạy cục bộ, không phải trên máy chủ)
+scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
+scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
+```
+
+Đặt quyền chính xác:
+
+```bash
+chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
+chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
+```
+
+### Bước 3 — Nhập tên miền của bạn vào ứng dụng
+
+<!-- SCREENSHOT NEEDED: manual certificate form -->
+
+1. Trong màn hình thiết lập SSL, nhấp vào Cài đặt chứng chỉ theo cách thủ công
+2. Nhập tên miền của bạn (phải khớp với Common Name hoặc SAN của chứng chỉ)
+3. Nhấp vào Áp dụng
+
+Máy chủ sẽ định cấu hình Nginx với chứng chỉ của bạn và tự động tải lại.
+
+---
+
+## Bước tiếp theo
+
+Khi SSL được kích hoạt, hãy tiến hành Đăng nhập lần đầu [first-login](first-login).

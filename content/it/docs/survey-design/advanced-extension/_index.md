@@ -1,0 +1,89 @@
+---
+title: "Estensioni avanzate"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 289
+---
+
+La colonna `appearance` in rtSurvey consente di personalizzare la presentazione visiva e il comportamento delle domande nei tuoi sondaggi. Questa funzionalità migliora l'esperienza utente e può migliorare significativamente l'efficienza della raccolta dati. rtSurvey supporta gli attributi di appearance XLSForm standard ed li estende con opzioni aggiuntive.
+
+## Estensioni appearance specifiche di rtSurvey
+
+rtSurvey estende le opzioni di appearance standard con le seguenti:
+
+### Personalizzazione dell'input orario
+
+Per le domande di tipo `text` usate per l'input orario:
+
+- `appearance:` - Mostra un orologio per selezionare ore e minuti
+- `appearance: inline` - Mostra l'orologio come icona
+- `appearance: inline-1line` - Mostra l'orologio in formato riga singola
+- `appearance: inline-onlyresult` - Mostra l'icona dell'orologio, scompare dopo la selezione
+- `appearance: inline-[FORMAT]` - Personalizza il formato di visualizzazione dell'orario (es. `[%H:%M]`, `[%h:%M:%S]`)
+
+### Personalizzazione del colore
+
+rtSurvey consente la personalizzazione del colore per varie appearance:
+
+- `appearance: inline colors("0099FF")` - Personalizza il colore dell'icona
+- `appearance: inline-1line colors("0000FF","FFFF00")` - Personalizza i colori in formato riga singola
+
+### Layout a griglia
+
+rtSurvey introduce un layout a griglia per visualizzazioni compatte simili a tabelle:
+
+- `appearance: grid` - Si applica ai gruppi per creare un layout a griglia
+
+### Gruppi comprimibili
+
+- `appearance: collapsible` - Crea gruppi espandibili/comprimibili
+
+## Best practice per l'uso di Appearance
+
+1. **Coerenza**: Usa gli attributi di appearance in modo coerente nel tuo sondaggio per un aspetto uniforme.
+2. **Mobile vs. Web**: Considera come le appearance vengono renderizzate su diversi dispositivi e piattaforme.
+3. **Prestazioni**: Sii cauto con gli attributi di appearance che potrebbero rallentare il caricamento del modulo (es. `table-list` per gruppi di grandi dimensioni).
+4. **Esperienza utente**: Scegli appearance che rendono l'inserimento dati più facile e intuitivo per i rispondenti.
+5. **Test**: Testa sempre il tuo modulo sui dispositivi di destinazione per assicurarti che le appearance funzionino come previsto.
+
+## Tecniche avanzate
+
+### Combinare le appearance
+
+Alcuni attributi di appearance possono essere combinati per layout più complessi:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Seleziona uno: | minimal compact |
+```
+
+### Appearance dinamiche
+
+rtSurvey consente modifiche dinamiche dell'appearance basate sulla logica del modulo:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Inserisci l'orario: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Considerazioni sull'app mobile
+
+- Alcune appearance (es. `quick`, `signature`) sono specifiche per i dispositivi mobili.
+- Testa approfonditamente sia su Android che su iOS per garantire un comportamento coerente.
+
+## Limitazioni note
+
+- Le appearance complesse potrebbero non essere renderizzate in modo identico su tutte le piattaforme.
+- Alcune appearance avanzate di rtSurvey potrebbero non essere supportate in modalità offline.
+
+## Risoluzione dei problemi di appearance
+
+1. **Appearance non applicata**: Controlla la presenza di errori di battitura nella colonna appearance.
+2. **Rendering inconsistente**: Verifica la compatibilità con il tipo di domanda e la piattaforma.
+3. **Problemi di prestazioni**: Considera la semplificazione delle appearance complesse, specialmente per sondaggi di grandi dimensioni.

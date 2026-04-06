@@ -1,0 +1,36 @@
+---
+title: "Gestión de formularios"
+description: "Suba, configure y gestione formularios de recopilación de datos en RT-CPMS."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 315
+---
+
+El módulo **Gestión de formularios** sirve como la puerta de entrada principal para organizar sus instrumentos de encuesta y coordinar las tareas de trabajo de campo. Proporciona un control preciso sobre la accesibilidad de los formularios, la visualización de datos y la segmentación de dispositivos.
+
+![Interfaz de gestión de formularios](/images/manage_forms.png)
+
+## Descripción general de la familia de formularios
+
+En el menú **Entrada de formularios y datos**, la sección **Familia de formularios** muestra una cuadrícula completa de todos los formularios importados junto con controles esenciales de acceso rápido. Esta vista centralizada permite a los gestores de proyectos implementar y configurar rápidamente encuestas individuales.
+
+### Columnas de datos clave y opciones de configuración
+
+- **Vista de datos:** Acceda directamente a los registros enviados y vistas previas de conjuntos de datos para cada formulario.
+- **Permitir edición:** Un interruptor rápido para bloquear o desbloquear la capacidad de los trabajadores de campo para editar sus datos enviados (estados Activo/Inactivo).
+- **Visibilidad pública:** Un interruptor para hacer que un formulario esté disponible públicamente sin requerir autenticación del encuestador.
+- **URL del formulario web:** Recupere instantáneamente el enlace público único para compartir formularios de recopilación de datos basados en navegador.
+- **Configuración de anulación:** Un modal de configuraciones avanzadas (al que se accede a través del icono de engranaje) para personalizar reglas y valores específicos del formulario y deshabilitar características específicas.
+- **Identificadores del formulario:** Vea metadatos estándar, incluido el nombre de la familia de formularios, el código de familia y un ID de formulario único.
+- **Configuración geográfica:** Configuraciones de mapeo o geopunto específicas vinculadas a la estructura del formulario.
+- **Bloquear formulario:** Función para bloquear el acceso a los envíos para finalizar la fase de recopilación de datos.
+
+## Acciones y navegación de formularios
+
+El panel de control superior facilita las operaciones por lotes y vistas alternativas de formularios:
+
+- **Acción al dispositivo:** Una poderosa herramienta desplegable que permite a los gestores de proyectos asignar tareas, enviar formularios dirigidos o enviar acciones directamente a los dispositivos de campo de encuestadores específicos.
+- **Pestaña de formulario XLSX:** Navegue rápidamente desde la cuadrícula de gestión principal a los entornos de carga para manejar nuevos archivos XLSForm nativos.
+- **Pestaña del constructor de formularios:** Acceda a la herramienta integrada para construir o modificar formularios visualmente de forma dinámica sin usar software de hojas de cálculo externo.

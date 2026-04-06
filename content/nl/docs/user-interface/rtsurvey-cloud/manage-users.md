@@ -1,0 +1,47 @@
+---
+title: "Gebruikers beheren"
+description: "Systeemgebruikers en veldpersoneel aanmaken, organiseren en beheren."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 314
+---
+
+De module **Gebruikers beheren** (vaak gelabeld als **Personeel beheren** in het menu Instellen) is de gecentraliseerde directory voor het beheren van alle accounts binnen uw CPMS-omgeving. Het biedt projectbeheerders de hulpmiddelen die nodig zijn om personeel aan boord te nemen, rollen toe te wijzen en geografische toegangsniveaus te dicteren.
+
+![Gebruikersbeheerinterface](/images/manage_users.png)
+
+## Overzicht gebruikersraster
+
+De hoofdinterface bevat een uitgebreid raster met alle geregistreerde personeelsleden. In deze weergave kunnen beheerders snel accountstatussen zoeken, filteren en bekijken.
+
+### Belangrijkste gegevenskolommen
+
+Het raster bevat de volgende essentiële details voor elke gebruiker:
+
+- **Gebruikersnaam & Volledige naam:** Primaire identificatoren voor het personeelslid.
+- **E-mail:** Contacte-mailadres gekoppeld aan het account.
+- **Gebruikersrol:** Geeft de systeemmachtigingen aan die aan de gebruiker zijn verleend (bijv. Beheerder, Personeel, Monitor, Gast).
+- **Groep:** Toont de specifieke gebruikersgroep of het team waartoe het personeelslid behoort.
+- **Status:** Geeft aan of het account momenteel **Actief** of **Inactief** is.
+- **Aanmaakoverdatum:** De tijdstempel wanneer het account is geregistreerd.
+
+## Personeelsbeheeracties
+
+Beheerders hebben toegang tot een reeks hulpmiddelen voor het aan boord nemen en onderhouden van gebruikersaccounts, toegankelijk via het bovenste bedieningspaneel:
+
+- **Personeel toevoegen:** Opent een gedetailleerd aanmaakformulier om handmatig het profiel van een nieuwe gebruiker in te voeren, inclusief hun rol, toegewezen regio's en contactinformatie.
+- **Personeel importeren:** Maakt bulkaanmaak van accounts mogelijk door een Excel-spreadsheet te uploaden. Dit is bijzonder nuttig voor het snel opzetten van grote veldteams.
+- **Importsjabloon downloaden:** Biedt het gestandaardiseerde `.xlsx`-sjabloon dat vereist is voor het bulkimportproces.
+- **Exporteren naar Excel:** Genereert een downloadbaar rapport met de gefilterde lijst van gebruikers en hun details uit het huidige raster.
+- **Verwijderen:** Verwijdert geselecteerde gebruikersaccounts permanent uit het systeem.
+
+## Gebruikersprofielen en toewijzingen
+
+Bij het aanmaken of bewerken van een specifieke gebruiker (via de knop **Personeel toevoegen** of door op een Gebruikersnaam te klikken), kunnen beheerders gedetailleerde profielen configureren:
+
+- **Persoonlijke informatie:** Velden voor Geboortedatum, Geslacht, Identificatienummer en Avatar.
+- **Contactgegevens:** Mobiel telefoonnummer en gedetailleerde locatie-informatie (Provincie, District, Wijk, Adres).
+- **Systeemtoewijzingen:** Cruciaal voor gegevensbeveiliging kunnen beheerders gebruikers koppelen aan specifieke **Regio's** en precieze **Gebruikersrollen** toewijzen.
+- **Supervisorconfiguratie:** In geavanceerde instellingen kunnen gebruikers specifieke supervisiecodes krijgen of worden gekoppeld aan specifieke tablets (apparaten).

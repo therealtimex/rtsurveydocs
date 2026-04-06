@@ -1,0 +1,97 @@
+---
+title: "Trigger / Acknowledge"
+description: "Trigger-Fragen zeigen eine Aussage an, die der Interviewer ausdrücklich bestätigen muss, bevor er fortfährt."
+icon: "check-circle"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 240
+---
+
+Der Fragetyp `trigger` (auch `acknowledge` genannt) zeigt eine **Aussage mit einem Kontrollkästchen** an. Der Interviewer muss das Kontrollkästchen aktivieren, um zu bestätigen, dass er die Aussage gelesen und verstanden hat, bevor das Formular das Fortfahren erlaubt. Es wird kein Datenwert gespeichert — nur ob das Kontrollkästchen aktiviert wurde.
+
+## Grundlegende XLSForm-Spezifikation
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | Der Befragte hat seine mündliche informierte Zustimmung gegeben. |
+
+Oder mit dem Alias `acknowledge`:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | Der Befragte hat seine mündliche informierte Zustimmung gegeben. |
+
+Sowohl `trigger` als auch `acknowledge` sind gleichwertig — verwenden Sie, was Ihre Plattform dokumentiert.
+
+## Anwendungsbereiche
+
+Trigger/Acknowledge-Fragen werden häufig verwendet für:
+
+1. **Informierte Zustimmung** — bestätigen, dass der Interviewer die Zustimmung eingeholt hat, bevor sensible Daten erfasst werden
+2. **Weiche Warnungen** — auf einen ungewöhnlichen Wert hinweisen und eine ausdrückliche Bestätigung vor dem Fortfahren erfordern
+3. **Checklisten-Punkte** — eine körperliche Beobachtung bestätigen (z. B. "Ich habe die Wasserquelle direkt beobachtet")
+4. **Anweisungen** — den Interviewer dazu zwingen, eine Abschnittsanweisung zu bestätigen, bevor er fortfährt
+5. **Qualitätsprüfungen** — Ausreißerwerte markieren und verlangen, dass der Interviewer sie verifiziert
+
+## Beispielhafte Verwendung
+
+### Einwilligungsbestätigung
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | Der Befragte hat seine mündliche informierte Zustimmung zur Teilnahme an dieser Umfrage gegeben. | yes |
+
+### Weiche Warnung bei Ausreißerwerten
+
+Zusammen mit einem `relevant`-Ausdruck verwendet, sodass der Trigger nur bei Eingabe eines verdächtigen Werts angezeigt wird:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Anzahl der Kinder | | |
+| trigger | children_confirm | Sie haben ${children} Kinder eingegeben. Bitte verifizieren Sie dies mit dem Befragten und tippen Sie auf OK zur Bestätigung. | `${children} > 10` | `${children} > 10` |
+
+### Anweisungsbestätigung am Abschnittsbeginn
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Abschnitt B: Landwirtschaftliche Flächennutzung. Alle Fragen in diesem Abschnitt nur dem Haushaltsvorstand stellen. |
+
+## Trigger als Pflichtfeld
+
+Fügen Sie `required: yes` hinzu, um das Fortfahren zu verhindern, bis das Kontrollkästchen aktiviert ist:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | Alle Sicherheitsausrüstungen sind vorhanden und funktionsfähig. | yes | Sie müssen dies bestätigen, bevor Sie fortfahren. |
+
+## Bedingte Anzeige
+
+Trigger nur anzeigen, wenn eine Bedingung erfüllt ist:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | Hat der Haushalt einen Brunnen? | |
+| trigger | well_observation | Bestätigen Sie, dass Sie den Zustand des Brunnens direkt beobachtet haben. | `${has_well} = 'yes'` |
+
+## Unterschied zu `note`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| Zeigt Text an | Ja | Ja |
+| Erfordert Interaktion | Nein | Ja (muss aktiviert werden) |
+| Speichert Daten | Nein | Nein (nur OK/aktiviert) |
+| Kann Fortschritt blockieren | Nein | Ja (mit `required`) |
+
+## Empfohlene Vorgehensweisen
+
+1. Halten Sie Trigger-Beschriftungen prägnant und handlungsorientiert — der Interviewer sollte sie in Sekunden lesen und bestätigen können.
+2. Fügen Sie immer `required: yes` hinzu, wenn die Bestätigung obligatorisch ist.
+3. Verwenden Sie Trigger für Zustimmungs- und Sicherheitsprüfungen, bei denen Sie einen Prüfpfad benötigen, dass der Interviewer die Bestätigung gegeben hat.
+4. Kombinieren Sie mit `relevant` für bedingte weiche Warnungen, damit der Trigger nur erscheint, wenn ein Wert überprüft werden muss.
+
+## Einschränkungen
+
+- Trigger-Felder speichern keinen aussagekräftigen Datenwert — sie zeichnen nur auf, dass das Kontrollkästchen aktiviert wurde.
+- Das Trigger-Widget wird auf den meisten Clients als einfaches Kontrollkästchen/Schaltfläche dargestellt; es ist keine vollständige elektronische Signatur.

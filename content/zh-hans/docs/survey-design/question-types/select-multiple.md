@@ -1,0 +1,148 @@
+---
+title: "Select_multiple"
+description: "Select_multiple 题目让受访者从预定义列表中选择一个或多个选项。"
+icon: "check_box"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 225
+---
+
+`select_multiple` 题目类型显示一个列表，受访者可以选择**一个或多个选项**。默认情况下，选项以复选框形式渲染。存储的值是所有所选选项值的**空格分隔列表**。
+
+## 基本 XLSForm 规范
+
+**survey 工作表：**
+
+| type | name | label |
+|------|------|-------|
+| select_multiple crops | crops_grown | 家庭种植哪些农作物？ |
+
+**choices 工作表：**
+
+| list_name | name | label |
+|-----------|------|-------|
+| crops | maize | 玉米 |
+| crops | beans | 豆类 |
+| crops | rice | 水稻 |
+| crops | vegetables | 蔬菜 |
+| crops | other | 其他 |
+
+更多详情请参阅 [XLSForm 规范](https://xlsform.org/en/#question-types)。
+
+## 存储数据格式
+
+导出列包含所选值的空格分隔列表：
+
+```
+maize beans vegetables
+```
+
+在表达式中测试 select_multiple 值时，使用 `selected()` 函数——而不是 `=`（见下文）。
+
+## 用途
+
+Select_multiple 题目用于：
+
+1. 收集多个适用的答案（例如，收入来源、种植的农作物、症状）
+2. 复选框式同意项目（例如，"选择所有适用项"）
+3. 语言或技能清单
+4. 任何多个答案同时有效的题目
+
+## 外观选项
+
+{{< table >}}
+| 外观 | 描述 |
+|------------|-------------|
+| *（无）* | 默认复选框，每行一个 |
+| `minimal` | 下拉多选控件 |
+| `compact` | 紧凑网格，列数根据屏幕宽度调整 |
+| `compact-N` | 强制显示 N 列的紧凑网格 |
+| `horizontal` | 选项水平排列成一行（网页） |
+| `horizontal-compact` | 水平，紧凑间距（网页） |
+| `label` | 仅显示标签，无复选框（与 `list-nolabel` 配合使用） |
+| `list-nolabel` | 仅显示复选框，无标签（与 `label` 配合使用） |
+| `columns(N)` | 以 N 列显示（rtSurvey 扩展） |
+{{< /table >}}
+
+### 示例：3 列紧凑布局
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple symptoms | symptoms | 选择所有观察到的症状 | compact-3 |
+
+## 在表达式中使用 `selected()`
+
+由于存储的值是空格分隔的字符串，您**必须**使用 `selected()` 来测试是否选择了特定选项。使用 `=` 将无法正确工作。
+
+### 在 `relevant` 中
+
+仅在选择了"其他"时显示后续题目：
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_multiple crops | crops_grown | 种植了哪些农作物？ | |
+| text | crops_other | 请说明其他农作物 | `selected(${crops_grown}, 'other')` |
+
+### 在 `constraint` 中
+
+要求至少 2 个选项：
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple issues | issues | `count-selected(.) >= 2` | 至少选择 2 个问题 |
+
+限制最多 3 个：
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple priorities | priorities | `count-selected(.) <= 3` | 最多选择 3 个优先项 |
+
+### 在 `calculate` 中——连接所选标签
+
+结合 `selected-at()`、`count-selected()` 和 `choice-label()` 来构建可读的摘要：
+
+| type | name | calculation |
+|------|------|-------------|
+| calculate | crops_summary | join(', ', ${crops_grown}) |
+
+## "以上皆无" / 排他选项
+
+一种常见模式是使一个选项与其他所有选项互斥。使用 `constraint` 来强制执行：
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| select_multiple issues | issues | 选择所有存在的问题 | `not(selected(., 'none') and count-selected(.) > 1)` | "以上皆无"不能与其他选项同时选择 |
+
+**choices：**
+
+| list_name | name | label |
+|-----------|------|-------|
+| issues | water | 缺水 |
+| issues | roads | 道路差 |
+| issues | health | 缺乏医疗服务 |
+| issues | none | 以上皆无 |
+
+## 计数和汇总选择
+
+| 函数 | 示例 | 结果 |
+|----------|---------|--------|
+| `count-selected(field)` | `count-selected(${crops_grown})` | 所选选项数量 |
+| `selected(field, value)` | `selected(${crops_grown}, 'maize')` | true/false |
+| `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | 第一个所选值 |
+| `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | 值的标签 |
+
+## 最佳实践
+
+1. 在 `relevant`、`constraint` 和 `calculate` 中始终使用 `selected()`——永远不要用 `=` 或 `!=`。
+2. 如果题目设计需要，添加约束以限制最大选择数量。
+3. 当零选项是有效答案时，包含"无"或"不适用"选项。
+4. 对于长列表（15 个以上选项），使用 `minimal`（多选下拉框）以避免过度滚动。
+5. 导出数据并在分析工具中使用字符串分割——空格分隔的格式在透视之前需要分割。
+
+## 限制
+
+- Select_multiple 值不能直接与 `=` 比较。始终使用 `selected()`。
+- 紧凑外观可能不适合非常长的选项标签。
+- 使用 `choice_filter` 过滤选项时，过滤适用于所有显示的选项，与 `select_one` 相同。

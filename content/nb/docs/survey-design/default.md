@@ -1,0 +1,109 @@
+---
+title: "Standardverdier"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 287
+---
+
+Standardverdier i rtSurvey lar deg forhåndsfylle spørsmål med svar når en respondent først møter dem. Denne funksjonen kan øke effektiviteten og datakvaliteten ved spørreundersøkelser betydelig ved å gi innledende verdier som enten ofte velges eller fungerer som eksempler på forventet inndata.
+
+## Grunnleggende bruk
+
+For å angi en standardverdi, bruk `default`-kolonnen i XLSForm:
+
+```
+| type    | name        | label                         | default    |
+|---------|-------------|-------------------------------|------------|
+| date    | survey_date | Undersøkelsesdato             | 2024-07-04 |
+| decimal | weight      | Respondentens vekt? (i kg)    | 51.3       |
+```
+
+I dette eksemplet vil undersøkelsesdatoen være forhåndsutfylt med 4. juli 2024, og vektfeltet vil starte med 51,3 kg.
+
+## Dynamiske standardverdier
+
+rtSurvey støtter dynamiske standardverdier ved hjelp av funksjoner:
+
+```
+| type | name | label                              | default  |
+|------|------|------------------------------------| ---------|
+| date | d    | Skriv inn datoen hendelsen skjedde?| today()  |
+```
+
+Her setter `today()`-funksjonen automatisk standarden til gjeldende dato.
+
+## rtSurvey-spesifikke funksjoner
+
+### Kontekstbevisste standardverdier
+
+rtSurvey utvider standardfunksjonaliteten med kontekstbevisste standardverdier:
+
+```
+| type    | name     | label           | default            |
+|---------|----------|-----------------|---------------------|
+| text    | location | Nåværende sted  | ${current_location} |
+```
+
+### Kaskaderende standardverdier
+
+rtSurvey tillater standardverdier basert på tidligere svar:
+
+```
+| type    | name     | label           | default         |
+|---------|----------|-----------------|-----------------|
+| text    | city     | By              |                 |
+| text    | district | Distrikt        | ${city}-district|
+```
+
+Her forhåndsutfylles distriktfeltet basert på den angitte byen.
+
+### Standard i repeats
+
+For spørsmål inne i en repeat-gruppe beregnes standarden når gjentagelsen legges til:
+
+```
+| type         | name      | label        | default                |
+|--------------|-----------|--------------|------------------------|
+| begin repeat | visits    | Klinikbesøk  |                        |
+| date         | visit_date| Besøksdato   | ${previous_visit_date} |
+| end repeat   |           |              |                        |
+```
+
+## Beste praksis for bruk av standardverdier
+
+1. **Bruk sparsomt**: Bruk bare standardverdier der de vesentlig forbedrer effektiviteten eller datakvaliteten.
+2. **Sørg for nøyaktighet**: Gjennomgå og oppdater statiske standardverdier regelmessig.
+3. **Test grundig**: Spesielt når du bruker dynamiske eller beregnede standardverdier.
+4. **Vurder brukeropplevelsen**: Sørg for at standardverdier ikke villeder respondentene eller introduserer skjevhet.
+5. **Dokumenter tydelig**: Sørg for at alle teammedlemmer forstår begrunnelsen bak standardverdiene.
+
+## Avanserte standardteknikker
+
+### Randomiserte standardverdier
+
+rtSurvey støtter randomiserte standardverdier for visse spørsmålstyper:
+
+```
+| type              | name    | label        | default           |
+|-------------------|---------|--------------|-------------------|
+| select_one options| choice  | Velg én:     | random(options)   |
+```
+
+### Betingede standardverdier
+
+Bruk relevans for å angi betingede standardverdier:
+
+```
+| type    | name     | label    | default | relevant        |
+|---------|----------|----------|---------|-----------------|
+| text    | other    | Spesifiser | N/A   | ${q1} = 'other' |
+```
+
+## Kjente begrensninger
+
+- Komplekse beregnede standardverdier kan påvirke skjemalastetiden, spesielt på lavere-ends enheter.
+- Noen dynamiske standardverdier fungerer kanskje ikke som forventet i forhåndsvisningsmodus.

@@ -1,0 +1,148 @@
+---
+title: "Select_multiple"
+description: "Pytania select_multiple umożliwiają respondentom wybranie jednej lub więcej opcji z predefiniowanej listy."
+icon: "check_box"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 225
+---
+
+Typ pytania `select_multiple` wyświetla listę, z której respondent może wybrać **jedną lub więcej opcji**. Domyślnie opcje są wyświetlane jako pola wyboru. Przechowywana wartość to **lista wybranych wartości opcji oddzielona spacjami**.
+
+## Podstawowa specyfikacja XLSForm
+
+**Arkusz survey:**
+
+| type | name | label |
+|------|------|-------|
+| select_multiple crops | crops_grown | Jakie uprawy prowadzi gospodarstwo? |
+
+**Arkusz choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| crops | maize | Kukurydza |
+| crops | beans | Fasola |
+| crops | rice | Ryż |
+| crops | vegetables | Warzywa |
+| crops | other | Inne |
+
+Więcej szczegółów znajdziesz w [specyfikacji XLSForm](https://xlsform.org/en/#question-types).
+
+## Format przechowywanych danych
+
+Wyeksportowana kolumna zawiera listę wybranych wartości oddzielonych spacją:
+
+```
+maize beans vegetables
+```
+
+Przy testowaniu wartości select_multiple w wyrażeniach należy używać funkcji `selected()` — a nie `=` (patrz poniżej).
+
+## Zastosowania
+
+Pytania select_multiple są używane do:
+
+1. Zbierania wielu pasujących odpowiedzi (np. źródła dochodu, uprawy, objawy)
+2. Pytań wielokrotnego wyboru (np. „Zaznacz wszystkie, które dotyczą")
+3. Inwentaryzacji języków lub umiejętności
+4. Każdego pytania, gdzie jednocześnie poprawnych może być wiele odpowiedzi
+
+## Opcje wyglądu
+
+{{< table >}}
+| Wygląd | Opis |
+|--------|------|
+| *(brak)* | Domyślne pola wyboru, jedno w wierszu |
+| `minimal` | Widget wielokrotnego wyboru z listą rozwijaną |
+| `compact` | Zwarta siatka, kolumny dostosowują się do szerokości ekranu |
+| `compact-N` | Zwarta siatka z wymuszeniem N kolumn |
+| `horizontal` | Opcje ułożone poziomo w rzędzie (web) |
+| `horizontal-compact` | Poziome, zwarte odstępy (web) |
+| `label` | Pokazuje tylko etykiety, bez pól wyboru (użyj z `list-nolabel`) |
+| `list-nolabel` | Pokazuje tylko pola wyboru, bez etykiet (użyj z `label`) |
+| `columns(N)` | Wyświetlanie w N kolumnach (rozszerzenie rtSurvey) |
+{{< /table >}}
+
+### Przykład: Zwarte 3 kolumny
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple symptoms | symptoms | Zaznacz wszystkie zaobserwowane objawy | compact-3 |
+
+## Używanie `selected()` w wyrażeniach
+
+Ponieważ przechowywana wartość jest ciągiem oddzielonym spacją, **musisz** używać `selected()`, aby sprawdzić, czy konkretna opcja została wybrana. Użycie `=` nie zadziała poprawnie.
+
+### W `relevant`
+
+Pokaż pytanie uzupełniające tylko wtedy, gdy wybrano „inne":
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_multiple crops | crops_grown | Jakie uprawy są prowadzone? | |
+| text | crops_other | Proszę podać inne uprawy | `selected(${crops_grown}, 'other')` |
+
+### W `constraint`
+
+Wymagaj co najmniej 2 opcji:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple issues | issues | `count-selected(.) >= 2` | Wybierz co najmniej 2 problemy |
+
+Ogranicz do maksymalnie 3:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple priorities | priorities | `count-selected(.) <= 3` | Wybierz nie więcej niż 3 priorytety |
+
+### W `calculate` — łączenie wybranych etykiet
+
+Połącz `selected-at()`, `count-selected()` i `choice-label()`, aby zbudować czytelne podsumowanie:
+
+| type | name | calculation |
+|------|------|-------------|
+| calculate | crops_summary | join(', ', ${crops_grown}) |
+
+## Opcja „żadna z powyższych" / opcja wykluczająca
+
+Powszechnym wzorcem jest uczynienie jednej opcji wzajemnie wykluczającą z pozostałymi. Użyj `constraint`, aby to wymusić:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| select_multiple issues | issues | Zaznacz wszystkie obecne problemy | `not(selected(., 'none') and count-selected(.) > 1)` | „Żadne" nie może być wybrane razem z innymi opcjami |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| issues | water | Brak wody |
+| issues | roads | Złe drogi |
+| issues | health | Brak usług zdrowotnych |
+| issues | none | Żadne z powyższych |
+
+## Zliczanie i podsumowywanie wyborów
+
+| Funkcja | Przykład | Wynik |
+|---------|---------|-------|
+| `count-selected(field)` | `count-selected(${crops_grown})` | Liczba wybranych opcji |
+| `selected(field, value)` | `selected(${crops_grown}, 'maize')` | prawda/fałsz |
+| `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | Pierwsza wybrana wartość |
+| `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | Etykieta dla wartości |
+
+## Najlepsze praktyki
+
+1. Zawsze używaj `selected()` w `relevant`, `constraint` i `calculate` — nigdy `=` ani `!=`.
+2. Dodaj constraint ograniczający maksymalną liczbę wyborów, jeśli projekt pytania tego wymaga.
+3. Uwzględnij opcję „Żadne" lub „Nie dotyczy", gdy zero wyborów jest poprawną odpowiedzią.
+4. W przypadku długich list (15+ opcji) użyj `minimal` (wielokrotne wybieranie z listy), aby uniknąć nadmiernego przewijania.
+5. Eksportuj dane i używaj podziału ciągów w narzędziu analitycznym — format z separatorem spacji wymaga podziału przed przestawieniem.
+
+## Ograniczenia
+
+- Wartości select_multiple nie można bezpośrednio porównywać za pomocą `=`. Zawsze używaj `selected()`.
+- Wygląd compact może nie renderować się poprawnie dla bardzo długich etykiet opcji.
+- Przy filtrowaniu opcji za pomocą `choice_filter` filtrowanie dotyczy wszystkich wyświetlanych opcji, tak samo jak w `select_one`.

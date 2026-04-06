@@ -1,0 +1,47 @@
+---
+title: "Operátory a funkce"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 290
+---
+
+Výrazy v rtSurvey jsou psány v podmnožině **XPath 1.0**, rozšířené o funkce JavaRosa/ODK a vlastní funkce rtSurvey. Výrazy se používají ve sloupcích `calculate`, `constraint`, `relevant`, `required` a `default` ve vašem XLSForm.
+
+## Odkazování na hodnoty polí
+
+Použijte `${fieldname}` pro odkazování na hodnotu jiného pole:
+
+```
+${age} > 18
+```
+
+Použijte `.` (jednoduchá tečka) pro odkazování na **hodnotu aktuálního pole** — běžně se používá ve výrazech `constraint`:
+
+```
+. >= 0 and . <= 100
+```
+
+Použijte `..` pro odkazování na nadřazenou skupinu (pokročilé použití v opakováních).
+
+## Syntaxe výrazů
+
+Výrazy se řídí standardními pravidly XPath:
+
+- **Řetězce** musí být uzavřeny v jednoduchých uvozovkách: `'yes'`
+- **Čísla** jsou zapsána tak, jak jsou: `42`, `3.14`
+- **Logické** výsledky se používají pro `relevant`, `required` a `constraint` — jakákoliv neprázdná, nenulová hodnota je pravdivá
+- Bílé místo je ignorováno kolem operátorů
+
+{{% alert icon=" " context="warning" %}}
+Vždy používejte rovné uvozovky (`'` nebo `"`) — nikdy „typografické uvozovky" (lomené uvozovky). Editory formátovaného textu je automaticky převádějí a rozbijí výrazy.
+{{% /alert %}}
+
+## Sekce v této kapitole
+
+- **[Operátory](operators)** — operátory porovnání (`=`, `!=`, `>`, `<`, `>=`, `<=`) a logické operátory (`and`, `or`, `not()`)
+- **[Funkce](functions)** — řetězcové, výběrové, matematické, datové, geografické a opakující se funkce
+- **[Odkazování na hodnoty](references)** — jak používat `${fieldname}`, `.` a `..`

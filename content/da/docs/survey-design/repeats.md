@@ -1,0 +1,113 @@
+---
+title: "Gentagende spørgsmål"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 260
+---
+
+Gentagelser er en kraftfuld funktion i rtSurvey, der giver dig mulighed for at indsamle det samme sæt information flere gange inden for en enkelt undersøgelse. Dette er særligt nyttigt til scenarier som husholdningsundersøgelser, hvor du muligvis skal indsamle data om flere husholdningsmedlemmer.
+
+## Grundlæggende gentagelsesstruktur
+
+For at oprette en gentagelse i rtSurvey skal du bruge konstruktionen `begin repeat` og `end repeat`:
+
+```
+| type         | name         | label                |
+|--------------|--------------|----------------------|
+| begin repeat | child_repeat |                      |
+| text         | name         | Barnets navn         |
+| decimal      | birthweight  | Barnets fødselsvægt  |
+| select_one male_female | sex | Barnets køn         |
+| end repeat   |              |                      |
+```
+
+I dette eksempel kan brugeren indsamle oplysninger om flere børn ved at tilføje nye gentagelser i formularen.
+
+## Mærkning af gentagelser
+
+Selvom kolonnen `label` er valgfri for `begin repeat`, kan tilføjelse af et label forbedre navigationen:
+
+```
+| type         | name         | label                |
+|--------------|--------------|----------------------|
+| begin repeat | child_repeat | Barneinformation     |
+| text         | name         | Barnets navn         |
+| decimal      | birthweight  | Barnets fødselsvægt  |
+| select_one male_female | sex | Barnets køn         |
+| end repeat   |              |                      |
+```
+
+## Fast antal gentagelser
+
+For at angive et fast antal gentagelser skal du bruge kolonnen `repeat_count`:
+
+```
+| type         | name         | label                | repeat_count |
+|--------------|--------------|----------------------|--------------|
+| begin repeat | child_repeat | Barneinformation     | 3            |
+| text         | name         | Barnets navn         |              |
+| decimal      | birthweight  | Barnets fødselsvægt  |              |
+| end repeat   |              |                      |              |
+```
+
+## Dynamisk antal gentagelser
+
+rtSurvey understøtter dynamisk antal gentagelser baseret på tidligere svar:
+
+```
+| type     | name           | label                          | repeat_count       |
+|----------|----------------|--------------------------------|--------------------|
+| integer  | num_hh_members | Antal husholdningsmedlemmer?   |                    |
+| begin repeat | hh_member  | Husholdningsmedlem             | ${num_hh_members}  |
+| text     | name           | Navn                           |                    |
+| integer  | age            | Alder                          |                    |
+| end repeat |              |                                |                    |
+```
+
+## Betingede gentagelser
+
+Du kan bruge kolonnen `relevant` til betinget at vise gentagelser:
+
+```
+| type              | name        | label                     | relevant           |
+|-------------------|-------------|---------------------------|---------------------|
+| select_one yes_no | has_child   | Bor der børn her?         |                     |
+| begin repeat      | child_repeat| Barneinformation          | ${has_child} = 'yes'|
+| text              | name        | Barnets navn              |                     |
+| decimal           | birthweight | Barnets fødselsvægt       |                     |
+| end repeat        |             |                           |                     |
+```
+
+## rtSurvey-specifikke funktioner
+
+### Indlejrede gentagelser
+
+rtSurvey understøtter indlejrede gentagelser til komplekse datastrukturer:
+
+```
+| type         | name           | label                |
+|--------------|----------------|----------------------|
+| begin repeat | household      | Husholdning          |
+| text         | hh_name        | Husholdningsnavn     |
+| begin repeat | hh_member      | Husholdningsmedlem   |
+| text         | member_name    | Medlemsnavn          |
+| integer      | member_age     | Medlemsalder         |
+| end repeat   |                |                      |
+| end repeat   |                |                      |
+```
+
+## Bedste praksis for brug af gentagelser i rtSurvey
+
+1. Brug meningsfulde navne og labels til gentagelser for at forbedre dataanalysen.
+2. Overvej at bruge dynamisk antal gentagelser for at reducere dataindtastningsfejl.
+3. Test din formular grundigt, især ved brug af komplekse indlejrede gentagelser.
+4. Brug opsummeringsfunktionen til at hjælpe interviewere med at navigere i lange lister af gentagelser.
+5. Vær forsigtig med et stort antal gentagelser, da de kan påvirke formularens ydeevne.
+
+## Dataeksport-overvejelser
+
+Når du eksporterer data fra rtSurvey, fladgøres gentagelsesdata typisk. Hver gentagelsesinstans bliver en separat række i de eksporterede data, med den overordnede formulars data gentaget for hver instans.

@@ -1,0 +1,99 @@
+---
+title: "Video"
+description: "Câu hỏi video cho phép người trả lời quay và gửi tệp video như một phần của cuộc khảo sát."
+icon: "videocam"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 229
+---
+
+Loại câu hỏi `video` cho phép người trả lời **quay video** hoặc tải lên tệp video có sẵn như một phần câu trả lời khảo sát. Loại này hữu ích để ghi lại bằng chứng trực quan, minh họa, điều kiện môi trường, hoặc bất kỳ thông tin nào được truyền đạt tốt hơn qua hình ảnh kết hợp âm thanh.
+
+## Cấu hình XLSForm cơ bản
+
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Vui lòng quay một đoạn minh họa ngắn |
+
+Để biết thêm chi tiết về loại câu hỏi video tiêu chuẩn, xem [thông số kỹ thuật XLSForm](https://xlsform.org/en/#question-types).
+
+## Ứng dụng
+
+Câu hỏi video thường được dùng cho:
+
+1. Ghi lại điều kiện thực địa — hư hỏng đường sá, tình trạng cơ sở hạ tầng, sức khỏe cây trồng
+2. Ghi lại minh họa sản phẩm hoặc kiểm tra tuân thủ quy trình
+3. Thu thập lời chứng thực bằng video từ người trả lời
+4. Ghi lại bằng chứng cần bối cảnh không gian (ví dụ: quy mô và phạm vi của khu vực có vấn đề)
+5. Tài liệu trước/sau cho khảo sát theo dõi và đánh giá
+
+## Định dạng dữ liệu
+
+Tệp video được lưu dưới dạng tệp đính kèm nhị phân:
+
+- **Định dạng:** MP4 hoặc MOV (ghi trên mobile)
+- **Tên tệp:** `{instanceID}-{fieldname}.mp4` (hoặc tương đương)
+- **Lưu trữ:** Tải lên thư mục media trên server và liên kết với bản ghi gửi
+- **Truy cập:** Có thể phát và tải xuống từ giao diện quản lý bản ghi gửi
+
+## Phần mở rộng của rtSurvey
+
+### Thời lượng tối đa
+
+Dùng cột `parameters` để giới hạn độ dài ghi:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | site_visit | Ghi lại điều kiện tại chỗ | `max-duration=60` |
+
+`max-duration` tính bằng giây. Quá trình ghi tự động dừng khi đến giới hạn.
+
+### Chất lượng / độ phân giải
+
+Kiểm soát độ phân giải ghi thông qua `parameters`:
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | Quay video bằng chứng | `quality=low` |
+
+Các giá trị hỗ trợ: `low` (tải lên nhanh hơn), `normal` (mặc định), `high`. Dùng `low` ở khu vực có kết nối hạn chế.
+
+### Tải lên video có sẵn
+
+Trên mobile, người trả lời có thể chọn **tải lên video có sẵn** từ thư viện thiết bị thay vì quay mới. Tính năng này được bật mặc định trong tích hợp camera/thư viện gốc.
+
+### Phát lại trước khi gửi
+
+Trên mobile, có thể xem lại đoạn đã quay trước khi tiếp tục. Không cần cấu hình thêm.
+
+## Ví dụ sử dụng
+
+### Video kiểm tra thực địa với giới hạn
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| video | site_video | Quay điểm lấy nước | Đi vòng quanh toàn bộ cơ sở. Tối đa 90 giây. | `max-duration=90 quality=normal` |
+
+### Video có điều kiện — chỉ khi phát hiện hư hỏng
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | damage_found | Có phát hiện hư hỏng không? | | |
+| video | damage_video | Quay video ghi lại hư hỏng | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+
+## Thực hành tốt
+
+1. Đặt `max-duration` — video không giới hạn thời lượng có thể dễ dàng vượt quá 100 MB và không tải lên được khi kết nối kém.
+2. Dùng `quality=low` cho khảo sát giám sát nơi bằng chứng hình ảnh được yêu cầu nhưng không cần chi tiết cao — điều này giảm đáng kể kích thước tệp.
+3. Viết hướng dẫn quay cụ thể trong cột `hint` (ví dụ: "Đi vòng quanh toàn bộ tòa nhà, giữ camera ổn định").
+4. Cân nhắc xem video có thực sự cần thiết không — ảnh (`image`) thường đủ cho bằng chứng tĩnh và tạo ra tệp nhỏ hơn nhiều.
+5. Kiểm tra hiệu suất tải lên trên mạng thực địa thực tế trước khi triển khai.
+
+## Giới hạn
+
+- Tệp video rất lớn — video 1 phút ở chất lượng bình thường thường là 20–60 MB tùy thiết bị.
+- Tải lên tệp video lớn cần kết nối mạng tốt; cân nhắc yêu cầu đồng bộ qua Wi-Fi cho biểu mẫu nhiều video.
+- Không phải tất cả trình duyệt web đều hỗ trợ ghi video qua MediaRecorder — Chrome là đáng tin cậy nhất.
+- Phân tích câu trả lời video là thủ công và tốn thời gian; chỉ dùng khi nội dung video mang lại giá trị đặc biệt.

@@ -1,0 +1,190 @@
+---
+title: "Meta"
+description: "Llojet e pyetjeve meta kapin automatikisht informacionin e pajisjes, numëruesit dhe kohës pa asnjë hyrje nga i anketuari."
+icon: "info"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 237
+---
+
+Llojet e pyetjeve meta janë fusha speciale që plotësohen **automatikisht** — i anketuari nuk i sheh kurrë. Ato kapin kontekstin rreth dorëzimit: kur u mblodh, cila pajisje u përdor, dhe kush e mblodhi. Shtojini në fletën `survey` si çdo lloj tjetër pyetjeje; ato thjesht nuk shfaqen në ekran.
+
+## Specifikimi bazë XLSForm
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| deviceid | deviceid | |
+
+Etiketat janë opsionale për fushat meta pasi nuk shfaqen kurrë.
+
+---
+
+## Fushat meta të kohës
+
+### `start`
+
+Regjistron **datën dhe orën kur u hap formulari**. Ruhet në format ISO 8601 (`YYYY-MM-DDTHH:MM:SS.sss+HH:MM`).
+
+```
+type    | name  | label
+start   | start |
+```
+
+### `end`
+
+Regjistron **datën dhe orën kur u dorëzua formulari**. Bashkë me `start`, mund të llogaritni kohën e kaluar duke plotësuar formularin:
+
+```
+type      | name          | calculation
+calculate | duration_min  | (decimal-date-time(${end}) - decimal-date-time(${start})) * 1440
+```
+
+### `today`
+
+Regjistron **datën aktuale** (pa komponentin e orës). Ruhet si `YYYY-MM-DD`. I dobishëm kur keni nevojë vetëm për datën pa timestamp-in e plotë.
+
+```
+type  | name  | label
+today | today |
+```
+
+---
+
+## Fushat meta të pajisjes
+
+### `deviceid`
+
+Regjistron **identifikuesin unik të pajisjes** të përdorur për mbledhjen e të dhënave. Në Android kjo është zakonisht IMEI ose Android ID. I dobishëm për gjurmimin se cila pajisje dorëzoi çdo formular dhe zbulimin e dorëzimeve të dyfishta nga e njëjta pajisje.
+
+```
+type      | name     | label
+deviceid  | deviceid |
+```
+
+### `devicephonenum`
+
+Regjistron **numrin e telefonit të kartës SIM** në pajisje (nëse disponohet). Mund të jetë bosh nëse pajisja nuk ka SIM ose numri nuk ruhet në SIM.
+
+```
+type           | name          | label
+devicephonenum | devicephonenum |
+```
+
+### `simserial`
+
+Regjistron **numrin serial të kartës SIM** (ICCID). I dobishëm për identifikimin se cila SIM/operator u përdor.
+
+```
+type      | name      | label
+simserial | simserial |
+```
+
+### `subscriberid`
+
+Regjistron **IMSI (Identiteti Ndërkombëtar i Abonentit Mobile)** — identifikuesi unik i abonentit në kartën SIM.
+
+```
+type         | name        | label
+subscriberid | subscriberid |
+```
+
+---
+
+## Fushat meta të numëruesit
+
+### `username`
+
+Regjistron **emrin e përdoruesit të numëruesit të identifikuar** (llogaria e përdorur në aplikacionin rtSurvey). Kjo është mënyra më e besueshme për të gjurmuar kush mblodhi çdo dorëzim.
+
+```
+type     | name     | label
+username | username |
+```
+
+### `email`
+
+Regjistron **adresën email të numëruesit të identifikuar**.
+
+```
+type  | name  | label
+email | email |
+```
+
+### `phonenumber`
+
+Regjistron **numrin e telefonit të lidhur me llogarinë e numëruesit** (nëse konfigurohet).
+
+```
+type        | name       | label
+phonenumber | phonenumber |
+```
+
+---
+
+## Regjistri i auditit
+
+### `audit`
+
+Fusha meta `audit` mundëson **regjistrimin e detajuar të auditit** — regjistron regjistrin e timestamps të çdo pyetjeje që vizitoi numëruesi, sa kohë kaloi në secilën, dhe (opsionalisht) vendndodhjen e tyre GPS në çdo hap. Regjistri i auditit ruhet si skedar i veçantë `audit.csv` krahas çdo dorëzimi.
+
+```
+type  | name  | parameters
+audit | audit | location-priority=balanced location-min-interval=30 location-max-age=60
+```
+
+#### Parametrat e auditit
+
+| Parametri | Përshkrimi |
+|-----------|------------|
+| `location-priority` | Niveli i saktësisë GPS: `no-gps`, `low-power`, `balanced`, `high-accuracy` |
+| `location-min-interval` | Sekondat minimale midis kapjeve të vendndodhjes |
+| `location-max-age` | Mosha maksimale (sekonda) e vendndodhjes së kapur të ruajtur në memorie për ta pranuar |
+
+Regjistri i auditit kap:
+- Emrin e pyetjes dhe llojin e ngjarjes (`question`, `form.start`, `form.exit`, `form.save`, `form.finalize`)
+- Timestamps e fillimit dhe mbarimit për çdo ngjarje
+- Koordinatat GPS (nëse `location-priority` është vendosur)
+
+{{% alert icon=" " context="warning" %}}
+Fusha `audit` gjeneron skedar të veçantë për çdo dorëzim. Sigurohuni që tubacioni juaj i të dhënave përpunon si të dhënat kryesore të formularit ashtu edhe CSV-n e auditit.
+{{% /alert %}}
+
+---
+
+## Shembull i plotë
+
+Sondazhi tipik i familjes mund të përfshijë të gjitha fushat meta të kohës dhe numëruesit:
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| today | today | |
+| deviceid | deviceid | |
+| username | username | |
+| email | email | |
+| audit | audit | |
+| text | household_id | ID e familjes |
+| ... | ... | ... |
+
+---
+
+## Praktikat më të mira
+
+1. Gjithmonë përfshini `start` dhe `end` — janë falas, automatike dhe të paçmueshme për monitorimin e cilësisë.
+2. Gjithmonë përfshini `username` për të gjurmuar numëruesit.
+3. Përfshini `deviceid` kur dëshironi të zbuloni dorëzimet e dyfishta ose gjurmoni pajisjet në terren.
+4. Përdorni `audit` në sondazhet me llogaridhënie të lartë ku keni nevojë të verifikoni se numëruesit vizituan faktikisht çdo pyetje.
+5. Fushat meta të lidhura me SIM (`simserial`, `subscriberid`, `devicephonenum`) janë të besueshme vetëm në pajisjet Android me karta SIM aktive — kalojini ato për vendosjet vetëm me tabletë.
+
+---
+
+## Kufizimet
+
+- Të gjitha fushat meta janë **vetëm-lexueshëm** — nuk mund të referohen ose modifikohen nga llogaritjet e tjera.
+- `username` dhe `email` kërkojnë identifikimin e numëruesit; do të jenë bosh për dorëzimet anonime.
+- Fushat meta SIM/telefon mund të kthejnë vlera bosh në tabletët vetëm-Wi-Fi dhe disa versione Android për shkak të kufizimeve të lejeve.

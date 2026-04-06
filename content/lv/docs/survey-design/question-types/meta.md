@@ -1,0 +1,44 @@
+---
+title: "Meta"
+description: "Meta jautājumu tipi automātiski uztver ierīces, enumeratora un laika informāciju bez respondenta ievades."
+icon: "info"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 237
+---
+
+Meta jautājumu tipi ir speciāli lauki, kas tiek aizpildīti **automātiski** — respondents tos nekad neredz. Tie uztver kontekstu par iesniegumu: kad tas tika savākts, kura ierīce tika izmantota un kas to savāca. Pievienojiet tos darblapā `survey` kā jebkuru citu jautājuma tipu; tie vienkārši netiek rādīti ekrānā.
+
+## Pamata XLSForm specifikācija
+
+| type | name |
+|------|------|
+| start | start |
+| end | end |
+| today | today |
+| deviceid | deviceid |
+| phonenumber | phonenumber |
+| username | username |
+| email | email |
+| audit | audit |
+
+## Meta tipu apraksts
+
+| Tips | Apraksts |
+|------|----------|
+| `start` | Laika zīmogs, kad forma tika atvērta |
+| `end` | Laika zīmogs, kad forma tika iesniegta |
+| `today` | Pašreizējais datums formas sākšanas brīdī |
+| `deviceid` | Ierīces unikālais identifikators |
+| `phonenumber` | Ierīces tālruņa numurs (ja pieejams) |
+| `username` | Pierakstītā lietotāja vārds |
+| `email` | Pierakstītā lietotāja e-pasts |
+| `audit` | Detalizēts revīzijas žurnāls ar laika zīmogiem katram jautājumam |
+
+## Labākā prakse
+
+1. Vienmēr iekļaujiet `start` un `end`, lai aprēķinātu intervijas ilgumu.
+2. Izmantojiet `deviceid` un `username` datu audita izsekošanai.
+3. `audit` tips ģenerē detalizētu žurnālu — apsveriet tā izmēra ietekmi uz eksportēšanu.

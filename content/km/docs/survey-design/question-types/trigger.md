@@ -1,0 +1,97 @@
+---
+title: "Trigger / Acknowledge"
+description: "សំណួរ trigger បង្ហាញ statement ដែល enumerator ត្រូវ explicitly acknowledge មុននឹង continue។"
+icon: "check-circle"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 240
+---
+
+ប្រភេទ question `trigger` (ហៅថា `acknowledge`) បង្ហាញ **statement ជាមួយ checkbox**។ enumerator ត្រូវ tick checkbox ដើម្បីបញ្ជាក់ថាពួកគេបានអាន និងយល់ statement មុន form អនុញ្ញាត continue។ គ្មាន data value ដែលរក្សាទុក — តែ checkbox ត្រូវបាន ticked ឬ អត់ ។
+
+## ការបញ្ជាក់ XLSForm មូលដ្ឋាន
+
+| type | name | label |
+|------|------|-------|
+| trigger | consent_ack | The respondent has provided verbal informed consent. |
+
+ឬ ប្រើ alias `acknowledge`:
+
+| type | name | label |
+|------|------|-------|
+| acknowledge | consent_ack | The respondent has provided verbal informed consent. |
+
+`trigger` និង `acknowledge` ទាំងពីរ equivalent — ប្រើ whichever platform documents ។
+
+## ការប្រើប្រាស់
+
+Trigger/acknowledge questions ប្រើជាទូទៅសម្រាប់:
+
+1. **Informed consent** — confirm enumerator ទទួលបាន consent មុននឹងថត sensitive data
+2. **Soft alerts** — warning អំពី value unusual ហើយ require explicit confirmation មុន proceeding
+3. **Checklist items** — confirm physical observation ត្រូវបាន completed (ឧ. "I have observed the water source directly")
+4. **Instructions** — force enumerator ឱ្យ acknowledge section-level instruction មុន continuing
+5. **Quality checks** — flag outlier values ហើយ require enumerator verify them
+
+## ឧទាហរណ៍ការប្រើប្រាស់
+
+### Consent acknowledgement
+
+| type | name | label | required |
+|------|------|-------|----------|
+| trigger | consent | The respondent has given verbal informed consent to participate in this survey. | yes |
+
+### Soft alert សម្រាប់ outlier values
+
+ប្រើ ជាមួយ `relevant` expression ដើម្បី show trigger តែ នៅពេល suspicious value ត្រូវ entered:
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| integer | children | Number of children | | |
+| trigger | children_confirm | You entered ${children} children. Please verify with the respondent and tap OK to confirm. | `${children} > 10` | `${children} > 10` |
+
+### Instruction acknowledgement ក្នុង section start
+
+| type | name | label |
+|------|------|-------|
+| trigger | section_b_ack | Section B: Agricultural Land Use. Ask all questions in this section to the household head only. |
+
+## ការ trigger ចាំបាច់
+
+បន្ថែម `required: yes` ដើម្បីការ prevent advancing ទាល់ box ត្រូវបាន ticked:
+
+| type | name | label | required | required_message |
+|------|------|-------|----------|------------------|
+| trigger | safety_check | All safety equipment is present and functional. | yes | You must confirm before proceeding. |
+
+## Conditional display
+
+Show trigger តែ condition ណាមួយ meet:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_one yesno | has_well | Does the household have a well? | |
+| trigger | well_observation | Confirm you have directly observed the well condition. | `${has_well} = 'yes'` |
+
+## ភាពខុសគ្នាពី `note`
+
+| | `note` | `trigger` |
+|--|--------|-----------|
+| បង្ហាញ text | Yes | Yes |
+| ត្រូវការ interaction | No | Yes (ត្រូវ tick) |
+| Store data | No | No (តែ OK/ticked) |
+| អាច block progress | No | Yes (ជាមួយ `required`) |
+
+## ការអនុវត្តល្អ
+
+1. រក្សា trigger labels ខ្លី និង actionable — enumerator គួរ read ហើយ confirm ក្នុងវិនាទី។
+2. ដូចជាបន្ថែម `required: yes` នៅពេល acknowledgement ចាំបាច់។
+3. ប្រើ triggers សម្រាប់ consent និង safety checks ដែលអ្នកត្រូវការ audit trail ថា enumerator confirmed។
+4. រួមបញ្ចូល `relevant` សម្រាប់ conditional soft alerts ដើម្បី trigger appear តែ value ណាមួយត្រូវការ verification។
+
+## ការដាក់កំហិត
+
+- Trigger fields មិន store meaningful data value — ពួកវា record តែ box ត្រូវបាន ticked ។
+- Trigger widget render ជា simple checkbox/button លើ clients ជាច្រើន; វាមិន full e-signature។

@@ -1,0 +1,127 @@
+---
+title: "Call API"
+description: "Call API lar spørreundersøkelsen hente data fra en ekstern webtjeneste og bruke svaret til å fylle ut felt eller validere svar."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 294
+---
+
+**Call API**-funksjonen lar et skjemafelt sende en HTTP-forespørsel til en ekstern tjeneste og bruke svaret til å fylle ut en beregnet verdi eller validere brukerinput. Dette muliggjør sanntidsoppslag, ID-verifisering, strekkodeoppslag og enhver annen serversidesjekk under datainnsamling.
+
+Det finnes to funksjoner:
+
+- `callapi()` — henter en verdi fra et API og lagrer den i et `calculate`- eller `text`-felt
+- `callapi-verify()` — kaller et API og blokkerer fremgang hvis svaret ikke samsvarer med forventet verdi (brukes i `constraint`)
+
+---
+
+## `callapi()` — Hent og lagre et API-svar
+
+### Syntaks
+
+Plasser `callapi()` i **`calculation`**-kolonnen til et `calculate`- eller `text`-felt:
+
+```
+callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
+```
+
+### Parametere
+
+| # | Parameter | Beskrivelse |
+|---|-----------|-------------|
+| 1 | `method` | HTTP-metode: `'GET'` eller `'POST'` |
+| 2 | `url` | API-endepunkt-URL |
+| 3 | `allowed_auto` | `1` for å kalle automatisk når feltet nås; `0` for å kreve en manuell utløserknapp |
+| 4 | `max_retry` | Maksimalt antall forsøk ved feil |
+| 5 | `no_overwrite` | `1` for å beholde eksisterende verdi hvis feltet allerede har en; `0` for alltid å overskrive |
+| 6 | `extract_expr` | JSONPath-uttrykk for å hente ønsket verdi fra svaret (f.eks. `$.data.name`) |
+| 7 | `timeout` | Forespørsels-timeout i millisekunder |
+| 8 | `lifetime` | Hvor lenge (ms) det bufrede svaret er gyldig før nytt henting |
+| 9 | `response_q` | Navn på et felt for å lagre den rå HTTP-svarkoden (f.eks. `${response_status}`) |
+| 10 | `call_type` | *(Valgfri)* Spesiell kallmodus: `'lazy-upload'` eller `'lazy-upload-multiple'` |
+| 11 | `post_body` | *(Valgfri)* POST-body-streng. Referer til skjemafelt med `##feltnavn##` |
+
+### Eksempel: GET-forespørsel for å slå opp et hushold etter ID
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | household_id | Hushold-ID | | |
+| calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
+| note | hh_display | Hushold: ${hh_name} | | |
+
+### Eksempel: POST-forespørsel med JSON-body
+
+```
+callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
+```
+
+I `post_body`, bruk `##feltnavn##` for å sette inn gjeldende verdi for et skjemafelt.
+
+### Utseende: `callapi`
+
+Legg til `callapi` i `appearance`-kolonnen til feltet for å aktivere API-kallintegrasjonen:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | api_result | | callapi | `callapi('GET', ...)` |
+
+Når `allowed_auto` er `0`, viser rtSurvey en **"Hent"-knapp** som telleren trykker på manuelt.
+
+---
+
+## `callapi-verify()` — Valider en verdi mot et API
+
+`callapi-verify()` blokkerer innsending av et felt til et API bekrefter at den angitte verdien er gyldig. Bruk det i **`constraint`**-kolonnen.
+
+### Syntaks
+
+```
+callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
+```
+
+### Parametere
+
+| # | Parameter | Beskrivelse |
+|---|-----------|-------------|
+| 1 | `method` | HTTP-metode: `'GET'` eller `'POST'` |
+| 2 | `url` | Verifiserings-API-endepunkt |
+| 3 | `extract_expr` | JSONPath for å hente forventet verdi fra svaret |
+| 4 | `match_expr` | Uttrykk som sammenligner hentet verdi med feltverdien (f.eks. `$.status = 'valid'`) |
+| 5 | `timeout` | Forespørsels-timeout i millisekunder |
+| 6 | `constraint_mode` | `'soft'` for bare advarsel; `'hard'` for å blokkere fremgang |
+| 7 | `post_body` | *(Valgfri)* POST-body med `##feltnavn##`-erstatninger |
+| 8 | `message` | *(Valgfri)* Feilmelding. Støtter flerspråklig: `<en>Invalid!</en><vi>Không hợp lệ!</vi>` |
+
+### Eksempel: Verifiser en strekkode mot et aktivaregister
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| barcode | asset_code | Skann aktivastrekkoden | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` | Aktiva ikke funnet i register |
+
+---
+
+## Bruke App API-data sammen med callapi
+
+Kombiner `callapi()` med `pulldata('app-api', 'user.token')` for å sette inn den autentiserte brukerens token i API-forespørselen:
+
+```
+callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, '', '',
+  concat('{"token":"', pulldata('app-api','user.token'), '","id":"##item_id##"}'))
+```
+
+## Beste praksis
+
+1. Angi alltid en rimelig `timeout` (5000–15000 ms) — ikke bruk 0 eller svært høye verdier.
+2. Sett `allowed_auto=0` for verifiseringer som telleren bør utløse bevisst (f.eks. ID-sjekker).
+3. Sett `no_overwrite=1` når feltet kan redigeres senere og du ikke ønsker at ny henting skal overskrive manuelle rettelser.
+4. Bruk `extract_expr` med en spesifikk JSONPath i stedet for å stole på rå svartekst.
+5. Test API-kall i frakoblet modus — callapi vil mislykkes grasiøst og vise en feil, men skjemaet bør fortsatt kunne fullføres for ikke-kritiske felt.
+
+## Begrensninger
+
+- Krever nettverkstilkobling på tidspunktet for kallet — kall vil mislykkes når enheten er frakoblet.
+- API-svar må være JSON — XML- eller klartekstsvar krever ytterligere behandling.
+- Høy kallfrekvens (f.eks. ett API-kall per repeat-instans) kan bremse skjemanavigasjonen.

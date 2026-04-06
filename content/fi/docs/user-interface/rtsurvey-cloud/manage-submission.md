@@ -1,0 +1,40 @@
+---
+title: "Lähetysten hallinta"
+description: "Tarkastele, hallitse ja vie raakatietomerkintöjä ja lähetyksiä."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 317
+---
+
+**Lähetysten hallinta** -moduuli (käytettävissä **Tietotarkastelu**-painikkeen kautta Lomakeperheen osiossa) antaa projektipäälliköille ja valvojille mahdollisuuden olla suoraan vuorovaikutuksessa saapuvien raakadataan. Se toimii yhtenäisenä työtilana haastattelijoiden lähetysten tarkasteluun, laitetunnisteiden jäljittämiseen ja tietojen laadun toimintojen suorittamiseen.
+
+![Lähetysten hallintakäyttöliittymä](/images/manage_submissions.png)
+
+## Tietojen yleiskatsaus ja kolumnit
+
+Dataruudukko näyttää dynaamisesti tiettyä lomaketta varten kerätyt tiedot. Se toimii kahdessa päätilassa: **Virallinen** (viimeistellyt tietueet) ja **Työskentelyssä** (reaaliaikaiset, viimeistelemättömät tietueet).
+
+### Tärkeimmät datakolumnit
+
+Riippumatta lomakkeessa määritetyistä mukautetuista kysymyksistä, ruudukko sisältää useita vakiometatietokolumneja tarkastuksen avuksi:
+
+- **Lähettäjä:** Tunnistaa lähetyksen alkuperäalustan (esim. FA kentällä, WEB verkkolomakkeelle, RS etäjärjestelmille).
+- **Tiedot:** Avaa yhden tietueen näkymän (Haku-kuvake) tarkastellaksesi jokaista kyseiseen instanssiin lähetettyä muuttujaa ja vastausta.
+- **iNote:** Antaa valvojille mahdollisuuden liittää sivumuistiinpanoja tai sisäisiä kommentteja tiettyyn tietueeseen muuttamatta kerättyä dataa itsessään (kynäkuvakkeella esitetty).
+- **Päivämääräkentät:** Aikaleima, joka osoittaa, milloin tietue aloitettiin, saatiin päätökseen tai synkronoitiin.
+- **Medialiitteet:** Suorat pikkukuvalinkit kyselyyn kerätyille kuville, allekirjoituksille tai tiedostoille.
+- **Toistoryhmät:** Omistautuneet linkit toistuvien kysymysten sisäkkäisten taulukoiden käyttämiseen pääomaakkaassa lomakkeessa.
+
+## Lähetystoiminnot
+
+Aktiivisen tietojen laadunvalvonnan helpottamiseksi käyttöliittymä tarjoaa pudotusvalikon toiminnallisista komennoista, joita voidaan suorittaa valituille tietueille:
+
+- **Luo uusi instanssi:** Antaa järjestelmänvalvojille mahdollisuuden syöttää manuaalisesti uusi kyselyn tietue suoraan tietokantaan.
+- **Palauta instanssi:** Hylkää lähetetyn tietueen ja velvoittaa haastattelijan varmistamaan tai keräämään tiedot uudelleen.
+- **Seuraa instanssia:** Merkitsee tietueen jatkotoimia varten, yleensä lähettäen hälytyksen kenttätiimille selvitystä varten.
+- **Vie palautettuihin komentoihin / Seurantakomentopakettiin:** Luo erävientiä (tiedostoja) sisältäen tietojoukot, jotka on erityisesti merkitty palautuksiin tai seurantaan.
+- **Muunna XML:ksi:** Muuntaa jäsennellyn tietojoukon takaisin raakaan XML-muotoon taustapalvelimen analysointia tai järjestelmäintegraatiota varten.
+- **Välitä instanssit:** (Saatavilla *Työskentelyssä*-tilassa) Työntää viimeistelemättömät tiedot välittömästi toiselle laitteelle tai käyttäjälle.
+- **Poista:** Poistaa pysyvästi valitut instanssit tietokannasta.

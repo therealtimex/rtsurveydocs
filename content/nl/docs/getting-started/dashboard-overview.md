@@ -1,0 +1,50 @@
+---
+weight: 10
+date: "2026-03-04T00:00:00+00:00"
+draft: false
+title: "Dashboard Overzicht"
+icon: "home"
+toc: true
+description: "Inzicht in het RT-CPMS Systeemsdashboard en hulpmiddelen voor projectbeheer."
+tags: ["Dashboard", "Overzicht", "Monitoring"]
+---
+
+# Het Systeemdashboard
+
+Het Dashboard (`/cpms/cpmsDashBoard/indexNew`) fungeert als het administratieve commandocentrum en de primaire startpagina voor het Real-Time Survey-platform (RT-CPMS).
+
+![Systeemsdashboard Voorbeeld](/images/dashboard_overview.png)
+
+Het is ontworpen om enquêtemanagers een onmiddellijk overzicht te geven van actieve projecten, snelle links naar essentiële tools en een gecentraliseerde hub om door alle belangrijke platformmodules te navigeren.
+
+## Belangrijkste functies
+
+### 1. Project- en formulierselectie
+Het linker paneel bevat de navigator **Formulieren en Rapporten**. Dit gebied toont alle actieve enquêtes in uw werkruimte.
+* Door een specifieke enquête te selecteren (bijv. *RTA - ENQUÊTE 02*), richt u het dashboard op monitoring en statistieken van uitsluitend dat project.
+
+### 2. Visualisatie- en metriekfilters
+Boven de projectlijst kunt u schakelen tussen verschillende kritische gegevensperspectief om de voortgang van veldwerk in realtime te monitoren:
+* **Tellen op starttijd / eindtijd**: Bijhouden wanneer enquêteurs hun enquêtesessies beginnen en voltooien.
+* **Tellen op inzenddatum**: Monitoren van het dagelijkse totale volume aan gegevens dat de server bereikt.
+* **Tellen op gebruikersnaam**: De individuele productiviteit en prestaties van enquêteurs evalueren.
+* **Kaart van interviews**: Een geografische (GIS) verdeling bekijken van waar enquêteantwoorden worden verzameld om te controleren of aan de vereisten voor ruimtelijke dekking wordt voldaan.
+
+### 3. Applicatieportalen
+Het midden van het dashboard biedt onmiddellijke toegang tot de interfaces voor gegevensverzameling. Afhankelijk van de hardware van uw enquêteurs kunt u deze starten of daarnaar verwijzen:
+* **Webapp**: Voor gegevensverzameling via de browser.
+* **Android App**: Link naar de Google Play Store of APK.
+* **iOS App**: Link naar de Apple App Store.
+
+### 4. Directe modulesnelkoppelingen
+Drie prominente actieknoppen maken snelle overgang mogelijk naar de meest gebruikte operationele modules:
+* **Formulier & Gegevensinvoer**: Direct naar het handmatig beheren van verzamelde gegevens.
+* **Analyse & Rapporten**: Open de Business Intelligence (BI)-suite voor kruistabellen en grafieken van enquêteantwoorden.
+* **Machtigingsconfiguratie**: Aanpassen wie toegang heeft tot de actieve enquête en welke rollen zij hebben.
+
+### 5. Globale navigatiezijbalk
+De inklapbare linker zijbalk biedt toegang tot het complete ecosysteem van RT-CPMS-backendmodules. Van hieruit kunt u dieper ingaan op:
+* **Instellen**: Beheren van personeel en actieve apparaten.
+* **Veldbeheer**: Bijhouden van dagelijkse activiteiten van enquêteurs.
+* **Kwaliteitsborging**: Implementeren en beoordelen van KA-regels en -markeringen.
+* **Definitieve opleveringen**: Exporteren van uw opgeschoonde datasets naar CSV, PDF of Stata.

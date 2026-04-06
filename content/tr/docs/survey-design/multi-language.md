@@ -1,0 +1,126 @@
+---
+title: "Çok Dilli Destek"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 285
+---
+
+rtSurvey, birden fazla dilde anket oluşturmanıza olanak tanıyan sağlam çok dilli destek sağlar. Bu özellik, farklı dilsel nüfuslar veya çok dilli ortamlarda araştırma yürütmek için kritik öneme sahiptir.
+
+## Çok Dilli Anket Kurulumu
+
+rtSurvey'de çok dilli bir anket oluşturmak için XLSForm'unuza dile özgü sütunlar eklemeniz gerekir. İşte nasıl yapılır:
+
+1. **Etiket Çevirileri**: `label::Language (code)` biçimini kullanarak her dil için sütunlar ekleyin.
+2. **İpucu Çevirileri**: İpuçlarını çevirmek için `hint::Language (code)` kullanın.
+3. **Medya Dosyası Çevirileri**: Dile özgü medya için `media::Language (code)` kullanın.
+
+Örnek:
+
+```
+| type    | name | label::English (en) | label::Türkçe (tr) | hint::English (en) | hint::Türkçe (tr) |
+|---------|------|---------------------|---------------------|---------------------|---------------------|
+| integer | age  | Kaç yaşındasınız?    | Kaç yaşındasınız?   | Yaşınızı girin      | Yaşınızı girin     |
+```
+
+## Dil Kodları
+
+Dil adından sonra resmi 2 karakterli dil kodlarını (alt etiketleri) kullanmanız önerilir. Bu, form dili ile kullanıcı arayüz dilinin eşleştirilmesini kolaylaştırır. Resmi kodları [buradan](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry) bulabilirsiniz.
+
+## Varsayılan Dil Belirleme
+
+Veri toplama için varsayılan bir dil ayarlamak üzere XLSForm'unuzdaki `settings` çalışma sayfasını kullanın:
+
+```
+| form_id   | version | default_language |
+|-----------|---------|-------------------|
+| test_form | 101     | French (fr)       |
+```
+
+## rtSurvey'e Özgü Özellikler
+
+### Dinamik Dil Değiştirme
+
+rtSurvey, kullanıcıların veri toplama sırasında dinamik olarak dil değiştirmesine olanak tanır:
+
+- Web arayüzünde, üst gezinti çubuğundaki dil açılır menüsünü kullanın.
+- Mobil uygulamada, ayarlar menüsünden dil seçeneklerine erişin.
+
+### Dile Özgü Doğrulama Mesajları
+
+rtSurvey, çok dilli desteği doğrulama mesajlarına genişletir:
+
+```
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Türkçe (tr) |
+|---------|------|------------|----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Yaş 150 veya daha az olmalıdır    | Yaş 150 veya daha az olmalıdır  |
+```
+
+### RTL Dil Desteği
+
+Arapça veya İbranice gibi sağdan sola (RTL) yazılan diller için rtSurvey düzeni otomatik olarak ayarlar:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Adınız              | اسمك                |
+```
+
+### Dile Özgü Görünüm
+
+rtSurvey, farklı diller için farklı görünümler belirtmenize olanak tanır:
+
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Adres            | 地址                 | multiline                | textarea                  |
+```
+
+## Çok Dilli Anketler için En İyi Uygulamalar
+
+1. **Tutarlı Adlandırma**: Formunuz genelinde tutarlı dil kodları kullanın.
+2. **Profesyonel Çeviri**: Anket bağlamına aşina profesyonel çevirmenler kullanın.
+3. **Bağlam Notları**: Doğru çeviriler sağlamak için çevirmenlere bağlam notları verin.
+4. **Test**: Dağıtımdan önce formunuzu tüm dillerde test edin.
+5. **Unicode Desteği**: Veri toplama cihazlarının Latin olmayan alfabeler için Unicode'u desteklediğinden emin olun.
+6. **Dile Özgü Medya**: Her dil için kültürel açıdan uygun görüntüler veya ses kullanın.
+7. **Görüntülerde Metin Kullanmaktan Kaçının**: Metin içeren görüntüler kullanıyorsanız, her dil için ayrı görüntüler oluşturun.
+
+## Özel Durumları Ele Alma
+
+### Karma Dil Yanıtları
+
+rtSurvey, katılımcıların seçilen form dilinden bağımsız olarak herhangi bir karakterde metin girmesine olanak tanır. Bu, isimleri veya adresleri orijinal alfabelerinde yakalamak için kullanışlıdır.
+
+### Dile Özgü Soru Türleri
+
+Bazı soru türleri belirli diller için daha uygun olabilir. rtSurvey, farklı diller için farklı soru türleri kullanmanıza olanak tanır:
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Adınızı girin       | 名前を選んでください    |
+```
+
+## Çok Dilli Veriyi Dışa Aktarma
+
+rtSurvey'den veri dışa aktarılırken:
+
+- Belirli bir dilde dışa aktarmayı veya tüm dil sürümlerini dahil etmeyi seçin.
+- Dil meta verileri dışa aktarmaya dahil edilir; her yanıt için hangi dilin kullanıldığını gösterir.
+
+## Mobil Uygulama Hususları
+
+- rtSurvey mobil uygulaması çevrimdışı dil değiştirmeyi destekler.
+- Çevrimdışına geçmeden önce gerekli tüm dil dosyalarının indirildiğinden emin olun.
+
+## Bilinen Sınırlamalar
+
+- Bazı gelişmiş özellikler tüm dillerde mevcut olmayabilir.
+- Son derece uzun çeviriler daha küçük ekranlarda düzeni etkileyebilir.
+
+rtSurvey'in çok dilli yeteneklerinden yararlanarak, çeşitli nüfuslara ulaşan ve dilsel olarak doğru verileri sağlayan kapsayıcı, erişilebilir anketler oluşturabilirsiniz.

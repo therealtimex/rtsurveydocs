@@ -1,0 +1,128 @@
+---
+weight: 4
+title: "Skonfiguruj protokół SSL"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+icon: "lock"
+toc: true
+description: "Configure HTTPS for your rtSurvey server. Required before you can log in."
+---
+
+Zanim będziesz mógł się zalogować, musisz skonfigurować SSL. Kiedy otworzysz aplikację po raz pierwszy, zostaniesz automatycznie przekierowany do ekranu konfiguracji SSL.
+
+---
+
+## Opcje konfiguracji protokołu SSL
+
+![Opcje konfiguracji protokołu SSL](/img/ssl-setup/ssl-setup-options.png)
+
+Wybierz jedną z trzech opcji:
+
+| Opcja | Kiedy używać |
+|--------|-------------|
+| **Darmowa subdomena rtsurvey.com** *(Zalecony)* | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
+| **Moja własna domena** | Masz już domenę i jej DNS wskazuje na ten serwer. |
+| **Zainstaluj certyfikat ręcznie** | Enterprise lub niestandardowy urząd certyfikacji. Wymaga dostępu SSH. |
+
+---
+
+## Opcja 1 — Bezpłatna subdomena rtsurvey.com (zalecana)
+
+To najszybsza opcja. Nie jest wymagana rejestracja domeny ani zmiany DNS.
+
+1. Kliknij Bezpłatna subdomena rtsurvey.com, aby rozwinąć sekcję
+2. Wpisz żądaną nazwę subdomeny w polu wejściowym
+
+   > Use lowercase letters, numbers, and hyphens. 3–30 characters.
+   > Przykład: `myproject` → `myproject.rtsurvey.com`
+
+3. Kliknij Utwórz **https://[subdomain].rtsurvey.com**
+
+<!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
+
+4. Poczekaj 2–5 minut na wystawienie certyfikatu
+
+<!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
+
+5. Gdy certyfikat będzie gotowy, zostaniesz automatycznie przekierowany na nowy adres URL HTTPS
+
+<!-- SCREENSHOT NEEDED: success state / redirect to login -->
+
+---
+
+## Option 2 — My own domain
+
+Użyj tej opcji, jeśli masz istniejącą domenę, a jej rekord DNS A już wskazuje adres IP tego serwera.
+
+1. Kliknij opcję Moja własna domena, aby rozwinąć sekcję
+2. Wpisz pełną nazwę domeny (e.g. `survey.myorganization.org`)
+3. Kliknij Utwórz certyfikat
+
+<!-- SCREENSHOT NEEDED: own domain input form -->
+
+Let's Encrypt zweryfikuje Twoją domenę i wystawi certyfikat. Wymaga to najpierw prawidłowego wskazania DNS — w przeciwnym razie żądanie zakończy się niepowodzeniem.
+
+---
+
+## Opcja 3 — Zainstaluj certyfikat ręcznie
+
+Dla środowisk korporacyjnych korzystających z niestandardowego lub wewnętrznego urzędu certyfikacji. Pliki certyfikatów umieścisz na serwerze poprzez SSH, następnie wpisz swoją domenę w aplikacji.
+
+### Warunki wstępne
+
+- Dostęp SSH do serwera
+- Ważny certyfikat i klucz prywatny dla Twojej domeny (format PEM)
+
+### Krok 1 — SSH do serwera
+
+```bash
+ssh root@<server-ip>
+```
+
+### Krok 2 — Umieść pliki certyfikatów
+
+Utwórz katalog i skopiuj swoje pliki:
+
+```bash
+mkdir -p /etc/letsencrypt/live/<your-domain>
+```
+
+Skopiuj pliki do tego katalogu, podając dokładnie te nazwy:
+
+| Plik | Opis |
+|------|-------------|
+| `fullchain.pem` | Twój certyfikat + wszelkie pośrednie certyfikaty urzędu certyfikacji (połączone) |
+| `privkey.pem` | Twój klucz prywatny |
+
+Przykład:
+
+```bash
+# Skopiuj z komputera lokalnego (uruchom to lokalnie, a nie na serwerze)
+scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
+scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
+```
+
+Ustaw prawidłowe uprawnienia:
+
+```bash
+chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
+chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
+```
+
+### Krok 3 — Wpisz swoją domenę w aplikacji
+
+<!-- SCREENSHOT NEEDED: manual certificate form -->
+
+1. In the SSL setup screen, click Install certificate manually
+2. Wpisz nazwę swojej domeny (musi być zgodna z nazwą zwyczajową lub SAN certyfikatu)
+3. Kliknij Zastosuj
+
+Serwer skonfiguruje Nginx z Twoim certyfikatem i automatycznie przeładuje.
+
+---
+
+## Następny krok
+
+Po włączeniu protokołu SSL przejdź do Pierwszego logowania [first-login](first-login).

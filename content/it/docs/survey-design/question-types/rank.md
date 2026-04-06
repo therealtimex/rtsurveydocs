@@ -1,0 +1,88 @@
+---
+title: "Rank"
+description: "Le domande rank permettono ai rispondenti di ordinare un insieme di scelte per preferenza o priorità."
+icon: "list-ol"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 242
+---
+
+Il tipo di domanda `rank` presenta un elenco di scelte che il rispondente deve **trascinare in ordine** (o altrimenti classificare dal primo all'ultimo). Memorizza il risultato come un elenco di valori di scelta separati da spazi nell'ordine selezionato, con la scelta con priorità più alta per prima.
+
+## Specifica XLSForm di base
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Classifica questi bisogni della comunità dal più al meno importante |
+
+Le scelte sono definite nel foglio di lavoro **choices** proprio come `select_one`:
+
+**survey:**
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Classifica questi bisogni dal più al meno importante |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| priorities | water | Acqua pulita |
+| priorities | health | Assistenza sanitaria |
+| priorities | education | Istruzione |
+| priorities | roads | Strade |
+| priorities | electricity | Elettricità |
+
+## Formato del valore memorizzato
+
+Il valore memorizzato è un **elenco di valori di scelta separati da spazi** in ordine di classificazione (primo = priorità più alta):
+
+```
+water education health roads electricity
+```
+
+## Estrazione delle posizioni classificate
+
+Usa `selected-at()` per ottenere la scelta a una posizione specifica:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| rank priorities | main_priority | Classifica i bisogni della comunità | |
+| calculate | top_priority | | selected-at(${main_priority}, 0) |
+| calculate | second_priority | | selected-at(${main_priority}, 1) |
+
+`selected-at(${main_priority}, 0)` restituisce il valore messo **primo** (indice 0 = rango più alto).
+
+## Utilizzo di `rank-index()` con i gruppi repeat
+
+Quando `rank` viene usato all'interno di un gruppo repeat, `rank-index()` ti permette di fare riferimento al rango ordinale dall'esterno del repeat:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_ranked | | rank-index(1, ${score}) |
+
+Vedi [Funzioni — Funzioni per i campi ripetuti](../operators-and-functions/functions#repeated-field-functions) per i dettagli completi su `rank-index()` e `rank-index-if()`.
+
+## Utilizzi
+
+Le domande rank sono comunemente usate per:
+
+1. **Classificazione delle priorità** — chiedere alle comunità di classificare i bisogni di sviluppo
+2. **Ordinamento delle preferenze** — classificare le caratteristiche del prodotto, gli attributi del servizio, o le opzioni politiche
+3. **Ordinamento dei passi di un processo** — disporre i passaggi in una procedura
+4. **Selezione dei migliori N** — combinato con `selected-at()` per estrarre solo le prime 1, 2 o 3 scelte
+
+## Best practice
+
+1. Mantieni l'elenco breve (3–7 elementi) — la classificazione diventa cognitivamente gravosa oltre 7–8 scelte.
+2. Usa etichette di scelta chiare e mutuamente esclusive per evitare confusione su cosa significa "primo".
+3. Aggiungi testo di suggerimento che spieghi la direzione della classificazione (es. "Trascina per ordinare: primo = più importante").
+4. Valida usando `count-selected(.) = x` se devi assicurarti che tutte le scelte siano classificate.
+
+## Limitazioni
+
+- Il widget drag-to-rank richiede uno schermo touch o un mouse — potrebbe non funzionare bene negli ambienti solo tastiera.
+- Su alcuni client mobili più vecchi, il widget rank potrebbe ricorrere a un'interfaccia di input numerato.
+- Non puoi classificare parzialmente (cioè, classificare solo alcune scelte) — tutte le scelte devono essere ordinate.

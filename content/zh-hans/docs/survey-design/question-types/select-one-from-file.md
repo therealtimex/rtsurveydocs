@@ -1,0 +1,97 @@
+---
+title: "从文件选择"
+description: "select_one_from_file 和 select_multiple_from_file 从附加到表单的外部 CSV 或 XML 文件动态加载选项。"
+icon: "file-earmark-spreadsheet"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 241
+---
+
+`select_one_from_file` 和 `select_multiple_from_file` 的工作方式与 `select_one` 和 `select_multiple` 类似，但不是在 **choices 工作表**中定义选项，而是从附加到表单的**外部 CSV 或 XML 文件**中加载选项。当您的选项列表很长、频繁更改，或需要在不重建整个表单的情况下更新时，这非常有用。
+
+## 基本 XLSForm 规范
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | 选择医疗机构 |
+| select_multiple_from_file crops.csv | crops | 家庭种植哪些农作物？ |
+
+类型名称后的文件名必须与上传表单时附加的文件名匹配。
+
+## CSV 文件格式
+
+您的 CSV 文件必须至少有两列：`name`（存储值）和 `label`（显示文本）。您可以添加任意数量的额外列用于过滤。
+
+**health_facilities.csv：**
+
+```
+name,label,district,type
+HF001,内罗毕中央诊所,Nairobi,clinic
+HF002,西部地区卫生中心,Nairobi,health_centre
+HF003,基苏木区医院,Kisumu,hospital
+```
+
+## 过滤选项
+
+使用 `choice_filter` 列仅显示与当前上下文匹配的选项。直接使用列名引用 CSV 列（不带 `${}`）：
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | 选择区县 | |
+| select_one_from_file health_facilities.csv | facility | 选择机构 | district = ${district} |
+
+在此示例中，只显示所选区县的机构。`choice_filter` 中的 `district` 引用 CSV 文件中的 `district` 列；`${district}` 引用名为 `district` 的表单字段。
+
+## 用途
+
+从文件选择题目通常用于：
+
+1. **长选项列表**——医疗机构、学校、村庄、物种列表（数百或数千个项目）
+2. **频繁更新的列表**——当主列表在调查轮次之间发生变化时，只更新 CSV 而无需重建表单
+3. **共享参考数据**——一个 CSV 文件用于多个表单
+4. **过滤级联选择**——在一个文件中加载所有地区/区县/村庄，然后按父级选择进行过滤
+
+## 附加文件
+
+将表单上传到 rtSurvey 时，将 CSV 文件作为**媒体附件**附加。表单定义中的文件名必须与附件的文件名完全匹配。
+
+{{% alert icon=" " context="warning" %}}
+文件名区分大小写。`Health_Facilities.csv` 和 `health_facilities.csv` 被视为不同的文件。
+{{% /alert %}}
+
+## 将 `choice-label()` 与从文件选择一起使用
+
+要在注释或 calculate 字段中显示所选选项的标签：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | 选择机构 | |
+| calculate | facility_label | | choice-label(${facility}, ${facility}) |
+| note | summary | 所选机构：${facility_label} | |
+
+## 最佳实践
+
+1. 将 CSV 文件保持在 5,000 行以下，以在移动设备上获得良好性能。
+2. 始终包含 `name` 和 `label` 列——其他列是可选的。
+3. 对于级联选择，使用一个带父列的单一 CSV，并用 `choice_filter` 过滤。
+4. 在对列结构进行重大更改时，对 CSV 文件名进行版本控制（例如，`facilities_v3.csv`）。
+5. 仔细测试过滤表达式——`choice_filter` 中的拼写错误将默默地不显示任何选项。
+
+## 限制
+
+- 非常大的 CSV 文件（10,000 行以上）可能会降低表单加载速度，尤其是在低端设备上。
+- CSV 文件必须与表单一起上传——它们不能在运行时从 URL 获取（使用 `search()` 或 `pulldata()` 进行动态查找）。
+- `select_multiple_from_file` 在各客户端中的支持较少——在使用之前请验证兼容性。
+
+## 与 `search()` 的比较
+
+| | `select_one_from_file` | `search()` 外观 |
+|--|----------------------|----------------------|
+| 选项来源 | 附加的 CSV/XML 文件 | 服务器端数据库查询 |
+| 离线工作 | 是（文件已捆绑） | 需要网络连接 |
+| 选项数量 | 受设备内存限制 | 无限制（分页） |
+| 实时数据 | 否 | 是 |
+
+对于大型、频繁更改或服务器端数据集，请参阅[动态搜索](../advanced-extension/dynamic-search)。

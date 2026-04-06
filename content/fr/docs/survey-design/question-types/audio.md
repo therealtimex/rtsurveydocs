@@ -1,0 +1,99 @@
+---
+title: "Audio"
+description: "Les questions audio permettent aux répondants d'enregistrer et de soumettre des fichiers audio dans le cadre de l'enquête."
+icon: "mic"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 228
+---
+
+Le type de question `audio` permet aux répondants d'**enregistrer un audio** ou de téléverser un fichier audio existant dans leur réponse à l'enquête. Il est utile pour capturer des témoignages verbaux, des sons environnementaux, des récits ou toute information mieux transmise par la voix que par le texte.
+
+## Spécification XLSForm de base
+
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Veuillez enregistrer vos commentaires  |
+
+Pour plus de détails sur le type de question audio standard, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+
+## Utilisations
+
+Les questions audio sont couramment utilisées pour :
+
+1. Capturer des réponses verbales ouvertes pour réduire la charge de saisie de l'enquêteur
+2. Enregistrer des témoignages, histoires personnelles ou histoires orales
+3. Documenter des sons environnementaux (ex. : niveaux de bruit près d'une infrastructure)
+4. Collecter des échantillons de voix pour la recherche linguistique ou médicale
+5. Permettre aux répondants d'ajouter des précisions verbales à des réponses numériques ou de sélection
+
+## Format des données
+
+Les fichiers audio sont stockés comme pièces jointes binaires avec la soumission du formulaire, typiquement :
+
+- **Format :** MP3 ou AAC (enregistrement mobile) ; WAV (enregistrement haute qualité)
+- **Nommage :** `{instanceID}-{fieldname}.mp3` (ou équivalent)
+- **Stockage :** Téléversé dans le dossier média du serveur et lié à l'enregistrement de soumission
+- **Accès :** Lisible et téléchargeable depuis l'interface de gestion des soumissions
+
+## Extensions rtSurvey
+
+### Durée maximale
+
+Utilisez la colonne `parameters` pour limiter la durée d'enregistrement :
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | interview | Enregistrer l'entretien | `max-duration=120` |
+
+`max-duration` est en secondes. L'enregistreur s'arrête automatiquement à la limite.
+
+### Paramètres de qualité
+
+La qualité d'enregistrement peut être définie via `parameters` :
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Enregistrer le retour | `quality=normal` |
+
+Valeurs supportées : `low`, `normal` (par défaut), `voice-only`. `voice-only` est optimisé pour l'audio parlé avec réduction du bruit.
+
+### Écoute avant soumission
+
+Sur mobile, l'enquêteur peut réécouter le clip enregistré avant de continuer. Cette fonctionnalité est activée par défaut — aucune configuration n'est nécessaire.
+
+### Intégration avec l'enregistreur natif
+
+Sur Android et iOS, `audio` lance l'application d'enregistrement native de l'appareil. Sur le web, il utilise l'API MediaRecorder intégrée au navigateur.
+
+## Exemple d'utilisation
+
+### Avec durée maximale et conseil
+
+| type | name | label | hint | parameters |
+|------|------|-------|------|------------|
+| audio | story | Racontez-nous l'incident avec vos propres mots | Parlez clairement. L'enregistrement s'arrête après 3 minutes. | `max-duration=180` |
+
+### Audio conditionnel — uniquement si un problème a été signalé
+
+| type | name | label | relevant | required |
+|------|------|-------|----------|----------|
+| select_one yesno | issue_found | Un problème a-t-il été trouvé ? | | |
+| audio | issue_audio | Enregistrer une description du problème | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+
+## Bonnes pratiques
+
+1. Indiquez clairement dans le `label` ou le `hint` ce que l'enquêteur doit dire et pendant combien de temps.
+2. Utilisez `max-duration` pour éviter des fichiers trop volumineux dans les zones à faible débit de téléversement.
+3. Informez les répondants avant de commencer l'enregistrement — un enregistrement inattendu peut soulever des préoccupations en matière de vie privée.
+4. Testez l'enregistrement sur l'appareil cible et dans les conditions réseau avant le déploiement.
+5. Définissez `quality=voice-only` pour les enregistrements de type entretien afin de réduire la taille du fichier sans perdre l'intelligibilité.
+
+## Limitations
+
+- Les fichiers audio peuvent être volumineux (un enregistrement de 2 minutes en qualité normale représente ~2-4 Mo) — tenez-en compte dans vos estimations de forfait data et de temps de téléversement.
+- Tous les navigateurs ne prennent pas en charge l'API MediaRecorder — Chrome et Firefox fonctionnent de manière fiable ; Safari sur les anciennes versions d'iOS peut poser des problèmes.
+- La transcription des réponses audio nécessite un traitement supplémentaire (manuel ou par reconnaissance vocale automatique).
+- Les réglementations en matière de confidentialité peuvent restreindre l'enregistrement de voix — vérifiez les exigences locales de protection des données.

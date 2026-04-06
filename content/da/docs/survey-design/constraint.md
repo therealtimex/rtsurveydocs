@@ -1,0 +1,93 @@
+---
+title: "Validering af svar"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 270
+---
+
+En måde at sikre datakvalitet på er at tilføje begrænsninger til datafelterne i din formular. Begrænsninger hjælper med at forhindre brugere i at indtaste ugyldige eller umulige svar. Når du f.eks. spørger om en persons indkomst, vil du undgå urealistiske værdier såsom negative tal eller ekstremt høje værdier. Det er nemt at tilføje databegrænsninger i din formular. Følg blot trinnene nedenfor:
+
+1. Tilføj en ny kolonne kaldet "constraint" i din formular.
+2. I kolonnen "constraint" skal du indtaste en formel, der angiver grænserne for svaret.
+
+### Eksempel
+
+Lad os overveje et eksempel, hvor vi vil tilføje en begrænsning for en persons indkomst. Begrænsningen kræver, at indkomsten er mellem 0 og 1.000.000 kr. Sådan kan du opsætte begrænsningen:
+
+{{< table >}}
+| `name`      | `constraint`                  |
+|---------------|-----------------------------|
+| Indkomst      | . >= 0 & . <= 1000000       |
+{{< /table >}}
+
+I eksemplet ovenfor refererer "." i formlen til spørgsmålsvariablen, som repræsenterer den værdi, brugeren har indtastet for spørgsmålet "Indkomst". Begrænsningen ". >= 0 && . <= 1000000" sikrer, at den indtastede indkomst er større end eller lig med 0 og mindre end eller lig med 1.000.000.
+
+### Hård begrænsning
+
+En **hård begrænsning** blokerer formularindsendelse fuldstændigt, hvis den indtastede værdi ikke opfylder udtrykket. Intervieweren kan ikke fortsætte, før en gyldig værdi er indtastet.
+
+For at tilføje en hård begrænsning skal du indtaste dit udtryk i kolonnen `constraint`. Du kan valgfrit tilføje en menneskelig læsbar besked i `constraint_message`:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Respondentens alder | `. > 0 and . <= 120` | Alderen skal være mellem 1 og 120 |
+| decimal | temperature | Kropstemperatur (°C) | `. >= 35 and . <= 42` | Temperaturen skal være mellem 35°C og 42°C |
+| text | phone | Telefonnummer | `regex(., '^[0-9]{10}$')` | Indtast et 10-cifret telefonnummer |
+{{< /table >}}
+
+#### Flere betingelser
+
+Kombiner betingelser med `and` / `or`:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Brug af `regex()` til mønstervalidering
+
+Funktionen `regex(value, pattern)` tester en værdi mod et regulært udtryk:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | E-mailadresse | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Indtast en gyldig e-mailadresse |
+| text | zip_code | Postnummer | `regex(., '^[0-9]{4}$')` | Indtast et 4-cifret postnummer |
+{{< /table >}}
+
+#### Reference til andre felter i en begrænsning
+
+Brug `${fieldname}` til at referere til værdier fra andre spørgsmål:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Slutår | `. >= ${start_year}` | Slutåret skal være efter startåret |
+| decimal | loan_repaid | Tilbagebetalt beløb | `. <= ${loan_amount}` | Kan ikke tilbagebetale mere end lånebeløbet |
+{{< /table >}}
+
+### Blød advarsel
+
+En **blød advarsel** (også kaldet en blød begrænsning eller advarsel) advarer intervieweren om, at en værdi ser usædvanlig ud, men giver dem stadig mulighed for at fortsætte. Dette er nyttigt, når en værdi teknisk set er gyldig, men statistisk usandsynlig.
+
+Det mest almindelige mønster er at bruge en **note** med et `relevant`-udtryk, der markerer den mistænkelige værdi, kombineret med et **acknowledge**-spørgsmål for at bekræfte:
+
+{{< table >}}
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Antal børn | |
+| note | children_warning | Advarsel: Du har indtastet ${children} børn. Bekræft venligst, at dette er korrekt. | `. > 15` |
+| trigger | children_confirm | Bekræft, at antallet af børn er korrekt | `${children} > 15` |
+{{< /table >}}
+
+{{% alert icon=" " context="warning" %}}
+Forskellen mellem hårde og bløde begrænsninger er vigtig for datakvaliteten. Brug **hårde begrænsninger** til logisk umulige værdier (negative aldre, temperaturer over 100°C). Brug **bløde advarsler** til statistisk usandsynlige, men ikke umulige værdier – du ønsker ikke at blokere legitime kanttilfælde.
+{{% /alert %}}

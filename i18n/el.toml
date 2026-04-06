@@ -1,0 +1,38 @@
+[lang_select_title]
+    other = "Επιλέξτε τη γλώσσα σας"
+
+[search_title]
+    other = "Αναζήτηση"
+
+[search_navigate]
+    other = "για πλοήγηση"
+
+[search_select]
+    other = "για επιλογή"
+
+[search_close]
+    other = "για κλείσιμο"
+
+[search_cancel]
+    other = "ακύρωση"
+
+[search_no_results]
+    other = "Δεν βρέθηκαν αποτελέσματα για"
+
+[feedback_yes]
+    other = "Ναι"
+
+[feedback_no]
+    other = "Όχι"
+
+[feedback_helpful]
+    other = "Ήταν χρήσιμη αυτή η σελίδα;"
+
+[feedback_submit]
+    other = "Υποβολή"
+
+[enable_light_mode]
+    other = "Ενεργοποίηση φωτεινής λειτουργίας"
+
+[enable_dark_mode]
+    other = "Ενεργοποίηση σκοτεινής λειτουργίας"

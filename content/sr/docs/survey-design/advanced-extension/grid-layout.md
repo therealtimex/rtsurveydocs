@@ -1,0 +1,113 @@
+---
+title: "Raspored u mreži"
+description: "Raspored u mreži vam omogućava da pozicionirate polja u CSS mreži unutar grupe, omogućavajući dizajne formulara sa više kolona."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 296
+---
+
+Funkcija **Raspored u mreži** vam omogućava da rasporedite pitanja u **mreži sa više kolona** unutar grupe, koristeći tag izgleda `gridformat<>`. Ovo je korisno za formulare za intenzivan unos podataka gde više povezanih polja treba da se pojavi jedan pored drugog umesto vertikalno naslaganih.
+
+---
+
+## Kako funkcioniše
+
+Raspored u mreži se primenjuje na dva nivoa:
+
+1. **Grupa** — postavite `appearance: field-list grid(weight=N)` da definišete koliko kolona mreža ima
+2. **Svako polje unutar grupe** — postavite `appearance: gridformat<row=R col=C colspan=S/>` za pozicioniranje polja
+
+Mreža koristi 12-koloni sistem u Bootstrap stilu. `weight=N` definiše koliko logičkih kolona vaša mreža ima; svaka kolona zauzima `12/N` Bootstrap kolona.
+
+---
+
+## Izgled na nivou grupe
+
+| Izgled | Opis |
+|--------|------|
+| `field-list grid(weight=2)` | Mreža sa 2 kolone (svaka kolona = 6 Bootstrap kolona) |
+| `field-list grid(weight=3)` | Mreža sa 3 kolone (svaka kolona = 4 Bootstrap kolone) |
+| `field-list grid(weight=4)` | Mreža sa 4 kolone (svaka kolona = 3 Bootstrap kolone) |
+| `field-list grid(weight=6)` | Mreža sa 6 kolona (svaka kolona = 2 Bootstrap kolone) |
+
+---
+
+## Sintaksa `gridformat<>` na nivou polja
+
+```
+gridformat<row=R col=C colspan=S/>
+gridformat<row=R col=C colspan=S backgroundcolor=BOJA/>
+```
+
+| Atribut | Opis |
+|---------|------|
+| `row` | Broj reda (počevši od 1) |
+| `col` | Broj kolone (počevši od 1, unutar mreže definisane sa `weight`) |
+| `colspan` | Broj kolona koje ovo polje zauzima (podrazumevano 1) |
+| `backgroundcolor` | Opciona CSS boja za pozadinu polja (npr. `#f0f0f0`, `lightblue`) |
+
+---
+
+## Primer: Sekcija ankete o domaćinstvu sa 2 kolone
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | demographics | Demografija | `field-list grid(weight=2)` |
+| text | first_name | Ime | `gridformat<row=1 col=1/>` |
+| text | last_name | Prezime | `gridformat<row=1 col=2/>` |
+| integer | age | Godine | `gridformat<row=2 col=1/>` |
+| select_one gender | gender | Pol | `gridformat<row=2 col=2/>` |
+| text | address | Puna adresa | `gridformat<row=3 col=1 colspan=2/>` |
+| end_group | | | |
+
+Ovo se prikazuje kao:
+
+```
+[ Ime               ] [ Prezime            ]
+[ Godine            ] [ Pol                ]
+[ Puna adresa (zauzima obe kolone)         ]
+```
+
+---
+
+## Primer: Unos podataka o parceli sa 3 kolone
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | plot_data | Detalji parcele | `field-list grid(weight=3)` |
+| text | plot_id | ID parcele | `gridformat<row=1 col=1/>` |
+| decimal | area_ha | Površina (ha) | `gridformat<row=1 col=2/>` |
+| select_one crop_type | crop | Tip useva | `gridformat<row=1 col=3/>` |
+| decimal | yield | Prinos (kg) | `gridformat<row=2 col=1/>` |
+| decimal | revenue | Prihod | `gridformat<row=2 col=2/>` |
+| text | notes | Beleške | `gridformat<row=2 col=3/>` |
+| end_group | | | |
+
+---
+
+## Boje pozadine
+
+Koristite `backgroundcolor` za vizuelno razlikovanje sekcija:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | section_a | Sekcija A | `gridformat<row=1 col=1 colspan=2 backgroundcolor=#e8f4f8/>` |
+
+---
+
+## Najbolje prakse
+
+1. Koristite raspored u mreži samo za **ekrane sa intenzivnim unosom podataka** gde polja jedno pored drugog zaista smanjuju skrolovanje.
+2. Zadržite polja sa `colspan=1` kratkim (ID-ovi, kodovi, kratki izbori) — široke oznake se loše odbijaju u uskim kolonama mreže.
+3. Koristite `colspan=N` za polja sa dugim oznakama ili unosima sa više redova teksta.
+4. Testirajte na najmanjoj veličini ekrana koju očekujete da anketari koriste — mreža sa 4 kolone je stisnuta na telefonu.
+5. Raspored u mreži funkcioniše najbolje na veb i tablet faktorima forme; na mobilnim telefonima raspored sa 2 kolone je obično maksimalna udobna širina.
+
+## Ograničenja
+
+- `gridformat<>` radi samo unutar grupe sa izgledom `grid(weight=N)` — nema efekta na najvišem nivou.
+- Raspored u mreži je rtSurvey proširenje za veb formulare i možda se neće pravilno prikazivati u drugim ODK-kompatibilnim klijentima.
+- Pozicioniranje redova i kolona se ne validira u vreme izgradnje formulara — polja koja se preklapaju će se oba prikazati ali mogu izgledati pokvareno.

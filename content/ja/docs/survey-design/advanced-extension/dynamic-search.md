@@ -1,0 +1,143 @@
+---
+title: "Dynamic Search"
+description: "Dynamic Searchは調査員が入力するにつれてリモートAPIからリアルタイムで選択肢を読み込み、大規模または頻繁に更新されるデータセットを可能にします。"
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 293
+---
+
+**Dynamic Search**（Search APIとも呼ばれる）により、`select_one`、`select_multiple`、または`text`フィールドが調査員の入力に合わせて**実行時に**リモートWebサービスから選択肢を読み込めます。選択肢リストがCSVファイルにバンドルするには大きすぎる場合、頻繁に更新される場合、またはライブデータベースから取得する場合に適したアプローチです。
+
+---
+
+## `search-api()`外観
+
+ダイナミック検索は`appearance`列で`search-api()`関数を使用して設定されます：
+
+```
+search-api(method, url, post_body, value_column, display, data_path, save_path)
+```
+
+### パラメーター
+
+| パラメーター | 説明 |
+|-----------|-------------|
+| `method` | 常に`'POST'`を使用 |
+| `url` | クエリするAPIエンドポイント |
+| `post_body` | APIに送信されるJSONボディ。調査員の現在の検索テキストのプレースホルダーとして`%__input__%`を使用 |
+| `value_column` | 保存される**値**として使用するレスポンスオブジェクトのキー |
+| `display` | ドロップダウンに表示される**ラベル**として使用するキー（またはテンプレート）。`##key##`プレースホルダーと`@{func}`式をサポート |
+| `data_path` | レスポンス内の結果オブジェクトの配列へのJSONPath（例：`$.data`、`$.hits.hits.*._source`） |
+| `save_path` | 他のフィールドが使用するために生のレスポンスが保存される名前 |
+
+---
+
+## 基本的な例
+
+調査員が施設名の一部を入力する医療施設検索：
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | 医療施設を選択してください | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+
+調査員が「nair」と入力するとAPIは`{"query": "nair"}`を受け取り、以下を返します：
+
+```json
+{
+  "results": [
+    {"id": "HF001", "name": "Nairobi Central Clinic"},
+    {"id": "HF002", "name": "Nairobi West Hospital"}
+  ]
+}
+```
+
+ドロップダウンには`Nairobi Central Clinic`と`Nairobi West Hospital`が表示され、保存される値は`HF001`または`HF002`です。
+
+---
+
+## 高度な表示フォーマット
+
+### `##key##`テンプレートの使用
+
+ラベルに複数のフィールドを表示する：
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
+```
+
+`Nairobi Central Clinic (Nairobi)`のように表示されます。
+
+### `@{func}`式の使用
+
+表示ラベルに条件ロジックを適用する：
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
+  '@{if_else(eq("##status##", "active"), "✓ ##name##", "✗ ##name##")}',
+  '$.data', 'res')
+```
+
+アクティブな結果は`✓ クリニック名`と表示され、非アクティブは`✗ クリニック名`と表示されます。
+
+---
+
+## デフォルト値の設定：`search-default-api()`
+
+`search-api()`の後に`search-default-api()`を使用して、別のAPIコールから読み込まれたデフォルトの選択肢でフィールドを事前入力します（例：既存のレコードを編集するとき）：
+
+```
+appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
+```
+
+---
+
+## select_multipleのカスタムセパレーター：`search-default-separator()`
+
+`select_multiple`フィールドでは、複数の選択された値が保存文字列でどのように結合されるかを指定します：
+
+```
+appearance: search-api(...) search-default-separator(' || ')
+```
+
+デフォルトのセパレーターはスペースです。
+
+---
+
+## サポートされる質問タイプ
+
+| 質問タイプ | ユースケース |
+|---------------|----------|
+| `select_one` | 検索結果からの単一選択 |
+| `select_multiple` | 検索結果からの複数選択 |
+| `text` | オートコンプリート — 調査員が自由に入力するが提案から選択できる |
+
+---
+
+## 保存されたレスポンスデータの使用
+
+`save_path`は完全なAPIレスポンスオブジェクトを指定された名前で保存します。他のフィールドは`pulldata()`でそれを参照できます：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one | facility | 施設を選択してください | `search-api(..., 'facility_data')` |
+| calculate | facility_district | | `pulldata('facility_data', 'district')` |
+| calculate | facility_type | | `pulldata('facility_data', 'type')` |
+
+---
+
+## ベストプラクティス
+
+1. APIエンドポイントが1〜2秒以内に応答することを確認してください — 遅いAPIは検索を応答性がなく感じさせます。
+2. APIが一致する結果のみを返すようにpost_bodyで`%__input__%`を使用してください。
+3. 高速なレスポンスのためにサーバー側で検索フィールドをインデックス化してください（例：Elasticsearch、データベースの全文インデックス）。
+4. クエリごとの結果を20〜50項目に制限してください — 何千もの結果を返すと検索の目的が失われます。
+5. 単一文字の入力に対して広いクエリがトリガーされないように、APIに最小入力長の要件を含めてください。
+
+## 制限事項
+
+- Dynamic Searchはネットワーク接続が必要です — オフラインでは機能しません。
+- `%__input__%`プレースホルダーはそのまま注入されます；インジェクション攻撃を防ぐためにサーバー側で入力をサニタイズしてください。
+- 複雑な`@{func}`表示式はすべてのrtSurveyクライアントバージョンでサポートが制限されている場合があります。

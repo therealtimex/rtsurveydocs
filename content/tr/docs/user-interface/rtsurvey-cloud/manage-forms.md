@@ -1,0 +1,36 @@
+---
+title: "Form Yönetimi"
+description: "RT-CPMS'de veri toplama formlarını yükleyin, yapılandırın ve yönetin."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 315
+---
+
+**Form Yönetimi** modülü, anket araçlarınızı organize etmek ve saha çalışması görevlerini koordine etmek için birincil ağ geçidi olarak hizmet verir. Form erişilebilirliği, veri görüntüleme ve cihaz hedefleme üzerinde ayrıntılı kontrol sağlar.
+
+![Form Yönetimi Arayüzü](/images/manage_forms.png)
+
+## Form Ailesi Genel Bakışı
+
+**Form ve Veri Girişi** menüsü altında **Form Ailesi** bölümü, tüm içe aktarılmış formlarınızın kapsamlı bir ızgarasını ve temel hızlı erişim kontrollerini görüntüler. Bu merkezi görünüm, proje yöneticilerinin bireysel anketleri hızla dağıtmasına ve yapılandırmasına olanak tanır.
+
+### Temel Veri Sütunları ve Yapılandırma Seçenekleri
+
+- **Veri Görünümü:** Her form için gönderilen kayıtlara ve veri kümesi önizlemelerine doğrudan erişin.
+- **Düzenlemeye İzin Ver:** Saha çalışanlarının gönderilen verilerini düzenleme yeteneğini kilitlemek veya açmak için hızlı geçiş (Aktif/Pasif durumlar).
+- **Genel Görünürlük:** Sayımcı kimlik doğrulaması gerektirmeden formu genel kullanıma açmak için geçiş.
+- **Web Formunun URL'si:** Tarayıcı tabanlı veri toplama formlarını paylaşmak için benzersiz genel bağlantıyı anında alın.
+- **Geçersiz Kılma Ayarları:** Form özel kuralları, değerleri ve belirli özellikleri devre dışı bırakmayı özelleştirmek için gelişmiş yapılandırma modalı (dişli simgesi aracılığıyla erişilir).
+- **Form Tanımlayıcıları:** Form Ailesi adı, Aile Kodu ve benzersiz Form Kimliği dahil standart meta verileri görüntüleyin.
+- **Coğrafi Yapılandırma:** Form yapısına bağlı belirli haritalama veya coğrafi nokta yapılandırmaları.
+- **Formu Kilitle:** Veri toplama aşamasını tamamlamak için gönderim erişimini kilitleme özelliği.
+
+## Form Eylemleri ve Navigasyon
+
+Üst kontrol paneli, toplu işlemleri ve alternatif form görünümlerini kolaylaştırır:
+
+- **Cihaza Eylem:** Proje yöneticilerinin görev atamasına, hedefli formlar göndermesine veya belirli sayımcıların saha cihazlarına doğrudan eylemler gönderip göndermesine olanak tanıyan güçlü bir açılır araç.
+- **XLSX Form Sekmesi:** Ana yönetim ızgarasından yeni yerel XLSForm dosyalarını işlemek için yükleme ortamlarına hızla geçiş yapın.
+- **Form Oluşturucu Sekmesi:** Harici elektronik tablo yazılımı kullanmadan formları dinamik olarak görsel olarak oluşturmak veya değiştirmek için yerleşik araca erişin.

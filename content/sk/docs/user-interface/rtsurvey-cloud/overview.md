@@ -1,0 +1,72 @@
+---
+title: "Prehľad"
+description: "rtCloud je výkonná serverová komponenta rtSurvey, ktorá ponúka správu projektov, spracovanie formulárov, zber dát a pokročilé pracovné postupy odoslaní pre efektívne prieskumné operácie a longitudinálne štúdie."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 313
+---
+
+![Domovská stránka rtCloud](images/rtsurvey/rtsurvey-cloud-home.webp)
+
+rtCloud je robustná serverová komponenta ekosystému rtSurvey navrhnutá na zefektívnenie zberu, správy a analýzy dát. Ako centrálny uzol operácií rtSurvey ponúka rtCloud komplexnú sadu funkcií na podporu komplexných prieskumných projektov a longitudinálnych štúdií.
+
+## Kľúčové funkcie
+
+### Správa projektov
+- Organizujte všetky aspekty vášho prieskumného projektu na jednom mieste
+- Spravujte roly používateľov, formuláre, analýzy, výsledky a oprávnenia v rámci každého projektu
+
+### Správa používateľov a bezpečnosť
+- Vytvárajte a spravujte používateľské účty s oprávneniami na základe rol
+- Zaistite bezpečnosť dát a kontrolu prístupu na každej úrovni
+
+### Správa formulárov
+- Nahrávajte a spravujte XLSForms priamo
+- Podpora aktualizácií verzií formulárov vrátane menších úprav a štrukturálnych zmien
+- Pripájajte multimédiá alebo ďalšie dáta k formulárom
+- Skutočná možnosť odstránenia formulárov pre plnú kontrolu nad vašimi nástrojmi prieskumu
+
+### Zber dát a správa odoslaní
+- Bezproblémová integrácia s mobilnou aplikáciou rtSurvey, webovou aplikáciou a webformulármi
+- Podpora odoslaní od autentifikovaných používateľov aj anonymných verejných prepojení
+- Spracovanie multimédií odoslaní a dátových príloh
+- Interaktívny tabuľkový náhľad dát odoslaní pre rýchly prehľad
+
+### Pokročilé pracovné postupy odoslaní
+- Vracajte odoslania na zariadenia používateľov na ďalšie úpravy alebo overenie
+- Presúvajte odoslania na iné zariadenia, čím umožňujete spoluprácu a kontrolu kvality
+
+### Správa longitudinálnych dát
+- Efektívne spravujte opakované merania a dlhodobé štúdie
+- Sledujte zmeny a aktualizácie dát účastníkov v priebehu času
+
+### Flexibilné prepojenie
+- Umožnite mobilnej aplikácii rtSurvey pripojenie na sťahovanie formulárov a nahrávanie odoslaní
+- Podpora offline zberu dát s bezproblémovou synchronizáciou pri obnovení pripojenia
+
+## Čím sa rtCloud odlišuje
+
+Hoci inšpirovaný inými platformami zberu dát, rtCloud ponúka jedinečné funkcie, ktoré ho odlišujú:
+
+1. **Skutočné odstránenie formulárov**: Na rozdiel od niektorých platforiem rtCloud umožňuje úplné odstránenie formulárov, keď je to potrebné.
+
+2. **Flexibilné pracovné postupy odoslaní**: Schopnosť vracať a presúvať odoslania umožňuje komplexné procesy kontroly dát a zabezpečenia kvality.
+
+3. **Integrovaná správa projektov**: rtCloud presahuje správu formulárov a dát a ponúka nástroje na organizáciu všetkých aspektov vášho prieskumného projektu.
+
+4. **Priama podpora XLSForm**: Nahrávajte XLSForms priamo bez konverzie, čím zefektívňujete proces tvorby formulárov.
+
+5. **Komplexný systém oprávnení**: Jemnozrnnú kontrolu nad prístupom a schopnosťami používateľov v rámci projektov.
+
+## Začíname s rtCloud
+
+Na začatie používania rtCloud pre vaše prieskumné projekty:
+
+1. Nastavte si server rtCloud alebo kontaktujte rtSurvey pre hostované riešenia.
+2. Vytvorte prvý projekt a pozvite členov tímu.
+3. Nahrajte XLSForms a nakonfigurujte pracovné postupy zberu dát.
+4. Prepojte mobilné aplikácie rtSurvey a začnite zberať dáta.
+
+rtCloud umožňuje výskumníkom, organizáciám a tímom zberu dát spravovať komplexné prieskumné projekty s ľahkosťou, bezpečnosťou a flexibilitou. Či vykonávate jednorazový prieskum alebo viacročnú longitudinálnu štúdiu, rtCloud poskytuje nástroje, ktoré potrebujete na úspech.

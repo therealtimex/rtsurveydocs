@@ -1,0 +1,148 @@
+---
+title: "Select_multiple"
+description: "Pyetjet select_multiple lejojnë të anketuarit të zgjedhin një ose më shumë opsione nga lista e paracaktuar."
+icon: "check_box"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 225
+---
+
+Lloji i pyetjes `select_multiple` shfaq një listë ku i anketuari mund të zgjedhë **një ose më shumë opsione**. Zgjedhjet paraqiten si parazgjedhje me kutia zgjedhjeje. Vlera e ruajtur është një **listë e ndarë me hapësira** e të gjitha vlerave të zgjedhjeve të zgjedhura.
+
+## Specifikimi bazë XLSForm
+
+**Fleta survey:**
+
+| type | name | label |
+|------|------|-------|
+| select_multiple crops | crops_grown | Cilat kultura rritet familja? |
+
+**Fleta choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| crops | maize | Misri |
+| crops | beans | Fasule |
+| crops | rice | Oriz |
+| crops | vegetables | Perime |
+| crops | other | Të tjera |
+
+Për më shumë detaje shikoni [specifikimin XLSForm](https://xlsform.org/en/#question-types).
+
+## Formati i të dhënave të ruajtura
+
+Kolona e eksportuar përmban një listë të ndarë me hapësira të vlerave të zgjedhura:
+
+```
+maize beans vegetables
+```
+
+Përdorni funksionin `selected()` — jo `=` — kur testoni vlerat select_multiple në shprehje (shikoni poshtë).
+
+## Përdorimet
+
+Pyetjet select_multiple përdoren për:
+
+1. Mbledhjen e përgjigjeve të shumëfishta të zbatueshme (p.sh., burimet e të ardhurave, kulturat e rritura, simptomat)
+2. Artikujt e marrëveshjes me kutia zgjedhjeje (p.sh., "Zgjidhni të gjitha që zbatohen")
+3. Inventarët e gjuhëve ose aftësive
+4. Çdo pyetje ku shumë përgjigje janë njëkohësisht të vlefshme
+
+## Opsionet e pamjes
+
+{{< table >}}
+| Pamja | Përshkrimi |
+|-------|------------|
+| *(asnjë)* | Kutia zgjedhjeje parazgjedhëse, një për rresht |
+| `minimal` | Widget zgjedhjeje të shumëfishta me listë rënëse |
+| `compact` | Rrjetë kompakte, kolonat rregullohen me gjerësinë e ekranit |
+| `compact-N` | Rrjetë kompakte e detyruar në N kolona |
+| `horizontal` | Zgjedhjet të rregulluara horizontalisht në rresht (web) |
+| `horizontal-compact` | Horizontal, hapësirë kompakte (web) |
+| `label` | Tregon vetëm etiketat, pa kutia zgjedhjeje (përdorni me `list-nolabel`) |
+| `list-nolabel` | Tregon vetëm kutitë e zgjedhjes, pa etiketa (përdorni me `label`) |
+| `columns(N)` | Shfaqje në N kolona (zgjerim rtSurvey) |
+{{< /table >}}
+
+### Shembull: Paraqitje kompakte me 3 kolona
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple symptoms | symptoms | Zgjidhni të gjitha simptomat e vërejtura | compact-3 |
+
+## Përdorimi i `selected()` në shprehje
+
+Meqenëse vlera e ruajtur është një varg i ndarë me hapësira, **duhet** të përdorni `selected()` për të testuar nëse një zgjedhje specifike u zgjodh. Përdorimi i `=` nuk do të funksionojë saktë.
+
+### Në `relevant`
+
+Tregoni pyetjen e vazhdimit vetëm nëse u zgjodh "tjetër":
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_multiple crops | crops_grown | Cilat kultura rriten? | |
+| text | crops_other | Ju lutemi specifikoni kulturat e tjera | `selected(${crops_grown}, 'other')` |
+
+### Në `constraint`
+
+Kërkoni të paktën 2 zgjedhje:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple issues | issues | `count-selected(.) >= 2` | Zgjidhni të paktën 2 çështje |
+
+Kufizimi deri në maksimum 3:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple priorities | priorities | `count-selected(.) <= 3` | Zgjidhni jo më shumë se 3 prioritete |
+
+### Në `calculate` — bashkimi i etiketave të zgjedhura
+
+Kombinoni `selected-at()`, `count-selected()`, dhe `choice-label()` për të ndërtuar një përmbledhje të lexueshme:
+
+| type | name | calculation |
+|------|------|-------------|
+| calculate | crops_summary | join(', ', ${crops_grown}) |
+
+## Opsioni "Asnjë nga sa sipër" / opsioni ekskluziv
+
+Një model i zakonshëm është ta bëni një opsion të ndërveçuar me të gjithë të tjerët. Përdorni `constraint` për ta zbatuar:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| select_multiple issues | issues | Zgjidhni të gjitha çështjet e pranishme | `not(selected(., 'none') and count-selected(.) > 1)` | "Asnjë" nuk mund të zgjidhet me opsione të tjera |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| issues | water | Mungesa e ujit |
+| issues | roads | Rrugë të këqija |
+| issues | health | Mungesa e shërbimeve shëndetësore |
+| issues | none | Asnjë nga sa sipër |
+
+## Numërimi dhe përmbledhja e zgjedhjeve
+
+| Funksioni | Shembulli | Rezultati |
+|-----------|-----------|-----------|
+| `count-selected(field)` | `count-selected(${crops_grown})` | Numri i zgjedhjeve të zgjedhura |
+| `selected(field, value)` | `selected(${crops_grown}, 'maize')` | e vërtetë/e rreme |
+| `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | Vlera e parë e zgjedhur |
+| `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | Etiketa për një vlerë |
+
+## Praktikat më të mira
+
+1. Gjithmonë përdorni `selected()` në `relevant`, `constraint`, dhe `calculate` — kurrë `=` ose `!=`.
+2. Shtoni kufizim për të kufizuar numrin maksimal të zgjedhjeve nëse dizajni i pyetjes kërkon kështu.
+3. Përfshini opsionin "Asnjë" ose "Nuk zbatohet" kur zero zgjedhje është një përgjigje e vlefshme.
+4. Për lista të gjata (15+ zgjedhje), përdorni `minimal` (listë rënëse me zgjedhje të shumëfishta) për të shmangur lëvizjen e tepërt.
+5. Eksportoni të dhënat dhe përdorni ndarjen e vargut në mjetin tuaj të analizës — formati i ndarë me hapësira kërkon ndarje para tabelizimit.
+
+## Kufizimet
+
+- Vlerat select_multiple nuk mund të krahasohen direkt me `=`. Gjithmonë përdorni `selected()`.
+- Pamja kompakte mund të mos paraqitet mirë për etiketa shumë të gjata zgjedhjesh.
+- Kur filtroni zgjedhjet me `choice_filter`, filtrimi zbatohet për të gjitha zgjedhjet e shfaqura, si me `select_one`.

@@ -1,0 +1,105 @@
+---
+title: "Validácia odpovedí"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 270
+---
+
+Jedným zo spôsobov zabezpečenia kvality dát je pridanie obmedzení k dátovým poliam vo vašom formulári. Obmedzenia pomáhajú zabrániť používateľom zadávať neplatné alebo nemožné odpovede. Napríklad, pri pýtaní sa na príjem osoby chcete zabrániť nerealistickým hodnotám, ako sú záporné čísla alebo extrémne vysoké hodnoty. Pridanie obmedzení dát do vášho formulára je jednoduché. Stačí postupovať podľa nasledujúcich krokov:
+
+1. Pridajte nový stĺpec s názvom „constraint" do vášho formulára.
+2. V stĺpci „constraint" zadajte vzorec, ktorý špecifikuje limity pre odpoveď.
+
+### Príklad
+
+Uvažujme príklad, kde chceme pridať obmedzenie pre príjem osoby. Obmedzenie vyžaduje, aby príjem bol medzi 0 EUR a 1 000 000 EUR. Tu je návod, ako nastaviť obmedzenie:
+
+{{< table >}}
+| `name`      | `constraint`                  |
+|---------------|-----------------------------|
+| Income        | . >= 0 & . <= 1000000      |
+{{< /table >}}
+
+V príklade vyššie „." vo vzorci odkazuje späť na premennú otázky, ktorá predstavuje hodnotu zadanú používateľom pre otázku „Income". Obmedzenie „. >= 0 && . <= 1000000" zabezpečuje, že zadaný príjem je väčší alebo rovný 0 a menší alebo rovný 1 000 000.
+
+### Pevné obmedzenie
+
+**Pevné obmedzenie** úplne blokuje odoslanie formulára, ak zadaná hodnota nespĺňa výraz. Anketár nemôže pokračovať, kým nezadá platnú hodnotu.
+
+Na pridanie pevného obmedzenia zadajte výraz do stĺpca `constraint`. Voliteľne pridajte ľudsky čitateľnú správu do `constraint_message`:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | age | Vek respondenta | `. > 0 and . <= 120` | Vek musí byť medzi 1 a 120 rokmi |
+| decimal | temperature | Telesná teplota (°C) | `. >= 35 and . <= 42` | Teplota musí byť medzi 35°C a 42°C |
+| text | phone | Telefónne číslo | `regex(., '^[0-9]{10}$')` | Zadajte 10-ciferné telefónne číslo |
+{{< /table >}}
+
+#### Viacero podmienok
+
+Kombinujte podmienky pomocou `and` / `or`:
+
+```
+. >= 0 and . <= 100
+```
+
+```
+. = 'yes' or . = 'no'
+```
+
+#### Použitie `regex()` na overenie vzoru
+
+Funkcia `regex(value, pattern)` testuje hodnotu voči regulárnemu výrazu:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| text | email | E-mailová adresa | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Zadajte platnú e-mailovú adresu |
+| text | zip_code | PSČ | `regex(., '^[0-9]{5}$')` | Zadajte 5-ciferné PSČ |
+{{< /table >}}
+
+#### Odkazovanie na iné polia v obmedzení
+
+Použite `${fieldname}` na odkazovanie hodnôt z iných otázok:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | end_year | Rok ukončenia | `. >= ${start_year}` | Rok ukončenia musí byť po roku začatia |
+| decimal | loan_repaid | Splatená suma | `. <= ${loan_amount}` | Nie je možné splatiť viac, ako je výška pôžičky |
+{{< /table >}}
+
+### Mäkké upozornenie
+
+**Mäkké upozornenie** (tiež nazývané mäkké obmedzenie alebo varovanie) varuje anketára, že hodnota vyzerá neobvykle, ale stále mu umožňuje pokračovať. Je to užitočné, keď je hodnota technicky platná, ale štatisticky nepravdepodobná.
+
+rtSurvey podporuje mäkké upozornenia pomocou stĺpca `constraint` so špeciálnym prístupom `constraint_type` alebo cez vzhľad `soft` kombinovaný s poľom note.
+
+Najbežnejší vzor je použiť **note** s výrazom `relevant`, ktorý označí podozrivú hodnotu, spárovaný s otázkou **acknowledge** na potvrdenie:
+
+{{< table >}}
+| `type` | `name` | `label` | `relevant` |
+|--------|--------|---------|------------|
+| integer | children | Počet detí | |
+| note | children_warning | Upozornenie: Zadali ste ${children} detí. Prosím potvrďte, že je to správne. | `. > 15` |
+| trigger | children_confirm | Potvrďte, že počet detí je správny | `${children} > 15` |
+{{< /table >}}
+
+#### Mäkké upozornenie iba s constraint_message
+
+Pre jednoduchšie mäkké varovanie môžete sformulovať obmedzenie tak, aby varovalo pri extrémnych hodnotách, ale stále umožňovalo široký rozsah:
+
+{{< table >}}
+| `type` | `name` | `label` | `constraint` | `constraint_message` |
+|--------|--------|---------|--------------|----------------------|
+| integer | children | Počet detí | `. >= 0 and . <= 30` | Táto hodnota sa zdá byť veľmi vysoká. Prosím overte. |
+{{< /table >}}
+
+{{% alert icon=" " context="warning" %}}
+Rozlíšenie medzi pevnými a mäkkými obmedzeniami je dôležité pre kvalitu dát. Používajte **pevné obmedzenia** pre logicky nemožné hodnoty (záporný vek, teploty nad 100°C). Používajte **mäkké upozornenia** pre štatisticky nepravdepodobné, ale nie nemožné hodnoty — nechcete blokovať legitímne okrajové prípady.
+{{% /alert %}}

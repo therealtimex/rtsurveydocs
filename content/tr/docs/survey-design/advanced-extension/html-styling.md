@@ -1,0 +1,145 @@
+---
+title: "HTML Stil"
+description: "rtSurvey etiketlerde ve ipuçlarında HTML etiketlerini destekler; zengin metin biçimlendirme, bağlantılar ve dinamik renk temaları oluşturmanıza olanak tanır."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 297
+---
+
+rtSurvey, web formlarında **etiket** ve **ipucu** metnini HTML olarak işler. Bu, metni biçimlendirmek, satır sonları eklemek, bağlantılar oluşturmak ve renkler uygulamak için standart HTML etiketlerini kullanabileceğiniz anlamına gelir. Bu özellikle not alanları, bölüm talimatları ve dinamik özetler için kullanışlıdır.
+
+{{% alert icon=" " context="warning" %}}
+Etiketlerdeki HTML, **web formunda** ve rtSurvey mobil uygulamalarında işlenir. Tüm ODK uyumlu istemcilerde görüntülenmeyebilir. Her zaman hedef platformunuzda test edin.
+{{% /alert %}}
+
+---
+
+## Desteklenen HTML etiketleri
+
+### Metin biçimlendirme
+
+| Etiket | Sonuç |
+|-----|--------|
+| `<strong>metin</strong>` veya `<b>metin</b>` | **Kalın metin** |
+| `<em>metin</em>` veya `<i>metin</i>` | *İtalik metin* |
+| `<u>metin</u>` | Altı çizili metin |
+| `<br>` | Satır sonu |
+| `<span style="...">metin</span>` | Satır içi stil |
+
+### Bağlantılar
+
+```html
+<a href="https://example.com" target="_blank">Buraya tıklayın</a>
+```
+
+Yeni bir sekmede açılır. Sayımcının başvurması gereken referans belgeler, kılavuzlar veya harici kaynaklar için kullanın.
+
+### Renkler
+
+`<span>`'i satır içi stillerle kullanın:
+
+```html
+<span style="color: red;">Uyarı: değer aralık dışında</span>
+<span style="color: #009688;">Bölüm tamamlandı</span>
+```
+
+---
+
+## Renk teması değişkenleri
+
+rtSurvey, uygulamanın yapılandırılmış temasına uyum sağlayan **renk teması belirteçlerini** destekler. `__COLOR_THEME_NAME__` sözdizimini kullanın:
+
+```html
+<span style="color: var(--color-theme-primary);">Birincil renk metni</span>
+```
+
+Veya etiket metnindeki belirteç kısayolunu kullanarak:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Önemli not</font>
+```
+
+Bu, işleme zamanında CSS değişkenli eşdeğer `<span>`'e otomatik olarak dönüştürülür.
+
+---
+
+## Çok dilli etiketler
+
+Tek bir etiket hücresinde birden fazla dili desteklemek için içeriği dil etiketleriyle sarın:
+
+```
+<en>Hane boyutunu girin</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey, geçerli uygulama diliyle eşleşen içeriği çıkarır. Eşleşen dil etiketi bulunamazsa, tam dize olduğu gibi gösterilir.
+
+---
+
+## Not alanlarındaki örnekler
+
+### Kalın ve satır sonu içeren bölüm talimatı
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Bölüm 3: Arazi Kullanımı</strong><br>Bu bölümdeki tüm soruları yalnızca hane reisine sorun.` |
+
+### Hesaplama referanslı dinamik özet
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Toplam hane üyesi: <strong>${total}</strong><br><span style="color: gray;">Yetişkinler: ${adults} · Çocuklar: ${children}</span>` |
+
+### Kırmızı renkte uyarı
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Uyarı:</strong> Girilen yaş (${age}) alışılmadık derecede yüksek. Lütfen doğrulayın.</span>` | `${age} > 100` |
+
+### Referans belgeye bağlantı
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Bu bölüme başlamadan önce <a href="https://docs.example.com/guidelines" target="_blank">Saha Kılavuzu</a>'na bakın.` |
+
+---
+
+## Özel rtSurvey HTML etiketleri
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+Form içi modal olarak bir URL'yi yerleştirir. Tam ayrıntılar için [Webbox](webbox) sayfasına bakın.
+
+### `<delete-repeat-current>etiket</delete-repeat-current>`
+
+Tekrar grubunun içine dokunulduğunda mevcut tekrar örneğini silen bir düğme oluşturur.
+
+### `<delete-repeat-last>etiket</delete-repeat-last>`
+
+Son tekrar örneğini silen bir düğme oluşturur.
+
+Bir tekrar grubu içindeki örnek kullanım:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Bu üyeyi kaldır</delete-repeat-current>` |
+
+---
+
+## En İyi Uygulamalar
+
+1. HTML'yi dikkatli kullanın — aşırı biçimlendirilmiş etiketler okumayı kolaylaştırmaz, zorlaştırır.
+2. Kalın için `<strong>` ve italik için `<em>` tercih edin; kullanımdan kaldırılmış `<b>` ve `<i>` yerine.
+3. Renk kullanımını anlamlı tutun — uyarılar için kırmızı kullanın, dekorasyon için değil.
+4. HTML işlemeyi hem mobil uygulamada hem de web formunda test edin; işleme biraz farklı olabilir.
+5. Etiketlerin içinde `<table>` etiketlerinden kaçının — mobil ekranlarda nadiren iyi görüntülenirler.
+6. JavaScript (`<script>`) kullanmayın — kaldırılacak veya hatalara neden olacaktır.
+
+## Sınırlamalar
+
+- Karmaşık HTML (tablolar, formlar, scriptler) desteklenmez ve işlemeyi bozabilir.
+- Bazı eski mobil istemciler HTML etiketlerini gerçek metin olarak görüntüleyebilir — tüm hedef cihazlarda test edin.
+- `<a>` bağlantıları bir tarayıcıda veya WebView'de açılır — sayımcı formu terk eder, bu mobilde rahatsız edici olabilir.

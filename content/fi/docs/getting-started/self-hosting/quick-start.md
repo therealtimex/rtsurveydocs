@@ -1,0 +1,43 @@
+---
+weight: 1
+date: "2026-03-12T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+title: "Pika-aloitus"
+icon: "play_circle"
+toc: true
+description: "Ota rtCloud käyttöön omalla palvelimellasi muutamassa minuutissa automatisoidulla pilviskripting."
+---
+
+Tämä opas auttaa sinua saamaan rtCloud käyntiin omalla palvelimellasi. Automatisoidut skriptit hoitavat kaiken — Docker, SSL, tietokanta, palomuuri — yhdellä ajolla.
+
+## Vaatimukset
+
+### Palvelin
+
+| Resurssi | Minimi | Suositeltu |
+|---------|--------|-----------|
+| RAM | 2 GB | 4 GB (vaaditaan Keycloak SSO:n kanssa) |
+| Levy | 25 GB | 40 GB |
+| CPU | 1 vCPU | 2 vCPUs |
+| Käyttöjärjestelmä | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Verkkotunnus
+
+Tarvitset verkkotunnuksen, jossa on **A-tietue, joka osoittaa palvelimen IP-osoitteeseen**, ennen skriptin suorittamista. Let's Encrypt vaatii DNS-resoluution SSL-sertifikaatin myöntämiseen.
+
+---
+
+## Valitse pilvipalveluntarjoajasi
+
+Valitse palveluntarjoajasi alta. Kullakin on automatisoitu skripti, joka suoritetaan ensimmäisellä käynnistyksellä ja viimeistelee asennuksen **5–10 minuutissa**.
+
+| Palveluntarjoaja | Opas |
+|-----------------|------|
+| Linode (Akamai) | [Ota käyttöön Linodessa](../cloud-deployment/linode) — helpoin, lomakepohjainen asennus StackScriptin kautta |
+| DigitalOcean | [Ota käyttöön DigitalOceanissa](../cloud-deployment/digitalocean) |
+| AWS EC2 | [Ota käyttöön AWS:ssä](../cloud-deployment/aws) |
+| Google Cloud | [Ota käyttöön GCP:ssä](../cloud-deployment/gcp) |
+
+> **Suositeltu useimmille:** Aloita Linodesta — StackScript tarjoaa lomakepohjaisen käyttöliittymän, joten mitään ei tarvitse muokata manuaalisesti.

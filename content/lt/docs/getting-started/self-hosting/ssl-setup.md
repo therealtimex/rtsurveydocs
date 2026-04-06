@@ -1,0 +1,128 @@
+---
+weight: 4
+title: "Nustatykite SSL"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+icon: "lock"
+toc: true
+description: "Sukonfigūruokite HTTPS savo rtSurvey serveriui. Būtina prieš prisijungiant."
+---
+
+SSL turi būti sukonfigūruotas, kad galėtumėte prisijungti. Kai atidarysite programą pirmą kartą, būsite automatiškai nukreipti į SSL sąrankos ekraną.
+
+---
+
+## SSL sąrankos parinktys
+
+![SSL sąrankos parinktys](/img/ssl-setup/ssl-setup-options.png)
+
+Pasirinkite vieną iš trijų parinkčių:
+
+| Parinktis | Kada naudoti |
+|--------|-------------|
+| **Nemokamas rtsurvey.com subdomenas** *(Rekomenduojama)* | Nereikia DNS sąrankos. Mes sukuriame įrašą už jus. Paruošta per 2-5 minutes. |
+| **Mano domenas** | Jau turite domeną ir jo DNS nukreipia į šį serverį. |
+| **Įdiekite sertifikatą rankiniu būdu** | Enterprise or custom CA. Requires SSH access. |
+
+---
+
+## 1 parinktis – nemokamas rsurvey.com padomenis (rekomenduojama)
+
+Tai greičiausias variantas. Nereikia jokios domeno registracijos ar DNS pakeitimų.
+
+1. Spustelėkite Nemokama rsurvey.com padomenis, kad išplėstumėte skyrių
+2. Įvesties lauke įveskite norimo padomenio pavadinimą
+
+   > Naudokite mažąsias raides, skaičius ir brūkšnelius. 3–30 simbolių.
+   > Pavyzdys: `myproject` → `myproject.rtsurvey.com`
+
+3. Spustelėkite Sukurti **https://[subdomain].rtsurvey.com**
+
+<!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
+
+4. Palaukite 2–5 minutes, kol bus išduotas sertifikatas
+
+<!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
+
+5. Kai sertifikatas bus paruoštas, būsite automatiškai nukreipti į naują HTTPS URL
+
+<!-- SCREENSHOT NEEDED: success state / redirect to login -->
+
+---
+
+## 2 variantas – mano domenas
+
+Naudokite tai, jei turite domeną ir jo DNS A įrašas jau nurodo šio serverio IP.
+
+1. Spustelėkite Mano domenas, kad išplėstumėte skyrių
+2. Įveskite visą savo domeno pavadinimą (e.g. `survey.myorganization.org`)
+3. Spustelėkite Sukurti sertifikatą
+
+<!-- SCREENSHOT NEEDED: own domain input form -->
+
+„Encrypt“ patvirtins jūsų domeną ir išduos sertifikatą. Tam pirmiausia reikia tinkamai nukreipti DNS – priešingu atveju užklausa nepavyks.
+
+---
+
+## 3 parinktis. Įdiekite sertifikatą rankiniu būdu
+
+Įmonės aplinkai, naudojanti pasirinktinį arba vidinį CA. Sertifikato failus įdėsite į serverį naudodami SSH, tada programoje įveskite savo domeną.
+
+### Prerequisites
+
+- SSH prieiga prie serverio
+- Galiojantis sertifikatas ir privatus raktas jūsų domenui (PEM formatas)
+
+### 1 veiksmas – SSH į serverį
+
+```bash
+ssh root@<server-ip>
+```
+
+### 2 veiksmas – pateikite sertifikato failus
+
+Sukurkite katalogą ir nukopijuokite failus:
+
+```bash
+mkdir -p /etc/letsencrypt/live/<your-domain>
+```
+
+Nukopijuokite failus į tą katalogą tiksliais pavadinimais:
+
+| Failas | Aprašymas |
+|------|-------------|
+| `fullchain.pem` | Jūsų sertifikatas + visi tarpiniai CA sertifikatai (sujungti) |
+| `privkey.pem` | Jūsų privatus raktas |
+
+Pavyzdys:
+
+```bash
+# Nukopijuokite iš vietinio kompiuterio (paleiskite tai vietoje, o ne serveryje)
+scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
+scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
+```
+
+Nustatykite teisingus leidimus:
+
+```bash
+chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
+chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
+```
+
+### 3 veiksmas – programoje įveskite savo domeną
+
+<!-- SCREENSHOT NEEDED: manual certificate form -->
+
+1. SSL sąrankos ekrane spustelėkite Įdiegti sertifikatą rankiniu būdu
+2. Įveskite savo domeno pavadinimą (turi atitikti sertifikato bendrąjį pavadinimą arba SAN)
+3. Spustelėkite Taikyti
+
+Serveris sukonfigūruos Nginx su jūsų sertifikatu ir automatiškai įkels iš naujo.
+
+---
+
+## Kitas žingsnis
+
+Kai SSL bus aktyvus, pereikite prie pirmojo prisijungimo [first-login](first-login).

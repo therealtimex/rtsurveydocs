@@ -1,0 +1,76 @@
+---
+title: "ការភ្ជាប់ទៅម៉ាស៊ីនមេ"
+description: "ស្វែងយល់ពីរបៀបភ្ជាប់កម្មវិធីទូរស័ព្ទ rtSurvey ទៅ project server, ចូលដំណើរការ functionalities តាមតួនាទី, និងចាប់ផ្ដើម collaborate ស្ទង់មតិ។"
+icon: "cloud_sync"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 313
+---
+
+ការ ភ ្ ជ ា ប ់ rtSurvey app ទ ៅ server គ ឺ ជ ាំ ហ ា ន ចា ំ ប ា ច ់ ដើ ម ្ ប ី ចា ប ់ ផ ្ ត ើ ម ប ្ រ ើ app ស ម ្ រ ា ប ់ ប ្ រ មូ ល ទ ិ ន ្ ន ន ័ យ , ការ គ ្ រ ប ់ គ ្ រ ាំ , ហ ើ យ ការ វ ិ ភ ា គ ។
+
+## Key Differences ពី ODK Collect
+
+rtSurvey ផ ្ ត ល ់ functionalities ដ ែ ល ប ន ្ ថ ែ ម ប ើ ប ្ ត ូ រ ន ឹ ង ODK Collect:
+- **Administrator**: Messaging, notifications, form filling, ហ ើ យ ការ ស ្ វ ែ ង មើ ល analysis reports ។
+- **Project Manager**: Functionalities ស ្ រ ើ ប ស ្ ទ ើ ប ដូ ច Administrators, រួ ម ទ ា ំ ង project setup ។
+- **Survey Designer**: Messaging, notifications, form filling, ហ ើ យ analysis reports ។
+- **Field Enumerator**: Form filling, messaging, notifications, ហ ើ យ progress reports ។
+- **Data Analyst**: Messaging, notifications, ហ ើ យ analytics reports ។
+
+## ជំ ហ ា ន ភ ្ ជ ា ប ់ rtSurvey App ទ ៅ Server
+
+### ១. ធ ា ន ា ថ ា អ ្ ន ក ម ា ន គ ណ ន ី
+
+ដើ ម ្ ប ី ភ ្ ជ ា ប ់ ទ ៅ server, អ ្ ន ក ត ្ រ ូ វ ការ គ ណ ន ី ។ គ ណ ន ី អ ា ច ត ្ រ ូ វ ប ា ន ប ង ្ ក ើ ត ដ ោ យ Administrator ឬ ដ ោ យ staff ដ ោ យ ប ្ រ ើ account creation URL ។
+
+### ២. បើ ក rtSurvey App
+
+Launch rtSurvey app ន ៅ ល ើ mobile device ។
+
+### ៣. ចូ ល ដ ំ ណ ើ រ ការ Server Connection Settings
+
+1. បើ ក app ហ ើ យ navigate ទ ៅ settings menu ។
+2. ជ ្ រ ើ ស ជ ំ រ ើ ស ដើ ម ្ ប ី ភ ្ ជ ា ប ់ ទ ៅ server ។
+
+### ៤. ដ ា ក ់ បញ ្ ចូ ល Account Details
+
+- **Username**: ដ ា ក ់ បញ ្ ចូ ល account username ។
+- **Password**: ដ ា ក ់ បញ ្ ចូ ល account password ។
+
+ប ន ្ ទ ា ប ់ ពី ដ ា ក ់ បញ ្ ចូ ល credentials:
+
+- ប ្ រ ស ិ ន ប ើ គ ណ ន ី ភ ្ ជ ា ប ់ ជ ា មួ យ survey project ម ួ យ ប ្ រ ើ គ ណ ន ី :#1: app ន ឹ ង ចូ ល ភ ្ លា ម ៗ ទ ៅ project server ន ោ ះ ។
+- ប ្ រ ស ិ ន ប ើ គ ណ ន ី ភ ្ ជ ា ប ់ ជ ា មួ យ survey projects ច ្ រ ើ ន: ប ន ្ ទ ា ប ់ ពី authentication, អ ្ ន ក ន ឹ ង ឃ ើ ញ ប ញ ្ ជ ី projects ។
+
+```mermaid
+flowchart TD
+    A["📱 Start rtSurvey App"] --> B["🔑 Enter Username<br>and Password"]
+    style A fill:#4CAF50,stroke:#666666,stroke-width:3px,color:white
+    style B fill:#2196F3,stroke:#666666,stroke-width:3px,color:white
+
+    B --> C{"🌳 Multiple<br>projects?"}
+    style C fill:#FFC107,stroke:#666666,stroke-width:3px,color:black
+
+    C -->|Yes| D["📋 Display list<br>of projects"]
+    C -->|No| E["🔄 Auto-connect to<br>single project"]
+    style D fill:#FF9800,stroke:#666666,stroke-width:3px,color:white
+    style E fill:#009688,stroke:#666666,stroke-width:3px,color:white
+
+    D --> F["👆 User selects<br>a project"]
+    style F fill:#FF5722,stroke:#666666,stroke-width:3px,color:white
+
+    E --> G["☁️ Connect to server"]
+    F --> G
+    style G fill:#3F51B5,stroke:#666666,stroke-width:3px,color:white
+    G --> H["👥 Access role-specific<br>functionalities"]
+    style H fill:#9C27B0,stroke:#666666,stroke-width:3px,color:white
+```
+
+## ការ ដ ោ ះ ស ្ រ ា យ បញ ្ ហ ា Connection
+
+1. **ពិ ន ិ ត ្ យ Internet Connection**: ធ ា ន ា ថ ា ឧ ប ករណ ់ ភ ្ ជ ា ប ់ internet ។
+2. **ប ញ ្ ជ ា ក ់ Credentials**: ធ ា ន ា ថ ា username ហ ើ យ password ត ្ រ ូ វ ។
+3. **Restart App**: ប ិ ទ ហ ើ យ បើ ក rtSurvey app ម ្ ត ង ទ ៀ ត ។
+4. **ទ ាក ់ ទ ង Support**: ប ្ រ ស ិ ន ប ើ បញ ្ ហ ា ន ៅ ប ន ្ ត ន ៅ , ទ ាក ់ ទ ង administrator ឬ rtSurvey support ។

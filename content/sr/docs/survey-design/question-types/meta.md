@@ -1,0 +1,190 @@
+---
+title: "Meta"
+description: "Meta tipovi pitanja automatski hvataju informacije o uređaju, anketaru i vremenu bez ikakvih unosa od strane ispitanika."
+icon: "info"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 237
+---
+
+Meta tipovi pitanja su specijalna polja koja se popunjavaju **automatski** — ispitanik ih nikada ne vidi. Hvataju kontekst o slanju: kada je prikupljeno, koji uređaj je korišćen i ko ga je prikupio. Dodajte ih u radni list `survey` kao i bilo koji drugi tip pitanja; jednostavno se ne pojavljuju na ekranu.
+
+## Osnovna XLSForm specifikacija
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| deviceid | deviceid | |
+
+Oznake su opcione za meta polja jer se nikada ne prikazuju.
+
+---
+
+## Meta polja za vreme
+
+### `start`
+
+Beleži **datum i vreme kada je formular otvoren**. Čuva se u ISO 8601 formatu (`YYYY-MM-DDTHH:MM:SS.sss+HH:MM`).
+
+```
+type    | name  | label
+start   | start |
+```
+
+### `end`
+
+Beleži **datum i vreme kada je formular poslat**. Zajedno sa `start`, možete izračunati vreme provedeno na popunjavanju formulara:
+
+```
+type      | name          | calculation
+calculate | duration_min  | (decimal-date-time(${end}) - decimal-date-time(${start})) * 1440
+```
+
+### `today`
+
+Beleži **trenutni datum** (bez vremenske komponente). Čuva se kao `YYYY-MM-DD`. Koristan je kada trebate samo datum bez kompletne vremenske oznake.
+
+```
+type  | name  | label
+today | today |
+```
+
+---
+
+## Meta polja za uređaj
+
+### `deviceid`
+
+Beleži **jedinstveni identifikator uređaja** korišćenog za prikupljanje podataka. Na Android-u ovo je obično IMEI ili Android ID. Korisno za praćenje koji uređaj je poslao svaki formular i otkrivanje duplikata slanja sa istog uređaja.
+
+```
+type      | name     | label
+deviceid  | deviceid |
+```
+
+### `devicephonenum`
+
+Beleži **broj telefona SIM kartice** u uređaju (ako je dostupan). Može biti prazan ako uređaj nema SIM karticu ili ako broj nije sačuvan na SIM kartici.
+
+```
+type           | name          | label
+devicephonenum | devicephonenum |
+```
+
+### `simserial`
+
+Beleži **serijski broj SIM kartice** (ICCID). Korisno za identifikaciju koji je SIM/operater korišćen.
+
+```
+type      | name      | label
+simserial | simserial |
+```
+
+### `subscriberid`
+
+Beleži **IMSI (International Mobile Subscriber Identity)** — jedinstveni identifikator pretplatnika na SIM kartici.
+
+```
+type         | name        | label
+subscriberid | subscriberid |
+```
+
+---
+
+## Meta polja za anketara
+
+### `username`
+
+Beleži **korisničko ime prijavljenog anketara** (nalog korišćen u rtSurvey aplikaciji). Ovo je najpouzdaniji način praćenja ko je prikupio svako slanje.
+
+```
+type     | name     | label
+username | username |
+```
+
+### `email`
+
+Beleži **adresu elektronske pošte prijavljenog anketara**.
+
+```
+type  | name  | label
+email | email |
+```
+
+### `phonenumber`
+
+Beleži **broj telefona povezan sa nalogom anketara** (ako je podešen).
+
+```
+type        | name       | label
+phonenumber | phonenumber |
+```
+
+---
+
+## Revizijski dnevnik
+
+### `audit`
+
+Meta polje `audit` omogućava **detaljno evidentiranje revizije** — beleži vremenski označeni dnevnik svakog pitanja koje je anketar posetio, koliko dugo je proveo na svakom, i (opciono) njegovu GPS lokaciju u svakom koraku. Revizijski dnevnik se čuva kao zasebna `audit.csv` datoteka zajedno sa svakim slanjem.
+
+```
+type  | name  | parameters
+audit | audit | location-priority=balanced location-min-interval=30 location-max-age=60
+```
+
+#### Parametri revizije
+
+| Parametar | Opis |
+|-----------|------|
+| `location-priority` | Nivo GPS tačnosti: `no-gps`, `low-power`, `balanced`, `high-accuracy` |
+| `location-min-interval` | Minimalan broj sekundi između hvatanja lokacija |
+| `location-max-age` | Maksimalna starost (sekunde) keširane lokacije za prihvatanje |
+
+Revizijski dnevnik beleži:
+- Naziv pitanja i tip događaja (`question`, `form.start`, `form.exit`, `form.save`, `form.finalize`)
+- Početne i krajnje vremenske oznake za svaki događaj
+- GPS koordinate (ako je `location-priority` postavljen)
+
+{{% alert icon=" " context="warning" %}}
+Polje `audit` generiše zasebnu datoteku po slanju. Osigurajte da vaš cevovod podataka obrađuje i glavne podatke formulara i revizijski CSV.
+{{% /alert %}}
+
+---
+
+## Kompletan primer
+
+Tipična anketa domaćinstva može uključiti sva meta polja za vreme i anketara:
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| today | today | |
+| deviceid | deviceid | |
+| username | username | |
+| email | email | |
+| audit | audit | |
+| text | household_id | ID domaćinstva |
+| ... | ... | ... |
+
+---
+
+## Najbolje prakse
+
+1. Uvek uključite `start` i `end` — besplatni su, automatski i neprocenjivi za praćenje kvaliteta.
+2. Uvek uključite `username` za praćenje anketara.
+3. Uključite `deviceid` kada želite da otkrijete duplikata slanja ili pratite terenske uređaje.
+4. Koristite `audit` u anketama sa visokom odgovornošću gde trebate da verifikujete da su anketari zaista posetili svako pitanje.
+5. Polja vezana za SIM karticu (`simserial`, `subscriberid`, `devicephonenum`) su pouzdana samo na Android uređajima sa aktivnim SIM karticama — preskočite ih za implementacije samo sa tabletima.
+
+---
+
+## Ograničenja
+
+- Sva meta polja su **samo za čitanje** — ne mogu biti referencirana ili modifikovana od strane drugih proračuna.
+- `username` i `email` zahtevaju da anketar bude prijavljen; biće prazni za anonimna slanja.
+- Meta polja SIM/telefona mogu vraćati prazne vrednosti na tabletima samo sa Wi-Fi-jem i nekim Android verzijama zbog ograničenja dozvola.

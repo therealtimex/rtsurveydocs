@@ -1,0 +1,38 @@
+[lang_select_title]
+    other = "Выберите язык"
+
+[search_title]
+    other = "Поиск"
+
+[search_navigate]
+    other = "для навигации"
+
+[search_select]
+    other = "для выбора"
+
+[search_close]
+    other = "для закрытия"
+
+[search_cancel]
+    other = "отмена"
+
+[search_no_results]
+    other = "Нет результатов для"
+
+[feedback_yes]
+    other = "Да"
+
+[feedback_no]
+    other = "Нет"
+
+[feedback_helpful]
+    other = "Была ли эта страница полезной?"
+
+[feedback_submit]
+    other = "Отправить"
+
+[enable_light_mode]
+    other = "Включить светлый режим"
+
+[enable_dark_mode]
+    other = "Включить тёмный режим"

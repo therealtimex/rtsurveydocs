@@ -1,0 +1,190 @@
+---
+title: "Meta"
+description: "Meta question types automatically capture device, enumerator, and timing information without any input from the respondent."
+icon: "info"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 237
+---
+
+Meta question types are special fields that are filled in **automatically** — the respondent never sees them. They capture context about the submission: when it was collected, which device was used, and who collected it. Add them in the `survey` worksheet like any other question type; they simply do not appear on screen.
+
+## Basic XLSForm Specification
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| deviceid | deviceid | |
+
+Labels are optional for meta fields since they are never displayed.
+
+---
+
+## Timing meta fields
+
+### `start`
+
+Records the **date and time when the form was opened**. Stored in ISO 8601 format (`YYYY-MM-DDTHH:MM:SS.sss+HH:MM`).
+
+```
+type    | name  | label
+start   | start |
+```
+
+### `end`
+
+Records the **date and time when the form was submitted**. Together with `start`, you can calculate the time spent filling in the form:
+
+```
+type      | name          | calculation
+calculate | duration_min  | (decimal-date-time(${end}) - decimal-date-time(${start})) * 1440
+```
+
+### `today`
+
+Records the **current date** (no time component). Stored as `YYYY-MM-DD`. Useful when you need only the date without the full timestamp.
+
+```
+type  | name  | label
+today | today |
+```
+
+---
+
+## Device meta fields
+
+### `deviceid`
+
+Records the **unique identifier of the device** used for data collection. On Android this is typically the IMEI or Android ID. Useful for tracking which device submitted each form and detecting duplicate submissions from the same device.
+
+```
+type      | name     | label
+deviceid  | deviceid |
+```
+
+### `devicephonenum`
+
+Records the **phone number of the SIM card** in the device (if available). May be empty if the device has no SIM or if the number is not stored on the SIM.
+
+```
+type           | name          | label
+devicephonenum | devicephonenum |
+```
+
+### `simserial`
+
+Records the **serial number of the SIM card** (ICCID). Useful for identifying which SIM/carrier was used.
+
+```
+type      | name      | label
+simserial | simserial |
+```
+
+### `subscriberid`
+
+Records the **IMSI (International Mobile Subscriber Identity)** — the unique subscriber identifier on the SIM card.
+
+```
+type         | name        | label
+subscriberid | subscriberid |
+```
+
+---
+
+## Enumerator meta fields
+
+### `username`
+
+Records the **username of the logged-in enumerator** (the account used in the rtSurvey app). This is the most reliable way to track who collected each submission.
+
+```
+type     | name     | label
+username | username |
+```
+
+### `email`
+
+Records the **email address of the logged-in enumerator**.
+
+```
+type  | name  | label
+email | email |
+```
+
+### `phonenumber`
+
+Records the **phone number associated with the enumerator's account** (if configured).
+
+```
+type        | name       | label
+phonenumber | phonenumber |
+```
+
+---
+
+## Audit log
+
+### `audit`
+
+The `audit` meta field enables **detailed audit logging** — it records a timestamped log of every question the enumerator visited, how long they spent on each, and (optionally) their GPS location at each step. The audit log is saved as a separate `audit.csv` file alongside each submission.
+
+```
+type  | name  | parameters
+audit | audit | location-priority=balanced location-min-interval=30 location-max-age=60
+```
+
+#### Audit parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `location-priority` | GPS accuracy level: `no-gps`, `low-power`, `balanced`, `high-accuracy` |
+| `location-min-interval` | Minimum seconds between location captures |
+| `location-max-age` | Maximum age (seconds) of a cached location to accept |
+
+The audit log captures:
+- Question name and event type (`question`, `form.start`, `form.exit`, `form.save`, `form.finalize`)
+- Start and end timestamps for each event
+- GPS coordinates (if `location-priority` is set)
+
+{{% alert icon=" " context="warning" %}}
+The `audit` field generates a separate file per submission. Make sure your data pipeline processes both the main form data and the audit CSV.
+{{% /alert %}}
+
+---
+
+## Complete example
+
+A typical household survey might include all timing and enumerator meta fields:
+
+| type | name | label |
+|------|------|-------|
+| start | start | |
+| end | end | |
+| today | today | |
+| deviceid | deviceid | |
+| username | username | |
+| email | email | |
+| audit | audit | |
+| text | household_id | Household ID |
+| ... | ... | ... |
+
+---
+
+## Best Practices
+
+1. Always include `start` and `end` — they are free, automatic, and invaluable for quality monitoring.
+2. Always include `username` to track enumerators.
+3. Include `deviceid` when you want to detect duplicate submissions or track field devices.
+4. Use `audit` in high-accountability surveys where you need to verify that enumerators actually visited each question.
+5. SIM-related fields (`simserial`, `subscriberid`, `devicephonenum`) are only reliable on Android devices with active SIM cards — skip them for tablet-only deployments.
+
+---
+
+## Limitations
+
+- All meta fields are **read-only** — they cannot be referenced or modified by other calculations.
+- `username` and `email` require the enumerator to be logged in; they will be empty for anonymous submissions.
+- SIM/phone meta fields may return empty values on Wi-Fi-only tablets and some Android versions due to permission restrictions.

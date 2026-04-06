@@ -1,0 +1,147 @@
+---
+title: "Medios"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 286
+---
+
+rtSurvey admite la integración enriquecida de medios en las encuestas, lo que le permite mejorar sus cuestionarios con imágenes, audio y video. Esta función puede mejorar significativamente la experiencia del encuestado y la calidad de los datos recopilados.
+
+## Tipos de medios admitidos
+
+rtSurvey admite los siguientes tipos de medios:
+- Imágenes (jpg, png, gif)
+- Audio (mp3, wav)
+- Video (mp4, webm)
+
+## Adición de medios a su encuesta
+
+Para incluir medios en su formulario de rtSurvey, use las siguientes columnas en su XLSForm:
+
+- `image`: Para mostrar imágenes
+- `audio`: Para reproducir archivos de audio
+- `video`: Para reproducir archivos de video
+
+Ejemplo:
+
+```
+| type | name          | label         | image        | audio       | video       |
+|------|---------------|---------------|--------------|-------------|-------------|
+| note | media_example | Ejemplo de medios | example.jpg | sound.mp3 | clip.mp4  |
+```
+
+## Gestión de archivos multimedia
+
+### Encuestas basadas en web
+Para las encuestas basadas en web, rtSurvey proporciona una interfaz de gestión de medios donde puede subir y organizar sus archivos multimedia. Estos archivos están disponibles automáticamente para su uso en sus encuestas.
+
+### Aplicación móvil
+Al usar la aplicación móvil rtSurvey:
+1. Coloque sus archivos multimedia en la carpeta `/rtSurvey/forms/[form-name]-media/` en su dispositivo.
+2. Haga referencia al nombre exacto del archivo en su XLSForm.
+
+## Características específicas de rtSurvey
+
+### Carga dinámica de medios
+rtSurvey admite la carga dinámica de medios basada en las respuestas de la encuesta:
+
+```
+| type         | name      | label              | image                    |
+|--------------|-----------|--------------------|--------------------------| 
+| select_one species | animal | Seleccione un animal | ${animal}.jpg          |
+```
+
+### Medios en opciones de elección
+rtSurvey le permite usar medios en las opciones de elección para preguntas de selección:
+
+```
+| type                | name    | label           | media::image |
+|---------------------|---------|-----------------|--------------|
+| select_one_from_file animals | Elija un animal |              |
+```
+
+En la hoja choices:
+```
+| list_name | name  | label | media::image |
+|-----------|-------|-------|--------------|
+| animals   | dog   | Perro | dog.jpg      |
+| animals   | cat   | Gato  | cat.jpg      |
+```
+
+### Captura de medios
+rtSurvey amplía XLSForm con capacidades de captura de medios:
+
+```
+| type  | name        | label               |
+|-------|-------------|---------------------|
+| image | photo       | Tome una foto       |
+| audio | voice_note  | Grabe una nota de voz |
+| video | video_clip  | Grabe un video      |
+```
+
+## Mejores prácticas para usar medios
+
+1. **Optimice los tamaños de archivo**: Los archivos multimedia grandes pueden ralentizar la carga y el envío de la encuesta.
+2. **Use formatos apropiados**: Cíñase a los formatos ampliamente admitidos (jpg para imágenes, mp3 para audio, mp4 para video).
+3. **Proporcione alternativas**: Siempre incluya alternativas de texto para la accesibilidad.
+4. **Pruebe exhaustivamente**: Asegúrese de que los medios se muestren correctamente en todos los dispositivos de destino.
+5. **Considere el uso sin conexión**: Para encuestas que puedan realizarse sin conexión, asegúrese de que todos los medios estén disponibles localmente.
+
+## Soporte de medios multilingüe
+
+rtSurvey admite medios específicos del idioma. Use el sufijo `::language`:
+
+```
+| type | name  | label    | image::English | image::Spanish |
+|------|-------|----------|----------------|----------------|
+| note | intro | Bienvenido | welcome_en.jpg | welcome_es.jpg |
+```
+
+## Medios en la exportación de datos
+
+Al exportar datos de rtSurvey:
+- Para encuestas web, las URL de los medios se incluyen en la exportación.
+- Para encuestas con la aplicación móvil, se incluyen las rutas de los archivos.
+
+## Consideraciones de la aplicación móvil
+
+- Asegúrese de que haya suficiente espacio de almacenamiento en los dispositivos para encuestas con muchos medios.
+- La aplicación móvil rtSurvey admite la reproducción y captura de medios sin conexión.
+- Los archivos multimedia grandes pueden afectar el rendimiento de la aplicación en dispositivos de gama baja.
+
+## Limitaciones conocidas
+
+- Algunos navegadores más antiguos pueden no admitir todos los formatos multimedia.
+- Los archivos de video muy grandes pueden causar problemas en situaciones de bajo ancho de banda.
+
+## Solución de problemas de medios
+
+1. **Los medios no se muestran**: Verifique las rutas y nombres de los archivos para mayor precisión.
+2. **Problemas de reproducción**: Asegúrese de que el formato multimedia sea compatible con los dispositivos de destino.
+3. **Carga lenta**: Considere optimizar los tamaños de archivo o precargar los medios.
+
+## Funciones multimedia avanzadas
+
+### Geoetiquetado
+rtSurvey puede etiquetar geográficamente automáticamente los medios capturados durante las encuestas:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Tome una foto | geotag    |
+```
+
+### Anotaciones de medios
+Permita a los encuestados anotar imágenes:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Anote la imagen | annotate |
+```
+
+Al usar efectivamente los medios en sus formularios de rtSurvey, puede crear encuestas más atractivas, informativas y precisas. Recuerde equilibrar los beneficios de la inclusión de medios con las consideraciones de rendimiento, especialmente para encuestas implementadas en áreas con conectividad a Internet limitada o en dispositivos de gama baja.

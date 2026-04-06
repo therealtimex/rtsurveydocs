@@ -1,0 +1,97 @@
+---
+title: "Select from file"
+description: "select_one_from_file និង select_multiple_from_file ផ្ទុកជម្រើសដោយ dynamic ពីឯកសារ CSV ឬ XML ខាងក្រៅដែលភ្ជាប់ទៅ form។"
+icon: "file-earmark-spreadsheet"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 241
+---
+
+`select_one_from_file` និង `select_multiple_from_file` ធ្វើការដូច `select_one` និង `select_multiple` ប៉ុន្តែជំនួសការកំណត់ជម្រើសក្នុង **choices worksheet** ជម្រើសត្រូវបានផ្ទុកពី **ឯកសារ CSV ឬ XML ខាងក្រៅ** ដែលភ្ជាប់ទៅ form។ នេះមានប្រយោជន៍នៅពេលបញ្ជីជម្រើសវែងណាស់ ផ្លាស់ប្តូរញឹកញាប់ ឬត្រូវការ update ដោយមិនចាំបាច់សាងសង់ form ឡើងវិញ។
+
+## ការបញ្ជាក់ XLSForm មូលដ្ឋាន
+
+| type | name | label |
+|------|------|-------|
+| select_one_from_file health_facilities.csv | facility | Select the health facility |
+| select_multiple_from_file crops.csv | crops | Which crops does the household grow? |
+
+ឈ្មោះឯកសារបន្ទាប់ពីឈ្មោះប្រភេទត្រូវតែត្រូវជាមួយឈ្មោះឯកសារដែលភ្ជាប់នៅពេល upload form។
+
+## ទម្រង់ CSV file
+
+CSV file របស់អ្នកត្រូវតែមានយ៉ាងហោចណាស់ 2 ជួរ: `name` (តម្លៃដែលរក្សាទុក) និង `label` (អក្សរដែលបង្ហាញ)។ អ្នកអាចបន្ថែម columns ណាមួយចំនួនសម្រាប់ filtering។
+
+**health_facilities.csv:**
+
+```
+name,label,district,type
+HF001,Nairobi Central Clinic,Nairobi,clinic
+HF002,Westlands Health Centre,Nairobi,health_centre
+HF003,Kisumu District Hospital,Kisumu,hospital
+```
+
+## ការ Filter ជម្រើស
+
+ប្រើជួរ `choice_filter` ដើម្បីបង្ហាញតែជម្រើសដែលត្រូវជាមួយ context បច្ចុប្បន្ន។ Reference ជួរ CSV ជាមួយឈ្មោះជួររបស់ពួកវាដោយផ្ទាល់ (គ្មាន `${}`):
+
+| type | name | label | choice_filter |
+|------|------|-------|---------------|
+| select_one districts.csv | district | Select district | |
+| select_one_from_file health_facilities.csv | facility | Select facility | district = ${district} |
+
+ក្នុងឧទាហរណ៍នេះ តែ facilities ក្នុង district ដែលបានជ្រើសរើសបង្ហាញ។ `district` ក្នុង `choice_filter` refers ទៅជួរ `district` ក្នុង CSV file; `${district}` refers ទៅ field ដែលឈ្មោះ `district` ក្នុង form។
+
+## ការប្រើប្រាស់
+
+Select-from-file questions ប្រើជាទូទៅសម្រាប់:
+
+1. **បញ្ជីជម្រើសវែង** — health facilities, schools, villages, species lists (រាប់រយ ឬរាប់ពាន់ items)
+2. **បញ្ជីដែលផ្លាស់ប្តូរញឹកញាប់** — នៅពេល master list ផ្លាស់ប្តូររវាង survey rounds update តែ CSV ដោយមិនចាំបាច់សាងសង់ form ឡើងវិញ
+3. **Reference data ដែលចែករំលែក** — CSV file មួយប្រើ cross forms ច្រើន
+4. **Cascading selects ដែល filter** — ផ្ទុក regions/districts/villages ទាំងអស់ក្នុង file មួយ បន្ទាប់មក filter ដោយការជ្រើសរើស parent
+
+## ការភ្ជាប់ file
+
+នៅពេលអ្នក upload form ទៅ rtSurvey ភ្ជាប់ CSV file ជា **media attachment**។ ឈ្មោះឯកសារក្នុង form definition ត្រូវតែត្រូវនឹងឈ្មោះ attachment ។
+
+{{% alert icon=" " context="warning" %}}
+ឈ្មោះ File ប្រកាន់អក្សរតូចធំ។ `Health_Facilities.csv` និង `health_facilities.csv` ត្រូវបានចាត់ទុកជាឯកសារផ្សេងគ្នា។
+{{% /alert %}}
+
+## ការប្រើ `choice-label()` ជាមួយ from-file
+
+ដើម្បីបង្ហាញ label នៃជម្រើសដែលបានជ្រើសក្នុង note ឬ calculate field:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file health_facilities.csv | facility | Select facility | |
+| calculate | facility_label | | choice-label(${facility}, ${facility}) |
+| note | summary | Selected facility: ${facility_label} | |
+
+## ការអនុវត្តល្អ
+
+1. រក្សា CSV files ខ្លីក្រោម 5,000 ជួរ សម្រាប់ performance ល្អលើ mobile devices។
+2. ដូចជារួមបញ្ចូលជួរ `name` និង `label` — columns បន្ថែមមានការជ្រើសរើស។
+3. សម្រាប់ cascading selects ប្រើ CSV តែមួយ ជាមួយជួរ parent ហើយ filter ជាមួយ `choice_filter`។
+4. Version ឈ្មោះ CSV files (ឧ. `facilities_v3.csv`) នៅពេលធ្វើការផ្លាស់ប្តូរ breaking ទៅ column structure។
+5. ធ្វើការតេស្ត filtering expressions ដោយប្រុងប្រយ័ត្ន — typo ក្នុង `choice_filter` នឹងបង្ហាញ silently គ្មានជម្រើស។
+
+## ការដាក់កំហិត
+
+- CSV files ធំណាស់ (10,000+ ជួរ) អាចធ្វើឱ្យ form loading យឺតជាពិសេសលើ devices ល្មមល្មមថោក។
+- CSV files ត្រូវតែ upload ជាមួយ form — ពួកវាមិនអាច fetch ពី URL ក្នុង runtime (ប្រើ `search()` ឬ `pulldata()` សម្រាប់ dynamic lookups)។
+- `select_multiple_from_file` ត្រូវបានគាំទ្រតិចជាងលើ clients — verify compatibility មុននឹងប្រើ។
+
+## ការប្រៀបធៀបជាមួយ `search()`
+
+| | `select_one_from_file` | `search()` appearance |
+|--|----------------------|----------------------|
+| ប្រភព choices | Attached CSV/XML file | Server-side database query |
+| ធ្វើការ offline | Yes (file ត្រូវបាន bundle) | ត្រូវការ connectivity |
+| ចំនួន choices | ដាក់ដំណើរការដោយ device memory | Unlimited (paginated) |
+| ទិន្នន័យ Real-time | No | Yes |
+
+សម្រាប់ datasets ធំ ផ្លាស់ប្តូរញឹកញាប់ ឬ server-side សូមមើល [Dynamic search](../advanced-extension/dynamic-search)។

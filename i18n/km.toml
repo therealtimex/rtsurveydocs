@@ -1,0 +1,38 @@
+[lang_select_title]
+    other = "ជ្រើសរើសភាសារបស់អ្នក"
+
+[search_title]
+    other = "ស្វែងរក"
+
+[search_navigate]
+    other = "ដើម្បីរុករក"
+
+[search_select]
+    other = "ដើម្បីជ្រើសរើស"
+
+[search_close]
+    other = "ដើម្បីបិទ"
+
+[search_cancel]
+    other = "បោះបង់"
+
+[search_no_results]
+    other = "គ្មានលទ្ធផលសម្រាប់"
+
+[feedback_yes]
+    other = "បាទ/ចាស"
+
+[feedback_no]
+    other = "ទេ"
+
+[feedback_helpful]
+    other = "តើទំព័រនេះមានប្រយោជន៍ទេ?"
+
+[feedback_submit]
+    other = "ដាក់ស្នើ"
+
+[enable_light_mode]
+    other = "បើករបៀបភ្លឺ"
+
+[enable_dark_mode]
+    other = "បើករបៀបងងឹត"

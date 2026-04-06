@@ -1,0 +1,133 @@
+---
+title: "Giá trị mặc định (Default)"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 287
+---
+
+Các giá trị mặc định trong rtSurvey cho phép bạn điền trước câu trả lời cho các câu hỏi khi người trả lời lần đầu tiên gặp chúng. Tính năng này có thể nâng cao đáng kể hiệu quả khảo sát và chất lượng dữ liệu bằng cách cung cấp các giá trị ban đầu thường được chọn hoặc đóng vai trò làm ví dụ cho dữ liệu nhập vào mong đợi.
+
+## Cách dùng cơ bản
+
+Để thiết lập giá trị mặc định, hãy sử dụng cột `default` trong XLSForm của bạn:
+
+```
+| type    | name        | label                         | default    |
+|---------|-------------|-------------------------------|------------|
+| date    | survey_date | Ngày khảo sát                 | 2024-07-04 |
+| decimal | weight      | Trọng lượng người trả lời? (kg)| 51.3       |
+```
+
+Trong ví dụ này, ngày khảo sát sẽ được điền sẵn là ngày 4 tháng 7 năm 2024 và trường trọng lượng sẽ bắt đầu với giá trị 51.3 kg.
+
+## Giá trị mặc định động
+
+rtSurvey hỗ trợ các giá trị mặc định động bằng cách sử dụng các hàm:
+
+```
+| type | name | label                              | default  |
+|------|------|------------------------------------| ---------|
+| date | d    | Nhập ngày diễn ra sự kiện?         | today()  |
+```
+
+Ở đây, hàm `today()` sẽ tự động thiết lập giá trị mặc định là ngày hiện tại.
+
+## Các tính năng dành riêng cho rtSurvey
+
+### Giá trị mặc định theo ngữ cảnh (Context-Aware Defaults)
+
+rtSurvey mở rộng chức năng mặc định với các giá trị mặc định nhận biết ngữ cảnh:
+
+```
+| type    | name     | label           | default            |
+|---------|----------|-----------------|---------------------|
+| text    | location | Vị trí hiện tại | ${current_location} |
+```
+
+Ví dụ này sử dụng biến `${current_location}` của rtSurvey để điền sẵn vị trí dựa trên GPS của thiết bị.
+
+### Giá trị mặc định phân tầng (Cascading Defaults)
+
+rtSurvey cho phép thiết lập giá trị mặc định dựa trên các câu trả lời trước đó:
+
+```
+| type    | name     | label           | default         |
+|---------|----------|-----------------|-----------------|
+| text    | city     | Thành phố       |                 |
+| text    | district | Quận/Huyện      | ${city}-district|
+```
+
+Ở đây, trường quận/huyện được điền sẵn dựa trên thành phố đã nhập.
+
+### Giá trị mặc định trong Nhóm lặp (Repeats)
+
+Đối với các câu hỏi bên trong một nhóm lặp, giá trị mặc định được tính toán khi vòng lặp mới được thêm vào:
+
+```
+| type         | name      | label        | default                |
+|--------------|-----------|--------------|------------------------|
+| begin repeat | visits    | Lần thăm khám|                        |
+| date         | visit_date| Ngày thăm    | ${previous_visit_date} |
+| end repeat   |           |              |                        |
+```
+
+Ví dụ này thiết lập ngày thăm khám mặc định là ngày của lần thăm khám trước đó.
+
+## Các phương pháp hay nhất khi sử dụng Giá trị mặc định
+
+1. **Sử dụng chừng mực**: Chỉ sử dụng giá trị mặc định ở những nơi chúng thực sự cải thiện hiệu quả hoặc chất lượng dữ liệu.
+2. **Đảm bảo tính chính xác**: Thường xuyên rà soát và cập nhật các giá trị mặc định tĩnh.
+3. **Kiểm thử kỹ lưỡng**: Đặc biệt là khi sử dụng các giá trị mặc định động hoặc được tính toán.
+4. **Xem xét trải nghiệm người dùng**: Đảm bảo các giá trị mặc định không gây hiểu lầm cho người trả lời hoặc dẫn đến sai lệch.
+5. **Tài liệu hóa rõ ràng**: Đảm bảo tất cả các thành viên trong nhóm hiểu lý do đằng sau các giá trị mặc định.
+
+## Kỹ thuật thiết lập giá trị mặc định nâng cao
+
+### Giá trị mặc định ngẫu nhiên
+
+rtSurvey hỗ trợ các giá trị mặc định ngẫu nhiên cho một số loại câu hỏi nhất định:
+
+```
+| type              | name    | label        | default           |
+|-------------------|---------|--------------|-------------------|
+| select_one options| choice  | Chọn một:    | random(options)   |
+```
+
+Hàm này sẽ chọn ngẫu nhiên một tùy chọn mặc định từ danh sách 'options'.
+
+### Giá trị mặc định có điều kiện
+
+Sử dụng tính năng `relevance` để thiết lập các giá trị mặc định có điều kiện:
+
+```
+| type    | name     | label    | default | relevant        |
+|---------|----------|----------|---------|-----------------|
+| text    | other    | Cụ thể   | N/A     | ${q1} = 'other' |
+```
+
+Ở đây, 'N/A' là giá trị mặc định chỉ khi 'other' được chọn ở câu hỏi trước đó.
+
+## Lưu ý về Quản lý dữ liệu
+
+- Các giá trị mặc định được bao gồm trong quá trình xuất dữ liệu, thường đi kèm với một cờ đánh dấu đó là giá trị mặc định.
+- Tính năng `audit trail` của rtSurvey theo dõi khi nào các giá trị mặc định bị thay đổi bởi người trả lời.
+
+## Hành vi trên Ứng dụng di động
+
+- Ứng dụng di động rtSurvey hỗ trợ tất cả các chức năng mặc định, bao gồm cả các giá trị mặc định động và nhận biết ngữ cảnh.
+- Chế độ ngoại tuyến (`offline mode`) có thể ảnh hưởng đến một số giá trị mặc định động dựa trên dữ liệu thời gian thực.
+
+## Các hạn chế đã biết
+
+- Các giá trị mặc định được tính toán phức tạp có thể ảnh hưởng đến thời gian tải biểu mẫu, đặc biệt là trên các thiết bị cấu hình thấp.
+- Một số giá trị mặc định động có thể không hoạt động như mong đợi ở chế độ xem trước (`preview mode`).
+
+## Khắc phục sự cố giá trị mặc định
+
+1. **Giá trị mặc định không xuất hiện**: Kiểm tra lỗi cú pháp trong biểu thức mặc định.
+2. **Giá trị không mong muốn**: Xác minh logic tính toán và kiểm tra với nhiều tình huống khác nhau.
+3. **Vấn đề hiệu suất**: Tối ưu hóa các tính toán mặc định phức tạp hoặc cân nhắc các phương pháp thay thế.

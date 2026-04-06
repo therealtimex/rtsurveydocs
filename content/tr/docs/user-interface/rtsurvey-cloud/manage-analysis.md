@@ -1,0 +1,41 @@
+---
+title: "Analiz Yönetimi"
+description: "RT-CPMS'de anket verileriniz için analitik raporlar oluşturma, yapılandırma ve görüntüleme."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 317
+---
+
+RT-CPMS'deki **Analiz Yönetimi** modülü, anket verilerinizi işlemek ve görselleştirmek için kapsamlı bir araç paketi sağlar. Global navigasyon kenar çubuğundan erişilebilen iki birincil bölüme ayrılmıştır: **Analitik Geliştirme** ve **Analitik ve Raporlar**.
+
+![Analiz Yönetimi Arayüzü](/images/manage_analysis.png)
+
+## Analitik Geliştirme
+
+**Analitik Geliştirme** bölümü, yeni analiz tasarımları oluşturmak ve yapılandırmak için merkezi merkezinizdir. Araştırmacıların ve veri yöneticilerinin ham anket verilerinin nasıl işleneceğini ve tablo haline getirileceğini tanımladığı yerdir.
+
+### Analitik Geliştirmenin Temel Özellikleri
+- **Yeni Tasarımlar Oluşturun:** Yeni bir rapor şablonu veya analiz tasarımı oluşturmaya başlamak için belirgin **Yeni Analitik +** düğmesini kullanın.
+- **Mevcut Tasarımları Yönetin:** Ana ızgara, tüm analitik modellerinize kapsamlı bir genel bakış sağlar ve şunlar dahil temel meta verileri görüntüler:
+  - Kimlik ve Başlık/Açıklama
+  - Kolay kategorizasyon için etiketler
+  - Sürüm takibi
+  - Oluşturma ve güncelleme zaman damgaları
+  - Yazar bilgisi
+- **Ara ve Filtrele:** Her sütundaki yerleşik arama ve filtreleme araçlarını kullanarak belirli tasarımları kolayca bulun.
+- **Hızlı Eylemler:** Izgara'daki eylem menüsünden belirli tasarımları doğrudan görüntüleyin, düzenleyin veya silin.
+
+## Analitik ve Raporlar
+
+Bir analiz tasarımı oluşturulup çalıştırıldıktan sonra **Analitik ve Raporlar** bölümü, oluşturulan iş zekası (BI) çıktısıyla etkileşime girdiğiniz yerdir.
+
+### Analitik ve Raporların Temel Özellikleri
+- **Rapor Navigasyon Kenar Çubuğu:** Adanmış sol panel kullanarak farklı mevcut raporlar arasında hızla geçiş yapın.
+- **Arama ve Filtreleme:** Rapor listesini daraltmak için arama çubuğunu veya "Tüm analitikler" açılır filtresini kullanın.
+- **Favoriler:** Gelecekte daha hızlı erişim için önemli veya sık erişilen raporları favori olarak işaretleyin.
+
+## Gösterge Paneli Entegrasyonu
+
+Hızlı gözetim için ana **Ana Gösterge Paneli**, birincil Form takip cihazının yanında adanmış bir **Raporlar** sekmesi içerir. Bu sekme, idari komuta merkezinden raporlarınıza anında erişim sağlar; veri toplama ilerlemesini ve analitik çıktıları sorunsuz biçimde izlemenizi sağlar.

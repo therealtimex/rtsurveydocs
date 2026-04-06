@@ -1,0 +1,12 @@
+---
+title: "Select from file"
+description: "select_one_from_file และ select_multiple_from_file โหลดตัวเลือกแบบไดนามิกจากไฟล์ CSV หรือ XML ภายนอกที่แนบกับแบบฟอร์ม"
+icon: "file-earmark-spreadsheet"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 241
+---
+
+`select_one_from_file` และ `select_multiple_from_file` ทำงานเหมือน `select_one` และ `select_multiple` แต่แทนที่จะกำหนดตัวเลือกในเวิร์กชีต **choices** ตัวเลือกจะโหลดจาก **ไฟล์ CSV หรือ XML ภายนอก** ที่แนบกับแบบฟอร์ม ซึ่งมีประโยชน์เมื่อรายการตัวเลือกยาวมาก เปลี่ยนแปลงบ่อย หรือต้องการอัปเดตโดยไม่ต้องสร้างแบบฟอร์มใหม่ทั้งหมด

@@ -1,0 +1,79 @@
+---
+title: "Range"
+description: "Range-Fragen ermöglichen es Befragten, eine Zahl durch Ziehen eines Schiebereglers zwischen einem definierten Mindest- und Höchstwert auszuwählen."
+icon: "sliders"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 238
+---
+
+Der Fragetyp `range` zeigt einen **Schieberegler** (oder eine gleichwertige Eingabe) an, mit dem Befragte eine Zahl innerhalb eines definierten Mindest- und Höchstwerts auswählen können. Er eignet sich ideal für die Erfassung von Bewertungen, Zufriedenheitswerten oder beliebigen numerischen Werten, bei denen der Bereich visuell eingeschränkt werden soll, anstatt auf eine Texteingabe mit Einschränkungen zu setzen.
+
+## Grundlegende XLSForm-Spezifikation
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | satisfaction | Wie zufrieden sind Sie mit dem Service? | start=1 end=5 step=1 |
+
+Die Spalte `parameters` definiert die Grenzen des Schiebereglers und die Schrittgröße:
+
+| Parameter | Beschreibung | Standard |
+|-----------|-------------|---------|
+| `start` | Mindestwert (einschließlich) | 0 |
+| `end` | Höchstwert (einschließlich) | 10 |
+| `step` | Schrittweite zwischen gültigen Werten | 1 |
+
+Weitere Details zum Standard-Range-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+
+## Anwendungsbereiche
+
+Range-Fragen werden häufig verwendet für:
+
+1. Zufriedenheits- oder Bewertungsskalen (z. B. 1–5 oder 0–10)
+2. Numerische Likert-Skalen
+3. Erfassung von Messungen, bei denen nur diskrete Werte gültig sind
+4. Altersgruppen oder Punktebereiche, bei denen ein Schieberegler die Benutzerfreundlichkeit gegenüber einem Textfeld verbessert
+
+## Verwendungsbeispiele
+
+### Grundlegende Bewertungsskala
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | overall_rating | Gesamtbewertung (0–10) | start=0 end=10 step=1 |
+
+### Dezimale Schrittgröße
+
+| type | name | label | parameters |
+|------|------|-------|------------|
+| range | weight_kg | Gewicht (kg) | start=0 end=200 step=0.5 |
+
+### Wert in einer Berechnung verwenden
+
+| type | name | label | parameters | calculation |
+|------|------|-------|------------|-------------|
+| range | score | Testergebnis (0–100) | start=0 end=100 step=5 | |
+| calculate | grade | | | if(${score} >= 90, 'A', if(${score} >= 80, 'B', if(${score} >= 70, 'C', 'F'))) |
+| note | grade_note | Ihre Note: ${grade} | | |
+
+## Erscheinungsbild
+
+Der Typ `range` wird standardmäßig als Schieberegler dargestellt. Für die grundlegende Verwendung sind keine zusätzlichen Erscheinungswerte erforderlich. Sie können ihn mit `horizontal` für ein breiteres Layout in Webformularen kombinieren:
+
+| type | name | label | parameters | appearance |
+|------|------|-------|------------|------------|
+| range | nps | Wie wahrscheinlich ist es, dass Sie uns weiterempfehlen? (0–10) | start=0 end=10 step=1 | horizontal |
+
+## Empfohlene Vorgehensweisen
+
+1. Setzen Sie immer aussagekräftige `start`-, `end`- und `step`-Werte — verlassen Sie sich nicht auf Standardwerte.
+2. Beschriften Sie die Enden Ihrer Skala in der Spalte `hint` (z. B. `hint: 0 = Sehr unzufrieden, 10 = Sehr zufrieden`), um den Befragten Kontext zu geben.
+3. Verwenden Sie für 5-Punkte-Likert-Skalen `start=1 end=5 step=1` statt 0–4, da Befragte erwarten, dass "1" den niedrigsten Wert bedeutet.
+4. Verwenden Sie `range` statt `integer` mit Einschränkung, wenn der begrenzte Charakter der Eingabe Teil des Fragedesigns ist (der Schieberegler kommuniziert die Skala visuell).
+
+## Einschränkungen
+
+- Das Schieberegler-Widget ist möglicherweise nicht ideal für sehr breite Bereiche (z. B. 0–10000) — ein Text-`integer` mit Einschränkungen ist in diesen Fällen benutzerfreundlicher.
+- Auf mobilen Geräten können feine Schrittweiten (z. B. `step=0.1`) mit einem Touch-Schieberegler schwer präzise zu steuern sein.

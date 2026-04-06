@@ -1,0 +1,46 @@
+---
+title: "Operatori"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 292
+---
+
+### Operatori di confronto
+
+{{< table >}}
+Operatore | Operazione      | Esempio              | Risposta di esempio
+-------- | -------------- | -------------------- | --------------
+`=`        | Uguale          | ${age} = 25     | true o false
+`!=`       | Non uguale      | ${age} != 25    | true o false
+`>`        | Maggiore di   | ${age} > 25     | true o false
+`>=`       | Maggiore o uguale a | ${age} >= 25 | true o false
+`<`        | Minore di      | ${age} < 25     | true o false
+`<=`       | Minore o uguale a | ${age} <= 25  | true o false
+{{< /table >}}
+
+Negli esempi sopra, ${age} rappresenta il valore del campo corrente, e l'operatore viene usato per confrontarlo con il valore 25. Il vincolo restituirà true o false, a seconda che il confronto sia soddisfatto o meno.
+
+### Operatori logici
+
+Gli operatori logici vengono usati per combinare più espressioni nei vincoli. Ecco alcuni operatori logici comunemente usati con le loro operazioni ed esempi:
+
+Operatore | Operazione      | Esempio                                           
+-------- | -------------- | --------------------------------------------------
+`or`       | Restituisce true se una delle espressioni è vera          | ${age} = 3 or ${age} = 4
+`and`      | Restituisce true solo se entrambe le espressioni sono vere    | ${age} > 3 and ${age} < 5
+`not()`    | Restituisce true se l'espressione non è vera        | not(${age} > 3 and ${age} < 5)
+
+Negli esempi sopra, ${age} rappresenta il valore del campo corrente, e gli operatori logici vengono usati per combinare le espressioni. Il vincolo verrà valutato come true o false in base alle condizioni specificate.
+
+Esempio 1:
+{{< alert icon=" " context="info" text="`${age} = 3 or ${age} = 4` restituirà `true` se l'età è 3 o 4." />}}
+
+Esempio 2:
+{{< alert icon=" " context="info" text="`${age} > 3 and ${age} < 5` restituirà `true` se l'età è compresa tra 3 e 5." />}}
+
+Esempio 3:
+{{< alert icon=" " context="info" text="`not(${age} > 3 and ${age} < 5)` restituirà `true` se l'età non è compresa tra 3 e 5." />}}

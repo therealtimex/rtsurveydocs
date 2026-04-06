@@ -1,0 +1,109 @@
+---
+title: "Medier"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 286
+---
+
+rtSurvey understøtter rig medieintegration i undersøgelser, hvilket giver dig mulighed for at forbedre dine spørgeskemaer med billeder, lyd og video. Denne funktion kan markant forbedre respondenternes oplevelse og kvaliteten af de indsamlede data.
+
+## Understøttede medietyper
+
+rtSurvey understøtter følgende medietyper:
+- Billeder (jpg, png, gif)
+- Lyd (mp3, wav)
+- Video (mp4, webm)
+
+## Tilføjelse af medier til din undersøgelse
+
+For at inkludere medier i din rtSurvey-formular skal du bruge følgende kolonner i din XLSForm:
+
+- `image`: Til visning af billeder
+- `audio`: Til afspilning af lydfiler
+- `video`: Til afspilning af videofiler
+
+Eksempel:
+
+```
+| type | name          | label         | image        | audio       | video       |
+|------|---------------|---------------|--------------|-------------|-------------|
+| note | media_example | Medieeksempel | example.jpg  | sound.mp3   | clip.mp4    |
+```
+
+## Mediefil-administration
+
+### Webbaserede undersøgelser
+For webbaserede undersøgelser giver rtSurvey en medieadministrationsgrænseflade, hvor du kan uploade og organisere dine mediefiler. Disse filer er derefter automatisk tilgængelige til brug i dine undersøgelser.
+
+### Mobilapp
+Når du bruger rtSurvey-mobilappen:
+1. Placer dine mediefiler i mappen `/rtSurvey/forms/[form-name]-media/` på din enhed.
+2. Reference det præcise filnavn i din XLSForm.
+
+## rtSurvey-specifikke funktioner
+
+### Dynamisk medieindlæsning
+rtSurvey understøtter dynamisk indlæsning af medier baseret på undersøgelsessvar:
+
+```
+| type         | name      | label              | image                    |
+|--------------|-----------|--------------------|--------------------------| 
+| select_one species | animal | Vælg et dyr | ${animal}.jpg            |
+```
+
+### Medier i svarvalg
+rtSurvey giver dig mulighed for at bruge medier i svarvalg til select-spørgsmål:
+
+```
+| list_name | name  | label | media::image |
+|-----------|-------|-------|--------------|
+| animals   | dog   | Hund  | dog.jpg      |
+| animals   | cat   | Kat   | cat.jpg      |
+```
+
+## Bedste praksis ved brug af medier
+
+1. **Optimer filstørrelser**: Store mediefiler kan sænke undersøgelsesindlæsning og -indsendelse.
+2. **Brug passende formater**: Hold dig til bredt understøttede formater (jpg til billeder, mp3 til lyd, mp4 til video).
+3. **Giv alternativer**: Inkludér altid tekstalternativer af hensyn til tilgængelighed.
+4. **Test grundigt**: Sørg for, at medier vises korrekt på alle målenheder.
+5. **Overvej offline-brug**: Til undersøgelser, der kan gennemføres offline, skal du sørge for, at alle medier er tilgængelige lokalt.
+
+## Flersproglig medieunderstøttelse
+
+rtSurvey understøtter sprogspecifikke medier. Brug suffikset `::sprog`:
+
+```
+| type | name  | label    | image::Dansk | image::Engelsk |
+|------|-------|----------|--------------|----------------|
+| note | intro | Velkommen| welcome_da.jpg | welcome_en.jpg |
+```
+
+## Kendte begrænsninger
+
+- Visse ældre browsere understøtter muligvis ikke alle medieformater.
+- Meget store videofiler kan forårsage problemer i situationer med lav båndbredde.
+
+## Avancerede mediefunktioner
+
+### Geotagging
+rtSurvey kan automatisk geotag medier optaget under undersøgelser:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Tag et billede | geotag   |
+```
+
+### Medieannotering
+Tillad respondenter at annotere billeder:
+
+```
+| type  | name        | label        | appearance |
+|-------|-------------|--------------|------------|
+| image | photo       | Annotér billedet | annotate |
+```

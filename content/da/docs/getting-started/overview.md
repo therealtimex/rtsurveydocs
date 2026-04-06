@@ -1,0 +1,42 @@
+---
+weight: 1
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+title: "Oversigt"
+icon: "rocket_launch"
+toc: false
+description: "Hvad rtSurvey er, hvordan det virker, og hvad du skal bruge inden du starter."
+---
+
+rtSurvey er en selvhostet platform til at designe formularer, indsamle data i felten og analysere resultater i realtid. Du kører det på din egen server — dine data forlader aldrig din infrastruktur.
+
+---
+
+## Sådan fungerer det
+
+| Trin | Hvad du gør |
+|------|-------------|
+| **1. Implementer** | Start en server og kør rtSurvey-stakken med ét automatiseret script |
+| **2. Design** | Opret formularer med XLSForm eller den visuelle Form Builder |
+| **3. Indsaml** | Feltteams indsender data via mobilappen eller browseren — online eller offline |
+| **4. Analysér** | Gennemgå indsendelser i dashboardet, eksportér til CSV/Stata eller forbind til Power BI / R |
+
+---
+
+## Inden du begynder
+
+Du har brug for:
+
+- En **Linux-server** (eller en cloudkonto hos Linode, DigitalOcean, AWS eller GCP)
+- Et **domænenavn** der peger på din server
+- Cirka **10 minutter**
+
+Ingen forudgående Docker-viden påkrævet — implementeringsscriptet håndterer det hele.
+
+---
+
+## Klar?
+
+**[Implementér din server →](self-hosting/quick-start)**

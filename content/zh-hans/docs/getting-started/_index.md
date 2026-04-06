@@ -1,0 +1,61 @@
+---
+weight: 100
+title: "快速入门"
+date: "2023-05-03T22:37:22+01:00"
+draft: false
+author: "rtSurvey"
+icon: "rocket_launch"
+toc: true
+description: "使用 rtSurvey 开展调查的快速入门指南"
+publishdate: "2023-05-03T22:37:22+01:00"
+---
+
+rtSurvey 是一个功能强大的平台，用于构建表单和工作流程，以高效收集数据。使用 rtSurvey，您可以：
+
+1.  构建包含照片、GPS 位置、跳题逻辑、计算、外部数据集、多种语言等功能的复杂表单。
+2.  使用移动应用或网页界面收集数据，连接互联网后自动同步。
+3.  通过导出至 CSV 或 Stata 轻松分析数据，或将 rtSurvey 与 Excel、Power BI、Python 或 R 集成，创建动态实时更新的仪表板。
+
+各行业的研究人员、实地团队和专业人员都依赖 rtSurvey 满足其关键数据收集需求。以下是入门步骤：
+
+## 1. 访问 rtSurvey Cloud {#getting-started-get-rtCloud}
+
+最快的入门方式是使用 [rtSurvey Cloud](https://rtsurvey.com/#rtsurvey-cloud)——我们的官方托管服务。它可通过 rtSurvey 网站访问，构建在强大、安全的基础设施之上。如需要，您也可以在自己的基础设施上部署 rtSurvey。
+
+## 2. 创建您的调查表单 {#getting-started-create-form}
+
+1. 使用 `XLSForm` 设计表单，或使用我们的[全组件示例表单](https://docs.google.com/spreadsheets/d/1af_Sl8A_L8_EULbhRLHVl8OclCfco09Hq2tqb9CslwQ/edit#gid=0)模板进行试验。
+2. 将您的 XLSForm 上传至 rtSurvey Cloud 并发布，或使用我们的表单构建器（Beta 版）进行可视化设计。
+
+## 3. 安装 rtSurvey 应用 {#getting-started-get-collect}
+
+在您的移动设备上下载 rtSurvey 应用：
+
+### Android 设备：
+1. 访问 [Google Play 商店](https://play.google.com/store/apps/details?id=vn.rta.rtsurvey)。
+2. 搜索"rtSurvey"，点击带有 rtSurvey 标志的应用。
+3. 点击"安装"下载并设置应用。
+
+### iOS 设备：
+1. 在您的设备上打开 [App Store](https://apps.apple.com/vn/app/rtsurvey/id1178851547)。
+2. 搜索"rtSurvey"，找到带有 rtSurvey 标志的应用。
+3. 点击"获取"下载并安装应用。
+
+## 4. 将 rtSurvey 应用连接至 rtSurvey Cloud {#getting-started-connect}
+
+1. 创建账户：
+   - rtSurvey Cloud 管理员可以为调查员创建账户。
+   - 或者，管理员可以生成 URL，供调查员自行创建账户。
+2. 打开 rtSurvey 应用，使用您的账户凭据登录。
+
+## 5. 开展调查 {#getting-started-fill-form}
+
+1. 在应用中，选择"填写空白表单"开始新调查。
+2. 输入受访者数据完成表单。
+3. 完成后，有网络连接时，表单数据将自动同步至 rtSurvey Cloud。
+
+## 6. 在 rtSurvey Cloud 中分析数据 {#getting-started-use-data}
+
+1. 登录 rtSurvey Cloud 查看已收集的数据。
+2. 以 CSV 或 Stata 等多种格式下载数据，进行进一步分析。
+3. 使用内置分析工具，或与您首选的数据分析软件集成。

@@ -1,0 +1,86 @@
+---
+title: "Geoshape"
+description: "Geoshape questions allow respondents to draw shapes on a map, capturing complex geographical data as part of the survey."
+icon: "map"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 233
+---
+
+The geoshape question type in XLSForms and rtSurvey enables respondents to draw shapes (polygons) on a map, capturing complex geographical data. This feature is particularly useful for mapping areas, defining boundaries, or marking regions of interest in spatial surveys.
+
+## Basic XLSForm Specification
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geoshape | field_area  | Draw the boundary of the field  |
+
+For more details on the basic geoshape question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+
+## Uses
+
+Geoshape questions are commonly used for:
+
+1. Mapping field boundaries in agricultural surveys
+2. Defining areas of environmental impact
+3. Marking zones in urban planning studies
+4. Outlining regions for geological surveys
+5. Capturing complex geographical features for spatial analysis
+
+## Best Practices
+
+1. Ensure the device has location services enabled and permissions granted.
+2. Provide clear instructions on how to draw the shape and what area should be included.
+3. Consider using satellite imagery or base maps to help respondents accurately draw shapes.
+4. Be mindful of the potential complexity of shapes and their impact on data size and processing.
+
+## Example Usage
+
+Here's an example of how you might use a geoshape question in a survey:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geoshape | forest_area    | Outline the boundary of the forest patch   | Use at least 3 points to create a closed shape |
+
+## rtSurvey Extensions
+
+While the basic XLSForm specification for geoshape questions is straightforward, rtSurvey may offer additional features or customizations:
+
+1. Integration with offline maps for remote areas
+2. Options to set minimum and maximum number of points for the shape
+3. Ability to edit or refine shapes after initial drawing
+4. Support for different shape types (e.g., rectangles, circles) in addition to free-form polygons
+
+(Note: The specific extensions available in rtSurvey for geoshape questions would need to be confirmed and detailed here.)
+
+## Data Format
+
+Geoshape data is typically stored as a string of space-separated coordinate pairs, enclosed in parentheses:
+
+```
+(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+```
+
+For example:
+```
+(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+```
+
+## Considerations for Analysis
+
+When using geoshape questions, consider:
+
+1. How the geographic data will be visualized and analyzed (e.g., GIS software)
+2. The potential need for data cleaning or simplification of complex shapes
+3. Privacy and data protection measures for handling detailed spatial data
+4. Integration with other spatial data sources for comprehensive analysis
+
+## Limitations
+
+- Drawing accurate shapes on small mobile screens can be challenging.
+- Complex shapes may require significant storage and processing capacity.
+- Geoshape questions may not be suitable for all types of surveys or respondents.
+- There may be privacy concerns associated with collecting detailed spatial data.
+

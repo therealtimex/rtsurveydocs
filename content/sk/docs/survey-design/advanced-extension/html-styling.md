@@ -1,0 +1,145 @@
+---
+title: "HTML štýlovanie"
+description: "rtSurvey podporuje HTML tagy v popisoch a nápovedeach, umožňujúc formátovanie bohatého textu, odkazy a dynamické farebné témy."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 297
+---
+
+rtSurvey renderuje text **popisku** a **nápovedy** ako HTML na webových formulároch. To znamená, že môžete používať štandardné HTML tagy na formátovanie textu, pridávanie zalomení riadkov, vytváranie odkazov a aplikovanie farieb. Je to obzvlášť užitočné pre polia poznámok, pokyny k sekcii a dynamické súhrny.
+
+{{% alert icon=" " context="warning" %}}
+HTML v popisoch sa renderuje na **webovom formulári** a mobilných aplikáciách rtSurvey. Nemusí sa renderovať vo všetkých klientoch kompatibilných s ODK. Vždy testujte na vašej cieľovej platforme.
+{{% /alert %}}
+
+---
+
+## Podporované HTML tagy
+
+### Formátovanie textu
+
+| Tag | Výsledok |
+|-----|--------|
+| `<strong>text</strong>` alebo `<b>text</b>` | **Tučný text** |
+| `<em>text</em>` alebo `<i>text</i>` | *Text kurzívou* |
+| `<u>text</u>` | Podčiarknutý text |
+| `<br>` | Zalomenie riadka |
+| `<span style="...">text</span>` | Inline štýlovanie |
+
+### Odkazy
+
+```html
+<a href="https://example.com" target="_blank">Kliknite tu</a>
+```
+
+Otvorí sa na novej karte. Použite pre referenčné dokumenty, usmernenia alebo externé zdroje, s ktorými by sa mal anketár poradiť.
+
+### Farby
+
+Použite `<span>` s inline štýlmi:
+
+```html
+<span style="color: red;">Varovanie: hodnota je mimo rozsahu</span>
+<span style="color: #009688;">Sekcia dokončená</span>
+```
+
+---
+
+## Premenné farebnej témy
+
+rtSurvey podporuje **tokeny farebnej témy**, ktoré sa prispôsobujú nakonfigurovanej téme aplikácie. Použite syntax `__COLOR_THEME_NAME__`:
+
+```html
+<span style="color: var(--color-theme-primary);">Text primárnej farby</span>
+```
+
+Alebo pomocou skratky tokenu v texte popisku:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Dôležitá poznámka</font>
+```
+
+Toto sa automaticky konvertuje na ekvivalentný `<span>` s CSS premennou pri renderovaní.
+
+---
+
+## Viacjazyčné popisky
+
+Zabaľte obsah do jazykových tagov na podporu viacerých jazykov v jednej bunke popisku:
+
+```
+<en>Enter the household size</en><sk>Zadajte veľkosť domácnosti</sk>
+```
+
+rtSurvey extrahuje obsah zodpovedajúci aktuálnemu jazyku aplikácie. Ak sa nenájde zodpovedajúci jazykový tag, zobrazí sa celý reťazec tak, ako je.
+
+---
+
+## Príklady v poliach poznámok
+
+### Pokyn k sekcii s tučným textom a zalomením riadka
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Sekcia 3: Využitie pôdy</strong><br>Všetky otázky v tejto sekcii kladte iba hlavovi domácnosti.` |
+
+### Dynamický súhrn s odkazom na výpočet
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Celkový počet členov domácnosti: <strong>${total}</strong><br><span style="color: gray;">Dospelí: ${adults} · Deti: ${children}</span>` |
+
+### Varovanie červenou farbou
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Varovanie:</strong> Zadaný vek (${age}) je neobvykle vysoký. Prosím overte.</span>` | `${age} > 100` |
+
+### Odkaz na referenčný dokument
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Pred začiatkom tejto sekcie sa pozrite do <a href="https://docs.example.com/guidelines" target="_blank">Terénnych usmernení</a>.` |
+
+---
+
+## Špeciálne HTML tagy rtSurvey
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+Vloží tlačidlo, ktoré otvorí URL v modálnom okne vo formulári. Úplné podrobnosti nájdete v [Webbox](webbox).
+
+### `<delete-repeat-current>popisok</delete-repeat-current>`
+
+Renderuje tlačidlo vo vnútri skupiny opakovania, ktoré vymaže aktuálnu inštanciu opakovania pri ťuknutí.
+
+### `<delete-repeat-last>popisok</delete-repeat-last>`
+
+Renderuje tlačidlo, ktoré vymaže poslednú inštanciu opakovania.
+
+Príklad použitia v skupine opakovania:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Odstrániť tohto člena</delete-repeat-current>` |
+
+---
+
+## Najlepšie postupy
+
+1. Používajte HTML striedmo — príliš naformátované popisky sú ťažšie čitateľné, nie ľahšie.
+2. Preferujte `<strong>` pre tučné písmo a `<em>` pre kurzívu pred zastaranými `<b>` a `<i>`.
+3. Udržujte používanie farieb zmysluplné — používajte červenú pre varovania, nie na dekoráciu.
+4. Vždy testujte renderovanie HTML na mobilnej aplikácii aj webovom formulári, pretože renderovanie sa môže mierne líšiť.
+5. Vyhýbajte sa tagom `<table>` vo vnútri popiskov — na mobilných obrazovkách sa zriedka renderujú dobre.
+6. Nepoužívajte JavaScript (`<script>`) — bude odstránený alebo spôsobí chyby.
+
+## Obmedzenia
+
+- Komplexné HTML (tabuľky, formuláre, skripty) nie je podporované a môže prerušiť renderovanie.
+- Niektorí starší mobilní klienti môžu zobrazovať HTML tagy ako doslovný text — testujte na všetkých cieľových zariadeniach.
+- Odkazy `<a>` sa otvárajú v prehliadači alebo WebView — anketár opustí formulár, čo môže byť rušivé na mobilnom zariadení.

@@ -1,0 +1,128 @@
+---
+weight: 4
+title: "Configurar SSL"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+icon: "lock"
+toc: true
+description: "Configure HTTPS para su servidor rtSurvey. Requerido antes de poder iniciar sesión."
+---
+
+Se debe configurar SSL antes de poder iniciar sesión. Cuando abra la aplicación por primera vez, será redirigido automáticamente a la pantalla de configuración de SSL.
+
+---
+
+## Opciones de configuración SSL
+
+![Opciones de configuración SSL](/img/ssl-setup/ssl-setup-options.png)
+
+Elija una de las tres opciones:
+
+| Opción | cuando usar |
+|--------|-------------|
+| **Subdominio gratuito rtsurvey.com** *(Recomendado)* | No se necesita configuración de DNS. Creamos el registro para usted. Listo en 2 a 5 minutos. |
+| **mi propio dominio** | Ya tienes un dominio y su DNS apunta a este servidor. |
+| **Instalar certificado manualmente** | CA empresarial o personalizada. Requiere acceso SSH. |
+
+---
+
+## Opción 1: subdominio gratuito rtsurvey.com (recomendado)
+
+Esta es la opción más rápida. No se requiere registro de dominio ni cambios de DNS.
+
+1. Haga clic en el subdominio gratuito rtsurvey.com para expandir la sección
+2. Escriba el nombre de su subdominio deseado en el campo de entrada
+
+   > Utilice letras minúsculas, números y guiones. 3 a 30 caracteres.
+   > Ejemplo: `myproject` → `myproject.rtsurvey.com`
+
+3. Haga clic en Crear **https://[subdomain].rtsurvey.com**
+
+<!-- SCREENSHOT NEEDED: subdomain input filled in, before clicking Create -->
+
+4. Espere de 2 a 5 minutos mientras se emite el certificado
+
+<!-- SCREENSHOT NEEDED: certificate being issued / progress state -->
+
+5. Una vez que el certificado esté listo, será redirigido automáticamente a su nueva URL HTTPS.
+
+<!-- SCREENSHOT NEEDED: success state / redirect to login -->
+
+---
+
+## Opción 2: mi propio dominio
+
+Úselo si tiene un dominio existente y su registro DNS A ya apunta a la IP de este servidor.
+
+1. Haga clic en Mi propio dominio para expandir la sección
+2. Ingrese su nombre de dominio completo (e.g. `survey.myorganization.org`)
+3. Haga clic en Crear certificado
+
+<!-- SCREENSHOT NEEDED: own domain input form -->
+
+Let's Encrypt verificará su dominio y emitirá un certificado. Esto requiere que primero se apunte correctamente el DNS; de lo contrario, la solicitud fallará.
+
+---
+
+## Opción 3: instalar el certificado manualmente
+
+Para entornos empresariales que utilizan una CA personalizada o interna. Colocará los archivos de su certificado en el servidor a través de SSH y luego ingresará su dominio en la aplicación.
+
+### Requisitos previos
+
+- Acceso SSH al servidor
+- Un certificado válido y una clave privada para su dominio (formato PEM)
+
+### Paso 1: SSH en el servidor
+
+```bash
+ssh root@<server-ip>
+```
+
+### Paso 2: coloque los archivos de su certificado
+
+Crea el directorio y copia tus archivos:
+
+```bash
+mkdir -p /etc/letsencrypt/live/<your-domain>
+```
+
+Copie sus archivos en ese directorio con estos nombres exactos:
+
+| Archivo | Descripción |
+|------|-------------|
+| `fullchain.pem` | Su certificado + cualquier certificado de CA intermedio (concatenado) |
+| `privkey.pem` | Tu clave privada |
+
+Ejemplo:
+
+```bash
+# Copie desde su máquina local (ejecútelo localmente, no en el servidor)
+scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
+scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
+```
+
+Establezca los permisos correctos:
+
+```bash
+chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
+chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
+```
+
+### Paso 3: ingresa tu dominio en la aplicación
+
+<!-- SCREENSHOT NEEDED: manual certificate form -->
+
+1. En la pantalla de configuración de SSL, haga clic en Instalar certificado manualmente
+2. Ingrese su nombre de dominio (debe coincidir con el nombre común o SAN del certificado)
+3. Haga clic en Aplicar
+
+El servidor configurará Nginx con su certificado y se recargará automáticamente.
+
+---
+
+## Siguiente paso
+
+Una vez que SSL esté activo, proceda al primer inicio de sesión [first-login](first-login).

@@ -1,0 +1,78 @@
+---
+title: "Дата и час"
+description: "Въпросите от тип дата и час позволяват на респондентите да въвеждат дата и час в едно поле."
+icon: "event"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 226
+---
+
+The datetime question type in XLSForms and rtSurvey enables respondents to input both date and time in a single field. This question type is useful when you need to capture a specific moment in time, including both the date and the exact time.
+
+## Basic XLSForm Specification
+
+| type     | name           | label                           |
+|----------|----------------|--------------------------------|
+| datetime | event_datetime | When did the event occur?       |
+
+For more details on the basic datetime question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+
+## Uses
+
+Datetime questions are commonly used for:
+
+1. Recording timestamps of events or observations
+2. Scheduling appointments or meetings
+3. Logging start and end times of activities
+4. Capturing precise moments for time-sensitive data collection
+
+## rtSurvey Extensions
+
+rtSurvey extends the functionality of datetime questions with various appearances and customization options:
+
+### Appearance Options
+
+- `(default)`: Display the calendar and clock for selecting date and time
+- `inline`: Display the calendar and clock as icons
+- `inline-1line`: Display the calendar and clock for selection in a single row format
+- `inline-onlyresult`: Display the calendar and clock as icons at the end of the line; icons disappear after selection
+
+### Color Customization
+
+You can customize the color of the calendar and clock icons using the `colors()` function:
+
+- `inline colors("0099FF")`: Display icons with custom color
+- `inline-1line-0000FF`: Display in single row format with custom color
+- `inline-1line colors("0000FF","FFFF00")`: Display in single row format with multiple custom colors
+- `inline-onlyresult colors("0099FF")`: Display icons that disappear after selection, with custom color
+
+### Custom Date and Time Formats
+
+rtSurvey allows for custom date and time formats using special syntax:
+
+- `inline-[%Y-%m-%d %H:%M:%S]`: Custom format example (Year-Month-Day Hour:Minute:Second)
+- `inline-[%d/%m/%Y %I:%M %p]`: Custom format example (Day/Month/Year Hour:Minute AM/PM)
+
+## Example Usage
+
+Here's an example of how you might use a datetime question in a survey:
+
+| type     | name           | label                                      | appearance                    |
+|----------|----------------|--------------------------------------------|-----------------------------|
+| datetime | incident_time  | When did the incident occur?               | inline-[%d/%m/%Y %I:%M %p]  |
+
+## Best Practices
+
+1. Provide clear instructions on the expected date and time format.
+2. Consider using the `inline` appearance for a more compact display.
+3. Use custom formats when you need specific date and time components or formatting.
+4. Be mindful of time zones when collecting datetime data across different regions.
+
+## Limitations
+
+- Some appearances or custom formats may not be supported on all devices or platforms.
+- Users may need guidance on inputting date and time correctly, especially with custom formats.
+- Time zone differences can complicate data analysis if not properly accounted for.
+

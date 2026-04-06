@@ -1,0 +1,51 @@
+---
+weight: 15
+date: "2026-03-04T00:00:00+00:00"
+draft: false
+title: "Usuário do sistema"
+icon: "people"
+toc: true
+description: "Gerencie funções, permissões e integração de todos os participantes da plataforma."
+tags: ["Usuários", "Controle de acesso", "Integração", "Funções"]
+---
+
+# Gerenciamento de usuários do sistema
+
+O módulo **Usuário do sistema** (`/cpms/cpmsSystemUser/admin`) é uma interface de gerenciamento abrangente para controlar quem tem acesso à sua plataforma Real-Time Survey (RT-CPMS) e quais ações pode executar.
+
+![Interface de usuário do sistema](/images/system_user.png)
+
+## Abordagem de gerenciamento unificado
+
+No RT-CPMS, um **Entrevistador** é simplesmente uma Função específica atribuída a um Usuário do sistema. Não existe um banco de dados separado de "Entrevistadores". Seja um usuário de alto nível como Administrador monitorando o portal web ou um Entrevistador de campo coletando dados pelo aplicativo móvel, todos são gerenciados nesta estrutura única e unificada.
+
+## Principais funcionalidades
+
+### 1. Diretório de usuários e visualização em grade
+A interface principal exibe uma lista paginada de todos os usuários conectados ao espaço de trabalho. Os principais atributos incluem:
+* **ID e nome da organização**: Agrupamento lógico de usuários sob entidades organizacionais específicas (por exemplo, `rta`, `partner_org`).
+* **Função**: Especifica o nível de permissão do usuário (por exemplo, `Administrator`, `Leadteam`, `Enumerator`).
+* **Grupo**: Atribuições de agrupamento espacial ou lógico (por exemplo, distritos específicos ou equipes operacionais).
+* **Está sincronizado**: Indica se a conta está integrada com sucesso ao sistema central de Single Sign-On (SSO).
+* **Status**: Indicadores visuais confirmando se uma conta está `Ativa`, `Inativa`, `Excluída` ou `Bloqueada`.
+
+**Ações globais:**
+* **Adicionar usuário do sistema**: Criar manualmente um perfil individual.
+* **Importar usuário do sistema**: Carregar contas em massa usando um modelo Excel. Você pode resolver conflitos usando os modos `Pular` ou `Substituir` e sincronizar diretamente com o SSO.
+* **Exclusão em massa**: Suporte a seleção múltipla para remoção em massa de contas.
+
+### 2. Controle de acesso e segurança
+Ao criar ou editar um perfil de usuário, vários campos críticos de segurança e fluxo de trabalho estão disponíveis:
+* **Código do usuário**: Um identificador único que vincula a conta local do CPMS ao repositório central do SSO.
+* **Código de troca de dispositivo**: Um token de segurança robusto necessário quando um entrevistador precisa trocar o dispositivo móvel usado para coleta de dados.
+* **Nível de poder**: Uma escala granular de prioridade/acesso que vai de 0 (mais baixo) a 20 (mais alto).
+* **Alternância de supervisão**: Uma caixa de seleção que eleva instantaneamente um usuário padrão ao status de gerenciamento.
+* **Automação de fluxo de trabalho**: Uma opção para "Aprovar automaticamente solicitações de edição", que agiliza o processo de limpeza e verificação de dados para usuários confiáveis.
+
+### 3. Gerenciamento de códigos (integração automatizada)
+Encontrado na subaba "Código", este recurso gerencia links de registro e convite baseados em hash, simplificando o processo de integração para grandes equipes.
+
+* **Registro vs. convite**: Escolha se os usuários podem se registrar automaticamente usando um link distribuído ou se precisam de um convite direto do administrador.
+* **Datas de validade**: Confine a integração a janelas de tempo específicas.
+* **Limites de uso**: Limite o número de usuários que podem ingressar usando um único código gerado.
+* **Funções pré-atribuídas**: Os usuários que ingressam por meio desses códigos herdam automaticamente a função e o nível de poder predefinidos, garantindo que estejam prontos para trabalhar imediatamente sem intervenção manual do administrador.

@@ -1,0 +1,326 @@
+---
+title: "Функции"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 293
+---
+
+### String functions
+
+{{% alert icon=" " context="warning" %}}
+When working with strings within expressions, it's important to use single quotes ('') to enclose literal strings. However, an exception arises when you want to include single quotes within a literal string. In such cases, you can use double quotes ("") to enclose the entire string.
+
+For example:
+- Correct: if(${yesno} = 1, "a string with 'single quotes' in it", "no single quotes here")
+- Incorrect: if(${yesno} = 1, 'a string with 'single quotes' in it', 'no single quotes here')
+
+Regarding smart quotes, it's crucial to be aware of their presence, as they can cause issues in expressions. Many rich text editors automatically convert straight quotes ("" or '') into smart quotes or curly quotes (“” or ‘’), which may result in syntax errors or unexpected behavior. To avoid this, ensure that you are using straight quotes ('') consistently in your expressions.
+
+Please let me know if you have any further questions or need additional assistance!
+{{% /alert %}}
+
+rtSurvey supports various functions, including:
+
+1. `string(field)`: Converts a field to a string.
+   - Example: `string(34.8)` will be converted to `'34.8'`.
+
+2. `string-length(field)`: Returns the length of a string field.
+   - Example: `string-length(.) > 3 and string-length(.) < 10` can be used to ensure the current field is between 3 and 10 characters.
+
+3. `substr(fieldorstring, startindex, endindex)`: Returns a substring starting at `startindex` and ending just before `endindex`. Indexes start at 0 for the first character in the string.
+   - Example: `substr(${phone}, 0, 3)` will return the first three digits of a phone number.
+
+4. `concat(a, b, c, ...)`: Concatenates fields (and/or strings) together.
+   - Example: `concat(${firstname}, ' ', ${lastname})` will return a full name by combining the values in the `firstname` and `lastname` fields.
+
+5. `linebreak()`: Returns a linebreak character.
+   - Example: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` will return a list of three field values with linebreaks between them.
+
+6. `lower()`: Converts a string to all lowercase characters.
+   - Example: `lower('Street Name')` will return "street name".
+
+7. `upper()`: Converts a string to all uppercase characters.
+   - Example: `upper('Street Name')` will return "STREET NAME".
+
+### select_one and select_multiple functions
+
+1. `count-selected(field)`: Returns the number of items selected in a select_multiple field.
+   - Example: `count-selected(.) = 3` can be used as a constraint expression to ensure exactly three choices are selected.
+
+2. `selected(field, value)`: Returns true or false depending on whether the specified value was selected in the select_one or select_multiple field.
+   - Example: `selected(${color}, 'Blue')` can be used as a relevance expression to show a group or field only if the respondent selected "Blue" as their favorite color.
+   - Note: The second parameter should always specify the choice value, not the choice label. Use the value from the value column in the choices worksheet of the form definition.
+
+3. `selected-at(field, number)`: Returns the selected item at the specified position in a select_multiple field. When the passed number is 0, it returns the first selected item; when the number is 1, it returns the second selected item, and so on.
+   - Example: `selected-at(${fruits}, 0) = 'Apple'` can be used as a relevance expression to show a group or field only if the first selected choice is "Apple".
+   - Note: The returned value will be the choice value, not the choice label. Use the value from the value column in the choices worksheet of the form definition.
+
+4. `choice-label(field, value)`: Returns the label for a select_one or select_multiple field choice, as defined in the choices worksheet of the form definition.
+   - Example 1: `choice-label(${country}, ${country})` will return the choice label for the currently selected choice in the field named `country`.
+   - Example 2: `choice-label(${languages}, selected-at(${languages}, 0))` will return the label for the first selected choice in the field named `languages`.
+   - Note: This function retrieves the choice label, not the value. It uses the label column from the choices worksheet of the form definition.
+
+### Repeated field functions
+
+In rtSurvey, if you want to ask the same question(s) multiple times, you can put a field inside a repeat group. This results in multiple instances of the same field. The following functions can help you deal with these repeated fields and the repeated data they produce. See the help topic on repeating fields for more details.
+
+1. `join(string, repeatedfield)`: For a field within a repeat group, generates a string-separated list of values. The first parameter specifies the delimiter to use to separate the values.
+   - Example: `join(', ', ${member_name})` will generate a single comma-separated list from all entered names.
+
+2. `join-if(string, repeatedfield, expression)`: Functions exactly like `join()`, except that it checks each instance in the repeat group using the supplied expression. If the expression evaluates to false, the item will be omitted from the output.
+   - Example: `join-if(', ', ${member_name}, ${age} >= 18)` will generate a comma-separated list of names of only adult members (those with ages 18 and over).
+
+3. `count(repeatgroup)`: Returns the current number of times that a repeat group has repeated.
+   - Example: `count(${groupname})` will return the number of instances of the group.
+
+4. `count-if(repeatgroup, expression)`: Functions exactly like `count()`, except that it checks each instance in the repeat group using the supplied expression. If the expression evaluates to false, the item will be omitted from the output.
+   - Example: `count-if(${members}, ${age} >= 18)` will return the count of adult members based on the age field within the "members" repeat group.
+
+5. `sum(repeatedfield)`: For a field within a repeat group, calculates the sum of all values.
+   - Example: `sum(${loan_amount})` will return the total value of all loans.
+
+6. `sum-if(repeatedfield, expression)`: Functions exactly like `sum()`, except that it checks each instance in the repeat group using the supplied expression. If the expression evaluates to false, the item will be omitted from the output.
+   - Example: `sum-if(${loan_amount}, ${loan_amount} > 500)` will return the total value of all loans that are over 500. Smaller loans will be ignored.
+
+7. `min(repeatedfield)`: For a field within a repeat group, calculates the minimum of all values.
+   - Example: `min(${member_age})` will return the age of the youngest member in the group.
+
+8. `min-if(repeatedfield, expression)`: Functions exactly like `min()`, except that it checks each instance in the repeat group using the supplied expression. If the expression evaluates to false, the item will be omitted from the output.
+   - Example: `min-if(${member_age}, ${member_age} >= 18)` will return the age of the youngest adult in the group. Those younger than 18 will be ignored.
+
+9. `max(repeatedfield)`: For a field within a repeat group, calculates the maximum of all values.
+   - Example: `max(${member_age})` will return the age of the oldest member in the group.
+
+10. `max-if(repeatedfield, expression)`: Functions exactly like `max()`, except that it checks each instance in the repeat group using the supplied expression. If the expression evaluates to false, the item will be omitted from the output.
+    - Example: `max-if(${member_age}, ${member_age} >= 18)` will return the age of the oldest adult in the group. Those younger than 18 will be ignored.
+
+11. `index()`: Called within a repeat group, returns the index number for the current group or instance.
+    - Example: `index()` when used within a repeat group will return 1 for the first instance, 2 for the second, and so on.
+
+12. `indexed-repeat(repeatedfield, repeatgroup, index)`: References a field or group that is inside a repeat group from outside that repeat group. The first parameter specifies the repeated field or group of interest, the second specifies the repeat group within which the field or group is located, and the third specifies the instance number within the repeat group to use.
+    - Example 1: `indexed-repeat(${name}, ${names}, 1)` will return the first name available when the name field is inside a prior repeat group named "names".
+    - Example 2: `indexed-repeat(${name}, ${names}, index())` will pull the name corresponding to the instance number of the current repeat group.
+
+13. `rank-index(index, repeatedfield)`: This function calculates the ordinal rank of the specified instance of a repeated field for use outside the repeat group. The rank of 1 is assigned to the instance with the highest value, the rank of 2 to the instance with the next-highest value, and so on. If you pass an invalid index or an index to an instance with a non-numeric value, a rank of 999 will be returned.
+    - Example: `rank-index(1, ${random_draw})` calculates the rank of the first instance based on the value of its `random_draw` field compared to other instances' values.
+
+14. `rank-index-if(index, repeatedfield, expression)`: This function works similarly to `rank-index()`, but it checks each instance in the repeated field's repeat group using the supplied expression. If the expression evaluates to false, the item will be omitted from the calculation. The index used is based on the full set of instances before evaluating the expression for each instance. If you pass an index for an instance that was ignored due to not satisfying the expression, it is considered an invalid index, and a rank of 999 will be returned.
+    - Example: `rank-index-if(1, ${age}, ${age} >= 18)` calculates the age rank within the set of adults, considering only instances where the age is greater than or equal to 18.
+
+### Number functions 
+
+{{< table >}}
+| Operator | Operation | Example | Example answer |
+|----------|-----------|---------|----------------|
+| `+` | Addition | 1 + 1 | 2 |
+| `-` | Subtraction | 3 - 2 | 1 |
+| `*` | Multiplication | 3 * 2 | 6 |
+| `div` | Division | 10 div 2 | 5 |
+| `mod` | Modulus | 9 mod 2 | 1 |
+{{< /table >}}
+
+rtSurvey supports number functions, including:
+- `number(field)`: Converts the value of the field to a number.
+  - Example: `number('34.8')` = 34.8
+
+- `int(field)`: Converts the value of the field to an integer.
+  - Example: `int('39.2')` = 39
+
+- `min(field1, ..., fieldx)`: Returns the minimum value among the passed fields.
+  - Example: `min(${father_age}, ${mother_age})` will return the age of either the mother or the father, whichever is smaller.
+
+- `max(field1, ..., fieldx)`: Returns the maximum value among the passed fields.
+  - Example: `max(${father_age}, ${mother_age})` will return the age of either the mother or the father, whichever is larger.
+
+- `format-number(field)`: Formats the value of an integer or decimal field according to the user's locale settings.
+  - Example: `format-number(${income})` This expression might format "120000" as "120,000".
+
+- `round(field, digits)`: Rounds the numeric field value to the specified number of digits after the decimal place.
+  - Example: `round(${interest_rate}, 2)`
+
+- `abs(number)`: Returns the absolute value of a number.
+  
+- `pow(base, exponent)`: Returns the value of the first parameter raised to the power of the second parameter.
+  - Each parameter can be a field, number, or expression.
+
+- `log10(fieldorvalue)`: Returns the base-ten logarithm of the field or value passed in.
+
+- `sin(fieldorvalue)`: Returns the sine of the field or value passed in, expressed in radians.
+  
+- `cos(fieldorvalue)`: Returns the cosine of the field or value passed in, expressed in radians.
+
+- `tan(fieldorvalue)`: Returns the tangent of the field or value passed in, expressed in radians.
+
+- `asin(fieldorvalue)`: Returns the arcsine of the field or value passed in, expressed in radians.
+
+- `acos(fieldorvalue)`: Returns the arccosine of the field or value passed in, expressed in radians.
+
+- `atan(fieldorvalue)`: Returns the arctangent of the field or value passed in, expressed in radians.
+
+- `atan2(x, y)`: Returns the angle in radians subtended at the origin by the point with coordinates (x, y) and the positive x-axis. The result is in the range -pi() to pi().
+
+- `sqrt(fieldorvalue)`: Returns the non-negative square root of the field or value passed in.
+
+- `exp(x)`: Returns the value of e^x.
+
+- `pi()`: Returns the value of pi.
+
+### Date and time functions
+
+{{% alert icon=" " context="warning" %}}
+Date values in rtSurvey are stored as strings in `YYYY-MM-DD` format. Datetime values are stored as ISO 8601 strings (`YYYY-MM-DDTHH:MM:SS`). Use `decimal-date-time()` to convert to a number for arithmetic (e.g., calculating durations).
+{{% /alert %}}
+
+1. `today()`: Returns today's date as a string in `YYYY-MM-DD` format. Evaluated once when the form opens.
+   - Example: `today()` → `'2024-03-15'`
+   - Common use: `default` column to pre-fill today's date, or in `relevant`/`constraint` to compare against a date field.
+
+2. `now()`: Returns the current date and time as an ISO 8601 string. Evaluated each time the expression is computed.
+   - Example: `now()` → `'2024-03-15T14:32:00.000+03:00'`
+   - Common use: Recording the exact timestamp of a specific event during the survey.
+
+3. `date(value)`: Converts a value (string or number) to a date string. Useful for coercing calculated values into a date type.
+   - Example: `date('2024-03-15')` → `'2024-03-15'`
+
+4. `date-time(value)`: Converts a value to a datetime string.
+   - Example: `date-time(${event_timestamp})`
+
+5. `decimal-date-time(value)`: Converts a date or datetime string to a decimal number representing milliseconds since the Unix epoch divided by 86400000 (i.e., fractional days since 1970-01-01). Use this to perform arithmetic on dates.
+   - Example: Duration in days between two dates:
+     `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
+   - Example: Duration in minutes between two datetimes:
+     `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
+
+6. `format-date(date, format)`: Formats a date value using a pattern string.
+   - Format tokens: `%Y` (4-digit year), `%y` (2-digit year), `%m` (month 01–12), `%d` (day 01–31), `%a` (abbreviated weekday), `%b` (abbreviated month name)
+   - Example: `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+   - Example: `format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
+
+7. `format-date-time(datetime, format)`: Formats a datetime value using a pattern string. Accepts all `format-date` tokens plus:
+   - `%H` (hour 00–23), `%h` (hour 01–12), `%M` (minutes 00–59), `%S` (seconds 00–59), `%3` (milliseconds), `%P` (AM/PM)
+   - Example: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+   - Example: `format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
+
+---
+
+### Boolean functions
+
+1. `boolean(value)`: Converts any value to a boolean. Returns `true` for non-empty strings, non-zero numbers, and `true`; returns `false` for empty strings, `0`, and `false`.
+   - Example: `boolean(${name})` returns `true` if `name` is not empty.
+
+2. `boolean-from-string(string)`: Returns `true` if the string is `'1'` or `'true'` (case-insensitive); returns `false` otherwise.
+   - Example: `boolean-from-string(${enabled_flag})` — useful when a field stores `'true'`/`'false'` as text.
+
+3. `true()`: Returns the boolean value `true`.
+   - Example: In the `required` column, `true()` is equivalent to `yes`.
+
+4. `false()`: Returns the boolean value `false`.
+   - Example: `if(${skip_section} = 'yes', false(), true())` — dynamically set required.
+
+5. `not(expression)`: Returns the logical negation of the expression. Returns `true` if the expression is false, and vice versa.
+   - Example: `not(${consent} = 'yes')` — show a warning when consent was NOT given.
+   - Example: `not(selected(${issues}, 'none'))` — require detail only if "none" was not selected.
+
+---
+
+### Additional string functions
+
+1. `starts-with(string, prefix)`: Returns `true` if `string` begins with `prefix`.
+   - Example: `starts-with(${phone}, '+254')` checks if the phone number begins with the Kenya country code.
+
+2. `contains(string, substring)`: Returns `true` if `string` contains `substring`.
+   - Example: `contains(${email}, '@')` checks that an email address has an `@` sign.
+   - Example: `contains(${notes}, 'urgent')` triggers a follow-up question if the notes mention "urgent".
+
+3. `substring-before(string, needle)`: Returns the part of `string` that appears before the first occurrence of `needle`.
+   - Example: `substring-before(${full_name}, ' ')` extracts the first word (first name).
+
+4. `substring-after(string, needle)`: Returns the part of `string` that appears after the first occurrence of `needle`.
+   - Example: `substring-after(${email}, '@')` extracts the domain part of an email address.
+
+5. `normalize-space(string)`: Strips leading and trailing whitespace and collapses all internal whitespace sequences to a single space.
+   - Example: `normalize-space(${name})` — cleans up a name that may have been typed with extra spaces.
+
+6. `translate(string, search_chars, replace_chars)`: Replaces each character in `string` that appears in `search_chars` with the corresponding character in `replace_chars`. Characters in `search_chars` with no corresponding character in `replace_chars` are deleted.
+   - Example: `translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` converts to uppercase (equivalent to `upper()`).
+   - Example: `translate(${phone}, ' -()', '')` removes spaces, dashes, and parentheses from a phone number.
+
+---
+
+### Additional math functions
+
+1. `floor(number)`: Returns the largest integer less than or equal to `number` (rounds towards negative infinity).
+   - Example: `floor(4.9)` = 4, `floor(-2.1)` = -3
+
+2. `ceiling(number)`: Returns the smallest integer greater than or equal to `number` (rounds towards positive infinity).
+   - Example: `ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
+
+3. `random()`: Returns a random decimal number between 0.0 (inclusive) and 1.0 (exclusive). Typically used in `calculate` fields to assign random values or randomize question order.
+   - Example: `random()` → e.g., `0.7341`
+   - Example: `int(random() * 6) + 1` → random number 1–6 (dice roll)
+
+4. `coalesce(a, b)`: Returns `a` if `a` is non-empty; otherwise returns `b`. Useful as a fallback when a field might be empty.
+   - Example: `coalesce(${preferred_name}, ${full_name})` — use preferred name if set, otherwise fall back to full name.
+
+5. `once(value)`: Evaluates `value` and stores it, but only if the current field is **empty**. If the field already has a value (e.g., was previously set), `once()` returns the existing value unchanged. This prevents recalculation from overwriting user input.
+   - Example: `once(today())` in the `default` column sets today's date once and does not update if the enumerator re-opens the form.
+   - Example: `once(uuid())` generates a UUID once and keeps it stable across re-edits.
+
+---
+
+### Geo functions
+
+1. `area(geoshape_value)`: Calculates the **area in square meters** enclosed by a geoshape (polygon) value.
+   - The parameter is a geoshape field value in the format `lat1 lon1 0 0; lat2 lon2 0 0; ...`
+   - Example: `area(${field_boundary})` — calculate the area of a surveyed field in m².
+   - Example: `round(area(${field_boundary}) div 10000, 2)` — convert to hectares.
+
+2. `distance(coordinates)`: Calculates the **total path length in meters** of a geotrace (line), or the distance between two geopoints.
+   - For a geotrace: `distance(${route})` returns the total path length in meters.
+   - For two geopoints: `distance(concat(${point_a}, ' ', ${point_b}))` returns the distance between them.
+   - Example: `round(distance(${road_trace}) div 1000, 3)` — road length in kilometers.
+
+---
+
+### Validation functions
+
+1. `regex(value, pattern)`: Returns `true` if `value` matches the regular expression `pattern`. Use in the `constraint` column for pattern-based validation.
+   - The pattern uses standard regex syntax (POSIX ERE subset).
+   - Example: `regex(., '^[0-9]{10}$')` — validate a 10-digit number.
+   - Example: `regex(., '^[A-Z]{2}[0-9]{6}$')` — validate a passport number format (2 uppercase letters followed by 6 digits).
+   - Example: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — basic email format check.
+
+2. `checklist(min, max, v1, v2, ...)`: Evaluates a list of boolean expressions and returns `true` if the number of `true` values is between `min` and `max` (inclusive). Pass `-1` for `min` or `max` to skip that bound.
+   - Example: `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — passes if exactly 2 or 3 of the three conditions are true.
+   - Example: `checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — at least one safety measure must be true.
+
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Like `checklist()`, but each value has a weight. The sum of weights for `true` values must be between `min` and `max`.
+   - Example: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — sum of weights for present facilities must be at least 10.
+
+---
+
+### Utility functions
+
+1. `uuid()`: Generates a random UUID (RFC 4122 v4 format) as a string.
+   - Example: `uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
+   - Typically used with `once()` to generate a stable unique ID: `once(uuid())`
+
+2. `version()`: Returns the value of the form's `version` attribute as set in the settings worksheet.
+   - Example: `version()` → `'3.1'`
+   - Useful in `calculate` fields to embed the form version in exported data.
+
+3. `position()`: When called inside a **repeat group**, returns the 1-based index of the current repeat instance.
+   - Example: `position()` in the first instance returns `1`, in the second returns `2`, and so on.
+   - See also: `index()` (alias), `indexed-repeat()` for referencing repeat values from outside the group.
+
+4. `thousandsep(length, separator, value)`: Formats a number with a thousands separator. `length` is the minimum total string length (padded with spaces if shorter), `separator` is the character to use (e.g., `','`), and `value` is the number to format.
+   - Example: `thousandsep(0, ',', 1234567)` → `'1,234,567'`
+   - Example: `thousandsep(0, '.', ${income})` → formats income with period as thousands separator.
+
+5. `substr-jsonpath(value, jsonpath)`: Extracts a substring from a JSON string using a JSONPath expression.
+   - Example: `substr-jsonpath(${api_response}, '$.data.name')` — extract the `name` field from a JSON string stored in `api_response`.
+   - Typically used alongside `callapi()` to extract specific values from API responses.

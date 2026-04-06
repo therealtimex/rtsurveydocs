@@ -1,0 +1,145 @@
+---
+title: "HTML-stílus"
+description: "Az rtSurvey HTML-tageket támogat a feliratokban és súgókban, lehetővé téve a formázott szöveget, hivatkozásokat és dinamikus szín-témákat."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 297
+---
+
+Az rtSurvey a **felirat** és **súgó** szövegét HTML-ként jeleníti meg a webes űrlapokon. Ez azt jelenti, hogy szabványos HTML-tagekkel formázhatja a szöveget, sortöréseket adhat hozzá, hivatkozásokat hozhat létre és színeket alkalmazhat. Ez különösen hasznos megjegyzésmezőknél, szakaszutasításoknál és dinamikus összefoglalóknál.
+
+{{% alert icon=" " context="warning" %}}
+A feliratokban lévő HTML a **webes űrlapon** és az rtSurvey mobilalkalmazásokban jelenik meg. Esetleg nem jelenik meg az összes ODK-kompatibilis kliensben. Mindig tesztelje a célplatformon.
+{{% /alert %}}
+
+---
+
+## Támogatott HTML-tagek
+
+### Szövegformázás
+
+| Tag | Eredmény |
+|-----|--------|
+| `<strong>szöveg</strong>` vagy `<b>szöveg</b>` | **Félkövér szöveg** |
+| `<em>szöveg</em>` vagy `<i>szöveg</i>` | *Dőlt szöveg* |
+| `<u>szöveg</u>` | Aláhúzott szöveg |
+| `<br>` | Sortörés |
+| `<span style="...">szöveg</span>` | Inline stílus |
+
+### Hivatkozások
+
+```html
+<a href="https://example.com" target="_blank">Kattintson ide</a>
+```
+
+Új lapon nyílik meg. Hivatkozási dokumentumokhoz, irányelvekhez vagy a kérdező által felkeresendő külső forrásokhoz használja.
+
+### Színek
+
+Használja a `<span>` tagot inline stílusokkal:
+
+```html
+<span style="color: red;">Figyelmeztetés: az érték tartományon kívül van</span>
+<span style="color: #009688;">Szakasz befejezve</span>
+```
+
+---
+
+## Szín-téma változók
+
+Az rtSurvey az alkalmazás konfigurált témájához alkalmazkodó **szín-téma tokeneket** támogat. Használja a `__SZÍN_TÉMA_NEVE__` szintaxist:
+
+```html
+<span style="color: var(--color-theme-primary);">Elsődleges szín szöveg</span>
+```
+
+Vagy a token rövidítést a felirat szövegében:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Fontos megjegyzés</font>
+```
+
+Ez megjelenítéskor automatikusan a CSS-változót tartalmazó megfelelő `<span>` taggé alakul.
+
+---
+
+## Többnyelvű feliratok
+
+Az egynyelvű tartalom több nyelven való támogatásához csomagolja be az adott tartalmakat nyelvcímkékbe egyetlen feliratcellán belül:
+
+```
+<en>Enter the household size</en><hu>Adja meg a háztartás méretét</hu>
+```
+
+Az rtSurvey kinyeri az aktuális alkalmazásnyelv-nek megfelelő tartalmat. Ha nem találja a megfelelő nyelvcímkét, a teljes karakterláncot jeleníti meg.
+
+---
+
+## Példák megjegyzésmezőkre
+
+### Szakaszutasítás félkövér szöveggel és sortöréssel
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>3. szakasz: Földhasználat</strong><br>Ebben a szakaszban az összes kérdést csak a háztartásfőnek tegye fel.` |
+
+### Dinamikus összefoglaló számítási hivatkozással
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Háztartástagok száma összesen: <strong>${total}</strong><br><span style="color: gray;">Felnőttek: ${adults} · Gyermekek: ${children}</span>` |
+
+### Figyelmeztetés pirosban
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Figyelmeztetés:</strong> A megadott kor (${age}) szokatlanul magas. Kérjük, ellenőrizze.</span>` | `${age} > 100` |
+
+### Hivatkozás referencia-dokumentumra
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `A szakasz megkezdése előtt tekintse meg a <a href="https://docs.example.com/guidelines" target="_blank">Terepi irányelveket</a>.` |
+
+---
+
+## rtSurvey speciális HTML-tagek
+
+### `<webbox src='url' title='cím'>...</webbox>`
+
+Egy URL-t ágyaz be az űrlapba modális iframeként. A teljes részletekért lásd: [Webbox](webbox).
+
+### `<delete-repeat-current>felirat</delete-repeat-current>`
+
+Egy ismétlőcsoporton belül gombot jelenít meg, amely megnyomáskor törli az aktuális ismétlési példányt.
+
+### `<delete-repeat-last>felirat</delete-repeat-last>`
+
+Egy gombot jelenít meg, amely törli az utolsó ismétlési példányt.
+
+Példa használat egy ismétlőcsoportban:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Ez a tag törlése</delete-repeat-current>` |
+
+---
+
+## Bevált módszerek
+
+1. Takarékosan használja a HTML-t – a túlformázott feliratok nehezebben olvashatók, nem könnyebben.
+2. Félkövérhez előnyben részesítse a `<strong>` tagot, dőlthez az `<em>` tagot az elavult `<b>` és `<i>` helyett.
+3. A színhasználatot tegye értelemmel teltté – a pirosat figyelmeztetésekre használja, ne dekorációra.
+4. Mindig tesztelje a HTML-megjelenítést mobilalkalmazáson és webes űrlapon egyaránt, mivel a megjelenítés kissé eltérhet.
+5. Kerülje a `<table>` tagokat a feliratokban – ezek ritkán jelennek meg jól mobilképernyőkön.
+6. Ne használjon JavaScript-et (`<script>`) – ez el lesz távolítva vagy hibát okoz.
+
+## Korlátozások
+
+- Az összetett HTML (táblázatok, űrlapok, szkriptek) nem támogatott, és megjelenítési problémákat okozhat.
+- Egyes régebbi mobil kliensek literál szövegként jeleníthetik meg a HTML-tageket – tesztelje az összes céleszközön.
+- A `<a>` hivatkozások böngészőben vagy WebView-ban nyílnak meg – a kérdező elhagyja az űrlapot, ami zavaró lehet mobilon.

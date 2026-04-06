@@ -1,0 +1,74 @@
+---
+title: "Llojet e pyetjeve"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 220
+---
+
+rtSurvey mbështet të gjitha llojet standarde të pyetjeve XLSForm, plus disa zgjerime. Çdo lloj pyetjeje kontrollon çfarë lloji të dhënash mblidhen dhe si paraqitet widget-i i hyrjes në pajisje.
+
+Për të vendosur llojin e pyetjes, shkruani emrin e llojit në kolonën `type` të fletës **survey** në XLSForm tuaj.
+
+## Hyrja e tekstit
+
+| Lloji | Përshkrimi |
+|-------|------------|
+| [text](text) | Përgjigje me tekst të lirë — lejohen çdo karakter |
+| [integer](integer) | Numër i plotë (pa decimale) |
+| [decimal](decimal) | Numër me shifra decimale |
+| [range](range) | Numër i zgjedhur nga rrëshqitësi brenda një diapazoni të definuar min/maks |
+
+## Zgjedhja
+
+| Lloji | Përshkrimi |
+|-------|------------|
+| [select_one listname](select-one) | Zgjidh saktësisht një opsion nga lista |
+| [select_multiple listname](select-multiple) | Zgjidh një ose më shumë opsione nga lista |
+| [select_one_from_file filename](select-one-from-file) | Zgjidh një opsion ngarkuar nga skedar i jashtëm CSV |
+| [rank listname](rank) | Rendit zgjedhjet sipas preferencës ose prioritetit |
+
+## Data dhe Ora
+
+| Lloji | Përshkrimi |
+|-------|------------|
+| [date](date) | Data e kalendarit (viti, muaji, dita) |
+| [time](time) | Ora e ditës (orët, minutat) |
+| [datetime](datetime-date-time) | Data dhe ora e kombinuara |
+
+## Vendndodhja
+
+| Lloji | Përshkrimi |
+|-------|------------|
+| [geopoint](geopoint) | Koordinatë e vetme GPS (gjerësia, gjatësia, lartësia, saktësia) |
+| [geotrace](geotrace) | Një rrugë — seri pikash GPS që formojnë një vijë |
+| [geoshape](geoshape) | Një zonë — poligon i mbyllur i pikave GPS |
+
+## Media
+
+| Lloji | Përshkrimi |
+|-------|------------|
+| [image](image) | Kapja e fotografisë ose ngarkimi i imazhit |
+| [audio](audio) | Regjistrimi audio |
+| [video](video) | Regjistrimi video |
+| [file](file) | Ngarkimi i skedarit të përgjithshëm (PDF, dokument, etj.) |
+
+## Të tjera
+
+| Lloji | Përshkrimi |
+|-------|------------|
+| [barcode](barcode) | Skanoni një barcode ose kod QR |
+| [note](note) | Tekst shfaqje vetëm-lexueshëm — tregon udhëzime ose përmbledhje të llogaritura |
+| [calculate](calculate) | Fushë e fshehur që ruan një vlerë të llogaritur |
+| [hidden](hidden) | Fushë e fshehur që ruan një vlerë statike ose të parapredisur |
+| [trigger / acknowledge](trigger) | Kutia e zgjedhjes që numëruesi duhet ta shënojë për të konfirmuar që ka lexuar një deklaratë |
+| [meta](meta) | Metadata automatike: timestamps, ID pajisje, informacion numëruesi |
+
+## Si funksionojnë lloji dhe pamja së bashku
+
+`type` përcakton **çfarë të dhënash mblidhen**. Kolona `appearance` kontrollon **si duket widget-i**. Shumë lloje mbështesin pamje të shumëfishta — për shembull `select_one` mund të shfaqet si butona radio, listë rënëse, shkallë Likert, ose rrjetë kompakte.
+
+Shikoni [Pamjen](../appearance) për listën e plotë të opsioneve.

@@ -1,0 +1,145 @@
+---
+title: "Định dạng HTML (HTML Styling)"
+description: "rtSurvey hỗ trợ thẻ HTML trong nhãn và gợi ý, cho phép định dạng văn bản phong phú, liên kết và chủ đề màu động."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 297
+---
+
+rtSurvey hiển thị văn bản **label** và **hint** dưới dạng HTML trên biểu mẫu web. Điều này có nghĩa là bạn có thể dùng các thẻ HTML tiêu chuẩn để định dạng văn bản, thêm ngắt dòng, tạo liên kết và áp dụng màu sắc. Tính năng này đặc biệt hữu ích cho các trường note, hướng dẫn phần và tóm tắt động.
+
+{{% alert icon=" " context="warning" %}}
+HTML trong nhãn được hiển thị trên **biểu mẫu web** và ứng dụng di động rtSurvey. Có thể không hiển thị trong tất cả các client tương thích ODK. Luôn kiểm tra trên nền tảng mục tiêu của bạn.
+{{% /alert %}}
+
+---
+
+## Các thẻ HTML được hỗ trợ
+
+### Định dạng văn bản
+
+| Thẻ | Kết quả |
+|-----|---------|
+| `<strong>text</strong>` hoặc `<b>text</b>` | **Văn bản đậm** |
+| `<em>text</em>` hoặc `<i>text</i>` | *Văn bản nghiêng* |
+| `<u>text</u>` | Văn bản gạch chân |
+| `<br>` | Ngắt dòng |
+| `<span style="...">text</span>` | Định dạng nội tuyến |
+
+### Liên kết
+
+```html
+<a href="https://example.com" target="_blank">Nhấp vào đây</a>
+```
+
+Mở trong tab mới. Dùng cho tài liệu tham khảo, hướng dẫn, hoặc tài nguyên bên ngoài mà người điều tra cần tham khảo.
+
+### Màu sắc
+
+Dùng `<span>` với kiểu nội tuyến:
+
+```html
+<span style="color: red;">Cảnh báo: giá trị ngoài phạm vi</span>
+<span style="color: #009688;">Phần đã hoàn thành</span>
+```
+
+---
+
+## Biến màu chủ đề
+
+rtSurvey hỗ trợ **token màu chủ đề** thích nghi với chủ đề được cấu hình của ứng dụng. Dùng cú pháp `__COLOR_THEME_NAME__`:
+
+```html
+<span style="color: var(--color-theme-primary);">Văn bản màu chính</span>
+```
+
+Hoặc dùng cách viết tắt token trong văn bản nhãn:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Ghi chú quan trọng</font>
+```
+
+Điều này được tự động chuyển thành `<span>` tương đương với biến CSS khi hiển thị.
+
+---
+
+## Nhãn đa ngôn ngữ
+
+Bọc nội dung trong thẻ ngôn ngữ để hỗ trợ nhiều ngôn ngữ trong một ô nhãn:
+
+```
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey trích xuất nội dung khớp với ngôn ngữ ứng dụng hiện tại. Nếu không tìm thấy thẻ ngôn ngữ phù hợp, toàn bộ chuỗi được hiển thị nguyên vẹn.
+
+---
+
+## Ví dụ trong trường note
+
+### Hướng dẫn phần với in đậm và ngắt dòng
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Phần 3: Sử dụng đất</strong><br>Hỏi tất cả câu hỏi trong phần này chỉ với chủ hộ.` |
+
+### Tóm tắt động với tham chiếu tính toán
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Tổng số thành viên hộ: <strong>${total}</strong><br><span style="color: gray;">Người lớn: ${adults} · Trẻ em: ${children}</span>` |
+
+### Cảnh báo màu đỏ
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Cảnh báo:</strong> Tuổi đã nhập (${age}) cao bất thường. Vui lòng xác minh.</span>` | `${age} > 100` |
+
+### Liên kết đến tài liệu tham khảo
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Tham khảo <a href="https://docs.example.com/guidelines" target="_blank">Hướng dẫn thực địa</a> trước khi bắt đầu phần này.` |
+
+---
+
+## Thẻ HTML đặc biệt của rtSurvey
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+Nhúng nút mở URL trong modal bên trong biểu mẫu. Xem [Webbox](webbox) để biết chi tiết đầy đủ.
+
+### `<delete-repeat-current>label</delete-repeat-current>`
+
+Hiển thị nút bên trong nhóm lặp để xóa phiên bản lặp hiện tại khi nhấn.
+
+### `<delete-repeat-last>label</delete-repeat-last>`
+
+Hiển thị nút để xóa phiên bản lặp cuối cùng.
+
+Ví dụ sử dụng trong nhóm lặp:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Xóa thành viên này</delete-repeat-current>` |
+
+---
+
+## Thực hành tốt
+
+1. Dùng HTML vừa phải — nhãn được định dạng quá nhiều khó đọc hơn chứ không dễ hơn.
+2. Ưu tiên `<strong>` cho in đậm và `<em>` cho in nghiêng thay vì các thẻ cũ `<b>` và `<i>`.
+3. Giữ việc dùng màu sắc có ý nghĩa — dùng đỏ cho cảnh báo, không phải để trang trí.
+4. Luôn kiểm tra hiển thị HTML trên cả ứng dụng di động và biểu mẫu web, vì hiển thị có thể khác nhau đôi chút.
+5. Tránh thẻ `<table>` trong nhãn — chúng hiếm khi hiển thị tốt trên màn hình di động.
+6. Không dùng JavaScript (`<script>`) — nó sẽ bị loại bỏ hoặc gây lỗi.
+
+## Giới hạn
+
+- HTML phức tạp (bảng, form, script) không được hỗ trợ và có thể làm hỏng hiển thị.
+- Một số client di động cũ hơn có thể hiển thị thẻ HTML dưới dạng văn bản thuần — kiểm tra trên tất cả thiết bị mục tiêu.
+- Liên kết `<a>` mở trong trình duyệt hoặc WebView — người điều tra rời khỏi biểu mẫu, điều này có thể gây gián đoạn trên thiết bị di động.

@@ -1,0 +1,42 @@
+---
+weight: 1
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+title: "Oversikt"
+icon: "rocket_launch"
+toc: false
+description: "Hva rtSurvey er, hvordan det fungerer og hva du trenger før du starter."
+---
+
+rtSurvey er en selvhostet plattform for å designe skjemaer, samle inn feltdata og analysere resultater i sanntid. Du kjører det på din egen server — dataene dine forlater aldri din infrastruktur.
+
+---
+
+## Slik fungerer det
+
+| Trinn | Hva du gjør |
+|-------|-------------|
+| **1. Distribuer** | Start en server og kjør rtSurvey-stakken med ett automatisert skript |
+| **2. Utform** | Lag skjemaer med XLSForm eller den visuelle Form Builder |
+| **3. Samle inn** | Feltteam sender inn data via mobilappen eller nettleseren — online eller offline |
+| **4. Analyser** | Se gjennom innleveringer i dashbordet, eksporter til CSV/Stata eller koble til Power BI / R |
+
+---
+
+## Før du begynner
+
+Du trenger:
+
+- En **Linux-server** (eller en skykonto hos Linode, DigitalOcean, AWS eller GCP)
+- Et **domenenavn** som peker til serveren din
+- Omtrent **10 minutter**
+
+Ingen forkunnskaper om Docker kreves — distribusjonsskriptet tar seg av alt.
+
+---
+
+## Klar?
+
+**[Distribuer serveren din →](self-hosting/quick-start)**

@@ -1,0 +1,60 @@
+---
+title: "Barcode"
+description: "សំណួរ barcode ឱ្យ scan និងចាប់ barcode data ក្នុងការស្ទង់មតិ។"
+icon: "qr_code_scanner"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 231
+---
+
+ប្រភេទសំណួរ barcode ក្នុង XLSForms និង rtSurvey ឱ្យអ្នកប្រើប្រាស់ scan និងចាប់ barcode data ដោយផ្ទាល់ក្នុងការស្ទង់មតិ។ feature នេះមានប្រយោជន៍ជាពិសេសសម្រាប់ inventory management, product tracking, ឬ scenario ណាដែល data entry ដែលឆាប់ និងត្រឹមត្រូវ ចាំបាច់។
+
+## ការបញ្ជាក់ XLSForm មូលដ្ឋាន
+
+| type    | name          | label                   |
+|---------|---------------|-------------------------|
+| barcode | product_code  | Scan the product barcode|
+
+សម្រាប់ព័ត៌មានបន្ថែម សូមមើល [XLSForm specification](https://xlsform.org/en/#question-types)។
+
+## ការប្រើប្រាស់
+
+សំណួរ barcode ប្រើជាទូទៅសម្រាប់:
+
+1. Product identification ក្នុង inventory surveys
+2. Asset tracking ក្នុង field operations
+3. Ticket ឬ ID verification ក្នុង events
+4. Quick data entry សម្រាប់ coded information
+
+## ផ្នែកពង្រីករបស់ rtSurvey
+
+ខណៈដែល XLSForm specification មូលដ្ឋានសម្រាប់ barcode គឺ straightforward rtSurvey អាចផ្តល់:
+
+1. ការគាំទ្រ barcode formats ច្រើន (ឧ. QR codes, UPC, EAN)
+2. Integration ជាមួយ device camera សម្រាប់ barcode scanning
+3. Manual entry option ក្នុងករណី barcode ខូច ឬ scan មិនបាន
+
+## ការអនុវត្តល្អ
+
+1. ធានា lighting conditions ត្រឹមត្រូវ សម្រាប់ barcode scanning ដែលត្រឹមត្រូវ។
+2. ផ្តល់ការណែនាំច្បាស់ដល់អ្នកប្រើ អំពីរបៀប position device សម្រាប់ scanning។
+3. Include manual entry option ជា fallback ក្នុងករណី scanning difficulties។
+4. Test barcode scanning feature ជាមួយ devices ផ្សេងៗ និង barcode types មុនដំណើរការការស្ទង់មតិ។
+
+## ការដាក់កំហិត
+
+- Barcode scanning accuracy ប្រហែលប្រែប្រួលអាស្រ័យ camera quality device និង environmental conditions។
+- Devices ចាស់ ឬ low-end ខ្លះ ប្រហែលមិន support barcode scanning។
+- Barcode types ជាក់លាក់ ប្រហែលមិនត្រូវបានគាំទ្រ អាស្រ័យ implementation។
+
+## ឧទាហរណ៍ការប្រើប្រាស់
+
+| type    | name          | label                   | hint                                      |
+|---------|---------------|-------------------------|-------------------------------------------|
+| barcode | product_code  | Scan the product barcode| Position the barcode within the frame     |
+| integer | quantity      | Enter product quantity  |                                           |
+| note    | confirmation  | Product scanned: ${product_code}. Quantity: ${quantity} |           |
+
+ក្នុងឧទាហរណ៍នេះ ការស្ទង់មតិចាប់ barcode product, សួរ quantity, ហើយបង្ហាញ confirmation note ជាមួយ scanned information។

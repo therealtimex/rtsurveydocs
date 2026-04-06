@@ -1,0 +1,71 @@
+---
+weight: 5
+title: "首次登录"
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+icon: "login"
+toc: true
+description: "如何在部署后首次登录您的 rtSurvey 实例。"
+---
+
+> **登录前必须配置 SSL。** 如果您通过 HTTP 访问应用，将看到安全警告且 SSO 将被阻止。请先完成 [SSL 设置](ssl-setup)。
+
+SSL 激活后，在您的 HTTPS 地址打开浏览器：
+
+```
+https://your-domain.com
+```
+
+---
+
+## 登录界面
+
+<!-- SCREENSHOT NEEDED: login page over HTTPS — username/password form + SSO button -->
+
+登录页面显示：
+
+- **用户名**和**密码**字段
+- **登录**按钮
+- **使用 SSO 登录**按钮（分隔线下方）— 供拥有 SSO 账户的团队成员使用
+
+---
+
+## 默认管理员凭据
+
+输入默认凭据并点击**登录**：
+
+| 字段 | 值 |
+|------|----|
+| 用户名 | `admin` |
+| 密码 | `admin` |
+
+> **首次登录后立即更改密码。**
+
+---
+
+## 如果看到安全警告
+
+如果您通过 HTTP 访问应用（SSL 配置前），将看到：
+
+- 登录页面顶部的黄色警告横幅
+- 点击**登录**时弹出的模态框，警告凭据将以未加密形式发送
+
+<!-- SCREENSHOT NEEDED: HTTP warning banner on login page -->
+<!-- SCREENSHOT NEEDED: SSL warning modal with "Set up SSL" and "Continue anyway" buttons -->
+
+点击**设置 SSL** 来配置 HTTPS，或点击**无论如何继续**以不使用 SSL 登录（不推荐）。
+
+HTTP 上的 SSO 登录被完全阻止——点击**使用 SSO 登录**将显示通知而非重定向。
+
+---
+
+## 登录后
+
+登录后，您将进入仪表板。从这里：
+
+1. **更改管理员密码** — 账户设置 → 更改密码
+2. **创建第一个项目** — 项目 → 新建项目
+3. **上传或构建表单** — 表单 → 上传 XLSForm 或打开表单构建器
+4. **添加用户** — 用户 → 邀请或为您的团队创建账户

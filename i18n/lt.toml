@@ -1,0 +1,38 @@
+[lang_select_title]
+    other = "Pasirinkite kalbą"
+
+[search_title]
+    other = "Ieškoti"
+
+[search_navigate]
+    other = "naršyti"
+
+[search_select]
+    other = "pasirinkti"
+
+[search_close]
+    other = "uždaryti"
+
+[search_cancel]
+    other = "atšaukti"
+
+[search_no_results]
+    other = "Rezultatų nerasta:"
+
+[feedback_yes]
+    other = "Taip"
+
+[feedback_no]
+    other = "Ne"
+
+[feedback_helpful]
+    other = "Ar šis puslapis buvo naudingas?"
+
+[feedback_submit]
+    other = "Pateikti"
+
+[enable_light_mode]
+    other = "Įjungti šviesų režimą"
+
+[enable_dark_mode]
+    other = "Įjungti tamsų režimą"

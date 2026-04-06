@@ -1,0 +1,148 @@
+---
+title: "Select_multiple"
+description: "Les questions select_multiple permettent aux répondants de choisir une ou plusieurs options dans une liste prédéfinie."
+icon: "check_box"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 225
+---
+
+Le type de question `select_multiple` affiche une liste dans laquelle le répondant peut sélectionner **une ou plusieurs options**. Par défaut, les choix s'affichent sous forme de cases à cocher. La valeur stockée est une **liste séparée par des espaces** de toutes les valeurs de choix sélectionnées.
+
+## Spécification XLSForm de base
+
+**Feuille survey :**
+
+| type | name | label |
+|------|------|-------|
+| select_multiple crops | crops_grown | Quelles cultures le ménage cultive-t-il ? |
+
+**Feuille choices :**
+
+| list_name | name | label |
+|-----------|------|-------|
+| crops | maize | Maïs |
+| crops | beans | Haricots |
+| crops | rice | Riz |
+| crops | vegetables | Légumes |
+| crops | other | Autre |
+
+Pour plus de détails, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+
+## Format des données stockées
+
+La colonne exportée contient une liste séparée par des espaces des valeurs sélectionnées :
+
+```
+maize beans vegetables
+```
+
+Utilisez la fonction `selected()` — et non `=` — pour tester les valeurs select_multiple dans les expressions (voir ci-dessous).
+
+## Utilisations
+
+Les questions select_multiple sont utilisées pour :
+
+1. Collecter plusieurs réponses applicables (ex. : sources de revenus, cultures cultivées, symptômes)
+2. Éléments d'accord de type cases à cocher (ex. : "Sélectionner tout ce qui s'applique")
+3. Inventaires de langues ou de compétences
+4. Toute question où plusieurs réponses sont simultanément valides
+
+## Options d'apparence
+
+{{< table >}}
+| Appearance | Description |
+|------------|-------------|
+| *(aucune)* | Cases à cocher par défaut, une par ligne |
+| `minimal` | Widget de sélection multiple déroulant |
+| `compact` | Grille compacte, colonnes ajustées à la largeur de l'écran |
+| `compact-N` | Grille compacte forcée à N colonnes |
+| `horizontal` | Choix disposés horizontalement en ligne (web) |
+| `horizontal-compact` | Horizontal, espacement compact (web) |
+| `label` | Affiche uniquement les étiquettes sans cases à cocher (à utiliser avec `list-nolabel`) |
+| `list-nolabel` | Affiche uniquement les cases à cocher sans étiquettes (à utiliser avec `label`) |
+| `columns(N)` | Affichage en N colonnes (extension rtSurvey) |
+{{< /table >}}
+
+### Exemple : Mise en page compacte 3 colonnes
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple symptoms | symptoms | Sélectionner tous les symptômes observés | compact-3 |
+
+## Utiliser `selected()` dans les expressions
+
+Comme la valeur stockée est une chaîne séparée par des espaces, vous **devez** utiliser `selected()` pour vérifier si un choix spécifique a été sélectionné. Utiliser `=` ne fonctionnera pas correctement.
+
+### Dans `relevant`
+
+Afficher une question de suivi uniquement si "autre" a été sélectionné :
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_multiple crops | crops_grown | Quelles cultures sont cultivées ? | |
+| text | crops_other | Veuillez préciser les autres cultures | `selected(${crops_grown}, 'other')` |
+
+### Dans `constraint`
+
+Exiger au moins 2 choix :
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple issues | issues | `count-selected(.) >= 2` | Sélectionner au moins 2 problèmes |
+
+Limiter à un maximum de 3 :
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple priorities | priorities | `count-selected(.) <= 3` | Sélectionner au maximum 3 priorités |
+
+### Dans `calculate` — réunir les étiquettes sélectionnées
+
+Combinez `selected-at()`, `count-selected()` et `choice-label()` pour créer un résumé lisible :
+
+| type | name | calculation |
+|------|------|-------------|
+| calculate | crops_summary | join(', ', ${crops_grown}) |
+
+## Option "Aucune des réponses ci-dessus" / option exclusive
+
+Un schéma courant consiste à rendre une option mutuellement exclusive avec toutes les autres. Utilisez une `constraint` pour l'imposer :
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| select_multiple issues | issues | Sélectionner tous les problèmes présents | `not(selected(., 'none') and count-selected(.) > 1)` | "Aucun" ne peut pas être sélectionné avec d'autres options |
+
+**choices :**
+
+| list_name | name | label |
+|-----------|------|-------|
+| issues | water | Pénurie d'eau |
+| issues | roads | Routes en mauvais état |
+| issues | health | Manque de services de santé |
+| issues | none | Aucune des réponses ci-dessus |
+
+## Compter et résumer les sélections
+
+| Fonction | Exemple | Résultat |
+|----------|---------|--------|
+| `count-selected(field)` | `count-selected(${crops_grown})` | Nombre de choix sélectionnés |
+| `selected(field, value)` | `selected(${crops_grown}, 'maize')` | vrai/faux |
+| `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | Première valeur sélectionnée |
+| `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | Étiquette d'une valeur |
+
+## Bonnes pratiques
+
+1. Utilisez toujours `selected()` dans `relevant`, `constraint` et `calculate` — jamais `=` ou `!=`.
+2. Ajoutez une contrainte pour limiter le nombre maximum de sélections si la conception de la question l'exige.
+3. Incluez une option "Aucun" ou "Non applicable" lorsque zéro sélection est une réponse valide.
+4. Pour les longues listes (15+ choix), utilisez `minimal` (liste déroulante multi-sélection) pour éviter un défilement excessif.
+5. Exportez les données et utilisez le fractionnement de chaînes dans votre outil d'analyse — le format séparé par des espaces nécessite un fractionnement avant le pivotement.
+
+## Limitations
+
+- Les valeurs select_multiple ne peuvent pas être comparées directement avec `=`. Utilisez toujours `selected()`.
+- L'apparence compacte peut ne pas bien s'afficher pour les étiquettes de choix très longues.
+- Lors du filtrage des choix avec `choice_filter`, le filtrage s'applique à tous les choix affichés, de la même façon qu'avec `select_one`.

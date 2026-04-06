@@ -1,0 +1,113 @@
+---
+title: "Tata letak grid"
+description: "Tata letak grid memungkinkan Anda memposisikan bidang dalam grid CSS dalam grup, memungkinkan desain formulir multi-kolom."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 296
+---
+
+Fitur **Tata Letak Grid** memungkinkan Anda mengatur pertanyaan dalam **grid multi-kolom** dalam grup, menggunakan tag appearance `gridformat<>`. Ini berguna untuk formulir entri data yang padat di mana beberapa bidang terkait harus muncul berdampingan daripada ditumpuk secara vertikal.
+
+---
+
+## Cara kerjanya
+
+Tata letak grid diterapkan pada dua tingkat:
+
+1. **Grup** — tetapkan `appearance: field-list grid(weight=N)` untuk mendefinisikan berapa banyak kolom yang dimiliki grid
+2. **Setiap bidang dalam grup** — tetapkan `appearance: gridformat<row=R col=C colspan=S/>` untuk memposisikan bidang
+
+Grid menggunakan sistem 12 kolom gaya Bootstrap. `weight=N` mendefinisikan berapa banyak kolom logis yang dimiliki grid Anda; setiap kolom menempati `12/N` kolom Bootstrap.
+
+---
+
+## Appearance tingkat grup
+
+| Appearance | Deskripsi |
+|------------|-----------|
+| `field-list grid(weight=2)` | Grid 2 kolom (setiap kolom = 6 kolom Bootstrap) |
+| `field-list grid(weight=3)` | Grid 3 kolom (setiap kolom = 4 kolom Bootstrap) |
+| `field-list grid(weight=4)` | Grid 4 kolom (setiap kolom = 3 kolom Bootstrap) |
+| `field-list grid(weight=6)` | Grid 6 kolom (setiap kolom = 2 kolom Bootstrap) |
+
+---
+
+## Sintaks `gridformat<>` tingkat bidang
+
+```
+gridformat<row=R col=C colspan=S/>
+gridformat<row=R col=C colspan=S backgroundcolor=COLOR/>
+```
+
+| Atribut | Deskripsi |
+|---------|-----------|
+| `row` | Nomor baris (berbasis 1) |
+| `col` | Nomor kolom (berbasis 1, dalam grid yang didefinisikan oleh `weight`) |
+| `colspan` | Jumlah kolom yang dispan bidang ini (default 1) |
+| `backgroundcolor` | Warna CSS opsional untuk latar belakang bidang (misalnya, `#f0f0f0`, `lightblue`) |
+
+---
+
+## Contoh: Bagian survei rumah tangga 2 kolom
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | demographics | Demografi | `field-list grid(weight=2)` |
+| text | first_name | Nama depan | `gridformat<row=1 col=1/>` |
+| text | last_name | Nama belakang | `gridformat<row=1 col=2/>` |
+| integer | age | Usia | `gridformat<row=2 col=1/>` |
+| select_one gender | gender | Jenis kelamin | `gridformat<row=2 col=2/>` |
+| text | address | Alamat lengkap | `gridformat<row=3 col=1 colspan=2/>` |
+| end_group | | | |
+
+Ini dirender sebagai:
+
+```
+[ Nama depan        ] [ Nama belakang      ]
+[ Usia              ] [ Jenis kelamin      ]
+[ Alamat lengkap (mencakup kedua kolom)    ]
+```
+
+---
+
+## Contoh: Entri data plot 3 kolom
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_group | plot_data | Detail plot | `field-list grid(weight=3)` |
+| text | plot_id | ID Plot | `gridformat<row=1 col=1/>` |
+| decimal | area_ha | Luas (ha) | `gridformat<row=1 col=2/>` |
+| select_one crop_type | crop | Jenis tanaman | `gridformat<row=1 col=3/>` |
+| decimal | yield | Hasil (kg) | `gridformat<row=2 col=1/>` |
+| decimal | revenue | Pendapatan | `gridformat<row=2 col=2/>` |
+| text | notes | Catatan | `gridformat<row=2 col=3/>` |
+| end_group | | | |
+
+---
+
+## Warna latar belakang
+
+Gunakan `backgroundcolor` untuk membedakan bagian secara visual:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | section_a | Bagian A | `gridformat<row=1 col=1 colspan=2 backgroundcolor=#e8f4f8/>` |
+
+---
+
+## Praktik Terbaik
+
+1. Gunakan tata letak grid hanya untuk layar **entri data intensif** di mana bidang berdampingan benar-benar mengurangi pengguliran.
+2. Jaga bidang `colspan=1` tetap pendek (ID, kode, pilihan singkat) — label lebar terpotong dengan buruk dalam kolom grid yang sempit.
+3. Gunakan `colspan=N` untuk bidang dengan label panjang atau input teks multi-baris.
+4. Uji pada ukuran layar terkecil yang diharapkan digunakan enumerator — grid 4 kolom terasa sempit di ponsel.
+5. Tata letak grid paling baik di faktor bentuk web dan tablet; di ponsel 2 kolom biasanya lebar yang nyaman maksimum.
+
+## Keterbatasan
+
+- `gridformat<>` hanya berfungsi di dalam grup dengan appearance `grid(weight=N)` — tidak berpengaruh di tingkat atas.
+- Tata letak grid adalah ekstensi formulir web rtSurvey dan mungkin tidak dirender dengan benar di klien lain yang kompatibel dengan ODK.
+- Posisi baris dan kolom tidak divalidasi saat pembuatan formulir — bidang yang tumpang tindih keduanya akan dirender tetapi mungkin terlihat rusak.

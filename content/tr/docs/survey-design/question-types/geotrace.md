@@ -1,0 +1,83 @@
+---
+title: "Geotrace"
+description: "Geotrace soruları, katılımcıların harita üzerinde birbirine bağlı nokta serisi yakalayarak anketin bir parçası olarak çizgi veya yollar oluşturmasına olanak tanır."
+icon: "timeline"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 234
+---
+
+XLSForm'larda ve rtSurvey'de geotrace soru türü, katılımcıların harita üzerinde birbirine bağlı nokta serisi yakalayarak çizgiler veya yollar oluşturmasına olanak tanır. Bu özellik, rotaları, sınırları veya mekânsal anketlerdeki doğrusal özellikleri haritalamak için özellikle kullanışlıdır.
+
+## Temel XLSForm Tanımı
+
+| type     | name        | label                           |
+|----------|-------------|--------------------------------|
+| geotrace | river_path  | Nehrin yolunu izleyin           |
+
+Temel geotrace soru türü hakkında daha fazla ayrıntı için [XLSForm spesifikasyonuna](https://xlsform.org/en/#question-types) bakın.
+
+## Kullanım Alanları
+
+Geotrace soruları yaygın olarak şunlar için kullanılır:
+
+1. Saha anketleri sırasında alınan rotaları veya yolları haritalama
+2. Yollar, nehirler veya sınırlar gibi doğrusal özellikleri izleme
+3. Doğrusal altyapının kapsamını yakalama (örn. boru hatları, elektrik hatları)
+4. Ulaştırma çalışmalarında seyahat yollarını kaydetme
+5. Ekolojik anketlerde transektleri tanımlama
+
+## En İyi Uygulamalar
+
+1. Cihazda konum hizmetlerinin etkin olduğundan ve izinlerin verildiğinden emin olun.
+2. Yolun nasıl izleneceği ve hangi özelliklerin dahil edilmesi gerektiği konusunda net talimatlar verin.
+3. Katılımcıların yolları doğru izlemesine yardımcı olmak için uydu görüntüsü veya temel haritalar kullanmayı düşünün.
+4. İzlerin potansiyel karmaşıklığına ve bunların veri boyutu ve işleme üzerindeki etkisine dikkat edin.
+
+## Örnek Kullanım
+
+Bir ankette geotrace sorusunu nasıl kullanabileceğinize dair bir örnek:
+
+| type     | name           | label                                      | hint                                        |
+|----------|----------------|--------------------------------------------|--------------------------------------------|
+| geotrace | hiking_trail   | Yürüyüş parkurunun yolunu izleyin          | Parkur başlangıcından zirveye kadar izleyin |
+
+## rtSurvey Uzantıları
+
+XLSForm için temel geotrace soru tanımı basit olmakla birlikte, rtSurvey ek özellikler veya özelleştirmeler sunabilir:
+
+1. Uzak bölgeler için çevrimdışı haritalarla entegrasyon
+2. İz için minimum ve maksimum nokta sayısı belirleme seçenekleri
+3. İlk çizimden sonra izleri düzenleme veya iyileştirme imkânı
+4. Hareket sırasında belirli aralıklarda otomatik izleme desteği
+
+## Veri Biçimi
+
+Geotrace verisi genellikle geoshape'e benzer şekilde, ancak kapanış noktası olmadan noktalı virgülle ayrılmış koordinat çiftleri dizisi olarak saklanır:
+
+```
+enlem1 boylam1; enlem2 boylam2; enlem3 boylam3; ... enlemN boylamN
+```
+
+Örneğin:
+```
+38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
+```
+
+## Analiz için Değerlendirmeler
+
+Geotrace soruları kullanırken şunları göz önünde bulundurun:
+
+1. Coğrafi verilerin nasıl görselleştirileceği ve analiz edileceği (örn. GIS yazılımı)
+2. Karmaşık izlerin temizlenmesi veya basitleştirilmesi gereksinimi
+3. Ayrıntılı mekânsal verilerin işlenmesi için gizlilik ve veri koruma önlemleri
+4. Kapsamlı analiz için diğer mekânsal veri kaynaklarıyla entegrasyon
+
+## Sınırlamalar
+
+- Küçük mobil ekranlarda doğru yollar çizmek zor olabilir.
+- Karmaşık izler önemli depolama ve işleme kapasitesi gerektirebilir.
+- Otomatik izleme için sürekli GPS kullanımı cihaz pilini hızla tüketebilir.
+- Ayrıntılı yol verisi toplamayla ilgili gizlilik endişeleri olabilir.

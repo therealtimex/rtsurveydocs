@@ -1,0 +1,66 @@
+---
+title: "Uzlabotas atkārtojumu grupas"
+description: "Uzlaboti modeļi atkārtojumu grupām: dinamiskie skaiti, ligzdotas atkārtojumu grupas, atkārtojumu datu apkopošana un vērtību atsauces starp atkārtojumiem."
+icon: "manage_search"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 295
+---
+
+Šī lapa aptver uzlabotos modeļus darbam ar atkārtojumu grupām rtSurvey. Atkārtojumu grupas pamatu iestatīšanai skatiet [Grupēšana un atkārtojumi](../repeats).
+
+---
+
+## Dinamiskie atkārtojumu skaiti
+
+Izmantojiet iepriekšējo atbilžu lauku, lai noteiktu atkārtojumu skaitu:
+
+```
+| type         | name           | label                          | repeat_count       |
+|--------------|----------------|--------------------------------|--------------------|
+| integer      | num_children   | Bērnu skaits?                  |                    |
+| begin repeat | child          | Bērns                          | ${num_children}    |
+| text         | child_name     | Bērna vārds                    |                    |
+| integer      | child_age      | Bērna vecums                   |                    |
+| end repeat   |                |                                |                    |
+```
+
+## Atsauces uz atkārtojumu vērtībām no ārpuses
+
+Izmantojiet `indexed-repeat()`, lai piekļūtu konkrētai atkārtojuma instancei no ārpuses atkārtojuma grupas:
+
+```
+indexed-repeat(${child_name}, ${children}, 1)
+```
+
+Tas atgriež pirmā bērna vārdu.
+
+## Atkārtojumu datu apkopošana
+
+```
+sum(${loan_amount})          → Visu aizdevumu summa
+count(${household_members})  → Mājsaimniecības locekļu skaits
+join(', ', ${member_name})   → Komata atdalīts vārdu saraksts
+```
+
+## Ligzdotas atkārtojumu grupas
+
+```
+| type         | name           | label                |
+|--------------|----------------|----------------------|
+| begin repeat | household      | Mājsaimniecība       |
+| text         | hh_name        | Mājsaimniecības nosaukums |
+| begin repeat | hh_member      | Mājsaimniecības loceklis |
+| text         | member_name    | Locekļa vārds        |
+| integer      | member_age     | Locekļa vecums       |
+| end repeat   |                |                      |
+| end repeat   |                |                      |
+```
+
+## Labākā prakse
+
+1. Ierobežojiet ligzdošanas dziļumu — dziļi ligzdoti atkārtojumi var ietekmēt veiktspēju.
+2. Izmantojiet `count()` un `sum()` apkopojuma aprēķiniem.
+3. Pārbaudiet ar lieliem atkārtojumu skaitiem mobilo ierīču veiktspējai.

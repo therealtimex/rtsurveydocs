@@ -1,0 +1,42 @@
+---
+weight: 1
+date: "2026-04-01T00:00:00+07:00"
+lastmod: "2026-04-01T00:00:00+07:00"
+draft: false
+author: "rtSurvey"
+title: "Overview"
+icon: "rocket_launch"
+toc: false
+description: "What rtSurvey is, how it works, and what you need before you start."
+---
+
+rtSurvey is a self-hosted platform for designing forms, collecting data in the field, and analyzing results in real time. You run it on your own server — your data never leaves your infrastructure.
+
+---
+
+## How it works
+
+| Step | What you do |
+|------|-------------|
+| **1. Deploy** | Spin up a server and run the rtSurvey stack with one automated script |
+| **2. Design** | Build forms using XLSForm or the visual Form Builder |
+| **3. Collect** | Field teams submit data via the mobile app or web browser — online or offline |
+| **4. Analyze** | Review submissions in the dashboard, export to CSV/Stata, or connect to Power BI / R |
+
+---
+
+## Before you start
+
+You need:
+
+- A **Linux server** (or a cloud account on Linode, DigitalOcean, AWS, or GCP)
+- A **domain name** pointed at your server
+- About **10 minutes**
+
+No prior Docker knowledge required — the deployment script handles everything.
+
+---
+
+## Ready?
+
+**[Deploy your server →](self-hosting/quick-start)**

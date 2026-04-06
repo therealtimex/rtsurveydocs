@@ -1,0 +1,140 @@
+---
+title: "App API"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 300
+---
+
+AppAPI umožňuje uživatelům načítat systémová metadata z aplikace pomocí různých metod ve FormEngine a DMView. Poskytuje přístup k různým datovým klíčům pro získání konkrétních informací z aplikace.
+
+V XLSForm můžete použít funkci `pulldata()` s následující syntaxí:
+
+{{< alert context="light" text="pulldata('app-api', 'data-key')" />}}
+
+- `'app-api'`: Toto klíčové slovo informuje FormEngine, aby načetl data z App API.
+- `'data-key'`: Toto je klíč dat, která chcete načíst z App API.
+- Pokud je datový klíč neplatný nebo nepodporovaný, výpočet vrátí „n/a".
+
+Zde jsou podporované datové klíče, které můžete použít s App-API:
+
+`osPlatform`: Vrátí aktuální název OS (Android nebo iOS) a verzi OS. Webové platformy vrátí prázdnou hodnotu.
+
+`appPlatform`: Vrátí název platformy aplikace, což je `rtSurvey`.
+
+`appVersion`: Vrátí název verze aplikace.
+
+`getDisplayWidth`: Vrátí šířku obrazovky zařízení v pixelech.
+
+`getDisplayHeight`: Vrátí výšku obrazovky zařízení v pixelech.
+
+`getScreenSize`: Vrátí velikost obrazovky zařízení v palcích.
+
+`projectCode`: Vrátí aktuální kód projektu webu, ke kterému se uživatel přihlašuje.
+
+`projectURL`: Vrátí aktuální URL projektu webu, ke kterému se uživatel přihlašuje. Výchozí/záložní hodnota je prázdný text ("").
+
+`startingPoint`: Vrátí cestu bodu, který spustí formulář. Podrobnosti viz „Výchozí bod formuláře".
+
+`serverTime`: Vrátí nejlepší dostupnou aproximaci data a času na serveru.
+
+`user.[attribute]`: Vrátí atributy aktuálního uživatele na základě zadaného klíče atributu. Dostupné klíče atributů viz tabulka „Atributy uživatele".
+
+Kombinujte níže uvedené klíče atributů s „user." v parametrech `pulldata()` pro získání informací o aktuálním uživateli. Například použijte `user.username`, `user.email` atd.
+
+| Klíč atributu | Popis |
+|---------------|-------|
+| username | Uživatelské jméno uživatele |
+| name | Celé jméno uživatele |
+| staffCode | Kód pracovníka uživatele |
+| phone | Telefonní číslo uživatele |
+| email | E-mailová adresa uživatele |
+| description | Popis v informacích o uživateli |
+| organization_id | ID organizace, do které uživatel patří |
+| organization_name | Název organizace, do které uživatel patří |
+| team_id | ID týmu, do kterého uživatel patří |
+| supervisor_id | ID nadřízeného uživatele |
+| is_supervisor | 1 pokud je uživatel nadřízený, 0 pokud ne |
+
+`instancePath`: Vrátí aktuální cestu ke složce instance.
+
+`appLanguage`: Vrátí aktuální jazyk aplikace nastavený v nastavení aplikace (např. vi, en).
+
+`openArgs.[attribute]`: Vrátí argument otevření formuláře předaný z ActionButton (act_fill_form, act_get_instance). Výchozí/záložní hodnota je prázdný text ("").
+
+`primaryAppColor`: Načte primární barvu aplikace.
+
+---
+
+## Příklady použití
+
+### Uložení uživatelského jména a organizace enumerátora
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | enumerator_name | | `pulldata('app-api', 'user.name')` |
+| calculate | enumerator_org | | `pulldata('app-api', 'user.organization_name')` |
+| calculate | enumerator_email | | `pulldata('app-api', 'user.email')` |
+
+Použijte je v popiscích poznámek pro účely auditu:
+```
+note | interviewer_info | Tazatel: ${enumerator_name} (${enumerator_org})
+```
+
+### Informace o zařízení a obrazovce
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | device_platform | | `pulldata('app-api', 'osPlatform')` |
+| calculate | app_ver | | `pulldata('app-api', 'appVersion')` |
+| calculate | screen_w | | `pulldata('app-api', 'getDisplayWidth')` |
+
+Užitečné pro odstraňování problémů: exportujte `device_platform` a `app_ver` spolu s daty pro identifikaci, která verze zařízení byla použita pro každé odeslání.
+
+### Čas serveru místo času zařízení
+
+Hodiny zařízení mohou být nesprávné. Používejte `serverTime` pro spolehlivější časové razítko:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | server_ts | | `pulldata('app-api', 'serverTime')` |
+
+### Podmíněná logika na základě role uživatele
+
+Zobrazení sekce pouze pro nadřízené:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| calculate | is_supervisor | | `pulldata('app-api', 'user.is_supervisor')` |
+| begin_group | supervisor_section | Kontrola nadřízeného | `${is_supervisor} = '1'` |
+| text | supervisor_notes | Poznámky nadřízeného | |
+| end_group | | | |
+
+### Předávání argumentů z tlačítka akce
+
+Když je formulář spuštěn z tlačítka akce `act_fill_form` s vlastními argumenty:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | passed_hh_id | | `pulldata('app-api', 'openArgs.household_id')` |
+| calculate | passed_task | | `pulldata('app-api', 'openArgs.task_code')` |
+
+Tlačítko akce musí předat argumenty s odpovídajícími klíči (např. `household_id`, `task_code`).
+
+### Používání informací o projektu
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | project | | `pulldata('app-api', 'projectCode')` |
+| calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+---
+
+## Poznámky
+
+- Všechna volání `pulldata('app-api', ...)` jsou vyhodnocena při otevření formuláře a nejsou dynamicky přehodnocována během relace (s výjimkou `serverTime` a `now()`).
+- Pokud klíč není podporován nebo data nejsou dostupná, funkce vrátí `'n/a'` (nikoli prázdný řetězec — testujte pomocí `!= 'n/a'` spíše než `!= ''`).
+- Hodnoty `openArgs` jsou dostupné pouze při spuštění formuláře z tlačítka akce; jinak vrátí prázdný řetězec.

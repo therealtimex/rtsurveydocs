@@ -1,0 +1,43 @@
+---
+title: "العدد الصحيح"
+description: "تتيح أسئلة الأعداد الصحيحة إدخال أرقام كاملة في استطلاعك."
+icon: "123"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 222
+---
+
+يُستخدم نوع سؤال integer في XLSForms وrtSurvey لجمع الإجابات الرقمية الكاملة. هذا النوع ضروري لجمع البيانات الرقمية بدون منازل عشرية، مثل الأعداد والأعمار أو السنوات.
+
+## مواصفة XLSForm الأساسية
+
+| type    | name  | label                 |
+|---------|-------|------------------------|
+| integer | age   | Enter your age in years|
+
+## الاستخدامات
+
+تُستخدم أسئلة integer شائعاً لـ:
+
+1. إدخالات العمر
+2. عد العناصر (مثل عدد الأطفال وأفراد الأسرة)
+3. إدخالات السنة (مثل سنة الميلاد)
+4. التقييمات على مقياس رقمي
+5. أي جمع بيانات رقمية كاملة
+
+## القيود والتحقق
+
+يمكن إضافة قيود للتأكد من أن القيمة المُدخلة تقع ضمن نطاق محدد:
+
+| type    | name  | label                 | constraint        | constraint_message                    |
+|---------|-------|------------------------|-------------------|---------------------------------------|
+| integer | age   | Enter your age in years| .>0 and .<=120    | Age must be between 1 and 120 years   |
+
+## مثال الاستخدام
+
+| type    | name           | label                                     | constraint | constraint_message                |
+|---------|----------------|-------------------------------------------|------------|-----------------------------------|
+| integer | household_size | How many people live in your household?   | .>0        | Household size must be at least 1 |
+| integer | num_children   | How many children under 18 in the household? | .>=0    | Number of children cannot be negative |

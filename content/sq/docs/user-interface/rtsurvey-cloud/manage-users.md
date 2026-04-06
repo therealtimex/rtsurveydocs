@@ -1,0 +1,47 @@
+---
+title: "Menaxhimi i Përdoruesve"
+description: "Krijoni, organizoni dhe menaxhoni përdoruesit e sistemit dhe stafin e fushës."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 314
+---
+
+Moduli **Menaxhimi i Përdoruesve** (shpesh i etiketuar **Menaxho Stafin** në menunë e Konfigurimit) është drejtoria qendrore për trajtimin e të gjitha llogarive brenda mjedisit tuaj CPMS. Ai u siguron administratorëve të projekteve mjetet e nevojshme për të integruar personelin, caktuar role dhe diktuar nivelet e aksesit gjeografik.
+
+![Ndërfaqja e Menaxhimit të Përdoruesve](/images/manage_users.png)
+
+## Pamja e Përgjithshme e Rrjetit të Përdoruesve
+
+Ndërfaqja kryesore paraqet një rrjet gjithëpërfshirës që shfaq të gjithë anëtarët e stafit të regjistruar. Kjo pamje lejon administratorët të kërkojnë, filtrojnë dhe rishikojnë shpejt statuset e llogarive.
+
+### Kolonat Kryesore të të Dhënave
+
+Rrjeti përfshin detajet e mëposhtme thelbësore për çdo përdorues:
+
+- **Emri i Përdoruesit dhe Emri i Plotë:** Identifikuesit kryesorë për anëtarin e stafit.
+- **Email:** Adresa email e kontaktit e lidhur me llogarinë.
+- **Roli i Përdoruesit:** Tregon lejet e sistemit të dhëna përdoruesit (p.sh., Administrator, Staf, Monitor, Mik).
+- **Grupi:** Shfaq grupin specifik të përdoruesit ose ekipin të cilit i përket anëtari i stafit.
+- **Statusi:** Tregon nëse llogaria është aktualisht **Aktive** ose **Joaktive**.
+- **Data e Krijimit:** Shenja kohore kur u regjistrua llogaria.
+
+## Veprimet e Menaxhimit të Stafit
+
+Administratorët kanë akses në një suitë mjetesh për integrimin dhe mirëmbajtjen e llogarive të përdoruesve, të aksesueshme nga paneli i kontrollit të sipërm:
+
+- **Shto Staf:** Hap një formular të detajuar krijimi për të futur manualisht profilin e një përdoruesi të ri, duke përfshirë rolin e tij, rajonet e caktuara dhe informacionin e kontaktit.
+- **Importo Stafin:** Lejon krijimin e llogarive në grup duke ngarkuar një spreadsheet Excel. Kjo është veçanërisht e dobishme për krijimin e shpejtë të ekipeve të mëdha të fushës.
+- **Shkarko shabllon importi:** Siguron shablllonin e standardizuar `.xlsx` të kërkuar për procesin e importit në grup.
+- **Eksporto në Excel:** Gjeneron një raport të shkarkueshëm që përmban listën e filtruar aktuale të rrjetit me përdorues dhe detajet e tyre.
+- **Fshi:** Heq permanentisht llogaritë e zgjedhura të përdoruesve nga sistemi.
+
+## Profilet dhe Caktimet e Përdoruesve
+
+Kur krijoni ose editoni një përdorues specifik (nëpërmjet butonit **Shto Staf** ose duke klikuar mbi Emrin e Përdoruesit), administratorët mund të konfigurojnë profilet e detajuara:
+
+- **Informacioni Personal:** Fushat për Datën e Lindjes, Gjininë, Numrin e Identifikimit dhe Avatarin.
+- **Detajet e Kontaktit:** Numri i telefonit celular dhe informacioni i detajuar i vendndodhjes (Provinca, Rrethi, Fshati, Adresa).
+- **Caktimet e Sistemit:** Kritike për sigurinë e të dhënave, administratorët mund të lidhin përdoruesit me **Rajonet** specifike dhe të caktojnë **Rolet Specifike të Përdoruesit**.
+- **Konfigurimi i Mbikëqyrësit:** Në konfigurime të avancuara, përdoruesve mund t'u caktohen kode specifike mbikëqyrjeje ose t'i hartohen tabletave specifike (pajisjet).

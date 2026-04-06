@@ -1,0 +1,111 @@
+---
+title: "Lidhja me një server"
+description: "Mësoni si të lidhni aplikacionin celular rtSurvey me serverin e projektit tuaj, të aksesoni funksionalitetet specifike për role dhe të filloni bashkëpunimin në sondazhe nëpërmjet projekteve të shumta."
+icon: "cloud_sync"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 313
+---
+
+Lidhja e aplikacionit rtSurvey me një server është një hap vendimtar për të filluar përdorimin e aplikacionit për mbledhjen, menaxhimin dhe analizën e të dhënave. Ky proces siguron që të gjitha rolet e sondazhit mund të aksesojnë funksionalitetet dhe të dhënat e nevojshme në kohë reale.
+
+## Ndryshimet Kryesore nga ODK Collect
+
+rtSurvey ofron funksionalitete të zgjeruara krahasuar me ODK Collect, duke u kujdesur për role të ndryshme sondazhi:
+- **Administratori**: Mesazheria, njoftimet për përditësimet (dorëzimi i të dhënave, raportet e reja, llogaritë e reja), plotësimi i formularëve dhe shikimi i raporteve analitike.
+- **Menaxheri i Projektit**: Funksionalitete të ngjashme me Administratorët, duke përfshirë konfigurimin dhe menaxhimin e projekteve.
+- **Dizajneri i Sondazhit**: Mesazheria, njoftimet, plotësimi i formularëve dhe shikimi i raporteve analitike.
+- **Numëruesi i Fushës**: Plotësimi i formularëve, mesazheria, njoftimet dhe raportet e progresit.
+- **Analisti i të Dhënave**: Mesazheria, njoftimet dhe aksesi në raportet analitike.
+
+## Hapat për të Lidhur Aplikacionin rtSurvey me një Server
+
+### 1. Sigurohuni që Keni një Llogari
+
+Për t'u lidhur me serverin, keni nevojë për një llogari. Llogaritë mund të krijohen nga një Administrator ose nga stafi duke përdorur një URL të krijimit të llogarisë të konfiguruar nga Administratori.
+
+### 2. Hapni Aplikacionin rtSurvey
+
+Hapni aplikacionin rtSurvey në pajisjen tuaj celulare. Nëse nuk e keni instaluar ende, referojuni faqes [Instalimi i Aplikacionit rtSurvey](#installing-rtsurvey-app).
+
+### 3. Aksesoni Cilësimet e Lidhjes me Serverin
+
+1. Hapni aplikacionin dhe navigoni te menuja e cilësimeve.
+2. Zgjidhni opsionin për t'u lidhur me një server.
+
+### 4. Futni Detajet e Llogarisë dhe Zgjidhni Projektin
+
+Kur lidheni me rtSurvey, procesi thjeshtësohet bazuar në konfigurimin e llogarisë suaj:
+
+- **Emri i përdoruesit**: Futni emrin e përdoruesit të llogarisë suaj.
+- **Fjalëkalimi**: Futni fjalëkalimin e llogarisë suaj.
+
+Pas futjes së kredencialeve tuaja:
+
+- Nëse llogaria juaj është e lidhur me vetëm një projekt sondazhi:
+  - Aplikacioni do t'ju identifikojë automatikisht në serverin e atij projekti.
+  - Nuk keni nevojë të futni URL-n e serverit ose të zgjidhni manualisht projektin.
+
+- Nëse llogaria juaj është e lidhur me projekte të shumta sondazhi:
+  - Pas autentifikimit të suksesshëm, do të shihni një listë projektesh ku keni akses.
+  - Zgjidhni projektin ku dëshironi të punoni nga kjo listë.
+
+### 5. Autentifikohuni
+
+Pasi keni futur detajet e serverit, trokitni butonin "Lidhu" ose "Hyr". Aplikacioni do të autentifikojë kredencialet tuaja dhe do të krijojë një lidhje me serverin.
+
+```mermaid
+flowchart TD
+    A["📱 Nisni Aplikacionin rtSurvey"] --> B["🔑 Futni Emrin e Përdoruesit<br>dhe Fjalëkalimin"]
+    style A fill:#4CAF50,stroke:#666666,stroke-width:3px,color:white
+    style B fill:#2196F3,stroke:#666666,stroke-width:3px,color:white
+
+    B --> C{"🌳 Projekte<br>të shumta?"}
+    style C fill:#FFC107,stroke:#666666,stroke-width:3px,color:black
+
+    C -->|Po| D["📋 Shfaq listën<br>e projekteve"]
+    C -->|Jo| E["🔄 Lidhje automatike me<br>projektin e vetëm"]
+    style D fill:#FF9800,stroke:#666666,stroke-width:3px,color:white
+    style E fill:#009688,stroke:#666666,stroke-width:3px,color:white
+
+    D --> F["👆 Përdoruesi zgjedh<br>një projekt"]
+    style F fill:#FF5722,stroke:#666666,stroke-width:3px,color:white
+
+    E --> G["☁️ Lidhuni me serverin"]
+    F --> G
+    style G fill:#3F51B5,stroke:#666666,stroke-width:3px,color:white
+    G --> H["👥 Aksesoni funksionalitetet<br>specifike për role"]
+    style H fill:#9C27B0,stroke:#666666,stroke-width:3px,color:white
+
+    H --> I["👨‍💼 Administrator/<br>Menaxher Projekti"]
+    H --> J["🎨 Dizajner Sondazhi"]
+    H --> K["📝 Numërues Fushe"]
+    H --> L["📊 Analist të Dhënash"]
+    style I fill:#E91E63,stroke:#666666,stroke-width:3px,color:white
+    style J fill:#795548,stroke:#666666,stroke-width:3px,color:white
+    style K fill:#607D8B,stroke:#666666,stroke-width:3px,color:white
+    style L fill:#8BC34A,stroke:#666666,stroke-width:3px,color:white
+
+    I --> M["💬 Mesazheria<br>🔔 Njoftimet<br>📄 Plotësimi Formularëve<br>📈 Shikimi Raporteve"]
+    J --> N["💬 Mesazheria<br>🔔 Njoftimet<br>🧪 Testimi Formularëve<br>📈 Shikimi Raporteve"]
+    K --> O["📝 Plotësimi Formularëve<br>💬 Mesazheria<br>🔔 Njoftimet<br>📊 Raportet e Progresit"]
+    L --> P["💬 Mesazheria<br>🔔 Njoftimet<br>📊 Raportet Analitike"]
+    style M fill:#FF4081,stroke:#666666,stroke-width:3px,color:white
+    style N fill:#9E9E9E,stroke:#666666,stroke-width:3px,color:white
+    style O fill:#00BCD4,stroke:#666666,stroke-width:3px,color:white
+    style P fill:#CDDC39,stroke:#666666,stroke-width:3px,color:white
+```
+
+## Zgjidhja e Problemeve të Lidhjes
+
+Nëse ndeshni probleme gjatë lidhjes me serverin:
+
+1. **Kontrolloni Lidhjen me Internetin**: Sigurohuni që pajisja juaj është e lidhur me internetin.
+2. **Konfirmoni Kredencialet**: Sigurohuni që emri i përdoruesit dhe fjalëkalimi janë korrekte.
+3. **Rinisni Aplikacionin**: Mbyllni dhe rihapni aplikacionin rtSurvey.
+4. **Kontaktoni Mbështetjen**: Nëse problemet vazhdojnë, kontaktoni administratorin e sistemit tuaj ose mbështetjen rtSurvey për asistencë.
+
+## Përfundim
+
+Lidhja e aplikacionit rtSurvey me një server është një proces i drejtpërdrejtë që ju mundëson të shfrytëzoni të gjitha aftësitë e aplikacionit. Duke ndjekur hapat e delineuar më sipër, mund të garantoni mbledhjen, menaxhimin dhe analizën e pandërprerë të të dhënave të personalizuara sipas rolit tuaj specifik të sondazhit.

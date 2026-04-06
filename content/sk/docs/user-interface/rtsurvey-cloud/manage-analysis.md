@@ -1,0 +1,41 @@
+---
+title: "Správa analýz"
+description: "Vytváranie, konfigurácia a zobrazenie analytických správ pre dáta z prieskumov v RT-CPMS."
+icon: "cloud"
+date: "2023-05-22T00:34:57+01:00"
+lastmod: "2023-05-22T00:34:57+01:00"
+draft: false
+weight: 317
+---
+
+Modul **Správa analýz** v RT-CPMS poskytuje komplexnú sadu nástrojov na spracovanie a vizualizáciu dát z prieskumov. Je rozdelený do dvoch primárnych sekcií prístupných z globálneho navigačného panela: **Analytics Dev** a **Analytika a správy**.
+
+![Rozhranie správy analýz](/images/manage_analysis.png)
+
+## Analytics Dev
+
+Sekcia **Analytics Dev** je vašim centralizovaným uzlom na vytváranie a konfiguráciu nových analytických návrhov. Tu výskumníci a správcovia dát definujú, ako sa majú surové dáta prieskumu spracovávať a tabulovať.
+
+### Kľúčové funkcie Analytics Dev
+- **Vytváranie nových návrhov:** Použite výrazné tlačidlo **Nová analytika +** na začatie tvorby novej šablóny správy alebo analytického návrhu.
+- **Správa existujúcich návrhov:** Hlavná mriežka poskytuje komplexný prehľad všetkých vašich analytických modelov zobrazujúcich kľúčové metadáta ako:
+  - ID a Nadpis/Popis
+  - Štítky pre jednoduché kategorizovanie
+  - Sledovanie verzií
+  - Časové pečiatky vytvorenia a aktualizácie
+  - Informácie o autorovi
+- **Vyhľadávanie a filtrovanie:** Jednoducho nájdite konkrétne návrhy pomocou zabudovaných nástrojov vyhľadávania a filtrovania v každom stĺpci.
+- **Rýchle akcie:** Zobrazte, upravte alebo odstráňte konkrétne návrhy priamo z menu akcií v mriežke.
+
+## Analytika a správy
+
+Po vytvorení a spustení analytického návrhu je sekcia **Analytika a správy** miestom, kde komunikujete s vygenerovaným výstupom business intelligence (BI).
+
+### Kľúčové funkcie Analytiky a správ
+- **Panel navigácie správami:** Rýchlo prepínajte medzi rôznymi dostupnými správami pomocou vyhradenéhо ľavého panela.
+- **Vyhľadávanie a filtrovanie:** Pomocou vyhľadávacieho panela alebo rozbaľovacieho filtra „Všetky analytiky" zúžte zoznam správ.
+- **Obľúbené:** Označte dôležité alebo často prístupné správy ako obľúbené pre rýchlejší prístup v budúcnosti.
+
+## Integrácia dashboardu
+
+Pre rýchly prehľad hlavný **Domovský dashboard** obsahuje vyhradenú kartu **Správy** vedľa primárneho sledovača formulárov. Táto karta poskytuje okamžitý prístup k vašim správam priamo z administratívneho veliteľského centra, čo vám umožňuje bezproblémovo monitorovať postup zberu dát aj analytické výstupy.

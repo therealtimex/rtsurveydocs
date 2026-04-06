@@ -1,0 +1,129 @@
+---
+title: "Select_multiple"
+description: "Select_multiple-spørsmål lar respondenter velge ett eller flere alternativer fra en forhåndsdefinert liste."
+icon: "check_box"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 225
+---
+
+`select_multiple`-spørsmålstypen viser en liste der respondenten kan velge **ett eller flere alternativer**. Som standard gjengis valg som avkrysningsbokser. Den lagrede verdien er en **mellomrom-separert liste** over alle valgte alternativer.
+
+## Grunnleggende XLSForm-spesifikasjon
+
+**survey-regneark:**
+
+| type | name | label |
+|------|------|-------|
+| select_multiple crops | crops_grown | Hvilke vekster dyrker husholdningen? |
+
+**choices-regneark:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| crops | maize | Mais |
+| crops | beans | Bønner |
+| crops | rice | Ris |
+| crops | vegetables | Grønnsaker |
+| crops | other | Annet |
+
+## Lagret dataformat
+
+Den eksporterte kolonnen inneholder en mellomrom-separert liste over valgte verdier:
+
+```
+maize beans vegetables
+```
+
+Bruk `selected()`-funksjonen — ikke `=` — når du tester select_multiple-verdier i uttrykk (se nedenfor).
+
+## Brukstilfeller
+
+Select_multiple-spørsmål brukes for:
+
+1. Samle inn flere gjeldende svar (f.eks. inntektskilder, vekster dyrket, symptomer)
+2. Avkrysningsboks-stil samtykkeelementer (f.eks. "Velg alle som gjelder")
+3. Språk- eller ferdighetsoversikter
+4. Spørsmål der flere svar er gyldige simultant
+
+## Utseendealternativer
+
+{{< table >}}
+| Utseende | Beskrivelse |
+|----------|-------------|
+| *(ingen)* | Standard avkrysningsbokser, én per linje |
+| `minimal` | Nedtrekksmeny multi-select widget |
+| `compact` | Kompakt grid, kolonner justeres til skjermbredde |
+| `compact-N` | Kompakt grid tvunget til N kolonner |
+| `horizontal` | Valg arrangert horisontalt i en rad (web) |
+| `horizontal-compact` | Horisontal, kompakt avstand (web) |
+| `label` | Viser bare etiketter, ingen avkrysningsbokser (bruk med `list-nolabel`) |
+| `list-nolabel` | Viser bare avkrysningsbokser, ingen etiketter (bruk med `label`) |
+| `columns(N)` | Vis i N kolonner (rtSurvey-utvidelse) |
+{{< /table >}}
+
+### Eksempel: 3-kolonne kompakt oppsett
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple symptoms | symptoms | Velg alle observerte symptomer | compact-3 |
+
+## Bruke `selected()` i uttrykk
+
+Fordi den lagrede verdien er en mellomrom-separert streng, **må** du bruke `selected()` for å teste om et spesifikt alternativ ble valgt. Bruk av `=` vil ikke fungere korrekt.
+
+### I `relevant`
+
+Vis et oppfølgingsspørsmål bare hvis "other" ble valgt:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_multiple crops | crops_grown | Hvilke vekster dyrkes? | |
+| text | crops_other | Vennligst spesifiser andre vekster | `selected(${crops_grown}, 'other')` |
+
+### I `constraint`
+
+Krev minst 2 valg:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple issues | issues | `count-selected(.) >= 2` | Velg minst 2 problemer |
+
+Begrens til maksimalt 3:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple priorities | priorities | `count-selected(.) <= 3` | Velg ikke mer enn 3 prioriteter |
+
+## "Ingen av disse" / eksklusivt alternativ
+
+Et vanlig mønster er å gjøre ett alternativ gjensidig eksklusivt med alle andre. Bruk en `constraint` for å håndheve det:
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| select_multiple issues | issues | Velg alle problemer som er til stede | `not(selected(., 'none') and count-selected(.) > 1)` | "Ingen" kan ikke velges med andre alternativer |
+
+## Telle og oppsummere valg
+
+| Funksjon | Eksempel | Resultat |
+|----------|---------|---------|
+| `count-selected(field)` | `count-selected(${crops_grown})` | Antall valg valgt |
+| `selected(field, value)` | `selected(${crops_grown}, 'maize')` | sant/usant |
+| `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | Første valgte verdi |
+| `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | Etikett for en verdi |
+
+## Beste praksis
+
+1. Bruk alltid `selected()` i `relevant`, `constraint` og `calculate` — aldri `=` eller `!=`.
+2. Legg til en begrensning for å begrense maksimalt antall valg hvis spørsmålsdesignet krever det.
+3. Inkluder et "Ingen" eller "Ikke aktuelt"-alternativ når null valg er et gyldig svar.
+4. For lange lister (15+ valg), bruk `minimal` (multi-select nedtrekksmeny) for å unngå overdreven rulling.
+5. Eksporter data og bruk strengdeling i analyseverktøyet — det mellomrom-separerte formatet krever deling før pivotering.
+
+## Begrensninger
+
+- Select_multiple-verdier kan ikke sammenlignes direkte med `=`. Bruk alltid `selected()`.
+- Kompakt-utseendet gjengis kanskje ikke bra for svært lange valgetiketter.
+- Når du filtrerer valg med `choice_filter`, gjelder filtreringen for alle viste valg, samme som `select_one`.

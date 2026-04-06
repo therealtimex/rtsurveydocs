@@ -1,0 +1,127 @@
+---
+title: "Select_multiple"
+description: "Otázky select_multiple umožňují respondentům vybrat jednu nebo více možností z předdefinovaného seznamu."
+icon: "check_box"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 225
+---
+
+Typ otázky `select_multiple` zobrazuje seznam, kde může respondent vybrat **jednu nebo více možností**. Ve výchozím nastavení se volby zobrazují jako zaškrtávací políčka. Uložená hodnota je **seznam oddělený mezerami** hodnot všech vybraných voleb.
+
+## Základní specifikace XLSForm
+
+**list survey:**
+
+| type | name | label |
+|------|------|-------|
+| select_multiple crops | crops_grown | Které plodiny domácnost pěstuje? |
+
+**list choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| crops | maize | Kukuřice |
+| crops | beans | Fazole |
+| crops | rice | Rýže |
+| crops | vegetables | Zelenina |
+| crops | other | Jiné |
+
+## Formát uložených dat
+
+Exportovaný sloupec obsahuje seznam vybraných hodnot oddělených mezerami:
+
+```
+maize beans vegetables
+```
+
+Při testování hodnot select_multiple ve výrazech používejte funkci `selected()` — nikoli `=`.
+
+## Použití
+
+Otázky select_multiple se používají pro:
+
+1. Sběr více platných odpovědí (např. zdroje příjmů, pěstované plodiny, příznaky)
+2. Položky souhlasu ve stylu zaškrtávacích políček (např. „Vyberte vše, co platí")
+3. Inventáře jazyků nebo dovedností
+4. Jakákoli otázka, kde jsou více odpovědí platné současně
+
+## Možnosti vzhledu
+
+{{< table >}}
+| Vzhled | Popis |
+|--------|-------|
+| *(žádný)* | Výchozí zaškrtávací políčka, jedno na řádek |
+| `minimal` | Widget pro výběr více možností z rozbalovací nabídky |
+| `compact` | Kompaktní mřížka, sloupce se přizpůsobují šířce obrazovky |
+| `compact-N` | Kompaktní mřížka vynucená na N sloupců |
+| `horizontal` | Volby uspořádané horizontálně v řadě (web) |
+| `horizontal-compact` | Horizontální, kompaktní mezery (web) |
+| `label` | Zobrazuje pouze popisky, bez zaškrtávacích políček (použijte s `list-nolabel`) |
+| `list-nolabel` | Zobrazuje pouze zaškrtávací políčka, bez popisků (použijte s `label`) |
+| `columns(N)` | Zobrazení v N sloupcích (rozšíření rtSurvey) |
+{{< /table >}}
+
+### Příklad: 3sloupcové kompaktní rozvržení
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple symptoms | symptoms | Vyberte všechny pozorované příznaky | compact-3 |
+
+## Použití `selected()` ve výrazech
+
+Protože uložená hodnota je řetězec oddělený mezerami, **musíte** použít `selected()` pro testování, zda byla vybrána konkrétní volba. Použití `=` nebude fungovat správně.
+
+### V `relevant`
+
+Zobrazení doplňující otázky pouze pokud bylo vybráno „jiné":
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| select_multiple crops | crops_grown | Které plodiny se pěstují? | |
+| text | crops_other | Prosím specifikujte jiné plodiny | `selected(${crops_grown}, 'other')` |
+
+### V `constraint`
+
+Vyžadování alespoň 2 voleb:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple issues | issues | `count-selected(.) >= 2` | Vyberte alespoň 2 problémy |
+
+Omezení na maximum 3:
+
+| type | name | constraint | constraint_message |
+|------|------|------------|-------------------|
+| select_multiple priorities | priorities | `count-selected(.) <= 3` | Vyberte nejvýše 3 priority |
+
+## Vzor „Žádná z výše uvedených" / exkluzivní možnost
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| select_multiple issues | issues | Vyberte všechny přítomné problémy | `not(selected(., 'none') and count-selected(.) > 1)` | „Žádná" nemůže být vybrána spolu s jinými možnostmi |
+
+## Počítání a sumarizace výběrů
+
+| Funkce | Příklad | Výsledek |
+|--------|---------|---------|
+| `count-selected(field)` | `count-selected(${crops_grown})` | Počet vybraných voleb |
+| `selected(field, value)` | `selected(${crops_grown}, 'maize')` | true/false |
+| `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | První vybraná hodnota |
+| `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | Popisek pro hodnotu |
+
+## Osvědčené postupy
+
+1. Vždy používejte `selected()` v `relevant`, `constraint` a `calculate` — nikdy `=` nebo `!=`.
+2. Přidejte omezení pro omezení maximálního počtu výběrů, pokud to návrh otázky vyžaduje.
+3. Zahrňte možnost „Žádná" nebo „Neplatí", kdy je nulový počet výběrů platnou odpovědí.
+4. Pro dlouhé seznamy (15+ voleb) používejte `minimal` (víceVýběrová rozbalovací nabídka) pro zamezení nadměrného rolování.
+5. Exportujte data a používejte rozdělování řetězců v analytickém nástroji — formát oddělený mezerami vyžaduje rozdělení před pivotováním.
+
+## Omezení
+
+- Hodnoty select_multiple nelze přímo porovnávat s `=`. Vždy používejte `selected()`.
+- Kompaktní vzhled nemusí dobře fungovat pro velmi dlouhé popisky voleb.
+- Při filtrování voleb pomocí `choice_filter` se filtrování vztahuje na všechny zobrazené volby, stejně jako u `select_one`.

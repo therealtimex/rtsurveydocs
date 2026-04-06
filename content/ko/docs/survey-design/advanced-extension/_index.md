@@ -1,0 +1,89 @@
+---
+title: "고급 확장"
+description: ""
+icon: "code"
+date: "2023-05-22T00:44:31+01:00"
+lastmod: "2023-05-22T00:44:31+01:00"
+draft: false
+toc: true
+weight: 289
+---
+
+rtSurvey의 `appearance` 열은 설문의 질문에 대한 시각적 표현과 동작을 사용자 정의할 수 있습니다. 이 기능은 사용자 경험을 향상시키고 데이터 수집 효율을 크게 향상시킬 수 있습니다. rtSurvey는 표준 XLSForm appearance 속성을 지원하고 추가 옵션으로 확장합니다.
+
+## rtSurvey 전용 Appearance 확장
+
+rtSurvey는 다음과 같은 표준 appearance 옵션을 확장합니다:
+
+### 시간 입력 사용자 정의
+
+시간 입력에 사용되는 `text` 유형 질문의 경우:
+
+- `appearance:` - 시간 및 분 선택을 위한 시계 표시
+- `appearance: inline` - 시계를 아이콘으로 표시
+- `appearance: inline-1line` - 시계를 한 줄 형식으로 표시
+- `appearance: inline-onlyresult` - 시계 아이콘 표시, 선택 후 사라짐
+- `appearance: inline-[FORMAT]` - 시간 형식 표시 사용자 정의 (예: `[%H:%M]`, `[%h:%M:%S]`)
+
+### 색상 사용자 정의
+
+rtSurvey는 다양한 appearance에 대한 색상 사용자 정의를 허용합니다:
+
+- `appearance: inline colors("0099FF")` - 아이콘 색상 사용자 정의
+- `appearance: inline-1line colors("0000FF","FFFF00")` - 한 줄 형식의 색상 사용자 정의
+
+### 그리드 레이아웃
+
+rtSurvey는 컴팩트한 표 형식 표시를 위한 그리드 레이아웃을 도입합니다:
+
+- `appearance: grid` - 그룹에 적용하여 그리드 레이아웃 생성
+
+### 접을 수 있는 그룹
+
+- `appearance: collapsible` - 펼치기/접기 가능한 그룹 생성
+
+## Appearance 사용 모범 사례
+
+1. **일관성**: 통일된 모양을 위해 설문 전체에 걸쳐 appearance 속성을 일관되게 사용합니다.
+2. **모바일 대 웹**: 다양한 기기와 플랫폼에서 appearance가 어떻게 렌더링될지 고려합니다.
+3. **성능**: 양식 로딩 속도를 늦출 수 있는 appearance 속성에 주의합니다 (예: 대형 그룹의 `table-list`).
+4. **사용자 경험**: 응답자에게 데이터 입력을 더 쉽고 직관적으로 만드는 appearance를 선택합니다.
+5. **테스트**: 항상 대상 기기에서 양식을 테스트하여 appearance가 예상대로 작동하는지 확인합니다.
+
+## 고급 기술
+
+### Appearance 결합
+
+일부 appearance 속성은 더 복잡한 레이아웃을 위해 결합할 수 있습니다:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | 하나를 선택하세요: | minimal compact |
+```
+
+### 동적 Appearance
+
+rtSurvey는 양식 논리에 따라 동적 appearance 변경을 허용합니다:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | 시간 입력: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## 모바일 앱 고려 사항
+
+- 일부 appearance (예: `quick`, `signature`)는 모바일 기기에만 해당됩니다.
+- 일관된 동작을 보장하기 위해 Android와 iOS 모두에서 철저히 테스트합니다.
+
+## 알려진 제한 사항
+
+- 복잡한 appearance는 모든 플랫폼에서 동일하게 렌더링되지 않을 수 있습니다.
+- 일부 고급 rtSurvey appearance는 오프라인 모드에서 지원되지 않을 수 있습니다.
+
+## Appearance 문제 해결
+
+1. **Appearance가 적용되지 않음**: appearance 열에 오타가 없는지 확인합니다.
+2. **일관되지 않은 렌더링**: 질문 유형 및 플랫폼과의 호환성을 확인합니다.
+3. **성능 문제**: 복잡한 appearance를 단순화하는 것을 고려합니다, 특히 대형 설문의 경우.
