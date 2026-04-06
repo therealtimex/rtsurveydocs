@@ -1,9 +1,9 @@
 {
   "index": "Home",
-  "getting-started": "Getting Started",
-  "deployment": "Deployment",
-  "survey-design": "Survey Design",
-  "platform-interfaces": "Platform Interfaces",
+  "getting-started": "Початок роботи",
+  "deployment": "Розгортання",
+  "survey-design": "Проектування опитувань",
+  "platform-interfaces": "Інтерфейс користувача",
   "contact": "Contact Us",
   "support": "Support",
   "sponsor": "Sponsor"

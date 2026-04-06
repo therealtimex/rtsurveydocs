@@ -1,9 +1,9 @@
 {
   "index": "Home",
-  "getting-started": "Getting Started",
-  "deployment": "Deployment",
-  "survey-design": "Survey Design",
-  "platform-interfaces": "Platform Interfaces",
+  "getting-started": "Első lépések",
+  "deployment": "Telepítés",
+  "survey-design": "Felmérés tervezése",
+  "platform-interfaces": "Felhasználói felület",
   "contact": "Contact Us",
   "support": "Support",
   "sponsor": "Sponsor"

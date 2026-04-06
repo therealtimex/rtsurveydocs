@@ -10,7 +10,7 @@
   "multi-language": "Multi-Language",
   "repeats": "Repeats",
   "logic": "Logic & Expressions",
-  "question-types": "Question Types",
-  "operators-and-functions": "Operators & Functions",
-  "advanced-features": "Advanced Features"
+  "question-types": "题目类型",
+  "operators-and-functions": "运算符和函数",
+  "advanced-features": "高级扩展"
 }

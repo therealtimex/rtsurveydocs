@@ -10,7 +10,7 @@
   "multi-language": "Multi-Language",
   "repeats": "Repeats",
   "logic": "Logic & Expressions",
-  "question-types": "Question Types",
-  "operators-and-functions": "Operators & Functions",
-  "advanced-features": "Advanced Features"
+  "question-types": "질문 유형",
+  "operators-and-functions": "연산자 및 함수",
+  "advanced-features": "고급 확장"
 }

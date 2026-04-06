@@ -1,9 +1,9 @@
 {
   "index": "Home",
-  "getting-started": "Getting Started",
-  "deployment": "Deployment",
-  "survey-design": "Survey Design",
-  "platform-interfaces": "Platform Interfaces",
+  "getting-started": "Başlarken",
+  "deployment": "Dağıtım",
+  "survey-design": "Anket Tasarımı",
+  "platform-interfaces": "Kullanıcı Arayüzü",
   "contact": "Contact Us",
   "support": "Support",
   "sponsor": "Sponsor"

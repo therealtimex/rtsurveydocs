@@ -1,9 +1,9 @@
 {
   "index": "Home",
-  "getting-started": "Getting Started",
-  "deployment": "Deployment",
-  "survey-design": "Survey Design",
-  "platform-interfaces": "Platform Interfaces",
+  "getting-started": "Primeros pasos",
+  "deployment": "Implementación",
+  "survey-design": "Diseño de encuestas",
+  "platform-interfaces": "Interfaz de usuario",
   "contact": "Contact Us",
   "support": "Support",
   "sponsor": "Sponsor"

@@ -1,9 +1,9 @@
 {
   "index": "Home",
-  "getting-started": "Getting Started",
-  "deployment": "Deployment",
-  "survey-design": "Survey Design",
-  "platform-interfaces": "Platform Interfaces",
+  "getting-started": "시작하기",
+  "deployment": "배포",
+  "survey-design": "설문 설계",
+  "platform-interfaces": "사용자 인터페이스",
   "contact": "Contact Us",
   "support": "Support",
   "sponsor": "Sponsor"

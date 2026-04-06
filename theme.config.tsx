@@ -7,34 +7,181 @@ const LanguageSwitcher = () => {
   const [currentLocale, setCurrentLocale] = useState('en');
   const [isOpen, setIsOpen] = useState(false);
 
+  const ALL_LANGUAGES = [
+  {
+    "code": "en",
+    "name": "English"
+  },
+  {
+    "code": "id",
+    "name": "Bahasa Indonesia"
+  },
+  {
+    "code": "cs",
+    "name": "Čeština"
+  },
+  {
+    "code": "da",
+    "name": "Dansk"
+  },
+  {
+    "code": "de",
+    "name": "Deutsch"
+  },
+  {
+    "code": "es",
+    "name": "Español"
+  },
+  {
+    "code": "fr",
+    "name": "Français"
+  },
+  {
+    "code": "it",
+    "name": "Italiano"
+  },
+  {
+    "code": "lv",
+    "name": "Latviešu"
+  },
+  {
+    "code": "lt",
+    "name": "Lietuvių"
+  },
+  {
+    "code": "hu",
+    "name": "Magyar"
+  },
+  {
+    "code": "nl",
+    "name": "Nederlands"
+  },
+  {
+    "code": "nb",
+    "name": "Norsk Bokmål"
+  },
+  {
+    "code": "pl",
+    "name": "Polski"
+  },
+  {
+    "code": "pt",
+    "name": "Português"
+  },
+  {
+    "code": "pt-br",
+    "name": "Português (Brasil)"
+  },
+  {
+    "code": "sq",
+    "name": "Shqip"
+  },
+  {
+    "code": "sk",
+    "name": "Slovenčina"
+  },
+  {
+    "code": "sr",
+    "name": "Srpski"
+  },
+  {
+    "code": "fi",
+    "name": "Suomi"
+  },
+  {
+    "code": "sv",
+    "name": "Svenska"
+  },
+  {
+    "code": "vi",
+    "name": "Tiếng Việt"
+  },
+  {
+    "code": "tr",
+    "name": "Türkçe"
+  },
+  {
+    "code": "el",
+    "name": "Ελληνικά"
+  },
+  {
+    "code": "bg",
+    "name": "Български"
+  },
+  {
+    "code": "ru",
+    "name": "Русский"
+  },
+  {
+    "code": "uk",
+    "name": "Українська"
+  },
+  {
+    "code": "ar",
+    "name": "العربية"
+  },
+  {
+    "code": "hi",
+    "name": "हिन्दी"
+  },
+  {
+    "code": "te",
+    "name": "తెలుగు"
+  },
+  {
+    "code": "th",
+    "name": "ไทย"
+  },
+  {
+    "code": "km",
+    "name": "ភាសាខ្មែរ"
+  },
+  {
+    "code": "ko",
+    "name": "한국어"
+  },
+  {
+    "code": "ja",
+    "name": "日本語"
+  },
+  {
+    "code": "zh-hans",
+    "name": "简体中文"
+  },
+  {
+    "code": "zh-hant",
+    "name": "繁體中文"
+  }
+];
+
   useEffect(() => {
     const pathParts = asPath.split('/');
-    if (pathParts[1] === 'vi') {
-      setCurrentLocale('vi');
+    if (pathParts[1] && ALL_LANGUAGES.some(l => l.code === pathParts[1])) {
+      setCurrentLocale(pathParts[1]);
     } else {
       setCurrentLocale('en');
     }
   }, [asPath]);
 
-  const switchLanguage = (locale: 'en' | 'vi') => {
+  const switchLanguage = (locale: string) => {
     if (locale === currentLocale) {
       setIsOpen(false);
       return;
     }
 
     let newPath = '';
-    if (locale === 'vi') {
-      // Switch to VI: add /vi prefix
-      newPath = `/vi${asPath === '/' ? '' : asPath}`;
+    if (locale === 'en') {
+      newPath = asPath.replace(/^\/([a-z-]+)(\/|$)/, '/');
     } else {
-      // Switch to EN: remove /vi prefix
-      newPath = asPath.replace(/^\/vi(\/|$)/, '/');
+      // If currently not en, first remove old locale
+      const pathWithoutLocale = currentLocale === 'en' ? asPath : asPath.replace(/^\/([a-z-]+)(\/|$)/, '/');
+      newPath = `/${locale}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`;
     }
 
-    // Since each locale is a separate build, we redirect to the absolute root-based path.
-    // We don't use basePath here because it's already included in the deployment structure.
     window.location.href = newPath;
   };
+
+  const currentLangName = ALL_LANGUAGES.find(l => l.code === currentLocale)?.name || 'English';
 
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -60,7 +207,7 @@ const LanguageSwitcher = () => {
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
         </svg>
-        {currentLocale === 'en' ? 'English' : 'Tiếng Việt'}
+        {currentLangName}
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '2px', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
           <path d="M6 9l6 6 6-6"/>
         </svg>
@@ -77,37 +224,29 @@ const LanguageSwitcher = () => {
           borderRadius: '6px',
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           zIndex: 1000,
-          minWidth: '120px',
-          overflow: 'hidden'
+          minWidth: '160px',
+          maxHeight: '400px',
+          overflowY: 'auto',
+          overflowX: 'hidden'
         }}>
-          <div
-            onClick={() => switchLanguage('en')}
-            style={{
-              padding: '8px 12px',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              background: currentLocale === 'en' ? 'rgba(128,128,128,0.1)' : 'transparent',
-              fontWeight: currentLocale === 'en' ? 600 : 400
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(128,128,128,0.1)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = currentLocale === 'en' ? 'rgba(128,128,128,0.1)' : 'transparent')}
-          >
-            English
-          </div>
-          <div
-            onClick={() => switchLanguage('vi')}
-            style={{
-              padding: '8px 12px',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              background: currentLocale === 'vi' ? 'rgba(128,128,128,0.1)' : 'transparent',
-              fontWeight: currentLocale === 'vi' ? 600 : 400
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(128,128,128,0.1)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = currentLocale === 'vi' ? 'rgba(128,128,128,0.1)' : 'transparent')}
-          >
-            Tiếng Việt
-          </div>
+          {ALL_LANGUAGES.map(lang => (
+            <div
+              key={lang.code}
+              onClick={() => switchLanguage(lang.code)}
+              style={{
+                padding: '8px 12px',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                background: currentLocale === lang.code ? 'rgba(128,128,128,0.1)' : 'transparent',
+                fontWeight: currentLocale === lang.code ? 600 : 400,
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(128,128,128,0.1)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = currentLocale === lang.code ? 'rgba(128,128,128,0.1)' : 'transparent')}
+            >
+              {lang.name}
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -134,34 +273,18 @@ const config: DocsThemeConfig = {
     text: (
       <span>
         MIT {new Date().getFullYear()} ©{' '}
-        <a href="https://rtsurvey.com" target="_blank" rel="noopener noreferrer">
+        <a href="https://rtsurvey.com" target="_blank">
           rtSurvey
         </a>
-        {' · '}
-        <a href="mailto:support@rta.vn">support@rta.vn</a>
+        .
       </span>
-    )
-  },
-  useNextSeoProps() {
-    return {
-      titleTemplate: '%s – rtSurvey Docs'
-    }
-  },
-  sidebar: {
-    defaultMenuCollapseLevel: 1,
-    autoCollapse: true,
-    toggleButton: true,
-  },
-  toc: {
-    backToTop: true,
-  },
-  feedback: {
-    content: null,
+    ),
   },
   head: (
     <>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="description" content="rtSurvey — Self-hosted mobile data collection and survey platform." />
+      <meta property="og:title" content="rtSurvey Docs" />
+      <meta property="og:description" content="Official documentation for rtSurvey platform." />
       <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     </>
   ),

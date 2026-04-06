@@ -1,9 +1,9 @@
 {
   "index": "Home",
-  "getting-started": "Getting Started",
-  "deployment": "Deployment",
-  "survey-design": "Survey Design",
-  "platform-interfaces": "Platform Interfaces",
+  "getting-started": "快速入门",
+  "deployment": "部署",
+  "survey-design": "调查设计",
+  "platform-interfaces": "用户界面",
   "contact": "Contact Us",
   "support": "Support",
   "sponsor": "Sponsor"
