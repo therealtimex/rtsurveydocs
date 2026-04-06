@@ -155,9 +155,13 @@ const LanguageSwitcher = () => {
 ];
 
   useEffect(() => {
-    const pathParts = asPath.split('/');
-    if (pathParts[1] && ALL_LANGUAGES.some(l => l.code === pathParts[1])) {
-      setCurrentLocale(pathParts[1]);
+    // Determine current locale from URL path
+    const path = window.location.pathname;
+    const pathParts = path.split('/');
+    // Check if first part is a known locale (excluding empty string from leading slash)
+    const firstPart = pathParts[1];
+    if (firstPart && ALL_LANGUAGES.some(l => l.code === firstPart)) {
+      setCurrentLocale(firstPart);
     } else {
       setCurrentLocale('en');
     }
@@ -169,15 +173,26 @@ const LanguageSwitcher = () => {
       return;
     }
 
+    const currentPath = window.location.pathname;
     let newPath = '';
-    if (locale === 'en') {
-      newPath = asPath.replace(/^\/([a-z-]+)(\/|$)/, '/');
-    } else {
-      // If currently not en, first remove old locale
-      const pathWithoutLocale = currentLocale === 'en' ? asPath : asPath.replace(/^\/([a-z-]+)(\/|$)/, '/');
-      newPath = `/${locale}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`;
+
+    // 1. Remove current locale prefix if it exists
+    let cleanPath = currentPath;
+    if (currentLocale !== 'en') {
+      const regex = new RegExp(`^/${currentLocale}(/|$)`);
+      cleanPath = currentPath.replace(regex, '/');
     }
 
+    // 2. Add new locale prefix if not switching to English
+    if (locale === 'en') {
+      newPath = cleanPath;
+    } else {
+      newPath = `/${locale}${cleanPath === '/' ? '' : cleanPath}`;
+    }
+
+    // 3. Force absolute redirect to handle different static build roots
+    // Ensure we don't have double slashes
+    newPath = newPath.replace(/\/+/g, '/');
     window.location.href = newPath;
   };
 
