@@ -1,9 +1,71 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DocsThemeConfig } from 'nextra-theme-docs';
+import { useRouter } from 'next/router';
+
+const LanguageSwitcher = () => {
+  const { asPath, basePath } = useRouter();
+  const [currentLocale, setCurrentLocale] = useState('en');
+
+  useEffect(() => {
+    // Determine current locale from path
+    // If path starts with /vi/, locale is vi
+    const pathParts = asPath.split('/');
+    if (pathParts[1] === 'vi') {
+      setCurrentLocale('vi');
+    } else {
+      setCurrentLocale('en');
+    }
+  }, [asPath]);
+
+  const toggleLanguage = () => {
+    const isVi = currentLocale === 'vi';
+    let newPath = '';
+
+    if (isVi) {
+      // Switch from VI to EN: remove /vi prefix
+      newPath = asPath.replace(/^\/vi(\/|$)/, '/');
+    } else {
+      // Switch from EN to VI: add /vi prefix
+      newPath = `/vi${asPath === '/' ? '' : asPath}`;
+    }
+
+    // Since we are using static export with split builds,
+    // we just redirect to the physical URL.
+    window.location.href = `${basePath}${newPath}`;
+  };
+
+  return (
+    <button
+      onClick={toggleLanguage}
+      style={{
+        padding: '0.4rem 0.8rem',
+        borderRadius: '6px',
+        fontSize: '0.85rem',
+        fontWeight: 500,
+        cursor: 'pointer',
+        background: 'var(--nextra-primary-hue)',
+        color: 'white',
+        border: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        marginRight: '8px'
+      }}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+      {currentLocale === 'en' ? 'Tiếng Việt' : 'English'}
+    </button>
+  );
+};
 
 const config: DocsThemeConfig = {
   project: {
     link: 'https://github.com/therealtimex/rtsurvey',
+  },
+  navbar: {
+    extraContent: <LanguageSwitcher />
   },
   chat: {
     link: 'https://twitter.com/RtSurvey',
