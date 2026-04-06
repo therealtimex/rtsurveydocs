@@ -3,8 +3,9 @@ import { DocsThemeConfig } from 'nextra-theme-docs';
 import { useRouter } from 'next/router';
 
 const LanguageSwitcher = () => {
-  const { asPath, basePath } = useRouter();
+  const { asPath } = useRouter();
   const [currentLocale, setCurrentLocale] = useState('en');
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const pathParts = asPath.split('/');
@@ -15,43 +16,101 @@ const LanguageSwitcher = () => {
     }
   }, [asPath]);
 
-  const toggleLanguage = () => {
-    const isVi = currentLocale === 'vi';
-    let newPath = '';
-
-    if (isVi) {
-      newPath = asPath.replace(/^\/vi(\/|$)/, '/');
-    } else {
-      newPath = `/vi${asPath === '/' ? '' : asPath}`;
+  const switchLanguage = (locale: 'en' | 'vi') => {
+    if (locale === currentLocale) {
+      setIsOpen(false);
+      return;
     }
 
-    window.location.href = `${basePath}${newPath}`;
+    let newPath = '';
+    if (locale === 'vi') {
+      // Switch to VI: add /vi prefix
+      newPath = `/vi${asPath === '/' ? '' : asPath}`;
+    } else {
+      // Switch to EN: remove /vi prefix
+      newPath = asPath.replace(/^\/vi(\/|$)/, '/');
+    }
+
+    // Since each locale is a separate build, we redirect to the absolute root-based path.
+    // We don't use basePath here because it's already included in the deployment structure.
+    window.location.href = newPath;
   };
 
   return (
-    <button
-      onClick={toggleLanguage}
-      style={{
-        padding: '0.4rem 0.8rem',
-        borderRadius: '6px',
-        fontSize: '0.85rem',
-        fontWeight: 600,
-        cursor: 'pointer',
-        background: '#0da37f', // Hardcoded green
-        color: 'white',
-        border: '1px solid rgba(0,0,0,0.1)',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '6px',
-        marginLeft: '8px',
-        marginRight: '8px'
-      }}
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-      </svg>
-      {currentLocale === 'en' ? 'Tiếng Việt' : 'English'}
-    </button>
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
+        style={{
+          padding: '0.4rem 0.8rem',
+          borderRadius: '6px',
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          cursor: 'pointer',
+          background: 'transparent',
+          color: 'inherit',
+          border: '1px solid rgba(128,128,128,0.2)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          marginLeft: '8px',
+          marginRight: '8px'
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        {currentLocale === 'en' ? 'English' : 'Tiếng Việt'}
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '2px', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          right: '8px',
+          marginTop: '8px',
+          background: 'var(--nextra-bg)',
+          border: '1px solid rgba(128,128,128,0.2)',
+          borderRadius: '6px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          zIndex: 1000,
+          minWidth: '120px',
+          overflow: 'hidden'
+        }}>
+          <div
+            onClick={() => switchLanguage('en')}
+            style={{
+              padding: '8px 12px',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              background: currentLocale === 'en' ? 'rgba(128,128,128,0.1)' : 'transparent',
+              fontWeight: currentLocale === 'en' ? 600 : 400
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(128,128,128,0.1)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = currentLocale === 'en' ? 'rgba(128,128,128,0.1)' : 'transparent')}
+          >
+            English
+          </div>
+          <div
+            onClick={() => switchLanguage('vi')}
+            style={{
+              padding: '8px 12px',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              background: currentLocale === 'vi' ? 'rgba(128,128,128,0.1)' : 'transparent',
+              fontWeight: currentLocale === 'vi' ? 600 : 400
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(128,128,128,0.1)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = currentLocale === 'vi' ? 'rgba(128,128,128,0.1)' : 'transparent')}
+          >
+            Tiếng Việt
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
