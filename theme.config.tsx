@@ -526,12 +526,17 @@ const INTL_LOCALE_MAP: Record<string, string> = {
 };
 
 const GitTimestamp: React.FC<{ timestamp: Date }> = ({ timestamp }) => {
-  const { asPath } = useRouter();
-  const pathParts = asPath.split('/');
-  const firstPart = pathParts[1];
-  const locale = (firstPart && LAST_UPDATED_LABELS[firstPart]) ? firstPart : 'en';
+  useRouter();
+  let locale = 'en';
+  if (typeof window !== 'undefined') {
+    const first = window.location.pathname.split('/')[1];
+    if (first && LAST_UPDATED_LABELS[first]) locale = first;
+  } else {
+    const base = (process.env.NEXT_BASE_PATH || '').replace(/^\//, '');
+    if (LAST_UPDATED_LABELS[base]) locale = base;
+  }
   const intlLocale = INTL_LOCALE_MAP[locale] || locale;
-  const label = LAST_UPDATED_LABELS[locale] || LAST_UPDATED_LABELS['en'];
+  const label = LAST_UPDATED_LABELS[locale];
   const formatted = new Intl.DateTimeFormat(intlLocale, { year: 'numeric', month: 'long', day: 'numeric' }).format(timestamp);
   return <>{label} {formatted}</>;
 };
