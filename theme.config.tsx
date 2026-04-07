@@ -297,6 +297,45 @@ const LanguageSwitcher = () => {
   );
 };
 
+const SEARCH_PLACEHOLDERS: Record<string, string> = {
+  en: 'Search documentation...',
+  ar: 'البحث في التوثيق...',
+  bg: 'Търсене в документацията...',
+  cs: 'Prohledat dokumentaci...',
+  da: 'Søg i dokumentationen...',
+  de: 'Dokumentation durchsuchen...',
+  el: 'Αναζήτηση στην τεκμηρίωση...',
+  es: 'Buscar en la documentación...',
+  fi: 'Hae dokumentaatiosta...',
+  fr: 'Rechercher dans la documentation...',
+  hi: 'दस्तावेज़ीकरण खोजें...',
+  hu: 'Keresés a dokumentációban...',
+  id: 'Cari dokumentasi...',
+  it: 'Cerca nella documentazione...',
+  ja: 'ドキュメントを検索...',
+  km: 'ស្វែងរកឯកសារ...',
+  ko: '문서 검색...',
+  lt: 'Ieškoti dokumentacijoje...',
+  lv: 'Meklēt dokumentācijā...',
+  nb: 'Søk i dokumentasjonen...',
+  nl: 'Documentatie doorzoeken...',
+  pl: 'Szukaj w dokumentacji...',
+  pt: 'Pesquisar na documentação...',
+  'pt-br': 'Pesquisar na documentação...',
+  ru: 'Поиск по документации...',
+  sk: 'Hľadať v dokumentácii...',
+  sq: 'Kërko në dokumentacion...',
+  sr: 'Претражи документацију...',
+  sv: 'Sök i dokumentationen...',
+  te: 'డాక్యుమెంటేషన్ శోధించండి...',
+  th: 'ค้นหาเอกสาร...',
+  tr: 'Belgelerde ara...',
+  uk: 'Пошук у документації...',
+  vi: 'Tìm kiếm tài liệu...',
+  'zh-hans': '搜索文档...',
+  'zh-hant': '搜尋文件...',
+};
+
 const LAST_UPDATED_LABELS: Record<string, string> = {
   en: 'Last updated on',
   ar: 'آخر تحديث في',
@@ -369,6 +408,14 @@ const config: DocsThemeConfig = {
   },
   navbar: {
     extraContent: <LanguageSwitcher />
+  },
+  search: {
+    placeholder: () => {
+      if (typeof window === 'undefined') return SEARCH_PLACEHOLDERS['en'];
+      const parts = window.location.pathname.split('/');
+      const locale = parts[1] && SEARCH_PLACEHOLDERS[parts[1]] ? parts[1] : 'en';
+      return SEARCH_PLACEHOLDERS[locale];
+    },
   },
   gitTimestamp: GitTimestamp,
   docsRepositoryBase: 'https://github.com/therealtimex/rtsurvey/tree/main/docs',
