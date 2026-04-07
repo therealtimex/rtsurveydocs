@@ -336,6 +336,100 @@ const SEARCH_PLACEHOLDERS: Record<string, string> = {
   'zh-hant': '搜尋文件...',
 };
 
+const EDIT_PAGE_LABELS: Record<string, string> = {
+  en: 'Edit this page',
+  ar: 'تعديل هذه الصفحة',
+  bg: 'Редактирай тази страница',
+  cs: 'Upravit tuto stránku',
+  da: 'Rediger denne side',
+  de: 'Diese Seite bearbeiten',
+  el: 'Επεξεργασία αυτής της σελίδας',
+  es: 'Editar esta página',
+  fi: 'Muokkaa tätä sivua',
+  fr: 'Modifier cette page',
+  hi: 'इस पृष्ठ को संपादित करें',
+  hu: 'Oldal szerkesztése',
+  id: 'Edit halaman ini',
+  it: 'Modifica questa pagina',
+  ja: 'このページを編集',
+  km: 'កែសម្រួលទំព័រនេះ',
+  ko: '이 페이지 편집',
+  lt: 'Redaguoti šį puslapį',
+  lv: 'Rediģēt šo lapu',
+  nb: 'Rediger denne siden',
+  nl: 'Bewerk deze pagina',
+  pl: 'Edytuj tę stronę',
+  pt: 'Editar esta página',
+  'pt-br': 'Editar esta página',
+  ru: 'Редактировать страницу',
+  sk: 'Upraviť túto stránku',
+  sq: 'Redakto këtë faqe',
+  sr: 'Измени ову страницу',
+  sv: 'Redigera den här sidan',
+  te: 'ఈ పేజీని సవరించండి',
+  th: 'แก้ไขหน้านี้',
+  tr: 'Bu sayfayı düzenle',
+  uk: 'Редагувати цю сторінку',
+  vi: 'Chỉnh sửa trang này',
+  'zh-hans': '编辑此页',
+  'zh-hant': '編輯此頁',
+};
+
+const FEEDBACK_LABELS: Record<string, string> = {
+  en: 'Question? Give us feedback →',
+  ar: 'سؤال؟ أعطنا تعليقك →',
+  bg: 'Въпрос? Дайте ни обратна връзка →',
+  cs: 'Dotaz? Pošlete nám zpětnou vazbu →',
+  da: 'Spørgsmål? Giv os feedback →',
+  de: 'Frage? Gib uns Feedback →',
+  el: 'Ερώτηση; Στείλτε μας σχόλια →',
+  es: '¿Pregunta? Envíanos tu opinión →',
+  fi: 'Kysymys? Anna meille palautetta →',
+  fr: 'Question ? Donnez-nous votre avis →',
+  hi: 'प्रश्न? हमें फ़ीडबैक दें →',
+  hu: 'Kérdés? Küldj visszajelzést →',
+  id: 'Ada pertanyaan? Beri kami masukan →',
+  it: 'Domanda? Inviaci un feedback →',
+  ja: 'ご質問は？フィードバックを送る →',
+  km: 'មានសំណួរ? ផ្ញើមតិកែលម្អ →',
+  ko: '질문이 있으신가요? 피드백 보내기 →',
+  lt: 'Klausimas? Pateikite atsiliepimą →',
+  lv: 'Jautājums? Sniedziet atsauksmi →',
+  nb: 'Spørsmål? Gi oss tilbakemelding →',
+  nl: 'Vraag? Geef ons feedback →',
+  pl: 'Pytanie? Prześlij nam opinię →',
+  pt: 'Dúvida? Envie-nos feedback →',
+  'pt-br': 'Dúvida? Envie-nos feedback →',
+  ru: 'Вопрос? Отправьте отзыв →',
+  sk: 'Otázka? Pošlite nám spätnú väzbu →',
+  sq: 'Pyetje? Na jepni komente →',
+  sr: 'Питање? Пошаљите нам повратне информације →',
+  sv: 'Fråga? Ge oss feedback →',
+  te: 'ప్రశ్న ఉందా? మాకు అభిప్రాయం పంపండి →',
+  th: 'มีคำถาม? ส่งความคิดเห็นถึงเรา →',
+  tr: 'Sorunuz mu var? Bize geri bildirim gönderin →',
+  uk: 'Питання? Надішліть нам відгук →',
+  vi: 'Câu hỏi? Gửi phản hồi cho chúng tôi →',
+  'zh-hans': '有疑问？给我们反馈 →',
+  'zh-hant': '有疑問？給我們回饋 →',
+};
+
+const useLocale = () => {
+  const { asPath } = useRouter();
+  const first = asPath.split('/')[1];
+  return (first && EDIT_PAGE_LABELS[first]) ? first : 'en';
+};
+
+const EditLinkText: React.FC = () => {
+  const locale = useLocale();
+  return <>{EDIT_PAGE_LABELS[locale]}</>;
+};
+
+const FeedbackContent: React.FC = () => {
+  const locale = useLocale();
+  return <>{FEEDBACK_LABELS[locale]}</>;
+};
+
 const LAST_UPDATED_LABELS: Record<string, string> = {
   en: 'Last updated on',
   ar: 'آخر تحديث في',
@@ -423,6 +517,8 @@ const config: DocsThemeConfig = {
       return SEARCH_PLACEHOLDERS[locale];
     },
   },
+  editLink: { text: EditLinkText },
+  feedback: { content: FeedbackContent },
   gitTimestamp: GitTimestamp,
   docsRepositoryBase: 'https://github.com/therealtimex/rtsurvey/tree/main/docs',
   footer: {
