@@ -411,7 +411,13 @@ const config: DocsThemeConfig = {
   },
   search: {
     placeholder: () => {
-      if (typeof window === 'undefined') return SEARCH_PLACEHOLDERS['en'];
+      // SSR / static generation: read locale from NEXT_BASE_PATH (e.g. "/vi")
+      if (typeof window === 'undefined') {
+        const base = process.env.NEXT_BASE_PATH || '';
+        const locale = base.replace(/^\//, '');
+        return SEARCH_PLACEHOLDERS[locale] || SEARCH_PLACEHOLDERS['en'];
+      }
+      // Client-side: read locale from URL path
       const parts = window.location.pathname.split('/');
       const locale = parts[1] && SEARCH_PLACEHOLDERS[parts[1]] ? parts[1] : 'en';
       return SEARCH_PLACEHOLDERS[locale];
