@@ -7,6 +7,6 @@
   "self-host-docker": "Sopstveni hosting sa Dockerom",
   "configuration": "Konfiguracija",
   "maintenance": "Održavanje",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "ssl-setup": "Podešavanje SSL",
+  "sso-authentication": "SSO autentifikacija"
 }

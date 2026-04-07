@@ -7,6 +7,6 @@
   "self-host-docker": "โฮสต์เองด้วย Docker",
   "configuration": "การกำหนดค่า",
   "maintenance": "การบำรุงรักษา",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "ssl-setup": "การตั้งค่า SSL",
+  "sso-authentication": "การยืนยันตัวตน SSO"
 }

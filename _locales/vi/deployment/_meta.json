@@ -7,6 +7,6 @@
   "self-host-docker": "Tự lưu trữ với Docker",
   "configuration": "Cấu hình",
   "maintenance": "Bảo trì",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "ssl-setup": "Cài đặt SSL",
+  "sso-authentication": "Xác thực SSO"
 }

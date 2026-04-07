@@ -7,6 +7,6 @@
   "self-host-docker": "Самостійний хостинг з Docker",
   "configuration": "Конфігурація",
   "maintenance": "Обслуговування",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "ssl-setup": "Налаштування SSL",
+  "sso-authentication": "SSO автентифікація"
 }

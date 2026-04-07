@@ -7,6 +7,6 @@
   "self-host-docker": "Auto-hospedagem com Docker",
   "configuration": "Configuração",
   "maintenance": "Manutenção",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "ssl-setup": "Configuração SSL",
+  "sso-authentication": "Autenticação SSO"
 }

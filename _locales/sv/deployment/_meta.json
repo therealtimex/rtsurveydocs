@@ -7,6 +7,6 @@
   "self-host-docker": "Självhosting med Docker",
   "configuration": "Konfiguration",
   "maintenance": "Underhåll",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "ssl-setup": "SSL-inställning",
+  "sso-authentication": "SSO-autentisering"
 }

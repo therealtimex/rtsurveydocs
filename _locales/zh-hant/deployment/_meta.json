@@ -7,6 +7,6 @@
   "self-host-docker": "使用 Docker 自托管",
   "configuration": "設定",
   "maintenance": "維護",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "ssl-setup": "SSL 設定",
+  "sso-authentication": "SSO 身份驗證"
 }

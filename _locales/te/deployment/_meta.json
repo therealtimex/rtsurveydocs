@@ -7,6 +7,6 @@
   "self-host-docker": "Docker తో స్వయం-హోస్ట్",
   "configuration": "కాన్ఫిగరేషన్",
   "maintenance": "నిర్వహణ",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "ssl-setup": "SSL సెటప్",
+  "sso-authentication": "SSO ప్రమాణీకరణ"
 }

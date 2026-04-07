@@ -26,7 +26,7 @@ KEEP_AS_IS = {
     "rtSurvey", "rtCloud", "rtSurvey Cloud", "XForm", "ODK", "KoBoToolbox",
     "WebBox",
     # Acronyms / tech terms kept in English
-    "SSL", "SSL Setup", "SSO", "SSO Authentication",
+    "SSL", "SSO",
     "HTTPS", "HTTP", "API", "Call API", "HTML Styling",
     "PDF", "CSV", "JSON", "XLSForm", "XML",
     "Android", "iOS", "Power BI", "AWS", "GCP", "Azure",
