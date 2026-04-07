@@ -297,6 +297,64 @@ const LanguageSwitcher = () => {
   );
 };
 
+const LAST_UPDATED_LABELS: Record<string, string> = {
+  en: 'Last updated on',
+  ar: 'آخر تحديث في',
+  bg: 'Последна актуализация на',
+  cs: 'Poslední aktualizace',
+  da: 'Sidst opdateret',
+  de: 'Zuletzt aktualisiert am',
+  el: 'Τελευταία ενημέρωση',
+  es: 'Última actualización el',
+  fi: 'Viimeksi päivitetty',
+  fr: 'Dernière mise à jour le',
+  hi: 'अंतिम अपडेट',
+  hu: 'Utolsó frissítés',
+  id: 'Terakhir diperbarui pada',
+  it: 'Ultimo aggiornamento il',
+  ja: '最終更新日',
+  km: 'បានធ្វើបច្ចុប្បន្នភាពចុងក្រោយ',
+  ko: '마지막 업데이트',
+  lt: 'Paskutinį kartą atnaujinta',
+  lv: 'Pēdējo reizi atjaunināts',
+  nb: 'Sist oppdatert',
+  nl: 'Laatst bijgewerkt op',
+  pl: 'Ostatnia aktualizacja',
+  pt: 'Última atualização em',
+  'pt-br': 'Última atualização em',
+  ru: 'Последнее обновление',
+  sk: 'Posledná aktualizácia',
+  sq: 'Përditësimi i fundit',
+  sr: 'Последња измена',
+  sv: 'Senast uppdaterad',
+  te: 'చివరిగా నవీకరించబడింది',
+  th: 'อัปเดตล่าสุดเมื่อ',
+  tr: 'Son güncelleme',
+  uk: 'Останнє оновлення',
+  vi: 'Cập nhật lần cuối vào',
+  'zh-hans': '最后更新于',
+  'zh-hant': '最後更新於',
+};
+
+// Map app locale codes to BCP 47 tags for Intl.DateTimeFormat
+const INTL_LOCALE_MAP: Record<string, string> = {
+  'zh-hans': 'zh-Hans',
+  'zh-hant': 'zh-Hant',
+  'pt-br': 'pt-BR',
+  'nb': 'nb-NO',
+};
+
+const GitTimestamp: React.FC<{ timestamp: Date }> = ({ timestamp }) => {
+  const { asPath } = useRouter();
+  const pathParts = asPath.split('/');
+  const firstPart = pathParts[1];
+  const locale = (firstPart && LAST_UPDATED_LABELS[firstPart]) ? firstPart : 'en';
+  const intlLocale = INTL_LOCALE_MAP[locale] || locale;
+  const label = LAST_UPDATED_LABELS[locale] || LAST_UPDATED_LABELS['en'];
+  const formatted = new Intl.DateTimeFormat(intlLocale, { year: 'numeric', month: 'long', day: 'numeric' }).format(timestamp);
+  return <>{label} {formatted}</>;
+};
+
 const config: DocsThemeConfig = {
   project: {
     link: 'https://github.com/therealtimex/rtsurvey',
@@ -312,6 +370,7 @@ const config: DocsThemeConfig = {
   navbar: {
     extraContent: <LanguageSwitcher />
   },
+  gitTimestamp: GitTimestamp,
   docsRepositoryBase: 'https://github.com/therealtimex/rtsurvey/tree/main/docs',
   footer: {
     text: (
