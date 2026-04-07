@@ -416,8 +416,16 @@ const FEEDBACK_LABELS: Record<string, string> = {
 
 const useLocale = () => {
   const { asPath } = useRouter();
-  const first = asPath.split('/')[1];
-  return (first && EDIT_PAGE_LABELS[first]) ? first : 'en';
+  // Client-side: window.location.pathname includes the basePath locale prefix
+  if (typeof window !== 'undefined') {
+    const first = window.location.pathname.split('/')[1];
+    if (first && EDIT_PAGE_LABELS[first]) return first;
+    return 'en';
+  }
+  // SSR / static generation: asPath lacks basePath; read locale from env
+  const base = process.env.NEXT_BASE_PATH || '';
+  const locale = base.replace(/^\//, '');
+  return EDIT_PAGE_LABELS[locale] ? locale : 'en';
 };
 
 const EditLinkText: React.FC = () => {
