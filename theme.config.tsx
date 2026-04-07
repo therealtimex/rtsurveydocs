@@ -6,7 +6,16 @@ const LanguageSwitcher = () => {
   const { asPath } = useRouter();
   const [currentLocale, setCurrentLocale] = useState('en');
   const [isOpen, setIsOpen] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   // Close dropdown on outside click (avoids onBlur/onClick race condition)
   useEffect(() => {
@@ -254,10 +263,10 @@ const LanguageSwitcher = () => {
           top: '100%',
           right: '8px',
           marginTop: '8px',
-          background: 'var(--nextra-bg)',
-          border: '1px solid rgba(128,128,128,0.2)',
+          background: isDark ? '#1a1a1a' : '#ffffff',
+          border: '1px solid rgba(128,128,128,0.25)',
           borderRadius: '6px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
           zIndex: 1000,
           minWidth: '160px',
           maxHeight: '400px',
