@@ -25,12 +25,11 @@ jobs:
           node-version: 20
           cache: yarn
       - run: yarn install --frozen-lockfile
-      - name: Restore Next.js cache
+      - name: Restore Next.js webpack cache
         uses: actions/cache@v4
         with:
-          path: .next/cache
-          key: nextjs-v2-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('pages/**') }}-${{ hashFiles('_locales/**') }}
-          restore-keys: nextjs-v2-${{ hashFiles('**/yarn.lock') }}-
+          path: .next/cache/webpack
+          key: nextjs-v3-webpack-${{ hashFiles('**/yarn.lock') }}
       - name: Build English
         run: NODE_OPTIONS='--max-old-space-size=6144' yarn build
       - uses: actions/upload-artifact@v4
