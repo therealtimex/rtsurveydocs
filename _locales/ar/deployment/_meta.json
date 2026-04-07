@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "البداية السريعة",
+  "cloud-providers": "مزودو السحابة",
+  "self-host-docker": "الاستضافة الذاتية باستخدام Docker",
+  "configuration": "الإعدادات",
+  "maintenance": "الصيانة",
+  "ssl-setup": "إعداد SSL",
+  "sso-authentication": "مصادقة SSO"
 }

@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "クイックスタート",
+  "cloud-providers": "クラウドプロバイダー",
+  "self-host-docker": "Dockerでセルフホスト",
+  "configuration": "設定",
+  "maintenance": "メンテナンス",
+  "ssl-setup": "SSL設定",
+  "sso-authentication": "SSO認証"
 }

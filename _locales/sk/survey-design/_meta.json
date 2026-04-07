@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Kľúčové pojmy",
+  "app-api": "API aplikácie",
+  "appearance": "Vzhľad",
+  "grouping-questions": "Zoskupovanie otázok",
+  "media": "Médiá",
+  "multi-language": "Viacjazyčnosť",
+  "repeats": "Opakovania",
+  "logic": "Logika a výrazy",
   "question-types": "Typy otázok",
   "operators-and-functions": "Operátory a funkcie",
   "advanced-features": "Pokročilé rozšírenia"

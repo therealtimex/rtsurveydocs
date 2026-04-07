@@ -1,0 +1,446 @@
+---
+title: "Docker로 자체 호스팅"
+description: "공개 Docker 이미지를 사용하여 모든 서버에서 rtSurvey를 실행하세요 — 클라우드 스크립트 불필요."
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+이 가이드는 공개 Docker 이미지 `rtawebteam/rtcloud:survey-public`을 사용하여 자체 서버(VPS, 베어 메탈 또는 로컬 머신)에서 rtSurvey를 실행하려는 경우에 사용하세요.
+
+**Docker Hub 로그인 불필요** — 이미지는 공개입니다.
+
+컨테이너는 단일 이미지에 모든 것을 번들로 제공합니다:
+- Apache + PHP (애플리케이션 서버)
+- Shiny Server (분석 대시보드, 포트 3838)
+- Beanstalkd (백그라운드 작업 큐)
+
+---
+
+## 요구 사항
+
+### 서버
+
+| 리소스 | 최소 | 권장 |
+|----------|---------|-------------|
+| RAM | 4 GB | 8 GB |
+| 디스크 | 50 GB | 100 GB SSD |
+| CPU | 2 vCPUs | 4 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### 소프트웨어
+
+- **Docker Engine 24.0+** — [설치 가이드](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — Docker Desktop에 포함; Linux에서: `apt install docker-compose-plugin`
+
+---
+
+## 설정
+
+<Steps>
+
+### 작업 디렉토리 만들기
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### `docker-compose.yml` 만들기
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # Optional: Embedded Keycloak SSO
+  # Start with: docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### `.env` 만들기
+
+```bash
+# Project
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Database
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Admin (set before first startup — cannot change via env after DB is created)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Ports (optional — defaults shown)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+시작하기 전에 `MYSQL_ROOT_PASSWORD`와 `MYSQL_PASSWORD`를 변경하세요. 프로덕션에서는 강력한 무작위 문자열(32자 이상)을 사용하세요.
+</Callout>
+
+### 스택 시작
+
+```bash
+docker compose up -d
+```
+
+첫 번째 시작은 약 60–90초가 걸립니다 — MySQL이 첫 실행 시 데이터베이스를 초기화합니다.
+
+### 확인
+
+```bash
+# Check all containers are running
+docker compose ps
+
+# Check application health
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## 첫 로그인
+
+헬스 체크가 통과되면 브라우저를 열어주세요:
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| 필드 | 값 |
+|-------|-------|
+| 사용자 이름 | `admin` |
+| 비밀번호 | `.env`의 `ADMIN_PASSWORD` 값 (기본값 `admin`) |
+
+<Callout type="warning">
+첫 번째 시작 전에 `.env`에서 `ADMIN_PASSWORD`를 설정하세요. 엔트리포인트는 첫 실행 시 이를 설정합니다 — 데이터베이스가 초기화된 후 변경하면 효과가 없습니다.
+</Callout>
+
+---
+
+## 환경 변수
+
+### 앱 컨테이너에 필요한 항목
+
+다음 중 하나라도 누락되면 엔트리포인트가 시작을 거부합니다:
+
+| 변수 | 설명 |
+|----------|-------------|
+| `PROJECT_ID` | 이 인스턴스의 고유 식별자 (영숫자, 공백 없음) |
+| `PROJECT_URL` | 앱에 접근하는 도메인 또는 IP (`http://` 접두사 없음) |
+| `MYSQL_HOST` | MySQL 호스트 이름 — Docker 서비스 이름 사용 (예: `mysql`) |
+| `MYSQL_DATABASE` | 데이터베이스 이름 |
+| `MYSQL_PASSWORD` | 데이터베이스 사용자 비밀번호 |
+
+### MySQL 컨테이너에 필요한 항목
+
+| 변수 | 설명 |
+|----------|-------------|
+| `MYSQL_ROOT_PASSWORD` | MySQL 루트 비밀번호 (`mysql` 컨테이너에서 사용, 앱 아님) |
+
+### 권장 항목
+
+| 변수 | 기본값 | 설명 |
+|----------|---------|-------------|
+| `MYSQL_USER` | `smartsurvey` | 데이터베이스 사용자 이름 |
+| `ADMIN_PASSWORD` | `admin` | 초기 관리자 비밀번호 — **첫 번째 시작 전에 설정**, DB 생성 후 환경 변수로 변경 불가 |
+| `HTTP_PROTOCOL` | `https` | SSL을 사용하지 않는 경우 `http`로 설정 |
+| `PROJECT_PORT` | `80` | 사용자가 연결하는 외부 포트 (내부 Docker 포트 아님) |
+| `PROJECT_TYPE` | `rtwork` | 플랫폼 유형 — 설문 플랫폼에는 `rtsurvey` 사용 |
+| `TZ` | `UTC` | 시간대 (예: `Asia/Bangkok`, `America/New_York`) |
+
+### 런타임
+
+| 변수 | 기본값 | 설명 |
+|----------|---------|-------------|
+| `RUN_ENV` | `prod` | 환경 모드 (`prod` 또는 `dev`) |
+| `RUN_MODE` | `admin` | 서비스 역할 — 단일 서버 설정에는 `admin` 사용 |
+| `GII_ENABLED` | `false` | 프로덕션에서 `false`로 유지 (Yii 코드 생성기) |
+| `CSRF_VALIDATION_ENABLED` | `true` | CSRF 보호 — `true`로 유지 |
+
+### 라이선스
+
+| 변수 | 기본값 | 설명 |
+|----------|---------|-------------|
+| `REQUIRE_LICENSE` | `false` | 라이선스 검증을 적용하려면 `true`로 설정 |
+| `RTCLOUD_LICENSE_KEY` | — | 라이선스 키 — `REQUIRE_LICENSE=true`일 때 필요 |
+
+---
+
+## 데이터 지속성
+
+모든 사용자 데이터는 명명된 Docker 볼륨에 저장됩니다. 이는 컨테이너 재시작 및 이미지 업데이트 후에도 유지됩니다.
+
+| 볼륨 | 내용 |
+|--------|----------|
+| `mysql_data` | 데이터베이스 (설문, 사용자, 응답) |
+| `app_uploads` | 설문의 파일 업로드 |
+| `app_gallery` | 미디어 라이브러리 |
+| `app_downloads` | 생성된 내보내기 파일 |
+| `app_audios` | 오디오 녹음 |
+| `app_runtime` | PHP 세션 및 캐시 파일 |
+| `app_aggregate` | 집계된 분석 데이터 |
+
+---
+
+## 일반 작업
+
+### 로그 보기
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### 앱 재시작
+
+```bash
+docker compose restart rtsurvey
+```
+
+### 쉘 접근
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### 데이터베이스 마이그레이션 수동 실행
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## 업그레이드
+
+이미지는 `survey-public` 태그가 붙어 있습니다. 최신 버전으로 업데이트하려면:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+데이터베이스 마이그레이션은 프로덕션 엔트리포인트를 통해 시작 시 자동으로 실행됩니다.
+
+---
+
+## 백업 및 복원
+
+### 데이터베이스 백업
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### 데이터베이스 복원
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### 업로드된 파일 백업
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## 내장 Keycloak (선택적 SSO)
+
+프로덕션 컴포즈 파일에는 SSO를 위한 선택적 Keycloak 컨테이너가 포함되어 있습니다. 동일한 MySQL 인스턴스를 공유하며 Docker Compose 프로필을 통해 활성화됩니다.
+
+<Callout type="info">
+내장 Keycloak는 최소 **4 GB RAM**이 필요합니다. 선택 사항입니다 — SSO가 필요하지 않으면 건너뛰세요.
+</Callout>
+
+### `.env`에 Keycloak 변수 추가
+
+```bash
+# Keycloak admin
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Keycloak database (created automatically in the shared MySQL on first run)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: full public URL of your server (Keycloak appends /auth automatically)
+KC_HOSTNAME=http://your-server:8091
+
+# Port Keycloak listens on (host)
+KEYCLOAK_PORT=8091
+
+# Tell the rtCloud app to connect to embedded Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+`keycloak` 서비스는 이미 위의 `docker-compose.yml`에 포함되어 있습니다 (`embed-keycloak` 프로필 아래 — `--profile embed-keycloak`을 사용하지 않으면 시작되지 않습니다).
+
+임포트 디렉토리 생성 (Keycloak은 없어도 시작되지만 렐름 자동 프로비저닝이 작동하지 않습니다):
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### Keycloak으로 시작
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+Keycloak 없이 시작하려면 (기본값):
+
+```bash
+docker compose up -d
+```
+
+### Keycloak 관리 콘솔
+
+정상 상태가 되면 다음 주소에서 Keycloak 관리 UI에 접근하세요:
+
+```
+http://your-server:8091/auth/admin
+```
+
+`KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD`로 로그인하세요.
+
+---
+
+## 다음 단계
+
+- **HTTPS** — nginx 또는 Caddy를 앞에 배치하고 [SSL 설정](ssl-setup) 가이드를 따르세요
+- **SSO** — [SSO 인증](sso-authentication) 가이드를 통해 Azure AD 또는 Keycloak에 연결하세요
+- **클라우드 배포** — 자동화된 스크립트를 사용한 제공업체별 설정은 [클라우드 제공업체](cloud-providers)를 참조하세요

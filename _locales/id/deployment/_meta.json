@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "Mulai Cepat",
+  "cloud-providers": "Penyedia Cloud",
+  "self-host-docker": "Self-Host dengan Docker",
+  "configuration": "Konfigurasi",
+  "maintenance": "Pemeliharaan",
+  "ssl-setup": "Pengaturan SSL",
+  "sso-authentication": "Autentikasi SSO"
 }

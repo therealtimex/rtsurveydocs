@@ -3,12 +3,12 @@
     "display": "hidden"
   },
   "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
+  "dynamic-question-type": "Dynamisk spørsmålstype",
+  "dynamic-search": "Dynamisk søk",
+  "exams": "Eksamener",
+  "grid-layout": "Rutenettoppsett",
   "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "images": "Bilder",
+  "repeats": "Avanserte gjentakelser",
   "webbox": "WebBox"
 }

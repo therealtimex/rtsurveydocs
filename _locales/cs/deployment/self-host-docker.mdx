@@ -1,0 +1,446 @@
+---
+title: "Self-hosting s Dockerem"
+description: "Spusťte rtSurvey na jakémkoli serveru pomocí veřejného Docker obrazu — nejsou potřeba cloudové skripty."
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+Použijte tuto příručku, pokud chcete spustit rtSurvey na vlastním serveru (VPS, bare metal nebo lokální počítač) pomocí veřejného Docker obrazu `rtawebteam/rtcloud:survey-public`.
+
+**Není potřeba přihlášení do Docker Hub** — obraz je veřejný.
+
+Kontejner vše sdružuje v jednom obrazu:
+- Apache + PHP (aplikační server)
+- Shiny Server (analytické dashboardy, port 3838)
+- Beanstalkd (fronta úloh na pozadí)
+
+---
+
+## Požadavky
+
+### Server
+
+| Zdroj | Minimum | Doporučeno |
+|----------|---------|-------------|
+| RAM | 4 GB | 8 GB |
+| Disk | 50 GB | 100 GB SSD |
+| CPU | 2 vCPUs | 4 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Software
+
+- **Docker Engine 24.0+** — [průvodce instalací](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — součástí Docker Desktop; na Linuxu: `apt install docker-compose-plugin`
+
+---
+
+## Nastavení
+
+<Steps>
+
+### Vytvořte pracovní adresář
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### Vytvořte `docker-compose.yml`
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # Volitelné: Integrovaný Keycloak SSO
+  # Spusťte: docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### Vytvořte `.env`
+
+```bash
+# Projekt
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Databáze
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Administrátor (nastavte před prvním spuštěním — nelze změnit přes env po vytvoření DB)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Porty (volitelné — zobrazeny výchozí hodnoty)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+Před spuštěním změňte `MYSQL_ROOT_PASSWORD` a `MYSQL_PASSWORD`. V produkci používejte silné náhodné řetězce (32+ znaků).
+</Callout>
+
+### Spusťte stack
+
+```bash
+docker compose up -d
+```
+
+První spuštění trvá přibližně 60–90 sekund — MySQL inicializuje databázi při prvním spuštění.
+
+### Ověřte
+
+```bash
+# Zkontrolujte, zda jsou všechny kontejnery spuštěny
+docker compose ps
+
+# Zkontrolujte zdraví aplikace
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## První přihlášení
+
+Po úspěšné zdravotní kontrole otevřete prohlížeč:
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| Pole | Hodnota |
+|-------|-------|
+| Uživatelské jméno | `admin` |
+| Heslo | hodnota `ADMIN_PASSWORD` ve vašem `.env` (výchozí `admin`) |
+
+<Callout type="warning">
+Nastavte `ADMIN_PASSWORD` v `.env` před prvním spuštěním. Vstupní bod ho nastaví při prvním spuštění — jeho změna po inicializaci databáze nemá žádný účinek.
+</Callout>
+
+---
+
+## Proměnné prostředí
+
+### Vyžadované kontejnerem aplikace
+
+Vstupní bod odmítne spuštění, pokud některá z nich chybí:
+
+| Proměnná | Popis |
+|----------|-------------|
+| `PROJECT_ID` | Jedinečný identifikátor pro tuto instanci (alfanumerický, bez mezer) |
+| `PROJECT_URL` | Doména nebo IP, kde je aplikace přístupná (bez předpony `http://`) |
+| `MYSQL_HOST` | Hostname MySQL — použijte název Docker service (např. `mysql`) |
+| `MYSQL_DATABASE` | Název databáze |
+| `MYSQL_PASSWORD` | Heslo uživatele databáze |
+
+### Vyžadované kontejnerem MySQL
+
+| Proměnná | Popis |
+|----------|-------------|
+| `MYSQL_ROOT_PASSWORD` | MySQL root heslo (používá ho kontejner `mysql`, ne aplikace) |
+
+### Doporučené
+
+| Proměnná | Výchozí | Popis |
+|----------|---------|-------------|
+| `MYSQL_USER` | `smartsurvey` | Uživatelské jméno databáze |
+| `ADMIN_PASSWORD` | `admin` | Počáteční heslo administrátora — **nastavte před prvním spuštěním**, nelze změnit přes env po vytvoření DB |
+| `HTTP_PROTOCOL` | `https` | Nastavte na `http`, pokud nepoužíváte SSL |
+| `PROJECT_PORT` | `80` | Externí port, ke kterému se uživatelé připojují (ne interní port Docker) |
+| `PROJECT_TYPE` | `rtwork` | Typ platformy — použijte `rtsurvey` pro survey platformu |
+| `TZ` | `UTC` | Časové pásmo (např. `Asia/Bangkok`, `America/New_York`) |
+
+### Runtime
+
+| Proměnná | Výchozí | Popis |
+|----------|---------|-------------|
+| `RUN_ENV` | `prod` | Režim prostředí (`prod` nebo `dev`) |
+| `RUN_MODE` | `admin` | Role služby — použijte `admin` pro jednoduchý server |
+| `GII_ENABLED` | `false` | Nechte `false` v produkci (Yii generátor kódu) |
+| `CSRF_VALIDATION_ENABLED` | `true` | CSRF ochrana — nechte `true` |
+
+### Licence
+
+| Proměnná | Výchozí | Popis |
+|----------|---------|-------------|
+| `REQUIRE_LICENSE` | `false` | Nastavte na `true` pro vynucení ověření licence |
+| `RTCLOUD_LICENSE_KEY` | — | Váš licenční klíč — vyžadováno když `REQUIRE_LICENSE=true` |
+
+---
+
+## Trvalost dat
+
+Všechna uživatelská data jsou uložena v pojmenovaných Docker svazcích. Tyto přežijí restartování kontejnerů a aktualizace obrazů.
+
+| Svazek | Obsah |
+|--------|----------|
+| `mysql_data` | Databáze (průzkumy, uživatelé, odpovědi) |
+| `app_uploads` | Nahraní soubory z průzkumů |
+| `app_gallery` | Mediální knihovna |
+| `app_downloads` | Vygenerované exportní soubory |
+| `app_audios` | Zvukové nahrávky |
+| `app_runtime` | PHP session a cache soubory |
+| `app_aggregate` | Agregovaná analytická data |
+
+---
+
+## Běžné operace
+
+### Zobrazení logů
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### Restart aplikace
+
+```bash
+docker compose restart rtsurvey
+```
+
+### Přístup do shellu
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### Ruční spuštění migrací databáze
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## Aktualizace
+
+Obraz je označen `survey-public`. Pro aktualizaci na nejnovější verzi:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Migrace databáze běží automaticky při spuštění přes produkční vstupní bod.
+
+---
+
+## Záloha a obnova
+
+### Záloha databáze
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### Obnova databáze
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### Záloha nahraných souborů
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## Integrovaný Keycloak (Volitelné SSO)
+
+Produkční compose soubor obsahuje volitelný Keycloak kontejner pro SSO. Sdílí stejnou MySQL instanci a je aktivován prostřednictvím Docker Compose profilu.
+
+<Callout type="info">
+Integrovaný Keycloak vyžaduje alespoň **4 GB RAM**. Je volitelný — přeskočte ho, pokud SSO nepotřebujete.
+</Callout>
+
+### Přidejte Keycloak proměnné do `.env`
+
+```bash
+# Keycloak administrátor
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Databáze Keycloak (automaticky vytvořena ve sdíleném MySQL při prvním spuštění)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: úplná veřejná URL vašeho serveru (Keycloak automaticky přidá /auth)
+KC_HOSTNAME=http://your-server:8091
+
+# Port, na kterém Keycloak naslouchá (host)
+KEYCLOAK_PORT=8091
+
+# Řekněte rtCloud aplikaci, aby se připojila k integrovanému Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+Služba `keycloak` je již zahrnuta v `docker-compose.yml` výše (pod profilem `embed-keycloak` — nespustí se, pokud nepoužijete `--profile embed-keycloak`).
+
+Vytvořte adresář pro import (Keycloak se spustí i bez něj, ale automatické vytváření realm nebude fungovat):
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### Spuštění s Keycloakem
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+Spuštění bez Keycloaku (výchozí):
+
+```bash
+docker compose up -d
+```
+
+### Administrátorská konzola Keycloak
+
+Po úspěšné zdravotní kontrole přistupte k administrátorskému UI Keycloak na:
+
+```
+http://your-server:8091/auth/admin
+```
+
+Přihlaste se pomocí `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD`.
+
+---
+
+## Další kroky
+
+- **HTTPS** — Umístěte nginx nebo Caddy před aplikaci a postupujte podle průvodce [nastavení SSL](ssl-setup)
+- **SSO** — Připojte Azure AD nebo Keycloak prostřednictvím průvodce [SSO autentizace](sso-authentication)
+- **Cloud nasazení** — Viz [Cloud provideri](cloud-providers) pro nastavení specifické pro poskytovatele s automatizovanými skripty

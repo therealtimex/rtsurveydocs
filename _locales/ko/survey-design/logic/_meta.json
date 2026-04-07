@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "조건 (건너뛰기 논리)",
+  "constraint": "제약",
+  "calculate": "계산",
+  "default": "기본값",
+  "read-only": "읽기 전용"
 }

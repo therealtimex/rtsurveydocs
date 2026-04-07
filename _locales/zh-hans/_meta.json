@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "首页",
   "getting-started": "快速入门",
   "deployment": "部署",
   "survey-design": "调查设计",
   "platform-interfaces": "用户界面",
-  "contact": "Contact Us",
-  "support": "Support",
-  "sponsor": "Sponsor"
+  "contact": "联系我们",
+  "support": "支持",
+  "sponsor": "赞助商"
 }

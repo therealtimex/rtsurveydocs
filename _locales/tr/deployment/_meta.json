@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
+  "quick-start": "Hızlı Başlangıç",
+  "cloud-providers": "Bulut Sağlayıcıları",
+  "self-host-docker": "Docker ile Kendi Sunucuya Kurulum",
+  "configuration": "Yapılandırma",
+  "maintenance": "Bakım",
   "ssl-setup": "SSL Setup",
   "sso-authentication": "SSO Authentication"
 }

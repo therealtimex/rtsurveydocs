@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "Greita pradžia",
+  "cloud-providers": "Debesų tiekėjai",
+  "self-host-docker": "Savarankiškas talpinimas su Docker",
+  "configuration": "Konfigūracija",
+  "maintenance": "Priežiūra",
+  "ssl-setup": "SSL nustatymas",
+  "sso-authentication": "SSO autentifikacija"
 }

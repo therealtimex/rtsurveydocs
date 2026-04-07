@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Relevant（跳题逻辑）",
+  "constraint": "约束",
+  "calculate": "计算",
+  "default": "默认值",
+  "read-only": "只读"
 }

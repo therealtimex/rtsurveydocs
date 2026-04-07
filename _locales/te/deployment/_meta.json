@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
+  "quick-start": "త్వరిత ప్రారంభం",
+  "cloud-providers": "క్లౌడ్ ప్రొవైడర్లు",
+  "self-host-docker": "Docker తో స్వయం-హోస్ట్",
+  "configuration": "కాన్ఫిగరేషన్",
+  "maintenance": "నిర్వహణ",
   "ssl-setup": "SSL Setup",
   "sso-authentication": "SSO Authentication"
 }

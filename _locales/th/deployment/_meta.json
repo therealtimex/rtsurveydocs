@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
+  "quick-start": "เริ่มต้นอย่างรวดเร็ว",
+  "cloud-providers": "ผู้ให้บริการคลาวด์",
+  "self-host-docker": "โฮสต์เองด้วย Docker",
+  "configuration": "การกำหนดค่า",
+  "maintenance": "การบำรุงรักษา",
   "ssl-setup": "SSL Setup",
   "sso-authentication": "SSO Authentication"
 }

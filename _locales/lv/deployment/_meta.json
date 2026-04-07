@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "Ātrā sākšana",
+  "cloud-providers": "Mākoņpakalpojumu sniedzēji",
+  "self-host-docker": "Pašmitināšana ar Docker",
+  "configuration": "Konfigurācija",
+  "maintenance": "Uzturēšana",
+  "ssl-setup": "SSL iestatīšana",
+  "sso-authentication": "SSO autentifikācija"
 }

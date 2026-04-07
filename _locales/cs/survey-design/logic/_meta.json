@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Relevance (logika přeskakování)",
+  "constraint": "Omezení",
+  "calculate": "Výpočet",
+  "default": "Výchozí",
+  "read-only": "Jen pro čtení"
 }

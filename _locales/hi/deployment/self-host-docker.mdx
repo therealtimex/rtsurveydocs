@@ -1,0 +1,446 @@
+---
+title: "Docker के साथ स्व-होस्टिंग"
+description: "सार्वजनिक Docker इमेज का उपयोग करके किसी भी सर्वर पर rtSurvey चलाएं — कोई क्लाउड स्क्रिप्ट आवश्यक नहीं।"
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+इस गाइड का उपयोग करें यदि आप सार्वजनिक Docker इमेज `rtawebteam/rtcloud:survey-public` का उपयोग करके अपने खुद के सर्वर (VPS, bare metal, या स्थानीय मशीन) पर rtSurvey चलाना चाहते हैं।
+
+**Docker Hub लॉगिन आवश्यक नहीं** — इमेज सार्वजनिक है।
+
+कंटेनर एक ही इमेज में सब कुछ बंडल करता है:
+- Apache + PHP (एप्लिकेशन सर्वर)
+- Shiny Server (एनालिटिक्स डैशबोर्ड, पोर्ट 3838)
+- Beanstalkd (बैकग्राउंड जॉब कतार)
+
+---
+
+## आवश्यकताएं
+
+### सर्वर
+
+| संसाधन | न्यूनतम | अनुशंसित |
+|--------|---------|----------|
+| RAM | 4 GB | 8 GB |
+| डिस्क | 50 GB | 100 GB SSD |
+| CPU | 2 vCPUs | 4 vCPUs |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### सॉफ़्टवेयर
+
+- **Docker Engine 24.0+** — [इंस्टॉल गाइड](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — Docker Desktop के साथ शामिल; Linux पर: `apt install docker-compose-plugin`
+
+---
+
+## सेटअप
+
+<Steps>
+
+### एक कार्यशील निर्देशिका बनाएं
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### `docker-compose.yml` बनाएं
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # Optional: Embedded Keycloak SSO
+  # Start with: docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### `.env` बनाएं
+
+```bash
+# Project
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Database
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Admin (set before first startup — cannot change via env after DB is created)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Ports (optional — defaults shown)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+शुरू करने से पहले `MYSQL_ROOT_PASSWORD` और `MYSQL_PASSWORD` बदलें। प्रोडक्शन में मजबूत यादृच्छिक स्ट्रिंग (32+ वर्ण) का उपयोग करें।
+</Callout>
+
+### स्टैक शुरू करें
+
+```bash
+docker compose up -d
+```
+
+पहली बार शुरू होने में लगभग 60–90 सेकंड लगते हैं — MySQL पहली बार चलने पर डेटाबेस आरंभ करता है।
+
+### सत्यापित करें
+
+```bash
+# Check all containers are running
+docker compose ps
+
+# Check application health
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## पहला लॉगिन
+
+एक बार हेल्थ चेक पास होने के बाद, अपना ब्राउज़र खोलें:
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| फ़ील्ड | मान |
+|--------|-----|
+| उपयोगकर्ता नाम | `admin` |
+| पासवर्ड | आपके `.env` में `ADMIN_PASSWORD` का मान (डिफ़ॉल्ट: `admin`) |
+
+<Callout type="warning">
+पहली बार शुरू करने से पहले अपने `.env` में `ADMIN_PASSWORD` सेट करें। entrypoint इसे पहली बार चलाने पर सेट करता है — डेटाबेस आरंभ होने के बाद इसे बदलने का कोई प्रभाव नहीं होता।
+</Callout>
+
+---
+
+## पर्यावरण चर
+
+### एप्लिकेशन कंटेनर द्वारा आवश्यक
+
+यदि इनमें से कोई भी गायब है तो entrypoint शुरू होने से इनकार करेगा:
+
+| चर | विवरण |
+|----|-------|
+| `PROJECT_ID` | इस इंस्टेंस के लिए अद्वितीय पहचानकर्ता (अल्फ़ान्यूमेरिक, कोई रिक्त स्थान नहीं) |
+| `PROJECT_URL` | डोमेन या IP जहां ऐप एक्सेस किया जाता है (कोई `http://` उपसर्ग नहीं) |
+| `MYSQL_HOST` | MySQL होस्टनाम — Docker सेवा नाम का उपयोग करें (जैसे `mysql`) |
+| `MYSQL_DATABASE` | डेटाबेस नाम |
+| `MYSQL_PASSWORD` | डेटाबेस उपयोगकर्ता पासवर्ड |
+
+### MySQL कंटेनर द्वारा आवश्यक
+
+| चर | विवरण |
+|----|-------|
+| `MYSQL_ROOT_PASSWORD` | MySQL root पासवर्ड (`mysql` कंटेनर द्वारा उपयोग किया जाता है, ऐप द्वारा नहीं) |
+
+### अनुशंसित
+
+| चर | डिफ़ॉल्ट | विवरण |
+|----|---------|-------|
+| `MYSQL_USER` | `smartsurvey` | डेटाबेस उपयोगकर्ता नाम |
+| `ADMIN_PASSWORD` | `admin` | प्रारंभिक admin पासवर्ड — **पहली बार शुरू करने से पहले सेट करें**, DB बनने के बाद env के माध्यम से नहीं बदला जा सकता |
+| `HTTP_PROTOCOL` | `https` | SSL का उपयोग नहीं करने पर `http` पर सेट करें |
+| `PROJECT_PORT` | `80` | बाहरी पोर्ट जिससे उपयोगकर्ता कनेक्ट होते हैं (आंतरिक Docker पोर्ट नहीं) |
+| `PROJECT_TYPE` | `rtwork` | प्लेटफ़ॉर्म प्रकार — सर्वेक्षण प्लेटफ़ॉर्म के लिए `rtsurvey` का उपयोग करें |
+| `TZ` | `UTC` | समय क्षेत्र (जैसे `Asia/Bangkok`, `America/New_York`) |
+
+### रनटाइम
+
+| चर | डिफ़ॉल्ट | विवरण |
+|----|---------|-------|
+| `RUN_ENV` | `prod` | पर्यावरण मोड (`prod` या `dev`) |
+| `RUN_MODE` | `admin` | सेवा भूमिका — एकल-सर्वर सेटअप के लिए `admin` का उपयोग करें |
+| `GII_ENABLED` | `false` | प्रोडक्शन में `false` रखें (Yii कोड जनरेटर) |
+| `CSRF_VALIDATION_ENABLED` | `true` | CSRF सुरक्षा — `true` रखें |
+
+### लाइसेंस
+
+| चर | डिफ़ॉल्ट | विवरण |
+|----|---------|-------|
+| `REQUIRE_LICENSE` | `false` | लाइसेंस सत्यापन लागू करने के लिए `true` पर सेट करें |
+| `RTCLOUD_LICENSE_KEY` | — | आपकी लाइसेंस कुंजी — जब `REQUIRE_LICENSE=true` हो तो आवश्यक |
+
+---
+
+## डेटा दृढ़ता
+
+सभी उपयोगकर्ता डेटा नामित Docker वॉल्यूम में संग्रहीत है। ये कंटेनर रीस्टार्ट और इमेज अपडेट से बचे रहते हैं।
+
+| वॉल्यूम | सामग्री |
+|---------|---------|
+| `mysql_data` | डेटाबेस (सर्वेक्षण, उपयोगकर्ता, प्रतिक्रियाएं) |
+| `app_uploads` | सर्वेक्षणों से फ़ाइल अपलोड |
+| `app_gallery` | मीडिया लाइब्रेरी |
+| `app_downloads` | जनरेट किए गए एक्सपोर्ट फ़ाइलें |
+| `app_audios` | ऑडियो रिकॉर्डिंग |
+| `app_runtime` | PHP सत्र और कैश फ़ाइलें |
+| `app_aggregate` | एकत्रित एनालिटिक्स डेटा |
+
+---
+
+## सामान्य संचालन
+
+### लॉग देखें
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### ऐप रीस्टार्ट करें
+
+```bash
+docker compose restart rtsurvey
+```
+
+### शेल एक्सेस करें
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### डेटाबेस माइग्रेशन मैन्युअल रूप से चलाएं
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## अपग्रेड
+
+इमेज `survey-public` टैग की गई है। नवीनतम संस्करण में अपडेट करने के लिए:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+डेटाबेस माइग्रेशन प्रोडक्शन entrypoint के माध्यम से स्टार्टअप पर स्वचालित रूप से चलते हैं।
+
+---
+
+## बैकअप और पुनर्स्थापना
+
+### डेटाबेस बैकअप करें
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### डेटाबेस पुनर्स्थापित करें
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### अपलोड की गई फ़ाइलों का बैकअप करें
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## एम्बेडेड Keycloak (वैकल्पिक SSO)
+
+प्रोडक्शन compose फ़ाइल में SSO के लिए एक वैकल्पिक Keycloak कंटेनर शामिल है। यह समान MySQL इंस्टेंस साझा करता है और Docker Compose प्रोफ़ाइल के माध्यम से सक्रिय होता है।
+
+<Callout type="info">
+एम्बेडेड Keycloak को कम से कम **4 GB RAM** की आवश्यकता है। यह वैकल्पिक है — यदि आपको SSO की आवश्यकता नहीं है तो इसे छोड़ें।
+</Callout>
+
+### `.env` में Keycloak चर जोड़ें
+
+```bash
+# Keycloak admin
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Keycloak database (created automatically in the shared MySQL on first run)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: full public URL of your server (Keycloak appends /auth automatically)
+KC_HOSTNAME=http://your-server:8091
+
+# Port Keycloak listens on (host)
+KEYCLOAK_PORT=8091
+
+# Tell the rtCloud app to connect to embedded Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+`keycloak` सेवा पहले से ही ऊपर के `docker-compose.yml` में शामिल है (`embed-keycloak` प्रोफ़ाइल के तहत — यह तब तक शुरू नहीं होगी जब तक आप `--profile embed-keycloak` का उपयोग नहीं करते)।
+
+इंपोर्ट निर्देशिका बनाएं (Keycloak इसके बिना शुरू होगा लेकिन realm ऑटो-प्रोविज़निंग काम नहीं करेगी):
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### Keycloak के साथ शुरू करें
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+Keycloak के बिना शुरू करने के लिए (डिफ़ॉल्ट):
+
+```bash
+docker compose up -d
+```
+
+### Keycloak एडमिन कंसोल
+
+एक बार स्वस्थ होने पर, Keycloak एडमिन UI पर जाएं:
+
+```
+http://your-server:8091/auth/admin
+```
+
+`KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD` से लॉगिन करें।
+
+---
+
+## अगले चरण
+
+- **HTTPS** — nginx या Caddy को सामने रखें और [SSL सेटअप](ssl-setup) गाइड का पालन करें
+- **SSO** — [SSO प्रमाणीकरण](sso-authentication) गाइड के माध्यम से Azure AD या Keycloak कनेक्ट करें
+- **क्लाउड तैनाती** — स्वचालित स्क्रिप्ट के साथ प्रदाता-विशिष्ट सेटअप के लिए [Cloud Providers](cloud-providers) देखें

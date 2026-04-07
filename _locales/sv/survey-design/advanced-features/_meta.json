@@ -2,13 +2,13 @@
   "index": {
     "display": "hidden"
   },
-  "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
+  "call-api": "Anropa API",
+  "dynamic-question-type": "Dynamisk frågtyp",
+  "dynamic-search": "Dynamisk sökning",
+  "exams": "Prov",
+  "grid-layout": "Rutnätslayout",
   "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "images": "Bilder",
+  "repeats": "Avancerade upprepningar",
   "webbox": "WebBox"
 }

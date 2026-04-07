@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
+  "quick-start": "Fillim i Shpejtë",
+  "cloud-providers": "Ofruesit e Cloud",
+  "self-host-docker": "Vetë-pritja me Docker",
+  "configuration": "Konfigurimi",
+  "maintenance": "Mirëmbajtja",
   "ssl-setup": "SSL Setup",
   "sso-authentication": "SSO Authentication"
 }

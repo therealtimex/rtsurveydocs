@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Pagrindinės sąvokos",
+  "app-api": "Programos API",
+  "appearance": "Išvaizda",
+  "grouping-questions": "Klausimų grupavimas",
+  "media": "Medija",
+  "multi-language": "Daugkalbystė",
+  "repeats": "Kartojimai",
+  "logic": "Logika ir išraiškos",
   "question-types": "Klausimų tipai",
   "operators-and-functions": "Operatoriai ir funkcijos",
   "advanced-features": "Pažangūs plėtiniai"

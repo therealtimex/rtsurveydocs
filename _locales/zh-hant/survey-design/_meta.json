@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "核心概念",
+  "app-api": "應用程式 API",
+  "appearance": "外觀",
+  "grouping-questions": "問題分組",
+  "media": "媒體",
+  "multi-language": "多語言",
+  "repeats": "重複",
+  "logic": "邏輯與表達式",
   "question-types": "問題類型",
   "operators-and-functions": "運算符和函數",
   "advanced-features": "進階擴展"

@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "प्रासंगिक (स्किप लॉजिक)",
+  "constraint": "बाधा",
+  "calculate": "गणना",
+  "default": "डिफ़ॉल्ट",
+  "read-only": "केवल पढ़ें"
 }

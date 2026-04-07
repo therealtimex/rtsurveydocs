@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
+  "key-concepts": "Nøkkelbegreper",
+  "app-api": "Applikasjons-API",
+  "appearance": "Utseende",
+  "grouping-questions": "Gruppering av spørsmål",
   "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "multi-language": "Flerspråklig",
+  "repeats": "Gjentakelser",
+  "logic": "Logikk og uttrykk",
   "question-types": "Spørsmålstyper",
   "operators-and-functions": "Operatorer og funksjoner",
   "advanced-features": "Avanserte utvidelser"

@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Alapfogalmak",
+  "app-api": "Alkalmazás API",
+  "appearance": "Megjelenés",
+  "grouping-questions": "Kérdések csoportosítása",
+  "media": "Média",
+  "multi-language": "Többnyelvűség",
+  "repeats": "Ismétlések",
+  "logic": "Logika és kifejezések",
   "question-types": "Kérdéstípusok",
   "operators-and-functions": "Operátorok és függvények",
   "advanced-features": "Haladó bővítések"

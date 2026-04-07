@@ -1,0 +1,446 @@
+---
+title: "Vetë-Pritje me Docker"
+description: "Ekzekutoni rtSurvey në çdo server duke përdorur imazhin publik Docker — nuk kërkohen skripte cloud."
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+Përdorni këtë udhëzues nëse doni të ekzekutoni rtSurvey në serverin tuaj (VPS, metal i zbrazët, ose makinë lokale) duke përdorur imazhin publik Docker `rtawebteam/rtcloud:survey-public`.
+
+**Nuk kërkohet hyrje në Docker Hub** — imazhi është publik.
+
+Kontejneri përfshin gjithçka në një imazh të vetëm:
+- Apache + PHP (serveri i aplikacionit)
+- Shiny Server (panelet e analizës, porta 3838)
+- Beanstalkd (radhë e punëve në sfond)
+
+---
+
+## Kërkesat
+
+### Serveri
+
+| Burimi | Minimum | I Rekomanduar |
+|----------|---------|-------------|
+| RAM | 4 GB | 8 GB |
+| Disk | 50 GB | 100 GB SSD |
+| CPU | 2 vCPU | 4 vCPU |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Softueri
+
+- **Docker Engine 24.0+** — [udhëzuesi i instalimit](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — i përfshirë me Docker Desktop; në Linux: `apt install docker-compose-plugin`
+
+---
+
+## Konfigurimi
+
+<Steps>
+
+### Krijoni një direktori pune
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### Krijoni `docker-compose.yml`
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # Optional: Embedded Keycloak SSO
+  # Start with: docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### Krijoni `.env`
+
+```bash
+# Project
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Database
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Admin (set before first startup — cannot change via env after DB is created)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Ports (optional — defaults shown)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+Ndryshoni `MYSQL_ROOT_PASSWORD` dhe `MYSQL_PASSWORD` para se të filloni. Përdorni vargje të forta të rastit (32+ karaktere) në prodhim.
+</Callout>
+
+### Nisni grumbullin
+
+```bash
+docker compose up -d
+```
+
+Nisja e parë merr rreth 60–90 sekonda — MySQL inicializon bazën e të dhënave në ekzekutimin e parë.
+
+### Verifikoni
+
+```bash
+# Check all containers are running
+docker compose ps
+
+# Check application health
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## Hyrja e Parë
+
+Pasi kontrolli i shëndetit kalon, hapni shfletuesin tuaj:
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| Fusha | Vlera |
+|-------|-------|
+| Emri i përdoruesit | `admin` |
+| Fjalëkalimi | vlera e `ADMIN_PASSWORD` në `.env` tuaj (default është `admin`) |
+
+<Callout type="warning">
+Vendosni `ADMIN_PASSWORD` në `.env` tuaj para nisjes së parë. Pika e hyrjes e vendos atë në ekzekutimin e parë — ndryshimi i tij pas inicializimit të bazës së të dhënave nuk ka efekt.
+</Callout>
+
+---
+
+## Variablat e Mjedisit
+
+### Të kërkuara nga kontejneri i aplikacionit
+
+Pika e hyrjes do të refuzojë të nisë nëse ndonjë prej tyre mungon:
+
+| Variabla | Përshkrimi |
+|----------|-------------|
+| `PROJECT_ID` | Identifikues unik për këtë instancë (alfanumerik, pa hapësira) |
+| `PROJECT_URL` | Domeni ose IP ku qaseni aplikacionin (pa prefiksin `http://`) |
+| `MYSQL_HOST` | Emri i hostit MySQL — përdorni emrin e shërbimit Docker (p.sh. `mysql`) |
+| `MYSQL_DATABASE` | Emri i bazës së të dhënave |
+| `MYSQL_PASSWORD` | Fjalëkalimi i përdoruesit të bazës së të dhënave |
+
+### Të kërkuara nga kontejneri MySQL
+
+| Variabla | Përshkrimi |
+|----------|-------------|
+| `MYSQL_ROOT_PASSWORD` | Fjalëkalimi root i MySQL (përdoret nga kontejneri `mysql`, jo aplikacioni) |
+
+### I Rekomanduar
+
+| Variabla | Default | Përshkrimi |
+|----------|---------|-------------|
+| `MYSQL_USER` | `smartsurvey` | Emri i përdoruesit të bazës së të dhënave |
+| `ADMIN_PASSWORD` | `admin` | Fjalëkalimi fillestar i administratorit — **vendosni para nisjes së parë**, nuk mund të ndryshohet përmes env pas krijimit të DB |
+| `HTTP_PROTOCOL` | `https` | Vendoseni në `http` nëse nuk përdorni SSL |
+| `PROJECT_PORT` | `80` | Porta e jashtme ku lidhen përdoruesit (jo porta e brendshme Docker) |
+| `PROJECT_TYPE` | `rtwork` | Lloji i platformës — përdorni `rtsurvey` për platformën e sondazhit |
+| `TZ` | `UTC` | Zona kohore (p.sh. `Asia/Bangkok`, `America/New_York`) |
+
+### Ekzekutimi
+
+| Variabla | Default | Përshkrimi |
+|----------|---------|-------------|
+| `RUN_ENV` | `prod` | Modaliteti i mjedisit (`prod` ose `dev`) |
+| `RUN_MODE` | `admin` | Roli i shërbimit — përdorni `admin` për konfigurimin me një server |
+| `GII_ENABLED` | `false` | Mbajeni `false` në prodhim (gjeneratori i kodit Yii) |
+| `CSRF_VALIDATION_ENABLED` | `true` | Mbrojtja CSRF — mbajeni `true` |
+
+### Licenca
+
+| Variabla | Default | Përshkrimi |
+|----------|---------|-------------|
+| `REQUIRE_LICENSE` | `false` | Vendoseni në `true` për të zbatuar validimin e licencës |
+| `RTCLOUD_LICENSE_KEY` | — | Çelësi juaj i licencës — i kërkuar kur `REQUIRE_LICENSE=true` |
+
+---
+
+## Persistenca e të Dhënave
+
+Të gjitha të dhënat e përdoruesit ruhen në vëllime të emëruara Docker. Këto mbijetojnë rinisjeve të kontejnerit dhe përditësimeve të imazhit.
+
+| Vëllimi | Përmbajtja |
+|--------|----------|
+| `mysql_data` | Baza e të dhënave (sondazhe, përdorues, përgjigje) |
+| `app_uploads` | Ngarkimet e skedarëve nga sondazhet |
+| `app_gallery` | Libraria e mediave |
+| `app_downloads` | Skedarët e eksportit të gjeneruar |
+| `app_audios` | Regjistrime audio |
+| `app_runtime` | Skedarët e sesionit dhe cache PHP |
+| `app_aggregate` | Të dhënat e analizës së grumbulluara |
+
+---
+
+## Operacionet e Zakonshme
+
+### Shikoni regjistrat
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### Rinisni aplikacionin
+
+```bash
+docker compose restart rtsurvey
+```
+
+### Qasuni në një shell
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### Ekzekutoni migrimet e bazës së të dhënave manualisht
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## Përditësimet
+
+Imazhi është etiketuar `survey-public`. Për të përditësuar në versionin e fundit:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Migrimet e bazës së të dhënave ekzekutohen automatikisht në nisje përmes pikës së hyrjes së prodhimit.
+
+---
+
+## Rezervimi & Rikthimi
+
+### Rezervimi i bazës së të dhënave
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### Rikthimi i bazës së të dhënave
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### Rezervimi i skedarëve të ngarkuar
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## Keycloak i Integruar (SSO Opsional)
+
+Skedari i prodhimit compose përfshin një kontejner opsional Keycloak për SSO. Ai ndan të njëjtin instancë MySQL dhe aktivizohet përmes një profili Docker Compose.
+
+<Callout type="info">
+Keycloak i integruar kërkon të paktën **4 GB RAM**. Është opsional — kapërcejeni këtë nëse nuk keni nevojë për SSO.
+</Callout>
+
+### Shtoni variablat Keycloak në `.env`
+
+```bash
+# Keycloak admin
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Keycloak database (created automatically in the shared MySQL on first run)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: full public URL of your server (Keycloak appends /auth automatically)
+KC_HOSTNAME=http://your-server:8091
+
+# Port Keycloak listens on (host)
+KEYCLOAK_PORT=8091
+
+# Tell the rtCloud app to connect to embedded Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+Shërbimi `keycloak` është tashmë i përfshirë në `docker-compose.yml` të mësipërm (nën profilin `embed-keycloak` — nuk do të nisë nëse nuk përdorni `--profile embed-keycloak`).
+
+Krijoni direktorinë e importit (Keycloak do të nisë pa të, por provizionimi automatik i realmit nuk do të funksionojë):
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### Nisni me Keycloak
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+Për të nisur pa Keycloak (default):
+
+```bash
+docker compose up -d
+```
+
+### Konsola e administratorit Keycloak
+
+Pasi të jetë shëndetshëm, qasuni në UI-n e administratorit Keycloak në:
+
+```
+http://your-server:8091/auth/admin
+```
+
+Hyni me `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD`.
+
+---
+
+## Hapat e Ardhshëm
+
+- **HTTPS** — Vendosni nginx ose Caddy përpara dhe ndiqni udhëzuesin [SSL Setup](ssl-setup)
+- **SSO** — Lidhni Azure AD ose Keycloak përmes udhëzuesit [SSO Authentication](sso-authentication)
+- **Vendosja Cloud** — Shikoni [Cloud Providers](cloud-providers) për konfigurimin specifik të ofruesit me skripte të automatizuara

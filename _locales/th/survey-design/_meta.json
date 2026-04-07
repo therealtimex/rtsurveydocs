@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "แนวคิดหลัก",
+  "app-api": "API ของแอปพลิเคชัน",
+  "appearance": "รูปลักษณ์",
+  "grouping-questions": "การจัดกลุ่มคำถาม",
+  "media": "สื่อ",
+  "multi-language": "หลายภาษา",
+  "repeats": "การทำซ้ำ",
+  "logic": "ลอจิกและนิพจน์",
   "question-types": "ประเภทคำถาม",
   "operators-and-functions": "ตัวดำเนินการและฟังก์ชัน",
   "advanced-features": "ส่วนขยายขั้นสูง"

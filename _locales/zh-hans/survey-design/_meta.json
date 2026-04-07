@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "核心概念",
+  "app-api": "应用程序 API",
+  "appearance": "外观",
+  "grouping-questions": "问题分组",
+  "media": "媒体",
+  "multi-language": "多语言",
+  "repeats": "重复",
+  "logic": "逻辑与表达式",
   "question-types": "题目类型",
   "operators-and-functions": "运算符和函数",
   "advanced-features": "高级扩展"

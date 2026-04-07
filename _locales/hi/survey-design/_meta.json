@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "मुख्य अवधारणाएँ",
+  "app-api": "एप्लिकेशन API",
+  "appearance": "दिखावट",
+  "grouping-questions": "प्रश्न समूहीकरण",
+  "media": "मीडिया",
+  "multi-language": "बहुभाषी",
+  "repeats": "दोहराव",
+  "logic": "तर्क और अभिव्यक्तियाँ",
   "question-types": "प्रश्न प्रकार",
   "operators-and-functions": "Operators और Functions",
   "advanced-features": "उन्नत एक्सटेंशन"

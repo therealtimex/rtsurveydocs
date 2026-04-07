@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "İlgili (Atlama Mantığı)",
+  "constraint": "Kısıt",
+  "calculate": "Hesapla",
+  "default": "Varsayılan",
+  "read-only": "Salt Okunur"
 }

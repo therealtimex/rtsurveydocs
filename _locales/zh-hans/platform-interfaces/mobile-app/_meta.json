@@ -4,7 +4,7 @@
   },
   "android": "Android",
   "ios": "iOS",
-  "connection": "Connecting to Server",
-  "configuration": "Configuration",
-  "functionalities": "Functionalities"
+  "connection": "连接服务器",
+  "configuration": "配置",
+  "functionalities": "功能"
 }

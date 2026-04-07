@@ -3,12 +3,12 @@
     "display": "hidden"
   },
   "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
+  "dynamic-question-type": "ប្រភេទសំណួរដ្យណាមិក",
+  "dynamic-search": "ការស្វែងរកដ្យណាមិក",
+  "exams": "ការប្រឡង",
+  "grid-layout": "ប្លង់ក្រឡាចត្រង្គ",
   "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "images": "រូបភាព",
+  "repeats": "ការដដែលៗកម្រិតខ្ពស់",
   "webbox": "WebBox"
 }

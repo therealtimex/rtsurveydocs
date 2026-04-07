@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "Áttekintés",
+  "dashboard-overview": "Irányítópult áttekintése",
+  "system-user": "Rendszer és felhasználó",
+  "manage-forms": "Űrlapok kezelése",
+  "manage-submission": "Beküldések kezelése",
+  "manage-analysis": "Elemzés",
+  "manage-quality": "Minőség-ellenőrzés",
+  "manage-users": "Felhasználók kezelése"
 }

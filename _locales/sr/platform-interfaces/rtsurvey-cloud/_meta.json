@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "Pregled",
+  "dashboard-overview": "Pregled kontrolne table",
+  "system-user": "Sistem i korisnik",
+  "manage-forms": "Upravljanje obrascima",
+  "manage-submission": "Upravljanje podnošenjima",
+  "manage-analysis": "Analiza",
+  "manage-quality": "Kontrola kvaliteta",
+  "manage-users": "Upravljanje korisnicima"
 }

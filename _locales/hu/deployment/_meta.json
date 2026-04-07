@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "Gyors kezdés",
+  "cloud-providers": "Felhőszolgáltatók",
+  "self-host-docker": "Saját üzemeltetés Dockerrel",
+  "configuration": "Konfiguráció",
+  "maintenance": "Karbantartás",
+  "ssl-setup": "SSL beállítás",
+  "sso-authentication": "SSO hitelesítés"
 }

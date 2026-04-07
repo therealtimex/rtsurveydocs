@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "Tổng quan",
+  "dashboard-overview": "Tổng quan bảng điều khiển",
+  "system-user": "Hệ thống & Người dùng",
+  "manage-forms": "Quản lý biểu mẫu",
+  "manage-submission": "Quản lý dữ liệu thu thập",
+  "manage-analysis": "Phân tích",
+  "manage-quality": "Kiểm soát chất lượng",
+  "manage-users": "Quản lý người dùng"
 }

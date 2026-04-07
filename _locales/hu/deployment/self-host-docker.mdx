@@ -1,0 +1,446 @@
+---
+title: "Önálló üzemeltetés Docker-rel"
+description: "Futtassa az rtSurvey-t bármely szerveren a nyilvános Docker image segítségével — nincs szükség felhőalapú szkriptekre."
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+Használja ezt az útmutatót, ha az rtSurvey-t saját szerverén (VPS, bare metal vagy helyi gép) szeretné futtatni a nyilvános Docker image `rtawebteam/rtcloud:survey-public` segítségével.
+
+**Nem szükséges Docker Hub bejelentkezés** — a image nyilvános.
+
+A konténer mindent egyetlen image-ben tartalmaz:
+- Apache + PHP (alkalmazáskiszolgáló)
+- Shiny Server (elemzési irányítópultok, 3838-as port)
+- Beanstalkd (háttérfeladat-sor)
+
+---
+
+## Követelmények
+
+### Szerver
+
+| Erőforrás | Minimum | Ajánlott |
+|----------|---------|-------------|
+| RAM | 4 GB | 8 GB |
+| Lemez | 50 GB | 100 GB SSD |
+| CPU | 2 vCPU | 4 vCPU |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Szoftver
+
+- **Docker Engine 24.0+** — [telepítési útmutató](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — a Docker Desktop tartalmazza; Linux esetén: `apt install docker-compose-plugin`
+
+---
+
+## Beállítás
+
+<Steps>
+
+### Munkakönyvtár létrehozása
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### `docker-compose.yml` létrehozása
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # Opcionális: Beágyazott Keycloak SSO
+  # Indítás: docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### `.env` létrehozása
+
+```bash
+# Project
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Database
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Admin (set before first startup — cannot change via env after DB is created)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Ports (optional — defaults shown)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+Változtassa meg a `MYSQL_ROOT_PASSWORD` és `MYSQL_PASSWORD` értékeket az indítás előtt. Használjon erős véletlenszerű karakterláncokat (32+ karakter) éles környezetben.
+</Callout>
+
+### A stack elindítása
+
+```bash
+docker compose up -d
+```
+
+Az első indítás körülbelül 60–90 másodpercet vesz igénybe — a MySQL az első futtatáskor inicializálja az adatbázist.
+
+### Ellenőrzés
+
+```bash
+# Ellenőrizze, hogy minden konténer fut-e
+docker compose ps
+
+# Ellenőrizze az alkalmazás állapotát
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## Első bejelentkezés
+
+Ha az állapotellenőrzés sikeres, nyissa meg a böngészőt:
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| Mező | Érték |
+|-------|-------|
+| Felhasználónév | `admin` |
+| Jelszó | az `ADMIN_PASSWORD` értéke a `.env` fájlban (alapértelmezés: `admin`) |
+
+<Callout type="warning">
+Állítsa be az `ADMIN_PASSWORD` értékét a `.env` fájlban az első indítás előtt. A belépési pont az első futtatáskor állítja be — az adatbázis inicializálása után a módosításnak nincs hatása.
+</Callout>
+
+---
+
+## Környezeti változók
+
+### Az alkalmazás konténer által megkövetelt változók
+
+A belépési pont megtagadja az indítást, ha bármelyik hiányzik:
+
+| Változó | Leírás |
+|----------|-------------|
+| `PROJECT_ID` | Egyedi azonosító ehhez a példányhoz (alfanumerikus, szóközök nélkül) |
+| `PROJECT_URL` | Tartomány vagy IP, amelyen az alkalmazás elérhető (nincs `http://` előtag) |
+| `MYSQL_HOST` | MySQL állomásnév — használja a Docker szolgáltatásnevet (pl. `mysql`) |
+| `MYSQL_DATABASE` | Adatbázis neve |
+| `MYSQL_PASSWORD` | Adatbázis felhasználói jelszó |
+
+### A MySQL konténer által megkövetelt változók
+
+| Változó | Leírás |
+|----------|-------------|
+| `MYSQL_ROOT_PASSWORD` | MySQL root jelszó (a `mysql` konténer használja, nem az alkalmazás) |
+
+### Ajánlott változók
+
+| Változó | Alapértelmezett | Leírás |
+|----------|---------|-------------|
+| `MYSQL_USER` | `smartsurvey` | Adatbázis felhasználónév |
+| `ADMIN_PASSWORD` | `admin` | Kezdeti admin jelszó — **állítsa be az első indítás előtt**, az adatbázis létrehozása után nem módosítható env-en keresztül |
+| `HTTP_PROTOCOL` | `https` | Állítsa `http`-re, ha nem használ SSL-t |
+| `PROJECT_PORT` | `80` | Külső port, amelyen a felhasználók csatlakoznak (nem a belső Docker port) |
+| `PROJECT_TYPE` | `rtwork` | Platform típusa — használja az `rtsurvey` értéket a felmérési platformhoz |
+| `TZ` | `UTC` | Időzóna (pl. `Asia/Bangkok`, `America/New_York`) |
+
+### Futtatókörnyezet
+
+| Változó | Alapértelmezett | Leírás |
+|----------|---------|-------------|
+| `RUN_ENV` | `prod` | Környezeti mód (`prod` vagy `dev`) |
+| `RUN_MODE` | `admin` | Szolgáltatási szerepkör — használja az `admin` értéket egyszerű szerver esetén |
+| `GII_ENABLED` | `false` | Tartsa `false`-on éles környezetben (Yii kódgenerátor) |
+| `CSRF_VALIDATION_ENABLED` | `true` | CSRF védelem — tartsa `true`-n |
+
+### Licenc
+
+| Változó | Alapértelmezett | Leírás |
+|----------|---------|-------------|
+| `REQUIRE_LICENSE` | `false` | Állítsa `true`-ra a licenc érvényesítéséhez |
+| `RTCLOUD_LICENSE_KEY` | — | Licenckulcsa — kötelező, ha `REQUIRE_LICENSE=true` |
+
+---
+
+## Adatmegőrzés
+
+Minden felhasználói adat nevesített Docker kötetekben van tárolva. Ezek megmaradnak a konténer újraindításai és az image frissítések után is.
+
+| Kötet | Tartalom |
+|--------|----------|
+| `mysql_data` | Adatbázis (felmérések, felhasználók, válaszok) |
+| `app_uploads` | Felmérésekből feltöltött fájlok |
+| `app_gallery` | Médiakönyvtár |
+| `app_downloads` | Generált exportfájlok |
+| `app_audios` | Hangfelvételek |
+| `app_runtime` | PHP munkamenet és gyorsítótár fájlok |
+| `app_aggregate` | Összesített elemzési adatok |
+
+---
+
+## Általános műveletek
+
+### Naplók megtekintése
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### Az alkalmazás újraindítása
+
+```bash
+docker compose restart rtsurvey
+```
+
+### Shell elérése
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### Adatbázis-migrációk manuális futtatása
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## Frissítések
+
+Az image címkéje `survey-public`. A legújabb verzióra való frissítéshez:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Az adatbázis-migrációk automatikusan futnak az indításkor az éles belépési ponton keresztül.
+
+---
+
+## Biztonsági mentés és visszaállítás
+
+### Adatbázis biztonsági mentése
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### Adatbázis visszaállítása
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### Feltöltött fájlok biztonsági mentése
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## Beágyazott Keycloak (Opcionális SSO)
+
+Az éles compose fájl tartalmaz egy opcionális Keycloak konténert az SSO-hoz. Ugyanazt a MySQL példányt osztja meg, és egy Docker Compose profil aktiválja.
+
+<Callout type="info">
+A beágyazott Keycloak legalább **4 GB RAM**-ot igényel. Opcionális — hagyja ki, ha nincs szüksége SSO-ra.
+</Callout>
+
+### Keycloak változók hozzáadása a `.env` fájlhoz
+
+```bash
+# Keycloak admin
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Keycloak database (created automatically in the shared MySQL on first run)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: full public URL of your server (Keycloak appends /auth automatically)
+KC_HOSTNAME=http://your-server:8091
+
+# Port Keycloak listens on (host)
+KEYCLOAK_PORT=8091
+
+# Tell the rtCloud app to connect to embedded Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+A `keycloak` szolgáltatás már szerepel a fenti `docker-compose.yml` fájlban (az `embed-keycloak` profil alatt — csak akkor indul el, ha a `--profile embed-keycloak` opciót használja).
+
+Hozza létre az importkönyvtárat (a Keycloak e nélkül is elindul, de az automatikus realm-kiépítés nem fog működni):
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### Indítás Keycloak-kal
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+Keycloak nélküli indítás (alapértelmezett):
+
+```bash
+docker compose up -d
+```
+
+### Keycloak admin konzol
+
+Ha az állapot megfelelő, a Keycloak admin felülete elérhető:
+
+```
+http://your-server:8091/auth/admin
+```
+
+Jelentkezzen be a `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD` adatokkal.
+
+---
+
+## Következő lépések
+
+- **HTTPS** — Helyezzen nginx-et vagy Caddy-t elé, és kövesse az [SSL Beállítás](ssl-setup) útmutatót
+- **SSO** — Csatlakoztassa az Azure AD-t vagy a Keycloak-ot az [SSO Hitelesítés](sso-authentication) útmutatón keresztül
+- **Felhőalapú telepítés** — Lásd a [Felhőszolgáltatók](cloud-providers) oldalt az automatizált szkriptekkel rendelkező szolgáltatóspecifikus beállításhoz

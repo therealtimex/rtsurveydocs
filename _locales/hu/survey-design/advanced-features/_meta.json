@@ -3,12 +3,12 @@
     "display": "hidden"
   },
   "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
+  "dynamic-question-type": "Dinamikus kérdéstípus",
+  "dynamic-search": "Dinamikus keresés",
+  "exams": "Vizsgák",
+  "grid-layout": "Rácselrendezés",
   "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "images": "Képek",
+  "repeats": "Speciális ismétlések",
   "webbox": "WebBox"
 }

@@ -2,15 +2,15 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Βασικές έννοιες",
+  "app-api": "API εφαρμογής",
+  "appearance": "Εμφάνιση",
+  "grouping-questions": "Ομαδοποίηση ερωτήσεων",
+  "media": "Μέσα",
+  "multi-language": "Πολύγλωσσο",
+  "repeats": "Επαναλήψεις",
+  "logic": "Λογική & εκφράσεις",
   "question-types": "Τύποι ερωτήσεων",
-  "operators-and-functions": "Operators and Functions",
+  "operators-and-functions": "Τελεστές & συναρτήσεις",
   "advanced-features": "Προχωρημένες επεκτάσεις"
 }

@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "빠른 시작",
+  "cloud-providers": "클라우드 제공업체",
+  "self-host-docker": "Docker로 자체 호스팅",
+  "configuration": "구성",
+  "maintenance": "유지보수",
+  "ssl-setup": "SSL 설정",
+  "sso-authentication": "SSO 인증"
 }

@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Khái niệm cơ bản",
+  "app-api": "API ứng dụng",
+  "appearance": "Giao diện",
+  "grouping-questions": "Nhóm câu hỏi",
+  "media": "Phương tiện",
+  "multi-language": "Đa ngôn ngữ",
+  "repeats": "Lặp lại",
+  "logic": "Logic & Biểu thức",
   "question-types": "Các loại câu hỏi",
   "operators-and-functions": "Toán tử và Hàm",
   "advanced-features": "Các phần mở rộng nâng cao (Advanced extensions)"

@@ -4,7 +4,7 @@
   },
   "android": "Android",
   "ios": "iOS",
-  "connection": "Connecting to Server",
-  "configuration": "Configuration",
-  "functionalities": "Functionalities"
+  "connection": "సర్వర్‌కు కనెక్ట్ అవడం",
+  "configuration": "కాన్ఫిగరేషన్",
+  "functionalities": "విధులు"
 }

@@ -1,0 +1,446 @@
+---
+title: "Self-Host ជាមួយ Docker"
+description: "រត់ rtSurvey នៅលើម៉ាស៊ីនមេណាមួយដោយប្រើ Docker image សាធារណៈ — មិនត្រូវការស្គ្រីបពពករ។"
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+ប្រើគ្រោងការណ៍ណែនាំនេះប្រសិនបើអ្នកចង់រត់ rtSurvey នៅលើម៉ាស៊ីនមេផ្ទាល់ខ្លួន (VPS, bare metal ឬម៉ាស៊ីនក្នុងស្រុក) ដោយប្រើ Docker image សាធារណៈ `rtawebteam/rtcloud:survey-public`។
+
+**មិនត្រូវការការចូល Docker Hub** — image គឺជាសាធារណៈ។
+
+container រួមបញ្ចូលអ្វីៗទាំងអស់ក្នុង image តែមួយ:
+- Apache + PHP (ម៉ាស៊ីនមេកម្មវិធី)
+- Shiny Server (ផ្ទាំងព័ត៌មានវិភាគ port 3838)
+- Beanstalkd (ជួរការងារផ្ទៃខាងក្រោយ)
+
+---
+
+## តម្រូវការ
+
+### ម៉ាស៊ីនមេ
+
+| ធនធាន | អប្បបរមា | ណែនាំ |
+|----------|---------|-------------|
+| RAM | 4 GB | 8 GB |
+| ថាស | 50 GB | 100 GB SSD |
+| CPU | 2 vCPU | 4 vCPU |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### កម្មវិធី
+
+- **Docker Engine 24.0+** — [ការណែនាំដំឡើង](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — រួមបញ្ចូលជាមួយ Docker Desktop; នៅលើ Linux: `apt install docker-compose-plugin`
+
+---
+
+## ការដំឡើង
+
+<Steps>
+
+### បង្កើតថតការងារ
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### បង្កើត `docker-compose.yml`
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # ស្រេចចិត្ត: Keycloak SSO បង្កប់
+  # ចាប់ផ្តើមជាមួយ: docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### បង្កើត `.env`
+
+```bash
+# Project
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Database
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Admin (set before first startup — cannot change via env after DB is created)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Ports (optional — defaults shown)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+ផ្លាស់ប្តូរ `MYSQL_ROOT_PASSWORD` និង `MYSQL_PASSWORD` មុនពេលចាប់ផ្តើម។ ប្រើខ្សែអក្សរចៃដន្យដ៏ខ្លាំង (ជាង 32 តួអក្សរ) ក្នុងការដំណើរការផលិតកម្ម។
+</Callout>
+
+### ចាប់ផ្តើម stack
+
+```bash
+docker compose up -d
+```
+
+ការចាប់ផ្តើមដំបូងใช้ ប្រហែល 60–90 វិនាទី — MySQL ចាប់ផ្តើមដំណើរការ database នៅការដំណើរការដំបូង។
+
+### ផ្ទៀងផ្ទាត់
+
+```bash
+# ពិនិត្យថា container ទាំងអស់កំពុងដំណើរការ
+docker compose ps
+
+# ពិនិត្យសុខភាពកម្មវិធី
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## ការចូលដំបូង
+
+នៅពេលការពិនិត្យសុខភាពឆ្លងកាត់ សូមបើកបណ្តំ:
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| ទុំ | តម្លៃ |
+|-------|-------|
+| ឈ្មោះអ្នកប្រើ | `admin` |
+| ពាក្យសម្ងាត់ | តម្លៃ `ADMIN_PASSWORD` ក្នុង `.env` របស់អ្នក (លំនាំដើម: `admin`) |
+
+<Callout type="warning">
+កំណត់ `ADMIN_PASSWORD` ក្នុង `.env` របស់អ្នកមុនពេលចាប់ផ្តើមដំបូង។ entrypoint កំណត់វានៅការដំណើរការដំបូង — ការផ្លាស់ប្តូរវាបន្ទាប់ពី database ត្រូវបានចាប់ផ្តើមគ្មានប្រសិទ្ធភាព។
+</Callout>
+
+---
+
+## អថេរបរិស្ថាន
+
+### ត្រូវការដោយ container កម្មវិធី
+
+entrypoint នឹងបដិសេធមិនចាប់ផ្តើមប្រសិនបើមួយក្នុងចំណោមទាំងនេះបាត់:
+
+| អថេរ | ការពិពណ៌នា |
+|----------|-------------|
+| `PROJECT_ID` | អត្តសញ្ញាណមិនស្ទួននៃ instance នេះ (អក្ខរក្រម គ្មានចន្លោះ) |
+| `PROJECT_URL` | ដែន ឬ IP ដែលចូលដំណើរការកម្មវិធី (គ្មានបុព្វបទ `http://`) |
+| `MYSQL_HOST` | ឈ្មោះ host MySQL — ប្រើឈ្មោះ Docker service (ឧ. `mysql`) |
+| `MYSQL_DATABASE` | ឈ្មោះ database |
+| `MYSQL_PASSWORD` | ពាក្យសម្ងាត់អ្នកប្រើ database |
+
+### ត្រូវការដោយ container MySQL
+
+| អថេរ | ការពិពណ៌នា |
+|----------|-------------|
+| `MYSQL_ROOT_PASSWORD` | ពាក្យសម្ងាត់ root MySQL (ប្រើដោយ container `mysql` មិនមែន app) |
+
+### ណែនាំ
+
+| អថេរ | លំនាំដើម | ការពិពណ៌នា |
+|----------|---------|-------------|
+| `MYSQL_USER` | `smartsurvey` | ឈ្មោះអ្នកប្រើ database |
+| `ADMIN_PASSWORD` | `admin` | ពាក្យសម្ងាត់ admin ដំបូង — **កំណត់មុនពេលចាប់ផ្តើមដំបូង** មិនអាចផ្លាស់ប្តូរតាម env បន្ទាប់ពី DB ត្រូវបានបង្កើត |
+| `HTTP_PROTOCOL` | `https` | កំណត់ជា `http` ប្រសិនបើមិនប្រើ SSL |
+| `PROJECT_PORT` | `80` | port ខាងក្រៅដែលអ្នកប្រើប្រាស់ភ្ជាប់ (មិនមែន port Docker ខាងក្នុង) |
+| `PROJECT_TYPE` | `rtwork` | ប្រភេទវេទិកា — ប្រើ `rtsurvey` សម្រាប់វេទិកាការស្ទង់មតិ |
+| `TZ` | `UTC` | តំបន់ពេលវេលា (ឧ. `Asia/Bangkok`, `America/New_York`) |
+
+### Runtime
+
+| អថេរ | លំនាំដើម | ការពិពណ៌នា |
+|----------|---------|-------------|
+| `RUN_ENV` | `prod` | របៀបបរិស្ថាន (`prod` ឬ `dev`) |
+| `RUN_MODE` | `admin` | តួនាទីសេវាកម្ម — ប្រើ `admin` សម្រាប់ការដំឡើងម៉ាស៊ីនមេតែមួយ |
+| `GII_ENABLED` | `false` | រក្សា `false` ក្នុងការផលិតកម្ម (ម៉ាស៊ីនបង្កើតកូដ Yii) |
+| `CSRF_VALIDATION_ENABLED` | `true` | ការការពារ CSRF — រក្សា `true` |
+
+### អាជ្ញាបណ្ណ
+
+| អថេរ | លំនាំដើម | ការពិពណ៌នា |
+|----------|---------|-------------|
+| `REQUIRE_LICENSE` | `false` | កំណត់ជា `true` ដើម្បីអនុវត្តការផ្ទៀងផ្ទាត់អាជ្ញាបណ្ណ |
+| `RTCLOUD_LICENSE_KEY` | — | សោអាជ្ញាបណ្ណរបស់អ្នក — ត្រូវការនៅពេល `REQUIRE_LICENSE=true` |
+
+---
+
+## ការរក្សាទុកទិន្នន័យ
+
+ទិន្នន័យអ្នកប្រើប្រាស់ទាំងអស់ត្រូវបានរក្សាទុកក្នុង Docker volume ដែលមានឈ្មោះ។ ទាំងនេះនៅរស់រានតាមការចាប់ផ្តើម container ឡើងវិញ និងការអាប់ដេត image។
+
+| Volume | មាតិកា |
+|--------|----------|
+| `mysql_data` | Database (ការស្ទង់មតិ អ្នកប្រើ ចម្លើយ) |
+| `app_uploads` | ឯកសារដែលបានបង្ហោះពីការស្ទង់មតិ |
+| `app_gallery` | បណ្ណាល័យមេឌា |
+| `app_downloads` | ឯកសារនាំចេញដែលបានបង្កើត |
+| `app_audios` | ការថតសំឡេង |
+| `app_runtime` | ឯកសារ session និង cache PHP |
+| `app_aggregate` | ទិន្នន័យវិភាគដែលបានប្រមូល |
+
+---
+
+## ប្រតិបត្តិការទូទៅ
+
+### មើល log
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### ចាប់ផ្តើមកម្មវិធីឡើងវិញ
+
+```bash
+docker compose restart rtsurvey
+```
+
+### ចូលទៅ shell
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### រត់ database migration ដោយដៃ
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## ការអាប់ដេត
+
+image ត្រូវបានដាក់ tag `survey-public`។ ដើម្បីអាប់ដេតទៅកំណែចុងក្រោយបង្អស់:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Database migration ដំណើរការដោយស្វ័យប្រវត្តិនៅពេលចាប់ផ្តើមតាម entrypoint ផលិតកម្ម។
+
+---
+
+## ការបម្រុងទុក & ការស្ដារ
+
+### ការបម្រុងទុក database
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### ការស្ដារ database
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### ការបម្រុងទុកឯកសារដែលបានបង្ហោះ
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## Keycloak បង្កប់ (SSO ស្រេចចិត្ត)
+
+ឯកសារ compose ផលិតកម្មរួមបញ្ចូល container Keycloak ស្រេចចិត្តសម្រាប់ SSO។ វារំលែក instance MySQL ដូចគ្នា ហើយត្រូវបានធ្វើឱ្យដំណើរការតាម Docker Compose profile។
+
+<Callout type="info">
+Keycloak បង្កប់ត្រូវការ RAM យ៉ាងហោចណាស់ **4 GB**។ វាជាស្រេចចិត្ត — រំលង់ប្រសិនបើអ្នកមិនត្រូវការ SSO។
+</Callout>
+
+### បន្ថែមអថេរ Keycloak ទៅ `.env`
+
+```bash
+# Keycloak admin
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Keycloak database (created automatically in the shared MySQL on first run)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: full public URL of your server (Keycloak appends /auth automatically)
+KC_HOSTNAME=http://your-server:8091
+
+# Port Keycloak listens on (host)
+KEYCLOAK_PORT=8091
+
+# Tell the rtCloud app to connect to embedded Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+សេវា `keycloak` ត្រូវបានបញ្ចូលក្នុង `docker-compose.yml` ខាងលើ (ក្រោម profile `embed-keycloak` — វានឹងមិនចាប់ផ្តើម លុះត្រាតែអ្នកប្រើ `--profile embed-keycloak`)។
+
+បង្កើតថតនាំចូល (Keycloak នឹងចាប់ផ្តើមដោយគ្មានវា ប៉ុន្តែការផ្តល់ realm ដោយស្វ័យប្រវត្តិនឹងមិនដំណើរការ):
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### ចាប់ផ្តើមជាមួយ Keycloak
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+ដើម្បីចាប់ផ្តើមដោយគ្មាន Keycloak (លំនាំដើម):
+
+```bash
+docker compose up -d
+```
+
+### កុងសូល admin Keycloak
+
+នៅពេលដំណើរការ ចូលទៅ UI admin Keycloak នៅ:
+
+```
+http://your-server:8091/auth/admin
+```
+
+ចូលជាមួយ `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD`។
+
+---
+
+## ជំហានបន្ទាប់
+
+- **HTTPS** — ដាក់ nginx ឬ Caddy ក្នុងមុខ និងធ្វើតាមការណែនាំ [ការដំឡើង SSL](ssl-setup)
+- **SSO** — ភ្ជាប់ Azure AD ឬ Keycloak តាម [ការផ្ទៀងផ្ទាត់ SSO](sso-authentication)
+- **ការដាក់ពង្រាយពពក** — សូមមើល [អ្នកផ្តល់ Cloud](cloud-providers) សម្រាប់ការដំឡើងជាក់លាក់ក្នុង provider ជាមួយស្គ្រីបស្វ័យប្រវត្តិ

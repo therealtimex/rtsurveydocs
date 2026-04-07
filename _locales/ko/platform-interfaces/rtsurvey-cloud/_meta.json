@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "개요",
+  "dashboard-overview": "대시보드 개요",
+  "system-user": "시스템 및 사용자",
+  "manage-forms": "양식 관리",
+  "manage-submission": "제출 관리",
+  "manage-analysis": "분석",
+  "manage-quality": "품질 관리",
+  "manage-users": "사용자 관리"
 }

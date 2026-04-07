@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Nøglebegreber",
+  "app-api": "Applikations-API",
+  "appearance": "Udseende",
+  "grouping-questions": "Gruppering af spørgsmål",
+  "media": "Medie",
+  "multi-language": "Flersproget",
+  "repeats": "Gentagelser",
+  "logic": "Logik og udtryk",
   "question-types": "Spørgsmålstyper",
   "operators-and-functions": "Operatorer og funktioner",
   "advanced-features": "Avancerede udvidelser"

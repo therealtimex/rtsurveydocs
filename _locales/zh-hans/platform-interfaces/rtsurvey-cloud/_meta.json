@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "概述",
+  "dashboard-overview": "仪表板概述",
+  "system-user": "系统与用户",
+  "manage-forms": "管理表单",
+  "manage-submission": "管理提交",
+  "manage-analysis": "分析",
+  "manage-quality": "质量控制",
+  "manage-users": "管理用户"
 }

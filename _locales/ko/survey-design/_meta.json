@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "주요 개념",
+  "app-api": "애플리케이션 API",
+  "appearance": "외관",
+  "grouping-questions": "질문 그룹화",
+  "media": "미디어",
+  "multi-language": "다국어",
+  "repeats": "반복",
+  "logic": "논리 및 표현식",
   "question-types": "질문 유형",
   "operators-and-functions": "연산자 및 함수",
   "advanced-features": "고급 확장"

@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "त्वरित प्रारंभ",
+  "cloud-providers": "क्लाउड प्रदाता",
+  "self-host-docker": "Docker के साथ स्व-होस्ट",
+  "configuration": "कॉन्फ़िगरेशन",
+  "maintenance": "रखरखाव",
+  "ssl-setup": "SSL सेटअप",
+  "sso-authentication": "SSO प्रमाणीकरण"
 }

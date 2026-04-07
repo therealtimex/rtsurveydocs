@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "Rychlý start",
+  "cloud-providers": "Poskytovatelé cloudu",
+  "self-host-docker": "Vlastní hosting s Dockerem",
+  "configuration": "Konfigurace",
+  "maintenance": "Údržba",
+  "ssl-setup": "SSL nastavení",
+  "sso-authentication": "SSO ověřování"
 }

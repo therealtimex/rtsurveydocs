@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "الصلة (منطق التخطي)",
+  "constraint": "القيد",
+  "calculate": "الحساب",
+  "default": "الافتراضي",
+  "read-only": "للقراءة فقط"
 }

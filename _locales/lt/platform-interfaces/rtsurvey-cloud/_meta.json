@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "Apžvalga",
+  "dashboard-overview": "Prietaisų skydelio apžvalga",
+  "system-user": "Sistema ir vartotojas",
+  "manage-forms": "Tvarkyti formas",
+  "manage-submission": "Tvarkyti pateiktis",
+  "manage-analysis": "Analizė",
+  "manage-quality": "Kokybės kontrolė",
+  "manage-users": "Tvarkyti vartotojus"
 }

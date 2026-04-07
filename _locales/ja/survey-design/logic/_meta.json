@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Relevant (スキップロジック)",
+  "constraint": "制約",
+  "calculate": "計算",
+  "default": "デフォルト",
+  "read-only": "読み取り専用"
 }

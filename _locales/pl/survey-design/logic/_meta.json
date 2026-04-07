@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Relevant (logika pominięcia)",
+  "constraint": "Ograniczenie",
+  "calculate": "Obliczanie",
+  "default": "Domyślne",
+  "read-only": "Tylko do odczytu"
 }

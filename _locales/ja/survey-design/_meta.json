@@ -2,15 +2,15 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "主要概念",
+  "app-api": "アプリケーションAPI",
+  "appearance": "外観",
+  "grouping-questions": "質問のグループ化",
+  "media": "メディア",
+  "multi-language": "多言語対応",
+  "repeats": "繰り返し",
+  "logic": "ロジックと式",
   "question-types": "質問タイプ",
   "operators-and-functions": "演算子と関数",
-  "advanced-features": "Advanced extensions"
+  "advanced-features": "高度な機能"
 }

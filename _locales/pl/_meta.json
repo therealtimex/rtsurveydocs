@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "Strona główna",
   "getting-started": "Pierwsze kroki",
   "deployment": "Wdrożenie",
   "survey-design": "Projektowanie ankiet",
   "platform-interfaces": "Interfejs użytkownika",
-  "contact": "Contact Us",
-  "support": "Support",
+  "contact": "Kontakt",
+  "support": "Wsparcie",
   "sponsor": "Sponsor"
 }

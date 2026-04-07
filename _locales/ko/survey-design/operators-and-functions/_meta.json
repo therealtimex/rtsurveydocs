@@ -2,7 +2,7 @@
   "index": {
     "display": "hidden"
   },
-  "operators": "Operators",
-  "functions": "Functions",
-  "references": "References"
+  "operators": "연산자",
+  "functions": "함수",
+  "references": "참조"
 }

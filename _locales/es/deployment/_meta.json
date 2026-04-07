@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "Inicio rápido",
+  "cloud-providers": "Proveedores de nube",
+  "self-host-docker": "Alojamiento propio con Docker",
+  "configuration": "Configuración",
+  "maintenance": "Mantenimiento",
+  "ssl-setup": "Configuración SSL",
+  "sso-authentication": "Autenticación SSO"
 }

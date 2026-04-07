@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "ホーム",
   "getting-started": "はじめに",
   "deployment": "デプロイ",
   "survey-design": "調査設計",
   "platform-interfaces": "ユーザーインターフェース",
-  "contact": "Contact Us",
-  "support": "Support",
-  "sponsor": "Sponsor"
+  "contact": "お問い合わせ",
+  "support": "サポート",
+  "sponsor": "スポンサー"
 }

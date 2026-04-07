@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
+  "quick-start": "Быстрый старт",
+  "cloud-providers": "Облачные провайдеры",
+  "self-host-docker": "Самостоятельный хостинг с Docker",
+  "configuration": "Конфигурация",
+  "maintenance": "Обслуживание",
   "ssl-setup": "SSL Setup",
   "sso-authentication": "SSO Authentication"
 }

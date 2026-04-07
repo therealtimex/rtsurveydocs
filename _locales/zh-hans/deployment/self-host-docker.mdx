@@ -1,0 +1,446 @@
+---
+title: "使用 Docker 自托管"
+description: "使用公共 Docker 镜像在任何服务器上运行 rtSurvey — 无需云脚本。"
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+如果您想使用公共 Docker 镜像 `rtawebteam/rtcloud:survey-public` 在自己的服务器（VPS、裸机或本地机器）上运行 rtSurvey，请使用本指南。
+
+**无需 Docker Hub 登录** — 镜像是公开的。
+
+该容器将所有内容打包在单个镜像中：
+- Apache + PHP（应用服务器）
+- Shiny Server（分析仪表板，端口 3838）
+- Beanstalkd（后台任务队列）
+
+---
+
+## 要求
+
+### 服务器
+
+| 资源 | 最低 | 推荐 |
+|------|------|------|
+| 内存 | 4 GB | 8 GB |
+| 磁盘 | 50 GB | 100 GB SSD |
+| CPU | 2 vCPU | 4 vCPU |
+| 操作系统 | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### 软件
+
+- **Docker Engine 24.0+** — [安装指南](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — 随 Docker Desktop 提供；Linux 上：`apt install docker-compose-plugin`
+
+---
+
+## 设置
+
+<Steps>
+
+### 创建工作目录
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### 创建 `docker-compose.yml`
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # 可选：嵌入式 Keycloak SSO
+  # 启动方式：docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### 创建 `.env`
+
+```bash
+# Project
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Database
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Admin (set before first startup — cannot change via env after DB is created)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Ports (optional — defaults shown)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+启动前请更改 `MYSQL_ROOT_PASSWORD` 和 `MYSQL_PASSWORD`。生产环境中使用强随机字符串（32+ 个字符）。
+</Callout>
+
+### 启动服务栈
+
+```bash
+docker compose up -d
+```
+
+首次启动需要约 60–90 秒 — MySQL 在首次运行时初始化数据库。
+
+### 验证
+
+```bash
+# 检查所有容器是否正在运行
+docker compose ps
+
+# 检查应用健康状态
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## 首次登录
+
+健康检查通过后，打开浏览器：
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| 字段 | 值 |
+|------|-----|
+| 用户名 | `admin` |
+| 密码 | `.env` 中 `ADMIN_PASSWORD` 的值（默认为 `admin`） |
+
+<Callout type="warning">
+在首次启动前在 `.env` 中设置 `ADMIN_PASSWORD`。入口点在首次运行时设置该值 — 数据库初始化后更改无效。
+</Callout>
+
+---
+
+## 环境变量
+
+### 应用容器必需变量
+
+如果缺少以下任何变量，入口点将拒绝启动：
+
+| 变量 | 说明 |
+|------|------|
+| `PROJECT_ID` | 此实例的唯一标识符（字母数字，无空格） |
+| `PROJECT_URL` | 访问应用的域名或 IP（无 `http://` 前缀） |
+| `MYSQL_HOST` | MySQL 主机名 — 使用 Docker 服务名（如 `mysql`） |
+| `MYSQL_DATABASE` | 数据库名 |
+| `MYSQL_PASSWORD` | 数据库用户密码 |
+
+### MySQL 容器必需变量
+
+| 变量 | 说明 |
+|------|------|
+| `MYSQL_ROOT_PASSWORD` | MySQL root 密码（由 `mysql` 容器使用，非应用） |
+
+### 推荐变量
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `MYSQL_USER` | `smartsurvey` | 数据库用户名 |
+| `ADMIN_PASSWORD` | `admin` | 初始管理员密码 — **首次启动前设置**，数据库创建后无法通过 env 更改 |
+| `HTTP_PROTOCOL` | `https` | 不使用 SSL 时设为 `http` |
+| `PROJECT_PORT` | `80` | 用户连接的外部端口（非内部 Docker 端口） |
+| `PROJECT_TYPE` | `rtwork` | 平台类型 — 调查平台使用 `rtsurvey` |
+| `TZ` | `UTC` | 时区（如 `Asia/Bangkok`、`America/New_York`） |
+
+### 运行时变量
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `RUN_ENV` | `prod` | 环境模式（`prod` 或 `dev`） |
+| `RUN_MODE` | `admin` | 服务角色 — 单服务器设置使用 `admin` |
+| `GII_ENABLED` | `false` | 生产环境保持 `false`（Yii 代码生成器） |
+| `CSRF_VALIDATION_ENABLED` | `true` | CSRF 保护 — 保持 `true` |
+
+### 许可证变量
+
+| 变量 | 默认值 | 说明 |
+|------|--------|------|
+| `REQUIRE_LICENSE` | `false` | 设为 `true` 以强制许可证验证 |
+| `RTCLOUD_LICENSE_KEY` | — | 您的许可证密钥 — `REQUIRE_LICENSE=true` 时必需 |
+
+---
+
+## 数据持久化
+
+所有用户数据存储在命名的 Docker 卷中。这些卷在容器重启和镜像更新后依然保留。
+
+| 卷 | 内容 |
+|----|------|
+| `mysql_data` | 数据库（调查、用户、响应） |
+| `app_uploads` | 调查中的文件上传 |
+| `app_gallery` | 媒体库 |
+| `app_downloads` | 生成的导出文件 |
+| `app_audios` | 录音文件 |
+| `app_runtime` | PHP 会话和缓存文件 |
+| `app_aggregate` | 聚合分析数据 |
+
+---
+
+## 常见操作
+
+### 查看日志
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### 重启应用
+
+```bash
+docker compose restart rtsurvey
+```
+
+### 访问 Shell
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### 手动运行数据库迁移
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## 升级
+
+镜像标记为 `survey-public`。更新到最新版本：
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+数据库迁移通过生产入口点在启动时自动运行。
+
+---
+
+## 备份与恢复
+
+### 备份数据库
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### 恢复数据库
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### 备份上传文件
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## 嵌入式 Keycloak（可选 SSO）
+
+生产 compose 文件包含一个用于 SSO 的可选 Keycloak 容器。它共享同一个 MySQL 实例，通过 Docker Compose profile 激活。
+
+<Callout type="info">
+嵌入式 Keycloak 至少需要 **4 GB 内存**。这是可选的 — 如果不需要 SSO 可跳过。
+</Callout>
+
+### 将 Keycloak 变量添加到 `.env`
+
+```bash
+# Keycloak admin
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Keycloak database (created automatically in the shared MySQL on first run)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: full public URL of your server (Keycloak appends /auth automatically)
+KC_HOSTNAME=http://your-server:8091
+
+# Port Keycloak listens on (host)
+KEYCLOAK_PORT=8091
+
+# Tell the rtCloud app to connect to embedded Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+`keycloak` 服务已包含在上述 `docker-compose.yml` 中（在 `embed-keycloak` profile 下 — 除非使用 `--profile embed-keycloak` 否则不会启动）。
+
+创建导入目录（Keycloak 没有它也能启动，但领域自动配置将无法工作）：
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### 使用 Keycloak 启动
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+不使用 Keycloak 启动（默认）：
+
+```bash
+docker compose up -d
+```
+
+### Keycloak 管理控制台
+
+健康后，访问 Keycloak 管理界面：
+
+```
+http://your-server:8091/auth/admin
+```
+
+使用 `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD` 登录。
+
+---
+
+## 后续步骤
+
+- **HTTPS** — 在前面放置 nginx 或 Caddy 并遵循 [SSL 设置](ssl-setup) 指南
+- **SSO** — 通过 [SSO 认证](sso-authentication) 指南连接 Azure AD 或 Keycloak
+- **云部署** — 参阅 [云提供商](cloud-providers) 了解使用自动化脚本的提供商特定设置

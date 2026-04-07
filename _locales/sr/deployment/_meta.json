@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
+  "quick-start": "Brzi početak",
+  "cloud-providers": "Cloud provajderi",
+  "self-host-docker": "Sopstveni hosting sa Dockerom",
+  "configuration": "Konfiguracija",
+  "maintenance": "Održavanje",
   "ssl-setup": "SSL Setup",
   "sso-authentication": "SSO Authentication"
 }

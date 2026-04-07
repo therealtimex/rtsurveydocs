@@ -4,7 +4,7 @@
   },
   "android": "Android",
   "ios": "iOS",
-  "connection": "Connecting to Server",
-  "configuration": "Configuration",
-  "functionalities": "Functionalities"
+  "connection": "การเชื่อมต่อกับเซิร์ฟเวอร์",
+  "configuration": "การกำหนดค่า",
+  "functionalities": "ฟังก์ชันการทำงาน"
 }

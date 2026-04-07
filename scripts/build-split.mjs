@@ -70,8 +70,8 @@ async function buildLocale(locale) {
 
   // English root page files/dirs to stash
   const ENGLISH_DIRS = ['getting-started','deployment','survey-design','platform-interfaces'];
-  // Only stash _meta.json — root .mdx pages (index, contact, etc.) stay as English fallbacks
-  const ENGLISH_FILES = ['_meta.json'];
+  // Stash all English root files so locale builds don't overwrite them
+  const ENGLISH_FILES = ['_meta.json', 'index.mdx', 'contact.mdx', 'support.mdx', 'sponsor.mdx'];
 
   // Stash English root structure (copy+delete to handle Docker overlay fs)
   for (const d of ENGLISH_DIRS) {

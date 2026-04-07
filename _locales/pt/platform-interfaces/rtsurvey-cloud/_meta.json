@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "Visão Geral",
+  "dashboard-overview": "Visão Geral do Painel",
+  "system-user": "Sistema e Utilizador",
+  "manage-forms": "Gerir Formulários",
+  "manage-submission": "Gerir Submissões",
+  "manage-analysis": "Análise",
+  "manage-quality": "Controlo de Qualidade",
+  "manage-users": "Gerir Utilizadores"
 }

@@ -3,12 +3,12 @@
     "display": "hidden"
   },
   "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
+  "dynamic-question-type": "Динамічний тип питання",
+  "dynamic-search": "Динамічний пошук",
+  "exams": "Іспити",
+  "grid-layout": "Сіткове розташування",
   "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "images": "Зображення",
+  "repeats": "Розширені повтори",
   "webbox": "WebBox"
 }

@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
+  "quick-start": "快速开始",
+  "cloud-providers": "云服务提供商",
+  "self-host-docker": "使用 Docker 自托管",
+  "configuration": "配置",
+  "maintenance": "维护",
   "ssl-setup": "SSL Setup",
   "sso-authentication": "SSO Authentication"
 }

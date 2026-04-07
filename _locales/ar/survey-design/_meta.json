@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "المفاهيم الأساسية",
+  "app-api": "واجهة برمجة التطبيقات",
+  "appearance": "المظهر",
+  "grouping-questions": "تجميع الأسئلة",
+  "media": "الوسائط",
+  "multi-language": "متعدد اللغات",
+  "repeats": "التكرارات",
+  "logic": "المنطق والتعبيرات",
   "question-types": "أنواع الأسئلة",
   "operators-and-functions": "العوامل والدوال",
   "advanced-features": "الامتدادات المتقدمة"

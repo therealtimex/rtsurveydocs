@@ -1,0 +1,446 @@
+---
+title: "Pašmitināšana ar Docker"
+description: "Palaidiet rtSurvey jebkurā serverī, izmantojot publisko Docker attēlu — nav nepieciešami mākoņu skripti."
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+Izmantojiet šo rokasgrāmatu, ja vēlaties palaist rtSurvey savā serverī (VPS, bare metal vai lokālajā mašīnā), izmantojot publisko Docker attēlu `rtawebteam/rtcloud:survey-public`.
+
+**Nav nepieciešama Docker Hub pieteikšanās** — attēls ir publisks.
+
+Konteiners apvieno visu vienā attēlā:
+- Apache + PHP (lietotnes serveris)
+- Shiny Server (analītikas informācijas paneļi, ports 3838)
+- Beanstalkd (fona uzdevumu rinda)
+
+---
+
+## Prasības
+
+### Serveris
+
+| Resurss | Minimālais | Ieteicamais |
+|----------|---------|-------------|
+| RAM | 4 GB | 8 GB |
+| Disks | 50 GB | 100 GB SSD |
+| CPU | 2 vCPU | 4 vCPU |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Programmatūra
+
+- **Docker Engine 24.0+** — [instalēšanas rokasgrāmata](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — iekļauts Docker Desktop; Linux: `apt install docker-compose-plugin`
+
+---
+
+## Iestatīšana
+
+<Steps>
+
+### Izveidojiet darba direktoriju
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### Izveidojiet `docker-compose.yml`
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # Optional: Embedded Keycloak SSO
+  # Start with: docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### Izveidojiet `.env`
+
+```bash
+# Project
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Database
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Admin (set before first startup — cannot change via env after DB is created)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Ports (optional — defaults shown)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+Pirms startēšanas mainiet `MYSQL_ROOT_PASSWORD` un `MYSQL_PASSWORD`. Ražošanā izmantojiet stipras nejaušas virknes (32+ rakstzīmes).
+</Callout>
+
+### Palaidiet pakotni
+
+```bash
+docker compose up -d
+```
+
+Pirmā startēšana aizņem apmēram 60–90 sekundes — MySQL inicializē datu bāzi pirmajā palaišanā.
+
+### Pārbaudiet
+
+```bash
+# Check all containers are running
+docker compose ps
+
+# Check application health
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## Pirmā pieteikšanās
+
+Kad veselības pārbaude tiks izturēta, atveriet pārlūkprogrammu:
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| Lauks | Vērtība |
+|-------|-------|
+| Lietotājvārds | `admin` |
+| Parole | `ADMIN_PASSWORD` vērtība jūsu `.env` (noklusējums `admin`) |
+
+<Callout type="warning">
+Pirms pirmās startēšanas iestatiet `ADMIN_PASSWORD` savā `.env`. Ieejas punkts to iestata pirmajā palaišanā — mainot pēc datu bāzes inicializācijas nav ietekmes.
+</Callout>
+
+---
+
+## Vides mainīgie
+
+### Nepieciešami lietotnes konteinerim
+
+Ieejas punkts atteiks startēšanu, ja kāds no tiem trūks:
+
+| Mainīgais | Apraksts |
+|----------|-------------|
+| `PROJECT_ID` | Unikāls šīs instances identifikators (burtciparu, bez atstarpēm) |
+| `PROJECT_URL` | Domēns vai IP, no kurienes tiek piekļūts lietotnei (bez `http://` prefiksa) |
+| `MYSQL_HOST` | MySQL resursdatora nosaukums — izmantojiet Docker pakalpojuma nosaukumu (piem., `mysql`) |
+| `MYSQL_DATABASE` | Datu bāzes nosaukums |
+| `MYSQL_PASSWORD` | Datu bāzes lietotāja parole |
+
+### Nepieciešami MySQL konteinerim
+
+| Mainīgais | Apraksts |
+|----------|-------------|
+| `MYSQL_ROOT_PASSWORD` | MySQL saknes parole (ko izmanto `mysql` konteineris, nevis lietotne) |
+
+### Ieteicamie
+
+| Mainīgais | Noklusējums | Apraksts |
+|----------|---------|-------------|
+| `MYSQL_USER` | `smartsurvey` | Datu bāzes lietotājvārds |
+| `ADMIN_PASSWORD` | `admin` | Sākotnējā administratora parole — **iestatiet pirms pirmās startēšanas**, pēc DB izveidošanas nevar mainīt caur env |
+| `HTTP_PROTOCOL` | `https` | Iestatiet uz `http`, ja neizmantojat SSL |
+| `PROJECT_PORT` | `80` | Ārējais ports, kuram lietotāji pieslēdzas (nevis iekšējais Docker ports) |
+| `PROJECT_TYPE` | `rtwork` | Platformas tips — aptauju platformai izmantojiet `rtsurvey` |
+| `TZ` | `UTC` | Laika josla (piem., `Asia/Bangkok`, `America/New_York`) |
+
+### Izpildlaiks
+
+| Mainīgais | Noklusējums | Apraksts |
+|----------|---------|-------------|
+| `RUN_ENV` | `prod` | Vides režīms (`prod` vai `dev`) |
+| `RUN_MODE` | `admin` | Pakalpojuma loma — viena servera iestatīšanai izmantojiet `admin` |
+| `GII_ENABLED` | `false` | Ražošanā saglabājiet `false` (Yii kodu ģenerators) |
+| `CSRF_VALIDATION_ENABLED` | `true` | CSRF aizsardzība — saglabājiet `true` |
+
+### Licence
+
+| Mainīgais | Noklusējums | Apraksts |
+|----------|---------|-------------|
+| `REQUIRE_LICENSE` | `false` | Iestatiet uz `true`, lai piemērotu licences validāciju |
+| `RTCLOUD_LICENSE_KEY` | — | Jūsu licences atslēga — nepieciešama, kad `REQUIRE_LICENSE=true` |
+
+---
+
+## Datu noturība
+
+Visi lietotāja dati tiek glabāti nosauktajos Docker apjomos. Tie izdzīvo konteinera restartēšanu un attēla atjauninājumus.
+
+| Apjoms | Saturs |
+|--------|----------|
+| `mysql_data` | Datu bāze (aptaujas, lietotāji, atbildes) |
+| `app_uploads` | Failu augšupielādes no aptaujām |
+| `app_gallery` | Multivides bibliotēka |
+| `app_downloads` | Ģenerētie eksporta faili |
+| `app_audios` | Audio ieraksti |
+| `app_runtime` | PHP sesijas un kešatmiņas faili |
+| `app_aggregate` | Apkopotie analītikas dati |
+
+---
+
+## Izplatītās darbības
+
+### Skatīt žurnālus
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### Restartēt lietotni
+
+```bash
+docker compose restart rtsurvey
+```
+
+### Piekļūt apvalkam
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### Manuāli palaist datu bāzes migrācijas
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## Jauninājumi
+
+Attēlam ir taga `survey-public`. Lai atjauninātu uz jaunāko versiju:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Datu bāzes migrācijas tiek palaistas automātiski startēšanas laikā caur ražošanas ieejas punktu.
+
+---
+
+## Dublēšana un atjaunošana
+
+### Datu bāzes dublēšana
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### Datu bāzes atjaunošana
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### Augšupielādēto failu dublēšana
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## Iegultais Keycloak (izvēles SSO)
+
+Ražošanas compose failā ir iekļauts izvēles Keycloak konteiners SSO. Tas koplieto to pašu MySQL instanci un tiek aktivizēts caur Docker Compose profilu.
+
+<Callout type="info">
+Iegultajam Keycloak nepieciešami vismaz **4 GB RAM**. Tas ir izvēles — izlaidiet to, ja jums nav nepieciešams SSO.
+</Callout>
+
+### Pievienojiet Keycloak mainīgos `.env`
+
+```bash
+# Keycloak admin
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Keycloak database (created automatically in the shared MySQL on first run)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: full public URL of your server (Keycloak appends /auth automatically)
+KC_HOSTNAME=http://your-server:8091
+
+# Port Keycloak listens on (host)
+KEYCLOAK_PORT=8091
+
+# Tell the rtCloud app to connect to embedded Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+`keycloak` pakalpojums jau ir iekļauts iepriekš minētajā `docker-compose.yml` (zem `embed-keycloak` profila — tas netiks palaists, ja vien neizmantosiet `--profile embed-keycloak`).
+
+Izveidojiet importa direktoriju (Keycloak darbosies bez tā, bet sfēras automātiskā nodrošināšana nedarbosies):
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### Palaidiet ar Keycloak
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+Lai palaistu bez Keycloak (noklusējums):
+
+```bash
+docker compose up -d
+```
+
+### Keycloak administratora konsole
+
+Kad būs vesels, piekļūstiet Keycloak administratora UI:
+
+```
+http://your-server:8091/auth/admin
+```
+
+Piesakieties ar `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD`.
+
+---
+
+## Nākamie soļi
+
+- **HTTPS** — Novietojiet nginx vai Caddy priekšā un sekojiet [SSL iestatīšanas](ssl-setup) rokasgrāmatai
+- **SSO** — Pievienojiet Azure AD vai Keycloak caur [SSO autentifikācijas](sso-authentication) rokasgrāmatu
+- **Mākoņa izvietošana** — Skatiet [Mākoņa nodrošinātāji](cloud-providers) nodrošinātājam specifiskai iestatīšanai ar automatizētiem skriptiem

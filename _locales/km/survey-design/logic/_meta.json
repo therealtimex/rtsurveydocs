@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Relevant (តក្កៈលោត)",
+  "constraint": "ការដាក់កំហិត",
+  "calculate": "ការគណនា",
+  "default": "លំនាំដើម",
+  "read-only": "អានប៉ុណ្ណោះ"
 }

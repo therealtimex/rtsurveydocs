@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Klíčové koncepty",
+  "app-api": "Aplikační API",
+  "appearance": "Vzhled",
+  "grouping-questions": "Seskupování otázek",
+  "media": "Média",
+  "multi-language": "Více jazyků",
+  "repeats": "Opakování",
+  "logic": "Logika a výrazy",
   "question-types": "Typy otázek",
   "operators-and-functions": "Operátory a funkce",
   "advanced-features": "Pokročilá rozšíření"

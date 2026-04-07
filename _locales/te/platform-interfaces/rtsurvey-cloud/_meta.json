@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "అవలోకనం",
+  "dashboard-overview": "డాష్‌బోర్డ్ అవలోకనం",
+  "system-user": "సిస్టమ్ & వినియోగదారు",
+  "manage-forms": "ఫారమ్‌లను నిర్వహించండి",
+  "manage-submission": "సమర్పణలను నిర్వహించండి",
+  "manage-analysis": "విశ్లేషణ",
+  "manage-quality": "నాణ్యత నియంత్రణ",
+  "manage-users": "వినియోగదారులను నిర్వహించండి"
 }

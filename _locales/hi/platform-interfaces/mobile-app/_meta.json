@@ -4,7 +4,7 @@
   },
   "android": "Android",
   "ios": "iOS",
-  "connection": "Connecting to Server",
-  "configuration": "Configuration",
-  "functionalities": "Functionalities"
+  "connection": "सर्वर से कनेक्ट करना",
+  "configuration": "कॉन्फ़िगरेशन",
+  "functionalities": "कार्यक्षमताएँ"
 }

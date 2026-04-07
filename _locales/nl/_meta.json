@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "Thuis",
   "getting-started": "Aan de slag",
-  "deployment": "Deployment",
+  "deployment": "Implementatie",
   "survey-design": "Enquêteontwerp",
   "platform-interfaces": "Gebruikersinterface",
-  "contact": "Contact Us",
-  "support": "Support",
+  "contact": "Neem contact op",
+  "support": "Ondersteuning",
   "sponsor": "Sponsor"
 }

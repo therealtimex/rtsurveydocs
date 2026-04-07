@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Ключевые понятия",
+  "app-api": "API приложения",
+  "appearance": "Внешний вид",
+  "grouping-questions": "Группировка вопросов",
+  "media": "Медиа",
+  "multi-language": "Многоязычность",
+  "repeats": "Повторы",
+  "logic": "Логика и выражения",
   "question-types": "Типы вопросов",
   "operators-and-functions": "Операторы и функции",
   "advanced-features": "Расширенные возможности"

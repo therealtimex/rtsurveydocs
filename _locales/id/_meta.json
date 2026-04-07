@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "Beranda",
   "getting-started": "Memulai",
-  "deployment": "Deployment",
+  "deployment": "Penerapan",
   "survey-design": "Desain Survei",
   "platform-interfaces": "Antarmuka Pengguna",
-  "contact": "Contact Us",
-  "support": "Support",
+  "contact": "Hubungi Kami",
+  "support": "Dukungan",
   "sponsor": "Sponsor"
 }

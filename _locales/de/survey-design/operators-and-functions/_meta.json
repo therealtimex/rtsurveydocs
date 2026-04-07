@@ -2,7 +2,8 @@
   "index": {
     "display": "hidden"
   },
-  "operators": "Operators",
-  "functions": "Functions",
-  "references": "References"
+  "overview": "Übersicht",
+  "operators": "Operatoren",
+  "functions": "Funktionen",
+  "references": "Referenzen"
 }

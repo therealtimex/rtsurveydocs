@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Relevantti (ohituslogiikka)",
+  "constraint": "Rajoite",
+  "calculate": "Laske",
+  "default": "Oletus",
+  "read-only": "Vain luku"
 }

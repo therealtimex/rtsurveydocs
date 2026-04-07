@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "Koti",
   "getting-started": "Aloittaminen",
   "deployment": "Käyttöönotto",
   "survey-design": "Kyselyn suunnittelu",
   "platform-interfaces": "Käyttöliittymä",
-  "contact": "Contact Us",
-  "support": "Support",
-  "sponsor": "Sponsor"
+  "contact": "Ota yhteyttä",
+  "support": "Tuki",
+  "sponsor": "Sponsori"
 }

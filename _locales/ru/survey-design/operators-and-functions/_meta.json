@@ -2,7 +2,7 @@
   "index": {
     "display": "hidden"
   },
-  "operators": "Operators",
-  "functions": "Functions",
-  "references": "References"
+  "operators": "Операторы",
+  "functions": "Функции",
+  "references": "Справочник"
 }

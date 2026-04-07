@@ -1,0 +1,446 @@
+---
+title: "Itse isännöinti Dockerilla"
+description: "Suorita rtSurvey millä tahansa palvelimella julkista Docker-kuvaa käyttäen — ei pilvikomentosarjoja tarvita."
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+Käytä tätä opasta, jos haluat suorittaa rtSurveyn omalla palvelimellasi (VPS, bare metal tai paikallinen kone) julkista Docker-kuvaa `rtawebteam/rtcloud:survey-public` käyttäen.
+
+**Docker Hub -kirjautumista ei tarvita** — kuva on julkinen.
+
+Kontti sisältää kaiken yhdessä kuvassa:
+- Apache + PHP (sovelluspalvelin)
+- Shiny Server (analytiikkakoontinäytöt, portti 3838)
+- Beanstalkd (taustatöiden jono)
+
+---
+
+## Vaatimukset
+
+### Palvelin
+
+| Resurssi | Minimi | Suositeltu |
+|----------|--------|-----------|
+| RAM | 4 GB | 8 GB |
+| Levy | 50 GB | 100 GB SSD |
+| CPU | 2 vCPU | 4 vCPU |
+| Käyttöjärjestelmä | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Ohjelmisto
+
+- **Docker Engine 24.0+** — [asennusohje](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — sisältyy Docker Desktopiin; Linuxissa: `apt install docker-compose-plugin`
+
+---
+
+## Asennus
+
+<Steps>
+
+### Luo työhakemisto
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### Luo `docker-compose.yml`
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # Optional: Embedded Keycloak SSO
+  # Start with: docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### Luo `.env`
+
+```bash
+# Project
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Database
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Admin (set before first startup — cannot change via env after DB is created)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Ports (optional — defaults shown)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+Vaihda `MYSQL_ROOT_PASSWORD` ja `MYSQL_PASSWORD` ennen käynnistystä. Käytä tuotannossa vahvoja satunnaisia merkkijonoja (vähintään 32 merkkiä).
+</Callout>
+
+### Käynnistä pino
+
+```bash
+docker compose up -d
+```
+
+Ensimmäinen käynnistys kestää noin 60–90 sekuntia — MySQL alustaa tietokannan ensimmäisellä suorituskerralla.
+
+### Tarkista
+
+```bash
+# Check all containers are running
+docker compose ps
+
+# Check application health
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## Ensimmäinen kirjautuminen
+
+Kun terveystarkistus läpäistään, avaa selaimesi:
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| Kenttä | Arvo |
+|--------|------|
+| Käyttäjänimi | `admin` |
+| Salasana | `ADMIN_PASSWORD`-arvo `.env`-tiedostossasi (oletus: `admin`) |
+
+<Callout type="warning">
+Aseta `ADMIN_PASSWORD` `.env`-tiedostossasi ennen ensimmäistä käynnistystä. Entrypoint asettaa sen ensimmäisellä suorituskerralla — sen muuttamisella tietokannan alustamisen jälkeen ei ole vaikutusta.
+</Callout>
+
+---
+
+## Ympäristömuuttujat
+
+### Sovelluskontin vaatimat
+
+Entrypoint kieltäytyy käynnistymästä, jos jokin näistä puuttuu:
+
+| Muuttuja | Kuvaus |
+|----------|--------|
+| `PROJECT_ID` | Tämän instanssin yksilöllinen tunniste (aakkosnumeerinen, ei välilyöntejä) |
+| `PROJECT_URL` | Toimialue tai IP, jossa sovellukseen pääsee (ilman `http://`-etuliitettä) |
+| `MYSQL_HOST` | MySQL-isäntänimi — käytä Docker-palvelun nimeä (esim. `mysql`) |
+| `MYSQL_DATABASE` | Tietokannan nimi |
+| `MYSQL_PASSWORD` | Tietokannan käyttäjän salasana |
+
+### MySQL-kontin vaatimat
+
+| Muuttuja | Kuvaus |
+|----------|--------|
+| `MYSQL_ROOT_PASSWORD` | MySQL root -salasana (käytetään `mysql`-kontin, ei sovelluksen toimesta) |
+
+### Suositellut
+
+| Muuttuja | Oletus | Kuvaus |
+|----------|--------|--------|
+| `MYSQL_USER` | `smartsurvey` | Tietokannan käyttäjänimi |
+| `ADMIN_PASSWORD` | `admin` | Alkuperäinen järjestelmänvalvojan salasana — **aseta ennen ensimmäistä käynnistystä**, ei voi muuttaa ympäristömuuttujalla tietokannan luomisen jälkeen |
+| `HTTP_PROTOCOL` | `https` | Aseta `http`, jos SSL ei ole käytössä |
+| `PROJECT_PORT` | `80` | Ulkoinen portti, johon käyttäjät yhdistävät (ei sisäinen Docker-portti) |
+| `PROJECT_TYPE` | `rtwork` | Alustatyyppi — käytä `rtsurvey` kyselyalustalle |
+| `TZ` | `UTC` | Aikavyöhyke (esim. `Asia/Bangkok`, `America/New_York`) |
+
+### Suoritusaika
+
+| Muuttuja | Oletus | Kuvaus |
+|----------|--------|--------|
+| `RUN_ENV` | `prod` | Ympäristötila (`prod` tai `dev`) |
+| `RUN_MODE` | `admin` | Palvelun rooli — käytä `admin` yhden palvelimen asennukseen |
+| `GII_ENABLED` | `false` | Pidä `false` tuotannossa (Yii-koodigeneroija) |
+| `CSRF_VALIDATION_ENABLED` | `true` | CSRF-suojaus — pidä `true` |
+
+### Lisenssi
+
+| Muuttuja | Oletus | Kuvaus |
+|----------|--------|--------|
+| `REQUIRE_LICENSE` | `false` | Aseta `true` pakottaaksesi lisenssitarkistuksen |
+| `RTCLOUD_LICENSE_KEY` | — | Lisenssisi avain — vaaditaan kun `REQUIRE_LICENSE=true` |
+
+---
+
+## Tietojen pysyvyys
+
+Kaikki käyttäjätiedot tallennetaan nimettyihin Docker-volyymeihin. Nämä säilyvät kontin uudelleenkäynnistysten ja kuvan päivitysten läpi.
+
+| Volyymi | Sisältö |
+|---------|---------|
+| `mysql_data` | Tietokanta (kyselyt, käyttäjät, vastaukset) |
+| `app_uploads` | Kyselyistä ladatut tiedostot |
+| `app_gallery` | Mediakirjasto |
+| `app_downloads` | Luodut vientitiedostot |
+| `app_audios` | Äänitallenteet |
+| `app_runtime` | PHP-istunto- ja välimuistitiedostot |
+| `app_aggregate` | Koottu analytiikkadata |
+
+---
+
+## Yleiset toiminnot
+
+### Näytä lokit
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### Käynnistä sovellus uudelleen
+
+```bash
+docker compose restart rtsurvey
+```
+
+### Pääsy shelliin
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### Suorita tietokantamigraatiot manuaalisesti
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## Päivitykset
+
+Kuvalla on tunniste `survey-public`. Päivittääksesi uusimpaan versioon:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Tietokantamigraatiot suoritetaan automaattisesti käynnistyksen yhteydessä tuotantoentrypoint-skriptin kautta.
+
+---
+
+## Varmuuskopiointi ja palautus
+
+### Varmuuskopioi tietokanta
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### Palauta tietokanta
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### Varmuuskopioi ladatut tiedostot
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## Sisäänrakennettu Keycloak (valinnainen SSO)
+
+Tuotanto-compose-tiedosto sisältää valinnaisen Keycloak-kontin SSO:ta varten. Se jakaa saman MySQL-instanssin ja aktivoidaan Docker Compose -profiilin kautta.
+
+<Callout type="info">
+Sisäänrakennettu Keycloak vaatii vähintään **4 GB RAM**. Se on valinnainen — ohita tämä, jos et tarvitse SSO:ta.
+</Callout>
+
+### Lisää Keycloak-muuttujat `.env`-tiedostoon
+
+```bash
+# Keycloak admin
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Keycloak database (created automatically in the shared MySQL on first run)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: full public URL of your server (Keycloak appends /auth automatically)
+KC_HOSTNAME=http://your-server:8091
+
+# Port Keycloak listens on (host)
+KEYCLOAK_PORT=8091
+
+# Tell the rtCloud app to connect to embedded Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+`keycloak`-palvelu on jo sisällytetty yllä olevaan `docker-compose.yml`-tiedostoon (`embed-keycloak`-profiilin alla — se ei käynnisty, ellei käytä `--profile embed-keycloak`).
+
+Luo tuontihakemisto (Keycloak käynnistyy ilman sitä, mutta realm-automaattinen valmistelu ei toimi):
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### Käynnistä Keycloakin kanssa
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+Käynnistääksesi ilman Keycloakia (oletus):
+
+```bash
+docker compose up -d
+```
+
+### Keycloak-hallintakonsoli
+
+Kun se on terve, pääset Keycloakin hallintakäyttöliittymään osoitteessa:
+
+```
+http://your-server:8091/auth/admin
+```
+
+Kirjaudu sisään käyttäen `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD`.
+
+---
+
+## Seuraavat vaiheet
+
+- **HTTPS** — Aseta nginx tai Caddy eteen ja seuraa [SSL-asetukset](ssl-setup)-opasta
+- **SSO** — Yhdistä Azure AD tai Keycloak [SSO-todennus](sso-authentication)-oppaan kautta
+- **Pilvipalvelu** — Katso [Cloud Providers](cloud-providers) palvelukohtaiseen asennukseen automaattisilla skripteillä

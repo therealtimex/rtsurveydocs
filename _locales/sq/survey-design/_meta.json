@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
+  "key-concepts": "Konceptet Kryesore",
+  "app-api": "API i Aplikacionit",
+  "appearance": "Pamja",
+  "grouping-questions": "Grupimi i Pyetjeve",
   "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "multi-language": "Shumë-Gjuhësh",
+  "repeats": "Përsëritjet",
+  "logic": "Logjika & Shprehjet",
   "question-types": "Llojet e pyetjeve",
   "operators-and-functions": "Operatorët dhe Funksionet",
   "advanced-features": "Zgjerime të avancuara"

@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "نظرة عامة",
+  "dashboard-overview": "نظرة عامة على لوحة التحكم",
+  "system-user": "النظام والمستخدم",
+  "manage-forms": "إدارة النماذج",
+  "manage-submission": "إدارة البيانات المُرسلة",
+  "manage-analysis": "التحليل",
+  "manage-quality": "مراقبة الجودة",
+  "manage-users": "إدارة المستخدمين"
 }

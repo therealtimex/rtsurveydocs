@@ -3,12 +3,12 @@
     "display": "hidden"
   },
   "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
-  "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "dynamic-question-type": "Dynamický typ otázky",
+  "dynamic-search": "Dynamické vyhledávání",
+  "exams": "Zkoušky",
+  "grid-layout": "Mřížkové rozvržení",
+  "html-styling": "HTML stylování",
+  "images": "Obrázky",
+  "repeats": "Pokročilá opakování",
   "webbox": "WebBox"
 }

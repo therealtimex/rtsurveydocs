@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
+  "key-concepts": "Konsep Utama",
+  "app-api": "API Aplikasi",
+  "appearance": "Tampilan",
+  "grouping-questions": "Pengelompokan Pertanyaan",
   "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "multi-language": "Multi-Bahasa",
+  "repeats": "Pengulangan",
+  "logic": "Logika & Ekspresi",
   "question-types": "Tipe pertanyaan",
   "operators-and-functions": "Operator dan Fungsi",
   "advanced-features": "Ekstensi lanjutan"

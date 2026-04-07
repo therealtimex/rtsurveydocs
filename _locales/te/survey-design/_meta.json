@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "కీలక భావనలు",
+  "app-api": "అప్లికేషన్ API",
+  "appearance": "రూపం",
+  "grouping-questions": "ప్రశ్నల సమూహీకరణ",
+  "media": "మీడియా",
+  "multi-language": "బహు-భాష",
+  "repeats": "పునరావృత్తులు",
+  "logic": "లాజిక్ & వ్యక్తీకరణలు",
   "question-types": "ప్రశ్న రకాలు",
   "operators-and-functions": "ఆపరేటర్లు మరియు ఫంక్షన్‌లు",
   "advanced-features": "అధునాతన పొడిగింపులు"

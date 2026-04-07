@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "సంబంధిత (స్కిప్ లాజిక్)",
+  "constraint": "పరిమితి",
+  "calculate": "లెక్కింపు",
+  "default": "డిఫాల్ట్",
+  "read-only": "చదవడానికి మాత్రమే"
 }

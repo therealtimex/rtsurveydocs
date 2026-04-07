@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Relevant (логика пропуска)",
+  "constraint": "Ограничение",
+  "calculate": "Вычисление",
+  "default": "Значение по умолчанию",
+  "read-only": "Только для чтения"
 }

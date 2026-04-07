@@ -2,7 +2,7 @@
   "index": {
     "display": "hidden"
   },
-  "operators": "Operators",
-  "functions": "Functions",
-  "references": "References"
+  "operators": "运算符",
+  "functions": "函数",
+  "references": "参考资料"
 }

@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "Rask start",
+  "cloud-providers": "Skyleverandører",
+  "self-host-docker": "Selvhosting med Docker",
+  "configuration": "Konfigurasjon",
+  "maintenance": "Vedlikehold",
+  "ssl-setup": "SSL-oppsett",
+  "sso-authentication": "SSO-autentisering"
 }

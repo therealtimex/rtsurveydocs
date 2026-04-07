@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "Преглед",
+  "dashboard-overview": "Преглед на таблото",
+  "system-user": "Система и потребител",
+  "manage-forms": "Управление на формуляри",
+  "manage-submission": "Управление на подадени данни",
+  "manage-analysis": "Анализ",
+  "manage-quality": "Контрол на качеството",
+  "manage-users": "Управление на потребители"
 }

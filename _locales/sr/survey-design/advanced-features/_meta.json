@@ -2,13 +2,13 @@
   "index": {
     "display": "hidden"
   },
-  "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
+  "call-api": "Pozivanje API-ja",
+  "dynamic-question-type": "Dinamički tip pitanja",
+  "dynamic-search": "Dinamička pretraga",
+  "exams": "Ispiti",
+  "grid-layout": "Raspored mreže",
   "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "images": "Slike",
+  "repeats": "Napredna ponavljanja",
   "webbox": "WebBox"
 }

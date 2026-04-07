@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Aktualus (praleisti logiką)",
+  "constraint": "Apribojimas",
+  "calculate": "Skaičiuoti",
+  "default": "Numatytasis",
+  "read-only": "Tik skaityti"
 }

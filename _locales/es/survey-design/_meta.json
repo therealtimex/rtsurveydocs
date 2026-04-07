@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Conceptos clave",
+  "app-api": "API de aplicación",
+  "appearance": "Apariencia",
+  "grouping-questions": "Agrupación de preguntas",
+  "media": "Medios",
+  "multi-language": "Multiidioma",
+  "repeats": "Repeticiones",
+  "logic": "Lógica y expresiones",
   "question-types": "Tipos de pregunta",
   "operators-and-functions": "Operadores y funciones",
   "advanced-features": "Extensiones avanzadas"

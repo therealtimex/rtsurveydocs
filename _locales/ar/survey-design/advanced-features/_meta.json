@@ -3,12 +3,12 @@
     "display": "hidden"
   },
   "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
-  "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "dynamic-question-type": "نوع السؤال الديناميكي",
+  "dynamic-search": "البحث الديناميكي",
+  "exams": "الاختبارات",
+  "grid-layout": "تخطيط الشبكة",
+  "html-styling": "تنسيق HTML",
+  "images": "الصور",
+  "repeats": "التكرارات المتقدمة",
   "webbox": "WebBox"
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DocsThemeConfig } from 'nextra-theme-docs';
 import { useRouter } from 'next/router';
 
@@ -6,6 +6,19 @@ const LanguageSwitcher = () => {
   const { asPath } = useRouter();
   const [currentLocale, setCurrentLocale] = useState('en');
   const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click (avoids onBlur/onClick race condition)
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [isOpen]);
 
   const ALL_LANGUAGES = [
   {
@@ -174,8 +187,7 @@ const LanguageSwitcher = () => {
     }
 
     const currentPath = window.location.pathname;
-    let newPath = '';
-
+    
     // 1. Remove current locale prefix if it exists
     let cleanPath = currentPath;
     if (currentLocale !== 'en') {
@@ -183,26 +195,34 @@ const LanguageSwitcher = () => {
       cleanPath = currentPath.replace(regex, '/');
     }
 
-    // 2. Add new locale prefix if not switching to English
+    // 2. Ensure cleanPath doesn't have double slashes and has a single leading slash
+    cleanPath = '/' + cleanPath.replace(/\/+/g, '/').replace(/^\//, '');
+
+    // 3. Add new locale prefix if not switching to English
+    let newPath = '';
     if (locale === 'en') {
       newPath = cleanPath;
     } else {
-      newPath = `/${locale}${cleanPath === '/' ? '' : cleanPath}`;
+      newPath = `/${locale}${cleanPath === '/' ? '/' : cleanPath}`;
     }
 
-    // 3. Force absolute redirect to handle different static build roots
-    // Ensure we don't have double slashes
+    // 4. Final safety: ensure it ends with a slash (Nextra trailingSlash: true)
+    if (!newPath.endsWith('/')) {
+      newPath += '/';
+    }
+    
+    // Remove double slashes again just in case
     newPath = newPath.replace(/\/+/g, '/');
+
     window.location.href = newPath;
   };
 
   const currentLangName = ALL_LANGUAGES.find(l => l.code === currentLocale)?.name || 'English';
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
+    <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        onBlur={() => setTimeout(() => setIsOpen(false), 200)}
         style={{
           padding: '0.4rem 0.8rem',
           borderRadius: '6px',
@@ -247,7 +267,7 @@ const LanguageSwitcher = () => {
           {ALL_LANGUAGES.map(lang => (
             <div
               key={lang.code}
-              onClick={() => switchLanguage(lang.code)}
+              onMouseDown={(e) => { e.preventDefault(); switchLanguage(lang.code); }}
               style={{
                 padding: '8px 12px',
                 cursor: 'pointer',

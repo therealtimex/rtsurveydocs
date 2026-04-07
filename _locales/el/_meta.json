@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "Αρχική",
   "getting-started": "Ξεκινώντας",
   "deployment": "Ανάπτυξη",
   "survey-design": "Σχεδιασμός έρευνας",
   "platform-interfaces": "Διεπαφή χρήστη",
-  "contact": "Contact Us",
-  "support": "Support",
-  "sponsor": "Sponsor"
+  "contact": "Επικοινωνήστε μαζί μας",
+  "support": "Υποστήριξη",
+  "sponsor": "Χορηγός"
 }

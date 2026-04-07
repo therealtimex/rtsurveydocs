@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Relevant (sla-over-logica)",
+  "constraint": "Beperking",
+  "calculate": "Berekenen",
+  "default": "Standaard",
+  "read-only": "Alleen-lezen"
 }

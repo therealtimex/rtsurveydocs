@@ -3,12 +3,12 @@
     "display": "hidden"
   },
   "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
+  "dynamic-question-type": "गतिशील प्रश्न प्रकार",
+  "dynamic-search": "गतिशील खोज",
+  "exams": "परीक्षाएँ",
+  "grid-layout": "ग्रिड लेआउट",
   "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "images": "चित्र",
+  "repeats": "उन्नत दोहराव",
   "webbox": "WebBox"
 }

@@ -2,15 +2,15 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "គំនិតសំខាន់",
+  "app-api": "API កម្មវិធី",
+  "appearance": "រូបរាង",
+  "grouping-questions": "ការដាក់ក្រុមសំណួរ",
+  "media": "មេឌៀ",
+  "multi-language": "ពហុភាសា",
+  "repeats": "ការដដែលៗ",
+  "logic": "តក្កៈ & កន្សោម",
   "question-types": "ប្រភេទសំណួរ",
-  "operators-and-functions": "Operators and Functions",
-  "advanced-features": "Advanced Extensions"
+  "operators-and-functions": "ប្រតិបត្តិករ និងមុខងារ",
+  "advanced-features": "មុខងារកម្រិតខ្ពស់"
 }

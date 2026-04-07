@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "होम",
   "getting-started": "शुरुआत करें",
   "deployment": "तैनाती",
   "survey-design": "सर्वेक्षण डिज़ाइन",
   "platform-interfaces": "उपयोगकर्ता इंटरफ़ेस",
-  "contact": "Contact Us",
-  "support": "Support",
-  "sponsor": "Sponsor"
+  "contact": "हमसे संपर्क करें",
+  "support": "सहायता",
+  "sponsor": "प्रायोजक"
 }

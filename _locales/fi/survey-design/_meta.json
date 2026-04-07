@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
+  "key-concepts": "Keskeiset käsitteet",
+  "app-api": "Sovellus-API",
+  "appearance": "Ulkoasu",
+  "grouping-questions": "Kysymysten ryhmittely",
   "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "multi-language": "Monikielisyys",
+  "repeats": "Toistot",
+  "logic": "Logiikka ja lausekkeet",
   "question-types": "Kysymystyypit",
   "operators-and-functions": "Operaattorit ja funktiot",
   "advanced-features": "Edistyneet laajennukset"

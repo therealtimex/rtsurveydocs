@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Релевантност (логика на пропускане)",
+  "constraint": "Ограничение",
+  "calculate": "Изчисляване",
+  "default": "По подразбиране",
+  "read-only": "Само за четене"
 }

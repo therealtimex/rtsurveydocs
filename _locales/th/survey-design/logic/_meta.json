@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "เงื่อนไขแสดง (Skip Logic)",
+  "constraint": "ข้อจำกัด",
+  "calculate": "การคำนวณ",
+  "default": "ค่าเริ่มต้น",
+  "read-only": "อ่านอย่างเดียว"
 }

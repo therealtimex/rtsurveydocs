@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "Ana Sayfa",
   "getting-started": "Başlarken",
   "deployment": "Dağıtım",
   "survey-design": "Anket Tasarımı",
   "platform-interfaces": "Kullanıcı Arayüzü",
-  "contact": "Contact Us",
-  "support": "Support",
+  "contact": "Bize Ulaşın",
+  "support": "Destek",
   "sponsor": "Sponsor"
 }

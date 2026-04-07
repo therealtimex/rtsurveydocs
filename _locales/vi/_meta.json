@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "Trang chủ",
   "getting-started": "Bắt đầu",
   "deployment": "Triển khai",
   "survey-design": "Thiết kế Khảo sát",
   "platform-interfaces": "Giao diện người dùng",
-  "contact": "Contact Us",
-  "support": "Support",
-  "sponsor": "Sponsor"
+  "contact": "Liên hệ",
+  "support": "Hỗ trợ",
+  "sponsor": "Nhà tài trợ"
 }

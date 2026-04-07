@@ -3,12 +3,12 @@
     "display": "hidden"
   },
   "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
+  "dynamic-question-type": "동적 질문 유형",
+  "dynamic-search": "동적 검색",
+  "exams": "시험",
+  "grid-layout": "그리드 레이아웃",
   "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "images": "이미지",
+  "repeats": "고급 반복",
   "webbox": "WebBox"
 }

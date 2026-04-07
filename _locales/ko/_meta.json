@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "홈",
   "getting-started": "시작하기",
   "deployment": "배포",
   "survey-design": "설문 설계",
   "platform-interfaces": "사용자 인터페이스",
-  "contact": "Contact Us",
-  "support": "Support",
-  "sponsor": "Sponsor"
+  "contact": "문의하기",
+  "support": "지원",
+  "sponsor": "후원"
 }

@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "Главная",
   "getting-started": "Начало работы",
   "deployment": "Развёртывание",
   "survey-design": "Дизайн опроса",
   "platform-interfaces": "Интерфейс пользователя",
-  "contact": "Contact Us",
-  "support": "Support",
-  "sponsor": "Sponsor"
+  "contact": "Связаться с нами",
+  "support": "Поддержка",
+  "sponsor": "Спонсор"
 }

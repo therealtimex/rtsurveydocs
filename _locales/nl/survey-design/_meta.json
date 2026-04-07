@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
+  "key-concepts": "Kernconcepten",
+  "app-api": "Applicatie-API",
+  "appearance": "Uiterlijk",
+  "grouping-questions": "Vragen groeperen",
   "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "multi-language": "Meertalig",
+  "repeats": "Herhalingen",
+  "logic": "Logica en uitdrukkingen",
   "question-types": "Vraagtypen",
   "operators-and-functions": "Operatoren en functies",
   "advanced-features": "Geavanceerde uitbreidingen"

@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Galvenie jēdzieni",
+  "app-api": "Lietojumprogrammas API",
+  "appearance": "Izskats",
+  "grouping-questions": "Jautājumu grupēšana",
+  "media": "Mediji",
+  "multi-language": "Daudzvalodu",
+  "repeats": "Atkārtojumi",
+  "logic": "Loģika un izteiksmes",
   "question-types": "Jautājumu tipi",
   "operators-and-functions": "Operatori un funkcijas",
   "advanced-features": "Uzlabotas paplašinājumi"

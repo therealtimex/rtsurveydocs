@@ -2,10 +2,11 @@
   "index": {
     "display": "hidden"
   },
-  "quick-start": "Quick Start",
-  "cloud-providers": "Cloud Providers",
-  "configuration": "Configuration",
-  "maintenance": "Maintenance",
-  "ssl-setup": "SSL Setup",
-  "sso-authentication": "SSO Authentication"
+  "quick-start": "ចាប់ផ្តើមរហ័ស",
+  "cloud-providers": "អ្នកផ្តល់ Cloud",
+  "self-host-docker": "Self-Host ជាមួយ Docker",
+  "configuration": "ការកំណត់",
+  "maintenance": "ការថែទាំ",
+  "ssl-setup": "ការកំណត់ SSL",
+  "sso-authentication": "ការផ្ទៀងផ្ទាត់ SSO"
 }

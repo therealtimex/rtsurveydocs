@@ -1,10 +1,10 @@
 {
-  "index": "Home",
+  "index": "หน้าหลัก",
   "getting-started": "เริ่มต้นใช้งาน",
   "deployment": "การติดตั้ง",
   "survey-design": "การออกแบบแบบสำรวจ",
   "platform-interfaces": "อินเทอร์เฟซผู้ใช้",
-  "contact": "Contact Us",
-  "support": "Support",
-  "sponsor": "Sponsor"
+  "contact": "ติดต่อเรา",
+  "support": "การสนับสนุน",
+  "sponsor": "ผู้สนับสนุน"
 }

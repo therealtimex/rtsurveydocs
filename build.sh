@@ -12,6 +12,10 @@ LOCALES="${1:-}"
 echo "=== Building English ==="
 NODE_OPTIONS='--max-old-space-size=6144' yarn build
 
+echo "=== Saving English output to combined/en/ ==="
+mkdir -p combined/en
+cp -r out/. combined/en/
+
 if [ -n "$LOCALES" ]; then
   if [ "$LOCALES" = "all" ]; then
     echo "=== Building all locales ==="

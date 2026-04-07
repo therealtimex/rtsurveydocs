@@ -2,9 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "relevant": "Relevant (Skip Logic)",
-  "constraint": "Constraint",
-  "calculate": "Calculate",
-  "default": "Default",
-  "read-only": "Read-Only"
+  "relevant": "Relevantno (Logika preskoka)",
+  "constraint": "Ograničenje",
+  "calculate": "Izračunavanje",
+  "default": "Podrazumevano",
+  "read-only": "Samo za čitanje"
 }

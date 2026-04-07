@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "ទិដ្ឋភាពទូទៅ",
+  "dashboard-overview": "ទិដ្ឋភាពទូទៅនៃផ្ទាំងគ្រប់គ្រង",
+  "system-user": "ប្រព័ន្ធ & អ្នកប្រើ",
+  "manage-forms": "គ្រប់គ្រងទម្រង់",
+  "manage-submission": "គ្រប់គ្រងការដាក់ស្នើ",
+  "manage-analysis": "វិភាគ",
+  "manage-quality": "ការគ្រប់គ្រងគុណភាព",
+  "manage-users": "គ្រប់គ្រងអ្នកប្រើ"
 }

@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "Oversigt",
+  "dashboard-overview": "Oversigt over dashboard",
+  "system-user": "System og bruger",
+  "manage-forms": "Administrer formularer",
+  "manage-submission": "Administrer indsendelser",
+  "manage-analysis": "Analyse",
+  "manage-quality": "Kvalitetskontrol",
+  "manage-users": "Administrer brugere"
 }

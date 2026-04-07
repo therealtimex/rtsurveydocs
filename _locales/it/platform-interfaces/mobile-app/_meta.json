@@ -4,7 +4,7 @@
   },
   "android": "Android",
   "ios": "iOS",
-  "connection": "Connecting to Server",
-  "configuration": "Configuration",
-  "functionalities": "Functionalities"
+  "connection": "Connessione al server",
+  "configuration": "Configurazione",
+  "functionalities": "Funzionalità"
 }

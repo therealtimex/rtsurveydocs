@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Основні концепції",
+  "app-api": "API додатку",
+  "appearance": "Зовнішній вигляд",
+  "grouping-questions": "Групування питань",
+  "media": "Медіа",
+  "multi-language": "Багатомовність",
+  "repeats": "Повтори",
+  "logic": "Логіка та вирази",
   "question-types": "Типи питань",
   "operators-and-functions": "Оператори та функції",
   "advanced-features": "Розширені розширення"

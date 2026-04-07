@@ -2,14 +2,14 @@
   "index": {
     "display": "hidden"
   },
-  "key-concepts": "Key Concepts",
-  "app-api": "Application API",
-  "appearance": "Appearance",
-  "grouping-questions": "Grouping Questions",
-  "media": "Media",
-  "multi-language": "Multi-Language",
-  "repeats": "Repeats",
-  "logic": "Logic & Expressions",
+  "key-concepts": "Temel Kavramlar",
+  "app-api": "Uygulama API",
+  "appearance": "Görünüm",
+  "grouping-questions": "Soruları Gruplama",
+  "media": "Medya",
+  "multi-language": "Çok Dilli",
+  "repeats": "Tekrarlar",
+  "logic": "Mantık & İfadeler",
   "question-types": "Soru Türleri",
   "operators-and-functions": "Operatörler ve Fonksiyonlar",
   "advanced-features": "Gelişmiş Uzantılar"

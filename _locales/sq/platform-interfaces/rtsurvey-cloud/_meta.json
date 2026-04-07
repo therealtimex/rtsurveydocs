@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "Pasqyrë e Përgjithshme",
+  "dashboard-overview": "Pasqyrë e Panelit",
+  "system-user": "Sistemi & Përdoruesi",
+  "manage-forms": "Menaxhimi i Formularëve",
+  "manage-submission": "Menaxhimi i Dërgimeve",
+  "manage-analysis": "Analiza",
+  "manage-quality": "Kontrolli i Cilësisë",
+  "manage-users": "Menaxhimi i Përdoruesve"
 }

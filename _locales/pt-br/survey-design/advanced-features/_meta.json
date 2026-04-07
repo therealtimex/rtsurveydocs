@@ -3,12 +3,12 @@
     "display": "hidden"
   },
   "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
+  "dynamic-question-type": "Tipo de pergunta dinâmica",
+  "dynamic-search": "Pesquisa dinâmica",
+  "exams": "Provas",
+  "grid-layout": "Layout em grade",
   "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "images": "Imagens",
+  "repeats": "Repetições avançadas",
   "webbox": "WebBox"
 }

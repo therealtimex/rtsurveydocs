@@ -3,12 +3,12 @@
     "display": "hidden"
   },
   "call-api": "Call API",
-  "dynamic-question-type": "Dynamic Question Type",
-  "dynamic-search": "Dynamic Search",
-  "exams": "Exams",
-  "grid-layout": "Grid Layout",
+  "dynamic-question-type": "動的質問タイプ",
+  "dynamic-search": "動的検索",
+  "exams": "試験",
+  "grid-layout": "グリッドレイアウト",
   "html-styling": "HTML Styling",
-  "images": "Images",
-  "repeats": "Advanced Repeats",
+  "images": "画像",
+  "repeats": "高度な繰り返し",
   "webbox": "WebBox"
 }

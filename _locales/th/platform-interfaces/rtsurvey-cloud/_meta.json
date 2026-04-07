@@ -2,12 +2,12 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
-  "dashboard-overview": "Dashboard Overview",
-  "system-user": "System & User",
-  "manage-forms": "Manage Forms",
-  "manage-submission": "Manage Submissions",
-  "manage-analysis": "Analysis",
-  "manage-quality": "Quality Control",
-  "manage-users": "Manage Users"
+  "overview": "ภาพรวม",
+  "dashboard-overview": "ภาพรวมแดชบอร์ด",
+  "system-user": "ระบบและผู้ใช้",
+  "manage-forms": "จัดการแบบฟอร์ม",
+  "manage-submission": "จัดการการส่ง",
+  "manage-analysis": "การวิเคราะห์",
+  "manage-quality": "การควบคุมคุณภาพ",
+  "manage-users": "จัดการผู้ใช้"
 }

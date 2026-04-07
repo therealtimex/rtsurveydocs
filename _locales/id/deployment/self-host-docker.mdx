@@ -1,0 +1,446 @@
+---
+title: "Self-Host dengan Docker"
+description: "Jalankan rtSurvey di server mana pun menggunakan image Docker publik — tanpa perlu skrip cloud."
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+Gunakan panduan ini jika Anda ingin menjalankan rtSurvey di server Anda sendiri (VPS, bare metal, atau mesin lokal) menggunakan image Docker publik `rtawebteam/rtcloud:survey-public`.
+
+**Tidak diperlukan login Docker Hub** — image bersifat publik.
+
+Container menggabungkan semuanya dalam satu image:
+- Apache + PHP (server aplikasi)
+- Shiny Server (dasbor analitik, port 3838)
+- Beanstalkd (antrian tugas latar belakang)
+
+---
+
+## Persyaratan
+
+### Server
+
+| Sumber Daya | Minimum | Rekomendasi |
+|----------|---------|-------------|
+| RAM | 4 GB | 8 GB |
+| Disk | 50 GB | 100 GB SSD |
+| CPU | 2 vCPU | 4 vCPU |
+| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Perangkat Lunak
+
+- **Docker Engine 24.0+** — [panduan instalasi](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — disertakan dengan Docker Desktop; di Linux: `apt install docker-compose-plugin`
+
+---
+
+## Pengaturan
+
+<Steps>
+
+### Buat direktori kerja
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### Buat `docker-compose.yml`
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # Opsional: Keycloak SSO Tertanam
+  # Mulai dengan: docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### Buat `.env`
+
+```bash
+# Project
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Database
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Admin (set before first startup — cannot change via env after DB is created)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Ports (optional — defaults shown)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+Ubah `MYSQL_ROOT_PASSWORD` dan `MYSQL_PASSWORD` sebelum memulai. Gunakan string acak yang kuat (32+ karakter) di lingkungan produksi.
+</Callout>
+
+### Mulai stack
+
+```bash
+docker compose up -d
+```
+
+Startup pertama membutuhkan sekitar 60–90 detik — MySQL menginisialisasi database pada jalankan pertama.
+
+### Verifikasi
+
+```bash
+# Periksa semua container berjalan
+docker compose ps
+
+# Periksa kesehatan aplikasi
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## Login Pertama
+
+Setelah pemeriksaan kesehatan lulus, buka browser Anda:
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| Kolom | Nilai |
+|-------|-------|
+| Username | `admin` |
+| Password | nilai `ADMIN_PASSWORD` di `.env` Anda (default: `admin`) |
+
+<Callout type="warning">
+Atur `ADMIN_PASSWORD` di `.env` Anda sebelum startup pertama. Titik masuk mengaturnya pada jalankan pertama — mengubahnya setelah database diinisialisasi tidak berpengaruh.
+</Callout>
+
+---
+
+## Variabel Lingkungan
+
+### Diperlukan oleh container aplikasi
+
+Titik masuk akan menolak untuk memulai jika ada yang hilang:
+
+| Variabel | Deskripsi |
+|----------|-------------|
+| `PROJECT_ID` | Pengenal unik untuk instance ini (alfanumerik, tanpa spasi) |
+| `PROJECT_URL` | Domain atau IP tempat aplikasi diakses (tanpa awalan `http://`) |
+| `MYSQL_HOST` | Nama host MySQL — gunakan nama layanan Docker (mis. `mysql`) |
+| `MYSQL_DATABASE` | Nama database |
+| `MYSQL_PASSWORD` | Kata sandi pengguna database |
+
+### Diperlukan oleh container MySQL
+
+| Variabel | Deskripsi |
+|----------|-------------|
+| `MYSQL_ROOT_PASSWORD` | Kata sandi root MySQL (digunakan oleh container `mysql`, bukan aplikasi) |
+
+### Rekomendasi
+
+| Variabel | Default | Deskripsi |
+|----------|---------|-------------|
+| `MYSQL_USER` | `smartsurvey` | Nama pengguna database |
+| `ADMIN_PASSWORD` | `admin` | Kata sandi admin awal — **atur sebelum startup pertama**, tidak dapat diubah melalui env setelah DB dibuat |
+| `HTTP_PROTOCOL` | `https` | Atur ke `http` jika tidak menggunakan SSL |
+| `PROJECT_PORT` | `80` | Port eksternal yang digunakan pengguna untuk terhubung (bukan port Docker internal) |
+| `PROJECT_TYPE` | `rtwork` | Tipe platform — gunakan `rtsurvey` untuk platform survei |
+| `TZ` | `UTC` | Zona waktu (mis. `Asia/Bangkok`, `America/New_York`) |
+
+### Runtime
+
+| Variabel | Default | Deskripsi |
+|----------|---------|-------------|
+| `RUN_ENV` | `prod` | Mode lingkungan (`prod` atau `dev`) |
+| `RUN_MODE` | `admin` | Peran layanan — gunakan `admin` untuk setup server tunggal |
+| `GII_ENABLED` | `false` | Pertahankan `false` di produksi (generator kode Yii) |
+| `CSRF_VALIDATION_ENABLED` | `true` | Perlindungan CSRF — pertahankan `true` |
+
+### Lisensi
+
+| Variabel | Default | Deskripsi |
+|----------|---------|-------------|
+| `REQUIRE_LICENSE` | `false` | Atur ke `true` untuk menegakkan validasi lisensi |
+| `RTCLOUD_LICENSE_KEY` | — | Kunci lisensi Anda — diperlukan saat `REQUIRE_LICENSE=true` |
+
+---
+
+## Persistensi Data
+
+Semua data pengguna disimpan dalam volume Docker bernama. Ini bertahan melewati restart container dan pembaruan image.
+
+| Volume | Konten |
+|--------|----------|
+| `mysql_data` | Database (survei, pengguna, respons) |
+| `app_uploads` | Unggahan file dari survei |
+| `app_gallery` | Perpustakaan media |
+| `app_downloads` | File ekspor yang dihasilkan |
+| `app_audios` | Rekaman audio |
+| `app_runtime` | File sesi dan cache PHP |
+| `app_aggregate` | Data analitik yang diagregasikan |
+
+---
+
+## Operasi Umum
+
+### Lihat log
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### Restart aplikasi
+
+```bash
+docker compose restart rtsurvey
+```
+
+### Akses shell
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### Jalankan migrasi database secara manual
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## Pembaruan
+
+Image diberi tag `survey-public`. Untuk memperbarui ke versi terbaru:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Migrasi database berjalan secara otomatis saat startup melalui titik masuk produksi.
+
+---
+
+## Backup & Restore
+
+### Backup database
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### Restore database
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### Backup file yang diunggah
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## Keycloak Tertanam (SSO Opsional)
+
+File compose produksi menyertakan container Keycloak opsional untuk SSO. Ini berbagi instance MySQL yang sama dan diaktifkan melalui profil Docker Compose.
+
+<Callout type="info">
+Keycloak tertanam membutuhkan setidaknya **4 GB RAM**. Ini opsional — lewati jika Anda tidak memerlukan SSO.
+</Callout>
+
+### Tambahkan variabel Keycloak ke `.env`
+
+```bash
+# Keycloak admin
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Keycloak database (created automatically in the shared MySQL on first run)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: full public URL of your server (Keycloak appends /auth automatically)
+KC_HOSTNAME=http://your-server:8091
+
+# Port Keycloak listens on (host)
+KEYCLOAK_PORT=8091
+
+# Tell the rtCloud app to connect to embedded Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+Layanan `keycloak` sudah disertakan dalam `docker-compose.yml` di atas (di bawah profil `embed-keycloak` — tidak akan mulai kecuali Anda menggunakan `--profile embed-keycloak`).
+
+Buat direktori impor (Keycloak akan mulai tanpanya tetapi penyediaan realm otomatis tidak akan berfungsi):
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### Mulai dengan Keycloak
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+Untuk memulai tanpa Keycloak (default):
+
+```bash
+docker compose up -d
+```
+
+### Konsol admin Keycloak
+
+Setelah sehat, akses UI admin Keycloak di:
+
+```
+http://your-server:8091/auth/admin
+```
+
+Login dengan `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD`.
+
+---
+
+## Langkah Selanjutnya
+
+- **HTTPS** — Tempatkan nginx atau Caddy di depan dan ikuti panduan [Pengaturan SSL](ssl-setup)
+- **SSO** — Hubungkan Azure AD atau Keycloak melalui panduan [Autentikasi SSO](sso-authentication)
+- **Deployment cloud** — Lihat [Penyedia Cloud](cloud-providers) untuk pengaturan khusus penyedia dengan skrip otomatis

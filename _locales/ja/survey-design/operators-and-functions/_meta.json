@@ -2,7 +2,7 @@
   "index": {
     "display": "hidden"
   },
-  "operators": "Operators",
-  "functions": "Functions",
-  "references": "References"
+  "operators": "演算子",
+  "functions": "関数",
+  "references": "参照"
 }

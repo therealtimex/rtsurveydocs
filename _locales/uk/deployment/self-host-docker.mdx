@@ -1,0 +1,446 @@
+---
+title: "Самостійне розгортання за допомогою Docker"
+description: "Запустіть rtSurvey на будь-якому сервері за допомогою публічного образу Docker — без хмарних скриптів."
+---
+
+import { Callout, Steps } from 'nextra/components'
+
+Використовуйте цей посібник, якщо хочете запустити rtSurvey на власному сервері (VPS, bare metal або локальна машина) за допомогою публічного образу Docker `rtawebteam/rtcloud:survey-public`.
+
+**Вхід до Docker Hub не потрібен** — образ є публічним.
+
+Контейнер об'єднує все в одному образі:
+- Apache + PHP (сервер додатків)
+- Shiny Server (аналітичні панелі, порт 3838)
+- Beanstalkd (черга фонових завдань)
+
+---
+
+## Вимоги
+
+### Сервер
+
+| Ресурс | Мінімум | Рекомендовано |
+|--------|---------|---------------|
+| RAM | 4 ГБ | 8 ГБ |
+| Диск | 50 ГБ | 100 ГБ SSD |
+| CPU | 2 vCPU | 4 vCPU |
+| ОС | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+
+### Програмне забезпечення
+
+- **Docker Engine 24.0+** — [посібник з встановлення](https://docs.docker.com/engine/install/ubuntu/)
+- **Docker Compose v2.0+** — входить до Docker Desktop; на Linux: `apt install docker-compose-plugin`
+
+---
+
+## Налаштування
+
+<Steps>
+
+### Створіть робочу директорію
+
+```bash
+mkdir -p /opt/rtsurvey && cd /opt/rtsurvey
+```
+
+### Створіть `docker-compose.yml`
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rtsurvey-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_unicode_ci
+      --sql-mode=NO_ENGINE_SUBSTITUTION
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-smartsurvey}
+      MYSQL_USER: ${MYSQL_USER:-smartsurvey}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  rtsurvey:
+    image: rtawebteam/rtcloud:survey-public
+    container_name: rtsurvey-app
+    restart: unless-stopped
+    entrypoint: ["/bin/entrypoint-production.sh"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+      - "${SHINY_PORT:-3838}:3838"
+    env_file:
+      - .env
+    volumes:
+      - app_uploads:/var/www/html/smartsurvey/uploads
+      - app_audios:/var/www/html/smartsurvey/audios
+      - app_downloads:/var/www/html/smartsurvey/downloads
+      - app_gallery:/var/www/html/smartsurvey/gallery
+      - app_tmp:/var/www/html/smartsurvey/tmp
+      - app_cache:/var/www/html/smartsurvey/cache
+      - app_runtime:/var/www/html/smartsurvey/protected/runtime
+      - app_assets:/var/www/html/smartsurvey/assets
+      - app_aggregate:/var/www/html/smartsurvey/aggregate
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  # Необов'язково: вбудований Keycloak SSO
+  # Запустіть за допомогою: docker compose --profile embed-keycloak up -d
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: rtsurvey-keycloak
+    restart: unless-stopped
+    profiles:
+      - embed-keycloak
+    command: start --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: ${KC_HOSTNAME}
+      KC_HOSTNAME_STRICT: "false"
+      KC_DB: mysql
+      KC_DB_URL_DATABASE: ${KEYCLOAK_DB:-keycloak}
+      KC_DB_URL_HOST: mysql
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import
+    ports:
+      - "${KEYCLOAK_PORT:-8091}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - rtsurvey-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+volumes:
+  mysql_data:
+  app_uploads:
+  app_audios:
+  app_downloads:
+  app_gallery:
+  app_tmp:
+  app_cache:
+  app_runtime:
+  app_assets:
+  app_aggregate:
+
+networks:
+  rtsurvey-net:
+    driver: bridge
+```
+
+### Створіть `.env`
+
+```bash
+# Project
+PROJECT_ID=mysurvey
+PROJECT_TYPE=rtsurvey
+PROJECT_URL=your-server-ip-or-domain
+HTTP_PROTOCOL=http
+TZ=UTC
+
+# Database
+MYSQL_HOST=mysql
+MYSQL_DATABASE=smartsurvey
+MYSQL_USER=smartsurvey
+MYSQL_ROOT_PASSWORD=change-this-root-password
+MYSQL_PASSWORD=change-this-app-password
+
+# Admin (set before first startup — cannot change via env after DB is created)
+ADMIN_PASSWORD=change-this-admin-password
+
+# Runtime
+RUN_ENV=prod
+RUN_MODE=admin
+GII_ENABLED=false
+CSRF_VALIDATION_ENABLED=true
+
+# Ports (optional — defaults shown)
+APP_PORT=8080
+SHINY_PORT=3838
+```
+
+<Callout type="warning">
+Змініть `MYSQL_ROOT_PASSWORD` та `MYSQL_PASSWORD` перед запуском. Використовуйте надійні випадкові рядки (32+ символи) у виробничому середовищі.
+</Callout>
+
+### Запустіть стек
+
+```bash
+docker compose up -d
+```
+
+Перший запуск займає близько 60–90 секунд — MySQL ініціалізує базу даних при першому запуску.
+
+### Перевірте
+
+```bash
+# Перевірте, чи всі контейнери запущені
+docker compose ps
+
+# Перевірте стан додатку
+curl http://localhost:8080/health
+```
+
+</Steps>
+
+---
+
+## Перший вхід
+
+Після успішної перевірки стану відкрийте браузер:
+
+```
+http://your-server:8080/cpms/cpmsSite/login
+```
+
+| Поле | Значення |
+|------|----------|
+| Ім'я користувача | `admin` |
+| Пароль | значення `ADMIN_PASSWORD` у вашому `.env` (за замовчуванням `admin`) |
+
+<Callout type="warning">
+Встановіть `ADMIN_PASSWORD` у вашому `.env` перед першим запуском. Точка входу встановлює його під час першого запуску — зміна після ініціалізації бази даних не матиме ефекту.
+</Callout>
+
+---
+
+## Змінні середовища
+
+### Обов'язкові для контейнера додатку
+
+Точка входу відмовиться запускатися, якщо будь-яка з них відсутня:
+
+| Змінна | Опис |
+|--------|------|
+| `PROJECT_ID` | Унікальний ідентифікатор для цього екземпляру (буквено-цифровий, без пробілів) |
+| `PROJECT_URL` | Домен або IP, де доступний додаток (без префіксу `http://`) |
+| `MYSQL_HOST` | Ім'я хосту MySQL — використовуйте ім'я сервісу Docker (наприклад, `mysql`) |
+| `MYSQL_DATABASE` | Назва бази даних |
+| `MYSQL_PASSWORD` | Пароль користувача бази даних |
+
+### Обов'язкові для контейнера MySQL
+
+| Змінна | Опис |
+|--------|------|
+| `MYSQL_ROOT_PASSWORD` | Пароль root MySQL (використовується контейнером `mysql`, не додатком) |
+
+### Рекомендовані
+
+| Змінна | За замовчуванням | Опис |
+|--------|-----------------|------|
+| `MYSQL_USER` | `smartsurvey` | Ім'я користувача бази даних |
+| `ADMIN_PASSWORD` | `admin` | Початковий пароль адміністратора — **встановіть перед першим запуском**, не можна змінити через env після створення БД |
+| `HTTP_PROTOCOL` | `https` | Встановіть `http`, якщо не використовується SSL |
+| `PROJECT_PORT` | `80` | Зовнішній порт, до якого підключаються користувачі (не внутрішній порт Docker) |
+| `PROJECT_TYPE` | `rtwork` | Тип платформи — використовуйте `rtsurvey` для платформи опитувань |
+| `TZ` | `UTC` | Часовий пояс (наприклад, `Asia/Bangkok`, `America/New_York`) |
+
+### Час виконання
+
+| Змінна | За замовчуванням | Опис |
+|--------|-----------------|------|
+| `RUN_ENV` | `prod` | Режим середовища (`prod` або `dev`) |
+| `RUN_MODE` | `admin` | Роль сервісу — використовуйте `admin` для одно-серверного налаштування |
+| `GII_ENABLED` | `false` | Зберігайте `false` у виробництві (генератор коду Yii) |
+| `CSRF_VALIDATION_ENABLED` | `true` | Захист CSRF — зберігайте `true` |
+
+### Ліцензія
+
+| Змінна | За замовчуванням | Опис |
+|--------|-----------------|------|
+| `REQUIRE_LICENSE` | `false` | Встановіть `true` для примусової перевірки ліцензії |
+| `RTCLOUD_LICENSE_KEY` | — | Ваш ліцензійний ключ — потрібен, коли `REQUIRE_LICENSE=true` |
+
+---
+
+## Збереження даних
+
+Усі дані користувачів зберігаються у іменованих томах Docker. Вони зберігаються при перезапуску контейнерів та оновленнях образів.
+
+| Том | Вміст |
+|-----|-------|
+| `mysql_data` | База даних (опитування, користувачі, відповіді) |
+| `app_uploads` | Завантажені файли з опитувань |
+| `app_gallery` | Медіатека |
+| `app_downloads` | Згенеровані файли експорту |
+| `app_audios` | Аудіозаписи |
+| `app_runtime` | Файли сесій та кешу PHP |
+| `app_aggregate` | Агреговані аналітичні дані |
+
+---
+
+## Поширені операції
+
+### Перегляд журналів
+
+```bash
+docker compose logs -f rtsurvey
+docker compose logs -f mysql
+```
+
+### Перезапуск додатку
+
+```bash
+docker compose restart rtsurvey
+```
+
+### Доступ до оболонки
+
+```bash
+docker compose exec rtsurvey bash
+```
+
+### Запуск міграцій бази даних вручну
+
+```bash
+docker compose exec rtsurvey php /var/www/html/smartsurvey/protected/yiic migrate
+```
+
+---
+
+## Оновлення
+
+Образ позначений як `survey-public`. Щоб оновитися до останньої версії:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Міграції бази даних запускаються автоматично при старті через виробничу точку входу.
+
+---
+
+## Резервне копіювання та відновлення
+
+### Резервне копіювання бази даних
+
+```bash
+docker compose exec mysql \
+  mysqldump -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  > backup-$(date +%Y%m%d).sql
+```
+
+### Відновлення бази даних
+
+```bash
+docker compose exec -T mysql \
+  mysql -u root -p"${MYSQL_ROOT_PASSWORD}" smartsurvey \
+  < backup-20240101.sql
+```
+
+### Резервне копіювання завантажених файлів
+
+```bash
+docker run --rm \
+  -v rtsurvey_app_uploads:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/uploads-$(date +%Y%m%d).tar.gz -C /data .
+```
+
+---
+
+## Вбудований Keycloak (необов'язковий SSO)
+
+Виробничий файл compose містить необов'язковий контейнер Keycloak для SSO. Він використовує той самий екземпляр MySQL і активується через профіль Docker Compose.
+
+<Callout type="info">
+Вбудований Keycloak потребує щонайменше **4 ГБ RAM**. Він необов'язковий — пропустіть, якщо вам не потрібен SSO.
+</Callout>
+
+### Додайте змінні Keycloak до `.env`
+
+```bash
+# Keycloak admin
+KEYCLOAK_ADMIN_USER=admin
+KEYCLOAK_ADMIN_PASSWORD=change-this-keycloak-password
+
+# Keycloak database (created automatically in the shared MySQL on first run)
+KEYCLOAK_DB=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=change-this-keycloak-db-password
+
+# KC_HOSTNAME: full public URL of your server (Keycloak appends /auth automatically)
+KC_HOSTNAME=http://your-server:8091
+
+# Port Keycloak listens on (host)
+KEYCLOAK_PORT=8091
+
+# Tell the rtCloud app to connect to embedded Keycloak
+EMBED_KEYCLOAK=true
+KEYCLOAK_URL=http://your-server:8091
+KEYCLOAK_REALM=rtsurvey
+KEYCLOAK_CLIENT_ID=rtsurvey
+KEYCLOAK_CLIENT_SECRET=your-client-secret
+```
+
+Сервіс `keycloak` вже включено до наведеного вище `docker-compose.yml` (у профілі `embed-keycloak` — він не запуститься, якщо не використовувати `--profile embed-keycloak`).
+
+Створіть директорію імпорту (Keycloak запуститься без неї, але автоматичне надання realm не працюватиме):
+
+```bash
+mkdir -p /opt/rtsurvey/keycloak-import
+```
+
+### Запустіть з Keycloak
+
+```bash
+docker compose --profile embed-keycloak up -d
+```
+
+Щоб запустити без Keycloak (за замовчуванням):
+
+```bash
+docker compose up -d
+```
+
+### Консоль адміністратора Keycloak
+
+Після успішного запуску відкрийте інтерфейс адміністратора Keycloak за адресою:
+
+```
+http://your-server:8091/auth/admin
+```
+
+Увійдіть за допомогою `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD`.
+
+---
+
+## Наступні кроки
+
+- **HTTPS** — Розмістіть nginx або Caddy перед додатком і дотримуйтесь посібника з [налаштування SSL](ssl-setup)
+- **SSO** — Підключіть Azure AD або Keycloak через посібник з [SSO-автентифікації](sso-authentication)
+- **Хмарне розгортання** — Дивіться [Хмарні провайдери](cloud-providers) для налаштування, специфічного для провайдера, з автоматизованими скриптами
