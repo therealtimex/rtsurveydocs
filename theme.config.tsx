@@ -336,6 +336,46 @@ const SEARCH_PLACEHOLDERS: Record<string, string> = {
   'zh-hant': '搜尋文件...',
 };
 
+type ThemeOptions = { light: string; dark: string; system: string };
+const THEME_SWITCH_LABELS: Record<string, ThemeOptions> = {
+  en: { light: 'Light', dark: 'Dark', system: 'System' },
+  ar: { light: 'فاتح', dark: 'داكن', system: 'النظام' },
+  bg: { light: 'Светла', dark: 'Тъмна', system: 'Системна' },
+  cs: { light: 'Světlý', dark: 'Tmavý', system: 'Systém' },
+  da: { light: 'Lys', dark: 'Mørk', system: 'System' },
+  de: { light: 'Hell', dark: 'Dunkel', system: 'System' },
+  el: { light: 'Φωτεινό', dark: 'Σκοτεινό', system: 'Σύστημα' },
+  es: { light: 'Claro', dark: 'Oscuro', system: 'Sistema' },
+  fi: { light: 'Vaalea', dark: 'Tumma', system: 'Järjestelmä' },
+  fr: { light: 'Clair', dark: 'Sombre', system: 'Système' },
+  hi: { light: 'लाइट', dark: 'डार्क', system: 'सिस्टम' },
+  hu: { light: 'Világos', dark: 'Sötét', system: 'Rendszer' },
+  id: { light: 'Terang', dark: 'Gelap', system: 'Sistem' },
+  it: { light: 'Chiaro', dark: 'Scuro', system: 'Sistema' },
+  ja: { light: 'ライト', dark: 'ダーク', system: 'システム' },
+  km: { light: 'ភ្លឺ', dark: 'ងងឹត', system: 'ប្រព័ន្ធ' },
+  ko: { light: '라이트', dark: '다크', system: '시스템' },
+  lt: { light: 'Šviesi', dark: 'Tamsi', system: 'Sistema' },
+  lv: { light: 'Gaišs', dark: 'Tumšs', system: 'Sistēma' },
+  nb: { light: 'Lys', dark: 'Mørk', system: 'System' },
+  nl: { light: 'Licht', dark: 'Donker', system: 'Systeem' },
+  pl: { light: 'Jasny', dark: 'Ciemny', system: 'System' },
+  pt: { light: 'Claro', dark: 'Escuro', system: 'Sistema' },
+  'pt-br': { light: 'Claro', dark: 'Escuro', system: 'Sistema' },
+  ru: { light: 'Светлая', dark: 'Тёмная', system: 'Системная' },
+  sk: { light: 'Svetlý', dark: 'Tmavý', system: 'Systém' },
+  sq: { light: 'E ndritshme', dark: 'E errët', system: 'Sistemi' },
+  sr: { light: 'Светла', dark: 'Тамна', system: 'Систем' },
+  sv: { light: 'Ljus', dark: 'Mörk', system: 'System' },
+  te: { light: 'లైట్', dark: 'డార్క్', system: 'సిస్టమ్' },
+  th: { light: 'สว่าง', dark: 'มืด', system: 'ระบบ' },
+  tr: { light: 'Açık', dark: 'Koyu', system: 'Sistem' },
+  uk: { light: 'Світла', dark: 'Темна', system: 'Системна' },
+  vi: { light: 'Sáng', dark: 'Tối', system: 'Hệ thống' },
+  'zh-hans': { light: '浅色', dark: '深色', system: '系统' },
+  'zh-hant': { light: '淺色', dark: '深色', system: '系統' },
+};
+
 const EDIT_PAGE_LABELS: Record<string, string> = {
   en: 'Edit this page',
   ar: 'تعديل هذه الصفحة',
@@ -415,7 +455,7 @@ const FEEDBACK_LABELS: Record<string, string> = {
 };
 
 const useLocale = () => {
-  const { asPath } = useRouter();
+  useRouter();
   // Client-side: window.location.pathname includes the basePath locale prefix
   if (typeof window !== 'undefined') {
     const first = window.location.pathname.split('/')[1];
@@ -523,6 +563,17 @@ const config: DocsThemeConfig = {
       const parts = window.location.pathname.split('/');
       const locale = parts[1] && SEARCH_PLACEHOLDERS[parts[1]] ? parts[1] : 'en';
       return SEARCH_PLACEHOLDERS[locale];
+    },
+  },
+  themeSwitch: {
+    useOptions: () => {
+      if (typeof window !== 'undefined') {
+        const first = window.location.pathname.split('/')[1];
+        if (first && THEME_SWITCH_LABELS[first]) return THEME_SWITCH_LABELS[first];
+        return THEME_SWITCH_LABELS['en'];
+      }
+      const locale = (process.env.NEXT_BASE_PATH || '').replace(/^\//, '');
+      return THEME_SWITCH_LABELS[locale] || THEME_SWITCH_LABELS['en'];
     },
   },
   editLink: { text: EditLinkText },
