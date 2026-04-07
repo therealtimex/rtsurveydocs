@@ -3,8 +3,5 @@
     "display": "hidden"
   },
   "rtsurvey-cloud": "rtSurvey Cloud",
-  "mobile-app": "Mobilna aplikacija",
-  "web-form": {
-    "display": "hidden"
-  }
+  "mobile-app": "Mobilna aplikacija"
 }

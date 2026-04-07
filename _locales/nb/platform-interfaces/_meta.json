@@ -3,8 +3,5 @@
     "display": "hidden"
   },
   "rtsurvey-cloud": "rtSurvey Cloud",
-  "mobile-app": "Mobilapp",
-  "web-form": {
-    "display": "hidden"
-  }
+  "mobile-app": "Mobilapp"
 }

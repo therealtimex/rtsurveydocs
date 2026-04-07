@@ -3,8 +3,5 @@
     "display": "hidden"
   },
   "rtsurvey-cloud": "rtSurvey Cloud",
-  "mobile-app": "Mobilā lietotne",
-  "web-form": {
-    "display": "hidden"
-  }
+  "mobile-app": "Mobilā lietotne"
 }
