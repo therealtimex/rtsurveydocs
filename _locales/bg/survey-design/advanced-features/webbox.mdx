@@ -25,7 +25,7 @@ Insert a `<webbox>` HTML tag directly in a `label` or `note` label column:
 
 ---
 
-## Основно example
+## Основен пример
 
 | type | name | label |
 |------|------|-------|
@@ -35,7 +35,7 @@ This renders a button labelled "📖 Open Field Guide". When tapped, a modal ope
 
 ---
 
-## Embedding a map
+## Вграждане на карта
 
 | type | name | label |
 |------|------|-------|
@@ -43,7 +43,7 @@ This renders a button labelled "📖 Open Field Guide". When tapped, a modal ope
 
 ---
 
-## Passing form values to the embedded page
+## Предаване на стойности от формуляра към вградената страница
 
 Append form field values to the URL using `concat()` in the `calculation` column and reference the result in the label:
 
@@ -58,7 +58,7 @@ The `src` attribute in the `<webbox>` tag supports `${fieldname}` references whe
 
 ---
 
-## Repeat interaction: delete buttons
+## Взаимодействие с повторения: бутони за изтриване
 
 Webbox also supports special action tags for managing repeat groups inside labels:
 
@@ -78,7 +78,7 @@ These render as buttons that delete repeat instances when tapped. Place them in 
 
 ---
 
-## Communication with the embedded page (postMessage)
+## Комуникация с вградената страница (postMessage)
 
 The webbox iframe and the parent form can communicate using the browser's `postMessage` API. The parent sends an `init` message to the iframe when it opens. The embedded page can respond with:
 
@@ -89,7 +89,7 @@ This enables custom web tools (e.g., drawing tools, interactive maps) to trigger
 
 ---
 
-## Best Practices
+## Най-добри практики
 
 1. Use webbox for **reference material** (guidelines, lookup tables, maps) — not for collecting data that should be in the form itself.
 2. Ensure the embedded URL is accessible from the device's network — webbox requires connectivity.
@@ -97,7 +97,7 @@ This enables custom web tools (e.g., drawing tools, interactive maps) to trigger
 4. Use descriptive button text (e.g., "View Village Map") rather than generic labels ("Click here").
 5. Inform enumerators that closing the modal returns them to the survey — some users may not know how to close an iframe overlay.
 
-## Limitations
+## Ограничения
 
 - Webbox requires network connectivity to load the embedded URL.
 - Some external sites block embedding in iframes via `X-Frame-Options` or `Content-Security-Policy` headers — these sites cannot be used with webbox.

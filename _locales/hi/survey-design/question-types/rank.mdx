@@ -5,7 +5,7 @@ description: "Rank questions उत्तरदाताओं को choices �
 
 `rank` question type choices की एक list प्रस्तुत करता है जिसे उत्तरदाता को **order में drag करना होता है** (या अन्यथा पहले से आखिरी तक rank करना होता है)। यह result को सबसे उच्च-priority choice के साथ पहले, चुने गए order में choice values की space-separated list के रूप में store करता है।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type | name | label |
 |------|------|-------|
@@ -29,7 +29,7 @@ Choices **choices worksheet** में `select_one` की तरह define क
 | priorities | roads | सड़कें |
 | priorities | electricity | बिजली |
 
-## Stored value format
+## संग्रहीत मूल्य प्रारूप
 
 Stored value ranked order में choice values की **space-separated list** है (पहला = highest priority):
 
@@ -68,7 +68,7 @@ Rank questions सामान्यतः इनके लिए उपयो�
 3. **Exam item ordering** — किसी process के steps को arrange करना
 4. **Top-N selection** — केवल top 1, 2, या 3 choices extract करने के लिए `selected-at()` के साथ combined
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. List को short (3–7 items) रखें — 7–8 choices से परे ranking cognitively taxing हो जाती है।
 2. Confusion से बचने के लिए clear, mutually exclusive choice labels का उपयोग करें।

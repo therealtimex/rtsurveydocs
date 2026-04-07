@@ -5,7 +5,7 @@ description: ""
 
 Default values ក្នុង rtSurvey អនុញ្ញាតឱ្យ pre-populate questions ជាមួយ ចម្លើយ នៅពេល respondent ជួប questions ដំបូង ។
 
-## Basic Usage
+## ការប្រើប្រាស់មូលដ្ឋាន
 
 ```
 | type    | name        | label                         | default    |
@@ -14,7 +14,7 @@ Default values ក្នុង rtSurvey អនុញ្ញាតឱ្យ pre-po
 | decimal | weight      | Respondent's weight? (in kgs) | 51.3       |
 ```
 
-## Dynamic Defaults
+## ការកំណត់លំនាំដើមថាមវន្ត
 
 rtSurvey គាំទ្រ dynamic default values ដោយ ប្រើ functions:
 
@@ -24,9 +24,9 @@ rtSurvey គាំទ្រ dynamic default values ដោយ ប្រើ functi
 | date | d    | Enter the date the event occurred? | today()  |
 ```
 
-## rtSurvey-Specific Features
+## មុខងារជាក់លាក់ rtSurvey
 
-### Context-Aware Defaults
+### ការកំណត់លំនាំដើមដែលដឹងបរិបទ
 
 ```
 | type    | name     | label           | default            |
@@ -34,7 +34,7 @@ rtSurvey គាំទ្រ dynamic default values ដោយ ប្រើ functi
 | text    | location | Current location| ${current_location} |
 ```
 
-### Cascading Defaults
+### ការកំណត់លំនាំដើមជាបណ្ដាញ
 
 ```
 | type    | name     | label           | default         |
@@ -43,7 +43,7 @@ rtSurvey គាំទ្រ dynamic default values ដោយ ប្រើ functi
 | text    | district | District        | ${city}-district|
 ```
 
-### Default in Repeats
+### ការកំណត់លំនាំដើមក្នុងការដដែលៗ
 
 ```
 | type         | name      | label        | default                |
@@ -53,7 +53,7 @@ rtSurvey គាំទ្រ dynamic default values ដោយ ប្រើ functi
 | end repeat   |           |              |                        |
 ```
 
-## Best Practices
+## វិធីល្អបំផុត
 
 1. **ប្រើ ដោយ កក្រើក**: ប្រើ defaults ត្រឹម តែ ពេល ចាំ បាច់ ។
 2. **ធានា Accuracy**: review ហើយ update static default values ។

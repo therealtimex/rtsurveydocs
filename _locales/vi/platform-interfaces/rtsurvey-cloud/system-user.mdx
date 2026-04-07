@@ -10,13 +10,13 @@ The **System User** module (`/cpms/cpmsSystemUser/admin`) is a comprehensive man
 
 ![System User Interface](/images/system_user.png)
 
-## Unified Management Approach
+## Phương pháp quản lý thống nhất
 
 In RT-CPMS, an **Enumerator** is simply a specific Role assigned to a System User. There is no separate "Enumerator" database. Whether a user is a high-level Administrator monitoring the web portal or a field Enumerator collecting data via the mobile app, they are all managed within this single, unified framework.
 
-## Key Features
+## Tính năng chính
 
-### 1. User Directory & Grid View
+### 1. Danh sách & Chế độ xem lưới người dùng
 The main interface displays a paginated list of all users connected to the workspace. Key attributes include:
 * **Organization ID & Name**: Logical grouping of users under specific organizational entities (e.g., `rta`, `partner_org`).
 * **Role**: Specifies the user's permission level (e.g., `Administrator`, `Leadteam`, `Enumerator`).
@@ -29,7 +29,7 @@ The main interface displays a paginated list of all users connected to the works
 * **Import System User**: Bulk upload accounts using an Excel template. You can resolve conflicts using `Skip` or `Replace` modes and sync directly with the SSO.
 * **Bulk Delete**: Multi-select support for bulk account removal.
 
-### 2. Access Control & Security
+### 2. Kiểm soát truy cập & Bảo mật
 When creating or editing a user profile, several critical security and workflow fields are available:
 * **User Code**: A unique identifier linking the local CPMS account to the central SSO repository.
 * **Change-Device Code**: A robust security token required when an enumerator needs to switch the mobile device they are using for data collection.
@@ -37,7 +37,7 @@ When creating or editing a user profile, several critical security and workflow 
 * **Supervisory Toggle**: A checkbox that instantly elevates a standard user to management status.
 * **Workflow Automation**: An option to "Automatically approve Request to Edit," which streamlines the data cleaning and verification process for trusted users.
 
-### 3. Code Management (Automated Onboarding)
+### 3. Quản lý mã (Tự động giới thiệu)
 Found under the "Code" sub-tab, this feature manages hash-based registration and invitation links, streamlining the onboarding process for large teams.
 
 * **Registration vs. Invitation**: Choose whether users can self-register using a distributed link or if they require a direct admin invitation.

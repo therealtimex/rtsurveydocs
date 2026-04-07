@@ -5,7 +5,7 @@ description: "Video questions उत्तरदाताओं को survey �
 
 `video` question type उत्तरदाताओं को अपने survey response के हिस्से के रूप में **video record** करने या एक existing video file upload करने की अनुमति देता है। यह visual evidence, demonstrations, environmental conditions, या कोई भी जानकारी capture करने के लिए उपयोगी है जो motion और audio एक साथ होने से benefit करती है।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type  | name        | label                              |
 |-------|-------------|-------------------------------------|
@@ -23,7 +23,7 @@ Video questions सामान्यतः इनके लिए उपयो�
 4. ऐसी evidence capture करना जिसके लिए spatial context की आवश्यकता हो
 5. Monitoring और evaluation surveys के लिए before/after documentation
 
-## Data format
+## डेटा प्रारूप
 
 Video files binary attachments के रूप में store होती हैं:
 
@@ -32,9 +32,9 @@ Video files binary attachments के रूप में store होती ह
 - **Storage:** Server media folder में upload होती हैं और submission record से linked होती हैं
 - **Access:** Submission management interface से playable और downloadable
 
-## rtSurvey extensions
+## rtSurvey एक्सटेंशन
 
-### Maximum duration
+### अधिकतम अवधि
 
 Recording length सीमित करने के लिए `parameters` column का उपयोग करें:
 
@@ -44,7 +44,7 @@ Recording length सीमित करने के लिए `parameters` colu
 
 `max-duration` seconds में है। Recording limit पर automatically रुकती है।
 
-### Quality / resolution
+### गुणवत्ता / रिज़ॉल्यूशन
 
 `parameters` के माध्यम से recording resolution control करें:
 
@@ -62,7 +62,7 @@ Mobile पर, उत्तरदाता नई recording करने के 
 
 Mobile पर, recorded clip को आगे बढ़ने से पहले review किया जा सकता है। कोई additional configuration आवश्यक नहीं।
 
-## Example usage
+## उदाहरण उपयोग
 
 ### Duration limit के साथ Site inspection video
 
@@ -77,7 +77,7 @@ Mobile पर, recorded clip को आगे बढ़ने से पहल�
 | select_one yesno | damage_found | क्या damage पाया गया? | | |
 | video | damage_video | Damage का video record करें | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. `max-duration` सेट करें — unrestricted video recordings आसानी से 100 MB से अधिक हो सकती हैं और weak connections पर upload fail हो सकती हैं।
 2. Monitoring surveys के लिए `quality=low` का उपयोग करें जहाँ visual evidence आवश्यक हो लेकिन fine detail नहीं — यह file size को dramatically कम करता है।

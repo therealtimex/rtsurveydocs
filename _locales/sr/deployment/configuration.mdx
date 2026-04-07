@@ -9,7 +9,7 @@ description: "Потпуна референца за све променљиве
 
 ---
 
-## Project
+## Projekat
 
 These variables define the identity and access point of your rtCloud instance.
 
@@ -23,7 +23,7 @@ These variables define the identity and access point of your rtCloud instance.
 
 ---
 
-## Database
+## Baza podataka
 
 MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
@@ -38,7 +38,7 @@ MySQL connection credentials. The database is managed automatically by the MySQL
 
 ---
 
-## Admin Account
+## Administratorski nalog
 
 The admin account is created automatically on the first boot of a fresh database.
 
@@ -50,7 +50,7 @@ The admin account is created automatically on the first boot of a fresh database
 
 ---
 
-## Ports
+## Portovi
 
 Control which host ports the application binds to.
 
@@ -61,7 +61,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Runtime
+## Izvršno okruženje
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -76,7 +76,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Security
+## Bezbednost
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -85,7 +85,7 @@ Control which host ports the application binds to.
 
 ---
 
-## SSO — Embedded Keycloak
+## SSO — Ugrađeni Keycloak
 
 Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
@@ -108,7 +108,7 @@ See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete 
 
 ---
 
-## SSO — External OIDC Provider
+## SSO — Eksterni OIDC provajder
 
 Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
 
@@ -137,7 +137,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Optional Integrations
+## Opcione integracije
 
 ### Stata
 
@@ -175,7 +175,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 | `RTBOX_USER_API` | RtBox user API key. |
 | `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix Messaging
+### Matrix poruke
 
 | Variable | Description |
 |----------|-------------|
@@ -184,7 +184,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Data Volumes
+## Volumeni podataka
 
 All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 

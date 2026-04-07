@@ -5,7 +5,7 @@ description: "Въпросите от тип аудио позволяват н�
 
 The `audio` question type enables respondents to **record audio** or upload an existing audio file as part of their survey response. It is useful for capturing verbal accounts, environmental sounds, testimonials, or any information that is better conveyed through voice than text.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type  | name        | label                        |
 |-------|-------------|------------------------------|
@@ -13,7 +13,7 @@ The `audio` question type enables respondents to **record audio** or upload an e
 
 For more details on the standard audio question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Uses
+## Приложения
 
 Audio questions are commonly used for:
 
@@ -23,7 +23,7 @@ Audio questions are commonly used for:
 4. Collecting voice samples for linguistic or health research
 5. Allowing respondents to add verbal clarifications to numeric or select answers
 
-## Data format
+## Формат на данните
 
 Audio files are stored as binary attachments alongside the form submission, typically:
 
@@ -32,9 +32,9 @@ Audio files are stored as binary attachments alongside the form submission, typi
 - **Storage:** Uploaded to the server media folder and linked to the submission record
 - **Access:** Playable and downloadable from the submission management interface
 
-## rtSurvey extensions
+## Разширения на rtSurvey
 
-### Maximum duration
+### Максимална продължителност
 
 Use the `parameters` column to limit recording length:
 
@@ -44,7 +44,7 @@ Use the `parameters` column to limit recording length:
 
 `max-duration` is in seconds. The recorder stops automatically at the limit.
 
-### Quality settings
+### Настройки за качество
 
 The recording quality can be set via `parameters`:
 
@@ -54,30 +54,30 @@ The recording quality can be set via `parameters`:
 
 Supported values: `low`, `normal` (default), `voice-only`. `voice-only` optimises for spoken audio with noise reduction.
 
-### Playback before submission
+### Възпроизвеждане преди изпращане
 
 On mobile, the enumerator can play back the recorded clip before proceeding. This is enabled by default — there is no configuration needed.
 
-### Native recorder integration
+### Интеграция на вградения рекордер
 
 On Android and iOS, `audio` launches the device's native recording app. On web, it uses the browser's built-in MediaRecorder API.
 
-## Example usage
+## Примерна употреба
 
-### With maximum duration and hint
+### С максимална продължителност и подсказка
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
 | audio | story | Tell us about the incident in your own words | Speak clearly. Recording stops after 3 minutes. | `max-duration=180` |
 
-### Conditional audio — only if an issue was reported
+### Условно аудио — само ако е докладван проблем
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
 | select_one yesno | issue_found | Was an issue found? | | |
 | audio | issue_audio | Record a description of the issue | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
-## Best Practices
+## Най-добри практики
 
 1. State clearly in the `label` or `hint` what the enumerator should say and for how long.
 2. Use `max-duration` to prevent excessively large files in areas with slow upload speeds.
@@ -85,7 +85,7 @@ On Android and iOS, `audio` launches the device's native recording app. On web, 
 4. Test recording on the target device and network conditions before deployment.
 5. Set `quality=voice-only` for interview-style recordings to reduce file size without losing intelligibility.
 
-## Limitations
+## Ограничения
 
 - Audio files can be large (a 2-minute recording at normal quality is ~2–4 MB) — factor this into your data plan and upload time estimates.
 - Not all browsers support the MediaRecorder API — Chrome and Firefox work reliably; Safari on older iOS versions may have issues.

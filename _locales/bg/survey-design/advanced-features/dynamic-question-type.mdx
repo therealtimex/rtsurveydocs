@@ -21,9 +21,9 @@ The field is marked with `specialFeature: isDynamicQuestionType` internally, whi
 
 ---
 
-## Setup
+## Настройка
 
-### Step 1: Fetch the field configuration
+### Стъпка 1: Извличане на конфигурацията на полето
 
 Use a `calculate` field with `callapi()` to retrieve the dynamic configuration:
 
@@ -31,7 +31,7 @@ Use a `calculate` field with `callapi()` to retrieve the dynamic configuration:
 |------|------|-------|------------|-------------|
 | calculate | field_config | | callapi | `callapi('POST', 'https://api.example.com/field-config', 1, 2, 0, '$.config', 10000, 0, '', '', '{"form_id": "##form_id##", "field_id": "inspection_result"}')` |
 
-### Step 2: Reference the configuration in the dynamic field
+### Стъпка 2: Препратка към конфигурацията в динамичното поле
 
 The dynamic field uses `callapi-verify()` in its `appearance` or `constraint` to link to the fetched config:
 
@@ -43,7 +43,7 @@ The form engine reads `field_config` and dynamically determines whether to rende
 
 ---
 
-## API response format
+## Формат на отговора на API
 
 The API should return a JSON object describing the field configuration. A typical response:
 
@@ -80,7 +80,7 @@ The server returns the correct widget type, label, choices, and validation for e
 
 ---
 
-## Best Practices
+## Най-добри практики
 
 1. Use dynamic question types only when the field structure genuinely varies at runtime — for static forms, use standard question types.
 2. Ensure the configuration API responds quickly (under 2 seconds) and is available on the field network.
@@ -88,7 +88,7 @@ The server returns the correct widget type, label, choices, and validation for e
 4. Version your API response schema — changes to the response format will affect all active forms using that endpoint.
 5. Test every combination of field types the API may return before deployment.
 
-## Limitations
+## Ограничения
 
 - Dynamic question types require network connectivity to fetch the configuration.
 - The full range of widget types available dynamically depends on rtSurvey client version — test your target version.

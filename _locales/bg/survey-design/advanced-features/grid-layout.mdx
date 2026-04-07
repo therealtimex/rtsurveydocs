@@ -18,7 +18,7 @@ The grid uses a 12-column Bootstrap-style system. `weight=N` defines how many lo
 
 ---
 
-## Group-level appearance
+## Изглед на ниво група
 
 | Appearance | Description |
 |------------|-------------|
@@ -29,7 +29,7 @@ The grid uses a 12-column Bootstrap-style system. `weight=N` defines how many lo
 
 ---
 
-## Field-level `gridformat<>` syntax
+## Синтаксис `gridformat<>` на ниво поле
 
 ```
 gridformat<row=R col=C colspan=S/>
@@ -82,7 +82,7 @@ This renders as:
 
 ---
 
-## Background colors
+## Цветове на фона
 
 Use `backgroundcolor` to visually distinguish sections:
 
@@ -92,7 +92,7 @@ Use `backgroundcolor` to visually distinguish sections:
 
 ---
 
-## Best Practices
+## Най-добри практики
 
 1. Use grid layout only for **data-entry intensive** screens where side-by-side fields genuinely reduce scrolling.
 2. Keep `colspan=1` fields short (IDs, codes, short selects) — wide labels truncate badly in narrow grid columns.
@@ -100,7 +100,7 @@ Use `backgroundcolor` to visually distinguish sections:
 4. Test on the smallest screen size you expect enumerators to use — a 4-column grid is cramped on a phone.
 5. Grid layout works best on web and tablet form factors; on mobile phones a 2-column layout is usually the maximum comfortable width.
 
-## Limitations
+## Ограничения
 
 - `gridformat<>` only works inside a group with `grid(weight=N)` appearance — it has no effect at the top level.
 - Grid layout is an rtSurvey web form extension and may not render correctly in other ODK-compatible clients.

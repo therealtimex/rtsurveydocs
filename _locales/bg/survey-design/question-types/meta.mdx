@@ -7,7 +7,7 @@ import { Callout } from 'nextra/components'
 
 Meta question types are special fields that are filled in **automatically** — the respondent never sees them. They capture context about the submission: when it was collected, which device was used, and who collected it. Add them in the `survey` worksheet like any other question type; they simply do not appear on screen.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type | name | label |
 |------|------|-------|
@@ -19,7 +19,7 @@ Labels are optional for meta fields since they are never displayed.
 
 ---
 
-## Timing meta fields
+## Мета полета за времето
 
 ### `start`
 
@@ -50,7 +50,7 @@ today | today |
 
 ---
 
-## Device meta fields
+## Мета полета на устройството
 
 ### `deviceid`
 
@@ -90,7 +90,7 @@ subscriberid | subscriberid |
 
 ---
 
-## Enumerator meta fields
+## Мета полета на изброителя
 
 ### `username`
 
@@ -121,7 +121,7 @@ phonenumber | phonenumber |
 
 ---
 
-## Audit log
+## Одиторски журнал
 
 ### `audit`
 
@@ -151,7 +151,7 @@ The `audit` field generates a separate file per submission. Make sure your data 
 
 ---
 
-## Complete example
+## Пълен пример
 
 A typical household survey might include all timing and enumerator meta fields:
 
@@ -169,7 +169,7 @@ A typical household survey might include all timing and enumerator meta fields:
 
 ---
 
-## Best Practices
+## Най-добри практики
 
 1. Always include `start` and `end` — they are free, automatic, and invaluable for quality monitoring.
 2. Always include `username` to track enumerators.
@@ -179,7 +179,7 @@ A typical household survey might include all timing and enumerator meta fields:
 
 ---
 
-## Limitations
+## Ограничения
 
 - All meta fields are **read-only** — they cannot be referenced or modified by other calculations.
 - `username` and `email` require the enumerator to be logged in; they will be empty for anonymous submissions.

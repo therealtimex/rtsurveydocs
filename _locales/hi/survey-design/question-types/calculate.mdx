@@ -5,7 +5,7 @@ description: ""
 
 XLSForms और rtSurvey में Calculate questions का उपयोग आपके form के अन्य fields या values के आधार पर computations perform करने के लिए किया जाता है। ये questions user को display नहीं होते बल्कि background में run होते हैं, अपने results को बाद में उपयोग या submission के लिए store करते हैं।
 
-## Syntax
+## वाक्य विन्यास
 
 XLSForm में, एक calculate question इस प्रकार define किया जाता है:
 
@@ -29,7 +29,7 @@ Calculate questions सामान्यतः इनके लिए उपय
 
 ## उदाहरण
 
-### Basic Arithmetic
+### बुनियादी अंकगणित
 
 ```
 | type      | name     | calculation |
@@ -37,7 +37,7 @@ Calculate questions सामान्यतः इनके लिए उपय
 | calculate | total    | ${price} * ${quantity} |
 ```
 
-### String Concatenation
+### स्ट्रिंग संयोजन
 
 ```
 | type      | name     | calculation |
@@ -55,7 +55,7 @@ Calculate questions सामान्यतः इनके लिए उपय
 
 ## rtSurvey में Advanced Usage
 
-### pulldata() Function
+### pulldata() फ़ंक्शन
 
 rtSurvey calculate fields में `pulldata()` function का समर्थन करता है, जिससे आप बाहरी CSV files से data retrieve कर सकते हैं:
 
@@ -87,7 +87,7 @@ pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
 5. Pull किए जा सकने वाले text length पर सीमाएं हो सकती हैं (लगभग 76 characters)।
 6. आप CSV data के विरुद्ध entries validate करने के लिए constraints में pulldata() का उपयोग कर सकते हैं।
 
-### Conditional Calculations
+### सशर्त गणनाएँ
 
 Conditional calculations के लिए if() statements का उपयोग कर सकते हैं:
 
@@ -97,7 +97,7 @@ Conditional calculations के लिए if() statements का उपयोग
 | calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
 ```
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. Form readability में सुधार करने के लिए calculate fields के लिए meaningful names का उपयोग करें।
 2. एक ही field में अत्यधिक complex calculations से बचें; यदि आवश्यक हो तो उन्हें break down करें।

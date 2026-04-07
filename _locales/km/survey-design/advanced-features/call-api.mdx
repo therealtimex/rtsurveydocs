@@ -12,15 +12,15 @@ functions ពីរ:
 
 ---
 
-## `callapi()` — Fetch and store an API response
+## `callapi()` — ទទួល និងរក្សាទុកការឆ្លើយតប API
 
-### Syntax
+### វាក្យសម្ព័ន្ធ
 
 ```
 callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
 ```
 
-### Parameters
+### ប៉ារ៉ាម៉ែត្រ
 
 | # | Parameter | ការពិពណ៌នា |
 |---|-----------|-------------|
@@ -34,14 +34,14 @@ callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeou
 | 8 | `lifetime` | Cache duration milliseconds |
 | 9 | `response_q` | Field ដើម្បី store HTTP response code |
 
-### Example: GET request
+### ឧទាហរណ៍: សំណើ GET
 
 | type | name | label | appearance | calculation |
 |------|------|-------|------------|-------------|
 | text | household_id | Household ID | | |
 | calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
 
-### Example: POST request
+### ឧទាហរណ៍: សំណើ POST
 
 ```
 callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 15000, 0, '', '', '{"id": "##household_id##"}')
@@ -49,15 +49,15 @@ callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 150
 
 ---
 
-## `callapi-verify()` — Validate a value against an API
+## `callapi-verify()` — ផ្ទៀងផ្ទាត់តម្លៃជាមួយ API
 
-### Syntax
+### វាក្យសម្ព័ន្ធ
 
 ```
 callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, post_body, message)
 ```
 
-### Parameters
+### ប៉ារ៉ាម៉ែត្រ
 
 | # | Parameter | ការពិពណ៌នា |
 |---|-----------|-------------|
@@ -68,7 +68,7 @@ callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, 
 | 5 | `timeout` | Request timeout |
 | 6 | `constraint_mode` | `'soft'` warning; `'hard'` block |
 
-### Example: Verify barcode
+### ឧទាហរណ៍: ផ្ទៀងផ្ទាត់បាកូដ
 
 | type | name | label | appearance | constraint |
 |------|------|-------|------------|------------|
@@ -76,14 +76,14 @@ callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, 
 
 ---
 
-## Best Practices
+## វិធីល្អបំផុត
 
 1. Set `timeout` ត្រឹម ត្រូ វ (5000–15000 ms) ។
 2. Set `allowed_auto=0` សម្រាប់ verifications ។
 3. ប្រើ `extract_expr` ជ ា ម ួ យ specific JSONPath ។
 4. Test API calls ក្នុង offline mode ។
 
-## Limitations
+## ដែនកំណត់
 
 - ត ្ រ ូ វ ក ា រ network connectivity ។
 - API responses ត ្ រ ូ វ ត ែ ជ ា JSON ។

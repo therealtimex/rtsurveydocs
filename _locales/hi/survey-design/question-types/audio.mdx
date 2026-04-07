@@ -5,7 +5,7 @@ description: "Audio questions उत्तरदाताओं को survey �
 
 `audio` question type उत्तरदाताओं को अपने survey response के हिस्से के रूप में **audio record** करने या एक existing audio file upload करने की अनुमति देता है। यह verbal accounts, environmental sounds, testimonials, या कोई भी जानकारी capture करने के लिए उपयोगी है जो text की तुलना में voice के माध्यम से बेहतर conveyed होती है।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type  | name        | label                        |
 |-------|-------------|------------------------------|
@@ -23,7 +23,7 @@ Audio questions सामान्यतः इनके लिए उपयो�
 4. Linguistic या health research के लिए voice samples एकत्र करना
 5. उत्तरदाताओं को numeric या select answers में verbal clarifications जोड़ने की अनुमति देना
 
-## Data format
+## डेटा प्रारूप
 
 Audio files form submission के साथ binary attachments के रूप में store होती हैं, आमतौर पर:
 
@@ -32,9 +32,9 @@ Audio files form submission के साथ binary attachments के रूप
 - **Storage:** Server media folder में upload होती हैं और submission record से linked होती हैं
 - **Access:** Submission management interface से playable और downloadable
 
-## rtSurvey extensions
+## rtSurvey एक्सटेंशन
 
-### Maximum duration
+### अधिकतम अवधि
 
 Recording length सीमित करने के लिए `parameters` column का उपयोग करें:
 
@@ -44,7 +44,7 @@ Recording length सीमित करने के लिए `parameters` colu
 
 `max-duration` seconds में है। Recorder limit पर automatically रुक जाता है।
 
-### Quality settings
+### गुणवत्ता सेटिंग
 
 Recording quality को `parameters` के माध्यम से सेट किया जा सकता है:
 
@@ -58,11 +58,11 @@ Supported values: `low`, `normal` (default), `voice-only`। `voice-only` noise 
 
 Mobile पर, गणनाकर्ता आगे बढ़ने से पहले recorded clip play back कर सकता है। यह default रूप से enabled है — कोई configuration आवश्यक नहीं।
 
-### Native recorder integration
+### नेटिव रिकॉर्डर एकीकरण
 
 Android और iOS पर, `audio` device के native recording app launch करता है। Web पर, यह browser के built-in MediaRecorder API का उपयोग करता है।
 
-## Example usage
+## उदाहरण उपयोग
 
 ### Maximum duration और hint के साथ
 
@@ -77,7 +77,7 @@ Android और iOS पर, `audio` device के native recording app launch क
 | select_one yesno | issue_found | क्या कोई issue पाया गया? | | |
 | audio | issue_audio | Issue का description record करें | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. `label` या `hint` में clearly state करें कि गणनाकर्ता को क्या कहना चाहिए और कितने समय तक।
 2. Slow upload speeds वाले areas में अत्यधिक बड़ी files रोकने के लिए `max-duration` का उपयोग करें।

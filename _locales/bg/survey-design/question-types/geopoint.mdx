@@ -5,7 +5,7 @@ description: "Въпросите от тип geopoint заснемат геог�
 
 The geopoint question type in XLSForms and rtSurvey enables the collection of geographic coordinates using the device's GPS or other location services. This feature is particularly useful for mapping survey responses, tracking field activities, or associating data with specific locations.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type     | name        | label                           |
 |----------|-------------|--------------------------------|
@@ -13,7 +13,7 @@ The geopoint question type in XLSForms and rtSurvey enables the collection of ge
 
 For more details on the basic geopoint question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Uses
+## Приложения
 
 Geopoint questions are commonly used for:
 
@@ -23,14 +23,14 @@ Geopoint questions are commonly used for:
 4. Associating environmental or social data with specific locations
 5. Calculating distances or areas in geographical analyses
 
-## Best Practices
+## Най-добри практики
 
 1. Ensure the device has location services enabled and permissions granted.
 2. Allow sufficient time for the GPS to acquire an accurate fix.
 3. Consider privacy implications and inform respondents about location data collection.
 4. Use in conjunction with other question types to provide context for the location data.
 
-## Example Usage
+## Примерна употреба
 
 Here's an example of how you might use a geopoint question in a survey:
 
@@ -38,7 +38,7 @@ Here's an example of how you might use a geopoint question in a survey:
 |----------|----------------|--------------------------------------------|--------------------------------------------|
 | geopoint | sample_location| Record the location of the sample collection | Stand in an open area for better GPS signal |
 
-## rtSurvey Extensions
+## Разширения на rtSurvey
 
 While the basic XLSForm specification for geopoint questions is straightforward, rtSurvey may offer additional features or customizations:
 
@@ -49,7 +49,7 @@ While the basic XLSForm specification for geopoint questions is straightforward,
 
 (Note: The specific extensions available in rtSurvey for geopoint questions would need to be confirmed and detailed here.)
 
-## Data Format
+## Формат на данните
 
 Geopoint data is typically stored as a string of four space-separated values:
 
@@ -62,7 +62,7 @@ For example:
 41.40338 2.17403 30.5 10
 ```
 
-## Considerations for Analysis
+## Съображения за анализ
 
 When using geopoint questions, consider:
 
@@ -71,7 +71,7 @@ When using geopoint questions, consider:
 3. Privacy and data protection measures for handling location data
 4. Potential integration with GIS (Geographic Information System) tools
 
-## Limitations
+## Ограничения
 
 - Accuracy can vary depending on the device and environmental conditions.
 - GPS signals may be weak or unavailable in indoor locations or areas with obstructions.

@@ -7,7 +7,7 @@ This page covers advanced patterns for working with repeat groups in rtSurvey. F
 
 ---
 
-## Dynamic repeat count
+## Динамичен брой повторения
 
 By default, the enumerator decides how many times to repeat. You can fix the number of repetitions using `repeat_count`:
 
@@ -22,7 +22,7 @@ The repeat runs exactly `${num_members}` times, where `num_members` was collecte
 
 ---
 
-## Indexed access: `indexed-repeat()`
+## Индексиран достъп: `indexed-repeat()`
 
 Access a specific repeat instance's field value from **outside** the repeat group using `indexed-repeat(repeatedField, repeatGroup, index)`:
 
@@ -35,7 +35,7 @@ This is useful for building summary fields or referencing the "primary" member's
 
 ---
 
-## Current instance position: `index()`
+## Текуща позиция на екземпляра: `index()`
 
 Inside a repeat group, `index()` returns the 1-based position of the current instance. Use it to label each repetition or create unique identifiers:
 
@@ -48,7 +48,7 @@ Inside a repeat group, `index()` returns the 1-based position of the current ins
 
 ---
 
-## Referencing fields in the same instance
+## Препратка към полета в същия екземпляр
 
 Within a repeat, use `${fieldname}` to reference another field **in the same repeat instance**. There is no need for `indexed-repeat()` within the same loop:
 
@@ -62,7 +62,7 @@ Within a repeat, use `${fieldname}` to reference another field **in the same rep
 
 ---
 
-## Referencing parent fields from inside a repeat
+## Препратка към родителски полета от вътрешността на повторение
 
 Fields outside (above) the repeat group can be referenced normally with `${fieldname}`:
 
@@ -75,7 +75,7 @@ Fields outside (above) the repeat group can be referenced normally with `${field
 
 ---
 
-## Summarising repeat data
+## Обобщаване на данни от повторения
 
 Use repeat aggregate functions **outside** the repeat group to summarise:
 
@@ -106,7 +106,7 @@ Use repeat aggregate functions **outside** the repeat group to summarise:
 
 ---
 
-## Nested repeats
+## Вложени повторения
 
 A repeat group can contain another repeat group. Use this carefully — nested repeats add complexity and can be confusing for enumerators.
 
@@ -125,7 +125,7 @@ Inside the `hh_members` repeat, `${hh_id}` returns the ID of the **current** hou
 
 ---
 
-## Rank inside repeat groups: `rank-index()`
+## Класиране в групи за повторение: `rank-index()`
 
 When a `rank` field exists inside a repeat, use `rank-index(instanceNumber, repeatedField)` from outside to get the ordinal rank of a specific instance:
 
@@ -137,7 +137,7 @@ When a `rank` field exists inside a repeat, use `rank-index(instanceNumber, repe
 
 ---
 
-## Best Practices
+## Най-добри практики
 
 1. Always use `repeat_count` when the number of repetitions is known in advance — it prevents enumerators from accidentally adding or removing instances.
 2. Keep repeat groups focused — a repeat with 20+ questions per instance is difficult to navigate.
@@ -147,7 +147,7 @@ When a `rank` field exists inside a repeat, use `rank-index(instanceNumber, repe
 
 ---
 
-## Limitations
+## Ограничения
 
 - `indexed-repeat()` requires a valid index (1 to count of instances) — out-of-range indices return empty.
 - Nested repeats beyond 2 levels are not recommended and may cause display issues on some clients.

@@ -21,7 +21,7 @@ rtSurvey में multi-language survey बनाने के लिए, आ�
 | integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
 ```
 
-## Language Codes
+## भाषा कोड
 
 भाषा के नाम के बाद आधिकारिक 2-character language codes (subtags) का उपयोग करने की सिफारिश की जाती है। यह form language को user interface language से match करना सुगम बनाता है। आप आधिकारिक codes [यहाँ](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry) पा सकते हैं।
 
@@ -35,16 +35,16 @@ data collection के लिए default language सेट करने के 
 | test_form | 101     | French (fr)       |
 ```
 
-## rtSurvey-Specific Features
+## rtSurvey-विशिष्ट सुविधाएँ
 
-### Dynamic Language Switching
+### गतिशील भाषा स्विचिंग
 
 rtSurvey users को data collection के दौरान dynamically भाषाएं बदलने की अनुमति देता है:
 
 - web interface में, top navigation bar में language dropdown का उपयोग करें।
 - mobile app में, settings menu के माध्यम से language options तक पहुँचें।
 
-### Language-Specific Validation Messages
+### भाषा-विशिष्ट सत्यापन संदेश
 
 rtSurvey बहु-भाषा समर्थन को validation messages तक विस्तारित करता है:
 
@@ -54,7 +54,7 @@ rtSurvey बहु-भाषा समर्थन को validation messages �
 | integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-### RTL Language Support
+### RTL भाषा समर्थन
 
 Arabic या Hebrew जैसी right-to-left (RTL) भाषाओं के लिए, rtSurvey स्वचालित रूप से layout को adjust करता है:
 
@@ -64,7 +64,7 @@ Arabic या Hebrew जैसी right-to-left (RTL) भाषाओं के 
 | text | name | Your name           | اسمك                |
 ```
 
-### Language-Specific Appearance
+### भाषा-विशिष्ट उपस्थिति
 
 rtSurvey आपको विभिन्न भाषाओं के लिए अलग-अलग appearances निर्दिष्ट करने की अनुमति देता है:
 
@@ -86,11 +86,11 @@ rtSurvey आपको विभिन्न भाषाओं के लिए 
 
 ## Special Cases को संभालना
 
-### Mixed Language Responses
+### मिश्रित भाषा प्रतिक्रियाएँ
 
 rtSurvey उत्तरदाताओं को selected form language की परवाह किए बिना किसी भी script में text input करने की अनुमति देता है। यह नामों या पतों को उनकी मूल script में capture करने के लिए उपयोगी है।
 
-### Language-Specific Question Types
+### भाषा-विशिष्ट प्रश्न प्रकार
 
 कुछ question types कुछ भाषाओं के लिए अधिक उपयुक्त हो सकते हैं। rtSurvey आपको विभिन्न भाषाओं के लिए अलग-अलग question types का उपयोग करने की अनुमति देता है:
 

@@ -5,7 +5,7 @@ description: "Hidden fields ऐसे values store करते हैं जो
 
 एक `hidden` field एक value store करती है जो **उत्तरदाता को कभी display नहीं होती**। `calculate` (जो एक value compute करता है) के विपरीत, `hidden` का उपयोग एक **बाहरी रूप से provided value** को carry करने के लिए किया जाता है — उदाहरण के लिए, एक task ID, किसी अन्य system से passed household ID, या form launch होने पर inject किया गया एक enumerator code।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type | name | label |
 |------|------|-------|
@@ -52,7 +52,7 @@ https://your-server.com/form/FORMID?household_id=H00123&zone_code=NORTH
 
 `household_id` नामक field स्वचालित रूप से `H00123` से populated हो जाएगी।
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. `hidden` (न कि `calculate`) का उपयोग करें जब value **बाहरी रूप से inject** की जाती है और recompute नहीं होनी चाहिए।
 2. `calculate` का उपयोग करें जब value form के अन्य fields से **derived** होती है।

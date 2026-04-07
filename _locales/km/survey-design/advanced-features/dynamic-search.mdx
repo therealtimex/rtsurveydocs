@@ -7,13 +7,13 @@ description: "Dynamic Search load choices ពី remote API ជាក់ស្�
 
 ---
 
-## `search-api()` appearance
+## រូបរាង `search-api()`
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
 ```
 
-### Parameters
+### ប៉ារ៉ាម៉ែត្រ
 
 | Parameter | ការពិពណ៌នា |
 |-----------|-------------|
@@ -27,7 +27,7 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 
 ---
 
-## Basic example
+## ឧទាហរណ៍មូលដ្ឋាន
 
 | type | name | label | appearance |
 |------|------|-------|------------|
@@ -45,9 +45,9 @@ API returns:
 
 ---
 
-## Advanced display formatting
+## ការធ្វើទ្រង់ទ្រាយការបង្ហាញកម្រិតខ្ពស់
 
-### Using `##key##` templates
+### ប្រើគំរូ `##key##`
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
@@ -55,7 +55,7 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
 
 ---
 
-## Setting a default value: `search-default-api()`
+## ការកំណត់តម្លៃលំនាំដើម: `search-default-api()`
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -63,7 +63,7 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## Using saved response data
+## ប្រើទិន្នន័យការឆ្លើយតបដែលបានរក្សាទុក
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -72,13 +72,13 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## Best Practices
+## វិធីល្អបំផុត
 
 1. ធានា API endpoint respond ក ្ ន ុ ង 1–2 seconds ។
 2. ប ្ រ ើ `%__input__%` ក ្ ន ុ ង `post_body` ។
 3. Limit results ទ ៅ 20–50 items ។
 
-## Limitations
+## ដែនកំណត់
 
 - Dynamic Search ត ្ រ ូ វ ក ា រ network connectivity ។
 - `%__input__%` inject as-is; sanitise inputs server-side ។

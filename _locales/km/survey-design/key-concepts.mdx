@@ -3,10 +3,10 @@ title: "គំនិតសំខាន់ ៗ"
 description: "ទិដ្ឋភាពទូទៅ នៃ ការ រចនា ទម្រង់"
 ---
 
-## XLSForm ជា អ្វី?
+## XLSForm គឺជាអ្វី?
 rtSurvey ប្រើ version ដែល extended នៃ ស្ដង់ដារ [XLSForm](https://xlsform.org/) សម្រាប់ ការ រចនា ទម្រង់ ។ ជាមួយ XLSForms, អ្នក អាច author forms ក្នុង format ដែល human-readable ដោយប្រើ Excel ។
 
-## XLSForm Structure
+## រចនាសម្ព័ន្ធ XLSForm
 XLSForm ជាទូទៅ រួមមាន worksheets ចម្បង ពីរ:
 
 1. **survey**: កំណត់ structure និង content នៃ form ។
@@ -14,7 +14,7 @@ XLSForm ជាទូទៅ រួមមាន worksheets ចម្បង ពី�
 
 worksheet **settings** ស្រេចចិត្ត អាច ផ្ដល់ form specifications បន្ថែម ។
 
-### The survey worksheet
+### សន្លឹក survey
 **survey worksheet** ជា កន្លែង ដែល អ្នក កំណត់ structure នៃ form ។ columns ខាងក្រោម ចាំបាច់:
 
 - `type`: បញ្ជាក់ ប្រភេទ entry ។
@@ -27,7 +27,7 @@ worksheet **settings** ស្រេចចិត្ត អាច ផ្ដល់ 
 | select_one gender   | gender   | Respondent's gender? |
 | integer             | age      | Respondent's age?    |
 
-### The choices worksheet
+### សន្លឹក choices
 **`choices`** worksheet ប្រើ ដើម្បី បញ្ជាក់ answer choices ។ columns ខាងក្រោម ចាំបាច់:
 
 - **`list_name`**: ដាក់ជាក្រុម answer choices ។
@@ -41,7 +41,7 @@ worksheet **settings** ស្រេចចិត្ត អាច ផ្ដល់ 
 | gender              | male        | Male                 |
 | gender              | other       | Other                |
 
-### The settings worksheet
+### សន្លឹក settings
 
 | Column | ការពិពណ៌នា |
 |--------|-------------|
@@ -51,7 +51,7 @@ worksheet **settings** ស្រេចចិត្ត អាច ផ្ដល់ 
 | version | version number |
 | instance_name | Expression ដើម្បី generate name តែ មួយ គត់ |
 
-## ប្រភេទ Questions សំខាន់ ៗ
+## ប្រភេទសំណួរសំខាន់ៗ
 
 | ប្រភេទ questions          | Input ចម្លើយ                                                                 |
 | ------------------------- | ---------------------------------------------------------------------------- |
@@ -66,7 +66,7 @@ worksheet **settings** ស្រេចចិត្ត អាច ផ្ដល់ 
 | calculate                 | ធ្វើ calculation ។                                                           |
 | note                      | បង្ហាញ note ។                                                               |
 
-## Components សំខាន់ ៗ
+## សមាសភាគសំខាន់ៗ
 
 | Component | ការពិពណ៌នា |
 |-----------|-------------|

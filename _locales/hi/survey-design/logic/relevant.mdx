@@ -5,7 +5,7 @@ description: ""
 
 Skip logic, जिसे branching या conditional logic भी कहा जाता है, आपको ऐसे dynamic surveys बनाने की अनुमति देता है जो उत्तरदाताओं के उत्तरों के अनुसार अनुकूलित होते हैं। rtSurvey में, skip logic को आपके XLSForm में `relevant` कॉलम का उपयोग करके लागू किया जाता है।
 
-## Basic Skip Logic
+## बुनियादी स्किप लॉजिक
 
 Basic skip logic लागू करने के लिए, एक condition निर्दिष्ट करने हेतु `relevant` कॉलम का उपयोग करें:
 
@@ -24,9 +24,9 @@ Basic skip logic लागू करने के लिए, एक condition �
 - `select_one` प्रश्नों के लिए, सीधे तुलना करें: `${question_name} = 'answer'`
 - `select_multiple` प्रश्नों के लिए, `selected()` function का उपयोग करें।
 
-## Advanced Skip Logic
+## उन्नत स्किप लॉजिक
 
-### Multiple Conditions
+### एकाधिक शर्तें
 
 आप `and`, `or`, और parentheses का उपयोग करके multiple conditions को जोड़ सकते हैं:
 
@@ -61,9 +61,9 @@ Basic skip logic लागू करने के लिए, एक condition �
 
 याद रखें कि अपनी choices worksheet में 'other' को एक विकल्प के रूप में शामिल करें।
 
-## rtSurvey-Specific Features
+## rtSurvey-विशिष्ट सुविधाएँ
 
-### Dynamic Relevance
+### गतिशील प्रासंगिकता
 
 rtSurvey calculated fields के आधार पर dynamic relevance की अनुमति देता है:
 
@@ -87,7 +87,7 @@ rtSurvey repeat groups के भीतर relevance का समर्थन �
 | end repeat   |              |                  |                        |
 ```
 
-### Cascading Relevance
+### कैस्केडिंग प्रासंगिकता
 
 rtSurvey cascading relevance को कुशलतापूर्वक संभालता है, जहाँ एक प्रश्न की relevance दूसरे पर निर्भर करती है, जो बदले में तीसरे पर निर्भर करती है:
 

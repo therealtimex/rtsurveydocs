@@ -5,7 +5,7 @@ description: ""
 
 rtSurvey में Read-only fields आपको ऐसी जानकारी प्रदर्शित करने की अनुमति देते हैं जिसे उत्तरदाता द्वारा संपादित नहीं किया जा सकता। यह सुविधा विशेष रूप से pre-filled data, calculated results, या ऐसी जानकारी दिखाने के लिए उपयोगी है जो पूरे survey में स्थिर रहनी चाहिए।
 
-## Basic Usage
+## बुनियादी उपयोग
 
 एक field को read-only बनाने के लिए, अपने XLSForm में `read_only` कॉलम का उपयोग करें:
 
@@ -30,9 +30,9 @@ Read-only fields अक्सर pre-determined या calculated जानक�
 
 यहाँ, username और वर्तमान तारीख प्रदर्शित की जाती हैं लेकिन संपादित नहीं की जा सकतीं।
 
-## rtSurvey-Specific Features
+## rtSurvey-विशिष्ट सुविधाएँ
 
-### Conditional Read-only
+### सशर्त केवल-पढ़ें
 
 rtSurvey conditional logic के साथ read-only functionality को विस्तारित करता है:
 
@@ -47,7 +47,7 @@ rtSurvey conditional logic के साथ read-only functionality को व�
 - 'age' field केवल तभी read-only है जब user की role 'viewer' हो।
 - 'comments' field तब read-only हो जाती है जब status 'closed' हो।
 
-### Dynamic Read-only Status
+### गतिशील केवल-पढ़ें स्थिति
 
 rtSurvey आपको read-only status को dynamically बदलने की अनुमति देता है:
 
@@ -67,9 +67,9 @@ rtSurvey आपको read-only status को dynamically बदलने की
 4. **Performance**: read-only fields में complex calculations के साथ सावधान रहें, क्योंकि वे form loading time को प्रभावित कर सकते हैं।
 5. **Accessibility**: सुनिश्चित करें कि read-only fields screen readers के लिए उचित रूप से चिह्नित हों।
 
-## Advanced Techniques
+## उन्नत तकनीक
 
-### Calculated Read-only Fields
+### गणना किए गए केवल-पढ़ें फ़ील्ड
 
 अन्य responses के आधार पर calculations प्रदर्शित करने के लिए read-only fields का उपयोग करें:
 

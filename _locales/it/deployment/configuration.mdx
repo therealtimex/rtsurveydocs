@@ -9,7 +9,7 @@ Le variabili contrassegnate come **obbligatorie** devono essere impostate prima 
 
 ---
 
-## Project
+## Progetto
 
 These variables define the identity and access point of your rtCloud instance.
 
@@ -38,7 +38,7 @@ MySQL connection credentials. The database is managed automatically by the MySQL
 
 ---
 
-## Admin Account
+## Account amministratore
 
 The admin account is created automatically on the first boot of a fresh database.
 
@@ -50,7 +50,7 @@ The admin account is created automatically on the first boot of a fresh database
 
 ---
 
-## Ports
+## Porte
 
 Control which host ports the application binds to.
 
@@ -76,7 +76,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Security
+## Sicurezza
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -85,7 +85,7 @@ Control which host ports the application binds to.
 
 ---
 
-## SSO — Embedded Keycloak
+## SSO — Keycloak incorporato
 
 Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
@@ -108,7 +108,7 @@ See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete 
 
 ---
 
-## SSO — External OIDC Provider
+## SSO — Provider OIDC esterno
 
 Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
 
@@ -137,7 +137,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Optional Integrations
+## Integrazioni opzionali
 
 ### Stata
 
@@ -161,13 +161,13 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 | `PIWIK_ID` | Matomo site ID. |
 | `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (R Computation)
+### OpenCPU (calcolo R)
 
 | Variable | Description |
 |----------|-------------|
 | `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox Integration
+### Integrazione RtBox
 
 | Variable | Description |
 |----------|-------------|
@@ -175,7 +175,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 | `RTBOX_USER_API` | RtBox user API key. |
 | `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix Messaging
+### Messaggistica Matrix
 
 | Variable | Description |
 |----------|-------------|
@@ -184,7 +184,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Data Volumes
+## Volumi dati
 
 All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 

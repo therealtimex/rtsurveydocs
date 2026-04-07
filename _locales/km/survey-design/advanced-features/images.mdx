@@ -7,11 +7,11 @@ rtSurvey ផ្ដល់ extensions សម្រាប់ **watermarking** photo
 
 ---
 
-## Watermark
+## ស្លាកទឹក
 
 Watermark feature overlay text ឬ image ទ ៅ ល ើ photo ។
 
-### Setup
+### ការដំឡើង
 
 ```
 watermark(type, size, distance, color, shadow, rotate, blur)
@@ -27,7 +27,7 @@ watermark(type, size, distance, color, shadow, rotate, blur)
 | `rotate` | Rotation angle degrees |
 | `blur` | Opacity (0-100) |
 
-### Text watermark example
+### ឧទាហរណ៍ស្លាកទឹកអក្សរ
 
 | type | name | label | appearance | calculation |
 |------|------|-------|------------|-------------|
@@ -36,7 +36,7 @@ watermark(type, size, distance, color, shadow, rotate, blur)
 
 ---
 
-## Media grid widget
+## Widget ក្រឡាចត្រង្គមេឌា
 
 Media grid widget display collection ន ៃ media files ក ្ ន ុ ង grid layout ។
 
@@ -44,7 +44,7 @@ Media grid widget display collection ន ៃ media files ក ្ ន ុ ង gri
 appearance: mediagridwidget
 ```
 
-### Example: Show all photos from a repeat
+### ឧទាហរណ៍: បង្ហាញរូបថតទាំងអស់ពីការដដែលៗ
 
 | type | name | label | appearance | calculation |
 |------|------|-------|------------|-------------|
@@ -53,13 +53,13 @@ appearance: mediagridwidget
 
 ---
 
-## Best Practices
+## វិធីល្អបំផុត
 
 1. Compute watermark text ក ្ ន ុ ង `calculate` field **ខ ា ង ល ើ** image field ។
 2. ប ្ រ ើ rotation angle (45°) ។
 3. Set opacity (`blur`) 30–60% ។
 
-## Limitations
+## ដែនកំណត់
 
 - Watermarking ត ្ រ ូ វ ប ា ន apply client-side ។
 - Watermarks baked ក ្ ន ុ ង image file ។

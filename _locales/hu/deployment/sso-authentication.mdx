@@ -7,24 +7,24 @@ Az rtCloud háromféle megközelítést támogat az egyszeri bejelentkezéshez (
 
 | Option | Best For |
 |--------|----------|
-| [Embedded Keycloak](#embedded-keycloak) | Organizations that want a fully self-contained SSO server bundled with rtCloud |
-| [External OIDC Provider](#external-oidc-provider) | Organizations already running an identity provider (Auth0, Authentik, Okta, Supabase, etc.) |
+| [Embedded Keycloak](#beágyazott-keycloak) | Organizations that want a fully self-contained SSO server bundled with rtCloud |
+| [External OIDC Provider](#külső-oidc-szolgáltató) | Organizations already running an identity provider (Auth0, Authentik, Okta, Supabase, etc.) |
 | [Azure Active Directory](#azure-active-directory) | Organizations using Microsoft 365 or Azure AD |
 
 Without SSO configured, users log in with local rtCloud accounts managed through the admin panel.
 
 ---
 
-## Embedded Keycloak
+## Beágyazott Keycloak
 
 The deployment includes an optional Keycloak container that runs alongside rtCloud. Keycloak is pre-configured with an rtSurvey realm and ready to use.
 
-### Requirements
+### Követelmények
 
 - A domain name with HTTPS (Keycloak requires HTTPS in production)
 - At least 4 GB RAM on the server (Keycloak adds ~512 MB memory usage)
 
-### Setup
+### Beállítás
 
 **1. Configure environment variables in `.env`:**
 
@@ -77,7 +77,7 @@ https://rtcloud.example.com/auth/admin
 
 Log in with `KEYCLOAK_ADMIN_USER` and `KEYCLOAK_ADMIN_PASSWORD`.
 
-### What Is Pre-Configured
+### Mi van előre konfigurálva
 
 The embedded Keycloak starts with a pre-imported `rtsurvey` realm that includes:
 
@@ -98,11 +98,11 @@ When using the cloud deployment scripts, Nginx is configured to proxy both servi
 
 ---
 
-## External OIDC Provider
+## Külső OIDC-szolgáltató
 
 Connect rtCloud to any OpenID Connect-compatible identity provider. This approach does not require the Keycloak container.
 
-### Supported Providers
+### Támogatott szolgáltatók
 
 Any OIDC-compliant provider works, including:
 - Authentik
@@ -113,7 +113,7 @@ Any OIDC-compliant provider works, including:
 - Google (for Google Workspace organizations)
 - GitHub (via OAuth apps with OIDC extension)
 
-### Setup
+### Beállítás
 
 **1. Register rtCloud as an OIDC client in your identity provider.**
 
@@ -152,13 +152,13 @@ OPEN_REGISTRATION=false
 docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 ```
 
-### Auto-Provisioning Users
+### Felhasználók automatikus kiépítése
 
 When `OPEN_REGISTRATION=true`, rtCloud automatically creates a local account the first time a user signs in via OIDC. The account is populated with the user's name and email from the ID token.
 
 When `OPEN_REGISTRATION=false` (default), an rtCloud administrator must create the user account first, and the OIDC identity is linked on first login.
 
-### Custom Endpoints
+### Egyéni végpontok
 
 If your provider does not support OIDC discovery (`.well-known/openid-configuration`), you can set endpoints manually:
 
@@ -174,7 +174,7 @@ OIDC_USERINFO_ENDPOINT=https://your-provider.com/oauth2/userinfo
 
 Integrate rtCloud with your organization's Microsoft Azure AD tenant.
 
-### Setup
+### Beállítás
 
 **1. Register a new app in the [Azure Portal](https://portal.azure.com):**
 
@@ -201,7 +201,7 @@ Users in your Azure AD tenant can now log in to rtCloud using their Microsoft cr
 
 ---
 
-## Disabling SSO
+## SSO letiltása
 
 To revert to local authentication, remove or comment out all SSO-related variables from `.env`, then restart the app container:
 

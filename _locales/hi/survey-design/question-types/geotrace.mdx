@@ -5,7 +5,7 @@ description: "Geotrace questions उत्तरदाताओं को map �
 
 XLSForms और rtSurvey में geotrace question type उत्तरदाताओं को map पर connected points की series capture करने में सक्षम बनाता है, lines या paths बनाता है। यह सुविधा routes map करने, boundaries trace करने, या spatial surveys में linear features के लिए विशेष रूप से उपयोगी है।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type     | name        | label                           |
 |----------|-------------|--------------------------------|
@@ -23,14 +23,14 @@ Geotrace questions सामान्यतः इनके लिए उपय�
 4. Transportation studies में travel paths record करना
 5. Ecological surveys में transects define करना
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. सुनिश्चित करें कि device में location services enabled हों और permissions granted हों।
 2. Path कैसे trace करें और कौन से features शामिल होने चाहिए, इस पर clear instructions प्रदान करें।
 3. Paths accurately trace करने में उत्तरदाताओं की मदद के लिए satellite imagery या base maps का उपयोग करने पर विचार करें।
 4. Traces की potential complexity और data size और processing पर उनके प्रभाव के प्रति सावधान रहें।
 
-## Example Usage
+## उदाहरण उपयोग
 
 यहाँ बताया गया है कि आप survey में geotrace question का उपयोग कैसे कर सकते हैं:
 
@@ -38,7 +38,7 @@ Geotrace questions सामान्यतः इनके लिए उपय�
 |----------|----------------|--------------------------------------------|--------------------------------------------|
 | geotrace | hiking_trail   | Hiking trail का path trace करें            | Trailhead से शुरू करें और summit पर समाप्त करें |
 
-## rtSurvey Extensions
+## rtSurvey एक्सटेंशन
 
 Basic XLSForm specification के अतिरिक्त, rtSurvey अतिरिक्त सुविधाएं या customizations प्रदान कर सकता है:
 
@@ -47,7 +47,7 @@ Basic XLSForm specification के अतिरिक्त, rtSurvey अति�
 3. Initial drawing के बाद traces edit या refine करने की ability
 4. Movement के दौरान set intervals पर automatic tracing का समर्थन
 
-## Data Format
+## डेटा प्रारूप
 
 Geotrace data आमतौर पर space-separated coordinate pairs की string के रूप में store होती है, geoshape के समान लेकिन closing point के बिना:
 

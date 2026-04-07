@@ -5,7 +5,7 @@ description: ""
 
 rtSurvey में default values आपको प्रश्नों को उत्तरों के साथ pre-populate करने की अनुमति देती हैं जब उत्तरदाता पहली बार उनका सामना करता है। यह सुविधा प्रारंभिक मूल्य प्रदान करके survey दक्षता और डेटा गुणवत्ता में महत्वपूर्ण सुधार कर सकती है जो या तो सामान्य रूप से चयनित होते हैं या अपेक्षित input के उदाहरण के रूप में काम करते हैं।
 
-## Basic Usage
+## बुनियादी उपयोग
 
 default value सेट करने के लिए, अपने XLSForm में `default` कॉलम का उपयोग करें:
 
@@ -18,7 +18,7 @@ default value सेट करने के लिए, अपने XLSForm म�
 
 इस उदाहरण में, survey की तारीख July 4, 2024 से pre-filled होगी, और weight field 51.3 किग्रा से शुरू होगी।
 
-## Dynamic Defaults
+## गतिशील डिफ़ॉल्ट
 
 rtSurvey functions का उपयोग करके dynamic default values का समर्थन करता है:
 
@@ -30,9 +30,9 @@ rtSurvey functions का उपयोग करके dynamic default values �
 
 यहाँ, `today()` function स्वचालित रूप से default को वर्तमान तारीख पर सेट करता है।
 
-## rtSurvey-Specific Features
+## rtSurvey-विशिष्ट सुविधाएँ
 
-### Context-Aware Defaults
+### संदर्भ-जागरूक डिफ़ॉल्ट
 
 rtSurvey context-aware defaults के साथ default functionality को विस्तारित करता है:
 
@@ -44,7 +44,7 @@ rtSurvey context-aware defaults के साथ default functionality को �
 
 यह device के GPS के आधार पर स्थान pre-fill करने के लिए rtSurvey के `${current_location}` variable का उपयोग करता है।
 
-### Cascading Defaults
+### कैस्केडिंग डिफ़ॉल्ट
 
 rtSurvey पिछले उत्तरों के आधार पर defaults की अनुमति देता है:
 
@@ -79,9 +79,9 @@ repeat group के अंदर प्रश्नों के लिए, defa
 4. **User Experience पर विचार करें**: सुनिश्चित करें कि defaults उत्तरदाताओं को गुमराह न करें या bias न डालें।
 5. **स्पष्ट रूप से दस्तावेज़ीकरण करें**: सुनिश्चित करें कि सभी team members default values के पीछे के तर्क को समझें।
 
-## Advanced Default Techniques
+## उन्नत डिफ़ॉल्ट तकनीक
 
-### Randomized Defaults
+### यादृच्छिक डिफ़ॉल्ट
 
 rtSurvey कुछ question types के लिए randomized defaults का समर्थन करता है:
 
@@ -93,7 +93,7 @@ rtSurvey कुछ question types के लिए randomized defaults का �
 
 यह 'options' list से एक default विकल्प randomly चुनता है।
 
-### Conditional Defaults
+### सशर्त डिफ़ॉल्ट
 
 conditional defaults सेट करने के लिए relevance का उपयोग करें:
 

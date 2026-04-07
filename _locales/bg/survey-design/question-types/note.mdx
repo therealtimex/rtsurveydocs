@@ -5,7 +5,7 @@ description: "Въпросите от тип note показват текст с
 
 The note question type in XLSForms and rtSurvey is used to display read-only text or media to the survey respondent. It's not a question that requires an answer, but rather a way to provide information, instructions, or context within the survey.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type | name | label |
 |------|------|-------|
@@ -13,7 +13,7 @@ The note question type in XLSForms and rtSurvey is used to display read-only tex
 
 For more details on the basic note question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Uses
+## Приложения
 
 Note questions are commonly used for:
 
@@ -23,14 +23,14 @@ Note questions are commonly used for:
 4. Separating sections of a survey
 5. Giving feedback based on previous responses
 
-## Best Practices
+## Най-добри практики
 
 1. Keep note text concise and clear to maintain respondent engagement.
 2. Use formatting (bold, italics) to emphasize important information.
 3. Consider using media (images, audio) to enhance understanding when appropriate.
 4. Use notes sparingly to avoid cluttering the survey.
 
-## Example Usage
+## Примерна употреба
 
 Here's an example of how you might use note questions in a survey:
 
@@ -43,7 +43,7 @@ Here's an example of how you might use note questions in a survey:
 
 In this example, we use notes to introduce the survey and provide a summary of calculated results.
 
-## rtSurvey Extensions
+## Разширения на rtSurvey
 
 While the basic XLSForm specification for note questions is straightforward, rtSurvey may offer additional features or customizations:
 
@@ -54,9 +54,9 @@ While the basic XLSForm specification for note questions is straightforward, rtS
 
 (Note: The specific extensions available in rtSurvey for note questions would need to be confirmed and detailed here.)
 
-## Advanced Usage
+## Разширена употреба
 
-### Conditional Display
+### Условно показване
 
 You can use relevance expressions to show notes conditionally:
 
@@ -64,7 +64,7 @@ You can use relevance expressions to show notes conditionally:
 |------|------|-------|----------|
 | note | high_reader_note | You're an avid reader! | `${books_per_month}` > 5 |
 
-### Including Calculations
+### Включване на изчисления
 
 Notes can include calculations to provide dynamic feedback:
 
@@ -72,7 +72,7 @@ Notes can include calculations to provide dynamic feedback:
 |------|------|-------|
 | note | reading_time | Based on your responses, you spend approximately `${books_per_month * 5}` hours reading each month. |
 
-## Limitations
+## Ограничения
 
 - Notes do not collect data, so they should not be used when you need to gather information from respondents.
 - Overuse of notes can make a survey feel cluttered or overly long.

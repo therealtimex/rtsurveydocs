@@ -5,7 +5,7 @@ description: "Въпросите от тип geotrace позволяват на 
 
 The geotrace question type in XLSForms and rtSurvey enables respondents to capture a series of connected points on a map, creating lines or paths. This feature is particularly useful for mapping routes, boundaries, or linear features in spatial surveys.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type     | name        | label                           |
 |----------|-------------|--------------------------------|
@@ -13,7 +13,7 @@ The geotrace question type in XLSForms and rtSurvey enables respondents to captu
 
 For more details on the basic geotrace question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Uses
+## Приложения
 
 Geotrace questions are commonly used for:
 
@@ -23,14 +23,14 @@ Geotrace questions are commonly used for:
 4. Recording travel paths in transportation studies
 5. Defining transects in ecological surveys
 
-## Best Practices
+## Най-добри практики
 
 1. Ensure the device has location services enabled and permissions granted.
 2. Provide clear instructions on how to trace the path and what features should be included.
 3. Consider using satellite imagery or base maps to help respondents accurately trace paths.
 4. Be mindful of the potential complexity of traces and their impact on data size and processing.
 
-## Example Usage
+## Примерна употреба
 
 Here's an example of how you might use a geotrace question in a survey:
 
@@ -38,7 +38,7 @@ Here's an example of how you might use a geotrace question in a survey:
 |----------|----------------|--------------------------------------------|--------------------------------------------|
 | geotrace | hiking_trail   | Trace the path of the hiking trail         | Start at the trailhead and end at the summit |
 
-## rtSurvey Extensions
+## Разширения на rtSurvey
 
 While the basic XLSForm specification for geotrace questions is straightforward, rtSurvey may offer additional features or customizations:
 
@@ -49,7 +49,7 @@ While the basic XLSForm specification for geotrace questions is straightforward,
 
 (Note: The specific extensions available in rtSurvey for geotrace questions would need to be confirmed and detailed here.)
 
-## Data Format
+## Формат на данните
 
 Geotrace data is typically stored as a string of space-separated coordinate pairs, similar to geoshape but without the closing point:
 
@@ -62,7 +62,7 @@ For example:
 38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
 ```
 
-## Considerations for Analysis
+## Съображения за анализ
 
 When using geotrace questions, consider:
 
@@ -71,7 +71,7 @@ When using geotrace questions, consider:
 3. Privacy and data protection measures for handling detailed spatial data
 4. Integration with other spatial data sources for comprehensive analysis
 
-## Limitations
+## Ограничения
 
 - Tracing accurate paths on small mobile screens can be challenging.
 - Complex traces may require significant storage and processing capacity.

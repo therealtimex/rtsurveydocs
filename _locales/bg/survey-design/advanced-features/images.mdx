@@ -7,11 +7,11 @@ Beyond the standard `image` question type, rtSurvey provides extensions for **wa
 
 ---
 
-## Watermark
+## Воден знак
 
 The watermark feature overlays text or an image onto a captured photo before it is stored. This is used to brand field photos with the date, enumerator name, GPS location, or any other survey data — making it harder to pass off pre-existing photos as freshly captured evidence.
 
-### Setup
+### Настройка
 
 Use `watermark()` in the **`calculation`** column of an `image` field, combined with `callapi` appearance:
 
@@ -29,7 +29,7 @@ watermark(type, size, distance, color, shadow, rotate, blur)
 | `rotate` | Rotation angle in degrees (e.g., `45` for diagonal) |
 | `blur` | Opacity of the watermark (0 = invisible, 100 = fully opaque) |
 
-### Text watermark example
+### Пример за текстов воден знак
 
 Overlay the enumerator's name and today's date diagonally across each captured photo:
 
@@ -40,7 +40,7 @@ Overlay the enumerator's name and today's date diagonally across each captured p
 
 The watermark text is taken from `${wm_text}`. Set the watermark text field **before** the image field in the form.
 
-### Image/logo watermark example
+### Пример за воден знак с изображение/лого
 
 Overlay an organisation logo (attached as a media file named `logo.png`):
 
@@ -48,17 +48,17 @@ Overlay an organisation logo (attached as a media file named `logo.png`):
 |------|------|-------|------------|-------------|
 | image | evidence_photo | Take photo of evidence | watermark | `watermark('file', 25, 80, '', '#000000', 0, 50)` |
 
-### Undo/redo
+### Отмяна/повторение
 
 The watermark editor supports undo and redo — enumerators can step back through editing history before confirming the photo.
 
-### Watermark tiling
+### Плочки с воден знак
 
 The watermark repeats (tiles) across the entire image automatically. The `distance` parameter controls spacing between tiles; `rotate` controls the angle of each tile.
 
 ---
 
-## Media grid widget
+## Медийна мрежова джаджа
 
 The media grid widget displays a collection of media files (images, audio, video) in a grid layout, allowing reviewers or enumerators to browse captured files visually.
 
@@ -73,7 +73,7 @@ This widget is activated by the `mediagridwidget` appearance and is typically us
 
 ---
 
-## Best Practices for watermarked photos
+## Най-добри практики за снимки с воден знак
 
 1. Always compute the watermark text in a `calculate` field **above** the image field so it is available when the photo is taken.
 2. Use a rotation angle (e.g., 45°) to make watermarks harder to crop out.
@@ -81,7 +81,7 @@ This widget is activated by the `mediagridwidget` appearance and is typically us
 4. Include the enumerator name, date, and GPS coordinates in the watermark text to maximise audit value.
 5. Test watermark rendering on the lowest-spec device in your fleet — canvas-based watermarking can be slow on older hardware.
 
-## Limitations
+## Ограничения
 
 - Watermarking is applied client-side using the HTML5 Canvas API — it requires a capable browser or mobile WebView.
 - Very high-resolution photos may take several seconds to watermark on low-end devices.

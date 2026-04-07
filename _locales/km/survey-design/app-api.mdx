@@ -15,7 +15,7 @@ AppAPI អនុញ្ញាតឱ្យ users load system metadata ពី app �
 - `'data-key'`: key ន ៃ data ។
 - ប ្ រ ស ិ ន ប ើ data key invalid, calculation return "n/a" ។
 
-## Data Keys ដែល គាំទ្រ
+## Data Keys ដែលគាំទ្រ
 
 `osPlatform`: Returns OS name (Android ឬ iOS) ។
 
@@ -38,9 +38,9 @@ AppAPI អនុញ្ញាតឱ្យ users load system metadata ពី app �
 | organization_name    | Organization name                     |
 | is_supervisor        | 1 ប ្ រ ស ិ ន ប ើ supervisor, 0 ប ្ រ ស ិ ន ប ើ ម ិ ន ម ែ ន |
 
-## Usage Examples
+## ឧទាហរណ៍ការប្រើប្រាស់
 
-### Store enumerator's username
+### រក្សាទុកឈ្មោះអ្នកប្រើរបស់អ្នកចុះបញ្ជី
 
 ```
 | type      | name           | label | calculation                          |
@@ -49,7 +49,7 @@ AppAPI អនុញ្ញាតឱ្យ users load system metadata ពី app �
 | calculate | enumerator_org |       | pulldata('app-api', 'user.organization_name') |
 ```
 
-### Server time
+### ម៉ោងម៉ាស៊ីនមេ
 
 ```
 | type      | name      | label | calculation                       |
@@ -57,7 +57,7 @@ AppAPI អនុញ្ញាតឱ្យ users load system metadata ពី app �
 | calculate | server_ts |       | pulldata('app-api', 'serverTime') |
 ```
 
-### Conditional logic based on user role
+### តក្កវិជ្ជាតាមលក្ខខណ្ឌដោយផ្អែកលើតួនាទីអ្នកប្រើ
 
 ```
 | type      | name          | label | relevant                    |
@@ -68,7 +68,7 @@ AppAPI អនុញ្ញាតឱ្យ users load system metadata ពី app �
 | end_group |               |       |                             |
 ```
 
-## Notes
+## កំណត់ចំណាំ
 
 - calls `pulldata('app-api', ...)` ទ ាំ ង អ ស ់ ត ្ រ ូ វ ប ា ន evaluate ន ៅ ព េ ល form ត ្ រ ូ វ ប ា ន បើ ក ។
 - ប ្ រ ស ិ ន ប ើ key unsupported, function return `'n/a'` ។

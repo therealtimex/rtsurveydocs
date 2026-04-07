@@ -7,7 +7,7 @@ import { Callout } from 'nextra/components'
 
 Meta question types special fields हैं जो **automatically** fill होती हैं — उत्तरदाता उन्हें कभी नहीं देखता। वे submission के बारे में context capture करती हैं: कब collect किया गया, किस device का उपयोग किया गया, और किसने collect किया। उन्हें `survey` worksheet में किसी भी अन्य question type की तरह जोड़ें; वे simply screen पर दिखाई नहीं देतीं।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type | name | label |
 |------|------|-------|
@@ -19,7 +19,7 @@ Meta fields के लिए Labels optional हैं क्योंकि व
 
 ---
 
-## Timing meta fields
+## समय meta फ़ील्ड
 
 ### `start`
 
@@ -50,7 +50,7 @@ today | today |
 
 ---
 
-## Device meta fields
+## डिवाइस meta फ़ील्ड
 
 ### `deviceid`
 
@@ -90,7 +90,7 @@ subscriberid | subscriberid |
 
 ---
 
-## Enumerator meta fields
+## गणनाकर्ता meta फ़ील्ड
 
 ### `username`
 
@@ -121,7 +121,7 @@ phonenumber | phonenumber |
 
 ---
 
-## Audit log
+## ऑडिट लॉग
 
 ### `audit`
 
@@ -151,7 +151,7 @@ Audit log capture करती है:
 
 ---
 
-## Complete example
+## पूर्ण उदाहरण
 
 एक typical household survey में सभी timing और enumerator meta fields शामिल हो सकती हैं:
 
@@ -169,7 +169,7 @@ Audit log capture करती है:
 
 ---
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. हमेशा `start` और `end` शामिल करें — वे free, automatic, और quality monitoring के लिए invaluable हैं।
 2. Enumerators track करने के लिए हमेशा `username` शामिल करें।

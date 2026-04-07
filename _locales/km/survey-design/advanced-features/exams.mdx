@@ -9,14 +9,14 @@ import { Callout } from 'nextra/components'
 
 ---
 
-## `check-exam()` function
+## មុខងារ `check-exam()`
 
 ```
 check-exam(examTime, questionToStoreRemainingTime)
 check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, excludeQuestion)
 ```
 
-### Parameters
+### ប៉ារ៉ាម៉ែត្រ
 
 | # | Parameter | ការពិពណ៌នា |
 |---|-----------|-------------|
@@ -28,7 +28,7 @@ check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, exclu
 
 ---
 
-## Basic setup
+## ការដំឡើងមូលដ្ឋាន
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -37,7 +37,7 @@ check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, exclu
 
 ---
 
-## With audio feedback
+## ជាមួយការឆ្លើយតបជាសំឡេង
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -49,7 +49,7 @@ Sound files ត ្ រ ូ វ ត ែ ភ ្ ជ ា ប ់ ជ ា media fi
 
 ---
 
-## Excluding questions ពី timer
+## ការដកសំណួរចេញពី timer
 
 ```
 check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header')
@@ -57,13 +57,13 @@ check-exam(300, 'remaining_time', '', '', 'intro_note,consent_ack,section_header
 
 ---
 
-## Best Practices
+## វិធីល្អបំផុត
 
 1. ជ ា ន ិ ច ្ ច inform respondents អំ ព ី time limit ។
 2. Exclude intro notes ហ ើ យ consent questions ។
 3. ប ្ រ ើ `remaining_time` ដ ើ ម ្ ប ី detect time-outs ។
 
-## Limitations
+## ដែនកំណត់
 
 - Timer display-only — form ដ ោ យ ស ្ វ ័ យ ប ្ រ វ ត ្ ត ិ submit ម ិ ន ។
 - Exam feature ជ ា rtSurvey extension ។

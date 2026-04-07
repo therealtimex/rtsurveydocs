@@ -5,7 +5,7 @@ description: "Select_multiple questions उत्तरदाताओं को
 
 `select_multiple` question type एक list प्रदर्शित करता है जहाँ उत्तरदाता **एक या अधिक विकल्प** चुन सकता है। Default रूप से choices checkboxes के रूप में render होती हैं। Stored value सभी selected choice values की **space-separated list** है।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 **survey worksheet:**
 
@@ -25,7 +25,7 @@ description: "Select_multiple questions उत्तरदाताओं को
 
 अधिक जानकारी के लिए [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
 
-## Stored data format
+## संग्रहीत डेटा प्रारूप
 
 Exported column selected values की space-separated list contains करता है:
 
@@ -44,7 +44,7 @@ Select_multiple questions का उपयोग इनके लिए कि�
 3. Language या skill inventories
 4. कोई भी प्रश्न जहाँ multiple answers एक साथ valid हों
 
-## Appearance options
+## उपस्थिति विकल्प
 
 | Appearance | विवरण |
 |------------|-------------|
@@ -125,7 +125,7 @@ Select_multiple questions का उपयोग इनके लिए कि�
 | `selected-at(field, index)` | `selected-at(${crops_grown}, 0)` | पहली selected value |
 | `choice-label(field, value)` | `choice-label(${crops_grown}, 'maize')` | एक value के लिए label |
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. `relevant`, `constraint`, और `calculate` में हमेशा `selected()` का उपयोग करें — कभी `=` या `!=` का नहीं।
 2. यदि question design की आवश्यकता हो तो selections की maximum संख्या सीमित करने के लिए constraint जोड़ें।

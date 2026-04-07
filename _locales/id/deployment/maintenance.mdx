@@ -32,7 +32,7 @@ docker compose -f docker-compose.production.yml exec rtcloud bash
 
 ---
 
-## Upgrading
+## Peningkatan Versi
 
 rtCloud updates are distributed as new Docker image tags. Upgrading pulls the latest image and recreates the app container. Database migrations run automatically on startup.
 
@@ -50,7 +50,7 @@ docker compose -f docker-compose.production.yml up -d
 
 Docker replaces only the containers whose image has changed. The MySQL container and all named volumes are unaffected.
 
-### Pinning a Version
+### Menetapkan Versi
 
 To upgrade to a specific version instead of `latest`, update `RTCLOUD_IMAGE` in `.env`:
 
@@ -60,15 +60,15 @@ RTCLOUD_IMAGE=rtawebteam/rta-smartsurvey:1.2.3
 
 Then run `docker compose pull` and `up -d` as above.
 
-### Downgrading
+### Menurunkan Versi
 
 Downgrading is generally not recommended, as database migrations cannot be reversed. If a downgrade is necessary, restore from a database backup taken before the upgrade.
 
 ---
 
-## Backup and Restore
+## Cadangan dan Pemulihan
 
-### Backup the Database
+### Mencadangkan Basis Data
 
 Run this command to export the application database to a SQL file:
 
@@ -80,7 +80,7 @@ docker compose -f docker-compose.production.yml exec mysql \
 
 The backup file is written to your current directory on the host.
 
-### Restore the Database
+### Memulihkan Basis Data
 
 ```bash
 docker compose -f docker-compose.production.yml exec -T mysql \
@@ -88,7 +88,7 @@ docker compose -f docker-compose.production.yml exec -T mysql \
   < backup-20240101-120000.sql
 ```
 
-### Backup Uploaded Files
+### Mencadangkan File yang Diunggah
 
 Survey submissions often include uploaded files (photos, audio, documents) stored in named Docker volumes. Back them up separately from the database:
 
@@ -108,7 +108,7 @@ docker run --rm \
 
 Replace `rtcloud_uploads` and `rtcloud_audios` with your actual volume names (prefixed by `COMPOSE_PROJECT_NAME`) if you changed the default.
 
-### Restore Uploaded Files
+### Memulihkan File yang Diunggah
 
 ```bash
 docker run --rm \
@@ -117,7 +117,7 @@ docker run --rm \
   alpine tar xzf /backup/uploads-20240101.tar.gz -C /data
 ```
 
-### Automated Daily Backups
+### Cadangan Harian Otomatis
 
 Add a cron job on the host to run backups automatically. Edit the root crontab with `crontab -e`:
 
@@ -131,9 +131,9 @@ Add a cron job on the host to run backups automatically. Edit the root crontab w
 
 ---
 
-## Troubleshooting
+## Pemecahan Masalah
 
-### App container not starting
+### Container aplikasi tidak mau mulai
 
 Check the container logs for error messages:
 
@@ -146,7 +146,7 @@ Common causes:
 - MySQL not yet ready (wait 60 seconds and check again)
 - Port conflict — another process is already using `APP_PORT`
 
-### MySQL not healthy
+### MySQL tidak sehat
 
 ```bash
 docker compose -f docker-compose.production.yml logs mysql
@@ -158,7 +158,7 @@ Common causes:
 
 MySQL can take 30–60 seconds to initialize on the very first boot. Wait and check again before assuming failure.
 
-### Port already in use
+### Port sudah digunakan
 
 Change `APP_PORT` or `SHINY_PORT` in `.env` to a free port, then recreate the containers:
 
@@ -172,7 +172,7 @@ To find what is using a port on the host:
 lsof -i :8080
 ```
 
-### 400 CSRF Token Could Not Be Verified
+### 400 Token CSRF tidak dapat diverifikasi
 
 This error appears in local or reverse-proxy environments where the request origin does not match the expected host. Disable CSRF validation for local development only:
 
@@ -188,7 +188,7 @@ docker compose -f docker-compose.production.yml up -d --force-recreate rtcloud
 
 > Do not disable CSRF validation in production. If this error occurs in production, ensure your reverse proxy is forwarding the correct `Host` and `X-Forwarded-For` headers.
 
-### Forgot the Admin Password
+### Lupa kata sandi admin
 
 Reset the admin password directly in the database. Connect to the MySQL container and update the password hash:
 
@@ -209,7 +209,7 @@ docker compose -f docker-compose.production.yml exec mysql \
   -e "UPDATE ss_user SET password='<hash_from_step_1>' WHERE username='admin';"
 ```
 
-### Container keeps restarting
+### Container terus memulai ulang
 
 Check if the health check is failing:
 
@@ -220,7 +220,7 @@ docker inspect rtcloud-app --format '{{{{json .State.Health}}}}'
 
 The app health check calls the `/health` endpoint. If it fails repeatedly, check the application logs for startup errors.
 
-### Disk space full
+### Ruang disk penuh
 
 Identify what is consuming space:
 
@@ -239,7 +239,7 @@ Do not use `docker system prune --volumes` as this will delete application data.
 
 ---
 
-## Health Checks
+## Pemeriksaan Kesehatan
 
 Each service has an automatic health check. Container status reflects the result:
 

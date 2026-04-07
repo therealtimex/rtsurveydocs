@@ -9,7 +9,7 @@ Các biến được đánh dấu **bắt buộc** phải được đặt trư�
 
 ---
 
-## Project
+## Dự án
 
 These variables define the identity and access point of your rtCloud instance.
 
@@ -23,7 +23,7 @@ These variables define the identity and access point of your rtCloud instance.
 
 ---
 
-## Database
+## Cơ sở dữ liệu
 
 MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
@@ -38,7 +38,7 @@ MySQL connection credentials. The database is managed automatically by the MySQL
 
 ---
 
-## Admin Account
+## Tài khoản quản trị viên
 
 The admin account is created automatically on the first boot of a fresh database.
 
@@ -50,7 +50,7 @@ The admin account is created automatically on the first boot of a fresh database
 
 ---
 
-## Ports
+## Cổng
 
 Control which host ports the application binds to.
 
@@ -61,7 +61,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Runtime
+## Môi trường chạy
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -76,7 +76,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Security
+## Bảo mật
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -137,7 +137,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Optional Integrations
+## Tích hợp tùy chọn
 
 ### Stata
 
@@ -167,7 +167,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 |----------|-------------|
 | `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox Integration
+### Tích hợp RtBox
 
 | Variable | Description |
 |----------|-------------|
@@ -175,7 +175,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 | `RTBOX_USER_API` | RtBox user API key. |
 | `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix Messaging
+### Matrix Nhắn tin
 
 | Variable | Description |
 |----------|-------------|
@@ -184,7 +184,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Data Volumes
+## Khối dữ liệu
 
 All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 

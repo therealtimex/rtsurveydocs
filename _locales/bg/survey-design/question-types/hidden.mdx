@@ -5,7 +5,7 @@ description: "Скритите полета съхраняват стойнос�
 
 A `hidden` field stores a value that is **never displayed to the respondent**. Unlike `calculate` (which computes a value), `hidden` is used to carry in an **externally provided value** — for example, a task ID, a household ID passed from another system, or an enumerator code injected when the form is launched.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type | name | label |
 |------|------|-------|
@@ -13,7 +13,7 @@ A `hidden` field stores a value that is **never displayed to the respondent**. U
 
 Labels are not required for hidden fields since nothing is rendered on screen.
 
-## Uses
+## Приложения
 
 Hidden fields are commonly used for:
 
@@ -23,7 +23,7 @@ Hidden fields are commonly used for:
 4. Carrying data from a parent form into a child form in linked workflows
 5. Storing a value derived from URL parameters when the form is opened via a web link
 
-## Setting a default value
+## Задаване на стойност по подразбиране
 
 The most common pattern is to use `hidden` with a `default` expression so the value is set when the form opens:
 
@@ -32,7 +32,7 @@ The most common pattern is to use `hidden` with a `default` expression so the va
 | hidden | deployment_code | 'ZONE_A_2024' |
 | hidden | form_version | '3.1' |
 
-## Referencing a hidden field in calculations
+## Препратка към скрито поле в изчисления
 
 Hidden values can be referenced like any other field using `${fieldname}`:
 
@@ -42,7 +42,7 @@ Hidden values can be referenced like any other field using `${fieldname}`:
 | calculate | label_prefix | | concat('[', `${zone_code}`, '] ') |
 | note | intro | `${label_prefix}` Welcome to the household survey | |
 
-## Using hidden with prefill / URL parameters
+## Използване на hidden с предварително попълване / URL параметри
 
 When launching a web form via URL, you can pass parameters that populate hidden fields. This allows you to pre-load a household ID or task code without the enumerator typing it:
 
@@ -52,14 +52,14 @@ https://your-server.com/form/FORMID?household_id=H00123&zone_code=NORTH
 
 The field named `household_id` will be automatically populated with `H00123`.
 
-## Best Practices
+## Най-добри практики
 
 1. Use `hidden` (not `calculate`) when the value is **injected externally** and should not be recomputed.
 2. Use `calculate` when the value is **derived from other fields** in the form.
 3. Always set a `default` if the hidden field must have a value — a hidden field with no default will be empty.
 4. Name hidden fields clearly to distinguish them (e.g., prefix with `_hidden_` or use a consistent naming convention).
 
-## Limitations
+## Ограничения
 
 - Hidden fields are included in the exported data like any other field.
 - They cannot be shown conditionally — they are always present (but invisible).

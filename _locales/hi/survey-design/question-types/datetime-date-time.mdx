@@ -5,7 +5,7 @@ description: "Datetime questions उत्तरदाताओं को एक
 
 XLSForms और rtSurvey में datetime question type उत्तरदाताओं को एक single field में दोनों date और time input करने की अनुमति देता है। यह question type तब उपयोगी है जब आपको समय में एक specific moment capture करने की आवश्यकता हो, जिसमें date और exact time दोनों शामिल हों।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type     | name           | label                           |
 |----------|----------------|--------------------------------|
@@ -22,18 +22,18 @@ Datetime questions सामान्यतः इनके लिए उपय�
 3. Activities के start और end times log करना
 4. Time-sensitive data collection के लिए precise moments capture करना
 
-## rtSurvey Extensions
+## rtSurvey एक्सटेंशन
 
 rtSurvey datetime questions की functionality को विभिन्न appearances और customization options के साथ विस्तारित करता है:
 
-### Appearance Options
+### उपस्थिति विकल्प
 
 - `(default)`: Date और time select करने के लिए calendar और clock प्रदर्शित करें
 - `inline`: Calendar और clock को icons के रूप में प्रदर्शित करें
 - `inline-1line`: Calendar और clock को single row format में selection के लिए प्रदर्शित करें
 - `inline-onlyresult`: Calendar और clock icons को line के end में प्रदर्शित करें; चयन के बाद icons गायब हो जाते हैं
 
-### Color Customization
+### रंग अनुकूलन
 
 आप `colors()` function का उपयोग करके calendar और clock icons का color customize कर सकते हैं:
 
@@ -49,7 +49,7 @@ rtSurvey special syntax का उपयोग करके custom date और t
 - `inline-[%Y-%m-%d %H:%M:%S]`: Custom format उदाहरण (Year-Month-Day Hour:Minute:Second)
 - `inline-[%d/%m/%Y %I:%M %p]`: Custom format उदाहरण (Day/Month/Year Hour:Minute AM/PM)
 
-## Example Usage
+## उदाहरण उपयोग
 
 यहाँ बताया गया है कि आप survey में datetime question का उपयोग कैसे कर सकते हैं:
 
@@ -57,7 +57,7 @@ rtSurvey special syntax का उपयोग करके custom date और t
 |----------|----------------|--------------------------------------------|-----------------------------|
 | datetime | incident_time  | घटना कब हुई?                               | inline-[%d/%m/%Y %I:%M %p]  |
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. Expected date और time format पर clear instructions प्रदान करें।
 2. अधिक compact display के लिए `inline` appearance का उपयोग करने पर विचार करें।

@@ -9,7 +9,7 @@ Proměnné označené jako **povinné** musí být nastaveny před spuštěním 
 
 ---
 
-## Project
+## Projekt
 
 These variables define the identity and access point of your rtCloud instance.
 
@@ -23,7 +23,7 @@ These variables define the identity and access point of your rtCloud instance.
 
 ---
 
-## Database
+## Databáze
 
 MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
@@ -38,7 +38,7 @@ MySQL connection credentials. The database is managed automatically by the MySQL
 
 ---
 
-## Admin Account
+## Účet administrátora
 
 The admin account is created automatically on the first boot of a fresh database.
 
@@ -50,7 +50,7 @@ The admin account is created automatically on the first boot of a fresh database
 
 ---
 
-## Ports
+## Porty
 
 Control which host ports the application binds to.
 
@@ -61,7 +61,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Runtime
+## Prostředí běhu
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -76,7 +76,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Security
+## Zabezpečení
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -85,7 +85,7 @@ Control which host ports the application binds to.
 
 ---
 
-## SSO — Embedded Keycloak
+## SSO — Integrovaný Keycloak
 
 Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
@@ -108,7 +108,7 @@ See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete 
 
 ---
 
-## SSO — External OIDC Provider
+## SSO — Externí OIDC poskytovatel
 
 Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
 
@@ -137,7 +137,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Optional Integrations
+## Volitelné integrace
 
 ### Stata
 
@@ -161,13 +161,13 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 | `PIWIK_ID` | Matomo site ID. |
 | `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (R Computation)
+### OpenCPU (výpočty R)
 
 | Variable | Description |
 |----------|-------------|
 | `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox Integration
+### Integrace RtBox
 
 | Variable | Description |
 |----------|-------------|
@@ -184,7 +184,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Data Volumes
+## Datové svazky
 
 All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 

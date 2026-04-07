@@ -5,7 +5,7 @@ description: ""
 
 Groups ក្នុង XLSForm អនុញ្ញាតឱ្យ organize questions ដែល ទាក់ ទ ន គ្នា ។ rtSurvey support XLSForm groups ពេញ លេញ ហើយ extend functionality ពួក វា ។
 
-## Basic Group Structure
+## រចនាសម្ព័ន្ធក្រុមមូលដ្ឋាន
 
 ```
 | type         | name       | label                                    |
@@ -16,13 +16,13 @@ Groups ក្នុង XLSForm អនុញ្ញាតឱ្យ organize questi
 | end_group    |            |                                          |
 ```
 
-## Group Appearance
+## រូបរាងក្រុម
 
 1. **field-list**: បង្ហាញ questions ច្រើន នៅ screen ដូច គ្នា ។
 2. **grid**: បង្កើត compact, table-like layout (rtSurvey-specific) ។
 3. **collapsible**: បង្កើត expandable/collapsible groups (rtSurvey-specific) ។
 
-## Nested Groups
+## ក្រុមដំឡើងក្នុង
 
 ```
 | type         | name       | label                                    |
@@ -35,7 +35,7 @@ Groups ក្នុង XLSForm អនុញ្ញាតឱ្យ organize questi
 | end_group    |            |                                          |
 ```
 
-## Skip Logic សម្រាប់ Groups
+## តក្កវិជ្ជារំលងសម្រាប់ Groups
 
 ```
 | type         | name   | label                                        | relevant        |
@@ -46,14 +46,14 @@ Groups ក្នុង XLSForm អនុញ្ញាតឱ្យ organize questi
 | end_group    |        |                                              |                 |
 ```
 
-## Best Practices
+## វិធីល្អបំផុត
 
 1. ប្រើ names ដែល meaningful ។
 2. រក្សា groups ឱ្យ focused លើ questions ដែល ទាក់ ទ ន ។
 3. Test skip logic ដោយ ហ្មត់ ចត់ ។
 4. ប្រើ `field-list` appearance សម្រាប់ groups ខ្លី ។
 
-## Multilingual Support
+## ការគាំទ្រពហុភាសា
 
 ```
 | type         | name       | label::English | label::French |

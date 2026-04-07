@@ -12,7 +12,7 @@ description: "Функцията Call API позволява на анкетат
 
 ---
 
-## `callapi()` — Fetch and store an API response
+## `callapi()` — Извличане и съхраняване на API отговор
 
 ### Синтаксис
 
@@ -54,7 +54,7 @@ callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.result.value', 150
 
 In the `post_body`, use `##fieldname##` to inject the current value of any form field.
 
-### Appearance: `callapi`
+### Изглед: `callapi`
 
 Add `callapi` to the `appearance` column of the field to enable the API call integration:
 
@@ -66,7 +66,7 @@ When `allowed_auto` is `0`, rtSurvey shows a **"Fetch" button** that the enumera
 
 ---
 
-## `callapi-verify()` — Validate a value against an API
+## `callapi-verify()` — Валидиране на стойност срещу API
 
 `callapi-verify()` blocks submission of a field until an API confirms the entered value is valid. Use it in the **`constraint`** column.
 
@@ -95,13 +95,13 @@ callapi-verify(method, url, extract_expr, match_expr, timeout, constraint_mode, 
 |------|------|-------|------------|------------|-------------------|
 | barcode | asset_code | Scan the asset barcode | callapi-verify | `callapi-verify('POST', 'https://api.example.com/assets/verify', '$.valid', ". = 'true'", 10000, 'hard', '{"code": "##asset_code##"}')` | Asset not found in registry |
 
-### Appearance: `callapi-verify(...)`
+### Изглед: `callapi-verify(...)`
 
 The `appearance` column on a field with `callapi-verify()` in constraint should contain `callapi-verify(params)` or `callapi-verify(dynamicParams)` to signal to rtSurvey that this field uses API verification.
 
 ---
 
-## Using App API data alongside callapi
+## Използване на данни от App API заедно с callapi
 
 Combine `callapi()` with `pulldata('app-api', 'user.token')` to inject the authenticated user's token into your API request:
 
@@ -110,7 +110,7 @@ callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, ''
   concat('{"token":"', pulldata('app-api','user.token'), '","id":"##item_id##"}'))
 ```
 
-## Best Practices
+## Най-добри практики
 
 1. Always set a reasonable `timeout` (5000–15000 ms) — do not use 0 or very high values.
 2. Set `allowed_auto=0` for verifications the enumerator should trigger consciously (e.g., ID checks).
@@ -118,7 +118,7 @@ callapi('POST', 'https://api.example.com/data', 1, 2, 0, '$.value', 10000, 0, ''
 4. Use `extract_expr` with a specific JSONPath rather than relying on raw response text.
 5. Test API calls in offline mode — callapi will fail gracefully and show an error, but the form should still be completable for non-critical fields.
 
-## Limitations
+## Ограничения
 
 - Requires network connectivity at the time of the call — calls will fail when the device is offline.
 - API responses must be JSON — XML or plain-text responses require additional parsing.

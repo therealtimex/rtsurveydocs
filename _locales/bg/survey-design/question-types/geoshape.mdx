@@ -5,7 +5,7 @@ description: "Въпросите от тип geoshape позволяват на 
 
 The geoshape question type in XLSForms and rtSurvey enables respondents to draw shapes (polygons) on a map, capturing complex geographical data. This feature is particularly useful for mapping areas, defining boundaries, or marking regions of interest in spatial surveys.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type     | name        | label                           |
 |----------|-------------|--------------------------------|
@@ -13,7 +13,7 @@ The geoshape question type in XLSForms and rtSurvey enables respondents to draw 
 
 For more details on the basic geoshape question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Uses
+## Приложения
 
 Geoshape questions are commonly used for:
 
@@ -23,14 +23,14 @@ Geoshape questions are commonly used for:
 4. Outlining regions for geological surveys
 5. Capturing complex geographical features for spatial analysis
 
-## Best Practices
+## Най-добри практики
 
 1. Ensure the device has location services enabled and permissions granted.
 2. Provide clear instructions on how to draw the shape and what area should be included.
 3. Consider using satellite imagery or base maps to help respondents accurately draw shapes.
 4. Be mindful of the potential complexity of shapes and their impact on data size and processing.
 
-## Example Usage
+## Примерна употреба
 
 Here's an example of how you might use a geoshape question in a survey:
 
@@ -38,7 +38,7 @@ Here's an example of how you might use a geoshape question in a survey:
 |----------|----------------|--------------------------------------------|--------------------------------------------|
 | geoshape | forest_area    | Outline the boundary of the forest patch   | Use at least 3 points to create a closed shape |
 
-## rtSurvey Extensions
+## Разширения на rtSurvey
 
 While the basic XLSForm specification for geoshape questions is straightforward, rtSurvey may offer additional features or customizations:
 
@@ -49,7 +49,7 @@ While the basic XLSForm specification for geoshape questions is straightforward,
 
 (Note: The specific extensions available in rtSurvey for geoshape questions would need to be confirmed and detailed here.)
 
-## Data Format
+## Формат на данните
 
 Geoshape data is typically stored as a string of space-separated coordinate pairs, enclosed in parentheses:
 
@@ -62,7 +62,7 @@ For example:
 (38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
 ```
 
-## Considerations for Analysis
+## Съображения за анализ
 
 When using geoshape questions, consider:
 
@@ -71,7 +71,7 @@ When using geoshape questions, consider:
 3. Privacy and data protection measures for handling detailed spatial data
 4. Integration with other spatial data sources for comprehensive analysis
 
-## Limitations
+## Ограничения
 
 - Drawing accurate shapes on small mobile screens can be challenging.
 - Complex shapes may require significant storage and processing capacity.

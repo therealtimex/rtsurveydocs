@@ -5,7 +5,7 @@ description: "Въпросите от тип decimal позволяват чис
 
 The decimal question type in XLSForms and rtSurvey is used to collect numeric responses that may include fractional parts. This question type is essential for gathering precise numerical data such as measurements, prices, or percentages.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type    | name   | label                    |
 |---------|--------|--------------------------|
@@ -13,7 +13,7 @@ The decimal question type in XLSForms and rtSurvey is used to collect numeric re
 
 For more details on the basic decimal question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Uses
+## Приложения
 
 Decimal questions are commonly used for:
 
@@ -23,14 +23,14 @@ Decimal questions are commonly used for:
 4. Scientific data collection
 5. Any numeric data that requires precision beyond whole numbers
 
-## Best Practices
+## Най-добри практики
 
 1. Use clear and concise labels to specify the expected input and unit of measurement.
 2. Implement range constraints to prevent unrealistic or erroneous inputs.
 3. Consider using hint text to provide examples or clarify the expected format.
 4. Specify the desired number of decimal places in the label or hint if precision is important.
 
-## Constraints and Validation
+## Ограничения и валидация
 
 You can add constraints to ensure the entered value falls within a specific range:
 
@@ -38,7 +38,7 @@ You can add constraints to ensure the entered value falls within a specific rang
 |---------|--------|--------------------------|-------------------|---------------------------------------|
 | decimal | height | Enter your height in meters | .>0 and .&lt;=3    | Height must be between 0 and 3 meters |
 
-## Example Usage
+## Примерна употреба
 
 Here's an example of how you might use decimal questions in a health survey:
 
@@ -57,7 +57,7 @@ calculation | ${weight} / (${height} * ${height})
 
 This will calculate the BMI using the entered weight and height.
 
-## rtSurvey Extensions
+## Разширения на rtSurvey
 
 While the basic XLSForm specification for decimal questions is straightforward, rtSurvey may offer additional features or customizations:
 
@@ -67,7 +67,7 @@ While the basic XLSForm specification for decimal questions is straightforward, 
 
 (Note: The specific extensions available in rtSurvey for decimal questions would need to be confirmed and detailed here.)
 
-## Limitations
+## Ограничения
 
 - The precision of decimal numbers may be limited by the underlying system or database.
 - Users may need guidance on the expected decimal separator (period or comma) depending on their locale.

@@ -9,7 +9,7 @@ Mainīgie, kas atzīmēti kā **obligāti**, jāiestata pirms konteineru palaiš
 
 ---
 
-## Project
+## Projekts
 
 These variables define the identity and access point of your rtCloud instance.
 
@@ -23,7 +23,7 @@ These variables define the identity and access point of your rtCloud instance.
 
 ---
 
-## Database
+## Datubāze
 
 MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
@@ -38,7 +38,7 @@ MySQL connection credentials. The database is managed automatically by the MySQL
 
 ---
 
-## Admin Account
+## Administratora konts
 
 The admin account is created automatically on the first boot of a fresh database.
 
@@ -50,7 +50,7 @@ The admin account is created automatically on the first boot of a fresh database
 
 ---
 
-## Ports
+## Porti
 
 Control which host ports the application binds to.
 
@@ -61,7 +61,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Runtime
+## Izpildes vide
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -76,7 +76,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Security
+## Drošība
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -85,7 +85,7 @@ Control which host ports the application binds to.
 
 ---
 
-## SSO — Embedded Keycloak
+## SSO — Iebūvētais Keycloak
 
 Enable the bundled Keycloak container for full-featured enterprise SSO. Requires a domain with HTTPS.
 
@@ -104,11 +104,11 @@ Enable the bundled Keycloak container for full-featured enterprise SSO. Requires
 | `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
 | `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
 
-See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+See [SSO Authentication](sso-authentication#iebūvētais-keycloak) for the complete setup guide.
 
 ---
 
-## SSO — External OIDC Provider
+## SSO — Ārējais OIDC nodrošinātājs
 
 Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authentik, Okta, etc.).
 
@@ -137,7 +137,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Optional Integrations
+## Papildu integrācijas
 
 ### Stata
 
@@ -153,7 +153,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 | `ES_HOST` | Elasticsearch host (e.g., `http://elasticsearch:9200`). |
 | `ES_PORT` | Elasticsearch port. |
 
-### Matomo Analytics
+### Matomo analīze
 
 | Variable | Description |
 |----------|-------------|
@@ -161,13 +161,13 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 | `PIWIK_ID` | Matomo site ID. |
 | `PIWIK_SECRET` | Matomo authentication token. |
 
-### OpenCPU (R Computation)
+### OpenCPU (R aprēķini)
 
 | Variable | Description |
 |----------|-------------|
 | `OCPU_HOST` | OpenCPU server URL for R-based statistical computation. |
 
-### RtBox Integration
+### RtBox integrācija
 
 | Variable | Description |
 |----------|-------------|
@@ -175,7 +175,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 | `RTBOX_USER_API` | RtBox user API key. |
 | `RTBOX_BASIC_AUTH` | Basic authentication credentials for RtBox. |
 
-### Matrix Messaging
+### Matrix ziņojumapmaiņa
 
 | Variable | Description |
 |----------|-------------|
@@ -184,7 +184,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Data Volumes
+## Datu sējumi
 
 All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 

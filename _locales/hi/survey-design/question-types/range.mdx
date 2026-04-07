@@ -5,7 +5,7 @@ description: "Range questions उत्तरदाताओं को defined m
 
 `range` question type एक **slider** (या समकक्ष input) प्रदर्शित करता है जो उत्तरदाताओं को defined minimum और maximum के भीतर एक number चुनने देता है। यह ratings, satisfaction scores, या किसी भी numeric value एकत्र करने के लिए आदर्श है जहाँ आप text input के बजाय visually range को constrain करना चाहते हैं।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type | name | label | parameters |
 |------|------|-------|------------|
@@ -30,15 +30,15 @@ Range questions सामान्यतः इनके लिए उपयो�
 3. ऐसे measurements एकत्र करना जहाँ केवल discrete values valid हों
 4. Age brackets या score ranges जहाँ slider text field पर usability में सुधार करता है
 
-## Example Usage
+## उदाहरण उपयोग
 
-### Basic rating scale
+### बुनियादी रेटिंग स्केल
 
 | type | name | label | parameters |
 |------|------|-------|------------|
 | range | overall_rating | Overall rating (0–10) | start=0 end=10 step=1 |
 
-### Decimal step
+### दशमलव चरण
 
 | type | name | label | parameters |
 |------|------|-------|------------|
@@ -52,7 +52,7 @@ Range questions सामान्यतः इनके लिए उपयो�
 | calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
 | note | grade_note | आपका grade है: `${grade}` | | |
 
-## Appearance
+## उपस्थिति
 
 `range` type default रूप से slider के रूप में render होता है। Basic usage के लिए कोई additional appearance values आवश्यक नहीं हैं। आप web forms पर wider layout के लिए इसे `horizontal` के साथ combine कर सकते हैं:
 
@@ -60,7 +60,7 @@ Range questions सामान्यतः इनके लिए उपयो�
 |------|------|-------|------------|------------|
 | range | nps | आप हमें recommend करने की कितनी संभावना रखते हैं? (0–10) | start=0 end=10 step=1 | horizontal |
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. हमेशा meaningful `start`, `end`, और `step` values सेट करें — defaults पर निर्भर न रहें।
 2. उत्तरदाताओं को context देने के लिए `hint` column में अपने scale के ends को label करें (जैसे `hint: 0 = बहुत असंतुष्ट, 10 = बहुत संतुष्ट`)।

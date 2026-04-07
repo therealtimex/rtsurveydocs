@@ -9,7 +9,7 @@ Premenné označené ako **povinné** musia byť nastavené pred spustením kont
 
 ---
 
-## Project
+## Projekt
 
 These variables define the identity and access point of your rtCloud instance.
 
@@ -23,7 +23,7 @@ These variables define the identity and access point of your rtCloud instance.
 
 ---
 
-## Database
+## Databáza
 
 MySQL connection credentials. The database is managed automatically by the MySQL container — you only need to set strong passwords.
 
@@ -38,7 +38,7 @@ MySQL connection credentials. The database is managed automatically by the MySQL
 
 ---
 
-## Admin Account
+## Účet správcu
 
 The admin account is created automatically on the first boot of a fresh database.
 
@@ -50,7 +50,7 @@ The admin account is created automatically on the first boot of a fresh database
 
 ---
 
-## Ports
+## Porty
 
 Control which host ports the application binds to.
 
@@ -61,7 +61,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Runtime
+## Prostredie behu
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -76,7 +76,7 @@ Control which host ports the application binds to.
 
 ---
 
-## Security
+## Bezpečnosť
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -104,7 +104,7 @@ Enable the bundled Keycloak container for full-featured enterprise SSO. Requires
 | `KC_HOSTNAME` | — | Keycloak frontend URL (e.g., `https://rtcloud.example.com/auth`). |
 | `KC_HOSTNAME_STRICT` | `false` | Enforce strict hostname matching. Set to `true` in production with a fixed domain. |
 
-See [SSO Authentication](sso-authentication#embedded-keycloak) for the complete setup guide.
+See [SSO Authentication](sso-authentication#vstavaný-keycloak) for the complete setup guide.
 
 ---
 
@@ -137,7 +137,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Optional Integrations
+## Voliteľné integrácie
 
 ### Stata
 
@@ -184,7 +184,7 @@ Connect to an existing OIDC-compatible identity provider (Supabase, Auth0, Authe
 
 ---
 
-## Data Volumes
+## Dátové zväzky
 
 All application data is stored in named Docker volumes. Volumes are automatically created on first startup and persist across container restarts and updates.
 

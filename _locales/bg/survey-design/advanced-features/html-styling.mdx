@@ -15,7 +15,7 @@ HTML in labels is rendered on the **web form** and rtSurvey mobile apps. It may 
 
 ## Поддържани HTML тагове
 
-### Text formatting
+### Форматиране на текст
 
 | Tag | Result |
 |-----|--------|
@@ -25,7 +25,7 @@ HTML in labels is rendered on the **web form** and rtSurvey mobile apps. It may 
 | `<br>` | Line break |
 | `<span style="...">text</span>` | Inline styling |
 
-### Links
+### Връзки
 
 ```html
 <a href="https://example.com" target="_blank">Click here</a>
@@ -33,7 +33,7 @@ HTML in labels is rendered on the **web form** and rtSurvey mobile apps. It may 
 
 Opens in a new tab. Use for reference documents, guidelines, or external resources the enumerator should consult.
 
-### Colors
+### Цветове
 
 Use `<span>` with inline styles:
 
@@ -44,7 +44,7 @@ Use `<span>` with inline styles:
 
 ---
 
-## Color theme variables
+## Променливи на цветовата тема
 
 rtSurvey supports **color theme tokens** that adapt to the app's configured theme. Use the `__COLOR_THEME_NAME__` syntax:
 
@@ -62,7 +62,7 @@ This is automatically converted to the equivalent `<span>` with a CSS variable a
 
 ---
 
-## Multi-language labels
+## Многоезични етикети
 
 Wrap content in language tags to support multiple languages in a single label cell:
 
@@ -74,28 +74,28 @@ rtSurvey extracts the content matching the current app language. If no matching 
 
 ---
 
-## Примерs in note fields
+## Примери в note полета
 
-### Section instruction with bold and a line break
+### Инструкция за секция с удебелен шрифт и нов ред
 
 | type | name | label |
 |------|------|-------|
 | note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
 
-### Dynamic summary with calculation reference
+### Динамично обобщение с препратка към изчисление
 
 | type | name | label |
 |------|------|-------|
 | calculate | total | | `${adults} + ${children}` |
 | note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
 
-### Warning in red
+### Предупреждение в червено
 
 | type | name | label | relevant |
 |------|------|-------|----------|
 | note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
 
-### Link to a reference document
+### Връзка към референтен документ
 
 | type | name | label |
 |------|------|-------|
@@ -103,7 +103,7 @@ rtSurvey extracts the content matching the current app language. If no matching 
 
 ---
 
-## Special rtSurvey HTML tags
+## Специални HTML тагове на rtSurvey
 
 ### `<webbox src='url' title='title'>...</webbox>`
 
@@ -125,7 +125,7 @@ Example usage in a repeat group:
 
 ---
 
-## Best Practices
+## Най-добри практики
 
 1. Use HTML sparingly — overformatted labels are harder to read, not easier.
 2. Prefer `<strong>` for bold and `<em>` for italics over deprecated `<b>` and `<i>`.
@@ -134,7 +134,7 @@ Example usage in a repeat group:
 5. Avoid `<table>` tags inside labels — they rarely render well on mobile screens.
 6. Do not use JavaScript (`<script>`) — it will be stripped or cause errors.
 
-## Limitations
+## Ограничения
 
 - Complex HTML (tables, forms, scripts) is not supported and may break rendering.
 - Some older mobile clients may display HTML tags as literal text — test on all target devices.

@@ -7,7 +7,7 @@ import { Callout } from 'nextra/components'
 
 Expressions in rtSurvey are written in a subset of **XPath 1.0**, extended with JavaRosa/ODK functions and custom rtSurvey functions. You use expressions in the `calculate`, `constraint`, `relevant`, `required`, and `default` columns of your XLSForm.
 
-## Referencing field values
+## Препратка към стойности на полета
 
 Use `${fieldname}` to reference the value of another field:
 
@@ -23,7 +23,7 @@ Use `.` (a single dot) to reference the **current field's value** — commonly u
 
 Use `..` to reference the parent group (advanced usage in repeats).
 
-## Expression syntax
+## Синтаксис на изразите
 
 Expressions follow standard XPath rules:
 
@@ -36,13 +36,13 @@ Expressions follow standard XPath rules:
 Always use straight quotes (`'` or `"`) — never "smart quotes" (curly quotes). Rich text editors often convert quotes automatically and will break your expressions.
 </Callout>
 
-## Sections in this chapter
+## Раздели в тази глава
 
 - **[Operators](operators)** — comparison operators (`=`, `!=`, `>`, `<`, `>=`, `<=`) and logical operators (`and`, `or`, `not()`)
 - **[Functions](functions)** — string, selection, number, date/time, boolean, geo, and utility functions
 - **[References](references)** — how to reference fields and context values
 
-## Quick examples
+## Бързи примери
 
 | Use case | Expression |
 |----------|------------|

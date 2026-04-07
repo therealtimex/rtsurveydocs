@@ -5,7 +5,7 @@ description: ""
 
 Calculate questions in XLSForms and rtSurvey are used to perform computations based on other fields or values in your form. These questions don't display to the user but instead run in the background, storing their results for later use or submission.
 
-## Syntax
+## Синтаксис
 
 In the XLSForm, a calculate question is defined as follows:
 
@@ -18,7 +18,7 @@ In the XLSForm, a calculate question is defined as follows:
 - **label**: Usually left blank as calculate questions are not displayed to users.
 - **calculation**: The formula to be evaluated.
 
-## Uses
+## Приложения
 
 Calculate questions are commonly used for:
 
@@ -27,9 +27,9 @@ Calculate questions are commonly used for:
 3. Applying complex logic or functions
 4. Storing intermediate results for later use
 
-## Examples
+## Примери
 
-### Basic Arithmetic
+### Основна аритметика
 
 ```
 | type      | name     | calculation |
@@ -37,7 +37,7 @@ Calculate questions are commonly used for:
 | calculate | total    | ${price} * ${quantity} |
 ```
 
-### String Concatenation
+### Конкатенация на низове
 
 ```
 | type      | name     | calculation |
@@ -45,7 +45,7 @@ Calculate questions are commonly used for:
 | calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
 ```
 
-### Using Functions
+### Използване на функции
 
 ```
 | type      | name     | calculation |
@@ -53,9 +53,9 @@ Calculate questions are commonly used for:
 | calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
 ```
 
-## Advanced Usage in rtSurvey
+## Разширена употреба в rtSurvey
 
-### pulldata() Function
+### Функция pulldata()
 
 rtSurvey supports the `pulldata()` function in calculate fields, allowing you to retrieve data from external CSV files:
 
@@ -87,7 +87,7 @@ pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
 5. There may be limitations on text length that can be pulled (around 76 characters).
 6. You can use pulldata() in constraints to validate entries against the CSV data.
 
-### Conditional Calculations
+### Условни изчисления
 
 You can use if() statements for conditional calculations:
 
@@ -97,7 +97,7 @@ You can use if() statements for conditional calculations:
 | calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
 ```
 
-## Best Practices
+## Най-добри практики
 
 1. Use meaningful names for calculate fields to improve form readability.
 2. Avoid overly complex calculations in a single field; break them down if necessary.
@@ -105,7 +105,7 @@ You can use if() statements for conditional calculations:
 4. Remember that calculate fields run each time the form is evaluated, which can impact performance for very complex or numerous calculations.
 5. When using pulldata(), ensure your CSV files are correctly formatted and test thoroughly with your specific data and form structure.
 
-## Limitations
+## Ограничения
 
 - Calculate fields are not directly editable by users.
 - The result of a calculate field is not immediately visible unless referenced in a display field or used in form logic.

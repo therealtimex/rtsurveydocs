@@ -5,7 +5,7 @@ description: "Въпросите от тип video позволяват на р�
 
 The `video` question type enables respondents to **record video** or upload an existing video file as part of their survey response. It is useful for capturing visual evidence, demonstrations, environmental conditions, or any information that benefits from motion and audio together.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type  | name        | label                              |
 |-------|-------------|-------------------------------------|
@@ -13,7 +13,7 @@ The `video` question type enables respondents to **record video** or upload an e
 
 For more details on the standard video question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Uses
+## Приложения
 
 Video questions are commonly used for:
 
@@ -23,7 +23,7 @@ Video questions are commonly used for:
 4. Capturing evidence that requires spatial context (e.g., the size and extent of a problem area)
 5. Before/after documentation for monitoring and evaluation surveys
 
-## Data format
+## Формат на данните
 
 Video files are stored as binary attachments:
 
@@ -32,9 +32,9 @@ Video files are stored as binary attachments:
 - **Storage:** Uploaded to the server media folder and linked to the submission record
 - **Access:** Playable and downloadable from the submission management interface
 
-## rtSurvey extensions
+## Разширения на rtSurvey
 
-### Maximum duration
+### Максимална продължителност
 
 Use the `parameters` column to limit the recording length:
 
@@ -44,7 +44,7 @@ Use the `parameters` column to limit the recording length:
 
 `max-duration` is in seconds. The recording stops automatically at the limit.
 
-### Quality / resolution
+### Качество / резолюция
 
 Control the recording resolution via `parameters`:
 
@@ -54,30 +54,30 @@ Control the recording resolution via `parameters`:
 
 Supported values: `low` (faster upload), `normal` (default), `high`. Use `low` in areas with limited connectivity.
 
-### Upload existing video
+### Качване на съществуващо видео
 
 On mobile, the respondent can choose to **upload an existing video** from the device gallery instead of recording a new one. This is enabled by default in the native camera/gallery integration.
 
-### Playback before submission
+### Възпроизвеждане преди изпращане
 
 On mobile, the recorded clip can be reviewed before proceeding. No additional configuration is needed.
 
-## Example usage
+## Примерна употреба
 
-### Site inspection video with limit
+### Видео за проверка на обект с ограничение
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
 | video | site_video | Record the water point | Walk around the entire facility. Max 90 seconds. | `max-duration=90 quality=normal` |
 
-### Conditional video — only if damage is reported
+### Условно видео — само ако е докладвана повреда
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
 | select_one yesno | damage_found | Was damage found? | | |
 | video | damage_video | Record video of the damage | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
-## Best Practices
+## Най-добри практики
 
 1. Set `max-duration` — unrestricted video recordings can easily exceed 100 MB and fail to upload on weak connections.
 2. Use `quality=low` for monitoring surveys where visual evidence is required but fine detail is not — it cuts file size dramatically.
@@ -85,7 +85,7 @@ On mobile, the recorded clip can be reviewed before proceeding. No additional co
 4. Consider whether video is necessary — a photo (`image`) is usually sufficient for static evidence and produces much smaller files.
 5. Test upload performance on the actual field network before deployment.
 
-## Limitations
+## Ограничения
 
 - Video files are very large — a 1-minute video at normal quality is typically 20–60 MB depending on device.
 - Uploading large video files requires a good network connection; consider requiring Wi-Fi sync for video-heavy forms.

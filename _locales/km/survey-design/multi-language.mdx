@@ -5,7 +5,7 @@ description: ""
 
 rtSurvey ផ្ដល់ multi-language support ដ៏ រឹង មា ំ, អនុញ្ញាតឱ្យ បង្កើត surveys ក្នុង ភាសា ជ ា ច ្ រ ើ ន ។
 
-## ការ Setup Multi-Language Surveys
+## ការដំឡើងការស្ទង់មតិពហុភាសា
 
 1. **Label Translations**: បន្ថែម columns ដោយ ប្រើ format `label::Language (code)` ។
 2. **Hint Translations**: ប្រើ `hint::Language (code)` ។
@@ -17,11 +17,11 @@ rtSurvey ផ្ដល់ multi-language support ដ៏ រឹង មា ំ, អ
 | integer | age  | How old are you?    | ¿Cuántos años tienes?|
 ```
 
-## Language Codes
+## លេខកូដភាសា
 
 ណែ នា ំ ប្រើ official 2-character language codes ។
 
-## Setting a Default Language
+## ការកំណត់ភាសាលំនាំដើម
 
 ```
 | form_id   | version | default_language |
@@ -29,13 +29,13 @@ rtSurvey ផ្ដល់ multi-language support ដ៏ រឹង មា ំ, អ
 | test_form | 101     | French (fr)       |
 ```
 
-## rtSurvey-Specific Features
+## មុខងារជាក់លាក់ rtSurvey
 
-### Dynamic Language Switching
+### ការប្ដូរភាសាថាមវន្ត
 
 rtSurvey អនុញ្ញាតឱ្យ users switch languages ដោយ dynamic ក្នុង ការ ប្រ មូ ល ទិន្ន ន័យ ។
 
-### Language-Specific Validation Messages
+### សារផ្ទៀងផ្ទាត់ជាក់លាក់ភាសា
 
 ```
 | type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
@@ -47,7 +47,7 @@ rtSurvey អនុញ្ញាតឱ្យ users switch languages ដោយ dyna
 
 សម្រាប់ right-to-left (RTL) languages ដូចជា Arabic ឬ Hebrew, rtSurvey adjust layout ដោយ ស្វ័យប្រវត្តិ ។
 
-## Best Practices
+## វិធីល្អបំផុត
 
 1. ប្រើ language codes ដោយ consistent ។
 2. ប្រើ professional translators ។

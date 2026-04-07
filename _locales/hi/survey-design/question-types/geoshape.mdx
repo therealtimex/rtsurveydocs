@@ -5,7 +5,7 @@ description: "Geoshape questions उत्तरदाताओं को map �
 
 XLSForms और rtSurvey में geoshape question type उत्तरदाताओं को map पर shapes (polygons) draw करने में सक्षम बनाता है, complex geographical data capture करता है। यह सुविधा areas map करने, boundaries define करने, या spatial surveys में interest के regions mark करने के लिए विशेष रूप से उपयोगी है।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type     | name        | label                           |
 |----------|-------------|--------------------------------|
@@ -23,14 +23,14 @@ Geoshape questions सामान्यतः इनके लिए उपय�
 4. Geological surveys के लिए regions outline करना
 5. Spatial analysis के लिए complex geographical features capture करना
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. सुनिश्चित करें कि device में location services enabled हों और permissions granted हों।
 2. Shape कैसे draw करें और कौन सा area शामिल होना चाहिए, इस पर clear instructions प्रदान करें।
 3. Shapes accurately draw करने में उत्तरदाताओं की मदद के लिए satellite imagery या base maps का उपयोग करने पर विचार करें।
 4. Shapes की potential complexity और data size और processing पर उनके प्रभाव के प्रति सावधान रहें।
 
-## Example Usage
+## उदाहरण उपयोग
 
 यहाँ बताया गया है कि आप survey में geoshape question का उपयोग कैसे कर सकते हैं:
 
@@ -38,7 +38,7 @@ Geoshape questions सामान्यतः इनके लिए उपय�
 |----------|----------------|--------------------------------------------|--------------------------------------------|
 | geoshape | forest_area    | Forest patch की boundary outline करें       | एक closed shape बनाने के लिए कम से कम 3 points का उपयोग करें |
 
-## rtSurvey Extensions
+## rtSurvey एक्सटेंशन
 
 Basic XLSForm specification के अतिरिक्त, rtSurvey अतिरिक्त सुविधाएं या customizations प्रदान कर सकता है:
 
@@ -47,7 +47,7 @@ Basic XLSForm specification के अतिरिक्त, rtSurvey अति�
 3. Initial drawing के बाद shapes edit या refine करने की ability
 4. Free-form polygons के अतिरिक्त different shape types (जैसे rectangles, circles) का समर्थन
 
-## Data Format
+## डेटा प्रारूप
 
 Geoshape data आमतौर पर space-separated coordinate pairs की string के रूप में store होती है:
 

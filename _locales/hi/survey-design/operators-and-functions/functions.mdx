@@ -5,7 +5,7 @@ description: ""
 
 import { Callout } from 'nextra/components'
 
-### String functions
+### स्ट्रिंग फ़ंक्शन
 
 <Callout type="warning">
 Expressions में strings के साथ काम करते समय, literal strings को enclose करने के लिए single quotes ('') का उपयोग करना महत्वपूर्ण है। हालांकि, एक अपवाद तब उत्पन्न होता है जब आप एक literal string के भीतर single quotes शामिल करना चाहते हैं। ऐसे मामलों में, आप पूरी string को enclose करने के लिए double quotes ("") का उपयोग कर सकते हैं।
@@ -58,7 +58,7 @@ rtSurvey विभिन्न functions का समर्थन करता 
    - उदाहरण 2: `choice-label(${languages}, selected-at(${languages}, 0))` `languages` नामक field में पहले चुने गए choice के लिए label return करेगा।
    - नोट: यह function choice label retrieve करता है, value नहीं। यह form definition की choices worksheet में label column का उपयोग करता है।
 
-### Repeated field functions
+### दोहराए गए फ़ील्ड फ़ंक्शन
 
 rtSurvey में, यदि आप एक ही प्रश्न(ों) को कई बार पूछना चाहते हैं, तो आप एक field को एक repeat group के अंदर रख सकते हैं। इससे एक ही field के multiple instances बनते हैं। निम्नलिखित functions आपको इन repeated fields और उनके द्वारा produce किए गए repeated data से deal करने में मदद कर सकते हैं।
 
@@ -105,7 +105,7 @@ rtSurvey में, यदि आप एक ही प्रश्न(ों) �
 14. `rank-index-if(index, repeatedfield, expression)`: यह function `rank-index()` की तरह ही काम करता है, लेकिन यह supplied expression का उपयोग करके repeated field के repeat group में प्रत्येक instance को check करता है। यदि expression false evaluate होती है, तो item calculation से omit हो जाएगा। उपयोग किया गया index प्रत्येक instance के लिए expression evaluate करने से पहले instances के full set पर आधारित है। यदि आप किसी ऐसे instance का index pass करते हैं जिसे expression को satisfy न करने के कारण ignore किया गया था, तो इसे एक invalid index माना जाता है, और 999 का rank return किया जाएगा।
     - उदाहरण: `rank-index-if(1, ${age}, ${age} >= 18)` adults के set के भीतर age rank calculate करता है, केवल उन instances पर विचार करता है जहाँ age 18 या उससे अधिक है।
 
-### Number functions 
+### संख्या फ़ंक्शन
 
 | Operator | Operation | Example | Example answer |
 |----------|-----------|---------|----------------|
@@ -199,7 +199,7 @@ rtSurvey में Date values `YYYY-MM-DD` format में strings के र�
 
 ---
 
-### Boolean functions
+### बूलियन फ़ंक्शन
 
 1. `boolean(value)`: किसी भी value को boolean में convert करता है। non-empty strings, non-zero numbers, और `true` के लिए `true` return करता है; empty strings, `0`, और `false` के लिए `false` return करता है।
    - उदाहरण: `boolean(${name})` `true` return करता है यदि `name` empty नहीं है।
@@ -219,7 +219,7 @@ rtSurvey में Date values `YYYY-MM-DD` format में strings के र�
 
 ---
 
-### Additional string functions
+### अतिरिक्त स्ट्रिंग फ़ंक्शन
 
 1. `starts-with(string, prefix)`: `true` return करता है यदि `string` `prefix` से शुरू होती है।
    - उदाहरण: `starts-with(${phone}, '+254')` जांचता है कि phone number Kenya country code से शुरू होता है।
@@ -243,7 +243,7 @@ rtSurvey में Date values `YYYY-MM-DD` format में strings के र�
 
 ---
 
-### Additional math functions
+### अतिरिक्त गणित फ़ंक्शन
 
 1. `floor(number)`: `number` से कम या बराबर सबसे बड़ा integer return करता है (negative infinity की ओर round करता है)।
    - उदाहरण: `floor(4.9)` = 4, `floor(-2.1)` = -3
@@ -264,7 +264,7 @@ rtSurvey में Date values `YYYY-MM-DD` format में strings के र�
 
 ---
 
-### Geo functions
+### जियो फ़ंक्शन
 
 1. `area(geoshape_value)`: एक geoshape (polygon) value द्वारा enclosed **area square meters में** calculate करता है।
    - Parameter `lat1 lon1 0 0; lat2 lon2 0 0; ...` format में एक geoshape field value है
@@ -278,7 +278,7 @@ rtSurvey में Date values `YYYY-MM-DD` format में strings के र�
 
 ---
 
-### Validation functions
+### सत्यापन फ़ंक्शन
 
 1. `regex(value, pattern)`: `true` return करता है यदि `value` regular expression `pattern` से match करती है। pattern-based validation के लिए `constraint` column में उपयोग करें।
    - Pattern standard regex syntax (POSIX ERE subset) का उपयोग करता है।
@@ -295,7 +295,7 @@ rtSurvey में Date values `YYYY-MM-DD` format में strings के र�
 
 ---
 
-### Utility functions
+### उपयोगिता फ़ंक्शन
 
 1. `uuid()`: एक random UUID (RFC 4122 v4 format) को string के रूप में generate करता है।
    - उदाहरण: `uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`

@@ -5,7 +5,7 @@ description: "Decimal questions आपके survey में fractional parts �
 
 XLSForms और rtSurvey में decimal question type का उपयोग ऐसे numeric responses एकत्र करने के लिए किया जाता है जिनमें fractional parts शामिल हो सकते हैं। यह question type measurements, prices, या percentages जैसे precise numerical data gather करने के लिए आवश्यक है।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type    | name   | label                    |
 |---------|--------|--------------------------|
@@ -23,7 +23,7 @@ Decimal questions सामान्यतः इनके लिए उपय�
 4. Scientific data collection
 5. कोई भी numeric data जिसके लिए whole numbers से परे precision की आवश्यकता हो
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. Expected input और measurement की unit निर्दिष्ट करने के लिए clear और concise labels का उपयोग करें।
 2. Unrealistic या erroneous inputs को रोकने के लिए range constraints लागू करें।
@@ -38,7 +38,7 @@ Decimal questions सामान्यतः इनके लिए उपय�
 |---------|--------|--------------------------|-------------------|---------------------------------------|
 | decimal | height | अपनी ऊँचाई meters में दर्ज करें | .>0 and .&lt;=3    | ऊँचाई 0 और 3 meters के बीच होनी चाहिए |
 
-## Example Usage
+## उदाहरण उपयोग
 
 यहाँ बताया गया है कि आप health survey में decimal questions का उपयोग कैसे कर सकते हैं:
 
@@ -57,7 +57,7 @@ calculation | ${weight} / (${height} * ${height})
 
 यह दर्ज किए गए weight और height का उपयोग करके BMI calculate करेगा।
 
-## rtSurvey Extensions
+## rtSurvey एक्सटेंशन
 
 Basic XLSForm specification के अतिरिक्त, rtSurvey अतिरिक्त सुविधाएं प्रदान कर सकता है:
 

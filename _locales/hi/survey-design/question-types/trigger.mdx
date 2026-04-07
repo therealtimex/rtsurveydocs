@@ -5,7 +5,7 @@ description: "Trigger questions एक statement प्रदर्शित क
 
 `trigger` (जिसे `acknowledge` भी कहा जाता है) question type एक **checkbox के साथ एक statement** प्रदर्शित करता है। गणनाकर्ता को confirm करने के लिए checkbox tick करना होता है कि उन्होंने form को आगे बढ़ने से पहले statement पढ़ और समझ लिया है। कोई data value store नहीं होती — केवल यह कि checkbox tick किया गया था।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type | name | label |
 |------|------|-------|
@@ -29,9 +29,9 @@ Trigger/acknowledge questions सामान्यतः इनके लिए
 4. **Instructions** — गणनाकर्ता को जारी रखने से पहले एक section-level instruction acknowledge करने के लिए force करें
 5. **Quality checks** — outlier values flag करें और गणनाकर्ता को उन्हें verify करने की आवश्यकता करें
 
-## Example Usage
+## उदाहरण उपयोग
 
-### Consent acknowledgement
+### सहमति स्वीकृति
 
 | type | name | label | required |
 |------|------|-------|----------|
@@ -60,7 +60,7 @@ Box tick होने तक आगे बढ़ने से रोकने �
 |------|------|-------|----------|------------------|
 | trigger | safety_check | सभी safety equipment present और functional है। | yes | आगे बढ़ने से पहले आपको confirm करना होगा। |
 
-## Conditional display
+## सशर्त प्रदर्शन
 
 केवल तभी trigger दिखाएं जब कोई condition पूरी हो:
 
@@ -78,7 +78,7 @@ Box tick होने तक आगे बढ़ने से रोकने �
 | Data store करता है | नहीं | नहीं (केवल OK/ticked) |
 | Progress block कर सकता है | नहीं | हाँ (`required` के साथ) |
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. Trigger labels को concise और actionable रखें — गणनाकर्ता seconds में पढ़ और confirm कर सके।
 2. जब acknowledgement mandatory हो तो हमेशा `required: yes` जोड़ें।

@@ -5,7 +5,7 @@ description: "Въпросите от тип integer позволяват във
 
 The integer question type in XLSForms and rtSurvey is used to collect whole number responses. This question type is essential for gathering numerical data without decimal places, such as counts, ages, or years.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type    | name  | label                 |
 |---------|-------|------------------------|
@@ -13,7 +13,7 @@ The integer question type in XLSForms and rtSurvey is used to collect whole numb
 
 For more details on the basic integer question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Uses
+## Приложения
 
 Integer questions are commonly used for:
 
@@ -23,7 +23,7 @@ Integer questions are commonly used for:
 4. Ratings on a numerical scale
 5. Any whole number data collection
 
-## rtSurvey Extensions
+## Разширения на rtSurvey
 
 While the basic XLSForm specification for integer questions is straightforward, rtSurvey may offer additional features or customizations:
 
@@ -33,14 +33,14 @@ While the basic XLSForm specification for integer questions is straightforward, 
 
 (Note: The specific extensions available in rtSurvey for integer questions would need to be confirmed and detailed here.)
 
-## Best Practices
+## Най-добри практики
 
 1. Use clear and concise labels to specify the expected input.
 2. Implement range constraints to prevent unrealistic or erroneous inputs.
 3. Consider using hint text to provide examples or clarify the expected format.
 4. For large numbers, consider using commas or spaces in the label to improve readability (e.g., "Enter the population (up to 1,000,000)").
 
-## Constraints and Validation
+## Ограничения и валидация
 
 You can add constraints to ensure the entered value falls within a specific range:
 
@@ -48,7 +48,7 @@ You can add constraints to ensure the entered value falls within a specific rang
 |---------|-------|------------------------|-------------------|---------------------------------------|
 | integer | age   | Enter your age in years| .>0 and .&lt;=120    | Age must be between 1 and 120 years   |
 
-## Example Usage
+## Примерна употреба
 
 Here's an example of how you might use integer questions in a household survey:
 
@@ -58,7 +58,7 @@ Here's an example of how you might use integer questions in a household survey:
 | integer | num_children   | How many children under 18 in the household? | .>=0    | Number of children cannot be negative |
 | integer | year_built     | In what year was your house built?        | .>1800 and .&lt;=2023 | Year must be between 1800 and 2023 |
 
-## Calculation with Integer Values
+## Изчисление с целочислени стойности
 
 Integer values can be used in calculations. Here's an example:
 

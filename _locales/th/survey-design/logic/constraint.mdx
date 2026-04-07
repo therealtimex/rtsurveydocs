@@ -18,7 +18,7 @@ import { Callout } from 'nextra/components'
 |---------------|-----------------------------|
 | Income        | . >= 0 & . &lt;= 1000000      |
 
-### Hard constraint
+### เงื่อนไขบังคับ
 
 **Hard constraint** จะบล็อกการส่งแบบฟอร์มทั้งหมดหากค่าที่ป้อนไม่ตรงตามนิพจน์ ผู้เก็บข้อมูลไม่สามารถดำเนินการต่อได้จนกว่าจะป้อนค่าที่ถูกต้อง
 
@@ -37,7 +37,7 @@ import { Callout } from 'nextra/components'
 | text | email | Email address | `regex(., '^[^@]+@[^@]+\.[^@]+$')` | Enter a valid email address |
 | text | zip_code | ZIP code | `regex(., '^[0-9]{5}$')` | Enter a 5-digit ZIP code |
 
-### Soft alert
+### การแจ้งเตือนแบบอ่อน
 
 **Soft alert** (หรือเรียกว่า soft constraint หรือคำเตือน) เตือนผู้เก็บข้อมูลว่าค่าดูผิดปกติ แต่ยังคงอนุญาตให้ดำเนินการต่อได้ ซึ่งมีประโยชน์เมื่อค่าถูกต้องตามเทคนิคแต่ไม่น่าจะเป็นทางสถิติ
 

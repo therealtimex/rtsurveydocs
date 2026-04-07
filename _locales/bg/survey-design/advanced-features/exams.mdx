@@ -11,7 +11,7 @@ This is useful for knowledge assessments, literacy tests, field staff competency
 
 ---
 
-## `check-exam()` function
+## Функция `check-exam()`
 
 Configure the exam using `check-exam()` in the **`calculation`** column of a `calculate` field placed at the start of the form:
 
@@ -32,9 +32,9 @@ check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, exclu
 
 ---
 
-## Основно setup
+## Основна настройка
 
-### Step 1: Add exam fields
+### Стъпка 1: Добавяне на полета за изпит
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -43,7 +43,7 @@ check-exam(examTime, questionToStoreRemainingTime, rightSound, wrongSound, exclu
 
 `exam_config` triggers the 600-second (10-minute) timer. `remaining_time` is populated automatically when the respondent finishes.
 
-### Step 2: Add your questions
+### Стъпка 2: Добавяне на въпроси
 
 The exam timer covers all questions in the form except those listed in `excludeQuestion`.
 
@@ -53,13 +53,13 @@ The exam timer covers all questions in the form except those listed in `excludeQ
 | select_one choices | q2 | Which organ pumps blood around the body? |
 | select_one choices | q3 | Water boils at 100°C at sea level. True or false? |
 
-### Step 3: Store the remaining time
+### Стъпка 3: Съхраняване на оставащото време
 
 The field named in parameter 2 (`remaining_time`) is automatically set to the number of seconds remaining when the respondent submits. A value of `0` means time ran out; a high value means they finished quickly.
 
 ---
 
-## With audio feedback
+## С аудио обратна връзка
 
 Attach sound files to the form (as media attachments), then reference them:
 
@@ -76,7 +76,7 @@ Sound files must be attached to the form as media files and the filename must ma
 
 ---
 
-## Excluding questions from the timer
+## Изключване на въпроси от таймера
 
 Pass a comma-separated list of field names to exclude from the exam (e.g., introductory notes or consent questions):
 
@@ -88,7 +88,7 @@ Leave `rightSound` and `wrongSound` as empty strings `''` if you do not need aud
 
 ---
 
-## Complete example
+## Пълен пример
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -102,7 +102,7 @@ Leave `rightSound` and `wrongSound` as empty strings `''` if you do not need aud
 
 ---
 
-## Best Practices
+## Най-добри практики
 
 1. Always inform respondents about the time limit before starting — use a `note` or `trigger` before the `check-exam()` field.
 2. Exclude intro notes and consent questions from the timer using the `excludeQuestion` parameter.
@@ -110,7 +110,7 @@ Leave `rightSound` and `wrongSound` as empty strings `''` if you do not need aud
 4. Keep the number of questions proportional to the time allowed — 2–3 minutes per question is a reasonable baseline for most knowledge assessments.
 5. Test with audio files on the actual device before deployment — audio playback varies across Android versions and browsers.
 
-## Limitations
+## Ограничения
 
 - The timer is display-only — the form does not automatically submit when time runs out; the respondent must still submit manually.
 - Audio feedback requires the device volume to be on and not muted.

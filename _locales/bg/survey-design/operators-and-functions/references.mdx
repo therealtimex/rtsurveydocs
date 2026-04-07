@@ -17,13 +17,13 @@ If you want to check if the proposed value for the current field is less than 3,
 
 ---
 
-## `..` — Parent group reference
+## `..` — Препратка към родителска група
 
 Inside a group or repeat group, `..` refers to the **parent context**. This is rarely needed in practice but is used in advanced XPath expressions to navigate the form hierarchy.
 
 ---
 
-## Where references are used
+## Където се използват препратки
 
 | Column | Reference type | Example |
 |--------|---------------|---------|
@@ -41,7 +41,7 @@ In the `choice_filter` column, reference **choice column names** directly (witho
 
 ---
 
-## Referencing values inside repeat groups
+## Препратка към стойности в групи за повторение
 
 Inside a repeat, `${fieldname}` refers to the field in the **same instance** of the repeat:
 
@@ -61,7 +61,7 @@ See [Functions — Repeated field functions](functions#repeated-field-functions)
 
 ---
 
-## Empty value checks
+## Проверки за празни стойности
 
 Test whether a field has been answered:
 
@@ -77,6 +77,6 @@ ${age} > 0               (age has a positive value — implicitly not empty for 
 
 ---
 
-## Type coercion in references
+## Принудително преобразуване на типове в препратки
 
 When you use `${fieldname}` in a numeric context (e.g., `${age} + 1`), rtSurvey automatically coerces the string value to a number. An empty field coerces to `0` or `NaN` depending on the operation — use `coalesce(${field}, 0)` to safely default an empty numeric field to zero.

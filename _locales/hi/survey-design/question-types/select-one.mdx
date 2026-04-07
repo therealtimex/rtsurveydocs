@@ -7,7 +7,7 @@ import { Callout } from 'nextra/components'
 
 `select_one` question type उत्तरदाता को predefined list से **ठीक एक विकल्प** चुनने के लिए prompt करता है। Default रूप से choices radio buttons के रूप में render होती हैं, लेकिन layout और behavior बदलने के लिए appearance options की एक wide range उपलब्ध है।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 **survey worksheet:**
 
@@ -36,7 +36,7 @@ Select_one questions का उपयोग इनके लिए किया 
 4. Cascading (linked) selects जहाँ पिछले उत्तर के आधार पर choices filter होती हैं
 5. Country, region, district, या अन्य administrative unit selection
 
-## Appearance options
+## उपस्थिति विकल्प
 
 Choices कैसे प्रदर्शित होती हैं यह बदलने के लिए `appearance` column में एक value निर्दिष्ट करें:
 
@@ -70,7 +70,7 @@ Choices कैसे प्रदर्शित होती हैं यह �
 |------|------|-------|------------|
 | select_one regions | region | Region चुनें | compact-3 |
 
-## Cascading selects
+## कैस्केडिंग चयन
 
 एक cascading (linked) select पिछले प्रश्न में चुने गए value के आधार पर choices filter करता है। अपनी choices worksheet से किसी column के नाम के साथ `choice_filter` column का उपयोग करें।
 
@@ -130,7 +130,7 @@ calculate: choice-label(${education_level}, ${education_level})
 | occupation | student | छात्र |
 | occupation | other | अन्य (कृपया निर्दिष्ट करें) |
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. Lists को short और mutually exclusive रखें — यदि उत्तरदाता एक से अधिक चाहते हों, तो `select_multiple` का उपयोग करें।
 2. सबसे सामान्य उत्तर पहले रखें, या लंबी lists के लिए alphabetically order करें।

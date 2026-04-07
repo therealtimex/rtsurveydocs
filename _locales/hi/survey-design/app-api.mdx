@@ -130,7 +130,7 @@ action button को matching keys (जैसे `household_id`, `task_code`) �
 
 ---
 
-## Notes
+## नोट्स
 
 - सभी `pulldata('app-api', ...)` calls form खुलने पर evaluate किए जाते हैं और session के दौरान dynamically re-evaluate नहीं होते (सिवाय `serverTime` और `now()` के)।
 - यदि कोई key unsupported है या data उपलब्ध नहीं है, तो function `'n/a'` return करता है (empty string नहीं — `!= ''` के बजाय `!= 'n/a'` से test करें)।

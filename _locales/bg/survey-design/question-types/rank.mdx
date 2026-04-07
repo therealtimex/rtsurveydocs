@@ -5,7 +5,7 @@ description: "Въпросите от тип rank позволяват на ре
 
 The `rank` question type presents a list of choices that the respondent must **drag into order** (or otherwise rank from first to last). It stores the result as a space-separated list of choice values in the order selected, with the highest-priority choice first.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type | name | label |
 |------|------|-------|
@@ -29,7 +29,7 @@ The choices are defined in the **choices worksheet** just like `select_one`:
 | priorities | roads | Roads |
 | priorities | electricity | Electricity |
 
-## Stored value format
+## Формат на съхраняваната стойност
 
 The stored value is a **space-separated list** of choice values in ranked order (first = highest priority):
 
@@ -37,7 +37,7 @@ The stored value is a **space-separated list** of choice values in ranked order 
 water education health roads electricity
 ```
 
-## Extracting ranked positions
+## Извличане на класирани позиции
 
 Use `selected-at()` to get the choice at a specific rank:
 
@@ -49,7 +49,7 @@ Use `selected-at()` to get the choice at a specific rank:
 
 `selected-at(${main_priority}, 0)` returns the value placed **first** (index 0 = top rank).
 
-## Using `rank-index()` with repeat groups
+## Използване на `rank-index()` с групи за повторение
 
 When `rank` is used inside a repeat group, `rank-index()` lets you reference the ordinal rank from outside the repeat:
 
@@ -59,7 +59,7 @@ When `rank` is used inside a repeat group, `rank-index()` lets you reference the
 
 See [Functions — Repeated field functions](../operators-and-functions/functions#repeated-field-functions) for full details on `rank-index()` and `rank-index-if()`.
 
-## Uses
+## Приложения
 
 Rank questions are commonly used for:
 
@@ -68,14 +68,14 @@ Rank questions are commonly used for:
 3. **Exam item ordering** — arranging steps in a process
 4. **Top-N selection** — combined with `selected-at()` to extract only the top 1, 2, or 3 choices
 
-## Best Practices
+## Най-добри практики
 
 1. Keep the list short (3–7 items) — ranking becomes cognitively taxing beyond 7–8 choices.
 2. Use clear, mutually exclusive choice labels to avoid confusion about what "first" means.
 3. Add hint text explaining the ranking direction (e.g., "Drag to order: first = most important").
 4. Validate using `count-selected(.) = x` if you need to ensure all choices are ranked.
 
-## Limitations
+## Ограничения
 
 - The drag-to-rank widget requires a touch screen or mouse — it may not work well in keyboard-only environments.
 - On some older mobile clients, the rank widget may fall back to a numbered input interface.

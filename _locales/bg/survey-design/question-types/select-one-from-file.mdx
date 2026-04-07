@@ -7,7 +7,7 @@ import { Callout } from 'nextra/components'
 
 `select_one_from_file` and `select_multiple_from_file` work like `select_one` and `select_multiple`, but instead of defining choices in the **choices worksheet**, the choices are loaded from an **external CSV or XML file** attached to the form. This is useful when your choice list is very long, changes frequently, or needs to be updated without rebuilding the entire form.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type | name | label |
 |------|------|-------|
@@ -16,7 +16,7 @@ import { Callout } from 'nextra/components'
 
 The filename after the type name must match the name of the file you attach when uploading the form.
 
-## CSV file format
+## Формат на CSV файл
 
 Your CSV file must have at least two columns: `name` (the stored value) and `label` (the displayed text). You can add any number of extra columns for filtering.
 
@@ -29,7 +29,7 @@ HF002,Westlands Health Centre,Nairobi,health_centre
 HF003,Kisumu District Hospital,Kisumu,hospital
 ```
 
-## Filtering choices
+## Филтриране на избори
 
 Use the `choice_filter` column to show only the choices that match the current context. Reference CSV columns with their column name directly (no `${}`):
 
@@ -40,7 +40,7 @@ Use the `choice_filter` column to show only the choices that match the current c
 
 In this example, only facilities in the selected district are shown. The `district` in `choice_filter` refers to the `district` column in the CSV file; `${district}` refers to the form field named `district`.
 
-## Uses
+## Приложения
 
 Select-from-file questions are commonly used for:
 
@@ -49,7 +49,7 @@ Select-from-file questions are commonly used for:
 3. **Shared reference data** — one CSV file used across multiple forms
 4. **Filtered cascading selects** — load all regions/districts/villages in one file, then filter by the parent selection
 
-## Attaching the file
+## Прикачване на файла
 
 When you upload your form to rtSurvey, attach the CSV file as a **media attachment**. The filename in the form definition must exactly match the filename of the attachment.
 
@@ -57,7 +57,7 @@ When you upload your form to rtSurvey, attach the CSV file as a **media attachme
 File names are case-sensitive. `Health_Facilities.csv` and `health_facilities.csv` are treated as different files.
 </Callout>
 
-## Using `choice-label()` with from-file
+## Използване на `choice-label()` с from-file
 
 To display the label of a selected choice in a note or calculate field:
 
@@ -67,7 +67,7 @@ To display the label of a selected choice in a note or calculate field:
 | calculate | facility_label | | choice-label(`${facility}`, `${facility}`) |
 | note | summary | Selected facility: `${facility_label}` | |
 
-## Best Practices
+## Най-добри практики
 
 1. Keep your CSV files under 5,000 rows for good performance on mobile devices.
 2. Always include a `name` and `label` column — additional columns are optional.
@@ -75,13 +75,13 @@ To display the label of a selected choice in a note or calculate field:
 4. Version your CSV filenames (e.g., `facilities_v3.csv`) when making breaking changes to the column structure.
 5. Test filtering expressions carefully — a typo in `choice_filter` will silently show no choices.
 
-## Limitations
+## Ограничения
 
 - Very large CSV files (10,000+ rows) can slow down form loading, especially on low-end devices.
 - CSV files must be uploaded together with the form — they cannot be fetched from a URL at runtime (use `search()` or `pulldata()` for dynamic lookups).
 - `select_multiple_from_file` is less commonly supported across clients — verify compatibility before using it.
 
-## Comparison with `search()`
+## Сравнение с `search()`
 
 | | `select_one_from_file` | `search()` appearance |
 |--|----------------------|----------------------|

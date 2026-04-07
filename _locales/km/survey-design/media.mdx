@@ -11,7 +11,7 @@ rtSurvey គាំទ្រ rich media integration ក្នុង surveys, អ�
 - Audio (mp3, wav)
 - Video (mp4, webm)
 
-## ការ Adding Media ទៅ Survey
+## ការបន្ថែម Media ទៅ Survey
 
 ```
 | type | name          | label         | image        | audio       | video       |
@@ -19,18 +19,18 @@ rtSurvey គាំទ្រ rich media integration ក្នុង surveys, អ�
 | note | media_example | Media example | example.jpg  | sound.mp3   | clip.mp4    |
 ```
 
-## Media File Management
+## ការគ្រប់គ្រងឯកសារ Media
 
-### Web-based surveys
+### ការស្ទង់មតិតាមបណ្ដាញ
 rtSurvey ផ្ដល់ media management interface ។
 
-### Mobile app
+### កម្មវិធីទូរស័ព្ទ
 1. ដាក់ media files ក្នុង `/rtSurvey/forms/[form-name]-media/` ។
 2. Reference file name ជាក់ លាក់ ក្នុង XLSForm ។
 
-## rtSurvey-Specific Features
+## មុខងារជាក់លាក់ rtSurvey
 
-### Dynamic Media Loading
+### ការផ្ទុក Media ថាមវន្ត
 
 ```
 | type         | name      | label              | image                    |
@@ -38,7 +38,7 @@ rtSurvey ផ្ដល់ media management interface ។
 | select_one species | animal | Select an animal | ${animal}.jpg            |
 ```
 
-### Media in Choice Options
+### Media ក្នុងជម្រើស
 
 ```
 | list_name | name  | label | media::image |
@@ -47,7 +47,7 @@ rtSurvey ផ្ដល់ media management interface ។
 | animals   | cat   | Cat   | cat.jpg      |
 ```
 
-## Best Practices
+## វិធីល្អបំផុត
 
 1. **Optimize file sizes**: Large files slow down loading ។
 2. **ប្រើ formats ត្រឹម ត្រូ វ**: jpg, mp3, mp4 ។
@@ -55,7 +55,7 @@ rtSurvey ផ្ដល់ media management interface ។
 4. **Test ដោយ ហ្មត់ ចត់** ។
 5. **ពិ ចារ ណា offline use** ។
 
-## Multilingual Media Support
+## ការគាំទ្រ Media ពហុភាសា
 
 ```
 | type | name  | label    | image::English | image::Spanish |

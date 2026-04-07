@@ -5,7 +5,7 @@ description: ""
 
 Repeats rtSurvey में एक शक्तिशाली सुविधा है जो आपको एक ही survey के भीतर कई बार एक ही सेट की जानकारी एकत्र करने की अनुमति देती है। यह household surveys जैसे scenarios के लिए विशेष रूप से उपयोगी है, जहाँ आपको कई household members के बारे में डेटा एकत्र करना हो सकता है।
 
-## Basic Repeat Structure
+## मूल दोहराव संरचना
 
 rtSurvey में repeat बनाने के लिए, `begin repeat` और `end repeat` construct का उपयोग करें:
 
@@ -37,7 +37,7 @@ rtSurvey में repeat बनाने के लिए, `begin repeat` औ�
 
 rtSurvey प्रत्येक repeat instance के लिए "बच्चे की जानकारी" को शीर्षक के रूप में प्रदर्शित करेगा।
 
-## Fixed Repeat Counts
+## निश्चित दोहराव गणना
 
 repeats की एक निश्चित संख्या निर्दिष्ट करने के लिए, `repeat_count` कॉलम का उपयोग करें:
 
@@ -52,7 +52,7 @@ repeats की एक निश्चित संख्या निर्द�
 
 यह ठीक 3 child repeats बनाएगा।
 
-## Dynamic Repeat Counts
+## गतिशील दोहराव गणना
 
 rtSurvey पिछले उत्तरों के आधार पर dynamic repeat counts का समर्थन करता है:
 
@@ -66,7 +66,7 @@ rtSurvey पिछले उत्तरों के आधार पर dynami
 | end repeat |              |                                |                    |
 ```
 
-## Conditional Repeats
+## सशर्त दोहराव
 
 आप repeats को conditionally प्रदर्शित करने के लिए `relevant` कॉलम का उपयोग कर सकते हैं:
 
@@ -80,9 +80,9 @@ rtSurvey पिछले उत्तरों के आधार पर dynami
 | end repeat        |             |                           |                     |
 ```
 
-## rtSurvey-Specific Features
+## rtSurvey-विशिष्ट सुविधाएँ
 
-### Repeat Summary
+### दोहराव सारांश
 
 rtSurvey repeats का summary view प्रदान करता है। summary को customize करने के लिए, repeat के भीतर एक group का उपयोग करें:
 
@@ -98,7 +98,7 @@ rtSurvey repeats का summary view प्रदान करता है। s
 | end repeat   |              |                                          |
 ```
 
-### Repeat Appearance Options
+### दोहराव उपस्थिति विकल्प
 
 rtSurvey repeats के लिए additional appearance options प्रदान करता है:
 
@@ -114,7 +114,7 @@ rtSurvey repeats के लिए additional appearance options प्रदा�
 | end repeat   |              |                   |             |
 ```
 
-### Nested Repeats
+### नेस्टेड दोहराव
 
 rtSurvey जटिल data structures के लिए nested repeats का समर्थन करता है:
 

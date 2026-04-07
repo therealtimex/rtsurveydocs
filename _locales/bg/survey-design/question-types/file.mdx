@@ -5,7 +5,7 @@ description: "Въпросите от тип файл позволяват на 
 
 The `file` question type allows respondents to **upload any file** from their device — documents, spreadsheets, PDFs, or other file types. Unlike `image`, `audio`, and `video` which launch specific capture tools, `file` opens a general-purpose file picker.
 
-## Basic XLSForm Specification
+## Основна спецификация на XLSForm
 
 | type | name      | label                        |
 |------|-----------|------------------------------|
@@ -13,7 +13,7 @@ The `file` question type allows respondents to **upload any file** from their de
 
 For more details on the standard file question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Uses
+## Приложения
 
 File questions are commonly used for:
 
@@ -22,7 +22,7 @@ File questions are commonly used for:
 3. Gathering spreadsheets or data exports from other systems
 4. Any digital file type that image/audio/video does not cover
 
-## Data format
+## Формат на данните
 
 Uploaded files are stored as binary attachments:
 
@@ -31,9 +31,9 @@ Uploaded files are stored as binary attachments:
 - **Storage:** Uploaded to the server media folder alongside the submission
 - **Access:** Downloadable from the submission management interface
 
-## rtSurvey extensions
+## Разширения на rtSurvey
 
-### Accepted file types
+### Приети типове файлове
 
 Use the `parameters` column to restrict which file types can be selected:
 
@@ -44,7 +44,7 @@ Use the `parameters` column to restrict which file types can be selected:
 
 The `accept` parameter uses standard file extension syntax (comma-separated).
 
-### File size guidance
+### Насоки за размера на файловете
 
 rtSurvey does not enforce a hard file-size limit at the question level, but the server upload limit applies. Use `hint` to communicate expectations to the enumerator:
 
@@ -52,7 +52,7 @@ rtSurvey does not enforce a hard file-size limit at the question level, but the 
 |------|------|-------|------|
 | file | receipt | Upload the payment receipt | Accepted: PDF or image. Maximum file size: 5 MB |
 
-### Integration with device file system and cloud storage
+### Интеграция с файловата система на устройството и облачното хранилище
 
 On Android and iOS, the `file` question opens the device's native file picker, which may include access to:
 - Local device storage
@@ -62,22 +62,22 @@ On Android and iOS, the `file` question opens the device's native file picker, w
 
 On web, it opens the browser's standard file upload dialog.
 
-## Example usage
+## Примерна употреба
 
-### Required PDF upload
+### Задължително качване на PDF
 
 | type | name | label | hint | required | required_message |
 |------|------|-------|------|----------|-----------------|
 | file | signed_consent | Upload the signed consent form | PDF only, max 2MB | yes | A consent form is required |
 
-### Conditional document upload
+### Условно качване на документ
 
 | type | name | label | relevant |
 |------|------|-------|----------|
 | select_one yesno | has_land_title | Does the household have a land title? | |
 | file | land_title_doc | Upload a photo or scan of the land title | `${has_land_title} = 'yes'` |
 
-## Best Practices
+## Най-добри практики
 
 1. Use `accept` to restrict file types — this prevents enumerators from accidentally uploading wrong files.
 2. Always include size and format guidance in the `hint` column.
@@ -85,13 +85,13 @@ On web, it opens the browser's standard file upload dialog.
 4. For large surveys with file attachments, plan your data storage and download bandwidth accordingly.
 5. Test the file picker on the target device type (Android vs. iOS vs. web) before deployment — access to cloud drives varies.
 
-## Data handling considerations
+## Съображения при обработката на данни
 
 - Files are stored in their original format; they are not converted or compressed by rtSurvey.
 - Analyse files after download — rtSurvey does not extract or index file contents.
 - Large file attachments significantly increase the time required to download a full dataset.
 
-## Limitations
+## Ограничения
 
 - File questions do not validate file contents — only the file extension check via `accept` is enforced at the UI level.
 - Very large files (100 MB+) may time out on upload in low-connectivity environments.

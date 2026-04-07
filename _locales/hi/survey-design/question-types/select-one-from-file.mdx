@@ -7,7 +7,7 @@ import { Callout } from 'nextra/components'
 
 `select_one_from_file` और `select_multiple_from_file` `select_one` और `select_multiple` की तरह काम करते हैं, लेकिन **choices worksheet** में choices define करने के बजाय, choices form से attached **बाहरी CSV या XML file** से load की जाती हैं। यह तब उपयोगी है जब आपकी choice list बहुत लंबी हो, बार-बार बदलती हो, या पूरे form को rebuild किए बिना update होने की आवश्यकता हो।
 
-## Basic XLSForm Specification
+## बुनियादी XLSForm विशिष्टता
 
 | type | name | label |
 |------|------|-------|
@@ -16,7 +16,7 @@ import { Callout } from 'nextra/components'
 
 Type name के बाद filename उस file के नाम से match होना चाहिए जिसे आप form upload करते समय attach करते हैं।
 
-## CSV file format
+## CSV फ़ाइल प्रारूप
 
 आपकी CSV file में कम से कम दो columns होने चाहिए: `name` (stored value) और `label` (displayed text)। आप filtering के लिए कितने भी extra columns जोड़ सकते हैं।
 
@@ -67,7 +67,7 @@ Note या calculate field में selected choice का label प्रद�
 | calculate | facility_label | | choice-label(`${facility}`, `${facility}`) |
 | note | summary | Selected facility: `${facility_label}` | |
 
-## Best Practices
+## सर्वोत्तम प्रथाएँ
 
 1. Mobile devices पर अच्छे performance के लिए अपनी CSV files को 5,000 rows से कम रखें।
 2. हमेशा `name` और `label` column शामिल करें — additional columns optional हैं।
