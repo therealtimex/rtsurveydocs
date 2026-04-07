@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "అవలోకనం",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "డాష్‌బోర్డ్ అవలోకనం",
   "system-user": "సిస్టమ్ & వినియోగదారు",
   "manage-forms": "ఫారమ్‌లను నిర్వహించండి",

@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Apžvalga",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Prietaisų skydelio apžvalga",
   "system-user": "Sistema ir vartotojas",
   "manage-forms": "Tvarkyti formas",

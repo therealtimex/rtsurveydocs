@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Pasqyrë e Përgjithshme",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Pasqyrë e Panelit",
   "system-user": "Sistemi & Përdoruesi",
   "manage-forms": "Menaxhimi i Formularëve",

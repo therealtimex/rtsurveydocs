@@ -4,5 +4,7 @@
   },
   "rtsurvey-cloud": "rtSurvey Cloud",
   "mobile-app": "Aplikasi Seluler",
-  "web-form": "Formulir Web"
+  "web-form": {
+    "display": "hidden"
+  }
 }

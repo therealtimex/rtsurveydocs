@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Panoramica",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Panoramica del dashboard",
   "system-user": "Sistema e utente",
   "manage-forms": "Gestisci moduli",

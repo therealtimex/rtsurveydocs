@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Преглед",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Преглед на таблото",
   "system-user": "Система и потребител",
   "manage-forms": "Управление на формуляри",

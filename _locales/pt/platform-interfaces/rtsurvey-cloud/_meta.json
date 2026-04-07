@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Visão Geral",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Visão Geral do Painel",
   "system-user": "Sistema e Utilizador",
   "manage-forms": "Gerir Formulários",

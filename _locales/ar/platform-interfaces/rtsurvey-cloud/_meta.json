@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "نظرة عامة",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "نظرة عامة على لوحة التحكم",
   "system-user": "النظام والمستخدم",
   "manage-forms": "إدارة النماذج",

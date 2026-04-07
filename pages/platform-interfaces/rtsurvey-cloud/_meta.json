@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Overview",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Dashboard Overview",
   "system-user": "System & User",
   "manage-forms": "Manage Forms",

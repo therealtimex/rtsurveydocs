@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "개요",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "대시보드 개요",
   "system-user": "시스템 및 사용자",
   "manage-forms": "양식 관리",

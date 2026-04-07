@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "概述",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "仪表板概述",
   "system-user": "系统与用户",
   "manage-forms": "管理表单",

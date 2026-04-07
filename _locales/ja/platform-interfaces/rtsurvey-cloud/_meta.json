@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "概要",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "ダッシュボード概要",
   "system-user": "システムとユーザー",
   "manage-forms": "フォーム管理",

@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "ទិដ្ឋភាពទូទៅ",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "ទិដ្ឋភាពទូទៅនៃផ្ទាំងគ្រប់គ្រង",
   "system-user": "ប្រព័ន្ធ & អ្នកប្រើ",
   "manage-forms": "គ្រប់គ្រងទម្រង់",

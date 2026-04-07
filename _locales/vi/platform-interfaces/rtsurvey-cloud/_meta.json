@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Tổng quan",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Tổng quan bảng điều khiển",
   "system-user": "Hệ thống & Người dùng",
   "manage-forms": "Quản lý biểu mẫu",

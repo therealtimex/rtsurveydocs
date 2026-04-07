@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Pārskats",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Paneļa pārskats",
   "system-user": "Sistēma un lietotājs",
   "manage-forms": "Pārvaldīt veidlapas",

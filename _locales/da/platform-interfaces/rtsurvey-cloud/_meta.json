@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Oversigt",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Oversigt over dashboard",
   "system-user": "System og bruger",
   "manage-forms": "Administrer formularer",

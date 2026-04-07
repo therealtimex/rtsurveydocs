@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Descripción general",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Resumen del panel",
   "system-user": "Sistema y usuario",
   "manage-forms": "Gestionar formularios",

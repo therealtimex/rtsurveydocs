@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Aperçu",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Aperçu du tableau de bord",
   "system-user": "Système et utilisateur",
   "manage-forms": "Gérer les formulaires",

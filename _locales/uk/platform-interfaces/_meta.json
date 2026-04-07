@@ -4,5 +4,7 @@
   },
   "rtsurvey-cloud": "rtSurvey Cloud",
   "mobile-app": "Мобільний додаток",
-  "web-form": "Веб-форма"
+  "web-form": {
+    "display": "hidden"
+  }
 }

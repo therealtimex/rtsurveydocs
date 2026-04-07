@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Ikhtisar",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Ikhtisar Dasbor",
   "system-user": "Sistem & Pengguna",
   "manage-forms": "Kelola Formulir",

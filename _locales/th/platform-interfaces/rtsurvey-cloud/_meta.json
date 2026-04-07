@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "ภาพรวม",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "ภาพรวมแดชบอร์ด",
   "system-user": "ระบบและผู้ใช้",
   "manage-forms": "จัดการแบบฟอร์ม",

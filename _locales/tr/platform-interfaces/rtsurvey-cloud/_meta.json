@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Genel Bakış",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Panele Genel Bakış",
   "system-user": "Sistem & Kullanıcı",
   "manage-forms": "Formları Yönet",

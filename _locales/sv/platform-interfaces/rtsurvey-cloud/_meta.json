@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Översikt",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Instrumentpanelsöversikt",
   "system-user": "System och användare",
   "manage-forms": "Hantera formulär",

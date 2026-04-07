@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Pregled",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Pregled kontrolne table",
   "system-user": "Sistem i korisnik",
   "manage-forms": "Upravljanje obrascima",

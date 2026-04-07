@@ -4,5 +4,7 @@
   },
   "rtsurvey-cloud": "rtSurvey Cloud",
   "mobile-app": "Mobilalkalmazás",
-  "web-form": "Webes űrlap"
+  "web-form": {
+    "display": "hidden"
+  }
 }

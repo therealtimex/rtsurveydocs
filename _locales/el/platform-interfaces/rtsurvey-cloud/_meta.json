@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Επισκόπηση",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Επισκόπηση πίνακα ελέγχου",
   "system-user": "Σύστημα & χρήστης",
   "manage-forms": "Διαχείριση φορμών",

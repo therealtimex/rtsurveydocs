@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Áttekintés",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Irányítópult áttekintése",
   "system-user": "Rendszer és felhasználó",
   "manage-forms": "Űrlapok kezelése",

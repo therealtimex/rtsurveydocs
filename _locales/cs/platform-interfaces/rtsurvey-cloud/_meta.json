@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Přehled",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Přehled řídicího panelu",
   "system-user": "Systém a uživatel",
   "manage-forms": "Správa formulářů",

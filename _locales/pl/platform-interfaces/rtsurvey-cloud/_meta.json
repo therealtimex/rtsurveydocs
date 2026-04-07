@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Przegląd",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Przegląd pulpitu",
   "system-user": "System i użytkownicy",
   "manage-forms": "Zarządzanie formularzami",

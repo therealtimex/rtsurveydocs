@@ -4,5 +4,7 @@
   },
   "rtsurvey-cloud": "rtSurvey Cloud",
   "mobile-app": "Mobilioji programa",
-  "web-form": "Žiniatinklio forma"
+  "web-form": {
+    "display": "hidden"
+  }
 }

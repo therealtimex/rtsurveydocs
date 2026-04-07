@@ -2,7 +2,9 @@
   "index": {
     "display": "hidden"
   },
-  "overview": "Yleiskatsaus",
+  "overview": {
+    "display": "hidden"
+  },
   "dashboard-overview": "Kojetaulun yleiskatsaus",
   "system-user": "Järjestelmä ja käyttäjä",
   "manage-forms": "Lomakkeiden hallinta",
