@@ -62,6 +62,16 @@ Seçeneklerin nasıl görüntülendiğini değiştirmek için `appearance` sütu
 | `columns(N)` | N sütunda görüntüle (rtSurvey uzantısı, örn. `columns(3)`) |
 | `distress` | Kessler Psikolojik Sıkıntı (K10) duygusal simge widget'ı |
 | `search-api(...)` | Dinamik arama — çalışma zamanında bir API'den seçenekleri yükler |
+| `tagging` | Seçenekleri radyo düğmeleri yerine tıklanabilir etiket chip'leri olarak gösterir |
+| `boxtag` | Seçenekleri kullanıcının seçmek için dokunduğu stilize dikdörtgen kutular olarak gösterir |
+| `boxtag -search` | Kutular üzerinde bir arama/filtreleme girişi olan boxtag düzeni |
+| `duolingo-style1` | Duolingo ilhamlı kart düzeni — ikonlu büyük dokunulabilir kartlar |
+| `rating_box` | Izgara tabanlı derecelendirme kutuları — sayısal veya ölçek seçenekleri için en iyi |
+| `star_rating` | Yıldız derecelendirme widget'ı — seçenekler 1–N yıldız olarak gösterilir |
+| `choices-noshow` | Başlangıçta yalnızca ilk 10 seçeneği gösterir; geri kalanı istek üzerine ortaya çıkarır |
+| `noshow` | Seçenek listesini tamamen gizler; değer programatik olarak ayarlanır |
+| `checkall` | Listenin üstüne "Tümünü seç" seçeneği ekler |
+| `max-items(N)` | Görünür seçenek sayısını N ile sınırlar (örn. max-items(5)) |
 {{< /table >}}
 
 ### Örnek: Likert ölçeği

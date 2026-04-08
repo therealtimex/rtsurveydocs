@@ -93,6 +93,11 @@ I tillegg til standard XLSForm-utseender støtter rtSurvey følgende plattformsp
 | `columns(n)` | select_one, select_multiple | Viser alternativer i `n` kolonner. Eksempel: `columns(3)` viser tre kolonner med radioknapper. |
 | `gridformat<row=R col=C colspan=S align=center>` | enhver | Plasserer feltet i et CSS-grid-oppsett ved rad `R`, kolonne `C`, med `S` kolonner. Brukes med `advanced-extension/grid-layout`. |
 | `ignore-simplify` | enhver | Instruerer skjemaviseren til å hoppe over automatisk forenkling eller komprimering av dette feltets oppsett. |
+| `required-but-simplify` | enhver | Feltet er obligatorisk, men oppsettet forenkles likevel |
+| `embed` | enhver | Gjengir feltet i innebygd/inline visningsmodus |
+| `popup` | select_one, select_multiple | Gjengir valglisten i et popup/modal-overlay |
+| `auto-hide-empty` | boxtag, select | Skjuler widgeten når valglisten er tom |
+| `text-nolabel` | select_one, select_multiple | Skjuler tekstetiketten for hvert valg |
 
 ### Widgets
 
@@ -100,6 +105,44 @@ I tillegg til standard XLSForm-utseender støtter rtSurvey følgende plattformsp
 |-------------------|----------------|-------------|
 | `likert` | select_one | Presenterer alternativer som en Likert-skalarad (allerede i standardtabellen ovenfor; bekreftet støttet). |
 | `distress` | select_one | Gjengir alternativer som Kessler Psychological Distress Scale (K10) visuell widget med emosjonelle ikoner. |
+
+### Visuelle utvalgswidgets
+
+| Utseendeattributt | Spørsmålstyper | Beskrivelse |
+|-------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Viser valg som klikkbare tag-chips i stedet for radioknapper eller avkrysningsbokser |
+| `boxtag` | select_one, select_multiple | Viser valg som stiliserte rektangulære bokser som brukeren trykker for å velge |
+| `boxtag -search` | select_one, select_multiple | Boxtag-oppsett med et søke-/filtreringsfelt over boksene |
+| `duolingo-style1` | select_one, select_multiple | Duolingo-inspirert kortoppsett — store trykkbare kort med ikoner |
+| `rating_box` | select_one | Gridbaserte vurderingsbokser — best for numeriske eller skalavalg |
+| `star_rating` | select_one | Stjernevurderingswidget — valg gjengis som 1–N stjerner |
+| `choices-noshow` | select_one, select_multiple | Viser bare de første 10 valgene innledningsvis; avslører resten på forespørsel |
+| `noshow` | select_one | Skjuler valglisten fullstendig; verdi settes programmatisk |
+| `checkall` | select_multiple | Legger til et "Velg alle"-alternativ øverst i listen |
+| `max-items(N)` | select_one, select_multiple | Begrenser antall synlige valg til N (f.eks. max-items(5)) |
+
+### Visuelle tekstwidgets
+
+| Utseendeattributt | Spørsmålstyper | Beskrivelse |
+|-------------------|----------------|-------------|
+| `richtext` | text | Rik tekstredigerer — verktøylinje med fet, kursiv, lister og lenker |
+| `typingtest` | text | Skrivetestgrensesnitt — presenterer et avsnitt og måler skrivehastighet og nøyaktighet |
+
+### Mediautvidelser
+
+| Utseendeattributt | Spørsmålstyper | Beskrivelse |
+|-------------------|----------------|-------------|
+| `watermark("expr")` | image | Legger et tekstvannmerke over det tatte bildet; argumentet er et XPath-uttrykk som evalueres ved opptakstidspunktet |
+| `editable` | image | Lar respondenten kommentere eller tegne på det tatte bildet |
+
+### Innebygd visningskonfigurasjon
+
+Bruk `display{}` for å kontrollere hvordan en feltverdi vises innebygd i en etikett eller merknad. Bruk `results{}` for å kontrollere resultatoppsummeringsvisningen som vises etter innsending.
+
+| Syntaks | Spørsmålstyper | Beskrivelse |
+|----------|----------------|-------------|
+| `display{format="..."}` | enhver | Formaterer feltverdien når den settes inn innebygd i en etikett via `${fieldname}` |
+| `results{show="true"}` | enhver | Viser feltverdien i resultatoppsummeringsvisningen etter innsending |
 
 ### API-integrasjon
 

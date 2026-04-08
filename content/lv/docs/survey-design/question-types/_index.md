@@ -28,7 +28,6 @@ Lai iestatītu jautājuma tipu, ievadiet tipa nosaukumu kolonnā `type` darblap�
 |------|-------------|
 | [select_one listname](select-one) | Izvēlieties tieši vienu iespēju no saraksta |
 | [select_multiple listname](select-multiple) | Izvēlieties vienu vai vairākas iespējas no saraksta |
-| [select_one_from_file filename](select-one-from-file) | Izvēlieties vienu iespēju, kas ielādēta no ārēja CSV faila |
 | [rank listname](rank) | Sakārtojiet izvēles pēc priekšrocībām vai prioritātes |
 
 ## Datums un laiks
@@ -66,6 +65,18 @@ Lai iestatītu jautājuma tipu, ievadiet tipa nosaukumu kolonnā `type` darblap�
 | [hidden](hidden) | Slēpts lauks, kas glabā statisku vai iepriekš aizpildītu vērtību |
 | [trigger / acknowledge](trigger) | Izvēles rūtiņa, kuru enumeratoram jāatzīmē, apstiprinot, ka ir izlasījis paziņojumu |
 | [meta](meta) | Automātiski metadati: laika zīmogi, ierīces ID, enumeratora informācija |
+
+## rtSurvey paplašinājumi
+
+Šie tipi ir rtSurvey specifiski un nav daļa no standarta XLSForm specifikācijas.
+
+| Tips | Apraksts |
+|------|----------|
+| [search-autocomplete](search-autocomplete) | Teksta ievade ar reāllaika API balstītiem automātiskās pabeigšanas ieteikumiem |
+| [mentions](mentions) | Teksta lauks ar `@`-pieminēšanas automātisko pabeigšanu entitāšu atzīmēšanai iekšrindiski |
+| [texttags](texttags) | Tagu ievades lauks — katrs ieraksts kļūst par noņemamu žetonu; saglabāts kā atstarpi atdalīta virkne |
+
+Par atkārtojumu grupām skatiet [Repeats](../advanced-extension/repeats)
 
 ## Kā tips un izskats darbojas kopā
 

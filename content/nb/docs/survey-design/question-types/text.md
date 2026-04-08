@@ -36,6 +36,8 @@ Tekstspørsmål brukes for:
 |----------|-------------|
 | *(ingen)* | Enkelt-linje tekstinndata |
 | `multiline` | Flerlinjet tekstområde — best for lengre fritekst på web |
+| `richtext` | Rik tekstredigerer — verktøylinje med fet, kursiv, lister og lenker |
+| `typingtest` | Skrivetestgrensesnitt — presenterer et avsnitt og måler skrivehastighet og nøyaktighet |
 
 ## rtSurvey tidsinndatautvidelser
 

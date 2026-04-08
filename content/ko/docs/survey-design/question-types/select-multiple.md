@@ -64,6 +64,14 @@ Select_multiple 질문은 다음 용도로 사용됩니다:
 | `label` | 체크박스 없이 레이블만 표시 (`list-nolabel`과 함께 사용) |
 | `list-nolabel` | 레이블 없이 체크박스만 표시 (`label`과 함께 사용) |
 | `columns(N)` | N열로 표시 (rtSurvey 확장) |
+| `tagging` | 선택지가 알약 모양의 태그 칩으로 렌더링됨 |
+| `boxtag` | 선택지가 직사각형 스타일 박스로 렌더링됨 |
+| `boxtag -search` | 박스 위에 검색/필터 입력이 있는 Boxtag 레이아웃 |
+| `duolingo-style1` | 대형 카드 레이아웃 — 짧은 선택지 목록에 최적 |
+| `rating_box` | 그리드 기반 평점 박스 |
+| `choices-noshow` | 처음에 처음 10개의 선택지를 표시; 나머지는 요청 시 표시 |
+| `checkall` | 목록 상단에 "모두 선택" 옵션 추가 |
+| `max-items(N)` | 보이는 선택지 수를 N으로 제한 |
 {{< /table >}}
 
 ### 예시: 3열 컴팩트 레이아웃

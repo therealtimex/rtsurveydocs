@@ -38,6 +38,8 @@ Text questions are used for:
 |------------|-------------|
 | *(none)* | Single-line text input |
 | `multiline` | Multi-line text area — best for longer free text on web |
+| `richtext` | Rich text editor — toolbar with bold, italic, lists, and links |
+| `typingtest` | Typing test interface — presents a passage and measures the respondent's typing speed and accuracy |
 
 ## rtSurvey time input extensions
 
@@ -98,6 +100,30 @@ Apply constraints to enforce format, length, or pattern:
 | text | name | Full name | `string-length(.) >= 2` | Name must be at least 2 characters |
 | text | code | Reference code | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Enter 2 uppercase letters followed by 4 digits |
 | text | phone | Phone number | `regex(., '^[0-9]{9,15}$')` | Enter a valid phone number |
+
+## rtSurvey text widget extensions
+
+### richtext
+
+The `richtext` appearance replaces the plain text input with a rich text editor. The toolbar provides bold, italic, bullet lists, numbered lists, and hyperlink tools. The stored value is HTML.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | notes | Field notes | richtext |
+
+{{% alert icon=" " context="warning" %}}
+Stored HTML values require post-processing if you intend to analyse the plain-text content. Avoid `richtext` when downstream analysis needs clean strings.
+{{% /alert %}}
+
+### typingtest
+
+The `typingtest` appearance presents a predefined passage of text and asks the respondent to type it out. The widget records the respondent's typed text alongside timing data, enabling calculation of words-per-minute and accuracy. The passage is defined in the `label` column.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | typing_speed | The quick brown fox jumps over the lazy dog. | typingtest |
+
+The stored value is the raw typed text entered by the respondent.
 
 ## Best Practices
 

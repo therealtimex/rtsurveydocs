@@ -93,6 +93,11 @@ Okrem štandardných vzhľadov XLSForm rtSurvey podporuje nasledujúce možnosti
 | `columns(n)` | select_one, select_multiple | Zobrazí voľby v `n` stĺpcoch. Príklad: `columns(3)` zobrazí tri stĺpce prepínačov. |
 | `gridformat<row=R col=C colspan=S align=center>` | akýkoľvek | Umiestni pole v rozložení CSS mriežky na riadku `R`, stĺpci `C`, presahujúci `S` stĺpcov. Používa sa s `advanced-extension/grid-layout`. |
 | `ignore-simplify` | akýkoľvek | Inštruuje renderer formulára, aby preskočil automatické zjednodušenie alebo kondenzáciu rozloženia tohto poľa. |
+| `required-but-simplify` | akýkoľvek | Pole je povinné, ale jeho rozloženie je stále zjednodušené rendererom (prepíše predvolené správanie, kde povinné polia sú vylúčené zo zjednodušenia). |
+| `embed` | akýkoľvek | Renderuje pole vo vloženom/inline režime zobrazenia, potlačí jeho vonkajší obal a kontajner popisku — používa sa, keď je otázka vnorená do vlastného HTML. |
+| `popup` | select_one, select_multiple | Renderuje zoznam volieb v vyskakovacom/modálnom okne namiesto inline. |
+| `auto-hide-empty` | boxtag, select | Skryje celý widget otázky, keď je zoznam volieb prázdny (napr. API nevrátilo žiadne výsledky). |
+| `text-nolabel` | select_one, select_multiple | Skryje textový popisok každej voľby, zobrazuje iba vstupný ovládací prvok. Podobné `list-nolabel`, ale aplikované pre každú voľbu, nie ako rozdelenie stĺpcov. |
 
 ### Widgety
 
@@ -100,6 +105,68 @@ Okrem štandardných vzhľadov XLSForm rtSurvey podporuje nasledujúce možnosti
 |----------------------|----------------|-------------|
 | `likert` | select_one | Prezentuje voľby ako rad Likertovej škály (potvrdené ako podporované). |
 | `distress` | select_one | Renderuje voľby ako vizuálny widget Kesslerovej škály psychologickej tiesne (K10) s emocionálnymi ikonami. |
+
+### Vizuálne widgety pre výber
+
+Tieto vzhľady menia celé renderovanie zoznamov volieb pre výber.
+
+| Atribút vzhľadu | Typy otázok | Popis |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Voľby sa renderujú ako klikateľné tagové čipy v tvare piluliek. |
+| `boxtag` | select_one, select_multiple | Voľby sa renderujú ako obdĺžnikové štylizované boxy, na ktoré používateľ klepne. |
+| `boxtag -search` | select_one, select_multiple | Rozloženie boxtag s živým vyhľadávacím/filtrovacím poľom nad boxmi. |
+| `duolingo-style1` | select_one, select_multiple | Rozloženie veľkých kariet inšpirované Duolingom — vhodné pre krátke zoznamy s ikonami. |
+| `rating_box` | select_one, select_multiple | Mriežka klepateľných číslovaných boxov — vhodná pre škálové alebo NPS otázky. |
+| `star_rating` | select_one | Voľby sa renderujú ako hviezdičky; počet hviezdičiek zodpovedá počtu volieb. |
+| `choices-noshow` | select_one, select_multiple | Spočiatku zobrazuje iba prvých 10 volieb s ovládacím prvkom „Zobraziť viac". |
+| `noshow` | select_one, select_multiple | Skryje zoznam volieb úplne; hodnota sa nastavuje programovo cez `calculate` alebo API. |
+| `checkall` | select_multiple | Pridá skratku „Vybrať všetko" na vrchol zoznamu volieb. |
+| `max-items(N)` | select_one, select_multiple | Obmedzí viditeľný zoznam volieb na N položiek. Príklad: `max-items(5)`. |
+
+### Vizuálne widgety pre text
+
+| Atribút vzhľadu | Typy otázok | Popis |
+|----------------------|----------------|-------------|
+| `richtext` | text | Nahradí prosté textové pole editorom formátovaného textu (tučné, kurzíva, zoznamy, odkazy). Ukladá HTML. |
+| `typingtest` | text | Widget testu písania — text popisku je pasáž; widget zaznamenáva zadanú odpoveď a časovanie. |
+
+### Mediálne rozšírenia
+
+| Atribút vzhľadu | Typy otázok | Popis |
+|----------------------|----------------|-------------|
+| `watermark("výraz")` | image | Prekryje textový vodoznak na zachytených fotografiách. Argument je výraz XPath vyhodnotený v čase zachytenia. Príklad: `watermark("${id} ${today()}")`. |
+| `editable` | image | Umožní anotáciu/kreslenie cez zachytenú fotografiu pred uložením. |
+
+### Konfigurácia inline zobrazenia
+
+Modifikátory `display{}` a `results{}` možno pripojiť k `inline` vzhľadom pre riadenie zarovnania ikon a zobrazenia výsledkov. Používajú sa spolu s rozšírením inline časového vstupu na poliach `text` a s widgetmi na zachytenie médií.
+
+#### Parametre `display{}`
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parameter | Hodnoty | Popis |
+|-----------|--------|-------------|
+| Zarovnanie | `left`, `right`, `top`, `bottom`, `center` | Pozícia ikony relatívne k vstupnému poľu |
+| Veľkosť | `small`, `medium`, `large` | Veľkosť ikony (zodpovedá 2,5 rem, 5 rem, 8 rem) |
+| Režim | `inline-icon` | Renderuje spúšťač iba ako ikonu (bez okraja tlačidla) |
+| Režim | `inline-button` | Renderuje spúšťač ako celé tlačidlo |
+
+#### Parametre `results{}`
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parameter | Hodnoty | Popis |
+|-----------|--------|-------------|
+| Zarovnanie | `left`, `right`, `top`, `bottom`, `center` | Pozícia zobrazenia výslednej hodnoty |
+| `hide(pole)` | ľubovoľný názov čiastkového poľa | Skryje konkrétnu komponentu výsledku (napr. `hide(seconds)`) |
 
 ### Integrácia API
 

@@ -70,6 +70,21 @@ Image-kysymyksiä käytettäessä harkitse:
 3. Yksityisyys ja tietosuojatoimenpiteet valokuvien tallentamiseen ja käsittelyyn
 4. Mahdollinen tarve kuvanmuokkaus- tai järjestelytyökaluille analyysivaiheessa
 
+## rtSurveyn ulkoasulaajennukset
+
+rtSurvey laajentaa `image`-tyyppiä kahdella lisäulkoasuvaihtoehdolla:
+
+| Ulkoasu | Kuvaus |
+|---------|--------|
+| `watermark("lauseke")` | Lisää tekstivesileiman otettuihin kuviin. Argumentti on XPath-lauseke, joka arvioidaan kuvaushetkellä. Esimerkki: `watermark("${id} ${today()}")` |
+| `editable` | Mahdollistaa otetun valokuvan merkitsemisen/piirtämisen ennen tallentamista |
+
+### Esimerkki: Vesileima vastaajan tunnuksella ja päivämäärällä
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Ota kuva sijainnista | `watermark("${respondent_id} ${today()}")` |
+
 ## Rajoitukset
 
 - Kuvatiedostot voivat olla suuria, mikä voi vaikuttaa tiedonsiirtoon ja tallennukseen.

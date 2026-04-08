@@ -62,6 +62,16 @@ Chỉ định giá trị trong cột `appearance` để thay đổi cách hiển
 | `columns(N)` | Hiển thị theo N cột (phần mở rộng rtSurvey, ví dụ: `columns(3)`) |
 | `distress` | Widget biểu tượng cảm xúc thang đo tâm lý Kessler (K10) |
 | `search-api(...)` | Tìm kiếm động — tải lựa chọn từ API trong thời gian thực |
+| `tagging` | Hiển thị các lựa chọn dưới dạng chip thẻ có thể nhấp thay vì nút radio |
+| `boxtag` | Hiển thị các lựa chọn dưới dạng hộp hình chữ nhật có kiểu dáng mà người dùng nhấn để chọn |
+| `boxtag -search` | Bố cục boxtag với ô tìm kiếm/lọc phía trên các hộp |
+| `duolingo-style1` | Bố cục thẻ lấy cảm hứng từ Duolingo — thẻ lớn có thể nhấn với biểu tượng |
+| `rating_box` | Hộp đánh giá dạng lưới — phù hợp nhất cho các lựa chọn số hoặc thang đo |
+| `star_rating` | Widget đánh giá sao — các lựa chọn hiển thị dưới dạng 1–N ngôi sao |
+| `choices-noshow` | Chỉ hiển thị 10 lựa chọn đầu tiên ban đầu; hiện phần còn lại theo yêu cầu |
+| `noshow` | Ẩn hoàn toàn danh sách lựa chọn; giá trị được đặt theo chương trình |
+| `checkall` | Thêm tùy chọn "Chọn tất cả" ở đầu danh sách |
+| `max-items(N)` | Giới hạn số lượng lựa chọn hiển thị thành N (ví dụ: max-items(5)) |
 {{< /table >}}
 
 ### Ví dụ: Thang Likert

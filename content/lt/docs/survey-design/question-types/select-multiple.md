@@ -62,6 +62,14 @@ Select_multiple klausimai naudojami:
 | `label` | Rodo tik etiketes, be žymimųjų langelių (naudokite su `list-nolabel`) |
 | `list-nolabel` | Rodo tik žymimuosius langelius, be etikečių (naudokite su `label`) |
 | `columns(N)` | Rodyti N stulpeliuose (rtSurvey plėtinys) |
+| `tagging` | Rodo pasirinkimus kaip spustelėjamus pill formos žymų čipsus |
+| `boxtag` | Rodo pasirinkimus kaip stilizuotus stačiakampius laukelius |
+| `boxtag -search` | Boxtag išdėstymas su gyvu paieškos/filtravimo įvedimu virš laukelių |
+| `duolingo-style1` | Duolingo įkvėptas kortelių išdėstymas — didelės paliečiamos kortelės su piktogramomis |
+| `rating_box` | Tinklelio pagrindu sukurti vertinimo laukeliai |
+| `choices-noshow` | Iš pradžių rodo tik pirmus 10 pasirinkimų; likusius atskleidžia pagal poreikį |
+| `checkall` | Prideda parinktį „Pasirinkti visus" sąrašo viršuje |
+| `max-items(N)` | Apriboja matomų pasirinkimų skaičių iki N |
 {{< /table >}}
 
 ### Pavyzdys: 3 stulpelių kompaktiška išdėstymas

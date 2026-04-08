@@ -76,3 +76,27 @@ Quando usi le domande image, considera:
 - Non tutti i dispositivi potrebbero avere fotocamere di alta qualità o spazio di archiviazione sufficiente.
 - L'analisi di un gran numero di immagini può richiedere molto tempo.
 - Potrebbero esserci preoccupazioni sulla privacy durante l'acquisizione di immagini, specialmente negli spazi pubblici.
+
+## Estensioni per immagini di rtSurvey
+
+### watermark()
+
+L'appearance `watermark()` sovrappone una filigrana di testo alle foto acquisite con questo campo. La filigrana contiene tipicamente metadati come il nome dell'enumeratore, la data/ora o le coordinate GPS, impressi direttamente sull'immagine prima che venga salvata.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Scatta una foto del sito | `watermark("${enumerator_id} ${today()}")` |
+
+L'argomento di `watermark()` è un'espressione XPath valutata al momento dell'acquisizione. La stringa risultante viene visualizzata come testo della filigrana.
+
+### editable
+
+L'appearance `editable` consente al rispondente di annotare o disegnare sulla foto acquisita dopo averla scattata. Sull'immagine appare una barra degli strumenti di disegno.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Fotografa e contrassegna le aree di interesse | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` può essere combinato con `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

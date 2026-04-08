@@ -93,6 +93,11 @@ Naast standaard XLSForm-weergaven ondersteunt rtSurvey de volgende platformspeci
 | `columns(n)` | select_one, select_multiple | Toont keuzes in `n` kolommen. Voorbeeld: `columns(3)` toont drie kolommen keuzerondjes. |
 | `gridformat<row=R col=C colspan=S align=center>` | elk | Plaatst het veld in een CSS-rasterindeling op rij `R`, kolom `C`, met `S` kolommen spanning. Gebruikt met `advanced-extension/grid-layout`. |
 | `ignore-simplify` | elk | Instrueert de formulierweergave om automatische vereenvoudiging of condensering van de indeling van dit veld over te slaan. |
+| `required-but-simplify` | elk | Veld is verplicht maar de indeling wordt toch vereenvoudigd |
+| `embed` | elk | Geeft het veld weer in ingesloten/inline weergavemodus |
+| `popup` | select_one, select_multiple | Geeft de keuzenlijst weer in een popup/modaal overlay |
+| `auto-hide-empty` | boxtag, select | Verbergt de widget wanneer de keuzenlijst leeg is |
+| `text-nolabel` | select_one, select_multiple | Verbergt het tekstlabel voor elke keuze |
 
 ### Widgets
 
@@ -100,6 +105,44 @@ Naast standaard XLSForm-weergaven ondersteunt rtSurvey de volgende platformspeci
 |----------------------|----------------|-------------|
 | `likert` | select_one | Presenteert keuzes als een Likert-schaalrij (al in de standaardtabel; bevestigd ondersteund). |
 | `distress` | select_one | Geeft keuzes weer als de Kessler Psychological Distress Scale (K10) visuele widget met emotionele iconen. |
+
+### Visuele selectiewidgets
+
+| Weergaveattribuut | Vraagtypen | Beschrijving |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Toont keuzes als klikbare tag-chips in plaats van keuzerondjes of selectievakjes |
+| `boxtag` | select_one, select_multiple | Toont keuzes als gestileerde rechthoekige vakken die de gebruiker aanraakt om te selecteren |
+| `boxtag -search` | select_one, select_multiple | Boxtag-indeling met een zoek-/filterveld boven de vakken |
+| `duolingo-style1` | select_one, select_multiple | Duolingo-geïnspireerde kaartindeling — grote aantikbare kaarten met pictogrammen |
+| `rating_box` | select_one | Op grid gebaseerde beoordelingsvakken — best voor numerieke of schaalgebaseerde keuzes |
+| `star_rating` | select_one | Sterbeoordelingswidget — keuzes worden weergegeven als 1–N sterren |
+| `choices-noshow` | select_one, select_multiple | Toont aanvankelijk alleen de eerste 10 keuzes; onthult de rest op aanvraag |
+| `noshow` | select_one | Verbergt de keuzenlijst volledig; de waarde wordt programmatisch ingesteld |
+| `checkall` | select_multiple | Voegt een optie "Alles selecteren" toe bovenaan de lijst |
+| `max-items(N)` | select_one, select_multiple | Beperkt het aantal zichtbare keuzes tot N (bijv. max-items(5)) |
+
+### Visuele tekstwidgets
+
+| Weergaveattribuut | Vraagtypen | Beschrijving |
+|----------------------|----------------|-------------|
+| `richtext` | text | RTF-editor — werkbalk met vet, cursief, lijsten en koppelingen |
+| `typingtest` | text | Typtestinterface — toont een passage en meet typsnelheid en nauwkeurigheid |
+
+### Media-uitbreidingen
+
+| Weergaveattribuut | Vraagtypen | Beschrijving |
+|----------------------|----------------|-------------|
+| `watermark("expr")` | image | Plaatst een tekstwatermerk over de gemaakte foto; het argument is een XPath-expressie die bij vastleggen wordt geëvalueerd |
+| `editable` | image | Stelt de respondent in staat om de gemaakte foto te annoteren of op te tekenen |
+
+### Inline weergaveconfiguratie
+
+Gebruik `display{}` om te bepalen hoe de waarde van een veld inline in een label of notitie wordt weergegeven. Gebruik `results{}` om het resultatensamenvattingsscherm na indiening te bepalen.
+
+| Syntaxis | Vraagtypen | Beschrijving |
+|----------|----------------|-------------|
+| `display{format="..."}` | elk | Formatteert de veldwaarde wanneer deze inline in een label via `${fieldname}` wordt ingevoegd |
+| `results{show="true"}` | elk | Toont de veldwaarde in de resultatensamenvattingsweergave na indiening |
 
 ### API-integratie
 

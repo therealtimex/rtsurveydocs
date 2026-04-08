@@ -38,6 +38,8 @@ Metin soruları şunlar için kullanılır:
 |------------|-------------|
 | *(yok)* | Tek satırlı metin girişi |
 | `multiline` | Çok satırlı metin alanı — web'de daha uzun serbest metin için en iyisi |
+| `richtext` | Zengin metin düzenleyici — kalın, italik, listeler ve bağlantılar içeren araç çubuğu |
+| `typingtest` | Yazma testi arayüzü — bir metin parçası sunar ve yazma hızını ve doğruluğunu ölçer |
 
 ## rtSurvey saat giriş uzantıları
 

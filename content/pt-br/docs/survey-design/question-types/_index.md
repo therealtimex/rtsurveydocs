@@ -28,7 +28,6 @@ Para definir o tipo de pergunta, insira o nome do tipo na coluna `type` da plani
 |------|-----------|
 | [select_one listname](select-one) | Escolha exatamente uma opção de uma lista |
 | [select_multiple listname](select-multiple) | Escolha uma ou mais opções de uma lista |
-| [select_one_from_file filename](select-one-from-file) | Escolha uma opção carregada de um arquivo CSV externo |
 | [rank listname](rank) | Ordene as opções por preferência ou prioridade |
 
 ## Data e hora
@@ -66,6 +65,18 @@ Para definir o tipo de pergunta, insira o nome do tipo na coluna `type` da plani
 | [hidden](hidden) | Campo oculto que armazena um valor estático ou pré-preenchido |
 | [trigger / acknowledge](trigger) | Uma caixa de seleção que o entrevistador deve marcar para confirmar que leu uma declaração |
 | [meta](meta) | Metadados automáticos: carimbos de tempo, ID do dispositivo, informações do entrevistador |
+
+## Extensões rtSurvey
+
+Esses tipos são específicos do rtSurvey e não fazem parte da especificação XLSForm padrão.
+
+| Tipo | Descrição |
+|------|-----------|
+| [search-autocomplete](search-autocomplete) | Entrada de texto com sugestões de preenchimento automático em tempo real via API |
+| [mentions](mentions) | Campo de texto com preenchimento automático de menções `@` para marcar entidades inline |
+| [texttags](texttags) | Entrada de tags — cada entrada se torna um chip removível; armazenado como string separada por espaços |
+
+Para grupos de repetição, consulte [Repeats](../advanced-extension/repeats)
 
 ## Como tipo e aparência funcionam juntos
 

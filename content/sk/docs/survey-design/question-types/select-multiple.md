@@ -64,6 +64,14 @@ Otázky select_multiple sa používajú pre:
 | `label` | Zobrazuje iba popisky, žiadne zaškrtávacie políčka (použite s `list-nolabel`) |
 | `list-nolabel` | Zobrazuje iba zaškrtávacie políčka, žiadne popisky (použite s `label`) |
 | `columns(N)` | Zobrazenie v N stĺpcoch (rozšírenie rtSurvey) |
+| `tagging` | Zobrazí voľby ako klikateľné tagové čipy |
+| `boxtag` | Zobrazí voľby ako obdĺžnikové štylizované boxy |
+| `boxtag -search` | Rozloženie boxtag s vyhľadávacím poľom |
+| `duolingo-style1` | Rozloženie veľkých kariet inšpirované Duolingom |
+| `rating_box` | Hodnotiace boxy v mriežke |
+| `choices-noshow` | Zobrazí prvých 10 volieb, zvyšok na požiadanie |
+| `checkall` | Pridá možnosť „Vybrať všetko" |
+| `max-items(N)` | Obmedzí počet viditeľných volieb na N |
 {{< /table >}}
 
 ### Príklad: Kompaktné rozloženie s 3 stĺpcami

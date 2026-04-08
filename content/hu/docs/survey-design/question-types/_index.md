@@ -28,7 +28,6 @@ A kérdéstípus beállításához írja be a típus nevét az XLSForm **survey*
 |------|-------------|
 | [select_one listanév](select-one) | Pontosan egy lehetőség kiválasztása a listából |
 | [select_multiple listanév](select-multiple) | Egy vagy több lehetőség kiválasztása a listából |
-| [select_one_from_file fájlnév](select-one-from-file) | Egy lehetőség kiválasztása külső CSV-fájlból |
 | [rank listanév](rank) | Lehetőségek sorrendbe helyezése preferencia vagy prioritás szerint |
 
 ## Dátum és idő
@@ -66,6 +65,18 @@ A kérdéstípus beállításához írja be a típus nevét az XLSForm **survey*
 | [hidden](hidden) | Rejtett mező, amely statikus vagy előzetesen kitöltött értéket tárol |
 | [trigger / acknowledge](trigger) | Jelölőnégyzet, amelyet a kérdezőnek be kell pipálnia egy kijelentés elolvasásának megerősítéséhez |
 | [meta](meta) | Automatikus metaadatok: időbélyegek, eszközazonosító, kérdező adatai |
+
+## rtSurvey-bővítmények
+
+Ezek a típusok rtSurvey-specifikusak, és nem részei a szabványos XLSForm-specifikációnak.
+
+| Típus | Leírás |
+|-------|--------|
+| [search-autocomplete](search-autocomplete) | Szövegbeviteli mező valós idejű API-alapú automatikus kiegészítési javaslatokkal |
+| [mentions](mentions) | Szövegmező `@`-megemlítés automatikus kiegészítéssel entitások inline megjelöléséhez |
+| [texttags](texttags) | Cimke-beviteli mező — minden bejegyzés eltávolítható chippé válik; szóközzel elválasztott karakterláncként tárolva |
+
+Az ismétlődő csoportokról lásd: [Repeats](../advanced-extension/repeats)
 
 ## A típus és a megjelenés együttműködése
 

@@ -36,6 +36,8 @@ Teksta jautājumi tiek izmantoti:
 |------------|-------------|
 | *(nav)* | Vienas rindiņas teksta ievade |
 | `multiline` | Vairāku rindiņu teksta apgabals — piemērots garākam brīvam tekstam tīmeklī |
+| `richtext` | Bagātā teksta redaktors — rīkjosla ar treknrakstu, slīprakstu, sarakstiem un saitēm |
+| `typingtest` | Rakstīšanas testa interfeiss — uzrāda fragmentu un mēra respondenta rakstīšanas ātrumu un precizitāti |
 
 ## rtSurvey laika ievades paplašinājumi
 

@@ -28,7 +28,6 @@ Soru türünü ayarlamak için XLSForm'unuzdaki **survey** çalışma sayfasın�
 |------|-------------|
 | [select_one listname](select-one) | Listeden tam olarak bir seçenek seç |
 | [select_multiple listname](select-multiple) | Listeden bir veya daha fazla seçenek seç |
-| [select_one_from_file filename](select-one-from-file) | Harici bir CSV dosyasından yüklenen seçeneklerden birini seç |
 | [rank listname](rank) | Seçenekleri tercih veya önceliğe göre sırala |
 
 ## Tarih ve Saat
@@ -66,6 +65,18 @@ Soru türünü ayarlamak için XLSForm'unuzdaki **survey** çalışma sayfasın�
 | [hidden](hidden) | Statik veya önceden doldurulmuş bir değer saklayan gizli alan |
 | [trigger / acknowledge](trigger) | Sayımcının bir ifadeyi okuduğunu onaylamak için işaretlemesi gereken onay kutusu |
 | [meta](meta) | Otomatik meta veriler: zaman damgaları, cihaz kimliği, sayımcı bilgileri |
+
+## rtSurvey Uzantıları
+
+Bu türler rtSurvey'e özgüdür ve standart XLSForm spesifikasyonunun bir parçası değildir.
+
+| Tür | Açıklama |
+|-----|----------|
+| [search-autocomplete](search-autocomplete) | Gerçek zamanlı API destekli otomatik tamamlama önerileriyle metin girişi |
+| [mentions](mentions) | Varlıkları satır içinde etiketlemek için `@` bahsetme otomatik tamamlamalı metin alanı |
+| [texttags](texttags) | Etiket girişi — her giriş kaldırılabilir bir chip olur; boşlukla ayrılmış dize olarak saklanır |
+
+Tekrar grupları için bkz. [Repeats](../advanced-extension/repeats)
 
 ## Tür ve görünümün birlikte çalışması
 

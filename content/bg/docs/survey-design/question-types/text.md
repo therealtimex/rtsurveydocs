@@ -38,6 +38,8 @@ Text questions are used for:
 |------------|-------------|
 | *(none)* | Single-line text input |
 | `multiline` | Multi-line text area — best for longer free text on web |
+| `richtext` | Редактор за форматиран текст с лента с инструменти (удебелен, курсив, списъци, връзки) |
+| `typingtest` | Интерфейс за тест за писане — респондентът въвежда показания текст |
 
 ## rtSurvey time input extensions
 

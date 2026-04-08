@@ -62,6 +62,16 @@ Navedite vrednost u koloni `appearance` za promenu načina prikazivanja opcija:
 | `columns(N)` | Prikazati u N kolona (rtSurvey proširenje, npr. `columns(3)`) |
 | `distress` | Widget sa emocionalnim ikonama Kesslerove skale psihološkog distresa (K10) |
 | `search-api(...)` | Dinamička pretraga — učitava opcije iz API-ja u vreme izvođenja |
+| `tagging` | Prikazuje opcije kao klikabilne čipove sa oznakama |
+| `boxtag` | Prikazuje opcije kao pravougaone stilizovane kutije |
+| `boxtag -search` | Raspored boxtag sa poljem za pretragu |
+| `duolingo-style1` | Raspored velikih kartica inspirisan Duolingom |
+| `rating_box` | Kutije za ocenjivanje na bazi mreže |
+| `star_rating` | Widget za ocenjivanje zvezdama |
+| `choices-noshow` | Prikazuje prvih 10 opcija, ostatak na zahtev |
+| `noshow` | Skriva listu opcija; vrednost se postavlja programski |
+| `checkall` | Dodaje opciju „Izaberi sve" |
+| `max-items(N)` | Ograničava broj vidljivih opcija na N |
 {{< /table >}}
 
 ### Primer: Likertova skala

@@ -79,3 +79,27 @@ When using image questions, consider:
 - Analyzing large numbers of images can be time-consuming.
 - There may be privacy concerns when capturing images, especially in public spaces.
 
+## Разширения на rtSurvey за изображения
+
+### watermark()
+
+Изгледът `watermark()` наслагва текстов воден знак върху снимките, направени с това поле. Водният знак обикновено съдържа метаданни като името на анкетьора, дата/час или GPS координати, отпечатани директно върху изображението преди записването.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Снимайте обекта | `watermark("${enumerator_id} ${today()}")` |
+
+Аргументът на `watermark()` е XPath израз, изчислен по времe на заснемане. Полученият низ се рендерира като текст на водния знак.
+
+### editable
+
+Изгледът `editable` позволява на респондента да анотира или рисува върху заснетата снимка след направата й. Над изображението се появява лента с инструменти за рисуване.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Снимайте и маркирайте области от интерес | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` може да се комбинира с `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}
+

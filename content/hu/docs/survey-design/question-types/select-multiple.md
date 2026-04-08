@@ -64,6 +64,14 @@ A select_multiple kérdések a következőkre használhatók:
 | `label` | Csak feliratokat jelenít meg, jelölőnégyzetek nélkül (használja a `list-nolabel` mellé) |
 | `list-nolabel` | Csak jelölőnégyzeteket jelenít meg, feliratok nélkül (használja a `label` mellé) |
 | `columns(N)` | Megjelenítés N oszlopban (rtSurvey-bővítés) |
+| `tagging` | Kattintható cimke-chipekként jeleníti meg a lehetőségeket |
+| `boxtag` | Téglalap alakú stilizált dobozokként jeleníti meg a lehetőségeket |
+| `boxtag -search` | Boxtag elrendezés kereső beviteli mezővel |
+| `duolingo-style1` | Duolingo-ihlette kártyaelrendezés |
+| `rating_box` | Rácsalapú értékelődobozok |
+| `choices-noshow` | Az első 10 lehetőséget mutatja, a többi igény szerint |
+| `checkall` | „Az összes kijelölése" lehetőséget ad |
+| `max-items(N)` | N-re korlátozza a látható lehetőségek számát |
 {{< /table >}}
 
 ### Példa: 3 oszlopos kompakt elrendezés

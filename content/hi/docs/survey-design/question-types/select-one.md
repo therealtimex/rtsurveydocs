@@ -62,6 +62,16 @@ Choices कैसे प्रदर्शित होती हैं यह �
 | `columns(N)` | N columns में प्रदर्शित करें (rtSurvey extension, जैसे `columns(3)`) |
 | `distress` | Kessler Psychological Distress (K10) emotional icon widget |
 | `search-api(...)` | Dynamic search — runtime पर API से choices load करता है |
+| `tagging` | Radio buttons के बजाय क्लिक करने योग्य टैग चिप्स के रूप में choices दिखाता है |
+| `boxtag` | Choices को styled आयताकार बॉक्स के रूप में दिखाता है जिन्हें उपयोगकर्ता चुनने के लिए tap करता है |
+| `boxtag -search` | बॉक्स के ऊपर search/filter input के साथ Boxtag layout |
+| `duolingo-style1` | Duolingo-प्रेरित card layout — icons के साथ बड़े tappable cards |
+| `rating_box` | Grid-आधारित rating boxes — numeric या scale choices के लिए सबसे अच्छा |
+| `star_rating` | Star rating widget — choices 1–N stars के रूप में render होती हैं |
+| `choices-noshow` | शुरू में केवल पहले 10 choices दिखाता है; बाकी को मांग पर दिखाता है |
+| `noshow` | Choice list को पूरी तरह छुपाता है; value programmatically सेट होती है |
+| `checkall` | List के शीर्ष पर "Select all" विकल्प जोड़ता है |
+| `max-items(N)` | Visible choices की संख्या को N तक सीमित करता है (जैसे max-items(5)) |
 {{< /table >}}
 
 ### उदाहरण: Likert scale

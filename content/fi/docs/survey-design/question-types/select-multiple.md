@@ -64,6 +64,14 @@ Select_multiple-kysymyksiä käytetään:
 | `label` | Näyttää vain otsikot, ei valintaruutuja (käytä `list-nolabel` kanssa) |
 | `list-nolabel` | Näyttää vain valintaruudut, ei otsikoita (käytä `label` kanssa) |
 | `columns(N)` | Näyttää N sarakkeessa (rtSurvey-laajennus) |
+| `tagging` | Näyttää valinnat klikattavina tagi-chipeinä valintaruutujen sijaan |
+| `boxtag` | Näyttää valinnat tyylikäs suorakulmainen bokseina, joita käyttäjä napauttaa valitakseen |
+| `boxtag -search` | Boxtag-asettelu haku-/suodatussyötteellä boksien yläpuolella |
+| `duolingo-style1` | Duolingo-inspiroitu korttiasettelu — suuret napautettavat kortit ikoneilla |
+| `rating_box` | Ruudukkopohjainen arviointiboxi — parhaiten numeerisille tai asteikkovaihtoehdoille |
+| `choices-noshow` | Näyttää aluksi vain ensimmäiset 10 vaihtoehtoa; paljastaa loput tarvittaessa |
+| `checkall` | Lisää "Valitse kaikki" -vaihtoehdon luettelon alkuun |
+| `max-items(N)` | Rajoittaa näkyvien valintojen määrän N:ään |
 {{< /table >}}
 
 ### Esimerkki: 3 sarakkeen kompakti asettelu

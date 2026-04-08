@@ -33,6 +33,13 @@ Dodaj `multiline` do kolumny `appearance`, aby wyświetlić wieloliniowe pole te
 |------|---------|-----------------|------------|
 | text | comment | Twoje komentarze | multiline  |
 
+Dodatkowe opcje wyglądu:
+
+| Wygląd | Opis |
+|--------|------|
+| `richtext` | Zastępuje zwykłe pole tekstowe edytorem tekstu sformatowanego (pogrubienie, kursywa, listy, linki). Przechowuje HTML |
+| `typingtest` | Widget testu pisania — tekst etykiety jest fragmentem; widget rejestruje wpisaną odpowiedź i czas |
+
 ## Walidacja
 
 Używaj `constraint` z `regex()` do walidacji wzorców:

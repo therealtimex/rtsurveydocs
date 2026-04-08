@@ -93,6 +93,11 @@ En plus des apparences standard XLSForm, rtSurvey prend en charge les options sp
 | `columns(n)` | select_one, select_multiple | Affiche les choix en `n` colonnes. Exemple : `columns(3)` affiche trois colonnes de boutons radio. |
 | `gridformat<row=R col=C colspan=S align=center>` | tout | Positionne le champ dans une mise en page CSS grid à la ligne `R`, colonne `C`, en s'étendant sur `S` colonnes. Utilisé avec `advanced-extension/grid-layout`. |
 | `ignore-simplify` | tout | Indique au moteur de rendu de formulaire d'ignorer la simplification ou la condensation automatique de la mise en page de ce champ. |
+| `required-but-simplify` | tout | Le champ est obligatoire mais sa mise en page est toujours simplifiée par le moteur de rendu |
+| `embed` | tout | Affiche le champ en mode intégré/inline, supprimant son conteneur externe et le conteneur d'étiquettes |
+| `popup` | select_one, select_multiple | Affiche la liste des choix dans une superposition popup/modal au lieu d'être inline |
+| `auto-hide-empty` | boxtag, select | Masque tout le widget de question quand la liste de choix est vide |
+| `text-nolabel` | select_one, select_multiple | Masque l'étiquette de texte pour chaque choix, n'affichant que le contrôle de saisie |
 
 ### Widgets
 
@@ -100,6 +105,57 @@ En plus des apparences standard XLSForm, rtSurvey prend en charge les options sp
 |----------------------|----------------|-------------|
 | `likert` | select_one | Présente les choix sous forme d'une ligne d'échelle de Likert (déjà dans le tableau standard ci-dessus ; confirmé comme pris en charge). |
 | `distress` | select_one | Affiche les choix sous forme du widget visuel de l'échelle de détresse psychologique de Kessler (K10) avec des icônes émotionnelles. |
+
+### Widgets visuels de sélection
+
+Ces apparences modifient entièrement le rendu des listes de choix de sélection.
+
+| Apparence | Types de questions | Description |
+|-----------|-------------------|-------------|
+| `tagging` | select_one, select_multiple | Les choix s'affichent sous forme de chips de tags cliquables en forme de pilule. |
+| `boxtag` | select_one, select_multiple | Les choix s'affichent sous forme de boîtes rectangulaires stylisées que l'utilisateur tape. |
+| `boxtag -search` | select_one, select_multiple | Mise en page boxtag avec une saisie de recherche/filtre en direct au-dessus des boîtes. |
+| `duolingo-style1` | select_one, select_multiple | Grand layout de cartes inspiré de Duolingo — adapté aux listes courtes avec icônes. |
+| `rating_box` | select_one, select_multiple | Grille de boîtes numérotées tapables — adaptée aux questions d'échelle ou NPS. |
+| `star_rating` | select_one | Les choix s'affichent sous forme d'étoiles ; le nombre d'étoiles est égal au nombre de choix. |
+| `choices-noshow` | select_one, select_multiple | Affiche initialement seulement les 10 premiers choix avec un contrôle "Afficher plus". |
+| `noshow` | select_one, select_multiple | Masque entièrement la liste des choix ; la valeur est définie programmatiquement via calculate ou API. |
+| `checkall` | select_multiple | Ajoute un raccourci "Tout sélectionner" en haut de la liste des choix. |
+| `max-items(N)` | select_one, select_multiple | Limite la liste de choix visible à N éléments. Exemple : max-items(5). |
+
+### Widgets visuels de texte
+
+| Apparence | Types de questions | Description |
+|-----------|-------------------|-------------|
+| `richtext` | text | Remplace la zone de texte simple par un éditeur de texte riche (gras, italique, listes, liens). Stocke du HTML. |
+| `typingtest` | text | Widget de test de frappe — l'étiquette est le passage ; le widget enregistre la réponse saisie et le timing. |
+
+### Extensions médias
+
+| Apparence | Types de questions | Description |
+|-----------|-------------------|-------------|
+| `watermark("expression")` | image | Superpose un filigrane textuel sur les photos capturées. L'argument est une expression XPath évaluée au moment de la capture. |
+| `editable` | image | Active l'annotation/le dessin sur la photo capturée avant l'enregistrement. |
+
+### Configuration de l'affichage inline
+
+Les modificateurs `display{}` et `results{}` contrôlent l'alignement des icônes et l'affichage des résultats pour les widgets inline.
+
+#### Paramètres de `display{}`
+
+| Paramètre | Valeurs | Description |
+|-----------|---------|-------------|
+| Alignement | `left`, `right`, `top`, `bottom`, `center` | Position de l'icône par rapport au champ de saisie |
+| Taille | `small`, `medium`, `large` | Taille de l'icône |
+| Mode | `inline-icon` | Rend le déclencheur sous forme d'icône uniquement |
+| Mode | `inline-button` | Rend le déclencheur sous forme de bouton complet |
+
+#### Paramètres de `results{}`
+
+| Paramètre | Valeurs | Description |
+|-----------|---------|-------------|
+| Alignement | `left`, `right`, `top`, `bottom`, `center` | Position de l'affichage de la valeur résultat |
+| `hide(field)` | tout nom de sous-champ | Masque un composant spécifique du résultat |
 
 ### Intégration API
 

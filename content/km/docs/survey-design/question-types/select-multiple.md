@@ -64,6 +64,14 @@ maize beans vegetables
 | `label` | បង្ហាញតែ labels គ្មាន checkboxes (ប្រើជាមួយ `list-nolabel`) |
 | `list-nolabel` | បង្ហាញតែ checkboxes គ្មាន labels (ប្រើជាមួយ `label`) |
 | `columns(N)` | បង្ហាញក្នុង N ជួរឈរ (ផ្នែកពង្រីករបស់ rtSurvey) |
+| `tagging` | ជម្រើសបង្ហាញជាចិបស្លាករូបរាង pill |
+| `boxtag` | ជម្រើសបង្ហាញជាប្រអប់ចតុកោណទ្រង់ទ្រាយ |
+| `boxtag -search` | Layout Boxtag ជាមួយ input ស្វែងរក/filter នៅខាងលើប្រអប់ |
+| `duolingo-style1` | Layout បន្ទះការ៍ធំ — ល្អបំផុតសម្រាប់បញ្ជីជម្រើសខ្លី |
+| `rating_box` | ប្រអប់ rating ផ្អែកលើ grid |
+| `choices-noshow` | បង្ហាញ 10 ជម្រើសដំបូងជាដំបូង; បង្ហាញជម្រើសដែលនៅសល់តាមតម្រូវការ |
+| `checkall` | បន្ថែម option "ជ្រើសទាំងអស់" នៅខាងលើបញ្ជី |
+| `max-items(N)` | ដាក់កំហិតចំនួនជម្រើសដែលអាចមើលឃើញទៅ N |
 {{< /table >}}
 
 ### ឧទាហរណ៍: Layout compact 3 ជួរឈរ

@@ -62,6 +62,16 @@ Specify a value in the `appearance` column to change how choices are displayed:
 | `columns(N)` | Display in N columns (rtSurvey extension, e.g., `columns(3)`) |
 | `distress` | Kessler Psychological Distress (K10) emotional icon widget |
 | `search-api(...)` | Dynamic search — loads choices from an API at runtime |
+| `tagging` | Displays choices as clickable tag chips instead of radio buttons |
+| `boxtag` | Displays choices as styled rectangular boxes the user taps to select |
+| `boxtag -search` | Boxtag layout with a search/filter input above the boxes |
+| `duolingo-style1` | Duolingo-inspired card layout — large tappable cards with icons |
+| `rating_box` | Grid-based rating boxes — best for numeric or scale choices |
+| `star_rating` | Star rating widget — choices render as 1–N stars |
+| `choices-noshow` | Shows only the first 10 choices initially; reveals the rest on demand |
+| `noshow` | Hides the choice list entirely; value is set programmatically |
+| `checkall` | Adds a "Select all" option at the top of the list |
+| `max-items(N)` | Limits the number of visible choices to N (e.g., `max-items(5)`) |
 {{< /table >}}
 
 ### Example: Likert scale
@@ -75,6 +85,68 @@ Specify a value in the `appearance` column to change how choices are displayed:
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one regions | region | Select region | compact-3 |
+
+### rtSurvey visual widget appearances
+
+#### tagging
+
+Choices render as pill-shaped chips. Tapping a chip selects it; tapping again deselects.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one colors | favourite_color | Pick your favourite color | tagging |
+
+#### boxtag
+
+Choices render as rectangular styled boxes. Use `-search` to add a filter input above the boxes.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one products | product | Which product? | boxtag |
+| select_one products | product_search | Which product? | boxtag -search |
+
+#### duolingo-style1
+
+Large card layout inspired by Duolingo. Best for short choice lists with icons or images.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one quiz_options | answer | Choose the correct answer | duolingo-style1 |
+
+#### star_rating
+
+Choices render as stars. The number of stars equals the number of choices.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one stars5 | satisfaction | Rate your satisfaction | star_rating |
+
+**choices:**
+
+| list_name | name | label |
+|-----------|------|-------|
+| stars5 | 1 | 1 |
+| stars5 | 2 | 2 |
+| stars5 | 3 | 3 |
+| stars5 | 4 | 4 |
+| stars5 | 5 | 5 |
+
+#### rating_box
+
+Numeric choices render as a grid of tappable boxes. Suited for scale questions (e.g., 0–10 NPS).
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one nps | nps_score | How likely are you to recommend us? (0–10) | rating_box |
+
+#### choices-noshow / noshow / checkall / max-items(N)
+
+| Appearance | Use when |
+|------------|----------|
+| `choices-noshow` | The list is long — show 10 items and a "Show more" control |
+| `noshow` | The value will be set by a `calculate` or API, not by user selection |
+| `checkall` | You want a "Select all" shortcut at the top of the list |
+| `max-items(N)` | You want to cap the visible choices at exactly N items |
 
 ## Cascading selects
 

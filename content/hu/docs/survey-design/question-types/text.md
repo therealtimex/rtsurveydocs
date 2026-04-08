@@ -38,6 +38,8 @@ A text kérdések a következőkre használhatók:
 |------------|--------|
 | *(nincs)* | Egysoros szövegbeviteli mező |
 | `multiline` | Többsoros szövegterület – hosszabb szabad szöveghez legjobb a weben |
+| `richtext` | Formázott szövegszerkesztő eszköztárral (félkövér, dőlt, listák, hivatkozások) |
+| `typingtest` | Gépelési teszt felület — a válaszadó a megjelenített szöveget írja be |
 
 ## rtSurvey időbeviteli bővítmények
 

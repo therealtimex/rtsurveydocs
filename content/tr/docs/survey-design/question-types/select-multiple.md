@@ -64,6 +64,14 @@ Select_multiple soruları şunlar için kullanılır:
 | `label` | Yalnızca etiketleri gösterir, onay kutusu yok (`list-nolabel` ile birlikte kullanın) |
 | `list-nolabel` | Yalnızca onay kutularını gösterir, etiket yok (`label` ile birlikte kullanın) |
 | `columns(N)` | N sütunda görüntüle (rtSurvey uzantısı) |
+| `tagging` | Seçenekler hap şeklinde etiket chip'leri olarak gösterilir |
+| `boxtag` | Seçenekler dikdörtgen stilize kutular olarak gösterilir |
+| `boxtag -search` | Kutular üzerinde bir arama/filtreleme girişi olan boxtag düzeni |
+| `duolingo-style1` | Büyük kart düzeni — kısa seçenek listeleri için en iyi |
+| `rating_box` | Izgara tabanlı derecelendirme kutuları |
+| `choices-noshow` | Başlangıçta ilk 10 seçeneği gösterir; geri kalanı istek üzerine ortaya çıkarır |
+| `checkall` | Listenin üstüne "Tümünü seç" seçeneği ekler |
+| `max-items(N)` | Görünür seçenek sayısını N ile sınırlar |
 {{< /table >}}
 
 ### Örnek: 3 sütunlu kompakt düzen

@@ -64,6 +64,14 @@ Select_multiple questions का उपयोग इनके लिए कि�
 | `label` | केवल labels दिखाता है, कोई checkboxes नहीं (`list-nolabel` के साथ उपयोग करें) |
 | `list-nolabel` | केवल checkboxes दिखाता है, कोई labels नहीं (`label` के साथ उपयोग करें) |
 | `columns(N)` | N columns में प्रदर्शित करें (rtSurvey extension) |
+| `tagging` | Choices pill-shaped tag chips के रूप में render होती हैं |
+| `boxtag` | Choices आयताकार styled boxes के रूप में render होती हैं |
+| `boxtag -search` | बॉक्स के ऊपर search/filter input के साथ Boxtag layout |
+| `duolingo-style1` | बड़ा card layout — छोटी choice lists के लिए सबसे अच्छा |
+| `rating_box` | Grid-आधारित rating boxes |
+| `choices-noshow` | शुरू में पहले 10 choices दिखाता है; बाकी को मांग पर दिखाता है |
+| `checkall` | List के शीर्ष पर "Select all" विकल्प जोड़ता है |
+| `max-items(N)` | Visible choices की संख्या को N तक सीमित करता है |
 {{< /table >}}
 
 ### उदाहरण: 3-column compact layout

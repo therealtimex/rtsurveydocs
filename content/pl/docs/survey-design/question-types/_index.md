@@ -28,7 +28,6 @@ Aby ustawić typ pytania, wprowadź nazwę typu w kolumnie `type` arkusza **surv
 |------|-------------|
 | [select_one listname](select-one) | Wybierz dokładnie jedną opcję z listy |
 | [select_multiple listname](select-multiple) | Wybierz jedną lub więcej opcji z listy |
-| [select_one_from_file filename](select-one-from-file) | Wybierz jedną opcję załadowaną z zewnętrznego pliku CSV |
 | [rank listname](rank) | Uszereguj opcje według preferencji lub priorytetu |
 
 ## Data i godzina
@@ -66,6 +65,18 @@ Aby ustawić typ pytania, wprowadź nazwę typu w kolumnie `type` arkusza **surv
 | [hidden](hidden) | Ukryte pole przechowujące statyczną lub wstępnie wypełnioną wartość |
 | [trigger / acknowledge](trigger) | Pole wyboru, które ankieter musi zaznaczyć, aby potwierdzić przeczytanie oświadczenia |
 | [meta](meta) | Automatyczne metadane: znaczniki czasu, ID urządzenia, informacje o ankieterze |
+
+## Rozszerzenia rtSurvey
+
+Te typy są specyficzne dla rtSurvey i nie są częścią standardowej specyfikacji XLSForm.
+
+| Typ | Opis |
+|-----|------|
+| [search-autocomplete](search-autocomplete) | Wprowadzanie tekstu z sugestiami autouzupełniania opartymi na API w czasie rzeczywistym |
+| [mentions](mentions) | Pole tekstowe z autouzupełnianiem wzmianek `@` do oznaczania encji inline |
+| [texttags](texttags) | Pole wprowadzania tagów — każdy wpis staje się usuwalnym chipem; przechowywany jako ciąg oddzielony spacjami |
+
+Dla grup powtórzeń, zob. [Repeats](../advanced-extension/repeats)
 
 ## Jak typ i wygląd współpracują
 

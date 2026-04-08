@@ -78,3 +78,27 @@ XLSForms 和 rtSurvey 中的 image 問題類型使受訪者能夠拍攝並提交
 - 並非所有裝置都具有高品質相機或足夠的儲存空間。
 - 分析大量圖片可能很耗時。
 - 在拍攝圖片時（尤其是在公共場所）可能存在隱私問題。
+
+## rtSurvey 圖片擴充
+
+### watermark()
+
+`watermark()` 外觀會在此欄位拍攝的照片上疊加文字浮水印。浮水印通常包含調查員姓名、日期/時間或 GPS 座標等元資料，在圖片儲存前直接戳印在圖片上。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | 拍攝現場照片 | `watermark("${enumerator_id} ${today()}")` |
+
+`watermark()` 的參數是在拍攝時評估的 XPath 表達式。結果字串會作為浮水印文字呈現。
+
+### editable
+
+`editable` 外觀允許受訪者在拍攝照片後對其進行標註或繪製。圖片上方會出現繪圖工具列。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | 拍照並標記關注區域 | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` 可以與 `watermark()` 結合使用：`appearance: editable watermark("${id}")`
+{{% /alert %}}

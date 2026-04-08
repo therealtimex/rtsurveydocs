@@ -93,6 +93,11 @@ Além das aparências XLSForm padrão, o rtSurvey suporta as seguintes opções 
 | `columns(n)` | select_one, select_multiple | Exibe escolhas em `n` colunas. Exemplo: `columns(3)` mostra três colunas de botões de rádio. |
 | `gridformat<row=R col=C colspan=S align=center>` | qualquer | Posiciona o campo num layout CSS-grid na linha `R`, coluna `C`, ocupando `S` colunas. Usado com `advanced-extension/grid-layout`. |
 | `ignore-simplify` | qualquer | Instrui o renderizador do formulário a ignorar a simplificação ou condensação automática do layout deste campo. |
+| `required-but-simplify` | qualquer | O campo é obrigatório mas o seu layout é ainda simplificado pelo renderizador |
+| `embed` | qualquer | Renderiza o campo em modo de exibição embutido/inline, suprimindo o seu wrapper externo e o container de etiqueta |
+| `popup` | select_one, select_multiple | Renderiza a lista de escolhas numa sobreposição popup/modal em vez de inline |
+| `auto-hide-empty` | boxtag, select | Oculta todo o widget de pergunta quando a lista de escolhas está vazia |
+| `text-nolabel` | select_one, select_multiple | Oculta a etiqueta de texto para cada escolha, mostrando apenas o controlo de entrada |
 
 ### Widgets
 
@@ -100,6 +105,57 @@ Além das aparências XLSForm padrão, o rtSurvey suporta as seguintes opções 
 |----------------------|----------------|-----------|
 | `likert` | select_one | Apresenta escolhas como uma linha de escala de Likert (já na tabela padrão acima; confirmado suportado). |
 | `distress` | select_one | Renderiza escolhas como o widget visual da Escala de Angústia Psicológica de Kessler (K10) com ícones emocionais. |
+
+### Widgets visuais de seleção
+
+Estas aparências alteram toda a renderização das listas de escolha de seleção.
+
+| Aparência | Tipos de Pergunta | Descrição |
+|-----------|------------------|-----------|
+| `tagging` | select_one, select_multiple | As escolhas renderizam como chips de etiqueta clicáveis em forma de pílula. |
+| `boxtag` | select_one, select_multiple | As escolhas renderizam como caixas retangulares estilizadas que o utilizador toca. |
+| `boxtag -search` | select_one, select_multiple | Layout boxtag com entrada de pesquisa/filtro ao vivo acima das caixas. |
+| `duolingo-style1` | select_one, select_multiple | Layout de cartão grande inspirado no Duolingo — adequado para listas curtas com ícones. |
+| `rating_box` | select_one, select_multiple | Grelha de caixas numeradas tocáveis — adequada para perguntas de escala ou NPS. |
+| `star_rating` | select_one | As escolhas renderizam como estrelas; o número de estrelas é igual ao número de escolhas. |
+| `choices-noshow` | select_one, select_multiple | Mostra inicialmente apenas as primeiras 10 escolhas com um controlo "Mostrar mais". |
+| `noshow` | select_one, select_multiple | Oculta a lista de escolhas completamente; o valor é definido programaticamente via calculate ou API. |
+| `checkall` | select_multiple | Adiciona um atalho "Selecionar tudo" no topo da lista de escolhas. |
+| `max-items(N)` | select_one, select_multiple | Limita a lista de escolhas visível a N itens. Exemplo: max-items(5). |
+
+### Widgets visuais de texto
+
+| Aparência | Tipos de Pergunta | Descrição |
+|-----------|------------------|-----------|
+| `richtext` | text | Substitui a caixa de texto simples por um editor de texto rico (negrito, itálico, listas, links). Armazena HTML. |
+| `typingtest` | text | Widget de teste de digitação — o texto da etiqueta é a passagem; o widget regista a resposta digitada e o tempo. |
+
+### Extensões de multimédia
+
+| Aparência | Tipos de Pergunta | Descrição |
+|-----------|------------------|-----------|
+| `watermark("expression")` | image | Sobrepõe uma marca d'água de texto em fotos capturadas. O argumento é uma expressão XPath avaliada no momento da captura. |
+| `editable` | image | Ativa anotação/desenho sobre a foto capturada antes de guardar. |
+
+### Configuração de exibição inline
+
+Os modificadores `display{}` e `results{}` controlam o alinhamento de ícones e a exibição de resultados para widgets inline.
+
+#### Parâmetros de `display{}`
+
+| Parâmetro | Valores | Descrição |
+|-----------|---------|-----------|
+| Alinhamento | `left`, `right`, `top`, `bottom`, `center` | Posição do ícone em relação ao campo de entrada |
+| Tamanho | `small`, `medium`, `large` | Tamanho do ícone |
+| Modo | `inline-icon` | Renderiza o gatilho apenas como ícone |
+| Modo | `inline-button` | Renderiza o gatilho como botão completo |
+
+#### Parâmetros de `results{}`
+
+| Parâmetro | Valores | Descrição |
+|-----------|---------|-----------|
+| Alinhamento | `left`, `right`, `top`, `bottom`, `center` | Posição da exibição do valor do resultado |
+| `hide(field)` | qualquer nome de sub-campo | Oculta um componente específico do resultado |
 
 ### Integração de API
 

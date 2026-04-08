@@ -76,3 +76,27 @@ A képkérdések használatakor vegye figyelembe:
 - Nem minden eszközön áll rendelkezésre kiváló minőségű kamera vagy elegendő tárhely.
 - Nagy mennyiségű kép elemzése időigényes lehet.
 - Képek készítésekor – különösen nyilvános helyeken – adatvédelmi aggályok merülhetnek fel.
+
+## rtSurvey képbővítmények
+
+### watermark()
+
+A `watermark()` megjelenési beállítás szöveges vízjelet helyez a mezőn rögzített fotókra. A vízjel általában metaadatokat tartalmaz, például a kérdező nevét, dátumot/időt vagy GPS-koordinátákat, közvetlenül a mentés előtt ráégetve a képre.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Készítsen fényképet a helyszínről | `watermark("${enumerator_id} ${today()}")` |
+
+A `watermark()` argumentuma egy XPath-kifejezés, amelyet rögzítés közben értékel ki a rendszer. Az eredményül kapott karakterlánc jelenik meg vízjelként.
+
+### editable
+
+Az `editable` megjelenési beállítás lehetővé teszi a válaszadó számára, hogy a rögzítés után megjegyzéseket fűzzön vagy rajzoljon a fényképre. A kép felett egy rajzolóeszköztár jelenik meg.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Fényképezzen és jelölje meg az érintett területeket | editable |
+
+{{% alert icon=" " context="info" %}}
+Az `editable` kombinálható a `watermark()` beállítással: `appearance: editable watermark("${id}")`
+{{% /alert %}}

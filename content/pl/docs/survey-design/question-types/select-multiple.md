@@ -64,6 +64,14 @@ Pytania select_multiple są używane do:
 | `label` | Pokazuje tylko etykiety, bez pól wyboru (użyj z `list-nolabel`) |
 | `list-nolabel` | Pokazuje tylko pola wyboru, bez etykiet (użyj z `label`) |
 | `columns(N)` | Wyświetlanie w N kolumnach (rozszerzenie rtSurvey) |
+| `tagging` | Wyświetla opcje jako klikalne chipsy tagów zamiast pól wyboru |
+| `boxtag` | Wyświetla opcje jako stylowe prostokątne pola, które użytkownik dotyka, aby wybrać |
+| `boxtag -search` | Układ boxtag z polem wyszukiwania/filtrowania nad polami |
+| `duolingo-style1` | Układ kart inspirowany Duolingo — duże klikalne karty z ikonami |
+| `rating_box` | Pola oceny w siatce — najlepsze dla opcji numerycznych lub skali |
+| `choices-noshow` | Początkowo wyświetla tylko pierwsze 10 opcji; ujawnia pozostałe na żądanie |
+| `checkall` | Dodaje opcję "Zaznacz wszystkie" na górze listy |
+| `max-items(N)` | Ogranicza liczbę widocznych opcji do N |
 {{< /table >}}
 
 ### Przykład: Zwarte 3 kolumny

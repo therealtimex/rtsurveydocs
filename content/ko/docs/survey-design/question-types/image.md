@@ -76,3 +76,27 @@ image 질문을 사용할 때는 다음을 고려합니다:
 - 모든 기기가 고품질 카메라나 충분한 저장 공간을 갖추고 있지 않을 수 있습니다.
 - 많은 수의 이미지를 분석하는 것은 시간이 많이 걸릴 수 있습니다.
 - 특히 공공장소에서 이미지를 캡처할 때 개인 정보 보호 우려가 있을 수 있습니다.
+
+## rtSurvey 이미지 확장
+
+### watermark()
+
+`watermark()` appearance는 이 필드로 캡처된 사진에 텍스트 워터마크를 오버레이합니다. 워터마크에는 일반적으로 조사원 이름, 날짜/시간 또는 GPS 좌표와 같은 메타데이터가 포함되며, 이미지가 저장되기 전에 이미지에 직접 스탬프됩니다.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | 현장 사진을 찍으세요 | `watermark("${enumerator_id} ${today()}")` |
+
+`watermark()`의 인수는 캡처 시 평가되는 XPath 표현식입니다. 결과 문자열이 워터마크 텍스트로 렌더링됩니다.
+
+### editable
+
+`editable` appearance는 응답자가 사진을 찍은 후 캡처된 사진에 주석을 달거나 그림을 그릴 수 있게 합니다. 이미지 위에 그리기 도구 모음이 표시됩니다.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | 사진을 찍고 우려 사항 영역을 표시하세요 | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable`은 `watermark()`와 결합할 수 있습니다: `appearance: editable watermark("${id}")`
+{{% /alert %}}

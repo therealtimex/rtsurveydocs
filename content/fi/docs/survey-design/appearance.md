@@ -93,6 +93,11 @@ Vakio XLSForm-ulkoasujen lisäksi rtSurvey tukee seuraavia alustakompatiisia ase
 | `columns(n)` | select_one, select_multiple | Näyttää valinnat `n` sarakkeessa. Esimerkki: `columns(3)` näyttää kolme saraketta valintapainikkeita. |
 | `gridformat<row=R col=C colspan=S align=center>` | mikä tahansa | Sijoittaa kentän CSS-ruudukkoon riville `R`, sarakkeeseen `C`, ulottuen `S` saraketta. Käytetään `advanced-extension/grid-layout`:n kanssa. |
 | `ignore-simplify` | mikä tahansa | Ohjaa lomakkeen renderöijää ohittamaan automaattinen yksinkertaistaminen tai tämän kentän asettelun tiivistäminen. |
+| `required-but-simplify` | mikä tahansa | Kenttä on pakollinen mutta renderöijä yksinkertaistaa sen asettelua silti (ohittaa oletustoiminnan, jossa pakolliset kentät jätetään yksinkertaistamisen ulkopuolelle). |
+| `embed` | mikä tahansa | Renderöi kentän upotettuna/inline-näyttötilassa, poistaen ulomman paketin ja nimiökonttainerin — käytetään kun kysymys on upotettuna mukautettuun HTML:ään. |
+| `popup` | select_one, select_multiple | Renderöi valikaluettelon popup/modal-kerroksessa inline-näytön sijaan. |
+| `auto-hide-empty` | boxtag, select | Piilottaa koko kysymyswidgetin, kun valintaluettelo on tyhjä (esim. API ei palauttanut tuloksia). |
+| `text-nolabel` | select_one, select_multiple | Piilottaa tekstinimiön jokaiselta valinnalta näyttäen vain syöttökontrolin. Samankaltainen kuin `list-nolabel`, mutta sovelletaan per valinta eikä sarakejakona. |
 
 ### Widgetit
 
@@ -100,6 +105,68 @@ Vakio XLSForm-ulkoasujen lisäksi rtSurvey tukee seuraavia alustakompatiisia ase
 |-------------------|---------------|--------|
 | `likert` | select_one | Esittää valinnat Likert-asteikkoriveinä. |
 | `distress` | select_one | Renderöi valinnat Kessler Psychological Distress Scale (K10) -visuaalisena widgettinä tunneikoneineen. |
+
+### Visuaaliset select-widgetit
+
+Nämä ulkoasut muuttavat koko select-valintaluettelon renderöinnin.
+
+| Ulkoasuattribuutti | Kysymystyypit | Kuvaus |
+|-------------------|---------------|--------|
+| `tagging` | select_one, select_multiple | Valinnat renderöityvät pillimäisinä klikattavina tagi-chipeinä. |
+| `boxtag` | select_one, select_multiple | Valinnat renderöityvät suorakulmaisina tyylikeltyinä bokseina, joita käyttäjä napauttaa. |
+| `boxtag -search` | select_one, select_multiple | Boxtag-asettelu live-haku-/suodatussyötteellä boksien yläpuolella. |
+| `duolingo-style1` | select_one, select_multiple | Suuri korttiasettelu Duolingo-inspiraatiolla — sopii lyhyille listoille ikoneilla. |
+| `rating_box` | select_one, select_multiple | Ruudukko napautettavia numeroituja bokseja — sopii asteikko- tai NPS-kysymyksiin. |
+| `star_rating` | select_one | Valinnat renderöityvät tähtinä; tähtien määrä vastaa valintojen määrää. |
+| `choices-noshow` | select_one, select_multiple | Näyttää aluksi vain ensimmäiset 10 vaihtoehtoa "Näytä lisää" -kontrollilla. |
+| `noshow` | select_one, select_multiple | Piilottaa valintaluettelon kokonaan; arvo asetetaan ohjelmallisesti `calculate`:n tai API:n kautta. |
+| `checkall` | select_multiple | Lisää "Valitse kaikki" -pikakuvakkeen valintaluettelon yläosaan. |
+| `max-items(N)` | select_one, select_multiple | Rajoittaa näkyvän valintaluettelon N kohteeseen. Esimerkki: `max-items(5)`. |
+
+### Visuaaliset teksti-widgetit
+
+| Ulkoasuattribuutti | Kysymystyypit | Kuvaus |
+|-------------------|---------------|--------|
+| `richtext` | text | Korvaa tavallisen tekstikentän rikastekstieditorilla (lihavointi, kursiivi, listat, linkit). Tallentaa HTML:nä. |
+| `typingtest` | text | Kirjoitustesti-widget — otsikkoteksti on teksti; widget tallentaa kirjoitetun vastauksen ja ajoituksen. |
+
+### Medialaajennukset
+
+| Ulkoasuattribuutti | Kysymystyypit | Kuvaus |
+|-------------------|---------------|--------|
+| `watermark("lauseke")` | image | Lisää tekstivesileiman otettuihin kuviin. Argumentti on XPath-lauseke, joka arvioidaan kuvaushetkellä. Esimerkki: `watermark("${id} ${today()}")`. |
+| `editable` | image | Mahdollistaa otetun valokuvan merkitsemisen/piirtämisen ennen tallentamista. |
+
+### Inline-näyttökonfiguraatio
+
+`display{}`- ja `results{}`-muokkaajia voidaan liittää `inline`-ulkoasuihin kuvakejuhdistuksen ja tuloksen näytön hallitsemiseksi. Näitä käytetään yhdessä `inline`-ajankirjauslaajenuksen kanssa `text`-kentillä ja media-tallennuswidgeteillä.
+
+#### `display{}`-parametrit
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parametri | Arvot | Kuvaus |
+|-----------|-------|--------|
+| Kohdistus | `left`, `right`, `top`, `bottom`, `center` | Kuvakkeen sijainti syöttökenttään nähden |
+| Koko | `small`, `medium`, `large` | Kuvakkeen koko (vastaa 2,5 rem, 5 rem, 8 rem) |
+| Tila | `inline-icon` | Renderöi laukaisimen pelkkänä kuvakkeena (ei nappirajaa) |
+| Tila | `inline-button` | Renderöi laukaisimen täytenä nappina |
+
+#### `results{}`-parametrit
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parametri | Arvot | Kuvaus |
+|-----------|-------|--------|
+| Kohdistus | `left`, `right`, `top`, `bottom`, `center` | Tulosarvon näytön sijainti |
+| `hide(kenttä)` | mikä tahansa alikentän nimi | Piilottaa tuloksen tietyn komponentin (esim. `hide(seconds)`) |
 
 ### API-integraatio
 

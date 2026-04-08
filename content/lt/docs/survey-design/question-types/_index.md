@@ -28,7 +28,6 @@ Norėdami nustatyti klausimo tipą, įveskite tipo pavadinimą stulpelyje `type`
 |------|-------------|
 | [select_one sąrašo_pavadinimas](select-one) | Pasirinkite tiksliai vieną parinktį iš sąrašo |
 | [select_multiple sąrašo_pavadinimas](select-multiple) | Pasirinkite vieną ar daugiau parinkčių iš sąrašo |
-| [select_one_from_file failo_pavadinimas](select-one-from-file) | Pasirinkite vieną parinktį, įkeltą iš išorinio CSV failo |
 | [rank sąrašo_pavadinimas](rank) | Suranguokite pasirinkimus pagal pirmenybę ar prioritetą |
 
 ## Data ir laikas
@@ -66,6 +65,18 @@ Norėdami nustatyti klausimo tipą, įveskite tipo pavadinimą stulpelyje `type`
 | [hidden](hidden) | Paslėptas laukas, saugantis statinę arba iš anksto užpildytą reikšmę |
 | [trigger / acknowledge](trigger) | Žymimasis langelis, kurį surašytojas turi pažymėti patvirtindamas, kad perskaitė pareiškimą |
 | [meta](meta) | Automatiniai metaduomenys: laiko žymės, įrenginio ID, surašytojo informacija |
+
+## rtSurvey plėtiniai
+
+Šie tipai yra būdingi rtSurvey ir nėra standartinės XLSForm specifikacijos dalis.
+
+| Tipas | Aprašymas |
+|-------|-----------|
+| [search-autocomplete](search-autocomplete) | Teksto įvedimas su realaus laiko API pagrįstais automatinio pildymo pasiūlymais |
+| [mentions](mentions) | Teksto laukas su `@`-paminėjimų automatiniu papildymu objektų žymėjimui eilutėje |
+| [texttags](texttags) | Žymų įvedimo laukas — kiekvienas įrašas tampa pašalinamu žetonu; saugomas kaip tarpais atskirtų eilutė |
+
+Apie pasikartojimo grupes žr. [Repeats](../advanced-extension/repeats)
 
 ## Kaip tipo ir išvaizdos sąveika veikia
 

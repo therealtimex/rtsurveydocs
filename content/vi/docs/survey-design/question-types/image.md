@@ -76,3 +76,27 @@ Khi sử dụng câu hỏi hình ảnh, hãy cân nhắc:
 - Không phải tất cả các thiết bị đều có camera chất lượng cao hoặc đủ dung lượng lưu trữ.
 - Phân tích số lượng lớn hình ảnh có thể mất nhiều thời gian.
 - Có thể có những lo ngại về quyền riêng tư khi chụp ảnh, đặc biệt là ở những nơi công cộng.
+
+## Phần mở rộng hình ảnh rtSurvey
+
+### watermark()
+
+Kiểu hiển thị `watermark()` chèn hình mờ văn bản lên ảnh được chụp bằng trường này. Hình mờ thường chứa siêu dữ liệu như tên người điều tra, ngày/giờ hoặc tọa độ GPS, được đóng dấu trực tiếp lên ảnh trước khi lưu.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Chụp ảnh địa điểm | `watermark("${enumerator_id} ${today()}")` |
+
+Tham số của `watermark()` là một biểu thức XPath được đánh giá tại thời điểm chụp. Chuỗi kết quả được hiển thị làm văn bản hình mờ.
+
+### editable
+
+Kiểu hiển thị `editable` cho phép người trả lời chú thích hoặc vẽ lên ảnh đã chụp. Thanh công cụ vẽ xuất hiện trên ảnh.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Chụp ảnh và đánh dấu các khu vực cần lưu ý | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` có thể kết hợp với `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

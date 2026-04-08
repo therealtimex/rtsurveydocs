@@ -44,6 +44,80 @@ column `appearance` ក្នុង rtSurvey អនុញ្ញាតឱ្យ�
 |----------------------|----------------|-------------|
 | `columns(n)` | select_one, select_multiple | បង្ហាញ choices ក្នុង `n` columns |
 | `gridformat<row=R col=C colspan=S>` | any | position field ក្នុង CSS-grid layout |
+| `required-but-simplify` | any | Field ចាំបាច់ ប៉ុន្តែ layout របស់វានៅតែត្រូវបានធ្វើឱ្យសាមញ្ញដោយ renderer |
+| `embed` | any | Render field ក្នុង embedded/inline display mode |
+| `popup` | select_one, select_multiple | Render បញ្ជីជម្រើសក្នុង popup/modal overlay ជំនួស inline |
+| `auto-hide-empty` | boxtag, select | លាក់ widget question ទាំងមូលនៅពេល choice list ទទេ |
+| `text-nolabel` | select_one, select_multiple | លាក់ text label សម្រាប់ជម្រើសនីមួយៗ បង្ហាញតែ input control |
+
+### Widgets
+
+| Appearance Attribute | ប្រភេទ Questions | ការពិពណ៌នា |
+|----------------------|----------------|-------------|
+| `likert` | select_one | បង្ហាញ choices ជា Likert scale row |
+| `distress` | select_one | Render choices ជា Kessler Psychological Distress Scale (K10) widget ជាមួយ emotional icons |
+
+### Select visual widgets
+
+Appearances ទាំងនេះ ផ្លាស់ប្តូរការ render ទាំងមូលនៃ select choice lists។
+
+| Appearance Attribute | ប្រភេទ Questions | ការពិពណ៌នា |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | ជម្រើសបង្ហាញជា pill-shaped clickable tag chips។ |
+| `boxtag` | select_one, select_multiple | ជម្រើសបង្ហាញជា rectangular styled boxes ដែលអ្នកប្រើប្រាស់ចុច។ |
+| `boxtag -search` | select_one, select_multiple | Layout Boxtag ជាមួយ live search/filter input នៅខាងលើប្រអប់។ |
+| `duolingo-style1` | select_one, select_multiple | Layout card ធំ style Duolingo — ស័ក្តិសមសម្រាប់បញ្ជីខ្លីជាមួយ icons។ |
+| `rating_box` | select_one, select_multiple | Grid នៃ numbered boxes ដែលអាចចុចបាន — ស័ក្តិសមសម្រាប់ scale ឬ NPS questions។ |
+| `star_rating` | select_one | ជម្រើសបង្ហាញជាផ្កាយ; ចំនួនផ្កាយស្មើចំនួនជម្រើស។ |
+| `choices-noshow` | select_one, select_multiple | បង្ហាញ 10 ជម្រើសដំបូងជាដំបូងជាមួយ "Show more" control។ |
+| `noshow` | select_one, select_multiple | លាក់បញ្ជីជម្រើសទាំងស្រុង; តម្លៃត្រូវបានកំណត់ដោយ program តាមរយៈ `calculate` ឬ API។ |
+| `checkall` | select_multiple | បន្ថែម "Select all" shortcut នៅខាងលើបញ្ជីជម្រើស។ |
+| `max-items(N)` | select_one, select_multiple | Cap visible choice list ទៅ N items។ ឧទាហរណ៍: `max-items(5)`។ |
+
+### Text visual widgets
+
+| Appearance Attribute | ប្រភេទ Questions | ការពិពណ៌នា |
+|----------------------|----------------|-------------|
+| `richtext` | text | ជំនួស plain text box ជាមួយ rich text editor (bold, italic, lists, links)។ ផ្ទុក HTML។ |
+| `typingtest` | text | Typing test widget — label text គឺជា passage; widget ថតការឆ្លើយតបដែលបានវាយ និងពេលវេលា។ |
+
+### Media extensions
+
+| Appearance Attribute | ប្រភេទ Questions | ការពិពណ៌នា |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | Overlay text watermark លើ photos ដែលបានចាប់។ argument គឺជា XPath expression ដែលបានគណនានៅពេល capture។ ឧទាហរណ៍: `watermark("${id} ${today()}")`។ |
+| `editable` | image | Enable annotation/drawing លើ photo ដែលបានចាប់មុនពេលរក្សាទុក។ |
+
+### Inline display configuration
+
+Modifiers `display{}` និង `results{}` អាចភ្ជាប់ទៅ `inline` appearances ដើម្បីគ្រប់គ្រង icon alignment និង result display។ ទាំងនេះប្រើជាមួយ `inline` time input extension លើ `text` fields និង media capture widgets។
+
+#### `display{}` parameters
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parameter | Values | ការពិពណ៌នា |
+|-----------|--------|-------------|
+| Alignment | `left`, `right`, `top`, `bottom`, `center` | ទីតាំង icon ដែលទាក់ទងនឹង input field |
+| Size | `small`, `medium`, `large` | ទំហំ icon (2.5 rem, 5 rem, 8 rem ហៅ respectivement) |
+| Mode | `inline-icon` | Render trigger ជា icon តែប៉ុណ្ណោះ (គ្មាន button border) |
+| Mode | `inline-button` | Render trigger ជា full button |
+
+#### `results{}` parameters
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parameter | Values | ការពិពណ៌នា |
+|-----------|--------|-------------|
+| Alignment | `left`, `right`, `top`, `bottom`, `center` | ទីតាំងនៃការបង្ហាញ result value |
+| `hide(field)` | ឈ្មោះ sub-field ណាក៏បាន | លាក់ component ជាក់លាក់នៃ result (ឧ. `hide(seconds)`) |
 
 ### API Integration
 

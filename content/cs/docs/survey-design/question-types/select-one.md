@@ -60,6 +60,16 @@ Zadejte hodnotu do sloupce `appearance` pro změnu zobrazení voleb:
 | `columns(N)` | Zobrazení v N sloupcích (rozšíření rtSurvey, např. `columns(3)`) |
 | `distress` | Widget emočních ikon Kesslerovy psychologické tísně (K10) |
 | `search-api(...)` | Dynamické vyhledávání — načítá volby z API za běhu |
+| `tagging` | Zobrazí volby jako klikatelné tagové čipy |
+| `boxtag` | Zobrazí volby jako obdélníkové stylizované boxy |
+| `boxtag -search` | Rozvržení boxtag s vyhledávacím polem |
+| `duolingo-style1` | Rozvržení velkých karet inspirované Duolingem |
+| `rating_box` | Hodnotící boxy v mřížce |
+| `star_rating` | Widget hvězdičkového hodnocení |
+| `choices-noshow` | Zobrazí prvních 10 voleb, zbytek na požádání |
+| `noshow` | Skryje seznam voleb; hodnota se nastavuje programově |
+| `checkall` | Přidá možnost „Vybrat vše" |
+| `max-items(N)` | Omezí počet viditelných voleb na N |
 {{< /table >}}
 
 ### Příklad: Likertova škála

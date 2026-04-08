@@ -64,6 +64,14 @@ Pyetjet select_multiple përdoren për:
 | `label` | Tregon vetëm etiketat, pa kutia zgjedhjeje (përdorni me `list-nolabel`) |
 | `list-nolabel` | Tregon vetëm kutitë e zgjedhjes, pa etiketa (përdorni me `label`) |
 | `columns(N)` | Shfaqje në N kolona (zgjerim rtSurvey) |
+| `tagging` | Zgjedhjet renderohen si chip-e etikete të klikueshme në formë pill |
+| `boxtag` | Zgjedhjet renderohen si kuti të stilizuara drejtkëndore |
+| `boxtag -search` | Paraqitja boxtag me hyrje kërkimi/filtrimi të drejtpërdrejtë mbi kutitë |
+| `duolingo-style1` | Paraqitje karte e frymëzuar nga Duolingo — karta të mëdha të troketshme me ikona |
+| `rating_box` | Kuti vlerësimi të bazuara në rrjetë |
+| `choices-noshow` | Tregon vetëm 10 zgjedhjet e para fillimisht; zbulon pjesën tjetër me kërkesë |
+| `checkall` | Shton opsionin "Zgjidhni të gjitha" në krye të listës |
+| `max-items(N)` | Kufizon numrin e zgjedhjeve të dukshme në N |
 {{< /table >}}
 
 ### Shembull: Paraqitje kompakte me 3 kolona

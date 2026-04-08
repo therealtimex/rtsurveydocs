@@ -28,7 +28,6 @@ Pour définir le type de question, entrez le nom du type dans la colonne `type` 
 |------|-------------|
 | [select_one listname](select-one) | Choisir exactement une option dans une liste |
 | [select_multiple listname](select-multiple) | Choisir une ou plusieurs options dans une liste |
-| [select_one_from_file filename](select-one-from-file) | Choisir une option chargée depuis un fichier CSV externe |
 | [rank listname](rank) | Classer les choix par préférence ou priorité |
 
 ## Date et heure
@@ -66,6 +65,18 @@ Pour définir le type de question, entrez le nom du type dans la colonne `type` 
 | [hidden](hidden) | Champ masqué qui stocke une valeur statique ou pré-remplie |
 | [trigger / acknowledge](trigger) | Une case à cocher que l'enquêteur doit cocher pour confirmer avoir lu une déclaration |
 | [meta](meta) | Métadonnées automatiques : horodatages, identifiant de l'appareil, informations sur l'enquêteur |
+
+## Extensions rtSurvey
+
+Ces types sont spécifiques à rtSurvey et ne font pas partie de la spécification XLSForm standard.
+
+| Type | Description |
+|------|-------------|
+| [search-autocomplete](search-autocomplete) | Saisie de texte avec suggestions d'autocomplétion alimentées par une API en direct |
+| [mentions](mentions) | Champ de texte avec autocomplétion des mentions `@` pour identifier des entités en ligne |
+| [texttags](texttags) | Saisie de tags — chaque entrée devient une puce amovible ; stocké en chaîne séparée par des espaces |
+
+Pour les groupes répétitifs, voir [Repeats](../advanced-extension/repeats)
 
 ## Comment type et appearance fonctionnent ensemble
 

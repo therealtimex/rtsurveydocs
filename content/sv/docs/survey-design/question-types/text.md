@@ -38,6 +38,8 @@ Textfrågor används för:
 |----------|-------------|
 | *(inget)* | Enrads textinmatning |
 | `multiline` | Flerrads textområde — bäst för längre fritext på webben |
+| `richtext` | Ersätter det vanliga textfältet med en riktexteditor (fetstil, kursiv, listor, länkar). Lagrar HTML |
+| `typingtest` | Skrivtestwidget — etikettexten är passagen; widgetten registrerar det skrivna svaret och tidtagningen |
 
 ## rtSurvey-tidsinmatningstillägg
 

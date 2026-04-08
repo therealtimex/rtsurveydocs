@@ -93,6 +93,11 @@ Pored standardnih izgleda XLSForm-a, rtSurvey podržava sledeće opcije specifi�
 | `columns(n)` | select_one, select_multiple | Prikazuje opcije u `n` kolona. Primer: `columns(3)` prikazuje tri kolone radio dugmića. |
 | `gridformat<row=R col=C colspan=S align=center>` | bilo koji | Pozicionira polje u CSS-grid raspored na redu `R`, koloni `C`, prostirući se na `S` kolona. Koristi se sa `advanced-extension/grid-layout`. |
 | `ignore-simplify` | bilo koji | Nalaže rendereru formulara da preskoči automatsko pojednostavljivanje ili kondenzovanje rasporeda ovog polja. |
+| `required-but-simplify` | bilo koji | Polje je obavezno, ali se njegov raspored i dalje pojednostavlja od strane renderera (zamenjuje podrazumevano ponašanje gde su obavezna polja isključena iz pojednostavljivanja). |
+| `embed` | bilo koji | Prikazuje polje u ugrađenom/inline režimu prikaza, potiskujući njegov spoljni omotač i kontejner oznake — koristi se kada je pitanje ugnežđeno unutar prilagođenog HTML-a. |
+| `popup` | select_one, select_multiple | Prikazuje listu opcija u iskačućem/modalnom preklapaču umesto inline. |
+| `auto-hide-empty` | boxtag, select | Skriva ceo widget pitanja kada je lista opcija prazna (npr. API nije vratio rezultate). |
+| `text-nolabel` | select_one, select_multiple | Skriva tekstualnu oznaku za svaku opciju, prikazujući samo kontrolu unosa. Slično `list-nolabel`, ali primenjeno po opciji, a ne kao podela kolona. |
 
 ### Widgeti
 
@@ -100,6 +105,68 @@ Pored standardnih izgleda XLSForm-a, rtSurvey podržava sledeće opcije specifi�
 |-----------------|----------------|------|
 | `likert` | select_one | Prikazuje opcije kao red Likertove skale (već u standardnoj tabeli iznad; potvrđeno podržano). |
 | `distress` | select_one | Prikazuje opcije kao Kesslerovu skalu psihološkog distresa (K10) vizuelni widget sa emocionalnim ikonama. |
+
+### Vizuelni widgeti za izbor
+
+Ovi izgledi menjaju celokupno prikazivanje lista opcija za izbor.
+
+| Atribut izgleda | Tipovi pitanja | Opis |
+|-----------------|----------------|------|
+| `tagging` | select_one, select_multiple | Opcije se prikazuju kao klikabilni čipovi u obliku pilule sa oznakama. |
+| `boxtag` | select_one, select_multiple | Opcije se prikazuju kao pravougaone stilizovane kutije koje korisnik dodiruje. |
+| `boxtag -search` | select_one, select_multiple | Raspored boxtag sa živim poljem za pretragu/filter iznad kutija. |
+| `duolingo-style1` | select_one, select_multiple | Raspored velikih kartica inspirisan Duolingom — pogodan za kratke liste sa ikonama. |
+| `rating_box` | select_one, select_multiple | Mreža klikabilnih numerisanih kutija — pogodna za skalarna ili NPS pitanja. |
+| `star_rating` | select_one | Opcije se prikazuju kao zvezde; broj zvezda je jednak broju opcija. |
+| `choices-noshow` | select_one, select_multiple | Inicijalno prikazuje samo prvih 10 opcija sa kontrolom „Prikaži više". |
+| `noshow` | select_one, select_multiple | Potpuno skriva listu opcija; vrednost se postavlja programski putem `calculate` ili API-ja. |
+| `checkall` | select_multiple | Dodaje prečicu „Izaberi sve" na vrh liste opcija. |
+| `max-items(N)` | select_one, select_multiple | Ograničava vidljivu listu opcija na N stavki. Primer: `max-items(5)`. |
+
+### Vizuelni widgeti za tekst
+
+| Atribut izgleda | Tipovi pitanja | Opis |
+|-----------------|----------------|------|
+| `richtext` | text | Zamenjuje obično tekstualno polje editorom bogatog teksta (podebljano, kurziv, liste, veze). Čuva HTML. |
+| `typingtest` | text | Widget za test kucanja — tekst oznake je pasaž; widget beleži ukucani odgovor i vremenski raspored. |
+
+### Medijska proširenja
+
+| Atribut izgleda | Tipovi pitanja | Opis |
+|-----------------|----------------|------|
+| `watermark("izraz")` | image | Prekriva tekstualni vodeni žig na snimljenim fotografijama. Argument je XPath izraz koji se procenjuje u trenutku snimanja. Primer: `watermark("${id} ${today()}")`. |
+| `editable` | image | Omogućava anotaciju/crtanje preko snimljene fotografije pre čuvanja. |
+
+### Konfigurisanje inline prikaza
+
+Modifikatori `display{}` i `results{}` mogu se dodati uz `inline` izglede za kontrolu poravnanja ikona i prikaza rezultata. Koriste se zajedno sa `inline` proširenjem za unos vremena na `text` poljima i sa widgetima za hvatanje medija.
+
+#### Parametri `display{}`
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parametar | Vrednosti | Opis |
+|-----------|-----------|------|
+| Poravnanje | `left`, `right`, `top`, `bottom`, `center` | Pozicija ikone u odnosu na polje unosa |
+| Veličina | `small`, `medium`, `large` | Veličina ikone (odgovara 2,5 rem, 5 rem, 8 rem) |
+| Režim | `inline-icon` | Prikazuje okidač samo kao ikonu (bez ivice dugmeta) |
+| Režim | `inline-button` | Prikazuje okidač kao puno dugme |
+
+#### Parametri `results{}`
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parametar | Vrednosti | Opis |
+|-----------|-----------|------|
+| Poravnanje | `left`, `right`, `top`, `bottom`, `center` | Pozicija prikaza rezultatne vrednosti |
+| `hide(polje)` | bilo koje podpolje | Skriva određenu komponentu rezultata (npr. `hide(seconds)`) |
 
 ### API integracija
 

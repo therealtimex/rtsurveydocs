@@ -64,6 +64,14 @@ As perguntas select_multiple são usadas para:
 | `label` | Mostra apenas rótulos, sem caixas de seleção (use com `list-nolabel`) |
 | `list-nolabel` | Mostra apenas caixas de seleção, sem rótulos (use com `label`) |
 | `columns(N)` | Exibir em N colunas (extensão rtSurvey) |
+| `tagging` | Renderiza as opções como chips de tag clicáveis em formato de pílula |
+| `boxtag` | Renderiza as opções como caixas retangulares estilizadas que o usuário toca |
+| `boxtag -search` | Layout boxtag com uma entrada de pesquisa/filtro ao vivo acima das caixas |
+| `duolingo-style1` | Layout de cartão inspirado no Duolingo — cartões grandes tocáveis com ícones |
+| `rating_box` | Caixas de avaliação em grade |
+| `choices-noshow` | Mostra apenas as primeiras 10 opções inicialmente; revela o restante sob demanda |
+| `checkall` | Adiciona uma opção "Selecionar tudo" no topo da lista |
+| `max-items(N)` | Limita o número de opções visíveis a N |
 {{< /table >}}
 
 ### Exemplo: Layout compacto de 3 colunas

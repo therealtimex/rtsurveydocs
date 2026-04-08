@@ -22,3 +22,18 @@ Typ pytania `image` pozwala respondentom robić zdjęcia aparatem urządzenia lu
 - `signature` — przechwytuje podpis
 - `draw` — umożliwia rysowanie odręczne
 - `annotate` — umożliwia adnotację obrazu
+
+## Rozszerzenia wyglądu rtSurvey
+
+rtSurvey rozszerza typ `image` o dwie dodatkowe opcje wyglądu:
+
+| Wygląd | Opis |
+|--------|------|
+| `watermark("wyrażenie")` | Nakłada tekstowy znak wodny na zrobione zdjęcia. Argument jest wyrażeniem XPath ocenianym w momencie fotografowania. Przykład: `watermark("${id} ${today()}")` |
+| `editable` | Umożliwia adnotację/rysowanie na wykonanym zdjęciu przed zapisaniem |
+
+### Przykład: Znak wodny z ID respondenta i datą
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Zrób zdjęcie miejsca | `watermark("${respondent_id} ${today()}")` |

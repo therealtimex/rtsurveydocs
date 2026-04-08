@@ -62,6 +62,16 @@ weight: 224
 | `columns(N)` | បង្ហាញក្នុង N ជួរឈរ (ផ្នែកពង្រីករបស់ rtSurvey, ឧ. `columns(3)`) |
 | `distress` | Kessler Psychological Distress (K10) emotional icon widget |
 | `search-api(...)` | Dynamic search — ផ្ទុកជម្រើសពី API ក្នុង runtime |
+| `tagging` | បង្ហាញជម្រើសជាចិបស្លាកដែលអាចចុចបានជំនួស radio buttons |
+| `boxtag` | បង្ហាញជម្រើសជាប្រអប់ចតុកោណទ្រង់ទ្រាយដែលអ្នកប្រើប្រាស់ចុចដើម្បីជ្រើស |
+| `boxtag -search` | Layout Boxtag ជាមួយ input ស្វែងរក/filter នៅខាងលើប្រអប់ |
+| `duolingo-style1` | Layout បន្ទះការ៍ ala Duolingo — បន្ទះការ៍ធំដែលអាចចុចបានជាមួយ icons |
+| `rating_box` | ប្រអប់ rating ផ្អែកលើ grid — ល្អបំផុតសម្រាប់ជម្រើសចំនួន ឬ scale |
+| `star_rating` | Widget rating ផ្កាយ — ជម្រើសបង្ហាញជាផ្កាយ 1–N |
+| `choices-noshow` | បង្ហាញ 10 ជម្រើសដំបូងជាដំបូង; បង្ហាញជម្រើសដែលនៅសល់តាមតម្រូវការ |
+| `noshow` | លាក់បញ្ជីជម្រើសទាំងស្រុង; តម្លៃត្រូវបានកំណត់ដោយ program |
+| `checkall` | បន្ថែម option "ជ្រើសទាំងអស់" នៅខាងលើបញ្ជី |
+| `max-items(N)` | ដាក់កំហិតចំនួនជម្រើសដែលអាចមើលឃើញទៅ N (ឧ. max-items(5)) |
 {{< /table >}}
 
 ### ឧទាហរណ៍: Likert scale

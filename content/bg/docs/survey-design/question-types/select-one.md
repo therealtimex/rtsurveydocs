@@ -62,6 +62,16 @@ Specify a value in the `appearance` column to change how choices are displayed:
 | `columns(N)` | Display in N columns (rtSurvey extension, e.g., `columns(3)`) |
 | `distress` | Kessler Psychological Distress (K10) emotional icon widget |
 | `search-api(...)` | Dynamic search — loads choices from an API at runtime |
+| `tagging` | Показва опциите като кликаеми чипове с тагове |
+| `boxtag` | Показва опциите като правоъгълни стилизирани кутии |
+| `boxtag -search` | Оформление boxtag с поле за търсене |
+| `duolingo-style1` | Оформление с големи карти, вдъхновено от Duolingo |
+| `rating_box` | Решеткообразни кутии за оценяване |
+| `star_rating` | Widget за оценяване със звезди |
+| `choices-noshow` | Показва първите 10 опции, останалите при поискване |
+| `noshow` | Скрива списъка с опции; стойността се задава програмно |
+| `checkall` | Добавя опция „Избери всички" |
+| `max-items(N)` | Ограничава броя на видимите опции до N |
 {{< /table >}}
 
 ### Example: Likert scale

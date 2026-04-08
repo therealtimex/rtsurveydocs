@@ -93,8 +93,53 @@ Standart XLSForm görünümlerine ek olarak, rtSurvey aşağıdaki platforma öz
 | `columns(n)` | select_one, select_multiple | Seçenekleri `n` sütunda görüntüler. Örnek: `columns(3)` üç sütun radyo düğmesi gösterir. |
 | `gridformat<row=R col=C colspan=S align=center>` | herhangi | Alanı `R` satır, `C` sütun konumunda `S` sütun kapsayan bir CSS ızgara düzenine yerleştirir. `advanced-extension/grid-layout` ile kullanılır. |
 | `ignore-simplify` | herhangi | Form oluşturucuya bu alanın düzeninin otomatik basitleştirilmesini veya sıkıştırılmasını atlamasını söyler. |
+| `required-but-simplify` | herhangi | Alan zorunludur ancak düzen yine de basitleştirilir |
+| `embed` | herhangi | Alanı gömülü/satır içi görüntüleme modunda gösterir |
+| `popup` | select_one, select_multiple | Seçenek listesini bir popup/modal katmanında gösterir |
+| `auto-hide-empty` | boxtag, select | Seçenek listesi boş olduğunda widget'ı gizler |
+| `text-nolabel` | select_one, select_multiple | Her seçenek için metin etiketini gizler |
 
 ### Widget'lar
 
 | Görünüm Özniteliği | Soru Türleri | Açıklama |
 |----------------------|----------------|-------------|
+| `likert` | select_one | Seçenekleri Likert ölçeği satırı olarak sunar (standart tabloda zaten var; desteklendiği onaylandı). |
+| `distress` | select_one | Seçenekleri duygusal ikonlarla Kessler Psikolojik Sıkıntı Ölçeği (K10) görsel widget'ı olarak gösterir. |
+
+### Seçim görsel widget'ları
+
+| Görünüm Özniteliği | Soru Türleri | Açıklama |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Seçenekleri radyo düğmeleri veya onay kutuları yerine tıklanabilir etiket chip'leri olarak gösterir |
+| `boxtag` | select_one, select_multiple | Seçenekleri kullanıcının seçmek için dokunduğu stilize dikdörtgen kutular olarak gösterir |
+| `boxtag -search` | select_one, select_multiple | Kutular üzerinde bir arama/filtreleme girişi olan boxtag düzeni |
+| `duolingo-style1` | select_one, select_multiple | Duolingo ilhamlı kart düzeni — ikonlu büyük dokunulabilir kartlar |
+| `rating_box` | select_one | Izgara tabanlı derecelendirme kutuları — sayısal veya ölçek seçenekleri için en iyi |
+| `star_rating` | select_one | Yıldız derecelendirme widget'ı — seçenekler 1–N yıldız olarak gösterilir |
+| `choices-noshow` | select_one, select_multiple | Başlangıçta yalnızca ilk 10 seçeneği gösterir; geri kalanı istek üzerine ortaya çıkarır |
+| `noshow` | select_one | Seçenek listesini tamamen gizler; değer programatik olarak ayarlanır |
+| `checkall` | select_multiple | Listenin üstüne "Tümünü seç" seçeneği ekler |
+| `max-items(N)` | select_one, select_multiple | Görünür seçenek sayısını N ile sınırlar (örn. max-items(5)) |
+
+### Metin görsel widget'ları
+
+| Görünüm Özniteliği | Soru Türleri | Açıklama |
+|----------------------|----------------|-------------|
+| `richtext` | text | Zengin metin düzenleyici — kalın, italik, listeler ve bağlantılar içeren araç çubuğu |
+| `typingtest` | text | Yazma testi arayüzü — bir metin parçası sunar ve yazma hızını ve doğruluğunu ölçer |
+
+### Medya uzantıları
+
+| Görünüm Özniteliği | Soru Türleri | Açıklama |
+|----------------------|----------------|-------------|
+| `watermark("expr")` | image | Çekilen fotoğrafın üzerine metin filigranı ekler; argüman yakalama anında değerlendirilen bir XPath ifadesidir |
+| `editable` | image | Katılımcının çektikten sonra fotoğrafa açıklama eklemesine veya üzerine çizim yapmasına olanak tanır |
+
+### Inline görüntü yapılandırması
+
+Bir etiket veya not içindeki alan değerinin nasıl görüntüleneceğini kontrol etmek için `display{}` kullanın. Gönderi sonrası gösterilen sonuçlar özetini kontrol etmek için `results{}` kullanın.
+
+| Sözdizimi | Soru Türleri | Açıklama |
+|----------|----------------|-------------|
+| `display{format="..."}` | herhangi | `${fieldname}` aracılığıyla bir etikete inline eklendiğinde alan değerini biçimlendirir |
+| `results{show="true"}` | herhangi | Gönderme sonrası sonuçlar özet ekranında alan değerini gösterir |

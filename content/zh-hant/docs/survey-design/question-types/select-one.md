@@ -62,6 +62,16 @@ Select_one 問題用於：
 | `columns(N)` | 以 N 欄顯示（rtSurvey 擴展，例如 `columns(3)`） |
 | `distress` | Kessler 心理困擾量表（K10）情緒圖示小工具 |
 | `search-api(...)` | 動態搜尋——在執行時從 API 載入選項 |
+| `tagging` | 以可點擊的標籤片顯示選項，而非單選按鈕 |
+| `boxtag` | 以樣式化的矩形方塊顯示選項，使用者點擊選取 |
+| `boxtag -search` | 方塊上方帶有搜尋/篩選輸入框的 Boxtag 版面 |
+| `duolingo-style1` | Duolingo 風格的卡片版面——帶圖示的大型可點擊卡片 |
+| `rating_box` | 網格式評分方塊——最適合數字或量表選項 |
+| `star_rating` | 星星評分小工具——選項呈現為 1–N 顆星 |
+| `choices-noshow` | 初始僅顯示前 10 個選項；其餘按需顯示 |
+| `noshow` | 完全隱藏選項清單；值以程式設定 |
+| `checkall` | 在清單頂部新增「全選」選項 |
+| `max-items(N)` | 將可見選項數量限制為 N（例如 max-items(5)） |
 {{< /table >}}
 
 ### 範例：Likert 量表

@@ -62,6 +62,16 @@ Select_one 题目用于：
 | `columns(N)` | 以 N 列显示（rtSurvey 扩展，例如，`columns(3)`） |
 | `distress` | Kessler 心理困扰（K10）情感图标控件 |
 | `search-api(...)` | 动态搜索——在运行时从 API 加载选项 |
+| `tagging` | 将选项显示为可点击的标签片，而不是单选按钮 |
+| `boxtag` | 将选项显示为样式化的矩形框，用户点击以选择 |
+| `boxtag -search` | 带有搜索/过滤输入框的 Boxtag 布局 |
+| `duolingo-style1` | Duolingo 风格的卡片布局——带图标的大型可点击卡片 |
+| `rating_box` | 基于网格的评分框——最适合数字或量表选项 |
+| `star_rating` | 星级评分控件——选项呈现为 1–N 颗星 |
+| `choices-noshow` | 初始仅显示前 10 个选项；按需显示其余选项 |
+| `noshow` | 完全隐藏选项列表；值通过程序设置 |
+| `checkall` | 在列表顶部添加"全选"选项 |
+| `max-items(N)` | 将可见选项数量限制为 N（例如，max-items(5)） |
 {{< /table >}}
 
 ### 示例：李克特量表

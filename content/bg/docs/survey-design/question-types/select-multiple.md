@@ -64,6 +64,14 @@ Select_multiple questions are used for:
 | `label` | Shows only labels, no checkboxes (use with `list-nolabel`) |
 | `list-nolabel` | Shows only checkboxes, no labels (use with `label`) |
 | `columns(N)` | Display in N columns (rtSurvey extension) |
+| `tagging` | Показва опциите като кликаеми чипове с тагове |
+| `boxtag` | Показва опциите като правоъгълни стилизирани кутии |
+| `boxtag -search` | Оформление boxtag с поле за търсене |
+| `duolingo-style1` | Оформление с големи карти, вдъхновено от Duolingo |
+| `rating_box` | Решеткообразни кутии за оценяване |
+| `choices-noshow` | Показва първите 10 опции, останалите при поискване |
+| `checkall` | Добавя опция „Избери всички" |
+| `max-items(N)` | Ограничава броя на видимите опции до N |
 {{< /table >}}
 
 ### Example: 3-column compact layout

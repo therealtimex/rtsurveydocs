@@ -93,6 +93,11 @@ Ngoài các appearance XLSForm tiêu chuẩn, rtSurvey hỗ trợ các tùy ch�
 | `columns(n)` | select_one, select_multiple | Hiển thị lựa chọn theo `n` cột. Ví dụ: `columns(3)` hiển thị ba cột nút radio. |
 | `gridformat<row=R col=C colspan=S align=center>` | bất kỳ | Định vị trường trong bố cục CSS grid tại hàng `R`, cột `C`, kéo dài `S` cột. Dùng với `advanced-extension/grid-layout`. |
 | `ignore-simplify` | bất kỳ | Hướng dẫn renderer biểu mẫu bỏ qua đơn giản hóa hoặc thu gọn tự động bố cục trường này. |
+| `required-but-simplify` | bất kỳ | Trường là bắt buộc nhưng bố cục vẫn được đơn giản hóa bởi renderer |
+| `embed` | bất kỳ | Hiển thị trường trong chế độ nhúng/nội tuyến, loại bỏ vùng bọc ngoài và vùng chứa nhãn |
+| `popup` | select_one, select_multiple | Hiển thị danh sách lựa chọn trong lớp phủ popup/modal thay vì nội tuyến |
+| `auto-hide-empty` | boxtag, select | Ẩn toàn bộ widget câu hỏi khi danh sách lựa chọn trống |
+| `text-nolabel` | select_one, select_multiple | Ẩn nhãn văn bản cho mỗi lựa chọn, chỉ hiển thị control nhập liệu |
 
 ### Widget
 
@@ -100,6 +105,57 @@ Ngoài các appearance XLSForm tiêu chuẩn, rtSurvey hỗ trợ các tùy ch�
 |----------------------|--------------|-------|
 | `likert` | select_one | Trình bày lựa chọn dưới dạng hàng thang Likert (đã có trong bảng tiêu chuẩn ở trên; được xác nhận hỗ trợ). |
 | `distress` | select_one | Hiển thị lựa chọn dưới dạng widget trực quan Thang đo tâm lý Kessler (K10) với biểu tượng cảm xúc. |
+
+### Widget trực quan lựa chọn
+
+Các appearance này thay đổi toàn bộ cách hiển thị danh sách lựa chọn.
+
+| Appearance | Loại câu hỏi | Mô tả |
+|------------|--------------|-------|
+| `tagging` | select_one, select_multiple | Các lựa chọn hiển thị dưới dạng chip thẻ hình viên thuốc có thể nhấp. |
+| `boxtag` | select_one, select_multiple | Các lựa chọn hiển thị dưới dạng hộp hình chữ nhật có kiểu dáng mà người dùng nhấn. |
+| `boxtag -search` | select_one, select_multiple | Bố cục boxtag với ô tìm kiếm/lọc trực tiếp phía trên các hộp. |
+| `duolingo-style1` | select_one, select_multiple | Bố cục thẻ lớn lấy cảm hứng từ Duolingo — phù hợp cho danh sách ngắn với biểu tượng. |
+| `rating_box` | select_one, select_multiple | Lưới các hộp số có thể nhấn — phù hợp cho câu hỏi thang đo hoặc NPS. |
+| `star_rating` | select_one | Các lựa chọn hiển thị dưới dạng ngôi sao; số ngôi sao bằng số lựa chọn. |
+| `choices-noshow` | select_one, select_multiple | Ban đầu chỉ hiển thị 10 lựa chọn đầu tiên với điều khiển "Hiện thêm". |
+| `noshow` | select_one, select_multiple | Ẩn hoàn toàn danh sách lựa chọn; giá trị được đặt theo chương trình qua calculate hoặc API. |
+| `checkall` | select_multiple | Thêm phím tắt "Chọn tất cả" ở đầu danh sách lựa chọn. |
+| `max-items(N)` | select_one, select_multiple | Giới hạn danh sách lựa chọn hiển thị thành N mục. Ví dụ: max-items(5). |
+
+### Widget trực quan văn bản
+
+| Appearance | Loại câu hỏi | Mô tả |
+|------------|--------------|-------|
+| `richtext` | text | Thay thế ô nhập văn bản thuần bằng trình soạn thảo văn bản phong phú (in đậm, in nghiêng, danh sách, liên kết). Lưu dưới dạng HTML. |
+| `typingtest` | text | Widget kiểm tra gõ phím — nhãn là đoạn văn; widget ghi lại phản hồi đã gõ và thời gian. |
+
+### Phần mở rộng phương tiện
+
+| Appearance | Loại câu hỏi | Mô tả |
+|------------|--------------|-------|
+| `watermark("expression")` | image | Chèn hình mờ văn bản lên ảnh chụp. Tham số là biểu thức XPath được đánh giá tại thời điểm chụp. |
+| `editable` | image | Cho phép chú thích/vẽ lên ảnh chụp trước khi lưu. |
+
+### Cấu hình hiển thị nội tuyến
+
+Các modifier `display{}` và `results{}` kiểm soát căn chỉnh biểu tượng và hiển thị kết quả cho các widget nội tuyến.
+
+#### Tham số `display{}`
+
+| Tham số | Giá trị | Mô tả |
+|---------|---------|-------|
+| Căn chỉnh | `left`, `right`, `top`, `bottom`, `center` | Vị trí của biểu tượng so với trường nhập liệu |
+| Kích thước | `small`, `medium`, `large` | Kích thước biểu tượng |
+| Chế độ | `inline-icon` | Hiển thị trigger dưới dạng biểu tượng |
+| Chế độ | `inline-button` | Hiển thị trigger dưới dạng nút đầy đủ |
+
+#### Tham số `results{}`
+
+| Tham số | Giá trị | Mô tả |
+|---------|---------|-------|
+| Căn chỉnh | `left`, `right`, `top`, `bottom`, `center` | Vị trí của hiển thị giá trị kết quả |
+| `hide(field)` | tên trường phụ bất kỳ | Ẩn một thành phần cụ thể của kết quả |
 
 ### Tích hợp API
 

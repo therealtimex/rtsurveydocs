@@ -62,6 +62,16 @@ Spécifiez une valeur dans la colonne `appearance` pour modifier l'affichage des
 | `columns(N)` | Affichage en N colonnes (extension rtSurvey, ex. : `columns(3)`) |
 | `distress` | Widget d'icônes émotionnelles de l'échelle de détresse psychologique de Kessler (K10) |
 | `search-api(...)` | Recherche dynamique — charge les choix depuis une API au moment de l'exécution |
+| `tagging` | Affiche les choix sous forme de chips de tags cliquables au lieu de boutons radio |
+| `boxtag` | Affiche les choix sous forme de boîtes rectangulaires stylisées que l'utilisateur tape pour sélectionner |
+| `boxtag -search` | Mise en page boxtag avec une saisie de recherche/filtre au-dessus des boîtes |
+| `duolingo-style1` | Mise en page de cartes inspirée de Duolingo — grandes cartes tapables avec icônes |
+| `rating_box` | Boîtes de notation en grille — idéales pour les choix numériques ou d'échelle |
+| `star_rating` | Widget de notation par étoiles — les choix s'affichent sous forme de 1 à N étoiles |
+| `choices-noshow` | Affiche uniquement les 10 premiers choix initialement ; révèle le reste à la demande |
+| `noshow` | Masque entièrement la liste des choix ; la valeur est définie de manière programmatique |
+| `checkall` | Ajoute une option "Tout sélectionner" en haut de la liste |
+| `max-items(N)` | Limite le nombre de choix visibles à N (ex. : max-items(5)) |
 {{< /table >}}
 
 ### Exemple : Échelle de Likert

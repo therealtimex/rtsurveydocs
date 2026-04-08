@@ -93,6 +93,11 @@ Selain appearance XLSForm standar, rtSurvey mendukung opsi khusus platform berik
 | `columns(n)` | select_one, select_multiple | Menampilkan pilihan dalam `n` kolom. Contoh: `columns(3)` menampilkan tiga kolom tombol radio. |
 | `gridformat<row=R col=C colspan=S align=center>` | apa saja | Memposisikan bidang dalam tata letak CSS-grid pada baris `R`, kolom `C`, merentangkan `S` kolom. Digunakan dengan `advanced-extension/grid-layout`. |
 | `ignore-simplify` | apa saja | Menginstruksikan renderer formulir untuk melewati penyederhanaan atau pemadatan otomatis tata letak bidang ini. |
+| `required-but-simplify` | apa saja | Bidang wajib diisi tetapi tata letaknya masih disederhanakan oleh renderer |
+| `embed` | apa saja | Merender bidang dalam mode tampilan tertanam/inline |
+| `popup` | select_one, select_multiple | Merender daftar pilihan dalam overlay popup/modal alih-alih inline |
+| `auto-hide-empty` | boxtag, select | Menyembunyikan seluruh widget pertanyaan ketika daftar pilihan kosong |
+| `text-nolabel` | select_one, select_multiple | Menyembunyikan label teks untuk setiap pilihan, hanya menampilkan kontrol input |
 
 ### Widget
 
@@ -100,6 +105,68 @@ Selain appearance XLSForm standar, rtSurvey mendukung opsi khusus platform berik
 |-------------------|-----------------|-----------|
 | `likert` | select_one | Menyajikan pilihan sebagai baris skala Likert (sudah ada di tabel standar di atas; dikonfirmasi didukung). |
 | `distress` | select_one | Merender pilihan sebagai widget visual Kessler Psychological Distress Scale (K10) dengan ikon emosional. |
+
+### Widget visual pilihan
+
+Appearance ini mengubah seluruh rendering daftar pilihan.
+
+| Atribut Appearance | Jenis Pertanyaan | Deskripsi |
+|-------------------|-----------------|-----------|
+| `tagging` | select_one, select_multiple | Pilihan dirender sebagai chip tag berbentuk pil yang dapat diklik. |
+| `boxtag` | select_one, select_multiple | Pilihan dirender sebagai kotak persegi panjang bergaya yang diketuk pengguna. |
+| `boxtag -search` | select_one, select_multiple | Tata letak Boxtag dengan input pencarian/filter langsung di atas kotak. |
+| `duolingo-style1` | select_one, select_multiple | Tata letak kartu besar ala Duolingo — cocok untuk daftar pendek dengan ikon. |
+| `rating_box` | select_one, select_multiple | Grid kotak bernomor yang dapat diketuk — cocok untuk pertanyaan skala atau NPS. |
+| `star_rating` | select_one | Pilihan dirender sebagai bintang; jumlah bintang sama dengan jumlah pilihan. |
+| `choices-noshow` | select_one, select_multiple | Awalnya menampilkan 10 pilihan pertama dengan kontrol "Tampilkan lebih banyak". |
+| `noshow` | select_one, select_multiple | Menyembunyikan daftar pilihan sepenuhnya; nilai diatur secara terprogram melalui `calculate` atau API. |
+| `checkall` | select_multiple | Menambahkan pintasan "Pilih semua" di bagian atas daftar pilihan. |
+| `max-items(N)` | select_one, select_multiple | Membatasi daftar pilihan yang terlihat menjadi N item. Contoh: `max-items(5)`. |
+
+### Widget visual teks
+
+| Atribut Appearance | Jenis Pertanyaan | Deskripsi |
+|-------------------|-----------------|-----------|
+| `richtext` | text | Mengganti kotak teks biasa dengan editor teks kaya (tebal, miring, daftar, tautan). Menyimpan HTML. |
+| `typingtest` | text | Widget uji mengetik — teks label adalah teks yang harus diketik; widget merekam respons yang diketik dan waktu. |
+
+### Ekstensi media
+
+| Atribut Appearance | Jenis Pertanyaan | Deskripsi |
+|-------------------|-----------------|-----------|
+| `watermark("expression")` | image | Melapisi tanda air teks pada foto yang diambil. Argumennya adalah ekspresi XPath yang dievaluasi pada saat pengambilan. Contoh: `watermark("${id} ${today()}")`. |
+| `editable` | image | Mengaktifkan anotasi/gambar pada foto yang diambil sebelum disimpan. |
+
+### Konfigurasi tampilan inline
+
+Modifier `display{}` dan `results{}` dapat ditambahkan ke appearance `inline` untuk mengontrol penyelarasan ikon dan tampilan hasil. Ini digunakan bersama dengan ekstensi input waktu `inline` pada bidang `text` dan widget pengambilan media.
+
+#### Parameter `display{}`
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parameter | Nilai | Deskripsi |
+|-----------|-------|-----------|
+| Penyelarasan | `left`, `right`, `top`, `bottom`, `center` | Posisi ikon relatif terhadap bidang input |
+| Ukuran | `small`, `medium`, `large` | Ukuran ikon (masing-masing 2,5 rem, 5 rem, 8 rem) |
+| Mode | `inline-icon` | Merender pemicu sebagai ikon saja (tanpa batas tombol) |
+| Mode | `inline-button` | Merender pemicu sebagai tombol penuh |
+
+#### Parameter `results{}`
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parameter | Nilai | Deskripsi |
+|-----------|-------|-----------|
+| Penyelarasan | `left`, `right`, `top`, `bottom`, `center` | Posisi tampilan nilai hasil |
+| `hide(field)` | nama sub-field apa saja | Menyembunyikan komponen tertentu dari hasil (misalnya, `hide(seconds)`) |
 
 ### Integrasi API
 

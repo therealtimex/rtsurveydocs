@@ -38,6 +38,8 @@ Tekstikysymyksiä käytetään:
 |---------|--------|
 | *(ei mitään)* | Yksirivisinen tekstisyöte |
 | `multiline` | Monirivisinen tekstialue — parhaiten pitkälle vapaamuotoiselle tekstille verkossa |
+| `richtext` | Korvaa tavallisen tekstikentän rikastekstieditorilla (lihavointi, kursiivi, listat, linkit). Tallentaa HTML:nä |
+| `typingtest` | Kirjoitustesti-widget — otsikkoteksti on teksti; widget tallentaa kirjoitetun vastauksen ja ajoituksen |
 
 ## rtSurveyn ajan syöttölaajennukset
 

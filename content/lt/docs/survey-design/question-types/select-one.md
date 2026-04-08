@@ -62,6 +62,16 @@ Nurodykite reikšmę stulpelyje `appearance`, kad pakeistumėte pasirinkimų atv
 | `columns(N)` | Rodyti N stulpeliuose (rtSurvey plėtinys, pvz., `columns(3)`) |
 | `distress` | Kesslerio psichologinio streso (K10) emocijų piktogramų valdiklis |
 | `search-api(...)` | Dinaminė paieška — vykdymo metu įkelia pasirinkimus iš API |
+| `tagging` | Rodo pasirinkimus kaip spustelėjamus pill formos žymų čipsus |
+| `boxtag` | Rodo pasirinkimus kaip stilizuotus stačiakampius laukelius, kuriuos vartotojas paliečia |
+| `boxtag -search` | Boxtag išdėstymas su gyvu paieškos/filtravimo įvedimu virš laukelių |
+| `duolingo-style1` | Duolingo įkvėptas kortelių išdėstymas — didelės paliečiamos kortelės su piktogramomis |
+| `rating_box` | Tinklelio pagrindu sukurti vertinimo laukeliai — geriausiai tinka skaitiniams ar skalės klausimams |
+| `star_rating` | Žvaigždžių vertinimo valdiklis — pasirinkimai atvaizduojami kaip 1–N žvaigždžių |
+| `choices-noshow` | Iš pradžių rodo tik pirmus 10 pasirinkimų; likusius atskleidžia pagal poreikį |
+| `noshow` | Visiškai slepia pasirinkimų sąrašą; reikšmė nustatoma programatiškai |
+| `checkall` | Prideda parinktį „Pasirinkti visus" sąrašo viršuje |
+| `max-items(N)` | Apriboja matomų pasirinkimų skaičių iki N (pvz., `max-items(5)`) |
 {{< /table >}}
 
 ### Pavyzdys: Likerto skalė

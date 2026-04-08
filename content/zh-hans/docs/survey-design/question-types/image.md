@@ -76,3 +76,27 @@ XLSForm 和 rtSurvey 中的 image 题目类型使受访者能够拍摄并提交�
 - 并非所有设备都有高质量摄像头或足够的存储空间。
 - 分析大量图像可能耗时。
 - 在公共场所拍摄图像时可能存在隐私问题。
+
+## rtSurvey 图片扩展
+
+### watermark()
+
+`watermark()` 外观会在此字段拍摄的照片上叠加文字水印。水印通常包含元数据，如枚举员姓名、日期/时间或 GPS 坐标，在保存图像前直接印在图像上。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Take a photo of the site | `watermark("${enumerator_id} ${today()}")` |
+
+`watermark()` 的参数是在拍摄时求值的 XPath 表达式，结果字符串将作为水印文字渲染。
+
+### editable
+
+`editable` 外观允许受访者在拍摄照片后对其进行注释或绘制。图像上方会出现绘图工具栏。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Photograph and mark areas of concern | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` 可与 `watermark()` 组合使用：`appearance: editable watermark("${id}")`
+{{% /alert %}}

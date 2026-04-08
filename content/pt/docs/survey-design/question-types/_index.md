@@ -28,7 +28,6 @@ Para definir o tipo de pergunta, introduza o nome do tipo na coluna `type` da fo
 |------|-----------|
 | [select_one listname](select-one) | Escolher exatamente uma opção de uma lista |
 | [select_multiple listname](select-multiple) | Escolher uma ou mais opções de uma lista |
-| [select_one_from_file filename](select-one-from-file) | Escolher uma opção carregada a partir de um ficheiro CSV externo |
 | [rank listname](rank) | Ordenar escolhas por preferência ou prioridade |
 
 ## Data e Hora
@@ -66,6 +65,18 @@ Para definir o tipo de pergunta, introduza o nome do tipo na coluna `type` da fo
 | [hidden](hidden) | Campo oculto que armazena um valor estático ou pré-preenchido |
 | [trigger / acknowledge](trigger) | Uma caixa de verificação que o enumerador deve marcar para confirmar que leu uma declaração |
 | [meta](meta) | Metadados automáticos: timestamps, ID do dispositivo, informação do enumerador |
+
+## Extensões rtSurvey
+
+Estes tipos são específicos do rtSurvey e não fazem parte da especificação XLSForm padrão.
+
+| Tipo | Descrição |
+|------|-----------|
+| [search-autocomplete](search-autocomplete) | Entrada de texto com sugestões de preenchimento automático em tempo real via API |
+| [mentions](mentions) | Campo de texto com preenchimento automático de menções `@` para identificar entidades inline |
+| [texttags](texttags) | Entrada de etiquetas — cada entrada torna-se um chip removível; armazenado como string separada por espaços |
+
+Para grupos de repetição, ver [Repeats](../advanced-extension/repeats)
 
 ## Como type e appearance funcionam em conjunto
 

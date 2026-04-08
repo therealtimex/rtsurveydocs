@@ -76,3 +76,27 @@ Image questions का उपयोग करते समय, विचार �
 - सभी devices में high-quality cameras या पर्याप्त storage space नहीं हो सकती।
 - बड़ी संख्या में images analyze करना time-consuming हो सकता है।
 - Photos capture करते समय, विशेषकर public spaces में, privacy concerns हो सकती हैं।
+
+## rtSurvey image extensions
+
+### watermark()
+
+`watermark()` appearance कैप्चर किए गए photos पर text watermark overlay करता है। watermark में आमतौर पर enumerator name, date/time, या GPS coordinates जैसे metadata होते हैं, जो image save होने से पहले सीधे उस पर stamp होते हैं।
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Site की photo लें | `watermark("${enumerator_id} ${today()}")` |
+
+`watermark()` का argument capture time पर evaluate किया गया XPath expression है। परिणामी string watermark text के रूप में render होती है।
+
+### editable
+
+`editable` appearance उत्तरदाता को photo लेने के बाद उस पर annotate या draw करने की अनुमति देता है। image के ऊपर एक drawing toolbar दिखाई देता है।
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Photo लें और concern areas को mark करें | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` को `watermark()` के साथ combine किया जा सकता है: `appearance: editable watermark("${id}")`
+{{% /alert %}}

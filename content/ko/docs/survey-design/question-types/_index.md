@@ -28,7 +28,6 @@ rtSurvey는 모든 표준 XLSForm 질문 유형과 여러 확장 기능을 지�
 |------|-------------|
 | [select_one listname](select-one) | 목록에서 정확히 하나의 옵션 선택 |
 | [select_multiple listname](select-multiple) | 목록에서 하나 이상의 옵션 선택 |
-| [select_one_from_file filename](select-one-from-file) | 양식에 첨부된 외부 CSV 파일에서 로드된 하나의 옵션 선택 |
 | [rank listname](rank) | 선호도나 우선순위에 따라 선택지 순서 지정 |
 
 ## 날짜 및 시간
@@ -66,6 +65,18 @@ rtSurvey는 모든 표준 XLSForm 질문 유형과 여러 확장 기능을 지�
 | [hidden](hidden) | 정적 또는 미리 채워진 값을 저장하는 숨겨진 필드 |
 | [trigger / acknowledge](trigger) | 조사원이 진술을 읽었음을 확인하기 위해 반드시 체크해야 하는 체크박스 |
 | [meta](meta) | 자동 메타데이터: 타임스탬프, 기기 ID, 조사원 정보 |
+
+## rtSurvey 확장
+
+이 유형들은 rtSurvey 전용이며 표준 XLSForm 사양의 일부가 아닙니다.
+
+| 유형 | 설명 |
+|------|------|
+| [search-autocomplete](search-autocomplete) | 실시간 API 기반 자동 완성 제안이 있는 텍스트 입력 |
+| [mentions](mentions) | 엔티티를 인라인으로 태그하기 위한 `@` 멘션 자동 완성이 있는 텍스트 필드 |
+| [texttags](texttags) | 태그 입력 — 각 항목이 제거 가능한 칩이 됨; 공백으로 구분된 문자열로 저장 |
+
+반복 그룹에 대해서는 [Repeats](../advanced-extension/repeats) 참조
 
 ## 유형과 appearance의 작동 방식
 

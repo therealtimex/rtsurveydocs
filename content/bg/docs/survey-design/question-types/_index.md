@@ -28,7 +28,6 @@ To set the question type, enter the type name in the `type` column of the **surv
 |------|-------------|
 | [select_one listname](select-one) | Pick exactly one option from a list |
 | [select_multiple listname](select-multiple) | Pick one or more options from a list |
-| [select_one_from_file filename](select-one-from-file) | Pick one option loaded from an external CSV file |
 | [rank listname](rank) | Order choices by preference or priority |
 
 ## Date and Time
@@ -66,6 +65,18 @@ To set the question type, enter the type name in the `type` column of the **surv
 | [hidden](hidden) | Hidden field that stores a static or prefilled value |
 | [trigger / acknowledge](trigger) | A checkbox the enumerator must tick to confirm they have read a statement |
 | [meta](meta) | Automatic metadata: timestamps, device ID, enumerator info |
+
+## Разширения на rtSurvey
+
+Тези типове са специфични за rtSurvey и не са част от стандартната спецификация XLSForm.
+
+| Тип | Описание |
+|-----|----------|
+| [search-autocomplete](search-autocomplete) | Текстово въвеждане с предложения за автоматично довършване на базата на API в реално време |
+| [mentions](mentions) | Текстово поле с автоматично довършване на `@`-споменавания за маркиране на обекти |
+| [texttags](texttags) | Поле за въвеждане на тагове — всяко въвеждане се превръща в премахваем чип; съхранява се като низ, разделен с интервали |
+
+За повтарящи се групи вижте [Repeats](../advanced-extension/repeats)
 
 ## How type and appearance work together
 

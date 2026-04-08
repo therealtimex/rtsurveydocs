@@ -38,3 +38,27 @@ Saglabātā vērtība ir faila nosaukums. Pats fails tiek saglabāts atsevišķ�
 2. Apsveriet privātumu — informējiet respondentus par fotoattēlu uzņemšanu.
 3. Pārbaudiet kameras funkcionalitāti gan priekšējā, gan aizmugurējā kamerā.
 4. Nodrošiniet pietiekami daudz uzglabāšanas vietas ierīcē.
+
+## rtSurvey attēla paplašinājumi
+
+### watermark()
+
+Izskata variants `watermark()` pārklāj teksta ūdenszīmi uz fotoattēliem, kas uzņemti ar šo lauku. Ūdenszīme parasti satur metadatus, piemēram, enumeratora vārdu, datumu/laiku vai GPS koordinātas, kas tiek iespiesti tieši uz attēla pirms saglabāšanas.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Uzņemiet objekta fotoattēlu | `watermark("${enumerator_id} ${today()}")` |
+
+Arguments `watermark()` funkcijai ir XPath izteiksme, kas tiek novērtēta uzņemšanas brīdī. Iegūtā virkne tiek renderēta kā ūdenszīmes teksts.
+
+### editable
+
+Izskata variants `editable` ļauj respondentam anotēt vai zīmēt uz uzņemtā fotoattēla pēc tā uzņemšanas. Virs attēla parādās zīmēšanas rīkjosla.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Fotografējiet un atzīmējiet problēmu zonas | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` var kombinēt ar `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

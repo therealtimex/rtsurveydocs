@@ -62,6 +62,16 @@ Az `appearance` oszlopban adjon meg értéket a lehetőségek megjelenítéséne
 | `columns(N)` | Megjelenítés N oszlopban (rtSurvey-bővítés, pl. `columns(3)`) |
 | `distress` | Kessler Pszichológiai Distressz (K10) érzelmi ikon widget |
 | `search-api(...)` | Dinamikus keresés – futásidőben tölt be lehetőségeket egy API-ból |
+| `tagging` | Kattintható cimke-chipekként jeleníti meg a lehetőségeket |
+| `boxtag` | Téglalap alakú stilizált dobozokként jeleníti meg a lehetőségeket |
+| `boxtag -search` | Boxtag elrendezés kereső beviteli mezővel |
+| `duolingo-style1` | Duolingo-ihlette kártyaelrendezés |
+| `rating_box` | Rácsalapú értékelődobozok |
+| `star_rating` | Csillagos értékelő widget |
+| `choices-noshow` | Az első 10 lehetőséget mutatja, a többi igény szerint |
+| `noshow` | Elrejti a lehetőséglistát; az értéket programozottan állítja be |
+| `checkall` | „Az összes kijelölése" lehetőséget ad |
+| `max-items(N)` | N-re korlátozza a látható lehetőségek számát |
 {{< /table >}}
 
 ### Példa: Likert-skála

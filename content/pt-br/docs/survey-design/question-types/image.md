@@ -76,3 +76,27 @@ Ao usar perguntas de imagem, considere:
 - Nem todos os dispositivos podem ter câmeras de alta qualidade ou espaço de armazenamento suficiente.
 - Analisar um grande número de imagens pode ser demorado.
 - Pode haver preocupações de privacidade ao capturar imagens, especialmente em espaços públicos.
+
+## Extensões de imagem do rtSurvey
+
+### watermark()
+
+A aparência `watermark()` sobrepõe uma marca d'água de texto nas fotos capturadas com este campo. A marca d'água normalmente contém metadados como o nome do entrevistador, data/hora ou coordenadas GPS, gravados diretamente na imagem antes de ser salva.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Tire uma foto do local | `watermark("${enumerator_id} ${today()}")` |
+
+O argumento de `watermark()` é uma expressão XPath avaliada no momento da captura. A string resultante é renderizada como o texto da marca d'água.
+
+### editable
+
+A aparência `editable` permite ao respondente anotar ou desenhar na foto capturada após tirá-la. Uma barra de ferramentas de desenho aparece sobre a imagem.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Fotografe e marque as áreas de preocupação | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` pode ser combinado com `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

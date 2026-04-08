@@ -38,6 +38,8 @@ As perguntas de texto são usadas para:
 |------------|-----------|
 | *(nenhuma)* | Entrada de texto de uma única linha |
 | `multiline` | Área de texto de múltiplas linhas — melhor para texto livre mais longo na web |
+| `richtext` | Editor de texto rico — barra de ferramentas com negrito, itálico, listas e links |
+| `typingtest` | Interface de teste de digitação — apresenta uma passagem e mede velocidade e precisão de digitação |
 
 ## Extensões de entrada de hora do rtSurvey
 

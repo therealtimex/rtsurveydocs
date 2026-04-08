@@ -38,6 +38,8 @@ Pertanyaan teks digunakan untuk:
 |------------|-----------|
 | *(tidak ada)* | Input teks satu baris |
 | `multiline` | Area teks multi-baris — terbaik untuk teks bebas yang lebih panjang di web |
+| `richtext` | Editor teks kaya — toolbar dengan opsi tebal, miring, daftar, dan tautan |
+| `typingtest` | Antarmuka uji mengetik — menampilkan teks dan mengukur kecepatan serta akurasi mengetik |
 
 ## Ekstensi input waktu rtSurvey
 

@@ -52,6 +52,21 @@ Bilder som samlas in via denna frågtyp:
 2. Lagras tillsammans med andra undersökningsdata, ofta i en separat mediamapp
 3. Är tillgängliga för visning och analys via undersökningshanteringsplattformen
 
+## rtSurvey utseendetillägg
+
+rtSurvey utökar `image`-typen med två ytterligare utseendealternativ:
+
+| Utseende | Beskrivning |
+|----------|-------------|
+| `watermark("uttryck")` | Lägger ett textvattenmärke över tagna foton. Argumentet är ett XPath-uttryck som utvärderas vid tagningsstunden. Exempel: `watermark("${id} ${today()}")` |
+| `editable` | Möjliggör anteckning/ritning ovanpå det tagna fotot innan det sparas |
+
+### Exempel: Vattenmärke med respondent-ID och datum
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Ta ett foto av platsen | `watermark("${respondent_id} ${today()}")` |
+
 ## Begränsningar
 
 - Bildfiler kan vara stora, vilket kan påverka dataöverföring och lagring.

@@ -93,6 +93,11 @@ rtSurvey는 양식 논리에 따라 동적 appearance 변경을 허용합니다:
 | `columns(n)` | select_one, select_multiple | `n` 열로 선택지를 표시합니다. 예시: `columns(3)`은 세 열의 라디오 버튼을 표시합니다. |
 | `gridformat<row=R col=C colspan=S align=center>` | any | 행 `R`, 열 `C`, `S` 열에 걸쳐 CSS 그리드 레이아웃에서 필드를 배치합니다. `advanced-extension/grid-layout`에서 사용됩니다. |
 | `ignore-simplify` | any | 양식 렌더러가 이 필드의 레이아웃 자동 단순화 또는 압축을 건너뛰도록 지시합니다. |
+| `required-but-simplify` | any | 필드는 필수이지만 레이아웃은 여전히 단순화됨 |
+| `embed` | any | 필드를 내장/인라인 표시 모드로 렌더링 |
+| `popup` | select_one, select_multiple | 선택지 목록을 팝업/모달 오버레이로 렌더링 |
+| `auto-hide-empty` | boxtag, select | 선택지 목록이 비어 있을 때 위젯 숨기기 |
+| `text-nolabel` | select_one, select_multiple | 각 선택지의 텍스트 레이블 숨기기 |
 
 ### 위젯
 
@@ -100,6 +105,52 @@ rtSurvey는 양식 논리에 따라 동적 appearance 변경을 허용합니다:
 |----------------------|----------------|-------------|
 | `likert` | select_one | 선택지를 Likert 척도 행으로 표시합니다 (이미 표준 표에 있음; 지원 확인됨). |
 | `distress` | select_one | 선택지를 감정 아이콘이 있는 Kessler 심리적 고통 척도 (K10) 시각적 위젯으로 렌더링합니다. |
+
+### 선택 시각적 위젯
+
+| Appearance 속성 | 질문 유형 | 설명 |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | 선택지를 클릭 가능한 태그 칩으로 표시 |
+| `boxtag` | select_one, select_multiple | 선택지를 스타일화된 직사각형 박스로 표시 |
+| `boxtag -search` | select_one, select_multiple | 박스 위에 검색/필터 입력이 있는 Boxtag 레이아웃 |
+| `duolingo-style1` | select_one, select_multiple | 대형 카드 레이아웃 — 짧은 선택지 목록에 최적 |
+| `rating_box` | select_one, select_multiple | 그리드 기반 평점 박스 |
+| `star_rating` | select_one | 별점 위젯 — 선택지가 1–N 개의 별로 렌더링됨 |
+| `choices-noshow` | select_one, select_multiple | 처음에 처음 10개의 선택지만 표시; 나머지는 요청 시 |
+| `noshow` | select_one, select_multiple | 선택지 목록을 완전히 숨김; 값은 프로그래밍 방식으로 설정 |
+| `checkall` | select_multiple | 목록 상단에 "모두 선택" 옵션 추가 |
+| `max-items(N)` | select_one, select_multiple | 보이는 선택지 수를 N으로 제한 |
+
+### 텍스트 시각적 위젯
+
+| Appearance 속성 | 질문 유형 | 설명 |
+|----------------------|----------------|-------------|
+| `richtext` | text | 서식 있는 텍스트 편집기 — 굵게, 기울임, 목록 및 링크가 있는 도구 모음 |
+| `typingtest` | text | 타이핑 테스트 인터페이스 — 텍스트를 제시하고 타이핑 속도와 정확도를 측정 |
+
+### 미디어 확장
+
+| Appearance 속성 | 질문 유형 | 설명 |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | 캡처된 사진에 텍스트 워터마크를 오버레이; 표현식은 캡처 시 평가됨 |
+| `editable` | image | 응답자가 사진 촬영 후 이미지에 주석을 달고 그림을 그릴 수 있게 함 |
+
+### 인라인 표시 구성
+
+`display{}` 매개변수는 인라인 표시 동작을 구성합니다:
+
+| 매개변수 | 설명 |
+|---------|------|
+| `display{title="레이블"}` | 인라인 표시를 위한 사용자 지정 제목 설정 |
+| `display{icon="icon_name"}` | 인라인 표시를 위한 아이콘 설정 |
+| `display{color="RRGGBB"}` | 인라인 표시를 위한 사용자 지정 색상 설정 |
+
+`results{}` 매개변수는 결과 표시를 구성합니다:
+
+| 매개변수 | 설명 |
+|---------|------|
+| `results{format="pattern"}` | 결과 표시를 위한 형식 패턴 설정 |
+| `results{show=true}` | 결과를 인라인으로 표시 |
 
 ### API 통합
 

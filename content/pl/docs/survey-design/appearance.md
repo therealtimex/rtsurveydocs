@@ -71,6 +71,94 @@ rtSurvey umożliwia dynamiczne zmiany wyglądu na podstawie logiki formularza:
 - Niektóre wyglądy (np. `quick`, `signature`) są specyficzne dla urządzeń mobilnych.
 - Testuj dokładnie zarówno na Android, jak i iOS, aby zapewnić spójne działanie.
 
+## Rozszerzone atrybuty wyglądu rtSurvey
+
+Oprócz standardowych wyglądów XLSForm, rtSurvey obsługuje następujące opcje specyficzne dla platformy:
+
+### Układ
+
+| Atrybut wyglądu | Typy pytań | Opis |
+|-----------------|------------|------|
+| `1screen` | group | Wymusza wyświetlenie całej grupy na jednym ekranie niezależnie od jej rozmiaru. |
+| `columns(n)` | select_one, select_multiple | Wyświetla opcje w `n` kolumnach. Przykład: `columns(3)` pokazuje trzy kolumny przycisków radiowych. |
+| `gridformat<row=R col=C colspan=S align=center>` | dowolny | Umieszcza pole w układzie CSS-grid w wierszu `R`, kolumnie `C`, obejmując `S` kolumn. |
+| `ignore-simplify` | dowolny | Instruuje renderer formularza, aby pominął automatyczne upraszczanie układu tego pola. |
+| `required-but-simplify` | dowolny | Pole jest wymagane, ale jego układ jest nadal upraszczany przez renderer. |
+| `embed` | dowolny | Renderuje pole w trybie wbudowanym/inline, pomijając zewnętrzne opakowanie i kontener etykiety. |
+| `popup` | select_one, select_multiple | Renderuje listę opcji w nakładce popup/modal zamiast inline. |
+| `auto-hide-empty` | boxtag, select | Ukrywa cały widget pytania, gdy lista opcji jest pusta (np. brak wyników API). |
+| `text-nolabel` | select_one, select_multiple | Ukrywa etykietę tekstową każdej opcji, pokazując tylko element sterowania wejściem. |
+
+### Wizualne widgety wyboru
+
+Te wyglądy zmieniają całe renderowanie list opcji select.
+
+| Atrybut wyglądu | Typy pytań | Opis |
+|-----------------|------------|------|
+| `tagging` | select_one, select_multiple | Opcje renderowane jako klikalne chipsy tagów w kształcie pigułki. |
+| `boxtag` | select_one, select_multiple | Opcje renderowane jako prostokątne stylowe pola, które użytkownik dotyka. |
+| `boxtag -search` | select_one, select_multiple | Układ boxtag z live polem wyszukiwania/filtrowania nad polami. |
+| `duolingo-style1` | select_one, select_multiple | Duży układ kart inspirowany Duolingo — odpowiedni dla krótkich list z ikonami. |
+| `rating_box` | select_one, select_multiple | Siatka klikaliwych ponumerowanych pól — odpowiednia dla pytań skali lub NPS. |
+| `star_rating` | select_one | Opcje renderowane jako gwiazdki; liczba gwiazdek równa liczbie opcji. |
+| `choices-noshow` | select_one, select_multiple | Początkowo pokazuje tylko pierwsze 10 opcji z kontrolką "Pokaż więcej". |
+| `noshow` | select_one, select_multiple | Całkowicie ukrywa listę opcji; wartość jest ustawiana programowo przez `calculate` lub API. |
+| `checkall` | select_multiple | Dodaje skrót "Zaznacz wszystkie" na górze listy opcji. |
+| `max-items(N)` | select_one, select_multiple | Ogranicza widoczną listę opcji do N elementów. Przykład: `max-items(5)`. |
+
+### Wizualne widgety tekstu
+
+| Atrybut wyglądu | Typy pytań | Opis |
+|-----------------|------------|------|
+| `richtext` | text | Zastępuje zwykłe pole tekstowe edytorem tekstu sformatowanego (pogrubienie, kursywa, listy, linki). Przechowuje HTML. |
+| `typingtest` | text | Widget testu pisania — tekst etykiety jest fragmentem; widget rejestruje wpisaną odpowiedź i czas. |
+
+### Rozszerzenia mediów
+
+| Atrybut wyglądu | Typy pytań | Opis |
+|-----------------|------------|------|
+| `watermark("wyrażenie")` | image | Nakłada tekstowy znak wodny na zrobione zdjęcia. Argument jest wyrażeniem XPath ocenianym w momencie fotografowania. Przykład: `watermark("${id} ${today()}")`. |
+| `editable` | image | Umożliwia adnotację/rysowanie na wykonanym zdjęciu przed zapisaniem. |
+
+### Konfiguracja wyświetlania inline
+
+Modyfikatory `display{}` i `results{}` można dołączyć do wyglądów `inline` w celu sterowania wyrównaniem ikon i wyświetlaniem wyników. Są używane razem z rozszerzeniem wprowadzania czasu `inline` na polach `text` i z widgetami przechwytywania multimediów.
+
+#### Parametry `display{}`
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parametr | Wartości | Opis |
+|----------|---------|------|
+| Wyrównanie | `left`, `right`, `top`, `bottom`, `center` | Pozycja ikony względem pola wejściowego |
+| Rozmiar | `small`, `medium`, `large` | Rozmiar ikony (odpowiada 2,5 rem, 5 rem, 8 rem) |
+| Tryb | `inline-icon` | Renderuje wyzwalacz jako samą ikonę (bez obramowania przycisku) |
+| Tryb | `inline-button` | Renderuje wyzwalacz jako pełny przycisk |
+
+#### Parametry `results{}`
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parametr | Wartości | Opis |
+|----------|---------|------|
+| Wyrównanie | `left`, `right`, `top`, `bottom`, `center` | Pozycja wyświetlania wartości wyniku |
+| `hide(pole)` | dowolna nazwa podpola | Ukrywa określony składnik wyniku (np. `hide(seconds)`) |
+
+### Integracja API
+
+| Atrybut wyglądu | Typy pytań | Opis |
+|-----------------|------------|------|
+| `callapi` | text, integer, decimal, select_one | Włącza integrację wywołania API dla tego pola. Kolumna calculation powinna zawierać wyrażenie `callapi()`. Zobacz [Call API](advanced-extension/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Wyzwala wywołanie weryfikacji API przy użyciu statycznych parametrów. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Jak `callapi-verify`, ale z parametrami pochodzi z innych wartości pól w czasie wykonania. |
+
 ## Znane ograniczenia
 
 - Złożone wyglądy mogą nie renderować się identycznie na wszystkich platformach.

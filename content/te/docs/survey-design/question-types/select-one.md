@@ -57,6 +57,16 @@ Select_one ప్రశ్నలు వీటికి ఉపయోగిస్�
 | `columns(N)` | N columns లో ప్రదర్శించు (rtSurvey పొడిగింపు, ఉదా. `columns(3)`) |
 | `distress` | Kessler Psychological Distress (K10) emotional icon widget |
 | `search-api(...)` | డైనమిక్ శోధన — రన్‌టైమ్‌లో API నుండి ఎంపికలు లోడ్ చేస్తుంది |
+| `tagging` | ఎంపికలు క్లిక్ చేయగలిగే pill-ఆకారపు tag chips గా రెండర్ చేయబడతాయి |
+| `boxtag` | ఎంపికలు వినియోగదారు నొక్కే styled rectangular boxes గా రెండర్ చేయబడతాయి |
+| `boxtag -search` | Boxes పైన live search/filter input తో boxtag layout |
+| `duolingo-style1` | Duolingo స్ఫూర్తిపొందిన card layout — icons తో పెద్ద tappable cards |
+| `rating_box` | Grid-ఆధారిత rating boxes — numeric లేదా scale ప్రశ్నలకు అనుకూలం |
+| `star_rating` | Star rating widget — ఎంపికలు 1–N stars గా రెండర్ చేయబడతాయి |
+| `choices-noshow` | మొదట్లో కేవలం మొదటి 10 ఎంపికలు చూపిస్తుంది; మిగిలినవి అవసరాన్ని బట్టి వెల్లడి చేస్తుంది |
+| `noshow` | ఎంపికల జాబితాను పూర్తిగా దాచుతుంది; విలువ programmatically సెట్ చేయబడుతుంది |
+| `checkall` | జాబితా పైభాగంలో "అన్నీ ఎంచుకో" సత్వర మార్గం జోడిస్తుంది |
+| `max-items(N)` | కనిపించే ఎంపికల జాబితాను N కు పరిమితం చేస్తుంది (ఉదా. `max-items(5)`) |
 {{< /table >}}
 
 ### ఉదాహరణ: Likert scale

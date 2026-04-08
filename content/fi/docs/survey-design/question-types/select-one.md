@@ -62,6 +62,16 @@ Määritä arvo `appearance`-sarakkeessa muuttaaksesi, miten valinnat näytetä�
 | `columns(N)` | Näyttää N sarakkeessa (rtSurvey-laajennus, esim. `columns(3)`) |
 | `distress` | Kessler Psychological Distress (K10) emotionaalinen ikoniwidget |
 | `search-api(...)` | Dynaaminen haku — lataa valinnat API:lta ajonaikana |
+| `tagging` | Näyttää valinnat klikattavina tagi-chipeinä radiopainikkeiden sijaan |
+| `boxtag` | Näyttää valinnat tyylikäs suorakulmainen bokseina, joita käyttäjä napauttaa valitakseen |
+| `boxtag -search` | Boxtag-asettelu haku-/suodatussyötteellä boksien yläpuolella |
+| `duolingo-style1` | Duolingo-inspiroitu korttiasettelu — suuret napautettavat kortit ikoneilla |
+| `rating_box` | Ruudukkopohjainen arviointiboxi — parhaiten numeerisille tai asteikkovaihtoehdoille |
+| `star_rating` | Tähtiarviointiwidget — valinnat näytetään 1–N tähtinä |
+| `choices-noshow` | Näyttää aluksi vain ensimmäiset 10 vaihtoehtoa; paljastaa loput tarvittaessa |
+| `noshow` | Piilottaa valikaluettelon kokonaan; arvo asetetaan ohjelmallisesti |
+| `checkall` | Lisää "Valitse kaikki" -vaihtoehdon luettelon alkuun |
+| `max-items(N)` | Rajoittaa näkyvien valintojen määrän N:ään |
 {{< /table >}}
 
 ### Esimerkki: Likert-asteikko

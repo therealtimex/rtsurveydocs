@@ -28,7 +28,6 @@ question type सेट करने के लिए, अपने XLSForm क�
 |------|-------------|
 | [select_one listname](select-one) | एक list से ठीक एक विकल्प चुनें |
 | [select_multiple listname](select-multiple) | एक list से एक या अधिक विकल्प चुनें |
-| [select_one_from_file filename](select-one-from-file) | बाहरी CSV file से load किया गया एक विकल्प चुनें |
 | [rank listname](rank) | preference या priority के अनुसार choices को order करें |
 
 ## Date और Time
@@ -66,6 +65,18 @@ question type सेट करने के लिए, अपने XLSForm क�
 | [hidden](hidden) | Hidden field जो static या prefilled value store करता है |
 | [trigger / acknowledge](trigger) | एक checkbox जिसे गणनाकर्ता को एक statement पढ़ने की पुष्टि करने के लिए tick करना होगा |
 | [meta](meta) | Automatic metadata: timestamps, device ID, enumerator की जानकारी |
+
+## rtSurvey एक्सटेंशन
+
+ये प्रकार rtSurvey-विशिष्ट हैं और मानक XLSForm विशिष्टता का हिस्सा नहीं हैं।
+
+| प्रकार | विवरण |
+|--------|-------|
+| [search-autocomplete](search-autocomplete) | रियल-टाइम API-आधारित ऑटोकम्पलीट सुझावों के साथ टेक्स्ट इनपुट |
+| [mentions](mentions) | इनलाइन संस्थाओं को टैग करने के लिए `@` मेंशन ऑटोकम्पलीट वाला टेक्स्ट फ़ील्ड |
+| [texttags](texttags) | टैग इनपुट — प्रत्येक एंट्री एक हटाने योग्य चिप बन जाती है; स्पेस-विभाजित स्ट्रिंग के रूप में संग्रहीत |
+
+दोहराव समूहों के लिए देखें: [Repeats](../advanced-extension/repeats)
 
 ## Type और appearance एक साथ कैसे काम करते हैं
 

@@ -40,3 +40,27 @@ Afbeeldingsvragen worden veelgebruikt voor:
 - Niet alle apparaten hebben camera's van hoge kwaliteit of voldoende opslagruimte.
 - Het analyseren van grote aantallen afbeeldingen kan tijdrovend zijn.
 - Er kunnen privacyproblemen zijn bij het vastleggen van afbeeldingen, vooral in openbare ruimten.
+
+## rtSurvey afbeeldingsuitbreidingen
+
+### watermark()
+
+De `watermark()`-weergave plaatst een tekstwatermerk over foto's die met dit veld zijn gemaakt. Het watermerk bevat doorgaans metadata zoals de naam van de enumerator, datum/tijd of GPS-coördinaten, direct op de afbeelding gestempeld voordat deze wordt opgeslagen.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Maak een foto van de locatie | `watermark("${enumerator_id} ${today()}")` |
+
+Het argument van `watermark()` is een XPath-expressie die wordt geëvalueerd op het moment van vastleggen. De resulterende string wordt weergegeven als watermerktekst.
+
+### editable
+
+De `editable`-weergave stelt de respondent in staat om de gemaakte foto na het nemen ervan te annoteren of op te tekenen. Een tekeningwerkbalk verschijnt over de afbeelding.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Fotografeer en markeer aandachtsgebieden | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` kan worden gecombineerd met `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

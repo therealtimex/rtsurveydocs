@@ -65,3 +65,27 @@ Naudojant vaizdo klausimus, atsižvelkite į:
 - Ne visi įrenginiai gali turėti aukštos kokybės fotoaparatus ar pakankamai saugyklos vietos.
 - Didelių vaizdų kiekio analizė gali būti daug laiko reikalaujanti.
 - Fiksuojant vaizdus, ypač viešose vietose, gali kilti privatumo problemų.
+
+## rtSurvey vaizdo plėtiniai
+
+### watermark()
+
+Išvaizdos variantas `watermark()` uždeda teksto vandens ženklą ant nuotraukų, užfiksuotų su šiuo lauku. Vandens ženklas paprastai yra metaduomenys, tokie kaip surašytojo vardas, data/laikas arba GPS koordinatės, antspauduotos tiesiai ant vaizdo prieš išsaugojimą.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Nufotografuokite objektą | `watermark("${enumerator_id} ${today()}")` |
+
+`watermark()` argumentas yra XPath išraiška, įvertinta fiksavimo metu. Gauta eilutė atvaizduojama kaip vandens ženklo tekstas.
+
+### editable
+
+Išvaizdos variantas `editable` leidžia respondentui anotuoti arba piešti ant užfiksuotos nuotraukos po jos padarymo. Virš vaizdo atsiranda piešimo įrankių juosta.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Fotografuokite ir pažymėkite probleminias sritis | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` gali būti derinamas su `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

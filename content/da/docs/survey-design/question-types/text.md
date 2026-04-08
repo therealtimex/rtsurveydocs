@@ -38,6 +38,8 @@ Tekstspørgsmål bruges til:
 |------------|-------------|
 | *(ingen)* | Enkeltlinjet tekstinput |
 | `multiline` | Flerlinjers tekstområde — bedst til længere fritekst på web |
+| `richtext` | Erstatter det almindelige tekstfelt med en teksteditor med formatering (fed, kursiv, lister, links). Gemmer HTML |
+| `typingtest` | Skrivetestewidget — labelteksten er passagen; widgetten registrerer det skrevne svar og tidspunktet |
 
 ## rtSurvey-tidsinputudvidelser
 

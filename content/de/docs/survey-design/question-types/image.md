@@ -78,3 +78,27 @@ Berücksichtigen Sie bei der Verwendung von `image`-Fragen:
 - Nicht alle Geräte verfügen über hochwertige Kameras oder ausreichend Speicherplatz.
 - Die Analyse einer großen Anzahl von Bildern kann zeitaufwendig sein.
 - Beim Aufnehmen von Bildern können Datenschutzbedenken aufkommen, insbesondere im öffentlichen Raum.
+
+## rtSurvey-Bild-Erweiterungen
+
+### watermark()
+
+Das Erscheinungsbild `watermark()` legt ein Text-Wasserzeichen auf mit diesem Feld aufgenommene Fotos. Das Wasserzeichen enthält typischerweise Metadaten wie den Namen des Interviewers, Datum/Uhrzeit oder GPS-Koordinaten, die direkt vor dem Speichern auf das Bild gestempelt werden.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Foto vom Standort aufnehmen | `watermark("${enumerator_id} ${today()}")` |
+
+Das Argument von `watermark()` ist ein XPath-Ausdruck, der zum Zeitpunkt der Aufnahme ausgewertet wird. Die resultierende Zeichenkette wird als Wasserzeichen-Text gerendert.
+
+### editable
+
+Das Erscheinungsbild `editable` ermöglicht es dem Befragten, das aufgenommene Foto nach der Aufnahme zu kommentieren oder darauf zu zeichnen. Eine Zeichenwerkzeugleiste erscheint über dem Bild.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Foto aufnehmen und Problembereiche markieren | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` kann mit `watermark()` kombiniert werden: `appearance: editable watermark("${id}")`
+{{% /alert %}}

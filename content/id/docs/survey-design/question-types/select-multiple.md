@@ -64,6 +64,14 @@ Pertanyaan select_multiple digunakan untuk:
 | `label` | Hanya menampilkan label, tanpa kotak centang (gunakan dengan `list-nolabel`) |
 | `list-nolabel` | Hanya menampilkan kotak centang, tanpa label (gunakan dengan `label`) |
 | `columns(N)` | Tampilkan dalam N kolom (ekstensi rtSurvey) |
+| `tagging` | Pilihan dirender sebagai chip tag berbentuk pil |
+| `boxtag` | Pilihan dirender sebagai kotak persegi panjang bergaya |
+| `boxtag -search` | Tata letak Boxtag dengan input pencarian/filter di atas kotak |
+| `duolingo-style1` | Tata letak kartu besar — terbaik untuk daftar pilihan pendek |
+| `rating_box` | Kotak penilaian berbasis grid |
+| `choices-noshow` | Menampilkan 10 pilihan pertama awalnya; mengungkap sisanya sesuai permintaan |
+| `checkall` | Menambahkan opsi "Pilih semua" di bagian atas daftar |
+| `max-items(N)` | Membatasi jumlah pilihan yang terlihat menjadi N |
 {{< /table >}}
 
 ### Contoh: Tata letak kompak 3 kolom

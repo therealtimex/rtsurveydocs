@@ -76,3 +76,27 @@ Kur përdorni pyetjet image, konsideroni:
 - Jo të gjitha pajisjet mund të kenë kamera me cilësi të lartë ose hapësirë të mjaftueshme ruajtjeje.
 - Analizimi i numrave të mëdhenj të imazheve mund të jetë i ngadalshëm.
 - Mund të ketë shqetësime privatësie kur kapni imazhe, veçanërisht në hapësirat publike.
+
+## Zgjerime imazhi rtSurvey
+
+### watermark()
+
+Pamja `watermark()` mbivendos një filigran teksti mbi fotografitë e kapturuara me këtë fushë. Filigrani zakonisht përmban metadata si emrin e numëruesit, datën/orën, ose koordinatat GPS, vulosur direkt mbi imazh para se të ruhet.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Fotografoni faqen | `watermark("${enumerator_id} ${today()}")` |
+
+Argumenti i `watermark()` është një shprehje XPath e vlerësuar në kohën e kapjes. Vargu rezultues renderohet si teksti i filigranit.
+
+### editable
+
+Pamja `editable` lejon të anketuarin të komentojë ose vizatojë mbi fotografinë e kapur pasi e ka nxjerrë. Një shirit vizatimi shfaqet mbi imazh.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Fotografoni dhe shënoni zonat problematike | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` mund të kombinohet me `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

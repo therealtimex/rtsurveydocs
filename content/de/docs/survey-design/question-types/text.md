@@ -38,6 +38,8 @@ Text-Fragen werden verwendet für:
 |-----------------|-------------|
 | *(keine)* | Einzeiliges Texteingabefeld |
 | `multiline` | Mehrzeiliges Textfeld — am besten für längere Freitexte im Web |
+| `richtext` | Rich-Text-Editor — Symbolleiste mit Fett, Kursiv, Listen und Links |
+| `typingtest` | Tipptest-Oberfläche — zeigt einen Text und misst Tippgeschwindigkeit und -genauigkeit |
 
 ## rtSurvey-Zeiteingabe-Erweiterungen
 

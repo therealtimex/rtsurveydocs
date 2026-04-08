@@ -38,6 +38,8 @@ rtSurvey ក៏ពង្រីក `text` ជាមួយ **time input widgets** 
 |------------|-------------|
 | *(none)* | Single-line text input |
 | `multiline` | Multi-line text area — ល្អបំផុតសម្រាប់អក្សរទំហំធំលើ web |
+| `richtext` | Rich text editor — toolbar ជាមួយ bold, italic, lists, និង links |
+| `typingtest` | ចំណុចប្រទាក់ typing test — បង្ហាញអត្ថបទហើយវាស់ល្បឿន និងភាពត្រឹមត្រូវក្នុងការវាយ |
 
 ## ផ្នែកពង្រីក time input របស់ rtSurvey
 

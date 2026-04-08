@@ -62,6 +62,14 @@ Select_multiple-spørsmål brukes for:
 | `label` | Viser bare etiketter, ingen avkrysningsbokser (bruk med `list-nolabel`) |
 | `list-nolabel` | Viser bare avkrysningsbokser, ingen etiketter (bruk med `label`) |
 | `columns(N)` | Vis i N kolonner (rtSurvey-utvidelse) |
+| `tagging` | Valg gjengis som pillformede tag-chips |
+| `boxtag` | Valg gjengis som rektangulære stiliserte bokser |
+| `boxtag -search` | Boxtag-oppsett med et søke-/filtreringsfelt over boksene |
+| `duolingo-style1` | Stort kortoppsett — best for korte valglister |
+| `rating_box` | Gridbaserte vurderingsbokser |
+| `choices-noshow` | Viser de første 10 valgene innledningsvis; avslører resten på forespørsel |
+| `checkall` | Legger til et "Velg alle"-alternativ øverst i listen |
+| `max-items(N)` | Begrenser antall synlige valg til N |
 {{< /table >}}
 
 ### Eksempel: 3-kolonne kompakt oppsett

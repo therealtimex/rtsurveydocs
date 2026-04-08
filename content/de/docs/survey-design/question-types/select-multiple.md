@@ -64,6 +64,14 @@ Select_multiple-Fragen werden verwendet für:
 | `label` | Zeigt nur Beschriftungen, keine Kontrollkästchen (zusammen mit `list-nolabel` verwenden) |
 | `list-nolabel` | Zeigt nur Kontrollkästchen, keine Beschriftungen (zusammen mit `label` verwenden) |
 | `columns(N)` | Anzeige in N Spalten (rtSurvey-Erweiterung) |
+| `tagging` | Auswahlmöglichkeiten werden als pillenförmige Tag-Chips dargestellt |
+| `boxtag` | Auswahlmöglichkeiten werden als gestaltete rechteckige Boxen dargestellt |
+| `boxtag -search` | Boxtag-Layout mit Such-/Filtereingabe über den Boxen |
+| `duolingo-style1` | Großes Kartenlayout — am besten für kurze Auswahllisten |
+| `rating_box` | Rasterbasierte Bewertungsboxen |
+| `choices-noshow` | Zeigt zunächst die ersten 10 Optionen; blendet den Rest auf Anfrage ein |
+| `checkall` | Fügt oben in der Liste eine Option "Alle auswählen" hinzu |
+| `max-items(N)` | Begrenzt die sichtbaren Auswahlmöglichkeiten auf N |
 {{< /table >}}
 
 ### Beispiel: 3-Spalten-kompaktes Layout

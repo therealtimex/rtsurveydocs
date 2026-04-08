@@ -62,6 +62,16 @@ Angiv en værdi i kolonnen `appearance` for at ændre, hvordan valg vises:
 | `columns(N)` | Vis i N kolonner (rtSurvey-udvidelse, f.eks. `columns(3)`) |
 | `distress` | Kessler Psykologisk Stressskala (K10) emotionel ikonwidget |
 | `search-api(...)` | Dynamisk søgning — indlæser valg fra et API ved kørselstid |
+| `tagging` | Viser valgmuligheder som klikbare tag-chips i stedet for radioknapper |
+| `boxtag` | Viser valgmuligheder som stilede rektangulære bokse, som brugeren trykker på for at vælge |
+| `boxtag -search` | Boxtag-layout med et søge-/filterinput over boksene |
+| `duolingo-style1` | Duolingo-inspireret kortlayout — store klikbare kort med ikoner |
+| `rating_box` | Gitterbaserede vurderingsbokse — bedst til numeriske valg eller skalerede valg |
+| `star_rating` | Stjernebedømmelseswidget — valgmuligheder gengives som 1–N stjerner |
+| `choices-noshow` | Viser kun de første 10 valgmuligheder indledningsvis; afslører resten efter behov |
+| `noshow` | Skjuler valglisten helt; værdien angives programmatisk |
+| `checkall` | Tilføjer en "Vælg alle"-mulighed øverst på listen |
+| `max-items(N)` | Begrænser antallet af synlige valgmuligheder til N |
 {{< /table >}}
 
 ### Eksempel: Likert-skala

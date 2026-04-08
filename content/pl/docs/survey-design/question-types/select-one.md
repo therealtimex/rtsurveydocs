@@ -62,6 +62,16 @@ Podaj wartość w kolumnie `appearance`, aby zmienić sposób wyświetlania opcj
 | `columns(N)` | Wyświetlanie w N kolumnach (rozszerzenie rtSurvey, np. `columns(3)`) |
 | `distress` | Widget ikon emocji Kessler Psychological Distress (K10) |
 | `search-api(...)` | Dynamiczne wyszukiwanie — ładuje opcje z API w czasie rzeczywistym |
+| `tagging` | Wyświetla opcje jako klikalne chipsy tagów zamiast przycisków radiowych |
+| `boxtag` | Wyświetla opcje jako stylowe prostokątne pola, które użytkownik dotyka, aby wybrać |
+| `boxtag -search` | Układ boxtag z polem wyszukiwania/filtrowania nad polami |
+| `duolingo-style1` | Układ kart inspirowany Duolingo — duże klikalne karty z ikonami |
+| `rating_box` | Pola oceny w siatce — najlepsze dla opcji numerycznych lub skali |
+| `star_rating` | Widget oceniania gwiazdkami — opcje wyświetlane jako 1–N gwiazdek |
+| `choices-noshow` | Początkowo wyświetla tylko pierwsze 10 opcji; ujawnia pozostałe na żądanie |
+| `noshow` | Całkowicie ukrywa listę opcji; wartość jest ustawiana programowo |
+| `checkall` | Dodaje opcję "Zaznacz wszystkie" na górze listy |
+| `max-items(N)` | Ogranicza liczbę widocznych opcji do N |
 {{< /table >}}
 
 ### Przykład: Skala Likerta

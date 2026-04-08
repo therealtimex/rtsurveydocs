@@ -64,3 +64,27 @@ Bilder samlet inn gjennom denne spørsmålstypen er vanligvis:
 - Ikke alle enheter kan ha høykvalitetskamera eller tilstrekkelig lagringsplass.
 - Å analysere store mengder bilder kan være tidkrevende.
 - Det kan være personvernbekymringer ved bildetaking, spesielt på offentlige steder.
+
+## rtSurvey bildeudvidelser
+
+### watermark()
+
+`watermark()`-utseendet legger et tekstvannmerke over bilder tatt med dette feltet. Vannmerket inneholder vanligvis metadata som teller-navn, dato/tid eller GPS-koordinater, stemplet direkte på bildet før det lagres.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Ta et bilde av stedet | `watermark("${enumerator_id} ${today()}")` |
+
+Argumentet til `watermark()` er et XPath-uttrykk som evalueres ved opptakstidspunktet. Den resulterende strengen gjengis som vannmerketekst.
+
+### editable
+
+`editable`-utseendet lar respondenten kommentere eller tegne på det tatte bildet etter å ha tatt det. En tegningsverktøylinje vises over bildet.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Fotografer og merk bekymringsområder | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` kan kombineres med `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

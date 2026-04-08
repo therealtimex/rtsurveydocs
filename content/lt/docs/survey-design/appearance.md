@@ -93,6 +93,11 @@ Be standartinių XLSForm išvaizadų, rtSurvey palaiko šias platformai būdinga
 | `columns(n)` | select_one, select_multiple | Rodo pasirinkimus `n` stulpeliuose. Pavyzdys: `columns(3)` rodo tris radijo mygtukų stulpelius. |
 | `gridformat<row=R col=C colspan=S align=center>` | bet koks | Nustato lauką CSS-tinklelio išdėstyme eilutėje `R`, stulpelyje `C`, apimant `S` stulpelius. Naudojama su `advanced-extension/grid-layout`. |
 | `ignore-simplify` | bet koks | Nurodo formos vaizdinimui praleisti automatinį šio lauko išdėstymo supaprastinimą ar suspaudimą. |
+| `required-but-simplify` | bet koks | Laukas yra privalomas, bet jo išdėstymas vis tiek supaprastinamas vaizdintojo (nepaiso numatytosios elgsenos, kai privalomi laukai atmetami iš supaprastinimo). |
+| `embed` | bet koks | Renderuoja lauką įterptame/inline rodymo režime, slopinant jo išorinį apvalkalą ir etiketės konteinerį — naudojama, kai klausimas yra įterpiamas į pasirinktinį HTML. |
+| `popup` | select_one, select_multiple | Renderuoja pasirinkimų sąrašą popup/modal perdangoje, o ne inline. |
+| `auto-hide-empty` | boxtag, select | Paslepia visą klausimo valdiklį, kai pasirinkimų sąrašas yra tuščias (pvz., grąžintų API rezultatų nėra). |
+| `text-nolabel` | select_one, select_multiple | Paslepia teksto etiketę kiekvienam pasirinkimui, rodydamas tik įvesties valdiklį. Panašus į `list-nolabel`, bet taikomas kiekvienam pasirinkimui, o ne kaip stulpelio padalijimas. |
 
 ### Valdikliai
 
@@ -100,6 +105,68 @@ Be standartinių XLSForm išvaizadų, rtSurvey palaiko šias platformai būdinga
 |----------------------|----------------|-------------|
 | `likert` | select_one | Pateikia pasirinkimus kaip Likerto skalės eilutę (jau standartinėje lentelėje aukščiau; patvirtinta, kad palaikoma). |
 | `distress` | select_one | Vaizduoja pasirinkimus kaip Keslerio psichologinio distreso skalės (K10) vizualinį valdiklį su emocinėmis piktogramomis. |
+
+### Pasirinkimo vizualiniai valdikliai
+
+Šie išvaizdos variantai keičia visą pasirinkimų sąrašų renderavimą.
+
+| Išvaizdos atributas | Klausimų tipai | Aprašymas |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Pasirinkimai renderuojami kaip spustelėjami pill formos žymų čipsai. |
+| `boxtag` | select_one, select_multiple | Pasirinkimai renderuojami kaip stilizuoti stačiakampiai laukeliai, kuriuos vartotojas paliečia. |
+| `boxtag -search` | select_one, select_multiple | Boxtag išdėstymas su gyvu paieškos/filtravimo įvedimu virš laukelių. |
+| `duolingo-style1` | select_one, select_multiple | Duolingo įkvėptas kortelių išdėstymas — tinkamas trumpiems sąrašams su piktogramomis. |
+| `rating_box` | select_one, select_multiple | Paliečiamų sunumeruotų laukelių tinklelis — tinkamas skalės ar NPS klausimams. |
+| `star_rating` | select_one | Pasirinkimai renderuojami kaip žvaigždės; žvaigždžių skaičius lygus pasirinkimų skaičiui. |
+| `choices-noshow` | select_one, select_multiple | Iš pradžių rodo tik pirmus 10 pasirinkimų su valdikliu „Rodyti daugiau". |
+| `noshow` | select_one, select_multiple | Visiškai slepia pasirinkimų sąrašą; reikšmė nustatoma programatiškai per `calculate` ar API. |
+| `checkall` | select_multiple | Prideda „Pasirinkti visus" sparčiąją nuorodą pasirinkimų sąrašo viršuje. |
+| `max-items(N)` | select_one, select_multiple | Apriboja matomą pasirinkimų sąrašą iki N elementų. Pavyzdys: `max-items(5)`. |
+
+### Teksto vizualiniai valdikliai
+
+| Išvaizdos atributas | Klausimų tipai | Aprašymas |
+|----------------------|----------------|-------------|
+| `richtext` | text | Pakeičia paprastą teksto lauką raiškiojo teksto redaktoriumi (paryškintas, kursyvinis, sąrašai, nuorodos). Saugo HTML. |
+| `typingtest` | text | Rašymo testo valdiklis — etiketės tekstas yra ištrauka; valdiklis įrašo surinktą atsakymą ir laiką. |
+
+### Medijų plėtiniai
+
+| Išvaizdos atributas | Klausimų tipai | Aprašymas |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | Uždeda teksto vandens ženklą ant užfiksuotų nuotraukų. Arguments yra XPath išraiška, įvertinta fiksavimo metu. Pavyzdys: `watermark("${id} ${today()}")`. |
+| `editable` | image | Įgalina anotaciją/piešimą ant užfiksuotos nuotraukos prieš išsaugojimą. |
+
+### Inline rodinio konfigūracija
+
+Modifikatoriai `display{}` ir `results{}` gali būti pridedami prie `inline` išvaizdos variantų, siekiant kontroliuoti piktogramų išlygiavimą ir rezultatų rodymą.
+
+#### `display{}` parametrai
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parametras | Reikšmės | Aprašymas |
+|------------|----------|-----------|
+| Išlygiavimas | `left`, `right`, `top`, `bottom`, `center` | Piktogramos padėtis įvesties lauko atžvilgiu |
+| Dydis | `small`, `medium`, `large` | Piktogramos dydis (atitinkamai 2,5 rem, 5 rem, 8 rem) |
+| Režimas | `inline-icon` | Renderuoja aktyviklį tik kaip piktogramą (be mygtuko kraštinės) |
+| Režimas | `inline-button` | Renderuoja aktyviklį kaip visą mygtuką |
+
+#### `results{}` parametrai
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parametras | Reikšmės | Aprašymas |
+|------------|----------|-----------|
+| Išlygiavimas | `left`, `right`, `top`, `bottom`, `center` | Rezultato reikšmės rodymo padėtis |
+| `hide(field)` | bet koks sublauko pavadinimas | Paslepia konkretų rezultato komponentą (pvz., `hide(seconds)`) |
 
 ### API integracija
 

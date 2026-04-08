@@ -64,6 +64,14 @@ Pitanja tipa select_multiple se koriste za:
 | `label` | Prikazuje samo oznake, bez potvrdnih okvira (koristiti sa `list-nolabel`) |
 | `list-nolabel` | Prikazuje samo potvrdne okvire, bez oznaka (koristiti sa `label`) |
 | `columns(N)` | Prikazati u N kolona (rtSurvey proširenje) |
+| `tagging` | Prikazuje opcije kao klikabilne čipove sa oznakama |
+| `boxtag` | Prikazuje opcije kao pravougaone stilizovane kutije |
+| `boxtag -search` | Raspored boxtag sa poljem za pretragu |
+| `duolingo-style1` | Raspored velikih kartica inspirisan Duolingom |
+| `rating_box` | Kutije za ocenjivanje na bazi mreže |
+| `choices-noshow` | Prikazuje prvih 10 opcija, ostatak na zahtev |
+| `checkall` | Dodaje opciju „Izaberi sve" |
+| `max-items(N)` | Ograničava broj vidljivih opcija na N |
 {{< /table >}}
 
 ### Primer: Kompaktni raspored sa 3 kolone

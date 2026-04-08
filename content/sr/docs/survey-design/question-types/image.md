@@ -76,3 +76,27 @@ Kada koristite pitanja tipa image, razmotrite:
 - Ne moraju svi uređaji imati kamere visokog kvaliteta ili dovoljno prostora za skladištenje.
 - Analiza velikog broja slika može biti vremenski zahtevna.
 - Mogu postojati problemi sa privatnošću prilikom snimanja slika, posebno u javnim prostorima.
+
+## rtSurvey proširenja za slike
+
+### watermark()
+
+Izgled `watermark()` prekriva tekstualni vodeni žig na fotografijama snimljenim ovim poljem. Vodeni žig obično sadrži metapodatke kao što su ime anketara, datum/vreme ili GPS koordinate, utisnute direktno na sliku pre čuvanja.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Fotografišite lokaciju | `watermark("${enumerator_id} ${today()}")` |
+
+Argument za `watermark()` je XPath izraz koji se procenjuje u trenutku snimanja. Rezultujući niz se prikazuje kao tekst vodenog žiga.
+
+### editable
+
+Izgled `editable` dozvoljava ispitaniku da anotira ili crta na snimljenu fotografiju nakon snimanja. Traka sa alatkama za crtanje pojavljuje se iznad slike.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Fotografišite i označite oblasti od interesa | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` se može kombinovati sa `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

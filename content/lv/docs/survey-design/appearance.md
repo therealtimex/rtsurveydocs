@@ -93,6 +93,11 @@ Papildus standarta XLSForm izskata variantiem, rtSurvey atbalsta šādas platfor
 | `columns(n)` | select_one, select_multiple | Parāda izvēles `n` kolonnās. Piemērs: `columns(3)` rāda trīs radio pogu kolonnas. |
 | `gridformat<row=R col=C colspan=S align=center>` | jebkuri | Novieto lauku CSS-grid izkārtojumā rindā `R`, kolonnā `C`, aptverot `S` kolonnas. Izmanto ar `advanced-extension/grid-layout`. |
 | `ignore-simplify` | jebkuri | Instruē formas renderētāju izlaist šī lauka izkārtojuma automātisko vienkāršošanu vai saīsināšanu. |
+| `required-but-simplify` | jebkuri | Lauks ir obligāts, bet tā izkārtojums renderētājs joprojām vienkāršo (ignorē noklusējuma uzvedību, kad obligātie lauki tiek izslēgti no vienkāršošanas). |
+| `embed` | jebkuri | Renderē lauku iegultā/inline attēlojuma režīmā, nomācot tā ārējo apvalku un etiķetes konteineru — izmanto, kad jautājums ir iegults pielāgotā HTML. |
+| `popup` | select_one, select_multiple | Renderē izvēļu sarakstu popup/modal pārklājumā, nevis inline. |
+| `auto-hide-empty` | boxtag, select | Paslēpj visu jautājuma logrīku, kad izvēļu saraksts ir tukšs (piemēram, nav atgrieztu API rezultātu). |
+| `text-nolabel` | select_one, select_multiple | Paslēpj teksta etiķeti katrai izvēlei, rādot tikai ievades vadību. Līdzīgs `list-nolabel`, bet tiek piemērots katrai izvēlei, nevis kā kolonnu sadalījums. |
 
 ### Logrīki
 
@@ -100,6 +105,68 @@ Papildus standarta XLSForm izskata variantiem, rtSurvey atbalsta šādas platfor
 |----------------------|----------------|-------------|
 | `likert` | select_one | Piedāvā izvēles kā Likerta skalas rindu. |
 | `distress` | select_one | Renderē izvēles kā Kesslera psiholoģiskā distresa skalas (K10) vizuālo logrīku ar emocionālām ikonām. |
+
+### Izvēles vizuālie logrīki
+
+Šie izskata varianti maina visu atlases izvēļu sarakstu renderēšanu.
+
+| Izskata atribūts | Jautājumu tipi | Apraksts |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Izvēles renderējas kā noklikšķināmi pill formas tagu čipsi. |
+| `boxtag` | select_one, select_multiple | Izvēles renderējas kā stilizēti taisnstūrveida lodziņi, kurus lietotājs pieskaras. |
+| `boxtag -search` | select_one, select_multiple | Boxtag izkārtojums ar dzīvas meklēšanas/filtrēšanas ievadi virs lodziņiem. |
+| `duolingo-style1` | select_one, select_multiple | Duolingo iedvesmots karšu izkārtojums — piemērots īsiem sarakstiem ar ikonām. |
+| `rating_box` | select_one, select_multiple | Skaitļotu pieskaramās lodziņu tīkls — piemērots skalas vai NPS jautājumiem. |
+| `star_rating` | select_one | Izvēles renderējas kā zvaigznes; zvaigžņu skaits vienāds ar izvēļu skaitu. |
+| `choices-noshow` | select_one, select_multiple | Sākotnēji rāda tikai pirmās 10 izvēles ar vadīklu "Rādīt vairāk". |
+| `noshow` | select_one, select_multiple | Pilnīgi slēpj izvēļu sarakstu; vērtību iestata programmatiski ar `calculate` vai API. |
+| `checkall` | select_multiple | Pievieno "Atlasīt visas" saīsni izvēļu saraksta augšdaļā. |
+| `max-items(N)` | select_one, select_multiple | Ierobežo redzamo izvēļu sarakstu līdz N elementiem. Piemērs: `max-items(5)`. |
+
+### Teksta vizuālie logrīki
+
+| Izskata atribūts | Jautājumu tipi | Apraksts |
+|----------------------|----------------|-------------|
+| `richtext` | text | Aizstāj vienkāršo teksta lodziņu ar bagātā teksta redaktoru (treknraksts, slīpraksts, saraksti, saites). Saglabā HTML. |
+| `typingtest` | text | Rakstīšanas testa logrīks — etiķetes teksts ir fragments; logrīks reģistrē ierakstīto atbildi un laiku. |
+
+### Multivides paplašinājumi
+
+| Izskata atribūts | Jautājumu tipi | Apraksts |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | Pārklāj teksta ūdenszīmi uz uzņemtajiem fotoattēliem. Arguments ir XPath izteiksme, kas tiek novērtēta uzņemšanas brīdī. Piemērs: `watermark("${id} ${today()}")`. |
+| `editable` | image | Iespējo anotāciju/zīmēšanu virs uzņemtā fotoattēla pirms saglabāšanas. |
+
+### Inline attēlojuma konfigurācija
+
+Modifikatori `display{}` un `results{}` var tikt pievienoti `inline` izskata variantiem, lai kontrolētu ikonas izlīdzinājumu un rezultātu attēlojumu.
+
+#### `display{}` parametri
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parametrs | Vērtības | Apraksts |
+|-----------|----------|----------|
+| Izlīdzinājums | `left`, `right`, `top`, `bottom`, `center` | Ikonas pozīcija attiecībā pret ievades lauku |
+| Izmērs | `small`, `medium`, `large` | Ikonas izmērs (attiecīgi 2,5 rem, 5 rem, 8 rem) |
+| Režīms | `inline-icon` | Renderē aktivizētāju tikai kā ikonu (bez pogas apmales) |
+| Režīms | `inline-button` | Renderē aktivizētāju kā pilnu pogu |
+
+#### `results{}` parametri
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parametrs | Vērtības | Apraksts |
+|-----------|----------|----------|
+| Izlīdzinājums | `left`, `right`, `top`, `bottom`, `center` | Rezultāta vērtības attēlojuma pozīcija |
+| `hide(field)` | jebkurš apakšlauka nosaukums | Paslēpj konkrētu rezultāta komponentu (piemēram, `hide(seconds)`) |
 
 ### API integrācija
 

@@ -79,3 +79,27 @@ When using image questions, consider:
 - Analyzing large numbers of images can be time-consuming.
 - There may be privacy concerns when capturing images, especially in public spaces.
 
+## rtSurvey image extensions
+
+### watermark()
+
+The `watermark()` appearance overlays a text watermark on photos captured with this field. The watermark typically contains metadata such as the enumerator name, date/time, or GPS coordinates, stamped directly onto the image before it is saved.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Take a photo of the site | `watermark("${enumerator_id} ${today()}")` |
+
+The argument to `watermark()` is an XPath expression evaluated at capture time. The resulting string is rendered as the watermark text.
+
+### editable
+
+The `editable` appearance allows the respondent to annotate or draw on the captured photo after taking it. A drawing toolbar appears over the image.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Photograph and mark areas of concern | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` can be combined with `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}
+

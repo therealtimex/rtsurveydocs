@@ -28,7 +28,6 @@ Kysymystyypin asettamiseksi kirjoita tyypin nimi XLSFormisi **survey**-laskentat
 |--------|--------|
 | [select_one listname](select-one) | Valitse täsmälleen yksi vaihtoehto listalta |
 | [select_multiple listname](select-multiple) | Valitse yksi tai useampi vaihtoehto listalta |
-| [select_one_from_file filename](select-one-from-file) | Valitse yksi vaihtoehto ulkoisesta CSV-tiedostosta ladattuna |
 | [rank listname](rank) | Järjestä valinnat tärkeysjärjestykseen tai prioriteetin mukaan |
 
 ## Päivämäärä ja aika
@@ -66,6 +65,18 @@ Kysymystyypin asettamiseksi kirjoita tyypin nimi XLSFormisi **survey**-laskentat
 | [hidden](hidden) | Piilotettu kenttä, johon tallennetaan staattinen tai esitäytetty arvo |
 | [trigger / acknowledge](trigger) | Valintaruutu, jota luetteloijan on rastittava vahvistaakseen lukeneensa lausuman |
 | [meta](meta) | Automaattiset metatiedot: aikaleima, laitteen tunnus, luetteloijan tiedot |
+
+## rtSurvey-laajennukset
+
+Nämä tyypit ovat rtSurvey-kohtaisia eivätkä ole osa XLSForm-standardimääritystä.
+
+| Tyyppi | Kuvaus |
+|--------|--------|
+| [search-autocomplete](search-autocomplete) | Tekstisyöte, jossa on reaaliaikainen API-pohjainen automaattinen täydennys |
+| [mentions](mentions) | Tekstikenttä `@`-maininta automaattisella täydennyksellä entiteettien tagittamiseen |
+| [texttags](texttags) | Tagi-syötekenttä — jokainen merkintä muuttuu poistettavaksi chipiksi; tallennettu välilyönnein erotettu merkkijono |
+
+Toistoryhmistä katso [Repeats](../advanced-extension/repeats)
 
 ## Miten tyyppi ja ulkoasu toimivat yhdessä
 

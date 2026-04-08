@@ -64,6 +64,14 @@ Select_multiple 問題用於：
 | `label` | 只顯示標籤，無核取方塊（與 `list-nolabel` 一起使用） |
 | `list-nolabel` | 只顯示核取方塊，無標籤（與 `label` 一起使用） |
 | `columns(N)` | 以 N 欄顯示（rtSurvey 擴展） |
+| `tagging` | 選項呈現為藥丸狀標籤片 |
+| `boxtag` | 選項呈現為矩形樣式方塊 |
+| `boxtag -search` | 方塊上方帶有搜尋/篩選輸入框的 Boxtag 版面 |
+| `duolingo-style1` | 大型卡片版面——最適合短選項清單 |
+| `rating_box` | 網格式評分方塊 |
+| `choices-noshow` | 初始顯示前 10 個選項；其餘按需顯示 |
+| `checkall` | 在清單頂部新增「全選」選項 |
+| `max-items(N)` | 將可見選項數量限制為 N |
 {{< /table >}}
 
 ### 範例：3 欄緊湊佈局

@@ -66,6 +66,11 @@ rtSurvey รองรับแอตทริบิวต์ appearance มา�
 | `columns(n)` | select_one, select_multiple | แสดงตัวเลือกใน `n` คอลัมน์ |
 | `gridformat<row=R col=C colspan=S align=center>` | any | วางฟิลด์ในเลย์เอาต์ CSS-grid |
 | `ignore-simplify` | any | สั่งให้ renderer ข้ามการลดความซับซ้อนอัตโนมัติ |
+| `required-but-simplify` | any | ฟิลด์จำเป็นต้องกรอก แต่เลย์เอาต์ยังคงถูกย่อโดย renderer |
+| `embed` | any | เรนเดอร์ฟิลด์ในโหมดแสดงผลแบบฝังตัว/อินไลน์ |
+| `popup` | select_one, select_multiple | เรนเดอร์รายการตัวเลือกในป๊อปอัป/โมดัลแทนการแสดงในบรรทัด |
+| `auto-hide-empty` | boxtag, select | ซ่อนวิดเจ็ตคำถามทั้งหมดเมื่อรายการตัวเลือกว่างเปล่า |
+| `text-nolabel` | select_one, select_multiple | ซ่อนป้ายกำกับข้อความสำหรับแต่ละตัวเลือก แสดงเฉพาะตัวควบคุมอินพุต |
 
 ### วิดเจ็ต
 
@@ -73,6 +78,68 @@ rtSurvey รองรับแอตทริบิวต์ appearance มา�
 |----------------------|----------------|-------------|
 | `likert` | select_one | นำเสนอตัวเลือกเป็นแถว Likert scale |
 | `distress` | select_one | เรนเดอร์ตัวเลือกเป็น Kessler Psychological Distress Scale (K10) |
+
+### วิดเจ็ตภาพสำหรับการเลือก
+
+appearances เหล่านี้เปลี่ยนการแสดงผลทั้งหมดของรายการตัวเลือก
+
+| Appearance Attribute | Question Types | คำอธิบาย |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | ตัวเลือกแสดงเป็นชิปแท็กรูปเม็ดยาที่คลิกได้ |
+| `boxtag` | select_one, select_multiple | ตัวเลือกแสดงเป็นกล่องสี่เหลี่ยมที่มีสไตล์ให้แตะ |
+| `boxtag -search` | select_one, select_multiple | เลย์เอาต์ Boxtag พร้อมช่องค้นหา/กรองแบบ live เหนือกล่อง |
+| `duolingo-style1` | select_one, select_multiple | เลย์เอาต์การ์ดขนาดใหญ่สไตล์ Duolingo — เหมาะสำหรับรายการสั้นที่มีไอคอน |
+| `rating_box` | select_one, select_multiple | กริดของกล่องตัวเลขที่แตะได้ — เหมาะสำหรับคำถามแบบสเกลหรือ NPS |
+| `star_rating` | select_one | ตัวเลือกแสดงเป็นดาว จำนวนดาวเท่ากับจำนวนตัวเลือก |
+| `choices-noshow` | select_one, select_multiple | แสดง 10 ตัวเลือกแรกเริ่มต้นพร้อมตัวควบคุม "แสดงเพิ่มเติม" |
+| `noshow` | select_one, select_multiple | ซ่อนรายการตัวเลือกทั้งหมด ค่าถูกกำหนดโดยโปรแกรมผ่าน `calculate` หรือ API |
+| `checkall` | select_multiple | เพิ่มทางลัด "เลือกทั้งหมด" ที่ด้านบนของรายการตัวเลือก |
+| `max-items(N)` | select_one, select_multiple | จำกัดรายการตัวเลือกที่มองเห็นเป็น N รายการ ตัวอย่าง: `max-items(5)` |
+
+### วิดเจ็ตภาพสำหรับข้อความ
+
+| Appearance Attribute | Question Types | คำอธิบาย |
+|----------------------|----------------|-------------|
+| `richtext` | text | แทนที่กล่องข้อความธรรมดาด้วย rich text editor (หนา เอียง รายการ ลิงก์) เก็บ HTML |
+| `typingtest` | text | วิดเจ็ตทดสอบพิมพ์ดีด — ข้อความป้ายกำกับคือข้อความที่ต้องพิมพ์ วิดเจ็ตบันทึกคำตอบที่พิมพ์และเวลา |
+
+### ส่วนขยายมีเดีย
+
+| Appearance Attribute | Question Types | คำอธิบาย |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | วางลายน้ำข้อความทับบนรูปถ่ายที่ถ่าย อาร์กิวเมนต์คือ XPath expression ที่ประเมิน ณ เวลาถ่าย ตัวอย่าง: `watermark("${id} ${today()}")` |
+| `editable` | image | เปิดใช้งานการใส่คำอธิบาย/วาดภาพบนรูปถ่ายที่ถ่ายก่อนบันทึก |
+
+### การกำหนดค่าการแสดงผลแบบอินไลน์
+
+โมดิฟายเออร์ `display{}` และ `results{}` สามารถต่อท้าย appearance แบบ `inline` เพื่อควบคุมการจัดแนวไอคอนและการแสดงผล ใช้ร่วมกับส่วนขยายอินพุตเวลา `inline` ในฟิลด์ `text` และวิดเจ็ตบันทึกมีเดีย
+
+#### พารามิเตอร์ `display{}`
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| พารามิเตอร์ | ค่า | คำอธิบาย |
+|-----------|--------|-------------|
+| การจัดแนว | `left`, `right`, `top`, `bottom`, `center` | ตำแหน่งไอคอนเทียบกับฟิลด์อินพุต |
+| ขนาด | `small`, `medium`, `large` | ขนาดไอคอน (2.5 rem, 5 rem, 8 rem ตามลำดับ) |
+| โหมด | `inline-icon` | เรนเดอร์ตัวกระตุ้นเป็นไอคอนเท่านั้น (ไม่มีกรอบปุ่ม) |
+| โหมด | `inline-button` | เรนเดอร์ตัวกระตุ้นเป็นปุ่มเต็มรูปแบบ |
+
+#### พารามิเตอร์ `results{}`
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| พารามิเตอร์ | ค่า | คำอธิบาย |
+|-----------|--------|-------------|
+| การจัดแนว | `left`, `right`, `top`, `bottom`, `center` | ตำแหน่งการแสดงค่าผลลัพธ์ |
+| `hide(field)` | ชื่อ sub-field ใดก็ได้ | ซ่อนส่วนประกอบเฉพาะของผลลัพธ์ (เช่น `hide(seconds)`) |
 
 ### การผสานรวม API
 

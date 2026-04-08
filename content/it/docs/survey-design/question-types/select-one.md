@@ -62,6 +62,16 @@ Specifica un valore nella colonna `appearance` per cambiare come vengono visuali
 | `columns(N)` | Visualizza in N colonne (estensione rtSurvey, es. `columns(3)`) |
 | `distress` | Widget di icone emotive Kessler Psychological Distress (K10) |
 | `search-api(...)` | Ricerca dinamica — carica le scelte da un'API in fase di esecuzione |
+| `tagging` | Mostra le scelte come chip di tag cliccabili invece di pulsanti radio |
+| `boxtag` | Mostra le scelte come riquadri rettangolari stilizzati che l'utente tocca per selezionare |
+| `boxtag -search` | Layout boxtag con un campo di ricerca/filtro sopra i riquadri |
+| `duolingo-style1` | Layout a schede ispirato a Duolingo — grandi schede toccabili con icone |
+| `rating_box` | Riquadri di valutazione a griglia — ideale per scelte numeriche o a scala |
+| `star_rating` | Widget di valutazione a stelle — le scelte vengono visualizzate come 1–N stelle |
+| `choices-noshow` | Mostra inizialmente solo le prime 10 scelte; rivela le restanti su richiesta |
+| `noshow` | Nasconde completamente l'elenco delle scelte; il valore viene impostato programmaticamente |
+| `checkall` | Aggiunge un'opzione "Seleziona tutto" in cima all'elenco |
+| `max-items(N)` | Limita il numero di scelte visibili a N (es. max-items(5)) |
 {{< /table >}}
 
 ### Esempio: Scala Likert

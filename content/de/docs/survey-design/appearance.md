@@ -93,6 +93,11 @@ Zusätzlich zu den Standard-XLSForm-Erscheinungsbildern unterstützt rtSurvey fo
 | `columns(n)` | select_one, select_multiple | Zeigt Auswahlmöglichkeiten in `n` Spalten an. Beispiel: `columns(3)` zeigt drei Spalten von Optionsfeldern. |
 | `gridformat<row=R col=C colspan=S align=center>` | beliebig | Positioniert das Feld in einem CSS-Grid-Layout bei Zeile `R`, Spalte `C`, über `S` Spalten. Wird mit `advanced-extension/grid-layout` verwendet. |
 | `ignore-simplify` | beliebig | Weist den Formular-Renderer an, die automatische Vereinfachung oder Komprimierung des Layouts dieses Feldes zu überspringen. |
+| `required-but-simplify` | beliebig | Das Feld ist erforderlich, aber sein Layout wird trotzdem vom Renderer vereinfacht |
+| `embed` | beliebig | Rendert das Feld im eingebetteten/Inline-Anzeigemodus und unterdrückt seinen äußeren Wrapper und Label-Container |
+| `popup` | select_one, select_multiple | Rendert die Auswahlliste in einem Popup/Modal-Overlay statt inline |
+| `auto-hide-empty` | boxtag, select | Blendet das gesamte Frage-Widget aus, wenn die Auswahlliste leer ist |
+| `text-nolabel` | select_one, select_multiple | Blendet die Textbeschriftung für jede Auswahl aus und zeigt nur das Eingabe-Steuerelement |
 
 ### Widgets
 
@@ -100,6 +105,57 @@ Zusätzlich zu den Standard-XLSForm-Erscheinungsbildern unterstützt rtSurvey fo
 |----------------------|----------------|-------------|
 | `likert` | select_one | Präsentiert Auswahlmöglichkeiten als Likert-Skalenreihe (bereits in der Standardtabelle oben; Unterstützung bestätigt). |
 | `distress` | select_one | Stellt Auswahlmöglichkeiten als Kessler Psychological Distress Scale (K10) visuelles Widget mit emotionalen Symbolen dar. |
+
+### Visuelle Auswahl-Widgets
+
+Diese Erscheinungsbilder ändern die gesamte Darstellung von Auswahl-Choice-Listen.
+
+| Erscheinungsbild | Fragetypen | Beschreibung |
+|-----------------|-----------|-------------|
+| `tagging` | select_one, select_multiple | Auswahlmöglichkeiten werden als pillenförmige anklickbare Tag-Chips dargestellt. |
+| `boxtag` | select_one, select_multiple | Auswahlmöglichkeiten werden als gestaltete rechteckige Boxen dargestellt, die der Benutzer antippt. |
+| `boxtag -search` | select_one, select_multiple | Boxtag-Layout mit einer Live-Such-/Filtereingabe über den Boxen. |
+| `duolingo-style1` | select_one, select_multiple | Großes Kartenlayout nach Duolingo-Vorbild — geeignet für kurze Listen mit Symbolen. |
+| `rating_box` | select_one, select_multiple | Raster tippbarer nummerierter Boxen — geeignet für Skalen- oder NPS-Fragen. |
+| `star_rating` | select_one | Auswahlmöglichkeiten werden als Sterne dargestellt; die Anzahl der Sterne entspricht der Anzahl der Optionen. |
+| `choices-noshow` | select_one, select_multiple | Zeigt zunächst nur die ersten 10 Optionen mit einem "Mehr anzeigen"-Steuerelement. |
+| `noshow` | select_one, select_multiple | Blendet die Auswahlliste vollständig aus; der Wert wird programmatisch via calculate oder API gesetzt. |
+| `checkall` | select_multiple | Fügt oben in der Auswahlliste eine "Alle auswählen"-Schaltfläche hinzu. |
+| `max-items(N)` | select_one, select_multiple | Begrenzt die sichtbare Auswahlliste auf N Einträge. Beispiel: max-items(5). |
+
+### Visuelle Text-Widgets
+
+| Erscheinungsbild | Fragetypen | Beschreibung |
+|-----------------|-----------|-------------|
+| `richtext` | text | Ersetzt das einfache Textfeld durch einen Rich-Text-Editor (Fett, Kursiv, Listen, Links). Speichert HTML. |
+| `typingtest` | text | Tipptest-Widget — der Label-Text ist der Passage; das Widget zeichnet die getippte Antwort und die Zeit auf. |
+
+### Medienerweiterungen
+
+| Erscheinungsbild | Fragetypen | Beschreibung |
+|-----------------|-----------|-------------|
+| `watermark("expression")` | image | Legt ein Text-Wasserzeichen auf aufgenommene Fotos. Das Argument ist ein XPath-Ausdruck, der zum Aufnahmezeitpunkt ausgewertet wird. |
+| `editable` | image | Ermöglicht Annotation/Zeichnen über dem aufgenommenen Foto vor dem Speichern. |
+
+### Inline-Anzeigeformat-Konfiguration
+
+Die Modifier `display{}` und `results{}` steuern Symbolausrichtung und Ergebnisanzeige für Inline-Widgets.
+
+#### `display{}`-Parameter
+
+| Parameter | Werte | Beschreibung |
+|-----------|-------|-------------|
+| Ausrichtung | `left`, `right`, `top`, `bottom`, `center` | Position des Symbols relativ zum Eingabefeld |
+| Größe | `small`, `medium`, `large` | Symbolgröße |
+| Modus | `inline-icon` | Rendert den Trigger nur als Symbol |
+| Modus | `inline-button` | Rendert den Trigger als vollständige Schaltfläche |
+
+#### `results{}`-Parameter
+
+| Parameter | Werte | Beschreibung |
+|-----------|-------|-------------|
+| Ausrichtung | `left`, `right`, `top`, `bottom`, `center` | Position der Ergebniswertanzeige |
+| `hide(field)` | beliebiger Teilfeldname | Blendet eine bestimmte Komponente des Ergebnisses aus |
 
 ### API-Integration
 

@@ -38,6 +38,8 @@ Pyetjet me tekst përdoren për:
 |-------|------------|
 | *(asnjë)* | Hyrje teksti me një rresht |
 | `multiline` | Zonë teksti me shumë rreshta — më e mirë për tekst të gjatë të lirë në web |
+| `richtext` | Redaktues teksti i pasur — shiriti i veglave me të theksuar, kursiv, lista dhe lidhje |
+| `typingtest` | Ndërfaqe testi shtypi — paraqet një pasazh dhe mat shpejtësinë dhe saktësinë e shtypjes |
 
 ## Zgjerime hyrjeje kohe të rtSurvey
 

@@ -28,7 +28,6 @@ Um den Fragetyp festzulegen, geben Sie den Typnamen in die Spalte `type` des **s
 |-----|-------------|
 | [select_one listname](select-one) | Genau eine Option aus einer Liste auswählen |
 | [select_multiple listname](select-multiple) | Eine oder mehrere Optionen aus einer Liste auswählen |
-| [select_one_from_file filename](select-one-from-file) | Eine Option aus einer externen CSV-Datei auswählen |
 | [rank listname](rank) | Auswahlmöglichkeiten nach Präferenz oder Priorität ordnen |
 
 ## Datum und Uhrzeit
@@ -66,6 +65,18 @@ Um den Fragetyp festzulegen, geben Sie den Typnamen in die Spalte `type` des **s
 | [hidden](hidden) | Verborgenes Feld, das einen statischen oder vorausgefüllten Wert speichert |
 | [trigger / acknowledge](trigger) | Ein Kontrollkästchen, das der Interviewer aktivieren muss, um das Lesen einer Aussage zu bestätigen |
 | [meta](meta) | Automatische Metadaten: Zeitstempel, Geräte-ID, Interviewer-Informationen |
+
+## rtSurvey-Erweiterungen
+
+Diese Typen sind rtSurvey-spezifisch und nicht Teil der Standard-XLSForm-Spezifikation.
+
+| Typ | Beschreibung |
+|-----|--------------|
+| [search-autocomplete](search-autocomplete) | Texteingabe mit Live-API-gestützter Autovervollständigung |
+| [mentions](mentions) | Texteingabe mit `@`-Erwähnung-Autovervollständigung zum Markieren von Entitäten |
+| [texttags](texttags) | Tag-Eingabe — jeder Eintrag wird zu einem entfernbaren Chip; als leerzeichengetrennter String gespeichert |
+
+Informationen zu Wiederholungsgruppen: [Repeats](../advanced-extension/repeats)
 
 ## Zusammenspiel von Typ und Erscheinungsbild
 

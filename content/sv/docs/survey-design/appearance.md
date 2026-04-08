@@ -66,6 +66,11 @@ Förutom standard XLSForm-utseenden stöder rtSurvey följande plattformsspecifi
 | `columns(n)` | select_one, select_multiple | Visar alternativ i `n` kolumner. Exempel: `columns(3)` visar tre kolumner med radioknappar. |
 | `gridformat<row=R col=C colspan=S align=center>` | valfri | Placerar fältet i en CSS-rutnätslayout. |
 | `ignore-simplify` | valfri | Instruerar formulärrenderaren att hoppa över automatisk förenkling av fältets layout. |
+| `required-but-simplify` | valfri | Fältet är obligatoriskt men dess layout förenklas ändå av renderaren (åsidosätter standardbeteendet där obligatoriska fält undantas från förenkling). |
+| `embed` | valfri | Renderar fältet i inbäddat/inline-visningsläge, undertrycker den yttre omslutaren och etikettcontainern — används när en fråga är inbäddad i anpassad HTML. |
+| `popup` | select_one, select_multiple | Renderar valslistan i ett popup/modal-överlägg istället för inline. |
+| `auto-hide-empty` | boxtag, select | Döljer hela frågewidgeten när valslistan är tom (t.ex. inga API-resultat returnerades). |
+| `text-nolabel` | select_one, select_multiple | Döljer textetiketten för varje alternativ och visar bara inmatningskontrollen. Liknande `list-nolabel` men appliceras per alternativ snarare än som kolumndelning. |
 
 ### Widgetar
 
@@ -73,6 +78,68 @@ Förutom standard XLSForm-utseenden stöder rtSurvey följande plattformsspecifi
 |----------------------|----------------|-------------|
 | `likert` | select_one | Presenterar alternativ som en Likert-skalarad. |
 | `distress` | select_one | Renderar alternativ som den psykologiska stressskalans (K10) visuella widget med emotionella ikoner. |
+
+### Visuella select-widgetar
+
+Dessa utseenden ändrar hela renderingen av select-valslistor.
+
+| Utseendeattribut | Frågetyper | Beskrivning |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Alternativ renderas som pillformade klickbara taggchips. |
+| `boxtag` | select_one, select_multiple | Alternativ renderas som rektangulära stiliserade rutor som användaren trycker på. |
+| `boxtag -search` | select_one, select_multiple | Boxtag-layout med en live sök-/filterinmatning ovanför rutorna. |
+| `duolingo-style1` | select_one, select_multiple | Stort kortlayout inspirerat av Duolingo — passar korta listor med ikoner. |
+| `rating_box` | select_one, select_multiple | Rutnät av tryckvänliga numrerade rutor — passar skala- eller NPS-frågor. |
+| `star_rating` | select_one | Alternativ renderas som stjärnor; antalet stjärnor är lika med antalet alternativ. |
+| `choices-noshow` | select_one, select_multiple | Visar initialt bara de första 10 alternativen med en "Visa mer"-kontroll. |
+| `noshow` | select_one, select_multiple | Döljer valslistan helt; värdet ställs in programmatiskt via `calculate` eller API. |
+| `checkall` | select_multiple | Lägger till en "Välj alla"-genväg högst upp i valslistan. |
+| `max-items(N)` | select_one, select_multiple | Begränsar den synliga valslistan till N objekt. Exempel: `max-items(5)`. |
+
+### Visuella textwidgetar
+
+| Utseendeattribut | Frågetyper | Beskrivning |
+|----------------------|----------------|-------------|
+| `richtext` | text | Ersätter det vanliga textfältet med en riktexteditor (fetstil, kursiv, listor, länkar). Lagrar HTML. |
+| `typingtest` | text | Skrivtestwidget — etikettexten är passagen; widgetten registrerar det skrivna svaret och tidtagningen. |
+
+### Mediatillägg
+
+| Utseendeattribut | Frågetyper | Beskrivning |
+|----------------------|----------------|-------------|
+| `watermark("uttryck")` | image | Lägger ett textvattenmärke över tagna foton. Argumentet är ett XPath-uttryck som utvärderas vid tagningsstunden. Exempel: `watermark("${id} ${today()}")`. |
+| `editable` | image | Möjliggör anteckning/ritning ovanpå det tagna fotot innan det sparas. |
+
+### Inline visningskonfiguration
+
+Modifikatorerna `display{}` och `results{}` kan läggas till `inline`-utseenden för att styra ikonjustering och resultatvisning. Dessa används tillsammans med `inline`-tidsinmatningsutökningen på `text`-fält och med medieupptagningswidgetar.
+
+#### `display{}`-parametrar
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parameter | Värden | Beskrivning |
+|-----------|--------|-------------|
+| Justering | `left`, `right`, `top`, `bottom`, `center` | Position av ikonen relativt inmatningsfältet |
+| Storlek | `small`, `medium`, `large` | Ikonstorlek (motsvarar 2,5 rem, 5 rem, 8 rem) |
+| Läge | `inline-icon` | Renderar utlösaren som ikon enbart (ingen knappkant) |
+| Läge | `inline-button` | Renderar utlösaren som en fullständig knapp |
+
+#### `results{}`-parametrar
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parameter | Värden | Beskrivning |
+|-----------|--------|-------------|
+| Justering | `left`, `right`, `top`, `bottom`, `center` | Position av resultatvärdesvisningen |
+| `hide(fält)` | valfritt underfältsnamn | Döljer en specifik komponent av resultatet (t.ex. `hide(seconds)`) |
 
 ### API-integration
 

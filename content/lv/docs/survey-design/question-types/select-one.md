@@ -30,6 +30,7 @@ Choices darblapā:
 
 ## Biežākās izskata iespējas
 
+{{< table >}}
 | Izskats | Apraksts |
 |---------|----------|
 | *(nav)* | Radio pogas (noklusējums) |
@@ -37,6 +38,17 @@ Choices darblapā:
 | `likert` | Likerta skala |
 | `horizontal` | Horizontālas radio pogas |
 | `quick` | Automātiski pāriet uz nākamo jautājumu pēc atlases (tikai mobilais) |
+| `tagging` | Parāda izvēles kā noklikšķināmus pill formas tagu čipsus |
+| `boxtag` | Parāda izvēles kā stilizētus taisnstūrveida lodziņus, kurus lietotājs pieskaras |
+| `boxtag -search` | Boxtag izkārtojums ar dzīvas meklēšanas/filtrēšanas ievadi virs lodziņiem |
+| `duolingo-style1` | Duolingo iedvesmots karšu izkārtojums — lielas pieskaramās kartes ar ikonām |
+| `rating_box` | Tīklveida vērtēšanas lodziņi — vislabākais skaitliskiem vai skalas jautājumiem |
+| `star_rating` | Zvaigžņu vērtēšanas logrīks — izvēles tiek renderētas kā 1–N zvaigznes |
+| `choices-noshow` | Sākotnēji rāda tikai pirmās 10 izvēles; pārējās atklāj pēc pieprasījuma |
+| `noshow` | Pilnīgi slēpj izvēļu sarakstu; vērtību iestata programmatiski |
+| `checkall` | Pievieno opciju "Atlasīt visas" saraksta augšdaļā |
+| `max-items(N)` | Ierobežo redzamo izvēļu skaitu līdz N (piemēram, `max-items(5)`) |
+{{< /table >}}
 
 ## Labākā prakse
 

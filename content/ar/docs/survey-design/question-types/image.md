@@ -33,3 +33,27 @@ weight: 227
 
 - يمكن أن تكون ملفات الصور كبيرة، مما قد يؤثر على نقل البيانات والتخزين.
 - قد لا تمتلك جميع الأجهزة كاميرات عالية الجودة أو مساحة تخزين كافية.
+
+## امتدادات صور rtSurvey
+
+### watermark()
+
+يُراكب مظهر `watermark()` علامة مائية نصية على الصور الملتقطة بهذا الحقل. تحتوي العلامة المائية عادةً على بيانات وصفية مثل اسم المعدِّد والتاريخ/الوقت أو إحداثيات GPS، وتُطبع مباشرة على الصورة قبل حفظها.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Take a photo of the site | `watermark("${enumerator_id} ${today()}")` |
+
+الوسيطة الممررة إلى `watermark()` هي تعبير XPath يُقيَّم عند الالتقاط. تُعرض السلسلة الناتجة كنص العلامة المائية.
+
+### editable
+
+يتيح مظهر `editable` للمستجيب التعليق على الصورة الملتقطة أو الرسم عليها بعد التقاطها. تظهر شريط أدوات الرسم فوق الصورة.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Photograph and mark areas of concern | editable |
+
+{{% alert icon=" " context="info" %}}
+يمكن دمج `editable` مع `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

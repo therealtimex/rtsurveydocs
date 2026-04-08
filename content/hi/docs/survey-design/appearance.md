@@ -88,6 +88,11 @@ rtSurvey फ़ॉर्म लॉजिक के आधार पर डाय
 | `columns(n)` | select_one, select_multiple | विकल्पों को `n` कॉलम में प्रदर्शित करता है। |
 | `gridformat<row=R col=C colspan=S align=center>` | कोई भी | फील्ड को CSS-grid लेआउट में row `R`, column `C` पर, `S` कॉलम तक फैलाकर रखता है। |
 | `ignore-simplify` | कोई भी | फ़ॉर्म रेंडरर को इस फील्ड के लेआउट के स्वचालित सरलीकरण या संक्षिप्त करने को छोड़ने का निर्देश देता है। |
+| `required-but-simplify` | कोई भी | फ़ील्ड required है लेकिन layout फिर भी simplified रहता है |
+| `embed` | कोई भी | फ़ील्ड को embedded/inline display mode में render करता है |
+| `popup` | select_one, select_multiple | Choice list को popup/modal overlay में render करता है |
+| `auto-hide-empty` | boxtag, select | Choice list खाली होने पर widget को छुपाता है |
+| `text-nolabel` | select_one, select_multiple | प्रत्येक choice के लिए text label छुपाता है |
 
 ### Widgets
 
@@ -95,6 +100,52 @@ rtSurvey फ़ॉर्म लॉजिक के आधार पर डाय
 |----------------------|----------------|-------------|
 | `likert` | select_one | विकल्पों को Likert पैमाने पंक्ति के रूप में प्रस्तुत करता है। |
 | `distress` | select_one | विकल्पों को भावनात्मक आइकन के साथ Kessler Psychological Distress Scale (K10) विज़ुअल विजेट के रूप में रेंडर करता है। |
+
+### Select visual widgets
+
+| Appearance Attribute | प्रश्न प्रकार | विवरण |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Choices को clickable tag chips के रूप में render करता है |
+| `boxtag` | select_one, select_multiple | Choices को styled rectangular boxes के रूप में render करता है |
+| `boxtag -search` | select_one, select_multiple | Boxtag layout, boxes के ऊपर search/filter input के साथ |
+| `duolingo-style1` | select_one, select_multiple | Large card layout — icons के साथ बड़े tappable cards |
+| `rating_box` | select_one, select_multiple | Grid-based rating boxes — numeric या scale choices के लिए |
+| `star_rating` | select_one | Star rating widget — choices 1–N stars के रूप में render होती हैं |
+| `choices-noshow` | select_one, select_multiple | शुरू में केवल पहले 10 choices दिखाता है; बाकी मांग पर |
+| `noshow` | select_one, select_multiple | Choice list पूरी तरह छुपाता है; value programmatically सेट होती है |
+| `checkall` | select_multiple | List के शीर्ष पर "Select all" विकल्प जोड़ता है |
+| `max-items(N)` | select_one, select_multiple | Visible choices की संख्या को N तक सीमित करता है |
+
+### Text visual widgets
+
+| Appearance Attribute | प्रश्न प्रकार | विवरण |
+|----------------------|----------------|-------------|
+| `richtext` | text | Rich text editor — bold, italic, lists, और links के साथ toolbar |
+| `typingtest` | text | Typing test interface — passage प्रस्तुत करता है और typing speed और accuracy मापता है |
+
+### Media extensions
+
+| Appearance Attribute | प्रश्न प्रकार | विवरण |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | Captured photo पर text watermark overlay करता है; expression capture time पर evaluate होता है |
+| `editable` | image | उत्तरदाता को photo लेने के बाद उस पर annotate और draw करने की अनुमति देता है |
+
+### Inline display configuration
+
+`display{}` parameter inline display behavior configure करता है:
+
+| Parameter | विवरण |
+|-----------|-------------|
+| `display{title="लेबल"}` | Inline display के लिए custom title सेट करता है |
+| `display{icon="icon_name"}` | Inline display के लिए icon सेट करता है |
+| `display{color="RRGGBB"}` | Inline display के लिए custom color सेट करता है |
+
+`results{}` parameter result display configure करता है:
+
+| Parameter | विवरण |
+|-----------|-------------|
+| `results{format="pattern"}` | Result display के लिए format pattern सेट करता है |
+| `results{show=true}` | Results inline display करता है |
 
 ### API एकीकरण
 

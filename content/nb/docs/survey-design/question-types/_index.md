@@ -28,7 +28,6 @@ For å angi spørsmålstypen, skriv inn typenavnet i `type`-kolonnen i **survey*
 |------|-------------|
 | [select_one listenavn](select-one) | Velg nøyaktig ett alternativ fra en liste |
 | [select_multiple listenavn](select-multiple) | Velg ett eller flere alternativer fra en liste |
-| [select_one_from_file filnavn](select-one-from-file) | Velg ett alternativ lastet fra en ekstern CSV-fil |
 | [rank listenavn](rank) | Ranger valg etter preferanse eller prioritet |
 
 ## Dato og klokkeslett
@@ -66,6 +65,18 @@ For å angi spørsmålstypen, skriv inn typenavnet i `type`-kolonnen i **survey*
 | [hidden](hidden) | Skjult felt som lagrer en statisk eller forhåndsutfylt verdi |
 | [trigger / acknowledge](trigger) | En avkrysningsboks som telleren må huke av for å bekrefte at de har lest en uttalelse |
 | [meta](meta) | Automatiske metadata: tidsstempler, enhets-ID, tellerinformasjon |
+
+## rtSurvey-utvidelser
+
+Disse typene er rtSurvey-spesifikke og ikke en del av standard XLSForm-spesifikasjonen.
+
+| Type | Beskrivelse |
+|------|-------------|
+| [search-autocomplete](search-autocomplete) | Tekstinndata med sanntids API-baserte autofullføringsforslag |
+| [mentions](mentions) | Tekstfelt med `@`-omtale-autofullføring for å merke enheter innebygd i teksten |
+| [texttags](texttags) | Taginndatafelt — hver oppføring blir en chip som kan fjernes; lagret som mellomromsseparert streng |
+
+For gjentagende grupper, se [Repeats](../advanced-extension/repeats)
 
 ## Hvordan type og utseende fungerer sammen
 

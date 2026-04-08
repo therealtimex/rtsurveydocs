@@ -62,6 +62,16 @@ Ange ett värde i kolumnen `appearance` för att ändra hur alternativ visas:
 | `columns(N)` | Visa i N kolumner (rtSurvey-tillägg, t.ex. `columns(3)`) |
 | `distress` | Kessler Psychological Distress (K10) emotionell ikonwidget |
 | `search-api(...)` | Dynamisk sökning — laddar alternativ från ett API vid körning |
+| `tagging` | Visar alternativ som klickbara taggchips istället för radioknappar |
+| `boxtag` | Visar alternativ som stiliserade rektangulära rutor som användaren trycker på för att välja |
+| `boxtag -search` | Boxtag-layout med en sök-/filterinmatning ovanför rutorna |
+| `duolingo-style1` | Duolingo-inspirerad kortlayout — stora tryckvänliga kort med ikoner |
+| `rating_box` | Rutnätsbaserade betygsrutor — bäst för numeriska val eller skalerade val |
+| `star_rating` | Stjärnbetygwidget — alternativ renderas som 1–N stjärnor |
+| `choices-noshow` | Visar initialt bara de första 10 alternativen; visar resten vid behov |
+| `noshow` | Döljer valslistan helt; värdet ställs in programmatiskt |
+| `checkall` | Lägger till ett "Välj alla"-alternativ högst upp i listan |
+| `max-items(N)` | Begränsar antalet synliga alternativ till N |
 {{< /table >}}
 
 ### Exempel: Likert-skala

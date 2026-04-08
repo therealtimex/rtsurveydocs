@@ -61,6 +61,14 @@ Select_multiple ప్రశ్నలు వీటికి ఉపయోగి�
 | `compact-N` | N columns కు forced compact grid |
 | `horizontal` | వరుసలో అడ్డంగా అమర్చబడిన ఎంపికలు (web) |
 | `columns(N)` | N columns లో ప్రదర్శించు (rtSurvey పొడిగింపు) |
+| `tagging` | ఎంపికలు క్లిక్ చేయగలిగే pill-ఆకారపు tag chips గా రెండర్ చేయబడతాయి |
+| `boxtag` | ఎంపికలు వినియోగదారు నొక్కే styled rectangular boxes గా రెండర్ చేయబడతాయి |
+| `boxtag -search` | Boxes పైన live search/filter input తో boxtag layout |
+| `duolingo-style1` | Duolingo స్ఫూర్తిపొందిన card layout — icons తో పెద్ద tappable cards |
+| `rating_box` | Grid-ఆధారిత rating boxes |
+| `choices-noshow` | మొదట్లో కేవలం మొదటి 10 ఎంపికలు చూపిస్తుంది; మిగిలినవి అవసరాన్ని బట్టి వెల్లడి చేస్తుంది |
+| `checkall` | జాబితా పైభాగంలో "అన్నీ ఎంచుకో" సత్వర మార్గం జోడిస్తుంది |
+| `max-items(N)` | కనిపించే ఎంపికల జాబితాను N కు పరిమితం చేస్తుంది |
 {{< /table >}}
 
 ### ఉదాహరణ: 3-column compact layout

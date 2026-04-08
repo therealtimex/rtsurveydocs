@@ -38,6 +38,8 @@ Pitanja tipa tekst se koriste za:
 |--------|------|
 | *(ništa)* | Jednoredno tekstualno polje |
 | `multiline` | Višeredno tekstualno polje — best za duži slobodan tekst na vebu |
+| `richtext` | Editor bogatog teksta sa trakom sa alatkama (podebljano, kurziv, liste, veze) |
+| `typingtest` | Interfejs za test kucanja — ispitanik unosi prikazani tekst |
 
 ## rtSurvey proširenja za unos vremena
 

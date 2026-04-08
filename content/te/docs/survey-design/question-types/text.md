@@ -38,6 +38,8 @@ Text ప్రశ్నలు వీటికి ఉపయోగిస్తా�
 |----------|--------|
 | *(none)* | ఒకే-వరుస text input |
 | `multiline` | బహుళ-వరుస text area — వెబ్‌లో పొడవైన స్వేచ్ఛా టెక్స్ట్‌కు ఉత్తమం |
+| `richtext` | Rich text editor — bold, italic, lists మరియు links తో toolbar |
+| `typingtest` | Typing test interface — ఒక passage ప్రదర్శిస్తుంది మరియు ప్రతిస్పందించే వ్యక్తి typing వేగం మరియు ఖచ్చితత కొలుస్తుంది |
 
 ## rtSurvey time input పొడిగింపులు
 

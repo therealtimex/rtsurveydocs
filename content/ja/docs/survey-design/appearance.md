@@ -93,6 +93,11 @@ rtSurveyはフォームロジックに基づいた動的な外観変更を許可
 | `columns(n)` | select_one、select_multiple | 選択肢を`n`列で表示する。例：`columns(3)`は3列のラジオボタンを表示する。 |
 | `gridformat<row=R col=C colspan=S align=center>` | any | CSSグリッドレイアウトで行`R`、列`C`、`S`列スパンにフィールドを配置する。`advanced-extension/grid-layout`と一緒に使用する。 |
 | `ignore-simplify` | any | フォームレンダラーにこのフィールドのレイアウトの自動簡略化や縮小をスキップするよう指示する。 |
+| `required-but-simplify` | any | フィールドは必須だがレイアウトは簡略化されたまま |
+| `embed` | any | フィールドを埋め込み/インライン表示モードでレンダリングする |
+| `popup` | select_one, select_multiple | 選択肢リストをポップアップ/モーダルオーバーレイでレンダリングする |
+| `auto-hide-empty` | boxtag, select | 選択肢リストが空のときウィジェットを非表示にする |
+| `text-nolabel` | select_one, select_multiple | 各選択肢のテキストラベルを非表示にする |
 
 ### ウィジェット
 
@@ -100,6 +105,52 @@ rtSurveyはフォームロジックに基づいた動的な外観変更を許可
 |----------------------|----------------|-------------|
 | `likert` | select_one | 選択肢をリッカートスケール行として表示する。 |
 | `distress` | select_one | 感情的なアイコンを持つKessler心理的苦痛スケール（K10）ビジュアルウィジェットとして選択肢をレンダリングする。 |
+
+### 選択ビジュアルウィジェット
+
+| 外観属性 | 質問タイプ | 説明 |
+|----------------------|----------------|-------------|
+| `tagging` | select_one、select_multiple | 選択肢をクリック可能なタグチップとして表示する |
+| `boxtag` | select_one、select_multiple | 選択肢をスタイル付きの長方形ボックスとして表示する |
+| `boxtag -search` | select_one、select_multiple | ボックスの上に検索/フィルター入力があるBoxtag レイアウト |
+| `duolingo-style1` | select_one、select_multiple | 大型カードレイアウト — 短い選択肢リストに最適 |
+| `rating_box` | select_one、select_multiple | グリッドベースの評価ボックス |
+| `star_rating` | select_one | 星評価ウィジェット — 選択肢が1〜N個の星としてレンダリングされる |
+| `choices-noshow` | select_one、select_multiple | 最初に最初の10個の選択肢のみ表示；残りはオンデマンドで |
+| `noshow` | select_one、select_multiple | 選択肢リストを完全に非表示にする；値はプログラムで設定される |
+| `checkall` | select_multiple | リストの上部に「すべて選択」オプションを追加する |
+| `max-items(N)` | select_one、select_multiple | 表示される選択肢の数をNに制限する |
+
+### テキストビジュアルウィジェット
+
+| 外観属性 | 質問タイプ | 説明 |
+|----------------------|----------------|-------------|
+| `richtext` | text | リッチテキストエディター — 太字、斜体、リスト、リンク付きのツールバー |
+| `typingtest` | text | タイピングテストインターフェース — 文章を提示し、タイピング速度と正確さを測定する |
+
+### メディア拡張
+
+| 外観属性 | 質問タイプ | 説明 |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | 撮影した写真にテキストの透かしを重ねる；式は撮影時に評価される |
+| `editable` | image | 回答者が写真撮影後に画像に注釈を付けたり描画できるようにする |
+
+### インライン表示の設定
+
+`display{}` パラメーターはインライン表示動作を設定します：
+
+| パラメーター | 説明 |
+|------------|------|
+| `display{title="ラベル"}` | インライン表示のカスタムタイトルを設定する |
+| `display{icon="icon_name"}` | インライン表示のアイコンを設定する |
+| `display{color="RRGGBB"}` | インライン表示のカスタムカラーを設定する |
+
+`results{}` パラメーターは結果表示を設定します：
+
+| パラメーター | 説明 |
+|------------|------|
+| `results{format="pattern"}` | 結果表示のフォーマットパターンを設定する |
+| `results{show=true}` | 結果をインラインで表示する |
 
 ### API統合
 

@@ -38,6 +38,8 @@ Le domande text vengono usate per:
 |------------|-------------|
 | *(nessuna)* | Input di testo a riga singola |
 | `multiline` | Area di testo a più righe — ideale per testo libero più lungo sul web |
+| `richtext` | Editor di testo ricco — barra degli strumenti con grassetto, corsivo, elenchi e link |
+| `typingtest` | Interfaccia di test di digitazione — presenta un brano e misura velocità e precisione di digitazione |
 
 ## Estensioni di input temporale di rtSurvey
 

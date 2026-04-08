@@ -62,6 +62,14 @@ Select_multiple-vragen worden gebruikt voor:
 | `label` | Toont alleen labels, geen selectievakjes (gebruik met `list-nolabel`) |
 | `list-nolabel` | Toont alleen selectievakjes, geen labels (gebruik met `label`) |
 | `columns(N)` | Weergave in N kolommen (rtSurvey-uitbreiding) |
+| `tagging` | Keuzes worden weergegeven als pilvormige tag-chips |
+| `boxtag` | Keuzes worden weergegeven als rechthoekige gestileerde vakken |
+| `boxtag -search` | Boxtag-indeling met een zoek-/filterveld boven de vakken |
+| `duolingo-style1` | Grote kaartindeling — best voor korte keuzenlijsten |
+| `rating_box` | Op grid gebaseerde beoordelingsvakken |
+| `choices-noshow` | Toont de eerste 10 keuzes aanvankelijk; onthult de rest op aanvraag |
+| `checkall` | Voegt een optie "Alles selecteren" toe bovenaan de lijst |
+| `max-items(N)` | Beperkt het aantal zichtbare keuzes tot N |
 {{< /table >}}
 
 ## `selected()` gebruiken in expressies

@@ -60,6 +60,16 @@ Specificeer een waarde in de kolom `appearance` om te wijzigen hoe keuzes worden
 | `columns(N)` | Weergave in N kolommen (rtSurvey-uitbreiding, bijv. `columns(3)`) |
 | `distress` | Kessler Psychological Distress (K10) emotionele pictogramwidget |
 | `search-api(...)` | Dynamisch zoeken — laadt keuzes uit een API bij uitvoering |
+| `tagging` | Toont keuzes als klikbare tag-chips in plaats van keuzerondjes |
+| `boxtag` | Toont keuzes als gestileerde rechthoekige vakken die de gebruiker aanraakt om te selecteren |
+| `boxtag -search` | Boxtag-indeling met een zoek-/filterveld boven de vakken |
+| `duolingo-style1` | Duolingo-geïnspireerde kaartindeling — grote aantikbare kaarten met pictogrammen |
+| `rating_box` | Op grid gebaseerde beoordelingsvakken — best voor numerieke of schaalgebaseerde keuzes |
+| `star_rating` | Sterbeoordelingswidget — keuzes worden weergegeven als 1–N sterren |
+| `choices-noshow` | Toont aanvankelijk alleen de eerste 10 keuzes; onthult de rest op aanvraag |
+| `noshow` | Verbergt de keuzenlijst volledig; de waarde wordt programmatisch ingesteld |
+| `checkall` | Voegt een optie "Alles selecteren" toe bovenaan de lijst |
+| `max-items(N)` | Beperkt het aantal zichtbare keuzes tot N (bijv. max-items(5)) |
 {{< /table >}}
 
 ### Voorbeeld: Likert-schaal

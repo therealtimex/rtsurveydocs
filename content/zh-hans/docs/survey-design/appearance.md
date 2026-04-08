@@ -93,6 +93,11 @@ rtSurvey 允许基于表单逻辑的动态外观变化：
 | `columns(n)` | select_one, select_multiple | 以 `n` 列显示选项。例如：`columns(3)` 显示三列单选按钮。 |
 | `gridformat<row=R col=C colspan=S align=center>` | 任意 | 将字段定位在 CSS 网格布局中的第 R 行、第 C 列，跨越 S 列。与 `advanced-extension/grid-layout` 一起使用。 |
 | `ignore-simplify` | 任意 | 指示表单渲染器跳过此字段布局的自动简化或压缩。 |
+| `required-but-simplify` | 任意 | 字段为必填项，但渲染器仍会简化其布局 |
+| `embed` | 任意 | 以嵌入/内联显示模式渲染字段 |
+| `popup` | select_one, select_multiple | 以弹出/模态覆盖层而非内联方式渲染选项列表 |
+| `auto-hide-empty` | boxtag, select | 当选项列表为空时隐藏整个问题控件 |
+| `text-nolabel` | select_one, select_multiple | 隐藏每个选项的文字标签，仅显示输入控件 |
 
 ### 小部件
 
@@ -100,6 +105,68 @@ rtSurvey 允许基于表单逻辑的动态外观变化：
 |----------------------|----------------|-------------|
 | `likert` | select_one | 以李克特量表行呈现选项（标准表格中已确认支持）。 |
 | `distress` | select_one | 将选项渲染为 Kessler 心理困扰量表（K10）带情感图标的可视小部件。 |
+
+### 选择视觉控件
+
+这些外观会改变选择列表的整体渲染方式。
+
+| 外观属性 | 问题类型 | 描述 |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | 选项以药丸形状的可点击标签片呈现。 |
+| `boxtag` | select_one, select_multiple | 选项以用户点击的矩形样式框呈现。 |
+| `boxtag -search` | select_one, select_multiple | 带有实时搜索/过滤输入框的 Boxtag 布局。 |
+| `duolingo-style1` | select_one, select_multiple | Duolingo 风格的大型卡片布局——适合带图标的短列表。 |
+| `rating_box` | select_one, select_multiple | 可点击的数字框网格——适合量表或 NPS 题目。 |
+| `star_rating` | select_one | 选项以星形呈现；星星数量等于选项数量。 |
+| `choices-noshow` | select_one, select_multiple | 初始仅显示前 10 个选项，带有"显示更多"控件。 |
+| `noshow` | select_one, select_multiple | 完全隐藏选项列表；值通过 `calculate` 或 API 以编程方式设置。 |
+| `checkall` | select_multiple | 在选项列表顶部添加"全选"快捷方式。 |
+| `max-items(N)` | select_one, select_multiple | 将可见选项列表上限设为 N 项。例如：`max-items(5)`。 |
+
+### 文本视觉控件
+
+| 外观属性 | 问题类型 | 描述 |
+|----------------------|----------------|-------------|
+| `richtext` | text | 以富文本编辑器（粗体、斜体、列表、链接）替换纯文本框。存储 HTML。 |
+| `typingtest` | text | 打字测试控件——标签文本为文章段落；控件记录输入的回答和计时。 |
+
+### 媒体扩展
+
+| 外观属性 | 问题类型 | 描述 |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | 在拍摄的照片上叠加文字水印。参数是在拍摄时求值的 XPath 表达式。例如：`watermark("${id} ${today()}")`。 |
+| `editable` | image | 允许在保存前对拍摄的照片进行注释/绘制。 |
+
+### 内联显示配置
+
+`display{}` 和 `results{}` 修饰符可附加到 `inline` 外观，以控制图标对齐和结果显示。这些与 `text` 字段的 `inline` 时间输入扩展和媒体捕获控件一起使用。
+
+#### `display{}` 参数
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| 参数 | 值 | 描述 |
+|-----------|--------|-------------|
+| 对齐 | `left`, `right`, `top`, `bottom`, `center` | 图标相对于输入字段的位置 |
+| 大小 | `small`, `medium`, `large` | 图标大小（分别对应 2.5 rem、5 rem、8 rem） |
+| 模式 | `inline-icon` | 将触发器渲染为仅图标（无按钮边框） |
+| 模式 | `inline-button` | 将触发器渲染为完整按钮 |
+
+#### `results{}` 参数
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| 参数 | 值 | 描述 |
+|-----------|--------|-------------|
+| 对齐 | `left`, `right`, `top`, `bottom`, `center` | 结果值显示的位置 |
+| `hide(field)` | 任意子字段名称 | 隐藏结果的特定组件（例如，`hide(seconds)`） |
 
 ### API 集成
 

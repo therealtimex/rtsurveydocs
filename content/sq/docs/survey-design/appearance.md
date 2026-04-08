@@ -93,6 +93,11 @@ Përveç pamjeve standarde XLSForm, rtSurvey mbështet opsionet e mëposhtme spe
 | `columns(n)` | select_one, select_multiple | Shfaq zgjedhjet në `n` kolona. Shembull: `columns(3)` tregon tre kolona butonaesh radio. |
 | `gridformat<row=R col=C colspan=S align=center>` | çdo | Pozicionon fushën në një paraqitje CSS-grid në rreshtin `R`, kolonën `C`, duke shtrirë `S` kolona. Përdoret me `advanced-extension/grid-layout`. |
 | `ignore-simplify` | çdo | Instrukton renderin e formularit të kapërcejë thjeshtimin ose ngjeshjen automatike të paraqitjes së kësaj fushe. |
+| `required-but-simplify` | çdo | Fusha është e detyrueshme por paraqitja e saj thjeshtësohet gjithsesi nga rendereri (anashkalon sjelljen e parazgjedhur ku fushat e detyrueshme përjashtohen nga thjeshtimi). |
+| `embed` | çdo | Renderueson fushën në modalitetin e shfaqjes së ngulitur/inline, duke fshehur mbështjellësin e jashtëm dhe kontejnerin e etiketës — përdoret kur pyetja është e ngulitur brenda HTML-it të personalizuar. |
+| `popup` | select_one, select_multiple | Renderueson listën e zgjedhjeve në një mbishtresë popup/modal në vend se inline. |
+| `auto-hide-empty` | boxtag, select | Fsheh të gjithë widget-in e pyetjes kur lista e zgjedhjeve është e zbrazët (p.sh., nuk kthehen rezultate API). |
+| `text-nolabel` | select_one, select_multiple | Fsheh etiketën e tekstit për çdo zgjedhje, duke treguar vetëm kontrollin e hyrjes. E ngjashme me `list-nolabel` por e aplikuar për çdo zgjedhje dhe jo si ndarje kolonash. |
 
 ### Widget-et
 
@@ -100,6 +105,68 @@ Përveç pamjeve standarde XLSForm, rtSurvey mbështet opsionet e mëposhtme spe
 |----------------------|----------------|-------------|
 | `likert` | select_one | Paraqet zgjedhjet si një rresht shkalle Likert (tashmë në tabelën standarde; i konfirmuar si i mbështetur). |
 | `distress` | select_one | Renderueson zgjedhjet si widget-in vizual të Shkallës Psikologjike të Shqetësimit Kessler (K10) me ikona emocionale. |
+
+### Widget-et vizuale të zgjedhjes
+
+Këto pamje ndryshojnë renderimin e plotë të listave të zgjedhjeve të zgjedhjes.
+
+| Atributi i Pamjes | Llojet e Pyetjeve | Përshkrimi |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Zgjedhjet renderohen si chip-e etikete të klikueshme në formë pill. |
+| `boxtag` | select_one, select_multiple | Zgjedhjet renderohen si kuti të stilizuara drejtkëndore që përdoruesi troket. |
+| `boxtag -search` | select_one, select_multiple | Paraqitja boxtag me hyrje kërkimi/filtrimi të drejtpërdrejtë mbi kutitë. |
+| `duolingo-style1` | select_one, select_multiple | Paraqitje karte e frymëzuar nga Duolingo — e përshtatshme për lista të shkurtra me ikona. |
+| `rating_box` | select_one, select_multiple | Rrjetë kutish të numëruara të troketshme — e përshtatshme për pyetje me shkallë ose NPS. |
+| `star_rating` | select_one | Zgjedhjet renderohen si yje; numri i yjeve barazohet me numrin e zgjedhjeve. |
+| `choices-noshow` | select_one, select_multiple | Fillimisht tregon vetëm 10 zgjedhjet e para me kontroll "Shfaq më shumë". |
+| `noshow` | select_one, select_multiple | Fsheh plotësisht listën e zgjedhjeve; vlera vendoset programatikisht nëpërmjet `calculate` ose API. |
+| `checkall` | select_multiple | Shton një shkurtore "Zgjidhni të gjitha" në krye të listës së zgjedhjeve. |
+| `max-items(N)` | select_one, select_multiple | Kufizon listën e dukshme të zgjedhjeve në N artikuj. Shembull: `max-items(5)`. |
+
+### Widget-et vizuale të tekstit
+
+| Atributi i Pamjes | Llojet e Pyetjeve | Përshkrimi |
+|----------------------|----------------|-------------|
+| `richtext` | text | Zëvendëson kutinë e tekstit të thjeshtë me redaktues teksti të pasur (të theksuar, kursiv, lista, lidhje). Ruan HTML. |
+| `typingtest` | text | Widget testi shtypi — teksti i etiketës është pasazhi; widget-i regjistron përgjigjen e shtypur dhe kohën. |
+
+### Zgjerime media
+
+| Atributi i Pamjes | Llojet e Pyetjeve | Përshkrimi |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | Mbivendos një filigran teksti mbi fotografitë e kapturuara. Argumenti është një shprehje XPath e vlerësuar në kohën e kapjes. Shembull: `watermark("${id} ${today()}")`. |
+| `editable` | image | Aktivizon komentimin/vizatimin mbi fotografinë e kapur para ruajtjes. |
+
+### Konfigurimi i shfaqjes inline
+
+Modifikuesit `display{}` dhe `results{}` mund t'i shtohen pamjeve `inline` për të kontrolluar rreshtimin e ikonave dhe shfaqjen e rezultateve.
+
+#### Parametrat `display{}`
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parametri | Vlerat | Përshkrimi |
+|-----------|--------|------------|
+| Rreshtimi | `left`, `right`, `top`, `bottom`, `center` | Pozicioni i ikonës relative me fushën e hyrjes |
+| Madhësia | `small`, `medium`, `large` | Madhësia e ikonës (2,5 rem, 5 rem, 8 rem respektivisht) |
+| Modaliteti | `inline-icon` | Renderueson nxitësin si ikonë vetëm (pa kufi butoni) |
+| Modaliteti | `inline-button` | Renderueson nxitësin si buton të plotë |
+
+#### Parametrat `results{}`
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parametri | Vlerat | Përshkrimi |
+|-----------|--------|------------|
+| Rreshtimi | `left`, `right`, `top`, `bottom`, `center` | Pozicioni i shfaqjes së vlerës së rezultatit |
+| `hide(field)` | çdo emër nënfushe | Fsheh një komponent specifik të rezultatit (p.sh., `hide(seconds)`) |
 
 ### Integrimi API
 

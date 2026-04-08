@@ -28,7 +28,6 @@ rtSurvey 支援所有標準 XLSForm 問題類型，以及幾個擴展類型。�
 |------|-------------|
 | [select_one listname](select-one) | 從清單中選取正好一個選項 |
 | [select_multiple listname](select-multiple) | 從清單中選取一個或多個選項 |
-| [select_one_from_file filename](select-one-from-file) | 從外部 CSV 文件載入的選項中選取一個 |
 | [rank listname](rank) | 按喜好或優先順序排列選項 |
 
 ## 日期和時間
@@ -66,6 +65,18 @@ rtSurvey 支援所有標準 XLSForm 問題類型，以及幾個擴展類型。�
 | [hidden](hidden) | 儲存靜態或預填值的隱藏字段 |
 | [trigger / acknowledge](trigger) | 調查員必須勾選以確認已閱讀聲明的核取方塊 |
 | [meta](meta) | 自動元資料：時間戳、裝置 ID、調查員資訊 |
+
+## rtSurvey 擴充
+
+這些類型是 rtSurvey 特有的，不屬於標準 XLSForm 規範。
+
+| 類型 | 描述 |
+|------|------|
+| [search-autocomplete](search-autocomplete) | 文字輸入，帶有即時 API 自動完成建議 |
+| [mentions](mentions) | 帶有 `@` 提及自動完成功能的文字欄位，用於在行內標記實體 |
+| [texttags](texttags) | 標籤輸入——每個條目成為可移除的標籤片；以空格分隔的字串儲存 |
+
+有關重複組，請參閱 [Repeats](../advanced-extension/repeats)
 
 ## 類型和外觀如何協同工作
 

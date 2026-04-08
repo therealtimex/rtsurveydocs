@@ -38,6 +38,8 @@ Textové otázky sa používajú pre:
 |------------|-------------|
 | *(žiadny)* | Jednoriadkový textový vstup |
 | `multiline` | Viacriadkový textový priestor — najlepší pre dlhší voľný text na webe |
+| `richtext` | Editor formátovaného textu s panelom nástrojov (tučné, kurzíva, zoznamy, odkazy) |
+| `typingtest` | Rozhranie pre test písania — respondent opisuje predložený text |
 
 ## Rozšírenia vstupu času rtSurvey
 

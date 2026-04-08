@@ -36,6 +36,8 @@ Textové otázky se používají pro:
 |--------|-------|
 | *(žádný)* | Jednořádkové textové pole |
 | `multiline` | Víceřádková textová oblast — nejlepší pro delší volný text na webu |
+| `richtext` | Editor formátovaného textu s panelem nástrojů (tučné, kurzíva, seznamy, odkazy) |
+| `typingtest` | Rozhraní pro test psaní — respondent opisuje předložený text |
 
 ## Rozšíření rtSurvey pro zadávání času
 

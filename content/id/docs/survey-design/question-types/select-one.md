@@ -62,6 +62,16 @@ Tentukan nilai dalam kolom `appearance` untuk mengubah cara pilihan ditampilkan:
 | `columns(N)` | Tampilkan dalam N kolom (ekstensi rtSurvey, misalnya, `columns(3)`) |
 | `distress` | Widget ikon emosional Kessler Psychological Distress (K10) |
 | `search-api(...)` | Pencarian dinamis — memuat pilihan dari API saat runtime |
+| `tagging` | Menampilkan pilihan sebagai chip tag yang dapat diklik alih-alih tombol radio |
+| `boxtag` | Menampilkan pilihan sebagai kotak persegi panjang bergaya yang diketuk pengguna untuk memilih |
+| `boxtag -search` | Tata letak Boxtag dengan input pencarian/filter di atas kotak |
+| `duolingo-style1` | Tata letak kartu ala Duolingo — kartu besar yang dapat diketuk dengan ikon |
+| `rating_box` | Kotak penilaian berbasis grid — terbaik untuk pilihan numerik atau skala |
+| `star_rating` | Widget penilaian bintang — pilihan dirender sebagai 1–N bintang |
+| `choices-noshow` | Menampilkan 10 pilihan pertama awalnya; mengungkap sisanya sesuai permintaan |
+| `noshow` | Menyembunyikan daftar pilihan sepenuhnya; nilai diatur secara terprogram |
+| `checkall` | Menambahkan opsi "Pilih semua" di bagian atas daftar |
+| `max-items(N)` | Membatasi jumlah pilihan yang terlihat menjadi N (misalnya, max-items(5)) |
 {{< /table >}}
 
 ### Contoh: Skala Likert

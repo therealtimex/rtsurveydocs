@@ -65,3 +65,27 @@ Images ដែលប្រមូលតាមប្រភេទ question នេះ
 - Devices ទាំងអស់ប្រហែលមិនមាន cameras ល្អ ឬ storage space គ្រប់គ្រាន់។
 - ការ Analyzing images ចំនួនច្រើន អាច time-consuming។
 - ប្រហែលមាន privacy concerns នៅពេល capture images ជាពិសេសក្នុង public spaces។
+
+## ផ្នែកពង្រីក image របស់ rtSurvey
+
+### watermark()
+
+Appearance `watermark()` បន្ថែម watermark អក្សរទៅលើរូបថតដែលចាប់ជាមួយ field នេះ។ watermark ជាធម្មតាផ្ទុក metadata ដូចជាឈ្មោះអ្នកប្រមូល ថ្ងៃ/ម៉ោង ឬ GPS coordinates ដែលត្រូវបានចុះត្រា ដោយផ្ទាល់ទៅលើ image មុនពេលរក្សាទុក។
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Take a photo of the site | `watermark("${enumerator_id} ${today()}")` |
+
+argument ទៅ `watermark()` គឺជា expression XPath ដែលត្រូវបានគណនានៅពេល capture។ string លទ្ធផលត្រូវបាន render ជា watermark text។
+
+### editable
+
+Appearance `editable` អនុញ្ញាតឱ្យអ្នកឆ្លើយតបធ្វើ annotation ឬគូសលើ photo ដែលបានថតបន្ទាប់ពីថត។ Drawing toolbar បង្ហាញខាងលើ image។
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Photograph and mark areas of concern | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` អាចរួមជាមួយ `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

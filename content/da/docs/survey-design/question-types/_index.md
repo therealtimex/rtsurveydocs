@@ -28,7 +28,6 @@ For at angive spørgsmålstypen skal du skrive typenavnet i kolonnen `type` i re
 |------|-------------|
 | [select_one listenavn](select-one) | Vælg præcis én mulighed fra en liste |
 | [select_multiple listenavn](select-multiple) | Vælg en eller flere muligheder fra en liste |
-| [select_one_from_file filnavn](select-one-from-file) | Vælg én mulighed indlæst fra en ekstern CSV-fil |
 | [rank listenavn](rank) | Ordner valgmuligheder efter præference eller prioritet |
 
 ## Dato og tid
@@ -66,6 +65,18 @@ For at angive spørgsmålstypen skal du skrive typenavnet i kolonnen `type` i re
 | [hidden](hidden) | Skjult felt, der gemmer en statisk eller forudfyldt værdi |
 | [trigger / acknowledge](trigger) | Et afkrydsningsfelt, intervieweren skal markere for at bekræfte, at de har læst en erklæring |
 | [meta](meta) | Automatiske metadata: tidsstempler, enheds-ID, interviewerinfo |
+
+## rtSurvey-udvidelser
+
+Disse typer er rtSurvey-specifikke og ikke en del af standard XLSForm-specifikationen.
+
+| Type | Beskrivelse |
+|------|-------------|
+| [search-autocomplete](search-autocomplete) | Tekstinput med realtids API-baserede autoudfyldningsforslag |
+| [mentions](mentions) | Tekstfelt med `@`-omtale-autoudfyldning til at tagge enheder inline |
+| [texttags](texttags) | Tag-inputfelt — hver indtastning bliver en chip, der kan fjernes; gemt som mellemrumssepareret streng |
+
+For gentagelsesgrupper, se [Repeats](../advanced-extension/repeats)
 
 ## Sådan arbejder type og appearance sammen
 

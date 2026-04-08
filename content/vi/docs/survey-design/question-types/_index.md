@@ -28,7 +28,6 @@ rtSurvey hỗ trợ tất cả các loại câu hỏi XLSForm tiêu chuẩn, cù
 |------|-------|
 | [select_one listname](select-one) | Chọn đúng một tùy chọn từ danh sách |
 | [select_multiple listname](select-multiple) | Chọn một hoặc nhiều tùy chọn từ danh sách |
-| [select_one_from_file filename](select-one-from-file) | Chọn một tùy chọn được tải từ tệp CSV bên ngoài |
 | [rank listname](rank) | Sắp xếp các lựa chọn theo ưu tiên hoặc thứ tự quan trọng |
 
 ## Ngày và Giờ
@@ -66,6 +65,18 @@ rtSurvey hỗ trợ tất cả các loại câu hỏi XLSForm tiêu chuẩn, cù
 | [hidden](hidden) | Trường ẩn lưu trữ giá trị tĩnh hoặc được điền sẵn |
 | [trigger / acknowledge](trigger) | Hộp kiểm mà người điều tra phải đánh dấu để xác nhận đã đọc một phát biểu |
 | [meta](meta) | Siêu dữ liệu tự động: dấu thời gian, ID thiết bị, thông tin người điều tra |
+
+## Phần mở rộng rtSurvey
+
+Các loại này là đặc trưng của rtSurvey và không thuộc thông số kỹ thuật XLSForm tiêu chuẩn.
+
+| Loại | Mô tả |
+|------|-------|
+| [search-autocomplete](search-autocomplete) | Nhập văn bản với gợi ý tự động hoàn thành từ API theo thời gian thực |
+| [mentions](mentions) | Trường văn bản với tính năng tự động hoàn thành `@` để gắn thẻ thực thể ngay trong dòng |
+| [texttags](texttags) | Nhập thẻ — mỗi mục nhập trở thành chip có thể xóa; lưu dưới dạng chuỗi phân tách bằng khoảng trắng |
+
+Xem thêm về nhóm lặp: [Repeats](../advanced-extension/repeats)
 
 ## Cách type và appearance hoạt động cùng nhau
 

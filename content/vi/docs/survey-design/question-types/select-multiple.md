@@ -64,6 +64,14 @@ Câu hỏi Select_multiple được dùng cho:
 | `label` | Chỉ hiển thị nhãn, không có hộp kiểm (dùng với `list-nolabel`) |
 | `list-nolabel` | Chỉ hiển thị hộp kiểm, không có nhãn (dùng với `label`) |
 | `columns(N)` | Hiển thị theo N cột (phần mở rộng rtSurvey) |
+| `tagging` | Các lựa chọn hiển thị dưới dạng chip thẻ hình viên thuốc |
+| `boxtag` | Các lựa chọn hiển thị dưới dạng hộp hình chữ nhật có kiểu dáng |
+| `boxtag -search` | Bố cục boxtag với ô tìm kiếm/lọc phía trên các hộp |
+| `duolingo-style1` | Bố cục thẻ lớn — phù hợp nhất cho danh sách lựa chọn ngắn |
+| `rating_box` | Hộp đánh giá dạng lưới |
+| `choices-noshow` | Hiển thị 10 lựa chọn đầu tiên ban đầu; hiện phần còn lại theo yêu cầu |
+| `checkall` | Thêm tùy chọn "Chọn tất cả" ở đầu danh sách |
+| `max-items(N)` | Giới hạn số lượng lựa chọn hiển thị thành N |
 {{< /table >}}
 
 ### Ví dụ: Bố cục lưới 3 cột thu gọn

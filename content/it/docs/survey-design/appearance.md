@@ -93,6 +93,11 @@ Oltre alle appearance XLSForm standard, rtSurvey supporta le seguenti opzioni sp
 | `columns(n)` | select_one, select_multiple | Mostra le scelte in `n` colonne. Esempio: `columns(3)` mostra tre colonne di pulsanti radio. |
 | `gridformat<row=R col=C colspan=S align=center>` | qualsiasi | Posiziona il campo in un layout CSS-grid alla riga `R`, colonna `C`, coprendo `S` colonne. Usato con `advanced-extension/grid-layout`. |
 | `ignore-simplify` | qualsiasi | Istruisce il renderer del modulo a saltare la semplificazione automatica o la condensazione del layout di questo campo. |
+| `required-but-simplify` | qualsiasi | Il campo è obbligatorio ma il layout viene comunque semplificato |
+| `embed` | qualsiasi | Visualizza il campo in modalità incorporata/inline |
+| `popup` | select_one, select_multiple | Visualizza l'elenco delle scelte in un overlay popup/modale |
+| `auto-hide-empty` | boxtag, select | Nasconde il widget quando l'elenco delle scelte è vuoto |
+| `text-nolabel` | select_one, select_multiple | Nasconde l'etichetta testuale per ogni scelta |
 
 ### Widget
 
@@ -100,6 +105,44 @@ Oltre alle appearance XLSForm standard, rtSurvey supporta le seguenti opzioni sp
 |----------------------|----------------|-------------|
 | `likert` | select_one | Presenta le scelte come riga della scala Likert (già nella tabella standard sopra; confermato supportato). |
 | `distress` | select_one | Renderizza le scelte come widget visivo della scala di disagio psicologico di Kessler (K10) con icone emotive. |
+
+### Widget visivi per la selezione
+
+| Attributo appearance | Tipi di domanda | Descrizione |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Mostra le scelte come chip di tag cliccabili invece di pulsanti radio o caselle di controllo |
+| `boxtag` | select_one, select_multiple | Mostra le scelte come riquadri rettangolari stilizzati che l'utente tocca per selezionare |
+| `boxtag -search` | select_one, select_multiple | Layout boxtag con un campo di ricerca/filtro sopra i riquadri |
+| `duolingo-style1` | select_one, select_multiple | Layout a schede ispirato a Duolingo — grandi schede toccabili con icone |
+| `rating_box` | select_one | Riquadri di valutazione a griglia — ideale per scelte numeriche o a scala |
+| `star_rating` | select_one | Widget di valutazione a stelle — le scelte vengono visualizzate come 1–N stelle |
+| `choices-noshow` | select_one, select_multiple | Mostra inizialmente solo le prime 10 scelte; rivela le restanti su richiesta |
+| `noshow` | select_one | Nasconde completamente l'elenco delle scelte; il valore viene impostato programmaticamente |
+| `checkall` | select_multiple | Aggiunge un'opzione "Seleziona tutto" in cima all'elenco |
+| `max-items(N)` | select_one, select_multiple | Limita il numero di scelte visibili a N (es. max-items(5)) |
+
+### Widget visivi per il testo
+
+| Attributo appearance | Tipi di domanda | Descrizione |
+|----------------------|----------------|-------------|
+| `richtext` | text | Editor di testo ricco — barra degli strumenti con grassetto, corsivo, elenchi e link |
+| `typingtest` | text | Interfaccia di test di digitazione — presenta un brano e misura velocità e precisione di digitazione |
+
+### Estensioni media
+
+| Attributo appearance | Tipi di domanda | Descrizione |
+|----------------------|----------------|-------------|
+| `watermark("expr")` | image | Sovrappone una filigrana di testo alla foto acquisita; l'argomento è un'espressione XPath valutata al momento dell'acquisizione |
+| `editable` | image | Consente al rispondente di annotare o disegnare sulla foto acquisita |
+
+### Configurazione del display inline
+
+Usa `display{}` per controllare come viene visualizzato il valore di un campo all'interno di un'etichetta o di una nota. Usa `results{}` per controllare il riepilogo dei risultati visualizzato dopo l'invio.
+
+| Sintassi | Tipi di domanda | Descrizione |
+|----------|----------------|-------------|
+| `display{format="..."}` | qualsiasi | Formatta il valore del campo quando viene inserito inline in un'etichetta tramite `${fieldname}` |
+| `results{show="true"}` | qualsiasi | Mostra il valore del campo nel riepilogo dei risultati post-invio |
 
 ### Integrazione API
 

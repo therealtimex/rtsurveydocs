@@ -93,6 +93,11 @@ Ud over standard XLSForm-appearances understøtter rtSurvey følgende platformsp
 | `columns(n)` | select_one, select_multiple | Viser valgmuligheder i `n` kolonner. Eksempel: `columns(3)` viser tre kolonner med radioknapper. |
 | `gridformat<row=R col=C colspan=S align=center>` | enhver | Placerer feltet i et CSS-grid-layout på række `R`, kolonne `C`, og spænder `S` kolonner. |
 | `ignore-simplify` | enhver | Instruerer formulargengiveren om at springe automatisk forenkling af dette felts layout over. |
+| `required-but-simplify` | enhver | Feltet er påkrævet, men dets layout forenkles stadig af gengiveren (tilsidesætter standardadfærden, hvor påkrævede felter udelukkes fra forenkling). |
+| `embed` | enhver | Gengiver feltet i indlejret/inline-visningstilstand, undertrykker den ydre indpakning og labelcontainer — bruges, når et spørgsmål er indlejret i tilpasset HTML. |
+| `popup` | select_one, select_multiple | Gengiver valglisten i et popup/modal-overlag i stedet for inline. |
+| `auto-hide-empty` | boxtag, select | Skjuler hele spørgsmålswidgetten, når valglisten er tom (f.eks. ingen API-resultater returneret). |
+| `text-nolabel` | select_one, select_multiple | Skjuler tekstlabelen for hvert valg og viser kun inputkontrollen. Ligner `list-nolabel`, men anvendes pr. valg frem for som kolonnesplit. |
 
 ### Widgets
 
@@ -100,6 +105,68 @@ Ud over standard XLSForm-appearances understøtter rtSurvey følgende platformsp
 |----------------------|----------------|-------------|
 | `likert` | select_one | Præsenterer valgmuligheder som en Likert-skala-række. |
 | `distress` | select_one | Gengiver valgmuligheder som den visuelle Kessler Psychological Distress Scale (K10) widget. |
+
+### Visuelle select-widgets
+
+Disse appearances ændrer hele gengivelsen af select-valglister.
+
+| Appearance-attribut | Spørgsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | Valgmuligheder gengives som pilleformede klikbare tag-chips. |
+| `boxtag` | select_one, select_multiple | Valgmuligheder gengives som rektangulære stilede bokse, som brugeren trykker på. |
+| `boxtag -search` | select_one, select_multiple | Boxtag-layout med et live søge-/filterinput over boksene. |
+| `duolingo-style1` | select_one, select_multiple | Stort kortlayout inspireret af Duolingo — velegnet til korte lister med ikoner. |
+| `rating_box` | select_one, select_multiple | Grid af klikbare nummererede bokse — velegnet til skala- eller NPS-spørgsmål. |
+| `star_rating` | select_one | Valgmuligheder gengives som stjerner; stjerneantallet svarer til antallet af valgmuligheder. |
+| `choices-noshow` | select_one, select_multiple | Viser i første omgang kun de første 10 valgmuligheder med en "Vis mere"-kontrol. |
+| `noshow` | select_one, select_multiple | Skjuler valglisten helt; værdien angives programmatisk via `calculate` eller API. |
+| `checkall` | select_multiple | Tilføjer en "Vælg alle"-genvej øverst på valglisten. |
+| `max-items(N)` | select_one, select_multiple | Begrænser den synlige valgliste til N elementer. Eksempel: `max-items(5)`. |
+
+### Visuelle tekst-widgets
+
+| Appearance-attribut | Spørgsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| `richtext` | text | Erstatter det almindelige tekstfelt med en teksteditor med formatering (fed, kursiv, lister, links). Gemmer HTML. |
+| `typingtest` | text | Skrivetestewidget — labelteksten er passagen; widgetten registrerer det skrevne svar og tidspunktet. |
+
+### Medieudvidelser
+
+| Appearance-attribut | Spørgsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| `watermark("udtryk")` | image | Overlejrer et tekstvandmærke på optagne fotos. Argumentet er et XPath-udtryk, der evalueres ved optagelsestidspunktet. Eksempel: `watermark("${id} ${today()}")`. |
+| `editable` | image | Muliggør annotering/tegning oven på det optagne foto inden gemning. |
+
+### Inline visningskonfiguration
+
+`display{}`- og `results{}`-modifikatorerne kan tilføjes til `inline`-appearances for at styre ikonjustering og resultatvisning. Disse bruges sammen med `inline`-tidsinputudvidelsen på `text`-felter og med medieoptagewidgets.
+
+#### `display{}`-parametre
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parameter | Værdier | Beskrivelse |
+|-----------|---------|-------------|
+| Justering | `left`, `right`, `top`, `bottom`, `center` | Position af ikonet i forhold til inputfeltet |
+| Størrelse | `small`, `medium`, `large` | Ikonstørrelse (svarer til henholdsvis 2,5 rem, 5 rem, 8 rem) |
+| Tilstand | `inline-icon` | Gengiver udløseren som ikon alene (ingen knapkant) |
+| Tilstand | `inline-button` | Gengiver udløseren som en fuld knap |
+
+#### `results{}`-parametre
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parameter | Værdier | Beskrivelse |
+|-----------|---------|-------------|
+| Justering | `left`, `right`, `top`, `bottom`, `center` | Position af resultatværdivisningen |
+| `hide(felt)` | ethvert underfeltsnavn | Skjuler en specifik komponent af resultatet (f.eks. `hide(seconds)`) |
 
 ### API-integration
 

@@ -54,3 +54,27 @@ Obrázky shromážděné prostřednictvím tohoto typu otázky jsou obvykle:
 - Ne všechna zařízení mohou mít vysokokvalitnlí kamery nebo dostatek místa v úložišti.
 - Analýza velkého počtu obrázků může být časově náročná.
 - Při pořizování obrázků, zejména na veřejných místech, mohou existovat obavy o soukromí.
+
+## Rozšíření rtSurvey pro obrázky
+
+### watermark()
+
+Vzhled `watermark()` překryje textový vodoznak na fotografiích zachycených v tomto poli. Vodoznak obvykle obsahuje metadata jako jméno enumerátora, datum/čas nebo GPS souřadnice, razítko přímo na obrázek před uložením.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Vyfotografujte místo | `watermark("${enumerator_id} ${today()}")` |
+
+Argument pro `watermark()` je výraz XPath vyhodnocený v době zachycení. Výsledný řetězec je vykreslen jako text vodoznaku.
+
+### editable
+
+Vzhled `editable` umožňuje respondentovi anotovat nebo kreslit na zachycenou fotografii po jejím pořízení. Nad obrázkem se zobrazí panel nástrojů pro kreslení.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Vyfotografujte a označte oblasti zájmu | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` lze kombinovat s `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

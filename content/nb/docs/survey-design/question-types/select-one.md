@@ -58,6 +58,16 @@ Select_one-spørsmål brukes for:
 | `columns(N)` | Vis i N kolonner (rtSurvey-utvidelse, f.eks. `columns(3)`) |
 | `distress` | Kessler Psychological Distress (K10) emosjonell ikonwidget |
 | `search-api(...)` | Dynamisk søk — laster valg fra et API ved kjøretid |
+| `tagging` | Viser valg som klikkbare tag-chips i stedet for radioknapper |
+| `boxtag` | Viser valg som stiliserte rektangulære bokser som brukeren trykker for å velge |
+| `boxtag -search` | Boxtag-oppsett med et søke-/filtreringsfelt over boksene |
+| `duolingo-style1` | Duolingo-inspirert kortoppsett — store trykkbare kort med ikoner |
+| `rating_box` | Gridbaserte vurderingsbokser — best for numeriske eller skalavalg |
+| `star_rating` | Stjernevurderingswidget — valg gjengis som 1–N stjerner |
+| `choices-noshow` | Viser bare de første 10 valgene innledningsvis; avslører resten på forespørsel |
+| `noshow` | Skjuler valglisten fullstendig; verdi settes programmatisk |
+| `checkall` | Legger til et "Velg alle"-alternativ øverst i listen |
+| `max-items(N)` | Begrenser antall synlige valg til N (f.eks. max-items(5)) |
 {{< /table >}}
 
 ### Eksempel: Likert-skala

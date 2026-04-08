@@ -93,6 +93,11 @@ Além das aparências padrão do XLSForm, o rtSurvey suporta as seguintes opçõ
 | `columns(n)` | select_one, select_multiple | Exibe opções em `n` colunas. Exemplo: `columns(3)` mostra três colunas de botões de rádio. |
 | `gridformat<row=R col=C colspan=S align=center>` | qualquer | Posiciona o campo em um layout CSS-grid na linha `R`, coluna `C`, abrangendo `S` colunas. Usado com `advanced-extension/grid-layout`. |
 | `ignore-simplify` | qualquer | Instrui o renderizador de formulário a pular a simplificação ou condensação automática do layout deste campo. |
+| `required-but-simplify` | qualquer | O campo é obrigatório, mas seu layout ainda é simplificado pelo renderizador (substitui o comportamento padrão onde campos obrigatórios são excluídos da simplificação). |
+| `embed` | qualquer | Renderiza o campo no modo de exibição incorporado/inline, suprimindo seu contêiner externo e de rótulo — usado quando uma pergunta está aninhada dentro de HTML personalizado. |
+| `popup` | select_one, select_multiple | Renderiza a lista de opções em uma sobreposição popup/modal em vez de inline. |
+| `auto-hide-empty` | boxtag, select | Oculta todo o widget de pergunta quando a lista de opções está vazia (por exemplo, nenhum resultado de API retornado). |
+| `text-nolabel` | select_one, select_multiple | Oculta o rótulo de texto para cada opção, mostrando apenas o controle de entrada. Semelhante a `list-nolabel`, mas aplicado por opção em vez de como uma divisão de coluna. |
 
 ### Widgets
 
@@ -100,6 +105,68 @@ Além das aparências padrão do XLSForm, o rtSurvey suporta as seguintes opçõ
 |-----------------------|-------------------|-----------|
 | `likert` | select_one | Apresenta opções como uma linha de escala Likert (já na tabela padrão acima; confirmado como suportado). |
 | `distress` | select_one | Renderiza opções como o widget visual da Escala de Sofrimento Psicológico de Kessler (K10) com ícones emocionais. |
+
+### Widgets visuais de seleção
+
+Essas aparências mudam toda a renderização das listas de opções de seleção.
+
+| Atributo de aparência | Tipos de perguntas | Descrição |
+|-----------------------|-------------------|-----------|
+| `tagging` | select_one, select_multiple | As opções são renderizadas como chips de tag clicáveis em formato de pílula. |
+| `boxtag` | select_one, select_multiple | As opções são renderizadas como caixas retangulares estilizadas que o usuário toca. |
+| `boxtag -search` | select_one, select_multiple | Layout boxtag com uma entrada de pesquisa/filtro ao vivo acima das caixas. |
+| `duolingo-style1` | select_one, select_multiple | Layout de cartão inspirado no Duolingo — adequado para listas curtas com ícones. |
+| `rating_box` | select_one, select_multiple | Grade de caixas numeradas tocáveis — adequado para perguntas de escala ou NPS. |
+| `star_rating` | select_one | As opções são renderizadas como estrelas; o número de estrelas é igual ao número de opções. |
+| `choices-noshow` | select_one, select_multiple | Mostra inicialmente apenas as primeiras 10 opções com um controle "Mostrar mais". |
+| `noshow` | select_one, select_multiple | Oculta completamente a lista de opções; o valor é definido programaticamente via `calculate` ou API. |
+| `checkall` | select_multiple | Adiciona um atalho "Selecionar tudo" no topo da lista de opções. |
+| `max-items(N)` | select_one, select_multiple | Limita a lista de opções visível a N itens. Exemplo: `max-items(5)`. |
+
+### Widgets visuais de texto
+
+| Atributo de aparência | Tipos de perguntas | Descrição |
+|-----------------------|-------------------|-----------|
+| `richtext` | text | Substitui a caixa de texto simples por um editor de texto rico (negrito, itálico, listas, links). Armazena HTML. |
+| `typingtest` | text | Widget de teste de digitação — o texto do rótulo é a passagem; o widget registra a resposta digitada e o tempo. |
+
+### Extensões de mídia
+
+| Atributo de aparência | Tipos de perguntas | Descrição |
+|-----------------------|-------------------|-----------|
+| `watermark("expression")` | image | Sobrepõe uma marca d'água de texto nas fotos capturadas. O argumento é uma expressão XPath avaliada no momento da captura. Exemplo: `watermark("${id} ${today()}")`. |
+| `editable` | image | Habilita anotação/desenho sobre a foto capturada antes de salvar. |
+
+### Configuração de exibição inline
+
+Os modificadores `display{}` e `results{}` podem ser anexados às aparências `inline` para controlar o alinhamento de ícones e a exibição de resultados.
+
+#### Parâmetros de `display{}`
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Parâmetro | Valores | Descrição |
+|-----------|---------|-----------|
+| Alinhamento | `left`, `right`, `top`, `bottom`, `center` | Posição do ícone em relação ao campo de entrada |
+| Tamanho | `small`, `medium`, `large` | Tamanho do ícone (2,5 rem, 5 rem, 8 rem respectivamente) |
+| Modo | `inline-icon` | Renderiza o gatilho apenas como ícone (sem borda de botão) |
+| Modo | `inline-button` | Renderiza o gatilho como um botão completo |
+
+#### Parâmetros de `results{}`
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Parâmetro | Valores | Descrição |
+|-----------|---------|-----------|
+| Alinhamento | `left`, `right`, `top`, `bottom`, `center` | Posição da exibição do valor do resultado |
+| `hide(field)` | qualquer nome de subcampo | Oculta um componente específico do resultado (por exemplo, `hide(seconds)`) |
 
 ### Integração de API
 

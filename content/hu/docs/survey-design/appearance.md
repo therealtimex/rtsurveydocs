@@ -93,6 +93,11 @@ A szabványos XLSForm megjelenési beállításokon túl az rtSurvey a következ
 | `columns(n)` | select_one, select_multiple | A lehetőségeket `n` oszlopban jeleníti meg. Pl.: `columns(3)` háromoszlopos rádiógombok. |
 | `gridformat<row=R col=C colspan=S align=center>` | bármely | CSS-rácselrendezésben helyezi el a mezőt az `R` sorban, `C` oszlopban, `S` oszlopot átfedve. Az `advanced-extension/grid-layout` funkcióval használható. |
 | `ignore-simplify` | bármely | Utasítja a form-megjelenítőt, hogy hagyja ki az automatikus egyszerűsítést ennél a mezőnél. |
+| `required-but-simplify` | bármely | A mező kötelező, de az elrendezése továbbra is egyszerűsítésre kerül (felülírja az alapértelmezett viselkedést, ahol a kötelező mezők ki vannak zárva az egyszerűsítésből). |
+| `embed` | bármely | A mezőt beágyazott/inline megjelenítési módban rendereli, elnyomva a külső burkolóját és felirat-konténerét — egyéni HTML-be ágyazott kérdéseknél használatos. |
+| `popup` | select_one, select_multiple | A lehetőséglistát felugró/modális ablakban rendereli inline helyett. |
+| `auto-hide-empty` | boxtag, select | Elrejti a teljes kérdés-widgetet, ha a lehetőséglista üres (pl. az API nem adott vissza eredményt). |
+| `text-nolabel` | select_one, select_multiple | Elrejti az egyes lehetőségek szöveges feliratát, csak a beviteli vezérlőelemet mutatja. Hasonló a `list-nolabel`-hez, de lehetőségenként alkalmazva, nem oszlop-felosztásként. |
 
 ### Widgetek
 
@@ -100,6 +105,68 @@ A szabványos XLSForm megjelenési beállításokon túl az rtSurvey a következ
 |------------------------|----------------|--------|
 | `likert` | select_one | Likert-skálaként jeleníti meg a lehetőségeket (a szabványos táblában is szerepel). |
 | `distress` | select_one | A Kessler Pszichológiai Distresszskálát (K10) jeleníti meg érzelmi ikonokkal. |
+
+### Vizuális widgetek a kiválasztáshoz
+
+Ezek a megjelenési beállítások a kiválasztási listák teljes megjelenítési módját megváltoztatják.
+
+| Megjelenési attribútum | Kérdéstípusok | Leírás |
+|------------------------|----------------|--------|
+| `tagging` | select_one, select_multiple | A lehetőségek labdaforma chipekként jelennek meg. |
+| `boxtag` | select_one, select_multiple | A lehetőségek téglalap alakú stilizált dobozokként jelennek meg. |
+| `boxtag -search` | select_one, select_multiple | Boxtag elrendezés élő kereső/szűrő beviteli mezővel a dobozok felett. |
+| `duolingo-style1` | select_one, select_multiple | Duolingo-ihlette nagy kártyaelrendezés — rövid listákhoz ikonokkal. |
+| `rating_box` | select_one, select_multiple | Kattintható számozott dobozok rácsa — skálás vagy NPS kérdésekhez. |
+| `star_rating` | select_one | A lehetőségek csillagokként jelennek meg; a csillagok száma egyenlő a lehetőségek számával. |
+| `choices-noshow` | select_one, select_multiple | Kezdetben csak az első 10 lehetőséget mutatja „Több megjelenítése" vezérlővel. |
+| `noshow` | select_one, select_multiple | Teljesen elrejti a lehetőséglistát; az értéket programozottan állítja be a `calculate` vagy API. |
+| `checkall` | select_multiple | „Az összes kijelölése" gyorsgombot ad a lehetőséglista tetejére. |
+| `max-items(N)` | select_one, select_multiple | N elemre korlátozza a látható lehetőséglistát. Pl.: `max-items(5)`. |
+
+### Vizuális widgetek a szöveghez
+
+| Megjelenési attribútum | Kérdéstípusok | Leírás |
+|------------------------|----------------|--------|
+| `richtext` | text | A sima szövegmezőt formázott szövegszerkesztőre cseréli (félkövér, dőlt, listák, hivatkozások). HTML-t tárol. |
+| `typingtest` | text | Gépelési teszt widget — a felirat szövege a passzus; a widget rögzíti a begépelt választ és az időzítést. |
+
+### Médiabővítmények
+
+| Megjelenési attribútum | Kérdéstípusok | Leírás |
+|------------------------|----------------|--------|
+| `watermark("kifejezés")` | image | Szöveges vízjelet helyez a rögzített fotókra. Az argumentum egy rögzítés közben kiértékelt XPath-kifejezés. Pl.: `watermark("${id} ${today()}")`. |
+| `editable` | image | Lehetővé teszi a rögzített fotó mentés előtti annotálását/rajzolását. |
+
+### Beágyazott megjelenítési konfiguráció
+
+A `display{}` és `results{}` módosítók hozzáfűzhetők az `inline` megjelenési beállításokhoz az ikonok igazításának és az eredmények megjelenítésének szabályozásához. A `text` mezők `inline` időbeviteli bővítményével és médiarögzítő widgetekkel együtt használatosak.
+
+#### `display{}` paraméterek
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| Paraméter | Értékek | Leírás |
+|-----------|---------|--------|
+| Igazítás | `left`, `right`, `top`, `bottom`, `center` | Az ikon pozíciója a beviteli mezőhöz képest |
+| Méret | `small`, `medium`, `large` | Ikon mérete (2,5 rem, 5 rem, 8 rem) |
+| Mód | `inline-icon` | A kiváltót csak ikonként rendereli (gombkeret nélkül) |
+| Mód | `inline-button` | A kiváltót teljes gombként rendereli |
+
+#### `results{}` paraméterek
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| Paraméter | Értékek | Leírás |
+|-----------|---------|--------|
+| Igazítás | `left`, `right`, `top`, `bottom`, `center` | Az eredményérték megjelenítésének pozíciója |
+| `hide(mező)` | bármely almező neve | Elrejt egy adott eredmény-komponenst (pl. `hide(seconds)`) |
 
 ### API-integráció
 

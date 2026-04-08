@@ -28,7 +28,6 @@ Para establecer el tipo de pregunta, ingrese el nombre del tipo en la columna `t
 |------|-------------|
 | [select_one listname](select-one) | Elegir exactamente una opción de una lista |
 | [select_multiple listname](select-multiple) | Elegir una o más opciones de una lista |
-| [select_one_from_file filename](select-one-from-file) | Elegir una opción cargada desde un archivo CSV externo |
 | [rank listname](rank) | Ordenar opciones por preferencia o prioridad |
 
 ## Fecha y hora
@@ -66,6 +65,18 @@ Para establecer el tipo de pregunta, ingrese el nombre del tipo en la columna `t
 | [hidden](hidden) | Campo oculto que almacena un valor estático o precargado |
 | [trigger / acknowledge](trigger) | Una casilla de verificación que el encuestador debe marcar para confirmar que ha leído una declaración |
 | [meta](meta) | Metadatos automáticos: marcas de tiempo, ID del dispositivo, información del encuestador |
+
+## Extensiones rtSurvey
+
+Estos tipos son específicos de rtSurvey y no forman parte de la especificación XLSForm estándar.
+
+| Tipo | Descripción |
+|------|-------------|
+| [search-autocomplete](search-autocomplete) | Entrada de texto con sugerencias de autocompletado en vivo impulsadas por API |
+| [mentions](mentions) | Campo de texto con autocompletado de menciones `@` para etiquetar entidades en línea |
+| [texttags](texttags) | Entrada de etiquetas — cada entrada se convierte en un chip extraíble; almacenado como cadena separada por espacios |
+
+Para grupos de repetición, ver [Repeats](../advanced-extension/repeats)
 
 ## Cómo funcionan juntos el tipo y la apariencia
 

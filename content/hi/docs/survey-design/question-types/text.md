@@ -38,6 +38,8 @@ Text questions का उपयोग इनके लिए किया जा
 |------------|-------------|
 | *(none)* | Single-line text input |
 | `multiline` | Multi-line text area — web पर longer free text के लिए सबसे अच्छा |
+| `richtext` | Rich text editor — bold, italic, lists, और links के साथ toolbar |
+| `typingtest` | Typing test interface — एक passage प्रस्तुत करता है और typing speed और accuracy मापता है |
 
 ## rtSurvey time input extensions
 

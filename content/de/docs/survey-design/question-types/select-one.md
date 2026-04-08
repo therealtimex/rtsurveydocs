@@ -62,6 +62,16 @@ Geben Sie einen Wert in der Spalte `appearance` an, um die Darstellung der Auswa
 | `columns(N)` | Anzeige in N Spalten (rtSurvey-Erweiterung, z. B. `columns(3)`) |
 | `distress` | Kessler Psychological Distress (K10) Widget mit emotionalen Symbolen |
 | `search-api(...)` | Dynamische Suche — lädt Auswahlmöglichkeiten zur Laufzeit von einer API |
+| `tagging` | Zeigt Auswahlmöglichkeiten als anklickbare Tag-Chips statt Optionsfelder |
+| `boxtag` | Zeigt Auswahlmöglichkeiten als gestaltete rechteckige Boxen, die der Benutzer antippt |
+| `boxtag -search` | Boxtag-Layout mit Such-/Filtereingabe über den Boxen |
+| `duolingo-style1` | Duolingo-inspiriertes Kartenlayout — große tippbare Karten mit Symbolen |
+| `rating_box` | Rasterbasierte Bewertungsboxen — am besten für numerische oder Skalenoptionen |
+| `star_rating` | Sternebewertungs-Widget — Auswahlmöglichkeiten werden als 1–N Sterne dargestellt |
+| `choices-noshow` | Zeigt zunächst nur die ersten 10 Optionen; blendet den Rest auf Anfrage ein |
+| `noshow` | Blendet die Auswahlliste vollständig aus; Wert wird programmatisch gesetzt |
+| `checkall` | Fügt oben in der Liste eine Option "Alle auswählen" hinzu |
+| `max-items(N)` | Begrenzt die sichtbaren Auswahlmöglichkeiten auf N (z. B. max-items(5)) |
 {{< /table >}}
 
 ### Beispiel: Likert-Skala

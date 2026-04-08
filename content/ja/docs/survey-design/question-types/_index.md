@@ -28,7 +28,6 @@ rtSurveyはすべての標準XLSForm質問タイプに加え、独自の拡張�
 |------|-------------|
 | [select_one listname](select-one) | リストから1つのオプションだけを選択 |
 | [select_multiple listname](select-multiple) | リストから1つ以上のオプションを選択 |
-| [select_one_from_file filename](select-one-from-file) | 外部CSVファイルから読み込まれた選択肢から1つを選択 |
 | [rank listname](rank) | 好みや優先度に従って選択肢を並べ替え |
 
 ## 日付と時刻
@@ -66,6 +65,18 @@ rtSurveyはすべての標準XLSForm質問タイプに加え、独自の拡張�
 | [hidden](hidden) | 静的または事前入力された値を格納する非表示フィールド |
 | [trigger / acknowledge](trigger) | 調査員が声明を読んだことを確認するためにチェックしなければならないチェックボックス |
 | [meta](meta) | 自動メタデータ：タイムスタンプ、デバイスID、調査員情報 |
+
+## rtSurvey 拡張
+
+これらのタイプは rtSurvey 固有のものであり、標準の XLSForm 仕様には含まれていません。
+
+| タイプ | 説明 |
+|--------|------|
+| [search-autocomplete](search-autocomplete) | リアルタイム API による自動補完候補付きテキスト入力 |
+| [mentions](mentions) | エンティティをインラインでタグ付けするための `@` メンション自動補完付きテキストフィールド |
+| [texttags](texttags) | タグ入力 — 各エントリが削除可能なチップになる；スペース区切りの文字列として保存 |
+
+繰り返しグループについては [Repeats](../advanced-extension/repeats) を参照
 
 ## タイプと外観の連携
 

@@ -26,6 +26,21 @@ Choices darblapā:
 | languages | russian | Krievu |
 | languages | other | Cita |
 
+Pilnīgāks izskatu saraksts:
+
+{{< table >}}
+| Izskats | Apraksts |
+|---------|----------|
+| `tagging` | Parāda izvēles kā noklikšķināmus pill formas tagu čipsus |
+| `boxtag` | Parāda izvēles kā stilizētus taisnstūrveida lodziņus |
+| `boxtag -search` | Boxtag izkārtojums ar dzīvas meklēšanas/filtrēšanas ievadi virs lodziņiem |
+| `duolingo-style1` | Duolingo iedvesmots karšu izkārtojums — lielas pieskaramās kartes ar ikonām |
+| `rating_box` | Tīklveida vērtēšanas lodziņi |
+| `choices-noshow` | Sākotnēji rāda tikai pirmās 10 izvēles; pārējās atklāj pēc pieprasījuma |
+| `checkall` | Pievieno opciju "Atlasīt visas" saraksta augšdaļā |
+| `max-items(N)` | Ierobežo redzamo izvēļu skaitu līdz N |
+{{< /table >}}
+
 ## Izteiksmes ar select_multiple
 
 Lai pārbaudītu, vai konkrēta izvēle ir atlasīta, izmantojiet `selected()` funkciju:

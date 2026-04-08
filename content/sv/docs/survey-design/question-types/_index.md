@@ -28,7 +28,6 @@ För att ange frågtypen anger du typnamnet i kolumnen `type` i kalkylbladet **s
 |-----|-------------|
 | [select_one listname](select-one) | Välj exakt ett alternativ från en lista |
 | [select_multiple listname](select-multiple) | Välj ett eller flera alternativ från en lista |
-| [select_one_from_file filename](select-one-from-file) | Välj ett alternativ laddat från en extern CSV-fil |
 | [rank listname](rank) | Rangordna alternativ efter preferens eller prioritet |
 
 ## Datum och tid
@@ -66,6 +65,18 @@ För att ange frågtypen anger du typnamnet i kolumnen `type` i kalkylbladet **s
 | [hidden](hidden) | Dolt fält som lagrar ett statiskt eller förhandsifyllt värde |
 | [trigger / acknowledge](trigger) | En kryssruta som räknaren måste bocka för att bekräfta att de läst ett påstående |
 | [meta](meta) | Automatiska metadata: tidsstämplar, enhets-ID, räknarinformation |
+
+## rtSurvey-tillägg
+
+Dessa typer är rtSurvey-specifika och är inte en del av standard XLSForm-specifikationen.
+
+| Typ | Beskrivning |
+|-----|-------------|
+| [search-autocomplete](search-autocomplete) | Textinmatning med realtids API-drivna autokompletteringsförslag |
+| [mentions](mentions) | Textfält med `@`-omnämnande autokomplettering för att tagga enheter inline |
+| [texttags](texttags) | Tagginmatningsfält — varje post blir ett borttagbart chip; lagrat som blankstegsavgränsad sträng |
+
+För upprepningsgrupper, se [Repeats](../advanced-extension/repeats)
 
 ## Hur typ och utseende fungerar tillsammans
 

@@ -36,6 +36,8 @@ Tekstvragen worden gebruikt voor:
 |----------|-------------|
 | *(geen)* | Enkelregelige tekstinvoer |
 | `multiline` | Meerregelig tekstgebied — het beste voor langere vrije tekst op web |
+| `richtext` | RTF-editor — werkbalk met vet, cursief, lijsten en koppelingen |
+| `typingtest` | Typtestinterface — toont een passage en meet typsnelheid en nauwkeurigheid |
 
 ## rtSurvey tijdinvoerextensies
 

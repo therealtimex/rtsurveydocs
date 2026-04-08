@@ -28,7 +28,6 @@ Për të vendosur llojin e pyetjes, shkruani emrin e llojit në kolonën `type` 
 |-------|------------|
 | [select_one listname](select-one) | Zgjidh saktësisht një opsion nga lista |
 | [select_multiple listname](select-multiple) | Zgjidh një ose më shumë opsione nga lista |
-| [select_one_from_file filename](select-one-from-file) | Zgjidh një opsion ngarkuar nga skedar i jashtëm CSV |
 | [rank listname](rank) | Rendit zgjedhjet sipas preferencës ose prioritetit |
 
 ## Data dhe Ora
@@ -66,6 +65,18 @@ Për të vendosur llojin e pyetjes, shkruani emrin e llojit në kolonën `type` 
 | [hidden](hidden) | Fushë e fshehur që ruan një vlerë statike ose të parapredisur |
 | [trigger / acknowledge](trigger) | Kutia e zgjedhjes që numëruesi duhet ta shënojë për të konfirmuar që ka lexuar një deklaratë |
 | [meta](meta) | Metadata automatike: timestamps, ID pajisje, informacion numëruesi |
+
+## Zgjerime rtSurvey
+
+Këto lloje janë specifike për rtSurvey dhe nuk janë pjesë e specifikimit standard XLSForm.
+
+| Lloji | Përshkrimi |
+|-------|------------|
+| [search-autocomplete](search-autocomplete) | Hyrje teksti me sugjerime plotësimi automatik të bazuara në API në kohë reale |
+| [mentions](mentions) | Fushë teksti me plotësim automatik të `@`-mencioneve për etiketimin e entiteteve inline |
+| [texttags](texttags) | Fushë e hyrjes së etiketave — çdo hyrje bëhet një chip i heqshëm; ruhet si varg i ndarë me hapësira |
+
+Për grupet e përsëritjes, shihni [Repeats](../advanced-extension/repeats)
 
 ## Si funksionojnë lloji dhe pamja së bashku
 

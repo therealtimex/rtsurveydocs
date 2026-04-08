@@ -28,7 +28,6 @@ Da biste postavili tip pitanja, unesite naziv tipa u kolonu `type` radnog lista 
 |-----|------|
 | [select_one listname](select-one) | Izaberite tačno jednu opciju sa liste |
 | [select_multiple listname](select-multiple) | Izaberite jednu ili više opcija sa liste |
-| [select_one_from_file filename](select-one-from-file) | Izaberite jednu opciju učitanu iz spoljne CSV datoteke |
 | [rank listname](rank) | Poredajte opcije po preferenciji ili prioritetu |
 
 ## Datum i vreme
@@ -66,6 +65,18 @@ Da biste postavili tip pitanja, unesite naziv tipa u kolonu `type` radnog lista 
 | [hidden](hidden) | Skriveno polje koje čuva statičku ili unapred popunjenu vrednost |
 | [trigger / acknowledge](trigger) | Potvrdni okvir koji anketar mora označiti da potvrdi da je pročitao izjavu |
 | [meta](meta) | Automatski metapodaci: vremenske oznake, ID uređaja, informacije o anketaru |
+
+## rtSurvey проширења
+
+Ови типови су специфични за rtSurvey и нису дeo стандардне XLSForm спецификације.
+
+| Тип | Опис |
+|-----|------|
+| [search-autocomplete](search-autocomplete) | Текстуални унос са предлозима аутоматског довршавања на основу API-ја у реалном времену |
+| [mentions](mentions) | Текстуално поље са аутоматским довршавањем `@`-помена за означавање ентитета |
+| [texttags](texttags) | Поље за унос ознака — сваки унос постаје уклоњиви чип; чува се као низ раздвојен размацима |
+
+За понављајуће групе погледајте [Repeats](../advanced-extension/repeats)
 
 ## Kako tip i izgled funkcionišu zajedno
 

@@ -28,7 +28,6 @@ Pro nastavení typu otázky zadejte název typu do sloupce `type` listu **survey
 |-----|-------|
 | [select_one listname](select-one) | Výběr přesně jedné možnosti ze seznamu |
 | [select_multiple listname](select-multiple) | Výběr jedné nebo více možností ze seznamu |
-| [select_one_from_file filename](select-one-from-file) | Výběr jedné možnosti načtené z externího CSV souboru |
 | [rank listname](rank) | Seřazení voleb podle preference nebo priority |
 
 ## Datum a čas
@@ -66,6 +65,18 @@ Pro nastavení typu otázky zadejte název typu do sloupce `type` listu **survey
 | [hidden](hidden) | Skryté pole ukládající statickou nebo předvyplněnou hodnotu |
 | [trigger / acknowledge](trigger) | Zaškrtávací políčko, které musí enumerátor zaškrtnout pro potvrzení přečtení prohlášení |
 | [meta](meta) | Automatická metadata: časová razítka, ID zařízení, informace o enumerátorovi |
+
+## Rozšíření rtSurvey
+
+Tyto typy jsou specifické pro rtSurvey a nejsou součástí standardní specifikace XLSForm.
+
+| Typ | Popis |
+|-----|-------|
+| [search-autocomplete](search-autocomplete) | Textový vstup s návrhy automatického doplňování na základě API v reálném čase |
+| [mentions](mentions) | Textové pole s automatickým doplňováním `@`-zmínek pro označování entit inline |
+| [texttags](texttags) | Pole pro zadávání tagů — každý záznam se stane odstraňovacím čipem; uloženo jako řetězec oddělený mezerami |
+
+Pro skupiny opakování viz [Repeats](../advanced-extension/repeats)
 
 ## Jak typ a vzhled spolupracují
 

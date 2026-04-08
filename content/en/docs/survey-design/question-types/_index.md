@@ -28,7 +28,6 @@ To set the question type, enter the type name in the `type` column of the **surv
 |------|-------------|
 | [select_one listname](select-one) | Pick exactly one option from a list |
 | [select_multiple listname](select-multiple) | Pick one or more options from a list |
-| [select_one_from_file filename](select-one-from-file) | Pick one option loaded from an external CSV file |
 | [rank listname](rank) | Order choices by preference or priority |
 
 ## Date and Time
@@ -66,6 +65,18 @@ To set the question type, enter the type name in the `type` column of the **surv
 | [hidden](hidden) | Hidden field that stores a static or prefilled value |
 | [trigger / acknowledge](trigger) | A checkbox the enumerator must tick to confirm they have read a statement |
 | [meta](meta) | Automatic metadata: timestamps, device ID, enumerator info |
+
+## rtSurvey Extensions
+
+These types are rtSurvey-specific and are not part of the standard XLSForm specification.
+
+| Type | Description |
+|------|-------------|
+| [search-autocomplete](search-autocomplete) | Text input with live API-powered autocomplete suggestions |
+| [mentions](mentions) | Text field with `@` mention autocomplete for tagging entities inline |
+| [texttags](texttags) | Tag input — each entry becomes a removable chip; stores as space-separated string |
+
+For repeat groups (repeating sets of questions), see [Repeats](../advanced-extension/repeats).
 
 ## How type and appearance work together
 

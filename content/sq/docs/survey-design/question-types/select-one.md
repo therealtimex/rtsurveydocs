@@ -62,6 +62,16 @@ Specifikoni një vlerë në kolonën `appearance` për të ndryshuar mënyrën s
 | `columns(N)` | Shfaqje në N kolona (zgjerim rtSurvey, p.sh., `columns(3)`) |
 | `distress` | Widget ikonë emocionale e Kessler Psychological Distress (K10) |
 | `search-api(...)` | Kërkim dinamik — ngarkon zgjedhjet nga API gjatë ekzekutimit |
+| `tagging` | Shfaq zgjedhjet si chip-e etikete të klikueshme në formë pill |
+| `boxtag` | Shfaq zgjedhjet si kuti të stilizuara drejtkëndore që përdoruesi troket |
+| `boxtag -search` | Paraqitja boxtag me hyrje kërkimi/filtrimi mbi kutitë |
+| `duolingo-style1` | Paraqitje karte e frymëzuar nga Duolingo — karta të mëdha të troketshme me ikona |
+| `rating_box` | Kuti vlerësimi të bazuara në rrjetë — më e mirë për pyetje numerike ose shkallë |
+| `star_rating` | Widget vlerësimi me yje — zgjedhjet renderohen si 1–N yje |
+| `choices-noshow` | Tregon vetëm 10 zgjedhjet e para fillimisht; zbulon pjesën tjetër me kërkesë |
+| `noshow` | Fsheh plotësisht listën e zgjedhjeve; vlera vendoset programatikisht |
+| `checkall` | Shton opsionin "Zgjidhni të gjitha" në krye të listës |
+| `max-items(N)` | Kufizon numrin e zgjedhjeve të dukshme në N (p.sh., `max-items(5)`) |
 {{< /table >}}
 
 ### Shembull: Shkalla Likert

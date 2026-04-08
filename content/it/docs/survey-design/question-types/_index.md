@@ -28,7 +28,6 @@ Per impostare il tipo di domanda, inserisci il nome del tipo nella colonna `type
 |------|-------------|
 | [select_one listname](select-one) | Scegli esattamente un'opzione da un elenco |
 | [select_multiple listname](select-multiple) | Scegli una o più opzioni da un elenco |
-| [select_one_from_file filename](select-one-from-file) | Scegli un'opzione caricata da un file CSV esterno |
 | [rank listname](rank) | Ordina le scelte per preferenza o priorità |
 
 ## Data e ora
@@ -66,6 +65,18 @@ Per impostare il tipo di domanda, inserisci il nome del tipo nella colonna `type
 | [hidden](hidden) | Campo nascosto che memorizza un valore statico o pre-compilato |
 | [trigger / acknowledge](trigger) | Una casella di controllo che l'enumeratore deve spuntare per confermare di aver letto una dichiarazione |
 | [meta](meta) | Metadati automatici: timestamp, ID dispositivo, informazioni sull'enumeratore |
+
+## Estensioni rtSurvey
+
+Questi tipi sono specifici di rtSurvey e non fanno parte della specifica XLSForm standard.
+
+| Tipo | Descrizione |
+|------|-------------|
+| [search-autocomplete](search-autocomplete) | Inserimento testo con suggerimenti di completamento automatico basati su API in tempo reale |
+| [mentions](mentions) | Campo di testo con completamento automatico delle menzioni `@` per taggare entità inline |
+| [texttags](texttags) | Inserimento tag — ogni voce diventa un chip rimovibile; memorizzato come stringa separata da spazi |
+
+Per i gruppi di ripetizione, vedere [Repeats](../advanced-extension/repeats)
 
 ## Come tipo e appearance lavorano insieme
 

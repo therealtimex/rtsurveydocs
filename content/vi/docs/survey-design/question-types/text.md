@@ -38,6 +38,8 @@ Câu hỏi văn bản được dùng cho:
 |------------|-------|
 | *(không có)* | Ô nhập văn bản một dòng |
 | `multiline` | Vùng văn bản nhiều dòng — phù hợp nhất cho văn bản tự do dài trên web |
+| `richtext` | Trình soạn thảo văn bản phong phú — thanh công cụ với in đậm, in nghiêng, danh sách và liên kết |
+| `typingtest` | Giao diện kiểm tra gõ phím — hiển thị một đoạn văn và đo tốc độ cũng như độ chính xác khi gõ |
 
 ## Phần mở rộng nhập thời gian của rtSurvey
 

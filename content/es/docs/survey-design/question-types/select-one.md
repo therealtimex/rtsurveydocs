@@ -62,6 +62,16 @@ Especifique un valor en la columna `appearance` para cambiar cómo se muestran l
 | `columns(N)` | Mostrar en N columnas (extensión de rtSurvey, p. ej., `columns(3)`) |
 | `distress` | Widget de iconos emocionales de angustia psicológica de Kessler (K10) |
 | `search-api(...)` | Búsqueda dinámica — carga opciones desde una API en tiempo de ejecución |
+| `tagging` | Muestra las opciones como chips de etiqueta clicables en lugar de botones de radio |
+| `boxtag` | Muestra las opciones como cuadros rectangulares con estilo que el usuario toca para seleccionar |
+| `boxtag -search` | Diseño boxtag con entrada de búsqueda/filtro sobre los cuadros |
+| `duolingo-style1` | Diseño de tarjetas inspirado en Duolingo — tarjetas grandes tocables con iconos |
+| `rating_box` | Cuadros de valoración en cuadrícula — mejor para opciones numéricas o de escala |
+| `star_rating` | Widget de valoración por estrellas — las opciones se renderizan como 1–N estrellas |
+| `choices-noshow` | Muestra solo las primeras 10 opciones inicialmente; revela el resto a demanda |
+| `noshow` | Oculta la lista de opciones completamente; el valor se establece programáticamente |
+| `checkall` | Agrega una opción "Seleccionar todo" al principio de la lista |
+| `max-items(N)` | Limita el número de opciones visibles a N (p. ej., max-items(5)) |
 {{< /table >}}
 
 ### Ejemplo: Escala Likert

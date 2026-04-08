@@ -76,3 +76,27 @@ Image ప్రశ్నలు ఉపయోగించేటప్పుడు 
 - అన్ని devices కు high-quality cameras లేదా తగినంత storage space లేకపోవచ్చు.
 - పెద్ద సంఖ్యలో images analyze చేయడానికి చాలా సమయం పట్టవచ్చు.
 - ముఖ్యంగా public spaces లో images capture చేసేటప్పుడు privacy concerns ఉండవచ్చు.
+
+## rtSurvey image పొడిగింపులు
+
+### watermark()
+
+`watermark()` అపీరెన్స్ ఈ field తో capture చేయబడిన photos పై text watermark overlay చేస్తుంది. Watermark సాధారణంగా enumerator పేరు, తేదీ/సమయం, లేదా GPS coordinates వంటి metadata కలిగి ఉంటుంది, save అవ్వడానికి ముందు image పై నేరుగా స్టాంప్ చేయబడుతుంది.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | సైట్ యొక్క ఫోటో తీయండి | `watermark("${enumerator_id} ${today()}")` |
+
+`watermark()` కి argument capture సమయంలో evaluate చేయబడే XPath expression. ఫలితంగా వచ్చే string watermark text గా రెండర్ చేయబడుతుంది.
+
+### editable
+
+`editable` అపీరెన్స్ ప్రతిస్పందించే వ్యక్తి capture చేసిన ఫోటోను తీసిన తర్వాత annotate చేయడానికి లేదా దానిపై draw చేయడానికి అనుమతిస్తుంది. Image పైన drawing toolbar కనిపిస్తుంది.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Photograph చేసి ఆందోళన ప్రాంతాలు గుర్తించండి | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` ని `watermark()` తో కలపవచ్చు: `appearance: editable watermark("${id}")`
+{{% /alert %}}

@@ -66,6 +66,80 @@ rtSurvey కింది స్టాండర్డ్ XLSForm అపీరె�
 | `columns(n)` | select_one, select_multiple | ఎంపికలను `n` కాలమ్‌లలో ప్రదర్శిస్తుంది. ఉదాహరణ: `columns(3)` మూడు రేడియో బటన్‌ల కాలమ్‌లు చూపిస్తుంది. |
 | `gridformat<row=R col=C colspan=S align=center>` | ఏదైనా | CSS-grid layout లో వరుస `R`, కాలమ్ `C` లో `S` కాలమ్‌లు స్పాన్ చేస్తూ ఫీల్డ్‌ను ఉంచుతుంది. `advanced-extension/grid-layout` తో ఉపయోగించబడుతుంది. |
 | `ignore-simplify` | ఏదైనా | ఈ ఫీల్డ్ layout యొక్క స్వయంచాలిత సరళీకరణ లేదా కాంపాక్టింగ్‌ను దాటవేయమని ఫారం రెండరర్‌కు సూచిస్తుంది. |
+| `required-but-simplify` | ఏదైనా | ఫీల్డ్ అవసరం కానీ దాని layout ఇప్పటికీ renderer సరళీకరిస్తుంది (అవసరమైన ఫీల్డ్‌లు సరళీకరణ నుండి మినహాయించబడే డిఫాల్ట్ ప్రవర్తనను override చేస్తుంది). |
+| `embed` | ఏదైనా | ఫీల్డ్‌ను embedded/inline ప్రదర్శన మోడ్‌లో రెండర్ చేస్తుంది, దాని outer wrapper మరియు label container అణిచివేస్తుంది — custom HTML లో nested ప్రశ్న ఉన్నప్పుడు ఉపయోగించబడుతుంది. |
+| `popup` | select_one, select_multiple | Choice జాబితాను inline కాకుండా popup/modal overlay లో రెండర్ చేస్తుంది. |
+| `auto-hide-empty` | boxtag, select | Choice జాబితా ఖాళీగా ఉన్నప్పుడు (ఉదా. API ఫలితాలు తిరిగి రానప్పుడు) మొత్తం question widget దాచుతుంది. |
+| `text-nolabel` | select_one, select_multiple | ప్రతి choice కోసం text label దాచుతుంది, కేవలం input control మాత్రమే చూపిస్తుంది. `list-nolabel` లాంటిది కానీ column split గా కాకుండా per-choice వర్తించబడుతుంది. |
+
+### Widgets
+
+| అపీరెన్స్ లక్షణం | ప్రశ్న రకాలు | వివరణ |
+|----------------------|----------------|-------------|
+| `likert` | select_one | ఎంపికలను Likert scale వరుసగా ప్రదర్శిస్తుంది (ఇప్పటికే పైన standard table లో ఉంది; మద్దతు ఉందని confirm చేయబడింది). |
+| `distress` | select_one | ఎంపికలను Kessler Psychological Distress Scale (K10) visual widget గా emotional icons తో రెండర్ చేస్తుంది. |
+
+### Select visual widgets
+
+ఈ appearances select choice జాబితాల మొత్తం rendering మారుస్తాయి.
+
+| అపీరెన్స్ లక్షణం | ప్రశ్న రకాలు | వివరణ |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | ఎంపికలు pill-ఆకారపు క్లిక్ చేయగలిగే tag chips గా రెండర్ అవుతాయి. |
+| `boxtag` | select_one, select_multiple | ఎంపికలు వినియోగదారు నొక్కే styled rectangular boxes గా రెండర్ అవుతాయి. |
+| `boxtag -search` | select_one, select_multiple | Boxes పైన live search/filter input తో boxtag layout. |
+| `duolingo-style1` | select_one, select_multiple | Duolingo స్ఫూర్తిపొందిన card layout — icons తో short lists కు అనుకూలం. |
+| `rating_box` | select_one, select_multiple | Tappable numbered boxes grid — scale లేదా NPS ప్రశ్నలకు అనుకూలం. |
+| `star_rating` | select_one | ఎంపికలు stars గా రెండర్ అవుతాయి; star count choices సంఖ్యకు సమానం. |
+| `choices-noshow` | select_one, select_multiple | మొదట్లో కేవలం మొదటి 10 choices "Show more" control తో చూపిస్తుంది. |
+| `noshow` | select_one, select_multiple | Choices జాబితాను పూర్తిగా దాచుతుంది; విలువ `calculate` లేదా API ద్వారా programmatically సెట్ చేయబడుతుంది. |
+| `checkall` | select_multiple | Choice జాబితా పైభాగంలో "Select all" shortcut జోడిస్తుంది. |
+| `max-items(N)` | select_one, select_multiple | Visible choice జాబితాను N items కు పరిమితం చేస్తుంది. ఉదాహరణ: `max-items(5)`. |
+
+### Text visual widgets
+
+| అపీరెన్స్ లక్షణం | ప్రశ్న రకాలు | వివరణ |
+|----------------------|----------------|-------------|
+| `richtext` | text | Plain text box ని rich text editor తో replace చేస్తుంది (bold, italic, lists, links). HTML నిల్వ చేస్తుంది. |
+| `typingtest` | text | Typing test widget — label text passage; widget typed response మరియు timing record చేస్తుంది. |
+
+### Media పొడిగింపులు
+
+| అపీరెన్స్ లక్షణం | ప్రశ్న రకాలు | వివరణ |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | Captured photos పై text watermark overlay చేస్తుంది. Argument capture సమయంలో evaluate చేయబడే XPath expression. ఉదాహరణ: `watermark("${id} ${today()}")`. |
+| `editable` | image | Save అవ్వడానికి ముందు captured photo పై annotation/drawing enable చేస్తుంది. |
+
+### Inline display configuration
+
+`display{}` మరియు `results{}` modifiers `inline` appearances కు icon alignment మరియు result display నియంత్రించడానికి append చేయవచ్చు.
+
+#### `display{}` parameters
+
+```
+inline display{left}
+inline display{right,small}
+inline display{top,large,inline-icon}
+```
+
+| పారామీటర్ | విలువలు | వివరణ |
+|-----------|---------|-------|
+| Alignment | `left`, `right`, `top`, `bottom`, `center` | Input field కు relative గా icon position |
+| Size | `small`, `medium`, `large` | Icon size (వరుసగా 2.5 rem, 5 rem, 8 rem) |
+| Mode | `inline-icon` | Trigger ని icon మాత్రమే గా రెండర్ చేస్తుంది (button border లేకుండా) |
+| Mode | `inline-button` | Trigger ని full button గా రెండర్ చేస్తుంది |
+
+#### `results{}` parameters
+
+```
+inline results{right}
+inline results{left,hide(seconds)}
+```
+
+| పారామీటర్ | విలువలు | వివరణ |
+|-----------|---------|-------|
+| Alignment | `left`, `right`, `top`, `bottom`, `center` | Result value display position |
+| `hide(field)` | ఏ sub-field పేరైనా | Result యొక్క నిర్దిష్ట component దాచుతుంది (ఉదా. `hide(seconds)`) |
 
 ## తెలిసిన పరిమితులు
 

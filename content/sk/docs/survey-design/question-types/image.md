@@ -76,3 +76,27 @@ Pri používaní otázok image zvážte:
 - Nie všetky zariadenia môžu mať vysokokvalitné fotoaparáty alebo dostatok úložného priestoru.
 - Analýza veľkého počtu obrázkov môže byť časovo náročná.
 - So zachytávaním obrázkov, najmä na verejných miestach, môžu byť spojené obavy o súkromie.
+
+## Rozšírenia rtSurvey pre obrázky
+
+### watermark()
+
+Vzhľad `watermark()` prekryje textový vodoznak na fotografiách zachytených v tomto poli. Vodoznak zvyčajne obsahuje metadáta ako meno anketára, dátum/čas alebo GPS súradnice, pečiatkované priamo na obrázok pred uložením.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Odfotografujte miesto | `watermark("${enumerator_id} ${today()}")` |
+
+Argument pre `watermark()` je výraz XPath vyhodnotený v čase zachytenia. Výsledný reťazec je vykreslený ako text vodoznaku.
+
+### editable
+
+Vzhľad `editable` umožňuje respondentovi anotovať alebo kresliť na zachytenú fotografiu po jej porizení. Nad obrázkom sa zobrazí panel nástrojov na kreslenie.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Odfotografujte a označte oblasti záujmu | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` možno kombinovať s `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

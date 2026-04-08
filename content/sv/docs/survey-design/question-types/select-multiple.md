@@ -64,6 +64,14 @@ Select_multiple-frågor används för:
 | `label` | Visar bara etiketter, inga kryssrutor (använd med `list-nolabel`) |
 | `list-nolabel` | Visar bara kryssrutor, inga etiketter (använd med `label`) |
 | `columns(N)` | Visa i N kolumner (rtSurvey-tillägg) |
+| `tagging` | Visar alternativ som klickbara taggchips istället för kryssrutor |
+| `boxtag` | Visar alternativ som stiliserade rektangulära rutor som användaren trycker på för att välja |
+| `boxtag -search` | Boxtag-layout med en sök-/filterinmatning ovanför rutorna |
+| `duolingo-style1` | Duolingo-inspirerad kortlayout — stora tryckvänliga kort med ikoner |
+| `rating_box` | Rutnätsbaserade betygsrutor — bäst för numeriska val eller skalerade val |
+| `choices-noshow` | Visar initialt bara de första 10 alternativen; visar resten vid behov |
+| `checkall` | Lägger till ett "Välj alla"-alternativ högst upp i listan |
+| `max-items(N)` | Begränsar antalet synliga alternativ till N |
 {{< /table >}}
 
 ### Exempel: 3-kolumns kompakt layout

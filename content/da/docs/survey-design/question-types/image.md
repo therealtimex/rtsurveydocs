@@ -72,6 +72,21 @@ Når du bruger billedspørgsmål, bør du overveje:
 3. Privatlivs- og databeskyttelsesforanstaltninger til lagring og håndtering af fotos
 4. Potentielt behov for billedredigerings- eller organiseringsværktøjer i analysefasen
 
+## rtSurvey appearance-udvidelser
+
+rtSurvey udvider `image`-typen med to yderligere appearance-muligheder:
+
+| Appearance | Beskrivelse |
+|------------|-------------|
+| `watermark("udtryk")` | Overlejrer et tekstvandmærke på optagne fotos. Argumentet er et XPath-udtryk, der evalueres ved optagelsestidspunktet. Eksempel: `watermark("${id} ${today()}")` |
+| `editable` | Muliggør annotering/tegning oven på det optagne foto inden gemning |
+
+### Eksempel: Vandmærke med respondent-ID og dato
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Tag et foto af stedet | `watermark("${respondent_id} ${today()}")` |
+
 ## Begrænsninger
 
 - Billedfiler kan være store, hvilket kan påvirke dataoverførsel og lagring.

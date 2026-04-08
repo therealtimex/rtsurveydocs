@@ -93,6 +93,11 @@ Además de las apariencias estándar de XLSForm, rtSurvey admite las siguientes 
 | `columns(n)` | select_one, select_multiple | Muestra las opciones en `n` columnas. Ejemplo: `columns(3)` muestra tres columnas de botones de radio. |
 | `gridformat<row=R col=C colspan=S align=center>` | cualquiera | Posiciona el campo en un diseño de cuadrícula CSS en la fila `R`, columna `C`, abarcando `S` columnas. Se usa con `advanced-extension/grid-layout`. |
 | `ignore-simplify` | cualquiera | Instruye al renderizador de formularios a omitir la simplificación o condensación automática del diseño de este campo. |
+| `required-but-simplify` | cualquiera | El campo es obligatorio pero su diseño aún es simplificado por el renderizador |
+| `embed` | cualquiera | Renderiza el campo en modo de visualización integrado/inline, suprimiendo su envoltorio externo y el contenedor de etiquetas |
+| `popup` | select_one, select_multiple | Renderiza la lista de opciones en una superposición popup/modal en lugar de inline |
+| `auto-hide-empty` | boxtag, select | Oculta todo el widget de pregunta cuando la lista de opciones está vacía |
+| `text-nolabel` | select_one, select_multiple | Oculta la etiqueta de texto para cada opción, mostrando solo el control de entrada |
 
 ### Widgets
 
@@ -100,6 +105,57 @@ Además de las apariencias estándar de XLSForm, rtSurvey admite las siguientes 
 |----------------------|----------------|-------------|
 | `likert` | select_one | Presenta las opciones como una fila de escala Likert (ya en la tabla estándar anterior; confirmado como compatible). |
 | `distress` | select_one | Renderiza las opciones como el widget visual de la Escala de angustia psicológica de Kessler (K10) con iconos emocionales. |
+
+### Widgets visuales de selección
+
+Estas apariencias cambian toda la renderización de las listas de opciones de selección.
+
+| Apariencia | Tipos de pregunta | Descripción |
+|-----------|------------------|-------------|
+| `tagging` | select_one, select_multiple | Las opciones se renderizan como chips de etiqueta clicables con forma de píldora. |
+| `boxtag` | select_one, select_multiple | Las opciones se renderizan como cuadros rectangulares con estilo que el usuario toca. |
+| `boxtag -search` | select_one, select_multiple | Diseño boxtag con entrada de búsqueda/filtro en vivo sobre los cuadros. |
+| `duolingo-style1` | select_one, select_multiple | Diseño de tarjetas grande inspirado en Duolingo — adecuado para listas cortas con iconos. |
+| `rating_box` | select_one, select_multiple | Cuadrícula de cuadros numéricos tocables — adecuado para preguntas de escala o NPS. |
+| `star_rating` | select_one | Las opciones se renderizan como estrellas; el número de estrellas es igual al número de opciones. |
+| `choices-noshow` | select_one, select_multiple | Muestra inicialmente solo las primeras 10 opciones con un control "Mostrar más". |
+| `noshow` | select_one, select_multiple | Oculta la lista de opciones completamente; el valor se establece programáticamente via calculate o API. |
+| `checkall` | select_multiple | Agrega un acceso directo "Seleccionar todo" al principio de la lista de opciones. |
+| `max-items(N)` | select_one, select_multiple | Limita la lista de opciones visible a N elementos. Ejemplo: max-items(5). |
+
+### Widgets visuales de texto
+
+| Apariencia | Tipos de pregunta | Descripción |
+|-----------|------------------|-------------|
+| `richtext` | text | Reemplaza el cuadro de texto simple con un editor de texto enriquecido (negrita, cursiva, listas, enlaces). Almacena HTML. |
+| `typingtest` | text | Widget de prueba de escritura — el texto de la etiqueta es el pasaje; el widget registra la respuesta escrita y el tiempo. |
+
+### Extensiones de medios
+
+| Apariencia | Tipos de pregunta | Descripción |
+|-----------|------------------|-------------|
+| `watermark("expression")` | image | Superpone una marca de agua de texto en las fotos capturadas. El argumento es una expresión XPath evaluada en el momento de la captura. |
+| `editable` | image | Habilita la anotación/dibujo sobre la foto capturada antes de guardar. |
+
+### Configuración de visualización inline
+
+Los modificadores `display{}` y `results{}` controlan la alineación de iconos y la visualización de resultados para widgets inline.
+
+#### Parámetros de `display{}`
+
+| Parámetro | Valores | Descripción |
+|-----------|---------|-------------|
+| Alineación | `left`, `right`, `top`, `bottom`, `center` | Posición del icono relativa al campo de entrada |
+| Tamaño | `small`, `medium`, `large` | Tamaño del icono |
+| Modo | `inline-icon` | Renderiza el disparador solo como icono |
+| Modo | `inline-button` | Renderiza el disparador como botón completo |
+
+#### Parámetros de `results{}`
+
+| Parámetro | Valores | Descripción |
+|-----------|---------|-------------|
+| Alineación | `left`, `right`, `top`, `bottom`, `center` | Posición de la visualización del valor del resultado |
+| `hide(field)` | cualquier nombre de sub-campo | Oculta un componente específico del resultado |
 
 ### Integración de API
 

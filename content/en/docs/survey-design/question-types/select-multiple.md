@@ -64,6 +64,14 @@ Select_multiple questions are used for:
 | `label` | Shows only labels, no checkboxes (use with `list-nolabel`) |
 | `list-nolabel` | Shows only checkboxes, no labels (use with `label`) |
 | `columns(N)` | Display in N columns (rtSurvey extension) |
+| `tagging` | Choices render as pill-shaped tag chips |
+| `boxtag` | Choices render as rectangular styled boxes |
+| `boxtag -search` | Boxtag layout with a search/filter input above the boxes |
+| `duolingo-style1` | Large card layout — best for short choice lists |
+| `rating_box` | Grid-based rating boxes |
+| `choices-noshow` | Shows the first 10 choices initially; reveals the rest on demand |
+| `checkall` | Adds a "Select all" option at the top of the list |
+| `max-items(N)` | Limits the number of visible choices to N |
 {{< /table >}}
 
 ### Example: 3-column compact layout
@@ -71,6 +79,26 @@ Select_multiple questions are used for:
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_multiple symptoms | symptoms | Select all symptoms observed | compact-3 |
+
+### rtSurvey visual widget appearances
+
+The `tagging`, `boxtag`, `boxtag -search`, `duolingo-style1`, and `rating_box` appearances work the same way on `select_multiple` as they do on `select_one` — see [select_one appearances](select-one#rtsurvey-visual-widget-appearances) for screenshots and examples. The key difference is that multiple choices can be selected simultaneously.
+
+#### checkall
+
+Adds a "Select all" shortcut at the top of the choice list. Tapping it selects every available choice. Tapping it again deselects all.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple equipment | items_collected | Which items were collected? | checkall |
+
+#### max-items(N)
+
+Caps the visible choice list at N items. Choices beyond N are hidden until the respondent scrolls or taps "Show more".
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple long_list | topics | Select all relevant topics | max-items(8) |
 
 ## Using `selected()` in expressions
 

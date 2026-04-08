@@ -93,6 +93,11 @@ rtSurvey 允許根據表單邏輯動態更改外觀：
 | `columns(n)` | select_one, select_multiple | 在 `n` 欄中顯示選項。例如：`columns(3)` 顯示三欄單選按鈕。 |
 | `gridformat<row=R col=C colspan=S align=center>` | 任何 | 在 CSS 網格佈局中將字段定位在行 `R`、列 `C`，跨越 `S` 欄。與 `advanced-extension/grid-layout` 一起使用。 |
 | `ignore-simplify` | 任何 | 指示表單渲染器跳過此字段佈局的自動簡化或壓縮。 |
+| `required-but-simplify` | 任何 | 字段為必填但版面仍保持簡化 |
+| `embed` | 任何 | 以內嵌/行內顯示模式呈現字段 |
+| `popup` | select_one, select_multiple | 以彈出視窗/模態疊加層呈現選項清單 |
+| `auto-hide-empty` | boxtag, select | 當選項清單為空時隱藏小工具 |
+| `text-nolabel` | select_one, select_multiple | 隱藏每個選項的文字標籤 |
 
 ### 小工具
 
@@ -100,6 +105,52 @@ rtSurvey 允許根據表單邏輯動態更改外觀：
 |----------------------|----------------|-------------|
 | `likert` | select_one | 將選項呈現為 Likert 量表行（已在標準表格中；已確認支援）。 |
 | `distress` | select_one | 將選項呈現為 Kessler 心理困擾量表（K10）視覺小工具，帶有情感圖示。 |
+
+### 選擇視覺小工具
+
+| 外觀屬性 | 問題類型 | 說明 |
+|----------------------|----------------|-------------|
+| `tagging` | select_one, select_multiple | 以可點擊的標籤片顯示選項 |
+| `boxtag` | select_one, select_multiple | 以樣式化的矩形方塊顯示選項 |
+| `boxtag -search` | select_one, select_multiple | 方塊上方帶有搜尋/篩選輸入框的 Boxtag 版面 |
+| `duolingo-style1` | select_one, select_multiple | 大型卡片版面——最適合短選項清單 |
+| `rating_box` | select_one, select_multiple | 網格式評分方塊 |
+| `star_rating` | select_one | 星星評分小工具——選項呈現為 1–N 顆星 |
+| `choices-noshow` | select_one, select_multiple | 初始僅顯示前 10 個選項；其餘按需顯示 |
+| `noshow` | select_one, select_multiple | 完全隱藏選項清單；值以程式設定 |
+| `checkall` | select_multiple | 在清單頂部新增「全選」選項 |
+| `max-items(N)` | select_one, select_multiple | 將可見選項數量限制為 N |
+
+### 文字視覺小工具
+
+| 外觀屬性 | 問題類型 | 說明 |
+|----------------------|----------------|-------------|
+| `richtext` | text | 富文字編輯器——帶有粗體、斜體、清單和連結的工具列 |
+| `typingtest` | text | 打字測試介面——呈現段落並測量打字速度和準確性 |
+
+### 媒體擴充
+
+| 外觀屬性 | 問題類型 | 說明 |
+|----------------------|----------------|-------------|
+| `watermark("expression")` | image | 在拍攝的照片上疊加文字浮水印；表達式在拍攝時評估 |
+| `editable` | image | 允許受訪者在拍照後對圖片進行標註和繪製 |
+
+### 內嵌顯示配置
+
+`display{}` 參數配置內嵌顯示行為：
+
+| 參數 | 說明 |
+|------|------|
+| `display{title="標籤"}` | 為內嵌顯示設定自訂標題 |
+| `display{icon="icon_name"}` | 為內嵌顯示設定圖示 |
+| `display{color="RRGGBB"}` | 為內嵌顯示設定自訂顏色 |
+
+`results{}` 參數配置結果顯示：
+
+| 參數 | 說明 |
+|------|------|
+| `results{format="pattern"}` | 為結果顯示設定格式模式 |
+| `results{show=true}` | 內嵌顯示結果 |
 
 ### API 整合
 

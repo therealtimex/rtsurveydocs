@@ -28,7 +28,6 @@ Om het vraagtype in te stellen, voert u de typenaam in de kolom `type` van het w
 |------|-------------|
 | [select_one lijstnaam](select-one) | Kies precies één optie uit een lijst |
 | [select_multiple lijstnaam](select-multiple) | Kies één of meer opties uit een lijst |
-| [select_one_from_file bestandsnaam](select-one-from-file) | Kies één optie geladen uit een extern CSV-bestand |
 | [rank lijstnaam](rank) | Orden keuzes op voorkeur of prioriteit |
 
 ## Datum en tijd
@@ -66,6 +65,18 @@ Om het vraagtype in te stellen, voert u de typenaam in de kolom `type` van het w
 | [hidden](hidden) | Verborgen veld dat een statische of vooraf ingevulde waarde opslaat |
 | [trigger / acknowledge](trigger) | Een selectievakje dat de enumerator moet aanvinken om te bevestigen dat ze een verklaring hebben gelezen |
 | [meta](meta) | Automatische metagegevens: tijdstempels, apparaat-ID, enumeratorinfo |
+
+## rtSurvey-extensies
+
+Deze typen zijn rtSurvey-specifiek en maken geen deel uit van de standaard XLSForm-specificatie.
+
+| Type | Beschrijving |
+|------|--------------|
+| [search-autocomplete](search-autocomplete) | Tekstinvoer met live API-aangedreven automatische aanvullingssuggesties |
+| [mentions](mentions) | Tekstveld met `@`-vermelding automatisch aanvullen om entiteiten inline te taggen |
+| [texttags](texttags) | Tag-invoer — elke invoer wordt een verwijderbare chip; opgeslagen als door spaties gescheiden string |
+
+Voor herhalingsgroepen, zie [Repeats](../advanced-extension/repeats)
 
 ## Hoe type en weergave samenwerken
 

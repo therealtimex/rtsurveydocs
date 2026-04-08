@@ -38,6 +38,8 @@ Les questions texte sont utilisées pour :
 |------------|-------------|
 | *(aucune)* | Saisie de texte sur une seule ligne |
 | `multiline` | Zone de texte multi-lignes — idéale pour le texte libre long sur le web |
+| `richtext` | Éditeur de texte riche — barre d'outils avec gras, italique, listes et liens |
+| `typingtest` | Interface de test de frappe — présente un passage et mesure la vitesse et la précision de frappe |
 
 ## Extensions de saisie de l'heure de rtSurvey
 

@@ -76,3 +76,27 @@ Görsel soruları kullanırken şunları göz önünde bulundurun:
 - Tüm cihazlar yüksek kaliteli kameralara veya yeterli depolama alanına sahip olmayabilir.
 - Çok sayıda görsel analiz etmek zaman alıcı olabilir.
 - Özellikle kamusal alanlarda görsel yakalanırken gizlilik endişeleri olabilir.
+
+## rtSurvey görsel uzantıları
+
+### watermark()
+
+`watermark()` görünümü, bu alanla çekilen fotoğrafların üzerine metin filigranı ekler. Filigran genellikle sayımcının adı, tarih/saat veya GPS koordinatları gibi meta verileri içerir ve görüntü kaydedilmeden önce doğrudan görüntünün üzerine damgalanır.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Alanın fotoğrafını çekin | `watermark("${enumerator_id} ${today()}")` |
+
+`watermark()` argümanı, yakalama anında değerlendirilen bir XPath ifadesidir. Ortaya çıkan dize, filigran metni olarak işlenir.
+
+### editable
+
+`editable` görünümü, katılımcının çektikten sonra fotoğrafa açıklama eklemesine veya üzerine çizim yapmasına olanak tanır. Görüntünün üzerinde bir çizim araç çubuğu belirir.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Fotoğraf çekin ve ilgi alanlarını işaretleyin | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable`, `watermark()` ile birleştirilebilir: `appearance: editable watermark("${id}")`
+{{% /alert %}}

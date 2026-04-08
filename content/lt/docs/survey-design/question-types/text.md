@@ -38,6 +38,8 @@ Teksto klausimai naudojami:
 |------------|-------------|
 | *(nė viena)* | Vienos eilutės teksto įvestis |
 | `multiline` | Kelių eilučių teksto sritis — geriausiai tinka ilgesniam laisvam tekstui žiniatinklyje |
+| `richtext` | Raiškiojo teksto redaktorius — įrankių juosta su paryškintu, kursyviniu tekstu, sąrašais ir nuorodomis |
+| `typingtest` | Rašymo testo sąsaja — pateikia ištrauką ir matuoja respondento rašymo greitį ir tikslumą |
 
 ## rtSurvey laiko įvesties plėtiniai
 

@@ -28,7 +28,6 @@ rtSurvey 支持所有标准 XLSForm 题目类型，以及多种扩展类型。�
 |------|-------------|
 | [select_one listname](select-one) | 从列表中精确选择一个选项 |
 | [select_multiple listname](select-multiple) | 从列表中选择一个或多个选项 |
-| [select_one_from_file filename](select-one-from-file) | 从外部 CSV 文件加载的选项中选择一项 |
 | [rank listname](rank) | 按偏好或优先级排列选项 |
 
 ## 日期和时间
@@ -66,6 +65,18 @@ rtSurvey 支持所有标准 XLSForm 题目类型，以及多种扩展类型。�
 | [hidden](hidden) | 存储静态或预填值的隐藏字段 |
 | [trigger / acknowledge](trigger) | 枚举员必须勾选的复选框，以确认已阅读某个陈述 |
 | [meta](meta) | 自动元数据：时间戳、设备 ID、枚举员信息 |
+
+## rtSurvey 扩展
+
+这些类型是 rtSurvey 特有的，不属于标准 XLSForm 规范。
+
+| 类型 | 描述 |
+|------|------|
+| [search-autocomplete](search-autocomplete) | 文本输入，带有实时 API 自动完成建议 |
+| [mentions](mentions) | 带有 `@` 提及自动完成功能的文本字段，用于在行内标记实体 |
+| [texttags](texttags) | 标签输入——每个条目成为可移除的标签片；以空格分隔的字符串存储 |
+
+有关重复组，请参阅 [Repeats](../advanced-extension/repeats)
 
 ## 类型与外观的协同工作
 

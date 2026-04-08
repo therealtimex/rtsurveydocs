@@ -76,3 +76,27 @@ Saat menggunakan pertanyaan gambar, pertimbangkan:
 - Tidak semua perangkat mungkin memiliki kamera berkualitas tinggi atau ruang penyimpanan yang cukup.
 - Menganalisis sejumlah besar gambar bisa memakan waktu.
 - Mungkin ada kekhawatiran privasi saat mengambil gambar, terutama di tempat umum.
+
+## Ekstensi gambar rtSurvey
+
+### watermark()
+
+Appearance `watermark()` melapisi tanda air teks pada foto yang diambil dengan bidang ini. Tanda air biasanya berisi metadata seperti nama enumerator, tanggal/waktu, atau koordinat GPS, yang dicap langsung ke gambar sebelum disimpan.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | site_photo | Take a photo of the site | `watermark("${enumerator_id} ${today()}")` |
+
+Argumen untuk `watermark()` adalah ekspresi XPath yang dievaluasi pada saat pengambilan. String yang dihasilkan dirender sebagai teks tanda air.
+
+### editable
+
+Appearance `editable` memungkinkan responden untuk memberi anotasi atau menggambar pada foto yang diambil setelah mengambilnya. Toolbar gambar muncul di atas gambar.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| image | annotated_photo | Photograph and mark areas of concern | editable |
+
+{{% alert icon=" " context="info" %}}
+`editable` dapat dikombinasikan dengan `watermark()`: `appearance: editable watermark("${id}")`
+{{% /alert %}}

@@ -28,7 +28,6 @@ Untuk mengatur tipe pertanyaan, masukkan nama tipe dalam kolom `type` dari lemba
 |------|-----------|
 | [select_one listname](select-one) | Pilih tepat satu opsi dari daftar |
 | [select_multiple listname](select-multiple) | Pilih satu atau lebih opsi dari daftar |
-| [select_one_from_file filename](select-one-from-file) | Pilih satu opsi yang dimuat dari file CSV eksternal |
 | [rank listname](rank) | Urutkan pilihan berdasarkan preferensi atau prioritas |
 
 ## Tanggal dan Waktu
@@ -66,6 +65,18 @@ Untuk mengatur tipe pertanyaan, masukkan nama tipe dalam kolom `type` dari lemba
 | [hidden](hidden) | Bidang tersembunyi yang menyimpan nilai statis atau yang diisi sebelumnya |
 | [trigger / acknowledge](trigger) | Kotak centang yang harus ditandai enumerator untuk mengkonfirmasi mereka telah membaca pernyataan |
 | [meta](meta) | Metadata otomatis: cap waktu, ID perangkat, info enumerator |
+
+## Ekstensi rtSurvey
+
+Tipe-tipe ini khusus untuk rtSurvey dan bukan bagian dari spesifikasi XLSForm standar.
+
+| Tipe | Deskripsi |
+|------|-----------|
+| [search-autocomplete](search-autocomplete) | Input teks dengan saran pelengkapan otomatis berbasis API secara real-time |
+| [mentions](mentions) | Kolom teks dengan pelengkapan otomatis `@` untuk menandai entitas secara inline |
+| [texttags](texttags) | Input tag — setiap entri menjadi chip yang dapat dihapus; disimpan sebagai string yang dipisahkan spasi |
+
+Untuk grup pengulangan, lihat [Repeats](../advanced-extension/repeats)
 
 ## Bagaimana tipe dan appearance bekerja bersama
 
