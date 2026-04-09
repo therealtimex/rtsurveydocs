@@ -1,93 +1,155 @@
 ---
 title: "Video"
-description: "Video-kysymykset antavat vastaajille mahdollisuuden nauhoittaa ja lähettää videotiedostoja osana kyselyä."
+description: "Videokysymysten avulla vastaajat voivat tallentaa ja lähettää videotiedostoja osana kyselyä."
 ---
 
-`video`-kysymystyyppi mahdollistaa vastaajien **nauhoittaa videota** tai ladata olemassa olevan videotiedoston osana kyselyvastaustaan. Se on hyödyllinen visuaalisten todisteiden, demonstraatioiden, ympäristöolosuhteiden tai minkä tahansa tiedon tallentamiseen, josta hyötyy liike ja ääni yhdessä.
+`video`-kysymystyyppi antaa vastaajille mahdollisuuden **tallentaa videota** tai ladata olemassa olevan videotiedoston osana kyselyvastaustaan. Se on hyödyllinen visuaalisten todisteiden, esittelyjen, ympäristöolosuhteiden tai minkä tahansa tiedon tallentamiseen, joka hyötyy liikkeestä ja äänestä yhdessä.
 
-## XLSForm-perusmäärittely
+## XLSFormin perusmäärittely
 
-| type  | name        | label                               |
+| type  | name        | label                              |
 |-------|-------------|-------------------------------------|
-| video | demo_video  | Nauhoita lyhyt demonstraatio        |
+| video | demo_video  | Ole hyvä ja tallenna lyhyt demonstraatio |
 
-Lisätietoja video-kysymystyypin standardista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+Lisätietoja tavallisesta videokysymystyypistä on [XLSFormin määrittelyssä](https://xlsform.org/en/#question-types).
 
 ## Käyttötarkoitukset
 
-Video-kysymyksiä käytetään yleisesti:
+Videokysymyksiä käytetään yleisesti:
 
-1. Kenttäolosuhteiden dokumentointiin — tievauriot, infrastruktuurin tila, sadon kunto
-2. Tuotedemonstraatioiden tai menettelytapojen noudattamisen tarkistusten nauhoittamiseen
-3. Vastaajilta videosuositusten keräämiseen
-4. Todisteiden tallentamiseen, joka vaatii spatiaalisuuden (esim. ongelmakohteen koko ja laajuus)
-5. Ennen/jälkeen-dokumentaatio seuranta- ja arviointikyselyissä
+1. Kenttäolosuhteiden dokumentointi – tiestön vauriot, infrastruktuurin tila, sadon terveys
+2. Tuote-esittelyjen tai menettelytapojen noudattamisen tarkistusten tallentaminen
+3. Videomuotoisten suositusten kerääminen vastaajilta
+4. Tilan vaativan todistusaineiston kerääminen (esim. ongelma-alueen koko ja laajuus)
+5. Ennen/jälkeen -dokumentaatio seuranta- ja arviointitutkimuksiin
 
 ## Tietomuoto
 
-Videotiedostot tallennetaan binääriliitteinä:
+Videotiedostot tallennetaan binäärisinä liitteinä:
 
-- **Muoto:** MP4 tai MOV (mobiilinauhiointi)
+- **Muoto:** MP4 tai MOV (mobiilitallennus)
 - **Nimeäminen:** `{instanceID}-{fieldname}.mp4` (tai vastaava)
-- **Tallennus:** Ladataan palvelimen mediahakemistoon ja yhdistetään lähetystietueeseen
+- **Tallennus:** Ladattu palvelimen mediatiedostokansioon ja linkitetty lähetystietueeseen
 - **Käyttö:** Toistettavissa ja ladattavissa lähetysten hallintaliittymästä
 
-## rtSurveyn laajennukset
+## rtSurvey-laajennukset
 
 ### Enimmäiskesto
 
-Käytä `parameters`-saraketta nauhoituksen pituuden rajoittamiseen:
+Käytä `parameters`-saraketta rajoittamaan tallennuksen pituutta:
 
 | type | name | label | parameters |
-|------|------|-------|------------|
-| video | site_visit | Nauhoita kohteen olosuhteet | `max-duration=60` |
+|------|-------|-------|------------|
+| video | site_visit | Tallenna paikan olosuhteet | `max-duration=60` |
 
-`max-duration` on sekunneissa. Nauhoitus pysähtyy automaattisesti rajalla.
+`max-duration` on sekunneissa. Tallennus pysähtyy automaattisesti rajan saavuttamisen jälkeen.
 
 ### Laatu / resoluutio
 
-Ohjaa nauhoituksen resoluutiota `parameters`-sarakkeen kautta:
+Ohjaa tallennuksen resoluutiota `parameters`-sarakkeen avulla:
 
 | type | name | label | parameters |
-|------|------|-------|------------|
-| video | evidence | Nauhoita videotodisteita | `quality=low` |
+|------|-------|-------|------------|
+| video | evidence | Tallenna videotodiste | `quality=low` |
 
-Tuetut arvot: `low` (nopeampi lataus), `normal` (oletus), `high`. Käytä `low` alueilla, joilla on rajoitettu yhteys.
+Tuetut arvot: `low` (nopeampi lataus), `normal` (oletus), `high`. Käytä `low`-arvoa alueilla, joilla on rajoitettu yhteys.
 
-### Olemassa olevan videon lataaminen
+### Lataa olemassa oleva video
 
-Mobiililla vastaaja voi valita **ladata olemassa olevan videon** laitteen galleriasta uuden nauhoittamisen sijaan. Tämä on käytössä oletuksena natiivin kamera-/galleria-integraatiossa.
+Mobiililaitteella vastaaja voi valita **ladata olemassa olevan videon** laitteen galleriasta uuden tallentamisen sijaan. Tämä on oletuksena käytössä natiivissa kamera-/galleriaintegraatiossa.
 
 ### Toisto ennen lähettämistä
 
-Mobiililla nauhoitettu klippi voidaan tarkistaa ennen jatkamista. Lisäkonfigurointia ei tarvita.
+Mobiililaitteella tallennettu leike voidaan tarkistaa ennen jatkamista. Lisäkonfigurointia ei tarvita.
+
+### Upotettu painikeasettelu
+
+Lisää `inline` renderöidäksesi kameran **pyöreänä kuvakepainikkeena** otsikon viereen koko leveän kaappausalueen sijaan.
+
+```
+| type  | name  | label        | appearance                              |
+|-------|-------|--------------|----------------------------------------|
+| video | clip  | Tallenna video | inline display{right}                  |
+| video | clip  | Tallenna video | inline display{left, large}            |
+| video | clip  | Tallenna video | inline display{center, large, <0099FF/>} |
+```
+
+**Painikkeen sijainti** — `left`, `right` *(oletus)*, `top`, `center`, `bottom`
+
+**Painikkeen koko** — `small` *(oletus)*, `medium`, `large`
+
+**Painikkeen väri** — lisää heksaväri `display{}`-sisään ohittaaksesi ensisijaisen värin:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Kaappauksen jälkeinen hallinta – `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Piilottaa tallennuspainikkeen videon tallentamisen jälkeen |
+| `results{hide(review)}` | Piilottaa toiston pikkukuvan tallentamisen jälkeen |
+| `results{hide(filename)}` | Piilottaa tiedostonimen ja keston |
+| `results{left}` | Siirtää kuvakkeen vasemmalle tallentamisen jälkeen |
+
+Esimerkki – piilota tallennuspainike, säilytä toisto:
+```
+inline display{right} results{hide(capture)}
+```
+
+### `thumbnail-square-[WxH]` – kiinteäkokoinen videon esikatselu
+
+Kaappauksen jälkeen näyttää videon kiinteäkokoisena upotettuna soittimena koko leveän sijaan. Yhdistä `inline`-määritteen kanssa kompaktiin asetteluun.
+
+```
+inline display{right} thumbnail-square-[120x90]
+inline display{center} thumbnail-square-[200x150]
+```
+
+Leveys ja korkeus ovat pikseleinä.
+
+### `invisible auto-show` – automaattinen tallentimen avaus
+
+Piilottaa kysymyswidgetin asettelusta, mutta avaa videotallentimen automaattisesti sivun latautuessa.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Piilota otsikko
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Esimerkkikäyttö
 
-### Kohteen tarkastusvideo rajalla
+### Paikan tarkastusvideo rajoituksella
 
 | type | name | label | hint | parameters |
-|------|------|-------|------|------------|
-| video | site_video | Nauhoita vesipiste | Kävele koko laitoksen ympäri. Enintään 90 sekuntia. | `max-duration=90 quality=normal` |
+|------|-------|-------|------|------------|
+| video | site_video | Tallenna vesipiste | Kävele koko tilan ympäri. Enintään 90 sekuntia. | `max-duration=90 quality=normal` |
 
-### Ehdollinen video — vain jos vaurio on raportoitu
+### Ehdoton video – vain jos vahingosta ilmoitetaan
 
 | type | name | label | relevant | required |
-|------|------|-------|----------|----------|
-| select_one yesno | damage_found | Löytyikö vauriota? | | |
-| video | damage_video | Nauhoita video vauriosta | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+|------|-------|-------|----------|----------|
+| select_one yesno | damage_found | Löydettiinkö vaurioita? | | |
+| video | damage_video | Tallenna video vauriosta | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
 ## Parhaat käytännöt
 
-1. Aseta `max-duration` — rajoittamattomat videonauhioinnit voivat helposti ylittää 100 Mt ja epäonnistua latauksessa heikkojen yhteyksien vuoksi.
-2. Käytä `quality=low` seurantakyselyissä, joissa visuaalinen todiste vaaditaan mutta hienot yksityiskohdat eivät — se pienentää tiedostokokoa merkittävästi.
-3. Kirjoita erityiset nauhoitusohjeet `hint`-sarakkeeseen (esim. "Kävele koko rakennuksen ympäri, pidä kamera vakaana").
-4. Harkitse, onko video tarpeellinen — valokuva (`image`) riittää yleensä staattisille todisteille ja tuottaa paljon pienempiä tiedostoja.
-5. Testaa lataussuorituskyky todellisessa kenttäverkossa ennen käyttöönottoa.
+1. Aseta `max-duration` – rajoittamattomat videotallenteet voivat helposti ylittää 100 Mt ja ne eivät välttämättä lataudu heikoilla yhteyksillä.
+2. Käytä `quality=low` seurantakyselyissä, joissa visuaalista näyttöä tarvitaan, mutta tarkkaa yksityiskohtaa ei – se pienentää tiedostokokoa dramaattisesti.
+3. Kirjoita tarkat tallennusohjeet `hint`-sarakkeeseen (esim. "Kävele koko rakennuksen ympäri, pidä kamera vakaana").
+4. Harkitse, onko video tarpeellinen – valokuva (`image`) riittää yleensä staattiseen todisteeseen ja tuottaa paljon pienempiä tiedostoja.
+5. Testaa lataustehoa todellisessa kenttäverkossa ennen käyttöönottoa.
 
 ## Rajoitukset
 
-- Videotiedostot ovat erittäin suuria — 1 minuutin video normaalilla laadulla on tyypillisesti 20–60 Mt laitteesta riippuen.
-- Suurten videotiedostojen lataaminen vaatii hyvän verkkoyhteyden; harkitse Wi-Fi-synkronoinnin vaatimista videopainotteisille lomakkeille.
-- Kaikki verkkoselaimet eivät tue videonauhiointia MediaRecorder-API:n kautta — Chrome on luotettavin.
-- Videovastaausten analyysi on manuaalista ja aikaa vievää; käytä säästeliäästi ja vain silloin, kun videoiden sisältö lisää ainutlaatuista arvoa.
+- Videotiedostot ovat erittäin suuria – 1 minuutin video normaalilaadulla on tyypillisesti 20–60 Mt laitteesta riippuen.
+- Suurten videotiedostojen lataaminen vaatii hyvän verkkoyhteyden; harkitse Wi-Fi-synkronoinnin vaatimista paljon videoita sisältäville lomakkeille.
+- Kaikki selaimet eivät tue videon tallennusta MediaRecorderin kautta – Chrome on luotettavin.
+- Videovastausten analysointi on manuaalista ja aikaa vievää; käytä harkiten ja vain, jos videosisältö tuo ainutlaatuista lisäarvoa.
