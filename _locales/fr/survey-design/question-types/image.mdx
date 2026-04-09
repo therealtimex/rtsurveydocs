@@ -1,15 +1,15 @@
 ---
 title: "Image"
-description: "Les questions de type image permettent aux répondants de capturer et de soumettre des photos dans le cadre de l'enquête."
+description: "Les questions d'image permettent aux répondants de capturer et de soumettre des photos dans le cadre de l'enquête."
 ---
 
 Le type de question `image` dans XLSForms et rtSurvey permet aux répondants de capturer et de soumettre des photos dans le cadre de leurs réponses à l'enquête. Cette fonctionnalité est particulièrement utile pour collecter des données visuelles, documenter des observations ou fournir des preuves lors d'enquêtes sur le terrain.
 
-## Spécification XLSForm de Base
+## Spécification XLSForm de base
 
-| type  | name        | label                           |
-|-------|-------------|--------------------------------|
-| image | photo       | Prendre une photo de l'emplacement |
+| type  | name        | label                                  |
+|-------|-------------|----------------------------------------|
+| image | photo       | Prendre une photo du lieu              |
 
 Pour plus de détails sur le type de question `image` de base, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
 
@@ -17,58 +17,131 @@ Pour plus de détails sur le type de question `image` de base, consultez la [sp�
 
 Les questions d'image sont couramment utilisées pour :
 
-1. Documenter les conditions sur le terrain ou les observations
+1. Documenter les conditions ou les observations sur le terrain
 2. Capturer des preuves visuelles dans les études de recherche
-3. Collecter des photos avant/après dans les évaluations d'impact
-4. Vérifier l'achèvement de tâches ou la présence à des endroits précis
-5. Rassembler des données visuelles pour une analyse à distance
+3. Collecter des photos avant et après dans les évaluations d'impact
+4. Vérifier l'achèvement des tâches ou la présence à des endroits
+5. Recueillir des données visuelles pour une analyse à distance
 
-## Meilleures Pratiques
+## Bonnes pratiques
 
 1. Fournissez des instructions claires sur ce qui doit être photographié.
-2. Tenez compte des implications en matière de confidentialité et informez les répondants de la manière dont leurs photos seront utilisées.
-3. Soyez attentif à la taille des fichiers et aux limitations de stockage, en particulier pour les enquêtes dans des zones où la connectivité Internet est limitée.
-4. Assurez-vous que l'appareil dispose d'un espace de stockage suffisant et que les autorisations de caméra sont accordées.
+2. Tenez compte des implications en matière de confidentialité et informez les répondants sur la manière dont leurs photos seront utilisées.
+3. Soyez conscient de la taille des fichiers et des limitations de stockage, en particulier pour les enquêtes dans les zones où la connectivité Internet est limitée.
+4. Assurez-vous que l'appareil dispose d'un espace de stockage suffisant et que les autorisations de l'appareil photo sont accordées.
 
-## Exemple d'Utilisation
+## Exemple d'utilisation
 
-Voici un exemple de la manière dont vous pourriez utiliser une question d'image dans une enquête :
+Voici un exemple de la façon dont vous pourriez utiliser une question `image` dans une enquête :
 
-| type  | name           | label                                      | hint                                        |
-|-------|----------------|--------------------------------------------|--------------------------------------------|
-| image | storefront     | Prendre une photo de l'entrée du magasin   | Assurez-vous que le nom du magasin est bien visible |
+| type  | name           | label                                           | hint                                                 |
+|-------|----------------|-------------------------------------------------|------------------------------------------------------|
+| image | storefront     | Prendre une photo de l'entrée du magasin        | Assurez-vous que le nom du magasin est clairement visible |
 
 ## Extensions rtSurvey
 
-Bien que la spécification XLSForm de base pour les questions d'image soit simple, rtSurvey peut proposer des fonctionnalités ou des personnalisations supplémentaires :
+### Disposition du bouton en ligne
 
-1. Paramètres de qualité d'image (ex : résolution basse, moyenne, haute)
-2. Option pour ajouter des légendes ou des étiquettes (tags) aux images
-3. Capture d'images multiples pour une seule question
-4. Intégration avec l'application caméra native de l'appareil ou la galerie
+Ajoutez `inline` à la colonne `appearance` pour afficher l'appareil photo sous forme de **bouton icône circulaire** à côté de l'étiquette au lieu d'une zone de capture pleine largeur. Le fait d'appuyer dessus ouvre une modale.
 
-(Note : Les extensions spécifiques disponibles dans rtSurvey pour les questions d'image devront être confirmées et détaillées ici.)
+```
+| type  | name  | label        | appearance                          |
+|-------|-------|--------------|-------------------------------------|
+| image | photo | Prendre une photo | inline display{right}               |
+| image | photo | Prendre une photo | inline display{center, large}       |
+```
 
-## Manipulation des Données
+**Position du bouton — `display{}` :**
 
-Les images collectées via ce type de question sont typiquement :
+| Value | Layout |
+|-------|--------|
+| `right` *(par défaut)* | Icône à droite de l'étiquette |
+| `left` | Icône à gauche de l'étiquette |
+| `top` | Icône au-dessus de l'étiquette, centrée |
+| `center` / `bottom` | Icône en dessous de l'étiquette, centrée |
 
-1. Enregistrées dans un format d'image courant (ex : JPG, PNG)
-2. Stockées aux côtés des autres données d'enquête, souvent dans un dossier média séparé
-3. Accessibles pour visualisation et analyse via la plateforme de gestion d'enquête
+**Taille du bouton :**
 
-## Considérations pour l'Analyse
+| Value | Size |
+|-------|------|
+| `small` *(par défaut)* | Petit cercle |
+| `medium` | Cercle moyen |
+| `large` | Grand cercle |
 
-Lors de l'utilisation de questions d'image, tenez compte de :
+**Couleur du bouton** — ajoutez une couleur hexadécimale à l'intérieur de `display{}` pour remplacer la couleur primaire :
 
-1. La manière dont les images seront analysées (ex : examen manuel, analyse d'image automatisée)
+```
+inline display{right, large, <FF5500/>}
+inline display{center, medium, <0099FF/>}
+```
+
+**Contrôle post-capture — `results{}` :**
+
+| Appearance | Effect                                       |
+|------------|----------------------------------------------|
+| `results{hide(capture)}` | Masque le bouton de l'appareil photo après la prise d'une photo |
+| `results{hide(camera)}` | Identique à `hide(capture)` — alias pour le type `image` |
+| `results{hide(review)}` | Masque l'aperçu de la miniature après la capture |
+| `results{hide(filename)}` | Masque le nom du fichier affiché après le téléchargement |
+| `results{left}` | Déplace l'icône vers la gauche après la capture |
+
+Exemple — grand bouton centré, masquer la caméra après la capture :
+```
+inline display{center, large} results{hide(capture)}
+```
+
+### `invisible auto-show` — ouvrir automatiquement l'appareil photo
+
+Masque le widget de question de la mise en page mais ouvre automatiquement l'appareil photo lorsque la page se charge. Utile pour intégrer une étape de capture silencieuse dans un flux de formulaire.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Signature et dessin
+
+| Appearance | Description                           |
+|------------|---------------------------------------|
+| `signature` | Modale de pavé de signature plein écran |
+| `signature display{quick}` | Pavé de signature rapide en ligne — pas de modale |
+| `draw` | Toile de dessin à main levée           |
+
+### Filigrane
+
+Ajoutez un filigrane de texte ou d'image aux photos capturées :
+
+```
+watermark(text, "Survey ID: ${id}", bottom-right, 0.5)
+watermark(file, logo.png, top-left, 1.0, 20%)
+```
+
+### Supprimer l'étiquette
+
+```
+inline text-nolabel display{center, large}
+```
+
+## Gestion des données
+
+Les images collectées via ce type de question sont généralement :
+
+1. Enregistrées dans un format d'image courant (par exemple, JPG, PNG)
+2. Stockées avec d'autres données d'enquête, souvent dans un dossier de médias séparé
+3. Accessibles pour la visualisation et l'analyse via la plateforme de gestion d'enquête
+
+## Considérations pour l'analyse
+
+Lorsque vous utilisez des questions d'image, tenez compte de :
+
+1. La façon dont les images seront analysées (par exemple, examen manuel, analyse d'image automatisée)
 2. L'espace de stockage supplémentaire requis pour les fichiers image
-3. Les mesures de confidentialité et de protection des données pour le stockage et la manipulation des photos
-4. Le besoin potentiel d'outils d'édition ou d'organisation d'images lors de la phase d'analyse
+3. Les mesures de confidentialité et de protection des données pour le stockage et la gestion des photos
+4. Le besoin potentiel d'outils d'édition ou d'organisation d'images dans la phase d'analyse
 
 ## Limitations
 
 - Les fichiers image peuvent être volumineux, ce qui peut avoir un impact sur le transfert et le stockage des données.
-- Tous les appareils ne disposent pas forcément de caméras de haute qualité ou d'un espace de stockage suffisant.
+- Tous les appareils ne disposent pas d'appareils photo de haute qualité ou d'un espace de stockage suffisant.
 - L'analyse d'un grand nombre d'images peut prendre beaucoup de temps.
-- Des préoccupations en matière de confidentialité peuvent survenir lors de la capture d'images, en particulier dans les espaces publics.
+- Il peut y avoir des préoccupations en matière de confidentialité lors de la capture d'images, en particulier dans les espaces publics.
