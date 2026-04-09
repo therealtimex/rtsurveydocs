@@ -1,13 +1,13 @@
-# Translation Spec — Image question type
+# Translation Spec — Video question type
 
 ## Source
-`pages/survey-design/question-types/image.mdx`
+`pages/survey-design/question-types/video.mdx`
 
 ## Target path pattern
-`_locales/{locale}/survey-design/question-types/image.mdx`
+`_locales/{locale}/survey-design/question-types/video.mdx`
 
 ## Summary of changes
-Added rtSurvey extensions: inline button layout with display{align, size, color} and results{} (hide(capture), hide(camera), hide(review), hide(filename)), invisible auto-show, signature (including quick variant), draw, watermark, text-nolabel.
+Added rtSurvey extensions: inline button layout with display{align, size, color} and results{} (hide(capture), hide(review), hide(filename)), thumbnail-square-[WxH] fixed-size preview, invisible auto-show, text-nolabel.
 
 ## Locales
 

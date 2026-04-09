@@ -62,6 +62,68 @@ On mobile, the respondent can choose to **upload an existing video** from the de
 
 On mobile, the recorded clip can be reviewed before proceeding. No additional configuration is needed.
 
+### Inline button layout
+
+Add `inline` to render the camera as a **circular icon button** next to the label instead of a full-width capture area.
+
+```
+| type  | name  | label        | appearance                              |
+|-------|-------|--------------|----------------------------------------|
+| video | clip  | Record video | inline display{right}                  |
+| video | clip  | Record video | inline display{left, large}            |
+| video | clip  | Record video | inline display{center, large, <0099FF/>} |
+```
+
+**Button position** — `left`, `right` *(default)*, `top`, `center`, `bottom`
+
+**Button size** — `small` *(default)*, `medium`, `large`
+
+**Button color** — add a hex color inside `display{}` to override the primary color:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Post-capture control — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Hides the record button after a video is captured |
+| `results{hide(review)}` | Hides the playback thumbnail after capture |
+| `results{hide(filename)}` | Hides the filename and duration |
+| `results{left}` | Moves icon to the left after capture |
+
+Example — hide record button, keep playback:
+```
+inline display{right} results{hide(capture)}
+```
+
+### `thumbnail-square-[WxH]` — fixed-size video preview
+
+After capture, displays the video as a fixed-size inline player instead of full-width. Combine with `inline` for a compact layout.
+
+```
+inline display{right} thumbnail-square-[120x90]
+inline display{center} thumbnail-square-[200x150]
+```
+
+Width and height are in pixels.
+
+### `invisible auto-show` — auto-open recorder
+
+Hides the question widget from the layout but automatically opens the video recorder when the page loads.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Suppress the label
+
+```
+inline text-nolabel display{center, large}
+```
+
 ## Example usage
 
 ### Site inspection video with limit

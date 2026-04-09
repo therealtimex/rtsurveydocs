@@ -68,11 +68,19 @@ Add `inline` to the `appearance` column to render the camera as a **circular ico
 | `medium` | Medium circle |
 | `large` | Large circle |
 
+**Button color** — add a hex color inside `display{}` to override the primary color:
+
+```
+inline display{right, large, <FF5500/>}
+inline display{center, medium, <0099FF/>}
+```
+
 **Post-capture control — `results{}`:**
 
 | Appearance | Effect |
 |---|---|
 | `results{hide(capture)}` | Hides the camera button after a photo is taken |
+| `results{hide(camera)}` | Same as `hide(capture)` — alias for image type |
 | `results{hide(review)}` | Hides the thumbnail preview after capture |
 | `results{hide(filename)}` | Hides the filename shown after upload |
 | `results{left}` | Moves icon to the left after capture |
@@ -82,12 +90,22 @@ Example — large centered button, hide camera after capture:
 inline display{center, large} results{hide(capture)}
 ```
 
+### `invisible auto-show` — auto-open camera
+
+Hides the question widget from the layout but automatically opens the camera when the page loads. Useful for embedding a silent capture step in a form flow.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
 ### Signature and drawing
 
 | Appearance | Description |
 |---|---|
-| `signature` | Enables signature pad instead of camera |
-| `draw` | Enables freehand drawing canvas |
+| `signature` | Full-screen signature pad modal |
+| `signature display{quick}` | Inline quick-draw signature pad — no modal |
+| `draw` | Freehand drawing canvas |
 
 ### Watermark
 

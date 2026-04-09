@@ -62,6 +62,48 @@ On Android and iOS, the `file` question opens the device's native file picker, w
 
 On web, it opens the browser's standard file upload dialog.
 
+### Inline button layout
+
+Add `inline` to render the upload as a **circular icon button** next to the label instead of a full-width file picker.
+
+```
+| type | name | label           | appearance                              |
+|------|------|-----------------|-----------------------------------------|
+| file | doc  | Upload document | inline display{right}                   |
+| file | doc  | Upload document | inline display{left, large}             |
+| file | doc  | Upload document | inline display{center, large, <0099FF/>} |
+```
+
+**Button position** — `left`, `right` *(default)*, `top`, `center`, `bottom`
+
+**Button size** — `small` *(default)*, `medium`, `large`
+
+**Button color** — add a hex color inside `display{}` to override the primary color:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Post-capture control — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Hides the upload button after a file is attached |
+| `results{hide(review)}` | Hides the review/preview button after upload |
+| `results{hide(filename)}` | Hides the filename shown after upload |
+| `results{left}` | Moves icon to the left after upload |
+
+Example — hide upload button after file attached:
+```
+inline display{right} results{hide(capture)}
+```
+
+### Suppress the label
+
+```
+inline text-nolabel display{center, large}
+```
+
 ## Example usage
 
 ### Required PDF upload

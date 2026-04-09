@@ -7,7 +7,7 @@
 `_locales/{locale}/survey-design/question-types/audio.mdx`
 
 ## Summary of changes
-Added inline button layout section with display{} and results{} hide options (hide(capture), hide(review), hide(filename)).
+Added inline button layout section with display{align, size, color} and results{} hide options (hide(capture), hide(review), hide(filename)).
 
 ## Locales
 
