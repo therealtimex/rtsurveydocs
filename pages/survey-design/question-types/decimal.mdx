@@ -1,75 +1,212 @@
 ---
 title: "Decimal"
-description: "Decimal questions allow numeric inputs with fractional parts in your survey."
+description: "Fractional number input question type in rtSurvey"
 ---
 
-The decimal question type in XLSForms and rtSurvey is used to collect numeric responses that may include fractional parts. This question type is essential for gathering precise numerical data such as measurements, prices, or percentages.
+The `decimal` question type collects numbers that may include a fractional part (e.g. `3.14`, `72.5`). It triggers a numeric keyboard on mobile and supports the same appearance options as the `text` type for layout and formatting.
 
 ## Basic XLSForm Specification
 
-| type    | name   | label                    |
-|---------|--------|--------------------------|
-| decimal | weight | Enter your weight in kg  |
+| type | name | label |
+|------|------|-------|
+| decimal | weight_kg | Weight (kg) |
+| decimal | height_m | Height (m) |
+| decimal | temperature | Body temperature (°C) |
 
-For more details on the basic decimal question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+For the standard specification see the [XLSForm documentation](https://xlsform.org/en/#question-types).
 
-## Uses
+---
 
-Decimal questions are commonly used for:
+## Appearance options
 
-1. Measurements (e.g., weight, height, distance)
-2. Financial data (e.g., prices, salaries)
-3. Percentages
-4. Scientific data collection
-5. Any numeric data that requires precision beyond whole numbers
+### `number-hspinner` — horizontal spinner
+
+Replaces the input with a horizontal **− value +** spinner. Tapping minus/plus adjusts the value by the configured step.
+
+```
+number-hspinner
+```
+
+The displayed value is formatted with one decimal place (e.g. `3.0`, `72.5`). Default step is `1`; use `hspinner()` to set a decimal step.
+
+**Customize button shape and step** using `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','0.1')
+```
+
+Parameters: left button shape, right button shape, step value. Use a decimal step like `0.5` or `0.1` for fine-grained control.
+
+**Custom colors** using `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Four values in order: left-button background, left-button icon, right-button background, right-button icon.
+
+---
+
+### `thousandsep` — thousands separator
+
+Formats the displayed number with comma grouping (e.g. `1,234.56`). The raw number is stored without commas. Input type is switched to `"text"` to allow the formatted display.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — custom digit grouping
+
+Groups integer-part digits into blocks of `n` separated by a custom separator.
+
+```
+digisep(3," ")      → 1 234 567.89
+```
+
+Input type is switched to `"text"` when this appearance is active.
+
+---
+
+### `textonly` — force text keyboard
+
+Forces `type="text"` on the input element. Prevents browser number-input quirks (hiding trailing zeros, desktop spin arrows) while still accepting decimal values.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — hint floats as label
+
+The `hint` text renders inside the input as a placeholder. When the user starts typing, it floats above the field as a label.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — hint inside input boundary
+
+Similar to `floating_hint` — the hint sits inside the input boundary when empty. It does not float when the user types.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — modal dialog input
+
+Tapping the field opens a modal dialog with a larger input. Useful on small screens.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — live character counter
+
+Displays a live `(n)` character count below the input, updated as the user types.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — prepend a prefix
+
+Prepends a static or calculated string to the displayed value. The stored value does not include the prefix.
+
+```
+prefix('USD ')          → displays "USD 72.50", stores "72.50"
+prefix(${currency})     → dynamic prefix from another field
+```
+
+---
+
+### `align_answer` — input text alignment
+
+Controls the horizontal alignment of the typed value inside the input.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — QR / barcode scan into field
+
+Adds a QR code scan button next to the input. Opens the camera scanner and populates the field with the scanned value.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Appearance quick reference
+
+| Appearance | Widget rendered |
+|---|---|
+| *(none)* | Number input (`type="number"`) — numeric keyboard on mobile |
+| `number-hspinner` | Horizontal − value + spinner, one decimal place displayed |
+| `number-hspinner hspinner(...)` | Spinner with custom button shape and step |
+| `number-hspinner colors(...)` | Spinner with custom button colors |
+| `thousandsep` | Comma-grouped number display |
+| `digisep(n,"sep")` | Custom digit grouping |
+| `textonly` | Force text keyboard |
+| `floating_hint` | Hint floats above field while typing |
+| `embed` | Hint inside input boundary |
+| `textpopup` | Tap to open modal dialog |
+| `charcount` | Live character count below input |
+| `prefix(expr)` | Prepend static or dynamic prefix |
+| `align_answer = left/right/center` | Input text alignment |
+| `inputs{qrscan}` | QR/barcode scan button |
+
+---
+
+## Constraints and validation
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| decimal | weight | Weight (kg) | `. > 0 and . <= 500` | Enter a value between 0 and 500 |
+| decimal | height | Height (m) | `. > 0 and . <= 3` | Enter a value between 0 and 3 |
+| decimal | temp | Temperature (°C) | `. >= 35 and . <= 42` | Normal temperature: 35°C–42°C |
+| decimal | percentage | Percentage | `. >= 0 and . <= 100` | Enter a value between 0 and 100 |
+
+---
+
+## Example — measurement form
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| decimal | weight_kg | Weight (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Enter a valid weight |
+| decimal | height_m | Height (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Enter a valid height |
+| calculate | bmi | | | | |
+
+BMI calculation column:
+```
+${weight_kg} div (${height_m} * ${height_m})
+```
+
+---
 
 ## Best Practices
 
-1. Use clear and concise labels to specify the expected input and unit of measurement.
-2. Implement range constraints to prevent unrealistic or erroneous inputs.
-3. Consider using hint text to provide examples or clarify the expected format.
-4. Specify the desired number of decimal places in the label or hint if precision is important.
-
-## Constraints and Validation
-
-You can add constraints to ensure the entered value falls within a specific range:
-
-| type    | name   | label                    | constraint        | constraint_message                    |
-|---------|--------|--------------------------|-------------------|---------------------------------------|
-| decimal | height | Enter your height in meters | .>0 and .&lt;=3    | Height must be between 0 and 3 meters |
-
-## Example Usage
-
-Here's an example of how you might use decimal questions in a health survey:
-
-| type    | name           | label                                     | constraint | constraint_message                |
-|---------|----------------|-------------------------------------------|------------|-----------------------------------|
-| decimal | weight         | Enter your weight in kg                   | .>0 and .&lt;=500 | Weight must be between 0 and 500 kg |
-| decimal | height         | Enter your height in meters               | .>0 and .&lt;=3 | Height must be between 0 and 3 meters |
-| decimal | body_temp      | Enter your body temperature in Celsius    | .>=35 and .&lt;=42 | Temperature must be between 35°C and 42°C |
-| calculate | bmi          |                                           |            |                                   |
-
-In the calculate row for BMI, you can use:
-
-```
-calculation | ${weight} / (${height} * ${height})
-```
-
-This will calculate the BMI using the entered weight and height.
-
-## rtSurvey Extensions
-
-While the basic XLSForm specification for decimal questions is straightforward, rtSurvey may offer additional features or customizations:
-
-1. Precision control (number of decimal places)
-2. Custom input formats (e.g., percentage, currency)
-3. Advanced validation rules
-
-(Note: The specific extensions available in rtSurvey for decimal questions would need to be confirmed and detailed here.)
+1. Use `number-hspinner hspinner(..., '0.1')` for measurements requiring one decimal of precision — the spinner auto-formats to one decimal place, keeping values consistent.
+2. Use `textonly` when browsers add unwanted spin controls or truncate trailing zeros (e.g. `3.0` displayed as `3`).
+3. Use `thousandsep` for large financial values so respondents can verify they entered the correct magnitude.
+4. Enforce range constraints rather than relying on mobile keyboard type alone.
 
 ## Limitations
 
-- The precision of decimal numbers may be limited by the underlying system or database.
-- Users may need guidance on the expected decimal separator (period or comma) depending on their locale.
-- Large decimal numbers may be difficult to read or input accurately on mobile devices.
-
+- The spinner always displays one decimal place — if you need more precision in the displayed value, use the plain input instead.
+- `thousandsep` and `digisep()` store the raw number — do not read the formatted display value in calculations.
