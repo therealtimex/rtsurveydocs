@@ -119,3 +119,84 @@ To evaluate `pulldata()` only on first load (preventing re-evaluation when the k
 <Callout type="info">
 rtSurvey also supports extended forms of `pulldata()` for reading device metadata, JWT fields, and JSON data. See [App API](../app-api) for `pulldata('app-api', ...)` and the [Call API](../advanced-features/call-api) page for JSON-based lookup patterns.
 </Callout>
+
+---
+
+## Extended pulldata() variants
+
+Beyond CSV lookups, `pulldata()` supports several additional data sources by changing the first argument.
+
+### `pulldata('app-api', key)`
+
+Read device metadata, user attributes, and app context. See the full reference on the [App API](../app-api) page.
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Parse an inline JSON string and extract a value using a JSONPath expression. Useful when you have a JSON literal embedded in the form.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Returns the matched value as a string, or empty string if not found.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Extract a value from a JSON string stored in another field using a JSONPath expression. This is equivalent to `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Decode a JWT token stored in a field and return the value of a specific claim from the payload.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Returns empty string if the token is invalid or the claim is not present.
+
+### `pulldata('instanceid')`
+
+Returns the unique instance ID of the current submission. Equivalent to the `instanceID` meta field.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Map a value to another using a named mapping table defined in the form configuration.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Returns the mapped value, or empty string if no mapping matches.
+
+### `pulldata('options', optionName)`
+
+Read a form configuration option by name.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', 'filename.csv', whereClause)`
+
+Execute a raw SQL `WHERE` clause filter against a CSV media file. More flexible than the standard `pulldata()` four-argument form when complex filtering is needed.
+
+```
+pulldata('rawquery', 'staff.csv', concat('department = ''Health'' AND active = ''1'''))
+```
+
+Returns the first matching row's `name` column value, or empty string if no row matches.

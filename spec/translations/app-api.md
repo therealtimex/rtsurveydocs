@@ -1,13 +1,13 @@
-# Translation Spec — pulldata() function
+# Translation Spec — App API
 
 ## Source
-`pages/survey-design/operators-and-functions/pulldata.mdx`
+`pages/survey-design/app-api.mdx`
 
 ## Target path pattern
-`_locales/{locale}/survey-design/operators-and-functions/pulldata.mdx`
+`_locales/{locale}/survey-design/app-api.mdx`
 
 ## Summary of changes
-New page. Documents standard CSV pulldata() syntax (4 parameters), prerequisites, basic lookup, label retrieval, multi-column lookups, use in relevant/constraint, once() wrapping, best practices, limitations. Added "Extended pulldata() variants" section covering all 8 non-CSV backends: app-api, json, jsonpath, jwt, instanceid, mapping, options, rawquery — each with syntax and example.
+Added 4 missing data keys: randomnanoid (short unique ID, wrap in once()), getURLparam.[paramName] (URL query param from launch URL), jholder.[key] (shared in-memory JSON holder), token (JWT access token for callapi() auth). Added two new usage examples: "Passing the user token to a callapi() request" and "Generate a short unique ID" with once() wrapping note.
 
 ## Locales
 

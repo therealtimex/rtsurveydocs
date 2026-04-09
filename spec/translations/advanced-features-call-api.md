@@ -1,13 +1,13 @@
-# Translation Spec — pulldata() function
+# Translation Spec — Call API
 
 ## Source
-`pages/survey-design/operators-and-functions/pulldata.mdx`
+`pages/survey-design/advanced-features/call-api.mdx`
 
 ## Target path pattern
-`_locales/{locale}/survey-design/operators-and-functions/pulldata.mdx`
+`_locales/{locale}/survey-design/advanced-features/call-api.mdx`
 
 ## Summary of changes
-New page. Documents standard CSV pulldata() syntax (4 parameters), prerequisites, basic lookup, label retrieval, multi-column lookups, use in relevant/constraint, once() wrapping, best practices, limitations. Added "Extended pulldata() variants" section covering all 8 non-CSV backends: app-api, json, jsonpath, jwt, instanceid, mapping, options, rawquery — each with syntax and example.
+Added "Fetching multiple values from one API call" section: extract_expr='json:' stores raw JSON response, then substr-jsonpath() extracts individual fields in separate calculate rows — avoids multiple HTTP calls. Includes full XLSForm table example and link to substr-jsonpath().
 
 ## Locales
 

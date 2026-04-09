@@ -1,13 +1,13 @@
-# Translation Spec — pulldata() function
+# Translation Spec — Functions
 
 ## Source
-`pages/survey-design/operators-and-functions/pulldata.mdx`
+`pages/survey-design/operators-and-functions/functions.mdx`
 
 ## Target path pattern
-`_locales/{locale}/survey-design/operators-and-functions/pulldata.mdx`
+`_locales/{locale}/survey-design/operators-and-functions/functions.mdx`
 
 ## Summary of changes
-New page. Documents standard CSV pulldata() syntax (4 parameters), prerequisites, basic lookup, label retrieval, multi-column lookups, use in relevant/constraint, once() wrapping, best practices, limitations. Added "Extended pulldata() variants" section covering all 8 non-CSV backends: app-api, json, jsonpath, jwt, instanceid, mapping, options, rawquery — each with syntax and example.
+Expanded substr-jsonpath() entry with: return type (string), empty-string behavior on no match, array indexing example ($.items[0].name), and cross-reference link to call-api for the json: extract pattern.
 
 ## Locales
 
