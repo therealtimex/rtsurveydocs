@@ -1,69 +1,261 @@
 ---
-title: "Datetime, date, time"
-description: "Otázky datetime umožňují respondentům zadávat datum i čas v jednom poli."
+title: "Datum a čas, datum, čas"
+description: "Otázky typu Datum a čas umožňují respondentům zadat datum i čas do jednoho pole."
 ---
 
-Typ otázky datetime v XLSForms a rtSurvey umožňuje respondentům zadávat datum i čas v jednom poli. Tento typ otázky je užitečný, když potřebujete zachytit konkrétní okamžik v čase, včetně data a přesného času.
+Typy otázek `date`, `time` a `datetime` zachycují hodnoty data a/nebo času. rtSurvey je vykresluje v několika režimech rozvržení ovládaných sloupcem `appearance`.
 
 ## Základní specifikace XLSForm
 
-| type     | name           | label                           |
-|----------|----------------|--------------------------------|
-| datetime | event_datetime | Kdy k události došlo?       |
+| type     | name           | label                     |
+|----------|----------------|---------------------------|
+| date     | birth_date     | Datum narození            |
+| time     | start_time     | V kolik hodin to začalo?  |
+| datetime | event_datetime | Kdy k události došlo?     |
 
-## Použití
+Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
 
-Otázky datetime se běžně používají pro:
+## Režimy rozvržení
 
-1. Zaznamenávání časových razítek událostí nebo pozorování
-2. Plánování schůzek nebo setkání
-3. Protokolování začátku a konce aktivit
-4. Zachycení přesných okamžiků pro sběr dat citlivých na čas
+### Výchozí — vždy otevřený kalendář
 
-## Rozšíření rtSurvey
+Není vyžadována žádná hodnota vzhledu. Kalendář (a hodiny pro `time`/`datetime`) se vykresluje přímo na stránce — je vždy viditelný, není potřeba žádné tlačítko.
 
-rtSurvey rozšiřuje funkčnost otázek datetime různými možnostmi vzhledu a přizpůsobení:
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Datum návštěvy|            |
 
-### Možnosti vzhledu
+---
 
-- `(výchozí)`: Zobrazení kalendáře a hodin pro výběr data a času
-- `inline`: Zobrazení kalendáře a hodin jako ikon
-- `inline-1line`: Zobrazení kalendáře a hodin pro výběr ve formátu jednoho řádku
-- `inline-onlyresult`: Zobrazení kalendáře a hodin jako ikon na konci řádku; ikony zmizí po výběru
+### `inline` — kruhové tlačítko → modální okno
 
-### Přizpůsobení barev
+Vedle štítku otázky se zobrazí kruhové tlačítko s ikonou (kalendář nebo hodiny). Klepnutím na něj se otevře modální okno s výběrem. Po výběru se zvolená hodnota zobrazí jako text vedle štítku.
 
-Barvu ikon kalendáře a hodin můžete přizpůsobit pomocí funkce `colors()`:
+- Pozadí tlačítka: primární barva motivu (lze přepsat)
+- Tvar tlačítka: plný kruh (`border-radius: 50%`)
 
-- `inline colors("0099FF")`: Zobrazení ikon s vlastní barvou
-- `inline-1line-0000FF`: Zobrazení v jednořádkovém formátu s vlastní barvou
-- `inline-1line colors("0000FF","FFFF00")`: Zobrazení v jednořádkovém formátu s více vlastními barvami
-- `inline-onlyresult colors("0099FF")`: Zobrazení ikon zmizejících po výběru, s vlastní barvou
+```
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Datum návštěvy| inline     |
+```
 
-### Vlastní formáty data a času
+---
 
-rtSurvey umožňuje vlastní formáty data a času pomocí speciální syntaxe:
+### `inline-onlyresult` — tlačítko po výběru zmizí
 
-- `inline-[%Y-%m-%d %H:%M:%S]`: Příklad vlastního formátu (Rok-Měsíc-Den Hodina:Minuta:Sekunda)
-- `inline-[%d/%m/%Y %I:%M %p]`: Příklad vlastního formátu (Den/Měsíc/Rok Hodina:Minuta AM/PM)
+Stejné jako `inline`, ale tlačítko se po výběru hodnoty skryje. Užitečné, když chcete, aby bylo datum viditelné pouze po výběru, bez trvalé ikony.
+
+```
+inline-onlyresult
+```
+
+---
+
+### `inline-1line` — řada rolovacích prvků (spinners)
+
+Vykreslí jednotlivé rolovací prvky (▲ hodnota ▼) v jedné vodorovné řadě — jeden sloupec pro každou složku. Pro `date`: měsíc / den / rok. Pro `datetime`: měsíc / den / rok / hodiny / minuty. Pro `time`: hodiny / minuty.
+
+Žádné modální okno ani vyskakovací kalendář — uživatel roluje každým prvkem nezávisle.
+
+```
+inline-1line
+```
+
+**Zobrazení pouze konkrétních složek** přidáním názvů složek:
+
+```
+inline-1line month year      → skryje výběr dne
+inline-1line year            → zobrazí pouze rok
+```
+
+**Omezení rozsahu let:**
+
+```
+inline-1line y_range(2000-2030)
+```
+
+---
+
+### `box` — textový vstup
+
+Vykreslí pole pro zadávání prostého textu. Uživatel zadá datum přímo ve formátu definovaném ve vzhledu.
+
+```
+box(%d/%m/%Y)       → DD/MM/YYYY
+box(%Y-%m-%d)       → YYYY-MM-DD
+```
+
+---
+
+### `month-year` — pouze měsíc a rok
+
+Standardní vzhled XLSForm. Výběr začíná zobrazením roku; uživatel vybere měsíc a rok, nikoliv konkrétní den.
+
+```
+month-year
+```
+
+---
+
+### `year` — pouze rok
+
+Standardní vzhled XLSForm. Výběr začíná zobrazením desetiletí; lze vybrat pouze rok.
+
+```
+year
+```
+
+---
+
+## Vlastní formát zobrazení
+
+K libovolnému vzhledu `inline` připojte `-[format]`, abyste ovlivnili, jak se vybraná hodnota zobrazí jako text. Používá tokeny ve stylu strftime.
+
+| Token | Význam | Příklad |
+|-------|---------|---------|
+| `%d`  | Den (doplněný nulou) | 07 |
+| `%e`  | Den (bez doplnění) | 7 |
+| `%m`  | Číslo měsíce | 04 |
+| `%n`  | Číslo měsíce (bez doplnění) | 4 |
+| `%b`  | Zkratka měsíce | Dub |
+| `%Y`  | 4místný rok | 2026 |
+| `%y`  | 2místný rok | 26 |
+| `%H`  | Hodina (24h) | 14 |
+| `%h`  | Hodina (bez doplnění) | 14 |
+| `%M`  | Minuta | 05 |
+| `%S`  | Sekunda | 00 |
+| `%a`  | Zkratka názvu dne | St |
+
+**Příklady:**
+
+```
+inline-[%d/%m/%Y]            → 07/04/2026
+inline-[%d %b %Y]            → 07 Dub 2026
+inline-1line-[%Y-%m-%d]      → vstup rolovacím prvkem, formátované zobrazení
+inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
+```
+
+---
+
+## Přizpůsobení barev
+
+Přepište barvu tlačítka s ikonou pomocí `colors()`:
+
+```
+inline colors("0099FF")                   → pozadí tlačítka #0099FF
+inline colors("0099FF","FFFFFF")          → pozadí #0099FF, barva ikony #FFFFFF
+inline-1line colors("0000FF","FFFF00")    → akcentní barvy rolovacích prvků
+inline-onlyresult colors("E53935")        → červené tlačítko
+```
+
+---
+
+## Pozice tlačítka pomocí `display{}`
+
+Modifikátor `display{}` určuje, kde se tlačítko s ikonou zobrazí vzhledem ke štítku otázky. Platí pro `inline` a `inline-onlyresult`.
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parametr | Hodnoty | Výchozí |
+|-----------|--------|---------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex např. `#FF5500` | primární barva motivu |
+
+**Chování zarovnání:**
+
+| Hodnota | Rozvržení |
+|-------|--------|
+| `right` | Tlačítko vpravo od štítku |
+| `left` | Tlačítko vlevo od štítku |
+| `top` | Tlačítko nad štítkem, vycentrované na celou šířku |
+| `center` / `bottom` | Tlačítko pod štítkem, vycentrované na celou šířku |
+
+**Příklady:**
+
+```
+inline display{left}
+inline display{center, large}
+inline display{right, medium, #E53935}
+inline-onlyresult display{bottom, large, #0099FF}
+```
+
+---
+
+## Omezení rozsahu dat
+
+Použijte `inputs{range[...]}` k omezení dat, která lze vybrat.
+
+```
+inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
+```
+
+Parametry uvnitř `range[...]`:
+
+| Parametr | Popis |
+|-----------|-------------|
+| `dateGt(YYYY-MM-DD)` | Minimální volitelné datum (větší nebo rovno) |
+| `dateLt(YYYY-MM-DD)` | Maximální volitelné datum (menší nebo rovno) |
+| `indayTimeGt(HH:MM:SS)` | Minimální čas v rámci dne (pouze pro datetime) |
+| `indayTimeLt(HH:MM:SS)` | Maximální čas v rámci dne (pouze pro datetime) |
+
+Lze definovat více rozsahů — datum je volitelné, pokud spadá do **libovolného** z rozsahů.
+
+---
+
+## Skrytí štítku
+
+Přidejte `text-nolabel` pro skrytí štítku otázky. Tlačítko se vykreslí samostatně.
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Přehled rozvržení
+
+| Vzhled | Vykreslený prvek | Přizpůsobitelná barva |
+|---|---|---|
+| *(žádný)* | Vždy otevřený kalendář | Ne |
+| `inline` | Kruhové tlačítko → modální kalendář | Ano |
+| `inline-onlyresult` | Kruhové tlačítko → modální okno, po výběru zmizí | Ano |
+| `inline-1line` | Řada rolovacích prvků | Ano |
+| `box(%format%)` | Pole pro zadávání textu | Ne |
+| `month-year` | Výběr měsíce/roku | Ne |
+| `year` | Výběr pouze roku | Ne |
+
+---
 
 ## Příklad použití
 
-Příklad použití otázky datetime v průzkumu:
+```
+| type     | name        | label              | appearance                              |
+|----------|-------------|--------------------|-----------------------------------------|
+| date     | visit_date  | Datum návštěvy     | inline display{right} -[%d/%m/%Y]       |
+| date     | birth_date  | Datum narození     | inline-1line y_range(1940-2026)         |
+| time     | start_time  | Čas zahájení       | inline-1line                            |
+| datetime | event_time  | Datum a čas události| inline display{center, large} -[%d/%m/%Y %H:%M] |
+| date     | report_date | Datum hlášení      | box(%d/%m/%Y)                           |
+```
 
-| type     | name           | label                                      | appearance                    |
-|----------|----------------|--------------------------------------------|-----------------------------|
-| datetime | incident_time  | Kdy k incidentu došlo?               | inline-[%d/%m/%Y %I:%M %p]  |
+---
 
 ## Osvědčené postupy
 
-1. Poskytněte jasné pokyny k očekávanému formátu data a času.
-2. Zvažte použití vzhledu `inline` pro kompaktnější zobrazení.
-3. Používejte vlastní formáty, když potřebujete specifické složky data a času nebo formátování.
-4. Buďte opatrní ohledně časových pásem při sběru dat datetime napříč různými regiony.
+1. Pro kompaktní formuláře používejte `inline` — šetří vertikální prostor ve srovnání s vždy otevřeným kalendářem.
+2. Používejte `inline-1line`, když respondenti potřebují upravit jednotlivé složky data (např. rok narození).
+3. `box()` používejte pouze tehdy, když důvěřujete tazateli, že datum zadá správně — nezobrazuje se žádné uživatelské rozhraní pro validaci.
+4. Používejte `display{center, large}`, aby bylo tlačítko na mobilních obrazovkách výraznější.
+5. Vždy specifikujte `-[format]`, pokud by výchozí zobrazení `YYYY-MM-DD` mátlo místní uživatele.
+6. Při sběru dat o datu a čase v různých oblastech mějte na paměti časová pásma.
 
 ## Omezení
 
-- Některé vzhleды nebo vlastní formáty nemusí být podporovány na všech zařízeních nebo platformách.
-- Uživatelé mohou potřebovat pokyny k správnému zadávání data a času, zejména u vlastních formátů.
-- Rozdíly časových pásem mohou zkomplikovat analýzu dat, pokud nejsou správně zohledněny.
+- `inline-1line` se vždy nastaví na dnešní datum, pokud neexistuje žádná hodnota — pro předvyplnění konkrétního data použijte sloupec `default`.
+- Formát `box()` řídí pouze zobrazení; uložená hodnota je vždy ISO 8601.
+- Omezení rozsahu dat (`inputs{range[...]}`) nefunguje s rozvržením `box`.
+- Rozdíly v časových pásmech mohou zkomplikovat analýzu dat, pokud nejsou řádně zohledněny.

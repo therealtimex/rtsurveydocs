@@ -3,40 +3,40 @@ title: "Vzhled"
 description: ""
 ---
 
-Sloupec `appearance` v rtSurvey vám umožňuje přizpůsobit vizuální prezentaci a chování otázek ve vašich průzkumech. Tato funkce zlepšuje uživatelský zážitek a může výrazně zvýšit efektivitu sběru dat. rtSurvey podporuje standardní atributy vzhledu XLSForm a rozšiřuje je o další možnosti.
+Sloupec `appearance` v rtSurvey vám umožňuje přizpůsobit vizuální prezentaci a chování otázek ve vašich průzkumech. Tato funkce zlepšuje uživatelskou zkušenost a může výrazně zvýšit efektivitu sběru dat. rtSurvey podporuje standardní atributy vzhledu XLSForm a rozšiřuje je o další možnosti.
 
 ## Standardní atributy vzhledu XLSForm
 
 rtSurvey podporuje následující standardní atributy vzhledu XLSForm:
 
 | Atribut vzhledu | Typy otázek | Popis |
-|----------------------|----------------|-------------|
+|-----------------|-------------|-------|
 | multiline | text | Vytvoří víceřádkové textové pole (nejlepší pro webové klienty) |
-| minimal | select_one, select_multiple | Zobrazí možnosti v rozevíracím menu |
-| quick | select_one | Automaticky přejde na další otázku po výběru (pouze mobilní) |
-| no-calendar | date | Potlačí zobrazení kalendáře (pouze mobilní) |
-| month-year | date | Umožní výběr pouze měsíce a roku |
-| year | date | Umožní výběr pouze roku |
-| horizontal-compact | select_one, select_multiple | Zobrazí možnosti horizontálně (pouze web) |
-| horizontal | select_one, select_multiple | Zobrazí možnosti horizontálně ve sloupcích (pouze web) |
+| minimal | select_one, select_multiple | Zobrazí možnosti v rozbalovací nabídce |
+| quick | select_one | Po výběru automaticky přejde na další otázku (pouze mobilní zařízení) |
+| no-calendar | date | Potlačí zobrazení kalendáře (pouze mobilní zařízení) |
+| month-year | date | Umožňuje pouze výběr měsíce a roku |
+| year | date | Umožňuje pouze výběr roku |
+| horizontal-compact | select_one, select_multiple | Zobrazuje možnosti horizontálně (pouze web) |
+| horizontal | select_one, select_multiple | Zobrazuje možnosti horizontálně ve sloupcích (pouze web) |
 | likert | select_one | Prezentuje možnosti jako Likertovu škálu |
-| compact | select_one, select_multiple | Zobrazí možnosti vedle sebe s minimálním odsazením |
-| quickcompact | select_one | Kombinuje kompaktní zobrazení s automatickým přechodem (pouze mobilní) |
-| field-list | skupiny | Zobrazí celou skupinu na jedné obrazovce (pouze mobilní) |
-| label | select_one, select_multiple | Zobrazí popisky možností bez vstupů |
-| list-nolabel | select_one, select_multiple | Zobrazí vstupy bez popisků (použijte s `label`) |
-| table-list | skupiny | Zobrazí otázky ve formátu tabulky |
-| signature | image | Povolí zachycení podpisu (pouze mobilní) |
-| draw | image | Umožní volné kreslení (pouze mobilní) |
-| map, quick map | select_one, select_one_from_file | Umožní výběr z mapových prvků |
+| compact | select_one, select_multiple | Zobrazuje možnosti vedle sebe s minimálním odsazením |
+| quickcompact | select_one | Kombinuje kompaktní zobrazení s automatickým přechodem (pouze mobilní zařízení) |
+| field-list | groups | Zobrazí celou skupinu na jedné obrazovce (pouze mobilní zařízení) |
+| label | select_one, select_multiple | Zobrazuje popisky možností bez vstupních polí |
+| list-nolabel | select_one, select_multiple | Zobrazuje vstupní pole bez popisků (používejte s `label`) |
+| table-list | groups | Zobrazuje otázky ve formátu tabulky |
+| signature | image | Umožňuje zachycení podpisu (pouze mobilní zařízení) |
+| draw | image | Umožňuje kreslení volnou rukou (pouze mobilní zařízení) |
+| map, quick map | select_one, select_one_from_file | Umožňuje výběr z prvků na mapě |
 
-## Osvědčené postupy pro používání vzhledu
+## Best practices pro používání vzhledu
 
-1. **Konzistence**: Používejte atributy vzhledu konzistentně napříč průzkumem pro jednotný vzhled.
-2. **Mobilní vs. web**: Zvažte, jak se vzhled bude vykreslovat na různých zařízeních a platformách.
-3. **Výkon**: Buďte opatrní s atributy vzhledu, které by mohly zpomalit načítání formuláře (např. `table-list` pro velké skupiny).
-4. **Uživatelský zážitek**: Vybírejte vzhled, který usnadní zadávání dat a bude intuitivnější pro respondenty.
-5. **Testování**: Vždy testujte formulář na cílových zařízeních, abyste se ujistili, že se vzhled zobrazuje správně.
+1. **Konzistence**: Používejte atributy vzhledu v celém průzkumu konzistentně pro jednotný vzhled.
+2. **Mobilní zařízení vs. Web**: Zvažte, jak se vzhledy vykreslí na různých zařízeních a platformách.
+3. **Výkon**: Buďte opatrní u atributů vzhledu, které by mohly zpomalit načítání formuláře (např. `table-list` u velkých skupin).
+4. **Uživatelská zkušenost**: Vybírejte vzhledy, které respondentům usnadní a zpřehlední zadávání dat.
+5. **Testování**: Vždy testujte formulář na cílových zařízeních, abyste se ujistili, že vzhledy fungují podle očekávání.
 
 ## Pokročilé techniky
 
@@ -47,75 +47,141 @@ Některé atributy vzhledu lze kombinovat pro složitější rozvržení:
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Vyberte jednu: | minimal compact |
+| select_one options | choice | Select one: | minimal compact |
 ```
 
-### Dynamický vzhled
+### Dynamické vzhledy
 
 rtSurvey umožňuje dynamické změny vzhledu na základě logiky formuláře:
 
 ```
 | type | name | label | appearance | relevant |
 |------|------|-------|------------|----------|
-| text | time | Zadejte čas: | inline-[%H:%M] | ${show_time} = 'yes' |
+| text | time | Enter time: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
+
+## Specifika mobilní aplikace
+
+- Některé vzhledy (např. `quick`, `signature`) jsou specifické pro mobilní zařízení.
+- Důkladně testujte na Androidu i iOS, abyste zajistili konzistentní chování.
 
 ## Rozšířené atributy vzhledu rtSurvey
 
-Kromě standardních vzhledů XLSForm rtSurvey podporuje následující možnosti specifické pro platformu:
+Kromě standardních vzhledů XLSForm podporuje rtSurvey následující možnosti specifické pro platformu:
 
-### Kontrola dat a zobrazení
+### Řízení dat a zobrazení
 
 | Atribut vzhledu | Typy otázek | Popis |
-|----------------------|----------------|-------------|
-| `invisible` | libovolné | Skryje pole ze zobrazení při zachování sběru nebo výpočtu hodnoty. Liší se od typu `hidden` — pole se stále účastní logiky. |
-| `displaytitle` | libovolné | Vynutí zobrazení popisku/názvu pole, i když by byl jinak potlačen. |
+|-----------------|-------------|-------|
+| `invisible` | libovolný | Skryje pole ze zobrazení, přičemž stále sbírá nebo vypočítává jeho hodnotu. Liší se od typu `hidden` – pole se stále účastní logiky. |
+| `displaytitle` | libovolný | Vynutí zobrazení popisku/názvu pole i v případech, kdy by byl jinak potlačen. |
 | `autopull` | select_one, select_multiple | Automaticky načte externí data pro naplnění možností při načtení formuláře nebo změně spouštěcího pole. |
-| `floating_hint` | text, integer, decimal | Zobrazí text nápovědy jako plovoucí popisek nad vstupním polem místo pod ním. |
-| `calculate-button` | calculate | Přidá viditelné tlačítko, které spustí přepočítání pole na vyžádání, místo automatického výpočtu. |
+| `floating_hint` | text, integer, decimal | Zobrazí text nápovědy (hint) jako plovoucí popisek nad vstupním polem namísto pod ním. |
+| `calculate-button` | calculate | Přidá viditelné tlačítko, které na vyžádání spustí přepočet pole, namísto automatického výpočtu. |
 
-### Rozvržení
+### Rozvržení (Layout)
 
 | Atribut vzhledu | Typy otázek | Popis |
-|----------------------|----------------|-------------|
+|-----------------|-------------|-------|
 | `1screen` | skupina | Vynutí zobrazení celé skupiny na jedné obrazovce bez ohledu na velikost skupiny. |
-| `columns(n)` | select_one, select_multiple | Zobrazí možnosti v `n` sloupcích. Příklad: `columns(3)` zobrazí tři sloupce přepínacích tlačítek. |
-| `gridformat<row=R col=C colspan=S align=center>` | libovolné | Umístí pole do rozvržení CSS-grid na řádku `R`, sloupci `C`, pokrývající `S` sloupců. Použijte s `advanced-extension/grid-layout`. |
-| `ignore-simplify` | libovolné | Instruuje vykreslovač formuláře, aby přeskočil automatické zjednodušení nebo kondenzaci rozvržení tohoto pole. |
+| `columns(n)` | select_one, select_multiple | Zobrazí možnosti v `n` sloupcích. Příklad: `columns(3)` zobrazí tři sloupce přepínačů (radio buttons). |
+| `gridformat<row=R col=C colspan=S align=center>` | libovolný | Umístí pole v rozvržení CSS-grid na řádek `R`, sloupec `C`, s rozsahem `S` sloupců. Používá se s `advanced-extension/grid-layout`. |
+| `ignore-simplify` | libovolný | Instruuje renderer formuláře, aby přeskočil automatické zjednodušení nebo zahuštění rozvržení tohoto pole. |
 
 ### Widgety
 
 | Atribut vzhledu | Typy otázek | Popis |
-|----------------------|----------------|-------------|
-| `likert` | select_one | Prezentuje možnosti jako řádek Likertovy škály. |
-| `distress` | select_one | Vykreslí možnosti jako vizuální widget Kesslera pro psychologický distres (K10) s emočními ikonami. |
+|-----------------|-------------|-------|
+| `likert` | select_one | Prezentuje možnosti jako řádek Likertovy škály (již uvedeno ve standardní tabulce výše; podpora potvrzena). |
+| `distress` | select_one | Vykreslí možnosti jako vizuální widget Kesslerovy škály psychického stresu (K10) s emočními ikonami. |
 
 ### Integrace API
 
 | Atribut vzhledu | Typy otázek | Popis |
-|----------------------|----------------|-------------|
-| `callapi` | text, integer, decimal, select_one | Povolí integraci volání API pro toto pole. Sloupec calculation by měl obsahovat výraz `callapi()`. Viz [Volání API](advanced-extension/call-api). |
-| `callapi-verify(params)` | text, integer, decimal | Spustí volání API pro ověření pomocí statických parametrů. Formulář zablokuje průchod, dokud API nepotvrdí hodnotu. |
+|-----------------|-------------|-------|
+| `callapi` | text, integer, decimal, select_one | Povoluje integraci volání API pro toto pole. Sloupec pro výpočet (calculation) by měl obsahovat výraz `callapi()`. Viz [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Spustí ověřovací volání API pomocí statických parametrů. Formulář blokuje postup, dokud API nepotvrdí hodnotu. |
 | `callapi-verify(dynamicParams)` | text, integer, decimal | Stejné jako `callapi-verify`, ale s parametry odvozenými z hodnot jiných polí za běhu. |
 
-### Formát data/času inline
+### Formát data/času v řádku (inline)
 
-Pro pole `date`, `time` a `datetime` můžete zadat vlastní formát zobrazení pomocí formátovacího řetězce přidaného k vzhledu:
+U polí `date`, `time` a `datetime` můžete specifikovat vlastní formát zobrazení pomocí formátovacího řetězce připojeného ke vzhledu:
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-Formátovací tokeny jsou stejné jako u `format-date()` a `format-date-time()`. Viz [Funkce — Funkce data a času](operators-and-functions/functions#date-and-time-functions).
+Tokeny formátu jsou stejné jako u `format-date()` a `format-date-time()`. Viz [Funkce — Funkce data a času](operators-and-functions/functions#date-and-time-functions).
 
-## Omezení
+Příklad:
 
-- Složité vzhled se nemusí identicky vykreslovat na všech platformách.
-- Některé pokročilé vzhled rtSurvey nemusí být podporovány v offline režimu.
+| type | name | label | appearance |
+|------|------|-------|------------|
+| datetime | event_time | Datum a čas události | inline-[%d/%m/%Y %I:%M %p] |
+| date | birth_date | Datum narození | inline-[%d/%m/%Y] |
+
+### Rozvržení tlačítek v řádku — `display{}` a `results{}`
+
+U typů otázek, které se vykreslují jako řádkové tlačítko s ikonou (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), ovládají dva modifikátory vzhledu pozici tlačítka a chování po zachycení.
+
+#### `display{...}` — pozice tlačítka před zachycením
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parametr | Hodnoty | Výchozí |
+|-----------|--------|---------|
+| Align (Zarovnání) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (Velikost) | `small`, `medium`, `large` | `small` |
+| Color (Barva) | hex např. `#FF5500` | primární barva motivu |
+| Flag | `inline-icon` | vynutí režim ikony |
+
+| Hodnota Align | Rozvržení |
+|---------------|-----------|
+| `right` | Tlačítko vpravo od popisku |
+| `left` | Tlačítko vlevo od popisku |
+| `top` | Tlačítko nad popiskem, vycentrované na celou šířku |
+| `center` / `bottom` | Tlačítko pod popiskem, vycentrované na celou šířku |
+
+#### `results{...}` — rozvržení a viditelnost po zachycení
+
+Přebírá nastavení `display{}`. Použijte k přesunu tlačítka nebo skrytí prvků po zachycení hodnoty.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| Hodnota `hide` | Efekt |
+|---|---|
+| `hide(capture)` | Skryje tlačítko pro zachycení, jakmile existuje soubor/hodnota |
+| `hide(review)` | Skryje miniaturu náhledu / tlačítko přehrávání |
+| `hide(filename)` | Skryje název souboru zobrazený po nahrání |
+| `hide(camera)` | Skryje tlačítko spouště fotoaparátu po zachycení |
+| `hide(scanner)` | Skryje tlačítko pro skenování čárového kódu po naskenování hodnoty |
+| `hide(value)` | Skryje text naskenované hodnoty (barcode / geopoint) |
+
+Widget se automaticky přepne z rozvržení `display{}` na `results{}` v okamžiku, kdy je zachycena hodnota.
+
+**Příklady:**
+
+```
+inline display{right}                                    → ikona vpravo od popisku
+inline display{left, large}                              → velká ikona vlevo
+inline display{center, large, #FF5500}                   → velká oranžová ikona pod popiskem
+inline display{right} results{left}                      → ikona se po zachycení přesune doleva
+inline display{right} results{hide(capture)}             → ikona po zachycení zmizí
+inline display{center} results{hide(capture), hide(filename)}
+```
+
+## Známá omezení
+
+- Komplexní vzhledy se nemusí na všech platformách vykreslovat identicky.
+- Některé pokročilé vzhledy rtSurvey nemusí být podporovány v režimu offline.
 
 ## Řešení problémů se vzhledem
 
-1. **Vzhled není použit**: Zkontrolujte překlepy ve sloupci appearance.
+1. **Vzhled není aplikován**: Zkontrolujte překlepy ve sloupci appearance.
 2. **Nekonzistentní vykreslování**: Ověřte kompatibilitu s typem otázky a platformou.
-3. **Problémy s výkonem**: Zvažte zjednodušení složitých vzhledů, zejména pro velké průzkumy.
+3. **Problémy s výkonem**: Zvažte zjednodušení komplexních vzhledů, zejména u velkých průzkumů.

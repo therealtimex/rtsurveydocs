@@ -1,59 +1,178 @@
 ---
-title: "Баркод"
-description: "Въпросите от тип баркод позволяват сканиране и заснемане на данни от баркод в анкетата."
+title: "Barcode"
+description: "Въпросите от тип Barcode сканират и улавят QR кодове и данни от баркодове във вашето проучване."
 ---
 
-The barcode question type in XLSForms and rtSurvey enables users to scan and capture barcode data directly within the survey. This feature is particularly useful for inventory management, product tracking, or any scenario where quick and accurate data entry of coded information is required.
+Типът въпрос `barcode` улавя стойността на кода чрез сканиране на QR код или баркод с камерата на устройството. Модалният прозорец на скенера включва и ръчно въвеждане на текст като резервен вариант, когато сканирането не е възможно.
 
-## Основна спецификация на XLSForm
+## Basic XLSForm Specification
 
-| type    | name          | label                   |
-|---------|---------------|-------------------------|
-| barcode | product_code  | Scan the product barcode|
+| type    | name         | label                    |
+|---------|--------------|--------------------------|
+| barcode | product_code | Scan the product barcode |
+| barcode | ticket_id    | Scan the ticket          |
 
-For more details on the basic barcode question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+За стандартната спецификация вижте [XLSForm документацията](https://xlsform.org/en/#question-types).
 
-## Приложения
+---
 
-Barcode questions are commonly used for:
+## Supported formats
 
-1. Product identification in inventory surveys
-2. Asset tracking in field operations
-3. Ticket or ID verification at events
-4. Quick data entry for coded information
+rtSurvey поддържа QR кодове и стандартни 1D баркодове чрез камерата на устройството, включително:
 
-## Разширения на rtSurvey
+- QR Code
+- UPC-A, UPC-E
+- EAN-8, EAN-13
+- Code 39, Code 128
+- ITF, Codabar
 
-While the basic XLSForm specification for barcode questions is straightforward, rtSurvey may offer additional features or customizations. These could include:
+---
 
-1. Support for multiple barcode formats (e.g., QR codes, UPC, EAN)
-2. Integration with device camera for barcode scanning
-3. Manual entry option in case the barcode is damaged or can't be scanned
+## Default layout
 
-(Note: The specific extensions available in rtSurvey for barcode questions would need to be confirmed and detailed here.)
+Когато не е зададено `appearance`, въпросът изобразява бутон с пълна ширина **"GET BARCODE"**. Докосването му отваря модалния прозорец на скенера. След успешно сканиране бутонът се променя на **"REPLACE BARCODE"** и сканираната стойност се появява отдолу като връзка, върху която може да се кликне.
 
-## Най-добри практики
+---
 
-1. Ensure proper lighting conditions for accurate barcode scanning.
-2. Provide clear instructions to users on how to position the device for scanning.
-3. Include a manual entry option as a fallback in case of scanning difficulties.
-4. Test the barcode scanning feature with various devices and barcode types before deploying the survey.
+## Scanner modal
 
-## Ограничения
+Модалният прозорец на скенера винаги включва:
+- **Изглед от камерата на живо (Live camera view)** — сканира автоматично при откриване; модалният прозорец се затваря след успешно сканиране.
+- **Ръчно въвеждане на текст (Manual text input)** — текстово поле в долната част, където анкетьорът може да въведе кода, ако сканирането е неуспешно.
+- **Бутон "Готово" (Done button)** — изпраща ръчно въведената стойност.
 
-- Barcode scanning accuracy may vary depending on the device's camera quality and environmental conditions.
-- Some older or low-end devices may not support barcode scanning.
-- Certain barcode types may not be supported, depending on the implementation.
+Когато камерата на устройството не е налична, модалният прозорец преминава към опция **"Upload an image"** — анкетьорът може да изпрати снимка на баркода за декодиране.
+
+---
+
+## Inline button layout
+
+Добавете `inline`, за да изобразите скенера като **кръгъл бутон с икона** до етикета (label) вместо бутон с пълна ширина.
+
+```
+| type    | name | label     | appearance                              |
+|---------|------|-----------|----------------------------------------|
+| barcode | code | Scan item | inline display{right}                  |
+| barcode | code | Scan item | inline display{left, large}            |
+| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+```
+
+**Позиция на бутона** — `left`, `right` *(по подразбиране)*, `top`, `center`, `bottom`
+
+**Размер на бутона** — `small` *(по подразбиране)*, `medium`, `large`
+
+**Цвят на бутона** — добавете хексадесетичен цвят в `display{}`, за да презапишете основния цвят:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Контрол след улавяне — `results{}`:**
+
+| Appearance | Ефект |
+|---|---|
+| `results{hide(scanner)}` | Скрива бутона за сканиране след улавяне на стойност |
+| `results{hide(review)}` | Скрива връзката към сканираната стойност след улавяне |
+| `results{hide(value)}` | Скрива показването на текста на сканираната стойност |
+| `results{left}` | Премества иконата наляво след улавяне |
+
+Пример — скриване на скенера след първото сканиране:
+```
+inline display{center, large} results{hide(scanner)}
+```
+
+---
+
+## `inputs{auto-close(N)}` — автоматично затваряне на скенера
+
+Автоматично затваря модалния прозорец на скенера след `N` секунди, ако не бъде открит баркод. В модалния прозорец се показва таймер за обратно отброяване на живо.
+
+```
+inputs{auto-close(10)}     → затваря се след 10 секунди
+inputs{auto-close(5)}      → затваря се след 5 секунди
+```
+
+Комбиниране с inline:
+```
+inline display{right} inputs{auto-close(10)}
+```
+
+---
+
+## `inputs{floating}` — плаващ подвижен скенер
+
+Показва **бутон за минимизиране** (икона за свиване ⊞) в заглавната част на модалния прозорец на скенера. Докосването му свива скенера до малка плаваща кръгла икона, която може да се плъзга навсякъде по екрана. Докосването на плаващата икона отваря скенера отново.
+
+```
+inputs{floating}
+inline display{right} inputs{floating}
+```
+
+Полезно при работни процеси, при които анкетьорът трябва да вижда формата, докато скенерът е активен (напр. сканиране на артикули в списък).
+
+---
+
+## `invisible auto-show` — автоматично отваряне на скенера
+
+Скрива уиджета на въпроса от оформлението, но автоматично отваря скенера при зареждане на страницата. Полезно за вграждане на стъпка на скрито сканиране в потока на формата.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+---
+
+## В групи с повторение (In repeat groups)
+
+Когато `barcode` е в група `begin repeat`, успешното сканиране автоматично преминава към **следващия екземпляр на повторение**, след като стойността бъде записана. Това позволява бързо последователно сканиране, без анкетьорът да докосва "Добавяне" (Add) между артикулите.
+
+---
+
+## Потискане на етикета (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
 
 ## Примерна употреба
 
-Here's an example of how you might use a barcode question in an inventory survey:
+### Сканиране на инвентар
 
-| type    | name          | label                   | hint                                      |
-|---------|---------------|-------------------------|-------------------------------------------|
-| barcode | product_code  | Scan the product barcode| Position the barcode within the frame     |
-| integer | quantity      | Enter product quantity  |                                           |
-| note    | confirmation  | Product scanned: `${product_code}`. Quantity: `${quantity}` |           |
+| type | name | label | appearance | required |
+|------|------|-------|------------|----------|
+| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
+| integer | quantity | Quantity | | yes |
+| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
 
-In this example, the survey captures a product's barcode, asks for the quantity, and then displays a confirmation note with the scanned information.
+### Бързо сканиране на няколко артикула (група с повторение)
 
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin repeat | items | | |
+| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| end repeat | items | | |
+
+### Скрито автоматично сканиране при зареждане на страницата
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| barcode | entry_code | | `invisible auto-show` |
+
+---
+
+## Най-добри практики
+
+1. Използвайте `inputs{auto-close(N)}`, за да предотвратите безкрайното отваряне на скенера — изберете стойност, която дава на анкетьорите достатъчно време да позиционират баркода (обикновено 8–15 секунди).
+2. Използвайте `inputs{floating}`, когато формата трябва да остане видима по време на сканиране (напр. сканиране от списък, където анкетьорът прави справка с видимо поле).
+3. Поставете въпроса за баркод в група с повторение за бързо последователно сканиране — автоматичното преминаване към следващото повторение елиминира ръчната стъпка "Добавяне".
+4. Винаги включвайте колоната `hint` с инструкции за позициониране (напр. "Дръжте баркода на разстояние 10–30 см от камерата, при добра светлина").
+5. Ръчното въвеждане на текст в модалния прозорец на скенера е винаги налично — обучете анкетьорите да го използват като резервен вариант при повредени или замърсени баркодове.
+
+## Ограничения
+
+- Точността на сканиране зависи от качеството на камерата, осветлението и състоянието на баркода — повредени или кодове с нисък контраст може да не се сканират надеждно.
+- Скенерът използва задната камера (обърната към околната среда); устройства без задна камера преминават към опцията за качване на изображение.
+- `invisible auto-show` се отваря само при първото зареждане на страницата; навигацията обратно към страницата не задейства повторно автоматичното отваряне.

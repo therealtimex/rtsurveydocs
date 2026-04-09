@@ -1,56 +1,178 @@
 ---
-title: "Stregkode"
-description: "Stregkodespørgsmål giver mulighed for at scanne og fange stregkodedata i din undersøgelse."
+title: "Barcode"
+description: "Barcode-spørgsmål scanner og indfanger QR-koder og stregkodedata i din undersøgelse."
 ---
 
-Spørgsmålstypen barcode i XLSForms og rtSurvey giver brugere mulighed for at scanne og fange stregkodedata direkte i undersøgelsen. Denne funktion er særligt nyttig til lagerstyring, produktsporing eller ethvert scenarie, hvor hurtig og præcis dataindtastning af kodet information er påkrævet.
+Spørgsmålstypen `barcode` indfanger en kodeværdi ved at scanne en QR-kode eller stregkode med enhedens kamera. Scanner-modalen indeholder også manuel tekstindtastning som en reservemulighed, når scanning ikke er mulig.
 
-## Grundlæggende XLSForm-specifikation
+## Basic XLSForm Specification
 
-| type    | name          | label                   |
-|---------|---------------|-------------------------|
-| barcode | product_code  | Scan produktets stregkode|
+| type    | name         | label                    |
+|---------|--------------|--------------------------|
+| barcode | product_code | Scan the product barcode |
+| barcode | ticket_id    | Scan the ticket          |
 
-For flere detaljer om den grundlæggende stregkodespørgsmålstype, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+For standard-specifikationen se [XLSForm-dokumentationen](https://xlsform.org/en/#question-types).
 
-## Anvendelser
+---
 
-Stregkodespørgsmål bruges typisk til:
+## Supported formats
 
-1. Produktidentifikation i lagerundersøgelser
-2. Aktivsporing i feltoperationer
-3. Billet- eller ID-verifikation ved arrangementer
-4. Hurtig dataindtastning for kodet information
+rtSurvey understøtter QR-koder og standard 1D-stregkoder via enhedens kamera, herunder:
 
-## rtSurvey-udvidelser
+- QR Code
+- UPC-A, UPC-E
+- EAN-8, EAN-13
+- Code 39, Code 128
+- ITF, Codabar
 
-Mens den grundlæggende XLSForm-specifikation for stregkodespørgsmål er enkel, kan rtSurvey tilbyde yderligere funktioner eller tilpasninger:
+---
 
-1. Understøttelse af flere stregkodeformater (f.eks. QR-koder, UPC, EAN)
-2. Integration med enhedskamera til stregkodescanning
-3. Manuel indtastningsindstilling i tilfælde af, at stregkoden er beskadiget eller ikke kan scannes
+## Default layout
 
-## Bedste praksis
+Uden `appearance` indstillet viser spørgsmålet en **"GET BARCODE"**-knap i fuld bredde. Ved at trykke på den åbnes scanner-modalen. Efter en vellykket scanning ændres knappen til **"REPLACE BARCODE"**, og den scannede værdi vises nedenfor som et klikbart link.
 
-1. Sørg for korrekte lysforhold for præcis stregkodescanning.
-2. Giv brugere klare instruktioner om, hvordan enheden placeres til scanning.
-3. Inkluder en manuel indtastningsmulighed som fallback i tilfælde af scanningsvanskeligheder.
-4. Test stregkodescanningsfunktionen med forskellige enheder og stregkodetyper inden udrulning.
+---
 
-## Begrænsninger
+## Scanner modal
 
-- Nøjagtigheden af stregkodescanning kan variere afhængigt af enhedens kamerakvalitet og miljøforhold.
-- Nogle ældre eller lavspecifikke enheder understøtter muligvis ikke stregkodescanning.
-- Visse stregkodetyper understøttes muligvis ikke, afhængigt af implementeringen.
+Scanner-modalen indeholder altid:
+- **Live kameravisning (Live camera view)** — scanner automatisk ved detektering; modalen lukker efter en vellykket scanning.
+- **Manuel tekstindtastning (Manual text input)** — et tekstfelt i bunden, hvor intervieweren kan skrive koden, hvis scanningen mislykkes.
+- **Udført-knap (Done button)** — indsender den manuelt indtastede værdi.
+
+Når enhedens kamera ikke er tilgængeligt, skifter modalen til en **"Upload an image"**-mulighed — intervieweren kan indsende et billede af stregkoden til afkodning.
+
+---
+
+## Inline button layout
+
+Tilføj `inline` for at vise scanneren som en **rund ikon-knap** ved siden af etiketten (label) i stedet for en knap i fuld bredde.
+
+```
+| type    | name | label     | appearance                              |
+|---------|------|-----------|----------------------------------------|
+| barcode | code | Scan item | inline display{right}                  |
+| barcode | code | Scan item | inline display{left, large}            |
+| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+```
+
+**Knapposition** — `left`, `right` *(standard)*, `top`, `center`, `bottom`
+
+**Knapstørrelse** — `small` *(standard)*, `medium`, `large`
+
+**Knapfarve** — tilføj en hex-farve inde i `display{}` for at tilsidesætte primærfarven:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Kontrol efter indfangning — `results{}`:**
+
+| Appearance | Effekt |
+|---|---|
+| `results{hide(scanner)}` | Skjuler scanningsknappen, efter en værdi er indfanget |
+| `results{hide(review)}` | Skjuler linket til den scannede værdi efter indfangning |
+| `results{hide(value)}` | Skjuler tekstvisningen af den scannede værdi |
+| `results{left}` | Flytter ikonet til venstre efter indfangning |
+
+Eksempel — skjul scanner efter første scanning:
+```
+inline display{center, large} results{hide(scanner)}
+```
+
+---
+
+## `inputs{auto-close(N)}` — automatisk lukning af scanner
+
+Lukker automatisk scanner-modalen efter `N` sekunder, hvis der ikke detekteres nogen stregkode. En live nedtællingstimer vises inde i modalen.
+
+```
+inputs{auto-close(10)}     → lukker efter 10 sekunder
+inputs{auto-close(5)}      → lukker efter 5 sekunder
+```
+
+Kombiner med inline:
+```
+inline display{right} inputs{auto-close(10)}
+```
+
+---
+
+## `inputs{floating}` — flydende flytbar scanner
+
+Viser en **minimeringsknap** (komprimeringsikon ⊞) i scanner-modalens overskrift. Ved at trykke på det minimeres scanneren til et lille flydende rundt ikon, der kan trækkes hvor som helst på skærmen. Ved at trykke på det flydende ikon genåbnes scanneren.
+
+```
+inputs{floating}
+inline display{right} inputs{floating}
+```
+
+Nyttig i arbejdsflow, hvor intervieweren har brug for at se formularen, mens scanneren er aktiv (f.eks. scanning af elementer i en liste).
+
+---
+
+## `invisible auto-show` — automatisk åbning af scanner
+
+Skjuler spørgsmåls-widgetten fra layoutet, men åbner automatisk scanneren, når siden indlæses. Nyttig til indlejring af et lydløst scanningstrin i formularflowet.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+---
+
+## I repeat-grupper (In repeat groups)
+
+Når `barcode` er inde i en `begin repeat`-gruppe, vil en vellykket scanning automatisk gå videre til **næste repeat-instans**, efter værdien er registreret. Dette muliggør hurtig sekventiel scanning, uden at intervieweren skal trykke på "Tilføj" (Add) mellem elementer.
+
+---
+
+## Undertryk etiketten (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
 
 ## Eksempel på brug
 
-Her er et eksempel på, hvordan du kan bruge et stregkodespørgsmål i en lagerundersøgelse:
+### Lagerscanning
 
-| type    | name          | label                   | hint                                      |
-|---------|---------------|-------------------------|-------------------------------------------|
-| barcode | product_code  | Scan produktets stregkode| Placer stregkoden inden for rammen     |
-| integer | quantity      | Indtast produktmængde  |                                           |
-| note    | confirmation  | Produkt scannet: `${product_code}`. Mængde: `${quantity}` |           |
+| type | name | label | appearance | required |
+|------|------|-------|------------|----------|
+| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
+| integer | quantity | Quantity | | yes |
+| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
 
-I dette eksempel fanger undersøgelsen et produkts stregkode, spørger om mængden og viser derefter en bekræftelsesnote med den scannede information.
+### Hurtig scanning af flere elementer (repeat-gruppe)
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin repeat | items | | |
+| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| end repeat | items | | |
+
+### Lydløs auto-scanning ved sideindlæsning
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| barcode | entry_code | | `invisible auto-show` |
+
+---
+
+## Bedste praksis
+
+1. Brug `inputs{auto-close(N)}` for at forhindre, at scanneren forbliver åben på ubestemt tid — vælg en værdi, der giver interviewerne tid nok til at placere stregkoden (8–15 sekunder er typisk).
+2. Brug `inputs{floating}`, når formularen skal forblive synlig under scanning (f.eks. scanning fra en liste, hvor intervieweren krydsrefererer et synligt felt).
+3. Placer stregkodespørgsmålet inde i en repeat-gruppe for hurtig sekventiel scanning — automatisk repeat-fremføring eliminerer det manuelle "Tilføj"-trin.
+4. Inkluder altid kolonnen `hint` med instruktioner om placering (f.eks. "Hold stregkoden inden for 10–30 cm fra kameraet i godt lys").
+5. Den manuelle tekstindtastning i scanner-modalen er altid tilgængelig — oplær interviewere i at bruge den som en reservemulighed for beskadigede eller beskidte stregkoder.
+
+## Begrænsninger
+
+- Scanningsnøjagtighed afhænger af kamerakvalitet, belysning og stregkodens tilstand — beskadigede koder eller koder med lav kontrast scannes muligvis ikke pålideligt.
+- Scanneren bruger det bagudvendte kamera; enheder uden et bagudvendt kamera falder tilbage på muligheden for billedupload.
+- `invisible auto-show` åbner kun ved den første sideindlæsning; at navigere tilbage til siden genudløser ikke auto-åbningen.

@@ -1,71 +1,261 @@
 ---
 title: "Datetime, tanggal, waktu"
-description: "Pertanyaan datetime memungkinkan responden memasukkan tanggal dan waktu dalam satu bidang."
+description: "Pertanyaan Datetime memungkinkan responden untuk memasukkan tanggal dan waktu dalam satu bidang."
 ---
 
-Tipe pertanyaan datetime dalam XLSForm dan rtSurvey memungkinkan responden memasukkan tanggal dan waktu dalam satu bidang. Tipe pertanyaan ini berguna ketika Anda perlu menangkap momen tertentu dalam waktu, termasuk tanggal dan waktu yang tepat.
+Tipe pertanyaan `date`, `time`, dan `datetime` menangkap nilai tanggal dan/atau waktu. rtSurvey merendernya dengan beberapa mode tata letak yang dikendalikan oleh kolom `appearance`.
 
-## Spesifikasi XLSForm Dasar
+## Spesifikasi Dasar XLSForm
 
-| type     | name           | label                           |
-|----------|----------------|---------------------------------|
-| datetime | event_datetime | Kapan peristiwa itu terjadi?    |
+| type     | name           | label                         |
+|----------|----------------|-------------------------------|
+| date     | birth_date     | Tanggal lahir                 |
+| time     | start_time     | Jam berapa ini dimulai?       |
+| datetime | event_datetime | Kapan peristiwa itu terjadi?  |
 
-Untuk detail lebih lanjut tentang tipe pertanyaan datetime dasar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk spesifikasi standar, lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
-## Penggunaan
+## Mode tata letak
 
-Pertanyaan datetime umum digunakan untuk:
+### Default — kalender selalu terbuka
 
-1. Merekam cap waktu peristiwa atau pengamatan
-2. Menjadwalkan janji atau pertemuan
-3. Mencatat waktu mulai dan berakhir dari aktivitas
-4. Menangkap momen tepat untuk pengumpulan data yang sensitif terhadap waktu
+Tidak diperlukan nilai appearance. Kalender (dan jam untuk `time`/`datetime`) merender langsung di halaman — selalu terlihat, tidak perlu tombol.
 
-## Ekstensi rtSurvey
+| type | name       | label            | appearance |
+|------|------------|------------------|------------|
+| date | start_date | Tanggal kunjungan|            |
 
-rtSurvey memperluas fungsionalitas pertanyaan datetime dengan berbagai appearance dan opsi kustomisasi:
+---
 
-### Opsi Appearance
+### `inline` — tombol melingkar → modal
 
-- `(default)`: Tampilkan kalender dan jam untuk memilih tanggal dan waktu
-- `inline`: Tampilkan kalender dan jam sebagai ikon
-- `inline-1line`: Tampilkan kalender dan jam untuk dipilih dalam format satu baris
-- `inline-onlyresult`: Tampilkan kalender dan jam sebagai ikon di akhir baris; ikon menghilang setelah dipilih
+Tombol ikon melingkar (kalender atau jam) mengambang di samping label pertanyaan. Mengetuknya akan membuka modal dengan pemilih. Setelah pemilihan, nilai yang dipilih muncul sebagai teks di samping label.
 
-### Kustomisasi Warna
+- Latar belakang tombol: warna tema utama (dapat ditimpa)
+- Bentuk tombol: lingkaran penuh (`border-radius: 50%`)
 
-Anda dapat menyesuaikan warna ikon kalender dan jam menggunakan fungsi `colors()`:
+```
+| type | name       | label            | appearance |
+|------|------------|------------------|------------|
+| date | start_date | Tanggal kunjungan| inline     |
+```
 
-- `inline colors("0099FF")`: Tampilkan ikon dengan warna kustom
-- `inline-1line-0000FF`: Tampilkan dalam format satu baris dengan warna kustom
-- `inline-1line colors("0000FF","FFFF00")`: Tampilkan dalam format satu baris dengan beberapa warna kustom
-- `inline-onlyresult colors("0099FF")`: Tampilkan ikon yang menghilang setelah dipilih, dengan warna kustom
+---
 
-### Format Tanggal dan Waktu Kustom
+### `inline-onlyresult` — tombol menghilang setelah pemilihan
 
-rtSurvey memungkinkan format tanggal dan waktu kustom menggunakan sintaks khusus:
+Sama seperti `inline` tetapi tombol menyembunyikan dirinya sendiri setelah nilai dipilih. Berguna bila Anda hanya ingin tanggal terlihat setelah dipilih, tanpa ikon yang menetap.
 
-- `inline-[%Y-%m-%d %H:%M:%S]`: Contoh format kustom (Tahun-Bulan-Hari Jam:Menit:Detik)
-- `inline-[%d/%m/%Y %I:%M %p]`: Contoh format kustom (Hari/Bulan/Tahun Jam:Menit AM/PM)
+```
+inline-onlyresult
+```
 
-## Contoh Penggunaan
+---
 
-Berikut adalah contoh cara menggunakan pertanyaan datetime dalam survei:
+### `inline-1line` — deretan pemutar (spinners)
 
-| type     | name           | label                                      | appearance                    |
-|----------|----------------|--------------------------------------------|-------------------------------|
-| datetime | incident_time  | Kapan insiden itu terjadi?                 | inline-[%d/%m/%Y %I:%M %p]   |
+Merender kontrol pemutar individual (▲ nilai ▼) dalam satu baris horizontal — satu kolom per komponen. Untuk `date`: bulan / hari / tahun. Untuk `datetime`: bulan / hari / tahun / jam / menit. Untuk `time`: jam / menit.
+
+Tidak ada modal atau popup kalender — pengguna menggulir setiap pemutar secara independen.
+
+```
+inline-1line
+```
+
+**Tampilkan hanya komponen tertentu** dengan menambahkan nama komponen:
+
+```
+inline-1line month year      → menyembunyikan pemutar hari
+inline-1line year            → hanya menampilkan tahun
+```
+
+**Batasi rentang tahun:**
+
+```
+inline-1line y_range(2000-2030)
+```
+
+---
+
+### `box` — input teks
+
+Merender bidang input teks biasa. Pengguna mengetik tanggal secara langsung menggunakan format yang ditentukan dalam appearance.
+
+```
+box(%d/%m/%Y)       → HH/BB/TTTT
+box(%Y-%m-%d)       → TTTT-BB-HH
+```
+
+---
+
+### `month-year` — hanya bulan dan tahun
+
+Penampilan standar XLSForm. Pemilih dimulai pada tampilan tahun; pengguna memilih bulan dan tahun tetapi bukan hari tertentu.
+
+```
+month-year
+```
+
+---
+
+### `year` — hanya tahun
+
+Penampilan standar XLSForm. Pemilih dimulai pada tampilan dekade; hanya tahun yang dapat dipilih.
+
+```
+year
+```
+
+---
+
+## Format tampilan kustom
+
+Tambahkan `-[format]` ke penampilan `inline` apa pun untuk mengontrol bagaimana nilai yang dipilih ditampilkan sebagai teks. Menggunakan token gaya strftime.
+
+| Token | Arti | Contoh |
+|-------|---------|---------|
+| `%d`  | Hari (dengan nol di depan) | 07 |
+| `%e`  | Hari (tanpa bantalan) | 7 |
+| `%m`  | Nomor bulan | 04 |
+| `%n`  | Nomor bulan (tanpa bantalan) | 4 |
+| `%b`  | Singkatan bulan | Apr |
+| `%Y`  | Tahun 4 digit | 2026 |
+| `%y`  | Tahun 2 digit | 26 |
+| `%H`  | Jam (24 jam) | 14 |
+| `%h`  | Jam (tanpa bantalan) | 14 |
+| `%M`  | Menit | 05 |
+| `%S`  | Detik | 00 |
+| `%a`  | Singkatan nama hari | Wed |
+
+**Contoh:**
+
+```
+inline-[%d/%m/%Y]            → 07/04/2026
+inline-[%d %b %Y]            → 07 Apr 2026
+inline-1line-[%Y-%m-%d]      → input pemutar, tampilan terformat
+inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
+```
+
+---
+
+## Kustomisasi warna
+
+Timpa warna tombol ikon menggunakan `colors()`:
+
+```
+inline colors("0099FF")                   → latar belakang tombol #0099FF
+inline colors("0099FF","FFFFFF")          → latar belakang #0099FF, warna ikon #FFFFFF
+inline-1line colors("0000FF","FFFF00")    → warna aksen pemutar
+inline-onlyresult colors("E53935")        → tombol merah
+```
+
+---
+
+## Posisi tombol dengan `display{}`
+
+Pengubah `display{}` mengontrol di mana tombol ikon muncul relatif terhadap label pertanyaan. Berlaku untuk `inline` dan `inline-onlyresult`.
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parameter | Nilai | Default |
+|-----------|--------|---------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex mis. `#FF5500` | warna tema utama |
+
+**Perilaku perataan (Align):**
+
+| Nilai | Tata Letak |
+|-------|--------|
+| `right` | Tombol di sebelah kanan label |
+| `left` | Tombol di sebelah kiri label |
+| `top` | Tombol di atas label, lebar penuh rata tengah |
+| `center` / `bottom` | Tombol di bawah label, lebar penuh rata tengah |
+
+**Contoh:**
+
+```
+inline display{left}
+inline display{center, large}
+inline display{right, medium, #E53935}
+inline-onlyresult display{bottom, large, #0099FF}
+```
+
+---
+
+## Pembatasan rentang tanggal
+
+Gunakan `inputs{range[...]}` untuk membatasi tanggal mana yang dapat dipilih.
+
+```
+inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
+```
+
+Parameter di dalam `range[...]`:
+
+| Parameter | Deskripsi |
+|-----------|-------------|
+| `dateGt(YYYY-MM-DD)` | Tanggal minimum yang dapat dipilih (lebih besar dari atau sama dengan) |
+| `dateLt(YYYY-MM-DD)` | Tanggal maksimum yang dapat dipilih (lebih kecil dari atau sama dengan) |
+| `indayTimeGt(HH:MM:SS)` | Waktu minimum dalam sehari (hanya datetime) |
+| `indayTimeLt(HH:MM:SS)` | Waktu maksimum dalam sehari (hanya datetime) |
+
+Beberapa rentang dapat ditentukan — tanggal dapat dipilih jika jatuh dalam **salah satu** rentang tersebut.
+
+---
+
+## Sembunyikan label
+
+Tambahkan `text-nolabel` untuk menyembunyikan label pertanyaan. Tombol merender sendiri.
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Ringkasan tata letak
+
+| Appearance | Widget yang dirender | Warna dapat dikustomisasi |
+|---|---|---|
+| *(tidak ada)* | Kalender selalu terbuka | Tidak |
+| `inline` | Tombol melingkar → kalender modal | Ya |
+| `inline-onlyresult` | Tombol melingkar → modal, bersembunyi setelah pemilihan | Ya |
+| `inline-1line` | Deretan pemutar | Ya |
+| `box(%format%)` | Bidang input teks | Tidak |
+| `month-year` | Pemilih bulan/tahun | Tidak |
+| `year` | Pemilih tahun saja | Tidak |
+
+---
+
+## Contoh penggunaan
+
+```
+| type     | name        | label              | appearance                              |
+|----------|-------------|--------------------|-----------------------------------------|
+| date     | visit_date  | Tanggal kunjungan  | inline display{right} -[%d/%m/%Y]       |
+| date     | birth_date  | Tanggal lahir      | inline-1line y_range(1940-2026)         |
+| time     | start_time  | Waktu mulai        | inline-1line                            |
+| datetime | event_time  | Tanggal & waktu acara | inline display{center, large} -[%d/%m/%Y %H:%M] |
+| date     | report_date | Tanggal pelaporan  | box(%d/%m/%Y)                           |
+```
+
+---
 
 ## Praktik Terbaik
 
-1. Berikan instruksi yang jelas tentang format tanggal dan waktu yang diharapkan.
-2. Pertimbangkan menggunakan appearance `inline` untuk tampilan yang lebih kompak.
-3. Gunakan format kustom ketika Anda memerlukan komponen atau pemformatan tanggal dan waktu tertentu.
-4. Perhatikan zona waktu saat mengumpulkan data datetime di berbagai wilayah.
+1. Gunakan `inline` untuk formulir ringkas — ini menghemat ruang vertikal dibandingkan dengan kalender yang selalu terbuka.
+2. Gunakan `inline-1line` saat responden perlu menyesuaikan komponen tanggal individual (misalnya tahun kelahiran).
+3. Gunakan `box()` hanya bila Anda percaya pencacah akan mengetik tanggal dengan benar — tidak ada UI validasi yang ditampilkan.
+4. Gunakan `display{center, large}` untuk membuat tombol lebih menonjol di layar seluler.
+5. Selalu tentukan `-[format]` jika tampilan default `YYYY-MM-DD` akan membingungkan pengguna lokal.
+6. Perhatikan zona waktu saat mengumpulkan data datetime di berbagai wilayah.
 
-## Keterbatasan
+## Batasan
 
-- Beberapa appearance atau format kustom mungkin tidak didukung di semua perangkat atau platform.
-- Pengguna mungkin memerlukan panduan tentang cara memasukkan tanggal dan waktu dengan benar, terutama dengan format kustom.
+- `inline-1line` selalu default ke tanggal hari ini jika tidak ada nilai — gunakan kolom `default` untuk mengisi tanggal tertentu sebelumnya.
+- Format `box()` hanya mengontrol tampilan; nilai yang disimpan selalu ISO 8601.
+- Pembatasan rentang tanggal (`inputs{range[...]}`) tidak berfungsi dengan tata letak `box`.
 - Perbedaan zona waktu dapat mempersulit analisis data jika tidak diperhitungkan dengan benar.

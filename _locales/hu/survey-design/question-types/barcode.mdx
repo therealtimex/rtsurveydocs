@@ -1,56 +1,178 @@
 ---
-title: "Vonalkód"
-description: "A vonalkód-kérdések lehetővé teszik vonalkódadatok beolvasását és rögzítését a felmérésben."
+title: "Barcode"
+description: "A Barcode kérdéstípusok QR codes és barcode adatokat szkennelnek és rögzítenek a felmérésben."
 ---
 
-Az XLSForm és az rtSurvey vonalkód kérdéstípusa lehetővé teszi a felhasználók számára vonalkódadatok beolvasását és rögzítését közvetlenül a felmérésben. Ez a funkció különösen hasznos készletkezeléshez, termékkövetéshez vagy bármilyen olyan helyzetben, ahol kódolt információk gyors és pontos adatbevitele szükséges.
+A `barcode` kérdéstípus egy kódértéket rögzít egy QR code vagy barcode beolvasásával az eszköz kameráján keresztül. A szkenner modális ablak (scanner modal) egy kézi szövegbeviteli lehetőséget is tartalmaz tartalékként arra az esetre, ha a szkennelés nem lehetséges.
 
-## Alapvető XLSForm-specifikáció
+## Basic XLSForm Specification
 
-| type    | name          | label                   |
-|---------|---------------|-------------------------|
-| barcode | product_code  | Olvassa be a termék vonalkódját |
+| type    | name         | label                    |
+|---------|--------------|--------------------------|
+| barcode | product_code | Scan the product barcode |
+| barcode | ticket_id    | Scan the ticket          |
 
-A vonalkód kérdéstípussal kapcsolatos további részletekért lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+A szabványos specifikációt az [XLSForm dokumentációjában](https://xlsform.org/en/#question-types) találja.
 
-## Felhasználási területek
+---
 
-A vonalkód-kérdések általánosan használt területei:
+## Supported formats
 
-1. Termékazonosítás a készletfelmérésekben
-2. Eszközkövetés terepi műveletekben
-3. Jegy- vagy azonosítóellenőrzés eseményeken
-4. Kódolt információk gyors adatbevitele
+Az rtSurvey támogatja a QR codes és a szabványos 1D barcodes formátumokat az eszköz kameráján keresztül, beleértve a következőket:
 
-## rtSurvey-bővítések
+- QR Code
+- UPC-A, UPC-E
+- EAN-8, EAN-13
+- Code 39, Code 128
+- ITF, Codabar
 
-Bár az alapvető XLSForm-specifikáció egyszerű a vonalkód-kérdéseknél, az rtSurvey további funkciókat és testreszabási lehetőségeket kínálhat:
+---
 
-1. Több vonalkód-formátum támogatása (pl. QR-kódok, UPC, EAN)
-2. Eszközkamera integrációja a vonalkód-beolvasáshoz
-3. Manuális beviteli lehetőség sérült vagy beolvashatalan vonalkód esetén
+## Default layout
 
-## Bevált módszerek
+Ha nincs beállítva `appearance`, a kérdés egy teljes szélességű **"GET BARCODE"** gombot jelenít meg. Erre koppintva nyílik meg a szkenner modális ablaka. Sikeres szkennelés után a gomb felirata **"REPLACE BARCODE"**-ra változik, és a beolvasott érték alatta kattintható linkként jelenik meg.
 
-1. Biztosítson megfelelő megvilágítást a pontos vonalkód-beolvasáshoz.
-2. Adjon egyértelmű utasításokat a felhasználóknak, hogyan helyezzék az eszközt beolvasáshoz.
-3. Vegyen fel manuális beviteli lehetőséget tartalékként beolvasási nehézségek esetén.
-4. Tesztelje a vonalkód-beolvasó funkciót különféle eszközökkel és vonalkód-típusokkal a felmérés telepítése előtt.
+---
+
+## Scanner modal
+
+A szkenner modális ablaka mindig tartalmazza a következőket:
+- **Élő kamerakép (Live camera view)** — automatikusan szkennel az észleléskor; a modális ablak sikeres szkennelés után bezárul.
+- **Kézi szövegbevitel (Manual text input)** — egy szöveges mező az ablak alján, ahová a kérdező beírhatja a kódot, ha a szkennelés sikertelen.
+- **Kész gomb (Done button)** — beküldi a kézzel beírt értéket.
+
+Ha az eszköz kamerája nem érhető el, a modális ablak egy **"Upload an image"** lehetőségre vált — a kérdező beküldhet egy fotót a vonalkódról a dekódoláshoz.
+
+---
+
+## Inline button layout
+
+Adja hozzá az `inline` beállítást, hogy a szkenner egy **kerek ikon gombként** jelenjen meg a címke (label) mellett a teljes szélességű gomb helyett.
+
+```
+| type    | name | label     | appearance                              |
+|---------|------|-----------|----------------------------------------|
+| barcode | code | Scan item | inline display{right}                  |
+| barcode | code | Scan item | inline display{left, large}            |
+| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+```
+
+**Gomb pozíciója (Button position)** — `left`, `right` *(alapértelmezett)*, `top`, `center`, `bottom`
+
+**Gomb mérete (Button size)** — `small` *(alapértelmezett)*, `medium`, `large`
+
+**Gomb színe (Button color)** — adjon meg egy hex kódot a `display{}`-en belül az elsődleges szín felülírásához:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Rögzítés utáni vezérlés (Post-capture control) — `results{}`:**
+
+| Appearance | Hatás |
+|---|---|
+| `results{hide(scanner)}` | Elrejti a szkennelés gombot az érték rögzítése után |
+| `results{hide(review)}` | Elrejti a beolvasott érték linkjét a rögzítés után |
+| `results{hide(value)}` | Elrejti a beolvasott érték szöveges megjelenítését |
+| `results{left}` | Az ikont balra mozgatja a rögzítés után |
+
+Példa — szkenner elrejtése az első szkennelés után:
+```
+inline display{center, large} results{hide(scanner)}
+```
+
+---
+
+## `inputs{auto-close(N)}` — szkenner automatikus bezárása
+
+Automatikusan bezárja a szkenner modális ablakát `N` másodperc után, ha nem észlel vonalkódot. Egy élő visszaszámláló időzítő jelenik meg az ablakban.
+
+```
+inputs{auto-close(10)}     → 10 másodperc után bezárul
+inputs{auto-close(5)}      → 5 másodperc után bezárul
+```
+
+Kombinálás inline móddal:
+```
+inline display{right} inputs{auto-close(10)}
+```
+
+---
+
+## `inputs{floating}` — lebegő, mozgatható szkenner
+
+Egy **minimalizálás gombot** (tömörítés ikon ⊞) jelenít meg a szkenner modális ablakának fejlécében. Erre koppintva a szkenner egy kis lebegő kerek ikonná zsugorodik, amely a képernyőn bárhová elhúzható. A lebegő ikonra koppintva a szkenner újra megnyílik.
+
+```
+inputs{floating}
+inline display{right} inputs{floating}
+```
+
+Hasznos olyan munkafolyamatokban, ahol a kérdezőnek látnia kell az űrlapot, miközben a szkenner aktív (pl. elemek szkennelése egy listából).
+
+---
+
+## `invisible auto-show` — szkenner automatikus megnyitása
+
+Elrejti a kérdés widgetet az elrendezésből, de az oldal betöltésekor automatikusan megnyitja a szkennert. Hasznos egy csendes szkennelési lépés beágyazásához az űrlapfolyamatba.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+---
+
+## Ismétlődő csoportokban (In repeat groups)
+
+Ha a `barcode` egy `begin repeat` csoporton belül van, a sikeres szkennelés az érték rögzítése után automatikusan a **következő ismétlődésre** ugrik. Ez lehetővé teszi a gyors egymás utáni szkennelést anélkül, hogy a kérdezőnek az elemek között a "Hozzáadás" (Add) gombra kellene koppintania.
+
+---
+
+## Címke elnyomása (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Példa a használatra
+
+### Leltár szkennelés
+
+| type | name | label | appearance | required |
+|------|------|-------|------------|----------|
+| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
+| integer | quantity | Quantity | | yes |
+| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
+
+### Gyors több elemes szkennelés (ismétlődő csoport)
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin repeat | items | | |
+| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| end repeat | items | | |
+
+### Csendes automatikus szkennelés oldalbetöltéskor
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| barcode | entry_code | | `invisible auto-show` |
+
+---
+
+## Legjobb gyakorlatok
+
+1. Használja az `inputs{auto-close(N)}` beállítást, hogy megakadályozza a szkenner végtelen ideig tartó nyitva maradását — válasszon olyan értéket, amely elég időt ad a kérdezőknek a vonalkód pozicionálására (általában 8–15 másodperc).
+2. Használja az `inputs{floating}` beállítást, ha az űrlapnak láthatónak kell maradnia szkennelés közben (pl. szkennelés egy listából, ahol a kérdező egy látható mezővel veti össze az adatokat).
+3. Helyezze a vonalkód kérdést egy ismétlődő csoportba a gyors egymás utáni szkenneléshez — az automatikus ismétlődés-továbblépés szükségtelenné teszi a manuális "Hozzáadás" lépést.
+4. Mindig használja a `hint` oszlopot a pozicionálási utasításokkal (pl. "Tartsa a vonalkódot 10–30 cm távolságra a kamerától, jó fényviszonyok mellett").
+5. A szkenner modális ablakában a kézi szövegbevitel mindig elérhető — tanítsa meg a kérdezőket, hogy ezt használják tartalékként sérült vagy piszkos vonalkódok esetén.
 
 ## Korlátozások
 
-- A vonalkód-beolvasás pontossága az eszköz kamerájának minőségétől és a környezeti feltételektől függően változhat.
-- Egyes régebbi vagy alacsony kategóriájú eszközök esetleg nem támogatják a vonalkód-beolvasást.
-- Egyes vonalkód-típusok a megvalósítástól függően esetleg nem támogatottak.
-
-## Példa
-
-Íme egy példa arra, hogyan lehet vonalkód-kérdést felhasználni egy készletfelmérésben:
-
-| type    | name          | label                   | hint                                      |
-|---------|---------------|-------------------------|-------------------------------------------|
-| barcode | product_code  | Olvassa be a termék vonalkódját | Helyezze a vonalkódot a keretbe |
-| integer | quantity      | Adja meg a termék mennyiségét  |                                           |
-| note    | confirmation  | Beolvasott termék: `${product_code}`. Mennyiség: `${quantity}` |           |
-
-Ebben a példában a felmérés rögzíti a termék vonalkódját, megkérdezi a mennyiséget, majd visszaigazoló megjegyzést jelenít meg a beolvasott adatokkal.
+- A szkennelés pontossága a kamera minőségétől, a megvilágítástól és a vonalkód állapotától függ — a sérült vagy alacsony kontrasztú kódok beolvasása nem feltétlenül megbízható.
+- A szkenner a hátsó (környezet felé néző) kamerát használja; a hátsó kamera nélküli eszközök a képfeltöltési lehetőségre váltanak.
+- Az `invisible auto-show` csak az oldal első betöltésekor nyílik meg; az oldalra való visszanavigálás nem váltja ki újra az automatikus megnyitást.

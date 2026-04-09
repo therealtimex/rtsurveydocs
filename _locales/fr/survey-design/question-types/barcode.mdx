@@ -1,58 +1,178 @@
 ---
-title: "Code-barres"
-description: "Les questions de type code-barres permettent de scanner et de capturer des données de codes-barres dans votre enquête."
+title: "Barcode"
+description: "Les questions de type Barcode scanne et capturent les codes QR codes et les données de codes-barres dans votre enquête."
 ---
 
-Le type de question code-barres dans XLSForms et rtSurvey permet aux utilisateurs de scanner et de capturer des données de codes-barres directement dans l'enquête. Cette fonctionnalité est particulièrement utile pour la gestion des stocks, le suivi des produits ou tout scénario nécessitant une saisie de données rapide et précise d'informations codées.
+Le type de question `barcode` capture une valeur de code en scannant un code QR code ou un code-barres avec la caméra de l'appareil. Le modal du scanner comprend également une saisie de texte manuelle comme solution de repli lorsque le scan n'est pas possible.
 
-## Spécification XLSForm de Base
+## Basic XLSForm Specification
 
-| type    | name          | label                   |
-|---------|---------------|-------------------------|
-| barcode | product_code  | Scannez le code-barres du produit |
+| type    | name         | label                    |
+|---------|--------------|--------------------------|
+| barcode | product_code | Scan the product barcode |
+| barcode | ticket_id    | Scan the ticket          |
 
-Pour plus de détails sur le type de question code-barres de base, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+Pour la spécification standard, consultez la [documentation XLSForm](https://xlsform.org/en/#question-types).
 
-## Utilisations
+---
 
-Les questions de type code-barres sont couramment utilisées pour :
+## Supported formats
 
-1. L'identification de produits dans les enquêtes d'inventaire
-2. Le suivi des actifs dans les opérations sur le terrain
-3. La vérification de billets ou d'identités lors d'événements
-4. La saisie rapide de données pour des informations codées
+rtSurvey prend en charge les codes QR codes et les codes-barres 1D standard via la caméra de l'appareil, notamment :
 
-## Extensions rtSurvey
+- QR Code
+- UPC-A, UPC-E
+- EAN-8, EAN-13
+- Code 39, Code 128
+- ITF, Codabar
 
-Bien que la spécification XLSForm de base pour les questions de type code-barres soit simple, rtSurvey peut proposer des fonctionnalités ou des personnalisations supplémentaires. Celles-ci pourraient inclure :
+---
 
-1. La prise en charge de plusieurs formats de codes-barres (ex : codes QR, UPC, EAN)
-2. L'intégration avec la caméra de l'appareil pour le balayage des codes-barres
-3. Une option de saisie manuelle au cas où le code-barres serait endommagé ou ne pourrait pas être scanné
+## Default layout
 
-(Note : Les extensions spécifiques disponibles dans rtSurvey pour les questions de type code-barres devront être confirmées et détaillées ici.)
+Sans paramètre `appearance`, la question affiche un bouton pleine largeur **"GET BARCODE"**. En appuyant dessus, le modal du scanner s'ouvre. Après un scan réussi, le bouton devient **"REPLACE BARCODE"** et la valeur scannée apparaît en dessous sous forme de lien cliquable.
 
-## Meilleures Pratiques
+---
 
-1. Assurez de bonnes conditions d'éclairage pour un balayage précis des codes-barres.
-2. Fournissez des instructions claires aux utilisateurs sur la manière de positionner l'appareil pour le balayage.
-3. Incluez une option de saisie manuelle comme solution de secours en cas de difficultés de balayage.
-4. Testez la fonction de balayage de codes-barres avec divers appareils et types de codes-barres avant de déployer l'enquête.
+## Scanner modal
 
-## Limitations
+Le modal du scanner comprend toujours :
+- **Vue caméra en direct (Live camera view)** — scanne automatiquement lors de la détection ; le modal se ferme après un scan réussi.
+- **Saisie de texte manuelle (Manual text input)** — un champ de texte en bas où l'enquêteur peut taper le code si le scan échoue.
+- **Bouton Terminé (Done button)** — soumet la valeur tapée manuellement.
 
-- La précision du balayage des codes-barres peut varier en fonction de la qualité de la caméra de l'appareil et des conditions environnementales.
-- Certains appareils anciens ou d'entrée de gamme peuvent ne pas prendre en charge le balayage des codes-barres.
-- Certains types de codes-barres peuvent ne pas être pris en charge, selon l'implémentation.
+Lorsque la caméra de l'appareil n'est pas disponible, le modal bascule vers une option **"Upload an image"** — l'enquêteur peut soumettre une photo du code-barres pour le décodage.
 
-## Exemple d'Utilisation
+---
 
-Voici un exemple de la manière dont vous pourriez utiliser une question de type code-barres dans une enquête d'inventaire :
+## Inline button layout
 
-| type    | name          | label                   | hint                                      |
-|---------|---------------|-------------------------|-------------------------------------------|
-| barcode | product_code  | Scannez le code-barres du produit | Positionnez le code-barres dans le cadre |
-| integer | quantity      | Entrez la quantité du produit |                                           |
-| note    | confirmation  | Produit scanné : `${product_code}`. Quantité : `${quantity}` |           |
+Ajoutez `inline` pour afficher le scanner sous forme de **bouton d'icône circulaire** à côté du libellé (label) au lieu d'un bouton pleine largeur.
 
-Dans cet exemple, l'enquête capture le code-barres d'un produit, demande la quantité, puis affiche une note de confirmation avec les informations scannées.
+```
+| type    | name | label     | appearance                              |
+|---------|------|-----------|----------------------------------------|
+| barcode | code | Scan item | inline display{right}                  |
+| barcode | code | Scan item | inline display{left, large}            |
+| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+```
+
+**Position du bouton** — `left`, `right` *(par défaut)*, `top`, `center`, `bottom`
+
+**Taille du bouton** — `small` *(par défaut)*, `medium`, `large`
+
+**Couleur du bouton** — ajoutez une couleur hexadécimale à l'intérieur de `display{}` pour remplacer la couleur primaire :
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Contrôle post-capture — `results{}` :**
+
+| Appearance | Effet |
+|---|---|
+| `results{hide(scanner)}` | Masque le bouton de scan après la capture d'une valeur |
+| `results{hide(review)}` | Masque le lien de la valeur scannée après la capture |
+| `results{hide(value)}` | Masque l'affichage du texte de la valeur scannée |
+| `results{left}` | Déplace l'icône vers la gauche après la capture |
+
+Exemple — masquer le scanner après le premier scan :
+```
+inline display{center, large} results{hide(scanner)}
+```
+
+---
+
+## `inputs{auto-close(N)}` — fermeture automatique du scanner
+
+Ferme automatiquement le modal du scanner après `N` secondes si aucun code-barres n'est détecté. Un compte à rebours en direct est affiché à l'intérieur du modal.
+
+```
+inputs{auto-close(10)}     → se ferme après 10 secondes
+inputs{auto-close(5)}      → se ferme après 5 secondes
+```
+
+Combiner avec inline :
+```
+inline display{right} inputs{auto-close(10)}
+```
+
+---
+
+## `inputs{floating}` — scanner flottant déplaçable
+
+Affiche un **bouton de réduction** (icône de compression ⊞) dans l'en-tête du modal du scanner. En appuyant dessus, le scanner se réduit en une petite icône circulaire flottante qui peut être déplacée n'importe où sur l'écran. En appuyant sur l'icône flottante, le scanner se rouvre.
+
+```
+inputs{floating}
+inline display{right} inputs{floating}
+```
+
+Utile dans les flux de travail où l'enquêteur doit voir le formulaire pendant que le scanner est actif (par exemple, scannage d'articles dans une liste).
+
+---
+
+## `invisible auto-show` — ouverture automatique du scanner
+
+Masque le widget de la question de la mise en page mais ouvre automatiquement le scanner lors du chargement de la page. Utile pour intégrer une étape de scan silencieuse dans le flux du formulaire.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+---
+
+## Dans les groupes de répétition (In repeat groups)
+
+Lorsque `barcode` est à l'intérieur d'un groupe `begin repeat`, un scan réussi passe automatiquement à l'**instance de répétition suivante** après l'enregistrement de la valeur. Cela permet un scannage séquentiel rapide sans que l'enquêteur n'ait à appuyer sur "Ajouter" (Add) entre les articles.
+
+---
+
+## Supprimer le libellé (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Exemple d'utilisation
+
+### Scan d'inventaire
+
+| type | name | label | appearance | required |
+|------|------|-------|------------|----------|
+| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
+| integer | quantity | Quantity | | yes |
+| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
+
+### Scan rapide de plusieurs articles (groupe de répétition)
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin repeat | items | | |
+| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| end repeat | items | | |
+
+### Scan automatique silencieux au chargement de la page
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| barcode | entry_code | | `invisible auto-show` |
+
+---
+
+## Meilleures pratiques
+
+1. Utilisez `inputs{auto-close(N)}` pour empêcher le scanner de rester ouvert indéfiniment — choisissez une valeur qui donne aux enquêteurs suffisamment de temps pour positionner le code-barres (8 à 15 secondes est typique).
+2. Utilisez `inputs{floating}` lorsque le formulaire doit rester visible pendant le scan (par exemple, scannage à partir d'une liste où l'enquêteur effectue des recoupements avec un champ visible).
+3. Placez la question de code-barres à l'intérieur d'un groupe de répétition pour un scannage séquentiel rapide — l'avancement automatique de la répétition élimine l'étape manuelle "Ajouter".
+4. Incluez toujours la colonne `hint` avec des instructions de positionnement (par exemple, "Maintenez le code-barres à une distance de 10 à 30 cm de la caméra, sous un bon éclairage").
+5. La saisie de texte manuelle dans le modal du scanner est toujours disponible — formez les enquêteurs à l'utiliser comme solution de repli pour les codes-barres endommagés ou sales.
+
+## Limites
+
+- La précision du scan dépend de la qualité de la caméra, de l'éclairage et de l'état du code-barres — les codes endommagés ou à faible contraste peuvent ne pas être scannés de manière fiable.
+- Le scanner utilise la caméra arrière (orientée vers l'environnement) ; les appareils sans caméra arrière basculent vers l'option de téléchargement d'image.
+- `invisible auto-show` s'ouvre uniquement lors du premier chargement de la page ; revenir à la page ne déclenche pas à nouveau l'ouverture automatique.

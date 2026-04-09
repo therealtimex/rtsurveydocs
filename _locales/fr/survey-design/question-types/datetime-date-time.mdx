@@ -1,71 +1,261 @@
 ---
-title: "Datetime, date, time (Date et heure)"
-description: "Les questions de type datetime permettent aux répondants de saisir à la fois la date et l'heure dans un seul champ."
+title: "Date et heure, date, heure"
+description: "Les questions de type Date et heure permettent aux répondants de saisir à la fois la date et l'heure dans un seul champ."
 ---
 
-Le type de question `datetime` dans XLSForms et rtSurvey permet aux répondants de saisir à la fois la date et l'heure dans un seul champ. Ce type de question est utile lorsque vous devez capturer un moment précis dans le temps, incluant à la fois la date et l'heure exacte.
+Les types de questions `date`, `time` et `datetime` capturent des valeurs de date et/ou d'heure. rtSurvey les affiche avec plusieurs modes de mise en page contrôlés par la colonne `appearance`.
 
-## Spécification XLSForm de Base
+## Spécification XLSForm de base
 
-| type     | name           | label                           |
-|----------|----------------|--------------------------------|
-| datetime | event_datetime | Quand l'événement s'est-il produit ? |
+| type     | name           | label                         |
+|----------|----------------|-------------------------------|
+| date     | birth_date     | Date de naissance             |
+| time     | start_time     | À quelle heure cela a-t-il commencé ? |
+| datetime | event_datetime | Quand l'événement a-t-il eu lieu ? |
 
-Pour plus de détails sur le type de question `datetime` de base, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+Pour la spécification standard, consultez la [documentation XLSForm](https://xlsform.org/en/#question-types).
 
-## Utilisations
+## Modes de mise en page
 
-Les questions `datetime` sont couramment utilisées pour :
+### Par défaut — calendrier toujours ouvert
 
-1. Enregistrer l'horodatage d'événements ou d'observations
-2. Planifier des rendez-vous ou des réunions
-3. Journaliser les heures de début et de fin d'activités
-4. Capturer des moments précis pour la collecte de données sensibles au temps
+Aucune valeur d'apparence n'est requise. Le calendrier (et l'horloge pour `time`/`datetime`) s'affiche directement sur la page — toujours visible, aucun bouton n'est nécessaire.
 
-## Extensions rtSurvey
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Date de visite|            |
 
-rtSurvey étend les fonctionnalités des questions `datetime` avec diverses apparences et options de personnalisation :
+---
 
-### Options d'Apparence
+### `inline` — bouton circulaire → modal
 
-- `(par défaut)` : Affiche le calendrier et l'horloge pour sélectionner la date et l'heure
-- `inline` : Affiche le calendrier et l'horloge sous forme d'icônes
-- `inline-1line` : Affiche le calendrier et l'horloge pour la sélection dans un format à une seule ligne
-- `inline-onlyresult` : Affiche le calendrier et l'horloge sous forme d'icônes en fin de ligne ; les icônes disparaissent après la sélection
+Un bouton d'icône circulaire (calendrier ou horloge) flotte à côté du libellé de la question. En appuyant dessus, une fenêtre modale s'ouvre avec le sélecteur. Après la sélection, la valeur choisie apparaît sous forme de texte à côté du libellé.
 
-### Personnalisation des Couleurs
+- Arrière-plan du bouton : couleur principale du thème (modifiable)
+- Forme du bouton : cercle complet (`border-radius: 50%`)
 
-Vous pouvez personnaliser la couleur des icônes du calendrier et de l'horloge en utilisant la fonction `colors()` :
+```
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Date de visite| inline     |
+```
 
-- `inline colors("0099FF")` : Affiche les icônes avec une couleur personnalisée
-- `inline-1line-0000FF` : Affiche le format sur une seule ligne avec une couleur personnalisée
-- `inline-1line colors("0000FF","FFFF00")` : Affiche le format sur une seule ligne avec plusieurs couleurs personnalisées
-- `inline-onlyresult colors("0099FF")` : Affiche des icônes qui disparaissent après sélection, avec une couleur personnalisée
+---
 
-### Formats de Date et d'Heure Personnalisés
+### `inline-onlyresult` — le bouton disparaît après la sélection
 
-rtSurvey permet des formats de date et d'heure personnalisés en utilisant une syntaxe spéciale :
+Identique à `inline` mais le bouton se cache une fois qu'une valeur est sélectionnée. Utile lorsque vous souhaitez que seule la date soit visible après avoir été choisie, sans icône persistante.
 
-- `inline-[%Y-%m-%d %H:%M:%S]` : Exemple de format personnalisé (Année-Mois-Jour Heure:Minute:Seconde)
-- `inline-[%d/%m/%Y %I:%M %p]` : Exemple de format personnalisé (Jour/Mois/Année Heure:Minute AM/PM)
+```
+inline-onlyresult
+```
 
-## Exemple d'Utilisation
+---
 
-Voici un exemple de la manière dont vous pourriez utiliser une question `datetime` dans une enquête :
+### `inline-1line` — rangée de sélecteurs (spinners)
 
-| type     | name           | label                                      | appearance                    |
-|----------|----------------|--------------------------------------------|-----------------------------|
-| datetime | incident_time  | Quand l'incident s'est-il produit ?        | inline-[%d/%m/%Y %I:%M %p]  |
+Affiche des commandes de sélection individuelles (▲ valeur ▼) sur une seule rangée horizontale — une colonne par composant. Pour `date` : mois / jour / année. Pour `datetime` : mois / jour / année / heures / minutes. Pour `time` : heures / minutes.
 
-## Meilleures Pratiques
+Pas de fenêtre modale ni de calendrier contextuel — l'utilisateur fait défiler chaque sélecteur indépendamment.
 
-1. Fournissez des instructions claires sur le format de date et d'heure attendu.
-2. Envisagez d'utiliser l'apparence `inline` pour un affichage plus compact.
-3. Utilisez des formats personnalisés lorsque vous avez besoin de composants de date et d'heure ou d'un formatage spécifiques.
-4. Soyez attentif aux fuseaux horaires lors de la collecte de données `datetime` dans différentes régions.
+```
+inline-1line
+```
+
+**Afficher uniquement certains composants** en ajoutant les noms des composants :
+
+```
+inline-1line month year      → masque le sélecteur de jour
+inline-1line year            → affiche uniquement l'année
+```
+
+**Limiter la plage d'années :**
+
+```
+inline-1line y_range(2000-2030)
+```
+
+---
+
+### `box` — saisie de texte
+
+Affiche un champ de saisie de texte simple. l'utilisateur tape la date directement en utilisant le format défini dans l'apparence.
+
+```
+box(%d/%m/%Y)       → JJ/MM/AAAA
+box(%Y-%m-%d)       → AAAA-MM-JJ
+```
+
+---
+
+### `month-year` — mois et année uniquement
+
+Apparence XLSForm standard. Le sélecteur commence à la vue par année ; l'utilisateur sélectionne le mois et l'année mais pas de jour spécifique.
+
+```
+month-year
+```
+
+---
+
+### `year` — année uniquement
+
+Apparence XLSForm standard. Le sélecteur commence à la vue par décennie ; seule l'année est sélectionnable.
+
+```
+year
+```
+
+---
+
+## Format d'affichage personnalisé
+
+Ajoutez `-[format]` à n'importe quelle apparence `inline` pour contrôler la façon dont la valeur sélectionnée est affichée sous forme de texte. Utilise des jetons de style strftime.
+
+| Jeton | Signification | Exemple |
+|-------|---------|---------|
+| `%d`  | Jour (avec zéro non significatif) | 07 |
+| `%e`  | Jour (sans zéro non significatif) | 7 |
+| `%m`  | Numéro du mois | 04 |
+| `%n`  | Numéro du mois (sans zéro non significatif) | 4 |
+| `%b`  | Abréviation du mois | avr |
+| `%Y`  | Année sur 4 chiffres | 2026 |
+| `%y`  | Année sur 2 chiffres | 26 |
+| `%H`  | Heure (24h) | 14 |
+| `%h`  | Heure (sans zéro non significatif) | 14 |
+| `%M`  | Minute | 05 |
+| `%S`  | Seconde | 00 |
+| `%a`  | Abréviation du nom du jour | mer |
+
+**Exemples :**
+
+```
+inline-[%d/%m/%Y]            → 07/04/2026
+inline-[%d %b %Y]            → 07 avr 2026
+inline-1line-[%Y-%m-%d]      → saisie par sélecteur, affichage formaté
+inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
+```
+
+---
+
+## Personnalisation des couleurs
+
+Remplacez la couleur du bouton d'icône à l'aide de `colors()` :
+
+```
+inline colors("0099FF")                   → arrière-plan du bouton #0099FF
+inline colors("0099FF","FFFFFF")          → arrière-plan #0099FF, couleur de l'icône #FFFFFF
+inline-1line colors("0000FF","FFFF00")    → couleurs d'accentuation du sélecteur
+inline-onlyresult colors("E53935")        → bouton rouge
+```
+
+---
+
+## Position du bouton avec `display{}`
+
+Le modificateur `display{}` contrôle l'endroit où le bouton d'icône apparaît par rapport au libellé de la question. S'applique à `inline` et `inline-onlyresult`.
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Paramètre | Valeurs | Par défaut |
+|-----------|--------|---------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex ex. `#FF5500` | couleur principale du thème |
+
+**Comportement d'alignement :**
+
+| Valeur | Mise en page |
+|-------|--------|
+| `right` | Bouton à droite du libellé |
+| `left` | Bouton à gauche du libellé |
+| `top` | Bouton au-dessus du libellé, centré sur toute la largeur |
+| `center` / `bottom` | Bouton au-dessous du libellé, centré sur toute la largeur |
+
+**Exemples :**
+
+```
+inline display{left}
+inline display{center, large}
+inline display{right, medium, #E53935}
+inline-onlyresult display{bottom, large, #0099FF}
+```
+
+---
+
+## Restriction de la plage de dates
+
+Utilisez `inputs{range[...]}` pour restreindre les dates sélectionnables.
+
+```
+inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
+```
+
+Paramètres à l'intérieur de `range[...]` :
+
+| Paramètre | Description |
+|-----------|-------------|
+| `dateGt(YYYY-MM-DD)` | Date minimale sélectionnable (supérieure ou égale) |
+| `dateLt(YYYY-MM-DD)` | Date maximale sélectionnable (inférieure ou égale) |
+| `indayTimeGt(HH:MM:SS)` | Heure minimale dans une journée (datetime uniquement) |
+| `indayTimeLt(HH:MM:SS)` | Heure maximale dans une journée (datetime uniquement) |
+
+Plusieurs plages peuvent être définies — une date est sélectionnable si elle se situe dans **l'une** des plages.
+
+---
+
+## Supprimer le libellé
+
+Ajoutez `text-nolabel` pour masquer le libellé de la question. Le bouton s'affiche seul.
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Résumé de la mise en page
+
+| Apparence | Widget affiché | Couleur personnalisable |
+|---|---|---|
+| *(aucune)* | Calendrier toujours ouvert | Non |
+| `inline` | Bouton circulaire → calendrier modal | Oui |
+| `inline-onlyresult` | Bouton circulaire → modal, se cache après le choix | Oui |
+| `inline-1line` | Rangée de sélecteurs | Oui |
+| `box(%format%)` | Champ de saisie de texte | Non |
+| `month-year` | Sélecteur mois/année | Non |
+| `year` | Sélecteur d'année uniquement | Non |
+
+---
+
+## Exemple d'utilisation
+
+```
+| type     | name        | label              | appearance                              |
+|----------|-------------|--------------------|-----------------------------------------|
+| date     | visit_date  | Date de visite      | inline display{right} -[%d/%m/%Y]       |
+| date     | birth_date  | Date de naissance   | inline-1line y_range(1940-2026)         |
+| time     | start_time  | Heure de début      | inline-1line                            |
+| datetime | event_time  | Date et heure de l'événement | inline display{center, large} -[%d/%m/%Y %H:%M] |
+| date     | report_date | Date du rapport     | box(%d/%m/%Y)                           |
+```
+
+---
+
+## Bonnes pratiques
+
+1. Utilisez `inline` pour les formulaires compacts — cela permet d'économiser de l'espace vertical par rapport au calendrier toujours ouvert.
+2. Utilisez `inline-1line` lorsque les répondants doivent ajuster les composants individuels de la date (par exemple, l'année de naissance).
+3. Utilisez `box()` uniquement lorsque vous faites confiance à l'enquêteur pour saisir les dates correctement — aucune interface de validation n'est affichée.
+4. Utilisez `display{center, large}` pour rendre le bouton plus visible sur les écrans mobiles.
+5. Spécifiez toujours `-[format]` lorsque l'affichage par défaut `YYYY-MM-DD` risque de dérouter les utilisateurs locaux.
+6. Soyez attentif aux fuseaux horaires lors de la collecte de données de type date et heure dans différentes régions.
 
 ## Limitations
 
-- Certaines apparences ou certains formats personnalisés peuvent ne pas être pris en charge sur tous les appareils ou plateformes.
-- Les utilisateurs peuvent avoir besoin d'aide pour saisir correctement la date et l'heure, en particulier avec des formats personnalisés.
+- `inline-1line` utilise toujours par défaut la date du jour si aucune valeur n'existe — utilisez la colonne `default` pour pré-remplir une date spécifique.
+- Le format `box()` contrôle uniquement l'affichage ; la valeur stockée est toujours ISO 8601.
+- La restriction de plage de dates (`inputs{range[...]}`) ne fonctionne pas avec la mise en page `box`.
 - Les différences de fuseau horaire peuvent compliquer l'analyse des données si elles ne sont pas correctement prises en compte.

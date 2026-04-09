@@ -1,71 +1,261 @@
 ---
 title: "Fecha y hora, fecha, hora"
-description: "Las preguntas de fecha y hora permiten a los encuestados ingresar tanto la fecha como la hora en un solo campo."
+description: "Las preguntas de tipo fecha y hora permiten a los encuestados ingresar tanto la fecha como la hora en un solo campo."
 ---
 
-El tipo de pregunta datetime en XLSForms y rtSurvey permite a los encuestados ingresar tanto la fecha como la hora en un solo campo. Este tipo de pregunta es útil cuando necesita capturar un momento específico en el tiempo, incluyendo tanto la fecha como la hora exacta.
+Los tipos de pregunta `date`, `time` y `datetime` capturan valores de fecha y/o hora. rtSurvey los representa con varios modos de diseño controlados por la columna `appearance`.
 
 ## Especificación básica de XLSForm
 
-| type     | name           | label                        |
-|----------|----------------|------------------------------|
-| datetime | event_datetime | ¿Cuándo ocurrió el evento?   |
+| type     | name           | label                         |
+|----------|----------------|-------------------------------|
+| date     | birth_date     | Fecha de nacimiento           |
+| time     | start_time     | ¿A qué hora comenzó?          |
+| datetime | event_datetime | ¿Cuándo ocurrió el evento?    |
 
-Para obtener más detalles sobre el tipo de pregunta datetime básico, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
+Para la especificación estándar, consulte la [documentación de XLSForm](https://xlsform.org/en/#question-types).
 
-## Usos
+## Modos de diseño
 
-Las preguntas de fecha y hora se usan comúnmente para:
+### Predeterminado — calendario siempre abierto
 
-1. Registrar marcas de tiempo de eventos u observaciones
-2. Programar citas o reuniones
-3. Registrar tiempos de inicio y fin de actividades
-4. Capturar momentos precisos para recopilación de datos sensibles al tiempo
+No se necesita ningún valor de apariencia. El calendario (y el reloj para `time`/`datetime`) se muestra directamente en la página — siempre visible, no se requiere ningún botón.
 
-## Extensiones de rtSurvey
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Fecha de visita|            |
 
-rtSurvey extiende la funcionalidad de las preguntas de fecha y hora con varias apariencias y opciones de personalización:
+---
 
-### Opciones de apariencia
+### `inline` — botón circular → modal
 
-- `(predeterminado)`: Muestra el calendario y el reloj para seleccionar fecha y hora
-- `inline`: Muestra el calendario y el reloj como iconos
-- `inline-1line`: Muestra el calendario y el reloj para selección en formato de una sola fila
-- `inline-onlyresult`: Muestra el calendario y el reloj como iconos al final de la línea; los iconos desaparecen después de la selección
+Un botón de icono circular (calendario o reloj) flota junto a la etiqueta de la pregunta. Al tocarlo, se abre un modal con el selector. Después de la selección, el valor elegido aparece como texto junto a la etiqueta.
 
-### Personalización de color
+- Fondo del botón: color principal del tema (personalizable)
+- Forma del botón: círculo completo (`border-radius: 50%`)
 
-Puede personalizar el color de los iconos de calendario y reloj usando la función `colors()`:
+```
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Fecha de visita| inline     |
+```
 
-- `inline colors("0099FF")`: Mostrar iconos con color personalizado
-- `inline-1line-0000FF`: Mostrar en formato de fila única con color personalizado
-- `inline-1line colors("0000FF","FFFF00")`: Mostrar en formato de fila única con múltiples colores personalizados
-- `inline-onlyresult colors("0099FF")`: Mostrar iconos que desaparecen después de la selección, con color personalizado
+---
 
-### Formatos personalizados de fecha y hora
+### `inline-onlyresult` — el botón desaparece después de la selección
 
-rtSurvey permite formatos personalizados de fecha y hora usando sintaxis especial:
+Igual que `inline` pero el botón se oculta una vez que se selecciona un valor. Útil cuando solo desea que la fecha sea visible después de haber sido elegida, sin un icono persistente.
 
-- `inline-[%Y-%m-%d %H:%M:%S]`: Ejemplo de formato personalizado (Año-Mes-Día Hora:Minuto:Segundo)
-- `inline-[%d/%m/%Y %I:%M %p]`: Ejemplo de formato personalizado (Día/Mes/Año Hora:Minuto AM/PM)
+```
+inline-onlyresult
+```
+
+---
+
+### `inline-1line` — fila de selectores giratorios (spinners)
+
+Muestra controles giratorios individuales (▲ valor ▼) en una sola fila horizontal — una columna por componente. Para `date`: mes / día / año. Para `datetime`: mes / día / año / horas / minutos. Para `time`: horas / minutos.
+
+Sin ventana modal ni calendario emergente — el usuario se desplaza por cada selector de forma independiente.
+
+```
+inline-1line
+```
+
+**Mostrar solo componentes específicos** agregando los nombres de los componentes:
+
+```
+inline-1line month year      → oculta el selector de día
+inline-1line year            → muestra solo el año
+```
+
+**Limitar el rango de años:**
+
+```
+inline-1line y_range(2000-2030)
+```
+
+---
+
+### `box` — entrada de texto
+
+Representa un campo de entrada de texto simple. El usuario escribe la fecha directamente utilizando el formato definido en la apariencia.
+
+```
+box(%d/%m/%Y)       → DD/MM/AAAA
+box(%Y-%m-%d)       → AAAA-MM-DD
+```
+
+---
+
+### `month-year` — solo mes y año
+
+Apariencia estándar de XLSForm. El selector comienza en la vista de año; el usuario selecciona el mes y el año, pero no un día específico.
+
+```
+month-year
+```
+
+---
+
+### `year` — solo año
+
+Apariencia estándar de XLSForm. El selector comienza en la vista de década; solo se puede seleccionar el año.
+
+```
+year
+```
+
+---
+
+## Formato de visualización personalizado
+
+Agregue `-[format]` a cualquier apariencia `inline` para controlar cómo se muestra el valor seleccionado como texto. Utiliza tokens de estilo strftime.
+
+| Token | Significado | Ejemplo |
+|-------|---------|---------|
+| `%d`  | Día (con cero a la izquierda) | 07 |
+| `%e`  | Día (sin relleno) | 7 |
+| `%m`  | Número de mes | 04 |
+| `%n`  | Número de mes (sin relleno) | 4 |
+| `%b`  | Abreviatura del mes | Abr |
+| `%Y`  | Año de 4 dígitos | 2026 |
+| `%y`  | Año de 2 dígitos | 26 |
+| `%H`  | Hora (24h) | 14 |
+| `%h`  | Hora (sin relleno) | 14 |
+| `%M`  | Minuto | 05 |
+| `%S`  | Segundo | 00 |
+| `%a`  | Abreviatura del nombre del día | Mié |
+
+**Ejemplos:**
+
+```
+inline-[%d/%m/%Y]            → 07/04/2026
+inline-[%d %b %Y]            → 07 Abr 2026
+inline-1line-[%Y-%m-%d]      → entrada de selector giratorio, visualización formateada
+inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
+```
+
+---
+
+## Personalización de colores
+
+Anule el color del botón de icono utilizando `colors()`:
+
+```
+inline colors("0099FF")                   → fondo del botón #0099FF
+inline colors("0099FF","FFFFFF")          → fondo #0099FF, color del icono #FFFFFF
+inline-1line colors("0000FF","FFFF00")    → colores de acento del selector giratorio
+inline-onlyresult colors("E53935")        → botón rojo
+```
+
+---
+
+## Posición del botón con `display{}`
+
+El modificador `display{}` controla dónde aparece el botón de icono en relación con la etiqueta de la pregunta. Se aplica a `inline` e `inline-onlyresult`.
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parámetro | Valores | Predeterminado |
+|-----------|--------|---------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex p. ej. `#FF5500` | color principal del tema |
+
+**Comportamiento de alineación:**
+
+| Valor | Diseño |
+|-------|--------|
+| `right` | Botón a la derecha de la etiqueta |
+| `left` | Botón a la izquierda de la etiqueta |
+| `top` | Botón arriba de la etiqueta, centrado en todo el ancho |
+| `center` / `bottom` | Botón debajo de la etiqueta, centrado en todo el ancho |
+
+**Ejemplos:**
+
+```
+inline display{left}
+inline display{center, large}
+inline display{right, medium, #E53935}
+inline-onlyresult display{bottom, large, #0099FF}
+```
+
+---
+
+## Restricción del rango de fechas
+
+Utilice `inputs{range[...]}` para restringir qué fechas se pueden seleccionar.
+
+```
+inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
+```
+
+Parámetros dentro de `range[...]`:
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| `dateGt(YYYY-MM-DD)` | Fecha mínima seleccionable (mayor o igual) |
+| `dateLt(YYYY-MM-DD)` | Fecha máxima seleccionable (menor o igual) |
+| `indayTimeGt(HH:MM:SS)` | Hora mínima dentro de un día (solo para datetime) |
+| `indayTimeLt(HH:MM:SS)` | Hora máxima dentro de un día (solo para datetime) |
+
+Se pueden definir múltiples rangos — una fecha es seleccionable si cae dentro de **cualquiera** de los rangos.
+
+---
+
+## Ocultar la etiqueta
+
+Agregue `text-nolabel` para ocultar la etiqueta de la pregunta. El botón se muestra solo.
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Resumen de diseño
+
+| Apariencia | Widget representado | Color personalizable |
+|---|---|---|
+| *(ninguna)* | Calendario siempre abierto | No |
+| `inline` | Botón circular → calendario modal | Sí |
+| `inline-onlyresult` | Botón circular → modal, se oculta después de elegir | Sí |
+| `inline-1line` | Fila de selectores giratorios | Sí |
+| `box(%format%)` | Campo de entrada de texto | No |
+| `month-year` | Selector de mes/año | No |
+| `year` | Selector de solo año | No |
+
+---
 
 ## Ejemplo de uso
 
-He aquí un ejemplo de cómo podría usar una pregunta de fecha y hora en una encuesta:
+```
+| type     | name        | label              | appearance                              |
+|----------|-------------|--------------------|-----------------------------------------|
+| date     | visit_date  | Fecha de visita    | inline display{right} -[%d/%m/%Y]       |
+| date     | birth_date  | Fecha de nacimiento| inline-1line y_range(1940-2026)         |
+| time     | start_time  | Hora de inicio     | inline-1line                            |
+| datetime | event_time  | Fecha y hora del evento | inline display{center, large} -[%d/%m/%Y %H:%M] |
+| date     | report_date | Fecha del informe  | box(%d/%m/%Y)                           |
+```
 
-| type     | name           | label                                    | appearance                    |
-|----------|----------------|------------------------------------------|-----------------------------|
-| datetime | incident_time  | ¿Cuándo ocurrió el incidente?            | inline-[%d/%m/%Y %I:%M %p]  |
+---
 
 ## Mejores prácticas
 
-1. Proporcione instrucciones claras sobre el formato de fecha y hora esperado.
-2. Considere usar la apariencia `inline` para una visualización más compacta.
-3. Use formatos personalizados cuando necesite componentes o formateo específico de fecha y hora.
-4. Sea consciente de las zonas horarias al recopilar datos de fecha y hora en diferentes regiones.
+1. Utilice `inline` para formularios compactos — ahorra espacio vertical en comparación con el calendario siempre abierto.
+2. Utilice `inline-1line` cuando los encuestados necesiten ajustar componentes de fecha individuales (p. ej., año de nacimiento).
+3. Utilice `box()` solo cuando confíe en que el encuestador escribirá las fechas correctamente — no se muestra ninguna interfaz de validación.
+4. Utilice `display{center, large}` para que el botón sea más prominente en pantallas móviles.
+5. Especifique siempre `-[format]` cuando la visualización predeterminada `YYYY-MM-DD` confunda a los usuarios locales.
+6. Tenga en cuenta las zonas horarias al recopilar datos de fecha y hora en diferentes regiones.
 
 ## Limitaciones
 
-- Algunas apariencias o formatos personalizados pueden no ser compatibles con todos los dispositivos o plataformas.
-- Los usuarios pueden necesitar orientación sobre cómo ingresar la fecha y la hora correctamente, especialmente con formatos personalizados.
+- `inline-1line` siempre usa por defecto la fecha de hoy si no existe ningún valor — use la columna `default` para completar previamente una fecha específica.
+- El formato `box()` solo controla la visualización; el valor almacenado es siempre ISO 8601.
+- La restricción del rango de fechas (`inputs{range[...]}`) no funciona con el diseño `box`.
 - Las diferencias de zona horaria pueden complicar el análisis de datos si no se tienen en cuenta adecuadamente.

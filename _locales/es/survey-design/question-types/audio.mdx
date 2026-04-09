@@ -3,25 +3,25 @@ title: "Audio"
 description: "Las preguntas de audio permiten a los encuestados grabar y enviar archivos de audio como parte de la encuesta."
 ---
 
-El tipo de pregunta `audio` permite a los encuestados **grabar audio** o cargar un archivo de audio existente como parte de su respuesta a la encuesta. Es útil para capturar relatos verbales, sonidos ambientales, testimonios o cualquier información que se comunique mejor a través de la voz que del texto.
+El tipo de pregunta `audio` permite a los encuestados **grabar audio** o cargar un archivo de audio existente como parte de su respuesta a la encuesta. Es útil para capturar relatos verbales, sonidos ambientales, testimonios o cualquier información que se transmita mejor a través de la voz que del texto.
 
 ## Especificación básica de XLSForm
 
-| type  | name        | label                          |
-|-------|-------------|--------------------------------|
-| audio | voice_note  | Por favor grabe sus comentarios |
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Por favor, grabe sus comentarios |
 
-Para obtener más detalles sobre el tipo de pregunta de audio estándar, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
+Para más detalles sobre el tipo de pregunta de audio estándar, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
 
 ## Usos
 
-Las preguntas de audio se usan comúnmente para:
+Las preguntas de audio se utilizan comúnmente para:
 
 1. Capturar respuestas verbales abiertas para reducir la carga de escritura del encuestador
 2. Grabar testimonios, historias personales o historias orales
-3. Documentar sonidos ambientales (p. ej., niveles de ruido cerca de infraestructura)
+3. Documentar sonidos ambientales (por ejemplo, niveles de ruido cerca de infraestructuras)
 4. Recopilar muestras de voz para investigación lingüística o de salud
-5. Permitir a los encuestados agregar aclaraciones verbales a respuestas numéricas o de selección
+5. Permitir que los encuestados agreguen aclaraciones verbales a respuestas numéricas o de selección
 
 ## Formato de datos
 
@@ -29,7 +29,7 @@ Los archivos de audio se almacenan como archivos adjuntos binarios junto con el 
 
 - **Formato:** MP3 o AAC (grabación móvil); WAV (grabación de alta calidad)
 - **Nomenclatura:** `{instanceID}-{fieldname}.mp3` (o equivalente)
-- **Almacenamiento:** Cargado a la carpeta multimedia del servidor y vinculado al registro de envío
+- **Almacenamiento:** Cargado en la carpeta de medios del servidor y vinculado al registro de envío
 - **Acceso:** Reproducible y descargable desde la interfaz de gestión de envíos
 
 ## Extensiones de rtSurvey
@@ -40,31 +40,66 @@ Use la columna `parameters` para limitar la duración de la grabación:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| audio | interview | Grabar la entrevista | `max-duration=120` |
+| audio | interview | Grabe la entrevista | `max-duration=120` |
 
-`max-duration` está en segundos. La grabadora se detiene automáticamente al alcanzar el límite.
+`max-duration` está en segundos. El grabador se detiene automáticamente al alcanzar el límite.
 
-### Configuración de calidad
+### Ajustes de calidad
 
-La calidad de grabación se puede establecer a través de `parameters`:
+La calidad de la grabación se puede configurar a través de `parameters`:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| audio | feedback | Grabar retroalimentación | `quality=normal` |
+| audio | feedback | Grabe sus comentarios | `quality=normal` |
 
 Valores admitidos: `low`, `normal` (predeterminado), `voice-only`. `voice-only` optimiza para audio hablado con reducción de ruido.
 
 ### Reproducción antes del envío
 
-En móvil, el encuestador puede reproducir el clip grabado antes de continuar. Está habilitado de forma predeterminada; no se necesita configuración.
+En dispositivos móviles, el encuestador puede reproducir el clip grabado antes de proceder. Esto está habilitado por defecto; no se requiere configuración.
 
-### Integración con la grabadora nativa
+### Integración con el grabador nativo
 
-En Android e iOS, `audio` lanza la aplicación de grabación nativa del dispositivo. En web, usa la API MediaRecorder integrada del navegador.
+En Android e iOS, `audio` inicia la aplicación de grabación nativa del dispositivo. En la web, utiliza la API MediaRecorder integrada del navegador.
+
+### Diseño de botón en línea (Inline)
+
+Agregue `inline` para renderizar el micrófono como un **botón de icono circular** junto a la etiqueta.
+
+```
+| type  | name | label        | appearance                    |
+|-------|------|--------------|-------------------------------|
+| audio | clip | Grabar audio | inline display{right}         |
+| audio | clip | Grabar audio | inline display{left, large}   |
+```
+
+**Posición del botón** — `left`, `right` *(predeterminado)*, `top`, `center`, `bottom`
+
+**Tamaño del botón** — `small` *(predeterminado)*, `medium`, `large`
+
+**Color del botón** — agregue un color hexadecimal dentro de `display{}` para anular el color primario:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Control posterior a la captura — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Oculta el botón de grabación después de capturar el audio |
+| `results{hide(review)}` | Oculta el botón de reproducción |
+| `results{hide(filename)}` | Oculta el nombre del archivo y la duración |
+| `results{left}` | Mueve el icono a la izquierda después de la captura |
+
+Ejemplo — ocultar el botón de grabación después de la captura, mantener la reproducción:
+```
+inline display{right} results{hide(capture)}
+```
 
 ## Ejemplo de uso
 
-### Con duración máxima e indicación
+### Con duración máxima y sugerencia (hint)
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
@@ -74,20 +109,20 @@ En Android e iOS, `audio` lanza la aplicación de grabación nativa del disposit
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
-| select_one yesno | issue_found | ¿Se encontró un problema? | | |
+| select_one yesno | issue_found | ¿Se encontró algún problema? | | |
 | audio | issue_audio | Grabe una descripción del problema | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
-## Mejores prácticas
+## Mejores Prácticas
 
-1. Indique claramente en la `label` o `hint` qué debe decir el encuestador y durante cuánto tiempo.
-2. Use `max-duration` para prevenir archivos excesivamente grandes en áreas con velocidades de carga lentas.
-3. Informe a los encuestados antes de iniciar la grabación; las grabaciones inesperadas pueden generar preocupaciones de privacidad.
-4. Pruebe la grabación en el dispositivo de destino y las condiciones de red antes de la implementación.
-5. Establezca `quality=voice-only` para grabaciones de estilo entrevista para reducir el tamaño del archivo sin perder inteligibilidad.
+1. Indique claramente en el `label` o `hint` qué debe decir el encuestador y por cuánto tiempo.
+2. Use `max-duration` para evitar archivos excesivamente grandes en áreas con velocidades de carga lentas.
+3. Informe a los encuestados antes de comenzar la grabación; una grabación inesperada puede generar preocupaciones sobre la privacidad.
+4. Pruebe la grabación en el dispositivo de destino y en las condiciones de red antes del despliegue.
+5. Configure `quality=voice-only` para grabaciones tipo entrevista para reducir el tamaño del archivo sin perder inteligibilidad.
 
 ## Limitaciones
 
-- Los archivos de audio pueden ser grandes (una grabación de 2 minutos a calidad normal es ~2–4 MB); tenga esto en cuenta en sus estimaciones de plan de datos y tiempo de carga.
-- No todos los navegadores admiten la API MediaRecorder; Chrome y Firefox funcionan de manera confiable; Safari en versiones de iOS antiguas puede tener problemas.
-- La transcripción de respuestas de audio requiere procesamiento posterior adicional (conversión de voz a texto manual o automatizada).
+- Los archivos de audio pueden ser grandes (una grabación de 2 minutos a calidad normal es de ~2–4 MB); factorice esto en su plan de datos y estimaciones de tiempo de carga.
+- No todos los navegadores son compatibles con la API MediaRecorder; Chrome y Firefox funcionan de manera confiable; Safari en versiones antiguas de iOS puede tener problemas.
+- La transcripción de las respuestas de audio requiere un procesamiento posterior adicional (conversión de voz a texto manual o automatizada).
 - Las regulaciones de privacidad pueden restringir la grabación de voces; verifique los requisitos locales de protección de datos.

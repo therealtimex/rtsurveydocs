@@ -1,118 +1,118 @@
 ---
-title: "Tampilan (Appearance)"
+title: "Tampilan"
 description: ""
 ---
 
-Kolom `appearance` di rtSurvey memungkinkan Anda menyesuaikan presentasi visual dan perilaku pertanyaan dalam survei Anda. Fitur ini meningkatkan pengalaman pengguna dan dapat secara signifikan meningkatkan efisiensi pengumpulan data. rtSurvey mendukung atribut appearance XLSForm standar dan memperluasnya dengan opsi tambahan.
+Kolom `appearance` di rtSurvey memungkinkan Anda untuk menyesuaikan presentasi visual dan perilaku pertanyaan dalam survei Anda. Fitur ini meningkatkan pengalaman pengguna dan dapat secara signifikan meningkatkan efisiensi pengumpulan data. rtSurvey mendukung atribut tampilan standar XLSForm dan memperluasnya dengan opsi tambahan.
 
-## Atribut Appearance XLSForm Standar
+## Atribut Tampilan Standar XLSForm
 
-rtSurvey mendukung atribut appearance XLSForm standar berikut:
+rtSurvey mendukung atribut tampilan standar XLSForm berikut:
 
-| Atribut Appearance | Jenis Pertanyaan | Deskripsi |
-|-------------------|-----------------|-----------|
+| Atribut Tampilan | Tipe Pertanyaan | Deskripsi |
+|------------------|-----------------|-----------|
 | multiline | text | Membuat kotak teks multi-baris (terbaik untuk klien web) |
 | minimal | select_one, select_multiple | Menampilkan pilihan dalam menu dropdown |
-| quick | select_one | Maju otomatis ke pertanyaan berikutnya setelah pemilihan (hanya mobile) |
-| no-calendar | date | Menyembunyikan tampilan kalender (hanya mobile) |
+| quick | select_one | Berlanjut secara otomatis ke pertanyaan berikutnya setelah pemilihan (hanya seluler) |
+| no-calendar | date | Menghilangkan tampilan kalender (hanya seluler) |
 | month-year | date | Memungkinkan pemilihan bulan dan tahun saja |
 | year | date | Memungkinkan pemilihan tahun saja |
 | horizontal-compact | select_one, select_multiple | Menampilkan pilihan secara horizontal (hanya web) |
 | horizontal | select_one, select_multiple | Menampilkan pilihan secara horizontal dalam kolom (hanya web) |
 | likert | select_one | Menyajikan pilihan sebagai skala Likert |
-| compact | select_one, select_multiple | Menampilkan pilihan berdampingan dengan padding minimal |
-| quickcompact | select_one | Menggabungkan tampilan kompak dengan maju otomatis (hanya mobile) |
-| field-list | groups | Menampilkan seluruh grup di satu layar (hanya mobile) |
-| label | select_one, select_multiple | Menampilkan label pilihan tanpa masukan |
-| list-nolabel | select_one, select_multiple | Menampilkan masukan tanpa label (gunakan dengan `label`) |
+| compact | select_one, select_multiple | Menampilkan pilihan secara berdampingan dengan padding minimal |
+| quickcompact | select_one | Menggabungkan tampilan ringkas dengan pemajuan otomatis (hanya seluler) |
+| field-list | groups | Menampilkan seluruh grup dalam satu layar (hanya seluler) |
+| label | select_one, select_multiple | Menunjukkan label pilihan tanpa input |
+| list-nolabel | select_one, select_multiple | Menunjukkan input tanpa label (gunakan dengan `label`) |
 | table-list | groups | Menampilkan pertanyaan dalam format tabel |
-| signature | image | Mengaktifkan penangkapan tanda tangan (hanya mobile) |
-| draw | image | Memungkinkan gambar tangan bebas (hanya mobile) |
-| map, quick map | select_one, select_one_from_file | Mengaktifkan pemilihan dari fitur peta |
+| signature | image | Memungkinkan pengambilan tanda tangan (hanya seluler) |
+| draw | image | Memungkinkan menggambar bebas (hanya seluler) |
+| map, quick map | select_one, select_one_from_file | Memungkinkan pemilihan dari fitur peta |
 
-## Praktik Terbaik untuk Menggunakan Appearance
+## Praktik Terbaik untuk Menggunakan Tampilan
 
-1. **Konsistensi**: Gunakan atribut appearance secara konsisten di seluruh survei Anda untuk tampilan yang seragam.
-2. **Mobile vs. Web**: Pertimbangkan bagaimana appearance akan dirender di berbagai perangkat dan platform.
-3. **Kinerja**: Berhati-hatilah dengan atribut appearance yang mungkin memperlambat pemuatan formulir (misalnya, `table-list` untuk grup besar).
-4. **Pengalaman Pengguna**: Pilih appearance yang membuat entri data lebih mudah dan lebih intuitif bagi responden.
-5. **Pengujian**: Selalu uji formulir Anda di perangkat target untuk memastikan appearance berfungsi seperti yang diharapkan.
+1. **Konsistensi**: Gunakan atribut tampilan secara konsisten di seluruh survei Anda untuk tampilan yang seragam.
+2. **Seluler vs. Web**: Pertimbangkan bagaimana tampilan akan dirender pada perangkat dan platform yang berbeda.
+3. **Performa**: Berhati-hatilah dengan atribut tampilan yang mungkin memperlambat pemuatan formulir (misalnya, `table-list` untuk grup besar).
+4. **Pengalaman Pengguna**: Pilih tampilan yang membuat entri data lebih mudah dan lebih intuitif bagi responden.
+5. **Pengujian**: Selalu uji formulir Anda pada perangkat target untuk memastikan tampilan berfungsi sesuai harapan.
 
 ## Teknik Lanjutan
 
-### Menggabungkan Appearance
+### Menggabungkan Tampilan
 
-Beberapa atribut appearance dapat digabungkan untuk tata letak yang lebih kompleks:
+Beberapa atribut tampilan dapat digabungkan untuk tata letak yang lebih kompleks:
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Pilih satu: | minimal compact |
+| select_one options | choice | Select one: | minimal compact |
 ```
 
-### Appearance Dinamis
+### Tampilan Dinamis
 
-rtSurvey memungkinkan perubahan appearance dinamis berdasarkan logika formulir:
+rtSurvey memungkinkan perubahan tampilan dinamis berdasarkan logika formulir:
 
 ```
 | type | name | label | appearance | relevant |
 |------|------|-------|------------|----------|
-| text | time | Masukkan waktu: | inline-[%H:%M] | ${show_time} = 'yes' |
+| text | time | Enter time: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## Pertimbangan Aplikasi Mobile
+## Pertimbangan Aplikasi Seluler
 
-- Beberapa appearance (misalnya, `quick`, `signature`) khusus untuk perangkat mobile.
+- Beberapa tampilan (misalnya, `quick`, `signature`) khusus untuk perangkat seluler.
 - Uji secara menyeluruh di Android dan iOS untuk memastikan perilaku yang konsisten.
 
-## Atribut Appearance yang Diperluas rtSurvey
+## Atribut Tampilan Tambahan rtSurvey
 
-Selain appearance XLSForm standar, rtSurvey mendukung opsi khusus platform berikut:
+Selain tampilan standar XLSForm, rtSurvey mendukung opsi spesifik platform berikut:
 
 ### Kontrol data dan tampilan
 
-| Atribut Appearance | Jenis Pertanyaan | Deskripsi |
-|-------------------|-----------------|-----------|
-| `invisible` | apa saja | Menyembunyikan bidang dari tampilan sambil tetap mengumpulkan atau menghitung nilainya. Berbeda dari tipe `hidden` — bidang masih berpartisipasi dalam logika. |
+| Atribut Tampilan | Tipe Pertanyaan | Deskripsi |
+|------------------|-----------------|-----------|
+| `invisible` | apa saja | Menyembunyikan bidang dari pandangan sambil tetap mengumpulkan atau menghitung nilainya. Berbeda dari tipe `hidden` — bidang masih berpartisipasi dalam logika. |
 | `displaytitle` | apa saja | Memaksa tampilan label/judul bidang bahkan ketika seharusnya disembunyikan. |
 | `autopull` | select_one, select_multiple | Secara otomatis mengambil data eksternal untuk mengisi pilihan saat formulir dimuat atau bidang pemicu berubah. |
-| `floating_hint` | text, integer, decimal | Menampilkan teks petunjuk sebagai label mengambang di atas bidang masukan daripada di bawahnya. |
-| `calculate-button` | calculate | Menambahkan tombol yang terlihat yang memicu kalkulasi ulang bidang sesuai permintaan, daripada menghitung secara otomatis. |
+| `floating_hint` | text, integer, decimal | Menampilkan teks petunjuk (hint) sebagai label melayang di atas bidang input, bukan di bawahnya. |
+| `calculate-button` | calculate | Menambahkan tombol terlihat yang memicu perhitungan ulang bidang sesuai permintaan, bukan menghitung secara otomatis. |
 
-### Tata letak
+### Tata Letak (Layout)
 
-| Atribut Appearance | Jenis Pertanyaan | Deskripsi |
-|-------------------|-----------------|-----------|
-| `1screen` | group | Memaksa seluruh grup untuk ditampilkan di satu layar terlepas dari ukuran grup. |
-| `columns(n)` | select_one, select_multiple | Menampilkan pilihan dalam `n` kolom. Contoh: `columns(3)` menampilkan tiga kolom tombol radio. |
-| `gridformat<row=R col=C colspan=S align=center>` | apa saja | Memposisikan bidang dalam tata letak CSS-grid pada baris `R`, kolom `C`, merentangkan `S` kolom. Digunakan dengan `advanced-extension/grid-layout`. |
-| `ignore-simplify` | apa saja | Menginstruksikan renderer formulir untuk melewati penyederhanaan atau pemadatan otomatis tata letak bidang ini. |
+| Atribut Tampilan | Tipe Pertanyaan | Deskripsi |
+|------------------|-----------------|-----------|
+| `1screen` | group | Memaksa seluruh grup untuk ditampilkan pada satu layar tanpa memandang ukuran grup. |
+| `columns(n)` | select_one, select_multiple | Menampilkan pilihan dalam `n` kolom. Contoh: `columns(3)` menunjukkan tiga kolom tombol radio. |
+| `gridformat<row=R col=C colspan=S align=center>` | apa saja | Memposisikan bidang dalam tata letak CSS-grid pada baris `R`, kolom `C`, mencakup `S` kolom. Digunakan dengan `advanced-extension/grid-layout`. |
+| `ignore-simplify` | apa saja | Menginstruksikan perender formulir untuk melewati penyederhanaan otomatis atau pemadatan tata letak bidang ini. |
 
 ### Widget
 
-| Atribut Appearance | Jenis Pertanyaan | Deskripsi |
-|-------------------|-----------------|-----------|
-| `likert` | select_one | Menyajikan pilihan sebagai baris skala Likert (sudah ada di tabel standar di atas; dikonfirmasi didukung). |
+| Atribut Tampilan | Tipe Pertanyaan | Deskripsi |
+|------------------|-----------------|-----------|
+| `likert` | select_one | Menyajikan pilihan sebagai baris skala Likert (sudah ada di tabel standar di atas; dukungan dikonfirmasi). |
 | `distress` | select_one | Merender pilihan sebagai widget visual Kessler Psychological Distress Scale (K10) dengan ikon emosional. |
 
 ### Integrasi API
 
-| Atribut Appearance | Jenis Pertanyaan | Deskripsi |
-|-------------------|-----------------|-----------|
-| `callapi` | text, integer, decimal, select_one | Mengaktifkan integrasi panggilan API untuk bidang ini. Kolom kalkulasi harus berisi ekspresi `callapi()`. Lihat [Call API](advanced-extension/call-api). |
-| `callapi-verify(params)` | text, integer, decimal | Memicu panggilan verifikasi API menggunakan parameter statis. Formulir memblokir kemajuan hingga API mengonfirmasi nilai. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | Sama seperti `callapi-verify` tetapi dengan parameter yang berasal dari nilai bidang lain saat runtime. |
+| Atribut Tampilan | Tipe Pertanyaan | Deskripsi |
+|------------------|-----------------|-----------|
+| `callapi` | text, integer, decimal, select_one | Mengaktifkan integrasi panggilan API untuk bidang ini. Kolom perhitungan (calculation) harus berisi ekspresi `callapi()`. Lihat [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Memicu panggilan verifikasi API menggunakan parameter statis. Formulir memblokir kemajuan sampai API mengonfirmasi nilainya. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Sama seperti `callapi-verify` tetapi dengan parameter yang diturunkan dari nilai bidang lain saat runtime. |
 
-### Format tanggal/waktu sebaris
+### Format tanggal/waktu inline
 
-Untuk bidang `date`, `time`, dan `datetime`, Anda dapat menentukan format tampilan kustom menggunakan string format yang ditambahkan ke appearance:
+Untuk bidang `date`, `time`, dan `datetime`, Anda dapat menentukan format tampilan khusus menggunakan string format yang ditambahkan ke tampilan:
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-Token format sama seperti `format-date()` dan `format-date-time()`. Lihat [Fungsi — Fungsi tanggal dan waktu](operators-and-functions/functions#date-and-time-functions).
+Token format sama dengan `format-date()` dan `format-date-time()`. Lihat [Fungsi — Fungsi tanggal dan waktu](operators-and-functions/functions#date-and-time-functions).
 
 Contoh:
 
@@ -121,13 +121,67 @@ Contoh:
 | datetime | event_time | Tanggal dan waktu acara | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | Tanggal lahir | inline-[%d/%m/%Y] |
 
-## Keterbatasan yang Diketahui
+### Tata letak tombol inline — `display{}` dan `results{}`
 
-- Appearance yang kompleks mungkin tidak dirender identik di semua platform.
-- Beberapa appearance rtSurvey lanjutan mungkin tidak didukung dalam mode offline.
+Untuk tipe pertanyaan yang dirender sebagai tombol ikon inline (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), dua pengubah tampilan mengontrol posisi tombol dan perilaku pasca-pengambilan.
 
-## Pemecahan Masalah Appearance
+#### `display{...}` — posisi tombol sebelum pengambilan
 
-1. **Appearance Tidak Diterapkan**: Periksa kesalahan ketik di kolom appearance.
-2. **Rendering Tidak Konsisten**: Verifikasi kompatibilitas dengan jenis pertanyaan dan platform.
-3. **Masalah Kinerja**: Pertimbangkan untuk menyederhanakan appearance yang kompleks, terutama untuk survei besar.
+```
+display{<align>, <size>, <color>}
+```
+
+| Parameter | Nilai | Default |
+|-----------|-------|---------|
+| Align (Perataan) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (Ukuran) | `small`, `medium`, `large` | `small` |
+| Color (Warna) | hex misal `#FF5500` | warna tema primer |
+| Flag | `inline-icon` | memaksa mode ikon |
+
+| Nilai Align | Tata Letak |
+|-------------|------------|
+| `right` | Tombol di sebelah kanan label |
+| `left` | Tombol di sebelah kiri label |
+| `top` | Tombol di atas label, tengah dengan lebar penuh |
+| `center` / `bottom` | Tombol di bawah label, tengah dengan lebar penuh |
+
+#### `results{...}` — tata letak dan visibilitas setelah pengambilan
+
+Mewarisi pengaturan `display{}`. Gunakan untuk memindahkan tombol atau menyembunyikan elemen setelah nilai diambil.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| Nilai `hide` | Efek |
+|---|---|
+| `hide(capture)` | Menyembunyikan tombol pengambilan setelah file/nilai ada |
+| `hide(review)` | Menyembunyikan thumbnail tinjauan / tombol putar |
+| `hide(filename)` | Menyembunyikan nama file yang ditampilkan setelah unggah |
+| `hide(camera)` | Menyembunyikan tombol pemicu kamera setelah pengambilan |
+| `hide(scanner)` | Menyembunyikan tombol pemindaian barcode setelah nilai dipindai |
+| `hide(value)` | Menyembunyikan teks nilai yang dipindai (barcode / geopoint) |
+
+Widget secara otomatis beralih dari tata letak `display{}` ke `results{}` saat nilai diambil.
+
+**Contoh:**
+
+```
+inline display{right}                                    → ikon di kanan label
+inline display{left, large}                              → ikon besar di kiri
+inline display{center, large, #FF5500}                   → ikon oranye besar di bawah label
+inline display{right} results{left}                      → ikon pindah ke kiri setelah pengambilan
+inline display{right} results{hide(capture)}             → ikon menghilang setelah pengambilan
+inline display{center} results{hide(capture), hide(filename)}
+```
+
+## Batasan yang Diketahui
+
+- Tampilan yang kompleks mungkin tidak dirender secara identik di semua platform.
+- Beberapa tampilan rtSurvey lanjutan mungkin tidak didukung dalam mode luring (offline).
+
+## Pemecahan Masalah Tampilan
+
+1. **Tampilan Tidak Diterapkan**: Periksa kesalahan ketik pada kolom appearance.
+2. **Perenderan Tidak Konsisten**: Verifikasi kompatibilitas dengan tipe pertanyaan dan platform.
+3. **Masalah Performa**: Pertimbangkan untuk menyederhanakan tampilan yang kompleks, terutama untuk survei besar.

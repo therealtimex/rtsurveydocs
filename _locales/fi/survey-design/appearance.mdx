@@ -3,131 +3,185 @@ title: "Ulkoasu"
 description: ""
 ---
 
-`appearance`-sarake rtSurveyssa mahdollistaa kysymysten visuaalisen esittämistavan ja toiminnan mukauttamisen kyselyissäsi. Tämä ominaisuus parantaa käyttökokemusta ja voi merkittävästi tehostaa tiedonkeruuta. rtSurvey tukee XLSFormin vakioulkoasuattribuutteja ja laajentaa niitä lisäasetuksilla.
+Sarakkeen `appearance` avulla voit mukauttaa rtSurveyssa kysymysten visuaalista esitystapaa ja käyttäytymistä kyselyissäsi. Tämä ominaisuus parantaa käyttäjäkokemusta ja voi merkittävästi tehostaa tiedonkeruuta. rtSurvey tukee standardeja XLSForm-ulkoasuattribuutteja ja laajentaa niitä lisävaihtoehdoilla.
 
-## Vakio XLSForm-ulkoasuattribuutit
+## Standardit XLSForm-ulkoasuattribuutit
 
-rtSurvey tukee seuraavia vakio XLSForm-ulkoasuattribuutteja:
+rtSurvey tukee seuraavia standardeja XLSForm-ulkoasuattribuutteja:
 
 | Ulkoasuattribuutti | Kysymystyypit | Kuvaus |
-|-------------------|---------------|--------|
-| multiline | text | Luo monirivisentekstiruudun (parhaiten webissä) |
-| minimal | select_one, select_multiple | Näyttää valinnat pudotusvalikossa |
+|-------------------|---------------|-------------|
+| multiline | text | Luo monirivisen tekstikentän (paras verkkokäyttäjille) |
+| minimal | select_one, select_multiple | Näyttää vaihtoehdot pudotusvalikossa |
 | quick | select_one | Siirtyy automaattisesti seuraavaan kysymykseen valinnan jälkeen (vain mobiili) |
-| no-calendar | date | Estää kalenterin näyttämisen (vain mobiili) |
-| month-year | date | Mahdollistaa kuukauden ja vuoden valinnan |
-| year | date | Mahdollistaa vain vuoden valinnan |
-| horizontal-compact | select_one, select_multiple | Näyttää valinnat vaakasuoraan (vain web) |
-| horizontal | select_one, select_multiple | Näyttää valinnat vaakasuoraan sarakkeissa (vain web) |
-| likert | select_one | Esittää valinnat Likert-asteikkona |
-| compact | select_one, select_multiple | Näyttää valinnat vierekkäin minimaalisella täytteellä |
-| quickcompact | select_one | Yhdistää tiiviin näytön ja automaattisen etenemisen (vain mobiili) |
+| no-calendar | date | Estää kalenterin näytön (vain mobiili) |
+| month-year | date | Sallii vain kuukauden ja vuoden valinnan |
+| year | date | Sallii vain vuoden valinnan |
+| horizontal-compact | select_one, select_multiple | Näyttää vaihtoehdot vaakasuunnassa (vain verkko) |
+| horizontal | select_one, select_multiple | Näyttää vaihtoehdot vaakasuunnassa sarakkeissa (vain verkko) |
+| likert | select_one | Esittää vaihtoehdot Likert-asteikkona |
+| compact | select_one, select_multiple | Näyttää vaihtoehdot rinnakkain minimaalisella välillä |
+| quickcompact | select_one | Yhdistää tiiviin näytön ja automaattisen siirtymisen (vain mobiili) |
 | field-list | groups | Näyttää koko ryhmän yhdellä näytöllä (vain mobiili) |
-| label | select_one, select_multiple | Näyttää valintojen otsikot ilman syöttöelementtejä |
-| list-nolabel | select_one, select_multiple | Näyttää syöttöelementit ilman otsikoita (käytä `label`:n kanssa) |
-| table-list | groups | Näyttää kysymykset taulukkona |
+| label | select_one, select_multiple | Näyttää vaihtoehtojen selitteet ilman syöttökenttiä |
+| list-nolabel | select_one, select_multiple | Näyttää syöttökentät ilman selitteitä (käytä `label`-attribuutin kanssa) |
+| table-list | groups | Näyttää kysymykset taulukkomuodossa |
 | signature | image | Mahdollistaa allekirjoituksen tallentamisen (vain mobiili) |
-| draw | image | Mahdollistaa vapaamuotoisen piirroksen (vain mobiili) |
-| map, quick map | select_one, select_one_from_file | Mahdollistaa valinnan kartalta |
+| draw | image | Sallii vapaalla kädellä piirtämisen (vain mobiili) |
+| map, quick map | select_one, select_one_from_file | Mahdollistaa valinnan karttaominaisuuksista |
 
 ## Ulkoasun käytön parhaat käytännöt
 
-1. **Johdonmukaisuus**: Käytä ulkoasuattribuutteja johdonmukaisesti koko kyselyssä yhtenäisen ulkoasun saavuttamiseksi.
-2. **Mobiili vs. web**: Harkitse miten ulkoasut renderöityvät eri laitteilla ja alustoilla.
-3. **Suorituskyky**: Ole varovainen ulkoasuattribuuttien kanssa, jotka saattavat hidastaa lomakkeen latautumista (esim. `table-list` suurille ryhmille).
-4. **Käyttökokemus**: Valitse ulkoasut, jotka tekevät tietojensyötöstä helpompaa ja intuitiivisempaa vastaajille.
-5. **Testaus**: Testaa aina lomakkeesi kohdejaitteilla varmistaaksesi ulkoasujen toimivuuden.
+1. **Johdonmukaisuus**: Käytä ulkoasuattribuutteja johdonmukaisesti koko kyselyssä yhtenäisen ilmeen saavuttamiseksi.
+2. **Mobiili vs. verkko**: Huomioi, miten ulkoasut näkyvät eri laitteilla ja alustoilla.
+3. **Suorituskyky**: Ole varovainen sellaisten ulkoasuattribuuttien kanssa, jotka saattavat hidastaa lomakkeen latautumista (esim. `table-list` suurille ryhmille).
+4. **Käyttäjäkokemus**: Valitse ulkoasuja, jotka tekevät tietojen syöttämisestä helpompaa ja intuitiivisempaa vastaajille.
+5. **Testaus**: Testaa lomake aina kohdelaitteilla varmistaaksesi, että ulkoasut toimivat odotetulla tavalla.
 
 ## Edistyneet tekniikat
 
 ### Ulkoasujen yhdistäminen
 
-Joitain ulkoasuattribuutteja voidaan yhdistää monimutkaisempien asettelujen saavuttamiseksi:
+Joitakin ulkoasuattribuutteja voidaan yhdistää monimutkaisempien asettelujen luomiseksi:
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Valitse yksi: | minimal compact |
+| select_one options | choice | Select one: | minimal compact |
 ```
 
 ### Dynaamiset ulkoasut
 
-rtSurvey mahdollistaa dynaamiset ulkoasumuutokset lomakelogiikan perusteella:
+rtSurvey mahdollistaa dynaamiset ulkoasumuutokset lomakkeen logiikan perusteella:
 
 ```
 | type | name | label | appearance | relevant |
 |------|------|-------|------------|----------|
-| text | time | Anna aika: | inline-[%H:%M] | ${show_time} = 'yes' |
+| text | time | Enter time: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## Mobiilisovelluksen huomioiminen
+## Huomioitavaa mobiilisovelluksessa
 
-- Jotkut ulkoasut (esim. `quick`, `signature`) ovat mobiililaitekohtaisia.
-- Testaa perusteellisesti sekä Androidilla että iOS:llä yhdenmukaisen toiminnan varmistamiseksi.
+- Jotkut ulkoasut (esim. `quick`, `signature`) ovat ominaisia mobiililaitteille.
+- Testaa huolellisesti sekä Androidilla että iOS:llä varmistaaksesi johdonmukaisen toiminnan.
 
-## rtSurvey-laajennetut ulkoasuattribuutit
+## rtSurveyn laajennetut ulkoasuattribuutit
 
-Vakio XLSForm-ulkoasujen lisäksi rtSurvey tukee seuraavia alustakompatiisia asetuksia:
+Standardien XLSForm-ulkoasujen lisäksi rtSurvey tukee seuraavia alustakohtaisia vaihtoehtoja:
 
-### Tietojen hallinta ja näyttö
-
-| Ulkoasuattribuutti | Kysymystyypit | Kuvaus |
-|-------------------|---------------|--------|
-| `invisible` | mikä tahansa | Piilottaa kentän näkyvistä keräten tai laskien silti sen arvon. Eroaa `hidden`-tyypistä — kenttä osallistuu silti logiikkaan. |
-| `displaytitle` | mikä tahansa | Pakottaa kentän otsikon/nimen näyttämisen, vaikka se muuten olisi piilotettu. |
-| `autopull` | select_one, select_multiple | Hakee automaattisesti ulkoisen datan täyttääkseen valinnat lomakkeen latautuessa tai triggerikentän muuttuessa. |
-| `floating_hint` | text, integer, decimal | Näyttää vihjeen tekstin kelluvana tunnisteena syöttökentän yläpuolella sen sijaan, että se olisi alla. |
-| `calculate-button` | calculate | Lisää näkyvän painikkeen, joka käynnistää kentän uudelleenlaskennan pyydettäessä automaattisen laskennan sijaan. |
-
-### Asettelu
+### Tiedon ja näytön hallinta
 
 | Ulkoasuattribuutti | Kysymystyypit | Kuvaus |
-|-------------------|---------------|--------|
+|-------------------|---------------|-------------|
+| `invisible` | mikä tahansa | Piilottaa kentän näkyvistä, vaikka se edelleen kerää tai laskee arvoaan. Eroaa `hidden`-tyypistä — kenttä osallistuu edelleen logiikkaan. |
+| `displaytitle` | mikä tahansa | Pakottaa kentän selitteen/otsikon näkymään, vaikka se muuten piilotettaisiin. |
+| `autopull` | select_one, select_multiple | Noutaa automaattisesti ulkoista dataa vaihtoehtojen täyttämiseksi, kun lomake ladataan tai liipaisinkenttä muuttuu. |
+| `floating_hint` | text, integer, decimal | Näyttää vihjetekstin (hint) kelluvana selitteenä syöttökentän yläpuolella sen alapuolen sijaan. |
+| `calculate-button` | calculate | Lisää näkyvän painikkeen, joka käynnistää kentän uudelleenlaskennan tarvittaessa automaattisen laskennan sijaan. |
+
+### Asettelu (Layout)
+
+| Ulkoasuattribuutti | Kysymystyypit | Kuvaus |
+|-------------------|---------------|-------------|
 | `1screen` | group | Pakottaa koko ryhmän näkymään yhdellä näytöllä ryhmän koosta riippumatta. |
-| `columns(n)` | select_one, select_multiple | Näyttää valinnat `n` sarakkeessa. Esimerkki: `columns(3)` näyttää kolme saraketta valintapainikkeita. |
-| `gridformat<row=R col=C colspan=S align=center>` | mikä tahansa | Sijoittaa kentän CSS-ruudukkoon riville `R`, sarakkeeseen `C`, ulottuen `S` saraketta. Käytetään `advanced-extension/grid-layout`:n kanssa. |
-| `ignore-simplify` | mikä tahansa | Ohjaa lomakkeen renderöijää ohittamaan automaattinen yksinkertaistaminen tai tämän kentän asettelun tiivistäminen. |
+| `columns(n)` | select_one, select_multiple | Näyttää vaihtoehdot `n` sarakkeessa. Esimerkki: `columns(3)` näyttää valintapainikkeet kolmessa sarakkeessa. |
+| `gridformat<row=R col=C colspan=S align=center>` | mikä tahansa | Sijoittaa kentän CSS-ruudukkoasetteluun riville `R`, sarakkeeseen `C`, ulottuen `S` sarakkeen leveydelle. Käytetään `advanced-extension/grid-layout`-laajennuksen kanssa. |
+| `ignore-simplify` | mikä tahansa | Ohjeistaa lomakkeen piirtäjää ohittamaan tämän kentän asettelun automaattisen yksinkertaistamisen tai tiivistämisen. |
 
 ### Widgetit
 
 | Ulkoasuattribuutti | Kysymystyypit | Kuvaus |
-|-------------------|---------------|--------|
-| `likert` | select_one | Esittää valinnat Likert-asteikkoriveinä. |
-| `distress` | select_one | Renderöi valinnat Kessler Psychological Distress Scale (K10) -visuaalisena widgettinä tunneikoneineen. |
+|-------------------|---------------|-------------|
+| `likert` | select_one | Esittää vaihtoehdot Likert-asteikon rivinä (mukana jo yllä olevassa standarditaulukossa; tuki vahvistettu). |
+| `distress` | select_one | Piirtää vaihtoehdot Kessler Psychological Distress Scale (K10) -visuaalisena widgetinä tunnekuvakkeilla. |
 
 ### API-integraatio
 
 | Ulkoasuattribuutti | Kysymystyypit | Kuvaus |
-|-------------------|---------------|--------|
-| `callapi` | text, integer, decimal, select_one | Mahdollistaa API-kutsuintegraation tälle kentälle. Calculation-sarakkeen tulee sisältää `callapi()`-lauseke. Katso [Call API](advanced-extension/call-api). |
+|-------------------|---------------|-------------|
+| `callapi` | text, integer, decimal, select_one | Mahdollistaa API-kutsun integroinnin tälle kentälle. Laskentasarakkeen (calculation) tulee sisältää `callapi()`-lauseke. Katso [Call API](advanced-features/call-api). |
 | `callapi-verify(params)` | text, integer, decimal | Käynnistää API-varmistuskutsun staattisilla parametreilla. Lomake estää etenemisen, kunnes API vahvistaa arvon. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | Sama kuin `callapi-verify`, mutta parametrit johdetaan muiden kenttien arvoista suorituksen aikana. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Sama kuin `callapi-verify`, mutta parametrit johdetaan muista kenttien arvoista suoritusaikana. |
 
-### Sisäinen päivämäärä/aika-muoto
+### Upotettu päivämäärä/aikamuoto (inline)
 
-`date`-, `time`- ja `datetime`-kentille voit määrittää mukautetun näyttömuodon lisäämällä muotoilujonon ulkoasuun:
+Kentille `date`, `time` ja `datetime` voit määrittää mukautetun näyttömuodon käyttämällä ulkoasuun liitettyä muotoilumerkkijonoa:
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-Muotoilutunnukset ovat samat kuin `format-date()` ja `format-date-time()`. Katso [Funktiot — Päivämäärä- ja aikafunktiot](operators-and-functions/functions#date-and-time-functions).
+Muotoilumerkit ovat samat kuin funktioissa `format-date()` ja `format-date-time()`. Katso [Funktiot — Päivämäärä- ja aikafunktiot](operators-and-functions/functions#date-and-time-functions).
 
 Esimerkki:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | datetime | event_time | Tapahtuman päivämäärä ja aika | inline-[%d/%m/%Y %I:%M %p] |
-| date | birth_date | Syntymäpäivä | inline-[%d/%m/%Y] |
+| date | birth_date | Syntymäaika | inline-[%d/%m/%Y] |
+
+### Upotettu painikeasettelu — `display{}` ja `results{}`
+
+Kysymystyypeille, jotka näkyvät upotettuna kuvakepainikkeena (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), kaksi ulkoasumuokkainta ohjaa painikkeen sijaintia ja käyttäytymistä tallennuksen jälkeen.
+
+#### `display{...}` — painikkeen sijainti ennen tallennusta
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parametri | Arvot | Oletus |
+|-----------|-------|---------|
+| Align (Tasaus) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (Koko) | `small`, `medium`, `large` | `small` |
+| Color (Väri) | hex esim. `#FF5500` | teeman ensisijainen väri |
+| Flag | `inline-icon` | pakottaa kuvaketilan |
+
+| Align-arvo | Asettelu |
+|------------|----------|
+| `right` | Painike selitteen oikealla puolella |
+| `left` | Painike selitteen vasemmalla puolella |
+| `top` | Painike selitteen yläpuolella, koko leveydellä keskitettynä |
+| `center` / `bottom` | Painike selitteen alapuolella, koko leveydellä keskitettynä |
+
+#### `results{...}` — asettelu ja näkyvyys tallennuksen jälkeen
+
+Perii `display{}`-asetukset. Käytä painikkeen siirtämiseen tai elementtien piilottamiseen, kun arvo on tallennettu.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| `hide`-arvo | Vaikutus |
+|---|---|
+| `hide(capture)` | Piilottaa tallennuspainikkeen, kun tiedosto/arvo on olemassa |
+| `hide(review)` | Piilottaa esikatselukuvan / toistopainikkeen |
+| `hide(filename)` | Piilottaa latauksen jälkeen näkyvän tiedostonimen |
+| `hide(camera)` | Piilottaa kameran laukaisinpainikkeen tallennuksen jälkeen |
+| `hide(scanner)` | Piilottaa viivakoodin lukupainikkeen arvon lukemisen jälkeen |
+| `hide(value)` | Piilottaa luetun arvon tekstin (barcode / geopoint) |
+
+Widget vaihtaa automaattisesti `display{}`-asettelusta `results{}`-asetteluun heti, kun arvo on tallennettu.
+
+**Esimerkkejä:**
+
+```
+inline display{right}                                    → kuvake selitteen oikealla puolella
+inline display{left, large}                              → suuri kuvake vasemmalla
+inline display{center, large, #FF5500}                   → suuri oranssi kuvake selitteen alapuolella
+inline display{right} results{left}                      → kuvake siirtyy vasemmalle tallennuksen jälkeen
+inline display{right} results{hide(capture)}             → kuvake katoaa tallennuksen jälkeen
+inline display{center} results{hide(capture), hide(filename)}
+```
 
 ## Tunnetut rajoitukset
 
-- Monimutkaiset ulkoasut eivät välttämättä renderöidy identtisesti kaikilla alustoilla.
-- Jotkut edistyneet rtSurvey-ulkoasut eivät välttämättä tue offline-tilaa.
+- Monimutkaiset ulkoasut eivät välttämättä näy identtisesti kaikilla alustoilla.
+- Joitakin rtSurveyn edistyneitä ulkoasuja ei välttämättä tueta offline-tilassa.
 
 ## Ulkoasuongelmien vianmääritys
 
-1. **Ulkoasua ei sovelleta**: Tarkista ulkoasu-sarakkeessa olevat kirjoitusvirheet.
-2. **Epäjohdonmukainen renderöinti**: Tarkista yhteensopivuus kysymystyypin ja alustan kanssa.
-3. **Suorituskykyongelmat**: Harkitse monimutkaisten ulkoasujen yksinkertaistamista erityisesti suurille kyselyille.
+1. **Ulkoasua ei sovelleta**: Tarkista kirjoitusvirheet appearance-sarakkeessa.
+2. **Epäjohdonmukainen esitys**: Varmista yhteensopivuus kysymystyypin ja alustan kanssa.
+3. **Suorituskykyongelmat**: Harkitse monimutkaisten ulkoasujen yksinkertaistamista, erityisesti suuria kyselyitä varten.

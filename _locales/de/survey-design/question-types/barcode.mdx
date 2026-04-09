@@ -1,58 +1,178 @@
 ---
 title: "Barcode"
-description: "Barcode-Fragen ermöglichen das Scannen und Erfassen von Barcode-Daten in Ihrer Umfrage."
+description: "Barcode-Fragen scannen und erfassen QR-Codes und Barcode-Daten in Ihrer Umfrage."
 ---
 
-Der Barcode-Fragetyp in XLSForms und rtSurvey ermöglicht es Benutzern, Barcode-Daten direkt innerhalb der Umfrage zu scannen und zu erfassen. Diese Funktion ist besonders nützlich für die Bestandsverwaltung, Produktverfolgung oder jedes Szenario, in dem eine schnelle und genaue Dateneingabe kodierter Informationen erforderlich ist.
+Der Fragetyp `barcode` erfasst einen Codewert durch Scannen eines QR-Codes oder Barcodes mit der Kamera des Geräts. Das Scanner-Modal enthält auch eine manuelle Texteingabe als Fallback, wenn das Scannen nicht möglich ist.
 
-## Grundlegende XLSForm-Spezifikation
+## Basic XLSForm Specification
 
-| type    | name          | label                   |
-|---------|---------------|-------------------------|
-| barcode | product_code  | Scannen Sie den Produkt-Barcode |
+| type    | name         | label                    |
+|---------|--------------|--------------------------|
+| barcode | product_code | Scan the product barcode |
+| barcode | ticket_id    | Scan the ticket          |
 
-Weitere Details zum grundlegenden Barcode-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Informationen zur Standardspezifikation finden Sie in der [XLSForm-Dokumentation](https://xlsform.org/en/#question-types).
 
-## Anwendungen
+---
 
-Barcode-Fragen werden häufig verwendet für:
+## Supported formats
 
-1. Produktidentifikation in Inventarumfragen
-2. Bestandsverfolgung im Außendienst
-3. Ticket- oder ID-Verifizierung bei Veranstaltungen
-4. Schnelle Dateneingabe für kodierte Informationen
+rtSurvey unterstützt QR-Codes und Standard-1D-Barcodes über die Gerätekamera, einschließlich:
 
-## rtSurvey-Erweiterungen
+- QR Code
+- UPC-A, UPC-E
+- EAN-8, EAN-13
+- Code 39, Code 128
+- ITF, Codabar
 
-Während die grundlegende XLSForm-Spezifikation für Barcode-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen. Diese könnten umfassen:
+---
 
-1. Unterstützung für mehrere Barcode-Formate (z. B. QR-Codes, UPC, EAN)
-2. Integration mit der Gerätekamera für das Scannen von Barcodes
-3. Manuelle Eingabeoption für den Fall, dass der Barcode beschädigt ist oder nicht gescannt werden kann
+## Default layout
 
-(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für Barcode-Fragen müssten hier bestätigt und detailliert werden.)
+Wenn kein `appearance` festgelegt ist, zeigt die Frage eine Schaltfläche in voller Breite mit der Aufschrift **"GET BARCODE"** an. Durch Antippen wird das Scanner-Modal geöffnet. Nach einem erfolgreichen Scan ändert sich die Schaltfläche in **"REPLACE BARCODE"** und der gescannte Wert erscheint darunter als anklickbarer Link.
 
-## Empfohlene Vorgehensweisen
+---
 
-1. Sorgen Sie für angemessene Lichtverhältnisse für ein genaues Scannen von Barcodes.
-2. Geben Sie den Benutzern klare Anweisungen, wie sie das Gerät zum Scannen positionieren sollen.
-3. Fügen Sie eine manuelle Eingabeoption als Fallback für den Fall von Scanschwierigkeiten hinzu.
-4. Testen Sie die Barcode-Scanfunktion mit verschiedenen Geräten und Barcodetypen, bevor Sie die Umfrage bereitstellen.
+## Scanner modal
+
+Das Scanner-Modal enthält immer:
+- **Live-Kameraansicht (Live camera view)** — scannt automatisch bei Erkennung; das Modal schließt sich nach einem erfolgreichen Scan.
+- **Manuelle Texteingabe (Manual text input)** — ein Textfeld am unteren Rand, in das der Interviewer den Code eingeben kann, wenn das Scannen fehlschlägt.
+- **Fertig-Schaltfläche (Done button)** — übermittelt den manuell eingegebenen Wert.
+
+Wenn die Gerätekamera nicht verfügbar ist, wechselt das Modal zur Option **"Upload an image"** — der Interviewer kann ein Foto des Barcodes zur Dekodierung einreichen.
+
+---
+
+## Inline button layout
+
+Fügen Sie `inline` hinzu, um den Scanner als **kreisförmige Symbolschaltfläche** neben dem Label anstatt als Schaltfläche in voller Breite anzuzeigen.
+
+```
+| type    | name | label     | appearance                              |
+|---------|------|-----------|----------------------------------------|
+| barcode | code | Scan item | inline display{right}                  |
+| barcode | code | Scan item | inline display{left, large}            |
+| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+```
+
+**Schaltflächenposition** — `left`, `right` *(Standard)*, `top`, `center`, `bottom`
+
+**Schaltflächengröße** — `small` *(Standard)*, `medium`, `large`
+
+**Schaltflächenfarbe** — fügen Sie einen Hex-Farbcode innerhalb von `display{}` hinzu, um die Primärfarbe zu überschreiben:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Steuerung nach der Erfassung — `results{}`:**
+
+| Appearance | Effekt |
+|---|---|
+| `results{hide(scanner)}` | Blendet die Scan-Schaltfläche nach der Erfassung eines Wertes aus |
+| `results{hide(review)}` | Blendet den Link zum gescannten Wert nach der Erfassung aus |
+| `results{hide(value)}` | Blendet die Textanzeige des gescannten Wertes aus |
+| `results{left}` | Verschiebt das Symbol nach der Erfassung nach links |
+
+Beispiel — Scanner nach dem ersten Scan ausblenden:
+```
+inline display{center, large} results{hide(scanner)}
+```
+
+---
+
+## `inputs{auto-close(N)}` — Scanner automatisch schließen
+
+Schließt das Scanner-Modal automatisch nach `N` Sekunden, wenn kein Barcode erkannt wird. Ein Live-Countdown-Timer wird im Modal angezeigt.
+
+```
+inputs{auto-close(10)}     → schließt nach 10 Sekunden
+inputs{auto-close(5)}      → schließt nach 5 Sekunden
+```
+
+Kombination mit inline:
+```
+inline display{right} inputs{auto-close(10)}
+```
+
+---
+
+## `inputs{floating}` — schwebender, verschiebbarer Scanner
+
+Zeigt eine **Minimieren-Schaltfläche** (Komprimierungssymbol ⊞) in der Kopfzeile des Scanner-Modals an. Durch Antippen wird der Scanner zu einem kleinen schwebenden kreisförmigen Symbol verkleinert, das an eine beliebige Stelle auf dem Bildschirm gezogen werden kann. Durch Antippen des schwebenden Symbols wird der Scanner wieder geöffnet.
+
+```
+inputs{floating}
+inline display{right} inputs{floating}
+```
+
+Nützlich bei Arbeitsabläufen, bei denen der Interviewer das Formular sehen muss, während der Scanner aktiv ist (z. B. beim Scannen von Artikeln in einer Liste).
+
+---
+
+## `invisible auto-show` — Scanner automatisch öffnen
+
+Blendet das Fragen-Widget aus dem Layout aus, öffnet aber automatisch den Scanner, wenn die Seite geladen wird. Nützlich, um einen stillen Scanschritt in den Formularfluss einzubetten.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+---
+
+## In Wiederholungsgruppen (In repeat groups)
+
+Wenn sich `barcode` innerhalb einer `begin repeat`-Gruppe befindet, wechselt ein erfolgreicher Scan automatisch zur **nächsten Wiederholungsinstanz**, nachdem der Wert aufgezeichnet wurde. Dies ermöglicht schnelles sequenzielles Scannen, ohne dass der Interviewer zwischen den Artikeln auf "Hinzufügen" (Add) tippen muss.
+
+---
+
+## Label unterdrücken (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Beispielnutzung
+
+### Inventar-Scan
+
+| type | name | label | appearance | required |
+|------|------|-------|------------|----------|
+| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
+| integer | quantity | Quantity | | yes |
+| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
+
+### Schneller Multi-Artikel-Scan (Wiederholungsgruppe)
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin repeat | items | | |
+| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| end repeat | items | | |
+
+### Stiller Auto-Scan beim Laden der Seite
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| barcode | entry_code | | `invisible auto-show` |
+
+---
+
+## Best Practices
+
+1. Verwenden Sie `inputs{auto-close(N)}`, um zu verhindern, dass der Scanner unbegrenzt offen bleibt – wählen Sie einen Wert, der den Interviewern genügend Zeit gibt, den Barcode zu positionieren (8–15 Sekunden sind typisch).
+2. Verwenden Sie `inputs{floating}`, wenn das Formular während des Scannens sichtbar bleiben muss (z. B. beim Scannen aus einer Liste, bei der der Interviewer ein sichtbares Feld abgleicht).
+3. Platzieren Sie die Barcode-Frage innerhalb einer Wiederholungsgruppe für schnelles sequenzielles Scannen – das automatische Vorrücken der Wiederholung macht den manuellen Schritt "Hinzufügen" überflüssig.
+4. Fügen Sie immer die Spalte `hint` mit Anweisungen zur Positionierung hinzu (z. B. "Halten Sie den Barcode in einem Abstand von 10–30 cm von der Kamera, bei gutem Licht").
+5. Die manuelle Texteingabe im Scanner-Modal ist immer verfügbar – schulen Sie die Interviewer darin, sie als Fallback für beschädigte oder verschmutzte Barcodes zu verwenden.
 
 ## Einschränkungen
 
-- Die Genauigkeit des Barcode-Scannens kann je nach Kameraqualität des Geräts und den Umgebungsbedingungen variieren.
-- Einige ältere oder leistungsschwächere Geräte unterstützen das Scannen von Barcodes möglicherweise nicht.
-- Bestimmte Barcodetypen werden je nach Implementierung möglicherweise nicht unterstützt.
-
-## Beispielhafte Verwendung
-
-Hier ist ein Beispiel dafür, wie Sie eine Barcode-Frage in einer Inventarumfragen verwenden könnten:
-
-| type    | name          | label                             | hint                                      |
-|---------|---------------|-----------------------------------|-------------------------------------------|
-| barcode | product_code  | Scannen Sie den Produkt-Barcode   | Positionieren Sie den Barcode im Rahmen   |
-| integer | quantity      | Produktmenge eingeben             |                                           |
-| note    | confirmation  | Produkt gescannt: `${product_code}`. Menge: `${quantity}` |           |
-
-In diesem Beispiel erfasst die Umfrage den Barcode eines Produkts, fragt nach der Menge und zeigt dann einen Bestätigungshinweis mit den gescannten Informationen an.
+- Die Scangenauigkeit hängt von der Kameraqualität, der Beleuchtung und dem Zustand des Barcodes ab – beschädigte Codes oder Codes mit geringem Kontrast werden möglicherweise nicht zuverlässig gescannt.
+- Der Scanner verwendet die rückwärtige Kamera; Geräte ohne rückwärtige Kamera greifen auf die Option zum Hochladen von Bildern zurück.
+- `invisible auto-show` wird nur beim ersten Laden der Seite geöffnet; das Zurücknavigieren zur Seite löst das automatische Öffnen nicht erneut aus.

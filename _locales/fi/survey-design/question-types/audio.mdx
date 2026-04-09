@@ -1,93 +1,128 @@
 ---
-title: "Audio"
-description: "Audio-kysymykset antavat vastaajille mahdollisuuden nauhoittaa ja lähettää äänitiedostoja osana kyselyä."
+title: "Ääni"
+description: "Äänikysymykset mahdollistavat vastaajien äänitiedostojen tallentamisen ja lähettämisen osana kyselyä."
 ---
 
-`audio`-kysymystyyppi mahdollistaa vastaajien **nauhoittaa ääntä** tai ladata olemassa olevan äänitiedoston osana kyselyvastaustaan. Se on hyödyllinen suullisten kertomusten, ympäristöäänien, suositusten tai tietojen tallentamiseen, jotka välittyvät parhaiten äänen kautta tekstin sijaan.
+Kysymystyyppi `audio` mahdollistaa vastaajien **äänen tallentamisen** tai olemassa olevan äänitiedoston lataamisen osana heidän kyselyvastaustaan. Se on hyödyllinen suullisten kertomusten, ympäristön äänien, todistusten tai sellaisten tietojen keräämiseen, jotka välittyvät paremmin äänen kuin tekstin avulla.
 
 ## XLSForm-perusmäärittely
 
-| type  | name        | label                           |
-|-------|-------------|--------------------------------|
-| audio | voice_note  | Nauhoita kommenttisi           |
+| type  | name        | label                        |
+|-------|-------------|------------------------------|
+| audio | voice_note  | Ole hyvä ja tallenna kommenttisi |
 
-Lisätietoja audio-kysymystyypin standardista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+Lisätietoja standardista äänikysymystyypistä on [XLSForm-määrittelyssä](https://xlsform.org/en/#question-types).
 
-## Käyttötarkoitukset
+## Käyttökohteet
 
-Audio-kysymyksiä käytetään yleisesti:
+Äänikysymyksiä käytetään yleisesti seuraaviin tarkoituksiin:
 
-1. Avoimien suullisten vastausten tallentamiseen luetteloijan kirjoitustaakan vähentämiseksi
-2. Suositusten, henkilökohtaisten tarinoiden tai suullisten historioiden nauhoittamiseen
-3. Ympäristöäänien dokumentointiin (esim. melutasot infrastruktuurin lähellä)
-4. Äänentäytteiden keräämiseen kielelliseen tai terveystutkimukseen
-5. Vastaajien mahdollistaminen lisätä suullisia selvennyksiä numeerisiin tai valintavastauksiin
+1. Avoimien suullisten vastausten kerääminen haastattelijan kirjoitustaakan vähentämiseksi
+2. Todistusten, henkilökohtaisten tarinoiden tai suullisen historian tallentaminen
+3. Ympäristön äänien dokumentointi (esim. melutasot infrastruktuurin lähellä)
+4. Ääninäytteiden kerääminen kielellistä tai terveystutkimusta varten
+5. Vastaajien mahdollisuus lisätä suullisia selvennyksiä numeerisiin tai valintavastauksiin
 
 ## Tietomuoto
 
-Äänitiedostot tallennetaan binääriliitteinä lomakkeen lähetyksen ohessa, tyypillisesti:
+Äänitiedostot tallennetaan binaarisina liitteinä lomakkeen lähetyksen yhteydessä, yleensä seuraavasti:
 
-- **Muoto:** MP3 tai AAC (mobiilinauhiointi); WAV (korkealaatuinen nauhoitus)
+- **Muoto:** MP3 tai AAC (mobiilitallennus); WAV (korkealaatuinen tallennus)
 - **Nimeäminen:** `{instanceID}-{fieldname}.mp3` (tai vastaava)
-- **Tallennus:** Ladataan palvelimen mediahakemistoon ja yhdistetään lähetystietueeseen
-- **Käyttö:** Toistettavissa ja ladattavissa lähetysten hallintaliittymästä
+- **Tallennus:** Ladattu palvelimen mediakansioon ja linkitetty lähetystietueeseen
+- **Pääsy:** Toistettavissa ja ladattavissa lähetysten hallintaliittymästä
 
-## rtSurveyn laajennukset
+## rtSurvey-laajennukset
 
-### Enimmäiskesto
+### Maksimikesto
 
-Käytä `parameters`-saraketta nauhoituksen pituuden rajoittamiseen:
-
-| type | name | label | parameters |
-|------|------|-------|------------|
-| audio | interview | Nauhoita haastattelu | `max-duration=120` |
-
-`max-duration` on sekunneissa. Tallennin pysähtyy automaattisesti rajalla.
-
-### Laadun asetukset
-
-Nauhoituksen laatu voidaan asettaa `parameters`-sarakkeen kautta:
+Käytä `parameters`-saraketta rajoittaaksesi tallennuksen pituutta:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| audio | feedback | Nauhoita palaute | `quality=normal` |
+| audio | interview | Tallenna haastattelu | `max-duration=120` |
 
-Tuetut arvot: `low`, `normal` (oletus), `voice-only`. `voice-only` optimoi puheäänelle melunvaimennuksella.
+`max-duration` on sekunteina. Tallennin pysähtyy automaattisesti rajan kohdalla.
 
-### Toisto ennen lähettämistä
+### Laatunasetukset
 
-Mobiililla luetteloija voi toistaa nauhoitetun klipin ennen jatkamista. Tämä on käytössä oletuksena — konfigurointia ei tarvita.
+Tallennuslaatu voidaan asettaa `parameters`-sarakkeen kautta:
 
-### Natiivi tallennin-integraatio
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | Tallenna palaute | `quality=normal` |
 
-Androidilla ja iOS:llä `audio` käynnistää laitteen natiivin tallennussovelluksen. Verkossa se käyttää selaimen sisäänrakennettua MediaRecorder-API:a.
+Tuetut arvot: `low`, `normal` (oletus), `voice-only`. `voice-only` optimoi puheäänen taustamelun vaimennuksella.
+
+### Toisto ennen lähetystä
+
+Mobiililaitteella haastattelija voi toistaa tallennetun pätkän ennen jatkamista. Tämä on käytössä oletuksena — asetuksia ei tarvita.
+
+### Integrointi natiiviin tallentimeen
+
+Androidilla ja iOS:llä `audio` käynnistää laitteen natiivin tallennussovelluksen. Verkossa se käyttää selaimen sisäänrakennettua MediaRecorder-rajapintaa.
+
+### Inline-painikeasettelu
+
+Lisää `inline` renderöidäksesi mikrofonin **pyöreänä ikonipainikkeena** etiketin viereen.
+
+```
+| type  | name | label        | appearance                    |
+|-------|------|--------------|-------------------------------|
+| audio | clip | Tallenna ääni | inline display{right}         |
+| audio | clip | Tallenna ääni | inline display{left, large}   |
+```
+
+**Painikkeen sijainti** — `left`, `right` *(oletus)*, `top`, `center`, `bottom`
+
+**Painikkeen koko** — `small` *(oletus)*, `medium`, `large`
+
+**Painikkeen väri** — lisää hex-väri `display{}`-kohdan sisään korvataksesi ensisijaisen värin:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Tallennuksen jälkeinen hallinta — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Piilottaa tallennuspainikkeen äänen tallentamisen jälkeen |
+| `results{hide(review)}` | Piilottaa toistopainikkeen |
+| `results{hide(filename)}` | Piilottaa tiedostonimen ja keston |
+| `results{left}` | Siirtää ikonin vasemmalle tallennuksen jälkeen |
+
+Esimerkki — piilota tallennuspainike tallennuksen jälkeen, säilytä toisto:
+```
+inline display{right} results{hide(capture)}
+```
 
 ## Esimerkkikäyttö
 
-### Enimmäiskeston ja vihjeen kanssa
+### Maksimikestolla ja vihjeellä
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| audio | story | Kerro meille tapahtumasta omin sanoin | Puhu selkeästi. Nauhoitus pysähtyy 3 minuutin jälkeen. | `max-duration=180` |
+| audio | story | Kerro meille tapahtumasta omin sanoin | Puhu selkeästi. Tallennus pysähtyy 3 minuutin kuluttua. | `max-duration=180` |
 
-### Ehdollinen ääni — vain jos ongelma on raportoitu
+### Ehdollinen ääni — vain jos ongelmasta ilmoitettiin
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
 | select_one yesno | issue_found | Löytyikö ongelma? | | |
-| audio | issue_audio | Nauhoita kuvaus ongelmasta | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+| audio | issue_audio | Tallenna kuvaus ongelmasta | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
 ## Parhaat käytännöt
 
-1. Ilmoita selkeästi `label`- tai `hint`-sarakkeessa, mitä luetteloijan tulisi sanoa ja kuinka kauan.
-2. Käytä `max-duration`-parametria liian suurten tiedostojen estämiseksi alueilla, joilla on hidas latausnopeus.
-3. Informoi vastaajia ennen nauhoituksen aloittamista — odottamaton nauhoitus voi herättää yksityisyyshuolenaiheita.
-4. Testaa nauhoittaminen kohdelaitteella ja verkon olosuhteissa ennen käyttöönottoa.
-5. Aseta `quality=voice-only` haastattelutyylisiin nauhoituksiin tiedostokoon pienentämiseksi ilman ymmärrettävyyden heikkenemistä.
+1. Ilmoita selkeästi `label`- tai `hint`-kohdassa, mitä haastattelijan tulee sanoa ja kuinka kauan.
+2. Käytä `max-duration`-asetusta estääksesi liian suurten tiedostojen syntymisen alueilla, joilla on hidas lähetysnopeus.
+3. Informoi vastaajia ennen tallennuksen aloittamista — odottamaton tallennus voi herättää tietosuojaan liittyviä huolenaiheita.
+4. Testaa tallennusta kohdelaitteella ja verkko-olosuhteissa ennen käyttöönottoa.
+5. Aseta `quality=voice-only` haastattelutyyppisille tallenteille tiedostokoon pienentämiseksi ymmärrettävyyden kärsimättä.
 
 ## Rajoitukset
 
-- Äänitiedostot voivat olla suuria (2 minuutin nauhoitus normaalilla laadulla on ~2–4 Mt) — ota tämä huomioon datasuunnitelmassa ja latausajan arvioissa.
-- Kaikki selaimet eivät tue MediaRecorder-API:a — Chrome ja Firefox toimivat luotettavasti; Safari vanhemmilla iOS-versioilla voi olla ongelmia.
-- Äänivastaausten litterointi vaatii lisäjälkikäsittelyä (manuaalinen tai automatisoitu puheesta tekstiksi).
-- Yksityisyysmääräykset voivat rajoittaa äänten nauhoittamista — tarkista paikalliset tietosuojavaatimukset.
+- Äänitiedostot voivat olla suuria (2 minuutin tallenne normaalilaadulla on noin 2–4 MB) — ota tämä huomioon tietoliikennesuunnitelmassasi ja lähetysaikojen arvioinnissa.
+- Kaikki selaimet eivät tue MediaRecorder-rajapintaa — Chrome ja Firefox toimivat luotettavasti; Safarissa vanhemmilla iOS-versioilla voi olla ongelmia.
+- Äänivastausten tekstittäminen vaatii ylimääräistä jälkikäsittelyä (manuaalinen tai automaattinen puheesta tekstiksi -muunnos).
+- Tietosuoja-asetukset voivat rajoittaa äänien tallentamista — tarkista paikalliset tietosuojavaatimukset.

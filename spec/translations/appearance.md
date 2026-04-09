@@ -13,18 +13,18 @@ Added full display{} / results{} section: align options (left/right/top/center/b
 
 | Locale | Status |
 |--------|--------|
-| ar | not_implemented |
-| bg | not_implemented |
-| cs | not_implemented |
-| da | not_implemented |
-| de | not_implemented |
-| el | not_implemented |
-| es | not_implemented |
-| fi | not_implemented |
-| fr | not_implemented |
-| hi | not_implemented |
-| hu | not_implemented |
-| id | not_implemented |
+| ar | implemented |
+| bg | implemented |
+| cs | implemented |
+| da | implemented |
+| de | implemented |
+| el | implemented |
+| es | implemented |
+| fi | implemented |
+| fr | implemented |
+| hi | implemented |
+| hu | implemented |
+| id | implemented |
 | it | not_implemented |
 | ja | not_implemented |
 | km | not_implemented |

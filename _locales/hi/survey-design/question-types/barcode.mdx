@@ -1,56 +1,178 @@
 ---
 title: "Barcode"
-description: "Barcode questions आपके survey में barcode data को scan और capture करने की अनुमति देते हैं।"
+description: "Barcode प्रश्न आपके सर्वेक्षण में QR codes और barcode डेटा को स्कैन और कैप्चर करते हैं।"
 ---
 
-XLSForms और rtSurvey में barcode question type users को survey के भीतर directly barcode data scan और capture करने की अनुमति देता है। यह सुविधा inventory management, product tracking, या किसी भी scenario के लिए विशेष रूप से उपयोगी है जहाँ coded information की quick और accurate data entry की आवश्यकता होती है।
+`barcode` प्रश्न प्रकार डिवाइस के कैमरे से QR code या barcode को स्कैन करके कोड मान कैप्चर करता है। स्कैनिंग संभव न होने पर स्कैनर मोडल (scanner modal) में बैकअप के रूप में मैन्युअल टेक्स्ट इनपुट (manual text input) भी शामिल होता है।
 
-## बुनियादी XLSForm विशिष्टता
+## Basic XLSForm Specification
 
-| type    | name          | label                   |
-|---------|---------------|-------------------------|
-| barcode | product_code  | Product barcode scan करें |
+| type    | name         | label                    |
+|---------|--------------|--------------------------|
+| barcode | product_code | उत्पाद बारकोड स्कैन करें (Scan the product barcode) |
+| barcode | ticket_id    | टिकट स्कैन करें (Scan the ticket) |
 
-Basic barcode question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+मानक विनिर्देश के लिए [XLSForm दस्तावेज़](https://xlsform.org/en/#question-types) देखें।
 
-## उपयोग
+---
 
-Barcode questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+## Supported formats
 
-1. Inventory surveys में product identification
-2. Field operations में asset tracking
-3. Events पर ticket या ID verification
-4. Coded information के लिए quick data entry
+rtSurvey डिवाइस कैमरे के माध्यम से QR codes और मानक 1D barcodes का समर्थन करता है, जिनमें शामिल हैं:
 
-## rtSurvey एक्सटेंशन
+- QR Code
+- UPC-A, UPC-E
+- EAN-8, EAN-13
+- Code 39, Code 128
+- ITF, Codabar
 
-Basic XLSForm specification के अतिरिक्त, rtSurvey अतिरिक्त सुविधाएं या customizations प्रदान कर सकता है:
+---
 
-1. Multiple barcode formats का समर्थन (जैसे QR codes, UPC, EAN)
-2. Barcode scanning के लिए device camera के साथ integration
-3. यदि barcode damaged हो या scan नहीं किया जा सकता तो manual entry विकल्प
+## Default layout
 
-## सर्वोत्तम प्रथाएँ
+बिना किसी `appearance` सेट किए, प्रश्न पूरी चौड़ाई वाला **"GET BARCODE"** बटन प्रदर्शित करता है। इसे टैप करने पर स्कैनर मोडल खुल जाता है। सफल स्कैन के बाद, बटन **"REPLACE BARCODE"** में बदल जाता है और स्कैन किया गया मान नीचे क्लिक करने योग्य लिंक के रूप में दिखाई देता है।
 
-1. Accurate barcode scanning के लिए proper lighting conditions सुनिश्चित करें।
-2. Scanning के लिए device को position करने के तरीके पर users को clear instructions प्रदान करें।
-3. Scanning difficulties के मामले में एक fallback के रूप में manual entry विकल्प शामिल करें।
-4. Survey deploy करने से पहले विभिन्न devices और barcode types के साथ barcode scanning feature का परीक्षण करें।
+---
 
-## सीमाएं
+## Scanner modal
 
-- Barcode scanning accuracy device की camera quality और environmental conditions के आधार पर vary कर सकती है।
-- कुछ पुराने या low-end devices barcode scanning का समर्थन नहीं कर सकते।
-- Implementation के आधार पर कुछ barcode types supported नहीं हो सकते।
+स्कैनर मोडल में हमेशा शामिल होते हैं:
+- **लाइव कैमरा व्यू (Live camera view)** — पहचान होने पर स्वचालित रूप से स्कैन करता है; सफल स्कैन के बाद मोडल बंद हो जाता है।
+- **मैन्युअल टेक्स्ट इनपुट (Manual text input)** — नीचे एक टेक्स्ट फ़ील्ड जहाँ गणनाकर्ता (enumerator) स्कैन विफल होने पर कोड टाइप कर सकता है।
+- **डन बटन (Done button)** — मैन्युअल रूप से टाइप किए गए मान को सबमिट करता है।
+
+जब डिवाइस कैमरा अनुपलब्ध होता है, तो मोडल **"Upload an image"** विकल्प पर वापस आ जाता है — गणनाकर्ता डिकोडिंग के लिए बारकोड की एक फोटो सबमिट कर सकता है।
+
+---
+
+## Inline button layout
+
+स्कैनर को पूरी चौड़ाई वाले बटन के बजाय लेबल के बगल में **गोलाकार आइकन बटन** के रूप में रेंडर करने के लिए `inline` जोड़ें।
+
+```
+| type    | name | label     | appearance                              |
+|---------|------|-----------|----------------------------------------|
+| barcode | code | Scan item | inline display{right}                  |
+| barcode | code | Scan item | inline display{left, large}            |
+| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+```
+
+**बटन की स्थिति (Button position)** — `left`, `right` *(डिफ़ॉल्ट)*, `top`, `center`, `bottom`
+
+**बटन का आकार (Button size)** — `small` *(डिफ़ॉल्ट)*, `medium`, `large`
+
+**बटन का रंग (Button color)** — प्राथमिक रंग को ओवरराइड करने के लिए `display{}` के अंदर एक हेक्स (hex) रंग जोड़ें:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**कैप्चर के बाद नियंत्रण (Post-capture control) — `results{}`:**
+
+| Appearance | प्रभाव |
+|---|---|
+| `results{hide(scanner)}` | मान कैप्चर होने के बाद स्कैन बटन को छुपाता है |
+| `results{hide(review)}` | कैप्चर के बाद स्कैन किए गए मान लिंक को छुपाता है |
+| `results{hide(value)}` | स्कैन किए गए मान टेक्स्ट डिस्प्ले को छुपाता है |
+| `results{left}` | कैप्चर के बाद आइकन को बाईं ओर ले जाता है |
+
+उदाहरण — पहले स्कैन के बाद स्कैनर छुपाएं:
+```
+inline display{center, large} results{hide(scanner)}
+```
+
+---
+
+## `inputs{auto-close(N)}` — स्कैनर का स्वचालित रूप से बंद होना
+
+यदि कोई बारकोड नहीं मिलता है, तो `N` सेकंड के बाद स्कैनर मोडल को स्वचालित रूप से बंद कर देता है। मोडल के अंदर एक लाइव काउंटडाउन टाइमर दिखाया जाता है।
+
+```
+inputs{auto-close(10)}     → 10 सेकंड के बाद बंद होता है
+inputs{auto-close(5)}      → 5 सेकंड के बाद बंद होता है
+```
+
+इनलाइन के साथ संयोजन:
+```
+inline display{right} inputs{auto-close(10)}
+```
+
+---
+
+## `inputs{floating}` — फ्लोटिंग ड्रैगेबल स्कैनर
+
+स्कैनर मोडल हेडर में एक **मिनिमाइज बटन** (कंप्रेस आइकन ⊞) दिखाता है। इसे टैप करने पर स्कैनर एक छोटे फ्लोटिंग गोलाकार आइकन में सिकुड़ जाता है जिसे स्क्रीन पर कहीं भी खींचा जा सकता है। फ्लोटिंग आइकन को टैप करने पर स्कैनर फिर से खुल जाता है।
+
+```
+inputs{floating}
+inline display{right} inputs{floating}
+```
+
+उन वर्कफ़्लो में उपयोगी जहाँ स्कैनर सक्रिय होने पर गणनाकर्ता को फ़ॉर्म देखने की आवश्यकता होती है (जैसे, सूची में आइटम स्कैन करना)।
+
+---
+
+## `invisible auto-show` — स्कैनर का स्वचालित रूप से खुलना
+
+लेआउट से प्रश्न विजेट को छुपाता है लेकिन पेज लोड होने पर स्कैनर को स्वचालित रूप से खोलता है। फ़ॉर्म फ़्लो में एक साइलेंट स्कैन स्टेप एम्बेड करने के लिए उपयोगी।
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+---
+
+## रिपीट ग्रुप में (In repeat groups)
+
+जब `barcode` एक `begin repeat` ग्रुप के अंदर होता है, तो मान रिकॉर्ड होने के बाद एक सफल स्कैन स्वचालित रूप से **अगले रिपीट इंस्टेंस** पर आगे बढ़ जाता है। यह गणनाकर्ता द्वारा आइटम के बीच "जोड़ें" (Add) टैप किए बिना तेजी से अनुक्रमिक स्कैनिंग सक्षम करता है।
+
+---
+
+## लेबल को हटाना (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
 
 ## उदाहरण उपयोग
 
-यहाँ बताया गया है कि आप inventory survey में barcode question का उपयोग कैसे कर सकते हैं:
+### इन्वेंट्री स्कैन
 
-| type    | name          | label                   | hint                                      |
-|---------|---------------|-------------------------|-------------------------------------------|
-| barcode | product_code  | Product barcode scan करें | Barcode को frame के भीतर position करें   |
-| integer | quantity      | Product quantity दर्ज करें |                                           |
-| note    | confirmation  | Product scan किया: `${product_code}`। Quantity: `${quantity}` |           |
+| type | name | label | appearance | required |
+|------|------|-------|------------|----------|
+| barcode | item_code | आइटम बारकोड स्कैन करें (Scan item barcode) | `inline display{right}` | yes |
+| integer | quantity | मात्रा (Quantity) | | yes |
+| note | confirm | आइटम: `${item_code}` — मात्रा: `${quantity}` | | |
 
-इस उदाहरण में, survey एक product का barcode capture करती है, quantity पूछती है, और फिर scanned information के साथ एक confirmation note प्रदर्शित करती है।
+### रैपिड मल्टी-आइटम स्कैन (रिपीट ग्रुप)
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin repeat | items | | |
+| barcode | code | अगला आइटम स्कैन करें (Scan next item) | `inline display{right} inputs{auto-close(8)}` |
+| end repeat | items | | |
+
+### पेज लोड पर साइलेंट ऑटो-स्कैन
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| barcode | entry_code | | `invisible auto-show` |
+
+---
+
+## सर्वोत्तम प्रथाएं (Best Practices)
+
+1. स्कैनर को अनिश्चित काल तक खुला रहने से रोकने के लिए `inputs{auto-close(N)}` का उपयोग करें — ऐसा मान चुनें जो गणनाकर्ताओं को बारकोड को सही स्थिति में लाने के लिए पर्याप्त समय दे (8-15 सेकंड विशिष्ट है)।
+2. जब स्कैनिंग के दौरान फ़ॉर्म को दृश्यमान रहने की आवश्यकता हो, तो `inputs{floating}` का उपयोग करें (जैसे, सूची से स्कैन करना जहाँ गणनाकर्ता एक दृश्यमान फ़ील्ड के साथ क्रॉस-रेफरेंस करता है)।
+3. तेजी से अनुक्रमिक स्कैनिंग के लिए बारकोड प्रश्न को रिपीट ग्रुप के अंदर रखें — स्वचालित रिपीट एडवांसमेंट मैन्युअल "जोड़ें" स्टेप को समाप्त कर देता है।
+4. पोजिशनिंग निर्देशों के साथ हमेशा `hint` कॉलम शामिल करें (जैसे, "बारकोड को अच्छी रोशनी में कैमरे से 10-30 सेमी की दूरी पर रखें")।
+5. स्कैनर मोडल में मैन्युअल टेक्स्ट इनपुट हमेशा उपलब्ध होता है — गणनाकर्ताओं को क्षतिग्रस्त या गंदे बारकोड के बैकअप के रूप में इसका उपयोग करने के लिए प्रशिक्षित करें।
+
+## सीमाएं (Limitations)
+
+- स्कैनिंग सटीकता कैमरे की गुणवत्ता, रोशनी और बारकोड की स्थिति पर निर्भर करती है — क्षतिग्रस्त या कम-कंट्रास्ट वाले कोड विश्वसनीय रूप से स्कैन नहीं हो सकते हैं।
+- स्कैनर पीछे के (वातावरण की ओर मुख वाले) कैमरे का उपयोग करता है; पीछे के कैमरे के बिना डिवाइस इमेज अपलोड विकल्प पर वापस आ जाते हैं।
+- `invisible auto-show` केवल पहले पेज लोड पर खुलता है; पेज पर वापस नेविगेट करने से ऑटो-ओपन फिर से ट्रिगर नहीं होता है।

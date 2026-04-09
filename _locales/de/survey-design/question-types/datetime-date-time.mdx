@@ -1,71 +1,261 @@
 ---
-title: "Datetime, date, time (Datum und Uhrzeit)"
-description: "Datetime-Fragen ermöglichen es den Befragten, sowohl Datum als auch Uhrzeit in einem einzigen Feld einzugeben."
+title: "Datum und Uhrzeit, Datum, Zeit"
+description: "Fragen zu Datum und Uhrzeit ermöglichen es den Befragten, sowohl das Datum als auch die Uhrzeit in einem einzigen Feld einzugeben."
 ---
 
-Der `datetime`-Fragetyp in XLSForms und rtSurvey ermöglicht es Befragten, sowohl Datum als auch Uhrzeit in einem einzigen Feld einzugeben. Dieser Fragetyp ist nützlich, wenn Sie einen bestimmten Zeitpunkt erfassen müssen, der sowohl das Datum als auch die exakte Uhrzeit umfasst.
+Die Fragetypen `date`, `time` und `datetime` erfassen Datums- und/oder Zeitwerte. rtSurvey stellt sie in verschiedenen Layout-Modi dar, die über die Spalte `appearance` gesteuert werden.
 
 ## Grundlegende XLSForm-Spezifikation
 
-| type     | name           | label                           |
-|----------|----------------|--------------------------------|
-| datetime | event_datetime | Wann ist das Ereignis eingetreten?|
+| type     | name           | label                         |
+|----------|----------------|-------------------------------|
+| date     | birth_date     | Geburtsdatum                  |
+| time     | start_time     | Um wie viel Uhr begann es?    |
+| datetime | event_datetime | Wann fand das Ereignis statt? |
 
-Weitere Details zum grundlegenden `datetime`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Die Standard-Spezifikation finden Sie in der [XLSForm-Dokumentation](https://xlsform.org/en/#question-types).
 
-## Anwendungen
+## Layout-Modi
 
-`Datetime`-Fragen werden häufig verwendet für:
+### Standard — immer offener Kalender
 
-1. Aufzeichnung von Zeitstempeln von Ereignissen oder Beobachtungen
-2. Planung von Terminen oder Besprechungen
-3. Protokollierung von Start- und Endzeiten von Aktivitäten
-4. Erfassung präziser Momente für zeitkritische Datenerhebungen
+Kein Appearance-Wert erforderlich. Der Kalender (und die Uhr für `time`/`datetime`) wird direkt auf der Seite angezeigt – immer sichtbar, keine Schaltfläche erforderlich.
 
-## rtSurvey-Erweiterungen
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Besuchsdatum  |            |
 
-rtSurvey erweitert die Funktionalität von `datetime`-Fragen um verschiedene Darstellungsformen (Appearances) und Anpassungsoptionen:
+---
 
-### Darstellungsoptionen (Appearances)
+### `inline` — runde Schaltfläche → Modal
 
-- `(Standard)`: Zeigt den Kalender und die Uhr zur Auswahl von Datum und Uhrzeit an
-- `inline`: Zeigt den Kalender und die Uhr als Symbole an
-- `inline-1line`: Zeigt den Kalender und die Uhr zur Auswahl in einem einzeiligen Format an
-- `inline-onlyresult`: Zeigt den Kalender und die Uhr als Symbole am Ende der Zeile an; Symbole verschwinden nach der Auswahl
+Eine runde Icon-Schaltfläche (Kalender oder Uhr) wird neben der Fragenbeschriftung (Label) angezeigt. Durch Antippen öffnet sich ein Modal mit der Auswahl. Nach der Auswahl erscheint der gewählte Wert als Text neben dem Label.
 
-### Farbanpassung
+- Hintergrund der Schaltfläche: Primäre Themenfarbe (überschreibbar)
+- Form der Schaltfläche: Kreis (`border-radius: 50%`)
 
-Sie können die Farbe der Kalender- und Uhr-Symbole mit der Funktion `colors()` anpassen:
+```
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Besuchsdatum  | inline     |
+```
 
-- `inline colors("0099FF")`: Zeigt Symbole mit benutzerdefinierter Farbe an
-- `inline-1line-0000FF`: Anzeige im einzeiligen Format mit benutzerdefinierter Farbe
-- `inline-1line colors("0000FF","FFFF00")`: Anzeige im einzeiligen Format mit mehreren benutzerdefinierten Farben
-- `inline-onlyresult colors("0099FF")`: Zeigt Symbole an, die nach der Auswahl verschwinden, mit benutzerdefinierter Farbe
+---
 
-### Benutzerdefinierte Datums- und Zeitformate
+### `inline-onlyresult` — Schaltfläche verschwindet nach Auswahl
 
-rtSurvey ermöglicht benutzerdefinierte Datums- und Zeitformate durch eine spezielle Syntax:
+Gleich wie `inline`, aber die Schaltfläche blendet sich aus, sobald ein Wert ausgewählt wurde. Nützlich, wenn das Datum nach der Auswahl ohne dauerhaftes Icon sichtbar sein soll.
 
-- `inline-[%Y-%m-%d %H:%M:%S]`: Beispiel für ein benutzerdefiniertes Format (Jahr-Monat-Tag Stunde:Minute:Sekunde)
-- `inline-[%d/%m/%Y %I:%M %p]`: Beispiel für ein benutzerdefiniertes Format (Tag/Monat/Jahr Stunde:Minute AM/PM)
+```
+inline-onlyresult
+```
+
+---
+
+### `inline-1line` — Reihe von Scroll-Rädern (Spinners)
+
+Stellt einzelne Scroll-Steuerelemente (▲ Wert ▼) in einer horizontalen Reihe dar – eine Spalte pro Komponente. Für `date`: Monat / Tag / Jahr. Für `datetime`: Monat / Tag / Jahr / Stunden / Minuten. Für `time`: Stunden / Minuten.
+
+Kein Modal oder Kalender-Popup – der Benutzer scrollt jedes Rad unabhängig.
+
+```
+inline-1line
+```
+
+**Nur bestimmte Komponenten anzeigen**, indem die Komponentennamen hinzugefügt werden:
+
+```
+inline-1line month year      → blendet das Tages-Rad aus
+inline-1line year            → zeigt nur das Jahr an
+```
+
+**Jahresbereich einschränken:**
+
+```
+inline-1line y_range(2000-2030)
+```
+
+---
+
+### `box` — Texteingabe
+
+Stellt ein einfaches Texteingabefeld dar. Der Benutzer gibt das Datum direkt im in der Appearance definierten Format ein.
+
+```
+box(%d/%m/%Y)       → TT/MM/JJJJ
+box(%Y-%m-%d)       → JJJJ-MM-TT
+```
+
+---
+
+### `month-year` — Nur Monat und Jahr
+
+Standard-XLSForm-Appearance. Die Auswahl beginnt mit der Jahresansicht; der Benutzer wählt Monat und Jahr, aber keinen spezifischen Tag.
+
+```
+month-year
+```
+
+---
+
+### `year` — Nur Jahr
+
+Standard-XLSForm-Appearance. Die Auswahl beginnt mit der Jahrzehnt-Ansicht; nur das Jahr ist auswählbar.
+
+```
+year
+```
+
+---
+
+## Benutzerdefiniertes Anzeigeformat
+
+Hängen Sie `-[format]` an eine beliebige `inline`-Appearance an, um zu steuern, wie der ausgewählte Wert als Text angezeigt wird. Verwendet Token im strftime-Stil.
+
+| Token | Bedeutung | Beispiel |
+|-------|---------|---------|
+| `%d`  | Tag (mit führender Null) | 07 |
+| `%e`  | Tag (ohne führende Null) | 7 |
+| `%m`  | Monat (Nummer) | 04 |
+| `%n`  | Monat (Nummer ohne führende Null) | 4 |
+| `%b`  | Monatsabkürzung | Apr |
+| `%Y`  | 4-stelliges Jahr | 2026 |
+| `%y`  | 2-stelliges Jahr | 26 |
+| `%H`  | Stunde (24h) | 14 |
+| `%h`  | Stunde (ohne führende Null) | 14 |
+| `%M`  | Minute | 05 |
+| `%S`  | Sekunde | 00 |
+| `%a`  | Wochentagsabkürzung | Mi |
+
+**Beispiele:**
+
+```
+inline-[%d/%m/%Y]            → 07/04/2026
+inline-[%d %b %Y]            → 07. Apr. 2026
+inline-1line-[%Y-%m-%d]      → Spinner-Eingabe, formatierte Anzeige
+inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
+```
+
+---
+
+## Farbanpassung
+
+Überschreiben Sie die Farbe der Icon-Schaltfläche mit `colors()`:
+
+```
+inline colors("0099FF")                   → Hintergrund der Schaltfläche #0099FF
+inline colors("0099FF","FFFFFF")          → Hintergrund #0099FF, Icon-Farbe #FFFFFF
+inline-1line colors("0000FF","FFFF00")    → Akzentfarben der Spinner
+inline-onlyresult colors("E53935")        → Rote Schaltfläche
+```
+
+---
+
+## Schaltflächenposition mit `display{}`
+
+Der Modifikator `display{}` steuert, wo die Icon-Schaltfläche im Verhältnis zum Fragen-Label erscheint. Gilt für `inline` und `inline-onlyresult`.
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parameter | Werte | Standard |
+|-----------|--------|---------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | Hex-Code z.B. `#FF5500` | Primäre Themenfarbe |
+
+**Ausrichtungsverhalten:**
+
+| Wert | Layout |
+|-------|--------|
+| `right` | Schaltfläche rechts vom Label |
+| `left` | Schaltfläche links vom Label |
+| `top` | Schaltfläche über dem Label, mittig in voller Breite |
+| `center` / `bottom` | Schaltfläche unter dem Label, mittig in voller Breite |
+
+**Beispiele:**
+
+```
+inline display{left}
+inline display{center, large}
+inline display{right, medium, #E53935}
+inline-onlyresult display{bottom, large, #0099FF}
+```
+
+---
+
+## Einschränkung des Datumsbereichs
+
+Verwenden Sie `inputs{range[...]}` um einzuschränken, welche Daten auswählbar sind.
+
+```
+inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
+```
+
+Parameter innerhalb von `range[...]`:
+
+| Parameter | Beschreibung |
+|-----------|-------------|
+| `dateGt(YYYY-MM-DD)` | Minimal auswählbares Datum (größer oder gleich) |
+| `dateLt(YYYY-MM-DD)` | Maximal auswählbares Datum (kleiner oder gleich) |
+| `indayTimeGt(HH:MM:SS)` | Minimale Uhrzeit innerhalb eines Tages (nur bei datetime) |
+| `indayTimeLt(HH:MM:SS)` | Maximale Uhrzeit innerhalb eines Tages (nur bei datetime) |
+
+Es können mehrere Bereiche definiert werden – ein Datum ist auswählbar, wenn es in **einen** der Bereiche fällt.
+
+---
+
+## Label unterdrücken
+
+Fügen Sie `text-nolabel` hinzu, um das Label der Frage auszublenden. Die Schaltfläche wird allein dargestellt.
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Layout-Zusammenfassung
+
+| Appearance | Dargestelltes Widget | Farbe anpassbar |
+|---|---|---|
+| *(keine)* | Immer offener Kalender | Nein |
+| `inline` | Runde Schaltfläche → Modal-Kalender | Ja |
+| `inline-onlyresult` | Runde Schaltfläche → Modal, wird nach Auswahl ausgeblendet | Ja |
+| `inline-1line` | Reihe von Spinners | Ja |
+| `box(%format%)` | Texteingabefeld | Nein |
+| `month-year` | Monats-/Jahresauswahl | Nein |
+| `year` | Nur Jahresauswahl | Nein |
+
+---
 
 ## Beispielhafte Verwendung
 
-Hier ist ein Beispiel dafür, wie Sie eine `datetime`-Frage in einer Umfrage verwenden könnten:
+```
+| type     | name        | label              | appearance                              |
+|----------|-------------|--------------------|-----------------------------------------|
+| date     | visit_date  | Besuchsdatum       | inline display{right} -[%d/%m/%Y]       |
+| date     | birth_date  | Geburtsdatum       | inline-1line y_range(1940-2026)         |
+| time     | start_time  | Startzeit          | inline-1line                            |
+| datetime | event_time  | Ereignisdatum & Zeit| inline display{center, large} -[%d/%m/%Y %H:%M] |
+| date     | report_date | Berichtsdatum      | box(%d/%m/%Y)                           |
+```
 
-| type     | name           | label                                      | appearance                    |
-|----------|----------------|--------------------------------------------|-----------------------------|
-| datetime | incident_time  | Wann ist der Vorfall eingetreten?          | inline-[%d/%m/%Y %I:%M %p]  |
+---
 
-## Empfohlene Vorgehensweisen
+## Best Practices
 
-1. Geben Sie klare Anweisungen zum erwarteten Datums- und Zeitformat.
-2. Erwägen Sie die Verwendung der `inline`-Darstellung für eine kompaktere Anzeige.
-3. Verwenden Sie benutzerdefinierte Formate, wenn Sie spezifische Datums- und Zeitkomponenten oder Formatierungen benötigen.
-4. Achten Sie auf Zeitzonen, wenn Sie Datums- und Zeitdaten über verschiedene Regionen hinweg sammeln.
+1. Verwenden Sie `inline` für kompakte Formulare – es spart im Vergleich zum immer offenen Kalender vertikalen Platz.
+2. Verwenden Sie `inline-1line`, wenn die Befragten einzelne Datumskomponenten anpassen müssen (z. B. Geburtsjahr).
+3. Verwenden Sie `box()` nur, wenn Sie darauf vertrauen können, dass der Interviewer die Daten korrekt eintippt – es wird keine Validierungs-Benutzeroberfläche angezeigt.
+4. Verwenden Sie `display{center, large}`, um die Schaltfläche auf mobilen Bildschirmen prominenter zu machen.
+5. Geben Sie immer `-[format]` an, wenn die Standardanzeige `YYYY-MM-DD` lokale Benutzer verwirren würde.
+6. Berücksichtigen Sie Zeitzonen, wenn Sie Datum-Zeit-Daten über verschiedene Regionen hinweg sammeln.
 
 ## Einschränkungen
 
-- Einige Darstellungsformen oder benutzerdefinierte Formate werden möglicherweise nicht auf allen Geräten oder Plattformen unterstützt.
-- Benutzer benötigen möglicherweise Hilfe bei der korrekten Eingabe von Datum und Uhrzeit, insbesondere bei benutzerdefinierten Formaten.
+- `inline-1line` verwendet standardmäßig immer das heutige Datum, wenn kein Wert vorhanden ist – verwenden Sie die Spalte `default`, um ein bestimmtes Datum vorab auszufüllen.
+- Das `box()`-Format steuert nur die Anzeige; der gespeicherte Wert ist immer ISO 8601.
+- Die Einschränkung des Datumsbereichs (`inputs{range[...]}`) funktioniert nicht mit dem Layout `box`.
 - Zeitzonenunterschiede können die Datenanalyse erschweren, wenn sie nicht ordnungsgemäß berücksichtigt werden.

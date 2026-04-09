@@ -1,93 +1,128 @@
 ---
-title: "Audio"
-description: "Audio questions उत्तरदाताओं को survey के हिस्से के रूप में audio files record और submit करने देते हैं।"
+title: "ऑडियो (Audio)"
+description: "ऑडियो प्रश्न उत्तरदाताओं को सर्वेक्षण के हिस्से के रूप में ऑडियो फाइलें रिकॉर्ड करने और सबमिट करने की अनुमति देते हैं।"
 ---
 
-`audio` question type उत्तरदाताओं को अपने survey response के हिस्से के रूप में **audio record** करने या एक existing audio file upload करने की अनुमति देता है। यह verbal accounts, environmental sounds, testimonials, या कोई भी जानकारी capture करने के लिए उपयोगी है जो text की तुलना में voice के माध्यम से बेहतर conveyed होती है।
+`audio` प्रश्न प्रकार उत्तरदाताओं को उनके सर्वेक्षण प्रतिक्रिया के हिस्से के रूप में **ऑडियो रिकॉर्ड करने** या मौजूदा ऑडियो फ़ाइल अपलोड करने में सक्षम बनाता है। यह मौखिक विवरण, पर्यावरणीय ध्वनियों, प्रशंसापत्रों, या ऐसी किसी भी जानकारी को कैप्चर करने के लिए उपयोगी है जिसे टेक्स्ट की तुलना में आवाज़ के माध्यम से बेहतर तरीके से व्यक्त किया जा सकता है।
 
-## बुनियादी XLSForm विशिष्टता
+## बुनियादी XLSForm विशिष्टता (Basic XLSForm Specification)
 
 | type  | name        | label                        |
 |-------|-------------|------------------------------|
-| audio | voice_note  | कृपया अपनी टिप्पणियाँ record करें |
+| audio | voice_note  | कृपया अपनी टिप्पणियाँ रिकॉर्ड करें  |
 
-Standard audio question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+मानक ऑडियो प्रश्न प्रकार के बारे में अधिक जानकारी के लिए, [XLSForm विशिष्टता](https://xlsform.org/en/#question-types) देखें।
 
-## उपयोग
+## उपयोग (Uses)
 
-Audio questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+ऑडियो प्रश्नों का आमतौर पर उपयोग किया जाता है:
 
-1. Enumerator typing burden को कम करने के लिए open-ended verbal responses capture करना
-2. Testimonials, personal stories, या oral histories record करना
-3. Environmental sounds document करना (जैसे infrastructure के पास noise levels)
-4. Linguistic या health research के लिए voice samples एकत्र करना
-5. उत्तरदाताओं को numeric या select answers में verbal clarifications जोड़ने की अनुमति देना
+1. प्रगणक (enumerator) के टाइपिंग के बोझ को कम करने के लिए ओपन-एंडेड मौखिक प्रतिक्रियाओं को कैप्चर करना
+2. प्रशंसापत्र, व्यक्तिगत कहानियों या मौखिक इतिहास को रिकॉर्ड करना
+3. पर्यावरणीय ध्वनियों का दस्तावेजीकरण करना (जैसे, बुनियादी ढांचे के पास शोर का स्तर)
+4. भाषाई या स्वास्थ्य अनुसंधान के लिए आवाज़ के नमूने एकत्र करना
+5. उत्तरदाताओं को संख्यात्मक या चयन उत्तरों में मौखिक स्पष्टीकरण जोड़ने की अनुमति देना
 
-## डेटा प्रारूप
+## डेटा प्रारूप (Data format)
 
-Audio files form submission के साथ binary attachments के रूप में store होती हैं, आमतौर पर:
+ऑडियो फ़ाइलों को फॉर्म सबमिशन के साथ बाइनरी अटैचमेंट के रूप में संग्रहीत किया जाता है, आमतौर पर:
 
-- **Format:** MP3 या AAC (mobile recording); WAV (high-quality recording)
-- **Naming:** `{instanceID}-{fieldname}.mp3` (या equivalent)
-- **Storage:** Server media folder में upload होती हैं और submission record से linked होती हैं
-- **Access:** Submission management interface से playable और downloadable
+- **प्रारूप (Format):** MP3 या AAC (मोबाइल रिकॉर्डिंग); WAV (उच्च गुणवत्ता वाली रिकॉर्डिंग)
+- **नामकरण (Naming):** `{instanceID}-{fieldname}.mp3` (या समकक्ष)
+- **भंडारण (Storage):** सर्वर मीडिया फोल्डर में अपलोड किया गया और सबमिशन रिकॉर्ड से जुड़ा हुआ
+- **पहुँच (Access):** सबमिशन प्रबंधन इंटरफ़ेस से खेलने योग्य और डाउनलोड करने योग्य
 
 ## rtSurvey एक्सटेंशन
 
-### अधिकतम अवधि
+### अधिकतम अवधि (Maximum duration)
 
-Recording length सीमित करने के लिए `parameters` column का उपयोग करें:
-
-| type | name | label | parameters |
-|------|------|-------|------------|
-| audio | interview | Interview record करें | `max-duration=120` |
-
-`max-duration` seconds में है। Recorder limit पर automatically रुक जाता है।
-
-### गुणवत्ता सेटिंग
-
-Recording quality को `parameters` के माध्यम से सेट किया जा सकता है:
+रिकॉर्डिंग की लंबाई सीमित करने के लिए `parameters` कॉलम का उपयोग करें:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| audio | feedback | Feedback record करें | `quality=normal` |
+| audio | interview | साक्षात्कार रिकॉर्ड करें | `max-duration=120` |
 
-Supported values: `low`, `normal` (default), `voice-only`। `voice-only` noise reduction के साथ spoken audio के लिए optimize करता है।
+`max-duration` सेकंड में है। रिकॉर्डर सीमा पर अपने आप रुक जाता है।
 
-### Submission से पहले Playback
+### गुणवत्ता सेटिंग्स (Quality settings)
 
-Mobile पर, गणनाकर्ता आगे बढ़ने से पहले recorded clip play back कर सकता है। यह default रूप से enabled है — कोई configuration आवश्यक नहीं।
+रिकॉर्डिंग गुणवत्ता `parameters` के माध्यम से सेट की जा सकती है:
 
-### नेटिव रिकॉर्डर एकीकरण
+| type | name | label | parameters |
+|------|------|-------|------------|
+| audio | feedback | फीडबैक रिकॉर्ड करें | `quality=normal` |
 
-Android और iOS पर, `audio` device के native recording app launch करता है। Web पर, यह browser के built-in MediaRecorder API का उपयोग करता है।
+समर्थित मान: `low`, `normal` (डिफ़ॉल्ट), `voice-only` | `voice-only` शोर कम करने के साथ बोले गए ऑडियो के लिए अनुकूलित होता है।
 
-## उदाहरण उपयोग
+### सबमिशन से पहले प्लेबैक
 
-### Maximum duration और hint के साथ
+मोबाइल पर, प्रगणक आगे बढ़ने से पहले रिकॉर्ड की गई क्लिप को चला सकता है। यह डिफ़ॉल्ट रूप से सक्षम है — किसी कॉन्फ़िगरेशन की आवश्यकता नहीं है।
+
+### नेटिव रिकॉर्डर एकीकरण (Native recorder integration)
+
+Android और iOS पर, `audio` डिवाइस के नेटिव रिकॉर्डिंग ऐप को लॉन्च करता है। वेब पर, यह ब्राउज़र के अंतर्निहित MediaRecorder API का उपयोग करता है।
+
+### इनलाइन बटन लेआउट (Inline button layout)
+
+लेबल के बगल में माइक्रोफ़ोन को **गोलाकार आइकन बटन** के रूप में रेंडर करने के लिए `inline` जोड़ें।
+
+```
+| type  | name | label        | appearance                    |
+|-------|------|--------------|-------------------------------|
+| audio | clip | ऑडियो रिकॉर्ड करें | inline display{right}         |
+| audio | clip | ऑडियो रिकॉर्ड करें | inline display{left, large}   |
+```
+
+**बटन की स्थिति (Button position)** — `left`, `right` *(डिफ़ॉल्ट)*, `top`, `center`, `bottom`
+
+**बटन का आकार (Button size)** — `small` *(डिफ़ॉल्ट)*, `medium`, `large`
+
+**बटन का रंग (Button color)** — प्राथमिक रंग को ओवरराइड करने के लिए `display{}` के अंदर एक हेक्स रंग जोड़ें:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**कैप्चर के बाद नियंत्रण (Post-capture control) — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | ऑडियो कैप्चर होने के बाद रिकॉर्ड बटन को छुपाता है |
+| `results{hide(review)}` | प्लेबैक बटन को छुपाता है |
+| `results{hide(filename)}` | फ़ाइल नाम और अवधि छुपाता है |
+| `results{left}` | कैप्चर के बाद आइकन को बाईं ओर ले जाता है |
+
+उदाहरण — कैप्चर के बाद रिकॉर्ड बटन छुपाएं, प्लेबैक रखें:
+```
+inline display{right} results{hide(capture)}
+```
+
+## उदाहरण उपयोग (Example usage)
+
+### अधिकतम अवधि और संकेत (hint) के साथ
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| audio | story | घटना के बारे में अपने शब्दों में बताएं | स्पष्ट रूप से बोलें। Recording 3 minutes बाद रुकती है। | `max-duration=180` |
+| audio | story | हमें घटना के बारे में अपने शब्दों में बताएं | स्पष्ट रूप से बोलें। रिकॉर्डिंग 3 मिनट के बाद रुक जाती है। | `max-duration=180` |
 
-### Conditional audio — केवल तभी जब कोई issue report किया गया हो
+### सशर्त ऑडियो — केवल यदि किसी समस्या की सूचना दी गई थी
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
-| select_one yesno | issue_found | क्या कोई issue पाया गया? | | |
-| audio | issue_audio | Issue का description record करें | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+| select_one yesno | issue_found | क्या कोई समस्या मिली? | | |
+| audio | issue_audio | समस्या का विवरण रिकॉर्ड करें | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
-## सर्वोत्तम प्रथाएँ
+## सर्वोत्तम प्रथाएँ (Best Practices)
 
-1. `label` या `hint` में clearly state करें कि गणनाकर्ता को क्या कहना चाहिए और कितने समय तक।
-2. Slow upload speeds वाले areas में अत्यधिक बड़ी files रोकने के लिए `max-duration` का उपयोग करें।
-3. Recording शुरू करने से पहले उत्तरदाताओं को सूचित करें — अनपेक्षित recording से privacy concerns हो सकती हैं।
-4. Deployment से पहले target device और network conditions पर recording का परीक्षण करें।
-5. Interview-style recordings के लिए intelligibility खोए बिना file size कम करने के लिए `quality=voice-only` सेट करें।
+1. `label` या `hint` में स्पष्ट रूप से बताएं कि प्रगणक को क्या कहना चाहिए और कितनी देर तक।
+2. धीमी अपलोड गति वाले क्षेत्रों में अत्यधिक बड़ी फ़ाइलों को रोकने के लिए `max-duration` का उपयोग करें।
+3. रिकॉर्डिंग शुरू करने से पहले उत्तरदाताओं को सूचित करें — अप्रत्याशित रिकॉर्डिंग गोपनीयता की चिंता पैदा कर सकती है।
+4. परिनियोजन से पहले लक्षित डिवाइस और नेटवर्क स्थितियों पर रिकॉर्डिंग का परीक्षण करें।
+5. स्पष्टता खोए बिना फ़ाइल आकार कम करने के लिए साक्षात्कार-शैली की रिकॉर्डिंग के लिए `quality=voice-only` सेट करें।
 
-## सीमाएं
+## सीमाएं (Limitations)
 
-- Audio files बड़ी हो सकती हैं (normal quality पर 2-minute recording ~2–4 MB) — इसे अपने data plan और upload time estimates में factor करें।
-- सभी browsers MediaRecorder API का समर्थन नहीं करते — Chrome और Firefox reliably काम करते हैं; पुराने iOS versions पर Safari में issues हो सकते हैं।
-- Audio responses का transcription additional post-processing की आवश्यकता है।
-- Privacy regulations voice recording को restrict कर सकते हैं — local data protection requirements verify करें।
+- ऑडियो फ़ाइलें बड़ी हो सकती हैं (सामान्य गुणवत्ता पर 2 मिनट की रिकॉर्डिंग ~2-4 एमबी है) — इसे अपने डेटा प्लान और अपलोड समय के अनुमानों में शामिल करें।
+- सभी ब्राउज़र MediaRecorder API का समर्थन नहीं करते हैं — Chrome और Firefox मज़बूती से काम करते हैं; पुराने iOS संस्करणों पर Safari में समस्याएँ हो सकती हैं।
+- ऑडियो प्रतिक्रियाओं के प्रतिलेखन (transcription) के लिए अतिरिक्त पोस्ट-प्रोसेसिंग (मैनुअल या ऑटोमेटेड स्पीच-टू-टेक्स्ट) की आवश्यकता होती है।
+- गोपनीयता नियम आवाज़ रिकॉर्ड करने को प्रतिबंधित कर सकते हैं — स्थानीय डेटा सुरक्षा आवश्यकताओं को सत्यापित करें।

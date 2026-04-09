@@ -3,109 +3,109 @@ title: "Apariencia"
 description: ""
 ---
 
-La columna `appearance` en rtSurvey le permite personalizar la presentación visual y el comportamiento de las preguntas en sus encuestas. Esta función mejora la experiencia del usuario y puede mejorar significativamente la eficiencia de la recopilación de datos. rtSurvey admite atributos de apariencia estándar de XLSForm y los amplía con opciones adicionales.
+La columna `appearance` en rtSurvey le permite personalizar la presentación visual y el comportamiento de las preguntas en sus encuestas. Esta característica mejora la experiencia del usuario y puede mejorar significativamente la eficiencia de la recopilación de datos. rtSurvey admite atributos de apariencia estándar de XLSForm y los amplía con opciones adicionales.
 
 ## Atributos de apariencia estándar de XLSForm
 
 rtSurvey admite los siguientes atributos de apariencia estándar de XLSForm:
 
 | Atributo de apariencia | Tipos de pregunta | Descripción |
-|----------------------|----------------|-------------|
-| multiline | text | Crea un cuadro de texto multilínea (mejor para clientes web) |
+|------------------------|-------------------|-------------|
+| multiline | text | Crea un cuadro de texto de varias líneas (mejor para clientes web) |
 | minimal | select_one, select_multiple | Muestra las opciones en un menú desplegable |
 | quick | select_one | Avanza automáticamente a la siguiente pregunta después de la selección (solo móvil) |
 | no-calendar | date | Suprime la visualización del calendario (solo móvil) |
-| month-year | date | Permite la selección de mes y año solamente |
-| year | date | Permite la selección de año solamente |
+| month-year | date | Permite la selección de solo mes y año |
+| year | date | Permite la selección de solo año |
 | horizontal-compact | select_one, select_multiple | Muestra las opciones horizontalmente (solo web) |
 | horizontal | select_one, select_multiple | Muestra las opciones horizontalmente en columnas (solo web) |
-| likert | select_one | Presenta las opciones como una escala Likert |
-| compact | select_one, select_multiple | Muestra las opciones una al lado de la otra con relleno mínimo |
+| likert | select_one | Presenta las opciones como una escala de Likert |
+| compact | select_one, select_multiple | Muestra las opciones una al lado de la otra con un relleno mínimo |
 | quickcompact | select_one | Combina la visualización compacta con el avance automático (solo móvil) |
 | field-list | groups | Muestra todo el grupo en una pantalla (solo móvil) |
-| label | select_one, select_multiple | Muestra las etiquetas de opciones sin entradas |
-| list-nolabel | select_one, select_multiple | Muestra las entradas sin etiquetas (usar con `label`) |
+| label | select_one, select_multiple | Muestra las etiquetas de las opciones sin campos de entrada |
+| list-nolabel | select_one, select_multiple | Muestra campos de entrada sin etiquetas (usar con `label`) |
 | table-list | groups | Muestra las preguntas en formato de tabla |
-| signature | image | Habilita la captura de firma (solo móvil) |
+| signature | image | Permite la captura de firma (solo móvil) |
 | draw | image | Permite el dibujo a mano alzada (solo móvil) |
-| map, quick map | select_one, select_one_from_file | Habilita la selección desde características del mapa |
+| map, quick map | select_one, select_one_from_file | Permite la selección a partir de elementos del mapa |
 
-## Mejores prácticas para usar la apariencia
+## Mejores prácticas para el uso de Appearance
 
-1. **Coherencia**: Use los atributos de apariencia de forma coherente en toda su encuesta para una apariencia uniforme.
-2. **Móvil vs. Web**: Considere cómo se renderizarán las apariencias en diferentes dispositivos y plataformas.
-3. **Rendimiento**: Tenga cuidado con los atributos de apariencia que podrían ralentizar la carga del formulario (p. ej., `table-list` para grupos grandes).
+1. **Consistencia**: Use los atributos de apariencia de manera consistente en toda su encuesta para lograr un aspecto uniforme.
+2. **Móvil vs. Web**: Considere cómo se representarán las apariencias en diferentes dispositivos y plataformas.
+3. **Rendimiento**: Tenga cuidado con los atributos de apariencia que podrían ralentizar la carga del formulario (por ejemplo, `table-list` para grupos grandes).
 4. **Experiencia del usuario**: Elija apariencias que faciliten la entrada de datos y sean más intuitivas para los encuestados.
-5. **Pruebas**: Pruebe siempre su formulario en los dispositivos de destino para asegurarse de que las apariencias funcionen como se espera.
+5. **Pruebas**: Siempre pruebe su formulario en los dispositivos de destino para asegurarse de que las apariencias funcionen como se espera.
 
 ## Técnicas avanzadas
 
-### Combinar apariencias
+### Combinación de apariencias
 
-Algunos atributos de apariencia pueden combinarse para diseños más complejos:
+Algunos atributos de apariencia se pueden combinar para diseños más complejos:
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Seleccione uno: | minimal compact |
+| select_one options | choice | Select one: | minimal compact |
 ```
 
 ### Apariencias dinámicas
 
-rtSurvey permite cambios dinámicos de apariencia basados en la lógica del formulario:
+rtSurvey permite cambios de apariencia dinámicos basados en la lógica del formulario:
 
 ```
 | type | name | label | appearance | relevant |
 |------|------|-------|------------|----------|
-| text | time | Ingrese la hora: | inline-[%H:%M] | ${show_time} = 'yes' |
+| text | time | Enter time: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## Consideraciones sobre la aplicación móvil
+## Consideraciones para la aplicación móvil
 
-- Algunas apariencias (p. ej., `quick`, `signature`) son específicas para dispositivos móviles.
-- Pruebe exhaustivamente tanto en Android como en iOS para garantizar un comportamiento coherente.
+- Algunas apariencias (por ejemplo, `quick`, `signature`) son específicas para dispositivos móviles.
+- Realice pruebas exhaustivas tanto en Android como en iOS para garantizar un comportamiento constante.
 
-## Atributos de apariencia extendida de rtSurvey
+## Atributos de apariencia extendidos de rtSurvey
 
 Además de las apariencias estándar de XLSForm, rtSurvey admite las siguientes opciones específicas de la plataforma:
 
 ### Control de datos y visualización
 
 | Atributo de apariencia | Tipos de pregunta | Descripción |
-|----------------------|----------------|-------------|
-| `invisible` | cualquiera | Oculta el campo de la vista mientras aún recopila o calcula su valor. Diferente del tipo `hidden` — el campo aún participa en la lógica. |
-| `displaytitle` | cualquiera | Fuerza la visualización de la etiqueta/título del campo incluso cuando de otro modo estaría suprimido. |
-| `autopull` | select_one, select_multiple | Obtiene automáticamente datos externos para llenar las opciones cuando el formulario se carga o un campo disparador cambia. |
-| `floating_hint` | text, integer, decimal | Muestra el texto de sugerencia como una etiqueta flotante encima del campo de entrada en lugar de debajo. |
-| `calculate-button` | calculate | Agrega un botón visible que activa el recálculo del campo a demanda, en lugar de calcularse automáticamente. |
+|------------------------|-------------------|-------------|
+| `invisible` | any | Oculta el campo de la vista mientras sigue recopilando o calculando su valor. Diferente del tipo `hidden`: el campo sigue participando en la lógica. |
+| `displaytitle` | any | Fuerza la visualización de la etiqueta/título del campo incluso cuando de otro modo se suprimiría. |
+| `autopull` | select_one, select_multiple | Obtiene automáticamente datos externos para completar las opciones cuando se carga el formulario o cambia un campo activador. |
+| `floating_hint` | text, integer, decimal | Muestra el texto de la sugerencia (hint) como una etiqueta flotante sobre el campo de entrada en lugar de debajo de él. |
+| `calculate-button` | calculate | Agrega un botón visible que activa el recálculo del campo a pedido, en lugar de computarlo automáticamente. |
 
-### Diseño
+### Diseño (Layout)
 
 | Atributo de apariencia | Tipos de pregunta | Descripción |
-|----------------------|----------------|-------------|
+|------------------------|-------------------|-------------|
 | `1screen` | group | Fuerza a que todo el grupo se muestre en una sola pantalla independientemente del tamaño del grupo. |
 | `columns(n)` | select_one, select_multiple | Muestra las opciones en `n` columnas. Ejemplo: `columns(3)` muestra tres columnas de botones de radio. |
-| `gridformat<row=R col=C colspan=S align=center>` | cualquiera | Posiciona el campo en un diseño de cuadrícula CSS en la fila `R`, columna `C`, abarcando `S` columnas. Se usa con `advanced-extension/grid-layout`. |
-| `ignore-simplify` | cualquiera | Instruye al renderizador de formularios a omitir la simplificación o condensación automática del diseño de este campo. |
+| `gridformat<row=R col=C colspan=S align=center>` | any | Posiciona el campo en un diseño de cuadrícula CSS en la fila `R`, columna `C`, abarcando `S` columnas. Se usa con `advanced-extension/grid-layout`. |
+| `ignore-simplify` | any | Indica al renderizador del formulario que omita la simplificación o condensación automática del diseño de este campo. |
 
 ### Widgets
 
 | Atributo de apariencia | Tipos de pregunta | Descripción |
-|----------------------|----------------|-------------|
-| `likert` | select_one | Presenta las opciones como una fila de escala Likert (ya en la tabla estándar anterior; confirmado como compatible). |
-| `distress` | select_one | Renderiza las opciones como el widget visual de la Escala de angustia psicológica de Kessler (K10) con iconos emocionales. |
+|------------------------|-------------------|-------------|
+| `likert` | select_one | Presenta las opciones como una fila de escala de Likert (ya está en la tabla estándar anterior; soporte confirmado). |
+| `distress` | select_one | Representa las opciones como el widget visual de la Escala de Distrés Psicológico de Kessler (K10) con iconos emocionales. |
 
 ### Integración de API
 
 | Atributo de apariencia | Tipos de pregunta | Descripción |
-|----------------------|----------------|-------------|
-| `callapi` | text, integer, decimal, select_one | Habilita la integración de llamada a API para este campo. La columna de cálculo debe contener una expresión `callapi()`. Consulte [Call API](advanced-extension/call-api). |
-| `callapi-verify(params)` | text, integer, decimal | Activa una llamada de verificación de API usando parámetros estáticos. El formulario bloquea el progreso hasta que la API confirme el valor. |
+|------------------------|-------------------|-------------|
+| `callapi` | text, integer, decimal, select_one | Permite la integración de llamadas a API para este campo. La columna de cálculo (calculation) debe contener una expresión `callapi()`. Consulte [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Activa una llamada de verificación de API utilizando parámetros estáticos. El formulario bloquea el progreso hasta que la API confirma el valor. |
 | `callapi-verify(dynamicParams)` | text, integer, decimal | Igual que `callapi-verify` pero con parámetros derivados de otros valores de campo en tiempo de ejecución. |
 
-### Formato de fecha/hora en línea
+### Formato de fecha/hora en línea (inline)
 
-Para campos `date`, `time` y `datetime`, puede especificar un formato de visualización personalizado usando una cadena de formato anexada a la apariencia:
+Para los campos `date`, `time` y `datetime`, puede especificar un formato de visualización personalizado utilizando una cadena de formato añadida a la apariencia:
 
 ```
 inline-[%d/%m/%Y]
@@ -121,13 +121,67 @@ Ejemplo:
 | datetime | event_time | Fecha y hora del evento | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | Fecha de nacimiento | inline-[%d/%m/%Y] |
 
+### Diseño de botones en línea — `display{}` y `results{}`
+
+Para los tipos de preguntas que se representan como un botón de icono en línea (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), dos modificadores de apariencia controlan la posición del botón y el comportamiento posterior a la captura.
+
+#### `display{...}` — posición del botón antes de la captura
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parámetro | Valores | Por defecto |
+|-----------|---------|-------------|
+| Align (Alineación) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (Tamaño) | `small`, `medium`, `large` | `small` |
+| Color | hex p. ej. `#FF5500` | color del tema primario |
+| Flag | `inline-icon` | fuerza el modo de icono |
+
+| Valor de Align | Diseño |
+|----------------|--------|
+| `right` | Botón a la derecha de la etiqueta |
+| `left` | Botón a la izquierda de la etiqueta |
+| `top` | Botón sobre la etiqueta, centrado en todo el ancho |
+| `center` / `bottom` | Botón debajo de la etiqueta, centrado en todo el ancho |
+
+#### `results{...}` — diseño y visibilidad después de la captura
+
+Hereda la configuración de `display{}`. Úselo para mover el botón o ocultar elementos una vez que se haya capturado un valor.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| Valor de `hide` | Efecto |
+|---|---|
+| `hide(capture)` | Oculta el botón de captura una vez que existe un archivo/valor |
+| `hide(review)` | Oculta la miniatura de revisión / el botón de reproducción |
+| `hide(filename)` | Oculta el nombre del archivo que se muestra después de la carga |
+| `hide(camera)` | Oculta el botón disparador de la cámara después de la captura |
+| `hide(scanner)` | Oculta el botón de escaneo de código de barras después de escanear un valor |
+| `hide(value)` | Oculta el texto del valor escaneado (barcode / geopoint) |
+
+El widget cambia automáticamente del diseño `display{}` al de `results{}` en el momento en que se captura un valor.
+
+**Ejemplos:**
+
+```
+inline display{right}                                    → icono a la derecha de la etiqueta
+inline display{left, large}                              → icono grande a la izquierda
+inline display{center, large, #FF5500}                   → icono naranja grande debajo de la etiqueta
+inline display{right} results{left}                      → el icono se mueve a la izquierda después de la captura
+inline display{right} results{hide(capture)}             → el icono desaparece después de la captura
+inline display{center} results{hide(capture), hide(filename)}
+```
+
 ## Limitaciones conocidas
 
-- Las apariencias complejas pueden no renderizarse de forma idéntica en todas las plataformas.
-- Algunas apariencias avanzadas de rtSurvey pueden no estar disponibles en el modo sin conexión.
+- Es posible que las apariencias complejas no se representen de forma idéntica en todas las plataformas.
+- Es posible que algunas apariencias avanzadas de rtSurvey no sean compatibles en el modo sin conexión (offline).
 
-## Solución de problemas de apariencia
+## Resolución de problemas de apariencia
 
-1. **Apariencia no aplicada**: Verifique si hay errores tipográficos en la columna de apariencia.
-2. **Renderización inconsistente**: Verifique la compatibilidad con el tipo de pregunta y la plataforma.
+1. **Apariencia no aplicada**: Verifique si hay errores tipográficos en la columna appearance.
+2. **Representación inconsistente**: Verifique la compatibilidad con el tipo de pregunta y la plataforma.
 3. **Problemas de rendimiento**: Considere simplificar las apariencias complejas, especialmente para encuestas grandes.

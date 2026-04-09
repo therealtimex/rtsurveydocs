@@ -1,71 +1,261 @@
 ---
-title: "Dátum-idő, dátum, idő"
-description: "A dátum-idő kérdések lehetővé teszik a válaszadók számára, hogy egyetlen mezőben adjanak meg dátumot és időpontot."
+title: "Dátum és idő, dátum, idő"
+description: "A Dátum és idő kérdések lehetővé teszik a válaszadók számára, hogy egyetlen mezőben adják meg a dátumot és az időt is."
 ---
 
-Az XLSForm és az rtSurvey datetime kérdéstípusa lehetővé teszi a válaszadók számára, hogy egyetlen mezőben adjanak meg dátumot és időpontot. Ez a kérdéstípus hasznos, ha az idő egy adott pillanatát kell rögzíteni, beleértve a dátumot és a pontos időpontot.
+A `date` (dátum), `time` (idő) és `datetime` (dátum és idő) kérdéstípusok dátum- és/vagy időértékeket rögzítenek. Az rtSurvey ezeket többféle elrendezési módban jeleníti meg, amelyeket az `appearance` (megjelenés) oszlop vezérel.
 
-## Alapvető XLSForm-specifikáció
+## Alapvető XLSForm specifikáció
 
-| type     | name           | label                           |
-|----------|----------------|--------------------------------|
-| datetime | event_datetime | Mikor történt az esemény?       |
+| type     | name           | label                         |
+|----------|----------------|-------------------------------|
+| date     | birth_date     | Születési idő                 |
+| time     | start_time     | Mikor kezdődött?              |
+| datetime | event_datetime | Mikor történt az esemény?     |
 
-A datetime kérdéstípus alapvető részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+A szabványos specifikációt az [XLSForm dokumentációjában](https://xlsform.org/en/#question-types) találja.
 
-## Felhasználási területek
+## Elrendezési módok
 
-A dátum-idő kérdések általánosan használt területei:
+### Alapértelmezett — mindig nyitott naptár
 
-1. Események vagy megfigyelések időbélyegeinek rögzítése
-2. Találkozók vagy megbeszélések ütemezése
-3. Tevékenységek kezdő és záró időpontjainak naplózása
-4. Pontos pillanatok rögzítése időérzékeny adatgyűjtéshez
+Nincs szükség megjelenési értékre. A naptár (és a `time`/`datetime` esetén az óra) közvetlenül az oldalon jelenik meg – mindig látható, nincs szükség gombra.
 
-## rtSurvey-bővítések
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Látogatás dátuma |            |
 
-Az rtSurvey kiterjeszti a datetime kérdések funkcionalitását különböző megjelenési és testreszabási lehetőségekkel:
+---
 
-### Megjelenési lehetőségek
+### `inline` — kör alakú gomb → modális ablak
 
-- `(alapértelmezett)`: Naptár és óra megjelenítése dátum és idő kiválasztásához
-- `inline`: Naptár és óra megjelenítése ikonként
-- `inline-1line`: Naptár és óra megjelenítése egysoros formátumban
-- `inline-onlyresult`: Naptár és óra megjelenítése ikonként a sor végén; az ikonok eltűnnek a kiválasztás után
+Egy kör alakú ikongomb (naptár vagy óra) jelenik meg a kérdés felirata mellett. Megérintésével egy modális ablak nyílik meg a választóval. A kiválasztás után a választott érték szövegként jelenik meg a felirat mellett.
 
-### Szín testreszabása
+- Gomb háttere: az elsődleges témaszín (felülírható)
+- Gomb alakja: teljes kör (`border-radius: 50%`)
 
-A naptár és az óra ikonok színe testreszabható a `colors()` függvénnyel:
+```
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Látogatás dátuma | inline     |
+```
 
-- `inline colors("0099FF")`: Ikonok megjelenítése egyedi színnel
-- `inline-1line-0000FF`: Megjelenítés egysoros formátumban egyedi színnel
-- `inline-1line colors("0000FF","FFFF00")`: Megjelenítés egysoros formátumban több egyedi színnel
-- `inline-onlyresult colors("0099FF")`: A kiválasztás után eltűnő ikonok megjelenítése egyedi színnel
+---
 
-### Egyedi dátum és idő formátumok
+### `inline-onlyresult` — a gomb eltűnik a kiválasztás után
 
-Az rtSurvey speciális szintaxissal lehetővé teszi az egyedi dátum és idő formátumokat:
+Ugyanaz, mint az `inline`, de a gomb elrejtőzik, amint kiválasztottak egy értéket. Akkor hasznos, ha azt szeretné, hogy a dátum csak a kiválasztás után legyen látható, állandó ikon nélkül.
 
-- `inline-[%Y-%m-%d %H:%M:%S]`: Egyedi formátum példa (Év-Hónap-Nap Óra:Perc:Másodperc)
-- `inline-[%d/%m/%Y %I:%M %p]`: Egyedi formátum példa (Nap/Hónap/Év Óra:Perc DE/DU)
+```
+inline-onlyresult
+```
 
-## Példa
+---
 
-Íme egy példa arra, hogyan lehet datetime kérdést felhasználni egy felmérésben:
+### `inline-1line` — görgetős választók sora (spinners)
 
-| type     | name           | label                                      | appearance                    |
-|----------|----------------|--------------------------------------------|-----------------------------|
-| datetime | incident_time  | Mikor történt az incidens?                 | inline-[%d/%m/%Y %I:%M %p]  |
+Egyetlen vízszintes sorban jeleníti meg az egyes görgetős vezérlőket (▲ érték ▼) – összetevőnként egy oszlopot. `date` esetén: hónap / nap / év. `datetime` esetén: hónap / nap / év / óra / perc. `time` esetén: óra / perc.
 
-## Bevált módszerek
+Nincs modális ablak vagy felugró naptár – a felhasználó minden választót függetlenül görget.
 
-1. Adjon egyértelmű utasításokat a várt dátum és idő formátumról.
-2. Fontolja meg az `inline` megjelenés használatát kompaktabb megjelenítéshez.
-3. Akkor használjon egyedi formátumokat, ha meghatározott dátum és idő összetevőkre vagy formázásra van szüksége.
-4. Különböző régiókra kiterjedő dátum-idő adatok gyűjtésekor legyen tekintettel az időzónákra.
+```
+inline-1line
+```
+
+**Csak bizonyos összetevők megjelenítése** az összetevők nevének hozzáadásával:
+
+```
+inline-1line month year      → elrejti a nap választót
+inline-1line year            → csak az évet mutatja
+```
+
+**Évtartomány korlátozása:**
+
+```
+inline-1line y_range(2000-2030)
+```
+
+---
+
+### `box` — szöveges bevitel
+
+Egy egyszerű szöveges beviteli mezőt jelenít meg. A felhasználó közvetlenül írja be a dátumot a megjelenésben meghatározott formátum használatával.
+
+```
+box(%d/%m/%Y)       → NN/HH/ÉÉÉÉ
+box(%Y-%m-%d)       → ÉÉÉÉ-HH-NN
+```
+
+---
+
+### `month-year` — csak hónap és év
+
+Szabványos XLSForm megjelenés. A választó az év nézettel indul; a felhasználó hónapot és évet választ, de konkrét napot nem.
+
+```
+month-year
+```
+
+---
+
+### `year` — csak év
+
+Szabványos XLSForm megjelenés. A választó az évtized nézettel indul; csak az év választható ki.
+
+```
+year
+```
+
+---
+
+## Egyedi megjelenítési formátum
+
+Bármely `inline` megjelenéshez fűzze hozzá a `-[format]` jelölést a kiválasztott érték szöveges megjelenítésének vezérléséhez. Strftime-stílusú tokeneket használ.
+
+| Token | Jelentés | Példa |
+|-------|---------|---------|
+| `%d`  | Nap (vezető nullával) | 07 |
+| `%e`  | Nap (kitöltés nélkül) | 7 |
+| `%m`  | Hónap száma | 04 |
+| `%n`  | Hónap száma (kitöltés nélkül) | 4 |
+| `%b`  | Hónap rövidítése | ápr |
+| `%Y`  | 4 jegyű év | 2026 |
+| `%y`  | 2 jegyű év | 26 |
+| `%H`  | Óra (24 órás) | 14 |
+| `%h`  | Óra (kitöltés nélkül) | 14 |
+| `%M`  | Perc | 05 |
+| `%S`  | Másodperc | 00 |
+| `%a`  | Nap nevének rövidítése | sze |
+
+**Példák:**
+
+```
+inline-[%d/%m/%Y]            → 07/04/2026
+inline-[%d %b %Y]            → 07 ápr 2026
+inline-1line-[%Y-%m-%d]      → görgetős bevitel, formázott megjelenítés
+inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
+```
+
+---
+
+## Szín testreszabása
+
+Az ikongomb színének felülírása a `colors()` használatával:
+
+```
+inline colors("0099FF")                   → gomb háttere #0099FF
+inline colors("0099FF","FFFFFF")          → háttér #0099FF, ikon színe #FFFFFF
+inline-1line colors("0000FF","FFFF00")    → görgető kiemelő színei
+inline-onlyresult colors("E53935")        → piros gomb
+```
+
+---
+
+## Gomb pozíciója a `display{}` használatával
+
+A `display{}` módosító szabályozza, hogy az ikongomb hol jelenjen meg a kérdés feliratához képest. Az `inline` és az `inline-onlyresult` típusokra vonatkozik.
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Paraméter | Értékek | Alapértelmezett |
+|-----------|--------|---------|
+| Align (igazítás) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (méret) | `small`, `medium`, `large` | `small` |
+| Color (szín) | hex pl. `#FF5500` | az elsődleges témaszín |
+
+**Igazítási viselkedés:**
+
+| Érték | Elrendezés |
+|-------|--------|
+| `right` | Gomb a felirattól jobbra |
+| `left` | Gomb a felirattól balra |
+| `top` | Gomb a felirat felett, teljes szélességben középre zárva |
+| `center` / `bottom` | Gomb a felirat alatt, teljes szélességben középre zárva |
+
+**Példák:**
+
+```
+inline display{left}
+inline display{center, large}
+inline display{right, medium, #E53935}
+inline-onlyresult display{bottom, large, #0099FF}
+```
+
+---
+
+## Dátumtartomány korlátozása
+
+Az `inputs{range[...]}` használatával korlátozhatja a kiválasztható dátumokat.
+
+```
+inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
+```
+
+Paraméterek a `range[...]` belsejében:
+
+| Paraméter | Leírás |
+|-----------|-------------|
+| `dateGt(YYYY-MM-DD)` | Legkisebb kiválasztható dátum (nagyobb vagy egyenlő) |
+| `dateLt(YYYY-MM-DD)` | Legnagyobb kiválasztható dátum (kisebb vagy egyenlő) |
+| `indayTimeGt(HH:MM:SS)` | Minimális idő egy napon belül (csak datetime esetén) |
+| `indayTimeLt(HH:MM:SS)` | Maximális idő egy napon belül (csak datetime esetén) |
+
+Több tartomány is meghatározható – egy dátum akkor választható ki, ha **bármelyik** tartományba beleesik.
+
+---
+
+## Felirat elrejtése
+
+Adja hozzá a `text-nolabel` értéket a kérdés feliratának elrejtéséhez. A gomb önmagában jelenik meg.
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Elrendezési összefoglaló
+
+| Megjelenés | Megjelenített vezérlő | Testreszabható szín |
+|---|---|---|
+| *(nincs)* | Mindig nyitott naptár | Nem |
+| `inline` | Kör alakú gomb → modális naptár | Igen |
+| `inline-onlyresult` | Kör alakú gomb → modális ablak, kiválasztás után eltűnik | Igen |
+| `inline-1line` | Görgetős választók sora | Igen |
+| `box(%format%)` | Szöveges beviteli mező | Nem |
+| `month-year` | Hónap/év választó | Nem |
+| `year` | Csak év választó | Nem |
+
+---
+
+## Példa a használatra
+
+```
+| type     | name        | label              | appearance                              |
+|----------|-------------|--------------------|-----------------------------------------|
+| date     | visit_date  | Látogatás dátuma   | inline display{right} -[%d/%m/%Y]       |
+| date     | birth_date  | Születési idő      | inline-1line y_range(1940-2026)         |
+| time     | start_time  | Kezdési idő        | inline-1line                            |
+| datetime | event_time  | Esemény dátuma és ideje | inline display{center, large} -[%d/%m/%Y %H:%M] |
+| date     | report_date | Jelentés dátuma    | box(%d/%m/%Y)                           |
+```
+
+---
+
+## Legjobb gyakorlatok
+
+1. Használja az `inline` megjelenést a kompakt űrlapokhoz – függőleges helyet takarít meg a mindig nyitott naptárhoz képest.
+2. Használja az `inline-1line` megjelenést, ha a válaszadóknak az egyes dátumösszetevőket (pl. születési évet) kell módosítaniuk.
+3. A `box()` megjelenést csak akkor használja, ha bízik abban, hogy a kérdező megfelelően gépeli be a dátumokat – nem jelenik meg ellenőrző felület.
+4. Használja a `display{center, large}` beállítást, hogy a gomb hangsúlyosabb legyen a mobilképernyőkön.
+5. Mindig adja meg a `-[format]` jelölést, ha az alapértelmezett `YYYY-MM-DD` megjelenítés megzavarná a helyi felhasználókat.
+6. Legyen körültekintő az időzónákkal kapcsolatban, amikor különböző régiókban gyűjt dátum-idő adatokat.
 
 ## Korlátozások
 
-- Egyes megjelenések vagy egyedi formátumok esetleg nem támogatottak minden eszközön vagy platformon.
-- A felhasználóknak útmutatásra lehet szükségük a dátum és idő helyes megadásához, különösen egyedi formátumokkal.
-- Az időzóna-különbségek bonyolíthatják az adatelemzést, ha nem megfelelően figyelembe vett.
+- Az `inline-1line` mindig a mai dátumot veszi alapul, ha nincs érték – használja a `default` oszlopot egy adott dátum előre kitöltéséhez.
+- A `box()` formátum csak a megjelenítést szabályozza; a tárolt érték mindig ISO 8601.
+- A dátumtartomány korlátozása (`inputs{range[...]}`) nem működik a `box` elrendezéssel.
+- Az időzóna-különbségek bonyolíthatják az adatelemzést, ha nem veszik figyelembe őket megfelelően.

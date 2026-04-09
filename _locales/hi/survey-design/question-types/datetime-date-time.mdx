@@ -1,71 +1,261 @@
 ---
-title: "Datetime, date, time"
-description: "Datetime questions उत्तरदाताओं को एक single field में दोनों date और time input करने देते हैं।"
+title: "तारीख और समय, तारीख, समय"
+description: "तारीख और समय (Datetime) प्रश्न उत्तरदाताओं को एक ही क्षेत्र में तारीख और समय दोनों दर्ज करने की अनुमति देते हैं।"
 ---
 
-XLSForms और rtSurvey में datetime question type उत्तरदाताओं को एक single field में दोनों date और time input करने की अनुमति देता है। यह question type तब उपयोगी है जब आपको समय में एक specific moment capture करने की आवश्यकता हो, जिसमें date और exact time दोनों शामिल हों।
+`date`, `time`, और `datetime` प्रश्न प्रकार तारीख और/या समय के मानों को कैप्चर करते हैं। rtSurvey उन्हें `appearance` कॉलम द्वारा नियंत्रित कई लेआउट मोड के साथ रेंडर करता है।
 
-## बुनियादी XLSForm विशिष्टता
+## बुनियादी XLSForm विनिर्देश (Specification)
 
-| type     | name           | label                           |
-|----------|----------------|--------------------------------|
-| datetime | event_datetime | घटना कब हुई?                    |
+| type     | name           | label                     |
+|----------|----------------|---------------------------|
+| date     | birth_date     | जन्म तिथि                 |
+| time     | start_time     | यह किस समय शुरू हुआ?      |
+| datetime | event_datetime | घटना कब हुई?              |
 
-Basic datetime question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+मानक विनिर्देश के लिए [XLSForm दस्तावेज़](https://xlsform.org/en/#question-types) देखें।
 
-## उपयोग
+## लेआउट मोड
 
-Datetime questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+### डिफ़ॉल्ट — हमेशा खुला रहने वाला कैलेंडर
 
-1. Events या observations के timestamps record करना
-2. Appointments या meetings schedule करना
-3. Activities के start और end times log करना
-4. Time-sensitive data collection के लिए precise moments capture करना
+किसी appearance मान की आवश्यकता नहीं है। कैलेंडर (और `time`/`datetime` के लिए घड़ी) सीधे पेज पर रेंडर होता है — हमेशा दिखाई देता है, किसी बटन की आवश्यकता नहीं होती है।
 
-## rtSurvey एक्सटेंशन
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | यात्रा की तिथि|            |
 
-rtSurvey datetime questions की functionality को विभिन्न appearances और customization options के साथ विस्तारित करता है:
+---
 
-### उपस्थिति विकल्प
+### `inline` — गोलाकार बटन → मोडल (Modal)
 
-- `(default)`: Date और time select करने के लिए calendar और clock प्रदर्शित करें
-- `inline`: Calendar और clock को icons के रूप में प्रदर्शित करें
-- `inline-1line`: Calendar और clock को single row format में selection के लिए प्रदर्शित करें
-- `inline-onlyresult`: Calendar और clock icons को line के end में प्रदर्शित करें; चयन के बाद icons गायब हो जाते हैं
+प्रश्न के लेबल के बगल में एक गोलाकार आइकन बटन (कैलेंडर या घड़ी) तैरता है। इसे टैप करने पर पिकर के साथ एक मोडल खुलता है। चयन के बाद, चुना गया मान लेबल के बगल में टेक्स्ट के रूप में दिखाई देता है।
 
-### रंग अनुकूलन
+- बटन बैकग्राउंड: प्राथमिक थीम रंग (ओवरराइड करने योग्य)
+- बटन का आकार: पूर्ण गोला (`border-radius: 50%`)
 
-आप `colors()` function का उपयोग करके calendar और clock icons का color customize कर सकते हैं:
+```
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | यात्रा की तिथि| inline     |
+```
 
-- `inline colors("0099FF")`: Custom color के साथ icons प्रदर्शित करें
-- `inline-1line-0000FF`: Custom color के साथ single row format में प्रदर्शित करें
-- `inline-1line colors("0000FF","FFFF00")`: Multiple custom colors के साथ single row format में प्रदर्शित करें
-- `inline-onlyresult colors("0099FF")`: चयन के बाद गायब होने वाले icons प्रदर्शित करें, custom color के साथ
+---
 
-### Custom Date और Time Formats
+### `inline-onlyresult` — चयन के बाद बटन गायब हो जाता है
 
-rtSurvey special syntax का उपयोग करके custom date और time formats की अनुमति देता है:
+`inline` के समान लेकिन मान चुनने के बाद बटन अपने आप छिप जाता है। तब उपयोगी होता है जब आप चाहते हैं कि तारीख केवल चुने जाने के बाद ही दिखाई दे, बिना किसी स्थायी आइकन के।
 
-- `inline-[%Y-%m-%d %H:%M:%S]`: Custom format उदाहरण (Year-Month-Day Hour:Minute:Second)
-- `inline-[%d/%m/%Y %I:%M %p]`: Custom format उदाहरण (Day/Month/Year Hour:Minute AM/PM)
+```
+inline-onlyresult
+```
+
+---
+
+### `inline-1line` — स्पिनर्स (Spinners) की पंक्ति
+
+एकल क्षैतिज पंक्ति में व्यक्तिगत स्पिनर नियंत्रण (▲ मान ▼) रेंडर करता है — प्रति घटक एक कॉलम। `date` के लिए: महीना / दिन / वर्ष। `datetime` के लिए: महीना / दिन / वर्ष / घंटे / मिनट। `time` के लिए: घंटे / मिनट।
+
+कोई मोडल या कैलेंडर पॉपअप नहीं — उपयोगकर्ता प्रत्येक स्पिनर को स्वतंत्र रूप से स्क्रॉल करता है।
+
+```
+inline-1line
+```
+
+घटक नाम जोड़कर **केवल विशिष्ट घटक दिखाएं**:
+
+```
+inline-1line month year      → दिन के स्पिनर को छिपा देता है
+inline-1line year            → केवल वर्ष दिखाता है
+```
+
+**वर्ष की सीमा सीमित करें:**
+
+```
+inline-1line y_range(2000-2030)
+```
+
+---
+
+### `box` — टेक्स्ट इनपुट
+
+एक साधारण टेक्स्ट इनपुट फ़ील्ड रेंडर करता है। उपयोगकर्ता appearance में परिभाषित प्रारूप का उपयोग करके सीधे तारीख टाइप करता है।
+
+```
+box(%d/%m/%Y)       → DD/MM/YYYY
+box(%Y-%m-%d)       → YYYY-MM-DD
+```
+
+---
+
+### `month-year` — केवल महीना और वर्ष
+
+मानक XLSForm उपस्थिति। पिकर वर्ष दृश्य से शुरू होता है; उपयोगकर्ता महीने और वर्ष का चयन करता है लेकिन किसी विशिष्ट दिन का नहीं।
+
+```
+month-year
+```
+
+---
+
+### `year` — केवल वर्ष
+
+मानक XLSForm उपस्थिति। पिकर दशक दृश्य से शुरू होता है; केवल वर्ष चयन योग्य है।
+
+```
+year
+```
+
+---
+
+## कस्टम डिस्प्ले प्रारूप
+
+चुने गए मान को टेक्स्ट के रूप में कैसे प्रदर्शित किया जाए, इसे नियंत्रित करने के लिए किसी भी `inline` उपस्थिति में `-[format]` जोड़ें। strftime-शैली के टोकन का उपयोग करता है।
+
+| टोकन | अर्थ | उदाहरण |
+|-------|---------|---------|
+| `%d`  | दिन (शून्य के साथ) | 07 |
+| `%e`  | दिन (बिना शून्य के) | 7 |
+| `%m`  | महीने की संख्या | 04 |
+| `%n`  | महीने की संख्या (बिना शून्य के) | 4 |
+| `%b`  | महीने का संक्षिप्त नाम | Apr |
+| `%Y`  | 4-अंकीय वर्ष | 2026 |
+| `%y`  | 2-अंकीय वर्ष | 26 |
+| `%H`  | घंटा (24 घंटे) | 14 |
+| `%h`  | घंटा (बिना शून्य के) | 14 |
+| `%M`  | मिनट | 05 |
+| `%S`  | सेकंड | 00 |
+| `%a`  | दिन के नाम का संक्षिप्त नाम | Wed |
+
+**उदाहरण:**
+
+```
+inline-[%d/%m/%Y]            → 07/04/2026
+inline-[%d %b %Y]            → 07 Apr 2026
+inline-1line-[%Y-%m-%d]      → स्पिनर इनपुट, स्वरूपित डिस्प्ले
+inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
+```
+
+---
+
+## रंगों का अनुकूलन (Color customization)
+
+`colors()` का उपयोग करके आइकन बटन का रंग ओवरराइड करें:
+
+```
+inline colors("0099FF")                   → बटन बैकग्राउंड #0099FF
+inline colors("0099FF","FFFFFF")          → बैकग्राउंड #0099FF, आइकन का रंग #FFFFFF
+inline-1line colors("0000FF","FFFF00")    → स्पिनर एक्सेंट रंग
+inline-onlyresult colors("E53935")        → लाल बटन
+```
+
+---
+
+## `display{}` के साथ बटन की स्थिति
+
+`display{}` संशोधक नियंत्रित करता है कि प्रश्न लेबल के सापेक्ष आइकन बटन कहाँ दिखाई देता है। यह `inline` और `inline-onlyresult` पर लागू होता है।
+
+```
+display{<align>, <size>, <color>}
+```
+
+| पैरामीटर | मान | डिफ़ॉल्ट |
+|-----------|--------|---------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex जैसे कि `#FF5500` | प्राथमिक थीम रंग |
+
+**अलाइन व्यवहार:**
+
+| मान | लेआउट |
+|-------|--------|
+| `right` | लेबल के दाईं ओर बटन |
+| `left` | लेबल के बाईं ओर बटन |
+| `top` | लेबल के ऊपर बटन, पूर्ण चौड़ाई में केंद्रित |
+| `center` / `bottom` | लेबल के नीचे बटन, पूर्ण चौड़ाई में केंद्रित |
+
+**उदाहरण:**
+
+```
+inline display{left}
+inline display{center, large}
+inline display{right, medium, #E53935}
+inline-onlyresult display{bottom, large, #0099FF}
+```
+
+---
+
+## तारीख सीमा प्रतिबंध
+
+चयन योग्य तारीखों को प्रतिबंधित करने के लिए `inputs{range[...]}` का उपयोग करें।
+
+```
+inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
+```
+
+`range[...]` के अंदर के पैरामीटर:
+
+| पैरामीटर | विवरण |
+|-----------|-------------|
+| `dateGt(YYYY-MM-DD)` | न्यूनतम चयन योग्य तारीख (इससे बड़ी या बराबर) |
+| `dateLt(YYYY-MM-DD)` | अधिकतम चयन योग्य तारीख (इससे कम या बराबर) |
+| `indayTimeGt(HH:MM:SS)` | एक दिन के भीतर न्यूनतम समय (केवल datetime के लिए) |
+| `indayTimeLt(HH:MM:SS)` | एक दिन के भीतर अधिकतम समय (केवल datetime के लिए) |
+
+एकाधिक रेंज परिभाषित की जा सकती हैं — यदि कोई तारीख **किसी भी** रेंज के भीतर आती है तो वह चयन योग्य है।
+
+---
+
+## लेबल छिपाएँ
+
+प्रश्न लेबल को छिपाने के लिए `text-nolabel` जोड़ें। बटन अकेले रेंडर होता है।
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## लेआउट सारांश
+
+| Appearance | रेंडर किया गया विजेट | रंग अनुकूलन योग्य |
+|---|---|---|
+| *(कोई नहीं)* | हमेशा खुला रहने वाला कैलेंडर | नहीं |
+| `inline` | गोलाकार बटन → मोडल कैलेंडर | हाँ |
+| `inline-onlyresult` | गोलाकार बटन → मोडल, चुनने के बाद छिप जाता है | हाँ |
+| `inline-1line` | स्पिनर्स की पंक्ति | हाँ |
+| `box(%format%)` | टेक्स्ट इनपुट फ़ील्ड | नहीं |
+| `month-year` | महीना/वर्ष पिकर | नहीं |
+| `year` | केवल वर्ष पिकर | नहीं |
+
+---
 
 ## उदाहरण उपयोग
 
-यहाँ बताया गया है कि आप survey में datetime question का उपयोग कैसे कर सकते हैं:
+```
+| type     | name        | label              | appearance                              |
+|----------|-------------|--------------------|-----------------------------------------|
+| date     | visit_date  | यात्रा की तिथि     | inline display{right} -[%d/%m/%Y]       |
+| date     | birth_date  | जन्म तिथि          | inline-1line y_range(1940-2026)         |
+| time     | start_time  | शुरू होने का समय   | inline-1line                            |
+| datetime | event_time  | घटना की तिथि और समय| inline display{center, large} -[%d/%m/%Y %H:%M] |
+| date     | report_date | रिपोर्टिंग तिथि     | box(%d/%m/%Y)                           |
+```
 
-| type     | name           | label                                      | appearance                    |
-|----------|----------------|--------------------------------------------|-----------------------------|
-| datetime | incident_time  | घटना कब हुई?                               | inline-[%d/%m/%Y %I:%M %p]  |
+---
 
-## सर्वोत्तम प्रथाएँ
+## सर्वोत्तम प्रथाएं (Best Practices)
 
-1. Expected date और time format पर clear instructions प्रदान करें।
-2. अधिक compact display के लिए `inline` appearance का उपयोग करने पर विचार करें।
-3. जब आपको specific date और time components या formatting की आवश्यकता हो तो custom formats का उपयोग करें।
-4. विभिन्न regions में datetime data एकत्र करते समय time zones के प्रति सावधान रहें।
+1. कॉम्पैक्ट फॉर्म के लिए `inline` का उपयोग करें — यह हमेशा खुले रहने वाले कैलेंडर की तुलना में लंबवत जगह बचाता है।
+2. जब उत्तरदाताओं को व्यक्तिगत तारीख घटकों (जैसे जन्म का वर्ष) को समायोजित करने की आवश्यकता हो, तो `inline-1line` का उपयोग करें।
+3. `box()` का उपयोग केवल तभी करें जब आपको प्रगणक (enumerator) पर भरोसा हो कि वह तारीख सही ढंग से टाइप करेगा — कोई सत्यापन यूआई (UI) नहीं दिखाया जाता है।
+4. मोबाइल स्क्रीन पर बटन को अधिक प्रमुख बनाने के लिए `display{center, large}` का उपयोग करें।
+5. हमेशा `-[format]` निर्दिष्ट करें जब डिफ़ॉल्ट `YYYY-MM-DD` डिस्प्ले स्थानीय उपयोगकर्ताओं को भ्रमित कर सकता है।
+6. विभिन्न क्षेत्रों में तारीख-समय डेटा एकत्र करते समय समय क्षेत्रों (time zones) के प्रति सचेत रहें।
 
 ## सीमाएं
 
-- कुछ appearances या custom formats सभी devices या platforms पर supported नहीं हो सकते।
-- Users को date और time correctly input करने पर मार्गदर्शन की आवश्यकता हो सकती है, विशेषकर custom formats के साथ।
-- Time zone differences को properly account न किए जाने पर data analysis को complicated बना सकते हैं।
+- `inline-1line` हमेशा आज की तारीख पर डिफ़ॉल्ट होता है यदि कोई मान मौजूद नहीं है — किसी विशिष्ट तारीख को पहले से भरने के लिए `default` कॉलम का उपयोग करें।
+- `box()` प्रारूप केवल डिस्प्ले को नियंत्रित करता है; संग्रहीत मान हमेशा ISO 8601 होता है।
+- तारीख सीमा प्रतिबंध (`inputs{range[...]}`) `box` लेआउट के साथ काम नहीं करता है।
+- यदि डेटा विश्लेषण में समय क्षेत्र के अंतर को ठीक से ध्यान में नहीं रखा जाता है, तो यह विश्लेषण को जटिल बना सकता है।

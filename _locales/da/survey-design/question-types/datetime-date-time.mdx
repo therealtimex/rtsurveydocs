@@ -1,71 +1,261 @@
 ---
-title: "Datetime, dato, tid"
-description: "Datetime-spørgsmål giver respondenter mulighed for at indtaste både dato og tid i ét felt."
+title: "Dato og tid, dato, tid"
+description: "Dato og tid-spørgsmål giver respondenter mulighed for at indtaste både dato og tid i et enkelt felt."
 ---
 
-Spørgsmålstypen datetime i XLSForms og rtSurvey giver respondenter mulighed for at indtaste både dato og tid i ét felt. Denne spørgsmålstype er nyttig, når du har brug for at fange et bestemt tidspunkt, inklusive både datoen og det præcise tidspunkt.
+Spørgsmålstyperne `date`, `time` og `datetime` indsamler dato- og/eller tidsværdier. rtSurvey viser dem med flere layouttilstande styret af kolonnen `appearance`.
 
 ## Grundlæggende XLSForm-specifikation
 
-| type     | name           | label                           |
-|----------|----------------|--------------------------------|
-| datetime | event_datetime | Hvornår skete hændelsen?       |
+| type     | name           | label                         |
+|----------|----------------|-------------------------------|
+| date     | birth_date     | Fødselsdato                   |
+| time     | start_time     | Hvornår startede det?         |
+| datetime | event_datetime | Hvornår fandt begivenheden sted? |
 
-For flere detaljer om den grundlæggende datetime-spørgsmålstype, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+For standard-specifikationen se [XLSForm-dokumentationen](https://xlsform.org/en/#question-types).
 
-## Anvendelser
+## Layouttilstande
 
-Datetime-spørgsmål bruges typisk til:
+### Standard — altid åben kalender
 
-1. Registrering af tidsstempler for hændelser eller observationer
-2. Planlægning af aftaler eller møder
-3. Logning af start- og sluttider for aktiviteter
-4. Optagelse af præcise øjeblikke til tidsfølsom dataindsamling
+Ingen værdi for udseende er nødvendig. Kalenderen (og uret for `time`/`datetime`) vises direkte på siden — altid synlig, ingen knap påkrævet.
 
-## rtSurvey-udvidelser
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Besøgsdato    |            |
 
-rtSurvey udvider funktionaliteten af datetime-spørgsmål med forskellige appearances og tilpasningsmuligheder:
+---
 
-### Appearance-muligheder
+### `inline` — cirkulær knap → modal
 
-- `(standard)`: Vis kalender og ur til valg af dato og tid
-- `inline`: Vis kalender og ur som ikoner
-- `inline-1line`: Vis kalender og ur til valg i enkeltradformat
-- `inline-onlyresult`: Vis kalender og ur som ikoner i slutningen af linjen; ikoner forsvinder efter valg
+En cirkulær ikonknap (kalender eller ur) flyder ved siden af spørgsmålets label. Ved at trykke på den åbnes en modal med vælgeren. Efter valg vises den valgte værdi som tekst ved siden af labelen.
 
-### Farvetilpasning
+- Knapbaggrund: primær temafarve (kan overskrives)
+- Knapform: hel cirkel (`border-radius: 50%`)
 
-Du kan tilpasse farven på kalender- og urikonerne ved hjælp af funktionen `colors()`:
+```
+| type | name       | label         | appearance |
+|------|------------|---------------|------------|
+| date | start_date | Besøgsdato    | inline     |
+```
 
-- `inline colors("0099FF")`: Vis ikoner med brugerdefineret farve
-- `inline-1line-0000FF`: Vis i enkeltradformat med brugerdefineret farve
-- `inline-1line colors("0000FF","FFFF00")`: Vis i enkeltradformat med flere brugerdefinerede farver
-- `inline-onlyresult colors("0099FF")`: Vis ikoner der forsvinder efter valg, med brugerdefineret farve
+---
 
-### Brugerdefinerede dato- og tidsformater
+### `inline-onlyresult` — knappen forsvinder efter valg
 
-rtSurvey tillader brugerdefinerede dato- og tidsformater ved hjælp af speciel syntaks:
+Samme som `inline`, men knappen skjuler sig selv, når en værdi er valgt. Nyttig, når du kun ønsker datoen synlig efter den er valgt, uden et vedvarende ikon.
 
-- `inline-[%Y-%m-%d %H:%M:%S]`: Eksempel på brugerdefineret format (År-Måned-Dag Time:Minut:Sekund)
-- `inline-[%d/%m/%Y %I:%M %p]`: Eksempel på brugerdefineret format (Dag/Måned/År Time:Minut AM/PM)
+```
+inline-onlyresult
+```
+
+---
+
+### `inline-1line` — række af spinnere
+
+Viser individuelle spinner-kontroller (▲ værdi ▼) i en enkelt horisontal række — én kolonne pr. komponent. For `date`: måned / dag / år. For `datetime`: måned / dag / år / timer / minutter. For `time`: timer / minutter.
+
+Ingen modal eller kalender-popup — brugeren ruller hver spinner uafhængigt.
+
+```
+inline-1line
+```
+
+**Vis kun specifikke komponenter** ved at tilføje komponentnavnene:
+
+```
+inline-1line month year      → skjuler dag-spinner
+inline-1line year            → viser kun år
+```
+
+**Begræns årstal-området:**
+
+```
+inline-1line y_range(2000-2030)
+```
+
+---
+
+### `box` — tekstindtastning
+
+Viser et almindeligt tekstindtastningsfelt. Brugeren skriver datoen direkte ved hjælp af det format, der er defineret i appearance.
+
+```
+box(%d/%m/%Y)       → DD/MM/ÅÅÅÅ
+box(%Y-%m-%d)       → ÅÅÅÅ-MM-DD
+```
+
+---
+
+### `month-year` — kun måned og år
+
+Standard XLSForm-udseende. Vælgeren starter ved årsvisning; brugeren vælger måned og år, men ikke en specifik dag.
+
+```
+month-year
+```
+
+---
+
+### `year` — kun år
+
+Standard XLSForm-udseende. Vælgeren starter ved årtivisning; kun året kan vælges.
+
+```
+year
+```
+
+---
+
+## Brugerdefineret visningsformat
+
+Tilføj `-[format]` til ethvert `inline`-udseende for at styre, hvordan den valgte værdi vises som tekst. Bruger strftime-stil tokens.
+
+| Token | Betydning | Eksempel |
+|-------|---------|---------|
+| `%d`  | Dag (med foranstillet nul) | 07 |
+| `%e`  | Dag (uden foranstillet nul) | 7 |
+| `%m`  | Måned nummer | 04 |
+| `%n`  | Måned nummer (uden foranstillet nul) | 4 |
+| `%b`  | Måned forkortelse | Apr |
+| `%Y`  | 4-cifret år | 2026 |
+| `%y`  | 2-cifret år | 26 |
+| `%H`  | Time (24t) | 14 |
+| `%h`  | Time (uden foranstillet nul) | 14 |
+| `%M`  | Minut | 05 |
+| `%S`  | Sekund | 00 |
+| `%a`  | Dag navn forkortelse | Ons |
+
+**Eksempler:**
+
+```
+inline-[%d/%m/%Y]            → 07/04/2026
+inline-[%d %b %Y]            → 07 Apr 2026
+inline-1line-[%Y-%m-%d]      → spinner-indtastning, formateret visning
+inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
+```
+
+---
+
+## Farvetilpasning
+
+Overskriv ikonknappens farve ved hjælp af `colors()`:
+
+```
+inline colors("0099FF")                   → knapbaggrund #0099FF
+inline colors("0099FF","FFFFFF")          → baggrund #0099FF, ikonfarve #FFFFFF
+inline-1line colors("0000FF","FFFF00")    → spinner-accentfarver
+inline-onlyresult colors("E53935")        → rød knap
+```
+
+---
+
+## Knapposition med `display{}`
+
+Modifikatoren `display{}` styrer, hvor ikonknappen vises i forhold til spørgsmålets label. Gælder for `inline` og `inline-onlyresult`.
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parameter | Værdier | Standard |
+|-----------|--------|---------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex f.eks. `#FF5500` | primær temafarve |
+
+**Align-adfærd:**
+
+| Værdi | Layout |
+|-------|--------|
+| `right` | Knap til højre for labelen |
+| `left` | Knap til venstre for labelen |
+| `top` | Knap over labelen, centreret i fuld bredde |
+| `center` / `bottom` | Knap under labelen, centreret i fuld bredde |
+
+**Eksempler:**
+
+```
+inline display{left}
+inline display{center, large}
+inline display{right, medium, #E53935}
+inline-onlyresult display{bottom, large, #0099FF}
+```
+
+---
+
+## Datobegrænsning
+
+Brug `inputs{range[...]}` til at begrænse, hvilke datoer der kan vælges.
+
+```
+inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
+```
+
+Parametre inde i `range[...]`:
+
+| Parameter | Beskrivelse |
+|-----------|-------------|
+| `dateGt(YYYY-MM-DD)` | Mindste valgbare dato (større end eller lig med) |
+| `dateLt(YYYY-MM-DD)` | Største valgbare dato (mindre end eller lig med) |
+| `indayTimeGt(HH:MM:SS)` | Minimum tid på en dag (kun datetime) |
+| `indayTimeLt(HH:MM:SS)` | Maksimum tid på en dag (kun datetime) |
+
+Der kan defineres flere områder — en dato kan vælges, hvis den falder inden for **et hvilket som helst** af områderne.
+
+---
+
+## Skjul labelen
+
+Tilføj `text-nolabel` for at skjule spørgsmålets label. Knappen vises alene.
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Layout-oversigt
+
+| Udseende | Widget der vises | Farve kan tilpasses |
+|---|---|---|
+| *(ingen)* | Altid åben kalender | Nej |
+| `inline` | Cirkulær knap → modal kalender | Ja |
+| `inline-onlyresult` | Cirkulær knap → modal, skjules efter valg | Ja |
+| `inline-1line` | Række af spinnere | Ja |
+| `box(%format%)` | Tekstindtastningsfelt | Nej |
+| `month-year` | Måned/år-vælger | Nej |
+| `year` | Kun år-vælger | Nej |
+
+---
 
 ## Eksempel på brug
 
-Her er et eksempel på, hvordan du kan bruge et datetime-spørgsmål i en undersøgelse:
+```
+| type     | name        | label              | appearance                              |
+|----------|-------------|--------------------|-----------------------------------------|
+| date     | visit_date  | Besøgsdato         | inline display{right} -[%d/%m/%Y]       |
+| date     | birth_date  | Fødselsdato        | inline-1line y_range(1940-2026)         |
+| time     | start_time  | Starttidspunkt     | inline-1line                            |
+| datetime | event_time  | Begivenhed dato & tid | inline display{center, large} -[%d/%m/%Y %H:%M] |
+| date     | report_date | Rapporteringsdato  | box(%d/%m/%Y)                           |
+```
 
-| type     | name           | label                                      | appearance                    |
-|----------|----------------|--------------------------------------------|-----------------------------|
-| datetime | incident_time  | Hvornår skete hændelsen?               | inline-[%d/%m/%Y %I:%M %p]  |
+---
 
 ## Bedste praksis
 
-1. Giv klare instruktioner om det forventede dato- og tidsformat.
-2. Overvej at bruge `inline` appearance til en mere kompakt visning.
-3. Brug brugerdefinerede formater, når du har brug for specifikke dato- og tidskomponenter eller formatering.
-4. Vær opmærksom på tidszoner ved indsamling af datetime-data på tværs af forskellige regioner.
+1. Brug `inline` til kompakte formularer — det sparer vertikal plads sammenlignet med den altid åbne kalender.
+2. Brug `inline-1line`, når respondenter skal justere individuelle datokomponenter (f.eks. fødselsår).
+3. Brug kun `box()`, når du stoler på, at indsamleren skriver datoer korrekt — der vises ingen valideringsbrugerflade.
+4. Brug `display{center, large}` for at gøre knappen mere fremtrædende på mobilskærme.
+5. Angiv altid `-[format]`, når standardvisningen `YYYY-MM-DD` ville forvirre lokale brugere.
+6. Vær opmærksom på tidszoner, når du indsamler datetime-data på tværs af forskellige regioner.
 
 ## Begrænsninger
 
-- Visse appearances eller brugerdefinerede formater understøttes muligvis ikke på alle enheder eller platforme.
-- Brugere kan have brug for vejledning i korrekt indtastning af dato og tid, især med brugerdefinerede formater.
-- Tidszoneforskelle kan komplicere dataanalysen, hvis de ikke håndteres korrekt.
+- `inline-1line` bruger altid dags dato som standard, hvis der ikke findes nogen værdi — brug kolonnen `default` til at forudfylde en bestemt dato.
+- `box()`-formatet styrer kun visningen; den gemte værdi er altid ISO 8601.
+- Datobegrænsning (`inputs{range[...]}`) virker ikke med `box`-layoutet.
+- Tidszoneforskelle kan komplicere dataanalyse, hvis der ikke tages højde for dem korrekt.

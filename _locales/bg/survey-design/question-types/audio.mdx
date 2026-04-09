@@ -1,66 +1,101 @@
 ---
 title: "Аудио"
-description: "Въпросите от тип аудио позволяват на респондентите да записват и изпращат аудио файлове като част от анкетата."
+description: "Аудио въпросите позволяват на респондентите да записват и изпращат аудио файлове като част от анкетата."
 ---
 
-The `audio` question type enables respondents to **record audio** or upload an existing audio file as part of their survey response. It is useful for capturing verbal accounts, environmental sounds, testimonials, or any information that is better conveyed through voice than text.
+Типът въпрос `audio` позволява на респондентите да **записват аудио** или да качват съществуващ аудио файл като част от техния отговор в анкетата. Той е полезен за улавяне на устни разкази, звуци от околната среда, свидетелства или всякаква информация, която се предава по-добре чрез глас, отколкото чрез текст.
 
-## Основна спецификация на XLSForm
+## Основна XLSForm спецификация
 
 | type  | name        | label                        |
 |-------|-------------|------------------------------|
-| audio | voice_note  | Please record your comments  |
+| audio | voice_note  | Моля, запишете вашите коментари  |
 
-For more details on the standard audio question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+За повече подробности относно стандартния тип аудио въпрос, вижте [XLSForm спецификацията](https://xlsform.org/en/#question-types).
 
-## Приложения
+## Употреби
 
-Audio questions are commonly used for:
+Аудио въпросите обикновено се използват за:
 
-1. Capturing open-ended verbal responses to reduce enumerator typing burden
-2. Recording testimonials, personal stories, or oral histories
-3. Documenting environmental sounds (e.g., noise levels near infrastructure)
-4. Collecting voice samples for linguistic or health research
-5. Allowing respondents to add verbal clarifications to numeric or select answers
+1. Улавяне на отворени устни отговори за намаляване на тежестта при писане за анкетьора
+2. Записване на свидетелства, лични истории или устни хроники
+3. Документиране на звуци от околната среда (напр. нива на шум близо до инфраструктура)
+4. Събиране на гласови проби за лингвистични или здравни изследвания
+5. Позволяване на респондентите да добавят устни пояснения към цифрови или избрани отговори
 
 ## Формат на данните
 
-Audio files are stored as binary attachments alongside the form submission, typically:
+Аудио файловете се съхраняват като двоични прикачени файлове заедно с подадения формуляр, обикновено:
 
-- **Format:** MP3 or AAC (mobile recording); WAV (high-quality recording)
-- **Naming:** `{instanceID}-{fieldname}.mp3` (or equivalent)
-- **Storage:** Uploaded to the server media folder and linked to the submission record
-- **Access:** Playable and downloadable from the submission management interface
+- **Формат:** MP3 или AAC (мобилен запис); WAV (висококачествен запис)
+- **Именуване:** `{instanceID}-{fieldname}.mp3` (или еквивалентно)
+- **Съхранение:** Качени в папката за медии на сървъра и свързани със записа за подаване
+- **Достъп:** Възможност за възпроизвеждане и изтегляне от интерфейса за управление на подаванията
 
-## Разширения на rtSurvey
+## rtSurvey разширения
 
 ### Максимална продължителност
 
-Use the `parameters` column to limit recording length:
+Използвайте колоната `parameters`, за да ограничите дължината на записа:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| audio | interview | Record the interview | `max-duration=120` |
+| audio | interview | Запишете интервюто | `max-duration=120` |
 
-`max-duration` is in seconds. The recorder stops automatically at the limit.
+`max-duration` е в секунди. Рекордерът спира автоматично при достигане на лимита.
 
 ### Настройки за качество
 
-The recording quality can be set via `parameters`:
+Качеството на записа може да бъде зададено чрез `parameters`:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| audio | feedback | Record feedback | `quality=normal` |
+| audio | feedback | Запишете обратна връзка | `quality=normal` |
 
-Supported values: `low`, `normal` (default), `voice-only`. `voice-only` optimises for spoken audio with noise reduction.
+Поддържани стойности: `low`, `normal` (по подразбиране), `voice-only`. `voice-only` оптимизира за говор с намаляване на шума.
 
-### Възпроизвеждане преди изпращане
+### Възпроизвеждане преди подаване
 
-On mobile, the enumerator can play back the recorded clip before proceeding. This is enabled by default — there is no configuration needed.
+На мобилно устройство анкетьорът може да възпроизведе записания клип, преди да продължи. Това е активирано по подразбиране — не е необходима конфигурация.
 
-### Интеграция на вградения рекордер
+### Интеграция с вградения рекордер
 
-On Android and iOS, `audio` launches the device's native recording app. On web, it uses the browser's built-in MediaRecorder API.
+На Android и iOS `audio` стартира вграденото приложение за запис на устройството. В мрежата се използва вграденият MediaRecorder API на браузъра.
+
+### Оформление на вградения бутон
+
+Добавете `inline`, за да рендерирате микрофона като **кръгъл бутон с икона** до етикета.
+
+```
+| type  | name | label        | appearance                    |
+|-------|------|--------------|-------------------------------|
+| audio | clip | Запишете аудио | inline display{right}         |
+| audio | clip | Запишете аудио | inline display{left, large}   |
+```
+
+**Позиция на бутона** — `left`, `right` *(по подразбиране)*, `top`, `center`, `bottom`
+
+**Размер на бутона** — `small` *(по подразбиране)*, `medium`, `large`
+
+**Цвят на бутона** — добавете хексадесетичен цвят вътре в `display{}`, за да презапишете основния цвят:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Контрол след заснемане — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Скрива бутона за запис след заснемане на аудиото |
+| `results{hide(review)}` | Скрива бутона за възпроизвеждане |
+| `results{hide(filename)}` | Скрива името на файла и продължителността |
+| `results{left}` | Премества иконата наляво след заснемане |
+
+Пример — скриване на бутона за запис след заснемане, запазване на възпроизвеждането:
+```
+inline display{right} results{hide(capture)}
+```
 
 ## Примерна употреба
 
@@ -68,26 +103,26 @@ On Android and iOS, `audio` launches the device's native recording app. On web, 
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| audio | story | Tell us about the incident in your own words | Speak clearly. Recording stops after 3 minutes. | `max-duration=180` |
+| audio | story | Разкажете ни за инцидента със свои думи | Говорете ясно. Записът спира след 3 минути. | `max-duration=180` |
 
-### Условно аудио — само ако е докладван проблем
+### Условно аудио — само ако е съобщен проблем
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
-| select_one yesno | issue_found | Was an issue found? | | |
-| audio | issue_audio | Record a description of the issue | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+| select_one yesno | issue_found | Намерен ли е проблем? | | |
+| audio | issue_audio | Запишете описание на проблема | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
 ## Най-добри практики
 
-1. State clearly in the `label` or `hint` what the enumerator should say and for how long.
-2. Use `max-duration` to prevent excessively large files in areas with slow upload speeds.
-3. Inform respondents before starting the recording — unexpected recording can raise privacy concerns.
-4. Test recording on the target device and network conditions before deployment.
-5. Set `quality=voice-only` for interview-style recordings to reduce file size without losing intelligibility.
+1. Посочете ясно в `label` или `hint` какво трябва да каже анкетьорът и колко дълго.
+2. Използвайте `max-duration`, за да предотвратите твърде големи файлове в зони с ниска скорост на качване.
+3. Информирайте респондентите преди започване на записа — неочакваният запис може да предизвика притеснения относно поверителността.
+4. Тествайте записа на целевото устройство и в мрежови условия преди внедряване.
+5. Задайте `quality=voice-only` за записи тип интервю, за да намалите размера на файла, без да губите разбираемост.
 
 ## Ограничения
 
-- Audio files can be large (a 2-minute recording at normal quality is ~2–4 MB) — factor this into your data plan and upload time estimates.
-- Not all browsers support the MediaRecorder API — Chrome and Firefox work reliably; Safari on older iOS versions may have issues.
-- Transcription of audio responses requires additional post-processing (manual or automated speech-to-text).
-- Privacy regulations may restrict recording voices — verify local data protection requirements.
+- Аудио файловете могат да бъдат големи (2-минутен запис при нормално качество е ~2–4 MB) — вземете това предвид при вашия план за данни и оценки за време за качване.
+- Не всички браузъри поддържат MediaRecorder API — Chrome и Firefox работят надеждно; Safari на по-стари версии на iOS може да има проблеми.
+- Транскрипцията на аудио отговори изисква допълнителна последваща обработка (ръчно или автоматизирано преобразуване на реч в текст).
+- Разпоредбите за поверителност могат да ограничат записването на гласове — проверете местните изисквания за защита на данните.

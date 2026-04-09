@@ -1,46 +1,178 @@
 ---
 title: "Barcode"
-description: "Otázky barcode umožňují skenování a zachycení dat čárových kódů v průzkumu."
+description: "Otázky typu Barcode skenují a zachycují QR kódy a data z čárových kódů ve vašem průzkumu."
 ---
 
-Typ otázky barcode v XLSForms a rtSurvey umožňuje uživatelům skenovat a zachycovat data čárových kódů přímo v průzkumu. Tato funkce je zvláště užitečná pro správu zásob, sledování produktů nebo jakýkoli scénář, kde je vyžadováno rychlé a přesné zadávání kódovaných informací.
+Typ otázky `barcode` zachycuje hodnotu kódu naskenováním QR kódu nebo čárového kódu pomocí kamery zařízení. Modální okno skeneru obsahuje také ruční zadávání textu jako zálohu pro případy, kdy skenování není možné.
 
-## Základní specifikace XLSForm
+## Basic XLSForm Specification
 
-| type    | name          | label                   |
-|---------|---------------|-------------------------|
-| barcode | product_code  | Naskenujte čárový kód produktu |
+| type    | name         | label                    |
+|---------|--------------|--------------------------|
+| barcode | product_code | Scan the product barcode |
+| barcode | ticket_id    | Scan the ticket          |
 
-## Použití
+Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
 
-Otázky barcode se běžně používají pro:
+---
 
-1. Identifikaci produktů v inventárních průzkumech
-2. Sledování majetku při terénních operacích
-3. Ověřování lístků nebo ID na akcích
-4. Rychlé zadávání kódovaných informací
+## Supported formats
 
-## Osvědčené postupy
+rtSurvey podporuje QR kódy a standardní 1D čárové kódy prostřednictvím kamery zařízení, včetně:
 
-1. Zajistěte správné osvětlení pro přesné skenování čárových kódů.
-2. Poskytněte uživatelům jasné pokyny, jak umístit zařízení pro skenování.
-3. Zahrňte možnost ručního zadání jako zálohu v případě potíží se skenováním.
-4. Testujte funkci skenování čárových kódů s různými zařízeními a typy čárových kódů před nasazením průzkumu.
+- QR Code
+- UPC-A, UPC-E
+- EAN-8, EAN-13
+- Code 39, Code 128
+- ITF, Codabar
 
-## Omezení
+---
 
-- Přesnost skenování čárových kódů se může lišit v závislosti na kvalitě kamery zařízení a podmínkách prostředí.
-- Některá starší nebo levná zařízení nemusí podporovat skenování čárových kódů.
-- Určité typy čárových kódů nemusí být podporovány v závislosti na implementaci.
+## Default layout
+
+Bez nastavení `appearance` otázka zobrazí tlačítko na celou šířku **"GET BARCODE"**. Klepnutím na něj se otevře modální okno skeneru. Po úspěšném naskenování se tlačítko změní na **"REPLACE BARCODE"** a naskenovaná hodnota se zobrazí níže jako klikatelný odkaz.
+
+---
+
+## Scanner modal
+
+Modální okno skeneru vždy obsahuje:
+- **Živý náhled kamery (Live camera view)** — skenuje automaticky při detekci; modální okno se po úspěšném naskenování zavře.
+- **Ruční zadávání textu (Manual text input)** — textové pole ve spodní části, kam může tazatel zadat kód, pokud skenování selže.
+- **Tlačítko Hotovo (Done button)** — odešle ručně zadanou hodnotu.
+
+Pokud není kamera zařízení k dispozici, modální okno se přepne na možnost **"Upload an image"** — tazatel může nahrát fotografii čárového kódu k dekódování.
+
+---
+
+## Inline button layout
+
+Přidáním `inline` vykreslíte skener jako **kulaté tlačítko s ikonou** vedle popisku (label) namísto tlačítka na celou šířku.
+
+```
+| type    | name | label     | appearance                              |
+|---------|------|-----------|----------------------------------------|
+| barcode | code | Scan item | inline display{right}                  |
+| barcode | code | Scan item | inline display{left, large}            |
+| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+```
+
+**Pozice tlačítka** — `left`, `right` *(výchozí)*, `top`, `center`, `bottom`
+
+**Velikost tlačítka** — `small` *(výchozí)*, `medium`, `large`
+
+**Barva tlačítka** — přidejte hexadecimální barvu dovnitř `display{}`, chcete-li přepsat primární barvu:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Kontrola po zachycení — `results{}`:**
+
+| Appearance | Účinek |
+|---|---|
+| `results{hide(scanner)}` | Skryje tlačítko skenování po zachycení hodnoty |
+| `results{hide(review)}` | Skryje odkaz na naskenovanou hodnotu po zachycení |
+| `results{hide(value)}` | Skryje textové zobrazení naskenované hodnoty |
+| `results{left}` | Přesune ikonu doleva po zachycení |
+
+Příklad — skrytí skeneru po prvním skenování:
+```
+inline display{center, large} results{hide(scanner)}
+```
+
+---
+
+## `inputs{auto-close(N)}` — automatické zavření skeneru
+
+Automaticky zavře modální okno skeneru po `N` sekundách, pokud není detekován žádný čárový kód. Uvnitř modálního okna se zobrazuje odpočet času.
+
+```
+inputs{auto-close(10)}     → zavře se po 10 sekundách
+inputs{auto-close(5)}      → zavře se po 5 sekundách
+```
+
+Kombinace s inline:
+```
+inline display{right} inputs{auto-close(10)}
+```
+
+---
+
+## `inputs{floating}` — plovoucí posuvný skener
+
+Zobrazí **tlačítko pro minimalizaci** (ikona ⊞) v záhlaví modálního okna skeneru. Klepnutím na něj se skener sbalí do malé plovoucí kulaté ikony, kterou lze přetáhnout kamkoli na obrazovce. Klepnutím na plovoucí ikonu se skener znovu otevře.
+
+```
+inputs{floating}
+inline display{right} inputs{floating}
+```
+
+Užitečné v pracovních postupech, kde tazatel potřebuje vidět formulář, zatímco je skener aktivní (např. skenování položek v seznamu).
+
+---
+
+## `invisible auto-show` — automatické otevření skeneru
+
+Skryje widget otázky z rozvržení, ale automaticky otevře skener při načtení stránky. Užitečné pro vložení tichého kroku skenování do toku formuláře.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+---
+
+## V opakovacích skupinách (In repeat groups)
+
+Pokud je `barcode` uvnitř skupiny `begin repeat`, úspěšné naskenování po zaznamenání hodnoty automaticky přejde na **další instanci opakování**. To umožňuje rychlé sekvenční skenování, aniž by tazatel musel mezi položkami klepat na "Přidat" (Add).
+
+---
+
+## Potlačení popisku (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
 
 ## Příklad použití
 
-Příklad použití otázky barcode v inventárním průzkumu:
+### Skenování inventáře
 
-| type    | name          | label                   | hint                                      |
-|---------|---------------|-------------------------|-------------------------------------------|
-| barcode | product_code  | Naskenujte čárový kód produktu | Umístěte čárový kód do rámečku     |
-| integer | quantity      | Zadejte množství produktu  |                                           |
-| note    | confirmation  | Naskenovaný produkt: `${product_code}`. Množství: `${quantity}` |           |
+| type | name | label | appearance | required |
+|------|------|-------|------------|----------|
+| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
+| integer | quantity | Quantity | | yes |
+| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
 
-V tomto příkladu průzkum zachycuje čárový kód produktu, ptá se na množství a poté zobrazí potvrzovací poznámku s naskenovanými informacemi.
+### Rychlé skenování více položek (opakovací skupina)
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin repeat | items | | |
+| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| end repeat | items | | |
+
+### Tiché automatické skenování při načtení stránky
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| barcode | entry_code | | `invisible auto-show` |
+
+---
+
+## Best Practices
+
+1. Používejte `inputs{auto-close(N)}`, abyste zabránili tomu, že skener zůstane otevřený neomezeně dlouho — zvolte hodnotu, která tazatelům poskytne dostatek času na umístění čárového kódu (obvykle 8–15 sekund).
+2. Používejte `inputs{floating}`, když formulář potřebuje zůstat viditelný během skenování (např. skenování ze seznamu, kde tazatel porovnává viditelné pole).
+3. Umístěte otázku s čárovým kódem do opakovací skupiny pro rychlé sekvenční skenování — automatický přechod na další opakování eliminuje manuální krok "Přidat".
+4. Vždy uvádějte sloupec `hint` s pokyny k umístění (např. "Držte čárový kód ve vzdálenosti 10–30 cm od kamery při dobrém osvětlení").
+5. Ruční zadávání textu v modálním okně skeneru je k dispozici vždy — vyškolte tazatele, aby jej používali jako zálohu pro poškozené nebo špinavé čárové kódy.
+
+## Omezení
+
+- Přesnost skenování závisí na kvalitě kamery, osvětlení a stavu čárového kódu — poškozené nebo málo kontrastní kódy nemusí být naskenovány spolehlivě.
+- Skener používá zadní kameru (směřující do prostředí); zařízení bez zadní kamery se přepnou na možnost nahrání obrázku.
+- `invisible auto-show` se otevře pouze při prvním načtení stránky; navigace zpět na stránku znovu nespustí automatické otevření.

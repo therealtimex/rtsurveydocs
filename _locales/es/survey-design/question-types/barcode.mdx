@@ -1,56 +1,178 @@
 ---
-title: "Código de barras"
-description: "Las preguntas de código de barras permiten escanear y capturar datos de códigos de barras en su encuesta."
+title: "Barcode"
+description: "Las preguntas de tipo Barcode escanean και capturan códigos QR codes y datos de barcode en su encuesta."
 ---
 
-El tipo de pregunta de código de barras en XLSForms y rtSurvey permite a los usuarios escanear y capturar datos de códigos de barras directamente dentro de la encuesta. Esta función es particularmente útil para la gestión de inventarios, el seguimiento de productos o cualquier escenario donde se requiera una entrada de datos rápida y precisa de información codificada.
+El tipo de pregunta `barcode` captura un valor de código escaneando un código QR code o barcode con la cámara del dispositivo. El modal del escáner también incluye una entrada de texto manual como alternativa cuando el escaneo no es posible.
 
-## Especificación básica de XLSForm
+## Basic XLSForm Specification
 
-| type    | name          | label                        |
-|---------|---------------|------------------------------|
-| barcode | product_code  | Escanee el código de barras del producto |
+| type    | name         | label                    |
+|---------|--------------|--------------------------|
+| barcode | product_code | Scan the product barcode |
+| barcode | ticket_id    | Scan the ticket          |
 
-Para obtener más detalles sobre el tipo de pregunta de código de barras básico, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
+Para la especificación estándar, consulte la [documentación de XLSForm](https://xlsform.org/en/#question-types).
 
-## Usos
+---
 
-Las preguntas de código de barras se usan comúnmente para:
+## Supported formats
 
-1. Identificación de productos en encuestas de inventario
-2. Seguimiento de activos en operaciones de campo
-3. Verificación de entradas o ID en eventos
-4. Entrada rápida de datos de información codificada
+rtSurvey admite códigos QR codes y códigos de barras 1D estándar a través de la cámara del dispositivo, incluidos:
 
-## Extensiones de rtSurvey
+- QR Code
+- UPC-A, UPC-E
+- EAN-8, EAN-13
+- Code 39, Code 128
+- ITF, Codabar
 
-Si bien la especificación básica de XLSForm para preguntas de código de barras es sencilla, rtSurvey puede ofrecer características o personalizaciones adicionales:
+---
 
-1. Soporte para múltiples formatos de código de barras (p. ej., códigos QR, UPC, EAN)
-2. Integración con la cámara del dispositivo para escanear códigos de barras
-3. Opción de entrada manual en caso de que el código de barras esté dañado o no pueda escanearse
+## Default layout
 
-## Mejores prácticas
+Sin un `appearance` establecido, la pregunta muestra un botón de ancho completo **"GET BARCODE"**. Al tocarlo, se abre el modal του escáner. Después de un escaneo exitoso, el botón cambia a **"REPLACE BARCODE"** y el valor escaneado aparece debajo como un enlace en el que se puede hacer clic.
 
-1. Asegure condiciones de iluminación adecuadas para un escaneo preciso de códigos de barras.
-2. Proporcione instrucciones claras a los usuarios sobre cómo posicionar el dispositivo para escanear.
-3. Incluya una opción de entrada manual como respaldo en caso de dificultades de escaneo.
-4. Pruebe la función de escaneo de códigos de barras con varios dispositivos y tipos de códigos de barras antes de implementar la encuesta.
+---
 
-## Limitaciones
+## Scanner modal
 
-- La precisión del escaneo de códigos de barras puede variar dependiendo de la calidad de la cámara del dispositivo y las condiciones ambientales.
-- Algunos dispositivos más antiguos o de gama baja pueden no admitir el escaneo de códigos de barras.
-- Es posible que ciertos tipos de códigos de barras no sean admitidos, dependiendo de la implementación.
+El modal του escáner siempre incluye:
+- **Vista de cámara en vivo (Live camera view)** — escanea automáticamente al detectar; el modal se cierra después de un escaneo exitoso.
+- **Entrada de texto manual (Manual text input)** — un campo de texto en la parte inferior donde el encuestador puede escribir el código si falla el escaneo.
+- **Botón de Hecho (Done button)** — envía el valor escrito manualmente.
+
+Cuando la cámara del dispositivo no está disponible, el modal recurre a una opción de **"Upload an image"** — el encuestador puede enviar una foto del código de barras para su decodificación.
+
+---
+
+## Inline button layout
+
+Agregue `inline` para mostrar el escáner como un **botón de icono circular** junto a la etiqueta (label) en lugar de un botón de ancho completo.
+
+```
+| type    | name | label     | appearance                              |
+|---------|------|-----------|----------------------------------------|
+| barcode | code | Scan item | inline display{right}                  |
+| barcode | code | Scan item | inline display{left, large}            |
+| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+```
+
+**Posición del botón** — `left`, `right` *(predeterminado)*, `top`, `center`, `bottom`
+
+**Tamaño del botón** — `small` *(predeterminado)*, `medium`, `large`
+
+**Color del botón** — agregue un color hexadecimal dentro de `display{}` para anular el color principal:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Control posterior a la captura — `results{}`:**
+
+| Appearance | Efecto |
+|---|---|
+| `results{hide(scanner)}` | Oculta el botón de escaneo después de capturar un valor |
+| `results{hide(review)}` | Oculta el enlace del valor escaneado después de la captura |
+| `results{hide(value)}` | Oculta la visualización del texto del valor escaneado |
+| `results{left}` | Mueve el icono a la izquierda después de la captura |
+
+Ejemplo — ocultar el escáner después del primer escaneo:
+```
+inline display{center, large} results{hide(scanner)}
+```
+
+---
+
+## `inputs{auto-close(N)}` — cierre automático del escáner
+
+Cierra automáticamente el modal del escáner después de `N` segundos si no se detecta ningún código de barras. Se muestra un temporizador de cuenta regresiva en vivo dentro del modal.
+
+```
+inputs{auto-close(10)}     → se cierra después de 10 segundos
+inputs{auto-close(5)}      → se cierra después de 5 segundos
+```
+
+Combinar con inline:
+```
+inline display{right} inputs{auto-close(10)}
+```
+
+---
+
+## `inputs{floating}` — escáner flotante desplazable
+
+Muestra un **botón de minimizar** (icono de comprimir ⊞) en el encabezado del modal del escáner. Al tocarlo, el escáner se contrae en un pequeño icono circular flotante que se puede arrastrar a cualquier lugar de la pantalla. Al tocar el icono flotante, se vuelve a abrir el escáner.
+
+```
+inputs{floating}
+inline display{right} inputs{floating}
+```
+
+Útil en flujos de trabajo donde el encuestador necesita ver el formulario mientras el escáner está activo (por ejemplo, escaneando elementos en una lista).
+
+---
+
+## `invisible auto-show` — apertura automática del escáner
+
+Oculta el widget de la pregunta del diseño pero abre automáticamente el escáner cuando se carga la página. Útil para insertar un paso de escaneo silencioso en el flujo del formulario.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+---
+
+## En grupos de repetición (In repeat groups)
+
+Cuando `barcode` está dentro de un grupo `begin repeat`, un escaneo exitoso avanza automáticamente a la **siguiente instancia de repetición** después de que se registra el valor. Esto permite un escaneo secuencial rápido sin que el encuestador tenga que tocar "Añadir" (Add) entre elementos.
+
+---
+
+## Suprimir la etiqueta (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
 
 ## Ejemplo de uso
 
-He aquí un ejemplo de cómo podría usar una pregunta de código de barras en una encuesta de inventario:
+### Escaneo de inventario
 
-| type    | name          | label                        | hint                                          |
-|---------|---------------|------------------------------|-----------------------------------------------|
-| barcode | product_code  | Escanee el código de barras del producto | Coloque el código de barras dentro del marco |
-| integer | quantity      | Ingrese la cantidad del producto |                                           |
-| note    | confirmation  | Producto escaneado: `${product_code}`. Cantidad: `${quantity}` |               |
+| type | name | label | appearance | required |
+|------|------|-------|------------|----------|
+| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
+| integer | quantity | Quantity | | yes |
+| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
 
-En este ejemplo, la encuesta captura el código de barras de un producto, solicita la cantidad y luego muestra una nota de confirmación con la información escaneada.
+### Escaneo rápido de múltiples elementos (grupo de repetición)
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin repeat | items | | |
+| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| end repeat | items | | |
+
+### Auto-escaneo silencioso al cargar la página
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| barcode | entry_code | | `invisible auto-show` |
+
+---
+
+## Mejores Prácticas
+
+1. Utilice `inputs{auto-close(N)}` para evitar que el escáner permanezca abierto indefinidamente; elija un valor que dé a los encuestadores tiempo suficiente para posicionar el código de barras (8 a 15 segundos es lo habitual).
+2. Utilice `inputs{floating}` cuando el formulario deba permanecer visible durante el escaneo (por ejemplo, escaneo de una lista donde el encuestador hace una referencia cruzada con un campo visible).
+3. Coloque la pregunta del código de barras dentro de un grupo de repetición para un escaneo secuencial rápido; el avance automático de la repetición elimina el paso manual de "Añadir".
+4. Incluya siempre la columna `hint` con instrucciones de posicionamiento (por ejemplo, "Sujete el código de barras a una distancia de 10 a 30 cm de la cámara, con buena luz").
+5. La entrada de texto manual en el modal del escáner siempre está disponible; capacite a los encuestadores para que la utilicen como alternativa para códigos de barras dañados o sucios.
+
+## Limitaciones
+
+- La precisión del escaneo depende de la calidad de la cámara, la iluminación y el estado del código de barras; es posible que los códigos dañados o de bajo contraste no se escaneen de manera confiable.
+- El escáner utiliza la cámara trasera (orientada al entorno); los dispositivos sin cámara trasera recurren a la opción de carga de imágenes.
+- `invisible auto-show` se abre solo en la primera carga de la página; volver a navegar a la página no vuelve a activar la apertura automática.

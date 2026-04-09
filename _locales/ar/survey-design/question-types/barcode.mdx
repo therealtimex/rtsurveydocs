@@ -1,38 +1,178 @@
 ---
-title: "الرمز الشريطي"
-description: "تتيح أسئلة الرمز الشريطي مسح وتسجيل بيانات الرمز الشريطي في استطلاعك."
+title: "Barcode"
+description: "تقوم أسئلة Barcode بمسح والتقاط رموز QR codes وبيانات barcode في استبيانك."
 ---
 
-يُتيح نوع سؤال barcode في XLSForms وrtSurvey للمستخدمين مسح وتسجيل بيانات الرمز الشريطي مباشرةً داخل الاستطلاع. هذه الميزة مفيدة بشكل خاص لإدارة المخزون وتتبع المنتجات أو أي سيناريو يتطلب إدخال بيانات مشفرة بدقة وسرعة.
+يلتقط نوع السؤال `barcode` قيمة الرمز عن طريق مسح QR code أو barcode باستخدام كاميرا الجهاز. تتضمن نافذة الماسح الضوئي (scanner modal) أيضاً إدخال نص يدوي كبديل عندما لا يكون المسح ممكناً.
 
-## مواصفة XLSForm الأساسية
+## Basic XLSForm Specification
 
-| type    | name          | label                   |
-|---------|---------------|-------------------------|
-| barcode | product_code  | Scan the product barcode|
+| type    | name         | label                    |
+|---------|--------------|--------------------------|
+| barcode | product_code | Scan the product barcode |
+| barcode | ticket_id    | Scan the ticket          |
 
-للاطلاع على مزيد من التفاصيل حول نوع سؤال barcode الأساسي، راجع [مواصفة XLSForm](https://xlsform.org/en/#question-types).
+للمواصفات القياسية، راجع [XLSForm documentation](https://xlsform.org/en/#question-types).
 
-## الاستخدامات
+---
 
-تُستخدم أسئلة الرمز الشريطي شائعاً لـ:
+## Supported formats
 
-1. تحديد المنتجات في استطلاعات المخزون
-2. تتبع الأصول في العمليات الميدانية
-3. التحقق من التذاكر أو الهوية في الفعاليات
-4. إدخال البيانات السريع للمعلومات المشفرة
+يدعم rtSurvey رموز QR codes ورموز 1D barcodes القياسية عبر كاميرا الجهاز، بما في ذلك:
 
-## أفضل الممارسات
+- QR Code
+- UPC-A, UPC-E
+- EAN-8, EAN-13
+- Code 39, Code 128
+- ITF, Codabar
 
-1. تأكد من توفر إضاءة مناسبة لمسح الرمز الشريطي بدقة.
-2. قدم تعليمات واضحة للمستخدمين حول كيفية تحديد موضع الجهاز للمسح.
-3. أدرج خياراً للإدخال اليدوي كاحتياطي في حالة صعوبات المسح.
-4. اختبر ميزة مسح الرمز الشريطي مع أجهزة وأنواع رموز مختلفة قبل نشر الاستطلاع.
+---
 
-## مثال الاستخدام
+## Default layout
 
-| type    | name          | label                   | hint                                      |
-|---------|---------------|-------------------------|-------------------------------------------|
-| barcode | product_code  | Scan the product barcode| Position the barcode within the frame     |
-| integer | quantity      | Enter product quantity  |                                           |
-| note    | confirmation  | Product scanned: `${product_code}`. Quantity: `${quantity}` |           |
+عندما لا يتم ضبط `appearance` ، يعرض السؤال زر **"GET BARCODE"** بعرض كامل. يؤدي الضغط عليه إلى فتح نافذة الماسح الضوئي. بعد نجاح المسح، يتغير الزر إلى **"REPLACE BARCODE"** وتظهر القيمة الممسوحة أدناه كرابط قابل للنقر.
+
+---
+
+## Scanner modal
+
+تتضمن نافذة الماسح الضوئي دائماً:
+- **عرض الكاميرا المباشر (Live camera view)** — يمسح تلقائياً عند الاكتشاف؛ وتغلق النافذة بعد نجاح المسح.
+- **إدخال نص يدوي (Manual text input)** — حقل نصي في الأسفل حيث يمكن للباحث كتابة الرمز إذا فشل المسح.
+- **زر تم (Done button)** — يرسل القيمة المكتوبة يدوياً.
+
+عندما لا تتوفر كاميرا الجهاز، تنتقل النافذة إلى خيار **"Upload an image"** — حيث يمكن للباحث إرسال صورة للـ barcode لفك تشفيرها.
+
+---
+
+## Inline button layout
+
+أضف `inline` لعرض الماسح الضوئي كـ **زر أيقونة دائري** بجوار التسمية (label) بدلاً من زر بعرض كامل.
+
+```
+| type    | name | label     | appearance                              |
+|---------|------|-----------|----------------------------------------|
+| barcode | code | Scan item | inline display{right}                  |
+| barcode | code | Scan item | inline display{left, large}            |
+| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+```
+
+**Button position** — `left`, `right` *(default)*, `top`, `center`, `bottom`
+
+**Button size** — `small` *(default)*, `medium`, `large`
+
+**Button color** — أضف رمز لون hex داخل `display{}` لتجاوز اللون الأساسي:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Post-capture control — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(scanner)}` | يخفي زر المسح بعد التقاط القيمة |
+| `results{hide(review)}` | يخفي رابط القيمة الممسوحة بعد التقاطها |
+| `results{hide(value)}` | يخفي عرض نص القيمة الممسوحة |
+| `results{left}` | ينقل الأيقونة إلى اليسار بعد التقاطها |
+
+مثال — إخفاء الماسح الضوئي بعد المسح الأول:
+```
+inline display{center, large} results{hide(scanner)}
+```
+
+---
+
+## `inputs{auto-close(N)}` — auto-close scanner
+
+يغلق نافذة الماسح الضوئي تلقائياً بعد `N` ثوانٍ إذا لم يتم اكتشاف barcode. يتم عرض مؤقت تنازلي مباشر داخل النافذة.
+
+```
+inputs{auto-close(10)}     → يغلق بعد 10 ثوانٍ
+inputs{auto-close(5)}      → يغلق بعد 5 ثوانٍ
+```
+
+الدمج مع inline:
+```
+inline display{right} inputs{auto-close(10)}
+```
+
+---
+
+## `inputs{floating}` — floating draggable scanner
+
+يعرض **زر تصغير** (أيقونة الضغط ⊞) في رأس نافذة الماسح الضوئي. يؤدي الضغط عليه إلى طي الماسح الضوئي إلى أيقونة دائرية عائمة صغيرة يمكن سحبها إلى أي مكان على الشاشة. يؤدي الضغط على الأيقونة العائمة إلى إعادة فتح الماسح الضوئي.
+
+```
+inputs{floating}
+inline display{right} inputs{floating}
+```
+
+مفيد في سير العمل حيث يحتاج الباحث إلى رؤية النموذج بينما الماسح الضوئي نشط (مثلاً، مسح العناصر في قائمة).
+
+---
+
+## `invisible auto-show` — auto-open scanner
+
+يخفي أداة السؤال من التخطيط ولكنه يفتح الماسح الضوئي تلقائياً عند تحميل الصفحة. مفيد لتضمين خطوة مسح صامتة في تدفق النموذج.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+---
+
+## In repeat groups
+
+عندما يكون `barcode` داخل مجموعة `begin repeat` ، فإن المسح الناجح ينتقل تلقائياً إلى **instance التكرار التالي** بعد تسجيل القيمة. يتيح ذلك مسحاً متسلسلاً سريعاً دون أن يضغط الباحث على "إضافة" (Add) بين العناصر.
+
+---
+
+## Suppress the label
+
+```
+inline text-nolabel display{center, large}
+```
+
+---
+
+## Example usage
+
+### Inventory scan
+
+| type | name | label | appearance | required |
+|------|------|-------|------------|----------|
+| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
+| integer | quantity | Quantity | | yes |
+| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
+
+### Rapid multi-item scan (repeat group)
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin repeat | items | | |
+| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| end repeat | items | | |
+
+### Silent auto-scan on page load
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| barcode | entry_code | | `invisible auto-show` |
+
+---
+
+## Best Practices
+
+1. استخدم `inputs{auto-close(N)}` لمنع الماسح الضوئي من البقاء مفتوحاً إلى الأبد — اختر قيمة تمنح الباحثين وقتاً كافياً لوضع الـ barcode (8-15 ثانية هو المعتاد).
+2. استخدم `inputs{floating}` عندما يحتاج النموذج إلى البقاء مرئياً أثناء المسح (مثلاً، المسح من قائمة حيث يقوم الباحث بمطابقة حقل مرئي).
+3. ضع سؤال الـ barcode داخل مجموعة تكرار (repeat group) للمسح المتسلسل السريع — التقدم التلقائي للتكرار يلغي خطوة "إضافة" اليدوية.
+4. قم دائماً بتضمين عمود `hint` مع تعليمات تحديد الموقع (مثلاً، "أمسك الـ barcode على بعد 10-30 سم من الكاميرا، في إضاءة جيدة").
+5. إدخال النص اليدوي في نافذة الماسح الضوئي متاح دائماً — قم بتدريب الباحثين على استخدامه كبديل للـ barcodes التالفة أو المتسخة.
+
+## Limitations
+
+- تعتمد دقة المسح على جودة الكاميرا والإضاءة وحالة الـ barcode — قد لا يتم مسح الرموز التالفة أو ذات التباين المنخفض بشكل موثوق.
+- يستخدم الماسح الضوئي الكاميرا الخلفية (المواجهة للبيئة)؛ الأجهزة التي لا تحتوي على كاميرا خلفية تنتقل إلى خيار تحميل الصور.
+- يفتح `invisible auto-show` فقط عند تحميل الصفحة لأول مرة؛ التنقل مرة أخرى إلى الصفحة لا يؤدي إلى إعادة تفعيل الفتح التلقائي.
