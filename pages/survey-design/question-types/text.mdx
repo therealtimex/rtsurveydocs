@@ -3,9 +3,7 @@ title: "Text"
 description: "Free text response question type in rtSurvey"
 ---
 
-The `text` question type collects a free-text response — any string of characters. It is the most flexible input type and is used for names, addresses, descriptions, codes, and anything that does not fit a more specific type.
-
-rtSurvey also extends `text` with **time input widgets** that allow precise time entry with a clock picker.
+The `text` question type collects a free-text string. It is the most flexible input type and supports a large number of appearance variants that change how the input is rendered — from a simple single-line field to speech-to-text, popup dialogs, rich text editors, and numeric spinners.
 
 ## Basic XLSForm Specification
 
@@ -14,74 +12,315 @@ rtSurvey also extends `text` with **time input widgets** that allow precise time
 | text | respondent_name | Full name of respondent |
 | text | address | Home address |
 
-For more details on the standard XLSForm text type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+For the standard specification see the [XLSForm documentation](https://xlsform.org/en/#question-types).
 
-## Uses
+---
 
-Text questions are used for:
+## Layout modes
 
-1. Names, addresses, free descriptions
-2. Open-ended comments or feedback
-3. Codes, IDs, or reference numbers that do not fit integer/decimal
-4. Collecting time values with rtSurvey's time input extensions
-5. Autocomplete text fields (via `search-autocomplete-noedit-v2()`)
+### Default — single-line input
 
-## Standard appearance options
+No appearance needed. Renders a standard `<input type="text">` field.
+
+---
+
+### `multiline` — textarea
+
+Renders a multi-line textarea. The user can expand it by typing; it auto-grows.
+
+```
+multiline
+```
+
+**Control row height** by appending `[initRows, maxRows]`:
+
+```
+multiline [3,8]     → starts at 3 rows, expands up to 8
+multiline [5]       → fixed at 5 rows
+```
+
+Default is 1 row with no max. Shift+Enter inserts a line break; Enter advances to the next question.
+
+---
+
+### `floating_hint` — hint floats as label
+
+The `hint` text renders inside the input field as a placeholder. When the user starts typing, the hint floats up above the field as a label.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — hint inside the input
+
+Similar to `floating_hint` — the hint renders inside the input boundary when the field is empty. Does not float when typing.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — modal dialog input
+
+Tapping the field opens a SweetAlert modal dialog with a large input instead of editing inline. Useful on mobile to give more screen space for typing.
+
+```
+textpopup
+```
+
+---
+
+### `richtext` — WYSIWYG editor
+
+Renders a full rich-text editor (Monaco / Draft.js). The respondent can bold, italicize, add lists, etc. The stored value is HTML.
+
+```
+richtext
+richtext(30%)       → editor height 30% of viewport
+```
+
+---
+
+### `charcount` — live character counter
+
+Adds a `(n)` character count display below the input, updating as the user types.
+
+```
+charcount
+multiline charcount
+```
+
+---
+
+## Numeric input variants
+
+These appearances work on `text` type to collect numbers with special formatting or interaction patterns.
+
+### `numbers` — numeric keyboard
+
+Forces the HTML input type to `number`, triggering a numeric keyboard on mobile.
+
+```
+numbers
+```
+
+### `thousandsep` — thousands separator
+
+Displays the number with comma grouping (e.g. `1,234,567`) while storing the raw number. Input type is forced to `text` to allow the comma display.
+
+```
+thousandsep
+```
+
+### `digisep(n, "sep")` — custom digit grouping
+
+Groups digits into blocks of `n` separated by a custom character. Useful for phone numbers, ID numbers, etc.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+### `number-hspinner` — horizontal spinner
+
+Replaces the input with a horizontal **− value +** spinner. The user taps the minus/plus buttons to decrement or increment the value. Works with `int` and `decimal` types.
+
+```
+number-hspinner
+```
+
+**Customize button appearance** using `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','1')
+```
+
+Parameters: left button shape, right button shape, step value.
+
+**Custom colors** using `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Four color values: left-bg, left-icon, right-bg, right-icon.
+
+### `prefix(expr)` — prepend a prefix
+
+Prepends a calculated or static string to the displayed value. The stored value does not include the prefix.
+
+```
+prefix('USD ')      → displays "USD 100", stores "100"
+prefix(${currency}) → dynamic prefix from another field
+```
+
+### `textonly` — force text input type
+
+Forces `type="text"` even when the field is `integer` or `decimal`. Useful to avoid browser number-input quirks.
+
+```
+textonly
+```
+
+---
+
+## Text transformation
+
+These appearances auto-transform the value as the user types.
+
+| Appearance | Effect | Example input → stored |
+|---|---|---|
+| `upper` | Converts to UPPERCASE | `hello` → `HELLO` |
+| `lower` | Converts to lowercase | `HELLO` → `hello` |
+| `proper` | Converts to Proper Case | `john doe` → `John Doe` |
+
+---
+
+## Input capture helpers
+
+### `inputs{stt}` — speech to text
+
+Adds a microphone button next to the input. Tapping it starts browser speech recognition (Web Speech API). The transcribed text is appended to the field.
+
+```
+inputs{stt}
+```
+
+Not supported on Safari. Requires microphone permission.
+
+### `inputs{qrscan}` — QR / barcode scanner
+
+Adds a QR code scan button next to the input. Opens the camera scanner modal and populates the field with the scanned value.
+
+```
+inputs{qrscan}
+```
+
+**Tokenize** (append scanned values instead of replacing):
+
+```
+inputs{qrscan} append(${separator})
+```
+
+### `inputs{stt,qrscan}` — both speech and scan
+
+Renders both the microphone and QR scan buttons side by side.
+
+```
+inputs{stt,qrscan}
+inputs{qrscan,stt}
+```
+
+---
+
+## Selection-linked variants
+
+These appearances link a text field to a `select_one` choice list, letting the user either pick from the list or type freely.
+
+### `selection_one_hide` — dropdown picker
+
+Renders the text input with a dropdown arrow. Tapping the arrow shows choices from the linked `search()` list. Selecting a choice fills the input and locks it (shows ✕ to clear).
+
+```
+selection_one_hide
+```
+
+### `selection_one_show` — radio list below
+
+Renders the text input with radio buttons below it. Selecting a radio fills and locks the input.
+
+```
+selection_one_show
+```
+
+Both variants require a `search()` expression in the `calculation` column to define the choice list.
+
+---
+
+## Answer alignment
+
+Controls horizontal alignment of the typed text within the input.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+## Time input widget (inline clock)
+
+rtSurvey extends `text` with a clock picker widget. These appearances display a clock icon the enumerator taps to select a time value. The value is stored as plain text in the chosen format.
+
+### Appearances
 
 | Appearance | Description |
-|------------|-------------|
-| *(none)* | Single-line text input |
-| `multiline` | Multi-line text area — best for longer free text on web |
+|---|---|
+| `inline` | Clock icon button next to the field, opens modal |
+| `inline-onlyresult` | Clock icon disappears after selection |
+| `inline-1line` | Compact single-row time spinner |
+| `inline colors("RRGGBB")` | Clock icon with custom color |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Spinner with two accent colors |
 
-## rtSurvey time input extensions
+### Format tokens
 
-rtSurvey extends `text` with a **clock picker widget** for collecting time values. These appearance options display a clock icon the enumerator can tap to select hours, minutes, seconds, or milliseconds.
+Append `-[format]` to control which time components are shown and stored:
 
-### Appearance variants
-
-| Appearance | Description |
-|------------|-------------|
-| `inline` | Clock icon displayed next to the field |
-| `inline colors("RRGGBB")` | Clock icon with custom hex color |
-| `inline-1line` | Clock displayed in a compact single-row format |
-| `inline-1line-RRGGBB` | Single-row with custom icon color (hex, no `#`) |
-| `inline-1line colors("RRGGBB","RRGGBB")` | Single-row with two colors |
-| `inline-onlyresult` | Clock icon disappears after selection; only the value is shown |
-| `inline-onlyresult colors("RRGGBB")` | Same, with custom icon color |
-
-### Time format tokens
-
-Append a format string in brackets to control which time components are shown:
-
-| Format string | Displays |
-|---------------|----------|
-| `inline-[%H:%M]` | Hours and minutes (24-hour) |
-| `inline-[%h:%M]` | Hours and minutes (12-hour) |
-| `inline-[%H:%M:%S]` | Hours, minutes, seconds (24-hour) |
-| `inline-[%h:%M:%S]` | Hours, minutes, seconds (12-hour) |
-| `inline-[%H:%M:%3]` | Hours, minutes, milliseconds |
-| `inline-[%M:%S]` | Minutes and seconds only |
-| `inline-[%M:%3]` | Minutes and milliseconds only |
+| Format | Displays |
+|---|---|
+| `inline-[%H:%M]` | Hours : Minutes (24h) |
+| `inline-[%h:%M]` | Hours : Minutes (12h) |
+| `inline-[%H:%M:%S]` | Hours : Minutes : Seconds (24h) |
+| `inline-[%M:%S]` | Minutes : Seconds |
+| `inline-[%H:%M:%3]` | Hours : Minutes : Milliseconds |
 | `inline-[%S]` | Seconds only |
 | `inline-[%3]` | Milliseconds only |
-| `inline-[%H]` | Hours only (24-hour) |
-| `inline-[%h]` | Hours only (12-hour) |
+| `inline-[%H]` | Hours only (24h) |
 
-### Example: Record a task duration in minutes and seconds
+### Button position with `display{}`
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | task_duration | Time taken to complete the task | `inline-[%M:%S]` |
+Same as other inline types — controls position and size of the clock button:
 
-### Example: Record an event time in 24-hour format with custom color
+```
+inline display{right}
+inline display{center, large}
+inline-onlyresult display{left, medium, #0099FF}
+```
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | event_time | Time of event | `inline-1line colors("0099FF")` |
+---
 
-## Data format
+## Appearance quick reference
 
-Text data is stored and exported as a plain string. For time-based inputs using the inline clock widget, the value is stored in the format matching the chosen format string (e.g., `14:32` for `%H:%M`).
+| Appearance | Widget rendered |
+|---|---|
+| *(none)* | Single-line text input |
+| `multiline` | Textarea |
+| `multiline [n,m]` | Textarea with init/max row control |
+| `floating_hint` | Hint floats as label when typing |
+| `embed` | Hint inside input boundary |
+| `textpopup` | Tap to open modal dialog |
+| `richtext` / `richtext(height)` | WYSIWYG rich text editor |
+| `charcount` | Live character count below input |
+| `numbers` | Numeric keyboard |
+| `thousandsep` | Thousands-comma formatting |
+| `digisep(n,"sep")` | Custom digit grouping |
+| `number-hspinner` | Horizontal − value + spinner |
+| `prefix(expr)` | Prepend static or calculated prefix |
+| `upper` / `lower` / `proper` | Auto case transformation |
+| `inputs{stt}` | Speech-to-text microphone button |
+| `inputs{qrscan}` | QR/barcode scan button |
+| `inputs{stt,qrscan}` | Both mic and scan buttons |
+| `selection_one_hide` | Dropdown picker from choice list |
+| `selection_one_show` | Radio list below input |
+| `align_answer = left/right/center` | Answer text alignment |
+| `inline-[%H:%M]` | Clock picker — time collection |
+| `inline-1line` | Compact time spinner |
+
+---
 
 ## Constraints and validation
 
@@ -89,22 +328,24 @@ Apply constraints to enforce format, length, or pattern:
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| text | name | Full name | `string-length(.) >= 2` | Name must be at least 2 characters |
-| text | code | Reference code | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Enter 2 uppercase letters followed by 4 digits |
+| text | name | Full name | `string-length(.) >= 2` | At least 2 characters required |
+| text | code | Reference code | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 uppercase letters + 4 digits |
 | text | phone | Phone number | `regex(., '^[0-9]{9,15}$')` | Enter a valid phone number |
+
+---
 
 ## Best Practices
 
-1. Use more specific types (`integer`, `decimal`, `date`) whenever the data has a known structure — this prevents invalid entries and simplifies analysis.
-2. Add `constraint` with `string-length()` or `regex()` to validate codes or IDs.
-3. Use `multiline` appearance for open-ended questions where respondents may write several sentences.
-4. For time collection, choose the time format tokens that match the precision your analysis requires — collecting milliseconds when you only need minutes wastes enumerator effort.
-
-## Platform support
-
-The text question type and all time input appearances are supported on iOS, Android, and web platforms.
+1. Use more specific types (`integer`, `decimal`, `date`) when the data has a known structure — this prevents invalid entries.
+2. Use `multiline [3,8]` for open-ended questions to give respondents room to write without overwhelming the screen.
+3. Use `thousandsep` or `digisep()` instead of `numbers` when you need formatted display — `numbers` alone only changes the keyboard.
+4. Use `inputs{qrscan}` to eliminate manual typing errors for codes, IDs, and serial numbers.
+5. Use `floating_hint` when the hint is important context that should remain visible while typing — standard hints disappear from view on small screens.
+6. Use `charcount` on questions with length constraints so respondents can self-monitor.
 
 ## Limitations
 
-- Text responses are free-form — there is no built-in spell check or vocabulary constraint beyond regex patterns.
-- The inline time widget is an rtSurvey extension and is not part of the standard XLSForm specification.
+- `inputs{stt}` requires a browser that supports the Web Speech API. Chrome is the most reliable; Safari is not supported.
+- `richtext` stores HTML — plan for HTML stripping or sanitization in your analysis pipeline if plain text is expected.
+- `selection_one_hide` and `selection_one_show` require a `search()` expression and are only supported on the web client.
+- `number-hspinner` validates against the `constraint` column on each button press, not just on blur — design constraints accordingly.
