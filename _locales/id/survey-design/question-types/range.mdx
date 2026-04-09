@@ -1,34 +1,34 @@
 ---
 title: "Rentang"
-description: "Pertanyaan rentang memungkinkan responden memilih angka dengan menyeret slider antara nilai minimum dan maksimum yang ditentukan."
+description: "Pertanyaan rentang memungkinkan responden untuk memilih angka dengan menyeret penggeser antara nilai minimum dan maksimum yang ditentukan."
 ---
 
-Tipe pertanyaan `range` menampilkan **slider** (atau input yang setara) yang memungkinkan responden memilih angka dalam rentang minimum dan maksimum yang ditentukan. Ini ideal untuk mengumpulkan penilaian, skor kepuasan, atau nilai numerik apa pun di mana Anda ingin membatasi rentang secara visual daripada mengandalkan input teks dengan constraint.
+Tipe pertanyaan `range` memungkinkan responden untuk memilih angka dalam batas minimum dan maksimum yang ditentukan. Dalam formulir web rtSurvey, ini dirender sebagai **input angka** standar — enumerator mengetikkan nilai secara langsung. Parameter `start`, `end`, dan `step` mendefinisikan rentang yang valid dan diberlakukan sebagai batasan.
 
-## Spesifikasi XLSForm Dasar
+## Spesifikasi Dasar XLSForm
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | satisfaction | Seberapa puas Anda dengan layanan ini? | start=1 end=5 step=1 |
+| range | satisfaction | Seberapa puaskah Anda dengan layanan ini? | start=1 end=5 step=1 |
 
-Kolom `parameters` mendefinisikan batas slider dan ukuran langkah:
+Kolom `parameters` mendefinisikan batas penggeser dan ukuran langkah:
 
 | Parameter | Deskripsi | Default |
-|-----------|-----------|---------|
+|-----------|-------------|---------|
 | `start` | Nilai minimum (inklusif) | 0 |
 | `end` | Nilai maksimum (inklusif) | 10 |
-| `step` | Kenaikan antara nilai yang valid | 1 |
+| `step` | Peningkatan antara nilai yang valid | 1 |
 
 Untuk detail lebih lanjut tentang tipe pertanyaan rentang standar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
 
 ## Penggunaan
 
-Pertanyaan rentang umum digunakan untuk:
+Pertanyaan rentang umumnya digunakan untuk:
 
 1. Skala kepuasan atau penilaian (misalnya, 1–5 atau 0–10)
 2. Skala numerik gaya Likert
 3. Mengumpulkan pengukuran di mana hanya nilai diskrit yang valid
-4. Rentang usia atau rentang skor di mana slider meningkatkan kegunaan dibandingkan bidang teks
+4. Kelompok usia atau rentang skor di mana penggeser meningkatkan kegunaan dibandingkan dengan bidang teks
 
 ## Contoh Penggunaan
 
@@ -36,7 +36,7 @@ Pertanyaan rentang umum digunakan untuk:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | overall_rating | Penilaian keseluruhan (0–10) | start=0 end=10 step=1 |
+| range | overall_rating | Peringkat keseluruhan (0–10) | start=0 end=10 step=1 |
 
 ### Langkah desimal
 
@@ -44,7 +44,7 @@ Pertanyaan rentang umum digunakan untuk:
 |------|------|-------|------------|
 | range | weight_kg | Berat (kg) | start=0 end=200 step=0.5 |
 
-### Menggunakan nilai dalam kalkulasi
+### Menggunakan nilai dalam perhitungan
 
 | type | name | label | parameters | calculation |
 |------|------|-------|------------|-------------|
@@ -52,22 +52,15 @@ Pertanyaan rentang umum digunakan untuk:
 | calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
 | note | grade_note | Nilai Anda adalah: `${grade}` | | |
 
-## Appearance
-
-Tipe `range` dirender sebagai slider secara default. Tidak diperlukan nilai appearance tambahan untuk penggunaan dasar. Anda dapat menggabungkannya dengan `horizontal` untuk tata letak yang lebih lebar pada formulir web:
-
-| type | name | label | parameters | appearance |
-|------|------|-------|------------|------------|
-| range | nps | Seberapa besar kemungkinan Anda merekomendasikan kami? (0–10) | start=0 end=10 step=1 | horizontal |
-
 ## Praktik Terbaik
 
-1. Selalu tetapkan nilai `start`, `end`, dan `step` yang bermakna — jangan mengandalkan default.
-2. Beri label ujung skala Anda dalam kolom `hint` (misalnya, `hint: 0 = Sangat tidak puas, 10 = Sangat puas`) untuk memberi konteks kepada responden.
-3. Untuk skala Likert 5 poin, gunakan `start=1 end=5 step=1` daripada 0–4, karena responden mengharapkan "1" berarti yang terendah.
-4. Gunakan `range` daripada `integer` + constraint ketika sifat terbatas dari input adalah bagian dari desain pertanyaan (slider mengkomunikasikan skala secara visual).
+1. Selalu atur nilai `start`, `end`, dan `step` yang bermakna — jangan mengandalkan nilai default.
+2. Labeli ujung skala Anda di kolom `hint` (misalnya, `hint: 0 = Sangat tidak puas, 10 = Sangat puas`) untuk memberikan konteks kepada responden.
+3. Untuk skala Likert 5 poin, gunakan `start=1 end=5 step=1` daripada 0–4, karena responden berharap "1" berarti yang terendah.
+4. Gunakan `range` alih-alih `integer` + batasan ketika sifat input yang dibatasi adalah bagian dari desain pertanyaan (penggeser mengkomunikasikan skala secara visual).
 
 ## Keterbatasan
 
-- Widget slider mungkin tidak ideal untuk rentang yang sangat lebar (misalnya, 0–10000) — `integer` teks dengan constraint lebih ramah pengguna dalam kasus tersebut.
-- Pada perangkat mobile, nilai langkah yang halus (misalnya, `step=0.1`) bisa sulit dikontrol secara tepat dengan slider sentuh.
+- Tidak ada widget penggeser di formulir web rtSurvey — entri nilai adalah input angka biasa. Untuk pengalaman penggeser visual, gunakan klien seluler yang mendukung widget rentang.
+- Untuk rentang yang sangat lebar (misalnya, 0–10000), `integer` biasa dengan batasan sama efektifnya dan lebih ramah pengguna.
+- Nilai langkah halus (misalnya, `step=0.1`) berfungsi sebagai batasan tetapi tidak memiliki masalah presisi penggeser di formulir web.

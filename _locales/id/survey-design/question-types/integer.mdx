@@ -1,75 +1,207 @@
 ---
-title: "Integer"
-description: "Pertanyaan integer memungkinkan input bilangan bulat dalam survei Anda."
+title: "Bilangan Bulat"
+description: "Jenis pertanyaan input bilangan bulat dalam rtSurvey"
 ---
 
-Tipe pertanyaan integer dalam XLSForm dan rtSurvey digunakan untuk mengumpulkan respons bilangan bulat. Tipe pertanyaan ini penting untuk mengumpulkan data numerik tanpa tempat desimal, seperti jumlah, usia, atau tahun.
+Tipe pertanyaan `integer` mengumpulkan bilangan bulat (tanpa tempat desimal). Ini memicu keyboard numerik di ponsel dan memblokir entri titik desimal. Ini mendukung opsi penampilan yang sama dengan tipe `text` untuk tata letak dan pemformatan.
 
-## Spesifikasi XLSForm Dasar
+## Spesifikasi Dasar XLSForm
 
-| type    | name  | label                  |
-|---------|-------|------------------------|
-| integer | age   | Masukkan usia Anda dalam tahun |
+| type | name | label |
+|------|------|-------|
+| integer | age | Usia responden |
+| integer | household_size | Jumlah orang dalam rumah tangga |
 
-Untuk detail lebih lanjut tentang tipe pertanyaan integer dasar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk spesifikasi standar, lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
-## Penggunaan
+---
 
-Pertanyaan integer umum digunakan untuk:
+## Opsi Penampilan
 
-1. Input usia
-2. Menghitung item (misalnya, jumlah anak, anggota rumah tangga)
-3. Input tahun (misalnya, tahun lahir)
-4. Penilaian pada skala numerik
-5. Pengumpulan data bilangan bulat apa pun
+### `number-hspinner` — pemutar horizontal
 
-## Ekstensi rtSurvey
+Mengganti input dengan pemutar horizontal **− nilai +**. Mengetuk minus/plus mengurangi atau menambah nilai sebesar 1 (atau langkah kustom).
 
-Meskipun spesifikasi XLSForm dasar untuk pertanyaan integer sederhana, rtSurvey mungkin menawarkan fitur atau kustomisasi tambahan:
+```
+number-hspinner
+```
 
-1. Validasi rentang
-2. Pesan kesalahan kustom
-3. Opsi appearance untuk input angka
+**Kustomisasi bentuk dan langkah tombol** menggunakan `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','5')
+```
+
+Parameter: bentuk tombol kiri, bentuk tombol kanan, nilai langkah (default `1` untuk bilangan bulat).
+
+**Warna kustom** menggunakan `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Empat nilai secara berurutan: latar belakang tombol kiri, ikon tombol kiri, latar belakang tombol kanan, ikon tombol kanan.
+
+---
+
+### `thousandsep` — pemisah ribuan
+
+Memformat angka yang ditampilkan dengan pengelompokan koma (misalnya `1,234,567`). Angka mentah disimpan tanpa koma. Tipe input dialihkan ke `"text"` untuk memungkinkan tampilan yang diformat.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — pengelompokan digit kustom
+
+Mengelompokkan digit menjadi blok `n` yang dipisahkan oleh pemisah kustom. Berguna untuk ID yang diformat atau kode referensi yang bersifat numerik.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+Tipe input dialihkan ke `"text"` saat penampilan ini aktif.
+
+---
+
+### `textonly` — paksa keyboard teks
+
+Memaksa `type="text"` pada elemen input. Ini mencegah kekhasan input angka browser (seperti menyembunyikan angka nol di depan atau menambahkan panah putar di browser desktop) sambil tetap mengumpulkan nilai numerik.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — petunjuk mengambang sebagai label
+
+Teks `hint` dirender di dalam input sebagai placeholder. Ketika pengguna mulai mengetik, teks itu akan mengambang di atas bidang sebagai label.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — petunjuk di dalam batas input
+
+Mirip dengan `floating_hint` — petunjuk berada di dalam batas input saat kosong. Tidak mengambang saat pengguna mengetik.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — input dialog modal
+
+Mengetuk bidang akan membuka dialog modal dengan input yang lebih besar, bukan mengedit secara sebaris. Berguna di layar kecil di mana input layar penuh lebih mudah.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — penghitung karakter langsung
+
+Menampilkan hitungan karakter `(n)` langsung di bawah input, diperbarui saat pengguna mengetik.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — tambahkan awalan
+
+Menambahkan string statis atau terhitung ke nilai yang ditampilkan. Nilai yang disimpan tidak menyertakan awalan.
+
+```
+prefix('Item #')        → menampilkan "Item #42", menyimpan "42"
+prefix(${code_prefix})  → awalan dinamis dari bidang lain
+```
+
+---
+
+### `align_answer` — perataan teks input
+
+Mengontrol perataan horizontal nilai yang diketik di dalam input.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — pemindaian QR / barcode ke bidang
+
+Menambahkan tombol pemindaian kode QR di samping input. Membuka pemindai kamera dan mengisi bidang dengan nilai numerik yang dipindai.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Referensi cepat penampilan
+
+| Penampilan | Widget yang Dirender |
+|---|---|
+| *(tidak ada)* | Input angka (`type="number"`) — keyboard numerik di ponsel |
+| `number-hspinner` | Pemutar horizontal − nilai +, langkah = 1 |
+| `number-hspinner hspinner(...)` | Pemutar dengan bentuk dan langkah tombol kustom |
+| `number-hspinner colors(...)` | Pemutar dengan warna tombol kustom |
+| `thousandsep` | Tampilan angka yang dikelompokkan koma |
+| `digisep(n,"sep")` | Pengelompokan digit kustom |
+| `textonly` | Paksa keyboard teks |
+| `floating_hint` | Petunjuk mengambang di atas bidang saat mengetik |
+| `embed` | Petunjuk di dalam batas input |
+| `textpopup` | Ketuk untuk membuka dialog modal |
+| `charcount` | Penghitung karakter langsung di bawah input |
+| `prefix(expr)` | Awalan statis atau dinamis |
+| `align_answer = left/right/center` | Perataan teks input |
+| `inputs{qrscan}` | Tombol pindai QR/barcode |
+
+---
+
+## Batasan dan Validasi
+
+Gunakan batasan untuk menegakkan rentang nilai. Batasan di kolom `constraint` dievaluasi setelah setiap penekanan tombol dalam mode `number-hspinner`, bukan hanya saat blur.
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| integer | age | Usia | `. > 0 and . <= 120` | Usia harus antara 1 dan 120 |
+| integer | year | Tahun | `. >= 1800 and . <= 2100` | Masukkan tahun yang valid |
+| integer | count | Jumlah item | `. >= 0` | Tidak boleh negatif |
+
+---
+
+## Contoh — Survei Rumah Tangga
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| integer | household_size | Jumlah orang dalam rumah tangga | `number-hspinner` | `. >= 1 and . <= 30` | Harus antara 1 dan 30 |
+| integer | under_5 | Anak di bawah 5 tahun | `number-hspinner` | `. >= 0 and . <= ${household_size}` | Tidak boleh melebihi ukuran rumah tangga |
+| integer | year_built | Tahun rumah dibangun | `textonly` | `. >= 1800 and . <= 2100` | Masukkan tahun yang valid |
+
+---
 
 ## Praktik Terbaik
 
-1. Gunakan label yang jelas dan ringkas untuk menentukan input yang diharapkan.
-2. Terapkan constraint rentang untuk mencegah input yang tidak realistis atau keliru.
-3. Pertimbangkan menggunakan teks petunjuk untuk memberikan contoh atau mengklarifikasi format yang diharapkan.
-4. Untuk angka besar, pertimbangkan menggunakan koma atau spasi dalam label untuk meningkatkan keterbacaan (misalnya, "Masukkan populasi (hingga 1.000.000)").
+1. Gunakan `number-hspinner` untuk hitungan rentang kecil di mana mengklik ± lebih cepat daripada mengetik (misalnya jumlah anak, skor pada skala 1–10).
+2. Gunakan `thousandsep` saat menampilkan bilangan bulat besar (populasi, pendapatan) agar responden dapat memeriksa sendiri besarnya.
+3. Gunakan `textonly` saat browser menambahkan UI input angka yang tidak diinginkan (panah putar, gulir sentuh) yang membingungkan responden.
+4. Terapkan batasan rentang daripada mengandalkan jenis keyboard seluler — penegakan keyboard tidak universal.
 
-## Constraint dan Validasi
+## Keterbatasan
 
-Anda dapat menambahkan constraint untuk memastikan nilai yang dimasukkan berada dalam rentang tertentu:
-
-| type    | name  | label                  | constraint        | constraint_message                    |
-|---------|-------|------------------------|-------------------|---------------------------------------|
-| integer | age   | Masukkan usia Anda dalam tahun | .>0 and .&lt;=120 | Usia harus antara 1 dan 120 tahun  |
-
-## Contoh Penggunaan
-
-Berikut adalah contoh cara menggunakan pertanyaan integer dalam survei rumah tangga:
-
-| type    | name           | label                                     | constraint | constraint_message                |
-|---------|----------------|-------------------------------------------|------------|-----------------------------------|
-| integer | household_size | Berapa banyak orang yang tinggal di rumah tangga Anda? | .>0 | Ukuran rumah tangga harus minimal 1 |
-| integer | num_children   | Berapa banyak anak di bawah 18 tahun dalam rumah tangga? | .>=0 | Jumlah anak tidak bisa negatif |
-| integer | year_built     | Pada tahun berapa rumah Anda dibangun?    | .>1800 and .&lt;=2023 | Tahun harus antara 1800 dan 2023 |
-
-## Kalkulasi dengan Nilai Integer
-
-Nilai integer dapat digunakan dalam kalkulasi. Berikut contohnya:
-
-| type    | name           | label                                     |
-|---------|----------------|-------------------------------------------|
-| integer | num_adults     | Jumlah orang dewasa dalam rumah tangga    |
-| integer | num_children   | Jumlah anak-anak dalam rumah tangga       |
-| calculate | total_members | |
-
-Dalam baris kalkulasi, Anda dapat menggunakan:
-
-```
-calculation | ${num_adults} + ${num_children}
-```
-
-Ini akan menjumlahkan jumlah orang dewasa dan anak-anak untuk mendapatkan total anggota rumah tangga.
+- Input titik desimal diblokir — jika Anda membutuhkan nilai pecahan, gunakan tipe `decimal`.
+- `number-hspinner` memvalidasi `constraint` pada setiap penekanan tombol — hindari batasan yang mahal (misalnya rantai `if()` yang kompleks) dalam mode pemutar.
+- `thousandsep` dan `digisep()` menyimpan angka mentah tanpa pemformatan — jangan mengandalkan nilai tampilan yang diformat dalam perhitungan.

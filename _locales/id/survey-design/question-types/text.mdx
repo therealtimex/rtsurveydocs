@@ -1,110 +1,351 @@
 ---
 title: "Teks"
-description: "Tipe pertanyaan respons teks bebas di rtSurvey"
+description: "Jenis pertanyaan respons teks bebas di rtSurvey"
 ---
 
-Tipe pertanyaan `text` mengumpulkan respons teks bebas — string karakter apa pun. Ini adalah tipe input yang paling fleksibel dan digunakan untuk nama, alamat, deskripsi, kode, dan apa pun yang tidak sesuai dengan tipe yang lebih spesifik.
+Jenis pertanyaan `text` mengumpulkan string teks bebas. Ini adalah jenis input yang paling fleksibel dan mendukung sejumlah besar varian penampilan yang mengubah cara input dirender — dari bidang satu baris sederhana hingga pengenalan suara ke teks, dialog pop-up, editor teks kaya, dan pemutar numerik.
 
-rtSurvey juga memperluas `text` dengan **widget input waktu** yang memungkinkan entri waktu yang tepat dengan pemilih jam.
-
-## Spesifikasi XLSForm Dasar
+## Spesifikasi Dasar XLSForm
 
 | type | name | label |
 |------|------|-------|
 | text | respondent_name | Nama lengkap responden |
 | text | address | Alamat rumah |
 
-Untuk detail lebih lanjut tentang tipe teks XLSForm standar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk spesifikasi standar, lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
-## Penggunaan
+---
 
-Pertanyaan teks digunakan untuk:
+## Mode Tata Letak
 
-1. Nama, alamat, deskripsi bebas
-2. Komentar atau umpan balik terbuka
-3. Kode, ID, atau nomor referensi yang tidak sesuai dengan integer/decimal
-4. Mengumpulkan nilai waktu dengan ekstensi input waktu rtSurvey
-5. Bidang teks pelengkap otomatis (melalui `search-autocomplete-noedit-v2()`)
+### Default — Input Satu Baris
 
-## Opsi appearance standar
+Tidak perlu penampilan. Merender bidang `<input type="text">` standar.
 
-| Appearance | Deskripsi |
-|------------|-----------|
+---
+
+### `multiline` — area teks
+
+Merender area teks multi-baris. Pengguna dapat memperluasnya dengan mengetik; itu akan tumbuh secara otomatis.
+
+```
+multiline
+```
+
+**Kontrol tinggi baris** dengan menambahkan `[initRows, maxRows]`:
+
+```
+multiline [3,8]     → dimulai dengan 3 baris, diperluas hingga 8
+multiline [5]       → ditetapkan pada 5 baris
+```
+
+Default adalah 1 baris tanpa maks. Shift+Enter menyisipkan jeda baris; Enter berpindah ke pertanyaan berikutnya.
+
+---
+
+### `floating_hint` — petunjuk mengambang sebagai label
+
+Teks `hint` dirender di dalam bidang input sebagai placeholder. Ketika pengguna mulai mengetik, petunjuk akan mengambang di atas bidang sebagai label.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — petunjuk di dalam input
+
+Mirip dengan `floating_hint` — petunjuk dirender di dalam batas input ketika bidang kosong. Tidak mengambang saat mengetik.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — input dialog modal
+
+Mengetuk bidang akan membuka dialog modal SweetAlert dengan input besar, bukan mengedit secara sebaris. Berguna di ponsel untuk memberikan lebih banyak ruang layar untuk mengetik.
+
+```
+textpopup
+```
+
+---
+
+### `richtext` — editor WYSIWYG
+
+Merender editor teks kaya lengkap (Monaco / Draft.js). Responden dapat menebalkan, memiringkan, menambahkan daftar, dll. Nilai yang disimpan adalah HTML.
+
+```
+richtext
+richtext(30%)       → tinggi editor 30% dari viewport
+```
+
+---
+
+### `charcount` — penghitung karakter langsung
+
+Menambahkan tampilan hitungan karakter `(n)` di bawah input, memperbarui saat pengguna mengetik.
+
+```
+charcount
+multiline charcount
+```
+
+---
+
+## Varian Input Numerik
+
+Penampilan ini berfungsi pada tipe `text` untuk mengumpulkan angka dengan pemformatan khusus atau pola interaksi.
+
+### `numbers` — keyboard numerik
+
+Memaksa tipe input HTML menjadi `number`, memicu keyboard numerik di ponsel.
+
+```
+numbers
+```
+
+### `thousandsep` — pemisah ribuan
+
+Menampilkan angka dengan pengelompokan koma (misalnya `1,234,567`) sambil menyimpan angka mentah. Tipe input dipaksa menjadi `"text"` untuk memungkinkan tampilan koma.
+
+```
+thousandsep
+```
+
+### `digisep(n, "sep")` — pengelompokan digit kustom
+
+Mengelompokkan digit menjadi blok `n` yang dipisahkan oleh karakter kustom. Berguna untuk nomor telepon, nomor ID, dll.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+### `number-hspinner` — pemutar horizontal
+
+Mengganti input dengan pemutar horizontal **− nilai +**. Pengguna mengetuk tombol minus/plus untuk mengurangi atau menambah nilai. Bekerja dengan tipe `int` dan `decimal`.
+
+```
+number-hspinner
+```
+
+**Kustomisasi penampilan tombol** menggunakan `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','1')
+```
+
+Parameter: bentuk tombol kiri, bentuk tombol kanan, nilai langkah.
+
+**Warna kustom** menggunakan `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Empat nilai warna: latar belakang kiri, ikon kiri, latar belakang kanan, ikon kanan.
+
+### `prefix(expr)` — tambahkan awalan
+
+Menambahkan string yang dihitung atau statis ke nilai yang ditampilkan. Nilai yang disimpan tidak menyertakan awalan.
+
+```
+prefix('USD ')      → menampilkan "USD 100", menyimpan "100"
+prefix(${currency}) → awalan dinamis dari bidang lain
+```
+
+### `textonly` — paksa tipe input teks
+
+Memaksa `type="text"` meskipun bidangnya `integer` atau `decimal`. Berguna untuk menghindari kekhasan input angka browser.
+
+```
+textonly
+```
+
+---
+
+## Transformasi Teks
+
+Penampilan ini secara otomatis mengubah nilai saat pengguna mengetik.
+
+| Penampilan | Efek | Contoh input → disimpan |
+|---|---|---|
+| `upper` | Mengonversi ke HURUF BESAR | `halo` → `HALO` |
+| `lower` | Mengonversi ke huruf kecil | `HALO` → `halo` |
+| `proper` | Mengonversi ke Huruf Kapital Awal | `john doe` → `John Doe` |
+
+---
+
+## Pembantu Penangkapan Input
+
+### `inputs{stt}` — suara ke teks
+
+Menambahkan tombol mikrofon di samping input. Mengetuknya akan memulai pengenalan suara browser (Web Speech API). Teks yang ditranskripsi ditambahkan ke bidang.
+
+```
+inputs{stt}
+```
+
+Tidak didukung di Safari. Memerlukan izin mikrofon.
+
+### `inputs{qrscan}` — pemindai QR / barcode
+
+Menambahkan tombol pemindaian kode QR di samping input. Membuka modal pemindai kamera dan mengisi bidang dengan nilai yang dipindai.
+
+```
+inputs{qrscan}
+```
+
+**Tokenisasi** (menambahkan nilai yang dipindai alih-alih mengganti):
+
+```
+inputs{qrscan} append(${separator})
+```
+
+### `inputs{stt,qrscan}` — suara dan pindai
+
+Merender tombol mikrofon dan pemindaian QR berdampingan.
+
+```
+inputs{stt,qrscan}
+inputs{qrscan,stt}
+```
+
+---
+
+## Varian Terkait Pilihan
+
+Penampilan ini menautkan bidang teks ke daftar pilihan `select_one`, memungkinkan pengguna untuk memilih dari daftar atau mengetik secara bebas.
+
+### `selection_one_hide` — pemilih dropdown
+
+Merender input teks dengan panah dropdown. Mengetuk panah menampilkan pilihan dari daftar `search()` yang ditautkan. Memilih pilihan mengisi input dan menguncinya (menampilkan ✕ untuk menghapus).
+
+```
+selection_one_hide
+```
+
+### `selection_one_show` — daftar radio di bawah
+
+Merender input teks dengan tombol radio di bawahnya. Memilih radio mengisi dan mengunci input.
+
+```
+selection_one_show
+```
+
+Kedua varian memerlukan ekspresi `search()` di kolom `calculation` untuk mendefinisikan daftar pilihan.
+
+---
+
+## Perataan Jawaban
+
+Mengontrol perataan horizontal teks yang diketik dalam input.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+## Widget Input Waktu (Jam Sebaris)
+
+rtSurvey memperluas `text` dengan widget pemilih jam. Penampilan ini menampilkan ikon jam yang diketuk enumerator untuk memilih nilai waktu. Nilai disimpan sebagai teks biasa dalam format yang dipilih.
+
+### Penampilan
+
+| Penampilan | Deskripsi |
+|---|---|
+| `inline` | Tombol ikon jam di samping bidang, membuka modal |
+| `inline-onlyresult` | Ikon jam menghilang setelah pemilihan |
+| `inline-1line` | Pemutar waktu satu baris yang ringkas |
+| `inline colors("RRGGBB")` | Ikon jam dengan warna kustom |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Pemutar dengan dua warna aksen |
+
+### Token Format
+
+Tambahkan `-[format]` untuk mengontrol komponen waktu mana yang ditampilkan dan disimpan:
+
+| Format | Menampilkan |
+|---|---|
+| `inline-[%H:%M]` | Jam : Menit (24j) |
+| `inline-[%h:%M]` | Jam : Menit (12j) |
+| `inline-[%H:%M:%S]` | Jam : Menit : Detik (24j) |
+| `inline-[%M:%S]` | Menit : Detik |
+| `inline-[%H:%M:%3]` | Jam : Menit : Milidetik |
+| `inline-[%S]` | Hanya detik |
+| `inline-[%3]` | Hanya milidetik |
+| `inline-[%H]` | Hanya jam (24j) |
+
+### Posisi Tombol dengan `display{}`
+
+Sama dengan jenis sebaris lainnya — mengontrol posisi dan ukuran tombol jam:
+
+```
+inline display{right}
+inline display{center, large}
+inline-onlyresult display{left, medium, #0099FF}
+```
+
+---
+
+## Referensi Cepat Penampilan
+
+| Penampilan | Widget yang Dirender |
+|---|---|
 | *(tidak ada)* | Input teks satu baris |
-| `multiline` | Area teks multi-baris — terbaik untuk teks bebas yang lebih panjang di web |
+| `multiline` | Area teks |
+| `multiline [n,m]` | Area teks dengan kontrol baris awal/maks |
+| `floating_hint` | Petunjuk mengambang sebagai label saat mengetik |
+| `embed` | Petunjuk di dalam batas input |
+| `textpopup` | Ketuk untuk membuka dialog modal |
+| `richtext` / `richtext(height)` | Editor teks kaya WYSIWYG |
+| `charcount` | Penghitung karakter langsung di bawah input |
+| `numbers` | Keyboard numerik |
+| `thousandsep` | Pemformatan koma ribuan |
+| `digisep(n,"sep")` | Pengelompokan digit kustom |
+| `number-hspinner` | Pemutar horizontal − nilai + |
+| `prefix(expr)` | Awalan statis atau terhitung |
+| `upper` / `lower` / `proper` | Transformasi kasus otomatis |
+| `inputs{stt}` | Tombol mikrofon suara ke teks |
+| `inputs{qrscan}` | Tombol pemindaian QR/barcode |
+| `inputs{stt,qrscan}` | Tombol mikrofon dan pindai |
+| `selection_one_hide` | Pemilih dropdown dari daftar pilihan |
+| `selection_one_show` | Daftar radio di bawah input |
+| `align_answer = left/right/center` | Perataan teks jawaban |
+| `inline-[%H:%M]` | Pemilih jam — pengumpulan waktu |
+| `inline-1line` | Pemutar waktu ringkas |
 
-## Ekstensi input waktu rtSurvey
+---
 
-rtSurvey memperluas `text` dengan **widget pemilih jam** untuk mengumpulkan nilai waktu. Opsi appearance ini menampilkan ikon jam yang dapat diketuk enumerator untuk memilih jam, menit, detik, atau milidetik.
+## Batasan dan Validasi
 
-### Varian appearance
-
-| Appearance | Deskripsi |
-|------------|-----------|
-| `inline` | Ikon jam ditampilkan di sebelah bidang |
-| `inline colors("RRGGBB")` | Ikon jam dengan warna hex kustom |
-| `inline-1line` | Jam ditampilkan dalam format satu baris yang kompak |
-| `inline-1line-RRGGBB` | Satu baris dengan warna ikon kustom (hex, tanpa `#`) |
-| `inline-1line colors("RRGGBB","RRGGBB")` | Satu baris dengan dua warna |
-| `inline-onlyresult` | Ikon jam menghilang setelah dipilih; hanya nilai yang ditampilkan |
-| `inline-onlyresult colors("RRGGBB")` | Sama, dengan warna ikon kustom |
-
-### Token format waktu
-
-Tambahkan string format dalam tanda kurung untuk mengontrol komponen waktu mana yang ditampilkan:
-
-| String format | Menampilkan |
-|---------------|-------------|
-| `inline-[%H:%M]` | Jam dan menit (24 jam) |
-| `inline-[%h:%M]` | Jam dan menit (12 jam) |
-| `inline-[%H:%M:%S]` | Jam, menit, detik (24 jam) |
-| `inline-[%h:%M:%S]` | Jam, menit, detik (12 jam) |
-| `inline-[%H:%M:%3]` | Jam, menit, milidetik |
-| `inline-[%M:%S]` | Menit dan detik saja |
-| `inline-[%M:%3]` | Menit dan milidetik saja |
-| `inline-[%S]` | Detik saja |
-| `inline-[%3]` | Milidetik saja |
-| `inline-[%H]` | Jam saja (24 jam) |
-| `inline-[%h]` | Jam saja (12 jam) |
-
-### Contoh: Rekam durasi tugas dalam menit dan detik
-
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | task_duration | Waktu yang diperlukan untuk menyelesaikan tugas | `inline-[%M:%S]` |
-
-### Contoh: Rekam waktu peristiwa dalam format 24 jam dengan warna kustom
-
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | event_time | Waktu peristiwa | `inline-1line colors("0099FF")` |
-
-## Format data
-
-Data teks disimpan dan diekspor sebagai string biasa. Untuk input berbasis waktu menggunakan widget jam inline, nilainya disimpan dalam format yang sesuai dengan string format yang dipilih (misalnya, `14:32` untuk `%H:%M`).
-
-## Constraint dan validasi
-
-Terapkan constraint untuk menegakkan format, panjang, atau pola:
+Terapkan batasan untuk menegakkan format, panjang, atau pola:
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| text | name | Nama lengkap | `string-length(.) >= 2` | Nama harus minimal 2 karakter |
-| text | code | Kode referensi | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Masukkan 2 huruf besar diikuti 4 digit |
+| text | name | Nama lengkap | `string-length(.) >= 2` | Diperlukan minimal 2 karakter |
+| text | code | Kode referensi | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 huruf besar + 4 digit |
 | text | phone | Nomor telepon | `regex(., '^[0-9]{9,15}$')` | Masukkan nomor telepon yang valid |
+
+---
 
 ## Praktik Terbaik
 
-1. Gunakan tipe yang lebih spesifik (`integer`, `decimal`, `date`) kapan pun data memiliki struktur yang diketahui — ini mencegah entri yang tidak valid dan menyederhanakan analisis.
-2. Tambahkan `constraint` dengan `string-length()` atau `regex()` untuk memvalidasi kode atau ID.
-3. Gunakan appearance `multiline` untuk pertanyaan terbuka di mana responden mungkin menulis beberapa kalimat.
-4. Untuk pengumpulan waktu, pilih token format waktu yang sesuai dengan presisi yang dibutuhkan analisis Anda — mengumpulkan milidetik ketika Anda hanya memerlukan menit membuang usaha enumerator.
-
-## Dukungan platform
-
-Tipe pertanyaan teks dan semua appearance input waktu didukung di platform iOS, Android, dan web.
+1. Gunakan jenis yang lebih spesifik (`integer`, `decimal`, `date`) ketika data memiliki struktur yang diketahui — ini mencegah entri yang tidak valid.
+2. Gunakan `multiline [3,8]` untuk pertanyaan terbuka untuk memberi responden ruang untuk menulis tanpa membebani layar.
+3. Gunakan `thousandsep` atau `digisep()` alih-alih `numbers` ketika Anda membutuhkan tampilan yang diformat — `numbers` sendiri hanya mengubah keyboard.
+4. Gunakan `inputs{qrscan}` untuk menghilangkan kesalahan pengetikan manual untuk kode, ID, dan nomor seri.
+5. Gunakan `floating_hint` ketika petunjuk adalah konteks penting yang harus tetap terlihat saat mengetik — petunjuk standar menghilang dari pandangan di layar kecil.
+6. Gunakan `charcount` pada pertanyaan dengan batasan panjang agar responden dapat memantau diri sendiri.
 
 ## Keterbatasan
 
-- Respons teks adalah teks bebas — tidak ada pemeriksaan ejaan atau constraint kosakata bawaan di luar pola regex.
-- Widget waktu inline adalah ekstensi rtSurvey dan bukan bagian dari spesifikasi XLSForm standar.
+- `inputs{stt}` memerlukan browser yang mendukung Web Speech API. Chrome adalah yang paling andal; Safari tidak didukung.
+- `richtext` menyimpan HTML — rencanakan penghapusan atau sanitasi HTML dalam pipeline analisis Anda jika teks biasa diharapkan.
+- `selection_one_hide` dan `selection_one_show` memerlukan ekspresi `search()` dan hanya didukung pada klien web.
+- `number-hspinner` memvalidasi kolom `constraint` pada setiap penekanan tombol, bukan hanya saat blur — rancang batasan yang sesuai.

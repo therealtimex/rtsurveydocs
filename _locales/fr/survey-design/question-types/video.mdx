@@ -3,7 +3,7 @@ title: "Vidéo"
 description: "Les questions vidéo permettent aux répondants d'enregistrer et de soumettre des fichiers vidéo dans le cadre de l'enquête."
 ---
 
-Le type de question `video` permet aux répondants **d'enregistrer une vidéo** ou de télécharger un fichier vidéo existant dans le cadre de leur réponse à l'enquête. Il est utile pour capturer des preuves visuelles, des démonstrations, des conditions environnementales ou toute information bénéficiant du mouvement et du son combinés.
+Le type de question `video` permet aux répondants d'**enregistrer des vidéos** ou de télécharger un fichier vidéo existant dans le cadre de leur réponse à l'enquête. Il est utile pour capturer des preuves visuelles, des démonstrations, des conditions environnementales ou toute information bénéficiant du mouvement et du son combinés.
 
 ## Spécification XLSForm de base
 
@@ -19,18 +19,18 @@ Les questions vidéo sont couramment utilisées pour :
 
 1. Documenter les conditions de terrain — dommages routiers, état des infrastructures, santé des cultures
 2. Enregistrer des démonstrations de produits ou des vérifications de conformité procédurale
-3. Collecter des témoignages vidéo auprès des répondants
+3. Recueillir des témoignages vidéo des répondants
 4. Capturer des preuves nécessitant un contexte spatial (par exemple, la taille et l'étendue d'une zone problématique)
 5. Documentation avant/après pour les enquêtes de suivi et d'évaluation
 
-## Format des données
+## Format de données
 
 Les fichiers vidéo sont stockés en tant que pièces jointes binaires :
 
 - **Format :** MP4 ou MOV (enregistrement mobile)
 - **Nommage :** `{instanceID}-{fieldname}.mp4` (ou équivalent)
-- **Stockage :** Téléchargé vers le dossier média du serveur et lié à l'enregistrement de la soumission
-- **Accès :** Visualisable et téléchargeable depuis l'interface de gestion des soumissions
+- **Stockage :** Téléchargé dans le dossier média du serveur et lié à l'enregistrement de soumission
+- **Accès :** Lisible et téléchargeable depuis l'interface de gestion des soumissions
 
 ## Extensions rtSurvey
 
@@ -39,7 +39,7 @@ Les fichiers vidéo sont stockés en tant que pièces jointes binaires :
 Utilisez la colonne `parameters` pour limiter la durée d'enregistrement :
 
 | type | name | label | parameters |
-|------|------|-------|------------|
+|------|-------|-------|------------|
 | video | site_visit | Enregistrer les conditions du site | `max-duration=60` |
 
 `max-duration` est en secondes. L'enregistrement s'arrête automatiquement à la limite.
@@ -49,34 +49,34 @@ Utilisez la colonne `parameters` pour limiter la durée d'enregistrement :
 Contrôlez la résolution d'enregistrement via `parameters` :
 
 | type | name | label | parameters |
-|------|------|-------|------------|
-| video | evidence | Enregistrer une preuve vidéo | `quality=low` |
+|------|-------|-------|------------|
+| video | evidence | Enregistrer des preuves vidéo | `quality=low` |
 
 Valeurs prises en charge : `low` (téléchargement plus rapide), `normal` (par défaut), `high`. Utilisez `low` dans les zones à connectivité limitée.
 
 ### Télécharger une vidéo existante
 
-Sur mobile, le répondant peut choisir de **télécharger une vidéo existante** depuis la galerie de l'appareil au lieu d'en enregistrer une nouvelle. Ceci est activé par défaut dans l'intégration native de la caméra/galerie.
+Sur mobile, le répondant peut choisir de **télécharger une vidéo existante** depuis la galerie de l'appareil au lieu d'en enregistrer une nouvelle. Ceci est activé par défaut dans l'intégration native appareil photo/galerie.
 
 ### Lecture avant soumission
 
-Sur mobile, le clip enregistré peut être révisé avant de procéder. Aucune configuration supplémentaire n'est nécessaire.
+Sur mobile, le clip enregistré peut être révisé avant de continuer. Aucune configuration supplémentaire n'est nécessaire.
 
-### Disposition des boutons en ligne
+### Disposition du bouton en ligne
 
-Ajoutez `inline` pour afficher la caméra comme un **bouton circulaire** à côté de l'étiquette au lieu d'une zone de capture pleine largeur.
+Ajoutez `inline` pour afficher la caméra sous forme de **bouton icône circulaire** à côté de l'étiquette au lieu d'une zone de capture pleine largeur.
 
 ```
 | type  | name  | label        | appearance                              |
 |-------|-------|--------------|----------------------------------------|
-| video | clip  | Record video | inline display{right}                  |
-| video | clip  | Record video | inline display{left, large}            |
-| video | clip  | Record video | inline display{center, large, <0099FF/>} |
+| video | clip  | Enregistrer la vidéo | inline display{right}                  |
+| video | clip  | Enregistrer la vidéo | inline display{left, large}            |
+| video | clip  | Enregistrer la vidéo | inline display{center, large, <0099FF/>} |
 ```
 
-**Position du bouton** — `left`, `right` *(par défaut)*, `top`, `center`, `bottom`
+**Position du bouton** — `gauche`, `droite` *(par défaut)*, `haut`, `centre`, `bas`
 
-**Taille du bouton** — `small` *(par défaut)*, `medium`, `large`
+**Taille du bouton** — `petite` *(par défaut)*, `moyenne`, `grande`
 
 **Couleur du bouton** — ajoutez une couleur hexadécimale à l'intérieur de `display{}` pour remplacer la couleur primaire :
 
@@ -88,19 +88,19 @@ inline display{right, large, <FF5500/>}
 
 | Appearance | Effect |
 |---|---|
-| `results{hide(capture)}` | Cache le bouton d'enregistrement après la capture d'une vidéo |
-| `results{hide(review)}` | Cache la vignette de lecture après la capture |
-| `results{hide(filename)}` | Cache le nom de fichier et la durée |
+| `results{hide(capture)}` | Masque le bouton d'enregistrement après la capture d'une vidéo |
+| `results{hide(review)}` | Masque la vignette de lecture après la capture |
+| `results{hide(filename)}` | Masque le nom de fichier et la durée |
 | `results{left}` | Déplace l'icône vers la gauche après la capture |
 
-Exemple — cacher le bouton d'enregistrement, conserver la lecture :
+Exemple — masquer le bouton d'enregistrement, conserver la lecture :
 ```
 inline display{right} results{hide(capture)}
 ```
 
 ### `thumbnail-square-[WxH]` — aperçu vidéo de taille fixe
 
-Après la capture, affiche la vidéo comme un lecteur en ligne de taille fixe au lieu d'une pleine largeur. À combiner avec `inline` pour une mise en page compacte.
+Après la capture, affiche la vidéo sous forme de lecteur en ligne de taille fixe au lieu de pleine largeur. Combinez avec `inline` pour une disposition compacte.
 
 ```
 inline display{right} thumbnail-square-[120x90]
@@ -111,7 +111,7 @@ La largeur et la hauteur sont en pixels.
 
 ### `invisible auto-show` — enregistreur à ouverture automatique
 
-Cache le widget de question de la mise en page mais ouvre automatiquement l'enregistreur vidéo lorsque la page se charge.
+Masque le widget de question de la disposition mais ouvre automatiquement l'enregistreur vidéo au chargement de la page.
 
 ```
 invisible auto-show
@@ -124,32 +124,32 @@ inline invisible auto-show
 inline text-nolabel display{center, large}
 ```
 
-## Exemple d'utilisation
+## Exemples d'utilisation
 
 ### Vidéo d'inspection du site avec limite
 
 | type | name | label | hint | parameters |
-|------|------|-------|------|------------|
-| video | site_video | Enregistrer le point d'eau | Faites le tour de toute l'installation. Max 90 secondes. | `max-duration=90 quality=normal` |
+|------|-------|-------|------|------------|
+| video | site_video | Enregistrer le point d'eau | Faire le tour de toute l'installation. Max 90 secondes. | `max-duration=90 quality=normal` |
 
 ### Vidéo conditionnelle — uniquement si des dommages sont signalés
 
 | type | name | label | relevant | required |
-|------|------|-------|----------|----------|
+|------|-------|-------|----------|----------|
 | select_one yesno | damage_found | Des dommages ont-ils été trouvés ? | | |
 | video | damage_video | Enregistrer une vidéo des dommages | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
-## Bonnes pratiques
+## Meilleures pratiques
 
-1. Définissez `max-duration` — les enregistrements vidéo illimités peuvent facilement dépasser 100 Mo et échouer au téléchargement sur des connexions faibles.
-2. Utilisez `quality=low` pour les enquêtes de suivi où des preuves visuelles sont requises mais les détails fins ne le sont pas — cela réduit considérablement la taille du fichier.
-3. Rédigez des instructions d'enregistrement spécifiques dans la colonne `hint` (par exemple, "Faites le tour de tout le bâtiment, tenez l'appareil photo stable").
-4. Demandez-vous si la vidéo est nécessaire — une photo (`image`) est généralement suffisante pour des preuves statiques et produit des fichiers beaucoup plus petits.
+1. Définissez `max-duration` — les enregistrements vidéo illimités peuvent facilement dépasser 100 Mo et échouer à être téléchargés sur des connexions faibles.
+2. Utilisez `quality=low` pour les enquêtes de suivi où des preuves visuelles sont requises mais où les détails fins ne le sont pas — cela réduit considérablement la taille du fichier.
+3. Écrivez des instructions d'enregistrement spécifiques dans la colonne `hint` (par exemple, "Faites le tour de tout le bâtiment, maintenez la caméra stable").
+4. Déterminez si la vidéo est nécessaire — une photo (`image`) est généralement suffisante pour des preuves statiques et produit des fichiers beaucoup plus petits.
 5. Testez les performances de téléchargement sur le réseau de terrain réel avant le déploiement.
 
-## Limites
+## Limitations
 
-- Les fichiers vidéo sont très volumineux — une vidéo d'1 minute de qualité normale représente généralement 20 à 60 Mo selon l'appareil.
-- Le téléchargement de fichiers vidéo volumineux nécessite une bonne connexion réseau ; envisagez de synchroniser via Wi-Fi pour les formulaires riches en vidéos.
+- Les fichiers vidéo sont très volumineux — une vidéo d'une minute en qualité normale fait généralement 20 à 60 Mo selon l'appareil.
+- Le téléchargement de fichiers vidéo volumineux nécessite une bonne connexion réseau ; envisagez d'exiger une synchronisation Wi-Fi pour les formulaires lourds en vidéo.
 - Tous les navigateurs web ne prennent pas en charge l'enregistrement vidéo via MediaRecorder — Chrome est le plus fiable.
-- L'analyse des réponses vidéo est manuelle et chronophage ; utilisez-les avec parcimonie et uniquement lorsque le contenu vidéo apporte une valeur unique.
+- L'analyse des réponses vidéo est manuelle et prend du temps ; utilisez-les avec parcimonie et uniquement lorsque le contenu vidéo apporte une valeur unique.

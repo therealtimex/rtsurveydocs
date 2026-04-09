@@ -1,25 +1,25 @@
 ---
-title: "Classement (Rank)"
-description: "Les questions de classement permettent aux répondants d'ordonner un ensemble de choix par préférence ou priorité."
+title: "Classement"
+description: "Les questions de classement permettent aux répondants d'ordonner un ensemble de choix par préférence ou par priorité."
 ---
 
-Le type de question `rank` (classement) présente une liste de choix que le répondant ordonne par préférence ou priorité. Il stocke le résultat sous la forme d'une liste de valeurs de choix séparées par des espaces dans l'ordre de classement, le choix le plus prioritaire étant en premier.
+Le type de question `rank` présente une liste de choix que le répondant ordonne par préférence ou par priorité. Il stocke le résultat sous forme de liste de valeurs de choix séparées par des espaces dans l'ordre de classement, le choix de plus haute priorité étant le premier.
 
-> **Formulaire web rtSurvey :** Le widget de glisser-déposer pour classer n'est pas actuellement implémenté. Dans le formulaire web, `rank` s'affiche comme une liste de sélection. Utilisez ce type lorsque vous ciblez des clients mobiles qui prennent en charge le widget de classement, ou lorsque le format de la valeur stockée est plus important que l'interaction de glisser-déposer.
+> **Formulaire web rtSurvey :** Le widget de glisser-déposer pour le classement n'est pas actuellement implémenté. Dans le formulaire web, `rank` s'affiche sous forme de liste de sélection. Utilisez ce type lorsque vous ciblez des clients mobiles qui prennent en charge le widget de classement, ou lorsque le format de la valeur stockée est plus important que l'interaction de glisser-déposer pour ordonner.
 
 ## Spécification XLSForm de base
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Classez ces besoins communautaires du plus au moins important |
+| rank priorities | main_priority | Classer ces besoins communautaires du plus au moins important |
 
-Les choix sont définis dans la **feuille de calcul des choix** comme `select_one` :
+Les choix sont définis dans la **feuille de calcul des choix** comme pour `select_one` :
 
 **enquête :**
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Classez ces besoins du plus au moins important |
+| rank priorities | main_priority | Classer ces besoins du plus au moins important |
 
 **choix :**
 
@@ -31,15 +31,15 @@ Les choix sont définis dans la **feuille de calcul des choix** comme `select_on
 | priorities | roads | Routes |
 | priorities | electricity | Électricité |
 
-## Format de la valeur stockée
+## Format de valeur stockée
 
-La valeur stockée est une **liste séparée par des espaces** des valeurs de choix dans l'ordre de classement (le premier = priorité la plus élevée) :
+La valeur stockée est une **liste de valeurs de choix séparées par des espaces** dans l'ordre de classement (première = priorité la plus élevée) :
 
 ```
 water education health roads electricity
 ```
 
-## Extraction des positions classées
+## Extraire les positions classées
 
 Utilisez `selected-at()` pour obtenir le choix à un rang spécifique :
 
@@ -49,36 +49,36 @@ Utilisez `selected-at()` pour obtenir le choix à un rang spécifique :
 | calculate | top_priority | | selected-at(`${main_priority}`, 0) |
 | calculate | second_priority | | selected-at(`${main_priority}`, 1) |
 
-`selected-at(${main_priority}, 0)` renvoie la valeur placée **en premier** (index 0 = rang le plus élevé).
+`selected-at(${main_priority}, 0)` renvoie la valeur placée en **première** position (index 0 = rang supérieur).
 
-## Utilisation de `rank-index()` avec des groupes répétitifs
+## Utilisation de `rank-index()` avec les groupes répétitifs
 
-Lorsque `rank` est utilisé dans un groupe répétitif, `rank-index()` vous permet de référencer le rang ordinal depuis l'extérieur de la répétition :
+Lorsque `rank` est utilisé à l'intérieur d'un groupe répétitif, `rank-index()` vous permet de référencer le rang ordinal depuis l'extérieur de la répétition :
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_ranked | | rank-index(1, `${score}`) |
 
-Voir [Fonctions — Fonctions de champ répété](../operators-and-functions/functions#repeated-field-functions) pour tous les détails sur `rank-index()` et `rank-index-if()`.
+Voir [Fonctions — Fonctions de champ répétées](../operators-and-functions/functions#repeated-field-functions) pour tous les détails sur `rank-index()` et `rank-index-if()`.
 
 ## Utilisations
 
 Les questions de classement sont couramment utilisées pour :
 
 1. **Classement par priorité** — demander aux communautés de classer les besoins de développement
-2. **Ordre de préférence** — classer les fonctionnalités de produits, les attributs de service ou les options de politique
+2. **Classement par préférence** — classer les caractéristiques des produits, les attributs de service ou les options politiques
 3. **Ordre des éléments d'examen** — organiser les étapes d'un processus
-4. **Sélection Top-N** — combinée avec `selected-at()` pour extraire uniquement les 1, 2 ou 3 premiers choix
+4. **Sélection des N meilleurs** — combiné avec `selected-at()` pour extraire uniquement les 1, 2 ou 3 meilleurs choix
 
 ## Bonnes pratiques
 
-1. Gardez la liste courte (3 à 7 éléments) — le classement devient cognitivement exigeant au-delà de 7 à 8 choix.
-2. Utilisez des étiquettes de choix claires et mutuellement exclusives pour éviter toute confusion quant à ce que signifie "premier".
-3. Ajoutez un texte d'indice expliquant la direction du classement (par exemple, "Faites glisser pour ordonner : premier = le plus important").
+1. Gardez la liste courte (3 à 7 éléments) — le classement devient cognitivement exigeant au-delà de 7-8 choix.
+2. Utilisez des étiquettes de choix claires et mutuellement exclusives pour éviter toute confusion sur ce que signifie "premier".
+3. Ajoutez un texte d'aide expliquant la direction du classement (par exemple, "Faites glisser pour classer : premier = le plus important").
 4. Validez en utilisant `count-selected(.) = x` si vous devez vous assurer que tous les choix sont classés.
 
-## Limites
+## Limitations
 
-- Le widget de glisser-déposer pour classer n'est pas implémenté dans le formulaire web rtSurvey.
+- Le widget de glisser-déposer pour le classement n'est pas implémenté dans le formulaire web rtSurvey.
 - Vous ne pouvez pas classer partiellement — tous les choix doivent être ordonnés.
 - Gardez les listes à 3-7 éléments ; les listes plus longues deviennent difficiles à gérer quel que soit le client.

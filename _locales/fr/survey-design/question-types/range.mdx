@@ -1,9 +1,9 @@
 ---
 title: "Plage"
-description: "Les questions de plage permettent aux répondants de sélectionner un nombre en faisant glisser un curseur entre une valeur minimale et maximale définie."
+description: "Les questions de type "plage" permettent aux répondants de sélectionner un nombre en faisant glisser un curseur entre une valeur minimale et maximale définie."
 ---
 
-Le type de question `range` permet aux répondants de choisir un nombre dans une plage minimale et maximale définie. Dans le formulaire Web de rtSurvey, cela se traduit par un **champ numérique** standard — l'enquêteur saisit directement une valeur. Les paramètres `start`, `end` et `step` définissent la plage valide et sont appliqués comme contraintes.
+Le type de question `range` permet aux répondants de choisir un nombre entre un minimum et un maximum définis. Dans le formulaire web de rtSurvey, cela se présente sous la forme d'une **saisie numérique** standard — l'enquêteur saisit directement une valeur. Les paramètres `start`, `end` et `step` définissent la plage valide et sont appliqués comme contraintes.
 
 ## Spécification XLSForm de base
 
@@ -13,30 +13,30 @@ Le type de question `range` permet aux répondants de choisir un nombre dans une
 
 La colonne `parameters` définit les limites du curseur et la taille du pas :
 
-| Parameter | Description                               | Default |
-|-----------|-------------------------------------------|---------|
-| `start`   | Valeur minimale (incluse)                 | 0       |
-| `end`     | Valeur maximale (incluse)                 | 10      |
-| `step`    | Incrément entre les valeurs valides | 1       |
+| Parameter | Description | Par défaut |
+|-----------|-------------|---------|
+| `start` | Valeur minimale (inclusive) | 0 |
+| `end` | Valeur maximale (inclusive) | 10 |
+| `step` | Incrément entre les valeurs valides | 1 |
 
-Pour plus de détails sur le type de question `range` standard, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+Pour plus de détails sur le type de question de plage standard, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
 
 ## Utilisations
 
-Les questions de plage sont couramment utilisées pour :
+Les questions de type "plage" sont couramment utilisées pour :
 
-1. Échelles de satisfaction ou d'évaluation (par exemple, 1 à 5 ou 0 à 10)
+1. Échelles de satisfaction ou d'évaluation (par exemple, 1-5 ou 0-10)
 2. Échelles numériques de type Likert
-3. Collecte de mesures où seules des valeurs discrètes sont valides
-4. Tranches d'âge ou plages de scores où un curseur améliore la convivialité par rapport à un champ de texte
+3. Collecte de mesures où seules les valeurs discrètes sont valides
+4. Tranches d'âge ou plages de scores où un curseur améliore l'utilisabilité par rapport à un champ de texte
 
 ## Exemple d'utilisation
 
-### Échelle d'évaluation de base
+### Échelle de notation de base
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | overall_rating | Évaluation globale (0–10) | start=0 end=10 step=1 |
+| range | overall_rating | Note globale (0-10) | start=0 end=10 step=1 |
 
 ### Pas décimal
 
@@ -48,19 +48,19 @@ Les questions de plage sont couramment utilisées pour :
 
 | type | name | label | parameters | calculation |
 |------|------|-------|------------|-------------|
-| range | score | Score au test (0–100) | start=0 end=100 step=5 | |
+| range | score | Score du test (0-100) | start=0 end=100 step=5 | |
 | calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
 | note | grade_note | Votre note est : `${grade}` | | |
 
 ## Bonnes pratiques
 
-1. Définissez toujours des valeurs `start`, `end` et `step` significatives — ne vous fiez pas aux valeurs par défaut.
+1. Définissez toujours des valeurs significatives pour `start`, `end` et `step` — ne vous fiez pas aux valeurs par défaut.
 2. Étiquetez les extrémités de votre échelle dans la colonne `hint` (par exemple, `hint: 0 = Très insatisfait, 10 = Très satisfait`) pour donner du contexte aux répondants.
 3. Pour les échelles de Likert à 5 points, utilisez `start=1 end=5 step=1` plutôt que 0-4, car les répondants s'attendent à ce que "1" signifie le plus bas.
 4. Utilisez `range` au lieu de `integer` + contrainte lorsque la nature bornée de l'entrée fait partie de la conception de la question (le curseur communique visuellement l'échelle).
 
 ## Limitations
 
-- Il n'y a pas de widget de curseur dans le formulaire Web rtSurvey — la saisie de la valeur est un simple champ numérique. Pour une expérience de curseur visuel, utilisez un client mobile qui prend en charge le widget `range`.
-- Pour des plages très larges (par exemple, 0 à 10000), un simple `integer` avec une contrainte est tout aussi efficace et plus convivial.
-- Les pas fins (par exemple, `step=0.1`) fonctionnent comme des contraintes mais n'ont pas de problème de précision de curseur dans le formulaire Web.
+- Il n'y a pas de widget de curseur dans le formulaire web rtSurvey — la saisie de valeur est une simple entrée numérique. Pour une expérience de curseur visuel, utilisez un client mobile qui prend en charge le widget de plage.
+- Pour les très larges plages (par exemple, 0-10000), un simple `integer` avec une contrainte est tout aussi efficace et plus convivial.
+- Les valeurs de pas fines (par exemple, `step=0.1`) fonctionnent comme des contraintes mais n'ont pas de problème de précision du curseur dans le formulaire web.

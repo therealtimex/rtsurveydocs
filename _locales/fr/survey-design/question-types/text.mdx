@@ -1,9 +1,9 @@
 ---
 title: "Texte"
-description: "Type de question de réponse en texte libre dans rtSurvey"
+description: "Type de question à réponse libre dans rtSurvey"
 ---
 
-Le type de question `text` (texte) collecte une chaîne de texte libre. C'est le type de saisie le plus flexible et il prend en charge un grand nombre de variantes d'apparence qui modifient la façon dont l'entrée est rendue — d'un simple champ à une seule ligne à la parole-texte, des dialogues contextuels, des éditeurs de texte enrichi et des sélecteurs numériques.
+Le type de question `text` collecte une chaîne de texte libre. C'est le type de saisie le plus flexible et il prend en charge un grand nombre de variantes d'apparence qui modifient la façon dont la saisie est rendue — d'un simple champ monoligne à la reconnaissance vocale, aux boîtes de dialogue contextuelles, aux éditeurs de texte enrichi et aux sélecteurs numériques.
 
 ## Spécification XLSForm de base
 
@@ -16,17 +16,17 @@ Pour la spécification standard, consultez la [documentation XLSForm](https://xl
 
 ---
 
-## Modes de mise en page
+## Modes de disposition
 
-### Par défaut — saisie sur une seule ligne
+### Par défaut — saisie monoligne
 
-Aucune apparence n'est nécessaire. Affiche un champ `<input type="text">` standard.
+Aucune apparence nécessaire. Rend un champ `<input type="text">` standard.
 
 ---
 
 ### `multiline` — zone de texte
 
-Affiche une zone de texte multiligne. L'utilisateur peut l'étendre en tapant ; elle s'agrandit automatiquement.
+Rend une zone de texte multiligne. L'utilisateur peut l'agrandir en tapant ; elle s'agrandit automatiquement.
 
 ```
 multiline
@@ -36,10 +36,10 @@ multiline
 
 ```
 multiline [3,8]     → commence à 3 lignes, s'étend jusqu'à 8
-multiline [5]       → fixe à 5 lignes
+multiline [5]       → fixé à 5 lignes
 ```
 
-La valeur par défaut est 1 ligne sans maximum. Maj+Entrée insère un saut de ligne ; Entrée passe à la question suivante.
+La valeur par défaut est 1 ligne sans maximum. Shift+Entrée insère un saut de ligne ; Entrée passe à la question suivante.
 
 ---
 
@@ -53,7 +53,7 @@ floating_hint
 
 ---
 
-### `embed` — indice à l'intérieur de l'entrée
+### `embed` — indice à l'intérieur de la saisie
 
 Similaire à `floating_hint` — l'indice s'affiche à l'intérieur de la limite de saisie lorsque le champ est vide. Ne flotte pas lors de la saisie.
 
@@ -63,9 +63,9 @@ embed
 
 ---
 
-### `textpopup` — saisie dans une boîte de dialogue modale
+### `textpopup` — saisie par boîte de dialogue modale
 
-Taper sur le champ ouvre une boîte de dialogue modale SweetAlert avec une grande entrée au lieu d'éditer en ligne. Utile sur mobile pour donner plus d'espace d'écran pour la saisie.
+Appuyer sur le champ ouvre une boîte de dialogue modale SweetAlert avec une grande saisie au lieu d'éditer en ligne. Utile sur mobile pour donner plus d'espace d'écran pour la saisie.
 
 ```
 textpopup
@@ -75,18 +75,18 @@ textpopup
 
 ### `richtext` — éditeur WYSIWYG
 
-Affiche un éditeur de texte enrichi complet (Monaco / Draft.js). Le répondant peut mettre en gras, en italique, ajouter des listes, etc. La valeur stockée est du HTML.
+Rend un éditeur de texte riche complet (Monaco / Draft.js). Le répondant peut mettre en gras, en italique, ajouter des listes, etc. La valeur stockée est HTML.
 
 ```
 richtext
-richtext(30%)       → hauteur de l'éditeur 30 % de la fenêtre d'affichage
+richtext(30%)       → hauteur de l'éditeur 30% de la fenêtre d'affichage
 ```
 
 ---
 
 ### `charcount` — compteur de caractères en direct
 
-Ajoute un affichage de compteur de caractères `(n)` sous l'entrée, mis à jour au fur et à mesure que l'utilisateur tape.
+Ajoute un affichage du nombre de caractères `(n)` en direct sous la saisie, mis à jour au fur et à mesure que l'utilisateur tape.
 
 ```
 charcount
@@ -97,7 +97,7 @@ multiline charcount
 
 ## Variantes de saisie numérique
 
-Ces apparences fonctionnent sur le type `text` pour collecter des nombres avec un formatage ou des schémas d'interaction spéciaux.
+Ces apparences fonctionnent sur le type `text` pour collecter des nombres avec des formats ou des modèles d'interaction spéciaux.
 
 ### `numbers` — clavier numérique
 
@@ -109,7 +109,7 @@ numbers
 
 ### `thousandsep` — séparateur de milliers
 
-Affiche le nombre avec un regroupement par virgule (par exemple `1,234,567`) tout en stockant le nombre brut. Le type d'entrée est forcé à `text` pour permettre l'affichage de la virgule.
+Affiche le nombre avec un regroupement par virgules (par exemple `1,234,567`) tout en stockant le nombre brut. Le type d'entrée est forcé à `text` pour permettre l'affichage de la virgule.
 
 ```
 thousandsep
@@ -117,7 +117,7 @@ thousandsep
 
 ### `digisep(n, "sep")` — regroupement de chiffres personnalisé
 
-Regroupe les chiffres par blocs de `n` séparés par un caractère personnalisé. Utile pour les numéros de téléphone, les numéros d'identification, etc.
+Regroupe les chiffres en blocs de `n` séparés par un caractère personnalisé. Utile pour les numéros de téléphone, les numéros d'identification, etc.
 
 ```
 digisep(4,"-")      → 0912-3456-789
@@ -126,13 +126,13 @@ digisep(3," ")      → 012 345 678
 
 ### `number-hspinner` — sélecteur horizontal
 
-Remplace l'entrée par un sélecteur horizontal **− valeur +**. L'utilisateur tape sur les boutons moins/plus pour décrémenter ou incrémenter la valeur. Fonctionne avec les types `int` et `decimal`.
+Remplace la saisie par un sélecteur horizontal **− valeur +**. L'utilisateur appuie sur les boutons moins/plus pour décrémenter ou incrémenter la valeur. Fonctionne avec les types `int` et `decimal`.
 
 ```
 number-hspinner
 ```
 
-**Personnaliser l'apparence des boutons** en utilisant `hspinner()` :
+**Personnaliser l'apparence du bouton** en utilisant `hspinner()`:
 
 ```
 number-hspinner hspinner('left-small-square','right-small-square','1')
@@ -140,13 +140,13 @@ number-hspinner hspinner('left-small-square','right-small-square','1')
 
 Paramètres : forme du bouton gauche, forme du bouton droit, valeur du pas.
 
-**Couleurs personnalisées** en utilisant `colors()` :
+**Couleurs personnalisées** en utilisant `colors()`:
 
 ```
 number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
 ```
 
-Quatre valeurs de couleur : arrière-plan gauche, icône gauche, arrière-plan droit, icône droite.
+Quatre valeurs de couleur : arrière-plan gauche, icône gauche, arrière-plan droit, icône droit.
 
 ### `prefix(expr)` — ajouter un préfixe
 
@@ -171,17 +171,17 @@ textonly
 
 Ces apparences transforment automatiquement la valeur au fur et à mesure que l'utilisateur tape.
 
-| Appearance | Effect | Exemple de saisie → stocké |
+| Appearance | Effect | Example input → stored |
 |---|---|---|
 | `upper` | Convertit en MAJUSCULES | `hello` → `HELLO` |
 | `lower` | Convertit en minuscules | `HELLO` → `hello` |
-| `proper` | Convertit en Casse Titre | `john doe` → `John Doe` |
+| `proper` | Convertit en casse appropriée | `john doe` → `John Doe` |
 
 ---
 
-## Aides à la capture de saisie
+## Aides à la capture d'entrée
 
-### `inputs{stt}` — parole-texte
+### `inputs{stt}` — reconnaissance vocale
 
 Ajoute un bouton microphone à côté de l'entrée. Taper dessus démarre la reconnaissance vocale du navigateur (Web Speech API). Le texte transcrit est ajouté au champ.
 
@@ -199,15 +199,15 @@ Ajoute un bouton de scan de code QR à côté de l'entrée. Ouvre la modale du s
 inputs{qrscan}
 ```
 
-**Tokenisation** (ajouter les valeurs scannées au lieu de les remplacer) :
+**Tokeniser** (ajouter les valeurs scannées au lieu de les remplacer) :
 
 ```
 inputs{qrscan} append(${separator})
 ```
 
-### `inputs{stt,qrscan}` — parole et scan
+### `inputs{stt,qrscan}` — à la fois la parole et le scan
 
-Affiche les boutons microphone et scan QR côte à côte.
+Affiche à la fois les boutons microphone et scan QR côte à côte.
 
 ```
 inputs{stt,qrscan}
@@ -222,7 +222,7 @@ Ces apparences lient un champ de texte à une liste de choix `select_one`, perme
 
 ### `selection_one_hide` — sélecteur déroulant
 
-Affiche l'entrée de texte avec une flèche déroulante. Taper sur la flèche affiche les choix de la liste `search()`. La sélection d'un choix remplit l'entrée et la verrouille (affiche ✕ pour effacer).
+Rend l'entrée de texte avec une flèche déroulante. Taper sur la flèche affiche les choix de la liste `search()` liée. La sélection d'un choix remplit l'entrée et la verrouille (affiche ✕ pour effacer).
 
 ```
 selection_one_hide
@@ -230,7 +230,7 @@ selection_one_hide
 
 ### `selection_one_show` — liste radio ci-dessous
 
-Affiche l'entrée de texte avec des boutons radio en dessous. La sélection d'une radio remplit et verrouille l'entrée.
+Rend l'entrée de texte avec des boutons radio en dessous. La sélection d'un bouton radio remplit et verrouille l'entrée.
 
 ```
 selection_one_show
@@ -242,7 +242,7 @@ Les deux variantes nécessitent une expression `search()` dans la colonne `calcu
 
 ## Alignement de la réponse
 
-Contrôle l'alignement horizontal du texte tapé dans l'entrée.
+Contrôle l'alignement horizontal du texte saisi dans la zone de saisie.
 
 ```
 align_answer = left
@@ -254,36 +254,36 @@ align_answer = center
 
 ## Widget de saisie de l'heure (horloge en ligne)
 
-rtSurvey étend le type `text` avec un widget de sélection d'horloge. Ces apparences affichent une icône d'horloge sur laquelle l'enquêteur tape pour sélectionner une valeur horaire. La valeur est stockée en texte brut dans le format choisi.
+rtSurvey étend `text` avec un widget de sélection d'heure. Ces apparences affichent une icône d'horloge que l'énumérateur touche pour sélectionner une valeur horaire. La valeur est stockée en texte brut dans le format choisi.
 
 ### Apparences
 
 | Appearance | Description |
 |---|---|
-| `inline` | Bouton d'icône d'horloge à côté du champ, ouvre la modale |
-| `inline-onlyresult` | L'icône de l'horloge disparaît après la sélection |
-| `inline-1line` | Sélecteur de temps compact sur une seule ligne |
-| `inline colors("RRGGBB")` | Icône d'horloge avec couleur personnalisée |
+| `inline` | Bouton icône horloge à côté du champ, ouvre une modale |
+| `inline-onlyresult` | L'icône horloge disparaît après la sélection |
+| `inline-1line` | Sélecteur d'heure compact à une seule ligne |
+| `inline colors("RRGGBB")` | Icône horloge avec couleur personnalisée |
 | `inline-1line colors("RRGGBB","RRGGBB")` | Sélecteur avec deux couleurs d'accentuation |
 
 ### Jetons de format
 
-Ajoutez `-[format]` pour contrôler les composants horaires affichés et stockés :
+Ajoutez `-[format]` pour contrôler quels composants de temps sont affichés et stockés :
 
-| Format | Displays |
+| Format | Affiche |
 |---|---|
 | `inline-[%H:%M]` | Heures : Minutes (24h) |
 | `inline-[%h:%M]` | Heures : Minutes (12h) |
 | `inline-[%H:%M:%S]` | Heures : Minutes : Secondes (24h) |
 | `inline-[%M:%S]` | Minutes : Secondes |
 | `inline-[%H:%M:%3]` | Heures : Minutes : Millisecondes |
-| `inline-[%S]` | Secondes uniquement |
-| `inline-[%3]` | Millisecondes uniquement |
-| `inline-[%H]` | Heures uniquement (24h) |
+| `inline-[%S]` | Secondes seulement |
+| `inline-[%3]` | Millisecondes seulement |
+| `inline-[%H]` | Heures seulement (24h) |
 
 ### Position du bouton avec `display{}`
 
-Identique aux autres types en ligne — contrôle la position et la taille du bouton d'horloge :
+Identique aux autres types en ligne — contrôle la position et la taille du bouton de l'horloge :
 
 ```
 inline display{right}
@@ -293,44 +293,44 @@ inline-onlyresult display{left, medium, #0099FF}
 
 ---
 
-## Référence rapide de l'apparence
+## Référence rapide d'apparence
 
-| Appearance | Widget rendered |
+| Appearance | Widget rendu |
 |---|---|
-| *(aucun)* | Entrée de texte sur une seule ligne |
+| *(aucun)* | Saisie de texte monoligne |
 | `multiline` | Zone de texte |
-| `multiline [n,m]` | Zone de texte avec contrôle des lignes initiales/max |
+| `multiline [n,m]` | Zone de texte avec contrôle init/max de ligne |
 | `floating_hint` | L'indice flotte comme étiquette lors de la saisie |
-| `embed` | Indice à l'intérieur de la limite d'entrée |
-| `textpopup` | Taper pour ouvrir la boîte de dialogue modale |
+| `embed` | Indice à l'intérieur de la limite de saisie |
+| `textpopup` | Appuyez pour ouvrir la boîte de dialogue modale |
 | `richtext` / `richtext(height)` | Éditeur de texte enrichi WYSIWYG |
-| `charcount` | Compteur de caractères en direct sous l'entrée |
+| `charcount` | Compteur de caractères en direct sous la saisie |
 | `numbers` | Clavier numérique |
-| `thousandsep` | Formatage des milliers avec virgule |
+| `thousandsep` | Formatage avec séparateur de milliers |
 | `digisep(n,"sep")` | Regroupement de chiffres personnalisé |
 | `number-hspinner` | Sélecteur horizontal − valeur + |
 | `prefix(expr)` | Ajouter un préfixe statique ou calculé |
 | `upper` / `lower` / `proper` | Transformation automatique de la casse |
-| `inputs{stt}` | Bouton microphone parole-texte |
+| `inputs{stt}` | Bouton microphone pour la reconnaissance vocale |
 | `inputs{qrscan}` | Bouton de scan QR/code-barres |
 | `inputs{stt,qrscan}` | Boutons micro et scan |
 | `selection_one_hide` | Sélecteur déroulant à partir de la liste de choix |
-| `selection_one_show` | Liste radio sous l'entrée |
+| `selection_one_show` | Liste radio sous la saisie |
 | `align_answer = left/right/center` | Alignement du texte de réponse |
 | `inline-[%H:%M]` | Sélecteur d'horloge — collecte de l'heure |
-| `inline-1line` | Sélecteur de temps compact |
+| `inline-1line` | Sélecteur d'heure compact |
 
 ---
 
 ## Contraintes et validation
 
-Appliquez des contraintes pour faire respecter le format, la longueur ou le motif :
+Appliquer des contraintes pour faire respecter le format, la longueur ou le motif :
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
 | text | name | Nom complet | `string-length(.) >= 2` | Au moins 2 caractères requis |
 | text | code | Code de référence | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 lettres majuscules + 4 chiffres |
-| text | phone | Numéro de téléphone | `regex(., '^[0-9]{9,15}$')` | Entrez un numéro de téléphone valide |
+| text | phone | Numéro de téléphone | `regex(., '^[0-9]{9,15}$')` | Saisir un numéro de téléphone valide |
 
 ---
 
@@ -338,14 +338,14 @@ Appliquez des contraintes pour faire respecter le format, la longueur ou le moti
 
 1. Utilisez des types plus spécifiques (`integer`, `decimal`, `date`) lorsque les données ont une structure connue — cela empêche les entrées non valides.
 2. Utilisez `multiline [3,8]` pour les questions ouvertes afin de donner aux répondants de l'espace pour écrire sans surcharger l'écran.
-3. Utilisez `thousandsep` ou `digisep()` au lieu de `numbers` lorsque vous avez besoin d'un affichage formaté — `numbers` seul ne fait que modifier le clavier.
+3. Utilisez `thousandsep` ou `digisep()` au lieu de `numbers` lorsque vous avez besoin d'un affichage formaté — `numbers` seul ne fait que changer le clavier.
 4. Utilisez `inputs{qrscan}` pour éliminer les erreurs de saisie manuelle pour les codes, les identifiants et les numéros de série.
 5. Utilisez `floating_hint` lorsque l'indice est un contexte important qui doit rester visible pendant la saisie — les indices standard disparaissent de la vue sur les petits écrans.
 6. Utilisez `charcount` sur les questions avec des contraintes de longueur afin que les répondants puissent s'auto-surveiller.
 
-## Limites
+## Limitations
 
 - `inputs{stt}` nécessite un navigateur qui prend en charge l'API Web Speech. Chrome est le plus fiable ; Safari n'est pas pris en charge.
-- `richtext` stocke le HTML — prévoyez le nettoyage ou la désinfection du HTML dans votre pipeline d'analyse si du texte brut est attendu.
+- `richtext` stocke le HTML — prévoyez l'élimination ou la désinfection du HTML dans votre pipeline d'analyse si du texte brut est attendu.
 - `selection_one_hide` et `selection_one_show` nécessitent une expression `search()` et ne sont pris en charge que sur le client web.
-- `number-hspinner` valide par rapport à la colonne `constraint` à chaque pression de bouton, pas seulement lors de la perte de focus — concevez les contraintes en conséquence.
+- `number-hspinner` valide par rapport à la colonne `constraint` à chaque pression de bouton, et pas seulement lors de la perte de focus — concevez les contraintes en conséquence.

@@ -1,16 +1,16 @@
 ---
 title: "Entier"
-description: "Type de question de saisie de nombre entier dans rtSurvey"
+description: "Type de question à saisie de nombre entier dans rtSurvey"
 ---
 
-Le type de question `integer` recueille des nombres entiers (sans décimales). Il déclenche un clavier numérique sur mobile et bloque la saisie de points décimaux. Il prend en charge les mêmes options `appearance` que le type `text` pour la mise en page et le formatage.
+Le type de question `integer` collecte des nombres entiers (sans décimales). Il déclenche un clavier numérique sur mobile et bloque la saisie de points décimaux. Il prend en charge les mêmes options d'apparence que le type `text` pour la mise en page et le formatage.
 
 ## Spécification XLSForm de base
 
 | type | name | label |
 |------|------|-------|
 | integer | age | Âge du répondant |
-| integer | household_size | Nombre de personnes dans le foyer |
+| integer | household_size | Nombre de personnes dans le ménage |
 
 Pour la spécification standard, consultez la [documentation XLSForm](https://xlsform.org/en/#question-types).
 
@@ -20,13 +20,13 @@ Pour la spécification standard, consultez la [documentation XLSForm](https://xl
 
 ### `number-hspinner` — sélecteur horizontal
 
-Remplace l'entrée par un sélecteur horizontal **− valeur +**. Appuyer sur moins/plus décrémente ou incrémente la valeur de 1 (ou d'un pas personnalisé).
+Remplace la saisie par un sélecteur horizontal **− valeur +**. Appuyer sur moins/plus décrémente ou incrémente la valeur de 1 (ou d'un pas personnalisé).
 
 ```
 number-hspinner
 ```
 
-**Personnaliser la forme du bouton et le pas** à l'aide de `hspinner()` :
+**Personnaliser la forme et le pas du bouton** en utilisant `hspinner()`:
 
 ```
 number-hspinner hspinner('left-small-square','right-small-square','5')
@@ -34,7 +34,7 @@ number-hspinner hspinner('left-small-square','right-small-square','5')
 
 Paramètres : forme du bouton gauche, forme du bouton droit, valeur du pas (par défaut `1` pour les entiers).
 
-**Couleurs personnalisées** à l'aide de `colors()` :
+**Couleurs personnalisées** en utilisant `colors()`:
 
 ```
 number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
@@ -46,7 +46,7 @@ Quatre valeurs dans l'ordre : arrière-plan du bouton gauche, icône du bouton g
 
 ### `thousandsep` — séparateur de milliers
 
-Formate le nombre affiché avec un regroupement par virgules (par exemple, `1,234,567`). Le nombre brut est stocké sans virgules. Le type d'entrée est remplacé par `"text"` pour permettre l'affichage formaté.
+Formate le nombre affiché avec un regroupement par virgules (par exemple `1,234,567`). Le nombre brut est stocké sans virgules. Le type de saisie est basculé sur `"text"` pour permettre l'affichage formaté.
 
 ```
 thousandsep
@@ -63,13 +63,13 @@ digisep(4,"-")      → 0912-3456-789
 digisep(3," ")      → 012 345 678
 ```
 
-Le type d'entrée est remplacé par `"text"` lorsque cette `appearance` est active.
+Le type de saisie est basculé sur `"text"` lorsque cette apparence est active.
 
 ---
 
 ### `textonly` — forcer le clavier texte
 
-Force `type="text"` sur l'élément d'entrée. Cela empêche les bizarreries de saisie de nombres du navigateur (telles que la masquage des zéros en tête ou l'ajout de flèches de rotation dans les navigateurs de bureau) tout en collectant une valeur numérique.
+Force `type="text"` sur l'élément d'entrée. Cela évite les bizarreries de saisie numérique du navigateur (telles que le masquage des zéros en tête ou l'ajout de flèches de rotation dans les navigateurs de bureau) tout en collectant une valeur numérique.
 
 ```
 textonly
@@ -79,7 +79,7 @@ textonly
 
 ### `floating_hint` — l'indice flotte comme étiquette
 
-Le texte `hint` s'affiche à l'intérieur de l'entrée comme un espace réservé. Lorsque l'utilisateur commence à taper, il flotte au-dessus du champ comme une étiquette.
+Le texte `hint` s'affiche à l'intérieur de la saisie comme un espace réservé. Lorsque l'utilisateur commence à taper, il flotte au-dessus du champ comme une étiquette.
 
 ```
 floating_hint
@@ -87,9 +87,9 @@ floating_hint
 
 ---
 
-### `embed` — indice à l'intérieur de la limite d'entrée
+### `embed` — indice à l'intérieur de la limite de saisie
 
-Similaire à `floating_hint` — l'indice se trouve à l'intérieur de la limite d'entrée lorsqu'il est vide. Il ne flotte pas lorsque l'utilisateur tape.
+Similaire à `floating_hint` — l'indice se trouve à l'intérieur de la limite de saisie lorsqu'elle est vide. Il ne flotte pas lorsque l'utilisateur tape.
 
 ```
 embed
@@ -97,9 +97,9 @@ embed
 
 ---
 
-### `textpopup` — entrée de dialogue modale
+### `textpopup` — saisie par boîte de dialogue modale
 
-Appuyer sur le champ ouvre une boîte de dialogue modale avec une entrée plus grande au lieu d'éditer en ligne. Utile sur les petits écrans où une entrée plein écran est plus facile.
+Appuyer sur le champ ouvre une boîte de dialogue modale avec une saisie plus grande au lieu d'une édition en ligne. Utile sur les petits écrans où une saisie plein écran est plus facile.
 
 ```
 textpopup
@@ -109,7 +109,7 @@ textpopup
 
 ### `charcount` — compteur de caractères en direct
 
-Affiche un compteur de caractères en direct `(n)` sous l'entrée, mis à jour au fur et à mesure que l'utilisateur tape.
+Affiche un compteur de caractères `(n)` en direct sous la saisie, mis à jour au fur et à mesure que l'utilisateur tape.
 
 ```
 charcount
@@ -128,9 +128,9 @@ prefix(${code_prefix})  → préfixe dynamique d'un autre champ
 
 ---
 
-### `align_answer` — alignement du texte d'entrée
+### `align_answer` — alignement du texte de saisie
 
-Contrôle l'alignement horizontal de la valeur tapée à l'intérieur de l'entrée.
+Contrôle l'alignement horizontal de la valeur tapée à l'intérieur de la saisie.
 
 ```
 align_answer = left
@@ -142,7 +142,7 @@ align_answer = center
 
 ### `inputs{qrscan}` — scan QR / code-barres dans le champ
 
-Ajoute un bouton de scan de code QR à côté de l'entrée. Ouvre le scanner de la caméra et remplit le champ avec la valeur numérique scannée.
+Ajoute un bouton de scan de code QR à côté de l'entrée. Ouvre le scanner de l'appareil photo et remplit le champ avec la valeur numérique scannée.
 
 ```
 inputs{qrscan}
@@ -150,35 +150,35 @@ inputs{qrscan}
 
 ---
 
-## Référence rapide de l'apparence
+## Référence rapide d'apparence
 
 | Appearance | Widget rendu |
 |---|---|
-| *(aucun)* | Entrée numérique (`type="number"`) — clavier numérique sur mobile |
+| *(aucun)* | Saisie numérique (`type="number"`) — clavier numérique sur mobile |
 | `number-hspinner` | Sélecteur horizontal − valeur +, pas = 1 |
-| `number-hspinner hspinner(...)` | Sélecteur avec forme de bouton et pas personnalisés |
+| `number-hspinner hspinner(...)` | Sélecteur avec forme et pas de bouton personnalisés |
 | `number-hspinner colors(...)` | Sélecteur avec couleurs de bouton personnalisées |
 | `thousandsep` | Affichage numérique groupé par virgules |
 | `digisep(n,"sep")` | Regroupement de chiffres personnalisé |
 | `textonly` | Forcer le clavier texte |
 | `floating_hint` | L'indice flotte au-dessus du champ pendant la saisie |
-| `embed` | Indice à l'intérieur de la limite d'entrée |
-| `textpopup` | Appuyer pour ouvrir une boîte de dialogue modale |
-| `charcount` | Compteur de caractères en direct sous l'entrée |
+| `embed` | Indice à l'intérieur de la limite de saisie |
+| `textpopup` | Appuyez pour ouvrir la boîte de dialogue modale |
+| `charcount` | Compteur de caractères en direct sous la saisie |
 | `prefix(expr)` | Ajouter un préfixe statique ou dynamique |
-| `align_answer = left/right/center` | Alignement du texte d'entrée |
+| `align_answer = left/right/center` | Alignement du texte de saisie |
 | `inputs{qrscan}` | Bouton de scan QR/code-barres |
 
 ---
 
 ## Contraintes et validation
 
-Utilisez des contraintes pour appliquer des plages de valeurs. Les contraintes de la colonne `constraint` sont évaluées après chaque appui sur un bouton en mode `number-hspinner`, et pas seulement lors de la perte de focus.
+Utilisez des contraintes pour faire respecter les plages de valeurs. Les contraintes dans la colonne `constraint` sont évaluées après chaque pression de bouton en mode `number-hspinner`, et pas seulement lors de la perte de focus.
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
 | integer | age | Âge | `. > 0 and . <= 120` | L'âge doit être compris entre 1 et 120 |
-| integer | year | Année de construction | `. >= 1800 and . <= 2100` | Entrez une année valide |
+| integer | year | Année de construction | `. >= 1800 and . <= 2100` | Saisir une année valide |
 | integer | count | Nombre d'articles | `. >= 0` | Ne peut pas être négatif |
 
 ---
@@ -187,21 +187,21 @@ Utilisez des contraintes pour appliquer des plages de valeurs. Les contraintes d
 
 | type | name | label | appearance | constraint | constraint_message |
 |------|------|-------|------------|------------|-------------------|
-| integer | household_size | Personnes dans le foyer | `number-hspinner` | `. >= 1 and . <= 30` | Doit être compris entre 1 et 30 |
+| integer | household_size | Personnes dans le ménage | `number-hspinner` | `. >= 1 and . <= 30` | Doit être compris entre 1 et 30 |
 | integer | under_5 | Enfants de moins de 5 ans | `number-hspinner` | `. >= 0 and . <= ${household_size}` | Ne peut pas dépasser la taille du ménage |
-| integer | year_built | Année de construction de la maison | `textonly` | `. >= 1800 and . <= 2100` | Entrez une année valide |
+| integer | year_built | Année de construction de la maison | `textonly` | `. >= 1800 and . <= 2100` | Saisir une année valide |
 
 ---
 
 ## Bonnes pratiques
 
-1. Utilisez `number-hspinner` pour les petits nombres où cliquer sur ± est plus rapide que de taper (par exemple, nombre d'enfants, score sur une échelle de 1 à 10).
-2. Utilisez `thousandsep` lors de l'affichage de grands entiers (population, revenu) afin que les répondants puissent vérifier l'ordre de grandeur.
-3. Utilisez `textonly` lorsque les navigateurs ajoutent une interface utilisateur de saisie numérique indésirable (flèches de rotation, défilement tactile) qui perturbe les répondants.
+1. Utilisez `number-hspinner` pour les décomptes à petite échelle où cliquer sur ± est plus rapide que de taper (par exemple, nombre d'enfants, score sur une échelle de 1 à 10).
+2. Utilisez `thousandsep` lors de l'affichage de grands entiers (population, revenu) afin que les répondants puissent vérifier eux-mêmes l'ordre de grandeur.
+3. Utilisez `textonly` lorsque les navigateurs ajoutent des éléments d'interface utilisateur indésirables pour les nombres (flèches de défilement, défilement tactile) qui déroutent les répondants.
 4. Appliquez des contraintes de plage plutôt que de vous fier au type de clavier mobile — l'application du clavier n'est pas universelle.
 
 ## Limitations
 
 - La saisie de points décimaux est bloquée — si vous avez besoin de valeurs fractionnaires, utilisez le type `decimal`.
-- `number-hspinner` valide la `constraint` à chaque appui sur un bouton — évitez les contraintes coûteuses (par exemple, les chaînes `if()` complexes) en mode sélecteur.
+- `number-hspinner` valide la `constraint` à chaque pression de bouton — évitez les contraintes coûteuses (par exemple, les chaînes `if()` complexes) en mode sélecteur.
 - `thousandsep` et `digisep()` stockent le nombre brut sans formatage — ne vous fiez pas à la valeur d'affichage formatée dans les calculs.
