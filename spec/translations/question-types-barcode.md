@@ -7,7 +7,7 @@
 `_locales/{locale}/survey-design/question-types/barcode.mdx`
 
 ## Summary of changes
-Replaced placeholder rtSurvey extensions. Added: supported formats, inline button layout with display{} and results{} (hide(scanner), hide(value), hide(review)), invisible auto-show.
+Full rewrite. Added: supported formats, default full-width button layout, scanner modal description (manual text entry, camera fallback), inline button layout with display{align, size, color} and results{} (hide(scanner), hide(review), hide(value)), inputs{auto-close(N)} countdown auto-close, inputs{floating} draggable scanner icon, invisible auto-show, repeat group auto-advance behavior, text-nolabel.
 
 ## Locales
 
