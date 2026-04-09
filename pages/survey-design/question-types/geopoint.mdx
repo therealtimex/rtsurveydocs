@@ -3,78 +3,201 @@ title: "Geopoint"
 description: "Geopoint questions capture geographic coordinates (latitude, longitude, altitude, and accuracy) as part of the survey."
 ---
 
-The geopoint question type in XLSForms and rtSurvey enables the collection of geographic coordinates using the device's GPS or other location services. This feature is particularly useful for mapping survey responses, tracking field activities, or associating data with specific locations.
+The `geopoint` question type captures geographic coordinates (latitude, longitude, altitude, accuracy) using the device GPS. rtSurvey renders the picker with several layout modes and supports automation through `inputs{}` and `outputs{}` parameters.
 
 ## Basic XLSForm Specification
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geopoint | location    | Record the current location     |
+| type     | name        | label                       |
+|----------|-------------|-----------------------------|
+| geopoint | location    | Record the current location |
 
-For more details on the basic geopoint question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
-
-## Uses
-
-Geopoint questions are commonly used for:
-
-1. Mapping survey responses geographically
-2. Verifying the location of field activities
-3. Tracking the route of enumerators
-4. Associating environmental or social data with specific locations
-5. Calculating distances or areas in geographical analyses
-
-## Best Practices
-
-1. Ensure the device has location services enabled and permissions granted.
-2. Allow sufficient time for the GPS to acquire an accurate fix.
-3. Consider privacy implications and inform respondents about location data collection.
-4. Use in conjunction with other question types to provide context for the location data.
-
-## Example Usage
-
-Here's an example of how you might use a geopoint question in a survey:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geopoint | sample_location| Record the location of the sample collection | Stand in an open area for better GPS signal |
-
-## rtSurvey Extensions
-
-While the basic XLSForm specification for geopoint questions is straightforward, rtSurvey may offer additional features or customizations:
-
-1. Map integration for visual confirmation of the captured location
-2. Accuracy threshold settings
-3. Option to manually input coordinates
-4. Integration with offline maps for remote areas
-
-(Note: The specific extensions available in rtSurvey for geopoint questions would need to be confirmed and detailed here.)
+For the standard specification see the [XLSForm documentation](https://xlsform.org/en/#question-types).
 
 ## Data Format
 
-Geopoint data is typically stored as a string of four space-separated values:
+Stored as four space-separated values:
 
 ```
 latitude longitude altitude accuracy
 ```
 
-For example:
+Example: `13.756331 100.501762 15 8`
+
+---
+
+## Layout modes
+
+### Default — rectangular button
+
+A rectangular "START GEOPOINT" button opens a full map modal where the enumerator selects a point. After capture, the button label changes to "View or change geo point" and coordinates appear below.
+
+No appearance value required.
+
+---
+
+### `display{inline-icon}` — circular crosshairs button
+
+Renders a circular icon button (crosshairs ⊕) instead of the rectangular button. Tapping it opens the same map modal.
+
 ```
-41.40338 2.17403 30.5 10
+display{inline-icon}
 ```
 
-## Considerations for Analysis
+**Combined with position and size:**
 
-When using geopoint questions, consider:
+```
+display{inline-icon, left}           → button left of label
+display{inline-icon, top}            → button above label
+display{inline-icon, bottom}         → button below label, centered
+display{inline-icon, large}          → large icon (75px)
+display{inline-icon, medium}         → medium icon (50px)
+display{inline-icon, left, large}    → large button on the left
+```
 
-1. How the geographic data will be visualized (e.g., mapping software)
-2. The accuracy of the collected coordinates and its impact on analysis
-3. Privacy and data protection measures for handling location data
-4. Potential integration with GIS (Geographic Information System) tools
+| Size | Icon height/width |
+|------|------------------|
+| *(default)* | 25px |
+| `medium` | 50px |
+| `large` | 75px |
+
+---
+
+### `display{thumbnail-square}` — live map thumbnail
+
+Renders a live map preview (Leaflet) directly on the question instead of a button. The thumbnail shows the current GPS position and the selected point. Tapping the expand button opens the full modal.
+
+```
+display{thumbnail-square}
+```
+
+**Custom thumbnail size:**
+
+```
+display{thumbnail-square-[WxH]}          → fixed pixels
+display{thumbnail-square-[400x200]}      → 400px wide × 200px tall
+
+display{thumbnail-square-[W%xH%]}        → percentage of form width
+display{thumbnail-square-[100%x30%]}     → full width × 30% of form width
+```
+
+---
+
+## `display{}` vs `results{}` — before and after capture
+
+`display{}` controls layout **before** the user captures a location. `results{}` controls layout **after** a value exists. They can have different alignments.
+
+```
+display{inline-icon, right} results{left}
+```
+
+This renders the button on the right before capture, then moves it to the left once a point is recorded.
+
+### `hide(value)` — suppress coordinates display
+
+By default, the captured lat/lon/accuracy/altitude text is shown below the button. Hide it with:
+
+```
+results{hide(value)}
+display{inline-icon} results{hide(value)}
+```
+
+---
+
+## `inputs{}` — GPS automation
+
+### Auto-capture on load
+
+Automatically records the GPS position when the form loads, without the enumerator pressing anything.
+
+```
+inputs{auto-take}
+```
+
+**Conditional auto-capture** using an XLSForm expression:
+
+```
+inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
+```
+
+### Pre-fill from a text field
+
+Populate the geopoint from a question that contains a place name or address string. rtSurvey reverse-geocodes the string to coordinates via OpenStreetMap Nominatim.
+
+```
+inputs{question(address_field)}
+```
+
+---
+
+## `outputs{}` — reverse geocode to text
+
+After a point is captured, automatically populate a `text` question with the human-readable address (reverse geocoded from the coordinates).
+
+```
+outputs{question(address_field)}
+```
+
+Example:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | location | Record location | `outputs{question(address_text)}` |
+| text | address_text | Address | |
+
+---
+
+## `nomap` — GPS capture without map
+
+Replaces the map modal with a simple dialog that requests location permission and records coordinates. No map is displayed. Useful for GPS-only capture on low-end devices or when map tiles are unavailable offline.
+
+```
+nomap
+```
+
+---
+
+## Custom button style
+
+Use `styleButton()` to apply custom CSS to the default rectangular button:
+
+```
+styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
+```
+
+---
+
+## Suppress the label
+
+```
+text-nolabel display{inline-icon, center, large}
+```
+
+---
+
+## Example usage
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | field_loc | Record field location | `display{inline-icon, right, large}` |
+| geopoint | site | Site location | `display{thumbnail-square-[100%x30%]}` |
+| geopoint | auto_loc | Current position | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | mapped_loc | Location | `display{inline-icon} outputs{question(address)}` |
+| geopoint | gps_only | GPS point | `nomap` |
+
+---
+
+## Best Practices
+
+1. Use `inputs{auto-take}` for enumerator-verification surveys where GPS is mandatory — it removes the manual step.
+2. Use `display{thumbnail-square}` when you want the enumerator to visually confirm the selected point before proceeding.
+3. Pair `outputs{question(...)}` with a read-only `text` field to show the reverse-geocoded address to the enumerator.
+4. Use `nomap` in areas with no internet connectivity where map tiles cannot load.
+5. Allow GPS time to stabilise before recording — accuracy under 10m is typically sufficient for field surveys.
 
 ## Limitations
 
-- Accuracy can vary depending on the device and environmental conditions.
-- GPS signals may be weak or unavailable in indoor locations or areas with obstructions.
-- Collecting location data may significantly impact device battery life.
-- There may be privacy concerns associated with collecting precise location data.
-
+- `inputs{question(name)}` geocoding requires internet access — it calls the OpenStreetMap Nominatim API.
+- `outputs{question(name)}` reverse geocoding also requires internet access.
+- Map thumbnail (`display{thumbnail-square}`) requires internet for tile loading; coordinates are still captured offline.
+- GPS accuracy varies by device and environment — indoor or urban canyon conditions may produce accuracy > 50m.
+- Collecting location data may significantly impact device battery life during long surveys.

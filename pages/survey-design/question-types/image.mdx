@@ -40,14 +40,69 @@ Here's an example of how you might use an image question in a survey:
 
 ## rtSurvey Extensions
 
-While the basic XLSForm specification for image questions is straightforward, rtSurvey may offer additional features or customizations:
+### Inline button layout
 
-1. Image quality settings (e.g., low, medium, high resolution)
-2. Option to add captions or tags to images
-3. Multiple image capture for a single question
-4. Integration with device's native camera app or gallery
+Add `inline` to the `appearance` column to render the camera as a **circular icon button** next to the label instead of a full-width capture area. Tapping it opens a modal.
 
-(Note: The specific extensions available in rtSurvey for image questions would need to be confirmed and detailed here.)
+```
+| type  | name  | label        | appearance                          |
+|-------|-------|--------------|-------------------------------------|
+| image | photo | Take a photo | inline display{right}               |
+| image | photo | Take a photo | inline display{center, large}       |
+```
+
+**Button position — `display{}`:**
+
+| Value | Layout |
+|-------|--------|
+| `right` *(default)* | Icon right of label |
+| `left` | Icon left of label |
+| `top` | Icon above label, centered |
+| `center` / `bottom` | Icon below label, centered |
+
+**Button size:**
+
+| Value | Size |
+|-------|------|
+| `small` *(default)* | Small circle |
+| `medium` | Medium circle |
+| `large` | Large circle |
+
+**Post-capture control — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Hides the camera button after a photo is taken |
+| `results{hide(review)}` | Hides the thumbnail preview after capture |
+| `results{hide(filename)}` | Hides the filename shown after upload |
+| `results{left}` | Moves icon to the left after capture |
+
+Example — large centered button, hide camera after capture:
+```
+inline display{center, large} results{hide(capture)}
+```
+
+### Signature and drawing
+
+| Appearance | Description |
+|---|---|
+| `signature` | Enables signature pad instead of camera |
+| `draw` | Enables freehand drawing canvas |
+
+### Watermark
+
+Add a text or image watermark to captured photos:
+
+```
+watermark(text, "Survey ID: ${id}", bottom-right, 0.5)
+watermark(file, logo.png, top-left, 1.0, 20%)
+```
+
+### Suppress the label
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Data Handling
 

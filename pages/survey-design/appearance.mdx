@@ -121,6 +121,60 @@ Example:
 | datetime | event_time | Event date and time | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | Date of birth | inline-[%d/%m/%Y] |
 
+### Inline button layout — `display{}` and `results{}`
+
+For question types that render as an inline icon button (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), two appearance modifiers control the button position and post-capture behavior.
+
+#### `display{...}` — button position before capture
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parameter | Values | Default |
+|-----------|--------|---------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex e.g. `#FF5500` | primary theme color |
+| Flag | `inline-icon` | forces icon mode |
+
+| Align value | Layout |
+|-------------|--------|
+| `right` | Button to the right of the label |
+| `left` | Button to the left of the label |
+| `top` | Button above the label, full-width centered |
+| `center` / `bottom` | Button below the label, full-width centered |
+
+#### `results{...}` — layout and visibility after capture
+
+Inherits `display{}` settings. Use to move the button or hide elements once a value has been captured.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| `hide` value | Effect |
+|---|---|
+| `hide(capture)` | Hides the capture button once a file/value exists |
+| `hide(review)` | Hides the review thumbnail / playback button |
+| `hide(filename)` | Hides the filename shown after upload |
+| `hide(camera)` | Hides the camera trigger button after capture |
+| `hide(scanner)` | Hides the barcode scan button after a value is scanned |
+| `hide(value)` | Hides the scanned value text (barcode / geopoint) |
+
+The widget automatically switches from `display{}` to `results{}` layout the moment a value is captured.
+
+**Examples:**
+
+```
+inline display{right}                                    → icon right of label
+inline display{left, large}                              → large icon on the left
+inline display{center, large, #FF5500}                   → large orange icon below label
+inline display{right} results{left}                      → icon moves left after capture
+inline display{right} results{hide(capture)}             → icon disappears after capture
+inline display{center} results{hide(capture), hide(filename)}
+```
+
 ## Known Limitations
 
 - Complex appearances may not render identically across all platforms.

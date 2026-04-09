@@ -62,6 +62,31 @@ On mobile, the enumerator can play back the recorded clip before proceeding. Thi
 
 On Android and iOS, `audio` launches the device's native recording app. On web, it uses the browser's built-in MediaRecorder API.
 
+### Inline button layout
+
+Add `inline` to render the microphone as a **circular icon button** next to the label.
+
+```
+| type  | name | label        | appearance                    |
+|-------|------|--------------|-------------------------------|
+| audio | clip | Record audio | inline display{right}         |
+| audio | clip | Record audio | inline display{left, large}   |
+```
+
+**Post-capture control — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Hides the record button after audio is captured |
+| `results{hide(review)}` | Hides the playback button |
+| `results{hide(filename)}` | Hides the filename and duration |
+| `results{left}` | Moves icon to the left after capture |
+
+Example — hide record button after capture, keep playback:
+```
+inline display{right} results{hide(capture)}
+```
+
 ## Example usage
 
 ### With maximum duration and hint

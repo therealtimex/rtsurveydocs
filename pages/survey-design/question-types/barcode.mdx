@@ -24,13 +24,40 @@ Barcode questions are commonly used for:
 
 ## rtSurvey Extensions
 
-While the basic XLSForm specification for barcode questions is straightforward, rtSurvey may offer additional features or customizations. These could include:
+### Supported formats
 
-1. Support for multiple barcode formats (e.g., QR codes, UPC, EAN)
-2. Integration with device camera for barcode scanning
-3. Manual entry option in case the barcode is damaged or can't be scanned
+rtSurvey supports QR codes, UPC, EAN, Code 128, Code 39, and other common barcode formats via the device camera.
 
-(Note: The specific extensions available in rtSurvey for barcode questions would need to be confirmed and detailed here.)
+### Inline button layout
+
+Add `inline` to render the scanner as a **circular icon button** next to the label.
+
+```
+| type    | name | label      | appearance            |
+|---------|------|------------|-----------------------|
+| barcode | code | Scan item  | inline display{right} |
+```
+
+**Post-capture control — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(scanner)}` | Hides the scan button after a value is captured |
+| `results{hide(value)}` | Hides the scanned value text |
+| `results{hide(review)}` | Hides the review display |
+
+Example — large centered button, hide scanner after scan:
+```
+inline display{center, large} results{hide(scanner)}
+```
+
+### Auto-show
+
+When combined with `invisible`, the scanner modal can be triggered automatically:
+
+```
+invisible auto-show
+```
 
 ## Best Practices
 
