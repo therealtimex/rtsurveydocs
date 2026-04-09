@@ -1,75 +1,207 @@
 ---
-title: "Integer"
-description: "Az integer kérdések egész számok bevitelét teszik lehetővé a felmérésben."
+title: "Egész szám"
+description: "Egész szám típusú beviteli kérdés az rtSurveyben"
 ---
 
-Az XLSForm és az rtSurvey integer kérdéstípusa egész számú válaszok gyűjtésére szolgál. Ez a kérdéstípus elengedhetetlen tizedesjegyek nélküli numerikus adatok – például darabszámok, korhatárok vagy évszámok – gyűjtéséhez.
+Az `integer` kérdéstípus egész számokat gyűjt (tizedesjegyek nélkül). Mobilon numerikus billentyűzetet indít el, és letiltja a tizedes pont bevitelt. Ugyanazokat a megjelenési opciókat támogatja, mint a `text` típus az elrendezés és a formázás szempontjából.
 
-## Alapvető XLSForm-specifikáció
+## Alapvető XLSForm specifikáció
 
-| type    | name  | label                      |
-|---------|-------|----------------------------|
-| integer | age   | Adja meg korát években     |
+| type | name | label |
+|------|------|-------|
+| integer | age | Válaszadó életkora |
+| integer | household_size | Háztartásban élők száma |
 
-Az integer kérdéstípus alapvető részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+A szabványos specifikációért lásd az [XLSForm dokumentációt](https://xlsform.org/en/#question-types).
 
-## Felhasználási területek
+---
 
-Az integer kérdések általánosan használt területei:
+## Megjelenési opciók
 
-1. Kor megadása
-2. Elemek számlálása (pl. gyerekek, háztartási tagok száma)
-3. Évszám megadása (pl. születési év)
-4. Numerikus skálán végzett értékelések
-5. Bármilyen egész számot igénylő numerikus adatgyűjtés
+### `number-hspinner` — horizontális forgató
 
-## rtSurvey-bővítések
-
-Bár az alapvető XLSForm-specifikáció egyszerű az integer kérdéseknél, az rtSurvey további funkciókat kínálhat:
-
-1. Tartomány-érvényesítés
-2. Egyéni hibaüzenetek
-3. Megjelenési lehetőségek a számbevitelhez
-
-## Bevált módszerek
-
-1. Használjon egyértelmű és tömör feliratokat a várt bevitel és formátum megjelöléséhez.
-2. Alkalmazzon tartomány-korlátokat az irreális vagy hibás bevitelek megelőzéséhez.
-3. Fontolja meg súgószöveg hozzáadását a várt formátum példáinak megadásához.
-4. Nagy számok esetén jelezze a várható nagyságrendet a feliratban vagy súgóban (pl. „Adja meg a népességet (legfeljebb 1 000 000)").
-
-## Korlátok és ellenőrzés
-
-Korlátokat adhat hozzá, hogy biztosítsa, hogy a megadott érték egy adott tartományba essen:
-
-| type    | name  | label                      | constraint        | constraint_message                       |
-|---------|-------|----------------------------|-------------------|------------------------------------------|
-| integer | age   | Adja meg korát években     | .>0 and .&lt;=120    | A kornak 1 és 120 év közé kell esnie     |
-
-## Példa
-
-Íme egy példa arra, hogyan lehet integer kérdéseket felhasználni egy háztartási felmérésben:
-
-| type    | name           | label                                       | constraint           | constraint_message                            |
-|---------|----------------|---------------------------------------------|----------------------|-----------------------------------------------|
-| integer | household_size | Hányan laknak a háztartásban?               | .>0                  | A háztartás mérete legalább 1 kell legyen      |
-| integer | num_children   | Hány 18 év alatti gyermek él a háztartásban? | .>=0               | A gyermekek száma nem lehet negatív            |
-| integer | year_built     | Melyik évben épült a háza?                  | .>1800 and .&lt;=2023   | Az évnek 1800 és 2023 közé kell esnie         |
-
-## Számítás integer értékekkel
-
-Az integer értékek felhasználhatók számításokban. Íme egy példa:
-
-| type    | name           | label                                       |
-|---------|----------------|---------------------------------------------|
-| integer | num_adults     | Felnőttek száma a háztartásban              |
-| integer | num_children   | Gyermekek száma a háztartásban              |
-| calculate | total_members | |
-
-A calculate sorban a következőt használhatja:
+Kicseréli a bevitelt egy horizontális **− érték +** forgatóra. A mínusz/plusz megérintése 1-gyel (vagy egy egyedi lépésközzel) csökkenti vagy növeli az értéket.
 
 ```
-calculation | ${num_adults} + ${num_children}
+number-hspinner
 ```
 
-Ez a felnőttek és gyermekek számát összeadva adja meg a háztartás összlétszámát.
+**Gomb alakzatának és lépésének testreszabása** `hspinner()` használatával:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','5')
+```
+
+Paraméterek: bal gomb alakzata, jobb gomb alakzata, lépés értéke (alapértelmezett `1` az egész számokhoz).
+
+**Egyedi színek** `colors()` használatával:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Négy érték sorrendben: bal gomb háttér, bal gomb ikon, jobb gomb háttér, jobb gomb ikon.
+
+---
+
+### `thousandsep` — ezres elválasztó
+
+A megjelenített számot vesszővel csoportosítva formázza (pl. `1,234,567`). A nyers számot vesszők nélkül tárolja. A beviteli típus `"text"`-re vált, hogy lehetővé tegye a formázott megjelenítést.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — egyedi számjegycsoportosítás
+
+A számjegyeket `n` blokkokba csoportosítja, egyedi elválasztóval elválasztva. Hasznos formázott azonosítókhoz vagy numerikus hivatkozási kódokhoz.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+A beviteli típus `"text"`-re vált, ha ez a megjelenés aktív.
+
+---
+
+### `textonly` — szöveges billentyűzet kényszerítése
+
+`type="text"`-et kényszerít a beviteli elemre. Ez megakadályozza a böngésző számbillentyűzet-hibáit (például a vezető nullák elrejtését vagy a forgatógombok hozzáadását asztali böngészőkben), miközben továbbra is numerikus értéket gyűjt.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — tipp lebeg címkeként
+
+A `hint` szöveg helyőrzőként jelenik meg a beviteli mezőben. Amikor a felhasználó gépelni kezd, az a mező fölé lebeg, mint egy címke.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — tipp a beviteli határon belül
+
+Hasonló a `floating_hint`-hez — a tipp a beviteli határon belül helyezkedik el üres állapotban. Nem lebeg gépeléskor.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — modális párbeszédpanel bevitele
+
+A mező megérintése egy modális párbeszédpanelt nyit meg nagyobb bevitellel az inline szerkesztés helyett. Kisméretű képernyőkön hasznos, ahol egy teljes képernyős bevitel könnyebb.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — élő karakterszámláló
+
+Élő `(n)` karakterszámlálót jelenít meg a beviteli mező alatt, amely a felhasználó gépelésekor frissül.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — előtag hozzáadása
+
+Statikus vagy számított karakterláncot illeszt a megjelenített érték elé. A tárolt érték nem tartalmazza az előtagot.
+
+```
+prefix('Tétel #')        → "Tétel #42" jelenik meg, "42" tárolódik
+prefix(${code_prefix})  → dinamikus előtag egy másik mezőből
+```
+
+---
+
+### `align_answer` — beviteli szöveg igazítása
+
+A beírt érték vízszintes igazítását szabályozza a beviteli mezőben.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — QR / vonalkód beolvasása mezőbe
+
+Hozzáad egy QR-kód szkennelő gombot a beviteli mező mellé. Megnyitja a kamera szkennert, és kitölti a mezőt a beolvasott numerikus értékkel.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Gyors megjelenési referencia
+
+| Megjelenés | Megjelenített widget |
+|---|---|
+| *(nincs)* | Számbevitel (`type="number"`) — numerikus billentyűzet mobilon |
+| `number-hspinner` | Horizontális − érték + forgató, lépés = 1 |
+| `number-hspinner hspinner(...)` | Forgató egyedi gomb alakzattal és lépéssel |
+| `number-hspinner colors(...)` | Forgató egyedi gomb színekkel |
+| `thousandsep` | Vesszővel csoportosított szám megjelenítése |
+| `digisep(n,"sep")` | Egyedi számjegycsoportosítás |
+| `textonly` | Szöveges billentyűzet kényszerítése |
+| `floating_hint` | A tipp lebeg a mező felett gépelés közben |
+| `embed` | A tipp a beviteli határon belül |
+| `textpopup` | Érintse meg a modális párbeszédpanel megnyitásához |
+| `charcount` | Élő karakterszámláló a bevitel alatt |
+| `prefix(expr)` | Statikus vagy dinamikus előtag |
+| `align_answer = left/right/center` | Beviteli szöveg igazítása |
+| `inputs{qrscan}` | QR/vonalkód szkennelő gomb |
+
+---
+
+## Korlátok és érvényesítés
+
+Használjon korlátokat az értéktartományok érvényesítésére. A `constraint` oszlopban található korlátok minden gombnyomás után kiértékelődnek `number-hspinner` módban, nem csak elmosódáskor.
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| integer | age | Életkor | `. > 0 and . <= 120` | Az életkornak 1 és 120 között kell lennie |
+| integer | year | Év | `. >= 1800 and . <= 2100` | Adjon meg érvényes évet |
+| integer | count | Tételek száma | `. >= 0` | Nem lehet negatív |
+
+---
+
+## Példa — háztartási felmérés
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| integer | household_size | Háztartásban élők száma | `number-hspinner` | `. >= 1 and . <= 30` | 1 és 30 között kell lennie |
+| integer | under_5 | 5 év alatti gyermekek | `number-hspinner` | `. >= 0 and . <= ${household_size}` | Nem haladhatja meg a háztartás méretét |
+| integer | year_built | Építés éve | `textonly` | `. >= 1800 and . <= 2100` | Adjon meg érvényes évet |
+
+---
+
+## Legjobb gyakorlatok
+
+1. Használja a `number-hspinner`-t kis tartományú számlálásokhoz, ahol a ± kattintás gyorsabb, mint a gépelés (pl. gyermekek száma, 1-10-es skálán elért pontszám).
+2. Használja a `thousandsep`-t nagy egész számok (populáció, jövedelem) megjelenítésekor, hogy a válaszadók maguk ellenőrizhessék a nagyságrendet.
+3. Használja a `textonly`-t, ha a böngészők nem kívánt számbillentyűzet-UI-t (forgatógombok, érintésgörgetés) adnak hozzá, ami megzavarja a válaszadókat.
+4. Kényszerítse az értéktartomány-korlátokat a mobil billentyűzet típusára való támaszkodás helyett — a billentyűzet-kényszerítés nem univerzális.
+
+## Korlátok
+
+- A tizedes pont bevitel blokkolva van — ha tört értékekre van szüksége, használja a `decimal` típust.
+- A `number-hspinner` minden gombnyomásra érvényesíti a `constraint`-et — kerülje a drága korlátokat (pl. komplex `if()` láncokat) forgató módban.
+- A `thousandsep` és a `digisep()` a nyers számot formázás nélkül tárolják — ne támaszkodjon a formázott megjelenítési értékre a számításokban.

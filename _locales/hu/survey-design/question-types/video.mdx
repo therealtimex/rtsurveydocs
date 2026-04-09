@@ -1,93 +1,155 @@
 ---
-title: "Video"
-description: "A videókérdések lehetővé teszik a válaszadók számára, hogy videofájlokat rögzítsenek és nyújtsanak be a felmérés részeként."
+title: "Videó"
+description: "A videókérdések lehetővé teszik a válaszadók számára, hogy videofájlokat rögzítsenek és töltsenek fel a felmérés részeként."
 ---
 
-A `video` kérdéstípus lehetővé teszi a válaszadók számára, hogy **videót rögzítsenek** vagy egy meglévő videofájlt töltsenek fel felmérési válaszuk részeként. Hasznos vizuális bizonyítékok, bemutatók, környezeti körülmények vagy bármilyen olyan információ rögzítéséhez, amely mozgásból és hangból együttesen profitál.
+A `video` kérdéstípus lehetővé teszi a válaszadók számára, hogy **videót rögzítsenek** vagy meglévő videofájlt töltsenek fel felmérésük részeként. Hasznos vizuális bizonyítékok, bemutatók, környezeti feltételek vagy bármely olyan információ rögzítésére, amely a mozgás és a hang együttes előnyeit élvezi.
 
-## Alapvető XLSForm-specifikáció
+## Alapvető XLSForm specifikáció
 
-| type  | name        | label                                   |
-|-------|-------------|------------------------------------------|
-| video | demo_video  | Kérjük, rögzítsen egy rövid bemutatót   |
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Kérjük, rögzítsen egy rövid bemutatót |
 
-A standard video kérdéstípus részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+A szabványos video kérdéstípusról további részleteket az [XLSForm specification](https://xlsform.org/en/#question-types) talál.
 
 ## Felhasználási területek
 
-A videókérdések általánosan használt területei:
+A videókérdéseket gyakran használják:
 
-1. Terepi körülmények dokumentálása – útkárosodás, infrastruktúra állapota, növényzet egészsége
-2. Termékbemutatók vagy eljárási megfelelési ellenőrzések rögzítése
-3. Válaszadóktól videós beszámolók gyűjtése
-4. Térbeli kontextust igénylő bizonyítékok rögzítése (pl. egy problématerület mérete és kiterjedése)
+1. Terepi körülmények dokumentálása — útkárok, infrastruktúra állapota, termés egészsége
+2. Termékbemutatók vagy eljárási megfelelőségi ellenőrzések rögzítése
+3. Videós visszajelzések gyűjtése a válaszadóktól
+4. Bizonyítékok rögzítése, amelyek térbeli kontextust igényelnek (pl. egy problémás terület mérete és kiterjedése)
 5. Előtte/utána dokumentáció monitoring és értékelési felmérésekhez
 
 ## Adatformátum
 
-A videofájlok bináris mellékletekként kerülnek tárolásra:
+A videofájlok bináris mellékletekként tárolódnak:
 
 - **Formátum:** MP4 vagy MOV (mobil felvétel)
-- **Elnevezés:** `{instanceID}-{mezőnév}.mp4` (vagy egyenértékű)
-- **Tárolás:** Feltöltve a szerver médiamappájába és összekapcsolva a beküldési rekorddal
-- **Hozzáférés:** Lejátszható és letölthető a beküldések kezelési felületéről
+- **Elnevezés:** `{instanceID}-{fieldname}.mp4` (vagy ennek megfelelő)
+- **Tárolás:** Feltöltve a szerver média mappájába és kapcsolva a beküldött rekordhoz
+- **Hozzáférés:** Lejátszható és letölthető a beküldéskezelő felületről
 
-## rtSurvey-bővítések
+## rtSurvey kiterjesztések
 
 ### Maximális időtartam
 
-A `parameters` oszlop segítségével korlátozhatja a felvétel hosszát:
+Használja a `parameters` oszlopot a felvételi időtartam korlátozására:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | site_visit | Rögzítse a helyszín körülményeit | `max-duration=60` |
+| video | site_visit | Rögzítse a helyszíni körülményeket | `max-duration=60` |
 
-A `max-duration` értéke másodpercben értendő. A felvétel automatikusan leáll a határidőnél.
+`max-duration` másodpercben értendő. A felvétel automatikusan leáll a határértéknél.
 
 ### Minőség / felbontás
 
-A felvételi felbontást a `parameters` segítségével szabályozhatja:
+Szabályozza a felvételi felbontást a `parameters` segítségével:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | evidence | Rögzítsen videós bizonyítékot | `quality=low` |
+| video | evidence | Rögzítsen videó bizonyítékot | `quality=low` |
 
-Támogatott értékek: `low` (gyorsabb feltöltés), `normal` (alapértelmezett), `high`. Korlátozott kapcsolattal rendelkező területeken használjon `low` értéket.
+Támogatott értékek: `low` (gyorsabb feltöltés), `normal` (alapértelmezett), `high`. Használja a `low`-t korlátozott kapcsolattal rendelkező területeken.
 
 ### Meglévő videó feltöltése
 
-Mobilon a válaszadó dönthet úgy, hogy az eszköz galériájából **meglévő videót tölt fel** új felvétel helyett. Ez alapértelmezés szerint engedélyezve van a natív kamera/galéria integrációban.
+Mobilon a válaszadó választhatja, hogy **meglévő videót tölt fel** az eszköz galériájából egy új felvétele helyett. Ez alapértelmezés szerint engedélyezve van a natív kamera/galéria integrációban.
 
 ### Lejátszás beküldés előtt
 
-Mobilon a rögzített klip a folytatás előtt megtekinthető. Ehhez nincs szükség további konfigurációra.
+Mobilon a rögzített klip áttekinthető a folytatás előtt. Nincs szükség további konfigurációra.
 
-## Példa
+### Beágyazott gombelrendezés
 
-### Helyszíni ellenőrzési videó időkorláttal
+Adja hozzá az `inline` opciót, hogy a kamera kerek ikon gombként jelenjen meg a címke mellett a teljes szélességű rögzítési terület helyett.
+
+```
+| type  | name  | label        | appearance                              |
+|-------|-------|--------------|----------------------------------------|
+| video | clip  | Record video | inline display{right}                  |
+| video | clip  | Record video | inline display{left, large}            |
+| video | clip  | Record video | inline display{center, large, <0099FF/>} |
+```
+
+**Gomb pozíciója** — `left`, `right` *(default)*, `top`, `center`, `bottom`
+
+**Gomb mérete** — `small` *(default)*, `medium`, `large`
+
+**Gomb színe** — adjon hozzá egy hexadecimális színt a `display{}` belsejébe az elsődleges szín felülírásához:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Felvétel utáni vezérlés — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Elrejti a felvétel gombot videó rögzítése után |
+| `results{hide(review)}` | Elrejti a lejátszás bélyegképét rögzítés után |
+| `results{hide(filename)}` | Elrejti a fájlnevet és az időtartamot |
+| `results{left}` | Az ikont balra mozgatja rögzítés után |
+
+Példa — felvétel gomb elrejtése, lejátszás megtartása:
+```
+inline display{right} results{hide(capture)}
+```
+
+### `thumbnail-square-[WxH]` — fix méretű videó előnézet
+
+Rögzítés után a videót fix méretű beágyazott lejátszóként jeleníti meg, teljes szélesség helyett. Kombinálja az `inline`-nal a kompakt elrendezés érdekében.
+
+```
+inline display{right} thumbnail-square-[120x90]
+inline display{center} thumbnail-square-[200x150]
+```
+
+Szélesség és magasság pixelben.
+
+### `invisible auto-show` — automatikus felvevőnyitás
+
+Elrejti a kérdés widgetet az elrendezésből, de automatikusan megnyitja a videó felvevőt az oldal betöltésekor.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### A címke elrejtése
+
+```
+inline text-nolabel display{center, large}
+```
+
+## Példa felhasználás
+
+### Helyszíni ellenőrző videó korláttal
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| video | site_video | Rögzítse a vízpontot | Járja körbe a teljes létesítményt. Max. 90 másodperc. | `max-duration=90 quality=normal` |
+| video | site_video | Rögzítse a vízvételi helyet | Sétáljon körbe az egész létesítményben. Max 90 másodperc. | `max-duration=90 quality=normal` |
 
-### Feltételes videó – csak ha károsodás kerül jelentésre
+### Feltételes videó — csak ha sérülést jelentettek
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
-| select_one yesno | damage_found | Találtak-e károsodást? | | |
-| video | damage_video | Rögzítse a károsodásról szóló videót | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+| select_one yesno | damage_found | Találtak-e sérülést? | | |
+| video | damage_video | Rögzítse a sérülésről szóló videót | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
-## Bevált módszerek
+## Ajánlott Gyakorlatok
 
-1. Állítson be `max-duration` értéket – a korlátlan videofelvételek könnyen meghaladhatják a 100 MB-ot és gyenge kapcsolaton feltöltési hibát okozhatnak.
-2. Használjon `quality=low` értéket monitoring felmérésekben, ahol vizuális bizonyítékra van szükség, de finom részletek nem szükségesek – ez drasztikusan csökkenti a fájlméretet.
-3. Írjon konkrét felvételi utasításokat a `hint` oszlopba (pl. „Járja körbe az egész épületet, tartsa stabilan a kamerát").
-4. Fontolja meg, hogy valóban szükséges-e a videó – egy fotó (`image`) általában elegendő statikus bizonyítékhoz és sokkal kisebb fájlokat eredményez.
-5. A telepítés előtt tesztelje a feltöltési teljesítményt a tényleges terepi hálózaton.
+1. Állítsa be a `max-duration`-t — a korlátlan videófelvételek könnyen meghaladhatják a 100 MB-ot, és gyenge kapcsolatokon nem tölthetők fel.
+2. Használja a `quality=low`-t olyan monitoring felmérésekhez, ahol vizuális bizonyíték szükséges, de finom részletekre nincs szükség — drámaian csökkenti a fájlméretet.
+3. Írjon konkrét felvételi utasításokat a `hint` oszlopba (pl. "Sétáljon körbe az egész épületben, tartsa stabilan a kamerát").
+4. Fontolja meg, hogy szükséges-e videó — egy fénykép (`image`) általában elegendő statikus bizonyítékokhoz, és sokkal kisebb fájlokat eredményez.
+5. Tesztelje a feltöltési teljesítményt a tényleges terepi hálózaton a telepítés előtt.
 
-## Korlátozások
+## Korlátok
 
-- A videofájlok nagyon nagyok – 1 perces normál minőségű videó tipikusan 20–60 MB az eszköztől függően.
-- Nagy videofájlok feltöltéséhez jó hálózati kapcsolat szükséges; fontolja meg, hogy videóban gazdag felmérések esetén Wi-Fi-szinkronizálást tegyen kötelezővé.
-- Nem minden webböngésző támogatja a videórögzítést a MediaRecorder API-n keresztül – a Chrome a legmegbízhatóbb.
-- A videós válaszok elemzése manuális és időigényes; mértékletesen használja, csak ha a videótartalom egyedi értéket ad.
+- A videofájlok nagyon nagyok — egy 1 perces videó normál minőségben tipikusan 20–60 MB az eszköz típusától függően.
+- Nagy videofájlok feltöltéséhez jó hálózati kapcsolatra van szükség; fontolja meg a Wi-Fi szinkronizálás megkövetelését videó-intenzív űrlapok esetén.
+- Nem minden webböngésző támogatja a videó rögzítését a MediaRecorder-en keresztül — a Chrome a legmegbízhatóbb.
+- A videó válaszok elemzése manuális és időigényes; használja takarékosan és csak akkor, ha a videó tartalom egyedi értéket ad.

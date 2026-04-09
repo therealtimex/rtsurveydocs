@@ -1,110 +1,351 @@
 ---
-title: "Text"
-description: "Szabad szöveges válasz kérdéstípus az rtSurvey-ben"
+title: "Szöveg"
+description: "Szabad szöveges válasz típusú kérdés az rtSurvey-ben"
 ---
 
-A `text` kérdéstípus szabad szöveges választ gyűjt – bármilyen karakterláncot. Ez a legrugalmasabb beviteli típus, és nevekhez, címekhez, leírásokhoz, kódokhoz és minden olyan adathoz használható, amely nem illeszkedik egy specifikusabb típusba.
+A `text` kérdéstípus szabad szöveges karakterláncot gyűjt. Ez a legrugalmasabb beviteli típus, és számos megjelenési változatot támogat, amelyek megváltoztatják a bevitel megjelenítését — az egyszerű egysoros mezőtől a beszédfelismerésig, felugró párbeszédpanelekig, gazdag szövegszerkesztőkig és numerikus számlálókig.
 
-Az rtSurvey a `text` típust **időbeviteli widgetekkel** is bővíti, amelyek óraválasztóval teszik lehetővé a pontos időbevitelt.
-
-## Alapvető XLSForm-specifikáció
+## Alapvető XLSForm specifikáció
 
 | type | name | label |
 |------|------|-------|
-| text | respondent_name | A válaszadó teljes neve |
+| text | respondent_name | Válaszadó teljes neve |
 | text | address | Lakcím |
 
-A standard XLSForm text típus részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+A szabványos specifikációért lásd az [XLSForm documentation](https://xlsform.org/en/#question-types).
 
-## Felhasználási területek
+---
 
-A text kérdések a következőkre használhatók:
+## Elrendezési módok
 
-1. Nevek, címek, szabad leírások
-2. Nyílt végű megjegyzések vagy visszajelzések
-3. Kódok, azonosítók vagy hivatkozási számok, amelyek nem illeszkednek integer/decimal típusba
-4. Időértékek gyűjtése az rtSurvey időbeviteli bővítményeivel
-5. Automatikus kiegészítésű szövegmezők (a `search-autocomplete-noedit-v2()` segítségével)
+### Alapértelmezett — egysoros bevitel
 
-## Standard megjelenési lehetőségek
+Nincs szükség megjelenésre. Egy szabványos `<input type="text">` mezőt renderel.
 
-| Megjelenés | Leírás |
-|------------|--------|
-| *(nincs)* | Egysoros szövegbeviteli mező |
-| `multiline` | Többsoros szövegterület – hosszabb szabad szöveghez legjobb a weben |
+---
 
-## rtSurvey időbeviteli bővítmények
+### `multiline` — szövegmező
 
-Az rtSurvey a `text` típust **óraválasztó widgettel** bővíti időértékek gyűjtéséhez. Ezek a megjelenési lehetőségek egy óra ikont jelenítenek meg, amelyre a kérdező rákoppintva kiválaszthatja az órákat, perceket, másodperceket vagy ezredmásodperceket.
+Többsoros szövegmezőt renderel. A felhasználó gépeléssel bővítheti; automatikusan növekszik.
 
-### Megjelenési változatok
+```
+multiline
+```
 
-| Megjelenés | Leírás |
-|------------|--------|
-| `inline` | Óra ikon a mező mellett |
-| `inline colors("RRGGBB")` | Óra ikon egyéni hex-színnel |
-| `inline-1line` | Óra megjelenítése kompakt egysoros formátumban |
-| `inline-1line-RRGGBB` | Egysoros, egyéni ikon színnel (hex, `#` nélkül) |
-| `inline-1line colors("RRGGBB","RRGGBB")` | Egysoros, két színnel |
-| `inline-onlyresult` | Az óra ikon a kiválasztás után eltűnik; csak az érték látható |
-| `inline-onlyresult colors("RRGGBB")` | Ugyanaz, egyéni ikon színnel |
+**Sor magasságának szabályozása a `[initRows, maxRows]` hozzáfűzésével:**
 
-### Időformátum-tokenek
+```
+multiline [3,8]     → starts at 3 rows, expands up to 8
+multiline [5]       → fixed at 5 rows
+```
 
-Formátumkarakter-lánc hozzáfűzésével szögletes zárójelben szabályozható, hogy mely időkomponensek jelenjenek meg:
+Az alapértelmezett 1 sor, maximum nélkül. Shift+Enter soremelést szúr be; Enter a következő kérdésre lép.
 
-| Formátum-karakterlánc | Megjelenítés |
-|-----------------------|--------------|
-| `inline-[%H:%M]` | Órák és percek (24 órás) |
-| `inline-[%h:%M]` | Órák és percek (12 órás) |
-| `inline-[%H:%M:%S]` | Órák, percek, másodpercek (24 órás) |
-| `inline-[%h:%M:%S]` | Órák, percek, másodpercek (12 órás) |
-| `inline-[%H:%M:%3]` | Órák, percek, ezredmásodpercek |
-| `inline-[%M:%S]` | Csak percek és másodpercek |
-| `inline-[%M:%3]` | Csak percek és ezredmásodpercek |
+---
+
+### `floating_hint` — tipp címkeként lebeg
+
+A `hint` szöveg helykitöltőként jelenik meg a beviteli mezőben. Amikor a felhasználó elkezd gépelni, a súgó címkeként lebeg a mező felett.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — tipp a beviteli mezőn belül
+
+Hasonló a `floating_hint`-hez — a súgó a beviteli mezőn belül jelenik meg, amikor a mező üres. Nem lebeg gépelés közben.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — modális párbeszédpanel bevitele
+
+A mező megérintése egy SweetAlert modális párbeszédpanelt nyit meg egy nagy beviteli mezővel, ahelyett, hogy inline szerkesztené. Hasznos mobilon, hogy több képernyőterületet biztosítson a gépeléshez.
+
+```
+textpopup
+```
+
+---
+
+### `richtext` — WYSIWYG szerkesztő
+
+Teljes gazdag szövegszerkesztőt (Monaco / Draft.js) renderel. A válaszadó félkövéren, dőlten írhat, listákat adhat hozzá stb. A tárolt érték HTML.
+
+```
+richtext
+richtext(30%)       → editor height 30% of viewport
+```
+
+---
+
+### `charcount` — élő karakter számláló
+
+Élő `(n)` karakterszámláló kijelzőt ad a beviteli mező alá, amely a felhasználó gépelése közben frissül.
+
+```
+charcount
+multiline charcount
+```
+
+---
+
+## Numerikus beviteli változatok
+
+Ezek a megjelenések `text` típuson működnek, hogy számokat gyűjtsenek speciális formázással vagy interakciós mintákkal.
+
+### `numbers` — numerikus billentyűzet
+
+Az HTML beviteli típust `number`-re kényszeríti, mobilon numerikus billentyűzetet indít.
+
+```
+numbers
+```
+
+### `thousandsep` — ezres elválasztó
+
+Vesszővel csoportosítva jeleníti meg a számot (pl. `1,234,567`), miközben tárolja a nyers számot. A beviteli típus `text`-re kényszerül, hogy lehetővé tegye a vesszők megjelenítését.
+
+```
+thousandsep
+```
+
+### `digisep(n, "sep")` — egyéni számjegycsoportosítás
+
+Számjegyeket csoportosít `n` blokkokba, egyéni karakterrel elválasztva. Hasznos telefonszámokhoz, azonosító számokhoz stb.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+### `number-hspinner` — vízszintes számláló
+
+Kicseréli a beviteli mezőt egy vízszintes **− érték +** számlálóra. A felhasználó a mínusz/plusz gombok megérintésével csökkenti vagy növeli az értéket. `int` és `decimal` típusokkal is működik.
+
+```
+number-hspinner
+```
+
+**Gomb megjelenésének testreszabása a `hspinner()` használatával:**
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','1')
+```
+
+Paraméterek: bal gomb alakja, jobb gomb alakja, lépésköz.
+
+**Egyéni színek a `colors()` használatával:**
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Négy színérték: bal-háttér, bal-ikon, jobb-háttér, jobb-ikon.
+
+### `prefix(expr)` — előtag hozzáadása
+
+Kiszámított vagy statikus karakterláncot illeszt a megjelenített érték elé. A tárolt érték nem tartalmazza az előtagot.
+
+```
+prefix('USD ')      → displays "USD 100", stores "100"
+prefix(${currency}) → dynamic prefix from another field
+```
+
+### `textonly` — szöveges beviteli típus kényszerítése
+
+`type="text"` értéket kényszerít akkor is, ha a mező `integer` vagy `decimal`. Hasznos a böngésző numerikus beviteli sajátosságainak elkerülésére.
+
+```
+textonly
+```
+
+---
+
+## Szöveg átalakítás
+
+Ezek a megjelenések automatikusan átalakítják az értéket, ahogy a felhasználó gépel.
+
+| Appearance | Effect | Example input → stored |
+|---|---|---|
+| `upper` | Nagybetűssé alakít | `hello` → `HELLO` |
+| `lower` | Kisbetűssé alakít | `HELLO` → `hello` |
+| `proper` | Nagy kezdőbetűssé alakít | `john doe` → `John Doe` |
+
+---
+
+## Bevitel rögzítési segédek
+
+### `inputs{stt}` — beszéd szöveggé
+
+Mikrofon gombot ad a beviteli mező mellé. Megérintve elindítja a böngésző beszédfelismerését (Web Speech API). Az átírt szöveg hozzáfűződik a mezőhöz.
+
+```
+inputs{stt}
+```
+
+Nem támogatott a Safarin. Mikrofon engedély szükséges.
+
+### `inputs{qrscan}` — QR / vonalkód olvasó
+
+QR-kód beolvasó gombot ad a beviteli mező mellé. Megnyitja a kamera szkennelő modális ablakát, és feltölti a mezőt a beolvasott értékkel.
+
+```
+inputs{qrscan}
+```
+
+**Tokenizálás** (beolvasott értékek hozzáfűzése csere helyett):
+
+```
+inputs{qrscan} append(${separator})
+```
+
+### `inputs{stt,qrscan}` — beszéd és beolvasás is
+
+A mikrofon és a QR beolvasás gombokat is egymás mellett rendereli.
+
+```
+inputs{stt,qrscan}
+inputs{qrscan,stt}
+```
+
+---
+
+## Kiválasztáshoz kapcsolt változatok
+
+Ezek a megjelenések egy szövegmezőt egy `select_one` választási listához kapcsolnak, lehetővé téve a felhasználó számára, hogy a listából válasszon, vagy szabadon gépeljen.
+
+### `selection_one_hide` — legördülő választó
+
+A szöveges bevitelt legördülő nyíllal rendereli. A nyílra koppintva megjelennek a kapcsolt `search()` listából származó választások. Egy választás kiválasztása kitölti a beviteli mezőt és zárolja azt (✕-et mutat a törléshez).
+
+```
+selection_one_hide
+```
+
+### `selection_one_show` — rádió lista alább
+
+A szöveges bevitelt rádiógombokkal rendereli alatta. Egy rádiógomb kiválasztása kitölti és zárolja a beviteli mezőt.
+
+```
+selection_one_show
+```
+
+Mindkét változatnak szüksége van egy `search()` kifejezésre a `calculation` oszlopban a választási lista definiálásához.
+
+---
+
+## Válasz igazítása
+
+Szabályozza a beírt szöveg vízszintes igazítását a beviteli mezőn belül.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+## Időbevitel widget (beágyazott óra)
+
+Az rtSurvey kiterjeszti a `text` típust egy óra választó widgettel. Ezek a megjelenések egy óra ikont jelenítenek meg, amelyet az összeíró megérintve kiválaszt egy időértéket. Az érték egyszerű szövegként tárolódik a kiválasztott formátumban.
+
+### Megjelenések
+
+| Appearance | Description |
+|---|---|
+| `inline` | Óra ikon gomb a mező mellett, modális ablakot nyit meg |
+| `inline-onlyresult` | Óra ikon eltűnik a kiválasztás után |
+| `inline-1line` | Kompakt egysoros idő számláló |
+| `inline colors("RRGGBB")` | Óra ikon egyéni színnel |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Számláló két hangsúlyos színnel |
+
+### Formátum tokenek
+
+Fűzze hozzá a `-[format]`-et, hogy szabályozza, mely időösszetevők jelenjenek meg és tárolódjanak:
+
+| Format | Displays |
+|---|---|
+| `inline-[%H:%M]` | Órák : Percek (24h) |
+| `inline-[%h:%M]` | Órák : Percek (12h) |
+| `inline-[%H:%M:%S]` | Órák : Percek : Másodpercek (24h) |
+| `inline-[%M:%S]` | Percek : Másodpercek |
+| `inline-[%H:%M:%3]` | Órák : Percek : Ezredmásodpercek |
 | `inline-[%S]` | Csak másodpercek |
 | `inline-[%3]` | Csak ezredmásodpercek |
-| `inline-[%H]` | Csak órák (24 órás) |
-| `inline-[%h]` | Csak órák (12 órás) |
+| `inline-[%H]` | Csak órák (24h) |
 
-### Példa: Feladat időtartamának rögzítése percekben és másodpercekben
+### Gomb pozíciója `display{}`
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | task_duration | A feladat elvégzéséhez szükséges idő | `inline-[%M:%S]` |
+Ugyanaz, mint más inline típusoknál — az óra gomb pozícióját és méretét szabályozza:
 
-### Példa: Esemény időpontjának rögzítése 24 órás formátumban, egyéni színnel
+```
+inline display{right}
+inline display{center, large}
+inline-onlyresult display{left, medium, #0099FF}
+```
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | event_time | Az esemény időpontja | `inline-1line colors("0099FF")` |
+---
 
-## Adatformátum
+## Gyorshivatkozás a megjelenésre
 
-A szöveges adatok egyszerű karakterláncként kerülnek tárolásra és exportálásra. Az inline órawidget segítségével bevitt időalapú értékek a kiválasztott formátum-karakterláncnak megfelelő formátumban tárolódnak (pl. `14:32` a `%H:%M` esetén).
+| Appearance | Widget rendered |
+|---|---|
+| *(nincs)* | Egysoros szövegbevitel |
+| `multiline` | Szövegmező |
+| `multiline [n,m]` | Szövegmező init/max sorvezérléssel |
+| `floating_hint` | Tipp lebeg címkeként gépeléskor |
+| `embed` | Tipp a beviteli mezőn belül |
+| `textpopup` | Koppintással nyissa meg a modális párbeszédpanelt |
+| `richtext` / `richtext(height)` | WYSIWYG gazdag szövegszerkesztő |
+| `charcount` | Élő karakterszámláló a beviteli mező alatt |
+| `numbers` | Numerikus billentyűzet |
+| `thousandsep` | Ezres vessző formázás |
+| `digisep(n,"sep")` | Egyéni számjegycsoportosítás |
+| `number-hspinner` | Vízszintes − érték + számláló |
+| `prefix(expr)` | Statikus vagy számított előtag hozzáadása |
+| `upper` / `lower` / `proper` | Automatikus nagybetűs/kisbetűs átalakítás |
+| `inputs{stt}` | Beszéd-szöveg mikrofon gomb |
+| `inputs{qrscan}` | QR/vonalkód beolvasó gomb |
+| `inputs{stt,qrscan}` | Mikrofon és beolvasó gombok is |
+| `selection_one_hide` | Legördülő választó a választási listából |
+| `selection_one_show` | Rádió lista a beviteli mező alatt |
+| `align_answer = left/right/center` | Válasz szöveg igazítása |
+| `inline-[%H:%M]` | Óra választó — időgyűjtés |
+| `inline-1line` | Kompakt idő számláló |
 
-## Korlátok és ellenőrzés
+---
 
-Alkalmazzon korlátokat a formátum, hossz vagy minta kényszerítéséhez:
+## Korlátozások és érvényesítés
+
+Alkalmazzon korlátozásokat a formátum, a hossz vagy a minta kikényszerítésére:
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| text | name | Teljes név | `string-length(.) >= 2` | A névnek legalább 2 karakterből kell állnia |
-| text | code | Hivatkozási kód | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Adjon meg 2 nagybetűt és 4 számjegyet |
+| text | name | Teljes név | `string-length(.) >= 2` | Legalább 2 karakter szükséges |
+| text | code | Hivatkozási kód | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 nagybetű + 4 számjegy |
 | text | phone | Telefonszám | `regex(., '^[0-9]{9,15}$')` | Adjon meg érvényes telefonszámot |
 
-## Bevált módszerek
+---
 
-1. Ha az adatnak ismert struktúrája van, használjon specifikusabb típusokat (`integer`, `decimal`, `date`) – ez megakadályozza az érvénytelen beviteleket és egyszerűsíti az elemzést.
-2. Adjon hozzá `constraint`-et `string-length()` vagy `regex()` segítségével kódok vagy azonosítók érvényesítéséhez.
-3. Nyílt végű kérdéseknél, ahol a válaszadók több mondatot írhatnak, használja a `multiline` megjelenítést.
-4. Időgyűjtéshez válassza az elemzési igényeinek megfelelő pontosságú formátum-tokeneket – ezredmásodpercek gyűjtése, ha csak percekre van szükség, felesleges terhelést jelent a kérdezőknek.
+## Ajánlott Gyakorlatok
 
-## Platform-támogatás
+1. Használjon specifikusabb típusokat (`integer`, `decimal`, `date`), ha az adatoknak ismert struktúrájuk van — ez megakadályozza az érvénytelen bejegyzéseket.
+2. Használja a `multiline [3,8]`-at a nyitott kérdésekhez, hogy a válaszadók számára helyet biztosítson az íráshoz anélkül, hogy túlterhelnék a képernyőt.
+3. Használja a `thousandsep`-et vagy `digisep()`-et `numbers` helyett, ha formázott megjelenítésre van szüksége — a `numbers` önmagában csak a billentyűzetet változtatja meg.
+4. Használja az `inputs{qrscan}`-t a kódok, azonosítók és sorozatszámok kézi gépelési hibáinak kiküszöbölésére.
+5. Használja a `floating_hint`-et, ha a súgó fontos kontextus, amelynek láthatónak kell maradnia gépelés közben — a szabványos súgók eltűnnek a kis képernyőkről.
+6. Használja a `charcount`-ot a hosszkorláttal rendelkező kérdéseken, hogy a válaszadók önellenőrzést végezhessenek.
 
-A text kérdéstípus és az összes időbeviteli megjelenítés iOS, Android és webes platformokon egyaránt támogatott.
+## Korlátok
 
-## Korlátozások
-
-- A szöveges válaszok szabad formájúak – nincs beépített helyesírás-ellenőrzés vagy szókészlet-korlát a regex mintákon túl.
-- Az inline időwidget egy rtSurvey-bővítmény, és nem része a standard XLSForm specifikációnak.
+- Az `inputs{stt}`-hez olyan böngésző szükséges, amely támogatja a Web Speech API-t. A Chrome a legmegbízhatóbb; a Safari nem támogatott.
+- A `richtext` HTML-t tárol — tervezze meg az HTML eltávolítását vagy szanálását az elemzési pipeline-ban, ha egyszerű szöveg várható.
+- A `selection_one_hide` és `selection_one_show` `search()` kifejezést igényel, és csak a webes kliensen támogatottak.
+- A `number-hspinner` minden gombnyomásra ellenőrzi a `constraint` oszlopot, nem csak a fókusz elvesztésekor — ennek megfelelően tervezze meg a korlátozásokat.

@@ -1,37 +1,39 @@
 ---
-title: "Rank"
-description: "A rank kérdések lehetővé teszik a válaszadók számára, hogy sorrendbe állítsanak egy sor lehetőséget preferencia vagy prioritás szerint."
+title: "Rangsorolás"
+description: "A rangsorolási kérdések lehetővé teszik a válaszadók számára, hogy preferenciájuk vagy prioritásuk szerint rendezzék a választási lehetőségeket."
 ---
 
-A `rank` kérdéstípus olyan lehetőséglistát jelenít meg, amelyet a válaszadónak **sorba kell rendeznie** (húzással vagy más módon, az elsőtől az utolsóig). Az eredményt szóközzel elválasztott, a kiválasztott sorrendben felsorolt értékekként tárolja, a legmagasabb prioritású lehetőséggel az élen.
+A `rank` kérdéstípus a válaszadó által preferenciájuk vagy prioritásuk szerint rendezett választási lehetőségek listáját jeleníti meg. Az eredményt szóközzel elválasztott választási értékek listájaként tárolja rangsorolt sorrendben, a legmagasabb prioritású választással kezdve.
 
-## Alapvető XLSForm-specifikáció
+> **rtSurvey webes űrlap:** A húzás-a-rangsoroláshoz widget jelenleg nincs implementálva. A webes űrlapon a `rank` kiválasztási listaként jelenik meg. Ezt a típust akkor használja, ha olyan mobil klienseket céloz meg, amelyek támogatják a rangsorolási widgetet, vagy ha a tárolt érték formátuma fontosabb, mint a húzás-a-rendezés interakció.
 
-| type | name | label |
-|------|------|-------|
-| rank priorities | main_priority | Rangsorolja a közösségi szükségleteket a legfontosabbtól a legkevésbé fontosig |
-
-A lehetőségek a **choices munkalapon** vannak meghatározva, ugyanúgy mint a `select_one` típusnál:
-
-**survey:**
+## Alapvető XLSForm specifikáció
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Rangsorolja ezeket a szükségleteket a legfontosabbtól a legkevésbé fontosig |
+| rank priorities | main_priority | Rangsorolja ezeket a közösségi igényeket a legfontosabbtól a legkevésbé fontosig |
 
-**choices:**
+A választások a **choices munkalapon** vannak definiálva, akárcsak a `select_one` esetében:
+
+**felmérés:**
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Rangsorolja ezeket az igényeket a legfontosabbtól a legkevésbé fontosig |
+
+**választások:**
 
 | list_name | name | label |
 |-----------|------|-------|
-| priorities | water | Tiszta ivóvíz |
-| priorities | health | Egészségügyi ellátás |
+| priorities | water | Tiszta víz |
+| priorities | health | Egészségügy |
 | priorities | education | Oktatás |
 | priorities | roads | Utak |
-| priorities | electricity | Villamos energia |
+| priorities | electricity | Elektromosság |
 
-## Tárolt értékformátum
+## Tárolt érték formátuma
 
-A tárolt érték a lehetőségértékek **szóközzel elválasztott listája** rangsorolt sorrendben (az első = legmagasabb prioritású):
+A tárolt érték a választási értékek **szóközzel elválasztott listája** rangsorolt sorrendben (első = legmagasabb prioritás):
 
 ```
 water education health roads electricity
@@ -39,44 +41,44 @@ water education health roads electricity
 
 ## Rangsorolt pozíciók kinyerése
 
-A `selected-at()` segítségével lekérdezheti az adott rangon lévő lehetőséget:
+Használja a `selected-at()` függvényt egy adott rangon lévő választás lekéréséhez:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| rank priorities | main_priority | Rangsorolja a közösségi szükségleteket | |
+| rank priorities | main_priority | Rangsorolja a közösségi igényeket | |
 | calculate | top_priority | | selected-at(`${main_priority}`, 0) |
 | calculate | second_priority | | selected-at(`${main_priority}`, 1) |
 
-A `selected-at(${main_priority}, 0)` az **első helyre** tett értéket adja vissza (0. index = legelső).
+A `selected-at(${main_priority}, 0)` az **első** helyre (0-ás index = legmagasabb rang) helyezett értéket adja vissza.
 
-## `rank-index()` használata ismétlő csoportokkal
+## `rank-index()` használata ismétlődő csoportokkal
 
-Ha a `rank` ismétlő csoporton belül van, a `rank-index()` lehetővé teszi a sorszám hivatkozást az ismétlőn kívülről:
+Ha a `rank` ismétlődő csoporton belül van használva, a `rank-index()` lehetővé teszi, hogy az ismétlődésen kívülről hivatkozzon a sorszámra:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_ranked | | rank-index(1, `${score}`) |
 
-A `rank-index()` és `rank-index-if()` teljes részleteiért lásd a [Függvények – Ismételt mezőfüggvények](../operators-and-functions/functions#repeated-field-functions) részt.
+Lásd a [Függvények — Ismétlődő mezőfüggvények](../operators-and-functions/functions#repeated-field-functions) részt a `rank-index()` és `rank-index-if()` részletes leírásáért.
 
-## Felhasználási területek
+## Felhasználás
 
-A rank kérdések általánosan használt területei:
+A rangsorolási kérdéseket gyakran használják:
 
-1. **Prioritás-rangsorolás** – közösségek felkérése fejlesztési szükségletek rangsorolására
-2. **Preferencia-sorrend** – terméktulajdonságok, szolgáltatási jellemzők vagy szakpolitikai lehetőségek rangsorolása
-3. **Vizsga-elemek sorrendezése** – egy folyamat lépéseinek sorba rendezése
-4. **Legjobb N kiválasztása** – a `selected-at()` segítségével csak az első 1, 2 vagy 3 lehetőség kinyerésére
+1. **Prioritások rangsorolása** — a közösségek fejlesztési igényeinek rangsorolása
+2. **Preferenciák sorrendje** — termékjellemzők, szolgáltatási attribútumok vagy szakpolitikai lehetőségek rangsorolása
+3. **Vizsga tételeinek sorrendje** — egy folyamat lépéseinek elrendezése
+4. **Top-N kiválasztás** — `selected-at()` függvényel kombinálva csak a top 1, 2 vagy 3 választás kinyerésére
 
-## Bevált módszerek
+## Legjobb gyakorlatok
 
-1. Tartsa rövidre a listát (3–7 elem) – a rangsorolás kognitívan megterhelővé válik 7–8 lehetőség felett.
-2. Használjon egyértelmű, kölcsönösen kizáró lehetőség-feliratokat az „első" értelmezési zavarának elkerüléséhez.
-3. Adjon hozzá súgószöveget a rangsorolás irányának magyarázatával (pl. „Húzza sorrendbe: első = legfontosabb").
-4. Érvényesítse a `count-selected(.) = x` feltétellel, ha biztosítani kell, hogy minden lehetőség rangsorolva legyen.
+1. Tartsa rövidre a listát (3–7 elem) — a rangsorolás 7–8 választás felett kognitíve megterhelővé válik.
+2. Használjon egyértelmű, kölcsönösen kizáró választási címkéket, hogy elkerülje a "első" jelentésével kapcsolatos zavart.
+3. Adjon hozzá tippszöveget, amely magyarázza a rangsorolás irányát (pl. "Húzza a sorrendbe: első = legfontosabb").
+4. Érvényesítse a `count-selected(.) = x` segítségével, ha biztosítania kell, hogy minden választás rangsorolva legyen.
 
-## Korlátozások
+## Korlátok
 
-- A húzásos rangsoroló widget érintőképernyőt vagy egeret igényel – csak billentyűzettel nem működik jól.
-- Egyes régebbi mobileszközökön a rank widget visszaeshet számozottbevitel-felületre.
-- Részleges rangsorolás nem lehetséges (azaz nem rangsorolhat csak egyes lehetőségeket) – minden lehetőséget sorba kell rendezni.
+- A húzás-a-rangsoroláshoz widget nincs implementálva az rtSurvey webes űrlapján.
+- Nem lehet részlegesen rangsorolni — minden választást rendezni kell.
+- Tartsa a listákat 3–7 elemre; a hosszabb listák kezelhetetlenné válnak, függetlenül a klienstől.
