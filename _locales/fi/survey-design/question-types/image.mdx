@@ -1,72 +1,147 @@
 ---
-title: "Image"
-description: "Image-kysymykset antavat vastaajille mahdollisuuden ottaa ja lähettää valokuvia osana kyselyä."
+title: "Kuva"
+description: "Kuvakysymysten avulla vastaajat voivat ottaa ja lähettää valokuvia osana kyselyä."
 ---
 
-XLSFormien ja rtSurveyn image-kysymystyyppi mahdollistaa vastaajien ottaa ja lähettää valokuvia osana kyselyvastaustaan. Tämä ominaisuus on erityisen hyödyllinen visuaalisen tiedon keräämiseen, havaintojen dokumentointiin tai todisteiden toimittamiseen kenttätutkimuksissa.
+Kuvakysymystyyppi XLSForms- ja rtSurvey-sovelluksissa antaa vastaajille mahdollisuuden ottaa ja lähettää valokuvia osana kyselyvastauksiaan. Tämä ominaisuus on erityisen hyödyllinen visuaalisen tiedon keräämisessä, havaintojen dokumentoinnissa tai todisteiden esittämisessä kenttäkyselyissä.
 
-## XLSForm-perusmäärittely
+## XLSFormin peruserittely
 
 | type  | name        | label                           |
 |-------|-------------|--------------------------------|
-| image | photo       | Ota kuva sijainnista            |
+| image | photo       | Ota kuva sijainnista             |
 
-Lisätietoja image-kysymystyypin perusteista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+Lisätietoja kuvakysymystyypistä on [XLSFormin dokumentaatiossa](https://xlsform.org/en/#question-types).
 
 ## Käyttötarkoitukset
 
-Image-kysymyksiä käytetään yleisesti:
+Kuvakysymyksiä käytetään yleisesti:
 
-1. Kenttäolosuhteiden tai havaintojen dokumentointiin
-2. Visuaalisten todisteiden tallentamiseen tutkimuksissa
-3. Ennen/jälkeen-valokuvien keräämiseen vaikutusten arvioinneissa
-4. Tehtävien suorittamisen tai sijainneissa oleskelun todentamiseen
-5. Visuaalisten tietojen keräämiseen etäanalyysiä varten
+1.  Kenttäolosuhteiden tai havaintojen dokumentointiin
+2.  Visuaalisten todisteiden keräämiseen tutkimuksissa
+3.  Ennen ja jälkeen -kuvien keräämiseen vaikutusten arvioinneissa
+4.  Tehtävien suorittamisen tai läsnäolon vahvistamiseen paikoissa
+5.  Visuaalisen datan keräämiseen etäanalyysiä varten
 
 ## Parhaat käytännöt
 
-1. Anna selkeät ohjeet siitä, mitä tulee valokuvata.
-2. Harkitse yksityisyysasioita ja informoi vastaajia siitä, miten heidän valokuviaan käytetään.
-3. Kiinnitä huomiota tiedostokokoihin ja tallennusrajoituksiin, erityisesti kyselyissä alueilla, joilla on rajoitettu Internet-yhteys.
-4. Varmista, että laitteella on riittävästi tallennustilaa ja kameran luvat on myönnetty.
+1.  Anna selkeät ohjeet siitä, mitä tulee kuvata.
+2.  Harkitse yksityisyyteen liittyviä vaikutuksia ja ilmoita vastaajille, miten heidän valokuviaan käytetään.
+3.  Pidä mielessä tiedostojen koot ja tallennustilan rajoitukset, erityisesti kyselyissä alueilla, joilla Internet-yhteydet ovat rajoitettuja.
+4.  Varmista, että laitteessa on riittävästi tallennustilaa ja kameran käyttöoikeudet on myönnetty.
 
-## Esimerkkikäyttö
+## Käyttöesimerkki
 
-Esimerkki kyselyssä:
+Tässä esimerkki siitä, miten voit käyttää kuvakysymystä kyselyssä:
 
-| type  | name           | label                                       | hint                                             |
-|-------|----------------|---------------------------------------------|--------------------------------------------------|
-| image | storefront     | Ota kuva kaupan sisäänkäynnistä             | Varmista, että kaupan nimi on selvästi näkyvissä  |
+| type  | name           | label                                      | hint                                        |
+|-------|----------------|--------------------------------------------|--------------------------------------------|
+| image | storefront     | Ota kuva myymälän sisäänkäynnistä          | Varmista, että myymälän nimi näkyy selvästi |
 
-## rtSurveyn laajennukset
+## rtSurvey-laajennukset
 
-Vaikka XLSForm-standardin image-kysymysten perusmäärittely on suoraviivainen, rtSurvey voi tarjota lisäominaisuuksia tai mukautuksia:
+### Sisäisen painikkeen asettelu
 
-1. Kuvan laadun asetukset (esim. matala, keskitaso, korkea resoluutio)
-2. Mahdollisuus lisätä kuvatekstejä tai tunnisteita kuviin
-3. Useiden kuvien ottaminen yhdelle kysymykselle
-4. Integraatio laitteen natiivin kamerasovelluksen tai gallerian kanssa
+Lisää `inline` `appearance`-sarakkeeseen, jotta kamera renderöidään **pyöreänä kuvakepainikkeena** tekstin viereen koko leveän sieppausalueen sijaan. Sen napauttaminen avaa modaalin.
+
+```
+| type  | name  | label        | appearance                          |
+|-------|-------|--------------|-------------------------------------|
+| image | photo | Ota kuva     | inline display{right}               |
+| image | photo | Ota kuva     | inline display{center, large}       |
+```
+
+**Painikkeen sijainti — `display{}`:**
+
+| Value | Layout |
+|-------|--------|
+| `right` *(oletus)* | Kuvake tekstin oikealla puolella |
+| `left` | Kuvake tekstin vasemmalla puolella |
+| `top` | Kuvake tekstin yläpuolella, keskellä |
+| `center` / `bottom` | Kuvake tekstin alapuolella, keskellä |
+
+**Painikkeen koko:**
+
+| Value | Size |
+|-------|------|
+| `small` *(oletus)* | Pieni ympyrä |
+| `medium` | Keskikokoinen ympyrä |
+| `large` | Suuri ympyrä |
+
+**Painikkeen väri** — lisää heksaväri `display{}`-elementin sisälle ohittaaksesi päävärin:
+
+```
+inline display{right, large, <FF5500/>}
+inline display{center, medium, <0099FF/>}
+```
+
+**Sieppauksen jälkeinen ohjaus — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Piilottaa kameran painikkeen kuvan ottamisen jälkeen |
+| `results{hide(camera)}` | Sama kuin `hide(capture)` — alias kuvatyypille |
+| `results{hide(review)}` | Piilottaa pienoiskuvan esikatselun sieppauksen jälkeen |
+| `results{hide(filename)}` | Piilottaa tiedostonimen, joka näkyy latauksen jälkeen |
+| `results{left}` | Siirtää kuvakkeen vasemmalle sieppauksen jälkeen |
+
+Esimerkki — suuri keskitetty painike, piilota kamera sieppauksen jälkeen:
+```
+inline display{center, large} results{hide(capture)}
+```
+
+### `invisible auto-show` — automaattinen kameran avaus
+
+Piilottaa kysymys-widgetin asettelusta, mutta avaa kameran automaattisesti sivun latautuessa. Hyödyllinen hiljaisen tallennusvaiheen upottamiseen lomakkeen työnkulkuun.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Allekirjoitus ja piirustus
+
+| Appearance | Description |
+|---|---|
+| `signature` | Koko näytön allekirjoitusalustan modaali |
+| `signature display{quick}` | Inline-pikapiirtoallekirjoitusalusta — ei modaalia |
+| `draw` | Vapaapiirtoalusta |
+
+### Vesileima
+
+Lisää teksti- tai kuvavesileima otettuihin kuviin:
+
+```
+watermark(text, "Kyselyn tunnus: ${id}", bottom-right, 0.5)
+watermark(file, logo.png, top-left, 1.0, 20%)
+```
+
+### Piilota otsikko
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Tietojen käsittely
 
-Tämän kysymystyypin kautta kerätyt kuvat:
+Tämän kysymystyypin kautta kerätyt kuvat ovat tyypillisesti:
 
-1. Tallennetaan yleiseen kuvamuotoon (esim. JPG, PNG)
-2. Tallennetaan muiden kyselytietojen ohessa, usein erillisessä mediahakemistossa
-3. Ovat tarkasteltavissa ja analysoitavissa kyselynhallintajärjestelmän kautta
+1.  Tallennettu yleiseen kuvamuotoon (esim. JPG, PNG)
+2.  Varastoitu muiden kyselytietojen rinnalle, usein erilliseen mediakansioon
+3.  Katseltavissa ja analysoitavissa kyselynhallinta-alustan kautta
 
-## Analyysin näkökohtia
+## Analyysiin liittyvät huomioitavat asiat
 
-Image-kysymyksiä käytettäessä harkitse:
+Kun käytät kuvakysymyksiä, harkitse:
 
-1. Miten kuvat analysoidaan (esim. manuaalinen tarkistus, automaattinen kuva-analyysi)
-2. Kuvatiedostoihin tarvittava lisätallennustila
-3. Yksityisyys ja tietosuojatoimenpiteet valokuvien tallentamiseen ja käsittelyyn
-4. Mahdollinen tarve kuvanmuokkaus- tai järjestelytyökaluille analyysivaiheessa
+1.  Miten kuvat analysoidaan (esim. manuaalinen tarkistus, automaattinen kuva-analyysi)
+2.  Kuvien edellyttämä lisätallennustila
+3.  Yksityisyyden suojaa ja tietosuojatoimenpiteitä valokuvien tallentamisessa ja käsittelyssä
+4.  Kuvankäsittely- tai järjestelytyökalujen mahdollinen tarve analyysivaiheessa
 
 ## Rajoitukset
 
-- Kuvatiedostot voivat olla suuria, mikä voi vaikuttaa tiedonsiirtoon ja tallennukseen.
-- Kaikilla laitteilla ei välttämättä ole korkealaatuisia kameroita tai riittävästi tallennustilaa.
-- Suurten kuvamäärien analysoiminen voi olla aikaa vievää.
-- Kuvien ottamiseen julkisissa paikoissa voi liittyä yksityisyyshuolenaiheita.
+-   Kuvatiedostot voivat olla suuria, mikä voi vaikuttaa tiedonsiirtoon ja tallennukseen.
+-   Kaikilla laitteilla ei välttämättä ole korkealaatuisia kameroita tai riittävästi tallennustilaa.
+-   Suuren kuvamäärän analysointi voi olla aikaa vievää.
+-   Kuvien ottamiseen voi liittyä yksityisyyden suojaan liittyviä huolenaiheita, erityisesti julkisilla paikoilla.

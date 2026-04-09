@@ -1,11 +1,9 @@
 ---
 title: "Text"
-description: "Fragetyp für freie Textantworten in rtSurvey"
+description: "Fragetyp für Freitextantworten in rtSurvey"
 ---
 
-Der Fragetyp `text` erfasst eine freie Textantwort — jede beliebige Zeichenkette. Er ist der flexibelste Eingabetyp und wird für Namen, Adressen, Beschreibungen, Codes und alles verwendet, was nicht in einen spezifischeren Typ passt.
-
-rtSurvey erweitert `text` zusätzlich mit **Zeiteingabe-Widgets**, die eine präzise Zeiteingabe über eine Uhranzeige ermöglichen.
+Der Fragetyp `text` sammelt eine Freitextzeichenfolge. Es ist der flexibelste Eingabetyp und unterstützt eine große Anzahl von Erscheinungsvarianten, die die Art und Weise ändern, wie die Eingabe gerendert wird – von einem einfachen einzeiligen Feld bis hin zu Sprache-zu-Text, Popup-Dialogen, Rich-Text-Editoren und numerischen Spinnern.
 
 ## Grundlegende XLSForm-Spezifikation
 
@@ -14,74 +12,315 @@ rtSurvey erweitert `text` zusätzlich mit **Zeiteingabe-Widgets**, die eine prä
 | text | respondent_name | Vollständiger Name des Befragten |
 | text | address | Wohnadresse |
 
-Weitere Details zum Standard-XLSForm-Texttyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Für die Standardspezifikation siehe die [XLSForm documentation](https://xlsform.org/en/#question-types).
 
-## Anwendungsbereiche
+---
 
-Text-Fragen werden verwendet für:
+## Layout-Modi
 
-1. Namen, Adressen, freie Beschreibungen
-2. Offene Kommentare oder Rückmeldungen
-3. Codes, IDs oder Referenznummern, die nicht in integer/decimal passen
-4. Erfassung von Zeitwerten mit den Zeiteingabe-Erweiterungen von rtSurvey
-5. Autovervollständigungs-Textfelder (über `search-autocomplete-noedit-v2()`)
+### Standard – einzeilige Eingabe
 
-## Standard-Erscheinungsoptionen
+Kein Erscheinungsbild erforderlich. Rendert ein Standard `<input type="text">` Feld.
 
-| Erscheinungsbild | Beschreibung |
-|-----------------|-------------|
-| *(keine)* | Einzeiliges Texteingabefeld |
-| `multiline` | Mehrzeiliges Textfeld — am besten für längere Freitexte im Web |
+---
 
-## rtSurvey-Zeiteingabe-Erweiterungen
+### `multiline` – Textbereich
 
-rtSurvey erweitert `text` mit einem **Uhr-Picker-Widget** zur Erfassung von Zeitwerten. Diese Erscheinungsoptionen zeigen ein Uhrsymbol an, das der Interviewer antippen kann, um Stunden, Minuten, Sekunden oder Millisekunden auszuwählen.
+Rendert ein mehrzeiliges Textfeld. Der Benutzer kann es durch Tippen erweitern; es wächst automatisch.
 
-### Erscheinungsvarianten
+```
+multiline
+```
 
-| Erscheinungsbild | Beschreibung |
-|-----------------|-------------|
-| `inline` | Uhrsymbol neben dem Feld angezeigt |
-| `inline colors("RRGGBB")` | Uhrsymbol mit benutzerdefinierter Hex-Farbe |
-| `inline-1line` | Uhr im kompakten einzeiligen Format dargestellt |
-| `inline-1line-RRGGBB` | Einzeiliges Format mit benutzerdefinierter Symbolfarbe (Hex, ohne `#`) |
-| `inline-1line colors("RRGGBB","RRGGBB")` | Einzeiliges Format mit zwei Farben |
-| `inline-onlyresult` | Uhrsymbol verschwindet nach der Auswahl; nur der Wert wird angezeigt |
-| `inline-onlyresult colors("RRGGBB")` | Gleich wie oben, mit benutzerdefinierter Symbolfarbe |
+**Zeilenhöhe steuern** durch Anhängen von `[initRows, maxRows]`:
 
-### Zeitformat-Token
+```
+multiline [3,8]     → beginnt mit 3 Zeilen, erweitert sich auf bis zu 8
+multiline [5]       → fest auf 5 Zeilen
+```
 
-Hängen Sie eine Formatzeichenkette in eckigen Klammern an, um zu steuern, welche Zeitkomponenten angezeigt werden:
+Standard ist 1 Zeile ohne Maximum. Shift+Enter fügt einen Zeilenumbruch ein; Enter geht zur nächsten Frage.
 
-| Formatzeichenkette | Zeigt an |
-|-------------------|---------|
-| `inline-[%H:%M]` | Stunden und Minuten (24-Stunden-Format) |
-| `inline-[%h:%M]` | Stunden und Minuten (12-Stunden-Format) |
-| `inline-[%H:%M:%S]` | Stunden, Minuten, Sekunden (24-Stunden-Format) |
-| `inline-[%h:%M:%S]` | Stunden, Minuten, Sekunden (12-Stunden-Format) |
-| `inline-[%H:%M:%3]` | Stunden, Minuten, Millisekunden |
-| `inline-[%M:%S]` | Nur Minuten und Sekunden |
-| `inline-[%M:%3]` | Nur Minuten und Millisekunden |
+---
+
+### `floating_hint` – Hinweis schwebt als Beschriftung
+
+Der `hint` Text wird im Eingabefeld als Platzhalter gerendert. Wenn der Benutzer zu tippen beginnt, schwebt der Hinweis als Beschriftung über das Feld.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` – Hinweis innerhalb der Eingabe
+
+Ähnlich wie `floating_hint` – der Hinweis wird innerhalb der Eingabebegrenzung gerendert, wenn das Feld leer ist. Schwebt nicht beim Tippen.
+
+```
+embed
+```
+
+---
+
+### `textpopup` – modale Dialogeingabe
+
+Durch Tippen auf das Feld wird ein SweetAlert-Modaldialog mit einer großen Eingabe geöffnet, anstatt inline zu bearbeiten. Nützlich auf Mobilgeräten, um mehr Platz zum Tippen zu schaffen.
+
+```
+textpopup
+```
+
+---
+
+### `richtext` – WYSIWYG-Editor
+
+Rendert einen vollständigen Rich-Text-Editor (Monaco / Draft.js). Der Befragte kann fett, kursiv formatieren, Listen hinzufügen usw. Der gespeicherte Wert ist HTML.
+
+```
+richtext
+richtext(30%)       → Editorhöhe 30% des Ansichtsfensters
+```
+
+---
+
+### `charcount` – Live-Zeichenzähler
+
+Fügt eine `(n)` Zeichenanzahl-Anzeige unter der Eingabe hinzu, die sich aktualisiert, während der Benutzer tippt.
+
+```
+charcount
+multiline charcount
+```
+
+---
+
+## Numerische Eingabevarianten
+
+Diese Erscheinungsbilder funktionieren mit dem Typ `text`, um Zahlen mit spezieller Formatierung oder Interaktionsmustern zu erfassen.
+
+### `numbers` – numerische Tastatur
+
+Erzwingt den HTML-Eingabetyp `number` und löst eine numerische Tastatur auf Mobilgeräten aus.
+
+```
+numbers
+```
+
+### `thousandsep` – Tausender-Trennzeichen
+
+Zeigt die Zahl mit Kommagruppierung an (z. B. `1.234.567`), während die Rohzahl gespeichert wird. Der Eingabetyp wird auf `text` gezwungen, um die Kommaanzeige zu ermöglichen.
+
+```
+thousandsep
+```
+
+### `digisep(n, "sep")` – benutzerdefinierte Zifferngruppierung
+
+Gruppiert Ziffern in Blöcken von `n`, getrennt durch ein benutzerdefiniertes Zeichen. Nützlich für Telefonnummern, ID-Nummern usw.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+### `number-hspinner` – horizontaler Spinner
+
+Ersetzt die Eingabe durch einen horizontalen **− Wert +** Spinner. Der Benutzer tippt auf die Minus-/Plus-Schaltflächen, um den Wert zu verringern oder zu erhöhen. Funktioniert mit `int` und `decimal` Typen.
+
+```
+number-hspinner
+```
+
+**Schaltflächenaussehen anpassen** mit `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','1')
+```
+
+Parameter: Form der linken Schaltfläche, Form der rechten Schaltfläche, Schrittwert.
+
+**Benutzerdefinierte Farben** mit `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Vier Farbwerte: linker Hintergrund, linkes Symbol, rechter Hintergrund, rechtes Symbol.
+
+### `prefix(expr)` – Präfix voranstellen
+
+Stellt einen berechneten oder statischen String dem angezeigten Wert voran. Der gespeicherte Wert enthält das Präfix nicht.
+
+```
+prefix('USD ')      → zeigt "USD 100", speichert "100"
+prefix(${currency}) → dynamisches Präfix aus einem anderen Feld
+```
+
+### `textonly` – erzwingt den Texteingabetyp
+
+Erzwingt `type="text"`, auch wenn das Feld `integer` oder `decimal` ist. Nützlich, um Eigenheiten der Browser-Zahleneingabe zu vermeiden.
+
+```
+textonly
+```
+
+---
+
+## Texttransformation
+
+Diese Erscheinungsbilder transformieren den Wert automatisch, während der Benutzer tippt.
+
+| Appearance | Effekt | Beispiel Eingabe → gespeichert |
+|---|---|---|
+| `upper` | Konvertiert zu GROSSBUCHSTABEN | `hallo` → `HALLO` |
+| `lower` | Konvertiert zu Kleinbuchstaben | `HALLO` → `hallo` |
+| `proper` | Konvertiert zu Groß-/Kleinschreibung | `john doe` → `John Doe` |
+
+---
+
+## Helfer zur Eingabeerfassung
+
+### `inputs{stt}` – Sprache zu Text
+
+Fügt neben der Eingabe eine Mikrofontaste hinzu. Durch Tippen wird die Spracherkennung des Browsers (Web Speech API) gestartet. Der transkribierte Text wird an das Feld angehängt.
+
+```
+inputs{stt}
+```
+
+Wird unter Safari nicht unterstützt. Erfordert Mikrofonberechtigung.
+
+### `inputs{qrscan}` – QR- / Barcode-Scanner
+
+Fügt neben der Eingabe eine QR-Code-Scan-Taste hinzu. Öffnet das Kamera-Scanner-Modal und füllt das Feld mit dem gescannten Wert aus.
+
+```
+inputs{qrscan}
+```
+
+**Tokenisieren** (gescannte Werte anhängen statt zu ersetzen):
+
+```
+inputs{qrscan} append(${separator})
+```
+
+### `inputs{stt,qrscan}` – sowohl Sprache als auch Scan
+
+Rendert sowohl die Mikrofontaste als auch die QR-Scan-Taste nebeneinander.
+
+```
+inputs{stt,qrscan}
+inputs{qrscan,stt}
+```
+
+---
+
+## Auswahl-verknüpfte Varianten
+
+Diese Erscheinungsbilder verknüpfen ein Textfeld mit einer `select_one`-Auswahlliste, sodass der Benutzer entweder aus der Liste auswählen oder frei tippen kann.
+
+### `selection_one_hide` – Dropdown-Auswahl
+
+Rendert die Texteingabe mit einem Dropdown-Pfeil. Durch Tippen auf den Pfeil werden Auswahlmöglichkeiten aus der verknüpften `search()`-Liste angezeigt. Eine Auswahl füllt die Eingabe und sperrt sie (zeigt ✕ zum Löschen).
+
+```
+selection_one_hide
+```
+
+### `selection_one_show` – Radio-Liste darunter
+
+Rendert die Texteingabe mit Radio-Buttons darunter. Eine Auswahl füllt und sperrt die Eingabe.
+
+```
+selection_one_show
+```
+
+Beide Varianten erfordern einen `search()`-Ausdruck in der `calculation`-Spalte, um die Auswahlliste zu definieren.
+
+---
+
+## Ausrichtungsantwort
+
+Steuert die horizontale Ausrichtung des eingegebenen Textes innerhalb der Eingabe.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+## Zeiteingabe-Widget (Inline-Uhr)
+
+rtSurvey erweitert `text` um ein Uhr-Auswahl-Widget. Diese Erscheinungsbilder zeigen ein Uhrensymbol an, das der Erfasser antippt, um einen Zeitwert auszuwählen. Der Wert wird im gewählten Format als Klartext gespeichert.
+
+### Erscheinungsbilder
+
+| Appearance | Description |
+|---|---|
+| `inline` | Uhrensymbol-Schaltfläche neben dem Feld, öffnet Modal |
+| `inline-onlyresult` | Uhrensymbol verschwindet nach der Auswahl |
+| `inline-1line` | Kompakter einzeiliger Zeitspinner |
+| `inline colors("RRGGBB")` | Uhrensymbol mit benutzerdefinierter Farbe |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Spinner mit zwei Akzentfarben |
+
+### Format-Token
+
+Hängen Sie `-[format]` an, um zu steuern, welche Zeitkomponenten angezeigt und gespeichert werden:
+
+| Format | Zeigt an |
+|---|---|
+| `inline-[%H:%M]` | Stunden : Minuten (24h) |
+| `inline-[%h:%M]` | Stunden : Minuten (12h) |
+| `inline-[%H:%M:%S]` | Stunden : Minuten : Sekunden (24h) |
+| `inline-[%M:%S]` | Minuten : Sekunden |
+| `inline-[%H:%M:%3]` | Stunden : Minuten : Millisekunden |
 | `inline-[%S]` | Nur Sekunden |
 | `inline-[%3]` | Nur Millisekunden |
-| `inline-[%H]` | Nur Stunden (24-Stunden-Format) |
-| `inline-[%h]` | Nur Stunden (12-Stunden-Format) |
+| `inline-[%H]` | Nur Stunden (24h) |
 
-### Beispiel: Aufgabendauer in Minuten und Sekunden aufzeichnen
+### Schaltflächenposition mit `display{}`
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | task_duration | Benötigte Zeit für die Aufgabe | `inline-[%M:%S]` |
+Wie bei anderen Inline-Typen – steuert Position und Größe der Uhr-Schaltfläche:
 
-### Beispiel: Ereigniszeit im 24-Stunden-Format mit benutzerdefinierter Farbe aufzeichnen
+```
+inline display{right}
+inline display{center, large}
+inline-onlyresult display{left, medium, #0099FF}
+```
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | event_time | Ereigniszeitpunkt | `inline-1line colors("0099FF")` |
+---
 
-## Datenformat
+## Kurzübersicht Erscheinungsbild
 
-Textdaten werden als einfache Zeichenkette gespeichert und exportiert. Bei zeitbasierten Eingaben mit dem Inline-Uhr-Widget wird der Wert im Format der gewählten Formatzeichenkette gespeichert (z. B. `14:32` für `%H:%M`).
+| Appearance | Gerendertes Widget |
+|---|---|
+| *(keine)* | Einzeilige Texteingabe |
+| `multiline` | Textbereich |
+| `multiline [n,m]` | Textbereich mit Steuerung der Anfangs-/Maximalzeilen |
+| `floating_hint` | Hinweis schwebt als Beschriftung beim Tippen |
+| `embed` | Hinweis innerhalb der Eingabegrenzung |
+| `textpopup` | Tippen zum Öffnen eines Modal-Dialogs |
+| `richtext` / `richtext(height)` | WYSIWYG Rich-Text-Editor |
+| `charcount` | Live-Zeichenzähler unter der Eingabe |
+| `numbers` | Numerische Tastatur |
+| `thousandsep` | Tausender-Komma-Formatierung |
+| `digisep(n,"sep")` | Benutzerdefinierte Zifferngruppierung |
+| `number-hspinner` | Horizontaler – Wert + Spinner |
+| `prefix(expr)` | Statisches oder berechnetes Präfix voranstellen |
+| `upper` / `lower` / `proper` | Automatische Groß-/Kleinschreibungstransformation |
+| `inputs{stt}` | Mikrofontaste für Sprache-zu-Text |
+| `inputs{qrscan}` | QR-/Barcode-Scan-Taste |
+| `inputs{stt,qrscan}` | Sowohl Mikrofon- als auch Scan-Tasten |
+| `selection_one_hide` | Dropdown-Auswahl aus der Auswahlliste |
+| `selection_one_show` | Radio-Liste unter der Eingabe |
+| `align_answer = left/right/center` | Ausrichtung des Antworttextes |
+| `inline-[%H:%M]` | Uhr-Auswahl – Zeiterfassung |
+| `inline-1line` | Kompakter Zeitspinner |
+
+---
 
 ## Einschränkungen und Validierung
 
@@ -89,22 +328,24 @@ Wenden Sie Einschränkungen an, um Format, Länge oder Muster zu erzwingen:
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| text | name | Vollständiger Name | `string-length(.) >= 2` | Name muss mindestens 2 Zeichen lang sein |
-| text | code | Referenzcode | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 Großbuchstaben gefolgt von 4 Ziffern eingeben |
-| text | phone | Telefonnummer | `regex(., '^[0-9]{9,15}$')` | Gültige Telefonnummer eingeben |
+| text | name | Vollständiger Name | `string-length(.) >= 2` | Mindestens 2 Zeichen erforderlich |
+| text | code | Referenzcode | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 Großbuchstaben + 4 Ziffern |
+| text | phone | Telefonnummer | `regex(., '^[0-9]{9,15}$')` | Geben Sie eine gültige Telefonnummer ein |
 
-## Empfohlene Vorgehensweisen
+---
 
-1. Verwenden Sie spezifischere Typen (`integer`, `decimal`, `date`), wenn die Daten eine bekannte Struktur haben — dies verhindert ungültige Einträge und vereinfacht die Analyse.
-2. Fügen Sie `constraint` mit `string-length()` oder `regex()` hinzu, um Codes oder IDs zu validieren.
-3. Verwenden Sie die Erscheinung `multiline` bei offenen Fragen, bei denen Befragte mehrere Sätze schreiben könnten.
-4. Wählen Sie bei der Zeiterfassung die Zeitformat-Token, die der für Ihre Analyse erforderlichen Präzision entsprechen — das Erfassen von Millisekunden, wenn nur Minuten benötigt werden, belastet die Interviewer unnötig.
+## Best Practices
 
-## Plattform-Unterstützung
-
-Der Fragetyp text und alle Zeiteingabe-Erscheinungsbilder werden auf iOS-, Android- und Web-Plattformen unterstützt.
+1. Verwenden Sie spezifischere Typen (`integer`, `decimal`, `date`), wenn die Daten eine bekannte Struktur haben – dies verhindert ungültige Einträge.
+2. Verwenden Sie `multiline [3,8]` für offene Fragen, um den Befragten Platz zum Schreiben zu geben, ohne den Bildschirm zu überladen.
+3. Verwenden Sie `thousandsep` oder `digisep()` anstelle von `numbers`, wenn Sie eine formatierte Anzeige benötigen – `numbers` allein ändert nur die Tastatur.
+4. Verwenden Sie `inputs{qrscan}`, um manuelle Tippfehler bei Codes, IDs und Seriennummern zu eliminieren.
+5. Verwenden Sie `floating_hint`, wenn der Hinweis ein wichtiger Kontext ist, der beim Tippen sichtbar bleiben sollte – Standardhinweise verschwinden auf kleinen Bildschirmen aus dem Blickfeld.
+6. Verwenden Sie `charcount` bei Fragen mit Längenbeschränkungen, damit Befragte ihre Eingabe selbst überwachen können.
 
 ## Einschränkungen
 
-- Textantworten sind freigestellt — es gibt keine eingebaute Rechtschreibprüfung oder Wortschatzeinschränkung über Regex-Muster hinaus.
-- Das Inline-Uhr-Widget ist eine rtSurvey-Erweiterung und ist nicht Teil der Standard-XLSForm-Spezifikation.
+- `inputs{stt}` erfordert einen Browser, der die Web Speech API unterstützt. Chrome ist am zuverlässigsten; Safari wird nicht unterstützt.
+- `richtext` speichert HTML – planen Sie HTML-Bereinigung oder -Sanitisierung in Ihrer Analysepipeline ein, wenn Klartext erwartet wird.
+- `selection_one_hide` und `selection_one_show` erfordern einen `search()`-Ausdruck und werden nur im Webclient unterstützt.
+- `number-hspinner` validiert bei jedem Tastendruck anhand der `constraint`-Spalte, nicht nur beim Verlassen des Feldes – gestalten Sie Einschränkungen entsprechend.

@@ -1,23 +1,25 @@
 ---
-title: "Rank"
-description: "Rank-kysymykset antavat vastaajille mahdollisuuden järjestää valinnat mieltymysten tai prioriteetin mukaan."
+title: "Järjestys"
+description: "Järjestyskysymysten avulla vastaajat voivat järjestää joukon valintoja mieltymystensä tai prioriteettiensa mukaan."
 ---
 
-`rank`-kysymystyyppi esittää valintaluettelon, jonka vastaajan on **vedettävä järjestykseen** (tai muuten sijoitettava ensimmäisestä viimeiseen). Se tallentaa tuloksen välilyönneillä eroteltuna listana valintojen arvoista valitussa järjestyksessä, korkeimman prioriteetin valinta ensin.
+`rank`-kysymystyyppi esittää luettelon valinnoista, jotka vastaaja järjestää mieltymystensä tai prioriteettiensa mukaan. Se tallentaa tuloksen välilyönneillä erotettuna luettelona valintojen arvoista järjestetyssä järjestyksessä, korkeimman prioriteetin valinta ensin.
 
-## XLSForm-perusmäärittely
+> **rtSurvey-verkkolomake:** Raahaa ja järjestä -widgettiä ei ole tällä hetkellä toteutettu. Verkkolomakkeessa `rank` renderöityy valintalistana. Käytä tätä tyyppiä, kun kohdistat mobiiliasiakkaita, jotka tukevat rank-widgettiä, tai kun tallennetun arvon muoto on tärkeämpi kuin raahaa ja järjestä -vuorovaikutus.
+
+## XLSFormin peruserittely
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Sijoita nämä yhteisön tarpeet tärkeimmästä vähiten tärkeimpään |
+| rank priorities | main_priority | Järjestä nämä yhteisön tarpeet tärkeimmästä vähiten tärkeään |
 
-Valinnat määritellään **choices-laskentataulukossa** kuten `select_one`:ssa:
+Valinnat määritellään **valintatyöarkissa** aivan kuten `select_one`:
 
 **survey:**
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Sijoita nämä tarpeet tärkeimmästä vähiten tärkeimpään |
+| rank priorities | main_priority | Järjestä nämä tarpeet tärkeimmästä vähiten tärkeään |
 
 **choices:**
 
@@ -31,52 +33,52 @@ Valinnat määritellään **choices-laskentataulukossa** kuten `select_one`:ssa:
 
 ## Tallennetun arvon muoto
 
-Tallennettu arvo on **välilyönneillä eroteltu lista** valintojen arvoista sijoitusjärjestyksessä (ensimmäinen = korkein prioriteetti):
+Tallennettu arvo on **välilyönneillä erotettu luettelo** valintojen arvoista järjestetyssä järjestyksessä (ensimmäinen = korkein prioriteetti):
 
 ```
 water education health roads electricity
 ```
 
-## Sijoitettujen positioiden poimiminen
+## Järjestettyjen sijaintien poimiminen
 
-Käytä `selected-at()`:a saadaksesi tietyssä sijoituksessa olevan valinnan:
+Käytä `selected-at()`-funktiota saadaksesi valinnan tietyssä järjestyksessä:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| rank priorities | main_priority | Sijoita yhteisön tarpeet | |
+| rank priorities | main_priority | Järjestä yhteisön tarpeet | |
 | calculate | top_priority | | selected-at(`${main_priority}`, 0) |
 | calculate | second_priority | | selected-at(`${main_priority}`, 1) |
 
-`selected-at(${main_priority}, 0)` palauttaa **ensimmäiselle** sijalle asetetun arvon (indeksi 0 = korkein sijoitus).
+`selected-at(${main_priority}, 0)` palauttaa **ensimmäiseksi** asetetun arvon (indeksi 0 = korkein sijoitus).
 
-## `rank-index()`-funktion käyttö toistoryhmissä
+## `rank-index()`-funktion käyttäminen toistuvien ryhmien kanssa
 
-Kun `rank`-tyyppiä käytetään toistoryhmässä, `rank-index()` antaa sinulle viitata ordinaaliseen sijoitukseen toiston ulkopuolelta:
+Kun `rank`-funktiota käytetään toistuvan ryhmän sisällä, `rank-index()`-funktion avulla voit viitata järjestysnumeroon toiston ulkopuolelta:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_ranked | | rank-index(1, `${score}`) |
 
-Katso täydelliset tiedot `rank-index()`- ja `rank-index-if()`-funktioista [Funktiot — Toistettujen kenttien funktiot](../operators-and-functions/functions#repeated-field-functions).
+Katso [Funktiot — Toistuvien kenttien funktiot](../operators-and-functions/functions#repeated-field-functions) saadaksesi täydelliset tiedot `rank-index()`- ja `rank-index-if()`-funktioista.
 
 ## Käyttötarkoitukset
 
-Rank-kysymyksiä käytetään yleisesti:
+Järjestyskysymyksiä käytetään yleisesti:
 
-1. **Prioriteettiluokitus** — yhteisöjen pyytäminen sijoittamaan kehitystarpeet tärkeysjärjestykseen
-2. **Mieltymysjärjestys** — tuotteen ominaisuuksien, palveluattribuuttien tai politiikkavaihtoehtojen sijoittaminen
-3. **Koevaiheiden järjestys** — prosessin vaiheiden järjestäminen
-4. **Top-N-valinta** — yhdistettynä `selected-at()`-funktion kanssa vain ylimmän 1, 2 tai 3 valinnan poimimiseen
+1.  **Prioriteettien järjestäminen** – yhteisöjen pyytäminen järjestämään kehitystarpeet
+2.  **Mieltymysten järjestäminen** – tuoteominaisuuksien, palvelun ominaisuuksien tai politiikkavaihtoehtojen järjestäminen
+3.  **Koearvojen järjestäminen** – prosessin vaiheiden järjestäminen
+4.  **Top-N valinta** – yhdistettynä `selected-at()`-funktioon poimiakseen vain 1, 2 tai 3 parasta valintaa
 
 ## Parhaat käytännöt
 
-1. Pidä lista lyhyenä (3–7 kohdetta) — sijoittaminen muuttuu kognitiivisesti raskaaksi yli 7–8 valinnan jälkeen.
-2. Käytä selkeitä, toisiaan poissulkevia valintojen otsikoita sekaannusten välttämiseksi siitä, mitä "ensimmäinen" tarkoittaa.
-3. Lisää ohjeteksti, jossa selitetään sijoitussuunta (esim. "Vedä järjestykseen: ensimmäinen = tärkein").
-4. Validoi käyttäen `count-selected(.) = x`, jos sinun on varmistettava, että kaikki valinnat on sijoitettu.
+1.  Pidä lista lyhyenä (3–7 kohdetta) – järjestäminen muuttuu kognitiivisesti raskaaksi yli 7–8 vaihtoehdon jälkeen.
+2.  Käytä selkeitä, toisensa poissulkevia valintamerkintöjä välttääksesi sekaannuksen siitä, mitä "ensimmäinen" tarkoittaa.
+3.  Lisää vihjeteksti, joka selittää järjestyssuunnan (esim. "Vedä järjestääksesi: ensimmäinen = tärkein").
+4.  Validoi käyttämällä `count-selected(.) = x`, jos haluat varmistaa, että kaikki valinnat on järjestetty.
 
 ## Rajoitukset
 
-- Vedä-sijoitusaktiivisuus vaatii kosketusnäytön tai hiiren — se ei ehkä toimi hyvin pelkkää näppäimistöä käytettäessä.
-- Joillakin vanhemmilla mobiiliasiakasohjelmilla rank-widget voi palautua numeroituun syöttöliittymään.
-- Ei voi sijoittaa osittain (eli sijoittaa vain joitain valintoja) — kaikki valinnat on järjestettävä.
+-   Raahaa ja järjestä -widgettiä ei ole toteutettu rtSurvey-verkkolomakkeessa.
+-   Et voi osittain järjestää – kaikki valinnat on järjestettävä.
+-   Pidä listat 3–7 kohteessa; pidemmät listat muuttuvat hankaliksi asiakkaasta riippumatta.

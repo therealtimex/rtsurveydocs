@@ -1,9 +1,9 @@
 ---
 title: "Video"
-description: "Video-Fragen ermöglichen es Befragten, Videodateien als Teil der Umfrage aufzunehmen und einzureichen."
+description: "Videofragen ermöglichen es Befragten, Videodateien als Teil der Umfrage aufzunehmen und einzureichen."
 ---
 
-Der Fragetyp `video` ermöglicht es Befragten, **Video aufzunehmen** oder eine vorhandene Videodatei als Teil ihrer Umfrageantwort hochzuladen. Er ist nützlich für die Erfassung visueller Beweise, Demonstrationen, Umweltbedingungen oder anderer Informationen, bei denen Bewegung und Ton zusammen von Vorteil sind.
+Der Fragetyp `video` ermöglicht es Befragten, **Videos aufzunehmen** oder eine vorhandene Videodatei als Teil ihrer Umfrageantwort hochzuladen. Er ist nützlich, um visuelle Beweise, Demonstrationen, Umgebungsbedingungen oder alle Informationen zu erfassen, die von Bewegung und Ton zusammen profitieren.
 
 ## Grundlegende XLSForm-Spezifikation
 
@@ -11,38 +11,38 @@ Der Fragetyp `video` ermöglicht es Befragten, **Video aufzunehmen** oder eine v
 |-------|-------------|-------------------------------------|
 | video | demo_video  | Bitte nehmen Sie eine kurze Demonstration auf |
 
-Weitere Details zum Standard-Video-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Weitere Details zum Standard-Video-Fragetyp finden Sie in der [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Anwendungsbereiche
+## Verwendungszwecke
 
-Video-Fragen werden häufig verwendet für:
+Videofragen werden häufig verwendet für:
 
-1. Dokumentation von Feldbedingungen — Straßenschäden, Infrastrukturzustand, Erntezustand
-2. Aufnahme von Produktdemonstrationen oder Compliance-Überprüfungen von Verfahren
-3. Erfassung von Video-Testimonials von Befragten
-4. Aufzeichnung von Belegen, die räumlichen Kontext erfordern (z. B. Größe und Ausmaß eines Problembereichs)
-5. Vorher/Nachher-Dokumentation für Monitoring- und Evaluierungsumfragen
+1.  Dokumentation von Feldbedingungen – Straßenschäden, Infrastrukturzustand, Pflanzengesundheit
+2.  Aufzeichnung von Produktdemonstrationen oder Prüfungen der Verfahrenskonformität
+3.  Sammeln von Video-Testimonials von Befragten
+4.  Erfassung von Beweismitteln, die einen räumlichen Kontext erfordern (z. B. Größe und Ausdehnung eines Problembereichs)
+5.  Vorher-/Nachher-Dokumentation für Monitoring- und Evaluierungsumfragen
 
 ## Datenformat
 
-Videodateien werden als Binärdaten gespeichert:
+Videodateien werden als binäre Anhänge gespeichert:
 
-- **Format:** MP4 oder MOV (mobile Aufnahme)
-- **Benennung:** `{instanceID}-{fieldname}.mp4` (oder entsprechend)
-- **Speicherung:** In den Server-Medienordner hochgeladen und mit dem Übermittlungsdatensatz verknüpft
-- **Zugriff:** Über die Übermittlungsverwaltungsoberfläche abspielbar und herunterladbar
+-   **Format:** MP4 oder MOV (mobile Aufnahme)
+-   **Benennung:** `{instanceID}-{fieldname}.mp4` (oder Ähnliches)
+-   **Speicherung:** Hochgeladen in den Medienordner des Servers und mit dem Übertragungsdatensatz verknüpft
+-   **Zugriff:** Abspielbar und herunterladbar über die Benutzeroberfläche zur Übertragungsverwaltung
 
 ## rtSurvey-Erweiterungen
 
-### Maximale Aufnahmedauer
+### Maximale Dauer
 
 Verwenden Sie die Spalte `parameters`, um die Aufnahmelänge zu begrenzen:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | site_visit | Standortbedingungen aufnehmen | `max-duration=60` |
+| video | site_visit | Zeichnen Sie die Standortbedingungen auf | `max-duration=60` |
 
-`max-duration` wird in Sekunden angegeben. Die Aufnahme stoppt automatisch bei Erreichen des Limits.
+`max-duration` ist in Sekunden angegeben. Die Aufnahme stoppt automatisch nach Erreichen der Grenze.
 
 ### Qualität / Auflösung
 
@@ -50,44 +50,106 @@ Steuern Sie die Aufnahmeauflösung über `parameters`:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | evidence | Videobeweise aufnehmen | `quality=low` |
+| video | evidence | Videoaufzeichnung als Beweis | `quality=low` |
 
 Unterstützte Werte: `low` (schnellerer Upload), `normal` (Standard), `high`. Verwenden Sie `low` in Gebieten mit eingeschränkter Konnektivität.
 
 ### Vorhandenes Video hochladen
 
-Auf mobilen Geräten kann der Befragte wählen, ein **vorhandenes Video** aus der Galerie des Geräts hochzuladen, anstatt ein neues aufzunehmen. Dies ist standardmäßig in der nativen Kamera-/Galerie-Integration aktiviert.
+Auf Mobilgeräten kann der Befragte ein **vorhandenes Video** aus der Gerätegalerie hochladen, anstatt ein neues aufzunehmen. Dies ist standardmäßig in der nativen Kamera-/Galerieintegration aktiviert.
 
 ### Wiedergabe vor der Übermittlung
 
-Auf mobilen Geräten kann der aufgenommene Clip vor dem Fortfahren überprüft werden. Keine zusätzliche Konfiguration erforderlich.
+Auf Mobilgeräten kann der aufgenommene Clip vor dem Fortfahren überprüft werden. Es ist keine zusätzliche Konfiguration erforderlich.
 
-## Beispielhafte Verwendung
+### Inline-Button-Layout
 
-### Standortbesichtigungsvideo mit Zeitlimit
+Fügen Sie `inline` hinzu, um die Kamera als **runden Icon-Button** neben dem Label anstelle eines vollbreiten Aufnahmebereichs darzustellen.
+
+```
+| type  | name  | label        | appearance                              |
+|-------|-------|--------------|----------------------------------------|
+| video | clip  | Video aufnehmen | inline display{right}                  |
+| video | clip  | Video aufnehmen | inline display{left, large}            |
+| video | clip  | Video aufnehmen | inline display{center, large, <0099FF/>} |
+```
+
+**Button-Position** — `left`, `right` *(Standard)*, `top`, `center`, `bottom`
+
+**Button-Größe** — `small` *(Standard)*, `medium`, `large`
+
+**Button-Farbe** — fügen Sie eine Hex-Farbe in `display{}` hinzu, um die Primärfarbe zu überschreiben:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Steuerung nach der Aufnahme — `results{}`:**
+
+| Appearance | Effekt |
+|---|---|
+| `results{hide(capture)}` | Verbirgt die Aufnahmetaste, nachdem ein Video aufgenommen wurde |
+| `results{hide(review)}` | Verbirgt die Wiedergabe-Miniaturansicht nach der Aufnahme |
+| `results{hide(filename)}` | Verbirgt den Dateinamen und die Dauer |
+| `results{left}` | Verschiebt das Symbol nach der Aufnahme nach links |
+
+Beispiel – Aufnahmetaste ausblenden, Wiedergabe beibehalten:
+```
+inline display{right} results{hide(capture)}
+```
+
+### `thumbnail-square-[WxH]` – Vorschau für Videos mit fester Größe
+
+Nach der Aufnahme wird das Video als Inline-Player mit fester Größe anstelle der vollen Breite angezeigt. Kombinieren Sie es mit `inline` für ein kompaktes Layout.
+
+```
+inline display{right} thumbnail-square-[120x90]
+inline display{center} thumbnail-square-[200x150]
+```
+
+Breite und Höhe sind in Pixel angegeben.
+
+### `invisible auto-show` – Rekorder automatisch öffnen
+
+Verbirgt das Fragen-Widget aus dem Layout, öffnet aber automatisch den Videorekorder, wenn die Seite geladen wird.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Das Label unterdrücken
+
+```
+inline text-nolabel display{center, large}
+```
+
+## Anwendungsbeispiele
+
+### Video zur Standortinspektion mit Begrenzung
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| video | site_video | Wasserquelle aufnehmen | Gehen Sie um die gesamte Anlage herum. Max. 90 Sekunden. | `max-duration=90 quality=normal` |
+| video | site_video | Zeichnen Sie den Wasserpunkt auf | Gehen Sie um die gesamte Anlage herum. Max. 90 Sekunden. | `max-duration=90 quality=normal` |
 
-### Bedingtes Video — nur bei gemeldeten Schäden
+### Bedingtes Video – nur wenn Schäden gemeldet werden
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
-| select_one yesno | damage_found | Wurde ein Schaden festgestellt? | | |
-| video | damage_video | Video des Schadens aufnehmen | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+| select_one yesno | damage_found | Wurden Schäden gefunden? | | |
+| video | damage_video | Video der Schäden aufnehmen | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
-## Empfohlene Vorgehensweisen
+## Best Practices
 
-1. Setzen Sie `max-duration` — uneingeschränkte Videoaufnahmen können leicht 100 MB überschreiten und bei schlechten Verbindungen nicht hochgeladen werden.
-2. Verwenden Sie `quality=low` bei Monitoringumfragen, bei denen visuelle Belege erforderlich, aber feine Details nicht wichtig sind — dies reduziert die Dateigröße erheblich.
-3. Schreiben Sie spezifische Aufnahmeanweisungen in die Spalte `hint` (z. B. "Gehen Sie um das gesamte Gebäude, halten Sie die Kamera ruhig").
-4. Überlegen Sie, ob Video wirklich notwendig ist — ein Foto (`image`) reicht für statische Belege meist aus und erzeugt wesentlich kleinere Dateien.
+1. Legen Sie `max-duration` fest – uneingeschränkte Videoaufnahmen können leicht 100 MB überschreiten und bei schlechten Verbindungen nicht hochgeladen werden.
+2. Verwenden Sie `quality=low` für Monitoring-Umfragen, bei denen visuelle Beweise erforderlich sind, aber keine feinen Details – dies reduziert die Dateigröße drastisch.
+3. Schreiben Sie spezifische Aufnahmehinweise in die `hint`-Spalte (z. B. "Gehen Sie um das gesamte Gebäude, halten Sie die Kamera ruhig").
+4. Überlegen Sie, ob Video notwendig ist – ein Foto (`image`) ist für statische Beweismittel in der Regel ausreichend und erzeugt viel kleinere Dateien.
 5. Testen Sie die Upload-Leistung im tatsächlichen Feldnetzwerk vor dem Einsatz.
 
 ## Einschränkungen
 
-- Videodateien sind sehr groß — ein 1-minütiges Video bei normaler Qualität ist typischerweise 20–60 MB je nach Gerät.
-- Das Hochladen großer Videodateien erfordert eine gute Netzwerkverbindung; erwägen Sie, für videohaltige Formulare eine WLAN-Synchronisierung vorzuschreiben.
-- Nicht alle Webbrowser unterstützen Videoaufnahmen über MediaRecorder — Chrome ist am zuverlässigsten.
-- Die Analyse von Videoantworten ist manuell und zeitaufwendig; setzen Sie Videos sparsam und nur dann ein, wenn der Videoinhalt einen einzigartigen Wert bietet.
+- Videodateien sind sehr groß – ein 1-minütiges Video in normaler Qualität beträgt je nach Gerät typischerweise 20–60 MB.
+- Das Hochladen großer Videodateien erfordert eine gute Netzwerkverbindung; erwägen Sie, für videointensive Formulare eine WLAN-Synchronisierung zu verlangen.
+- Nicht alle Webbrowser unterstützen Videoaufnahmen über MediaRecorder – Chrome ist am zuverlässigsten.
+- Die Analyse von Videoantworten ist manuell und zeitaufwändig; verwenden Sie sie sparsam und nur, wenn Videoinhalte einen einzigartigen Wert hinzufügen.

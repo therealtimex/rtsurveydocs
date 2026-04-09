@@ -3,34 +3,34 @@ title: "Video"
 description: "Las preguntas de video permiten a los encuestados grabar y enviar archivos de video como parte de la encuesta."
 ---
 
-El tipo de pregunta `video` permite a los encuestados **grabar video** o cargar un archivo de video existente como parte de su respuesta a la encuesta. Es útil para capturar evidencia visual, demostraciones, condiciones ambientales o cualquier información que se beneficie de movimiento y audio juntos.
+El tipo de pregunta `video` permite a los encuestados **grabar videos** o cargar un archivo de video existente como parte de su respuesta a la encuesta. Es útil para capturar evidencia visual, demostraciones, condiciones ambientales o cualquier información que se beneficie del movimiento y el audio juntos.
 
 ## Especificación básica de XLSForm
 
-| type  | name        | label                                    |
-|-------|-------------|------------------------------------------|
-| video | demo_video  | Por favor grabe una demostración corta   |
+| type  | name        | label                              |
+|-------|-------------|-------------------------------------|
+| video | demo_video  | Por favor, grabe una demostración corta |
 
 Para obtener más detalles sobre el tipo de pregunta de video estándar, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
 
 ## Usos
 
-Las preguntas de video se usan comúnmente para:
+Las preguntas de video se utilizan comúnmente para:
 
-1. Documentar condiciones de campo — daños en carreteras, estado de infraestructura, salud de cultivos
-2. Grabar demostraciones de productos o verificaciones de cumplimiento de procedimientos
-3. Recopilar testimonios en video de encuestados
-4. Capturar evidencia que requiera contexto espacial (p. ej., el tamaño y extensión de un área problemática)
-5. Documentación antes/después para encuestas de monitoreo y evaluación
+1.  Documentar condiciones de campo — daños en carreteras, estado de la infraestructura, salud de los cultivos
+2.  Grabar demostraciones de productos o comprobaciones de cumplimiento de procedimientos
+3.  Recopilar testimonios en video de los encuestados
+4.  Capturar evidencia que requiere contexto espacial (por ejemplo, el tamaño y la extensión de un área problemática)
+5.  Documentación de antes/después para encuestas de monitoreo y evaluación
 
 ## Formato de datos
 
 Los archivos de video se almacenan como archivos adjuntos binarios:
 
-- **Formato:** MP4 o MOV (grabación móvil)
-- **Nomenclatura:** `{instanceID}-{fieldname}.mp4` (o equivalente)
-- **Almacenamiento:** Cargado a la carpeta multimedia del servidor y vinculado al registro de envío
-- **Acceso:** Reproducible y descargable desde la interfaz de gestión de envíos
+-   **Formato:** MP4 o MOV (grabación móvil)
+-   **Nomenclatura:** `{instanceID}-{fieldname}.mp4` (o equivalente)
+-   **Almacenamiento:** Cargado a la carpeta de medios del servidor y vinculado al registro de envío
+-   **Acceso:** Reproducible y descargable desde la interfaz de gestión de envíos
 
 ## Extensiones de rtSurvey
 
@@ -40,27 +40,89 @@ Use la columna `parameters` para limitar la duración de la grabación:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | site_visit | Grabe las condiciones del sitio | `max-duration=60` |
+| video | site_visit | Grabar las condiciones del sitio | `max-duration=60` |
 
-`max-duration` está en segundos. La grabación se detiene automáticamente al alcanzar el límite.
+`max-duration` está en segundos. La grabación se detiene automáticamente al límite.
 
 ### Calidad / resolución
 
-Controle la resolución de grabación a través de `parameters`:
+Controle la resolución de la grabación a través de `parameters`:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | evidence | Grabe video de evidencia | `quality=low` |
+| video | evidence | Grabar evidencia en video | `quality=low` |
 
 Valores admitidos: `low` (carga más rápida), `normal` (predeterminado), `high`. Use `low` en áreas con conectividad limitada.
 
 ### Cargar video existente
 
-En móvil, el encuestado puede elegir **cargar un video existente** desde la galería del dispositivo en lugar de grabar uno nuevo. Esto está habilitado de forma predeterminada en la integración nativa de cámara/galería.
+En dispositivos móviles, el encuestado puede optar por **cargar un video existente** de la galería del dispositivo en lugar de grabar uno nuevo. Esto está habilitado de forma predeterminada en la integración nativa de cámara/galería.
 
 ### Reproducción antes del envío
 
-En móvil, el clip grabado puede revisarse antes de continuar. No se necesita configuración adicional.
+En dispositivos móviles, el clip grabado se puede revisar antes de continuar. No se necesita configuración adicional.
+
+### Diseño de botón en línea
+
+Agregue `inline` para renderizar la cámara como un **botón circular con icono** junto a la etiqueta en lugar de un área de captura de ancho completo.
+
+```
+| type  | name  | label        | appearance                              |
+|-------|-------|--------------|----------------------------------------|
+| video | clip  | Grabar video | inline display{right}                  |
+| video | clip  | Grabar video | inline display{left, large}            |
+| video | clip  | Grabar video | inline display{center, large, <0099FF/>} |
+```
+
+**Posición del botón** — `left`, `right` *(predeterminado)*, `top`, `center`, `bottom`
+
+**Tamaño del botón** — `small` *(predeterminado)*, `medium`, `large`
+
+**Color del botón** — agregue un color hexadecimal dentro de `display{}` para anular el color principal:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Control posterior a la captura — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Oculta el botón de grabación después de capturar un video |
+| `results{hide(review)}` | Oculta la miniatura de reproducción después de la captura |
+| `results{hide(filename)}` | Oculta el nombre de archivo y la duración |
+| `results{left}` | Mueve el icono a la izquierda después de la captura |
+
+Ejemplo: ocultar el botón de grabación, mantener la reproducción:
+```
+inline display{right} results{hide(capture)}
+```
+
+### `thumbnail-square-[WxH]` — vista previa de video de tamaño fijo
+
+Después de la captura, muestra el video como un reproductor en línea de tamaño fijo en lugar de ancho completo. Combine con `inline` para un diseño compacto.
+
+```
+inline display{right} thumbnail-square-[120x90]
+inline display{center} thumbnail-square-[200x150]
+```
+
+El ancho y la altura están en píxeles.
+
+### `invisible auto-show` — abridor automático de grabadora
+
+Oculta el widget de la pregunta del diseño pero abre automáticamente la grabadora de video cuando se carga la página.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Suprimir la etiqueta
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Ejemplo de uso
 
@@ -68,26 +130,26 @@ En móvil, el clip grabado puede revisarse antes de continuar. No se necesita co
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| video | site_video | Grabe el punto de agua | Camine alrededor de toda la instalación. Máx 90 segundos. | `max-duration=90 quality=normal` |
+| video | site_video | Grabar el punto de agua | Recorra toda la instalación. Máx. 90 segundos. | `max-duration=90 quality=normal` |
 
-### Video condicional — solo si se reportaron daños
+### Video condicional — solo si se reportan daños
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
 | select_one yesno | damage_found | ¿Se encontraron daños? | | |
-| video | damage_video | Grabe video de los daños | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+| video | damage_video | Grabar video del daño | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
 ## Mejores prácticas
 
-1. Establezca `max-duration`; las grabaciones de video sin restricciones pueden superar fácilmente los 100 MB y fallar al cargar en conexiones débiles.
-2. Use `quality=low` para encuestas de monitoreo donde se requiere evidencia visual pero no los detalles finos; reduce drásticamente el tamaño del archivo.
-3. Escriba instrucciones de grabación específicas en la columna `hint` (p. ej., "Camine alrededor de todo el edificio, mantenga la cámara estable").
-4. Considere si el video es necesario; una foto (`image`) suele ser suficiente para evidencia estática y produce archivos mucho más pequeños.
-5. Pruebe el rendimiento de carga en la red de campo real antes de la implementación.
+1.  Establezca `max-duration`: las grabaciones de video sin restricciones pueden exceder fácilmente los 100 MB y fallar al cargarse en conexiones débiles.
+2.  Use `quality=low` para encuestas de monitoreo donde se requiere evidencia visual pero no detalles finos; reduce drásticamente el tamaño del archivo.
+3.  Escriba instrucciones de grabación específicas en la columna `hint` (por ejemplo, "Camine alrededor de todo el edificio, mantenga la cámara estable").
+4.  Considere si el video es necesario: una foto (`image`) suele ser suficiente para evidencia estática y produce archivos mucho más pequeños.
+5.  Pruebe el rendimiento de la carga en la red de campo real antes de la implementación.
 
 ## Limitaciones
 
-- Los archivos de video son muy grandes; un video de 1 minuto a calidad normal es típicamente de 20–60 MB según el dispositivo.
-- Cargar archivos de video grandes requiere una buena conexión de red; considere requerir sincronización por Wi-Fi para formularios con muchos videos.
-- No todos los navegadores web admiten la grabación de video a través de MediaRecorder; Chrome es el más confiable.
-- El análisis de respuestas de video es manual y lleva mucho tiempo; úselos con moderación y solo cuando el contenido de video agregue un valor único.
+-   Los archivos de video son muy grandes; un video de 1 minuto con calidad normal suele pesar entre 20 y 60 MB, dependiendo del dispositivo.
+-   La carga de archivos de video grandes requiere una buena conexión de red; considere requerir la sincronización por Wi-Fi para formularios con muchos videos.
+-   No todos los navegadores web admiten la grabación de video a través de MediaRecorder; Chrome es el más confiable.
+-   El análisis de las respuestas en video es manual y requiere mucho tiempo; úselo con moderación y solo cuando el contenido del video agregue un valor único.

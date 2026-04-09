@@ -3,70 +3,145 @@ title: "Imagen"
 description: "Las preguntas de imagen permiten a los encuestados capturar y enviar fotos como parte de la encuesta."
 ---
 
-El tipo de pregunta de imagen en XLSForms y rtSurvey permite a los encuestados capturar y enviar fotos como parte de sus respuestas a la encuesta. Esta función es particularmente útil para recopilar datos visuales, documentar observaciones o proporcionar evidencia en encuestas de campo.
+El tipo de pregunta de imagen en XLSForms y rtSurvey permite a los encuestados capturar y enviar fotos como parte de sus respuestas a la encuesta. Esta característica es particularmente útil para recopilar datos visuales, documentar observaciones o proporcionar evidencia en encuestas de campo.
 
 ## Especificación básica de XLSForm
 
 | type  | name        | label                           |
-|-------|-------------|----------------------------------|
-| image | photo       | Tome una foto de la ubicación    |
+|-------|-------------|--------------------------------|
+| image | photo       | Tomar una foto de la ubicación    |
 
 Para obtener más detalles sobre el tipo de pregunta de imagen básico, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
 
 ## Usos
 
-Las preguntas de imagen se usan comúnmente para:
+Las preguntas de imagen se utilizan comúnmente para:
 
-1. Documentar condiciones o observaciones de campo
-2. Capturar evidencia visual en estudios de investigación
-3. Recopilar fotos de antes y después en evaluaciones de impacto
-4. Verificar la finalización de tareas o la presencia en ubicaciones
-5. Recopilar datos visuales para análisis remoto
+1.  Documentar condiciones u observaciones de campo
+2.  Capturar evidencia visual en estudios de investigación
+3.  Recolectar fotos de antes y después en evaluaciones de impacto
+4.  Verificar la finalización de tareas o la presencia en ubicaciones
+5.  Recopilar datos visuales para análisis remoto
 
 ## Mejores prácticas
 
-1. Proporcione instrucciones claras sobre qué debe fotografiarse.
-2. Considere las implicaciones de privacidad e informe a los encuestados sobre cómo se usarán sus fotos.
-3. Sea consciente del tamaño de los archivos y las limitaciones de almacenamiento, especialmente para encuestas en áreas con conectividad a internet limitada.
-4. Asegúrese de que el dispositivo tenga suficiente espacio de almacenamiento y que los permisos de cámara estén otorgados.
+1.  Proporcione instrucciones claras sobre lo que debe fotografiarse.
+2.  Considere las implicaciones de privacidad e informe a los encuestados sobre cómo se utilizarán sus fotos.
+3.  Tenga en cuenta el tamaño de los archivos y las limitaciones de almacenamiento, especialmente para encuestas en áreas con conectividad a Internet limitada.
+4.  Asegúrese de que el dispositivo tenga suficiente espacio de almacenamiento y se hayan otorgado los permisos de la cámara.
 
 ## Ejemplo de uso
 
-He aquí un ejemplo de cómo podría usar una pregunta de imagen en una encuesta:
+Aquí hay un ejemplo de cómo podría usar una pregunta de imagen en una encuesta:
 
-| type  | name           | label                                      | hint                                               |
-|-------|----------------|--------------------------------------------|----------------------------------------------------|
-| image | storefront     | Tome una foto de la entrada de la tienda   | Asegúrese de que el nombre de la tienda sea claramente visible |
+| type  | name           | label                                      | hint                                        |
+|-------|----------------|--------------------------------------------|--------------------------------------------|
+| image | storefront     | Tomar una foto de la entrada de la tienda | Asegúrese de que el nombre de la tienda sea claramente visible |
 
 ## Extensiones de rtSurvey
 
-Si bien la especificación básica de XLSForm para preguntas de imagen es sencilla, rtSurvey puede ofrecer características o personalizaciones adicionales:
+### Diseño de botón en línea
 
-1. Configuración de calidad de imagen (p. ej., resolución baja, media, alta)
-2. Opción para agregar leyendas o etiquetas a las imágenes
-3. Captura de múltiples imágenes para una sola pregunta
-4. Integración con la aplicación de cámara nativa del dispositivo o la galería
+Agregue `inline` a la columna `appearance` para que la cámara se muestre como un **botón circular con icono** junto a la etiqueta en lugar de un área de captura de ancho completo. Al tocarlo, se abre un modal.
+
+```
+| type  | name  | label        | appearance                          |
+|-------|-------|--------------|-------------------------------------|
+| image | photo | Tomar una foto | inline display{right}               |
+| image | photo | Tomar una foto | inline display{center, large}       |
+```
+
+**Posición del botón — `display{}`:**
+
+| Value | Layout |
+|-------|--------|
+| `right` *(predeterminado)* | Icono a la derecha de la etiqueta |
+| `left` | Icono a la izquierda de la etiqueta |
+| `top` | Icono encima de la etiqueta, centrado |
+| `center` / `bottom` | Icono debajo de la etiqueta, centrado |
+
+**Tamaño del botón:**
+
+| Value | Size |
+|-------|------|
+| `small` *(predeterminado)* | Círculo pequeño |
+| `medium` | Círculo mediano |
+| `large` | Círculo grande |
+
+**Color del botón** — agregue un color hexadecimal dentro de `display{}` para anular el color principal:
+
+```
+inline display{right, large, <FF5500/>}
+inline display{center, medium, <0099FF/>}
+```
+
+**Control posterior a la captura — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Oculta el botón de la cámara después de tomar una foto |
+| `results{hide(camera)}` | Igual que `hide(capture)` — alias para el tipo de imagen |
+| `results{hide(review)}` | Oculta la vista previa en miniatura después de la captura |
+| `results{hide(filename)}` | Oculta el nombre del archivo que se muestra después de la carga |
+| `results{left}` | Mueve el icono a la izquierda después de la captura |
+
+Ejemplo — botón grande centrado, ocultar cámara después de la captura:
+```
+inline display{center, large} results{hide(capture)}
+```
+
+### `invisible auto-show` — cámara de apertura automática
+
+Oculta el widget de la pregunta del diseño pero abre automáticamente la cámara cuando se carga la página. Útil para incrustar un paso de captura silenciosa en un flujo de formulario.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Firma y dibujo
+
+| Appearance | Description |
+|---|---|
+| `signature` | Modal de panel de firma a pantalla completa |
+| `signature display{quick}` | Panel de firma de dibujo rápido en línea — sin modal |
+| `draw` | Lienzo de dibujo a mano alzada |
+
+### Marca de agua
+
+Agregue una marca de agua de texto o imagen a las fotos capturadas:
+
+```
+watermark(text, "ID de encuesta: ${id}", bottom-right, 0.5)
+watermark(file, logo.png, top-left, 1.0, 20%)
+```
+
+### Suprimir la etiqueta
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Manejo de datos
 
-Las imágenes recopiladas a través de este tipo de pregunta típicamente se:
+Las imágenes recopiladas a través de este tipo de pregunta suelen ser:
 
-1. Guardan en un formato de imagen común (p. ej., JPG, PNG)
-2. Almacenan junto con otros datos de la encuesta, a menudo en una carpeta de medios separada
-3. Pueden ver y analizar a través de la plataforma de gestión de encuestas
+1.  Guardadas en un formato de imagen común (por ejemplo, JPG, PNG)
+2.  Almacenadas junto con otros datos de la encuesta, a menudo en una carpeta de medios separada
+3.  Accesibles para su visualización y análisis a través de la plataforma de gestión de encuestas
 
 ## Consideraciones para el análisis
 
 Al usar preguntas de imagen, considere:
 
-1. Cómo se analizarán las imágenes (p. ej., revisión manual, análisis de imagen automatizado)
-2. El espacio de almacenamiento adicional requerido para archivos de imagen
-3. Medidas de privacidad y protección de datos para almacenar y manejar fotos
-4. Posible necesidad de herramientas de edición u organización de imágenes en la fase de análisis
+1.  Cómo se analizarán las imágenes (por ejemplo, revisión manual, análisis automático de imágenes)
+2.  El espacio de almacenamiento adicional requerido para los archivos de imagen
+3.  Medidas de privacidad y protección de datos para almacenar y manejar fotos
+4.  Posible necesidad de herramientas de edición u organización de imágenes en la fase de análisis
 
 ## Limitaciones
 
-- Los archivos de imagen pueden ser grandes, lo que puede impactar la transferencia de datos y el almacenamiento.
-- No todos los dispositivos pueden tener cámaras de alta calidad o suficiente espacio de almacenamiento.
-- Analizar grandes cantidades de imágenes puede ser llevar mucho tiempo.
-- Puede haber preocupaciones de privacidad al capturar imágenes, especialmente en espacios públicos.
+-   Los archivos de imagen pueden ser grandes, lo que puede afectar la transferencia de datos y el almacenamiento.
+-   No todos los dispositivos pueden tener cámaras de alta calidad o suficiente espacio de almacenamiento.
+-   Analizar un gran número de imágenes puede llevar mucho tiempo.
+-   Puede haber preocupaciones de privacidad al capturar imágenes, especialmente en espacios públicos.

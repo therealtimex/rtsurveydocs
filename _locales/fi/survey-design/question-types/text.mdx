@@ -1,110 +1,351 @@
 ---
-title: "Text"
-description: "Vapaan tekstin vastauksen kysymystyyppi rtSurveyssa"
+title: "Teksti"
+description: "Vapaamuotoinen tekstivastauskysymystyyppi rtSurvey-ohjelmassa"
 ---
 
-`text`-kysymystyyppi kerää vapaan tekstin vastauksen — minkä tahansa merkkijonon. Se on joustavin syötetyyppi ja sitä käytetään nimiin, osoitteisiin, kuvauksiin, koodeihin ja kaikkeen, mikä ei sovi spesifisempään tyyppiin.
+`text`-kysymystyyppi kerää vapaamuotoisen tekstimerkkijonon. Se on joustavin syötytyyppi ja tukee suurta määrää ulkoasuvariantteja, jotka muuttavat syötteen renderöintiä – yksinkertaisesta yksirivisestä kentästä puheesta tekstiksi, ponnahdusikkunoihin, rikkaan tekstin editoreihin ja numerospinnereihin.
 
-rtSurvey laajentaa `text`-tyyppiä myös **ajan syöttöwidgeteillä**, jotka mahdollistavat tarkan ajanvalintakellon käytön.
-
-## XLSForm-perusmäärittely
+## XLSFormin peruserittely
 
 | type | name | label |
 |------|------|-------|
 | text | respondent_name | Vastaajan koko nimi |
 | text | address | Kotiosoite |
 
-Lisätietoja XLSForm-standardin text-tyypistä löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+Vakiomääritykset löytyvät [XLSFormin dokumentaatiosta](https://xlsform.org/en/#question-types).
 
-## Käyttötarkoitukset
+---
 
-Tekstikysymyksiä käytetään:
+## Asettelutilat
 
-1. Nimiin, osoitteisiin, vapaisiin kuvauksiin
-2. Avoimiin kommentteihin tai palautteeseen
-3. Koodeihin, tunnuksiin tai viitenumeroihin, jotka eivät sovi integer/decimal-tyypeille
-4. Aikaarvojen keräämiseen rtSurveyn ajan syöttölaajennuksilla
-5. Automaattisiin tekstikenttiin (via `search-autocomplete-noedit-v2()`)
+### Oletus — yksirivinen syöte
 
-## Vakiomuotoiset ulkoasuvaihtoehdot
+Ei ulkoasua tarvita. Renderöi standardin `<input type="text">` -kentän.
 
-| Ulkoasu | Kuvaus |
-|---------|--------|
-| *(ei mitään)* | Yksirivisinen tekstisyöte |
-| `multiline` | Monirivisinen tekstialue — parhaiten pitkälle vapaamuotoiselle tekstille verkossa |
+---
 
-## rtSurveyn ajan syöttölaajennukset
+### `multiline` — tekstialue
 
-rtSurvey laajentaa `text`-tyyppiä **kellovalitsimella** aikaarvojen keräämiseksi. Nämä ulkoasuvaihtoehdot näyttävät kello-ikonin, jota luetteloija voi napauttaa valitakseen tunnit, minuutit, sekunnit tai millisekunnit.
+Renderöi monirivisen tekstialueen. Käyttäjä voi laajentaa sitä kirjoittamalla; se kasvaa automaattisesti.
 
-### Ulkoasuvariantit
+```
+multiline
+```
 
-| Ulkoasu | Kuvaus |
-|---------|--------|
-| `inline` | Kello-ikoni näytetään kentän vieressä |
-| `inline colors("RRGGBB")` | Kello-ikoni mukautetulla heksavärillä |
-| `inline-1line` | Kello näytetään kompaktissa yhden rivin muodossa |
-| `inline-1line-RRGGBB` | Yhden rivin muoto mukautetulla ikoni-värillä (heksa, ei `#`) |
-| `inline-1line colors("RRGGBB","RRGGBB")` | Yhden rivin muoto kahdella värillä |
-| `inline-onlyresult` | Kello-ikoni katoaa valinnan jälkeen; näytetään vain arvo |
-| `inline-onlyresult colors("RRGGBB")` | Sama, mukautetulla ikoni-värillä |
+**Rivin korkeuden säätely** lisäämällä `[initRows, maxRows]`:
 
-### Aikamuototokenit
+```
+multiline [3,8]     → alkaa 3 rivistä, laajenee jopa 8:aan
+multiline [5]       → kiinteä 5 riviin
+```
 
-Lisää muotomerkkijono hakasulkeissa ohjaamaan, mitkä aikakomponentit näytetään:
+Oletuksena on 1 rivi ilman maksimia. Shift+Enter lisää rivinvaihdon; Enter siirtyy seuraavaan kysymykseen.
 
-| Muotomerkkijono | Näyttää |
-|-----------------|---------|
-| `inline-[%H:%M]` | Tunnit ja minuutit (24 tunnin muoto) |
-| `inline-[%h:%M]` | Tunnit ja minuutit (12 tunnin muoto) |
-| `inline-[%H:%M:%S]` | Tunnit, minuutit, sekunnit (24 tunnin muoto) |
-| `inline-[%h:%M:%S]` | Tunnit, minuutit, sekunnit (12 tunnin muoto) |
-| `inline-[%H:%M:%3]` | Tunnit, minuutit, millisekunnit |
-| `inline-[%M:%S]` | Vain minuutit ja sekunnit |
-| `inline-[%M:%3]` | Vain minuutit ja millisekunnit |
+---
+
+### `floating_hint` — vihje leijuu otsikkona
+
+`hint`-teksti renderöidään syötekentän sisälle paikkamerkkinä. Kun käyttäjä alkaa kirjoittaa, vihje leijuu kentän yläpuolella otsikkona.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — vihje syötteen sisällä
+
+Samoin kuin `floating_hint` — vihje renderöidään syötteen rajan sisälle, kun kenttä on tyhjä. Ei leiju kirjoitettaessa.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — modaalinen dialogisyöte
+
+Kentän napauttaminen avaa SweetAlert-modaalisen dialogin, jossa on suuri syöte inline-muokkauksen sijaan. Hyödyllinen mobiililaitteissa, jotta näytölle saadaan enemmän tilaa kirjoittamiseen.
+
+```
+textpopup
+```
+
+---
+
+### `richtext` — WYSIWYG-editori
+
+Renderöi täyden rikkaan tekstin editorin (Monaco / Draft.js). Vastaaja voi lihavoida, kursivoida, lisätä listoja jne. Tallennettu arvo on HTML.
+
+```
+richtext
+richtext(30%)       → editorin korkeus 30% näkymästä
+```
+
+---
+
+### `charcount` — reaaliaikainen merkkilaskuri
+
+Lisää `(n)` merkkilaskurin syötekentän alapuolelle, joka päivittyy käyttäjän kirjoittaessa.
+
+```
+charcount
+multiline charcount
+```
+
+---
+
+## Numeeriset syötevariantit
+
+Nämä ulkoasut toimivat `text`-tyypissä kerätäkseen numeroita erityisellä muotoilulla tai vuorovaikutuskuvioilla.
+
+### `numbers` — numeerinen näppäimistö
+
+Pakottaa HTML-syötytyypin `number`:iksi, mikä laukaisee numeerisen näppäimistön mobiililaitteissa.
+
+```
+numbers
+```
+
+### `thousandsep` — tuhaterotin
+
+Näyttää numeron pilkulla ryhmiteltynä (esim. `1,234,567`) ja tallentaa raa'an numeron. Syötytyyppi pakotetaan `text`:iksi, jotta pilkkuja sisältävä näyttö on mahdollinen.
+
+```
+thousandsep
+```
+
+### `digisep(n, "sep")` — mukautettu numeroryhmittely
+
+Ryhmittää numerot `n`:n ryhmiin, jotka on erotettu mukautetulla erottimella. Hyödyllinen puhelinnumeroille, tunnuksille jne.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+### `number-hspinner` — vaakasuuntainen spinneri
+
+Korvaa syötteen vaakasuuntaisella **− arvo +** -spinnerillä. Käyttäjä napauttaa miinus/plus-painikkeita vähentääkseen tai lisätäkseen arvoa. Toimii `int`- ja `decimal`-tyyppien kanssa.
+
+```
+number-hspinner
+```
+
+**Mukauta painikkeen ulkoasua** käyttämällä `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','1')
+```
+
+Parametrit: vasemman painikkeen muoto, oikean painikkeen muoto, askelarvo.
+
+**Mukautetut värit** käyttämällä `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Neljä väriarvoa: vasen tausta, vasen kuvake, oikea tausta, oikea kuvake.
+
+### `prefix(expr)` — etuliitteen lisääminen
+
+Lisää lasketun tai staattisen merkkijonon näytettyyn arvoon. Tallennettu arvo ei sisällä etuliitettä.
+
+```
+prefix('USD ')      → näyttää "USD 100", tallentaa "100"
+prefix(${currency}) → dynaaminen etuliite toisesta kentästä
+```
+
+### `textonly` — pakota tekstisyötytyyppi
+
+Pakottaa `type="text"` -tyypin, vaikka kenttä olisi `integer` tai `decimal`. Hyödyllinen selainten numeronsyöttöön liittyvien omituisuuksien välttämiseksi.
+
+```
+textonly
+```
+
+---
+
+## Tekstin muunnos
+
+Nämä ulkoasut muuntavat arvoa automaattisesti käyttäjän kirjoittaessa.
+
+| Appearance | Effect | Esimerkki syöte → tallennettu |
+|---|---|---|
+| `upper` | Muuntaa ISOIKSI KIRJAIMIKSI | `hei` → `HEI` |
+| `lower` | Muuntaa pieniksi kirjaimiksi | `HEI` → `hei` |
+| `proper` | Muuntaa isolla alkukirjaimella | `john doe` → `John Doe` |
+
+---
+
+## Syötteen sieppaajan apuri
+
+### `inputs{stt}` — puhe tekstiksi
+
+Lisää mikrofonipainikkeen syötteen viereen. Sen napauttaminen käynnistää selaimen puheentunnistuksen (Web Speech API). Transkriptoitu teksti lisätään kenttään.
+
+```
+inputs{stt}
+```
+
+Ei tuettu Safarilla. Vaatii mikrofoniluvan.
+
+### `inputs{qrscan}` — QR- / viivakoodinlukija
+
+Lisää QR-koodin skannauspainikkeen syötteen viereen. Avaa kamerasimuloinnin modaalin ja täyttää kentän skannatulla arvolla.
+
+```
+inputs{qrscan}
+```
+
+**Tokenisoi** (lisää skannatut arvot korvaamisen sijaan):
+
+```
+inputs{qrscan} append(${separator})
+```
+
+### `inputs{stt,qrscan}` — sekä puhe että skannaus
+
+Renderöi sekä mikrofonin että QR-skannauspainikkeet vierekkäin.
+
+```
+inputs{stt,qrscan}
+inputs{qrscan,stt}
+```
+
+---
+
+## Valintaan liittyvät variantit
+
+Nämä ulkoasut yhdistävät tekstikentän `select_one`-valintalistaan, jolloin käyttäjä voi joko valita listasta tai kirjoittaa vapaasti.
+
+### `selection_one_hide` — pudotusvalikko
+
+Renderöi tekstisyötteen alasvetonuolella. Nuolen napauttaminen näyttää vaihtoehdot linkitetystä `search()`-listasta. Valinnan tekeminen täyttää syötteen ja lukitsee sen (näyttää ✕ tyhjentääksesi).
+
+```
+selection_one_hide
+```
+
+### `selection_one_show` — radiolista alapuolella
+
+Renderöi tekstisyötteen radiopainikkeilla sen alapuolella. Radiopainikkeen valitseminen täyttää ja lukitsee syötteen.
+
+```
+selection_one_show
+```
+
+Molemmissa varianteissa tarvitaan `search()`-lauseke `calculation`-sarakkeessa valintalistan määrittelyä varten.
+
+---
+
+## Vastausten tasaus
+
+Ohjaa kirjoitetun tekstin vaakasuuntaista tasausta syötteen sisällä.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+## Ajan syöte-widget (inline-kello)
+
+rtSurvey laajentaa `text`-kenttää kellonvalintawidgetillä. Nämä ulkoasut näyttävät kellokuvakkeen, jota luettelija napauttaa valitakseen aika-arvon. Arvo tallennetaan pelkkänä tekstinä valitussa muodossa.
+
+### Ulkoasut
+
+| Appearance | Description |
+|---|---|
+| `inline` | Kellokuvakepainike kentän vieressä, avaa modaalin |
+| `inline-onlyresult` | Kellokuvake katoaa valinnan jälkeen |
+| `inline-1line` | Kompakti yksirivinen aikanäyttö |
+| `inline colors("RRGGBB")` | Kellokuvake mukautetulla värillä |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Spinneri kahdella korostusvärillä |
+
+### Muotoilumerkit
+
+Lisää `-[format]` ohjataksesi, mitkä aikaosat näytetään ja tallennetaan:
+
+| Format | Näyttää |
+|---|---|
+| `inline-[%H:%M]` | Tunnit : Minuutit (24h) |
+| `inline-[%h:%M]` | Tunnit : Minuutit (12h) |
+| `inline-[%H:%M:%S]` | Tunnit : Minuutit : Sekunnit (24h) |
+| `inline-[%M:%S]` | Minuutit : Sekunnit |
+| `inline-[%H:%M:%3]` | Tunnit : Minuutit : Millisekunnit |
 | `inline-[%S]` | Vain sekunnit |
 | `inline-[%3]` | Vain millisekunnit |
-| `inline-[%H]` | Vain tunnit (24 tunnin muoto) |
-| `inline-[%h]` | Vain tunnit (12 tunnin muoto) |
+| `inline-[%H]` | Vain tunnit (24h) |
 
-### Esimerkki: Tehtävän keston tallentaminen minuuteissa ja sekunneissa
+### Painikkeen sijainti `display{}`-funktiolla
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | task_duration | Tehtävän suorittamiseen kulunut aika | `inline-[%M:%S]` |
+Sama kuin muut inline-tyypit — ohjaa kellopainikkeen sijaintia ja kokoa:
 
-### Esimerkki: Tapahtuman ajan tallentaminen 24 tunnin muodossa mukautetulla värillä
+```
+inline display{right}
+inline display{center, large}
+inline-onlyresult display{left, medium, #0099FF}
+```
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | event_time | Tapahtuman aika | `inline-1line colors("0099FF")` |
+---
 
-## Tietomuoto
+## Ulkoasun pikaopas
 
-Tekstitiedot tallennetaan ja viedään tavallisena merkkijonona. Aikapohjaisia syötteitä varten inline-kellowidjettillä arvo tallennetaan valitun muotomerkkijonon mukaisessa muodossa (esim. `14:32` muodolle `%H:%M`).
+| Appearance | Renderöity widget |
+|---|---|
+| *(ei mitään)* | Yksirivinen tekstisyöte |
+| `multiline` | Tekstialue |
+| `multiline [n,m]` | Tekstialue, jossa alustus-/maksimirivien hallinta |
+| `floating_hint` | Vihje leijuu otsikkona kirjoitettaessa |
+| `embed` | Vihje syötteen rajan sisällä |
+| `textpopup` | Napauta avataksesi modaalisen dialogin |
+| `richtext` / `richtext(height)` | WYSIWYG-rikkaan tekstin editori |
+| `charcount` | Reaaliaikainen merkkilaskuri syötteen alapuolella |
+| `numbers` | Numeerinen näppäimistö |
+| `thousandsep` | Tuhaterottimen muotoilu |
+| `digisep(n,"sep")` | Mukautettu numeroryhmittely |
+| `number-hspinner` | Vaakasuuntainen − arvo + -spinneri |
+| `prefix(expr)` | Lisää staattinen tai laskettu etuliite |
+| `upper` / `lower` / `proper` | Automaattinen kirjainkoon muunnos |
+| `inputs{stt}` | Puheesta tekstiksi -mikrofonipainike |
+| `inputs{qrscan}` | QR-/viivakoodinlukupainike |
+| `inputs{stt,qrscan}` | Sekä mikrofoni- että skannauspainikkeet |
+| `selection_one_hide` | Pudotusvalikko valintalistasta |
+| `selection_one_show` | Radioluettelo syötteen alapuolella |
+| `align_answer = left/right/center` | Vastaustekstin tasaus |
+| `inline-[%H:%M]` | Kellonvalitsin — ajan kerääminen |
+| `inline-1line` | Kompakti aikanäyttö |
 
-## Rajoitteet ja validointi
+---
 
-Käytä rajoitteita muodon, pituuden tai kuvion pakottamiseen:
+## Rajoitukset ja validointi
+
+Käytä rajoituksia muodon, pituuden tai kuvion pakottamiseen:
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| text | name | Koko nimi | `string-length(.) >= 2` | Nimen on oltava vähintään 2 merkkiä |
-| text | code | Viitenumero | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Syötä 2 isoa kirjainta ja 4 numeroa |
-| text | phone | Puhelinnumero | `regex(., '^[0-9]{9,15}$')` | Syötä kelvollinen puhelinnumero |
+| text | name | Koko nimi | `string-length(.) >= 2` | Vähintään 2 merkkiä vaaditaan |
+| text | code | Viitekoodi | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 isoa kirjainta + 4 numeroa |
+| text | phone | Puhelinnumero | `regex(., '^[0-9]{9,15}$')` | Anna kelvollinen puhelinnumero |
+
+---
 
 ## Parhaat käytännöt
 
-1. Käytä tarkempia tyyppejä (`integer`, `decimal`, `date`) aina kun tiedolla on tunnettu rakenne — tämä estää virheelliset merkinnät ja yksinkertaistaa analyysiä.
-2. Lisää `constraint` `string-length()`- tai `regex()`-funktiolla koodien tai tunnuksien validointiin.
-3. Käytä `multiline`-ulkoasua avoimiin kysymyksiin, joissa vastaajat voivat kirjoittaa useita lauseita.
-4. Ajan keräämistä varten valitse aikamuototokenit, jotka vastaavat analyysisi edellyttämää tarkkuutta — millisekuntien kerääminen, kun tarvitset vain minuutteja, tuhlaa luetteloijan vaivaa.
-
-## Alustatuki
-
-Text-kysymystyyppi ja kaikki ajan syötön ulkoasut ovat tuettuja iOS-, Android- ja verkkoalustoilla.
+1.  Käytä tarkempia tyyppejä (`integer`, `decimal`, `date`), kun tiedoilla on tunnettu rakenne — tämä estää virheelliset syötteet.
+2.  Käytä `multiline [3,8]` avoimissa kysymyksissä antaaksesi vastaajille tilaa kirjoittaa ilman, että näyttö ylikuormittuu.
+3.  Käytä `thousandsep` tai `digisep()` `numbers`-kentän sijaan, kun tarvitset muotoiltua näyttöä — pelkkä `numbers` muuttaa vain näppäimistöä.
+4.  Käytä `inputs{qrscan}` poistaaksesi manuaaliset kirjoitusvirheet koodeista, tunnuksista ja sarjanumeroista.
+5.  Käytä `floating_hint`-vihjettä, kun vihje on tärkeä konteksti, jonka tulisi pysyä näkyvissä kirjoitettaessa — tavalliset vihjeet katoavat näkyvistä pienillä näytöillä.
+6.  Käytä `charcount`-laskuria kysymyksissä, joissa on pituusrajoituksia, jotta vastaajat voivat itse tarkkailla.
 
 ## Rajoitukset
 
-- Tekstivastaukset ovat vapaamuotoisia — sisäänrakennettua oikeinkirjoituksen tarkistusta tai sanastorajoitetta ei ole muuten kuin regex-kuvioiden kautta.
-- Inline-kellowidjetti on rtSurvey-laajennus eikä se ole osa XLSForm-standardispesifikaatiota.
+-   `inputs{stt}` vaatii selaimen, joka tukee Web Speech API:a. Chrome on luotettavin; Safaria ei tueta.
+-   `richtext` tallentaa HTML:ää — suunnittele HTML:n poisto tai desinfiointi analyysiputkessasi, jos pelkkää tekstiä odotetaan.
+-   `selection_one_hide` ja `selection_one_show` vaativat `search()`-lausekkeen ja ovat tuettuja vain verkkopankissa.
+-   `number-hspinner` validoi `constraint`-sarakkeen perusteella jokaisella painikkeen painalluksella, ei vain epäkeskisyydessä — suunnittele rajoitukset sen mukaisesti.

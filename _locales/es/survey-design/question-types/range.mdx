@@ -1,9 +1,9 @@
 ---
 title: "Rango"
-description: "Las preguntas de rango permiten a los encuestados seleccionar un número arrastrando un control deslizante entre un valor mínimo y máximo definido."
+description: "Las preguntas de rango permiten a los encuestados seleccionar un número arrastrando un control deslizante entre un valor mínimo y máximo definidos."
 ---
 
-El tipo de pregunta `range` muestra un **control deslizante** (o entrada equivalente) que permite a los encuestados elegir un número dentro de un mínimo y máximo definidos. Es ideal para recopilar calificaciones, puntuaciones de satisfacción o cualquier valor numérico donde desee restringir el rango visualmente en lugar de depender de una entrada de texto con restricciones.
+El tipo de pregunta `range` permite a los encuestados seleccionar un número dentro de un mínimo y un máximo definidos. En el formulario web de rtSurvey, esto se muestra como una **entrada numérica** estándar; el encuestador introduce un valor directamente. Los parámetros `start`, `end` y `step` definen el rango válido y se aplican como restricciones.
 
 ## Especificación básica de XLSForm
 
@@ -13,8 +13,8 @@ El tipo de pregunta `range` muestra un **control deslizante** (o entrada equival
 
 La columna `parameters` define los límites del control deslizante y el tamaño del paso:
 
-| Parámetro | Descripción | Predeterminado |
-|-----------|-------------|----------------|
+| Parameter | Description | Default |
+|-----------|-------------|---------|
 | `start` | Valor mínimo (inclusive) | 0 |
 | `end` | Valor máximo (inclusive) | 10 |
 | `step` | Incremento entre valores válidos | 1 |
@@ -23,12 +23,12 @@ Para obtener más detalles sobre el tipo de pregunta de rango estándar, consult
 
 ## Usos
 
-Las preguntas de rango se usan comúnmente para:
+Las preguntas de rango se utilizan comúnmente para:
 
-1. Escalas de satisfacción o calificación (p. ej., 1–5 o 0–10)
-2. Escalas numéricas tipo Likert
-3. Recopilar medidas donde solo son válidos valores discretos
-4. Rangos de edad o de puntuación donde un control deslizante mejora la usabilidad sobre un campo de texto
+1.  Escalas de satisfacción o calificación (por ejemplo, 1–5 o 0–10)
+2.  Escalas numéricas tipo Likert
+3.  Recopilación de mediciones donde solo los valores discretos son válidos
+4.  Rangos de edad o puntuación donde un control deslizante mejora la usabilidad sobre un campo de texto
 
 ## Ejemplo de uso
 
@@ -44,30 +44,23 @@ Las preguntas de rango se usan comúnmente para:
 |------|------|-------|------------|
 | range | weight_kg | Peso (kg) | start=0 end=200 step=0.5 |
 
-### Uso del valor en un cálculo
+### Usando el valor en un cálculo
 
 | type | name | label | parameters | calculation |
 |------|------|-------|------------|-------------|
-| range | score | Puntuación de prueba (0–100) | start=0 end=100 step=5 | |
+| range | score | Puntuación de la prueba (0–100) | start=0 end=100 step=5 | |
 | calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
 | note | grade_note | Su calificación es: `${grade}` | | |
 
-## Apariencia
-
-El tipo `range` se renderiza como un control deslizante de forma predeterminada. No se requieren valores de apariencia adicionales para uso básico. Puede combinarlo con `horizontal` para un diseño más amplio en formularios web:
-
-| type | name | label | parameters | appearance |
-|------|------|-------|------------|------------|
-| range | nps | ¿Qué tan probable es que nos recomiende? (0–10) | start=0 end=10 step=1 | horizontal |
-
 ## Mejores prácticas
 
-1. Siempre establezca valores significativos de `start`, `end` y `step`; no dependa de los valores predeterminados.
-2. Etiquete los extremos de su escala en la columna `hint` (p. ej., `hint: 0 = Muy insatisfecho, 10 = Muy satisfecho`) para dar contexto a los encuestados.
-3. Para escalas Likert de 5 puntos, use `start=1 end=5 step=1` en lugar de 0–4, ya que los encuestados esperan que "1" signifique el valor más bajo.
-4. Use `range` en lugar de `integer` + restricción cuando la naturaleza limitada de la entrada forma parte del diseño de la pregunta (el control deslizante comunica la escala visualmente).
+1.  Siempre establezca valores significativos para `start`, `end` y `step`; no confíe en los valores predeterminados.
+2.  Etiquete los extremos de su escala en la columna `hint` (por ejemplo, `hint: 0 = Muy insatisfecho, 10 = Muy satisfecho`) para dar contexto a los encuestados.
+3.  Para escalas Likert de 5 puntos, use `start=1 end=5 step=1` en lugar de 0–4, ya que los encuestados esperan que "1" signifique el más bajo.
+4.  Use `range` en lugar de `integer` + restricción cuando la naturaleza acotada de la entrada sea parte del diseño de la pregunta (el control deslizante comunica la escala visualmente).
 
 ## Limitaciones
 
-- El widget de control deslizante puede no ser ideal para rangos muy amplios (p. ej., 0–10000); un `integer` de texto con restricciones es más fácil de usar en esos casos.
-- En dispositivos móviles, los valores de paso finos (p. ej., `step=0.1`) pueden ser difíciles de controlar con precisión con un control deslizante táctil.
+-   No hay un widget de control deslizante en el formulario web de rtSurvey; la entrada de valores es una simple entrada numérica. Para una experiencia visual de control deslizante, use un cliente móvil que admita el widget de rango.
+-   Para rangos muy amplios (por ejemplo, 0–10000), un `integer` simple con una restricción es igualmente efectivo y más fácil de usar.
+-   Los valores de paso finos (por ejemplo, `step=0.1`) funcionan como restricciones, pero no hay problemas de precisión del control deslizante en el formulario web.

@@ -1,75 +1,207 @@
 ---
-title: "Integer"
-description: "Integer-kysymykset mahdollistavat kokonaisluvun syöttämisen kyselyyn."
+title: "Kokonaisluku"
+description: "Kokonaislukutyyppinen syötekysymystyyppi rtSurvey-ohjelmassa"
 ---
 
-XLSFormien ja rtSurveyn integer-kysymystyyppiä käytetään kokonaislukuvastausten keräämiseen. Tämä kysymystyyppi on välttämätön numeerisen tiedon keräämiseen ilman desimaaleja, kuten lukumääriin, ikiin tai vuosiin.
+`integer`-kysymystyyppi kerää kokonaislukuja (ei desimaaleja). Se laukaisee numeerisen näppäimistön mobiililaitteissa ja estää desimaalien syöttämisen. Se tukee samoja ulkoasuasetuksia kuin `text`-tyyppi asettelun ja muotoilun osalta.
 
-## XLSForm-perusmäärittely
+## XLSFormin peruserittely
 
-| type    | name  | label                  |
-|---------|-------|------------------------|
-| integer | age   | Syötä ikäsi vuosina    |
+| type | name | label |
+|------|------|-------|
+| integer | age | Vastaajan ikä |
+| integer | household_size | Kotitalouden jäsenten lukumäärä |
 
-Lisätietoja integer-kysymystyypin perusteista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+Vakiomääritykset löytyvät [XLSFormin dokumentaatiosta](https://xlsform.org/en/#question-types).
 
-## Käyttötarkoitukset
+---
 
-Integer-kysymyksiä käytetään yleisesti:
+## Ulkoasuasetukset
 
-1. Ikäsyötteisiin
-2. Esineiden laskemiseen (esim. lasten tai kotitalouden jäsenten lukumäärä)
-3. Vuosisyötteisiin (esim. syntymävuosi)
-4. Numeerisiin arviointiasteikkoihin
-5. Mihin tahansa kokonaislukutiedon keräämiseen
+### `number-hspinner` — vaakasuuntainen spinneri
 
-## rtSurveyn laajennukset
+Korvaa syötteen vaakasuuntaisella **− arvo +** -spinnerillä. Miinus/plus-painikkeiden napauttaminen vähentää tai lisää arvoa 1:llä (tai mukautetulla askeleella).
 
-Vaikka XLSForm-standardin integer-kysymysten perusmäärittely on suoraviivainen, rtSurvey voi tarjota lisäominaisuuksia tai mukautuksia:
+```
+number-hspinner
+```
 
-1. Aluevalidointi
-2. Mukautetut virheilmoitukset
-3. Numeerisen syötteen ulkoasuvaihtoehdot
+**Mukauta painikkeen muotoa ja askelta** käyttämällä `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','5')
+```
+
+Parametrit: vasemman painikkeen muoto, oikean painikkeen muoto, askel (oletus `1` kokonaisluvulle).
+
+**Mukautetut värit** käyttämällä `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Neljä arvoa järjestyksessä: vasemman painikkeen tausta, vasemman painikkeen kuvake, oikean painikkeen tausta, oikean painikkeen kuvake.
+
+---
+
+### `thousandsep` — tuhaterotin
+
+Muotoilee näytetyn numeron tuhaterottimella (esim. `1,234,567`). Raaka numero tallennetaan ilman pilkkuja. Syötyetyyppi vaihdetaan `"text"`:ksi, jotta muotoiltu näyttö on mahdollinen.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — mukautettu numeroryhmittely
+
+Ryhmittää numerot `n`:n ryhmiin, jotka on erotettu mukautetulla erottimella. Hyödyllinen muotoilluille tunnuksille tai viitekoodeille, jotka ovat numeerisia.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+Syötyetyyppi vaihdetaan `"text"`:ksi, kun tämä ulkoasu on aktiivinen.
+
+---
+
+### `textonly` — pakota tekstinäppäimistö
+
+Pakottaa `type="text"` syöte-elementtiin. Tämä estää selaimen numeronsyöttöön liittyvät omituisuudet (kuten johtavien nollien piilottamisen tai pyöräytysnuolien lisäämisen työpöytäselaimissa) samalla kun kerätään numeerinen arvo.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — vihje leijuu otsikkona
+
+`hint`-teksti renderöidään syötekentän sisälle paikkamerkkinä. Kun käyttäjä alkaa kirjoittaa, vihje leijuu kentän yläpuolella otsikkona.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — vihje syötekentän sisällä
+
+Samoin kuin `floating_hint` — vihje sijaitsee syötekentän sisällä, kun se on tyhjä. Se ei leiju, kun käyttäjä kirjoittaa.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — modaalinen dialogisyöte
+
+Kentän napauttaminen avaa modaalisen dialogin, jossa on suurempi syöte inline-muokkaamisen sijaan. Hyödyllinen pienillä näytöillä, joissa koko näytön syöte on helpompi.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — reaaliaikainen merkkilaskuri
+
+Näyttää reaaliaikaisen `(n)`-merkkilaskurin syötekentän alapuolella, joka päivittyy käyttäjän kirjoittaessa.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — etuliitteen lisääminen
+
+Lisää lasketun tai staattisen merkkijonon näytettyyn arvoon. Tallentettu arvo ei sisällä etuliitettä.
+
+```
+prefix('Tuote #')        → näyttää "Tuote #42", tallentaa "42"
+prefix(${code_prefix})  → dynaaminen etuliite toisesta kentästä
+```
+
+---
+
+### `align_answer` — syötekentän tekstin tasaus
+
+Ohjaa kirjoitetun arvon vaakasuuntaista tasausta syötekentän sisällä.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — QR / viivakoodiskannaus kenttään
+
+Lisää QR-koodin skannauspainikkeen syötekentän viereen. Avaa kamerasimuloinnin ja täyttää kentän skannatulla numeerisella arvolla.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Ulkoasun pikaopas
+
+| Appearance | Renderöity widget |
+|---|---|
+| *(ei mitään)* | Numerosyöte (`type="number"`) — numeerinen näppäimistö mobiililaitteessa |
+| `number-hspinner` | Vaakasuuntainen − arvo + spinneri, askel = 1 |
+| `number-hspinner hspinner(...)` | Spinneri mukautetulla painikkeen muodolla ja askeleella |
+| `number-hspinner colors(...)` | Spinneri mukautetuilla painikkeen väreillä |
+| `thousandsep` | Pilkulla ryhmitelty numeronäyttö |
+| `digisep(n,"sep")` | Mukautettu numeroryhmittely |
+| `textonly` | Pakota tekstinäppäimistö |
+| `floating_hint` | Vihje leijuu kentän yläpuolella kirjoittaessa |
+| `embed` | Vihje syötekentän sisällä |
+| `textpopup` | Napauta avataksesi modaalisen dialogin |
+| `charcount` | Reaaliaikainen merkkilaskuri syötteen alla |
+| `prefix(expr)` | Lisää staattinen tai dynaaminen etuliite |
+| `align_answer = left/right/center` | Syötteen tekstin tasaus |
+| `inputs{qrscan}` | QR/viivakoodin skannauspainike |
+
+---
+
+## Rajoitukset ja validointi
+
+Käytä rajoituksia arvoalueiden pakottamiseen. `constraint`-sarakkeen rajoitukset arvioidaan jokaisen painikkeen painalluksen jälkeen `number-hspinner`-tilassa, ei vain epäkeskisyydessä.
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| integer | age | Ikä | `. > 0 and . <= 120` | Iän on oltava 1–120 |
+| integer | year | Rakennusvuosi | `. >= 1800 and . <= 2100` | Anna kelvollinen vuosi |
+| integer | count | Tuotteiden lukumäärä | `. >= 0` | Ei voi olla negatiivinen |
+
+---
+
+## Esimerkki — kotitalouskysely
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| integer | household_size | Henkilöä kotitaloudessa | `number-hspinner` | `. >= 1 and . <= 30` | Täytyy olla 1 ja 30 välillä |
+| integer | under_5 | Alle 5-vuotiaita lapsia | `number-hspinner` | `. >= 0 and . <= ${household_size}` | Ei voi ylittää kotitalouden kokoa |
+| integer | year_built | Talon rakennusvuosi | `textonly` | `. >= 1800 and . <= 2100` | Anna kelvollinen vuosi |
+
+---
 
 ## Parhaat käytännöt
 
-1. Käytä selkeitä ja ytimekkäitä otsikoita odotetun syötteen määrittelemiseksi.
-2. Toteuta aluerajoitteet epärealististen tai virheellisten syötteiden estämiseksi.
-3. Harkitse ohjetekstin käyttöä esimerkkien antamiseksi tai odotetun muodon selventämiseksi.
-4. Suurille luvuille harkitse pilkkujen tai välilyöntien käyttöä otsikossa luettavuuden parantamiseksi (esim. "Syötä väestö (enintään 1 000 000)").
+1.  Käytä `number-hspinner`-spinneriä pienialueisille laskureille, joissa ±-painikkeen napsauttaminen on nopeampaa kuin kirjoittaminen (esim. lasten lukumäärä, pisteet 1–10 asteikolla).
+2.  Käytä `thousandsep`-erotinta näytettäessä suuria kokonaislukuja (väestö, tulot), jotta vastaajat voivat tarkistaa suuruusluokan.
+3.  Käytä `textonly`-asetusta, kun selaimet lisäävät ei-toivottua numeronsyöttöliittymää (pyöräytysnuolet, kosketusskrollaus), joka hämmentää vastaajia.
+4.  Pakota alueen rajoitukset mobiilinäppäimistötyypin sijaan — näppäimistön pakottaminen ei ole universaalia.
 
-## Rajoitteet ja validointi
+## Rajoitukset
 
-Voit lisätä rajoitteita varmistaaksesi, että syötetty arvo on tietyllä alueella:
-
-| type    | name  | label                  | constraint        | constraint_message                    |
-|---------|-------|------------------------|-------------------|---------------------------------------|
-| integer | age   | Syötä ikäsi vuosina    | .>0 and .&lt;=120    | Iän on oltava 1 ja 120 vuoden välillä |
-
-## Esimerkkikäyttö
-
-Esimerkki kotitalouskyselyssä:
-
-| type    | name           | label                                          | constraint | constraint_message                          |
-|---------|----------------|------------------------------------------------|------------|---------------------------------------------|
-| integer | household_size | Kuinka monta henkilöä kotitaloudessa asuu?     | .>0        | Kotitalouden koon on oltava vähintään 1      |
-| integer | num_children   | Kuinka monta alle 18-vuotiasta lasta kotitaloudessa on? | .>=0 | Lasten lukumäärä ei voi olla negatiivinen |
-| integer | year_built     | Minä vuonna talo rakennettiin?                 | .>1800 and .&lt;=2023 | Vuoden on oltava välillä 1800 ja 2023 |
-
-## Laskeminen integer-arvoilla
-
-Integer-arvoja voidaan käyttää laskuissa. Esimerkki:
-
-| type    | name           | label                               |
-|---------|----------------|-------------------------------------|
-| integer | num_adults     | Aikuisten lukumäärä kotitaloudessa  |
-| integer | num_children   | Lasten lukumäärä kotitaloudessa     |
-| calculate | total_members | |
-
-calculate-rivillä voidaan käyttää:
-
-```
-calculation | ${num_adults} + ${num_children}
-```
-
-Tämä laskee yhteen aikuisten ja lasten lukumäärän kotitalouden kokonaismäärän saamiseksi.
+-   Desimaalien syöttö on estetty — jos tarvitset murto-osia, käytä `decimal`-tyyppiä.
+-   `number-hspinner`-spinneri validioidaan `constraint`-sarakkeen perusteella jokaisella painikkeen painalluksella, ei vain epäselvyydessä — suunnittele rajoitukset sen mukaisesti.
+-   `thousandsep` ja `digisep()` tallentavat raa'an numeron ilman muotoilua — älä luota muotoiltuun näyttöarvoon laskutoimituksissa.

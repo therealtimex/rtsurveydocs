@@ -1,75 +1,207 @@
 ---
 title: "Entero"
-description: "Las preguntas de entero permiten entradas de números enteros en su encuesta."
+description: "Tipo de pregunta de entrada de número entero en rtSurvey"
 ---
 
-El tipo de pregunta entero en XLSForms y rtSurvey se usa para recopilar respuestas de números enteros. Este tipo de pregunta es esencial para recopilar datos numéricos sin decimales, como conteos, edades o años.
+El tipo de pregunta `integer` recopila números enteros (sin decimales). Activa un teclado numérico en dispositivos móviles y bloquea la entrada de puntos decimales. Admite las mismas opciones de apariencia que el tipo `text` para el diseño y el formato.
 
 ## Especificación básica de XLSForm
 
-| type    | name  | label                      |
-|---------|-------|----------------------------|
-| integer | age   | Ingrese su edad en años     |
+| type | name | label |
+|------|------|-------|
+| integer | age | Edad del encuestado |
+| integer | household_size | Número de personas en el hogar |
 
-Para obtener más detalles sobre el tipo de pregunta entero básico, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
+Para la especificación estándar, consulte la [documentación de XLSForm](https://xlsform.org/en/#question-types).
 
-## Usos
+---
 
-Las preguntas de entero se usan comúnmente para:
+## Opciones de apariencia
 
-1. Entradas de edad
-2. Contar elementos (p. ej., número de hijos, miembros del hogar)
-3. Entradas de año (p. ej., año de nacimiento)
-4. Calificaciones en una escala numérica
-5. Cualquier recopilación de datos de números enteros
+### `number-hspinner` — selector horizontal
 
-## Extensiones de rtSurvey
+Reemplaza la entrada con un selector horizontal **− valor +**. Al tocar menos/más, se decrementa o incrementa el valor en 1 (o un paso personalizado).
 
-Si bien la especificación básica de XLSForm para preguntas de entero es sencilla, rtSurvey puede ofrecer características o personalizaciones adicionales:
+```
+number-hspinner
+```
 
-1. Validación de rango
-2. Mensajes de error personalizados
-3. Opciones de apariencia para entrada numérica
+**Personalice la forma y el paso del botón** usando `hspinner()`:
 
-## Mejores prácticas
+```
+number-hspinner hspinner('left-small-square','right-small-square','5')
+```
 
-1. Use etiquetas claras y concisas para especificar la entrada esperada.
-2. Implemente restricciones de rango para prevenir entradas no realistas o erróneas.
-3. Considere usar texto de indicación para proporcionar ejemplos o aclarar el formato esperado.
-4. Para números grandes, considere usar comas o espacios en la etiqueta para mejorar la legibilidad (p. ej., "Ingrese la población (hasta 1,000,000)").
+Parámetros: forma del botón izquierdo, forma del botón derecho, valor del paso (por defecto `1` para entero).
+
+**Colores personalizados** usando `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Cuatro valores en orden: fondo del botón izquierdo, icono del botón izquierdo, fondo del botón derecho, icono del botón derecho.
+
+---
+
+### `thousandsep` — separador de miles
+
+Formatea el número mostrado con agrupación de comas (por ejemplo, `1.234.567`). El número sin procesar se almacena sin comas. El tipo de entrada se cambia a `"text"` para permitir la visualización formateada.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — agrupación de dígitos personalizada
+
+Agrupa dígitos en bloques de `n` separados por un separador personalizado. Útil para identificaciones formateadas o códigos de referencia que son numéricos.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+El tipo de entrada se cambia a `"text"` cuando esta apariencia está activa.
+
+---
+
+### `textonly` — forzar teclado de texto
+
+Fuerza `type="text"` en el elemento de entrada. Esto evita las peculiaridades de entrada de números del navegador (como ocultar ceros iniciales o agregar flechas de giro en los navegadores de escritorio) mientras se sigue recopilando un valor numérico.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — la pista flota como etiqueta
+
+El texto `hint` se renderiza dentro de la entrada como un marcador de posición. Cuando el usuario comienza a escribir, la pista flota sobre el campo como una etiqueta.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — pista dentro del límite de entrada
+
+Similar a `floating_hint`: la pista se encuentra dentro del límite de entrada cuando está vacía. No flota cuando el usuario escribe.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — entrada de diálogo modal
+
+Al tocar el campo, se abre un cuadro de diálogo modal con una entrada más grande en lugar de editar en línea. Útil en pantallas pequeñas donde una entrada de pantalla completa es más fácil.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — contador de caracteres en vivo
+
+Muestra un contador de caracteres `(n)` en vivo debajo de la entrada, actualizado a medida que el usuario escribe.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — anteponer un prefijo
+
+Antepone una cadena estática o calculada al valor mostrado. El valor almacenado no incluye el prefijo.
+
+```
+prefix('Artículo #')        → muestra "Artículo #42", almacena "42"
+prefix(${code_prefix})  → prefijo dinámico de otro campo
+```
+
+---
+
+### `align_answer` — alineación del texto de entrada
+
+Controla la alineación horizontal del valor escrito dentro de la entrada.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — escaneo de QR / código de barras en el campo
+
+Agrega un botón de escaneo de código QR junto a la entrada. Abre el escáner de la cámara y llena el campo con el valor numérico escaneado.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Referencia rápida de apariencia
+
+| Appearance | Widget renderizado |
+|---|---|
+| *(ninguno)* | Entrada de número (`type="number"`) — teclado numérico en móvil |
+| `number-hspinner` | Selector horizontal − valor +, paso = 1 |
+| `number-hspinner hspinner(...)` | Selector con forma de botón y paso personalizados |
+| `number-hspinner colors(...)` | Selector con colores de botón personalizados |
+| `thousandsep` | Visualización de número agrupado por comas |
+| `digisep(n,"sep")` | Agrupación de dígitos personalizada |
+| `textonly` | Forzar teclado de texto |
+| `floating_hint` | La pista flota sobre el campo mientras se escribe |
+| `embed` | Pista dentro del límite de entrada |
+| `textpopup` | Tocar para abrir el cuadro de diálogo modal |
+| `charcount` | Contador de caracteres en vivo debajo de la entrada |
+| `prefix(expr)` | Anteponer prefijo estático o dinámico |
+| `align_answer = left/right/center` | Alineación del texto de entrada |
+| `inputs{qrscan}` | Botón de escaneo QR/código de barras |
+
+---
 
 ## Restricciones y validación
 
-Puede agregar restricciones para garantizar que el valor ingresado esté dentro de un rango específico:
+Utilice restricciones para aplicar rangos de valores. Las restricciones en la columna `constraint` se evalúan después de cada pulsación de botón en el modo `number-hspinner`, no solo al desenfocar.
 
-| type    | name  | label                      | constraint        | constraint_message                      |
-|---------|-------|----------------------------|-------------------|-----------------------------------------|
-| integer | age   | Ingrese su edad en años     | .>0 and .&lt;=120    | La edad debe estar entre 1 y 120 años   |
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| integer | age | Edad | `. > 0 and . <= 120` | La edad debe estar entre 1 y 120 |
+| integer | year | Año de construcción | `. >= 1800 and . <= 2100` | Ingrese un año válido |
+| integer | count | Número de artículos | `. >= 0` | No puede ser negativo |
 
-## Ejemplo de uso
+---
 
-He aquí un ejemplo de cómo podría usar preguntas de entero en una encuesta de hogar:
+## Ejemplo — encuesta de hogares
 
-| type    | name           | label                                          | constraint | constraint_message                           |
-|---------|----------------|------------------------------------------------|------------|----------------------------------------------|
-| integer | household_size | ¿Cuántas personas viven en su hogar?           | .>0        | El tamaño del hogar debe ser al menos 1      |
-| integer | num_children   | ¿Cuántos niños menores de 18 años hay en el hogar? | .>=0   | El número de niños no puede ser negativo    |
-| integer | year_built     | ¿En qué año fue construida su casa?            | .>1800 and .&lt;=2023 | El año debe estar entre 1800 y 2023  |
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| integer | household_size | Personas en el hogar | `number-hspinner` | `. >= 1 and . <= 30` | Debe estar entre 1 y 30 |
+| integer | under_5 | Niños menores de 5 años | `number-hspinner` | `. >= 0 and . <= ${household_size}` | No puede exceder el tamaño del hogar |
+| integer | year_built | Año de construcción de la casa | `textonly` | `. >= 1800 and . <= 2100` | Ingrese un año válido |
 
-## Cálculo con valores enteros
+---
 
-Los valores enteros pueden usarse en cálculos. He aquí un ejemplo:
+## Mejores prácticas
 
-| type    | name           | label                                          |
-|---------|----------------|------------------------------------------------|
-| integer | num_adults     | Número de adultos en el hogar                  |
-| integer | num_children   | Número de niños en el hogar                    |
-| calculate | total_members | |
+1.  Utilice `number-hspinner` para recuentos de rango pequeño donde hacer clic en ± es más rápido que escribir (por ejemplo, número de niños, puntuación en una escala de 1 a 10).
+2.  Utilice `thousandsep` al mostrar números enteros grandes (población, ingresos) para que los encuestados puedan verificar la magnitud.
+3.  Utilice `textonly` cuando los navegadores agreguen una interfaz de usuario de entrada de números no deseada (flechas de giro, desplazamiento táctil) que confunda a los encuestados.
+4.  Aplique restricciones de rango en lugar de depender del tipo de teclado móvil; la aplicación del teclado no es universal.
 
-En la fila de cálculo, puede usar:
+## Limitaciones
 
-```
-calculation | ${num_adults} + ${num_children}
-```
-
-Esto sumará el número de adultos y niños para obtener el total de miembros del hogar.
+-   La entrada de puntos decimales está bloqueada; si necesita valores fraccionarios, use el tipo `decimal`.
+-   `number-hspinner` valida la `constraint` en cada pulsación de botón; evite restricciones costosas (por ejemplo, cadenas `if()` complejas) en el modo de selector.
+-   `thousandsep` y `digisep()` almacenan el número sin procesar sin formato; no confíe en el valor de visualización formateado en los cálculos.
