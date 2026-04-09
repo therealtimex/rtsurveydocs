@@ -3,7 +3,7 @@ title: "Range"
 description: "Range questions let respondents select a number by dragging a slider between a defined minimum and maximum value."
 ---
 
-The `range` question type displays a **slider** (or equivalent input) that lets respondents pick a number within a defined minimum and maximum. It is ideal for collecting ratings, satisfaction scores, or any numeric value where you want to constrain the range visually rather than relying on a text input with constraints.
+The `range` question type lets respondents pick a number within a defined minimum and maximum. In rtSurvey's web form, this renders as a standard **number input** — the enumerator types a value directly. The `start`, `end`, and `step` parameters define the valid range and are enforced as constraints.
 
 ## Basic XLSForm Specification
 
@@ -52,14 +52,6 @@ Range questions are commonly used for:
 | calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
 | note | grade_note | Your grade is: `${grade}` | | |
 
-## Appearance
-
-The `range` type renders as a slider by default. No additional appearance values are required for basic usage. You can combine it with `horizontal` for a wider layout on web forms:
-
-| type | name | label | parameters | appearance |
-|------|------|-------|------------|------------|
-| range | nps | How likely are you to recommend us? (0–10) | start=0 end=10 step=1 | horizontal |
-
 ## Best Practices
 
 1. Always set meaningful `start`, `end`, and `step` values — do not rely on defaults.
@@ -69,5 +61,6 @@ The `range` type renders as a slider by default. No additional appearance values
 
 ## Limitations
 
-- The slider widget may not be ideal for very wide ranges (e.g., 0–10000) — a text `integer` with constraints is more user-friendly in those cases.
-- On mobile devices, fine step values (e.g., `step=0.1`) can be difficult to control precisely with a touch slider.
+- There is no slider widget in the rtSurvey web form — value entry is a plain number input. For a visual slider experience, use a mobile client that supports the range widget.
+- For very wide ranges (e.g., 0–10000), a plain `integer` with a constraint is equally effective and more user-friendly.
+- Fine step values (e.g., `step=0.1`) work as constraints but have no slider precision concern in the web form.

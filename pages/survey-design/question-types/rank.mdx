@@ -3,7 +3,9 @@ title: "Rank"
 description: "Rank questions let respondents order a set of choices by preference or priority."
 ---
 
-The `rank` question type presents a list of choices that the respondent must **drag into order** (or otherwise rank from first to last). It stores the result as a space-separated list of choice values in the order selected, with the highest-priority choice first.
+The `rank` question type presents a list of choices that the respondent orders by preference or priority. It stores the result as a space-separated list of choice values in ranked order, with the highest-priority choice first.
+
+> **rtSurvey web form:** The drag-to-rank widget is not currently implemented. In the web form, `rank` renders as a select list. Use this type when targeting mobile clients that support the rank widget, or when the stored value format is more important than the drag-to-order interaction.
 
 ## Basic XLSForm Specification
 
@@ -77,6 +79,6 @@ Rank questions are commonly used for:
 
 ## Limitations
 
-- The drag-to-rank widget requires a touch screen or mouse — it may not work well in keyboard-only environments.
-- On some older mobile clients, the rank widget may fall back to a numbered input interface.
-- You cannot partially rank (i.e., rank only some choices) — all choices must be ordered.
+- The drag-to-rank widget is not implemented in the rtSurvey web form.
+- You cannot partially rank — all choices must be ordered.
+- Keep lists to 3–7 items; longer lists become unwieldy regardless of client.
