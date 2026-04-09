@@ -1,61 +1,61 @@
 ---
 title: "Kép"
-description: "A képkérdések lehetővé teszik a válaszadók számára, hogy fényképeket készítsenek és töltsenek fel a felmérés részeként."
+description: "A képkérdések lehetővé teszik a válaszadók számára, hogy fényképeket készítsenek és küldjenek be a felmérés részeként."
 ---
 
-Az XLSForms és az rtSurvey képkérdés típusa lehetővé teszi a válaszadók számára, hogy fényképeket készítsenek és töltsenek fel felmérésük részeként. Ez a funkció különösen hasznos vizuális adatok gyűjtésére, megfigyelések dokumentálására vagy bizonyítékok szolgáltatására terepfelmérések során.
+Az XLSFormokban és az rtSurveyben található képkérdés-típus lehetővé teszi a válaszadók számára, hogy fényképeket készítsenek és küldjenek be felmérésük részeként. Ez a funkció különösen hasznos vizuális adatok gyűjtéséhez, megfigyelések dokumentálásához vagy terepi felmérésekben bizonyítékok szolgáltatásához.
 
-## Alapvető XLSForm specifikáció
+## Alap XLSForm specifikáció
 
 | type  | name        | label                           |
 |-------|-------------|--------------------------------|
-| image | photo       | Készítsen fényképet a helyről    |
+| image | photo       | Készítsen fotót a helyszínről    |
 
-A képkérdés típus alapvető részleteiért lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+Az alapvető képkérdés-típusról további részleteket az [XLSForm specifikációban](https://xlsform.org/en/#question-types) talál.
 
-## Felhasználás
+## Felhasználási területek
 
 A képkérdéseket gyakran használják:
 
-1. Terepi körülmények vagy megfigyelések dokumentálására
-2. Vizuális bizonyítékok rögzítésére kutatások során
-3. Előtte és utána fotók gyűjtésére hatáselemzésekben
-4. Feladatok elvégzésének vagy helyszíni jelenlét igazolására
-5. Vizuális adatok gyűjtésére távoli elemzéshez
+1. Terepi körülmények vagy megfigyelések dokumentálása
+2. Vizuális bizonyítékok rögzítése kutatásokban
+3. Előtte-utána fotók gyűjtése hatástanulmányokban
+4. Feladatok teljesítésének vagy helyszíni jelenlét igazolása
+5. Vizuális adatok gyűjtése távoli elemzéshez
 
-## Legjobb gyakorlatok
+## Bevált gyakorlatok
 
-1. Adjon egyértelmű utasításokat arra vonatkozóan, hogy mit kell lefotózni.
-2. Vegye figyelembe az adatvédelmi vonatkozásokat, és tájékoztassa a válaszadókat arról, hogyan használják fel a fényképeiket.
-3. Ügyeljen a fájlméretekre és a tárolási korlátokra, különösen korlátozott internet-hozzáférésű területeken végzett felmérések esetén.
-4. Győződjön meg arról, hogy az eszköz elegendő tárhellyel rendelkezik, és a kameraengedélyek meg vannak adva.
+1. Adjon egyértelmű utasításokat arra vonatkozóan, hogy mit kell fényképezni.
+2. Vegye figyelembe az adatvédelmi vonatkozásokat, és tájékoztassa a válaszadókat arról, hogyan használják fel fotóikat.
+3. Ügyeljen a fájlméretekre és a tárolási korlátokra, különösen korlátozott internet-kapcsolattal rendelkező területeken végzett felmérések esetén.
+4. Győződjön meg arról, hogy az eszköz elegendő tárhellyel rendelkezik, és a kameraengedélyek megadottak.
 
 ## Példa használat
 
-Íme egy példa arra, hogyan használhat egy képkérdést egy felmérésben:
+Íme egy példa arra, hogyan használhat képkérdést egy felmérésben:
 
 | type  | name           | label                                      | hint                                        |
 |-------|----------------|--------------------------------------------|--------------------------------------------|
-| image | storefront     | Készítsen fényképet az üzlet bejáratáról       | Győződjön meg róla, hogy az üzlet neve jól látható    |
+| image | storefront     | Készítsen fotót az üzlet bejáratáról       | Győződjön meg arról, hogy az üzlet neve jól látható    |
 
 ## rtSurvey kiterjesztések
 
 ### Beágyazott gombelrendezés
 
-Adja hozzá az `inline` opciót az `appearance` oszlophoz, hogy a kamera a címke melletti **kör alakú ikon gombként** jelenjen meg, a teljes szélességű rögzítési terület helyett. Az érintés egy modális ablakot nyit meg.
+Adja hozzá az `inline` megjelenést a `appearance` oszlophoz, hogy a kamera **kör alakú ikon gombként** jelenjen meg a címke mellett, teljes szélességű rögzítési terület helyett. Erre koppintva egy modális ablak nyílik meg.
 
 ```
 | type  | name  | label        | appearance                          |
 |-------|-------|--------------|-------------------------------------|
-| image | photo | Take a photo | inline display{right}               |
-| image | photo | Take a photo | inline display{center, large}       |
+| image | photo | Készítsen fotót | inline display{right}               |
+| image | photo | Készítsen fotót | inline display{center, large}       |
 ```
 
-**Gomb pozíció — `display{}`:**
+**Gomb pozíciója — `display{}`:**
 
 | Value | Layout |
 |-------|--------|
-| `right` *(default)* | Ikon a címke jobb oldalán |
+| `right` *(alapértelmezett)* | Ikon a címke jobb oldalán |
 | `left` | Ikon a címke bal oldalán |
 | `top` | Ikon a címke felett, középen |
 | `center` / `bottom` | Ikon a címke alatt, középen |
@@ -64,11 +64,11 @@ Adja hozzá az `inline` opciót az `appearance` oszlophoz, hogy a kamera a címk
 
 | Value | Size |
 |-------|------|
-| `small` *(default)* | Kis kör |
+| `small` *(alapértelmezett)* | Kis kör |
 | `medium` | Közepes kör |
 | `large` | Nagy kör |
 
-**Gomb színe** — adjon hozzá egy hexadecimális színt a `display{}` belsejébe az elsődleges szín felülírásához:
+**Gomb színe** — adjon meg egy hexadecimális színt a `display{}`-ben az elsődleges szín felülírásához:
 
 ```
 inline display{right, large, <FF5500/>}
@@ -79,20 +79,20 @@ inline display{center, medium, <0099FF/>}
 
 | Appearance | Effect |
 |---|---|
-| `results{hide(capture)}` | Elrejti a kamera gombot a fénykép készítése után |
-| `results{hide(camera)}` | Ugyanaz, mint `hide(capture)` — alias a kép típusra |
-| `results{hide(review)}` | Elrejti a miniatűr előnézetet rögzítés után |
+| `results{hide(capture)}` | Elrejti a kamera gombot a fénykép elkészítése után |
+| `results{hide(camera)}` | Ugyanaz, mint a `hide(capture)` — alias kép típushoz |
+| `results{hide(review)}` | Elrejti az előnézeti bélyegképet a rögzítés után |
 | `results{hide(filename)}` | Elrejti a feltöltés után megjelenő fájlnevet |
-| `results{left}` | Az ikont balra mozgatja rögzítés után |
+| `results{left}` | Az ikont balra mozgatja a rögzítés után |
 
-Példa — nagy, középre igazított gomb, elrejti a kamerát rögzítés után:
+Példa — nagy középre igazított gomb, kamera elrejtése rögzítés után:
 ```
 inline display{center, large} results{hide(capture)}
 ```
 
 ### `invisible auto-show` — automatikus kamera megnyitás
 
-Elrejti a kérdés widgetjét az elrendezésből, de automatikusan megnyitja a kamerát az oldal betöltésekor. Hasznos egy csendes rögzítési lépés beágyazásához egy űrlapfolyamba.
+Elrejti a kérdés-widgetet az elrendezésből, de automatikusan megnyitja a kamerát az oldal betöltésekor. Hasznos csendes rögzítési lépés beágyazásához egy űrlapfolyamatba.
 
 ```
 invisible auto-show
@@ -103,8 +103,8 @@ inline invisible auto-show
 
 | Appearance | Description |
 |---|---|
-| `signature` | Teljes képernyős aláírási pad modális ablak |
-| `signature display{quick}` | Beágyazott gyors rajzoló aláírási pad — nincs modális ablak |
+| `signature` | Teljes képernyős aláírópad modális ablak |
+| `signature display{quick}` | Beágyazott gyors rajz aláírópad — nincs modális ablak |
 | `draw` | Szabadkézi rajzvászon |
 
 ### Vízjel
@@ -126,22 +126,22 @@ inline text-nolabel display{center, large}
 
 Az ezen a kérdéstípuson keresztül gyűjtött képek jellemzően:
 
-1. Közös képformátumban (pl. JPG, PNG) kerülnek mentésre
-2. Más felmérés adatokkal együtt tárolódnak, gyakran külön média mappában
-3. Megtekinthetők és elemezhetők a felmérés-kezelő platformon keresztül
+1. Közös képformátumban mentve (pl. JPG, PNG)
+2. Együtt tárolva más felmérési adatokkal, gyakran külön média mappában
+3. Megtekinthetők és elemezhetők a felméréskezelő platformon keresztül
 
 ## Elemzési szempontok
 
 Képkérdések használatakor vegye figyelembe:
 
-1. Hogyan elemzik a képeket (pl. manuális áttekintés, automatizált kép elemzés)
-2. A képefájlokhoz szükséges további tárhelyet
-3. Adatvédelmi és adatkezelési intézkedéseket a fényképek tárolására és kezelésére
-4. A képszerkesztési vagy rendszerezési eszközök lehetséges szükségességét az elemzési szakaszban
+1. Hogyan elemzik a képeket (pl. kézi felülvizsgálat, automatizált képelemzés)
+2. A képfájlokhoz szükséges további tárhely
+3. Adatvédelmi és adatbiztonsági intézkedések a fotók tárolására és kezelésére
+4. A képszerkesztő vagy -szervező eszközök potenciális szükségessége az elemzési fázisban
 
 ## Korlátok
 
 - A képfájlok nagyok lehetnek, ami befolyásolhatja az adatátvitelt és a tárolást.
-- Nem minden eszköz rendelkezhet kiváló minőségű kamerával vagy elegendő tárhellyel.
-- Nagy számú kép elemzése időigényes lehet.
-- Adatvédelmi aggályok merülhetnek fel a képek rögzítésekor, különösen nyilvános helyeken.
+- Nem minden eszköz rendelkezik kiváló minőségű kamerával vagy elegendő tárhellyel.
+- Nagy mennyiségű kép elemzése időigényes lehet.
+- Adatvédelmi aggályok merülhetnek fel képek rögzítésekor, különösen nyilvános helyeken.

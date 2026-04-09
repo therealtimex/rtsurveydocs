@@ -1,42 +1,42 @@
 ---
 title: "Tartomány"
-description: "A tartományi kérdések lehetővé teszik a válaszadók számára, hogy egy számot válasszanak egy meghatározott minimum és maximum érték közötti csúszkával."
+description: "A tartománykérdések lehetővé teszik a válaszadók számára, hogy egy számot válasszanak egy definiált minimum és maximum érték között egy csúszka húzásával."
 ---
 
-A `range` kérdéstípus lehetővé teszi a válaszadók számára, hogy egy számot válasszanak egy meghatározott minimum és maximum érték között. Az rtSurvey webes űrlapján ez egy szabványos **számbeviteli mezőként** jelenik meg – az adatgyűjtő közvetlenül beírja az értéket. A `start`, `end` és `step` paraméterek határozzák meg az érvényes tartományt, és kényszerként érvényesülnek.
+A `range` kérdéstípus lehetővé teszi a válaszadók számára, hogy egy definiált minimum és maximum érték közötti számot válasszanak. Az rtSurvey webes űrlapján ez szabványos **numerikus beviteli mezőként** jelenik meg — a felmérő közvetlenül beír egy értéket. A `start`, `end` és `step` paraméterek határozzák meg az érvényes tartományt, és korlátozásként érvényesülnek.
 
-## Alapvető XLSForm specifikáció
+## Alap XLSForm specifikáció
 
 | type | name | label | parameters |
 |------|------|-------|------------|
 | range | satisfaction | Mennyire elégedett a szolgáltatással? | start=1 end=5 step=1 |
 
-A `parameters` oszlop határozza meg a csúszka határait és a lépésméretet:
+A `parameters` oszlop definiálja a csúszka határait és a lépésméretet:
 
 | Paraméter | Leírás | Alapértelmezett |
 |-----------|-------------|---------|
-| `start` | Minimum érték (beleértve) | 0 |
-| `end` | Maximum érték (beleértve) | 10 |
-| `step` | Növekmény az érvényes értékek között | 1 |
+| `start` | Minimális érték (beleértve) | 0 |
+| `end` | Maximális érték (beleértve) | 10 |
+| `step` | Érvényes értékek közötti növekmény | 1 |
 
-A szabványos tartományi kérdéstípusról bővebben az [XLSForm specifikációban](https://xlsform.org/en/#question-types) olvashat.
+A standard tartománykérdés-típusról további részleteket az [XLSForm specifikációban](https://xlsform.org/en/#question-types) talál.
 
-## Felhasználás
+## Felhasználási területek
 
-A tartományi kérdéseket gyakran használják:
+A tartománykérdéseket gyakran használják:
 
 1. Elégedettségi vagy értékelési skálák (pl. 1–5 vagy 0–10)
 2. Likert-típusú numerikus skálák
-3. Mérések gyűjtésére, ahol csak diszkrét értékek érvényesek
-4. Korosztályok vagy pontszám-tartományok, ahol egy csúszka javítja a használhatóságot egy szöveges mezőhöz képest
+3. Mérések gyűjtése, ahol csak diszkrét értékek érvényesek
+4. Korosztályok vagy pontszámtartományok, ahol a csúszka javítja a használhatóságot a szöveges mezőhöz képest
 
 ## Példa használat
 
-### Alapvető értékelési skála
+### Alapértékelési skála
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | overall_rating | Összértékelés (0–10) | start=0 end=10 step=1 |
+| range | overall_rating | Összesített értékelés (0–10) | start=0 end=10 step=1 |
 
 ### Tizedes lépés
 
@@ -44,23 +44,23 @@ A tartományi kérdéseket gyakran használják:
 |------|------|-------|------------|
 | range | weight_kg | Súly (kg) | start=0 end=200 step=0.5 |
 
-### Az érték felhasználása egy számításban
+### Az érték felhasználása számításban
 
 | type | name | label | parameters | calculation |
 |------|------|-------|------------|-------------|
-| range | score | Tesztpontszám (0–100) | start=0 end=100 step=5 | |
+| range | score | Teszteredmény (0–100) | start=0 end=100 step=5 | |
 | calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
 | note | grade_note | Az Ön osztályzata: `${grade}` | | |
 
-## Legjobb gyakorlatok
+## Bevált gyakorlatok
 
-1. Mindig állítson be értelmes `start`, `end` és `step` értékeket – ne támaszkodjon az alapértelmezettekre.
-2. Címkézze fel a skála végeit a `hint` oszlopban (pl. `hint: 0 = Nagyon elégedetlen, 10 = Nagyon elégedett), hogy kontextust biztosítson a válaszadóknak.
-3. 5 pontos Likert-skálák esetén használja a `start=1 end=5 step=1` beállítást a 0–4 helyett, mivel a válaszadók az "1"-et a legalacsonyabbnak várják.
-4. Használja a `range`-t az `integer` + korlát helyett, ha a bevitel korlátozott jellege a kérdés tervezésének része (a csúszka vizuálisan kommunikálja a skálát).
+1. Mindig állítson be értelmes `start`, `end` és `step` értékeket — ne hagyatkozzon az alapértelmezettekre.
+2. Címkézze fel a skála végeit a `hint` oszlopban (pl. `hint: 0 = Nagyon elégedetlen, 10 = Nagyon elégedett), hogy a válaszadók számára kontextust biztosítson.`
+3. Az 5 pontos Likert-skálákhoz használja a `start=1 end=5 step=1` beállítást a 0–4 helyett, mivel a válaszadók azt várják, hogy az "1" jelenti a legalacsonyabbat.
+4. Használja a `range` típust az `integer` + korlátozás helyett, amikor a bemenet korlátos jellege a kérdés tervezésének része (a csúszka vizuálisan kommunikálja a skálát).
 
 ## Korlátok
 
-- Az rtSurvey webes űrlapján nincs csúszka widget – az értékbeviteli mező egy egyszerű számbeviteli mező. Vizuális csúszkaélményhez használjon olyan mobil klienst, amely támogatja a tartományi widgetet.
-- Nagyon széles tartományok esetén (pl. 0–10000) egy egyszerű `integer` korláttal ugyanolyan hatékony és felhasználóbarátabb.
-- A finom lépésértékek (pl. `step=0.1`) korlátként működnek, de a webes űrlapon nincs csúszka pontossági aggály.
+- Az rtSurvey webes űrlapban nincs csúszka widget — az értékbevitel egyszerű numerikus beviteli mező. Vizuális csúszkaélményhez használjon olyan mobil klienst, amely támogatja a tartomány widgetet.
+- Nagyon széles tartományok (pl. 0–10000) esetén egy egyszerű `integer` korlátozással éppolyan hatékony és felhasználóbarát.
+- A finom lépésértékek (pl. `step=0.1`) korlátozásként működnek, de a webes űrlapon nincs csúszka pontosságukra vonatkozó aggodalom.

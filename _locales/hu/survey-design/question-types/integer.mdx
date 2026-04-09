@@ -1,52 +1,52 @@
 ---
 title: "Egész szám"
-description: "Egész szám típusú beviteli kérdés az rtSurveyben"
+description: "Egész szám beviteli kérdéstípus az rtSurvey-ben"
 ---
 
-Az `integer` kérdéstípus egész számokat gyűjt (tizedesjegyek nélkül). Mobilon numerikus billentyűzetet indít el, és letiltja a tizedes pont bevitelt. Ugyanazokat a megjelenési opciókat támogatja, mint a `text` típus az elrendezés és a formázás szempontjából.
+Az `integer` kérdéstípus egész számokat (tizedesjegyek nélkül) gyűjt. Mobilon numerikus billentyűzetet indít, és blokkolja a tizedespont bevitelt. Ugyanazokat a megjelenési beállításokat támogatja, mint a `text` típus az elrendezés és formázás szempontjából.
 
-## Alapvető XLSForm specifikáció
+## Alap XLSForm specifikáció
 
 | type | name | label |
 |------|------|-------|
-| integer | age | Válaszadó életkora |
+| integer | age | A válaszadó életkora |
 | integer | household_size | Háztartásban élők száma |
 
-A szabványos specifikációért lásd az [XLSForm dokumentációt](https://xlsform.org/en/#question-types).
+A standard specifikációért lásd az [XLSForm dokumentációt](https://xlsform.org/en/#question-types).
 
 ---
 
-## Megjelenési opciók
+## Megjelenési beállítások
 
-### `number-hspinner` — horizontális forgató
+### `number-hspinner` — vízszintes számláló
 
-Kicseréli a bevitelt egy horizontális **− érték +** forgatóra. A mínusz/plusz megérintése 1-gyel (vagy egy egyedi lépésközzel) csökkenti vagy növeli az értéket.
+A bevitelt vízszintes **− érték +** számlálóval helyettesíti. A mínusz/plusz megérintésével az érték 1-gyel (vagy egyéni lépéssel) csökken vagy nő.
 
 ```
 number-hspinner
 ```
 
-**Gomb alakzatának és lépésének testreszabása** `hspinner()` használatával:
+**Gomb alakjának és lépésének testreszabása** a `hspinner()` segítségével:
 
 ```
 number-hspinner hspinner('left-small-square','right-small-square','5')
 ```
 
-Paraméterek: bal gomb alakzata, jobb gomb alakzata, lépés értéke (alapértelmezett `1` az egész számokhoz).
+Paraméterek: bal gomb alakja, jobb gomb alakja, lépésérték (egész számok esetén alapértelmezés szerint `1`).
 
-**Egyedi színek** `colors()` használatával:
+**Egyéni színek** a `colors()` segítségével:
 
 ```
 number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
 ```
 
-Négy érték sorrendben: bal gomb háttér, bal gomb ikon, jobb gomb háttér, jobb gomb ikon.
+Négy érték sorrendben: bal gomb háttérszíne, bal gomb ikonja, jobb gomb háttérszíne, jobb gomb ikonja.
 
 ---
 
 ### `thousandsep` — ezres elválasztó
 
-A megjelenített számot vesszővel csoportosítva formázza (pl. `1,234,567`). A nyers számot vesszők nélkül tárolja. A beviteli típus `"text"`-re vált, hogy lehetővé tegye a formázott megjelenítést.
+A megjelenített számot ezres tagolással (pl. `1,234,567`) formázza. A nyers szám vesszők nélkül kerül tárolásra. A beviteli típus `"text"`-re vált, hogy lehetővé tegye a formázott megjelenítést.
 
 ```
 thousandsep
@@ -54,9 +54,9 @@ thousandsep
 
 ---
 
-### `digisep(n, "sep")` — egyedi számjegycsoportosítás
+### `digisep(n, "sep")` — egyéni számjegycsoportosítás
 
-A számjegyeket `n` blokkokba csoportosítja, egyedi elválasztóval elválasztva. Hasznos formázott azonosítókhoz vagy numerikus hivatkozási kódokhoz.
+Az számjegyeket `n` blokkokba csoportosítja, egyéni elválasztóval elválasztva. Hasznos formázott azonosítók vagy numerikus hivatkozási kódok esetén.
 
 ```
 digisep(4,"-")      → 0912-3456-789
@@ -69,7 +69,7 @@ A beviteli típus `"text"`-re vált, ha ez a megjelenés aktív.
 
 ### `textonly` — szöveges billentyűzet kényszerítése
 
-`type="text"`-et kényszerít a beviteli elemre. Ez megakadályozza a böngésző számbillentyűzet-hibáit (például a vezető nullák elrejtését vagy a forgatógombok hozzáadását asztali böngészőkben), miközben továbbra is numerikus értéket gyűjt.
+A beviteli elemen `type="text"` értéket kényszerít. Ez megakadályozza a böngészők numerikus beviteli sajátosságait (például a vezető nullák elrejtését vagy a görgető nyilak hozzáadását asztali böngészőkben), miközben továbbra is numerikus értéket gyűjt.
 
 ```
 textonly
@@ -77,9 +77,9 @@ textonly
 
 ---
 
-### `floating_hint` — tipp lebeg címkeként
+### `floating_hint` — a súgó lebeg címkeként
 
-A `hint` szöveg helyőrzőként jelenik meg a beviteli mezőben. Amikor a felhasználó gépelni kezd, az a mező fölé lebeg, mint egy címke.
+A `hint` szöveg helykitöltőként jelenik meg a beviteli mezőben. Amikor a felhasználó gépelni kezd, a súgó címkeként lebeg a mező felett.
 
 ```
 floating_hint
@@ -87,9 +87,9 @@ floating_hint
 
 ---
 
-### `embed` — tipp a beviteli határon belül
+### `embed` — súgó a beviteli határon belül
 
-Hasonló a `floating_hint`-hez — a tipp a beviteli határon belül helyezkedik el üres állapotban. Nem lebeg gépeléskor.
+Hasonló a `floating_hint`-hez — a súgó a beviteli határon belül helyezkedik el, ha üres. Nem lebeg, amikor a felhasználó gépel.
 
 ```
 embed
@@ -97,9 +97,9 @@ embed
 
 ---
 
-### `textpopup` — modális párbeszédpanel bevitele
+### `textpopup` — modális párbeszédablak bevitel
 
-A mező megérintése egy modális párbeszédpanelt nyit meg nagyobb bevitellel az inline szerkesztés helyett. Kisméretű képernyőkön hasznos, ahol egy teljes képernyős bevitel könnyebb.
+A mező megérintésekor egy modális párbeszédablak nyílik meg nagyobb beviteli mezővel az in-line szerkesztés helyett. Hasznos kis képernyőkön, ahol a teljes képernyős bevitel könnyebb.
 
 ```
 textpopup
@@ -109,7 +109,7 @@ textpopup
 
 ### `charcount` — élő karakterszámláló
 
-Élő `(n)` karakterszámlálót jelenít meg a beviteli mező alatt, amely a felhasználó gépelésekor frissül.
+Élő `(n)` karakterszámlálót jelenít meg a beviteli mező alatt, amely a gépelés során frissül.
 
 ```
 charcount
@@ -122,7 +122,7 @@ charcount
 Statikus vagy számított karakterláncot illeszt a megjelenített érték elé. A tárolt érték nem tartalmazza az előtagot.
 
 ```
-prefix('Tétel #')        → "Tétel #42" jelenik meg, "42" tárolódik
+prefix('Item #')        → megjeleníti: "Tétel #42", tárolja: "42"
 prefix(${code_prefix})  → dinamikus előtag egy másik mezőből
 ```
 
@@ -130,7 +130,7 @@ prefix(${code_prefix})  → dinamikus előtag egy másik mezőből
 
 ### `align_answer` — beviteli szöveg igazítása
 
-A beírt érték vízszintes igazítását szabályozza a beviteli mezőben.
+Szabályozza a beírt érték vízszintes igazítását a beviteli mezőben.
 
 ```
 align_answer = left
@@ -140,9 +140,9 @@ align_answer = center
 
 ---
 
-### `inputs{qrscan}` — QR / vonalkód beolvasása mezőbe
+### `inputs{qrscan}` — QR / vonalkód beolvasása a mezőbe
 
-Hozzáad egy QR-kód szkennelő gombot a beviteli mező mellé. Megnyitja a kamera szkennert, és kitölti a mezőt a beolvasott numerikus értékkel.
+Hozzáad egy QR-kód beolvasó gombot a beviteli mező mellé. Megnyitja a kamera szkennert és feltölti a mezőt a beolvasott numerikus értékkel.
 
 ```
 inputs{qrscan}
@@ -152,34 +152,34 @@ inputs{qrscan}
 
 ## Gyors megjelenési referencia
 
-| Megjelenés | Megjelenített widget |
+| Appearance | Renderelt widget |
 |---|---|
-| *(nincs)* | Számbevitel (`type="number"`) — numerikus billentyűzet mobilon |
-| `number-hspinner` | Horizontális − érték + forgató, lépés = 1 |
-| `number-hspinner hspinner(...)` | Forgató egyedi gomb alakzattal és lépéssel |
-| `number-hspinner colors(...)` | Forgató egyedi gomb színekkel |
-| `thousandsep` | Vesszővel csoportosított szám megjelenítése |
-| `digisep(n,"sep")` | Egyedi számjegycsoportosítás |
+| *(nincs)* | Számbeviteli mező (`type="number"`) — numerikus billentyűzet mobilon |
+| `number-hspinner` | Vízszintes − érték + számláló, lépés = 1 |
+| `number-hspinner hspinner(...)` | Számláló egyéni gombformával és lépéssel |
+| `number-hspinner colors(...)` | Számláló egyéni gomb színekkel |
+| `thousandsep` | Vesszővel tagolt számmegjelenítés |
+| `digisep(n,"sep")` | Egyéni számjegycsoportosítás |
 | `textonly` | Szöveges billentyűzet kényszerítése |
-| `floating_hint` | A tipp lebeg a mező felett gépelés közben |
-| `embed` | A tipp a beviteli határon belül |
-| `textpopup` | Érintse meg a modális párbeszédpanel megnyitásához |
+| `floating_hint` | A súgó a mező fölött lebeg gépelés közben |
+| `embed` | Súgó a beviteli határon belül |
+| `textpopup` | Érintse meg a modális párbeszédablak megnyitásához |
 | `charcount` | Élő karakterszámláló a bevitel alatt |
-| `prefix(expr)` | Statikus vagy dinamikus előtag |
+| `prefix(expr)` | Statikus vagy dinamikus előtag hozzáadása |
 | `align_answer = left/right/center` | Beviteli szöveg igazítása |
-| `inputs{qrscan}` | QR/vonalkód szkennelő gomb |
+| `inputs{qrscan}` | QR/vonalkód beolvasó gomb |
 
 ---
 
-## Korlátok és érvényesítés
+## Korlátozások és érvényesítés
 
-Használjon korlátokat az értéktartományok érvényesítésére. A `constraint` oszlopban található korlátok minden gombnyomás után kiértékelődnek `number-hspinner` módban, nem csak elmosódáskor.
+Használjon korlátozásokat az értékhatárok betartatására. A `constraint` oszlopban lévő korlátozások a `number-hspinner` módban minden gombnyomás után kiértékelésre kerülnek, nem csak a fókusz elvesztésekor.
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
 | integer | age | Életkor | `. > 0 and . <= 120` | Az életkornak 1 és 120 között kell lennie |
-| integer | year | Év | `. >= 1800 and . <= 2100` | Adjon meg érvényes évet |
-| integer | count | Tételek száma | `. >= 0` | Nem lehet negatív |
+| integer | year | Építés éve | `. >= 1800 and . <= 2100` | Adjon meg érvényes évet |
+| integer | count | Elemek száma | `. >= 0` | Nem lehet negatív |
 
 ---
 
@@ -187,21 +187,21 @@ Használjon korlátokat az értéktartományok érvényesítésére. A `constrai
 
 | type | name | label | appearance | constraint | constraint_message |
 |------|------|-------|------------|------------|-------------------|
-| integer | household_size | Háztartásban élők száma | `number-hspinner` | `. >= 1 and . <= 30` | 1 és 30 között kell lennie |
+| integer | household_size | Személyek a háztartásban | `number-hspinner` | `. >= 1 and . <= 30` | 1 és 30 között kell lennie |
 | integer | under_5 | 5 év alatti gyermekek | `number-hspinner` | `. >= 0 and . <= ${household_size}` | Nem haladhatja meg a háztartás méretét |
-| integer | year_built | Építés éve | `textonly` | `. >= 1800 and . <= 2100` | Adjon meg érvényes évet |
+| integer | year_built | A ház építésének éve | `textonly` | `. >= 1800 and . <= 2100` | Adjon meg érvényes évet |
 
 ---
 
-## Legjobb gyakorlatok
+## Bevált gyakorlatok
 
-1. Használja a `number-hspinner`-t kis tartományú számlálásokhoz, ahol a ± kattintás gyorsabb, mint a gépelés (pl. gyermekek száma, 1-10-es skálán elért pontszám).
-2. Használja a `thousandsep`-t nagy egész számok (populáció, jövedelem) megjelenítésekor, hogy a válaszadók maguk ellenőrizhessék a nagyságrendet.
-3. Használja a `textonly`-t, ha a böngészők nem kívánt számbillentyűzet-UI-t (forgatógombok, érintésgörgetés) adnak hozzá, ami megzavarja a válaszadókat.
-4. Kényszerítse az értéktartomány-korlátokat a mobil billentyűzet típusára való támaszkodás helyett — a billentyűzet-kényszerítés nem univerzális.
+1. Használja a `number-hspinner`-t kis tartományú számlálásokhoz, ahol a ± gombra kattintás gyorsabb, mint a gépelés (pl. gyermekek száma, pontszám 1–10-es skálán).
+2. Használja az `thousandsep`-et nagy egész számok (népesség, jövedelem) megjelenítésekor, hogy a válaszadók ellenőrizhessék a nagyságrendet.
+3. Használja a `textonly`-t, ha a böngészők nem kívánt számbeviteli felületet (forgató nyilak, érintéses görgetés) adnak hozzá, ami összezavarja a válaszadókat.
+4. Kényszerítse ki a tartománykorlátozásokat a mobil billentyűzet típusára való támaszkodás helyett — a billentyűzetkényszerítés nem univerzális.
 
 ## Korlátok
 
-- A tizedes pont bevitel blokkolva van — ha tört értékekre van szüksége, használja a `decimal` típust.
-- A `number-hspinner` minden gombnyomásra érvényesíti a `constraint`-et — kerülje a drága korlátokat (pl. komplex `if()` láncokat) forgató módban.
-- A `thousandsep` és a `digisep()` a nyers számot formázás nélkül tárolják — ne támaszkodjon a formázott megjelenítési értékre a számításokban.
+- A tizedesvessző bevitele le van tiltva — ha törtértékekre van szüksége, használja a `decimal` típust.
+- `number-hspinner` minden gombnyomásra érvényesíti a `constraint`-et — kerülje a költséges korlátozásokat (pl. komplex `if()` láncok) a számláló módban.
+- `thousandsep` és `digisep()` a nyers számot formázás nélkül tárolják — ne támaszkodjon a formázott megjelenítési értékre a számításokban.
