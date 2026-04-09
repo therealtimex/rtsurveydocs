@@ -46,6 +46,23 @@ callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeou
 | calculate | hh_name | | callapi | `callapi('GET', concat('https://api.example.com/households/', ${household_id}), 1, 3, 0, '$.name', 10000, 0, '')` |
 | note | hh_display | Household: `${hh_name}` | | |
 
+### Fetching multiple values from one API call
+
+When you need several fields from the same response, set `extract_expr` to `'json:'` to store the **raw JSON string** in the field, then extract individual values using `substr-jsonpath()` in separate `calculate` fields.
+
+This avoids making a separate HTTP request for each field — the response is fetched once and reused.
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| text | product_id | Product ID | | |
+| calculate | product_raw | | callapi | `callapi('GET', concat('https://api.example.com/products/', ${product_id}), 1, 3, 0, 'json:', 10000, 0, '')` |
+| calculate | product_name | | | `substr-jsonpath(${product_raw}, '$.name')` |
+| calculate | product_price | | | `substr-jsonpath(${product_raw}, '$.price')` |
+| calculate | product_category | | | `substr-jsonpath(${product_raw}, '$.category')` |
+| note | product_display | `${product_name}` — `${product_price}` (`${product_category}`) | | |
+
+The `'json:'` prefix tells rtSurvey to store the full JSON response string instead of extracting a single value. See [`substr-jsonpath()`](../operators-and-functions/functions#utility-functions) for extraction syntax.
+
 ### Example: POST request with a JSON body
 
 ```

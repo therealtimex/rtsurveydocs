@@ -315,6 +315,12 @@ Date values in rtSurvey are stored as strings in `YYYY-MM-DD` format. Datetime v
    - Example: `thousandsep(0, ',', 1234567)` → `'1,234,567'`
    - Example: `thousandsep(0, '.', ${income})` → formats income with period as thousands separator.
 
-5. `substr-jsonpath(value, jsonpath)`: Extracts a substring from a JSON string using a JSONPath expression.
-   - Example: `substr-jsonpath(${api_response}, '$.data.name')` — extract the `name` field from a JSON string stored in `api_response`.
-   - Typically used alongside `callapi()` to extract specific values from API responses.
+5. `substr-jsonpath(value, jsonpath)`: Extracts a value from a JSON string using a JSONPath expression.
+   - `value` must be a JSON string (e.g. a field that stored a raw API response using `callapi(..., 'json:', ...)`).
+   - `jsonpath` is a JSONPath expression (e.g. `'$.data.name'`, `'$.items[0].id'`).
+   - Always returns a **string** — wrap in `number()` when used in arithmetic.
+   - Returns an empty string `''` if the path is not found or `value` is not valid JSON.
+   - Example: `substr-jsonpath(${api_response}, '$.data.name')` — extract the `name` field.
+   - Example: `substr-jsonpath(${api_response}, '$.items[0].label')` — first element of an array.
+   - Example: `number(substr-jsonpath(${api_response}, '$.price'))` — extract a numeric value.
+   - Typically used alongside `callapi(..., 'json:', ...)` to extract multiple fields from one API response. See [Fetching multiple values from one API call](../advanced-features/call-api#fetching-multiple-values-from-one-api-call).

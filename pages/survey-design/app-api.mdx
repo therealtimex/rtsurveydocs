@@ -64,6 +64,14 @@ Combine the below attribute keys with "user." in the `pulldata()` params to retr
 
 `primaryAppColor`: Retrieves the app's primary color.
 
+`randomnanoid`: Returns a randomly generated NanoID string. Useful for generating short unique identifiers.
+
+`getURLparam.[paramName]`: Returns the value of a URL query parameter from the app launch URL. Replace `[paramName]` with the actual parameter name (e.g. `getURLparam.ref`). Returns empty string if the parameter is not present.
+
+`jholder.[key]`: Reads a value from the app's JSON holder — a shared in-memory key-value store that can be set by other parts of the app. Replace `[key]` with the holder key name (e.g. `jholder.selectedId`). Returns empty string if the key is not set.
+
+`token`: Returns the current authenticated user's JWT access token as a raw string. Use this to pass authentication credentials to `callapi()` POST requests via `concat(...)` in the `post_body` parameter.
+
 ---
 
 ## Usage examples
@@ -127,6 +135,23 @@ The action button must pass the arguments with matching keys (e.g., `household_i
 |------|------|-------|-------------|
 | calculate | project | | `pulldata('app-api', 'projectCode')` |
 | calculate | project_url | | `pulldata('app-api', 'projectURL')` |
+
+### Passing the user token to a callapi() request
+
+Read the user's JWT token and inject it into an authenticated API call:
+
+| type | name | label | appearance | calculation |
+|------|------|-------|------------|-------------|
+| calculate | user_token | | | `pulldata('app-api', 'token')` |
+| calculate | api_result | | callapi | `callapi('POST', 'https://api.example.com/lookup', 1, 2, 0, '$.value', 10000, 0, '', '', concat('{"token":"', ${user_token}, '","id":"##item_id##"}'))` |
+
+### Generate a short unique ID
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | short_id | | `once(pulldata('app-api', 'randomnanoid'))` |
+
+Wrap in `once()` to prevent regeneration when the form re-evaluates.
 
 ---
 
