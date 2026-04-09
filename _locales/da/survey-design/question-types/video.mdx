@@ -1,9 +1,9 @@
 ---
 title: "Video"
-description: "Videospørgsmål giver respondenter mulighed for at optage og indsende videofiler som en del af undersøgelsen."
+description: "Video-spørgsmål gør det muligt for respondenter at optage og indsende videofiler som en del af undersøgelsen."
 ---
 
-Spørgsmålstypen `video` giver respondenter mulighed for at **optage video** eller uploade en eksisterende videofil som en del af deres undersøgelsessvar. Det er nyttigt til at fange visuelt bevis, demonstrationer, miljøforhold eller enhver information, der har gavn af bevægelse og lyd sammen.
+Spørgsmålstypen `video` gør det muligt for respondenter at **optage video** eller uploade en eksisterende videofil som en del af deres svar i undersøgelsen. Det er nyttigt til at fange visuelle beviser, demonstrationer, miljøforhold eller enhver information, der drager fordel af både bevægelse og lyd.
 
 ## Grundlæggende XLSForm-specifikation
 
@@ -11,36 +11,36 @@ Spørgsmålstypen `video` giver respondenter mulighed for at **optage video** el
 |-------|-------------|-------------------------------------|
 | video | demo_video  | Optag venligst en kort demonstration |
 
-For flere detaljer om standard video-spørgsmålstypen, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+For flere detaljer om den standard video-spørgsmålstype, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
 
 ## Anvendelser
 
-Videospørgsmål bruges typisk til:
+Video-spørgsmål bruges ofte til:
 
-1. Dokumentering af feltforhold — vejskader, infrastrukturtilstand, afgrødehelbred
-2. Optagelse af produktdemonstrationer eller procedureoverholdelsestjek
-3. Indsamling af videoudtalelser fra respondenter
-4. Fangst af beviser, der kræver rumlig kontekst (f.eks. størrelse og omfang af et problemområde)
+1. Dokumentation af feltforhold — vejbeskadigelse, infrastrukturstatus, afgrødesundhed
+2. Optagelse af produktdemonstrationer eller kontrol af procedureoverholdelse
+3. Indsamling af video-udtalelser fra respondenter
+4. Indfangning af beviser, der kræver rumlig kontekst (f.eks. størrelsen og omfanget af et problemområde)
 5. Før/efter-dokumentation til overvågnings- og evalueringsundersøgelser
 
 ## Dataformat
 
-Videofiler gemmes som binære vedhæftninger:
+Videofiler gemmes som binære vedhæftede filer:
 
 - **Format:** MP4 eller MOV (mobiloptagelse)
-- **Navngivning:** `{instanceID}-{feltnavn}.mp4` (eller tilsvarende)
+- **Navngivning:** `{instanceID}-{fieldname}.mp4` (eller tilsvarende)
 - **Lagring:** Uploadet til serverens mediemappe og knyttet til indsendelsesposten
-- **Adgang:** Kan afspilles og downloades fra indsendelseshåndteringsgrænsefladen
+- **Adgang:** Kan afspilles og downloades fra grænsefladen til administration af indsendelser
 
 ## rtSurvey-udvidelser
 
 ### Maksimal varighed
 
-Brug kolonnen `parameters` til at begrænse optagelseslængden:
+Brug kolonnen `parameters` til at begrænse optagelsens længde:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | site_visit | Optag stedsforholdene | `max-duration=60` |
+| video | site_visit | Optag forholdene på stedet | `max-duration=60` |
 
 `max-duration` er i sekunder. Optagelsen stopper automatisk ved grænsen.
 
@@ -52,42 +52,104 @@ Styr optagelsesopløsningen via `parameters`:
 |------|------|-------|------------|
 | video | evidence | Optag videobevis | `quality=low` |
 
-Understøttede værdier: `low` (hurtigere upload), `normal` (standard), `high`. Brug `low` i områder med begrænset forbindelseskvalitet.
+Understøttede værdier: `low` (hurtigere upload), `normal` (standard), `high`. Brug `low` i områder med begrænset forbindelse.
 
-### Upload af eksisterende video
+### Upload eksisterende video
 
-På mobil kan respondenten vælge at **uploade en eksisterende video** fra enhedsgalleriet i stedet for at optage en ny. Dette er aktiveret som standard i den native kamera/galleri-integration.
+På mobilen kan respondenten vælge at **uploade en eksisterende video** fra enhedens galleri i stedet for at optage en ny. Dette er aktiveret som standard i den indfødte kamera/galleri-integration.
 
-### Afspilning inden indsendelse
+### Afspilning før indsendelse
 
-På mobil kan det optagne klip gennemses, inden man fortsætter. Ingen yderligere konfiguration er nødvendig.
+På mobilen kan det optagede klip gennemses, før man fortsætter. Ingen yderligere konfiguration er nødvendig.
 
-## Eksempler på brug
+### Inline knap-layout
 
-### Stedsinspektionsvideo med grænse
+Tilføj `inline` for at vise kameraet som en **rund ikonknap** ved siden af etiketten i stedet for et optagelsesområde i fuld bredde.
+
+```
+| type  | name  | label        | appearance                              |
+|-------|-------|--------------|----------------------------------------|
+| video | clip  | Optag video | inline display{right}                  |
+| video | clip  | Optag video | inline display{left, large}            |
+| video | clip  | Optag video | inline display{center, large, <0099FF/>} |
+```
+
+**Knapposition** — `left`, `right` *(standard)*, `top`, `center`, `bottom`
+
+**Knapstørrelse** — `small` *(standard)*, `medium`, `large`
+
+**Knapfarve** — tilføj en hex-farve inde i `display{}` for at tilsidesætte primærfarven:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Kontrol efter optagelse — `results{}`:**
+
+| Appearance | Effekt |
+|---|---|
+| `results{hide(capture)}` | Skjuler optageknappen, efter en video er optaget |
+| `results{hide(review)}` | Skjuler miniaturebilledet til afspilning efter optagelse |
+| `results{hide(filename)}` | Skjuler filnavn og varighed |
+| `results{left}` | Flytter ikonet til venstre efter optagelse |
+
+Eksempel — skjul optageknap, behold afspilning:
+```
+inline display{right} results{hide(capture)}
+```
+
+### `thumbnail-square-[WxH]` — video-forhåndsvisning i fast størrelse
+
+Efter optagelse vises videoen som en indlejret afspiller i fast størrelse i stedet for i fuld bredde. Kombiner med `inline` for et kompakt layout.
+
+```
+inline display{right} thumbnail-square-[120x90]
+inline display{center} thumbnail-square-[200x150]
+```
+
+Bredde og højde er i pixels.
+
+### `invisible auto-show` — åbn optager automatisk
+
+Skjuler spørgsmålswidgetten fra layoutet, men åbner automatisk videooptageren, når siden indlæses.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Undertryk etiketten
+
+```
+inline text-nolabel display{center, large}
+```
+
+## Eksempel på brug
+
+### Video af inspektion på stedet med begrænsning
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| video | site_video | Optag vandpunktet | Gå rundt om hele faciliteten. Maks. 90 sekunder. | `max-duration=90 quality=normal` |
+| video | site_video | Optag vandstedet | Gå hele vejen rundt om anlægget. Maks. 90 sekunder. | `max-duration=90 quality=normal` |
 
-### Betinget video — kun hvis skader rapporteres
+### Betinget video — kun hvis der rapporteres skade
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
-| select_one janer | damage_found | Blev der fundet skader? | | |
-| video | damage_video | Optag video af skaderne | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+| select_one yesno | damage_found | Blev der fundet skade? | | |
+| video | damage_video | Optag video af skaden | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
 ## Bedste praksis
 
-1. Angiv `max-duration` — ubegrænsede videooptagelser kan nemt overstige 100 MB og mislykkes ved upload på svage forbindelser.
-2. Brug `quality=low` til overvågningsundersøgelser, hvor visuelt bevis er påkrævet, men fine detaljer ikke er nødvendige — det reducerer filstørrelsen dramatisk.
-3. Skriv specifikke optagelsesinstruktioner i kolonnen `hint` (f.eks. "Gå rundt om hele bygningen, hold kameraet stille").
-4. Overvej om video er nødvendigt — et foto (`image`) er normalt tilstrækkeligt til statisk bevis og producerer meget mindre filer.
-5. Test uploadydelsen på det faktiske feltnetværk inden udrulning.
+1. Indstil `max-duration` — ubegrænsede videooptagelser kan nemt overstige 100 MB og fejle ved upload på svage forbindelser.
+2. Brug `quality=low` til overvågningsundersøgelser, hvor visuel dokumentation er påkrævet, men fine detaljer ikke er nødvendige — det reducerer filstørrelsen dramatisk.
+3. Skriv specifikke optagelsesinstruktioner i kolonnen `hint` (f.eks. "Gå hele vejen rundt om bygningen, hold kameraet stille").
+4. Overvej om video er nødvendig — et foto (`image`) er normalt tilstrækkeligt som statisk bevis og giver meget mindre filer.
+5. Test upload-ydeevnen på det faktiske feltnetværk før udrulning.
 
 ## Begrænsninger
 
-- Videofiler er meget store — en 1-minutters video ved normal kvalitet er typisk 20–60 MB afhængigt af enheden.
-- Upload af store videofiler kræver en god netværksforbindelse; overvej at kræve Wi-Fi-synkronisering til videooptungede formularer.
-- Ikke alle webbrowsere understøtter videooptagelse via MediaRecorder — Chrome er den mest pålidelige.
-- Analyse af videosvar er manuel og tidskrævende; brug sparsomt og kun når videoindhold tilføjer unik værdi.
+- Videofiler er meget store — en video på 1 minut i normal kvalitet er typisk 20-60 MB afhængigt af enhed.
+- Upload af store videofiler kræver en god netværksforbindelse; overvej at kræve Wi-Fi-synkronisering til video-tunge formularer.
+- Ikke alle browsere understøtter videooptagelse via MediaRecorder — Chrome er den mest pålidelige.
+- Analyse af video-svar er manuel og tidskrævende; bruges sparsomt og kun når videoindhold tilføjer unik værdi.

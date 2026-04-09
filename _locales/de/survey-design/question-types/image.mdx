@@ -1,38 +1,38 @@
 ---
-title: "Image (Bild)"
-description: "Image-Fragen ermöglichen es den Befragten, Fotos als Teil der Umfrage aufzunehmen und einzureichen."
+title: "Bild"
+description: "Bildfragen ermöglichen es den Befragten, Fotos als Teil der Umfrage aufzunehmen und einzureichen."
 ---
 
-Der `image`-Fragetyp in XLSForms und rtSurvey ermöglicht es Befragten, Fotos als Teil ihrer Umfrageantworten aufzunehmen und einzureichen. Diese Funktion ist besonders nützlich für die Erfassung visueller Daten, die Dokumentation von Beobachtungen oder die Erbringung von Nachweisen bei Außendiensteinsätzen.
+Der Bildfragetyp in XLSForms und rtSurvey ermöglicht es den Befragten, Fotos als Teil ihrer Umfrageantworten aufzunehmen und einzureichen. Diese Funktion ist besonders nützlich für die Erfassung visueller Daten, die Dokumentation von Beobachtungen oder die Bereitstellung von Beweisen bei Feldumfragen.
 
 ## Grundlegende XLSForm-Spezifikation
 
 | type  | name        | label                           |
 |-------|-------------|--------------------------------|
-| image | photo       | Machen Sie ein Foto vom Standort|
+| image | photo       | Machen Sie ein Foto vom Standort |
 
-Weitere Details zum grundlegenden `image`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Weitere Einzelheiten zum grundlegenden Bildfragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
 
 ## Anwendungen
 
-`Image`-Fragen werden häufig verwendet für:
+Bildfragen werden häufig verwendet für:
 
-1. Dokumentation von Bedingungen vor Ort oder Beobachtungen
+1. Dokumentation von Feldbedingungen oder Beobachtungen
 2. Erfassung visueller Beweise in Forschungsstudien
-3. Sammlung von Vorher-Nachher-Fotos bei Wirkungsanalysen
-4. Überprüfung des Abschlusses von Aufgaben oder der Anwesenheit an Standorten
-5. Sammlung visueller Daten für die Fernanalyse
+3. Sammeln von Vorher-Nachher-Fotos in Wirkungsanalysen
+4. Überprüfung des Abschlusses von Aufgaben oder der Anwesenheit an Orten
+5. Erfassung visueller Daten für die Fernanalyse
 
-## Empfohlene Vorgehensweisen
+## Best Practices
 
 1. Geben Sie klare Anweisungen dazu, was fotografiert werden soll.
 2. Berücksichtigen Sie Datenschutzaspekte und informieren Sie die Befragten darüber, wie ihre Fotos verwendet werden.
 3. Achten Sie auf Dateigrößen und Speicherbeschränkungen, insbesondere bei Umfragen in Gebieten mit eingeschränkter Internetverbindung.
-4. Stellen Sie sicher, dass das Gerät über ausreichend Speicherplatz verfügt und die Kameraberechtigungen erteilt sind.
+4. Stellen Sie sicher, dass das Gerät über ausreichend Speicherplatz verfügt und die Kameraberechtigungen erteilt wurden.
 
 ## Beispielhafte Verwendung
 
-Hier ist ein Beispiel dafür, wie Sie eine `image`-Frage in einer Umfrage verwenden könnten:
+Hier ist ein Beispiel dafür, wie Sie eine Bildfrage in einer Umfrage verwenden könnten:
 
 | type  | name           | label                                      | hint                                        |
 |-------|----------------|--------------------------------------------|--------------------------------------------|
@@ -40,35 +40,108 @@ Hier ist ein Beispiel dafür, wie Sie eine `image`-Frage in einer Umfrage verwen
 
 ## rtSurvey-Erweiterungen
 
-Während die grundlegende XLSForm-Spezifikation für `image`-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen:
+### Inline-Button-Layout
 
-1. Bildqualitätseinstellungen (z. B. niedrige, mittlere, hohe Auflösung)
-2. Option zum Hinzufügen von Bildunterschriften oder Tags zu Bildern
-3. Aufnahme mehrerer Bilder für eine einzige Frage
-4. Integration mit der nativen Kamera-App oder der Galerie des Geräts
+Fügen Sie `inline` zur Spalte `appearance` hinzu, um die Kamera als **kreisförmigen Icon-Button** neben der Beschriftung anstelle eines Erfassungsbereichs in voller Breite darzustellen. Das Antippen öffnet ein Modal.
 
-(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für `image`-Fragen müssten hier bestätigt und detailliert werden.)
+```
+| type  | name  | label        | appearance                          |
+|-------|-------|--------------|-------------------------------------|
+| image | photo | Foto machen  | inline display{right}               |
+| image | photo | Foto machen  | inline display{center, large}       |
+```
+
+**Button-Position — `display{}`:**
+
+| Wert | Layout |
+|-------|--------|
+| `right` *(Standard)* | Icon rechts von der Beschriftung |
+| `left` | Icon links von der Beschriftung |
+| `top` | Icon über der Beschriftung, zentriert |
+| `center` / `bottom` | Icon unter der Beschriftung, zentriert |
+
+**Button-Größe:**
+
+| Wert | Größe |
+|-------|------|
+| `small` *(Standard)* | Kleiner Kreis |
+| `medium` | Mittlerer Kreis |
+| `large` | Großer Kreis |
+
+**Button-Farbe** — fügen Sie eine Hex-Farbe in `display{}` hinzu, um die Primärfarbe zu überschreiben:
+
+```
+inline display{right, large, <FF5500/>}
+inline display{center, medium, <0099FF/>}
+```
+
+**Steuerung nach der Erfassung — `results{}`:**
+
+| Appearance | Effekt |
+|---|---|
+| `results{hide(capture)}` | Blendet den Kamera-Button aus, nachdem ein Foto aufgenommen wurde |
+| `results{hide(camera)}` | Dasselbe wie `hide(capture)` — Alias für den Bildtyp |
+| `results{hide(review)}` | Blendet die Thumbnail-Vorschau nach der Erfassung aus |
+| `results{hide(filename)}` | Blendet den nach dem Upload angezeigten Dateinamen aus |
+| `results{left}` | Verschiebt das Icon nach der Erfassung nach links |
+
+Beispiel — großer zentrierter Button, Kamera nach Erfassung ausblenden:
+```
+inline display{center, large} results{hide(capture)}
+```
+
+### `invisible auto-show` — Kamera automatisch öffnen
+
+Blendet das Frage-Widget aus dem Layout aus, öffnet aber automatisch die Kamera, wenn die Seite geladen wird. Nützlich zum Einbetten eines stillen Erfassungsschritts in einen Formularfluss.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Unterschrift und Zeichnung
+
+| Appearance | Beschreibung |
+|---|---|
+| `signature` | Vollbild-Unterschriftenpad-Modal |
+| `signature display{quick}` | Inline-Schnellzeichnungs-Unterschriftenpad — kein Modal |
+| `draw` | Freihand-Zeichenfläche |
+
+### Wasserzeichen
+
+Fügen Sie erfassten Fotos ein Text- oder Bildwasserzeichen hinzu:
+
+```
+watermark(text, "Survey ID: ${id}", bottom-right, 0.5)
+watermark(file, logo.png, top-left, 1.0, 20%)
+```
+
+### Beschriftung unterdrücken
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Datenhandhabung
 
 Über diesen Fragetyp gesammelte Bilder werden in der Regel:
 
-1. In einem gängigen Bildformat gespeichert (z. B. JPG, PNG)
+1. In einem gängigen Bildformat (z. B. JPG, PNG) gespeichert
 2. Zusammen mit anderen Umfragedaten gespeichert, oft in einem separaten Medienordner
-3. Über die Umfrage-Management-Plattform zum Betrachten und zur Analyse zugänglich gemacht
+3. Über die Umfragemanagement-Plattform für die Anzeige und Analyse zugänglich gemacht
 
 ## Überlegungen zur Analyse
 
-Berücksichtigen Sie bei der Verwendung von `image`-Fragen:
+Berücksichtigen Sie bei der Verwendung von Bildfragen:
 
 1. Wie die Bilder analysiert werden (z. B. manuelle Überprüfung, automatisierte Bildanalyse)
-2. Den zusätzlichen Speicherplatzbedarf für Bilddateien
-3. Datenschutz- und Datensicherheitsmaßnahmen für die Speicherung und Handhabung von Fotos
+2. Den zusätzlichen Speicherplatz, der für Bilddateien erforderlich ist
+3. Datenschutz- und Datenschutzmaßnahmen für die Speicherung und Handhabung von Fotos
 4. Potenzielle Notwendigkeit von Bildbearbeitungs- oder Organisationswerkzeugen in der Analysephase
 
 ## Einschränkungen
 
-- Bilddateien können groß sein, was sich auf die Datenübertragung und Speicherung auswirken kann.
+- Bilddateien können groß sein, was sich auf die Datenübertragung und -speicherung auswirken kann.
 - Nicht alle Geräte verfügen über hochwertige Kameras oder ausreichend Speicherplatz.
 - Die Analyse einer großen Anzahl von Bildern kann zeitaufwendig sein.
-- Beim Aufnehmen von Bildern können Datenschutzbedenken aufkommen, insbesondere im öffentlichen Raum.
+- Es kann Datenschutzbedenken beim Erfassen von Bildern geben, insbesondere in öffentlichen Räumen.

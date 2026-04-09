@@ -1,80 +1,81 @@
 ---
-title: "Геотраса"
-description: "Въпросите от тип geotrace позволяват на респондентите да заснемат поредица от свързани точки на карта, създавайки линии или пътеки."
+title: "Geotrace"
+description: "Въпросите от тип Geotrace улавят серия от GPS точки, образуващи линия или път."
 ---
 
-The geotrace question type in XLSForms and rtSurvey enables respondents to capture a series of connected points on a map, creating lines or paths. This feature is particularly useful for mapping routes, boundaries, or linear features in spatial surveys.
+Типът въпрос `geotrace` улавя последователност от географски координати, образуващи линия или път (полилиния). В уеб формата на rtSurvey това се изобразява като **текстово поле**, където анкетьорът въвежда или поставя низа с координати директно.
 
-## Основна спецификация на XLSForm
+## Основна XLSForm спецификация
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geotrace | river_path  | Trace the path of the river     |
+| type     | name        | label                        |
+|----------|-------------|------------------------------|
+| geotrace | river_path  | Проследете пътя на реката    |
+| geotrace | road_route  | Запишете маршрута на пътя    |
 
-For more details on the basic geotrace question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+За стандартната спецификация вижте [документацията на XLSForm](https://xlsform.org/en/#question-types).
 
-## Приложения
-
-Geotrace questions are commonly used for:
-
-1. Mapping routes or paths taken during field surveys
-2. Tracing linear features like roads, rivers, or boundaries
-3. Capturing the extent of linear infrastructure (e.g., pipelines, power lines)
-4. Recording travel paths in transportation studies
-5. Defining transects in ecological surveys
-
-## Най-добри практики
-
-1. Ensure the device has location services enabled and permissions granted.
-2. Provide clear instructions on how to trace the path and what features should be included.
-3. Consider using satellite imagery or base maps to help respondents accurately trace paths.
-4. Be mindful of the potential complexity of traces and their impact on data size and processing.
-
-## Примерна употреба
-
-Here's an example of how you might use a geotrace question in a survey:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geotrace | hiking_trail   | Trace the path of the hiking trail         | Start at the trailhead and end at the summit |
-
-## Разширения на rtSurvey
-
-While the basic XLSForm specification for geotrace questions is straightforward, rtSurvey may offer additional features or customizations:
-
-1. Integration with offline maps for remote areas
-2. Options to set minimum and maximum number of points for the trace
-3. Ability to edit or refine traces after initial drawing
-4. Support for automatic tracing at set intervals during movement
-
-(Note: The specific extensions available in rtSurvey for geotrace questions would need to be confirmed and detailed here.)
+---
 
 ## Формат на данните
 
-Geotrace data is typically stored as a string of space-separated coordinate pairs, similar to geoshape but without the closing point:
+Съхранява се като списък от точки, разделени с точка и запетая, **без интервали около точките и запетаите**. Всяка точка се състои от четири стойности, разделени с интервал:
 
 ```
-lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
+lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-For example:
+| Компонент | Описание |
+|-----------|-------------|
+| `lat` | Географска ширина в десетични градуси |
+| `lon` | Географска дължина в десетични градуси |
+| `alt` | Надморска височина в метри (`0`, ако е неизвестна) |
+| `acc` | GPS точност в метри (`0`, ако е неизвестна) |
+
+**Пример — път с три точки:**
 ```
-38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
+13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
 ```
 
-## Съображения за анализ
+Необходими са минимум две точки за формиране на валиден път.
 
-When using geotrace questions, consider:
+---
 
-1. How the geographic data will be visualized and analyzed (e.g., GIS software)
-2. The potential need for data cleaning or simplification of complex traces
-3. Privacy and data protection measures for handling detailed spatial data
-4. Integration with other spatial data sources for comprehensive analysis
+## Как се изобразява в rtSurvey
+
+В уеб формата на rtSurvey `geotrace` се изобразява като обикновено **текстово поле**. Анкетьорът въвежда или поставя низа с координати. В текущата уеб форма няма вграден интерактивен инструмент за избор от карта за този тип.
+
+### Интерактивно събиране на точки
+
+Препоръчителният модел за събиране на терен е **повтаряща се група от въпроси тип `geopoint`** — всяка точка използва пълния GPS инструмент за избор от карта — комбинирана с `calculate` за генериране на geotrace низа:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | path_points | Запишете всяка точка от пътя | |
+| geopoint | point | Докоснете за запис на точка | |
+| end repeat | path_points | | |
+| calculate | geotrace_value | | `join(';', ${path_points/point})` |
+
+Изчисленият низ може след това да бъде съхранен във въпрос тип `text` или използван в `geotrace`.
+
+---
+
+## Примерен модел
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geotrace | farm_boundary_path | Запишете пътя за достъп до фермата | Въведете всяка точка, разделена с точка и запетая | yes |
+
+---
+
+## Най-добри практики
+
+1. Използвайте повтаряща се група от въпроси тип `geopoint` за интерактивно събиране чрез карта, след което обединете стойностите — това дава на анкетьорите GPS инструмент за всяка отделна точка.
+2. Включете очаквания формат в колоната `hint`, когато се изисква ръчно въвеждане на координати.
+3. Валидирайте присъствието с `required = yes`, когато пътят е задължителен.
+4. Планирайте почистване на данните — ръчно въведените пътища може да имат непоследователна точност.
 
 ## Ограничения
 
-- Tracing accurate paths on small mobile screens can be challenging.
-- Complex traces may require significant storage and processing capacity.
-- Continuous GPS usage for automatic tracing can quickly drain device batteries.
-- There may be privacy concerns associated with collecting detailed path data.
-
+- В уеб формата на rtSurvey няма вграден интерактивен инструмент за избор от карта за `geotrace`.
+- Координатният низ може да бъде дълъг за сложни пътища — имайте го предвид за производителността на формата и съхранението.
+- Валидирането на топологията на пътя (напр. минимален брой точки, самопресичане) изисква последваща обработка извън ограниченията на XLSForm.

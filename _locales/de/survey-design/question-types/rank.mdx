@@ -1,23 +1,25 @@
 ---
-title: "Rank"
-description: "Rank-Fragen ermöglichen es Befragten, eine Liste von Auswahlmöglichkeiten nach Präferenz oder Priorität zu ordnen."
+title: "Rangfolge"
+description: "Rangfolge-Fragen ermöglichen es den Befragten, eine Reihe von Auswahlmöglichkeiten nach Präferenz oder Priorität zu ordnen."
 ---
 
-Der Fragetyp `rank` präsentiert eine Liste von Auswahlmöglichkeiten, die der Befragte **per Drag-and-Drop** (oder auf anderem Weg) in eine Reihenfolge bringen muss (von Platz 1 bis zum letzten Platz). Das Ergebnis wird als leerzeichengetrennte Liste von Auswahlwerten in der gewählten Reihenfolge gespeichert, wobei die Auswahlmöglichkeit mit der höchsten Priorität an erster Stelle steht.
+Der Fragetyp `rank` präsentiert eine Liste von Auswahlmöglichkeiten, die der Befragte nach Präferenz oder Priorität ordnet. Das Ergebnis wird als durch Leerzeichen getrennte Liste der Auswahlwerte in der Rangfolge gespeichert, wobei die Auswahl mit der höchsten Priorität zuerst steht.
+
+> **rtSurvey-Webformular:** Das Drag-to-Rank-Widget ist derzeit nicht implementiert. Im Webformular wird `rank` als Auswahlliste dargestellt. Verwenden Sie diesen Typ, wenn Sie mobile Clients ansprechen, die das Rangfolgen-Widget unterstützen, oder wenn das Format des gespeicherten Wertes wichtiger ist als die Drag-to-Order-Interaktion.
 
 ## Grundlegende XLSForm-Spezifikation
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Ordnen Sie diese Gemeinschaftsbedürfnisse vom wichtigsten zum unwichtigsten |
+| rank priorities | main_priority | Ordnen Sie diese Gemeinschaftsbedürfnisse von am wichtigsten bis am wenigsten wichtig |
 
-Die Auswahlmöglichkeiten werden im **choices-Arbeitsblatt** genau wie bei `select_one` definiert:
+Die Auswahlmöglichkeiten werden im **Choices-Arbeitsblatt** genau wie bei `select_one` definiert:
 
 **survey:**
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Ordnen Sie diese Bedürfnisse vom wichtigsten zum unwichtigsten |
+| rank priorities | main_priority | Ordnen Sie diese Bedürfnisse von am wichtigsten bis am wenigsten wichtig |
 
 **choices:**
 
@@ -27,19 +29,19 @@ Die Auswahlmöglichkeiten werden im **choices-Arbeitsblatt** genau wie bei `sele
 | priorities | health | Gesundheitsversorgung |
 | priorities | education | Bildung |
 | priorities | roads | Straßen |
-| priorities | electricity | Strom |
+| priorities | electricity | Elektrizität |
 
-## Gespeichertes Wertformat
+## Format des gespeicherten Wertes
 
-Der gespeicherte Wert ist eine **leerzeichengetrennte Liste** von Auswahlwerten in der geordneten Reihenfolge (erster Platz = höchste Priorität):
+Der gespeicherte Wert ist eine **durch Leerzeichen getrennte Liste** von Auswahlwerten in der Rangfolge (zuerst = höchste Priorität):
 
 ```
 water education health roads electricity
 ```
 
-## Rangpositionen extrahieren
+## Extrahieren von Rangpositionen
 
-Verwenden Sie `selected-at()`, um die Auswahlmöglichkeit an einer bestimmten Rangposition zu erhalten:
+Verwenden Sie `selected-at()`, um die Auswahl an einem bestimmten Rang zu erhalten:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -47,36 +49,36 @@ Verwenden Sie `selected-at()`, um die Auswahlmöglichkeit an einer bestimmten Ra
 | calculate | top_priority | | selected-at(`${main_priority}`, 0) |
 | calculate | second_priority | | selected-at(`${main_priority}`, 1) |
 
-`selected-at(${main_priority}, 0)` gibt den Wert zurück, der an **erster Stelle** steht (Index 0 = höchster Rang).
+`selected-at(${main_priority}, 0)` gibt den Wert zurück, der an **erster** Stelle steht (Index 0 = oberster Rang).
 
 ## Verwendung von `rank-index()` mit Wiederholungsgruppen
 
-Wenn `rank` innerhalb einer Wiederholungsgruppe verwendet wird, ermöglicht `rank-index()` die Referenzierung des ordinalen Rangs von außerhalb der Wiederholung:
+Wenn `rank` innerhalb einer Wiederholungsgruppe (Repeat Group) verwendet wird, ermöglicht `rank-index()` den Zugriff auf den Ordinalrang von außerhalb der Wiederholung:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_ranked | | rank-index(1, `${score}`) |
 
-Vollständige Details zu `rank-index()` und `rank-index-if()` finden Sie unter [Funktionen — Funktionen für Wiederholungsfelder](../operators-and-functions/functions#repeated-field-functions).
+Siehe [Funktionen — Wiederholte Feld-Funktionen](../operators-and-functions/functions#repeated-field-functions) für vollständige Einzelheiten zu `rank-index()` und `rank-index-if()`.
 
-## Anwendungsbereiche
+## Anwendungen
 
-Rank-Fragen werden häufig verwendet für:
+Rangfolge-Fragen werden häufig verwendet für:
 
-1. **Prioritätsranking** — Gemeinschaften nach Entwicklungsbedürfnissen befragen
-2. **Präferenzordnung** — Produktfunktionen, Serviceattribute oder politische Optionen ordnen
-3. **Prüfungsaufgaben** — Schritte in einem Prozess anordnen
-4. **Top-N-Auswahl** — kombiniert mit `selected-at()`, um nur die Top 1, 2 oder 3 Auswahlmöglichkeiten zu extrahieren
+1. **Prioritätsranking** — Befragung von Gemeinschaften zur Einstufung von Entwicklungsbedarfen
+2. **Präferenzordnung** — Einstufung von Produktmerkmalen, Dienstleistungsattributen oder Richtlinienoptionen
+3. **Prüfungsreihenfolge** — Anordnung von Schritten in einem Prozess
+4. **Top-N-Auswahl** — kombiniert mit `selected-at()`, um nur die ersten 1, 2 oder 3 Auswahlmöglichkeiten zu extrahieren
 
-## Empfohlene Vorgehensweisen
+## Best Practices
 
-1. Halten Sie die Liste kurz (3–7 Elemente) — das Ordnen wird bei mehr als 7–8 Auswahlmöglichkeiten kognitiv anspruchsvoll.
-2. Verwenden Sie klare, gegenseitig ausschließende Beschriftungen, um Verwirrung darüber zu vermeiden, was "erster Platz" bedeutet.
-3. Fügen Sie Hinweistext hinzu, der die Ordnungsrichtung erklärt (z. B. "Ziehen Sie, um zu ordnen: erster Platz = am wichtigsten").
-4. Validieren Sie mit `count-selected(.) = x`, wenn sichergestellt werden soll, dass alle Auswahlmöglichkeiten geordnet sind.
+1. Halten Sie die Liste kurz (3–7 Elemente) — das Ranking wird jenseits von 7–8 Auswahlmöglichkeiten kognitiv belastend.
+2. Verwenden Sie klare, sich gegenseitig ausschließende Auswahlbeschriftungen, um Verwirrung darüber zu vermeiden, was „zuerst“ bedeutet.
+3. Fügen Sie einen Hinweistext hinzu, der die Richtung der Rangfolge erklärt (z. B. „Ziehen zum Ordnen: zuerst = am wichtigsten“).
+4. Validieren Sie mit `count-selected(.) = x`, wenn Sie sicherstellen müssen, dass alle Auswahlmöglichkeiten eingestuft wurden.
 
 ## Einschränkungen
 
-- Das Drag-to-Rank-Widget erfordert einen Touchscreen oder eine Maus — es funktioniert möglicherweise in reinen Tastaturumgebungen nicht gut.
-- Auf einigen älteren mobilen Clients kann das Rank-Widget auf eine nummerierte Eingabeoberfläche zurückfallen.
-- Es ist kein teilweises Ordnen möglich (d. h. nur einige Auswahlmöglichkeiten ordnen) — alle Auswahlmöglichkeiten müssen geordnet werden.
+- Das Drag-to-Rank-Widget ist im rtSurvey-Webformular nicht implementiert.
+- Ein teilweises Ranking ist nicht möglich — alle Auswahlmöglichkeiten müssen geordnet werden.
+- Halten Sie Listen auf 3–7 Elemente beschränkt; längere Listen werden unabhängig vom Client unhandlich.
