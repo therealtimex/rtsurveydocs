@@ -4,5 +4,6 @@
   },
   "operators": "Операторы",
   "functions": "Функции",
+  "pulldata": "pulldata()",
   "references": "Справочник"
 }

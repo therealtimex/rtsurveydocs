@@ -4,5 +4,6 @@
   },
   "operators": "Operátorok",
   "functions": "Függvények",
+  "pulldata": "pulldata()",
   "references": "Hivatkozások"
 }

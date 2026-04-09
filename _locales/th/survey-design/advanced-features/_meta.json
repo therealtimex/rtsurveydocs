@@ -5,10 +5,8 @@
   "call-api": "เรียก API",
   "dynamic-question-type": "ประเภทคำถามแบบไดนามิก",
   "dynamic-search": "การค้นหาแบบไดนามิก",
-  "exams": "การสอบ",
   "grid-layout": "เลย์เอาต์กริด",
   "html-styling": "HTML Styling",
   "images": "รูปภาพ",
-  "repeats": "การทำซ้ำขั้นสูง",
-  "webbox": "WebBox"
+  "repeats": "การทำซ้ำขั้นสูง"
 }

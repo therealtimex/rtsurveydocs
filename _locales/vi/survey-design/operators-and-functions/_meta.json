@@ -4,5 +4,6 @@
   },
   "operators": "Toán tử",
   "functions": "Hàm",
+  "pulldata": "pulldata()",
   "references": "Tài liệu tham khảo"
 }

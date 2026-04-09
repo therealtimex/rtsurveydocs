@@ -4,5 +4,6 @@
   },
   "operators": "연산자",
   "functions": "함수",
+  "pulldata": "pulldata()",
   "references": "참조"
 }

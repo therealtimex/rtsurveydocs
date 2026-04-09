@@ -4,5 +4,6 @@
   },
   "operators": "运算符",
   "functions": "函数",
+  "pulldata": "pulldata()",
   "references": "参考资料"
 }

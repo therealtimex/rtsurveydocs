@@ -5,10 +5,8 @@
   "call-api": "Call API",
   "dynamic-question-type": "动态题目类型",
   "dynamic-search": "动态搜索",
-  "exams": "考试",
   "grid-layout": "网格布局",
   "html-styling": "HTML Styling",
   "images": "图片",
-  "repeats": "高级重复",
-  "webbox": "WebBox"
+  "repeats": "高级重复"
 }

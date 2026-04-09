@@ -5,10 +5,8 @@
   "call-api": "Call API",
   "dynamic-question-type": "Динамический тип вопроса",
   "dynamic-search": "Динамический поиск",
-  "exams": "Тесты и экзамены",
   "grid-layout": "Сеточный макет",
   "html-styling": "HTML Styling",
   "images": "Изображения",
-  "repeats": "Расширенные повторы",
-  "webbox": "WebBox"
+  "repeats": "Расширенные повторы"
 }

@@ -4,5 +4,6 @@
   },
   "operators": "Operaattorit",
   "functions": "Funktiot",
+  "pulldata": "pulldata()",
   "references": "Viitteet"
 }

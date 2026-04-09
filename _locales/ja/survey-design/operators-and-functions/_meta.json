@@ -4,5 +4,6 @@
   },
   "operators": "演算子",
   "functions": "関数",
+  "pulldata": "pulldata()",
   "references": "参照"
 }

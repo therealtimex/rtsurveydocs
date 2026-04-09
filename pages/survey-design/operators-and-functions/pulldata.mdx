@@ -1,0 +1,121 @@
+---
+title: "pulldata()"
+description: "The pulldata() function retrieves a value from an external CSV file attached to the form, matching a key column to a key value and returning the corresponding result column."
+---
+
+import { Callout } from 'nextra/components'
+
+The `pulldata()` function retrieves a value from a CSV file attached to the form. Given a filename, a column to return, a column to match on, and a key value, it returns the cell at the intersection of the matching row and the result column.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Position | Parameter | Description |
+|----------|-----------|-------------|
+| 1 | Filename | Name of the CSV media file (same name used in `select_one_from_file`) |
+| 2 | Result column | The column whose value you want to return |
+| 3 | Key column | The column to match against |
+| 4 | Key value | The value to match — usually a field reference like `${field}` |
+
+The function returns an empty string if no match is found.
+
+---
+
+## Prerequisites
+
+The CSV file must be attached to the form as a **media file**. The same file referenced by `pulldata()` can also be used as the choice list for `select_one_from_file`.
+
+**Example CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Basic example
+
+Look up a staff member's department and phone from their ID:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Select staff member | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Department: `${dept}` — Phone: `${phone}` | |
+
+<Callout type="info">
+The `name` column in a `select_one_from_file` CSV is the stored value. When the enumerator selects "Alice", `${staff_id}` holds `"Alice"`, which `pulldata()` uses as the key to retrieve her department and phone.
+</Callout>
+
+---
+
+## Retrieving the label of a selected choice
+
+A `select_one_from_file` question stores the `name` value. To display the human-readable `label`, use `pulldata()` to look it up:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Select village | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | You selected: `${village_label}` | |
+
+---
+
+## Multiple lookups from one selection
+
+You can call `pulldata()` multiple times on the same file to retrieve different columns for the same selected row:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Select facility | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## Using pulldata in relevant and constraint
+
+`pulldata()` can be used in `relevant` and `constraint` columns to apply logic based on looked-up values:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Select facility | | |
+| integer | bed_count | Number of beds occupied | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## Using pulldata with `once()`
+
+To evaluate `pulldata()` only on first load (preventing re-evaluation when the key field changes after initial entry), wrap it in `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Best Practices
+
+1. The key column in the CSV must match the `name` column used in `select_one_from_file` — these must be the same value.
+2. Column names in the CSV are case-sensitive — `Department` and `department` are different columns.
+3. If the key value is not found, `pulldata()` returns an empty string — use `if(${field} != '', pulldata(...), '')` to guard against empty selections.
+4. Keep CSV files small where possible — large files increase form load time on low-bandwidth connections.
+5. For data that changes between data collection rounds, update the CSV media file by uploading a new form version.
+
+## Limitations
+
+- `pulldata()` only matches the **first** row where the key column equals the key value — duplicate key values in the CSV are not supported.
+- The CSV file must be attached to the form before deployment; it cannot be fetched from a URL at runtime.
+- Numeric values returned by `pulldata()` are strings — wrap in `number()` when used in arithmetic: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey also supports extended forms of `pulldata()` for reading device metadata, JWT fields, and JSON data. See [App API](../app-api) for `pulldata('app-api', ...)` and the [Call API](../advanced-features/call-api) page for JSON-based lookup patterns.
+</Callout>

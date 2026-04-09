@@ -5,10 +5,8 @@
   "call-api": "Call API",
   "dynamic-question-type": "動的質問タイプ",
   "dynamic-search": "動的検索",
-  "exams": "試験",
   "grid-layout": "グリッドレイアウト",
   "html-styling": "HTML Styling",
   "images": "画像",
-  "repeats": "高度な繰り返し",
-  "webbox": "WebBox"
+  "repeats": "高度な繰り返し"
 }

@@ -4,5 +4,6 @@
   },
   "operators": "Operator",
   "functions": "Fungsi",
+  "pulldata": "pulldata()",
   "references": "Referensi"
 }
