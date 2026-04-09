@@ -1,99 +1,141 @@
 ---
 title: "Файл"
-description: "Въпросите от тип файл позволяват на респондентите да качват документи и други файлове като част от отговорите им."
+description: "Въпросите от тип файл позволяват на респондентите да качват документи и други файлове като част от техните отговори в анкетата."
 ---
 
-The `file` question type allows respondents to **upload any file** from their device — documents, spreadsheets, PDFs, or other file types. Unlike `image`, `audio`, and `video` which launch specific capture tools, `file` opens a general-purpose file picker.
+Типът въпрос `file` позволява на респондентите да **качват всеки файл** от своето устройство — документи, електронни таблици, PDF файлове или други типове файлове. За разлика от `image`, `audio` и `video`, които стартират специфични инструменти за заснемане, `file` отваря инструмент за избор на файл с общо предназначение.
 
 ## Основна спецификация на XLSForm
 
 | type | name      | label                        |
 |------|-----------|------------------------------|
-| file | document  | Please upload your document  |
+| file | document  | Моля, качете вашия документ  |
 
-For more details on the standard file question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+За повече подробности относно стандартния тип въпрос за файл вижте [спецификацията на XLSForm](https://xlsform.org/en/#question-types).
 
-## Приложения
+## Употреба
 
-File questions are commonly used for:
+Въпросите за файлове обикновено се използват за:
 
-1. Collecting supporting documents (receipts, certificates, contracts, reports)
-2. Uploading completed paper forms that were scanned
-3. Gathering spreadsheets or data exports from other systems
-4. Any digital file type that image/audio/video does not cover
+1. Събиране на подкрепящи документи (разписки, сертификати, договори, отчети)
+2. Качване на попълнени хартиени формуляри, които са били сканирани
+3. Събиране на електронни таблици или експортиране на данни от други системи
+4. Всеки цифров тип файл, който изображенията/аудиото/видеото не покриват
 
 ## Формат на данните
 
-Uploaded files are stored as binary attachments:
+Качените файлове се съхраняват като двоични прикачени файлове:
 
-- **Format:** Preserved in original format (PDF, XLSX, DOCX, etc.)
-- **Naming:** `{instanceID}-{fieldname}.{extension}`
-- **Storage:** Uploaded to the server media folder alongside the submission
-- **Access:** Downloadable from the submission management interface
+- **Формат:** Запазен в оригиналния формат (PDF, XLSX, DOCX и др.)
+- **Именуване:** `{instanceID}-{fieldname}.{extension}`
+- **Съхранение:** Качени в папката за медия на сървъра заедно с подадената форма
+- **Достъп:** Могат да бъдат изтеглени от интерфейса за управление на подадените данни
 
-## Разширения на rtSurvey
+## rtSurvey разширения
 
 ### Приети типове файлове
 
-Use the `parameters` column to restrict which file types can be selected:
+Използвайте колоната `parameters`, за да ограничите кои типове файлове могат да бъдат избрани:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| file | report | Upload the inspection report | `accept=.pdf` |
-| file | spreadsheet | Upload the data file | `accept=.xlsx,.csv` |
+| file | report | Качете отчета от инспекцията | `accept=.pdf` |
+| file | spreadsheet | Качете файла с данни | `accept=.xlsx,.csv` |
 
-The `accept` parameter uses standard file extension syntax (comma-separated).
+Параметърът `accept` използва стандартен синтаксис за файлови разширения (разделени със запетая).
 
-### Насоки за размера на файловете
+### Насоки за размера на файла
 
-rtSurvey does not enforce a hard file-size limit at the question level, but the server upload limit applies. Use `hint` to communicate expectations to the enumerator:
+rtSurvey не налага твърдо ограничение на размера на файла на ниво въпрос, но се прилага ограничението за качване на сървъра. Използвайте `hint`, за да комуникирате очакванията към анкетьора:
 
 | type | name | label | hint |
 |------|------|-------|------|
-| file | receipt | Upload the payment receipt | Accepted: PDF or image. Maximum file size: 5 MB |
+| file | receipt | Качете разписката за плащане | Приемат се: PDF или изображение. Максимален размер на файла: 5 MB |
 
-### Интеграция с файловата система на устройството и облачното хранилище
+### Интеграция с файловата система на устройството и облачно съхранение
 
-On Android and iOS, the `file` question opens the device's native file picker, which may include access to:
-- Local device storage
-- SD card (Android)
+На Android и iOS въпросът `file` отваря оригиналния инструмент за избор на файлове на устройството, който може да включва достъп до:
+- Локално съхранение на устройството
+- SD карта (Android)
 - iCloud Drive (iOS)
-- Google Drive, Dropbox (if installed)
+- Google Drive, Dropbox (ако са инсталирани)
 
-On web, it opens the browser's standard file upload dialog.
+В мрежата той отваря стандартния диалогов прозорец за качване на файлове на браузъра.
 
-## Примерна употреба
+### Оформление на вграден бутон
 
-### Задължително качване на PDF
+Добавете `inline`, за да изобразите качването като **кръгъл бутон с икона** до етикета вместо инструмент за избор на файл с пълна ширина.
+
+```
+| type | name | label           | appearance                              |
+|------|------|-----------------|-----------------------------------------|
+| file | doc  | Качване на документ | inline display{right}                   |
+| file | doc  | Качване на документ | inline display{left, large}             |
+| file | doc  | Качване на документ | inline display{center, large, <0099FF/>} |
+```
+
+**Позиция на бутона** — `left`, `right` *(по подразбиране)*, `top`, `center`, `bottom`
+
+**Размер на бутона** — `small` *(по подразбиране)*, `medium`, `large`
+
+**Цвят на бутона** — добавете шестнадесетичен цвят в `display{}`, за да презапишете основния цвят:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Контрол след заснемане — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Скрива бутона за качване, след като е прикачен файл |
+| `results{hide(review)}` | Скрива бутона за преглед след качване |
+| `results{hide(filename)}` | Скрива името на файла, показано след качване |
+| `results{left}` | Премества иконата наляво след качване |
+
+Пример — скриване на бутона за качване след прикачване на файл:
+```
+inline display{right} results{hide(capture)}
+```
+
+### Премахване на етикета
+
+```
+inline text-nolabel display{center, large}
+```
+
+## Примери за употреба
+
+### Изисквано качване на PDF
 
 | type | name | label | hint | required | required_message |
 |------|------|-------|------|----------|-----------------|
-| file | signed_consent | Upload the signed consent form | PDF only, max 2MB | yes | A consent form is required |
+| file | signed_consent | Качете подписаната форма за съгласие | Само PDF, макс. 2MB | yes | Изисква се форма за съгласие |
 
 ### Условно качване на документ
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| select_one yesno | has_land_title | Does the household have a land title? | |
-| file | land_title_doc | Upload a photo or scan of the land title | `${has_land_title} = 'yes'` |
+| select_one yesno | has_land_title | Домакинството има ли документ за собственост на земята? | |
+| file | land_title_doc | Качете снимка или сканирано копие на документа за собственост | `${has_land_title} = 'yes'` |
 
 ## Най-добри практики
 
-1. Use `accept` to restrict file types — this prevents enumerators from accidentally uploading wrong files.
-2. Always include size and format guidance in the `hint` column.
-3. For photos and images, use the `image` type instead — it offers better compression and consistent format handling.
-4. For large surveys with file attachments, plan your data storage and download bandwidth accordingly.
-5. Test the file picker on the target device type (Android vs. iOS vs. web) before deployment — access to cloud drives varies.
+1. Използвайте `accept`, за да ограничите типовете файлове — това предотвратява случайно качване на грешни файлове от анкетьорите.
+2. Винаги включвайте насоки за размера и формата в колоната `hint`.
+3. За снимки и изображения използвайте типа `image` вместо това — той предлага по-добра компресия и последователна обработка на формата.
+4. За големи анкети с прикачени файлове планирайте съответно съхранението на вашите данни и капацитета за изтегляне.
+5. Тествайте инструмента за избор на файлове на целевия тип устройство (Android срещу iOS срещу мрежа) преди внедряване — достъпът до облачни дискове варира.
 
-## Съображения при обработката на данни
+## Съображения за обработка на данни
 
-- Files are stored in their original format; they are not converted or compressed by rtSurvey.
-- Analyse files after download — rtSurvey does not extract or index file contents.
-- Large file attachments significantly increase the time required to download a full dataset.
+- Файловете се съхраняват в оригиналния им формат; те не се конвертират или компресират от rtSurvey.
+- Анализирайте файловете след изтегляне — rtSurvey не извлича и не индексира съдържанието на файловете.
+- Прикачените големи файлове значително увеличават времето, необходимо за изтегляне на пълен набор от данни.
 
 ## Ограничения
 
-- File questions do not validate file contents — only the file extension check via `accept` is enforced at the UI level.
-- Very large files (100 MB+) may time out on upload in low-connectivity environments.
-- Offline enumerators can attach files but they will not upload until connectivity is restored.
-- Some device configurations restrict access to certain storage locations (e.g., corporate MDM policies).
+- Въпросите за файлове не валидират съдържанието на файловете — на ниво потребителски интерфейс се налага само проверката на файловото разширение чрез `accept`.
+- Много големи файлове (100 MB+) могат да прекъснат при качване в среди със слаба свързаност.
+- Офлайн анкетьорите могат да прикачват файлове, но те няма да бъдат качени, докато не се възстанови свързаността.
+- Някои конфигурации на устройства ограничават достъпа до определени места за съхранение (напр. корпоративни политики за MDM).

@@ -1,72 +1,212 @@
 ---
-title: "Tizedes szám"
-description: "A tizedes szám kérdések lehetővé teszik a töredékes részeket tartalmazó numerikus bevitelt a felmérésben."
+title: "Tizedes tört"
+description: "Törtszám beviteli kérdéstípus az rtSurvey-ben"
 ---
 
-Az XLSForm és az rtSurvey decimal kérdéstípusa töredékes részeket tartalmazó numerikus válaszok gyűjtésére szolgál. Ez a kérdéstípus elengedhetetlen pontos numerikus adatok – például mérések, árak vagy százalékos értékek – gyűjtéséhez.
+A `decimal` kérdéstípus olyan számokat gyűjt össze, amelyek tartalmazhatnak tört részt is (pl. `3.14`, `72.5`). Mobileszközökön numerikus billentyűzetet jelenít meg, és ugyanazokat a megjelenési lehetőségeket támogatja az elrendezéshez és formázáshoz, mint a `text` típus.
 
-## Alapvető XLSForm-specifikáció
+## Alapvető XLSForm specifikáció
 
-| type    | name   | label                    |
-|---------|--------|--------------------------|
-| decimal | weight | Adja meg súlyát kg-ban   |
+| type | name | label |
+|------|------|-------|
+| decimal | weight_kg | Súly (kg) |
+| decimal | height_m | Magasság (m) |
+| decimal | temperature | Testhőmérséklet (°C) |
 
-A decimal kérdéstípus alapvető részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+A szabványos specifikációért tekintse meg az [XLSForm dokumentációját](https://xlsform.org/en/#question-types).
 
-## Felhasználási területek
+---
 
-A tizedes szám kérdések általánosan használt területei:
+## Megjelenési lehetőségek (Appearance options)
 
-1. Mérések (pl. súly, magasság, távolság)
-2. Pénzügyi adatok (pl. árak, fizetések)
-3. Százalékos értékek
-4. Tudományos adatgyűjtés
-5. Bármilyen egész számon túli pontosságot igénylő numerikus adat
+### `number-hspinner` — vízszintes léptető
 
-## Bevált módszerek
-
-1. Adjon egyértelmű és tömör feliratokat a várt bevitel és mértékegység megjelöléséhez.
-2. Tartomány-korlátokat alkalmazzon az irreális vagy hibás bevitelek megelőzéséhez.
-3. Fontolja meg súgó szöveg hozzáadását a várt formátum példáinak megadásához.
-4. Ha a pontosság fontos, adja meg a kívánt tizedesjegyek számát a feliratban vagy a súgóban.
-
-## Korlátok és ellenőrzés
-
-Korlátokat adhat hozzá, hogy biztosítsa, hogy a megadott érték egy adott tartományba essen:
-
-| type    | name   | label                    | constraint        | constraint_message                    |
-|---------|--------|--------------------------|-------------------|---------------------------------------|
-| decimal | height | Adja meg magasságát méterben | .>0 and .&lt;=3    | A magasságnak 0 és 3 méter közé kell esnie |
-
-## Példa
-
-Íme egy példa arra, hogyan lehet tizedes szám kérdéseket felhasználni egy egészségügyi felmérésben:
-
-| type    | name           | label                                     | constraint | constraint_message                |
-|---------|----------------|-------------------------------------------|------------|-----------------------------------|
-| decimal | weight         | Adja meg súlyát kg-ban                    | .>0 and .&lt;=500 | A súlynak 0 és 500 kg közé kell esnie |
-| decimal | height         | Adja meg magasságát méterben              | .>0 and .&lt;=3 | A magasságnak 0 és 3 méter közé kell esnie |
-| decimal | body_temp      | Adja meg testhőmérsékletét Celsius-ban    | .>=35 and .&lt;=42 | A hőmérsékletnek 35°C és 42°C közé kell esnie |
-| calculate | bmi          |                                           |            |                                   |
-
-A BMI számítás sorban a következőt használhatja:
+A beviteli mezőt egy vízszintes **− érték +** léptetővel helyettesíti. A mínusz/plusz gombok megérintése a beállított lépésközzel módosítja az értéket.
 
 ```
-calculation | ${weight} / (${height} * ${height})
+number-hspinner
 ```
 
-Ez a beírt súly és magasság segítségével kiszámítja a BMI-t.
+A megjelenített érték egy tizedesjegyre van formázva (pl. `3.0`, `72.5`). Az alapértelmezett lépésköz `1`; tizedes lépésköz beállításához használja a `hspinner()` függvényt.
 
-## rtSurvey-bővítések
+**Gombforma és lépésköz testreszabása** a `hspinner()` használatával:
 
-Bár az alapvető XLSForm-specifikáció egyszerű a decimal kérdéseknél, az rtSurvey további funkciókat és testreszabási lehetőségeket kínálhat:
+```
+number-hspinner hspinner('left-small-square','right-small-square','0.1')
+```
 
-1. Pontosság-szabályozás (tizedesjegyek száma)
-2. Egyedi beviteli formátumok (pl. százalék, pénznem)
-3. Haladó érvényesítési szabályok
+Paraméterek: bal oldali gomb formája, jobb oldali gomb formája, lépésköz értéke. A finomhangoláshoz használjon tizedes lépésközt, például `0.5` vagy `0.1`.
+
+**Egyedi színek** a `colors()` használatával:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Négy érték sorrendben: bal gomb háttere, bal gomb ikonja, jobb gomb háttere, jobb gomb ikonja.
+
+---
+
+### `thousandsep` — ezres elválasztó
+
+A megjelenített számot vesszős csoportosítással formázza (pl. `1,234.56`). A nyers szám vesszők nélkül kerül tárolásra. A beviteli típus `"text"`-re vált a formázott megjelenítés lehetővé tétele érdekében.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — egyedi számjegy-csoportosítás
+
+Az egész részt `n` hosszúságú blokkokba csoportosítja, amelyeket egy egyedi elválasztó választ el.
+
+```
+digisep(3," ")      → 1 234 567.89
+```
+
+A beviteli típus `"text"`-re vált, ha ez a megjelenés aktív.
+
+---
+
+### `textonly` — szöveges billentyűzet kényszerítése
+
+A beviteli elemen a `type="text"` értéket kényszeríti. Megelőzi a böngészők számbeviteli furcsaságait (záró nullák elrejtése, asztali léptető nyilak), miközben továbbra is elfogad tizedes értékeket.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — címkeként lebegő tipp
+
+A `hint` szöveg helykitöltőként (placeholder) jelenik meg a beviteli mezőben. Amikor a felhasználó gépelni kezd, címkeként (label) a mező fölé úszik.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — tipp a beviteli mezőn belül
+
+Hasonló a `floating_hint`-hez — a tipp a beviteli mezőn belül marad, ha az üres. Gépeléskor nem úszik fel.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — modális ablakos bevitel
+
+A mező megérintésekor egy nagyobb beviteli mezőt tartalmazó modális ablak nyílik meg. Kis képernyőkön hasznos.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — élő karakterszámláló
+
+Élő `(n)` karakterszámlálót jelenít meg a beviteli mező alatt, amely gépelés közben frissül.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — előtag hozzáadása
+
+Egy statikus vagy számított karakterláncot illeszt a megjelenített érték elé. A tárolt érték nem tartalmazza az előtagot.
+
+```
+prefix('USD ')          → "USD 72.50"-et jelenít meg, "72.50"-et tárol
+prefix(${currency})     → dinamikus előtag egy másik mezőből
+```
+
+---
+
+### `align_answer` — beviteli szöveg igazítása
+
+A beviteli mezőben lévő gépelt érték vízszintes igazítását szabályozza.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — QR / vonalkód beolvasása a mezőbe
+
+Egy QR-kód beolvasó gombot ad a beviteli mező mellé. Megnyitja a kamera-szkennert, és beilleszti a beolvasott értéket a mezőbe.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Megjelenési gyorshivatkozás
+
+| Appearance | Widget rendered |
+|---|---|
+| *(nincs)* | Számbevitel (`type="number"`) — numerikus billentyűzet mobilon |
+| `number-hspinner` | Vízszintes − érték + léptető, egy tizedesjegy megjelenítve |
+| `number-hspinner hspinner(...)` | Léptető egyedi gombformával és lépésközzel |
+| `number-hspinner colors(...)` | Léptető egyedi gombszínekkel |
+| `thousandsep` | Ezres csoportosítású számmegjelenítés |
+| `digisep(n,"sep")` | Egyedi számjegy-csoportosítás |
+| `textonly` | Szöveges billentyűzet kényszerítése |
+| `floating_hint` | Gépelés közben a mező fölé úszó tipp |
+| `embed` | Tipp a beviteli mezőn belül |
+| `textpopup` | Érintse meg a modális ablak megnyitásához |
+| `charcount` | Élő karakterszámláló a mező alatt |
+| `prefix(expr)` | Statikus vagy dinamikus előtag hozzáadása |
+| `align_answer = left/right/center` | Beviteli szöveg igazítása |
+| `inputs{qrscan}` | QR/vonalkód beolvasó gomb |
+
+---
+
+## Korlátozások és validáció
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| decimal | weight | Súly (kg) | `. > 0 and . <= 500` | Adjon meg egy értéket 0 és 500 között |
+| decimal | height | Magasság (m) | `. > 0 and . <= 3` | Adjon meg egy értéket 0 és 3 között |
+| decimal | temp | Hőmérséklet (°C) | `. >= 35 and . <= 42` | Normál hőmérséklet: 35°C–42°C |
+| decimal | percentage | Százalék | `. >= 0 and . <= 100` | Adjon meg egy értéket 0 és 100 között |
+
+---
+
+## Példa — mérési űrlap
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| decimal | weight_kg | Súly (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Adjon meg egy érvényes súlyt |
+| decimal | height_m | Magasság (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Adjon meg egy érvényes magasságot |
+| calculate | bmi | | | | |
+
+BMI számítási oszlop:
+```
+${weight_kg} div (${height_m} * ${height_m})
+```
+
+---
+
+## Legjobb gyakorlatok
+
+1. Használja a `number-hspinner hspinner(..., '0.1')` beállítást egy tizedesjegy pontosságot igénylő mérésekhez — a léptető automatikusan egy tizedesjegyre formáz, konzisztensen tartva az értékeket.
+2. Használja a `textonly` beállítást, ha a böngészők nem kívánt léptetőket adnak hozzá, vagy levágják a záró nullákat (pl. a `3.0` értéket `3`-ként jelenítik meg).
+3. Használja a `thousandsep` beállítást nagy pénzügyi értékeknél, hogy a válaszadók ellenőrizhessék, a megfelelő nagyságrendet adták-e meg.
+4. Kényszerítsen tartománykorlátozásokat (constraints), ahelyett, hogy kizárólag a mobil billentyűzet típusára hagyatkozna.
 
 ## Korlátozások
 
-- A tizedes számok pontossága korlátozott lehet az alapul szolgáló rendszer vagy adatbázis miatt.
-- A felhasználóknak útmutatásra lehet szükségük a várt tizedes elválasztóval kapcsolatban (pont vagy vessző) a területi beállításuktól függően.
-- A nagy tizedes számok nehéznek tűnhetnek mobileszközökön olvasni vagy megadni pontosan.
+- A léptető mindig egy tizedesjegyet jelenít meg — ha nagyobb pontosságra van szüksége a megjelenített értékben, használja helyette a sima beviteli mezőt.
+- A `thousandsep` és a `digisep()` a nyers számot tárolja — a számítások során ne a formázott megjelenített értéket olvassa ki.

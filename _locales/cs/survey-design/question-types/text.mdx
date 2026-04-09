@@ -1,104 +1,351 @@
 ---
 title: "Text"
-description: "Typ otázky pro volnou textovou odpověď v rtSurvey"
+description: "Typ otázky pro odpovědi s volným textem v rtSurvey"
 ---
 
-Typ otázky `text` sbírá volnou textovou odpověď — jakýkoli řetězec znaků. Je to nejflexibilnější typ vstupu a používá se pro jména, adresy, popisy, kódy a vše, co se nevejde do specifičtějšího typu.
-
-rtSurvey také rozšiřuje `text` o **widgety pro zadávání času**, které umožňují přesné zadávání času pomocí výběru hodin.
+Typ otázky `text` shromažďuje volný textový řetězec. Je to nejflexibilnější typ vstupu a podporuje velké množství variant vzhledu, které mění způsob vykreslení vstupu — od jednoduchého jednořádkového pole přes převod řeči na text, vyskakovací dialogy, editory formátovaného textu až po číselné číselníky.
 
 ## Základní specifikace XLSForm
 
 | type | name | label |
 |------|------|-------|
 | text | respondent_name | Celé jméno respondenta |
-| text | address | Domácí adresa |
+| text | address | Adresa bydliště |
 
-## Použití
+Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
 
-Textové otázky se používají pro:
+---
 
-1. Jména, adresy, volné popisy
-2. Otevřené komentáře nebo zpětnou vazbu
-3. Kódy, ID nebo referenční čísla, která se nevejdou do integer/decimal
-4. Sběr časových hodnot pomocí rozšíření pro zadávání času rtSurvey
-5. Textová pole s automatickým doplňováním (přes `search-autocomplete-noedit-v2()`)
+## Režimy rozložení
 
-## Standardní možnosti vzhledu
+### Výchozí — jednořádkový vstup
 
-| Vzhled | Popis |
-|--------|-------|
-| *(žádný)* | Jednořádkové textové pole |
-| `multiline` | Víceřádková textová oblast — nejlepší pro delší volný text na webu |
+Není potřeba žádný vzhled (appearance). Vykreslí standardní pole `<input type="text">`.
 
-## Rozšíření rtSurvey pro zadávání času
+---
 
-rtSurvey rozšiřuje `text` o **widget výběru hodin** pro sběr časových hodnot. Tyto možnosti vzhledu zobrazují ikonu hodin, na kterou enumerátor klepne pro výběr hodin, minut, sekund nebo milisekund.
+### `multiline` — textová oblast
 
-### Varianty vzhledu
+Vykreslí víceřádkovou textovou oblast (textarea). Uživatel ji může psaním rozšiřovat; automaticky se zvětšuje.
 
-| Vzhled | Popis |
-|--------|-------|
-| `inline` | Ikona hodin zobrazena vedle pole |
-| `inline colors("RRGGBB")` | Ikona hodin s vlastní hexadecimální barvou |
-| `inline-1line` | Hodiny zobrazeny v kompaktním jednořádkovém formátu |
-| `inline-1line-RRGGBB` | Jednořádkový s vlastní barvou ikony (hex, bez `#`) |
-| `inline-1line colors("RRGGBB","RRGGBB")` | Jednořádkový se dvěma barvami |
-| `inline-onlyresult` | Ikona hodin zmizí po výběru; zobrazena je pouze hodnota |
-| `inline-onlyresult colors("RRGGBB")` | Stejné, s vlastní barvou ikony |
+```
+multiline
+```
 
-### Formátovací tokeny času
+**Ovládání výšky řádků** připojením `[initRows, maxRows]`:
 
-Přidejte formátovací řetězec v závorkách pro řízení zobrazených časových složek:
+```
+multiline [3,8]     → začíná na 3 řádcích, rozšiřuje se až na 8
+multiline [5]       → pevně 5 řádků
+```
 
-| Formátovací řetězec | Zobrazuje |
-|---------------------|-----------|
-| `inline-[%H:%M]` | Hodiny a minuty (24hodinový) |
-| `inline-[%h:%M]` | Hodiny a minuty (12hodinový) |
-| `inline-[%H:%M:%S]` | Hodiny, minuty, sekundy (24hodinový) |
-| `inline-[%h:%M:%S]` | Hodiny, minuty, sekundy (12hodinový) |
-| `inline-[%H:%M:%3]` | Hodiny, minuty, milisekundy |
-| `inline-[%M:%S]` | Pouze minuty a sekundy |
-| `inline-[%M:%3]` | Pouze minuty a milisekundy |
+Výchozí je 1 řádek bez maxima. Shift+Enter vloží zalomení řádku; Enter přejde na další otázku.
+
+---
+
+### `floating_hint` — nápověda jako plovoucí štítek
+
+Text `hint` se ve vstupním poli vykreslí jako zástupný symbol (placeholder). Když uživatel začne psát, nápověda se vysune nad pole jako štítek.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — nápověda uvnitř vstupu
+
+Podobné jako `floating_hint` — nápověda se vykreslí uvnitř ohraničení vstupu, pokud je pole prázdné. Při psaní se neposouvá.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — vstup v modálním dialogu
+
+Klepnutím na pole se místo úprav v řádku otevře modální dialog SweetAlert s velkým vstupem. Užitečné na mobilních zařízeních pro získání většího prostoru na obrazovce pro psaní.
+
+```
+textpopup
+```
+
+---
+
+### `richtext` — WYSIWYG editor
+
+Vykreslí plnohodnotný editor formátovaného textu (Monaco / Draft.js). Respondent může používat tučné písmo, kurzívu, přidávat seznamy atd. Uložená hodnota je HTML.
+
+```
+richtext
+richtext(30%)       → výška editoru 30 % výřezu (viewportu)
+```
+
+---
+
+### `charcount` — živé počítadlo znaků
+
+Přidá zobrazení počtu znaků `(n)` pod vstup, který se aktualizuje během psaní.
+
+```
+charcount
+multiline charcount
+```
+
+---
+
+## Varianty číselného vstupu
+
+Tyto vzhledy fungují u typu `text` pro sběr čísel se speciálním formátováním nebo vzory interakce.
+
+### `numbers` — numerická klávesnice
+
+Vynutí typ vstupu HTML na `number`, což na mobilu vyvolá numerickou klávesnici.
+
+```
+numbers
+```
+
+### `thousandsep` — oddělovač tisíců
+
+Zobrazuje číslo s oddělovačem tisíců (např. `1 234 567`), zatímco ukládá nezpracované číslo. Typ vstupu je vynucen na `text`, aby bylo možné zobrazit oddělovače.
+
+```
+thousandsep
+```
+
+### `digisep(n, "sep")` — vlastní seskupování číslic
+
+Seskupuje číslice do bloků o velikosti `n` oddělených vlastním znakem. Užitečné pro telefonní čísla, identifikační čísla atd.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+### `number-hspinner` — horizontální číselník
+
+Nahradí vstup horizontálním číselníkem **− hodnota +**. Uživatel klepnutím na tlačítka mínus/plus hodnotu snižuje nebo zvyšuje. Funguje s typy `int` a `decimal`.
+
+```
+number-hspinner
+```
+
+**Přizpůsobte vzhled tlačítek** pomocí `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','1')
+```
+
+Parametry: tvar levého tlačítka, tvar pravého tlačítka, hodnota kroku.
+
+**Vlastní barvy** pomocí `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Čtyři hodnoty barev: pozadí levého, ikona levého, pozadí pravého, ikona pravého tlačítka.
+
+### `prefix(expr)` — přidání předpony
+
+Přidá vypočítaný nebo statický řetězec před zobrazenou hodnotu. Uložená hodnota předponu neobsahuje.
+
+```
+prefix('USD ')      → zobrazí "USD 100", uloží "100"
+prefix(${currency}) → dynamická předpona z jiného pole
+```
+
+### `textonly` — vynucení textového typu vstupu
+
+Vynutí `type="text"`, i když je pole typu `integer` nebo `decimal`. Užitečné pro vyhnutí se chování prohlížeče u číselných vstupů.
+
+```
+textonly
+```
+
+---
+
+## Transformace textu
+
+Tyto vzhledy automaticky transformují hodnotu, jakmile uživatel píše.
+
+| Appearance | Účinek | Příklad vstupu → uloženo |
+|---|---|---|
+| `upper` | Převádí na VELKÁ PÍSMENA | `ahoj` → `AHOJ` |
+| `lower` | Převádí na malá písmena | `AHOJ` → `ahoj` |
+| `proper` | Převádí na Velká První Písmena | `jan novák` → `Jan Novák` |
+
+---
+
+## Pomocníci pro zachycení vstupu
+
+### `inputs{stt}` — převod řeči na text
+
+Přidá tlačítko mikrofonu vedle vstupu. Klepnutím na něj se spustí rozpoznávání řeči v prohlížeči (Web Speech API). Přepsaný text se přidá do pole.
+
+```
+inputs{stt}
+```
+
+Není podporováno v Safari. Vyžaduje oprávnění k mikrofonu.
+
+### `inputs{qrscan}` — skener QR / čárových kódů
+
+Přidá tlačítko pro skenování QR kódu vedle vstupu. Otevře modální okno skeneru fotoaparátu a vyplní pole naskenovanou hodnotou.
+
+```
+inputs{qrscan}
+```
+
+**Tokenize** (naskenované hodnoty se přidávají místo nahrazování):
+
+```
+inputs{qrscan} append(${separator})
+```
+
+### `inputs{stt,qrscan} — řeč i skenování`
+
+Vykreslí tlačítka mikrofonu i skenování QR kódu vedle sebe.
+
+```
+inputs{stt,qrscan}
+inputs{qrscan,stt}
+```
+
+---
+
+## Varianty propojené s výběrem
+
+Tyto vzhledy propojují textové pole se seznamem voleb `select_one`, což uživateli umožňuje buď vybrat ze seznamu, nebo volně psát.
+
+### `selection_one_hide` — rozevírací výběr
+
+Vykreslí textový vstup s rozbalovací šipkou. Klepnutím na šipku se zobrazí volby z propojeného seznamu `search()`. Výběrem volby se pole vyplní a uzamkne (zobrazí se ✕ pro vymazání).
+
+```
+selection_one_hide
+```
+
+### `selection_one_show` — seznam přepínačů pod sebou
+
+Vykreslí textový vstup s přepínači (radio buttons) pod ním. Výběrem přepínače se vstup vyplní a uzamkne.
+
+```
+selection_one_show
+```
+
+Obě varianty vyžadují výraz `search()` ve sloupci `calculation` pro definování seznamu voleb.
+
+---
+
+## Zarovnání odpovědi
+
+Ovládá horizontální zarovnání zadávaného textu uvnitř vstupu.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+## Widget pro zadávání času (vložené hodiny)
+
+rtSurvey rozšiřuje typ `text` o widget pro výběr času. Tyto vzhledy zobrazují ikonu hodin, na kterou tazatel klepne, aby vybral časovou hodnotu. Hodnota se ukládá jako prostý text ve zvoleném formátu.
+
+### Vzhledy (Appearances)
+
+| Appearance | Popis |
+|---|---|
+| `inline` | Tlačítko s ikonou hodin vedle pole, otevírá modální okno |
+| `inline-onlyresult` | Ikona hodin po výběru zmizí |
+| `inline-1line` | Kompaktní jednořádkový číselník času |
+| `inline colors("RRGGBB")` | Ikona hodin s vlastní barvou |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Číselník se dvěma zvýrazňujícími barvami |
+
+### Formátovací značky
+
+Přidejte `-[format]` pro ovládání toho, které složky času se zobrazují a ukládají:
+
+| Formát | Zobrazení |
+|---|---|
+| `inline-[%H:%M]` | Hodiny : Minuty (24h) |
+| `inline-[%h:%M]` | Hodiny : Minuty (12h) |
+| `inline-[%H:%M:%S]` | Hodiny : Minuty : Sekundy (24h) |
+| `inline-[%M:%S]` | Minuty : Sekundy |
+| `inline-[%H:%M:%3]` | Hodiny : Minuty : Milisekundy |
 | `inline-[%S]` | Pouze sekundy |
 | `inline-[%3]` | Pouze milisekundy |
-| `inline-[%H]` | Pouze hodiny (24hodinový) |
-| `inline-[%h]` | Pouze hodiny (12hodinový) |
+| `inline-[%H]` | Pouze hodiny (24h) |
 
-### Příklad: Záznam doby trvání úkolu v minutách a sekundách
+### Pozice tlačítka s `display{}`
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | task_duration | Čas potřebný k dokončení úkolu | `inline-[%M:%S]` |
+Stejné jako u ostatních inline typů — ovládá pozici a velikost tlačítka hodin:
 
-### Příklad: Záznam času události ve 24hodinovém formátu s vlastní barvou
+```
+inline display{right}
+inline display{center, large}
+inline-onlyresult display{left, medium, #0099FF}
+```
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | event_time | Čas události | `inline-1line colors("0099FF")` |
+---
 
-## Formát dat
+## Rychlý přehled vzhledu
 
-Textová data jsou uložena a exportována jako prostý řetězec. Pro vstupy na základě času pomocí inline widgetu hodin je hodnota uložena ve formátu odpovídajícím zvolenému formátovacímu řetězci (např. `14:32` pro `%H:%M`).
+| Appearance | Vykreslený widget |
+|---|---|
+| *(žádný)* | Jednořádkový textový vstup |
+| `multiline` | Textová oblast |
+| `multiline [n,m]` | Textová oblast s ovládáním počátečních/maximálních řádků |
+| `floating_hint` | Nápověda se při psaní vysune nad pole jako štítek |
+| `embed` | Nápověda uvnitř ohraničení vstupu |
+| `textpopup` | Klepnutím otevřete modální dialog |
+| `richtext` / `richtext(height)` | WYSIWYG editor formátovaného textu |
+| `charcount` | Živý počet znaků pod vstupem |
+| `numbers` | Numerická klávesnice |
+| `thousandsep` | Formátování s oddělovačem tisíců |
+| `digisep(n,"sep")` | Vlastní seskupování číslic |
+| `number-hspinner` | Horizontální číselník − hodnota + |
+| `prefix(expr)` | Přidání statické nebo vypočítané předpony |
+| `upper` / `lower` / `proper` | Automatická transformace velikosti písma |
+| `inputs{stt}` | Tlačítko mikrofonu pro převod řeči na text |
+| `inputs{qrscan}` | Tlačítko pro skenování QR/čárového kódu |
+| `inputs{stt,qrscan}` | Tlačítka mikrofonu i skenování |
+| `selection_one_hide` | Rozevírací výběr ze seznamu voleb |
+| `selection_one_show` | Seznam přepínačů pod vstupem |
+| `align_answer = left/right/center` | Zarovnání textu odpovědi |
+| `inline-[%H:%M]` | Výběr hodin — sběr času |
+| `inline-1line` | Kompaktní číselník času |
+
+---
 
 ## Omezení a validace
 
-Aplikujte omezení pro vynucení formátu, délky nebo vzoru:
+Používejte omezení (constraints) k vynucení formátu, délky nebo vzoru:
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| text | name | Celé jméno | `string-length(.) >= 2` | Jméno musí mít alespoň 2 znaky |
-| text | code | Referenční kód | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Zadejte 2 velká písmena následovaná 4 číslicemi |
+| text | name | Celé jméno | `string-length(.) >= 2` | Jsou vyžadovány alespoň 2 znaky |
+| text | code | Referenční kód | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 velká písmena + 4 číslice |
 | text | phone | Telefonní číslo | `regex(., '^[0-9]{9,15}$')` | Zadejte platné telefonní číslo |
+
+---
 
 ## Osvědčené postupy
 
-1. Používejte specifičtější typy (`integer`, `decimal`, `date`), kdykoli mají data známou strukturu — to zabraňuje neplatným záznamům a zjednodušuje analýzu.
-2. Přidejte `constraint` s `string-length()` nebo `regex()` pro validaci kódů nebo ID.
-3. Používejte vzhled `multiline` pro otevřené otázky, kde respondenti mohou napsat několik vět.
-4. Pro sběr času zvolte formátovací tokeny odpovídající přesnosti požadované analýzou — sběr milisekund, když potřebujete pouze minuty, plýtvá úsilím enumerátora.
+1. Pokud mají data známou strukturu, používejte specifičtější typy (`integer`, `decimal`, `date`) — předejdete tak neplatným záznamům.
+2. U otevřených otázek používejte `multiline [3,8]`, abyste respondentům poskytli prostor pro psaní, aniž byste zahltili obrazovku.
+3. Pokud potřebujete formátované zobrazení, použijte `thousandsep` nebo `digisep()` místo pouhého `numbers` — samotné `numbers` mění pouze klávesnici.
+4. Používejte `inputs{qrscan}`, abyste eliminovali chyby při ručním zadávání kódů, ID a sériových čísel.
+5. `floating_hint` používejte, když je nápověda důležitým kontextem, který by měl zůstat viditelný i během psaní — standardní nápovědy na malých obrazovkách mizí.
+6. U otázek s omezením délky používejte `charcount`, aby respondenti mohli sami sledovat počet znaků.
 
 ## Omezení
 
-- Textové odpovědi jsou volné — neexistuje žádná vestavěná kontrola pravopisu ani omezení slovní zásoby nad rámec vzorů regex.
-- Inline widget hodin je rozšíření rtSurvey a není součástí standardní specifikace XLSForm.
+- `inputs{stt}` vyžaduje prohlížeč, který podporuje Web Speech API. Nejspolehlivější je Chrome; Safari není podporováno.
+- `richtext` ukládá HTML — pokud očekáváte prostý text, počítejte v analytickém řetězci s odstraňováním nebo sanitací HTML.
+- `selection_one_hide` a `selection_one_show` vyžadují výraz `search()` a jsou podporovány pouze ve webovém klientovi.
+- `number-hspinner` validuje proti sloupci `constraint` při každém stisknutí tlačítka, nejen při opuštění pole — navrhujte omezení odpovídajícím způsobem.

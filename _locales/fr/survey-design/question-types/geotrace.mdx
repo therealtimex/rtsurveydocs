@@ -1,79 +1,81 @@
 ---
 title: "Geotrace"
-description: "Les questions de type geotrace permettent aux répondants de capturer une série de points connectés sur une carte, créant ainsi des lignes ou des tracés dans le cadre de l'enquête."
+description: "Les questions Geotrace capturent une série de points GPS formant une ligne ou un chemin."
 ---
 
-Le type de question `geotrace` dans XLSForms et rtSurvey permet aux répondants de capturer une série de points connectés sur une carte, créant ainsi des lignes ou des tracés. Cette fonctionnalité est particulièrement utile pour cartographier des itinéraires, des limites ou des caractéristiques linéaires dans le cadre d'enquêtes spatiales.
+Le type de question `geotrace` capture une séquence de coordonnées géographiques formant une ligne ou un chemin (polyline). Dans le formulaire web de rtSurvey, cela se présente sous la forme d'un **champ de texte** où l'enquêteur (énumérateur) saisit ou colle directement la chaîne de coordonnées.
 
-## Spécification XLSForm de Base
+## Spécification de base XLSForm
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geotrace | river_path  | Tracer le cours de la rivière  |
+| type     | name        | label                        |
+|----------|-------------|------------------------------|
+| geotrace | river_path  | Tracer le chemin de la rivière |
+| geotrace | road_route  | Enregistrer l'itinéraire de la route |
 
-Pour plus de détails sur le type de question `geotrace` de base, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+Pour la spécification standard, voir la [documentation XLSForm](https://xlsform.org/en/#question-types).
 
-## Utilisations
+---
 
-Les questions `geotrace` sont couramment utilisées pour :
+## Format des données (Data Format)
 
-1. Cartographier des itinéraires ou des trajets effectués lors d'enquêtes sur le terrain
-2. Tracer des caractéristiques linéaires comme des routes, des rivières ou des limites
-3. Capturer l'étendue d'infrastructures linéaires (ex : pipelines, lignes électriques)
-4. Enregistrer des trajets de déplacement dans les études de transport
-5. Définir des transects dans les enquêtes écologiques
-
-## Meilleures Pratiques
-
-1. Assurez-vous que l'appareil a activé les services de localisation et que les autorisations sont accordées.
-2. Fournissez des instructions claires sur la manière de tracer le chemin et sur les éléments à inclure.
-3. Envisagez d'utiliser l'imagerie satellite ou des cartes de base pour aider les répondants à tracer les chemins avec précision.
-4. Soyez conscient de la complexité potentielle des tracés et de leur impact sur la taille et le traitement des données.
-
-## Exemple d'Utilisation
-
-Voici un exemple de la manière dont vous pourriez utiliser une question `geotrace` dans une enquête :
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geotrace | hiking_trail   | Tracer le chemin du sentier de randonnée   | Commencez au point de départ et finissez au sommet |
-
-## Extensions rtSurvey
-
-Bien que la spécification XLSForm de base pour les questions `geotrace` soit simple, rtSurvey peut proposer des fonctionnalités ou des personnalisations supplémentaires :
-
-1. Intégration de cartes hors ligne pour les zones reculées
-2. Options pour définir un nombre minimum et maximum de points pour le tracé
-3. Possibilité de modifier ou d'affiner les tracés après le dessin initial
-4. Prise en charge du traçage automatique à des intervalles définis pendant le déplacement
-
-(Note : Les extensions spécifiques disponibles dans rtSurvey pour les questions `geotrace` devront être confirmées et détaillées ici.)
-
-## Format des Données
-
-Les données `geotrace` sont généralement stockées sous forme d'une chaîne de paires de coordonnées séparées par des espaces, similaire au `geoshape` mais sans le point de fermeture :
+Stocké sous forme d'une liste de points séparés par des points-virgules **sans espaces autour des points-virgules**. Chaque point est composé de quatre valeurs séparées par des espaces :
 
 ```
-lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
+lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-Par exemple :
+| Component | Description |
+|-----------|-------------|
+| `lat` | Latitude en degrés décimaux |
+| `lon` | Longitude en degrés décimaux |
+| `alt` | Altitude en mètres (`0` si inconnue) |
+| `acc` | Précision GPS en mètres (`0` si inconnue) |
+
+**Exemple — un chemin à trois points :**
 ```
-38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
+13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
 ```
 
-## Considérations pour l'Analyse
+Un minimum de deux points est requis pour former un chemin valide.
 
-Lors de l'utilisation de questions `geotrace`, tenez compte de :
+---
 
-1. La manière dont les données géographiques seront visualisées et analysées (ex : logiciel SIG)
-2. Le besoin potentiel de nettoyage ou de simplification des tracés complexes
-3. Les mesures de confidentialité et de protection des données pour la manipulation des données spatiales détaillées
-4. L'intégration avec d'autres sources de données spatiales pour une analyse complète
+## Comment il s'affiche dans rtSurvey
 
-## Limitations
+Dans le formulaire web de rtSurvey, `geotrace` s'affiche comme un simple **champ de texte**. L'enquêteur tape ou colle la chaîne de coordonnées. Il n'y a pas de sélecteur de carte interactif intégré pour ce type dans le formulaire web actuel.
 
-- Tracer des chemins précis sur de petits écrans mobiles peut être difficile.
-- Les tracés complexes peuvent nécessiter une capacité de stockage et de traitement importante.
-- L'utilisation continue du GPS pour le traçage automatique peut épuiser rapidement la batterie de l'appareil.
-- Des préoccupations en matière de confidentialité peuvent être associées à la collecte de données de trajet détaillées.
+### Collecte de points de manière interactive
+
+Le modèle recommandé pour la collecte sur le terrain est un **groupe de répétition (repeat group) de questions `geopoint`** — chaque point utilise le sélecteur de carte GPS complet — combiné à un `calculate` pour produire la chaîne geotrace :
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | path_points | Enregistrer chaque point de passage | |
+| geopoint | point | Appuyer pour enregistrer le point | |
+| end repeat | path_points | | |
+| calculate | geotrace_value | | `join(';', ${path_points/point})` |
+
+La chaîne calculée peut ensuite être stockée dans une question de type `text` ou utilisée dans `geotrace`.
+
+---
+
+## Exemple d'utilisation
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geotrace | farm_boundary_path | Enregistrer le chemin d'accès à la ferme | Saisir chaque point de passage séparé par des points-virgules | yes |
+
+---
+
+## Bonnes pratiques
+
+1. Utilisez un groupe de répétition de questions `geopoint` pour une collecte interactive basée sur une carte, puis joignez les valeurs — cela donne aux enquêteurs un sélecteur GPS pour chaque point individuel.
+2. Incluez le format attendu dans la colonne `hint` lorsqu'une saisie manuelle des coordonnées est requise.
+3. Validez la présence avec `required = yes` lorsque le chemin est obligatoire.
+4. Prévoyez le nettoyage des données — les chemins saisis manuellement peuvent avoir une précision incohérente.
+
+## Limites (Limitations)
+
+- Il n'y a pas de sélecteur de carte interactif intégré pour `geotrace` dans le formulaire web de rtSurvey.
+- La chaîne de coordonnées peut être longue pour des chemins complexes — gardez cela à l'esprit pour la performance du formulaire et le stockage.
+- La validation de la topologie du chemin (ex: nombre minimum de points, auto-intersection) nécessite un post-traitement en dehors des contraintes XLSForm.

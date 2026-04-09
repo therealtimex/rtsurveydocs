@@ -1,93 +1,155 @@
 ---
-title: "Видео"
-description: "Въпросите от тип video позволяват на респондентите да записват и изпращат видео файлове като част от анкетата."
+title: "Video"
+description: "Video въпросите позволяват на респондентите да записват и изпращат видео файлове като част от анкетата."
 ---
 
-The `video` question type enables respondents to **record video** or upload an existing video file as part of their survey response. It is useful for capturing visual evidence, demonstrations, environmental conditions, or any information that benefits from motion and audio together.
+Типът въпрос `video` позволява на респондентите да **записват видео** или да качват съществуващ видео файл като част от техния отговор на анкетата. Той е полезен за улавяне на визуални доказателства, демонстрации, условия на околната среда или всяка информация, която изисква движение и звук едновременно.
 
-## Основна спецификация на XLSForm
+## Базова XLSForm спецификация
 
 | type  | name        | label                              |
 |-------|-------------|-------------------------------------|
-| video | demo_video  | Please record a short demonstration |
+| video | demo_video  | Моля, запишете кратка демонстрация |
 
-For more details on the standard video question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+За повече подробности относно стандартния тип въпрос video, вижте [XLSForm спецификацията](https://xlsform.org/en/#question-types).
 
-## Приложения
+## Употреби
 
-Video questions are commonly used for:
+Video въпросите обикновено се използват за:
 
-1. Documenting field conditions — road damage, infrastructure state, crop health
-2. Recording product demonstrations or procedural compliance checks
-3. Collecting video testimonials from respondents
-4. Capturing evidence that requires spatial context (e.g., the size and extent of a problem area)
-5. Before/after documentation for monitoring and evaluation surveys
+1. Документиране на полеви условия — повреди по пътищата, състояние на инфраструктурата, здраве на културите
+2. Записване на демонстрации на продукти или проверки за спазване на процедури
+3. Събиране на видео препоръки от респонденти
+4. Заснемане на доказателства, които изискват пространствен контекст (напр. размерът и обхватът на проблемна зона)
+5. Документация „преди/след“ за анкети за мониторинг и оценка
 
 ## Формат на данните
 
-Video files are stored as binary attachments:
+Видео файловете се съхраняват като бинарни прикачени файлове:
 
-- **Format:** MP4 or MOV (mobile recording)
-- **Naming:** `{instanceID}-{fieldname}.mp4` (or equivalent)
-- **Storage:** Uploaded to the server media folder and linked to the submission record
-- **Access:** Playable and downloadable from the submission management interface
+- **Формат:** MP4 или MOV (мобилен запис)
+- **Именуване:** `{instanceID}-{fieldname}.mp4` (или еквивалент)
+- **Съхранение:** Качват се в папката за медия на сървъра и се свързват със записа на подаването
+- **Достъп:** Могат да се възпроизвеждат и изтеглят от интерфейса за управление на подадените данни
 
-## Разширения на rtSurvey
+## rtSurvey разширения
 
 ### Максимална продължителност
 
-Use the `parameters` column to limit the recording length:
+Използвайте колоната `parameters`, за да ограничите дължината на записа:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | site_visit | Record the site conditions | `max-duration=60` |
+| video | site_visit | Запишете условията на обекта | `max-duration=60` |
 
-`max-duration` is in seconds. The recording stops automatically at the limit.
+`max-duration` е в секунди. Записът спира автоматично при достигане на лимита.
 
 ### Качество / резолюция
 
-Control the recording resolution via `parameters`:
+Контролирайте резолюцията на записа чрез `parameters`:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | evidence | Record video evidence | `quality=low` |
+| video | evidence | Запишете видео доказателство | `quality=low` |
 
-Supported values: `low` (faster upload), `normal` (default), `high`. Use `low` in areas with limited connectivity.
+Поддържани стойности: `low` (по-бързо качване), `normal` (по подразбиране), `high`. Използвайте `low` в райони с ограничена свързаност.
 
 ### Качване на съществуващо видео
 
-On mobile, the respondent can choose to **upload an existing video** from the device gallery instead of recording a new one. This is enabled by default in the native camera/gallery integration.
+На мобилни устройства респондентът може да избере да **качи съществуващо видео** от галерията на устройството, вместо да записва ново. Това е активирано по подразбиране в интеграцията с вградената камера/галерия.
 
 ### Възпроизвеждане преди изпращане
 
-On mobile, the recorded clip can be reviewed before proceeding. No additional configuration is needed.
+На мобилни устройства записаният клип може да бъде прегледан преди продължаване. Не е необходима допълнителна конфигурация.
 
-## Примерна употреба
+### Inline оформление на бутона
 
-### Видео за проверка на обект с ограничение
+Добавете `inline`, за да изобразите камерата като **кръгъл иконен бутон** до етикета, вместо като зона за заснемане по цялата ширина.
+
+```
+| type  | name  | label        | appearance                              |
+|-------|-------|--------------|----------------------------------------|
+| video | clip  | Запишете видео | inline display{right}                  |
+| video | clip  | Запишете видео | inline display{left, large}            |
+| video | clip  | Запишете видео | inline display{center, large, <0099FF/>} |
+```
+
+**Позиция на бутона** — `left`, `right` *(по подразбиране)*, `top`, `center`, `bottom`
+
+**Размер на бутона** — `small` *(по подразбиране)*, `medium`, `large`
+
+**Цвят на бутона** — добавете хексадесетичен цвят вътре в `display{}`, за да презапишете основния цвят:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Контрол след заснемане — `results{}`:**
+
+| Appearance | Ефект |
+|---|---|
+| `results{hide(capture)}` | Скрива бутона за запис след заснемане на видео |
+| `results{hide(review)}` | Скрива миниатюрата за възпроизвеждане след заснемане |
+| `results{hide(filename)}` | Скрива името на файла и продължителността |
+| `results{left}` | Премества иконата вляво след заснемане |
+
+Пример — скриване на бутона за запис, запазване на възпроизвеждането:
+```
+inline display{right} results{hide(capture)}
+```
+
+### `thumbnail-square-[WxH]` — видео преглед с фиксиран размер
+
+След заснемане изобразява видеото като инлине плейър с фиксиран размер, вместо по цялата ширина. Комбинирайте с `inline` за компактно оформление.
+
+```
+inline display{right} thumbnail-square-[120x90]
+inline display{center} thumbnail-square-[200x150]
+```
+
+Ширината и височината са в пиксели.
+
+### `invisible auto-show` — автоматично отваряне на рекордера
+
+Скрива уиджета на въпроса от оформлението, но автоматично отваря видео рекордера, когато страницата се зареди.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Потискане на етикета
+
+```
+inline text-nolabel display{center, large}
+```
+
+## Примери за употреба
+
+### Видео от инспекция на обект с лимит
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| video | site_video | Record the water point | Walk around the entire facility. Max 90 seconds. | `max-duration=90 quality=normal` |
+| video | site_video | Запишете водоизточника | Обиколете цялото съоръжение. Максимум 90 секунди. | `max-duration=90 quality=normal` |
 
 ### Условно видео — само ако е докладвана повреда
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
-| select_one yesno | damage_found | Was damage found? | | |
-| video | damage_video | Record video of the damage | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+| select_one yesno | damage_found | Открита ли е повреда? | | |
+| video | damage_video | Запишете видео на повредата | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
-## Най-добри практики
+## Добри практики
 
-1. Set `max-duration` — unrestricted video recordings can easily exceed 100 MB and fail to upload on weak connections.
-2. Use `quality=low` for monitoring surveys where visual evidence is required but fine detail is not — it cuts file size dramatically.
-3. Write specific recording instructions in the `hint` column (e.g., "Walk around the entire building, hold camera steady").
-4. Consider whether video is necessary — a photo (`image`) is usually sufficient for static evidence and produces much smaller files.
-5. Test upload performance on the actual field network before deployment.
+1. Задайте `max-duration` — неограничените видео записи лесно могат да надхвърлят 100 MB и да не успеят да се качат при слаба връзка.
+2. Използвайте `quality=low` за анкети за мониторинг, където се изискват визуални доказателства, но не и фини детайли — това драстично намалява размера на файла.
+3. Напишете конкретни инструкции за запис в колоната `hint` (напр. „Обиколете цялата сграда, дръжте камерата неподвижна“).
+4. Преценете дали видеото е необходимо — снимката (`image`) обикновено е достатъчна за статични доказателства и генерира много по-малки файлове.
+5. Тествайте производителността на качване в реалната полева мрежа преди внедряване.
 
 ## Ограничения
 
-- Video files are very large — a 1-minute video at normal quality is typically 20–60 MB depending on device.
-- Uploading large video files requires a good network connection; consider requiring Wi-Fi sync for video-heavy forms.
-- Not all web browsers support video recording via MediaRecorder — Chrome is the most reliable.
-- Analysis of video responses is manual and time-consuming; use sparingly and only when video content adds unique value.
+- Видео файловете са много големи — 1-минутно видео с нормално качество обикновено е 20–60 MB в зависимост от устройството.
+- Качването на големи видео файлове изисква добра мрежова връзка; помислете за изискване на Wi-Fi синхронизация за формуляри с много видеоклипове.
+- Не всички уеб браузъри поддържат видео запис чрез MediaRecorder — Chrome е най-надеждният.
+- Анализът на видео отговорите е ръчен и отнема много време; използвайте пестеливо и само когато видео съдържанието добавя уникална стойност.

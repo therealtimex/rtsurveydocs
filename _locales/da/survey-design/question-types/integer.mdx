@@ -1,75 +1,207 @@
 ---
 title: "Heltal"
-description: "Heltalsspørgsmål giver mulighed for hele tals input i din undersøgelse."
+description: "Spørgsmålstype til indtastning af heltal i rtSurvey"
 ---
 
-Spørgsmålstypen integer i XLSForms og rtSurvey bruges til at indsamle heltalssvar. Denne spørgsmålstype er essentiel til at indsamle numeriske data uden decimaler, såsom tæller, aldre eller år.
+Spørgsmålstypen `integer` indsamler heltal (ingen decimaler). Den aktiverer et numerisk tastatur på mobilen og blokerer indtastning af decimalkomma. Den understøtter de samme udseendemuligheder som typen `text` til layout og formatering.
 
 ## Grundlæggende XLSForm-specifikation
 
-| type    | name  | label                 |
-|---------|-------|------------------------|
-| integer | age   | Indtast din alder i år|
+| type | name | label |
+|------|------|-------|
+| integer | age | Respondentens alder |
+| integer | household_size | Antal personer i husstanden |
 
-For flere detaljer om den grundlæggende integer-spørgsmålstype, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+For standard-specifikationen se [XLSForm-dokumentationen](https://xlsform.org/en/#question-types).
 
-## Anvendelser
+---
 
-Heltalsspørgsmål bruges typisk til:
+## Udseendemuligheder (Appearance)
 
-1. Aldersinput
-2. Tælling af elementer (f.eks. antal børn, husholdningsmedlemmer)
-3. Årstals input (f.eks. fødselsår)
-4. Bedømmelse på en numerisk skala
-5. Enhver indsamling af hele tals data
+### `number-hspinner` — horisontal spinner
 
-## rtSurvey-udvidelser
-
-Mens den grundlæggende XLSForm-specifikation for integer-spørgsmål er enkel, kan rtSurvey tilbyde yderligere funktioner eller tilpasninger:
-
-1. Intervalvalidering
-2. Brugerdefinerede fejlmeddelelser
-3. Appearance-muligheder for tals input
-
-## Bedste praksis
-
-1. Brug klare og præcise labels til at angive det forventede input.
-2. Implementer intervalrestriktioner for at forhindre urealistiske eller fejlagtige input.
-3. Overvej at bruge hinttekst til at give eksempler eller præcisere det forventede format.
-4. For store tal bør du overveje at bruge kommaer eller mellemrum i labelen for at forbedre læsbarheden (f.eks. "Indtast befolkningstallet (op til 1.000.000)").
-
-## Restriktioner og validering
-
-Du kan tilføje restriktioner for at sikre, at den indtastede værdi falder inden for et bestemt interval:
-
-| type    | name  | label                 | constraint        | constraint_message                    |
-|---------|-------|------------------------|-------------------|---------------------------------------|
-| integer | age   | Indtast din alder i år| .>0 and .&lt;=120    | Alder skal være mellem 1 og 120 år   |
-
-## Eksempel på brug
-
-Her er et eksempel på, hvordan du kan bruge heltalsspørgsmål i en husholdningsundersøgelse:
-
-| type    | name           | label                                     | constraint | constraint_message                |
-|---------|----------------|-------------------------------------------|------------|-----------------------------------|
-| integer | household_size | Hvor mange personer bor i din husstand?   | .>0        | Husstandsstørrelse skal være mindst 1 |
-| integer | num_children   | Hvor mange børn under 18 er der i husstanden? | .>=0    | Antal børn kan ikke være negativt |
-| integer | year_built     | I hvilket år blev dit hus bygget?        | .>1800 and .&lt;=2024 | Årstallet skal være mellem 1800 og 2024 |
-
-## Beregning med heltalværdier
-
-Heltalværdier kan bruges i beregninger. Her er et eksempel:
-
-| type    | name           | label                                     |
-|---------|----------------|-------------------------------------------|
-| integer | num_adults     | Antal voksne i husstanden         |
-| integer | num_children   | Antal børn i husstanden       |
-| calculate | total_members | | 
-
-I beregningsrækken kan du bruge:
+Erstatter inputfeltet med en horisontal **− værdi +** spinner. Ved at trykke på minus/plus reduceres eller øges værdien med 1 (eller et brugerdefineret trin).
 
 ```
-calculation | ${num_adults} + ${num_children}
+number-hspinner
 ```
 
-Dette summerer antallet af voksne og børn for at få det samlede antal husholdningsmedlemmer.
+**Tilpas knapform og trin** ved hjælp af `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','5')
+```
+
+Parametre: venstre knapform, højre knapform, trinværdi (standard er `1` for heltal).
+
+**Brugerdefinerede farver** ved hjælp af `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Fire værdier i rækkefølge: venstre knaps baggrund, venstre knaps ikon, højre knaps baggrund, højre knaps ikon.
+
+---
+
+### `thousandsep` — tusindtalsseparator
+
+Formaterer det viste tal med tusindtalsseparator (f.eks. `1.234.567`). Selve tallet gemmes uden separatorer. Inputtypen skiftes til `"text"` for at tillade den formaterede visning.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — brugerdefineret cifregruppering
+
+Grupperer cifre i blokke af `n` adskilt af en brugerdefineret separator. Nyttigt til formaterede ID'er eller referencekoder, der er numeriske.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+Inputtypen skiftes til `"text"`, når denne visning er aktiv.
+
+---
+
+### `textonly` — gennemtving teksttastatur
+
+Gennemtvinger `type="text"` på input-elementet. Dette forhindrer browser-specifikke problemer med talindtastning (såsom at skjule foranstillede nuler eller tilføje spinner-pile i desktop-browsere), mens der stadig indsamles en numerisk værdi.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — hint svæver som etiket
+
+`hint`-teksten vises inde i inputfeltet som en pladsholder. Når brugeren begynder at skrive, svæver den over feltet som en etiket.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — hint inde i inputfeltet
+
+Svarer til `floating_hint` — hintet befinder sig inde i inputfeltet, når det er tomt. Det svæver ikke op, når brugeren skriver.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — input i modal dialog
+
+Ved at trykke på feltet åbnes en modal dialog med et større inputfelt i stedet for at redigere direkte i linjen. Nyttigt på små skærme, hvor et inputfelt i fuld skærm er nemmere.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — live tegnoptælling
+
+Viser en live `(n)` tegnoptælling under inputfeltet, som opdateres, mens brugeren skriver.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr) — tilføj præfiks`
+
+Tilføjer en statisk eller beregnet streng foran den viste værdi. Den gemte værdi inkluderer ikke præfikset.
+
+```
+prefix('Vare nr. ')     → viser "Vare nr. 42", gemmer "42"
+prefix(${code_prefix})  → dynamisk præfiks fra et andet felt
+```
+
+---
+
+### `align_answer` — tekstjustering af input
+
+Styrer den horisontale justering af den indtastede værdi inde i inputfeltet.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — scan QR- / stregkode til feltet
+
+Tilføjer en knap til scanning af QR-koder ved siden af inputfeltet. Åbner kamerascanneren og udfylder feltet med den scannede numeriske værdi.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Hurtig reference til udseende
+
+| Appearance | Widget vist |
+|---|---|
+| *(ingen)* | Talindtastning (`type="number"`) — numerisk tastatur på mobilen |
+| `number-hspinner` | Horisontal − værdi + spinner, trin = 1 |
+| `number-hspinner hspinner(...)` | Spinner med brugerdefineret knapform og trin |
+| `number-hspinner colors(...)` | Spinner med brugerdefinerede knapfarver |
+| `thousandsep` | Visning af tal med tusindtalsseparator |
+| `digisep(n,"sep")` | Brugerdefineret cifregruppering |
+| `textonly` | Gennemtving teksttastatur |
+| `floating_hint` | Hint svæver over feltet, mens der skrives |
+| `embed` | Hint inde i inputfeltet |
+| `textpopup` | Tryk for at åbne modal dialog |
+| `charcount` | Live tegnoptælling under inputfeltet |
+| `prefix(expr)` | Tilføj statisk eller dynamisk præfiks |
+| `align_answer = left/right/center` | Tekstjustering af input |
+| `inputs{qrscan}` | Knap til scanning af QR-/stregkode |
+
+---
+
+## Begrænsninger og validering
+
+Brug begrænsninger (constraints) til at håndhæve værdiintervaller. Begrænsninger i kolonnen `constraint` evalueres efter hvert knaptryk i `number-hspinner`-tilstand, ikke kun når feltet forlades.
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| integer | age | Alder | `. > 0 and . <= 120` | Alder skal være mellem 1 og 120 |
+| integer | year | Byggeår | `. >= 1800 and . <= 2100` | Indtast et gyldigt årstal |
+| integer | count | Antal varer | `. >= 0` | Kan ikke være negativt |
+
+---
+
+## Eksempel — husstandsundersøgelse
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| integer | household_size | Antal personer i husstanden | `number-hspinner` | `. >= 1 and . <= 30` | Skal være mellem 1 og 30 |
+| integer | under_5 | Børn under 5 år | `number-hspinner` | `. >= 0 and . <= ${household_size}` | Kan ikke overstige husstandens størrelse |
+| integer | year_built | Årstal huset blev bygget | `textonly` | `. >= 1800 and . <= 2100` | Indtast et gyldigt årstal |
+
+---
+
+## Best practices
+
+1. Brug `number-hspinner` til optællinger med små intervaller, hvor det er hurtigere at klikke på ± end at skrive (f.eks. antal børn, point på en skala fra 1–10).
+2. Brug `thousandsep` ved visning af store heltal (befolkningstal, indkomst), så respondenterne selv kan tjekke størrelsesordenen.
+3. Brug `textonly`, når browsere tilføjer uønsket brugerflade til talindtastning (spinner-pile, touch scroll), som forvirrer respondenterne.
+4. Håndhæv intervalbegrænsninger i stedet for at stole på mobilens tastaturtype — håndhævelse via tastatur er ikke universel.
+
+## Begrænsninger
+
+- Indtastning af decimaler er blokeret — hvis du har brug for brøkværdier, skal du bruge typen `decimal`.
+- `number-hspinner` validerer `constraint` ved hvert knaptryk — undgå ressourcekrævende begrænsninger (f.eks. komplekse `if()`-kæder) i spinner-tilstand.
+- `thousandsep` og `digisep()` gemmer selve tallet uden formatering — stol ikke på den formaterede visningsværdi i beregninger.

@@ -1,77 +1,85 @@
 ---
 title: "Geoshape"
-description: "Pertanyaan geoshape memungkinkan responden menggambar bentuk pada peta, menangkap data geografis yang kompleks sebagai bagian dari survei."
+description: "Pertanyaan Geoshape menangkap poligon tertutup yang ditentukan oleh urutan titik GPS."
 ---
 
-Tipe pertanyaan geoshape dalam XLSForm dan rtSurvey memungkinkan responden menggambar bentuk (poligon) pada peta, menangkap data geografis yang kompleks. Fitur ini sangat berguna untuk memetakan area, mendefinisikan batas, atau menandai wilayah yang diminati dalam survei spasial.
+Tipe pertanyaan `geoshape` menangkap poligon tertutup — serangkaian koordinat GPS di mana titik pertama dan terakhir adalah sama. Dalam formulir web rtSurvey, ini dirender sebagai **input teks** di mana enumerator memasukkan atau menempelkan string koordinat secara langsung.
 
-## Spesifikasi XLSForm Dasar
+## Spesifikasi Dasar XLSForm
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geoshape | field_area  | Gambar batas ladang             |
+| type     | name        | label                            |
+|----------|-------------|----------------------------------|
+| geoshape | field_area  | Gambar batas lapangan            |
+| geoshape | zone        | Catat batas zona                 |
 
-Untuk detail lebih lanjut tentang tipe pertanyaan geoshape dasar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk spesifikasi standar lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
-## Penggunaan
-
-Pertanyaan geoshape umum digunakan untuk:
-
-1. Pemetaan batas ladang dalam survei pertanian
-2. Mendefinisikan area dampak lingkungan
-3. Menandai zona dalam studi perencanaan perkotaan
-4. Menguraikan wilayah untuk survei geologi
-5. Menangkap fitur geografis yang kompleks untuk analisis spasial
-
-## Praktik Terbaik
-
-1. Pastikan layanan lokasi perangkat diaktifkan dan izin diberikan.
-2. Berikan instruksi yang jelas tentang cara menggambar bentuk dan area apa yang harus disertakan.
-3. Pertimbangkan menggunakan citra satelit atau peta dasar untuk membantu responden menggambar bentuk secara akurat.
-4. Perhatikan potensi kompleksitas bentuk dan dampaknya pada ukuran dan pemrosesan data.
-
-## Contoh Penggunaan
-
-Berikut adalah contoh cara menggunakan pertanyaan geoshape dalam survei:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geoshape | forest_area    | Gambarkan batas patch hutan                | Gunakan setidaknya 3 titik untuk membuat bentuk tertutup |
-
-## Ekstensi rtSurvey
-
-Meskipun spesifikasi XLSForm dasar untuk pertanyaan geoshape sederhana, rtSurvey mungkin menawarkan fitur atau kustomisasi tambahan:
-
-1. Integrasi dengan peta offline untuk area terpencil
-2. Opsi untuk mengatur jumlah minimum dan maksimum titik untuk bentuk
-3. Kemampuan untuk mengedit atau menyempurnakan bentuk setelah penggambaran awal
-4. Dukungan untuk berbagai tipe bentuk (misalnya, persegi panjang, lingkaran) selain poligon bebas
+---
 
 ## Format Data
 
-Data geoshape biasanya disimpan sebagai string pasangan koordinat yang dipisahkan spasi, diapit dalam tanda kurung:
+Disimpan sebagai daftar titik yang dipisahkan titik koma dengan **tanpa spasi di sekitar titik koma**. Setiap titik terdiri dari empat nilai yang dipisahkan spasi:
 
 ```
-(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-Contoh:
+| Component | Description |
+|-----------|-------------|
+| `lat` | Lintang dalam derajat desimal |
+| `lon` | Bujur dalam derajat desimal |
+| `alt` | Ketinggian dalam meter (`0` jika tidak diketahui) |
+| `acc` | Akurasi GPS dalam meter (`0` jika tidak diketahui) |
+
+**Poligon harus tertutup** — titik terakhir harus sama dengan titik pertama.
+
+**Contoh — poligon empat titik (segitiga, tertutup):**
 ```
-(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
 ```
 
-## Pertimbangan untuk Analisis
+Minimal tiga titik berbeda ditambah pengulangan penutup diperlukan untuk membentuk poligon yang valid.
 
-Saat menggunakan pertanyaan geoshape, pertimbangkan:
+---
 
-1. Bagaimana data geografis akan divisualisasikan dan dianalisis (misalnya, perangkat lunak GIS)
-2. Potensi kebutuhan pembersihan data atau penyederhanaan bentuk yang kompleks
-3. Tindakan privasi dan perlindungan data untuk menangani data spasial yang terperinci
-4. Integrasi dengan sumber data spasial lain untuk analisis yang komprehensif
+## Cara perenderaan di rtSurvey
 
-## Keterbatasan
+Dalam formulir web rtSurvey, `geoshape` dirender sebagai **bidang teks** biasa. Enumerator mengetik atau menempelkan string koordinat. Tidak ada pemilih peta poligon interaktif bawaan untuk tipe ini dalam formulir web saat ini.
 
-- Menggambar bentuk yang akurat di layar mobile yang kecil bisa menjadi tantangan.
-- Bentuk yang kompleks mungkin memerlukan kapasitas penyimpanan dan pemrosesan yang signifikan.
-- Pertanyaan geoshape mungkin tidak cocok untuk semua jenis survei atau responden.
-- Mungkin ada kekhawatiran privasi terkait pengumpulan data spasial yang terperinci.
+### Mengumpulkan titik poligon secara interaktif
+
+Pola yang direkomendasikan untuk pengumpulan lapangan adalah **grup pengulangan (repeat group) dari pertanyaan `geopoint`** — setiap simpul menggunakan pemilih peta GPS lengkap — digabungkan dengan `calculate` untuk menghasilkan string geoshape:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | polygon_points | Catat setiap sudut | |
+| geopoint | point | Ketuk untuk mencatat sudut | |
+| end repeat | polygon_points | | |
+| calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
+
+Setelah digabungkan, tambahkan titik pertama secara manual untuk menutup poligon, atau gunakan calculate kedua untuk menggabungkannya.
+
+---
+
+## Contoh penggunaan
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geoshape | farm_boundary | Catat batas lapangan | Masukkan semua sudut yang dipisahkan oleh titik koma. Titik pertama dan terakhir harus sama. | yes |
+
+---
+
+## Praktik Terbaik
+
+1. Gunakan grup pengulangan dari pertanyaan `geopoint` untuk pengumpulan berbasis peta interaktif dan gabungkan nilainya — ini memberi enumerator pemilih GPS untuk setiap simpul.
+2. Selalu tutup poligon (ulangi titik pertama di akhir) sebelum mengirimkan.
+3. Sertakan format yang diharapkan di kolom `hint` saat entri koordinat manual diperlukan.
+4. Syaratkan setidaknya 3 titik sudut yang berbeda untuk poligon yang valid — terapkan ini melalui instruksi daripada batasan XLSForm.
+5. Gunakan `geopoint` untuk pertanyaan lokasi tunggal dan `geoshape` hanya jika demarkasi area adalah tujuan survei yang sebenarnya.
+
+## Keterbatasan (Limitations)
+
+- Tidak ada pemilih peta poligon interaktif bawaan untuk `geoshape` di formulir web rtSurvey.
+- Poligon harus ditutup secara manual — tidak ada mekanisme penutupan otomatis dalam mode input teks.
+- Memvalidasi topologi poligon (misalnya, tidak ada perpotongan sendiri, area minimum) memerlukan pemrosesan pasca di luar batasan XLSForm.
+- Batas panjang dengan banyak simpul menghasilkan string teks yang besar.

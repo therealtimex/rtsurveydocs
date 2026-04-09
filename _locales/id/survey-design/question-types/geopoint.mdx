@@ -1,77 +1,203 @@
 ---
 title: "Geopoint"
-description: "Pertanyaan geopoint menangkap koordinat geografis (lintang, bujur, ketinggian, dan akurasi) sebagai bagian dari survei."
+description: "Pertanyaan Geopoint menangkap koordinat geografis (lintang, bujur, ketinggian, dan akurasi) sebagai bagian dari survei."
 ---
 
-Tipe pertanyaan geopoint dalam XLSForm dan rtSurvey memungkinkan pengumpulan koordinat geografis menggunakan GPS perangkat atau layanan lokasi lainnya. Fitur ini sangat berguna untuk memetakan respons survei, melacak aktivitas lapangan, atau mengaitkan data dengan lokasi tertentu.
+Tipe pertanyaan `geopoint` menangkap koordinat geografis (lintang, bujur, ketinggian, akurasi) menggunakan GPS perangkat. rtSurvey merender pemilih dengan beberapa mode tata letak dan mendukung otomatisasi melalui parameter `inputs{}` dan `outputs{}`.
 
 ## Spesifikasi XLSForm Dasar
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geopoint | location    | Rekam lokasi saat ini           |
+| type     | name        | label                       |
+|----------|-------------|-----------------------------|
+| geopoint | location    | Catat lokasi saat ini       |
 
-Untuk detail lebih lanjut tentang tipe pertanyaan geopoint dasar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
-
-## Penggunaan
-
-Pertanyaan geopoint umum digunakan untuk:
-
-1. Pemetaan respons survei secara geografis
-2. Verifikasi lokasi aktivitas lapangan
-3. Pelacakan rute enumerator
-4. Mengaitkan data lingkungan atau sosial dengan lokasi tertentu
-5. Menghitung jarak atau area dalam analisis geografis
-
-## Praktik Terbaik
-
-1. Pastikan layanan lokasi perangkat diaktifkan dan izin diberikan.
-2. Berikan waktu yang cukup bagi GPS untuk mendapatkan akurasi yang baik.
-3. Pertimbangkan implikasi privasi dan informasikan responden tentang pengumpulan data lokasi.
-4. Gunakan bersama dengan tipe pertanyaan lain untuk memberikan konteks pada data lokasi.
-
-## Contoh Penggunaan
-
-Berikut adalah contoh cara menggunakan pertanyaan geopoint dalam survei:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geopoint | sample_location| Rekam lokasi pengambilan sampel            | Berdiri di area terbuka untuk sinyal GPS yang lebih baik |
-
-## Ekstensi rtSurvey
-
-Meskipun spesifikasi XLSForm dasar untuk pertanyaan geopoint sederhana, rtSurvey mungkin menawarkan fitur atau kustomisasi tambahan:
-
-1. Integrasi peta untuk konfirmasi visual lokasi yang diambil
-2. Pengaturan ambang akurasi
-3. Opsi untuk memasukkan koordinat secara manual
-4. Integrasi dengan peta offline untuk area terpencil
+Untuk spesifikasi standar, lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
 ## Format Data
 
-Data geopoint biasanya disimpan sebagai string dari empat nilai yang dipisahkan spasi:
+Disimpan sebagai empat nilai yang dipisahkan spasi:
 
 ```
-lintang bujur ketinggian akurasi
+latitude longitude altitude accuracy
+```
+
+Contoh: `13.756331 100.501762 15 8`
+
+---
+
+## Mode tata letak (Layout modes)
+
+### Default — tombol persegi panjang
+
+Tombol persegi panjang "START GEOPOINT" membuka modal peta lengkap di mana enumerator memilih titik. Setelah penangkapan, label tombol berubah menjadi "View or change geo point" dan koordinat muncul di bawahnya.
+
+Tidak diperlukan nilai penampilan (appearance).
+
+---
+
+### `display{inline-icon}` — tombol crosshairs melingkar
+
+Merender tombol ikon melingkar (crosshairs ⊕) alih-alih tombol persegi panjang. Mengetuknya akan membuka modal peta yang sama.
+
+```
+display{inline-icon}
+```
+
+**Dikombinasikan dengan posisi dan ukuran:**
+
+```
+display{inline-icon, left}           → tombol di kiri label
+display{inline-icon, top}            → tombol di atas label
+display{inline-icon, bottom}         → tombol di bawah label, di tengah
+display{inline-icon, large}          → ikon besar (75px)
+display{inline-icon, medium}         → ikon sedang (50px)
+display{inline-icon, left, large}    → tombol besar di sebelah kiri
+```
+
+| Size | Icon height/width |
+|------|------------------|
+| *(default)* | 25px |
+| `medium` | 50px |
+| `large` | 75px |
+
+---
+
+### `display{thumbnail-square}` — thumbnail peta langsung
+
+Merender pratinjau peta langsung (Leaflet) langsung pada pertanyaan, bukan tombol. Thumbnail menunjukkan posisi GPS saat ini dan titik yang dipilih. Mengetuk tombol perluas akan membuka modal lengkap.
+
+```
+display{thumbnail-square}
+```
+
+**Ukuran thumbnail khusus:**
+
+```
+display{thumbnail-square-[WxH]}          → piksel tetap
+display{thumbnail-square-[400x200]}      → lebar 400px × tinggi 200px
+
+display{thumbnail-square-[W%xH%]}        → persentase lebar formulir
+display{thumbnail-square-[100%x30%]}     → lebar penuh × 30% dari lebar formulir
+```
+
+---
+
+## `display{}` vs `results{}` — sebelum dan sesudah penangkapan
+
+`display{}` mengontrol tata letak **sebelum** pengguna menangkap lokasi. `results{}` mengontrol tata letak **setelah** ada nilai. Keduanya dapat memiliki penyelarasan yang berbeda.
+
+```
+display{inline-icon, right} results{left}
+```
+
+Ini merender tombol di sebelah kanan sebelum penangkapan, lalu memindahkannya ke kiri setelah titik dicatat.
+
+### `hide(value)` — menyembunyikan tampilan koordinat
+
+Secara default, teks lintang/bujur/akurasi/ketinggian yang ditangkap ditampilkan di bawah tombol. Sembunyikan dengan:
+
+```
+results{hide(value)}
+display{inline-icon} results{hide(value)}
+```
+
+---
+
+## `inputs{}` — otomatisasi GPS
+
+### Penangkapan otomatis saat memuat
+
+Mencatat posisi GPS secara otomatis saat formulir dimuat, tanpa enumerator menekan apa pun.
+
+```
+inputs{auto-take}
+```
+
+**Penangkapan otomatis bersyarat** menggunakan ekspresi XLSForm:
+
+```
+inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
+```
+
+### Isi awal dari bidang teks
+
+Isi geopoint dari pertanyaan yang berisi nama tempat atau string alamat. rtSurvey melakukan geocode balik string tersebut ke koordinat melalui OpenStreetMap Nominatim.
+
+```
+inputs{question(address_field)}
+```
+
+---
+
+## `outputs{}` — geocode balik ke teks
+
+Setelah titik ditangkap, secara otomatis isi pertanyaan `text` dengan alamat yang dapat dibaca manusia (di-geocode balik dari koordinat).
+
+```
+outputs{question(address_field)}
 ```
 
 Contoh:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | location | Catat lokasi | `outputs{question(address_text)}` |
+| text | address_text | Alamat | |
+
+---
+
+## `nomap` — penangkapan GPS tanpa peta
+
+Mengganti modal peta dengan dialog sederhana yang meminta izin lokasi dan mencatat koordinat. Tidak ada peta yang ditampilkan. Berguna untuk penangkapan GPS saja pada perangkat kelas bawah atau saat ubin peta tidak tersedia secara offline.
+
 ```
-41.40338 2.17403 30.5 10
+nomap
 ```
 
-## Pertimbangan untuk Analisis
+---
 
-Saat menggunakan pertanyaan geopoint, pertimbangkan:
+## Gaya tombol khusus (Custom button style)
 
-1. Bagaimana data geografis akan divisualisasikan (misalnya, perangkat lunak pemetaan)
-2. Akurasi koordinat yang dikumpulkan dan dampaknya pada analisis
-3. Tindakan privasi dan perlindungan data untuk menangani data lokasi
-4. Potensi integrasi dengan alat GIS (Sistem Informasi Geografis)
+Gunakan `styleButton()` untuk menerapkan CSS khusus ke tombol persegi panjang default:
 
-## Keterbatasan
+```
+styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
+```
 
-- Akurasi dapat bervariasi tergantung pada perangkat dan kondisi lingkungan.
-- Sinyal GPS mungkin lemah atau tidak tersedia di lokasi dalam ruangan atau area dengan hambatan.
-- Pengumpulan data lokasi dapat secara signifikan memengaruhi baterai perangkat.
-- Mungkin ada kekhawatiran privasi terkait pengumpulan data lokasi yang tepat.
+---
+
+## Menyembunyikan label
+
+```
+text-nolabel display{inline-icon, center, large}
+```
+
+---
+
+## Contoh penggunaan
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | field_loc | Catat lokasi lapangan | `display{inline-icon, right, large}` |
+| geopoint | site | Lokasi situs | `display{thumbnail-square-[100%x30%]}` |
+| geopoint | auto_loc | Posisi saat ini | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | mapped_loc | Lokasi | `display{inline-icon} outputs{question(address)}` |
+| geopoint | gps_only | Titik GPS | `nomap` |
+
+---
+
+## Praktik Terbaik
+
+1. Gunakan `inputs{auto-take}` untuk survei verifikasi enumerator di mana GPS wajib — ini menghapus langkah manual.
+2. Gunakan `display{thumbnail-square}` jika Anda ingin enumerator mengonfirmasi titik yang dipilih secara visual sebelum melanjutkan.
+3. Pasangkan `outputs{question(...)}` dengan bidang `text` hanya-baca untuk menunjukkan alamat yang di-geocode balik kepada enumerator.
+4. Gunakan `nomap` di area tanpa konektivitas internet di mana ubin peta tidak dapat dimuat.
+5. Beri waktu bagi GPS untuk stabil sebelum merekam — akurasi di bawah 10m biasanya cukup untuk survei lapangan.
+
+## Batasan
+
+- Geocoding `inputs{question(name)}` memerlukan akses internet — ini memanggil API OpenStreetMap Nominatim.
+- Reverse geocoding `outputs{question(name)}` juga memerlukan akses internet.
+- Thumbnail peta (`display{thumbnail-square}`) memerlukan internet untuk memuat ubin; koordinat tetap ditangkap secara offline.
+- Akurasi GPS bervariasi menurut perangkat dan lingkungan — kondisi dalam ruangan atau ngarai perkotaan dapat menghasilkan akurasi > 50m.
+- Mengumpulkan data lokasi dapat berdampak signifikan pada masa pakai baterai perangkat selama survei yang lama.

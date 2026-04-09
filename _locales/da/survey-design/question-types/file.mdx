@@ -1,35 +1,35 @@
 ---
 title: "Fil"
-description: "Filspørgsmål giver respondenter mulighed for at uploade dokumenter og andre filer som en del af deres undersøgelsessvar."
+description: "Fil-spørgsmål giver respondenter mulighed for at uploade dokumenter og andre filer som en del af deres svar på undersøgelsen."
 ---
 
-Spørgsmålstypen `file` giver respondenter mulighed for at **uploade enhver fil** fra deres enhed — dokumenter, regneark, PDF-filer eller andre filtyper. I modsætning til `image`, `audio` og `video`, der starter specifikke optagelsesværktøjer, åbner `file` en generel filpicker.
+Spørgsmålstypen `file` giver respondenter mulighed for at **uploade enhver fil** fra deres enhed — dokumenter, regneark, PDF-filer eller andre filtyper. I modsætning til `image`, `audio` og `video`, som starter specifikke optagelsesværktøjer, åbner `file` en generel filvælger.
 
 ## Grundlæggende XLSForm-specifikation
 
 | type | name      | label                        |
 |------|-----------|------------------------------|
-| file | document  | Upload venligst dit dokument  |
+| file | document  | Upload venligst dit dokument |
 
-For flere detaljer om standard fil-spørgsmålstypen, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+For flere detaljer om standard filspørgsmålstypen, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
 
 ## Anvendelser
 
-Filspørgsmål bruges typisk til:
+Fil-spørgsmål bruges ofte til:
 
-1. Indsamling af støttedokumenter (kvitteringer, certifikater, kontrakter, rapporter)
-2. Upload af udfyldte papirformularer, der er scannet
-3. Indsamling af regneark eller dataeksporter fra andre systemer
+1. Indsamling af bilag (kvitteringer, certifikater, kontrakter, rapporter)
+2. Upload af udfyldte papirformularer, der er blevet scannet
+3. Indsamling af regneark eller dataeksport fra andre systemer
 4. Enhver digital filtype, som billede/lyd/video ikke dækker
 
-## Dataformat
+## Datatransformat
 
-Uploadede filer gemmes som binære vedhæftninger:
+Uploadede filer gemmes som binære vedhæftede filer:
 
-- **Format:** Bevaret i originalformat (PDF, XLSX, DOCX osv.)
-- **Navngivning:** `{instanceID}-{feltnavn}.{filtypenavn}`
-- **Lagring:** Uploadet til serverens mediemappe ved siden af indsendelsen
-- **Adgang:** Kan downloades fra indsendelseshåndteringsgrænsefladen
+- **Format:** Bevares i originalt format (PDF, XLSX, DOCX osv.)
+- **Navngivning:** `{instanceID}-{fieldname}.{extension}`
+- **Lagring:** Uploadet til serverens mediemappe sammen med indsendelsen
+- **Adgang:** Kan downloades fra brugerfladen til administration af indsendelser
 
 ## rtSurvey-udvidelser
 
@@ -42,11 +42,11 @@ Brug kolonnen `parameters` til at begrænse, hvilke filtyper der kan vælges:
 | file | report | Upload inspektionsrapporten | `accept=.pdf` |
 | file | spreadsheet | Upload datafilen | `accept=.xlsx,.csv` |
 
-Parameteren `accept` bruger standard filtype-syntaks (kommasepareret).
+Parameteren `accept` bruger standard syntaks for filendelser (kommasepareret).
 
 ### Vejledning om filstørrelse
 
-rtSurvey håndhæver ikke en hård filstørrelsesgrænse på spørgsmålsniveau, men serverens uploadgrænse gælder. Brug `hint` til at kommunikere forventninger til intervieweren:
+rtSurvey håndhæver ikke en hård grænse for filstørrelse på spørgsmålsniveau, men serverens uploadgrænse gælder. Brug `hint` til at kommunikere forventninger til tælleren (enumerator):
 
 | type | name | label | hint |
 |------|------|-------|------|
@@ -54,15 +54,57 @@ rtSurvey håndhæver ikke en hård filstørrelsesgrænse på spørgsmålsniveau,
 
 ### Integration med enhedens filsystem og cloud-lagring
 
-På Android og iOS åbner `file`-spørgsmålet enhedens native filpicker, som kan give adgang til:
-- Lokal enhedslagring
+På Android og iOS åbner spørgsmålet `file` enhedens oprindelige filvælger, som kan omfatte adgang til:
+- Lokal lagring på enheden
 - SD-kort (Android)
 - iCloud Drive (iOS)
 - Google Drive, Dropbox (hvis installeret)
 
-På web åbnes browserens standard filupload-dialog.
+På web åbner det browserens standarddialog til filupload.
 
-## Eksempler på brug
+### Inline-knaplayout (Inline button layout)
+
+Tilføj `inline` for at rungere uploaden som en **cirkulær ikonknap** ved siden af etiketten i stedet for en filvælger i fuld bredde.
+
+```
+| type | name | label           | appearance                              |
+|------|------|-----------------|-----------------------------------------|
+| file | doc  | Upload dokument | inline display{right}                   |
+| file | doc  | Upload dokument | inline display{left, large}             |
+| file | doc  | Upload dokument | inline display{center, large, <0099FF/>} |
+```
+
+**Knapposition** — `left`, `right` *(standard)*, `top`, `center`, `bottom`
+
+**Knapstørrelse** — `small` *(standard)*, `medium`, `large`
+
+**Knapfarve** — tilføj en hex-farve inde i `display{}` for at overskrive den primære farve:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Kontrol efter optagelse — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Skjuler upload-knappen, efter en fil er vedhæftet |
+| `results{hide(review)}` | Skjuler knappen til gennemsyn/forhåndsvisning efter upload |
+| `results{hide(filename)}` | Skjuler filnavnet, der vises efter upload |
+| `results{left}` | Flytter ikonet til venstre efter upload |
+
+Eksempel — skjul upload-knap efter fil er vedhæftet:
+```
+inline display{right} results{hide(capture)}
+```
+
+### Undertrykke etiketten (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
+
+## Eksempel på brug
 
 ### Påkrævet PDF-upload
 
@@ -74,26 +116,26 @@ På web åbnes browserens standard filupload-dialog.
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| select_one janer | has_land_title | Har husstanden en landejendomsret? | |
-| file | land_title_doc | Upload et foto eller scan af landejendomsretten | `${has_land_title} = 'yes'` |
+| select_one yesno | has_land_title | Har husstanden et skøde? | |
+| file | land_title_doc | Upload et billede eller en scanning af skødet | `${has_land_title} = 'yes'` |
 
-## Bedste praksis
+## Best Practices
 
-1. Brug `accept` til at begrænse filtyper — dette forhindrer interviewere i at uploade forkerte filer ved en fejl.
-2. Inkluder altid størrelses- og formatvejledning i kolonnen `hint`.
-3. For fotos og billeder skal du bruge `image`-typen i stedet — den tilbyder bedre komprimering og ensartet formathåndtering.
-4. For store undersøgelser med filvedhæftninger skal du planlægge din datalagring og downloadbåndbredde i overensstemmelse hermed.
-5. Test filpickeren på målenheden (Android vs. iOS vs. web) inden udrulning — adgang til cloud-drev varierer.
+1. Brug `accept` til at begrænse filtyper — dette forhindrer tællere i at uploade forkerte filer ved en fejl.
+2. Inkluder altid vejledning om størrelse og format i kolonnen `hint`.
+3. For fotos og billeder skal du bruge typen `image` i stedet — det giver bedre komprimering og konsistent formathåndtering.
+4. For store undersøgelser med filvedhæftninger skal du planlægge din datalagring og download-båndbredde derefter.
+5. Test filvælgeren på den pågældende enhedstype (Android vs. iOS vs. web) før implementering — adgangen til cloud-drev varierer.
 
 ## Overvejelser om datahåndtering
 
-- Filer gemmes i deres originalformat; de konverteres eller komprimeres ikke af rtSurvey.
+- Filer gemmes i deres oprindelige format; de bliver ikke konverteret eller komprimeret af rtSurvey.
 - Analyser filer efter download — rtSurvey udtrækker eller indekserer ikke filindhold.
-- Store filvedhæftninger øger betydeligt den tid, der kræves for at downloade et fuldt datasæt.
+- Store filvedhæftninger øger markant den tid, det tager at downloade et komplet datasæt.
 
-## Begrænsninger
+## Begrænsninger (Limitations)
 
-- Filspørgsmål validerer ikke filindhold — kun filtypekontrollen via `accept` håndhæves på UI-niveau.
-- Meget store filer (100 MB+) kan time ud ved upload i miljøer med lav forbindelseskvalitet.
-- Offline-interviewere kan vedhæfte filer, men de uploades ikke, før forbindelsen er genoprettet.
-- Nogle enhedskonfigurationer begrænser adgangen til visse lagerplaceringer (f.eks. virksomheders MDM-politikker).
+- Fil-spørgsmål validerer ikke filindhold — kun tjek af filendelse via `accept` håndhæves på brugerfladeniveau.
+- Meget store filer (100 MB+) kan få timeout ved upload i miljøer med lav forbindelse.
+- Offline-tællere kan vedhæfte filer, men de vil ikke blive uploadet, før forbindelsen er genoprettet.
+- Nogle enhedskonfigurationer begrænser adgangen til visse lagringslokationer (f.eks. virksomheders MDM-politikker).

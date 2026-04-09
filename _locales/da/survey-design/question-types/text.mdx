@@ -1,11 +1,9 @@
 ---
 title: "Tekst"
-description: "Fritekst-svar spørgsmålstype i rtSurvey"
+description: "Spørgsmålstype til svar med fri tekst i rtSurvey"
 ---
 
-Spørgsmålstypen `text` indsamler et fritekst-svar — enhver tegnstreng. Det er den mest fleksible inputtype og bruges til navne, adresser, beskrivelser, koder og alt, der ikke passer til en mere specifik type.
-
-rtSurvey udvider også `text` med **tidsinputwidgetter**, der muliggør præcis tidsindtastning med en urpicker.
+Spørgsmålstypen `text` indsamler en streng med fri tekst. Det er den mest fleksible inputtype og understøtter et stort antal udseendevarianter, der ændrer, hvordan inputfeltet vises — fra et simpelt enkeltlinjefelt til tale-til-tekst, pop-up-dialoger, RTF-editorer og numeriske spinnere.
 
 ## Grundlæggende XLSForm-specifikation
 
@@ -14,97 +12,340 @@ rtSurvey udvider også `text` med **tidsinputwidgetter**, der muliggør præcis 
 | text | respondent_name | Respondentens fulde navn |
 | text | address | Hjemmeadresse |
 
-For flere detaljer om standard XLSForm-teksttypen, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+For standard-specifikationen se [XLSForm-dokumentationen](https://xlsform.org/en/#question-types).
 
-## Anvendelser
+---
 
-Tekstspørgsmål bruges til:
+## Layouttilstande
 
-1. Navne, adresser, frie beskrivelser
-2. Åbne kommentarer eller feedback
-3. Koder, ID'er eller referencenumre, der ikke passer til integer/decimal
-4. Indsamling af tidsværdier med rtSurveys tidsinputudvidelser
-5. Autoudfyldningstekstfelter (via `search-autocomplete-noedit-v2()`)
+### Standard — enkeltlinjet input
 
-## Standard appearance-muligheder
+Intet udseende (appearance) påkrævet. Viser et standard `<input type="text">` felt.
+
+---
+
+### `multiline` — tekstområde
+
+Viser et tekstområde med flere linjer. Brugeren kan udvide det ved at skrive; det vokser automatisk.
+
+```
+multiline
+```
+
+**Styr rækkehøjden** ved at tilføje `[initRows, maxRows]`:
+
+```
+multiline [3,8]     → starter med 3 rækker, udvides til 8
+multiline [5]       → fastlåst på 5 rækker
+```
+
+Standard er 1 række uden maksimum. Skift+Enter indsætter et linjeskift; Enter går videre til næste spørgsmål.
+
+---
+
+### `floating_hint` — hint svæver som etiket
+
+`hint`-teksten vises inde i inputfeltet som en pladsholder. Når brugeren begynder at skrive, svæver hintet op over feltet som en etiket.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — hint inde i inputfeltet
+
+Svarer til `floating_hint` — hintet vises inde i inputfeltet, når feltet er tomt. Det svæver ikke, når der skrives.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — input i modal dialog
+
+Ved at trykke på feltet åbnes en SweetAlert-modal dialog med et stort inputfelt i stedet for at redigere direkte i linjen. Nyttigt på mobilen for at give mere skærmplads til at skrive.
+
+```
+textpopup
+```
+
+---
+
+### `richtext` — WYSIWYG-editor
+
+Viser en fuld RTF-editor (Monaco / Draft.js). Respondenten kan skrive med fed, kursiv, tilføje lister osv. Den gemte værdi er HTML.
+
+```
+richtext
+richtext(30%)       → editor-højde på 30% af skærmområdet
+```
+
+---
+
+### `charcount` — live tegnoptælling
+
+Tilføjer en `(n)` tegnoptælling under inputfeltet, som opdateres, mens brugeren skriver.
+
+```
+charcount
+multiline charcount
+```
+
+---
+
+## Numeriske inputvarianter
+
+Disse udseender fungerer på typen `text` for at indsamle tal med speciel formatering eller interaktionsmønstre.
+
+### `numbers` — numerisk tastatur
+
+Gennemtvinger HTML-inputtypen `number`, hvilket aktiverer et numerisk tastatur på mobilen.
+
+```
+numbers
+```
+
+### `thousandsep` — tusindtalsseparator
+
+Viser tallet med tusindtalsseparator (f.eks. `1.234.567`), mens selve tallet gemmes. Inputtypen gennemtvinges til `text` for at tillade visning af separatoren.
+
+```
+thousandsep
+```
+
+### `digisep(n, "sep")` — brugerdefineret cifregruppering
+
+Grupperer cifre i blokke af `n` adskilt af et brugerdefineret tegn. Nyttigt til telefonnumre, ID-numre osv.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+### `number-hspinner` — horisontal spinner
+
+Erstatter inputfeltet med en horisontal **− værdi +** spinner. Brugeren trykker på minus-/plus-knapperne for at reducere eller øge værdien. Fungerer med typerne `int` og `decimal`.
+
+```
+number-hspinner
+```
+
+**Tilpas knappernes udseende** ved hjælp af `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','1')
+```
+
+Parametre: venstre knapform, højre knapform, trinværdi.
+
+**Brugerdefinerede farver** ved hjælp af `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Fire farveværdier: venstre-bg, venstre-ikon, højre-bg, højre-ikon.
+
+### `prefix(expr)` — tilføj præfiks
+
+Tilføjer en beregnet eller statisk streng foran den viste værdi. Den gemte værdi inkluderer ikke præfikset.
+
+```
+prefix('DKK ')      → viser "DKK 100", gemmer "100"
+prefix(${currency}) → dynamisk præfiks fra et andet felt
+```
+
+### `textonly` — gennemtving tekst-inputtype
+
+Gennemtvinger `type="text"`, selv når feltet er `integer` eller `decimal`. Nyttigt for at undgå browser-specifikke problemer med talindtastning.
+
+```
+textonly
+```
+
+---
+
+## Teksttransformation
+
+Disse udseender transformerer automatisk værdien, mens brugeren skriver.
+
+| Appearance | Effekt | Eksempel input → gemt |
+|---|---|---|
+| `upper` | Konverterer til STORE BOGSTAVER | `hej` → `HEJ` |
+| `lower` | Konverterer til små bogstaver | `HEJ` → `hej` |
+| `proper` | Konverterer til Stort Begyndelsesbogstav | `hans hansen` → `Hans Hansen` |
+
+---
+
+## Hjælpeværktøjer til inputoptagelse
+
+### `inputs{stt}` — tale-til-tekst
+
+Tilføjer en mikrofonknap ved siden af inputfeltet. Ved at trykke på den startes browserens talegenkendelse (Web Speech API). Den transskriberede tekst føjes til feltet.
+
+```
+inputs{stt}
+```
+
+Ikke understøttet i Safari. Kræver mikrofontilladelse.
+
+### `inputs{qrscan}` — QR- / stregkodescanner
+
+Tilføjer en knap til scanning af QR-koder ved siden af inputfeltet. Åbner kamerascanner-modalen og udfylder feltet med den scannede værdi.
+
+```
+inputs{qrscan}
+```
+
+**Tokenize** (tilføj scannede værdier i stedet for at erstatte):
+
+```
+inputs{qrscan} append(${separator})
+```
+
+### `inputs{stt,qrscan}` — både tale og scanning
+
+Viser både mikrofon- og QR-scanningsknapperne side om side.
+
+```
+inputs{stt,qrscan}
+inputs{qrscan,stt}
+```
+
+---
+
+## Valg-linkede varianter
+
+Disse udseender linker et tekstfelt til en `select_one`-valgliste, så brugeren enten kan vælge fra listen eller skrive frit.
+
+### `selection_one_hide` — rullelistevælger
+
+Viser tekstfeltet med en rullepil. Ved at trykke på pilen vises valgmuligheder fra den linkede `search()`-liste. Ved valg af en mulighed udfyldes feltet og låses (viser ✕ for at rydde).
+
+```
+selection_one_hide
+```
+
+### `selection_one_show` — radioliste nedenunder
+
+Viser tekstfeltet med radioknapper nedenunder. Ved valg af en radioknap udfyldes og låses feltet.
+
+```
+selection_one_show
+```
+
+Begge varianter kræver et `search()`-udtryk i kolonnen `calculation` for at definere valglisten.
+
+---
+
+## Svarjustering
+
+Styrer den horisontale justering af den indtastede tekst i feltet.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+## Tid-inputwidget (indbygget ur)
+
+rtSurvey udvider `text` med en ur-vælger-widget. Disse udseender viser et ur-ikon, som intervieweren trykker på for at vælge en tidsværdi. Værdien gemmes som almindelig tekst i det valgte format.
+
+### Appearances (Udseende)
 
 | Appearance | Beskrivelse |
-|------------|-------------|
-| *(ingen)* | Enkeltlinjet tekstinput |
-| `multiline` | Flerlinjers tekstområde — bedst til længere fritekst på web |
+|---|---|
+| `inline` | Ur-ikonknap ved siden af feltet, åbner modal |
+| `inline-onlyresult` | Ur-ikonet forsvinder efter valg |
+| `inline-1line` | Kompakt tidsspinner på én linje |
+| `inline colors("RRGGBB")` | Ur-ikon med brugerdefineret farve |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Spinner med to accentfarver |
 
-## rtSurvey-tidsinputudvidelser
+### Format-tokens
 
-rtSurvey udvider `text` med en **urpicker-widget** til indsamling af tidsværdier. Disse appearance-muligheder viser et urikon, intervieweren kan trykke på for at vælge timer, minutter, sekunder eller millisekunder.
+Tilføj `-[format]` for at styre, hvilke tidskomponenter der vises og gemmes:
 
-### Appearance-varianter
-
-| Appearance | Beskrivelse |
-|------------|-------------|
-| `inline` | Urikon vist ved siden af feltet |
-| `inline colors("RRGGBB")` | Urikon med brugerdefineret hexfarve |
-| `inline-1line` | Ur vist i kompakt enkeltradformat |
-| `inline-1line-RRGGBB` | Enkeltrad med brugerdefineret ikonfarve (hex, ingen `#`) |
-| `inline-1line colors("RRGGBB","RRGGBB")` | Enkeltrad med to farver |
-| `inline-onlyresult` | Urikon forsvinder efter valg; kun værdien vises |
-| `inline-onlyresult colors("RRGGBB")` | Samme, med brugerdefineret ikonfarve |
-
-### Tidsformattokens
-
-Tilføj en formatstreng i parentes for at styre, hvilke tidskomponenter der vises:
-
-| Formatstreng | Viser |
-|--------------|-------|
-| `inline-[%H:%M]` | Timer og minutter (24-timers) |
-| `inline-[%h:%M]` | Timer og minutter (12-timers) |
-| `inline-[%H:%M:%S]` | Timer, minutter, sekunder (24-timers) |
-| `inline-[%h:%M:%S]` | Timer, minutter, sekunder (12-timers) |
-| `inline-[%H:%M:%3]` | Timer, minutter, millisekunder |
-| `inline-[%M:%S]` | Kun minutter og sekunder |
-| `inline-[%M:%3]` | Kun minutter og millisekunder |
+| Format | Viser |
+|---|---|
+| `inline-[%H:%M]` | Timer : Minutter (24t) |
+| `inline-[%h:%M]` | Timer : Minutter (12t) |
+| `inline-[%H:%M:%S]` | Timer : Minutter : Sekunder (24t) |
+| `inline-[%M:%S]` | Minutter : Sekunder |
+| `inline-[%H:%M:%3]` | Timer : Minutter : Millisekunder |
 | `inline-[%S]` | Kun sekunder |
 | `inline-[%3]` | Kun millisekunder |
-| `inline-[%H]` | Kun timer (24-timers) |
-| `inline-[%h]` | Kun timer (12-timers) |
+| `inline-[%H]` | Kun timer (24t) |
 
-### Eksempel: Registrer en opgavevarighed i minutter og sekunder
+### Knapposition med `display{}`
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | task_duration | Tid brugt på at gennemføre opgaven | `inline-[%M:%S]` |
+Samme som andre inline-typer — styrer position og størrelse af ur-knappen:
 
-### Eksempel: Registrer en hændelsestid i 24-timers format med brugerdefineret farve
+```
+inline display{right}
+inline display{center, large}
+inline-onlyresult display{left, medium, #0099FF}
+```
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | event_time | Tidspunkt for hændelse | `inline-1line colors("0099FF")` |
+---
 
-## Dataformat
+## Hurtig reference til udseende
 
-Tekstdata gemmes og eksporteres som en ren streng. For tidsbaserede input ved brug af inline urwidgetten gemmes værdien i det format, der matcher den valgte formatstreng (f.eks. `14:32` for `%H:%M`).
+| Appearance | Widget vist |
+|---|---|
+| *(ingen)* | Enkeltlinjet tekstfelt |
+| `multiline` | Tekstområde |
+| `multiline [n,m]` | Tekstområde med styring af rækker |
+| `floating_hint` | Hint svæver som etiket, når der skrives |
+| `embed` | Hint inde i inputfeltet |
+| `textpopup` | Tryk for at åbne modal dialog |
+| `richtext` / `richtext(height)` | WYSIWYG RTF-editor |
+| `charcount` | Live tegnoptælling under inputfeltet |
+| `numbers` | Numerisk tastatur |
+| `thousandsep` | Tusindtals-formatering |
+| `digisep(n,"sep")` | Brugerdefineret cifregruppering |
+| `number-hspinner` | Horisontal − værdi + spinner |
+| `prefix(expr)` | Tilføj statisk eller beregnet præfiks |
+| `upper` / `lower` / `proper` | Automatisk konvertering af store/små bogstaver |
+| `inputs{stt}` | Tale-til-tekst mikrofonknap |
+| `inputs{qrscan}` | Knap til scanning af QR-/stregkode |
+| `inputs{stt,qrscan}` | Både mikrofon- og scanningsknapper |
+| `selection_one_hide` | Rullelistevælger fra valgliste |
+| `selection_one_show` | Radioliste under inputfeltet |
+| `align_answer = left/right/center` | Svartekst-justering |
+| `inline-[%H:%M]` | Ur-vælger — tidsindsamling |
+| `inline-1line` | Kompakt tidsspinner |
 
-## Restriktioner og validering
+---
 
-Anvend restriktioner til at håndhæve format, længde eller mønster:
+## Begrænsninger og validering
+
+Brug begrænsninger (constraints) til at håndhæve format, længde eller mønster:
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| text | name | Fuldt navn | `string-length(.) >= 2` | Navn skal indeholde mindst 2 tegn |
-| text | code | Referencekode | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Indtast 2 store bogstaver efterfulgt af 4 cifre |
+| text | name | Fulde navn | `string-length(.) >= 2` | Mindst 2 tegn påkrævet |
+| text | code | Referencekode | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 store bogstaver + 4 cifre |
 | text | phone | Telefonnummer | `regex(., '^[0-9]{9,15}$')` | Indtast et gyldigt telefonnummer |
 
-## Bedste praksis
+---
 
-1. Brug mere specifikke typer (`integer`, `decimal`, `date`), når data har en kendt struktur — dette forhindrer ugyldige indtastninger og forenkler analysen.
-2. Tilføj `constraint` med `string-length()` eller `regex()` til at validere koder eller ID'er.
-3. Brug `multiline` appearance til åbne spørgsmål, hvor respondenter kan skrive flere sætninger.
-4. Til tidsindsamling skal du vælge de tidsformattokens, der matcher den præcision, din analyse kræver — indsamling af millisekunder, når du kun har brug for minutter, spilder interviewerens indsats.
+## Best practices
 
-## Platformunderstøttelse
-
-Tekstspørgsmålstypen og alle tidsinputappearances understøttes på iOS, Android og webplatforme.
+1. Brug mere specifikke typer (`integer`, `decimal`, `date`), når data har en kendt struktur — dette forhindrer ugyldige indtastninger.
+2. Brug `multiline [3,8]` til åbne spørgsmål for at give respondenterne plads til at skrive uden at fylde hele skærmen.
+3. Brug `thousandsep` eller `digisep()` i stedet for `numbers`, når du har brug for formateret visning — `numbers` alene ændrer kun tastaturet.
+4. Brug `inputs{qrscan}` for at eliminere manuelle indtastningsfejl for koder, ID'er og serienumre.
+5. Brug `floating_hint`, når hintet er vigtig kontekst, der skal forblive synlig, mens der skrives — standard-hints forsvinder fra visningen på små skærme.
+6. Brug `charcount` ved spørgsmål med længdebegrænsninger, så respondenterne selv kan holde øje med det.
 
 ## Begrænsninger
 
-- Tekstsvar er friformatteret — der er ingen indbygget stavekontrol eller ordforrådsrestriktion ud over regex-mønstre.
-- Inline-tidswidgetten er en rtSurvey-udvidelse og er ikke en del af standard XLSForm-specifikationen.
+- `inputs{stt}` kræver en browser, der understøtter Web Speech API. Chrome er den mest pålidelige; Safari understøttes ikke.
+- `richtext` gemmer HTML — planlæg fjernelse af HTML-tags eller sanering i din analyseproces, hvis der forventes almindelig tekst.
+- `selection_one_hide` og `selection_one_show` kræver et `search()`-udtryk og understøttes kun i webklienten.
+- `number-hspinner` validerer mod kolonnen `constraint` ved hvert knaptryk, ikke kun når feltet forlades — design begrænsninger derefter.

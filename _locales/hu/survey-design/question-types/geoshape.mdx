@@ -1,77 +1,85 @@
 ---
 title: "Geoshape"
-description: "A geoshape kérdések lehetővé teszik a válaszadók számára, hogy alakzatokat rajzoljanak a térképre, összetett földrajzi adatokat rögzítve."
+description: "A geoshape kérdések egy GPS-pontok sorozatával meghatározott zárt poligont rögzítenek."
 ---
 
-Az XLSForm és az rtSurvey geoshape kérdéstípusa lehetővé teszi a válaszadók számára, hogy alakzatokat (sokszögeket) rajzoljanak a térképre összetett földrajzi adatok rögzítéséhez. Ez a funkció különösen hasznos területek feltérképezéséhez, határok meghatározásához vagy térbeli felmérésekben érdekes régiók megjelöléséhez.
+A `geoshape` kérdéstípus egy zárt poligont rögzít — GPS-koordináták sorozatát, ahol az első és az utolsó pont megegyezik. Az rtSurvey webes űrlapján ez **szöveges beviteli mezőként** jelenik meg, ahol a kérdező közvetlenül írja be vagy illeszti be a koordinátasort.
 
-## Alapvető XLSForm-specifikáció
+## Alapvető XLSForm specifikáció
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geoshape | field_area  | Rajzolja meg a mező határát     |
+| type     | name        | label                            |
+|----------|-------------|----------------------------------|
+| geoshape | field_area  | Rajzolja meg a terület határát   |
+| geoshape | zone        | Rögzítse a zóna határát          |
 
-A geoshape kérdéstípus alapvető részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+A szabványos specifikációért tekintse meg az [XLSForm dokumentációját](https://xlsform.org/en/#question-types).
 
-## Felhasználási területek
-
-A geoshape kérdések általánosan használt területei:
-
-1. Mezőhatárok feltérképezése mezőgazdasági felmérésekben
-2. Környezeti hatásterületek meghatározása
-3. Zónák megjelölése városrendezési tanulmányokban
-4. Geológiai felmérések területeinek körvonalazása
-5. Összetett földrajzi jellemzők rögzítése térbeli elemzéshez
-
-## Bevált módszerek
-
-1. Győződjön meg arról, hogy az eszközön engedélyezve van a helymeghatározó szolgáltatás és megvannak az engedélyek.
-2. Adjon egyértelmű utasításokat az alakzat rajzolásának módjáról és a belefoglalandó területről.
-3. Fontolja meg műholdképek vagy alaptérképek használatát a válaszadók pontos alakzatrajzolásának segítéséhez.
-4. Legyen tekintettel az alakzatok lehetséges összetettségére és annak hatására az adatok méretére és feldolgozására.
-
-## Példa
-
-Íme egy példa arra, hogyan lehet geoshape kérdést felhasználni egy felmérésben:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geoshape | forest_area    | Rajzolja meg az erdőfolt határát           | Legalább 3 pontot használjon a zárt alakzat létrehozásához |
-
-## rtSurvey-bővítések
-
-Bár az alapvető XLSForm-specifikáció egyszerű a geoshape kérdéseknél, az rtSurvey további funkciókat kínálhat:
-
-1. Integráció offline térképekkel távoli területeken
-2. Az alakzat pontjainak minimális és maximális számát beállító lehetőségek
-3. Az alakzatok szerkesztésének és finomításának képessége a kezdeti rajzolás után
-4. Különböző alakzattípusok támogatása (pl. téglalapok, körök) a szabad sokszögek mellett
+---
 
 ## Adatformátum
 
-A geoshape adatok általában szóközzel elválasztott koordinátapárokból álló, zárójelbe tett karakterláncként kerülnek tárolásra:
+Pontosvesszővel elválasztott pontlistaként tárolódik, a **pontosvesszők körül szóközök nélkül**. Minden pont négy, szóközzel elválasztott értékből áll:
 
 ```
-(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-Például:
+| Összetevő | Leírás |
+|-----------|-------------|
+| `lat` | Szélességi fok tizedes fokban |
+| `lon` | Hosszúsági fok tizedes fokban |
+| `alt` | Magasság méterben (`0`, ha ismeretlen) |
+| `acc` | GPS pontosság méterben (`0`, ha ismeretlen) |
+
+**A poligonnak zártnak kell lennie** — az utolsó pontnak meg kell egyeznie az elsővel.
+
+**Példa — egy négypontos poligon (háromszög, zárt):**
 ```
-(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
 ```
 
-## Elemzési szempontok
+Legalább három különböző pont és a záró ismétlés szükséges egy érvényes poligon létrehozásához.
 
-A geoshape kérdések használatakor vegye figyelembe:
+---
 
-1. A földrajzi adatok vizualizálásának és elemzésének módját (pl. GIS-szoftver)
-2. Az összetett alakzatok esetleges adattisztítási vagy -egyszerűsítési szükségletét
-3. Az adatvédelmi és adatbiztonsági intézkedéseket a részletes térbeli adatok kezeléséhez
-4. Integrációt más térbeli adatforrásokkal az átfogó elemzés érdekében
+## Megjelenítés az rtSurvey-ben
+
+Az rtSurvey webes űrlapján a `geoshape` egyszerű **szöveges mezőként** jelenik meg. A kérdező begépeli vagy beilleszti a koordinátasort. A jelenlegi webes űrlapon ehhez a típushoz nincs beépített interaktív poligon-választó térkép.
+
+### Poligonpontok interaktív gyűjtése
+
+A terepi adatgyűjtés javasolt mintája egy **`geopoint` kérdésekből álló ismétlődő csoport (repeat group)** — minden csúcspont a teljes GPS-térképválasztót használja —, kombinálva egy `calculate` mezővel a geoshape karakterlánc előállításához:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | polygon_points | Rögzítse az összes sarkot | |
+| geopoint | point | Érintse meg a sarok rögzítéséhez | |
+| end repeat | polygon_points | | |
+| calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
+
+Az egyesítés után manuálisan adja hozzá az első pontot a poligon bezárásához, vagy használjon egy második számítást (`calculate`) a konkatenáláshoz.
+
+---
+
+## Példa a használatra
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geoshape | farm_boundary | Rögzítse a tábla határát | Adja meg az összes sarkot pontosvesszővel elválasztva. Az első és az utolsó pontnak meg kell egyeznie. | yes |
+
+---
+
+## Legjobb gyakorlatok
+
+1. Interaktív, térkép alapú gyűjtéshez használjon egy `geopoint` kérdésekből álló ismétlődő csoportot, majd egyesítse az értékeket — ez GPS-választót biztosít a kérdezőknek minden egyes csúcsponthoz.
+2. Beküldés előtt mindig zárja le a poligont (ismételje meg az első pontot a végén).
+3. Tüntesse fel az elvárt formátumot a `hint` oszlopban, ha manuális koordináta-bevitelre van szükség.
+4. Érvényes poligonhoz legalább 3 különböző sarokpontot követeljen meg — ezt inkább utasításokkal kényszerítse ki, mintsem XLSForm korlátozásokkal.
+5. Használja a `geopoint` típust egyetlen helyszín rögzítéséhez, és csak akkor alkalmazza a `geoshape` típust, ha a terület lehatárolása a felmérés tényleges célja.
 
 ## Korlátozások
 
-- Pontos alakzatok rajzolása kis mobilképernyőkön kihívást jelenthet.
-- Az összetett alakzatok jelentős tárhelyet és feldolgozási kapacitást igényelhetnek.
-- A geoshape kérdések nem minden típusú felméréshez vagy válaszadóhoz megfelelők.
-- A részletes térbeli adatok gyűjtésével adatvédelmi aggályok merülhetnek fel.
+- Az rtSurvey webes űrlapján nincs beépített interaktív poligon-választó térkép a `geoshape` típushoz.
+- A poligont manuálisan kell bezárni — a szövegbeviteli módban nincs automatikus záró mechanizmus.
+- A poligon-topológia validálása (pl. önmetszés mentesség, minimális terület) az XLSForm korlátozásokon kívüli utófeldolgozást igényel.
+- A sok csúcsponttal rendelkező hosszú határok nagy szöveges karakterláncokat eredményeznek.

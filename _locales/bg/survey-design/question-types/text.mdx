@@ -1,110 +1,351 @@
 ---
-title: "Текст"
-description: "Тип въпрос за свободен текстов отговор в rtSurvey"
+title: "Text"
+description: "Тип въпрос за свободен текст в rtSurvey"
 ---
 
-The `text` question type collects a free-text response — any string of characters. It is the most flexible input type and is used for names, addresses, descriptions, codes, and anything that does not fit a more specific type.
+Типът въпрос `text` събира низ от свободен текст. Той е най-гъвкавият тип въвеждане и поддържа голям брой варианти на appearance, които променят начина на изобразяване на въвеждането — от просто едноредово поле до преобразуване на реч в текст, изскачащи диалогови прозорци, редактори за богат текст (rich text) и цифрови спинери.
 
-rtSurvey also extends `text` with **time input widgets** that allow precise time entry with a clock picker.
-
-## Основна спецификация на XLSForm
+## Базова XLSForm спецификация
 
 | type | name | label |
 |------|------|-------|
-| text | respondent_name | Full name of respondent |
-| text | address | Home address |
+| text | respondent_name | Пълно име на респондента |
+| text | address | Домашен адрес |
 
-For more details on the standard XLSForm text type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+За стандартната спецификация вижте [XLSForm документацията](https://xlsform.org/en/#question-types).
 
-## Приложения
+---
 
-Text questions are used for:
+## Режими на оформление
 
-1. Names, addresses, free descriptions
-2. Open-ended comments or feedback
-3. Codes, IDs, or reference numbers that do not fit integer/decimal
-4. Collecting time values with rtSurvey's time input extensions
-5. Autocomplete text fields (via `search-autocomplete-noedit-v2()`)
+### По подразбиране — едноредово въвеждане
 
-## Стандартни опции за изглед
+Не е необходим appearance. Изобразява стандартно поле `<input type="text">`.
 
-| Appearance | Description |
-|------------|-------------|
-| *(none)* | Single-line text input |
-| `multiline` | Multi-line text area — best for longer free text on web |
+---
 
-## Разширения за въвеждане на час в rtSurvey
+### `multiline` — textarea
 
-rtSurvey extends `text` with a **clock picker widget** for collecting time values. These appearance options display a clock icon the enumerator can tap to select hours, minutes, seconds, or milliseconds.
+Изобразява многоредова текстова зона (textarea). Потребителят може да я разшири чрез писане; тя нараства автоматично.
 
-### Варианти на изглед
+```
+multiline
+```
 
-| Appearance | Description |
-|------------|-------------|
-| `inline` | Clock icon displayed next to the field |
-| `inline colors("RRGGBB")` | Clock icon with custom hex color |
-| `inline-1line` | Clock displayed in a compact single-row format |
-| `inline-1line-RRGGBB` | Single-row with custom icon color (hex, no `#`) |
-| `inline-1line colors("RRGGBB","RRGGBB")` | Single-row with two colors |
-| `inline-onlyresult` | Clock icon disappears after selection; only the value is shown |
-| `inline-onlyresult colors("RRGGBB")` | Same, with custom icon color |
+**Контролирайте височината на реда**, като добавите `[initRows, maxRows]`:
 
-### Токени за формат на времето
+```
+multiline [3,8]     → започва с 3 реда, разширява се до 8
+multiline [5]       → фиксирано на 5 реда
+```
 
-Append a format string in brackets to control which time components are shown:
+По подразбиране е 1 ред без максимум. Shift+Enter вмъква нов ред; Enter преминава към следващия въпрос.
 
-| Format string | Displays |
-|---------------|----------|
-| `inline-[%H:%M]` | Hours and minutes (24-hour) |
-| `inline-[%h:%M]` | Hours and minutes (12-hour) |
-| `inline-[%H:%M:%S]` | Hours, minutes, seconds (24-hour) |
-| `inline-[%h:%M:%S]` | Hours, minutes, seconds (12-hour) |
-| `inline-[%H:%M:%3]` | Hours, minutes, milliseconds |
-| `inline-[%M:%S]` | Minutes and seconds only |
-| `inline-[%M:%3]` | Minutes and milliseconds only |
-| `inline-[%S]` | Seconds only |
-| `inline-[%3]` | Milliseconds only |
-| `inline-[%H]` | Hours only (24-hour) |
-| `inline-[%h]` | Hours only (12-hour) |
+---
 
-### Пример: Запис на продължителност на задача в минути и секунди
+### `floating_hint` — подсказката изплува като етикет
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | task_duration | Time taken to complete the task | `inline-[%M:%S]` |
+Текстът на `hint` се изобразява вътре в полето за въвеждане като плейсхолдър. Когато потребителят започне да пише, подсказката изплува над полето като етикет.
 
-### Пример: Запис на час на събитие в 24-часов формат с персонализиран цвят
+```
+floating_hint
+```
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | event_time | Time of event | `inline-1line colors("0099FF")` |
+---
 
-## Формат на данните
+### `embed` — подсказка вътре в полето
 
-Text data is stored and exported as a plain string. For time-based inputs using the inline clock widget, the value is stored in the format matching the chosen format string (e.g., `14:32` for `%H:%M`).
+Подобно на `floating_hint` — подсказката се изобразява вътре в границите на полето, когато то е празно. Не изплува при писане.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — въвеждане чрез модален диалог
+
+Докосването на полето отваря модален диалог на SweetAlert с голямо поле за въвеждане, вместо редактиране инлине. Полезно на мобилни устройства, за да се даде повече екранно пространство за писане.
+
+```
+textpopup
+```
+
+---
+
+### `richtext` — WYSIWYG редактор
+
+Изобразява пълен редактор за богат текст (Monaco / Draft.js). Респондентът може да прави текста получер (bold), курсив (italic), да добавя списъци и т.н. Съхранената стойност е HTML.
+
+```
+richtext
+richtext(30%)       → височина на редактора 30% от прозореца за изглед (viewport)
+```
+
+---
+
+### `charcount` — брояч на символи в реално време
+
+Добавя показване на брой символи `(n)` под полето за въвеждане, актуализиран докато потребителят пише.
+
+```
+charcount
+multiline charcount
+```
+
+---
+
+## Варианти за цифрово въвеждане
+
+Тези appearance работят върху тип `text` за събиране на числа със специално форматиране или модели на взаимодействие.
+
+### `numbers` — цифрова клавиатура
+
+Принуждава HTML типа на въвеждане да бъде `number`, задействайки цифрова клавиатура на мобилни устройства.
+
+```
+numbers
+```
+
+### `thousandsep` — сепаратор на хилядите
+
+Показва числото с групиране чрез запетая (напр. `1,234,567`), докато съхранява необработеното число. Типът на въвеждане се принуждава да бъде `text`, за да се позволи показването на запетаи.
+
+```
+thousandsep
+```
+
+### `digisep(n, "sep")` — потребителско групиране на цифри
+
+Групира цифрите в блокове от `n`, разделени от потребителски символ. Полезно за телефонни номера, идентификационни номера и др.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+### `number-hspinner` — хоризонтален спинер
+
+Заменя полето за въвеждане с хоризонтален **− стойност +** спинер. Потребителят докосва бутоните минус/плюс, за да намали или увеличи стойността. Работи с типове `int` и `decimal`.
+
+```
+number-hspinner
+```
+
+**Персонализиране на външния вид на бутона** чрез `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','1')
+```
+
+Параметри: форма на левия бутон, форма на десния бутон, стойност на стъпката.
+
+**Потребителски цветове** чрез `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Четири стойности на цвета: фон на левия бутон, икона на левия бутон, фон на десния бутон, икона на десния бутон.
+
+### `prefix(expr)` — добавяне на префикс отпред
+
+Добавя изчислен или статичен низ пред показваната стойност. Съхранената стойност не включва префикса.
+
+```
+prefix('USD ')      → показва "USD 100", съхранява "100"
+prefix(${currency}) → динамичен префикс от друго поле
+```
+
+### `textonly` — принудителен тип текстово въвеждане
+
+Принуждава `type="text"`, дори когато полето е `integer` или `decimal`. Полезно за избягване на странностите при въвеждане на числа в браузъра.
+
+```
+textonly
+```
+
+---
+
+## Трансформация на текст
+
+Тези appearance автоматично трансформират стойността, докато потребителят пише.
+
+| Appearance | Ефект | Пример въвеждане → съхранено |
+|---|---|---|
+| `upper` | Конвертира в ГЛАВНИ БУКВИ | `hello` → `HELLO` |
+| `lower` | Конвертира в малки букви | `HELLO` → `hello` |
+| `proper` | Конвертира в Proper Case (заглавни букви) | `john doe` → `John Doe` |
+
+---
+
+## Помощници за улавяне на входни данни
+
+### `inputs{stt}` — преобразуване на реч в текст (Speech to text)
+
+Добавя бутон с микрофон до полето за въвеждане. Докосването му стартира разпознаване на реч в браузъра (Web Speech API). Транскрибираният текст се добавя към полето.
+
+```
+inputs{stt}
+```
+
+Не се поддържа в Safari. Изисква разрешение за микрофон.
+
+### `inputs{qrscan}` — скенер на QR / баркодове
+
+Добавя бутон за сканиране на QR код до полето за въвеждане. Отваря модален скенер на камерата и попълва полето със сканираната стойност.
+
+```
+inputs{qrscan}
+```
+
+**Tokenize** (добавяне на сканирани стойности вместо замяна):
+
+```
+inputs{qrscan} append(${separator})
+```
+
+### `inputs{stt,qrscan}` — едновременно реч и сканиране
+
+Изобразява бутоните за микрофон и сканиране на QR един до друг.
+
+```
+inputs{stt,qrscan}
+inputs{qrscan,stt}
+```
+
+---
+
+## Варианти, свързани с избор (selection-linked)
+
+Тези appearance свързват текстово поле със списък с избори `select_one`, позволявайки на потребителя или да избере от списъка, или да пише свободно.
+
+### `selection_one_hide` — падащ списък (dropdown)
+
+Изобразява текстово поле със стрелка за падащо меню. Докосването на стрелката показва избори от свързания списък `search()`. Избирането на избор запълва полето и го заключва (показва ✕ за изчистване).
+
+```
+selection_one_hide
+```
+
+### `selection_one_show` — радио списък отдолу
+
+Изобразява текстово поле с радио бутони под него. Избирането на радио бутон попълва и заключва полето.
+
+```
+selection_one_show
+```
+
+И двата варианта изискват израз `search()` в колоната `calculation`, за да дефинират списъка с избори.
+
+---
+
+## Подравняване на отговора
+
+Контролира хоризонталното подравняване на въведения текст вътре в полето.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+## Уиджет за въвеждане на време (инлине часовник)
+
+rtSurvey разширява `text` с уиджет за избор на часовник. Тези appearance показват икона на часовник, която анкетьорът докосва, за да избере стойност на времето. Стойността се съхранява като обикновен текст в избрания формат.
+
+### Appearances
+
+| Appearance | Описание |
+|---|---|
+| `inline` | Бутон с икона на часовник до полето, отваря модален прозорец |
+| `inline-onlyresult` | Иконата на часовника изчезва след избиране |
+| `inline-1line` | Компактен едноредов спинер за време |
+| `inline colors("RRGGBB")` | Икона на часовник с потребителски цвят |
+| `inline-1line colors("RRGGBB","RRGGBB")` | Спинер с два акцентни цвята |
+
+### Токени за формат
+
+Добавете `-[format]`, за да контролирате кои компоненти на времето се показват и съхраняват:
+
+| Формат | Показва |
+|---|---|
+| `inline-[%H:%M]` | Часове : Минути (24ч) |
+| `inline-[%h:%M]` | Часове : Минути (12ч) |
+| `inline-[%H:%M:%S]` | Часове : Минути : Секунди (24ч) |
+| `inline-[%M:%S]` | Минути : Секунди |
+| `inline-[%H:%M:%3]` | Часове : Минути : Милисекунди |
+| `inline-[%S]` | Само секунди |
+| `inline-[%3]` | Само милисекунди |
+| `inline-[%H]` | Само часове (24ч) |
+
+### Позиция на бутона с `display{}`
+
+Същото като другите инлине типове — контролира позицията и размера на бутона за часовник:
+
+```
+inline display{right}
+inline display{center, large}
+inline-onlyresult display{left, medium, #0099FF}
+```
+
+---
+
+## Бърза справка за appearance
+
+| Appearance | Изобразен уиджет |
+|---|---|
+| *(няма)* | Едноредово текстово поле |
+| `multiline` | Текстова зона (textarea) |
+| `multiline [n,m]` | Текстова зона с контрол на първоначалните/максималните редове |
+| `floating_hint` | Подсказката изплува като етикет при писане |
+| `embed` | Подсказка вътре в границите на полето |
+| `textpopup` | Докосване за отваряне на модален диалог |
+| `richtext` / `richtext(height)` | WYSIWYG редактор за богат текст |
+| `charcount` | Брояч на символи в реално време под полето |
+| `numbers` | Цифрова клавиатура |
+| `thousandsep` | Форматиране на хилядите със запетая |
+| `digisep(n,"sep")` | Потребителско групиране на цифри |
+| `number-hspinner` | Хоризонтален − стойност + спинер |
+| `prefix(expr)` | Добавяне на статичен или изчислен префикс отпред |
+| `upper` / `lower` / `proper` | Автоматична трансформация на регистъра |
+| `inputs{stt}` | Бутон с микрофон за реч към текст |
+| `inputs{qrscan}` | Бутон за сканиране на QR/баркод |
+| `inputs{stt,qrscan}` | Бутони за микрофон и сканиране |
+| `selection_one_hide` | Падащ избор от списък с избори |
+| `selection_one_show` | Радио списък под полето за въвеждане |
+| `align_answer = left/right/center` | Подравняване на текста на отговора |
+| `inline-[%H:%M]` | Избор на часовник — събиране на време |
+| `inline-1line` | Компактен спинер за време |
+
+---
 
 ## Ограничения и валидация
 
-Apply constraints to enforce format, length, or pattern:
+Прилагайте ограничения (constraints), за да наложите формат, дължина или модел:
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| text | name | Full name | `string-length(.) >= 2` | Name must be at least 2 characters |
-| text | code | Reference code | `regex(., '^[A-Z]{2}[0-9]{4}$')` | Enter 2 uppercase letters followed by 4 digits |
-| text | phone | Phone number | `regex(., '^[0-9]{9,15}$')` | Enter a valid phone number |
+| text | name | Пълно име | `string-length(.) >= 2` | Необходими са поне 2 символа |
+| text | code | Референтен код | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 главни букви + 4 цифри |
+| text | phone | Телефонен номер | `regex(., '^[0-9]{9,15}$')` | Въведете валиден телефонен номер |
 
-## Най-добри практики
+---
 
-1. Use more specific types (`integer`, `decimal`, `date`) whenever the data has a known structure — this prevents invalid entries and simplifies analysis.
-2. Add `constraint` with `string-length()` or `regex()` to validate codes or IDs.
-3. Use `multiline` appearance for open-ended questions where respondents may write several sentences.
-4. For time collection, choose the time format tokens that match the precision your analysis requires — collecting milliseconds when you only need minutes wastes enumerator effort.
+## Добри практики
 
-## Поддръжка на платформата
-
-The text question type and all time input appearances are supported on iOS, Android, and web platforms.
+1. Използвайте по-специфични типове (`integer`, `decimal`, `date`), когато данните имат известна структура — това предотвратява невалидни записи.
+2. Използвайте `multiline [3,8]` за отворени въпроси, за да дадете на респондентите място за писане, без да претоварвате екрана.
+3. Използвайте `thousandsep` или `digisep()` вместо `numbers`, когато имате нужда от форматирано показване — `numbers` само по себе си променя само клавиатурата.
+4. Използвайте `inputs{qrscan}`, за да елиминирате грешките при ръчно въвеждане на кодове, идентификатори и серийни номера.
+5. Използвайте `floating_hint`, когато подсказката е важен контекст, който трябва да остане видим по време на писане — стандартните подсказки изчезват от поглед на малки екрани.
+6. Използвайте `charcount` при въпроси с ограничения за дължина, за да могат респондентите сами да се следят.
 
 ## Ограничения
 
-- Text responses are free-form — there is no built-in spell check or vocabulary constraint beyond regex patterns.
-- The inline time widget is an rtSurvey extension and is not part of the standard XLSForm specification.
+- `inputs{stt}` изисква браузър, който поддържа Web Speech API. Chrome е най-надеждният; Safari не се поддържа.
+- `richtext` съхранява HTML — планирайте премахване на HTML или саниране във вашия поток за анализ, ако се очаква обикновен текст.
+- `selection_one_hide` и `selection_one_show` изискват израз `search()` и се поддържат само в уеб клиента.
+- `number-hspinner` валидира спрямо колоната `constraint` при всяко натискане на бутон, а не само при напускане на полето — проектирайте ограниченията съответно.

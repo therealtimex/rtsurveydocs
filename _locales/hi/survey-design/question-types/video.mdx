@@ -1,93 +1,155 @@
 ---
 title: "Video"
-description: "Video questions उत्तरदाताओं को survey के हिस्से के रूप में video files record और submit करने देते हैं।"
+description: "वीडियो प्रश्न उत्तरदाताओं को सर्वेक्षण के हिस्से के रूप में वीडियो फ़ाइलें रिकॉर्ड करने और सबमिट करने की अनुमति देते हैं।"
 ---
 
-`video` question type उत्तरदाताओं को अपने survey response के हिस्से के रूप में **video record** करने या एक existing video file upload करने की अनुमति देता है। यह visual evidence, demonstrations, environmental conditions, या कोई भी जानकारी capture करने के लिए उपयोगी है जो motion और audio एक साथ होने से benefit करती है।
+`video` प्रश्न प्रकार उत्तरदाताओं को उनके सर्वेक्षण प्रतिक्रिया के हिस्से के रूप में **वीडियो रिकॉर्ड करने** या मौजूदा वीडियो फ़ाइल अपलोड करने में सक्षम बनाता है। यह दृश्य साक्ष्य, प्रदर्शन, पर्यावरणीय स्थितियों, या किसी भी जानकारी को कैप्चर करने के लिए उपयोगी है जो गति और ऑडियो दोनों से लाभान्वित होती है।
 
-## बुनियादी XLSForm विशिष्टता
+## बुनियादी XLSForm विनिर्देश (Specification)
 
 | type  | name        | label                              |
 |-------|-------------|-------------------------------------|
-| video | demo_video  | कृपया एक short demonstration record करें |
+| video | demo_video  | कृपया एक छोटा प्रदर्शन रिकॉर्ड करें |
 
-Standard video question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+मानक वीडियो प्रश्न प्रकार के बारे में अधिक जानकारी के लिए, [XLSForm विनिर्देश](https://xlsform.org/en/#question-types) देखें।
 
 ## उपयोग
 
-Video questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+वीडियो प्रश्नों का उपयोग आमतौर पर इनके लिए किया जाता है:
 
-1. Field conditions document करना — road damage, infrastructure state, crop health
-2. Product demonstrations या procedural compliance checks record करना
-3. उत्तरदाताओं से video testimonials एकत्र करना
-4. ऐसी evidence capture करना जिसके लिए spatial context की आवश्यकता हो
-5. Monitoring और evaluation surveys के लिए before/after documentation
+1. फ़ील्ड स्थितियों का दस्तावेजीकरण करना — सड़क की क्षति, बुनियादी ढांचे की स्थिति, फसल का स्वास्थ्य
+2. उत्पाद प्रदर्शन या प्रक्रियात्मक अनुपालन जांच रिकॉर्ड करना
+3. उत्तरदाताओं से वीडियो प्रशंसापत्र एकत्र करना
+4. उन साक्ष्यों को कैप्चर करना जिनके लिए स्थानिक संदर्भ की आवश्यकता होती है (जैसे, किसी समस्या क्षेत्र का आकार और सीमा)
+5. निगरानी और मूल्यांकन सर्वेक्षणों के लिए "पहले/बाद" का दस्तावेजीकरण
 
-## डेटा प्रारूप
+## डेटा प्रारूप (Data format)
 
-Video files binary attachments के रूप में store होती हैं:
+वीडियो फ़ाइलें बाइनरी अटैचमेंट के रूप में संग्रहीत की जाती हैं:
 
-- **Format:** MP4 या MOV (mobile recording)
-- **Naming:** `{instanceID}-{fieldname}.mp4` (या equivalent)
-- **Storage:** Server media folder में upload होती हैं और submission record से linked होती हैं
-- **Access:** Submission management interface से playable और downloadable
+- **प्रारूप:** MP4 या MOV (मोबाइल रिकॉर्डिंग)
+- **नामकरण:** `{instanceID}-{fieldname}.mp4` (या समकक्ष)
+- **भंडारण:** सर्वर मीडिया फ़ोल्डर में अपलोड किया जाता है और सबमिशन रिकॉर्ड से जोड़ा जाता है
+- **पहुंच:** सबमिशन प्रबंधन इंटरफ़ेस से चलाने और डाउनलोड करने योग्य
 
 ## rtSurvey एक्सटेंशन
 
-### अधिकतम अवधि
+### अधिकतम अवधि (Maximum duration)
 
-Recording length सीमित करने के लिए `parameters` column का उपयोग करें:
-
-| type | name | label | parameters |
-|------|------|-------|------------|
-| video | site_visit | Site conditions record करें | `max-duration=60` |
-
-`max-duration` seconds में है। Recording limit पर automatically रुकती है।
-
-### गुणवत्ता / रिज़ॉल्यूशन
-
-`parameters` के माध्यम से recording resolution control करें:
+रिकॉर्डिंग की लंबाई सीमित करने के लिए `parameters` कॉलम का उपयोग करें:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | evidence | Video evidence record करें | `quality=low` |
+| video | site_visit | साइट की स्थितियों को रिकॉर्ड करें | `max-duration=60` |
 
-Supported values: `low` (faster upload), `normal` (default), `high`। Limited connectivity वाले areas में `low` का उपयोग करें।
+`max-duration` सेकंड में है। रिकॉर्डिंग सीमा पर स्वतः रुक जाती है।
 
-### Existing video upload करना
+### गुणवत्ता / रिज़ॉल्यूशन (Quality / resolution)
 
-Mobile पर, उत्तरदाता नई recording करने के बजाय device gallery से **existing video upload** करना चुन सकता है। यह native camera/gallery integration में default रूप से enabled है।
+`parameters` के माध्यम से रिकॉर्डिंग रिज़ॉल्यूशन को नियंत्रित करें:
 
-### Submission से पहले Playback
+| type | name | label | parameters |
+|------|------|-------|------------|
+| video | evidence | वीडियो साक्ष्य रिकॉर्ड करें | `quality=low` |
 
-Mobile पर, recorded clip को आगे बढ़ने से पहले review किया जा सकता है। कोई additional configuration आवश्यक नहीं।
+समर्थित मान: `low` (तेज़ अपलोड), `normal` (डिफ़ॉल्ट), `high`| सीमित कनेक्टिविटी वाले क्षेत्रों में `low` का उपयोग करें।
+
+### मौजूदा वीडियो अपलोड करें
+
+मोबाइल पर, उत्तरदाता नया वीडियो रिकॉर्ड करने के बजाय डिवाइस गैलरी से **मौजूदा वीडियो अपलोड करना** चुन सकता है। यह मूल कैमरा/गैलरी एकीकरण में डिफ़ॉल्ट रूप से सक्षम है।
+
+### सबमिशन से पहले प्लेबैक
+
+मोबाइल पर, आगे बढ़ने से पहले रिकॉर्ड किए गए क्लिप की समीक्षा की जा सकती है। किसी अतिरिक्त कॉन्फ़िगरेशन की आवश्यकता नहीं है।
+
+### इनलाइन बटन लेआउट (Inline button layout)
+
+कैमरे को पूरी चौड़ाई वाले कैप्चर क्षेत्र के बजाय लेबल के बगल में एक **गोलाकार आइकन बटन** के रूप में प्रस्तुत करने के लिए `inline` जोड़ें।
+
+```
+| type  | name  | label        | appearance                              |
+|-------|-------|--------------|----------------------------------------|
+| video | clip  | वीडियो रिकॉर्ड करें | inline display{right}                  |
+| video | clip  | वीडियो रिकॉर्ड करें | inline display{left, large}            |
+| video | clip  | वीडियो रिकॉर्ड करें | inline display{center, large, <0099FF/>} |
+```
+
+**बटन की स्थिति** — `left`, `right` *(डिफ़ॉल्ट)*, `top`, `center`, `bottom`
+
+**बटन का आकार** — `small` *(डिफ़ॉल्ट)*, `medium`, `large`
+
+**बटन का रंग** — प्राथमिक रंग को ओवरराइड करने के लिए `display{}` के अंदर एक हेक्स रंग जोड़ें:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**कैप्चर के बाद का नियंत्रण — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | वीडियो कैप्चर होने के बाद रिकॉर्ड बटन को छुपा देता है |
+| `results{hide(review)}` | कैप्चर के बाद प्लेबैक थंबनेल को छुपाता है |
+| `results{hide(filename)}` | फ़ाइल नाम और अवधि को छुपाता है |
+| `results{left}` | कैप्चर के बाद आइकन को बाईं ओर ले जाता है |
+
+उदाहरण — रिकॉर्ड बटन छुपाएं, प्लेबैक रखें:
+```
+inline display{right} results{hide(capture)}
+```
+
+### `thumbnail-square-[WxH]` — निश्चित आकार का वीडियो पूर्वावलोकन
+
+कैप्चर के बाद, वीडियो को पूरी चौड़ाई के बजाय एक निश्चित आकार के इनलाइन प्लेयर के रूप में प्रदर्शित करता है। कॉम्पैक्ट लेआउट के लिए `inline` के साथ मिलाएँ।
+
+```
+inline display{right} thumbnail-square-[120x90]
+inline display{center} thumbnail-square-[200x150]
+```
+
+चौड़ाई और ऊंचाई पिक्सेल में हैं।
+
+### `invisible auto-show` — रिकॉर्डर स्वतः खोलें
+
+लेआउट से प्रश्न विजेट को छुपाता है लेकिन पेज लोड होने पर वीडियो रिकॉर्डर स्वतः खोल देता है।
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### लेबल को दबाएं (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## उदाहरण उपयोग
 
-### Duration limit के साथ Site inspection video
+### सीमा के साथ साइट निरीक्षण वीडियो
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| video | site_video | Water point record करें | पूरी facility के चारों ओर walk करें। Maximum 90 seconds। | `max-duration=90 quality=normal` |
+| video | site_video | जल बिंदु रिकॉर्ड करें | पूरी सुविधा के चारों ओर चलें। अधिकतम 90 सेकंड। | `max-duration=90 quality=normal` |
 
-### Conditional video — केवल तभी जब damage report किया गया हो
+### सशर्त वीडियो — केवल यदि क्षति की सूचना दी जाती है
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
-| select_one yesno | damage_found | क्या damage पाया गया? | | |
-| video | damage_video | Damage का video record करें | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
+| select_one yesno | damage_found | क्या क्षति मिली? | | |
+| video | damage_video | क्षति का वीडियो रिकॉर्ड करें | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
-## सर्वोत्तम प्रथाएँ
+## सर्वोत्तम प्रथाएं
 
-1. `max-duration` सेट करें — unrestricted video recordings आसानी से 100 MB से अधिक हो सकती हैं और weak connections पर upload fail हो सकती हैं।
-2. Monitoring surveys के लिए `quality=low` का उपयोग करें जहाँ visual evidence आवश्यक हो लेकिन fine detail नहीं — यह file size को dramatically कम करता है।
-3. `hint` column में specific recording instructions लिखें।
-4. विचार करें कि क्या video आवश्यक है — एक photo (`image`) आमतौर पर static evidence के लिए पर्याप्त है और बहुत छोटी files produce करती है।
-5. Deployment से पहले actual field network पर upload performance test करें।
+1. `max-duration` सेट करें — अप्रतिबंधित वीडियो रिकॉर्डिंग आसानी से 100 MB से अधिक हो सकती है और कमजोर कनेक्शन पर अपलोड करने में विफल हो सकती है।
+2. उन निगरानी सर्वेक्षणों के लिए `quality=low` का उपयोग करें जहाँ दृश्य साक्ष्य की आवश्यकता है लेकिन सूक्ष्म विवरण की नहीं — यह फ़ाइल आकार को नाटकीय रूप से कम कर देता है।
+3. `hint` कॉलम में विशिष्ट रिकॉर्डिंग निर्देश लिखें (जैसे, "पूरी इमारत के चारों ओर चलें, कैमरा स्थिर रखें")।
+4. विचार करें कि क्या वीडियो आवश्यक है — एक फ़ोटो (`image`) आमतौर पर स्थिर साक्ष्य के लिए पर्याप्त होती है और बहुत छोटी फ़ाइलें उत्पन्न करती है।
+5. तैनाती से पहले वास्तविक फ़ील्ड नेटवर्क पर अपलोड प्रदर्शन का परीक्षण करें।
 
-## सीमाएं
+## सीमाएं (Limitations)
 
-- Video files बहुत बड़ी होती हैं — normal quality पर 1-minute video आमतौर पर 20–60 MB होती है।
-- Large video files upload करने के लिए अच्छे network connection की आवश्यकता है।
-- सभी web browsers MediaRecorder के माध्यम से video recording का समर्थन नहीं करते — Chrome सबसे reliable है।
-- Video responses का analysis manual और time-consuming है; कम उपयोग करें और केवल तभी जब video content unique value add करे।
+- वीडियो फ़ाइलें बहुत बड़ी होती हैं — सामान्य गुणवत्ता में 1 मिनट का वीडियो डिवाइस के आधार पर आमतौर पर 20-60 MB का होता है।
+- बड़ी वीडियो फ़ाइलों को अपलोड करने के लिए एक अच्छे नेटवर्क कनेक्शन की आवश्यकता होती है; वीडियो-भारी फ़ॉर्म के लिए वाई-फाई सिंक की आवश्यकता पर विचार करें।
+- सभी वेब ब्राउज़र MediaRecorder के माध्यम से वीडियो रिकॉर्डिंग का समर्थन नहीं करते हैं — Chrome सबसे विश्वसनीय है।
+- वीडियो प्रतिक्रियाओं का विश्लेषण मैन्युअल और समय लेने वाला है; कम से कम उपयोग करें और केवल तभी जब वीडियो सामग्री अद्वितीय मूल्य जोड़ती है।

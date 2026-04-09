@@ -1,77 +1,203 @@
 ---
 title: "Geopoint"
-description: "Las preguntas de geopoint capturan coordenadas geográficas (latitud, longitud, altitud y precisión) como parte de la encuesta."
+description: "Preguntas de Geopoint capturan coordenadas geográficas (latitud, longitud, altitud y precisión) como parte de la encuesta."
 ---
 
-El tipo de pregunta geopoint en XLSForms y rtSurvey permite la recopilación de coordenadas geográficas mediante el GPS del dispositivo u otros servicios de localización. Esta función es particularmente útil para mapear respuestas de encuestas, rastrear actividades de campo o asociar datos con ubicaciones específicas.
+El tipo de pregunta `geopoint` captura coordenadas geográficas (latitud, longitud, altitud, precisión) utilizando el GPS del dispositivo. rtSurvey representa el selector con varios modos de diseño y admite la automatización a través de los parámetros `inputs{}` y `outputs{}`.
 
 ## Especificación básica de XLSForm
 
-| type     | name        | label                            |
-|----------|-------------|----------------------------------|
-| geopoint | location    | Registrar la ubicación actual    |
+| type     | name        | label                       |
+|----------|-------------|-----------------------------|
+| geopoint | location    | Registrar la ubicación actual |
 
-Para obtener más detalles sobre el tipo de pregunta geopoint básico, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
-
-## Usos
-
-Las preguntas de geopoint se usan comúnmente para:
-
-1. Mapear respuestas de encuestas geográficamente
-2. Verificar la ubicación de actividades de campo
-3. Rastrear la ruta de los encuestadores
-4. Asociar datos ambientales o sociales con ubicaciones específicas
-5. Calcular distancias o áreas en análisis geográficos
-
-## Mejores prácticas
-
-1. Asegúrese de que el dispositivo tenga los servicios de localización habilitados y los permisos otorgados.
-2. Permita suficiente tiempo para que el GPS adquiera una señal precisa.
-3. Considere las implicaciones de privacidad e informe a los encuestados sobre la recopilación de datos de ubicación.
-4. Use junto con otros tipos de pregunta para proporcionar contexto para los datos de ubicación.
-
-## Ejemplo de uso
-
-He aquí un ejemplo de cómo podría usar una pregunta de geopoint en una encuesta:
-
-| type     | name           | label                                         | hint                                               |
-|----------|----------------|-----------------------------------------------|----------------------------------------------------|
-| geopoint | sample_location| Registrar la ubicación de la toma de muestra  | Párese en un área abierta para una mejor señal GPS |
-
-## Extensiones de rtSurvey
-
-Si bien la especificación básica de XLSForm para preguntas de geopoint es sencilla, rtSurvey puede ofrecer características o personalizaciones adicionales:
-
-1. Integración de mapas para confirmación visual de la ubicación capturada
-2. Configuración de umbral de precisión
-3. Opción para ingresar coordenadas manualmente
-4. Integración con mapas sin conexión para áreas remotas
+Para la especificación estándar, consulte la [documentación de XLSForm](https://xlsform.org/en/#question-types).
 
 ## Formato de datos
 
-Los datos de geopoint se almacenan típicamente como una cadena de cuatro valores separados por espacios:
+Se almacena como cuatro valores separados por espacios:
 
 ```
-latitud longitud altitud precisión
+latitude longitude altitude accuracy
 ```
 
-Por ejemplo:
+Ejemplo: `13.756331 100.501762 15 8`
+
+---
+
+## Modos de diseño (Layout modes)
+
+### Predeterminado — botón rectangular
+
+Un botón rectangular "START GEOPOINT" abre un modal de mapa completo donde el encuestador selecciona un punto. Después de la captura, la etiqueta del botón cambia a "View or change geo point" y las coordenadas aparecen debajo.
+
+No se requiere valor de apariencia (appearance).
+
+---
+
+### `display{inline-icon}` — botón de retícula circular
+
+Representa un botón de icono circular (retícula ⊕) en lugar del botón rectangular. Al tocarlo se abre el mismo modal de mapa.
+
 ```
-41.40338 2.17403 30.5 10
+display{inline-icon}
 ```
 
-## Consideraciones para el análisis
+**Combinado con posición y tamaño:**
 
-Al usar preguntas de geopoint, considere:
+```
+display{inline-icon, left}           → botón a la izquierda de la etiqueta
+display{inline-icon, top}            → botón sobre la etiqueta
+display{inline-icon, bottom}         → botón debajo de la etiqueta, centrado
+display{inline-icon, large}          → icono grande (75px)
+display{inline-icon, medium}         → icono mediano (50px)
+display{inline-icon, left, large}    → botón grande a la izquierda
+```
 
-1. Cómo se visualizarán los datos geográficos (p. ej., software de mapeo)
-2. La precisión de las coordenadas recopiladas y su impacto en el análisis
-3. Medidas de privacidad y protección de datos para manejar datos de ubicación
-4. Posible integración con herramientas GIS (Sistema de Información Geográfica)
+| Size | Icon height/width |
+|------|------------------|
+| *(default)* | 25px |
+| `medium` | 50px |
+| `large` | 75px |
+
+---
+
+### `display{thumbnail-square}` — miniatura de mapa en vivo
+
+Representa una vista previa de mapa en vivo (Leaflet) directamente en la pregunta en lugar de un botón. La miniatura muestra la posición GPS actual y el punto seleccionado. Al tocar el botón de expandir se abre el modal completo.
+
+```
+display{thumbnail-square}
+```
+
+**Tamaño de miniatura personalizado:**
+
+```
+display{thumbnail-square-[WxH]}          → píxeles fijos
+display{thumbnail-square-[400x200]}      → 400px de ancho × 200px de alto
+
+display{thumbnail-square-[W%xH%]}        → porcentaje del ancho del formulario
+display{thumbnail-square-[100%x30%]}     → ancho completo × 30% del ancho del formulario
+```
+
+---
+
+## `display{}` vs `results{}` — antes y después de la captura
+
+`display{}` controla el diseño **antes** de que el usuario capture una ubicación. `results{}` controla el diseño **después** de que exista un valor. Pueden tener diferentes alineaciones.
+
+```
+display{inline-icon, right} results{left}
+```
+
+Esto representa el botón a la derecha antes de la captura, luego lo mueve a la izquierda una vez que se registra un punto.
+
+### `hide(value)` — suprimir la visualización de coordenadas
+
+Por defecto, el texto capturado de lat/lon/precisión/altitud se muestra debajo del botón. Ocúltelo con:
+
+```
+results{hide(value)}
+display{inline-icon} results{hide(value)}
+```
+
+---
+
+## `inputs{}` — automatización de GPS
+
+### Captura automática al cargar
+
+Registra automáticamente la posición GPS cuando se carga el formulario, sin que el encuestador presione nada.
+
+```
+inputs{auto-take}
+```
+
+**Captura automática condicional** usando una expresión XLSForm:
+
+```
+inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
+```
+
+### Precompletar desde un campo de texto
+
+Pueble el geopoint desde una pregunta que contenga un nombre de lugar o una cadena de dirección. rtSurvey geocodifica de forma inversa la cadena a coordenadas a través de OpenStreetMap Nominatim.
+
+```
+inputs{question(address_field)}
+```
+
+---
+
+## `outputs{}` — geocodificación inversa a texto
+
+Después de capturar un punto, pueble automáticamente una pregunta de `text` con la dirección legible por humanos (geocodificada de forma inversa a partir de las coordenadas).
+
+```
+outputs{question(address_field)}
+```
+
+Ejemplo:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | location | Registrar ubicación | `outputs{question(address_text)}` |
+| text | address_text | Dirección | |
+
+---
+
+## `nomap` — captura de GPS sin mapa
+
+Reemplaza el modal del mapa con un diálogo simple que solicita permiso de ubicación y registra las coordenadas. No se muestra ningún mapa. Útil para la captura solo de GPS en dispositivos de gama baja o cuando los mosaicos del mapa no están disponibles sin conexión.
+
+```
+nomap
+```
+
+---
+
+## Estilo de botón personalizado
+
+Use `styleButton()` para aplicar CSS personalizado al botón rectangular predeterminado:
+
+```
+styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
+```
+
+---
+
+## Suprimir la etiqueta
+
+```
+text-nolabel display{inline-icon, center, large}
+```
+
+---
+
+## Ejemplo de uso
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | field_loc | Registrar ubicación de campo | `display{inline-icon, right, large}` |
+| geopoint | site | Ubicación del sitio | `display{thumbnail-square-[100%x30%]}` |
+| geopoint | auto_loc | Posición actual | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | mapped_loc | Ubicación | `display{inline-icon} outputs{question(address)}` |
+| geopoint | gps_only | Punto GPS | `nomap` |
+
+---
+
+## Mejores prácticas
+
+1. Use `inputs{auto-take}` para encuestas de verificación de encuestadores donde el GPS es obligatorio; elimina el paso manual.
+2. Use `display{thumbnail-square}` cuando desee que el encuestador confirme visualmente el punto seleccionado antes de continuar.
+3. Empareje `outputs{question(...)}` con un campo de `text` de solo lectura para mostrar la dirección geocodificada de forma inversa al encuestador.
+4. Use `nomap` en áreas sin conectividad a Internet donde los mosaicos del mapa no se pueden cargar.
+5. Permita que el tiempo del GPS se estabilice antes de grabar; una precisión inferior a 10 m suele ser suficiente para encuestas de campo.
 
 ## Limitaciones
 
-- La precisión puede variar según el dispositivo y las condiciones ambientales.
-- Las señales GPS pueden ser débiles o no disponibles en ubicaciones interiores o áreas con obstrucciones.
-- La recopilación de datos de ubicación puede afectar significativamente la batería del dispositivo.
-- Puede haber preocupaciones de privacidad asociadas con la recopilación de datos de ubicación precisos.
+- La geocodificación de `inputs{question(name)}` requiere acceso a Internet; llama a la API de OpenStreetMap Nominatim.
+- La geocodificación inversa de `outputs{question(name)}` también requiere acceso a Internet.
+- La miniatura del mapa (`display{thumbnail-square}`) requiere Internet para la carga de mosaicos; las coordenadas se siguen capturando sin conexión.
+- La precisión del GPS varía según el dispositivo y el entorno; las condiciones de interiores o cañones urbanos pueden producir una precisión > 50 m.
+- La recopilación de datos de ubicación puede afectar significativamente la duración de la batería del dispositivo durante encuestas largas.

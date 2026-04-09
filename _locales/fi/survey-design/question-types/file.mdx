@@ -1,66 +1,108 @@
 ---
-title: "File"
-description: "File-kysymykset antavat vastaajille mahdollisuuden ladata asiakirjoja ja muita tiedostoja osana kyselyvastaustaan."
+title: "Tiedosto"
+description: "Tiedostokysymykset antavat vastaajille mahdollisuuden ladata dokumentteja ja muita tiedostoja osana heidän vastauksiaan."
 ---
 
-`file`-kysymystyyppi antaa vastaajille mahdollisuuden **ladata minkä tahansa tiedoston** laitteeltaan — asiakirjoja, taulukoita, PDF-tiedostoja tai muita tiedostotyyppejä. Toisin kuin `image`, `audio` ja `video`, jotka käynnistävät erityiset tallennustyökalut, `file` avaa yleiskäyttöisen tiedostonvalitsimen.
+`file`-kysymystyyppi antaa vastaajille mahdollisuuden **ladata minkä tahansa tiedoston** laitteeltaan — dokumentteja, taulukkolaskentatiedostoja, PDF-tiedostoja tai muita tiedostotyyppejä. Toisin kuin `image`-, `audio`- ja `video`-tyypit, jotka avaavat tiettyjä tallennustyökaluja, `file` avaa yleiskäyttöisen tiedostonvalitsimen.
 
 ## XLSForm-perusmäärittely
 
-| type | name      | label                          |
-|------|-----------|--------------------------------|
-| file | document  | Lataa asiakirjasi              |
+| type | name      | label                        |
+|------|-----------|------------------------------|
+| file | document  | Ole hyvä ja lataa tiedostosi |
 
-Lisätietoja file-kysymystyypin standardista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+Katso lisätietoja vakiomuotoisesta tiedostokysymystyypistä [XLSForm-määrittelystä](https://xlsform.org/en/#question-types).
 
 ## Käyttötarkoitukset
 
-File-kysymyksiä käytetään yleisesti:
+Tiedostokysymyksiä käytetään yleensä seuraaviin tarkoituksiin:
 
-1. Tukiasiakirjojen keräämiseen (kuitit, todistukset, sopimukset, raportit)
-2. Skannattujen paperilomakkeiden lataamiseen
-3. Taulukoiden tai tietovientienhakemiseen muista järjestelmistä
-4. Kaikkien digitaalisten tiedostotyyppien kohdalla, joita image/audio/video ei kata
+1. Tukidokumenttien kerääminen (kuitit, todistukset, sopimukset, raportit)
+2. Täytettyjen ja skannattujen paperilomakkeiden lataaminen
+3. Taulukkolaskentatiedostojen tai dataexporttien kerääminen muista järjestelmistä
+4. Mitkä tahansa digitaaliset tiedostotyypit, joita kuva/ääni/video ei kata
 
 ## Tietomuoto
 
-Ladatut tiedostot tallennetaan binääriliitteinä:
+Ladatut tiedostot tallennetaan binaarisina liitteinä:
 
 - **Muoto:** Säilytetään alkuperäisessä muodossa (PDF, XLSX, DOCX jne.)
 - **Nimeäminen:** `{instanceID}-{fieldname}.{extension}`
-- **Tallennus:** Ladataan palvelimen mediahakemistoon lähetyksen ohessa
-- **Käyttö:** Ladattavissa lähetysten hallintaliittymästä
+- **Tallennus:** Ladataan palvelimen mediakansioon vastauksen mukana
+- **Käyttö:** Ladattavissa vastausten hallintaliittymästä
 
-## rtSurveyn laajennukset
+## rtSurvey-laajennukset
 
 ### Hyväksytyt tiedostotyypit
 
-Käytä `parameters`-saraketta rajoittaaksesi, mitkä tiedostotyypit voidaan valita:
+Käytä `parameters`-saraketta rajoittaaksesi, mitä tiedostotyyppejä voidaan valita:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
 | file | report | Lataa tarkastusraportti | `accept=.pdf` |
 | file | spreadsheet | Lataa datatiedosto | `accept=.xlsx,.csv` |
 
-`accept`-parametri käyttää vakiotiedostopäätesyntaksia (pilkuilla erotettu).
+`accept`-parametri käyttää vakiomuotoista tiedostopäätteen syntaksia (pilkulla erotettu).
 
-### Tiedostokoon ohjaus
+### Tiedostokoon ohjeistus
 
-rtSurvey ei pakota tiukkaa tiedostokokorajoitusta kysymystasolla, mutta palvelimen lataamisraja koskee. Käytä `hint`-saraketta kommunikoidaksesi odotukset luetteloijalle:
+rtSurvey ei aseta tiukkaa tiedostokohtaisesta rajoitusta kysymystasolla, mutta palvelimen latausrajoitus on voimassa. Käytä `hint`-saraketta viestiäksesi odotukset haastattelijalle (enumerator):
 
 | type | name | label | hint |
 |------|------|-------|------|
-| file | receipt | Lataa maksukuitti | Hyväksytty: PDF tai kuva. Enimmäistiedostokoko: 5 Mt |
+| file | receipt | Lataa maksukuitti | Hyväksytyt: PDF tai kuva. Tiedoston enimmäiskoko: 5 MB |
 
-### Integraatio laitteen tiedostojärjestelmän ja pilvipalveluiden kanssa
+### Integraatio laitteen tiedostojärjestelmään ja pilvitallennukseen
 
-Androidilla ja iOS:llä `file`-kysymys avaa laitteen natiivin tiedostonvalitsimen, joka voi sisältää pääsyn:
-- Laitteen paikalliseen tallennukseen
-- SD-kortille (Android)
-- iCloud Drive -palveluun (iOS)
+Androidilla ja iOS:llä `file`-kysymys avaa laitteen oman tiedostonvalitsimen, joka voi sisältää pääsyn seuraaviin:
+- Laitteen paikallinen tallennustila
+- SD-kortti (Android)
+- iCloud Drive (iOS)
 - Google Drive, Dropbox (jos asennettu)
 
-Verkossa se avaa selaimen vakiomuotoisen tiedostonlatausdialogin.
+Verkkoselaimessa se avaa selaimen vakiomuotoisen tiedostonlatausikkunan.
+
+### Inline-painikeasettelu (Inline button layout)
+
+Lisää `inline` runderoidaksesi latauksen **pyöreänä kuvakepainikkeena** etiketin vieressä koko leveyden tiedostonvalitsimen sijaan.
+
+```
+| type | name | label           | appearance                              |
+|------|------|-----------------|-----------------------------------------|
+| file | doc  | Lataa tiedosto  | inline display{right}                   |
+| file | doc  | Lataa tiedosto  | inline display{left, large}             |
+| file | doc  | Lataa tiedosto  | inline display{center, large, <0099FF/>} |
+```
+
+**Painikkeen sijainti** — `left`, `right` *(oletus)*, `top`, `center`, `bottom`
+
+**Painikkeen koko** — `small` *(oletus)*, `medium`, `large`
+
+**Painikkeen väri** — lisää hex-väri `display{}`-määritteen sisään korvataksesi ensisijaisen värin:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Tallennuksen jälkeinen hallinta — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Piilottaa latauspainikkeen, kun tiedosto on liitetty |
+| `results{hide(review)}` | Piilottaa tarkastelu/esikatselupainikkeen latauksen jälkeen |
+| `results{hide(filename)}` | Piilottaa latauksen jälkeen näkyvän tiedostonimen |
+| `results{left}` | Siirtää kuvakkeen vasemmalle latauksen jälkeen |
+
+Esimerkki — piilota latauspainike tiedoston liittämisen jälkeen:
+```
+inline display{right} results{hide(capture)}
+```
+
+### Etiketin piilottaminen (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Esimerkkikäyttö
 
@@ -68,32 +110,32 @@ Verkossa se avaa selaimen vakiomuotoisen tiedostonlatausdialogin.
 
 | type | name | label | hint | required | required_message |
 |------|------|-------|------|----------|-----------------|
-| file | signed_consent | Lataa allekirjoitettu suostumuslomake | Vain PDF, enintään 2 Mt | yes | Suostumuslomake vaaditaan |
+| file | signed_consent | Lataa allekirjoitettu suostumuslomake | Vain PDF, enintään 2 MB | yes | Suostumuslomake vaaditaan |
 
-### Ehdollinen asiakirjan lataus
+### Ehdollinen tiedoston lataus
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| select_one yesno | has_land_title | Onko kotitaloudella maatodistus? | |
-| file | land_title_doc | Lataa valokuva tai skannattu kuva maatodistuksesta | `${has_land_title} = 'yes'` |
+| select_one yesno | has_land_title | Onko taloudella maankäyttöoikeustodistus? | |
+| file | land_title_doc | Lataa kuva tai skannaus todistuksesta | `${has_land_title} = 'yes'` |
 
 ## Parhaat käytännöt
 
-1. Käytä `accept`-parametria tiedostotyyppien rajoittamiseen — tämä estää luetteloijia vahingossa lataamasta vääriä tiedostoja.
-2. Sisällytä aina koko ja muoto-ohjeet `hint`-sarakkeessa.
-3. Valokuville ja kuville käytä `image`-tyyppiä — se tarjoaa paremman pakkauksen ja yhtenäisen muotokäsittelyn.
-4. Suurille kyselyille, joissa on tiedostoliitteitä, suunnittele tietovarasto ja latausbandwidth vastaavasti.
-5. Testaa tiedostonvalitsin kohdelaitetyypillä (Android vs. iOS vs. verkko) ennen käyttöönottoa — pääsy pilviasemiin vaihtelee.
+1. Käytä `accept`-rajoitusta — tämä estää haastattelijoita lataamasta vahingossa vääriä tiedostoja.
+2. Sisällytä aina koko- ja muoto-ohjeet `hint`-sarakkeeseen.
+3. Käytä valokuville ja kuville mieluummin `image`-tyyppiä — se tarjoaa paremman pakkauksen ja johdonmukaisen muodon käsittelyn.
+4. Suunnittele tiedostoliitteitä sisältävissä suurissa kyselyissä tallennustila ja latauskaistan tarve etukäteen.
+5. Testaa tiedostonvalitsin kohdelaitteella (Android vs. iOS vs. verkko) ennen käyttöönottoa — pääsy pilvipalveluihin vaihtelee.
 
-## Tietojenkäsittelyn näkökohtia
+## Tietojen käsittelyyn liittyvät huomiot
 
 - Tiedostot tallennetaan alkuperäisessä muodossaan; rtSurvey ei muunna tai pakkaa niitä.
-- Analysoi tiedostot lataamisen jälkeen — rtSurvey ei poimia tai indeksoi tiedostojen sisältöä.
-- Suuret tiedostoliitteet lisäävät merkittävästi koko datatietokannan lataamiseen tarvittavaa aikaa.
+- Analysoi tiedostot latauksen jälkeen — rtSurvey ei pura tai indeksoi tiedostojen sisältöä.
+- Suuret tiedostoliitteet pidentävät merkittävästi koko aineiston lataamiseen kuluvaa aikaa.
 
-## Rajoitukset
+## Rajoitukset (Limitations)
 
-- File-kysymykset eivät validoi tiedostojen sisältöä — vain tiedostopäätteen tarkistus `accept`:n kautta pakotetaan käyttöliittymätasolla.
-- Erittäin suuret tiedostot (100 Mt+) voivat aikakatkaista latauksen heikkoyhteyksisissä ympäristöissä.
-- Offline-luetteloijat voivat liittää tiedostoja, mutta ne eivät lataudu ennen kuin yhteys palautuu.
-- Jotkut laitekonfiguraatiot rajoittavat pääsyä tiettyihin tallennussijainteihin (esim. yrityksen MDM-käytännöt).
+- Tiedostokysymykset eivät validoi tiedoston sisältöä — vain tiedostopäätteen tarkistus `accept`-määritteen kautta on voimassa käyttöliittymätasolla.
+- Erittäin suuret tiedostot (100 MB+) saattavat aikakatkaista latauksen heikoissa yhteysolosuhteissa.
+- Offline-tilassa olevat haastattelijat voivat liittää tiedostoja, mutta ne latautuvat vasta, kun yhteys palautuu.
+- Jotkut laitekokoonpanot rajoittavat pääsyä tiettyihin tallennuspaikkoihin (esim. yritysten MDM-käytännöt).

@@ -1,75 +1,147 @@
 ---
-title: "Изображение"
-description: "Въпросите от тип image позволяват на респондентите да заснемат и изпращат снимки като част от анкетата."
+title: "Image"
+description: "Image въпросите позволяват на респондентите да заснемат и изпращат снимки като част от анкетата."
 ---
 
-The image question type in XLSForms and rtSurvey enables respondents to capture and submit photos as part of their survey responses. This feature is particularly useful for collecting visual data, documenting observations, or providing evidence in field surveys.
+Типът въпрос image в XLSForms и rtSurvey позволява на респондентите да заснемат и изпращат снимки като част от техните отговори на анкетата. Тази функция е особено полезна за събиране на визуални данни, документиране на наблюдения или предоставяне на доказателства при проучвания на терен.
 
-## Основна спецификация на XLSForm
+## Базова XLSForm спецификация
 
 | type  | name        | label                           |
 |-------|-------------|--------------------------------|
-| image | photo       | Take a photo of the location    |
+| image | photo       | Направете снимка на местоположението |
 
-For more details on the basic image question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+За повече подробности относно базовия тип въпрос image, вижте [XLSForm спецификацията](https://xlsform.org/en/#question-types).
 
-## Приложения
+## Употреби
 
-Image questions are commonly used for:
+Image въпросите обикновено се използват за:
 
-1. Documenting field conditions or observations
-2. Capturing visual evidence in research studies
-3. Collecting before-and-after photos in impact assessments
-4. Verifying the completion of tasks or presence at locations
-5. Gathering visual data for remote analysis
+1. Документиране на полеви условия или наблюдения
+2. Заснемане на визуални доказателства в изследователски проучвания
+3. Събиране на снимки „преди и след“ в оценки на въздействието
+4. Верифициране на завършването на задачи или присъствие на местоположения
+5. Събиране на визуални данни за отдалечен анализ
 
-## Най-добри практики
+## Добри практики
 
-1. Provide clear instructions on what should be photographed.
-2. Consider privacy implications and inform respondents about how their photos will be used.
-3. Be mindful of file sizes and storage limitations, especially for surveys in areas with limited internet connectivity.
-4. Ensure the device has sufficient storage space and camera permissions are granted.
+1. Предоставете ясни инструкции за това какво трябва да бъде снимано.
+2. Вземете предвид последиците за поверителността и информирайте респондентите за това как ще бъдат използвани техните снимки.
+3. Обърнете внимание на размерите на файловете и ограниченията за съхранение, особено за анкети в райони с ограничена интернет свързаност.
+4. Уверете се, че устройството има достатъчно място за съхранение и че са дадени разрешения за камерата.
 
-## Примерна употреба
+## Примерен вариант
 
-Here's an example of how you might use an image question in a survey:
+Ето пример за това как можете да използвате image въпрос в анкета:
 
 | type  | name           | label                                      | hint                                        |
 |-------|----------------|--------------------------------------------|--------------------------------------------|
-| image | storefront     | Take a photo of the store's entrance       | Ensure the store name is clearly visible    |
+| image | storefront     | Направете снимка на входа на магазина      | Уверете се, че името на магазина се вижда ясно |
 
-## Разширения на rtSurvey
+## rtSurvey разширения
 
-While the basic XLSForm specification for image questions is straightforward, rtSurvey may offer additional features or customizations:
+### Inline оформление на бутона
 
-1. Image quality settings (e.g., low, medium, high resolution)
-2. Option to add captions or tags to images
-3. Multiple image capture for a single question
-4. Integration with device's native camera app or gallery
+Добавете `inline` в колоната `appearance`, за да изобразите камерата като **кръгъл иконен бутон** до етикета, вместо като зона за заснемане по цялата ширина. Докосването му отваря модален прозорец.
 
-(Note: The specific extensions available in rtSurvey for image questions would need to be confirmed and detailed here.)
+```
+| type  | name  | label        | appearance                          |
+|-------|-------|--------------|-------------------------------------|
+| image | photo | Снимайте     | inline display{right}               |
+| image | photo | Снимайте     | inline display{center, large}       |
+```
 
-## Обработка на данни
+**Позиция на бутона — `display{}`:**
 
-Images collected through this question type are typically:
+| Стойност | Оформление |
+|-------|--------|
+| `right` *(по подразбиране)* | Икона вдясно от етикета |
+| `left` | Икона вляво от етикета |
+| `top` | Икона над етикета, центрирана |
+| `center` / `bottom` | Икона под етикета, центрирана |
 
-1. Saved in a common image format (e.g., JPG, PNG)
-2. Stored alongside other survey data, often in a separate media folder
-3. Accessible for viewing and analysis through the survey management platform
+**Размер на бутона:**
+
+| Стойност | Размер |
+|-------|------|
+| `small` *(по подразбиране)* | Малък кръг |
+| `medium` | Среден кръг |
+| `large` | Голям кръг |
+
+**Цвят на бутона** — добавете хексадесетичен цвят вътре в `display{}`, за да презапишете основния цвят:
+
+```
+inline display{right, large, <FF5500/>}
+inline display{center, medium, <0099FF/>}
+```
+
+**Контрол след заснемане — `results{}`:**
+
+| Appearance | Ефект |
+|---|---|
+| `results{hide(capture)}` | Скрива бутона на камерата след заснемане на снимка |
+| `results{hide(camera)}` | Същото като `hide(capture)` — синоним за типа image |
+| `results{hide(review)}` | Скрива прегледа на миниатюрата след заснемане |
+| `results{hide(filename)}` | Скрива името на файла, показано след качване |
+| `results{left}` | Премества иконата вляво след заснемане |
+
+Пример — голям центриран бутон, скриване на камерата след заснемане:
+```
+inline display{center, large} results{hide(capture)}
+```
+
+### `invisible auto-show` — автоматично отваряне на камерата
+
+Скрива уиджета на въпроса от оформлението, но автоматично отваря камерата, когато страницата се зареди. Полезно за вграждане на стъпка за тихо заснемане в потока на формуляра.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Подпис и рисуване
+
+| Appearance | Описание |
+|---|---|
+| `signature` | Модален прозорец за подпис на цял екран |
+| `signature display{quick}` | Инлине зона за бърз подпис — без модален прозорец |
+| `draw` | Платно за свободно рисуване |
+
+### Воден знак
+
+Добавете текстов или графичен воден знак към заснетите снимки:
+
+```
+watermark(text, "Survey ID: ${id}", bottom-right, 0.5)
+watermark(file, logo.png, top-left, 1.0, 20%)
+```
+
+### Потискане на етикета
+
+```
+inline text-nolabel display{center, large}
+```
+
+## Работа с данни
+
+Снимките, събрани чрез този тип въпрос, обикновено се:
+
+1. Запазват в общ формат за изображения (напр. JPG, PNG)
+2. Съхраняват заедно с другите данни от анкетата, често в отделна папка за медия
+3. Достъпни за преглед и анализ чрез платформата за управление на анкети
 
 ## Съображения за анализ
 
-When using image questions, consider:
+Когато използвате image въпроси, помислете за:
 
-1. How the images will be analyzed (e.g., manual review, automated image analysis)
-2. The additional storage space required for image files
-3. Privacy and data protection measures for storing and handling photos
-4. Potential need for image editing or organization tools in the analysis phase
+1. Как ще бъдат анализирани изображенията (напр. ръчен преглед, автоматизиран анализ на изображения)
+2. Допълнителното пространство за съхранение, необходимо за файловете с изображения
+3. Мерките за поверителност и защита на данните при съхранение и работа със снимки
+4. Потенциалната нужда от инструменти за редактиране или организиране на изображения във фазата на анализ
 
 ## Ограничения
 
-- Image files can be large, which may impact data transfer and storage.
-- Not all devices may have high-quality cameras or sufficient storage space.
-- Analyzing large numbers of images can be time-consuming.
-- There may be privacy concerns when capturing images, especially in public spaces.
-
+- Файловете с изображения могат да бъдат големи, което може да повлияе на трансфера и съхранението на данни.
+- Не всички устройства може да имат висококачествени камери или достатъчно място за съхранение.
+- Анализирането на голям брой изображения може да отнеме много време.
+- Може да има опасения относно поверителността при заснемане на изображения, особено на обществени места.

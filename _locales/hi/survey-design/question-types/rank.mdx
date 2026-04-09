@@ -1,25 +1,27 @@
 ---
 title: "Rank"
-description: "Rank questions उत्तरदाताओं को choices के एक set को preference या priority के अनुसार order करने देते हैं।"
+description: "रैंक (Rank) प्रश्न उत्तरदाताओं को पसंद या प्राथमिकता के आधार पर विकल्पों के एक समूह को क्रमबद्ध करने देते हैं।"
 ---
 
-`rank` question type choices की एक list प्रस्तुत करता है जिसे उत्तरदाता को **order में drag करना होता है** (या अन्यथा पहले से आखिरी तक rank करना होता है)। यह result को सबसे उच्च-priority choice के साथ पहले, चुने गए order में choice values की space-separated list के रूप में store करता है।
+`rank` प्रश्न प्रकार विकल्पों की एक सूची प्रस्तुत करता है जिसे उत्तरदाता पसंद या प्राथमिकता के आधार पर क्रमबद्ध करता है। यह परिणाम को रैंक क्रम में विकल्प मानों की एक स्थान-अलग (space-separated) सूची के रूप में संग्रहीत करता है, जिसमें उच्चतम प्राथमिकता वाला विकल्प पहले होता है।
 
-## बुनियादी XLSForm विशिष्टता
+> **rtSurvey वेब फ़ॉर्म:** ड्रैग-टू-रैंक विजेट (drag-to-rank widget) वर्तमान में लागू नहीं है। वेब फ़ॉर्म में, `rank` एक चयन सूची (select list) के रूप में दिखाई देता है। इस प्रकार का उपयोग तब करें जब उन मोबाइल क्लाइंट को लक्षित कर रहे हों जो रैंक विजेट का समर्थन करते हैं, या जब संग्रहीत मान प्रारूप ड्रैग-टू-ऑर्डर इंटरैक्शन से अधिक महत्वपूर्ण हो।
 
-| type | name | label |
-|------|------|-------|
-| rank priorities | main_priority | इन community needs को सबसे महत्वपूर्ण से कम महत्वपूर्ण तक rank करें |
-
-Choices **choices worksheet** में `select_one` की तरह define की जाती हैं:
-
-**survey:**
+## बुनियादी XLSForm विनिर्देश (Specification)
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | इन needs को सबसे महत्वपूर्ण से कम महत्वपूर्ण तक rank करें |
+| rank priorities | main_priority | इन सामुदायिक आवश्यकताओं को सबसे महत्वपूर्ण से कम महत्वपूर्ण के क्रम में रैंक करें |
 
-**choices:**
+विकल्पों को `select_one` की तरह ही **choices वर्कशीट** में परिभाषित किया गया है:
+
+**सर्वेक्षण (survey):**
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | इन आवश्यकताओं को सबसे महत्वपूर्ण से कम महत्वपूर्ण के क्रम में रैंक करें |
+
+**विकल्प (choices):**
 
 | list_name | name | label |
 |-----------|------|-------|
@@ -29,54 +31,54 @@ Choices **choices worksheet** में `select_one` की तरह define क
 | priorities | roads | सड़कें |
 | priorities | electricity | बिजली |
 
-## संग्रहीत मूल्य प्रारूप
+## संग्रहीत मान प्रारूप (Stored value format)
 
-Stored value ranked order में choice values की **space-separated list** है (पहला = highest priority):
+संग्रहीत मान रैंक क्रम में विकल्प मानों की एक **स्थान-अलग सूची** है (पहला = उच्चतम प्राथमिकता):
 
 ```
 water education health roads electricity
 ```
 
-## Ranked positions निकालना
+## रैंक किए गए स्थान निकालना
 
-किसी specific rank पर choice प्राप्त करने के लिए `selected-at()` का उपयोग करें:
+किसी विशिष्ट रैंक पर विकल्प प्राप्त करने के लिए `selected-at()` का उपयोग करें:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| rank priorities | main_priority | Community needs rank करें | |
+| rank priorities | main_priority | सामुदायिक आवश्यकताओं को रैंक करें | |
 | calculate | top_priority | | selected-at(`${main_priority}`, 0) |
 | calculate | second_priority | | selected-at(`${main_priority}`, 1) |
 
-`selected-at(${main_priority}, 0)` **पहले** रखे गए value को return करता है (index 0 = top rank)।
+`selected-at(${main_priority}, 0)` वह मान लौटाता है जिसे **पहले** (इंडेक्स 0 = शीर्ष रैंक) स्थान पर रखा गया है।
 
-## Repeat groups के साथ `rank-index()` का उपयोग करना
+## दोहराव समूहों (repeat groups) के साथ `rank-index()` का उपयोग करना
 
-जब `rank` को repeat group के अंदर उपयोग किया जाता है, `rank-index()` आपको repeat के बाहर से ordinal rank को reference करने देता है:
+जब `rank` का उपयोग दोहराव समूह के भीतर किया जाता है, तो `rank-index()` आपको दोहराव के बाहर से क्रमिक रैंक को संदर्भित करने देता है:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_ranked | | rank-index(1, `${score}`) |
 
-`rank-index()` और `rank-index-if()` के बारे में पूरे विवरण के लिए [Functions — Repeated field functions](../operators-and-functions/functions#repeated-field-functions) देखें।
+`rank-index()` और `rank-index-if()` पर पूरी जानकारी के लिए [Functions — Repeated field functions](../operators-and-functions/functions#repeated-field-functions) देखें।
 
 ## उपयोग
 
-Rank questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+रैंक प्रश्नों का उपयोग आमतौर पर इनके लिए किया जाता है:
 
-1. **Priority ranking** — communities को development needs rank करने के लिए कहना
-2. **Preference ordering** — product features, service attributes, या policy options rank करना
-3. **Exam item ordering** — किसी process के steps को arrange करना
-4. **Top-N selection** — केवल top 1, 2, या 3 choices extract करने के लिए `selected-at()` के साथ combined
+1. **प्राथमिकता रैंकिंग** — समुदायों से विकास की जरूरतों को रैंक करने के लिए कहना
+2. **पसंद का क्रम** — उत्पाद सुविधाओं, सेवा विशेषताओं, या नीति विकल्पों को रैंक करना
+3. **परीक्षा आइटम ऑर्डरिंग** — एक प्रक्रिया में चरणों को व्यवस्थित करना
+4. **शीर्ष-N चयन** — केवल शीर्ष 1, 2, या 3 विकल्पों को निकालने के लिए `selected-at()` के साथ संयुक्त
 
-## सर्वोत्तम प्रथाएँ
+## सर्वोत्तम प्रथाएं
 
-1. List को short (3–7 items) रखें — 7–8 choices से परे ranking cognitively taxing हो जाती है।
-2. Confusion से बचने के लिए clear, mutually exclusive choice labels का उपयोग करें।
-3. Ranking direction समझाने वाला hint text जोड़ें (जैसे "Drag to order: first = most important")।
-4. यदि आपको यह सुनिश्चित करने की आवश्यकता है कि सभी choices ranked हैं तो `count-selected(.) = x` का उपयोग करके validate करें।
+1. सूची को छोटा रखें (3-7 आइटम) — 7-8 विकल्पों से अधिक होने पर रैंकिंग संज्ञानात्मक रूप से थका देने वाली हो जाती है।
+2. "पहले" का क्या अर्थ है, इस बारे में भ्रम से बचने के लिए स्पष्ट, पारस्परिक रूप से अनन्य (mutually exclusive) विकल्प लेबल का उपयोग करें।
+3. रैंकिंग दिशा बताते हुए संकेत टेक्स्ट जोड़ें (जैसे, "क्रमबद्ध करने के लिए खींचें: पहला = सबसे महत्वपूर्ण")।
+4. यदि आपको यह सुनिश्चित करने की आवश्यकता है कि सभी विकल्पों को रैंक किया गया है, तो `count-selected(.) = x` का उपयोग करके सत्यापित करें।
 
-## सीमाएं
+## सीमाएं (Limitations)
 
-- Drag-to-rank widget के लिए touch screen या mouse की आवश्यकता है — यह keyboard-only environments में अच्छी तरह काम नहीं कर सकता।
-- कुछ पुराने mobile clients पर, rank widget एक numbered input interface पर fall back हो सकता है।
-- आप partially rank नहीं कर सकते (यानी केवल कुछ choices rank करें) — सभी choices को order किया जाना चाहिए।
+- rtSurvey वेब फ़ॉर्म में ड्रैग-टू-रैंक विजेट लागू नहीं है।
+- आप आंशिक रूप से रैंक नहीं कर सकते — सभी विकल्पों को क्रमबद्ध किया जाना चाहिए।
+- सूचियों को 3-7 आइटम तक रखें; लंबी सूचियां क्लाइंट की परवाह किए बिना बोझिल हो जाती हैं।

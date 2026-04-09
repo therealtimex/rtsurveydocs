@@ -1,48 +1,81 @@
 ---
 title: "Geotrace"
-description: "Otázky geotrace umožňují respondentům zachytit sérii propojených bodů na mapě, vytvářet linie nebo cesty jako součást průzkumu."
+description: "Otázky typu Geotrace zachycují sérii GPS bodů tvořících linii nebo cestu."
 ---
 
-Typ otázky geotrace v XLSForms a rtSurvey umožňuje respondentům zachytit sérii propojených bodů na mapě a vytvářet linie nebo cesty. Tato funkce je zvláště užitečná pro mapování tras, hranic nebo lineárních prvků v prostorových průzkumech.
+Typ otázky `geotrace` zachycuje sekvenci geografických souřadnic tvořících linii nebo cestu (polyline). Ve webovém formuláři rtSurvey se vykresluje jako **textový vstup**, kam tazatel (enumerator) zadává nebo vkládá řetězec souřadnic přímo.
 
 ## Základní specifikace XLSForm
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geotrace | river_path  | Sledujte tok řeky     |
+| type     | name        | label                        |
+|----------|-------------|------------------------------|
+| geotrace | river_path  | Sledujte cestu řeky |
+| geotrace | road_route  | Zaznamenejte trasu silnice |
 
-## Použití
+Pro standardní specifikaci viz [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
 
-Otázky geotrace se běžně používají pro:
+---
 
-1. Mapování tras nebo cest procházených při terénních průzkumech
-2. Sledování lineárních prvků, jako jsou silnice, řeky nebo hranice
-3. Zachycení rozsahu lineární infrastruktury (např. potrubí, elektrické vedení)
-4. Zaznamenávání cestovních tras v dopravních studiích
-5. Definování transektů v ekologických průzkumech
+## Formát dat (Data Format)
+
+Uloženo jako seznam bodů oddělených středníkem **bez mezer kolem středníků**. Každý bod tvoří čtyři hodnoty oddělené mezerou:
+
+```
+lat lon alt acc;lat lon alt acc;lat lon alt acc
+```
+
+| Component | Description |
+|-----------|-------------|
+| `lat` | Zeměpisná šířka v desetinných stupních |
+| `lon` | Zeměpisná délka v desetinných stupních |
+| `alt` | Nadmořská výška v metrech (`0`, pokud není známa) |
+| `acc` | Přesnost GPS v metrech (`0`, pokud není známa) |
+
+**Příklad — cesta o třech bodech:**
+```
+13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
+```
+
+Pro vytvoření platné cesty jsou vyžadovány alespoň dva body.
+
+---
+
+## Jak se vykresluje v rtSurvey
+
+Ve webovém formuláři rtSurvey se `geotrace` vykresluje jako prosté **textové pole**. Tazatel zapíše nebo vloží řetězec souřadnic. V současném webovém formuláři pro tento typ neexistuje žádný vestavěný interaktivní výběr z mapy.
+
+### Interaktivní sběr bodů
+
+Doporučený vzorec pro sběr v terénu je **skupina opakování (repeat group) s otázkami `geopoint`** — každý bod využívá plnohodnotný výběr z GPS mapy — v kombinaci s funkcí `calculate` pro vytvoření řetězce geotrace:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | path_points | Zaznamenejte každý trasový bod | |
+| geopoint | point | Klepnutím zaznamenejte bod | |
+| end repeat | path_points | | |
+| calculate | geotrace_value | | `join(';', ${path_points/point})` |
+
+Vypočtený řetězec lze poté uložit do otázky typu `text` nebo použít v `geotrace`.
+
+---
 
 ## Příklad použití
 
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geotrace | hiking_trail   | Sledujte cestu turistické stezky         | Začněte u vchodu na stezku a skončete na vrcholu |
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geotrace | farm_boundary_path | Zaznamenejte přístupovou cestu k farmě | Zadejte každý trasový bod oddělený středníkem | yes |
 
-## Formát dat
+---
 
-Data geotrace jsou obvykle uložena jako řetězec dvojic souřadnic oddělených středníky, podobně jako geoshape, ale bez uzavíracího bodu:
+## Nejlepší postupy
 
-```
-z.š1 z.d1; z.š2 z.d2; z.š3 z.d3; ... z.šN z.dN
-```
+1. Pro interaktivní sběr založený na mapě použijte skupinu opakování s otázkami `geopoint` a poté hodnoty spojte — to dává tazatelům GPS výběr pro každý jednotlivý bod.
+2. Pokud je vyžadováno ruční zadávání souřadnic, uveďte očekávaný formát v sloupci `hint`.
+3. Pokud je cesta povinná, ověřte přítomnost pomocí `required = yes`.
+4. Plánujte čištění dat — cesty zadané ručně mohou mít nekonzistentní přesnost.
 
-Například:
-```
-38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166
-```
+## Omezení (Limitations)
 
-## Omezení
-
-- Sledování přesných cest na malých mobilních obrazovkách může být náročné.
-- Složité sledování může vyžadovat značnou kapacitu úložiště a zpracování.
-- Kontinuální použití GPS pro automatické sledování může rychle vybít baterii zařízení.
-- Mohou existovat obavy o soukromí spojené se sběrem podrobných dat o cestách.
+- Ve webovém formuláři rtSurvey neexistuje žádný vestavěný interaktivní výběr z mapy pro `geotrace`.
+- Řetězec souřadnic může být u složitých cest dlouhý — mějte to na paměti z hlediska výkonu formuláře a úložiště.
+- Validace topologie cesty (např. minimální počet bodů, samoprotnutí) vyžaduje následné zpracování mimo omezení XLSForm.

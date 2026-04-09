@@ -1,65 +1,207 @@
 ---
-title: "Integer"
-description: "Otázky integer umožňují zadávání celých čísel v průzkumu."
+title: "Celé číslo"
+description: "Typ otázky pro zadávání celých čísel v rtSurvey"
 ---
 
-Typ otázky integer v XLSForms a rtSurvey se používá pro sběr celých číselných odpovědí. Tento typ otázky je nezbytný pro shromažďování numerických dat bez desetinných míst, jako jsou počty, věky nebo roky.
+Typ otázky `integer` shromažďuje celá čísla (bez desetinných míst). Na mobilních zařízeních vyvolává numerickou klávesnici a blokuje zadávání desetinné čárky. Podporuje stejné možnosti vzhledu jako typ `text` pro rozvržení a formátování.
 
 ## Základní specifikace XLSForm
 
-| type    | name  | label                 |
-|---------|-------|------------------------|
-| integer | age   | Zadejte svůj věk v letech |
+| type | name | label |
+|------|------|-------|
+| integer | age | Věk respondenta |
+| integer | household_size | Počet osob v domácnosti |
 
-## Použití
+Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
 
-Otázky integer se běžně používají pro:
+---
 
-1. Zadávání věku
-2. Počítání položek (např. počet dětí, členů domácnosti)
-3. Zadávání roku (např. rok narození)
-4. Hodnocení na číselné škále
-5. Jakýkoli sběr dat celých čísel
+## Možnosti vzhledu
 
-## Osvědčené postupy
+### `number-hspinner` — horizontální číselník
 
-1. Používejte jasné a stručné popisky pro specifikaci očekávaného vstupu.
-2. Implementujte omezení rozsahu pro prevenci nerealistických nebo chybných vstupů.
-3. Zvažte použití nápovědy pro poskytnutí příkladů nebo upřesnění očekávaného formátu.
-4. Pro velká čísla zvažte použití čárek nebo mezer v popisku pro zlepšení čitelnosti.
+Nahradí vstup horizontálním číselníkem **− hodnota +**. Klepnutím na mínus/plus se hodnota sníží nebo zvýší o 1 (nebo o vlastní krok).
+
+```
+number-hspinner
+```
+
+**Přizpůsobte tvar tlačítka a krok** pomocí `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','5')
+```
+
+Parametry: tvar levého tlačítka, tvar pravého tlačítka, hodnota kroku (pro integer je výchozí `1`).
+
+**Vlastní barvy** pomocí `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Čtyři hodnoty v pořadí: pozadí levého tlačítka, ikona levého tlačítka, pozadí pravého tlačítka, ikona pravého tlačítka.
+
+---
+
+### `thousandsep` — oddělovač tisíců
+
+Formátuje zobrazené číslo s oddělovačem tisíců (např. `1 234 567`). Nezpracované číslo se ukládá bez oddělovačů. Typ vstupu se přepne na `"text"`, aby bylo možné formátované zobrazení.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — vlastní seskupování číslic
+
+Seskupuje číslice do bloků o velikosti `n` oddělených vlastním oddělovačem. Užitečné pro formátovaná ID nebo referenční kódy, které jsou číselné.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+Pokud je tento vzhled aktivní, typ vstupu se přepne na `"text"`.
+
+---
+
+### `textonly` — vynucení textové klávesnice
+
+Vynutí `type="text"` na vstupním prvku. To zabraňuje chování prohlížeče u číselných vstupů (jako je skrývání počátečních nul nebo přidávání šipek v desktopových prohlížečích) při zachování sběru číselné hodnoty.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — nápověda jako plovoucí štítek
+
+Text `hint` se ve vstupu vykreslí jako zástupný symbol (placeholder). Když uživatel začne psát, nápověda se vysune nad pole jako štítek.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — nápověda uvnitř ohraničení vstupu
+
+Podobné jako `floating_hint` — nápověda je umístěna uvnitř ohraničení vstupu, pokud je prázdný. Při psaní se neposouvá nahoru.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — vstup v modálním dialogu
+
+Klepnutím na pole se otevře modální dialog s větším vstupem místo úprav přímo v řádku. Užitečné na malých obrazovkách, kde je celoobrazovkový vstup jednodušší.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — živé počítadlo znaků
+
+Zobrazuje živý počet znaků `(n)` pod vstupem, který se aktualizuje během psaní.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — přidání předpony
+
+Přidá statický nebo vypočítaný řetězec před zobrazenou hodnotu. Uložená hodnota předponu neobsahuje.
+
+```
+prefix('Položka č. ')   → zobrazí "Položka č. 42", uloží "42"
+prefix(${code_prefix})  → dynamická předpona z jiného pole
+```
+
+---
+
+### `align_answer` — zarovnání textu vstupu
+
+Ovládá horizontální zarovnání zadávané hodnoty uvnitř vstupu.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — skenování QR / čárového kódu do pole
+
+Přidá tlačítko pro skenování QR kódu vedle vstupu. Otevře skener fotoaparátu a vyplní pole naskenovanou číselnou hodnotou.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Rychlý přehled vzhledu
+
+| Appearance | Vykreslený widget |
+|---|---|
+| *(žádný)* | Číselný vstup (`type="number"`) — numerická klávesnice na mobilu |
+| `number-hspinner` | Horizontální číselník − hodnota +, krok = 1 |
+| `number-hspinner hspinner(...)` | Číselník s vlastním tvarem tlačítek a krokem |
+| `number-hspinner colors(...)` | Číselník s vlastními barvami tlačítek |
+| `thousandsep` | Zobrazení čísla s oddělovačem tisíců |
+| `digisep(n,"sep")` | Vlastní seskupování číslic |
+| `textonly` | Vynucení textové klávesnice |
+| `floating_hint` | Nápověda se při psaní vysune nad pole |
+| `embed` | Nápověda uvnitř ohraničení vstupu |
+| `textpopup` | Klepnutím otevřete modální dialog |
+| `charcount` | Živý počet znaků pod vstupem |
+| `prefix(expr)` | Přidání statické nebo dynamické předpony |
+| `align_answer = left/right/center` | Zarovnání textu vstupu |
+| `inputs{qrscan}` | Tlačítko pro skenování QR/čárového kódu |
+
+---
 
 ## Omezení a validace
 
-Můžete přidat omezení pro zajištění, že zadaná hodnota spadá do určitého rozsahu:
+K vynucení rozsahů hodnot použijte omezení (constraints). Omezení ve sloupci `constraint` jsou vyhodnocována po každém stisknutí tlačítka v režimu `number-hspinner`, nikoli pouze při opuštění pole.
 
-| type    | name  | label                 | constraint        | constraint_message                    |
-|---------|-------|------------------------|-------------------|---------------------------------------|
-| integer | age   | Zadejte svůj věk v letech | .>0 and .&lt;=120    | Věk musí být mezi 1 a 120 lety   |
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| integer | age | Věk | `. > 0 and . <= 120` | Věk musí být mezi 1 a 120 |
+| integer | year | Rok výstavby | `. >= 1800 and . <= 2100` | Zadejte platný rok |
+| integer | count | Počet položek | `. >= 0` | Nesmí být záporné |
 
-## Příklad použití
+---
 
-Příklad použití otázek integer v průzkumu domácností:
+## Příklad — průzkum domácností
 
-| type    | name           | label                                     | constraint | constraint_message                |
-|---------|----------------|-------------------------------------------|------------|-----------------------------------|
-| integer | household_size | Kolik lidí žije ve vaší domácnosti?   | .>0        | Velikost domácnosti musí být alespoň 1 |
-| integer | num_children   | Kolik dětí do 18 let je v domácnosti? | .>=0    | Počet dětí nemůže být záporný |
-| integer | year_built     | V jakém roce byl váš dům postaven?        | .>1800 and .&lt;=2023 | Rok musí být mezi 1800 a 2023 |
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| integer | household_size | Počet osob v domácnosti | `number-hspinner` | `. >= 1 and . <= 30` | Musí být mezi 1 a 30 |
+| integer | under_5 | Děti do 5 let | `number-hspinner` | `. >= 0 and . <= ${household_size}` | Nesmí překročit velikost domácnosti |
+| integer | year_built | Rok výstavby domu | `textonly` | `. >= 1800 and . <= 2100` | Zadejte platný rok |
 
-## Výpočty s hodnotami integer
+---
 
-Hodnoty integer lze použít ve výpočtech:
+## Osvědčené postupy
 
-| type    | name           | label                                     |
-|---------|----------------|-------------------------------------------|
-| integer | num_adults     | Počet dospělých v domácnosti         |
-| integer | num_children   | Počet dětí v domácnosti       |
-| calculate | total_members | | 
+1. Používejte `number-hspinner` pro počty v malém rozsahu, kde je klikání na ± rychlejší než psaní (např. počet dětí, skóre na stupnici 1–10).
+2. Používejte `thousandsep` při zobrazování velkých celých čísel (populace, příjem), aby si respondenti mohli sami zkontrolovat řádovou velikost.
+3. Používejte `textonly`, když prohlížeče přidávají nechtěné uživatelské rozhraní pro číselné vstupy (šipky číselníku, posouvání dotykem), které respondenty mate.
+4. Vynucujte omezení rozsahu raději než spoléhání se na typ mobilní klávesnice — vynucení klávesnice není univerzální.
 
-Ve výpočtovém řádku můžete použít:
+## Omezení
 
-```
-calculation | ${num_adults} + ${num_children}
-```
-
-Toto sečte počet dospělých a dětí pro získání celkového počtu členů domácnosti.
+- Zadávání desetinné čárky je blokováno — pokud potřebujete zlomkové hodnoty, použijte typ `decimal`.
+- `number-hspinner` validuje `constraint` při každém stisknutí tlačítka — v režimu číselníku se vyhněte náročným omezením (např. složité řetězce `if()`).
+- `thousandsep` a `digisep()` ukládají nezpracované číslo bez formátování — ve výpočtech nespoléhejte na formátovanou zobrazenou hodnotu.

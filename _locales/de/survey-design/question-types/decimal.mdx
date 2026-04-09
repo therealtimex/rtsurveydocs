@@ -1,74 +1,212 @@
 ---
-title: "Decimal (Dezimalzahl)"
-description: "Decimal-Fragen ermöglichen numerische Eingaben mit Nachkommastellen in Ihrer Umfrage."
+title: "Decimal"
+description: "Frage-Typ für die Eingabe von Dezimalzahlen in rtSurvey"
 ---
 
-Der `decimal`-Fragetyp in XLSForms und rtSurvey wird verwendet, um numerische Antworten zu sammeln, die Nachkommastellen enthalten können. Dieser Fragetyp ist für die Erfassung präziser numerischer Daten wie Messwerte, Preise oder Prozentsätze unerlässlich.
+Der Frage-Typ `decimal` erfasst Zahlen, die einen Bruchteil enthalten können (z. B. `3.14`, `72.5`). Er löst auf Mobilgeräten eine numerische Tastatur aus und unterstützt dieselben Darstellungsoptionen wie der Typ `text` für Layout und Formatierung.
 
 ## Grundlegende XLSForm-Spezifikation
 
-| type    | name   | label                    |
-|---------|--------|--------------------------|
-| decimal | weight | Geben Sie Ihr Gewicht in kg ein |
+| type | name | label |
+|------|------|-------|
+| decimal | weight_kg | Gewicht (kg) |
+| decimal | height_m | Größe (m) |
+| decimal | temperature | Körpertemperatur (°C) |
 
-Weitere Details zum grundlegenden `decimal`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Die Standard-Spezifikation finden Sie in der [XLSForm-Dokumentation](https://xlsform.org/en/#question-types).
 
-## Anwendungen
+---
 
-`Decimal`-Fragen werden häufig verwendet für:
+## Darstellungsoptionen (Appearance options)
 
-1. Messungen (z. B. Gewicht, Größe, Entfernung)
-2. Finanzdaten (z. B. Preise, Gehälter)
-3. Prozentsätze
-4. Wissenschaftliche Datenerhebung
-5. Alle numerischen Daten, die eine Genauigkeit über ganze Zahlen hinaus erfordern
+### `number-hspinner` — Horizontaler Spinner
 
-## Empfohlene Vorgehensweisen
+Ersetzt die Eingabe durch einen horizontalen **− Wert +** Spinner. Tippen auf Minus/Plus passt den Wert um den konfigurierten Schritt (step) an.
 
-1. Verwenden Sie klare und prägnante Beschriftungen, um die erwartete Eingabe und die Maßeinheit anzugeben.
-2. Implementieren Sie Bereichsbeschränkungen (Constraints), um unrealistische oder fehlerhafte Eingaben zu verhindern.
-3. Erwägen Sie die Verwendung von Hinweistexten (Hints), um Beispiele zu geben oder das erwartete Format zu klären.
-4. Geben Sie die gewünschte Anzahl der Dezimalstellen in der Beschriftung oder im Hinweis an, wenn Präzision wichtig ist.
+```
+number-hspinner
+```
+
+Der angezeigte Wert wird mit einer Dezimalstelle formatiert (z. B. `3.0`, `72.5`). Der Standardschritt ist `1`; verwenden Sie `hspinner()`, um einen Dezimalschritt festzulegen.
+
+**Anpassen der Schaltflächenform und des Schritts** mit `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','0.1')
+```
+
+Parameter: Form der linken Schaltfläche, Form der rechten Schaltfläche, Schrittwert. Verwenden Sie einen Dezimalschritt wie `0.5` oder `0.1` für eine feingliedrige Steuerung.
+
+**Benutzerdefinierte Farben** mit `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Vier Werte in der Reihenfolge: Hintergrund linke Schaltfläche, Symbol linke Schaltfläche, Hintergrund rechte Schaltfläche, Symbol rechte Schaltfläche.
+
+---
+
+### `thousandsep` — Tausendertrennzeichen
+
+Formatiert die angezeigte Zahl mit Tausender-Gruppierung (z. B. `1,234.56`). Die Rohzahl wird ohne Kommas gespeichert. Der Eingabetyp wird auf `"text"` umgeschaltet, um die formatierte Anzeige zu ermöglichen.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — Benutzerdefinierte Zifferngruppierung
+
+Gruppiert Ziffern des Ganzzahlteils in Blöcke von `n`, getrennt durch ein benutzerdefiniertes Trennzeichen.
+
+```
+digisep(3," ")      → 1 234 567.89
+```
+
+Der Eingabetyp wird auf `"text"` umgeschaltet, wenn diese Darstellung aktiv ist.
+
+---
+
+### `textonly` — Text-Tastatur erzwingen
+
+Erzwingt `type="text"` für das Eingabeelement. Verhindert Eigenheiten der Browser-Zahleneingabe (Ausblenden von Nachkommanullen, Desktop-Pfeile), während weiterhin Dezimalwerte akzeptiert werden.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — Hinweis schwebt als Label
+
+Der `hint`-Text wird innerhalb der Eingabe als Platzhalter angezeigt. Wenn der Benutzer mit der Eingabe beginnt, schwebt er als Label über dem Feld.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — Hinweis innerhalb der Eingabebegrenzung
+
+Ähnlich wie `floating_hint` — der Hinweis befindet sich innerhalb der Eingabebegrenzung, wenn das Feld leer ist. Er schwebt nicht, wenn der Benutzer tippt.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — Modaler Dialog zur Eingabe
+
+Tippen auf das Feld öffnet einen modalen Dialog mit einer größeren Eingabe. Nützlich auf kleinen Bildschirmen.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — Live-Zeichenzähler
+
+Zeigt einen Live-Zeichenzähler `(n)` unter der Eingabe an, der beim Tippen aktualisiert wird.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — Präfix voranstellen
+
+Stellt der angezeigten Zahl eine statische oder berechnete Zeichenfolge voran. Der gespeicherte Wert enthält das Präfix nicht.
+
+```
+prefix('USD ')          → zeigt "USD 72.50", speichert "72.50"
+prefix(${currency})     → dynamisches Präfix aus einem anderen Feld
+```
+
+---
+
+### `align_answer` — Ausrichtung des Eingabetextes
+
+Steuert die horizontale Ausrichtung des eingegebenen Wertes innerhalb der Eingabe.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — QR- / Barcode-Scan in das Feld
+
+Fügt eine Schaltfläche zum Scannen von QR-Codes neben der Eingabe hinzu. Öffnet den Kamera-Scanner und füllt das Feld mit dem gescannten Wert.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Kurzübersicht Darstellung (Appearance quick reference)
+
+| Appearance | Widget rendered |
+|---|---|
+| *(none)* | Zahleneingabe (`type="number"`) — numerische Tastatur auf Mobilgeräten |
+| `number-hspinner` | Horizontaler − Wert + Spinner, eine Dezimalstelle angezeigt |
+| `number-hspinner hspinner(...)` | Spinner mit benutzerdefinierter Schaltflächenform und Schritt |
+| `number-hspinner colors(...)` | Spinner mit benutzerdefinierten Schaltflächenfarben |
+| `thousandsep` | Zahlenausgabe mit Tausendertrennzeichen |
+| `digisep(n,"sep")` | Benutzerdefinierte Zifferngruppierung |
+| `textonly` | Text-Tastatur erzwingen |
+| `floating_hint` | Hinweis schwebt beim Tippen über dem Feld |
+| `embed` | Hinweis innerhalb der Eingabebegrenzung |
+| `textpopup` | Tippen zum Öffnen eines modalen Dialogs |
+| `charcount` | Live-Zeichenzähler unter der Eingabe |
+| `prefix(expr)` | Statisches oder dynamisches Präfix voranstellen |
+| `align_answer = left/right/center` | Ausrichtung des Eingabetextes |
+| `inputs{qrscan}` | Schaltfläche für QR-/Barcode-Scan |
+
+---
 
 ## Einschränkungen und Validierung
 
-Sie können Einschränkungen (Constraints) hinzufügen, um sicherzustellen, dass der eingegebene Wert innerhalb eines bestimmten Bereichs liegt:
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| decimal | weight | Gewicht (kg) | `. > 0 and . <= 500` | Geben Sie einen Wert zwischen 0 und 500 ein |
+| decimal | height | Größe (m) | `. > 0 and . <= 3` | Geben Sie einen Wert zwischen 0 und 3 ein |
+| decimal | temp | Temperatur (°C) | `. >= 35 and . <= 42` | Normale Temperatur: 35°C–42°C |
+| decimal | percentage | Prozentsatz | `. >= 0 and . <= 100` | Geben Sie einen Wert zwischen 0 und 100 ein |
 
-| type    | name   | label                    | constraint        | constraint_message                    |
-|---------|--------|--------------------------|-------------------|---------------------------------------|
-| decimal | height | Geben Sie Ihre Größe in Metern ein | .>0 and .&lt;=3    | Die Größe muss zwischen 0 und 3 Metern liegen |
+---
 
-## Beispielhafte Verwendung
+## Beispiel — Messformular
 
-Hier ist ein Beispiel dafür, wie Sie `decimal`-Fragen in einer Gesundheitsumfrage verwenden könnten:
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| decimal | weight_kg | Gewicht (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Geben Sie ein gültiges Gewicht ein |
+| decimal | height_m | Größe (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Geben Sie eine gültige Größe ein |
+| calculate | bmi | | | | |
 
-| type    | name           | label                                     | constraint | constraint_message                |
-|---------|----------------|-------------------------------------------|------------|-----------------------------------|
-| decimal | weight         | Geben Sie Ihr Gewicht in kg ein           | .>0 and .&lt;=500 | Das Gewicht muss zwischen 0 und 500 kg liegen |
-| decimal | height         | Geben Sie Ihre Größe in Metern ein        | .>0 and .&lt;=3 | Die Größe muss zwischen 0 und 3 Metern liegen |
-| decimal | body_temp      | Geben Sie Ihre Körpertemperatur in Celsius ein | .>=35 and .&lt;=42 | Die Temperatur muss zwischen 35°C und 42°C liegen |
-| calculate | bmi          |                                           |            |                                   |
-
-In der `calculate`-Zeile für den BMI können Sie verwenden:
-
+Spalte für BMI-Berechnung:
 ```
-calculation | ${weight} / (${height} * ${height})
+${weight_kg} div (${height_m} * ${height_m})
 ```
 
-Dies berechnet den BMI unter Verwendung des eingegebenen Gewichts und der Größe.
+---
 
-## rtSurvey-Erweiterungen
+## Best Practices
 
-Während die grundlegende XLSForm-Spezifikation für `decimal`-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen:
+1. Verwenden Sie `number-hspinner hspinner(..., '0.1')` für Messungen, die eine Dezimalstelle Genauigkeit erfordern — der Spinner formatiert automatisch auf eine Dezimalstelle, was die Werte konsistent hält.
+2. Verwenden Sie `textonly`, wenn Browser unerwünschte Spinner-Steuerelemente hinzufügen oder Nachkommanullen abschneiden (z. B. `3.0` als `3` angezeigt).
+3. Verwenden Sie `thousandsep` für große Finanzwerte, damit die Befragten überprüfen können, ob sie die richtige Größenordnung eingegeben haben.
+4. Setzen Sie Bereichsbeschränkungen (constraints) durch, anstatt sich nur auf den Tastaturtyp des Mobilgeräts zu verlassen.
 
-1. Kontrolle der Präzision (Anzahl der Dezimalstellen)
-2. Benutzerdefinierte Eingabeformate (z. B. Prozentsatz, Währung)
-3. Erweiterte Validierungsregeln
+## Einschränkungen (Limitations)
 
-(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für `decimal`-Fragen müssten hier bestätigt und detailliert werden.)
-
-## Einschränkungen
-
-- Die Präzision von Dezimalzahlen kann durch das zugrunde liegende System oder die Datenbank begrenzt sein.
-- Benutzer benötigen möglicherweise Hinweise zum erwarteten Dezimaltrennzeichen (Punkt oder Komma), abhängig von ihrem Gebietsschema.
-- Große Dezimalzahlen können auf mobilen Geräten schwierig zu lesen oder genau einzugeben sein.
+- Der Spinner zeigt immer eine Dezimalstelle an — wenn Sie mehr Präzision im angezeigten Wert benötigen, verwenden Sie stattdessen die einfache Eingabe.
+- `thousandsep` und `digisep()` speichern die Rohzahl — verwenden Sie den formatierten Anzeigewert nicht in Berechnungen.

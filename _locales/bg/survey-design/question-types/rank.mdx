@@ -1,82 +1,84 @@
 ---
-title: "Класиране"
-description: "Въпросите от тип rank позволяват на респондентите да наредят набор от опции по предпочитание или приоритет."
+title: "Rank"
+description: "Rank въпросите позволяват на респондентите да подреждат набор от избори по предпочитание или приоритет."
 ---
 
-The `rank` question type presents a list of choices that the respondent must **drag into order** (or otherwise rank from first to last). It stores the result as a space-separated list of choice values in the order selected, with the highest-priority choice first.
+Типът въпрос `rank` представя списък от избори, които респондентът подрежда по предпочитание или приоритет. Той съхранява резултата като разделен с интервали списък от стойности на избори в подреден ред, с избора с най-висок приоритет на първо място.
 
-## Основна спецификация на XLSForm
+> **rtSurvey уеб формуляр:** Уиджета „плъзгане за подреждане“ в момента не е реализиран. В уеб формуляра `rank` се изобразява като списък за избор. Използвайте този тип, когато се насочвате към мобилни клиенти, които поддържат rank уиджета, или когато форматът на съхранената стойност е по-важен от взаимодействието „плъзгане за подреждане“.
+
+## Базова XLSForm спецификация
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Rank these community needs from most to least important |
+| rank priorities | main_priority | Подредете тези нужди на общността от най-важни към най-малко важни |
 
-The choices are defined in the **choices worksheet** just like `select_one`:
+Изборите се дефинират в работния лист **choices**, точно както при `select_one`:
 
 **survey:**
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Rank these needs from most to least important |
+| rank priorities | main_priority | Подредете тези нужди от най-важни към най-малко важни |
 
 **choices:**
 
 | list_name | name | label |
 |-----------|------|-------|
-| priorities | water | Clean water |
-| priorities | health | Healthcare |
-| priorities | education | Education |
-| priorities | roads | Roads |
-| priorities | electricity | Electricity |
+| priorities | water | Чиста вода |
+| priorities | health | Здравеопазване |
+| priorities | education | Образование |
+| priorities | roads | Пътища |
+| priorities | electricity | Електричество |
 
-## Формат на съхраняваната стойност
+## Формат на съхранената стойност
 
-The stored value is a **space-separated list** of choice values in ranked order (first = highest priority):
+Съхранената стойност е **разделен с интервали списък** от стойности на избори в подреден ред (първият = най-висок приоритет):
 
 ```
 water education health roads electricity
 ```
 
-## Извличане на класирани позиции
+## Извличане на позиции в подредбата
 
-Use `selected-at()` to get the choice at a specific rank:
+Използвайте `selected-at()`, за да получите избора на конкретна позиция:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| rank priorities | main_priority | Rank community needs | |
+| rank priorities | main_priority | Подредете нуждите на общността | |
 | calculate | top_priority | | selected-at(`${main_priority}`, 0) |
 | calculate | second_priority | | selected-at(`${main_priority}`, 1) |
 
-`selected-at(${main_priority}, 0)` returns the value placed **first** (index 0 = top rank).
+`selected-at(${main_priority}, 0)` връща стойността, поставена на **първо** място (индекс 0 = най-висока позиция).
 
-## Използване на `rank-index()` с групи за повторение
+## Използване на `rank-index()` с повтарящи се групи (repeat groups)
 
-When `rank` is used inside a repeat group, `rank-index()` lets you reference the ordinal rank from outside the repeat:
+Когато `rank` се използва вътре в повтаряща се група, `rank-index()` ви позволява да реферирате към поредната позиция отвън на повторението:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_ranked | | rank-index(1, `${score}`) |
 
-See [Functions — Repeated field functions](../operators-and-functions/functions#repeated-field-functions) for full details on `rank-index()` and `rank-index-if()`.
+Вижте [Функции — Функции за повтарящи се полета](../operators-and-functions/functions#repeated-field-functions) за пълни подробности относно `rank-index()` и `rank-index-if()`.
 
-## Приложения
+## Употреби
 
-Rank questions are commonly used for:
+Rank въпросите обикновено се използват за:
 
-1. **Priority ranking** — asking communities to rank development needs
-2. **Preference ordering** — ranking product features, service attributes, or policy options
-3. **Exam item ordering** — arranging steps in a process
-4. **Top-N selection** — combined with `selected-at()` to extract only the top 1, 2, or 3 choices
+1. **Подреждане по приоритет** — искане от общностите да подредят нуждите за развитие
+2. **Подреждане по предпочитание** — подреждане на функции на продукта, атрибути на услугата или опции за политика
+3. **Подреждане на елементи в изпит** — подреждане на стъпки в процес
+4. **Избор на Топ-N** — комбинирано със `selected-at()` за извличане само на първите 1, 2 или 3 избора
 
-## Най-добри практики
+## Добри практики
 
-1. Keep the list short (3–7 items) — ranking becomes cognitively taxing beyond 7–8 choices.
-2. Use clear, mutually exclusive choice labels to avoid confusion about what "first" means.
-3. Add hint text explaining the ranking direction (e.g., "Drag to order: first = most important").
-4. Validate using `count-selected(.) = x` if you need to ensure all choices are ranked.
+1. Дръжте списъка кратък (3–7 елемента) — подреждането става когнитивно натоварващо над 7–8 избора.
+2. Използвайте ясни, взаимно изключващи се етикети за избор, за да избегнете объркване относно това какво означава „първи“.
+3. Добавете текст на подсказката (hint), обясняващ посоката на подреждане (напр. „Плъзнете за подреждане: първият = най-важният“).
+4. Валидирайте чрез `count-selected(.) = x`, ако трябва да сте сигурни, че всички избори са подредени.
 
 ## Ограничения
 
-- The drag-to-rank widget requires a touch screen or mouse — it may not work well in keyboard-only environments.
-- On some older mobile clients, the rank widget may fall back to a numbered input interface.
-- You cannot partially rank (i.e., rank only some choices) — all choices must be ordered.
+- Уиджета „плъзгане за подреждане“ не е реализиран в уеб формуляра на rtSurvey.
+- Не можете да подреждате частично — всички избори трябва да бъдат подредени.
+- Дръжте списъците от 3–7 елемента; по-дългите списъци стават трудни за управление независимо от клиента.

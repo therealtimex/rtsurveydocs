@@ -1,72 +1,212 @@
 ---
 title: "Decimal"
-description: "Decimalspørgsmål giver mulighed for numerisk input med brøkdele i din undersøgelse."
+description: "Spørgsmålstype til indtastning af decimaltal i rtSurvey"
 ---
 
-Spørgsmålstypen decimal i XLSForms og rtSurvey bruges til at indsamle numeriske svar, der kan indeholde brøkdele. Denne spørgsmålstype er essentiel til at indsamle præcise numeriske data som målinger, priser eller procentsatser.
+Spørgsmålstypen `decimal` indsamler tal, der kan indeholde en brøkdel (f.eks. `3.14`, `72.5`). Den udløser et numerisk tastatur på mobilenheder og understøtter de samme visningsmuligheder (appearance options) som typen `text` til layout og formatering.
 
 ## Grundlæggende XLSForm-specifikation
 
-| type    | name   | label                    |
-|---------|--------|--------------------------|
-| decimal | weight | Indtast din vægt i kg  |
+| type | name | label |
+|------|------|-------|
+| decimal | weight_kg | Vægt (kg) |
+| decimal | height_m | Højde (m) |
+| decimal | temperature | Kropstemperatur (°C) |
 
-For flere detaljer om den grundlæggende decimal-spørgsmålstype, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+For standard-specifikationen, se [XLSForm-dokumentationen](https://xlsform.org/en/#question-types).
 
-## Anvendelser
+---
 
-Decimalspørgsmål bruges typisk til:
+## Visningsmuligheder (Appearance options)
 
-1. Målinger (f.eks. vægt, højde, afstand)
-2. Finansielle data (f.eks. priser, lønninger)
-3. Procentsatser
-4. Videnskabelig dataindsamling
-5. Enhver numerisk data, der kræver præcision ud over heltal
+### `number-hspinner` — horisontal spinner
 
-## Bedste praksis
-
-1. Brug klare og præcise labels til at angive det forventede input og måleenhed.
-2. Implementer intervalrestriktioner for at forhindre urealistiske eller fejlagtige input.
-3. Overvej at bruge hinttekst til at give eksempler eller præcisere det forventede format.
-4. Angiv det ønskede antal decimaler i labelen eller hintet, hvis præcision er vigtig.
-
-## Restriktioner og validering
-
-Du kan tilføje restriktioner for at sikre, at den indtastede værdi falder inden for et bestemt interval:
-
-| type    | name   | label                    | constraint        | constraint_message                    |
-|---------|--------|--------------------------|-------------------|---------------------------------------|
-| decimal | height | Indtast din højde i meter | .>0 and .&lt;=3    | Højde skal være mellem 0 og 3 meter |
-
-## Eksempel på brug
-
-Her er et eksempel på, hvordan du kan bruge decimalspørgsmål i en sundhedsundersøgelse:
-
-| type    | name           | label                                     | constraint | constraint_message                |
-|---------|----------------|-------------------------------------------|------------|-----------------------------------|
-| decimal | weight         | Indtast din vægt i kg                   | .>0 and .&lt;=500 | Vægt skal være mellem 0 og 500 kg |
-| decimal | height         | Indtast din højde i meter               | .>0 and .&lt;=3 | Højde skal være mellem 0 og 3 meter |
-| decimal | body_temp      | Indtast din kropstemperatur i Celsius    | .>=35 and .&lt;=42 | Temperatur skal være mellem 35°C og 42°C |
-| calculate | bmi          |                                           |            |                                   |
-
-I beregningsrækken for BMI kan du bruge:
+Erstatter inputfeltet med en horisontal **− værdi +** spinner. Ved at trykke på minus/plus justeres værdien med det konfigurerede trin (step).
 
 ```
-calculation | ${weight} / (${height} * ${height})
+number-hspinner
 ```
 
-Dette beregner BMI ved hjælp af den indtastede vægt og højde.
+Den viste værdi formateres med én decimal (f.eks. `3.0`, `72.5`). Standardtrin er `1`; brug `hspinner()` til at angive et decimaltrin.
 
-## rtSurvey-udvidelser
+**Tilpas knapform og trin** ved hjælp af `hspinner()`:
 
-Mens den grundlæggende XLSForm-specifikation for decimalspørgsmål er enkel, kan rtSurvey tilbyde yderligere funktioner eller tilpasninger:
+```
+number-hspinner hspinner('left-small-square','right-small-square','0.1')
+```
 
-1. Præcisionsstyring (antal decimaler)
-2. Brugerdefinerede inputformater (f.eks. procent, valuta)
-3. Avancerede valideringsregler
+Parametre: venstre knapform, højre knapform, trinværdi. Brug et decimaltrin som `0.5` eller `0.1` for finmasket kontrol.
 
-## Begrænsninger
+**Brugerdefinerede farver** ved hjælp af `colors()`:
 
-- Præcisionen af decimaltal kan være begrænset af det underliggende system eller database.
-- Brugere kan have brug for vejledning om det forventede decimalseparatortegn (punktum eller komma) afhængigt af deres lokale indstillinger.
-- Store decimaltal kan være svære at læse eller indtaste præcist på mobilenheder.
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Fire værdier i rækkefølge: venstre knaps baggrund, venstre knaps ikon, højre knaps baggrund, højre knaps ikon.
+
+---
+
+### `thousandsep` — tusindtalsseparator
+
+Formaterer det viste tal med tusindtalsseparering (f.eks. `1,234.56`). Råtallet gemmes uden kommaer. Inputtypen skifter til `"text"` for at tillade den formaterede visning.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — brugerdefineret talkombination
+
+Grupperer cifre i heltalsdelen i blokke af `n` adskilt af en brugerdefineret separator.
+
+```
+digisep(3," ")      → 1 234 567.89
+```
+
+Inputtypen skifter til `"text"`, når denne visningsmulighed er aktiv.
+
+---
+
+### `textonly` — gennemtving teksttastatur
+
+Gennemtvinger `type="text"` på input-elementet. Forhindrer browserens tal-input-særheder (skjuler efterfølgende nuller, desktop-pile) mens decimalværdier stadig accepteres.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — hint svæver som label
+
+`hint`-teksten vises inde i inputfeltet som en pladsholder (placeholder). Når brugeren begynder at skrive, svæver den over feltet som en label.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — hint inde i inputfeltets kant
+
+Svarer til `floating_hint` — hintet sidder inde i inputfeltets kant, når det er tomt. Det svæver ikke, når brugeren skriver.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — modal dialog-indtastning
+
+Ved at trykke på feltet åbnes en modal dialog med et større indtastningsfelt. Nyttigt på små skærme.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — live tegntæller
+
+Viser en live `(n)` tegntæller under feltet, som opdateres mens brugeren skriver.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — tilføj præfiks
+
+Tilføjer en statisk eller beregnet streng foran den viste værdi. Den gemte værdi inkluderer ikke præfikset.
+
+```
+prefix('USD ')          → viser "USD 72.50", gemmer "72.50"
+prefix(${currency})     → dynamisk præfiks fra et andet felt
+```
+
+---
+
+### `align_answer` — justering af inputtekst
+
+Styrer den horisontale justering af den indtastede værdi inde i feltet.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — QR / stregkodescan til feltet
+
+Tilføjer en QR-kodescanningsknap ved siden af feltet. Åbner kamera-scanneren og udfylder feltet med den scannede værdi.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Hurtig oversigt over visningsmuligheder (Appearance quick reference)
+
+| Appearance | Widget rendered |
+|---|---|
+| *(none)* | Tal-indtastning (`type="number"`) — numerisk tastatur på mobilenheder |
+| `number-hspinner` | Horisontal − værdi + spinner, én decimal vises |
+| `number-hspinner hspinner(...)` | Spinner med brugerdefineret knapform og trin |
+| `number-hspinner colors(...)` | Spinner med brugerdefinerede knapfarver |
+| `thousandsep` | Talvisning med tusindtalsseparator |
+| `digisep(n,"sep")` | Brugerdefineret talkombination |
+| `textonly` | Gennemtving teksttastatur |
+| `floating_hint` | Hint svæver over feltet under skrivning |
+| `embed` | Hint inde i inputfeltets kant |
+| `textpopup` | Tryk for at åbne modal dialog |
+| `charcount` | Live tegntæller under feltet |
+| `prefix(expr)` | Tilføj statisk eller dynamisk præfiks |
+| `align_answer = left/right/center` | Justering af inputtekst |
+| `inputs{qrscan}` | Knap til QR/stregkodescan |
+
+---
+
+## Begrænsninger og validering
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| decimal | weight | Vægt (kg) | `. > 0 and . <= 500` | Indtast en værdi mellem 0 og 500 |
+| decimal | height | Højde (m) | `. > 0 and . <= 3` | Indtast en værdi mellem 0 og 3 |
+| decimal | temp | Temperatur (°C) | `. >= 35 and . <= 42` | Normal temperatur: 35°C–42°C |
+| decimal | percentage | Procent | `. >= 0 and . <= 100` | Indtast en værdi mellem 0 og 100 |
+
+---
+
+## Eksempel — måleskema
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| decimal | weight_kg | Vægt (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Indtast en gyldig vægt |
+| decimal | height_m | Højde (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Indtast en gyldig højde |
+| calculate | bmi | | | | |
+
+Søjle til BMI-beregning:
+```
+${weight_kg} div (${height_m} * ${height_m})
+```
+
+---
+
+## Best Practices
+
+1. Brug `number-hspinner hspinner(..., '0.1')` til målinger, der kræver én decimals præcision — spinneren formaterer automatisk til én decimal, hvilket holder værdierne konsistente.
+2. Brug `textonly` når browsere tilføjer uønskede spinner-kontroller eller fjerner efterfølgende nuller (f.eks. `3.0` vist som `3`).
+3. Brug `thousandsep` til store økonomiske værdier, så respondenterne kan bekræfte, at de har indtastet den korrekte størrelsesorden.
+4. Gennemfør intervalbegrænsninger (constraints) i stedet for kun at stole på mobiltastaturtypen.
+
+## Begrænsninger (Limitations)
+
+- Spinneren viser altid én decimal — hvis du har brug for mere præcision i den viste værdi, skal du bruge det almindelige inputfelt i stedet.
+- `thousandsep` og `digisep()` gemmer råtallet — læs ikke den formaterede visningsværdi i beregningar.

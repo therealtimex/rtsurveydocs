@@ -1,110 +1,351 @@
 ---
 title: "Text"
-description: "rtSurvey में Free text response question type"
+description: "rtSurvey में फ्री टेक्स्ट रिस्पॉन्स प्रश्न प्रकार"
 ---
 
-`text` question type एक free-text response — characters की कोई भी string — एकत्र करता है। यह सबसे flexible input type है और नामों, पतों, विवरणों, codes, और किसी भी ऐसी चीज़ के लिए उपयोग किया जाता है जो अधिक specific type में fit नहीं होती।
+`text` प्रश्न प्रकार एक फ्री-टेक्स्ट स्ट्रिंग एकत्र करता है। यह सबसे लचीला इनपुट प्रकार है और बड़ी संख्या में उपस्थिति वेरिएंट्स (appearance variants) का समर्थन करता है जो इनपुट के रेंडर होने के तरीके को बदलते हैं — एक साधारण सिंगल-लाइन फ़ील्ड से लेकर स्पीच-टू-टेक्स्ट, पॉपअप डायलॉग, रिच टेक्स्ट एडिटर और न्यूमेरिक स्पिनर तक।
 
-rtSurvey `text` को **time input widgets** के साथ भी विस्तारित करता है जो clock picker के साथ सटीक time entry की अनुमति देते हैं।
-
-## बुनियादी XLSForm विशिष्टता
+## बुनियादी XLSForm विनिर्देश (Specification)
 
 | type | name | label |
 |------|------|-------|
 | text | respondent_name | उत्तरदाता का पूरा नाम |
 | text | address | घर का पता |
 
-Standard XLSForm text type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+मानक विनिर्देश के लिए [XLSForm दस्तावेज़](https://xlsform.org/en/#question-types) देखें।
 
-## उपयोग
+---
 
-Text questions का उपयोग इनके लिए किया जाता है:
+## लेआउट मोड (Layout modes)
 
-1. नाम, पते, free descriptions
-2. Open-ended comments या feedback
-3. Codes, IDs, या reference numbers जो integer/decimal में fit नहीं होते
-4. rtSurvey के time input extensions के साथ time values एकत्र करना
-5. Autocomplete text fields (`search-autocomplete-noedit-v2()` के माध्यम से)
+### डिफ़ॉल्ट — सिंगल-लाइन इनपुट
 
-## मानक उपस्थिति विकल्प
+किसी विशेष उपस्थिति की आवश्यकता नहीं है। एक मानक `<input type="text">` फ़ील्ड रेंडर करता है।
 
-| Appearance | विवरण |
-|------------|-------------|
-| *(none)* | Single-line text input |
-| `multiline` | Multi-line text area — web पर longer free text के लिए सबसे अच्छा |
+---
 
-## rtSurvey समय इनपुट एक्सटेंशन
+### `multiline` — टेक्स्टएरिया (textarea)
 
-rtSurvey `text` को time values एकत्र करने के लिए **clock picker widget** के साथ विस्तारित करता है। ये appearance options एक clock icon प्रदर्शित करते हैं जिसे गणनाकर्ता hours, minutes, seconds, या milliseconds चुनने के लिए tap कर सकता है।
+एक मल्टी-लाइन टेक्स्टएरिया रेंडर करता है। उपयोगकर्ता टाइप करके इसे विस्तृत कर सकता है; यह स्वतः बढ़ता है।
 
-### उपस्थिति वेरिएंट
+```
+multiline
+```
 
-| Appearance | विवरण |
-|------------|-------------|
-| `inline` | Field के बगल में Clock icon प्रदर्शित |
-| `inline colors("RRGGBB")` | Custom hex color के साथ Clock icon |
-| `inline-1line` | Clock को compact single-row format में प्रदर्शित करता है |
-| `inline-1line-RRGGBB` | Custom icon color (hex, बिना `#`) के साथ single-row |
-| `inline-1line colors("RRGGBB","RRGGBB")` | दो colors के साथ single-row |
-| `inline-onlyresult` | चयन के बाद Clock icon गायब हो जाता है; केवल value दिखाई देती है |
-| `inline-onlyresult colors("RRGGBB")` | Same, custom icon color के साथ |
+`[initRows, maxRows]` जोड़कर **रो की ऊंचाई नियंत्रित करें**:
 
-### समय प्रारूप टोकन
+```
+multiline [3,8]     → 3 रो से शुरू होता है, 8 तक फैलता है
+multiline [5]       → 5 रो पर स्थिर
+```
 
-यह नियंत्रित करने के लिए कि कौन से time components दिखाए जाएं, brackets में format string जोड़ें:
+डिफ़ॉल्ट 1 रो है जिसमें कोई अधिकतम सीमा नहीं है। Shift+Enter लाइन ब्रेक डालता है; Enter अगले प्रश्न पर ले जाता है।
 
-| Format string | प्रदर्शित करता है |
-|---------------|----------|
-| `inline-[%H:%M]` | Hours और minutes (24-hour) |
-| `inline-[%h:%M]` | Hours और minutes (12-hour) |
-| `inline-[%H:%M:%S]` | Hours, minutes, seconds (24-hour) |
-| `inline-[%h:%M:%S]` | Hours, minutes, seconds (12-hour) |
-| `inline-[%H:%M:%3]` | Hours, minutes, milliseconds |
-| `inline-[%M:%S]` | केवल Minutes और seconds |
-| `inline-[%M:%3]` | केवल Minutes और milliseconds |
-| `inline-[%S]` | केवल Seconds |
-| `inline-[%3]` | केवल Milliseconds |
-| `inline-[%H]` | केवल Hours (24-hour) |
-| `inline-[%h]` | केवल Hours (12-hour) |
+---
 
-### उदाहरण: Minutes और seconds में एक task duration record करना
+### `floating_hint` — संकेत लेबल के रूप में तैरता है
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | task_duration | कार्य पूरा करने में लगा समय | `inline-[%M:%S]` |
+`hint` टेक्स्ट इनपुट फ़ील्ड के अंदर प्लेसहोल्डर के रूप में रेंडर होता है। जब उपयोगकर्ता टाइप करना शुरू करता है, तो संकेत फ़ील्ड के ऊपर लेबल के रूप में तैरता है।
 
-### उदाहरण: Custom color के साथ 24-hour format में event time record करना
+```
+floating_hint
+```
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| text | event_time | घटना का समय | `inline-1line colors("0099FF")` |
+---
 
-## डेटा प्रारूप
+### `embed` — इनपुट के अंदर संकेत
 
-Text data को plain string के रूप में संग्रहीत और export किया जाता है। Inline clock widget का उपयोग करके time-based inputs के लिए, मूल्य चुने गए format string से match करते format में संग्रहीत होता है (जैसे `%H:%M` के लिए `14:32`)।
+`floating_hint` के समान — फ़ील्ड खाली होने पर संकेत इनपुट सीमा के अंदर रेंडर होता है। टाइप करते समय यह ऊपर नहीं तैरता है।
 
-## Constraints और validation
+```
+embed
+```
 
-Format, length, या pattern enforce करने के लिए constraints लागू करें:
+---
+
+### `textpopup` — मोडल डायलॉग इनपुट
+
+फ़ील्ड पर टैप करने से इनलाइन संपादन के बजाय एक बड़े इनपुट के साथ स्वीटअलर्ट (SweetAlert) मोडल डायलॉग खुलता है। टाइपिंग के लिए अधिक स्क्रीन स्पेस देने के लिए मोबाइल पर उपयोगी है।
+
+```
+textpopup
+```
+
+---
+
+### `richtext` — WYSIWYG एडिटर
+
+एक पूर्ण रिच-टेक्स्ट एडिटर (Monaco / Draft.js) रेंडर करता है। उत्तरदाता टेक्स्ट को बोल्ड, इटैलिक कर सकता है, सूचियां जोड़ सकता है, आदि। संग्रहीत मान HTML होता है।
+
+```
+richtext
+richtext(30%)       → एडिटर की ऊंचाई व्यूपोर्ट का 30%
+```
+
+---
+
+### `charcount` — लाइव कैरेक्टर काउंटर
+
+इनपुट के नीचे एक `(n)` कैरेक्टर काउंट डिस्प्ले जोड़ता है, जो उपयोगकर्ता द्वारा टाइप करने पर अपडेट होता है।
+
+```
+charcount
+multiline charcount
+```
+
+---
+
+## संख्यात्मक इनपुट वेरिएंट्स (Numeric input variants)
+
+ये उपस्थिति विशेष फॉर्मेटिंग या इंटरैक्शन पैटर्न के साथ संख्याएं एकत्र करने के लिए `text` प्रकार पर काम करती हैं।
+
+### `numbers` — न्यूमेरिक कीबोर्ड
+
+HTML इनपुट प्रकार को `number` पर बाध्य करता है, जिससे मोबाइल पर न्यूमेरिक कीबोर्ड सक्रिय हो जाता है।
+
+```
+numbers
+```
+
+### `thousandsep` — हज़ार विभाजक
+
+संख्या को कॉमा ग्रुपिंग (जैसे `1,234,567`) के साथ प्रदर्शित करता है जबकि मूल संख्या को संग्रहीत करता है। कॉमा डिस्प्ले की अनुमति देने के लिए इनपुट प्रकार को `text` पर बाध्य किया जाता है।
+
+```
+thousandsep
+```
+
+### `digisep(n, "sep")` — कस्टम अंक समूहन (Grouping)
+
+अंकों को एक कस्टम कैरेक्टर द्वारा अलग किए गए `n` के ब्लॉकों में समूहित करता है। फोन नंबर, ID नंबर आदि के लिए उपयोगी है।
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+### `number-hspinner` — क्षैतिज स्पिनर
+
+इनपुट को क्षैतिज **− मान +** स्पिनर से बदल देता है। उपयोगकर्ता मान कम करने या बढ़ाने के लिए माइनस/प्लस बटन पर टैप करता है। `int` और `decimal` प्रकारों के साथ काम करता है।
+
+```
+number-hspinner
+```
+
+`hspinner()` का उपयोग करके **बटन की उपस्थिति को कस्टमाइज़ करें**:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','1')
+```
+
+पैरामीटर: बायां बटन आकार, दायां बटन आकार, स्टेप मान।
+
+`colors()` का उपयोग करके **कस्टम रंग**:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+चार रंग मान: बाएं-bg, बाएं-आइकन, दाएं-bg, दाएं-आइकन।
+
+### `prefix(expr)` — एक उपसर्ग (prefix) जोड़ें
+
+प्रदर्शित मान के पहले एक गणना की गई या स्थिर स्ट्रिंग जोड़ता है। संग्रहीत मान में उपसर्ग शामिल नहीं होता है।
+
+```
+prefix('USD ')      → प्रदर्शित करता है "USD 100", संग्रहीत करता है "100"
+prefix(${currency}) → दूसरे फ़ील्ड से गतिशील उपसर्ग
+```
+
+### `textonly` — टेक्स्ट इनपुट प्रकार के लिए बाध्य करें
+
+तब भी `type="text"` को बाध्य करता है जब फ़ील्ड `integer` या `decimal` हो। ब्राउज़र नंबर-इनपुट की समस्याओं से बचने के लिए उपयोगी है।
+
+```
+textonly
+```
+
+---
+
+## टेक्स्ट ट्रांसफॉर्मेशन (Text transformation)
+
+ये उपस्थिति उपयोगकर्ता द्वारा टाइप करने पर स्वतः मान को ट्रांसफॉर्म करती हैं।
+
+| Appearance | Effect | Example input → stored |
+|---|---|---|
+| `upper` | अपरकेस (UPPERCASE) में बदलता है | `hello` → `HELLO` |
+| `lower` | लोअरकेस (lowercase) में बदलता है | `HELLO` → `hello` |
+| `proper` | प्रॉपर केस (Proper Case) में बदलता है | `john doe` → `John Doe` |
+
+---
+
+## इनपुट कैप्चर हेल्पर
+
+### `inputs{stt}` — स्पीच टू टेक्स्ट (speech to text)
+
+इनपुट के बगल में एक माइक्रोफ़ोन बटन जोड़ता है। इसे टैप करने पर ब्राउज़र स्पीच रिकग्निशन (Web Speech API) शुरू हो जाता है। ट्रांसक्राइब किया गया टेक्स्ट फ़ील्ड में जुड़ जाता है।
+
+```
+inputs{stt}
+```
+
+Safari पर समर्थित नहीं है। माइक्रोफ़ोन अनुमति की आवश्यकता है।
+
+### `inputs{qrscan}` — QR / बारकोड स्कैनर
+
+इनपुट के बगल में एक QR कोड स्कैन बटन जोड़ता है। कैमरा स्कैनर मोडल खोलता है और फ़ील्ड को स्कैन किए गए मान से भर देता है।
+
+```
+inputs{qrscan}
+```
+
+**टोकनाइज़ (Tokenize)** (बदलने के बजाय स्कैन किए गए मानों को जोड़ें):
+
+```
+inputs{qrscan} append(${separator})
+```
+
+### `inputs{stt,qrscan}` — स्पीच और स्कैन दोनों
+
+माइक्रोफ़ोन और QR स्कैन बटन दोनों को साथ-साथ रेंडर करता है।
+
+```
+inputs{stt,qrscan}
+inputs{qrscan,stt}
+```
+
+---
+
+## चयन-लिंक्ड वेरिएंट्स (Selection-linked variants)
+
+ये उपस्थिति एक टेक्स्ट फ़ील्ड को `select_one` विकल्प सूची से जोड़ती हैं, जिससे उपयोगकर्ता या तो सूची से चुन सकता है या स्वतंत्र रूप से टाइप कर सकता है।
+
+### `selection_one_hide` — ड्रॉपडाउन चयनकर्ता
+
+टेक्स्ट इनपुट को ड्रॉपडाउन तीर के साथ रेंडर करता है। तीर पर टैप करने से लिंक की गई `search()` सूची से विकल्प दिखाई देते हैं। विकल्प चुनने पर इनपुट भर जाता है और लॉक हो जाता है (साफ़ करने के लिए ✕ दिखाता है)।
+
+```
+selection_one_hide
+```
+
+### `selection_one_show` — नीचे रेडियो सूची
+
+टेक्स्ट इनपुट को उसके नीचे रेडियो बटन के साथ रेंडर करता है। रेडियो चुनने पर इनपुट भर जाता है और लॉक हो जाता है।
+
+```
+selection_one_show
+```
+
+दोनों वेरिएंट्स के लिए विकल्प सूची को परिभाषित करने के लिए `calculation` कॉलम में `search()` एक्सप्रेशन की आवश्यकता होती है।
+
+---
+
+## उत्तर संरेखण (Answer alignment)
+
+इनपुट के भीतर टाइप किए गए टेक्स्ट के क्षैतिज संरेखण को नियंत्रित करता है।
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+## समय इनपुट विजेट (इनलाइन घड़ी)
+
+rtSurvey एक घड़ी चयनकर्ता (clock picker) विजेट के साथ `text` को विस्तारित करता है। ये उपस्थिति एक घड़ी आइकन प्रदर्शित करती हैं जिसे गणनाकर्ता समय मान चुनने के लिए टैप करता है। मान चुने गए प्रारूप में सादे टेक्स्ट के रूप में संग्रहीत किया जाता है।
+
+### उपस्थिति (Appearances)
+
+| Appearance | Description |
+|---|---|
+| `inline` | फ़ील्ड के बगल में घड़ी आइकन बटन, मोडल खोलता है |
+| `inline-onlyresult` | चयन के बाद घड़ी आइकन गायब हो जाता है |
+| `inline-1line` | कॉम्पैक्ट सिंगल-रो टाइम स्पिनर |
+| `inline colors("RRGGBB")` | कस्टम रंग के साथ घड़ी आइकन |
+| `inline-1line colors("RRGGBB","RRGGBB")` | दो एक्सेंट रंगों के साथ स्पिनर |
+
+### प्रारूप टोकन (Format tokens)
+
+कौन से समय घटक दिखाए और संग्रहीत किए जाते हैं, इसे नियंत्रित करने के लिए `-[format]` जोड़ें:
+
+| Format | Displays |
+|---|---|
+| `inline-[%H:%M]` | घंटे : मिनट (24h) |
+| `inline-[%h:%M]` | घंटे : मिनट (12h) |
+| `inline-[%H:%M:%S]` | घंटे : मिनट : सेकंड (24h) |
+| `inline-[%M:%S]` | मिनट : सेकंड |
+| `inline-[%H:%M:%3]` | घंटे : मिनट : मिलीसेकंड |
+| `inline-[%S]` | केवल सेकंड |
+| `inline-[%3]` | केवल मिलीसेकंड |
+| `inline-[%H]` | केवल घंटे (24h) |
+
+### `display{}` के साथ बटन स्थिति
+
+अन्य इनलाइन प्रकारों के समान — घड़ी बटन की स्थिति और आकार को नियंत्रित करता है:
+
+```
+inline display{right}
+inline display{center, large}
+inline-onlyresult display{left, medium, #0099FF}
+```
+
+---
+
+## उपस्थिति त्वरित संदर्भ (Appearance quick reference)
+
+| Appearance | Widget rendered |
+|---|---|
+| *(none)* | सिंगल-लाइन टेक्स्ट इनपुट |
+| `multiline` | टेक्स्टएरिया |
+| `multiline [n,m]` | शुरू/अधिकतम रो नियंत्रण के साथ टेक्स्टएरिया |
+| `floating_hint` | टाइप करते समय संकेत लेबल के रूप में तैरता है |
+| `embed` | इनपुट सीमा के अंदर संकेत |
+| `textpopup` | मोडल डायलॉग खोलने के लिए टैप करें |
+| `richtext` / `richtext(height)` | WYSIWYG रिच टेक्स्ट एडिटर |
+| `charcount` | इनपुट के नीचे लाइव कैरेक्टर गणना |
+| `numbers` | न्यूमेरिक कीबोर्ड |
+| `thousandsep` | हज़ारों-कॉमा फॉर्मेटिंग |
+| `digisep(n,"sep")` | कस्टम अंक समूहन |
+| `number-hspinner` | क्षैतिज − मान + स्पिनर |
+| `prefix(expr)` | स्थिर या गणना की गई उपसर्ग जोड़ें |
+| `upper` / `lower` / `proper` | स्वतः केस परिवर्तन |
+| `inputs{stt}` | स्पीच-टू-टेक्स्ट माइक्रोफ़ोन बटन |
+| `inputs{qrscan}` | QR/बारकोड स्कैन बटन |
+| `inputs{stt,qrscan}` | माइक्रोफ़ोन और स्कैन दोनों बटन |
+| `selection_one_hide` | विकल्प सूची से ड्रॉपडाउन चयनकर्ता |
+| `selection_one_show` | इनपुट के नीचे रेडियो सूची |
+| `align_answer = left/right/center` | उत्तर टेक्स्ट संरेखण |
+| `inline-[%H:%M]` | घड़ी चयनकर्ता — समय संग्रह |
+| `inline-1line` | कॉम्पैक्ट समय स्पिनर |
+
+---
+
+## प्रतिबंध और सत्यापन (Constraints and validation)
+
+प्रारूप, लंबाई या पैटर्न लागू करने के लिए प्रतिबंध लागू करें:
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| text | name | पूरा नाम | `string-length(.) >= 2` | नाम कम से कम 2 characters का होना चाहिए |
-| text | code | Reference code | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 uppercase letters और फिर 4 digits दर्ज करें |
-| text | phone | Phone number | `regex(., '^[0-9]{9,15}$')` | एक valid phone number दर्ज करें |
+| text | name | पूरा नाम | `string-length(.) >= 2` | कम से कम 2 कैरेक्टर आवश्यक हैं |
+| text | code | संदर्भ कोड | `regex(., '^[A-Z]{2}[0-9]{4}$')` | 2 बड़े अक्षर + 4 अंक |
+| text | phone | फोन नंबर | `regex(., '^[0-9]{9,15}$')` | मान्य फोन नंबर दर्ज करें |
 
-## सर्वोत्तम प्रथाएँ
+---
 
-1. जब भी डेटा की एक known structure हो, अधिक specific types (`integer`, `decimal`, `date`) का उपयोग करें — यह invalid entries को रोकता है और analysis को सरल बनाता है।
-2. Codes या IDs को validate करने के लिए `string-length()` या `regex()` के साथ `constraint` जोड़ें।
-3. Open-ended questions के लिए `multiline` appearance का उपयोग करें जहाँ उत्तरदाता कई वाक्य लिख सकते हैं।
-4. Time collection के लिए, वे time format tokens चुनें जो आपके analysis के लिए आवश्यक precision से match करते हों।
+## सर्वोत्तम प्रथाएं
 
-## प्लेटफ़ॉर्म समर्थन
+1. जब डेटा की संरचना ज्ञात हो तो अधिक विशिष्ट प्रकारों (`integer`, `decimal`, `date`) का उपयोग करें — यह अमान्य प्रविष्टियों को रोकता है।
+2. ओपन-एंडेड प्रश्नों के लिए `multiline [3,8]` का उपयोग करें ताकि उत्तरदाताओं को स्क्रीन को भरे बिना लिखने के लिए जगह मिल सके।
+3. जब आपको फॉर्मेट किए गए डिस्प्ले की आवश्यकता हो तो `numbers` के बजाय `thousandsep` या `digisep()` का उपयोग करें — केवल `numbers` केवल कीबोर्ड बदलता है।
+4. कोड, ID और सीरियल नंबर के लिए मैन्युअल टाइपिंग त्रुटियों को खत्म करने के लिए `inputs{qrscan}` का उपयोग करें।
+5. `floating_hint` का उपयोग करें जब संकेत महत्वपूर्ण संदर्भ हो जिसे टाइप करते समय दृश्यमान रहना चाहिए — मानक संकेत छोटी स्क्रीन पर ओझल हो जाते हैं।
+6. लंबाई प्रतिबंध वाले प्रश्नों पर `charcount` का उपयोग करें ताकि उत्तरदाता स्वयं निगरानी कर सकें।
 
-Text question type और सभी time input appearances iOS, Android, और web platforms पर समर्थित हैं।
+## सीमाएं (Limitations)
 
-## सीमाएं
-
-- Text responses free-form हैं — regex patterns से परे कोई built-in spell check या vocabulary constraint नहीं है।
-- Inline time widget एक rtSurvey extension है और standard XLSForm specification का हिस्सा नहीं है।
+- `inputs{stt}` के लिए एक ऐसे ब्राउज़र की आवश्यकता होती है जो Web Speech API का समर्थन करता हो। Chrome सबसे विश्वसनीय है; Safari समर्थित नहीं है।
+- `richtext` HTML संग्रहीत करता है — यदि सादे टेक्स्ट की अपेक्षा है, तो अपने विश्लेषण पाइपलाइन में HTML स्ट्रिपिंग या सैनिटाइजेशन की योजना बनाएं।
+- `selection_one_hide` और `selection_one_show` के लिए `search()` एक्सप्रेशन की आवश्यकता होती है और ये केवल वेब क्लाइंट पर समर्थित हैं।
+- `number-hspinner` प्रत्येक बटन प्रेस पर `constraint` कॉलम के विरुद्ध मान्य करता है, न कि केवल ब्लर पर — तदनुसार प्रतिबंध डिजाइन करें।

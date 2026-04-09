@@ -1,72 +1,212 @@
 ---
 title: "Desimal"
-description: "Pertanyaan desimal memungkinkan input numerik dengan bagian fraksional dalam survei Anda."
+description: "Tipe pertanyaan input angka pecahan di rtSurvey"
 ---
 
-Tipe pertanyaan desimal dalam XLSForm dan rtSurvey digunakan untuk mengumpulkan respons numerik yang mungkin mencakup bagian fraksional. Tipe pertanyaan ini penting untuk mengumpulkan data numerik yang tepat seperti pengukuran, harga, atau persentase.
+Tipe pertanyaan `decimal` mengumpulkan angka yang mungkin menyertakan bagian pecahan (misalnya `3.14`, `72.5`). Ini memicu keyboard numerik pada ponsel dan mendukung opsi tampilan (appearance) yang sama dengan tipe `text` untuk tata letak dan pemformatan.
 
-## Spesifikasi XLSForm Dasar
+## Spesifikasi Dasar XLSForm
 
-| type    | name   | label                        |
-|---------|--------|------------------------------|
-| decimal | weight | Masukkan berat Anda dalam kg |
+| type | name | label |
+|------|------|-------|
+| decimal | weight_kg | Berat (kg) |
+| decimal | height_m | Tinggi (m) |
+| decimal | temperature | Suhu tubuh (°C) |
 
-Untuk detail lebih lanjut tentang tipe pertanyaan desimal dasar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk spesifikasi standar lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
-## Penggunaan
+---
 
-Pertanyaan desimal umum digunakan untuk:
+## Opsi tampilan (Appearance options)
 
-1. Pengukuran (misalnya, berat, tinggi, jarak)
-2. Data keuangan (misalnya, harga, gaji)
-3. Persentase
-4. Pengumpulan data ilmiah
-5. Data numerik apa pun yang memerlukan presisi di luar bilangan bulat
+### `number-hspinner` — pemutar horizontal
+
+Mengganti input dengan pemutar horizontal **− nilai +**. Mengetuk minus/plus menyesuaikan nilai berdasarkan langkah (step) yang dikonfigurasi.
+
+```
+number-hspinner
+```
+
+Nilai yang ditampilkan diformat dengan satu tempat desimal (misalnya `3.0`, `72.5`). Langkah default adalah `1`; gunakan `hspinner()` untuk menyetel langkah desimal.
+
+**Sesuaikan bentuk tombol dan langkah** menggunakan `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','0.1')
+```
+
+Parameter: bentuk tombol kiri, bentuk tombol kanan, nilai langkah. Gunakan langkah desimal seperti `0.5` atau `0.1` untuk kontrol yang lebih halus.
+
+**Warna kustom** menggunakan `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Empat nilai secara berurutan: latar belakang tombol kiri, ikon tombol kiri, latar belakang tombol kanan, ikon tombol kanan.
+
+---
+
+### `thousandsep` — pemisah ribuan
+
+Memformat angka yang ditampilkan dengan pengelompokan koma (misalnya `1,234.56`). Angka mentah disimpan tanpa koma. Tipe input dialihkan ke `"text"` untuk memungkinkan tampilan yang diformat.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — pengelompokan digit kustom
+
+Mengelompokkan digit bagian integer ke dalam blok `n` yang dipisahkan oleh pemisah kustom.
+
+```
+digisep(3," ")      → 1 234 567.89
+```
+
+Tipe input dialihkan ke `"text"` saat tampilan ini aktif.
+
+---
+
+### `textonly` — paksa keyboard teks
+
+Memaksa `type="text"` pada elemen input. Mencegah keanehan input angka browser (menyembunyikan angka nol di belakang, panah putar desktop) sambil tetap menerima nilai desimal.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — petunjuk melayang sebagai label
+
+Teks `hint` merender di dalam input sebagai placeholder. Saat pengguna mulai mengetik, teks tersebut melayang di atas bidang sebagai label.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — petunjuk di dalam batas input
+
+Mirip dengan `floating_hint` — petunjuk berada di dalam batas input saat kosong. Petunjuk tidak melayang saat pengguna mengetik.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — input dialog modal
+
+Mengetuk bidang akan membuka dialog modal dengan input yang lebih besar. Berguna pada layar kecil.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — penghitung karakter langsung
+
+Menampilkan penghitung karakter `(n)` langsung di bawah input, diperbarui saat pengguna mengetik.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — tambahkan awalan
+
+Menambahkan string statis atau terhitung ke nilai yang ditampilkan. Nilai yang disimpan tidak termasuk awalan.
+
+```
+prefix('USD ')          → menampilkan "USD 72.50", menyimpan "72.50"
+prefix(${currency})     → awalan dinamis dari bidang lain
+```
+
+---
+
+### `align_answer` — perataan teks input
+
+Mengontrol perataan horizontal nilai yang diketik di dalam input.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — pemindaian QR / kode batang ke dalam bidang
+
+Menambahkan tombol pemindaian kode QR di sebelah input. Membuka pemindai kamera dan mengisi bidang dengan nilai yang dipindai.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Referensi cepat tampilan (Appearance quick reference)
+
+| Appearance | Widget rendered |
+|---|---|
+| *(none)* | Input angka (`type="number"`) — keyboard numerik pada ponsel |
+| `number-hspinner` | Pemutar horizontal − nilai +, satu tempat desimal ditampilkan |
+| `number-hspinner hspinner(...)` | Pemutar dengan bentuk tombol dan langkah kustom |
+| `number-hspinner colors(...)` | Pemutar dengan warna tombol kustom |
+| `thousandsep` | Tampilan angka dengan pengelompokan koma |
+| `digisep(n,"sep")` | Pengelompokan digit kustom |
+| `textonly` | Paksa keyboard teks |
+| `floating_hint` | Petunjuk melayang di atas bidang saat mengetik |
+| `embed` | Petunjuk di dalam batas input |
+| `textpopup` | Ketuk untuk membuka dialog modal |
+| `charcount` | Penghitungan karakter langsung di bawah input |
+| `prefix(expr)` | Tambahkan awalan statis atau dinamis |
+| `align_answer = left/right/center` | Perataan teks input |
+| `inputs{qrscan}` | Tombol pemindaian QR/kode batang |
+
+---
+
+## Batasan dan validasi (Constraints and validation)
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| decimal | weight | Berat (kg) | `. > 0 and . <= 500` | Masukkan nilai antara 0 dan 500 |
+| decimal | height | Tinggi (m) | `. > 0 and . <= 3` | Masukkan nilai antara 0 dan 3 |
+| decimal | temp | Suhu (°C) | `. >= 35 and . <= 42` | Suhu normal: 35°C–42°C |
+| decimal | percentage | Persentase | `. >= 0 and . <= 100` | Masukkan nilai antara 0 dan 100 |
+
+---
+
+## Contoh — formulir pengukuran
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| decimal | weight_kg | Berat (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Masukkan berat yang valid |
+| decimal | height_m | Tinggi (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Masukkan tinggi yang valid |
+| calculate | bmi | | | | |
+
+Kolom perhitungan BMI:
+```
+${weight_kg} div (${height_m} * ${height_m})
+```
+
+---
 
 ## Praktik Terbaik
 
-1. Gunakan label yang jelas dan ringkas untuk menentukan input yang diharapkan dan satuan pengukuran.
-2. Terapkan constraint rentang untuk mencegah input yang tidak realistis atau keliru.
-3. Pertimbangkan menggunakan teks petunjuk untuk memberikan contoh atau mengklarifikasi format yang diharapkan.
-4. Tentukan jumlah tempat desimal yang diinginkan dalam label atau petunjuk jika presisi penting.
+1. Gunakan `number-hspinner hspinner(..., '0.1')` untuk pengukuran yang memerlukan presisi satu desimal — pemutar memformat secara otomatis ke satu tempat desimal, menjaga nilai tetap konsisten.
+2. Gunakan `textonly` saat browser menambahkan kontrol putar yang tidak diinginkan atau memotong angka nol di belakang (misalnya `3.0` ditampilkan sebagai `3`).
+3. Gunakan `thousandsep` untuk nilai keuangan yang besar sehingga responden dapat memverifikasi bahwa mereka memasukkan besaran yang benar.
+4. Terapkan batasan rentang daripada hanya mengandalkan tipe keyboard ponsel saja.
 
-## Constraint dan Validasi
+## Keterbatasan (Limitations)
 
-Anda dapat menambahkan constraint untuk memastikan nilai yang dimasukkan berada dalam rentang tertentu:
-
-| type    | name   | label                        | constraint        | constraint_message                       |
-|---------|--------|------------------------------|-------------------|------------------------------------------|
-| decimal | height | Masukkan tinggi Anda dalam meter | .>0 and .&lt;=3  | Tinggi harus antara 0 dan 3 meter        |
-
-## Contoh Penggunaan
-
-Berikut adalah contoh cara menggunakan pertanyaan desimal dalam survei kesehatan:
-
-| type    | name           | label                                     | constraint | constraint_message                |
-|---------|----------------|-------------------------------------------|------------|-----------------------------------|
-| decimal | weight         | Masukkan berat Anda dalam kg              | .>0 and .&lt;=500 | Berat harus antara 0 dan 500 kg |
-| decimal | height         | Masukkan tinggi Anda dalam meter          | .>0 and .&lt;=3 | Tinggi harus antara 0 dan 3 meter |
-| decimal | body_temp      | Masukkan suhu tubuh Anda dalam Celsius    | .>=35 and .&lt;=42 | Suhu harus antara 35°C dan 42°C |
-| calculate | bmi          |                                           |            |                                   |
-
-Dalam baris kalkulasi untuk BMI, Anda dapat menggunakan:
-
-```
-calculation | ${weight} / (${height} * ${height})
-```
-
-Ini akan menghitung BMI menggunakan berat dan tinggi yang dimasukkan.
-
-## Ekstensi rtSurvey
-
-Meskipun spesifikasi XLSForm dasar untuk pertanyaan desimal sederhana, rtSurvey mungkin menawarkan fitur atau kustomisasi tambahan:
-
-1. Kontrol presisi (jumlah tempat desimal)
-2. Format input kustom (misalnya, persentase, mata uang)
-3. Aturan validasi lanjutan
-
-## Keterbatasan
-
-- Presisi angka desimal mungkin dibatasi oleh sistem atau database yang mendasarinya.
-- Pengguna mungkin memerlukan panduan tentang pemisah desimal yang diharapkan (titik atau koma) tergantung pada lokal mereka.
-- Angka desimal besar mungkin sulit dibaca atau dimasukkan secara akurat pada perangkat mobile.
+- Pemutar selalu menampilkan satu tempat desimal — jika Anda memerlukan presisi lebih pada nilai yang ditampilkan, gunakan input biasa saja.
+- `thousandsep` dan `digisep()` menyimpan angka mentah — jangan membaca nilai tampilan yang diformat dalam perhitungan.

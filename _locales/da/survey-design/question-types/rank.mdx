@@ -1,37 +1,39 @@
 ---
-title: "Rangering"
-description: "Rangeringsspørgsmål lader respondenter ordne et sæt valgmuligheder efter præference eller prioritet."
+title: "Rangorden"
+description: "Rangordensspørgsmål lader respondenterne sortere et sæt valgmuligheder efter præference eller prioritet."
 ---
 
-Spørgsmålstypen `rank` præsenterer en liste af valgmuligheder, som respondenten skal **trække i rækkefølge** (eller på anden måde rangere fra første til sidst). Den gemmer resultatet som en mellemrumsadskilt liste af valgværdier i den valgte rækkefølge, med den højest prioriterede valgmulighed først.
+Spørgsmålstypen `rank` viser en liste over valgmuligheder, som respondenten sorterer efter præference eller prioritet. Den gemmer resultatet som en mellemrumssepareret liste over valgmulighedernes værdier i rangeret rækkefølge, med den højest prioriterede valgmulighed først.
+
+> **rtSurveys webformular:** Widgetten til sortering ved hjælp af træk-og-slip er i øjeblikket ikke implementeret. I webformularen vises `rank` som en valgliste. Brug denne type, når du målretter undersøgelsen mod mobilklienter, der understøtter rangordens-widgetten, eller når formatet for den gemte værdi er vigtigere end selve sorteringsinteraktionen.
 
 ## Grundlæggende XLSForm-specifikation
 
 | type | name | label |
 |------|------|-------|
-| rank prioriteter | main_priority | Ranger disse fællesskabsbehov fra mest til mindst vigtigt |
+| rank priorities | main_priority | Ranger disse samfundsbehov fra mest til mindst vigtige |
 
-Valgmulighederne er defineret i regnearket **choices** ligesom `select_one`:
+Valgmulighederne defineres i **choices-regnearket** ligesom `select_one`:
 
 **survey:**
 
 | type | name | label |
 |------|------|-------|
-| rank prioriteter | main_priority | Ranger disse behov fra mest til mindst vigtigt |
+| rank priorities | main_priority | Ranger disse behov fra mest til mindst vigtige |
 
 **choices:**
 
 | list_name | name | label |
 |-----------|------|-------|
-| prioriteter | water | Rent vand |
-| prioriteter | health | Sundhedspleje |
-| prioriteter | education | Uddannelse |
-| prioriteter | roads | Veje |
-| prioriteter | electricity | Elektricitet |
+| priorities | water | Rent vand |
+| priorities | health | Sundhedsvæsen |
+| priorities | education | Uddannelse |
+| priorities | roads | Veje |
+| priorities | electricity | Elektricitet |
 
-## Gemt værdiformat
+## Format for gemt værdi
 
-Den gemte værdi er en **mellemrumsadskilt liste** af valgværdier i rangeret rækkefølge (første = højest prioritet):
+Den gemte værdi er en **mellemrumssepareret liste** over valgmulighedernes værdier i rangeret rækkefølge (først = højeste prioritet):
 
 ```
 water education health roads electricity
@@ -39,44 +41,44 @@ water education health roads electricity
 
 ## Udtrækning af rangerede positioner
 
-Brug `selected-at()` til at få valgmuligheden ved en specifik rang:
+Brug `selected-at()` til at hente valgmuligheden ved en bestemt rangering:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| rank prioriteter | main_priority | Ranger fællesskabsbehov | |
+| rank priorities | main_priority | Ranger samfundsbehov | |
 | calculate | top_priority | | selected-at(`${main_priority}`, 0) |
 | calculate | second_priority | | selected-at(`${main_priority}`, 1) |
 
-`selected-at(${main_priority}, 0)` returnerer den værdi, der er placeret **først** (indeks 0 = toprang).
+`selected-at(${main_priority}, 0)` returnerer værdien placeret som **nr. 1** (indeks 0 = øverste rangering).
 
 ## Brug af `rank-index()` med gentagelsesgrupper
 
-Når `rank` bruges inden for en gentagelsesgruppe, lader `rank-index()` dig referere til den ordinale rang udefra gentagelsen:
+Når `rank` bruges inde i en gentagelsesgruppe, lader `rank-index()` dig referere til den ordinale rangering udefra gentagelsen:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_ranked | | rank-index(1, `${score}`) |
 
-Se [Funktioner — Gentagede feltfunktioner](../operators-and-functions/functions#repeated-field-functions) for fulde detaljer om `rank-index()` og `rank-index-if()`.
+Se [Functions — Repeated field functions](../operators-and-functions/functions#repeated-field-functions) for alle detaljer om `rank-index()` og `rank-index-if()`.
 
 ## Anvendelser
 
-Rangeringsspørgsmål bruges typisk til:
+Rangordensspørgsmål bruges ofte til:
 
-1. **Prioritetsrangering** — at bede fællesskaber om at rangere udviklingsmæssige behov
-2. **Præferenceordning** — rangering af produktfunktioner, serviceattributter eller politikindstillinger
-3. **Eksamensemneordning** — arrangering af trin i en proces
-4. **Top-N-valg** — kombineret med `selected-at()` til kun at udtrække de øverste 1, 2 eller 3 valg
+1. **Prioritering** — bede lokalsamfund om at rangere udviklingsbehov
+2. **Sortering efter præference** — rangering af produktfunktioner, serviceattributter eller politiske valgmuligheder
+3. **Sortering af eksamensopgaver** — arrangere trin i en proces
+4. **Valg af Top-N** — kombineret med `selected-at()` for kun at udtrække de øverste 1, 2 eller 3 valgmuligheder
 
-## Bedste praksis
+## Best practices
 
-1. Hold listen kort (3–7 elementer) — rangering bliver kognitivt belastende ud over 7–8 valg.
-2. Brug klare, gensidig udelukkende valglabels for at undgå forvirring om, hvad "første" betyder.
-3. Tilføj hinttekst, der forklarer rangeringsretningen (f.eks. "Træk for at ordne: første = vigtigst").
-4. Valider ved hjælp af `count-selected(.) = x`, hvis du skal sikre, at alle valg er rangeret.
+1. Hold listen kort (3–7 punkter) — rangering bliver kognitivt krævende med mere end 7–8 valgmuligheder.
+2. Brug klare valgmulighedsetiketter, der udelukker hinanden, for at undgå forvirring om, hvad "først" betyder.
+3. Tilføj en hint-tekst, der forklarer rangeringsretningen (f.eks. "Træk for at sortere: først = vigtigst").
+4. Valider ved hjælp af `count-selected(.) = x`, hvis du skal sikre, at alle valgmuligheder er rangeret.
 
 ## Begrænsninger
 
-- Træk-for-at-rangere-widgetten kræver en berøringsskærm eller mus — den fungerer muligvis ikke godt i tastaturorienterede miljøer.
-- På nogle ældre mobilklienter kan rangeringswidgetten falde tilbage til en nummereret inputgrænseflade.
-- Du kan ikke delvist rangere (dvs. rangere kun nogle valg) — alle valg skal ordnes.
+- Widgetten til sortering ved hjælp af træk-og-slip er ikke implementeret i rtSurveys webformular.
+- Du kan ikke rangere delvist — alle valgmuligheder skal sorteres.
+- Hold listerne på 3–7 punkter; længere lister bliver uoverskuelige uanset klienten.

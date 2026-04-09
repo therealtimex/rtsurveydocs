@@ -1,77 +1,203 @@
 ---
 title: "Geopoint"
-description: "Geopoint-kysymykset tallentavat maantieteelliset koordinaatit (leveys, pituus, korkeus ja tarkkuus) osana kyselyä."
+description: "Geopoint-kysymykset tallentavat maantieteelliset koordinaatit (leveysaste, pituusaste, korkeus ja tarkkuus) osana kyselyä."
 ---
 
-XLSFormien ja rtSurveyn geopoint-kysymystyyppi mahdollistaa maantieteellisten koordinaattien keräämisen laitteen GPS:n tai muiden sijaintipalveluiden avulla. Tämä ominaisuus on erityisen hyödyllinen kyselyvastausten kartoittamiseen, kenttätoimintojen seuraamiseen tai tietojen yhdistämiseen tiettyihin sijainteihin.
+`geopoint`-kysymystyyppi tallentaa maantieteelliset koordinaatit (leveysaste, pituusaste, korkeus, tarkkuus) laitteen GPS:n avulla. rtSurvey renderöi valitsimen useilla asettelutiloilla ja tukee automaatiota `inputs{}`- ja `outputs{}`-parametrien kautta.
 
-## XLSForm-perusmäärittely
+## Basic XLSForm Specification
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geopoint | location    | Tallenna nykyinen sijainti      |
+| type     | name        | label                       |
+|----------|-------------|-----------------------------|
+| geopoint | location    | Tallenna nykyinen sijainti |
 
-Lisätietoja geopoint-kysymystyypin perusteista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+Katso vakiospesifikaatio [XLSForm-dokumentaatiosta](https://xlsform.org/en/#question-types).
 
-## Käyttötarkoitukset
+## Data Format
 
-Geopoint-kysymyksiä käytetään yleisesti:
-
-1. Kyselyvastausten maantieteelliseen kartoittamiseen
-2. Kenttätoimintojen sijainnin varmistamiseen
-3. Luetteloijien reitin seuraamiseen
-4. Ympäristö- tai sosiaalitietojen yhdistämiseen tiettyihin sijainteihin
-5. Etäisyyksien tai alueiden laskemiseen maantieteellisissä analyyseissä
-
-## Parhaat käytännöt
-
-1. Varmista, että laitteen sijaintipalvelut ovat käytössä ja luvat myönnetty.
-2. Anna GPS:lle riittävästi aikaa tarkan sijainnin hankkimiseen.
-3. Harkitse yksityisyysasioita ja informoi vastaajia sijaintitietojen keräämisestä.
-4. Käytä muiden kysymystyyppien yhteydessä sijaintitietojen asiayhteyden tarjoamiseksi.
-
-## Esimerkkikäyttö
-
-Esimerkki kyselyssä:
-
-| type     | name           | label                                          | hint                                             |
-|----------|----------------|------------------------------------------------|--------------------------------------------------|
-| geopoint | sample_location| Tallenna näytteenoton sijainti                 | Seiso avoimella alueella paremman GPS-signaalin saamiseksi |
-
-## rtSurveyn laajennukset
-
-Vaikka XLSForm-standardin geopoint-kysymysten perusmäärittely on suoraviivainen, rtSurvey voi tarjota lisäominaisuuksia tai mukautuksia:
-
-1. Karttaintegraatio tallennetun sijainnin visuaaliseen vahvistamiseen
-2. Tarkkuuskynnysasetukset
-3. Mahdollisuus syöttää koordinaatit manuaalisesti
-4. Integraatio offline-karttojen kanssa syrjäisillä alueilla
-
-## Tietomuoto
-
-Geopoint-tiedot tallennetaan tyypillisesti neljän välilyönnillä erotetun arvon merkkijonona:
+Tallennetaan neljänä välilyönneillä erotettuna arvona:
 
 ```
-leveysaste pituusaste korkeus tarkkuus
+latitude longitude altitude accuracy
 ```
 
-Esimerkiksi:
+Esimerkki: `13.756331 100.501762 15 8`
+
+---
+
+## Layout modes
+
+### Oletus — suorakaiteen muotoinen painike
+
+Suorakaiteen muotoinen "START GEOPOINT" -painike avaa koko kartan modaalin, jossa haastattelija valitsee pisteen. Tallennuksen jälkeen painikkeen teksti muuttuu muotoon "View or change geo point" ja koordinaatit näkyvät alla.
+
+Appearance-arvoa ei vaadita.
+
+---
+
+### `display{inline-icon}` — pyöreä hiusristikkopainike
+
+Renderöi pyöreän ikonipainikkeen (hiusristikko ⊕) suorakaiteen muotoisen painikkeen sijaan. Sen napauttaminen avaa saman karttamodaalin.
+
 ```
-41.40338 2.17403 30.5 10
+display{inline-icon}
 ```
 
-## Analyysin näkökohtia
+**Yhdistettynä sijaintiin ja kokoon:**
 
-Geopoint-kysymyksiä käytettäessä harkitse:
+```
+display{inline-icon, left}           → painike etiketin vasemmalla puolella
+display{inline-icon, top}            → painike etiketin yläpuolella
+display{inline-icon, bottom}         → painike etiketin alapuolella, keskitettynä
+display{inline-icon, large}          → suuri ikoni (75px)
+display{inline-icon, medium}         → keskikokoinen ikoni (50px)
+display{inline-icon, left, large}    → suuri painike vasemmalla
+```
 
-1. Miten maantieteelliset tiedot visualisoidaan (esim. karttaohjelmisto)
-2. Kerättyjen koordinaattien tarkkuus ja sen vaikutus analyysiin
-3. Sijaintitietojen yksityisyys ja tietosuojatoimenpiteet
-4. Mahdollinen integraatio GIS-työkalujen kanssa
+| Size | Icon height/width |
+|------|------------------|
+| *(default)* | 25px |
+| `medium` | 50px |
+| `large` | 75px |
 
-## Rajoitukset
+---
 
-- Tarkkuus voi vaihdella laitteen ja ympäristöolosuhteiden mukaan.
-- GPS-signaalit voivat olla heikkoja tai puuttua sisätiloissa tai alueilla, joilla on esteitä.
-- Sijaintitietojen kerääminen voi merkittävästi kuluttaa laitteen akkua.
-- Tarkkoihin sijaintitietoihin liittyy yksityisyyshuolenaiheita.
+### `display{thumbnail-square}` — live-kartan pikkukuva
+
+Renderöi live-kartan esikatselun (Leaflet) suoraan kysymykseen painikkeen sijaan. Pikkukuva näyttää nykyisen GPS-sijainnin ja valitun pisteen. Laajennuspainikkeen napauttaminen avaa koko modaalin.
+
+```
+display{thumbnail-square}
+```
+
+**Mukautettu pikkukuvan koko:**
+
+```
+display{thumbnail-square-[WxH]}          → kiinteät pikselit
+display{thumbnail-square-[400x200]}      → 400px leveä × 200px korkea
+
+display{thumbnail-square-[W%xH%]}        → prosenttiosuus lomakkeen leveydestä
+display{thumbnail-square-[100%x30%]}     → täysi leveys × 30% lomakkeen leveydestä
+```
+
+---
+
+## `display{}` vs `results{}` — ennen ja jälkeen tallennuksen
+
+`display{}` ohjaa asettelua **ennen** kuin käyttäjä tallentaa sijainnin. `results{}` ohjaa asettelua **sen jälkeen**, kun arvo on olemassa. Niillä voi olla eri tasaukset.
+
+```
+display{inline-icon, right} results{left}
+```
+
+Tämä renderöi painikkeen oikealle ennen tallennusta ja siirtää sen sitten vasemmalle, kun piste on tallennettu.
+
+### `hide(value)` — piilota koordinaattien näyttö
+
+Oletusarvoisesti tallennettu lat/lon/tarkkuus/korkeus-teksti näytetään painikkeen alla. Piilota se käyttämällä:
+
+```
+results{hide(value)}
+display{inline-icon} results{hide(value)}
+```
+
+---
+
+## `inputs{}` — GPS-automaatio
+
+### Automaattinen tallennus ladattaessa
+
+Tallentaa GPS-sijainnin automaattisesti, kun lomake latautuu, ilman että haastattelijan tarvitsee painaa mitään.
+
+```
+inputs{auto-take}
+```
+
+**Ehdollinen automaattinen tallennus** XLSForm-lausekkeen avulla:
+
+```
+inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
+```
+
+### Esitäyttö tekstikentästä
+
+Täytä geopoint kysymyksestä, joka sisältää paikan nimen tai osoitemerkkijonon. rtSurvey geokoodaa merkkijonon koordinaateiksi OpenStreetMap Nominatimin kautta.
+
+```
+inputs{question(address_field)}
+```
+
+---
+
+## `outputs{}` — käänteinen geokoodaus tekstiksi
+
+Kun piste on tallennettu, täytä automaattisesti `text`-kysymys ihmisen luettavissa olevalla osoitteella (koordinaateista käänteisesti geokoodattu).
+
+```
+outputs{question(address_field)}
+```
+
+Esimerkki:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | location | Tallenna sijainti | `outputs{question(address_text)}` |
+| text | address_text | Osoite | |
+
+---
+
+## `nomap` — GPS-tallennus ilman karttaa
+
+Korvaa karttamodaalin yksinkertaisella valintaikkunalla, joka pyytää sijaintilupaa ja tallentaa koordinaatit. Karttaa ei näytetä. Hyödyllinen vain GPS-tallennukseen halvemmilla laitteilla tai kun karttatiilet eivät ole saatavilla offline-tilassa.
+
+```
+nomap
+```
+
+---
+
+## Custom button style
+
+Käytä `styleButton()`-funktiota mukautetun CSS:n soveltamiseen oletusarvoiseen suorakaiteen muotoiseen painikkeeseen:
+
+```
+styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
+```
+
+---
+
+## Suppress the label
+
+```
+text-nolabel display{inline-icon, center, large}
+```
+
+---
+
+## Example usage
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | field_loc | Tallenna kentän sijainti | `display{inline-icon, right, large}` |
+| geopoint | site | Toimipaikan sijainti | `display{thumbnail-square-[100%x30%]}` |
+| geopoint | auto_loc | Nykyinen sijainti | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | mapped_loc | Sijainti | `display{inline-icon} outputs{question(address)}` |
+| geopoint | gps_only | GPS-piste | `nomap` |
+
+---
+
+## Best Practices
+
+1. Käytä `inputs{auto-take}` -ominaisuutta haastattelijan vahvistamissa kyselyissä, joissa GPS on pakollinen — se poistaa manuaalisen vaiheen.
+2. Käytä `display{thumbnail-square}` -ominaisuutta, kun haluat haastattelijan vahvistavan valitun pisteen visuaalisesti ennen jatkamista.
+3. Yhdistä `outputs{question(...)}` vain luku -muotoiseen `text`-kenttään näyttääksesi käänteisesti geokoodatun osoitteen haastattelijalle.
+4. Käytä `nomap`-asetusta alueilla, joilla ei ole internetyhteyttä ja joilla karttatiilet eivät lataudu.
+5. Anna GPS-ajan vakiintua ennen tallennusta — alle 10 metrin tarkkuus on yleensä riittävä kenttätutkimuksiin.
+
+## Limitations
+
+- `inputs{question(name)}` geokoodaus vaatii internetyhteyden — se kutsuu OpenStreetMap Nominatim API:a.
+- `outputs{question(name)}` käänteinen geokoodaus vaatii myös internetyhteyden.
+- Kartan pikkukuva (`display{thumbnail-square}`) vaatii internetin tiilien lataamiseen; koordinaatit tallennetaan silti offline-tilassa.
+- GPS-tarkkuus vaihtelee laitteen ja ympäristön mukaan — sisätilat tai urbaanit "kanjonit" voivat aiheuttaa yli 50 metrin epätarkkuuden.
+- Sijaintitietojen kerääminen voi vaikuttaa merkittävästi laitteen akun kestoon pitkien kyselyjen aikana.

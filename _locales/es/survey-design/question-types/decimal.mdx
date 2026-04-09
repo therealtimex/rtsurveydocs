@@ -1,72 +1,212 @@
 ---
 title: "Decimal"
-description: "Las preguntas decimales permiten entradas numéricas con partes fraccionarias en su encuesta."
+description: "Tipo de pregunta de entrada de número decimal en rtSurvey"
 ---
 
-El tipo de pregunta decimal en XLSForms y rtSurvey se usa para recopilar respuestas numéricas que pueden incluir partes fraccionarias. Este tipo de pregunta es esencial para recopilar datos numéricos precisos como medidas, precios o porcentajes.
+El tipo de pregunta `decimal` recopila números que pueden incluir una parte fraccionaria (p. ej., `3.14`, `72.5`). Activa un teclado numérico en dispositivos móviles y admite las mismas opciones de apariencia que el tipo `text` para el diseño y el formato.
 
 ## Especificación básica de XLSForm
 
-| type    | name   | label                       |
-|---------|--------|-----------------------------|
-| decimal | weight | Ingrese su peso en kg       |
+| type | name | label |
+|------|------|-------|
+| decimal | weight_kg | Peso (kg) |
+| decimal | height_m | Altura (m) |
+| decimal | temperature | Temperatura corporal (°C) |
 
-Para obtener más detalles sobre el tipo de pregunta decimal básico, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
+Para la especificación estándar, consulte la [documentación de XLSForm](https://xlsform.org/en/#question-types).
 
-## Usos
+---
 
-Las preguntas decimales se usan comúnmente para:
+## Opciones de apariencia
 
-1. Medidas (p. ej., peso, altura, distancia)
-2. Datos financieros (p. ej., precios, salarios)
-3. Porcentajes
-4. Recopilación de datos científicos
-5. Cualquier dato numérico que requiera precisión más allá de los números enteros
+### `number-hspinner` — selector horizontal
 
-## Mejores prácticas
+Reemplaza la entrada con un selector horizontal **− valor +**. Al tocar menos/más se ajusta el valor según el paso (step) configurado.
 
-1. Use etiquetas claras y concisas para especificar la entrada esperada y la unidad de medida.
-2. Implemente restricciones de rango para prevenir entradas no realistas o erróneas.
-3. Considere usar texto de indicación para proporcionar ejemplos o aclarar el formato esperado.
-4. Especifique el número deseado de decimales en la etiqueta o indicación si la precisión es importante.
+```
+number-hspinner
+```
+
+El valor mostrado se formatea con un decimal (p. ej., `3.0`, `72.5`). El paso predeterminado es `1`; use `hspinner()` para establecer un paso decimal.
+
+**Personalice la forma del botón y el paso** usando `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','0.1')
+```
+
+Parámetros: forma del botón izquierdo, forma del botón derecho, valor del paso. Use un paso decimal como `0.5` o `0.1` para un control detallado.
+
+**Colores personalizados** usando `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Cuatro valores en orden: fondo del botón izquierdo, icono del botón izquierdo, fondo del botón derecho, icono del botón derecho.
+
+---
+
+### `thousandsep` — separador de miles
+
+Formatea el número mostrado con agrupación de comas (p. ej., `1,234.56`). El número bruto se almacena sin comas. El tipo de entrada se cambia a `"text"` para permitir la visualización formateada.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — agrupación de dígitos personalizada
+
+Agrupa los dígitos de la parte entera en bloques de `n` separados por un separador personalizado.
+
+```
+digisep(3," ")      → 1 234 567.89
+```
+
+El tipo de entrada se cambia a `"text"` cuando esta apariencia está activa.
+
+---
+
+### `textonly` — forzar teclado de texto
+
+Fuerza `type="text"` en el elemento de entrada. Evita las peculiaridades de la entrada de números del navegador (ocultar ceros finales, flechas de giro en el escritorio) mientras sigue aceptando valores decimales.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — la sugerencia flota como etiqueta
+
+El texto `hint` se representa dentro de la entrada como un marcador de posición (placeholder). Cuando el usuario comienza a escribir, flota sobre el campo como una etiqueta (label).
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — sugerencia dentro del límite de entrada
+
+Similar a `floating_hint`: la sugerencia se ubica dentro del límite de entrada cuando está vacía. No flota cuando el usuario escribe.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — entrada de diálogo modal
+
+Al tocar el campo se abre un diálogo modal con una entrada más grande. Útil en pantallas pequeñas.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — contador de caracteres en vivo
+
+Muestra un recuento de caracteres `(n)` en vivo debajo de la entrada, que se actualiza a medida que el usuario escribe.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — anteponer un prefijo
+
+Antepone una cadena estática o calculada al valor mostrado. El valor almacenado no incluye el prefijo.
+
+```
+prefix('USD ')          → muestra "USD 72.50", almacena "72.50"
+prefix(${currency})     → prefijo dinámico desde otro campo
+```
+
+---
+
+### `align_answer` — alineación del texto de entrada
+
+Controla la alineación horizontal del valor escrito dentro de la entrada.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — escaneo de QR / código de barras en el campo
+
+Agrega un botón de escaneo de código QR junto a la entrada. Abre el escáner de la cámara y completa el campo con el valor escaneado.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Referencia rápida de apariencia
+
+| Appearance | Widget rendered |
+|---|---|
+| *(none)* | Entrada de número (`type="number"`) — teclado numérico en móviles |
+| `number-hspinner` | Selector horizontal − valor +, un decimal mostrado |
+| `number-hspinner hspinner(...)` | Selector con forma de botón y paso personalizados |
+| `number-hspinner colors(...)` | Selector con colores de botón personalizados |
+| `thousandsep` | Visualización de números agrupados por comas |
+| `digisep(n,"sep")` | Agrupación de dígitos personalizada |
+| `textonly` | Forzar teclado de texto |
+| `floating_hint` | La sugerencia flota sobre el campo mientras se escribe |
+| `embed` | Sugerencia dentro del límite de entrada |
+| `textpopup` | Tocar para abrir el diálogo modal |
+| `charcount` | Recuento de caracteres en vivo debajo de la entrada |
+| `prefix(expr)` | Anteponer prefijo estático o dinámico |
+| `align_answer = left/right/center` | Alineación del texto de entrada |
+| `inputs{qrscan}` | Botón de escaneo de QR/código de barras |
+
+---
 
 ## Restricciones y validación
 
-Puede agregar restricciones para garantizar que el valor ingresado esté dentro de un rango específico:
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| decimal | weight | Peso (kg) | `. > 0 and . <= 500` | Ingrese un valor entre 0 y 500 |
+| decimal | height | Altura (m) | `. > 0 and . <= 3` | Ingrese un valor entre 0 y 3 |
+| decimal | temp | Temperatura (°C) | `. >= 35 and . <= 42` | Temperatura normal: 35°C–42°C |
+| decimal | percentage | Porcentaje | `. >= 0 and . <= 100` | Ingrese un valor entre 0 y 100 |
 
-| type    | name   | label                          | constraint        | constraint_message                         |
-|---------|--------|--------------------------------|-------------------|--------------------------------------------|
-| decimal | height | Ingrese su altura en metros    | .>0 and .&lt;=3      | La altura debe estar entre 0 y 3 metros    |
+---
 
-## Ejemplo de uso
+## Ejemplo — formulario de medición
 
-He aquí un ejemplo de cómo podría usar preguntas decimales en una encuesta de salud:
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| decimal | weight_kg | Peso (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Ingrese un peso válido |
+| decimal | height_m | Altura (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Ingrese una altura válida |
+| calculate | bmi | | | | |
 
-| type    | name           | label                                    | constraint | constraint_message                          |
-|---------|----------------|------------------------------------------|------------|---------------------------------------------|
-| decimal | weight         | Ingrese su peso en kg                    | .>0 and .&lt;=500 | El peso debe estar entre 0 y 500 kg     |
-| decimal | height         | Ingrese su altura en metros              | .>0 and .&lt;=3 | La altura debe estar entre 0 y 3 metros   |
-| decimal | body_temp      | Ingrese su temperatura corporal en Celsius | .>=35 and .&lt;=42 | La temperatura debe estar entre 35°C y 42°C |
-| calculate | bmi          |                                          |            |                                             |
-
-En la fila de cálculo para el IMC, puede usar:
-
+Columna de cálculo del IMC:
 ```
-calculation | ${weight} / (${height} * ${height})
+${weight_kg} div (${height_m} * ${height_m})
 ```
 
-Esto calculará el IMC usando el peso y la altura ingresados.
+---
 
-## Extensiones de rtSurvey
+## Mejores prácticas
 
-Si bien la especificación básica de XLSForm para preguntas decimales es sencilla, rtSurvey puede ofrecer características o personalizaciones adicionales:
-
-1. Control de precisión (número de decimales)
-2. Formatos de entrada personalizados (p. ej., porcentaje, moneda)
-3. Reglas de validación avanzadas
+1. Use `number-hspinner hspinner(..., '0.1')` para mediciones que requieran un decimal de precisión; el selector se formatea automáticamente a un decimal, manteniendo los valores consistentes.
+2. Use `textonly` cuando los navegadores agreguen controles de giro no deseados o trunquen los ceros finales (p. ej., `3.0` mostrado como `3`).
+3. Use `thousandsep` para valores financieros grandes para que los encuestados puedan verificar que ingresaron la magnitud correcta.
+4. Aplique restricciones de rango en lugar de depender solo del tipo de teclado móvil.
 
 ## Limitaciones
 
-- La precisión de los números decimales puede estar limitada por el sistema o la base de datos subyacente.
-- Los usuarios pueden necesitar orientación sobre el separador decimal esperado (punto o coma) según su configuración regional.
-- Los números decimales grandes pueden ser difíciles de leer o ingresar con precisión en dispositivos móviles.
+- El selector siempre muestra un decimal; si necesita más precisión en el valor mostrado, use la entrada simple en su lugar.
+- `thousandsep` y `digisep()` almacenan el número bruto; no lea el valor de visualización formateado en los cálculos.

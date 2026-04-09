@@ -1,79 +1,85 @@
 ---
 title: "Geoshape"
-description: "Geoshape-Fragen ermöglichen es den Befragten, Formen auf einer Karte zu zeichnen und so komplexe geografische Daten als Teil der Umfrage zu erfassen."
+description: "Geoshape-Fragen erfassen ein geschlossenes Polygon, das durch eine Folge von GPS-Punkten definiert ist."
 ---
 
-Der `geoshape`-Fragetyp in XLSForms und rtSurvey ermöglicht es Befragten, Formen (Polygone) auf einer Karte zu zeichnen und so komplexe geografische Daten zu erfassen. Diese Funktion ist besonders nützlich für die Kartierung von Flächen, die Festlegung von Grenzen oder die Markierung von Regionen von Interesse in räumlichen Umfragen.
+Der Frage-Typ `geoshape` erfasst ein geschlossenes Polygon — eine Reihe von GPS-Koordinaten, bei denen der erste und der letzte Punkt identisch sind. Im Webformular von rtSurvey wird dies als **Texteingabe** dargestellt, in die der Datenerheber (enumerator) die Koordinatenzeichenfolge direkt eingibt oder einfügt.
 
 ## Grundlegende XLSForm-Spezifikation
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
+| type     | name        | label                            |
+|----------|-------------|----------------------------------|
 | geoshape | field_area  | Zeichnen Sie die Grenze des Feldes |
+| geoshape | zone        | Gebietsgrenze aufzeichnen         |
 
-Weitere Details zum grundlegenden `geoshape`-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Die Standard-Spezifikation finden Sie in der [XLSForm-Dokumentation](https://xlsform.org/en/#question-types).
 
-## Anwendungen
-
-`Geoshape`-Fragen werden häufig verwendet für:
-
-1. Kartierung von Feldgrenzen in landwirtschaftlichen Umfragen
-2. Festlegung von Gebieten mit Umweltauswirkungen
-3. Markierung von Zonen in Stadtplanungsstudien
-4. Umreißung von Regionen für geologische Untersuchungen
-5. Erfassung komplexer geografischer Merkmale für die räumliche Analyse
-
-## Empfohlene Vorgehensweisen
-
-1. Stellen Sie sicher, dass am Gerät die Ortungsdienste aktiviert und die entsprechenden Berechtigungen erteilt sind.
-2. Geben Sie klare Anweisungen dazu, wie die Form gezeichnet werden soll und welcher Bereich einbezogen werden soll.
-3. Erwägen Sie die Verwendung von Satellitenbildern oder Basiskarten, um den Befragten zu helfen, Formen genau zu zeichnen.
-4. Achten Sie auf die potenzielle Komplexität von Formen und deren Auswirkungen auf Datengröße und -verarbeitung.
-
-## Beispielhafte Verwendung
-
-Hier ist ein Beispiel dafür, wie Sie eine `geoshape`-Frage in einer Umfrage verwenden könnten:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geoshape | forest_area    | Umreißen Sie die Grenze des Waldstücks     | Verwenden Sie mindestens 3 Punkte, um eine geschlossene Form zu erstellen |
-
-## rtSurvey-Erweiterungen
-
-Während die grundlegende XLSForm-Spezifikation für `geoshape`-Fragen einfach ist, bietet rtSurvey möglicherweise zusätzliche Funktionen oder Anpassungen:
-
-1. Integration von Offline-Karten für abgelegene Gebiete
-2. Optionen zum Festlegen einer minimalen und maximalen Anzahl von Punkten für die Form
-3. Möglichkeit, Formen nach dem ersten Zeichnen zu bearbeiten oder zu verfeinern
-4. Unterstützung verschiedener Formtypen (z. J. Rechtecke, Kreise) zusätzlich zu Freiform-Polygonen
-
-(Hinweis: Die spezifischen in rtSurvey verfügbaren Erweiterungen für `geoshape`-Fragen müssten hier bestätigt und detailliert werden.)
+---
 
 ## Datenformat
 
-Geoshape-Daten werden in der Regel als eine Zeichenfolge aus durch Leerzeichen getrennten Koordinatenpaaren gespeichert, die in Klammern eingeschlossen sind:
+Gespeichert als eine durch Semikolons getrennte Liste von Punkten **ohne Leerzeichen um die Semikolons**. Jeder Punkt besteht aus vier durch Leerzeichen getrennten Werten:
 
 ```
-(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-Beispiel:
+| Component | Description |
+|-----------|-------------|
+| `lat` | Breitengrad in Dezimalgrad |
+| `lon` | Längengrad in Dezimalgrad |
+| `alt` | Höhe in Metern (`0` wenn unbekannt) |
+| `acc` | GPS-Genauigkeit in Metern (`0` wenn unbekannt) |
+
+**Das Polygon muss geschlossen sein** — der letzte Punkt muss dem ersten entsprechen.
+
+**Beispiel — ein Polygon mit vier Punkten (Dreieck, geschlossen):**
 ```
-(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
 ```
 
-## Überlegungen zur Analyse
+Um ein gültiges Polygon zu bilden, sind mindestens drei verschiedene Punkte plus die schließende Wiederholung erforderlich.
 
-Berücksichtigen Sie bei der Verwendung von `geoshape`-Fragen:
+---
 
-1. Wie die geografischen Daten visualisiert und analysiert werden (z. B. GIS-Software)
-2. Den potenziellen Bedarf an Datenbereinigung oder Vereinfachung komplexer Formen
-3. Datenschutz- und Datensicherheitsmaßnahmen für den Umgang mit detaillierten räumlichen Daten
-4. Integration mit anderen räumlichen Datenquellen für eine umfassende Analyse
+## Darstellung in rtSurvey
 
-## Einschränkungen
+Im Webformular von rtSurvey wird `geoshape` als einfaches **Textfeld** dargestellt. Der Datenerheber tippt die Koordinatenzeichenfolge ein oder fügt sie ein. Im aktuellen Webformular gibt es keinen integrierten interaktiven Polygon-Karten-Picker für diesen Typ.
 
-- Das genaue Zeichnen von Formen auf kleinen mobilen Bildschirmen kann schwierig sein.
-- Komplexe Formen können erhebliche Speicher- und Verarbeitungskapazität erfordern.
-- `Geoshape`-Fragen sind möglicherweise nicht für alle Arten von Umfragen oder Befragten geeignet.
-- Bei der Erfassung detaillierter räumlicher Daten können Datenschutzbedenken aufkommen.
+### Erfassung von Polygonpunkten auf interaktive Weise
+
+Das empfohlene Muster für die Datenerfassung im Feld ist eine **Wiederholungsgruppe von `geopoint`-Fragen** — jeder Eckpunkt verwendet den vollständigen GPS-Karten-Picker — kombiniert mit einer Berechnung (`calculate`), um die Geoshape-Zeichenfolge zu erzeugen:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | polygon_points | Jeden Eckpunkt aufzeichnen | |
+| geopoint | point | Tippen zum Aufzeichnen des Eckpunkts | |
+| end repeat | polygon_points | | |
+| calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
+
+Fügen Sie nach dem Zusammenfügen den ersten Punkt manuell hinzu, um das Polygon zu schließen, oder verwenden Sie eine zweite Berechnung, um ihn zu verketten.
+
+---
+
+## Anwendungsbeispiel
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geoshape | farm_boundary | Feldgrenze aufzeichnen | Geben Sie alle Ecken durch Semikolons getrennt ein. Der erste und der letzte Punkt müssen identisch sein. | yes |
+
+---
+
+## Best Practices
+
+1. Verwenden Sie eine Wiederholungsgruppe von `geopoint`-Fragen für die interaktive kartenbasierte Erfassung und fügen Sie die Werte zusammen — dies bietet den Datenerhebern einen GPS-Picker für jeden Eckpunkt.
+2. Schließen Sie das Polygon immer (wiederholen Sie den ersten Punkt am Ende), bevor Sie es absenden.
+3. Geben Sie das erwartete Format in der Spalte `hint` an, wenn eine manuelle Koordinateneingabe erforderlich ist.
+4. Verlangen Sie mindestens 3 verschiedene Eckpunkte für ein gültiges Polygon — setzen Sie dies durch Anweisungen und nicht durch XLSForm-Beschränkungen (constraints) durch.
+5. Verwenden Sie `geopoint` für Fragen zu einem einzelnen Standort und `geoshape` nur dann, wenn die Gebietsabgrenzung das eigentliche Ziel der Umfrage ist.
+
+## Einschränkungen (Limitations)
+
+- Im Webformular von rtSurvey gibt es keinen integrierten interaktiven Polygon-Karten-Picker für `geoshape`.
+- Das Polygon muss manuell geschlossen werden — im Texteingabemodus gibt es keinen automatischen Schließmechanismus.
+- Die Validierung der Polygon-Topologie (z. B. keine Selbstüberschneidung, Mindestfläche) erfordert eine Nachbearbeitung außerhalb der XLSForm-Beschränkungen.
+- Lange Grenzen mit vielen Eckpunkten erzeugen große Textzeichenfolgen.

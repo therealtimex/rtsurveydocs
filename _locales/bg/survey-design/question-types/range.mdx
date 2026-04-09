@@ -1,73 +1,66 @@
 ---
-title: "Диапазон"
-description: "Въпросите от тип range позволяват на респондентите да изберат число чрез плъзгане на плъзгач между дефинирана минимална и максимална стойност."
+title: "Range"
+description: "Въпросите от тип Range позволяват на респондентите да избират число чрез плъзгане на плъзгач между дефинирана минимална и максимална стойност."
 ---
 
-The `range` question type displays a **slider** (or equivalent input) that lets respondents pick a number within a defined minimum and maximum. It is ideal for collecting ratings, satisfaction scores, or any numeric value where you want to constrain the range visually rather than relying on a text input with constraints.
+Типът въпрос `range` позволява на респондентите да избират число в рамките на определен минимум и максимум. В уеб формуляра на rtSurvey това се изобразява като стандартно **поле за въвеждане на число** — анкетьорът въвежда стойност директно. Параметрите `start`, `end` и `step` дефинират валидния диапазон и се прилагат като ограничения (constraints).
 
-## Основна спецификация на XLSForm
+## Базова XLSForm спецификация
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | satisfaction | How satisfied are you with the service? | start=1 end=5 step=1 |
+| range | satisfaction | Колко сте доволни от услугата? | start=1 end=5 step=1 |
 
-The `parameters` column defines the slider bounds and step size:
+Колоната `parameters` дефинира границите на плъзгача и размера на стъпката:
 
-| Parameter | Description | Default |
+| Параметър | Описание | По подразбиране |
 |-----------|-------------|---------|
-| `start` | Minimum value (inclusive) | 0 |
-| `end` | Maximum value (inclusive) | 10 |
-| `step` | Increment between valid values | 1 |
+| `start` | Минимална стойност (включително) | 0 |
+| `end` | Максимална стойност (включително) | 10 |
+| `step` | Инкремент между валидните стойности | 1 |
 
-For more details on the standard range question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+За повече подробности относно стандартния тип въпрос range, вижте [XLSForm спецификацията](https://xlsform.org/en/#question-types).
 
-## Приложения
+## Употреби
 
-Range questions are commonly used for:
+Range въпросите обикновено се използват за:
 
-1. Satisfaction or rating scales (e.g., 1–5 or 0–10)
-2. Likert-style numeric scales
-3. Collecting measurements where only discrete values are valid
-4. Age brackets or score ranges where a slider improves usability over a text field
+1. Скали за удовлетвореност или рейтинг (напр. 1–5 или 0–10)
+2. Цифрови скали в стил Likert
+3. Събиране на измервания, където са валидни само дискретни стойности
+4. Възрастови групи или диапазони от резултати, където плъзгачът подобрява използваемостта в сравнение с текстово поле
 
-## Примерна употреба
+## Примери за употреба
 
-### Основна скала за оценка
+### Базова скала за рейтинг
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | overall_rating | Overall rating (0–10) | start=0 end=10 step=1 |
+| range | overall_rating | Общ рейтинг (0–10) | start=0 end=10 step=1 |
 
 ### Десетична стъпка
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | weight_kg | Weight (kg) | start=0 end=200 step=0.5 |
+| range | weight_kg | Тегло (kg) | start=0 end=200 step=0.5 |
 
 ### Използване на стойността в изчисление
 
 | type | name | label | parameters | calculation |
 |------|------|-------|------------|-------------|
-| range | score | Test score (0–100) | start=0 end=100 step=5 | |
+| range | score | Резултат от теста (0–100) | start=0 end=100 step=5 | |
 | calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
-| note | grade_note | Your grade is: `${grade}` | | |
+| note | grade_note | Вашата оценка е: `${grade}` | | |
 
-## Изглед
+## Добри практики
 
-The `range` type renders as a slider by default. No additional appearance values are required for basic usage. You can combine it with `horizontal` for a wider layout on web forms:
-
-| type | name | label | parameters | appearance |
-|------|------|-------|------------|------------|
-| range | nps | How likely are you to recommend us? (0–10) | start=0 end=10 step=1 | horizontal |
-
-## Най-добри практики
-
-1. Always set meaningful `start`, `end`, and `step` values — do not rely on defaults.
-2. Label the ends of your scale in the `hint` column (e.g., `hint: 0 = Very dissatisfied, 10 = Very satisfied`) to give respondents context.
-3. For 5-point Likert scales, use `start=1 end=5 step=1` rather than 0–4, since respondents expect "1" to mean the lowest.
-4. Use `range` instead of `integer` + constraint when the bounded nature of the input is part of the question design (slider communicates the scale visually).
+1. Винаги задавайте смислени стойности за `start`, `end` и `step` — не разчитайте на тези по подразбиране.
+2. Обозначете краищата на вашата скала в колоната `hint` (напр. `hint: 0 = Много недоволен, 10 = Много доволен`), за да дадете контекст на респондентите.
+3. За 5-степенни скали на Likert използвайте `start=1 end=5 step=1`, вместо 0–4, тъй като респондентите очакват „1“ да означава най-ниското.
+4. Използвайте `range` вместо `integer` + ограничение (constraint), когато ограничената природа на въвеждането е част от дизайна на въпроса (плъзгачът комуникира скалата визуално).
 
 ## Ограничения
 
-- The slider widget may not be ideal for very wide ranges (e.g., 0–10000) — a text `integer` with constraints is more user-friendly in those cases.
-- On mobile devices, fine step values (e.g., `step=0.1`) can be difficult to control precisely with a touch slider.
+- В уеб формуляра на rtSurvey няма уиджет за плъзгач — въвеждането на стойност е обикновено текстово поле за числа. За визуално изживяване с плъзгач използвайте мобилен клиент, който поддържа range уиджета.
+- За много широки диапазони (напр. 0–10000), обикновен `integer` с ограничение е еднакво ефективен и по-удобен за потребителя.
+- Стойностите на фината стъпка (напр. `step=0.1`) работят като ограничения, но няма значение за прецизността на плъзгача в уеб формуляра.

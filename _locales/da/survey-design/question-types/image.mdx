@@ -1,34 +1,34 @@
 ---
 title: "Billede"
-description: "Billedspørgsmål giver respondenter mulighed for at optage og indsende fotos som en del af undersøgelsen."
+description: "Billedspørgsmål giver respondenterne mulighed for at tage og indsende fotos som en del af undersøgelsen."
 ---
 
-Spørgsmålstypen image i XLSForms og rtSurvey giver respondenter mulighed for at optage og indsende fotos som en del af deres undersøgelsessvar. Denne funktion er særligt nyttig til at indsamle visuelle data, dokumentere observationer eller levere beviser i feltundersøgelser.
+Billedspørgsmålstypen i XLSForms og rtSurvey gør det muligt for respondenterne at tage og indsende fotos som en del af deres svar i undersøgelsen. Denne funktion er især nyttig til indsamling af visuelle data, dokumentation af observationer eller tilvejebringelse af beviser i feltundersøgelser.
 
 ## Grundlæggende XLSForm-specifikation
 
 | type  | name        | label                           |
 |-------|-------------|--------------------------------|
-| image | photo       | Tag et foto af stedet    |
+| image | photo       | Tag et foto af lokationen       |
 
 For flere detaljer om den grundlæggende billedspørgsmålstype, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
 
 ## Anvendelser
 
-Billedspørgsmål bruges typisk til:
+Billedspørgsmål bruges ofte til:
 
-1. Dokumentering af feltforhold eller observationer
-2. Fangst af visuelt bevis i forskningsstudier
-3. Indsamling af før-og-efter-billeder i konsekvensvurderinger
-4. Verificering af gennemførelse af opgaver eller tilstedeværelse på placeringer
+1. Dokumentation af feltforhold eller observationer
+2. Optagelse af visuelle beviser i forskningsstudier
+3. Indsamling af før-og-efter fotos i konsekvensanalyser
+4. Verificering af fuldførelse af opgaver eller tilstedeværelse på lokationer
 5. Indsamling af visuelle data til fjernanalyse
 
-## Bedste praksis
+## Best practices
 
 1. Giv klare instruktioner om, hvad der skal fotograferes.
-2. Overvej privatlivsimplikationer og informér respondenter om, hvordan deres fotos vil blive brugt.
-3. Vær opmærksom på filstørrelser og lagerbegrænsninger, især til undersøgelser i områder med begrænset internetforbindelseskvalitet.
-4. Sørg for, at enheden har tilstrækkelig lagerplads og kameratilladelser er givet.
+2. Overvej privatlivsaspekter og informer respondenterne om, hvordan deres fotos vil blive brugt.
+3. Vær opmærksom på filstørrelser og lagerbegrænsninger, især ved undersøgelser i områder med begrænset internetforbindelse.
+4. Sørg for, at enheden har tilstrækkelig lagerplads, og at der er givet kameratilladelser.
 
 ## Eksempel på brug
 
@@ -36,39 +36,112 @@ Her er et eksempel på, hvordan du kan bruge et billedspørgsmål i en undersøg
 
 | type  | name           | label                                      | hint                                        |
 |-------|----------------|--------------------------------------------|--------------------------------------------|
-| image | storefront     | Tag et foto af butikkens indgang       | Sørg for, at butiksnavnet er tydeligt synligt    |
+| image | storefront     | Tag et foto af butikkens indgang           | Sørg for, at butikkens navn er tydeligt synligt |
 
 ## rtSurvey-udvidelser
 
-Mens den grundlæggende XLSForm-specifikation for billedspørgsmål er enkel, kan rtSurvey tilbyde yderligere funktioner eller tilpasninger:
+### Inline knap-layout
 
-1. Billedkvalitetsindstillinger (f.eks. lav, mellem, høj opløsning)
-2. Mulighed for at tilføje billedtekster eller tags til billeder
-3. Flerfoldig billedoptagelse til ét spørgsmål
-4. Integration med enhedens native kameraapp eller galleri
+Tilføj `inline` til kolonnen `appearance` for at vise kameraet som en **rund ikonknap** ved siden af etiketten i stedet for et optagelsesområde i fuld bredde. Ved at trykke på den åbnes en modal.
 
-Se [Avancerede billeder](../advanced-extension/images) for vandmærkning og mediagrid-funktioner.
+```
+| type  | name  | label        | appearance                          |
+|-------|-------|--------------|-------------------------------------|
+| image | photo | Tag et foto  | inline display{right}               |
+| image | photo | Tag et foto  | inline display{center, large}       |
+```
 
-## Datahåndtering
+**Knapposition — `display{}`:**
 
-Billeder indsamlet via denne spørgsmålstype er typisk:
+| Værdi | Layout |
+|-------|--------|
+| `right` *(standard)* | Ikon til højre for etiketten |
+| `left` | Ikon til venstre for etiketten |
+| `top` | Ikon over etiketten, centreret |
+| `center` / `bottom` | Ikon under etiketten, centreret |
+
+**Knapstørrelse:**
+
+| Værdi | Størrelse |
+|-------|------|
+| `small` *(standard)* | Lille cirkel |
+| `medium` | Mellemstor cirkel |
+| `large` | Stor cirkel |
+
+**Knapfarve** — tilføj en hex-farve inde i `display{}` for at overstyre primærfarven:
+
+```
+inline display{right, large, <FF5500/>}
+inline display{center, medium, <0099FF/>}
+```
+
+**Kontrol efter optagelse — `results{}`:**
+
+| Appearance | Effekt |
+|---|---|
+| `results{hide(capture)}` | Skjuler kameraknappen, efter et foto er taget |
+| `results{hide(camera)}` | Samme som `hide(capture)` — alias for billedtype |
+| `results{hide(review)}` | Skjuler miniaturevisningen efter optagelse |
+| `results{hide(filename)}` | Skjuler filnavnet, der vises efter upload |
+| `results{left}` | Flytter ikonet til venstre efter optagelse |
+
+Eksempel — stor centreret knap, skjul kamera efter optagelse:
+```
+inline display{center, large} results{hide(capture)}
+```
+
+### `invisible auto-show` — åbn kamera automatisk
+
+Skjuler spørgsmålswidgetten fra layoutet, men åbner automatisk kameraet, når siden indlæses. Nyttigt til at indlejre et lydløst optagelsestrin i et formularflow.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Signatur og tegning
+
+| Appearance | Beskrivelse |
+|---|---|
+| `signature` | Fuldskærms signaturfelt-modal |
+| `signature display{quick}` | Inline hurtig-tegn signaturfelt — ingen modal |
+| `draw` | Lærred til frihåndstegning |
+
+### Vandmærke
+
+Tilføj et tekst- eller billedvandmærke til optagne fotos:
+
+```
+watermark(text, "Undersøgelses-ID: ${id}", bottom-right, 0.5)
+watermark(file, logo.png, top-left, 1.0, 20%)
+```
+
+### Skjul etiketten
+
+```
+inline text-nolabel display{center, large}
+```
+
+## Databehandling
+
+Billeder indsamlet gennem denne spørgsmålstype er typisk:
 
 1. Gemt i et almindeligt billedformat (f.eks. JPG, PNG)
-2. Gemt ved siden af andre undersøgelsesdata, ofte i en separat mediemappe
-3. Tilgængeligt for visning og analyse via undersøgelseshåndteringsplatformen
+2. Gemt sammen med andre undersøgelsesdata, ofte i en separat mediemappe
+3. Tilgængelige for visning og analyse via platformen til administration af undersøgelser
 
-## Overvejelser for analyse
+## Overvejelser til analyse
 
-Når du bruger billedspørgsmål, bør du overveje:
+Når du bruger billedspørgsmål, skal du overveje:
 
 1. Hvordan billederne vil blive analyseret (f.eks. manuel gennemgang, automatiseret billedanalyse)
-2. Den yderligere lagerplads der kræves til billedfiler
-3. Privatlivs- og databeskyttelsesforanstaltninger til lagring og håndtering af fotos
+2. Den ekstra lagerplads, der kræves til billedfiler
+3. Privatlivs- og databeskyttelsesforanstaltninger ved opbevaring og håndtering af fotos
 4. Potentielt behov for billedredigerings- eller organiseringsværktøjer i analysefasen
 
 ## Begrænsninger
 
 - Billedfiler kan være store, hvilket kan påvirke dataoverførsel og lagring.
-- Ikke alle enheder har højkvalitetskameraer eller tilstrækkelig lagerplads.
+- Ikke alle enheder har kameraer af høj kvalitet eller tilstrækkelig lagerplads.
 - Analyse af et stort antal billeder kan være tidskrævende.
-- Der kan være privatlivsbekymringer ved optagelse af billeder, især på offentlige steder.
+- Der kan være bekymringer om privatlivets fred ved optagelse af billeder, især i det offentlige rum.

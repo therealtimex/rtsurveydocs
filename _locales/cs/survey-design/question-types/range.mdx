@@ -1,9 +1,9 @@
 ---
-title: "Range"
-description: "Otázky range umožňují respondentům vybrat číslo přetažením posuvníku mezi definovanou minimální a maximální hodnotou."
+title: "Rozsah"
+description: "Otázky typu rozsah umožňují respondentům vybrat číslo posunutím posuvníku mezi definovanou minimální a maximální hodnotou."
 ---
 
-Typ otázky `range` zobrazuje **posuvník** (nebo ekvivalentní vstup), který umožňuje respondentům vybrat číslo v definovaném rozsahu minimum a maximum. Je ideální pro sběr hodnocení, skóre spokojenosti nebo jakékoli číselné hodnoty, kde chcete vizuálně omezit rozsah místo spoléhání na textový vstup s omezeními.
+Typ otázky `range` umožňuje respondentům vybrat číslo v rámci definovaného minima a maxima. Ve webovém formuláři rtSurvey se toto vykresluje jako standardní **číselný vstup** — tazatel zadává hodnotu přímo. Parametry `start`, `end` a `step` definují platný rozsah a jsou vynucovány jako omezení.
 
 ## Základní specifikace XLSForm
 
@@ -11,26 +11,28 @@ Typ otázky `range` zobrazuje **posuvník** (nebo ekvivalentní vstup), který u
 |------|------|-------|------------|
 | range | satisfaction | Jak jste spokojeni se službou? | start=1 end=5 step=1 |
 
-Sloupec `parameters` definuje meze posuvníku a velikost kroku:
+Sloupec `parameters` definuje hranice posuvníku a velikost kroku:
 
 | Parametr | Popis | Výchozí |
-|----------|-------|---------|
+|-----------|-------------|---------|
 | `start` | Minimální hodnota (včetně) | 0 |
 | `end` | Maximální hodnota (včetně) | 10 |
 | `step` | Přírůstek mezi platnými hodnotami | 1 |
 
+Další podrobnosti o standardním typu otázky rozsah naleznete v [specifikaci XLSForm](https://xlsform.org/en/#question-types).
+
 ## Použití
 
-Otázky range se běžně používají pro:
+Otázky s rozsahem se běžně používají pro:
 
-1. Škály spokojenosti nebo hodnocení (např. 1–5 nebo 0–10)
-2. Numerické škály ve stylu Likertovy škály
+1. Stupnice spokojenosti nebo hodnocení (např. 1–5 nebo 0–10)
+2. Číselné stupnice Likertova typu
 3. Sběr měření, kde jsou platné pouze diskrétní hodnoty
 4. Věkové skupiny nebo rozsahy skóre, kde posuvník zlepšuje použitelnost oproti textovému poli
 
 ## Příklad použití
 
-### Základní hodnotící škála
+### Základní stupnice hodnocení
 
 | type | name | label | parameters |
 |------|------|-------|------------|
@@ -46,18 +48,19 @@ Otázky range se běžně používají pro:
 
 | type | name | label | parameters | calculation |
 |------|------|-------|------------|-------------|
-| range | score | Výsledek testu (0–100) | start=0 end=100 step=5 | |
+| range | score | Skóre testu (0–100) | start=0 end=100 step=5 | |
 | calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
-| note | grade_note | Váš výsledek je: `${grade}` | | |
+| note | grade_note | Vaše známka je: `${grade}` | | |
 
 ## Osvědčené postupy
 
-1. Vždy nastavte smysluplné hodnoty `start`, `end` a `step` — nespoléhejte na výchozí hodnoty.
-2. Označte konce škály v sloupci `hint` (např. `hint: 0 = Velmi nespokojen, 10 = Velmi spokojen`) pro poskytnutí kontextu respondentům.
-3. Pro 5bodové Likertovy škály použijte `start=1 end=5 step=1` místo 0–4, protože respondenti očekávají, že „1" znamená nejnižší.
-4. Používejte `range` místo `integer` + omezení, když je ohraničená povaha vstupu součástí návrhu otázky (posuvník vizuálně komunikuje škálu).
+1. Vždy nastavte smysluplné hodnoty `start`, `end` a `step` — nespoléhejte na výchozí nastavení.
+2. Označte konce své stupnice ve sloupci `hint` (např. `hint: 0 = Velmi nespokojen, 10 = Velmi spokojen`), abyste respondentům poskytli kontext.
+3. Pro pětibodové Likertovy stupnice použijte raději `start=1 end=5 step=1` než 0–4, protože respondenti očekávají, že „1“ bude znamenat nejnižší hodnotu.
+4. Použijte `range` místo `integer` + omezení, pokud je ohraničená povaha vstupu součástí návrhu otázky (posuvník vizuálně sděluje měřítko).
 
 ## Omezení
 
-- Widget posuvníku nemusí být ideální pro velmi široké rozsahy (např. 0–10000) — textové `integer` s omezeními je v takových případech přívětivější pro uživatele.
-- Na mobilních zařízeních může být obtížné přesně ovládat malé hodnoty kroků (např. `step=0.1`) pomocí dotykového posuvníku.
+- Ve webovém formuláři rtSurvey není k dispozici widget posuvníku — zadávání hodnoty probíhá přes prostý číselný vstup. Pro vizuální zážitek s posuvníkem použijte mobilního klienta, který widget rozsah podporuje.
+- Pro velmi široké rozsahy (např. 0–10000) je stejně účinný a uživatelsky přívětivější prostý `integer` s omezením.
+- Jemné hodnoty kroku (např. `step=0.1`) fungují jako omezení, ale ve webovém formuláři nepředstavují problém s přesností posuvníku.

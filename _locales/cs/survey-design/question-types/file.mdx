@@ -1,24 +1,26 @@
 ---
 title: "Soubor"
-description: "Otázky file umožňují respondentům nahrávat dokumenty a jiné soubory jako součást jejich odpovědí na průzkum."
+description: "Otázky typu soubor umožňují respondentům nahrávat dokumenty a jiné soubory jako součást jejich odpovědí v průzkumu."
 ---
 
-Typ otázky `file` umožňuje respondentům **nahrát jakýkoli soubor** ze svého zařízení — dokumenty, tabulky, PDF nebo jiné typy souborů. Na rozdíl od `image`, `audio` a `video`, které spouštějí specifické nástroje pro zachycení, `file` otevírá obecný výběr souborů.
+Typ otázky `file` umožňuje respondentům **nahrát jakýkoli soubor** ze svého zařízení – dokumenty, tabulky, soubory PDF nebo jiné typy souborů. Na rozdíl od typů `image`, `audio` a `video`, které spouštějí specifické nástroje pro zachycení, `file` otevře univerzální výběr souborů.
 
 ## Základní specifikace XLSForm
 
 | type | name      | label                        |
 |------|-----------|------------------------------|
-| file | document  | Prosím nahrajte svůj dokument  |
+| file | document  | Nahrajte prosím svůj dokument  |
 
-## Použití
+Další podrobnosti o standardním typu otázky typu soubor naleznete ve [specifikaci XLSForm](https://xlsform.org/en/#question-types).
 
-Otázky file se běžně používají pro:
+## Využití
 
-1. Sběr podpůrných dokumentů (účtenky, certifikáty, smlouvy, zprávy)
+Otázky typu soubor se běžně používají pro:
+
+1. Sbírání podpůrných dokumentů (účtenky, certifikáty, smlouvy, zprávy)
 2. Nahrávání vyplněných papírových formulářů, které byly naskenovány
-3. Shromažďování tabulek nebo datových exportů z jiných systémů
-4. Jakýkoli typ digitálního souboru, který image/audio/video nepokrývá
+3. Shromažďování tabulek nebo exportů dat z jiných systémů
+4. Jakýkoli typ digitálního souboru, který nepokrývá image/audio/video
 
 ## Formát dat
 
@@ -26,56 +28,114 @@ Nahrané soubory jsou uloženy jako binární přílohy:
 
 - **Formát:** Zachován v původním formátu (PDF, XLSX, DOCX atd.)
 - **Pojmenování:** `{instanceID}-{fieldname}.{extension}`
-- **Úložiště:** Nahráno do mediální složky serveru spolu s odesláním
-- **Přístup:** Ke stažení z rozhraní správy odeslání
+- **Úložiště:** Nahráno do složky médií na serveru spolu s odeslaným formulářem
+- **Přístup:** Ke stažení z rozhraní pro správu odeslaných dat
 
 ## Rozšíření rtSurvey
 
-### Přijímané typy souborů
+### Akceptované typy souborů
 
-Použijte sloupec `parameters` pro omezení výběru typů souborů:
+Pomocí sloupce `parameters` omezte, které typy souborů lze vybrat:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| file | report | Nahrajte inspekční zprávu | `accept=.pdf` |
+| file | report | Nahrajte zprávu o kontrole | `accept=.pdf` |
 | file | spreadsheet | Nahrajte datový soubor | `accept=.xlsx,.csv` |
 
-Parametr `accept` používá standardní syntaxi přípon souborů (oddělené čárkami).
+Parametr `accept` používá standardní syntaxi přípon souborů (oddělených čárkou).
 
 ### Pokyny k velikosti souboru
 
-rtSurvey nevynucuje pevný limit velikosti souboru na úrovni otázky, ale platí limit nahrání serveru. Používejte `hint` pro sdělení očekávání enumerátorovi:
+rtSurvey nevynucuje pevný limit velikosti souboru na úrovni otázky, ale platí limit pro nahrávání na server. Pomocí sloupce `hint` sdělte očekávání tazateli:
 
 | type | name | label | hint |
 |------|------|-------|------|
-| file | receipt | Nahrajte potvrzení o platbě | Přijímáno: PDF nebo obrázek. Maximální velikost souboru: 5 MB |
+| file | receipt | Nahrajte doklad o zaplacení | Akceptováno: PDF nebo obrázek. Maximální velikost souboru: 5 MB |
+
+### Integrace se systémem souborů zařízení a cloudovým úložištěm
+
+V systémech Android a iOS otevírá otázka `file` nativní výběr souborů v zařízení, který může zahrnovat přístup k:
+- Lokálnímu úložišti zařízení
+- SD kartě (Android)
+- iCloud Drive (iOS)
+- Google Drive, Dropbox (pokud jsou nainstalovány)
+
+Na webu otevírá standardní dialog pro nahrávání souborů v prohlížeči.
+
+### Rozvržení s vloženým tlačítkem
+
+Přidejte `inline`, aby se nahrávání zobrazilo jako **kruhové tlačítko s ikonou** vedle popisku namísto výběru souboru na celou šířku.
+
+```
+| type | name | label           | appearance                              |
+|------|------|-----------------|-----------------------------------------|
+| file | doc  | Nahrát dokument | inline display{right}                   |
+| file | doc  | Nahrát dokument | inline display{left, large}             |
+| file | doc  | Nahrát dokument | inline display{center, large, <0099FF/>} |
+```
+
+**Pozice tlačítka** — `left`, `right` *(výchozí)*, `top`, `center`, `bottom`
+
+**Velikost tlačítka** — `small` *(výchozí)*, `medium`, `large`
+
+**Barva tlačítka** — přidejte hexadecimální barvu dovnitř `display{}`, abyste přepsali primární barvu:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Ovládání po zachycení — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Skryje tlačítko nahrávání po připojení souboru |
+| `results{hide(review)}` | Skryje tlačítko pro kontrolu/náhled po nahrání |
+| `results{hide(filename)}` | Skryje název souboru zobrazený po nahrání |
+| `results{left}` | Přesune ikonu doleva po nahrání |
+
+Příklad — skrytí tlačítka nahrávání po připojení souboru:
+```
+inline display{right} results{hide(capture)}
+```
+
+### Potlačení popisku
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Příklad použití
 
-### Povinné nahrání PDF
+### Požadované nahrání PDF
 
 | type | name | label | hint | required | required_message |
 |------|------|-------|------|----------|-----------------|
-| file | signed_consent | Nahrajte podepsaný formulář souhlasu | Pouze PDF, max 2 MB | yes | Je vyžadován formulář souhlasu |
+| file | signed_consent | Nahrajte podepsaný formulář souhlasu | Pouze PDF, max. 2 MB | yes | Formulář souhlasu je vyžadován |
 
-### Podmíněné nahrání dokumentu
+### Podmíněné nahrávání dokumentu
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| select_one yesno | has_land_title | Má domácnost pozemkový titul? | |
-| file | land_title_doc | Nahrajte fotografii nebo sken pozemkového titulu | `${has_land_title} = 'yes'` |
+| select_one yesno | has_land_title | Má domácnost list vlastnictví k pozemku? | |
+| file | land_title_doc | Nahrajte fotografii nebo sken listu vlastnictví | `${has_land_title} = 'yes'` |
 
-## Osvědčené postupy
+## Nejlepší postupy
 
-1. Použijte `accept` pro omezení typů souborů — zabraňuje enumerátorům náhodně nahrát nesprávné soubory.
-2. Vždy zahrňte pokyny k velikosti a formátu do sloupce `hint`.
-3. Pro fotografie a obrázky používejte typ `image` — nabízí lepší kompresi a konzistentní zpracování formátu.
-4. Pro velké průzkumy s přílohami souborů plánujte ukládání dat a šířku pásma pro stahování.
-5. Testujte výběr souborů na cílovém typu zařízení (Android vs. iOS vs. web) před nasazením.
+1. Používejte `accept` k omezení typů souborů – zabráníte tak tazatelům v neúmyslném nahrání špatných souborů.
+2. Vždy uvádějte pokyny k velikosti a formátu ve sloupci `hint`.
+3. Pro fotografie a obrázky použijte raději typ `image` – nabízí lepší kompresi a konzistentní zpracování formátu.
+4. U velkých průzkumů s přílohami souborů odpovídajícím způsobem naplánujte ukládání dat a šířku pásma pro stahování.
+5. Před nasazením otestujte výběr souborů na cílovém typu zařízení (Android vs. iOS vs. web) – přístup ke cloudovým diskům se liší.
+
+## Úvahy o manipulaci s daty
+
+- Soubory jsou uloženy v původním formátu; rtSurvey je nekonvertuje ani nekomprimuje.
+- Soubory analyzujte po stažení – rtSurvey neextrahuje ani neindexuje obsah souborů.
+- Velké přílohy souborů výrazně prodlužují dobu potřebnou ke stažení celé datové sady.
 
 ## Omezení
 
-- Otázky file nevalidují obsah souboru — pouze kontrola přípony souboru přes `accept` je vynucena na úrovni UI.
-- Velmi velké soubory (100 MB+) mohou při nahrávání v prostředí s nízkým připojením vypršet.
-- Offline enumerátoři mohou soubory připojit, ale nebudou nahrány, dokud není obnoveno připojení.
-- Některé konfigurace zařízení omezují přístup k určitým místům úložiště.
+- Otázky typu soubor nevalidují obsah souborů – na úrovni uživatelského rozhraní je vynucena pouze kontrola přípony souboru prostřednictvím `accept`.
+- Velmi velké soubory (100 MB+) mohou při nahrávání v prostředích se špatnou konektivitou vypršet.
+- Offline tazatelé mohou připojovat soubory, ale ty se nahrají až po obnovení připojení.
+- Některé konfigurace zařízení omezují přístup k určitým úložným místům (např. podnikové zásady MDM).

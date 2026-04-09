@@ -1,77 +1,203 @@
 ---
 title: "Geopoint"
-description: "Geopoint questions survey के हिस्से के रूप में geographic coordinates (latitude, longitude, altitude, और accuracy) capture करते हैं।"
+description: "Geopoint प्रश्न सर्वेक्षण के हिस्से के रूप में भौगोलिक निर्देशांक (अक्षांश, देशांतर, ऊंचाई और सटीकता) कैप्चर करते हैं।"
 ---
 
-XLSForms और rtSurvey में geopoint question type device के GPS या अन्य location services का उपयोग करके geographic coordinates एकत्र करने में सक्षम बनाता है। यह सुविधा survey responses को map करने, field activities को track करने, या डेटा को specific locations से associate करने के लिए विशेष रूप से उपयोगी है।
+`geopoint` प्रश्न प्रकार डिवाइस जीपीएस का उपयोग करके भौगोलिक निर्देशांक (अक्षांश, देशांतर, ऊंचाई, सटीकता) कैप्चर करता है। rtSurvey कई लेआउट मोड के साथ पिकर को रेंडर करता है और `inputs{}` और `outputs{}` पैरामीटर के माध्यम से ऑटोमेशन का समर्थन करता है।
 
-## बुनियादी XLSForm विशिष्टता
+## बुनियादी XLSForm विनिर्देश (Specification)
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geopoint | location    | वर्तमान location record करें   |
+| type     | name        | label                       |
+|----------|-------------|-----------------------------|
+| geopoint | location    | वर्तमान स्थान रिकॉर्ड करें |
 
-Basic geopoint question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+मानक विनिर्देश के लिए [XLSForm दस्तावेज़](https://xlsform.org/en/#question-types) देखें।
 
-## उपयोग
+## डेटा फॉर्मेट
 
-Geopoint questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
-
-1. Survey responses को geographically map करना
-2. Field activities के location को verify करना
-3. Enumerators के route को track करना
-4. Environmental या social data को specific locations से associate करना
-5. Geographical analyses में distances या areas calculate करना
-
-## सर्वोत्तम प्रथाएँ
-
-1. सुनिश्चित करें कि device में location services enabled हों और permissions granted हों।
-2. GPS को accurate fix प्राप्त करने के लिए पर्याप्त समय दें।
-3. Privacy implications पर विचार करें और उत्तरदाताओं को location data collection के बारे में सूचित करें।
-4. Location data के लिए context प्रदान करने के लिए अन्य question types के साथ conjunction में उपयोग करें।
-
-## उदाहरण उपयोग
-
-यहाँ बताया गया है कि आप survey में geopoint question का उपयोग कैसे कर सकते हैं:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geopoint | sample_location| Sample collection के location को record करें | बेहतर GPS signal के लिए open area में खड़े हों |
-
-## rtSurvey एक्सटेंशन
-
-Basic XLSForm specification के अतिरिक्त, rtSurvey अतिरिक्त सुविधाएं या customizations प्रदान कर सकता है:
-
-1. Captured location की visual confirmation के लिए map integration
-2. Accuracy threshold settings
-3. Coordinates manually input करने का विकल्प
-4. Remote areas के लिए offline maps के साथ integration
-
-## डेटा प्रारूप
-
-Geopoint data आमतौर पर चार space-separated values की string के रूप में store होती है:
+चार स्पेस-सेपरेटेड मानों के रूप में संग्रहीत:
 
 ```
 latitude longitude altitude accuracy
 ```
 
-उदाहरण के लिए:
+उदाहरण: `13.756331 100.501762 15 8`
+
+---
+
+## लेआउट मोड (Layout modes)
+
+### डिफ़ॉल्ट — आयताकार बटन
+
+एक आयताकार "START GEOPOINT" बटन एक पूर्ण मानचित्र मोडल खोलता है जहाँ गणनाकार एक बिंदु का चयन करता है। कैप्चर के बाद, बटन लेबल बदलकर "View or change geo point" हो जाता है और निर्देशांक नीचे दिखाई देते हैं।
+
+कोई appearance मान आवश्यक नहीं है।
+
+---
+
+### `display{inline-icon}` — गोलाकार क्रॉसहेयर बटन
+
+आयताकार बटन के बजाय एक गोलाकार आइकन बटन (क्रॉसहेयर ⊕) रेंडर करता है। इसे टैप करने पर वही मानचित्र मोडल खुलता है।
+
 ```
-41.40338 2.17403 30.5 10
+display{inline-icon}
 ```
 
-## Analysis के लिए विचार
+**स्थिति और आकार के साथ संयुक्त:**
 
-Geopoint questions का उपयोग करते समय, विचार करें:
+```
+display{inline-icon, left}           → लेबल के बाईं ओर बटन
+display{inline-icon, top}            → लेबल के ऊपर बटन
+display{inline-icon, bottom}         → लेबल के नीचे बटन, केंद्रित
+display{inline-icon, large}          → बड़ा आइकन (75px)
+display{inline-icon, medium}         → मध्यम आइकन (50px)
+display{inline-icon, left, large}    → बाईं ओर बड़ा बटन
+```
 
-1. Geographic data कैसे visualize होगा (जैसे mapping software)
-2. Collected coordinates की accuracy और analysis पर इसका प्रभाव
-3. Location data handle करने के लिए privacy और data protection measures
-4. GIS (Geographic Information System) tools के साथ potential integration
+| Size | Icon height/width |
+|------|------------------|
+| *(default)* | 25px |
+| `medium` | 50px |
+| `large` | 75px |
 
-## सीमाएं
+---
 
-- Device और environmental conditions के आधार पर Accuracy vary कर सकती है।
-- Indoor locations या obstructions वाले areas में GPS signals weak या unavailable हो सकते हैं।
-- Location data एकत्र करना device battery life को महत्वपूर्ण रूप से प्रभावित कर सकता है।
-- Precise location data एकत्र करने से associated privacy concerns हो सकती हैं।
+### `display{thumbnail-square}` — लाइव मानचित्र थंबनेल
+
+बटन के बजाय सीधे प्रश्न पर एक लाइव मानचित्र पूर्वावलोकन (Leaflet) रेंडर करता है। थंबनेल वर्तमान जीपीएस स्थिति और चयनित बिंदु दिखाता है। विस्तार बटन को टैप करने पर पूर्ण मोडल खुलता है।
+
+```
+display{thumbnail-square}
+```
+
+**कस्टम थंबनेल आकार:**
+
+```
+display{thumbnail-square-[WxH]}          → निश्चित पिक्सेल
+display{thumbnail-square-[400x200]}      → 400px चौड़ा × 200px लंबा
+
+display{thumbnail-square-[W%xH%]}        → फॉर्म की चौड़ाई का प्रतिशत
+display{thumbnail-square-[100%x30%]}     → पूरी चौड़ाई × फॉर्म की चौड़ाई का 30%
+```
+
+---
+
+## `display{}` बनाम `results{}` — कैप्चर से पहले और बाद में
+
+`display{}` उपयोगकर्ता द्वारा स्थान कैप्चर करने से **पहले** लेआउट को नियंत्रित करता है। `results{}` मान मौजूद होने के **बाद** लेआउट को नियंत्रित करता है। उनके अलग-अलग संरेखण (alignments) हो सकते हैं।
+
+```
+display{inline-icon, right} results{left}
+```
+
+यह कैप्चर से पहले बटन को दाईं ओर रेंडर करता है, फिर एक बार बिंदु रिकॉर्ड होने के बाद इसे बाईं ओर ले जाता है।
+
+### `hide(value)` — निर्देशांक प्रदर्शन को छिपाएं
+
+डिफ़ॉल्ट रूप से, कैप्चर किया गया अक्षांश/देशांतर/सटीकता/ऊंचाई टेक्स्ट बटन के नीचे दिखाया जाता है। इसे इसके साथ छिपाएं:
+
+```
+results{hide(value)}
+display{inline-icon} results{hide(value)}
+```
+
+---
+
+## `inputs{}` — जीपीएस ऑटोमेशन
+
+### लोड होने पर ऑटो-कैप्चर
+
+जब फॉर्म लोड होता है, तो गणनाकार द्वारा कुछ भी दबाए बिना जीपीएस स्थिति स्वचालित रूप से रिकॉर्ड हो जाती है।
+
+```
+inputs{auto-take}
+```
+
+XLSForm एक्सप्रेशन का उपयोग करके **सशर्त ऑटो-कैप्चर**:
+
+```
+inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
+```
+
+### टेक्स्ट फ़ील्ड से प्री-फिल
+
+किसी ऐसे प्रश्न से जियोपॉइंट भरें जिसमें स्थान का नाम या पता स्ट्रिंग हो। rtSurvey OpenStreetMap Nominatim के माध्यम से स्ट्रिंग को निर्देशांक में रिवर्स-जियोकोड करता है।
+
+```
+inputs{question(address_field)}
+```
+
+---
+
+## `outputs{}` — टेक्स्ट में रिवर्स जियोकोड
+
+एक बिंदु कैप्चर होने के बाद, मानव-पठनीय पते (निर्देशांक से रिवर्स जियोकोडेड) के साथ स्वचालित रूप से `text` प्रश्न भरें।
+
+```
+outputs{question(address_field)}
+```
+
+उदाहरण:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | location | स्थान रिकॉर्ड करें | `outputs{question(address_text)}` |
+| text | address_text | पता | |
+
+---
+
+## `nomap` — मानचित्र के बिना जीपीएस कैप्चर
+
+मानचित्र मोडल को एक सरल संवाद से बदल देता है जो स्थान की अनुमति का अनुरोध करता है और निर्देशांक रिकॉर्ड करता है। कोई मानचित्र प्रदर्शित नहीं होता है। कम-क्षमता वाले उपकरणों पर या जब मानचित्र टाइलें ऑफलाइन उपलब्ध नहीं होती हैं, तब केवल-जीपीएस कैप्चर के लिए उपयोगी है।
+
+```
+nomap
+```
+
+---
+
+## कस्टम बटन शैली (Custom button style)
+
+डिफ़ॉल्ट आयताकार बटन पर कस्टम CSS लागू करने के लिए `styleButton()` का उपयोग करें:
+
+```
+styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
+```
+
+---
+
+## लेबल को छिपाना (Suppress the label)
+
+```
+text-nolabel display{inline-icon, center, large}
+```
+
+---
+
+## उदाहरण उपयोग
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | field_loc | फ़ील्ड स्थान रिकॉर्ड करें | `display{inline-icon, right, large}` |
+| geopoint | site | साइट स्थान | `display{thumbnail-square-[100%x30%]}` |
+| geopoint | auto_loc | वर्तमान स्थिति | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | mapped_loc | स्थान | `display{inline-icon} outputs{question(address)}` |
+| geopoint | gps_only | जीपीएस बिंदु | `nomap` |
+
+---
+
+## सर्वोत्तम प्रथाएं
+
+1. गणनाकार-सत्यापन सर्वेक्षणों के लिए `inputs{auto-take}` का उपयोग करें जहाँ जीपीएस अनिवार्य है — यह मैन्युअल कदम को हटा देता है।
+2. `display{thumbnail-square}` का उपयोग तब करें जब आप चाहते हैं कि गणनाकार आगे बढ़ने से पहले चयनित बिंदु की दृष्टि से पुष्टि करें।
+3. गणनाकार को रिवर्स-जियोकोडेड पता दिखाने के लिए `outputs{question(...)}` को केवल-पठनीय (read-only) `text` फ़ील्ड के साथ जोड़ें।
+4. बिना इंटरनेट कनेक्टिविटी वाले क्षेत्रों में `nomap` का उपयोग करें जहाँ मानचित्र टाइलें लोड नहीं हो सकती हैं।
+5. रिकॉर्डिंग से पहले जीपीएस समय को स्थिर होने दें — 10 मीटर से कम की सटीकता आमतौर पर फ़ील्ड सर्वेक्षणों के लिए पर्याप्त है।
+
+## सीमाएं (Limitations)
+
+- `inputs{question(name)}` जियोकोडिंग के लिए इंटरनेट एक्सेस की आवश्यकता होती है — यह OpenStreetMap Nominatim API को कॉल करता है।
+- `outputs{question(name)}` रिवर्स जियोकोडिंग के लिए भी इंटरनेट एक्सेस की आवश्यकता होती है।
+- मानचित्र थंबनेल (`display{thumbnail-square}`) के लिए टाइल लोडिंग के लिए इंटरनेट की आवश्यकता होती है; निर्देशांक अभी भी ऑफलाइन कैप्चर किए जाते हैं।
+- जीपीएस सटीकता डिवाइस और वातावरण के अनुसार भिन्न होती है — इनडोर या शहरी क्षेत्रों में 50 मीटर से अधिक की सटीकता हो सकती है।
+- लंबे सर्वेक्षणों के दौरान स्थान डेटा एकत्र करने से डिवाइस की बैटरी लाइफ पर महत्वपूर्ण प्रभाव पड़ सकता है।

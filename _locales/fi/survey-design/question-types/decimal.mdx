@@ -1,72 +1,212 @@
 ---
-title: "Decimal"
-description: "Decimal-kysymykset mahdollistavat numeerisen syötteen desimaaliosalla kyselyssä."
+title: "Desimaali"
+description: "Desimaalilukujen syöttökysymystyyppi rtSurveyssä"
 ---
 
-XLSFormien ja rtSurveyn decimal-kysymystyyppiä käytetään keräämään numeerisia vastauksia, joihin voi sisältyä desimaaliosia. Tämä kysymystyyppi on välttämätön tarkan numeerisen tiedon keräämiseen, kuten mittauksiin, hintoihin tai prosenttiosuuksiin.
+`decimal`-kysymystyyppi kerää lukuja, joissa voi olla murtolukuosa (esim. `3.14`, `72.5`). Se aktivoi numeronäppäimistön mobiililaitteissa ja tukee samoja ulkoasuvaihtoehtoja (appearance) kuin `text`-tyyppi asettelua ja muotoilua varten.
 
 ## XLSForm-perusmäärittely
 
-| type    | name   | label                       |
-|---------|--------|-----------------------------|
-| decimal | weight | Syötä painosi kilogrammoina |
+| type | name | label |
+|------|------|-------|
+| decimal | weight_kg | Paino (kg) |
+| decimal | height_m | Pituus (m) |
+| decimal | temperature | Ruumiinlämpö (°C) |
 
-Lisätietoja decimal-kysymystyypin perusteista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+Katso vakiomäärittelyt [XLSForm-dokumentaatiosta](https://xlsform.org/en/#question-types).
 
-## Käyttötarkoitukset
+---
 
-Decimal-kysymyksiä käytetään yleisesti:
+## Ulkoasuvaihtoehdot (Appearance options)
 
-1. Mittauksiin (esim. paino, pituus, etäisyys)
-2. Taloudelliseen tietoon (esim. hinnat, palkat)
-3. Prosenttiosuuksiin
-4. Tieteelliseen tiedon keräämiseen
-5. Mihin tahansa numeeriseen tietoon, joka vaatii tarkkuutta kokonaislukujen yli
+### `number-hspinner` — vaakasuuntainen säädin (spinner)
+
+Korvaa syöttökentän vaakasuuntaisella **− arvo +** -säätimellä. Miinus- tai pluspainikkeen napauttaminen muuttaa arvoa määritetyn askeleen (step) verran.
+
+```
+number-hspinner
+```
+
+Näytettävä arvo muotoillaan yhdellä desimaalilla (esim. `3.0`, `72.5`). Oletusaskel on `1`; käytä `hspinner()`-funktiota asettaaksesi desimaaliaskeleen.
+
+**Mukauta painikkeen muotoa ja askelta** `hspinner()`-funktiolla:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','0.1')
+```
+
+Parametrit: vasemman painikkeen muoto, oikean painikkeen muoto, askeleen arvo. Käytä desimaaliaskelta, kuten `0.5` tai `0.1`, tarkkaa hallintaa varten.
+
+**Mukautetut värit** `colors()`-funktiolla:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Neljä arvoa järjestyksessä: vasemman painikkeen tausta, vasemman painikkeen kuvake, oikean painikkeen tausta, oikean painikkeen kuvake.
+
+---
+
+### `thousandsep` — tuhaterotin
+
+Muotoilee näytettävän luvun tuhaterottimilla (esim. `1,234.56`). Alkuperäinen luku tallennetaan ilman tuhaterottimia. Syöttötyyppi vaihdetaan muotoon `"text"`, jotta muotoiltu näyttö on mahdollinen.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — mukautettu numeroryhmittely
+
+Ryhmittelee kokonaislukuosan numerot `n` numeron lohkoihin, jotka on erotettu mukautetulla erottimella.
+
+```
+digisep(3," ")      → 1 234 567.89
+```
+
+Syöttötyyppi vaihdetaan muotoon `"text"`, kun tämä ulkoasu on käytössä.
+
+---
+
+### `textonly` — pakota tekstinäppäimistö
+
+Pakottaa `type="text"`-asetuksen syöttöelementtiin. Estää selaimen numerosyötön oikkuja (kuten lopun nollien piilottaminen, työpöytäselainten nuolipainikkeet) hyväksyen silti desimaaliarvot.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — vihje kelluu otsikkona
+
+`hint`-teksti näkyy syöttökentän sisällä paikkamerkkinä (placeholder). Kun käyttäjä alkaa kirjoittaa, se nousee kentän yläpuolelle otsikoksi (label).
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — vihje syöttökentän sisällä
+
+Samankaltainen kuin `floating_hint` — vihje on syöttökentän sisällä, kun kenttä on tyhjä. Se ei nouse ylös, kun käyttäjä kirjoittaa.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — modaalinen valintaikkuna
+
+Kentän napauttaminen avaa modaalisen valintaikkunan, jossa on suurempi syöttökenttä. Hyödyllinen pienillä näytöillä.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — reaaliaikainen merkkilaskuri
+
+Näyttää reaaliaikaisen merkkimäärän `(n)` syöttökentän alapuolella. Määrä päivittyy käyttäjän kirjoittaessa.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — lisää etuliite (prefix)
+
+Lisää staattisen tai lasketun merkkijonon näytettävän arvon eteen. Tallennettu arvo ei sisällä etuliitettä.
+
+```
+prefix('USD ')          → näyttää "USD 72.50", tallentaa "72.50"
+prefix(${currency})     → dynaaminen etuliite toisesta kentästä
+```
+
+---
+
+### `align_answer` — syötetyn tekstin tasaus
+
+Määrittää syötetyn arvon vaakasuuntaisen tasauksen kentän sisällä.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — QR- / viivakoodin skannaus kenttään
+
+Lisää QR-koodin skannauspainikkeen syöttökentän viereen. Avaa kameraskannerin ja täyttää kentän skannatulla arvolla.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Ulkoasun pikaopas (Appearance quick reference)
+
+| Appearance | Widget rendered |
+|---|---|
+| *(none)* | Numerosyöttö (`type="number"`) — numeronäppäimistö mobiililaitteissa |
+| `number-hspinner` | Vaakasuuntainen − arvo + -säädin, yksi desimaali näkyvissä |
+| `number-hspinner hspinner(...)` | Säädin mukautetulla painikkeen muodolla ja askeleella |
+| `number-hspinner colors(...)` | Säädin mukautetuilla painikkeiden väreillä |
+| `thousandsep` | Luvun näyttö tuhaterottimilla |
+| `digisep(n,"sep")` | Mukautettu numeroryhmittely |
+| `textonly` | Pakota tekstinäppäimistö |
+| `floating_hint` | Vihje nousee kentän yläpuolelle kirjoitettaessa |
+| `embed` | Vihje syöttökentän sisällä |
+| `textpopup` | Napauta avataksesi modaalisen valintaikkunan |
+| `charcount` | Reaaliaikainen merkkimäärä syöttökentän alapuolella |
+| `prefix(expr)` | Lisää staattinen tai dynaaminen etuliite |
+| `align_answer = left/right/center` | Syötetyn tekstin tasaus |
+| `inputs{qrscan}` | QR- tai viivakoodin skannauspainike |
+
+---
+
+## Rajoitukset ja validointi (Constraints and validation)
+
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| decimal | weight | Paino (kg) | `. > 0 and . <= 500` | Syötä arvo väliltä 0–500 |
+| decimal | height | Pituus (m) | `. > 0 and . <= 3` | Syötä arvo väliltä 0–3 |
+| decimal | temp | Lämpötila (°C) | `. >= 35 and . <= 42` | Normaali lämpötila: 35°C–42°C |
+| decimal | percentage | Prosenttiosuus | `. >= 0 and . <= 100` | Syötä arvo väliltä 0–100 |
+
+---
+
+## Esimerkki — mittauslomake
+
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| decimal | weight_kg | Paino (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Syötä kelvollinen paino |
+| decimal | height_m | Pituus (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Syötä kelvollinen pituus |
+| calculate | bmi | | | | |
+
+BMI-laskentasarake:
+```
+${weight_kg} div (${height_m} * ${height_m})
+```
+
+---
 
 ## Parhaat käytännöt
 
-1. Käytä selkeitä ja ytimekkäitä otsikoita odotetun syötteen ja mittayksikön määrittelemiseksi.
-2. Toteuta aluerajoitteet epärealististen tai virheellisten syötteiden estämiseksi.
-3. Harkitse ohjetekstin käyttöä esimerkkien antamiseksi tai odotetun muodon selventämiseksi.
-4. Määrittele haluttu desimaalien määrä otsikossa tai vihjeessä, jos tarkkuus on tärkeää.
+1. Käytä `number-hspinner hspinner(..., '0.1')` -ulkoasua mittauksiin, joissa tarvitaan yhden desimaalin tarkkuus — säädin muotoilee arvon automaattisesti yhteen desimaaliin, mikä pitää arvot johdonmukaisina.
+2. Käytä `textonly`-asetusta, jos selaimet lisäävät ei-toivottuja säädinpainikkeita tai poistavat lopun nollia (esim. `3.0` näkyy muodossa `3`).
+3. Käytä `thousandsep`-asetusta suurille taloudellisille arvoille, jotta vastaajat voivat varmistaa syöttäneensä oikean suuruusluokan.
+4. Käytä alueen rajoituksia (constraints) pelkän mobiilinäppäimistötyypin sijaan.
 
-## Rajoitteet ja validointi
+## Rajoitukset (Limitations)
 
-Voit lisätä rajoitteita varmistaaksesi, että syötetty arvo on tietyllä alueella:
-
-| type    | name   | label                          | constraint        | constraint_message                       |
-|---------|--------|--------------------------------|-------------------|------------------------------------------|
-| decimal | height | Syötä pituutesi metreissä      | .>0 and .&lt;=3      | Pituuden on oltava 0 ja 3 metrin välillä |
-
-## Esimerkkikäyttö
-
-Esimerkki terveyskyselyssä:
-
-| type    | name           | label                                        | constraint          | constraint_message                          |
-|---------|----------------|----------------------------------------------|---------------------|---------------------------------------------|
-| decimal | weight         | Syötä painosi kilogrammoina                  | .>0 and .&lt;=500      | Painon on oltava 0 ja 500 kg:n välillä      |
-| decimal | height         | Syötä pituutesi metreissä                    | .>0 and .&lt;=3        | Pituuden on oltava 0 ja 3 metrin välillä    |
-| decimal | body_temp      | Syötä kehon lämpötila Celsius-asteissa       | .>=35 and .&lt;=42     | Lämpötilan on oltava 35 °C ja 42 °C välillä |
-| calculate | bmi          |                                              |                     |                                             |
-
-BMI-laskentarivillä voidaan käyttää:
-
-```
-calculation | ${weight} / (${height} * ${height})
-```
-
-Tämä laskee BMI:n syötetyn painon ja pituuden avulla.
-
-## rtSurveyn laajennukset
-
-Vaikka XLSForm-standardin decimal-kysymysten perusmäärittely on suoraviivainen, rtSurvey voi tarjota lisäominaisuuksia tai mukautuksia:
-
-1. Tarkkuuden hallinta (desimaalien lukumäärä)
-2. Mukautetut syötemuodot (esim. prosentti, valuutta)
-3. Edistyneet validointisäännöt
-
-## Rajoitukset
-
-- Desimaalilukujen tarkkuus voi olla rajoitettu taustajärjestelmän tai tietokannan toimesta.
-- Käyttäjät saattavat tarvita ohjausta odotetusta desimaalierottimesta (piste tai pilkku) riippuen heidän alueasetuistaan.
-- Suuret desimaaliluvut voivat olla vaikeita lukea tai syöttää tarkasti mobiililaitteilla.
+- Säädin (spinner) näyttää aina yhden desimaalin — jos tarvitset enemmän tarkkuutta näytettävässä arvossa, käytä sen sijaan tavallista syöttökenttää.
+- `thousandsep` ja `digisep()` tallentavat alkuperäisen luvun — älä lue muotoiltua näyttöarvoa laskennoissa.

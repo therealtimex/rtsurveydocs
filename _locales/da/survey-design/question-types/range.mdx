@@ -1,9 +1,9 @@
 ---
 title: "Interval"
-description: "Intervalspørgsmål lader respondenter vælge et tal ved at trække en skyder mellem en defineret minimum- og maksimumsværdi."
+description: "Intervalspørgsmål lader respondenterne vælge et tal ved at trække en skyder mellem en defineret minimum- og maksimumværdi."
 ---
 
-Spørgsmålstypen `range` viser en **skyder** (eller tilsvarende input), der lader respondenter vælge et tal inden for et defineret minimum og maksimum. Det er ideelt til at indsamle bedømmelser, tilfredshedsscorer eller enhver numerisk værdi, hvor du visuelt vil begrænse intervallet frem for at stole på et tekstinput med restriktioner.
+Spørgsmålstypen `range` lader respondenterne vælge et tal inden for et defineret minimum og maksimum. I rtSurveys webformular vises dette som et standard **tal-inputfelt** — intervieweren indtaster en værdi direkte. Parametrene `start`, `end` og `step` definerer det gyldige interval og håndhæves som begrænsninger.
 
 ## Grundlæggende XLSForm-specifikation
 
@@ -11,34 +11,34 @@ Spørgsmålstypen `range` viser en **skyder** (eller tilsvarende input), der lad
 |------|------|-------|------------|
 | range | satisfaction | Hvor tilfreds er du med servicen? | start=1 end=5 step=1 |
 
-Kolonnen `parameters` definerer skyderens grænser og trinsstørrelse:
+Kolonnen `parameters` definerer skyderens grænser og trinstørrelse:
 
 | Parameter | Beskrivelse | Standard |
 |-----------|-------------|---------|
 | `start` | Minimumsværdi (inklusiv) | 0 |
 | `end` | Maksimumsværdi (inklusiv) | 10 |
-| `step` | Trin mellem gyldige værdier | 1 |
+| `step` | Stigning mellem gyldige værdier | 1 |
 
-For flere detaljer om standard range-spørgsmålstypen, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+For flere detaljer om den standardmæssige intervalspørgsmålstype, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
 
 ## Anvendelser
 
-Intervalspørgsmål bruges typisk til:
+Intervalspørgsmål bruges ofte til:
 
-1. Tilfredsheds- eller bedømmelsesskaer (f.eks. 1–5 eller 0–10)
-2. Likert-lignende numeriske skaer
+1. Tilfredsheds- eller vurderingsskalaer (f.eks. 1–5 eller 0–10)
+2. Numeriske skalaer af Likert-typen
 3. Indsamling af målinger, hvor kun diskrete værdier er gyldige
-4. Aldersgrupper eller scoreintervaller, hvor en skyder forbedrer brugbarheden frem for et tekstfelt
+4. Aldersgrupper eller pointintervaller, hvor en skyder forbedrer brugervenligheden i forhold til et tekstfelt
 
-## Eksempler på brug
+## Eksempel på brug
 
-### Grundlæggende bedømmelseskala
+### Grundlæggende vurderingsskala
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | overall_rating | Samlet bedømmelse (0–10) | start=0 end=10 step=1 |
+| range | overall_rating | Samlet vurdering (0–10) | start=0 end=10 step=1 |
 
-### Decimalstrin
+### Decimaltrin
 
 | type | name | label | parameters |
 |------|------|-------|------------|
@@ -50,24 +50,17 @@ Intervalspørgsmål bruges typisk til:
 |------|------|-------|------------|-------------|
 | range | score | Testresultat (0–100) | start=0 end=100 step=5 | |
 | calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
-| note | grade_note | Dit karakterniveau er: `${grade}` | | |
+| note | grade_note | Din karakter er: `${grade}` | | |
 
-## Udseende
+## Best practices
 
-Typen `range` gengives som standard som en skyder. Ingen yderligere appearance-værdier er påkrævet til grundlæggende brug. Du kan kombinere det med `horizontal` til et bredere layout på webformularer:
-
-| type | name | label | parameters | appearance |
-|------|------|-------|------------|------------|
-| range | nps | Hvor sandsynligt er det, at du anbefaler os? (0–10) | start=0 end=10 step=1 | horizontal |
-
-## Bedste praksis
-
-1. Angiv altid meningsfulde `start`-, `end`- og `step`-værdier — stol ikke på standarder.
-2. Mærk enderne af din skala i kolonnen `hint` (f.eks. `hint: 0 = Meget utilfreds, 10 = Meget tilfreds`) for at give respondenter kontekst.
-3. Til 5-punkts Likert-skaer bruges `start=1 end=5 step=1` frem for 0–4, da respondenter forventer, at "1" betyder det laveste.
-4. Brug `range` i stedet for `integer` + restriktion, når det afgrænsede input er en del af spørgsmålsdesignet (skyderen kommunikerer skalaen visuelt).
+1. Indstil altid meningsfulde værdier for `start`, `end` og `step` — stol ikke på standardværdierne.
+2. Sæt etiketter på yderpunkterne af din skala i kolonnen `hint` (f.eks. `hint: 0 = Meget utilfreds, 10 = Meget tilfreds`) for at give respondenterne kontekst.
+3. Til 5-punkts Likert-skalaer bør du bruge `start=1 end=5 step=1` i stedet for 0–4, da respondenterne forventer, at "1" betyder det laveste.
+4. Brug `range` i stedet for `integer` + begrænsning, når inputfeltets afgrænsede natur er en del af spørgsmålsdesignet (skyderen kommunikerer skalaen visuelt).
 
 ## Begrænsninger
 
-- Skyderwidgetten er muligvis ikke ideel til meget brede intervaller (f.eks. 0–10000) — et tekst-`integer`-felt med restriktioner er mere brugervenligt i disse tilfælde.
-- På mobilenheder kan fine trinværdier (f.eks. `step=0.1`) være svære at kontrollere præcist med en berøringsskyder.
+- Der er ingen skyder-widget i rtSurveys webformular — indtastning af værdi er et almindeligt tal-inputfelt. For at få en visuel skyder-oplevelse skal du bruge en mobilklient, der understøtter interval-widgetten.
+- Ved meget brede intervaller (f.eks. 0–10000) er et almindeligt `integer`-felt med en begrænsning lige så effektivt og mere brugervenligt.
+- Fine trinværdier (f.eks. `step=0.1`) fungerer som begrænsninger, men har ingen betydning for skyderens præcision i webformularen.

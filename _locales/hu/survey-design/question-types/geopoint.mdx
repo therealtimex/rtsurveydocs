@@ -1,77 +1,203 @@
 ---
 title: "Geopoint"
-description: "A geopoint kérdések az eszköz GPS-ének vagy más helymeghatározó szolgáltatásainak segítségével rögzítik a földrajzi koordinátákat."
+description: "A Geopoint kérdések földrajzi koordinátákat (szélesség, hosszúság, magasság és pontosság) rögzítenek a felmérés részeként."
 ---
 
-Az XLSForm és az rtSurvey geopoint kérdéstípusa lehetővé teszi az eszköz GPS-ét vagy más helymeghatározó szolgáltatásait felhasználva a földrajzi koordináták összegyűjtését. Ez a funkció különösen hasznos a felmérési válaszok térképezéséhez, a terepi tevékenységek nyomon követéséhez vagy az adatok konkrét helyszínekhez való kötéséhez.
+A `geopoint` kérdéstípus földrajzi koordinátákat (szélesség, hosszúság, magasság, pontosság) rögzít az eszköz GPS-ének segítségével. Az rtSurvey többféle elrendezési móddal jeleníti meg a választót, és támogatja az automatizálást az `inputs{}` és `outputs{}` paramétereken keresztül.
 
-## Alapvető XLSForm-specifikáció
+## Alapvető XLSForm specifikáció
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geopoint | location    | Rögzítse az aktuális helyszínt  |
+| type     | name        | label                       |
+|----------|-------------|-----------------------------|
+| geopoint | location    | Rögzítse az aktuális helyet |
 
-A geopoint kérdéstípus alapvető részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
-
-## Felhasználási területek
-
-A geopoint kérdések általánosan használt területei:
-
-1. Felmérési válaszok földrajzi térképezése
-2. Terepi tevékenységek helyszínének ellenőrzése
-3. Kérdezők útvonalának követése
-4. Környezeti vagy szociális adatok konkrét helyszínekhez kötése
-5. Távolságok vagy területek kiszámítása földrajzi elemzésekben
-
-## Bevált módszerek
-
-1. Győződjön meg arról, hogy az eszközön engedélyezve van a helymeghatározó szolgáltatás és megvannak az engedélyek.
-2. Hagyjon elegendő időt a GPS-nek a pontos koordináta megszerzéséhez.
-3. Vegye figyelembe az adatvédelmi következményeket, és tájékoztassa a válaszadókat a helyszín adatok gyűjtéséről.
-4. Más kérdéstípusokkal együtt használja a helyszín adatok kontextusának biztosításához.
-
-## Példa
-
-Íme egy példa arra, hogyan lehet geopoint kérdést felhasználni egy felmérésben:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geopoint | sample_location| Rögzítse a mintavétel helyszínét | Álljon nyílt területen a jobb GPS-jel érdekében |
-
-## rtSurvey-bővítések
-
-Bár az alapvető XLSForm-specifikáció egyszerű a geopoint kérdéseknél, az rtSurvey további funkciókat kínálhat:
-
-1. Térkép integráció a rögzített helyszín vizuális megerősítéséhez
-2. Pontossági küszöbérték beállítások
-3. Koordináták manuális bevitelének lehetősége
-4. Integráció offline térképekkel távoli területeken
+A szabványos specifikációt az [XLSForm dokumentációjában](https://xlsform.org/en/#question-types) találja.
 
 ## Adatformátum
 
-A geopoint adatok általában négy szóközzel elválasztott értékből álló karakterláncként kerülnek tárolásra:
+Négy szóközökkel elválasztott értékként tárolva:
 
 ```
-szélességi_fok hosszúsági_fok tengerszint_feletti_magasság pontosság
+latitude longitude altitude accuracy
 ```
 
-Például:
+Példa: `13.756331 100.501762 15 8`
+
+---
+
+## Elrendezési módok (Layout modes)
+
+### Alapértelmezett — téglalap alakú gomb
+
+A téglalap alakú „START GEOPOINT” gomb egy teljes térképes modális ablakot nyit meg, ahol a kérdező kiválaszt egy pontot. A rögzítés után a gomb felirata „View or change geo point”-ra változik, és a koordináták alatta jelennek meg.
+
+Nincs szükség appearance értékre.
+
+---
+
+### `display{inline-icon}` — kör alakú célkereszt gomb
+
+A téglalap alakú gomb helyett egy kör alakú ikongombot (célkereszt ⊕) jelenít meg. Megérintésével ugyanaz a térképes modális ablak nyílik meg.
+
 ```
-41.40338 2.17403 30.5 10
+display{inline-icon}
 ```
 
-## Elemzési szempontok
+**Pozícióval és mérettel kombinálva:**
 
-A geopoint kérdések használatakor vegye figyelembe:
+```
+display{inline-icon, left}           → gomb a felirattól balra
+display{inline-icon, top}            → gomb a felirat felett
+display{inline-icon, bottom}         → gomb a felirat alatt, középre igazítva
+display{inline-icon, large}          → nagy ikon (75px)
+display{inline-icon, medium}         → közepes ikon (50px)
+display{inline-icon, left, large}    → nagy gomb a bal oldalon
+```
 
-1. A földrajzi adatok vizualizálásának módját (pl. térképező szoftver)
-2. Az összegyűjtött koordináták pontosságát és annak hatását az elemzésre
-3. Az adatvédelmi és adatbiztonsági intézkedéseket a helyszínadatok kezeléséhez
-4. A lehetséges integrációt GIS-eszközökkel (Geographic Information System)
+| Size | Icon height/width |
+|------|------------------|
+| *(default)* | 25px |
+| `medium` | 50px |
+| `large` | 75px |
 
-## Korlátozások
+---
 
-- A pontosság az eszköztől és a környezeti feltételektől függően változhat.
-- Beltéren vagy akadályok által körülvett területeken a GPS-jel gyenge vagy nem elérhető.
-- A helyszínadatok gyűjtése jelentősen merítheti az eszköz akkumulátorát.
-- A pontos helyszínadatok gyűjtésével adatvédelmi aggályok merülhetnek fel.
+### `display{thumbnail-square}` — élő térkép bélyegkép
+
+Élő térkép előnézetet (Leaflet) jelenít meg közvetlenül a kérdésnél gomb helyett. A bélyegkép mutatja az aktuális GPS-pozíciót és a kiválasztott pontot. A nagyítás gomb megérintésével megnyílik a teljes modális ablak.
+
+```
+display{thumbnail-square}
+```
+
+**Egyedi bélyegkép méret:**
+
+```
+display{thumbnail-square-[WxH]}          → fix képpontok
+display{thumbnail-square-[400x200]}      → 400px széles × 200px magas
+
+display{thumbnail-square-[W%xH%]}        → az űrlap szélességének százaléka
+display{thumbnail-square-[100%x30%]}     → teljes szélesség × az űrlap szélességének 30%-a
+```
+
+---
+
+## `display{}` vs `results{}` — rögzítés előtt és után
+
+A `display{}` vezérli az elrendezést, **mielőtt** a felhasználó rögzítené a helyet. A `results{}` vezérli az elrendezést, **miután** létezik egy érték. Különböző igazításaik lehetnek.
+
+```
+display{inline-icon, right} results{left}
+```
+
+Ez a rögzítés előtt a jobb oldalon jeleníti meg a gombot, majd a pont rögzítése után balra helyezi át.
+
+### `hide(value)` — koordináták megjelenítésének elrejtése
+
+Alapértelmezés szerint a rögzített szélesség/hosszúság/pontosság/magasság szöveg a gomb alatt jelenik meg. Rejtse el ezzel:
+
+```
+results{hide(value)}
+display{inline-icon} results{hide(value)}
+```
+
+---
+
+## `inputs{}` — GPS automatizálás
+
+### Automatikus rögzítés betöltéskor
+
+Automatikusan rögzíti a GPS-pozíciót az űrlap betöltésekor, anélkül, hogy a kérdező bármit megnyomna.
+
+```
+inputs{auto-take}
+```
+
+**Feltételes automatikus rögzítés** XLSForm kifejezés használatával:
+
+```
+inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
+```
+
+### Előre kitöltés szöveges mezőből
+
+Töltse ki a geopointot egy olyan kérdésből, amely helynevet vagy címet tartalmaz. Az rtSurvey az OpenStreetMap Nominatim segítségével fordított geokódolást végez a karakterláncból koordinátákká.
+
+```
+inputs{question(address_field)}
+```
+
+---
+
+## `outputs{}` — fordított geokódolás szöveggé
+
+Egy pont rögzítése után automatikusan töltsön ki egy `text` kérdést az ember által olvasható címmel (a koordinátákból fordított geokódolással).
+
+```
+outputs{question(address_field)}
+```
+
+Példa:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | location | Hely rögzítése | `outputs{question(address_text)}` |
+| text | address_text | Cím | |
+
+---
+
+## `nomap` — GPS rögzítés térkép nélkül
+
+A térkép modális ablakot egy egyszerű párbeszédpanellel helyettesíti, amely helymeghatározási engedélyt kér és rögzíti a koordinátákat. Nem jelenik meg térkép. Hasznos a csak GPS-alapú rögzítéshez alacsony kategóriás eszközökön, vagy ha a térképcsempék nem érhetők el offline.
+
+```
+nomap
+```
+
+---
+
+## Egyedi gombstílus
+
+Használja a `styleButton()` függvényt egyedi CSS alkalmazásához az alapértelmezett téglalap alakú gombra:
+
+```
+styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
+```
+
+---
+
+## A felirat elrejtése
+
+```
+text-nolabel display{inline-icon, center, large}
+```
+
+---
+
+## Példa a használatra
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | field_loc | Terepi hely rögzítése | `display{inline-icon, right, large}` |
+| geopoint | site | Helyszín helye | `display{thumbnail-square-[100%x30%]}` |
+| geopoint | auto_loc | Aktuális pozíció | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | mapped_loc | Helyszín | `display{inline-icon} outputs{question(address)}` |
+| geopoint | gps_only | GPS pont | `nomap` |
+
+---
+
+## Legjobb gyakorlatok
+
+1. Használja az `inputs{auto-take}` funkciót a kérdező általi ellenőrző felmérésekhez, ahol a GPS kötelező — ez kiküszöböli a manuális lépést.
+2. Használja a `display{thumbnail-square}` megjelenítést, ha azt szeretné, hogy a kérdező vizuálisan is megerősítse a kiválasztott pontot a folytatás előtt.
+3. Párosítsa az `outputs{question(...)}` függvényt egy írásvédett `text` mezővel a fordítottan geokódolt cím megjelenítéséhez a kérdező számára.
+4. Használja a `nomap` beállítást internetkapcsolat nélküli területeken, ahol a térképcsempék nem tudnak betöltődni.
+5. Hagyjon időt a GPS-jel stabilizálódására a rögzítés előtt — a 10 méter alatti pontosság általában elegendő a terepi felmérésekhez.
+
+## Korlátozások (Limitations)
+
+- Az `inputs{question(name)}` geokódoláshoz internet-hozzáférés szükséges — az OpenStreetMap Nominatim API-t hívja meg.
+- Az `outputs{question(name)}` fordított geokódoláshoz szintén internet-hozzáférés szükséges.
+- A térkép bélyegképhez (`display{thumbnail-square}`) internet szükséges a csempék betöltéséhez; a koordináták rögzítése ettől függetlenül offline is megtörténik.
+- A GPS pontossága az eszköztől és a környezettől függően változik — a beltéri vagy városi kanyonviszonyok 50 méternél nagyobb pontatlanságot is eredményezhetnek.
+- A helyadatok gyűjtése hosszú felmérések során jelentősen befolyásolhatja az eszköz akkumulátorának élettartamát.

@@ -1,72 +1,81 @@
 ---
 title: "Geotrace"
-description: "Las preguntas de geotrace permiten a los encuestados capturar una serie de puntos conectados en un mapa, creando líneas o trayectos como parte de la encuesta."
+description: "Las preguntas Geotrace capturan una serie de puntos GPS que forman una línea o ruta."
 ---
 
-El tipo de pregunta geotrace en XLSForms y rtSurvey permite a los encuestados capturar una serie de puntos conectados en un mapa, creando líneas o trayectos. Esta función es particularmente útil para mapear rutas, límites o características lineales en encuestas espaciales.
+El tipo de pregunta `geotrace` captura una secuencia de coordenadas geográficas que forman una línea o ruta (polilínea). En el formulario web de rtSurvey, esto se representa como una **entrada de texto** donde el encuestador (enumerador) ingresa o pega la cadena de coordenadas directamente.
 
 ## Especificación básica de XLSForm
 
-| type     | name        | label                          |
-|----------|-------------|--------------------------------|
-| geotrace | river_path  | Trazar el camino del río       |
+| type     | name        | label                        |
+|----------|-------------|------------------------------|
+| geotrace | river_path  | Trazar la ruta del río |
+| geotrace | road_route  | Registrar la ruta de la carretera |
 
-Para obtener más detalles sobre el tipo de pregunta geotrace básico, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
+Para la especificación estándar, consulte la [documentación de XLSForm](https://xlsform.org/en/#question-types).
 
-## Usos
+---
 
-Las preguntas de geotrace se usan comúnmente para:
+## Formato de datos (Data Format)
 
-1. Mapear rutas o trayectos recorridos durante encuestas de campo
-2. Trazar características lineales como carreteras, ríos o límites
-3. Capturar la extensión de infraestructura lineal (p. ej., tuberías, líneas eléctricas)
-4. Registrar trayectos de viaje en estudios de transporte
-5. Definir transectos en encuestas ecológicas
+Se almacena como una lista de puntos separados por punto y coma **sin espacios alrededor de los puntos y coma**. Cada punto consta de cuatro valores separados por espacios:
 
-## Mejores prácticas
+```
+lat lon alt acc;lat lon alt acc;lat lon alt acc
+```
 
-1. Asegúrese de que el dispositivo tenga los servicios de localización habilitados y los permisos otorgados.
-2. Proporcione instrucciones claras sobre cómo trazar el trayecto y qué características deben incluirse.
-3. Considere usar imágenes satelitales o mapas base para ayudar a los encuestados a trazar trayectos con precisión.
-4. Sea consciente de la complejidad potencial de los trazos y su impacto en el tamaño y procesamiento de datos.
+| Component | Description |
+|-----------|-------------|
+| `lat` | Latitud en grados decimales |
+| `lon` | Longitud en grados decimales |
+| `alt` | Altitud en metros (`0` si se desconoce) |
+| `acc` | Precisión del GPS en metros (`0` si se desconoce) |
+
+**Ejemplo — una ruta de tres puntos:**
+```
+13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
+```
+
+Se requiere un mínimo de dos puntos para formar una ruta válida.
+
+---
+
+## Cómo se representa en rtSurvey
+
+In el formulario web de rtSurvey, `geotrace` se representa como un **campo de texto** simple. El encuestador escribe o pega la cadena de coordenadas. No hay un selector de mapas interactivo incorporado para este tipo en el formulario web actual.
+
+### Recopilación de puntos de forma interactiva
+
+El patrón recomendado para la recopilación de campo es un **grupo de repetición (repeat group) de preguntas `geopoint`** — cada punto utiliza el selector de mapas GPS completo — combinado con un `calculate` para producir la cadena geotrace:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | path_points | Registrar cada punto de ruta | |
+| geopoint | point | Tocar para registrar el punto | |
+| end repeat | path_points | | |
+| calculate | geotrace_value | | `join(';', ${path_points/point})` |
+
+La cadena calculada se puede almacenar en una pregunta de `text` o utilizarse en `geotrace`.
+
+---
 
 ## Ejemplo de uso
 
-He aquí un ejemplo de cómo podría usar una pregunta de geotrace en una encuesta:
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geotrace | farm_boundary_path | Registrar la ruta de acceso a la granja | Ingrese cada punto de ruta separado por punto y coma | yes |
 
-| type     | name           | label                                      | hint                                                        |
-|----------|----------------|--------------------------------------------|------------------------------------------------------------|
-| geotrace | hiking_trail   | Trazar el camino del sendero de senderismo | Comience en el inicio del sendero y termine en la cima     |
+---
 
-## Extensiones de rtSurvey
+## Mejores prácticas
 
-Si bien la especificación básica de XLSForm para preguntas de geotrace es sencilla, rtSurvey puede ofrecer características o personalizaciones adicionales:
+1. Utilice un grupo de repetición de preguntas `geopoint` para la recopilación interactiva basada en mapas y luego una los valores; esto les da a los encuestadores un selector de GPS para cada punto individual.
+2. Incluya el formato esperado en la columna `hint` cuando se requiera la entrada manual de coordenadas.
+3. Valide la presencia con `required = yes` cuando la ruta sea obligatoria.
+4. Planifique la limpieza de datos: las rutas ingresadas manualmente pueden tener una precisión inconsistente.
 
-1. Integración con mapas sin conexión para áreas remotas
-2. Opciones para establecer el número mínimo y máximo de puntos para el trazo
-3. Capacidad para editar o refinar trazos después del dibujo inicial
-4. Soporte para trazado automático a intervalos establecidos durante el movimiento
+## Limitaciones (Limitations)
 
-## Formato de datos
-
-Los datos de geotrace se almacenan típicamente como una cadena de pares de coordenadas separados por espacios, similar a geoshape pero sin el punto de cierre:
-
-```
-lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
-```
-
-## Consideraciones para el análisis
-
-Al usar preguntas de geotrace, considere:
-
-1. Cómo se visualizarán y analizarán los datos geográficos (p. ej., software GIS)
-2. La posible necesidad de limpieza o simplificación de datos de trazos complejos
-3. Medidas de privacidad y protección de datos para manejar datos espaciales detallados
-4. Integración con otras fuentes de datos espaciales para análisis completo
-
-## Limitaciones
-
-- Trazar trayectos precisos en pantallas móviles pequeñas puede ser un desafío.
-- Los trazos complejos pueden requerir una capacidad de almacenamiento y procesamiento significativa.
-- El uso continuo del GPS para trazado automático puede agotar rápidamente la batería del dispositivo.
-- Puede haber preocupaciones de privacidad asociadas con la recopilación de datos de trayectos detallados.
+- No hay un selector de mapas interactivo incorporado para `geotrace` en el formulario web de rtSurvey.
+- La cadena de coordenadas puede ser larga para rutas complejas; tenga esto en cuenta para el rendimiento del formulario y el almacenamiento.
+- La validación de la topología de la ruta (por ejemplo, recuento mínimo de puntos, autointersección) requiere un procesamiento posterior fuera de las restricciones de XLSForm.

@@ -1,62 +1,212 @@
 ---
-title: "Decimal"
-description: "Otázky decimal umožňují číselné vstupy se zlomkovými částmi v průzkumu."
+title: "Desetinné číslo"
+description: "Typ otázky pro zadávání zlomkových čísel v rtSurvey"
 ---
 
-Typ otázky decimal v XLSForms a rtSurvey se používá pro sběr číselných odpovědí, které mohou zahrnovat zlomkové části. Tento typ otázky je nezbytný pro shromažďování přesných numerických dat, jako jsou měření, ceny nebo procenta.
+Typ otázky `decimal` shromažďuje čísla, která mohou obsahovat zlomkovou část (např. `3.14`, `72.5`). Na mobilních zařízeních spouští numerickou klávesnici a podporuje stejné možnosti vzhledu jako typ `text` pro rozvržení a formátování.
 
 ## Základní specifikace XLSForm
 
-| type    | name   | label                    |
-|---------|--------|--------------------------|
-| decimal | weight | Zadejte svou hmotnost v kg  |
+| type | name | label |
+|------|------|-------|
+| decimal | weight_kg | Hmotnost (kg) |
+| decimal | height_m | Výška (m) |
+| decimal | temperature | Tělesná teplota (°C) |
 
-## Použití
+Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
 
-Otázky decimal se běžně používají pro:
+---
 
-1. Měření (např. hmotnost, výška, vzdálenost)
-2. Finanční data (např. ceny, platy)
-3. Procenta
-4. Vědecký sběr dat
-5. Jakákoli numerická data vyžadující přesnost nad rámec celých čísel
+## Možnosti vzhledu
 
-## Osvědčené postupy
+### `number-hspinner` — horizontální číselník
 
-1. Používejte jasné a stručné popisky pro specifikaci očekávaného vstupu a měrné jednotky.
-2. Implementujte omezení rozsahu pro prevenci nerealistických nebo chybných vstupů.
-3. Zvažte použití nápovědy pro poskytnutí příkladů nebo upřesnění očekávaného formátu.
-4. Pokud je přesnost důležitá, uveďte požadovaný počet desetinných míst v popisku nebo nápovědě.
+Nahradí vstup horizontálním číselníkem **− hodnota +**. Klepnutím na mínus/plus se hodnota upraví o nastavený krok.
+
+```
+number-hspinner
+```
+
+Zobrazená hodnota je formátována na jedno desetinné místo (např. `3.0`, `72.5`). Výchozí krok je `1`; pomocí `hspinner()` nastavíte desetinný krok.
+
+**Přizpůsobte tvar tlačítka a krok** pomocí `hspinner()`:
+
+```
+number-hspinner hspinner('left-small-square','right-small-square','0.1')
+```
+
+Parametry: tvar levého tlačítka, tvar pravého tlačítka, hodnota kroku. Pro jemné ovládání použijte desetinný krok jako `0.5` nebo `0.1`.
+
+**Vlastní barvy** pomocí `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Čtyři hodnoty v pořadí: pozadí levého tlačítka, ikona levého tlačítka, pozadí pravého tlačítka, ikona pravého tlačítka.
+
+---
+
+### `thousandsep` — oddělovač tisíců
+
+Formátuje zobrazené číslo se seskupením čárkami (např. `1,234.56`). Nezpracované číslo se ukládá bez čárek. Typ vstupu se přepne na `"text"`, aby bylo možné formátované zobrazení.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — vlastní seskupování číslic
+
+Seskupuje číslice celočíselné části do bloků o velikosti `n` oddělených vlastním oddělovačem.
+
+```
+digisep(3," ")      → 1 234 567.89
+```
+
+Pokud je tento vzhled aktivní, typ vstupu se přepne na `"text"`.
+
+---
+
+### `textonly` — vynutit textovou klávesnici
+
+Vynutí `type="text"` na vstupním elementu. Zabraňuje zvláštnostem prohlížeče při zadávání čísel (skrývání koncových nul, šipky pro změnu hodnoty na desktopu) a přitom stále přijímá desetinné hodnoty.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — nápověda plovoucí jako popisek
+
+Text nápovědy (`hint`) se ve vstupu zobrazuje jako zástupný symbol (placeholder). Když uživatel začne psát, vypluje nad pole jako popisek (label).
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — nápověda uvnitř hranic vstupu
+
+Podobné jako `floating_hint` — nápověda sedí uvnitř hranic vstupu, když je prázdný. Při psaní nevyplouvá.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — modalní dialogové okno pro vstup
+
+Klepnutím na pole se otevře modální dialogové okno s větším vstupem. Užitečné na malých obrazovkách.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — živé počítadlo znaků
+
+Zobrazuje živý počet znaků `(n)` pod vstupem, který se aktualizuje během psaní.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — přidat předponu
+
+Předřadí statický nebo vypočtený řetězec před zobrazenou hodnotu. Uložená hodnota předponu neobsahuje.
+
+```
+prefix('USD ')          → zobrazí "USD 72.50", uloží "72.50"
+prefix(${currency})     → dynamická předpona z jiného pole
+```
+
+---
+
+### `align_answer` — zarovnání textu vstupu
+
+Ovládá horizontální zarovnání napsané hodnoty uvnitř vstupu.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — skenování QR / čárového kódu do pole
+
+Přidá tlačítko pro skenování QR kódu vedle vstupu. Otevře skener fotoaparátu a vyplní pole naskenovanou hodnotou.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Rychlý přehled vzhledu
+
+| Appearance | Widget rendered |
+|---|---|
+| *(none)* | Číselný vstup (`type="number"`) — numerická klávesnice na mobilu |
+| `number-hspinner` | Horizontální číselník − hodnota +, zobrazeno jedno desetinné místo |
+| `number-hspinner hspinner(...)` | Číselník s vlastním tvarem tlačítka a krokem |
+| `number-hspinner colors(...)` | Číselník s vlastními barvami tlačítek |
+| `thousandsep` | Zobrazení čísel s oddělovačem tisíců (čárka) |
+| `digisep(n,"sep")` | Vlastní seskupování číslic |
+| `textonly` | Vynutit textovou klávesnici |
+| `floating_hint` | Nápověda plave nad polem během psaní |
+| `embed` | Nápověda uvnitř hranic vstupu |
+| `textpopup` | Klepnutím otevřete modální dialogové okno |
+| `charcount` | Živé počítadlo znaků pod vstupem |
+| `prefix(expr)` | Přidat statickou nebo dynamickou předponu |
+| `align_answer = left/right/center` | Zarovnání textu vstupu |
+| `inputs{qrscan}` | Tlačítko pro skenování QR/čárového kódu |
+
+---
 
 ## Omezení a validace
 
-Můžete přidat omezení pro zajištění, že zadaná hodnota spadá do určitého rozsahu:
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| decimal | weight | Hmotnost (kg) | `. > 0 and . <= 500` | Zadejte hodnotu mezi 0 a 500 |
+| decimal | height | Výška (m) | `. > 0 and . <= 3` | Zadejte hodnotu mezi 0 a 3 |
+| decimal | temp | Teplota (°C) | `. >= 35 and . <= 42` | Normální teplota: 35°C–42°C |
+| decimal | percentage | Procento | `. >= 0 and . <= 100` | Zadejte hodnotu mezi 0 a 100 |
 
-| type    | name   | label                    | constraint        | constraint_message                    |
-|---------|--------|--------------------------|-------------------|---------------------------------------|
-| decimal | height | Zadejte svou výšku v metrech | .>0 and .&lt;=3    | Výška musí být mezi 0 a 3 metry |
+---
 
-## Příklad použití
+## Příklad — formulář pro měření
 
-Příklad použití otázek decimal v průzkumu zdraví:
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| decimal | weight_kg | Hmotnost (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Zadejte platnou hmotnost |
+| decimal | height_m | Výška (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Zadejte platnou výšku |
+| calculate | bmi | | | | |
 
-| type    | name           | label                                     | constraint | constraint_message                |
-|---------|----------------|-------------------------------------------|------------|-----------------------------------|
-| decimal | weight         | Zadejte svou hmotnost v kg                   | .>0 and .&lt;=500 | Hmotnost musí být mezi 0 a 500 kg |
-| decimal | height         | Zadejte svou výšku v metrech               | .>0 and .&lt;=3 | Výška musí být mezi 0 a 3 metry |
-| decimal | body_temp      | Zadejte svou tělesnou teplotu ve stupních Celsia    | .>=35 and .&lt;=42 | Teplota musí být mezi 35°C a 42°C |
-| calculate | bmi          |                                           |            |                                   |
-
-Ve výpočtovém řádku pro BMI můžete použít:
-
+Sloupec pro výpočet BMI:
 ```
-calculation | ${weight} / (${height} * ${height})
+${weight_kg} div (${height_m} * ${height_m})
 ```
 
-Toto vypočítá BMI pomocí zadané hmotnosti a výšky.
+---
+
+## Nejlepší postupy
+
+1. Pro měření vyžadující přesnost na jedno desetinné místo použijte `number-hspinner hspinner(..., '0.1')` — číselník automaticky formátuje na jedno desetinné místo, čímž udržuje hodnoty konzistentní.
+2. Použijте `textonly`, když prohlížeče přidávají nechtěné ovládací prvky číselníku nebo zkracují koncové nuly (např. `3.0` zobrazené jako `3`).
+3. Pro velké finanční hodnoty použijte `thousandsep`, aby respondenti mohli ověřit, že zadali správný řád.
+4. Vynucujte omezení rozsahu namísto spoléhání se pouze na typ mobilní klávesnice.
 
 ## Omezení
 
-- Přesnost desetinných čísel může být omezena základním systémem nebo databází.
-- Uživatelé mohou potřebovat pokyny ohledně očekávaného oddělovače desetinných míst (tečka nebo čárka) v závislosti na jejich locale.
-- Velká desetinná čísla mohou být obtížně čitelná nebo zadávaná přesně na mobilních zařízeních.
+- Číselník vždy zobrazuje jedno desetinné místo — pokud potřebujete větší přesnost v zobrazené hodnotě, použijte místo toho prostý vstup.
+- `thousandsep` a `digisep()` ukládají nezpracované číslo — ve výpočtech nečtěte formátovanou hodnotu zobrazení.

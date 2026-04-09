@@ -1,80 +1,203 @@
 ---
-title: "Геоточка"
-description: "Въпросите от тип geopoint заснемат географски координати (ширина, дължина, височина и точност) като част от анкетата."
+title: "Geopoint"
+description: "Въпросите тип Geopoint заснемат географски координати (географска ширина, дължина, надморска височина и точност) като част от проучването."
 ---
 
-The geopoint question type in XLSForms and rtSurvey enables the collection of geographic coordinates using the device's GPS or other location services. This feature is particularly useful for mapping survey responses, tracking field activities, or associating data with specific locations.
+Типът въпрос `geopoint` заснема географски координати (географска ширина, дължина, надморска височина, точност) с помощта на GPS на устройството. rtSurvey изобразява селектора с няколко режима на оформление и поддържа автоматизация чрез параметрите `inputs{}` и `outputs{}`.
 
 ## Основна спецификация на XLSForm
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geopoint | location    | Record the current location     |
+| type     | name        | label                       |
+|----------|-------------|-----------------------------|
+| geopoint | location    | Запишете текущото местоположение |
 
-For more details on the basic geopoint question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
-
-## Приложения
-
-Geopoint questions are commonly used for:
-
-1. Mapping survey responses geographically
-2. Verifying the location of field activities
-3. Tracking the route of enumerators
-4. Associating environmental or social data with specific locations
-5. Calculating distances or areas in geographical analyses
-
-## Най-добри практики
-
-1. Ensure the device has location services enabled and permissions granted.
-2. Allow sufficient time for the GPS to acquire an accurate fix.
-3. Consider privacy implications and inform respondents about location data collection.
-4. Use in conjunction with other question types to provide context for the location data.
-
-## Примерна употреба
-
-Here's an example of how you might use a geopoint question in a survey:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geopoint | sample_location| Record the location of the sample collection | Stand in an open area for better GPS signal |
-
-## Разширения на rtSurvey
-
-While the basic XLSForm specification for geopoint questions is straightforward, rtSurvey may offer additional features or customizations:
-
-1. Map integration for visual confirmation of the captured location
-2. Accuracy threshold settings
-3. Option to manually input coordinates
-4. Integration with offline maps for remote areas
-
-(Note: The specific extensions available in rtSurvey for geopoint questions would need to be confirmed and detailed here.)
+За стандартната спецификация вижте [документацията на XLSForm](https://xlsform.org/en/#question-types).
 
 ## Формат на данните
 
-Geopoint data is typically stored as a string of four space-separated values:
+Съхранява се като четири стойности, разделени с интервал:
 
 ```
 latitude longitude altitude accuracy
 ```
 
-For example:
+Пример: `13.756331 100.501762 15 8`
+
+---
+
+## Режими на оформление (Layout modes)
+
+### По подразбиране — правоъгълен бутон
+
+Правоъгълен бутон „START GEOPOINT“ отваря модален прозорец с пълна карта, където анкетьорът избира точка. След заснемането етикетът на бутона се променя на „View or change geo point“ и координатите се появяват отдолу.
+
+Не се изисква стойност на appearance.
+
+---
+
+### `display{inline-icon}` — кръгъл бутон с мерник
+
+Изобразява кръгъл бутон с икона (мерник ⊕) вместо правоъгълния бутон. Докосването му отваря същия модален прозорец с карта.
+
 ```
-41.40338 2.17403 30.5 10
+display{inline-icon}
 ```
 
-## Съображения за анализ
+**Комбиниран с позиция и размер:**
 
-When using geopoint questions, consider:
+```
+display{inline-icon, left}           → бутон вляво от етикета
+display{inline-icon, top}            → бутон над етикета
+display{inline-icon, bottom}         → бутон под етикета, центриран
+display{inline-icon, large}          → голяма икона (75px)
+display{inline-icon, medium}         → средна икона (50px)
+display{inline-icon, left, large}    → голям бутон вляво
+```
 
-1. How the geographic data will be visualized (e.g., mapping software)
-2. The accuracy of the collected coordinates and its impact on analysis
-3. Privacy and data protection measures for handling location data
-4. Potential integration with GIS (Geographic Information System) tools
+| Size | Icon height/width |
+|------|------------------|
+| *(default)* | 25px |
+| `medium` | 50px |
+| `large` | 75px |
 
-## Ограничения
+---
 
-- Accuracy can vary depending on the device and environmental conditions.
-- GPS signals may be weak or unavailable in indoor locations or areas with obstructions.
-- Collecting location data may significantly impact device battery life.
-- There may be privacy concerns associated with collecting precise location data.
+### `display{thumbnail-square}` — миниатюра на карта на живо
 
+Изобразява визуализация на карта на живо (Leaflet) директно върху въпроса вместо бутон. Миниатюрата показва текущата GPS позиция и избраната точка. Докосването на бутона за разширяване отваря пълния модален прозорец.
+
+```
+display{thumbnail-square}
+```
+
+**Персонализиран размер на миниатюрата:**
+
+```
+display{thumbnail-square-[WxH]}          → фиксирани пиксели
+display{thumbnail-square-[400x200]}      → 400px ширина × 200px височина
+
+display{thumbnail-square-[W%xH%]}        → процент от ширината на формуляра
+display{thumbnail-square-[100%x30%]}     → пълна ширина × 30% от ширината на формуляра
+```
+
+---
+
+## `display{}` срещу `results{}` — преди и след заснемане
+
+`display{}` контролира оформлението **преди** потребителят да заснеме местоположение. `results{}` контролира оформлението **след** като съществува стойност. Те могат да имат различно подравняване.
+
+```
+display{inline-icon, right} results{left}
+```
+
+Това изобразява бутона вдясно преди заснемането, след което го премества вляво, след като бъде записана точка.
+
+### `hide(value)` — скриване на дисплея с координати
+
+По подразбиране заснетият текст за ширина/дължина/точност/надморска височина се показва под бутона. Скрийте го с:
+
+```
+results{hide(value)}
+display{inline-icon} results{hide(value)}
+```
+
+---
+
+## `inputs{}` — GPS автоматизация
+
+### Автоматично заснемане при зареждане
+
+Автоматично записва GPS позицията при зареждане на формуляра, без анкетьорът да натиска нищо.
+
+```
+inputs{auto-take}
+```
+
+**Условно автоматично заснемане** с помощта на XLSForm израз:
+
+```
+inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
+```
+
+### Предварително попълване от текстово поле
+
+Попълнете geopoint от въпрос, който съдържа име на място или адрес. rtSurvey извършва обратно геокодиране на низа до координати чрез OpenStreetMap Nominatim.
+
+```
+inputs{question(address_field)}
+```
+
+---
+
+## `outputs{}` — обратно геокодиране към текст
+
+След като точката бъде заснета, автоматично попълнете въпрос тип `text` с четлив за човека адрес (обратно геокодиран от координатите).
+
+```
+outputs{question(address_field)}
+```
+
+Пример:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | location | Записване на местоположение | `outputs{question(address_text)}` |
+| text | address_text | Адрес | |
+
+---
+
+## `nomap` — GPS заснемане без карта
+
+Заменя модалния прозорец на картата с прост диалог, който изисква разрешение за местоположение и записва координати. Не се показва карта. Полезно за заснемане само на GPS на устройства от нисък клас или когато частите от картата не са налични офлайн.
+
+```
+nomap
+```
+
+---
+
+## Персонализиран стил на бутона
+
+Използвайте `styleButton()`, за да приложите персонализиран CSS към стандартния правоъгълен бутон:
+
+```
+styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
+```
+
+---
+
+## Скриване на етикета
+
+```
+text-nolabel display{inline-icon, center, large}
+```
+
+---
+
+## Примери за употреба
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | field_loc | Запишете местоположението на полето | `display{inline-icon, right, large}` |
+| geopoint | site | Местоположение на обекта | `display{thumbnail-square-[100%x30%]}` |
+| geopoint | auto_loc | Текуща позиция | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | mapped_loc | Местоположение | `display{inline-icon} outputs{question(address)}` |
+| geopoint | gps_only | GPS точка | `nomap` |
+
+---
+
+## Най-добри практики
+
+1. Използвайте `inputs{auto-take}` за проучвания с проверка от анкетьор, където GPS е задължителен — това премахва ръчната стъпка.
+2. Използвайте `display{thumbnail-square}`, когато искате анкетьорът визуално да потвърди избраната точка, преди да продължи.
+3. Комбинирайте `outputs{question(...)}` с текстово поле само за четене (`text`), за да покажете обратно геокодирания адрес на анкетьора.
+4. Използвайте `nomap` в зони без интернет свързаност, където частите от картата не могат да се заредят.
+5. Оставете време на GPS сигнала да се стабилизира преди запис — точност под 10 метра обикновено е достатъчна за полеви проучвания.
+
+## Ограничения (Limitations)
+
+- Геокодирането чрез `inputs{question(name)}` изисква достъп до интернет — то извиква API на OpenStreetMap Nominatim.
+- Обратното геокодиране чрез `outputs{question(name)}` също изисква достъп до интернет.
+- Миниатюрата на картата (`display{thumbnail-square}`) изисква интернет за зареждане на частите; координатите все още се заснемат офлайн.
+- GPS точността варира според устройството и средата — условията на закрито или градските каньони могат да доведат до точност > 50 метра.
+- Събирането на данни за местоположение може значително да повлияе на живота на батерията на устройството по време на дълги проучвания.

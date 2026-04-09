@@ -1,77 +1,85 @@
 ---
 title: "Geoshape"
-description: "Geoshape-kysymykset antavat vastaajille mahdollisuuden piirtää muotoja kartalle, tallentaen monimutkaisia maantieteellisiä tietoja osana kyselyä."
+description: "Geoshape-kysymykset tallentavat suljetun monikulmion, joka on määritelty GPS-pisteiden sarjana."
 ---
 
-XLSFormien ja rtSurveyn geoshape-kysymystyyppi mahdollistaa vastaajien piirtää muotoja (monikulmioita) kartalle, tallentaen monimutkaisia maantieteellisiä tietoja. Tämä ominaisuus on erityisen hyödyllinen alueiden kartoittamiseen, rajojen määrittelemiseen tai kiinnostusalueiden merkitsemiseen paikalliskyselyissä.
+`geoshape`-kysymystyyppi tallentaa suljetun monikulmion — sarjan GPS-koordinaatteja, joissa ensimmäinen ja viimeinen piste ovat samat. rtSurveyn verkkolomakkeessa tämä näkyy **tekstikenttänä**, johon haastattelija syöttää tai liittää koordinaattijonon suoraan.
 
 ## XLSForm-perusmäärittely
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geoshape | field_area  | Piirrä pellon raja              |
+| type     | name        | label                            |
+|----------|-------------|----------------------------------|
+| geoshape | field_area  | Piirrä pellon raja               |
+| geoshape | zone        | Tallenna vyöhykkeen raja         |
 
-Lisätietoja geoshape-kysymystyypin perusteista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+Katso vakiomäärittelyt [XLSForm-dokumentaatiosta](https://xlsform.org/en/#question-types).
 
-## Käyttötarkoitukset
-
-Geoshape-kysymyksiä käytetään yleisesti:
-
-1. Peltorajojen kartoittamiseen maatalouskyselyissä
-2. Ympäristövaikutusalueiden määrittelemiseen
-3. Vyöhykkeiden merkitsemiseen kaupunkisuunnittelututkimuksissa
-4. Alueiden hahmottamiseen geologisissa tutkimuksissa
-5. Monimutkaisten maantieteellisten piirteiden tallentamiseen paikallisanalyysiä varten
-
-## Parhaat käytännöt
-
-1. Varmista, että laitteen sijaintipalvelut ovat käytössä ja luvat myönnetty.
-2. Anna selkeät ohjeet muodon piirtämiseen ja mitkä alueet tulee sisällyttää.
-3. Harkitse satelliittikuvien tai pohjakarttojen käyttöä vastaajien auttamiseksi piirtämään muodot tarkasti.
-4. Kiinnitä huomiota muotojen mahdolliseen monimutkaisuuteen ja sen vaikutukseen tiedon kokoon ja käsittelyyn.
-
-## Esimerkkikäyttö
-
-Esimerkki kyselyssä:
-
-| type     | name           | label                                           | hint                                              |
-|----------|-----------------|-------------------------------------------------|---------------------------------------------------|
-| geoshape | forest_area    | Hahmottele metsälaikun raja                     | Käytä vähintään 3 pistettä suljetun muodon luomiseen |
-
-## rtSurveyn laajennukset
-
-Vaikka XLSForm-standardin geoshape-kysymysten perusmäärittely on suoraviivainen, rtSurvey voi tarjota lisäominaisuuksia tai mukautuksia:
-
-1. Integraatio offline-karttojen kanssa syrjäisillä alueilla
-2. Vaihtoehdot muodon pisteiden vähimmäis- ja enimmäismäärän asettamiseen
-3. Mahdollisuus muokata tai tarkentaa muotoja alkuperäisen piirtämisen jälkeen
-4. Tuki eri muototyypeille (esim. suorakulmiot, ympyrät) vapaamuotoisten monikulmioiden lisäksi
+---
 
 ## Tietomuoto
 
-Geoshape-tiedot tallennetaan tyypillisesti välilyönnillä erotettuina koordinaattiparien merkkijonona, suljettuina sulkeisiin:
+Tallennetaan puolipisteellä erotettuna pisteluettelona, jossa **puolipisteiden ympärillä ei ole välilyöntejä**. Jokainen piste koostuu neljästä välilyönnillä erotetusta arvosta:
 
 ```
-(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-Esimerkiksi:
+| Component | Description |
+|-----------|-------------|
+| `lat` | Leveysaste desimaaliasteina |
+| `lon` | Pituusaste desimaaliasteina |
+| `alt` | Korkeus metreinä (`0` jos tuntematon) |
+| `acc` | GPS-tarkkuus metreinä (`0` jos tuntematon) |
+
+**Monikulmion on oltava suljettu** — viimeisen pisteen on oltava sama kuin ensimmäisen.
+
+**Esimerkki — neljän pisteen monikulmio (kolmio, suljettu):**
 ```
-(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
 ```
 
-## Analyysin näkökohtia
+Vähintään kolme erillistä pistettä plus sulkeva piste vaaditaan kelvollisen monikulmion muodostamiseen.
 
-Geoshape-kysymyksiä käytettäessä harkitse:
+---
 
-1. Miten maantieteelliset tiedot visualisoidaan ja analysoidaan (esim. GIS-ohjelmisto)
-2. Mahdollinen tarve tietojen puhdistamiseen tai monimutkaisten muotojen yksinkertaistamiseen
-3. Yksityisyys ja tietosuojatoimenpiteet yksityiskohtaisten paikkatietojen käsittelyyn
-4. Integraatio muiden paikkatietolähteiden kanssa kattavaa analyysia varten
+## Miten se näkyy rtSurveyssä
 
-## Rajoitukset
+rtSurveyn verkkolomakkeessa `geoshape` näkyy tavallisena **tekstikenttänä**. Haastattelija kirjoittaa tai liittää koordinaattijonon. Nykyisessä verkkolomakkeessa ei ole sisäänrakennettua interaktiivista monikulmiovalitsinta tälle tyypille.
 
-- Tarkkoja muotoja voi olla vaikea piirtää pienillä mobiiliruuduilla.
-- Monimutkaiset muodot voivat vaatia merkittävästi tallennustilaa ja käsittelykapasiteettia.
-- Geoshape-kysymykset eivät sovi kaikentyyppisiin kyselyihin tai vastaajille.
-- Yksityiskohtaisten paikkatietojen keräämiseen liittyy yksityisyyshuolenaiheita.
+### Monikulmion pisteiden kerääminen interaktiivisesti
+
+Suositeltu tapa kenttäkeruuseen on **`geopoint`-kysymysten toistoryhmä** — kukin piste käyttää täyttä GPS-karttavalitsinta — yhdistettynä `calculate`-toimintoon, joka tuottaa geoshape-jonon:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | polygon_points | Tallenna jokainen kulma | |
+| geopoint | point | Napauta tallentaaksesi kulma | |
+| end repeat | polygon_points | | |
+| calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
+
+Yhdistämisen jälkeen lisää ensimmäinen piste manuaalisesti sulkeaksesi monikulmion, tai käytä toista calculate-toimintoa sen liittämiseen.
+
+---
+
+## Esimerkkikäyttö
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geoshape | farm_boundary | Tallenna pellon raja | Syötä kaikki kulmat puolipisteillä erotettuina. Ensimmäisen ja viimeisen pisteen on oltava samat. | yes |
+
+---
+
+## Parhaat käytännöt
+
+1. Käytä `geopoint`-kysymysten toistoryhmää interaktiiviseen karttapohjaiseen keruuseen ja yhdistä arvot — tämä antaa haastattelijoille GPS-valitsimen jokaiselle kulmalle.
+2. Sulje monikulmio aina (toista ensimmäinen piste lopussa) ennen lähettämistä.
+3. Sisällytä odotettu muoto `hint`-sarakkeeseen, kun koordinaattien manuaalinen syöttö on tarpeen.
+4. Vaadi vähintään 3 erillistä kulmapistettä kelvolliseen monikulmioon — toteuta tämä ohjeiden avulla XLSForm-rajoitusten sijaan.
+5. Käytä `geopoint`-tyyppiä yksittäisiin sijaintikysymyksiin ja `geoshape`-tyyppiä vain silloin, kun alueen rajaaminen on kyselyn todellinen tavoite.
+
+## Rajoitukset (Limitations)
+
+- rtSurveyn verkkolomakkeessa ei ole sisäänrakennettua interaktiivista monikulmiovalitsinta `geoshape`-tyypille.
+- Monikulmio on suljettava manuaalisesti — tekstinsyöttötilassa ei ole automaattista sulkemismekanismia.
+- Monikulmion topologian validointi (esim. ei itseään leikkaava, vähimmäispinta-ala) vaatii jälkikäsittelyä XLSForm-rajoitusten ulkopuolella.
+- Pitkät rajat monilla kulmapisteillä tuottavat suuria tekstijonoja.

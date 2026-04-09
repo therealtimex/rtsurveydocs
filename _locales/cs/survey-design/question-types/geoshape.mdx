@@ -1,43 +1,85 @@
 ---
 title: "Geoshape"
-description: "Otázky geoshape umožňují respondentům kreslit tvary na mapě, zachycovat složitá geografická data jako součást průzkumu."
+description: "Otázky typu geoshape zachycují uzavřený polygon definovaný sekvencí bodů GPS."
 ---
 
-Typ otázky geoshape v XLSForms a rtSurvey umožňuje respondentům kreslit tvary (polygony) na mapě a zachycovat složitá geografická data. Tato funkce je zvláště užitečná pro mapování oblastí, definování hranic nebo označování oblastí zájmu v prostorových průzkumech.
+Typ otázky `geoshape` zachycuje uzavřený polygon — řadu souřadnic GPS, kde první a poslední bod jsou stejné. Ve webovém formuláři rtSurvey se tento typ vykresluje jako **textové pole**, kam tazatel přímo zadává nebo vkládá řetězec souřadnic.
 
 ## Základní specifikace XLSForm
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geoshape | field_area  | Nakreslete hranici pole  |
+| type     | name        | label                            |
+|----------|-------------|----------------------------------|
+| geoshape | field_area  | Nakreslete hranici pole          |
+| geoshape | zone        | Zaznamenejte hranici zóny        |
 
-## Použití
+Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
 
-Otázky geoshape se běžně používají pro:
-
-1. Mapování hranic polí v zemědělských průzkumech
-2. Definování oblastí environmentálního dopadu
-3. Označování zón v studiích urbanistického plánování
-4. Ohraničování regionů pro geologické průzkumy
-5. Zachycování složitých geografických prvků pro prostorovou analýzu
-
-## Osvědčené postupy
-
-1. Zajistěte, aby bylo na zařízení povoleno určování polohy a udělena oprávnění.
-2. Poskytněte jasné pokyny, jak nakreslit tvar a jakou oblast by měl zahrnovat.
-3. Zvažte použití satelitních snímků nebo základních map pro pomoc respondentům přesně nakreslit tvary.
-4. Buďte obeznámeni s potenciální složitostí tvarů a jejich dopadem na velikost dat a zpracování.
+---
 
 ## Formát dat
 
-Data geoshape jsou obvykle uložena jako řetězec dvojic souřadnic oddělených středníky, s uzavíracím bodem rovnajícím se počátečnímu:
+Ukládá se jako seznam bodů oddělených středníkem **bez mezer kolem středníků**. Každý bod tvoří čtyři hodnoty oddělené mezerou:
 
 ```
-z.š1 z.d1; z.š2 z.d2; z.š3 z.d3; ... z.šN z.dN; z.š1 z.d1
+lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
+
+| Komponenta | Popis |
+|-----------|-------------|
+| `lat` | Zeměpisná šířka v desítkových stupních |
+| `lon` | Zeměpisná délka v desítkových stupních |
+| `alt` | Nadmořská výška v metrech (`0`, pokud není známa) |
+| `acc` | Přesnost GPS v metrech (`0`, pokud není známa) |
+
+**Polygon musí být uzavřený** — poslední bod se musí rovnat prvnímu bodu.
+
+**Příklad — čtyřbodový polygon (trojúhelník, uzavřený):**
+```
+13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
+```
+
+K vytvoření platného polygonu jsou zapotřebí minimálně tři odlišné body plus uzavírací opakování.
+
+---
+
+## Jak se vykresluje v rtSurvey
+
+Ve webovém formuláři rtSurvey se `geoshape` vykresluje jako prosté **textové pole**. Tazatel napíše nebo vloží řetězec souřadnic. V současném webovém formuláři není pro tento typ vestavěný interaktivní výběr polygonu na mapě.
+
+### Interaktivní sběr bodů polygonu
+
+Doporučený vzor pro sběr v terénu je **skupina opakování otázek typu `geopoint`** — každý vrchol používá plnohodnotný výběr na mapě GPS — v kombinaci s výpočtem `calculate` pro vytvoření řetězce geoshape:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | polygon_points | Zaznamenejte každý roh | |
+| geopoint | point | Klepnutím zaznamenejte roh | |
+| end repeat | polygon_points | | |
+| calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
+
+Po spojení ručně připojte první bod pro uzavření polygonu nebo použijte druhý výpočet `calculate` k jeho zřetězení.
+
+---
+
+## Příklad použití
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geoshape | farm_boundary | Zaznamenejte hranici pole | Zadejte všechny rohy oddělené středníkem. První a poslední bod musí být stejné. | yes |
+
+---
+
+## Nejlepší postupy
+
+1. Pro interaktivní sběr na mapě použijte skupinu opakování otázek typu `geopoint` a hodnoty spojte — tazatelé tak získají výběr GPS pro každý vrchol.
+2. Před odesláním polygon vždy uzavřete (zopakujte první bod na konci).
+3. Pokud je vyžadováno ruční zadání souřadnic, uveďte očekávaný formát do sloupce `hint`.
+4. Vyžadujte alespoň 3 odlišné rohové body pro platný polygon — vynucujte to spíše pokyny než omezeními XLSForm.
+5. `geopoint` používejte pro otázky s jedním umístěním a `geoshape` pouze tehdy, když je skutečným cílem průzkumu vymezení oblasti.
 
 ## Omezení
 
-- Kreslení přesných polygonů na malých mobilních obrazovkách může být náročné.
-- Složité tvary mohou vyžadovat značnou kapacitu úložiště a zpracování.
-- Mohou existovat obavy o soukromí spojené se sběrem podrobných dat o poloze.
+- Ve webovém formuláři rtSurvey není pro `geoshape` vestavěný interaktivní výběr polygonu na mapě.
+- Polygon musí být uzavřen ručně — v režimu textového vstupu neexistuje žádný mechanismus automatického uzavírání.
+- Validace topologie polygonu (např. neprotínání se, minimální plocha) vyžaduje následné zpracování mimo omezení XLSForm.
+- Dlouhé hranice s mnoha vrcholy vytvářejí dlouhé textové řetězce.

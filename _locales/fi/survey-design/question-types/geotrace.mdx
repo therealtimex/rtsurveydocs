@@ -1,77 +1,81 @@
 ---
 title: "Geotrace"
-description: "Geotrace-kysymykset antavat vastaajille mahdollisuuden tallentaa sarja toisiinsa liitettyjä pisteitä kartalla, luoden viivoja tai polkuja osana kyselyä."
+description: "Geotrace-kysymykset tallentavat sarjan GPS-pisteitä, jotka muodostavat viivan tai polun."
 ---
 
-XLSFormien ja rtSurveyn geotrace-kysymystyyppi mahdollistaa vastaajien tallentaa sarja toisiinsa liitettyjä pisteitä kartalla, luoden viivoja tai polkuja. Tämä ominaisuus on erityisen hyödyllinen reittien, rajojen tai lineaaristen piirteiden kartoittamiseen paikalliskyselyissä.
+Kysymystyyppi `geotrace` tallentaa maantieteellisten koordinaattien sarjan, joka muodostaa viivan tai polun (polyline). rtSurveyn verkkolomakkeella tämä näkyy **tekstikenttänä**, johon tiedonkerääjä (enumerator) kirjoittaa tai liittää koordinaattimerkkijonon suoraan.
 
 ## XLSForm-perusmäärittely
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geotrace | river_path  | Jäljitä joen polku              |
+| type     | name        | label                        |
+|----------|-------------|------------------------------|
+| geotrace | river_path  | Seuraa joen kulkua |
+| geotrace | road_route  | Tallenna tien reitti |
 
-Lisätietoja geotrace-kysymystyypin perusteista löytyy [XLSForm-spesifikaatiosta](https://xlsform.org/en/#question-types).
+Katso standardimäärittely [XLSForm-dokumentaatiosta](https://xlsform.org/en/#question-types).
 
-## Käyttötarkoitukset
+---
 
-Geotrace-kysymyksiä käytetään yleisesti:
+## Tietomuoto (Data Format)
 
-1. Kenttätutkimusten aikana kuljettujen reittien tai polkujen kartoittamiseen
-2. Lineaaristen piirteiden, kuten teiden, jokien tai rajojen jäljittämiseen
-3. Lineaarisen infrastruktuurin laajuuden tallentamiseen (esim. putkistot, voimalinjat)
-4. Kulkureittien tallentamiseen liikennetutkimuksissa
-5. Transektien määrittelemiseen ekologisissa tutkimuksissa
+Tallennetaan puolipisteellä eroteltuna pisteluettelona **ilman välilyöntejä puolipisteiden ympärillä**. Jokainen piste koostuu neljästä välilyönnillä erotetusta arvosta:
 
-## Parhaat käytännöt
+```
+lat lon alt acc;lat lon alt acc;lat lon alt acc
+```
 
-1. Varmista, että laitteen sijaintipalvelut ovat käytössä ja luvat myönnetty.
-2. Anna selkeät ohjeet polun jäljittämiseen ja mitkä piirteet tulee sisällyttää.
-3. Harkitse satelliittikuvien tai pohjakarttojen käyttöä vastaajien auttamiseksi jäljittämään polut tarkasti.
-4. Kiinnitä huomiota jälkien mahdolliseen monimutkaisuuteen ja sen vaikutukseen tiedon kokoon ja käsittelyyn.
+| Component | Description |
+|-----------|-------------|
+| `lat` | Leveysaste desimaaliasteina |
+| `lon` | Pituusaste desimaaliasteina |
+| `alt` | Korkeus metreinä (`0`, jos tuntematon) |
+| `acc` | GPS-tarkkuus metreinä (`0`, jos tuntematon) |
+
+**Esimerkki — kolmipisteinen polku:**
+```
+13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
+```
+
+Kelvollisen polun muodostamiseen tarvitaan vähintään kaksi pistettä.
+
+---
+
+## Miten se näkyy rtSurveyssä
+
+rtSurveyn verkkolomakkeella `geotrace` näkyy tavallisena **tekstikenttänä**. Tiedonkerääjä kirjoittaa tai liittää koordinaattimerkkijonon. Tälle tyypille ei ole nykyisessä verkkolomakkeessa sisäänrakennettua interaktiivista karttavalitsinta.
+
+### Pisteiden kerääminen interaktiivisesti
+
+Suositeltu malli kenttäkeruuseen on **`geopoint`-kysymysten toistoryhmä (repeat group)** — kukin piste käyttää täyttä GPS-karttavalitsinta — yhdistettynä `calculate`-toimintoon geotrace-merkkijonon tuottamiseksi:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | path_points | Tallenna kukin reittipiste | |
+| geopoint | point | Tallenna piste napauttamalla | |
+| end repeat | path_points | | |
+| calculate | geotrace_value | | `join(';', ${path_points/point})` |
+
+Laskettu merkkijono voidaan sitten tallentaa `text`-kysymykseen tai käyttää `geotrace`-tyypissä.
+
+---
 
 ## Esimerkkikäyttö
 
-Esimerkki kyselyssä:
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geotrace | farm_boundary_path | Tallenna kulkureitti tilalle | Syötä kukin reittipiste puolipisteillä eroteltuna | yes |
 
-| type     | name           | label                                       | hint                                              |
-|----------|----------------|---------------------------------------------|---------------------------------------------------|
-| geotrace | hiking_trail   | Jäljitä vaellusreitin polku                 | Aloita reitin alusta ja lopeta huipulle            |
+---
 
-## rtSurveyn laajennukset
+## Parhaat käytännöt
 
-Vaikka XLSForm-standardin geotrace-kysymysten perusmäärittely on suoraviivainen, rtSurvey voi tarjota lisäominaisuuksia tai mukautuksia:
+1. Käytä `geopoint`-kysymysten toistoryhmää interaktiiviseen karttapohjaiseen keräämiseen ja yhdistä sitten arvot — tämä antaa tiedonkerääjille GPS-valitsimen kullekin yksittäiselle pisteelle.
+2. Sisällytä odotettu muoto `hint`-sarakkeeseen, kun koordinaattien manuaalinen syöttö on tarpeen.
+3. Varmista läsnäolo merkinnällä `required = yes`, kun polku on pakollinen.
+4. Suunnittele tietojen puhdistus — manuaalisesti syötettyjen polkujen tarkkuus voi vaihdella.
 
-1. Integraatio offline-karttojen kanssa syrjäisillä alueilla
-2. Vaihtoehdot jäljityksen pisteiden vähimmäis- ja enimmäismäärän asettamiseen
-3. Mahdollisuus muokata tai tarkentaa jäljityksiä alkuperäisen piirtämisen jälkeen
-4. Tuki automaattiselle jäljitykselle asetetuilla ajanjaksoilla liikkumisen aikana
+## Rajoitukset (Limitations)
 
-## Tietomuoto
-
-Geotrace-tiedot tallennetaan tyypillisesti välilyönnillä erotettuina koordinaattiparien merkkijonona, samankaltaisesti kuin geoshape, mutta ilman sulkupistettä:
-
-```
-lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
-```
-
-Esimerkiksi:
-```
-38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
-```
-
-## Analyysin näkökohtia
-
-Geotrace-kysymyksiä käytettäessä harkitse:
-
-1. Miten maantieteelliset tiedot visualisoidaan ja analysoidaan (esim. GIS-ohjelmisto)
-2. Mahdollinen tarve tietojen puhdistamiseen tai monimutkaisten jälkien yksinkertaistamiseen
-3. Yksityisyys ja tietosuojatoimenpiteet yksityiskohtaisten paikkatietojen käsittelyyn
-4. Integraatio muiden paikkatietolähteiden kanssa kattavaa analyysia varten
-
-## Rajoitukset
-
-- Tarkkoja polkuja voi olla vaikea jäljittää pienillä mobiiliruuduilla.
-- Monimutkaiset jäljet voivat vaatia merkittävästi tallennustilaa ja käsittelykapasiteettia.
-- Jatkuva GPS-käyttö automaattista jäljitystä varten voi kuluttaa laitteen akkua nopeasti.
-- Yksityiskohtaisten polkutietojen keräämiseen liittyy yksityisyyshuolenaiheita.
+- rtSurveyn verkkolomakkeessa ei ole sisäänrakennettua interaktiivista karttavalitsinta `geotrace`-tyypille.
+- Koordinaattimerkkijono voi olla pitkä monimutkaisilla poluilla — pidä tämä mielessä lomakkeen suorituskyvyn ja tallennustilan kannalta.
+- Polun topologian validointi (esim. pisteiden vähimmäismäärä, itse-leikkaavuus) vaatii jälkikäsittelyä XLSForm-rajoitteiden ulkopuolella.

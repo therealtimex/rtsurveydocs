@@ -1,55 +1,203 @@
 ---
 title: "Geopoint"
-description: "Otázky geopoint zachycují geografické souřadnice (zeměpisnou šířku, délku, nadmořskou výšku a přesnost) jako součást průzkumu."
+description: "Otázky Geopoint zachycují zeměpisné souřadnice (zeměpisnou šířku, zeměpisnou délku, nadmořskou výšku a přesnost) jako součást průzkumu."
 ---
 
-Typ otázky geopoint v XLSForms a rtSurvey umožňuje sběr geografických souřadnic pomocí GPS zařízení nebo jiných lokalizačních služeb. Tato funkce je zvláště užitečná pro geografické mapování odpovědí na průzkumy, sledování terénních aktivit nebo přiřazování dat ke konkrétním místům.
+Typ otázky `geopoint` zachycuje zeměpisné souřadnice (zeměpisnou šířku, zeměpisnou délku, nadmořskou výšku, přesnost) pomocí GPS zařízení. rtSurvey vykresluje výběr s několika režimy rozložení a podporuje automatizaci prostřednictvím parametrů `inputs{}` a `outputs{}`.
 
 ## Základní specifikace XLSForm
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geopoint | location    | Zaznamenejte aktuální polohu     |
+| type     | name        | label                       |
+|----------|-------------|-----------------------------|
+| geopoint | location    | Zaznamenejte aktuální polohu |
 
-## Použití
-
-Otázky geopoint se běžně používají pro:
-
-1. Geografické mapování odpovědí na průzkumy
-2. Ověřování polohy terénních aktivit
-3. Sledování trasy enumerátorů
-4. Přiřazování environmentálních nebo sociálních dat ke konkrétním místům
-5. Výpočet vzdáleností nebo ploch v geografických analýzách
-
-## Osvědčené postupy
-
-1. Zajistěte, aby bylo na zařízení povoleno určování polohy a udělena oprávnění.
-2. Ponechte dostatek času pro GPS k získání přesné polohy.
-3. Zvažte důsledky pro soukromí a informujte respondenty o sběru dat o poloze.
-4. Používejte v kombinaci s jinými typy otázek pro poskytnutí kontextu k datům o poloze.
-
-## Příklad použití
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geopoint | sample_location| Zaznamenejte místo odběru vzorku | Stůjte v otevřeném prostoru pro lepší signál GPS |
+Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
 
 ## Formát dat
 
-Data geopoint jsou obvykle uložena jako řetězec čtyř hodnot oddělených mezerou:
+Uloženo jako čtyři hodnoty oddělené mezerou:
 
 ```
-zeměpisná_šířka zeměpisná_délka nadmořská_výška přesnost
+latitude longitude altitude accuracy
 ```
 
-Například:
+Příklad: `13.756331 100.501762 15 8`
+
+---
+
+## Režimy rozložení (Layout modes)
+
+### Výchozí — obdélníkové tlačítko
+
+Obdélníkové tlačítko „START GEOPOINT“ otevře modální okno s celou mapou, kde tazatel vybere bod. Po zachycení se popisek tlačítka změní na „View or change geo point“ a souřadnice se zobrazí níže.
+
+Není vyžadována žádná hodnota appearance.
+
+---
+
+### `display{inline-icon}` — kruhové tlačítko s nitkovým křížem
+
+Vykreslí kruhové ikonové tlačítko (nitkový kříž ⊕) namísto obdélníkového tlačítka. Klepnutím na něj se otevře stejné modální okno s mapou.
+
 ```
-41.40338 2.17403 30.5 10
+display{inline-icon}
 ```
 
-## Omezení
+**V kombinaci s pozicí a velikostí:**
 
-- Přesnost se může lišit v závislosti na zařízení a podmínkách prostředí.
-- GPS signály mohou být slabé nebo nedostupné v interiérech nebo v oblastech s překážkami.
-- Sběr dat o poloze může výrazně ovlivnit výdrž baterie zařízení.
-- Mohou existovat obavy o soukromí spojené se sběrem přesných dat o poloze.
+```
+display{inline-icon, left}           → tlačítko vlevo od popisku
+display{inline-icon, top}            → tlačítko nad popiskem
+display{inline-icon, bottom}         → tlačítko pod popiskem, vycentrované
+display{inline-icon, large}          → velká ikona (75px)
+display{inline-icon, medium}         → střední ikona (50px)
+display{inline-icon, left, large}    → velké tlačítko vlevo
+```
+
+| Size | Icon height/width |
+|------|------------------|
+| *(default)* | 25px |
+| `medium` | 50px |
+| `large` | 75px |
+
+---
+
+### `display{thumbnail-square}` — miniatura živé mapy
+
+Vykreslí náhled živé mapy (Leaflet) přímo u otázky namísto tlačítka. Miniatura ukazuje aktuální polohu GPS a vybraný bod. Klepnutím na tlačítko rozbalení se otevře celé modální okno.
+
+```
+display{thumbnail-square}
+```
+
+**Vlastní velikost miniatury:**
+
+```
+display{thumbnail-square-[WxH]}          → pevné pixely
+display{thumbnail-square-[400x200]}      → 400px šířka × 200px výška
+
+display{thumbnail-square-[W%xH%]}        → procento šířky formuláře
+display{thumbnail-square-[100%x30%]}     → plná šířka × 30 % šířky formuláře
+```
+
+---
+
+## `display{}` vs `results{}` — před a po zachycení
+
+`display{}` ovládá rozložení **předtím**, než uživatel zachytí polohu. `results{}` ovládá rozložení **poté**, co hodnota existuje. Mohou mít různé zarovnání.
+
+```
+display{inline-icon, right} results{left}
+```
+
+Toto vykreslí tlačítko vpravo před zachycením a poté jej přesune doleva, jakmile je bod zaznamenán.
+
+### `hide(value)` — potlačení zobrazení souřadnic
+
+Ve výchozím nastavení se zachycený text šířky/délky/přesnosti/nadmořské výšky zobrazuje pod tlačítkem. Skryjte jej pomocí:
+
+```
+results{hide(value)}
+display{inline-icon} results{hide(value)}
+```
+
+---
+
+## `inputs{}` — automatizace GPS
+
+### Automatické zachycení při načtení
+
+Automaticky zaznamená polohu GPS při načtení formuláře, aniž by tazatel musel cokoli mačkat.
+
+```
+inputs{auto-take}
+```
+
+**Podmíněné automatické zachycení** pomocí výrazu XLSForm:
+
+```
+inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
+```
+
+### Předvyplnění z textového pole
+
+Vyplňte geopoint z otázky, která obsahuje název místa nebo řetězec adresy. rtSurvey provede reverzní geokódování řetězce na souřadnice prostřednictvím OpenStreetMap Nominatim.
+
+```
+inputs{question(address_field)}
+```
+
+---
+
+## `outputs{}` — reverzní geokódování na text
+
+Po zachycení bodu automaticky vyplňte otázku typu `text` adresou v čitelném formátu (reverzně geokódovanou ze souřadnic).
+
+```
+outputs{question(address_field)}
+```
+
+Příklad:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | location | Zaznamenat polohu | `outputs{question(address_text)}` |
+| text | address_text | Adresa | |
+
+---
+
+## `nomap` — zachycení GPS bez mapy
+
+Nahradí modální okno mapy jednoduchým dialogem, který vyžádá povolení k poloze a zaznamená souřadnice. Mapa se nezobrazuje. Užitečné pro zachycení pouze GPS na levnějších zařízeních nebo v případě, že dlaždice mapy nejsou k dispozici offline.
+
+```
+nomap
+```
+
+---
+
+## Vlastní styl tlačítka
+
+Pomocí `styleButton()` aplikujte vlastní CSS na výchozí obdélníkové tlačítko:
+
+```
+styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
+```
+
+---
+
+## Potlačení popisku
+
+```
+text-nolabel display{inline-icon, center, large}
+```
+
+---
+
+## Příklad použití
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| geopoint | field_loc | Zaznamenat polohu v terénu | `display{inline-icon, right, large}` |
+| geopoint | site | Poloha lokality | `display{thumbnail-square-[100%x30%]}` |
+| geopoint | auto_loc | Aktuální pozice | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | mapped_loc | Poloha | `display{inline-icon} outputs{question(address)}` |
+| geopoint | gps_only | Bod GPS | `nomap` |
+
+---
+
+## Nejlepší praxe
+
+1. Pro ověřovací průzkumy tazatelů, kde je GPS povinná, použijte `inputs{auto-take}` — odstraní se tím manuální krok.
+2. `display{thumbnail-square}` použijte v případě, že chcete, aby tazatel vizuálně potvrdil vybraný bod před pokračováním.
+3. Spárujte `outputs{question(...)}` s polem `text` určeným pouze pro čtení, aby se tazateli zobrazila reverzně geokódovaná adresa.
+4. V oblastech bez internetového připojení, kde se nemohou načíst dlaždice mapy, použijte `nomap`.
+5. Před záznamem nechte čas na stabilizaci GPS — přesnost pod 10 m je pro terénní průzkumy obvykle dostatečná.
+
+## Omezení (Limitations)
+
+- Geokódování `inputs{question(name)}` vyžaduje přístup k internetu — volá API OpenStreetMap Nominatim.
+- Reverzní geokódování `outputs{question(name)}` vyžaduje také přístup k internetu.
+- Miniatura mapy (`display{thumbnail-square}`) vyžaduje internet pro načítání dlaždic; souřadnice jsou stále zachycovány offline.
+- Přesnost GPS se liší podle zařízení a prostředí — podmínky v interiéru nebo v městské zástavbě mohou vést k přesnosti > 50 m.
+- Sběr údajů o poloze může během dlouhých průzkumů výrazně ovlivnit životnost baterie zařízení.

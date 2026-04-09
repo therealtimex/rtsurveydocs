@@ -1,99 +1,141 @@
 ---
-title: "File"
-description: "Pertanyaan file memungkinkan responden mengunggah dokumen dan file lainnya sebagai bagian dari respons survei mereka."
+title: "Berkas"
+description: "Pertanyaan berkas memungkinkan responden mengunggah dokumen dan berkas lainnya sebagai bagian dari respons survei mereka."
 ---
 
-Tipe pertanyaan `file` memungkinkan responden **mengunggah file apa pun** dari perangkat mereka — dokumen, spreadsheet, PDF, atau tipe file lainnya. Tidak seperti `image`, `audio`, dan `video` yang meluncurkan alat pengambilan tertentu, `file` membuka pemilih file tujuan umum.
+Tipe pertanyaan `file` memungkinkan responden untuk **mengunggah berkas apa pun** dari perangkat mereka — dokumen, lembar kerja, PDF, atau tipe berkas lainnya. Berbeda dengan `image`, `audio`, dan `video` yang meluncurkan alat penangkap khusus, `file` membuka pemilih berkas tujuan umum.
 
-## Spesifikasi XLSForm Dasar
+## Spesifikasi Dasar XLSForm
 
 | type | name      | label                        |
 |------|-----------|------------------------------|
-| file | document  | Harap unggah dokumen Anda    |
+| file | document  | Silakan unggah dokumen Anda |
 
-Untuk detail lebih lanjut tentang tipe pertanyaan file standar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk detail lebih lanjut tentang tipe pertanyaan berkas standar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
 
-## Penggunaan
+## Kegunaan
 
-Pertanyaan file umum digunakan untuk:
+Pertanyaan berkas biasanya digunakan untuk:
 
 1. Mengumpulkan dokumen pendukung (kuitansi, sertifikat, kontrak, laporan)
-2. Mengunggah formulir kertas yang telah dipindai
-3. Mengumpulkan spreadsheet atau ekspor data dari sistem lain
-4. Tipe file digital apa pun yang tidak dicakup oleh image/audio/video
+2. Mengunggah formulir kertas yang telah diisi dan dipindai
+3. Mengumpulkan lembar kerja atau ekspor data dari sistem lain
+4. Tipe berkas digital apa pun yang tidak dicakup oleh gambar/audio/video
 
 ## Format data
 
-File yang diunggah disimpan sebagai lampiran biner:
+Berkas yang diunggah disimpan sebagai lampiran biner:
 
 - **Format:** Dipertahankan dalam format asli (PDF, XLSX, DOCX, dll.)
 - **Penamaan:** `{instanceID}-{fieldname}.{extension}`
-- **Penyimpanan:** Diunggah ke folder media server bersama pengiriman
+- **Penyimpanan:** Diunggah ke folder media server bersama dengan pengiriman
 - **Akses:** Dapat diunduh dari antarmuka manajemen pengiriman
 
-## Ekstensi rtSurvey
+## ekstensi rtSurvey
 
-### Tipe file yang diterima
+### Tipe berkas yang diterima
 
-Gunakan kolom `parameters` untuk membatasi tipe file mana yang dapat dipilih:
+Gunakan kolom `parameters` untuk membatasi tipe berkas mana yang dapat dipilih:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
 | file | report | Unggah laporan inspeksi | `accept=.pdf` |
-| file | spreadsheet | Unggah file data | `accept=.xlsx,.csv` |
+| file | spreadsheet | Unggah berkas data | `accept=.xlsx,.csv` |
 
-Parameter `accept` menggunakan sintaks ekstensi file standar (dipisahkan koma).
+Parameter `accept` menggunakan sintaks ekstensi berkas standar (dipisahkan koma).
 
-### Panduan ukuran file
+### Panduan ukuran berkas
 
-rtSurvey tidak menegakkan batas ukuran file keras di tingkat pertanyaan, tetapi batas unggah server berlaku. Gunakan `hint` untuk mengkomunikasikan ekspektasi kepada enumerator:
+rtSurvey tidak memberlakukan batas ukuran berkas yang ketat di tingkat pertanyaan, tetapi batas unggahan server berlaku. Gunakan `hint` untuk mengomunikasikan harapan kepada enumerator:
 
 | type | name | label | hint |
 |------|------|-------|------|
-| file | receipt | Unggah kuitansi pembayaran | Diterima: PDF atau gambar. Ukuran file maksimum: 5 MB |
+| file | receipt | Unggah kuitansi pembayaran | Diterima: PDF atau gambar. Ukuran berkas maksimal: 5 MB |
 
-### Integrasi dengan sistem file perangkat dan penyimpanan cloud
+### Integrasi dengan sistem berkas perangkat dan penyimpanan cloud
 
-Di Android dan iOS, pertanyaan `file` membuka pemilih file asli perangkat, yang mungkin menyertakan akses ke:
-- Penyimpanan lokal perangkat
+Pada Android dan iOS, pertanyaan `file` membuka pemilih berkas bawaan perangkat, yang mungkin mencakup akses ke:
+- Penyimpanan perangkat lokal
 - Kartu SD (Android)
 - iCloud Drive (iOS)
-- Google Drive, Dropbox (jika terinstal)
+- Google Drive, Dropbox (jika terpasang)
 
-Di web, ini membuka dialog unggah file standar browser.
+Pada web, ini membuka dialog unggah berkas standar browser.
+
+### Tata letak tombol inline (Inline button layout)
+
+Tambahkan `inline` untuk merender unggahan sebagai **tombol ikon melingkar** di samping label, bukan pemilih berkas lebar penuh.
+
+```
+| type | name | label           | appearance                              |
+|------|------|-----------------|-----------------------------------------|
+| file | doc  | Unggah dokumen | inline display{right}                   |
+| file | doc  | Unggah dokumen | inline display{left, large}             |
+| file | doc  | Unggah dokumen | inline display{center, large, <0099FF/>} |
+```
+
+**Posisi tombol** — `left`, `right` *(default)*, `top`, `center`, `bottom`
+
+**Ukuran tombol** — `small` *(default)*, `medium`, `large`
+
+**Warna tombol** — tambahkan warna hex di dalam `display{}` untuk mengganti warna utama:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Kontrol pasca-penangkapan — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Menyembunyikan tombol unggah setelah berkas dilampirkan |
+| `results{hide(review)}` | Menyembunyikan tombol tinjau/pratinjau setelah unggahan |
+| `results{hide(filename)}` | Menyembunyikan nama berkas yang ditampilkan setelah unggahan |
+| `results{left}` | Memindahkan ikon ke kiri setelah unggahan |
+
+Contoh — sembunyikan tombol unggah setelah berkas dilampirkan:
+```
+inline display{right} results{hide(capture)}
+```
+
+### Menghilangkan label (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Contoh penggunaan
 
-### Unggahan PDF yang diperlukan
+### Unggahan PDF yang diwajibkan
 
 | type | name | label | hint | required | required_message |
 |------|------|-------|------|----------|-----------------|
-| file | signed_consent | Unggah formulir persetujuan yang ditandatangani | Hanya PDF, maks 2MB | yes | Formulir persetujuan diperlukan |
+| file | signed_consent | Unggah formulir persetujuan yang ditandatangani | Hanya PDF, maksimal 2MB | yes | Formulir persetujuan diperlukan |
 
-### Unggahan dokumen kondisional
+### Unggahan dokumen bersyarat
 
 | type | name | label | relevant |
 |------|------|-------|----------|
 | select_one yesno | has_land_title | Apakah rumah tangga memiliki sertifikat tanah? | |
-| file | land_title_doc | Unggah foto atau salinan sertifikat tanah | `${has_land_title} = 'yes'` |
+| file | land_title_doc | Unggah foto atau pemindaian sertifikat tanah | `${has_land_title} = 'yes'` |
 
 ## Praktik Terbaik
 
-1. Gunakan `accept` untuk membatasi tipe file — ini mencegah enumerator secara tidak sengaja mengunggah file yang salah.
-2. Selalu sertakan panduan ukuran dan format dalam kolom `hint`.
-3. Untuk foto dan gambar, gunakan tipe `image` sebagai gantinya — ia menawarkan kompresi yang lebih baik dan penanganan format yang konsisten.
-4. Untuk survei besar dengan lampiran file, rencanakan penyimpanan data dan bandwidth unduhan Anda.
-5. Uji pemilih file pada tipe perangkat target (Android vs. iOS vs. web) sebelum penerapan — akses ke drive cloud bervariasi.
+1. Gunakan `accept` untuk membatasi tipe berkas — ini mencegah enumerator mengunggah berkas yang salah secara tidak sengaja.
+2. Selalu sertakan panduan ukuran dan format di kolom `hint`.
+3. Untuk foto dan gambar, gunakan tipe `image` saja — tipe ini menawarkan kompresi yang lebih baik dan penanganan format yang konsisten.
+4. Untuk survei besar dengan lampiran berkas, rencanakan penyimpanan data dan bandwidth unduhan Anda sesuai dengan kebutuhan tersebut.
+5. Uji pemilih berkas pada tipe perangkat target (Android vs. iOS vs. web) sebelum penyebaran — akses ke drive cloud bervariasi.
 
 ## Pertimbangan penanganan data
 
-- File disimpan dalam format aslinya; tidak dikonversi atau dikompres oleh rtSurvey.
-- Analisis file setelah diunduh — rtSurvey tidak mengekstrak atau mengindeks konten file.
-- Lampiran file besar secara signifikan meningkatkan waktu yang diperlukan untuk mengunduh dataset lengkap.
+- Berkas disimpan dalam format aslinya; berkas tidak dikonversi atau dikompresi oleh rtSurvey.
+- Analisis berkas setelah diunduh — rtSurvey tidak mengekstrak atau mengindeks konten berkas.
+- Lampiran berkas yang besar secara signifikan meningkatkan waktu yang diperlukan untuk mengunduh kumpulan data lengkap.
 
-## Keterbatasan
+## Keterbatasan (Limitations)
 
-- Pertanyaan file tidak memvalidasi konten file — hanya pemeriksaan ekstensi file melalui `accept` yang ditegakkan di tingkat UI.
-- File yang sangat besar (100 MB+) mungkin kehabisan waktu saat diunggah di lingkungan dengan konektivitas rendah.
-- Enumerator offline dapat melampirkan file tetapi tidak akan diunggah sampai konektivitas pulih.
+- Pertanyaan berkas tidak memvalidasi konten berkas — hanya pemeriksaan ekstensi berkas melalui `accept` yang diberlakukan di tingkat UI.
+- Berkas yang sangat besar (100 MB+) mungkin mengalami waktu habis saat mengunggah di lingkungan dengan konektivitas rendah.
+- Enumerator luring dapat melampirkan berkas, tetapi berkas tersebut tidak akan diunggah hingga konektivitas pulih.
 - Beberapa konfigurasi perangkat membatasi akses ke lokasi penyimpanan tertentu (misalnya, kebijakan MDM perusahaan).

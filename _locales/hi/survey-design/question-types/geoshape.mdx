@@ -1,77 +1,85 @@
 ---
 title: "Geoshape"
-description: "Geoshape questions उत्तरदाताओं को map पर shapes draw करने देते हैं, survey के हिस्से के रूप में complex geographical data capture करते हैं।"
+description: "Geoshape प्रश्न GPS बिंदुओं के अनुक्रम द्वारा परिभाषित एक बंद बहुभुज (polygon) को कैप्चर करते हैं।"
 ---
 
-XLSForms और rtSurvey में geoshape question type उत्तरदाताओं को map पर shapes (polygons) draw करने में सक्षम बनाता है, complex geographical data capture करता है। यह सुविधा areas map करने, boundaries define करने, या spatial surveys में interest के regions mark करने के लिए विशेष रूप से उपयोगी है।
+`geoshape` प्रश्न प्रकार एक बंद बहुभुज को कैप्चर करता है — GPS निर्देशांकों की एक श्रृंखला जहाँ पहला और अंतिम बिंदु समान होते हैं। rtSurvey के वेब फॉर्म में, यह एक **टेक्स्ट इनपुट** के रूप में रेंडर होता है जहाँ गणनाकर्ता (enumerator) सीधे निर्देशांक स्ट्रिंग दर्ज करता है या पेस्ट करता है।
 
-## बुनियादी XLSForm विशिष्टता
+## बुनियादी XLSForm विनिर्देश (Specification)
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geoshape | field_area  | Field की boundary draw करें    |
+| type     | name        | label                            |
+|----------|-------------|----------------------------------|
+| geoshape | field_area  | खेत की सीमा बनाएं   |
+| geoshape | zone        | ज़ोन की सीमा रिकॉर्ड करें         |
 
-Basic geoshape question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+मानक विनिर्देश के लिए [XLSForm दस्तावेज़](https://xlsform.org/en/#question-types) देखें।
 
-## उपयोग
+---
 
-Geoshape questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+## डेटा प्रारूप (Data Format)
 
-1. Agricultural surveys में field boundaries map करना
-2. Environmental impact के areas define करना
-3. Urban planning studies में zones mark करना
-4. Geological surveys के लिए regions outline करना
-5. Spatial analysis के लिए complex geographical features capture करना
+सेमीकोलन-सेपरेटेड बिंदुओं की सूची के रूप में संग्रहीत, **सेमीकोलन के आसपास कोई स्थान नहीं** होता है। प्रत्येक बिंदु चार स्पेस-सेपरेटेड मान होते हैं:
 
-## सर्वोत्तम प्रथाएँ
+```
+lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
+```
 
-1. सुनिश्चित करें कि device में location services enabled हों और permissions granted हों।
-2. Shape कैसे draw करें और कौन सा area शामिल होना चाहिए, इस पर clear instructions प्रदान करें।
-3. Shapes accurately draw करने में उत्तरदाताओं की मदद के लिए satellite imagery या base maps का उपयोग करने पर विचार करें।
-4. Shapes की potential complexity और data size और processing पर उनके प्रभाव के प्रति सावधान रहें।
+| Component | Description |
+|-----------|-------------|
+| `lat` | दशमलव डिग्री में अक्षांश (Latitude) |
+| `lon` | दशमलव डिग्री में देशांतर (Longitude) |
+| `alt` | मीटर में ऊंचाई (`0` यदि अज्ञात है) |
+| `acc` | मीटर में GPS सटीकता (`0` यदि अज्ञात है) |
+
+**बहुभुज बंद होना चाहिए** — अंतिम बिंदु पहले बिंदु के बराबर होना चाहिए।
+
+**उदाहरण — चार बिंदुओं वाला बहुभुज (त्रिकोण, बंद):**
+```
+13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
+```
+
+एक मान्य बहुभुज बनाने के लिए कम से कम तीन अलग-अलग बिंदुओं और समापन दोहराव की आवश्यकता होती है।
+
+---
+
+## यह rtSurvey में कैसे रेंडर होता है
+
+rtSurvey वेब फॉर्म में, `geoshape` एक सादे **टेक्स्ट फ़ील्ड** के रूप में रेंडर होता है। गणनाकर्ता निर्देशांक स्ट्रिंग टाइप करता है या पेस्ट करता है। वर्तमान वेब फॉर्म में इस प्रकार के लिए कोई अंतर्निहित इंटरैक्टिव पॉलीगॉन मैप पिकर नहीं है।
+
+### बहुभुज बिंदुओं को इंटरैक्टिव रूप से एकत्र करना
+
+फ़ील्ड संग्रह के लिए अनुशंसित पैटर्न `geopoint` प्रश्नों का एक **रिपीट ग्रुप (repeat group)** है — प्रत्येक वर्टेक्स (vertex) पूर्ण GPS मैप पिकर का उपयोग करता है — जिसे geoshape स्ट्रिंग उत्पन्न करने के लिए `calculate` के साथ जोड़ा जाता है:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | polygon_points | प्रत्येक कोने को रिकॉर्ड करें | |
+| geopoint | point | कोने को रिकॉर्ड करने के लिए टैप करें | |
+| end repeat | polygon_points | | |
+| calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
+
+जोड़ने के बाद, बहुभुज को बंद करने के लिए मैन्युअल रूप से पहला बिंदु जोड़ें, या इसे जोड़ने के लिए दूसरे calculate का उपयोग करें।
+
+---
 
 ## उदाहरण उपयोग
 
-यहाँ बताया गया है कि आप survey में geoshape question का उपयोग कैसे कर सकते हैं:
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geoshape | farm_boundary | खेत की सीमा रिकॉर्ड करें | सेमीकोलन द्वारा अलग किए गए सभी कोनों को दर्ज करें। पहला और अंतिम बिंदु समान होना चाहिए। | yes |
 
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geoshape | forest_area    | Forest patch की boundary outline करें       | एक closed shape बनाने के लिए कम से कम 3 points का उपयोग करें |
+---
 
-## rtSurvey एक्सटेंशन
+## सर्वोत्तम प्रथाएं
 
-Basic XLSForm specification के अतिरिक्त, rtSurvey अतिरिक्त सुविधाएं या customizations प्रदान कर सकता है:
+1. इंटरैक्टिव मैप-आधारित संग्रह के लिए `geopoint` प्रश्नों के रिपीट ग्रुप का उपयोग करें और मानों को जोड़ें — यह गणनाकर्ताओं को प्रत्येक वर्टेक्स के लिए एक GPS पिकर देता है।
+2. सबमिट करने से पहले हमेशा बहुभुज को बंद करें (अंत में पहले बिंदु को दोहराएं)।
+3. जब मैन्युअल निर्देशांक प्रविष्टि की आवश्यकता हो, तो `hint` कॉलम में अपेक्षित प्रारूप शामिल करें।
+4. मान्य बहुभुज के लिए कम से कम 3 अलग-अलग कोने वाले बिंदुओं की आवश्यकता होती है — इसे XLSForm प्रतिबंधों के बजाय निर्देशों के माध्यम से लागू करें।
+5. एकल-स्थान प्रश्नों के लिए `geopoint` का उपयोग करें और `geoshape` का उपयोग केवल तभी करें जब क्षेत्र का सीमांकन वास्तविक सर्वेक्षण उद्देश्य हो।
 
-1. Remote areas के लिए offline maps के साथ integration
-2. Shape के लिए minimum और maximum number of points set करने के विकल्प
-3. Initial drawing के बाद shapes edit या refine करने की ability
-4. Free-form polygons के अतिरिक्त different shape types (जैसे rectangles, circles) का समर्थन
+## सीमाएं (Limitations)
 
-## डेटा प्रारूप
-
-Geoshape data आमतौर पर space-separated coordinate pairs की string के रूप में store होती है:
-
-```
-(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
-```
-
-उदाहरण के लिए:
-```
-(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
-```
-
-## Analysis के लिए विचार
-
-Geoshape questions का उपयोग करते समय, विचार करें:
-
-1. Geographic data कैसे visualize और analyze होगा (जैसे GIS software)
-2. Complex shapes की data cleaning या simplification की potential need
-3. Detailed spatial data handle करने के लिए privacy और data protection measures
-4. Comprehensive analysis के लिए अन्य spatial data sources के साथ integration
-
-## सीमाएं
-
-- Small mobile screens पर accurate shapes draw करना challenging हो सकता है।
-- Complex shapes के लिए significant storage और processing capacity की आवश्यकता हो सकती है।
-- Geoshape questions सभी types के surveys या उत्तरदाताओं के लिए suitable नहीं हो सकते।
-- Detailed spatial data एकत्र करने से associated privacy concerns हो सकती हैं।
+- rtSurvey वेब फॉर्म में `geoshape` के लिए कोई अंतर्निहित इंटरैक्टिव पॉलीगॉन मैप पिकर नहीं है।
+- बहुभुज को मैन्युअल रूप से बंद किया जाना चाहिए — टेक्स्ट इनपुट मोड में कोई स्वचालित समापन तंत्र नहीं है।
+- बहुभुज टोपोलॉजी (जैसे, गैर-स्व-प्रतिच्छेदन, न्यूनतम क्षेत्र) को सत्यापित करने के लिए XLSForm प्रतिबंधों के बाहर पोस्ट-प्रोसेसिंग की आवश्यकता होती है।
+- कई वर्टेक्स वाली लंबी सीमाएं बड़ी टेक्स्ट स्ट्रिंग्स उत्पन्न करती हैं।

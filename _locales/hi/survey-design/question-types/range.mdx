@@ -1,34 +1,34 @@
 ---
 title: "Range"
-description: "Range questions उत्तरदाताओं को defined minimum और maximum value के बीच slider खींचकर एक number चुनने देते हैं।"
+description: "रेंज (Range) प्रश्न उत्तरदाताओं को एक निर्धारित न्यूनतम और अधिकतम मान के बीच स्लाइडर को खींचकर एक संख्या चुनने देते हैं।"
 ---
 
-`range` question type एक **slider** (या समकक्ष input) प्रदर्शित करता है जो उत्तरदाताओं को defined minimum और maximum के भीतर एक number चुनने देता है। यह ratings, satisfaction scores, या किसी भी numeric value एकत्र करने के लिए आदर्श है जहाँ आप text input के बजाय visually range को constrain करना चाहते हैं।
+`range` प्रश्न प्रकार उत्तरदाताओं को एक निर्धारित न्यूनतम और अधिकतम के भीतर एक संख्या चुनने देता है। rtSurvey के वेब फ़ॉर्म में, यह एक मानक **नंबर इनपुट** के रूप में दिखाई देता है — गणनाकर्ता सीधे मान टाइप करता है। `start`, `end`, और `step` पैरामीटर मान्य श्रेणी को परिभाषित करते हैं और प्रतिबंधों (constraints) के रूप में लागू किए जाते हैं।
 
-## बुनियादी XLSForm विशिष्टता
+## बुनियादी XLSForm विनिर्देश (Specification)
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | satisfaction | आप service से कितने संतुष्ट हैं? | start=1 end=5 step=1 |
+| range | satisfaction | आप सेवा से कितने संतुष्ट हैं? | start=1 end=5 step=1 |
 
-`parameters` column slider bounds और step size define करता है:
+`parameters` कॉलम स्लाइडर की सीमा और स्टेप (step) आकार को परिभाषित करता है:
 
-| Parameter | विवरण | Default |
+| Parameter | Description | Default |
 |-----------|-------------|---------|
-| `start` | Minimum value (inclusive) | 0 |
-| `end` | Maximum value (inclusive) | 10 |
-| `step` | Valid values के बीच increment | 1 |
+| `start` | न्यूनतम मान (समावेशी) | 0 |
+| `end` | अधिकतम मान (समावेशी) | 10 |
+| `step` | मान्य मानों के बीच वृद्धि | 1 |
 
-Standard range question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+मानक रेंज प्रश्न प्रकार के बारे में अधिक जानकारी के लिए, [XLSForm विनिर्देश](https://xlsform.org/en/#question-types) देखें।
 
 ## उपयोग
 
-Range questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+रेंज प्रश्नों का उपयोग आमतौर पर इनके लिए किया जाता है:
 
-1. Satisfaction या rating scales (जैसे 1–5 या 0–10)
-2. Likert-style numeric scales
-3. ऐसे measurements एकत्र करना जहाँ केवल discrete values valid हों
-4. Age brackets या score ranges जहाँ slider text field पर usability में सुधार करता है
+1. संतुष्टि या रेटिंग स्केल (जैसे, 1-5 या 0-10)
+2. लिकर्ट-शैली (Likert-style) संख्यात्मक स्केल
+3. उन मापों को एकत्र करना जहाँ केवल असतत (discrete) मान मान्य हैं
+4. आयु वर्ग या स्कोर श्रेणियां जहाँ एक स्लाइडर टेक्स्ट फ़ील्ड की तुलना में उपयोगिता में सुधार करता है
 
 ## उदाहरण उपयोग
 
@@ -36,38 +36,31 @@ Range questions सामान्यतः इनके लिए उपयो�
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | overall_rating | Overall rating (0–10) | start=0 end=10 step=1 |
+| range | overall_rating | कुल रेटिंग (0–10) | start=0 end=10 step=1 |
 
-### दशमलव चरण
+### दशमलव स्टेप (Decimal step)
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| range | weight_kg | वजन (kg) | start=0 end=200 step=0.5 |
+| range | weight_kg | वजन (किग्रा) | start=0 end=200 step=0.5 |
 
-### Calculation में value का उपयोग करना
+### गणना में मान का उपयोग करना
 
 | type | name | label | parameters | calculation |
 |------|------|-------|------------|-------------|
-| range | score | Test score (0–100) | start=0 end=100 step=5 | |
+| range | score | टेस्ट स्कोर (0–100) | start=0 end=100 step=5 | |
 | calculate | grade | | | if(`${score}` >= 90, 'A', if(`${score}` >= 80, 'B', if(`${score}` >= 70, 'C', 'F'))) |
-| note | grade_note | आपका grade है: `${grade}` | | |
+| note | grade_note | आपका ग्रेड है: `${grade}` | | |
 
-## उपस्थिति
+## सर्वोत्तम प्रथाएं
 
-`range` type default रूप से slider के रूप में render होता है। Basic usage के लिए कोई additional appearance values आवश्यक नहीं हैं। आप web forms पर wider layout के लिए इसे `horizontal` के साथ combine कर सकते हैं:
+1. हमेशा सार्थक `start`, `end`, और `step` मान सेट करें — डिफ़ॉल्ट पर भरोसा न करें।
+2. उत्तरदाताओं को संदर्भ देने के लिए `hint` कॉलम में अपने स्केल के सिरों को लेबल करें (जैसे, `संकेत: 0 = बहुत असंतुष्ट, 10 = बहुत संतुष्ट`)।
+3. 5-पॉइंट लिकर्ट स्केल के लिए, 0-4 के बजाय `start=1 end=5 step=1` का उपयोग करें, क्योंकि उत्तरदाता "1" का अर्थ न्यूनतम होने की उम्मीद करते हैं।
+4. `integer` + प्रतिबंध के बजाय `range` का उपयोग करें जब इनपुट की सीमित प्रकृति प्रश्न डिजाइन का हिस्सा हो (स्लाइडर स्केल को दृश्य रूप से संप्रेषित करता है)।
 
-| type | name | label | parameters | appearance |
-|------|------|-------|------------|------------|
-| range | nps | आप हमें recommend करने की कितनी संभावना रखते हैं? (0–10) | start=0 end=10 step=1 | horizontal |
+## सीमाएं (Limitations)
 
-## सर्वोत्तम प्रथाएँ
-
-1. हमेशा meaningful `start`, `end`, और `step` values सेट करें — defaults पर निर्भर न रहें।
-2. उत्तरदाताओं को context देने के लिए `hint` column में अपने scale के ends को label करें (जैसे `hint: 0 = बहुत असंतुष्ट, 10 = बहुत संतुष्ट`)।
-3. 5-point Likert scales के लिए, 0–4 के बजाय `start=1 end=5 step=1` का उपयोग करें, क्योंकि उत्तरदाता "1" को lowest मानते हैं।
-4. `range` का उपयोग `integer` + constraint के बजाय करें जब input की bounded nature question design का हिस्सा हो।
-
-## सीमाएं
-
-- Slider widget बहुत wide ranges के लिए आदर्श नहीं हो सकता (जैसे 0–10000) — उन मामलों में constraints के साथ text `integer` अधिक user-friendly है।
-- Mobile devices पर, fine step values (जैसे `step=0.1`) को touch slider के साथ सटीक रूप से control करना कठिन हो सकता है।
+- rtSurvey वेब फ़ॉर्म में कोई स्लाइडर विजेट नहीं है — मान प्रविष्टि एक सादा नंबर इनपुट है। दृश्य स्लाइडर अनुभव के लिए, एक मोबाइल क्लाइंट का उपयोग करें जो रेंज विजेट का समर्थन करता है।
+- बहुत विस्तृत श्रेणियों (जैसे, 0-10000) के लिए, प्रतिबंध के साथ एक साधारण `integer` समान रूप से प्रभावी और अधिक उपयोगकर्ता के अनुकूल है।
+- बारीक स्टेप मान (जैसे, `step=0.1`) प्रतिबंधों के रूप में काम करते हैं लेकिन वेब फ़ॉर्म में स्लाइडर सटीकता की कोई चिंता नहीं है।

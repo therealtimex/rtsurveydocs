@@ -1,17 +1,25 @@
 ---
-title: "Rank"
-description: "Otázky rank umožňují respondentům seřadit sadu voleb podle preference nebo priority."
+title: "Pořadí"
+description: "Otázky typu pořadí umožňují respondentům seřadit soubor možností podle preference nebo priority."
 ---
 
-Typ otázky `rank` prezentuje seznam voleb, které respondent musí **přetáhnout do pořadí** (nebo jinak seřadit od prvního po poslední). Výsledek ukládá jako seznam hodnot voleb oddělených mezerami v pořadí výběru, s volbou s nejvyšší prioritou na prvním místě.
+Typ otázky `rank` představuje seznam možností, které respondent seřadí podle preference nebo priority. Výsledek ukládá jako mezerami oddělený seznam hodnot možností v seřazeném pořadí, přičemž možnost s nejvyšší prioritou je první.
+
+> **Webový formulář rtSurvey:** Widget pro řazení přetažením (drag-and-drop) není v současné době implementován. Ve webovém formuláři se `rank` vykresluje jako výběrový seznam. Tento typ použijte, pokud cílíte na mobilní klienty, kteří widget pro řazení podporují, nebo když je formát uložené hodnoty důležitější než interakce přetažením.
 
 ## Základní specifikace XLSForm
+
+| type | name | label |
+|------|------|-------|
+| rank priorities | main_priority | Seřaďte tyto potřeby komunity od nejdůležitější po nejméně důležitou |
+
+Možnosti jsou definovány v **listu choices** stejně jako u `select_one`:
 
 **survey:**
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Seřaďte tyto potřeby komunity od nejdůležitějších po nejméně důležité |
+| rank priorities | main_priority | Seřaďte tyto potřeby od nejdůležitější po nejméně důležitou |
 
 **choices:**
 
@@ -19,21 +27,21 @@ Typ otázky `rank` prezentuje seznam voleb, které respondent musí **přetáhno
 |-----------|------|-------|
 | priorities | water | Čistá voda |
 | priorities | health | Zdravotní péče |
-| priorities | education | Vzdělání |
+| priorities | education | Vzdělávání |
 | priorities | roads | Silnice |
 | priorities | electricity | Elektřina |
 
-## Formát uložených dat
+## Formát uložené hodnoty
 
-Uložená hodnota je **seznam oddělený mezerami** hodnot voleb v seřazeném pořadí (první = nejvyšší priorita):
+Uložená hodnota je **mezerami oddělený seznam** hodnot možností v seřazeném pořadí (první = nejvyšší priorita):
 
 ```
 water education health roads electricity
 ```
 
-## Extrakce seřazených pozic
+## Extrakce pozic v pořadí
 
-Použijte `selected-at()` pro získání volby na konkrétním pořadí:
+Pro získání volby na konkrétní pozici použijte funkci `selected-at()`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -41,26 +49,36 @@ Použijte `selected-at()` pro získání volby na konkrétním pořadí:
 | calculate | top_priority | | selected-at(`${main_priority}`, 0) |
 | calculate | second_priority | | selected-at(`${main_priority}`, 1) |
 
-`selected-at(${main_priority}, 0)` vrátí hodnotu umístěnou **na první místě** (index 0 = nejvyšší pořadí).
+`selected-at(${main_priority}, 0)` vrací hodnotu umístěnou jako **první** (index 0 = nejvyšší pozice).
+
+## Použití `rank-index()` s opakujícími se skupinami
+
+Když je `rank` použit uvnitř opakující se skupiny, funkce `rank-index()` umožňuje odkazovat na pořadí zvenčí opakování:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_ranked | | rank-index(1, `${score}`) |
+
+Úplné podrobnosti o funkcích `rank-index()` a `rank-index-if()` naleznete v části [Functions — Repeated field functions](../operators-and-functions/functions#repeated-field-functions).
 
 ## Použití
 
-Otázky rank se běžně používají pro:
+Otázky na pořadí se běžně používají pro:
 
-1. **Seřazení priorit** — žádost komunit o seřazení potřeb rozvoje
-2. **Seřazení preferencí** — seřazení funkcí produktu, atributů služby nebo možností politiky
-3. **Seřazení položek zkoušky** — uspořádání kroků v procesu
-4. **Výběr Top-N** — kombinace s `selected-at()` pro extrakci pouze top 1, 2 nebo 3 voleb
+1. **Stanovení priorit** — žádost komunitám o seřazení rozvojových potřeb
+2. **Uspořádání preferencí** — hodnocení vlastností produktu, atributů služeb nebo politických možností
+3. **Řazení položek zkoušky** — uspořádání kroků v procesu
+4. **Výběr nejlepších N** — v kombinaci s `selected-at()` pro extrakci pouze prvních 1, 2 nebo 3 možností
 
 ## Osvědčené postupy
 
-1. Udržujte seznam krátký (3–7 položek) — seřazování se stává kognitivně náročným nad 7–8 voleb.
-2. Používejte jasné, vzájemně se vylučující popisky voleb, abyste se vyhnuli nejasnostem ohledně toho, co „první" znamená.
-3. Přidejte text nápovědy vysvětlující směr seřazení (např. „Přetáhněte k seřazení: první = nejdůležitější").
-4. Validujte pomocí `count-selected(.) = x`, pokud potřebujete zajistit, že jsou seřazeny všechny volby.
+1. Seznam udržujte krátký (3–7 položek) — řazení se stává kognitivně náročným nad 7–8 možností.
+2. Používejte jasné, vzájemně se vylučující štítky možností, abyste předešli zmatku ohledně toho, co znamená „první“.
+3. Přidejte text nápovědy vysvětlující směr řazení (např. „Seřaďte přetažením: první = nejdůležitější“).
+4. Pokud potřebujete zajistit, aby byly seřazeny všechny možnosti, použijte validaci pomocí `count-selected(.) = x`.
 
 ## Omezení
 
-- Widget přetažení k seřazení vyžaduje dotykovou obrazovku nebo myš — nemusí dobře fungovat v prostředích pouze s klávesnicí.
-- Na některých starších mobilních klientech může widget rank přejít na rozhraní číselného vstupu.
-- Nelze částečně seřadit (tj. seřadit pouze některé volby) — všechny volby musí být seřazeny.
+- Widget pro řazení přetažením není ve webovém formuláři rtSurvey implementován.
+- Nelze provést částečné řazení — všechny možnosti musí být seřazeny.
+- Seznamy udržujte v rozsahu 3–7 položek; delší seznamy se stávají nepraktickými bez ohledu na klienta.

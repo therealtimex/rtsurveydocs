@@ -1,50 +1,147 @@
 ---
 title: "Obrázek"
-description: "Otázky image umožňují respondentům zachytit a odeslat fotografie jako součást průzkumu."
+description: "Otázky typu obrázek umožňují respondentům pořizovat a odesílat fotografie jako součást průzkumu."
 ---
 
-Typ otázky image v XLSForms a rtSurvey umožňuje respondentům zachytit a odeslat fotografie jako součást jejich odpovědí na průzkum. Tato funkce je zvláště užitečná pro sběr vizuálních dat, dokumentování pozorování nebo poskytování důkazů při terénních průzkumech.
+Typ otázky obrázek v XLSForms a rtSurvey umožňuje respondentům pořizovat a odesílat fotografie jako součást jejich odpovědí v průzkumu. Tato funkce je užitečná zejména pro sběr vizuálních dat, dokumentování pozorování nebo poskytování důkazů v terénních průzkumech.
 
 ## Základní specifikace XLSForm
 
 | type  | name        | label                           |
 |-------|-------------|--------------------------------|
-| image | photo       | Vyfotografujte místo    |
+| image | photo       | Vyfoťte dané místo             |
+
+Další podrobnosti o základním typu otázky obrázek naleznete v [specifikaci XLSForm](https://xlsform.org/en/#question-types).
 
 ## Použití
 
-Otázky image se běžně používají pro:
+Otázky s obrázkem se běžně používají pro:
 
-1. Dokumentování terénních podmínek nebo pozorování
-2. Zachycování vizuálních důkazů ve výzkumných studiích
-3. Sběr fotografií před a po v hodnocení dopadu
+1. Dokumentování podmínek v terénu nebo pozorování
+2. Pořizování vizuálních důkazů ve výzkumných studiích
+3. Sběr fotografií před a po v hodnocení dopadů
 4. Ověřování dokončení úkolů nebo přítomnosti na místech
 5. Shromažďování vizuálních dat pro vzdálenou analýzu
 
 ## Osvědčené postupy
 
-1. Poskytněte jasné pokyny o tom, co by mělo být fotografováno.
+1. Poskytněte jasné pokyny, co má být vyfotografováno.
 2. Zvažte důsledky pro soukromí a informujte respondenty o tom, jak budou jejich fotografie použity.
-3. Buďte obeznámeni s velikostí souborů a omezeními úložiště, zejména pro průzkumy v oblastech s omezeným připojením k internetu.
-4. Zajistěte, aby mělo zařízení dostatek místa v úložišti a aby byla udělena oprávnění ke kameře.
+3. Mějte na paměti velikosti souborů a omezení úložiště, zejména u průzkumů v oblastech s omezeným připojením k internetu.
+4. Ujistěte se, že zařízení má dostatek úložného prostoru a jsou udělena oprávnění k fotoaparátu.
 
 ## Příklad použití
 
+Zde je příklad toho, jak můžete v průzkumu použít otázku s obrázkem:
+
 | type  | name           | label                                      | hint                                        |
 |-------|----------------|--------------------------------------------|--------------------------------------------|
-| image | storefront     | Vyfotografujte vchod do obchodu       | Ujistěte se, že název obchodu je jasně viditelný    |
+| image | storefront     | Pořiďte fotografii vchodu do obchodu       | Ujistěte se, že název obchodu je jasně viditelný |
+
+## Rozšíření rtSurvey
+
+### Rozložení vloženého tlačítka
+
+Přidejte `inline` do sloupce `appearance`, aby se fotoaparát vykreslil jako **kruhové tlačítko s ikonou** vedle štítku místo oblasti pro pořízení na celou šířku. Klepnutím na něj se otevře modální okno.
+
+```
+| type  | name  | label        | appearance                          |
+|-------|-------|--------------|-------------------------------------|
+| image | photo | Vyfoťte      | inline display{right}               |
+| image | photo | Vyfoťte      | inline display{center, large}       |
+```
+
+**Pozice tlačítka — `display{}`:**
+
+| Hodnota | Rozložení |
+|-------|--------|
+| `right` *(výchozí)* | Ikona vpravo od štítku |
+| `left` | Ikona vlevo od štítku |
+| `top` | Ikona nad štítkem, uprostřed |
+| `center` / `bottom` | Ikona pod štítkem, uprostřed |
+
+**Velikost tlačítka:**
+
+| Hodnota | Velikost |
+|-------|------|
+| `small` *(výchozí)* | Malý kruh |
+| `medium` | Střední kruh |
+| `large` | Velký kruh |
+
+**Barva tlačítka** — přidejte hex kód barvy do `display{}`, abyste přepsali primární barvu:
+
+```
+inline display{right, large, <FF5500/>}
+inline display{center, medium, <0099FF/>}
+```
+
+**Ovládání po pořízení — `results{}`:**
+
+| Appearance | Účinek |
+|---|---|
+| `results{hide(capture)}` | Skryje tlačítko fotoaparátu po pořízení fotografie |
+| `results{hide(camera)}` | Stejné jako `hide(capture)` — alias pro typ obrázku |
+| `results{hide(review)}` | Skryje náhled miniatury po pořízení |
+| `results{hide(filename)}` | Skryje název souboru zobrazený po nahrání |
+| `results{left}` | Přesune ikonu doleva po pořízení |
+
+Příklad — velké tlačítko uprostřed, skrytí fotoaparátu po pořízení:
+```
+inline display{center, large} results{hide(capture)}
+```
+
+### `invisible auto-show` — automatické otevření fotoaparátu
+
+Skryje widget otázky z rozvržení, ale automaticky otevře fotoaparát při načtení stránky. Užitečné pro vložení kroku tichého pořízení do toku formuláře.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Podpis a kreslení
+
+| Appearance | Popis |
+|---|---|
+| `signature` | Modální okno s plochou pro podpis na celou obrazovku |
+| `signature display{quick}` | Vložená plocha pro rychlý podpis — bez modálního okna |
+| `draw` | Plátno pro kreslení od ruky |
+
+### Vodoznak
+
+Přidejte textový nebo obrázkový vodoznak do pořízených fotografií:
+
+```
+watermark(text, "ID průzkumu: ${id}", bottom-right, 0.5)
+watermark(file, logo.png, top-left, 1.0, 20%)
+```
+
+### Potlačení štítku
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Zpracování dat
 
 Obrázky shromážděné prostřednictvím tohoto typu otázky jsou obvykle:
 
 1. Uloženy v běžném formátu obrázku (např. JPG, PNG)
-2. Uloženy spolu s ostatními daty průzkumu, často v samostatné mediální složce
-3. Přístupné pro prohlížení a analýzu prostřednictvím platformy správy průzkumu
+2. Uloženy společně s ostatními daty průzkumu, často v samostatné složce médií
+3. Přístupné pro prohlížení a analýzu prostřednictvím platformy pro správu průzkumů
+
+## Úvahy pro analýzu
+
+Při používání otázek s obrázkem zvažte:
+
+1. Jak budou obrázky analyzovány (např. ruční kontrola, automatizovaná analýza obrázků)
+2. Dodatečný úložný prostor vyžadovaný pro soubory obrázků
+3. Opatření na ochranu soukromí a dat pro ukládání a manipulaci s fotografiemi
+4. Potenciální potřebu nástrojů pro úpravu nebo organizaci obrázků ve fázi analýzy
 
 ## Omezení
 
-- Soubory obrázků mohou být velké, což může ovlivnit přenos dat a úložiště.
-- Ne všechna zařízení mohou mít vysokokvalitnlí kamery nebo dostatek místa v úložišti.
-- Analýza velkého počtu obrázků může být časově náročná.
-- Při pořizování obrázků, zejména na veřejných místech, mohou existovat obavy o soukromí.
+- Soubory obrázků mohou být velké, což může ovlivnit přenos a ukládání dat.
+- Ne všechna zařízení mohou mít vysoce kvalitní fotoaparáty nebo dostatek úložného prostoru.
+- Analýza velkého množství obrázků může být časově náročná.
+- Při pořizování snímků mohou nastat obavy o soukromí, zejména na veřejných prostranstvích.

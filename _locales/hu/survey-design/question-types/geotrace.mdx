@@ -1,77 +1,81 @@
 ---
 title: "Geotrace"
-description: "A geotrace kérdések lehetővé teszik a válaszadók számára, hogy összefüggő pontok sorozatát rögzítsék a térképen, vonalakat vagy útvonalakat létrehozva."
+description: "A Geotrace kérdések GPS pontok sorozatát rögzítik, amelyek egy vonalat vagy útvonalat alkotnak."
 ---
 
-Az XLSForm és az rtSurvey geotrace kérdéstípusa lehetővé teszi a válaszadók számára, hogy összefüggő pontok sorozatát rögzítsék a térképen, vonalakat vagy útvonalakat alkotva. Ez a funkció különösen hasznos útvonalak, határok vagy lineáris jellemzők feltérképezéséhez térbeli felmérésekben.
+A `geotrace` kérdéstípus földrajzi koordináták sorozatát rögzíti, amelyek egy vonalat vagy útvonalat (polyline) alkotnak. Az rtSurvey webes űrlapján ez egy **szöveges beviteli mezőként** jelenik meg, ahová az adatgyűjtő (enumerator) közvetlenül írja be vagy másolja be a koordináta-karakterláncot.
 
-## Alapvető XLSForm-specifikáció
+## Alapvető XLSForm specifikáció
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geotrace | river_path  | Kövesse a folyó útvonalát       |
+| type     | name        | label                        |
+|----------|-------------|------------------------------|
+| geotrace | river_path  | Kövesse a folyó útvonalát |
+| geotrace | road_route  | Rögzítse az út útvonalát |
 
-A geotrace kérdéstípus alapvető részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+A szabványos specifikációt az [XLSForm dokumentációjában](https://xlsform.org/en/#question-types) találja.
 
-## Felhasználási területek
+---
 
-A geotrace kérdések általánosan használt területei:
+## Adatformátum (Data Format)
 
-1. Terepi felmérések során bejárt útvonalak vagy ösvények feltérképezése
-2. Lineáris jellemzők – utak, folyók vagy határok – nyomkövetése
-3. Lineáris infrastruktúra terjedelme rögzítése (pl. csővezetékek, villamos hálózatok)
-4. Utazási útvonalak rögzítése közlekedési tanulmányokban
-5. Transszektek meghatározása ökológiai felmérésekben
-
-## Bevált módszerek
-
-1. Győződjön meg arról, hogy az eszközön engedélyezve van a helymeghatározó szolgáltatás és megvannak az engedélyek.
-2. Adjon egyértelmű utasításokat az útvonal nyomkövetésének módjáról és a befoglalandó jellemzőkről.
-3. Fontolja meg műholdképek vagy alaptérképek használatát a válaszadók pontos útvonal-nyomkövetésének segítéséhez.
-4. Legyen tekintettel a nyomok lehetséges összetettségére és annak hatására az adatok méretére és feldolgozására.
-
-## Példa
-
-Íme egy példa arra, hogyan lehet geotrace kérdést felhasználni egy felmérésben:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geotrace | hiking_trail   | Kövesse a túraútvonal nyomvonalát          | Induljon a túra kezdőpontjáról, és fejezze be a csúcson |
-
-## rtSurvey-bővítések
-
-Bár az alapvető XLSForm-specifikáció egyszerű a geotrace kérdéseknél, az rtSurvey további funkciókat kínálhat:
-
-1. Integráció offline térképekkel távoli területeken
-2. A nyom pontjainak minimális és maximális számát beállító lehetőségek
-3. A nyomok szerkesztésének és finomításának képessége a kezdeti rajzolás után
-4. Automatikus nyomkövetés támogatása meghatározott intervallumokban mozgás közben
-
-## Adatformátum
-
-A geotrace adatok általában szóközzel elválasztott koordinátapárokból álló karakterláncként kerülnek tárolásra, hasonlóan a geoshape-hez, de zárópontot nélkül:
+Pontosvesszővel elválasztott pontlistaként tárolódik, a **pontosvesszők körül szóközök nélkül**. Minden pont négy, szóközzel elválasztott értékből áll:
 
 ```
-lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
+lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-Például:
+| Component | Description |
+|-----------|-------------|
+| `lat` | Szélességi fok tizedes fokokban |
+| `lon` | Hosszúsági fok tizedes fokokban |
+| `alt` | Magasság méterben (`0`, ha ismeretlen) |
+| `acc` | GPS pontosság méterben (`0`, ha ismeretlen) |
+
+**Példa — egy hárompontos útvonal:**
 ```
-38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
+13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
 ```
 
-## Elemzési szempontok
+Egy érvényes útvonal kialakításához legalább két pont szükséges.
 
-A geotrace kérdések használatakor vegye figyelembe:
+---
 
-1. A földrajzi adatok vizualizálásának és elemzésének módját (pl. GIS-szoftver)
-2. Az összetett nyomok esetleges adattisztítási vagy -egyszerűsítési szükségletét
-3. Az adatvédelmi és adatbiztonsági intézkedéseket a részletes térbeli adatok kezeléséhez
-4. Integrációt más térbeli adatforrásokkal az átfogó elemzés érdekében
+## Hogyan jelenik meg az rtSurvey-ben
 
-## Korlátozások
+Az rtSurvey webes űrlapján a `geotrace` egyszerű **szöveges mezőként** jelenik meg. Az adatgyűjtő begépeli vagy bemásolja a koordináta-karakterláncot. A jelenlegi webes űrlapon nincs beépített interaktív térképes választó ehhez a típushoz.
 
-- Pontos útvonalak nyomkövetése kis mobilképernyőkön kihívást jelenthet.
-- Az összetett nyomok jelentős tárhelyet és feldolgozási kapacitást igényelhetnek.
-- A folyamatos GPS-használat az automatikus nyomkövetéshez gyorsan lemeríthet az eszköz akkumulátorát.
-- A részletes útvonal adatok gyűjtésével adatvédelmi aggályok merülhetnek fel.
+### Pontok rögzítése interaktívan
+
+A terepi adatgyűjtéshez ajánlott minta a **`geopoint` kérdések ismétlődő csoportja (repeat group)** — minden pont a teljes GPS térképválasztót használja —, kombinálva egy `calculate` mezővel a geotrace karakterlánc előállításához:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | path_points | Rögzítsen minden útvonalpontot | |
+| geopoint | point | Érintse meg a pont rögzítéséhez | |
+| end repeat | path_points | | |
+| calculate | geotrace_value | | `join(';', ${path_points/point})` |
+
+A kiszámított karakterlánc ezután tárolható egy `text` kérdésben, vagy felhasználható a `geotrace` típusban.
+
+---
+
+## Példa a használatra
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geotrace | farm_boundary_path | Rögzítse a gazdasághoz vezető utat | Adja meg az egyes útvonalpontokat pontosvesszővel elválasztva | yes |
+
+---
+
+## Legjobb gyakorlatok
+
+1. Használjon `geopoint` kérdésekből álló ismétlődő csoportot az interaktív térképalapú gyűjtéshez, majd kapcsolja össze az értékeket — ez az adatgyűjtőknek GPS-választót biztosít minden egyes ponthoz.
+2. Adja meg az elvárt formátumot a `hint` oszlopban, ha kézi koordináta-bevitelre van szükség.
+3. Ellenőrizze a jelenlétet a `required = yes` beállítással, ha az útvonal kötelező.
+4. Tervezze meg az adattisztítást — a manuálisan megadott útvonalak pontossága következetlen lehet.
+
+## Korlátozások (Limitations)
+
+- Az rtSurvey webes űrlapján nincs beépített interaktív térképes választó a `geotrace` típushoz.
+- A koordináta-karakterlánc hosszú lehet összetett útvonalak esetén — ezt tartsa szem előtt az űrlap teljesítménye és a tárhely szempontjából.
+- Az útvonal topológiájának ellenőrzése (pl. minimális pontszám, önmetszés) az XLSForm korlátozásain kívüli utófeldolgozást igényel.

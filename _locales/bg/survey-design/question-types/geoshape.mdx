@@ -1,80 +1,85 @@
 ---
-title: "Геофигура"
-description: "Въпросите от тип geoshape позволяват на респондентите да рисуват фигури на карта, заснемайки сложни географски данни."
+title: "Геоформа"
+description: "Въпросите за геоформа улавят затворен полигон, дефиниран от последователност от GPS точки."
 ---
 
-The geoshape question type in XLSForms and rtSurvey enables respondents to draw shapes (polygons) on a map, capturing complex geographical data. This feature is particularly useful for mapping areas, defining boundaries, or marking regions of interest in spatial surveys.
+Типът въпрос `geoshape` улавя затворен полигон — поредица от GPS координати, където първата и последната точка са еднакви. В уеб формата на rtSurvey това се изобразява като **текстово поле**, в което анкетьорът въвежда или поставя низа с координати директно.
 
 ## Основна спецификация на XLSForm
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geoshape | field_area  | Draw the boundary of the field  |
+| type     | name        | label                            |
+|----------|-------------|----------------------------------|
+| geoshape | field_area  | Начертайте границата на полето   |
+| geoshape | zone        | Запишете границата на зоната     |
 
-For more details on the basic geoshape question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+За стандартната спецификация вижте [документацията на XLSForm](https://xlsform.org/en/#question-types).
 
-## Приложения
-
-Geoshape questions are commonly used for:
-
-1. Mapping field boundaries in agricultural surveys
-2. Defining areas of environmental impact
-3. Marking zones in urban planning studies
-4. Outlining regions for geological surveys
-5. Capturing complex geographical features for spatial analysis
-
-## Най-добри практики
-
-1. Ensure the device has location services enabled and permissions granted.
-2. Provide clear instructions on how to draw the shape and what area should be included.
-3. Consider using satellite imagery or base maps to help respondents accurately draw shapes.
-4. Be mindful of the potential complexity of shapes and their impact on data size and processing.
-
-## Примерна употреба
-
-Here's an example of how you might use a geoshape question in a survey:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geoshape | forest_area    | Outline the boundary of the forest patch   | Use at least 3 points to create a closed shape |
-
-## Разширения на rtSurvey
-
-While the basic XLSForm specification for geoshape questions is straightforward, rtSurvey may offer additional features or customizations:
-
-1. Integration with offline maps for remote areas
-2. Options to set minimum and maximum number of points for the shape
-3. Ability to edit or refine shapes after initial drawing
-4. Support for different shape types (e.g., rectangles, circles) in addition to free-form polygons
-
-(Note: The specific extensions available in rtSurvey for geoshape questions would need to be confirmed and detailed here.)
+---
 
 ## Формат на данните
 
-Geoshape data is typically stored as a string of space-separated coordinate pairs, enclosed in parentheses:
+Съхранява се като списък с точки, разделени с точка и запетая, без **интервали около точките и запетаите**. Всяка точка се състои от четири стойности, разделени с интервал:
 
 ```
-(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-For example:
+| Компонент | Описание |
+|-----------|-------------|
+| `lat` | Географска ширина в десетични градуси |
+| `lon` | Географска дължина в десетични градуси |
+| `alt` | Надморска височина в метри (`0`, ако е неизвестна) |
+| `acc` | GPS точност в метри (`0`, ако е неизвестна) |
+
+**Полигонът трябва да бъде затворен** — последната точка трябва да е същата като първата.
+
+**Пример — четириточков полигон (триъгълник, затворен):**
 ```
-(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
 ```
 
-## Съображения за анализ
+За формиране на валиден полигон са необходими минимум три различни точки плюс затварящото повторение.
 
-When using geoshape questions, consider:
+---
 
-1. How the geographic data will be visualized and analyzed (e.g., GIS software)
-2. The potential need for data cleaning or simplification of complex shapes
-3. Privacy and data protection measures for handling detailed spatial data
-4. Integration with other spatial data sources for comprehensive analysis
+## Как се изобразява в rtSurvey
+
+В уеб формата на rtSurvey `geoshape` се изобразява като обикновено **текстово поле**. Анкетьорът въвежда или поставя низа с координати. В текущата уеб форма няма вграден интерактивен инструмент за избор на полигон върху карта за този тип.
+
+### Интерактивно събиране на точки на полигон
+
+Препоръчителният модел за събиране на терен е **група от повтарящи се въпроси (repeat group) от тип `geopoint`** — всеки връх използва пълния инструмент за избор на GPS върху карта — комбинирана с `calculate` за генериране на низа за геоформата:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | polygon_points | Запишете всеки ъгъл | |
+| geopoint | point | Докоснете за запис на ъгъл | |
+| end repeat | polygon_points | | |
+| calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
+
+След обединяването добавете ръчно първата точка, за да затворите полигона, или използвайте втори изчислителен ред (`calculate`), за да я конкатенирате.
+
+---
+
+## Примери за употреба
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geoshape | farm_boundary | Запишете границата на полето | Въведете всички ъгли, разделени с точка и запетая. Първата и последната точка трябва да са еднакви. | yes |
+
+---
+
+## Най-добри практики
+
+1. Използвайте група от повтарящи се въпроси от тип `geopoint` за интерактивно събиране на базата на карта и обединете стойностите — това дава на анкетьорите GPS инструмент за избор за всеки връх.
+2. Винаги затваряйте полигона (повторете първата точка в края) преди изпращане.
+3. Включете очаквания формат в колоната `hint`, когато се изисква ръчно въвеждане на координати.
+4. Изисквайте поне 3 различни ъглови точки за валиден полигон — налагайте това чрез инструкции, а не чрез ограничения в XLSForm.
+5. Използвайте `geopoint` за въпроси с едно местоположение и `geoshape` само когато демаркацията на площ е действителната цел на проучването.
 
 ## Ограничения
 
-- Drawing accurate shapes on small mobile screens can be challenging.
-- Complex shapes may require significant storage and processing capacity.
-- Geoshape questions may not be suitable for all types of surveys or respondents.
-- There may be privacy concerns associated with collecting detailed spatial data.
-
+- В уеб формата на rtSurvey няма вграден интерактивен инструмент за избор на полигон върху карта за `geoshape`.
+- Полигонът трябва да бъде затворен ръчно — няма механизъм за автоматично затваряне в режима на текстово въвеждане.
+- Валидирането на топологията на полигона (напр. липса на самопресичане, минимална площ) изисква последваща обработка извън ограниченията на XLSForm.
+- Дългите граници с много върхове генерират големи текстови низове.

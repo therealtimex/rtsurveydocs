@@ -1,77 +1,81 @@
 ---
 title: "Geotrace"
-description: "Pertanyaan geotrace memungkinkan responden menangkap serangkaian titik yang terhubung pada peta, membuat garis atau jalur sebagai bagian dari survei."
+description: "Pertanyaan Geotrace menangkap serangkaian titik GPS yang membentuk garis atau jalur."
 ---
 
-Tipe pertanyaan geotrace dalam XLSForm dan rtSurvey memungkinkan responden menangkap serangkaian titik yang terhubung pada peta, membuat garis atau jalur. Fitur ini sangat berguna untuk memetakan rute, batas, atau fitur linier dalam survei spasial.
+Jenis pertanyaan `geotrace` menangkap urutan koordinat geografis yang membentuk garis atau jalur (polyline). Dalam formulir web rtSurvey, ini dirender sebagai **input teks** di mana enumerator memasukkan atau menempelkan string koordinat secara langsung.
 
-## Spesifikasi XLSForm Dasar
+## Spesifikasi Dasar XLSForm
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geotrace | river_path  | Lacak jalur sungai              |
+| type     | name        | label                        |
+|----------|-------------|------------------------------|
+| geotrace | river_path  | Telusuri jalur sungai |
+| geotrace | road_route  | Rekam rute jalan |
 
-Untuk detail lebih lanjut tentang tipe pertanyaan geotrace dasar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk spesifikasi standar, lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
-## Penggunaan
+---
 
-Pertanyaan geotrace umum digunakan untuk:
+## Format Data (Data Format)
 
-1. Pemetaan rute atau jalur yang ditempuh selama survei lapangan
-2. Menelusuri fitur linier seperti jalan, sungai, atau batas
-3. Menangkap cakupan infrastruktur linier (misalnya, pipa, jalur listrik)
-4. Merekam jalur perjalanan dalam studi transportasi
-5. Mendefinisikan transek dalam survei ekologi
+Disimpan sebagai daftar titik yang dipisahkan titik koma dengan **tanpa spasi di sekitar titik koma**. Setiap titik adalah empat nilai yang dipisahkan spasi:
+
+```
+lat lon alt acc;lat lon alt acc;lat lon alt acc
+```
+
+| Component | Description |
+|-----------|-------------|
+| `lat` | Lintang dalam derajat desimal |
+| `lon` | Bujur dalam derajat desimal |
+| `alt` | Ketinggian dalam meter (`0` jika tidak diketahui) |
+| `acc` | Akurasi GPS dalam meter (`0` jika tidak diketahui) |
+
+**Contoh — jalur tiga titik:**
+```
+13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
+```
+
+Minimal dua titik diperlukan untuk membentuk jalur yang valid.
+
+---
+
+## Cara kerjanya di rtSurvey
+
+Dalam formulir web rtSurvey, `geotrace` dirender sebagai **bidang teks** biasa. Enumerator mengetik atau menempelkan string koordinat. Tidak ada pemilih peta interaktif bawaan untuk jenis ini dalam formulir web saat ini.
+
+### Mengumpulkan titik secara interaktif
+
+Pola yang direkomendasikan untuk pengumpulan lapangan adalah **grup pengulangan (repeat group) dari pertanyaan `geopoint`** — setiap titik menggunakan pemilih peta GPS lengkap — dikombinasikan dengan `calculate` untuk menghasilkan string geotrace:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | path_points | Rekam setiap titik jalan (waypoint) | |
+| geopoint | point | Ketuk untuk merekam titik | |
+| end repeat | path_points | | |
+| calculate | geotrace_value | | `join(';', ${path_points/point})` |
+
+String yang dihitung kemudian dapat disimpan dalam pertanyaan `text` atau digunakan dalam `geotrace`.
+
+---
+
+## Contoh penggunaan
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geotrace | farm_boundary_path | Rekam jalur akses ke peternakan | Masukkan setiap titik jalan yang dipisahkan oleh titik koma | yes |
+
+---
 
 ## Praktik Terbaik
 
-1. Pastikan layanan lokasi perangkat diaktifkan dan izin diberikan.
-2. Berikan instruksi yang jelas tentang cara menelusuri jalur dan fitur apa yang harus disertakan.
-3. Pertimbangkan menggunakan citra satelit atau peta dasar untuk membantu responden menelusuri jalur secara akurat.
-4. Perhatikan potensi kompleksitas jejak dan dampaknya pada ukuran dan pemrosesan data.
+1. Gunakan grup pengulangan pertanyaan `geopoint` untuk pengumpulan berbasis peta interaktif, lalu gabungkan nilainya — ini memberi enumerator pemilih GPS untuk setiap titik individu.
+2. Sertakan format yang diharapkan dalam kolom `hint` saat input koordinat manual diperlukan.
+3. Validasi keberadaan dengan `required = yes` saat jalur bersifat wajib.
+4. Rencanakan pembersihan data — jalur yang dimasukkan secara manual mungkin memiliki presisi yang tidak konsisten.
 
-## Contoh Penggunaan
+## Batasan (Limitations)
 
-Berikut adalah contoh cara menggunakan pertanyaan geotrace dalam survei:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geotrace | hiking_trail   | Lacak jalur pendakian                      | Mulai dari pintu masuk jalur dan berakhir di puncak |
-
-## Ekstensi rtSurvey
-
-Meskipun spesifikasi XLSForm dasar untuk pertanyaan geotrace sederhana, rtSurvey mungkin menawarkan fitur atau kustomisasi tambahan:
-
-1. Integrasi dengan peta offline untuk area terpencil
-2. Opsi untuk mengatur jumlah minimum dan maksimum titik untuk jejak
-3. Kemampuan untuk mengedit atau menyempurnakan jejak setelah penggambaran awal
-4. Dukungan untuk pelacakan otomatis pada interval yang ditetapkan selama gerakan
-
-## Format Data
-
-Data geotrace biasanya disimpan sebagai string pasangan koordinat yang dipisahkan spasi, mirip dengan geoshape tetapi tanpa titik penutup:
-
-```
-lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
-```
-
-Contoh:
-```
-38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
-```
-
-## Pertimbangan untuk Analisis
-
-Saat menggunakan pertanyaan geotrace, pertimbangkan:
-
-1. Bagaimana data geografis akan divisualisasikan dan dianalisis (misalnya, perangkat lunak GIS)
-2. Potensi kebutuhan pembersihan data atau penyederhanaan jejak yang kompleks
-3. Tindakan privasi dan perlindungan data untuk menangani data spasial yang terperinci
-4. Integrasi dengan sumber data spasial lain untuk analisis yang komprehensif
-
-## Keterbatasan
-
-- Menelusuri jalur yang akurat di layar mobile yang kecil bisa menjadi tantangan.
-- Jejak yang kompleks mungkin memerlukan kapasitas penyimpanan dan pemrosesan yang signifikan.
-- Penggunaan GPS terus-menerus untuk pelacakan otomatis dapat menguras baterai perangkat dengan cepat.
-- Mungkin ada kekhawatiran privasi terkait pengumpulan data jalur yang terperinci.
+- Tidak ada pemilih peta interaktif bawaan untuk `geotrace` di formulir web rtSurvey.
+- String koordinat bisa panjang untuk jalur yang kompleks — ingatlah ini untuk kinerja dan penyimpanan formulir.
+- Memvalidasi topologi jalur (misalnya, jumlah titik minimum, perpotongan sendiri) memerlukan pemrosesan pasca di luar batasan XLSForm.

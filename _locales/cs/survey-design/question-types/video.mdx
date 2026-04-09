@@ -1,83 +1,155 @@
 ---
 title: "Video"
-description: "Otázky video umožňují respondentům nahrávat a odesílat videosoubory jako součást průzkumu."
+description: "Otázky typu video umožňují respondentům nahrávat a odesílat soubory videa jako součást průzkumu."
 ---
 
-Typ otázky `video` umožňuje respondentům **nahrávat video** nebo nahrát existující videosoubor jako součást jejich odpovědi na průzkum. Je užitečný pro zachycení vizuálních důkazů, ukázek, podmínek prostředí nebo jakýchkoli informací, které těží z pohybu a zvuku dohromady.
+Typ otázky `video` umožňuje respondentům **nahrát video** nebo nahrát existující soubor videa jako součást jejich odpovědi v průzkumu. Je užitečný pro zachycení vizuálních důkazů, ukázek, podmínek prostředí nebo jakýchkoli informací, které těží z pohybu a zvuku dohromady.
 
 ## Základní specifikace XLSForm
 
 | type  | name        | label                              |
 |-------|-------------|-------------------------------------|
-| video | demo_video  | Prosím nahrajte krátkou ukázku |
+| video | demo_video  | Nahrajte prosím krátkou ukázku      |
+
+Další podrobnosti o standardním typu otázky video naleznete v [specifikaci XLSForm](https://xlsform.org/en/#question-types).
 
 ## Použití
 
-Otázky video se běžně používají pro:
+Otázky s videem se běžně používají pro:
 
-1. Dokumentování terénních podmínek — poškození silnic, stav infrastruktury, zdraví plodin
-2. Nahrávání ukázek produktů nebo kontrol souladu s postupy
-3. Sběr videosvedectví od respondentů
-4. Zachycení důkazů vyžadujících prostorový kontext (např. rozsah a rozsah problémové oblasti)
-5. Dokumentace před/po pro průzkumy monitorování a hodnocení
+1. Dokumentování podmínek v terénu — poškození silnic, stav infrastruktury, zdraví plodin
+2. Nahrávání ukázek produktů nebo kontrol dodržování postupů
+3. Shromažďování video výpovědí od respondentů
+4. Pořizování důkazů, které vyžadují prostorový kontext (např. velikost a rozsah problémové oblasti)
+5. Dokumentaci „před a po“ pro monitorovací a vyhodnocovací průzkumy
 
-## Formát dat
+## Datový formát
 
-Videosoubory jsou uloženy jako binární přílohy:
+Soubory videa se ukládají jako binární přílohy:
 
 - **Formát:** MP4 nebo MOV (mobilní nahrávání)
 - **Pojmenování:** `{instanceID}-{fieldname}.mp4` (nebo ekvivalent)
-- **Úložiště:** Nahráno do mediální složky serveru a propojeno se záznamem odeslání
-- **Přístup:** Přehratelné a ke stažení z rozhraní správy odeslání
+- **Úložiště:** Nahráno do složky médií na serveru a propojeno se záznamem odeslání
+- **Přístup:** Přehrát a stáhnout lze z rozhraní pro správu odeslaných dat
 
 ## Rozšíření rtSurvey
 
-### Maximální délka
+### Maximální doba trvání
 
-Použijte sloupec `parameters` pro omezení délky záznamu:
+Pomocí sloupce `parameters` můžete omezit délku nahrávání:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | site_visit | Nahrajte podmínky na místě | `max-duration=60` |
+| video | site_visit | Nahrajte stav daného místa | `max-duration=60` |
 
-`max-duration` je v sekundách. Záznam se automaticky zastaví po dosažení limitu.
+`max-duration` je v sekundách. Nahrávání se po dosažení limitu automaticky zastaví.
 
 ### Kvalita / rozlišení
 
-Ovládejte rozlišení záznamu přes `parameters`:
+Pomocí `parameters` můžete ovládat rozlišení nahrávání:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| video | evidence | Nahrajte videodůkazy | `quality=low` |
+| video | evidence | Nahrajte video důkaz | `quality=low` |
 
-Podporované hodnoty: `low` (rychlejší nahrávání), `normal` (výchozí), `high`. Používejte `low` v oblastech s omezeným připojením.
+Podporované hodnoty: `low` (rychlejší nahrávání), `normal` (výchozí), `high`. V oblastech s omezeným připojením používejte `low`.
+
+### Nahrání existujícího videa
+
+Na mobilních zařízeních si respondent může zvolit **nahrání existujícího videa** z galerie zařízení místo nahrávání nového. Toto je ve výchozím nastavení povoleno v nativní integraci fotoaparátu/galerie.
+
+### Přehrání před odesláním
+
+Na mobilním zařízení lze nahraný klip před pokračováním zkontrolovat. Není vyžadována žádná další konfigurace.
+
+### Rozložení vloženého tlačítka
+
+Přidejte `inline`, aby se kamera vykreslila jako **kruhové tlačítko s ikonou** vedle štítku místo oblasti pro nahrávání na celou šířku.
+
+```
+| type  | name  | label        | appearance                              |
+|-------|-------|--------------|----------------------------------------|
+| video | clip  | Nahrajte video | inline display{right}                  |
+| video | clip  | Nahrajte video | inline display{left, large}            |
+| video | clip  | Nahrajte video | inline display{center, large, <0099FF/>} |
+```
+
+**Pozice tlačítka** — `left`, `right` *(výchozí)*, `top`, `center`, `bottom`
+
+**Velikost tlačítka** — `small` *(výchozí)*, `medium`, `large`
+
+**Barva tlačítka** — přidejte hex kód barvy do `display{}`, abyste přepsali primární barvu:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Ovládání po pořízení — `results{}`:**
+
+| Appearance | Účinek |
+|---|---|
+| `results{hide(capture)}` | Skryje tlačítko nahrávání po pořízení videa |
+| `results{hide(review)}` | Skryje miniaturu přehrávání po pořízení |
+| `results{hide(filename)}` | Skryje název souboru a dobu trvání |
+| `results{left}` | Přesune ikonu doleva po pořízení |
+
+Příklad — skrytí tlačítka nahrávání, zachování přehrávání:
+```
+inline display{right} results{hide(capture)}
+```
+
+### `thumbnail-square-[WxH]` — náhled videa s pevnou velikostí
+
+Po pořízení zobrazí video jako vložený přehrávač s pevnou velikostí namísto zobrazení na celou šířku. Zkombinujte s `inline` pro kompaktní rozvržení.
+
+```
+inline display{right} thumbnail-square-[120x90]
+inline display{center} thumbnail-square-[200x150]
+```
+
+Šířka a výška jsou v pixelech.
+
+### `invisible auto-show` — automatické otevření rekordéru
+
+Skryje widget otázky z rozvržení, ale automaticky otevře video rekordér při načtení stránky.
+
+```
+invisible auto-show
+inline invisible auto-show
+```
+
+### Potlačení štítku
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Příklad použití
 
-### Video inspekce místa s limitem
+### Inspekční video místa s limitem
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| video | site_video | Nahrajte vodní bod | Projděte celé zařízení. Max 90 sekund. | `max-duration=90 quality=normal` |
+| video | site_video | Nahrajte vodní zdroj | Obejděte celé zařízení. Max 90 sekund. | `max-duration=90 quality=normal` |
 
-### Podmíněné video — pouze pokud je nahlášeno poškození
+### Podmíněné video — pouze v případě nahlášení poškození
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
-| select_one yesno | damage_found | Bylo nalezeno poškození? | | |
+| select_one yesno | damage_found | Bylo zjištěno poškození? | | |
 | video | damage_video | Nahrajte video poškození | `${damage_found} = 'yes'` | `${damage_found} = 'yes'` |
 
 ## Osvědčené postupy
 
-1. Nastavte `max-duration` — neomezené videonahrávky mohou snadno přesáhnout 100 MB a nepodaří se je nahrát při slabém připojení.
-2. Používejte `quality=low` pro monitorovací průzkumy, kde jsou vizuální důkazy požadovány, ale jemné detaily nejsou nutné — výrazně snižuje velikost souboru.
-3. Pište konkrétní pokyny pro nahrávání do sloupce `hint` (např. „Projděte celou budovu, držte kameru stabilně").
-4. Zvažte, zda je video nezbytné — fotografie (`image`) je obvykle dostačující pro statické důkazy a produkuje mnohem menší soubory.
-5. Testujte výkon nahrávání na skutečné terénní síti před nasazením.
+1. Nastavte `max-duration` — neomezené nahrávání videa může snadno přesáhnout 100 MB a při slabém připojení se nemusí podařit nahrát na server.
+2. Pro monitorovací průzkumy, kde jsou vyžadovány vizuální důkazy, ale nikoli jemné detaily, používejte `quality=low` — dramaticky to snižuje velikost souboru.
+3. Do sloupce `hint` napište konkrétní pokyny k nahrávání (např. „Obejděte celou budovu, držte kameru klidně“).
+4. Zvažte, zda je video nezbytné — pro statické důkazy obvykle stačí fotografie (`image`), která generuje mnohem menší soubory.
+5. Před nasazením otestujte výkon nahrávání na skutečné síti v terénu.
 
 ## Omezení
 
-- Videosoubory jsou velmi velké — 1minutové video při normální kvalitě je obvykle 20–60 MB v závislosti na zařízení.
-- Nahrávání velkých videosoubory vyžaduje dobré síťové připojení; zvažte vyžadování synchronizace přes Wi-Fi pro formuláře s velkou spotřebou videa.
-- Ne všechny webové prohlížeče podporují nahrávání videa přes MediaRecorder — Chrome je nejspolehlivější.
-- Analýza videoodpovědí je ruční a časově náročná; používejte střídmě a pouze tehdy, když obsah videa přidává jedinečnou hodnotu.
+- Soubory videa jsou velmi velké — 1minutové video v běžné kvalitě má obvykle 20–60 MB v závislosti na zařízení.
+- Nahrávání velkých souborů videa vyžaduje dobré síťové připojení; u formulářů s velkým množstvím videa zvažte požadavek na synchronizaci přes Wi-Fi.
+- Ne všechny webové prohlížeče podporují nahrávání videa přes MediaRecorder — nejspolehlivější je Chrome.
+- Analýza video odpovědí je manuální a časově náročná; používejte střídmě a pouze tehdy, když video obsah přináší jedinečnou hodnotu.

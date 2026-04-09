@@ -3,56 +3,56 @@ title: "Archivo"
 description: "Las preguntas de archivo permiten a los encuestados cargar documentos y otros archivos como parte de sus respuestas a la encuesta."
 ---
 
-El tipo de pregunta `file` permite a los encuestados **cargar cualquier archivo** desde su dispositivo — documentos, hojas de cálculo, PDFs u otros tipos de archivo. A diferencia de `image`, `audio` y `video` que lanzan herramientas de captura específicas, `file` abre un selector de archivos de propósito general.
+El tipo de pregunta `file` permite a los encuestados **cargar cualquier archivo** desde su dispositivo: documentos, hojas de cálculo, PDF u otros tipos de archivos. A diferencia de `image`, `audio` y `video`, que inician herramientas de captura específicas, `file` abre un selector de archivos de propósito general.
 
 ## Especificación básica de XLSForm
 
-| type | name      | label                          |
-|------|-----------|--------------------------------|
-| file | document  | Por favor cargue su documento  |
+| type | name      | label                        |
+|------|-----------|------------------------------|
+| file | document  | Por favor cargue su documento |
 
 Para obtener más detalles sobre el tipo de pregunta de archivo estándar, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
 
 ## Usos
 
-Las preguntas de archivo se usan comúnmente para:
+Las preguntas de archivo se utilizan comúnmente para:
 
 1. Recopilar documentos de respaldo (recibos, certificados, contratos, informes)
-2. Cargar formularios en papel completados que fueron escaneados
-3. Recopilar hojas de cálculo o exportaciones de datos de otros sistemas
-4. Cualquier tipo de archivo digital que image/audio/video no cubra
+2. Cargar formularios de papel completados que fueron escaneados
+3. Reunir hojas de cálculo o exportaciones de datos de otros sistemas
+4. Cualquier tipo de archivo digital que la imagen/audio/video no cubra
 
 ## Formato de datos
 
 Los archivos cargados se almacenan como archivos adjuntos binarios:
 
-- **Formato:** Preservado en formato original (PDF, XLSX, DOCX, etc.)
+- **Formato:** Conservado en el formato original (PDF, XLSX, DOCX, etc.)
 - **Nomenclatura:** `{instanceID}-{fieldname}.{extension}`
-- **Almacenamiento:** Cargado a la carpeta multimedia del servidor junto con el envío
+- **Almacenamiento:** Cargado en la carpeta de medios del servidor junto con el envío
 - **Acceso:** Descargable desde la interfaz de gestión de envíos
 
 ## Extensiones de rtSurvey
 
-### Tipos de archivo aceptados
+### Tipos de archivos aceptados
 
-Use la columna `parameters` para restringir qué tipos de archivo se pueden seleccionar:
+Use la columna `parameters` para restringir qué tipos de archivos se pueden seleccionar:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
 | file | report | Cargar el informe de inspección | `accept=.pdf` |
 | file | spreadsheet | Cargar el archivo de datos | `accept=.xlsx,.csv` |
 
-El parámetro `accept` usa la sintaxis estándar de extensión de archivo (separada por comas).
+El parámetro `accept` utiliza la sintaxis estándar de extensión de archivo (separada por comas).
 
-### Orientación sobre el tamaño de archivo
+### Guía de tamaño de archivo
 
-rtSurvey no impone un límite de tamaño de archivo fijo a nivel de pregunta, pero se aplica el límite de carga del servidor. Use `hint` para comunicar las expectativas al encuestador:
+rtSurvey no impone un límite estricto de tamaño de archivo a nivel de pregunta, pero se aplica el límite de carga del servidor. Use `hint` para comunicar las expectativas al encuestador:
 
 | type | name | label | hint |
 |------|------|-------|------|
 | file | receipt | Cargar el recibo de pago | Aceptado: PDF o imagen. Tamaño máximo de archivo: 5 MB |
 
-### Integración con el sistema de archivos del dispositivo y almacenamiento en la nube
+### Integración con el sistema de archivos del dispositivo y el almacenamiento en la nube
 
 En Android e iOS, la pregunta `file` abre el selector de archivos nativo del dispositivo, que puede incluir acceso a:
 - Almacenamiento local del dispositivo
@@ -60,40 +60,82 @@ En Android e iOS, la pregunta `file` abre el selector de archivos nativo del dis
 - iCloud Drive (iOS)
 - Google Drive, Dropbox (si están instalados)
 
-En web, abre el cuadro de diálogo estándar de carga de archivos del navegador.
+En la web, abre el cuadro de diálogo de carga de archivos estándar del navegador.
+
+### Diseño de botones en línea (Inline button layout)
+
+Agregue `inline` para representar la carga como un **botón de icono circular** junto a la etiqueta en lugar de un selector de archivos de ancho completo.
+
+```
+| type | name | label           | appearance                              |
+|------|------|-----------------|-----------------------------------------|
+| file | doc  | Cargar documento | inline display{right}                   |
+| file | doc  | Cargar documento | inline display{left, large}             |
+| file | doc  | Cargar documento | inline display{center, large, <0099FF/>} |
+```
+
+**Posición del botón** — `left`, `right` *(predeterminado)*, `top`, `center`, `bottom`
+
+**Tamaño del botón** — `small` *(predeterminado)*, `medium`, `large`
+
+**Color del botón** — agregue un color hexadecimal dentro de `display{}` para anular el color primario:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Control posterior a la captura — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Oculta el botón de carga después de adjuntar un archivo |
+| `results{hide(review)}` | Oculta el botón de revisión/vista previa después de la carga |
+| `results{hide(filename)}` | Oculta el nombre del archivo mostrado después de la carga |
+| `results{left}` | Mueve el icono a la izquierda después de la carga |
+
+Ejemplo — ocultar el botón de carga después de adjuntar el archivo:
+```
+inline display{right} results{hide(capture)}
+```
+
+### Suprimir la etiqueta (Suppress the label)
+
+```
+inline text-nolabel display{center, large}
+```
 
 ## Ejemplo de uso
 
-### Carga de PDF requerida
+### Carga de PDF obligatoria
 
 | type | name | label | hint | required | required_message |
 |------|------|-------|------|----------|-----------------|
-| file | signed_consent | Cargar el formulario de consentimiento firmado | Solo PDF, máx 2MB | yes | Se requiere un formulario de consentimiento |
+| file | signed_consent | Cargar el formulario de consentimiento firmado | Solo PDF, máx. 2 MB | yes | Se requiere un formulario de consentimiento |
 
 ### Carga de documento condicional
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| select_one yesno | has_land_title | ¿El hogar tiene un título de tierra? | |
-| file | land_title_doc | Cargar una foto o escaneo del título de tierra | `${has_land_title} = 'yes'` |
+| select_one yesno | has_land_title | ¿Tiene el hogar un título de propiedad de la tierra? | |
+| file | land_title_doc | Cargue una foto o escaneo del título de propiedad de la tierra | `${has_land_title} = 'yes'` |
 
 ## Mejores prácticas
 
-1. Use `accept` para restringir los tipos de archivo; esto evita que los encuestadores carguen accidentalmente archivos incorrectos.
-2. Incluya siempre orientación sobre tamaño y formato en la columna `hint`.
-3. Para fotos e imágenes, use el tipo `image` en su lugar; ofrece mejor compresión y manejo consistente del formato.
-4. Para encuestas grandes con archivos adjuntos, planifique su almacenamiento de datos y ancho de banda de descarga en consecuencia.
-5. Pruebe el selector de archivos en el tipo de dispositivo de destino (Android vs. iOS vs. web) antes de la implementación; el acceso a unidades en la nube varía.
+1. Use `accept` para restringir los tipos de archivos; esto evita que los encuestadores carguen accidentalmente archivos incorrectos.
+2. Incluya siempre orientación sobre el tamaño y el formato en la columna `hint`.
+3. Para fotos e imágenes, use el tipo `image` en su lugar; ofrece una mejor compresión y un manejo de formato consistente.
+4. Para encuestas grandes con archivos adjuntos, planifique su almacenamiento de datos y el ancho de banda de descarga en consecuencia.
+5. Pruebe el selector de archivos en el tipo de dispositivo de destino (Android vs. iOS vs. web) antes de la implementación; el acceso a las unidades en la nube varía.
 
 ## Consideraciones sobre el manejo de datos
 
-- Los archivos se almacenan en su formato original; rtSurvey no los convierte ni comprime.
-- Analice los archivos después de descargarlos; rtSurvey no extrae ni indexa el contenido de los archivos.
+- Los archivos se almacenan en su formato original; rtSurvey no los convierte ni los comprime.
+- Analice los archivos después de la descarga: rtSurvey no extrae ni indexa el contenido de los archivos.
 - Los archivos adjuntos grandes aumentan significativamente el tiempo necesario para descargar un conjunto de datos completo.
 
 ## Limitaciones
 
-- Las preguntas de archivo no validan el contenido del archivo; solo se aplica la verificación de extensión de archivo mediante `accept` a nivel de UI.
+- Las preguntas de archivo no validan el contenido del archivo; solo se aplica la verificación de la extensión del archivo a través de `accept` a nivel de interfaz de usuario.
 - Los archivos muy grandes (100 MB+) pueden agotar el tiempo de espera en la carga en entornos de baja conectividad.
-- Los encuestadores sin conexión pueden adjuntar archivos pero no se cargarán hasta que se restaure la conectividad.
+- Los encuestadores fuera de línea pueden adjuntar archivos, pero no se cargarán hasta que se restaure la conectividad.
 - Algunas configuraciones de dispositivos restringen el acceso a ciertas ubicaciones de almacenamiento (p. ej., políticas MDM corporativas).

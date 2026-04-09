@@ -1,77 +1,81 @@
 ---
 title: "Geotrace"
-description: "Geotrace questions उत्तरदाताओं को map पर connected points की series capture करने देते हैं, survey के हिस्से के रूप में lines या paths बनाते हैं।"
+description: "Geotrace प्रश्न एक रेखा या पथ बनाने वाले GPS बिंदुओं की एक श्रृंखला को कैप्चर करते हैं।"
 ---
 
-XLSForms और rtSurvey में geotrace question type उत्तरदाताओं को map पर connected points की series capture करने में सक्षम बनाता है, lines या paths बनाता है। यह सुविधा routes map करने, boundaries trace करने, या spatial surveys में linear features के लिए विशेष रूप से उपयोगी है।
+`geotrace` प्रश्न प्रकार एक रेखा या पथ (polyline) बनाने वाले भौगोलिक निर्देशांकों के एक अनुक्रम को कैप्चर करता है। rtSurvey के वेब फ़ॉर्म में, यह एक **टेक्स्ट इनपुट** के रूप में दिखाई देता है जहाँ गणनाकर्ता (enumerator) सीधे निर्देशांक स्ट्रिंग दर्ज करता है या पेस्ट करता है।
 
-## बुनियादी XLSForm विशिष्टता
+## बुनियादी XLSForm विनिर्देश (Specification)
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geotrace | river_path  | River का path trace करें       |
+| type     | name        | label                        |
+|----------|-------------|------------------------------|
+| geotrace | river_path  | नदी के पथ का पता लगाएं |
+| geotrace | road_route  | सड़क मार्ग रिकॉर्ड करें |
 
-Basic geotrace question type के बारे में अधिक जानकारी के लिए, [XLSForm specification](https://xlsform.org/en/#question-types) देखें।
+मानक विनिर्देश के लिए [XLSForm दस्तावेज़](https://xlsform.org/en/#question-types) देखें।
 
-## उपयोग
+---
 
-Geotrace questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+## डेटा प्रारूप (Data Format)
 
-1. Field surveys के दौरान लिए गए routes या paths map करना
-2. Roads, rivers, या boundaries जैसे linear features trace करना
-3. Linear infrastructure का extent capture करना (जैसे pipelines, power lines)
-4. Transportation studies में travel paths record करना
-5. Ecological surveys में transects define करना
+बिंदुओं की एक सेमीकोलन-अलग सूची के रूप में संग्रहीत किया जाता है जिसमें **सेमीकोलन के आसपास कोई स्थान नहीं होता है**। प्रत्येक बिंदु चार स्थान-अलग मान (space-separated values) होता है:
 
-## सर्वोत्तम प्रथाएँ
+```
+lat lon alt acc;lat lon alt acc;lat lon alt acc
+```
 
-1. सुनिश्चित करें कि device में location services enabled हों और permissions granted हों।
-2. Path कैसे trace करें और कौन से features शामिल होने चाहिए, इस पर clear instructions प्रदान करें।
-3. Paths accurately trace करने में उत्तरदाताओं की मदद के लिए satellite imagery या base maps का उपयोग करने पर विचार करें।
-4. Traces की potential complexity और data size और processing पर उनके प्रभाव के प्रति सावधान रहें।
+| Component | Description |
+|-----------|-------------|
+| `lat` | दशमलव डिग्री में अक्षांश (Latitude) |
+| `lon` | दशमलव डिग्री में देशांतर (Longitude) |
+| `alt` | मीटर में ऊंचाई (`0` यदि अज्ञात है) |
+| `acc` | मीटर में GPS सटीकता (`0` यदि अज्ञात है) |
+
+**उदाहरण — तीन बिंदुओं वाला पथ:**
+```
+13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
+```
+
+एक मान्य पथ बनाने के लिए कम से कम दो बिंदुओं की आवश्यकता होती है।
+
+---
+
+## rtSurvey में यह कैसे दिखता है
+
+rtSurvey वेब फ़ॉर्म में, `geotrace` एक सादे **टेक्स्ट फ़ील्ड** के रूप में दिखाई देता है। गणनाकर्ता निर्देशांक स्ट्रिंग टाइप करता है या पेस्ट करता है। वर्तमान वेब फ़ॉर्म में इस प्रकार के लिए कोई अंतर्निहित इंटरैक्टिव मानचित्र चयनकर्ता (map picker) नहीं है।
+
+### बिंदुओं को इंटरैक्टिव रूप से एकत्र करना
+
+फ़ील्ड संग्रह के लिए अनुशंसित पैटर्न `geopoint` प्रश्नों का एक **दोहराव समूह (repeat group)** है — प्रत्येक बिंदु पूर्ण GPS मानचित्र चयनकर्ता का उपयोग करता है — जिसे geotrace स्ट्रिंग उत्पन्न करने के लिए `calculate` के साथ जोड़ा जाता है:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | path_points | प्रत्येक वेब बिंदु (waypoint) रिकॉर्ड करें | |
+| geopoint | point | बिंदु रिकॉर्ड करने के लिए टैप करें | |
+| end repeat | path_points | | |
+| calculate | geotrace_value | | `join(';', ${path_points/point})` |
+
+परिकलित स्ट्रिंग को तब `text` प्रश्न में संग्रहीत किया जा सकता है या `geotrace` में उपयोग किया जा सकता है।
+
+---
 
 ## उदाहरण उपयोग
 
-यहाँ बताया गया है कि आप survey में geotrace question का उपयोग कैसे कर सकते हैं:
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geotrace | farm_boundary_path | खेत तक पहुंचने का मार्ग रिकॉर्ड करें | सेमीकोलन द्वारा अलग किया गया प्रत्येक वेब बिंदु दर्ज करें | yes |
 
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geotrace | hiking_trail   | Hiking trail का path trace करें            | Trailhead से शुरू करें और summit पर समाप्त करें |
+---
 
-## rtSurvey एक्सटेंशन
+## सर्वोत्तम प्रथाएं
 
-Basic XLSForm specification के अतिरिक्त, rtSurvey अतिरिक्त सुविधाएं या customizations प्रदान कर सकता है:
+1. इंटरैक्टिव मानचित्र-आधारित संग्रह के लिए `geopoint` प्रश्नों के दोहराव समूह का उपयोग करें, फिर मानों को जोड़ें — यह गणनाकर्ताओं को प्रत्येक व्यक्तिगत बिंदु के लिए एक GPS चयनकर्ता देता है।
+2. जब मैन्युअल निर्देशांक प्रविष्टि की आवश्यकता हो तो `hint` कॉलम में अपेक्षित प्रारूप शामिल करें।
+3. जब पथ अनिवार्य हो तो `required = yes` के साथ उपस्थिति सत्यापित करें।
+4. डेटा सफाई के लिए योजना बनाएं — मैन्युअल रूप से दर्ज किए गए पथों में असंगत सटीकता हो सकती है।
 
-1. Remote areas के लिए offline maps के साथ integration
-2. Trace के लिए minimum और maximum number of points set करने के विकल्प
-3. Initial drawing के बाद traces edit या refine करने की ability
-4. Movement के दौरान set intervals पर automatic tracing का समर्थन
+## सीमाएं (Limitations)
 
-## डेटा प्रारूप
-
-Geotrace data आमतौर पर space-separated coordinate pairs की string के रूप में store होती है, geoshape के समान लेकिन closing point के बिना:
-
-```
-lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
-```
-
-उदाहरण के लिए:
-```
-38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
-```
-
-## Analysis के लिए विचार
-
-Geotrace questions का उपयोग करते समय, विचार करें:
-
-1. Geographic data कैसे visualize और analyze होगा (जैसे GIS software)
-2. Complex traces की data cleaning या simplification की potential need
-3. Detailed spatial data handle करने के लिए privacy और data protection measures
-4. Comprehensive analysis के लिए अन्य spatial data sources के साथ integration
-
-## सीमाएं
-
-- Small mobile screens पर accurate paths trace करना challenging हो सकता है।
-- Complex traces के लिए significant storage और processing capacity की आवश्यकता हो सकती है।
-- Automatic tracing के लिए continuous GPS usage से device batteries जल्दी drain हो सकती हैं।
-- Detailed path data एकत्र करने से associated privacy concerns हो सकती हैं।
+- rtSurvey वेब फ़ॉर्म में `geotrace` के लिए कोई अंतर्निहित इंटरैक्टिव मानचित्र चयनकर्ता नहीं है।
+- जटिल पथों के लिए निर्देशांक स्ट्रिंग लंबी हो सकती है — फ़ॉर्म प्रदर्शन और भंडारण के लिए इसे ध्यान में रखें।
+- पथ टोपोलॉजी (जैसे, न्यूनतम बिंदु गणना, स्व-प्रतिच्छेदन) को मान्य करने के लिए XLSForm प्रतिबंधों के बाहर पोस्ट-प्रोसेसिंग की आवश्यकता होती है।

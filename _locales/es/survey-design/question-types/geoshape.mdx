@@ -1,72 +1,85 @@
 ---
 title: "Geoshape"
-description: "Las preguntas de geoshape permiten a los encuestados dibujar formas en un mapa, capturando datos geográficos complejos como parte de la encuesta."
+description: "Las preguntas de Geoshape capturan un polígono cerrado definido por una secuencia de puntos GPS."
 ---
 
-El tipo de pregunta geoshape en XLSForms y rtSurvey permite a los encuestados dibujar formas (polígonos) en un mapa, capturando datos geográficos complejos. Esta función es particularmente útil para mapear áreas, definir límites o marcar regiones de interés en encuestas espaciales.
+El tipo de pregunta `geoshape` captura un polígono cerrado: una serie de coordenadas GPS donde el primer y el último punto son iguales. En el formulario web de rtSurvey, esto se representa como una **entrada de texto** donde el encuestador ingresa o pega la cadena de coordenadas directamente.
 
 ## Especificación básica de XLSForm
 
-| type     | name        | label                             |
-|----------|-------------|-----------------------------------|
-| geoshape | field_area  | Dibujar el límite del campo       |
+| type     | name        | label                            |
+|----------|-------------|----------------------------------|
+| geoshape | field_area  | Dibuje el límite del campo       |
+| geoshape | zone        | Registre el límite de la zona    |
 
-Para obtener más detalles sobre el tipo de pregunta geoshape básico, consulte la [especificación de XLSForm](https://xlsform.org/en/#question-types).
+Para la especificación estándar, consulte la [documentación de XLSForm](https://xlsform.org/en/#question-types).
 
-## Usos
-
-Las preguntas de geoshape se usan comúnmente para:
-
-1. Mapear límites de campos en encuestas agrícolas
-2. Definir áreas de impacto ambiental
-3. Marcar zonas en estudios de planificación urbana
-4. Delinear regiones para encuestas geológicas
-5. Capturar características geográficas complejas para análisis espacial
-
-## Mejores prácticas
-
-1. Asegúrese de que el dispositivo tenga los servicios de localización habilitados y los permisos otorgados.
-2. Proporcione instrucciones claras sobre cómo dibujar la forma y qué área debe incluirse.
-3. Considere usar imágenes satelitales o mapas base para ayudar a los encuestados a dibujar formas con precisión.
-4. Sea consciente de la complejidad potencial de las formas y su impacto en el tamaño y procesamiento de datos.
-
-## Ejemplo de uso
-
-He aquí un ejemplo de cómo podría usar una pregunta de geoshape en una encuesta:
-
-| type     | name           | label                                         | hint                                                      |
-|----------|----------------|-----------------------------------------------|-----------------------------------------------------------|
-| geoshape | forest_area    | Delinear el límite del parche de bosque       | Use al menos 3 puntos para crear una forma cerrada        |
-
-## Extensiones de rtSurvey
-
-Si bien la especificación básica de XLSForm para preguntas de geoshape es sencilla, rtSurvey puede ofrecer características o personalizaciones adicionales:
-
-1. Integración con mapas sin conexión para áreas remotas
-2. Opciones para establecer el número mínimo y máximo de puntos para la forma
-3. Capacidad para editar o refinar formas después del dibujo inicial
-4. Soporte para diferentes tipos de formas (p. ej., rectángulos, círculos) además de polígonos de forma libre
+---
 
 ## Formato de datos
 
-Los datos de geoshape se almacenan típicamente como una cadena de pares de coordenadas separados por espacios, encerrados entre paréntesis:
+Almacenado como una lista de puntos separados por puntos y coma **sin espacios alrededor de los puntos y coma**. Cada punto son cuatro valores separados por espacios:
 
 ```
-(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-## Consideraciones para el análisis
+| Component | Description |
+|-----------|-------------|
+| `lat` | Latitud en grados decimales |
+| `lon` | Longitud en grados decimales |
+| `alt` | Altitud en metros (`0` si se desconoce) |
+| `acc` | Precisión del GPS en metros (`0` si se desconoce) |
 
-Al usar preguntas de geoshape, considere:
+**El polígono debe estar cerrado**: el último punto debe ser igual al primero.
 
-1. Cómo se visualizarán y analizarán los datos geográficos (p. ej., software GIS)
-2. La posible necesidad de limpieza o simplificación de datos de formas complejas
-3. Medidas de privacidad y protección de datos para manejar datos espaciales detallados
-4. Integración con otras fuentes de datos espaciales para análisis completo
+**Ejemplo — un polígono de cuatro puntos (triángulo, cerrado):**
+```
+13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
+```
+
+Se requiere un mínimo de tres puntos distintos más la repetición de cierre para formar un polígono válido.
+
+---
+
+## Cómo se representa en rtSurvey
+
+En el formulario web de rtSurvey, `geoshape` se representa como un **campo de texto** simple. El encuestador escribe o pega la cadena de coordenadas. No hay un selector de mapa de polígono interactivo incorporado para este tipo en el formulario web actual.
+
+### Recopilación interactiva de puntos de polígono
+
+El patrón recomendado para la recopilación de campo es un **grupo de repetición de preguntas `geopoint`** —cada vértice utiliza el selector de mapa GPS completo— combinado con un `calculate` para producir la cadena geoshape:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | polygon_points | Registre cada esquina | |
+| geopoint | point | Toque para registrar la esquina | |
+| end repeat | polygon_points | | |
+| calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
+
+Después de unir, agregue el primer punto manualmente para cerrar el polígono, o use un segundo cálculo para concatenarlo.
+
+---
+
+## Ejemplo de uso
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geoshape | farm_boundary | Registre el límite del campo | Ingrese todas las esquinas separadas por puntos y coma. El primer y el último punto deben ser iguales. | yes |
+
+---
+
+## Mejores prácticas
+
+1. Utilice un grupo de repetición de preguntas `geopoint` para la recopilación interactiva basada en mapas y una los valores; esto les da a los encuestadores un selector GPS para cada vértice.
+2. Cierre siempre el polígono (repita el primer punto al final) antes de enviar.
+3. Incluya el formato esperado en la columna `hint` cuando se requiera la entrada manual de coordenadas.
+4. Requiera al menos 3 puntos de esquina distintos para un polígono válido; imponga esto a través de instrucciones en lugar de restricciones de XLSForm.
+5. Utilice `geopoint` para preguntas de una sola ubicación y `geoshape` solo cuando la demarcación del área sea el objetivo real de la encuesta.
 
 ## Limitaciones
 
-- Dibujar formas precisas en pantallas móviles pequeñas puede ser un desafío.
-- Las formas complejas pueden requerir una capacidad de almacenamiento y procesamiento significativa.
-- Las preguntas de geoshape pueden no ser adecuadas para todos los tipos de encuestas o encuestados.
-- Puede haber preocupaciones de privacidad asociadas con la recopilación de datos espaciales detallados.
+- No hay un selector de mapa de polígono interactivo incorporado para `geoshape` en el formulario web de rtSurvey.
+- El polígono debe cerrarse manualmente; no hay un mecanismo de cierre automático en el modo de entrada de texto.
+- La validación de la topología del polígono (p. ej., no autoinsección, área mínima) requiere un procesamiento posterior fuera de las restricciones de XLSForm.
+- Los límites largos con muchos vértices producen cadenas de texto grandes.

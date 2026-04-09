@@ -1,99 +1,141 @@
 ---
 title: "Fájl"
-description: "A fájlkérdések lehetővé teszik a válaszadók számára, hogy dokumentumokat és egyéb fájlokat töltsenek fel felmérési válaszuk részeként."
+description: "A fájl típusú kérdések lehetővé teszik a válaszadók számára dokumentumok és egyéb fájlok feltöltését a kérdőívre adott válaszaik részeként."
 ---
 
-A `file` kérdéstípus lehetővé teszi a válaszadók számára, hogy **bármilyen fájlt töltsenek fel** az eszközükről – dokumentumokat, táblázatokat, PDF-eket vagy más fájltípusokat. Az `image`, `audio` és `video` kérdéstípusokkal ellentétben, amelyek speciális rögzítő eszközöket nyitnak meg, a `file` általános célú fájlböngészőt nyit meg.
+A `file` kérdéstípus lehetővé teszi a válaszadók számára, hogy **bármilyen fájlt feltöltsenek** eszközükről — dokumentumokat, táblázatokat, PDF-eket vagy egyéb fájltípusokat. Az `image`, `audio` és `video` típusokkal ellentétben, amelyek specifikus rögzítőeszközöket indítanak el, a `file` egy általános célú fájlválasztót nyit meg.
 
-## Alapvető XLSForm-specifikáció
+## Alapvető XLSForm specifikáció
 
 | type | name      | label                        |
 |------|-----------|------------------------------|
-| file | document  | Kérjük, töltse fel dokumentumát |
+| file | document  | Kérjük, töltse fel a dokumentumát |
 
-A standard file kérdéstípus részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+A szabványos fájl kérdéstípussal kapcsolatos további részletekért tekintse meg az [XLSForm specifikációját](https://xlsform.org/en/#question-types).
 
 ## Felhasználási területek
 
-A fájlkérdések általánosan használt területei:
+A fájl típusú kérdéseket gyakran használják a következőkre:
 
-1. Kísérő dokumentumok gyűjtése (nyugták, tanúsítványok, szerződések, jelentések)
-2. Beszkennelt papíros nyomtatványok feltöltése
-3. Más rendszerekből exportált táblázatok vagy adatok összegyűjtése
-4. Bármilyen digitális fájltípus, amelyet az image/audio/video nem fed le
+1. Alátámasztó dokumentumok gyűjtése (nyugták, igazolások, szerződések, jelentések)
+2. Kitöltött, beszkennelt papíralapú űrlapok feltöltése
+3. Táblázatok vagy más rendszerekből származó adatexportok gyűjtése
+4. Bármilyen digitális fájltípus, amelyet a kép/hang/videó típus nem fed le
 
 ## Adatformátum
 
-A feltöltött fájlok bináris mellékletekként kerülnek tárolásra:
+A feltöltött fájlok bináris mellékletként kerülnek tárolásra:
 
 - **Formátum:** Eredeti formátumban megőrizve (PDF, XLSX, DOCX stb.)
-- **Elnevezés:** `{instanceID}-{mezőnév}.{kiterjesztés}`
-- **Tárolás:** Feltöltve a szerver médiamappájába a beküldés mellé
-- **Hozzáférés:** Letölthető a beküldések kezelési felületéről
+- **Névadás:** `{instanceID}-{fieldname}.{extension}`
+- **Tárolás:** A beküldéssel együtt a szerver média mappájába kerül feltöltésre
+- **Hozzáférés:** Letölthető a beküldéskezelő felületről
 
-## rtSurvey-bővítések
+## rtSurvey kiterjesztések
 
 ### Elfogadott fájltípusok
 
-A `parameters` oszlop segítségével korlátozhatja, hogy milyen fájltípusok választhatók:
+Használja a `parameters` oszlopot a választható fájltípusok korlátozására:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| file | report | Töltse fel az ellenőrzési jelentést | `accept=.pdf` |
+| file | report | Töltse fel a vizsgálati jelentést | `accept=.pdf` |
 | file | spreadsheet | Töltse fel az adatfájlt | `accept=.xlsx,.csv` |
 
-Az `accept` paraméter standard fájlkiterjesztés szintaxist használ (vesszővel elválasztva).
+Az `accept` paraméter a szabványos fájlkiterjesztés-szintaxist használja (vesszővel elválasztva).
 
-### Fájlméret iránymutatás
+### Fájlméretre vonatkozó útmutatás
 
-Az rtSurvey nem kényszerít rá kemény fájlméret-korlátot a kérdés szintjén, de a szerver feltöltési korlátja érvényes. Közölje az elvárásokat a kérdezővel a `hint` segítségével:
+Az rtSurvey nem kényszerít ki szigorú fájlméret-korlátot kérdés szinten, de a szerver feltöltési korlátja érvényes. Használja a `hint` oszlopot az elvárások közlésére a kérdezővel:
 
 | type | name | label | hint |
 |------|------|-------|------|
-| file | receipt | Töltse fel a fizetési nyugtát | Elfogadott: PDF vagy kép. Maximális fájlméret: 5 MB |
+| file | receipt | Töltse fel a fizetési bizonylatot | Elfogadott: PDF vagy kép. Maximális fájlméret: 5 MB |
 
-### Integráció az eszköz fájlrendszerével és felhőtárhellyel
+### Integráció az eszköz fájlrendszerével és a felhőalapú tárolással
 
-Android és iOS rendszeren a `file` kérdés megnyitja az eszköz natív fájlböngészőjét, amely hozzáférést biztosíthat:
-- Helyi eszköztárhelyhez
-- SD-kártyához (Android)
-- iCloud Drive-hoz (iOS)
-- Google Drive-hoz, Dropboxhoz (ha telepítve van)
+Androidon és iOS-en a `file` kérdés az eszköz natív fájlválasztóját nyitja meg, amely hozzáférést biztosíthat a következőkhöz:
+- Helyi eszköztárhely
+- SD kártya (Android)
+- iCloud Drive (iOS)
+- Google Drive, Dropbox (ha telepítve van)
 
-Weben a böngésző standard fájlfeltöltési párbeszédablakát nyitja meg.
+Weben a böngésző szabványos fájlfeltöltési párbeszédpanelét nyitja meg.
 
-## Példa
+### Beágyazott gomb elrendezés (Inline)
+
+Adja hozzá az `inline` értéket a feltöltés **kör alakú ikongombként** való megjelenítéséhez a címke mellett, a teljes szélességű fájlválasztó helyett.
+
+```
+| type | name | label           | appearance                              |
+|------|------|-----------------|-----------------------------------------|
+| file | doc  | Dokumentum feltöltése | inline display{right}                   |
+| file | doc  | Dokumentum feltöltése | inline display{left, large}             |
+| file | doc  | Dokumentum feltöltése | inline display{center, large, <0099FF/>} |
+```
+
+**Gomb pozíciója** — `left`, `right` *(alapértelmezett)*, `top`, `center`, `bottom`
+
+**Gomb mérete** — `small` *(alapértelmezett)*, `medium`, `large`
+
+**Gomb színe** — adjon meg egy hex színt a `display{}`-ben az elsődleges szín felülbírálásához:
+
+```
+inline display{right, large, <FF5500/>}
+```
+
+**Rögzítés utáni vezérlés — `results{}`:**
+
+| Appearance | Effect |
+|---|---|
+| `results{hide(capture)}` | Elrejti a feltöltés gombot a fájl csatolása után |
+| `results{hide(review)}` | Elrejti az ellenőrzés/előnézet gombot feltöltés után |
+| `results{hide(filename)}` | Elrejti a feltöltés után megjelenő fájlnevet |
+| `results{left}` | Az ikont balra mozgatja feltöltés után |
+
+Példa — feltöltés gomb elrejtése a fájl csatolása után:
+```
+inline display{right} results{hide(capture)}
+```
+
+### Címke elrejtése
+
+```
+inline text-nolabel display{center, large}
+```
+
+## Példa a használatra
 
 ### Kötelező PDF feltöltés
 
 | type | name | label | hint | required | required_message |
 |------|------|-------|------|----------|-----------------|
-| file | signed_consent | Töltse fel az aláírt beleegyező nyilatkozatot | Csak PDF, max. 2 MB | yes | Szükséges a beleegyező nyilatkozat |
+| file | signed_consent | Töltse fel az aláírt beleegyező nyilatkozatot | Csak PDF, max 2MB | yes | Beleegyező nyilatkozat kitöltése kötelező |
 
 ### Feltételes dokumentumfeltöltés
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| select_one yesno | has_land_title | Van a háztartásnak földtulajdoni lapja? | |
-| file | land_title_doc | Töltse fel a földtulajdoni lap fotóját vagy szkennelését | `${has_land_title} = 'yes'` |
+| select_one yesno | has_land_title | Rendelkezik a háztartás földtulajdonnal? | |
+| file | land_title_doc | Töltse fel a tulajdoni lap fotóját vagy szkennelt változatát | `${has_land_title} = 'yes'` |
 
-## Bevált módszerek
+## Legjobb gyakorlatok
 
-1. Használja az `accept` értéket a fájltípusok korlátozásához – ez megakadályozza, hogy a kérdezők véletlenül rossz fájlokat töltsenek fel.
-2. Mindig adjon méret- és formátum-útmutatást a `hint` oszlopban.
-3. Fotókhoz és képekhez használja az `image` típust – jobb tömörítést és egységes formátumkezelést kínál.
-4. Fájlmellékleteket tartalmazó nagy felmérések esetén tervezze meg az adattárolást és a letöltési sávszélességet ennek megfelelően.
-5. Tesztelje a fájlböngészőt a céleszköz típusán (Android vs. iOS vs. web) a telepítés előtt – a felhőtárhelyekhez való hozzáférés eltérő.
+1. Használja az `accept` paramétert a fájltípusok korlátozására — ez megakadályozza, hogy a kérdezők véletlenül rossz fájlokat töltsenek fel.
+2. Mindig tüntesse fel a méretre és formátumra vonatkozó útmutatást a `hint` oszlopban.
+3. Fotók és képek esetén használja inkább az `image` típust — az jobb tömörítést és konzisztens formátumkezelést kínál.
+4. Fájlmellékleteket tartalmazó nagy felmérések esetén tervezze meg megfelelően az adattárolást és a letöltési sávszélességet.
+5. Telepítés előtt tesztelje a fájlválasztót a cél eszköztípuson (Android vs. iOS vs. web) — a felhőalapú meghajtókhoz való hozzáférés eltérő lehet.
 
-## Adatkezelési szempontok
+## Adatkezelési megfontolások
 
-- A fájlok eredeti formátumban kerülnek tárolásra; az rtSurvey nem konvertálja vagy tömöríti azokat.
-- Elemezze a fájlokat letöltés után – az rtSurvey nem nyeri ki vagy indexeli a fájlok tartalmát.
-- A nagy fájlmellékleteket tartalmazó felmérések esetén a teljes adathalmazon letöltéséhez szükséges idő jelentősen növekedhet.
+- A fájlok eredeti formátumukban kerülnek tárolásra; az rtSurvey nem konvertálja vagy tömöríti azokat.
+- A fájlokat letöltés után elemezze — az rtSurvey nem emeli ki és nem indexeli a fájlok tartalmát.
+- A nagy fájlmellékletek jelentősen megnövelik a teljes adatkészlet letöltéséhez szükséges időt.
 
 ## Korlátozások
 
-- A fájlkérdések nem ellenőrzik a fájl tartalmát – csak a kiterjesztés-ellenőrzés érvényesül a felhasználói felületen az `accept` segítségével.
-- A nagyon nagy fájlok (100 MB+) alacsony kapcsolati sebességű környezetben feltöltéskor időtúllépést okozhatnak.
+- A fájl kérdések nem ellenőrzik a fájlok tartalmát — a felhasználói felületen csak az `accept` paraméterrel megadott fájlkiterjesztés-ellenőrzés érvényesül.
+- A nagyon nagy fájlok (100 MB+) feltöltése időtúllépéshez vezethet gyenge internetkapcsolat esetén.
 - Az offline kérdezők csatolhatnak fájlokat, de azok nem töltődnek fel, amíg a kapcsolat helyre nem áll.
-- Egyes eszközkonfigurációk korlátozzák bizonyos tárolási helyek elérését (pl. vállalati MDM-szabályzatok).
+- Egyes eszközkonfigurációk korlátozhatják a hozzáférést bizonyos tárolási helyekhez (pl. vállalati MDM-irányelvek).

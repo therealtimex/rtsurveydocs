@@ -1,78 +1,207 @@
 ---
-title: "Цяло число"
-description: "Въпросите от тип integer позволяват въвеждане на цели числа в анкетата."
+title: "Integer"
+description: "Тип въпрос за въвеждане на цели числа в rtSurvey"
 ---
 
-The integer question type in XLSForms and rtSurvey is used to collect whole number responses. This question type is essential for gathering numerical data without decimal places, such as counts, ages, or years.
+Типът въпрос `integer` събира цели числа (без десетични знаци). Той задейства цифрова клавиатура на мобилни устройства и блокира въвеждането на десетична запетая. Поддържа същите опции за `appearance` като типа `text` за оформление и форматиране.
 
-## Основна спецификация на XLSForm
+## Базова XLSForm спецификация
 
-| type    | name  | label                 |
-|---------|-------|------------------------|
-| integer | age   | Enter your age in years|
+| type | name | label |
+|------|------|-------|
+| integer | age | Възраст на респондента |
+| integer | household_size | Брой хора в домакинството |
 
-For more details on the basic integer question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+За стандартната спецификация вижте [XLSForm документацията](https://xlsform.org/en/#question-types).
 
-## Приложения
+---
 
-Integer questions are commonly used for:
+## Опции за appearance
 
-1. Age inputs
-2. Counting items (e.g., number of children, household members)
-3. Year inputs (e.g., year of birth)
-4. Ratings on a numerical scale
-5. Any whole number data collection
+### `number-hspinner` — хоризонтален спинер
 
-## Разширения на rtSurvey
+Заменя полето за въвеждане с хоризонтален **− стойност +** спинер. Докосването на минус/плюс намалява или увеличава стойността с 1 (или с потребителска стъпка).
 
-While the basic XLSForm specification for integer questions is straightforward, rtSurvey may offer additional features or customizations:
+```
+number-hspinner
+```
 
-1. Range validation
-2. Custom error messages
-3. Appearance options for number input
+**Персонализиране на формата на бутоните и стъпката** чрез `hspinner()`:
 
-(Note: The specific extensions available in rtSurvey for integer questions would need to be confirmed and detailed here.)
+```
+number-hspinner hspinner('left-small-square','right-small-square','5')
+```
 
-## Най-добри практики
+Параметри: форма на левия бутон, форма на десния бутон, стойност на стъпката (по подразбиране е `1` за integer).
 
-1. Use clear and concise labels to specify the expected input.
-2. Implement range constraints to prevent unrealistic or erroneous inputs.
-3. Consider using hint text to provide examples or clarify the expected format.
-4. For large numbers, consider using commas or spaces in the label to improve readability (e.g., "Enter the population (up to 1,000,000)").
+**Потребителски цветове** чрез `colors()`:
+
+```
+number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
+```
+
+Четири стойности по ред: фон на левия бутон, икона на левия бутон, фон на десния бутон, икона на десния бутон.
+
+---
+
+### `thousandsep` — сепаратор на хилядите
+
+Форматира показваното число с групиране чрез запетая (напр. `1,234,567`). Необработеното число се съхранява без запетаи. Типът на въвеждане се превключва на `"text"`, за да се позволи форматираното показване.
+
+```
+thousandsep
+```
+
+---
+
+### `digisep(n, "sep")` — потребителско групиране на цифри
+
+Групира цифрите в блокове от `n`, разделени от потребителски сепаратор. Полезно за форматирани идентификатори или референтни кодове, които са цифрови.
+
+```
+digisep(4,"-")      → 0912-3456-789
+digisep(3," ")      → 012 345 678
+```
+
+Типът на въвеждане се превключва на `"text"`, когато този appearance е активен.
+
+---
+
+### `textonly` — принудителна текстова клавиатура
+
+Принуждава `type="text"` на елемента за въвеждане. Това предотвратява странностите при въвеждане на числа в браузъра (като скриване на водещи нули или добавяне на стрелки за превъртане в десктоп браузъри), докато все още се събира цифрова стойност.
+
+```
+textonly
+```
+
+---
+
+### `floating_hint` — подсказката изплува като етикет
+
+Текстът на `hint` се изобразява вътре в полето като плейсхолдър. Когато потребителят започне да пише, тя изплува над полето като етикет.
+
+```
+floating_hint
+```
+
+---
+
+### `embed` — подсказка вътре в границите на полето
+
+Подобно на `floating_hint` — подсказката стои вътре в границите на полето, когато е празно. Тя не изплува, когато потребителят пише.
+
+```
+embed
+```
+
+---
+
+### `textpopup` — въвеждане чрез модален диалог
+
+Докосването на полето отваря модален диалог с по-голямо поле за въвеждане, вместо редактиране инлине. Полезно на малки екрани, където въвеждането на цял екран е по-лесно.
+
+```
+textpopup
+```
+
+---
+
+### `charcount` — брояч на символи в реално време
+
+Показва брой символи `(n)` в реално време под полето за въвеждане, актуализиран докато потребителят пише.
+
+```
+charcount
+```
+
+---
+
+### `prefix(expr)` — добавяне на префикс отпред
+
+Добавя статичен или изчислен низ пред показваната стойност. Съхранената стойност не включва префикса.
+
+```
+prefix('Item #')        → показва "Item #42", съхранява "42"
+prefix(${code_prefix})  → динамичен префикс от друго поле
+```
+
+---
+
+### `align_answer` — подравняване на текста за въвеждане
+
+Контролира хоризонталното подравняване на въведената стойност вътре в полето.
+
+```
+align_answer = left
+align_answer = right
+align_answer = center
+```
+
+---
+
+### `inputs{qrscan}` — QR / баркод сканиране в полето
+
+Добавя бутон за сканиране на QR код до полето за въвеждане. Отваря скенера на камерата и попълва полето със сканираната цифрова стойност.
+
+```
+inputs{qrscan}
+```
+
+---
+
+## Бърза справка за appearance
+
+| Appearance | Изобразен уиджет |
+|---|---|
+| *(няма)* | Поле за число (`type="number"`) — цифрова клавиатура на мобилни устройства |
+| `number-hspinner` | Хоризонтален − стойност + спинер, стъпка = 1 |
+| `number-hspinner hspinner(...)` | Спинер с потребителска форма на бутоните и стъпка |
+| `number-hspinner colors(...)` | Спинер с потребителски цветове на бутоните |
+| `thousandsep` | Число с групиране на хилядите чрез запетая |
+| `digisep(n,"sep")` | Потребителско групиране на цифри |
+| `textonly` | Принудителна текстова клавиатура |
+| `floating_hint` | Подсказката изплува над полето по време на писане |
+| `embed` | Подсказка вътре в границите на полето |
+| `textpopup` | Докосване за отваряне на модален диалог |
+| `charcount` | Брояч на символи в реално време под полето |
+| `prefix(expr)` | Добавяне на статичен или динамичен префикс отпред |
+| `align_answer = left/right/center` | Подравняване на текста за въвеждане |
+| `inputs{qrscan}` | Бутон за сканиране на QR/баркод |
+
+---
 
 ## Ограничения и валидация
 
-You can add constraints to ensure the entered value falls within a specific range:
+Използвайте ограничения (constraints), за да наложите диапазони от стойности. Ограниченията в колоната `constraint` се оценяват след всяко натискане на бутон в режим `number-hspinner`, а не само при напускане на полето (blur).
 
-| type    | name  | label                 | constraint        | constraint_message                    |
-|---------|-------|------------------------|-------------------|---------------------------------------|
-| integer | age   | Enter your age in years| .>0 and .&lt;=120    | Age must be between 1 and 120 years   |
+| type | name | label | constraint | constraint_message |
+|------|------|-------|------------|-------------------|
+| integer | age | Възраст | `. > 0 and . <= 120` | Възрастта трябва да бъде между 1 и 120 |
+| integer | year | Година на строеж | `. >= 1800 and . <= 2100` | Въведете валидна година |
+| integer | count | Брой елементи | `. >= 0` | Не може да бъде отрицателно число |
 
-## Примерна употреба
+---
 
-Here's an example of how you might use integer questions in a household survey:
+## Пример — проучване на домакинствата
 
-| type    | name           | label                                     | constraint | constraint_message                |
-|---------|----------------|-------------------------------------------|------------|-----------------------------------|
-| integer | household_size | How many people live in your household?   | .>0        | Household size must be at least 1 |
-| integer | num_children   | How many children under 18 in the household? | .>=0    | Number of children cannot be negative |
-| integer | year_built     | In what year was your house built?        | .>1800 and .&lt;=2023 | Year must be between 1800 and 2023 |
+| type | name | label | appearance | constraint | constraint_message |
+|------|------|-------|------------|------------|-------------------|
+| integer | household_size | Хора в домакинството | `number-hspinner` | `. >= 1 and . <= 30` | Трябва да бъде между 1 и 30 |
+| integer | under_5 | Деца под 5 години | `number-hspinner` | `. >= 0 and . <= ${household_size}` | Не може да надвишава размера на домакинството |
+| integer | year_built | Година на строеж на къщата | `textonly` | `. >= 1800 and . <= 2100` | Въведете валидна година |
 
-## Изчисление с целочислени стойности
+---
 
-Integer values can be used in calculations. Here's an example:
+## Добри практики
 
-| type    | name           | label                                     |
-|---------|----------------|-------------------------------------------|
-| integer | num_adults     | Number of adults in the household         |
-| integer | num_children   | Number of children in the household       |
-| calculate | total_members | | 
+1. Използвайте `number-hspinner` за малки диапазони, където щракването върху ± е по-бързо от писането (напр. брой деца, оценка по скала от 1–10).
+2. Използвайте `thousandsep` при показване на големи цели числа (население, доход), за да могат респондентите сами да проверят величината.
+3. Използвайте `textonly`, когато браузърите добавят нежелан потребителски интерфейс за въвеждане на числа (стрелки за превъртане, сензорно превъртане), който обърква респондентите.
+4. Налагайте ограничения за диапазона, вместо да разчитате на типа мобилна клавиатура — налагането чрез клавиатурата не е универсално.
 
-In the calculate row, you can use:
+## Ограничения
 
-```
-calculation | ${num_adults} + ${num_children}
-```
-
-This will sum the number of adults and children to get the total household members.
-
+- Въвеждането на десетична запетая е блокирано — ако имате нужда от дробни стойности, използвайте типа `decimal`.
+- `number-hspinner` валидира `constraint` при всяко натискане на бутон — избягвайте тежки ограничения (напр. сложни вериги от `if()`) в режим спинер.
+- `thousandsep` и `digisep()` съхраняват необработеното число без форматиране — не разчитайте на форматираната показвана стойност в изчисленията.
