@@ -77,6 +77,68 @@ mask() { [[ -n "${1:-}" ]] && echo "***" || echo ""; }
 # Nginx config helpers
 # ------------------------------------------------------------------------------
 
+# Loading page shown while the app container is still warming up
+write_loading_page() {
+  mkdir -p /var/www/html
+  cat > /var/www/html/loading.html << 'HTML_EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="20">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>rtCloud — Starting…</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      text-align: center;
+      padding: 3rem 2rem;
+      max-width: 420px;
+    }
+    .logo {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: -1px;
+      margin-bottom: 0.5rem;
+    }
+    .logo span { color: #e2e8f0; }
+    h1 { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: #94a3b8; }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid #1e293b;
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    p { color: #64748b; font-size: 0.9rem; line-height: 1.6; }
+    .hint { margin-top: 2rem; font-size: 0.78rem; color: #475569; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">rt<span>Cloud</span></div>
+    <div class="spinner"></div>
+    <h1>Server is starting up…</h1>
+    <p>The application is initializing. This usually takes 2–3 minutes after first deployment.</p>
+    <p class="hint">This page refreshes automatically every 20 seconds.</p>
+  </div>
+</body>
+</html>
+HTML_EOF
+}
+
 # Temporary HTTP-only config used by certbot for the ACME challenge
 write_nginx_http_only() {
   local domain="$1"
@@ -116,6 +178,13 @@ server {
     ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
     ssl_prefer_server_ciphers off;
 ${keycloak_block}
+    # Show loading page while the app container is still starting
+    error_page 502 503 504 /loading.html;
+    location = /loading.html {
+        root /var/www/html;
+        internal;
+    }
+
     location / {
         proxy_pass         http://127.0.0.1:8080;
         proxy_set_header   Host              \$host;
@@ -660,8 +729,10 @@ echo " The script will retry Certbot every 60s until DNS resolves."
 echo "============================================================"
 echo ""
 
+# Write loading page (shown while app container warms up after deploy)
+write_loading_page
+
 # Serve HTTP temporarily for the ACME challenge
-mkdir -p /var/www/html
 write_nginx_http_only "${DOMAIN}"
 systemctl is-active nginx && systemctl reload nginx || systemctl start nginx
 
@@ -767,4 +838,10 @@ echo "    - DB        : edit /opt/rtcloud/.env then docker compose up -d"
 echo ""
 echo " Logs  : /var/log/stackscript.log"
 echo " Files : /opt/rtcloud/"
+echo ""
+echo " *** ACCESS ***"
+echo " Open https://${DOMAIN} in your browser."
+echo " If you see the 'Server is starting' page, wait 2-3 minutes"
+echo " and refresh. The page auto-refreshes every 20 seconds."
+echo " No Glish / console access needed."
 echo "============================================================"
