@@ -1,80 +1,81 @@
 ---
 title: "Geotrace"
-description: "Geotrace questions allow respondents to capture a series of connected points on a map, creating lines or paths as part of the survey."
+description: "Geotrace questions capture a series of GPS points forming a line or path."
 ---
 
-The geotrace question type in XLSForms and rtSurvey enables respondents to capture a series of connected points on a map, creating lines or paths. This feature is particularly useful for mapping routes, boundaries, or linear features in spatial surveys.
+The `geotrace` question type captures a sequence of geographic coordinates forming a line or path (polyline). In rtSurvey's web form, this renders as a **text input** where the enumerator enters or pastes the coordinate string directly.
 
 ## Basic XLSForm Specification
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geotrace | river_path  | Trace the path of the river     |
+| type     | name        | label                        |
+|----------|-------------|------------------------------|
+| geotrace | river_path  | Trace the path of the river  |
+| geotrace | road_route  | Record the road route        |
 
-For more details on the basic geotrace question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+For the standard specification see the [XLSForm documentation](https://xlsform.org/en/#question-types).
 
-## Uses
-
-Geotrace questions are commonly used for:
-
-1. Mapping routes or paths taken during field surveys
-2. Tracing linear features like roads, rivers, or boundaries
-3. Capturing the extent of linear infrastructure (e.g., pipelines, power lines)
-4. Recording travel paths in transportation studies
-5. Defining transects in ecological surveys
-
-## Best Practices
-
-1. Ensure the device has location services enabled and permissions granted.
-2. Provide clear instructions on how to trace the path and what features should be included.
-3. Consider using satellite imagery or base maps to help respondents accurately trace paths.
-4. Be mindful of the potential complexity of traces and their impact on data size and processing.
-
-## Example Usage
-
-Here's an example of how you might use a geotrace question in a survey:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geotrace | hiking_trail   | Trace the path of the hiking trail         | Start at the trailhead and end at the summit |
-
-## rtSurvey Extensions
-
-While the basic XLSForm specification for geotrace questions is straightforward, rtSurvey may offer additional features or customizations:
-
-1. Integration with offline maps for remote areas
-2. Options to set minimum and maximum number of points for the trace
-3. Ability to edit or refine traces after initial drawing
-4. Support for automatic tracing at set intervals during movement
-
-(Note: The specific extensions available in rtSurvey for geotrace questions would need to be confirmed and detailed here.)
+---
 
 ## Data Format
 
-Geotrace data is typically stored as a string of space-separated coordinate pairs, similar to geoshape but without the closing point:
+Stored as a semicolon-separated list of points with **no spaces around the semicolons**. Each point is four space-separated values:
 
 ```
-lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN
+lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-For example:
+| Component | Description |
+|-----------|-------------|
+| `lat` | Latitude in decimal degrees |
+| `lon` | Longitude in decimal degrees |
+| `alt` | Altitude in metres (`0` if unknown) |
+| `acc` | GPS accuracy in metres (`0` if unknown) |
+
+**Example — a three-point path:**
 ```
-38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404
+13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
 ```
 
-## Considerations for Analysis
+A minimum of two points is required to form a valid path.
 
-When using geotrace questions, consider:
+---
 
-1. How the geographic data will be visualized and analyzed (e.g., GIS software)
-2. The potential need for data cleaning or simplification of complex traces
-3. Privacy and data protection measures for handling detailed spatial data
-4. Integration with other spatial data sources for comprehensive analysis
+## How it renders in rtSurvey
+
+In the rtSurvey web form, `geotrace` renders as a plain **text field**. The enumerator types or pastes the coordinate string. There is no built-in interactive map picker for this type in the current web form.
+
+### Collecting points interactively
+
+The recommended pattern for field collection is a **repeat group of `geopoint` questions** — each point uses the full GPS map picker — combined with a `calculate` to produce the geotrace string:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | path_points | Record each waypoint | |
+| geopoint | point | Tap to record point | |
+| end repeat | path_points | | |
+| calculate | geotrace_value | | `join(';', ${path_points/point})` |
+
+The calculated string can then be stored in a `text` question or used in `geotrace`.
+
+---
+
+## Example usage
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geotrace | farm_boundary_path | Record the access path to the farm | Enter each waypoint separated by semicolons | yes |
+
+---
+
+## Best Practices
+
+1. Use a repeat group of `geopoint` questions for interactive map-based collection, then join the values — this gives enumerators a GPS picker for each individual point.
+2. Include the expected format in the `hint` column when manual coordinate entry is required.
+3. Validate presence with `required = yes` when the path is mandatory.
+4. Plan for data cleaning — paths entered manually may have inconsistent precision.
 
 ## Limitations
 
-- Tracing accurate paths on small mobile screens can be challenging.
-- Complex traces may require significant storage and processing capacity.
-- Continuous GPS usage for automatic tracing can quickly drain device batteries.
-- There may be privacy concerns associated with collecting detailed path data.
-
+- There is no built-in interactive map picker for `geotrace` in the rtSurvey web form.
+- The coordinate string can be long for complex paths — keep this in mind for form performance and storage.
+- Validating path topology (e.g., minimum point count, self-intersection) requires post-processing outside of XLSForm constraints.

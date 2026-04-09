@@ -1,80 +1,85 @@
 ---
 title: "Geoshape"
-description: "Geoshape questions allow respondents to draw shapes on a map, capturing complex geographical data as part of the survey."
+description: "Geoshape questions capture a closed polygon defined by a sequence of GPS points."
 ---
 
-The geoshape question type in XLSForms and rtSurvey enables respondents to draw shapes (polygons) on a map, capturing complex geographical data. This feature is particularly useful for mapping areas, defining boundaries, or marking regions of interest in spatial surveys.
+The `geoshape` question type captures a closed polygon — a series of GPS coordinates where the first and last point are the same. In rtSurvey's web form, this renders as a **text input** where the enumerator enters or pastes the coordinate string directly.
 
 ## Basic XLSForm Specification
 
-| type     | name        | label                           |
-|----------|-------------|--------------------------------|
-| geoshape | field_area  | Draw the boundary of the field  |
+| type     | name        | label                            |
+|----------|-------------|----------------------------------|
+| geoshape | field_area  | Draw the boundary of the field   |
+| geoshape | zone        | Record the zone boundary         |
 
-For more details on the basic geoshape question type, see the [XLSForm specification](https://xlsform.org/en/#question-types).
+For the standard specification see the [XLSForm documentation](https://xlsform.org/en/#question-types).
 
-## Uses
-
-Geoshape questions are commonly used for:
-
-1. Mapping field boundaries in agricultural surveys
-2. Defining areas of environmental impact
-3. Marking zones in urban planning studies
-4. Outlining regions for geological surveys
-5. Capturing complex geographical features for spatial analysis
-
-## Best Practices
-
-1. Ensure the device has location services enabled and permissions granted.
-2. Provide clear instructions on how to draw the shape and what area should be included.
-3. Consider using satellite imagery or base maps to help respondents accurately draw shapes.
-4. Be mindful of the potential complexity of shapes and their impact on data size and processing.
-
-## Example Usage
-
-Here's an example of how you might use a geoshape question in a survey:
-
-| type     | name           | label                                      | hint                                        |
-|----------|----------------|--------------------------------------------|--------------------------------------------|
-| geoshape | forest_area    | Outline the boundary of the forest patch   | Use at least 3 points to create a closed shape |
-
-## rtSurvey Extensions
-
-While the basic XLSForm specification for geoshape questions is straightforward, rtSurvey may offer additional features or customizations:
-
-1. Integration with offline maps for remote areas
-2. Options to set minimum and maximum number of points for the shape
-3. Ability to edit or refine shapes after initial drawing
-4. Support for different shape types (e.g., rectangles, circles) in addition to free-form polygons
-
-(Note: The specific extensions available in rtSurvey for geoshape questions would need to be confirmed and detailed here.)
+---
 
 ## Data Format
 
-Geoshape data is typically stored as a string of space-separated coordinate pairs, enclosed in parentheses:
+Stored as a semicolon-separated list of points with **no spaces around the semicolons**. Each point is four space-separated values:
 
 ```
-(lat1 lon1; lat2 lon2; lat3 lon3; ... latN lonN)
+lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-For example:
+| Component | Description |
+|-----------|-------------|
+| `lat` | Latitude in decimal degrees |
+| `lon` | Longitude in decimal degrees |
+| `alt` | Altitude in metres (`0` if unknown) |
+| `acc` | GPS accuracy in metres (`0` if unknown) |
+
+**The polygon must be closed** — the last point must equal the first point.
+
+**Example — a four-point polygon (triangle, closed):**
 ```
-(38.253094215699576 21.756382658677467; 38.25021274773806 21.756382658677467; 38.25007793942195 21.763892843919166; 38.25290886154963 21.763935759263404; 38.253094215699576 21.756382658677467)
+13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
 ```
 
-## Considerations for Analysis
+A minimum of three distinct points plus the closing repeat is required to form a valid polygon.
 
-When using geoshape questions, consider:
+---
 
-1. How the geographic data will be visualized and analyzed (e.g., GIS software)
-2. The potential need for data cleaning or simplification of complex shapes
-3. Privacy and data protection measures for handling detailed spatial data
-4. Integration with other spatial data sources for comprehensive analysis
+## How it renders in rtSurvey
+
+In the rtSurvey web form, `geoshape` renders as a plain **text field**. The enumerator types or pastes the coordinate string. There is no built-in interactive polygon map picker for this type in the current web form.
+
+### Collecting polygon points interactively
+
+The recommended pattern for field collection is a **repeat group of `geopoint` questions** — each vertex uses the full GPS map picker — combined with a `calculate` to produce the geoshape string:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| begin repeat | polygon_points | Record each corner | |
+| geopoint | point | Tap to record corner | |
+| end repeat | polygon_points | | |
+| calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
+
+After joining, append the first point manually to close the polygon, or use a second calculate to concatenate it.
+
+---
+
+## Example usage
+
+| type | name | label | hint | required |
+|------|------|-------|------|----------|
+| geoshape | farm_boundary | Record the field boundary | Enter all corners separated by semicolons. First and last point must be the same. | yes |
+
+---
+
+## Best Practices
+
+1. Use a repeat group of `geopoint` questions for interactive map-based collection and join the values — this gives enumerators a GPS picker for each vertex.
+2. Always close the polygon (repeat the first point at the end) before submitting.
+3. Include the expected format in the `hint` column when manual coordinate entry is required.
+4. Require at least 3 distinct corner points for a valid polygon — enforce this through instructions rather than XLSForm constraints.
+5. Use `geopoint` for single-location questions and `geoshape` only when area demarcation is the actual survey objective.
 
 ## Limitations
 
-- Drawing accurate shapes on small mobile screens can be challenging.
-- Complex shapes may require significant storage and processing capacity.
-- Geoshape questions may not be suitable for all types of surveys or respondents.
-- There may be privacy concerns associated with collecting detailed spatial data.
-
+- There is no built-in interactive polygon map picker for `geoshape` in the rtSurvey web form.
+- The polygon must be manually closed — there is no automatic closing mechanism in the text input mode.
+- Validating polygon topology (e.g., non-self-intersection, minimum area) requires post-processing outside of XLSForm constraints.
+- Long boundaries with many vertices produce large text strings.
