@@ -1,26 +1,26 @@
 ---
-title: "Barcode"
-description: "Barcode-kysymykset skannaavat ja tallentavat QR-koodeja ja viivakooditietoja tutkimuksessasi."
+title: "Viivakoodi"
+description: "Viivakoodikysymykset skannaavat ja tallentavat QR-koodi- ja viivakoodidataa kyselyyn."
 ---
 
-`barcode`-kysymystyyppi tallentaa koodiarvon skannaamalla QR-koodin tai viivakoodin laitteen kameralla. Skannerimoduuli sisältää myös manuaalisen tekstinsyötön varavaihtoehtona, kun skannaaminen ei ole mahdollista.
+`barcode`-kysymystyyppi tallentaa koodiarvon skannaamalla QR-koodin tai viivakoodin laitteen kameralla. Skannerimodaalissa on myös manuaalinen tekstisyöte vararatkaisuna, kun skannaus ei ole mahdollista.
 
-## Basic XLSForm Specification
+## XLSFormin perusmäärittely
 
 | type    | name         | label                    |
 |---------|--------------|--------------------------|
-| barcode | product_code | Scan the product barcode |
-| barcode | ticket_id    | Scan the ticket          |
+| barcode | product_code | Skannaa tuotteen viivakoodi |
+| barcode | ticket_id    | Skannaa lippu            |
 
-Katso vakiomääritykset [XLSForm-dokumentaatiosta](https://xlsform.org/en/#question-types).
+Standardimäärittelystä katso [XLSForm-dokumentaatio](https://xlsform.org/en/#question-types).
 
 ---
 
-## Supported formats
+## Tuetut formaatit
 
 rtSurvey tukee QR-koodeja ja standardeja 1D-viivakoodeja laitteen kameran kautta, mukaan lukien:
 
-- QR Code
+- QR-koodi
 - UPC-A, UPC-E
 - EAN-8, EAN-13
 - Code 39, Code 128
@@ -28,53 +28,53 @@ rtSurvey tukee QR-koodeja ja standardeja 1D-viivakoodeja laitteen kameran kautta
 
 ---
 
-## Default layout
+## Oletusasetukset
 
-Ilman `appearance`-asetusta kysymys näyttää koko leveyden mittaisen **"GET BARCODE"** -painikkeen. Sen napauttaminen avaa skannerimoduulin. Onnistuneen skannauksen jälkeen painike muuttuu muotoon **"REPLACE BARCODE"** ja skannattu arvo näkyy alla klikattavana linkkinä.
-
----
-
-## Scanner modal
-
-Skannerimoduuli sisältää aina seuraavat:
-- **Reaaliaikainen kameranäkymä (Live camera view)** – skannaa automaattisesti havaitessaan koodin; moduuli sulkeutuu onnistuneen skannauksen jälkeen.
-- **Manuaalinen tekstinsyöttö (Manual text input)** – alareunassa oleva tekstikenttä, johon haastattelija voi kirjoittaa koodin, jos skannaus epäonnistuu.
-- **Valmis-painike (Done button)** – lähettää manuaalisesti kirjoitetun arvon.
-
-Kun laitteen kamera ei ole käytettävissä, moduuli tarjoaa **"Upload an image"** -vaihtoehdon – haastattelija voi lähettää kuvan viivakoodista purettavaksi.
+Kun `appearance`-asetusta ei ole, kysymys renderöi koko leveyden **"HAE VIIVAKOODI"** -painikkeen. Sitä napauttamalla avautuu skannerimodaali. Onnistuneen skannauksen jälkeen painike muuttuu **"VAIHDA VIIVAKOODI"** -muotoon ja skannattu arvo näkyy alla napsautettavana linkkinä.
 
 ---
 
-## Inline button layout
+## Skannerimodaali
 
-Lisää `inline` esittääksesi skannerin **pyöreänä kuvakepainikkeena** selitteen (label) vieressä koko leveyden mittaisen painikkeen sijaan.
+Skannerimodaali sisältää aina:
+- **Live-kameranäkymä** — skannaa automaattisesti havaitsemisen yhteydessä; modaali sulkeutuu onnistuneen skannauksen jälkeen.
+- **Manuaalinen tekstisyöte** — tekstikenttä alareunassa, johon kyselyn suorittaja voi kirjoittaa koodin, jos skannaus epäonnistuu.
+- **Valmis-painike** — lähettää manuaalisesti syötetyn arvon.
+
+Kun laitteen kamera ei ole käytettävissä, modaali palautuu **"Lataa kuva"** -vaihtoehtoon — kyselyn suorittaja voi lähettää viivakoodin kuvan dekoodattavaksi.
+
+---
+
+## Inline-painikkeen asettelu
+
+Lisää `inline` renderöimään skannerin **pyöreäksi kuvakepainikkeeksi** etiketin viereen koko leveyden painikkeen sijaan.
 
 ```
 | type    | name | label     | appearance                              |
 |---------|------|-----------|----------------------------------------|
-| barcode | code | Scan item | inline display{right}                  |
-| barcode | code | Scan item | inline display{left, large}            |
-| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+| barcode | code | Skannaa tuote | inline display{right}                  |
+| barcode | code | Skannaa tuote | inline display{left, large}            |
+| barcode | code | Skannaa tuote | inline display{center, large, <0099FF/>} |
 ```
 
-**Painikkeen sijainti** – `left`, `right` *(oletus)*, `top`, `center`, `bottom`
+**Painikkeen sijainti** — `left`, `right` *(oletus)*, `top`, `center`, `bottom`
 
-**Painikkeen koko** – `small` *(oletus)*, `medium`, `large`
+**Painikkeen koko** — `small` *(oletus)*, `medium`, `large`
 
-**Painikkeen väri** – lisää heksaväri `display{}`-määritteen sisään ohittaaksesi ensisijaisen värin:
+**Painikkeen väri** — lisää heksaväri `display{}`-sisään ohittaaksesi ensisijaisen värin:
 
 ```
 inline display{right, large, <FF5500/>}
 ```
 
-**Tallennuksen jälkeinen hallinta – `results{}`:**
+**Tallennuksen jälkeinen hallinta — `results{}`:**
 
 | Appearance | Vaikutus |
 |---|---|
-| `results{hide(scanner)}` | Piilottaa skannauspainikkeen arvon tallentamisen jälkeen |
-| `results{hide(review)}` | Piilottaa skannatun arvon linkin tallentamisen jälkeen |
+| `results{hide(scanner)}` | Piilottaa skannauspainikkeen arvon tallennuksen jälkeen |
+| `results{hide(review)}` | Piilottaa skannatun arvon linkin tallennuksen jälkeen |
 | `results{hide(value)}` | Piilottaa skannatun arvon tekstinäytön |
-| `results{left}` | Siirtää kuvakkeen vasemmalle tallentamisen jälkeen |
+| `results{left}` | Siirtää kuvakkeen vasemmalle tallennuksen jälkeen |
 
 Esimerkki – piilota skanneri ensimmäisen skannauksen jälkeen:
 ```
@@ -83,38 +83,38 @@ inline display{center, large} results{hide(scanner)}
 
 ---
 
-## `inputs{auto-close(N)}` – skannerin automaattinen sulkeminen
+## `inputs{auto-close(N)}` — automaattinen skannerin sulkeminen
 
-Sulkee skannerimoduulin automaattisesti `N` sekunnin kuluttua, jos viivakoodia ei havaita. Moduulin sisällä näkyy reaaliaikainen laskuri.
+Sulkee skannerimodaalin automaattisesti `N` sekunnin kuluttua, jos viivakoodia ei havaita. Modaalin sisällä näytetään live-alaslaskuri.
 
 ```
 inputs{auto-close(10)}     → sulkeutuu 10 sekunnin kuluttua
 inputs{auto-close(5)}      → sulkeutuu 5 sekunnin kuluttua
 ```
 
-Yhdistäminen inline-asetukseen:
+Yhdistä inline-asetukseen:
 ```
 inline display{right} inputs{auto-close(10)}
 ```
 
 ---
 
-## `inputs{floating}` – kelluva siirrettävä skanneri
+## `inputs{floating}` — kelluva, raahattava skanneri
 
-Näyttää **minimointipainikkeen** (pakkauskuvake ⊞) skannerimoduulin yläpalkissa. Sen napauttaminen pienentää skannerin pieneksi kelluvaksi pyöreäksi kuvakkeeksi, jota voidaan vetää mihin tahansa näytöllä. Kelluvan kuvakkeen napauttaminen avaa skannerin uudelleen.
+Näyttää **minimointipainikkeen** (pakkaa kuvake ⊞) skannerimodaalin otsikossa. Sitä napauttamalla skanneri kutistuu pieneksi kelluvaksi pyöreäksi kuvakkeeksi, jota voi vetää mihin tahansa näytöllä. Kelluvaa kuvaketta napauttamalla skanneri avautuu uudelleen.
 
 ```
 inputs{floating}
 inline display{right} inputs{floating}
 ```
 
-Hyödyllinen työnkuluissa, joissa haastattelijan on nähtävä lomake skannerin ollessa aktiivinen (esim. skannattaessa kohteita luettelosta).
+Hyödyllinen työnkuluissa, joissa kyselyn suorittajan on nähtävä lomake skannerin ollessa aktiivinen (esim. kohteiden skannaus luettelosta).
 
 ---
 
-## `invisible auto-show` – skannerin automaattinen avautuminen
+## `invisible auto-show` — automaattinen skannerin avaaminen
 
-Piilottaa kysymyswidgetin asettelusta, mutta avaa skannerin automaattisesti sivun latautuessa. Hyödyllinen hiljaisen skannausvaiheen upottamiseen lomakekulkuun.
+Piilottaa kysymyswidgetin asettelusta, mutta avaa skannerin automaattisesti sivun latautuessa. Hyödyllinen hiljaisen skannausvaiheen upottamiseen lomakkeen kulkuun.
 
 ```
 invisible auto-show
@@ -123,13 +123,13 @@ inline invisible auto-show
 
 ---
 
-## Toistoryhmissä (In repeat groups)
+## Toistuvissa ryhmissä
 
-Kun `barcode` on `begin repeat` -ryhmän sisällä, onnistunut skannaus siirtyy automaattisesti **seuraavaan toistokertaan** arvon tallentamisen jälkeen. Tämä mahdollistaa nopean peräkkäisen skannauksen ilman, että haastattelijan tarvitsee napauttaa "Lisää" (Add) kohteiden välillä.
+Kun `barcode` on `begin repeat` -ryhmän sisällä, onnistunut skannaus siirtyy automaattisesti **seuraavaan toistuvaan instanssiin** arvon tallentamisen jälkeen. Tämä mahdollistaa nopean peräkkäisen skannauksen ilman, että kyselyn suorittaja napauttaa "Lisää"-painiketta kohteiden välillä.
 
 ---
 
-## Selitteen piilottaminen (Suppress the label)
+## Piilota etiketti
 
 ```
 inline text-nolabel display{center, large}
@@ -139,20 +139,20 @@ inline text-nolabel display{center, large}
 
 ## Esimerkkikäyttö
 
-### Varaston skannaus
+### Varastoskannaus
 
 | type | name | label | appearance | required |
 |------|------|-------|------------|----------|
-| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
-| integer | quantity | Quantity | | yes |
-| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
+| barcode | item_code | Skannaa tuotteen viivakoodi | `inline display{right}` | yes |
+| integer | quantity | Määrä | | yes |
+| note | confirm | Tuote: `${item_code}` — Määrä: `${quantity}` | | |
 
-### Nopea usean kohteen skannaus (toistoryhmä)
+### Nopea usean kohteen skannaus (toistuva ryhmä)
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | begin repeat | items | | |
-| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| barcode | code | Skannaa seuraava tuote | `inline display{right} inputs{auto-close(8)}` |
 | end repeat | items | | |
 
 ### Hiljainen automaattinen skannaus sivun latautuessa
@@ -165,14 +165,14 @@ inline text-nolabel display{center, large}
 
 ## Parhaat käytännöt
 
-1. Käytä `inputs{auto-close(N)}` -asetusta estääksesi skanneria pysymästä auki loputtomiin – valitse arvo, joka antaa haastattelijoille riittävästi aikaa sijoittaa viivakoodi (8–15 sekuntia on tyypillinen).
-2. Käytä `inputs{floating}` -asetusta, kun lomakkeen on pysyttävä näkyvissä skannauksen aikana (esim. skannaus luettelosta, jossa haastattelija vertaa tietoja näkyvään kenttään).
-3. Sijoita viivakoodikysymys toistoryhmän sisään nopeaa peräkkäistä skannausta varten – automaattinen toiston eteneminen poistaa manuaalisen "Lisää"-vaiheen.
-4. Sisällytä aina `hint`-sarake, jossa on sijoitteluohjeet (esim. "Pidä viivakoodia 10–30 cm:n etäisyydellä kamerasta hyvässä valaistuksessa").
-5. Skannerimoduulin manuaalinen tekstinsyöttö on aina käytettävissä – opasta haastattelijoita käyttämään sitä varavaihtoehtona vaurioituneille tai likaisille viivakoodeille.
+1. Käytä `inputs{auto-close(N)}` -asetusta estääksesi skannerin jäämästä auki määräämättömäksi ajaksi – valitse arvo, joka antaa kyselyn suorittajille riittävästi aikaa asettaa viivakoodi (8–15 sekuntia on tyypillistä).
+2. Käytä `inputs{floating}` -asetusta, kun lomakkeen on pysyttävä näkyvissä skannauksen aikana (esim. skannattaessa luettelosta, jossa kyselyn suorittaja tarkistaa näkyvän kentän).
+3. Aseta viivakoodikysymys toistuvan ryhmän sisään nopeaa peräkkäistä skannausta varten – automaattinen toistumisen eteneminen poistaa manuaalisen "Lisää"-vaiheen.
+4. Sisällytä aina `hint`-sarake, jossa on ohjeet sijoittelusta (esim. "Pidä viivakoodia 10–30 cm etäisyydellä kamerasta, hyvässä valossa").
+5. Manuaalinen tekstisyöte skannerimodaalissa on aina käytettävissä – kouluta kyselyn suorittajia käyttämään sitä vararatkaisuna vaurioituneiden tai likaisten viivakoodien tapauksessa.
 
 ## Rajoitukset
 
-- Skannaustarkkuus riippuu kameran laadusta, valaistuksesta ja viivakoodin kunnosta – vaurioituneet tai heikkokontrastiset koodit eivät välttämättä skannaudu luotettavasti.
-- Skanneri käyttää takakameraa (ympäristöön päin olevaa); laitteet, joissa ei ole takakameraa, käyttävät kuvan latausvaihtoehtoa.
-- `invisible auto-show` avautuu vain ensimmäisellä sivun latauskerralla; sivulle palaaminen ei käynnistä automaattista avausta uudelleen.
+- Skannauksen tarkkuus riippuu kameran laadusta, valaistuksesta ja viivakoodin kunnosta – vaurioituneet tai huonokontrastiset koodit eivät välttämättä skannaa luotettavasti.
+- Skanneri käyttää takakameraa (ympäristöön suuntautuvaa); laitteet, joissa ei ole takakameraa, palautuvat kuvan latausvaihtoehtoon.
+- `invisible auto-show` avautuu vain ensimmäisellä sivun latauksella; takaisin sivulle navigointi ei käynnistä automaattista avausta uudelleen.

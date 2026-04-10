@@ -3,41 +3,41 @@ title: "Geopoint"
 description: "Geopoint-kysymykset tallentavat maantieteelliset koordinaatit (leveysaste, pituusaste, korkeus ja tarkkuus) osana kyselyä."
 ---
 
-`geopoint`-kysymystyyppi tallentaa maantieteelliset koordinaatit (leveysaste, pituusaste, korkeus, tarkkuus) laitteen GPS:n avulla. rtSurvey renderöi valitsimen useilla asettelutiloilla ja tukee automaatiota `inputs{}`- ja `outputs{}`-parametrien kautta.
+`geopoint`-kysymystyyppi tallentaa maantieteelliset koordinaatit (leveysaste, pituusaste, korkeus, tarkkuus) laitteen GPS:n avulla. rtSurvey renderöi valitsimen useilla ulkoasutiloilla ja tukee automaatiota `inputs{}`- ja `outputs{}`-parametrien kautta.
 
-## Basic XLSForm Specification
+## XLSFormin perusmäärittely
 
 | type     | name        | label                       |
 |----------|-------------|-----------------------------|
 | geopoint | location    | Tallenna nykyinen sijainti |
 
-Katso vakiospesifikaatio [XLSForm-dokumentaatiosta](https://xlsform.org/en/#question-types).
+Standardimäärittelystä katso [XLSForm-dokumentaatio](https://xlsform.org/en/#question-types).
 
-## Data Format
+## Datan muoto
 
 Tallennetaan neljänä välilyönneillä erotettuna arvona:
 
 ```
-latitude longitude altitude accuracy
+leveysaste pituusaste korkeus tarkkuus
 ```
 
 Esimerkki: `13.756331 100.501762 15 8`
 
 ---
 
-## Layout modes
+## Ulkoasutilat
 
-### Oletus — suorakaiteen muotoinen painike
+### Oletus – suorakaiteen muotoinen painike
 
-Suorakaiteen muotoinen "START GEOPOINT" -painike avaa koko kartan modaalin, jossa haastattelija valitsee pisteen. Tallennuksen jälkeen painikkeen teksti muuttuu muotoon "View or change geo point" ja koordinaatit näkyvät alla.
+Suorakaiteen muotoinen "ALOITA GEOPOINT" -painike avaa täyden karttamodaalin, jossa kyselyn suorittaja valitsee pisteen. Tallennuksen jälkeen painikkeen teksti muuttuu "Näytä tai muuta geopointtia" ja koordinaatit ilmestyvät alapuolelle.
 
-Appearance-arvoa ei vaadita.
+Ei vaadita `appearance`-arvoa.
 
 ---
 
-### `display{inline-icon}` — pyöreä hiusristikkopainike
+### `display{inline-icon}` – pyöreä ristikuvakkeen painike
 
-Renderöi pyöreän ikonipainikkeen (hiusristikko ⊕) suorakaiteen muotoisen painikkeen sijaan. Sen napauttaminen avaa saman karttamodaalin.
+Renderöi pyöreän kuvakepainikkeen (ristit ⊕) suorakaiteen muotoisen painikkeen sijaan. Sitä napauttamalla avautuu sama karttamodaali.
 
 ```
 display{inline-icon}
@@ -48,21 +48,21 @@ display{inline-icon}
 ```
 display{inline-icon, left}           → painike etiketin vasemmalla puolella
 display{inline-icon, top}            → painike etiketin yläpuolella
-display{inline-icon, bottom}         → painike etiketin alapuolella, keskitettynä
-display{inline-icon, large}          → suuri ikoni (75px)
-display{inline-icon, medium}         → keskikokoinen ikoni (50px)
+display{inline-icon, bottom}         → painike etiketin alapuolella, keskitetty
+display{inline-icon, large}          → suuri kuvake (75px)
+display{inline-icon, medium}         → keskikokoinen kuvake (50px)
 display{inline-icon, left, large}    → suuri painike vasemmalla
 ```
 
-| Size | Icon height/width |
+| Koko | Kuvakkeen korkeus/leveys |
 |------|------------------|
-| *(default)* | 25px |
+| *(oletus)* | 25px |
 | `medium` | 50px |
 | `large` | 75px |
 
 ---
 
-### `display{thumbnail-square}` — live-kartan pikkukuva
+### `display{thumbnail-square}` – live-kartan pikkukuva
 
 Renderöi live-kartan esikatselun (Leaflet) suoraan kysymykseen painikkeen sijaan. Pikkukuva näyttää nykyisen GPS-sijainnin ja valitun pisteen. Laajennuspainikkeen napauttaminen avaa koko modaalin.
 
@@ -70,31 +70,31 @@ Renderöi live-kartan esikatselun (Leaflet) suoraan kysymykseen painikkeen sijaa
 display{thumbnail-square}
 ```
 
-**Mukautettu pikkukuvan koko:**
+**Mukautettu pikkukuvakoko:**
 
 ```
 display{thumbnail-square-[WxH]}          → kiinteät pikselit
 display{thumbnail-square-[400x200]}      → 400px leveä × 200px korkea
 
 display{thumbnail-square-[W%xH%]}        → prosenttiosuus lomakkeen leveydestä
-display{thumbnail-square-[100%x30%]}     → täysi leveys × 30% lomakkeen leveydestä
+display{thumbnail-square-[100%x30%]}     → koko leveys × 30% lomakkeen leveydestä
 ```
 
 ---
 
-## `display{}` vs `results{}` — ennen ja jälkeen tallennuksen
+## `display{}` vs `results{}` – ennen ja jälkeen tallennuksen
 
-`display{}` ohjaa asettelua **ennen** kuin käyttäjä tallentaa sijainnin. `results{}` ohjaa asettelua **sen jälkeen**, kun arvo on olemassa. Niillä voi olla eri tasaukset.
+`display{}` ohjaa ulkoasua **ennen** kuin käyttäjä tallentaa sijainnin. `results{}` ohjaa ulkoasua **arvon ollessa olemassa**. Niillä voi olla eri kohdistukset.
 
 ```
 display{inline-icon, right} results{left}
 ```
 
-Tämä renderöi painikkeen oikealle ennen tallennusta ja siirtää sen sitten vasemmalle, kun piste on tallennettu.
+Tämä renderöi painikkeen oikealle ennen tallennusta, sitten siirtää sen vasemmalle, kun piste on tallennettu.
 
-### `hide(value)` — piilota koordinaattien näyttö
+### `hide(value)` – piilota koordinaattien näyttö
 
-Oletusarvoisesti tallennettu lat/lon/tarkkuus/korkeus-teksti näytetään painikkeen alla. Piilota se käyttämällä:
+Oletusarvoisesti tallennetut lat/lon/tarkkuus/korkeus-teksti näkyy painikkeen alapuolella. Piilota se seuraavasti:
 
 ```
 results{hide(value)}
@@ -103,25 +103,25 @@ display{inline-icon} results{hide(value)}
 
 ---
 
-## `inputs{}` — GPS-automaatio
+## `inputs{}` – GPS-automaatio
 
-### Automaattinen tallennus ladattaessa
+### Automaattinen tallennus latauksen yhteydessä
 
-Tallentaa GPS-sijainnin automaattisesti, kun lomake latautuu, ilman että haastattelijan tarvitsee painaa mitään.
+Tallentaa GPS-sijainnin automaattisesti lomakkeen latautuessa ilman, että kyselyn suorittaja painaa mitään.
 
 ```
 inputs{auto-take}
 ```
 
-**Ehdollinen automaattinen tallennus** XLSForm-lausekkeen avulla:
+**Ehdollinen automaattinen tallennus** XLSForm-lausekkeella:
 
 ```
 inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
 ```
 
-### Esitäyttö tekstikentästä
+### Esitäytä tekstikentästä
 
-Täytä geopoint kysymyksestä, joka sisältää paikan nimen tai osoitemerkkijonon. rtSurvey geokoodaa merkkijonon koordinaateiksi OpenStreetMap Nominatimin kautta.
+Täytä geopoint-kenttä kysymyksestä, joka sisältää paikannimen tai osoite-merkkijonon. rtSurvey muuntaa merkkijonon koordinaateiksi OpenStreetMap Nominatim -palvelun kautta.
 
 ```
 inputs{question(address_field)}
@@ -129,9 +129,9 @@ inputs{question(address_field)}
 
 ---
 
-## `outputs{}` — käänteinen geokoodaus tekstiksi
+## `outputs{}` – käänteinen geokoodaus tekstiksi
 
-Kun piste on tallennettu, täytä automaattisesti `text`-kysymys ihmisen luettavissa olevalla osoitteella (koordinaateista käänteisesti geokoodattu).
+Kun piste on tallennettu, täytä `text`-kysymys automaattisesti ihmisen luettavalla osoitteella (käänteisesti geokoodattu koordinaateista).
 
 ```
 outputs{question(address_field)}
@@ -146,9 +146,9 @@ Esimerkki:
 
 ---
 
-## `nomap` — GPS-tallennus ilman karttaa
+## `nomap` – GPS-tallennus ilman karttaa
 
-Korvaa karttamodaalin yksinkertaisella valintaikkunalla, joka pyytää sijaintilupaa ja tallentaa koordinaatit. Karttaa ei näytetä. Hyödyllinen vain GPS-tallennukseen halvemmilla laitteilla tai kun karttatiilet eivät ole saatavilla offline-tilassa.
+Korvaa karttamodaalin yksinkertaisella dialogilla, joka pyytää sijaintilupaa ja tallentaa koordinaatit. Karttaa ei näytetä. Hyödyllinen vain GPS-tallennukseen edullisilla laitteilla tai kun karttalaatat eivät ole saatavilla offline-tilassa.
 
 ```
 nomap
@@ -156,9 +156,9 @@ nomap
 
 ---
 
-## Custom button style
+## Mukautettu painiketyyli
 
-Käytä `styleButton()`-funktiota mukautetun CSS:n soveltamiseen oletusarvoiseen suorakaiteen muotoiseen painikkeeseen:
+Käytä `styleButton()`-funktiota mukautettujen CSS-tyylien soveltamiseen oletusarvoiseen suorakaiteen muotoiseen painikkeeseen:
 
 ```
 styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
@@ -166,7 +166,7 @@ styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"}
 
 ---
 
-## Suppress the label
+## Piilota etiketti
 
 ```
 text-nolabel display{inline-icon, center, large}
@@ -174,7 +174,7 @@ text-nolabel display{inline-icon, center, large}
 
 ---
 
-## Example usage
+## Esimerkkikäyttö
 
 | type | name | label | appearance |
 |------|------|-------|------------|
@@ -186,18 +186,18 @@ text-nolabel display{inline-icon, center, large}
 
 ---
 
-## Best Practices
+## Parhaat käytännöt
 
-1. Käytä `inputs{auto-take}` -ominaisuutta haastattelijan vahvistamissa kyselyissä, joissa GPS on pakollinen — se poistaa manuaalisen vaiheen.
-2. Käytä `display{thumbnail-square}` -ominaisuutta, kun haluat haastattelijan vahvistavan valitun pisteen visuaalisesti ennen jatkamista.
-3. Yhdistä `outputs{question(...)}` vain luku -muotoiseen `text`-kenttään näyttääksesi käänteisesti geokoodatun osoitteen haastattelijalle.
-4. Käytä `nomap`-asetusta alueilla, joilla ei ole internetyhteyttä ja joilla karttatiilet eivät lataudu.
-5. Anna GPS-ajan vakiintua ennen tallennusta — alle 10 metrin tarkkuus on yleensä riittävä kenttätutkimuksiin.
+1. Käytä `inputs{auto-take}` kyselyn suorittajan varmennuskyselyissä, joissa GPS on pakollinen – se poistaa manuaalisen vaiheen.
+2. Käytä `display{thumbnail-square}`, kun haluat, että kyselyn suorittaja vahvistaa valitun pisteen visuaalisesti ennen jatkamista.
+3. Yhdistä `outputs{question(...)}` vain luku -tyyppiseen `text`-kenttään näyttääksesi käänteisesti geokoodatun osoitteen kyselyn suorittajalle.
+4. Käytä `nomap` alueilla, joilla ei ole internetyhteyttä ja karttalaattoja ei voida ladata.
+5. Anna GPS:n vakiintua ennen tallennusta – alle 10 metrin tarkkuus riittää yleensä kenttätutkimuksiin.
 
-## Limitations
+## Rajoitukset
 
-- `inputs{question(name)}` geokoodaus vaatii internetyhteyden — se kutsuu OpenStreetMap Nominatim API:a.
-- `outputs{question(name)}` käänteinen geokoodaus vaatii myös internetyhteyden.
-- Kartan pikkukuva (`display{thumbnail-square}`) vaatii internetin tiilien lataamiseen; koordinaatit tallennetaan silti offline-tilassa.
-- GPS-tarkkuus vaihtelee laitteen ja ympäristön mukaan — sisätilat tai urbaanit "kanjonit" voivat aiheuttaa yli 50 metrin epätarkkuuden.
-- Sijaintitietojen kerääminen voi vaikuttaa merkittävästi laitteen akun kestoon pitkien kyselyjen aikana.
+- `inputs{question(name)}`-geokoodaus vaatii internetyhteyden – se kutsuu OpenStreetMap Nominatim API:a.
+- `outputs{question(name)}`-käänteinen geokoodaus vaatii myös internetyhteyden.
+- Kartan pikkukuva (`display{thumbnail-square}`) vaatii internetin laattojen lataamiseen; koordinaatit tallennetaan silti offline-tilassa.
+- GPS-tarkkuus vaihtelee laitteen ja ympäristön mukaan – sisätiloissa tai kaupunkikanjonissa tarkkuus voi olla yli 50 metriä.
+- Sijaintitietojen kerääminen voi vaikuttaa merkittävästi laitteen akunkestoon pitkien kyselyjen aikana.

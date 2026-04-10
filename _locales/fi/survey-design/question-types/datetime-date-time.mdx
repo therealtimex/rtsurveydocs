@@ -1,25 +1,25 @@
 ---
-title: "Päivämäärä ja aika, päivämäärä, aika"
-description: "Päivämäärä ja aika -kysymykset antavat vastaajille mahdollisuuden syöttää sekä päivämäärän että ajan yhteen kenttään."
+title: "Datetime, date, time"
+description: "Datetime-kysymysten avulla vastaajat voivat syöttää sekä päivämäärän että ajan yhdelle kentälle."
 ---
 
-Kysymystyypit `date`, `time` ja `datetime` keräävät päivämäärä- ja/tai aikaviisumit. rtSurvey esittää ne useilla eri asettelutiloilla, joita ohjataan `appearance`-sarakkeella.
+`date`-, `time`- ja `datetime`-kysymystyypit tallentavat päivämäärä- ja/tai aikatietoja. rtSurvey renderöi ne useilla ulkoasutiloilla, joita ohjataan `appearance`-sarakkeella.
 
-## XLSForm-perusmäärittely
+## XLSFormin perusmäärittely
 
-| type     | name           | label                         |
-|----------|----------------|-------------------------------|
-| date     | birth_date     | Syntymäaika                   |
-| time     | start_time     | Mihin aikaan se alkoi?        |
-| datetime | event_datetime | Milloin tapahtuma sattui?     |
+| type     | name           | label                     |
+|----------|----------------|---------------------------|
+| date     | birth_date     | Syntymäaika               |
+| time     | start_time     | Mihin aikaan se alkoi?    |
+| datetime | event_datetime | Milloin tapahtuma sattui? |
 
-Katso vakiomäärittelyt [XLSForm-dokumentaatiosta](https://xlsform.org/en/#question-types).
+Standardimäärittelystä katso [XLSForm-dokumentaatio](https://xlsform.org/en/#question-types).
 
-## Aettelutilat
+## Ulkoasutilat
 
-### Oletus — aina avoin kalenteri
+### Oletus – aina auki oleva kalenteri
 
-Ulkoasuarvoa (appearance) ei tarvita. Kalenteri (ja kello `time`/`datetime`-tyypeille) näkyy suoraan sivulla — aina näkyvissä, painiketta ei tarvita.
+Ei tarvita `appearance`-arvoa. Kalenteri (ja kello `time`/`datetime`-tyypeille) renderöityy suoraan sivulle – aina näkyvissä, ei tarvita painiketta.
 
 | type | name       | label         | appearance |
 |------|------------|---------------|------------|
@@ -27,11 +27,11 @@ Ulkoasuarvoa (appearance) ei tarvita. Kalenteri (ja kello `time`/`datetime`-tyyp
 
 ---
 
-### `inline` — pyöreä painike → modaali
+### `inline` – pyöreä painike → modaali
 
-Kysymyksen otsikon vieressä on pyöreä ikonipainike (kalenteri tai kello). Sen napauttaminen avaa modaali-ikkunan valitsimella. Valinnan jälkeen valittu arvo näkyy tekstinä otsikon vieressä.
+Pyöreä kuvakepainike (kalenteri tai kello) kelluu kysymyksen etiketin vieressä. Sitä napauttamalla avautuu modaali, jossa on valitsin. Valinnan jälkeen valittu arvo näkyy tekstinä etiketin vieressä.
 
-- Painikkeen tausta: teeman ensisijainen väri (ylitettävissä)
+- Painikkeen tausta: ensisijainen teeman väri (muokattavissa)
 - Painikkeen muoto: täysi ympyrä (`border-radius: 50%`)
 
 ```
@@ -42,9 +42,9 @@ Kysymyksen otsikon vieressä on pyöreä ikonipainike (kalenteri tai kello). Sen
 
 ---
 
-### `inline-onlyresult` — painike katoaa valinnan jälkeen
+### `inline-onlyresult` – painike katoaa valinnan jälkeen
 
-Sama kuin `inline`, mutta painike piiloutuu, kun arvo on valittu. Hyödyllinen, kun haluat päivämäärän olevan näkyvissä vasta valinnan jälkeen ilman pysyvää kuvaketta.
+Sama kuin `inline`, mutta painike piiloutuu itsestään, kun arvo on valittu. Hyödyllinen, kun haluat päivämäärän näkyvän vasta sen jälkeen, kun se on valittu, ilman pysyvää kuvaketta.
 
 ```
 inline-onlyresult
@@ -52,24 +52,24 @@ inline-onlyresult
 
 ---
 
-### `inline-1line` — rullavalitsinrivi (spinners)
+### `inline-1line` – rivi pyörittimiä
 
-Esittää yksittäiset rullavalitsimet (▲ arvo ▼) yhdessä vaakasuorassa rivissä — yksi sarake kullekin osalle. `date`: kuukausi / päivä / vuosi. `datetime`: kuukausi / päivä / vuosi / tunnit / minuutit. `time`: tunnit / minuutit.
+Renderöi yksittäiset pyöritinsäätimet (▲ arvo ▼) yhdelle vaakasuoralle riville – yksi sarake per komponentti. `date`: kuukausi / päivä / vuosi. `datetime`: kuukausi / päivä / vuosi / tunnit / minuutit. `time`: tunnit / minuutit.
 
-Ei modaalia tai kalenteria — käyttäjä rullaa kutakin valitsinta itsenäisesti.
+Ei modaalia tai kalenterin ponnahdusikkunaa – käyttäjä vierittää kutakin pyöritintä itsenäisesti.
 
 ```
 inline-1line
 ```
 
-**Näytä vain tietyt osat** lisäämällä osien nimet:
+**Näytä vain tietyt komponentit** lisäämällä komponenttien nimet:
 
 ```
-inline-1line month year      → piilottaa päivävalitsimen
+inline-1line month year      → piilottaa päiväpyörittimen
 inline-1line year            → näyttää vain vuoden
 ```
 
-**Rajoita vuosiväliä:**
+**Rajoita vuosilukuväliä:**
 
 ```
 inline-1line y_range(2000-2030)
@@ -77,9 +77,9 @@ inline-1line y_range(2000-2030)
 
 ---
 
-### `box` — tekstinsyöttö
+### `box` – tekstisyöte
 
-Esittää tavallisen tekstinsyöttökentän. Käyttäjä kirjoittaa päivämäärän suoraan käyttämällä ulkoasussa määritettyä muotoa.
+Renderöi tavallisen tekstinsyöttökentän. Käyttäjä kirjoittaa päivämäärän suoraan käyttäen `appearance`-sarakkeessa määritettyä muotoa.
 
 ```
 box(%d/%m/%Y)       → PP/KK/VVVV
@@ -88,9 +88,9 @@ box(%Y-%m-%d)       → VVVV-KK-PP
 
 ---
 
-### `month-year` — vain kuukausi ja vuosi
+### `month-year` – vain kuukausi ja vuosi
 
-Vakio XLSForm-ulkoasu. Valitsin alkaa vuosinäkymästä; käyttäjä valitsee kuukauden ja vuoden, mutta ei tiettyä päivää.
+Standardi XLSForm-ulkoasu. Valitsin alkaa vuosinäkymästä; käyttäjä valitsee kuukauden ja vuoden, mutta ei tiettyä päivää.
 
 ```
 month-year
@@ -98,9 +98,9 @@ month-year
 
 ---
 
-### `year` — vain vuosi
+### `year` – vain vuosi
 
-Vakio XLSForm-ulkoasu. Valitsin alkaa vuosikymmennäkymästä; vain vuosi on valittavissa.
+Standardi XLSForm-ulkoasu. Valitsin alkaa vuosikymmennäkymästä; vain vuosi on valittavissa.
 
 ```
 year
@@ -110,69 +110,69 @@ year
 
 ## Mukautettu näyttömuoto
 
-Lisää `-[muoto]` mihin tahansa `inline`-ulkoasuun hallitaksesi sitä, miten valittu arvo näytetään tekstinä. Käyttää strftime-tyylisiä merkkejä.
+Lisää `-[muoto]` mihin tahansa `inline`-ulkoasuun ohjataksesi, miten valittu arvo näytetään tekstinä. Käyttää strftime-tyyppisiä tunnuksia.
 
-| Merkki | Merkitys | Esimerkki |
+| Tunnus | Merkitys | Esimerkki |
 |-------|---------|---------|
 | `%d`  | Päivä (nollalla täytetty) | 07 |
-| `%e`  | Päivä (ilman nollaa) | 7 |
+| `%e`  | Päivä (ei täyttöä) | 7 |
 | `%m`  | Kuukauden numero | 04 |
-| `%n`  | Kuukauden numero (ilman nollaa) | 4 |
-| `%b`  | Kuukauden lyhenne | huhti |
+| `%n`  | Kuukauden numero (ei täyttöä) | 4 |
+| `%b`  | Kuukauden lyhenne | Huhti |
 | `%Y`  | 4-numeroinen vuosi | 2026 |
 | `%y`  | 2-numeroinen vuosi | 26 |
 | `%H`  | Tunti (24h) | 14 |
-| `%h`  | Tunti (ilman nollaa) | 14 |
+| `%h`  | Tunti (ei täyttöä) | 14 |
 | `%M`  | Minuutti | 05 |
 | `%S`  | Sekunti | 00 |
-| `%a`  | Viikonpäivän lyhenne | ke |
+| `%a`  | Viikonpäivän lyhenne | Ke |
 
 **Esimerkkejä:**
 
 ```
-inline-[%d.%m.%Y]            → 07.04.2026
+inline-[%d/%m/%Y]            → 07/04/2026
 inline-[%d %b %Y]            → 07 huhti 2026
-inline-1line-[%Y-%m-%d]      → rullavalitsinsyöttö, muotoiltu näyttö
-inline-[%d.%m.%Y %H:%M]      → 07.04.2026 14:30
+inline-1line-[%Y-%m-%d]      → pyöritinsyöte, muotoiltu näyttö
+inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
 ```
 
 ---
 
-## Värien mukauttaminen
+## Värin mukauttaminen
 
-Ylitä ikonipainikkeen väri käyttämällä `colors()`-funktiota:
+Ohita kuvakepainikkeen väri `colors()`:lla:
 
 ```
 inline colors("0099FF")                   → painikkeen tausta #0099FF
-inline colors("0099FF","FFFFFF")          → tausta #0099FF, ikonin väri #FFFFFF
-inline-1line colors("0000FF","FFFF00")    → rullavalitsimen korostusvärit
+inline colors("0099FF","FFFFFF")          → tausta #0099FF, kuvakkeen väri #FFFFFF
+inline-1line colors("0000FF","FFFF00")    → pyörittimen korostusvärit
 inline-onlyresult colors("E53935")        → punainen painike
 ```
 
 ---
 
-## Painikkeen sijainti `display{}`-määritteellä
+## Painikkeen sijainti `display{}`:n kanssa
 
-`display{}`-määrite ohjaa sitä, missä ikonipainike näkyy suhteessa kysymyksen otsikkoon. Koskee `inline`- ja `inline-onlyresult`-tyyppejä.
+`display{}`-muokkaaja ohjaa, missä kuvakepainike ilmestyy kysymyksen etikettiin nähden. Koskee `inline`- ja `inline-onlyresult`-tyyppejä.
 
 ```
-display{<align>, <size>, <color>}
+display{<kohdistus>, <koko>, <väri>}
 ```
 
 | Parametri | Arvot | Oletus |
 |-----------|--------|---------|
-| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
-| Size | `small`, `medium`, `large` | `small` |
-| Color | hex esim. `#FF5500` | teeman ensisijainen väri |
+| Kohdistus | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Koko | `small`, `medium`, `large` | `small` |
+| Väri | hex esim. `#FF5500` | ensisijainen teeman väri |
 
-**Sijaintikäyttäytyminen:**
+**Kohdistuksen käyttäytyminen:**
 
 | Arvo | Asettelu |
 |-------|--------|
-| `right` | Painike otsikon oikealla puolella |
-| `left` | Painike otsikon vasemmalla puolella |
-| `top` | Painike otsikon yläpuolella, koko leveys keskellä |
-| `center` / `bottom` | Painike otsikon alapuolella, koko leveys keskellä |
+| `right` | Painike etiketin oikealla puolella |
+| `left` | Painike etiketin vasemmalla puolella |
+| `top` | Painike etiketin yläpuolella, koko leveyden keskitetty |
+| `center` / `bottom` | Painike etiketin alapuolella, koko leveyden keskitetty |
 
 **Esimerkkejä:**
 
@@ -185,30 +185,30 @@ inline-onlyresult display{bottom, large, #0099FF}
 
 ---
 
-## Päivämäärävälin rajoitus
+## Päivämääräalueen rajoitus
 
-Käytä `inputs{range[...]}`-määritettä rajoittamaan valittavissa olevia päivämääriä.
+Käytä `inputs{range[...]}` -asetusta rajoittaaksesi valittavissa olevia päivämääriä.
 
 ```
 inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
 ```
 
-Parametrit `range[...]`-määritteen sisällä:
+Parametrit `range[...]`-sisällä:
 
 | Parametri | Kuvaus |
 |-----------|-------------|
-| `dateGt(YYYY-MM-DD)` | Pienin valittavissa oleva päivämäärä (suurempi tai yhtä suuri kuin) |
-| `dateLt(YYYY-MM-DD)` | Suurin valittavissa oleva päivämäärä (pienempi tai yhtä suuri kuin) |
-| `indayTimeGt(HH:MM:SS)` | Päivän sisäinen vähimmäisaika (vain datetime) |
-| `indayTimeLt(HH:MM:SS)` | Päivän sisäinen enimmäisaika (vain datetime) |
+| `dateGt(VVVV-KK-PP)` | Pienin valittavissa oleva päivämäärä (suurempi tai yhtä suuri) |
+| `dateLt(VVVV-KK-PP)` | Suurin valittavissa oleva päivämäärä (pienempi tai yhtä suuri) |
+| `indayTimeGt(HH:MM:SS)` | Pienin aika päivän aikana (vain datetime) |
+| `indayTimeLt(HH:MM:SS)` | Suurin aika päivän aikana (vain datetime) |
 
-Voidaan määritellä useita välejä — päivämäärä on valittavissa, jos se osuu **mihin tahansa** väleistä.
+Useita alueita voidaan määrittää – päivämäärä on valittavissa, jos se kuuluu **mihin tahansa** alueeseen.
 
 ---
 
-## Otsikon piilottaminen
+## Piilota etiketti
 
-Lisää `text-nolabel` piilottaaksesi kysymyksen otsikon. Painike näkyy yksinään.
+Lisää `text-nolabel` piilottaaksesi kysymyksen etiketin. Painike renderöityy yksin.
 
 ```
 inline text-nolabel display{center, large}
@@ -216,17 +216,17 @@ inline text-nolabel display{center, large}
 
 ---
 
-## Asetteluyhteenveto
+## Asettelun yhteenveto
 
-| Ulkoasu | Renderöity työkalu | Väri mukautettavissa |
+| Appearance | Widget rendered | Väri muokattavissa |
 |---|---|---|
-| *(ei mitään)* | Aina avoin kalenteri | Ei |
+| *(ei mitään)* | Aina auki oleva kalenteri | Ei |
 | `inline` | Pyöreä painike → modaalikalenteri | Kyllä |
-| `inline-onlyresult` | Pyöreä painike → modaali, piiloutuu valinnan jälkeen | Kyllä |
-| `inline-1line` | Rullavalitsinrivi | Kyllä |
+| `inline-onlyresult` | Pyöreä painike → modaali, katoaa valinnan jälkeen | Kyllä |
+| `inline-1line` | Pyörittimien rivi | Kyllä |
 | `box(%format%)` | Tekstinsyöttökenttä | Ei |
 | `month-year` | Kuukausi/vuosi-valitsin | Ei |
-| `year` | Vain vuosi -valitsin | Ei |
+| `year` | Vain vuosi-valitsin | Ei |
 
 ---
 
@@ -235,27 +235,27 @@ inline text-nolabel display{center, large}
 ```
 | type     | name        | label              | appearance                              |
 |----------|-------------|--------------------|-----------------------------------------|
-| date     | visit_date  | Käyntipäivä        | inline display{right} -[%d.%m.%Y]       |
+| date     | visit_date  | Käyntipäivä        | inline display{right} -[%d/%m/%Y]       |
 | date     | birth_date  | Syntymäaika        | inline-1line y_range(1940-2026)         |
-| time     | start_time  | Alkamisaika        | inline-1line                            |
-| datetime | event_time  | Tapahtuma aika & pvm | inline display{center, large} -[%d.%m.%Y %H:%M] |
-| date     | report_date | Raportointipäivä   | box(%d.%m.%Y)                           |
+| time     | start_time  | Aloitusaika        | inline-1line                            |
+| datetime | event_time  | Tapahtuman pvm & aika | inline display{center, large} -[%d/%m/%Y %H:%M] |
+| date     | report_date | Raportointipäivä   | box(%d/%m/%Y)                           |
 ```
 
 ---
 
 ## Parhaat käytännöt
 
-1. Käytä `inline`-ulkoasua tiiviissä lomakkeissa — se säästää pystysuoraa tilaa verrattuna aina avoimeen kalenteriin.
-2. Käytä `inline-1line`-ulkoasua, kun vastaajien on säädettävä yksittäisiä päivämäärän osia (esim. syntymävuosi).
-3. Käytä `box()`-ulkoasua vain, kun luotat siihen, että tiedonkerääjä kirjoittaa päivämäärät oikein — validointikäyttöliittymää ei näytetä.
-4. Käytä `display{center, large}` -määritettä tehdäksesi painikkeesta näkyvämmän mobiilinäytöillä.
-5. Määritä aina `-[muoto]`, jos oletusarvoinen `YYYY-MM-DD`-näyttö hämmentäisi paikallisia käyttäjiä.
-6. Huomioi aikavyöhykkeet, kun keräät datetime-tietoja eri alueilta.
+1. Käytä `inline`-asetusta kompakteissa lomakkeissa – se säästää pystysuuntaista tilaa verrattuna aina auki olevaan kalenteriin.
+2. Käytä `inline-1line`-asetusta, kun vastaajien on säädettävä yksittäisiä päivämäärän komponentteja (esim. syntymävuosi).
+3. Käytä `box()`-asetusta vain, kun luotat kyselyn suorittajan syöttävän päivämäärät oikein – validointikäyttöliittymää ei näytetä.
+4. Käytä `display{center, large}` -asetusta, jotta painike on näkyvämpi mobiilinäytöillä.
+5. Määritä aina `-[muoto]`, kun oletusarvoinen `VVVV-KK-PP`-näyttö hämmentäisi paikallisia käyttäjiä.
+6. Ole tietoinen aikavyöhykkeistä kerätessäsi datetime-dataa eri alueilla.
 
 ## Rajoitukset
 
-- `inline-1line` käyttää oletuksena aina tämän päivän päivämäärää, jos arvoa ei ole — käytä `default`-saraketta esitäyttääksesi tietyn päivämäärän.
-- `box()`-muoto hallitsee vain näyttöä; tallennettu arvo on aina ISO 8601.
-- Päivämäärävälin rajoitus (`inputs{range[...]}`) ei toimi `box`-asettelun kanssa.
-- Aikavyöhyke-erot voivat monimutkaistaa data-analyysia, jos niitä ei oteta asianmukaisesti huomioon.
+- `inline-1line` oletusarvoisesti aina nykyiseen päivämäärään, jos arvoa ei ole – käytä `default`-saraketta esitäyttääksesi tietyn päivämäärän.
+- `box()`-muoto ohjaa vain näyttöä; tallennettu arvo on aina ISO 8601.
+- Päivämääräalueen rajoitus (`inputs{range[...]}`) ei toimi `box`-ulkoasun kanssa.
+- Aikavyöhyke-erot voivat monimutkaistaa data-analyysiä, jos niitä ei oteta asianmukaisesti huomioon.
