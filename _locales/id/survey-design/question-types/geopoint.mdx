@@ -1,15 +1,15 @@
 ---
 title: "Geopoint"
-description: "Pertanyaan Geopoint menangkap koordinat geografis (lintang, bujur, ketinggian, dan akurasi) sebagai bagian dari survei."
+description: "Pertanyaan geopoint menangkap koordinat geografis (lintang, bujur, ketinggian, dan akurasi) sebagai bagian dari survei."
 ---
 
-Tipe pertanyaan `geopoint` menangkap koordinat geografis (lintang, bujur, ketinggian, akurasi) menggunakan GPS perangkat. rtSurvey merender pemilih dengan beberapa mode tata letak dan mendukung otomatisasi melalui parameter `inputs{}` dan `outputs{}`.
+Tipe pertanyaan `geopoint` menangkap koordinat geografis (lintang, bujur, ketinggian, akurasi) menggunakan GPS perangkat. rtSurvey menampilkan pemilih dengan beberapa mode tata letak dan mendukung otomatisasi melalui parameter `inputs{}` dan `outputs{}`.
 
-## Spesifikasi XLSForm Dasar
+## Spesifikasi Dasar XLSForm
 
-| type     | name        | label                       |
-|----------|-------------|-----------------------------|
-| geopoint | location    | Catat lokasi saat ini       |
+| type     | name        | label                           |
+|----------|-------------|---------------------------------|
+| geopoint | location    | Rekam lokasi saat ini           |
 
 Untuk spesifikasi standar, lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
@@ -25,19 +25,19 @@ Contoh: `13.756331 100.501762 15 8`
 
 ---
 
-## Mode tata letak (Layout modes)
+## Mode Tata Letak
 
 ### Default — tombol persegi panjang
 
-Tombol persegi panjang "START GEOPOINT" membuka modal peta lengkap di mana enumerator memilih titik. Setelah penangkapan, label tombol berubah menjadi "View or change geo point" dan koordinat muncul di bawahnya.
+Tombol persegi panjang "START GEOPOINT" membuka modal peta penuh tempat enumerator memilih suatu titik. Setelah pengambilan, label tombol berubah menjadi "Lihat atau ubah titik geo" dan koordinat muncul di bawah.
 
-Tidak diperlukan nilai penampilan (appearance).
+Tidak diperlukan nilai appearance.
 
 ---
 
-### `display{inline-icon}` — tombol crosshairs melingkar
+### `display{inline-icon}` — tombol bidik melingkar
 
-Merender tombol ikon melingkar (crosshairs ⊕) alih-alih tombol persegi panjang. Mengetuknya akan membuka modal peta yang sama.
+Menampilkan tombol ikon melingkar (bidik ⊕) alih-alih tombol persegi panjang. Mengetuknya akan membuka modal peta yang sama.
 
 ```
 display{inline-icon}
@@ -51,50 +51,50 @@ display{inline-icon, top}            → tombol di atas label
 display{inline-icon, bottom}         → tombol di bawah label, di tengah
 display{inline-icon, large}          → ikon besar (75px)
 display{inline-icon, medium}         → ikon sedang (50px)
-display{inline-icon, left, large}    → tombol besar di sebelah kiri
+display{inline-icon, left, large}    → tombol besar di kiri
 ```
 
-| Size | Icon height/width |
-|------|------------------|
-| *(default)* | 25px |
-| `medium` | 50px |
-| `large` | 75px |
+| Ukuran | Tinggi/lebar ikon |
+|--------|-------------------|
+| *(default)* | 25px              |
+| `medium` | 50px              |
+| `large` | 75px              |
 
 ---
 
 ### `display{thumbnail-square}` — thumbnail peta langsung
 
-Merender pratinjau peta langsung (Leaflet) langsung pada pertanyaan, bukan tombol. Thumbnail menunjukkan posisi GPS saat ini dan titik yang dipilih. Mengetuk tombol perluas akan membuka modal lengkap.
+Menampilkan pratinjau peta langsung (Leaflet) langsung pada pertanyaan alih-alih tombol. Thumbnail menunjukkan posisi GPS saat ini dan titik yang dipilih. Mengetuk tombol expand akan membuka modal penuh.
 
 ```
 display{thumbnail-square}
 ```
 
-**Ukuran thumbnail khusus:**
+**Ukuran thumbnail kustom:**
 
 ```
 display{thumbnail-square-[WxH]}          → piksel tetap
 display{thumbnail-square-[400x200]}      → lebar 400px × tinggi 200px
 
 display{thumbnail-square-[W%xH%]}        → persentase lebar formulir
-display{thumbnail-square-[100%x30%]}     → lebar penuh × 30% dari lebar formulir
+display{thumbnail-square-[100%x30%]}     → lebar penuh × 30% lebar formulir
 ```
 
 ---
 
-## `display{}` vs `results{}` — sebelum dan sesudah penangkapan
+## `display{}` vs `results{}` — sebelum dan sesudah pengambilan
 
-`display{}` mengontrol tata letak **sebelum** pengguna menangkap lokasi. `results{}` mengontrol tata letak **setelah** ada nilai. Keduanya dapat memiliki penyelarasan yang berbeda.
+`display{}` mengontrol tata letak **sebelum** pengguna mengambil lokasi. `results{}` mengontrol tata letak **setelah** nilai ada. Keduanya dapat memiliki penjajaran yang berbeda.
 
 ```
 display{inline-icon, right} results{left}
 ```
 
-Ini merender tombol di sebelah kanan sebelum penangkapan, lalu memindahkannya ke kiri setelah titik dicatat.
+Ini menampilkan tombol di kanan sebelum pengambilan, kemudian memindahkannya ke kiri setelah titik direkam.
 
-### `hide(value)` — menyembunyikan tampilan koordinat
+### `hide(value)` — menekan tampilan koordinat
 
-Secara default, teks lintang/bujur/akurasi/ketinggian yang ditangkap ditampilkan di bawah tombol. Sembunyikan dengan:
+Secara default, teks lat/lon/akurasi/ketinggian yang diambil ditampilkan di bawah tombol. Sembunyikan dengan:
 
 ```
 results{hide(value)}
@@ -103,25 +103,25 @@ display{inline-icon} results{hide(value)}
 
 ---
 
-## `inputs{}` — otomatisasi GPS
+## `inputs{}` — Otomatisasi GPS
 
-### Penangkapan otomatis saat memuat
+### Pengambilan otomatis saat memuat
 
-Mencatat posisi GPS secara otomatis saat formulir dimuat, tanpa enumerator menekan apa pun.
+Secara otomatis merekam posisi GPS saat formulir dimuat, tanpa enumerator menekan apa pun.
 
 ```
 inputs{auto-take}
 ```
 
-**Penangkapan otomatis bersyarat** menggunakan ekspresi XLSForm:
+**Pengambilan otomatis kondisional** menggunakan ekspresi XLSForm:
 
 ```
 inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
 ```
 
-### Isi awal dari bidang teks
+### Pra-isi dari kolom teks
 
-Isi geopoint dari pertanyaan yang berisi nama tempat atau string alamat. rtSurvey melakukan geocode balik string tersebut ke koordinat melalui OpenStreetMap Nominatim.
+Mengisi geopoint dari pertanyaan yang berisi nama tempat atau string alamat. rtSurvey melakukan geocoding terbalik string ke koordinat melalui OpenStreetMap Nominatim.
 
 ```
 inputs{question(address_field)}
@@ -129,9 +129,9 @@ inputs{question(address_field)}
 
 ---
 
-## `outputs{}` — geocode balik ke teks
+## `outputs{}` — geocoding terbalik ke teks
 
-Setelah titik ditangkap, secara otomatis isi pertanyaan `text` dengan alamat yang dapat dibaca manusia (di-geocode balik dari koordinat).
+Setelah titik diambil, secara otomatis mengisi pertanyaan `text` dengan alamat yang dapat dibaca manusia (geocoding terbalik dari koordinat).
 
 ```
 outputs{question(address_field)}
@@ -139,16 +139,16 @@ outputs{question(address_field)}
 
 Contoh:
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| geopoint | location | Catat lokasi | `outputs{question(address_text)}` |
-| text | address_text | Alamat | |
+| type     | name     | label             | appearance                   |
+|----------|----------|-------------------|------------------------------|
+| geopoint | location | Rekam lokasi      | `outputs{question(address_text)}` |
+| text     | address_text | Alamat            |                              |
 
 ---
 
-## `nomap` — penangkapan GPS tanpa peta
+## `nomap` — Pengambilan GPS tanpa peta
 
-Mengganti modal peta dengan dialog sederhana yang meminta izin lokasi dan mencatat koordinat. Tidak ada peta yang ditampilkan. Berguna untuk penangkapan GPS saja pada perangkat kelas bawah atau saat ubin peta tidak tersedia secara offline.
+Mengganti modal peta dengan dialog sederhana yang meminta izin lokasi dan merekam koordinat. Tidak ada peta yang ditampilkan. Berguna untuk pengambilan khusus GPS pada perangkat kelas bawah atau ketika tile peta tidak tersedia secara offline.
 
 ```
 nomap
@@ -156,9 +156,9 @@ nomap
 
 ---
 
-## Gaya tombol khusus (Custom button style)
+## Gaya tombol kustom
 
-Gunakan `styleButton()` untuk menerapkan CSS khusus ke tombol persegi panjang default:
+Gunakan `styleButton()` untuk menerapkan CSS kustom ke tombol persegi panjang default:
 
 ```
 styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
@@ -166,7 +166,7 @@ styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"}
 
 ---
 
-## Menyembunyikan label
+## Menekan label
 
 ```
 text-nolabel display{inline-icon, center, large}
@@ -176,28 +176,28 @@ text-nolabel display{inline-icon, center, large}
 
 ## Contoh penggunaan
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| geopoint | field_loc | Catat lokasi lapangan | `display{inline-icon, right, large}` |
-| geopoint | site | Lokasi situs | `display{thumbnail-square-[100%x30%]}` |
-| geopoint | auto_loc | Posisi saat ini | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
-| geopoint | mapped_loc | Lokasi | `display{inline-icon} outputs{question(address)}` |
-| geopoint | gps_only | Titik GPS | `nomap` |
+| type     | name        | label                       | appearance                                          |
+|----------|-------------|-----------------------------|-----------------------------------------------------|
+| geopoint | field_loc   | Rekam lokasi lapangan       | `display{inline-icon, right, large}`                |
+| geopoint | site        | Lokasi situs                | `display{thumbnail-square-[100%x30%]}`              |
+| geopoint | auto_loc    | Posisi saat ini             | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | mapped_loc  | Lokasi                      | `display{inline-icon} outputs{question(address)}`   |
+| geopoint | gps_only    | Titik GPS                   | `nomap`                                             |
 
 ---
 
 ## Praktik Terbaik
 
-1. Gunakan `inputs{auto-take}` untuk survei verifikasi enumerator di mana GPS wajib — ini menghapus langkah manual.
-2. Gunakan `display{thumbnail-square}` jika Anda ingin enumerator mengonfirmasi titik yang dipilih secara visual sebelum melanjutkan.
-3. Pasangkan `outputs{question(...)}` dengan bidang `text` hanya-baca untuk menunjukkan alamat yang di-geocode balik kepada enumerator.
-4. Gunakan `nomap` di area tanpa konektivitas internet di mana ubin peta tidak dapat dimuat.
-5. Beri waktu bagi GPS untuk stabil sebelum merekam — akurasi di bawah 10m biasanya cukup untuk survei lapangan.
+1.  Gunakan `inputs{auto-take}` untuk survei verifikasi enumerator di mana GPS wajib — ini menghilangkan langkah manual.
+2.  Gunakan `display{thumbnail-square}` ketika Anda ingin enumerator mengkonfirmasi secara visual titik yang dipilih sebelum melanjutkan.
+3.  Pasangkan `outputs{question(...)}` dengan kolom `text` hanya-baca untuk menampilkan alamat yang di-geocoding terbalik kepada enumerator.
+4.  Gunakan `nomap` di area tanpa konektivitas internet di mana tile peta tidak dapat dimuat.
+5.  Biarkan GPS stabil sebelum merekam — akurasi di bawah 10m biasanya cukup untuk survei lapangan.
 
-## Batasan
+## Keterbatasan
 
-- Geocoding `inputs{question(name)}` memerlukan akses internet — ini memanggil API OpenStreetMap Nominatim.
-- Reverse geocoding `outputs{question(name)}` juga memerlukan akses internet.
-- Thumbnail peta (`display{thumbnail-square}`) memerlukan internet untuk memuat ubin; koordinat tetap ditangkap secara offline.
-- Akurasi GPS bervariasi menurut perangkat dan lingkungan — kondisi dalam ruangan atau ngarai perkotaan dapat menghasilkan akurasi > 50m.
-- Mengumpulkan data lokasi dapat berdampak signifikan pada masa pakai baterai perangkat selama survei yang lama.
+-   Geocoding `inputs{question(name)}` memerlukan akses internet — ini memanggil OpenStreetMap Nominatim API.
+-   Geocoding terbalik `outputs{question(name)}` juga memerlukan akses internet.
+-   Thumbnail peta (`display{thumbnail-square}`) memerlukan internet untuk memuat tile; koordinat masih diambil secara offline.
+-   Akurasi GPS bervariasi tergantung perangkat dan lingkungan — kondisi dalam ruangan atau jurang perkotaan dapat menghasilkan akurasi > 50m.
+-   Mengumpulkan data lokasi dapat secara signifikan memengaruhi masa pakai baterai perangkat selama survei panjang.

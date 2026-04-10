@@ -1,77 +1,77 @@
 ---
 title: "Barcode"
-description: "Pertanyaan Barcode memindai dan menangkap data QR codes dan barcode dalam survei Anda."
+description: "Pertanyaan barcode memindai dan menangkap kode QR serta data barcode dalam survei Anda."
 ---
 
-Tipe pertanyaan `barcode` menangkap nilai kode dengan memindai QR code atau barcode dengan kamera perangkat. Modal pemindai juga menyertakan input teks manual sebagai cadangan ketika pemindaian tidak memungkinkan.
+Tipe pertanyaan `barcode` menangkap nilai kode dengan memindai kode QR atau barcode dengan kamera perangkat. Modal pemindai juga menyertakan input teks manual sebagai cadangan ketika pemindaian tidak memungkinkan.
 
-## Basic XLSForm Specification
+## Spesifikasi Dasar XLSForm
 
-| type    | name         | label                    |
-|---------|--------------|--------------------------|
-| barcode | product_code | Scan the product barcode |
-| barcode | ticket_id    | Scan the ticket          |
+| type    | name         | label                          |
+|---------|--------------|--------------------------------|
+| barcode | product_code | Pindai barcode produk          |
+| barcode | ticket_id    | Pindai tiket                   |
 
-Untuk spesifikasi standar lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk spesifikasi standar, lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
 ---
 
-## Supported formats
+## Format yang didukung
 
-rtSurvey mendukung QR codes dan barcode 1D standar melalui kamera perangkat, termasuk:
+rtSurvey mendukung kode QR dan barcode 1D standar melalui kamera perangkat, termasuk:
 
-- QR Code
+- Kode QR
 - UPC-A, UPC-E
 - EAN-8, EAN-13
-- Code 39, Code 128
+- Kode 39, Kode 128
 - ITF, Codabar
 
 ---
 
-## Default layout
+## Tata letak default
 
-Tanpa pengaturan `appearance`, pertanyaan merender tombol lebar penuh **"GET BARCODE"**. Mengetuknya akan membuka modal pemindai. Setelah pemindaian berhasil, tombol berubah menjadi **"REPLACE BARCODE"** dan nilai yang dipindai muncul di bawah sebagai tautan yang dapat diklik.
+Tanpa `appearance` yang diatur, pertanyaan akan menampilkan tombol **"GET BARCODE"** selebar penuh. Mengetuknya akan membuka modal pemindai. Setelah pemindaian berhasil, tombol berubah menjadi **"REPLACE BARCODE"** dan nilai yang dipindai muncul di bawah sebagai tautan yang dapat diklik.
 
 ---
 
-## Scanner modal
+## Modal pemindai
 
 Modal pemindai selalu menyertakan:
-- **Tampilan kamera langsung (Live camera view)** — memindai secara otomatis saat terdeteksi; modal tertutup setelah pemindaian berhasil.
-- **Input teks manual (Manual text input)** — bidang teks di bagian bawah tempat enumerator dapat mengetik kode jika pemindaian gagal.
-- **Tombol Selesai (Done button)** — mengirimkan nilai yang diketik secara manual.
+- **Tampilan kamera langsung** — memindai secara otomatis saat terdeteksi; modal akan menutup setelah pemindaian berhasil.
+- **Input teks manual** — kolom teks di bagian bawah tempat enumerator dapat mengetik kode jika pemindaian gagal.
+- **Tombol Selesai** — mengirimkan nilai yang diketik secara manual.
 
-Ketika kamera perangkat tidak tersedia, modal beralih ke opsi **"Upload an image"** — enumerator dapat mengirimkan foto barcode untuk didekode.
+Ketika kamera perangkat tidak tersedia, modal akan kembali ke opsi **"Unggah gambar"** — enumerator dapat mengirimkan foto barcode untuk dekode.
 
 ---
 
-## Inline button layout
+## Tata letak tombol inline
 
-Tambahkan `inline` untuk merender pemindai sebagai **tombol ikon lingkaran** di samping label alih-alih tombol lebar penuh.
+Tambahkan `inline` untuk merender pemindai sebagai **tombol ikon melingkar** di sebelah label, bukan tombol selebar penuh.
 
 ```
 | type    | name | label     | appearance                              |
 |---------|------|-----------|----------------------------------------|
-| barcode | code | Scan item | inline display{right}                  |
-| barcode | code | Scan item | inline display{left, large}            |
-| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+| barcode | code | Pindai item | inline display{right}                  |
+| barcode | code | Pindai item | inline display{left, large}            |
+| barcode | code | Pindai item | inline display{center, large, <0099FF/>} |
 ```
 
 **Posisi tombol** — `left`, `right` *(default)*, `top`, `center`, `bottom`
 
 **Ukuran tombol** — `small` *(default)*, `medium`, `large`
 
-**Warna tombol** — tambahkan warna hex di dalam `display{}` untuk mengganti warna utama:
+**Warna tombol** — tambahkan warna hex di dalam `display{}` untuk menimpa warna primer:
 
 ```
 inline display{right, large, <FF5500/>}
 ```
 
-**Kontrol pasca-penangkapan — `results{}`:**
+**Kontrol pasca-rekaman — `results{}`:**
 
-| Appearance | Efek |
-|---|---|
-| `results{hide(scanner)}` | Menyembunyikan tombol pemindaian setelah nilai ditangkap |
+| Appearance | Efek                                  |
+|------------|---------------------------------------|
+| `results{hide(scanner)}` | Menyembunyikan tombol pindai setelah nilai ditangkap |
 | `results{hide(review)}` | Menyembunyikan tautan nilai yang dipindai setelah penangkapan |
 | `results{hide(value)}` | Menyembunyikan tampilan teks nilai yang dipindai |
 | `results{left}` | Memindahkan ikon ke kiri setelah penangkapan |
@@ -83,13 +83,13 @@ inline display{center, large} results{hide(scanner)}
 
 ---
 
-## `inputs{auto-close(N)}` — tutup otomatis pemindai
+## `inputs{auto-close(N)}` — pemindai tutup otomatis
 
-Menutup modal pemindai secara otomatis setelah `N` detik jika tidak ada barcode yang terdeteksi. Pengatur waktu mundur langsung ditampilkan di dalam modal.
+Secara otomatis menutup modal pemindai setelah `N` detik jika tidak ada barcode yang terdeteksi. Penghitung waktu mundur langsung ditampilkan di dalam modal.
 
 ```
-inputs{auto-close(10)}     → tertutup setelah 10 detik
-inputs{auto-close(5)}      → tertutup setelah 5 detik
+inputs{auto-close(10)}     → menutup setelah 10 detik
+inputs{auto-close(5)}      → menutup setelah 5 detik
 ```
 
 Gabungkan dengan inline:
@@ -101,7 +101,7 @@ inline display{right} inputs{auto-close(10)}
 
 ## `inputs{floating}` — pemindai mengambang yang dapat diseret
 
-Menampilkan **tombol minimalkan** (ikon kompres ⊞) di header modal pemindai. Mengetuknya akan menciutkan pemindai menjadi ikon lingkaran mengambang kecil yang dapat diseret ke mana saja di layar. Mengetuk ikon mengambang akan membuka kembali pemindai.
+Menampilkan **tombol minimize** (ikon kompres ⊞) di header modal pemindai. Mengetuknya akan menyusutkan pemindai menjadi ikon melingkar kecil yang mengambang dan dapat diseret ke mana saja di layar. Mengetuk ikon mengambang akan membuka kembali pemindai.
 
 ```
 inputs{floating}
@@ -112,7 +112,7 @@ Berguna dalam alur kerja di mana enumerator perlu melihat formulir saat pemindai
 
 ---
 
-## `invisible auto-show` — buka otomatis pemindai
+## `invisible auto-show` — pemindai buka otomatis
 
 Menyembunyikan widget pertanyaan dari tata letak tetapi secara otomatis membuka pemindai saat halaman dimuat. Berguna untuk menyematkan langkah pemindaian senyap dalam alur formulir.
 
@@ -123,13 +123,13 @@ inline invisible auto-show
 
 ---
 
-## Dalam grup repetisi (In repeat groups)
+## Dalam grup berulang
 
-Ketika `barcode` berada di dalam grup `begin repeat`, pemindaian yang berhasil secara otomatis berlanjut ke **instansi repetisi berikutnya** setelah nilai dicatat. Ini memungkinkan pemindaian berurutan yang cepat tanpa enumerator mengetuk "Tambah" (Add) di antara item.
+Ketika `barcode` berada di dalam grup `begin repeat`, pemindaian yang berhasil secara otomatis akan maju ke **instance pengulangan berikutnya** setelah nilai dicatat. Ini memungkinkan pemindaian berurutan yang cepat tanpa enumerator harus mengetuk "Tambah" di antara item.
 
 ---
 
-## Sembunyikan label (Suppress the label)
+## Menekan label
 
 ```
 inline text-nolabel display{center, large}
@@ -141,38 +141,38 @@ inline text-nolabel display{center, large}
 
 ### Pemindaian inventaris
 
-| type | name | label | appearance | required |
-|------|------|-------|------------|----------|
-| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
-| integer | quantity | Quantity | | yes |
-| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
+| type    | name       | label                   | appearance              | required |
+|---------|------------|-------------------------|-------------------------|----------|
+| barcode | item_code  | Pindai barcode item     | `inline display{right}` | yes      |
+| integer | quantity   | Jumlah                  |                         | yes      |
+| note    | confirm    | Item: `${item_code}` — Jumlah: `${quantity}` |         |          |
 
-### Pemindaian cepat multi-item (grup repetisi)
+### Pemindaian multi-item cepat (grup berulang)
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| begin repeat | items | | |
-| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
-| end repeat | items | | |
+| type       | name  | label           | appearance                           |
+|------------|-------|-----------------|--------------------------------------|
+| begin repeat | items |                 |                                      |
+| barcode    | code  | Pindai item berikutnya | `inline display{right} inputs{auto-close(8)}` |
+| end repeat | items |                 |                                      |
 
-### Pemindaian otomatis senyap saat halaman dimuat
+### Pemindaian otomatis senyap saat memuat halaman
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| barcode | entry_code | | `invisible auto-show` |
+| type    | name       | label | appearance            |
+|---------|------------|-------|-----------------------|
+| barcode | entry_code |       | `invisible auto-show` |
 
 ---
 
 ## Praktik Terbaik
 
-1. Gunakan `inputs{auto-close(N)}` untuk mencegah pemindai tetap terbuka tanpa batas waktu — pilih nilai yang memberi enumerator cukup waktu untuk memposisikan barcode (biasanya 8–15 detik).
-2. Gunakan `inputs{floating}` saat formulir harus tetap terlihat selama pemindaian (misalnya, memindai dari daftar di mana enumerator melakukan referensi silang ke bidang yang terlihat).
-3. Tempatkan pertanyaan barcode di dalam grup repetisi untuk pemindaian berurutan yang cepat — kemajuan repetisi otomatis menghilangkan langkah "Tambah" manual.
-4. Selalu sertakan kolom `hint` dengan instruksi pemosisian (misalnya, "Pegang barcode dalam jarak 10–30 cm dari kamera, dalam cahaya yang baik").
-5. Input teks manual di modal pemindai selalu tersedia — latih enumerator untuk menggunakannya sebagai cadangan untuk barcode yang rusak atau kotor.
+1.  Gunakan `inputs{auto-close(N)}` untuk mencegah pemindai tetap terbuka tanpa batas — pilih nilai yang memberi enumerator cukup waktu untuk memposisikan barcode (8–15 detik biasanya).
+2.  Gunakan `inputs{floating}` ketika formulir perlu tetap terlihat saat memindai (misalnya, memindai dari daftar di mana enumerator merujuk silang bidang yang terlihat).
+3.  Tempatkan pertanyaan barcode di dalam grup berulang untuk pemindaian berurutan yang cepat — kemajuan pengulangan otomatis menghilangkan langkah "Tambah" manual.
+4.  Selalu sertakan kolom `hint` dengan instruksi pemosisian (misalnya, "Pegang barcode dalam jarak 10–30 cm dari kamera, dalam cahaya yang baik").
+5.  Input teks manual di modal pemindai selalu tersedia — latih enumerator untuk menggunakannya sebagai cadangan untuk barcode yang rusak atau kotor.
 
-## Batasan
+## Keterbatasan
 
-- Akurasi pemindaian bergantung pada kualitas kamera, pencahayaan, dan kondisi barcode — kode yang rusak atau kontras rendah mungkin tidak terpindai dengan andal.
-- Pemindai menggunakan kamera belakang (menghadap ke lingkungan); perangkat tanpa kamera belakang akan beralih ke opsi unggah gambar.
-- `invisible auto-show` hanya terbuka pada pemuatan halaman pertama; menavigasi kembali ke halaman tidak memicu kembali pembukaan otomatis.
+-   Akurasi pemindaian tergantung pada kualitas kamera, pencahayaan, dan kondisi barcode — kode yang rusak atau kontras rendah mungkin tidak dapat dipindai dengan andal.
+-   Pemindai menggunakan kamera belakang (menghadap lingkungan); perangkat tanpa kamera belakang akan kembali ke opsi unggah gambar.
+-   `invisible auto-show` hanya terbuka pada pemuatan halaman pertama; menavigasi kembali ke halaman tidak akan memicu kembali pembukaan otomatis.

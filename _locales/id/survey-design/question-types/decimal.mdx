@@ -3,31 +3,31 @@ title: "Desimal"
 description: "Tipe pertanyaan input angka pecahan di rtSurvey"
 ---
 
-Tipe pertanyaan `decimal` mengumpulkan angka yang mungkin menyertakan bagian pecahan (misalnya `3.14`, `72.5`). Ini memicu keyboard numerik pada ponsel dan mendukung opsi tampilan (appearance) yang sama dengan tipe `text` untuk tata letak dan pemformatan.
+Tipe pertanyaan `decimal` mengumpulkan angka yang mungkin menyertakan bagian pecahan (misalnya `3.14`, `72.5`). Ini memicu keyboard numerik di perangkat seluler dan mendukung opsi `appearance` yang sama dengan tipe `text` untuk tata letak dan pemformatan.
 
 ## Spesifikasi Dasar XLSForm
 
-| type | name | label |
-|------|------|-------|
-| decimal | weight_kg | Berat (kg) |
-| decimal | height_m | Tinggi (m) |
-| decimal | temperature | Suhu tubuh (°C) |
+| type    | name        | label                   |
+|---------|-------------|-------------------------|
+| decimal | weight_kg   | Berat (kg)              |
+| decimal | height_m    | Tinggi (m)              |
+| decimal | temperature | Suhu tubuh (°C)         |
 
-Untuk spesifikasi standar lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk spesifikasi standar, lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
 ---
 
-## Opsi tampilan (Appearance options)
+## Opsi appearance
 
 ### `number-hspinner` — pemutar horizontal
 
-Mengganti input dengan pemutar horizontal **− nilai +**. Mengetuk minus/plus menyesuaikan nilai berdasarkan langkah (step) yang dikonfigurasi.
+Menggantikan input dengan pemutar horizontal **− nilai +**. Mengetuk minus/plus menyesuaikan nilai dengan langkah yang dikonfigurasi.
 
 ```
 number-hspinner
 ```
 
-Nilai yang ditampilkan diformat dengan satu tempat desimal (misalnya `3.0`, `72.5`). Langkah default adalah `1`; gunakan `hspinner()` untuk menyetel langkah desimal.
+Nilai yang ditampilkan diformat dengan satu tempat desimal (misalnya `3.0`, `72.5`). Langkah default adalah `1`; gunakan `hspinner()` untuk mengatur langkah desimal.
 
 **Sesuaikan bentuk tombol dan langkah** menggunakan `hspinner()`:
 
@@ -49,7 +49,7 @@ Empat nilai secara berurutan: latar belakang tombol kiri, ikon tombol kiri, lata
 
 ### `thousandsep` — pemisah ribuan
 
-Memformat angka yang ditampilkan dengan pengelompokan koma (misalnya `1,234.56`). Angka mentah disimpan tanpa koma. Tipe input dialihkan ke `"text"` untuk memungkinkan tampilan yang diformat.
+Memformat angka yang ditampilkan dengan pengelompokan koma (misalnya `1,234.56`). Angka mentah disimpan tanpa koma. Tipe input diubah menjadi `"text"` untuk memungkinkan tampilan yang diformat.
 
 ```
 thousandsep
@@ -59,13 +59,13 @@ thousandsep
 
 ### `digisep(n, "sep")` — pengelompokan digit kustom
 
-Mengelompokkan digit bagian integer ke dalam blok `n` yang dipisahkan oleh pemisah kustom.
+Mengelompokkan digit bagian integer menjadi blok `n` yang dipisahkan oleh pemisah kustom.
 
 ```
 digisep(3," ")      → 1 234 567.89
 ```
 
-Tipe input dialihkan ke `"text"` saat tampilan ini aktif.
+Tipe input diubah menjadi `"text"` ketika appearance ini aktif.
 
 ---
 
@@ -79,9 +79,9 @@ textonly
 
 ---
 
-### `floating_hint` — petunjuk melayang sebagai label
+### `floating_hint` — petunjuk mengambang sebagai label
 
-Teks `hint` merender di dalam input sebagai placeholder. Saat pengguna mulai mengetik, teks tersebut melayang di atas bidang sebagai label.
+Teks `hint` dirender di dalam input sebagai placeholder. Saat pengguna mulai mengetik, teks tersebut mengambang di atas kolom sebagai label.
 
 ```
 floating_hint
@@ -91,7 +91,7 @@ floating_hint
 
 ### `embed` — petunjuk di dalam batas input
 
-Mirip dengan `floating_hint` — petunjuk berada di dalam batas input saat kosong. Petunjuk tidak melayang saat pengguna mengetik.
+Mirip dengan `floating_hint` — petunjuk berada di dalam batas input saat kosong. Petunjuk tidak mengambang saat pengguna mengetik.
 
 ```
 embed
@@ -101,7 +101,7 @@ embed
 
 ### `textpopup` — input dialog modal
 
-Mengetuk bidang akan membuka dialog modal dengan input yang lebih besar. Berguna pada layar kecil.
+Mengetuk kolom akan membuka dialog modal dengan input yang lebih besar. Berguna di layar kecil.
 
 ```
 textpopup
@@ -121,18 +121,18 @@ charcount
 
 ### `prefix(expr)` — tambahkan awalan
 
-Menambahkan string statis atau terhitung ke nilai yang ditampilkan. Nilai yang disimpan tidak termasuk awalan.
+Menambahkan string statis atau terhitung ke nilai yang ditampilkan. Nilai yang disimpan tidak menyertakan awalan.
 
 ```
 prefix('USD ')          → menampilkan "USD 72.50", menyimpan "72.50"
-prefix(${currency})     → awalan dinamis dari bidang lain
+prefix(${currency})     → awalan dinamis dari kolom lain
 ```
 
 ---
 
-### `align_answer` — perataan teks input
+### `align_answer` — penjajaran teks input
 
-Mengontrol perataan horizontal nilai yang diketik di dalam input.
+Mengontrol penjajaran horizontal nilai yang diketik di dalam input.
 
 ```
 align_answer = left
@@ -142,9 +142,9 @@ align_answer = center
 
 ---
 
-### `inputs{qrscan}` — pemindaian QR / kode batang ke dalam bidang
+### `inputs{qrscan}` — pemindaian QR / barcode ke kolom
 
-Menambahkan tombol pemindaian kode QR di sebelah input. Membuka pemindai kamera dan mengisi bidang dengan nilai yang dipindai.
+Menambahkan tombol pindai kode QR di sebelah input. Membuka pemindai kamera dan mengisi kolom dengan nilai yang dipindai.
 
 ```
 inputs{qrscan}
@@ -152,45 +152,45 @@ inputs{qrscan}
 
 ---
 
-## Referensi cepat tampilan (Appearance quick reference)
+## Referensi cepat appearance
 
-| Appearance | Widget rendered |
-|---|---|
-| *(none)* | Input angka (`type="number"`) — keyboard numerik pada ponsel |
-| `number-hspinner` | Pemutar horizontal − nilai +, satu tempat desimal ditampilkan |
-| `number-hspinner hspinner(...)` | Pemutar dengan bentuk tombol dan langkah kustom |
-| `number-hspinner colors(...)` | Pemutar dengan warna tombol kustom |
-| `thousandsep` | Tampilan angka dengan pengelompokan koma |
-| `digisep(n,"sep")` | Pengelompokan digit kustom |
-| `textonly` | Paksa keyboard teks |
-| `floating_hint` | Petunjuk melayang di atas bidang saat mengetik |
-| `embed` | Petunjuk di dalam batas input |
-| `textpopup` | Ketuk untuk membuka dialog modal |
-| `charcount` | Penghitungan karakter langsung di bawah input |
-| `prefix(expr)` | Tambahkan awalan statis atau dinamis |
-| `align_answer = left/right/center` | Perataan teks input |
-| `inputs{qrscan}` | Tombol pemindaian QR/kode batang |
+| Appearance                        | Widget yang dirender                               |
+|-----------------------------------|----------------------------------------------------|
+| *(none)*                          | Input angka (`type="number"`) — keyboard numerik di perangkat seluler |
+| `number-hspinner`                 | Pemutar horizontal − nilai +, satu tempat desimal ditampilkan |
+| `number-hspinner hspinner(...)`   | Pemutar dengan bentuk tombol dan langkah kustom      |
+| `number-hspinner colors(...)`     | Pemutar dengan warna tombol kustom                 |
+| `thousandsep`                     | Tampilan angka yang dikelompokkan koma            |
+| `digisep(n,"sep")`                | Pengelompokan digit kustom                         |
+| `textonly`                        | Paksa keyboard teks                                |
+| `floating_hint`                   | Petunjuk mengambang di atas kolom saat mengetik      |
+| `embed`                           | Petunjuk di dalam batas input                      |
+| `textpopup`                       | Ketuk untuk membuka dialog modal                   |
+| `charcount`                       | Penghitung karakter langsung di bawah input        |
+| `prefix(expr)`                    | Tambahkan awalan statis atau dinamis               |
+| `align_answer = left/right/center` | Penjajaran teks input                            |
+| `inputs{qrscan}`                  | Tombol pindai QR/barcode                           |
 
 ---
 
-## Batasan dan validasi (Constraints and validation)
+## Batasan dan validasi
 
-| type | name | label | constraint | constraint_message |
-|------|------|-------|------------|-------------------|
-| decimal | weight | Berat (kg) | `. > 0 and . <= 500` | Masukkan nilai antara 0 dan 500 |
-| decimal | height | Tinggi (m) | `. > 0 and . <= 3` | Masukkan nilai antara 0 dan 3 |
-| decimal | temp | Suhu (°C) | `. >= 35 and . <= 42` | Suhu normal: 35°C–42°C |
-| decimal | percentage | Persentase | `. >= 0 and . <= 100` | Masukkan nilai antara 0 dan 100 |
+| type    | name       | label                     | constraint               | constraint_message             |
+|---------|------------|---------------------------|--------------------------|--------------------------------|
+| decimal | weight     | Berat (kg)                | `. > 0 and . <= 500`     | Masukkan nilai antara 0 dan 500 |
+| decimal | height     | Tinggi (m)                | `. > 0 and . <= 3`       | Masukkan nilai antara 0 dan 3 |
+| decimal | temp       | Suhu (°C)                 | `. >= 35 and . <= 42`    | Suhu normal: 35°C–42°C        |
+| decimal | percentage | Persentase                | `. >= 0 and . <= 100`    | Masukkan nilai antara 0 dan 100 |
 
 ---
 
 ## Contoh — formulir pengukuran
 
-| type | name | label | appearance | constraint | constraint_message |
-|------|------|-------|------------|------------|-------------------|
-| decimal | weight_kg | Berat (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Masukkan berat yang valid |
-| decimal | height_m | Tinggi (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Masukkan tinggi yang valid |
-| calculate | bmi | | | | |
+| type    | name        | label               | appearance                                              | constraint             | constraint_message       |
+|---------|-------------|---------------------|---------------------------------------------------------|------------------------|--------------------------|
+| decimal | weight_kg   | Berat (kg)          | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300`   | Masukkan berat yang valid |
+| decimal | height_m    | Tinggi (m)          | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3`     | Masukkan tinggi yang valid |
+| calculate | bmi         |                     |                                                         |                        |                          |
 
 Kolom perhitungan BMI:
 ```
@@ -201,12 +201,12 @@ ${weight_kg} div (${height_m} * ${height_m})
 
 ## Praktik Terbaik
 
-1. Gunakan `number-hspinner hspinner(..., '0.1')` untuk pengukuran yang memerlukan presisi satu desimal — pemutar memformat secara otomatis ke satu tempat desimal, menjaga nilai tetap konsisten.
-2. Gunakan `textonly` saat browser menambahkan kontrol putar yang tidak diinginkan atau memotong angka nol di belakang (misalnya `3.0` ditampilkan sebagai `3`).
-3. Gunakan `thousandsep` untuk nilai keuangan yang besar sehingga responden dapat memverifikasi bahwa mereka memasukkan besaran yang benar.
-4. Terapkan batasan rentang daripada hanya mengandalkan tipe keyboard ponsel saja.
+1.  Gunakan `number-hspinner hspinner(..., '0.1')` untuk pengukuran yang memerlukan satu desimal presisi — pemutar secara otomatis memformat ke satu tempat desimal, menjaga nilai tetap konsisten.
+2.  Gunakan `textonly` ketika browser menambahkan kontrol putar yang tidak diinginkan atau memotong angka nol di belakang (misalnya `3.0` ditampilkan sebagai `3`).
+3.  Gunakan `thousandsep` untuk nilai keuangan yang besar agar responden dapat memverifikasi bahwa mereka memasukkan besaran yang benar.
+4.  Terapkan batasan rentang daripada hanya mengandalkan jenis keyboard seluler.
 
-## Keterbatasan (Limitations)
+## Keterbatasan
 
-- Pemutar selalu menampilkan satu tempat desimal — jika Anda memerlukan presisi lebih pada nilai yang ditampilkan, gunakan input biasa saja.
-- `thousandsep` dan `digisep()` menyimpan angka mentah — jangan membaca nilai tampilan yang diformat dalam perhitungan.
+-   Pemutar selalu menampilkan satu tempat desimal — jika Anda memerlukan presisi lebih dalam nilai yang ditampilkan, gunakan input biasa sebagai gantinya.
+-   `thousandsep` dan `digisep()` menyimpan angka mentah — jangan membaca nilai tampilan yang diformat dalam perhitungan.

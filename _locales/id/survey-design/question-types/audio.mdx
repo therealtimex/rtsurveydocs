@@ -3,34 +3,34 @@ title: "Audio"
 description: "Pertanyaan audio memungkinkan responden untuk merekam dan mengirimkan file audio sebagai bagian dari survei."
 ---
 
-Tipe pertanyaan `audio` memungkinkan responden untuk **merekam audio** atau mengunggah file audio yang sudah ada sebagai bagian dari respons survei mereka. Ini berguna untuk menangkap keterangan lisan, suara lingkungan, testimoni, atau informasi apa pun yang lebih baik disampaikan melalui suara daripada teks.
+Tipe pertanyaan `audio` memungkinkan responden untuk **merekam audio** atau mengunggah file audio yang sudah ada sebagai bagian dari tanggapan survei mereka. Ini berguna untuk merekam keterangan lisan, suara lingkungan, testimoni, atau informasi apa pun yang lebih baik disampaikan melalui suara daripada teks.
 
 ## Spesifikasi Dasar XLSForm
 
-| type  | name        | label                        |
-|-------|-------------|------------------------------|
-| audio | voice_note  | Silakan rekam komentar Anda  |
+| type  | name        | label                           |
+|-------|-------------|---------------------------------|
+| audio | voice_note  | Mohon rekam komentar Anda       |
 
 Untuk detail lebih lanjut tentang tipe pertanyaan audio standar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
 
-## Kegunaan
+## Penggunaan
 
 Pertanyaan audio umumnya digunakan untuk:
 
-1. Menangkap respons lisan terbuka untuk mengurangi beban mengetik bagi enumerator
-2. Merekam testimoni, cerita pribadi, atau sejarah lisan
-3. Mendokumentasikan suara lingkungan (misalnya, tingkat kebisingan di dekat infrastruktur)
-4. Mengumpulkan sampel suara untuk penelitian linguistik atau kesehatan
-5. Memungkinkan responden untuk menambahkan klarifikasi lisan pada jawaban numerik atau pilihan
+1.  Merekam tanggapan lisan terbuka untuk mengurangi beban pengetikan enumerator
+2.  Merekam testimoni, cerita pribadi, atau sejarah lisan
+3.  Mendokumentasikan suara lingkungan (misalnya, tingkat kebisingan di dekat infrastruktur)
+4.  Mengumpulkan sampel suara untuk penelitian linguistik atau kesehatan
+5.  Memungkinkan responden untuk menambahkan klarifikasi lisan pada jawaban numerik atau pilihan
 
 ## Format data
 
 File audio disimpan sebagai lampiran biner bersama dengan pengiriman formulir, biasanya:
 
-- **Format:** MP3 atau AAC (rekaman seluler); WAV (rekaman kualitas tinggi)
-- **Penamaan:** `{instanceID}-{fieldname}.mp3` (atau setara)
-- **Penyimpanan:** Diunggah ke folder media server dan ditautkan ke catatan pengiriman
-- **Akses:** Dapat diputar dan diunduh dari antarmuka manajemen pengiriman
+-   **Format:** MP3 atau AAC (rekaman seluler); WAV (rekaman berkualitas tinggi)
+-   **Penamaan:** `{instanceID}-{fieldname}.mp3` (atau yang setara)
+-   **Penyimpanan:** Diunggah ke folder media server dan ditautkan ke catatan pengiriman
+-   **Akses:** Dapat diputar dan diunduh dari antarmuka manajemen pengiriman
 
 ## Ekstensi rtSurvey
 
@@ -38,91 +38,91 @@ File audio disimpan sebagai lampiran biner bersama dengan pengiriman formulir, b
 
 Gunakan kolom `parameters` untuk membatasi panjang rekaman:
 
-| type | name | label | parameters |
-|------|------|-------|------------|
-| audio | interview | Rekam wawancara | `max-duration=120` |
+| type  | name      | label               | parameters          |
+|-------|-----------|---------------------|---------------------|
+| audio | interview | Rekam wawancara ini | `max-duration=120` |
 
-`max-duration` dalam hitungan detik. Perekam berhenti secara otomatis saat mencapai batas.
+`max-duration` dalam detik. Perekam berhenti otomatis pada batas waktu.
 
 ### Pengaturan kualitas
 
 Kualitas rekaman dapat diatur melalui `parameters`:
 
-| type | name | label | parameters |
-|------|------|-------|------------|
-| audio | feedback | Rekam umpan balik | `quality=normal` |
+| type  | name     | label               | parameters     |
+|-------|----------|---------------------|----------------|
+| audio | feedback | Rekam umpan balik   | `quality=normal` |
 
 Nilai yang didukung: `low`, `normal` (default), `voice-only`. `voice-only` mengoptimalkan audio ucapan dengan pengurangan kebisingan.
 
 ### Pemutaran sebelum pengiriman
 
-Di ponsel, enumerator dapat memutar kembali klip yang direkam sebelum melanjutkan. Ini diaktifkan secara default — tidak diperlukan konfigurasi.
+Di perangkat seluler, enumerator dapat memutar ulang klip yang direkam sebelum melanjutkan. Ini diaktifkan secara default — tidak ada konfigurasi yang diperlukan.
 
-### Integrasi perekam bawaan
+### Integrasi perekam native
 
-Di Android dan iOS, `audio` meluncurkan aplikasi rekaman bawaan perangkat. Di web, ia menggunakan MediaRecorder API bawaan browser.
+Di Android dan iOS, `audio` meluncurkan aplikasi perekaman native perangkat. Di web, ini menggunakan API MediaRecorder bawaan browser.
 
 ### Tata letak tombol inline
 
-Tambahkan `inline` untuk merender mikrofon sebagai **tombol ikon lingkaran** di samping label.
+Tambahkan `inline` untuk merender mikrofon sebagai **tombol ikon melingkar** di sebelah label.
 
 ```
 | type  | name | label        | appearance                    |
 |-------|------|--------------|-------------------------------|
-| audio | clip | Rekam audio  | inline display{right}         |
-| audio | clip | Rekam audio  | inline display{left, large}   |
+| audio | clip | Rekam audio | inline display{right}         |
+| audio | clip | Rekam audio | inline display{left, large}   |
 ```
 
 **Posisi tombol** — `left`, `right` *(default)*, `top`, `center`, `bottom`
 
 **Ukuran tombol** — `small` *(default)*, `medium`, `large`
 
-**Warna tombol** — tambahkan warna hex di dalam `display{}` untuk menimpa warna utama:
+**Warna tombol** — tambahkan warna hex di dalam `display{}` untuk menimpa warna primer:
 
 ```
 inline display{right, large, <FF5500/>}
 ```
 
-**Kontrol pasca-pengambilan — `results{}`:**
+**Kontrol pasca-rekaman — `results{}`:**
 
-| Appearance | Effect |
-|---|---|
-| `results{hide(capture)}` | Menyembunyikan tombol rekam setelah audio diambil |
-| `results{hide(review)}` | Menyembunyikan tombol putar |
+| Appearance        | Efek                                |
+|-------------------|-------------------------------------|
+| `results{hide(capture)}` | Menyembunyikan tombol rekam setelah audio direkam |
+| `results{hide(review)}` | Menyembunyikan tombol putar ulang   |
 | `results{hide(filename)}` | Menyembunyikan nama file dan durasi |
-| `results{left}` | Memindahkan ikon ke kiri setelah pengambilan |
+| `results{left}`   | Memindahkan ikon ke kiri setelah rekaman |
 
-Contoh — sembunyikan tombol rekam setelah pengambilan, tetap tampilkan tombol putar:
+Contoh — sembunyikan tombol rekam setelah rekaman, pertahankan pemutaran:
 ```
 inline display{right} results{hide(capture)}
 ```
 
 ## Contoh penggunaan
 
-### Dengan durasi maksimum dan petunjuk (hint)
+### Dengan durasi maksimum dan petunjuk
 
-| type | name | label | hint | parameters |
-|------|------|-------|------|------------|
-| audio | story | Ceritakan tentang kejadian tersebut dengan kata-kata Anda sendiri | Bicara dengan jelas. Rekaman berhenti setelah 3 menit. | `max-duration=180` |
+| type  | name  | label                                      | hint                                                 | parameters         |
+|-------|-------|--------------------------------------------|------------------------------------------------------|--------------------|
+| audio | story | Ceritakan kepada kami tentang kejadian itu | Bicaralah dengan jelas. Rekaman berhenti setelah 3 menit. | `max-duration=180` |
 
-### Audio kondisional — hanya jika ada masalah yang dilaporkan
+### Audio kondisional — hanya jika masalah dilaporkan
 
-| type | name | label | relevant | required |
-|------|------|-------|----------|----------|
-| select_one yesno | issue_found | Apakah ditemukan masalah? | | |
-| audio | issue_audio | Rekam deskripsi masalah | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+| type           | name        | label                    | relevant                | required                |
+|----------------|-------------|--------------------------|-------------------------|-------------------------|
+| select_one yesno | issue_found | Apakah masalah ditemukan? |                         |                         |
+| audio          | issue_audio | Rekam deskripsi masalah  | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
 ## Praktik Terbaik
 
-1. Nyatakan dengan jelas di `label` atau `hint` tentang apa yang harus dikatakan enumerator dan untuk berapa lama.
-2. Gunakan `max-duration` untuk mencegah file yang terlalu besar di area dengan kecepatan unggah yang lambat.
-3. Beritahu responden sebelum memulai rekaman — rekaman yang tidak terduga dapat menimbulkan masalah privasi.
-4. Uji rekaman pada perangkat target dan kondisi jaringan sebelum peluncuran.
-5. Atur `quality=voice-only` untuk rekaman bergaya wawancara guna mengurangi ukuran file tanpa mengurangi kejelasan.
+1.  Nyatakan dengan jelas di `label` atau `hint` apa yang harus dikatakan enumerator dan berapa lama.
+2.  Gunakan `max-duration` untuk mencegah file yang terlalu besar di area dengan kecepatan unggah yang lambat.
+3.  Beritahu responden sebelum memulai rekaman — rekaman yang tidak terduga dapat menimbulkan masalah privasi.
+4.  Uji rekaman pada perangkat target dan kondisi jaringan sebelum deployment.
+5.  Atur `quality=voice-only` untuk rekaman gaya wawancara guna mengurangi ukuran file tanpa kehilangan kejelasan.
 
-## Batasan
+## Keterbatasan
 
-- File audio bisa berukuran besar (rekaman 2 menit pada kualitas normal sekitar 2–4 MB) — pertimbangkan hal ini dalam rencana data dan estimasi waktu unggah Anda.
-- Tidak semua browser mendukung MediaRecorder API — Chrome dan Firefox bekerja dengan andal; Safari pada versi iOS yang lebih lama mungkin memiliki masalah.
-- Transkripsi respons audio memerlukan pemrosesan pasca-tambahan (speech-to-text manual atau otomatis).
-- Peraturan privasi dapat membatasi perekaman suara — verifikasi persyaratan perlindungan data lokal.
+-   File audio bisa berukuran besar (rekaman 2 menit dengan kualitas normal sekitar 2–4 MB) — pertimbangkan ini dalam rencana data dan perkiraan waktu unggah Anda.
+-   Tidak semua browser mendukung API MediaRecorder — Chrome dan Firefox berfungsi dengan andal; Safari pada versi iOS yang lebih lama mungkin memiliki masalah.
+-   Transkripsi tanggapan audio memerlukan pemrosesan pasca-rekaman tambahan (transkripsi manual atau otomatis dari ucapan ke teks).
+-   Peraturan privasi dapat membatasi perekaman suara — verifikasi persyaratan perlindungan data lokal.
