@@ -1,121 +1,130 @@
 ---
-title: "Iestatiet SSL"
-description: "Konfigurējiet HTTPS savam rtSurvey serverim. Nepieciešams, lai varētu pieteikties."
+title: "SSL iestatīšana"
+description: "Konfigurējiet HTTPS savam rtSurvey serverim. Nepieciešams pirms pieteikšanās."
 ---
 
-Lai varētu pieteikties, SSL ir jākonfigurē. Pirmoreiz atverot lietotni, jūs automātiski tiksit novirzīts uz SSL iestatīšanas ekrānu.
+Pirms pieteikšanās ir jākonfigurē SSL. Pirmo reizi atverot lietotni, jūs tiksiet automātiski novirzīts uz SSL iestatīšanas ekrānu.
 
 ---
 
-## SSL iestatīšanas iespējas
+## SSL iestatīšanas opcijas
 
-![SSL iestatīšanas iespējas](/img/ssl-setup/ssl-setup-options.png)
+![SSL iestatīšanas opcijas](/img/ssl-setup/ssl-setup-options.png)
 
-Izvēlieties vienu no trim iespējām:
+Izvēlieties vienu no trim opcijām:
 
 | Opcija | Kad lietot |
 |--------|-------------|
-| **Bezmaksas apakšdomēns rsurvey.com** *(Ieteicams)* | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
+| **Bezmaksas rtsurvey.com apakšdomēns** *(Ieteicams)* | Nav nepieciešama DNS iestatīšana. Mēs izveidosim ierakstu jūsu vietā. Gatavs 2–5 minūšu laikā. |
 | **Mans domēns** | Jums jau ir domēns, un tā DNS norāda uz šo serveri. |
-| **Instalējiet sertifikātu manuāli** | Uzņēmuma vai pielāgotā CA. Nepieciešama SSH piekļuve. |
+| **Instalēt sertifikātu manuāli** | Uzņēmuma vai pielāgota CA. Nepieciešama SSH piekļuve. |
 
 ---
 
-## 1. iespēja — bezmaksas apakšdomēns rsurvey.com (ieteicams)
+## 1. opcija — Bezmaksas rtsurvey.com apakšdomēns *(Ieteicams)*
 
-Šī ir ātrākā iespēja. Nav nepieciešama domēna reģistrācija vai DNS izmaiņas.
+Šī ir ātrākā opcija. Nav nepieciešama domēna reģistrācija vai DNS izmaiņas.
 
-1. Noklikšķiniet uz Bezmaksas rsurvey.com apakšdomēns, lai izvērstu sadaļu
-2. Ievades laukā ierakstiet vajadzīgo apakšdomēna nosaukumu
+![HTTPS iestatīšanas forma](/img/ssl-setup/ssl-setup-form.png)
 
-   > Izmantojiet mazos burtus, ciparus un defises. 3–30 rakstzīmes.
+> **Pirms turpināt:** Bezmaksas apakšdomēnam ir nepieciešams aktīvs konts vietnē [licenses.rtsurvey.com](https://licenses.rtsurvey.com). Bezmaksas plānā ir iekļauts 1 apakšdomēns (`*.rtsurvey.com`).
+
+1. Noklikšķiniet uz **Free rtsurvey.com subdomain**, lai izvērstu sadaļu
+2. Laukā **YOUR SUBDOMAIN** ierakstiet vēlamo apakšdomēna nosaukumu
+
+   > Izmantojiet mazos burtus, skaitļus un domuzīmes. 3–30 rakstzīmes.
    > Piemērs: `myproject` → `myproject.rtsurvey.com`
 
-3. Noklikšķiniet uz Izveidot **https://[subdomain].rtsurvey.com**
+3. Ielīmējiet savu **rtSurvey DNS Token** no [licenses.rtsurvey.com](https://licenses.rtsurvey.com) marķiera laukā
+4. Noklikšķiniet uz **Create secure subdomain**
 
+Pēc iesniegšanas lietotne sāks jūsu sertifikāta nodrošināšanu:
 
+![HTTPS iestatīšanas gaita](/img/ssl-setup/ssl-setup-progress.png)
 
-4. Uzgaidiet 2–5 minūtes, kamēr sertifikāts tiek izsniegts
+Četri posmi tiek veikti automātiski:
+- **DNS ieraksta pieprasīšana** — izveido DNS ierakstu jūsu apakšdomēnam
+- **DNS izplatīšanās gaidīšana** — parasti 2–5 minūtes
+- **SSL sertifikāta izsniegšana** — Let's Encrypt paraksta jūsu sertifikātu
+- **HTTPS aktivizēšana** — Nginx tiek restartēts ar jauno sertifikātu
 
-
-
-5. Kad sertifikāts būs gatavs, jūs automātiski tiksit novirzīts uz jauno HTTPS URL
+5. Pēc pabeigšanas jūs tiksiet automātiski novirzīts uz savu jauno HTTPS URL
 
 
 
 ---
 
-## 2. iespēja — mans domēns
+## 2. opcija — Mans domēns
 
-Izmantojiet šo, ja jums ir esošs domēns un tā DNS A ieraksts jau norāda uz šī servera IP.
+Izmantojiet šo, ja jums ir esošs domēns un tā DNS `A` ieraksts jau norāda uz šī servera IP adresi.
 
-1. Noklikšķiniet uz Mans domēns, lai izvērstu sadaļu
-2. Ievadiet pilnu domēna nosaukumu (e.g. `survey.myorganization.org`)
-3. Noklikšķiniet uz Izveidot sertifikātu
+1. Noklikšķiniet uz **My own domain**, lai izvērstu sadaļu
+2. Ievadiet savu pilno domēna nosaukumu (piemēram, `survey.myorganization.org`)
+3. Noklikšķiniet uz **Create certificate**
 
 
 
-Let's Encrypt verificēs jūsu domēnu un izsniegs sertifikātu. Tam vispirms ir pareizi jānorāda DNS — pretējā gadījumā pieprasījums neizdosies.
+Let's Encrypt pārbaudīs jūsu domēnu un izsniegs sertifikātu. Lai tas notiktu, DNS vispirms ir jābūt pareizi norādītam — pretējā gadījumā pieprasījums neizdosies.
 
 ---
 
-## 3. iespēja — instalējiet sertifikātu manuāli
+## 3. opcija — Instalēt sertifikātu manuāli
 
-Uzņēmuma vidēm, kurās tiek izmantota pielāgota vai iekšēja CA. Sertifikātu faili tiks ievietoti serverī, izmantojot SSH, un pēc tam lietotnē ievadiet savu domēnu.
+Uzņēmumu vidēm, kurās tiek izmantota pielāgota vai iekšēja CA. Jūs izvietosiet sertifikāta failus serverī, izmantojot SSH, un pēc tam lietotnē ievadīsiet savu domēnu.
 
-### Priekšnoteikumi
+### Priekšnosacījumi
 
 - SSH piekļuve serverim
-- Jūsu domēnam derīgs sertifikāts un privātā atslēga (PEM formāts)
+- Derīgs sertifikāts un privātā atslēga jūsu domēnam (PEM formātā)
 
-### 1. darbība — SSH ievade serverī
+### 1. solis — SSH pieslēgšanās serverim
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### 2. darbība — ievietojiet sertifikātu failus
+### 2. solis — Sertifikāta failu izvietošana
 
-Izveidojiet direktoriju un kopējiet failus:
+Izveidojiet direktoriju un nokopējiet failus:
 
 ```bash
-mkdir -p /etc/letsencrypt/live/<your-domain>
+mkdir -p /etc/letsencrypt/live/<jūsu-domēns>
 ```
 
-Kopējiet failus šajā direktorijā ar precīziem nosaukumiem:
+Nokopējiet failus šajā direktorijā ar šādiem precīziem nosaukumiem:
 
 | Fails | Apraksts |
 |------|-------------|
-| `fullchain.pem` | Jūsu sertifikāts + visi CA starpposma sertifikāti (savienoti) |
+| `fullchain.pem` | Jūsu sertifikāts + visi starpposma CA sertifikāti (apvienoti) |
 | `privkey.pem` | Jūsu privātā atslēga |
 
 Piemērs:
 
 ```bash
-# Kopējiet no vietējās mašīnas (palaidiet to lokāli, nevis serverī)
-scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
-scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
+# Kopēt no vietējās mašīnas (palaidiet šo lokāli, nevis serverī)
+scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<jūsu-domēns>/fullchain.pem
+scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<jūsu-domēns>/privkey.pem
 ```
 
-Iestatiet pareizās atļaujas:
+Iestatiet pareizas atļaujas:
 
 ```bash
-chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
-chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
+chmod 644 /etc/letsencrypt/live/<jūsu-domēns>/fullchain.pem
+chmod 600 /etc/letsencrypt/live/<jūsu-domēns>/privkey.pem
 ```
 
-### 3. darbība. Ievadiet savu domēnu lietotnē
+### 3. solis — Domēna ievadīšana lietotnē
 
 
 
-1. SSL iestatīšanas ekrānā noklikšķiniet uz Instalēt sertifikātu manuāli
-2. Ievadiet savu domēna nosaukumu (jāatbilst sertifikāta parastajam nosaukumam vai SAN)
-3. Noklikšķiniet uz Lietot
+1. SSL iestatīšanas ekrānā noklikšķiniet uz **Install certificate manually**
+2. Ievadiet savu domēna nosaukumu (tam jāatbilst sertifikāta Common Name vai SAN)
+3. Noklikšķiniet uz **Apply**
 
-Serveris konfigurēs Nginx ar jūsu sertifikātu un automātiski pārlādēs.
+Serveris konfigurēs Nginx ar jūsu sertifikātu un automātiski to restartēs.
 
 ---
 
 ## Nākamais solis
 
-Kad SSL ir aktīvs, pārejiet uz pirmo pieteikšanos [first-login](first-login).
+Kad SSL ir aktīvs, pārejiet pie [Pirmā pieteikšanās](first-login).

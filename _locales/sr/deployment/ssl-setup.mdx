@@ -1,121 +1,130 @@
 ---
-title: "Подесите ССЛ"
-description: "Конфигуришите ХТТПС за ваш ртСурвеи сервер. Обавезно пре него што се можете пријавити."
+title: "Podešavanje SSL-a"
+description: "Konfigurišite HTTPS za vaš rtSurvey server. Neophodno pre nego što se možete prijaviti."
 ---
 
-ССЛ мора бити конфигурисан да бисте могли да се пријавите. Када први пут отворите апликацију, аутоматски ћете бити преусмерени на екран за подешавање ССЛ-а.
-
----
-
-## Опције подешавања ССЛ-а
-
-![Опције подешавања ССЛ-а](/img/ssl-setup/ssl-setup-options.png)
-
-Изаберите једну од три опције:
-
-| Опција | Када користити |
-|--------|-------------|
-| **Бесплатан поддомен ртсурвеи.цом** *(Препоручено)* | Није потребно подешавање ДНС-а. Ми креирамо запис за вас. Спреман за 2-5 минута. |
-| **Мој сопствени домен** | Већ имате домен и његов ДНС упућује на овај сервер. |
-| **Инсталирајте сертификат ручно** | Пословни или прилагођени ЦА. Захтева ССХ приступ. |
+SSL mora biti konfigurisan pre nego što se možete prijaviti. Kada prvi put otvorite aplikaciju, automatski ćete biti preusmereni na ekran za podešavanje SSL-a.
 
 ---
 
-## Опција 1 — Бесплатан поддомен ртсурвеи.цом (препоручено)
+## Opcije za podešavanje SSL-a
 
-Ово је најбржа опција. Није потребна регистрација домена или ДНС промене.
+![SSL setup options](/img/ssl-setup/ssl-setup-options.png)
 
-1. Кликните на Фрее ртсурвеи.цом поддомен да проширите одељак
-2. Унесите жељено име поддомена у поље за унос
+Izaberite jednu od tri opcije:
 
-   > Користите мала слова, бројеве и цртице. 3–30 знакова.
-   > Пример: `myproject` → `myproject.rtsurvey.com`
+| Opcija | Kada koristiti |
+|--------|----------------|
+| **Besplatan rtsurvey.com poddomen** *(Preporučeno)* | DNS podešavanje nije potrebno. Mi kreiramo zapis za vas. Spremno za 2–5 minuta. |
+| **Moj sopstveni domen** | Već imate domen i njegov DNS ukazuje na ovaj server. |
+| **Ručno instaliranje sertifikata** | Korporativni ili prilagođeni CA. Zahteva SSH pristup. |
 
-3. Кликните на Креирај **https://[subdomain].rtsurvey.com**
+---
 
+## Opcija 1 — Besplatan rtsurvey.com poddomen *(Preporučeno)*
 
+Ovo je najbrža opcija. Nije potrebna registracija domena niti izmene DNS-a.
 
-4. Сачекајте 2-5 минута док се сертификат изда
+![HTTPS Setup form](/img/ssl-setup/ssl-setup-form.png)
 
+> **Pre nego što nastavite:** Besplatan poddomen zahteva aktivan nalog na [licenses.rtsurvey.com](https://licenses.rtsurvey.com). Besplatan plan uključuje 1 poddomen (`*.rtsurvey.com`).
 
+1. Kliknite na **Free rtsurvey.com subdomain** da biste proširili odeljak
+2. Unesite željeno ime poddomena u polje **YOUR SUBDOMAIN**
 
-5. Када сертификат буде спреман, бићете аутоматски преусмерени на нову ХТТПС УРЛ адресу
+   > Koristite mala slova, brojeve i crtice. 3–30 karaktera.
+   > Primer: `myproject` → `myproject.rtsurvey.com`
+
+3. Nalepite vaš **rtSurvey DNS Token** sa [licenses.rtsurvey.com](https://licenses.rtsurvey.com) u polje za token
+4. Kliknite na **Create secure subdomain**
+
+Nakon slanja, aplikacija će početi sa pripremom vašeg sertifikata:
+
+![Setting up HTTPS progress](/img/ssl-setup/ssl-setup-progress.png)
+
+Četiri koraka se izvršavaju automatski:
+- **Zahtevanje DNS zapisa** — kreira DNS unos za vaš poddomen
+- **Čekanje na propagaciju DNS-a** — obično 2–5 minuta
+- **Izdavanje SSL sertifikata** — Let's Encrypt potpisuje vaš sertifikat
+- **Aktiviranje HTTPS-a** — Nginx se ponovo učitava sa novim sertifikatom
+
+5. Kada se završi, automatski ćete biti preusmereni na vaš novi HTTPS URL
 
 
 
 ---
 
-## Опција 2 — Мој сопствени домен
+## Opcija 2 — Moj sopstveni domen
 
-Користите ово ако имате постојећи домен и његов ДНС А запис већ указује на ИП адресу овог сервера.
+Koristite ovo ako imate postojeći domen i njegov DNS `A` zapis već ukazuje na IP adresu ovog servera.
 
-1. Кликните на Мој сопствени домен да бисте проширили одељак
-2. Унесите своје пуно име домена (e.g. `survey.myorganization.org`)
-3. Кликните на Креирај сертификат
+1. Kliknite na **My own domain** da biste proširili odeljak
+2. Unesite vaš pun naziv domena (npr. `survey.myorganization.org`)
+3. Kliknite na **Create certificate**
 
 
 
-Лет'с Енцрипт ће верификовати ваш домен и издати сертификат. Ово захтева да се ДНС прво исправно укаже — у супротном захтев неће успети.
+Let's Encrypt će verifikovati vaš domen i izdati sertifikat. Ovo zahteva da DNS prvo bude ispravno usmeren — u suprotnom će zahtev neuspeti.
 
 ---
 
-## Опција 3 — Инсталирајте сертификат ручно
+## Opcija 3 — Ručno instaliranje sertifikata
 
-За окружења предузећа која користе прилагођени или интерни ЦА. Поставићете своје датотеке сертификата на сервер преко ССХ-а, а затим унесите свој домен у апликацију.
+Za korporativna okruženja koja koriste prilagođeni ili interni CA. Datoteke sertifikata ćete postaviti na server putem SSH-a, a zatim uneti svoj domen u aplikaciju.
 
-### Предуслови
+### Preduslovi
 
-- ССХ приступ серверу
-- Важећи сертификат и приватни кључ за ваш домен (ПЕМ формат)
+- SSH pristup serveru
+- Važeći sertifikat i privatni ključ za vaš domen (PEM format)
 
-### Корак 1 - ССХ у сервер
+### Korak 1 — SSH pristup serveru
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Корак 2 — Поставите своје датотеке сертификата
+### Korak 2 — Postavljanje datoteka sertifikata
 
-Креирајте директоријум и копирајте своје датотеке:
-
-```bash
-mkdir -p /etc/letsencrypt/live/<your-domain>
-```
-
-Копирајте своје датотеке у тај директоријум са овим тачним именима:
-
-| Филе | Опис |
-|------|-------------|
-| `fullchain.pem` | Ваш сертификат + било који средњи ЦА сертификати (удружени) |
-| `privkey.pem` | Ваш приватни кључ |
-
-Пример:
+Kreirajte direktorijum i kopirajte vaše datoteke:
 
 ```bash
-# Копирајте са ваше локалне машине (покрените ово локално, а не на серверу)
-scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
-scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
+mkdir -p /etc/letsencrypt/live/<vas-domen>
 ```
 
-Подесите исправне дозволе:
+Kopirajte vaše datoteke u taj direktorijum sa ovim tačnim nazivima:
+
+| Datoteka | Opis |
+|----------|------|
+| `fullchain.pem` | Vaš sertifikat + svi posrednički CA sertifikati (nadovezani) |
+| `privkey.pem` | Vaš privatni ključ |
+
+Primer:
 
 ```bash
-chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
-chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
+# Kopirajte sa vašeg lokalnog računara (pokrenite ovo lokalno, ne na serveru)
+scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<vas-domen>/fullchain.pem
+scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<vas-domen>/privkey.pem
 ```
 
-### Корак 3 — Унесите свој домен у апликацију
+Postavite ispravne dozvole:
+
+```bash
+chmod 644 /etc/letsencrypt/live/<vas-domen>/fullchain.pem
+chmod 600 /etc/letsencrypt/live/<vas-domen>/privkey.pem
+```
+
+### Korak 3 — Unos domena u aplikaciju
 
 
 
-1. На екрану за подешавање ССЛ-а кликните на дугме Инсталирај сертификат ручно
-2. Унесите име вашег домена (мора да одговара уобичајеном имену или САН-у сертификата)
-3. Кликните на Примени
+1. Na ekranu za podešavanje SSL-a, kliknite na **Install certificate manually**
+2. Unesite naziv vašeg domena (mora odgovarati Common Name ili SAN sertifikatu)
+3. Kliknite na **Apply**
 
-Сервер ће конфигурисати Нгинк са вашим сертификатом и аутоматски поново учитати.
+Server će konfigurisati Nginx sa vašim sertifikatom i automatski ga ponovo učitati.
 
 ---
 
-## Следећи корак
+## Sledeći korak
 
-Када је ССЛ активан, пређите на Прво пријављивање [first-login](first-login).
+Kada SSL postane aktivan, nastavite na [Prvo prijavljivanje](first-login).

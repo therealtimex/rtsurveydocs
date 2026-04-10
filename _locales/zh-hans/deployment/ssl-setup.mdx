@@ -1,61 +1,66 @@
 ---
 title: "设置 SSL"
-description: "为您的 rtSurvey 服务器配置 HTTPS。需要先登录才能登录。"
+description: "为您的 rtSurvey 服务器配置 HTTPS。登录前必须完成此步骤。"
 ---
 
-登录之前必须配置 SSL。首次打开应用程序时，您将自动重定向到 SSL 设置屏幕。
+在登录之前必须配置 SSL。当您第一次打开应用程序时，您将被自动重定向到 SSL 设置屏幕。
 
 ---
 
 ## SSL 设置选项
 
-![SSL 设置选项](/img/ssl-setup/ssl-setup-options.png)
+![SSL setup options](/img/ssl-setup/ssl-setup-options.png)
 
 选择以下三个选项之一：
 
 | 选项 | 何时使用 |
-|--------|-------------|
-| **免费 rtsurvey.com 子域** *(受到推崇的)* | 无需 DNS 设置。我们为您创造记录。 2-5 分钟内准备就绪。 |
-| **我自己的域名** | 您已经有一个域，并且它的 DNS 指向该服务器。 |
-| **手动安装证书** | 企业或自定义 CA。需要 SSH 访问。 |
+|------|----------|
+| **免费 rtsurvey.com 子域名** *(推荐)* | 无需 DNS 设置。我们为您创建记录。2–5 分钟内就绪。 |
+| **我自己的域名** | 您已经拥有一个域名，且其 DNS 已指向此服务器。 |
+| **手动安装证书** | 企业或自定义 CA。需要 SSH 访问权限。 |
 
 ---
 
-## 选项 1 — 免费 rtsurvey.com 子域（推荐）
+## 选项 1 — 免费 rtsurvey.com 子域名 *(推荐)*
 
-这是最快的选择。无需域名注册或 DNS 更改。
+这是最快的选项。无需域名注册或 DNS 更改。
 
-1. 单击免费 rtsurvey.com 子域以展开该部分
-2. 在输入字段中输入您想要的子域名
+![HTTPS Setup form](/img/ssl-setup/ssl-setup-form.png)
 
-   > 使用小写字母、数字和连字符。 3–30 个字符。
-   > 例子： `myproject` → `myproject.rtsurvey.com`
+> **在继续之前：** 免费子域名需要在 [licenses.rtsurvey.com](https://licenses.rtsurvey.com) 拥有一个活动账户。免费计划包含 1 个子域名 (`*.rtsurvey.com`)。
 
-3. 单击创建 **https://[subdomain].rtsurvey.com**
+1. 点击 **免费 rtsurvey.com 子域名** 以展开该部分
+2. 在 **YOUR SUBDOMAIN** 字段中输入您想要的子域名名称
 
+   > 使用小写字母、数字和连字符。3–30 个字符。
+   > 示例：`myproject` → `myproject.rtsurvey.com`
 
+3. 将您从 [licenses.rtsurvey.com](https://licenses.rtsurvey.com) 获取的 **rtSurvey DNS Token** 粘贴到令牌字段中
+4. 点击 **Create secure subdomain**
 
-4. 颁发证书时等待 2-5 分钟
+提交后，应用程序将开始为您配置证书：
 
+![Setting up HTTPS progress](/img/ssl-setup/ssl-setup-progress.png)
 
+四个步骤将自动运行：
+- **Requesting DNS record** — 为您的子域名创建 DNS 条目
+- **Waiting for DNS to propagate** — 通常需要 2–5 分钟
+- **Issuing SSL certificate** — Let's Encrypt 对您的证书进行签名
+- **Activating HTTPS** — Nginx 使用新证书重新加载
 
-5. 证书准备就绪后，您将自动重定向到新的 HTTPS URL
-
-
+5. 完成后，您将被自动重定向到您的新 HTTPS URL
 
 ---
 
-## 选项 2 — 我自己的域
+## 选项 2 — 我自己的域名
 
-如果您有现有域且其 DNS A 记录已指向该服务器的 IP，请使用此选项。
+如果您拥有现有域名且其 DNS `A` 记录已指向此服务器的 IP，请使用此选项。
 
-1. 单击我自己的域以展开该部分
-2. 输入您的完整域名 (e.g. `survey.myorganization.org`)
-3. 单击创建证书
+1. 点击 **我自己的域名** 以展开该部分
+2. 输入您的完整域名（例如 `survey.myorganization.org`）
+3. 点击 **Create certificate**
 
-
-
-Let's Encrypt 将验证您的域并颁发证书。这需要首先正确指向 DNS，否则请求将失败。
+Let's Encrypt 将验证您的域名并颁发证书。这需要先正确指向 DNS，否则请求将失败。
 
 ---
 
@@ -65,10 +70,10 @@ Let's Encrypt 将验证您的域并颁发证书。这需要首先正确指向 DN
 
 ### 先决条件
 
-- 通过 SSH 访问服务器
-- 您的域的有效证书和私钥（PEM 格式）
+- 服务器的 SSH 访问权限
+- 域名的有效证书和私钥（PEM 格式）
 
-### 第 1 步 — 通过 SSH 连接到服务器
+### 第 1 步 — 通过 SSH 登录服务器
 
 ```bash
 ssh root@<server-ip>
@@ -76,23 +81,23 @@ ssh root@<server-ip>
 
 ### 第 2 步 — 放置您的证书文件
 
-创建目录并复制文件：
+创建目录并复制您的文件：
 
 ```bash
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-使用以下确切名称将文件复制到该目录中：
+将您的文件复制到该目录中，并使用以下确切名称：
 
 | 文件 | 描述 |
-|------|-------------|
-| `fullchain.pem` | 您的证书 + 任何中间 CA 证书（串联） |
-| `privkey.pem` | 你的私钥 |
+|------|------|
+| `fullchain.pem` | 您的证书 + 任何中间 CA 证书（已合并） |
+| `privkey.pem` | 您的私钥 |
 
-例子：
+示例：
 
 ```bash
-# 从本地计算机复制（在本地运行，而不是在服务器上运行）
+# 从您的本地计算机复制（在本地运行此命令，而不是在服务器上）
 scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
 scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
@@ -106,16 +111,14 @@ chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 
 ### 第 3 步 — 在应用程序中输入您的域名
 
+1. 在 SSL 设置屏幕中，点击 **手动安装证书**
+2. 输入您的域名（必须与证书的 Common Name 或 SAN 匹配）
+3. 点击 **Apply**
 
-
-1. 在 SSL 设置屏幕中，单击手动安装证书
-2. 输入您的域名（必须与证书的公用名或 SAN 匹配）
-3. 单击“应用”
-
-服务器将使用您的证书配置 Nginx 并自动重新加载。
+服务器将配置 Nginx 使用您的证书并自动重新加载。
 
 ---
 
 ## 下一步
 
-SSL 激活后，继续首次登录。 [first-login](first-login).
+SSL 激活后，请继续进行 [首次登录](first-login)。

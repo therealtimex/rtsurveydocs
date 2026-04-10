@@ -1,9 +1,9 @@
 ---
-title: "SSL'yi Ayarla"
-description: "rtSurvey sunucunuz için HTTPS'yi yapılandırın. Oturum açabilmeniz için gereklidir."
+title: "SSL Kurulumu"
+description: "rtSurvey sunucunuz için HTTPS yapılandırın. Giriş yapabilmeniz için gereklidir."
 ---
 
-Giriş yapabilmeniz için SSL'nin yapılandırılması gerekmektedir. Uygulamayı ilk açtığınızda otomatik olarak SSL kurulum ekranına yönlendirileceksiniz.
+Giriş yapabilmeniz için önce SSL yapılandırılmalıdır. Uygulamayı ilk kez açtığınızda otomatik olarak SSL kurulum ekranına yönlendirileceksiniz.
 
 ---
 
@@ -13,33 +13,42 @@ Giriş yapabilmeniz için SSL'nin yapılandırılması gerekmektedir. Uygulamay�
 
 Üç seçenekten birini seçin:
 
-| Seçenek | Ne zaman kullanılmalı |
+| Seçenek | Ne zaman kullanılır |
 |--------|-------------|
-| **Ücretsiz rtsurvey.com alt alan adı** *(Tavsiye edilen)* | DNS kurulumuna gerek yok. Kayıtları sizin için oluşturuyoruz. 2-5 dakika içinde hazır. |
-| **Kendi etki alanım** | Zaten bir etki alanınız var ve DNS'si bu sunucuyu işaret ediyor. |
-| **Sertifikayı manuel olarak yükleyin** | Kurumsal veya özel CA. SSH erişimi gerektirir. |
+| **Ücretsiz rtsurvey.com alt alanı** *(Önerilen)* | DNS kurulumu gerekmez. Kaydı sizin yerinize biz oluştururuz. 2–5 dakika içinde hazır olur. |
+| **Kendi alan adım** | Zaten bir alan adınız var ve DNS'i bu sunucuyu gösteriyor. |
+| **Sertifikayı manuel olarak yükle** | Kurumsal veya özel CA. SSH erişimi gerektirir. |
 
 ---
 
-## Seçenek 1 — Ücretsiz rtsurvey.com alt alan adı (Önerilen)
+## Seçenek 1 — Ücretsiz rtsurvey.com alt alanı *(Önerilen)*
 
-Bu en hızlı seçenektir. Etki alanı kaydı veya DNS değişikliği gerekmez.
+Bu en hızlı seçenektir. Alan adı kaydı veya DNS değişikliği gerektirmez.
 
-1. Bölümü genişletmek için Ücretsiz rtsurvey.com alt alan adına tıklayın
-2. İstediğiniz alt alan adını giriş alanına yazın
+![HTTPS Kurulum formu](/img/ssl-setup/ssl-setup-form.png)
 
-   > Küçük harfler, sayılar ve kısa çizgiler kullanın. 3–30 karakter.
-   > Örnek: `myproject` → `myproject.rtsurvey.com`
+> **Devam etmeden önce:** Ücretsiz alt alan adı, [licenses.rtsurvey.com](https://licenses.rtsurvey.com) adresinde aktif bir hesap gerektirir. Ücretsiz plan 1 alt alan adı (`*.rtsurvey.com`) içerir.
 
-3. Oluştur'a tıklayın **https://[subdomain].rtsurvey.com**
+1. Bölümü genişletmek için **Free rtsurvey.com subdomain** seçeneğine tıklayın
+2. **YOUR SUBDOMAIN** alanına istediğiniz alt alan adı ismini yazın
 
+   > Küçük harf, sayı ve tire kullanın. 3–30 karakter.
+   > Örnek: `projem` → `projem.rtsurvey.com`
 
+3. [licenses.rtsurvey.com](https://licenses.rtsurvey.com) adresinden aldığınız **rtSurvey DNS Token**'ınızı belirteç alanına yapıştırın
+4. **Create secure subdomain** butonuna tıklayın
 
-4. Sertifika verilirken 2-5 dakika bekleyin
+Gönderildikten sonra uygulama sertifikanızı hazırlamaya başlayacaktır:
 
+![HTTPS kurulum ilerlemesi](/img/ssl-setup/ssl-setup-progress.png)
 
+Dört adım otomatik olarak çalışır:
+- **Requesting DNS record** — alt alan adınız için DNS kaydını oluşturur
+- **Waiting for DNS to propagate** — genellikle 2–5 dakika sürer
+- **Issuing SSL certificate** — Let's Encrypt sertifikanızı imzalar
+- **Activating HTTPS** — Nginx yeni sertifika ile yeniden yüklenir
 
-5. Sertifika hazır olduğunda otomatik olarak yeni HTTPS URL'nize yönlendirileceksiniz.
+5. Tamamlandığında, otomatik olarak yeni HTTPS URL'nize yönlendirileceksiniz
 
 
 
@@ -47,28 +56,28 @@ Bu en hızlı seçenektir. Etki alanı kaydı veya DNS değişikliği gerekmez.
 
 ## Seçenek 2 — Kendi alan adım
 
-Mevcut bir etki alanınız varsa ve DNS A kaydı zaten bu sunucunun IP'sini işaret ediyorsa bunu kullanın.
+Mevcut bir alan adınız varsa ve DNS `A` kaydı zaten bu sunucunun IP'sini gösteriyorsa bunu kullanın.
 
-1. Bölümü genişletmek için Kendi etki alanım'ı tıklayın
-2. Tam alan adınızı girin (e.g. `survey.myorganization.org`)
-3. Sertifika oluştur'a tıklayın
+1. Bölümü genişletmek için **My own domain** seçeneğine tıklayın
+2. Tam alan adınızı girin (örneğin `anket.kurumum.org`)
+3. **Create certificate** butonuna tıklayın
 
 
 
-Let's Encrypt alan adınızı doğrulayacak ve bir sertifika verecektir. Bunun için önce DNS'nin doğru şekilde yönlendirilmesi gerekir; aksi halde istek başarısız olur.
+Let's Encrypt alan adınızı doğrulayacak ve bir sertifika düzenleyecektir. Bu, önce DNS'in doğru şekilde yönlendirilmesini gerektirir — aksi takdirde istek başarısız olur.
 
 ---
 
-## Seçenek 3 — Sertifikayı manuel olarak yükleyin
+## Seçenek 3 — Sertifikayı manuel olarak yükle
 
-Özel veya dahili CA kullanan kurumsal ortamlar için. Sertifika dosyalarınızı SSH üzerinden sunucuya yerleştirecek, ardından uygulamaya alan adınızı gireceksiniz.
+Özel veya dahili bir CA kullanan kurumsal ortamlar için. Sertifika dosyalarınızı SSH üzerinden sunucuya yerleştirecek, ardından uygulamaya alan adınızı gireceksiniz.
 
 ### Önkoşullar
 
 - Sunucuya SSH erişimi
-- Alan adınız için geçerli bir sertifika ve özel anahtar (PEM formatı)
+- Alan adınız için geçerli bir sertifika ve özel anahtar (PEM formatında)
 
-### Adım 1 – Sunucuya SSH
+### Adım 1 — Sunucuya SSH ile bağlanın
 
 ```bash
 ssh root@<server-ip>
@@ -82,11 +91,11 @@ Dizini oluşturun ve dosyalarınızı kopyalayın:
 mkdir -p /etc/letsencrypt/live/<your-domain>
 ```
 
-Dosyalarınızı tam olarak şu adlarla bu dizine kopyalayın:
+Dosyalarınızı bu dizine tam olarak şu isimlerle kopyalayın:
 
-| Dosya | Tanım |
+| Dosya | Açıklama |
 |------|-------------|
-| `fullchain.pem` | Sertifikanız + tüm ara CA sertifikaları (birleştirilmiş) |
+| `fullchain.pem` | Sertifikanız + varsa ara CA sertifikaları (birleştirilmiş) |
 | `privkey.pem` | Özel anahtarınız |
 
 Örnek:
@@ -104,18 +113,18 @@ chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
 chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
-### 3. Adım — Alan adınızı uygulamaya girin
+### Adım 3 — Alan adınızı uygulamaya girin
 
 
 
-1. SSL kurulum ekranında Sertifikayı manuel olarak yükle'ye tıklayın.
-2. Alan adınızı girin (sertifikanın Ortak Adı veya SAN'ıyla eşleşmelidir)
-3. Uygula'yı tıklayın
+1. SSL kurulum ekranında **Install certificate manually** seçeneğine tıklayın
+2. Alan adınızı girin (sertifikanın Common Name veya SAN değeri ile eşleşmelidir)
+3. **Apply** butonuna tıklayın
 
-Sunucu, Nginx'i sertifikanızla yapılandıracak ve otomatik olarak yeniden yükleyecektir.
+Sunucu Nginx'i sertifikanızla yapılandıracak ve otomatik olarak yeniden yükleyecektir.
 
 ---
 
 ## Sonraki adım
 
-SSL aktif hale geldikten sonra İlk Giriş'e geçin [first-login](first-login).
+SSL aktif olduğunda, [İlk Giriş](first-login) adımına geçin.

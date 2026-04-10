@@ -1,6 +1,6 @@
 ---
-title: "Konfiguro SSL"
-description: "Konfiguro HTTPS për serverin tuaj rtSurvey. Kërkohet përpara se të mund të identifikoheni."
+title: "Konfigurimi i SSL"
+description: "Konfiguroni HTTPS për serverin tuaj rtSurvey. Kërkohet përpara se të mund të identifikoheni."
 ---
 
 SSL duhet të konfigurohet përpara se të mund të identifikoheni. Kur hapni aplikacionin për herë të parë, do të ridrejtoheni automatikisht në ekranin e konfigurimit të SSL.
@@ -9,113 +9,122 @@ SSL duhet të konfigurohet përpara se të mund të identifikoheni. Kur hapni ap
 
 ## Opsionet e konfigurimit të SSL
 
-![Opsionet e konfigurimit të SSL](/img/ssl-setup/ssl-setup-options.png)
+![SSL setup options](/img/ssl-setup/ssl-setup-options.png)
 
 Zgjidhni një nga tre opsionet:
 
-| Opsioni | Kur të përdoret |
-|--------|-------------|
-| **Nëndomain falas rtsurvey.com** *(Rekomanduar)* | Nuk nevojitet konfigurim DNS. Ne krijojmë rekordin për ju. Gati për 2-5 minuta. |
-| **Domeni im** | Ju tashmë keni një domen dhe DNS-ja e tij tregon në këtë server. |
-| **Instaloni certifikatën me dorë** | CA e ndërmarrjes ose me porosi. Kërkon qasje SSH. |
+| Opsioni | Kur duhet përdorur |
+|---------|-------------------|
+| **Nën-domain falas rtsurvey.com** *(Rekomandohet)* | Nuk kërkohet konfigurim i DNS. Ne e krijojmë regjistrimin për ju. Gati në 2–5 minuta. |
+| **Domain-i im** | Ju keni tashmë një domain dhe DNS-ja e tij drejtohet në këtë server. |
+| **Instalo certifikatën manualisht** | CA korporative ose e personalizuar. Kërkon akses SSH. |
 
 ---
 
-## Opsioni 1 - Nëndomeni falas rtsurvey.com (Rekomandohet)
+## Opsioni 1 — Nën-domain falas rtsurvey.com *(Rekomandohet)*
 
-Ky është opsioni më i shpejtë. Nuk kërkohet regjistrim domeni ose ndryshime DNS.
+Ky është opsioni më i shpejtë. Nuk kërkohet regjistrim i domain-it ose ndryshime të DNS.
 
-1. Klikoni në nëndomenin Free rtsurvey.com për të zgjeruar seksionin
-2. Shkruani emrin tuaj të dëshiruar të nëndomainit në fushën e hyrjes
+![HTTPS Setup form](/img/ssl-setup/ssl-setup-form.png)
 
-   > Përdorni shkronja të vogla, numra dhe viza. 3-30 karaktere.
+> **Përpara se të vazhdoni:** Një nën-domain falas kërkon një llogari aktive në [licenses.rtsurvey.com](https://licenses.rtsurvey.com). Plani falas përfshin 1 nën-domain (`*.rtsurvey.com`).
+
+1. Klikoni mbi **Free rtsurvey.com subdomain** për të zgjeruar seksionin
+2. Shkruani emrin e nën-domain-it që dëshironi në fushën **YOUR SUBDOMAIN**
+
+   > Përdorni shkronja të vogla, numra dhe viza lidhëse. 3–30 karaktere.
    > Shembull: `myproject` → `myproject.rtsurvey.com`
 
-3. Klikoni Krijo **https://[subdomain].rtsurvey.com**
+3. Ngjisni **rtSurvey DNS Token** tuaj nga [licenses.rtsurvey.com](https://licenses.rtsurvey.com) në fushën e token-it
+4. Klikoni mbi **Create secure subdomain**
 
+Pas dërgimit, aplikacioni do të fillojë përgatitjen e certifikatës suaj:
 
+![Setting up HTTPS progress](/img/ssl-setup/ssl-setup-progress.png)
 
-4. Prisni 2–5 minuta derisa të lëshohet certifikata
+Katër hapat ekzekutohen automatikisht:
+- **Kërkimi i regjistrit DNS** — krijon hyrjen DNS për nën-domain-in tuaj
+- **Pritja për përhapjen e DNS** — zakonisht 2–5 minuta
+- **Lëshimi i certifikatës SSL** — Let's Encrypt nënshkruan certifikatën tuaj
+- **Aktivizimi i HTTPS** — Nginx ringarkohet me certifikatën e re
 
-
-
-5. Pasi certifikata të jetë gati, do të ridrejtoheni automatikisht në URL-në tuaj të re HTTPS
+5. Pasi të përfundojë, do të ridrejtoheni automatikisht në URL-në tuaj të re HTTPS
 
 
 
 ---
 
-## Opsioni 2 - Domeni im
+## Opsioni 2 — Domain-i im
 
-Përdoreni këtë nëse keni një domen ekzistues dhe një rekord i tij DNS tashmë tregon IP-në e këtij serveri.
+Përdoreni këtë nëse keni një domain ekzistues dhe regjistri i tij DNS `A` drejtohet tashmë në IP-në e këtij serveri.
 
-1. Klikoni Domeni im për të zgjeruar seksionin
-2. Futni emrin tuaj të plotë të domenit (e.g. `survey.myorganization.org`)
-3. Klikoni Krijo certifikatë
+1. Klikoni mbi **My own domain** për të zgjeruar seksionin
+2. Vendosni emrin tuaj të plotë të domain-it (p.sh. `survey.myorganization.org`)
+3. Klikoni mbi **Create certificate**
 
 
 
-Let's Encrypt do të verifikojë domenin tuaj dhe do të lëshojë një certifikatë. Kjo kërkon që DNS të drejtohet saktë së pari - kërkesa do të dështojë përndryshe.
+Let's Encrypt do të verifikojë domain-in tuaj dhe do të lëshojë një certifikatë. Kjo kërkon që DNS-ja të jetë e drejtuar saktë paraprakisht — përndryshe kërkesa do të dështojë.
 
 ---
 
-## Opsioni 3 - Instaloni certifikatën manualisht
+## Opsioni 3 — Instalo certifikatën manualisht
 
-Për mjediset e ndërmarrjeve që përdorin një CA të personalizuar ose të brendshme. Do të vendosni skedarët tuaj të certifikatës në server përmes SSH, më pas futni domenin tuaj në aplikacion.
+Për mjedise korporative që përdorin një CA të personalizuar ose të brendshme. Ju do të vendosni skedarët e certifikatës suaj në server përmes SSH, pastaj do të vendosni domain-in tuaj në aplikacion.
 
 ### Parakushtet
 
-- Qasja SSH në server
-- Një certifikatë e vlefshme dhe një çelës privat për domenin tuaj (format PEM)
+- Akses SSH në server
+- Një certifikatë e vlefshme dhe çelësi privat për domain-in tuaj (formati PEM)
 
-### Hapi 1 - SSH në server
+### Hapi 1 — SSH në server
 
 ```bash
 ssh root@<server-ip>
 ```
 
-### Hapi 2 - Vendosni skedarët tuaj të certifikatës
+### Hapi 2 — Vendosni skedarët e certifikatës suaj
 
-Krijoni drejtorinë dhe kopjoni skedarët tuaj:
+Krijoni direktorinë dhe kopjoni skedarët tuaj:
 
 ```bash
-mkdir -p /etc/letsencrypt/live/<your-domain>
+mkdir -p /etc/letsencrypt/live/<domain-i-juaj>
 ```
 
-Kopjoni skedarët tuaj në atë drejtori me këta emra të saktë:
+Kopjoni skedarët tuaj në atë direktori me këta emra ekzakte:
 
 | Skedari | Përshkrimi |
-|------|-------------|
-| `fullchain.pem` | Certifikata juaj + çdo certifikatë e ndërmjetme CA (të lidhura) |
+|---------|------------|
+| `fullchain.pem` | Certifikata juaj + çdo certifikatë ndërmjetëse e CA (të bashkuara) |
 | `privkey.pem` | Çelësi juaj privat |
 
 Shembull:
 
 ```bash
-# Kopjo nga makina juaj lokale (ekzekutoni këtë në nivel lokal, jo në server)
-scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<your-domain>/fullchain.pem
-scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<your-domain>/privkey.pem
+# Kopjoni nga makina juaj lokale (ekzekutoni këtë lokalisht, jo në server)
+scp fullchain.pem root@<server-ip>:/etc/letsencrypt/live/<domain-i-juaj>/fullchain.pem
+scp privkey.pem  root@<server-ip>:/etc/letsencrypt/live/<domain-i-juaj>/privkey.pem
 ```
 
 Vendosni lejet e sakta:
 
 ```bash
-chmod 644 /etc/letsencrypt/live/<your-domain>/fullchain.pem
-chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
+chmod 644 /etc/letsencrypt/live/<domain-i-juaj>/fullchain.pem
+chmod 600 /etc/letsencrypt/live/<domain-i-juaj>/privkey.pem
 ```
 
-### Hapi 3 - Futni domenin tuaj në aplikacion
+### Hapi 3 — Vendosni domain-in tuaj në aplikacion
 
 
 
-1. Në ekranin e konfigurimit të SSL, klikoni Instalo certifikatën manualisht
-2. Futni emrin e domenit tuaj (duhet të përputhet me Emrin e Përbashkët ose SAN të certifikatës)
-3. Klikoni Apliko
+1. Në ekranin e konfigurimit të SSL, klikoni mbi **Install certificate manually**
+2. Vendosni emrin e domain-it tuaj (duhet të përputhet me Common Name ose SAN të certifikatës)
+3. Klikoni mbi **Apply**
 
-Serveri do të konfigurojë Nginx me certifikatën tuaj dhe do të ringarkojë automatikisht.
+Serveri do të konfigurojë Nginx me certifikatën tuaj dhe do të ringarkohet automatikisht.
 
 ---
 
 ## Hapi tjetër
 
-Pasi SSL të jetë aktiv, vazhdoni te Hyrja e Parë [first-login](first-login).
+Pasi SSL të jetë aktiv, vazhdoni te [Identifikimi i parë](first-login).
