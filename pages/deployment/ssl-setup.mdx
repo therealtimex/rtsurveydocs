@@ -3,40 +3,43 @@ title: "Set Up SSL"
 description: "Configure HTTPS for your rtSurvey server. Required before you can log in."
 ---
 
-SSL must be configured before you can log in. When you open the app for the first time, you will be redirected to the SSL setup screen automatically.
-
----
-
-## SSL setup options
+SSL must be configured before you can log in. When you open the app for the first time, you will be redirected to the HTTPS setup screen automatically.
 
 ![HTTPS Setup](/img/ssl-setup/ssl-setup-overview.png)
 
-Choose one of three options:
+---
 
-| Option | When to use |
-|--------|-------------|
-| **Free rtsurvey.com subdomain** *(Recommended)* | No DNS setup needed. We create the record for you. Ready in 2–5 minutes. |
-| **My own domain** | You already have a domain and its DNS points to this server. |
-| **Install certificate manually** | Enterprise or custom CA. Requires SSH access. |
+## Overview — Secure your workspace in 3 steps
+
+The setup screen walks you through three steps:
+
+| Step | Action | Details |
+|------|--------|---------|
+| **1** | **Create or activate your account** | Required to generate your free secure subdomain at [licenses.rtsurvey.com](https://licenses.rtsurvey.com) |
+| **2** | **Choose your subdomain** | Pick a name for your workspace |
+| **3** | **Go live over HTTPS** | SSL certificate and DNS configured automatically. Ready in 2–5 minutes |
+
+> **Why HTTPS?** Encrypts all data between your browser and server. Required for SSO, secure cookies, and modern browser features.
 
 ---
 
 ## Option 1 — Free rtsurvey.com subdomain *(Recommended)*
 
-This is the fastest option. No domain registration or DNS changes required.
+**No DNS NEEDED** · Ready in 2–5 min · SSL included · No manual records
 
-> **Before you continue:** A free subdomain requires an active account at [licenses.rtsurvey.com](https://licenses.rtsurvey.com). The free plan includes 1 subdomain (`*.rtsurvey.com`).
+> **Before you continue: activate your rtSurvey account.**
+> A free subdomain requires an active account at [licenses.rtsurvey.com](https://licenses.rtsurvey.com). Free plan includes 1 subdomain (`*.rtsurvey.com`).
+> If you don't have an account yet, click **Create / activate account →** on the setup screen first.
 
-1. Click **Free rtsurvey.com subdomain** to expand the section
-2. Type your desired subdomain name in the **YOUR SUBDOMAIN** field
+1. In the **YOUR SUBDOMAIN** field, type your desired subdomain name
 
    > Use lowercase letters, numbers, and hyphens. 3–30 characters.
    > Example: `myproject` → `myproject.rtsurvey.com`
 
-3. Paste your **rtSurvey DNS Token** from [licenses.rtsurvey.com](https://licenses.rtsurvey.com) into the token field
-4. Click **Create secure subdomain**
+2. Paste your **rtSurvey DNS Token** from [licenses.rtsurvey.com](https://licenses.rtsurvey.com) into the token field
+3. Click **Create secure subdomain**
 
-Once submitted, the app will start provisioning your certificate:
+Once submitted, the app will start provisioning automatically:
 
 ![Setting up HTTPS progress](/img/ssl-setup/ssl-setup-progress.png)
 
@@ -46,27 +49,28 @@ The four steps run automatically:
 - **Issuing SSL certificate** — Let's Encrypt signs your certificate
 - **Activating HTTPS** — Nginx reloads with the new certificate
 
-5. Once complete, you will be redirected to your new HTTPS URL automatically
+Once complete, you will be redirected to your new HTTPS URL automatically.
 
-
+> Need more subdomains? Upgrade at [licenses.rtsurvey.com](https://licenses.rtsurvey.com).
 
 ---
 
 ## Option 2 — My own domain
 
+Click **Use my own domain →** in the sidebar, or expand **Advanced options** on the setup screen.
+
 Use this if you have an existing domain and its DNS `A` record already points to this server's IP.
 
-1. Click **My own domain** to expand the section
-2. Enter your full domain name (e.g. `survey.myorganization.org`)
-3. Click **Create certificate**
-
-
+1. Enter your full domain name (e.g. `survey.myorganization.org`)
+2. Click **Create certificate**
 
 Let's Encrypt will verify your domain and issue a certificate. This requires DNS to be correctly pointed first — the request will fail otherwise.
 
 ---
 
-## Option 3 — Install certificate manually
+## Option 3 — Install certificate manually *(Advanced)*
+
+Expand **Advanced options** on the setup screen for manual certificate installation.
 
 For enterprise environments using a custom or internal CA. You will place your certificate files on the server via SSH, then enter your domain in the app.
 
@@ -112,8 +116,6 @@ chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 ```
 
 ### Step 3 — Enter your domain in the app
-
-
 
 1. In the SSL setup screen, click **Install certificate manually**
 2. Enter your domain name (must match the certificate's Common Name or SAN)
