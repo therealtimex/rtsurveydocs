@@ -1,11 +1,11 @@
 ---
 title: "Decimal"
-description: "Tipo de pregunta de entrada de número decimal en rtSurvey"
+description: "Tipo de pregunta de entrada de número fraccional en rtSurvey"
 ---
 
-El tipo de pregunta `decimal` recopila números que pueden incluir una parte fraccionaria (p. ej., `3.14`, `72.5`). Activa un teclado numérico en dispositivos móviles y admite las mismas opciones de apariencia que el tipo `text` para el diseño y el formato.
+El tipo de pregunta `decimal` recopila números que pueden incluir una parte fraccionaria (por ejemplo, `3.14`, `72.5`). Activa un teclado numérico en el móvil y admite las mismas opciones de apariencia que el tipo `text` para el diseño y el formato.
 
-## Especificación básica de XLSForm
+## Especificación Básica de XLSForm
 
 | type | name | label |
 |------|------|-------|
@@ -21,21 +21,21 @@ Para la especificación estándar, consulte la [documentación de XLSForm](https
 
 ### `number-hspinner` — selector horizontal
 
-Reemplaza la entrada con un selector horizontal **− valor +**. Al tocar menos/más se ajusta el valor según el paso (step) configurado.
+Reemplaza la entrada con un selector horizontal **− valor +**. Al tocar menos/más, se ajusta el valor según el paso configurado.
 
 ```
 number-hspinner
 ```
 
-El valor mostrado se formatea con un decimal (p. ej., `3.0`, `72.5`). El paso predeterminado es `1`; use `hspinner()` para establecer un paso decimal.
+El valor mostrado se formatea con un decimal (por ejemplo, `3.0`, `72.5`). El paso por defecto es `1`; use `hspinner()` para establecer un paso decimal.
 
-**Personalice la forma del botón y el paso** usando `hspinner()`:
+**Personalizar la forma y el paso del botón** usando `hspinner()`:
 
 ```
 number-hspinner hspinner('left-small-square','right-small-square','0.1')
 ```
 
-Parámetros: forma del botón izquierdo, forma del botón derecho, valor del paso. Use un paso decimal como `0.5` o `0.1` para un control detallado.
+Parámetros: forma del botón izquierdo, forma del botón derecho, valor del paso. Use un paso decimal como `0.5` o `0.1` para un control más preciso.
 
 **Colores personalizados** usando `colors()`:
 
@@ -49,7 +49,7 @@ Cuatro valores en orden: fondo del botón izquierdo, icono del botón izquierdo,
 
 ### `thousandsep` — separador de miles
 
-Formatea el número mostrado con agrupación de comas (p. ej., `1,234.56`). El número bruto se almacena sin comas. El tipo de entrada se cambia a `"text"` para permitir la visualización formateada.
+Formatea el número mostrado con agrupamiento de comas (por ejemplo, `1,234.56`). El número original se almacena sin comas. El tipo de entrada se cambia a `"text"` para permitir la visualización formateada.
 
 ```
 thousandsep
@@ -57,7 +57,7 @@ thousandsep
 
 ---
 
-### `digisep(n, "sep")` — agrupación de dígitos personalizada
+### `digisep(n, "sep")` — agrupamiento de dígitos personalizado
 
 Agrupa los dígitos de la parte entera en bloques de `n` separados por un separador personalizado.
 
@@ -71,7 +71,7 @@ El tipo de entrada se cambia a `"text"` cuando esta apariencia está activa.
 
 ### `textonly` — forzar teclado de texto
 
-Fuerza `type="text"` en el elemento de entrada. Evita las peculiaridades de la entrada de números del navegador (ocultar ceros finales, flechas de giro en el escritorio) mientras sigue aceptando valores decimales.
+Fuerza `type="text"` en el elemento de entrada. Evita las peculiaridades de la entrada de números del navegador (ocultar ceros finales, flechas de giro de escritorio) mientras sigue aceptando valores decimales.
 
 ```
 textonly
@@ -79,9 +79,9 @@ textonly
 
 ---
 
-### `floating_hint` — la sugerencia flota como etiqueta
+### `floating_hint` — la pista flota como etiqueta
 
-El texto `hint` se representa dentro de la entrada como un marcador de posición (placeholder). Cuando el usuario comienza a escribir, flota sobre el campo como una etiqueta (label).
+El texto `hint` se renderiza dentro de la entrada como un marcador de posición. Cuando el usuario comienza a escribir, flota por encima del campo como una etiqueta.
 
 ```
 floating_hint
@@ -89,9 +89,9 @@ floating_hint
 
 ---
 
-### `embed` — sugerencia dentro del límite de entrada
+### `embed` — pista dentro del límite de entrada
 
-Similar a `floating_hint`: la sugerencia se ubica dentro del límite de entrada cuando está vacía. No flota cuando el usuario escribe.
+Similar a `floating_hint` — la pista se encuentra dentro del límite de entrada cuando está vacía. No flota cuando el usuario escribe.
 
 ```
 embed
@@ -101,7 +101,7 @@ embed
 
 ### `textpopup` — entrada de diálogo modal
 
-Al tocar el campo se abre un diálogo modal con una entrada más grande. Útil en pantallas pequeñas.
+Al tocar el campo, se abre un diálogo modal con una entrada más grande. Útil en pantallas pequeñas.
 
 ```
 textpopup
@@ -111,7 +111,7 @@ textpopup
 
 ### `charcount` — contador de caracteres en vivo
 
-Muestra un recuento de caracteres `(n)` en vivo debajo de la entrada, que se actualiza a medida que el usuario escribe.
+Muestra un contador de caracteres `(n)` en vivo debajo de la entrada, actualizado a medida que el usuario escribe.
 
 ```
 charcount
@@ -125,7 +125,7 @@ Antepone una cadena estática o calculada al valor mostrado. El valor almacenado
 
 ```
 prefix('USD ')          → muestra "USD 72.50", almacena "72.50"
-prefix(${currency})     → prefijo dinámico desde otro campo
+prefix(${currency})     → prefijo dinámico de otro campo
 ```
 
 ---
@@ -142,9 +142,9 @@ align_answer = center
 
 ---
 
-### `inputs{qrscan}` — escaneo de QR / código de barras en el campo
+### `inputs{qrscan}` — escaneo QR / código de barras en el campo
 
-Agrega un botón de escaneo de código QR junto a la entrada. Abre el escáner de la cámara y completa el campo con el valor escaneado.
+Añade un botón de escaneo de código QR junto a la entrada. Abre la cámara del escáner y rellena el campo con el valor escaneado.
 
 ```
 inputs{qrscan}
@@ -152,24 +152,24 @@ inputs{qrscan}
 
 ---
 
-## Referencia rápida de apariencia
+## Referencia rápida de apariencias
 
-| Appearance | Widget rendered |
+| Appearance | Widget renderizado |
 |---|---|
-| *(none)* | Entrada de número (`type="number"`) — teclado numérico en móviles |
-| `number-hspinner` | Selector horizontal − valor +, un decimal mostrado |
-| `number-hspinner hspinner(...)` | Selector con forma de botón y paso personalizados |
+| *(ninguno)* | Entrada numérica (`type="number"`) — teclado numérico en móvil |
+| `number-hspinner` | Selector horizontal − valor + , un decimal mostrado |
+| `number-hspinner hspinner(...)` | Selector con forma y paso de botón personalizados |
 | `number-hspinner colors(...)` | Selector con colores de botón personalizados |
 | `thousandsep` | Visualización de números agrupados por comas |
-| `digisep(n,"sep")` | Agrupación de dígitos personalizada |
+| `digisep(n,"sep")` | Agrupamiento de dígitos personalizado |
 | `textonly` | Forzar teclado de texto |
-| `floating_hint` | La sugerencia flota sobre el campo mientras se escribe |
-| `embed` | Sugerencia dentro del límite de entrada |
+| `floating_hint` | La pista flota por encima del campo mientras se escribe |
+| `embed` | La pista dentro del límite de entrada |
 | `textpopup` | Tocar para abrir el diálogo modal |
-| `charcount` | Recuento de caracteres en vivo debajo de la entrada |
+| `charcount` | Contador de caracteres en vivo debajo de la entrada |
 | `prefix(expr)` | Anteponer prefijo estático o dinámico |
 | `align_answer = left/right/center` | Alineación del texto de entrada |
-| `inputs{qrscan}` | Botón de escaneo de QR/código de barras |
+| `inputs{qrscan}` | Botón de escaneo QR/código de barras |
 
 ---
 
@@ -177,10 +177,10 @@ inputs{qrscan}
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| decimal | weight | Peso (kg) | `. > 0 and . <= 500` | Ingrese un valor entre 0 y 500 |
-| decimal | height | Altura (m) | `. > 0 and . <= 3` | Ingrese un valor entre 0 y 3 |
+| decimal | weight | Peso (kg) | `. > 0 and . <= 500` | Introduzca un valor entre 0 y 500 |
+| decimal | height | Altura (m) | `. > 0 and . <= 3` | Introduzca un valor entre 0 y 3 |
 | decimal | temp | Temperatura (°C) | `. >= 35 and . <= 42` | Temperatura normal: 35°C–42°C |
-| decimal | percentage | Porcentaje | `. >= 0 and . <= 100` | Ingrese un valor entre 0 y 100 |
+| decimal | percentage | Porcentaje | `. >= 0 and . <= 100` | Introduzca un valor entre 0 y 100 |
 
 ---
 
@@ -188,25 +188,25 @@ inputs{qrscan}
 
 | type | name | label | appearance | constraint | constraint_message |
 |------|------|-------|------------|------------|-------------------|
-| decimal | weight_kg | Peso (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Ingrese un peso válido |
-| decimal | height_m | Altura (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Ingrese una altura válida |
+| decimal | weight_kg | Peso (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Introduzca un peso válido |
+| decimal | height_m | Altura (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Introduzca una altura válida |
 | calculate | bmi | | | | |
 
-Columna de cálculo del IMC:
+Columna de cálculo de IMC:
 ```
 ${weight_kg} div (${height_m} * ${height_m})
 ```
 
 ---
 
-## Mejores prácticas
+## Mejores Prácticas
 
-1. Use `number-hspinner hspinner(..., '0.1')` para mediciones que requieran un decimal de precisión; el selector se formatea automáticamente a un decimal, manteniendo los valores consistentes.
-2. Use `textonly` cuando los navegadores agreguen controles de giro no deseados o trunquen los ceros finales (p. ej., `3.0` mostrado como `3`).
-3. Use `thousandsep` para valores financieros grandes para que los encuestados puedan verificar que ingresaron la magnitud correcta.
-4. Aplique restricciones de rango en lugar de depender solo del tipo de teclado móvil.
+1. Use `number-hspinner hspinner(..., '0.1')` para mediciones que requieren una precisión decimal — el selector se auto-formatea a un decimal, manteniendo los valores consistentes.
+2. Use `textonly` cuando los navegadores añaden controles de giro no deseados o truncan ceros finales (por ejemplo, `3.0` mostrado como `3`).
+3. Use `thousandsep` para valores financieros grandes para que los encuestados puedan verificar que introdujeron la magnitud correcta.
+4. Aplique restricciones de rango en lugar de depender únicamente del tipo de teclado móvil.
 
 ## Limitaciones
 
-- El selector siempre muestra un decimal; si necesita más precisión en el valor mostrado, use la entrada simple en su lugar.
-- `thousandsep` y `digisep()` almacenan el número bruto; no lea el valor de visualización formateado en los cálculos.
+- El selector siempre muestra un decimal — si necesita más precisión en el valor mostrado, use la entrada simple en su lugar.
+- `thousandsep` y `digisep()` almacenan el número original — no lea el valor formateado en los cálculos.

@@ -1,11 +1,11 @@
 ---
-title: "Geopoint"
-description: "Preguntas de Geopoint capturan coordenadas geográficas (latitud, longitud, altitud y precisión) como parte de la encuesta."
+title: "Geopunto"
+description: "Las preguntas de geopunto capturan coordenadas geográficas (latitud, longitud, altitud y precisión) como parte de la encuesta."
 ---
 
-El tipo de pregunta `geopoint` captura coordenadas geográficas (latitud, longitud, altitud, precisión) utilizando el GPS del dispositivo. rtSurvey representa el selector con varios modos de diseño y admite la automatización a través de los parámetros `inputs{}` y `outputs{}`.
+El tipo de pregunta `geopoint` captura coordenadas geográficas (latitud, longitud, altitud, precisión) usando el GPS del dispositivo. rtSurvey renderiza el selector con varios modos de diseño y admite la automatización a través de los parámetros `inputs{}` y `outputs{}`.
 
-## Especificación básica de XLSForm
+## Especificación Básica de XLSForm
 
 | type     | name        | label                       |
 |----------|-------------|-----------------------------|
@@ -13,31 +13,31 @@ El tipo de pregunta `geopoint` captura coordenadas geográficas (latitud, longit
 
 Para la especificación estándar, consulte la [documentación de XLSForm](https://xlsform.org/en/#question-types).
 
-## Formato de datos
+## Formato de Datos
 
-Se almacena como cuatro valores separados por espacios:
+Almacenado como cuatro valores separados por espacios:
 
 ```
-latitude longitude altitude accuracy
+latitud longitud altitud precisión
 ```
 
 Ejemplo: `13.756331 100.501762 15 8`
 
 ---
 
-## Modos de diseño (Layout modes)
+## Modos de diseño
 
-### Predeterminado — botón rectangular
+### Por defecto — botón rectangular
 
-Un botón rectangular "START GEOPOINT" abre un modal de mapa completo donde el encuestador selecciona un punto. Después de la captura, la etiqueta del botón cambia a "View or change geo point" y las coordenadas aparecen debajo.
+Un botón rectangular "INICIAR GEOPUNTO" abre un modal de mapa completo donde el enumerador selecciona un punto. Después de la captura, la etiqueta del botón cambia a "Ver o cambiar geopunto" y las coordenadas aparecen debajo.
 
-No se requiere valor de apariencia (appearance).
+No se requiere ningún valor de apariencia.
 
 ---
 
-### `display{inline-icon}` — botón de retícula circular
+### `display{inline-icon}` — botón circular de mira
 
-Representa un botón de icono circular (retícula ⊕) en lugar del botón rectangular. Al tocarlo se abre el mismo modal de mapa.
+Renderiza un botón de icono circular (mira ⊕) en lugar del botón rectangular. Al tocarlo, se abre el mismo modal de mapa.
 
 ```
 display{inline-icon}
@@ -47,16 +47,16 @@ display{inline-icon}
 
 ```
 display{inline-icon, left}           → botón a la izquierda de la etiqueta
-display{inline-icon, top}            → botón sobre la etiqueta
+display{inline-icon, top}            → botón encima de la etiqueta
 display{inline-icon, bottom}         → botón debajo de la etiqueta, centrado
 display{inline-icon, large}          → icono grande (75px)
 display{inline-icon, medium}         → icono mediano (50px)
 display{inline-icon, left, large}    → botón grande a la izquierda
 ```
 
-| Size | Icon height/width |
-|------|------------------|
-| *(default)* | 25px |
+| Tamaño | Altura/anchura del icono |
+|------|------------------------|
+| *(por defecto)* | 25px |
 | `medium` | 50px |
 | `large` | 75px |
 
@@ -64,7 +64,7 @@ display{inline-icon, left, large}    → botón grande a la izquierda
 
 ### `display{thumbnail-square}` — miniatura de mapa en vivo
 
-Representa una vista previa de mapa en vivo (Leaflet) directamente en la pregunta en lugar de un botón. La miniatura muestra la posición GPS actual y el punto seleccionado. Al tocar el botón de expandir se abre el modal completo.
+Renderiza una vista previa de mapa en vivo (Leaflet) directamente en la pregunta en lugar de un botón. La miniatura muestra la posición GPS actual y el punto seleccionado. Al tocar el botón de expandir, se abre el modal completo.
 
 ```
 display{thumbnail-square}
@@ -73,10 +73,10 @@ display{thumbnail-square}
 **Tamaño de miniatura personalizado:**
 
 ```
-display{thumbnail-square-[WxH]}          → píxeles fijos
+display{thumbnail-square-[AnxAl]}          → píxeles fijos
 display{thumbnail-square-[400x200]}      → 400px de ancho × 200px de alto
 
-display{thumbnail-square-[W%xH%]}        → porcentaje del ancho del formulario
+display{thumbnail-square-[An%xAl%]}        → porcentaje del ancho del formulario
 display{thumbnail-square-[100%x30%]}     → ancho completo × 30% del ancho del formulario
 ```
 
@@ -84,17 +84,17 @@ display{thumbnail-square-[100%x30%]}     → ancho completo × 30% del ancho del
 
 ## `display{}` vs `results{}` — antes y después de la captura
 
-`display{}` controla el diseño **antes** de que el usuario capture una ubicación. `results{}` controla el diseño **después** de que exista un valor. Pueden tener diferentes alineaciones.
+`display{}` controla el diseño **antes** de que el usuario capture una ubicación. `results{}` controla el diseño **después** de que existe un valor. Pueden tener alineaciones diferentes.
 
 ```
 display{inline-icon, right} results{left}
 ```
 
-Esto representa el botón a la derecha antes de la captura, luego lo mueve a la izquierda una vez que se registra un punto.
+Esto renderiza el botón a la derecha antes de la captura, luego lo mueve a la izquierda una vez que se registra un punto.
 
 ### `hide(value)` — suprimir la visualización de coordenadas
 
-Por defecto, el texto capturado de lat/lon/precisión/altitud se muestra debajo del botón. Ocúltelo con:
+Por defecto, el texto de latitud/longitud/precisión/altitud capturado se muestra debajo del botón. Ocultarlo con:
 
 ```
 results{hide(value)}
@@ -103,25 +103,25 @@ display{inline-icon} results{hide(value)}
 
 ---
 
-## `inputs{}` — automatización de GPS
+## `inputs{}` — automatización GPS
 
-### Captura automática al cargar
+### Auto-captura al cargar
 
-Registra automáticamente la posición GPS cuando se carga el formulario, sin que el encuestador presione nada.
+Registra automáticamente la posición GPS cuando se carga el formulario, sin que el enumerador presione nada.
 
 ```
 inputs{auto-take}
 ```
 
-**Captura automática condicional** usando una expresión XLSForm:
+**Auto-captura condicional** usando una expresión XLSForm:
 
 ```
 inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
 ```
 
-### Precompletar desde un campo de texto
+### Pre-llenar desde un campo de texto
 
-Pueble el geopoint desde una pregunta que contenga un nombre de lugar o una cadena de dirección. rtSurvey geocodifica de forma inversa la cadena a coordenadas a través de OpenStreetMap Nominatim.
+Rellene el geopunto a partir de una pregunta que contenga un nombre de lugar o una cadena de dirección. rtSurvey geocodifica inversamente la cadena a coordenadas a través de OpenStreetMap Nominatim.
 
 ```
 inputs{question(address_field)}
@@ -131,7 +131,7 @@ inputs{question(address_field)}
 
 ## `outputs{}` — geocodificación inversa a texto
 
-Después de capturar un punto, pueble automáticamente una pregunta de `text` con la dirección legible por humanos (geocodificada de forma inversa a partir de las coordenadas).
+Después de capturar un punto, rellene automáticamente una pregunta `text` con la dirección legible por humanos (geocodificada inversamente a partir de las coordenadas).
 
 ```
 outputs{question(address_field)}
@@ -146,9 +146,9 @@ Ejemplo:
 
 ---
 
-## `nomap` — captura de GPS sin mapa
+## `nomap` — captura GPS sin mapa
 
-Reemplaza el modal del mapa con un diálogo simple que solicita permiso de ubicación y registra las coordenadas. No se muestra ningún mapa. Útil para la captura solo de GPS en dispositivos de gama baja o cuando los mosaicos del mapa no están disponibles sin conexión.
+Reemplaza el modal del mapa con un diálogo simple que solicita permiso de ubicación y registra coordenadas. No se muestra ningún mapa. Útil para la captura solo de GPS en dispositivos de gama baja o cuando los mosaicos de mapas no están disponibles sin conexión.
 
 ```
 nomap
@@ -178,7 +178,7 @@ text-nolabel display{inline-icon, center, large}
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| geopoint | field_loc | Registrar ubicación de campo | `display{inline-icon, right, large}` |
+| geopoint | field_loc | Registrar ubicación del campo | `display{inline-icon, right, large}` |
 | geopoint | site | Ubicación del sitio | `display{thumbnail-square-[100%x30%]}` |
 | geopoint | auto_loc | Posición actual | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
 | geopoint | mapped_loc | Ubicación | `display{inline-icon} outputs{question(address)}` |
@@ -186,18 +186,18 @@ text-nolabel display{inline-icon, center, large}
 
 ---
 
-## Mejores prácticas
+## Mejores Prácticas
 
-1. Use `inputs{auto-take}` para encuestas de verificación de encuestadores donde el GPS es obligatorio; elimina el paso manual.
-2. Use `display{thumbnail-square}` cuando desee que el encuestador confirme visualmente el punto seleccionado antes de continuar.
-3. Empareje `outputs{question(...)}` con un campo de `text` de solo lectura para mostrar la dirección geocodificada de forma inversa al encuestador.
+1. Use `inputs{auto-take}` para encuestas de verificación de enumeradores donde el GPS es obligatorio — elimina el paso manual.
+2. Use `display{thumbnail-square}` cuando desee que el enumerador confirme visualmente el punto seleccionado antes de continuar.
+3. Empareje `outputs{question(...)}` con un campo `text` de solo lectura para mostrar la dirección geocodificada inversamente al enumerador.
 4. Use `nomap` en áreas sin conectividad a Internet donde los mosaicos del mapa no se pueden cargar.
-5. Permita que el tiempo del GPS se estabilice antes de grabar; una precisión inferior a 10 m suele ser suficiente para encuestas de campo.
+5. Deje que el GPS se estabilice antes de registrar — una precisión inferior a 10 m suele ser suficiente para las encuestas de campo.
 
 ## Limitaciones
 
-- La geocodificación de `inputs{question(name)}` requiere acceso a Internet; llama a la API de OpenStreetMap Nominatim.
-- La geocodificación inversa de `outputs{question(name)}` también requiere acceso a Internet.
-- La miniatura del mapa (`display{thumbnail-square}`) requiere Internet para la carga de mosaicos; las coordenadas se siguen capturando sin conexión.
-- La precisión del GPS varía según el dispositivo y el entorno; las condiciones de interiores o cañones urbanos pueden producir una precisión > 50 m.
+- La geocodificación `inputs{question(name)}` requiere acceso a Internet — llama a la API Nominatim de OpenStreetMap.
+- La geocodificación inversa `outputs{question(name)}` también requiere acceso a Internet.
+- La miniatura del mapa (`display{thumbnail-square}`) requiere Internet para la carga de mosaicos; las coordenadas aún se capturan sin conexión.
+- La precisión del GPS varía según el dispositivo y el entorno — las condiciones interiores o de cañones urbanos pueden producir una precisión > 50 m.
 - La recopilación de datos de ubicación puede afectar significativamente la duración de la batería del dispositivo durante encuestas largas.
