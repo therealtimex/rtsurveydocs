@@ -1,41 +1,41 @@
 ---
 title: "Decimal"
-description: "Frage-Typ für die Eingabe von Dezimalzahlen in rtSurvey"
+description: "Fragetyp für Bruchzahlen in rtSurvey"
 ---
 
-Der Frage-Typ `decimal` erfasst Zahlen, die einen Bruchteil enthalten können (z. B. `3.14`, `72.5`). Er löst auf Mobilgeräten eine numerische Tastatur aus und unterstützt dieselben Darstellungsoptionen wie der Typ `text` für Layout und Formatierung.
+Der Fragetyp `decimal` erfasst Zahlen, die einen Bruchteil enthalten können (z. B. `3.14`, `72.5`). Er öffnet eine numerische Tastatur auf Mobilgeräten und unterstützt die gleichen Erscheinungsbildoptionen wie der `text`-Typ für Layout und Formatierung.
 
-## Grundlegende XLSForm-Spezifikation
+## Grundlegende XLSForm Spezifikation
 
-| type | name | label |
-|------|------|-------|
-| decimal | weight_kg | Gewicht (kg) |
-| decimal | height_m | Größe (m) |
-| decimal | temperature | Körpertemperatur (°C) |
+| type    | name        | label                     |
+|---------|-------------|---------------------------|
+| decimal | weight_kg   | Gewicht (kg)              |
+| decimal | height_m    | Größe (m)                 |
+| decimal | temperature | Körpertemperatur (°C)     |
 
-Die Standard-Spezifikation finden Sie in der [XLSForm-Dokumentation](https://xlsform.org/en/#question-types).
+Die Standard-Spezifikation finden Sie in der [XLSForm Dokumentation](https://xlsform.org/en/#question-types).
 
 ---
 
-## Darstellungsoptionen (Appearance options)
+## Erscheinungsbildoptionen
 
-### `number-hspinner` — Horizontaler Spinner
+### `number-hspinner` – horizontaler Spinner
 
-Ersetzt die Eingabe durch einen horizontalen **− Wert +** Spinner. Tippen auf Minus/Plus passt den Wert um den konfigurierten Schritt (step) an.
+Ersetzt die Eingabe durch einen horizontalen **− Wert +** Spinner. Durch Tippen auf Minus/Plus wird der Wert um den konfigurierten Schritt angepasst.
 
 ```
 number-hspinner
 ```
 
-Der angezeigte Wert wird mit einer Dezimalstelle formatiert (z. B. `3.0`, `72.5`). Der Standardschritt ist `1`; verwenden Sie `hspinner()`, um einen Dezimalschritt festzulegen.
+Der angezeigte Wert wird mit einer Dezimalstelle formatiert (z. B. `3.0`, `72.5`). Der Standardschritt ist `1`; verwenden Sie `hspinner()`, um einen Dezimalschritt einzustellen.
 
-**Anpassen der Schaltflächenform und des Schritts** mit `hspinner()`:
+**Schaltflächenform und -schritt anpassen** mit `hspinner()`:
 
 ```
 number-hspinner hspinner('left-small-square','right-small-square','0.1')
 ```
 
-Parameter: Form der linken Schaltfläche, Form der rechten Schaltfläche, Schrittwert. Verwenden Sie einen Dezimalschritt wie `0.5` oder `0.1` für eine feingliedrige Steuerung.
+Parameter: Form der linken Schaltfläche, Form der rechten Schaltfläche, Schrittwert. Verwenden Sie einen Dezimalschritt wie `0.5` oder `0.1` für eine präzise Steuerung.
 
 **Benutzerdefinierte Farben** mit `colors()`:
 
@@ -43,13 +43,13 @@ Parameter: Form der linken Schaltfläche, Form der rechten Schaltfläche, Schrit
 number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
 ```
 
-Vier Werte in der Reihenfolge: Hintergrund linke Schaltfläche, Symbol linke Schaltfläche, Hintergrund rechte Schaltfläche, Symbol rechte Schaltfläche.
+Vier Werte in der Reihenfolge: Hintergrund der linken Schaltfläche, Icon der linken Schaltfläche, Hintergrund der rechten Schaltfläche, Icon der rechten Schaltfläche.
 
 ---
 
-### `thousandsep` — Tausendertrennzeichen
+### `thousandsep` – Tausender-Trennzeichen
 
-Formatiert die angezeigte Zahl mit Tausender-Gruppierung (z. B. `1,234.56`). Die Rohzahl wird ohne Kommas gespeichert. Der Eingabetyp wird auf `"text"` umgeschaltet, um die formatierte Anzeige zu ermöglichen.
+Formatiert die angezeigte Zahl mit Komma-Gruppierung (z. B. `1,234.56`). Die Rohzahl wird ohne Kommas gespeichert. Der Eingabetyp wird auf `"text"` umgestellt, um die formatierte Anzeige zu ermöglichen.
 
 ```
 thousandsep
@@ -57,21 +57,21 @@ thousandsep
 
 ---
 
-### `digisep(n, "sep")` — Benutzerdefinierte Zifferngruppierung
+### `digisep(n, "sep")` – benutzerdefinierte Zifferngruppierung
 
-Gruppiert Ziffern des Ganzzahlteils in Blöcke von `n`, getrennt durch ein benutzerdefiniertes Trennzeichen.
+Gruppiert ganzzahlige Ziffern in Blöcke von `n`, getrennt durch ein benutzerdefiniertes Trennzeichen.
 
 ```
 digisep(3," ")      → 1 234 567.89
 ```
 
-Der Eingabetyp wird auf `"text"` umgeschaltet, wenn diese Darstellung aktiv ist.
+Der Eingabetyp wird auf `"text"` umgestellt, wenn dieses Erscheinungsbild aktiv ist.
 
 ---
 
-### `textonly` — Text-Tastatur erzwingen
+### `textonly` – Texttastatur erzwingen
 
-Erzwingt `type="text"` für das Eingabeelement. Verhindert Eigenheiten der Browser-Zahleneingabe (Ausblenden von Nachkommanullen, Desktop-Pfeile), während weiterhin Dezimalwerte akzeptiert werden.
+Erzwingt `type="text"` für das Eingabeelement. Verhindert Browser-Probleme bei der Zahleneingabe (Ausblenden von Nullen am Ende, Desktop-Drehpfeile), während Dezimalwerte weiterhin akzeptiert werden.
 
 ```
 textonly
@@ -79,9 +79,9 @@ textonly
 
 ---
 
-### `floating_hint` — Hinweis schwebt als Label
+### `floating_hint` – Hinweis schwebt als Label
 
-Der `hint`-Text wird innerhalb der Eingabe als Platzhalter angezeigt. Wenn der Benutzer mit der Eingabe beginnt, schwebt er als Label über dem Feld.
+Der `hint`-Text wird als Platzhalter im Eingabefeld gerendert. Wenn der Benutzer mit der Eingabe beginnt, schwebt er über dem Feld als Label.
 
 ```
 floating_hint
@@ -89,9 +89,9 @@ floating_hint
 
 ---
 
-### `embed` — Hinweis innerhalb der Eingabebegrenzung
+### `embed` – Hinweis innerhalb der Eingabebegrenzung
 
-Ähnlich wie `floating_hint` — der Hinweis befindet sich innerhalb der Eingabebegrenzung, wenn das Feld leer ist. Er schwebt nicht, wenn der Benutzer tippt.
+Ähnlich wie `floating_hint` – der Hinweis befindet sich im leeren Zustand innerhalb der Eingabebegrenzung. Er schwebt nicht, wenn der Benutzer tippt.
 
 ```
 embed
@@ -99,9 +99,9 @@ embed
 
 ---
 
-### `textpopup` — Modaler Dialog zur Eingabe
+### `textpopup` – Modaldialog-Eingabe
 
-Tippen auf das Feld öffnet einen modalen Dialog mit einer größeren Eingabe. Nützlich auf kleinen Bildschirmen.
+Durch Tippen auf das Feld öffnet sich ein Modaldialog mit einer größeren Eingabe. Nützlich auf kleinen Bildschirmen.
 
 ```
 textpopup
@@ -109,9 +109,9 @@ textpopup
 
 ---
 
-### `charcount` — Live-Zeichenzähler
+### `charcount` – Live-Zeichenzähler
 
-Zeigt einen Live-Zeichenzähler `(n)` unter der Eingabe an, der beim Tippen aktualisiert wird.
+Zeigt einen Live-Zeichenzähler `(n)` unter der Eingabe an, der aktualisiert wird, während der Benutzer tippt.
 
 ```
 charcount
@@ -119,9 +119,9 @@ charcount
 
 ---
 
-### `prefix(expr)` — Präfix voranstellen
+### `prefix(expr)` – Präfix voranstellen
 
-Stellt der angezeigten Zahl eine statische oder berechnete Zeichenfolge voran. Der gespeicherte Wert enthält das Präfix nicht.
+Stellt einen statischen oder berechneten String dem angezeigten Wert voran. Der gespeicherte Wert enthält das Präfix nicht.
 
 ```
 prefix('USD ')          → zeigt "USD 72.50", speichert "72.50"
@@ -130,9 +130,9 @@ prefix(${currency})     → dynamisches Präfix aus einem anderen Feld
 
 ---
 
-### `align_answer` — Ausrichtung des Eingabetextes
+### `align_answer` – Textausrichtung der Eingabe
 
-Steuert die horizontale Ausrichtung des eingegebenen Wertes innerhalb der Eingabe.
+Steuert die horizontale Ausrichtung des eingegebenen Wertes im Eingabefeld.
 
 ```
 align_answer = left
@@ -142,9 +142,9 @@ align_answer = center
 
 ---
 
-### `inputs{qrscan}` — QR- / Barcode-Scan in das Feld
+### `inputs{qrscan}` – QR-/Barcode-Scan in das Feld
 
-Fügt eine Schaltfläche zum Scannen von QR-Codes neben der Eingabe hinzu. Öffnet den Kamera-Scanner und füllt das Feld mit dem gescannten Wert.
+Fügt eine QR-Code-Scan-Schaltfläche neben der Eingabe hinzu. Öffnet den Kamerascaner und füllt das Feld mit dem gescannten Wert.
 
 ```
 inputs{qrscan}
@@ -152,47 +152,47 @@ inputs{qrscan}
 
 ---
 
-## Kurzübersicht Darstellung (Appearance quick reference)
+## Kurzübersicht Erscheinungsbild
 
-| Appearance | Widget rendered |
-|---|---|
-| *(none)* | Zahleneingabe (`type="number"`) — numerische Tastatur auf Mobilgeräten |
-| `number-hspinner` | Horizontaler − Wert + Spinner, eine Dezimalstelle angezeigt |
-| `number-hspinner hspinner(...)` | Spinner mit benutzerdefinierter Schaltflächenform und Schritt |
-| `number-hspinner colors(...)` | Spinner mit benutzerdefinierten Schaltflächenfarben |
-| `thousandsep` | Zahlenausgabe mit Tausendertrennzeichen |
-| `digisep(n,"sep")` | Benutzerdefinierte Zifferngruppierung |
-| `textonly` | Text-Tastatur erzwingen |
-| `floating_hint` | Hinweis schwebt beim Tippen über dem Feld |
-| `embed` | Hinweis innerhalb der Eingabebegrenzung |
-| `textpopup` | Tippen zum Öffnen eines modalen Dialogs |
-| `charcount` | Live-Zeichenzähler unter der Eingabe |
-| `prefix(expr)` | Statisches oder dynamisches Präfix voranstellen |
-| `align_answer = left/right/center` | Ausrichtung des Eingabetextes |
-| `inputs{qrscan}` | Schaltfläche für QR-/Barcode-Scan |
+| Erscheinungsbild                    | Gerendertes Widget                                    |
+|-----------------------------------|-------------------------------------------------------|
+| *(keine)*                         | Zahleneingabe (`type="number"`) – numerische Tastatur auf Mobilgeräten |
+| `number-hspinner`                 | Horizontaler − Wert + Spinner, eine Dezimalstelle angezeigt |
+| `number-hspinner hspinner(...)`   | Spinner mit benutzerdefinierter Schaltflächenform und Schritt |
+| `number-hspinner colors(...)`     | Spinner mit benutzerdefinierten Schaltflächenfarben   |
+| `thousandsep`                     | Durch Kommas gruppierte Zahlendarstellung             |
+| `digisep(n,"sep")`                | Benutzerdefinierte Zifferngruppierung                 |
+| `textonly`                        | Texttastatur erzwingen                               |
+| `floating_hint`                   | Hinweis schwebt über dem Feld während der Eingabe    |
+| `embed`                           | Hinweis innerhalb der Eingabebegrenzung               |
+| `textpopup`                       | Tippen zum Öffnen des Modaldialogs                    |
+| `charcount`                       | Live-Zeichenzähler unter der Eingabe                  |
+| `prefix(expr)`                    | Statisches oder dynamisches Präfix voranstellen     |
+| `align_answer = left/right/center` | Textausrichtung der Eingabe                           |
+| `inputs{qrscan}`                  | QR-/Barcode-Scan-Schaltfläche                         |
 
 ---
 
 ## Einschränkungen und Validierung
 
-| type | name | label | constraint | constraint_message |
-|------|------|-------|------------|-------------------|
-| decimal | weight | Gewicht (kg) | `. > 0 and . <= 500` | Geben Sie einen Wert zwischen 0 und 500 ein |
-| decimal | height | Größe (m) | `. > 0 and . <= 3` | Geben Sie einen Wert zwischen 0 und 3 ein |
-| decimal | temp | Temperatur (°C) | `. >= 35 and . <= 42` | Normale Temperatur: 35°C–42°C |
-| decimal | percentage | Prozentsatz | `. >= 0 and . <= 100` | Geben Sie einen Wert zwischen 0 und 100 ein |
+| type    | name       | label                     | constraint               | constraint_message             |
+|---------|------------|---------------------------|--------------------------|--------------------------------|
+| decimal | weight     | Gewicht (kg)              | `. > 0 and . <= 500`     | Geben Sie einen Wert zwischen 0 und 500 ein |
+| decimal | height     | Größe (m)                 | `. > 0 and . <= 3`       | Geben Sie einen Wert zwischen 0 und 3 ein |
+| decimal | temp       | Temperatur (°C)           | `. >= 35 and . <= 42`    | Normaltemperatur: 35°C–42°C    |
+| decimal | percentage | Prozentsatz               | `. >= 0 and . <= 100`    | Geben Sie einen Wert zwischen 0 und 100 ein |
 
 ---
 
-## Beispiel — Messformular
+## Beispiel – Messformular
 
-| type | name | label | appearance | constraint | constraint_message |
-|------|------|-------|------------|------------|-------------------|
-| decimal | weight_kg | Gewicht (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Geben Sie ein gültiges Gewicht ein |
-| decimal | height_m | Größe (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Geben Sie eine gültige Größe ein |
-| calculate | bmi | | | | |
+| type    | name      | label         | appearance                                          | constraint              | constraint_message        |
+|---------|-----------|---------------|-----------------------------------------------------|-------------------------|---------------------------|
+| decimal | weight_kg | Gewicht (kg)  | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300`    | Geben Sie ein gültiges Gewicht ein |
+| decimal | height_m  | Größe (m)     | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3`      | Geben Sie eine gültige Größe ein |
+| calculate | bmi       |               |                                                     |                         |                           |
 
-Spalte für BMI-Berechnung:
+BMI-Berechnungsspalte:
 ```
 ${weight_kg} div (${height_m} * ${height_m})
 ```
@@ -201,12 +201,12 @@ ${weight_kg} div (${height_m} * ${height_m})
 
 ## Best Practices
 
-1. Verwenden Sie `number-hspinner hspinner(..., '0.1')` für Messungen, die eine Dezimalstelle Genauigkeit erfordern — der Spinner formatiert automatisch auf eine Dezimalstelle, was die Werte konsistent hält.
-2. Verwenden Sie `textonly`, wenn Browser unerwünschte Spinner-Steuerelemente hinzufügen oder Nachkommanullen abschneiden (z. B. `3.0` als `3` angezeigt).
-3. Verwenden Sie `thousandsep` für große Finanzwerte, damit die Befragten überprüfen können, ob sie die richtige Größenordnung eingegeben haben.
-4. Setzen Sie Bereichsbeschränkungen (constraints) durch, anstatt sich nur auf den Tastaturtyp des Mobilgeräts zu verlassen.
+1.  Verwenden Sie `number-hspinner hspinner(..., '0.1')` für Messungen, die eine Dezimalstelle Genauigkeit erfordern – der Spinner formatiert automatisch auf eine Dezimalstelle und hält die Werte konsistent.
+2.  Verwenden Sie `textonly`, wenn Browser unerwünschte Drehfelder hinzufügen oder Nullen am Ende abschneiden (z. B. `3.0` als `3` angezeigt wird).
+3.  Verwenden Sie `thousandsep` für große Finanzwerte, damit die Befragten überprüfen können, ob sie die richtige Größenordnung eingegeben haben.
+4.  Erzwingen Sie Bereichseinschränkungen, anstatt sich allein auf den mobilen Tastaturtyp zu verlassen.
 
-## Einschränkungen (Limitations)
+## Einschränkungen
 
-- Der Spinner zeigt immer eine Dezimalstelle an — wenn Sie mehr Präzision im angezeigten Wert benötigen, verwenden Sie stattdessen die einfache Eingabe.
-- `thousandsep` und `digisep()` speichern die Rohzahl — verwenden Sie den formatierten Anzeigewert nicht in Berechnungen.
+-   Der Spinner zeigt immer eine Dezimalstelle an – wenn Sie mehr Präzision im angezeigten Wert benötigen, verwenden Sie stattdessen die normale Eingabe.
+-   `thousandsep` und `digisep()` speichern die Rohzahl – lesen Sie nicht den formatierten Anzeigewert in Berechnungen.

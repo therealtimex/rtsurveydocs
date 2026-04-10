@@ -1,37 +1,37 @@
 ---
 title: "Datei"
-description: "Dateifragen ermöglichen es den Befragten, Dokumente und andere Dateien als Teil ihrer Umfrageantworten hochzuladen."
+description: "Dateifragen ermöglichen es Befragten, Dokumente und andere Dateien als Teil ihrer Umfrageantworten hochzuladen."
 ---
 
-Der Frage-Typ `file` ermöglicht es den Befragten, **beliebige Dateien** von ihrem Gerät hochzuladen — Dokumente, Tabellenkalkulationen, PDFs oder andere Dateitypen. Im Gegensatz zu `image`, `audio` und `video`, die spezifische Aufnahmewerkzeuge starten, öffnet `file` eine allgemeine Dateiauswahl.
+Der Fragetyp `file` ermöglicht es Befragten, **jede Datei** von ihrem Gerät hochzuladen – Dokumente, Tabellen, PDFs oder andere Dateitypen. Im Gegensatz zu `image`, `audio` und `video`, die spezifische Erfassungstools starten, öffnet `file` einen allgemeinen Dateiauswahldialog.
 
-## Grundlegende XLSForm-Spezifikation
+## Grundlegende XLSForm Spezifikation
 
 | type | name      | label                        |
 |------|-----------|------------------------------|
 | file | document  | Bitte laden Sie Ihr Dokument hoch |
 
-Weitere Details zum Standard-Dateifrage-Typ finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Weitere Details zum Standard-Dateifragetyp finden Sie in der [XLSForm Spezifikation](https://xlsform.org/en/#question-types).
 
-## Verwendungszwecke
+## Verwendung
 
 Dateifragen werden häufig verwendet für:
 
-1. Sammeln von unterstützenden Dokumenten (Quittungen, Zertifikate, Verträge, Berichte)
-2. Hochladen ausgefüllter Papierformulare, die gescannt wurden
-3. Erfassen von Tabellenkalkulationen oder Datenexporten aus anderen Systemen
-4. Jeder digitale Dateityp, der nicht durch Bild/Audio/Video abgedeckt ist
+1.  Sammeln von Belegdokumenten (Quittungen, Zertifikate, Verträge, Berichte)
+2.  Hochladen von ausgefüllten, gescannten Papierformularen
+3.  Erfassen von Tabellen oder Datenexporten aus anderen Systemen
+4.  Jeder digitale Dateityp, der nicht von Bild/Audio/Video abgedeckt wird
 
 ## Datenformat
 
 Hochgeladene Dateien werden als binäre Anhänge gespeichert:
 
-- **Format:** Beibehalten im Originalformat (PDF, XLSX, DOCX usw.)
-- **Benennung:** `{instanceID}-{fieldname}.{extension}`
-- **Speicherung:** Hochgeladen in den Medienordner des Servers zusammen mit der Einreichung
-- **Zugriff:** Herunterladbar über die Verwaltungsoberfläche für Einreichungen
+-   **Format:** Im Originalformat erhalten (PDF, XLSX, DOCX usw.)
+-   **Benennung:** `{instanceID}-{fieldname}.{extension}`
+-   **Speicherung:** Wird zusammen mit der Übermittlung in den Medienserverordner hochgeladen
+-   **Zugriff:** Herunterladbar über die Verwaltungsoberfläche für Übermittlungen
 
-## rtSurvey-Erweiterungen
+## rtSurvey Erweiterungen
 
 ### Akzeptierte Dateitypen
 
@@ -39,32 +39,32 @@ Verwenden Sie die Spalte `parameters`, um einzuschränken, welche Dateitypen aus
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| file | report | Laden Sie den Inspektionsbericht hoch | `accept=.pdf` |
-| file | spreadsheet | Laden Sie die Datendatei hoch | `accept=.xlsx,.csv` |
+| file | report | Inspektionsbericht hochladen | `accept=.pdf` |
+| file | spreadsheet | Datendatei hochladen | `accept=.xlsx,.csv` |
 
-Der Parameter `accept` verwendet die Standard-Dateierweiterungssyntax (kommagetrennt).
+Der Parameter `accept` verwendet die Standard-Dateierweiterungssyntax (durch Kommas getrennt).
 
 ### Anleitung zur Dateigröße
 
-rtSurvey erzwingt kein hartes Limit für die Dateigröße auf Frage-Ebene, aber das Upload-Limit des Servers gilt. Verwenden Sie `hint`, um Erwartungen an den Datenerheber (enumerator) zu kommunizieren:
+rtSurvey erzwingt kein hartes Dateigrößenlimit auf Fragen-Ebene, aber das Server-Upload-Limit gilt. Verwenden Sie `hint`, um die Erwartungen an den Interviewer zu kommunizieren:
 
 | type | name | label | hint |
 |------|------|-------|------|
-| file | receipt | Laden Sie den Zahlungsbeleg hoch | Akzeptiert: PDF oder Bild. Maximale Dateigröße: 5 MB |
+| file | receipt | Zahlungsbeleg hochladen | Akzeptiert: PDF oder Bild. Maximale Dateigröße: 5 MB |
 
-### Integration mit dem Dateisystem des Geräts und Cloud-Speicher
+### Integration mit Gerätedateisystem und Cloud-Speicher
 
-Unter Android und iOS öffnet die Frage `file` die native Dateiauswahl des Geräts, die Zugriff beinhalten kann auf:
-- Lokaler Gerätespeicher
-- SD-Karte (Android)
-- iCloud Drive (iOS)
-- Google Drive, Dropbox (falls installiert)
+Auf Android und iOS öffnet die `file`-Frage den nativen Dateiauswahldialog des Geräts, der Zugriff auf folgende Bereiche bieten kann:
+-   Lokaler Gerätespeicher
+-   SD-Karte (Android)
+-   iCloud Drive (iOS)
+-   Google Drive, Dropbox (falls installiert)
 
-Im Web wird der Standard-Datei-Upload-Dialog des Browsers geöffnet.
+Im Web wird der Standard-Dateiupload-Dialog des Browsers geöffnet.
 
-### Inline-Schaltflächen-Layout (Inline button layout)
+### Inline-Button-Layout
 
-Fügen Sie `inline` hinzu, um den Upload als **kreisförmige Symbolschaltfläche** neben dem Label anstelle einer Dateiauswahl in voller Breite darzustellen.
+Fügen Sie `inline` hinzu, um den Upload als **kreisförmige Icon-Schaltfläche** neben dem Label anstelle eines Dateiauswahldialogs über die volle Breite darzustellen.
 
 ```
 | type | name | label           | appearance                              |
@@ -78,7 +78,7 @@ Fügen Sie `inline` hinzu, um den Upload als **kreisförmige Symbolschaltfläche
 
 **Schaltflächengröße** — `small` *(Standard)*, `medium`, `large`
 
-**Schaltflächenfarbe** — fügen Sie eine Hex-Farbe innerhalb von `display{}` hinzu, um die Primärfarbe zu überschreiben:
+**Schaltflächenfarbe** — Fügen Sie eine Hex-Farbe in `display{}` hinzu, um die Primärfarbe zu überschreiben:
 
 ```
 inline display{right, large, <FF5500/>}
@@ -86,56 +86,56 @@ inline display{right, large, <FF5500/>}
 
 **Steuerung nach der Aufnahme — `results{}`:**
 
-| Appearance | Effect |
-|---|---|
-| `results{hide(capture)}` | Blendet die Upload-Schaltfläche aus, nachdem eine Datei angehängt wurde |
-| `results{hide(review)}` | Blendet die Schaltfläche zum Überprüfen/Vorschauen nach dem Upload aus |
+| Appearance              | Effekt                                      |
+|-------------------------|---------------------------------------------|
+| `results{hide(capture)}` | Blendet die Upload-Schaltfläche nach dem Anhängen einer Datei aus |
+| `results{hide(review)}` | Blendet die Überprüfungs-/Vorschau-Schaltfläche nach dem Upload aus |
 | `results{hide(filename)}` | Blendet den nach dem Upload angezeigten Dateinamen aus |
-| `results{left}` | Verschiebt das Symbol nach dem Upload nach links |
+| `results{left}`         | Verschiebt das Symbol nach dem Upload nach links |
 
-Beispiel — Upload-Schaltfläche ausblenden, nachdem eine Datei angehängt wurde:
+Beispiel – Upload-Schaltfläche nach dem Anhängen der Datei ausblenden:
 ```
 inline display{right} results{hide(capture)}
 ```
 
-### Unterdrücken des Labels (Suppress the label)
+### Label unterdrücken
 
 ```
 inline text-nolabel display{center, large}
 ```
 
-## Anwendungsbeispiel
+## Anwendungsbeispiele
 
 ### Erforderlicher PDF-Upload
 
 | type | name | label | hint | required | required_message |
 |------|------|-------|------|----------|-----------------|
-| file | signed_consent | Laden Sie das unterzeichnete Einverständnisformular hoch | Nur PDF, max. 2 MB | yes | Ein Einverständnisformular ist erforderlich |
+| file | signed_consent | Unterschriebenes Einverständnisformular hochladen | Nur PDF, max. 2 MB | yes | Ein Einverständnisformular ist erforderlich |
 
-### Bedingter Dokument-Upload
+### Bedingter Dokumenten-Upload
 
-| type | name | label | relevant |
-|------|------|-------|----------|
-| select_one yesno | has_land_title | Verfügt der Haushalt über einen Landtitel? | |
-| file | land_title_doc | Laden Sie ein Foto oder einen Scan des Landtitels hoch | `${has_land_title} = 'yes'` |
+| type        | name           | label                                 | relevant                           |
+|-------------|----------------|---------------------------------------|------------------------------------|
+| select_one yesno | has_land_title | Hat der Haushalt einen Grundbuchauszug? |                                    |
+| file        | land_title_doc | Foto oder Scan des Grundbuchauszugs hochladen | `${has_land_title} = 'yes'` |
 
 ## Best Practices
 
-1. Verwenden Sie `accept`, um Dateitypen einzuschränken — dies verhindert, dass Datenerheber versehentlich falsche Dateien hochladen.
-2. Geben Sie immer Hinweise zu Größe und Format in der Spalte `hint` an.
-3. Verwenden Sie für Fotos und Bilder stattdessen den Typ `image` — dieser bietet eine bessere Komprimierung und eine konsistente Handhabung von Formaten.
-4. Planen Sie bei großen Umfragen mit Dateianhängen Ihren Datenspeicher und Ihre Download-Bandbreite entsprechend.
-5. Testen Sie die Dateiauswahl auf dem Zielgerätetyp (Android vs. iOS vs. Web) vor der Bereitstellung — der Zugriff auf Cloud-Laufwerke variiert.
+1.  Verwenden Sie `accept`, um Dateitypen einzuschränken – dies verhindert, dass Interviewer versehentlich falsche Dateien hochladen.
+2.  Fügen Sie immer Größen- und Formatierungsrichtlinien in die Spalte `hint` ein.
+3.  Für Fotos und Bilder verwenden Sie stattdessen den Typ `image` – dieser bietet eine bessere Komprimierung und konsistente Formatbehandlung.
+4.  Planen Sie bei großen Umfragen mit Dateianhängen Ihren Datenspeicher und die Download-Bandbreite entsprechend.
+5.  Testen Sie den Dateiauswahldialog auf dem Zielgerätetyp (Android vs. iOS vs. Web) vor der Bereitstellung – der Zugriff auf Cloud-Laufwerke variiert.
 
 ## Überlegungen zur Datenverarbeitung
 
-- Dateien werden in ihrem Originalformat gespeichert; sie werden von rtSurvey nicht konvertiert oder komprimiert.
-- Analysieren Sie Dateien nach dem Herunterladen — rtSurvey extrahiert oder indiziert keine Dateiinhalte.
-- Große Dateianhänge erhöhen die Zeit zum Herunterladen eines vollständigen Datensatzes erheblich.
+-   Dateien werden in ihrem Originalformat gespeichert; sie werden von rtSurvey nicht konvertiert oder komprimiert.
+-   Analysieren Sie Dateien nach dem Download – rtSurvey extrahiert oder indiziert keine Dateiinhalte.
+-   Große Dateianhänge erhöhen die zum Herunterladen eines vollständigen Datensatzes erforderliche Zeit erheblich.
 
-## Einschränkungen (Limitations)
+## Einschränkungen
 
-- Dateifragen validieren keine Dateiinhalte — nur die Dateierweiterungsprüfung über `accept` wird auf UI-Ebene erzwungen.
-- Sehr große Dateien (100 MB+) können beim Upload in Umgebungen mit geringer Konnektivität zu Zeitüberschreitungen führen.
-- Offline-Datenerheber können Dateien anhängen, diese werden jedoch erst hochgeladen, wenn die Verbindung wiederhergestellt ist.
-- Einige Gerätekonfigurationen beschränken den Zugriff auf bestimmte Speicherorte (z. B. MDM-Richtlinien von Unternehmen).
+-   Dateifragen validieren keine Dateiinhalte – nur die Dateierweiterungsprüfung über `accept` wird auf UI-Ebene erzwungen.
+-   Sehr große Dateien (100 MB+) können beim Hochladen in Umgebungen mit geringer Konnektivität eine Zeitüberschreitung verursachen.
+-   Offline-Interviewer können Dateien anhängen, diese werden jedoch erst hochgeladen, wenn die Konnektivität wiederhergestellt ist.
+-   Einige Gerätekonfigurationen schränken den Zugriff auf bestimmte Speicherorte ein (z. B. MDM-Richtlinien von Unternehmen).

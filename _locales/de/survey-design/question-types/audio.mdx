@@ -1,46 +1,46 @@
 ---
 title: "Audio"
-description: "Audio-Fragen ermöglichen es Befragten, Audiodateien als Teil der Umfrage aufzunehmen und zu übermitteln."
+description: "Audiofragen ermöglichen es den Befragten, Audiodateien als Teil der Umfrage aufzunehmen und einzureichen."
 ---
 
-Der Fragetyp `audio` ermöglicht es Befragten, **Audio aufzunehmen** oder eine vorhandene Audiodatei als Teil ihrer Antwort hochzuladen. Dies ist nützlich für die Erfassung mündlicher Berichte, Umgebungsgeräusche, Erfahrungsberichte oder Informationen, die über die Stimme besser als über Text vermittelt werden können.
+Der Fragetyp `audio` ermöglicht es Befragten, **Audio aufzunehmen** oder eine bestehende Audiodatei als Teil ihrer Umfrageantwort hochzuladen. Er ist nützlich, um mündliche Berichte, Umgebungsgeräusche, Zeugenaussagen oder jegliche Informationen zu erfassen, die besser über Sprache als über Text vermittelt werden.
 
-## Grundlegende XLSForm-Spezifikation
+## Grundlegende XLSForm Spezifikation
 
 | type  | name        | label                        |
 |-------|-------------|------------------------------|
-| audio | voice_note  | Bitte nehmen Sie Ihre Kommentare auf |
+| audio | voice_note  | Bitte sprechen Sie Ihre Kommentare auf |
 
-Weitere Details zum Standard-Audio-Fragetyp finden Sie in der [XLSForm-Spezifikation](https://xlsform.org/en/#question-types).
+Weitere Details zum Standard-Audiofragentyp finden Sie in der [XLSForm Spezifikation](https://xlsform.org/en/#question-types).
 
-## Anwendungsbereiche
+## Verwendung
 
-Audio-Fragen werden häufig verwendet für:
+Audiofragen werden häufig verwendet für:
 
-1. Erfassung offener mündlicher Antworten, um den Schreibaufwand für den Interviewer zu verringern
-2. Aufnahme von Erfahrungsberichten, persönlichen Geschichten oder mündlichen Überlieferungen
-3. Dokumentation von Umgebungsgeräuschen (z. B. Lärmpegel in der Nähe von Infrastruktur)
-4. Sammeln von Sprachproben für die linguistische oder medizinische Forschung
-5. Befragten ermöglichen, mündliche Erläuterungen zu numerischen oder Auswahl-Antworten hinzuzufügen
+1.  Erfassung offener mündlicher Antworten, um die Tippbelastung für den Interviewer zu reduzieren
+2.  Aufnahme von Zeugenaussagen, persönlichen Geschichten oder mündlichen Überlieferungen
+3.  Dokumentation von Umgebungsgeräuschen (z. B. Lärmpegel in der Nähe von Infrastruktur)
+4.  Sammeln von Sprachproben für die linguistische oder Gesundheitsforschung
+5.  Ermöglichung für Befragte, numerischen oder ausgewählten Antworten verbale Klarstellungen hinzuzufügen
 
 ## Datenformat
 
-Audiodateien werden als binäre Anhänge zusammen mit der Formularübermittlung gespeichert, in der Regel:
+Audiodateien werden als binäre Anhänge zusammen mit der Formularübermittlung gespeichert, typischerweise:
 
-- **Format:** MP3 oder AAC (mobile Aufnahme); WAV (hochwertige Aufnahme)
-- **Benennung:** `{instanceID}-{fieldname}.mp3` (oder entsprechend)
-- **Speicherung:** Hochgeladen in den Medienordner des Servers und mit dem Übermittlungsdatensatz verknüpft
-- **Zugriff:** Abspielbar und herunterladbar über die Verwaltungsoberfläche für Übermittlungen
+-   **Format:** MP3 oder AAC (mobile Aufnahme); WAV (hochwertige Aufnahme)
+-   **Benennung:** `{instanceID}-{fieldname}.mp3` (oder Ähnliches)
+-   **Speicherung:** Hochgeladen in den Medienordner des Servers und mit dem Übermittlungsdatensatz verknüpft
+-   **Zugriff:** Abspielbar und herunterladbar über die Benutzeroberfläche zur Übermittlungsverwaltung
 
-## rtSurvey-Erweiterungen
+## rtSurvey Erweiterungen
 
 ### Maximale Dauer
 
 Verwenden Sie die Spalte `parameters`, um die Aufnahmelänge zu begrenzen:
 
-| type | name | label | parameters |
-|------|------|-------|------------|
-| audio | interview | Nehmen Sie das Interview auf | `max-duration=120` |
+| type  | name      | label               | parameters        |
+|-------|-----------|---------------------|-------------------|
+| audio | interview | Interview aufnehmen | `max-duration=120` |
 
 `max-duration` wird in Sekunden angegeben. Der Rekorder stoppt automatisch bei Erreichen des Limits.
 
@@ -48,23 +48,23 @@ Verwenden Sie die Spalte `parameters`, um die Aufnahmelänge zu begrenzen:
 
 Die Aufnahmequalität kann über `parameters` eingestellt werden:
 
-| type | name | label | parameters |
-|------|------|-------|------------|
-| audio | feedback | Nehmen Sie Feedback auf | `quality=normal` |
+| type  | name     | label            | parameters     |
+|-------|----------|------------------|----------------|
+| audio | feedback | Feedback aufnehmen | `quality=normal` |
 
-Unterstützte Werte: `low`, `normal` (Standard), `voice-only`. `voice-only` optimiert für gesprochenes Audio mit Rauschunterdrückung.
+Unterstützte Werte: `low`, `normal` (Standard), `voice-only`. `voice-only` optimiert für gesprochene Audio mit Rauschunterdrückung.
 
 ### Wiedergabe vor der Übermittlung
 
-Auf mobilen Geräten kann der Interviewer den aufgenommenen Clip abspielen, bevor er fortfährt. Dies ist standardmäßig aktiviert — es ist keine Konfiguration erforderlich.
+Auf mobilen Geräten kann der Interviewer den aufgenommenen Clip vor dem Fortfahren abspielen. Dies ist standardmäßig aktiviert – es ist keine Konfiguration erforderlich.
 
-### Integration des nativen Rekorders
+### Native Rekorder-Integration
 
-Auf Android und iOS startet `audio` die native Aufnahme-App des Geräts. Im Web wird die integrierte MediaRecorder API des Browsers verwendet.
+Auf Android und iOS startet `audio` die native Aufnahmeanwendung des Geräts. Im Web wird die integrierte MediaRecorder API des Browsers verwendet.
 
 ### Inline-Button-Layout
 
-Fügen Sie `inline` hinzu, um das Mikrofon als **runden Icon-Button** neben der Beschriftung anzuzeigen.
+Fügen Sie `inline` hinzu, um das Mikrofon als **kreisförmiges Icon-Schaltfläche** neben dem Label darzustellen.
 
 ```
 | type  | name | label        | appearance                    |
@@ -73,11 +73,11 @@ Fügen Sie `inline` hinzu, um das Mikrofon als **runden Icon-Button** neben der 
 | audio | clip | Audio aufnehmen | inline display{left, large}   |
 ```
 
-**Button-Position** — `left`, `right` *(Standard)*, `top`, `center`, `bottom`
+**Schaltflächenposition** — `left`, `right` *(Standard)*, `top`, `center`, `bottom`
 
-**Button-Größe** — `small` *(Standard)*, `medium`, `large`
+**Schaltflächengröße** — `small` *(Standard)*, `medium`, `large`
 
-**Button-Farbe** — fügen Sie einen Hex-Farbcode in `display{}` ein, um die Primärfarbe zu überschreiben:
+**Schaltflächenfarbe** — Fügen Sie eine Hex-Farbe in `display{}` hinzu, um die Primärfarbe zu überschreiben:
 
 ```
 inline display{right, large, <FF5500/>}
@@ -85,44 +85,44 @@ inline display{right, large, <FF5500/>}
 
 **Steuerung nach der Aufnahme — `results{}`:**
 
-| Appearance | Effect |
-|---|---|
-| `results{hide(capture)}` | Blendet den Aufnahme-Button aus, nachdem das Audio aufgenommen wurde |
-| `results{hide(review)}` | Blendet den Wiedergabe-Button aus |
-| `results{hide(filename)}` | Blendet Dateinamen und Dauer aus |
-| `results{left}` | Verschiebt das Icon nach der Aufnahme nach links |
+| Appearance              | Effekt                                      |
+|-------------------------|---------------------------------------------|
+| `results{hide(capture)}` | Blendet die Aufnahmetaste nach der Audioaufnahme aus |
+| `results{hide(review)}` | Blendet die Wiedergabetaste aus             |
+| `results{hide(filename)}` | Blendet Dateinamen und Dauer aus             |
+| `results{left}`         | Verschiebt das Symbol nach der Aufnahme nach links |
 
-Beispiel — Aufnahme-Button nach der Aufnahme ausblenden, Wiedergabe beibehalten:
+Beispiel – Aufnahmetaste nach der Aufnahme ausblenden, Wiedergabe beibehalten:
 ```
 inline display{right} results{hide(capture)}
 ```
 
-## Beispielhafte Verwendung
+## Anwendungsbeispiele
 
 ### Mit maximaler Dauer und Hinweis
 
-| type | name | label | hint | parameters |
-|------|------|-------|------|------------|
-| audio | story | Erzählen Sie uns von dem Vorfall in Ihren eigenen Worten | Sprechen Sie deutlich. Die Aufnahme stoppt nach 3 Minuten. | `max-duration=180` |
+| type  | name  | label                                      | hint                                         | parameters        |
+|-------|-------|--------------------------------------------|----------------------------------------------|-------------------|
+| audio | story | Erzählen Sie uns in Ihren eigenen Worten von dem Vorfall | Sprechen Sie deutlich. Die Aufnahme stoppt nach 3 Minuten. | `max-duration=180` |
 
-### Bedingtes Audio — nur wenn ein Problem gemeldet wurde
+### Bedingtes Audio – nur wenn ein Problem gemeldet wurde
 
-| type | name | label | relevant | required |
-|------|------|-------|----------|----------|
-| select_one yesno | issue_found | Wurde ein Problem gefunden? | | |
-| audio | issue_audio | Nehmen Sie eine Beschreibung des Problems auf | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+| type        | name        | label                     | relevant                     | required                     |
+|-------------|-------------|---------------------------|------------------------------|------------------------------|
+| select_one yesno | issue_found | Wurde ein Problem gefunden? |                              |                              |
+| audio       | issue_audio | Beschreibung des Problems aufnehmen | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
 ## Best Practices
 
-1. Geben Sie in `label` oder `hint` klar an, was der Interviewer sagen soll und wie lange.
-2. Verwenden Sie `max-duration`, um zu große Dateien in Gebieten mit langsamen Upload-Geschwindigkeiten zu vermeiden.
-3. Informieren Sie die Befragten vor Beginn der Aufnahme — unerwartete Aufnahmen können Bedenken hinsichtlich des Datenschutzes aufwerfen.
-4. Testen Sie die Aufnahme auf dem Zielgerät und unter Netzwerkbedingungen vor dem Einsatz.
-5. Stellen Sie `quality=voice-only` für Aufnahmen im Interview-Stil ein, um die Dateigröße zu reduzieren, ohne die Verständlichkeit zu beeinträchtigen.
+1.  Geben Sie im `label` oder `hint` klar an, was der Interviewer sagen soll und wie lange.
+2.  Verwenden Sie `max-duration`, um übermäßig große Dateien in Gebieten mit langsamen Upload-Geschwindigkeiten zu vermeiden.
+3.  Informieren Sie die Befragten, bevor Sie die Aufnahme starten – unerwartete Aufnahmen können Datenschutzbedenken aufwerfen.
+4.  Testen Sie die Aufnahme auf dem Zielgerät und unter den Netzwerkbedingungen vor der Bereitstellung.
+5.  Stellen Sie `quality=voice-only` für Aufnahmen im Interview-Stil ein, um die Dateigröße zu reduzieren, ohne die Verständlichkeit zu verlieren.
 
 ## Einschränkungen
 
-- Audiodateien können groß sein (eine 2-minütige Aufnahme in normaler Qualität beträgt ca. 2–4 MB) — berücksichtigen Sie dies bei Ihrem Datenplan und den Schätzungen der Upload-Zeit.
-- Nicht alle Browser unterstützen die MediaRecorder API — Chrome und Firefox funktionieren zuverlässig; Safari auf älteren iOS-Versionen kann Probleme haben.
-- Die Transkription von Audio-Antworten erfordert eine zusätzliche Nachbearbeitung (manuelle oder automatisierte Spracherkennung).
-- Datenschutzbestimmungen können die Aufnahme von Stimmen einschränken — überprüfen Sie die lokalen Datenschutzanforderungen.
+-   Audiodateien können groß sein (eine 2-minütige Aufnahme in normaler Qualität beträgt ca. 2–4 MB) – berücksichtigen Sie dies in Ihrem Datenplan und den Upload-Zeitschätzungen.
+-   Nicht alle Browser unterstützen die MediaRecorder API – Chrome und Firefox funktionieren zuverlässig; Safari auf älteren iOS-Versionen kann Probleme haben.
+-   Die Transkription von Audioantworten erfordert zusätzliche Nachbearbeitung (manuelle oder automatische Spracherkennung).
+-   Datenschutzbestimmungen können die Aufnahme von Stimmen einschränken – überprüfen Sie die lokalen Datenschutzanforderungen.

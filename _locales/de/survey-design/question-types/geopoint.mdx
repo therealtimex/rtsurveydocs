@@ -3,22 +3,22 @@ title: "Geopoint"
 description: "Geopoint-Fragen erfassen geografische Koordinaten (Breitengrad, Längengrad, Höhe und Genauigkeit) als Teil der Umfrage."
 ---
 
-Der Fragetyp `geopoint` erfasst geografische Koordinaten (Breitengrad, Längengrad, Höhe, Genauigkeit) mithilfe des Geräte-GPS. rtSurvey rendert den Picker mit verschiedenen Layout-Modi und unterstützt die Automatisierung über die Parameter `inputs{}` und `outputs{}`.
+Der Fragetyp `geopoint` erfasst geografische Koordinaten (Breitengrad, Längengrad, Höhe, Genauigkeit) mithilfe des Geräte-GPS. rtSurvey stellt den Picker mit verschiedenen Layout-Modi dar und unterstützt die Automatisierung durch `inputs{}` und `outputs{}` Parameter.
 
-## Grundlegende XLSForm-Spezifikation
+## Grundlegende XLSForm Spezifikation
 
 | type     | name        | label                       |
 |----------|-------------|-----------------------------|
 | geopoint | location    | Aktuellen Standort aufzeichnen |
 
-Die Standard-Spezifikation finden Sie in der [XLSForm-Dokumentation](https://xlsform.org/en/#question-types).
+Die Standard-Spezifikation finden Sie in der [XLSForm Dokumentation](https://xlsform.org/en/#question-types).
 
 ## Datenformat
 
 Gespeichert als vier durch Leerzeichen getrennte Werte:
 
 ```
-latitude longitude altitude accuracy
+Breitengrad Längengrad Höhe Genauigkeit
 ```
 
 Beispiel: `13.756331 100.501762 15 8`
@@ -27,17 +27,17 @@ Beispiel: `13.756331 100.501762 15 8`
 
 ## Layout-Modi
 
-### Standard — rechteckige Schaltfläche
+### Standard – rechteckige Schaltfläche
 
-Eine rechteckige Schaltfläche „START GEOPOINT“ öffnet ein vollständiges Karten-Modal, in dem der Enumerator einen Punkt auswählt. Nach der Erfassung ändert sich die Beschriftung der Schaltfläche in „View or change geo point“ und die Koordinaten werden darunter angezeigt.
+Eine rechteckige Schaltfläche „START GEOPOINT“ öffnet einen vollständigen Karten-Modal, in dem der Interviewer einen Punkt auswählt. Nach der Erfassung ändert sich das Schaltflächen-Label in „Geo-Punkt anzeigen oder ändern“ und die Koordinaten erscheinen darunter.
 
-Kein Appearance-Wert erforderlich.
+Kein Erscheinungsbild-Wert erforderlich.
 
 ---
 
-### `display{inline-icon}` — kreisförmige Fadenkreuz-Schaltfläche
+### `display{inline-icon}` – kreisförmige Fadenkreuz-Schaltfläche
 
-Rendert eine kreisförmige Symbolschaltfläche (Fadenkreuz ⊕) anstelle der rechteckigen Schaltfläche. Das Antippen öffnet dasselbe Karten-Modal.
+Stellt stattdessen eine kreisförmige Icon-Schaltfläche (Fadenkreuz ⊕) dar. Durch Antippen öffnet sich derselbe Karten-Modal.
 
 ```
 display{inline-icon}
@@ -51,20 +51,20 @@ display{inline-icon, top}            → Schaltfläche über dem Label
 display{inline-icon, bottom}         → Schaltfläche unter dem Label, zentriert
 display{inline-icon, large}          → großes Symbol (75px)
 display{inline-icon, medium}         → mittleres Symbol (50px)
-display{inline-icon, left, large}    → große Schaltfläche auf der linken Seite
+display{inline-icon, left, large}    → große Schaltfläche links
 ```
 
-| Size | Icon height/width |
-|------|------------------|
-| *(default)* | 25px |
-| `medium` | 50px |
-| `large` | 75px |
+| Größe       | Symbolhöhe/-breite |
+|-------------|--------------------|
+| *(Standard)* | 25px               |
+| `medium`    | 50px               |
+| `large`     | 75px               |
 
 ---
 
-### `display{thumbnail-square}` — Live-Karten-Thumbnail
+### `display{thumbnail-square}` – Live-Karten-Vorschaubild
 
-Rendert eine Live-Kartenvorschau (Leaflet) direkt in der Frage anstelle einer Schaltfläche. Das Thumbnail zeigt die aktuelle GPS-Position und den ausgewählten Punkt an. Das Antippen der Schaltfläche zum Erweitern öffnet das vollständige Modal.
+Rendert eine Live-Karten-Vorschau (Leaflet) direkt auf der Frage anstelle einer Schaltfläche. Das Vorschaubild zeigt die aktuelle GPS-Position und den ausgewählten Punkt. Durch Antippen der Erweiterungsschaltfläche wird der vollständige Modal geöffnet.
 
 ```
 display{thumbnail-square}
@@ -73,28 +73,28 @@ display{thumbnail-square}
 **Benutzerdefinierte Thumbnail-Größe:**
 
 ```
-display{thumbnail-square-[WxH]}          → feste Pixel
+display{thumbnail-square-[BxH]}          → feste Pixel
 display{thumbnail-square-[400x200]}      → 400px breit × 200px hoch
 
-display{thumbnail-square-[W%xH%]}        → Prozentsatz der Formularbreite
-display{thumbnail-square-[100%x30%]}     → volle Breite × 30 % der Formularbreite
+display{thumbnail-square-[B%xH%]}        → Prozentsatz der Formularbreite
+display{thumbnail-square-[100%x30%]}     → volle Breite × 30% der Formularbreite
 ```
 
 ---
 
-## `display{}` vs. `results{}` — vor und nach der Erfassung
+## `display{}` vs `results{}` – vor und nach der Erfassung
 
-`display{}` steuert das Layout, **bevor** der Benutzer einen Standort erfasst. `results{}` steuert das Layout, **nachdem** ein Wert vorhanden ist. Sie können unterschiedliche Ausrichtungen haben.
+`display{}` steuert das Layout **bevor** der Benutzer einen Standort erfasst. `results{}` steuert das Layout **nachdem** ein Wert vorhanden ist. Sie können unterschiedliche Ausrichtungen haben.
 
 ```
 display{inline-icon, right} results{left}
 ```
 
-Dies rendert die Schaltfläche vor der Erfassung rechts und verschiebt sie nach der Aufzeichnung eines Punktes nach links.
+Dies rendert die Schaltfläche vor der Erfassung rechts und verschiebt sie nach der Erfassung eines Punkts nach links.
 
-### `hide(value)` — Koordinatenanzeige unterdrücken
+### `hide(value)` – Anzeige der Koordinaten unterdrücken
 
-Standardmäßig wird der erfasste Text für Breitengrad/Längengrad/Genauigkeit/Höhe unter der Schaltfläche angezeigt. Verbergen Sie ihn mit:
+Standardmäßig wird der erfasste Lat/Lon/Genauigkeit/Höhe-Text unter der Schaltfläche angezeigt. Blenden Sie ihn aus mit:
 
 ```
 results{hide(value)}
@@ -103,11 +103,11 @@ display{inline-icon} results{hide(value)}
 
 ---
 
-## `inputs{}` — GPS-Automatisierung
+## `inputs{}` – GPS-Automatisierung
 
 ### Automatische Erfassung beim Laden
 
-Zeichnet die GPS-Position automatisch auf, wenn das Formular geladen wird, ohne dass der Enumerator etwas drücken muss.
+Erfasst automatisch die GPS-Position beim Laden des Formulars, ohne dass der Interviewer etwas drücken muss.
 
 ```
 inputs{auto-take}
@@ -119,9 +119,9 @@ inputs{auto-take}
 inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
 ```
 
-### Vorbefüllung aus einem Textfeld
+### Vorab aus einem Textfeld füllen
 
-Füllen Sie den Geopoint aus einer Frage aus, die einen Ortsnamen oder eine Adresszeichenfolge enthält. rtSurvey geocodiert die Zeichenfolge über OpenStreetMap Nominatim umgekehrt in Koordinaten.
+Füllen Sie den Geopunkt aus einer Frage, die einen Ortsnamen oder eine Adresszeichenfolge enthält. rtSurvey geocodiert die Zeichenfolge über OpenStreetMap Nominatim in Koordinaten um.
 
 ```
 inputs{question(address_field)}
@@ -129,9 +129,9 @@ inputs{question(address_field)}
 
 ---
 
-## `outputs{}` — Reverse-Geocodierung in Text
+## `outputs{}` – Rückwärts-Geocodierung in Text
 
-Nachdem ein Punkt erfasst wurde, wird automatisch eine `text`-Frage mit der für Menschen lesbaren Adresse (umgekehrt geocodiert aus den Koordinaten) ausgefüllt.
+Nachdem ein Punkt erfasst wurde, füllt ein `text`-Feld automatisch mit der menschenlesbaren Adresse (rückwärts geocodiert aus den Koordinaten).
 
 ```
 outputs{question(address_field)}
@@ -139,16 +139,16 @@ outputs{question(address_field)}
 
 Beispiel:
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| geopoint | location | Standort aufzeichnen | `outputs{question(address_text)}` |
-| text | address_text | Adresse | |
+| type     | name      | label               | appearance                          |
+|----------|-----------|---------------------|-------------------------------------|
+| geopoint | location  | Standort aufzeichnen | `outputs{question(address_text)}`   |
+| text     | address_text | Adresse             |                                     |
 
 ---
 
-## `nomap` — GPS-Erfassung ohne Karte
+## `nomap` – GPS-Erfassung ohne Karte
 
-Ersetzt das Karten-Modal durch einen einfachen Dialog, der die Standortberechtigung anfordert und Koordinaten aufzeichnet. Es wird keine Karte angezeigt. Nützlich für die reine GPS-Erfassung auf Low-End-Geräten oder wenn Kartenkacheln offline nicht verfügbar sind.
+Ersetzt den Karten-Modal durch einen einfachen Dialog, der die Standortberechtigung anfordert und Koordinaten aufzeichnet. Es wird keine Karte angezeigt. Nützlich für die reine GPS-Erfassung auf Geräten der unteren Preisklasse oder wenn Kartenkacheln offline nicht verfügbar sind.
 
 ```
 nomap
@@ -174,30 +174,30 @@ text-nolabel display{inline-icon, center, large}
 
 ---
 
-## Beispielhafte Verwendung
+## Anwendungsbeispiele
 
-| type | name | label | appearance |
-|------|------|-------|------------|
-| geopoint | field_loc | Feldstandort aufzeichnen | `display{inline-icon, right, large}` |
-| geopoint | site | Standort des Geländes | `display{thumbnail-square-[100%x30%]}` |
-| geopoint | auto_loc | Aktuelle Position | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
-| geopoint | mapped_loc | Standort | `display{inline-icon} outputs{question(address)}` |
-| geopoint | gps_only | GPS-Punkt | `nomap` |
+| type     | name        | label                   | appearance                                  |
+|----------|-------------|-------------------------|---------------------------------------------|
+| geopoint | field_loc   | Standort des Feldes aufzeichnen | `display{inline-icon, right, large}`        |
+| geopoint | site        | Standort                   | `display{thumbnail-square-[100%x30%]}`      |
+| geopoint | auto_loc    | Aktuelle Position       | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | mapped_loc  | Standort                   | `display{inline-icon} outputs{question(address)}` |
+| geopoint | gps_only    | GPS-Punkt                 | `nomap`                                     |
 
 ---
 
 ## Best Practices
 
-1. Verwenden Sie `inputs{auto-take}` für Verifizierungsumfragen durch Enumeratoren, bei denen GPS obligatorisch ist — dies macht den manuellen Schritt überflüssig.
-2. Verwenden Sie `display{thumbnail-square}`, wenn Sie möchten, dass der Enumerator den ausgewählten Punkt visuell bestätigt, bevor er fortfährt.
-3. Koppeln Sie `outputs{question(...)}` mit einem schreibgeschützten `text`-Feld, um dem Enumerator die umgekehrt geocodierte Adresse anzuzeigen.
-4. Verwenden Sie `nomap` in Gebieten ohne Internetverbindung, in denen Kartenkacheln nicht geladen werden können.
-5. Lassen Sie der GPS-Zeit Zeit, sich zu stabilisieren, bevor Sie aufzeichnen — eine Genauigkeit von weniger als 10 m ist für Feldumfragen in der Regel ausreichend.
+1.  Verwenden Sie `inputs{auto-take}` für Interviewer-Verifikationsumfragen, bei denen GPS obligatorisch ist – es entfällt der manuelle Schritt.
+2.  Verwenden Sie `display{thumbnail-square}`, wenn Sie möchten, dass der Interviewer den ausgewählten Punkt visuell bestätigt, bevor er fortfährt.
+3.  Kombinieren Sie `outputs{question(...)}` mit einem schreibgeschützten `text`-Feld, um dem Interviewer die rückwärts geocodierte Adresse anzuzeigen.
+4.  Verwenden Sie `nomap` in Gebieten ohne Internetverbindung, wo Kartenkacheln nicht geladen werden können.
+5.  Lassen Sie dem GPS Zeit zur Stabilisierung, bevor Sie aufzeichnen – eine Genauigkeit unter 10 m ist für Feldvermessungen typischerweise ausreichend.
 
 ## Einschränkungen
 
-- Das Geocoding von `inputs{question(name)}` erfordert Internetzugang — es ruft die OpenStreetMap Nominatim API auf.
-- Die Reverse-Geocodierung von `outputs{question(name)}` erfordert ebenfalls Internetzugang.
-- Das Karten-Thumbnail (`display{thumbnail-square}`) erfordert Internet zum Laden der Kacheln; Koordinaten werden weiterhin offline erfasst.
-- Die GPS-Genauigkeit variiert je nach Gerät und Umgebung — Bedingungen in Innenräumen oder in Schluchten von Städten können eine Genauigkeit von > 50 m zur Folge haben.
-- Das Sammeln von Standortdaten kann die Akkulaufzeit des Geräts während langer Umfragen erheblich beeinträchtigen.
+-   `inputs{question(name)}` Geokodierung erfordert Internetzugang – es wird die OpenStreetMap Nominatim API aufgerufen.
+-   `outputs{question(name)}` Rückwärts-Geokodierung erfordert ebenfalls Internetzugang.
+-   Karten-Vorschaubild (`display{thumbnail-square}`) erfordert Internet zum Laden von Kacheln; Koordinaten werden jedoch offline erfasst.
+-   Die GPS-Genauigkeit variiert je nach Gerät und Umgebung – in Innenräumen oder in städtischen Häuserschluchten kann die Genauigkeit > 50 m betragen.
+-   Das Sammeln von Standortdaten kann die Akkulaufzeit des Geräts bei langen Umfragen erheblich beeinträchtigen.

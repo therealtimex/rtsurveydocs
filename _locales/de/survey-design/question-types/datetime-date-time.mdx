@@ -1,25 +1,25 @@
 ---
-title: "Datum und Uhrzeit, Datum, Zeit"
-description: "Fragen zu Datum und Uhrzeit ermöglichen es den Befragten, sowohl das Datum als auch die Uhrzeit in einem einzigen Feld einzugeben."
+title: "Datetime, date, time"
+description: "Datetime-Fragen ermöglichen es Befragten, Datum und Uhrzeit in einem einzigen Feld einzugeben."
 ---
 
-Die Fragetypen `date`, `time` und `datetime` erfassen Datums- und/oder Zeitwerte. rtSurvey stellt sie in verschiedenen Layout-Modi dar, die über die Spalte `appearance` gesteuert werden.
+Die Fragetypen `date`, `time` und `datetime` erfassen Datums- und/oder Zeitwerte. rtSurvey stellt sie mit verschiedenen Layout-Modi dar, die durch die Spalte `appearance` gesteuert werden.
 
-## Grundlegende XLSForm-Spezifikation
+## Grundlegende XLSForm Spezifikation
 
-| type     | name           | label                         |
-|----------|----------------|-------------------------------|
-| date     | birth_date     | Geburtsdatum                  |
-| time     | start_time     | Um wie viel Uhr begann es?    |
+| type     | name           | label                     |
+|----------|----------------|---------------------------|
+| date     | birth_date     | Geburtsdatum              |
+| time     | start_time     | Wann begann es?           |
 | datetime | event_datetime | Wann fand das Ereignis statt? |
 
-Die Standard-Spezifikation finden Sie in der [XLSForm-Dokumentation](https://xlsform.org/en/#question-types).
+Die Standard-Spezifikation finden Sie in der [XLSForm Dokumentation](https://xlsform.org/en/#question-types).
 
 ## Layout-Modi
 
-### Standard — immer offener Kalender
+### Standard – immer geöffneter Kalender
 
-Kein Appearance-Wert erforderlich. Der Kalender (und die Uhr für `time`/`datetime`) wird direkt auf der Seite angezeigt – immer sichtbar, keine Schaltfläche erforderlich.
+Kein `appearance`-Wert erforderlich. Der Kalender (und die Uhr für `time`/`datetime`) wird direkt auf der Seite angezeigt – immer sichtbar, keine Schaltfläche erforderlich.
 
 | type | name       | label         | appearance |
 |------|------------|---------------|------------|
@@ -27,12 +27,12 @@ Kein Appearance-Wert erforderlich. Der Kalender (und die Uhr für `time`/`dateti
 
 ---
 
-### `inline` — runde Schaltfläche → Modal
+### `inline` – kreisförmige Schaltfläche → Modal
 
-Eine runde Icon-Schaltfläche (Kalender oder Uhr) wird neben der Fragenbeschriftung (Label) angezeigt. Durch Antippen öffnet sich ein Modal mit der Auswahl. Nach der Auswahl erscheint der gewählte Wert als Text neben dem Label.
+Eine kreisförmige Icon-Schaltfläche (Kalender oder Uhr) schwebt neben dem Fragen-Label. Durch Antippen öffnet sich ein Modal mit dem Picker. Nach der Auswahl erscheint der gewählte Wert als Text neben dem Label.
 
-- Hintergrund der Schaltfläche: Primäre Themenfarbe (überschreibbar)
-- Form der Schaltfläche: Kreis (`border-radius: 50%`)
+-   Schaltflächenhintergrund: primäre Designfarbe (überschreibbar)
+-   Schaltflächenform: voller Kreis (`border-radius: 50%`)
 
 ```
 | type | name       | label         | appearance |
@@ -42,9 +42,9 @@ Eine runde Icon-Schaltfläche (Kalender oder Uhr) wird neben der Fragenbeschrift
 
 ---
 
-### `inline-onlyresult` — Schaltfläche verschwindet nach Auswahl
+### `inline-onlyresult` – Schaltfläche verschwindet nach Auswahl
 
-Gleich wie `inline`, aber die Schaltfläche blendet sich aus, sobald ein Wert ausgewählt wurde. Nützlich, wenn das Datum nach der Auswahl ohne dauerhaftes Icon sichtbar sein soll.
+Gleich wie `inline`, aber die Schaltfläche blendet sich aus, sobald ein Wert ausgewählt wurde. Nützlich, wenn Sie das Datum nach der Auswahl nur sichtbar haben möchten, ohne ein persistentes Icon.
 
 ```
 inline-onlyresult
@@ -52,24 +52,24 @@ inline-onlyresult
 
 ---
 
-### `inline-1line` — Reihe von Scroll-Rädern (Spinners)
+### `inline-1line` – Reihe von Drehfeldern
 
-Stellt einzelne Scroll-Steuerelemente (▲ Wert ▼) in einer horizontalen Reihe dar – eine Spalte pro Komponente. Für `date`: Monat / Tag / Jahr. Für `datetime`: Monat / Tag / Jahr / Stunden / Minuten. Für `time`: Stunden / Minuten.
+Stellt einzelne Drehfelder (▲ Wert ▼) in einer einzigen horizontalen Reihe dar – eine Spalte pro Komponente. Für `date`: Monat / Tag / Jahr. Für `datetime`: Monat / Tag / Jahr / Stunden / Minuten. Für `time`: Stunden / Minuten.
 
-Kein Modal oder Kalender-Popup – der Benutzer scrollt jedes Rad unabhängig.
+Kein Modal oder Kalender-Popup – der Benutzer scrollt jedes Drehfeld unabhängig.
 
 ```
 inline-1line
 ```
 
-**Nur bestimmte Komponenten anzeigen**, indem die Komponentennamen hinzugefügt werden:
+**Zeigen Sie nur bestimmte Komponenten an**, indem Sie die Komponentennamen hinzufügen:
 
 ```
-inline-1line month year      → blendet das Tages-Rad aus
-inline-1line year            → zeigt nur das Jahr an
+inline-1line month year      → verbirgt das Tages-Drehfeld
+inline-1line year            → zeigt nur das Jahr
 ```
 
-**Jahresbereich einschränken:**
+**Begrenzen Sie den Jahresbereich:**
 
 ```
 inline-1line y_range(2000-2030)
@@ -77,9 +77,9 @@ inline-1line y_range(2000-2030)
 
 ---
 
-### `box` — Texteingabe
+### `box` – Texteingabe
 
-Stellt ein einfaches Texteingabefeld dar. Der Benutzer gibt das Datum direkt im in der Appearance definierten Format ein.
+Stellt ein einfaches Texteingabefeld dar. Der Benutzer gibt das Datum direkt im in der Erscheinung definierten Format ein.
 
 ```
 box(%d/%m/%Y)       → TT/MM/JJJJ
@@ -88,9 +88,9 @@ box(%Y-%m-%d)       → JJJJ-MM-TT
 
 ---
 
-### `month-year` — Nur Monat und Jahr
+### `month-year` – nur Monat und Jahr
 
-Standard-XLSForm-Appearance. Die Auswahl beginnt mit der Jahresansicht; der Benutzer wählt Monat und Jahr, aber keinen spezifischen Tag.
+Standard XLSForm-Erscheinung. Der Picker startet in der Jahresansicht; der Benutzer wählt Monat und Jahr, aber keinen bestimmten Tag.
 
 ```
 month-year
@@ -98,9 +98,9 @@ month-year
 
 ---
 
-### `year` — Nur Jahr
+### `year` – nur Jahr
 
-Standard-XLSForm-Appearance. Die Auswahl beginnt mit der Jahrzehnt-Ansicht; nur das Jahr ist auswählbar.
+Standard XLSForm-Erscheinung. Der Picker startet in der Dekadenansicht; nur das Jahr ist wählbar.
 
 ```
 year
@@ -110,29 +110,29 @@ year
 
 ## Benutzerdefiniertes Anzeigeformat
 
-Hängen Sie `-[format]` an eine beliebige `inline`-Appearance an, um zu steuern, wie der ausgewählte Wert als Text angezeigt wird. Verwendet Token im strftime-Stil.
+Fügen Sie `-[format]` an jede `inline`-Erscheinung an, um zu steuern, wie der ausgewählte Wert als Text angezeigt wird. Verwendet strftime-ähnliche Token.
 
-| Token | Bedeutung | Beispiel |
-|-------|---------|---------|
-| `%d`  | Tag (mit führender Null) | 07 |
-| `%e`  | Tag (ohne führende Null) | 7 |
-| `%m`  | Monat (Nummer) | 04 |
-| `%n`  | Monat (Nummer ohne führende Null) | 4 |
-| `%b`  | Monatsabkürzung | Apr |
-| `%Y`  | 4-stelliges Jahr | 2026 |
-| `%y`  | 2-stelliges Jahr | 26 |
-| `%H`  | Stunde (24h) | 14 |
-| `%h`  | Stunde (ohne führende Null) | 14 |
-| `%M`  | Minute | 05 |
-| `%S`  | Sekunde | 00 |
-| `%a`  | Wochentagsabkürzung | Mi |
+| Token | Bedeutung               | Beispiel |
+|-------|-------------------------|----------|
+| `%d`  | Tag (mit führender Null) | 07       |
+| `%e`  | Tag (ohne führende Null) | 7        |
+| `%m`  | Monatsnummer            | 04       |
+| `%n`  | Monatsnummer (ohne führende Null) | 4 |
+| `%b`  | Monatsabkürzung         | Apr      |
+| `%Y`  | 4-stellige Jahreszahl   | 2026     |
+| `%y`  | 2-stellige Jahreszahl   | 26       |
+| `%H`  | Stunde (24h)            | 14       |
+| `%h`  | Stunde (ohne führende Null) | 14     |
+| `%M`  | Minute                  | 05       |
+| `%S`  | Sekunde                 | 00       |
+| `%a`  | Abkürzung des Wochentags | Mi       |
 
 **Beispiele:**
 
 ```
 inline-[%d/%m/%Y]            → 07/04/2026
-inline-[%d %b %Y]            → 07. Apr. 2026
-inline-1line-[%Y-%m-%d]      → Spinner-Eingabe, formatierte Anzeige
+inline-[%d %b %Y]            → 07 Apr 2026
+inline-1line-[%Y-%m-%d]      → Drehfeld-Eingabe, formatiertes Display
 inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
 ```
 
@@ -143,36 +143,36 @@ inline-[%d/%m/%Y %H:%M]      → 07/04/2026 14:30
 Überschreiben Sie die Farbe der Icon-Schaltfläche mit `colors()`:
 
 ```
-inline colors("0099FF")                   → Hintergrund der Schaltfläche #0099FF
+inline colors("0099FF")                   → Schaltflächenhintergrund #0099FF
 inline colors("0099FF","FFFFFF")          → Hintergrund #0099FF, Icon-Farbe #FFFFFF
-inline-1line colors("0000FF","FFFF00")    → Akzentfarben der Spinner
-inline-onlyresult colors("E53935")        → Rote Schaltfläche
+inline-1line colors("0000FF","FFFF00")    → Akzentfarben des Drehfelds
+inline-onlyresult colors("E53935")        → rote Schaltfläche
 ```
 
 ---
 
 ## Schaltflächenposition mit `display{}`
 
-Der Modifikator `display{}` steuert, wo die Icon-Schaltfläche im Verhältnis zum Fragen-Label erscheint. Gilt für `inline` und `inline-onlyresult`.
+Der `display{}`-Modifikator steuert, wo die Icon-Schaltfläche relativ zum Fragen-Label erscheint. Gilt für `inline` und `inline-onlyresult`.
 
 ```
-display{<align>, <size>, <color>}
+display{<Ausrichtung>, <Größe>, <Farbe>}
 ```
 
-| Parameter | Werte | Standard |
-|-----------|--------|---------|
-| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
-| Size | `small`, `medium`, `large` | `small` |
-| Color | Hex-Code z.B. `#FF5500` | Primäre Themenfarbe |
+| Parameter | Werte                               | Standard |
+|-----------|-------------------------------------|----------|
+| Ausrichtung | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Größe     | `small`, `medium`, `large`          | `small`  |
+| Farbe     | Hex z.B. `#FF5500`                  | primäre Themenfarbe |
 
 **Ausrichtungsverhalten:**
 
-| Wert | Layout |
-|-------|--------|
-| `right` | Schaltfläche rechts vom Label |
-| `left` | Schaltfläche links vom Label |
-| `top` | Schaltfläche über dem Label, mittig in voller Breite |
-| `center` / `bottom` | Schaltfläche unter dem Label, mittig in voller Breite |
+| Wert          | Layout                                     |
+|---------------|--------------------------------------------|
+| `right`       | Schaltfläche rechts neben dem Label        |
+| `left`        | Schaltfläche links neben dem Label         |
+| `top`         | Schaltfläche über dem Label, mittig, volle Breite |
+| `center` / `bottom` | Schaltfläche unter dem Label, mittig, volle Breite |
 
 **Beispiele:**
 
@@ -185,9 +185,9 @@ inline-onlyresult display{bottom, large, #0099FF}
 
 ---
 
-## Einschränkung des Datumsbereichs
+## Datumsbereichs-Beschränkung
 
-Verwenden Sie `inputs{range[...]}` um einzuschränken, welche Daten auswählbar sind.
+Verwenden Sie `inputs{range[...]}`, um die auswählbaren Daten zu beschränken.
 
 ```
 inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
@@ -195,20 +195,20 @@ inputs{range[dateGt(2024-01-01), dateLt(2024-12-31)]}
 
 Parameter innerhalb von `range[...]`:
 
-| Parameter | Beschreibung |
-|-----------|-------------|
-| `dateGt(YYYY-MM-DD)` | Minimal auswählbares Datum (größer oder gleich) |
-| `dateLt(YYYY-MM-DD)` | Maximal auswählbares Datum (kleiner oder gleich) |
-| `indayTimeGt(HH:MM:SS)` | Minimale Uhrzeit innerhalb eines Tages (nur bei datetime) |
-| `indayTimeLt(HH:MM:SS)` | Maximale Uhrzeit innerhalb eines Tages (nur bei datetime) |
+| Parameter              | Beschreibung                                 |
+|------------------------|----------------------------------------------|
+| `dateGt(JJJJ-MM-TT)`   | Minimal wählbares Datum (größer oder gleich) |
+| `dateLt(JJJJ-MM-TT)`   | Maximal wählbares Datum (kleiner oder gleich) |
+| `indayTimeGt(HH:MM:SS)` | Minimalzeit innerhalb eines Tages (nur Datum und Uhrzeit) |
+| `indayTimeLt(HH:MM:SS)` | Maximalzeit innerhalb eines Tages (nur Datum und Uhrzeit) |
 
-Es können mehrere Bereiche definiert werden – ein Datum ist auswählbar, wenn es in **einen** der Bereiche fällt.
+Es können mehrere Bereiche definiert werden – ein Datum ist wählbar, wenn es in **einem beliebigen** der Bereiche liegt.
 
 ---
 
 ## Label unterdrücken
 
-Fügen Sie `text-nolabel` hinzu, um das Label der Frage auszublenden. Die Schaltfläche wird allein dargestellt.
+Fügen Sie `text-nolabel` hinzu, um das Fragen-Label auszublenden. Die Schaltfläche wird dann alleine gerendert.
 
 ```
 inline text-nolabel display{center, large}
@@ -218,19 +218,19 @@ inline text-nolabel display{center, large}
 
 ## Layout-Zusammenfassung
 
-| Appearance | Dargestelltes Widget | Farbe anpassbar |
-|---|---|---|
-| *(keine)* | Immer offener Kalender | Nein |
-| `inline` | Runde Schaltfläche → Modal-Kalender | Ja |
-| `inline-onlyresult` | Runde Schaltfläche → Modal, wird nach Auswahl ausgeblendet | Ja |
-| `inline-1line` | Reihe von Spinners | Ja |
-| `box(%format%)` | Texteingabefeld | Nein |
-| `month-year` | Monats-/Jahresauswahl | Nein |
-| `year` | Nur Jahresauswahl | Nein |
+| Erscheinung        | Gerendertes Widget           | Farbe anpassbar |
+|-------------------|-----------------------------|-----------------|
+| *(keine)*         | Immer geöffneter Kalender   | Nein            |
+| `inline`          | Kreisförmige Schaltfläche → Modal-Kalender | Ja              |
+| `inline-onlyresult` | Kreisförmige Schaltfläche → Modal, blendet sich nach Auswahl aus | Ja |
+| `inline-1line`    | Reihe von Drehfeldern       | Ja              |
+| `box(%format%)`   | Texteingabefeld             | Nein            |
+| `month-year`      | Monats-/Jahres-Picker       | Nein            |
+| `year`            | Nur-Jahr-Picker             | Nein            |
 
 ---
 
-## Beispielhafte Verwendung
+## Anwendungsbeispiele
 
 ```
 | type     | name        | label              | appearance                              |
@@ -238,7 +238,7 @@ inline text-nolabel display{center, large}
 | date     | visit_date  | Besuchsdatum       | inline display{right} -[%d/%m/%Y]       |
 | date     | birth_date  | Geburtsdatum       | inline-1line y_range(1940-2026)         |
 | time     | start_time  | Startzeit          | inline-1line                            |
-| datetime | event_time  | Ereignisdatum & Zeit| inline display{center, large} -[%d/%m/%Y %H:%M] |
+| datetime | event_time  | Ereignisdatum & -zeit | inline display{center, large} -[%d/%m/%Y %H:%M] |
 | date     | report_date | Berichtsdatum      | box(%d/%m/%Y)                           |
 ```
 
@@ -246,16 +246,16 @@ inline text-nolabel display{center, large}
 
 ## Best Practices
 
-1. Verwenden Sie `inline` für kompakte Formulare – es spart im Vergleich zum immer offenen Kalender vertikalen Platz.
-2. Verwenden Sie `inline-1line`, wenn die Befragten einzelne Datumskomponenten anpassen müssen (z. B. Geburtsjahr).
-3. Verwenden Sie `box()` nur, wenn Sie darauf vertrauen können, dass der Interviewer die Daten korrekt eintippt – es wird keine Validierungs-Benutzeroberfläche angezeigt.
-4. Verwenden Sie `display{center, large}`, um die Schaltfläche auf mobilen Bildschirmen prominenter zu machen.
-5. Geben Sie immer `-[format]` an, wenn die Standardanzeige `YYYY-MM-DD` lokale Benutzer verwirren würde.
-6. Berücksichtigen Sie Zeitzonen, wenn Sie Datum-Zeit-Daten über verschiedene Regionen hinweg sammeln.
+1.  Verwenden Sie `inline` für kompakte Formulare – es spart vertikalen Platz im Vergleich zum immer geöffneten Kalender.
+2.  Verwenden Sie `inline-1line`, wenn die Befragten einzelne Datumskomponenten anpassen müssen (z. B. Geburtsjahr).
+3.  Verwenden Sie `box()` nur, wenn Sie dem Interviewer vertrauen, dass er Daten korrekt eingibt – es wird keine Validierungs-UI angezeigt.
+4.  Verwenden Sie `display{center, large}`, um die Schaltfläche auf mobilen Bildschirmen prominenter zu machen.
+5.  Geben Sie immer `-[format]` an, wenn die Standardanzeige `JJJJ-MM-TT` lokale Benutzer verwirren würde.
+6.  Berücksichtigen Sie Zeitzonen bei der Erfassung von Datums-/Zeitdaten in verschiedenen Regionen.
 
 ## Einschränkungen
 
-- `inline-1line` verwendet standardmäßig immer das heutige Datum, wenn kein Wert vorhanden ist – verwenden Sie die Spalte `default`, um ein bestimmtes Datum vorab auszufüllen.
-- Das `box()`-Format steuert nur die Anzeige; der gespeicherte Wert ist immer ISO 8601.
-- Die Einschränkung des Datumsbereichs (`inputs{range[...]}`) funktioniert nicht mit dem Layout `box`.
-- Zeitzonenunterschiede können die Datenanalyse erschweren, wenn sie nicht ordnungsgemäß berücksichtigt werden.
+-   `inline-1line` verwendet immer das heutige Datum als Standard, wenn kein Wert vorhanden ist – verwenden Sie die Spalte `default`, um ein bestimmtes Datum vorab auszufüllen.
+-   Das `box()`-Format steuert nur die Anzeige; der gespeicherte Wert ist immer ISO 8601.
+-   Die Datumsbereichs-Beschränkung (`inputs{range[...]}`) funktioniert nicht mit dem `box`-Layout.
+-   Zeitzonenunterschiede können die Datenanalyse erschweren, wenn sie nicht richtig berücksichtigt werden.
