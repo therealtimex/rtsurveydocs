@@ -1,38 +1,38 @@
 ---
 title: "Bilangan Bulat"
-description: "Jenis pertanyaan input bilangan bulat dalam rtSurvey"
+description: "Tipe pertanyaan input bilangan bulat di rtSurvey"
 ---
 
-Tipe pertanyaan `integer` mengumpulkan bilangan bulat (tanpa tempat desimal). Ini memicu keyboard numerik di ponsel dan memblokir entri titik desimal. Ini mendukung opsi penampilan yang sama dengan tipe `text` untuk tata letak dan pemformatan.
+Tipe pertanyaan `integer` mengumpulkan bilangan bulat (tanpa angka desimal). Ini memicu keyboard numerik di perangkat seluler dan memblokir entri titik desimal. Ini mendukung opsi `appearance` yang sama dengan tipe `text` untuk tata letak dan pemformatan.
 
-## Spesifikasi Dasar XLSForm
+## Spesifikasi XLSForm Dasar
 
 | type | name | label |
 |------|------|-------|
-| integer | age | Usia responden |
-| integer | household_size | Jumlah orang dalam rumah tangga |
+| integer | age | Umur responden |
+| integer | household_size | Jumlah orang di rumah tangga |
 
 Untuk spesifikasi standar, lihat [dokumentasi XLSForm](https://xlsform.org/en/#question-types).
 
 ---
 
-## Opsi Penampilan
+## Opsi `appearance`
 
 ### `number-hspinner` — pemutar horizontal
 
-Mengganti input dengan pemutar horizontal **− nilai +**. Mengetuk minus/plus mengurangi atau menambah nilai sebesar 1 (atau langkah kustom).
+Mengganti input dengan pemutar horizontal **− nilai +**. Menekan minus/plus akan mengurangi atau menambah nilai sebesar 1 (atau langkah kustom).
 
 ```
 number-hspinner
 ```
 
-**Kustomisasi bentuk dan langkah tombol** menggunakan `hspinner()`:
+**Sesuaikan bentuk tombol dan langkah** menggunakan `hspinner()`:
 
 ```
 number-hspinner hspinner('left-small-square','right-small-square','5')
 ```
 
-Parameter: bentuk tombol kiri, bentuk tombol kanan, nilai langkah (default `1` untuk bilangan bulat).
+Parameter: bentuk tombol kiri, bentuk tombol kanan, nilai langkah (defaultnya adalah `1` untuk bilangan bulat).
 
 **Warna kustom** menggunakan `colors()`:
 
@@ -46,7 +46,7 @@ Empat nilai secara berurutan: latar belakang tombol kiri, ikon tombol kiri, lata
 
 ### `thousandsep` — pemisah ribuan
 
-Memformat angka yang ditampilkan dengan pengelompokan koma (misalnya `1,234,567`). Angka mentah disimpan tanpa koma. Tipe input dialihkan ke `"text"` untuk memungkinkan tampilan yang diformat.
+Memformat angka yang ditampilkan dengan pengelompokan koma (misalnya `1,234,567`). Angka mentah disimpan tanpa koma. Jenis input diubah menjadi `"text"` untuk memungkinkan tampilan yang diformat.
 
 ```
 thousandsep
@@ -63,13 +63,13 @@ digisep(4,"-")      → 0912-3456-789
 digisep(3," ")      → 012 345 678
 ```
 
-Tipe input dialihkan ke `"text"` saat penampilan ini aktif.
+Jenis input diubah menjadi `"text"` saat `appearance` ini aktif.
 
 ---
 
 ### `textonly` — paksa keyboard teks
 
-Memaksa `type="text"` pada elemen input. Ini mencegah kekhasan input angka browser (seperti menyembunyikan angka nol di depan atau menambahkan panah putar di browser desktop) sambil tetap mengumpulkan nilai numerik.
+Memaksa `type="text"` pada elemen input. Ini mencegah keanehan input angka browser (seperti menyembunyikan angka nol di depan atau menambahkan panah putar di browser desktop) sambil tetap mengumpulkan nilai numerik.
 
 ```
 textonly
@@ -79,7 +79,7 @@ textonly
 
 ### `floating_hint` — petunjuk mengambang sebagai label
 
-Teks `hint` dirender di dalam input sebagai placeholder. Ketika pengguna mulai mengetik, teks itu akan mengambang di atas bidang sebagai label.
+Teks `hint` dirender di dalam input sebagai placeholder. Saat pengguna mulai mengetik, teks tersebut akan mengambang di atas bidang sebagai label.
 
 ```
 floating_hint
@@ -89,7 +89,7 @@ floating_hint
 
 ### `embed` — petunjuk di dalam batas input
 
-Mirip dengan `floating_hint` — petunjuk berada di dalam batas input saat kosong. Tidak mengambang saat pengguna mengetik.
+Mirip dengan `floating_hint` — petunjuk berada di dalam batas input saat kosong. Ini tidak mengambang saat pengguna mengetik.
 
 ```
 embed
@@ -99,7 +99,7 @@ embed
 
 ### `textpopup` — input dialog modal
 
-Mengetuk bidang akan membuka dialog modal dengan input yang lebih besar, bukan mengedit secara sebaris. Berguna di layar kecil di mana input layar penuh lebih mudah.
+Mengetuk bidang akan membuka dialog modal dengan input yang lebih besar, bukan mengedit secara inline. Berguna pada layar kecil di mana input layar penuh lebih mudah.
 
 ```
 textpopup
@@ -150,45 +150,45 @@ inputs{qrscan}
 
 ---
 
-## Referensi cepat penampilan
+## Referensi cepat `appearance`
 
-| Penampilan | Widget yang Dirender |
+| Appearance | Widget yang dirender |
 |---|---|
-| *(tidak ada)* | Input angka (`type="number"`) — keyboard numerik di ponsel |
+| *(tidak ada)* | Input angka (`type="number"`) — keyboard numerik di perangkat seluler |
 | `number-hspinner` | Pemutar horizontal − nilai +, langkah = 1 |
-| `number-hspinner hspinner(...)` | Pemutar dengan bentuk dan langkah tombol kustom |
+| `number-hspinner hspinner(...)` | Pemutar dengan bentuk tombol dan langkah kustom |
 | `number-hspinner colors(...)` | Pemutar dengan warna tombol kustom |
-| `thousandsep` | Tampilan angka yang dikelompokkan koma |
+| `thousandsep` | Tampilan angka yang dikelompokkan dengan koma |
 | `digisep(n,"sep")` | Pengelompokan digit kustom |
 | `textonly` | Paksa keyboard teks |
 | `floating_hint` | Petunjuk mengambang di atas bidang saat mengetik |
 | `embed` | Petunjuk di dalam batas input |
 | `textpopup` | Ketuk untuk membuka dialog modal |
 | `charcount` | Penghitung karakter langsung di bawah input |
-| `prefix(expr)` | Awalan statis atau dinamis |
+| `prefix(expr)` | Menambahkan awalan statis atau dinamis |
 | `align_answer = left/right/center` | Perataan teks input |
-| `inputs{qrscan}` | Tombol pindai QR/barcode |
+| `inputs{qrscan}` | Tombol pemindaian QR/barcode |
 
 ---
 
-## Batasan dan Validasi
+## Batasan dan validasi
 
-Gunakan batasan untuk menegakkan rentang nilai. Batasan di kolom `constraint` dievaluasi setelah setiap penekanan tombol dalam mode `number-hspinner`, bukan hanya saat blur.
+Gunakan batasan untuk memberlakukan rentang nilai. Batasan di kolom `constraint` dievaluasi setelah setiap penekanan tombol dalam mode `number-hspinner`, tidak hanya saat blur.
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| integer | age | Usia | `. > 0 and . <= 120` | Usia harus antara 1 dan 120 |
-| integer | year | Tahun | `. >= 1800 and . <= 2100` | Masukkan tahun yang valid |
+| integer | age | Umur | `. > 0 and . <= 120` | Umur harus antara 1 dan 120 |
+| integer | year | Tahun dibangun | `. >= 1800 and . <= 2100` | Masukkan tahun yang valid |
 | integer | count | Jumlah item | `. >= 0` | Tidak boleh negatif |
 
 ---
 
-## Contoh — Survei Rumah Tangga
+## Contoh — survei rumah tangga
 
 | type | name | label | appearance | constraint | constraint_message |
 |------|------|-------|------------|------------|-------------------|
-| integer | household_size | Jumlah orang dalam rumah tangga | `number-hspinner` | `. >= 1 and . <= 30` | Harus antara 1 dan 30 |
-| integer | under_5 | Anak di bawah 5 tahun | `number-hspinner` | `. >= 0 and . <= ${household_size}` | Tidak boleh melebihi ukuran rumah tangga |
+| integer | household_size | Jumlah orang di rumah tangga | `number-hspinner` | `. >= 1 and . <= 30` | Harus antara 1 dan 30 |
+| integer | under_5 | Anak di bawah 5 tahun | `number-hspinner` | `. >= 0 and . <= ${household_size}` | Tidak boleh melebihi jumlah orang di rumah tangga |
 | integer | year_built | Tahun rumah dibangun | `textonly` | `. >= 1800 and . <= 2100` | Masukkan tahun yang valid |
 
 ---
@@ -196,11 +196,11 @@ Gunakan batasan untuk menegakkan rentang nilai. Batasan di kolom `constraint` di
 ## Praktik Terbaik
 
 1. Gunakan `number-hspinner` untuk hitungan rentang kecil di mana mengklik ± lebih cepat daripada mengetik (misalnya jumlah anak, skor pada skala 1–10).
-2. Gunakan `thousandsep` saat menampilkan bilangan bulat besar (populasi, pendapatan) agar responden dapat memeriksa sendiri besarnya.
+2. Gunakan `thousandsep` saat menampilkan bilangan bulat besar (populasi, pendapatan) agar responden dapat memeriksa sendiri magnitudenya.
 3. Gunakan `textonly` saat browser menambahkan UI input angka yang tidak diinginkan (panah putar, gulir sentuh) yang membingungkan responden.
-4. Terapkan batasan rentang daripada mengandalkan jenis keyboard seluler — penegakan keyboard tidak universal.
+4. Terapkan batasan rentang daripada mengandalkan jenis keyboard seluler — penerapan keyboard tidak universal.
 
-## Keterbatasan
+## Batasan
 
 - Input titik desimal diblokir — jika Anda membutuhkan nilai pecahan, gunakan tipe `decimal`.
 - `number-hspinner` memvalidasi `constraint` pada setiap penekanan tombol — hindari batasan yang mahal (misalnya rantai `if()` yang kompleks) dalam mode pemutar.

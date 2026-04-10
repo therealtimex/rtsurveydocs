@@ -1,32 +1,32 @@
 ---
 title: "Peringkat"
-description: "Pertanyaan peringkat memungkinkan responden untuk mengurutkan serangkaian pilihan berdasarkan preferensi atau prioritas."
+description: "Pertanyaan `rank` memungkinkan responden mengurutkan serangkaian pilihan berdasarkan preferensi atau prioritas."
 ---
 
-Tipe pertanyaan `rank` menyajikan daftar pilihan yang diurutkan oleh responden berdasarkan preferensi atau prioritas. Ini menyimpan hasilnya sebagai daftar nilai pilihan yang dipisahkan spasi dalam urutan peringkat, dengan pilihan prioritas tertinggi terlebih dahulu.
+Tipe pertanyaan `rank` menyajikan daftar pilihan yang diurutkan oleh responden berdasarkan preferensi atau prioritas. Ini menyimpan hasilnya sebagai daftar nilai pilihan yang dipisahkan spasi dalam urutan peringkat, dengan pilihan prioritas tertinggi di tempat pertama.
 
-> **Formulir web rtSurvey:** Widget seret-untuk-peringkat saat ini tidak diimplementasikan. Dalam formulir web, `rank` dirender sebagai daftar pilihan. Gunakan jenis ini saat menargetkan klien seluler yang mendukung widget peringkat, atau ketika format nilai yang disimpan lebih penting daripada interaksi seret-untuk-mengurutkan.
+> **Formulir web rtSurvey:** Widget `drag-to-rank` saat ini tidak diterapkan. Dalam formulir web, `rank` dirender sebagai daftar pilihan. Gunakan tipe ini saat menargetkan klien seluler yang mendukung widget `rank`, atau saat format nilai yang disimpan lebih penting daripada interaksi `drag-to-order`.
 
-## Spesifikasi Dasar XLSForm
+## Spesifikasi XLSForm Dasar
 
 | type | name | label |
 |------|------|-------|
-| rank priorities | main_priority | Urutkan kebutuhan komunitas ini dari yang paling penting hingga yang paling tidak penting |
+| rank priorities | main_priority | Urutkan kebutuhan masyarakat ini dari yang paling penting hingga yang paling tidak penting |
 
-Pilihan didefinisikan dalam **lembar kerja pilihan** sama seperti `select_one`:
+Pilihan didefinisikan di **worksheet `choices`** sama seperti `select_one`:
 
-**survei:**
+**survey:**
 
 | type | name | label |
 |------|------|-------|
 | rank priorities | main_priority | Urutkan kebutuhan ini dari yang paling penting hingga yang paling tidak penting |
 
-**pilihan:**
+**choices:**
 
 | list_name | name | label |
 |-----------|------|-------|
 | priorities | water | Air bersih |
-| priorities | health | Pelayanan kesehatan |
+| priorities | health | Perawatan kesehatan |
 | priorities | education | Pendidikan |
 | priorities | roads | Jalan |
 | priorities | electricity | Listrik |
@@ -45,7 +45,7 @@ Gunakan `selected-at()` untuk mendapatkan pilihan pada peringkat tertentu:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| rank priorities | main_priority | Urutkan kebutuhan komunitas | |
+| rank priorities | main_priority | Peringkat kebutuhan masyarakat | |
 | calculate | top_priority | | selected-at(`${main_priority}`, 0) |
 | calculate | second_priority | | selected-at(`${main_priority}`, 1) |
 
@@ -53,7 +53,7 @@ Gunakan `selected-at()` untuk mendapatkan pilihan pada peringkat tertentu:
 
 ## Menggunakan `rank-index()` dengan grup berulang
 
-Ketika `rank` digunakan di dalam grup berulang, `rank-index()` memungkinkan Anda untuk mereferensikan peringkat ordinal dari luar pengulangan:
+Ketika `rank` digunakan di dalam grup berulang, `rank-index()` memungkinkan Anda mereferensikan peringkat ordinal dari luar pengulangan:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -61,24 +61,24 @@ Ketika `rank` digunakan di dalam grup berulang, `rank-index()` memungkinkan Anda
 
 Lihat [Fungsi — Fungsi bidang berulang](../operators-and-functions/functions#repeated-field-functions) untuk detail lengkap tentang `rank-index()` dan `rank-index-if()`.
 
-## Penggunaan
+## Kegunaan
 
-Pertanyaan peringkat umumnya digunakan untuk:
+Pertanyaan `rank` umumnya digunakan untuk:
 
-1. **Peringkat prioritas** — meminta komunitas untuk mengurutkan kebutuhan pembangunan
-2. **Urutan preferensi** — mengurutkan fitur produk, atribut layanan, atau opsi kebijakan
-3. **Urutan item ujian** — mengatur langkah-langkah dalam suatu proses
+1. **Peringkat prioritas** — meminta masyarakat untuk memeringkat kebutuhan pembangunan
+2. **Pengurutan preferensi** — memeringkat fitur produk, atribut layanan, atau opsi kebijakan
+3. **Pengurutan item ujian** — mengatur langkah-langkah dalam suatu proses
 4. **Pemilihan Top-N** — dikombinasikan dengan `selected-at()` untuk mengekstrak hanya 1, 2, atau 3 pilihan teratas
 
 ## Praktik Terbaik
 
-1. Pertahankan daftar tetap singkat (3–7 item) — peringkat menjadi melelahkan secara kognitif melebihi 7–8 pilihan.
-2. Gunakan label pilihan yang jelas dan saling eksklusif untuk menghindari kebingungan tentang arti "pertama".
+1. Buat daftar tetap pendek (3–7 item) — peringkat menjadi beban kognitif di luar 7–8 pilihan.
+2. Gunakan label pilihan yang jelas dan saling eksklusif untuk menghindari kebingungan tentang apa arti "pertama".
 3. Tambahkan teks petunjuk yang menjelaskan arah peringkat (misalnya, "Seret untuk mengurutkan: pertama = paling penting").
 4. Validasi menggunakan `count-selected(.) = x` jika Anda perlu memastikan semua pilihan diberi peringkat.
 
-## Keterbatasan
+## Batasan
 
-- Widget seret-untuk-peringkat tidak diimplementasikan di formulir web rtSurvey.
-- Anda tidak dapat memberi peringkat sebagian — semua pilihan harus diurutkan.
-- Pertahankan daftar menjadi 3–7 item; daftar yang lebih panjang menjadi sulit dikelola terlepas dari klien.
+- Widget `drag-to-rank` tidak diterapkan di formulir web rtSurvey.
+- Anda tidak dapat melakukan peringkat sebagian — semua pilihan harus diurutkan.
+- Pertahankan daftar 3–7 item; daftar yang lebih panjang menjadi sulit dikelola terlepas dari klien.

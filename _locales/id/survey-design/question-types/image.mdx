@@ -3,23 +3,23 @@ title: "Gambar"
 description: "Pertanyaan gambar memungkinkan responden untuk mengambil dan mengirimkan foto sebagai bagian dari survei."
 ---
 
-Tipe pertanyaan `image` dalam XLSForms dan rtSurvey memungkinkan responden untuk mengambil dan mengirimkan foto sebagai bagian dari tanggapan survei mereka. Fitur ini sangat berguna untuk mengumpulkan data visual, mendokumentasikan observasi, atau memberikan bukti dalam survei lapangan.
+Jenis pertanyaan `image` (gambar) di XLSForm dan rtSurvey memungkinkan responden untuk mengambil dan mengirimkan foto sebagai bagian dari tanggapan survei mereka. Fitur ini sangat berguna untuk mengumpulkan data visual, mendokumentasikan observasi, atau memberikan bukti dalam survei lapangan.
 
-## Spesifikasi Dasar XLSForm
+## Spesifikasi XLSForm Dasar
 
 | type  | name        | label                           |
 |-------|-------------|--------------------------------|
 | image | photo       | Ambil foto lokasi               |
 
-Untuk detail lebih lanjut tentang tipe pertanyaan gambar dasar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk detail lebih lanjut tentang jenis pertanyaan `image` dasar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
 
-## Penggunaan
+## Kegunaan
 
 Pertanyaan gambar umumnya digunakan untuk:
 
 1. Mendokumentasikan kondisi atau observasi lapangan
-2. Mengambil bukti visual dalam studi penelitian
-3. Mengumpulkan foto sebelum dan sesudah dalam penilaian dampak
+2. Mengumpulkan bukti visual dalam studi penelitian
+3. Mengambil foto sebelum dan sesudah dalam penilaian dampak
 4. Memverifikasi penyelesaian tugas atau kehadiran di lokasi
 5. Mengumpulkan data visual untuk analisis jarak jauh
 
@@ -28,7 +28,7 @@ Pertanyaan gambar umumnya digunakan untuk:
 1. Berikan instruksi yang jelas tentang apa yang harus difoto.
 2. Pertimbangkan implikasi privasi dan informasikan responden tentang bagaimana foto mereka akan digunakan.
 3. Perhatikan ukuran file dan batasan penyimpanan, terutama untuk survei di area dengan konektivitas internet terbatas.
-4. Pastikan perangkat memiliki ruang penyimpanan yang cukup dan izin kamera telah diberikan.
+4. Pastikan perangkat memiliki ruang penyimpanan yang cukup dan izin kamera diberikan.
 
 ## Contoh Penggunaan
 
@@ -36,7 +36,7 @@ Berikut adalah contoh bagaimana Anda dapat menggunakan pertanyaan gambar dalam s
 
 | type  | name           | label                                      | hint                                        |
 |-------|----------------|--------------------------------------------|--------------------------------------------|
-| image | storefront     | Ambil foto pintu masuk toko                | Pastikan nama toko terlihat jelas         |
+| image | storefront     | Ambil foto pintu masuk toko                 | Pastikan nama toko terlihat jelas         |
 
 ## Ekstensi rtSurvey
 
@@ -47,23 +47,23 @@ Tambahkan `inline` ke kolom `appearance` untuk merender kamera sebagai **tombol 
 ```
 | type  | name  | label        | appearance                          |
 |-------|-------|--------------|-------------------------------------|
-| image | photo | Take a photo | inline display{right}               |
-| image | photo | Take a photo | inline display{center, large}       |
+| image | photo | Ambil foto | inline display{right}               |
+| image | photo | Ambil foto | inline display{center, large}       |
 ```
 
 **Posisi tombol — `display{}`:**
 
-| Value | Layout |
-|-------|--------|
+| Nilai | Tata Letak |
+|-------|------------|
 | `right` *(default)* | Ikon di kanan label |
 | `left` | Ikon di kiri label |
-| `top` | Ikon di atas label, tengah |
-| `center` / `bottom` | Ikon di bawah label, tengah |
+| `top` | Ikon di atas label, di tengah |
+| `center` / `bottom` | Ikon di bawah label, di tengah |
 
 **Ukuran tombol:**
 
-| Value | Size |
-|-------|------|
+| Nilai | Ukuran |
+|-------|--------|
 | `small` *(default)* | Lingkaran kecil |
 | `medium` | Lingkaran sedang |
 | `large` | Lingkaran besar |
@@ -75,48 +75,48 @@ inline display{right, large, <FF5500/>}
 inline display{center, medium, <0099FF/>}
 ```
 
-**Kontrol pasca-tangkap — `results{}`:**
+**Kontrol pasca-pengambilan — `results{}`:**
 
-| Appearance | Effect |
+| Appearance | Efek |
 |---|---|
 | `results{hide(capture)}` | Menyembunyikan tombol kamera setelah foto diambil |
-| `results{hide(camera)}` | Sama dengan `hide(capture)` — alias untuk tipe gambar |
-| `results{hide(review)}` | Menyembunyikan pratinjau thumbnail setelah tangkapan |
+| `results{hide(camera)}` | Sama dengan `hide(capture)` — alias untuk jenis gambar |
+| `results{hide(review)}` | Menyembunyikan pratinjau gambar mini setelah pengambilan |
 | `results{hide(filename)}` | Menyembunyikan nama file yang ditampilkan setelah unggahan |
-| `results{left}` | Memindahkan ikon ke kiri setelah tangkapan |
+| `results{left}` | Memindahkan ikon ke kiri setelah pengambilan |
 
-Contoh — tombol tengah besar, sembunyikan kamera setelah tangkap:
+Contoh — tombol besar di tengah, sembunyikan kamera setelah pengambilan:
 ```
 inline display{center, large} results{hide(capture)}
 ```
 
-### `invisible auto-show` — buka kamera otomatis
+### `invisible auto-show` — kamera buka otomatis
 
-Menyembunyikan widget pertanyaan dari tata letak tetapi secara otomatis membuka kamera saat halaman dimuat. Berguna untuk menyematkan langkah tangkapan senyap dalam alur formulir.
+Menyembunyikan widget pertanyaan dari tata letak tetapi secara otomatis membuka kamera saat halaman dimuat. Berguna untuk menyematkan langkah pengambilan senyap dalam alur formulir.
 
 ```
 invisible auto-show
 inline invisible auto-show
 ```
 
-### Tanda Tangan dan Menggambar
+### Tanda tangan dan gambar
 
-| Appearance | Description |
+| Appearance | Deskripsi |
 |---|---|
 | `signature` | Modal pad tanda tangan layar penuh |
 | `signature display{quick}` | Pad tanda tangan cepat sebaris — tanpa modal |
-| `draw` | Kanvas gambar tangan bebas |
+| `draw` | Kanvas gambar bebas |
 
 ### Watermark
 
-Tambahkan tanda air teks atau gambar ke foto yang diambil:
+Tambahkan watermark teks atau gambar ke foto yang diambil:
 
 ```
 watermark(text, "Survey ID: ${id}", bottom-right, 0.5)
 watermark(file, logo.png, top-left, 1.0, 20%)
 ```
 
-### Sembunyikan Label
+### Sembunyikan label
 
 ```
 inline text-nolabel display{center, large}
@@ -124,7 +124,7 @@ inline text-nolabel display{center, large}
 
 ## Penanganan Data
 
-Gambar yang dikumpulkan melalui tipe pertanyaan ini biasanya:
+Gambar yang dikumpulkan melalui jenis pertanyaan ini biasanya:
 
 1. Disimpan dalam format gambar umum (misalnya, JPG, PNG)
 2. Disimpan bersama data survei lainnya, seringkali dalam folder media terpisah
@@ -137,11 +137,11 @@ Saat menggunakan pertanyaan gambar, pertimbangkan:
 1. Bagaimana gambar akan dianalisis (misalnya, tinjauan manual, analisis gambar otomatis)
 2. Ruang penyimpanan tambahan yang diperlukan untuk file gambar
 3. Langkah-langkah privasi dan perlindungan data untuk menyimpan dan menangani foto
-4. Potensi kebutuhan akan alat pengeditan atau pengorganisasian gambar dalam fase analisis
+4. Potensi kebutuhan alat pengeditan atau pengorganisasian gambar dalam fase analisis
 
-## Keterbatasan
+## Batasan
 
-- File gambar bisa besar, yang dapat memengaruhi transfer data dan penyimpanan.
+- File gambar bisa berukuran besar, yang dapat memengaruhi transfer data dan penyimpanan.
 - Tidak semua perangkat mungkin memiliki kamera berkualitas tinggi atau ruang penyimpanan yang cukup.
-- Menganalisis sejumlah besar gambar bisa memakan waktu.
+- Menganalisis sejumlah besar gambar dapat memakan waktu.
 - Mungkin ada masalah privasi saat mengambil gambar, terutama di ruang publik.

@@ -3,50 +3,50 @@ title: "Video"
 description: "Pertanyaan video memungkinkan responden untuk merekam dan mengirimkan file video sebagai bagian dari survei."
 ---
 
-Tipe pertanyaan `video` memungkinkan responden untuk **merekam video** atau mengunggah file video yang sudah ada sebagai bagian dari tanggapan survei mereka. Ini berguna untuk menangkap bukti visual, demonstrasi, kondisi lingkungan, atau informasi apa pun yang mendapat manfaat dari gerakan dan audio secara bersamaan.
+Tipe pertanyaan `video` memungkinkan responden untuk **merekam video** atau mengunggah file video yang sudah ada sebagai bagian dari tanggapan survei mereka. Ini berguna untuk merekam bukti visual, demonstrasi, kondisi lingkungan, atau informasi apa pun yang membutuhkan gerakan dan audio secara bersamaan.
 
-## Spesifikasi Dasar XLSForm
+## Spesifikasi XLSForm Dasar
 
 | type  | name        | label                              |
 |-------|-------------|-------------------------------------|
-| video | demo_video  | Silakan rekam demonstrasi singkat |
+| video | demo_video  | Harap rekam demonstrasi singkat     |
 
-Untuk detail lebih lanjut tentang tipe pertanyaan video standar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
+Untuk detail lebih lanjut tentang tipe pertanyaan `video` standar, lihat [spesifikasi XLSForm](https://xlsform.org/en/#question-types).
 
-## Penggunaan
+## Kegunaan
 
 Pertanyaan video umumnya digunakan untuk:
 
 1. Mendokumentasikan kondisi lapangan — kerusakan jalan, kondisi infrastruktur, kesehatan tanaman
-2. Merekam demonstrasi produk atau pemeriksaan kepatuhan prosedur
-3. Mengumpulkan testimoni video dari responden
-4. Menangkap bukti yang membutuhkan konteks spasial (misalnya, ukuran dan luas area masalah)
+2. Merekam demonstrasi produk atau pemeriksaan kepatuhan prosedural
+3. Mengumpulkan testimonial video dari responden
+4. Mengambil bukti yang membutuhkan konteks spasial (misalnya, ukuran dan luas area masalah)
 5. Dokumentasi sebelum/sesudah untuk survei pemantauan dan evaluasi
 
-## Format Data
+## Format data
 
 File video disimpan sebagai lampiran biner:
 
 - **Format:** MP4 atau MOV (rekaman seluler)
 - **Penamaan:** `{instanceID}-{fieldname}.mp4` (atau yang setara)
-- **Penyimpanan:** Diunggah ke folder media server dan ditautkan ke catatan pengajuan
-- **Akses:** Dapat diputar dan diunduh dari antarmuka manajemen pengajuan
+- **Penyimpanan:** Diunggah ke folder media server dan ditautkan ke catatan pengiriman
+- **Akses:** Dapat diputar dan diunduh dari antarmuka manajemen pengiriman
 
 ## Ekstensi rtSurvey
 
-### Durasi Maksimum
+### Durasi maksimum
 
-Gunakan kolom `parameters` untuk membatasi durasi perekaman:
+Gunakan kolom `parameters` untuk membatasi panjang rekaman:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
 | video | site_visit | Rekam kondisi situs | `max-duration=60` |
 
-`max-duration` dalam detik. Perekaman berhenti secara otomatis pada batas.
+`max-duration` dalam detik. Rekaman berhenti secara otomatis pada batas waktu.
 
-### Kualitas / Resolusi
+### Kualitas / resolusi
 
-Kontrol resolusi perekaman melalui `parameters`:
+Kontrol resolusi rekaman melalui `parameters`:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
@@ -54,49 +54,53 @@ Kontrol resolusi perekaman melalui `parameters`:
 
 Nilai yang didukung: `low` (unggah lebih cepat), `normal` (default), `high`. Gunakan `low` di area dengan konektivitas terbatas.
 
-### Unggah Video yang Ada
+### Unggah video yang sudah ada
 
-Di ponsel, responden dapat memilih untuk **mengunggah video yang sudah ada** dari galeri perangkat alih-alih merekam yang baru. Ini diaktifkan secara default dalam integrasi kamera/galeri native.
+Di perangkat seluler, responden dapat memilih untuk **mengunggah video yang sudah ada** dari galeri perangkat alih-alih merekam yang baru. Ini diaktifkan secara default dalam integrasi kamera/galeri asli.
 
-### Putar Ulang Sebelum Pengajuan
+### Pemutaran sebelum pengiriman
 
-Di ponsel, klip yang direkam dapat ditinjau sebelum melanjutkan. Tidak ada konfigurasi tambahan yang diperlukan.
+Di perangkat seluler, klip yang direkam dapat ditinjau sebelum melanjutkan. Tidak ada konfigurasi tambahan yang diperlukan.
 
-### Tata Letak Tombol Sebaris
+### Tata letak tombol sebaris
 
 Tambahkan `inline` untuk merender kamera sebagai **tombol ikon melingkar** di samping label, bukan area tangkap lebar penuh.
 
 ```
 | type  | name  | label        | appearance                              |
 |-------|-------|--------------|----------------------------------------|
-| video | clip  | Record video | inline display{right}                  |
-| video | clip  | Record video | inline display{left, large}            |
-| video | clip  | Record video | inline display{center, large, <0099FF/>} |
+| video | clip  | Rekam video | inline display{right}                  |
+| video | clip  | Rekam video | inline display{left, large}            |
+| video | clip  | Rekam video | inline display{center, large, <0099FF/>} |
 ```
 
-**Posisi Tombol** — `left`, `right` *(default)*, `top`, `center`, `bottom`
+**Posisi tombol** — `left`, `right` *(default)*, `top`, `center`, `bottom`
 
-**Ukuran Tombol** — `small` *(default)*, `medium`, `large`
+**Ukuran tombol** — `small` *(default)*, `medium`, `large`
 
-**Warna Tombol** — tambahkan kode warna heksadesimal di dalam `display{}` untuk menimpa warna primer:
+**Warna tombol** — tambahkan warna hex di dalam `display{}` untuk menimpa warna primer:
 
 ```
 inline display{right, large, <FF5500/>}
 ```
 
-**Kontrol Pasca-Rekam — `results{}`:**
+**Kontrol pasca-pengambilan — `results{}`:**
 
-| Penampilan | Efek |
+| Appearance | Efek |
 |---|---|
 | `results{hide(capture)}` | Menyembunyikan tombol rekam setelah video diambil |
-| `results{hide(review)}` | Menyembunyikan pratinjau thumbnail pemutaran setelah pengambilan |
+| `results{hide(review)}` | Menyembunyikan gambar mini pemutaran setelah pengambilan |
 | `results{hide(filename)}` | Menyembunyikan nama file dan durasi |
 | `results{left}` | Memindahkan ikon ke kiri setelah pengambilan |
 
-...
-### `thumbnail-square-[WxH]` — Pratinjau Video Ukuran Tetap
+Contoh — sembunyikan tombol rekam, pertahankan pemutaran:
+```
+inline display{right} results{hide(capture)}
+```
 
-Setelah pengambilan, menampilkan video sebagai pemutar sebaris ukuran tetap, bukan lebar penuh. Kombinasikan dengan `inline` untuk tata letak yang ringkas.
+### `thumbnail-square-[WxH]` — pratinjau video ukuran tetap
+
+Setelah pengambilan, menampilkan video sebagai pemutar sebaris ukuran tetap, bukan lebar penuh. Gabungkan dengan `inline` untuk tata letak yang ringkas.
 
 ```
 inline display{right} thumbnail-square-[120x90]
@@ -105,7 +109,7 @@ inline display{center} thumbnail-square-[200x150]
 
 Lebar dan tinggi dalam piksel.
 
-### `invisible auto-show` — Buka Perekam Otomatis
+### `invisible auto-show` — perekam buka otomatis
 
 Menyembunyikan widget pertanyaan dari tata letak tetapi secara otomatis membuka perekam video saat halaman dimuat.
 
@@ -114,21 +118,21 @@ invisible auto-show
 inline invisible auto-show
 ```
 
-### Sembunyikan Label
+### Sembunyikan label
 
 ```
 inline text-nolabel display{center, large}
 ```
 
-## Contoh Penggunaan
+## Contoh penggunaan
 
-### Video Inspeksi Situs dengan Batasan
+### Video inspeksi situs dengan batas
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| video | site_video | Rekam titik air | Berkeliling seluruh fasilitas. Maksimal 90 detik. | `max-duration=90 quality=normal` |
+| video | site_video | Rekam titik air | Berjalanlah di sekitar seluruh fasilitas. Maksimal 90 detik. | `max-duration=90 quality=normal` |
 
-### Video Kondisional — Hanya Jika Kerusakan Dilaporkan
+### Video bersyarat — hanya jika kerusakan dilaporkan
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
@@ -138,14 +142,14 @@ inline text-nolabel display{center, large}
 ## Praktik Terbaik
 
 1. Atur `max-duration` — rekaman video tanpa batas dapat dengan mudah melebihi 100 MB dan gagal diunggah pada koneksi yang lemah.
-2. Gunakan `quality=low` untuk survei pemantauan di mana bukti visual diperlukan tetapi detail halus tidak — ini sangat mengurangi ukuran file.
-3. Tulis instruksi perekaman khusus di kolom `hint` (misalnya, "Berjalanlah mengelilingi seluruh bangunan, pegang kamera dengan stabil").
+2. Gunakan `quality=low` untuk survei pemantauan di mana bukti visual diperlukan tetapi detail yang halus tidak — ini secara dramatis mengurangi ukuran file.
+3. Tulis instruksi rekaman spesifik di kolom `hint` (misalnya, "Berjalanlah di sekitar seluruh bangunan, pegang kamera dengan stabil").
 4. Pertimbangkan apakah video diperlukan — foto (`image`) biasanya cukup untuk bukti statis dan menghasilkan file yang jauh lebih kecil.
-5. Uji kinerja unggah pada jaringan lapangan yang sebenarnya sebelum penyebaran.
+5. Uji kinerja unggahan di jaringan lapangan yang sebenarnya sebelum penyebaran.
 
-## Keterbatasan
+## Batasan
 
-- File video sangat besar — video 1 menit dengan kualitas normal biasanya 20–60 MB tergantung perangkat.
-- Mengunggah file video besar memerlukan koneksi jaringan yang baik; pertimbangkan untuk mewajibkan sinkronisasi Wi-Fi untuk formulir yang banyak video.
+- File video berukuran sangat besar — video 1 menit dengan kualitas normal biasanya 20–60 MB tergantung pada perangkat.
+- Mengunggah file video besar membutuhkan koneksi jaringan yang baik; pertimbangkan untuk membutuhkan sinkronisasi Wi-Fi untuk formulir yang banyak video.
 - Tidak semua browser web mendukung perekaman video melalui MediaRecorder — Chrome adalah yang paling andal.
-- Analisis respons video bersifat manual dan memakan waktu; gunakan dengan hemat dan hanya jika konten video memberikan nilai unik.
+- Analisis respons video manual dan memakan waktu; gunakan dengan hemat dan hanya jika konten video menambahkan nilai unik.
