@@ -1,9 +1,9 @@
 ---
 title: "Desetinné číslo"
-description: "Typ otázky pro zadávání zlomkových čísel v rtSurvey"
+description: "Typ otázky pro zadávání desetinných čísel v rtSurvey"
 ---
 
-Typ otázky `decimal` shromažďuje čísla, která mohou obsahovat zlomkovou část (např. `3.14`, `72.5`). Na mobilních zařízeních spouští numerickou klávesnici a podporuje stejné možnosti vzhledu jako typ `text` pro rozvržení a formátování.
+Typ otázky `decimal` shromažďuje čísla, která mohou obsahovat desetinnou část (např. `3.14`, `72.5`). Na mobilních zařízeních se spustí numerická klávesnice a podporuje stejné možnosti vzhledu jako typ `text` pro rozložení a formátování.
 
 ## Základní specifikace XLSForm
 
@@ -13,29 +13,29 @@ Typ otázky `decimal` shromažďuje čísla, která mohou obsahovat zlomkovou č
 | decimal | height_m | Výška (m) |
 | decimal | temperature | Tělesná teplota (°C) |
 
-Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
+Pro standardní specifikaci viz [dokumentace XLSForm](https://xlsform.org/en/#question-types).
 
 ---
 
 ## Možnosti vzhledu
 
-### `number-hspinner` — horizontální číselník
+### `number-hspinner` — horizontální volič
 
-Nahradí vstup horizontálním číselníkem **− hodnota +**. Klepnutím na mínus/plus se hodnota upraví o nastavený krok.
+Nahrazuje vstup horizontálním voličem **− hodnota +**. Klepnutím na mínus/plus se hodnota upraví o nakonfigurovaný krok.
 
 ```
 number-hspinner
 ```
 
-Zobrazená hodnota je formátována na jedno desetinné místo (např. `3.0`, `72.5`). Výchozí krok je `1`; pomocí `hspinner()` nastavíte desetinný krok.
+Zobrazená hodnota je formátována na jedno desetinné místo (např. `3.0`, `72.5`). Výchozí krok je `1`; použijte `hspinner()` k nastavení desetinného kroku.
 
-**Přizpůsobte tvar tlačítka a krok** pomocí `hspinner()`:
+**Přizpůsobit tvar tlačítka a krok** pomocí `hspinner()`:
 
 ```
 number-hspinner hspinner('left-small-square','right-small-square','0.1')
 ```
 
-Parametry: tvar levého tlačítka, tvar pravého tlačítka, hodnota kroku. Pro jemné ovládání použijte desetinný krok jako `0.5` nebo `0.1`.
+Parametry: tvar levého tlačítka, tvar pravého tlačítka, hodnota kroku. Pro přesné ovládání použijte desetinný krok jako `0.5` nebo `0.1`.
 
 **Vlastní barvy** pomocí `colors()`:
 
@@ -49,7 +49,7 @@ number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
 
 ### `thousandsep` — oddělovač tisíců
 
-Formátuje zobrazené číslo se seskupením čárkami (např. `1,234.56`). Nezpracované číslo se ukládá bez čárek. Typ vstupu se přepne na `"text"`, aby bylo možné formátované zobrazení.
+Formátuje zobrazené číslo se seskupováním čárkou (např. `1,234.56`). Nezpracované číslo je uloženo bez čárek. Typ vstupu je přepnut na `"text"`, aby bylo umožněno formátované zobrazení.
 
 ```
 thousandsep
@@ -65,13 +65,13 @@ Seskupuje číslice celočíselné části do bloků o velikosti `n` oddělenýc
 digisep(3," ")      → 1 234 567.89
 ```
 
-Pokud je tento vzhled aktivní, typ vstupu se přepne na `"text"`.
+Typ vstupu je přepnut na `"text"`, když je tato volba vzhledu aktivní.
 
 ---
 
-### `textonly` — vynutit textovou klávesnici
+### `textonly` — vynutí textovou klávesnici
 
-Vynutí `type="text"` na vstupním elementu. Zabraňuje zvláštnostem prohlížeče při zadávání čísel (skrývání koncových nul, šipky pro změnu hodnoty na desktopu) a přitom stále přijímá desetinné hodnoty.
+Vynutí `type="text"` na vstupním prvku. Zabraňuje chybám prohlížeče při zadávání čísel (skrývání koncových nul, šipky pro zvýšení/snížení hodnoty na počítači) a přitom stále přijímá desetinné hodnoty.
 
 ```
 textonly
@@ -79,9 +79,9 @@ textonly
 
 ---
 
-### `floating_hint` — nápověda plovoucí jako popisek
+### `floating_hint` — nápověda plave jako popisek
 
-Text nápovědy (`hint`) se ve vstupu zobrazuje jako zástupný symbol (placeholder). Když uživatel začne psát, vypluje nad pole jako popisek (label).
+Text `hint` se vykreslí uvnitř vstupu jako zástupný text. Když uživatel začne psát, plave nad polem jako popisek.
 
 ```
 floating_hint
@@ -89,9 +89,9 @@ floating_hint
 
 ---
 
-### `embed` — nápověda uvnitř hranic vstupu
+### `embed` — nápověda uvnitř hranice vstupu
 
-Podobné jako `floating_hint` — nápověda sedí uvnitř hranic vstupu, když je prázdný. Při psaní nevyplouvá.
+Podobné jako `floating_hint` – nápověda se nachází uvnitř hranice vstupu, když je prázdná. Když uživatel píše, neplave.
 
 ```
 embed
@@ -99,9 +99,9 @@ embed
 
 ---
 
-### `textpopup` — modalní dialogové okno pro vstup
+### `textpopup` — vstup v modálním dialogu
 
-Klepnutím na pole se otevře modální dialogové okno s větším vstupem. Užitečné na malých obrazovkách.
+Klepnutím na pole se otevře modální dialog s větším vstupním polem. Užitečné na malých obrazovkách.
 
 ```
 textpopup
@@ -111,7 +111,7 @@ textpopup
 
 ### `charcount` — živé počítadlo znaků
 
-Zobrazuje živý počet znaků `(n)` pod vstupem, který se aktualizuje během psaní.
+Zobrazuje živé počítadlo znaků `(n)` pod vstupním polem, které se aktualizuje, jak uživatel píše.
 
 ```
 charcount
@@ -119,20 +119,20 @@ charcount
 
 ---
 
-### `prefix(expr)` — přidat předponu
+### `prefix(expr)` — připojení prefixu
 
-Předřadí statický nebo vypočtený řetězec před zobrazenou hodnotu. Uložená hodnota předponu neobsahuje.
+Připojí statický nebo vypočítaný řetězec k zobrazené hodnotě. Uložená hodnota neobsahuje prefix.
 
 ```
 prefix('USD ')          → zobrazí "USD 72.50", uloží "72.50"
-prefix(${currency})     → dynamická předpona z jiného pole
+prefix(${currency})     → dynamický prefix z jiného pole
 ```
 
 ---
 
 ### `align_answer` — zarovnání textu vstupu
 
-Ovládá horizontální zarovnání napsané hodnoty uvnitř vstupu.
+Řídí vodorovné zarovnání zadané hodnoty uvnitř vstupu.
 
 ```
 align_answer = left
@@ -144,7 +144,7 @@ align_answer = center
 
 ### `inputs{qrscan}` — skenování QR / čárového kódu do pole
 
-Přidá tlačítko pro skenování QR kódu vedle vstupu. Otevře skener fotoaparátu a vyplní pole naskenovanou hodnotou.
+Přidá tlačítko pro skenování QR kódu vedle vstupu. Otevře skener kamery a vyplní pole naskenovanou hodnotou.
 
 ```
 inputs{qrscan}
@@ -154,20 +154,20 @@ inputs{qrscan}
 
 ## Rychlý přehled vzhledu
 
-| Appearance | Widget rendered |
+| Vzhled | Vykreslený widget |
 |---|---|
-| *(none)* | Číselný vstup (`type="number"`) — numerická klávesnice na mobilu |
-| `number-hspinner` | Horizontální číselník − hodnota +, zobrazeno jedno desetinné místo |
-| `number-hspinner hspinner(...)` | Číselník s vlastním tvarem tlačítka a krokem |
-| `number-hspinner colors(...)` | Číselník s vlastními barvami tlačítek |
-| `thousandsep` | Zobrazení čísel s oddělovačem tisíců (čárka) |
+| *(žádný)* | Numerický vstup (`type="number"`) — numerická klávesnice na mobilu |
+| `number-hspinner` | Horizontální volič − hodnota +, zobrazeno jedno desetinné místo |
+| `number-hspinner hspinner(...)` | Volič s vlastním tvarem tlačítka a krokem |
+| `number-hspinner colors(...)` | Volič s vlastními barvami tlačítek |
+| `thousandsep` | Zobrazení čísla seskupeného čárkami |
 | `digisep(n,"sep")` | Vlastní seskupování číslic |
-| `textonly` | Vynutit textovou klávesnici |
+| `textonly` | Vynutí textovou klávesnici |
 | `floating_hint` | Nápověda plave nad polem během psaní |
-| `embed` | Nápověda uvnitř hranic vstupu |
-| `textpopup` | Klepnutím otevřete modální dialogové okno |
-| `charcount` | Živé počítadlo znaků pod vstupem |
-| `prefix(expr)` | Přidat statickou nebo dynamickou předponu |
+| `embed` | Nápověda uvnitř hranice vstupu |
+| `textpopup` | Klepnutím otevřete modální dialog |
+| `charcount` | Živé počítadlo znaků pod vstupním polem |
+| `prefix(expr)` | Připojit statický nebo dynamický prefix |
 | `align_answer = left/right/center` | Zarovnání textu vstupu |
 | `inputs{qrscan}` | Tlačítko pro skenování QR/čárového kódu |
 
@@ -177,14 +177,14 @@ inputs{qrscan}
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
-| decimal | weight | Hmotnost (kg) | `. > 0 and . <= 500` | Zadejte hodnotu mezi 0 a 500 |
-| decimal | height | Výška (m) | `. > 0 and . <= 3` | Zadejte hodnotu mezi 0 a 3 |
+| decimal | weight | Hmotnost | `. > 0 and . <= 500` | Zadejte hodnotu mezi 0 a 500 |
+| decimal | height | Výška | `. > 0 and . <= 3` | Zadejte hodnotu mezi 0 a 3 |
 | decimal | temp | Teplota (°C) | `. >= 35 and . <= 42` | Normální teplota: 35°C–42°C |
 | decimal | percentage | Procento | `. >= 0 and . <= 100` | Zadejte hodnotu mezi 0 a 100 |
 
 ---
 
-## Příklad — formulář pro měření
+## Příklad — formulář měření
 
 | type | name | label | appearance | constraint | constraint_message |
 |------|------|-------|------------|------------|-------------------|
@@ -192,21 +192,21 @@ inputs{qrscan}
 | decimal | height_m | Výška (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Zadejte platnou výšku |
 | calculate | bmi | | | | |
 
-Sloupec pro výpočet BMI:
+Sloupec výpočtu BMI:
 ```
 ${weight_kg} div (${height_m} * ${height_m})
 ```
 
 ---
 
-## Nejlepší postupy
+## Osvědčené postupy
 
-1. Pro měření vyžadující přesnost na jedno desetinné místo použijte `number-hspinner hspinner(..., '0.1')` — číselník automaticky formátuje na jedno desetinné místo, čímž udržuje hodnoty konzistentní.
-2. Použijте `textonly`, když prohlížeče přidávají nechtěné ovládací prvky číselníku nebo zkracují koncové nuly (např. `3.0` zobrazené jako `3`).
-3. Pro velké finanční hodnoty použijte `thousandsep`, aby respondenti mohli ověřit, že zadali správný řád.
+1. Použijte `number-hspinner hspinner(..., '0.1')` pro měření vyžadující jednu desetinnou přesnost – volič automaticky formátuje na jedno desetinné místo, čímž udržuje hodnoty konzistentní.
+2. Použijte `textonly`, když prohlížeče přidávají nežádoucí ovládací prvky pro posun nebo zkracují koncové nuly (např. `3.0` zobrazené jako `3`).
+3. Použijte `thousandsep` pro velké finanční hodnoty, aby respondenti mohli ověřit, že zadali správnou velikost.
 4. Vynucujte omezení rozsahu namísto spoléhání se pouze na typ mobilní klávesnice.
 
 ## Omezení
 
-- Číselník vždy zobrazuje jedno desetinné místo — pokud potřebujete větší přesnost v zobrazené hodnotě, použijte místo toho prostý vstup.
-- `thousandsep` a `digisep()` ukládají nezpracované číslo — ve výpočtech nečtěte formátovanou hodnotu zobrazení.
+- Volič vždy zobrazuje jedno desetinné místo – pokud potřebujete větší přesnost v zobrazené hodnotě, použijte namísto něj jednoduchý vstup.
+- `thousandsep` a `digisep()` ukládají nezpracované číslo – nečtěte formátovanou zobrazenou hodnotu ve výpočtech.

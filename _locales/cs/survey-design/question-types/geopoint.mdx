@@ -1,9 +1,9 @@
 ---
-title: "Geopoint"
-description: "Otázky Geopoint zachycují zeměpisné souřadnice (zeměpisnou šířku, zeměpisnou délku, nadmořskou výšku a přesnost) jako součást průzkumu."
+title: "Geobod"
+description: "Geopoint otázky zaznamenávají zeměpisné souřadnice (zeměpisná šířka, délka, nadmořská výška a přesnost) jako součást průzkumu."
 ---
 
-Typ otázky `geopoint` zachycuje zeměpisné souřadnice (zeměpisnou šířku, zeměpisnou délku, nadmořskou výšku, přesnost) pomocí GPS zařízení. rtSurvey vykresluje výběr s několika režimy rozložení a podporuje automatizaci prostřednictvím parametrů `inputs{}` a `outputs{}`.
+Typ otázky `geopoint` zachycuje zeměpisné souřadnice (zeměpisná šířka, délka, nadmořská výška, přesnost) pomocí GPS zařízení. rtSurvey vykresluje výběr s několika režimy rozložení a podporuje automatizaci prostřednictvím parametrů `inputs{}` a `outputs{}`.
 
 ## Základní specifikace XLSForm
 
@@ -11,60 +11,60 @@ Typ otázky `geopoint` zachycuje zeměpisné souřadnice (zeměpisnou šířku, 
 |----------|-------------|-----------------------------|
 | geopoint | location    | Zaznamenejte aktuální polohu |
 
-Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
+Pro standardní specifikaci viz [dokumentace XLSForm](https://xlsform.org/en/#question-types).
 
 ## Formát dat
 
-Uloženo jako čtyři hodnoty oddělené mezerou:
+Uloženo jako čtyři hodnoty oddělené mezerami:
 
 ```
-latitude longitude altitude accuracy
+zeměpisná_šířka zeměpisná_délka nadmořská_výška přesnost
 ```
 
 Příklad: `13.756331 100.501762 15 8`
 
 ---
 
-## Režimy rozložení (Layout modes)
+## Režimy rozložení
 
 ### Výchozí — obdélníkové tlačítko
 
-Obdélníkové tlačítko „START GEOPOINT“ otevře modální okno s celou mapou, kde tazatel vybere bod. Po zachycení se popisek tlačítka změní na „View or change geo point“ a souřadnice se zobrazí níže.
+Obdélníkové tlačítko "SPUSTIT GEOPOINT" otevře celoobrazovkové modální okno mapy, kde tazatel vybere bod. Po zachycení se popisek tlačítka změní na "Zobrazit nebo změnit geobod" a pod ním se objeví souřadnice.
 
-Není vyžadována žádná hodnota appearance.
+Není potřeba žádná hodnota vzhledu.
 
 ---
 
 ### `display{inline-icon}` — kruhové tlačítko s nitkovým křížem
 
-Vykreslí kruhové ikonové tlačítko (nitkový kříž ⊕) namísto obdélníkového tlačítka. Klepnutím na něj se otevře stejné modální okno s mapou.
+Vykreslí kruhové ikonové tlačítko (nitkový kříž ⊕) namísto obdélníkového tlačítka. Klepnutím na něj se otevře stejné modální okno mapy.
 
 ```
 display{inline-icon}
 ```
 
-**V kombinaci s pozicí a velikostí:**
+**Kombinováno s pozicí a velikostí:**
 
 ```
 display{inline-icon, left}           → tlačítko vlevo od popisku
 display{inline-icon, top}            → tlačítko nad popiskem
-display{inline-icon, bottom}         → tlačítko pod popiskem, vycentrované
+display{inline-icon, bottom}         → tlačítko pod popiskem, vycentrováno
 display{inline-icon, large}          → velká ikona (75px)
 display{inline-icon, medium}         → střední ikona (50px)
 display{inline-icon, left, large}    → velké tlačítko vlevo
 ```
 
-| Size | Icon height/width |
-|------|------------------|
-| *(default)* | 25px |
+| Velikost | Výška/šířka ikony |
+|----------|-------------------|
+| *(výchozí)* | 25px |
 | `medium` | 50px |
 | `large` | 75px |
 
 ---
 
-### `display{thumbnail-square}` — miniatura živé mapy
+### `display{thumbnail-square}` — živá miniatura mapy
 
-Vykreslí náhled živé mapy (Leaflet) přímo u otázky namísto tlačítka. Miniatura ukazuje aktuální polohu GPS a vybraný bod. Klepnutím na tlačítko rozbalení se otevře celé modální okno.
+Vykreslí živý náhled mapy (Leaflet) přímo na otázce namísto tlačítka. Miniatura zobrazuje aktuální polohu GPS a vybraný bod. Klepnutím na tlačítko pro rozbalení se otevře celé modální okno.
 
 ```
 display{thumbnail-square}
@@ -74,27 +74,27 @@ display{thumbnail-square}
 
 ```
 display{thumbnail-square-[WxH]}          → pevné pixely
-display{thumbnail-square-[400x200]}      → 400px šířka × 200px výška
+display{thumbnail-square-[400x200]}      → 400px široké × 200px vysoké
 
-display{thumbnail-square-[W%xH%]}        → procento šířky formuláře
-display{thumbnail-square-[100%x30%]}     → plná šířka × 30 % šířky formuláře
+display{thumbnail-square-[W%xH%]}        → procenta šířky formuláře
+display{thumbnail-square-[100%x30%]}     → celá šířka × 30% šířky formuláře
 ```
 
 ---
 
 ## `display{}` vs `results{}` — před a po zachycení
 
-`display{}` ovládá rozložení **předtím**, než uživatel zachytí polohu. `results{}` ovládá rozložení **poté**, co hodnota existuje. Mohou mít různé zarovnání.
+`display{}` řídí rozložení **před** tím, než uživatel zachytí polohu. `results{}` řídí rozložení **po** existenci hodnoty. Mohou mít různá zarovnání.
 
 ```
 display{inline-icon, right} results{left}
 ```
 
-Toto vykreslí tlačítko vpravo před zachycením a poté jej přesune doleva, jakmile je bod zaznamenán.
+Toto vykreslí tlačítko vpravo před zachycením a poté ho přesune vlevo, jakmile je bod zaznamenán.
 
 ### `hide(value)` — potlačení zobrazení souřadnic
 
-Ve výchozím nastavení se zachycený text šířky/délky/přesnosti/nadmořské výšky zobrazuje pod tlačítkem. Skryjte jej pomocí:
+Ve výchozím nastavení se zachycený text lat/lon/accuracy/altitude zobrazuje pod tlačítkem. Skryjte jej pomocí:
 
 ```
 results{hide(value)}
@@ -107,7 +107,7 @@ display{inline-icon} results{hide(value)}
 
 ### Automatické zachycení při načtení
 
-Automaticky zaznamená polohu GPS při načtení formuláře, aniž by tazatel musel cokoli mačkat.
+Automaticky zaznamená polohu GPS při načtení formuláře, aniž by tazatel musel cokoli stisknout.
 
 ```
 inputs{auto-take}
@@ -121,7 +121,7 @@ inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
 
 ### Předvyplnění z textového pole
 
-Vyplňte geopoint z otázky, která obsahuje název místa nebo řetězec adresy. rtSurvey provede reverzní geokódování řetězce na souřadnice prostřednictvím OpenStreetMap Nominatim.
+Vyplňte geobod z otázky, která obsahuje název místa nebo řetězec adresy. rtSurvey provede reverzní geokódování řetězce na souřadnice pomocí OpenStreetMap Nominatim.
 
 ```
 inputs{question(address_field)}
@@ -131,7 +131,7 @@ inputs{question(address_field)}
 
 ## `outputs{}` — reverzní geokódování na text
 
-Po zachycení bodu automaticky vyplňte otázku typu `text` adresou v čitelném formátu (reverzně geokódovanou ze souřadnic).
+Po zachycení bodu automaticky vyplňte otázku typu `text` lidsky čitelnou adresou (reverzní geokódování ze souřadnic).
 
 ```
 outputs{question(address_field)}
@@ -148,7 +148,7 @@ Příklad:
 
 ## `nomap` — zachycení GPS bez mapy
 
-Nahradí modální okno mapy jednoduchým dialogem, který vyžádá povolení k poloze a zaznamená souřadnice. Mapa se nezobrazuje. Užitečné pro zachycení pouze GPS na levnějších zařízeních nebo v případě, že dlaždice mapy nejsou k dispozici offline.
+Nahradí modální okno mapy jednoduchým dialogem, který požaduje povolení polohy a zaznamenává souřadnice. Mapa se nezobrazuje. Užitečné pro zachycení pouze GPS na zařízeních nižší třídy nebo když mapové dlaždice nejsou dostupné offline.
 
 ```
 nomap
@@ -158,7 +158,7 @@ nomap
 
 ## Vlastní styl tlačítka
 
-Pomocí `styleButton()` aplikujte vlastní CSS na výchozí obdélníkové tlačítko:
+Použijte `styleButton()` k aplikaci vlastního CSS na výchozí obdélníkové tlačítko:
 
 ```
 styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
@@ -179,25 +179,25 @@ text-nolabel display{inline-icon, center, large}
 | type | name | label | appearance |
 |------|------|-------|------------|
 | geopoint | field_loc | Zaznamenat polohu v terénu | `display{inline-icon, right, large}` |
-| geopoint | site | Poloha lokality | `display{thumbnail-square-[100%x30%]}` |
-| geopoint | auto_loc | Aktuální pozice | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
+| geopoint | site | Poloha místa | `display{thumbnail-square-[100%x30%]}` |
+| geopoint | auto_loc | Aktuální poloha | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
 | geopoint | mapped_loc | Poloha | `display{inline-icon} outputs{question(address)}` |
 | geopoint | gps_only | Bod GPS | `nomap` |
 
 ---
 
-## Nejlepší praxe
+## Osvědčené postupy
 
-1. Pro ověřovací průzkumy tazatelů, kde je GPS povinná, použijte `inputs{auto-take}` — odstraní se tím manuální krok.
-2. `display{thumbnail-square}` použijte v případě, že chcete, aby tazatel vizuálně potvrdil vybraný bod před pokračováním.
-3. Spárujte `outputs{question(...)}` s polem `text` určeným pouze pro čtení, aby se tazateli zobrazila reverzně geokódovaná adresa.
-4. V oblastech bez internetového připojení, kde se nemohou načíst dlaždice mapy, použijte `nomap`.
-5. Před záznamem nechte čas na stabilizaci GPS — přesnost pod 10 m je pro terénní průzkumy obvykle dostatečná.
+1. Použijte `inputs{auto-take}` pro průzkumy ověřování tazatele, kde je GPS povinná – odstraňuje ruční krok.
+2. Použijte `display{thumbnail-square}`, když chcete, aby tazatel vizuálně potvrdil vybraný bod před pokračováním.
+3. Spojte `outputs{question(...)}` s textovým polem `read-only` pro zobrazení reverzně geokódované adresy tazateli.
+4. Použijte `nomap` v oblastech bez připojení k internetu, kde nelze načíst mapové dlaždice.
+5. Před záznamem nechte čas na stabilizaci GPS – přesnost pod 10m je obvykle dostatečná pro terénní průzkumy.
 
-## Omezení (Limitations)
+## Omezení
 
-- Geokódování `inputs{question(name)}` vyžaduje přístup k internetu — volá API OpenStreetMap Nominatim.
-- Reverzní geokódování `outputs{question(name)}` vyžaduje také přístup k internetu.
+- Geokódování `inputs{question(name)}` vyžaduje přístup k internetu – volá OpenStreetMap Nominatim API.
+- Reverzní geokódování `outputs{question(name)}` také vyžaduje přístup k internetu.
 - Miniatura mapy (`display{thumbnail-square}`) vyžaduje internet pro načítání dlaždic; souřadnice jsou stále zachycovány offline.
-- Přesnost GPS se liší podle zařízení a prostředí — podmínky v interiéru nebo v městské zástavbě mohou vést k přesnosti > 50 m.
-- Sběr údajů o poloze může během dlouhých průzkumů výrazně ovlivnit životnost baterie zařízení.
+- Přesnost GPS se liší podle zařízení a prostředí – vnitřní nebo městské kaňonové podmínky mohou mít přesnost > 50 m.
+- Sběr dat o poloze může výrazně ovlivnit životnost baterie zařízení během dlouhých průzkumů.

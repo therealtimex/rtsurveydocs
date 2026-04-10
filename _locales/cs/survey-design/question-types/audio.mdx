@@ -1,15 +1,15 @@
 ---
 title: "Audio"
-description: "Audio otázky umožňují respondentům nahrávat a odesílat audio soubory jako součást průzkumu."
+description: "Audio otázky umožňují respondentům nahrávat a odesílat zvukové soubory jako součást průzkumu."
 ---
 
-Typ otázky `audio` umožňuje respondentům **nahrát zvuk** nebo nahrát existující audio soubor jako součást jejich odpovědi v průzkumu. Je užitečný pro zachycení slovních výpovědí, zvuků okolí, svědectví nebo jakýchkoli informací, které jsou lépe sdělovány hlasem než textem.
+Typ otázky `audio` umožňuje respondentům **nahrávat zvuk** nebo nahrát existující zvukový soubor jako součást jejich odpovědi v průzkumu. Je to užitečné pro zachycení slovních výpovědí, zvuků prostředí, svědectví nebo jakýchkoli informací, které jsou lépe sdělovány hlasem než textem.
 
 ## Základní specifikace XLSForm
 
 | type  | name        | label                        |
 |-------|-------------|------------------------------|
-| audio | voice_note  | Nahrajte prosím své komentáře  |
+| audio | voice_note  | Nahrajte své komentáře       |
 
 Další podrobnosti o standardním typu audio otázky naleznete ve [specifikaci XLSForm](https://xlsform.org/en/#question-types).
 
@@ -17,32 +17,32 @@ Další podrobnosti o standardním typu audio otázky naleznete ve [specifikaci 
 
 Audio otázky se běžně používají pro:
 
-1. Zachycení otevřených slovních odpovědí pro snížení zátěže tazatele při psaní
-2. Nahrávání svědectví, osobních příběhů nebo ústní historie
-3. Dokumentování zvuků okolí (např. hladiny hluku v blízkosti infrastruktury)
-4. Sbírání hlasových vzorků pro lingvistický nebo zdravotní výzkum
-5. Umožnění respondentům přidat slovní vysvětlení k číselným nebo výběrovým odpovědím
+1. Zachycení otevřených slovních odpovědí pro snížení zátěže při psaní tazatele
+2. Nahrávání svědectví, osobních příběhů nebo ústních historií
+3. Dokumentování zvuků prostředí (např. úrovně hluku v blízkosti infrastruktury)
+4. Sběr hlasových vzorků pro lingvistický nebo zdravotnický výzkum
+5. Umožnění respondentům přidat slovní objasnění k číselným nebo výběrovým odpovědím
 
-## Datový formát
+## Formát dat
 
-Audio soubory jsou ukládány jako binární přílohy spolu s odeslaným formulářem, obvykle:
+Zvukové soubory jsou ukládány jako binární přílohy společně s odesláním formuláře, typicky:
 
-- **Formát:** MP3 nebo AAC (mobilní nahrávání); WAV (vysoká kvalita nahrávání)
-- **Pojmenování:** `{instanceID}-{fieldname}.mp3` (nebo ekvivalent)
-- **Úložiště:** Nahráno do složky médií na serveru a propojeno se záznamem o odeslání
-- **Přístup:** Přehratelné a stažitelné z rozhraní pro správu odeslaných dat
+- **Formát:** MP3 nebo AAC (mobilní nahrávání); WAV (vysoce kvalitní nahrávání)
+- **Pojmenování:** `{instanceID}-{fieldname}.mp3` (nebo ekvivalentní)
+- **Úložiště:** Nahráno do složky médií serveru a propojeno se záznamem odeslání
+- **Přístup:** Přehratelné a stahovatelné z rozhraní pro správu odeslaných dat
 
 ## Rozšíření rtSurvey
 
 ### Maximální délka
 
-Pro omezení délky nahrávky použijte sloupec `parameters`:
+Použijte sloupec `parameters` pro omezení délky nahrávání:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
 | audio | interview | Nahrajte rozhovor | `max-duration=120` |
 
-`max-duration` je v sekundách. Rekordér se automaticky zastaví po dosažení limitu.
+`max-duration` je v sekundách. Nahrávání se automaticky zastaví po dosažení limitu.
 
 ### Nastavení kvality
 
@@ -52,32 +52,32 @@ Kvalitu nahrávání lze nastavit pomocí `parameters`:
 |------|------|-------|------------|
 | audio | feedback | Nahrajte zpětnou vazbu | `quality=normal` |
 
-Podporované hodnoty: `low`, `normal` (výchozí), `voice-only`. `voice-only` optimalizuje pro mluvené slovo s redukcí šumu.
+Podporované hodnoty: `low`, `normal` (výchozí), `voice-only`. `voice-only` optimalizuje pro mluvené audio s redukcí šumu.
 
 ### Přehrávání před odesláním
 
-Na mobilu si tazatel může přehrát nahraný klip před pokračováním. Toto je povoleno ve výchozím nastavení — není nutná žádná konfigurace.
+Na mobilních zařízeních může tazatel přehrát nahraný klip před pokračováním. Toto je ve výchozím nastavení povoleno – není potřeba žádná konfigurace.
 
-### Integrace s nativním rekordérem
+### Integrace nativního rekordéru
 
-Na Androidu a iOS spouští `audio` nativní aplikaci pro nahrávání v zařízení. Na webu používá vestavěné rozhraní MediaRecorder API prohlížeče.
+Na zařízeních Android a iOS spouští `audio` nativní nahrávací aplikaci zařízení. Na webu používá vestavěné rozhraní MediaRecorder API prohlížeče.
 
-### Vzhled s vloženým tlačítkem
+### Rozložení inline tlačítka
 
-Přidejte `inline` pro vykreslení mikrofonu jako **kruhového tlačítka s ikonou** vedle popisku.
+Přidejte `inline` pro vykreslení mikrofonu jako **kruhového ikonového tlačítka** vedle popisku.
 
 ```
 | type  | name | label        | appearance                    |
 |-------|------|--------------|-------------------------------|
-| audio | clip | Nahrajte zvuk | inline display{right}         |
-| audio | clip | Nahrajte zvuk | inline display{left, large}   |
+| audio | clip | Nahrát zvuk  | inline display{right}         |
+| audio | clip | Nahrát zvuk  | inline display{left, large}   |
 ```
 
 **Pozice tlačítka** — `left`, `right` *(výchozí)*, `top`, `center`, `bottom`
 
 **Velikost tlačítka** — `small` *(výchozí)*, `medium`, `large`
 
-**Barva tlačítka** — přidejte hex barvu uvnitř `display{}` pro přebití primární barvy:
+**Barva tlačítka** — přidejte hex barvu uvnitř `display{}` pro přepsání primární barvy:
 
 ```
 inline display{right, large, <FF5500/>}
@@ -87,12 +87,12 @@ inline display{right, large, <FF5500/>}
 
 | Appearance | Effect |
 |---|---|
-| `results{hide(capture)}` | Skryje tlačítko nahrávání po zachycení zvuku |
+| `results{hide(capture)}` | Skryje tlačítko záznamu po zachycení zvuku |
 | `results{hide(review)}` | Skryje tlačítko přehrávání |
 | `results{hide(filename)}` | Skryje název souboru a délku |
 | `results{left}` | Přesune ikonu doleva po zachycení |
 
-Příklad — skrytí tlačítka nahrávání po zachycení, zachování přehrávání:
+Příklad – skrytí tlačítka záznamu po zachycení, ponechání přehrávání:
 ```
 inline display{right} results{hide(capture)}
 ```
@@ -103,26 +103,26 @@ inline display{right} results{hide(capture)}
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| audio | story | Řekněte nám o incidentu vlastními slovy | Mluvte zřetelně. Nahrávání se zastaví po 3 minutách. | `max-duration=180` |
+| audio | story | Řekněte nám o události vlastními slovy | Mluvte zřetelně. Nahrávání se zastaví po 3 minutách. | `max-duration=180` |
 
-### Podmíněné audio — pouze pokud byl nahlášen problém
+### Podmíněné audio – pouze pokud byl nahlášen problém
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
 | select_one yesno | issue_found | Byl nalezen problém? | | |
 | audio | issue_audio | Nahrajte popis problému | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
-## Nejlepší postupy
+## Osvědčené postupy
 
-1. V popisku (`label`) nebo nápovědě (`hint`) jasně uveďte, co má tazatel říci a jak dlouho.
-2. Použijte `max-duration`, abyste zabránili vzniku příliš velkých souborů v oblastech s pomalým odesíláním.
-3. Před spuštěním nahrávání informujte respondenty — neočekávané nahrávání může vyvolat obavy o soukromí.
+1. V `label` nebo `hint` jasně uveďte, co má tazatel říci a jak dlouho.
+2. Použijte `max-duration` k zabránění nadměrně velkých souborů v oblastech s pomalými rychlostmi nahrávání.
+3. Informujte respondenty před zahájením nahrávání – neočekávané nahrávání může vyvolat obavy o soukromí.
 4. Před nasazením otestujte nahrávání na cílovém zařízení a v síťových podmínkách.
-5. Pro nahrávky typu rozhovoru nastavte `quality=voice-only`, abyste snížili velikost souboru bez ztráty srozumitelnosti.
+5. Nastavte `quality=voice-only` pro nahrávání ve stylu rozhovoru, abyste snížili velikost souboru bez ztráty srozumitelnosti.
 
 ## Omezení
 
-- Audio soubory mohou být velké (2minutová nahrávka v normální kvalitě má ~2–4 MB) — zohledněte to ve svém datovém tarifu a odhadech doby nahrávání.
-- Ne všechny prohlížeče podporují MediaRecorder API — Chrome a Firefox fungují spolehlivě; Safari na starších verzích iOS může mít problémy.
-- Přepis audio odpovědí vyžaduje dodatečné následné zpracování (ruční nebo automatizovaný převod řeči na text).
-- Předpisy o ochraně soukromí mohou omezovat nahrávání hlasů — ověřte si místní požadavky na ochranu osobních údajů.
+- Zvukové soubory mohou být velké (2minutová nahrávka v normální kvalitě je ~2–4 MB) – zohledněte to ve svém datovém plánu a odhadech doby nahrávání.
+- Ne všechny prohlížeče podporují MediaRecorder API – Chrome a Firefox fungují spolehlivě; Safari na starších verzích iOS může mít problémy.
+- Přepis zvukových odpovědí vyžaduje další post-processing (manuální nebo automatické převody řeči na text).
+- Předpisy o ochraně soukromí mohou omezovat nahrávání hlasů – ověřte místní požadavky na ochranu dat.
