@@ -34,38 +34,19 @@ Click **Create Linode** when done.
 
 The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
 
-You can watch progress directly in **Linode Cloud Manager** — no SSH required:
+**No console access needed.** Just open your browser and navigate to your domain (or the server IP) after about 2–3 minutes. You will see a branded loading page while the app finishes starting up:
 
-1. Go to your [Linode dashboard](https://cloud.linode.com/linodes)
-2. Click on your newly created Linode
-3. Click **Launch LISH Console** (top right of the Linode detail page)
+![rtCloud loading page shown while the server is starting](/img/deployment/linode-loading-page.png)
 
-A browser terminal opens showing the live boot log — the **Weblish** tab works directly in your browser, no SSH client needed.
+The page refreshes automatically every 20 seconds. Once the app is fully started, it loads automatically — no manual refresh needed.
 
-![Lish Console showing rtSurvey StackScript running](/img/first-login/lish-console.png)
-
-Wait until you see:
-
-```
-============================================================
- rtSurvey deployment complete!
-============================================================
- Server IP : <your-server-ip>
-
- App URL   : http://<your-server-ip>  (HTTP only until domain is set)
- Admin     : admin / admin
-============================================================
-```
-
-The log also shows your server IP — you will need it for the next step.
+> **Tip:** The server IP is shown in the [Linode dashboard](https://cloud.linode.com/linodes) on the Linode detail page. If DNS is already pointing to the server, you can use your domain name directly.
 
 ---
 
 ## Step 4 — Set up SSL
 
-Open your browser at `http://<server-ip>`. The app will redirect you to the SSL setup screen.
-
-Follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+Once the loading page disappears and the app is running, follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
 
 ---
 
