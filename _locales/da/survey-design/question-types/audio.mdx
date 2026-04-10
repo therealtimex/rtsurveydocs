@@ -3,25 +3,25 @@ title: "Lyd"
 description: "Lydspørgsmål gør det muligt for respondenter at optage og indsende lydfiler som en del af undersøgelsen."
 ---
 
-Spørgsmålstypen `audio` gør det muligt for respondenter at **optage lyd** eller uploade en eksisterende lydfil som en del af deres svar i undersøgelsen. Det er nyttigt til at fange mundtlige beretninger, omgivelseslyde, vidnesbyrd eller enhver information, der formidles bedre gennem stemme end tekst.
+Spørgsmålstypen `audio` gør det muligt for respondenter at **optage lyd** eller uploade en eksisterende lydfil som en del af deres undersøgelsesrespons. Det er nyttigt til at fange verbale beretninger, miljølyde, udtalelser eller enhver information, der bedre formidles gennem stemme end tekst.
 
 ## Grundlæggende XLSForm-specifikation
 
-| type  | name        | label                        |
-|-------|-------------|------------------------------|
-| audio | voice_note  | Optag venligst dine kommentarer |
+| type | name | label |
+|---|---|---|
+| audio | voice_note | Venligst optag dine kommentarer |
 
-For flere detaljer om standardlydspørgsmålstypen, se [XLSForm-specifikationen](https://xlsform.org/en/#question-types).
+For flere detaljer om standard lydspørgsmålstypen, se [XLSForm specification](https://xlsform.org/en/#question-types).
 
-## Anvendelsesmuligheder
+## Anvendelser
 
 Lydspørgsmål bruges ofte til:
 
-1. At fange åbne mundtlige svar for at reducere interviewerens skrivearbejde
-2. Optagelse af vidnesbyrd, personlige historier eller mundtlig historie
-3. Dokumentation af omgivelseslyde (f.eks. støjniveauer nær infrastruktur)
-4. Indsamling af stemmeprøver til sproglig eller sundhedsmæssig forskning
-5. At give respondenter mulighed for at tilføje mundtlige præciseringer til numeriske svar eller svar baseret på valg
+1. At fange åbne verbale svar for at reducere byrden ved indtastning for intervieweren
+2. Optagelse af udtalelser, personlige historier eller mundtlige historier
+3. Dokumentation af miljølyde (f.eks. støjniveauer nær infrastruktur)
+4. Indsamling af stemmeprøver til sproglig eller sundhedsforskning
+5. Gør det muligt for respondenter at tilføje verbale præciseringer til numeriske eller udvalgte svar
 
 ## Dataformat
 
@@ -29,55 +29,55 @@ Lydfiler gemmes som binære vedhæftede filer sammen med formularen, typisk:
 
 - **Format:** MP3 eller AAC (mobiloptagelse); WAV (højkvalitetsoptagelse)
 - **Navngivning:** `{instanceID}-{fieldname}.mp3` (eller tilsvarende)
-- **Lagring:** Uploadet til serverens mediemappe og knyttet til indsendelsesposten
-- **Adgang:** Kan afspilles og downloades fra indsendelsesstyringsgrænsefladen
+- **Opbevaring:** Uploades til serverens mediemappe og linkes til indsendelsesposten
+- **Adgang:** Kan afspilles og downloades fra grænsefladen til administration af indsendelser
 
-## rtSurvey-udvidelser
+## rtSurvey udvidelser
 
 ### Maksimal varighed
 
-Brug kolonnen `parameters` til at begrænse optagelsens længde:
+Brug kolonnen `parameters` til at begrænse optagelseslængden:
 
 | type | name | label | parameters |
-|------|------|-------|------------|
+|---|---|---|---|
 | audio | interview | Optag interviewet | `max-duration=120` |
 
 `max-duration` er i sekunder. Optageren stopper automatisk ved grænsen.
 
 ### Kvalitetsindstillinger
 
-Optagekvaliteten kan indstilles via `parameters`:
+Optagelseskvaliteten kan indstilles via `parameters`:
 
 | type | name | label | parameters |
-|------|------|-------|------------|
+|---|---|---|---|
 | audio | feedback | Optag feedback | `quality=normal` |
 
-Understøttede værdier: `low`, `normal` (standard), `voice-only`. `voice-only` optimerer til talt lyd med støjreduktion.
+Understøttede værdier: `low`, `normal` (standard), `voice-only`. `voice-only` optimerer for talt lyd med støjreduktion.
 
 ### Afspilning før indsendelse
 
-På mobilen kan intervieweren afspille det optagede klip, før de fortsætter. Dette er aktiveret som standard — der kræves ingen konfiguration.
+På mobil kan intervieweren afspille det optagede klip, før de fortsætter. Dette er aktiveret som standard – ingen konfiguration er nødvendig.
 
-### Integration med indfødt optager
+### Integration af native optager
 
-På Android og iOS starter `audio` enhedens indfødte optagelsesapp. På web bruger den browserens indbyggede MediaRecorder API.
+På Android og iOS starter `audio` enhedens native optagelsesapp. På web bruger den browserens indbyggede MediaRecorder API.
 
-### Inline-knaplayout
+### Inline knaplayout
 
-Tilføj `inline` for at vise mikrofonen som en **cirkulær ikonknap** ved siden af etiketten.
+Add `inline` to render the microphone as a **circular icon button** next to the label.
 
 ```
-| type  | name | label        | appearance                    |
-|-------|------|--------------|-------------------------------|
-| audio | clip | Optag lyd    | inline display{right}         |
-| audio | clip | Optag lyd    | inline display{left, large}   |
+| type | name | label | appearance |
+|---|---|---|---|
+| audio | clip | Optag lyd | inline display{right} |
+| audio | clip | Optag lyd | inline display{left, large} |
 ```
 
-**Knapposition** — `left`, `right` *(standard)*, `top`, `center`, `bottom`
+**Knapposition** – `left`, `right` *(standard)*, `top`, `center`, `bottom`
 
-**Knapstørrelse** — `small` *(standard)*, `medium`, `large`
+**Knapstørrelse** – `small` *(standard)*, `medium`, `large`
 
-**Knapfarve** — tilføj en hex-farve inde i `display{}` for at overstyre den primære farve:
+**Knapfarve** – tilføj en hex-farve inde i `display{}` for at overskrive primærfarven:
 
 ```
 inline display{right, large, <FF5500/>}
@@ -85,14 +85,14 @@ inline display{right, large, <FF5500/>}
 
 **Kontrol efter optagelse — `results{}`:**
 
-| Appearance | Effect |
+| Appearance | Effekt |
 |---|---|
-| `results{hide(capture)}` | Skjuler optageknappen efter lyd er optaget |
+| `results{hide(capture)}` | Skjuler optageknappen, når lyd er optaget |
 | `results{hide(review)}` | Skjuler afspilningsknappen |
 | `results{hide(filename)}` | Skjuler filnavn og varighed |
-| `results{left}` | Flytter ikonet til venstre efter optagelse |
+| `results{left}` | Flytter ikon til venstre efter optagelse |
 
-Eksempel — skjul optageknap efter optagelse, behold afspilning:
+Eksempel – skjul optageknap efter optagelse, behold afspilning:
 ```
 inline display{right} results{hide(capture)}
 ```
@@ -102,27 +102,27 @@ inline display{right} results{hide(capture)}
 ### Med maksimal varighed og hint
 
 | type | name | label | hint | parameters |
-|------|------|-------|------|------------|
+|---|---|---|---|---|
 | audio | story | Fortæl os om hændelsen med dine egne ord | Tal tydeligt. Optagelsen stopper efter 3 minutter. | `max-duration=180` |
 
-### Betinget lyd — kun hvis et problem blev rapporteret
+### Betinget lyd – kun hvis et problem blev rapporteret
 
 | type | name | label | relevant | required |
-|------|------|-------|----------|----------|
+|---|---|---|---|---|
 | select_one yesno | issue_found | Blev der fundet et problem? | | |
 | audio | issue_audio | Optag en beskrivelse af problemet | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
 ## Bedste praksis
 
-1. Angiv tydeligt i `label` eller `hint`, hvad intervieweren skal sige og hvor længe.
-2. Brug `max-duration` for at forhindre for store filer i områder med langsomme upload-hastigheder.
-3. Informer respondenterne, før optagelsen startes — uventet optagelse kan give anledning til bekymring om privatlivets fred.
+1. Angiv tydeligt i `label` eller `hint`, hvad intervieweren skal sige, og hvor længe.
+2. Brug `max-duration` for at forhindre unødigt store filer i områder med langsomme uploadhastigheder.
+3. Informer respondenter, før optagelsen startes – uventet optagelse kan give anledning til privatlivsproblemer.
 4. Test optagelse på målenheden og netværksforholdene før udrulning.
-5. Indstil `quality=voice-only` til optagelser i interviewstil for at reducere filstørrelsen uden at miste forståelighed.
+5. Indstil `quality=voice-only` for optagelser i interviewstil for at reducere filstørrelsen uden at miste forståeligheden.
 
 ## Begrænsninger
 
-- Lydfiler kan være store (en 2-minutters optagelse ved normal kvalitet er ~2–4 MB) — tag højde for dette i din dataplan og estimater for uploadtid.
-- Ikke alle browsere understøtter MediaRecorder API — Chrome og Firefox fungerer pålideligt; Safari på ældre iOS-versioner kan have problemer.
-- Transskription af lydsvar kræver yderligere efterbehandling (manuel eller automatiseret tale-til-tekst).
-- Privatlivslovgivning kan begrænse optagelse af stemmer — kontroller lokale krav til databeskyttelse.
+- Lydfiler kan være store (en 2-minutters optagelse med normal kvalitet er ~2–4 MB) – medregn dette i din dataplan og estimater for uploadtid.
+- Ikke alle browsere understøtter MediaRecorder API – Chrome og Firefox fungerer pålideligt; Safari på ældre iOS-versioner kan have problemer.
+- Transskription af lydsvar kræver yderligere efterbehandling (manuel eller automatisk tale-til-tekst).
+- Privatlivslovgivning kan begrænse optagelse af stemmer – kontroller lokale databeskyttelseskrav.

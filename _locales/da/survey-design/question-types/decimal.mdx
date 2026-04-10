@@ -1,33 +1,33 @@
 ---
 title: "Decimal"
-description: "Spørgsmålstype til indtastning af decimaltal i rtSurvey"
+description: "Brøknumeric input spørgsmålstype i rtSurvey"
 ---
 
-Spørgsmålstypen `decimal` indsamler tal, der kan indeholde en brøkdel (f.eks. `3.14`, `72.5`). Den udløser et numerisk tastatur på mobilenheder og understøtter de samme visningsmuligheder (appearance options) som typen `text` til layout og formatering.
+Spørgsmålstypen `decimal` indsamler tal, der kan inkludere en brøkdel (f.eks. `3.14`, `72.5`). Den udløser et numerisk tastatur på mobil og understøtter de samme appearance-muligheder som `text`-typen for layout og formatering.
 
 ## Grundlæggende XLSForm-specifikation
 
 | type | name | label |
-|------|------|-------|
+|---|---|---|
 | decimal | weight_kg | Vægt (kg) |
 | decimal | height_m | Højde (m) |
 | decimal | temperature | Kropstemperatur (°C) |
 
-For standard-specifikationen, se [XLSForm-dokumentationen](https://xlsform.org/en/#question-types).
+For standard specifikationen se [XLSForm documentation](https://xlsform.org/en/#question-types).
 
 ---
 
-## Visningsmuligheder (Appearance options)
+## Appearance-muligheder
 
 ### `number-hspinner` — horisontal spinner
 
-Erstatter inputfeltet med en horisontal **− værdi +** spinner. Ved at trykke på minus/plus justeres værdien med det konfigurerede trin (step).
+Erstatter inputfeltet med en horisontal **− værdi +** spinner. Ved at trykke på minus/plus justeres værdien med det konfigurerede trin.
 
 ```
 number-hspinner
 ```
 
-Den viste værdi formateres med én decimal (f.eks. `3.0`, `72.5`). Standardtrin er `1`; brug `hspinner()` til at angive et decimaltrin.
+Den viste værdi formateres med én decimal (f.eks. `3.0`, `72.5`). Standardtrin er `1`; brug `hspinner()` til at indstille et decimaltrin.
 
 **Tilpas knapform og trin** ved hjælp af `hspinner()`:
 
@@ -35,7 +35,7 @@ Den viste værdi formateres med én decimal (f.eks. `3.0`, `72.5`). Standardtrin
 number-hspinner hspinner('left-small-square','right-small-square','0.1')
 ```
 
-Parametre: venstre knapform, højre knapform, trinværdi. Brug et decimaltrin som `0.5` eller `0.1` for finmasket kontrol.
+Parametre: venstre knapform, højre knapform, trinværdi. Brug et decimaltrin som `0.5` eller `0.1` for finjusteret kontrol.
 
 **Brugerdefinerede farver** ved hjælp af `colors()`:
 
@@ -43,13 +43,13 @@ Parametre: venstre knapform, højre knapform, trinværdi. Brug et decimaltrin so
 number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
 ```
 
-Fire værdier i rækkefølge: venstre knaps baggrund, venstre knaps ikon, højre knaps baggrund, højre knaps ikon.
+Fire værdier i rækkefølge: venstre-knap baggrund, venstre-knap ikon, højre-knap baggrund, højre-knap ikon.
 
 ---
 
 ### `thousandsep` — tusindtalsseparator
 
-Formaterer det viste tal med tusindtalsseparering (f.eks. `1,234.56`). Råtallet gemmes uden kommaer. Inputtypen skifter til `"text"` for at tillade den formaterede visning.
+Formaterer det viste tal med komma-gruppering (f.eks. `1,234.56`). Det rå tal gemmes uden kommaer. Inputtypen skiftes til `"text"` for at tillade den formaterede visning.
 
 ```
 thousandsep
@@ -57,21 +57,21 @@ thousandsep
 
 ---
 
-### `digisep(n, "sep")` — brugerdefineret talkombination
+### `digisep(n, "sep")` — brugerdefineret ciffergruppering
 
-Grupperer cifre i heltalsdelen i blokke af `n` adskilt af en brugerdefineret separator.
+Grupperer hele tal-cifre i blokke af `n` adskilt af en brugerdefineret separator.
 
 ```
 digisep(3," ")      → 1 234 567.89
 ```
 
-Inputtypen skifter til `"text"`, når denne visningsmulighed er aktiv.
+Inputtypen skiftes til `"text"`, når denne appearance er aktiv.
 
 ---
 
-### `textonly` — gennemtving teksttastatur
+### `textonly` — tving teksttastatur
 
-Gennemtvinger `type="text"` på input-elementet. Forhindrer browserens tal-input-særheder (skjuler efterfølgende nuller, desktop-pile) mens decimalværdier stadig accepteres.
+Tvinger `type="text"` på inputelementet. Forhindrer browserens nummertastatur-særheder (skjule efterfølgende nuller, desktop-spinpile), samtidig med at den stadig accepterer decimalværdier.
 
 ```
 textonly
@@ -79,9 +79,9 @@ textonly
 
 ---
 
-### `floating_hint` — hint svæver som label
+### `floating_hint` — hint flyder som etiket
 
-`hint`-teksten vises inde i inputfeltet som en pladsholder (placeholder). Når brugeren begynder at skrive, svæver den over feltet som en label.
+`hint`-teksten gengives inde i inputfeltet som en pladsholder. Når brugeren begynder at skrive, flyder den over feltet som en etiket.
 
 ```
 floating_hint
@@ -89,9 +89,9 @@ floating_hint
 
 ---
 
-### `embed` — hint inde i inputfeltets kant
+### `embed` — hint inde i inputfeltets grænse
 
-Svarer til `floating_hint` — hintet sidder inde i inputfeltets kant, når det er tomt. Det svæver ikke, når brugeren skriver.
+Ligner `floating_hint` — hintet sidder inde i inputfeltets grænse, når det er tomt. Det flyder ikke, når brugeren skriver.
 
 ```
 embed
@@ -99,9 +99,9 @@ embed
 
 ---
 
-### `textpopup` — modal dialog-indtastning
+### `textpopup` — modal dialog input
 
-Ved at trykke på feltet åbnes en modal dialog med et større indtastningsfelt. Nyttigt på små skærme.
+Ved at trykke på feltet åbnes en modal dialog med et større input. Nyttigt på små skærme.
 
 ```
 textpopup
@@ -111,7 +111,7 @@ textpopup
 
 ### `charcount` — live tegntæller
 
-Viser en live `(n)` tegntæller under feltet, som opdateres mens brugeren skriver.
+Viser en live `(n)` tegntæller under inputfeltet, der opdateres, når brugeren skriver.
 
 ```
 charcount
@@ -119,7 +119,7 @@ charcount
 
 ---
 
-### `prefix(expr)` — tilføj præfiks
+### `prefix(expr)` — tilføj et præfiks
 
 Tilføjer en statisk eller beregnet streng foran den viste værdi. Den gemte værdi inkluderer ikke præfikset.
 
@@ -132,7 +132,7 @@ prefix(${currency})     → dynamisk præfiks fra et andet felt
 
 ### `align_answer` — justering af inputtekst
 
-Styrer den horisontale justering af den indtastede værdi inde i feltet.
+Styrer den vandrette justering af den indtastede værdi inde i inputfeltet.
 
 ```
 align_answer = left
@@ -142,9 +142,9 @@ align_answer = center
 
 ---
 
-### `inputs{qrscan}` — QR / stregkodescan til feltet
+### `inputs{qrscan}` — QR / stregkode scanning til felt
 
-Tilføjer en QR-kodescanningsknap ved siden af feltet. Åbner kamera-scanneren og udfylder feltet med den scannede værdi.
+Tilføjer en QR-kode scanningsknap ved siden af inputfeltet. Åbner kamera-scanneren og udfylder feltet med den scannede værdi.
 
 ```
 inputs{qrscan}
@@ -152,31 +152,31 @@ inputs{qrscan}
 
 ---
 
-## Hurtig oversigt over visningsmuligheder (Appearance quick reference)
+## Appearance hurtig reference
 
-| Appearance | Widget rendered |
+| Appearance | Widget gengivet |
 |---|---|
-| *(none)* | Tal-indtastning (`type="number"`) — numerisk tastatur på mobilenheder |
+| *(ingen)* | Talinput (`type="number"`) — numerisk tastatur på mobil |
 | `number-hspinner` | Horisontal − værdi + spinner, én decimal vises |
 | `number-hspinner hspinner(...)` | Spinner med brugerdefineret knapform og trin |
 | `number-hspinner colors(...)` | Spinner med brugerdefinerede knapfarver |
-| `thousandsep` | Talvisning med tusindtalsseparator |
-| `digisep(n,"sep")` | Brugerdefineret talkombination |
-| `textonly` | Gennemtving teksttastatur |
-| `floating_hint` | Hint svæver over feltet under skrivning |
-| `embed` | Hint inde i inputfeltets kant |
+| `thousandsep` | Komma-grupperet talvisning |
+| `digisep(n,"sep")` | Brugerdefineret ciffergruppering |
+| `textonly` | Tving teksttastatur |
+| `floating_hint` | Hint flyder over feltet under indtastning |
+| `embed` | Hint inde i inputfeltets grænse |
 | `textpopup` | Tryk for at åbne modal dialog |
-| `charcount` | Live tegntæller under feltet |
+| `charcount` | Live tegntæller under inputfeltet |
 | `prefix(expr)` | Tilføj statisk eller dynamisk præfiks |
 | `align_answer = left/right/center` | Justering af inputtekst |
-| `inputs{qrscan}` | Knap til QR/stregkodescan |
+| `inputs{qrscan}` | QR/stregkode scanningsknap |
 
 ---
 
 ## Begrænsninger og validering
 
 | type | name | label | constraint | constraint_message |
-|------|------|-------|------------|-------------------|
+|---|---|---|---|---|
 | decimal | weight | Vægt (kg) | `. > 0 and . <= 500` | Indtast en værdi mellem 0 og 500 |
 | decimal | height | Højde (m) | `. > 0 and . <= 3` | Indtast en værdi mellem 0 og 3 |
 | decimal | temp | Temperatur (°C) | `. >= 35 and . <= 42` | Normal temperatur: 35°C–42°C |
@@ -184,29 +184,29 @@ inputs{qrscan}
 
 ---
 
-## Eksempel — måleskema
+## Eksempel — målingsformular
 
 | type | name | label | appearance | constraint | constraint_message |
-|------|------|-------|------------|------------|-------------------|
+|---|---|---|---|---|---|
 | decimal | weight_kg | Vægt (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Indtast en gyldig vægt |
 | decimal | height_m | Højde (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Indtast en gyldig højde |
 | calculate | bmi | | | | |
 
-Søjle til BMI-beregning:
+BMI beregningskolonne:
 ```
 ${weight_kg} div (${height_m} * ${height_m})
 ```
 
 ---
 
-## Best Practices
+## Bedste praksis
 
 1. Brug `number-hspinner hspinner(..., '0.1')` til målinger, der kræver én decimals præcision — spinneren formaterer automatisk til én decimal, hvilket holder værdierne konsistente.
-2. Brug `textonly` når browsere tilføjer uønskede spinner-kontroller eller fjerner efterfølgende nuller (f.eks. `3.0` vist som `3`).
-3. Brug `thousandsep` til store økonomiske værdier, så respondenterne kan bekræfte, at de har indtastet den korrekte størrelsesorden.
-4. Gennemfør intervalbegrænsninger (constraints) i stedet for kun at stole på mobiltastaturtypen.
+2. Brug `textonly` når browsere tilføjer uønskede spin-kontroller eller afkorter efterfølgende nuller (f.eks. `3.0` vist som `3`).
+3. Brug `thousandsep` for store finansielle værdier, så respondenter kan verificere, at de indtastede den korrekte størrelsesorden.
+4. Håndhæv intervalbegrænsninger i stedet for kun at stole på mobilens tastaturtype.
 
-## Begrænsninger (Limitations)
+## Begrænsninger
 
-- Spinneren viser altid én decimal — hvis du har brug for mere præcision i den viste værdi, skal du bruge det almindelige inputfelt i stedet.
-- `thousandsep` og `digisep()` gemmer råtallet — læs ikke den formaterede visningsværdi i beregningar.
+- Spinneren viser altid én decimal — hvis du har brug for mere præcision i den viste værdi, skal du bruge den almindelige inputfelt i stedet.
+- `thousandsep` og `digisep()` gemmer det rå tal — læs ikke den formaterede visningsværdi i beregninger.
