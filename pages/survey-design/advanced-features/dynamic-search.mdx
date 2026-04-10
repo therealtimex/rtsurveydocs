@@ -112,13 +112,27 @@ Default separator is a space.
 
 ## Using saved response data
 
-The `save_path` stores the full API response object under the given name. Other fields can reference it with `pulldata()`:
+When the enumerator selects a result, rtSurvey saves the full matching object from the response under the `save_path` name. Other fields can read from it in two ways.
+
+### Method 1 — `pulldata()` lookup
+
+Use `pulldata('save_path', 'key')` to read a top-level field from the saved object:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Select facility | `search-api(..., 'facility_data')` |
+| select_one | facility | Select facility | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+The appearance on the `select_one` row must include `search-api(..., 'facility_data')` with the matching `save_path`.
+
+For **nested JSON fields**, combine with `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
 
 ---
 
