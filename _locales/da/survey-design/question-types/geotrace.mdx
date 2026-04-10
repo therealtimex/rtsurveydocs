@@ -1,56 +1,56 @@
 ---
 title: "Geotrace"
-description: "Geotrace-spørgsmål indfanger en serie af GPS-punkter, der danner en linje eller sti."
+description: "Geotrace-spørgsmål registrerer en række GPS-punkter, der danner en linje eller sti."
 ---
 
-Spørgsmålstypen `geotrace` indfanger en sekvens af geografiske koordinater, der danner en linje eller sti (polyline). I rtSurveys webformular vises dette som et **tekstfelt**, hvor intervieweren (enumerator) indtaster eller indsætter koordinatstrengen direkte.
+`geotrace`-spørgsmålstypen registrerer en sekvens af geografiske koordinater, der danner en linje eller sti (polylinje). I rtSurveys webformular gengives dette som et **tekstfelt**, hvor indsamleren indtaster eller indsætter koordinatstrengen direkte.
 
 ## Grundlæggende XLSForm-specifikation
 
 | type     | name        | label                        |
 |----------|-------------|------------------------------|
-| geotrace | river_path  | Spor flodens sti |
-| geotrace | road_route  | Registrer vejens rute |
+| geotrace | river_path  | Spor flodens sti             |
+| geotrace | road_route  | Registrer vejrutten          |
 
-For den standardmæssige specifikation, se [XLSForm-dokumentationen](https://xlsform.org/en/#question-types).
+For den standardiserede specifikation se [XLSForm-dokumentationen](https://xlsform.org/en/#question-types).
 
 ---
 
-## Dataformat (Data Format)
+## Dataformat
 
-Gemmes som en semikolon-separeret liste af punkter **uden mellemrum omkring semikolonerne**. Hvert punkt er fire mellemrums-separerede værdier:
+Gemt som en semikolon-separeret liste af punkter **uden mellemrum omkring semikolonerne**. Hvert punkt er fire mellemrum-separerede værdier:
 
 ```
 lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-| Component | Description |
-|-----------|-------------|
-| `lat` | Breddegrad i decimalgrader |
-| `lon` | Længdegrad i decimalgrader |
-| `alt` | Højde i meter (`0` hvis ukendt) |
-| `acc` | GPS-nøjagtighed i meter (`0` hvis ukendt) |
+| Komponent | Beskrivelse                 |
+|-----------|-----------------------------|
+| `lat`     | Breddegrad i decimalgrader  |
+| `lon`     | Længdegrad i decimalgrader  |
+| `alt`     | Højde i meter (`0` hvis ukendt) |
+| `acc`     | GPS-nøjagtighed i meter (`0` hvis ukendt) |
 
-**Eksempel — en sti med tre punkter:**
+**Eksempel – en tre-punkts sti:**
 ```
 13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
 ```
 
-Der kræves mindst to punkter for at danne en gyldig sti.
+Et minimum på to punkter er påkrævet for at danne en gyldig sti.
 
 ---
 
-## Hvordan det vises i rtSurvey
+## Sådan gengives det i rtSurvey
 
-I rtSurveys webformular vises `geotrace` som et simpelt **tekstfelt**. Intervieweren skriver eller indsætter koordinatstrengen. Der er ingen indbygget interaktiv kortvælger til denne type i den nuværende webformular.
+I rtSurvey-webformularen gengives `geotrace` som et almindeligt **tekstfelt**. Indsamleren indtaster eller indsætter koordinatstrengen. Der er ingen indbygget interaktiv kortvælger til denne type i den nuværende webformular.
 
 ### Indsamling af punkter interaktivt
 
-Det anbefalede mønster til indsamling i marken er en **gentagelsesgruppe (repeat group) af `geopoint`-spørgsmål** — hvert punkt bruger den fulde GPS-kortvælger — kombineret med en `calculate` til at generere geotrace-strengen:
+Den anbefalede metode til feltindsamling er en **gentagelsesgruppe af `geopoint`-spørgsmål** – hvor hvert punkt bruger den fulde GPS-kortvælger – kombineret med en `calculate` til at producere geotrace-strengen:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| begin repeat | path_points | Registrer hvert rutepunkt | |
+| begin repeat | path_points | Registrer hvert waypoint | |
 | geopoint | point | Tryk for at registrere punkt | |
 | end repeat | path_points | | |
 | calculate | geotrace_value | | `join(';', ${path_points/point})` |
@@ -63,19 +63,19 @@ Den beregnede streng kan derefter gemmes i et `text`-spørgsmål eller bruges i 
 
 | type | name | label | hint | required |
 |------|------|-------|------|----------|
-| geotrace | farm_boundary_path | Registrer adgangsstien til gården | Indtast hvert rutepunkt adskilt af semikolon | yes |
+| geotrace | farm_boundary_path | Registrer adgangsstien til gården | Indtast hvert waypoint adskilt af semikolon | yes |
 
 ---
 
 ## Bedste praksis
 
-1. Brug en gentagelsesgruppe af `geopoint`-spørgsmål til interaktiv kortbaseret indsamling, og kombiner derefter værdierne — dette giver interviewerene en GPS-vælger for hvert enkelt punkt.
-2. Inkluder det forventede format i kolonnen `hint`, når manuel koordinatindtastning er påkrævet.
-3. Valider tilstedeværelsen med `required = yes`, når stien er obligatorisk.
-4. Planlæg datarensning — stier indtastet manuelt kan have inkonsekvent præcision.
+1. Brug en gentagelsesgruppe af `geopoint`-spørgsmål til interaktiv kortbaseret indsamling, og sammenkæd derefter værdierne – dette giver indsamlere en GPS-vælger for hvert enkelt punkt.
+2. Inkluder det forventede format i `hint`-kolonnen, når manuel koordinatindtastning er påkrævet.
+3. Valider tilstedeværelse med `required = yes`, når stien er obligatorisk.
+4. Planlæg for datarensning – stier, der indtastes manuelt, kan have inkonsekvent præcision.
 
-## Begrænsninger (Limitations)
+## Begrænsninger
 
-- Der er ingen indbygget interaktiv kortvælger til `geotrace` i rtSurveys webformular.
-- Koordinatstrengen kan blive lang for komplekse stier — vær opmærksom på dette i forhold til formularens ydeevne og lagring.
-- Validering af stitopologi (f.eks. minimum antal punkter, selv-krydsning) kræver efterbehandling uden for XLSForm-begrænsninger.
+- Der er ingen indbygget interaktiv kortvælger til `geotrace` i rtSurvey-webformularen.
+- Koordinatstrengen kan være lang for komplekse stier – husk dette for formularens ydeevne og lagring.
+- Validering af stitopologi (f.eks. minimum antal punkter, selvskæring) kræver efterbehandling uden for XLSForm-begrænsninger.

@@ -1,54 +1,54 @@
 ---
 title: "Geoshape"
-description: "Geoshape-spørgsmål fanger en lukket polygon defineret af en sekvens af GPS-punkter."
+description: "Geoshape-spørgsmål registrerer en lukket polygon defineret af en sekvens af GPS-punkter."
 ---
 
-Spørgsmålstypen `geoshape` fanger en lukket polygon — en række GPS-koordinater, hvor det første og det sidste punkt er det samme. I rtSurveys webformular runderes dette som et **tekstindtastningsfelt**, hvor tælleren (enumerator) indtaster eller indsætter koordinatstrengen direkte.
+`geoshape`-spørgsmålstypen registrerer en lukket polygon – en række GPS-koordinater, hvor det første og sidste punkt er det samme. I rtSurveys webformular gengives dette som et **tekstfelt**, hvor indsamleren indtaster eller indsætter koordinatstrengen direkte.
 
 ## Grundlæggende XLSForm-specifikation
 
 | type     | name        | label                            |
 |----------|-------------|----------------------------------|
-| geoshape | field_area  | Tegn markens grænse              |
-| geoshape | zone        | Registrer zonens grænse          |
+| geoshape | field_area  | Tegn grænsen for feltet          |
+| geoshape | zone        | Registrer zonegrænsen            |
 
-For standard-specifikationen, se [XLSForm-dokumentationen](https://xlsform.org/en/#question-types).
+For den standardiserede specifikation se [XLSForm-dokumentationen](https://xlsform.org/en/#question-types).
 
 ---
 
-## Datatransformat
+## Dataformat
 
-Gemmes som en semikolonsepareret liste over punkter med **ingen mellemrum omkring semikolonerne**. Hvert punkt består af fire mellemrumsseparerede værdier:
+Gemt som en semikolon-separeret liste af punkter **uden mellemrum omkring semikolonerne**. Hvert punkt er fire mellemrum-separerede værdier:
 
 ```
 lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-| Component | Description |
-|-----------|-------------|
-| `lat` | Breddegrad i decimalgrader |
-| `lon` | Længdegrad i decimalgrader |
-| `alt` | Højde i meter (`0` hvis ukendt) |
-| `acc` | GPS-præcision i meter (`0` hvis ukendt) |
+| Komponent | Beskrivelse                 |
+|-----------|-----------------------------|
+| `lat`     | Breddegrad i decimalgrader  |
+| `lon`     | Længdegrad i decimalgrader  |
+| `alt`     | Højde i meter (`0` hvis ukendt) |
+| `acc`     | GPS-nøjagtighed i meter (`0` hvis ukendt) |
 
-**Polygonen skal være lukket** — det sidste punkt skal være lig med det første punkt.
+**Polygonen skal være lukket** – det sidste punkt skal være lig med det første punkt.
 
-**Eksempel — en polygon med fire punkter (trekant, lukket):**
+**Eksempel – en fire-punkts polygon (trekant, lukket):**
 ```
 13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
 ```
 
-Der kræves minimum tre forskellige punkter plus den afsluttende gentagelse for at danne en gyldig polygon.
+Et minimum på tre distinkte punkter plus den afsluttende gentagelse er påkrævet for at danne en gyldig polygon.
 
 ---
 
-## Hvordan det runderes i rtSurvey
+## Sådan gengives det i rtSurvey
 
-I rtSurveys webformular runderes `geoshape` som et almindeligt **tekstfelt**. Tælleren skriver eller indsætter koordinatstrengen. Der er ingen indbygget interaktiv polygon-kortvælger til denne type i den nuværende webformular.
+I rtSurvey-webformularen gengives `geoshape` som et almindeligt **tekstfelt**. Indsamleren indtaster eller indsætter koordinatstrengen. Der er ingen indbygget interaktiv polygonkortvælger til denne type i den nuværende webformular.
 
 ### Indsamling af polygonpunkter interaktivt
 
-Det anbefalede mønster til feltindsamling er en **gentagelsesgruppe af `geopoint`-spørgsmål** — hvert toppunkt bruger den fulde GPS-kortvælger — kombineret med en `calculate` til at producere geoshape-strengen:
+Den anbefalede metode til feltindsamling er en **gentagelsesgruppe af `geopoint`-spørgsmål** – hvor hvert hjørne bruger den fulde GPS-kortvælger – kombineret med en `calculate` til at producere geoshape-strengen:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -57,7 +57,7 @@ Det anbefalede mønster til feltindsamling er en **gentagelsesgruppe af `geopoin
 | end repeat | polygon_points | | |
 | calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
 
-Efter sammenføjning skal du tilføje det første punkt manuelt for at lukke polygonen, eller bruge en anden calculate til at sammenkæde det.
+Efter at have joinet, skal det første punkt tilføjes manuelt for at lukke polygonen, eller brug en anden `calculate` til at sammenkæde den.
 
 ---
 
@@ -65,21 +65,21 @@ Efter sammenføjning skal du tilføje det første punkt manuelt for at lukke pol
 
 | type | name | label | hint | required |
 |------|------|-------|------|----------|
-| geoshape | farm_boundary | Registrer markens grænse | Indtast alle hjørner adskilt af semikolon. Første og sidste punkt skal være det samme. | yes |
+| geoshape | farm_boundary | Registrer feltgrænsen | Indtast alle hjørner adskilt af semikolon. Første og sidste punkt skal være det samme. | yes |
 
 ---
 
-## Best Practices
+## Bedste praksis
 
-1. Brug en gentagelsesgruppe af `geopoint`-spørgsmål til interaktiv kortbaseret indsamling og sammenføj værdierne — dette giver tællere en GPS-vælger til hvert toppunkt.
-2. Luk altid polygonen (gentag det første punkt til sidst) før indsendelse.
-3. Inkluder det forventede format i kolonnen `hint`, når manuel koordinatindtastning er påkrævet.
-4. Kræv mindst 3 forskellige hjørnepunkter for en gyldig polygon — gennemtving dette via instruktioner snarere end XLSForm-begrænsninger (constraints).
-5. Brug `geopoint` til enkelt-lokationsspørgsmål og `geoshape` kun, når afgrænsning af et område er det faktiske formål med undersøgelsen.
+1. Brug en gentagelsesgruppe af `geopoint`-spørgsmål til interaktiv kortbaseret indsamling og sammenkæd værdierne – dette giver indsamlere en GPS-vælger for hvert hjørne.
+2. Luk altid polygonen (gentag det første punkt til sidst), før du indsender.
+3. Inkluder det forventede format i `hint`-kolonnen, når manuel koordinatindtastning er påkrævet.
+4. Kræv mindst 3 forskellige hjørnepunkter for en gyldig polygon – håndhæv dette gennem instruktioner snarere end XLSForm-begrænsninger.
+5. Brug `geopoint` til enkelt-lokationsspørgsmål og `geoshape` kun, når områdemarkering er det faktiske undersøgelsesmål.
 
-## Begrænsninger (Limitations)
+## Begrænsninger
 
-- Der er ingen indbygget interaktiv polygon-kortvælger til `geoshape` i rtSurveys webformular.
-- Polygonen skal lukkes manuelt — der er ingen automatisk lukkemekanisme i tekstindtastningstilstand.
-- Validering af polygontopologi (f.eks. ingen selv-skæring, minimumsareal) kræver efterbehandling uden for XLSForm-begrænsninger.
-- Lange grænser med mange toppunkter producerer store tekststrenge.
+- Der er ingen indbygget interaktiv polygonkortvælger til `geoshape` i rtSurvey-webformularen.
+- Polygonen skal lukkes manuelt – der er ingen automatisk lukkemekanisme i tekstindtastningstilstanden.
+- Validering af polygontopologi (f.eks. ikke-selvskærende, minimumsareal) kræver efterbehandling uden for XLSForm-begrænsninger.
+- Lange grænser med mange hjørner producerer store tekststrenge.
