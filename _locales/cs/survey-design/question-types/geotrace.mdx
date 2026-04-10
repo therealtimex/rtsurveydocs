@@ -1,61 +1,61 @@
 ---
-title: "Geotrace"
-description: "Otázky typu Geotrace zachycují sérii GPS bodů tvořících linii nebo cestu."
+title: "Geostopa"
+description: "Otázky typu Geotrace zaznamenávají řadu bodů GPS tvořících čáru nebo cestu."
 ---
 
-Typ otázky `geotrace` zachycuje sekvenci geografických souřadnic tvořících linii nebo cestu (polyline). Ve webovém formuláři rtSurvey se vykresluje jako **textový vstup**, kam tazatel (enumerator) zadává nebo vkládá řetězec souřadnic přímo.
+Typ otázky `geotrace` zachycuje sekvenci geografických souřadnic tvořících čáru nebo cestu (polyline). Ve webovém formuláři rtSurvey se to zobrazuje jako **textové pole**, kam tazatel zadává nebo vkládá řetězec souřadnic přímo.
 
 ## Základní specifikace XLSForm
 
 | type     | name        | label                        |
 |----------|-------------|------------------------------|
-| geotrace | river_path  | Sledujte cestu řeky |
-| geotrace | road_route  | Zaznamenejte trasu silnice |
+| geotrace | river_path  | Vytresujte cestu řeky        |
+| geotrace | road_route  | Zaznamenejte trasu silnice    |
 
-Pro standardní specifikaci viz [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
+Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en/#question-types).
 
 ---
 
-## Formát dat (Data Format)
+## Formát dat
 
-Uloženo jako seznam bodů oddělených středníkem **bez mezer kolem středníků**. Každý bod tvoří čtyři hodnoty oddělené mezerou:
+Ukládá se jako středníkem oddělený seznam bodů **bez mezer kolem středníků**. Každý bod se skládá ze čtyř hodnot oddělených mezerou:
 
 ```
 lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-| Component | Description |
-|-----------|-------------|
-| `lat` | Zeměpisná šířka v desetinných stupních |
-| `lon` | Zeměpisná délka v desetinných stupních |
-| `alt` | Nadmořská výška v metrech (`0`, pokud není známa) |
-| `acc` | Přesnost GPS v metrech (`0`, pokud není známa) |
+| Komponenta | Popis                                |
+|------------|--------------------------------------|
+| `lat`      | Zeměpisná šířka ve stupních          |
+| `lon`      | Zeměpisná délka ve stupních          |
+| `alt`      | Nadmořská výška v metrech (`0` pokud neznámá) |
+| `acc`      | Přesnost GPS v metrech (`0` pokud neznámá) |
 
-**Příklad — cesta o třech bodech:**
+**Příklad – tříbodová cesta:**
 ```
 13.756331 100.501762 15 8;13.758000 100.503000 14 6;13.760000 100.505000 13 5
 ```
 
-Pro vytvoření platné cesty jsou vyžadovány alespoň dva body.
+K vytvoření platné cesty jsou vyžadovány minimálně dva body.
 
 ---
 
 ## Jak se vykresluje v rtSurvey
 
-Ve webovém formuláři rtSurvey se `geotrace` vykresluje jako prosté **textové pole**. Tazatel zapíše nebo vloží řetězec souřadnic. V současném webovém formuláři pro tento typ neexistuje žádný vestavěný interaktivní výběr z mapy.
+Ve webovém formuláři rtSurvey se `geotrace` vykresluje jako obyčejné **textové pole**. Tazatel zadá nebo vloží řetězec souřadnic. V současné webové formě pro tento typ není vestavěný interaktivní nástroj pro výběr na mapě.
 
 ### Interaktivní sběr bodů
 
-Doporučený vzorec pro sběr v terénu je **skupina opakování (repeat group) s otázkami `geopoint`** — každý bod využívá plnohodnotný výběr z GPS mapy — v kombinaci s funkcí `calculate` pro vytvoření řetězce geotrace:
+Doporučený vzor pro sběr v terénu je **opakovaná skupina otázek `geopoint`** – každý bod používá plný výběr GPS mapy – v kombinaci s `calculate` pro vytvoření řetězce geotrace:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| begin repeat | path_points | Zaznamenejte každý trasový bod | |
-| geopoint | point | Klepnutím zaznamenejte bod | |
+| begin repeat | path_points | Zaznamenejte každý průjezdní bod | |
+| geopoint | point | Klepněte pro zaznamenání bodu | |
 | end repeat | path_points | | |
 | calculate | geotrace_value | | `join(';', ${path_points/point})` |
 
-Vypočtený řetězec lze poté uložit do otázky typu `text` nebo použít v `geotrace`.
+Vypočtený řetězec pak může být uložen v otázce typu `text` nebo použit v `geotrace`.
 
 ---
 
@@ -63,19 +63,19 @@ Vypočtený řetězec lze poté uložit do otázky typu `text` nebo použít v `
 
 | type | name | label | hint | required |
 |------|------|-------|------|----------|
-| geotrace | farm_boundary_path | Zaznamenejte přístupovou cestu k farmě | Zadejte každý trasový bod oddělený středníkem | yes |
+| geotrace | farm_boundary_path | Zaznamenejte přístupovou cestu k farmě | Zadejte každý průjezdní bod oddělený středníky | yes |
 
 ---
 
 ## Nejlepší postupy
 
-1. Pro interaktivní sběr založený na mapě použijte skupinu opakování s otázkami `geopoint` a poté hodnoty spojte — to dává tazatelům GPS výběr pro každý jednotlivý bod.
-2. Pokud je vyžadováno ruční zadávání souřadnic, uveďte očekávaný formát v sloupci `hint`.
-3. Pokud je cesta povinná, ověřte přítomnost pomocí `required = yes`.
-4. Plánujte čištění dat — cesty zadané ručně mohou mít nekonzistentní přesnost.
+1. Použijte opakovanou skupinu otázek `geopoint` pro interaktivní sběr dat založený na mapě, a poté spojte hodnoty – to poskytuje tazatelům GPS výběr pro každý jednotlivý bod.
+2. Pokud je vyžadováno ruční zadání souřadnic, uveďte očekávaný formát ve sloupci `hint`.
+3. Ověřte přítomnost pomocí `required = yes`, když je cesta povinná.
+4. Plánujte čištění dat – ručně zadané cesty mohou mít nekonzistentní přesnost.
 
-## Omezení (Limitations)
+## Omezení
 
-- Ve webovém formuláři rtSurvey neexistuje žádný vestavěný interaktivní výběr z mapy pro `geotrace`.
-- Řetězec souřadnic může být u složitých cest dlouhý — mějte to na paměti z hlediska výkonu formuláře a úložiště.
-- Validace topologie cesty (např. minimální počet bodů, samoprotnutí) vyžaduje následné zpracování mimo omezení XLSForm.
+- Ve webovém formuláři rtSurvey není pro `geotrace` vestavěný interaktivní nástroj pro výběr na mapě.
+- Řetězec souřadnic může být dlouhý pro složité cesty – mějte to na paměti ohledně výkonu formuláře a úložiště.
+- Ověřování topologie cesty (např. minimální počet bodů, křížení se) vyžaduje následné zpracování mimo omezení XLSForm.

@@ -1,9 +1,9 @@
 ---
-title: "Geoshape"
-description: "Otázky typu geoshape zachycují uzavřený polygon definovaný sekvencí bodů GPS."
+title: "Geotvar"
+description: "Otázky typu Geoshape zaznamenávají uzavřený mnohoúhelník definovaný posloupností bodů GPS."
 ---
 
-Typ otázky `geoshape` zachycuje uzavřený polygon — řadu souřadnic GPS, kde první a poslední bod jsou stejné. Ve webovém formuláři rtSurvey se tento typ vykresluje jako **textové pole**, kam tazatel přímo zadává nebo vkládá řetězec souřadnic.
+Typ otázky `geoshape` zachycuje uzavřený mnohoúhelník – řadu souřadnic GPS, kde první a poslední bod jsou stejné. Ve webovém formuláři rtSurvey se to zobrazuje jako **textové pole**, kam tazatel zadává nebo vkládá řetězec souřadnic přímo.
 
 ## Základní specifikace XLSForm
 
@@ -18,46 +18,46 @@ Standardní specifikaci naleznete v [dokumentaci XLSForm](https://xlsform.org/en
 
 ## Formát dat
 
-Ukládá se jako seznam bodů oddělených středníkem **bez mezer kolem středníků**. Každý bod tvoří čtyři hodnoty oddělené mezerou:
+Ukládá se jako středníkem oddělený seznam bodů **bez mezer kolem středníků**. Každý bod se skládá ze čtyř hodnot oddělených mezerou:
 
 ```
 lat lon alt acc;lat lon alt acc;lat lon alt acc;lat lon alt acc
 ```
 
-| Komponenta | Popis |
-|-----------|-------------|
-| `lat` | Zeměpisná šířka v desítkových stupních |
-| `lon` | Zeměpisná délka v desítkových stupních |
-| `alt` | Nadmořská výška v metrech (`0`, pokud není známa) |
-| `acc` | Přesnost GPS v metrech (`0`, pokud není známa) |
+| Komponenta | Popis                                |
+|------------|--------------------------------------|
+| `lat`      | Zeměpisná šířka ve stupních          |
+| `lon`      | Zeměpisná délka ve stupních          |
+| `alt`      | Nadmořská výška v metrech (`0` pokud neznámá) |
+| `acc`      | Přesnost GPS v metrech (`0` pokud neznámá) |
 
-**Polygon musí být uzavřený** — poslední bod se musí rovnat prvnímu bodu.
+**Polygon musí být uzavřen** – poslední bod se musí rovnat prvnímu bodu.
 
-**Příklad — čtyřbodový polygon (trojúhelník, uzavřený):**
+**Příklad – čtyřbodový polygon (trojúhelník, uzavřený):**
 ```
 13.756331 100.501762 0 0;13.758000 100.503000 0 0;13.757000 100.506000 0 0;13.756331 100.501762 0 0
 ```
 
-K vytvoření platného polygonu jsou zapotřebí minimálně tři odlišné body plus uzavírací opakování.
+K vytvoření platného polygonu jsou vyžadovány minimálně tři různé body plus uzavírací opakování.
 
 ---
 
 ## Jak se vykresluje v rtSurvey
 
-Ve webovém formuláři rtSurvey se `geoshape` vykresluje jako prosté **textové pole**. Tazatel napíše nebo vloží řetězec souřadnic. V současném webovém formuláři není pro tento typ vestavěný interaktivní výběr polygonu na mapě.
+Ve webovém formuláři rtSurvey se `geoshape` vykresluje jako obyčejné **textové pole**. Tazatel zadá nebo vloží řetězec souřadnic. V současné webové formě pro tento typ není vestavěný interaktivní nástroj pro výběr polygonu na mapě.
 
 ### Interaktivní sběr bodů polygonu
 
-Doporučený vzor pro sběr v terénu je **skupina opakování otázek typu `geopoint`** — každý vrchol používá plnohodnotný výběr na mapě GPS — v kombinaci s výpočtem `calculate` pro vytvoření řetězce geoshape:
+Doporučený vzor pro sběr v terénu je **opakovaná skupina otázek `geopoint`** – každý vrchol používá plný výběr GPS mapy – v kombinaci s `calculate` pro vytvoření řetězce geoshape:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | begin repeat | polygon_points | Zaznamenejte každý roh | |
-| geopoint | point | Klepnutím zaznamenejte roh | |
+| geopoint | point | Klepněte pro zaznamenání rohu | |
 | end repeat | polygon_points | | |
 | calculate | geoshape_value | | `join(';', ${polygon_points/point})` |
 
-Po spojení ručně připojte první bod pro uzavření polygonu nebo použijte druhý výpočet `calculate` k jeho zřetězení.
+Po spojení ručně připojte první bod pro uzavření polygonu, nebo použijte druhý `calculate` pro zřetězení.
 
 ---
 
@@ -65,21 +65,21 @@ Po spojení ručně připojte první bod pro uzavření polygonu nebo použijte 
 
 | type | name | label | hint | required |
 |------|------|-------|------|----------|
-| geoshape | farm_boundary | Zaznamenejte hranici pole | Zadejte všechny rohy oddělené středníkem. První a poslední bod musí být stejné. | yes |
+| geoshape | farm_boundary | Zaznamenejte hranici pole | Zadejte všechny rohy oddělené středníky. První a poslední bod musí být stejný. | yes |
 
 ---
 
 ## Nejlepší postupy
 
-1. Pro interaktivní sběr na mapě použijte skupinu opakování otázek typu `geopoint` a hodnoty spojte — tazatelé tak získají výběr GPS pro každý vrchol.
-2. Před odesláním polygon vždy uzavřete (zopakujte první bod na konci).
-3. Pokud je vyžadováno ruční zadání souřadnic, uveďte očekávaný formát do sloupce `hint`.
-4. Vyžadujte alespoň 3 odlišné rohové body pro platný polygon — vynucujte to spíše pokyny než omezeními XLSForm.
-5. `geopoint` používejte pro otázky s jedním umístěním a `geoshape` pouze tehdy, když je skutečným cílem průzkumu vymezení oblasti.
+1. Použijte opakovanou skupinu otázek `geopoint` pro interaktivní sběr dat založený na mapě a spojte hodnoty – to poskytuje tazatelům GPS výběr pro každý vrchol.
+2. Vždy uzavřete polygon (opakujte první bod na konci) před odesláním.
+3. Pokud je vyžadováno ruční zadání souřadnic, uveďte očekávaný formát ve sloupci `hint`.
+4. Pro platný polygon vyžadujte minimálně 3 různé rohové body – vynucujte to spíše prostřednictvím pokynů než omezení XLSForm.
+5. Použijte `geopoint` pro otázky s jednou lokalitou a `geoshape` pouze tehdy, když je cílem průzkumu vymezení oblasti.
 
 ## Omezení
 
-- Ve webovém formuláři rtSurvey není pro `geoshape` vestavěný interaktivní výběr polygonu na mapě.
-- Polygon musí být uzavřen ručně — v režimu textového vstupu neexistuje žádný mechanismus automatického uzavírání.
-- Validace topologie polygonu (např. neprotínání se, minimální plocha) vyžaduje následné zpracování mimo omezení XLSForm.
-- Dlouhé hranice s mnoha vrcholy vytvářejí dlouhé textové řetězce.
+- Ve webovém formuláři rtSurvey není pro `geoshape` vestavěný interaktivní nástroj pro výběr polygonu na mapě.
+- Polygon musí být uzavřen ručně – v režimu textového vstupu neexistuje automatický mechanismus uzavírání.
+- Ověřování topologie polygonu (např. nekřížení se, minimální plocha) vyžaduje následné zpracování mimo omezení XLSForm.
+- Dlouhé hranice s mnoha vrcholy vytvářejí velké textové řetězce.

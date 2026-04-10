@@ -1,30 +1,30 @@
 ---
-title: "Calculate"
+title: "Výpočet"
 description: ""
 ---
 
-Otázky calculate v XLSForms a rtSurvey se používají pro provádění výpočtů na základě jiných polí nebo hodnot ve formuláři. Tyto otázky se uživateli nezobrazují, ale místo toho běží na pozadí a ukládají výsledky pro pozdější použití nebo odeslání.
+XLSForm a rtSurvey výpočetní otázky se používají k provádění výpočtů na základě jiných polí nebo hodnot formuláře. Tyto otázky nejsou zobrazeny uživateli, ale jsou prováděny na pozadí a ukládají své výsledky pro pozdější použití nebo odeslání.
 
 ## Syntaxe
 
-V XLSForm je otázka calculate definována takto:
+Výpočetní otázka XLSForm je definována následovně:
 
 | type      | name     | label | calculation |
 |-----------|----------|-------|-------------|
 | calculate | calc_q1  |       | `${q1}` + `${q2}` |
 
-- **type**: Vždy „calculate" pro tento typ otázky.
-- **name**: Jedinečný název pro otázku calculate.
-- **label**: Obvykle ponecháno prázdné, protože otázky calculate se uživatelům nezobrazují.
-- **calculation**: Vzorec, který má být vyhodnocen.
+- **type**: Pro tento typ otázky vždy "calculate".
+- **name**: Jedinečný název výpočetní otázky.
+- **label**: Obvykle se nechává prázdné, protože výpočetní otázky nejsou zobrazeny uživatelům.
+- **calculation**: Vyhodnocovaný vzorec.
 
-## Použití
+## Případy použití
 
-Otázky calculate se běžně používají pro:
+Výpočetní otázky se často používají pro:
 
 1. Provádění aritmetických operací
-2. Zřetězení řetězců
-3. Aplikaci složité logiky nebo funkcí
+2. Spojování řetězců
+3. Použití složité logiky nebo funkcí
 4. Ukládání mezivýsledků pro pozdější použití
 
 ## Příklady
@@ -37,7 +37,7 @@ Otázky calculate se běžně používají pro:
 | calculate | total    | ${price} * ${quantity} |
 ```
 
-### Zřetězení řetězců
+### Spojování řetězců
 
 ```
 | type      | name     | calculation |
@@ -57,7 +57,7 @@ Otázky calculate se běžně používají pro:
 
 ### Funkce pulldata()
 
-rtSurvey podporuje funkci `pulldata()` v polích calculate, což umožňuje načítání dat z externích CSV souborů:
+rtSurvey podporuje funkci `pulldata()` ve výpočetních polích, což umožňuje získávat data z externích CSV souborů:
 
 ```
 | type      | name     | calculation |
@@ -67,29 +67,29 @@ rtSurvey podporuje funkci `pulldata()` v polích calculate, což umožňuje nač
 
 #### Syntaxe
 
-Základní syntaxe pro pulldata() je:
+Základní syntaxe pulldata() je:
 
 ```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
+pulldata('název_csv_souboru', 'vrácený_sloupec', 'klíčový_sloupec', ${odpovídající_hodnota})
 ```
 
-- `'csv_filename'`: Název CSV souboru (bez přípony .csv)
-- `'column_to_return'`: Název sloupce obsahujícího data, která chcete načíst
-- `'key_column'`: Název sloupce pro porovnání
-- `${matching_value}`: Hodnota pro vyhledání v klíčovém sloupci (často proměnná z formuláře)
+- 'název_csv_souboru': Název CSV souboru (bez přípony .csv)
+- 'vrácený_sloupec': Název sloupce obsahujícího data, která chcete získat
+- 'klíčový_sloupec': Název sloupce pro shodu
+- `${odpovídající_hodnota}`: Hodnota, kterou je třeba vyhledat v klíčovém sloupci (často proměnná z formuláře)
 
 #### Důležité poznámky
 
-1. CSV soubor musí být nahrán spolu s vaším XLSForm při nasazení průzkumu.
+1. CSV soubor musí být nahrán spolu s vaším XLSFormem při nasazování průzkumu.
 2. V CSV souboru používejte čárky jako oddělovače, nikoli středníky.
-3. Vyhněte se čárkám uvnitř datových polí CSV, protože mohou způsobit problémy s parsováním.
-4. pulldata() podporuje pouze relace 1:1. Pokud je nalezeno více shod, vrátí pouze první.
-5. Mohou existovat omezení délky textu, který lze načíst (přibližně 76 znaků).
-6. pulldata() můžete použít v omezeních pro validaci záznamů oproti datům CSV.
+3. Vyhněte se čárkám v datových polích CSV, protože mohou způsobit problémy se zpracováním.
+4. pulldata() podporuje pouze vztahy 1 ku 1. Pokud je nalezeno více shod, vrátí se pouze první.
+5. Mohou existovat omezení délky textu, který lze získat (kolem 76 znaků).
+6. pulldata() můžete použít v omezeních pro ověřování vstupů proti datům z CSV.
 
 ### Podmíněné výpočty
 
-Můžete použít příkazy if() pro podmíněné výpočty:
+Pro podmíněné výpočty můžete použít příkazy if():
 
 ```
 | type      | name     | calculation |
@@ -97,15 +97,15 @@ Můžete použít příkazy if() pro podmíněné výpočty:
 | calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
 ```
 
-## Osvědčené postupy
+## Nejlepší postupy
 
-1. Používejte smysluplné názvy pro pole calculate pro zlepšení čitelnosti formuláře.
-2. Vyhněte se příliš složitým výpočtům v jediném poli; v případě potřeby je rozdělte.
-3. Důkladně testujte výpočty, zejména při použití složitých vzorců nebo externích dat.
-4. Pamatujte, že pole calculate se spouštějí při každém vyhodnocení formuláře, což může ovlivnit výkon u velmi složitých nebo početných výpočtů.
-5. Při použití pulldata() zajistěte správné formátování CSV souborů a důkladně testujte s konkrétními daty a strukturou formuláře.
+1. Používejte smysluplné názvy výpočetních polí pro zlepšení čitelnosti formuláře.
+2. Vyhněte se příliš složitým výpočtům v jednom poli; v případě potřeby je rozdělte.
+3. Důkladně otestujte své výpočty, zejména při použití složitých vzorců nebo externích dat.
+4. Mějte na paměti, že výpočetní pole se provádí pokaždé, když je formulář vyhodnocen, což může ovlivnit výkon velmi složitých nebo velkoobjemových výpočtů.
+5. Při použití pulldata() zajistěte, aby vaše soubory CSV byly správně naformátovány a důkladně otestujte s konkrétními daty a strukturou formuláře.
 
 ## Omezení
 
-- Pole calculate nejsou přímo editovatelná uživateli.
-- Výsledek pole calculate není okamžitě viditelný, pokud není odkazován v poli zobrazení nebo použit v logice formuláře.
+- Výpočetní pole nejsou přímo editovatelná uživateli.
+- Výsledek výpočetního pole není okamžitě viditelný, pokud není specifikován ve zobrazovacím poli nebo použit v logice formuláře.
