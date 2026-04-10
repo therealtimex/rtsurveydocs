@@ -1,21 +1,21 @@
 ---
-title: "Geopoint"
-description: "Les questions Geopoint capturent les coordonnées géographiques (latitude, longitude, altitude et précision) dans le cadre de l'enquête."
+title: "Géopoint"
+description: "Les questions de type Géopoint capturent les coordonnées géographiques (latitude, longitude, altitude et précision) dans le cadre de l'enquête."
 ---
 
-Le type de question `geopoint` capture les coordonnées géographiques (latitude, longitude, altitude, précision) à l'aide du GPS de l'appareil. rtSurvey affiche le sélecteur avec plusieurs modes de mise en page et prend en charge l'automatisation via les paramètres `inputs{}` et `outputs{}`.
+Le type de question `geopoint` capture les coordonnées géographiques (latitude, longitude, altitude, précision) à l'aide du GPS de l'appareil. rtSurvey affiche le sélecteur avec plusieurs modes de disposition et prend en charge l'automatisation via les paramètres `inputs{}` et `outputs{}`.
 
 ## Spécification XLSForm de base
 
 | type     | name        | label                       |
 |----------|-------------|-----------------------------|
-| geopoint | location    | Enregistrer l'emplacement actuel |
+| geopoint | location    | Enregistrer la position actuelle |
 
 Pour la spécification standard, consultez la [documentation XLSForm](https://xlsform.org/en/#question-types).
 
 ## Format des données
 
-Stocké sous la forme de quatre valeurs séparées par des espaces :
+Stocké sous forme de quatre valeurs séparées par des espaces :
 
 ```
 latitude longitude altitude accuracy
@@ -25,19 +25,19 @@ Exemple : `13.756331 100.501762 15 8`
 
 ---
 
-## Modes de mise en page (Layout modes)
+## Modes de disposition
 
 ### Par défaut — bouton rectangulaire
 
-Un bouton rectangulaire "START GEOPOINT" ouvre une fenêtre modale de carte complète où l'enquêteur sélectionne un point. Après la capture, le libellé du bouton devient "View or change geo point" et les coordonnées apparaissent en dessous.
+Un bouton rectangulaire "DÉMARRER GÉOPOINT" ouvre un modal de carte complet où l'enquêteur sélectionne un point. Après la capture, l'étiquette du bouton devient "Voir ou modifier le géopoint" et les coordonnées apparaissent en dessous.
 
-Aucune valeur d'apparence (appearance) n'est requise.
+Aucune valeur d'apparence requise.
 
 ---
 
-### `display{inline-icon}` — bouton de réticule circulaire
+### `display{inline-icon}` — bouton circulaire en forme de réticule
 
-Affiche un bouton d'icône circulaire (réticule ⊕) au lieu du bouton rectangulaire. En appuyant dessus, on ouvre la même fenêtre modale de carte.
+Affiche un bouton icône circulaire (réticule ⊕) au lieu du bouton rectangulaire. Taper dessus ouvre le même modal de carte.
 
 ```
 display{inline-icon}
@@ -46,55 +46,55 @@ display{inline-icon}
 **Combiné avec la position et la taille :**
 
 ```
-display{inline-icon, left}           → bouton à gauche du libellé
-display{inline-icon, top}            → bouton au-dessus du libellé
-display{inline-icon, bottom}         → bouton en dessous du libellé, centré
+display{inline-icon, left}           → bouton à gauche de l'étiquette
+display{inline-icon, top}            → bouton au-dessus de l'étiquette
+display{inline-icon, bottom}         → bouton sous l'étiquette, centré
 display{inline-icon, large}          → grande icône (75px)
 display{inline-icon, medium}         → icône moyenne (50px)
-display{inline-icon, left, large}    → grand bouton sur la gauche
+display{inline-icon, left, large}    → grand bouton à gauche
 ```
 
 | Size | Icon height/width |
 |------|------------------|
-| *(default)* | 25px |
+| *(par défaut)* | 25px |
 | `medium` | 50px |
 | `large` | 75px |
 
 ---
 
-### `display{thumbnail-square}` — vignette de carte en direct
+### `display{thumbnail-square}` — miniature de carte en direct
 
-Affiche un aperçu de la carte en direct (Leaflet) directement sur la question au lieu d'un bouton. La vignette montre la position GPS actuelle et le point sélectionné. En appuyant sur le bouton d'agrandissement, on ouvre la fenêtre modale complète.
+Affiche un aperçu de carte en direct (Leaflet) directement sur la question au lieu d'un bouton. La miniature montre la position GPS actuelle et le point sélectionné. Taper sur le bouton d'extension ouvre le modal complet.
 
 ```
 display{thumbnail-square}
 ```
 
-**Taille de vignette personnalisée :**
+**Taille de la miniature personnalisée :**
 
 ```
 display{thumbnail-square-[WxH]}          → pixels fixes
 display{thumbnail-square-[400x200]}      → 400px de large × 200px de haut
 
 display{thumbnail-square-[W%xH%]}        → pourcentage de la largeur du formulaire
-display{thumbnail-square-[100%x30%]}     → pleine largeur × 30 % de la largeur du formulaire
+display{thumbnail-square-[100%x30%]}     → pleine largeur × 30% de la largeur du formulaire
 ```
 
 ---
 
 ## `display{}` vs `results{}` — avant et après la capture
 
-`display{}` contrôle la mise en page **avant** que l'utilisateur ne capture un emplacement. `results{}` contrôle la mise en page **après** qu'une valeur existe. Ils peuvent avoir des alignements différents.
+`display{}` contrôle la disposition **avant** que l'utilisateur ne capture un emplacement. `results{}` contrôle la disposition **après** qu'une valeur existe. Ils peuvent avoir des alignements différents.
 
 ```
 display{inline-icon, right} results{left}
 ```
 
-Ceci affiche le bouton à droite avant la capture, puis le déplace vers la gauche une fois qu'un point est enregistré.
+Cela affiche le bouton à droite avant la capture, puis le déplace à gauche une fois qu'un point est enregistré.
 
 ### `hide(value)` — supprimer l'affichage des coordonnées
 
-Par défaut, le texte de latitude/longitude/précision/altitude capturé est affiché sous le bouton. Masquez-le avec :
+Par défaut, le texte lat/lon/précision/altitude capturé est affiché sous le bouton. Masquez-le avec :
 
 ```
 results{hide(value)}
@@ -107,7 +107,7 @@ display{inline-icon} results{hide(value)}
 
 ### Capture automatique au chargement
 
-Enregistre automatiquement la position GPS au chargement du formulaire, sans que l'enquêteur n'ait à appuyer sur quoi que ce soit.
+Enregistre automatiquement la position GPS lorsque le formulaire se charge, sans que l'enquêteur n'appuie sur rien.
 
 ```
 inputs{auto-take}
@@ -119,9 +119,9 @@ inputs{auto-take}
 inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
 ```
 
-### Pré-remplissage à partir d'un champ de texte
+### Pré-remplir à partir d'un champ de texte
 
-Remplissez le geopoint à partir d'une question contenant un nom de lieu ou une chaîne d'adresse. rtSurvey effectue un géocodage inverse de la chaîne en coordonnées via OpenStreetMap Nominatim.
+Remplissez le géopoint à partir d'une question qui contient un nom de lieu ou une chaîne d'adresse. rtSurvey géocode inversement la chaîne en coordonnées via OpenStreetMap Nominatim.
 
 ```
 inputs{question(address_field)}
@@ -131,7 +131,7 @@ inputs{question(address_field)}
 
 ## `outputs{}` — géocodage inverse en texte
 
-Une fois qu'un point est capturé, remplissez automatiquement une question `text` avec l'adresse lisible par l'homme (géocodée inversement à partir des coordonnées).
+Après la capture d'un point, remplissez automatiquement une question `text` avec l'adresse lisible par l'homme (géocodage inverse à partir des coordonnées).
 
 ```
 outputs{question(address_field)}
@@ -141,14 +141,14 @@ Exemple :
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| geopoint | location | Enregistrer l'emplacement | `outputs{question(address_text)}` |
+| geopoint | location | Enregistrer la position | `outputs{question(address_text)}` |
 | text | address_text | Adresse | |
 
 ---
 
 ## `nomap` — capture GPS sans carte
 
-Remplace la fenêtre modale de la carte par une simple boîte de dialogue qui demande l'autorisation d'emplacement et enregistre les coordonnées. Aucune carte n'est affichée. Utile pour la capture GPS uniquement sur des appareils bas de gamme ou lorsque les tuiles de carte ne sont pas disponibles hors ligne.
+Remplace le modal de carte par un simple dialogue qui demande l'autorisation de localisation et enregistre les coordonnées. Aucune carte n'est affichée. Utile pour la capture GPS uniquement sur les appareils bas de gamme ou lorsque les tuiles de carte ne sont pas disponibles hors ligne.
 
 ```
 nomap
@@ -166,7 +166,7 @@ styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"}
 
 ---
 
-## Supprimer le libellé
+## Supprimer l'étiquette
 
 ```
 text-nolabel display{inline-icon, center, large}
@@ -178,26 +178,26 @@ text-nolabel display{inline-icon, center, large}
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| geopoint | field_loc | Enregistrer l'emplacement sur le terrain | `display{inline-icon, right, large}` |
+| geopoint | field_loc | Enregistrer la position du champ | `display{inline-icon, right, large}` |
 | geopoint | site | Emplacement du site | `display{thumbnail-square-[100%x30%]}` |
 | geopoint | auto_loc | Position actuelle | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
-| geopoint | mapped_loc | Emplacement | `display{inline-icon} outputs{question(address)}` |
+| geopoint | mapped_loc | Localisation | `display{inline-icon} outputs{question(address)}` |
 | geopoint | gps_only | Point GPS | `nomap` |
 
 ---
 
-## Meilleures pratiques
+## Bonnes pratiques
 
-1. Utilisez `inputs{auto-take}` pour les enquêtes de vérification par enquêteur où le GPS est obligatoire — cela supprime l'étape manuelle.
+1. Utilisez `inputs{auto-take}` pour les enquêtes de vérification par les enquêteurs où le GPS est obligatoire — cela supprime l'étape manuelle.
 2. Utilisez `display{thumbnail-square}` lorsque vous souhaitez que l'enquêteur confirme visuellement le point sélectionné avant de continuer.
 3. Associez `outputs{question(...)}` à un champ `text` en lecture seule pour afficher l'adresse géocodée inversement à l'enquêteur.
 4. Utilisez `nomap` dans les zones sans connectivité Internet où les tuiles de carte ne peuvent pas se charger.
-5. Laissez au GPS le temps de se stabiliser avant l'enregistrement — une précision inférieure à 10 m est généralement suffisante pour les enquêtes sur le terrain.
+5. Laissez le temps au GPS de se stabiliser avant l'enregistrement — une précision inférieure à 10 m est généralement suffisante pour les enquêtes de terrain.
 
 ## Limites
 
-- Le géocodage de `inputs{question(name)}` nécessite un accès Internet — il appelle l'API OpenStreetMap Nominatim.
-- Le géocodage inverse de `outputs{question(name)}` nécessite également un accès Internet.
-- La vignette de carte (`display{thumbnail-square}`) nécessite Internet pour le chargement des tuiles ; les coordonnées sont toujours capturées hors ligne.
-- La précision du GPS varie selon l'appareil et l'environnement — des conditions en intérieur ou en canyon urbain peuvent produire une précision > 50 m.
-- La collecte de données de localisation peut avoir un impact significatif sur l'autonomie de la batterie de l'appareil lors d'enquêtes prolongées.
+- Le géocodage `inputs{question(name)}` nécessite un accès à Internet — il appelle l'API OpenStreetMap Nominatim.
+- Le géocodage inverse `outputs{question(name)}` nécessite également un accès à Internet.
+- La miniature de carte (`display{thumbnail-square}`) nécessite Internet pour le chargement des tuiles ; les coordonnées sont toujours capturées hors ligne.
+- La précision GPS varie selon l'appareil et l'environnement — les conditions intérieures ou de canyon urbain peuvent produire une précision > 50 m.
+- La collecte de données de localisation peut avoir un impact significatif sur la durée de vie de la batterie de l'appareil lors de longues enquêtes.

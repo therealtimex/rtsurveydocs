@@ -1,9 +1,9 @@
 ---
-title: "Decimal"
-description: "Type de question d'entrée de nombre décimal dans rtSurvey"
+title: "Décimal"
+description: "Type de question à saisie de nombre fractionnaire dans rtSurvey"
 ---
 
-Le type de question `decimal` collecte des nombres qui peuvent inclure une partie fractionnaire (par exemple `3.14`, `72.5`). Il déclenche un clavier numérique sur mobile et prend en charge les mêmes options d'apparence que le type `text` pour la mise en page et le formatage.
+Le type de question `decimal` recueille des nombres pouvant inclure une partie fractionnaire (par exemple `3.14`, `72.5`). Il déclenche un clavier numérique sur mobile et prend en charge les mêmes options d'apparence que le type `text` pour la disposition et le formatage.
 
 ## Spécification XLSForm de base
 
@@ -19,9 +19,9 @@ Pour la spécification standard, consultez la [documentation XLSForm](https://xl
 
 ## Options d'apparence
 
-### `number-hspinner` — curseur horizontal
+### `number-hspinner` — sélecteur horizontal
 
-Remplace la saisie par un curseur horizontal **− valeur +**. Appuyer sur moins/plus ajuste la valeur selon le pas (step) configuré.
+Remplace la saisie par un sélecteur horizontal **− valeur +**. Taper sur moins/plus ajuste la valeur par le pas configuré.
 
 ```
 number-hspinner
@@ -29,7 +29,7 @@ number-hspinner
 
 La valeur affichée est formatée avec une décimale (par exemple `3.0`, `72.5`). Le pas par défaut est `1` ; utilisez `hspinner()` pour définir un pas décimal.
 
-**Personnaliser la forme du bouton et le pas** en utilisant `hspinner()` :
+**Personnaliser la forme et le pas du bouton** en utilisant `hspinner()` :
 
 ```
 number-hspinner hspinner('left-small-square','right-small-square','0.1')
@@ -49,7 +49,7 @@ Quatre valeurs dans l'ordre : arrière-plan du bouton gauche, icône du bouton g
 
 ### `thousandsep` — séparateur de milliers
 
-Formate le nombre affiché avec un groupement par virgules (par exemple `1,234.56`). Le nombre brut est stocké sans virgules. Le type de saisie est basculé sur `"text"` pour permettre l'affichage formaté.
+Formate le nombre affiché avec des groupes de virgules (par exemple `1,234.56`). Le nombre brut est stocké sans virgules. Le type d'entrée est basculé sur `"text"` pour permettre l'affichage formaté.
 
 ```
 thousandsep
@@ -57,21 +57,21 @@ thousandsep
 
 ---
 
-### `digisep(n, "sep")` — groupement de chiffres personnalisé
+### `digisep(n, "sep")` — regroupement de chiffres personnalisé
 
-Groupe les chiffres de la partie entière en blocs de `n` séparés par un séparateur personnalisé.
+Regroupe les chiffres de la partie entière en blocs de `n` séparés par un séparateur personnalisé.
 
 ```
 digisep(3," ")      → 1 234 567.89
 ```
 
-Le type de saisie est basculé sur `"text"` lorsque cette apparence est active.
+Le type d'entrée est basculé sur `"text"` lorsque cette apparence est active.
 
 ---
 
 ### `textonly` — forcer le clavier texte
 
-Force `type="text"` sur l'élément de saisie. Empêche les particularités de saisie de nombres des navigateurs (masquage des zéros terminaux, flèches de défilement sur bureau) tout en acceptant les valeurs décimales.
+Force `type="text"` sur l'élément d'entrée. Empêche les bizarreries de saisie numérique du navigateur (masquer les zéros de fin, les flèches de rotation du bureau) tout en acceptant les valeurs décimales.
 
 ```
 textonly
@@ -81,7 +81,7 @@ textonly
 
 ### `floating_hint` — l'indice flotte comme étiquette
 
-Le texte `hint` s'affiche à l'intérieur de la saisie comme un espace réservé (placeholder). Lorsque l'utilisateur commence à taper, il flotte au-dessus du champ comme une étiquette (label).
+Le texte `hint` s'affiche à l'intérieur de la saisie comme un espace réservé. Lorsque l'utilisateur commence à taper, il flotte au-dessus du champ comme une étiquette.
 
 ```
 floating_hint
@@ -99,9 +99,9 @@ embed
 
 ---
 
-### `textpopup` — saisie par boîte de dialogue modale
+### `textpopup` — saisie de dialogue modale
 
-Appuyer sur le champ ouvre une boîte de dialogue modale avec une saisie plus grande. Utile sur les petits écrans.
+Taper sur le champ ouvre un dialogue modal avec une saisie plus grande. Utile sur les petits écrans.
 
 ```
 textpopup
@@ -111,7 +111,7 @@ textpopup
 
 ### `charcount` — compteur de caractères en direct
 
-Affiche un décompte de caractères `(n)` en direct sous la saisie, mis à jour au fur et à mesure que l'utilisateur tape.
+Affiche un compteur de caractères `(n)` en direct sous l'entrée, mis à jour au fur et à mesure que l'utilisateur tape.
 
 ```
 charcount
@@ -121,18 +121,18 @@ charcount
 
 ### `prefix(expr)` — ajouter un préfixe
 
-Ajoute une chaîne statique ou calculée au début de la valeur affichée. La valeur stockée n'inclut pas le préfixe.
+Ajoute une chaîne statique ou calculée à la valeur affichée. La valeur stockée n'inclut pas le préfixe.
 
 ```
 prefix('USD ')          → affiche "USD 72.50", stocke "72.50"
-prefix(${currency})     → préfixe dynamique depuis un autre champ
+prefix(${currency})     → préfixe dynamique d'un autre champ
 ```
 
 ---
 
 ### `align_answer` — alignement du texte de saisie
 
-Contrôle l'alignement horizontal de la valeur tapée à l'intérieur de la saisie.
+Contrôle l'alignement horizontal de la valeur tapée à l'intérieur de l'entrée.
 
 ```
 align_answer = left
@@ -144,7 +144,7 @@ align_answer = center
 
 ### `inputs{qrscan}` — scan QR / code-barres dans le champ
 
-Ajoute un bouton de scan de code QR à côté de la saisie. Ouvre le scanner de la caméra et remplit le champ avec la valeur scannée.
+Ajoute un bouton de scan de code QR à côté de la saisie. Ouvre le scanner de caméra et remplit le champ avec la valeur scannée.
 
 ```
 inputs{qrscan}
@@ -152,21 +152,21 @@ inputs{qrscan}
 
 ---
 
-## Référence rapide de l'apparence
+## Référence rapide d'apparence
 
 | Appearance | Widget rendered |
 |---|---|
-| *(none)* | Saisie de nombre (`type="number"`) — clavier numérique sur mobile |
-| `number-hspinner` | Curseur horizontal − valeur +, une décimale affichée |
-| `number-hspinner hspinner(...)` | Curseur avec forme de bouton et pas personnalisés |
-| `number-hspinner colors(...)` | Curseur avec couleurs de boutons personnalisées |
-| `thousandsep` | Affichage du nombre groupé par virgules |
-| `digisep(n,"sep")` | Groupement de chiffres personnalisé |
+| *(none)* | Saisie numérique (`type="number"`) — clavier numérique sur mobile |
+| `number-hspinner` | Sélecteur horizontal − valeur +, une décimale affichée |
+| `number-hspinner hspinner(...)` | Sélecteur avec forme et pas de bouton personnalisés |
+| `number-hspinner colors(...)` | Sélecteur avec couleurs de bouton personnalisées |
+| `thousandsep` | Affichage de nombre groupé par virgule |
+| `digisep(n,"sep")` | Regroupement de chiffres personnalisé |
 | `textonly` | Forcer le clavier texte |
-| `floating_hint` | L'indice flotte au-dessus du champ lors de la saisie |
+| `floating_hint` | L'indice flotte au-dessus du champ pendant la saisie |
 | `embed` | Indice à l'intérieur de la bordure de saisie |
-| `textpopup` | Appuyer pour ouvrir une boîte de dialogue modale |
-| `charcount` | Compteur de caractères en direct sous la saisie |
+| `textpopup` | Taper pour ouvrir le dialogue modal |
+| `charcount` | Compteur de caractères en direct sous l'entrée |
 | `prefix(expr)` | Ajouter un préfixe statique ou dynamique |
 | `align_answer = left/right/center` | Alignement du texte de saisie |
 | `inputs{qrscan}` | Bouton de scan QR/code-barres |
@@ -199,14 +199,14 @@ ${weight_kg} div (${height_m} * ${height_m})
 
 ---
 
-## Meilleures pratiques
+## Bonnes pratiques
 
-1. Utilisez `number-hspinner hspinner(..., '0.1')` pour les mesures nécessitant une précision d'une décimale — le curseur formate automatiquement à une décimale, gardant les valeurs cohérentes.
-2. Utilisez `textonly` lorsque les navigateurs ajoutent des contrôles de défilement indésirables ou tronquent les zéros terminaux (par exemple `3.0` affiché comme `3`).
-3. Utilisez `thousandsep` pour les grandes valeurs financières afin que les répondants puissent vérifier qu'ils ont entré le bon ordre de grandeur.
-4. Imposez des contraintes de plage plutôt que de vous fier uniquement au type de clavier mobile.
+1. Utilisez `number-hspinner hspinner(..., '0.1')` pour les mesures nécessitant une décimale de précision — le sélecteur formate automatiquement à une décimale, en maintenant des valeurs cohérentes.
+2. Utilisez `textonly` lorsque les navigateurs ajoutent des contrôles de rotation indésirables ou tronquent les zéros de fin (par exemple `3.0` affiché comme `3`).
+3. Utilisez `thousandsep` pour les grandes valeurs financières afin que les répondants puissent vérifier qu'ils ont saisi la bonne magnitude.
+4. Appliquez des contraintes de plage plutôt que de vous fier uniquement au type de clavier mobile.
 
-## Limitations
+## Limites
 
-- Le curseur affiche toujours une décimale — si vous avez besoin de plus de précision dans la valeur affichée, utilisez la saisie simple à la place.
-- `thousandsep` et `digisep()` stockent le nombre brut — ne lisez pas la valeur d'affichage formatée dans les calculs.
+- Le sélecteur affiche toujours une décimale — si vous avez besoin de plus de précision dans la valeur affichée, utilisez la saisie simple à la place.
+- `thousandsep` et `digisep()` stockent le nombre brut — ne lisez pas la valeur affichée formatée dans les calculs.

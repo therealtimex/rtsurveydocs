@@ -1,24 +1,24 @@
 ---
-title: "Barcode"
-description: "Les questions de type Barcode scanne et capturent les codes QR codes et les données de codes-barres dans votre enquête."
+title: "Code-barres"
+description: "Les questions de type code-barres scannent et capturent les codes QR et les données de codes-barres dans votre enquête."
 ---
 
-Le type de question `barcode` capture une valeur de code en scannant un code QR code ou un code-barres avec la caméra de l'appareil. Le modal du scanner comprend également une saisie de texte manuelle comme solution de repli lorsque le scan n'est pas possible.
+Le type de question `barcode` capture une valeur de code en scannant un code QR ou un code-barres avec la caméra de l'appareil. Le modal du scanner comprend également une saisie de texte manuelle comme solution de repli lorsque le scan n'est pas possible.
 
-## Basic XLSForm Specification
+## Spécification XLSForm de base
 
 | type    | name         | label                    |
 |---------|--------------|--------------------------|
-| barcode | product_code | Scan the product barcode |
-| barcode | ticket_id    | Scan the ticket          |
+| barcode | product_code | Scanner le code-barres du produit |
+| barcode | ticket_id    | Scanner le ticket          |
 
 Pour la spécification standard, consultez la [documentation XLSForm](https://xlsform.org/en/#question-types).
 
 ---
 
-## Supported formats
+## Formats pris en charge
 
-rtSurvey prend en charge les codes QR codes et les codes-barres 1D standard via la caméra de l'appareil, notamment :
+rtSurvey prend en charge les codes QR et les codes-barres 1D standard via la caméra de l'appareil, y compris :
 
 - QR Code
 - UPC-A, UPC-E
@@ -28,40 +28,40 @@ rtSurvey prend en charge les codes QR codes et les codes-barres 1D standard via 
 
 ---
 
-## Default layout
+## Disposition par défaut
 
-Sans paramètre `appearance`, la question affiche un bouton pleine largeur **"GET BARCODE"**. En appuyant dessus, le modal du scanner s'ouvre. Après un scan réussi, le bouton devient **"REPLACE BARCODE"** et la valeur scannée apparaît en dessous sous forme de lien cliquable.
+Sans `appearance` défini, la question affiche un bouton **"OBTENIR CODE-BARRES"** pleine largeur. En appuyant dessus, le modal du scanner s'ouvre. Après un scan réussi, le bouton devient **"REMPLACER CODE-BARRES"** et la valeur scannée apparaît en dessous sous forme de lien cliquable.
 
 ---
 
-## Scanner modal
+## Modal du scanner
 
 Le modal du scanner comprend toujours :
-- **Vue caméra en direct (Live camera view)** — scanne automatiquement lors de la détection ; le modal se ferme après un scan réussi.
-- **Saisie de texte manuelle (Manual text input)** — un champ de texte en bas où l'enquêteur peut taper le code si le scan échoue.
-- **Bouton Terminé (Done button)** — soumet la valeur tapée manuellement.
+- **Vue caméra en direct** — scanne automatiquement à la détection ; le modal se ferme après un scan réussi.
+- **Saisie de texte manuelle** — un champ de texte en bas où l'enquêteur peut taper le code si le scan échoue.
+- **Bouton Terminé** — soumet la valeur tapée manuellement.
 
-Lorsque la caméra de l'appareil n'est pas disponible, le modal bascule vers une option **"Upload an image"** — l'enquêteur peut soumettre une photo du code-barres pour le décodage.
+Lorsque la caméra de l'appareil n'est pas disponible, le modal revient à une option **"Télécharger une image"** — l'enquêteur peut soumettre une photo du code-barres pour décodage.
 
 ---
 
-## Inline button layout
+## Disposition du bouton en ligne
 
-Ajoutez `inline` pour afficher le scanner sous forme de **bouton d'icône circulaire** à côté du libellé (label) au lieu d'un bouton pleine largeur.
+Ajoutez `inline` pour afficher le scanner comme un **bouton icône circulaire** à côté de l'étiquette au lieu d'un bouton pleine largeur.
 
 ```
 | type    | name | label     | appearance                              |
 |---------|------|-----------|----------------------------------------|
-| barcode | code | Scan item | inline display{right}                  |
-| barcode | code | Scan item | inline display{left, large}            |
-| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+| barcode | code | Scanner l'article | inline display{right}                  |
+| barcode | code | Scanner l'article | inline display{left, large}            |
+| barcode | code | Scanner l'article | inline display{center, large, <0099FF/>} |
 ```
 
 **Position du bouton** — `left`, `right` *(par défaut)*, `top`, `center`, `bottom`
 
 **Taille du bouton** — `small` *(par défaut)*, `medium`, `large`
 
-**Couleur du bouton** — ajoutez une couleur hexadécimale à l'intérieur de `display{}` pour remplacer la couleur primaire :
+**Couleur du bouton** — ajoutez une couleur hexadécimale à l'intérieur de `display{}` pour remplacer la couleur principale :
 
 ```
 inline display{right, large, <FF5500/>}
@@ -69,7 +69,7 @@ inline display{right, large, <FF5500/>}
 
 **Contrôle post-capture — `results{}` :**
 
-| Appearance | Effet |
+| Appearance | Effect |
 |---|---|
 | `results{hide(scanner)}` | Masque le bouton de scan après la capture d'une valeur |
 | `results{hide(review)}` | Masque le lien de la valeur scannée après la capture |
@@ -77,6 +77,7 @@ inline display{right, large, <FF5500/>}
 | `results{left}` | Déplace l'icône vers la gauche après la capture |
 
 Exemple — masquer le scanner après le premier scan :
+
 ```
 inline display{center, large} results{hide(scanner)}
 ```
@@ -88,11 +89,12 @@ inline display{center, large} results{hide(scanner)}
 Ferme automatiquement le modal du scanner après `N` secondes si aucun code-barres n'est détecté. Un compte à rebours en direct est affiché à l'intérieur du modal.
 
 ```
-inputs{auto-close(10)}     → se ferme après 10 secondes
-inputs{auto-close(5)}      → se ferme après 5 secondes
+inputs{auto-close(10)}     → ferme après 10 secondes
+inputs{auto-close(5)}      → ferme après 5 secondes
 ```
 
 Combiner avec inline :
+
 ```
 inline display{right} inputs{auto-close(10)}
 ```
@@ -101,20 +103,20 @@ inline display{right} inputs{auto-close(10)}
 
 ## `inputs{floating}` — scanner flottant déplaçable
 
-Affiche un **bouton de réduction** (icône de compression ⊞) dans l'en-tête du modal du scanner. En appuyant dessus, le scanner se réduit en une petite icône circulaire flottante qui peut être déplacée n'importe où sur l'écran. En appuyant sur l'icône flottante, le scanner se rouvre.
+Affiche un **bouton de réduction** (icône de compression ⊞) dans l'en-tête du modal du scanner. En appuyant dessus, le scanner se réduit à une petite icône circulaire flottante qui peut être glissée n'importe où sur l'écran. En appuyant sur l'icône flottante, le scanner se rouvre.
 
 ```
 inputs{floating}
 inline display{right} inputs{floating}
 ```
 
-Utile dans les flux de travail où l'enquêteur doit voir le formulaire pendant que le scanner est actif (par exemple, scannage d'articles dans une liste).
+Utile dans les flux de travail où l'enquêteur doit voir le formulaire pendant que le scanner est actif (par exemple, scanner des éléments dans une liste).
 
 ---
 
 ## `invisible auto-show` — ouverture automatique du scanner
 
-Masque le widget de la question de la mise en page mais ouvre automatiquement le scanner lors du chargement de la page. Utile pour intégrer une étape de scan silencieuse dans le flux du formulaire.
+Masque le widget de question de la mise en page mais ouvre automatiquement le scanner lorsque la page se charge. Utile pour intégrer une étape de scan silencieux dans le flux du formulaire.
 
 ```
 invisible auto-show
@@ -123,13 +125,13 @@ inline invisible auto-show
 
 ---
 
-## Dans les groupes de répétition (In repeat groups)
+## Dans les groupes répétables
 
-Lorsque `barcode` est à l'intérieur d'un groupe `begin repeat`, un scan réussi passe automatiquement à l'**instance de répétition suivante** après l'enregistrement de la valeur. Cela permet un scannage séquentiel rapide sans que l'enquêteur n'ait à appuyer sur "Ajouter" (Add) entre les articles.
+Lorsque `barcode` est à l'intérieur d'un groupe `begin repeat`, un scan réussi passe automatiquement à l'**instance répétée suivante** après que la valeur soit enregistrée. Cela permet un scan séquentiel rapide sans que l'enquêteur n'appuie sur "Ajouter" entre les éléments.
 
 ---
 
-## Supprimer le libellé (Suppress the label)
+## Supprimer l'étiquette
 
 ```
 inline text-nolabel display{center, large}
@@ -143,16 +145,16 @@ inline text-nolabel display{center, large}
 
 | type | name | label | appearance | required |
 |------|------|-------|------------|----------|
-| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
-| integer | quantity | Quantity | | yes |
-| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
+| barcode | item_code | Scanner le code-barres de l'article | `inline display{right}` | yes |
+| integer | quantity | Quantité | | yes |
+| note | confirm | Article: `${item_code}` — Qté: `${quantity}` | | |
 
-### Scan rapide de plusieurs articles (groupe de répétition)
+### Scan rapide de plusieurs articles (groupe répétable)
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | begin repeat | items | | |
-| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| barcode | code | Scanner l'article suivant | `inline display{right} inputs{auto-close(8)}` |
 | end repeat | items | | |
 
 ### Scan automatique silencieux au chargement de la page
@@ -163,16 +165,16 @@ inline text-nolabel display{center, large}
 
 ---
 
-## Meilleures pratiques
+## Bonnes pratiques
 
-1. Utilisez `inputs{auto-close(N)}` pour empêcher le scanner de rester ouvert indéfiniment — choisissez une valeur qui donne aux enquêteurs suffisamment de temps pour positionner le code-barres (8 à 15 secondes est typique).
-2. Utilisez `inputs{floating}` lorsque le formulaire doit rester visible pendant le scan (par exemple, scannage à partir d'une liste où l'enquêteur effectue des recoupements avec un champ visible).
-3. Placez la question de code-barres à l'intérieur d'un groupe de répétition pour un scannage séquentiel rapide — l'avancement automatique de la répétition élimine l'étape manuelle "Ajouter".
-4. Incluez toujours la colonne `hint` avec des instructions de positionnement (par exemple, "Maintenez le code-barres à une distance de 10 à 30 cm de la caméra, sous un bon éclairage").
+1. Utilisez `inputs{auto-close(N)}` pour éviter que le scanner ne reste ouvert indéfiniment — choisissez une valeur qui donne aux enquêteurs suffisamment de temps pour positionner le code-barres (8 à 15 secondes est typique).
+2. Utilisez `inputs{floating}` lorsque le formulaire doit rester visible pendant le scan (par exemple, scanner des éléments dans une liste où l'enquêteur recoupe un champ visible).
+3. Placez la question du code-barres à l'intérieur d'un groupe répétable pour un scan séquentiel rapide — l'avancement automatique de la répétition élimine l'étape manuelle "Ajouter".
+4. Incluez toujours la colonne `hint` avec les instructions de positionnement (par exemple, "Maintenez le code-barres à 10-30 cm de la caméra, dans de bonnes conditions d'éclairage").
 5. La saisie de texte manuelle dans le modal du scanner est toujours disponible — formez les enquêteurs à l'utiliser comme solution de repli pour les codes-barres endommagés ou sales.
 
 ## Limites
 
-- La précision du scan dépend de la qualité de la caméra, de l'éclairage et de l'état du code-barres — les codes endommagés ou à faible contraste peuvent ne pas être scannés de manière fiable.
-- Le scanner utilise la caméra arrière (orientée vers l'environnement) ; les appareils sans caméra arrière basculent vers l'option de téléchargement d'image.
-- `invisible auto-show` s'ouvre uniquement lors du premier chargement de la page ; revenir à la page ne déclenche pas à nouveau l'ouverture automatique.
+- La précision du scan dépend de la qualité de la caméra, de l'éclairage et de l'état du code-barres — les codes endommagés ou à faible contraste peuvent ne pas scanner de manière fiable.
+- Le scanner utilise la caméra arrière (orientée vers l'environnement) ; les appareils sans caméra arrière se rabattent sur l'option de téléchargement d'image.
+- `invisible auto-show` s'ouvre uniquement au premier chargement de la page ; naviguer en arrière vers la page ne redéclenche pas l'ouverture automatique.

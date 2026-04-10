@@ -3,7 +3,7 @@ title: "Fichier"
 description: "Les questions de type fichier permettent aux répondants de télécharger des documents et d'autres fichiers dans le cadre de leurs réponses à l'enquête."
 ---
 
-Le type de question `file` permet aux répondants de **télécharger n'importe quel fichier** depuis leur appareil — documents, feuilles de calcul, PDF ou autres types de fichiers. Contrairement à `image`, `audio` et `video` qui lancent des outils de capture spécifiques, `file` ouvre un sélecteur de fichiers polyvalent.
+Le type de question `file` permet aux répondants de **télécharger n'importe quel fichier** depuis leur appareil — documents, feuilles de calcul, PDF ou autres types de fichiers. Contrairement à `image`, `audio` et `video` qui lancent des outils de capture spécifiques, `file` ouvre un sélecteur de fichiers générique.
 
 ## Spécification XLSForm de base
 
@@ -11,22 +11,22 @@ Le type de question `file` permet aux répondants de **télécharger n'importe q
 |------|-----------|------------------------------|
 | file | document  | Veuillez télécharger votre document |
 
-Pour plus de détails sur le type de question de fichier standard, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
+Pour plus de détails sur le type de question fichier standard, consultez la [spécification XLSForm](https://xlsform.org/en/#question-types).
 
 ## Utilisations
 
 Les questions de type fichier sont couramment utilisées pour :
 
 1. Collecter des documents justificatifs (reçus, certificats, contrats, rapports)
-2. Télécharger des formulaires papier complétés qui ont été scannés
-3. Rassembler des feuilles de calcul ou des exports de données d'autres systèmes
+2. Télécharger des formulaires papier remplis qui ont été scannés
+3. Rassembler des feuilles de calcul ou des exportations de données d'autres systèmes
 4. Tout type de fichier numérique que l'image/audio/vidéo ne couvre pas
 
 ## Format des données
 
 Les fichiers téléchargés sont stockés en tant que pièces jointes binaires :
 
-- **Format :** Conservé dans son format d'origine (PDF, XLSX, DOCX, etc.)
+- **Format :** Préservé au format original (PDF, XLSX, DOCX, etc.)
 - **Nommage :** `{instanceID}-{fieldname}.{extension}`
 - **Stockage :** Téléchargé dans le dossier média du serveur avec la soumission
 - **Accès :** Téléchargeable depuis l'interface de gestion des soumissions
@@ -35,22 +35,22 @@ Les fichiers téléchargés sont stockés en tant que pièces jointes binaires :
 
 ### Types de fichiers acceptés
 
-Utilisez la colonne `parameters` pour restreindre les types de fichiers pouvant être sélectionnés :
+Utilisez la colonne `parameters` pour restreindre les types de fichiers qui peuvent être sélectionnés :
 
 | type | name | label | parameters |
 |------|------|-------|------------|
 | file | report | Télécharger le rapport d'inspection | `accept=.pdf` |
 | file | spreadsheet | Télécharger le fichier de données | `accept=.xlsx,.csv` |
 
-Le paramètre `accept` utilise la syntaxe standard des extensions de fichiers (séparées par des virgules).
+Le paramètre `accept` utilise la syntaxe standard d'extension de fichier (séparée par des virgules).
 
-### Conseils sur la taille des fichiers
+### Guide de taille de fichier
 
-rtSurvey n'impose pas de limite stricte de taille de fichier au niveau de la question, mais la limite de téléchargement du serveur s'applique. Utilisez `hint` pour communiquer les attentes à l'enquêteur :
+rtSurvey n'impose pas de limite de taille de fichier stricte au niveau de la question, mais la limite de téléchargement du serveur s'applique. Utilisez `hint` pour communiquer les attentes à l'enquêteur :
 
 | type | name | label | hint |
 |------|------|-------|------|
-| file | receipt | Télécharger le reçu de paiement | Acceptés : PDF ou image. Taille maximale du fichier : 5 Mo |
+| file | receipt | Télécharger le reçu de paiement | Accepté : PDF ou image. Taille maximale du fichier : 5 Mo |
 
 ### Intégration avec le système de fichiers de l'appareil et le stockage cloud
 
@@ -58,13 +58,13 @@ Sur Android et iOS, la question `file` ouvre le sélecteur de fichiers natif de 
 - Stockage local de l'appareil
 - Carte SD (Android)
 - iCloud Drive (iOS)
-- Google Drive, Dropbox (si installés)
+- Google Drive, Dropbox (si installé)
 
-Sur le web, il ouvre la boîte de dialogue standard de téléchargement de fichiers du navigateur.
+Sur le web, il ouvre la boîte de dialogue de téléchargement de fichiers standard du navigateur.
 
-### Disposition des boutons en ligne (Inline button layout)
+### Disposition du bouton en ligne
 
-Ajoutez `inline` pour afficher le téléchargement sous la forme d'un **bouton d'icône circulaire** à côté de l'étiquette au lieu d'un sélecteur de fichiers pleine largeur.
+Ajoutez `inline` pour afficher le téléchargement comme un **bouton icône circulaire** à côté de l'étiquette au lieu d'un sélecteur de fichiers pleine largeur.
 
 ```
 | type | name | label           | appearance                              |
@@ -78,27 +78,28 @@ Ajoutez `inline` pour afficher le téléchargement sous la forme d'un **bouton d
 
 **Taille du bouton** — `small` *(par défaut)*, `medium`, `large`
 
-**Couleur du bouton** — ajoutez une couleur hexadécimale à l'intérieur de `display{}` pour remplacer la couleur primaire :
+**Couleur du bouton** — ajoutez une couleur hexadécimale à l'intérieur de `display{}` pour remplacer la couleur principale :
 
 ```
 inline display{right, large, <FF5500/>}
 ```
 
-**Contrôle après capture — `results{}` :**
+**Contrôle post-capture — `results{}` :**
 
 | Appearance | Effect |
 |---|---|
-| `results{hide(capture)}` | Masque le bouton de téléchargement après l'ajout d'un fichier |
+| `results{hide(capture)}` | Masque le bouton de téléchargement après qu'un fichier est joint |
 | `results{hide(review)}` | Masque le bouton de révision/prévisualisation après le téléchargement |
 | `results{hide(filename)}` | Masque le nom du fichier affiché après le téléchargement |
 | `results{left}` | Déplace l'icône vers la gauche après le téléchargement |
 
-Exemple — masquer le bouton de téléchargement après l'ajout du fichier :
+Exemple — masquer le bouton de téléchargement après le fichier joint :
+
 ```
 inline display{right} results{hide(capture)}
 ```
 
-### Supprimer l'étiquette (Suppress the label)
+### Supprimer l'étiquette
 
 ```
 inline text-nolabel display{center, large}
@@ -106,7 +107,7 @@ inline text-nolabel display{center, large}
 
 ## Exemple d'utilisation
 
-### Téléchargement PDF obligatoire
+### Téléchargement PDF requis
 
 | type | name | label | hint | required | required_message |
 |------|------|-------|------|----------|-----------------|
@@ -116,26 +117,26 @@ inline text-nolabel display{center, large}
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| select_one yesno | has_land_title | Le ménage possède-t-il un titre foncier ? | |
+| select_one yesno | has_land_title | Le ménage a-t-il un titre foncier ? | |
 | file | land_title_doc | Télécharger une photo ou un scan du titre foncier | `${has_land_title} = 'yes'` |
 
-## Meilleures pratiques
+## Bonnes pratiques
 
-1. Utilisez `accept` pour restreindre les types de fichiers — cela empêche les enquêteurs de télécharger accidentellement les mauvais fichiers.
-2. Incluez toujours des conseils sur la taille et le format dans la colonne `hint`.
-3. Pour les photos et les images, utilisez plutôt le type `image` — il offre une meilleure compression et une gestion cohérente des formats.
-4. Pour les enquêtes importantes avec des pièces jointes, planifiez votre stockage de données et votre bande passante de téléchargement en conséquence.
+1. Utilisez `accept` pour restreindre les types de fichiers — cela empêche les enquêteurs de télécharger accidentellement de mauvais fichiers.
+2. Incluez toujours des indications de taille et de format dans la colonne `hint`.
+3. Pour les photos et les images, utilisez plutôt le type `image` — il offre une meilleure compression et une gestion de format cohérente.
+4. Pour les grandes enquêtes avec des pièces jointes, planifiez votre stockage de données et votre bande passante de téléchargement en conséquence.
 5. Testez le sélecteur de fichiers sur le type d'appareil cible (Android vs iOS vs web) avant le déploiement — l'accès aux lecteurs cloud varie.
 
-## Considérations sur la manipulation des données
+## Considérations relatives à la gestion des données
 
-- Les fichiers sont stockés dans leur format d'origine ; ils ne sont pas convertis ou compressés par rtSurvey.
-- Analysez les fichiers après le téléchargement — rtSurvey n'extrait pas et n'indexe pas le contenu des fichiers.
-- Les fichiers joints volumineux augmentent considérablement le temps nécessaire pour télécharger un jeu de données complet.
+- Les fichiers sont stockés dans leur format original ; ils ne sont pas convertis ou compressés par rtSurvey.
+- Analysez les fichiers après le téléchargement — rtSurvey n'extrait ni n'indexe le contenu des fichiers.
+- Les pièces jointes de grande taille augmentent considérablement le temps nécessaire pour télécharger un jeu de données complet.
 
-## Limitations
+## Limites
 
-- Les questions de type fichier ne valident pas le contenu des fichiers — seul le contrôle de l'extension du fichier via `accept` est appliqué au niveau de l'interface utilisateur.
-- Les fichiers très volumineux (100 Mo+) peuvent expirer lors du téléchargement dans des environnements à faible connectivité.
-- Les enquêteurs hors ligne peuvent joindre des fichiers, mais ils ne seront téléchargés que lorsque la connectivité sera rétablie.
-- Certaines configurations d'appareils restreignent l'accès à certains emplacements de stockage (par exemple, les politiques MDM d'entreprise).
+- Les questions de type fichier ne valident pas le contenu des fichiers — seule la vérification de l'extension de fichier via `accept` est appliquée au niveau de l'interface utilisateur.
+- Les très gros fichiers (plus de 100 Mo) peuvent expirer lors du téléchargement dans des environnements à faible connectivité.
+- Les enquêteurs hors ligne peuvent joindre des fichiers mais ils ne seront pas téléchargés tant que la connectivité ne sera pas rétablie.
+- Certaines configurations d'appareil restreignent l'accès à certains emplacements de stockage (par exemple, les politiques MDM d'entreprise).
