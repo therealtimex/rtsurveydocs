@@ -1,24 +1,24 @@
 ---
-title: "Barcode"
-description: "A Barcode kérdéstípusok QR codes és barcode adatokat szkennelnek és rögzítenek a felmérésben."
+title: "Vonalkód"
+description: "A vonalkód kérdések beolvassák és rögzítik a QR-kódokat és vonalkód adatokat a felmérésben."
 ---
 
-A `barcode` kérdéstípus egy kódértéket rögzít egy QR code vagy barcode beolvasásával az eszköz kameráján keresztül. A szkenner modális ablak (scanner modal) egy kézi szövegbeviteli lehetőséget is tartalmaz tartalékként arra az esetre, ha a szkennelés nem lehetséges.
+A `barcode` kérdéstípus egy kódértéket rögzít QR-kód vagy vonalkód beolvasásával az eszköz kamerájával. A szkenner modál tartalmaz egy kézi szöveges beviteli lehetőséget is, mint tartalékot, ha a beolvasás nem lehetséges.
 
-## Basic XLSForm Specification
+## Alapvető XLSForm specifikáció
 
 | type    | name         | label                    |
 |---------|--------------|--------------------------|
-| barcode | product_code | Scan the product barcode |
-| barcode | ticket_id    | Scan the ticket          |
+| barcode | product_code | Szkennelje be a termék vonalkódját |
+| barcode | ticket_id    | Szkennelje be a jegyet |
 
-A szabványos specifikációt az [XLSForm dokumentációjában](https://xlsform.org/en/#question-types) találja.
+A szabványos specifikációt lásd az [XLSForm dokumentációban](https://xlsform.org/en/#question-types).
 
 ---
 
-## Supported formats
+## Támogatott formátumok
 
-Az rtSurvey támogatja a QR codes és a szabványos 1D barcodes formátumokat az eszköz kameráján keresztül, beleértve a következőket:
+Az rtSurvey támogatja a QR-kódokat és a szabványos 1D vonalkódokat az eszköz kamerájával, beleértve:
 
 - QR Code
 - UPC-A, UPC-E
@@ -28,55 +28,55 @@ Az rtSurvey támogatja a QR codes és a szabványos 1D barcodes formátumokat az
 
 ---
 
-## Default layout
+## Alapértelmezett elrendezés
 
-Ha nincs beállítva `appearance`, a kérdés egy teljes szélességű **"GET BARCODE"** gombot jelenít meg. Erre koppintva nyílik meg a szkenner modális ablaka. Sikeres szkennelés után a gomb felirata **"REPLACE BARCODE"**-ra változik, és a beolvasott érték alatta kattintható linkként jelenik meg.
-
----
-
-## Scanner modal
-
-A szkenner modális ablaka mindig tartalmazza a következőket:
-- **Élő kamerakép (Live camera view)** — automatikusan szkennel az észleléskor; a modális ablak sikeres szkennelés után bezárul.
-- **Kézi szövegbevitel (Manual text input)** — egy szöveges mező az ablak alján, ahová a kérdező beírhatja a kódot, ha a szkennelés sikertelen.
-- **Kész gomb (Done button)** — beküldi a kézzel beírt értéket.
-
-Ha az eszköz kamerája nem érhető el, a modális ablak egy **"Upload an image"** lehetőségre vált — a kérdező beküldhet egy fotót a vonalkódról a dekódoláshoz.
+Ha nincs `appearance` beállítva, a kérdés egy teljes szélességű **"BARCODE BEOLVASÁSA"** gombot jelenít meg. Ennek megérintésével megnyílik a szkenner modál. Sikeres beolvasás után a gomb **"BARKÓD CSERÉJE"**-re változik, és a beolvasott érték alatta kattintható linkként jelenik meg.
 
 ---
 
-## Inline button layout
+## Szkenner modál
 
-Adja hozzá az `inline` beállítást, hogy a szkenner egy **kerek ikon gombként** jelenjen meg a címke (label) mellett a teljes szélességű gomb helyett.
+A szkenner modál mindig tartalmazza:
+- **Élő kamera nézet** — automatikusan beolvas érzékeléskor; a modál sikeres beolvasás után bezáródik.
+- **Kézi szöveges bevitel** — egy szövegmező alul, ahol az összeíró begépelheti a kódot, ha a beolvasás nem sikerül.
+- **Kész gomb** — elküldi a manuálisan beírt értéket.
+
+Ha az eszköz kamerája nem elérhető, a modál visszatér az **"Kép feltöltése"** opcióra — az összeíró feltölthet egy fényképet a vonalkódról a dekódoláshoz.
+
+---
+
+## Beágyazott gombelrendezés
+
+Adjon hozzá `inline` értéket, hogy a szkennert **kör alakú ikon gombként** jelenítse meg a címke mellett, a teljes szélességű gomb helyett.
 
 ```
 | type    | name | label     | appearance                              |
 |---------|------|-----------|----------------------------------------|
-| barcode | code | Scan item | inline display{right}                  |
-| barcode | code | Scan item | inline display{left, large}            |
-| barcode | code | Scan item | inline display{center, large, <0099FF/>} |
+| barcode | code | Elem beolvasása | inline display{right}                  |
+| barcode | code | Elem beolvasása | inline display{left, large}            |
+| barcode | code | Elem beolvasása | inline display{center, large, <0099FF/>} |
 ```
 
-**Gomb pozíciója (Button position)** — `left`, `right` *(alapértelmezett)*, `top`, `center`, `bottom`
+**Gomb pozíciója** — `left`, `right` *(alapértelmezett)*, `top`, `center`, `bottom`
 
-**Gomb mérete (Button size)** — `small` *(alapértelmezett)*, `medium`, `large`
+**Gomb mérete** — `small` *(alapértelmezett)*, `medium`, `large`
 
-**Gomb színe (Button color)** — adjon meg egy hex kódot a `display{}`-en belül az elsődleges szín felülírásához:
+**Gomb színe** — adjon hozzá egy hexadecimális színt a `display{}` belsejébe az elsődleges szín felülírásához:
 
 ```
 inline display{right, large, <FF5500/>}
 ```
 
-**Rögzítés utáni vezérlés (Post-capture control) — `results{}`:**
+**Felvétel utáni vezérlés — `results{}`:**
 
-| Appearance | Hatás |
+| Appearance | Effect |
 |---|---|
-| `results{hide(scanner)}` | Elrejti a szkennelés gombot az érték rögzítése után |
+| `results{hide(scanner)}` | Elrejti a szkennelés gombot, miután egy érték rögzítésre került |
 | `results{hide(review)}` | Elrejti a beolvasott érték linkjét a rögzítés után |
 | `results{hide(value)}` | Elrejti a beolvasott érték szöveges megjelenítését |
 | `results{left}` | Az ikont balra mozgatja a rögzítés után |
 
-Példa — szkenner elrejtése az első szkennelés után:
+Példa – a szkenner elrejtése az első szkennelés után:
 ```
 inline display{center, large} results{hide(scanner)}
 ```
@@ -85,36 +85,36 @@ inline display{center, large} results{hide(scanner)}
 
 ## `inputs{auto-close(N)}` — szkenner automatikus bezárása
 
-Automatikusan bezárja a szkenner modális ablakát `N` másodperc után, ha nem észlel vonalkódot. Egy élő visszaszámláló időzítő jelenik meg az ablakban.
+Automatikusan bezárja a szkenner modált `N` másodperc után, ha nem észlel vonalkódot. Élő visszaszámláló jelenik meg a modálban.
 
 ```
-inputs{auto-close(10)}     → 10 másodperc után bezárul
-inputs{auto-close(5)}      → 5 másodperc után bezárul
+inputs{auto-close(10)}     → 10 másodperc után bezáródik
+inputs{auto-close(5)}      → 5 másodperc után bezáródik
 ```
 
-Kombinálás inline móddal:
+Kombinálja az inline-nal:
 ```
 inline display{right} inputs{auto-close(10)}
 ```
 
 ---
 
-## `inputs{floating}` — lebegő, mozgatható szkenner
+## `inputs{floating}` — lebegő, húzható szkenner
 
-Egy **minimalizálás gombot** (tömörítés ikon ⊞) jelenít meg a szkenner modális ablakának fejlécében. Erre koppintva a szkenner egy kis lebegő kerek ikonná zsugorodik, amely a képernyőn bárhová elhúzható. A lebegő ikonra koppintva a szkenner újra megnyílik.
+Megjelenít egy **minimalizáló gombot** (összenyomó ikon ⊞) a szkenner modál fejlécében. Ennek megérintésével a szkenner egy kis lebegő kör alakú ikonná zsugorodik, amely a képernyő bármely pontjára húzható. A lebegő ikon megérintésével újra megnyílik a szkenner.
 
 ```
 inputs{floating}
 inline display{right} inputs{floating}
 ```
 
-Hasznos olyan munkafolyamatokban, ahol a kérdezőnek látnia kell az űrlapot, miközben a szkenner aktív (pl. elemek szkennelése egy listából).
+Hasznos olyan munkafolyamatokban, ahol az összeírónak látnia kell az űrlapot, miközben a szkenner aktív (pl. elemek szkennelése egy listában).
 
 ---
 
 ## `invisible auto-show` — szkenner automatikus megnyitása
 
-Elrejti a kérdés widgetet az elrendezésből, de az oldal betöltésekor automatikusan megnyitja a szkennert. Hasznos egy csendes szkennelési lépés beágyazásához az űrlapfolyamatba.
+Elrejti a kérdés widgetjét az elrendezésből, de automatikusan megnyitja a szkennert, amikor az oldal betöltődik. Hasznos egy néma szkennelési lépés beágyazásához az űrlapfolyamba.
 
 ```
 invisible auto-show
@@ -123,13 +123,13 @@ inline invisible auto-show
 
 ---
 
-## Ismétlődő csoportokban (In repeat groups)
+## Ismétlődő csoportokban
 
-Ha a `barcode` egy `begin repeat` csoporton belül van, a sikeres szkennelés az érték rögzítése után automatikusan a **következő ismétlődésre** ugrik. Ez lehetővé teszi a gyors egymás utáni szkennelést anélkül, hogy a kérdezőnek az elemek között a "Hozzáadás" (Add) gombra kellene koppintania.
+Amikor a `barcode` egy `begin repeat` csoporton belül van, a sikeres szkennelés automatikusan a **következő ismétlődő példányra** lép, miután az érték rögzítésre került. Ez lehetővé teszi a gyors, szekvenciális szkennelést anélkül, hogy az összeírónak minden elem között meg kellene érintenie az "Hozzáadás" gombot.
 
 ---
 
-## Címke elnyomása (Suppress the label)
+## A címke elrejtése
 
 ```
 inline text-nolabel display{center, large}
@@ -137,25 +137,25 @@ inline text-nolabel display{center, large}
 
 ---
 
-## Példa a használatra
+## Példa használat
 
 ### Leltár szkennelés
 
 | type | name | label | appearance | required |
 |------|------|-------|------------|----------|
-| barcode | item_code | Scan item barcode | `inline display{right}` | yes |
-| integer | quantity | Quantity | | yes |
-| note | confirm | Item: `${item_code}` — Qty: `${quantity}` | | |
+| barcode | item_code | Elem vonalkódjának beolvasása | `inline display{right}` | yes |
+| integer | quantity | Mennyiség | | yes |
+| note | confirm | Elem: `${item_code}` — Mennyiség: `${quantity}` | | |
 
-### Gyors több elemes szkennelés (ismétlődő csoport)
+### Gyors, több elemes szkennelés (ismétlődő csoport)
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | begin repeat | items | | |
-| barcode | code | Scan next item | `inline display{right} inputs{auto-close(8)}` |
+| barcode | code | Következő elem beolvasása | `inline display{right} inputs{auto-close(8)}` |
 | end repeat | items | | |
 
-### Csendes automatikus szkennelés oldalbetöltéskor
+### Néma automatikus szkennelés oldalbetöltéskor
 
 | type | name | label | appearance |
 |------|------|-------|------------|
@@ -163,16 +163,16 @@ inline text-nolabel display{center, large}
 
 ---
 
-## Legjobb gyakorlatok
+## Bevált gyakorlatok
 
-1. Használja az `inputs{auto-close(N)}` beállítást, hogy megakadályozza a szkenner végtelen ideig tartó nyitva maradását — válasszon olyan értéket, amely elég időt ad a kérdezőknek a vonalkód pozicionálására (általában 8–15 másodperc).
-2. Használja az `inputs{floating}` beállítást, ha az űrlapnak láthatónak kell maradnia szkennelés közben (pl. szkennelés egy listából, ahol a kérdező egy látható mezővel veti össze az adatokat).
-3. Helyezze a vonalkód kérdést egy ismétlődő csoportba a gyors egymás utáni szkenneléshez — az automatikus ismétlődés-továbblépés szükségtelenné teszi a manuális "Hozzáadás" lépést.
-4. Mindig használja a `hint` oszlopot a pozicionálási utasításokkal (pl. "Tartsa a vonalkódot 10–30 cm távolságra a kamerától, jó fényviszonyok mellett").
-5. A szkenner modális ablakában a kézi szövegbevitel mindig elérhető — tanítsa meg a kérdezőket, hogy ezt használják tartalékként sérült vagy piszkos vonalkódok esetén.
+1. Használja az `inputs{auto-close(N)}` lehetőséget, hogy megakadályozza a szkenner korlátlan nyitva maradását – válasszon egy értéket, amely elegendő időt biztosít az összeíróknak a vonalkód elhelyezésére (jellemzően 8–15 másodperc).
+2. Használja az `inputs{floating}` lehetőséget, amikor az űrlapnak láthatónak kell maradnia szkennelés közben (pl. egy listából történő szkennelés, ahol az összeíró egy látható mezőhöz viszonyít).
+3. Helyezze a vonalkód kérdést ismétlődő csoportba a gyors, szekvenciális szkenneléshez – az automatikus ismétlődés előrehaladás kiküszöböli a kézi "Hozzáadás" lépést.
+4. Mindig tartalmazza a `hint` oszlopot a pozicionálási utasításokkal (pl. "Tartsa a vonalkódot 10–30 cm távolságra a kamerától, jó fényviszonyok között").
+5. A szkenner modálban található kézi szöveges bevitel mindig elérhető – képezze ki az összeírókat, hogy használják tartalékként sérült vagy piszkos vonalkódok esetén.
 
 ## Korlátozások
 
-- A szkennelés pontossága a kamera minőségétől, a megvilágítástól és a vonalkód állapotától függ — a sérült vagy alacsony kontrasztú kódok beolvasása nem feltétlenül megbízható.
-- A szkenner a hátsó (környezet felé néző) kamerát használja; a hátsó kamera nélküli eszközök a képfeltöltési lehetőségre váltanak.
-- Az `invisible auto-show` csak az oldal első betöltésekor nyílik meg; az oldalra való visszanavigálás nem váltja ki újra az automatikus megnyitást.
+- A szkennelés pontossága a kamera minőségétől, a megvilágítástól és a vonalkód állapotától függ – a sérült vagy alacsony kontrasztú kódok nem biztos, hogy megbízhatóan szkennelhetők.
+- A szkenner a hátsó (környezet felé néző) kamerát használja; a hátsó kamera nélküli eszközök visszatérnek a képfeltöltési opcióhoz.
+- Az `invisible auto-show` csak az első oldalbetöltéskor nyílik meg; az oldalra való visszanavigálás nem indítja újra az automatikus megnyitást.

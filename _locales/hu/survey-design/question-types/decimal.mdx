@@ -1,9 +1,9 @@
 ---
-title: "Tizedes tört"
-description: "Törtszám beviteli kérdéstípus az rtSurvey-ben"
+title: "Tizedes"
+description: "Tört szám beviteli kérdéstípus az rtSurvey-ben"
 ---
 
-A `decimal` kérdéstípus olyan számokat gyűjt össze, amelyek tartalmazhatnak tört részt is (pl. `3.14`, `72.5`). Mobileszközökön numerikus billentyűzetet jelenít meg, és ugyanazokat a megjelenési lehetőségeket támogatja az elrendezéshez és formázáshoz, mint a `text` típus.
+A `decimal` kérdéstípus olyan számokat gyűjt, amelyek tört részt is tartalmazhatnak (pl. `3.14`, `72.5`). Mobiltelefonon numerikus billentyűzetet indít el, és ugyanazokat az appearance opciókat támogatja, mint a `text` típus az elrendezéshez és formázáshoz.
 
 ## Alapvető XLSForm specifikáció
 
@@ -13,43 +13,43 @@ A `decimal` kérdéstípus olyan számokat gyűjt össze, amelyek tartalmazhatna
 | decimal | height_m | Magasság (m) |
 | decimal | temperature | Testhőmérséklet (°C) |
 
-A szabványos specifikációért tekintse meg az [XLSForm dokumentációját](https://xlsform.org/en/#question-types).
+A szabványos specifikációt lásd az [XLSForm dokumentációban](https://xlsform.org/en/#question-types).
 
 ---
 
-## Megjelenési lehetőségek (Appearance options)
+## Megjelenítési beállítások
 
-### `number-hspinner` — vízszintes léptető
+### `number-hspinner` — vízszintes pörgető
 
-A beviteli mezőt egy vízszintes **− érték +** léptetővel helyettesíti. A mínusz/plusz gombok megérintése a beállított lépésközzel módosítja az értéket.
+A beviteli mezőt vízszintes **− érték +** pörgetőre cseréli. A mínusz/plusz gombok megérintésével a konfigurált lépéssel állítja be az értéket.
 
 ```
 number-hspinner
 ```
 
-A megjelenített érték egy tizedesjegyre van formázva (pl. `3.0`, `72.5`). Az alapértelmezett lépésköz `1`; tizedes lépésköz beállításához használja a `hspinner()` függvényt.
+A megjelenített érték egy tizedes pontossággal van formázva (pl. `3.0`, `72.5`). Az alapértelmezett lépés `1`; használja a `hspinner()`-t a tizedes lépés beállításához.
 
-**Gombforma és lépésköz testreszabása** a `hspinner()` használatával:
+**Testreszabhatja a gomb alakját és lépését** a `hspinner()` segítségével:
 
 ```
 number-hspinner hspinner('left-small-square','right-small-square','0.1')
 ```
 
-Paraméterek: bal oldali gomb formája, jobb oldali gomb formája, lépésköz értéke. A finomhangoláshoz használjon tizedes lépésközt, például `0.5` vagy `0.1`.
+Paraméterek: bal gomb alakja, jobb gomb alakja, lépés értéke. Használjon tizedes lépést, mint `0.5` vagy `0.1` a pontosabb vezérléshez.
 
-**Egyedi színek** a `colors()` használatával:
+**Egyéni színek** a `colors()` segítségével:
 
 ```
 number-hspinner colors(0099FF,FFFFFF,FF5500,FFFFFF)
 ```
 
-Négy érték sorrendben: bal gomb háttere, bal gomb ikonja, jobb gomb háttere, jobb gomb ikonja.
+Négy érték sorrendben: bal gomb háttérszíne, bal gomb ikonja, jobb gomb háttérszíne, jobb gomb ikonja.
 
 ---
 
 ### `thousandsep` — ezres elválasztó
 
-A megjelenített számot vesszős csoportosítással formázza (pl. `1,234.56`). A nyers szám vesszők nélkül kerül tárolásra. A beviteli típus `"text"`-re vált a formázott megjelenítés lehetővé tétele érdekében.
+A megjelenített számot vesszővel csoportosítva formázza (pl. `1,234.56`). A nyers szám vesszők nélkül kerül tárolásra. A beviteli típus "text"-re vált, hogy lehetővé tegye a formázott megjelenítést.
 
 ```
 thousandsep
@@ -57,21 +57,21 @@ thousandsep
 
 ---
 
-### `digisep(n, "sep")` — egyedi számjegy-csoportosítás
+### `digisep(n, "sep")` — egyéni számjegycsoportosítás
 
-Az egész részt `n` hosszúságú blokkokba csoportosítja, amelyeket egy egyedi elválasztó választ el.
+Az egészrész számjegyeit `n` blokkokba csoportosítja egyéni elválasztóval.
 
 ```
 digisep(3," ")      → 1 234 567.89
 ```
 
-A beviteli típus `"text"`-re vált, ha ez a megjelenés aktív.
+A beviteli típus "text"-re vált, ha ez az appearance aktív.
 
 ---
 
 ### `textonly` — szöveges billentyűzet kényszerítése
 
-A beviteli elemen a `type="text"` értéket kényszeríti. Megelőzi a böngészők számbeviteli furcsaságait (záró nullák elrejtése, asztali léptető nyilak), miközben továbbra is elfogad tizedes értékeket.
+`type="text"`-t kényszerít a beviteli elemen. Megakadályozza a böngésző szám-bevitel furcsaságait (nullák elrejtése, asztali pörgető nyilak), miközben továbbra is elfogadja a tizedes értékeket.
 
 ```
 textonly
@@ -79,9 +79,9 @@ textonly
 
 ---
 
-### `floating_hint` — címkeként lebegő tipp
+### `floating_hint` — súgó lebeg címkeként
 
-A `hint` szöveg helykitöltőként (placeholder) jelenik meg a beviteli mezőben. Amikor a felhasználó gépelni kezd, címkeként (label) a mező fölé úszik.
+A `hint` szöveg helykitöltőként jelenik meg a beviteli mezőben. Amikor a felhasználó gépelni kezd, címkeként lebeg a mező felett.
 
 ```
 floating_hint
@@ -89,9 +89,9 @@ floating_hint
 
 ---
 
-### `embed` — tipp a beviteli mezőn belül
+### `embed` — súgó a beviteli mezőn belül
 
-Hasonló a `floating_hint`-hez — a tipp a beviteli mezőn belül marad, ha az üres. Gépeléskor nem úszik fel.
+Hasonló a `floating_hint`-hez – a súgó a beviteli mezőn belül helyezkedik el üresen. Nem lebeg, amikor a felhasználó gépel.
 
 ```
 embed
@@ -99,9 +99,9 @@ embed
 
 ---
 
-### `textpopup` — modális ablakos bevitel
+### `textpopup` — modális párbeszédpanel bevitel
 
-A mező megérintésekor egy nagyobb beviteli mezőt tartalmazó modális ablak nyílik meg. Kis képernyőkön hasznos.
+A mező megérintésekor egy modális párbeszédpanel nyílik meg nagyobb beviteli mezővel. Hasznos kis képernyőkön.
 
 ```
 textpopup
@@ -109,9 +109,9 @@ textpopup
 
 ---
 
-### `charcount` — élő karakterszámláló
+### `charcount` — élő karakter számláló
 
-Élő `(n)` karakterszámlálót jelenít meg a beviteli mező alatt, amely gépelés közben frissül.
+Élő `(n)` karakter számlálót jelenít meg a beviteli mező alatt, amely frissül, ahogy a felhasználó gépel.
 
 ```
 charcount
@@ -121,10 +121,10 @@ charcount
 
 ### `prefix(expr)` — előtag hozzáadása
 
-Egy statikus vagy számított karakterláncot illeszt a megjelenített érték elé. A tárolt érték nem tartalmazza az előtagot.
+Statikus vagy számított karakterláncot illeszt a megjelenített érték elé. A tárolt érték nem tartalmazza az előtagot.
 
 ```
-prefix('USD ')          → "USD 72.50"-et jelenít meg, "72.50"-et tárol
+prefix('USD ')          → "USD 72.50" megjelenítése, "72.50" tárolása
 prefix(${currency})     → dinamikus előtag egy másik mezőből
 ```
 
@@ -132,7 +132,7 @@ prefix(${currency})     → dinamikus előtag egy másik mezőből
 
 ### `align_answer` — beviteli szöveg igazítása
 
-A beviteli mezőben lévő gépelt érték vízszintes igazítását szabályozza.
+Vezérli a beírt érték vízszintes igazítását a beviteli mezőben.
 
 ```
 align_answer = left
@@ -144,7 +144,7 @@ align_answer = center
 
 ### `inputs{qrscan}` — QR / vonalkód beolvasása a mezőbe
 
-Egy QR-kód beolvasó gombot ad a beviteli mező mellé. Megnyitja a kamera-szkennert, és beilleszti a beolvasott értéket a mezőbe.
+QR-kód beolvasó gombot ad a beviteli mező mellé. Megnyitja a kamera szkennert, és kitölti a mezőt a beolvasott értékkel.
 
 ```
 inputs{qrscan}
@@ -152,28 +152,28 @@ inputs{qrscan}
 
 ---
 
-## Megjelenési gyorshivatkozás
+## Megjelenítési gyors referenciatábla
 
-| Appearance | Widget rendered |
+| Megjelenés | Megjelenített widget |
 |---|---|
-| *(nincs)* | Számbevitel (`type="number"`) — numerikus billentyűzet mobilon |
-| `number-hspinner` | Vízszintes − érték + léptető, egy tizedesjegy megjelenítve |
-| `number-hspinner hspinner(...)` | Léptető egyedi gombformával és lépésközzel |
-| `number-hspinner colors(...)` | Léptető egyedi gombszínekkel |
-| `thousandsep` | Ezres csoportosítású számmegjelenítés |
-| `digisep(n,"sep")` | Egyedi számjegy-csoportosítás |
+| *(nincs)* | Számbevitel (`type="number"`) – numerikus billentyűzet mobilon |
+| `number-hspinner` | Vízszintes − érték + pörgető, egy tizedes pontossággal megjelenítve |
+| `number-hspinner hspinner(...)` | Pörgető egyéni gombformával és lépéssel |
+| `number-hspinner colors(...)` | Pörgető egyéni gomb színekkel |
+| `thousandsep` | Vesszővel csoportosított szám megjelenítése |
+| `digisep(n,"sep")` | Egyéni számjegycsoportosítás |
 | `textonly` | Szöveges billentyűzet kényszerítése |
-| `floating_hint` | Gépelés közben a mező fölé úszó tipp |
-| `embed` | Tipp a beviteli mezőn belül |
-| `textpopup` | Érintse meg a modális ablak megnyitásához |
-| `charcount` | Élő karakterszámláló a mező alatt |
+| `floating_hint` | Súgó lebeg a mező felett gépelés közben |
+| `embed` | Súgó a beviteli mezőn belül |
+| `textpopup` | Érintse meg a modális párbeszédpanel megnyitásához |
+| `charcount` | Élő karakter számláló a bevitel alatt |
 | `prefix(expr)` | Statikus vagy dinamikus előtag hozzáadása |
 | `align_answer = left/right/center` | Beviteli szöveg igazítása |
 | `inputs{qrscan}` | QR/vonalkód beolvasó gomb |
 
 ---
 
-## Korlátozások és validáció
+## Korlátozások és érvényesítés
 
 | type | name | label | constraint | constraint_message |
 |------|------|-------|------------|-------------------|
@@ -188,8 +188,8 @@ inputs{qrscan}
 
 | type | name | label | appearance | constraint | constraint_message |
 |------|------|-------|------------|------------|-------------------|
-| decimal | weight_kg | Súly (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Adjon meg egy érvényes súlyt |
-| decimal | height_m | Magasság (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Adjon meg egy érvényes magasságot |
+| decimal | weight_kg | Súly (kg) | `number-hspinner hspinner('left-small-square','right-small-square','0.5')` | `. > 0 and . <= 300` | Adjon meg érvényes súlyt |
+| decimal | height_m | Magasság (m) | `number-hspinner hspinner('left-small-square','right-small-square','0.01')` | `. > 0 and . <= 3` | Adjon meg érvényes magasságot |
 | calculate | bmi | | | | |
 
 BMI számítási oszlop:
@@ -199,14 +199,14 @@ ${weight_kg} div (${height_m} * ${height_m})
 
 ---
 
-## Legjobb gyakorlatok
+## Bevált gyakorlatok
 
-1. Használja a `number-hspinner hspinner(..., '0.1')` beállítást egy tizedesjegy pontosságot igénylő mérésekhez — a léptető automatikusan egy tizedesjegyre formáz, konzisztensen tartva az értékeket.
-2. Használja a `textonly` beállítást, ha a böngészők nem kívánt léptetőket adnak hozzá, vagy levágják a záró nullákat (pl. a `3.0` értéket `3`-ként jelenítik meg).
-3. Használja a `thousandsep` beállítást nagy pénzügyi értékeknél, hogy a válaszadók ellenőrizhessék, a megfelelő nagyságrendet adták-e meg.
-4. Kényszerítsen tartománykorlátozásokat (constraints), ahelyett, hogy kizárólag a mobil billentyűzet típusára hagyatkozna.
+1. Használja a `number-hspinner hspinner(..., '0.1')`-t olyan mérésekhez, amelyek egy tizedes pontosságot igényelnek – a pörgető automatikusan egy tizedes pontossággal formáz, így az értékek konzisztensek maradnak.
+2. Használja a `textonly`-t, amikor a böngészők nem kívánt pörgető vezérlőket adnak hozzá, vagy levágják a nulla értékű tizedeseket (pl. `3.0` helyett `3`-at jelenít meg).
+3. Használja a `thousandsep`-t nagy pénzügyi értékekhez, hogy a válaszadók ellenőrizhessék, helyes nagyságrendű értéket adtak-e meg.
+4. Érvényesítse a tartománykorlátozásokat, ahelyett, hogy csak a mobil billentyűzet típusára támaszkodna.
 
 ## Korlátozások
 
-- A léptető mindig egy tizedesjegyet jelenít meg — ha nagyobb pontosságra van szüksége a megjelenített értékben, használja helyette a sima beviteli mezőt.
-- A `thousandsep` és a `digisep()` a nyers számot tárolja — a számítások során ne a formázott megjelenített értéket olvassa ki.
+- A pörgető mindig egy tizedes pontossággal jelenít meg – ha nagyobb pontosságra van szüksége a megjelenített értékben, használja helyette az egyszerű beviteli mezőt.
+- A `thousandsep` és `digisep()` a nyers számot tárolja – ne olvassa be a formázott megjelenített értéket a számításokban.

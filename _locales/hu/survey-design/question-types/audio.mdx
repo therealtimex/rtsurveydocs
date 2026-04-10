@@ -1,70 +1,70 @@
 ---
-title: "Audió"
-description: "Az audió kérdések lehetővé teszik a válaszadók számára, hogy hangfájlokat rögzítsenek és küldjenek be a felmérés részeként."
+title: "Audio"
+description: "Az audio kérdések lehetővé teszik a válaszadók számára, hogy hangfájlokat rögzítsenek és küldjenek be a felmérés részeként."
 ---
 
-Az `audio` kérdéstípus lehetővé teszi a válaszadók számára, hogy **hangot rögzítsenek** vagy egy meglévő hangfájlt töltsenek fel a felmérésre adott válaszuk részeként. Hasznos verbális beszámolók, környezeti hangok, tanúvallomások vagy bármilyen olyan információ rögzítésére, amely hangon keresztül jobban átadható, mint szöveggel.
+Az `audio` kérdéstípus lehetővé teszi a válaszadók számára, hogy **hangot rögzítsenek**, vagy feltöltsenek egy meglévő hangfájlt a felmérés válaszának részeként. Hasznos verbális beszámolók, környezeti hangok, nyilatkozatok, vagy bármely olyan információ rögzítésére, amelyet jobban közvetít a hang, mint a szöveg.
 
 ## Alapvető XLSForm specifikáció
 
 | type  | name        | label                        |
 |-------|-------------|------------------------------|
-| audio | voice_note  | Kérjük, rögzítse észrevételeit |
+| audio | voice_note  | Kérjük, rögzítse megjegyzéseit |
 
-A standard audió kérdéstípussal kapcsolatos további részletekért lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
+Az audio kérdéstípus szabványos részleteiről lásd az [XLSForm specifikációt](https://xlsform.org/en/#question-types).
 
-## Felhasználási területek
+## Használat
 
-Az audió kérdéseket általában a következőkre használják:
+Az audio kérdéseket általában a következőkre használják:
 
-1. Nyitott végű verbális válaszok rögzítése a kérdező gépelési terhének csökkentése érdekében
-2. Tanúvallomások, személyes történetek vagy szóbeli előzmények rögzítése
+1. Nyílt végű verbális válaszok rögzítése az összeírók gépelési terhének csökkentésére
+2. Nyilatkozatok, személyes történetek vagy szóbeli történetek rögzítése
 3. Környezeti hangok dokumentálása (pl. zajszint az infrastruktúra közelében)
-4. Hangminták gyűjtése nyelvészeti vagy egészségügyi kutatásokhoz
-5. Lehetővé teszi a válaszadók számára, hogy szóbeli pontosításokat fűzzenek a numerikus vagy kiválasztós válaszokhoz
+4. Hangminták gyűjtése nyelvi vagy egészségügyi kutatásokhoz
+5. Lehetővé teszi a válaszadók számára, hogy verbális magyarázatokat adjanak a numerikus vagy választó válaszokhoz
 
 ## Adatformátum
 
-A hangfájlok bináris mellékletként tárolódnak az űrlap beküldése mellett, jellemzően:
+Az audiofájlokat bináris mellékletek**ként** tárolják a űrlap beküldése mellett, jellemzően:
 
-- **Formátum:** MP3 vagy AAC (mobil rögzítés); WAV (kiváló minőségű rögzítés)
-- **Elnevezés:** `{instanceID}-{fieldname}.mp3` (vagy ennek megfelelő)
+- **Formátum:** MP3 vagy AAC (mobil felvétel); WAV (kiváló minőségű felvétel)
+- **Elnevezés:** `{instanceID}-{fieldname}.mp3` (vagy ezzel egyenértékű)
 - **Tárolás:** Feltöltve a szerver média mappájába, és összekapcsolva a beküldési rekorddal
-- **Hozzáférés:** Lejátszható és letölthető a beküldéskezelő felületről
+- **Hozzáférés:** Lejátszható és letölthető a beküldéskezelő felületen keresztül
 
-## rtSurvey bővítmények
+## rtSurvey kiterjesztések
 
 ### Maximális időtartam
 
-Használja a `parameters` oszlopot a rögzítés hosszának korlátozására:
+Használja a `parameters` oszlopot a felvételi hossz korlátozására:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
-| audio | interview | Az interjú rögzítése | `max-duration=120` |
+| audio | interview | Rögzítse az interjút | `max-duration=120` |
 
-A `max-duration` másodpercben értendő. A rögzítő automatikusan leáll a limitnél.
+A `max-duration` másodpercben van megadva. A felvevő automatikusan leáll a határ elérésekor.
 
 ### Minőségi beállítások
 
-A rögzítési minőség a `parameters` segítségével állítható be:
+A felvétel minősége beállítható a `parameters` segítségével:
 
 | type | name | label | parameters |
 |------|------|-------|------------|
 | audio | feedback | Visszajelzés rögzítése | `quality=normal` |
 
-Támogatott értékek: `low`, `normal` (alapértelmezett), `voice-only`. A `voice-only` a beszélt hangra optimalizál zajcsökkentéssel.
+Támogatott értékek: `low`, `normal` (alapértelmezett), `voice-only`. A `voice-only` optimalizálja a beszélt hangot zajcsökkentéssel.
 
 ### Lejátszás beküldés előtt
 
-Mobilon a kérdező lejátszhatja a rögzített klipet a folytatás előtt. Ez alapértelmezés szerint engedélyezve van — nincs szükség konfigurációra.
+Mobiltelefonon az összeíró lejátszhatja a rögzített klipet a folytatás előtt. Ez alapértelmezés szerint engedélyezve van – nincs szükség konfigurációra.
 
-### Natív rögzítő integráció
+### Natív felvevő integráció
 
-Androidon és iOS-en az `audio` elindítja az eszköz natív rögzítő alkalmazását. Weben a böngésző beépített MediaRecorder API-ját használja.
+Androidon és iOS-en az `audio` elindítja az eszköz natív felvevő alkalmazását. Weben a böngésző beépített MediaRecorder API-ját használja.
 
-### Beágyazott gomb elrendezés (Inline)
+### Beágyazott gombelrendezés
 
-Adja hozzá az `inline` értéket, hogy a mikrofont **kör alakú ikon gombként** jelenítse meg a címke mellett.
+Adjon hozzá `inline` értéket, hogy a mikrofont **kör alakú ikon gombként** jelenítse meg a címke mellett.
 
 ```
 | type  | name | label        | appearance                    |
@@ -77,52 +77,52 @@ Adja hozzá az `inline` értéket, hogy a mikrofont **kör alakú ikon gombként
 
 **Gomb mérete** — `small` *(alapértelmezett)*, `medium`, `large`
 
-**Gomb színe** — adjon meg egy hex színt a `display{}`-en belül az elsődleges szín felülírásához:
+**Gomb színe** — adjon hozzá egy hexadecimális színt a `display{}` belsejébe az elsődleges szín felülírásához:
 
 ```
 inline display{right, large, <FF5500/>}
 ```
 
-**Rögzítés utáni vezérlés — `results{}`:**
+**Felvétel utáni vezérlés — `results{}`:**
 
 | Appearance | Effect |
 |---|---|
-| `results{hide(capture)}` | Elrejti a rögzítés gombot a hang rögzítése után |
+| `results{hide(capture)}` | Elrejti a felvétel gombot a hang rögzítése után |
 | `results{hide(review)}` | Elrejti a lejátszás gombot |
 | `results{hide(filename)}` | Elrejti a fájlnevet és az időtartamot |
-| `results{left}` | Az ikont balra mozgatja a rögzítés után |
+| `results{left}` | Az ikont balra mozgatja a felvétel után |
 
-Példa — rögzítés gomb elrejtése rögzítés után, lejátszás megtartása:
+Példa – a felvétel gomb elrejtése a rögzítés után, a lejátszás megtartása:
 ```
 inline display{right} results{hide(capture)}
 ```
 
 ## Példa használat
 
-### Maximális időtartammal és súgóval (hint)
+### Maximális időtartammal és súgóval
 
 | type | name | label | hint | parameters |
 |------|------|-------|------|------------|
-| audio | story | Meséljen az esetről a saját szavaival | Beszéljen tisztán. A felvétel 3 perc után leáll. | `max-duration=180` |
+| audio | story | Mondja el az esetet a saját szavaival | Beszéljen érthetően. A felvétel 3 perc után leáll. | `max-duration=180` |
 
-### Feltételes audió — csak ha problémát jelentettek
+### Feltételes hangfelvétel — csak ha problémát jelentettek
 
 | type | name | label | relevant | required |
 |------|------|-------|----------|----------|
-| select_one yesno | issue_found | Találtak problémát? | | |
-| audio | issue_audio | Probléma leírásának rögzítése | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
+| select_one yesno | issue_found | Probléma merült fel? | | |
+| audio | issue_audio | Rögzítse a probléma leírását | `${issue_found} = 'yes'` | `${issue_found} = 'yes'` |
 
-## Legjobb gyakorlatok
+## Bevált gyakorlatok
 
-1. A `label`-ben vagy `hint`-ben egyértelműen tüntesse fel, hogy mit kell mondania a kérdezőnek és mennyi ideig.
-2. Használja a `max-duration`-t a túlságosan nagy fájlok elkerülése érdekében a lassú feltöltési sebességű területeken.
-3. Tájékoztassa a válaszadókat a rögzítés megkezdése előtt — a váratlan rögzítés adatvédelmi aggályokat vethet fel.
-4. Telepítés előtt tesztelje a rögzítést a céleszközön és a hálózati körülmények között.
-5. Interjú stílusú felvételeknél állítsa be a `quality=voice-only` értéket a fájlméret csökkentése érdekében az érthetőség elvesztése nélkül.
+1. A `label` vagy `hint` mezőben egyértelműen tüntesse fel, mit és mennyi ideig kell mondania az összeírónak.
+2. Használja a `max-duration` beállítást, hogy elkerülje a túlságosan nagy fájlokat lassú feltöltési sebességű területeken.
+3. Tájékoztassa a válaszadókat a felvétel megkezdése előtt – a váratlan felvétel adatvédelmi aggályokat vethet fel.
+4. Tesztelje a felvételt a cél eszközön és hálózati körülmények között a telepítés előtt.
+5. Állítsa be a `quality=voice-only` értéket az interjú stílusú felvételekhez, hogy csökkentse a fájlméretet a érthetőség romlása nélkül.
 
 ## Korlátozások
 
-- A hangfájlok nagyok lehetnek (egy 2 perces felvétel normál minőségben ~2–4 MB) — vegye ezt figyelembe az adatforgalmi kereténél és a feltöltési idő becslésénél.
-- Nem minden böngésző támogatja a MediaRecorder API-t — a Chrome és a Firefox megbízhatóan működik; a Safari régebbi iOS-verzióin problémák adódhatnak.
-- Az audió válaszok átírása további utómunkálatokat igényel (manuális vagy automatizált beszéd-szöveg átalakítás).
-- Az adatvédelmi szabályozások korlátozhatják a hangok rögzítését — ellenőrizze a helyi adatvédelmi követelményeket.
+- Az audiofájlok nagyok lehetnek (egy 2 perces felvétel normál minőségben ~2–4 MB) – ezt vegye figyelembe az adatforgalmi tervénél és a feltöltési idő becslésénél.
+- Nem minden böngésző támogatja a MediaRecorder API-t – a Chrome és a Firefox megbízhatóan működik; a Safari régebbi iOS verzióinál problémák adódhatnak.
+- Az audio válaszok átírásához további utófeldolgozásra van szükség (manuális vagy automatizált beszédfelismerés).
+- Az adatvédelmi szabályozások korlátozhatják a hangfelvételeket – ellenőrizze a helyi adatvédelmi követelményeket.

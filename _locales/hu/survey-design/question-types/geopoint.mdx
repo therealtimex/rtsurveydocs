@@ -1,9 +1,9 @@
 ---
-title: "Geopoint"
-description: "A Geopoint kérdések földrajzi koordinátákat (szélesség, hosszúság, magasság és pontosság) rögzítenek a felmérés részeként."
+title: "Geopont"
+description: "A geopont kérdések földrajzi koordinátákat (szélesség, hosszúság, magasság és pontosság) rögzítenek a felmérés részeként."
 ---
 
-A `geopoint` kérdéstípus földrajzi koordinátákat (szélesség, hosszúság, magasság, pontosság) rögzít az eszköz GPS-ének segítségével. Az rtSurvey többféle elrendezési móddal jeleníti meg a választót, és támogatja az automatizálást az `inputs{}` és `outputs{}` paramétereken keresztül.
+A `geopoint` kérdéstípus földrajzi koordinátákat (szélesség, hosszúság, magasság, pontosság) rögzít az eszköz GPS-ének segítségével. Az rtSurvey többféle elrendezési móddal jeleníti meg a választót, és támogatja az automatizálást az `inputs{}` és `outputs{}` paraméterekkel.
 
 ## Alapvető XLSForm specifikáció
 
@@ -11,33 +11,33 @@ A `geopoint` kérdéstípus földrajzi koordinátákat (szélesség, hosszúság
 |----------|-------------|-----------------------------|
 | geopoint | location    | Rögzítse az aktuális helyet |
 
-A szabványos specifikációt az [XLSForm dokumentációjában](https://xlsform.org/en/#question-types) találja.
+A szabványos specifikációt lásd az [XLSForm dokumentációban](https://xlsform.org/en/#question-types).
 
 ## Adatformátum
 
-Négy szóközökkel elválasztott értékként tárolva:
+Négy szóközzel elválasztott értékként tárolódik:
 
 ```
-latitude longitude altitude accuracy
+szélesség hosszúság magasság pontosság
 ```
 
 Példa: `13.756331 100.501762 15 8`
 
 ---
 
-## Elrendezési módok (Layout modes)
+## Elrendezési módok
 
 ### Alapértelmezett — téglalap alakú gomb
 
-A téglalap alakú „START GEOPOINT” gomb egy teljes térképes modális ablakot nyit meg, ahol a kérdező kiválaszt egy pontot. A rögzítés után a gomb felirata „View or change geo point”-ra változik, és a koordináták alatta jelennek meg.
+Egy téglalap alakú "GEOPOONT INDÍTÁSA" gomb nyit meg egy teljes térkép modált, ahol az összeíró kiválaszt egy pontot. Rögzítés után a gomb felirata "Geopont megtekintése vagy módosítása"-ra változik, és a koordináták alatta jelennek meg.
 
-Nincs szükség appearance értékre.
+Nincs szükség megjelenítési értékre.
 
 ---
 
 ### `display{inline-icon}` — kör alakú célkereszt gomb
 
-A téglalap alakú gomb helyett egy kör alakú ikongombot (célkereszt ⊕) jelenít meg. Megérintésével ugyanaz a térképes modális ablak nyílik meg.
+Kör alakú ikon gombot (célkereszt ⊕) jelenít meg a téglalap alakú gomb helyett. Ennek megérintésével ugyanaz a térkép modál nyílik meg.
 
 ```
 display{inline-icon}
@@ -46,37 +46,37 @@ display{inline-icon}
 **Pozícióval és mérettel kombinálva:**
 
 ```
-display{inline-icon, left}           → gomb a felirattól balra
-display{inline-icon, top}            → gomb a felirat felett
-display{inline-icon, bottom}         → gomb a felirat alatt, középre igazítva
+display{inline-icon, left}           → gomb a címkétől balra
+display{inline-icon, top}            → gomb a címke felett
+display{inline-icon, bottom}         → gomb a címke alatt, középre igazítva
 display{inline-icon, large}          → nagy ikon (75px)
 display{inline-icon, medium}         → közepes ikon (50px)
-display{inline-icon, left, large}    → nagy gomb a bal oldalon
+display{inline-icon, left, large}    → nagy gomb bal oldalon
 ```
 
-| Size | Icon height/width |
-|------|------------------|
-| *(default)* | 25px |
+| Méret | Ikon magasság/szélesség |
+|------|-----------------------|
+| *(alapértelmezett)* | 25px |
 | `medium` | 50px |
 | `large` | 75px |
 
 ---
 
-### `display{thumbnail-square}` — élő térkép bélyegkép
+### `display{thumbnail-square}` — élő térkép miniatűr
 
-Élő térkép előnézetet (Leaflet) jelenít meg közvetlenül a kérdésnél gomb helyett. A bélyegkép mutatja az aktuális GPS-pozíciót és a kiválasztott pontot. A nagyítás gomb megérintésével megnyílik a teljes modális ablak.
+Élő térkép előnézetet (Leaflet) jelenít meg közvetlenül a kérdésen egy gomb helyett. A miniatűr az aktuális GPS pozíciót és a kiválasztott pontot mutatja. Az expand gomb megérintésével megnyílik a teljes modál.
 
 ```
 display{thumbnail-square}
 ```
 
-**Egyedi bélyegkép méret:**
+**Egyéni miniatűr méret:**
 
 ```
-display{thumbnail-square-[WxH]}          → fix képpontok
+display{thumbnail-square-[SxM]}          → rögzített képpontokban
 display{thumbnail-square-[400x200]}      → 400px széles × 200px magas
 
-display{thumbnail-square-[W%xH%]}        → az űrlap szélességének százaléka
+display{thumbnail-square-[Sz%xM%]}        → az űrlap szélességének százaléka
 display{thumbnail-square-[100%x30%]}     → teljes szélesség × az űrlap szélességének 30%-a
 ```
 
@@ -84,17 +84,17 @@ display{thumbnail-square-[100%x30%]}     → teljes szélesség × az űrlap sz�
 
 ## `display{}` vs `results{}` — rögzítés előtt és után
 
-A `display{}` vezérli az elrendezést, **mielőtt** a felhasználó rögzítené a helyet. A `results{}` vezérli az elrendezést, **miután** létezik egy érték. Különböző igazításaik lehetnek.
+A `display{}` a elrendezést vezérli a hely rögzítése **előtt**. A `results{}` a elrendezést vezérli, **miután** egy érték létezik. Különböző igazításokat is tartalmazhatnak.
 
 ```
 display{inline-icon, right} results{left}
 ```
 
-Ez a rögzítés előtt a jobb oldalon jeleníti meg a gombot, majd a pont rögzítése után balra helyezi át.
+Ez a gombot jobbra jeleníti meg rögzítés előtt, majd balra mozgatja, miután egy pont rögzítésre került.
 
 ### `hide(value)` — koordináták megjelenítésének elrejtése
 
-Alapértelmezés szerint a rögzített szélesség/hosszúság/pontosság/magasság szöveg a gomb alatt jelenik meg. Rejtse el ezzel:
+Alapértelmezés szerint a rögzített szélesség/hosszúság/pontosság/magasság szöveg a gomb alatt jelenik meg. Elrejtheti a következővel:
 
 ```
 results{hide(value)}
@@ -107,21 +107,21 @@ display{inline-icon} results{hide(value)}
 
 ### Automatikus rögzítés betöltéskor
 
-Automatikusan rögzíti a GPS-pozíciót az űrlap betöltésekor, anélkül, hogy a kérdező bármit megnyomna.
+Automatikusan rögzíti a GPS pozíciót az űrlap betöltésekor, anélkül, hogy az összeírónak bármit meg kellene nyomnia.
 
 ```
 inputs{auto-take}
 ```
 
-**Feltételes automatikus rögzítés** XLSForm kifejezés használatával:
+**Feltételes automatikus rögzítés** XLSForm kifejezéssel:
 
 ```
 inputs{autotakeGeo(expression(if(${capture_now} = 'yes', true(), false())))}
 ```
 
-### Előre kitöltés szöveges mezőből
+### Előzetes kitöltés szövegmezőből
 
-Töltse ki a geopointot egy olyan kérdésből, amely helynevet vagy címet tartalmaz. Az rtSurvey az OpenStreetMap Nominatim segítségével fordított geokódolást végez a karakterláncból koordinátákká.
+Töltse fel a geopontot egy kérdésből, amely helynevet vagy cím karakterláncot tartalmaz. Az rtSurvey visszafelé geokódolja a karakterláncot koordinátákká az OpenStreetMap Nominatim segítségével.
 
 ```
 inputs{question(address_field)}
@@ -129,9 +129,9 @@ inputs{question(address_field)}
 
 ---
 
-## `outputs{}` — fordított geokódolás szöveggé
+## `outputs{}` — visszafelé geokódolás szöveggé
 
-Egy pont rögzítése után automatikusan töltsön ki egy `text` kérdést az ember által olvasható címmel (a koordinátákból fordított geokódolással).
+Miután egy pontot rögzítettek, automatikusan töltse fel egy `text` kérdést az emberileg olvasható címmel (a koordinátákból visszafelé geokódolva).
 
 ```
 outputs{question(address_field)}
@@ -148,7 +148,7 @@ Példa:
 
 ## `nomap` — GPS rögzítés térkép nélkül
 
-A térkép modális ablakot egy egyszerű párbeszédpanellel helyettesíti, amely helymeghatározási engedélyt kér és rögzíti a koordinátákat. Nem jelenik meg térkép. Hasznos a csak GPS-alapú rögzítéshez alacsony kategóriás eszközökön, vagy ha a térképcsempék nem érhetők el offline.
+A térkép modált egy egyszerű párbeszédpanellel helyettesíti, amely helymeghatározási engedélyt kér, és rögzíti a koordinátákat. Nincs térkép megjelenítve. Hasznos csak GPS rögzítéshez alacsony kategóriás eszközökön vagy ha a térkép csempék offline nem elérhetők.
 
 ```
 nomap
@@ -156,9 +156,9 @@ nomap
 
 ---
 
-## Egyedi gombstílus
+## Egyéni gombstílus
 
-Használja a `styleButton()` függvényt egyedi CSS alkalmazásához az alapértelmezett téglalap alakú gombra:
+Használja a `styleButton()`-t egyéni CSS alkalmazásához az alapértelmezett téglalap alakú gombhoz:
 
 ```
 styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"})
@@ -166,7 +166,7 @@ styleButton({"backgroundColor":"#1976D2","color":"#ffffff","borderRadius":"8px"}
 
 ---
 
-## A felirat elrejtése
+## A címke elrejtése
 
 ```
 text-nolabel display{inline-icon, center, large}
@@ -174,30 +174,30 @@ text-nolabel display{inline-icon, center, large}
 
 ---
 
-## Példa a használatra
+## Példa használat
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| geopoint | field_loc | Terepi hely rögzítése | `display{inline-icon, right, large}` |
-| geopoint | site | Helyszín helye | `display{thumbnail-square-[100%x30%]}` |
+| geopoint | field_loc | Mező helyének rögzítése | `display{inline-icon, right, large}` |
+| geopoint | site | Helyszín | `display{thumbnail-square-[100%x30%]}` |
 | geopoint | auto_loc | Aktuális pozíció | `inputs{auto-take} display{inline-icon} results{hide(value)}` |
-| geopoint | mapped_loc | Helyszín | `display{inline-icon} outputs{question(address)}` |
+| geopoint | mapped_loc | Hely | `display{inline-icon} outputs{question(address)}` |
 | geopoint | gps_only | GPS pont | `nomap` |
 
 ---
 
-## Legjobb gyakorlatok
+## Bevált gyakorlatok
 
-1. Használja az `inputs{auto-take}` funkciót a kérdező általi ellenőrző felmérésekhez, ahol a GPS kötelező — ez kiküszöböli a manuális lépést.
-2. Használja a `display{thumbnail-square}` megjelenítést, ha azt szeretné, hogy a kérdező vizuálisan is megerősítse a kiválasztott pontot a folytatás előtt.
-3. Párosítsa az `outputs{question(...)}` függvényt egy írásvédett `text` mezővel a fordítottan geokódolt cím megjelenítéséhez a kérdező számára.
-4. Használja a `nomap` beállítást internetkapcsolat nélküli területeken, ahol a térképcsempék nem tudnak betöltődni.
-5. Hagyjon időt a GPS-jel stabilizálódására a rögzítés előtt — a 10 méter alatti pontosság általában elegendő a terepi felmérésekhez.
+1. Használja az `inputs{auto-take}`-t az összeírói ellenőrzési felmérésekhez, ahol a GPS kötelező – ez eltávolítja a kézi lépést.
+2. Használja a `display{thumbnail-square}`-t, amikor azt szeretné, hogy az összeíró vizuálisan erősítse meg a kiválasztott pontot a folytatás előtt.
+3. Párosítsa az `outputs{question(...)}`-t egy írásvédett `text` mezővel, hogy megjelenítse a visszafelé geokódolt címet az összeírónak.
+4. Használja a `nomap`-t olyan területeken, ahol nincs internetkapcsolat, és a térkép csempék nem tölthetők be.
+5. Hagyjon elegendő időt a GPS stabilizálódására a rögzítés előtt – a 10m alatti pontosság általában elegendő a helyszíni felmérésekhez.
 
-## Korlátozások (Limitations)
+## Korlátozások
 
-- Az `inputs{question(name)}` geokódoláshoz internet-hozzáférés szükséges — az OpenStreetMap Nominatim API-t hívja meg.
-- Az `outputs{question(name)}` fordított geokódoláshoz szintén internet-hozzáférés szükséges.
-- A térkép bélyegképhez (`display{thumbnail-square}`) internet szükséges a csempék betöltéséhez; a koordináták rögzítése ettől függetlenül offline is megtörténik.
-- A GPS pontossága az eszköztől és a környezettől függően változik — a beltéri vagy városi kanyonviszonyok 50 méternél nagyobb pontatlanságot is eredményezhetnek.
-- A helyadatok gyűjtése hosszú felmérések során jelentősen befolyásolhatja az eszköz akkumulátorának élettartamát.
+- Az `inputs{question(name)}` geokódoláshoz internetkapcsolat szükséges – az OpenStreetMap Nominatim API-t hívja meg.
+- Az `outputs{question(name)}` visszafelé geokódoláshoz szintén internetkapcsolat szükséges.
+- A térkép miniatűr (`display{thumbnail-square}`) internetet igényel a csempék betöltéséhez; a koordináták továbbra is rögzítésre kerülnek offline.
+- A GPS pontosság eszköztől és környezettől függően változik – beltéri vagy városi kanyon körülmények között 50m feletti pontosság is előfordulhat.
+- A helyadatok gyűjtése jelentősen befolyásolhatja az eszköz akkumulátor élettartamát hosszú felmérések során.
