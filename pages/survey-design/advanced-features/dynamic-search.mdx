@@ -136,6 +136,51 @@ substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
 
 ---
 
+## Local file search with search()
+
+`search()` performs offline, column-equality lookups against a bundled SQLite `.db` file — no network connection and no SQL queries required. Use it when your reference data is packaged with the form and you need a simple "find all rows where column equals value" lookup.
+
+### Signature
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `path` | Path to the SQLite table: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Match operator — returns rows where the column equals the value |
+| `'list_name'` | Column name to match against |
+| `${field}` | Value to match; typically a field reference |
+
+### Example
+
+Populate a `select_one` from a local database by matching the value of `${d307}` against the `list_name` column in the `externalData` table of `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Select facility | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+When `${d307}` equals `"HF001"`, `search()` returns every row in `externalData` where `list_name = 'HF001'` — entirely from the bundled file, with no network call.
+
+### search() vs rawquery autocomplete
+
+| Feature | `search()` | `rawquery` autocomplete |
+|---------|-----------|------------------------|
+| SQL queries | No — column equality only | Yes — full `SELECT … FROM …` |
+| Parameterized input | Column value match | Embedded in SQL string |
+| Free-text entry | Yes — enumerator can type freely | No — must select from list |
+| UNION / multi-table | Not supported | Supported |
+
+### When to use each
+
+- Use **`search()`** when you need a straightforward equality match against a bundled `.db` file, the form must work offline, and you want to allow free-text entry.
+- Use **`rawquery` autocomplete** when you need SQL flexibility (JOINs, UNIONs, computed columns) or must query across multiple tables, and the form has reliable connectivity.
+
+---
+
 ## Best Practices
 
 1. Ensure your API endpoint responds within 1–2 seconds — slow APIs make the search feel unresponsive.
