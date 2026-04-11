@@ -137,13 +137,109 @@ When a `rank` field exists inside a repeat, use `rank-index(instanceNumber, repe
 
 ---
 
+## `1screen` appearance on `begin_repeat`
+
+Adding `1screen` to the `appearance` column of a `begin_repeat` row displays all questions for each instance together on a single screen, rather than one question per screen.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Household member | `1screen` |
+| text | member_name | Member name | |
+| integer | member_age | Age | |
+| end_repeat | | | |
+
+When `1screen` is set and there is no `repeat_count` and no `add_repeat` field inside the group, rtSurvey automatically renders a circular **+** button at the bottom of the screen so enumerators can add new instances without any extra configuration.
+
+| Appearance | One screen per instance | Default + button added |
+|------------|-------------------------|------------------------|
+| `1screen` | Yes | Yes (when no `add_repeat` child) |
+| `field-list` | Yes | No |
+
+Use `field-list` when you want the grouped layout without the automatic add button. Use `1screen` when you want both the grouped layout and a built-in way to add instances.
+
+---
+
+## `add_repeat` custom add button
+
+A `note` (or `text`) field placed **inside** the repeat group with `appearance: add_repeat` renders as a full-width "Add" button. The button label comes from the field's `label` column. When an `add_repeat` field is present, the default circular + button (from `1screen`) is suppressed.
+
+Place the `add_repeat` field as the last field inside the repeat group:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Member | `1screen` |
+| text | member_name | Member name | |
+| integer | member_age | Age | |
+| note | btn_add | + Add member | `add_repeat` |
+| end_repeat | | | |
+
+### Color customization
+
+Pass a color code inside the appearance value to style the button:
+
+| Appearance value | Result |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Green background, default text color |
+| `add_repeat 04B404-ffffff` | Green background, white text |
+
+The first color is the background and the second (after the dash) is the text color. Omit the `#` when using the dash-separated form.
+
+### Icon variant
+
+Use `add_repeat icon` (with a space) to render a compact circular icon button instead of the full-width button:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Add | `add_repeat icon` |
+
+---
+
+## Delete buttons: `delete-repeat-current` and `delete-repeat-last`
+
+A `note` field inside the repeat group with `appearance: delete-repeat-current` or `appearance: delete-repeat-last` renders as a split delete button.
+
+| Appearance | Action |
+|------------|--------|
+| `delete-repeat-current` | Deletes the current (active) instance |
+| `delete-repeat-last` | Deletes the last instance in the repeat |
+
+The default (non-icon) button is a split button: a trash icon on the left and the field's label text on the right, spanning the full width of the screen.
+
+### Icon variant
+
+Append `-icon` to get a compact circular trash icon button:
+
+| Appearance | Result |
+|------------|--------|
+| `delete-repeat-current-icon` | Circular trash icon, deletes current instance |
+| `delete-repeat-last-icon` | Circular trash icon, deletes last instance |
+
+### Color customization
+
+Color format is identical to `add_repeat`: use `<#RRGGBB/>` or `RRGGBB-RRGGBB` (background-text).
+
+### Full pattern example
+
+The following repeat uses `1screen`, a circular delete-current button at the top, and a full-width add button at the bottom:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Member | `1screen` |
+| note | btn_del | Remove | `delete-repeat-current-icon` |
+| text | member_name | Member name | |
+| integer | member_age | Age | |
+| note | btn_add | + Add member | `add_repeat` |
+| end_repeat | | | |
+
+---
+
 ## Best Practices
 
 1. Always use `repeat_count` when the number of repetitions is known in advance — it prevents enumerators from accidentally adding or removing instances.
 2. Keep repeat groups focused — a repeat with 20+ questions per instance is difficult to navigate.
 3. Name repeat groups clearly (e.g., `household_members`, not `repeat1`) — the name appears in function calls and exported data.
 4. Test with the maximum expected number of instances to verify performance.
-5. Use `field-list` appearance on the repeat group to show all fields on one screen per instance (mobile).
+5. Use `1screen` on `begin_repeat` to show all questions on one screen per instance, paired with an `add_repeat` note field inside the group to give enumerators a clearly labelled "Add" button.
 
 ---
 
