@@ -1,0 +1,118 @@
+---
+title: "Audio Recording"
+description: "Record ambient or interview audio during survey data collection using audio-start and audio-end appearances on text fields."
+---
+
+Audio recording lets a form silently or visibly capture audio during a section of a survey. It is useful for recording interviews, ambient sound during field observations, or spoken responses that complement structured answers.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Mobile app only.** Audio recording requires the rtSurvey mobile app. In the web form the `audio-start` and `audio-end` appearances are silently ignored — no recording takes place and no error is shown. Always test on-device when audio recording is required.
+</Callout>
+
+---
+
+## How it works
+
+Audio recording is controlled by two `text` fields acting as **markers**:
+
+- A field with appearance `audio-start` begins recording when the enumerator reaches it.
+- A field with appearance `audio-end` stops recording and saves the audio file to the submission.
+
+Both marker fields are of type `text`. They are typically hidden from the enumerator (using `relevant = false` or placed in a non-interactive position), though they can be visible. The recorded audio is attached to the submission as a file linked to the `audio-end` field.
+
+---
+
+## Basic example
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Respondent name | |
+| text | q_occupation | Occupation | |
+| integer | q_age | Age | |
+| text | audio_e_a1 | | `audio-end` |
+
+The app starts recording when the enumerator reaches `audio_s_a1` and stops when they reach `audio_e_a1`. All questions between the two markers are recorded.
+
+---
+
+## Silent recording: `audio-start invisible`
+
+By default, the mobile app displays a recording indicator while audio is being captured. Adding `invisible` to the appearance suppresses this indicator, so recording happens without any visible cue to the respondent.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Do you agree to participate? | |
+| text | q_feedback | Your feedback | |
+| text | audio_e_a1 | | `audio-end` |
+
+Use `invisible` only when disclosure requirements have been satisfied through other means (e.g., a separate written consent field before the recording section).
+
+---
+
+## Naming convention
+
+Production forms use a consistent naming pattern for marker fields:
+
+```
+audio_s_{section}{n}   — start marker
+audio_e_{section}{n}   — end marker
+```
+
+Where `{section}` is a short label for the form section and `{n}` is a sequential number within that section.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | First recording in section A |
+| `audio_e_a1` | End | End of first recording in section A |
+| `audio_s_b1` | Start | First recording in section B |
+| `audio_e_b1` | End | End of first recording in section B |
+| `audio_s_a2` | Start | Second recording in section A |
+| `audio_e_a2` | End | End of second recording in section A |
+
+Following this convention makes it easy to identify recording boundaries when reviewing form definitions and submission data.
+
+---
+
+## Storage and retrieval
+
+When the enumerator reaches the `audio-end` field, the app finalises the audio file and attaches it to the submission. The file is:
+
+- Stored as an audio attachment on the submission, associated with the `audio-end` field name.
+- Accessible in the rtSurvey back-end submission viewer alongside other media attachments.
+- Downloadable via the standard submission export — audio files appear in the media column corresponding to the `audio-end` field name.
+
+File format and bitrate depend on the device and app version.
+
+---
+
+## Multiple recording sections
+
+A form can contain several non-overlapping recording sections. Each pair of `audio-start` / `audio-end` markers must be fully contained — sections must not interleave.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Introduction | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Details | |
+| text | audio_e_b1 | | `audio-end` |
+
+Each section produces a separate audio file attached to its respective `audio-end` field.
+
+---
+
+## Limitations
+
+- **Mobile app only.** The feature is not supported in the web form. `audio-start` and `audio-end` are silently ignored in a browser.
+- **No nesting.** Recording sections cannot overlap. Starting a new recording before the previous `audio-end` marker is reached is not supported.
+- **Field type must be `text`.** Using `audio-start` or `audio-end` on any other question type is not supported.
+- **Upload size.** Long recordings produce large files. Be aware of submission size limits and network conditions in the field.
+- **No mid-recording pause.** The recording runs continuously from the start marker to the end marker; there is no mechanism to pause and resume within a section.
