@@ -26,6 +26,11 @@ rtSurvey supports various functions, including:
 
 2. `string-length(field)`: Returns the length of a string field.
    - Example: `string-length(.) > 3 and string-length(.) < 10` can be used to ensure the current field is between 3 and 10 characters.
+   - **Cascade dependency pattern**: `string-length(${province}) >= 0` always evaluates to `true` but forces rtSurvey to re-evaluate the expression whenever `${province}` changes. Use this in `relevant` to trigger a cascade refresh when a parent field updates:
+     | type | name | relevant |
+     |------|------|----------|
+     | select_one | district | `string-length(${province}) >= 0` |
+     This ensures the district question re-evaluates its `search()` or `rawquery` appearance whenever province changes.
 
 3. `substr(fieldorstring, startindex, endindex)`: Returns a substring starting at `startindex` and ending just before `endindex`. Indexes start at 0 for the first character in the string.
    - Example: `substr(${phone}, 0, 3)` will return the first three digits of a phone number.
@@ -198,6 +203,10 @@ Date values in rtSurvey are stored as strings in `YYYY-MM-DD` format. Datetime v
    - `%H` (hour 00–23), `%h` (hour 01–12), `%M` (minutes 00–59), `%S` (seconds 00–59), `%3` (milliseconds), `%P` (AM/PM)
    - Example: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
    - Example: `format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
+
+8. `STRFTIME(format, datetime)`: SQLite-style date formatting. Available inside SQL strings passed to `rawquery` queries — **not** available in XLSForm `calculation` or `label` columns. Uses SQLite format tokens (`%Y`, `%m`, `%d`, `%H`, `%M`, `%S`).
+   - Example inside a rawquery SQL string: `'SELECT STRFTIME(''%Y-%m'', interview_date) AS month FROM data WHERE id = ?'`
+   - Note: Use `format-date-time()` for date formatting in XLSForm expressions. `STRFTIME()` is a SQLite function available only within SQL passed to `rawquery`.
 
 ---
 
