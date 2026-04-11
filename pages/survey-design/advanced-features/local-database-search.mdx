@@ -59,7 +59,7 @@ search-autocomplete-noedit-v2(
 
 ### The `db_path` convention
 
-The database file lives inside the form's bundled media directory. At runtime, `pulldata('app-api', 'family_path')` returns that directory path. The standard pattern is:
+The database file lives inside the form's bundled media directory. At runtime, `pulldata('app-api', 'family_path')` returns that directory path. See [family_path](family-path) for setup details. The standard pattern is:
 
 ```
 concat(${family_path}, '/mydata.db::tableName')

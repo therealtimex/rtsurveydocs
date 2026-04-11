@@ -115,7 +115,7 @@ Example — display a lookup result in the active language using `pulldata('rawq
 ```
 | type      | name        | calculation                                                                 |
 |-----------|-------------|-----------------------------------------------------------------------------|
-| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', 'name_en', 'code', ${district}), pulldata('rawquery', 'name_vi', 'code', ${district})) |
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
 ```
 
 Note: The `language_use` field is typically set by a `change_language` appearance widget. See Appearance — change_language.

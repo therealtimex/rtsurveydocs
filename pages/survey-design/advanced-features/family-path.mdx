@@ -51,7 +51,7 @@ The `::tableName` suffix is stripped when the app opens the file; the table name
 
 `family_path` is required in the path argument whenever you reference a bundled file:
 
-- **Local database search** — the `db_path` argument of `search-autocomplete-noedit-v2('rawquery', ...)` must be built with `concat(${family_path}, ...)`.
+- **Local database search** — the `db_path` argument of `search-autocomplete-noedit-v2('rawquery', ...)` must be built with `concat(${family_path}, ...)`. See [Local Database Search](local-database-search) for full usage details.
 - **`pulldata` rawquery** — any `pulldata('rawquery', ...)` call that reads from a `.db` file uses the same `concat()` pattern.
 - **`search()` with a local file** — dynamic-search appearances that load from a bundled CSV or DB file also rely on `family_path` for the file reference.
 
@@ -95,9 +95,9 @@ Define `family_path` once; reference it in as many fields as needed.
 
 Add a temporary `note` field below `family_path` to inspect the resolved value on the device:
 
-| type | name | label |
-|---|---|---|
+| type | name | label | calculation |
+|---|---|---|---|
 | calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
-| note | family_path_check | `Path: ${family_path}` |
+| note | family_path_check | `Path: ${family_path}` | |
 
 The note will display the actual resolved path during testing. Remove it before deploying the final form.
