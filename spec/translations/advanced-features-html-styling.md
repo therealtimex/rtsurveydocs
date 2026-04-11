@@ -13,13 +13,13 @@ Added "Dynamic HTML summaries with autopull()" section before Best Practices. Co
 
 | Locale | Status |
 |--------|--------|
-| ar | not_implemented |
-| bg | not_implemented |
-| cs | not_implemented |
-| da | not_implemented |
-| de | not_implemented |
-| el | not_implemented |
-| es | not_implemented |
+| ar | implemented |
+| bg | implemented |
+| cs | implemented |
+| da | implemented |
+| de | implemented |
+| el | implemented |
+| es | implemented |
 | fi | not_implemented |
 | fr | not_implemented |
 | hi | not_implemented |

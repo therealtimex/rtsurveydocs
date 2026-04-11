@@ -67,14 +67,18 @@ Both columns append GET parameters to `service_url`:
 
 ## Example
 
+[Download example dataSetting.csv](/examples/dataSetting.csv)
+
 ```csv
 filepath,service_url,option,frequency,primary_key,where,dynamic_part
 resources/familyMedia/FORM_A/staff.db,./api/dm/getData?token=tk&dm_name=staff_list,overwrite,3600,,`department`='##department##',
 resources/familyMedia/FORM_A/facilities.db,./api/download/facilities,overwrite,86400,,,
+resources/familyMedia/FORM_A/locations.db,./api/download/locations,overwrite,604800,,,
 ```
 
 - `staff.db` — downloads a staff list filtered by the `department` argument passed when opening the form; refreshes every hour.
 - `facilities.db` — downloads the full facility reference with no filter; refreshes once a day.
+- `locations.db` — downloads a location reference; refreshes once a week (604800 s).
 
 ---
 

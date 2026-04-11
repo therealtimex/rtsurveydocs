@@ -63,12 +63,22 @@ Upload the file as family media with the exact filename `formSetting.csv`. The a
 
 ## Example
 
+[Download example formSetting.csv](/examples/formSetting.csv)
+
 ```csv
 type,name,value,disable,note,description
 boolean,autosend_wifi,1,yes,,Auto send over WiFi
+boolean,autosend_network,1,no,,Auto send over any network
 boolean,save_mid,0,yes,,No mid-form save allowed
-text,font_size,18,no,,Slightly smaller font
 boolean,show_welcome_screen,0,yes,,Skip welcome screen
+boolean,show_final_screen,1,no,,Show final screen
+boolean,show_required_asterisk,1,no,,Show asterisk on required questions
+text,navigation,swipe_one,no,,Navigation mode
+boolean,buttons,1,no,,Show prev/next buttons
+text,font_size,21,no,,Font size in pt
+boolean,disable_screen_off,1,yes,,Keep screen on during form entry
+boolean,long_press_remove_answer,1,no,,Long press to clear answer
+boolean,long_press_remove_repeat,0,no,,Long press to delete repeat instance
 ```
 
 <Callout type="info">

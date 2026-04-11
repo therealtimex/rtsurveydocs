@@ -1,0 +1,4 @@
+filepath,service_url,option,frequency,primary_key,where,dynamic_part
+resources/familyMedia/FORM_A/staff.db,./api/dm/getData?token=tk&dm_name=staff_list,overwrite,3600,,`department`='##department##',
+resources/familyMedia/FORM_A/facilities.db,./api/download/facilities,overwrite,86400,,,
+resources/familyMedia/FORM_A/locations.db,./api/download/locations,overwrite,604800,,,

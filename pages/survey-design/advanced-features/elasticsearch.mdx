@@ -1,0 +1,56 @@
+---
+title: "Elasticsearch"
+description: "Use Elasticsearch data in RTSurvey forms via search-api() for real-time queries or dataSetting.csv for offline access."
+---
+
+import { Callout } from 'nextra/components'
+
+Elasticsearch (ES) is a server-side search engine managed by the platform administrator. From a form designer's perspective, ES is just another data source — you access it using the same mechanisms as any other remote or local data.
+
+---
+
+## Real-time search with `search-api()`
+
+Point `search-api()` at the ES `_search` endpoint using `POST` method. Key parameters to configure:
+
+- **method**: `POST`
+- **url**: the ES `_search` endpoint URL
+- **body**: the ES query JSON — use `%__input__%` where the search term goes
+- **value_column**: `_id` or a field inside `_source`
+- **display_template**: use `##_source.fieldname##` to access nested source fields
+- **data_path**: `$.hits.hits` — each hit becomes one result item
+- **result_key**: any name, used to read fields with `pulldata()` after selection
+
+See [Dynamic Search](dynamic-search) for the full `search-api()` parameter reference.
+
+**When to use:** Data changes frequently and the device has reliable connectivity.
+
+---
+
+## Offline access with `dataSetting.csv`
+
+Use `dataSetting.csv` to download an ES data export as a SQLite file at form open time. The server exports the ES index as a SQLite file with a single `externalData` table. Once on the device, query it with `rawquery` like any other local database.
+
+See [Data Settings](data-settings) and [Local Database Search](local-database-search) for full reference.
+
+**When to use:** Data changes daily or weekly and offline access is required.
+
+---
+
+## Choosing the right approach
+
+| Situation | Use |
+|-----------|-----|
+| Data changes frequently, device is always online | `search-api()` → ES `_search` |
+| Data changes daily / weekly, offline needed | `dataSetting.csv` + `rawquery` |
+| Data is static | Bundled CSV in family media |
+
+---
+
+## Security note
+
+The ES cluster uses HTTP Basic Auth managed server-side — credentials are never sent to devices. When `search-api()` queries ES directly from the device, the request is sent **without authentication headers**.
+
+<Callout type="warning">
+Do not expose sensitive personal data in an ES index queried directly via `search-api()`. For sensitive data, use the offline mode (`dataSetting.csv`) — the server handles the authenticated ES export and devices never communicate with ES directly.
+</Callout>
