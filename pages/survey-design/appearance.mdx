@@ -79,6 +79,23 @@ In addition to standard XLSForm appearances, rtSurvey supports the following pla
 | `floating_hint` | text, integer, decimal | Shows the hint text as a floating label above the input field rather than below it. |
 | `calculate-button` | calculate | Adds a visible button that triggers recalculation of the field on demand, rather than computing automatically. |
 
+### Group and navigation
+
+| Appearance Attribute | Question Types | Description |
+|----------------------|----------------|-------------|
+| `section` | group | Renders the group as a collapsible section card. Note: mobile app only. |
+| `toc-hide` | any | Excludes the question from the table-of-contents (TOC) navigation panel. |
+| `minilog` | begin_repeat | Displays completed repeat entries as a compact mini-log list rather than expanding each entry inline. |
+
+### Input behaviour
+
+| Appearance Attribute | Question Types | Description |
+|----------------------|----------------|-------------|
+| `proper` | text | Auto-capitalises the first letter of each word as the respondent types (title-case behaviour). |
+| `text-nolabel` | text, integer, decimal | Renders the input field without a visible label. |
+| `inline-1line` | text | Forces the text input to display as a single line even when the question label is long. |
+| `popup` | any | Renders the field inside a popup / modal overlay rather than inline on the page. |
+
 ### Layout
 
 | Appearance Attribute | Question Types | Description |
@@ -87,6 +104,8 @@ In addition to standard XLSForm appearances, rtSurvey supports the following pla
 | `columns(n)` | select_one, select_multiple | Displays choices in `n` columns. Example: `columns(3)` shows three columns of radio buttons. |
 | `gridformat<row=R col=C colspan=S align=center>` | any | Positions the field in a CSS-grid layout at row `R`, column `C`, spanning `S` columns. Used with `advanced-extension/grid-layout`. |
 | `ignore-simplify` | any | Instructs the form renderer to skip automatic simplification or condensing of this field's layout. |
+| `horizontal(N)` | select_one, select_multiple | Sets each choice to occupy `N` percent of the row width. Example: `horizontal(50)` places two choices per row. |
+| `scroll-view(N%)` | group, repeat | Constrains the container to a maximum height of `N%` of the viewport (or parent), adding a scroll bar when content overflows. Example: `scroll-view(60%)`. |
 
 ### Widgets
 
@@ -94,6 +113,8 @@ In addition to standard XLSForm appearances, rtSurvey supports the following pla
 |----------------------|----------------|-------------|
 | `likert` | select_one | Presents choices as a Likert scale row (already in standard table above; confirmed supported). |
 | `distress` | select_one | Renders choices as the Kessler Psychological Distress Scale (K10) visual widget with emotional icons. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Renders choices as styled rating boxes with five colour slots. `c1` = outer container border, `c2` = unchecked border, `c3` = checked border and fill, `c4` = unchecked text colour, `c5` = checked text colour. Example: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Renders choices as coloured tag chips. The five colour slots follow the same order as `rating_box-fill`. Selected choices are highlighted; unselected choices are suppressed from the summary view. |
 
 ### API integration
 
@@ -102,6 +123,12 @@ In addition to standard XLSForm appearances, rtSurvey supports the following pla
 | `callapi` | text, integer, decimal, select_one | Enables API call integration for this field. The calculation column should contain a `callapi()` expression. See [Call API](advanced-features/call-api). |
 | `callapi-verify(params)` | text, integer, decimal | Triggers an API verification call using static parameters. The form blocks progress until the API confirms the value. |
 | `callapi-verify(dynamicParams)` | text, integer, decimal | Same as `callapi-verify` but with parameters derived from other field values at runtime. |
+
+### Language switcher
+
+| Appearance Attribute | Question Types | Description |
+|----------------------|----------------|-------------|
+| `change_language-{colors} default('lang')` | note, text | Renders a language-switcher widget styled with the given colour codes. The `default('lang')` token sets the initial language (e.g. `default('en')`); it is rewritten to `rtDefault('lang')` internally during parsing. Example: `change_language-blue-white default('vi')`. |
 
 ### Inline date/time format
 
