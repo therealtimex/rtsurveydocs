@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path is a convention calculate field that returns the form's bundled media directory path at runtime — required by every form that uses local database lookups or file-based search."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` is a convention calculate field that holds the path to the form's bundled media directory. Every form that performs local database lookups with `rawquery`, `pulldata`, or `search()` must include this field — without it, file paths cannot be resolved and lookups silently return empty.
+
+---
+
+## The calculate field
+
+Add this row near the top of your survey sheet, after any meta fields and before the first question that uses a database file:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+The field stores no visible value and requires no label. It is a silent prerequisite for all path construction that follows.
+
+---
+
+## Why it is needed
+
+RTSurvey bundles form media — SQLite databases, images, audio clips — inside a per-form directory on the device. The exact path differs between platforms (Android, iOS, web) and between devices.
+
+At runtime the app fills in `family_path` automatically. A typical resolved value looks like:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Because the path is platform-specific and determined at launch time, it cannot be hard-coded in the form. `pulldata('app-api', 'family_path')` is the only reliable way to retrieve it.
+
+---
+
+## How to use it in paths
+
+Once `family_path` is defined, build a full file path with `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+The `::tableName` suffix is stripped when the app opens the file; the table name is used only inside your SQL query.
+
+---
+
+## Where family_path is used
+
+`family_path` is required in the path argument whenever you reference a bundled file:
+
+- **Local database search** — the `db_path` argument of `search-autocomplete-noedit-v2('rawquery', ...)` must be built with `concat(${family_path}, ...)`.
+- **`pulldata` rawquery** — any `pulldata('rawquery', ...)` call that reads from a `.db` file uses the same `concat()` pattern.
+- **`search()` with a local file** — dynamic-search appearances that load from a bundled CSV or DB file also rely on `family_path` for the file reference.
+
+---
+
+## Placement in the form
+
+`family_path` must appear **before the first field that references it**. The recommended position is immediately after the meta group:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(rawquery appearance referencing `${family_path}`)* |
+
+<Callout type="warning">
+If `family_path` is missing from the form, or is placed after the first `rawquery` / `search()` field that references it, all lookups against bundled files will silently return empty. There is no error message — the autocomplete simply shows no results.
+</Callout>
+
+---
+
+## Multiple database files
+
+A single form can use several `.db` files. Each path is constructed independently with `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Define `family_path` once; reference it in as many fields as needed.
+
+---
+
+## Verification during development
+
+Add a temporary `note` field below `family_path` to inspect the resolved value on the device:
+
+| type | name | label |
+|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Path: ${family_path}` |
+
+The note will display the actual resolved path during testing. Remove it before deploying the final form.
