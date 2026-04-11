@@ -1,0 +1,104 @@
+---
+title: "Form Navigation Controls"
+description: "Use SaveFinalizedExit and SaveIncompleteExit appearance values to render styled exit buttons that save and leave the form."
+---
+
+**Form Navigation Controls** are appearance values placed on `note` (or `text`) fields that render as full-width styled buttons at the bottom of a survey. They let the enumerator save the submission and exit the form in one tap — either as a completed (finalized) record or as a draft (incomplete) record.
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Renders a button that **saves the submission as finalized** and exits the form. The button label is taken from the field's `label` column.
+
+| XLSForm column | Value |
+|----------------|-------|
+| `type` | `note` |
+| `name` | any unique name (e.g., `btn_finish`) |
+| `label` | text shown on the button |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+The submission is marked as a final, complete record. This is equivalent to tapping the built-in submit button.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Renders a button that **saves the submission as incomplete (draft)** and exits the form. The enumerator can return to it later and continue filling it in.
+
+| XLSForm column | Value |
+|----------------|-------|
+| `type` | `note` |
+| `name` | any unique name (e.g., `btn_pause`) |
+| `label` | text shown on the button |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Color syntax
+
+Both appearances accept an inline color in `<#RRGGBB/>` format:
+
+- `#` followed by exactly **6 hex digits** (uppercase or lowercase)
+- The closing `/>` is **required** — omitting it breaks parsing
+- Example: `<#04B404/>` (green), `<#EDC602/>` (amber), `<#D9534F/>` (red)
+
+The color controls the button background. Text color is determined automatically by the app.
+
+---
+
+## Example
+
+The following two fields placed at the end of a form produce a green **Submit** button and an amber **Save as draft** button:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Submit | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Save as draft | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## `toc-hide` — excluding buttons from the table of contents
+
+The `toc-hide` appearance token tells rtSurvey to exclude a field from the form's **table of contents** (the overview list of questions). Navigation buttons are not questions, so they should never appear in the TOC.
+
+Always append `toc-hide` after the exit appearance:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+See [Appearances](/survey-design/appearance) for a full list of appearance tokens.
+
+---
+
+## Placement convention
+
+Follow these conventions when adding navigation controls to a form:
+
+- Place both buttons at the **very end** of the form, after all questions and groups.
+- Always include **both** buttons together — one finalized and one incomplete — so the enumerator always has a way to exit regardless of completion state.
+- Use the `relevant` column on the finalized exit button if submission should only be allowed when certain conditions are met (e.g., a required section is complete). The incomplete exit button should generally remain **always visible**.
+
+---
+
+## Conditional finalized exit
+
+Use the `relevant` column to control when the finalized exit button is shown. The incomplete exit should remain unconditionally visible so the enumerator can always pause and return.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Submit | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Save as draft | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+In this example the **Submit** button only appears when the enumerator has given consent and marked section A as complete. The **Save as draft** button is always available.
+
+---
+
+## Limitations
+
+- **Field type must be `note` or `text`.** Using these appearances on any other question type is not supported.
+- **6-digit hex only.** Shorthand hex (`<#FFF/>`) and named colors are not supported — always use the full 6-digit format (e.g., `<#FFFFFF/>`).
+- **Label column is the button text.** The `hint` column is ignored for these fields; only `label` is rendered.
+- **Both buttons should be present.** Omitting the incomplete exit button leaves the enumerator without a way to pause mid-form.
