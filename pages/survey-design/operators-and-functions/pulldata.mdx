@@ -191,12 +191,40 @@ Read a form configuration option by name.
 pulldata('options', 'max_household_size')
 ```
 
-### `pulldata('rawquery', 'filename.csv', whereClause)`
+### `pulldata('rawquery', path, sql, param1, ...)`
 
-Execute a raw SQL `WHERE` clause filter against a CSV media file. More flexible than the standard `pulldata()` four-argument form when complex filtering is needed.
+Execute a SQL `SELECT` against a bundled SQLite `.db` file and return the value from the first column of the first matching row. Parameters after the SQL string are substituted in order for `?` placeholders.
+
+| Position | Parameter | Description |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | Literal string identifying this variant |
+| 2 | path | File path in `concat(${family_path}, '/file.db::tableName')` format |
+| 3 | SQL | A `SELECT` statement using `?` as positional placeholders |
+| 4+ | params | Values substituted for each `?` in order — usually field references like `${field}` |
+
+Returns an empty string if no row matches.
+
+**Example — look up a province name by ID:**
 
 ```
-pulldata('rawquery', 'staff.csv', concat('department = ''Health'' AND active = ''1'''))
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
 ```
 
-Returns the first matching row's `name` column value, or empty string if no row matches.
+**Example — look up a ward name filtered by both province and district codes:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Unlike the standard four-argument `pulldata()` which matches a single key column in a CSV file, the `rawquery` variant executes a full SQL `SELECT` against a SQLite database, allowing multi-column `WHERE` conditions and any column as the return value.
+
+<Callout type="info">
+`rawquery` is commonly used with autocomplete fields for hierarchical location lookups. See [Local Database Search](../advanced-features/local-database-search) for details on building `.db` files and wiring them to `pulldata('rawquery', ...)`.
+</Callout>
