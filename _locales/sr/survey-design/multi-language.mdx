@@ -3,15 +3,15 @@ title: "Podrška za više jezika"
 description: ""
 ---
 
-rtSurvey pruža robusnu podršku za više jezika, dozvoljavajući vam da kreirate ankete na više jezika. Ova funkcija je ključna za sprovođenje istraživanja u raznolikim jezičkim populacijama ili u višejezičnim okruženjima.
+rtSurvey pruža snažnu podršku za više jezika, omogućavajući vam da kreirate ankete na više jezika. Ova funkcija je ključna za sprovođenje istraživanja među različitim jezičkim populacijama ili u višejezičnim okruženjima.
 
 ## Podešavanje višejezičnih anketa
 
-Za kreiranje višejezičnih anketa u rtSurvey-u, treba dodati jezički-specifične kolone u XLSForm. Evo kako:
+Da biste kreirali višejezičnu anketu u rtSurvey, potrebno je da dodate kolone specifične za jezik u svoj XLSForm. Evo kako:
 
-1. **Prevodi oznaka**: Dodajte kolone za svaki jezik koristeći format `label::Jezik (kod)`.
-2. **Prevodi napomena**: Koristite `hint::Jezik (kod)` za prevođenje napomena.
-3. **Prevodi medijskih datoteka**: Za medije specifične za jezik, koristite `media::Jezik (kod)`.
+1. **Prevodi oznaka (Label)**: Dodajte kolone za svaki jezik koristeći format `label::Language (code)`.
+2. **Prevodi saveta (Hint)**: Koristite `hint::Language (code)` za prevođenje saveta.
+3. **Prevodi medijskih datoteka**: Za medije specifične za jezik, koristite `media::Language (code)`.
 
 Primer:
 
@@ -23,11 +23,11 @@ Primer:
 
 ## Jezički kodovi
 
-Preporučuje se korišćenje zvaničnih 2-karakternih jezičkih kodova (podoznaka) posle naziva jezika. Ovo olakšava podudaranje jezika formulara sa jezikom korisničkog interfejsa. Zvanične kodove možete pronaći [ovde](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+Preporučuje se korišćenje zvaničnih dvokarakternih jezičkih kodova (subtags) nakon naziva jezika. Ovo olakšava usklađivanje jezika obrasca sa jezikom korisničkog interfejsa. Zvanične kodove možete pronaći [ovde](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
-## Postavljanje podrazumevanog jezika
+## Podešavanje podrazumevanog jezika
 
-Da biste postavili podrazumevani jezik za prikupljanje podataka, koristite radni list `settings` u XLSForm-u:
+Da biste postavili podrazumevani jezik za prikupljanje podataka, koristite radni list `settings` u svom XLSForm-u:
 
 ```
 | form_id   | version | default_language |
@@ -35,18 +35,18 @@ Da biste postavili podrazumevani jezik za prikupljanje podataka, koristite radni
 | test_form | 101     | French (fr)       |
 ```
 
-## Funkcije specifične za rtSurvey
+## Specifične funkcije rtSurvey-a
 
-### Dinamičko prebacivanje jezika
+### Dinamička promena jezika
 
-rtSurvey dozvoljava korisnicima da dinamički menjaju jezike tokom prikupljanja podataka:
+rtSurvey omogućava korisnicima da dinamički menjaju jezike tokom prikupljanja podataka:
 
 - U veb interfejsu, koristite padajući meni za jezik u gornjoj navigacionoj traci.
-- U mobilnoj aplikaciji, pristupite opcijama jezika putem menija podešavanja.
+- U mobilnoj aplikaciji, pristupite opcijama jezika preko menija podešavanja.
 
-### Poruke validacije specifične za jezik
+### Poruke o validaciji specifične za jezik
 
-rtSurvey proširuje podršku za više jezika na poruke validacije:
+rtSurvey proširuje višejezičnu podršku i na poruke o validaciji:
 
 ```
 | type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
@@ -54,9 +54,19 @@ rtSurvey proširuje podršku za više jezika na poruke validacije:
 | integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-### Podrška za jezike s desna na levo (RTL)
+### Lokalizovane poruke o obaveznosti
 
-Za jezike s desna na levo (RTL) kao što su arapski ili hebrejski, rtSurvey automatski prilagođava raspored:
+Koristite `required_message::Language (code)` da biste prikazali prevedenu grešku kada je obavezno polje ostavljeno prazno:
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
+### Podrška za RTL jezike
+
+Za jezike koji se pišu sa desna na levo (RTL), kao što su arapski ili hebrejski, rtSurvey automatski prilagođava raspored:
 
 ```
 | type | name | label::English (en) | label::Arabic (ar) |
@@ -64,9 +74,9 @@ Za jezike s desna na levo (RTL) kao što su arapski ili hebrejski, rtSurvey auto
 | text | name | Your name           | اسمك                |
 ```
 
-### Izgled specifičan za jezik
+### Izgled (Appearance) specifičan za jezik
 
-rtSurvey vam dozvoljava da specificirate različite izglede za različite jezike:
+rtSurvey vam omogućava da navedete različite izglede za različite jezike:
 
 ```
 | type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
@@ -74,25 +84,61 @@ rtSurvey vam dozvoljava da specificirate različite izglede za različite jezike
 | text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
 
-## Najbolje prakse za višejezičke ankete
+## HTML formatiranje u dvojezičnim oznakama
 
-1. **Konzistentno imenovanje**: Koristite konzistentne jezičke kodove u celom formularu.
-2. **Profesionalni prevod**: Angažujte profesionalne prevodioce upoznate sa kontekstom ankete.
-3. **Kontekstualne napomene**: Pružite kontekstualne napomene prevodiocima radi obezbeđivanja tačnih prevoda.
-4. **Testiranje**: Testirajte formular na svim jezicima pre primene.
-5. **Unicode podrška**: Osigurajte da vaši uređaji za prikupljanje podataka podržavaju Unicode za ne-latinska pisma.
-6. **Mediji specifični za jezik**: Koristite kulturno prikladne slike ili audio za svaki jezik.
+Možete kombinovati HTML oznake sa jezičkim omotačima u jednoj ćeliji oznake. rtSurvey izvlači blok aktivnog jezika i renderuje preostali HTML.
+
+Primer korišćenja podebljanog teksta i boje fonta po jeziku:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Podržane inline oznake unutar jezičkih omotača: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Primer obojenog teksta po jeziku:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Proračuni svesni jezika
+
+Kada obrazac ima polje `${language_use}` (postavljeno pomoću vidžeta `change_language`), koristite `if()` da biste vratili vrednosti na aktivnom jeziku:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Primer — prikazivanje rezultata pretrage na aktivnom jeziku pomoću `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Napomena: Polje `language_use` obično postavlja vidžet izgleda `change_language`. Pogledajte Appearance — change_language.
+
+## Najbolje prakse za višejezične ankete
+
+1. **Dosledno imenovanje**: Koristite dosledne jezičke kodove u celom obrascu.
+2. **Profesionalni prevod**: Angažujte profesionalne prevodioce koji su upoznati sa kontekstom ankete.
+3. **Napomene o kontekstu**: Obezbedite napomene o kontekstu za prevodioca kako biste osigurali tačne prevode.
+4. **Testiranje**: Testirajte svoj obrazac na svim jezicima pre postavljanja.
+5. **Unicode podrška**: Uverite se da vaši uređaji za prikupljanje podataka podržavaju Unicode za nelatinična pisma.
+6. **Mediji specifični za jezik**: Koristite kulturološki prikladne slike ili audio zapise za svaki jezik.
 7. **Izbegavajte tekst u slikama**: Ako koristite slike sa tekstom, kreirajte zasebne slike za svaki jezik.
 
-## Rukovanje posebnim slučajevima
+## Rešavanje posebnih slučajeva
 
-### Odgovori mešovitih jezika
+### Odgovori na mešovitim jezicima
 
-rtSurvey dozvoljava ispitanicima da unose tekst u bilo kom pismu, bez obzira na izabrani jezik formulara. Ovo je korisno za hvatanje imena ili adresa u originalnom pismu.
+rtSurvey omogućava ispitanicima da unose tekst na bilo kom pismu, bez obzira na izabrani jezik obrasca. Ovo je korisno za snimanje imena ili adresa na njihovom izvornom pismu.
 
 ### Tipovi pitanja specifični za jezik
 
-Neki tipovi pitanja mogu biti pogodniji za određene jezike. rtSurvey vam dozvoljava da koristite različite tipove pitanja za različite jezike:
+Neki tipovi pitanja mogu biti prikladniji za određene jezike. rtSurvey vam omogućava da koristite različite tipove pitanja za različite jezike:
 
 ```
 | type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
@@ -102,19 +148,19 @@ Neki tipovi pitanja mogu biti pogodniji za određene jezike. rtSurvey vam dozvol
 
 ## Izvoz višejezičnih podataka
 
-Kada izvozite podatke iz rtSurvey-a:
+Prilikom izvoza podataka iz rtSurvey-a:
 
-- Odaberite izvoz na određenom jeziku ili uključite sve jezičke verzije.
-- Metapodaci o jeziku su uključeni u izvoz, ukazujući koji jezik je korišćen za svaki odgovor.
+- Izaberite izvoz na određenom jeziku ili uključite sve jezičke verzije.
+- Jezički metapodaci su uključeni u izvoz, ukazujući na to koji je jezik korišćen za svaki odgovor.
 
 ## Razmatranja za mobilnu aplikaciju
 
-- rtSurvey mobilna aplikacija podržava prebacivanje jezika van mreže.
-- Osigurajte da su sve potrebne jezičke datoteke preuzete pre odlaska van mreže.
+- Mobilna aplikacija rtSurvey podržava promenu jezika van mreže (offline).
+- Uverite se da su sve potrebne jezičke datoteke preuzete pre nego što odete van mreže.
 
 ## Poznata ograničenja
 
-- Neke napredne funkcije možda nisu dostupne na svim jezicima.
-- Izuzetno dugi prevodi mogu uticati na raspored na manjim ekranima.
+- Neke napredne funkcije možda neće biti dostupne na svim jezicima.
+- Izuzetno dugački prevodi mogu uticati na raspored na manjim ekranima.
 
-Koristeći višejezičke mogućnosti rtSurvey-a, možete kreirati inkluzivne, pristupačne ankete koje dosežu raznolike populacije i pružaju visokokvalitetne, jezički tačne podatke.
+Iskorišćavanjem višejezičnih mogućnosti rtSurvey-a, možete kreirati inkluzivne, pristupačne ankete koje dopiru do različitih populacija i pružaju visokokvalitetne, lingvistički tačne podatke.

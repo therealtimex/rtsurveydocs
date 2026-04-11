@@ -1,0 +1,224 @@
+---
+title: "Pencarian Database Lokal"
+description: "Pencarian Database Lokal melakukan kueri pada file SQLite .db yang disertakan menggunakan SQL mentah, memungkinkan pelengkapan otomatis offline yang cepat untuk kumpulan data statis yang besar."
+---
+
+import { Callout } from 'nextra/components'
+
+**Pencarian Database Lokal** memungkinkan bidang `select_one` atau `text` untuk melakukan kueri pada file SQLite `.db` yang disertakan dengan paket media formulir — sepenuhnya offline, tanpa perlu terhubung ke server. Ini adalah pendekatan yang tepat ketika daftar pilihan Anda besar dan statis (misalnya, daftar nasional desa, fasilitas kesehatan, atau batas administratif) dan konektivitas tidak dapat dijamin.
+
+| Pendekatan | Sumber data | Memerlukan konektivitas |
+|---|---|---|
+| Pencarian database lokal (`rawquery`) | File `.db` yang disertakan (SQLite) | Tidak |
+| `search-api()` | REST API jarak jauh | Ya |
+| `search()` | File CSV yang disertakan | Tidak |
+
+---
+
+## Varian tampilan
+
+Bidang pelengkapan otomatis dikonfigurasi melalui kolom `appearance`. Tersedia tiga varian:
+
+| Varian | Catatan |
+|---|---|
+| `search-autocomplete-noedit(...)` | Pelengkapan otomatis standar — enumerator harus memilih dari daftar; entri teks bebas tidak disimpan |
+| `search-autocomplete-noedit-v2(...)` | Varian yang direkomendasikan — perilaku yang sama tetapi menggunakan mesin rendering yang diperbarui dengan performa yang lebih baik pada kumpulan hasil yang besar |
+| `search(...)` | Pencocokan berbasis file sederhana terhadap CSV yang disertakan; **tidak** mendukung SQL mentah — dicantumkan di sini hanya untuk perbandingan |
+
+<Callout type="info">
+`search-autocomplete-noedit` adalah alias — pada saat penguraian, aplikasi menggantinya dengan nama fungsi internal `searchAutocompleteNoedit`. Gunakan salah satu ejaan di XLSForm Anda; keduanya berfungsi.
+</Callout>
+
+---
+
+## Sumber data `rawquery`
+
+To run a SQL query against a `.db` file, pass `'rawquery'` as the first argument of the appearance function. The full signature is:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parameter
+
+| Posisi | Parameter | Deskripsi |
+|---|---|---|
+| 1 | `'rawquery'` | String literal — memberi tahu aplikasi untuk mengeksekusi SQL secara langsung |
+| 2 | `db_path` | Jalur ke file SQLite, dalam bentuk `<dir>/<file>.db::tableName`. Akhiran `::tableName` akan dihapus saat membuka file; nama tabel digunakan di dalam SQL Anda |
+| 3 | `'[display_col]'` | Kolom yang akan ditampilkan di dropdown. Tanda kurung siku `[ ]` di sekitarnya akan dihapus saat runtime |
+| 4 | `'value_col'` | Kolom yang nilainya disimpan saat enumerator membuat pilihan |
+| 5 | `'SELECT ...'` | Pernyataan SQLite SELECT apa pun yang valid. `SELECT DISTINCT` secara otomatis disuntikkan jika `DISTINCT` belum ada |
+| 6+ | `param1, ...` | Opsional. Nilai yang terikat pada placeholder `?` di SQL, secara berurutan. Jika SQL berisi `?` tetapi tidak ada parameter yang diberikan, bidang akan mengembalikan hasil kosong (perlindungan bawaan terhadap argumen yang hilang) |
+
+### Konvensi `db_path`
+
+File database berada di dalam direktori media formulir yang disertakan. Saat runtime, `pulldata('app-api', 'family_path')` mengembalikan jalur direktori tersebut. Lihat [family_path](family-path) untuk detail penyiapan. Pola standarnya adalah:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Saat aplikasi membuka file, aplikasi akan menghapus bagian `::tableName` dan menggunakan jalur file saja. Nama tabel hanya muncul di dalam SQL Anda.
+
+---
+
+## Contoh dasar — pencarian provinsi
+
+Dropdown provinsi hanya-baca yang didukung oleh file `vnxa3.db` yang disertakan:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Provinsi | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+Kolom `appearance` (diperluas agar mudah dibaca):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Label yang ditampilkan berasal dari kolom `provv`.
+- Nilai yang disimpan berasal dari kolom `provid`.
+- Hanya baris dengan `rta_filter = "1"` yang ditampilkan.
+
+---
+
+## Kueri berparameter
+
+Gunakan placeholder `?` di SQL Anda dan teruskan referensi bidang yang sesuai sebagai argumen tambahan (posisi 6 dan seterusnya). Ini adalah pola standar untuk pilihan berjenjang (cascading selects) — misalnya, memuat distrik yang termasuk dalam provinsi yang dipilih sebelumnya.
+
+<Callout type="warning">
+Jika SQL Anda berisi setidaknya satu `?` dan tidak ada argumen parameter yang diberikan, bidang akan mengembalikan kumpulan hasil kosong. Ini mencegah data lama atau tidak terfilter muncul sebelum pilihan induk dibuat.
+</Callout>
+
+### Contoh jenjang distrik
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+Nilai `${province}` terikat pada `?` pertama. Bidang kosong sampai enumerator memilih provinsi.
+
+### Contoh dua parameter — jenjang komune
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parameter terikat berdasarkan posisi: `${province}` → `?` pertama, `${district}` → `?` kedua.
+
+---
+
+## UNION SELECT untuk nilai khusus
+
+Suntikkan baris sintetis — seperti "Tidak Tahu" atau "Menolak Menjawab" — langsung di SQL menggunakan `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Tidak tahu</i>", "888"')
+```
+
+Konvensi yang digunakan dalam formulir RTSurvey:
+
+| Kode | Arti |
+|---|---|
+| `888` | Tidak Tahu |
+| `999` | Menolak Menjawab |
+
+Tag HTML seperti `<i>` dalam string tampilan dirender oleh aplikasi — Anda dapat menggunakannya untuk membedakan opsi khusus secara visual.
+
+---
+
+## Tampilan multibahasa
+
+Simpan label khusus bahasa di kolom terpisah (misalnya, `label_vi`, `label_en`) dan pilih yang sesuai berdasarkan bidang bahasa di formulir Anda:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Untuk mengganti kolom secara dinamis berdasarkan bidang `${language}`, gunakan ekspresi `if()` pada parameter kolom tampilan untuk beralih di antara kolom bahasa:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Parameter kolom tampilan dievaluasi sebelum kueri dijalankan. Hanya nama kolom (tanpa kurung) yang diteruskan ke mesin SQL; tanda kurung adalah penanda kosmetik yang dihapus saat penguraian.
+</Callout>
+
+---
+
+## Memvalidasi pilihan nyata
+
+Saat bidang mengizinkan nilai khusus seperti 888 atau 999, pemeriksaan `required = yes` saja tidak cukup — pemeriksaan ini terpenuhi meskipun enumerator memilih "Tidak Tahu". Gunakan batasan `selected-at(., 0) != -997` untuk memverifikasi bahwa nilai yang disimpan adalah pilihan asli dan bukan sentinel internal "tidak ada yang dipilih" `-997`:
+
+| kolom | nilai |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Silakan pilih opsi yang valid |
+
+Nilai `-997` adalah kode internal yang disimpan RTSurvey saat tidak ada item yang dipilih dari daftar pelengkapan otomatis. Pilihan 888 atau 999 tetap merupakan pilihan yang disengaja dan lolos pemeriksaan ini.
+
+Untuk mewajibkan nilai nyata (bukan khusus) tambahan, perluas batasan tersebut:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Perbandingan: database lokal vs metode pencarian lainnya
+
+| Fitur | Pelengkapan otomatis `rawquery` | `search-api()` | `search()` CSV | Pilihan CSV biasa |
+|---|---|---|---|---|
+| Sumber data | File `.db` yang disertakan (SQLite) | REST API jarak jauh | File CSV yang disertakan | Lembar pilihan |
+| Bekerja offline | Ya | Tidak | Ya | Ya |
+| Mendukung SQL mentah | Ya | Tidak | Tidak | Tidak |
+| Filter berjenjang | Ya — `?` berparameter | Melalui badan permintaan | Terbatas | Tidak |
+| Ukuran kumpulan data | Sangat besar (jutaan baris) | Tidak terbatas (sisi server) | Menengah (puluhan ribu) | Kecil |
+| Baris khusus yang disuntikkan | Ya — `UNION SELECT` | Tidak | Tidak | Ya (manual) |
+| Kompleksitas penyiapan | Sedang — memerlukan file `.db` yang disertakan | Tinggi — memerlukan server API | Rendah | Tidak ada |
+
+---
+
+## Batasan
+
+- File `.db` harus disertakan di dalam paket media formulir sebelum penerapan. Pembaruan dinamis ke database memerlukan penerapan formulir baru.
+- SQL dieksekusi apa adanya di perangkat. Tidak ada sanitasi sisi server — hindari membangun SQL dari input teks bebas enumerator.
+- Hanya pernyataan `SELECT` yang didukung. `INSERT`, `UPDATE`, dan `DELETE` tidak diizinkan.
+- Kueri yang sangat kompleks (rantai `UNION` besar, beberapa join) mungkin lambat pada perangkat Android kelas bawah.
+- Varian `search-autocomplete-noedit` tidak memungkinkan enumerator untuk menyimpan nilai yang tidak ada dalam kumpulan hasil. Jika entri teks bebas diperlukan, gunakan bidang `text` terpisah.
+- `SELECT DISTINCT` disuntikkan secara otomatis hanya jika `DISTINCT` tidak ada dalam kueri. Jika Anda menulis `SELECT DISTINCT` secara eksplisit, itu tidak akan diduplikasi.

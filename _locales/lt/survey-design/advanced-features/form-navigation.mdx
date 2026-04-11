@@ -1,0 +1,104 @@
+---
+title: "Formos navigacijos valdikliai"
+description: "Naudokite SaveFinalizedExit ir SaveIncompleteExit išvaizdos reikšmes, kad sukurtumėte stilizuotus išėjimo mygtukus, kurie išsaugo ir išeina iš formos."
+---
+
+**Formos navigacijos valdikliai** yra išvaizdos reikšmės, dedamos į `note` (arba `text`) laukus, kurie apklausos apačioje rodomi kaip viso pločio stilizuoti mygtukai. Jie leidžia tyrėjui vienu palietimu išsaugoti pateikimą ir išeiti iš formos — kaip užbaigtą (finalizuotą) įrašą arba kaip juodraštį (neužbaigtą įrašą).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Sukuria mygtuką, kuris **išsaugo pateikimą kaip finalizuotą** ir išeina iš formos. Mygtuko etiketė paimama iš lauko stulpelio `label`.
+
+| XLSForm column | Reikšmė |
+|----------------|-------|
+| `type` | `note` |
+| `name` | bet koks unikalus pavadinimas (pvz., `btn_finish`) |
+| `label` | tekstas, rodomas ant mygtuko |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Pateikimas pažymimas kaip galutinis, pilnas įrašas. Tai atitinka integruoto pateikimo mygtuko paspaudimą.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Sukuria mygtuką, kuris **išsaugo pateikimą kaip neužbaigtą (juodraštį)** ir išeina iš formos. Tyrėjas gali prie jo grįžti vėliau ir tęsti pildymą.
+
+| XLSForm column | Reikšmė |
+|----------------|-------|
+| `type` | `note` |
+| `name` | bet koks unikalus pavadinimas (pvz., `btn_pause`) |
+| `label` | tekstas, rodomas ant mygtuko |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Spalvų sintaksė
+
+Abi išvaizdos priima įterptą spalvą `<#RRGGBB/>` formatu:
+
+- `#`, po kurio eina tiksliai **6 šešioliktainiai skaitmenys** (didžiosios arba mažosios raidės)
+- Uždarymo `/>` yra **privalomas** — jo praleidimas nutraukia analizę
+- Pavyzdys: `<#04B404/>` (žalia), `<#EDC602/>` (gintarinė), `<#D9534F/>` (raudona)
+
+Spalva valdo mygtuko foną. Teksto spalvą programėlė nustato automatiškai.
+
+---
+
+## Pavyzdys
+
+Šie du laukai, esantys formos pabaigoje, sukuria žalią mygtuką **Pateikti** ir gintarinį mygtuką **Išsaugoti kaip juodraštį**:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Pateikti | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Išsaugoti kaip juodraštį | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — mygtukų pašalinimas iš turinio
+
+Išvaizdos raktas `toc-hide` nurodo rtSurvey pašalinti lauką iš formos **turinio** (klausimų apžvalgos sąrašo). Navigacijos mygtukai nėra klausimai, todėl jie niekada neturėtų būti rodomi turinyje.
+
+Visada pridėkite `toc-hide` po išėjimo išvaizdos:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Žr. [Išvaizda — toc-hide](../appearance#group-and-navigation) informaciją apie toc-hide.
+
+---
+
+## Dėjimo taisyklės
+
+Pridėdami navigacijos valdiklius į formą, laikykitės šių taisyklių:
+
+- Abu mygtukus dėkite į pačią formos **pabaigą**, po visų klausimų ir grupių.
+- Visada įtraukite **abu** mygtukus kartu — vieną finalizuotą ir vieną neužbaigtą — kad tyrėjas visada turėtų galimybę išeiti, nepriklausomai nuo užbaigimo būsenos.
+- Naudokite stulpelį `relevant` finalizuoto išėjimo mygtukui, jei pateikimas turėtų būti leidžiamas tik įvykdžius tam tikras sąlygas (pvz., užbaigtas privalomas skyrius). Neužbaigto išėjimo mygtukas paprastai turėtų likti **visada matomas**.
+
+---
+
+## Sąlyginis finalizuotas išėjimas
+
+Naudokite stulpelį `relevant`, kad valdytumėte, kada rodomas finalizuoto išėjimo mygtukas. Neužbaigtas išėjimas turėtų likti besąlygiškai matomas, kad tyrėjas visada galėtų sustoti ir grįžti.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Pateikti | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Išsaugoti kaip juodraštį | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Šiame pavyzdyje mygtukas **Pateikti** pasirodo tik tada, kai tyrėjas davė sutikimą ir pažymėjo A skyrių kaip užbaigtą. Mygtukas **Išsaugoti kaip juodraštį** yra pasiekiamas visada.
+
+---
+
+## Apribojimai
+
+- **Lauko tipas turi būti `note` arba `text`.** Šių išvaizdų naudojimas su bet kokio kito tipo klausimu nėra palaikomas.
+- **Tik 6 skaitmenų šešioliktainis kodas.** Trumpasis šešioliktainis kodas (`<#FFF/>`) ir spalvų pavadinimai nepalaikomi — visada naudokite pilną 6 skaitmenų formatą (pvz., `<#FFFFFF/>`).
+- **Etiketės stulpelis yra mygtuko tekstas.** Stulpelis `hint` šiems laukams ignoruojamas; rodoma tik `label`.
+- **Turi būti abu mygtukai.** Neužbaigto išėjimo mygtuko praleidimas palieka tyrėją be galimybės sustoti viduryje formos.

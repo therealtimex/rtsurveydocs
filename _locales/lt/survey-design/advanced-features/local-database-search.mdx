@@ -1,0 +1,224 @@
+---
+title: "Vietinė duomenų bazės paieška"
+description: "Vietinė duomenų bazės paieška užklausia pridėtą SQLite .db failą naudodama grynąjį SQL, įgalindama greitą neprisijungus pasiekiamą automatinį užbaigimą dideliems statiniams duomenų rinkiniams."
+---
+
+import { Callout } from 'nextra/components'
+
+**Vietinė duomenų bazės paieška** leidžia `select_one` arba `text` laukui pateikti užklausą SQLite `.db` faile, kuris yra pridėtas prie formos medijos paketo – visiškai neprisijungus, be ryšio su serveriu. Tai tinkamas požiūris, kai jūsų pasirinkimų sąrašas yra didelis ir statinis (pvz., nacionalinis kaimų, sveikatos priežiūros įstaigų ar administracinių ribų sąrašas) ir negalima garantuoti ryšio.
+
+| Požiūris | Duomenų šaltinis | Reikalingas ryšys |
+|---|---|---|
+| Vietinė duomenų bazės paieška (`rawquery`) | Pridėtas `.db` failas (SQLite) | Ne |
+| `search-api()` | Nuotolinė REST API | Taip |
+| `search()` | Pridėtas CSV failas | Ne |
+
+---
+
+## Išvaizdos variantai
+
+Automatinio užbaigimo laukas konfigūruojamas per `appearance` stulpelį. Galimi trys variantai:
+
+| Variantas | Pastabos |
+|---|---|
+| `search-autocomplete-noedit(...)` | Standartinis automatinis užbaigimas – surašinėtojas turi pasirinkti iš sąrašo; laisvo teksto įvedimas neišsaugomas |
+| `search-autocomplete-noedit-v2(...)` | Rekomenduojamas variantas – tas pats elgesys, bet naudojamas atnaujintas atvaizdavimo variklis su geresniu našumu dideliuose rezultatų rinkiniuose |
+| `search(...)` | Paprastas failais pagrįstas atitikimas pagal pridėtą CSV; **nepalaiko** grynojo SQL – čia nurodyta tik palyginimui |
+
+<Callout type="info">
+`search-autocomplete-noedit` yra pseudonimas – analizės metu programa jį pakeičia vidiniu funkcijos pavadinimu `searchAutocompleteNoedit`. Naudokite bet kurį rašybos variantą savo XLSForm; abu veikia.
+</Callout>
+
+---
+
+## `rawquery` duomenų šaltinis
+
+Norėdami vykdyti SQL užklausą `.db` faile, perduokite `'rawquery'` kaip pirmąjį išvaizdos funkcijos argumentą. Pilna sintaksė yra:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parametrai
+
+| Pozicija | Parametras | Aprašymas |
+|---|---|---|
+| 1 | `'rawquery'` | Literali eilutė – nurodo programai tiesiogiai vykdyti SQL |
+| 2 | `db_path` | Kelias į SQLite failą pavidalu `<dir>/<file>.db::tableName`. Priesaga `::tableName` pašalinama atidarant failą; lentelės pavadinimas naudojamas jūsų SQL viduje |
+| 3 | `'[display_col]'` | Stulpelis, kurį reikia rodyti išskleidžiamajame sąraše. Supantys laužtiniai skliaustai `[ ]` pašalinami vykdymo metu |
+| 4 | `'value_col'` | Stulpelis, kurio vertė išsaugoma, kai surašinėtojas pasirenka |
+| 5 | `'SELECT ...'` | Bet koks galiojantis SQLite SELECT teiginys. `SELECT DISTINCT` įterpiamas automatiškai, jei `DISTINCT` dar nėra |
+| 6+ | `param1, ...` | Pasirinktinai. Vertės, susietos su `?` vietos žymekliais SQL seka. Jei SQL yra `?`, bet nepateikta jokių parametrų, laukas grąžina tuščią rezultatą (įmontuota apsauga nuo trūkstamų argumentų) |
+
+### `db_path` konvencija
+
+Duomenų bazės failas randasi formos pridėtame medijos kataloge. Vykdymo metu `pulldata('app-api', 'family_path')` grąžina to katalogo kelią. Žr. [family_path](family-path) dėl nustatymo informacijos. Standartinis modelis yra:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Kai programa atidaro failą, ji pašalina `::tableName` dalį ir naudoja gryną failo kelią. Lentelės pavadinimas rodomas tik jūsų SQL viduje.
+
+---
+
+## Pagrindinis pavyzdys – provincijos paieška
+
+Tik skaitomas provincijos išskleidžiamasis sąrašas, pagrįstas pridėtu `vnxa3.db` failu:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Provincija | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+Stulpelis `appearance` (išskleistas dėl skaitomumo):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Rodoma etiketė gaunama iš stulpelio `provv`.
+- Išsaugota vertė gaunama iš stulpelio `provid`.
+- Rodomos tik tos eilutės, kuriose `rta_filter = "1"`.
+
+---
+
+## Parametrizuotos užklausos
+
+Naudokite `?` vietos žymeklius savo SQL ir perduokite atitinkamas laukų nuorodas kaip papildomus argumentus (nuo 6 pozicijos). Tai standartinis kaskadinių pasirinkimų modelis – pvz., rajonų, priklausančių anksčiau pasirinktai provincijai, įkėlimas.
+
+<Callout type="warning">
+Jei jūsų SQL yra bent vienas `?` ir nepateikta jokių parametrų argumentų, laukas grąžina tuščią rezultatų rinkinį. Tai neleidžia pasenusiems ar nefiltruotiems duomenims pasirodyti prieš atliekant pirminį pasirinkimą.
+</Callout>
+
+### Rajonų kaskados pavyzdys
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+`${province}` vertė yra susieta su pirmuoju `?`. Laukas yra tuščias, kol surašinėtojas nepasirenka provincijos.
+
+### Dviejų parametrų pavyzdys – seniūnijų kaskada
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parametrai susiejami pagal poziciją: `${province}` → pirmasis `?`, `${district}` → antrasis `?`.
+
+---
+
+## UNION SELECT specialioms vertėms
+
+Įterpkite sintetines eilutes – tokias kaip „Nežinau“ arba „Atsisakau atsakyti“ – tiesiogiai į SQL naudodami `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Nežinau</i>", "888"')
+```
+
+Konvencijos, naudojamos RTSurvey formose:
+
+| Kodas | Reikšmė |
+|---|---|
+| `888` | Nežinau |
+| `999` | Atsisakau atsakyti |
+
+HTML žymės, tokios kaip `<i>`, rodymo eilutėje yra atvaizduojamos programos – jas galite naudoti vizualiai atskirti specialias parinktis.
+
+---
+
+## Daugiakalbis rodymas
+
+Saugokite kalbai būdingas etiketes atskiruose stulpeliuose (pvz., `label_vi`, `label_en`) ir pasirinkite tinkamą, atsižvelgdami į kalbos lauką savo formoje:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Norėdami dinamiškai perjungti stulpelius pagal `${language}` lauką, naudokite `if()` išraišką rodymo stulpelio parametre, kad perjungtumėte kalbos stulpelius:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Rodymo stulpelio parametras įvertinamas prieš vykdant užklausą. SQL varikliui perduodamas tik stulpelio pavadinimas (be skliaustų); skliaustai yra kosmetiniai žymekliai, pašalinti analizės metu.
+</Callout>
+
+---
+
+## Tikro pasirinkimo patvirtinimas
+
+Kai laukas leidžia specialias vertes, tokias kaip 888 arba 999, paprasto `required = yes` patikrinimo nepakanka – jis patenkinamas, net jei surašinėtojas pasirenka „Nežinau“. Naudokite `selected-at(., 0) != -997` apribojimą, kad patikrintumėte, ar išsaugota vertė yra tikras pasirinkimas, o ne vidinis „nieko nepasirinkta“ sargas `-997`:
+
+| stulpelis | vertė |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Prašome pasirinkti galiojančią parinktį |
+
+Vertė `-997` yra vidinis kodas, kurį RTSurvey išsaugo, kai iš automatinio užbaigimo sąrašo nepasirinktas joks elementas. 888 arba 999 pasirinkimas vis tiek yra sąmoningas pasirinkimas ir praeina šį patikrinimą.
+
+Norėdami papildomai reikalauti tikros (ne specialios) vertės, išplėskite apribojimą:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Palyginimas: vietinė duomenų bazė prieš kitus paieškos metodus
+
+| Funkcija | `rawquery` automatinis užbaigimas | `search-api()` | `search()` CSV | Paprasti CSV pasirinkimai |
+|---|---|---|---|---|
+| Duomenų šaltinis | Pridėtas `.db` (SQLite) | Nuotolinė REST API | Pridėtas CSV | Pasirinkimų lapas |
+| Veikia neprisijungus | Taip | Ne | Taip | Taip |
+| Palaiko grynąjį SQL | Taip | Ne | Ne | Ne |
+| Kaskadiniai filtrai | Taip – parametrizuotas `?` | Per užklausos turinį | Ribota | Ne |
+| Duomenų rinkinio dydis | Labai didelis (milijonai eilučių) | Neribotas (serverio pusėje) | Vidutinis (dešimtys tūkstančių) | Mažas |
+| Specialios įterptos eilutės | Taip – `UNION SELECT` | Ne | Ne | Taip (rankiniu būdu) |
+| Sąrankos sudėtingumas | Vidutinis – reikia pridėto `.db` | Didelis – reikia API serverio | Mažas | Nėra |
+
+---
+
+## Apribojimai
+
+- `.db` failas turi būti pridėtas formos medijos paketo viduje prieš įdiegiant. Dinaminiams duomenų bazės atnaujinimams reikia naujo formos įdiegimo.
+- SQL įrenginyje vykdomas toks, koks yra. Nėra serverio pusės sanitarijos – venkite konstruoti SQL iš surašinėtojo laisvo teksto įvesties.
+- Palaikomi tik `SELECT` teiginiai. `INSERT`, `UPDATE` ir `DELETE` neleidžiami.
+- Labai sudėtingos užklausos (dideli `UNION` grandinės, kelios jungtys) gali būti lėtos žemos klasės „Android“ įrenginiuose.
+- `search-autocomplete-noedit` variantai neleidžia surašinėtojui išsaugoti vertės, kurios nėra rezultatų rinkinyje. Jei reikalingas laisvo teksto įvedimas, naudokite atskirą `text` lauką.
+- `SELECT DISTINCT` įterpiamas automatiškai tik tada, kai užklausoje nėra `DISTINCT`. Jei parašysite `SELECT DISTINCT` aiškiai, jis nebus padvigubintas.

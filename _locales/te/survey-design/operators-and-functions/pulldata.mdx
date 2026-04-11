@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "pulldata() ఫంక్షన్ ఫారమ్‌కు జోడించిన బాహ్య CSV ఫైల్ నుండి విలువను పొందుతుంది, కీ కాలమ్‌ను కీ విలువతో సరిపోల్చి, సంబంధిత ఫలిత కాలమ్‌ను తిరిగి ఇస్తుంది."
+---
+
+import { Callout } from 'nextra/components'
+
+`pulldata()` ఫంక్షన్ ఫారమ్‌కు జోడించిన CSV ఫైల్ నుండి విలువను పొందుతుంది. ఫైల్ పేరు, తిరిగి ఇవ్వవలసిన కాలమ్, సరిపోల్చవలసిన కాలమ్ మరియు కీ విలువను ఇస్తే, అది సరిపోలే అడ్డువరుస మరియు ఫలిత కాలమ్ కలిసే చోట ఉన్న సెల్ విలువను తిరిగి ఇస్తుంది.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| స్థానం | పారామీటర్ | వివరణ |
+|----------|-----------|-------------|
+| 1 | Filename | CSV మీడియా ఫైల్ పేరు (`select_one_from_file`లో ఉపయోగించిన అదే పేరు) |
+| 2 | Result column | మీరు తిరిగి పొందాలనుకుంటున్న విలువ ఉన్న కాలమ్ |
+| 3 | Key column | సరిపోల్చవలసిన కాలమ్ |
+| 4 | Key value | సరిపోల్చవలసిన విలువ — సాధారణంగా `${field}` వంటి ఫీల్డ్ రిఫరెన్స్ |
+
+సరిపోలిక కనుగొనబడకపోతే ఫంక్షన్ ఖాళీ స్ట్రింగ్‌ను తిరిగి ఇస్తుంది.
+
+---
+
+## ముందస్తు అవసరాలు
+
+CSV ఫైల్ ఫారమ్‌కు **మీడియా ఫైల్**గా జోడించబడాలి. `pulldata()` ద్వారా సూచించబడిన అదే ఫైల్‌ను `select_one_from_file` కోసం ఎంపికల జాబితాగా కూడా ఉపయోగించవచ్చు.
+
+**ఉదాహరణ CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## ప్రాథమిక ఉదాహరణ
+
+సిబ్బంది ID నుండి వారి విభాగం మరియు ఫోన్ నంబర్‌ను వెతకండి:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | సిబ్బందిని ఎంచుకోండి | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | విభాగం: `${dept}` — ఫోన్: `${phone}` | |
+
+<Callout type="info">
+`select_one_from_file` CSVలోని `name` కాలమ్ నిల్వ చేయబడిన విలువ. ఎన్యూమరేటర్ "Alice"ని ఎంచుకున్నప్పుడు, `${staff_id}`లో `"Alice"` ఉంటుంది, దీనిని `pulldata()` ఆమె విభాగం మరియు ఫోన్ నంబర్‌ను పొందడానికి కీగా ఉపయోగిస్తుంది.
+</Callout>
+
+---
+
+## ఎంచుకున్న ఎంపిక యొక్క లేబుల్ (label) పొందడం
+
+`select_one_from_file` ప్రశ్న `name` విలువను నిల్వ చేస్తుంది. మానవులు చదవగలిగే `label`ను ప్రదర్శించడానికి, దానిని వెతకడానికి `pulldata()`ని ఉపయోగించండి:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | గ్రామాన్ని ఎంచుకోండి | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | మీరు ఎంచుకున్నది: `${village_label}` | |
+
+---
+
+## ఒకే ఎంపిక నుండి బహుళ వెతకడాలు
+
+ఒకే ఎంపిక చేసిన అడ్డువరుస కోసం వేర్వేరు కాలమ్‌లను పొందడానికి మీరు ఒకే ఫైల్‌పై `pulldata()`ని అనేకసార్లు పిలవవచ్చు:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | సౌకర్యాన్ని ఎంచుకోండి | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## relevant మరియు constraintలలో pulldata ఉపయోగించడం
+
+వెతికిన విలువల ఆధారంగా లాజిక్‌ను వర్తింపజేయడానికి `relevant` మరియు `constraint` కాలమ్‌లలో `pulldata()`ని ఉపయోగించవచ్చు:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | సౌకర్యాన్ని ఎంచుకోండి | | |
+| integer | bed_count | ఆక్రమించబడిన బెడ్‌ల సంఖ్య | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## `once()`తో pulldata ఉపయోగించడం
+
+మొదటిసారి లోడ్ అయినప్పుడు మాత్రమే `pulldata()`ని మూల్యాంకనం చేయడానికి (ప్రారంభ ఎంట్రీ తర్వాత కీ ఫీల్డ్ మారినప్పుడు మళ్లీ మూల్యాంకనం చేయకుండా నిరోధించడానికి), దానిని `once()`లో చుట్టండి:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## ఉత్తమ పద్ధతులు
+
+1. CSVలోని కీ కాలమ్ `select_one_from_file`లో ఉపయోగించిన `name` కాలమ్‌తో సరిపోలాలి — ఇవి ఒకే విలువ అయి ఉండాలి.
+2. CSVలోని కాలమ్ పేర్లు కేస్-సెన్సిటివ్ — `Department` మరియు `department` వేర్వేరు కాలమ్‌లు.
+3. కీ విలువ కనుగొనబడకపోతే, `pulldata()` ఖాళీ స్ట్రింగ్‌ను తిరిగి ఇస్తుంది — ఖాళీ ఎంపికల నుండి రక్షించడానికి `if(${field} != '', pulldata(...), '')`ని ఉపయోగించండి.
+4. వీలైనంత వరకు CSV ఫైల్‌లను చిన్నవిగా ఉంచండి — పెద్ద ఫైల్‌లు తక్కువ బ్యాండ్‌విడ్త్ కనెక్షన్‌లలో ఫారమ్ లోడ్ అయ్యే సమయాన్ని పెంచుతాయి.
+5. డేటా సేకరణ రౌండ్‌ల మధ్య మారే డేటా కోసం, కొత్త ఫారమ్ వెర్షన్‌ను అప్‌లోడ్ చేయడం ద్వారా CSV మీడియా ఫైల్‌ను అప్‌లోడ్ చేయండి.
+
+## పరిమితులు
+
+- కీ కాలమ్ కీ విలువతో సమానంగా ఉన్న **మొదటి** అడ్డువరుసను మాత్రమే `pulldata()` సరిపోలుస్తుంది — CSVలో నకిలీ కీ విలువలకు మద్దతు లేదు.
+- విస్తరణకు ముందే CSV ఫైల్ ఫారమ్‌కు జోడించబడాలి; రన్‌టైమ్‌లో దీనిని URL నుండి పొందలేము.
+- `pulldata()` ద్వారా తిరిగి ఇవ్వబడిన సంఖ్యా విలువలు స్ట్రింగ్‌లు — అంకగణితంలో ఉపయోగించినప్పుడు వాటిని `number()`లో చుట్టండి: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey పరికరం మెటాడేటా, JWT ఫీల్డ్‌లు మరియు JSON డేటాను చదవడానికి `pulldata()` యొక్క పొడిగించిన రూపాలకు కూడా మద్దతు ఇస్తుంది. `pulldata('app-api', ...)` కోసం [App API](../app-api) మరియు JSON-ఆధారిత లుకప్ ప్యాటర్న్‌ల కోసం [Call API](../advanced-features/call-api) పేజీని చూడండి.
+</Callout>
+
+---
+
+## పొడిగించిన pulldata() వేరియంట్‌లు
+
+CSV లుకప్‌లతో పాటు, మొదటి వాదనను మార్చడం ద్వారా `pulldata()` అనేక అదనపు డేటా మూలాలకు మద్దతు ఇస్తుంది.
+
+### `pulldata('app-api', key)`
+
+పరికరం మెటాడేటా, యూజర్ అట్రిబ్యూట్‌లు మరియు యాప్ కాంటెక్స్ట్‌ని చదవండి. [App API](../app-api) పేజీలో పూర్తి సూచనను చూడండి.
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+ఇన్‌లైన్ JSON స్ట్రింగ్‌ని పార్స్ చేయండి మరియు JSONPath ఎక్స్‌ప్రెషన్‌ని ఉపయోగించి విలువను సంగ్రహించండి. ఫారమ్‌లో JSON లిటరల్ ఉన్నప్పుడు ఉపయోగకరంగా ఉంటుంది.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+సరిపోలిన విలువను స్ట్రింగ్‌గా తిరిగి ఇస్తుంది లేదా కనుగొనబడకపోతే ఖాళీ స్ట్రింగ్‌ను ఇస్తుంది.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+JSONPath ఎక్స్‌ప్రెషన్‌ని ఉపయోగించి మరొక ఫీల్డ్‌లో నిల్వ చేయబడిన JSON స్ట్రింగ్ నుండి విలువను సంగ్రహించండి. ఇది `substr-jsonpath(${field}, jsonpath)`కి సమానం.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+ఫీల్డ్‌లో నిల్వ చేయబడిన JWT టోకెన్‌ను డీకోడ్ చేయండి మరియు పేలోడ్ నుండి నిర్దిష్ట క్లెయిమ్ విలువను తిరిగి ఇవ్వండి.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+టోకెన్ చెల్లనిది అయితే లేదా క్లెయిమ్ లేకపోతే ఖాళీ స్ట్రింగ్‌ను తిరిగి ఇస్తుంది.
+
+### `pulldata('instanceid')`
+
+ప్రస్తుత సమర్పణ యొక్క ప్రత్యేక ఇన్‌స్టాన్స్ IDని తిరిగి ఇస్తుంది. `instanceID` మెటా ఫీల్డ్‌కి సమానం.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+ఫారమ్ కాన్ఫిగరేషన్‌లో నిర్వచించబడిన మ్యాపింగ్ టేబుల్‌ను ఉపయోగించి ఒక విలువను మరొకదానికి మ్యాప్ చేయండి.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+మ్యాప్ చేయబడిన విలువను తిరిగి ఇస్తుంది లేదా ఏ మ్యాపింగ్ సరిపోలకపోతే ఖాళీ స్ట్రింగ్‌ను ఇస్తుంది.
+
+### `pulldata('options', optionName)`
+
+పేరు ద్వారా ఫారమ్ కాన్ఫిగరేషన్ ఆప్షన్‌ను చదవండి.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+జోడించిన SQLite `.db` ఫైల్‌పై SQL `SELECT`ని అమలు చేయండి మరియు మొదటి సరిపోలే అడ్డువరుస యొక్క మొదటి కాలమ్ నుండి విలువను తిరిగి ఇవ్వండి. SQL స్ట్రింగ్ తర్వాత పారామీటర్లు `?` ప్లేస్‌హోల్డర్‌ల కోసం క్రమంలో భర్తీ చేయబడతాయి.
+
+| స్థానం | పారామీటర్ | వివరణ |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | ఈ వేరియంట్‌ని గుర్తించే లిటరల్ స్ట్రింగ్ |
+| 2 | path | `concat(${family_path}, '/file.db::tableName')` ఫార్మాట్‌లో ఫైల్ పాత్ |
+| 3 | SQL | పొజిషనల్ ప్లేస్‌హోల్డర్‌లుగా `?`ని ఉపయోగించే `SELECT` స్టేట్‌మెంట్ |
+| 4+ | params | ప్రతి `?` కోసం క్రమంలో భర్తీ చేయబడిన విలువలు — సాధారణంగా `${field}` వంటి ఫీల్డ్ రిఫరెన్స్‌లు |
+
+ఏ అడ్డువరుస సరిపోలకపోతే ఖాళీ స్ట్రింగ్‌ను తిరిగి ఇస్తుంది.
+
+**ఉదాహరణ — ID ద్వారా ప్రావిన్స్ పేరును వెతకండి:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**ఉదాహరణ — ప్రావిన్స్ మరియు జిల్లా కోడ్ల ద్వారా ఫిల్టర్ చేయబడిన వార్డు పేరును వెతకండి:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+CSV ఫైల్‌లో ఒకే కీ కాలమ్‌ను సరిపోల్చే ప్రామాణిక నాలుగు-వాదనల `pulldata()` వలె కాకుండా, `rawquery` వేరియంట్ SQLite డేటాబేస్‌పై పూర్తి SQL `SELECT`ని అమలు చేస్తుంది, ఇది బహుళ-కాలమ్ `WHERE` పరిస్థితులను మరియు ఏదైనా కాలమ్‌ను రిటర్న్ వాల్యూగా అనుమతిస్తుంది.
+
+<Callout type="info">
+హైరార్కికల్ లొకేషన్ లుకప్‌ల కోసం ఆటోకంప్లీట్ ఫీల్డ్‌లతో `rawquery` సాధారణంగా ఉపయోగించబడుతుంది. `.db` ఫైల్‌లను నిర్మించడం మరియు వాటిని `pulldata('rawquery', ...)`కి వైరింగ్ చేయడంపై వివరాల కోసం [లోకల్ డేటాబేస్ సెర్చ్](../advanced-features/local-database-search) చూడండి.
+</Callout>

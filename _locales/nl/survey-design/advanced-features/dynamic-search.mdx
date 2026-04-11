@@ -1,15 +1,15 @@
 ---
 title: "Dynamisch zoeken"
-description: "Dynamisch zoeken laadt keuzes uit een externe API in realtime terwijl de enumerator typt, waardoor grote of frequent bijgewerkte datasets mogelijk zijn."
+description: "Dynamisch zoeken laadt keuzes van een externe API in realtime terwijl de enquêteur typt, wat grote of veelvuldig bijgewerkte datasets mogelijk maakt."
 ---
 
-**Dynamisch zoeken** (ook wel Search API genoemd) stelt een `select_one`-, `select_multiple`- of `text`-veld in staat om zijn keuzes te laden uit een externe webservice **bij uitvoering** terwijl de enumerator typt. Dit is de juiste aanpak wanneer uw keuzelijst te groot is om in een CSV-bestand te bundelen, frequent wordt bijgewerkt, of afkomstig is uit een live database.
+**Dynamisch zoeken** (ook wel Search API genoemd) stelt een `select_one`-, `select_multiple`- of `text`-veld in staat om zijn keuzes te laden van een externe webservice **tijdens runtime**, terwijl de enquêteur typt. Dit is de juiste aanpak wanneer uw keuzelijst te groot is om in een CSV-bestand te bundelen, regelmatig wordt bijgewerkt of afkomstig is uit een live database.
 
 ---
 
-## `search-api()`-weergave
+## `search-api()` weergave (appearance)
 
-Het dynamisch zoeken wordt geconfigureerd via de kolom `appearance` met behulp van de functie `search-api()`:
+Het dynamische zoeken wordt geconfigureerd via de kolom `appearance` met behulp van de functie `search-api()`:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -20,24 +20,24 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 | Parameter | Beschrijving |
 |-----------|-------------|
 | `method` | Gebruik altijd `'POST'` |
-| `url` | Het API-endpoint om te bevragen |
-| `post_body` | JSON-body verzonden naar de API. Gebruik `%__input__%` als plaatshouder voor de huidige zoektekst van de enumerator |
-| `value_column` | De sleutel in het responsobject om te gebruiken als opgeslagen **waarde** |
-| `display` | De sleutel (of sjabloon) om te gebruiken als het **label** dat in het dropdownmenu wordt weergegeven. Ondersteunt `##sleutel##`-plaatshouders en `@{func}`-expressies |
-| `data_path` | JSONPath naar de array van resultaatobjecten in de respons (bijv. `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Een naam waaronder de ruwe respons wordt opgeslagen voor gebruik door andere velden |
+| `url` | Het API-eindpunt om op te vragen |
+| `post_body` | JSON-body die naar de API wordt verzonden. Gebruik `%__input__%` als tijdelijke aanduiding voor de huidige zoektekst van de enquêteur |
+| `value_column` | De sleutel in het antwoordobject die moet worden gebruikt als de opgeslagen **waarde** |
+| `display` | De sleutel (of sjabloon) die moet worden gebruikt als het **label** dat in de vervolgkeuzelijst wordt weergegeven. Ondersteunt `##key##`-placeholders en `@{func}`-expressies |
+| `data_path` | JSONPath naar de array van resultaatobjecten in het antwoord (bijv. `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Een naam waaronder het ruwe antwoord wordt opgeslagen voor gebruik door andere velden |
 
 ---
 
 ## Basisvoorbeeld
 
-Een zorginstelling-opzoekactie waarbij de enumerator een deel van de naam van de instelling typt:
+Het opzoeken van een gezondheidsinstelling waarbij de enquêteur een deel van de naam van de instelling typt:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one | facility | Selecteer zorginstelling | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+| select_one | facility | Selecteer gezondheidsinstelling | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-De API ontvangt `{"query": "nair"}` wanneer de enumerator "nair" typt en retourneert:
+De API ontvangt `{"query": "nair"}` wanneer de enquêteur "nair" typt en retourneert:
 
 ```json
 {
@@ -48,13 +48,13 @@ De API ontvangt `{"query": "nair"}` wanneer de enumerator "nair" typt en retourn
 }
 ```
 
-Het dropdownmenu toont `Nairobi Central Clinic` en `Nairobi West Hospital`; de opgeslagen waarde is `HF001` of `HF002`.
+De vervolgkeuzelijst toont `Nairobi Central Clinic` en `Nairobi West Hospital`; de opgeslagen waarde is `HF001` of `HF002`.
 
 ---
 
-## Geavanceerde weergaveopmaak
+## Geavanceerde weergaveformatering
 
-### `##sleutel##`-sjablonen gebruiken
+### Gebruik van `##key##`-sjablonen
 
 Toon meerdere velden in het label:
 
@@ -64,7 +64,7 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
 
 Weergegeven als: `Nairobi Central Clinic (Nairobi)`.
 
-### `@{func}`-expressies gebruiken
+### Gebruik van `@{func}`-expressies
 
 Pas voorwaardelijke logica toe in het weergavelabel:
 
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Actieve resultaten tonen `✓ Klinieksnaam`; inactieve tonen `✗ Klinieksnaam`.
+Actieve resultaten tonen `✓ Clinic Name`; inactieve tonen `✗ Clinic Name`.
 
 ---
 
 ## Een standaardwaarde instellen: `search-default-api()`
 
-Gebruik `search-default-api()` na `search-api()` om het veld vooraf in te vullen met een standaardkeuze die is geladen vanuit een aparte API-aanroep (bijv. bij het bewerken van een bestaand record):
+Gebruik `search-default-api()` na `search-api()` om het veld vooraf in te vullen met een standaardkeuze die is geladen via een afzonderlijke API-aanroep (bijv. bij het bewerken van een bestaand record):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -90,48 +90,107 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ## Aangepast scheidingsteken voor select_multiple: `search-default-separator()`
 
-Voor `select_multiple`-velden specificeert u hoe meerdere geselecteerde waarden worden samengevoegd in de opgeslagen tekenreeks:
+Geef voor `select_multiple`-velden op hoe meerdere geselecteerde waarden worden samengevoegd in de opgeslagen string:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
 ```
 
-Standaard scheidingsteken is een spatie.
+Het standaard scheidingsteken is een spatie.
 
 ---
 
 ## Ondersteunde vraagtypen
 
-| Vraagtype | Gebruiksgeval |
-|-----------|---------------|
-| `select_one` | Enkelvoudige selectie uit zoekresultaten |
-| `select_multiple` | Meervoudige selecties uit zoekresultaten |
-| `text` | Automatisch aanvullen — enumerator typt vrij maar kan een suggestie selecteren |
+| Vraagtype | Use case |
+|---------------|----------|
+| `select_one` | Enkele selectie uit zoekresultaten |
+| `select_multiple` | Meerdere selecties uit zoekresultaten |
+| `text` | Automatisch aanvullen — enquêteur typt vrijuit maar kan een suggestie selecteren |
 
 ---
 
-## Opgeslagen responsgegevens gebruiken
+## Opgeslagen antwoordgegevens gebruiken
 
-Het `save_path` slaat het volledige API-responsobject op onder de opgegeven naam. Andere velden kunnen ernaar verwijzen met `pulldata()`:
+Wanneer de enquêteur een resultaat selecteert, slaat rtSurvey het volledige overeenkomstige object uit het antwoord op onder de naam `save_path`. Andere velden kunnen er op twee manieren uit lezen.
+
+### Methode 1 — `pulldata()` opzoeken
+
+Gebruik `pulldata('save_path', 'key')` om een veld op het hoogste niveau uit het opgeslagen object te lezen:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Selecteer instelling | `search-api(..., 'facility_data')` |
+| select_one | facility | Selecteer instelling | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+De weergave (appearance) op de `select_one`-rij moet `search-api(..., 'facility_data')` bevatten met de bijbehorende `save_path`.
+
+Voor **geneste JSON-velden**, combineer met `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
 
 ---
 
-## Aanbevolen werkwijzen
+## Lokaal zoeken in bestanden met search()
 
-1. Zorg ervoor dat uw API-endpoint binnen 1–2 seconden reageert — trage API's maken het zoeken traag aanvoelen.
-2. Gebruik `%__input__%` in de `post_body` zodat de API alleen overeenkomende resultaten retourneert, niet de gehele dataset.
-3. Indexeer het zoekveld aan de serverzijde (bijv. Elasticsearch, database full-text index) voor snelle responsen.
-4. Beperk resultaten tot 20–50 items per query — het retourneren van duizenden resultaten verslaat het doel van zoeken.
-5. Neem een minimale invoerlengtevereiste op in de API om het activeren van brede queries op invoer van één teken te vermijden.
+`search()` voert offline kolom-gelijkheid opzoekingen uit tegen een gebundeld SQLite `.db`-bestand — geen netwerkverbinding en geen SQL-query's vereist. Gebruik het wanneer uw referentiegegevens bij het formulier zijn verpakt en u een eenvoudige opzoeking nodig hebt om "alle rijen te vinden waar kolom gelijk is aan waarde".
+
+### Signatuur
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parameters
+
+| Parameter | Beschrijving |
+|-----------|-------------|
+| `path` | Pad naar de SQLite-tabel: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Overeenkomstoperator — retourneert rijen waar de kolom gelijk is aan de waarde |
+| `'list_name'` | Kolomnaam om op te matchen |
+| `${field}` | Waarde om op te matchen; meestal een veldverwijzing |
+
+### Voorbeeld
+
+Vul een `select_one` in vanuit een lokale database door de waarde van `${d307}` te matchen met de kolom `list_name` in de tabel `externalData` van `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Selecteer instelling | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Wanneer `${d307}` gelijk is aan `"HF001"`, retourneert `search()` elke rij in `externalData` waar `list_name = 'HF001'` — volledig uit het gebundelde bestand, zonder netwerkoproep.
+
+### search() vs rawquery autocomplete
+
+| Functie | `search()` | `rawquery` autocomplete |
+|---------|-----------|------------------------|
+| SQL-query's | Nee — alleen kolomgelijkheid | Ja — volledige `SELECT … FROM …` |
+| Geparametriseerde invoer | Match op kolomwaarde | Ingebed in SQL-string |
+| Vrije tekstinvoer | Ja — enquêteur kan vrijuit typen | Nee — moet uit lijst selecteren |
+| UNION / multi-tabel | Niet ondersteund | Ondersteund |
+
+### Wanneer welke te gebruiken
+
+- Gebruik **`search()`** wanneer u een eenvoudige gelijkheidsovereenkomst nodig hebt tegen een gebundeld `.db`-bestand, het formulier offline moet werken en u vrije tekstinvoer wilt toestaan.
+- Gebruik **`rawquery` autocomplete** wanneer u SQL-flexibiliteit nodig hebt (JOIN's, UNION's, berekende kolommen) of over meerdere tabellen moet zoeken, en het formulier een betrouwbare verbinding heeft.
+
+---
+
+## Best Practices
+
+1. Zorg ervoor dat uw API-eindpunt binnen 1-2 seconden reageert — trage API's zorgen ervoor dat de zoekopdracht traag aanvoelt.
+2. Gebruik `%__input__%` in de `post_body` zodat de API alleen overeenkomende resultaten retourneert, niet de volledige dataset.
+3. Indexeer het zoekveld aan de serverzijde (bijv. Elasticsearch, database full-text index) voor snelle reacties.
+4. Beperk de resultaten tot 20-50 items per query — het retourneren van duizenden resultaten gaat voorbij aan het doel van zoeken.
+5. Neem een vereiste voor minimale invoerlengte op in de API om te voorkomen dat brede query's worden geactiveerd bij invoer van één teken.
 
 ## Beperkingen
 
-- Dynamisch zoeken vereist netwerkconnectiviteit — het werkt niet offline.
-- De plaatshouder `%__input__%` wordt zo ingevoegd; maak invoer aan de serverzijde schoon om injectieaanvallen te voorkomen.
-- Complexe `@{func}`-weergave-expressies kunnen beperkte ondersteuning hebben in alle rtSurvey-clientversies.
+- Dynamisch zoeken vereist netwerkverbinding — het werkt niet offline.
+- De `%__input__%`-placeholder wordt ongewijzigd ingevoegd; saniteer invoer aan de serverzijde om injectie-aanvallen te voorkomen.
+- Complexe `@{func}`-weergave-expressies kunnen beperkte ondersteuning hebben in alle versies van de rtSurvey-client.

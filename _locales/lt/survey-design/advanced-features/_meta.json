@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "Garso įrašymas",
   "call-api": "Call API",
   "dynamic-question-type": "Dinaminis klausimo tipas",
   "dynamic-search": "Dinaminis paieška",

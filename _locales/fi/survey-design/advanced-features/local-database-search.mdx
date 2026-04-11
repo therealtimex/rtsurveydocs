@@ -1,0 +1,224 @@
+---
+title: "Paikallinen tietokantahaku"
+description: "Paikallinen tietokantahaku tekee hakuja mukana tulevasta SQLite .db-tiedostosta raaka-SQL:llä, mikä mahdollistaa nopean offline-automaattitäydennyksen suurille staattisille tietojoukoille."
+---
+
+import { Callout } from 'nextra/components'
+
+**Paikallinen tietokantahaku** antaa `select_one`- tai `text`-kentän tehdä hakuja SQLite `.db`-tiedostosta, joka on pakattu lomakkeen medipakettiin — täysin offline-tilassa ilman palvelinyhteyttä. Tämä on oikea lähestymistapa, kun valintaluettelosi on suuri ja staattinen (esim. kansallinen luettelo kylistä, terveyslaitoksista tai hallinnollisista rajoista) eikä yhteyttä voida taata.
+
+| Lähestymistapa | Tietolähde | Vaatii yhteyden |
+|---|---|---|
+| Paikallinen tietokantahaku (`rawquery`) | Mukana tuleva `.db`-tiedosto (SQLite) | Ei |
+| `search-api()` | Etä-REST-API | Kyllä |
+| `search()` | Mukana tuleva CSV-tiedosto | Ei |
+
+---
+
+## Ulkoasuvariantit
+
+Automaattitäydennyskenttä määritetään `appearance`-sarakkeen kautta. Käytettävissä on kolme varianttia:
+
+| Variantti | Huomautukset |
+|---|---|
+| `search-autocomplete-noedit(...)` | Tavallinen automaattitäydennys — haastattelijan on valittava luettelosta; vapaata tekstinsyöttöä ei tallenneta |
+| `search-autocomplete-noedit-v2(...)` | Suositeltu variantti — sama toiminta, mutta käyttää päivitettyä renderöintimoottoria, joka on tehokkaampi suurilla tulosjoukoilla |
+| `search(...)` | Yksinkertainen tiedostopohjainen haku mukana tulevasta CSV-tiedostosta; **ei** tue raaka-SQL:ää — lueteltu tässä vain vertailun vuoksi |
+
+<Callout type="info">
+`search-autocomplete-noedit` on alias — sovellus korvaa sen jäsennysvaiheessa sisäisellä funktionimellä `searchAutocompleteNoedit`. Voit käyttää kumpaa tahansa kirjoitusasua XLSForm-lomakkeessasi; molemmat toimivat.
+</Callout>
+
+---
+
+## `rawquery`-tietolähde
+
+Suorittaaksesi SQL-haun `.db`-tiedostosta, anna `'rawquery'` ulkoasufunktion ensimmäisenä argumenttina. Täydellinen syntaksi on:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parametrit
+
+| Sijainti | Parametri | Kuvaus |
+|---|---|---|
+| 1 | `'rawquery'` | Merkkijono — kertoo sovellukselle, että SQL on suoritettava suoraan |
+| 2 | `db_path` | Polku SQLite-tiedostoon muodossa `<dir>/<file>.db::tableName`. `::tableName`-pääte poistetaan tiedostoa avattaessa; taulun nimeä käytetään SQL-lauseessasi |
+| 3 | `'[display_col]'` | Pudotusvalikossa näkyvä sarake. Ympäröivät `[ ]` -sulkeet poistetaan suorituksen aikana |
+| 4 | `'value_col'` | Sarake, jonka arvo tallennetaan, kun haastattelija tekee valinnan |
+| 5 | `'SELECT ...'` | Mikä tahansa kelvollinen SQLite SELECT -lause. `SELECT DISTINCT` lisätään automaattisesti, jos `DISTINCT` ei ole jo mukana |
+| 6+ | `param1, ...` | Valinnainen. SQL:n `?`-paikkamerkkeihin sidotut arvot järjestyksessä. Jos SQL sisältää `?`-merkkejä mutta parametreja ei anneta, kenttä palauttaa tyhjän tuloksen (sisäänrakennettu suoja puuttuvia argumentteja vastaan) |
+
+### `db_path`-käytäntö
+
+Tietokantatiedosto sijaitsee lomakkeen mukana tulevassa mediahakemistossa. Suorituksen aikana `pulldata('app-api', 'family_path')` palauttaa kyseisen hakemistopolun. Katso asetusten tiedot kohdasta [family_path](family-path). Vakiomalli on:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Kun sovellus avaa tiedoston, se poistaa `::tableName`-osan ja käyttää pelkkää tiedostopolkua. Taulun nimi näkyy vain SQL-lauseessasi.
+
+---
+
+## Perusesimerkki — maakunnan haku
+
+Vain luku -muotoinen maakunnan pudotusvalikko, jonka takana on mukana tuleva `vnxa3.db`-tiedosto:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Maakunta | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+`appearance`-sarake (laajennettu luettavuuden parantamiseksi):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Näkyvä teksti tulee `provv`-sarakkeesta.
+- Tallennettu arvo tulee `provid`-sarakkeesta.
+- Vain rivit, joilla `rta_filter = "1"`, näytetään.
+
+---
+
+## Parametroidut haut
+
+Käytä `?`-paikkamerkkejä SQL-lauseessasi ja anna vastaavat kenttäviittaukset lisäargumentteina (kohdasta 6 alkaen). Tämä on vakiomalli porrastetuille valinnoille — esim. aiempien valintojen perusteella suodatettujen kuntien lataaminen.
+
+<Callout type="warning">
+Jos SQL-lauseesi sisältää vähintään yhden `?`-merkin eikä parametriargumentteja anneta, kenttä palauttaa tyhjän tulosjoukon. Tämä estää vanhentuneiden tai suodattamattomien tietojen näkyvyyden ennen kuin ylätason valinta on tehty.
+</Callout>
+
+### Esimerkki kuntien suodatuksesta
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+`${province}`-arvo sidotaan ensimmäiseen `?`-merkkiin. Kenttä on tyhjä, kunnes haastattelija valitsee maakunnan.
+
+### Kahden parametrin esimerkki — kylien suodatus
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parametrit sidotaan järjestyksessä: `${province}` → ensimmäinen `?`, `${district}` → toinen `?`.
+
+---
+
+## UNION SELECT erikoisarvoille
+
+Lisää keinotekoisia rivejä — kuten "En tiedä" tai "Kieltäydyn vastaamasta" — suoraan SQL-lauseeseen käyttämällä `UNION SELECT` -komentoa:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>En tiedä</i>", "888"')
+```
+
+RTSurvey-lomakkeissa käytetyt käytännöt:
+
+| Koodi | Merkitys |
+|---|---|
+| `888` | En tiedä |
+| `999` | Kieltäydyn vastaamasta |
+
+Sovellus renderöi näkyvässä merkkijonossa olevat HTML-tagit, kuten `<i>` — voit käyttää niitä erikoisvaihtoehtojen visuaaliseen erottamiseen.
+
+---
+
+## Monikielinen näyttö
+
+Tallenna kielikohtaiset tekstit erillisiin sarakkeisiin (esim. `label_vi`, `label_en`) ja valitse oikea lomakkeen kielikentän perusteella:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Vaihtaaksesi sarakkeita dynaamisesti `${language}`-kentän perusteella, käytä `if()`-lauseketta näyttösarakkeen parametrissa vaihtaaksesi kielisarakkeiden välillä:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Näyttösarakkeen parametri arvioidaan ennen haun suorittamista. SQL-moottorille välitetään vain sarakkeen nimi (ilman sulkeita); sulkeet ovat merkintöjä, jotka poistetaan jäsennysvaiheessa.
+</Callout>
+
+---
+
+## Todellisen valinnan vahvistaminen
+
+Kun kenttä sallii erikoisarvot, kuten 888 tai 999, pelkkä `required = yes` -tarkistus ei riitä — se täyttyy, vaikka haastattelija valitsisi "En tiedä". Käytä rajoitusta `selected-at(., 0) != -997` varmistaaksesi, että tallennettu arvo on aito valinta eikä sisäinen "mitään ei valittu" -merkki `-997`:
+
+| sarake | arvo |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Valitse kelvollinen vaihtoehto |
+
+Arvo `-997` on sisäinen koodi, jonka RTSurvey tallentaa, kun automaattitäydennysluettelosta ei ole valittu mitään kohdetta. Valinta 888 tai 999 on silti tietoinen valinta ja läpäisee tämän tarkistuksen.
+
+Vaatiaksesi lisäksi todellisen (ei-erityisen) arvon, laajenna rajoitusta:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Vertailu: paikallinen tietokanta vs. muut hakumenetelmät
+
+| Ominaisuus | `rawquery`-automaattitäydennys | `search-api()` | `search()` CSV | Tavalliset CSV-valinnat |
+|---|---|---|---|---|
+| Tietolähde | Mukana tuleva `.db` (SQLite) | Etä-REST-API | Mukana tuleva CSV | Choices-välilehti |
+| Toimii offline-tilassa | Kyllä | Ei | Kyllä | Kyllä |
+| Tukee raaka-SQL:ää | Kyllä | Ei | Ei | Ei |
+| Porrastetut suodattimet | Kyllä — parametroidulla `?`-merkillä | Pyynnön rungon kautta | Rajoitettu | Ei |
+| Tietojoukon koko | Erittäin suuri (miljoonia rivejä) | Rajoittamaton (palvelinpuolella) | Keskikokoinen (kymmeniä tuhansia) | Pieni |
+| Erikoisrivien lisäys | Kyllä — `UNION SELECT` | Ei | Ei | Kyllä (manuaalinen) |
+| Käyttöönoton vaikeus | Keskitaso — vaatii `.db`-tiedoston | Korkea — vaatii API-palvelimen | Matala | Ei ole |
+
+---
+
+## Rajoitukset
+
+- `.db`-tiedosto on pakattava lomakkeen medipakettiin ennen käyttöönottoa. Tietokannan dynaamiset päivitykset edellyttävät lomakkeen uutta käyttöönottoa.
+- SQL suoritetaan laitteessa sellaisenaan. Palvelinpuolen puhdistusta ei ole — vältä SQL-lauseiden rakentamista haastattelijan vapaasta tekstisyötöstä.
+- Vain `SELECT`-lauseet ovat tuettuja. `INSERT`-, `UPDATE`- ja `DELETE`-lauseet eivät ole sallittuja.
+- Erittäin monimutkaiset haut (suuret `UNION`-ketjut, useat liitokset) voivat olla hitaita halvoilla Android-laitteilla.
+- `search-autocomplete-noedit`-variantit eivät salli haastattelijan tallentaa arvoa, joka ei ole tulosjoukossa. Jos vapaa tekstinsyöttö on tarpeen, käytä erillistä `text`-kenttää.
+- `SELECT DISTINCT` lisätään automaattisesti vain, kun `DISTINCT` puuttuu hausta. Jos kirjoitat `SELECT DISTINCT` suoraan, sitä ei tuplata.

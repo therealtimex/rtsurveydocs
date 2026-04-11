@@ -1,0 +1,104 @@
+---
+title: "Lomakkeen navigointiohjaimet"
+description: "Käytä SaveFinalizedExit- ja SaveIncompleteExit-ulkoasuarvoja renderöidäksesi tyylitellyt poistumispainikkeet, jotka tallentavat ja poistuvat lomakkeesta."
+---
+
+**Lomakkeen navigointiohjaimet** ovat ulkoasuarvoja, jotka sijoitetaan `note`- (tai `text`-) kenttiin ja jotka renderöidään leveinä tyyliteltyinä painikkeina kyselyn alaosassa. Niiden avulla haastattelija voi tallentaa lähetyksen ja poistua lomakkeesta yhdellä napautuksella — joko valmistuneena (lopullisena) tietueena tai luonnoksena (kesken jääneenä) tietueena.
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Renderöi painikkeen, joka **tallentaa lähetyksen lopullisena** ja poistuu lomakkeesta. Painikkeen teksti otetaan kentän `label`-sarakkeesta.
+
+| XLSForm column | Arvo |
+|----------------|-------|
+| `type` | `note` |
+| `name` | mikä tahansa yksilöllinen nimi (esim. `btn_finish`) |
+| `label` | painikkeessa näkyvä teksti |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Lähetys merkitään lopulliseksi, täydelliseksi tietueeksi. Tämä vastaa sisäänrakennetun lähetyspainikkeen napauttamista.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Renderöi painikkeen, joka **tallentaa lähetyksen keskeneräisenä (luonnoksena)** ja poistuu lomakkeesta. Haastattelija voi palata siihen myöhemmin ja jatkaa sen täyttämistä.
+
+| XLSForm column | Arvo |
+|----------------|-------|
+| `type` | `note` |
+| `name` | mikä tahansa yksilöllinen nimi (esim. `btn_pause`) |
+| `label` | painikkeessa näkyvä teksti |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Värisyntaksi
+
+Molemmat ulkoasut hyväksyvät inline-värin muodossa `<#RRGGBB/>`:
+
+- `#` jota seuraa täsmälleen **6 heksadesimaalinumeroa** (suuret tai pienet kirjaimet)
+- Sulkeva `/>` on **pakollinen** — sen jättäminen pois rikkoo jäsennyksen
+- Esimerkki: `<#04B404/>` (vihreä), `<#EDC602/>` (meripihka), `<#D9534F/>` (punainen)
+
+Väri ohjaa painikkeen taustaa. Tekstin väri määräytyy automaattisesti sovelluksen toimesta.
+
+---
+
+## Esimerkki
+
+Seuraavat kaksi lomakkeen loppuun sijoitettua kenttää tuottavat vihreän **Lähetä**-painikkeen ja meripihkan värisen **Tallenna luonnoksena** -painikkeen:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Lähetä | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Tallenna luonnoksena | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — painikkeiden jättäminen pois sisällysluettelosta
+
+`toc-hide`-ulkoasutunniste kertoo rtSurveylle, että kenttä on jätettävä pois lomakkeen **sisällysluettelosta** (kysymysten yleisluettelosta). Navigointipainikkeet eivät ole kysymyksiä, joten niiden ei pitäisi koskaan näkyä sisällysluettelossa.
+
+Lisää aina `toc-hide` poistumisnäkymän jälkeen:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Katso [Ulkoasu — toc-hide](../appearance#group-and-navigation) toc-hide-viitteeksi.
+
+---
+
+## Sijoittelukäytäntö
+
+Noudata näitä käytäntöjä, kun lisäät navigointiohjaimia lomakkeeseen:
+
+- Sijoita molemmat painikkeet lomakkeen **aivan loppuun**, kaikkien kysymysten ja ryhmien jälkeen.
+- Sisällytä aina **molemmat** painikkeet yhdessä — yksi lopullinen ja yksi keskeneräinen — jotta haastattelijalla on aina tapa poistua valmistumistilasta riippumatta.
+- Käytä `relevant`-saraketta lopullisessa poistumispainikkeessa, jos lähetyksen pitäisi olla sallittu vain, kun tietyt ehdot täyttyvät (esim. pakollinen osio on valmis). Keskeneräisen poistumispainikkeen tulisi yleensä pysyä **aina näkyvissä**.
+
+---
+
+## Ehdollinen lopullinen poistuminen
+
+Käytä `relevant`-saraketta ohjaamaan sitä, milloin lopullinen poistumispainike näytetään. Keskeneräisen poistumisen tulisi pysyä ehdottomasti näkyvissä, jotta haastattelija voi aina keskeyttää ja palata.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Lähetä | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Tallenna luonnoksena | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Tässä esimerkissä **Lähetä**-painike näkyy vain, kun haastattelija on antanut suostumuksensa ja merkinnyt osion A valmiiksi. **Tallenna luonnoksena** -painike on aina käytettävissä.
+
+---
+
+## Rajoitukset
+
+- **Kentän tyypin on oltava `note` tai `text`.** Näiden ulkoasujen käyttöä missään muussa kysymystyypissä ei tueta.
+- **Vain 6-numeroinen heksakoodi.** Lyhennettyjä heksakoodeja (`<#FFF/>`) ja nimettyjä värejä ei tueta — käytä aina täyttä 6-numeroista muotoa (esim. `<#FFFFFF/>`).
+- **Label-sarake on painikkeen teksti.** `hint`-sarake ohitetaan näissä kentissä; vain `label` renderöidään.
+- **Molempien painikkeiden tulisi olla läsnä.** Keskeneräisen poistumispainikkeen jättäminen pois jättää haastattelijan ilman tapaa keskeyttää lomakkeen täyttö puolivälissä.

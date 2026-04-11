@@ -1,0 +1,104 @@
+---
+title: "Kontrollet e Navigimit të Formularit"
+description: "Përdorni vlerat e pamjes SaveFinalizedExit dhe SaveIncompleteExit për të paraqitur butona daljeje të stilizuar që ruajnë dhe lënë formularin."
+---
+
+**Kontrollet e Navigimit të Formularit** janë vlera pamjeje të vendosura në fushat `note` (ose `text`) që paraqiten si butona të stilizuar me gjerësi të plotë në fund të një anketimi. Ata lejojnë anketuesin të ruajë dërgimin dhe të dalë nga formulari me një prekje — qoftë si një rekord i përfunduar (finalizuar) ose si një skicë (rekord i paplotë).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Paraqet një buton që **ruan dërgimin si të finalizuar** dhe del nga formulari. Etiketa e butonit merret nga kolona `label` e fushës.
+
+| XLSForm column | Vlera |
+|----------------|-------|
+| `type` | `note` |
+| `name` | çdo emër unik (p.sh., `btn_finish`) |
+| `label` | teksti i shfaqur në buton |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Dërgimi shënohet si një rekord final, i plotë. Kjo është e barabartë me prekjen e butonit të integruar të dërgimit.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Paraqet një buton që **ruan dërgimin si të paplotë (skicë)** dhe del nga formulari. Anketuesi mund të kthehet tek ai më vonë dhe të vazhdojë plotësimin.
+
+| XLSForm column | Vlera |
+|----------------|-------|
+| `type` | `note` |
+| `name` | çdo emër unik (p.sh., `btn_pause`) |
+| `label` | teksti i shfaqur në buton |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Sintaksa e ngjyrave
+
+Të dyja pamjet pranojnë një ngjyrë të brendshme në formatin `<#RRGGBB/>`:
+
+- `#` e ndjekur nga saktësisht **6 shifra heksadecimale** (të mëdha ose të vogla)
+- Mbyllja `/>` është **e kërkuar** — lënia pas dore e saj prish analizën
+- Shembull: `<#04B404/>` (e gjelbër), `<#EDC602/>` (e verdhë e ndezur), `<#D9534F/>` (e kuqe)
+
+Ngjyra kontrollon sfondin e butonit. Ngjyra e tekstit përcaktohet automatikisht nga aplikacioni.
+
+---
+
+## Shembull
+
+Dy fushat e mëposhtme të vendosura në fund të një formulari prodhojnë një buton të gjelbër **Dërgo** dhe një buton të verdhë **Ruaj si skicë**:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Dërgo | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Ruaj si skicë | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — përjashtimi i butonave nga tabela e përmbajtjes
+
+Tokeni i pamjes `toc-hide` udhëzon rtSurvey të përjashtojë një fushë nga **tabela e përmbajtjes** së formularit (lista përmbledhëse e pyetjeve). Butonat e navigimit nuk janë pyetje, prandaj nuk duhet të shfaqen kurrë në TOC.
+
+Gjithmonë shtoni `toc-hide` pas pamjes së daljes:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Shihni [Pamja — toc-hide](../appearance#group-and-navigation) për referencën e toc-hide.
+
+---
+
+## Konventa e vendosjes
+
+Ndiqni këto konventa kur shtoni kontrolle navigimi në një formular:
+
+- Vendosni të dy butonat në **fund fare** të formularit, pas të gjitha pyetjeve dhe grupeve.
+- Gjithmonë përfshini të **dy** butonat bashkë — një të finalizuar dhe një të paplotë — në mënyrë që anketuesi të ketë gjithmonë një mënyrë për të dalë pavarësisht nga gjendja e përfundimit.
+- Përdorni kolonën `relevant` në butonin e daljes së finalizuar nëse dërgimi duhet të lejohet vetëm kur plotësohen kushte të caktuara (p.sh., një seksion i kërkuar është i plotë). Butoni i daljes së paplotë në përgjithësi duhet të mbetet **gjithmonë i dukshëm**.
+
+---
+
+## Dalje e finalizuar me kusht
+
+Përdorni kolonën `relevant` për të kontrolluar se kur shfaqet butoni i daljes së finalizuar. Dalja e paplotë duhet të mbetet e dukshme pa kushte në mënyrë që anketuesi të mund të ndalojë gjithmonë dhe të kthehet.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Dërgo | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Ruaj si skicë | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Në këtë shembull butoni **Dërgo** shfaqet vetëm kur anketuesi ka dhënë pëlqimin dhe ka shënuar seksionin A si të plotë. Butoni **Ruaj si skicë** është gjithmonë i disponueshëm.
+
+---
+
+## Kufizimet
+
+- **Lloji i fushës duhet të jetë `note` ose `text`.** Përdorimi i këtyre pamjeve në çdo lloj tjetër pyetjeje nuk mbështetet.
+- **Vetëm heksadecimal me 6 shifra.** Heksadecimali i shkurtuar (`<#FFF/>`) dhe ngjyrat me emër nuk mbështeten — përdorni gjithmonë formatin e plotë me 6 shifra (p.sh., `<#FFFFFF/>`).
+- **Kolona e etiketës është teksti i butonit.** Kolona `hint` shpërfillet për këto fusha; vetëm `label` paraqitet.
+- **Të dy butonat duhet të jenë të pranishëm.** Lënia pas dore e butonit të daljes së paplotë e lë anketuesin pa një mënyrë për të ndaluar në mes të formularit.

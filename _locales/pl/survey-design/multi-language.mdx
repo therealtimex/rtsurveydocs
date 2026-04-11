@@ -3,63 +3,164 @@ title: "Obsługa wielu języków"
 description: ""
 ---
 
-rtSurvey zapewnia solidną obsługę wielu języków, umożliwiając tworzenie ankiet w wielu językach. Ta funkcja jest kluczowa dla prowadzenia badań w różnych populacjach językowych lub w środowiskach wielojęzycznych.
+rtSurvey zapewnia solidną obsługę wielu języków, umożliwiając tworzenie ankiet w różnych językach. Ta funkcja jest kluczowa dla prowadzenia badań w zróżnicowanych populacjach językowych lub w środowiskach wielojęzycznych.
 
 ## Konfigurowanie ankiet wielojęzycznych
 
-Aby utworzyć ankietę wielojęzyczną w rtSurvey, musisz dodać kolumny specyficzne dla języka do XLSForm. Oto jak:
+Aby utworzyć ankietę wielojęzyczną w rtSurvey, musisz dodać do swojego XLSForm kolumny specyficzne dla danego języka. Oto jak to zrobić:
 
-1. **Tłumaczenia etykiet**: Dodaj kolumny dla każdego języka używając formatu `label::Język (kod)`.
-2. **Tłumaczenia wskazówek**: Użyj `hint::Język (kod)` do tłumaczenia wskazówek.
-3. **Tłumaczenia plików mediów**: Dla mediów specyficznych dla języka użyj `media::Język (kod)`.
+1. **Tłumaczenia etykiet (Label Translations)**: Dodaj kolumny dla każdego języka, używając formatu `label::Language (code)`.
+2. **Tłumaczenia podpowiedzi (Hint Translations)**: Użyj `hint::Language (code)` do tłumaczenia podpowiedzi.
+3. **Tłumaczenia plików multimedialnych (Media File Translations)**: W przypadku multimediów specyficznych dla języka użyj `media::Language (code)`.
 
 Przykład:
 
 ```
-| type    | name | label::English (en) | label::Polski (pl)     | hint::English (en) | hint::Polski (pl) |
-|---------|------|---------------------|------------------------|---------------------|-------------------|
-| integer | age  | How old are you?    | Ile masz lat?          | Enter your age      | Podaj swój wiek   |
+| type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
+|---------|------|---------------------|---------------------|---------------------|---------------------|
+| integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
 ```
 
 ## Kody języków
 
-Zaleca się używanie oficjalnych 2-znakowych kodów języków (subtags) po nazwie języka. Ułatwia to dopasowanie języka formularza z językiem interfejsu użytkownika. Oficjalne kody można znaleźć [tutaj](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+Zaleca się używanie oficjalnych 2-znakowych kodów języków (subtagów) po nazwie języka. Ułatwia to dopasowanie języka formularza do języka interfejsu użytkownika. Oficjalne kody można znaleźć [tutaj](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
-## Ustawianie domyślnego języka
+## Ustawianie języka domyślnego
 
-Aby ustawić domyślny język dla zbierania danych, użyj arkusza `settings` w XLSForm:
+Aby ustawić domyślny język zbierania danych, użyj arkusza `settings` w swoim XLSForm:
 
 ```
 | form_id   | version | default_language |
 |-----------|---------|-------------------|
-| test_form | 101     | Polski (pl)       |
+| test_form | 101     | French (fr)       |
 ```
 
 ## Funkcje specyficzne dla rtSurvey
 
-### Dynamiczne przełączanie języka
+### Dynamiczne przełączanie języków
 
-rtSurvey umożliwia użytkownikom dynamiczne przełączanie języków podczas zbierania danych:
+rtSurvey pozwala użytkownikom na dynamiczną zmianę języka podczas zbierania danych:
 
-- W interfejsie webowym użyj listy rozwijanej języka w górnym pasku nawigacji.
-- W aplikacji mobilnej dostęp do opcji języka przez menu ustawień.
+- W interfejsie webowym użyj rozwijanego menu języków na górnym pasku nawigacyjnym.
+- W aplikacji mobilnej uzyskaj dostęp do opcji językowych poprzez menu ustawień.
 
-### Wiadomości walidacji specyficzne dla języka
+### Komunikaty walidacji specyficzne dla języka
 
-rtSurvey rozszerza obsługę wielu języków na wiadomości walidacji:
+rtSurvey rozszerza obsługę wielu języków na komunikaty walidacji:
 
 ```
-| type    | name | constraint | constraint_message::English (en) | constraint_message::Polski (pl)     |
-|---------|------|------------|----------------------------------|-------------------------------------|
-| integer | age  | . <= 150   | Age must be 150 or less          | Wiek musi wynosić 150 lub mniej     |
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
+|---------|------|------------|----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
+
+### Zlokalizowane komunikaty o wymagalności
+
+Użyj `required_message::Language (code)`, aby wyświetlić przetłumaczony błąd, gdy wymagane pole pozostanie puste:
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
+### Obsługa języków RTL
+
+W przypadku języków pisanych od prawej do lewej (RTL), takich jak arabski czy hebrajski, rtSurvey automatycznie dostosowuje układ:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Your name           | اسمك                |
+```
+
+### Wygląd (Appearance) specyficzny dla języka
+
+rtSurvey pozwala na określenie różnych wyglądów dla różnych języków:
+
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Address          | 地址                 | multiline                | textarea                  |
+```
+
+## Formatowanie HTML w etykietach dwujęzycznych
+
+Możesz łączyć tagi HTML z wrapperami językowymi w jednej komórce etykiety. rtSurvey wyodrębnia blok aktywnego języka i renderuje pozostały kod HTML.
+
+Przykład użycia pogrubienia i koloru czcionki dla każdego języka:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Obsługiwane tagi liniowe wewnątrz wrapperów językowych: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Przykład kolorowego tekstu dla każdego języka:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Obliczenia uwzględniające język (Language-aware calculations)
+
+Gdy formularz posiada pole `${language_use}` (ustawiane przez widżet `change_language`), użyj `if()`, aby zwrócić wartości w aktywnym języku:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Przykład — wyświetlanie wyniku wyszukiwania w aktywnym języku przy użyciu `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Uwaga: Pole `language_use` jest zazwyczaj ustawiane przez widżet wyglądu `change_language`. Zobacz Appearance — change_language.
 
 ## Najlepsze praktyki dla ankiet wielojęzycznych
 
-1. **Spójne nazewnictwo**: Używaj spójnych kodów języków w całym formularzu.
-2. **Profesjonalne tłumaczenie**: Zatrudniaj profesjonalnych tłumaczy znających kontekst ankiety.
-3. **Notatki kontekstowe**: Dostarczaj tłumaczom notatki kontekstowe, aby zapewnić dokładne tłumaczenia.
-4. **Testowanie**: Testuj formularz we wszystkich językach przed wdrożeniem.
-5. **Obsługa Unicode**: Upewnij się, że urządzenia do zbierania danych obsługują Unicode dla skryptów nielacińskich.
-6. **Media specyficzne dla języka**: Używaj kulturowo odpowiednich obrazów lub audio dla każdego języka.
-7. **Unikaj tekstu na obrazach**: Jeśli używasz obrazów z tekstem, twórz oddzielne obrazy dla każdego języka.
+1. **Spójne nazewnictwo**: Używaj spójnych kodów językowych w całym formularzu.
+2. **Profesjonalne tłumaczenie**: Zatrudnij profesjonalnych tłumaczy zaznajomionych z kontekstem ankiety.
+3. **Uwagi kontekstowe**: Przekaż tłumaczom uwagi dotyczące kontekstu, aby zapewnić dokładne tłumaczenia.
+4. **Testowanie**: Przetestuj formularz we wszystkich językach przed wdrożeniem.
+5. **Obsługa Unicode**: Upewnij się, że urządzenia do zbierania danych obsługują Unicode dla skryptów niełacińskich.
+6. **Multimedia specyficzne dla języka**: Używaj obrazów lub dźwięków odpowiednich kulturowo dla każdego języka.
+7. **Unikaj tekstu na obrazach**: Jeśli używasz obrazów z tekstem, utwórz oddzielne obrazy dla każdego języka.
+
+## Obsługa przypadków specjalnych
+
+### Odpowiedzi w różnych językach
+
+rtSurvey pozwala respondentom na wprowadzanie tekstu w dowolnym piśmie, niezależnie od wybranego języka formularza. Jest to przydatne do rejestrowania nazwisk lub adresów w ich oryginalnym piśmie.
+
+### Typy pytań specyficzne dla języka
+
+Niektóre typy pytań mogą być bardziej odpowiednie dla określonych języków. rtSurvey pozwala na używanie różnych typów pytań dla różnych języków:
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
+```
+
+## Eksportowanie danych wielojęzycznych
+
+Podczas eksportowania danych z rtSurvey:
+
+- Wybierz eksport w konkretnym języku lub uwzględnij wszystkie wersje językowe.
+- Metadane językowe są dołączane do eksportu, wskazując, który język został użyty dla każdej odpowiedzi.
+
+## Uwagi dotyczące aplikacji mobilnej
+
+- Aplikacja mobilna rtSurvey obsługuje przełączanie języków w trybie offline.
+- Przed przejściem w tryb offline upewnij się, że wszystkie wymagane pliki językowe zostały pobrane.
+
+## Znane ograniczenia
+
+- Niektóhome zaawansowane funkcje mogą nie być dostępne we wszystkich językach.
+- Bardzo długie tłumaczenia mogą wpływać na układ na mniejszych ekranach.
+
+Wykorzystując możliwości rtSurvey w zakresie obsługi wielu języków, możesz tworzyć inkluzywne, dostępne ankiety, które docierają do zróżnicowanych populacji i dostarczają wysokiej jakości, dokładnych pod względem językowym danych.

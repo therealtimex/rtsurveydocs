@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "La fonction pulldata() récupère une valeur à partir d'un fichier CSV externe joint au formulaire, en faisant correspondre une colonne clé à une valeur clé et en renvoyant la colonne de résultat correspondante."
+---
+
+import { Callout } from 'nextra/components'
+
+La fonction `pulldata()` récupère une valeur à partir d'un fichier CSV joint au formulaire. À partir d'un nom de fichier, d'une colonne à renvoyer, d'une colonne de correspondance et d'une valeur clé, elle renvoie la cellule à l'intersection de la ligne correspondante et de la colonne de résultat.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Position | Paramètre | Description |
+|----------|-----------|-------------|
+| 1 | Nom du fichier | Nom du fichier média CSV (même nom que celui utilisé dans `select_one_from_file`) |
+| 2 | Colonne de résultat | La colonne dont vous souhaitez renvoyer la valeur |
+| 3 | Colonne clé | La colonne sur laquelle effectuer la correspondance |
+| 4 | Valeur clé | La valeur à faire correspondre — généralement une référence de champ comme `${field}` |
+
+La fonction renvoie une chaîne vide si aucune correspondance n'est trouvée.
+
+---
+
+## Prérequis
+
+Le fichier CSV doit être joint au formulaire en tant que **fichier média (media file)**. Le même fichier référencé par `pulldata()` peut également être utilisé comme liste de choix pour `select_one_from_file`.
+
+**Exemple de CSV — `staff.csv` :**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Exemple de base
+
+Rechercher le département et le numéro de téléphone d'un membre du personnel à partir de son identifiant (ID) :
+
+**survey :**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Sélectionner un membre du personnel | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Département : `${dept}` — Téléphone : `${phone}` | |
+
+<Callout type="info">
+La colonne `name` dans un CSV `select_one_from_file` est la valeur stockée. Lorsque l'enquêteur sélectionne "Alice", `${staff_id}` contient `"Alice"`, que `pulldata()` utilise comme clé pour récupérer son département et son téléphone.
+</Callout>
+
+---
+
+## Récupération de l'étiquette d'un choix sélectionné
+
+Une question `select_one_from_file` stocke la valeur `name`. Pour afficher l'étiquette (`label`) lisible par l'homme, utilisez `pulldata()` pour la rechercher :
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Sélectionner un village | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | Vous avez sélectionné : `${village_label}` | |
+
+---
+
+## Recherches multiples à partir d'une seule sélection
+
+Vous pouvez appeler `pulldata()` plusieurs fois sur le même fichier pour récupérer différentes colonnes pour la même ligne sélectionnée :
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Sélectionner un établissement | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## Utilisation de pulldata dans relevant et constraint
+
+`pulldata()` peut être utilisé dans les colonnes `relevant` et `constraint` pour appliquer une logique basée sur les valeurs recherchées :
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Sélectionner un établissement | | |
+| integer | bed_count | Nombre de lits occupés | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## Utilisation de pulldata avec `once()`
+
+Pour évaluer `pulldata()` uniquement lors du premier chargement (en empêchant la réévaluation lorsque le champ clé change après la saisie initiale), enveloppez-le dans `once()` :
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Bonnes pratiques
+
+1. La colonne clé dans le CSV doit correspondre à la colonne `name` utilisée dans `select_one_from_file` — celles-ci doivent avoir la même valeur.
+2. Les noms de colonnes dans le CSV sont sensibles à la casse — `Department` et `department` sont des colonnes différentes.
+3. Si la valeur clé n'est pas trouvée, `pulldata()` renvoie une chaîne vide — utilisez `if(${field} != '', pulldata(...), '')` pour vous protéger contre les sélections vides.
+4. Gardez les fichiers CSV de petite taille si possible — les fichiers volumineux augmentent le temps de chargement du formulaire sur les connexions à faible bande passante.
+5. Pour les données qui changent entre les cycles de collecte de données, mettez à jour le fichier média CSV en téléchargeant une nouvelle version du formulaire.
+
+## Limitations
+
+- `pulldata()` ne correspond qu'à la **première** ligne où la colonne clé est égale à la valeur clé — les valeurs clés en double dans le CSV ne sont pas prises en charge.
+- Le fichier CSV doit être joint au formulaire avant le déploiement ; il ne peut pas être récupéré à partir d'une URL au moment de l'exécution.
+- Les valeurs numériques renvoyées par `pulldata()` sont des chaînes — enveloppez-les dans `number()` lorsqu'elles sont utilisées dans des calculs arithmétiques : `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey prend également en charge des formes étendues de `pulldata()` pour la lecture des métadonnées de l'appareil, des champs JWT et des données JSON. Voir [App API](../app-api) pour `pulldata('app-api', ...)` et la page [Call API](../advanced-features/call-api) pour les modèles de recherche basés sur JSON.
+</Callout>
+
+---
+
+## Variantes étendues de pulldata()
+
+Au-delà des recherches CSV, `pulldata()` prend en charge plusieurs sources de données supplémentaires en modifiant le premier argument.
+
+### `pulldata('app-api', key)`
+
+Lire les métadonnées de l'appareil, les attributs de l'utilisateur et le contexte de l'application. Voir la référence complète sur la page [App API](../app-api).
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Analyser une chaîne JSON en ligne et extraire une valeur à l'aide d'une expression JSONPath. Utile lorsque vous avez un littéral JSON incorporé dans le formulaire.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Renvoie la valeur correspondante sous forme de chaîne, ou une chaîne vide si elle n'est pas trouvée.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Extraire une valeur d'une chaîne JSON stockée dans un autre champ à l'aide d'une expression JSONPath. Ceci est équivalent à `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Décoder un jeton JWT stocké dans un champ et renvoyer la valeur d'une revendication (claim) spécifique à partir de la charge utile (payload).
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Renvoie une chaîne vide si le jeton n'est pas valide ou si la revendication n'est pas présente.
+
+### `pulldata('instanceid')`
+
+Renvoie l'identifiant d'instance unique de la soumission actuelle. Équivalent au champ méta `instanceID`.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Faire correspondre une valeur à une autre à l'aide d'une table de correspondance nommée définie dans la configuration du formulaire.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Renvoie la valeur correspondante, ou une chaîne vide si aucune correspondance n'est trouvée.
+
+### `pulldata('options', optionName)`
+
+Lire une option de configuration du formulaire par son nom.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Exécuter un `SELECT` SQL sur un fichier SQLite `.db` intégré et renvoyer la valeur de la première colonne de la première ligne correspondante. Les paramètres après la chaîne SQL sont remplacés dans l'ordre par les espaces réservés `?`.
+
+| Position | Paramètre | Description |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | Chaîne littérale identifiant cette variante |
+| 2 | path | Chemin du fichier au format `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | Une instruction `SELECT` utilisant `?` comme espaces réservés positionnels |
+| 4+ | params | Valeurs substituées pour chaque `?` dans l'ordre — généralement des références de champ comme `${field}` |
+
+Renvoie une chaîne vide si aucune ligne ne correspond.
+
+**Exemple — rechercher un nom de province par ID :**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Exemple — rechercher un nom de quartier filtré par les codes de province et de district :**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Contrairement au `pulldata()` standard à quatre arguments qui correspond à une seule colonne clé dans un fichier CSV, la variante `rawquery` exécute un `SELECT` SQL complet sur une base de données SQLite, permettant des conditions `WHERE` multi-colonnes et n'importe quelle colonne comme valeur de retour.
+
+<Callout type="info">
+`rawquery` est couramment utilisé avec des champs d'auto-complétion pour les recherches de lieux hiérarchiques. Voir [Recherche dans une base de données locale](../advanced-features/local-database-search) pour plus de détails sur la création de fichiers `.db` et leur connexion à `pulldata('rawquery', ...)`.
+</Callout>

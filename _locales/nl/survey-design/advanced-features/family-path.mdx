@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path is een conventioneel berekeningsveld dat het pad naar de gebundelde mediamap van het formulier retourneert tijdens runtime — vereist voor elk formulier dat lokale databasezoekopdrachten of op bestanden gebaseerd zoeken gebruikt."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` is een conventioneel berekeningsveld dat het pad bevat naar de gebundelde mediamap van het formulier. Elk formulier dat lokale databasezoekopdrachten uitvoert met `rawquery`, `pulldata` of `search()` moet dit veld bevatten — zonder dit veld kunnen bestandspaden niet worden opgelost en retourneren zoekopdrachten stilzwijgend een leeg resultaat.
+
+---
+
+## Het calculate veld
+
+Voeg deze rij toe bovenaan uw survey-blad, na eventuele metavelden en vóór de eerste vraag die een databasebestand gebruikt:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Het veld slaat geen zichtbare waarde op en vereist geen label. Het is een stille voorwaarde voor alle daaropvolgende constructies van paden.
+
+---
+
+## Waarom het nodig is
+
+RTSurvey bundelt formuliermedia — SQLite-databases, afbeeldingen, audiofragmenten — in een map per formulier op het apparaat. Het exacte pad verschilt per platform (Android, iOS, web) en per apparaat.
+
+Tijdens runtime vult de app `family_path` automatisch in. Een typische opgeloste waarde ziet er als volgt uit:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Omdat het pad platformspecifiek is en wordt bepaald bij het opstarten, kan het niet hardcoded in het formulier worden opgenomen. `pulldata('app-api', 'family_path')` is de enige betrouwbare manier om dit op te halen.
+
+---
+
+## Hoe het te gebruiken in paden
+
+Zodra `family_path` is gedefinieerd, bouwt u een volledig bestandspad met `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Het achtervoegsel `::tableName` wordt verwijderd wanneer de app het bestand opent; de tabelnaam wordt alleen gebruikt binnen uw SQL-query.
+
+---
+
+## Waar family_path wordt gebruikt
+
+`family_path` is vereist in het pad-argument telkens wanneer u naar een gebundeld bestand verwijst:
+
+- **Lokale databasezoekopdracht** — het `db_path`-argument van `search-autocomplete-noedit-v2('rawquery', ...)` moet worden opgebouwd met `concat(${family_path}, ...)`. Zie [Lokale databasezoekopdrachten](local-database-search) voor volledige gebruiksdetails.
+- **`pulldata` rawquery** — elke `pulldata('rawquery', ...)` aanroep die leest uit een `.db`-bestand gebruikt hetzelfde `concat()`-patroon.
+- **`search()` met een lokaal bestand** — weergaven voor dynamisch zoeken die laden uit een gebundeld CSV- of DB-bestand zijn ook afhankelijk van `family_path` voor de bestandsreferentie.
+
+---
+
+## Plaatsing in het formulier
+
+`family_path` moet verschijnen **vóór het eerste veld dat ernaar verwijst**. De aanbevolen positie is onmiddellijk na de meta-groep:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(rawquery weergave die verwijst naar `${family_path}`)* |
+
+<Callout type="warning">
+Als `family_path` ontbreekt in het formulier, of na het eerste `rawquery`- / `search()`-veld wordt geplaatst dat ernaar verwijst, zullen alle zoekopdrachten in gebundelde bestanden stilzwijgend leeg retourneren. Er is geen foutmelding — de autocomplete toont simpelweg geen resultaten.
+</Callout>
+
+---
+
+## Meerdere databasebestanden
+
+Een enkel formulier kan meerdere `.db`-bestanden gebruiken. Elk pad wordt onafhankelijk geconstrueerd met `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Definieer `family_path` één keer; verwijs ernaar in zoveel velden als nodig is.
+
+---
+
+## Verificatie tijdens ontwikkeling
+
+Voeg een tijdelijk `note`-veld toe onder `family_path` om de opgeloste waarde op het apparaat te inspecteren:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Path: ${family_path}` | |
+
+De notitie toont het werkelijke opgeloste pad tijdens het testen. Verwijder deze voordat u het definitieve formulier implementeert.

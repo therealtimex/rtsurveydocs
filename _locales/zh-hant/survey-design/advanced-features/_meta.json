@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "音訊錄製",
   "call-api": "Call API",
   "dynamic-question-type": "動態問題類型",
   "dynamic-search": "動態搜尋",

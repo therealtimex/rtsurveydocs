@@ -1,0 +1,224 @@
+---
+title: "Lokaal database zoeken"
+description: "Lokaal database zoeken bevraagt een meegeleverd SQLite .db-bestand met behulp van ruwe SQL, wat een snelle offline autocomplete mogelijk maakt voor grote statische datasets."
+---
+
+import { Callout } from 'nextra/components'
+
+**Lokaal database zoeken** stelt een `select_one`- of `text`-veld in staat om een SQLite `.db`-bestand te bevragen dat is meegeleverd met het mediapakket van het formulier — volledig offline, zonder servercommunicatie. Dit is de juiste aanpak wanneer uw keuzelijst groot en statisch is (bijv. een nationale lijst van dorpen, gezondheidsinstellingen of administratieve grenzen) un wanneer connectiviteit niet gegarandeerd kan worden.
+
+| Aanpak | Databron | Connectiviteit vereist |
+|---|---|---|
+| Lokaal database zoeken (`rawquery`) | Meegeleverd `.db`-bestand (SQLite) | Nee |
+| `search-api()` | Externe REST API | Ja |
+| `search()` | Meegeleverd CSV-bestand | Nee |
+
+---
+
+## Weergavevarianten (Appearance)
+
+Het autocomplete-veld wordt geconfigureerd via de kolom `appearance`. Er zijn drie varianten beschikbaar:
+
+| Variant | Opmerkingen |
+|---|---|
+| `search-autocomplete-noedit(...)` | Standaard autocomplete — de enumerator moet uit de lijst kiezen; vrije tekstinvoer wordt niet opgeslagen |
+| `search-autocomplete-noedit-v2(...)` | Aanbevolen variant — hetzelfde gedrag, maar gebruikt een vernieuwde rendering engine met betere prestaties op grote resultaatsets |
+| `search(...)` | Eenvoudige op bestanden gebaseerde match tegen een meegeleverde CSV; ondersteunt **geen** ruwe SQL — hier alleen ter vergelijking vermeld |
+
+<Callout type="info">
+`search-autocomplete-noedit` is een alias — tijdens het parsen vervangt de app deze door de interne functienaam `searchAutocompleteNoedit`. Gebruik beide schrijfwijzen in uw XLSForm; ze werken beide.
+</Callout>
+
+---
+
+## De `rawquery` databron
+
+Om een SQL-query uit te voeren op een `.db`-bestand, geeft u `'rawquery'` door als het eerste argument van de appearance-functie. De volledige signatuur is:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parameters
+
+| Positie | Parameter | Beschrijving |
+|---|---|---|
+| 1 | `'rawquery'` | Letterlijke string — vertelt de app om de SQL rechtstreeks uit te voeren |
+| 2 | `db_path` | Pad naar het SQLite-bestand, in de vorm `<dir>/<file>.db::tableName`. Het achtervoegsel `::tableName` wordt gestript bij het openen van het bestand; de tabelnaam wordt gebruikt in uw SQL |
+| 3 | `'[display_col]'` | Kolom om weer te geven in de dropdown. De omringende `[ ]` haakjes worden tijdens runtime gestript |
+| 4 | `'value_col'` | Kolom waarvan de waarde wordt opgeslagen wanneer de enumerator een selectie maakt |
+| 5 | `'SELECT ...'` | Elk geldig SQLite SELECT-statement. `SELECT DISTINCT` wordt automatisch geïnjecteerd als `DISTINCT` nog niet aanwezig is |
+| 6+ | `param1, ...` | Optioneel. Waarden gebonden aan `?` placeholders in de SQL, op volgorde. Als de SQL `?` bevat maar er geen parameters worden opgegeven, blijft het veld leeg (een ingebouwde beveiliging tegen ontbrekende argumenten) |
+
+### De `db_path` conventie
+
+Het databasebestand bevindt zich in de meegeleverde mediamap van het formulier. Tijdens runtime retourneert `pulldata('app-api', 'family_path')` dat mappad. Zie [family_path](family-path) voor details over de installatie. Het standaardpatroon is:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Wanneer de app het bestand opent, stript deze het gedeelte `::tableName` en gebruikt het kale bestandspad. De tabelnaam verschijnt alleen in uw SQL.
+
+---
+
+## Basisvoorbeeld — provincie opzoeken
+
+Een alleen-lezen provincie-dropdown ondersteund door een meegeleverd `vnxa3.db`-bestand:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Provincie | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+De kolom `appearance` (uitgebreid voor leesbaarheid):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Het weergegeven label is afkomstig uit de kolom `provv`.
+- De opgeslagen waarde is afkomstig uit de kolom `provid`.
+- Alleen rijen waar `rta_filter = "1"` worden getoond.
+
+---
+
+## Geparametriseerde query's
+
+Gebruik `?` placeholders in uw SQL en geef de bijbehorende veldreferenties door als extra argumenten (positie 6 en verder). Dit is het standaardpatroon voor trapsgewijze selecties (cascading selects) — bijv. het laden van districten die behoren tot de eerder geselecteerde provincie.
+
+<Callout type="warning">
+Als uw SQL ten minste één `?` bevat en er geen parameterargumenten worden opgegeven, retourneert het veld een lege resultaatset. Dit voorkomt dat verouderde of onjuist gefilterde gegevens verschijnen voordat een bovenliggende selectie is gemaakt.
+</Callout>
+
+### Voorbeeld district-cascade
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+De waarde van `${province}` is gebonden aan de eerste `?`. Het veld is leeg totdat de enumerator een provincie selecteert.
+
+### Voorbeeld met twee parameters — gemeente-cascade
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parameters zijn positioneel gebonden: `${province}` → eerste `?`, `${district}` → tweede `?`.
+
+---
+
+## UNION SELECT voor speciale waarden
+
+Injecteer synthetische rijen — zoals "Weet niet" of "Weigeren te antwoorden" — rechtstreeks in de SQL met behulp van `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Niet bekend</i>", "888"')
+```
+
+Conventies gebruikt in RTSurvey-formulieren:
+
+| Code | Betekenis |
+|---|---|
+| `888` | Weet niet |
+| `999` | Weigeren te antwoorden |
+
+HTML-tags zoals `<i>` in de weergavestring worden gerenderd door de app — u kunt ze gebruiken om speciale opties visueel te onderscheiden.
+
+---
+
+## Meertalige weergave
+
+Sla taalspecifieke labels op in aparte kolommen (bijv. `label_vi`, `label_en`) en selecteer de juiste op basis van een taalveld in uw formulier:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Om dynamisch van kolom te wisselen op basis van een `${language}`-veld, gebruikt u een `if()`-expressie op de parameter van de weergavekolom om te schakelen tussen taalkolommen:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+De parameter voor de weergavekolom wordt geëvalueerd voordat de query wordt uitgevoerd. Alleen de kolomnaam (zonder haakjes) wordt doorgegeven aan de SQL-engine; de haakjes zijn cosmetische markeringen die tijdens het parsen worden verwijderd.
+</Callout>
+
+---
+
+## Valideren van een echte selectie
+
+Wanneer het veld speciale waarden toestaat zoals 888 of 999, is een gewone `required = yes` controle onvoldoende — hieraan wordt voldaan zelfs als de enumerator "Weet niet" selecteert. Gebruik de constraint `selected-at(., 0) != -997` om te verifiëren dat de opgeslagen waarde een echte selectie is en niet de interne "niets geselecteerd" sentinel `-997`:
+
+| kolom | waarde |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Selecteer a.u.b. een geldige optie |
+
+De waarde `-997` is de interne code die RTSurvey opslaat wanneer er geen item is geselecteerd uit de autocomplete-lijst. Een selectie van 888 of 999 is nog steeds een bewuste keuze en slaagt voor deze controle.
+
+Om daarnaast een echte (niet-speciale) waarde te vereisen, breidt u de constraint uit:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Vergelijking: lokale database vs. andere zoekmethoden
+
+| Functie | `rawquery` autocomplete | `search-api()` | `search()` CSV | Gewone CSV-keuzes |
+|---|---|---|---|---|
+| Databron | Meegeleverde `.db` (SQLite) | Externe REST API | Meegeleverde CSV | Choices-blad |
+| Werkt offline | Ja | Nee | Ja | Ja |
+| Ondersteunt ruwe SQL | Ja | Nee | Nee | Nee |
+| Trapsgewijze filters | Ja — geparametriseerd `?` | Via request body | Beperkt | Nee |
+| Grootte dataset | Zeer groot (miljoenen rijen) | Onbeperkt (server-side) | Medium (tienduizenden) | Klein |
+| Speciale geïnjecteerde rijen | Ja — `UNION SELECT` | Nee | Nee | Ja (handmatig) |
+| Complexiteit installatie | Medium — vereist meegeleverde `.db` | Hoog — vereist API-server | Laag | Geen |
+
+---
+
+## Beperkingen
+
+- Het `.db`-bestand moet vóór implementatie worden meegeleverd in het mediapakket van het formulier. Dynamische updates van de database vereisen een nieuwe formulierimplementatie.
+- SQL wordt ongewijzigd uitgevoerd op het apparaat. Er vindt geen opschoning (sanitization) plaats aan de serverzijde — vermijd het construeren van SQL op basis van vrije tekstinvoer van de enumerator.
+- Alleen `SELECT`-statements worden ondersteund. `INSERT`, `UPDATE` en `DELETE` zijn niet toegestaan.
+- Zeer complexe query's (grote `UNION`-ketens, meerdere joins) kunnen traag zijn op low-end Android-apparaten.
+- De `search-autocomplete-noedit` varianten staan niet toe dat de enumerator een waarde opslaat die niet in de resultaatset voorkomt. Als vrije tekstinvoer vereist is, gebruik dan een apart `text`-veld.
+- `SELECT DISTINCT` wordt alleen automatisch geïnjecteerd als `DISTINCT` ontbreekt in de query. Als u expliciet `SELECT DISTINCT` schrijft, wordt dit niet verdubbeld.

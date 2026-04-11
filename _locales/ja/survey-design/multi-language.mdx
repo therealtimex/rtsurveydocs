@@ -3,60 +3,70 @@ title: "多言語サポート"
 description: ""
 ---
 
-rtSurveyは複数の言語で調査を作成できる堅牢な多言語サポートを提供します。この機能は多様な言語集団または多言語環境での研究実施に不可欠です。
+rtSurveyは強力な多言語サポートを提供しており、複数の言語でアンケートを作成できます。この機能は、多様な言語集団を対象とした調査や、多言語環境での調査において非常に重要です。
 
-## 多言語調査の設定
+## 多言語アンケートの設定
 
-rtSurveyで多言語調査を作成するには、XLSFormに言語固有の列を追加する必要があります：
+rtSurveyで多言語アンケートを作成するには、XLSFormに言語固有の列を追加する必要があります。手順は以下の通りです。
 
-1. **ラベル翻訳**：`label::Language (code)`形式を使って各言語の列を追加する。
-2. **ヒント翻訳**：ヒントの翻訳には`hint::Language (code)`を使用する。
-3. **メディアファイル翻訳**：言語固有のメディアには`media::Language (code)`を使用する。
+1. **ラベルの翻訳**：`label::Language (code)`という形式を使用して、各言語の列を追加します。
+2. **ヒントの翻訳**：ヒントの翻訳には`hint::Language (code)`を使用します。
+3. **メディアファイルの翻訳**：言語固有のメディアには`media::Language (code)`を使用します。
 
 例：
 
 ```
-| type    | name | label::English (en) | label::Japanese (ja) | hint::English (en) | hint::Japanese (ja) |
+| type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
 |---------|------|---------------------|---------------------|---------------------|---------------------|
-| integer | age  | How old are you?    | 何歳ですか？| Enter your age      | 年齢を入力してください     |
+| integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
 ```
 
 ## 言語コード
 
-言語名の後に公式の2文字の言語コード（サブタグ）を使用することをお勧めします。これにより、フォームの言語とユーザーインターフェースの言語を一致させやすくなります。公式コードは[こちら](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)で確認できます。
+言語名の後に公式の2文字の言語コード（サブタグ）を使用することをお勧めします。これにより、フォームの言語とユーザーインターフェースの言語の照合が容易になります。公式コードは[こちら](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)で確認できます。
 
 ## デフォルト言語の設定
 
-データ収集のデフォルト言語を設定するには、XLSFormの`settings`ワークシートを使用します：
+データ収集のデフォルト言語を設定するには、XLSFormの`settings`ワークシートを使用します。
 
 ```
 | form_id   | version | default_language |
 |-----------|---------|-------------------|
-| test_form | 101     | Japanese (ja)       |
+| test_form | 101     | French (fr)       |
 ```
 
 ## rtSurvey固有の機能
 
-### 動的言語切り替え
+### 動的な言語切り替え
 
-rtSurveyはデータ収集中に動的に言語を切り替えることができます：
+rtSurveyでは、データ収集中にユーザーが言語を動的に切り替えることができます。
 
-- Webインターフェースでは、上部ナビゲーションバーの言語ドロップダウンを使用する。
-- モバイルアプリでは、設定メニューから言語オプションにアクセスする。
+- Webインターフェースでは、上部のナビゲーションバーにある言語ドロップダウンを使用します。
+- モバイルアプリでは、設定メニューから言語オプションにアクセスします。
 
-### 言語固有の検証メッセージ
+### 言語固有のバリデーションメッセージ
 
-rtSurveyは検証メッセージに対しても多言語サポートを拡張します：
+rtSurveyは多言語サポートをバリデーションメッセージにも拡張しています。
 
 ```
-| type    | name | constraint | constraint_message::English (en) | constraint_message::Japanese (ja) |
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
 |---------|------|------------|----------------------------------|----------------------------------|
-| integer | age  | . <= 150   | Age must be 150 or less          | 年齢は150以下でなければなりません     |
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-### RTL言語サポート
+### ローカライズされた必須メッセージ
 
-アラビア語やヘブライ語などの右から左（RTL）言語については、rtSurveyが自動的にレイアウトを調整します：
+必須フィールドが空白のときに翻訳されたエラーを表示するには、`required_message::Language (code)`を使用します。
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
+### RTL言語のサポート
+
+アラビア語やヘブライ語などの右から左（RTL）に記述する言語の場合、rtSurveyは自動的にレイアウトを調整します。
 
 ```
 | type | name | label::English (en) | label::Arabic (ar) |
@@ -64,37 +74,93 @@ rtSurveyは検証メッセージに対しても多言語サポートを拡張し
 | text | name | Your name           | اسمك                |
 ```
 
-## 多言語調査のベストプラクティス
+### 言語固有のAppearance（外観）
 
-1. **一貫した命名**：フォーム全体で一貫した言語コードを使用する。
-2. **プロの翻訳**：調査の文脈に精通した専門の翻訳者を採用する。
-3. **文脈メモ**：正確な翻訳を確保するために翻訳者に文脈メモを提供する。
-4. **テスト**：デプロイ前にすべての言語でフォームをテストする。
-5. **Unicodeサポート**：ラテン文字以外のスクリプトのためにデータ収集デバイスがUnicodeをサポートしていることを確認する。
-6. **言語固有のメディア**：各言語に文化的に適した画像や音声を使用する。
-7. **画像内テキストを避ける**：テキストを含む画像を使用する場合は各言語に別々の画像を作成する。
+rtSurveyでは、言語ごとに異なるAppearance（外観）を指定できます。
 
-## 特殊ケースの処理
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Address          | 地址                 | multiline                | textarea                  |
+```
 
-### 混合言語回答
+## 2ヶ国語ラベルでのHTMLフォーマット
 
-rtSurveyは、選択されたフォーム言語に関わらず、回答者が任意のスクリプトでテキストを入力できます。これは名前や住所を元のスクリプトでキャプチャする際に有用です。
+単一のラベルセル内でHTMLタグと言語ラッパーを組み合わせることができます。rtSurveyはアクティブな言語ブロックを抽出し、残りのHTMLをレンダリングします。
 
-## 多言語データのエクスポート
+言語ごとの太字とフォント色の使用例：
 
-rtSurveyからデータをエクスポートする場合：
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
 
-- 特定の言語でエクスポートするか、すべての言語バージョンを含めるかを選択する。
-- 各回答にどの言語が使用されたかを示す言語メタデータがエクスポートに含まれる。
+言語ラッパー内でサポートされているインラインタグ：`<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`。
 
-## モバイルアプリの考慮事項
+言語ごとの色付きテキストの例：
 
-- rtSurveyモバイルアプリはオフライン言語切り替えをサポートする。
-- オフラインに切り替える前に必要なすべての言語ファイルがダウンロードされていることを確認する。
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
 
-## 既知の制限
+## 言語を考慮した計算
 
-- 一部の高度な機能はすべての言語で利用できない場合がある。
-- 非常に長い翻訳は小さな画面でレイアウトに影響する場合がある。
+フォームに`${language_use}`フィールド（`change_language`ウィジェットによって設定される）がある場合、`if()`を使用してアクティブな言語で値を返します。
 
-rtSurveyの多言語機能を活用することで、多様な集団にリーチして言語的に正確な高品質データを提供する、包括的でアクセシブルな調査を作成できます。
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+例 — `pulldata('rawquery', ...)`を使用してアクティブな言語でルックアップ結果を表示する：
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+注：`language_use`フィールドは通常、`change_language` Appearance（外観）ウィジェットによって設定されます。Appearance — change_languageを参照してください。
+
+## 多言語アンケートのベストプラクティス
+
+1. **一貫した命名**：フォーム全体で一貫した言語コードを使用してください。
+2. **専門的な翻訳**：アンケートの文脈に詳しい専門の翻訳者を起用してください。
+3. **コンテキストノート**：正確な翻訳を確実にするために、翻訳者にコンテキストノートを提供してください。
+4. **テスト**：デプロイ前に、すべての言語でフォームをテストしてください。
+5. **Unicodeサポート**：データ収集デバイスが非ラテン文字のUnicodeをサポートしていることを確認してください。
+6. **言語固有のメディア**：各言語に適した画像や音声を使用してください。
+7. **画像内のテキストを避ける**：テキストを含む画像を使用する場合は、言語ごとに個別の画像を作成してください。
+
+## 特殊なケースの処理
+
+### 混在言語の回答
+
+rtSurveyでは、選択したフォーム言語に関係なく、回答者が任意の文字でテキストを入力できます。これは、名前や住所を元の文字で取得するのに役立ちます。
+
+### 言語固有の質問タイプ
+
+言語によっては、特定の質問タイプの方が適切な場合があります。rtSurveyでは、言語ごとに異なる質問タイプを使用できます。
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
+```
+
+## 多言語データの書き出し
+
+rtSurveyからデータを書き出す際：
+
+- 特定の言語で書き出すか、すべての言語バージョンを含めるかを選択します。
+- 書き出しには言語メタデータが含まれ、各回答にどの言語が使用されたかが示されます。
+
+## モバイルアプリに関する考慮事項
+
+- rtSurveyモバイルアプリは、オフラインでの言語切り替えをサポートしています。
+- オフラインになる前に、必要なすべての言語ファイルがダウンロードされていることを確認してください。
+
+## 既知の制限事項
+
+- 一部の高度な機能は、すべての言語で利用できるとは限りません。
+- 翻訳が極端に長い場合、小さな画面ではレイアウトに影響を与える可能性があります。
+
+rtSurveyの多言語機能を活用することで、多様な人々に届き、高品質で言語的に正確なデータを提供する、包括的でアクセシブルなアンケートを作成できます。

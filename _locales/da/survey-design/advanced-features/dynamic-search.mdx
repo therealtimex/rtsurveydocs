@@ -1,15 +1,15 @@
 ---
 title: "Dynamisk søgning"
-description: "Dynamisk søgning indlæser valgmuligheder fra et eksternt API i realtid, mens intervieweren skriver, hvilket muliggør store eller hyppigt opdaterede datasæt."
+description: "Dynamisk søgning indlæser valgmuligheder fra et eksternt API i realtid, mens enumeratoren skriver, hvilket muliggør brug af store eller ofte opdaterede datasæt."
 ---
 
-**Dynamisk søgning** (også kaldet Search API) giver et `select_one`-, `select_multiple`- eller `text`-felt mulighed for at indlæse sine valgmuligheder fra en ekstern webtjeneste **ved kørselstid**, mens intervieweren skriver. Dette er den rette tilgang, når din valgliste er for stor til at bundte i en CSV-fil, opdateres hyppigt, eller stammer fra en live-database.
+**Dynamisk søgning** (også kaldet Search API) gør det muligt for et `select_one`-, `select_multiple`- eller `text`-felt at indlæse sine valgmuligheder fra en ekstern webservice **i realtid**, mens enumeratoren skriver. Dette er den rigtige tilgang, når din valgliste er for stor til at blive inkluderet i en CSV-fil, opdateres ofte eller kommer fra en live-database.
 
 ---
 
-## `search-api()` appearance
+## `search-api()`-udseende
 
-Den dynamiske søgning konfigureres via kolonnen `appearance` ved brug af funktionen `search-api()`:
+Den dynamiske søgning konfigureres via kolonnen `appearance` ved hjælp af funktionen `search-api()`:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -20,53 +20,53 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 | Parameter | Beskrivelse |
 |-----------|-------------|
 | `method` | Brug altid `'POST'` |
-| `url` | API-endepunktet, der forespørges |
-| `post_body` | JSON-tekst sendt til API'et. Brug `%__input__%` som pladsholder for interviewerens aktuelle søgetekst |
-| `value_column` | Den nøgle i svaret, der bruges som den gemte **værdi** |
-| `display` | Den nøgle (eller skabelon), der bruges som den **label**, der vises i rullemenuen. Understøtter `##nøgle##`-pladsholdere og `@{func}`-udtryk |
+| `url` | API-endpointet der skal forespørges |
+| `post_body` | JSON-body sendt til API'et. Brug `%__input__%` som en pladsholder for enumeratorens aktuelle søgetekst |
+| `value_column` | Nøglen i svarobjektet, der skal bruges som den gemte **værdi** (value) |
+| `display` | Nøglen (eller skabelonen), der skal bruges som **etiket** (label) vist i rullemenuen. Understøtter `##key##`-pladsholdere og `@{func}`-udtryk |
 | `data_path` | JSONPath til arrayet af resultatobjekter i svaret (f.eks. `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Et navn, under hvilket det rå svar gemmes til brug af andre felter |
+| `save_path` | Et navn, som det rå svar gemmes under til brug for andre felter |
 
 ---
 
 ## Grundlæggende eksempel
 
-Et sundhedsfacilitetsopslag, hvor intervieweren skriver en del af facilitetens navn:
+Opslag af en sundhedsfacilitet, hvor enumeratoren skriver en del af facilitetens navn:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one | facility | Vælg sundhedsfacilitet | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-API'et modtager `{"query": "kobe"}`, når intervieweren skriver "kobe" og returnerer:
+API'et modtager `{"query": "nair"}`, når enumeratoren skriver "nair", og returnerer:
 
 ```json
 {
   "results": [
-    {"id": "HF001", "name": "Kobenhavn Central Klinik"},
-    {"id": "HF002", "name": "Kobenhavn Vest Hospital"}
+    {"id": "HF001", "name": "Nairobi Central Clinic"},
+    {"id": "HF002", "name": "Nairobi West Hospital"}
   ]
 }
 ```
 
-Rullemenuen viser `Kobenhavn Central Klinik` og `Kobenhavn Vest Hospital`; den gemte værdi er `HF001` eller `HF002`.
+Rullemenuen viser `Nairobi Central Clinic` og `Nairobi West Hospital`; den gemte værdi er `HF001` eller `HF002`.
 
 ---
 
-## Avanceret visningsformatering
+## Avanceret formatering af visning
 
-### Brug af `##nøgle##`-skabeloner
+### Brug af `##key##`-skabeloner
 
-Vis flere felter i labelen:
+Vis flere felter i etiketten:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
 ```
 
-Vises som: `Kobenhavn Central Klinik (Kobenhavn)`.
+Vises som: `Nairobi Central Clinic (Nairobi)`.
 
 ### Brug af `@{func}`-udtryk
 
-Anvend betinget logik i visningslabelen:
+Anvend betinget logik i visningsetiketten:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Aktive resultater vises som `✓ Klinikens navn`; inaktive vises som `✗ Klinikens navn`.
+Aktive resultater viser `✓ Clinic Name`; inaktive viser `✗ Clinic Name`.
 
 ---
 
-## Angivelse af en standardværdi: `search-default-api()`
+## Indstilling af en standardværdi: `search-default-api()`
 
-Brug `search-default-api()` efter `search-api()` til at forudfylde feltet med et standardvalg indlæst fra et separat API-kald (f.eks. ved redigering af en eksisterende post):
+Brug `search-default-api()` efter `search-api()` for at forudfylde feltet med et standardvalg indlæst fra et separat API-kald (f.eks. ved redigering af en eksisterende post):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -90,7 +90,7 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ## Brugerdefineret separator for select_multiple: `search-default-separator()`
 
-For `select_multiple`-felter angives, hvordan flere valgte værdier sammenføjes i den gemte streng:
+For `select_multiple`-felter kan du angive, hvordan flere valgte værdier sammenføjes i den gemte streng:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
@@ -102,36 +102,95 @@ Standardseparatoren er et mellemrum.
 
 ## Understøttede spørgsmålstyper
 
-| Spørgsmålstype | Anvendelsestilfælde |
-|----------------|---------------------|
-| `select_one` | Enkeltvalg fra søgeresultater |
-| `select_multiple` | Flervalg fra søgeresultater |
-| `text` | Autofuldførelse — intervieweren skriver frit, men kan vælge et forslag |
+| Spørgsmålstype | Brugsscenarie |
+|---------------|----------|
+| `select_one` | Enkelt valg fra søgeresultater |
+| `select_multiple` | Flere valg fra søgeresultater |
+| `text` | Autocomplete — enumeratoren skriver frit, men kan vælge et forslag |
 
 ---
 
-## Brug af gemt svardata
+## Brug af gemte svardata
 
-`save_path` gemmer det fulde API-svar under det angivne navn. Andre felter kan referere til det med `pulldata()`:
+Når enumeratoren vælger et resultat, gemmer rtSurvey det fulde matchende objekt fra svaret under navnet `save_path`. Andre felter kan læse fra det på to måder.
+
+### Metode 1 — `pulldata()`-opslag
+
+Brug `pulldata('save_path', 'key')` til at læse et felt på øverste niveau fra det gemte objekt:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Vælg facilitet | `search-api(..., 'facility_data')` |
+| select_one | facility | Vælg facilitet | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+Udseendet (appearance) på `select_one`-rækken skal inkludere `search-api(..., 'facility_data')` med det matchende `save_path`.
+
+For **indlejrede JSON-felter** kombineres med `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
 
 ---
 
-## Bedste praksis
+## Lokal filsøgning med search()
 
-1. Sørg for, at dit API-endepunkt svarer inden for 1–2 sekunder — langsomme API'er får søgningen til at føles uresponsiv.
-2. Brug `%__input__%` i `post_body`, så API'et kun returnerer matchende resultater og ikke hele datasættet.
-3. Indekser søgefeltet på serversiden (f.eks. Elasticsearch, database-fuldtekstsøgeindeks) for hurtige svar.
-4. Begræns resultater til 20–50 elementer pr. forespørgsel — at returnere tusindvis af resultater modvirker formålet med søgning.
-5. Inkluder et minimumsinputlængdekrav i API'et for at undgå brede forespørgsler på enkeltkarakteriminput.
+`search()` udfører offline opslag baseret på kolonne-lighed mod en medfølgende SQLite `.db`-fil — ingen netværksforbindelse og ingen SQL-forespørgsler påkrævet. Brug det, når dine referencedata er pakket sammen med formularen, og du har brug for et simpelt "find alle rækker, hvor kolonnen er lig med værdien"-opslag.
+
+### Signatur
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parametre
+
+| Parameter | Beskrivelse |
+|-----------|-------------|
+| `path` | Sti til SQLite-tabellen: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Match-operator — returnerer rækker, hvor kolonnen er lig med værdien |
+| `'list_name'` | Kolonnenavn der skal matches mod |
+| `${field}` | Værdi der skal matches; typisk en feltreference |
+
+### Eksempel
+
+Udfyld en `select_one` fra en lokal database ved at matche værdien af `${d307}` mod kolonnen `list_name` i tabellen `externalData` i `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Vælg facilitet | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Når `${d307}` er lig med `"HF001"`, returnerer `search()` hver række i `externalData`, hvor `list_name = 'HF001'` — udelukkende fra den medfølgende fil, uden netværkskald.
+
+### search() vs rawquery autocomplete
+
+| Funktion | `search()` | `rawquery` autocomplete |
+|---------|-----------|------------------------|
+| SQL-forespørgsler | Nej — kun kolonne-lighed | Ja — fuld `SELECT … FROM …` |
+| Parametriseret input | Match på kolonneværdi | Indlejret i SQL-streng |
+| Fri tekstindtastning | Ja — enumeratoren kan skrive frit | Nej — skal vælge fra liste |
+| UNION / flere tabeller | Ikke understøttet | Understøttet |
+
+### Hvornår skal man bruge hvad
+
+- Brug **`search()`**, når du har brug for et ligetil lighedsmatch mod en medfølgende `.db`-fil, formularen skal fungere offline, og du vil tillade fri tekstindtastning.
+- Brug **`rawquery` autocomplete**, når du har brug for SQL-fleksibilitet (JOINs, UNIONs, beregnede kolonner) eller skal forespørge på tværs af flere tabeller, og formularen har pålidelig forbindelse.
+
+---
+
+## Best Practices
+
+1. Sørg for, at dit API-endpoint svarer inden for 1–2 sekunder — langsomme API'er får søgningen til at føles træg.
+2. Brug `%__input__%` i `post_body`, så API'et kun returnerer matchende resultater, ikke hele datasættet.
+3. Indekser søgefeltet på serversiden (f.eks. Elasticsearch, database full-text index) for hurtige svar.
+4. Begræns resultaterne til 20–50 elementer pr. forespørgsel — at returnere tusindvis af resultater modvirker formålet med søgning.
+5. Inkluder et krav om minimum inputlængde i API'et for at undgå at udløse brede forespørgsler på enkelt-karakter input.
 
 ## Begrænsninger
 
 - Dynamisk søgning kræver netværksforbindelse — det fungerer ikke offline.
-- Pladsholderen `%__input__%` indsættes som den er; rens input på serversiden for at forhindre injektionsangreb.
+- Pladsholderen `%__input__%` indsættes som den er; rens input på serversiden for at forhindre injection-angreb.
 - Komplekse `@{func}`-visningsudtryk kan have begrænset understøttelse på tværs af alle rtSurvey-klientversioner.

@@ -1,0 +1,118 @@
+---
+title: "Enregistrement Audio"
+description: "Enregistrez le son ambiant ou des entretiens pendant la collecte de données d'enquête en utilisant les apparences audio-start et audio-end sur des champs texte."
+---
+
+L'enregistrement audio permet à un formulaire de capturer du son de manière silencieuse ou visible pendant une section d'une enquête. Il est utile pour enregistrer des entretiens, le son ambiant lors d'observations sur le terrain ou des réponses parlées qui complètent les réponses structurées.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Application mobile uniquement.** L'enregistrement audio nécessite l'application mobile rtSurvey. Dans le formulaire web, les apparences `audio-start` et `audio-end` sont ignorées silencieusement — aucun enregistrement n'a lieu et aucune erreur n'est affichée. Testez toujours sur l'appareil lorsqu'un enregistrement audio est requis.
+</Callout>
+
+---
+
+## Comment ça marche
+
+L'enregistrement audio est contrôlé par deux champs `text` agissant comme **marqueurs** :
+
+- Un champ avec l'apparence `audio-start` commence l'enregistrement lorsque l'enquêteur l'atteint.
+- Un champ avec l'apparence `audio-end` arrête l'enregistrement et enregistre le fichier audio dans la soumission.
+
+Les deux champs de marquage sont de type `text`. Ils sont généralement masqués pour l'enquêteur (en utilisant `relevant = false` ou placés dans une position non interactive), bien qu'ils puissent être visibles. L'audio enregistré est joint à la soumission sous forme de fichier lié au champ `audio-end`.
+
+---
+
+## Exemple de base
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Nom du répondant | |
+| text | q_occupation | Profession | |
+| integer | q_age | Âge | |
+| text | audio_e_a1 | | `audio-end` |
+
+L'application commence à enregistrer lorsque l'enquêteur atteint `audio_s_a1` et s'arrête lorsqu'il atteint `audio_e_a1`. Toutes les questions entre les deux marqueurs sont enregistrées.
+
+---
+
+## Enregistrement silencieux : `audio-start invisible`
+
+Par défaut, l'application mobile affiche un indicateur d'enregistrement pendant la capture audio. L'ajout de `invisible` à l'apparence supprime cet indicateur, de sorte que l'enregistrement se produit sans aucun signal visible pour le répondant.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Acceptez-vous de participer ? | |
+| text | q_feedback | Vos commentaires | |
+| text | audio_e_a1 | | `audio-end` |
+
+Utilisez `invisible` uniquement lorsque les exigences de divulgation ont été satisfaites par d'autres moyens (par exemple, un champ de consentement écrit séparé avant la section d'enregistrement).
+
+---
+
+## Convention de nommage
+
+Les formulaires de production utilisent un modèle de nommage cohérent pour les champs de marquage :
+
+```
+audio_s_{section}{n}   — marqueur de début
+audio_e_{section}{n}   — marqueur de fin
+```
+
+Où `{section}` est un label court pour la section du formulaire et `{n}` est un numéro séquentiel au sein de cette section.
+
+| Nom du champ | Rôle | Signification |
+|------------|------|---------|
+| `audio_s_a1` | Début | Premier enregistrement dans la section A |
+| `audio_e_a1` | Fin | Fin du premier enregistrement dans la section A |
+| `audio_s_b1` | Début | Premier enregistrement dans la section B |
+| `audio_e_b1` | Fin | Fin du premier enregistrement dans la section B |
+| `audio_s_a2` | Début | Deuxième enregistrement dans la section A |
+| `audio_e_a2` | Fin | Fin du deuxième enregistrement dans la section A |
+
+Le respect de cette convention facilite l'identification des limites d'enregistrement lors de l'examen des définitions de formulaire et des données de soumission.
+
+---
+
+## Stockage et récupération
+
+Lorsque l'enquêteur atteint le champ `audio-end`, l'application finalise le fichier audio et le joint à la soumission. Le fichier est :
+
+- Stocké en tant que pièce jointe audio sur la soumission, associée au nom du champ `audio-end`.
+- Accessible dans le visualiseur de soumissions du back-end rtSurvey aux côtés des autres pièces jointes multimédias.
+- Téléchargeable via l'exportation standard des soumissions — les fichiers audio apparaissent dans la colonne média correspondant au nom du champ `audio-end`.
+
+Le format de fichier et le débit dépendent de l'appareil et de la version de l'application.
+
+---
+
+## Sections d'enregistrement multiples
+
+Un formulaire peut contenir plusieurs sections d'enregistrement sans chevauchement. Chaque paire de marqueurs `audio-start` / `audio-end` doit être entièrement contenue — les sections ne doivent pas s'entremêler.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Introduction | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Détails | |
+| text | audio_e_b1 | | `audio-end` |
+
+Chaque section produit un fichier audio séparé joint à son champ `audio-end` respectif.
+
+---
+
+## Limitations
+
+- **Application mobile uniquement.** La fonctionnalité n'est pas prise en charge dans le formulaire web. `audio-start` et `audio-end` sont ignorés silencieusement dans un navigateur.
+- **Pas d'imbrication.** Les sections d'enregistrement ne peuvent pas se chevaucher. Commencer un nouvel enregistrement avant que le marqueur `audio-end` précédent ne soit atteint n'est pas pris en charge.
+- **Le type de champ doit être `text`.** L'utilisation de `audio-start` ou `audio-end` sur tout autre type de question n'est pas prise en charge.
+- **Taille de téléchargement.** Les enregistrements longs produisent des fichiers volumineux. Soyez conscient des limites de taille de soumission et des conditions de réseau sur le terrain.
+- **Pas de pause pendant l'enregistrement.** L'enregistrement s'exécute en continu du marqueur de début au marqueur de fin ; il n'y a aucun mécanisme pour mettre en pause et reprendre au sein d'une section.

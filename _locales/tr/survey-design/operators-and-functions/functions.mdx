@@ -8,102 +8,109 @@ import { Callout } from 'nextra/components'
 ### Dize fonksiyonları
 
 <Callout type="warning">
-İfadeler içinde dizelerle çalışırken, gerçek dizeleri çevrelemek için tek tırnak ('') kullanmak önemlidir. Ancak bir gerçek dize içinde tek tırnak eklemek istediğinizde bir istisna vardır. Bu gibi durumlarda, tüm dizeyi çevrelemek için çift tırnak ("") kullanabilirsiniz.
+İfadeler içinde dize (string) kullanırken, harfi dizeleri çevrelemek için tek tırnak ('') kullanmak önemlidir. Ancak, bir harfi dizenin içinde tek tırnak eklemek istediğinizde bir istisna ortaya çıkar. Bu durumlarda, tüm dizeyi çevrelemek için çift tırnak ("") kullanabilirsiniz.
 
-Örneğin:
-- Doğru: if(`${yesno}` = 1, "içinde 'tek tırnak' olan bir dize", "burada tek tırnak yok")
-- Yanlış: if(`${yesno}` = 1, 'içinde 'tek tırnak' olan bir dize', 'burada tek tırnak yok')
+Örnek:
+- Doğru: if(`${yesno}` = 1, "a string with 'single quotes' in it", "no single quotes here")
+- Yanlış: if(`${yesno}` = 1, 'a string with 'single quotes' in it', 'no single quotes here')
 
-Akıllı tırnaklar konusunda, bunların ifadelerde sorunlara yol açabileceğini bilmek önemlidir. Birçok zengin metin düzenleyicisi düz tırnakları ("" veya '') akıllı tırnaklara veya kıvrımlı tırnaklara ("" veya '') otomatik olarak dönüştürür; bu sözdizimi hatalarına veya beklenmedik davranışlara yol açabilir. Bunu önlemek için ifadelerinizde düz tırnak ('') kullandığınızdan emin olun.
+Akıllı tırnaklar konusunda, ifadelerde sorunlara yol açabileceği için bunların varlığından haberdar olmak çok önemlidir. Birçok zengin metin düzenleyicisi düz tırnakları ("" veya '') otomatik olarak akıllı tırnaklara veya kıvrık tırnaklara (“” veya ‘’) dönüştürür; bu da sözdizimi hatalarına veya beklenmedik davranışlara neden olabilir. Bunu önlemek için, ifadelerinizde tutarlı bir şekilde düz tırnaklar ('') kullandığınızdan emin olun.
+
+Daha fazla sorunuz olursa veya ek yardıma ihtiyaç duyarsanız lütfen bana bildirin!
 </Callout>
 
-rtSurvey aşağıdakiler dahil çeşitli fonksiyonları destekler:
+rtSurvey aşağıdakiler de dahil olmak üzere çeşitli fonksiyonları destekler:
 
-1. `string(field)`: Bir alanı dizeye dönüştürür.
-   - Örnek: `string(34.8)` `'34.8'` olarak dönüştürülür.
+1. `string(field)`: Bir alanı dizeye (string) dönüştürür.
+   - Örnek: `string(34.8)` değeri `'34.8'` dizesine dönüştürülecektir.
 
 2. `string-length(field)`: Bir dize alanının uzunluğunu döndürür.
-   - Örnek: `string-length(.) > 3 and string-length(.) < 10`, geçerli alanın 3 ile 10 karakter arasında olmasını sağlamak için kullanılabilir.
+   - Örnek: `string-length(.) > 3 and string-length(.) < 10` mevcut alanın 3 ile 10 karakter arasında olmasını sağlamak için kullanılabilir.
+   - **Kademeli bağımlılık düzeni (Cascade dependency pattern)**: `string-length(${province}) >= 0` her zaman `true` (doğru) sonucunu verir ancak rtSurvey'i `${province}` her değiştiğinde ifadeyi yeniden değerlendirmeye zorlar. Üst bir alan güncellendiğinde kademeli bir yenilemeyi tetiklemek için bunu `relevant` sütununda kullanın:
+     | type | name | relevant |
+     |------|------|----------|
+     | select_one | district | `string-length(${province}) >= 0` |
+     Bu, province (il) değiştiğinde district (ilçe) sorusunun `search()` veya `rawquery` görünümünü (appearance) yeniden değerlendirmesini sağlar.
 
-3. `substr(fieldorstring, startindex, endindex)`: `startindex`'ten başlayıp `endindex`'ten hemen önce biten bir alt dize döndürür. İndeksler dizideki ilk karakter için 0'dan başlar.
-   - Örnek: `substr(${phone}, 0, 3)` telefon numarasının ilk üç rakamını döndürür.
+3. `substr(fieldorstring, startindex, endindex)`: `startindex`'ten başlayan ve `endindex`'ten hemen önce biten bir alt dizeyi (substring) döndürür. İndeksler dizedeki ilk karakter için 0'dan başlar.
+   - Örnek: `substr(${phone}, 0, 3)` bir telefon numarasının ilk üç hanesini döndürecektir.
 
-4. `concat(a, b, c, ...)`: Alanları (ve/veya dizeleri) birleştirir.
-   - Örnek: `concat(${firstname}, ' ', ${lastname})` `firstname` ve `lastname` alanlarındaki değerleri birleştirerek tam bir ad döndürür.
+4. `concat(a, b, c, ...)`: Alanları (ve/veya dizeleri) birbirine bağlar (concatenate).
+   - Örnek: `concat(${firstname}, ' ', ${lastname})` `firstname` ve `lastname` alanlarındaki değerleri birleştirerek tam bir isim döndürecektir.
 
-5. `linebreak()`: Satır sonu karakteri döndürür.
-   - Örnek: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` aralarında satır sonları olan üç alan değerinin listesini döndürür.
+5. `linebreak()`: Bir satır sonu karakteri döndürür.
+   - Örnek: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` aralarında satır sonu karakterleri bulunan üç alan değerinden oluşan bir liste döndürecektir.
 
-6. `lower()`: Bir dizeyi tüm küçük harflere dönüştürür.
-   - Örnek: `lower('Sokak Adı')` "sokak adı" döndürür.
+6. `lower()`: Bir dizeyi tamamen küçük harflere dönüştürür.
+   - Örnek: `lower('Street Name')` "street name" sonucunu döndürecektir.
 
-7. `upper()`: Bir dizeyi tüm büyük harflere dönüştürür.
-   - Örnek: `upper('Sokak Adı')` "SOKAK ADI" döndürür.
+7. `upper()`: Bir dizeyi tamamen büyük harflere dönüştürür.
+   - Örnek: `upper('Street Name')` "STREET NAME" sonucunu döndürecektir.
 
 ### select_one ve select_multiple fonksiyonları
 
-1. `count-selected(field)`: Bir select_multiple alanında seçilen öğelerin sayısını döndürür.
-   - Örnek: `count-selected(.) = 3` tam olarak üç seçeneğin seçilmesini sağlamak için kısıtlama ifadesi olarak kullanılabilir.
+1. `count-selected(field)`: Bir select_multiple alanında seçilen öğe sayısını döndürür.
+   - Örnek: `count-selected(.) = 3` tam olarak üç seçeneğin seçilmesini sağlamak için bir constraint (kısıtlama) ifadesi olarak kullanılabilir.
 
-2. `selected(field, value)`: Belirtilen değerin select_one veya select_multiple alanında seçilip seçilmediğine bağlı olarak doğru veya yanlış döndürür.
-   - Örnek: `selected(${color}, 'Blue')`, yalnızca katılımcı favori renk olarak "Blue"yu seçtiyse bir grubu veya alanı göstermek için ilgililik ifadesi olarak kullanılabilir.
-   - Not: İkinci parametre her zaman seçenek etiketini değil, seçenek değerini belirtmelidir. Form tanımının choices çalışma sayfasındaki değer sütunundan gelen değeri kullanın.
+2. `selected(field, value)`: Belirtilen değerin select_one veya select_multiple alanında seçilip seçilmediğine bağlı olarak true veya false döndürür.
+   - Örnek: `selected(${color}, 'Blue')` katılımcının favori rengi olarak "Blue" seçmesi durumunda bir grubu veya alanı göstermek için bir relevance (ilgililik) ifadesi olarak kullanılabilir.
+   - Not: İkinci parametre her zaman seçenek etiketini (label) değil, seçenek değerini (value) belirtmelidir. Form tanımının choices çalışma sayfasındaki value sütunundaki değeri kullanın.
 
-3. `selected-at(field, number)`: Bir select_multiple alanında belirtilen konumdaki seçili öğeyi döndürür. Geçirilen sayı 0 olduğunda ilk seçili öğeyi döndürür; sayı 1 olduğunda ikinci seçili öğeyi döndürür ve bu şekilde devam eder.
-   - Örnek: `selected-at(${fruits}, 0) = 'Apple'`, yalnızca ilk seçilen seçenek "Apple" ise bir grubu veya alanı göstermek için ilgililik ifadesi olarak kullanılabilir.
-   - Not: Döndürülen değer seçenek etiketi değil, seçenek değeri olacaktır. Form tanımının choices çalışma sayfasındaki değer sütunundan gelen değeri kullanın.
+3. `selected-at(field, number)`: Bir select_multiple alanında belirtilen konumdaki seçili öğeyi döndürür. Geçilen sayı 0 olduğunda ilk seçilen öğeyi; 1 olduğunda ikinci seçilen öğeyi döndürür ve bu şekilde devam eder.
+   - Örnek: `selected-at(${fruits}, 0) = 'Apple'` ilk seçilen seçeneğin "Apple" olması durumunda bir grubu veya alanı göstermek için bir relevance ifadesi olarak kullanılabilir.
+   - Not: Döndürülen değer seçenek etiketi değil, seçenek değeri olacaktır. Form tanımının choices çalışma sayfasındaki value sütunundaki değeri kullanın.
 
-4. `choice-label(field, value)`: Form tanımının choices çalışma sayfasında tanımlandığı şekliyle bir select_one veya select_multiple alan seçimi için etiketi döndürür.
-   - Örnek 1: `choice-label(${country}, ${country})`, `country` adlı alandaki geçerli seçilen seçim için seçim etiketini döndürür.
-   - Örnek 2: `choice-label(${languages}, selected-at(${languages}, 0))`, `languages` adlı alandaki ilk seçili seçim için etiketi döndürür.
-   - Not: Bu fonksiyon değeri değil, seçim etiketini alır. Form tanımının choices çalışma sayfasındaki etiket sütununu kullanır.
+4. `choice-label(field, value)`: Form tanımının choices çalışma sayfasında tanımlandığı gibi, bir select_one veya select_multiple alan seçeneği için etiketi (label) döndürür.
+   - Örnek 1: `choice-label(${country}, ${country})` `country` adlı alanda o an seçili olan seçenek için seçenek etiketini döndürür.
+   - Örnek 2: `choice-label(${languages}, selected-at(${languages}, 0))` `languages` adlı alanda ilk seçilen seçenek için etiketi döndürür.
+   - Not: Bu fonksiyon değer değil, seçenek etiketini alır. Form tanımının choices çalışma sayfasındaki label sütununu kullanır.
 
-### Tekrarlanan alan fonksiyonları
+### Tekrarlanan alan fonksiyonları (Repeated field functions)
 
-rtSurvey'de aynı soruyu birden fazla kez sormak istiyorsanız, bir alanı tekrar grubu içine koyabilirsiniz. Bu, aynı alanın birden fazla örneğiyle sonuçlanır. Aşağıdaki fonksiyonlar bu tekrarlanan alanlarla ve ürettikleri tekrarlanan verilerle başa çıkmanıza yardımcı olabilir.
+rtSurvey'de, aynı soruyu/soruları birden fazla kez sormak istiyorsanız bir alanı repeat (tekrar) grubu içine koyabilirsiniz. Bu, aynı alanın birden fazla örneğiyle sonuçlanır. Aşağıdaki fonksiyonlar bu tekrarlanan alanlarla ve ürettikleri tekrarlanan verilerle ilgilenmenize yardımcı olabilir. Daha fazla ayrıntı için tekrarlanan alanlar hakkındaki yardım konusuna bakın.
 
-1. `join(string, repeatedfield)`: Tekrar grubu içindeki bir alan için, değerlerin dize ayrılmış listesini oluşturur. İlk parametre değerleri ayırmak için kullanılacak sınırlayıcıyı belirtir.
-   - Örnek: `join(', ', ${member_name})` girilen tüm isimlerden tek bir virgülle ayrılmış liste oluşturur.
+1. `join(string, repeatedfield)`: Bir repeat grubundaki bir alan için değerlerin dize ile ayrılmış bir listesini oluşturur. İlk parametre, değerleri ayırmak için kullanılacak sınırlayıcıyı (delimiter) belirtir.
+   - Örnek: `join(', ', ${member_name})` girilen tüm isimlerden virgülle ayrılmış tek bir liste oluşturacaktır.
 
-2. `join-if(string, repeatedfield, expression)`: Tam olarak `join()` gibi çalışır, ancak sağlanan ifadeyi kullanarak tekrar grubundaki her örneği kontrol eder. İfade yanlış olarak değerlendirilirse, öğe çıktıdan çıkarılır.
-   - Örnek: `join-if(', ', ${member_name}, ${age} >= 18)` yalnızca yetişkin üyelerin (18 ve üzeri) isimlerinin virgülle ayrılmış listesini oluşturur.
+2. `join-if(string, repeatedfield, expression)`: Tam olarak `join()` gibi çalışır, ancak sağlanan ifadeyi kullanarak repeat grubundaki her bir örneği kontrol eder. İfade false (yanlış) sonucunu verirse, öğe çıktıdan çıkarılır.
+   - Örnek: `join-if(', ', ${member_name}, ${age} >= 18)` yalnızca yetişkin üyelerin (18 yaş ve üzeri olanlar) isimlerinden oluşan virgülle ayrılmış bir liste oluşturacaktır.
 
-3. `count(repeatgroup)`: Bir tekrar grubunun kaç kez tekrarlandığını döndürür.
-   - Örnek: `count(${groupname})`, grubun örnek sayısını döndürür.
+3. `count(repeatgroup)`: Bir repeat grubunun kaç kez tekrarlandığını döndürür.
+   - Örnek: `count(${groupname})` grubun kaç kez tekrarlandığını döndürecektir.
 
-4. `count-if(repeatgroup, expression)`: Tam olarak `count()` gibi çalışır, ancak sağlanan ifadeyi kullanarak tekrar grubundaki her örneği kontrol eder. İfade yanlış olarak değerlendirilirse, öğe çıktıdan çıkarılır.
-   - Örnek: `count-if(${members}, ${age} >= 18)`, "members" tekrar grubundaki age alanına göre yetişkin üye sayısını döndürür.
+4. `count-if(repeatgroup, expression)`: Tam olarak `count()` gibi çalışır, ancak sağlanan ifadeyi kullanarak repeat grubundaki her bir örneği kontrol eder. İfade false sonucunu verirse, öğe çıktıdan çıkarılır.
+   - Örnek: `count-if(${members}, ${age} >= 18)` "members" repeat grubu içindeki age (yaş) alanına dayanarak yetişkin üyelerin sayısını döndürecektir.
 
-5. `sum(repeatedfield)`: Tekrar grubu içindeki bir alan için tüm değerlerin toplamını hesaplar.
-   - Örnek: `sum(${loan_amount})` tüm kredilerin toplam değerini döndürür.
+5. `sum(repeatedfield)`: Bir repeat grubundaki bir alan için tüm değerlerin toplamını hesaplar.
+   - Örnek: `sum(${loan_amount})` tüm kredilerin toplam değerini döndürecektir.
 
-6. `sum-if(repeatedfield, expression)`: Tam olarak `sum()` gibi çalışır, ancak sağlanan ifadeyi kullanarak tekrar grubundaki her örneği kontrol eder.
-   - Örnek: `sum-if(${loan_amount}, ${loan_amount} > 500)` 500'ün üzerindeki tüm kredilerin toplam değerini döndürür.
+6. `sum-if(repeatedfield, expression)`: Tam olarak `sum()` gibi çalışır, ancak sağlanan ifadeyi kullanarak repeat grubundaki her bir örneği kontrol eder. İfade false sonucunu verirse, öğe çıktıdan çıkarılır.
+   - Örnek: `sum-if(${loan_amount}, ${loan_amount} > 500)` 500'ün üzerindeki tüm kredilerin toplam değerini döndürecektir. Daha küçük krediler dikkate alınmayacaktır.
 
-7. `min(repeatedfield)`: Tekrar grubu içindeki bir alan için tüm değerlerin minimumunu hesaplar.
-   - Örnek: `min(${member_age})` gruptaki en genç üyenin yaşını döndürür.
+7. `min(repeatedfield)`: Bir repeat grubundaki bir alan için tüm değerlerin minimumunu hesaplar.
+   - Örnek: `min(${member_age})` gruptaki en genç üyenin yaşını döndürecektir.
 
-8. `min-if(repeatedfield, expression)`: Tam olarak `min()` gibi çalışır, ancak sağlanan ifadeyi kullanarak her örneği kontrol eder.
-   - Örnek: `min-if(${member_age}, ${member_age} >= 18)` gruptaki en genç yetişkinin yaşını döndürür.
+8. `min-if(repeatedfield, expression)`: Tam olarak `min()` gibi çalışır, ancak sağlanan ifadeyi kullanarak repeat grubundaki her bir örneği kontrol eder. İfade false sonucunu verirse, öğe çıktıdan çıkarılır.
+   - Örnek: `min-if(${member_age}, ${member_age} >= 18)` gruptaki en genç yetişkinin yaşını döndürecektir. 18 yaşından küçükler dikkate alınmayacaktır.
 
-9. `max(repeatedfield)`: Tekrar grubu içindeki bir alan için tüm değerlerin maksimumunu hesaplar.
-   - Örnek: `max(${member_age})` gruptaki en yaşlı üyenin yaşını döndürür.
+9. `max(repeatedfield)`: Bir repeat grubundaki bir alan için tüm değerlerin maksimumunu hesaplar.
+   - Örnek: `max(${member_age})` gruptaki en yaşlı üyenin yaşını döndürecektir.
 
-10. `max-if(repeatedfield, expression)`: Tam olarak `max()` gibi çalışır, ancak sağlanan ifadeyi kullanarak her örneği kontrol eder.
-    - Örnek: `max-if(${member_age}, ${member_age} >= 18)` gruptaki en yaşlı yetişkinin yaşını döndürür.
+10. `max-if(repeatedfield, expression)`: Tam olarak `max()` gibi çalışır, ancak sağlanan ifadeyi kullanarak repeat grubundaki her bir örneği kontrol eder. İfade false sonucunu verirse, öğe çıktıdan çıkarılır.
+    - Örnek: `max-if(${member_age}, ${member_age} >= 18)` gruptaki en yaşlı yetişkinin yaşını döndürecektir. 18 yaşından küçükler dikkate alınmayacaktır.
 
-11. `index()`: Tekrar grubu içinde çağrıldığında, geçerli grup veya örnek için indeks numarasını döndürür.
-    - Örnek: Tekrar grubu içinde kullanıldığında `index()`, ilk örnek için 1, ikincisi için 2 vb. döndürür.
+11. `index()`: Bir repeat grubu içinde çağrıldığında, mevcut grup veya örneğin dizin (index) numarasını döndürür.
+    - Örnek: Bir repeat grubu içinde kullanıldığında `index()`, ilk örnek için 1, ikinci için 2 vb. döndürecektir.
 
-12. `indexed-repeat(repeatedfield, repeatgroup, index)`: Tekrar grubu içindeki bir alana veya gruba, o tekrar grubunun dışından referans verir.
-    - Örnek 1: `indexed-repeat(${name}, ${names}, 1)`, "names" adlı önceki tekrar grubunda name alanı bulunduğunda ilk mevcut adı döndürür.
-    - Örnek 2: `indexed-repeat(${name}, ${names}, index())`, geçerli tekrar grubunun örnek numarasına karşılık gelen adı çeker.
+12. `indexed-repeat(repeatedfield, repeatgroup, index)`: Bir repeat grubunun içindeki bir alan veya gruba o repeat grubunun dışından başvurur. İlk parametre ilgilenilen tekrarlanan alanı veya grubu, ikincisi alanın veya grubun içinde bulunduğu repeat grubunu ve üçüncüsü ise repeat grubu içinde kullanılacak örnek numarasını belirtir.
+    - Örnek 1: `indexed-repeat(${name}, ${names}, 1)` "names" adlı önceki bir repeat grubunun içindeki name alanında mevcut olan ilk ismi döndürecektir.
+    - Örnek 2: `indexed-repeat(${name}, ${names}, index())` mevcut repeat grubunun örnek numarasına karşılık gelen ismi çekecektir.
 
-13. `rank-index(index, repeatedfield)`: Bu fonksiyon, tekrar grubunun dışında kullanım için tekrarlanan bir alanın belirli örneğinin ordinal sıralamasını hesaplar. 1 sıralaması en yüksek değere sahip örneğe, 2 sıralaması bir sonraki en yüksek değere ve bu şekilde devam eder.
-    - Örnek: `rank-index(1, ${random_draw})`, diğer örneklerin değerleriyle karşılaştırıldığında ilk örneğin `random_draw` alanının değerine göre sıralamasını hesaplar.
+13. `rank-index(index, repeatedfield)`: Bu fonksiyon, bir repeat grubunun dışında kullanılmak üzere tekrarlanan bir alanın belirtilen örneğinin sıra derecesini (ordinal rank) hesaplar. En yüksek değere sahip örneğe 1, bir sonraki en yüksek değere sahip örneğe 2 derecesi atanır ve bu şekilde devam eder. Geçersiz bir dizin veya sayısal olmayan bir değere sahip bir örneğe dizin geçerseniz, 999 derecesi döndürülür.
+    - Örnek: `rank-index(1, ${random_draw})` diğer örneklerin değerleriyle karşılaştırıldığında kendi `random_draw` alanının değerine dayanarak ilk örneğin derecesini hesaplar.
 
-14. `rank-index-if(index, repeatedfield, expression)`: Bu fonksiyon `rank-index()` ile benzer şekilde çalışır, ancak sağlanan ifadeyi kullanarak tekrarlanan alanın tekrar grubundaki her örneği kontrol eder.
-    - Örnek: `rank-index-if(1, ${age}, ${age} >= 18)` yalnızca 18 veya üzeri yaştaki örnekleri göz önünde bulundurarak yetişkinler içindeki yaş sıralamasını hesaplar.
+14. `rank-index-if(index, repeatedfield, expression)`: Bu fonksiyon `rank-index()`'e benzer şekilde çalışır ancak sağlanan ifadeyi kullanarak tekrarlanan alanın repeat grubundaki her bir örneği kontrol eder. İfade false sonucunu verirse, öğe hesaplamadan çıkarılır. Kullanılan dizin, her bir örnek için ifadeyi değerlendirmeden önceki tam örnek kümesine dayanır. İfadeyi karşılamadığı için yok sayılan bir örnek için bir dizin geçerseniz, bu geçersiz bir dizin olarak kabul edilir ve 999 derecesi döndürülür.
+    - Örnek: `rank-index-if(1, ${age}, ${age} >= 18)` yalnızca yaşın 18'e eşit veya büyük olduğu örnekleri dikkate alarak yetişkinler kümesi içindeki yaş derecesini hesaplar.
 
 ### Sayı fonksiyonları
 
@@ -115,164 +122,214 @@ rtSurvey'de aynı soruyu birden fazla kez sormak istiyorsanız, bir alanı tekra
 | `div` | Bölme | 10 div 2 | 5 |
 | `mod` | Modül | 9 mod 2 | 1 |
 
-rtSurvey aşağıdakiler dahil sayı fonksiyonlarını destekler:
-- `number(field)`: Alanın değerini sayıya dönüştürür.
+rtSurvey aşağıdakiler de dahil olmak üzere sayı fonksiyonlarını destekler:
+- `number(field)`: Alanın değerini bir sayıya dönüştürür.
   - Örnek: `number('34.8')` = 34.8
 
-- `int(field)`: Alanın değerini tam sayıya dönüştürür.
+- `int(field)`: Alanın değerini bir tam sayıya (integer) dönüştürür.
   - Örnek: `int('39.2')` = 39
 
-- `min(field1, ..., fieldx)`: Geçirilen alanlar arasındaki minimum değeri döndürür.
-  - Örnek: `min(${father_age}, ${mother_age})` annenin veya babanın yaşını döndürür; hangisi daha küçükse.
+- `min(field1, ..., fieldx)`: Geçilen alanlar arasındaki minimum değeri döndürür.
+  - Örnek: `min(${father_age}, ${mother_age})` anne veya babadan hangisinin yaşı daha küçükse onu döndürecektir.
 
-- `max(field1, ..., fieldx)`: Geçirilen alanlar arasındaki maksimum değeri döndürür.
-  - Örnek: `max(${father_age}, ${mother_age})` annenin veya babanın yaşını döndürür; hangisi daha büyükse.
+- `max(field1, ..., fieldx)`: Geçilen alanlar arasındaki maksimum değeri döndürür.
+  - Örnek: `max(${father_age}, ${mother_age})` anne veya babadan hangisinin yaşı daha büyükse onu döndürecektir.
 
-- `format-number(field)`: Bir tam sayı veya ondalık alanın değerini kullanıcının yerel ayar ayarlarına göre biçimlendirir.
-  - Örnek: `format-number(${income})` "120000"i "120.000" olarak biçimlendirebilir.
+- `format-number(field)`: Bir tam sayı veya ondalık alanın değerini kullanıcının yerel ayarlarına göre biçimlendirir.
+  - Örnek: `format-number(${income})` Bu ifade "120000" değerini "120,000" şeklinde biçimlendirebilir.
 
-- `round(field, digits)`: Sayısal alan değerini ondalık noktadan sonra belirtilen basamak sayısına yuvarlar.
+- `round(field, digits)`: Sayısal alan değerini ondalık basamaktan sonra belirtilen basamak sayısına yuvarlar.
   - Örnek: `round(${interest_rate}, 2)`
 
 - `abs(number)`: Bir sayının mutlak değerini döndürür.
   
-- `pow(base, exponent)`: İlk parametrenin değerini ikinci parametrenin kuvvetine yükseltilmiş olarak döndürür.
+- `pow(base, exponent)`: İlk parametrenin ikinci parametre kuvvetine yükseltilmiş değerini döndürür.
+  - Her bir parametre bir alan, sayı veya ifade olabilir.
 
-- `log10(fieldorvalue)`: Geçirilen alanın veya değerin onluk logaritmasını döndürür.
+- `log10(fieldorvalue)`: Geçilen alanın veya değerin on tabanına göre logaritmasını döndürür.
 
-- `sin(fieldorvalue)`: Geçirilen alanın veya değerin sinüsünü radyan cinsinden döndürür.
+- `sin(fieldorvalue)`: Geçilen alanın veya değerin radyan cinsinden sinüsünü döndürür.
   
-- `cos(fieldorvalue)`: Geçirilen alanın veya değerin kosinüsünü radyan cinsinden döndürür.
+- `cos(fieldorvalue)`: Geçilen alanın veya değerin radyan cinsinden kosinüsünü döndürür.
 
-- `tan(fieldorvalue)`: Geçirilen alanın veya değerin tanjantını radyan cinsinden döndürür.
+- `tan(fieldorvalue)`: Geçilen alanın veya değerin radyan cinsinden tanjantını döndürür.
 
-- `asin(fieldorvalue)`: Geçirilen alanın veya değerin arcsinüsünü radyan cinsinden döndürür.
+- `asin(fieldorvalue)`: Geçilen alanın veya değerin radyan cinsinden ark sinüsünü döndürür.
 
-- `acos(fieldorvalue)`: Geçirilen alanın veya değerin arckosinüsünü radyan cinsinden döndürür.
+- `acos(fieldorvalue)`: Geçilen alanın veya değerin radyan cinsinden ark kosinüsünü döndürür.
 
-- `atan(fieldorvalue)`: Geçirilen alanın veya değerin arktanjantını radyan cinsinden döndürür.
+- `atan(fieldorvalue)`: Geçilen alanın veya değerin radyan cinsinden ark tanjantını döndürür.
 
-- `atan2(x, y)`: (x, y) koordinatları ve pozitif x ekseni tarafından orijinde oluşturulan açıyı radyan cinsinden döndürür.
+- `atan2(x, y)`: (x, y) koordinatlarına sahip noktanın başlangıç noktası ve pozitif x ekseni ile radyan cinsinden oluşturduğu açıyı döndürür. Sonuç -pi() ile pi() aralığındadır.
 
-- `sqrt(fieldorvalue)`: Geçirilen alanın veya değerin negatif olmayan karekökünü döndürür.
+- `sqrt(fieldorvalue)`: Geçilen alanın veya değerin negatif olmayan karekökünü döndürür.
 
 - `exp(x)`: e^x değerini döndürür.
 
-- `pi()`: Pi değerini döndürür.
+- `pi()`: pi değerini döndürür.
 
 ### Tarih ve saat fonksiyonları
 
 <Callout type="warning">
-rtSurvey'de tarih değerleri `YYYY-MM-DD` biçiminde dizeler olarak saklanır. Datetime değerleri ISO 8601 dizeler olarak saklanır (`YYYY-MM-DDTHH:MM:SS`). Aritmetik için (örn. süreleri hesaplama) sayıya dönüştürmek üzere `decimal-date-time()` kullanın.
+rtSurvey'deki tarih değerleri `YYYY-MM-DD` formatında dizeler olarak saklanır. Tarih-saat (datetime) değerleri ISO 8601 dizeleri olarak saklanır (`YYYY-MM-DDTHH:MM:SS`). Aritmetik işlemler (örneğin süreleri hesaplamak) için bir sayıya dönüştürmek amacıyla `decimal-date-time()` kullanın.
 </Callout>
 
-1. `today()`: Bugünün tarihini `YYYY-MM-DD` biçiminde bir dize olarak döndürür. Form açıldığında bir kez değerlendirilir.
+1. `today()`: Bugünün tarihini `YYYY-MM-DD` formatında bir dize olarak döndürür. Form açıldığında bir kez değerlendirilir.
    - Örnek: `today()` → `'2024-03-15'`
-   - Yaygın kullanım: Bugünün tarihini önceden doldurmak için `default` sütunu veya bir tarih alanıyla karşılaştırmak için `relevant`/`constraint` içinde.
+   - Ortak kullanım: Bugünün tarihini önceden doldurmak için `default` sütununda veya bir tarih alanıyla karşılaştırmak için `relevant`/`constraint` alanlarında kullanılır.
 
-2. `now()`: Geçerli tarih ve saati ISO 8601 dizesi olarak döndürür. İfade her hesaplandığında değerlendirilir.
+2. `now()`: Mevcut tarih ve saati bir ISO 8601 dizesi olarak döndürür. İfade her hesaplandığında değerlendirilir.
    - Örnek: `now()` → `'2024-03-15T14:32:00.000+03:00'`
-   - Yaygın kullanım: Anket sırasında belirli bir olayın tam zaman damgasını kaydetme.
+   - Ortak kullanım: Anket sırasında belirli bir olayın tam zaman damgasını kaydetmek.
 
-3. `date(value)`: Bir değeri (dize veya sayı) tarih dizesine dönüştürür.
+3. `date(value)`: Bir değeri (dize veya sayı) tarih dizesine dönüştürür. Hesaplanmış değerleri bir tarih türüne zorlamak için kullanışlıdır.
    - Örnek: `date('2024-03-15')` → `'2024-03-15'`
 
-4. `date-time(value)`: Bir değeri datetime dizesine dönüştürür.
+4. `date-time(value)`: Bir değeri tarih-saat dizesine dönüştürür.
    - Örnek: `date-time(${event_timestamp})`
 
-5. `decimal-date-time(value)`: Bir tarih veya datetime dizesini Unix epoch'tan bu yana geçen milisaniyeyi 86400000'e bölen ondalık sayıya dönüştürür (1970-01-01'den bu yana kesirli günler). Tarihler üzerinde aritmetik yapmak için bunu kullanın.
+5. `decimal-date-time(value)`: Bir tarih veya tarih-saat dizesini, Unix devrinden bu yana geçen milisaniyelerin 86400000'e bölünmesini (yani 1970-01-01'den bu yana geçen ondalık günleri) temsil eden ondalık bir sayıya dönüştürür. Tarihler üzerinde aritmetik işlemler gerçekleştirmek için bunu kullanın.
    - Örnek: İki tarih arasındaki gün cinsinden süre:
      `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
-   - Örnek: İki datetime arasındaki dakika cinsinden süre:
+   - Örnek: İki tarih-saat arasındaki dakika cinsinden süre:
      `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
 
-6. `format-date(date, format)`: Bir tarih değerini desen dizesi kullanarak biçimlendirir.
-   - Biçim belirteçleri: `%Y` (4 haneli yıl), `%y` (2 haneli yıl), `%m` (ay 01–12), `%d` (gün 01–31), `%a` (kısaltılmış haftanın günü), `%b` (kısaltılmış ay adı)
+6. `format-date(date, format)`: Bir tarih değerini bir model dizesi kullanarak biçimlendirir.
+   - Biçim belirteçleri: `%Y` (4 haneli yıl), `%y` (2 haneli yıl), `%m` (ay 01–12), `%d` (gün 01–31), `%a` (kısaltılmış hafta içi günü), `%b` (kısaltılmış ay adı)
    - Örnek: `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+   - Örnek: `format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
 
-7. `format-date-time(datetime, format)`: Bir datetime değerini desen dizesi kullanarak biçimlendirir. Tüm `format-date` belirteçlerini şunları da kabul eder:
+7. `format-date-time(datetime, format)`: Bir tarih-saat değerini bir model dizesi kullanarak biçimlendirir. Tüm `format-date` belirteçlerine ek olarak şunları kabul eder:
    - `%H` (saat 00–23), `%h` (saat 01–12), `%M` (dakika 00–59), `%S` (saniye 00–59), `%3` (milisaniye), `%P` (AM/PM)
    - Örnek: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+   - Örnek: `format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
+
+8. `STRFTIME(format, datetime)`: SQLite tarzı tarih biçimlendirme. `rawquery` sorgularına geçirilen SQL dizelerinin içinde kullanılabilir; XLSForm `calculation` veya `label` sütunlarında **kullanılamaz**. SQLite biçim belirteçlerini (`%Y`, `%m`, `%d`, `%H`, `%M`, `%S`) kullanır.
+   - Örnek bir rawquery SQL dizesi içinde: `'SELECT STRFTIME(''%Y-%m'', interview_date) AS month FROM data WHERE id = ?'`
+   - Not: XLSForm ifadelerinde tarih biçimlendirmesi için `format-date-time()` kullanın. `STRFTIME()`, yalnızca `rawquery`'ye geçirilen SQL içinde kullanılabilen bir SQLite fonksiyonudur.
 
 ---
 
-### Boolean fonksiyonları
+### Boole (Boolean) fonksiyonları
 
-1. `boolean(value)`: Herhangi bir değeri boolean'a dönüştürür. Boş olmayan dizeler, sıfırdan farklı sayılar ve `true` için `true` döndürür; boş dizeler, `0` ve `false` için `false` döndürür.
+1. `boolean(value)`: Herhangi bir değeri bir boole değerine dönüştürür. Boş olmayan dizeler, sıfır olmayan sayılar ve `true` için `true` döndürür; boş dizeler, `0` ve `false` için `false` döndürür.
+   - Örnek: `boolean(${name})` `name` boş değilse `true` döndürür.
 
-2. `boolean-from-string(string)`: Dize `'1'` veya `'true'` (büyük/küçük harf duyarsız) ise `true` döndürür; aksi hâlde `false` döndürür.
+2. `boolean-from-string(string)`: Dize `'1'` veya `'true'` (büyük/küçük harf duyarsız) ise `true` döndürür; aksi takdirde `false` döndürür.
+   - Örnek: `boolean-from-string(${enabled_flag})` — bir alan `'true'`/`'false'` değerlerini metin olarak sakladığında kullanışlıdır.
 
-3. `true()`: Boolean `true` değerini döndürür.
+3. `true()`: Boole değeri `true`'yu (doğru) döndürür.
+   - Örnek: `required` sütununda `true()`, `yes` ile eşdeğerdir.
 
-4. `false()`: Boolean `false` değerini döndürür.
+4. `false()`: Boole değeri `false`'u (yanlış) döndürür.
+   - Örnek: `if(${skip_section} = 'yes', false(), true())` — zorunluluğu dinamik olarak ayarlar.
 
-5. `not(expression)`: İfadenin mantıksal tersini döndürür. İfade yanlışsa `true`, tersinde `false` döndürür.
+5. `not(expression)`: İfadenin mantıksal değillemesini döndürür. İfade yanlışsa `true`, doğruysa `false` döndürür.
+   - Örnek: `not(${consent} = 'yes')` — onay VERİLMEDİĞİNDE bir uyarı gösterir.
+   - Örnek: `not(selected(${issues}, 'none'))` — yalnızca "none" seçilmediğinde ayrıntı gerektirir.
 
 ---
 
 ### Ek dize fonksiyonları
 
-1. `starts-with(string, prefix)`: `string` `prefix` ile başlıyorsa `true` döndürür.
+1. `starts-with(string, prefix)`: `string` `prefix` (ön ek) ile başlıyorsa `true` döndürür.
+   - Örnek: `starts-with(${phone}, '+254')` telefon numarasının Kenya ülke kodu ile başlayıp başlamadığını kontrol eder.
 
-2. `contains(string, substring)`: `string`, `substring` içeriyorsa `true` döndürür.
+2. `contains(string, substring)`: `string` `substring` (alt dize) içeriyorsa `true` döndürür.
+   - Örnek: `contains(${email}, '@')` bir e-posta adresinin `@` işareti içerip içermediğini kontrol eder.
+   - Örnek: `contains(${notes}, 'urgent')` notlarda "urgent" (acil) geçiyorsa bir takip sorusunu tetikler.
 
-3. `substring-before(string, needle)`: `string`'de `needle`'ın ilk geçtiği yerden önce gelen kısmı döndürür.
+3. `substring-before(string, needle)`: `string`'in `needle`'ın ilk geçtiği yerden önce görünen kısmını döndürür.
+   - Örnek: `substring-before(${full_name}, ' ')` ilk kelimeyi (adı) çıkarır.
 
-4. `substring-after(string, needle)`: `string`'de `needle`'ın ilk geçtiği yerden sonra gelen kısmı döndürür.
+4. `substring-after(string, needle)`: `string`'in `needle`'ın ilk geçtiği yerden sonra görünen kısmını döndürür.
+   - Örnek: `substring-after(${email}, '@')` bir e-posta adresinin alan adı (domain) kısmını çıkarır.
 
-5. `normalize-space(string)`: Baştaki ve sondaki boşlukları kaldırır ve tüm iç boşluk dizilerini tek boşluğa daraltır.
+5. `normalize-space(string)`: Baştaki ve sondaki boşlukları kaldırır ve tüm dahili boşluk dizilerini tek bir boşluğa indirger.
+   - Örnek: `normalize-space(${name})` — fazladan boşluklarla yazılmış olabilecek bir ismi temizler.
 
-6. `translate(string, search_chars, replace_chars)`: `string`'de `search_chars`'ta görünen her karakteri `replace_chars`'taki karşılık gelen karakterle değiştirir.
+6. `translate(string, search_chars, replace_chars)`: `string` içindeki `search_chars` içinde görünen her karakteri, `replace_chars` içindeki karşılık gelen karakterle değiştirir. `search_chars` içinde bulunan ancak `replace_chars` içinde karşılığı olmayan karakterler silinir.
+   - Örnek: `translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` büyük harfe dönüştürür (`upper()` ile eşdeğerdir).
+   - Örnek: `translate(${phone}, ' -()', '')` bir telefon numarasındaki boşlukları, tireleri ve parantezleri kaldırır.
 
 ---
 
 ### Ek matematik fonksiyonları
 
-1. `floor(number)`: `number`'dan küçük veya eşit en büyük tam sayıyı döndürür (negatif sonsuza doğru yuvarlar).
+1. `floor(number)`: `number` sayısına eşit veya ondan küçük olan en büyük tam sayıyı döndürür (negatif sonsuza doğru yuvarlar).
+   - Örnek: `floor(4.9)` = 4, `floor(-2.1)` = -3
 
-2. `ceiling(number)`: `number`'dan büyük veya eşit en küçük tam sayıyı döndürür (pozitif sonsuza doğru yuvarlar).
+2. `ceiling(number)`: `number` sayısına eşit veya ondan büyük olan en küçük tam sayıyı döndürür (pozitif sonsuza doğru yuvarlar).
+   - Örnek: `ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
 
-3. `random()`: 0,0 (dahil) ile 1,0 (hariç) arasında rastgele bir ondalık sayı döndürür.
+3. `random()`: 0.0 (dahil) ile 1.0 (hariç) arasında rastgele bir ondalık sayı döndürür. Genellikle rastgele değerler atamak veya soru sırasını rastgele hale getirmek için `calculate` alanlarında kullanılır.
+   - Örnek: `random()` → örn., `0.7341`
+   - Örnek: `int(random() * 6) + 1` → 1–6 arası rastgele sayı (zar atışı)
 
-4. `coalesce(a, b)`: `a` boş değilse `a` döndürür; aksi hâlde `b` döndürür.
+4. `coalesce(a, b)`: `a` boş değilse `a` değerini; aksi takdirde `b` değerini döndürür. Bir alanın boş olabileceği durumlarda yedek (fallback) olarak kullanışlıdır.
+   - Örnek: `coalesce(${preferred_name}, ${full_name})` — ayarlanmışsa tercih edilen ismi, aksi takdirde tam ismi kullanır.
 
-5. `once(value)`: `value`'yu değerlendirir ve depolar, ancak yalnızca geçerli alan **boşsa**. Alan zaten bir değere sahipse `once()` mevcut değeri değişmeden döndürür.
+5. `once(value)`: `value` ifadesini değerlendirir ve saklar, ancak yalnızca mevcut alan **boş** ise. Alanın zaten bir değeri varsa (örneğin önceden ayarlanmışsa), `once()` mevcut değeri değiştirmeden döndürür. Bu, yeniden hesaplamanın kullanıcı girişinin üzerine yazılmasını önler.
+   - Örnek: `default` sütunundaki `once(today())`, bugünün tarihini bir kez ayarlar ve anketör formu yeniden açarsa güncellemez.
+   - Örnek: `once(uuid())`, bir kez UUID oluşturur ve yeniden düzenlemeler boyunca sabit tutar.
 
 ---
 
-### Coğrafi fonksiyonlar
+### Coğrafi (Geo) fonksiyonlar
 
-1. `area(geoshape_value)`: Bir geoshape (poligon) değerinin çevrelediği **alanı metrekare cinsinden** hesaplar.
-   - Örnek: `area(${field_boundary})` — tarım arazisinin alanını m² cinsinden hesaplar.
+1. `area(geoshape_value)`: Bir geoshape (çokgen) değeri tarafından çevrelenen **metrekare cinsinden alanı** hesaplar.
+   - Parametre, `lat1 lon1 0 0; lat2 lon2 0 0; ...` formatındaki bir geoshape alan değeridir.
+   - Örnek: `area(${field_boundary})` — ölçümü yapılan bir tarlanın alanını m² cinsinden hesaplar.
    - Örnek: `round(area(${field_boundary}) div 10000, 2)` — hektara dönüştürür.
 
-2. `distance(coordinates)`: Bir geotrace (çizgi) için **metre cinsinden toplam yol uzunluğunu** veya iki geopoint arasındaki mesafeyi hesaplar.
+2. `distance(coordinates)`: Bir geotrace'in (çizgi) **metre cinsinden toplam yol uzunluğunu** veya iki geopoint arasındaki mesafeyi hesaplar.
+   - Bir geotrace için: `distance(${route})` metre cinsinden toplam yol uzunluğunu döndürür.
+   - İki geopoint için: `distance(concat(${point_a}, ' ', ${point_b}))` aralarındaki mesafeyi döndürür.
    - Örnek: `round(distance(${road_trace}) div 1000, 3)` — kilometre cinsinden yol uzunluğu.
 
 ---
 
-### Doğrulama fonksiyonları
+### Doğrulama (Validation) fonksiyonları
 
-1. `regex(value, pattern)`: `value`, `pattern` normal ifadesiyle eşleşiyorsa `true` döndürür. Desen tabanlı doğrulama için `constraint` sütununda kullanın.
-   - Örnek: `regex(., '^[0-9]{10}$')` — 10 haneli sayıyı doğrular.
+1. `regex(value, pattern)`: `value` düzenli ifade `pattern` ile eşleşirse `true` döndürür. Desen tabanlı doğrulama için `constraint` sütununda kullanın.
+   - Desen standart regex sözdizimini (POSIX ERE alt kümesi) kullanır.
+   - Örnek: `regex(., '^[0-9]{10}$')` — 10 haneli bir numarayı doğrular.
+   - Örnek: `regex(., '^[A-Z]{2}[0-9]{6}$')` — bir pasaport numarası formatını (2 büyük harf ve ardından 6 hane) doğrular.
+   - Örnek: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — temel e-posta formatı kontrolü.
 
-2. `checklist(min, max, v1, v2, ...)`: Bir boolean ifadeler listesini değerlendirir ve `true` değerlerin sayısı `min` ile `max` arasındaysa (dahil) `true` döndürür.
+2. `checklist(min, max, v1, v2, ...)`: Bir boole ifadeleri listesini değerlendirir ve `true` değerlerin sayısı `min` ile `max` (dahil) arasındaysa `true` döndürür. Bu sınırı atlamak için `min` veya `max` için `-1` geçin.
+   - Örnek: `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — üç koşuldan tam olarak 2 veya 3 tanesi doğruysa geçer.
+   - Örnek: `checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — en az bir güvenlik önlemi doğru olmalıdır.
 
-3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: `checklist()` gibi, ancak her değerin bir ağırlığı vardır.
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: `checklist()` gibidir ancak her değerin bir ağırlığı vardır. `true` değerler için ağırlıkların toplamı `min` ile `max` arasında olmalıdır.
+   - Örnek: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — mevcut tesisler için ağırlıkların toplamı en az 10 olmalıdır.
 
 ---
 
-### Yardımcı fonksiyonlar
+### Yardımcı (Utility) fonksiyonlar
 
-1. `uuid()`: Rastgele bir UUID (RFC 4122 v4 biçimi) dize olarak oluşturur.
-   - Genellikle kararlı bir benzersiz kimlik oluşturmak için `once()` ile kullanılır: `once(uuid())`
+1. `uuid()`: Rastgele bir UUID'yi (RFC 4122 v4 formatı) dize olarak oluşturur.
+   - Örnek: `uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
+   - Genellikle kararlı ve benzersiz bir kimlik oluşturmak için `once()` ile birlikte kullanılır: `once(uuid())`
 
-2. `version()`: Settings çalışma sayfasında ayarlandığı şekliyle formun `version` özniteliğinin değerini döndürür.
+2. `version()`: Ayarlar (settings) çalışma sayfasında ayarlandığı şekliyle formun `version` (versiyon) özniteliğinin değerini döndürür.
+   - Örnek: `version()` → `'3.1'`
+   - Dışa aktarılan verilere form versiyonunu gömmek için `calculate` alanlarında kullanışlıdır.
 
-3. `position()`: Bir **tekrar grubu** içinde çağrıldığında, geçerli tekrar örneğinin 1 tabanlı indeksini döndürür.
+3. `position()`: Bir **repeat grubu** içinde çağrıldığında, mevcut tekrar örneğinin 1 tabanlı dizinini döndürür.
+   - Örnek: İlk örnekte `position()` `1`, ikincide `2` vb. döndürür.
+   - Ayrıca bakınız: `index()` (takma ad), grubun dışından tekrar değerlerine başvurmak için `indexed-repeat()`.
 
-4. `thousandsep(length, separator, value)`: Bir sayıyı binlik ayırıcıyla biçimlendirir.
-   - Örnek: `thousandsep(0, ',', 1234567)` → `'1.234.567'`
+4. `thousandsep(length, separator, value)`: Bir sayıyı binlik ayırıcı ile biçimlendirir. `length` minimum toplam dize uzunluğudur (daha kısaysa boşluklarla doldurulur), `separator` kullanılacak karakterdir (örneğin `','`) ve `value` biçimlendirilecek sayıdır.
+   - Örnek: `thousandsep(0, ',', 1234567)` → `'1,234,567'`
+   - Örnek: `thousandsep(0, '.', ${income})` → geliri binlik ayırıcı olarak nokta ile biçimlendirir.
 
-5. `substr-jsonpath(value, jsonpath)`: JSONPath ifadesini kullanarak bir JSON dizesinden alt dize çıkarır.
-   - Örnek: `substr-jsonpath(${api_response}, '$.data.name')` — `api_response`'da saklanan bir JSON dizesinden `name` alanını çıkarır.
+5. `substr-jsonpath(value, jsonpath)`: Bir JSONPath ifadesi kullanarak bir JSON dizesinden bir değer çıkarır.
+   - `value` bir JSON dizesi olmalıdır (örneğin `callapi(..., 'json:', ...)` kullanarak ham bir API yanıtını saklayan bir alan).
+   - `jsonpath` bir JSONPath ifadesidir (örneğin `'$.data.name'`, `'$.items[0].id'`).
+   - Her zaman bir **dize** döndürür — aritmetikte kullanıldığında `number()` içine alın.
+   - Yol bulunamazsa veya `value` geçerli bir JSON değilse boş bir dize `''` döndürür.
+   - Örnek: `substr-jsonpath(${api_response}, '$.data.name')` — `name` alanını çıkarır.
+   - Örnek: `substr-jsonpath(${api_response}, '$.items[0].label')` — bir dizinin ilk elemanını çıkarır.
+   - Örnek: `number(substr-jsonpath(${api_response}, '$.price'))` — sayısal bir değeri çıkarır.
+   - Genellikle tek bir API yanıtından birden fazla alan çıkarmak için `callapi(..., 'json:', ...)` ile birlikte kullanılır. Bkz. [Bir API çağrısından birden fazla değer çekme](../advanced-features/call-api#fetching-multiple-values-from-one-api-call).

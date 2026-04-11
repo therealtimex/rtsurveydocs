@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path é um campo de cálculo (calculate) de convenção que retorna o caminho do diretório de média empacotado do formulário em tempo de execução — necessário para todos os formulários que usam pesquisas em base de dados local ou pesquisa baseada em ficheiros."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` é um campo de cálculo de convenção que contém o caminho para o diretório de média empacotado do formulário. Todos os formulários que realizam pesquisas em bases de dados locais com `rawquery`, `pulldata` ou `search()` devem incluir este campo — sem ele, os caminhos dos ficheiros não podem ser resolvidos e as pesquisas retornam silenciosamente resultados vazios.
+
+---
+
+## O campo calculate
+
+Adicione esta linha perto do topo da sua folha survey, após quaisquer campos meta e antes da primeira pergunta que utiliza um ficheiro de base de dados:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+O campo não armazena nenhum valor visível e não requer etiqueta (label). É um pré-requisito silencioso para toda a construção de caminhos que se segue.
+
+---
+
+## Por que é necessário
+
+O RTSurvey empacota os ficheiros de média do formulário — bases de dados SQLite, imagens, clipes de áudio — dentro de um diretório por formulário no dispositivo. O caminho exato difere entre plataformas (Android, iOS, web) e entre dispositivos.
+
+Em tempo de execução, a aplicação preenche o `family_path` automaticamente. Um valor resolvido típico assemelha-se a:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Como o caminho é específico da plataforma e determinado no momento do lançamento, não pode ser codificado rigidamente no formulário. `pulldata('app-api', 'family_path')` é a única forma fiável de o obter.
+
+---
+
+## Como usá-lo em caminhos
+
+Assim que o `family_path` estiver definido, construa um caminho completo de ficheiro con `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+O sufixo `::tableName` é removido quando a aplicação abre o ficheiro; o nome da tabela é usado apenas dentro da sua consulta SQL.
+
+---
+
+## Onde o family_path é usado
+
+O `family_path` é necessário no argumento do caminho sempre que referenciar um ficheiro empacotado:
+
+- **Pesquisa em base de dados local** — o argumento `db_path` de `search-autocomplete-noedit-v2('rawquery', ...)` deve ser construído com `concat(${family_path}, ...)`. Consulte [Pesquisa em Base de Dados Local](local-database-search) para detalhes completos de utilização.
+- **`pulldata` rawquery** — qualquer chamada `pulldata('rawquery', ...)` que lê de um ficheiro `.db` usa o mesmo padrão `concat()`.
+- **`search()` com um ficheiro local** — aparências (appearances) de pesquisa dinâmica que carregam a partir de um ficheiro CSV ou DB empacotado também dependem do `family_path` para a referência do ficheiro.
+
+---
+
+## Colocação no formulário
+
+O `family_path` deve aparecer **antes do primeiro campo que o referencia**. A posição recomendada é imediatamente após o grupo meta:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(aparência rawquery referenciando `${family_path}`)* |
+
+<Callout type="warning">
+Se o `family_path` estiver em falta no formulário, ou se for colocado após o primeiro campo `rawquery` / `search()` que o referencia, todas as pesquisas em ficheiros empacotados retornarão silenciosamente resultados vazios. Não existe mensagem de erro — o preenchimento automático simplesmente não mostra resultados.
+</Callout>
+
+---
+
+## Múltiplos ficheiros de base de dados
+
+Um único formulário pode usar vários ficheiros `.db`. Cada caminho é construído de forma independente com `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Defina o `family_path` uma vez; referencie-o em tantos campos quantos forem necessários.
+
+---
+
+## Verificação durante o desenvolvimento
+
+Adicione um campo `note` temporário abaixo do `family_path` para inspecionar o valor resolvido no dispositivo:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Caminho: ${family_path}` | |
+
+A nota exibirá o caminho resolvido real durante os testes. Remova-a antes de implementar o formulário final.

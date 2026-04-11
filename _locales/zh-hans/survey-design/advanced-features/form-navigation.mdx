@@ -1,0 +1,104 @@
+---
+title: "表单导航控件"
+description: "使用 SaveFinalizedExit 和 SaveIncompleteExit 外观值来渲染样式化的退出按钮，这些按钮可保存并离开表单。"
+---
+
+**表单导航控件**是放置在 `note`（或 `text`）字段上的外观值，这些字段在问卷底部渲染为全宽样式化按钮。它们让调查员只需点击一次即可保存提交并退出表单——既可以作为已完成（定稿）记录，也可以作为草稿（未完成）记录。
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+渲染一个**将提交保存为定稿**并退出表单的按钮。按钮标签取自字段的 `label` 列。
+
+| XLSForm column | 值 |
+|----------------|-------|
+| `type` | `note` |
+| `name` | 任何唯一名称（例如 `btn_finish`） |
+| `label` | 显示在按钮上的文本 |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+提交被标记为最终、完整的记录。这等同于点击内置的提交按钮。
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+渲染一个**将提交保存为未完成（草稿）**并退出表单的按钮。调查员稍后可以返回并继续填写。
+
+| XLSForm column | 值 |
+|----------------|-------|
+| `type` | `note` |
+| `name` | 任何唯一名称（例如 `btn_pause`） |
+| `label` | 显示在按钮上的文本 |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## 颜色语法
+
+两种外观都接受 `<#RRGGBB/>` 格式的内联颜色：
+
+- `#` 后跟正好 **6 位十六进制数字**（大写或小写）
+- 结束符 `/>` 是**必需的**——省略它会破坏解析
+- 示例：`<#04B404/>`（绿色）、`<#EDC602/>`（琥珀色）、`<#D9534F/>`（红色）
+
+颜色控制按钮背景。文本颜色由应用程序自动确定。
+
+---
+
+## 示例
+
+放置在表单末尾的以下两个字段会生成一个绿色的**提交**按钮和一个琥珀色的**保存为草稿**按钮：
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | 提交 | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | 保存为草稿 | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — 从目录中排除按钮
+
+`toc-hide` 外观标记告诉 rtSurvey 从表单的**目录**（问题概览列表）中排除一个字段。导航按钮不是问题，因此它们不应出现在目录中。
+
+始终在退出外观后附加 `toc-hide`：
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+有关 toc-hide 参考，请参阅 [外观 — toc-hide](../appearance#group-and-navigation)。
+
+---
+
+## 放置约定
+
+在表单中添加导航控件时，请遵循以下约定：
+
+- 将两个按钮都放在表单的**最后**，位于所有问题和组之后。
+- 始终将**两个**按钮放在一起——一个定稿和一个未完成——这样无论完成状态如何，调查员总能找到退出方式。
+- 如果仅应在满足某些条件（例如完成必填部分）时才允许提交，请在定稿退出按钮上使用 `relevant` 列。未完成退出按钮通常应保持**始终可见**。
+
+---
+
+## 条件定稿退出
+
+使用 `relevant` 列来控制定稿退出按钮的显示时机。未完成退出应保持无条件可见，以便调查员始终可以暂停并返回。
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | 提交 | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | 保存为草稿 | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+在此示例中，只有在调查员给予知情同意并将 A 部分标记为已完成时，**提交**按钮才会出现。**保存为草稿**按钮始终可用。
+
+---
+
+## 限制
+
+- **字段类型必须为 `note` 或 `text`。** 不支持在任何其他问题类型上使用这些外观。
+- **仅限 6 位十六进制。** 不支持简写十六进制（`<#FFF/>`）和命名颜色——始终使用完整的 6 位格式（例如 `<#FFFFFF/>`）。
+- **标签列是按钮文本。** 这些字段忽略 `hint` 列；仅渲染 `label`。
+- **两个按钮都应存在。** 省略未完成退出按钮会使调查员在表单中途无法暂停。

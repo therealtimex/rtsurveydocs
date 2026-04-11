@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "pulldata()-funktio hakee arvon lomakkeeseen liitetystä ulkoisesta CSV-tiedostosta täsmäämällä avainsarakkeen avainarvoon ja palauttamalla vastaavan tulossarakkeen."
+---
+
+import { Callout } from 'nextra/components'
+
+`pulldata()`-funktio hakee arvon lomakkeeseen liitetystä CSV-tiedostosta. Annetun tiedostonimen, palautettavan sarakkeen, täsmäytettävän sarakkeen ja avainarvon perusteella se palauttaa solun, joka sijaitsee vastaavan rivin ja tulossarakkeen leikkauspisteessä.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Sijainti | Parametri | Kuvaus |
+|----------|-----------|-------------|
+| 1 | Tiedostonimi | CSV-mediatiedoston nimi (sama nimi kuin `select_one_from_file`-kentässä) |
+| 2 | Tulossarake | Sarake, jonka arvon haluat palauttaa |
+| 3 | Avainsarake | Sarake, josta täsmäytystä etsitään |
+| 4 | Avainarvo | Täsmäytettävä arvo — yleensä kenttäviittaus, kuten `${field}` |
+
+Funktio palauttaa tyhjän merkkijonon, jos osumaa ei löydy.
+
+---
+
+## Esivaatimukset
+
+CSV-tiedoston on oltava liitettynä lomakkeeseen **mediatiedostona (media file)**. Samaa tiedostoa, johon `pulldata()` viittaa, voidaan käyttää myös `select_one_from_file`-kentän valintaluettelona.
+
+**Esimerkki CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Perusesimerkki
+
+Hae henkilöstön jäsenen osasto ja puhelinnumero ID:n perusteella:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Valitse henkilöstön jäsen | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Osasto: `${dept}` — Puhelin: `${phone}` | |
+
+<Callout type="info">
+`select_one_from_file` CSV-tiedoston `name`-sarake on tallennettu arvo. Kun haastattelija valitsee "Alice", `${staff_id}` sisältää arvon `"Alice"`, jota `pulldata()` käyttää avaimena hänen osastonsa ja puhelinnumeronsa hakuun.
+</Callout>
+
+---
+
+## Valitun valinnan nimen (label) haku
+
+`select_one_from_file`-kysymys tallentaa `name`-arvon. Jos haluat näyttää ihmiselle luettavan nimen (`label`), käytä `pulldata()`-funktiota sen hakuun:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Valitse kylä | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | Valitsit: `${village_label}` | |
+
+---
+
+## Useita hakuja samasta valinnasta
+
+Voit kutsua `pulldata()`-funktiota useita kertoja samalle tiedostolle hakeaksesi eri sarakkeita samalle valitulle riville:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Valitse laitos | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## pulldata-funktion käyttö relevant- ja constraint-sarakkeissa
+
+`pulldata()`-funktiota voidaan käyttää `relevant`- ja `constraint`-sarakkeissa logiikan soveltamiseksi haettujen arvojen perusteella:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Valitse laitos | | |
+| integer | bed_count | Varattujen vuodepaikkojen määrä | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## pulldata-funktion käyttö `once()`-funktion kanssa
+
+Jos haluat suorittaa `pulldata()`-haun vain lomakkeen ensimmäisellä latauskerralla (estääksesi uudelleenlaskennan, jos avainkenttä muuttuu alkuperäisen syötön jälkeen), kääri se `once()`-funktioon:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Parhaat käytännöt
+
+1. CSV-tiedoston avainsarakkeen on vastattava `select_one_from_file`-kentässä käytettyä `name`-saraketta — näiden on oltava sama arvo.
+2. CSV-tiedoston sarakkeiden nimet ovat merkkikokoherkkiä (case-sensitive) — `Department` ja `department` ovat eri sarakkeita.
+3. Jos avainarvoa ei löydy, `pulldata()` palauttaa tyhjän merkkijonon — käytä `if(${field} != '', pulldata(...), '')`-rakennetta suojautuaksesi tyhjiltä valinnoilta.
+4. Pidä CSV-tiedostot mahdollisimman pieninä — suuret tiedostot pidentävät lomakkeen latausaikaa hitailla yhteyksillä.
+5. Jos tiedot muuttuvat tiedonkeruukierrosten välillä, päivitä CSV-mediatiedosto lataamalla lomakkeesta uusi versio.
+
+## Rajoitukset
+
+- `pulldata()` täsmää vain **ensimmäiseen** riviin, jossa avainsarake on sama kuin avainarvo — CSV-tiedoston päällekkäisiä avainarvoja ei tueta.
+- CSV-tiedoston on oltava liitettynä lomakkeeseen ennen käyttöönottoa; sitä ei voi hakea URL-osoitteesta ajon aikana.
+- `pulldata()`-funktion palauttamat numeeriset arvot ovat merkkijonoja — kääri ne `number()`-funktioon, kun niitä käytetään laskutoimituksissa: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey tukee myös laajennettuja `pulldata()`-muotoja laitteen metatietojen, JWT-kenttien ja JSON-tietojen lukemiseen. Katso [App API](../app-api) sivulta `pulldata('app-api', ...)` ja [Call API](../advanced-features/call-api) sivulta JSON-pohjaiset hakumallit.
+</Callout>
+
+---
+
+## Laajennetut pulldata()-variantit
+
+CSV-hakujen lisäksi `pulldata()` tukee useita muita tietolähteitä vaihtamalla ensimmäistä argumenttia.
+
+### `pulldata('app-api', key)`
+
+Lue laitteen metatietoja, käyttäjän ominaisuuksia ja sovelluksen kontekstia. Katso täydellinen viite [App API](../app-api) -sivulta.
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Pura JSON-merkkijono ja hae arvo JSONPath-lausekkeella. Hyödyllinen, kun lomakkeeseen on upotettu JSON-literaali.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Palauttaa täsmäävän arvon merkkijonona tai tyhjän merkkijonon, jos sitä ei löydy.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Hae arvo toiseen kenttään tallennetusta JSON-merkkijonosta JSONPath-lausekkeella. Tämä vastaa komentoa `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Pura kenttään tallennettu JWT-tunnus ja palauta tietyn claimin arvo payloadista.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Palauttaa tyhjän merkkijonon, jos tunnus on virheellinen tai claimia ei löydy.
+
+### `pulldata('instanceid')`
+
+Palauttaa nykyisen lähetyksen yksilöllisen instance ID:n. Vastaa `instanceID`-metakenttää.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Mappaa arvo toiseen käyttämällä lomakkeen määrityksissä määriteltyä nimettyä mäppäystaulukkoa.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Palauttaa mäpätyn arvon tai tyhjän merkkijonon, jos mäppäystä ei löydy.
+
+### `pulldata('options', optionName)`
+
+Lue lomakkeen määritysasetus nimen perusteella.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Suorita SQL `SELECT`-kysely mukana tulevaan SQLite `.db`-tiedostoon ja palauta arvo ensimmäisen täsmäävän rivin ensimmäisestä sarakkeesta. SQL-merkkijonon jälkeiset parametrit korvataan järjestyksessä `?`-paikkamerkeillä.
+
+| Sijainti | Parametri | Kuvaus |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | Tunnistemerkkijono tälle variantille |
+| 2 | path | Tiedostopolku muodossa `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | `SELECT`-lause, joka käyttää `?`-merkkejä paikkamerkkeinä |
+| 4+ | params | Arvot, joilla kukin `?` korvataan — yleensä kenttäviittauksia kuten `${field}` |
+
+Palauttaa tyhjän merkkijonon, jos yhtään riviä ei täsmää.
+
+**Esimerkki — maakunnan nimen haku ID:n perusteella:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Esimerkki — kunnan nimen haku suodatettuna sekä maakunta- että piirikoodilla:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Toisin kuin tavallinen neljän argumentin `pulldata()`, joka täsmää yhteen avainsarakkeeseen CSV-tiedostossa, `rawquery`-variantti suorittaa täyden SQL `SELECT`-kyselyn SQLite-tietokantaan, mikä mahdollistaa usean sarakkeen `WHERE`-ehdot ja minkä tahansa sarakkeen palauttamisen.
+
+<Callout type="info">
+`rawquery`-varianttia käytetään yleensä autocomplete-kenttien kanssa hierarkkisiin sijaintihakuihin. Katso [Local Database Search](../advanced-features/local-database-search) lisätietoja `.db`-tiedostojen rakentamisesta ja niiden yhdistämisestä `pulldata('rawquery', ...)`-funktioon.
+</Callout>

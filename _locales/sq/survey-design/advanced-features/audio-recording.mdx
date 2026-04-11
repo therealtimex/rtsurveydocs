@@ -1,0 +1,118 @@
+---
+title: "Regjistrimi i Audios"
+description: "Regjistroni audion e mjedisit ose të intervistës gjatë mbledhjes së të dhënave të anketës duke përdorur dukjet audio-start dhe audio-end në fushat e tekstit."
+---
+
+Regjistrimi i audios lejon që një formular të kapë audion në mënyrë të heshtur ose të dukshme gjatë një seksioni të një ankete. Është i dobishëm për regjistrimin e intervistave, tingujve të mjedisit gjatë vëzhgimeve në terren, ose përgjigjeve të folura që plotësojnë përgjigjet e strukturuara.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Vetëm në aplikacionin celular.** Regjistrimi i audios kërkon aplikacionin celular rtSurvey. Në formularin ueb, dukjet `audio-start` dhe `audio-end` injorohen në heshtje — nuk kryhet asnjë regjistrim dhe nuk shfaqet asnjë gabim. Gjithmonë testoni në pajisje kur kërkohet regjistrim audio.
+</Callout>
+
+---
+
+## Si funksionon
+
+Regjistrimi i audios kontrollohet nga dy fusha `text` që veprojnë si **shënjues**:
+
+- Një fushë me dukjen `audio-start` fillon regjistrimin kur anketuesi arrin tek ajo.
+- Një fushë me dukjen `audio-end` ndalon regjistrimin dhe ruan skedarin audio në dërgimin e të dhënave.
+
+Të dyja fushat shënjuese janë të tipit `text`. Ato zakonisht janë të fshehura nga anketuesi (duke përdorur `relevant = false` ose të vendosura në një pozicion jo-interaktiv), megjithëse mund të jenë të dukshme. Audioja e regjistruar bashkëngjitet në dërgimin e të dhënave si një skedar i lidhur me fushën `audio-end`.
+
+---
+
+## Shembull bazë
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Emri i respondentit | |
+| text | q_occupation | Profesioni | |
+| integer | q_age | Mosha | |
+| text | audio_e_a1 | | `audio-end` |
+
+Aplikacioni fillon regjistrimin kur anketuesi arrin te `audio_s_a1` dhe ndalon kur arrin te `audio_e_a1`. Të gjitha pyetjet midis dy shënjuesve regjistrohen.
+
+---
+
+## Regjistrimi i heshtur: `audio-start invisible`
+
+Si parazgjedhje, aplikacioni celular shfaq një indikator regjistrimi ndërsa audioja po kapet. Shtimi i `invisible` në dukje e shtyp këtë indikator, kështu që regjistrimi ndodh pa asnjë sinjal të dukshëm për respondentin.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | A jeni dakord të merrni pjesë? | |
+| text | q_feedback | Feedback-u juaj | |
+| text | audio_e_a1 | | `audio-end` |
+
+Përdorni `invisible` vetëm kur kërkesat për zbulimin e informacionit janë përmbushur përmes mjeteve të tjera (p.sh., një fushë e veçantë e pëlqimit me shkrim përpara seksionit të regjistrimit).
+
+---
+
+## Konventa e emërtimit
+
+Formularët e prodhimit përdorin një model emërtimi konsistent për fushat shënjuese:
+
+```
+audio_s_{section}{n}   — shënjuesi i fillimit
+audio_e_{section}{n}   — shënjuesi i mbarimit
+```
+
+Ku `{section}` është një etiketë e shkurtër për seksionin e formularit dhe `{n}` është një numër rendor brenda atij seksioni.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | Regjistrimi i parë në seksionin A |
+| `audio_e_a1` | End | Fundi i regjistrimit të parë në seksionin A |
+| `audio_s_b1` | Start | Regjistrimi i parë në seksionin B |
+| `audio_e_b1` | End | Fundi i regjistrimit të parë në seksionin B |
+| `audio_s_a2` | Start | Regjistrimi i dytë në seksionin A |
+| `audio_e_a2` | End | Fundi i regjistrimit të dytë në seksionin A |
+
+Ndjekja e kësaj konvente e bën të lehtë identifikimin e kufijve të regjistrimit gjatë rishikimit të përkufizimeve të formularit dhe të dhënave të dërguara.
+
+---
+
+## Ruajtja dhe marrja
+
+Kur anketuesi arrin në fushën `audio-end`, aplikacioni finalizon skedarin audio dhe e bashkëngjit atë në dërgimin e të dhënave. Skedari është:
+
+- I ruajtur si një bashkëngjitje audio në dërgimin e të dhënave, i lidhur me emrin e fushës `audio-end`.
+- I aksesueshëm në shikuesin e dërgimeve të rtSurvey në back-end së bashku me bashkëngjitjet e tjera mediatike.
+- I shkarkueshëm përmes eksportit standard të dërgimeve — skedarët audio shfaqen në kolonën e medias që i korrespondon emrit të fushës `audio-end`.
+
+Formati i skedarit dhe shpejtësia e biteve varen nga pajisja dhe versioni i aplikacionit.
+
+---
+
+## Seksione të shumta regjistrimi
+
+Një formular mund të përmbajë disa seksione regjistrimi që nuk mbivendosen. Çdo çift shënjuesish `audio-start` / `audio-end` duhet të jetë plotësisht i mbyllur — seksionet nuk duhet të ndërthuren.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Hyrja | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Detajet | |
+| text | audio_e_b1 | | `audio-end` |
+
+Çdo seksion prodhon një skedar audio të veçantë të bashkëngjitur në fushën e tij përkatëse `audio-end`.
+
+---
+
+## Kufizimet
+
+- **Vetëm në aplikacionin celular.** Veçoria nuk mbështetet në formularin ueb. `audio-start` dhe `audio-end` injorohen në heshtje në një shfletues.
+- **Nuk ka folezim.** Seksionet e regjistrimit nuk mund të mbivendosen. Fillimi i një regjistrimi të ri përpara se të arrihet shënjuesi i mëparshëm `audio-end` nuk mbështetet.
+- **Tipi i fushës duhet të jetë `text`.** Përdorimi i `audio-start` ose `audio-end` në çdo lloj tjetër pyetjeje nuk mbështetet.
+- **Madhësia e ngarkimit.** Regjistrimet e gjata prodhojnë skedarë të mëdhenj. Kini parasysh kufijtë e madhësisë së dërgimit dhe kushtet e rrjetit në terren.
+- **Nuk ka pauzë gjatë regjistrimit.** Regjistrimi vazhdon vazhdimisht nga shënjuesi i fillimit deri te shënjuesi i mbarimit; nuk ka asnjë mekanizëm për të ndaluar dhe rifilluar brenda një seksioni.

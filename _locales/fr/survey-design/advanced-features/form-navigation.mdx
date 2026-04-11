@@ -1,0 +1,104 @@
+---
+title: "Contrôles de navigation du formulaire"
+description: "Utilisez les valeurs d'apparence SaveFinalizedExit et SaveIncompleteExit pour afficher des boutons de sortie stylisés qui enregistrent et quittent le formulaire."
+---
+
+**Les contrôles de navigation du formulaire** sont des valeurs d'apparence placées sur des champs `note` (ou `text`) qui s'affichent sous forme de boutons stylisés pleine largeur au bas d'une enquête. Ils permettent à l'enquêteur d'enregistrer la soumission et de quitter le formulaire en un seul clic, soit en tant qu'enregistrement terminé (finalisé), soit en tant que brouillon (enregistrement incomplet).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Affiche un bouton qui **enregistre la soumission comme finalisée** et quitte le formulaire. Le libellé du bouton est tiré de la colonne `label` du champ.
+
+| XLSForm column | Valeur |
+|----------------|-------|
+| `type` | `note` |
+| `name` | n'importe quel nom unique (ex: `btn_finish`) |
+| `label` | texte affiché sur le bouton |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+La soumission est marquée comme un enregistrement final et complet. Cela équivaut à appuyer sur le bouton de soumission intégré.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Affiche un bouton qui **enregistre la soumission comme incomplète (brouillon)** et quitte le formulaire. L'enquêteur peut y revenir plus tard et continuer à le remplir.
+
+| XLSForm column | Valeur |
+|----------------|-------|
+| `type` | `note` |
+| `name` | n'importe quel nom unique (ex: `btn_pause`) |
+| `label` | texte affiché sur le bouton |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Syntaxe des couleurs
+
+Les deux apparences acceptent une couleur en ligne au format `<#RRGGBB/>` :
+
+- `#` suivi de précisément **6 chiffres hexadécimaux** (majuscules ou minuscules)
+- Le `/>` de fermeture est **obligatoire** — son omission interrompt l'analyse
+- Exemple : `<#04B404/>` (vert), `<#EDC602/>` (ambre), `<#D9534F/>` (rouge)
+
+La couleur contrôle l'arrière-plan du bouton. La couleur du texte est déterminée automatiquement par l'application.
+
+---
+
+## Exemple
+
+Les deux champs suivants placés à la fin d'un formulaire produisent un bouton vert **Soumettre** et un bouton ambre **Enregistrer comme brouillon** :
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Soumettre | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Enregistrer comme brouillon | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — exclure les boutons de la table des matières
+
+Le jeton d'apparence `toc-hide` indique à rtSurvey d'exclure un champ de la **table des matières** du formulaire (la liste récapitulative des questions). Les boutons de navigation ne sont pas des questions, ils ne doivent donc jamais apparaître dans la table des matières.
+
+Ajoutez toujours `toc-hide` après l'apparence de sortie :
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Voir [Apparence — toc-hide](../appearance#group-and-navigation) pour la référence toc-hide.
+
+---
+
+## Convention de placement
+
+Suivez ces conventions lors de l'ajout de contrôles de navigation à un formulaire :
+
+- Placez les deux boutons à la **toute fin** du formulaire, après toutes les questions et groupes.
+- Incluez toujours les **deux** boutons ensemble — un finalisé et un incomplet — afin que l'enquêteur ait toujours un moyen de quitter, quel que soit l'état d'avancement.
+- Utilisez la colonne `relevant` sur le bouton de sortie finalisée si la soumission ne doit être autorisée que lorsque certaines conditions sont remplies (par exemple, une section requise est terminée). Le bouton de sortie incomplète doit généralement rester **toujours visible**.
+
+---
+
+## Sortie finalisée conditionnelle
+
+Utilisez la colonne `relevant` pour contrôler quand le bouton de sortie finalisée est affiché. La sortie incomplète doit rester visible sans condition afin que l'enquêteur puisse toujours faire une pause et revenir.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Soumettre | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Enregistrer comme brouillon | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Dans cet exemple, le bouton **Soumettre** n'apparaît que lorsque l'enquêteur a donné son consentement et a marqué la section A comme terminée. Le bouton **Enregistrer comme brouillon** est toujours disponible.
+
+---
+
+## Limitations
+
+- **Le type de champ doit être `note` ou `text`.** L'utilisation de ces apparences sur tout autre type de question n'est pas prise en charge.
+- **Hexadécimal à 6 chiffres uniquement.** L'hexadécimal abrégé (`<#FFF/>`) et les noms de couleurs ne sont pas pris en charge — utilisez toujours le format complet à 6 chiffres (ex: `<#FFFFFF/>`).
+- **La colonne label est le texte du bouton.** La colonne `hint` est ignorée pour ces champs ; seul `label` est affiché.
+- **Les deux boutons doivent être présents.** L'omission du bouton de sortie incomplète laisse l'enquêteur sans moyen de faire une pause en milieu de formulaire.

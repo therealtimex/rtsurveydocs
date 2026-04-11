@@ -1,0 +1,224 @@
+---
+title: "Helyi adatbázis-keresés"
+description: "A helyi adatbázis-keresés egy mellékelt SQLite .db fájlt kérdez le nyers SQL használatával, lehetővé téve a gyors offline automatikus kiegészítést nagy statikus adatkészletekhez."
+---
+
+import { Callout } from 'nextra/components'
+
+A **Helyi adatbázis-keresés** lehetővé teszi, hogy egy `select_one` vagy `text` mező lekérdezzen egy SQLite `.db` fájlt, amely az űrlap médiacsomagjához van mellékelve — teljesen offline, szerveroldali kommunikáció nélkül. Ez a megfelelő megközelítés, ha a választási listája nagy és statikus (például falvak, egészségügyi intézmények vagy közigazgatási határok országos listája), és a kapcsolat nem garantálható.
+
+| Megközelítés | Adatforrás | Kapcsolatot igényel |
+|---|---|---|
+| Helyi adatbázis-keresés (`rawquery`) | Mellékelt `.db` fájl (SQLite) | Nem |
+| `search-api()` | Távoli REST API | Igen |
+| `search()` | Mellékelt CSV fájl | Nem |
+
+---
+
+## Megjelenési változatok
+
+Az automatikus kiegészítési mező az `appearance` oszlopon keresztül konfigurálható. Három változat érhető el:
+
+| Változat | Megjegyzések |
+|---|---|
+| `search-autocomplete-noedit(...)` | Standard automatikus kiegészítés — az adatgyűjtőnek a listából kell választania; a szabad szöveges bevitelt nem menti el a rendszer |
+| `search-autocomplete-noedit-v2(...)` | Ajánlott változat — ugyanaz a viselkedés, de frissített megjelenítő motort használ, amely jobb teljesítményt nyújt nagy eredménylisták esetén |
+| `search(...)` | Egyszerű fájlalapú egyezés egy mellékelt CSV-vel szemben; **nem** támogatja a nyers SQL-t — csak összehasonlítás céljából szerepel itt |
+
+<Callout type="info">
+A `search-autocomplete-noedit` egy álnév — az elemzéskor az alkalmazás kicseréli a belső `searchAutocompleteNoedit` függvénynévre. Használja bármelyik írásmódot az XLSForm-ban; mindkettő működik.
+</Callout>
+
+---
+
+## A `rawquery` adatforrás
+
+Egy SQL lekérdezés futtatásához egy `.db` fájlon, adja át a `'rawquery'` értéket a megjelenítési függvény első argumentumaként. A teljes szignatúra:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Paraméterek
+
+| Pozíció | Paraméter | Leírás |
+|---|---|---|
+| 1 | `'rawquery'` | Literál karakterlánc — arra utasítja az alkalmazást, hogy közvetlenül hajtsa végre az SQL-t |
+| 2 | `db_path` | Az SQLite fájl útvonala `<dir>/<file>.db::tableName` formátumban. A `::tableName` utótag a fájl megnyitásakor törlődik; a tábla nevét az SQL-en belül kell használni |
+| 3 | `'[display_col]'` | A legördülő menüben megjelenítendő oszlop. A körülvevő `[ ]` zárójelek futás közben törlődnek |
+| 4 | `'value_col'` | Az az oszlop, amelynek az értéke tárolódik, amikor az adatgyűjtő kiválaszt egy elemet |
+| 5 | `'SELECT ...'` | Bármilyen érvényes SQLite SELECT utasítás. A `SELECT DISTINCT` automatikusan beillesztésre kerül, ha a `DISTINCT` még nincs jelen |
+| 6+ | `param1, ...` | Opcionális. Az SQL-ben lévő `?` helyőrzőkhöz kötött értékek sorrendben. Ha az SQL tartalmaz `?`-t, de nincsenek paraméterek megadva, a mező üresen tér vissza (beépített védelem a hiányzó argumentumok ellen) |
+
+### A `db_path` konvenció
+
+Az adatbázisfájl az űrlap mellékelt médiakönyvtárában található. Futás közben a `pulldata('app-api', 'family_path')` ezt a könyvtárútvonalat adja vissza. A beállítás részleteiért lásd: [family_path](family-path). A standard minta:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Amikor az alkalmazás megnyitja a fájlt, eltávolítja a `::tableName` részt, és a tiszta fájlútvonalat használja. A tábla neve csak az SQL-en belül jelenik meg.
+
+---
+
+## Alappélda — tartomány keresése
+
+Egy írásvédett tartományválasztó legördülő menü, amelyet egy mellékelt `vnxa3.db` fájl támogat:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Tartomány | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+Az `appearance` oszlop (az olvashatóság érdekében kibontva):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- A megjelenített címke a `provv` oszlopból származik.
+- A tárolt érték a `provid` oszlopból származik.
+- Csak azok a sorok jelennek meg, ahol a `rta_filter = "1"`.
+
+---
+
+## Paraméterezett lekérdezések
+
+Használjon `?` helyőrzőket az SQL-ben, és adja át a megfelelő mezőhivatkozásokat további argumentumként (a 6. pozíciótól kezdve). Ez a standard minta a lépcsőzetes választásokhoz — például a korábban kiválasztott tartományhoz tartozó körzetek betöltéséhez.
+
+<Callout type="warning">
+Ha az SQL legalább egy `?`-et tartalmaz, és nem ad meg paraméterargumentumokat, a mező üres eredménylistával tér vissza. Ez megakadályozza az elavult vagy nem szűrt adatok megjelenését a szülőelem kiválasztása előtt.
+</Callout>
+
+### Példa körzet-lépcsőre
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+A `${province}` értéke az első `?`-hez kötődik. A mező üres marad, amíg az adatgyűjtő ki nem választ egy tartományt.
+
+### Kétparaméteres példa — község-lépcső
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+A paraméterek pozíció szerint kötődnek: `${province}` → első `?`, `${district}` → második `?`.
+
+---
+
+## UNION SELECT speciális értékekhez
+
+Szintetikus sorokat — például „Nem tudom” vagy „Megtagadja a választ” — szúrhat be közvetlenül az SQL-be az `UNION SELECT` használatával:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Nem tudom</i>", "888"')
+```
+
+Az RTSurvey űrlapokon használt konvenciók:
+
+| Kód | Jelentés |
+|---|---|
+| `888` | Nem tudom |
+| `999` | Megtagadja a választ |
+
+A megjelenítési karakterláncban lévő HTML-tageket, például az `<i>`-t, az alkalmazás megjeleníti — ezeket a speciális opciók vizuális megkülönböztetésére használhatja.
+
+---
+
+## Többnyelvű megjelenítés
+
+Tárolja a nyelvspecifikus címkéket külön oszlopokban (például `label_vi`, `label_en`), és válassza ki a megfelelőt az űrlap nyelvi mezője alapján:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Az oszlopok dymanikus váltásához a `${language}` mező alapján használjon egy `if()` kifejezést a megjelenítési oszlop paraméterén a nyelvi oszlopok közötti váltáshoz:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+A megjelenítési oszlop paramétere a lekérdezés futtatása előtt kerül kiértékelésre. Csak az oszlopnév (zárójelek nélkül) kerül át az SQL motorhoz; a zárójelek kozmetikai jelölők, amelyek az elemzéskor törlődnek.
+</Callout>
+
+---
+
+## Valós választás érvényesítése
+
+Ha a mező speciális értékeket, például 888-at vagy 999-et tesz lehetővé, az egyszerű `required = yes` ellenőrzés nem elegendő — ez akkor is teljesül, ha az adatgyűjtő a „Nem tudom” opciót választja. Használja a `selected-at(., 0) != -997` kényszert annak ellenőrzésére, hogy a tárolt érték valódi választás-e, és nem a belső „nincs kiválasztva semmi” jelző `-997`:
+
+| oszlop | érték |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Kérjük, válasszon egy érvényes opciót |
+
+A `-997` érték az a belső kód, amelyet az RTSurvey tárol, ha az automatikus kiegészítési listából nem választottak ki elemet. A 888 vagy 999 választása továbbra is tudatos választás, és átmegy ezen az ellenőrzésen.
+
+Valódi (nem speciális) érték megköveteléséhez bővítse a kényszert:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Összehasonlítás: helyi adatbázis vs. egyéb keresési módszerek
+
+| Funkció | `rawquery` automatikus kiegészítés | `search-api()` | `search()` CSV | Egyszerű CSV választási lehetőségek |
+|---|---|---|---|---|
+| Adatforrás | Mellékelt `.db` (SQLite) | Távoli REST API | Mellékelt CSV | Választási lap |
+| Offline működik | Igen | Nem | Igen | Igen |
+| Támogatja a nyers SQL-t | Igen | Nem | Nem | Nem |
+| Lépcsőzetes szűrők | Igen — paraméterezett `?` | Kérelem törzsén keresztül | Korlátozott | Nem |
+| Adatkészlet mérete | Nagyon nagy (több millió sor) | Korlátlan (szerveroldali) | Közepes (tízezres nagyságrend) | Kicsi |
+| Speciális beillesztett sorok | Igen — `UNION SELECT` | Nem | Nem | Igen (manuális) |
+| Beállítás bonyolultsága | Közepes — mellékelt `.db`-t igényel | Magas — API szervert igényel | Alacsony | Nincs |
+
+---
+
+## Korlátozások
+
+- A `.db` fájlt a telepítés előtt mellékelni kell az űrlap médiacsomagjába. Az adatbázis dinamikus frissítéseihez új űrlaptelepítésre van szükség.
+- Az SQL úgy fut az eszközön, ahogy van. Nincs szerveroldali tisztítás — kerülje az SQL összeállítását az adatgyűjtő szabad szöveges beviteléből.
+- Csak a `SELECT` utasítások támogatottak. `INSERT`, `UPDATE` és `DELETE` nem engedélyezett.
+- A nagyon bonyolult lekérdezések (nagy `UNION` láncok, többszörös összekapcsolások) lassúak lehetnek az alacsony kategóriás Android készülékeken.
+- A `search-autocomplete-noedit` változatok nem teszik lehetővé az adatgyűjtő számára, hogy olyan értéket mentsen el, amely nem szerepel az eredménylistában. Ha szabad szöveges bevitelre van szükség, használjon külön `text` mezőt.
+- A `SELECT DISTINCT` csak akkor kerül beillesztésre automatikusan, ha a `DISTINCT` hiányzik a lekérdezésből. Ha explicit módon írja be a `SELECT DISTINCT`-et, az nem duplázódik meg.

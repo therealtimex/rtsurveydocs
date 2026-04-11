@@ -1,0 +1,224 @@
+---
+title: "Yerel Veritabanı Araması"
+description: "Yerel Veritabanı Araması, ham SQL kullanarak paketlenmiş bir SQLite .db dosyasını sorgular ve büyük statik veri kümeleri için hızlı çevrimdışı otomatik tamamlama sağlar."
+---
+
+import { Callout } from 'nextra/components'
+
+**Yerel Veritabanı Araması**, bir `select_one` veya `text` alanının, formun medya paketiyle birlikte sunulan bir SQLite `.db` dosyasını sorgulamasına olanak tanır — tamamen çevrimdışı, sunucu iletişimi olmadan. Bu, seçim listeniz büyük ve statik olduğunda (örneğin, ulusal köy listesi, sağlık tesisleri veya idari sınırlar) ve bağlantının garanti edilemediği durumlarda doğru yaklaşımdır.
+
+| Yaklaşım | Veri kaynağı | Bağlantı gerektirir |
+|---|---|---|
+| Yerel veritabanı araması (`rawquery`) | Paketlenmiş `.db` dosyası (SQLite) | Hayır |
+| `search-api()` | Uzak REST API | Evet |
+| `search()` | Paketlenmiş CSV dosyası | Hayır |
+
+---
+
+## Görünüm varyantları (Appearance)
+
+Otomatik tamamlama alanı `appearance` sütunu aracılığıyla yapılandırılır. Üç varyant mevcuttur:
+
+| Varyant | Notlar |
+|---|---|
+| `search-autocomplete-noedit(...)` | Standart otomatik tamamlama — anketör listeden seçim yapmalıdır; serbest metin girişi kaydedilmez |
+| `search-autocomplete-noedit-v2(...)` | Önerilen varyant — aynı davranış ancak büyük sonuç kümelerinde daha iyi performansa sahip güncellenmiş bir işleme motoru kullanır |
+| `search(...)` | Paketlenmiş bir CSV'ye karşı basit dosya tabanlı eşleşme; ham SQL'i **desteklemez** — buraya yalnızca karşılaştırma için listelenmiştir |
+
+<Callout type="info">
+`search-autocomplete-noedit` bir takma addır — ayrıştırma sırasında uygulama bunu dahili fonksiyon adı olan `searchAutocompleteNoedit` ile değiştirir. XLSForm'unuzda her iki yazımı da kullanabilirsiniz; ikisi de çalışır.
+</Callout>
+
+---
+
+## `rawquery` veri kaynağı
+
+Bir `.db` dosyasına karşı bir SQL sorgusu çalıştırmak için, görünüm fonksiyonunun ilk argümanı olarak `'rawquery'` değerini geçirin. Tam imza şöyledir:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parametreler
+
+| Pozisyon | Parametre | Açıklama |
+|---|---|---|
+| 1 | `'rawquery'` | Sabit dize — uygulamaya SQL'i doğrudan yürütmesini söyler |
+| 2 | `db_path` | SQLite dosyasının yolu, `<dir>/<file>.db::tableName` biçiminde. `::tableName` soneki dosya açılırken atılır; tablo adı SQL'inizin içinde kullanılır |
+| 3 | `'[display_col]'` | Açılır listede görüntülenecek sütun. Çevreleyen `[ ]` parantezleri çalışma zamanında atılır |
+| 4 | `'value_col'` | Anketör bir seçim yaptığında değeri saklanan sütun |
+| 5 | `'SELECT ...'` | Geçerli herhangi bir SQLite SELECT ifadesi. `DISTINCT` halihazırda mevcut değilse `SELECT DISTINCT` otomatik olarak eklenir |
+| 6+ | `param1, ...` | İsteğe bağlı. SQL'deki `?` yer tutucularına sırayla bağlanan değerler. SQL `?` içeriyor ancak parametre sağlanmamışsa, alan boş döner (eksik argümanlara karşı yerleşik bir koruma) |
+
+### `db_path` kuralı
+
+Veritabanı dosyası, formun paketlenmiş medya dizini içinde bulunur. Çalışma zamanında `pulldata('app-api', 'family_path')` bu dizin yolunu döndürür. Kurulum ayrıntıları için [family_path](family-path) sayfasına bakın. Standart model şöyledir:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Uygulama dosyayı açtığında `::tableName` kısmını atar ve çıplak dosya yolunu kullanır. Tablo adı yalnızca SQL'inizin içinde görünür.
+
+---
+
+## Temel örnek — il arama
+
+Paketlenmiş bir `vnxa3.db` dosyası tarafından desteklenen salt okunur bir il açılır listesi:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | İl | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+`appearance` sütunu (okunabilirlik için genişletilmiştir):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Görüntülenen etiket `provv` sütunundan gelir.
+- Saklanan değer `provid` sütunundan gelir.
+- Yalnızca `rta_filter = "1"` olan satırlar gösterilir.
+
+---
+
+## Parametreli sorgular
+
+SQL'inizde `?` yer tutucularını kullanın ve ilgili alan referanslarını ek argümanlar olarak (6. pozisyondan itibaren) geçirin. Bu, kademeli seçimler (cascading selects) için standart modeldir — örneğin, daha önce seçilen ile ait ilçelerin yüklenmesi.
+
+<Callout type="warning">
+SQL'iniz en az bir `?` içeriyor ve parametre argümanı sağlanmamışsa, alan boş bir sonuç kümesi döndürür. Bu, bir üst seçim yapılmadan önce güncel olmayan veya kapsam dışı verilerin görünmesini engeller.
+</Callout>
+
+### İlçe kademeli seçim örneği
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+`${province}` değeri ilk `?` işaretine bağlanır. Anketör bir il seçene kadar alan boş kalır.
+
+### İki parametreli örnek — mahalle kademeli seçimi
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parametreler konumsal olarak bağlanır: `${province}` → ilk `?`, `${district}` → ikinci `?`.
+
+---
+
+## Özel değerler için UNION SELECT
+
+"Bilmiyorum" veya "Cevap Vermeyi Reddediyor" gibi sentetik satırları `UNION SELECT` kullanarak doğrudan SQL'e ekleyin:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Bilmiyorum</i>", "888"')
+```
+
+RTSurvey formlarında kullanılan kurallar:
+
+| Kod | Anlamı |
+|---|---|
+| `888` | Bilmiyorum |
+| `999` | Cevap Vermeyi Reddediyor |
+
+Görüntüleme dizesindeki `<i>` gibi HTML etiketleri uygulama tarafından işlenir — özel seçenekleri görsel olarak ayırt etmek için bunları kullanabilirsiniz.
+
+---
+
+## Çok dilli görüntüleme
+
+Dile özel etiketleri ayrı sütunlarda saklayın (örneğin, `label_vi`, `label_en`) ve formunuzdaki bir dil alanına göre uygun olanı seçin:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+`${language}` alanına göre sütunları dinamik olarak değiştirmek için, dil sütunları arasında geçiş yapmak üzere görüntüleme sütunu parametresinde bir `if()` ifadesi kullanın:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Görüntüleme sütunu parametresi, sorgu çalışmadan önce değerlendirilir. SQL motoruna yalnızca sütun adı (köşeli parantezler olmadan) iletilir; köşeli parantezler, ayrıştırma sırasında atılan kozmetik işaretlerdir.
+</Callout>
+
+---
+
+## Gerçek bir seçimi doğrulama
+
+Alan 888 veya 999 gibi özel değerlere izin verdiğinde, düz bir `required = yes` kontrolü yetersizdir — anketör "Bilmiyorum" seçeneğini seçse bile bu kontrol karşılanır. Saklanan değerin gerçek bir seçim olduğunu ve dahili "hiçbir şey seçilmedi" işareti olan `-997` olmadığını doğrulamak için `selected-at(., 0) != -997` kısıtlamasını kullanın:
+
+| sütun | değer |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Lütfen geçerli bir seçenek belirleyin |
+
+`-997` değeri, otomatik tamamlama listesinden hiçbir öğe seçilmediğinde RTSurvey'in sakladığı dahili koddur. 888 veya 999 seçimi hala bilinçli bir seçimdir ve bu kontrolden geçer.
+
+Ek olarak gerçek (özel olmayan) bir değer gerektirmek için kısıtlamayı genişletin:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Karşılaştırma: yerel veritabanı ile diğer arama yöntemleri
+
+| Özellik | `rawquery` otomatik tamamlama | `search-api()` | `search()` CSV | Düz CSV seçenekleri |
+|---|---|---|---|---|
+| Veri kaynağı | Paketlenmiş `.db` (SQLite) | Uzak REST API | Paketlenmiş CSV | Choices sayfası |
+| Çevrimdışı çalışır | Evet | Hayır | Evet | Evet |
+| Ham SQL desteği | Evet | Hayır | Hayır | Hayır |
+| Kademeli filtreler | Evet — parametreli `?` | İstek gövdesi aracılığıyla | Sınırlı | Hayır |
+| Veri kümesi boyutu | Çok büyük (milyonlarca satır) | Sınırsız (sunucu tarafı) | Orta (on binlerce) | Küçük |
+| Özel eklenen satırlar | Evet — `UNION SELECT` | Hayır | Hayır | Evet (manuel) |
+| Kurulum karmaşıklığı | Orta — paketlenmiş `.db` gerektirir | Yüksek — API sunucusu gerektirir | Düşük | Yok |
+
+---
+
+## Sınırlamalar
+
+- `.db` dosyası, dağıtımdan önce formun medya paketi içine eklenmelidir. Veritabanına yönelik dinamik güncellemeler yeni bir form dağıtımı gerektirir.
+- SQL, cihazda olduğu gibi yürütülür. Sunucu tarafında temizleme (sanitization) yoktur — anketörün serbest metin girişinden SQL oluşturmaktan kaçının.
+- Yalnızca `SELECT` ifadeleri desteklenir. `INSERT`, `UPDATE` ve `DELETE` işlemlerine izin verilmez.
+- Çok karmaşık sorgular (büyük `UNION` zincirleri, çoklu join işlemleri) düşük seviyeli Android cihazlarda yavaş olabilir.
+- `search-autocomplete-noedit` varyantları, anketörün sonuç kümesinde olmayan bir değeri kaydetmesine izin vermez. Serbest metin girişi gerekiyorsa, ayrı bir `text` alanı kullanın.
+- `SELECT DISTINCT`, yalnızca sorguda `DISTINCT` eksik olduğunda otomatik olarak eklenir. `SELECT DISTINCT` ifadesini açıkça yazarsanız, tekrarlanmaz.

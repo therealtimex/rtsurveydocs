@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path är ett konventionellt beräkningsfält (calculate) som returnerar sökvägen till formulärets paketmedia vid körning — krävs av varje formulär som använder lokala databassökningar eller filbaserad sökning."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` är ett konventionellt beräkningsfält (calculate) som håller sökvägen till formulärets paketmedia-katalog. Varje formulär som utför lokala databassökningar med `rawquery`, `pulldata` eller `search()` måste innehålla detta fält — utan det kan filsökvägar inte lösas upp och sökningar returnerar tyst tomma resultat.
+
+---
+
+## Beräkningsfältet (calculate)
+
+Lägg till denna rad nära toppen av ditt survey-ark, efter eventuella metafält och före den första frågan som använder en databasfil:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Fältet lagrar inget synligt värde och kräver ingen label. Det är en tyst förutsättning för all sökvägskonstruktion som följer.
+
+---
+
+## Varför det behövs
+
+RTSurvey paketerar formulärmedia — SQLite-databaser, bilder, ljudklipp — i en formulärspecifik katalog på enheten. Den exakta sökvägen skiljer sig mellan plattformar (Android, iOS, webb) och mellan enheter.
+
+Vid körning fyller appen i `family_path` automatiskt. Ett typiskt upplöst värde ser ut så här:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Efterosm sökvägen är plattformsspecifik och bestäms vid starttiden, kan den inte hårdkodas i formuläret. `pulldata('app-api', 'family_path')` är det enda tillförlitliga sättet att hämta den.
+
+---
+
+## Hur man använder det i sökvägar
+
+När `family_path` väl är definierat, bygg en fullständig filsökväg med `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Suffixet `::tableName` tas bort när appen öppnar filen; tabellnamnet används endast inuti din SQL-fråga.
+
+---
+
+## Var family_path används
+
+`family_path` krävs i sökvägsargumentet när du refererar till en paketerad fil:
+
+- **Lokal databassökning** — argumentet `db_path` i `search-autocomplete-noedit-v2('rawquery', ...)` måste byggas med `concat(${family_path}, ...)`. Se [Lokal databassökning](local-database-search) för fullständiga användningsdetaljer.
+- **`pulldata` rawquery** — varje anrop av `pulldata('rawquery', ...)` som läser från en `.db`-fil använder samma `concat()`-mönster.
+- **`search()` med en lokal fil** — utseenden (appearance) för dynamisk sökning som laddas från en paketerad CSV- eller DB-fil förlitar sig också på `family_path` för filreferensen.
+
+---
+
+## Placering i formuläret
+
+`family_path` måste visas **före det första fältet som refererar till det**. Den rekommenderade positionen är omedelbart efter metagruppen:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(rawquery appearance referencing `${family_path}`)* |
+
+<Callout type="warning">
+Om `family_path` saknas i formuläret, eller placeras efter det första `rawquery` / `search()`-fältet som refererar till det, kommer alla sökningar mot paketerade filer tyst att returnera tomma resultat. Det finns inget felmeddelande — autokompletteringen visar helt enkelt inga resultat.
+</Callout>
+
+---
+
+## Flera databasfiler
+
+Ett enda formulär kan använda flera `.db`-filer. Varje sökväg konstrueras oberoende med `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Definiera `family_path` en gång; referera till den i så många fält som behövs.
+
+---
+
+## Verifiering under utveckling
+
+Lägg till ett tillfälligt `note`-fält under `family_path` för att inspektera det upplösta värdet på enheten:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Path: ${family_path}` | |
+
+Noteringen visar den faktiska upplösta sökvägen under testning. Ta bort den innan du distribuerar det slutliga formuläret.

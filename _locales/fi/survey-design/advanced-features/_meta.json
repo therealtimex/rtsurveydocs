@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "Äänitallennus",
   "call-api": "Call API",
   "dynamic-question-type": "Dynaaminen kysymystyyppi",
   "dynamic-search": "Dynaaminen haku",

@@ -1,13 +1,13 @@
 ---
 title: "Pencarian Dinamis"
-description: "Pencarian Dinamis memuat pilihan dari API jarak jauh secara real time saat enumerator mengetik, memungkinkan dataset yang besar atau sering diperbarui."
+description: "Pencarian Dinamis memuat pilihan dari API jarak jauh secara real-time saat enumerator mengetik, memungkinkan penggunaan kumpulan data yang besar atau yang sering diperbarui."
 ---
 
-**Pencarian Dinamis** (juga disebut Search API) memungkinkan bidang `select_one`, `select_multiple`, atau `text` memuat pilihannya dari layanan web jarak jauh **saat runtime** saat enumerator mengetik. Ini adalah pendekatan yang tepat ketika daftar pilihan Anda terlalu besar untuk dibundel dalam file CSV, sering diperbarui, atau berasal dari database langsung.
+**Pencarian Dinamis** (juga disebut Search API) memungkinkan bidang `select_one`, `select_multiple`, atau `text` untuk memuat pilihannya dari layanan web jarak jauh **pada saat runtime** saat enumerator mengetik. Ini adalah pendekatan yang tepat ketika daftar pilihan Anda terlalu besar untuk dibundel dalam file CSV, sering diperbarui, atau berasal dari database langsung.
 
 ---
 
-## Appearance `search-api()`
+## Tampilan `search-api()`
 
 Pencarian dinamis dikonfigurasi melalui kolom `appearance` menggunakan fungsi `search-api()`:
 
@@ -18,26 +18,26 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 ### Parameter
 
 | Parameter | Deskripsi |
-|-----------|-----------|
+|-----------|-------------|
 | `method` | Selalu gunakan `'POST'` |
-| `url` | Endpoint API untuk dikueri |
+| `url` | Endpoint API yang akan dipanggil |
 | `post_body` | Body JSON yang dikirim ke API. Gunakan `%__input__%` sebagai placeholder untuk teks pencarian enumerator saat ini |
-| `value_column` | Kunci dalam objek respons yang digunakan sebagai **nilai** yang disimpan |
-| `display` | Kunci (atau template) yang digunakan sebagai **label** yang ditampilkan dalam dropdown. Mendukung placeholder `##key##` dan ekspresi `@{func}` |
+| `value_column` | Kunci dalam objek respons untuk digunakan sebagai **nilai** (value) yang disimpan |
+| `display` | Kunci (atau templat) yang digunakan sebagai **label** yang ditampilkan di dropdown. Mendukung placeholder `##key##` dan ekspresi `@{func}` |
 | `data_path` | JSONPath ke array objek hasil dalam respons (misalnya, `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Nama di mana respons mentah disimpan untuk digunakan oleh bidang lain |
+| `save_path` | Nama tempat respons mentah disimpan untuk digunakan oleh bidang lain |
 
 ---
 
 ## Contoh dasar
 
-Pencarian fasilitas kesehatan di mana enumerator mengetik sebagian nama fasilitas:
+Pencarian fasilitas kesehatan di mana enumerator mengetik bagian dari nama fasilitas:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one | facility | Pilih fasilitas kesehatan | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-API menerima `{"query": "nair"}` ketika enumerator mengetik "nair" dan mengembalikan:
+API menerima `{"query": "nair"}` saat enumerator mengetik "nair" dan mengembalikan:
 
 ```json
 {
@@ -52,11 +52,11 @@ Dropdown menampilkan `Nairobi Central Clinic` dan `Nairobi West Hospital`; nilai
 
 ---
 
-## Format tampilan lanjutan
+## Pemformatan tampilan lanjutan
 
-### Menggunakan template `##key##`
+### Menggunakan templat `##key##`
 
-Tampilkan beberapa bidang dalam label:
+Menampilkan beberapa bidang dalam label:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
@@ -66,7 +66,7 @@ Ditampilkan sebagai: `Nairobi Central Clinic (Nairobi)`.
 
 ### Menggunakan ekspresi `@{func}`
 
-Terapkan logika kondisional dalam label tampilan:
+Menerapkan logika kondisional dalam label tampilan:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Hasil aktif menampilkan `✓ Clinic Name`; tidak aktif menampilkan `✗ Clinic Name`.
+Hasil yang aktif menampilkan `✓ Nama Klinik`; yang tidak aktif menampilkan `✗ Nama Klinik`.
 
 ---
 
-## Mengatur nilai default: `search-default-api()`
+## Menetapkan nilai default: `search-default-api()`
 
-Gunakan `search-default-api()` setelah `search-api()` untuk mengisi bidang terlebih dahulu dengan pilihan default yang dimuat dari panggilan API terpisah (misalnya, saat mengedit catatan yang ada):
+Gunakan `search-default-api()` setelah `search-api()` untuk mengisi bidang terlebih dahulu dengan pilihan default yang dimuat dari panggilan API terpisah (misalnya, saat mengedit rekaman yang ada):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -103,35 +103,94 @@ Pemisah default adalah spasi.
 ## Tipe pertanyaan yang didukung
 
 | Tipe pertanyaan | Kasus penggunaan |
-|----------------|-----------------|
+|---------------|----------|
 | `select_one` | Pilihan tunggal dari hasil pencarian |
 | `select_multiple` | Beberapa pilihan dari hasil pencarian |
-| `text` | Pelengkap otomatis — enumerator mengetik bebas tetapi dapat memilih saran |
+| `text` | Autocomplete — enumerator mengetik dengan bebas tetapi dapat memilih saran |
 
 ---
 
 ## Menggunakan data respons yang disimpan
 
-`save_path` menyimpan objek respons API lengkap di bawah nama yang diberikan. Bidang lain dapat mereferensikannya dengan `pulldata()`:
+Ketika enumerator memilih hasil, rtSurvey menyimpan objek pencocokan lengkap dari respons di bawah nama `save_path`. Bidang lain dapat membacanya dengan dua cara.
+
+### Metode 1 — pencarian `pulldata()`
+
+Gunakan `pulldata('save_path', 'key')` untuk membaca bidang tingkat atas dari objek yang disimpan:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Pilih fasilitas | `search-api(..., 'facility_data')` |
+| select_one | facility | Pilih fasilitas | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+Tampilan pada baris `select_one` harus menyertakan `search-api(..., 'facility_data')` dengan `save_path` yang sesuai.
+
+Untuk **bidang JSON bersarang**, gabungkan dengan `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## Pencarian file lokal dengan search()
+
+`search()` melakukan pencarian offline berbasis kesamaan kolom terhadap file SQLite `.db` yang dibundel — tidak memerlukan koneksi jaringan dan kueri SQL. Gunakan ini ketika data referensi Anda dikemas dengan formulir dan Anda memerlukan pencarian sederhana "temukan semua baris di mana kolom sama dengan nilai".
+
+### Signature
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parameter
+
+| Parameter | Deskripsi |
+|-----------|-------------|
+| `path` | Jalur ke tabel SQLite: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Operator pencocokan — mengembalikan baris di mana kolom sama dengan nilai |
+| `'list_name'` | Nama kolom yang akan dicocokkan |
+| `${field}` | Nilai yang akan dicocokkan; biasanya referensi bidang |
+
+### Contoh
+
+Mengisi `select_one` dari database lokal dengan mencocokkan nilai `${d307}` terhadap kolom `list_name` dalam tabel `externalData` di `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Pilih fasilitas | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Ketika `${d307}` sama dengan `"HF001"`, `search()` mengembalikan setiap baris dalam `externalData` di mana `list_name = 'HF001'` — sepenuhnya dari file yang dibundel, tanpa panggilan jaringan.
+
+### search() vs autocomplete rawquery
+
+| Fitur | `search()` | autocomplete `rawquery` |
+|---------|-----------|------------------------|
+| Kueri SQL | Tidak — hanya kesamaan kolom | Ya — `SELECT … FROM …` lengkap |
+| Input berparameter | Pencocokan nilai kolom | Tertanam dalam string SQL |
+| Entri teks bebas | Ya — enumerator dapat mengetik dengan bebas | Tidak — harus memilih dari daftar |
+| UNION / multi-tabel | Tidak didukung | Didukung |
+
+### Kapan menggunakan masing-masing
+
+- Gunakan **`search()`** ketika Anda memerlukan pencocokan kesamaan langsung terhadap file `.db` yang dibundel, formulir harus bekerja offline, dan Anda ingin mengizinkan entri teks bebas.
+- Gunakan **autocomplete `rawquery`** ketika Anda memerlukan fleksibilitas SQL (JOIN, UNION, kolom hasil perhitungan) atau harus melakukan kueri di beberapa tabel, dan formulir memiliki konektivitas yang andal.
 
 ---
 
 ## Praktik Terbaik
 
 1. Pastikan endpoint API Anda merespons dalam 1–2 detik — API yang lambat membuat pencarian terasa tidak responsif.
-2. Gunakan `%__input__%` dalam `post_body` sehingga API hanya mengembalikan hasil yang cocok, bukan seluruh dataset.
-3. Indeks bidang pencarian di sisi server (misalnya, Elasticsearch, indeks teks lengkap database) untuk respons yang cepat.
-4. Batasi hasil hingga 20–50 item per kueri — mengembalikan ribuan hasil mengalahkan tujuan pencarian.
-5. Sertakan persyaratan panjang input minimum dalam API untuk menghindari memicu kueri luas pada input karakter tunggal.
+2. Gunakan `%__input__%` dalam `post_body` sehingga API hanya mengembalikan hasil yang cocok, bukan seluruh kumpulan data.
+3. Berikan indeks pada bidang pencarian di sisi server (misalnya, Elasticsearch, indeks teks lengkap database) untuk respons cepat.
+4. Batasi hasil menjadi 20–50 item per kueri — mengembalikan ribuan hasil mengalahkan tujuan pencarian.
+5. Sertakan persyaratan panjang input minimum di API untuk menghindari pemicuan kueri luas pada input satu karakter.
 
-## Keterbatasan
+## Batasan
 
-- Pencarian Dinamis memerlukan konektivitas jaringan — tidak berfungsi secara offline.
+- Pencarian Dinamis memerlukan konektivitas jaringan — ini tidak berfungsi secara offline.
 - Placeholder `%__input__%` disuntikkan apa adanya; sanitasi input di sisi server untuk mencegah serangan injeksi.
 - Ekspresi tampilan `@{func}` yang kompleks mungkin memiliki dukungan terbatas di semua versi klien rtSurvey.

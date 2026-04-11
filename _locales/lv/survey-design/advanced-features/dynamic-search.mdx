@@ -1,15 +1,15 @@
 ---
 title: "Dinamiskā meklēšana"
-description: "Dinamiskā meklēšana ielādē izvēles no attāla API reāllaikā, kad enumerators raksta, ļaujot lielas vai bieži atjauninātas datu kopas."
+description: "Dinamiskā meklēšana ielādē izvēles iespējas no attāla API reāllaikā, kad anketētājs raksta, ļaujot izmantot lielas vai bieži atjauninātas datu kopas."
 ---
 
-**Dinamiskā meklēšana** (saukta arī Meklēšanas API) ļauj `select_one`, `select_multiple` vai `text` laukam ielādēt izvēles no attāla tīmekļa pakalpojuma **izpildlaikā**, kad enumerators raksta. Šī ir pareizā pieeja, ja izvēļu saraksts ir pārāk liels, lai to iekļautu CSV failā, tiek bieži atjaunināts vai nāk no dzīvas datu bāzes.
+**Dinamiskā meklēšana** (saukta arī par Search API) ļauj `select_one`, `select_multiple` vai `text` laukam ielādēt izvēles iespējas no attāla tīmekļa pakalpojuma **izpildes laikā**, kamēr anketētājs raksta. Šī ir pareizā pieeja, ja jūsu izvēles saraksts ir pārāk liels, lai to iekļautu CSV failā, tas tiek bieži atjaunināts vai tiek iegūts no tiešraides datubāzes.
 
 ---
 
 ## `search-api()` izskats
 
-Dinamiskā meklēšana tiek konfigurēta, izmantojot kolonnu `appearance` ar funkciju `search-api()`:
+Dinamiskā meklēšana tiek konfigurēta, izmantojot stabiņu `appearance` un funkciju `search-api()`:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -20,16 +20,177 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 | Parametrs | Apraksts |
 |-----------|-------------|
 | `method` | Vienmēr izmantojiet `'POST'` |
-| `url` | API galapunkts vaicājumam |
-| `post_body` | JSON pamatteksts, kas nosūtīts uz API. Izmantojiet `%__input__%` kā vietturi enumeratora pašreizējā meklēšanas tekstam |
-| `value_column` | API atbildes lauks, ko saglabāt kā izvēlēto vērtību |
-| `display` | API atbildes lauks, ko rādīt kā etiķeti |
-| `data_path` | JSONPath uz masīvu atbildē (piemēram, `$.data`) |
-| `save_path` | Papildu lauks saglabāšanai (neobligāts) |
+| `url` | API galapunkts, kuram veikt vaicājumu |
+| `post_body` | API nosūtītais JSON saturs. Izmantojiet `%__input__%` kā vietturi anketētāja pašreizējam meklēšanas tekstam |
+| `value_column` | Atslēga atbildes objektā, ko izmantot kā saglabāto **vērtību** |
+| `display` | Atslēga (vai veidne), ko izmantot kā nolaižamajā sarakstā redzamo **etiķeti**. Atbalsta `##key##` vietturus un `@{func}` izteiksmes |
+| `data_path` | JSONPath uz rezultātu objektu masīvu atbildē (piemēram, `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Nosaukums, zem kura tiek saglabāta neapstrādātā atbilde izmantošanai citos laukos |
+
+---
+
+## Pamata piemērs
+
+Veselības iestāžu meklēšana, kur anketētājs ieraksta daļu no iestādes nosaukuma:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Izvēlieties veselības iestādi | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+
+API saņem `{"query": "nair"}`, kad anketētājs ieraksta "nair", un atgriež:
+
+```json
+{
+  "results": [
+    {"id": "HF001", "name": "Nairobi Central Clinic"},
+    {"id": "HF002", "name": "Nairobi West Hospital"}
+  ]
+}
+```
+
+Nolaižamajā sarakstā tiek rādīts `Nairobi Central Clinic` un `Nairobi West Hospital`; saglabātā vērtība ir `HF001` vai `HF002`.
+
+---
+
+## Uzlabota attēlošanas formatēšana
+
+### `##key##` veidņu izmantošana
+
+Rādīt vairākus laukus etiķetē:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
+```
+
+Attēlots kā: `Nairobi Central Clinic (Nairobi)`.
+
+### `@{func}` izteiksmju izmantošana
+
+Lietot nosacījumu loģiku etiķetē:
+
+```
+search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
+  '@{if_else(eq("##status##", "active"), "✓ ##name##", "✗ ##name##")}',
+  '$.data', 'res')
+```
+
+Aktīvie rezultāti rāda `✓ Clinic Name`; neaktīvie rāda `✗ Clinic Name`.
+
+---
+
+## Noklusējuma vērtības iestatīšana: `search-default-api()`
+
+Izmantojiet `search-default-api()` pēc `search-api()`, lai iepriekš aizpildītu lauku ar noklusējuma izvēli, kas ielādēta no atsevišķa API izsaukuma (piemēram, rediģējot esošu ierakstu):
+
+```
+appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
+```
+
+---
+
+## Pielāgots atdalītājs priekš select_multiple: `search-default-separator()`
+
+Laukiem `select_multiple` norādiet, kā vairākas atlasītās vērtības tiek apvienotas saglabātajā virknē:
+
+```
+appearance: search-api(...) search-default-separator(' || ')
+```
+
+Noklusējuma atdalītājs ir atstarpe.
+
+---
+
+## Atbalstītie jautājumu veidi
+
+| Jautājuma veids | Lietošanas gadījums |
+|---------------|----------|
+| `select_one` | Viena atlase no meklēšanas rezultātiem |
+| `select_multiple` | Vairākas atlases no meklēšanas rezultātiem |
+| `text` | Automātiskā pabeigšana — anketētājs raksta brīvi, bet var izvēlēties ieteikumu |
+
+---
+
+## Saglabāto atbildes datu izmantošana
+
+Kad anketētājs izvēlas rezultātu, rtSurvey saglabā pilnu atbilstošo objektu no atbildes ar nosaukumu `save_path`. Citi lauki var lasīt no tā divos veidos.
+
+### 1. metode — `pulldata()` meklēšana
+
+Izmantojiet `pulldata('save_path', 'key')`, lai nolasītu augstākā līmeņa lauku no saglabātā objekta:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one | facility | Izvēlieties iestādi | |
+| calculate | facility_district | | `pulldata('facility_data', 'district')` |
+| calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+`select_one` rindas appearance kolonnā jāiekļauj `search-api(..., 'facility_data')` ar atbilstošo `save_path`.
+
+**Iegultiem JSON laukiem** kombinējiet ar `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## Lokālo failu meklēšana ar search()
+
+`search()` veic bezsaistes, stabiņu vienādības meklēšanu pievienotā SQLite `.db` failā — nav nepieciešams tīkla savienojums un SQL vaicājumi. Izmantojiet to, ja jūsu atsauces dati ir iepakoti kopā ar veidlapu un jums ir nepieciešama vienkārša "atrast visas rindas, kur stabiņš ir vienāds ar vērtību" meklēšana.
+
+### Paraksts
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parametri
+
+| Parametrs | Apraksts |
+|-----------|-------------|
+| `path` | Ceļš uz SQLite tabulu: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Atbilstības operators — atgriež rindas, kurās stabiņš ir vienāds ar vērtību |
+| `'list_name'` | Stabiņa nosaukums, kurā meklēt atbilstību |
+| `${field}` | Vērtība, kurai jāatbilst; parasti atsauce uz lauku |
+
+### Piemērs
+
+Aizpildiet `select_one` no lokālas datubāzes, saskaņojot `${d307}` vērtību ar `list_name` stabiņu `externalData` tabulā failā `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Izvēlieties iestādi | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Ja `${d307}` ir vienāds ar `"HF001"`, `search()` atgriež katru rindu tabulā `externalData`, kur `list_name = 'HF001'` — pilnībā no pievienotā faila, bez tīkla izsaukuma.
+
+### search() pret rawquery automātisko pabeigšanu
+
+| Funkcija | `search()` | `rawquery` automātiskā pabeigšana |
+|---------|-----------|------------------------|
+| SQL vaicājumi | Nē — tikai stabiņu vienādība | Jā — pilns `SELECT … FROM …` |
+| Parametrizēta ievade | Stabiņa vērtības atbilstība | Iegults SQL virknē |
+| Brīvā teksta ievade | Jā — anketētājs var rakstīt brīvi | Nē — jāizvēlas no saraksta |
+| UNION / vairākas tabulas | Netiek atbalstīts | Tiek atbalstīts |
+
+### Kad izmantot kuru
+
+- Izmantojiet **`search()`**, ja jums ir nepieciešama vienkārša vienādības atbilstība pret pievienotu `.db` failu, veidlapai jādarbojas bezsaistē un vēlaties atļaut brīva teksta ievadi.
+- Izmantojiet **`rawquery` automātisko pabeigšanu**, ja jums ir nepieciešama SQL elastība (JOIN, UNION, aprēķinātie stabiņi) vai jāveic vaicājumi vairākās tabulās, un veidlapai ir uzticams savienojums.
+
+---
 
 ## Labākā prakse
 
-1. Iestatiet saprātīgus API taimautus — lēnas atbildes pasliktina enumeratoru pieredzi.
-2. Izmantojiet dinamisko meklēšanu tikai tad, kad saraksts patiešām ir pārāk liels CSV failam.
-3. Pārbaudiet bezsaistē — dinamiskā meklēšana prasa interneta savienojumu.
-4. Apsveriet filtrēšanu pēc iepriekšējiem lauka vērtībām, lai ierobežotu meklēšanas rezultātus.
+1. Pārliecinieties, ka jūsu API galapunkts atbild 1–2 sekunžu laikā — lēni API liek meklēšanai justies nereaģējošai.
+2. Izmantojiet `%__input__%` iekš `post_body`, lai API atgrieztu tikai atbilstošos rezultātus, nevis visu datu kopu.
+3. Indeksējiet meklēšanas lauku servera pusē (piemēram, Elasticsearch, datubāzes pilnteksta indekss), lai nodrošinātu ātru atbildi.
+4. Ierobežojiet rezultātus līdz 20–50 vienumiem vienā vaicājumā — tūkstošiem rezultātu atgriešana ir pretrunā ar meklēšanas mērķi.
+5. API iekļaujiet minimālo ievades garuma prasību, lai izvairītos no plašu vaicājumu aktivizēšanas pie viena rakstzīmes ievades.
+
+## Ierobežojumi
+
+- Dinamiskajai meklēšanai ir nepieciešams tīkla savienojums — tā nedarbojas bezsaistē.
+- `%__input__%` vietturis tiek ievietots tāds, kāds tas ir; sanitizējiet ievadi servera pusē, lai novērstu injekcijas uzbrukumus.
+- Sarežģītām `@{func}` attēlošanas izteiksmēm var būt ierobežots atbalsts visās rtSurvey klientu versijās.

@@ -1,0 +1,118 @@
+---
+title: "Ses Kaydı"
+description: "Metin alanlarında audio-start ve audio-end görünümlerini kullanarak anket veri toplama sırasında ortam veya mülakat sesini kaydedin."
+---
+
+Ses kaydı, bir formun anketin bir bölümü sırasında sessizce veya görünür şekilde ses yakalamasına olanak tanır. Mülakatları, saha gözlemleri sırasında ortam sesini veya yapılandırılmış cevapları tamamlayan sözlü yanıtları kaydetmek için kullanışlıdır.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Yalnızca mobil uygulama.** Ses kaydı rtSurvey mobil uygulamasını gerektirir. Web formunda `audio-start` ve `audio-end` görünümleri sessizce yoksayılır; herhangi bir kayıt yapılmaz ve hata gösterilmez. Ses kaydı gerektiğinde her zaman cihaz üzerinde test yapın.
+</Callout>
+
+---
+
+## Nasıl çalışır?
+
+Ses kaydı, **işaretleyici** olarak işlev gören iki `text` alanı tarafından kontrol edilir:
+
+- `audio-start` görünümüne sahip bir alan, anketör ona ulaştığında kaydı başlatır.
+- `audio-end` görünümüne sahip bir alan, kaydı durdurur ve ses dosyasını gönderime kaydeder.
+
+Her iki işaretleyici alan da `text` tipindedir. Görünür olabilseler de, genellikle anketörden gizlenirler (`relevant = false` kullanarak veya etkileşimli olmayan bir konuma yerleştirilerek). Kaydedilen ses, gönderime `audio-end` alanına bağlı bir dosya olarak eklenir.
+
+---
+
+## Temel örnek
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Katılımcı adı | |
+| text | q_occupation | Meslek | |
+| integer | q_age | Yaş | |
+| text | audio_e_a1 | | `audio-end` |
+
+Uygulama, anketör `audio_s_a1` alanına ulaştığında kaydı başlatır ve `audio_e_a1` alanına ulaştığında durdurur. İki işaretleyici arasındaki tüm sorular kaydedilir.
+
+---
+
+## Sessiz kayıt: `audio-start invisible`
+
+Varsayılan olarak, mobil uygulama ses yakalanırken bir kayıt göstergesi görüntüler. Görünüme `invisible` eklemek bu göstergeyi bastırır, böylece kayıt katılımcıya görünür bir ipucu olmadan gerçekleşir.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Katılmayı kabul ediyor musunuz? | |
+| text | q_feedback | Geri bildiriminiz | |
+| text | audio_e_a1 | | `audio-end` |
+
+`invisible` seçeneğini yalnızca bilgilendirme gereklilikleri başka yollarla (örneğin, kayıt bölümünden önce ayrı bir yazılı onay alanı) karşılandığında kullanın.
+
+---
+
+## Adlandırma kuralı
+
+Üretim formları, işaretleyici alanları için tutarlı bir adlandırma düzeni kullanır:
+
+```
+audio_s_{section}{n}   — başlangıç işaretçisi
+audio_e_{section}{n}   — bitiş işaretçisi
+```
+
+Burada `{section}` form bölümü için kısa bir etiket ve `{n}` o bölüm içindeki ardışık bir sayıdır.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | A bölümündeki ilk kayıt |
+| `audio_e_a1` | End | A bölümündeki ilk kaydın sonu |
+| `audio_s_b1` | Start | B bölümündeki ilk kayıt |
+| `audio_e_b1` | End | B bölümündeki ilk kaydın sonu |
+| `audio_s_a2` | Start | A bölümündeki ikinci kayıt |
+| `audio_e_a2` | End | A bölümündeki ikinci kaydın sonu |
+
+Bu kurala uymak, form tanımlarını ve gönderim verilerini incelerken kayıt sınırlarını belirlemeyi kolaylaştırır.
+
+---
+
+## Depolama ve erişim
+
+Anketör `audio-end` alanına ulaştığında, uygulama ses dosyasını sonlandırır ve gönderime ekler. Dosya:
+
+- Gönderimde `audio-end` alan adıyla ilişkili bir ses eki olarak saklanır.
+- rtSurvey arka uç gönderim görüntüleyicisinde diğer medya eklerinin yanında erişilebilir.
+- Standart gönderim dışa aktarımı yoluyla indirilebilir; ses dosyaları `audio-end` alan adına karşılık gelen medya sütununda görünür.
+
+Dosya formatı ve bit hızı cihaza ve uygulama sürümüne bağlıdır.
+
+---
+
+## Birden fazla kayıt bölümü
+
+Bir form, birbiriyle örtüşmeyen birkaç kayıt bölümü içerebilir. Her bir `audio-start` / `audio-end` işaretçi çifti tamamen kapsanmalıdır; bölümler iç içe geçmemelidir.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Giriş | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Detaylar | |
+| text | audio_e_b1 | | `audio-end` |
+
+Her bölüm, ilgili `audio-end` alanına eklenmiş ayrı bir ses dosyası oluşturur.
+
+---
+
+## Sınırlamalar
+
+- **Yalnızca mobil uygulama.** Bu özellik web formunda desteklenmez. `audio-start` ve `audio-end` bir tarayıcıda sessizce yoksayılır.
+- **İç içe geçme yok.** Kayıt bölümleri birbiriyle örtüşemez. Önceki `audio-end` işaretçisine ulaşılmadan yeni bir kayıt başlatılması desteklenmez.
+- **Alan türü `text` olmalıdır.** Herhangi bir başka soru türünde `audio-start` veya `audio-end` kullanılması desteklenmez.
+- **Yükleme boyutu.** Uzun kayıtlar büyük dosyalar oluşturur. Sahadaki gönderim boyutu sınırlarının ve ağ koşullarının farkında olun.
+- **Kayıt sırasında duraklatma yok.** Kayıt, başlangıç işaretçisinden bitiş işaretçisine kadar kesintisiz çalışır; bir bölüm içinde duraklatma ve devam ettirme mekanizması yoktur.

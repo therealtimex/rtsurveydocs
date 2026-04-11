@@ -1,0 +1,118 @@
+---
+title: "音频录制"
+description: "在调查数据收集过程中，通过在文本字段上使用 audio-start 和 audio-end 外观来录制环境或采访音频。"
+---
+
+音频录制允许表单在调查的某个部分期间静默或公开地捕获音频。它对于录制采访、实地观察期间的环境声音或作为结构化回答补充的口头回答非常有用。
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**仅限移动应用。** 音频录制需要 rtSurvey 移动应用。在 Web 表单中，`audio-start` 和 `audio-end` 外观会被静默忽略——不会进行录制，也不会显示错误。当需要音频录制时，请始终在设备上进行测试。
+</Callout>
+
+---
+
+## 工作原理
+
+音频录制由两个充当**标记（markers）**的 `text` 字段控制：
+
+- 具有 `audio-start` 外观的字段在调查员到达该字段时开始录制。
+- 具有 `audio-end` 外观的字段停止录制并将音频文件保存到提交内容中。
+
+这两个标记字段都是 `text` 类型。它们通常对调查员隐藏（使用 `relevant = false` 或放置在非交互位置），尽管它们也可以是可见的。录制的音频作为链接到 `audio-end` 字段的文件附加到提交内容中。
+
+---
+
+## 基础示例
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | 受访者姓名 | |
+| text | q_occupation | 职业 | |
+| integer | q_age | 年龄 | |
+| text | audio_e_a1 | | `audio-end` |
+
+当调查员到达 `audio_s_a1` 时，应用开始录制，并在到达 `audio_e_a1` 时停止。两个标记之间的所有问题都会被录制。
+
+---
+
+## 静默录制：`audio-start invisible`
+
+默认情况下，移动应用在捕获音频时会显示录制指示器。在外观中添加 `invisible` 会隐藏此指示器，因此录制过程对受访者没有任何可见提示。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | 您是否同意参加？ | |
+| text | q_feedback | 您的反馈 | |
+| text | audio_e_a1 | | `audio-end` |
+
+仅当已通过其他方式（例如，在录制部分之前的单独书面同意字段）满足告知要求时，才使用 `invisible`。
+
+---
+
+## 命名规范
+
+生产环境的表单对标记字段使用一致的命名模式：
+
+```
+audio_s_{section}{n}   — 开始标记
+audio_e_{section}{n}   — 结束标记
+```
+
+其中 `{section}` 是表单部分的简短标签，`{n}` 是该部分内的顺序编号。
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | A 部分中的第一次录制 |
+| `audio_e_a1` | End | A 部分中第一次录制的结束 |
+| `audio_s_b1` | Start | B 部分中的第一次录制 |
+| `audio_e_b1` | End | B 部分中第一次录制的结束 |
+| `audio_s_a2` | Start | A 部分中的第二次录制 |
+| `audio_e_a2` | End | A 部分中第二次录制的结束 |
+
+遵循此规范可以轻松地在查看表单定义和提交数据时识别录制边界。
+
+---
+
+## 存储与检索
+
+当调查员到达 `audio-end` 字段时，应用会完成音频文件并将其附加到提交内容中。该文件：
+
+- 作为音频附件存储在提交内容中，并与 `audio-end` 字段名称相关联。
+- 可以在 rtSurvey 后端提交查看器中与其他媒体附件一起访问。
+- 可通过标准提交导出下载——音频文件显示在与 `audio-end` 字段名称相对应的媒体列中。
+
+文件格式和比特率取决于设备和应用版本。
+
+---
+
+## 多个录制部分
+
+一个表单可以包含多个不重叠的录制部分。每对 `audio-start` / `audio-end` 标记必须完全包含——各部分不得交错。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | 简介 | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | 详情 | |
+| text | audio_e_b1 | | `audio-end` |
+
+每个部分都会生成一个单独的音频文件，附加到其相应的 `audio-end` 字段。
+
+---
+
+## 限制
+
+- **仅限移动应用。** Web 表单不支持此功能。在浏览器中会静默忽略 `audio-start` 和 `audio-end`。
+- **无嵌套。** 录制部分不能重叠。不支持在达到上一个 `audio-end` 标记之前开始新的录制。
+- **字段类型必须为 `text`。** 不支持在任何其他问题类型上使用 `audio-start` 或 `audio-end`。
+- **上传大小。** 长时间的录制会产生大文件。请注意提交大小限制和现场网络状况。
+- **无录制中暂停。** 录制从开始标记到结束标记连续运行；在同一个部分内没有暂停和恢复机制。

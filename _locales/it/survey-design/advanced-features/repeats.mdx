@@ -1,15 +1,15 @@
 ---
-title: "Ripetizioni avanzate"
-description: "Pattern avanzati per i gruppi di ripetizione: conteggi dinamici, ripetizioni annidate, riepilogo dei dati di ripetizione e riferimento ai valori tra le ripetizioni."
+title: "Ripetizioni Avanzate"
+description: "Modelli avanzati per i gruppi di ripetizione: conteggi dinamici, ripetizioni annidate, riepilogo dei dati di ripetizione e riferimento ai valori tra le ripetizioni."
 ---
 
-Questa pagina copre i pattern avanzati per lavorare con i gruppi di ripetizione in rtSurvey. Per le nozioni di base sulla configurazione di un gruppo di ripetizione, vedi [Raggruppamento e ripetizioni](../repeats).
+Questa pagina copre i modelli avanzati per lavorare con i gruppi di ripetizione in rtSurvey. Per le basi della configurazione di un gruppo di ripetizione, vedi [Raggruppamento e Ripetizioni](../repeats).
 
 ---
 
-## Conteggio dinamico delle ripetizioni
+## Conteggio ripetizioni dinamico
 
-Per impostazione predefinita, l'intervistatore decide quante volte ripetere. Puoi fissare il numero di ripetizioni usando `repeat_count`:
+Per impostazione predefinita, il rilevatore decide quante volte ripetere. È possibile fissare il numero di ripetizioni utilizzando `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,13 +18,13 @@ Per impostazione predefinita, l'intervistatore decide quante volte ripetere. Puo
 | integer | member_age | Età | |
 | end_repeat | | | |
 
-La ripetizione viene eseguita esattamente `${num_members}` volte, dove `num_members` è stato raccolto in precedenza nel modulo. L'intervistatore non può aggiungere o rimuovere istanze.
+La ripetizione viene eseguita esattamente `${num_members}` volte, dove `num_members` è stato raccolto in precedenza nel modulo. Il rilevatore non può aggiungere o rimuovere istanze.
 
 ---
 
 ## Accesso indicizzato: `indexed-repeat()`
 
-Accedi al valore di un campo di un'istanza di ripetizione specifica dall'**esterno** del gruppo di ripetizione usando `indexed-repeat(repeatedField, repeatGroup, index)`:
+Accedi al valore di un campo di una specifica istanza di ripetizione dall'**esterno** del gruppo di ripetizione utilizzando `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -37,20 +37,20 @@ Questo è utile per costruire campi di riepilogo o fare riferimento ai dati del 
 
 ## Posizione dell'istanza corrente: `index()`
 
-All'interno di un gruppo di ripetizione, `index()` restituisce la posizione basata su 1 dell'istanza corrente. Usala per etichettare ogni ripetizione o creare identificatori univoci:
+All'interno di un gruppo di ripetizione, `index()` restituisce la posizione (basata su 1) dell'istanza corrente. Usalo per etichettare ogni ripetizione o creare identificatori univoci:
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | plots | Appezzamento |
 | note | plot_label | Appezzamento numero `${index()}` |
-| text | plot_id | ID appezzamento |
+| text | plot_id | ID Appezzamento |
 | end_repeat | | |
 
 ---
 
 ## Riferimento ai campi nella stessa istanza
 
-All'interno di una ripetizione, usa `${fieldname}` per fare riferimento a un altro campo **nella stessa istanza di ripetizione**. Non è necessario `indexed-repeat()` all'interno dello stesso ciclo:
+All'interno di una ripetizione, usa `${fieldname}` per fare riferimento a un altro campo **nella stessa istanza di ripetizione**. Non è necessario usare `indexed-repeat()` all'interno dello stesso ciclo:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -64,7 +64,7 @@ All'interno di una ripetizione, usa `${fieldname}` per fare riferimento a un alt
 
 ## Riferimento ai campi padre dall'interno di una ripetizione
 
-I campi fuori (sopra) del gruppo di ripetizione possono essere referenziati normalmente con `${fieldname}`:
+I campi all'esterno (sopra) il gruppo di ripetizione possono essere riferiti normalmente con `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
@@ -77,7 +77,7 @@ I campi fuori (sopra) del gruppo di ripetizione possono essere referenziati norm
 
 ## Riepilogo dei dati di ripetizione
 
-Usa le funzioni aggregate di ripetizione **fuori** dal gruppo di ripetizione per riassumere:
+Usa le funzioni di aggregazione delle ripetizioni **all'esterno** del gruppo di ripetizione per riepilogare:
 
 | Funzione | Esempio | Descrizione |
 |----------|---------|-------------|
@@ -108,47 +108,143 @@ Usa le funzioni aggregate di ripetizione **fuori** dal gruppo di ripetizione per
 
 ## Ripetizioni annidate
 
-Un gruppo di ripetizione può contenere un altro gruppo di ripetizione. Usalo con attenzione — le ripetizioni annidate aggiungono complessità e possono confondere gli intervistatori.
+Un gruppo di ripetizione può contenere un altro gruppo di ripetizione. Usa questa funzione con cautela: le ripetizioni annidate aggiungono complessità e possono confondere i rilevatori.
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | households | Nucleo familiare |
-| text | hh_id | ID nucleo familiare |
+| text | hh_id | ID Nucleo familiare |
 | begin_repeat | hh_members | Membro |
 | text | member_name | Nome del membro |
 | end_repeat | | |
 | end_repeat | | |
 
-Per fare riferimento a un campo in una ripetizione esterna dall'interno di quella interna, usa `${fieldname}` — si risolve all'antenato corrispondente più vicino:
+Per fare riferimento a un campo in una ripetizione esterna dalla ripetizione interna, usa `${fieldname}`: si risolve nell'antenato corrispondente più vicino:
 
 All'interno della ripetizione `hh_members`, `${hh_id}` restituisce l'ID del nucleo familiare **corrente**, non di tutti i nuclei familiari.
 
 ---
 
-## Rank all'interno dei gruppi di ripetizione: `rank-index()`
+## Rango all'interno dei gruppi di ripetizione: `rank-index()`
 
-Quando un campo `rank` esiste all'interno di una ripetizione, usa `rank-index(instanceNumber, repeatedField)` dall'esterno per ottenere il rank ordinale di un'istanza specifica:
+Quando esiste un campo `rank` all'interno di una ripetizione, usa `rank-index(instanceNumber, repeatedField)` dall'esterno per ottenere il rango ordinale di una specifica istanza:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` restituisce l'indice di istanza del punteggio più alto.
+`rank-index(1, ${score})` restituisce l'indice dell'istanza con il punteggio più alto.
 
 ---
 
-## Best practice
+## Aspetto `1screen` su `begin_repeat`
 
-1. Usa sempre `repeat_count` quando il numero di ripetizioni è noto in anticipo — impedisce agli intervistatori di aggiungere o rimuovere accidentalmente istanze.
-2. Mantieni i gruppi di ripetizione focalizzati — una ripetizione con più di 20 domande per istanza è difficile da navigare.
-3. Nomina chiaramente i gruppi di ripetizione (es. `household_members`, non `repeat1`) — il nome appare nelle chiamate di funzione e nei dati esportati.
-4. Testa con il numero massimo atteso di istanze per verificare le prestazioni.
-5. Usa l'appearance `field-list` sul gruppo di ripetizione per mostrare tutti i campi su un'unica schermata per istanza (mobile).
+L'aggiunta di `1screen` alla colonna `appearance` di una riga `begin_repeat` visualizza tutte le domande per ogni istanza insieme su una singola schermata, invece di una domanda per schermata.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Membro del nucleo familiare | `1screen` |
+| text | member_name | Nome del membro | |
+| integer | member_age | Età | |
+| end_repeat | | | |
+
+Quando `1screen` è impostato e non c'è il campo `repeat_count` né il campo `add_repeat` all'interno del gruppo, rtSurvey visualizza automaticamente un pulsante circolare **+** in fondo alla schermata, in modo che i rilevatori possano aggiungere nuove istanze senza alcuna configurazione extra.
+
+| Aspetto | Una schermata per istanza | Pulsante + predefinito aggiunto |
+|------------|--------------------------|---------------------------------|
+| `1screen` | Sì | Sì (quando non c'è un figlio `add_repeat`) |
+| `field-list` | Sì | No |
+
+Usa `field-list` quando desideri il layout raggruppato senza il pulsante di aggiunta automatica. Usa `1screen` quando desideri sia il layout raggruppato che un modo integrato per aggiungere istanze.
+
+---
+
+## Pulsante di aggiunta personalizzato `add_repeat`
+
+Un campo `note` (o `text`) posizionato **all'interno** del gruppo di ripetizione con `appearance: add_repeat` viene visualizzato come un pulsante "Aggiungi" a larghezza intera. L'etichetta del pulsante proviene dalla colonna `label` del campo. Quando è presente un campo `add_repeat`, il pulsante circolare + predefinito (da `1screen`) viene soppresso.
+
+Posiziona il campo `add_repeat` come ultimo campo all'interno del gruppo di ripetizione:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Membro | `1screen` |
+| text | member_name | Nome del membro | |
+| integer | member_age | Età | |
+| note | btn_add | + Aggiungi membro | `add_repeat` |
+| end_repeat | | | |
+
+### Personalizzazione del colore
+
+Passa un codice colore all'interno del valore dell'aspetto per personalizzare lo stile del pulsante:
+
+| Valore aspetto | Risultato |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Sfondo verde, colore del testo predefinito |
+| `add_repeat 04B404-ffffff` | Sfondo verde, testo bianco |
+
+Il primo colore è lo sfondo e il secondo (dopo il trattino) è il colore del testo. Ometti il simbolo `#` quando usi la forma separata dal trattino.
+
+### Variante icona
+
+Usa `add_repeat icon` (con uno spazio) per visualizzare un pulsante icona circolare compatto invece del pulsante a larghezza intera:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Aggiungi | `add_repeat icon` |
+
+---
+
+## Pulsanti di eliminazione: `delete-repeat-current` e `delete-repeat-last`
+
+Un campo `note` all'interno del gruppo di ripetizione con `appearance: delete-repeat-current` o `appearance: delete-repeat-last` viene visualizzato come un pulsante di eliminazione diviso.
+
+| Aspetto | Azione |
+|------------|--------|
+| `delete-repeat-current` | Elimina l'istanza corrente (attiva) |
+| `delete-repeat-last` | Elimina l'ultima istanza della ripetizione |
+
+Il pulsante predefinito (senza icona) è un pulsante diviso: un'icona del cestino a sinistra e il testo dell'etichetta del campo a destra, che copre l'intera larghezza della schermata.
+
+### Variante icona
+
+Aggiungi `-icon` per ottenere un pulsante icona del cestino circolare compatto:
+
+| Aspetto | Risultato |
+|------------|--------|
+| `delete-repeat-current-icon` | Icona cestino circolare, elimina l'istanza corrente |
+| `delete-repeat-last-icon` | Icona cestino circolare, elimina l'ultima istanza |
+
+### Personalizzazione del colore
+
+Il formato del colore è identico a `add_repeat`: usa `<#RRGGBB/>` o `RRGGBB-RRGGBB` (sfondo-testo).
+
+### Esempio di modello completo
+
+La seguente ripetizione utilizza `1screen`, un pulsante circolare elimina-corrente in alto e un pulsante aggiungi a larghezza intera in basso:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Membro | `1screen` |
+| note | btn_del | Rimuovi | `delete-repeat-current-icon` |
+| text | member_name | Nome del membro | |
+| integer | member_age | Età | |
+| note | btn_add | + Aggiungi membro | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## Buone Pratiche
+
+1. Usa sempre `repeat_count` quando il numero di ripetizioni è noto in anticipo: impedisce ai rilevatori di aggiungere o rimuovere accidentalmente istanze.
+2. Mantieni i gruppi di ripetizione focalizzati: una ripetizione con più di 20 domande per istanza è difficile da navigare.
+3. Nomina chiaramente i gruppi di ripetizione (ad esempio, `household_members`, non `repeat1`): il nome appare nelle chiamate alle funzioni e nei dati esportati.
+4. Esegui test con il numero massimo previsto di istanze per verificare le prestazioni.
+5. Usa `1screen` su `begin_repeat` per mostrare tutte le domande su una schermata per istanza, abbinato a un campo nota `add_repeat` all'interno del gruppo per fornire ai rilevatori un pulsante "Aggiungi" chiaramente etichettato.
 
 ---
 
 ## Limitazioni
 
-- `indexed-repeat()` richiede un indice valido (da 1 al conteggio delle istanze) — gli indici fuori range restituiscono vuoto.
-- Le ripetizioni annidate oltre 2 livelli non sono raccomandate e possono causare problemi di visualizzazione su alcuni client.
-- Le funzioni aggregate (`sum`, `count`, ecc.) operano sull'intero gruppo di ripetizione — non puoi aggregare un sottoinsieme di istanze senza le varianti `*-if`.
+- `indexed-repeat()` richiede un indice valido (da 1 al conteggio delle istanze); gli indici fuori intervallo restituiscono un valore vuoto.
+- Le ripetizioni annidate oltre i 2 livelli non sono raccomandate e potrebbero causare problemi di visualizzazione su alcuni client.
+- Le funzioni di aggregazione (`sum`, `count`, ecc.) operano sull'intero gruppo di ripetizione; non è possibile aggregare un sottoinsieme di istanze senza le varianti `*-if`.

@@ -1,0 +1,224 @@
+---
+title: "Pretraga lokalne baze podataka"
+description: "Pretraga lokalne baze podataka upućuje upite priloženoj SQLite .db datoteci koristeći sirovi SQL, omogućavajući brzo oflajn automatsko dopunjavanje za velike statičke skupove podataka."
+---
+
+import { Callout } from 'nextra/components'
+
+**Pretraga lokalne baze podataka** omogućava polju `select_one` ili `text` da upućuje upite SQLite `.db` datoteci koja je priložena uz medijski paket obrasca — potpuno oflajn, bez komunikacije sa serverom. Ovo je ispravan pristup kada je vaša lista izbora velika i statična (npr. nacionalna lista sela, zdravstvenih ustanova ili administrativnih granica) a povezivanje se ne može garantovati.
+
+| Pristup | Izvor podataka | Zahteva povezivanje |
+|---|---|---|
+| Pretraga lokalne baze podataka (`rawquery`) | Priložena `.db` datoteka (SQLite) | Ne |
+| `search-api()` | Udaljeni REST API | Da |
+| `search()` | Priložena CSV datoteka | Ne |
+
+---
+
+## Varijante izgleda (Appearance)
+
+Polje za automatsko dopunjavanje se konfiguriše preko kolone `appearance`. Dostupne su tri varijante:
+
+| Varijanta | Napomene |
+|---|---|
+| `search-autocomplete-noedit(...)` | Standardno automatsko dopunjavanje — anketar mora da izabere sa liste; unos slobodnog teksta se ne čuva |
+| `search-autocomplete-noedit-v2(...)` | Preporučena varijanta — isto ponašanje, ali koristi ažurirani mehanizam za prikazivanje sa boljim performansama na velikim skupovima rezultata |
+| `search(...)` | Jednostavno podudaranje zasnovano na priloženoj CSV datoteci; **ne** podržava sirovi SQL — navedeno ovde samo radi poređenja |
+
+<Callout type="info">
+`search-autocomplete-noedit` je alias — prilikom parsiranja aplikacija ga zamenjuje nazivom interne funkcije `searchAutocompleteNoedit`. Koristite bilo koji zapis u svom XLSForm-u; oba rade.
+</Callout>
+
+---
+
+## Izvor podataka `rawquery`
+
+Da biste pokrenuli SQL upit nad `.db` datotekom, prosledite `'rawquery'` kao prvi argument funkcije izgleda. Pun potpis je:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parametri
+
+| Pozicija | Parametar | Opis |
+|---|---|---|
+| 1 | `'rawquery'` | Doslovni string — govori aplikaciji da direktno izvrši SQL |
+| 2 | `db_path` | Putanja do SQLite datoteke, u obliku `<dir>/<file>.db::tableName`. Sufiks `::tableName` se uklanja prilikom otvaranja datoteke; naziv tabele se koristi unutar vašeg SQL-a |
+| 3 | `'[display_col]'` | Kolona koja se prikazuje u padajućoj listi. Okružujuće zagrade `[ ]` se uklanjaju tokom izvršavanja |
+| 4 | `'value_col'` | Kolona čija se vrednost čuva kada anketar izvrši izbor |
+| 5 | `'SELECT ...'` | Bilo koja važeća SQLite SELECT naredba. `SELECT DISTINCT` se automatski ubacuje ako `DISTINCT` već nije prisutan |
+| 6+ | `param1, ...` | Opciono. Vrednosti vezane za `?` mesta u SQL-u, po redu. Ako SQL sadrži `?` ali parametri nisu dostavljeni, polje vraća prazan rezultat (ugrađena zaštita od nedostajućih argumenata) |
+
+### Konvencija `db_path`
+
+Datoteka baze podataka se nalazi unutar priloženog medijskog direktorijuma obrasca. Tokom izvršavanja, `pulldata('app-api', 'family_path')` vraća tu putanju direktorijuma. Pogledajte [family_path](family-path) za detalje podešavanja. Standardni obrazac je:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Kada aplikacija otvori datoteku, ona uklanja deo `::tableName` i koristi samu putanju datoteke. Naziv tabele se pojavljuje samo unutar vašeg SQL-a.
+
+---
+
+## Osnovni primer — pretraga provincije
+
+Padajuća lista provincija samo za čitanje podržana priloženom `vnxa3.db` datotekom:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Provincija | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+Kolona `appearance` (proširena radi lakšeg čitanja):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Prikazana oznaka dolazi iz kolone `provv`.
+- Sačuvana vrednost dolazi iz kolone `provid`.
+- Prikazuju se samo redovi gde je `rta_filter = "1"`.
+
+---
+
+## Parametrizovani upiti
+
+Koristite `?` mesta u svom SQL-u i prosledite odgovarajuće reference polja kao dodatne argumente (pozicije 6 i dalje). Ovo je standardni obrazac za kaskadne izbore — npr. učitavanje okruga koji pripadaju prethodno izabranoj provinciji.
+
+<Callout type="warning">
+Ako vaš SQL sadrži bar jedan `?` a argumenti parametara nisu dostavljeni, polje vraća prazan skup rezultata. Ovo sprečava pojavljivanje zastarelih ili nefiltriranih podataka pre nego što se izvrši roditeljski izbor.
+</Callout>
+
+### Primer kaskade okruga
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+Vrednost `${province}` je vezana za prvi `?`. Polje je prazno dok anketar ne izabere provinciju.
+
+### Primer sa dva parametra — kaskada opština
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parametri su vezani poziciono: `${province}` → prvi `?`, `${district}` → drugi `?`.
+
+---
+
+## UNION SELECT za specijalne vrednosti
+
+Ubacite sintetičke redove — kao što su "Ne znam" ili "Odbija da odgovori" — direktno u SQL koristeći `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Ne znam</i>", "888"')
+```
+
+Konvencije korišćene u RTSurvey obrascima:
+
+| Kod | Značenje |
+|---|---|
+| `888` | Ne znam |
+| `999` | Odbija da odgovori |
+
+HTML oznake kao što je `<i>` u stringu za prikaz se renderuju od strane aplikacije — možete ih koristiti da vizuelno razlikujete specijalne opcije.
+
+---
+
+## Višejezični prikaz
+
+Čuvajte oznake specifične za jezik u odvojenim kolonama (npr. `label_vi`, `label_en`) i izaberite odgovarajuću na osnovu polja za jezik u vašem obrascu:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Za dinamičku promenu kolona na osnovu polja `${language}`, koristite `if()` izraz na parametru kolone za prikaz da biste prebacivali između kolona za jezike:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Parametar kolone za prikaz se procenjuje pre pokretanja upita. Samo naziv kolone (bez zagrada) se prosleđuje SQL mehanizmu; zagrade su kozmetički markeri koji se uklanjaju prilikom parsiranja.
+</Callout>
+
+---
+
+## Validacija stvarnog izbora
+
+Kada polje dozvoljava specijalne vrednosti kao što su 888 ili 999, obična `required = yes` provera je nedovoljna — ona je zadovoljena čak i ako anketar izabere "Ne znam". Koristite ograničenje `selected-at(., 0) != -997` da biste potvrdili da je sačuvana vrednost stvarni izbor, a ne interna oznaka "ništa nije izabrano" `-997`:
+
+| kolona | vrednost |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Molimo izaberite važeću opciju |
+
+Vrednost `-997` je interni kod koji RTSurvey čuva kada nijedna stavka nije izabrana sa liste za automatsko dopunjavanje. Izbor 888 ili 999 je i dalje nameran izbor i prolazi ovu proveru.
+
+Da biste dodatno zahtevali stvarnu (ne-specijalnu) vrednost, proširite ograničenje:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Poređenje: lokalna baza podataka u odnosu na druge metode pretrage
+
+| Funkcija | `rawquery` automatsko dopunjavanje | `search-api()` | `search()` CSV | Obični CSV izbori |
+|---|---|---|---|---|
+| Izvor podataka | Priložena `.db` (SQLite) | Udaljeni REST API | Priložena CSV datoteka | List Choices |
+| Radi oflajn | Da | Ne | Da | Da |
+| Podržava sirovi SQL | Da | Ne | Ne | Ne |
+| Kaskadni filteri | Da — parametrizovano `?` | Preko tela zahteva | Ograničeno | Ne |
+| Veličina skupa podataka | Veoma velika (milioni redova) | Neograničena (na strani servera) | Srednja (desetine hiljada) | Mala |
+| Specijalni umetnuti redovi | Da — `UNION SELECT` | Ne | Ne | Da (ručno) |
+| Složenost podešavanja | Srednja — zahteva priloženu `.db` datoteku | Visoka — zahteva API server | Niska | Bez |
+
+---
+
+## Ograničenja
+
+- `.db` datoteka mora biti priložena unutar medijskog paketa obrasca pre postavljanja. Dinamičko ažuriranje baze podataka zahteva novo postavljanje obrasca.
+- SQL se izvršava onako kako je naveden na uređaju. Ne postoji čišćenje (sanitizacija) na strani servera — izbegavajte konstrukciju SQL-a od slobodnog tekstualnog unosa anketara.
+- Podržane su samo `SELECT` naredbe. `INSERT`, `UPDATE` i `DELETE` nisu dozvoljeni.
+- Veoma složeni upiti (veliki `UNION` lanci, višestruka spajanja) mogu biti spori na slabijim Android uređajima.
+- `search-autocomplete-noedit` varijante ne dozvoljavaju anketaru da sačuva vrednost koja nije u skupu rezultata. Ako je potreban unos slobodnog teksta, koristite odvojeno `text` polje.
+- `SELECT DISTINCT` se automatski ubacuje samo kada `DISTINCT` nedostaje u upitu. Ako eksplicitno napišete `SELECT DISTINCT`, on se neće duplirati.

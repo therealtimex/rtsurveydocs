@@ -1,9 +1,9 @@
 ---
-title: "Appearance"
+title: "Giao diện (Appearance)"
 description: ""
 ---
 
-Cột `appearance` trong rtSurvey cho phép bạn tùy chỉnh cách trình bày trực quan và hành vi của các câu hỏi trong khảo sát. Tính năng này nâng cao trải nghiệm người dùng và có thể cải thiện đáng kể hiệu quả thu thập dữ liệu. rtSurvey hỗ trợ các thuộc tính appearance tiêu chuẩn của XLSForm và mở rộng chúng với các tùy chọn bổ sung.
+Cột `appearance` trong rtSurvey cho phép bạn tùy chỉnh cách hiển thị trực quan và hành vi của các câu hỏi trong khảo sát của mình. Tính năng này giúp nâng cao trải nghiệm người dùng và có thể cải thiện đáng kể hiệu quả thu thập dữ liệu. rtSurvey hỗ trợ các thuộc tính appearance tiêu chuẩn của XLSForm và mở rộng chúng với các tùy chọn bổ sung.
 
 ## Các thuộc tính Appearance tiêu chuẩn của XLSForm
 
@@ -11,38 +11,38 @@ rtSurvey hỗ trợ các thuộc tính appearance tiêu chuẩn sau của XLSFor
 
 | Thuộc tính Appearance | Loại câu hỏi | Mô tả |
 |----------------------|--------------|-------|
-| multiline | text | Tạo hộp văn bản nhiều dòng (tốt nhất cho web) |
-| minimal | select_one, select_multiple | Hiển thị các lựa chọn trong menu thả xuống |
-| quick | select_one | Tự động chuyển sang câu hỏi tiếp theo sau khi chọn (chỉ mobile) |
-| no-calendar | date | Không hiển thị lịch (chỉ mobile) |
+| multiline | text | Tạo một hộp văn bản nhiều dòng (tốt nhất cho các trình duyệt web) |
+| minimal | select_one, select_multiple | Hiển thị các lựa chọn trong một menu thả xuống (dropdown) |
+| quick | select_one | Tự động chuyển sang câu hỏi tiếp theo sau khi chọn (chỉ dành cho thiết bị di động) |
+| no-calendar | date | Không hiển thị lịch (chỉ dành cho thiết bị di động) |
 | month-year | date | Chỉ cho phép chọn tháng và năm |
 | year | date | Chỉ cho phép chọn năm |
-| horizontal-compact | select_one, select_multiple | Hiển thị lựa chọn theo chiều ngang (chỉ web) |
-| horizontal | select_one, select_multiple | Hiển thị lựa chọn theo chiều ngang trong các cột (chỉ web) |
-| likert | select_one | Trình bày lựa chọn dưới dạng thang đo Likert |
-| compact | select_one, select_multiple | Hiển thị lựa chọn cạnh nhau với khoảng cách tối thiểu |
-| quickcompact | select_one | Kết hợp hiển thị thu gọn với tự động chuyển câu hỏi (chỉ mobile) |
-| field-list | groups | Hiển thị toàn bộ nhóm trên một màn hình (chỉ mobile) |
-| label | select_one, select_multiple | Hiển thị nhãn lựa chọn mà không có nút chọn |
-| list-nolabel | select_one, select_multiple | Hiển thị nút chọn mà không có nhãn (dùng với `label`) |
-| table-list | groups | Hiển thị câu hỏi theo định dạng bảng |
-| signature | image | Bật chụp chữ ký (chỉ mobile) |
-| draw | image | Cho phép vẽ tay (chỉ mobile) |
-| map, quick map | select_one, select_one_from_file | Bật chọn từ các đặc điểm trên bản đồ |
+| horizontal-compact | select_one, select_multiple | Hiển thị các lựa chọn theo chiều ngang (chỉ dành cho web) |
+| horizontal | select_one, select_multiple | Hiển thị các lựa chọn theo chiều ngang trong các cột (chỉ dành cho web) |
+| likert | select_one | Hiển thị các lựa chọn dưới dạng thang đo Likert |
+| compact | select_one, select_multiple | Hiển thị các lựa chọn cạnh nhau với khoảng đệm tối thiểu |
+| quickcompact | select_one | Kết hợp hiển thị nhỏ gọn với tính năng tự động chuyển câu hỏi (chỉ dành cho thiết bị di động) |
+| field-list | groups | Hiển thị toàn bộ nhóm trên một màn hình (chỉ dành cho thiết bị di động) |
+| label | select_one, select_multiple | Chỉ hiển thị nhãn (label) của các lựa chọn mà không có ô nhập liệu |
+| list-nolabel | select_one, select_multiple | Chỉ hiển thị các ô nhập liệu mà không có nhãn (sử dụng kết hợp với `label`) |
+| table-list | groups | Hiển thị các câu hỏi dưới dạng bảng |
+| signature | image | Cho phép thu thập chữ ký (chỉ dành cho thiết bị di động) |
+| draw | image | Cho phép vẽ tự do (chỉ dành cho thiết bị di động) |
+| map, quick map | select_one, select_one_from_file | Cho phép chọn từ các thực thể trên bản đồ |
 
-## Thực hành tốt khi sử dụng Appearance
+## Các quy tắc tốt nhất khi sử dụng Appearance
 
-1. **Nhất quán**: Sử dụng các thuộc tính appearance nhất quán trong toàn bộ khảo sát để có giao diện đồng bộ.
-2. **Mobile và Web**: Xem xét cách appearance hiển thị trên các thiết bị và nền tảng khác nhau.
-3. **Hiệu suất**: Thận trọng với các appearance có thể làm chậm tải biểu mẫu (ví dụ: `table-list` cho các nhóm lớn).
-4. **Trải nghiệm người dùng**: Chọn appearance giúp nhập liệu dễ dàng và trực quan hơn cho người trả lời.
-5. **Kiểm thử**: Luôn kiểm tra biểu mẫu trên thiết bị đích để đảm bảo appearance hoạt động đúng mong đợi.
+1. **Sự nhất quán**: Sử dụng các thuộc tính appearance một cách nhất quán trong toàn bộ khảo sát để có giao diện đồng bộ.
+2. **Di động và Web**: Cân nhắc cách các thuộc tính appearance sẽ hiển thị trên các thiết bị và nền tảng khác nhau.
+3. **Hiệu suất**: Cẩn trọng với các thuộc tính appearance có thể làm chậm quá trình tải biểu mẫu (ví dụ: `table-list` cho các nhóm lớn).
+4. **Trải nghiệm người dùng**: Chọn các giao diện giúp việc nhập liệu dễ dàng và trực quan hơn cho người trả lời.
+5. **Kiểm thử**: Luôn kiểm tra biểu mẫu của bạn trên các thiết bị mục tiêu để đảm bảo các giao diện hoạt động như mong đợi.
 
-## Kỹ thuật nâng cao
+## Các kỹ thuật nâng cao
 
-### Kết hợp Appearance
+### Kết hợp các Appearance
 
-Một số thuộc tính appearance có thể kết hợp để tạo bố cục phức tạp hơn:
+Một số thuộc tính appearance có thể được kết hợp để tạo ra các bố cục phức tạp hơn:
 
 ```
 | type | name | label | appearance |
@@ -52,7 +52,7 @@ Một số thuộc tính appearance có thể kết hợp để tạo bố cục
 
 ### Appearance động
 
-rtSurvey cho phép thay đổi appearance động dựa trên logic biểu mẫu:
+rtSurvey cho phép thay đổi giao diện một cách động dựa trên logic của biểu mẫu:
 
 ```
 | type | name | label | appearance | relevant |
@@ -60,59 +60,86 @@ rtSurvey cho phép thay đổi appearance động dựa trên logic biểu mẫu
 | text | time | Nhập thời gian: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## Lưu ý cho Ứng dụng di động
+## Các lưu ý cho ứng dụng di động
 
-- Một số appearance (ví dụ: `quick`, `signature`) chỉ dành riêng cho thiết bị di động.
-- Kiểm tra kỹ trên cả Android và iOS để đảm bảo hành vi nhất quán.
+- Một số giao diện (ví dụ: `quick`, `signature`) chỉ dành riêng cho các thiết bị di động.
+- Kiểm tra kỹ lưỡng trên cả Android và iOS để đảm bảo hành vi nhất quán.
 
 ## Các thuộc tính Appearance mở rộng của rtSurvey
 
-Ngoài các appearance XLSForm tiêu chuẩn, rtSurvey hỗ trợ các tùy chọn riêng cho nền tảng sau:
+Ngoài các giao diện XLSForm tiêu chuẩn, rtSurvey hỗ trợ các tùy chọn dành riêng cho nền tảng sau:
 
-### Kiểm soát hiển thị và dữ liệu
-
-| Thuộc tính Appearance | Loại câu hỏi | Mô tả |
-|----------------------|--------------|-------|
-| `invisible` | bất kỳ | Ẩn trường khỏi hiển thị trong khi vẫn thu thập hoặc tính toán giá trị. Khác với loại `hidden` — trường vẫn tham gia vào logic. |
-| `displaytitle` | bất kỳ | Buộc hiển thị nhãn/tiêu đề của trường ngay cả khi nó thường bị ẩn. |
-| `autopull` | select_one, select_multiple | Tự động lấy dữ liệu bên ngoài để điền lựa chọn khi biểu mẫu tải hoặc trường kích hoạt thay đổi. |
-| `floating_hint` | text, integer, decimal | Hiển thị gợi ý dưới dạng nhãn nổi phía trên trường nhập thay vì phía dưới. |
-| `calculate-button` | calculate | Thêm nút hiển thị kích hoạt tính lại trường theo yêu cầu, thay vì tính tự động. |
-
-### Bố cục
+### Kiểm soát dữ liệu và hiển thị
 
 | Thuộc tính Appearance | Loại câu hỏi | Mô tả |
 |----------------------|--------------|-------|
-| `1screen` | group | Buộc hiển thị toàn bộ nhóm trên một màn hình bất kể kích thước nhóm. |
-| `columns(n)` | select_one, select_multiple | Hiển thị lựa chọn theo `n` cột. Ví dụ: `columns(3)` hiển thị ba cột nút radio. |
-| `gridformat<row=R col=C colspan=S align=center>` | bất kỳ | Định vị trường trong bố cục CSS grid tại hàng `R`, cột `C`, kéo dài `S` cột. Dùng với `advanced-extension/grid-layout`. |
-| `ignore-simplify` | bất kỳ | Hướng dẫn renderer biểu mẫu bỏ qua đơn giản hóa hoặc thu gọn tự động bố cục trường này. |
+| `invisible` | bất kỳ | Ẩn trường khỏi chế độ xem trong khi vẫn thu thập hoặc tính toán giá trị của nó. Khác với loại `hidden` — trường này vẫn tham gia vào logic. |
+| `displaytitle` | bất kỳ | Buộc hiển thị nhãn/tiêu đề của trường ngay cả khi nó bị ẩn theo mặc định. |
+| `autopull` | select_one, select_multiple | Tự động lấy dữ liệu bên ngoài để điền vào các lựa chọn khi biểu mẫu được tải hoặc khi một trường kích hoạt thay đổi. |
+| `floating_hint` | text, integer, decimal | Hiển thị văn bản gợi ý (hint) dưới dạng nhãn nổi phía trên trường nhập liệu thay vì bên dưới nó. |
+| `calculate-button` | calculate | Thêm một nút hiển thị để kích hoạt việc tính toán lại trường khi có yêu cầu, thay vì tính toán tự động. |
 
-### Widget
+### Nhóm và điều hướng
 
 | Thuộc tính Appearance | Loại câu hỏi | Mô tả |
 |----------------------|--------------|-------|
-| `likert` | select_one | Trình bày lựa chọn dưới dạng hàng thang Likert (đã có trong bảng tiêu chuẩn ở trên; được xác nhận hỗ trợ). |
-| `distress` | select_one | Hiển thị lựa chọn dưới dạng widget trực quan Thang đo tâm lý Kessler (K10) với biểu tượng cảm xúc. |
+| `section` | group | Hiển thị nhóm dưới dạng thẻ phần (section card) có thể thu gọn. Lưu ý: chỉ dành cho ứng dụng di động. |
+| `toc-hide` | bất kỳ | Loại trừ câu hỏi khỏi bảng điều hướng mục lục (TOC). |
+| `minilog` | begin_repeat | Hiển thị các mục nhập lặp lại đã hoàn thành dưới dạng danh sách nhật ký nhỏ gọn thay vì mở rộng từng mục nhập trực tiếp. |
+
+### Hành vi nhập liệu
+
+| Thuộc tính Appearance | Loại câu hỏi | Mô tả |
+|----------------------|--------------|-------|
+| `proper` | text | Tự động viết hoa chữ cái đầu tiên của mỗi từ khi người trả lời nhập (hành vi dạng tiêu đề). |
+| `text-nolabel` | text, integer, decimal | Hiển thị trường nhập liệu mà không có nhãn hiển thị. |
+| `inline-1line` | text | Buộc đầu vào văn bản hiển thị trên một dòng ngay cả khi nhãn câu hỏi dài. |
+| `popup` | bất kỳ | Hiển thị trường bên trong một cửa sổ bật lên (popup) / lớp phủ thay vì hiển thị trực tiếp trên trang. |
+
+### Bố cục (Layout)
+
+| Thuộc tính Appearance | Loại câu hỏi | Mô tả |
+|----------------------|--------------|-------|
+| `1screen` | group | Buộc toàn bộ nhóm hiển thị trên một màn hình duy nhất bất kể quy mô của nhóm. |
+| `columns(n)` | select_one, select_multiple | Hiển thị các lựa chọn trong `n` cột. Ví dụ: `columns(3)` hiển thị ba cột các nút chọn (radio buttons). |
+| `gridformat<row=R col=C colspan=S align=center>` | bất kỳ | Định vị trường trong bố cục CSS-grid tại hàng `R`, cột `C`, trải dài qua `S` cột. Được sử dụng với `advanced-extension/grid-layout`. |
+| `ignore-simplify` | bất kỳ | Yêu cầu trình hiển thị biểu mẫu bỏ qua việc tự động đơn giản hóa hoặc thu gọn bố cục của trường này. |
+| `horizontal(N)` | select_one, select_multiple | Đặt mỗi lựa chọn chiếm `N` phần trăm chiều rộng của hàng. Ví dụ: `horizontal(50)` đặt hai lựa chọn trên mỗi hàng. |
+| `scroll-view(N%)` | group, repeat | Giới hạn chiều cao tối đa của vùng chứa là `N%` của khung nhìn (viewport) hoặc phần tử cha, thêm thanh cuộn khi nội dung vượt quá. Ví dụ: `scroll-view(60%)`. |
+
+### Các Widget
+
+| Thuộc tính Appearance | Loại câu hỏi | Mô tả |
+|----------------------|--------------|-------|
+| `likert` | select_one | Hiển thị các lựa chọn dưới dạng một hàng thang đo Likert (đã có trong bảng tiêu chuẩn ở trên; đã xác nhận hỗ trợ). |
+| `distress` | select_one | Hiển thị các lựa chọn dưới dạng widget trực quan Thang đo Căng thẳng Tâm lý Kessler (K10) với các biểu tượng cảm xúc. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Hiển thị các lựa chọn dưới dạng các hộp xếp hạng được tạo kiểu với năm ô màu. `c1` = viền vùng chứa ngoài, `c2` = viền khi chưa chọn, `c3` = viền và màu nền khi đã chọn, `c4` = màu văn bản khi chưa chọn, `c5` = màu văn bản khi đã chọn. Ví dụ: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Hiển thị các lựa chọn dưới dạng các chip thẻ màu. Năm ô màu tuân theo cùng thứ tự như `rating_box-fill`. Các lựa chọn được chọn sẽ được đánh dấu; các lựa chọn không được chọn sẽ bị ẩn khỏi chế độ xem tóm tắt. |
 
 ### Tích hợp API
 
 | Thuộc tính Appearance | Loại câu hỏi | Mô tả |
 |----------------------|--------------|-------|
-| `callapi` | text, integer, decimal, select_one | Bật tích hợp gọi API cho trường này. Cột calculation phải chứa biểu thức `callapi()`. Xem [Call API](advanced-extension/call-api). |
-| `callapi-verify(params)` | text, integer, decimal | Kích hoạt cuộc gọi API xác minh với tham số tĩnh. Biểu mẫu chặn tiến độ cho đến khi API xác nhận giá trị. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | Giống `callapi-verify` nhưng với tham số lấy từ giá trị trường khác trong thời gian thực. |
+| `callapi` | text, integer, decimal, select_one | Cho phép tích hợp cuộc gọi API cho trường này. Cột tính toán phải chứa biểu thức `callapi()`. Xem [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Kích hoạt một cuộc gọi xác minh API bằng cách sử dụng các tham số tĩnh. Biểu mẫu sẽ chặn tiến trình cho đến khi API xác nhận giá trị. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Tương tự như `callapi-verify` nhưng với các tham số được lấy từ các giá trị trường khác tại thời điểm chạy. |
 
-### Định dạng ngày/giờ inline
+### Bộ chuyển đổi ngôn ngữ
 
-Với các trường `date`, `time`, và `datetime`, bạn có thể chỉ định định dạng hiển thị tùy chỉnh bằng chuỗi định dạng gắn vào appearance:
+| Thuộc tính Appearance | Loại câu hỏi | Mô tả |
+|----------------------|--------------|-------|
+| `change_language-{colors} default('lang')` | note, text | Hiển thị một widget chuyển đổi ngôn ngữ được tạo kiểu với các mã màu đã cho. Token `default('lang')` thiết lập ngôn ngữ ban đầu (ví dụ: `default('en')`); nó được viết lại thành `rtDefault('lang')` nội bộ trong quá trình phân tích cú pháp. Ví dụ: `change_language-blue-white default('vi')`. |
+
+### Định dạng ngày/giờ nội dòng (Inline)
+
+Đối với các trường `date`, `time`, và `datetime`, bạn có thể chỉ định định dạng hiển thị tùy chỉnh bằng cách sử dụng một chuỗi định dạng được thêm vào appearance:
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-Các mã định dạng giống với `format-date()` và `format-date-time()`. Xem [Hàm — Hàm ngày giờ](operators-and-functions/functions#date-and-time-functions).
+Các mã định dạng (tokens) giống như trong `format-date()` và `format-date-time()`. Xem [Các hàm — Các hàm Ngày và giờ](operators-and-functions/functions#date-and-time-functions).
 
 Ví dụ:
 
@@ -121,13 +148,67 @@ Ví dụ:
 | datetime | event_time | Ngày và giờ sự kiện | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | Ngày sinh | inline-[%d/%m/%Y] |
 
-## Hạn chế đã biết
+### Bố cục nút nội dòng — `display{}` và `results{}`
 
-- Các appearance phức tạp có thể không hiển thị giống hệt nhau trên tất cả các nền tảng.
-- Một số appearance nâng cao của rtSurvey có thể không được hỗ trợ ở chế độ ngoại tuyến.
+Đối với các loại câu hỏi hiển thị dưới dạng nút biểu tượng nội dòng (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), hai bộ bổ trợ appearance sẽ kiểm soát vị trí nút và hành vi sau khi thu thập.
 
-## Khắc phục sự cố Appearance
+#### `display{...}` — vị trí nút trước khi thu thập
 
-1. **Appearance không được áp dụng**: Kiểm tra lỗi đánh máy trong cột appearance.
-2. **Hiển thị không nhất quán**: Xác minh tính tương thích với loại câu hỏi và nền tảng.
-3. **Vấn đề hiệu suất**: Cân nhắc đơn giản hóa các appearance phức tạp, đặc biệt với khảo sát lớn.
+```
+display{<align>, <size>, <color>}
+```
+
+| Tham số | Giá trị | Mặc định |
+|---------|---------|----------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex ví dụ `#FF5500` | màu chủ đề chính |
+| Flag | `inline-icon` | buộc chế độ biểu tượng |
+
+| Giá trị Align | Bố cục |
+|---------------|--------|
+| `right` | Nút ở bên phải nhãn |
+| `left` | Nút ở bên trái nhãn |
+| `top` | Nút phía trên nhãn, căn giữa toàn chiều rộng |
+| `center` / `bottom` | Nút phía dưới nhãn, căn giữa toàn chiều rộng |
+
+#### `results{...}` — bố cục và khả năng hiển thị sau khi thu thập
+
+Kế thừa các cài đặt của `display{}`. Sử dụng để di chuyển nút hoặc ẩn các phần tử sau khi một giá trị đã được thu thập.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| Giá trị `hide` | Hiệu ứng |
+|---|---|
+| `hide(capture)` | Ẩn nút thu thập khi tệp/giá trị đã tồn tại |
+| `hide(review)` | Ẩn hình thu nhỏ xem trước / nút phát lại |
+| `hide(filename)` | Ẩn tên tệp hiển thị sau khi tải lên |
+| `hide(camera)` | Ẩn nút kích hoạt máy ảnh sau khi thu thập |
+| `hide(scanner)` | Ẩn nút quét mã vạch sau khi một giá trị đã được quét |
+| `hide(value)` | Ẩn văn bản giá trị đã quét (barcode / geopoint) |
+
+Widget sẽ tự động chuyển từ bố cục `display{}` sang `results{}` ngay khi một giá trị được thu thập.
+
+**Ví dụ:**
+
+```
+inline display{right}                                    → biểu tượng bên phải nhãn
+inline display{left, large}                              → biểu tượng lớn ở bên trái
+inline display{center, large, #FF5500}                   → biểu tượng lớn màu cam bên dưới nhãn
+inline display{right} results{left}                      → biểu tượng di chuyển sang trái sau khi thu thập
+inline display{right} results{hide(capture)}             → biểu tượng biến mất sau khi thu thập
+inline display{center} results{hide(capture), hide(filename)}
+```
+
+## Các hạn chế đã biết
+
+- Các giao diện phức tạp có thể không hiển thị giống nhau trên tất cả các nền tảng.
+- Một số giao diện rtSurvey nâng cao có thể không được hỗ trợ trong chế độ ngoại tuyến.
+
+## Khắc phục sự cố Giao diện
+
+1. **Giao diện không được áp dụng**: Kiểm tra lỗi đánh máy trong cột appearance.
+2. **Hiển thị không nhất quán**: Kiểm tra tính tương thích với loại câu hỏi và nền tảng.
+3. **Vấn đề hiệu suất**: Cân nhắc đơn giản hóa các giao diện phức tạp, đặc biệt là đối với các khảo sát lớn.

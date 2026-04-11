@@ -1,0 +1,104 @@
+---
+title: "Formular-Navigationssteuerungen"
+description: "Verwenden Sie die Darstellungswerte SaveFinalizedExit und SaveIncompleteExit, um gestaltete Schaltflächen zum Speichern und Verlassen des Formulars anzuzeigen."
+---
+
+**Formular-Navigationssteuerungen** sind Darstellungswerte, die auf `note`- (oder `text`-) Feldern platziert werden und als breite, gestaltete Schaltflächen am Ende einer Umfrage erscheinen. Sie ermöglichen es dem Interviewer, die Übermittlung zu speichern und das Formular mit einem Fingertipp zu verlassen – entweder als abgeschlossenen (finalisierten) Datensatz oder als Entwurf (unvollständiger Datensatz).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Erzeugt eine Schaltfläche, die die **Übermittlung als abgeschlossen speichert** und das Formular beendet. Die Beschriftung der Schaltfläche wird aus der Spalte `label` des Feldes übernommen.
+
+| XLSForm column | Wert |
+|----------------|-------|
+| `type` | `note` |
+| `name` | ein beliebiger eindeutiger Name (z. B. `btn_finish`) |
+| `label` | Text, der auf der Schaltfläche angezeigt wird |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Die Übermittlung wird als finaler, vollständiger Datensatz markiert. Dies entspricht dem Tippen auf die integrierte Senden-Schaltfläche.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Erzeugt eine Schaltfläche, die die **Übermittlung als unvollständig (Entwurf) speichert** und das Formular beendet. Der Interviewer kann später dorthin zurückkehren und das Ausfüllen fortsetzen.
+
+| XLSForm column | Wert |
+|----------------|-------|
+| `type` | `note` |
+| `name` | ein beliebiger eindeutiger Name (z. B. `btn_pause`) |
+| `label` | Text, der auf der Schaltfläche angezeigt wird |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Farbsyntax
+
+Beide Darstellungen akzeptieren eine Inline-Farbe im Format `<#RRGGBB/>`:
+
+- `#` gefolgt von genau **6 Hex-Ziffern** (Groß- oder Kleinschreibung)
+- Das schließende `/>` ist **erforderlich** – das Weglassen unterbricht das Parsen
+- Beispiel: `<#04B404/>` (grün), `<#EDC602/>` (bernstein), `<#D9534F/>` (rot)
+
+Die Farbe steuert den Hintergrund der Schaltfläche. Die Textfarbe wird automatisch von der App bestimmt.
+
+---
+
+## Beispiel
+
+Die folgenden zwei Felder am Ende eines Formulars erzeugen eine grüne **Senden**-Schaltfläche und eine bernsteinfarbene **Als Entwurf speichern**-Schaltfläche:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Senden | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Als Entwurf speichern | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — Schaltflächen aus dem Inhaltsverzeichnis ausschließen
+
+Das Darstellungstoken `toc-hide` weist rtSurvey an, ein Feld aus dem **Inhaltsverzeichnis** des Formulars (der Übersicht über die Fragen) auszuschließen. Navigationsschaltflächen sind keine Fragen und sollten daher niemals im Inhaltsverzeichnis erscheinen.
+
+Hängen Sie `toc-hide` immer nach der Exit-Darstellung an:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Siehe [Darstellung — toc-hide](../appearance#group-and-navigation) für die toc-hide-Referenz.
+
+---
+
+## Platzierungskonvention
+
+Befolgen Sie diese Konventionen beim Hinzufügen von Navigationssteuerungen zu einem Formular:
+
+- Platzieren Sie beide Schaltflächen am **ganz Ende** des Formulars, nach allen Fragen und Gruppen.
+- Fügen Sie immer **beide** Schaltflächen zusammen ein – eine finalisierte und eine unvollständige –, damit der Interviewer unabhängig vom Abschlussstatus immer eine Möglichkeit zum Beenden hat.
+- Verwenden Sie die Spalte `relevant` bei der Schaltfläche für den finalisierten Abschluss, wenn die Übermittlung nur zulässig sein soll, wenn bestimmte Bedingungen erfüllt sind (z. B. ein erforderlicher Abschnitt vollständig ist). Die Schaltfläche für den unvollständigen Abschluss sollte im Allgemeinen **immer sichtbar** bleiben.
+
+---
+
+## Bedingter finalisierter Abschluss
+
+Verwenden Sie die Spalte `relevant`, um zu steuern, wann die Schaltfläche für den finalisierten Abschluss angezeigt wird. Der unvollständige Abschluss sollte bedingungslos sichtbar bleiben, damit der Interviewer jederzeit pausieren und zurückkehren kann.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Senden | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Als Entwurf speichern | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+In diesem Beispiel erscheint die Schaltfläche **Senden** nur, wenn der Interviewer sein Einverständnis gegeben und Abschnitt A als vollständig markiert hat. Die Schaltfläche **Als Entwurf speichern** ist immer verfügbar.
+
+---
+
+## Einschränkungen
+
+- **Der Feldtyp muss `note` oder `text` sein.** Die Verwendung dieser Darstellungen bei einem anderen Fragentyp wird nicht unterstützt.
+- **Nur 6-stellige Hex-Werte.** Kurze Hex-Werte (`<#FFF/>`) und benannte Farben werden nicht unterstützt – verwenden Sie immer das vollständige 6-stellige Format (z. B. `<#FFFFFF/>`).
+- **Die Spalte 'label' ist der Schaltflächentext.** Die Spalte `hint` wird für diese Felder ignoriert; nur `label` wird gerendert.
+- **Beide Schaltflächen sollten vorhanden sein.** Das Weglassen der Schaltfläche für den unvollständigen Abschluss lässt den Interviewer ohne Möglichkeit, das Formular mittendrin zu unterbrechen.

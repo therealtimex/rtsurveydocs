@@ -5,111 +5,331 @@ description: ""
 
 import { Callout } from 'nextra/components'
 
-### Funkcje ciągów znaków
+### Funkcje tekstowe (String)
 
 <Callout type="warning">
-Przy pracy z ciągami znaków w wyrażeniach ważne jest używanie pojedynczych cudzysłowów ('') do owijania dosłownych ciągów. Wyjątek pojawia się gdy chcesz dołączyć pojedyncze cudzysłowy w dosłownym ciągu — w takim przypadku możesz użyć podwójnych cudzysłowów ("") do owinięcia całego ciągu.
+Podczas pracy z ciągami znaków (strings) w wyrażeniach, ważne jest używanie pojedynczych cudzysłowów ('') do otaczania literałów tekstowych. Wyjątek stanowi sytuacja, gdy chcesz zawrzeć pojedynczy cudzysłów wewnątrz literału tekstowego. W takich przypadkach możesz użyć podwójnych cudzysłowów (""), aby otoczyć cały ciąg.
+
+Na przykład:
+- Poprawnie: if(`${yesno}` = 1, "a string with 'single quotes' in it", "no single quotes here")
+- Niepoprawnie: if(`${yesno}` = 1, 'a string with 'single quotes' in it', 'no single quotes here')
+
+W przypadku cudzysłowów inteligentnych (smart quotes), kluczowe jest uświadomienie sobie ich obecności, ponieważ mogą one powodować problemy w wyrażeniach. Wiele edytorów tekstu sformatowanego automatycznie zamienia proste cudzysłowy ("" lub '') na inteligentne lub zakrzywione cudzysłowy („” lub ‘’), co może skutkować błędami składniowymi lub nieoczekiwanym zachowaniem. Aby tego uniknąć, upewnij się, że w wyrażeniach konsekwentnie używasz prostych cudzysłowów ('').
+
+Daj mi znać, jeśli masz dalsze pytania lub potrzebujesz dodatkowej pomocy!
 </Callout>
 
 rtSurvey obsługuje różne funkcje, w tym:
 
-1. `string(pole)`: Konwertuje pole na ciąg znaków.
-   - Przykład: `string(34.8)` zostanie skonwertowane na `'34.8'`.
+1. `string(field)`: Konwertuje pole na ciąg znaków (string).
+   - Przykład: `string(34.8)` zostanie przekonwertowane na `'34.8'`.
 
-2. `string-length(pole)`: Zwraca długość pola ciągu znaków.
-   - Przykład: `string-length(.) > 3 and string-length(.) < 10` może być używane do zapewnienia, że bieżące pole ma od 3 do 10 znaków.
+2. `string-length(field)`: Zwraca długość pola tekstowego.
+   - Przykład: `string-length(.) > 3 and string-length(.) < 10` może być użyte do upewnienia się, że bieżące pole ma od 3 do 10 znaków.
+   - **Wzorzec zależności kaskadowej**: `string-length(${province}) >= 0` zawsze zwraca wartość `true`, ale wymusza na rtSurvey ponowną ocenę wyrażenia za każdym razem, gdy zmienia się `${province}`. Użyj tego w kolumnie `relevant`, aby wywołać odświeżenie kaskadowe po aktualizacji pola nadrzędnego:
+     | type | name | relevant |
+     |------|------|----------|
+     | select_one | district | `string-length(${province}) >= 0` |
+     Zapewnia to, że pytanie o dystrykt (district) ponownie oceni swoją funkcję `search()` lub wygląd `rawquery` za każdym razem, gdy zmieni się prowincja (province).
 
-3. `substr(pole_lub_ciag, indeks_poczatkowy, indeks_koncowy)`: Zwraca podciąg zaczynający się od `indeks_poczatkowy` i kończący się tuż przed `indeks_koncowy`. Indeksy zaczynają się od 0 dla pierwszego znaku.
+3. `substr(fieldorstring, startindex, endindex)`: Zwraca podciąg zaczynający się od `startindex` i kończący się tuż przed `endindex`. Indeksy zaczynają się od 0 dla pierwszego znaku w ciągu.
    - Przykład: `substr(${phone}, 0, 3)` zwróci pierwsze trzy cyfry numeru telefonu.
 
-4. `concat(a, b, c, ...)`: Łączy pola (i/lub ciągi znaków) razem.
-   - Przykład: `concat(${firstname}, ' ', ${lastname})` zwróci pełne imię i nazwisko.
+4. `concat(a, b, c, ...)`: Łączy pola (i/lub ciągi znaków) ze sobą.
+   - Przykład: `concat(${firstname}, ' ', ${lastname})` zwróci pełne imię i nazwisko, łącząc wartości z pól `firstname` i `lastname`.
 
-5. `linebreak()`: Zwraca znak nowej linii.
+5. `linebreak()`: Zwraca znak końca linii.
+   - Przykład: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` zwróci listę trzech wartości pól oddzielonych znakami końca linii.
 
-6. `lower()`: Konwertuje ciąg na małe litery.
+6. `lower()`: Konwertuje ciąg znaków na małe litery.
+   - Przykład: `lower('Street Name')` zwróci "street name".
 
-7. `upper()`: Konwertuje ciąg na wielkie litery.
+7. `upper()`: Konwertuje ciąg znaków na wielkie litery.
+   - Przykład: `upper('Street Name')` zwróci "STREET NAME".
 
 ### Funkcje select_one i select_multiple
 
-1. `count-selected(pole)`: Zwraca liczbę elementów wybranych w polu select_multiple.
+1. `count-selected(field)`: Zwraca liczbę elementów wybranych w polu typu select_multiple.
+   - Przykład: `count-selected(.) = 3` może być użyte jako wyrażenie w kolumnie `constraint`, aby upewnić się, że wybrano dokładnie trzy opcje.
 
-2. `selected(pole, wartosc)`: Zwraca prawdę lub fałsz w zależności od tego, czy podana wartość została wybrana.
-   - Przykład: `selected(${color}, 'Blue')` — pokaż grupę jeśli respondent wybrał „Blue".
+2. `selected(field, value)`: Zwraca true lub false w zależności od tego, czy określona wartość została wybrana w polu select_one lub select_multiple.
+   - Przykład: `selected(${color}, 'Blue')` może być użyte jako wyrażenie w kolumnie `relevant`, aby pokazać grupę lub pole tylko wtedy, gdy respondent wybrał "Blue" jako swój ulubiony kolor.
+   - Uwaga: Drugi parametr powinien zawsze określać wartość opcji (choice value), a nie jej etykietę (choice label). Użyj wartości z kolumny value w arkuszu choices definicji formularza.
 
-3. `selected-at(pole, numer)`: Zwraca wybrany element na określonej pozycji w polu select_multiple.
+3. `selected-at(field, number)`: Zwraca wybrany element na określonej pozycji w polu select_multiple. Gdy podana liczba wynosi 0, zwraca pierwszy wybrany element; gdy liczba wynosi 1, zwraca drugi wybrany element i tak dalej.
+   - Przykład: `selected-at(${fruits}, 0) = 'Apple'` może być użyte jako wyrażenie w kolumnie `relevant`, aby pokazać grupę lub pole tylko wtedy, gdy pierwszą wybraną opcją jest "Apple".
+   - Uwaga: Zwrócona wartość będzie wartością opcji, a nie jej etykietę. Użyj wartości z kolumny value w arkuszu choices definicji formularza.
 
-4. `choice-label(pole, wartosc)`: Zwraca etykietę dla wyboru w polu select_one lub select_multiple.
+4. `choice-label(field, value)`: Zwraca etykietę dla opcji pola select_one lub select_multiple, zgodnie z definicją w arkuszu choices formularza.
+   - Przykład 1: `choice-label(${country}, ${country})` zwróci etykietę aktualnie wybranej opcji w polu o nazwie `country`.
+   - Przykład 2: `choice-label(${languages}, selected-at(${languages}, 0))` zwróci etykietę pierwszej wybranej opcji w polu o nazwie `languages`.
+   - Uwaga: Ta funkcja pobiera etykietę opcji, a nie jej wartość. Korzysta z kolumny label w arkuszu choices definicji formularza.
 
-### Funkcje pól powtarzanych
+### Funkcje pól powtarzalnych (Repeated field functions)
 
-1. `join(ciag, pole_powtarzane)`: Dla pola w grupie powtórzeń generuje listę wartości oddzieloną podanym separatorem.
-   - Przykład: `join(', ', ${member_name})` wygeneruje listę oddzieloną przecinkami.
+W rtSurvey, jeśli chcesz zadawać to samo pytanie (pytania) wielokrotnie, możesz umieścić pole wewnątrz grupy powtarzalnej (repeat group). Skutkuje to wieloma instancjami tego samego pola. Poniższe funkcje mogą pomóc w pracy z tymi powtarzalnymi polami i danymi, które generują. Zobacz temat pomocy dotyczący pól powtarzalnych, aby uzyskać więcej szczegółów.
 
-2. `count(grupa_powtorzen)`: Zwraca bieżącą liczbę powtórzeń grupy powtórzeń.
+1. `join(string, repeatedfield)`: Dla pola wewnątrz grupy powtarzalnej generuje listę wartości oddzielonych ciągiem znaków. Pierwszy parametr określa ogranicznik, który ma być użyty do oddzielenia wartości.
+   - Przykład: `join(', ', ${member_name})` wygeneruje pojedynczą listę oddzieloną przecinkami ze wszystkich wprowadzonych imion.
 
-3. `sum(pole_powtarzane)`: Dla pola w grupie powtórzeń oblicza sumę wszystkich wartości.
+2. `join-if(string, repeatedfield, expression)`: Działa dokładnie tak samo jak `join()`, z tym wyjątkiem, że sprawdza każdą instancję w grupie powtarzalnej za pomocą dostarczonego wyrażenia. Jeśli wyrażenie ma wartość false, element zostanie pominięty w danych wyjściowych.
+   - Przykład: `join-if(', ', ${member_name}, ${age} >= 18)` wygeneruje listę imion oddzielonych przecinkami tylko dla pełnoletnich członków (tych w wieku 18 lat i więcej).
 
-4. `min(pole_powtarzane)`: Dla pola w grupie powtórzeń oblicza minimum wszystkich wartości.
+3. `count(repeatgroup)`: Zwraca bieżącą liczbę powtórzeń grupy powtarzalnej.
+   - Przykład: `count(${groupname})` zwróci liczbę instancji grupy.
 
-5. `max(pole_powtarzane)`: Dla pola w grupie powtórzeń oblicza maksimum wszystkich wartości.
+4. `count-if(repeatgroup, expression)`: Działa dokładnie tak samo jak `count()`, z tym wyjątkiem, że sprawdza każdą instancję w grupie powtarzalnej za pomocą dostarczonego wyrażenia. Jeśli wyrażenie ma wartość false, element zostanie pominięty w danych wyjściowych.
+   - Przykład: `count-if(${members}, ${age} >= 18)` zwróci liczbę pełnoletnich członków na podstawie pola wieku (age) w grupie powtarzalnej "members".
+
+5. `sum(repeatedfield)`: Dla pola wewnątrz grupy powtarzalnej oblicza sumę wszystkich wartości.
+   - Przykład: `sum(${loan_amount})` zwróci całkowitą wartość wszystkich pożyczek.
+
+6. `sum-if(repeatedfield, expression)`: Działa dokładnie tak samo jak `sum()`, z tym wyjątkiem, że sprawdza każdą instancję w grupie powtarzalnej za pomocą dostarczonego wyrażenia. Jeśli wyrażenie ma wartość false, element zostanie pominięty w danych wyjściowych.
+   - Przykład: `sum-if(${loan_amount}, ${loan_amount} > 500)` zwróci całkowitą wartość wszystkich pożyczek przekraczających 500. Mniejsze pożyczki zostaną zignorowane.
+
+7. `min(repeatedfield)`: Dla pola wewnątrz grupy powtarzalnej oblicza minimum ze wszystkich wartości.
+   - Przykład: `min(${member_age})` zwróci wiek najmłodszego członka w grupie.
+
+8. `min-if(repeatedfield, expression)`: Działa dokładnie tak samo jak `min()`, z tym wyjątkiem, że sprawdza każdą instancję w grupie powtarzalnej za pomocą dostarczonego wyrażenia. Jeśli wyrażenie ma wartość false, element zostanie pominięty w danych wyjściowych.
+   - Przykład: `min-if(${member_age}, ${member_age} >= 18)` zwróci wiek najmłodszego dorosłego w grupie. Osoby poniżej 18 roku życia zostaną zignorowane.
+
+9. `max(repeatedfield)`: Dla pola wewnątrz grupy powtarzalnej oblicza maksimum ze wszystkich wartości.
+   - Przykład: `max(${member_age})` zwróci wiek najstarszego członka w grupie.
+
+10. `max-if(repeatedfield, expression)`: Działa dokładnie tak samo jak `max()`, z tym wyjątkiem, że sprawdza każdą instancję w grupie powtarzalnej za pomocą dostarczonego wyrażenia. Jeśli wyrażenie ma wartość false, element zostanie pominięty w danych wyjściowych.
+    - Przykład: `max-if(${member_age}, ${member_age} >= 18)` zwróci wiek najstarszego dorosłego w grupie. Osoby poniżej 18 roku życia zostaną zignorowane.
+
+11. `index()`: Wywołana wewnątrz grupy powtarzalnej, zwraca numer indeksu bieżącej grupy lub instancji.
+    - Przykład: `index()` użyty wewnątrz grupy powtarzalnej zwróci 1 dla pierwszej instancji, 2 dla drugiej i tak dalej.
+
+12. `indexed-repeat(repeatedfield, repeatgroup, index)`: Odwołuje się do pola lub grupy znajdującej się wewnątrz grupy powtarzalnej z zewnątrz tej grupy. Pierwszy parametr określa interesujące pole lub grupę powtarzalną, drugi określa grupę powtarzalną, w której znajduje się pole lub grupa, a trzeci określa numer instancji w grupie powtarzalnej, która ma zostać użyta.
+    - Przykład 1: `indexed-repeat(${name}, ${names}, 1)` zwróci pierwsze dostępne imię, gdy pole name znajduje się we wcześniejszej grupie powtarzalnej o nazwie "names".
+    - Przykład 2: `indexed-repeat(${name}, ${names}, index())` pobierze imię odpowiadające numerowi instancji bieżącej grupy powtarzalnej.
+
+13. `rank-index(index, repeatedfield)`: Ta funkcja oblicza rangę porządkową określonej instancji powtarzalnego pola do użytku poza grupą powtarzalną. Ranga 1 jest przypisywana instancji o najwyższej wartości, ranga 2 instancji o kolejnej najwyższej wartości i tak dalej. Jeśli przekażesz nieprawidłowy indeks lub indeks do instancji z wartością nienumeryczną, zostanie zwrócona ranga 999.
+    - Przykład: `rank-index(1, ${random_draw})` oblicza rangę pierwszej instancji na podstawie wartości jej pola `random_draw` w porównaniu z wartościami innych instancji.
+
+14. `rank-index-if(index, repeatedfield, expression)`: Ta funkcja działa podobnie do `rank-index()`, ale sprawdza każdą instancję w grupie powtarzalnej powtarzalnego pola za pomocą dostarczonego wyrażenia. Jeśli wyrażenie ma wartość false, element zostanie pominięty w obliczeniach. Użyty indeks opiera się na pełnym zestawie instancji przed oceną wyrażenia dla każdej z nich. Jeśli przekażesz indeks dla instancji, która została zignorowana z powodu niespełnienia wyrażenia, zostanie on uznany za nieprawidłowy i zostanie zwrócona ranga 999.
+    - Przykład: `rank-index-if(1, ${age}, ${age} >= 18)` oblicza rangę wieku w zestawie osób dorosłych, biorąc pod uwagę tylko te przypadki, w których wiek jest większy lub równy 18.
+
+### Funkcje liczbowe
+
+| Operator | Operacja | Przykład | Przykładowy wynik |
+|----------|-----------|---------|----------------|
+| `+` | Dodawanie | 1 + 1 | 2 |
+| `-` | Odejmowanie | 3 - 2 | 1 |
+| `*` | Mnożenie | 3 * 2 | 6 |
+| `div` | Dzielenie | 10 div 2 | 5 |
+| `mod` | Modulo | 9 mod 2 | 1 |
+
+rtSurvey obsługuje funkcje liczbowe, w tym:
+- `number(field)`: Konwertuje wartość pola na liczbę.
+  - Przykład: `number('34.8')` = 34.8
+
+- `int(field)`: Konwertuje wartość pola na liczbę całkowitą.
+  - Przykład: `int('39.2')` = 39
+
+- `min(field1, ..., fieldx)`: Zwraca minimalną wartość spośród przekazanych pól.
+  - Przykład: `min(${father_age}, ${mother_age})` zwróci wiek matki lub ojca, w zależności od tego, który jest mniejszy.
+
+- `max(field1, ..., fieldx)`: Zwraca maksymalną wartość spośród przekazanych pól.
+  - Przykład: `max(${father_age}, ${mother_age})` zwróci wiek matki lub ojca, w zależności od tego, który jest większy.
+
+- `format-number(field)`: Formatuje wartość pola całkowitego lub dziesiętnego zgodnie z ustawieniami regionalnymi użytkownika.
+  - Przykład: `format-number(${income})` To wyrażenie może sformatować "120000" jako "120,000".
+
+- `round(field, digits)`: Zaokrągla wartość pola numerycznego do określonej liczby cyfr po przecinku.
+  - Przykład: `round(${interest_rate}, 2)`
+
+- `abs(number)`: Zwraca wartość bezwzględną liczby.
+  
+- `pow(base, exponent)`: Zwraca wartość pierwszego parametru podniesioną do potęgi drugiego parametru.
+  - Każdy parametr może być polem, liczbą lub wyrażeniem.
+
+- `log10(fieldorvalue)`: Zwraca logarytm dziesiętny przekazanego pola lub wartości.
+
+- `sin(fieldorvalue)`: Zwraca sinus przekazanego pola lub wartości, wyrażony w radianach.
+  
+- `cos(fieldorvalue)`: Zwraca cosinus przekazanego pola lub wartości, wyrażony w radianach.
+
+- `tan(fieldorvalue)`: Zwraca tangens przekazanego pola lub wartości, wyrażony w radianach.
+
+- `asin(fieldorvalue)`: Zwraca arcus sinus przekazanego pola lub wartości, wyrażony w radianach.
+
+- `acos(fieldorvalue)`: Zwraca arcus cosinus przekazanego pola lub wartości, wyrażony w radianach.
+
+- `atan(fieldorvalue)`: Zwraca arcus tangens przekazanego pola lub wartości, wyrażony w radianach.
+
+- `atan2(x, y)`: Zwraca kąt w radianach, jaki tworzy z dodatnią osią X wektor o współrzędnych (x, y). Wynik mieści się w zakresie od -pi() do pi().
+
+- `sqrt(fieldorvalue)`: Zwraca nieujemny pierwiastek kwadratowy z przekazanego pola lub wartości.
+
+- `exp(x)`: Zwraca wartość e^x.
+
+- `pi()`: Zwraca wartość pi.
 
 ### Funkcje daty i czasu
 
-1. `today()`: Zwraca bieżącą datę.
+<Callout type="warning">
+Wartości dat w rtSurvey są przechowywane jako ciągi znaków w formacie `RRRR-MM-DD`. Wartości daty i czasu (datetime) są przechowywane jako ciągi znaków ISO 8601 (`RRRR-MM-DDTHH:MM:SS`). Użyj `decimal-date-time()`, aby przekonwertować je na liczbę do obliczeń arytmetycznych (np. obliczania czasu trwania).
+</Callout>
 
-2. `now()`: Zwraca bieżącą datę i czas.
+1. `today()`: Zwraca dzisiejszą datę jako ciąg znaków w formacie `RRRR-MM-DD`. Oceniane raz, gdy formularz zostaje otwarty.
+   - Przykład: `today()` → `'2024-03-15'`
+   - Typowe zastosowanie: Kolumna `default` do wstępnego wypełnienia dzisiejszą datą lub w kolumnach `relevant`/`constraint` do porównania z polem daty.
 
-3. `date(wartosc)`: Konwertuje wartość na datę.
+2. `now()`: Zwraca bieżącą datę i godzinę jako ciąg znaków ISO 8601. Oceniane za każdym razem, gdy wyrażenie jest obliczane.
+   - Przykład: `now()` → `'2024-03-15T14:32:00.000+03:00'`
+   - Typowe zastosowanie: Rejestrowanie dokładnego znacznika czasu konkretnego zdarzenia podczas ankiety.
 
-4. `date-time(wartosc)`: Konwertuje wartość na datę i czas.
+3. `date(value)`: Konwertuje wartość (ciąg znaków lub liczbę) na ciąg znaków daty. Przydatne do wymuszania typu daty dla obliczonych wartości.
+   - Przykład: `date('2024-03-15')` → `'2024-03-15'`
 
-5. `decimal-date-time(wartosc)`: Konwertuje datę/czas na reprezentację dziesiętną.
+4. `date-time(value)`: Konwertuje wartość na ciąg znaków daty i czasu (datetime).
+   - Przykład: `date-time(${event_timestamp})`
 
-6. `format-date(data, wzorzec)`: Formatuje datę zgodnie z podanym wzorcem.
+5. `decimal-date-time(value)`: Konwertuje ciąg znaków daty lub daty i czasu na liczbę dziesiętną reprezentującą milisekundy od epoki Uniksa podzielone przez 86400000 (tj. ułamkowe dni od 1970-01-01). Użyj tego do wykonywania operacji arytmetycznych na datach.
+   - Przykład: Czas trwania w dniach między dwiema datami:
+     `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
+   - Przykład: Czas trwania w minutach między dwiema datami i czasem:
+     `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
 
-### Funkcje numeryczne
+6. `format-date(date, format)`: Formatuje wartość daty przy użyciu ciągu wzorca.
+   - Tokeny formatu: `%Y` (4-cyfrowy rok), `%y` (2-cyfrowy rok), `%m` (miesiąc 01–12), `%d` (dzień 01–31), `%a` (skrócona nazwa dnia tygodnia), `%b` (skrócona nazwa miesiąca)
+   - Przykład: `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+   - Przykład: `format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
 
-1. `int(wartosc)`: Konwertuje wartość na integer (obcina część dziesiętną).
+7. `format-date-time(datetime, format)`: Formatuje wartość daty i czasu przy użyciu ciągu wzorca. Akceptuje wszystkie tokeny `format-date` oraz:
+   - `%H` (godzina 00–23), `%h` (godzina 01–12), `%M` (minuty 00–59), `%S` (sekundy 00–59), `%3` (milisekundy), `%P` (AM/PM)
+   - Przykład: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+   - Przykład: `format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
 
-2. `number(wartosc)`: Konwertuje wartość na liczbę.
+8. `STRFTIME(format, datetime)`: Formatowanie daty w stylu SQLite. Dostępne wewnątrz ciągów SQL przekazywanych do zapytań `rawquery` — **niedostępne** w kolumnach XLSForm `calculation` lub `label`. Używa tokenów formatu SQLite (`%Y`, `%m`, `%d`, `%H`, `%M`, `%S`).
+   - Przykład wewnątrz ciągu SQL rawquery: `'SELECT STRFTIME(''%Y-%m'', interview_date) AS month FROM data WHERE id = ?'`
+   - Uwaga: Do formatowania dat w wyrażeniach XLSForm używaj `format-date-time()`. `STRFTIME()` jest funkcją SQLite dostępną tylko wewnątrz SQL przekazywanego do `rawquery`.
 
-3. `round(wartosc, miejsca)`: Zaokrągla liczbę do podanej liczby miejsc dziesiętnych.
+---
 
-4. `floor(liczba)`: Zwraca największą liczbę całkowitą mniejszą lub równą `liczba`.
+### Funkcje logiczne (Boolean)
 
-5. `ceiling(liczba)`: Zwraca najmniejszą liczbę całkowitą większą lub równą `liczba`.
+1. `boolean(value)`: Konwertuje dowolną wartość na typ logiczny. Zwraca `true` dla niepustych ciągów znaków, liczb niezerowych i `true`; zwraca `false` dla pustych ciągów znaków, `0` i `false`.
+   - Przykład: `boolean(${name})` zwraca `true`, jeśli pole `name` nie jest puste.
 
-6. `random()`: Zwraca losową liczbę dziesiętną od 0,0 (włącznie) do 1,0 (wyłącznie).
+2. `boolean-from-string(string)`: Zwraca `true`, jeśli ciąg znaków to `'1'` lub `'true'` (wielkość liter nie ma znaczenia); w przeciwnym razie zwraca `false`.
+   - Przykład: `boolean-from-string(${enabled_flag})` — przydatne, gdy pole przechowuje `'true'`/`'false'` jako tekst.
 
-7. `coalesce(a, b)`: Zwraca `a` jeśli `a` nie jest puste; w przeciwnym razie zwraca `b`.
+3. `true()`: Zwraca wartość logiczną `true`.
+   - Przykład: W kolumnie `required` `true()` jest równoważne `yes`.
 
-8. `once(wartosc)`: Ocenia `wartosc` i przechowuje ją, ale tylko jeśli bieżące pole jest **puste**.
-   - Przykład: `once(uuid())` generuje UUID raz i zachowuje go stabilnym podczas ponownych edycji.
+4. `false()`: Zwraca wartość logiczną `false`.
+   - Przykład: `if(${skip_section} = 'yes', false(), true())` — dynamiczne ustawianie wymagalności (required).
 
-### Funkcje geo
+5. `not(expression)`: Zwraca logiczną negację wyrażenia. Zwraca `true`, jeśli wyrażenie jest fałszywe i odwrotnie.
+   - Przykład: `not(${consent} = 'yes')` — pokaż ostrzeżenie, gdy NIE udzielono zgody.
+   - Przykład: `not(selected(${issues}, 'none'))` — wymagaj szczegółów tylko wtedy, gdy nie wybrano opcji "none".
 
-1. `area(wartosc_geoshape)`: Oblicza **powierzchnię w metrach kwadratowych** otoczoną przez geoshape (wielokąt).
-   - Przykład: `area(${field_boundary})` — oblicz powierzchnię ankietowanego pola w m².
+---
 
-2. `distance(wspolrzedne)`: Oblicza **całkowitą długość ścieżki w metrach** geotrace (linii) lub odległość między dwoma geopointami.
+### Dodatkowe funkcje tekstowe
 
-### Funkcje walidacji
+1. `starts-with(string, prefix)`: Zwraca `true`, jeśli `string` zaczyna się od `prefix`.
+   - Przykład: `starts-with(${phone}, '+254')` sprawdza, czy numer telefonu zaczyna się od kodu kraju Kenii.
 
-1. `regex(wartosc, wzorzec)`: Zwraca `prawdę` jeśli `wartosc` pasuje do wyrażenia regularnego `wzorzec`.
-   - Przykład: `regex(., '^[0-9]{10}$')` — sprawdź poprawność 10-cyfrowego numeru.
+2. `contains(string, substring)`: Zwraca `true`, jeśli `string` zawiera `substring`.
+   - Przykład: `contains(${email}, '@')` sprawdza, czy adres e-mail zawiera znak `@`.
+   - Przykład: `contains(${notes}, 'urgent')` wywołuje pytanie uzupełniające, jeśli w notatkach wspomniano o słowie "urgent".
 
-2. `checklist(min, max, w1, w2, ...)`: Ocenia listę wyrażeń boolean i zwraca `prawdę` jeśli liczba wartości `prawda` mieści się w zakresie od `min` do `max`.
+3. `substring-before(string, needle)`: Zwraca część ciągu `string`, która pojawia się przed pierwszym wystąpieniem `needle`.
+   - Przykład: `substring-before(${full_name}, ' ')` wyodrębnia pierwsze słowo (imię).
+
+4. `substring-after(string, needle)`: Zwraca część ciągu `string`, która pojawia się po pierwszym wystąpieniu `needle`.
+   - Przykład: `substring-after(${email}, '@')` wyodrębnia część domeny z adresu e-mail.
+
+5. `normalize-space(string)`: Usuwa początkowe i końcowe białe znaki oraz zamienia wszystkie wewnętrzne sekwencje białych znaków na pojedynczą spację.
+   - Przykład: `normalize-space(${name})` — czyści imię i nazwisko, które mogło zostać wpisane z dodatkowymi spacjami.
+
+6. `translate(string, search_chars, replace_chars)`: Zastępuje każdy znak w `string`, który pojawia się w `search_chars`, odpowiednim znakiem z `replace_chars`. Znaki w `search_chars` niemające odpowiednika w `replace_chars` są usuwane.
+   - Przykład: `translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` konwertuje na wielkie litery (odpowiednik `upper()`).
+   - Przykład: `translate(${phone}, ' -()', '')` usuwa spacje, myślniki i nawiasy z numeru telefonu.
+
+---
+
+### Dodatkowe funkcje matematyczne
+
+1. `floor(number)`: Zwraca największą liczbę całkowitą mniejszą lub równą `number` (zaokrągla w stronę ujemnej nieskończoności).
+   - Przykład: `floor(4.9)` = 4, `floor(-2.1)` = -3
+
+2. `ceiling(number)`: Zwraca najmniejszą liczbę całkowitą większą lub równą `number` (zaokrągla w stronę dodatniej nieskończoności).
+   - Przykład: `ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
+
+3. `random()`: Zwraca losową liczbę dziesiętną z zakresu od 0.0 (włącznie) do 1.0 (wyłącznie). Zazwyczaj używana w polach `calculate` do przypisywania losowych wartości lub randomizacji kolejności pytań.
+   - Przykład: `random()` → np. `0.7341`
+   - Przykład: `int(random() * 6) + 1` → losowa liczba 1–6 (rzut kostką)
+
+4. `coalesce(a, b)`: Zwraca `a`, jeśli `a` nie jest puste; w przeciwnym razie zwraca `b`. Przydatne jako rozwiązanie rezerwowe, gdy pole może być puste.
+   - Przykład: `coalesce(${preferred_name}, ${full_name})` — użyj preferowanego imienia, jeśli jest ustawione, w przeciwnym razie użyj pełnego imienia i nazwiska.
+
+5. `once(value)`: Ocenia `value` i przechowuje ją, ale tylko wtedy, gdy bieżące pole jest **puste**. Jeśli pole ma już wartość (np. zostało wcześniej ustawione), `once()` zwraca istniejącą wartość bez zmian. Zapobiega to nadpisywaniu danych wprowadzonych przez użytkownika przez ponowne obliczenia.
+   - Przykład: `once(today())` w kolumnie `default` ustawia dzisiejszą datę raz i nie aktualizuje jej, jeśli ankieter ponownie otworzy formularz.
+   - Przykład: `once(uuid())` generuje identyfikator UUID raz i zachowuje go bez zmian przy ponownej edycji.
+
+---
+
+### Funkcje geograficzne
+
+1. `area(geoshape_value)`: Oblicza **powierzchnię w metrach kwadratowych** objętą wartością typu geoshape (wielokąt).
+   - Parametr to wartość pola geoshape w formacie `lat1 lon1 0 0; lat2 lon2 0 0; ...`
+   - Przykład: `area(${field_boundary})` — oblicz powierzchnię zmierzonego pola w m².
+   - Przykład: `round(area(${field_boundary}) div 10000, 2)` — przelicz na hektary.
+
+2. `distance(coordinates)`: Oblicza **całkowitą długość ścieżki w metrach** typu geotrace (linia) lub odległość między dwoma punktami geopoint.
+   - Dla geotrace: `distance(${route})` zwraca całkowitą długość ścieżki w metrach.
+   - Dla dwóch punktów geopoint: `distance(concat(${point_a}, ' ', ${point_b}))` zwraca odległość między nimi.
+   - Przykład: `round(distance(${road_trace}) div 1000, 3)` — długość drogi w kilometrach.
+
+---
+
+### Funkcje walidacyjne
+
+1. `regex(value, pattern)`: Zwraca `true`, jeśli `value` pasuje do wyrażenia regularnego `pattern`. Używaj w kolumnie `constraint` do walidacji opartej na wzorcach.
+   - Wzorzec używa standardowej składni regex (podzbiór POSIX ERE).
+   - Przykład: `regex(., '^[0-9]{10}$')` — walidacja 10-cyfrowego numeru.
+   - Przykład: `regex(., '^[A-Z]{2}[0-9]{6}$')` — walidacja formatu numeru paszportu (2 wielkie litery, a następnie 6 cyfr).
+   - Przykład: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — podstawowe sprawdzenie formatu e-mail.
+
+2. `checklist(min, max, v1, v2, ...)`: Ocenia listę wyrażeń logicznych i zwraca `true`, jeśli liczba wartości `true` mieści się w przedziale od `min` do `max` (włącznie). Przekaż `-1` dla `min` lub `max`, aby pominąć to ograniczenie.
+   - Przykład: `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — przechodzi, jeśli dokładnie 2 lub 3 z trzech warunków są prawdziwe.
+   - Przykład: `checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — co najmniej jeden środek bezpieczeństwa musi być prawdziwy.
+
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Podobnie jak `checklist()`, ale każda wartość ma wagę. Suma wag dla wartości `true` musi mieścić się w przedziale od `min` do `max`.
+   - Przykład: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — suma wag dla obecnych udogodnień musi wynosić co najmniej 10.
+
+---
 
 ### Funkcje narzędziowe
 
-1. `uuid()`: Generuje losowy UUID (format RFC 4122 v4) jako ciąg znaków.
-   - Zazwyczaj używany z `once()` do generowania stabilnego unikalnego ID: `once(uuid())`
+1. `uuid()`: Generuje losowy identyfikator UUID (format RFC 4122 v4) jako ciąg znaków.
+   - Przykład: `uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
+   - Zazwyczaj używany z `once()`, aby wygenerować stabilny, unikalny identyfikator: `once(uuid())`
 
-2. `version()`: Zwraca wartość atrybutu `version` formularza.
+2. `version()`: Zwraca wartość atrybutu `version` formularza, ustawioną w arkuszu settings.
+   - Przykład: `version()` → `'3.1'`
+   - Przydatne w polach `calculate` do osadzania wersji formularza w wyeksportowanych danych.
 
-3. `position()`: Gdy wywoływana wewnątrz **grupy powtórzeń**, zwraca 1-bazowany indeks bieżącej instancji powtórzenia.
+3. `position()`: Wywołana wewnątrz **grupy powtarzalnej** (repeat group), zwraca indeks bieżącej instancji powtórzenia (liczany od 1).
+   - Przykład: `position()` w pierwszej instancji zwraca `1`, w drugiej zwraca `2` i tak dalej.
+   - Zobacz także: `index()` (alias), `indexed-repeat()` do odwoływania się do wartości powtórzeń spoza grupy.
 
-4. `substr-jsonpath(wartosc, jsonpath)`: Wyodrębnia podciąg z ciągu JSON używając wyrażenia JSONPath.
-   - Zazwyczaj używany wraz z `callapi()` do wyodrębniania konkretnych wartości z odpowiedzi API.
+4. `thousandsep(length, separator, value)`: Formatuje liczbę z separatorem tysięcy. `length` to minimalna całkowita długość ciągu (dopełniona spacjami, jeśli jest krótsza), `separator` to znak, który ma być użyty (np. `','`), a `value` to liczba do sformatowania.
+   - Przykład: `thousandsep(0, ',', 1234567)` → `'1,234,567'`
+   - Przykład: `thousandsep(0, '.', ${income})` → formatuje dochód z kropką jako separatorem tysięcy.
+
+5. `substr-jsonpath(value, jsonpath)`: Wyodrębnia wartość z ciągu znaków JSON przy użyciu wyrażenia JSONPath.
+   - `value` musi być ciągiem znaków JSON (np. pole, w którym zapisano surową odpowiedź API za pomocą `callapi(..., 'json:', ...)`).
+   - `jsonpath` to wyrażenie JSONPath (np. `'$.data.name'`, `'$.items[0].id'`).
+   - Zawsze zwraca **ciąg znaków** — otocz funkcją `number()`, gdy jest używana w arytmetyce.
+   - Zwraca pusty ciąg `''`, jeśli ścieżka nie zostanie znaleziona lub `value` nie jest prawidłowym JSON-em.
+   - Przykład: `substr-jsonpath(${api_response}, '$.data.name')` — wyodrębnij pole `name`.
+   - Przykład: `substr-jsonpath(${api_response}, '$.items[0].label')` — pierwszy element tablicy.
+   - Przykład: `number(substr-jsonpath(${api_response}, '$.price'))` — wyodrębnij wartość numeryczną.
+   - Zazwyczaj używane razem z `callapi(..., 'json:', ...)` do wyodrębniania wielu pól z jednej odpowiedzi API. Zobacz [Pobieranie wielu wartości z jednego wywołania API](../advanced-features/call-api#fetching-multiple-values-from-one-api-call).

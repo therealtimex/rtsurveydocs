@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "Аудіозапис",
   "call-api": "Call API",
   "dynamic-question-type": "Динамічний тип питання",
   "dynamic-search": "Динамічний пошук",

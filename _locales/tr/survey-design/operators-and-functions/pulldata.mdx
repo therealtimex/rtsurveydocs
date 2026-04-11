@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "pulldata() fonksiyonu, forma eklenmiş harici bir CSV dosyasından bir değer alır, bir anahtar sütunu bir anahtar değerle eşleştirir ve ilgili sonuç sütununu döndürür."
+---
+
+import { Callout } from 'nextra/components'
+
+`pulldata()` fonksiyonu, forma eklenmiş bir CSV dosyasından bir değer alır. Bir dosya adı, döndürülecek bir sütun, eşleştirilecek bir sütun ve bir anahtar değer verildiğinde, eşleşen satır ve sonuç sütununun kesişimindeki hücreyi döndürür.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Sıra | Parametre | Açıklama |
+|----------|-----------|-------------|
+| 1 | Dosya adı | CSV medya dosyasının adı (`select_one_from_file` içinde kullanılan adla aynı) |
+| 2 | Sonuç sütunu | Değerini döndürmek istediğiniz sütun |
+| 3 | Anahtar sütun | Karşılaştırma yapılacak sütun |
+| 4 | Anahtar değer | Eşleştirilecek değer — genellikle `${field}` gibi bir alan referansı |
+
+Eşleşme bulunamazsa fonksiyon boş bir dize döndürür.
+
+---
+
+## Ön Koşullar
+
+CSV dosyası forma bir **medya dosyası** olarak eklenmelidir. `pulldata()` tarafından başvurulan aynı dosya, `select_one_from_file` için seçenek listesi olarak da kullanılabilir.
+
+**Örnek CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Temel örnek
+
+Kimliklerinden bir personelin departmanını ve telefonunu bulun:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Select staff member | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Department: `${dept}` — Phone: `${phone}` | |
+
+<Callout type="info">
+Bir `select_one_from_file` CSV'sindeki `name` sütunu saklanan değerdir. Sayım görevlisi "Alice"i seçtiğinde, `${staff_id}` değeri `"Alice"` olur ve `pulldata()` bunu departmanını ve telefonunu almak için anahtar olarak kullanır.
+</Callout>
+
+---
+
+## Seçilen bir seçeneğin etiketini alma
+
+Bir `select_one_from_file` sorusu `name` değerini saklar. İnsan tarafından okunabilir `label`ı (etiketi) görüntülemek için, onu bulmak üzere `pulldata()` kullanın:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Select village | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | You selected: `${village_label}` | |
+
+---
+
+## Bir seçimden birden fazla arama
+
+Aynı seçilen satır için farklı sütunları almak üzere aynı dosya üzerinde `pulldata()`yı birden çok kez çağırabilirsiniz:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Select facility | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## pulldata()'yı relevant ve constraint sütunlarında kullanma
+
+`pulldata()`, aranan değerlere dayalı mantık uygulamak için `relevant` (ilgili) ve `constraint` (kısıtlama) sütunlarında kullanılabilir:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Select facility | | |
+| integer | bed_count | Number of beds occupied | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## pulldata()'yı `once()` ile kullanma
+
+`pulldata()`yı yalnızca ilk yüklemede değerlendirmek için (ilk girişten sonra anahtar alanı değiştiğinde yeniden değerlendirmeyi önlemek amacıyla), onu `once()` içine alın:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## En İyi Uygulamalar
+
+1. CSV'deki anahtar sütun, `select_one_from_file` içinde kullanılan `name` sütunuyla eşleşmelidir — bunlar aynı değer olmalıdır.
+2. CSV'deki sütun adları büyük/küçük harfe duyarlıdır — `Department` ve `department` farklı sütunlardır.
+3. Anahtar değer bulunamazsa, `pulldata()` boş bir dize döndürür — boş seçimlere karşı korunmak için `if(${field} != '', pulldata(...), '')` kullanın.
+4. Mümkün olduğunda CSV dosyalarını küçük tutun — büyük dosyalar, düşük bant genişliğine sahip bağlantılarda form yükleme süresini artırır.
+5. Veri toplama turları arasında değişen veriler için, yeni bir form sürümü yükleyerek CSV medya dosyasını güncelleyin.
+
+## Sınırlamalar
+
+- `pulldata()` yalnızca anahtar sütunun anahtar değere eşit olduğu **ilk** satırı eşleştirir — CSV'deki kopya anahtar değerler desteklenmez.
+- CSV dosyası dağıtımdan önce forma eklenmelidir; çalışma zamanında bir URL'den getirilemez.
+- `pulldata()` tarafından döndürülen sayısal değerler dizedir — aritmetikte kullanıldığında `number()` içine alın: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey ayrıca cihaz meta verilerini, JWT alanlarını ve JSON verilerini okumak için `pulldata()`nın genişletilmiş formlarını da destekler. `pulldata('app-api', ...)` için [App API](../app-api) sayfasına ve JSON tabanlı arama desenleri için [Call API](../advanced-features/call-api) sayfasına bakın.
+</Callout>
+
+---
+
+## Genişletilmiş pulldata() varyantları
+
+CSV aramalarının ötesinde, `pulldata()` ilk bağımsız değişkeni değiştirerek birkaç ek veri kaynağını destekler.
+
+### `pulldata('app-api', key)`
+
+Cihaz meta verilerini, kullanıcı niteliklerini ve uygulama bağlamını okuyun. [App API](../app-api) sayfasındaki tam referansa bakın.
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Satır içi bir JSON dizesini ayrıştırın ve bir JSONPath ifadesi kullanarak bir değer ayıklayın. Forma gömülü bir JSON sabit değeriniz olduğunda kullanışlıdır.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Eşleşen değeri dize olarak veya bulunamazsa boş dize olarak döndürür.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Bir JSONPath ifadesi kullanarak başka bir alanda saklanan bir JSON dizesinden bir değer ayıklayın. Bu, `substr-jsonpath(${field}, jsonpath)` ile eşdeğerdir.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Bir alanda saklanan bir JWT belirtecini çözün ve yükten (payload) belirli bir hak talebinin (claim) değerini döndürün.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Belirteç geçersizse veya hak talebi mevcut değilse boş dize döndürür.
+
+### `pulldata('instanceid')`
+
+Mevcut gönderimin benzersiz örnek kimliğini döndürür. `instanceID` meta alanına eşdeğerdir.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Form yapılandırmasında tanımlanan adlandırılmış bir eşleme tablosunu kullanarak bir değeri diğeriyle eşleştirin.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Eşlenen değeri veya eşleşme yoksa boş dizeyi döndürür.
+
+### `pulldata('options', optionName)`
+
+Bir form yapılandırma seçeneğini adına göre okuyun.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Paketlenmiş bir SQLite `.db` dosyasına karşı bir SQL `SELECT` sorgusu yürütün ve ilk eşleşen satırın ilk sütunundaki değeri döndürün. SQL dizesinden sonraki parametreler, sırayla `?` yer tutucularıyla değiştirilir.
+
+| Sıra | Parametre | Açıklama |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | Bu varyantı tanımlayan değişmez dize |
+| 2 | yol | `concat(${family_path}, '/file.db::tableName')` biçimindeki dosya yolu |
+| 3 | SQL | Konumsal yer tutucu olarak `?` kullanan bir `SELECT` ifadesi |
+| 4+ | parametreler | Sırayla her `?` için değiştirilen değerler — genellikle `${field}` gibi alan referansları |
+
+Hiçbir satır eşleşmezse boş bir dize döndürür.
+
+**Örnek — kimliğe göre bir il adı bulun:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Örnek — hem il hem de ilçe kodlarına göre filtrelenmiş bir mahalle adı bulun:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Bir CSV dosyasındaki tek bir anahtar sütunu eşleştiren standart dört bağımsız değişkenli `pulldata()` fonksiyonunun aksine, `rawquery` varyantı bir SQLite veritabanına karşı tam bir SQL `SELECT` sorgusu yürüterek çok sütunlu `WHERE` koşullarına ve geri dönüş değeri olarak herhangi bir sütuna izin verir.
+
+<Callout type="info">
+`rawquery` yaygın olarak hiyerarşik konum aramaları için otomatik tamamlama alanlarıyla birlikte kullanılır. `.db` dosyaları oluşturma ve bunları `pulldata('rawquery', ...)` fonksiyonuna bağlama hakkında ayrıntılar için [Yerel Veritabanı Araması](../advanced-features/local-database-search) sayfasına bakın.
+</Callout>

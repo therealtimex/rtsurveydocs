@@ -1,0 +1,118 @@
+---
+title: "Nagrywanie dźwięku"
+description: "Nagrywaj dźwięki otoczenia lub wywiady podczas zbierania danych ankietowych, używając parametrów appearance audio-start i audio-end w polach tekstowych."
+---
+
+Nagrywanie dźwięku pozwala formularzowi na ciche lub widoczne rejestrowanie dźwięku podczas sekcji ankiety. Jest to przydatne do nagrywania wywiadów, dźwięków otoczenia podczas obserwacji terenowych lub odpowiedzi ustnych, które uzupełniają ustrukturyzowane odpowiedzi.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Tylko aplikacja mobilna.** Nagrywanie dźwięku wymaga aplikacji mobilnej rtSurvey. W formularzu internetowym parametry `audio-start` i `audio-end` są po prostu ignorowane — nagrywanie nie odbywa się i nie jest wyświetlany żaden błąd. Zawsze testuj na urządzeniu, gdy wymagane jest nagrywanie dźwięku.
+</Callout>
+
+---
+
+## Jak to działa
+
+Nagrywanie dźwięku jest kontrolowane przez dwa pola typu `text` działające jako **znaczniki**:
+
+- Pole z parametrem appearance `audio-start` rozpoczyna nagrywanie, gdy ankieter do niego dotrze.
+- Pole z parametrem appearance `audio-end` kończy nagrywanie i zapisuje plik audio w przesłanym formularzu.
+
+Oba pola znaczników są typu `text`. Zazwyczaj są one ukryte przed ankieterem (za pomocą `relevant = false` lub umieszczone w pozycji nieinteraktywnej), chociaż mogą być widoczne. Nagrany dźwięk jest dołączany do przesłanego formularza jako plik powiązany z polem `audio-end`.
+
+---
+
+## Podstawowy przykład
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Imię i nazwisko respondenta | |
+| text | q_occupation | Zawód | |
+| integer | q_age | Wiek | |
+| text | audio_e_a1 | | `audio-end` |
+
+Aplikacja rozpoczyna nagrywanie, gdy ankieter dotrze do pola `audio_s_a1`, i kończy, gdy dotrze do `audio_e_a1`. Wszystkie pytania pomiędzy tymi dwoma znacznikami zostaną nagrane.
+
+---
+
+## Ciche nagrywanie: `audio-start invisible`
+
+Domyślnie aplikacja mobilna wyświetla wskaźnik nagrywania podczas rejestrowania dźwięku. Dodanie `invisible` do parametru appearance ukrywa ten wskaźnik, dzięki czemu nagrywanie odbywa się bez widocznego sygnału dla respondenta.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Czy zgadzasz się na udział? | |
+| text | q_feedback | Twoja opinia | |
+| text | audio_e_a1 | | `audio-end` |
+
+Używaj `invisible` tylko wtedy, gdy wymogi dotyczące informowania zostały spełnione w inny sposób (np. oddzielne pole pisemnej zgody przed sekcją nagrywania).
+
+---
+
+## Konwencja nazewnictwa
+
+Formularze produkcyjne używają spójnego wzorca nazewnictwa dla pól znaczników:
+
+```
+audio_s_{section}{n}   — znacznik początku
+audio_e_{section}{n}   — znacznik końca
+```
+
+Gdzie `{section}` to krótka etykieta sekcji formularza, a `{n}` to numer kolejny w tej sekcji.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | Pierwsze nagranie w sekcji A |
+| `audio_e_a1` | End | Koniec pierwszego nagrania w sekcji A |
+| `audio_s_b1` | Start | Pierwsze nagranie w sekcji B |
+| `audio_e_b1` | End | Koniec pierwszego nagrania w sekcji B |
+| `audio_s_a2` | Start | Drugie nagranie w sekcji A |
+| `audio_e_a2` | End | Koniec drugiego nagrania w sekcji A |
+
+Przestrzeganie tej konwencji ułatwia identyfikację granic nagrywania podczas przeglądania definicji formularzy i danych przesłanych przez ankieterów.
+
+---
+
+## Przechowywanie i pobieranie
+
+Gdy ankieter dotrze do pola `audio-end`, aplikacja finalizuje plik audio i dołącza go do przesłanego formularza. Plik jest:
+
+- Przechowywany jako załącznik audio w przesłanym formularzu, powiązany z nazwą pola `audio-end`.
+- Dostępny w przeglądarce przesłanych formularzy w panelu administracyjnym rtSurvey wraz z innymi załącznikami multimedialnymi.
+- Możliwy do pobrania poprzez standardowy eksport danych — pliki audio pojawiają się w kolumnie mediów odpowiadającej nazwie pola `audio-end`.
+
+Format pliku i szybkość transmisji bitów zależą od urządzenia i wersji aplikacji.
+
+---
+
+## Wiele sekcji nagrywania
+
+Formularz może zawierać kilka nienakładających się sekcji nagrywania. Każda para znaczników `audio-start` / `audio-end` musi być w pełni domknięta — sekcje nie mogą się przeplatać.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Wstęp | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Szczegóły | |
+| text | audio_e_b1 | | `audio-end` |
+
+Każda sekcja tworzy oddzielny plik audio dołączony do odpowiedniego pola `audio-end`.
+
+---
+
+## Ograniczenia
+
+- **Tylko aplikacja mobilna.** Funkcja nie jest obsługiwana w formularzu internetowym. `audio-start` i `audio-end` są cicho ignorowane w przeglądarce.
+- **Brak zagnieżdżania.** Sekcje nagrywania nie mogą się nakładać. Rozpoczęcie nowego nagrywania przed osiągnięciem poprzedniego znacznika `audio-end` nie jest obsługiwane.
+- **Typ pola musi być `text`.** Używanie `audio-start` lub `audio-end` w pytaniach innego typu nie jest obsługiwane.
+- **Rozmiar wysyłanych danych.** Długie nagrania generują duże pliki. Należy pamiętać o limitach rozmiaru przesyłanych formularzy i warunkach sieciowych w terenie.
+- **Brak pauzy w trakcie nagrywania.** Nagrywanie odbywa się w sposób ciągły od znacznika początkowego do znacznika końcowego; nie ma mechanizmu wstrzymywania i wznawiania nagrywania w obrębie sekcji.

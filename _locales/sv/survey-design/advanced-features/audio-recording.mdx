@@ -1,0 +1,118 @@
+---
+title: "Ljudinspelning"
+description: "Spela in omgivningsljud eller intervju-ljud under insamling av enkätdata med audio-start och audio-end utseenden på textfält."
+---
+
+Ljudinspelning gör det möjligt för ett formulär att tyst eller synligt fånga ljud under en del av en enkät. Det är användbart för att spela in intervjuer, omgivningsljud under fältobservationer eller talade svar som kompletterar strukturerade svar.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Endast mobilapp.** Ljudinspelning kräver rtSurvey-mobilappen. I webbformuläret ignoreras utseendena `audio-start` och `audio-end` tyst — ingen inspelning sker och inget fel visas. Testa alltid på enheten när ljudinspelning krävs.
+</Callout>
+
+---
+
+## Hur det fungerar
+
+Ljudinspelning styrs av två `text`-fält som fungerar som **markörer**:
+
+- Ett fält med utseendet `audio-start` börjar spela in när intervjuaren når det.
+- Ett fält med utseendet `audio-end` stoppar inspelningen och sparar ljudfilen till inskickningen.
+
+Båda markörfälten är av typen `text`. De är vanligtvis dolda för intervjuaren (genom att använda `relevant = false` eller placerade i en icke-interaktiv position), även om de kan vara synliga. Det inspelade ljudet bifogas inskickningen som en fil länkad till fältet `audio-end`.
+
+---
+
+## Grundläggande exempel
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Respondentens namn | |
+| text | q_occupation | Yrke | |
+| integer | q_age | Ålder | |
+| text | audio_e_a1 | | `audio-end` |
+
+Appen börjar spela in när intervjuaren når `audio_s_a1` och slutar när de når `audio_e_a1`. Alla frågor mellan de två markörerna spelas in.
+
+---
+
+## Tyst inspelning: `audio-start invisible`
+
+Som standard visar mobilappen en inspelningsindikator medan ljud fångas. Genom att lägga till `invisible` i utseendet döljs denna indikator, så att inspelningen sker utan någon synlig ledtråd för respondenten.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Samtycker du till att delta? | |
+| text | q_feedback | Din feedback | |
+| text | audio_e_a1 | | `audio-end` |
+
+Använd `invisible` endast när krav på upplysning har uppfyllts på andra sätt (t.ex. ett separat skriftligt samtyckesfält före inspelningsavsnittet).
+
+---
+
+## Namngivningskonvention
+
+Produktionsformulär använder ett konsekvent namngivningsmönster för markörfält:
+
+```
+audio_s_{section}{n}   — startmarkör
+audio_e_{section}{n}   — slutmarkör
+```
+
+Där `{section}` är en kort etikett för formulärsavsnittet och `{n}` är ett löpnummer inom det avsnittet.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | Första inspelningen i avsnitt A |
+| `audio_e_a1` | End | Slut på första inspelningen i avsnitt A |
+| `audio_s_b1` | Start | Första inspelningen i avsnitt B |
+| `audio_e_b1` | End | Slut på första inspelningen i avsnitt B |
+| `audio_s_a2` | Start | Andra inspelningen i avsnitt A |
+| `audio_e_a2` | End | Slut på andra inspelningen i avsnitt A |
+
+Genom att följa denna konvention blir det lätt att identifiera inspelningsgränser när man granskar formulärsdefinitioner och inskickade data.
+
+---
+
+## Lagring och hämtning
+
+När intervjuaren når fältet `audio-end`, färdigställer appen ljudfilen och bifogar den till inskickningen. Filen är:
+
+- Lagrad som en ljudbilaga på inskickningen, associerad med fältnamnet `audio-end`.
+- Tillgänglig i rtSurveys back-end för granskning av inskickningar tillsammans med andra mediabilagor.
+- Nedladdningsbar via standardexporten av inskickningar — ljudfiler visas i mediakolumnen som motsvarar fältnamnet `audio-end`.
+
+Filformat och bithastighet beror på enheten och appversionen.
+
+---
+
+## Flera inspelningsavsnitt
+
+Ett formulär kan innehålla flera icke-överlappande inspelningsavsnitt. Varje par av `audio-start` / `audio-end`-markörer måste vara helt inneslutna — avsnitt får inte flätas samman.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Introduktion | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Detaljer | |
+| text | audio_e_b1 | | `audio-end` |
+
+Varje avsnitt skapar en separat ljudfil som bifogas dess respektive `audio-end`-fält.
+
+---
+
+## Begränsningar
+
+- **Endast mobilapp.** Funktionen stöds inte i webbformuläret. `audio-start` och `audio-end` ignoreras tyst i en webbläsare.
+- **Ingen nestning.** Inspelningsavsnitt kan inte överlappa. Att starta en ny inspelning innan föregående `audio-end`-markör har nåtts stöds inte.
+- **Fälttypen måste vara `text`.** Att använda `audio-start` eller `audio-end` på någon annan frågetyp stöds inte.
+- **Uppladdningsstorlek.** Långa inspelningar ger stora filer. Var medveten om storleksgränser för inskickningar och nätverksförhållanden i fält.
+- **Ingen paus under inspelning.** Inspelningen körs kontinuerligt från startmarkören till slutmarkören; det finns ingen mekanism för att pausa och återuppta inom ett avsnitt.

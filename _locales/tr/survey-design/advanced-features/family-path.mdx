@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path, çalışma zamanında formun paketlenmiş medya dizini yolunu döndüren bir kural hesaplama (calculate) alanıdır — yerel veritabanı aramalarını veya dosya tabanlı aramayı kullanan her form için gereklidir."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path`, formun paketlenmiş medya dizininin yolunu tutan bir kural hesaplama (calculate) alanıdır. `rawquery`, `pulldata` veya `search()` ile yerel veritabanı aramaları gerçekleştiren her form bu alanı içermelidir — bu alan olmadan dosya yolları çözülemez ve aramalar sessizce boş döner.
+
+---
+
+## Hesaplama alanı (calculate field)
+
+Bu satırı survey sayfanızın üst kısmına, meta alanlardan sonra ve bir veritabanı dosyası kullanan ilk sorudan önce ekleyin:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Alan görünür bir değer saklamaz ve etiket (label) gerektirmez. Bunu takip eden tüm yol yapılandırmaları için sessiz bir ön koşuldur.
+
+---
+
+## Neden gereklidir
+
+RTSurvey form medyasını — SQLite veritabanları, resimler, ses klipleri — cihazdaki form başına bir dizinde paketler. Tam yol, platformlar (Android, iOS, web) ve cihazlar arasında farklılık gösterir.
+
+Çalışma zamanında uygulama `family_path` değerini otomatik olarak doldurur. Tipik bir çözümlenmiş değer şuna benzer:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Yol platforma özgü olduğundan ve açılış zamanında belirlendiğinden, formda sabit kodlanamaz. `pulldata('app-api', 'family_path')` bunu almanın tek güvenilir yoludur.
+
+---
+
+## Yollarda nasıl kullanılır
+
+`family_path` tanımlandıktan sonra, `concat()` ile tam bir dosya yolu oluşturun:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Dosya açıldığında `::tableName` son eki kaldırılır; tablo adı yalnızca SQL sorgunuzun içinde kullanılır.
+
+---
+
+## family_path nerede kullanılır
+
+Paketlenmiş bir dosyaya her başvurduğunuzda yol bağımsız değişkeninde `family_path` gereklidir:
+
+- **Yerel veritabanı araması** — `search-autocomplete-noedit-v2('rawquery', ...)` işlevinin `db_path` bağımsız değişkeni `concat(${family_path}, ...)` ile oluşturulmalıdır. Tam kullanım ayrıntıları için [Yerel Veritabanı Araması](local-database-search) bölümüne bakın.
+- **`pulldata` rawquery** — Bir `.db` dosyasından okuyan herhangi bir `pulldata('rawquery', ...)` çağrısı aynı `concat()` desenini kullanır.
+- **Yerel bir dosya ile `search()`** — Paketlenmiş bir CSV veya DB dosyasından yüklenen dinamik arama görünümleri (appearance) de dosya referansı için `family_path` değerine dayanır.
+
+---
+
+## Formdaki yerleşimi
+
+`family_path`, ona başvuran **ilk alandan önce** görünmelidir. Önerilen konum meta grubundan hemen sonrasıdır:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *( `${family_path}` değerine başvuran rawquery görünümü)* |
+
+<Callout type="warning">
+`family_path` formda eksikse veya ona başvuran ilk `rawquery` / `search()` alanından sonra yerleştirilmişse, paketlenmiş dosyalara karşı yapılan tüm aramalar sessizce boş dönecektir. Herhangi bir hata mesajı yoktur — otomatik tamamlama (autocomplete) basitçe hiçbir sonuç göstermez.
+</Callout>
+
+---
+
+## Birden fazla veritabanı dosyası
+
+Tek bir form birkaç `.db` dosyası kullanabilir. Her yol `concat()` ile bağımsız olarak oluşturulur:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+`family_path` değerini bir kez tanımlayın; gerektiği kadar çok alanda ona başvurun.
+
+---
+
+## Geliştirme sırasında doğrulama
+
+Cihazdaki çözümlenmiş değeri incelemek için `family_path` altına geçici bir `note` alanı ekleyin:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Path: ${family_path}` | |
+
+Not, test sırasında gerçek çözümlenmiş yolu gösterecektir. Son formu yayınlamadan önce bunu kaldırın.

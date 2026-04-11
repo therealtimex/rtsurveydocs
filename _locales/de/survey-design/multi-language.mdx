@@ -9,16 +9,16 @@ rtSurvey bietet eine robuste mehrsprachige Unterstützung, die es Ihnen ermögli
 
 Um eine mehrsprachige Umfrage in rtSurvey zu erstellen, müssen Sie sprachspezifische Spalten zu Ihrer XLSForm hinzufügen. So geht's:
 
-1. **Übersetzung von Beschriftungen (Labels)**: Fügen Sie Spalten für jede Sprache im Format `label::Sprache (code)` hinzu.
-2. **Übersetzung von Hinweisen (Hints)**: Verwenden Sie `hint::Sprache (code)` für die Übersetzung von Hinweisen.
-3. **Übersetzung von Mediendateien**: Für sprachspezifische Medien verwenden Sie `media::Sprache (code)`.
+1. **Übersetzungen von Beschriftungen (Labels)**: Fügen Sie Spalten für jede Sprache im Format `label::Language (code)` hinzu.
+2. **Übersetzungen von Hinweisen (Hints)**: Verwenden Sie `hint::Language (code)` für die Übersetzung von Hinweisen.
+3. **Übersetzungen von Mediendateien**: Verwenden Sie für sprachspezifische Medien `media::Language (code)`.
 
 Beispiel:
 
 ```
-| type    | name | label::English (en) | label::Deutsch (de) | hint::English (en) | hint::Deutsch (de) |
-|---------|------|---------------------|---------------------|---------------------|---------------------|
-| integer | age  | How old are you?    | Wie alt sind Sie?   | Enter your age      | Geben Sie Ihr Alter ein |
+| type    | name | label::English (en) | label::German (de) | hint::English (en) | hint::German (de) |
+|---------|------|---------------------|--------------------|---------------------|-------------------|
+| integer | age  | How old are you?    | Wie alt sind Sie?  | Enter your age      | Geben Sie Ihr Alter ein |
 ```
 
 ## Sprachcodes
@@ -49,9 +49,19 @@ rtSurvey ermöglicht es Benutzern, die Sprache während der Datenerfassung dynam
 rtSurvey erweitert die mehrsprachige Unterstützung auf Validierungsmeldungen:
 
 ```
-| type    | name | constraint | constraint_message::English (en) | constraint_message::Deutsch (de) |
-|---------|------|------------|----------------------------------|----------------------------------|
+| type    | name | constraint | constraint_message::English (en) | constraint_message::German (de) |
+|---------|------|------------|----------------------------------|---------------------------------|
 | integer | age  | . <= 150   | Age must be 150 or less          | Das Alter muss 150 oder weniger sein |
+```
+
+### Lokalisierte Meldungen für Pflichtfelder
+
+Verwenden Sie `required_message::Language (code)`, um eine übersetzte Fehlermeldung anzuzeigen, wenn ein Pflichtfeld leer gelassen wird:
+
+```
+| type | name | required | required_message::English (en) | required_message::German (de) |
+|------|------|----------|-------------------------------|-------------------------------|
+| text | name | yes      | This field is required        | Dieses Feld ist ein Pflichtfeld |
 ```
 
 ### RTL-Sprachunterstützung
@@ -64,7 +74,7 @@ Für von rechts nach links (RTL) geschriebene Sprachen wie Arabisch oder Hebräi
 | text | name | Your name           | اسمك                |
 ```
 
-### Sprachspezifisches Erscheinungsbild
+### Sprachspezifisches Erscheinungsbild (Appearance)
 
 rtSurvey ermöglicht es Ihnen, unterschiedliche Darstellungsformen für verschiedene Sprachen festzulegen:
 
@@ -73,6 +83,42 @@ rtSurvey ermöglicht es Ihnen, unterschiedliche Darstellungsformen für verschie
 |------|------|---------------------|---------------------|--------------------------|---------------------------|
 | text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
+
+## HTML-Formatierung in zweisprachigen Beschriftungen
+
+Sie können HTML-Tags mit Sprach-Wrappern in einer einzigen Beschriftungszelle kombinieren. rtSurvey extrahiert den Block der aktiven Sprache und rendert das verbleibende HTML.
+
+Beispiel mit Fettdruck und Schriftfarbe pro Sprache:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><de><big><b>Abschnitt 2: Haushaltseinkommen</b></big><br>Fragen Sie nur das Haushaltsvorstand.</de>
+```
+
+Unterstützte Inline-Tags innerhalb von Sprach-Wrappern: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Beispiel für farbigen Text pro Sprache:
+
+```
+<en><font color="red">Required field</font></en><de><font color="red">Pflichtfeld</font></de>
+```
+
+## Sprachabhängige Berechnungen
+
+Wenn ein Formular ein Feld `${language_use}` hat (festgelegt durch ein `change_language`-Widget), verwenden Sie `if()`, um Werte in der aktiven Sprache zurückzugeben:
+
+```
+if(${language_use} = 'en', label_en, label_de)
+```
+
+Beispiel — Anzeige eines Suchergebnisses in der aktiven Sprache mit `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_de FROM externalData WHERE code = ?', ${district})) |
+```
+
+Hinweis: Das Feld `language_use` wird normalerweise durch ein `change_language`-Erscheinungsbild-Widget festgelegt. Siehe Appearance — change_language.
 
 ## Best Practices für mehrsprachige Umfragen
 

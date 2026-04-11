@@ -1,0 +1,104 @@
+---
+title: "Kontrole za navigaciju u formi"
+description: "Koristite vrednosti izgleda SaveFinalizedExit i SaveIncompleteExit za prikazivanje stilizovanih dugmadi za izlaz koji čuvaju podatke i zatvaraju formu."
+---
+
+**Kontrole za navigaciju u formi** su vrednosti izgleda koje se postavljaju u polja tipa `note` (ili `text`) i koji se prikazuju kao stilizovana dugmad pune širine na dnu ankete. Oni omogućavaju anketaru da sačuva slanje i izađe iz forme jednim dodirom — bilo kao završen (finalizovan) zapis ili kao nacrt (nezavršen zapis).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Prikazuje dugme koje **čuva slanje kao finalizovano** i zatvara formu. Tekst dugmeta se uzima iz kolone `label` tog polja.
+
+| XLSForm column | Vrednost |
+|----------------|-------|
+| `type` | `note` |
+| `name` | bilo koje jedinstveno ime (npr. `btn_finish`) |
+| `label` | tekst prikazan na dugmetu |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Slanje se označava kao konačan, potpun zapis. Ovo je ekvivalentno dodiru na ugrađeno dugme za slanje.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Prikazuje dugme koje **čuva slanje kao nezavršeno (nacrt)** i zatvara formu. Anketar može da se vrati na nju kasnije i nastavi sa popunjavanjem.
+
+| XLSForm column | Vrednost |
+|----------------|-------|
+| `type` | `note` |
+| `name` | bilo koje jedinstveno ime (npr. `btn_pause`) |
+| `label` | tekst prikazan na dugmetu |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Sintaksa boje
+
+Oba izgleda prihvataju ugrađenu boju u formatu `<#RRGGBB/>`:
+
+- `#` nakon čega sledi tačno **6 heksadecimalnih cifara** (velika ili mala slova)
+- Zatvarajući deo `/>` je **obavezan** — njegovo izostavljanje prekida analizu
+- Primer: `<#04B404/>` (zelena), `<#EDC602/>` (ćilibarna), `<#D9534F/>` (crvena)
+
+Boja kontroliše pozadinu dugmeta. Boju teksta aplikacija određuje automatski.
+
+---
+
+## Primer
+
+Sledeća dva polja postavljena na kraju forme stvaraju zeleno dugme **Pošalji** i ćilibarno dugme **Sačuvaj kao nacrt**:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Pošalji | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Sačuvaj kao nacrt | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — isključivanje dugmadi iz sadržaja
+
+Token izgleda `toc-hide` govori rtSurvey-u da isključi polje iz **sadržaja** forme (opšte liste pitanja). Navigaciona dugmad nisu pitanja, tako da nikada ne bi trebalo da se pojavljuju u sadržaju.
+
+Uvek dodajte `toc-hide` nakon izgleda izlaza:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Pogledajte [Izgled — toc-hide](../appearance#group-and-navigation) za referencu za toc-hide.
+
+---
+
+## Pravila postavljanja
+
+Prilikom dodavanja kontrola za navigaciju u formu pridržavajte se sledećih pravila:
+
+- Postavite oba dugmeta na **sam kraj** forme, nakon svih pitanja i grupa.
+- Uvek uključite **oba** dugmeta zajedno — jedno finalizovano i jedno nezavršeno — kako bi anketar uvek imao način da izađe bez obzira na status završetka.
+- Koristite kolonu `relevant` za dugme finalizovanog izlaza ako slanje treba da bude dozvoljeno samo kada su ispunjeni određeni uslovi (npr. završen je obavezni odeljak). Dugme nezavršenog izlaza obično treba da ostane **uvek vidljivo**.
+
+---
+
+## Uslovni finalizovani izlaz
+
+Koristite kolonu `relevant` za kontrolu toga kada se prikazuje dugme finalizovanog izlaza. Nezavršeni izlaz treba da ostane bezuslovno vidljiv kako bi anketar uvek mogao da prekine i vrati se.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Pošalji | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Sačuvaj kao nacrt | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+U ovom primeru dugme **Pošalji** se pojavljuje samo kada je anketar dao pristanak i označio odeljak A kao završen. Dugme **Sačuvaj kao nacrt** je uvek dostupno.
+
+---
+
+## Ograničenja
+
+- **Tip polja mora biti `note` ili `text`.** Korišćenje ovog izgleda za bilo koje druge tipove pitanja nije podržano.
+- **Samo 6-cifreni heksadecimalni kod.** Skraćeni heksadecimalni kod (`<#FFF/>`) i imenovane boje nisu podržani — uvek koristite puni 6-cifreni format (npr. `<#FFFFFF/>`).
+- **Kolona label je tekst dugmeta.** Kolona `hint` za ova polja se zanemaruje; prikazuje se samo `label`.
+- **Moraju biti prisutna oba dugmeta.** Odsustvo dugmeta nezavršenog izlaza lišava anketara mogućnosti da napravi pauzu u sredini forme.

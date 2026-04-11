@@ -1,9 +1,9 @@
 ---
-title: "Appearance"
+title: "Vzhľad (Appearance)"
 description: ""
 ---
 
-Stĺpec `appearance` v rtSurvey umožňuje prispôsobiť vizuálnu prezentáciu a správanie otázok vo vašich prieskumoch. Táto funkcia zlepšuje používateľský zážitok a môže výrazne zlepšiť efektivitu zberu dát. rtSurvey podporuje štandardné atribúty vzhľadu XLSForm a rozširuje ich o ďalšie možnosti.
+Stĺpec `appearance` v rtSurvey vám umožňuje prispôsobiť vizuálnu prezentáciu a správanie otázok vo vašich prieskumoch. Táto funkcia zlepšuje používateľskú skúsenosť a môže výrazne zvýšiť efektivitu zberu údajov. rtSurvey podporuje štandardné atribúty vzhľadu XLSForm a rozširuje ich o ďalšie možnosti.
 
 ## Štandardné atribúty vzhľadu XLSForm
 
@@ -12,42 +12,42 @@ rtSurvey podporuje nasledujúce štandardné atribúty vzhľadu XLSForm:
 | Atribút vzhľadu | Typy otázok | Popis |
 |----------------------|----------------|-------------|
 | multiline | text | Vytvorí viacriadkové textové pole (najlepšie pre webových klientov) |
-| minimal | select_one, select_multiple | Zobrazí voľby v rozbaľovacom menu |
-| quick | select_one | Automaticky postúpi na ďalšiu otázku po výbere (len mobilné) |
-| no-calendar | date | Potlačí zobrazenie kalendára (len mobilné) |
-| month-year | date | Umožní výber iba mesiaca a roka |
-| year | date | Umožní výber iba roka |
-| horizontal-compact | select_one, select_multiple | Zobrazí voľby horizontálne (len web) |
-| horizontal | select_one, select_multiple | Zobrazí voľby horizontálne v stĺpcoch (len web) |
-| likert | select_one | Prezentuje voľby ako Likertovu škálu |
-| compact | select_one, select_multiple | Zobrazí voľby vedľa seba s minimálnym okrajom |
-| quickcompact | select_one | Kombinuje kompaktné zobrazenie s automatickým postupom (len mobilné) |
-| field-list | groups | Zobrazí celú skupinu na jednej obrazovke (len mobilné) |
-| label | select_one, select_multiple | Zobrazí popisky volieb bez vstupov |
-| list-nolabel | select_one, select_multiple | Zobrazí vstupy bez popiskov (použite s `label`) |
-| table-list | groups | Zobrazí otázky v tabuľkovom formáte |
-| signature | image | Umožní zachytenie podpisu (len mobilné) |
-| draw | image | Umožní voľnoručné kreslenie (len mobilné) |
-| map, quick map | select_one, select_one_from_file | Umožní výber z prvkov mapy |
+| minimal | select_one, select_multiple | Zobrazí možnosti v rozbaľovacom menu |
+| quick | select_one | Automaticky prejde na ďalšiu otázku po výbere (iba mobilné zariadenia) |
+| no-calendar | date | Potlačí zobrazenie kalendára (iba mobilné zariadenia) |
+| month-year | date | Umožňuje výber iba mesiaca a roka |
+| year | date | Umožňuje výber iba roka |
+| horizontal-compact | select_one, select_multiple | Zobrazuje možnosti horizontálne (iba web) |
+| horizontal | select_one, select_multiple | Zobrazuje možnosti horizontálne v stĺpcoch (iba web) |
+| likert | select_one | Prezentuje možnosti ako Likertovu škálu |
+| compact | select_one, select_multiple | Zobrazuje možnosti vedľa seba s minimálnym odsadením |
+| quickcompact | select_one | Kombinuje kompaktné zobrazenie s automatickým prechodom (iba mobilné zariadenia) |
+| field-list | groups | Zobrazí celú skupinu na jednej obrazovke (iba mobilné zariadenia) |
+| label | select_one, select_multiple | Zobrazuje štítky možností bez vstupných polí |
+| list-nolabel | select_one, select_multiple | Zobrazuje vstupné polia bez štítkov (používa sa s `label`) |
+| table-list | groups | Zobrazuje otázky vo formáte tabuľky |
+| signature | image | Umožňuje zachytenie podpisu (iba mobilné zariadenia) |
+| draw | image | Umožňuje kreslenie voľnou rukou (iba mobilné zariadenia) |
+| map, quick map | select_one, select_one_from_file | Umožňuje výber z funkcií mapy |
 
 ## Najlepšie postupy pre používanie vzhľadu
 
 1. **Konzistentnosť**: Používajte atribúty vzhľadu konzistentne v celom prieskume pre jednotný vzhľad.
-2. **Mobilné vs. web**: Zvážte, ako sa vzhľady budú renderovať na rôznych zariadeniach a platformách.
-3. **Výkon**: Buďte opatrní s atribútmi vzhľadu, ktoré môžu spomaliť načítavanie formulára (napr. `table-list` pre veľké skupiny).
-4. **Používateľský zážitok**: Vyberte vzhľady, ktoré uľahčujú zadávanie dát a sú intuitívnejšie pre respondentov.
-5. **Testovanie**: Vždy testujte váš formulár na cieľových zariadeniach, aby ste sa uistili, že vzhľady fungujú podľa očakávaní.
+2. **Mobil vs. Web**: Zvážte, ako sa vzhľady vykreslia na rôznych zariadeniach a platformách.
+3. **Výkon**: Buďte opatrní pri atribútoch vzhľadu, ktoré by mohli spomaliť načítavanie formulára (napr. `table-list` pre veľké skupiny).
+4. **Používateľská skúsenosť**: Vyberajte vzhľady, ktoré uľahčujú zadávanie údajov a sú pre respondentov intuitívnejšie.
+5. **Testovanie**: Vždy otestujte svoj formulár na cieľových zariadeniach, aby ste sa uistili, že vzhľady fungujú podľa očakávania.
 
 ## Pokročilé techniky
 
-### Kombinácia vzhľadov
+### Kombinovanie vzhľadov
 
-Niektoré atribúty vzhľadu môžu byť kombinované pre zložitejšie rozloženia:
+Niektoré atribúty vzhľadu je možné kombinovať pre komplexnejšie rozloženia:
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Vyberte jednu: | minimal compact |
+| select_one options | choice | Vyberte jednu možnosť: | minimal compact |
 ```
 
 ### Dynamické vzhľady
@@ -60,59 +60,86 @@ rtSurvey umožňuje dynamické zmeny vzhľadu na základe logiky formulára:
 | text | time | Zadajte čas: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## Úvahy pre mobilnú aplikáciu
+## Úvahy pre mobilné aplikácie
 
 - Niektoré vzhľady (napr. `quick`, `signature`) sú špecifické pre mobilné zariadenia.
-- Dôkladne testujte na Androide aj iOS pre konzistentné správanie.
+- Dôkladne otestujte na systémoch Android aj iOS, aby ste zabezpečili konzistentné správanie.
 
 ## Rozšírené atribúty vzhľadu rtSurvey
 
-Okrem štandardných vzhľadov XLSForm rtSurvey podporuje nasledujúce možnosti špecifické pre platformu:
+Okrem štandardných vzhľadov XLSForm podporuje rtSurvey nasledujúce možnosti špecifické pre platformu:
 
-### Kontrola dát a zobrazenia
+### Kontrola údajov a zobrazenia
 
 | Atribút vzhľadu | Typy otázok | Popis |
 |----------------------|----------------|-------------|
-| `invisible` | akýkoľvek | Skryje pole pred zobrazením pri súčasnom zbere alebo výpočte jeho hodnoty. Odlišné od typu `hidden` — pole sa stále zúčastňuje logiky. |
-| `displaytitle` | akýkoľvek | Vynúti zobrazenie popisku/názvu poľa, aj keď by inak bol potlačený. |
-| `autopull` | select_one, select_multiple | Automaticky načíta externé dáta na vyplnenie volieb pri načítaní formulára alebo zmene spúšťacieho poľa. |
-| `floating_hint` | text, integer, decimal | Zobrazí text nápovedy ako plávajúci popisok nad vstupným poľom namiesto pod ním. |
-| `calculate-button` | calculate | Pridá viditeľné tlačidlo, ktoré spustí prepočítanie poľa na požiadanie, namiesto automatického výpočtu. |
+| `invisible` | any | Skryje pole z dohľadu, zatiaľ čo stále zbiera alebo vypočítava jeho hodnotu. Líši sa od typu `hidden` — pole sa stále zúčastňuje logiky. |
+| `displaytitle` | any | Vynúti zobrazenie štítku/názvu poľa, aj keď by bol inak potlačený. |
+| `autopull` | select_one, select_multiple | Automaticky načíta externé údaje na naplnenie možností pri načítaní formulára alebo zmene spúšťacieho poľa. |
+| `floating_hint` | text, integer, decimal | Zobrazuje text nápovedy ako plávajúci štítok nad vstupným polom namiesto pod ním. |
+| `calculate-button` | calculate | Pridá viditeľné tlačidlo, ktoré spustí prepočet poľa na požiadanie, namiesto automatického výpočtu. |
+
+### Skupina a navigácia
+
+| Atribút vzhľadu | Typy otázok | Popis |
+|----------------------|----------------|-------------|
+| `section` | group | Vykreslí skupinu ako rozbaliteľnú kartu sekcie. Poznámka: iba mobilná aplikácia. |
+| `toc-hide` | any | Vylúči otázku z navigačného panela obsahu (TOC). |
+| `minilog` | begin_repeat | Zobrazuje dokončené opakované záznamy ako kompaktný zoznam mini-logov namiesto rozbaľovania každého záznamu v riadku. |
+
+### Správanie vstupu
+
+| Atribút vzhľadu | Typy otázok | Popis |
+|----------------------|----------------|-------------|
+| `proper` | text | Automaticky zmení prvé písmeno každého slova na veľké, keď respondent píše (správanie title-case). |
+| `text-nolabel` | text, integer, decimal | Vykreslí vstupné pole bez viditeľného štítku. |
+| `inline-1line` | text | Vynúti zobrazenie textového vstupu v jednom riadku, aj keď je štítok otázky dlhý. |
+| `popup` | any | Vykreslí pole vo vnútri vyskakovacieho / modálneho okna namiesto priamo v riadku na stránke. |
 
 ### Rozloženie
 
 | Atribút vzhľadu | Typy otázok | Popis |
 |----------------------|----------------|-------------|
 | `1screen` | group | Vynúti zobrazenie celej skupiny na jednej obrazovke bez ohľadu na veľkosť skupiny. |
-| `columns(n)` | select_one, select_multiple | Zobrazí voľby v `n` stĺpcoch. Príklad: `columns(3)` zobrazí tri stĺpce prepínačov. |
-| `gridformat<row=R col=C colspan=S align=center>` | akýkoľvek | Umiestni pole v rozložení CSS mriežky na riadku `R`, stĺpci `C`, presahujúci `S` stĺpcov. Používa sa s `advanced-extension/grid-layout`. |
-| `ignore-simplify` | akýkoľvek | Inštruuje renderer formulára, aby preskočil automatické zjednodušenie alebo kondenzáciu rozloženia tohto poľa. |
+| `columns(n)` | select_one, select_multiple | Zobrazuje možnosti v `n` stĺpcoch. Príklad: `columns(3)` zobrazuje tri stĺpce rádiových tlačidiel. |
+| `gridformat<row=R col=C colspan=S align=center>` | any | Umiestni pole v rozložení CSS-grid do riadku `R`, stĺpca `C`, pričom zaberá `S` stĺpcov. Používa sa s `advanced-extension/grid-layout`. |
+| `ignore-simplify` | any | Inštruuje vykresľovač formulára, aby vynechal automatické zjednodušenie alebo zhustenie rozloženia tohto poľa. |
+| `horizontal(N)` | select_one, select_multiple | Nastaví každú možnosť tak, aby zaberala `N` percent šírky riadku. Príklad: `horizontal(50)` umiestni dve možnosti do riadku. |
+| `scroll-view(N%)` | group, repeat | Obmedzí kontajner na maximálnu výšku `N%` viewportu (alebo rodiča), čím pridá posuvník, keď obsah pretečie. Príklad: `scroll-view(60%)`. |
 
 ### Widgety
 
 | Atribút vzhľadu | Typy otázok | Popis |
 |----------------------|----------------|-------------|
-| `likert` | select_one | Prezentuje voľby ako rad Likertovej škály (potvrdené ako podporované). |
-| `distress` | select_one | Renderuje voľby ako vizuálny widget Kesslerovej škály psychologickej tiesne (K10) s emocionálnymi ikonami. |
+| `likert` | select_one | Prezentuje možnosti ako riadok Likertovej škály (už v štandardnej tabuľke vyššie; potvrdená podpora). |
+| `distress` | select_one | Vykreslí možnosti ako vizuálny widget Kesslerovej psychologickej škály tiesne (K10) s emočnými ikonami. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Vykreslí možnosti ako štylizované boxy hodnotenia s piatimi farebnými slotmi. `c1` = okraj vonkajšieho kontajnera, `c2` = nezačiarknutý okraj, `c3` = začiarknutý okraj a výplň, `c4` = farba nezačiarknutého textu, `c5` = farba začiarknutého textu. Príklad: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Vykreslí možnosti ako farebné čipy tagov. Päť farebných slotov nasleduje rovnaké poradie ako `rating_box-fill`. Vybrané možnosti sú zvýraznené; nevybrané možnosti sú v súhrnnom zobrazení potlačené. |
 
 ### Integrácia API
 
 | Atribút vzhľadu | Typy otázok | Popis |
 |----------------------|----------------|-------------|
-| `callapi` | text, integer, decimal, select_one | Umožňuje integráciu API volania pre toto pole. Stĺpec calculation by mal obsahovať výraz `callapi()`. Pozrite si [Volanie API](advanced-extension/call-api). |
-| `callapi-verify(params)` | text, integer, decimal | Spustí overovací hovor API pomocou statických parametrov. Formulár blokuje postup, kým API nepotvrdí hodnotu. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | Rovnaké ako `callapi-verify`, ale s parametrami odvodenými od hodnôt iných polí za behu. |
+| `callapi` | text, integer, decimal, select_one | Umožňuje integráciu volania API pre toto pole. Stĺpec výpočtu by mal obsahovať výraz `callapi()`. Pozri [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Spustí verifikačné volanie API pomocou statických parametrov. Formulár blokuje postup, kým API nepotvrdí hodnotu. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Rovnako ako `callapi-verify`, ale s parametrami odvodenými od hodnôt iných polí počas behu. |
+
+### Prepínač jazyka
+
+| Atribút vzhľadu | Typy otázok | Popis |
+|----------------------|----------------|-------------|
+| `change_language-{colors} default('lang')` | note, text | Vykreslí widget prepínača jazyka štylizovaný danými farebnými kódmi. Token `default('lang')` nastavuje počiatočný jazyk (napr. `default('en')`); počas parsovania sa interne prepíše na `rtDefault('lang')`. Príklad: `change_language-blue-white default('vi')`. |
 
 ### Inline formát dátumu/času
 
-Pre polia `date`, `time` a `datetime` môžete zadať vlastný formát zobrazenia pomocou reťazca formátu pripojeného k vzhľadu:
+Pre polia `date`, `time` a `datetime` môžete zadať vlastný formát zobrazenia pomocou formátovacieho reťazca pripojeného k vzhľadu:
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-Tokeny formátu sú rovnaké ako pre `format-date()` a `format-date-time()`. Pozrite si [Funkcie — Funkcie dátumu a času](operators-and-functions/functions#date-and-time-functions).
+Formátovacie tokeny sú rovnaké ako pre `format-date()` a `format-date-time()`. Pozri [Funkcie — Funkcie dátumu a času](operators-and-functions/functions#date-and-time-functions).
 
 Príklad:
 
@@ -121,13 +148,67 @@ Príklad:
 | datetime | event_time | Dátum a čas udalosti | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | Dátum narodenia | inline-[%d/%m/%Y] |
 
+### Inline rozloženie tlačidiel — `display{}` a `results{}`
+
+Pre typy otázok, ktoré sa vykresľujú ako vložené tlačidlo s ikonou (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), dva modifikátory vzhľadu ovládajú polohu tlačidla a správanie po zachytení.
+
+#### `display{...}` — poloha tlačidla pred zachytením
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parameter | Hodnoty | Predvolené |
+|-----------|--------|---------|
+| Align (Zarovnanie) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (Veľkosť) | `small`, `medium`, `large` | `small` |
+| Color (Farba) | hex napr. `#FF5500` | primárna farba témy |
+| Flag | `inline-icon` | vynúti režim ikony |
+
+| Hodnota zarovnania | Rozloženie |
+|-------------|--------|
+| `right` | Tlačidlo vpravo od štítku |
+| `left` | Tlačidlo vľavo od štítku |
+| `top` | Tlačidlo nad štítkom, vycentrované na celú šírku |
+| `center` / `bottom` | Tlačidlo pod štítkom, vycentrované na celú šírku |
+
+#### `results{...}` — rozloženie a viditeľnosť po zachytení
+
+Preberá nastavenia `display{}`. Použite na presun tlačidla alebo skrytie prvkov po zachytení hodnoty.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| Hodnota `hide` | Účinok |
+|---|---|
+| `hide(capture)` | Skryje tlačidlo zachytenia, keď už súbor/hodnota existuje |
+| `hide(review)` | Skryje miniatúru kontroly / tlačidlo prehrávania |
+| `hide(filename)` | Skryje názov súboru zobrazený po nahratí |
+| `hide(camera)` | Skryje spúšť fotoaparátu po zachytení |
+| `hide(scanner)` | Skryje tlačidlo skenovania čiarového kódu po naskenovaní hodnoty |
+| `hide(value)` | Skryje text naskenovanej hodnoty (čiarový kód / geopoint) |
+
+Widget sa automaticky prepne z rozloženia `display{}` na `results{}` v momente zachytenia hodnoty.
+
+**Príklady:**
+
+```
+inline display{right}                                    → ikona vpravo od štítku
+inline display{left, large}                              → veľká ikona vľavo
+inline display{center, large, #FF5500}                   → veľká oranžová ikona pod štítkom
+inline display{right} results{left}                      → ikona sa po zachytení presunie doľava
+inline display{right} results{hide(capture)}             → ikona po zachytení zmizne
+inline display{center} results{hide(capture), hide(filename)}
+```
+
 ## Známe obmedzenia
 
-- Komplexné vzhľady sa nemusia renderovať identicky naprieč všetkými platformami.
+- Komplexné vzhľady sa nemusia vykresľovať identicky na všetkých platformách.
 - Niektoré pokročilé vzhľady rtSurvey nemusia byť podporované v offline režime.
 
 ## Riešenie problémov so vzhľadom
 
-1. **Vzhľad nie je aplikovaný**: Skontrolujte preklepy v stĺpci appearance.
-2. **Nekonzistentné renderovanie**: Overte kompatibilitu s typom otázky a platformou.
-3. **Problémy s výkonom**: Zvážte zjednodušenie komplexných vzhľadov, najmä pre veľké prieskumy.
+1. **Vzhľad sa neaplikoval**: Skontrolujte preklepy v stĺpci appearance.
+2. **Nekonzistentné vykresľovanie**: Overte kompatibilitu s typom otázky a platformou.
+3. **Problémy s výkonom**: Zvážte zjednodušenie komplexných vzhľadov, najmä pri veľkých prieskumoch.

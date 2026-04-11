@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "Funksioni pulldata() merr një vlerë nga një skedar i jashtëm CSV i bashkëngjitur në formular, duke përputhur një kolonë kyçe me një vlerë kyçe dhe duke kthyer kolonën përkatëse të rezultatit."
+---
+
+import { Callout } from 'nextra/components'
+
+Funksioni `pulldata()` merr një vlerë nga një skedar CSV i bashkëngjitur në formular. Duke pasur emrin e skedarit, një kolonë për t'u kthyer, një kolonë për t'u përputhur dhe një vlerë kyçe, ai kthen qelizën në kryqëzimin e rreshtit përkatës dhe kolonës së rezultatit.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Pozicioni | Parametri | Përshkrimi |
+|-----------|-----------|------------|
+| 1 | Filename | Emri i skedarit media CSV (i njëjti emër i përdorur në `select_one_from_file`) |
+| 2 | Result column | Kolona vlerën e së cilës dëshironi ta ktheni |
+| 3 | Key column | Kolona me të cilën duhet të përputhet |
+| 4 | Key value | Vlera që duhet të përputhet — zakonisht një referencë fushe si `${field}` |
+
+Funksioni kthen një varg bosh nëse nuk gjendet asnjë përputhje.
+
+---
+
+## Parakushtet
+
+Skedari CSV duhet të jetë i bashkëngjitur në formular si një **skedar media**. I njëjti skedar i referuar nga `pulldata()` mund të përdoret gjithashtu si lista e zgjedhjeve për `select_one_from_file`.
+
+**Shembull CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Shembull bazë
+
+Kërkoni departamentin dhe telefonin e një anëtari të stafit nga ID-ja e tij:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Selektoni anëtarin e stafit | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Departamenti: `${dept}` — Telefoni: `${phone}` | |
+
+<Callout type="info">
+Kolona `name` në një CSV `select_one_from_file` është vlera e ruajtur. Kur numëruesi zgjedh "Alice", `${staff_id}` mban `"Alice"`, të cilën `pulldata()` e përdor si çelës për të marrë departamentin dhe telefonin e saj.
+</Callout>
+
+---
+
+## Marrja e etiketës (label) të një zgjedhjeje të përzgjedhur
+
+Një pyetje `select_one_from_file` ruan vlerën `name`. Për të shfaqur etiketën e lexueshme nga njeriu `label`, përdorni `pulldata()` për ta kërkuar atë:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Selektoni fshatin | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | Ju keni përzgjedhur: `${village_label}` | |
+
+---
+
+## Shikime të shumta nga një përzgjedhje e vetme
+
+Ju mund të thirrni `pulldata()` disa herë në të njëjtin skedar për të marrë kolona të ndryshme për të njëjtin rresht të përzgjedhur:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Selektoni objektin | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## Përdorimi i pulldata në relevant dhe constraint
+
+`pulldata()` mund të përdoret në kolonat `relevant` dhe `constraint` për të zbatuar logjikën bazuar në vlerat e kërkuara:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Selektoni objektin | | |
+| integer | bed_count | Numri i shtretërve të zënë | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## Përdorimi i pulldata me `once()`
+
+Për të vlerësuar `pulldata()` vetëm në ngarkimin e parë (duke parandaluar rivlerësimin kur fusha kyçe ndryshon pas hyrjes fillestare), mbështilleni atë në `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Praktikat më të mira
+
+1. Kolona kyçe në CSV duhet të përputhet me kolonën `name` të përdorur në `select_one_from_file` — këto duhet të jenë e njëjta vlerë.
+2. Emrat e kolonave në CSV janë të ndjeshëm ndaj shkronjave të mëdha/vogla — `Department` dhe `department` janë kolona të ndryshme.
+3. Nëse vlera kyçe nuk gjendet, `pulldata()` kthen një varg bosh — përdorni `if(${field} != '', pulldata(...), '')` për t'u mbrojtur nga zgjedhjet boshe.
+4. Mbajini skedarët CSV të vegjël ku është e mundur — skedarët e mëdhenj rrisin kohën e ngarkimit të formularit në lidhje me bandë të ulët.
+5. Për të dhënat që ndryshojnë midis raundeve të mbledhjes së të dhënave, përditësoni skedarin media CSV duke ngarkuar një version të ri të formularit.
+
+## Kufizimet
+
+- `pulldata()` përputhet vetëm me rreshtin e **parë** ku kolona kyçe është e barabartë me vlerën kyçe — vlerat kyçe të dublikuara në CSV nuk mbështeten.
+- Skedari CSV duhet të jetë i bashkëngjitur në formular përpara vendosjes; ai nuk mund të merret nga një URL gjatë ekzekutimit.
+- Vlerat numerike të kthyera nga `pulldata()` janë vargje — mbështillini në `number()` kur përdoren në aritmetikë: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey mbështet gjithashtu forma të zgjeruara të `pulldata()` për leximin e metadatave të pajisjes, fushave JWT dhe të dhënave JSON. Shihni [App API](../app-api) për `pulldata('app-api', ...)` dhe faqen [Thirr API](../advanced-features/call-api) për modelet e kërkimit bazuar në JSON.
+</Callout>
+
+---
+
+## Variantet e zgjeruara të pulldata()
+
+Përveç kërkimeve CSV, `pulldata()` mbështet disa burime shtesë të dhënash duke ndryshuar argumentin e parë.
+
+### `pulldata('app-api', key)`
+
+Lexoni metadata të pajisjes, atributet e përdoruesit dhe kontekstin e aplikacionit. Shihni referencën e plotë në faqen e [App API](../app-api).
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Analizoni një varg JSON të brendshëm dhe nxirrni një vlerë duke përdorur një shprehje JSONPath. E dobishme kur keni një literal JSON të ngulitur në formular.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Kthen vlerën e përputhur si një varg, ose varg bosh nëse nuk gjendet.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Nxirrni një vlerë nga një varg JSON i ruajtur në një fushë tjetër duke përdorur një shprehje JSONPath. Kjo është e barabartë me `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Dekodoni një token JWT të ruajtur në një fushë dhe ktheni vlerën e një kërkese specifike nga ngarkesa.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Kthen varg bosh nëse tokeni është i pavlefshëm ose kërkesa nuk është e pranishme.
+
+### `pulldata('instanceid')`
+
+Kthen ID-në unike të instancës së dërgimit aktual. E barabartë me fushën meta `instanceID`.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Harta e një vlere në një tjetër duke përdorur një tabelë hartëzimi të emërtuar të përcaktuar në konfigurimin e formularit.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Kthen vlerën e hartuar, ose vargun bosh nëse asnjë hartëzim nuk përputhet.
+
+### `pulldata('options', optionName)`
+
+Lexoni një opsion të konfigurimit të formularit sipas emrit.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Ekzekutoni një SQL `SELECT` kundrejt një skedari të bashkëngjitur SQLite `.db` dhe ktheni vlerën nga kolona e parë e rreshtit të parë të përputhur. Parametrat pas vargut SQL zëvendësohen sipas radhës për vendmbajtësit `?`.
+
+| Pozicioni | Parametri | Përshkrimi |
+|-----------|-----------|------------|
+| 1 | `'rawquery'` | Varg literal që identifikon këtë variant |
+| 2 | path | Rruga e skedarit në formatin `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | Një deklaratë `SELECT` duke përdorur `?` si vendmbajtës pozicionalë |
+| 4+ | params | Vlerat e zëvendësuara për çdo `?` sipas radhës — zakonisht referenca fushash si `${field}` |
+
+Kthen një varg bosh nëse asnjë rresht nuk përputhet.
+
+**Shembull — kërkoni emrin e një province sipas ID-së:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Shembull — kërkoni emrin e një lagjeje (ward) të filtruar nga kodet e provincës dhe rrethit (district):**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Për dallim nga `pulldata()` standarde me katër argumente që përputhet me një kolonë kyçe të vetme në një skedar CSV, varianti `rawquery` ekzekuton një SQL `SELECT` të plotë kundrejt një baze të dhënash SQLite, duke lejuar kushte `WHERE` me shumë kolona dhe çdo kolonë si vlerë kthimi.
+
+<Callout type="info">
+`rawquery` përdoret zakonisht me fusha vetëplotësuese (autocomplete) për kërkime të lokacioneve hierarkike. Shihni [Kërkimi në Bazën Lokale të të Dhënave](../advanced-features/local-database-search) për detaje mbi ndërtimin e skedarëve `.db` dhe lidhjen e tyre me `pulldata('rawquery', ...)`.
+</Callout>

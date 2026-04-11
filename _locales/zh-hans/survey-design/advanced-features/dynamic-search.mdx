@@ -1,13 +1,13 @@
 ---
 title: "动态搜索"
-description: "动态搜索在枚举员输入时从远程 API 实时加载选项，支持大型或频繁更新的数据集。"
+description: "动态搜索可在调查员输入时实时从远程 API 加载选项，从而支持大型或频繁更新的数据集。"
 ---
 
-**动态搜索**（也称为 Search API）允许 `select_one`、`select_multiple` 或 `text` 字段在枚举员输入时**实时**从远程网络服务加载其选项。当选项列表太大无法捆绑在 CSV 文件中、频繁更新或来自实时数据库时，这是正确的方法。
+**动态搜索**（也称为 Search API）允许 `select_one`、`select_multiple` 或 `text` 字段在调查员输入时**在运行时**从远程 Web 服务加载其选项。当您的选项列表太大而无法捆绑在 CSV 文件中、需要频繁更新或来自实时数据库时，这是正确的方法。
 
 ---
 
-## `search-api()` appearance
+## `search-api()` 外观 (appearance)
 
 动态搜索通过 `appearance` 列使用 `search-api()` 函数进行配置：
 
@@ -21,38 +21,38 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 |-----------|-------------|
 | `method` | 始终使用 `'POST'` |
 | `url` | 要查询的 API 端点 |
-| `post_body` | 发送到 API 的 JSON 请求体。使用 `%__input__%` 作为枚举员当前搜索文本的占位符 |
+| `post_body` | 发送到 API 的 JSON 正文。使用 `%__input__%` 作为调查员当前搜索文本的占位符 |
 | `value_column` | 响应对象中用作存储**值**的键 |
 | `display` | 用作下拉列表中显示的**标签**的键（或模板）。支持 `##key##` 占位符和 `@{func}` 表达式 |
-| `data_path` | 响应中结果对象数组的 JSONPath（例如，`$.data`、`$.hits.hits.*._source`） |
-| `save_path` | 保存原始响应以供其他字段使用的名称 |
+| `data_path` | 响应中结果对象数组的 JSONPath（例如 `$.data`、`$.hits.hits.*._source`） |
+| `save_path` | 用于保存原始响应以便其他字段使用的名称 |
 
 ---
 
-## 基本示例
+## 基础示例
 
-枚举员输入机构名称部分内容的医疗机构查找：
+医疗机构查询，调查员输入机构名称的一部分：
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one | facility | 选择医疗机构 | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-当枚举员输入"nair"时，API 接收 `{"query": "nair"}` 并返回：
+当调查员输入 "nair" 时，API 接收到 `{"query": "nair"}` 并返回：
 
 ```json
 {
   "results": [
-    {"id": "HF001", "name": "内罗毕中央诊所"},
-    {"id": "HF002", "name": "内罗毕西部医院"}
+    {"id": "HF001", "name": "Nairobi Central Clinic"},
+    {"id": "HF002", "name": "Nairobi West Hospital"}
   ]
 }
 ```
 
-下拉列表显示`内罗毕中央诊所`和`内罗毕西部医院`；存储的值为 `HF001` 或 `HF002`。
+下拉列表显示 `Nairobi Central Clinic` 和 `Nairobi West Hospital`；存储的值为 `HF001` 或 `HF002`。
 
 ---
 
-## 高级显示格式
+## 高级显示格式化
 
 ### 使用 `##key##` 模板
 
@@ -62,7 +62,7 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
 ```
 
-显示为：`内罗毕中央诊所 (内罗毕)`。
+显示为：`Nairobi Central Clinic (Nairobi)`。
 
 ### 使用 `@{func}` 表达式
 
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-活跃结果显示 `✓ 诊所名称`；非活跃结果显示 `✗ 诊所名称`。
+激活的结果显示 `✓ Clinic Name`；未激活的显示 `✗ Clinic Name`。
 
 ---
 
 ## 设置默认值：`search-default-api()`
 
-在 `search-api()` 之后使用 `search-default-api()` 来预填字段，使用从单独 API 调用加载的默认选项（例如，在编辑现有记录时）：
+在 `search-api()` 之后使用 `search-default-api()`，通过单独的 API 调用加载默认选项来预填充字段（例如，编辑现有记录时）：
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -88,9 +88,9 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## select_multiple 的自定义分隔符：`search-default-separator()`
+## `select_multiple` 的自定义分隔符：`search-default-separator()`
 
-对于 `select_multiple` 字段，指定多个所选值在存储字符串中如何连接：
+对于 `select_multiple` 字段，指定多个选定值在存储字符串中如何连接：
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
@@ -100,38 +100,97 @@ appearance: search-api(...) search-default-separator(' || ')
 
 ---
 
-## 支持的题目类型
+## 支持的问题类型
 
-| 题目类型 | 用途 |
+| 问题类型 | 使用场景 |
 |---------------|----------|
 | `select_one` | 从搜索结果中单选 |
 | `select_multiple` | 从搜索结果中多选 |
-| `text` | 自动完成——枚举员自由输入但可以选择建议 |
+| `text` | 自动完成 —— 调查员自由输入，但可以从建议中选择 |
 
 ---
 
 ## 使用保存的响应数据
 
-`save_path` 将完整的 API 响应对象保存在给定名称下。其他字段可以使用 `pulldata()` 引用它：
+当调查员选择结果时，rtSurvey 将响应中完全匹配的对象保存在 `save_path` 名称下。其他字段可以通过两种方式从中读取。
+
+### 方法 1 —— `pulldata()` 查询
+
+使用 `pulldata('save_path', 'key')` 从保存的对象中读取顶级字段：
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | 选择机构 | `search-api(..., 'facility_data')` |
+| select_one | facility | 选择机构 | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+`select_one` 行的外观必须包含带有匹配 `save_path` 的 `search-api(..., 'facility_data')`。
+
+对于**嵌套 JSON 字段**，结合使用 `substr-jsonpath()`：
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## 使用 search() 进行本地文件搜索
+
+`search()` 对捆绑的 SQLite `.db` 文件执行离线、列相等查询 —— 无需网络连接，也无需 SQL 查询。当您的参考数据随表单一起打包，并且您需要简单的“查找列等于值的所有行”查询时，请使用此方法。
+
+### 签名 (Signature)
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### 参数
+
+| 参数 | 描述 |
+|-----------|-------------|
+| `path` | SQLite 表的路径：`concat(${family_path}, '/file.db::table')` |
+| `'matches'` | 匹配运算符 —— 返回列等于值的行 |
+| `'list_name'` | 要匹配的列名 |
+| `${field}` | 要匹配的值；通常是字段引用 |
+
+### 示例
+
+通过将 `${d307}` 的值与 `d307.db` 的 `externalData` 表中的 `list_name` 列进行匹配，从本地数据库填充 `select_one`：
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | 选择机构 | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+当 `${d307}` 等于 `"HF001"` 时，`search()` 返回 `externalData` 中 `list_name = 'HF001'` 的每一行 —— 完全来自捆绑文件，无需网络调用。
+
+### search() 与 rawquery 自动完成的对比
+
+| 功能 | `search()` | `rawquery` 自动完成 |
+|---------|-----------|------------------------|
+| SQL 查询 | 否 —— 仅列相等 | 是 —— 完整的 `SELECT … FROM …` |
+| 参数化输入 | 列值匹配 | 嵌入在 SQL 字符串中 |
+| 自由文本录入 | 是 —— 调查员可以自由输入 | 否 —— 必须从列表中选择 |
+| UNION / 多表 | 不支持 | 支持 |
+
+### 适用场景
+
+- 当您需要对捆绑的 `.db` 文件进行简单的相等匹配，表单必须离线工作，并且您希望允许自由文本录入时，请使用 **`search()`**。
+- 当您需要 SQL 灵活性（JOIN、UNION、计算列）或必须跨多个表查询，且表单具有可靠的网络连接时，请使用 **`rawquery` 自动完成**。
 
 ---
 
 ## 最佳实践
 
-1. 确保 API 端点在 1–2 秒内响应——慢速 API 会使搜索感觉迟钝。
-2. 在 `post_body` 中使用 `%__input__%`，这样 API 只返回匹配结果，而不是整个数据集。
-3. 在服务器端为搜索字段建立索引（例如，Elasticsearch、数据库全文索引）以获得快速响应。
-4. 每次查询限制结果为 20–50 条——返回数千条结果违背了搜索的目的。
-5. 在 API 中包含最小输入长度要求，以避免在单字符输入时触发广泛查询。
+1. 确保您的 API 端点在 1-2 秒内响应 —— 缓慢的 API 会让搜索感觉迟钝。
+2. 在 `post_body` 中使用 `%__input__%`，以便 API 仅返回匹配的结果，而不是整个数据集。
+3. 在服务器端为搜索字段建立索引（例如 Elasticsearch、数据库全文索引）以实现快速响应。
+4. 将每次查询的结果限制在 20-50 项 —— 返回数千个结果会违背搜索的初衷。
+5. 在 API 中包含最小输入长度要求，以避免在输入单个字符时触发宽泛查询。
 
 ## 限制
 
-- 动态搜索需要网络连接——离线时不工作。
-- `%__input__%` 占位符按原样注入；在服务器端清理输入以防止注入攻击。
-- 复杂的 `@{func}` 显示表达式在所有 rtSurvey 客户端版本中的支持可能有限。
+- 动态搜索需要网络连接 —— 它无法离线工作。
+- `%__input__%` 占位符是原样注入的；请在服务器端清理输入以防止注入攻击。
+- 复杂的 `@{func}` 显示表达式在所有 rtSurvey 客户端版本中可能支持有限。

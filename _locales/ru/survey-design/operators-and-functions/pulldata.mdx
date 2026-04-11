@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "Функция pulldata() извлекает значение из внешнего CSV-файла, прикрепленного к форме, сопоставляя столбец ключа со значением ключа и возвращая соответствующий столбец результата."
+---
+
+import { Callout } from 'nextra/components'
+
+Функция `pulldata()` извлекает значение из CSV-файла, прикрепленного к форме. На основе имени файла, столбца для возврата, столбца для сопоставления и значения ключа она возвращает ячейку на пересечении соответствующей строки и столбца результата.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Позиция | Параметр | Описание |
+|---------|----------|----------|
+| 1 | Имя файла | Имя медиафайла CSV (то же имя, что используется в `select_one_from_file`) |
+| 2 | Столбец результата | Столбец, значение которого вы хотите вернуть |
+| 3 | Столбец ключа | Столбец для сопоставления |
+| 4 | Значение ключа | Значение для сопоставления — обычно ссылка на поле, например `${field}` |
+
+Функция возвращает пустую строку, если совпадение не найдено.
+
+---
+
+## Предварительные условия
+
+CSV-файл должен быть прикреплен к форме как **медиафайл**. Тот же файл, на который ссылается `pulldata()`, также может использоваться в качестве списка вариантов для `select_one_from_file`.
+
+**Пример CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Базовый пример
+
+Поиск отдела и телефона сотрудника по его ID:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Выберите сотрудника | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Department: `${dept}` — Phone: `${phone}` | |
+
+<Callout type="info">
+Столбец `name` в CSV-файле `select_one_from_file` является сохраненным значением. Когда интервьюер выбирает «Alice», `${staff_id}` содержит `"Alice"`, которое `pulldata()` использует в качестве ключа для получения ее отдела и телефона.
+</Callout>
+
+---
+
+## Получение метки (label) выбранного варианта
+
+Вопрос типа `select_one_from_file` сохраняет значение `name`. Чтобы отобразить понятную человеку метку `label`, используйте `pulldata()` для ее поиска:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Выберите деревню | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | You selected: `${village_label}` | |
+
+---
+
+## Несколько поисков по одному выбору
+
+Вы можете вызывать `pulldata()` несколько раз для одного и того же файла, чтобы получить разные столбцы для одной и той же выбранной строки:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Выберите объект | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## Использование pulldata в relevant и constraint
+
+`pulldata()` можно использовать в столбцах `relevant` и `constraint` для применения логики на основе найденных значений:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Выберите объект | | |
+| integer | bed_count | Number of beds occupied | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## Использование pulldata с `once()`
+
+Чтобы вычислять `pulldata()` только при первой загрузке (предотвращая повторное вычисление при изменении ключевого поля после первоначального ввода), оберните ее в `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Лучшие практики
+
+1. Столбец ключа в CSV должен совпадать со столбцом `name`, используемым в `select_one_from_file` — это должны быть одинаковые значения.
+2. Имена столбцов в CSV чувствительны к регистру — `Department` и `department` — это разные столбцы.
+3. Если значение ключа не найдено, `pulldata()` возвращает пустую строку — используйте `if(${field} != '', pulldata(...), '')` для защиты от пустых выборов.
+4. По возможности делайте CSV-файлы небольшими — большие файлы увеличивают время загрузки формы при медленном интернет-соединении.
+5. Для данных, которые меняются между раундами сбора данных, обновляйте медиафайл CSV, загружая новую версию формы.
+
+## Ограничения
+
+- `pulldata()` находит только **первую** строку, где столбец ключа равен значению ключа — дубликаты ключевых значений в CSV не поддерживаются.
+- CSV-файл должен быть прикреплен к форме перед развертыванием; его нельзя получить по URL-адресу во время выполнения.
+- Числовые значения, возвращаемые `pulldata()`, являются строками — оборачивайте их в `number()` при использовании в арифметических операциях: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey также поддерживает расширенные формы `pulldata()` для чтения метаданных устройства, полей JWT и данных JSON. См. [App API](../app-api) для `pulldata('app-api', ...)` и страницу [Call API](../advanced-features/call-api) для шаблонов поиска на основе JSON.
+</Callout>
+
+---
+
+## Расширенные варианты pulldata()
+
+Помимо поиска в CSV, `pulldata()` поддерживает несколько дополнительных источников данных при изменении первого аргумента.
+
+### `pulldata('app-api', key)`
+
+Чтение метаданных устройства, атрибутов пользователя и контекста приложения. См. полный справочник на странице [App API](../app-api).
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Парсинг встроенной строки JSON и извлечение значения с помощью выражения JSONPath. Полезно, когда у вас есть литерал JSON, встроенный в форму.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Возвращает найденное значение в виде строки или пустую строку, если значение не найдено.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Извлечение значения из строки JSON, хранящейся в другом поле, с помощью выражения JSONPath. Это эквивалентно `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Декодирование JWT-токена, хранящегося в поле, и возврат значения определенного клейма (claim) из полезной нагрузки.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Возвращает пустую строку, если токен недействителен или клейм отсутствует.
+
+### `pulldata('instanceid')`
+
+Возвращает уникальный идентификатор экземпляра (instance ID) текущей отправки. Эквивалентно мета-полю `instanceID`.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Сопоставление одного значения другому с помощью именованной таблицы сопоставления, определенной в конфигурации формы.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Возвращает сопоставленное значение или пустую строку, если совпадений не найдено.
+
+### `pulldata('options', optionName)`
+
+Чтение параметра конфигурации формы по имени.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Выполнение SQL-запроса `SELECT` к упакованному файлу SQLite `.db` и возврат значения из первого столбца первой подходящей строки. Параметры после строки SQL подставляются по порядку вместо заполнителей `?`.
+
+| Позиция | Параметр | Описание |
+|---------|----------|----------|
+| 1 | `'rawquery'` | Литеральная строка, идентифицирующая этот вариант |
+| 2 | path | Путь к файлу в формате `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | Оператор `SELECT`, использующий `?` в качестве позиционных заполнителей |
+| 4+ | params | Значения, подставляемые вместо каждого `?` по порядку — обычно ссылки на поля, такие как `${field}` |
+
+Возвращает пустую строку, если ни одна строка не подходит.
+
+**Пример — поиск названия провинции по ID:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Пример — поиск названия района (ward), отфильтрованного по кодам провинции и округа:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+В отличие от стандартной функции `pulldata()` с четырьмя аргументами, которая ищет совпадение в одном столбце ключа в CSV-файле, вариант `rawquery` выполняет полноценный SQL-запрос `SELECT` к базе данных SQLite, что позволяет использовать условия `WHERE` для нескольких столбцов и возвращать любой столбец в качестве значения.
+
+<Callout type="info">
+`rawquery` часто используется с полями автозаполнения для иерархического поиска местоположений. См. [Local Database Search](../advanced-features/local-database-search) для получения подробной информации о создании файлов `.db` и их подключении к `pulldata('rawquery', ...)` ( Local Database Search).
+</Callout>

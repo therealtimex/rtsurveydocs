@@ -1,0 +1,224 @@
+---
+title: "Pesquisa em Banco de Dados Local"
+description: "A Pesquisa em Banco de Dados Local consulta um arquivo SQLite .db incluído usando SQL bruto, permitindo um preenchimento automático offline rápido para grandes conjuntos de dados estáticos."
+---
+
+import { Callout } from 'nextra/components'
+
+**Pesquisa em Banco de Dados Local** permite que um campo `select_one` ou `text` consulte um arquivo SQLite `.db` que está incluído no pacote de mídia do formulário — inteiramente offline, sem comunicação com o servidor. Esta é a abordagem correta quando a sua lista de opções é grande e estática (por exemplo, uma lista nacional de aldeias, instalações de saúde ou limites administrativos) e a conectividade não pode ser garantida.
+
+| Abordagem | Fonte de dados | Requer conectividade |
+|---|---|---|
+| Pesquisa em banco de dados local (`rawquery`) | Arquivo `.db` incluído (SQLite) | Não |
+| `search-api()` | API REST remota | Sim |
+| `search()` | Arquivo CSV incluído | Não |
+
+---
+
+## Variantes de aparência (Appearance)
+
+O campo de preenchimento automático é configurado através da coluna `appearance`. Estão disponíveis três variantes:
+
+| Variante | Notas |
+|---|---|
+| `search-autocomplete-noedit(...)` | Preenchimento automático padrão — o enumerador deve selecionar da lista; a entrada de texto livre não é salva |
+| `search-autocomplete-noedit-v2(...)` | Variante recomendada — mesmo comportamento, mas utiliza um motor de renderização atualizado com melhor desempenho em grandes conjuntos de resultados |
+| `search(...)` | Correspondência simples baseada em arquivo contra um CSV incluído; **não** suporta SQL bruto — listado aqui apenas para comparação |
+
+<Callout type="info">
+`search-autocomplete-noedit` é um alias — no momento da análise, o aplicativo o substitui pelo nome da função interna `searchAutocompleteNoedit`. Utilize qualquer uma das grafias no seu XLSForm; ambas funcionam.
+</Callout>
+
+---
+
+## A fonte de dados `rawquery`
+
+Para executar uma consulta SQL contra um arquivo `.db`, passe `'rawquery'` como o primeiro argumento da função de aparência. A assinatura completa é:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parâmetros
+
+| Posição | Parâmetro | Descrição |
+|---|---|---|
+| 1 | `'rawquery'` | String literal — diz ao aplicativo para executar o SQL diretamente |
+| 2 | `db_path` | Caminho para o arquivo SQLite, na forma `<dir>/<file>.db::tableName`. O sufixo `::tableName` é removido ao abrir o arquivo; o nome da tabela é usado dentro do seu SQL |
+| 3 | `'[display_col]'` | Coluna a ser exibida no menu suspenso. Os colchetes `[ ]` circundantes são removidos em tempo de execução |
+| 4 | `'value_col'` | Coluna cujo valor é armazenado quando o enumerador faz uma seleção |
+| 5 | `'SELECT ...'` | Qualquer instrução SELECT SQLite válida. `SELECT DISTINCT` é injetado automaticamente se `DISTINCT` ainda não estiver presente |
+| 6+ | `param1, ...` | Opcional. Valores vinculados a marcadores `?` no SQL, por ordem. Se o SQL contiver `?` mas nenhum parâmetro for fornecido, o campo retorna vazio (uma proteção integrada contra argumentos ausentes) |
+
+### A convenção `db_path`
+
+O arquivo de banco de dados reside dentro do diretório de mídia incluído no formulário. Em tempo de execução, `pulldata('app-api', 'family_path')` retorna esse caminho de diretório. Consulte [family_path](family-path) para detalhes de configuração. O padrão padrão é:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Quando o aplicativo abre o arquivo, ele remove a parte `::tableName` e usa o caminho do arquivo nu. O nome da tabela aparece apenas dentro do seu SQL.
+
+---
+
+## Exemplo básico — busca de província
+
+Um menu suspenso de província apenas de leitura apoiado por um arquivo `vnxa3.db` incluído:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Província | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+A coluna `appearance` (expandida para legibilidade):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- O rótulo exibido vem da coluna `provv`.
+- O valor armazenado vem da coluna `provid`.
+- Apenas as linhas onde `rta_filter = "1"` são mostradas.
+
+---
+
+## Consultas parametrizadas
+
+Use marcadores `?` no seu SQL e passe as referências de campo correspondentes como argumentos adicionais (posições 6 em diante). Este é o padrão padrão para seleções em cascata — por exemplo, carregar distritos que pertencem à província selecionada anteriormente.
+
+<Callout type="warning">
+Se o seu SQL contiver pelo menos um `?` e não forem fornecidos argumentos de parâmetro, o campo retorna um conjunto de resultados vazio. Isso evita que dados obsoletos ou fora de escopo apareçam antes de uma seleção pai ser feita.
+</Callout>
+
+### Exemplo de cascata de distrito
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+O valor de `${province}` é vinculado ao primeiro `?`. O campo fica em branco até que o enumerador selecione uma província.
+
+### Exemplo de dois parâmetros — cascata de comuna
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Os parâmetros são vinculados posicionalmente: `${province}` → primeiro `?`, `${district}` → segundo `?`.
+
+---
+
+## UNION SELECT para valores especiais
+
+Injete linhas sintéticas — como "Não Sabe" ou "Recusa a Responder" — diretamente no SQL usando `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Não sabe</i>", "888"')
+```
+
+Convenções usadas nos formulários RTSurvey:
+
+| Código | Significado |
+|---|---|
+| `888` | Não Sabe |
+| `999` | Recusa a Responder |
+
+Tags HTML como `<i>` na string de exibição são renderizadas pelo aplicativo — você pode usá-las para distinguir visualmente opções especiais.
+
+---
+
+## Exibição multi-idioma
+
+Armazene rótulos específicos do idioma em colunas separadas (por exemplo, `label_vi`, `label_en`) e selecione a apropriada com base em um campo de idioma no seu formulário:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Para alternar colunas dinamicamente com base em um campo `${language}`, use uma expressão `if()` no parâmetro da coluna de exibição para alternar entre colunas de idioma:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+O parâmetro da coluna de exibição é avaliado antes da execução da consulta. Apenas o nome da coluna (sem colchetes) é passado para o motor SQL; os colchetes são marcadores cosméticos removidos no momento da análise.
+</Callout>
+
+---
+
+## Validar uma seleção real
+
+Quando o campo permite valores especiais como 888 ou 999, uma verificação simples `required = yes` é insuficiente — ela é satisfeita mesmo que o enumerador selecione "Não Sabe". Use a restrição `selected-at(., 0) != -997` para verificar se o valor armazenado é uma seleção genuína e não a sentinela interna "nada selecionado" `-997`:
+
+| coluna | valor |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Por favor, selecione uma opção válida |
+
+O valor `-997` é o código interno que o RTSurvey armazena quando nenhum item foi selecionado na lista de preenchimento automático. Uma seleção de 888 ou 999 ainda é uma escolha deliberada e passa nesta verificação.
+
+Para exigir adicionalmente um valor real (não especial), estenda a restrição:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Comparação: banco de dados local vs outros métodos de pesquisa
+
+| Recurso | Preenchimento automático `rawquery` | `search-api()` | `search()` CSV | Opções CSV simples |
+|---|---|---|---|---|
+| Fonte de dados | `.db` incluído (SQLite) | API REST remota | CSV incluído | Folha de opções (Choices) |
+| Funciona offline | Sim | Não | Sim | Sim |
+| Suporta SQL bruto | Sim | Não | Não | Não |
+| Filtros em cascata | Sim — `?` parametrizado | Através do corpo da requisição | Limitado | Não |
+| Tamanho do conjunto de dados | Muito grande (milhões de linhas) | Ilimitado (lado do servidor) | Médio (dezenas de milhares) | Pequeno |
+| Linhas injetadas especiais | Sim — `UNION SELECT` | Não | Não | Sim (manual) |
+| Complexidade de configuração | Média — requer `.db` incluído | Alta — requer servidor API | Baixa | Nenhuma |
+
+---
+
+## Limitações
+
+- O arquivo `.db` deve ser incluído no pacote de mídia do formulário antes da implantação. Atualizações dinâmicas do banco de dados requerem uma nova implantação do formulário.
+- O SQL é executado tal como está no dispositivo. Não há limpeza (sanitization) do lado do servidor — evite construir SQL a partir de entradas de texto livre do enumerador.
+- Apenas instruções `SELECT` são suportadas. `INSERT`, `UPDATE` e `DELETE` não são permitidos.
+- Consultas muito complexas (grandes cadeias `UNION`, múltiplas junções) podem ser lentas em dispositivos Android de baixo custo.
+- As variantes `search-autocomplete-noedit` não permitem que o enumerador salve um valor que não esteja no conjunto de resultados. Se for necessária a entrada de texto livre, use um campo `text` separado.
+- `SELECT DISTINCT` é injetado automaticamente apenas quando `DISTINCT` está ausente da consulta. Se você escrever `SELECT DISTINCT` explicitamente, não será duplicado.

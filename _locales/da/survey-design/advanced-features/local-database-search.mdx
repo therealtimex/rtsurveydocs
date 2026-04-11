@@ -1,0 +1,224 @@
+---
+title: "Lokal databasesøgning"
+description: "Lokal databasesøgning forespørger en inkluderet SQLite .db-fil ved hjælp af rå SQL, hvilket muliggør hurtig offline autofuldførelse for store statiske datasæt."
+---
+
+import { Callout } from 'nextra/components'
+
+**Lokal databasesøgning** lader et `select_one` eller `text` felt forespørge en SQLite `.db`-fil, der er pakket sammen med formularens mediepakke — helt offline, uden kommunikation med serveren. Dette er den rigtige tilgang, når din valgliste er stor og statisk (f.eks. en national liste over landsbyer, sundhedsfaciliteter eller administrative grænser), og der ikke kan garanteres internetforbindelse.
+
+| Tilgang | Datakilde | Kræver forbindelse |
+|---|---|---|
+| Lokal databasesøgning (`rawquery`) | Inkluderet `.db`-fil (SQLite) | Nej |
+| `search-api()` | Ekstern REST API | Ja |
+| `search()` | Inkluderet CSV-fil | Nej |
+
+---
+
+## Udseendevarianter
+
+Autofuldførelsesfeltet konfigureres via kolonnen `appearance`. Der er tre varianter tilgængelige:
+
+| Variant | Noter |
+|---|---|
+| `search-autocomplete-noedit(...)` | Standard autofuldførelse — intervieweren skal vælge fra listen; indtastning af fritekst gemmes ikke |
+| `search-autocomplete-noedit-v2(...)` | Anbefalet variant — samme adfærd, men bruger en opdateret renderingsmotor med bedre ydeevne på store resultatsæt |
+| `search(...)` | Simpel filbaseret match mod en inkluderet CSV; understøtter **ikke** rå SQL — angivet her kun til sammenligning |
+
+<Callout type="info">
+`search-autocomplete-noedit` er et alias — ved behandling erstatter appen det med det interne funktionsnavn `searchAutocompleteNoedit`. Brug begge stavemåder i din XLSForm; begge virker.
+</Callout>
+
+---
+
+## `rawquery` datakilden
+
+For at køre en SQL-forespørgsel mod en `.db`-fil skal du sende `'rawquery'` som det første argument i udseendefunktionen. Den fulde signatur er:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parametre
+
+| Position | Parameter | Beskrivelse |
+|---|---|---|
+| 1 | `'rawquery'` | Bogstavelig streng — fortæller appen, at den skal udføre SQL'en direkte |
+| 2 | `db_path` | Sti til SQLite-filen i formen `<dir>/<file>.db::tableName`. Suffikset `::tableName` fjernes, når filen åbnes; tabelnavnet bruges inde i din SQL |
+| 3 | `'[display_col]'` | Kolonne, der skal vises i rullemenuen. De omgivende `[ ]` kantede parenteser fjernes ved kørsel |
+| 4 | `'value_col'` | Kolonne, hvis værdi gemmes, når intervieweren foretager et valg |
+| 5 | `'SELECT ...'` | Enhver gyldig SQLite SELECT-sætning. `SELECT DISTINCT` indsættes automatisk, hvis `DISTINCT` ikke allerede er til stede |
+| 6+ | `param1, ...` | Valgfrit. Værdier bundet til `?` pladsholdere i SQL'en, i rækkefølge. Hvis SQL'en indeholder `?`, men der ikke leveres nogen parametre, returnerer feltet tomt (en indbygget sikring mod manglende argumenter) |
+
+### `db_path` konventionen
+
+Databasefilen ligger i formularens inkluderede mediemappe. Ved kørsel returnerer `pulldata('app-api', 'family_path')` stien til den mappe. Se [family_path](family-path) for opsætningsdetaljer. Det standardmønster er:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Når appen åbner filen, fjerner den `::tableName`-delen og bruger selve filstien. Tabelnavnet optræder kun inde i din SQL.
+
+---
+
+## Grundlæggende eksempel — provinsopslag
+
+En skrivebeskyttet provins-rullemenu understøttet af en inkluderet `vnxa3.db`-fil:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Provins | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+Kolonnen `appearance` (udvidet for læsbarhed):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Den viste etiket kommer fra kolonnen `provv`.
+- Den gemte værdi kommer fra kolonnen `provid`.
+- Kun rækker, hvor `rta_filter = "1"`, vises.
+
+---
+
+## Parametriserede forespørgsler
+
+Brug `?` pladsholdere i din SQL og send de tilsvarende feltreferencer som yderligere argumenter (position 6 og frem). Dette er standardmønsteret for kaskaderende valg — f.eks. indlæsning af distrikter, der hører til den tidligere valgte provins.
+
+<Callout type="warning">
+Hvis din SQL indeholder mindst ét `?` og der ikke leveres nogen parameterargumenter, returnerer feltet et tomt resultatsæt. Dette forhindrer forældede eller ufiltrerede data i at blive vist, før der er foretaget et overordnet valg.
+</Callout>
+
+### Eksempel på distriktskaskade
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+Værdien af `${province}` er bundet til det første `?`. Feltet er tomt, indtil intervieweren vælger en provins.
+
+### To-parameter eksempel — kommunekaskade
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parametre er bundet positionelt: `${province}` → første `?`, `${district}` → andet `?`.
+
+---
+
+## UNION SELECT for specialværdier
+
+Indsæt syntetiske rækker — såsom "Ved ikke" eller "Nægter at svare" — direkte i SQL'en ved hjælp af `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Ved ikke</i>", "888"')
+```
+
+Konventioner brugt i RTSurvey-formularer:
+
+| Kode | Betydning |
+|---|---|
+| `888` | Ved ikke |
+| `999` | Nægter at svare |
+
+HTML-tags såsom `<i>` i visningsstrengen renderes af appen — du kan bruge dem til visuelt at skelne specialvalg.
+
+---
+
+## Flersproget visning
+
+Gem sprogspecifikke etiketter i separate kolonner (f.eks. `label_vi`, `label_en`) og vælg den relevante baseret på et sprogfelt i din formular:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+For at skifte kolonner dynamisk baseret på et `${language}` felt, skal du bruge et `if()` udtryk på visningskolonneparameteren for at skifte mellem sprogkolonner:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Visningskolonneparameteren evalueres før forespørgslen kører. Kun kolonnenavnet (uden parenteser) sendes til SQL-motoren; parenteserne er kosmetiske markører, der fjernes ved behandling.
+</Callout>
+
+---
+
+## Validering af et reelt valg
+
+Når feltet tillader specialværdier som 888 eller 999, er et almindeligt `required = yes` tjek utilstrækkeligt — det er opfyldt, selvom intervieweren vælger "Ved ikke". Brug begrænsningen `selected-at(., 0) != -997` til at verificere, at den gemte værdi er et reelt valg og ikke den interne "intet valgt" markør `-997`:
+
+| kolonne | værdi |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Vælg venligst en gyldig mulighed |
+
+Værdien `-997` er den interne kode, RTSurvey gemmer, når intet punkt er valgt fra autofuldførelseslisten. Et valg af 888 eller 999 er stadig et bevidst valg og består dette tjek.
+
+For yderligere at kræve en reel (ikke-speciel) værdi, skal du udvide begrænsningen:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Sammenligning: lokal database vs. andre søgemetoder
+
+| Funktion | `rawquery` autofuldførelse | `search-api()` | `search()` CSV | Almindelige CSV-valg |
+|---|---|---|---|---|
+| Datakilde | Inkluderet `.db` (SQLite) | Ekstern REST API | Inkluderet CSV | Valg-ark |
+| Fungerer offline | Ja | Nej | Ja | Ja |
+| Understøtter rå SQL | Ja | Nej | Nej | Nej |
+| Kaskaderende filtre | Ja — parametriseret `?` | Via anmodningsdel | Begrænset | Nej |
+| Datasætstørrelse | Meget stor (millioner af rækker) | Ubegrænset (serversiden) | Mellem (titusinder) | Lille |
+| Specielle indsatte rækker | Ja — `UNION SELECT` | Nej | Nej | Ja (manuelt) |
+| Opsætningskompleksitet | Medium — kræver inkluderet `.db` | Høj — kræver API-server | Lav | Ingen |
+
+---
+
+## Begrænsninger
+
+- `.db`-filen skal være pakket sammen med formularens mediepakke før implementering. Dynamiske opdateringer til databasen kræver en ny formularimplementering.
+- SQL udføres som den er på enheden. Der er ingen serverside-sanering — undgå at konstruere SQL fra fritekstindtastning fra intervieweren.
+- Kun `SELECT`-sætninger understøttes. `INSERT`, `UPDATE` og `DELETE` er ikke tilladt.
+- Meget komplekse forespørgsler (store `UNION`-kæder, flere joins) kan være langsomme på lavpris-Android-enheder.
+- `search-autocomplete-noedit`-varianterne tillader ikke intervieweren at gemme en værdi, der ikke er i resultatsættet. Hvis fritekstindtastning er påkrævet, skal du bruge et separat `text`-felt.
+- `SELECT DISTINCT` indsættes kun automatisk, når `DISTINCT` mangler i forespørgslen. Hvis du skriver `SELECT DISTINCT` eksplicit, vil det ikke blive fordoblet.

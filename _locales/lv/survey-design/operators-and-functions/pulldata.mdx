@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "Funkcija pulldata() iegūst vērtību no ārēja CSV faila, kas pievienots veidlapai, salīdzinot atslēgas kolonnu ar atslēgas vērtību un atgriežot atbilstošo rezultātu kolonnu."
+---
+
+import { Callout } from 'nextra/components'
+
+Funkcija `pulldata()` iegūst vērtību no CSV faila, kas pievienots veidlapai. Norādot faila nosaukumu, atgriežamo kolonnu, kolonnu, pēc kuras meklēt sakritību, un atslēgas vērtību, tā atgriež šūnu, kas atrodas atbilstošās rindas un rezultātu kolonnas krustpunktā.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Pozīcija | Parametrs | Apraksts |
+|----------|-----------|-------------|
+| 1 | Faila nosaukums | CSV mediju faila nosaukums (tas pats nosaukums, kas izmantots `select_one_from_file`) |
+| 2 | Rezultātu kolonna | Kolonna, kuras vērtību vēlaties atgriezt |
+| 3 | Atslēgas kolonna | Kolonna, ar kuru salīdzināt |
+| 4 | Atslēgas vērtība | Vērtība, ar kuru salīdzināt — parasti atsauce uz lauku, piemēram, `${field}` |
+
+Funkcija atgriež tukšu virkni, ja sakritība netiek atrasta.
+
+---
+
+## Priekšnosacījumi
+
+CSV failam jābūt pievienotam veidlapai kā **mediju failam**. To pašu failu, uz kuru norāda `pulldata()`, var izmantot arī kā izvēles sarakstu funkcijai `select_one_from_file`.
+
+**CSV piemērs — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Pamata piemērs
+
+Atrodiet darbinieka nodaļu un tālruni pēc viņa ID:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Izvēlieties darbinieku | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Nodaļa: `${dept}` — Tālrunis: `${phone}` | |
+
+<Callout type="info">
+Kolonna `name` `select_one_from_file` CSV failā ir saglabātā vērtība. Kad intervētājs izvēlas "Alice", `${staff_id}` satur vērtību "Alice", kuru `pulldata()` izmanto kā atslēgu, lai iegūtu viņas nodaļu un tālruni.
+</Callout>
+
+---
+
+## Izvēlētās izvēles etiķetes (label) iegūšana
+
+Jautājums `select_one_from_file` saglabā `name` vērtību. Lai parādītu cilvēkam lasāmu `label`, izmantojiet `pulldata()`, lai to atrastu:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Izvēlieties ciematu | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | Jūs izvēlējāties: `${village_label}` | |
+
+---
+
+## Vairāku vērtību iegūšana no vienas izvēles
+
+Jūs varat izsaukt `pulldata()` vairākas reizes tam pašam failam, lai iegūtu dažādas kolonnas tai pašai izvēlētajai rindai:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Izvēlieties iestādi | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## pulldata izmantošana relevant un constraint kolonnās
+
+`pulldata()` var izmantot `relevant` un `constraint` kolonnās, lai piemērotu loģiku, balstoties uz meklētajām vērtībām:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Izvēlieties iestādi | | |
+| integer | bed_count | Aizņemto gultu skaits | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## pulldata izmantošana ar `once()`
+
+Lai novērtētu `pulldata()` tikai pirmajā ielādes reizē (novēršot atkārtotu novērtēšanu, ja atslēgas lauks mainās pēc sākotnējās ievades), ievietojiet to funkcijā `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Labā prakse
+
+1. Atslēgas kolonnai CSV failā ir jāsakrīt ar `name` kolonnu, kas izmantota `select_one_from_file` — tām jābūt vienādām vērtībām.
+2. Kolonnu nosaukumi CSV failā ir reģistrjutīgi — `Department` un `department` ir dažādas kolonnas.
+3. Ja atslēgas vērtība netiek atrasta, `pulldata()` atgriež tukšu virkni — izmantojiet `if(${field} != '', pulldata(...), '')` lai izvairītos no kļūdām tukšu izvēļu gadījumā.
+4. Ja iespējams, saglabājiet CSV failus mazus — lieli faili palielina veidlapas ielādes laiku lēna interneta savienojuma gadījumā.
+5. Datiem, kas mainās starp datu vākšanas posmiem, atjauniniet CSV mediju failu, augšupielādējot jaunu veidlapas versiju.
+
+## Ierobežojumi
+
+- `pulldata()` meklē tikai **pirmo** rindu, kurā atslēgas kolonna sakrīt ar atslēgas vērtību — dublējošas atslēgas vērtības CSV failā netiek atbalstītas.
+- CSV failam jābūt pievienotam veidlapai pirms izvietošanas; to nevar iegūt no URL izpildlaikā.
+- Skaitliskās vērtības, ko atgriež `pulldata()`, ir virknes — ievietojiet tās `number()`, ja izmantojat aritmētiskās darbībās: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey atbalsta arī paplašinātus `pulldata()` veidus ierīces metadatu, JWT lauku un JSON datu lasīšanai. Skatiet [App API](../app-api) par `pulldata('app-api', ...)` un [Call API](../advanced-features/call-api) lapu par JSON meklēšanas paraugiem.
+</Callout>
+
+---
+
+## Paplašinātie pulldata() varianti
+
+Papildus CSV meklēšanai `pulldata()` atbalsta vairākus papildu datu avotus, mainot pirmo argumentu.
+
+### `pulldata('app-api', key)`
+
+Lasiet ierīces metadatus, lietotāja atribūtus un lietotnes kontekstu. Pilnu atsauci skatiet [App API](../app-api) lapā.
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Analizējiet JSON virkni un izgūstiet vērtību, izmantojot JSONPath izteiksmi. Noderīgi, ja veidlapā ir iegults JSON literālis.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Atgriež sakritušo vērtību kā virkni vai tukšu virkni, ja tā nav atrasta.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Izgūstiet vērtību no JSON virknes, kas saglabāta citā laukā, izmantojot JSONPath izteiksmi. Tas ir ekvivalents `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Dekodējiet laukā saglabāto JWT marķieri (token) un atgrieziet konkrētas prasības (claim) vērtību no lietderīgās slodzes (payload).
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Atgriež tukšu virkni, ja marķieris ir nepareizs vai prasība nav atrodama.
+
+### `pulldata('instanceid')`
+
+Atgriež pašreizējā iesnieguma unikālo instances ID. Ekvivalents `instanceID` meta laukam.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Kartējiet (map) vērtību uz citu, izmantojot nosauktu kartēšanas tabulu, kas definēta veidlapas konfigurācijā.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Atgriež kartēto vērtību vai tukšu virkni, ja sakritība netiek atrasta.
+
+### `pulldata('options', optionName)`
+
+Lasiet veidlapas konfigurācijas opciju pēc nosaukuma.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Izpildiet SQL `SELECT` pret pievienoto SQLite `.db` failu un atgrieziet vērtību no pirmās atbilstošās rindas pirmās kolonnas. Parametri pēc SQL virknes tiek pēc kārtas aizstāti `?` vietā.
+
+| Pozīcija | Parametrs | Apraksts |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | Literāla virkne, kas identificē šo variantu |
+| 2 | ceļš | Faila ceļš `concat(${family_path}, '/file.db::tableName')` formātā |
+| 3 | SQL | `SELECT` paziņojums, izmantojot `?` kā pozicionālus vietas turētājus |
+| 4+ | parametri | Vērtības, kas pēc kārtas aizstāj katru `?` — parasti atsauces uz laukiem, piemēram, `${field}` |
+
+Atgriež tukšu virkni, ja neviena rinda nesakrīt.
+
+**Piemērs — provinces nosaukuma meklēšana pēc ID:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Piemērs — apkaimes (ward) nosaukuma meklēšana, filtrējot pēc provinces un rajona kodiem:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Atšķirībā no standarta četru argumentu `pulldata()`, kas CSV failā meklē sakritību vienā atslēgas kolonnā, `rawquery` variants izpilda pilnu SQL `SELECT` pret SQLite datubāzi, pieļaujot vairāku kolonnu `WHERE` nosacījumus un jebkuru kolonnu kā atgriežamo vērtību.
+
+<Callout type="info">
+`rawquery` parasti izmanto ar automātiskās pabeigšanas laukiem hierarhiskai atrašanās vietas meklēšanai. Skatiet [Vietējās datubāzes meklēšana](../advanced-features/local-database-search) informācijai par `.db` failu izveidi un to savienošanu ar `pulldata('rawquery', ...)`.
+</Callout>

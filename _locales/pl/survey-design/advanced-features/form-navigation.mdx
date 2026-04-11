@@ -1,0 +1,104 @@
+---
+title: "Kontrolki nawigacji formularza"
+description: "Użyj wartości wyglądu SaveFinalizedExit i SaveIncompleteExit, aby wyrenderować stylizowane przyciski wyjścia, które zapisują i opuszczają formularz."
+---
+
+**Kontrolki nawigacji formularza** to wartości wyglądu umieszczane w polach typu `note` (lub `text`), które są renderowane jako stylizowane przyciski o pełnej szerokości na dole ankiety. Pozwalają one ankieterowi zapisać zgłoszenie i wyjść z formularza jednym dotknięciem — jako ukończony (sfinalizowany) rekord lub jako wersję roboczą (nieukończony rekord).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Renderuje przycisk, który **zapisuje zgłoszenie jako sfinalizowane** i zamyka formularz. Etykieta przycisku jest pobierana z kolumny `label` danego pola.
+
+| XLSForm column | Wartość |
+|----------------|-------|
+| `type` | `note` |
+| `name` | dowolna unikalna nazwa (np. `btn_finish`) |
+| `label` | tekst wyświetlany na przycisku |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Zgłoszenie zostaje oznaczone jako ostateczny, kompletny rekord. Jest to równoznaczne z dotknięciem wbudowanego przycisku przesyłania.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Renderuje przycisk, który **zapisuje zgłoszenie jako nieukończone (wersja robocza)** i zamyka formularz. Ankieter może wrócić do niego później i kontynuować wypełnianie.
+
+| XLSForm column | Wartość |
+|----------------|-------|
+| `type` | `note` |
+| `name` | dowolna unikalna nazwa (np. `btn_pause`) |
+| `label` | tekst wyświetlany na przycisku |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Składnia kolorów
+
+Oba rodzaje wyglądu akceptują wbudowany kolor w formacie `<#RRGGBB/>`:
+
+- `#`, po którym następuje dokładnie **6 cyfr szesnastkowych** (wielkie lub małe litery)
+- Zamykający znak `/>` jest **wymagany** — jego pominięcie powoduje błąd parsowania
+- Przykład: `<#04B404/>` (zielony), `<#EDC602/>` (bursztynowy), `<#D9534F/>` (czerwony)
+
+Kolor kontroluje tło przycisku. Kolor tekstu jest określany automatycznie przez aplikację.
+
+---
+
+## Przykład
+
+Poniższe dwa pola umieszczone na końcu formularza tworzą zielony przycisk **Wyślij** i bursztynowy przycisk **Zapisz jako wersję roboczą**:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Wyślij | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Zapisz jako wersję roboczą | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — wykluczanie przycisków ze spisu treści
+
+Token wyglądu `toc-hide` informuje rtSurvey, aby wykluczyć pole ze **spisu treści** formularza (listy przeglądu pytań). Przyciski nawigacyjne nie są pytaniami, więc nigdy nie powinny pojawiać się w spisie treści.
+
+Zawsze dołączaj `toc-hide` po wyglądzie wyjścia:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Zobacz [Wygląd — toc-hide](../appearance#group-and-navigation), aby zapoznać się z dokumentacją toc-hide.
+
+---
+
+## Konwencja umieszczania
+
+Podczas dodawania kontrolek nawigacji do formularza należy przestrzegać następujących konwencji:
+
+- Umieść oba przyciski na **samym końcu** formularza, po wszystkich pytaniach i grupach.
+- Zawsze dołączaj **oba** przyciski razem — jeden sfinalizowany i jeden nieukończony — aby ankieter zawsze miał możliwość wyjścia bez względu na stan ukończenia.
+- Użyj kolumny `relevant` w przycisku sfinalizowanego wyjścia, jeśli przesłanie powinno być dozwolone tylko po spełnieniu określonych warunków (np. ukończeniu wymaganej sekcji). Przycisk nieukończonego wyjścia powinien zazwyczaj pozostać **zawsze widoczny**.
+
+---
+
+## Warunkowe sfinalizowane wyjście
+
+Użyj kolumny `relevant`, aby kontrolować, kiedy wyświetlany jest przycisk sfinalizowanego wyjścia. Nieukończone wyjście powinno pozostać bezwarunkowo widoczne, aby ankieter zawsze mógł przerwać i wrócić.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Wyślij | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Zapisz jako wersję roboczą | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+W tym przykładzie przycisk **Wyślij** pojawia się tylko wtedy, gdy ankieter wyraził zgodę i oznaczył sekcję A jako ukończoną. Przycisk **Zapisz jako wersję roboczą** jest zawsze dostępny.
+
+---
+
+## Ograniczenia
+
+- **Typ pola musi być `note` lub `text`.** Używanie tego wyglądu w jakimkolwiek innym typie pytań nie jest obsługiwane.
+- **Tylko 6-cyfrowy kod szesnastkowy.** Skrócony kod szesnastkowy (`<#FFF/>`) i nazwane kolory nie są obsługiwane — zawsze używaj pełnego formatu 6-cyfrowego (np. `<#FFFFFF/>`).
+- **Kolumna etykiety to tekst przycisku.** Kolumna `hint` jest ignorowana dla tych pól; renderowana jest tylko `label`.
+- **Oba przyciski powinny być obecne.** Pominięcie przycisku nieukończonego wyjścia pozostawia ankietera bez możliwości przerwania w połowie formularza.

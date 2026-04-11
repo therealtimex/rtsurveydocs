@@ -1,53 +1,53 @@
 ---
-title: "外觀"
+title: "外觀 (Appearance)"
 description: ""
 ---
 
-rtSurvey 中的 `appearance` 欄允許您自訂問卷調查中問題的視覺呈現和行為。此功能增強使用者體驗，可以顯著提高資料收集效率。rtSurvey 支援標準 XLSForm 外觀屬性，並使用額外選項進行擴展。
+rtSurvey 中的 `appearance` 列允許您自定義調查中問題的視覺呈現和行為。此功能增強了用戶體驗，並可以顯著提高數據收集效率。rtSurvey 支持標準的 XLSForm 外觀屬性，並提供了額外的擴展選項。
 
 ## 標準 XLSForm 外觀屬性
 
-rtSurvey 支援以下標準 XLSForm 外觀屬性：
+rtSurvey 支持以下標準 XLSForm 外觀屬性：
 
-| 外觀屬性 | 問題類型 | 說明 |
-|----------------------|----------------|-------------|
-| multiline | text | 建立多行文字方塊（最適合網頁客戶端） |
-| minimal | select_one, select_multiple | 在下拉選單中顯示選項 |
-| quick | select_one | 選取後自動前進至下一個問題（僅限行動） |
-| no-calendar | date | 抑制日曆顯示（僅限行動） |
-| month-year | date | 允許僅選取月份和年份 |
-| year | date | 允許僅選取年份 |
-| horizontal-compact | select_one, select_multiple | 水平顯示選項（僅限網頁） |
-| horizontal | select_one, select_multiple | 在欄中水平顯示選項（僅限網頁） |
-| likert | select_one | 將選項呈現為 Likert 量表 |
+| 外觀屬性 | 問題類型 | 描述 |
+|----------|----------|------|
+| multiline | text | 創建多行文本框（最適合 Web 客戶端） |
+| minimal | select_one, select_multiple | 在下拉菜單中顯示選項 |
+| quick | select_one | 選擇後自動跳轉到下一個問題（僅限移動端） |
+| no-calendar | date | 抑制日曆顯示（僅限移動端） |
+| month-year | date | 僅允許選擇月和年 |
+| year | date | 僅允許選擇年 |
+| horizontal-compact | select_one, select_multiple | 水平顯示選項（僅限 Web） |
+| horizontal | select_one, select_multiple | 在列中水平顯示選項（僅限 Web） |
+| likert | select_one | 將選項呈現為李克特量表 |
 | compact | select_one, select_multiple | 以最小間距並排顯示選項 |
-| quickcompact | select_one | 結合緊湊顯示和自動前進（僅限行動） |
-| field-list | groups | 在一個螢幕上顯示整個群組（僅限行動） |
-| label | select_one, select_multiple | 顯示無輸入的選項標籤 |
-| list-nolabel | select_one, select_multiple | 顯示無標籤的輸入（與 `label` 一起使用） |
+| quickcompact | select_one | 將緊湊顯示與自動跳轉結合（僅限移動端） |
+| field-list | groups | 在一個屏幕上顯示整個組（僅限移動端） |
+| label | select_one, select_multiple | 顯示選項標籤而不顯示輸入框 |
+| list-nolabel | select_one, select_multiple | 顯示輸入框而不顯示標籤（與 `label` 配合使用） |
 | table-list | groups | 以表格格式顯示問題 |
-| signature | image | 啟用簽名擷取（僅限行動） |
-| draw | image | 允許手繪（僅限行動） |
-| map, quick map | select_one, select_one_from_file | 啟用從地圖特徵選取 |
+| signature | image | 啟用簽名采集（僅限移動端） |
+| draw | image | 允許手繪（僅限移動端） |
+| map, quick map | select_one, select_one_from_file | 支持從地圖要素中進行選擇 |
 
 ## 使用外觀的最佳實踐
 
-1. **一致性**：在整個問卷調查中一致使用外觀屬性，以保持統一的外觀。
-2. **行動與網頁**：考慮外觀在不同裝置和平台上的呈現方式。
-3. **效能**：謹慎使用可能減慢表單載入速度的外觀屬性（例如大型群組的 `table-list`）。
-4. **使用者體驗**：選擇讓資料輸入對受訪者更容易和直覺的外觀。
-5. **測試**：始終在目標裝置上測試您的表單，確保外觀如預期運作。
+1. **一致性**：在整個調查中一致地使用外觀屬性，以獲得統一的外觀。
+2. **移動端 vs. Web**：考慮外觀在不同設備和平台上的呈現效果。
+3. **性能**：謹慎使用可能減慢表單加載速度的外觀屬性（例如，大組的 `table-list`）。
+4. **用戶體驗**：選擇使數據輸入對受訪者而言更簡單、更直觀的外觀。
+5. **測試**：務必在目標設備上測試表單，以確保外觀按預期工作。
 
-## 進階技術
+## 高級技巧
 
 ### 組合外觀
 
-某些外觀屬性可以組合以實現更複雜的佈局：
+某些外觀屬性可以組合使用，以實現更複雜的布局：
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Select one: | minimal compact |
+| select_one options | choice | 請選擇一個：| minimal compact |
 ```
 
 ### 動態外觀
@@ -57,77 +57,158 @@ rtSurvey 允許根據表單邏輯動態更改外觀：
 ```
 | type | name | label | appearance | relevant |
 |------|------|-------|------------|----------|
-| text | time | Enter time: | inline-[%H:%M] | ${show_time} = 'yes' |
+| text | time | 輸入時間： | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## 行動應用程式注意事項
+## 移動應用注意事項
 
-- 某些外觀（例如 `quick`、`signature`）特定於行動裝置。
-- 在 Android 和 iOS 上進行徹底測試，確保一致的行為。
+- 某些外觀（例如 `quick`、`signature`）僅適用於移動設備。
+- 在 Android 和 iOS 上進行徹底測試，以確保行為一致。
 
 ## rtSurvey 擴展外觀屬性
 
-除了標準 XLSForm 外觀外，rtSurvey 還支援以下平台特定選項：
+除了標準 XLSForm 外觀外，rtSurvey 還支持以下平台特定的選項：
 
-### 資料和顯示控制
+### 數據和顯示控制
 
-| 外觀屬性 | 問題類型 | 說明 |
-|----------------------|----------------|-------------|
-| `invisible` | 任何 | 從視圖中隱藏字段，同時仍收集或計算其值。與 `hidden` 類型不同——字段仍參與邏輯。 |
-| `displaytitle` | 任何 | 強制顯示字段的標籤/標題，即使它本來會被抑制。 |
-| `autopull` | select_one, select_multiple | 在表單載入或觸發字段更改時自動擷取外部資料以填充選項。 |
-| `floating_hint` | text, integer, decimal | 將提示文字顯示為輸入字段上方的浮動標籤，而不是下方。 |
-| `calculate-button` | calculate | 添加可見按鈕，按需觸發字段重新計算，而不是自動計算。 |
+| 外觀屬性 | 問題類型 | 描述 |
+|----------|----------|------|
+| `invisible` | 任何類型 | 在視圖中隱藏該字段，但仍收集或計算其值。與 `hidden` 類型不同——該字段仍參與邏輯。 |
+| `displaytitle` | 任何類型 | 即使在通常會被抑制的情況下，也強制顯示字段的標籤/標題。 |
+| `autopull` | select_one, select_multiple | 當表單加載或觸發字段更改時，自動獲取外部數據以填充選項。 |
+| `floating_hint` | text, integer, decimal | 將提示文本顯示為輸入框上方的浮動標籤，而不是下方。 |
+| `calculate-button` | calculate | 添加一個可見按鈕，按需觸發字段的重新計算，而不是自動計算。 |
 
-### 佈局
+### 組和導航
 
-| 外觀屬性 | 問題類型 | 說明 |
-|----------------------|----------------|-------------|
-| `1screen` | group | 強制整個群組在單一螢幕上顯示，無論群組大小如何。 |
-| `columns(n)` | select_one, select_multiple | 在 `n` 欄中顯示選項。例如：`columns(3)` 顯示三欄單選按鈕。 |
-| `gridformat<row=R col=C colspan=S align=center>` | 任何 | 在 CSS 網格佈局中將字段定位在行 `R`、列 `C`，跨越 `S` 欄。與 `advanced-extension/grid-layout` 一起使用。 |
-| `ignore-simplify` | 任何 | 指示表單渲染器跳過此字段佈局的自動簡化或壓縮。 |
+| 外觀屬性 | 問題類型 | 描述 |
+|----------|----------|------|
+| `section` | group | 將組呈現為可折疊的分段卡片。注意：僅限移動應用。 |
+| `toc-hide` | 任何類型 | 從目錄 (TOC) 導航面板中排除該問題。 |
+| `minilog` | begin_repeat | 將完成的重複條目顯示為緊湊的迷你日志列表，而不是內聯展開每個條目。 |
 
-### 小工具
+### 輸入行為
 
-| 外觀屬性 | 問題類型 | 說明 |
-|----------------------|----------------|-------------|
-| `likert` | select_one | 將選項呈現為 Likert 量表行（已在標準表格中；已確認支援）。 |
-| `distress` | select_one | 將選項呈現為 Kessler 心理困擾量表（K10）視覺小工具，帶有情感圖示。 |
+| 外觀屬性 | 問題類型 | 描述 |
+|----------|----------|------|
+| `proper` | text | 在受訪者輸入時自動將每個單詞的首字母大寫（標題大小寫行為）。 |
+| `text-nolabel` | text, integer, decimal | 呈現不帶可見標籤的輸入框。 |
+| `inline-1line` | text | 即使問題標籤很長，也強制文本輸入顯示為單行。 |
+| `popup` | 任何類型 | 在彈出窗口 / 模態層中呈現該字段，而不是頁面內聯呈現。 |
 
-### API 整合
+### 布局
 
-| 外觀屬性 | 問題類型 | 說明 |
-|----------------------|----------------|-------------|
-| `callapi` | text, integer, decimal, select_one | 啟用此字段的 API 呼叫整合。計算欄應包含 `callapi()` 表達式。請參閱 [Call API](advanced-extension/call-api)。 |
-| `callapi-verify(params)` | text, integer, decimal | 使用靜態參數觸發 API 驗證呼叫。表單在 API 確認值之前會阻止進度。 |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | 與 `callapi-verify` 相同，但參數在執行時從其他字段值派生。 |
+| 外觀屬性 | 問題類型 | 描述 |
+|----------|----------|------|
+| `1screen` | group | 無論組大小如何，強制整個組在單個屏幕上顯示。 |
+| `columns(n)` | select_one, select_multiple | 在 `n` 列中顯示選項。示例：`columns(3)` 顯示三列單選按鈕。 |
+| `gridformat<row=R col=C colspan=S align=center>` | 任何類型 | 將字段放置在 CSS 網格布局中，位於第 `R` 行、第 `C` 列，跨越 `S` 列。與 `advanced-extension/grid-layout` 配合使用。 |
+| `ignore-simplify` | 任何類型 | 指示表單渲染器跳過對此字段布局的自動簡化或壓縮。 |
+| `horizontal(N)` | select_one, select_multiple | 設置每個選項占據行寬的 `N` 百分比。示例：`horizontal(50)` 每行放置兩個選項。 |
+| `scroll-view(N%)` | group, repeat | 將容器限制為視口（或父級）高度的最大 `N%`，並在內容溢出時添加滾動條。示例：`scroll-view(60%)`。 |
+
+### 組件 (Widgets)
+
+| 外觀屬性 | 問題類型 | 描述 |
+|----------|----------|------|
+| `likert` | select_one | 將選項呈現為李克特量表行（已在上方標準表中列出；確認支持）。 |
+| `distress` | select_one | 將選項呈現為帶情感圖標的 Kessler 心理困擾量表 (K10) 視覺組件。 |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | 將選項呈現為帶五個顏色槽位的樣式化評分框。`c1` = 外部容器邊框，`c2` = 未選中邊框，`c3` = 已選中邊框和填充，`c4` = 未選中文本顏色，`c5` = 已選中文本顏色。示例：`rating_box-fill-grey-blue-green-black-white`。 |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | 將選項呈現為彩色標簽。五個顏色槽位遵循與 `rating_box-fill` 相同的順序。選中的選項會被高亮顯示；未選中的選項會從摘要視圖中隱藏。 |
+
+### API 集成
+
+| 外觀屬性 | 問題類型 | 描述 |
+|----------|----------|------|
+| `callapi` | text, integer, decimal, select_one | 為此字段啟用 API 調用集成。計算列應包含 `callapi()` 表達式。請參閱 [Call API](advanced-features/call-api)。 |
+| `callapi-verify(params)` | text, integer, decimal | 使用靜態參數觸發 API 驗證調用。表單會阻塞進度，直到 API 確認該值。 |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | 與 `callapi-verify` 相同，但參數在運行時衍生自其他字段值。 |
+
+### 語言切換器
+
+| 外觀屬性 | 問題類型 | 描述 |
+|----------|----------|------|
+| `change_language-{colors} default('lang')` | note, text | 呈現一個使用給定顏色代碼樣式化的語言切換器組件。`default('lang')` 標記設置初始語言（例如 `default('en')`）；在解析過程中它會在內部重寫為 `rtDefault('lang')`。示例：`change_language-blue-white default('vi')`。 |
 
 ### 內聯日期/時間格式
 
-對於 `date`、`time` 和 `datetime` 字段，您可以使用附加到外觀的格式字符串指定自訂顯示格式：
+對於 `date`、`time` 和 `datetime` 字段，您可以使用附加到外觀的格式字符串指定自定義顯示格式：
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-格式標記與 `format-date()` 和 `format-date-time()` 相同。請參閱[函數——日期和時間函數](operators-and-functions/functions#date-and-time-functions)。
+格式標記與 `format-date()` 和 `format-date-time()` 相同。請參閱 [函數 — 日期和時間函數](operators-and-functions/functions#date-and-time-functions)。
 
-範例：
+示例：
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| datetime | event_time | Event date and time | inline-[%d/%m/%Y %I:%M %p] |
-| date | birth_date | Date of birth | inline-[%d/%m/%Y] |
+| datetime | event_time | 事件日期和時間 | inline-[%d/%m/%Y %I:%M %p] |
+| date | birth_date | 出生日期 | inline-[%d/%m/%Y] |
+
+### 內聯按鈕布局 — `display{}` 和 `results{}`
+
+對於呈現為內聯圖標按鈕的問題類型（`date`、`time`、`datetime`、`image`、`audio`、`video`、`file`、`barcode`、`geopoint`），兩個外觀修改器控制按鈕位置和采集後的行為。
+
+#### `display{...}` — 采集前的按鈕位置
+
+```
+display{<align>, <size>, <color>}
+```
+
+| 參數 | 值 | 默認值 |
+|------|----|--------|
+| Align (對齊) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (大小) | `small`, `medium`, `large` | `small` |
+| Color (顏色) | 十六進位值，例如 `#FF5500` | 主題主色 |
+| Flag (標記) | `inline-icon` | 強制圖標模式 |
+
+| 對齊值 | 布局 |
+|--------|------|
+| `right` | 按鈕位於標簽右側 |
+| `left` | 按鈕位於標簽左側 |
+| `top` | 按鈕位於標簽上方，全寬居中 |
+| `center` / `bottom` | 按鈕位於標簽下方，全寬居中 |
+
+#### `results{...}` — 采集後的布局和可見性
+
+繼承 `display{}` 設置。用於在采集到值後移動按鈕或隱藏元素。
+
+```
+results{<align>, hide(<element>)}
+```
+
+| `hide` 值 | 效果 |
+|---|---|
+| `hide(capture)` | 一旦文件/值存在，隱藏采集按鈕 |
+| `hide(review)` | 隱藏預覽縮略圖 / 播放按鈕 |
+| `hide(filename)` | 隱藏上傳後顯示的文件名 |
+| `hide(camera)` | 采集後隱藏攝像頭觸發按鈕 |
+| `hide(scanner)` | 掃描到值後隱藏條形碼掃描按鈕 |
+| `hide(value)` | 隱藏掃描出的值文本（條形碼 / 地理點） |
+
+一旦采集到值，組件會自動從 `display{}` 布局切換到 `results{}` 布局。
+
+**示例：**
+
+```
+inline display{right}                                    → 圖標位於標簽右側
+inline display{left, large}                              → 左側大圖標
+inline display{center, large, #FF5500}                   → 標簽下方的大橙色圖標
+inline display{right} results{left}                      → 采集後圖標移動到左側
+inline display{right} results{hide(capture)}             → 采集後圖標消失
+inline display{center} results{hide(capture), hide(filename)}
+```
 
 ## 已知限制
 
-- 複雜的外觀可能無法在所有平台上完全相同地呈現。
-- 某些進階 rtSurvey 外觀可能在離線模式下不受支援。
+- 複雜的外觀在所有平台上可能無法完全一致地呈現。
+- 離線模式下可能不支持某些高級 rtSurvey 外觀。
 
-## 外觀問題疑難排解
+## 排除外觀問題
 
-1. **外觀未套用**：檢查外觀欄中的拼寫錯誤。
-2. **不一致的呈現**：驗證與問題類型和平台的相容性。
-3. **效能問題**：考慮簡化複雜的外觀，特別是對於大型問卷調查。
+1. **外觀未應用**：檢查 appearance 列是否存在拼寫錯誤。
+2. **渲染不一致**：驗證與問題類型和平台的兼容性。
+3. **性能問題**：考慮簡化複雜的外觀，尤其是對於大型調查。

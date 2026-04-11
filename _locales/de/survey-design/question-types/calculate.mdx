@@ -1,112 +1,128 @@
 ---
-title: "Calculate (Berechnen)"
-description: ""
-# Translation provided by AI.
+title: "calculate"
+description: "Der Fragetyp calculate führt Hintergrundberechnungen in einem XLSForm durch und speichert abgeleitete Werte, ohne dem Interviewer eine Eingabe anzuzeigen."
 ---
 
-`Calculate`-Fragen in XLSForms und rtSurvey werden verwendet, um Berechnungen basierend auf anderen Feldern oder Werten in Ihrem Formular durchzuführen. Diese Fragen werden dem Benutzer nicht angezeigt, sondern laufen im Hintergrund und speichern ihre Ergebnisse für die spätere Verwendung oder Übermittlung.
+import { Callout } from 'nextra/components'
 
-## Syntax
+Der Fragetyp `calculate` führt eine Formel lautlos im Hintergrund aus. Er speichert das Ergebnis in einem benannten Feld, auf das andere Fragen verweisen können – dem Interviewer wird jedoch kein Eingabefeld oder Label angezeigt. Verwenden Sie ihn, um Werte abzuleiten, Zeichenfolgen zu verketten, bedingte Logik auszuführen oder Daten nachzuschlagen, die Sie später im Formular benötigen.
 
-In der XLSForm wird eine `calculate`-Frage wie folgt definiert:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Grundlegende Syntax
 
-- **type**: Für diesen Fragetyp immer `calculate`.
-- **name**: Ein eindeutiger Name für die `calculate`-Frage.
-- **label**: Wird normalerweise leer gelassen, da `calculate`-Fragen den Benutzern nicht angezeigt werden.
-- **calculation**: Die auszuwertende Formel.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Anwendungen
+- **type**: Immer `calculate`.
+- **name**: Ein eindeutiger Feldname. Andere Fragen beziehen sich darauf mit `${name}`.
+- **label**: Leer lassen – Berechnungsfelder werden dem Interviewer nie angezeigt.
+- **calculation**: Die auszuwertende Formel. Unterstützt alle [XLSForm-Funktionen](../operators-and-functions/functions) und Feldreferenzen.
 
-`Calculate`-Fragen werden häufig verwendet für:
+---
 
-1. Durchführung arithmetischer Operationen
-2. Verknüpfung von Zeichenfolgen (Strings)
-3. Anwendung komplexer Logik oder Funktionen
-4. Speicherung von Zwischenergebnissen für die spätere Verwendung
+## Häufige Muster
 
-## Beispiele
+### Arithmetik
 
-### Grundlegende Arithmetik
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### Zeichenfolgenverkettung
 
-### Zeichenfolgenverknüpfung (String Concatenation)
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Bedingter Wert
 
-### Verwendung von Funktionen
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Alter aus Geburtsdatum
 
-## Fortgeschrittene Verwendung in rtSurvey
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### pulldata() Funktion
+---
 
-rtSurvey unterstützt die Funktion `pulldata()` in `calculate`-Feldern, mit der Sie Daten aus externen CSV-Dateien abrufen können:
+## Verwendung von `once()`, um den Wert zu sperren
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Standardmäßig wird `calculate` neu ausgewertet, wenn sich ein referenziertes Feld ändert. Umschließen Sie die Formel mit `once()`, damit sie nur beim ersten Laden ausgewertet wird und das Ergebnis eingefroren wird:
 
-#### Syntax
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-Die grundlegende Syntax für `pulldata()` ist:
+Verwenden Sie `once()` für Zeitstempel, Initialwerte oder alle Fälle, in denen eine Neuberechnung bei Änderungen unerwünscht ist.
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+---
 
-- 'csv_filename': Name der CSV-Datei (ohne die Erweiterung .csv)
-- 'column_to_return': Spaltenname, der die Daten enthält, die Sie abrufen möchten
-- 'key_column': Spaltenname, der für den Abgleich verwendet werden soll
-- `${matching_value}`: Wert, nach dem in der Schlüsselspalte gesucht werden soll (oft eine Variable aus dem Formular)
+## Abrufen von Daten aus externen Quellen
 
-#### Wichtige Hinweise
-
-1. Die CSV-Datei muss zusammen mit Ihrer XLSForm hochgeladen werden, wenn Sie die Umfrage bereitstellen.
-2. Verwenden Sie in Ihrer CSV-Datei Kommas als Trennzeichen, keine Semikolons.
-3. Vermeiden Sie Kommas innerhalb der Datenfelder Ihrer CSV-Datei, da diese Probleme beim Parsen verursachen können.
-4. `pulldata()` unterstützt nur 1-zu-1-Beziehungen. Wenn mehrere Übereinstimmungen gefunden werden, wird nur die erste zurückgegeben.
-5. Es kann Einschränkungen bei der Textlänge geben, die abgerufen werden kann (ca. 76 Zeichen).
-6. Sie können `pulldata()` in Constraints verwenden, um Eingaben gegen die CSV-Daten zu validieren.
-
-### Bedingte Berechnungen
-
-Sie können `if()`-Anweisungen für bedingte Berechnungen verwenden:
+### Aus einer CSV-Datei
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-## Empfohlene Vorgehensweisen
+Die vollständige Referenz finden Sie unter [pulldata()](../operators-and-functions/pulldata).
 
-1. Verwenden Sie aussagekräftige Namen für `calculate`-Felder, um die Lesbarkeit des Formulars zu verbessern.
-2. Vermeiden Sie zu komplexe Berechnungen in einem einzigen Feld; unterteilen Sie sie bei Bedarf.
-3. Testen Sie Ihre Berechnungen gründlich, insbesondere wenn Sie komplexe Formeln oder externe Daten verwenden.
-4. Denken Sie daran, dass `calculate`-Felder jedes Mal ausgeführt werden, wenn das Formular ausgewertet wird, was bei sehr komplexen oder zahlreichen Berechnungen die Leistung beeinträchtigen kann.
-5. Stellen Sie bei der Verwendung von `pulldata()` sicher, dass Ihre CSV-Dateien korrekt formatiert sind, und testen Sie gründlich mit Ihren spezifischen Daten und der Formularstruktur.
+### Aus einer gebündelten SQLite-Datenbank
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Details zur Pfadkonstruktion finden Sie unter [Lokale Datenbanksuche](../advanced-features/local-database-search).
+
+### Aus dem App-Kontext
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Alle verfügbaren Schlüssel finden Sie unter [App API](../app-api).
+
+---
+
+## Verwendung von calculate in relevant und constraint
+
+Andere Felder können auf ein `calculate`-Ergebnis wie auf jedes andere Feld verweisen:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## Best Practices
+
+1. Geben Sie Berechnungsfeldern aussagekräftige Namen – `total_cost` ist klarer als `calc1` und in Exporten leichter nachzuverfolgen.
+2. Teilen Sie komplexe Formeln in mehrere verkettete Berechnungsfelder auf, anstatt einen tief verschachtelten Ausdruck zu verwenden.
+3. Verwenden Sie `once()` für Zeitstempel und erste Snapshots, um zu verhindern, dass sich Werte nach der ersten Erfassung ändern.
+4. Platzieren Sie `calculate`-Felder vor der ersten Frage, die auf sie verweist – die Auswertungsreihenfolge folgt der Formularreihenfolge.
+5. Lassen Sie die Spalte `label` leer. Einige Tools zeigen das Label an; wenn es leer bleibt, werden verwirrende Ausgaben vermieden.
 
 ## Einschränkungen
 
-- `Calculate`-Felder sind von den Benutzern nicht direkt bearbeitbar.
-- Das Ergebnis eines `calculate`-Feldes ist nicht sofort sichtbar, es sei denn, es wird in einem Anzeigefeld referenziert oder in der Formularlogik verwendet.
+- Berechnungsfelder werden dem Interviewer nie direkt angezeigt – verwenden Sie ein `note`-Feld, um das Ergebnis anzuzeigen.
+- Die Spalte `calculation` ist erforderlich; eine `calculate`-Zeile ohne Formel speichert immer eine leere Zeichenfolge.
+- Ergebnisse werden bei jeder Formularänderung neu ausgewertet, es sei denn, sie sind in `once()` eingeschlossen – sehr komplexe Formeln in großen Formularen können die Rendering-Leistung auf Low-End-Geräten beeinträchtigen.
+- Berechnete Werte werden in der Übermittlung als Zeichenfolgen gespeichert. Verwenden Sie `number()`, `int()` oder `boolean()` für die Typumwandlung, wenn Sie das Ergebnis an arithmetische oder logische Ausdrücke übergeben.

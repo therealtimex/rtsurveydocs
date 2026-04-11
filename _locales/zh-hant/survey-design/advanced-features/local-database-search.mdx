@@ -1,0 +1,224 @@
+---
+title: "本地資料庫搜尋"
+description: "本地資料庫搜尋使用原始 SQL 查詢捆綁的 SQLite .db 檔案，為大型靜態資料集實現快速離線自動完成。"
+---
+
+import { Callout } from 'nextra/components'
+
+**本地資料庫搜尋**允許 `select_one` 或 `text` 欄位查詢與表單媒體包捆綁在一起的 SQLite `.db` 檔案 —— 完全離線，無需伺服器往返。當您的選項列表龐大且靜態（例如全國村莊列表、衛生設施或行政邊界）且無法保證連線性時，這是正確的方法。
+
+| 方法 | 資料源 | 需要連線性 |
+|---|---|---|
+| 本地資料庫搜尋 (`rawquery`) | 捆綁的 `.db` 檔案 (SQLite) | 否 |
+| `search-api()` | 遠端 REST API | 是 |
+| `search()` | 捆綁的 CSV 檔案 | 否 |
+
+---
+
+## 外觀變體
+
+自動完成欄位透過 `appearance` 欄位進行配置。有三種變體可用：
+
+| 變體 | 備註 |
+|---|---|
+| `search-autocomplete-noedit(...)` | 標準自動完成 —— 調查員必須從列表中選擇；不儲存自由文本輸入 |
+| `search-autocomplete-noedit-v2(...)` | 推薦變體 —— 行為相同，但使用更新的渲染引擎，在大型結果集上效能更好 |
+| `search(...)` | 針對捆綁 CSV 的簡單檔案匹配；**不支援**原始 SQL —— 此處列出僅用於比較 |
+
+<Callout type="info">
+`search-autocomplete-noedit` 是一個別名 —— 在解析時，應用程式會將其替換為內部函數名 `searchAutocompleteNoedit`。在您的 XLSForm 中使用任一拼寫均可；兩者都有效。
+</Callout>
+
+---
+
+## `rawquery` 資料源
+
+要對 `.db` 檔案執行 SQL 查詢，請將 `'rawquery'` 作為 appearance 函數的第一個參數傳遞。完整簽名如下：
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### 參數
+
+| 位置 | 參數 | 描述 |
+|---|---|---|
+| 1 | `'rawquery'` | 字面字串 —— 告訴應用程式直接執行 SQL |
+| 2 | `db_path` | SQLite 檔案的路徑，格式為 `<dir>/<file>.db::tableName`。打開檔案時會剝離 `::tableName` 後綴；表名在 SQL 內部使用 |
+| 3 | `'[display_col]'` | 在下拉列表中顯示的欄位。周圍的 `[ ]` 括號在執行時會被剝離 |
+| 4 | `'value_col'` | 調查員做出選擇時儲存其值的欄位 |
+| 5 | `'SELECT ...'` | 任何有效的 SQLite SELECT 語句。如果尚未存在 `DISTINCT`，則會自動注入 `SELECT DISTINCT` |
+| 6+ | `param1, ...` | 可選。按順序綁定到 SQL 中 `?` 佔位符的值。如果 SQL 包含 `?` 但未提供參數，則欄位返回空值（防止參數缺失的內置保護機制） |
+
+### `db_path` 約定
+
+資料庫檔案位於表單捆綁的媒體目錄中。在執行時，`pulldata('app-api', 'family_path')` 返回該目錄路徑。有關設置詳情，請參見 [family_path](family-path)。標準模式是：
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+當應用程式打開檔案時，它會剝離 `::tableName` 部分並使用裸檔案路徑。表名僅出現在 SQL 內部。
+
+---
+
+## 基本範例 —— 省份查找
+
+由捆綁的 `vnxa3.db` 檔案支援的唯讀省份下拉列表：
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | 省份 | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+`appearance` 欄位（展開以提高可讀性）：
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- 顯示的標籤來自 `provv` 欄位。
+- 儲存的值來自 `provid` 欄位。
+- 僅顯示 `rta_filter = "1"` 的行。
+
+---
+
+## 參數化查詢
+
+在 SQL 中使用 `?` 佔位符，並將相應的欄位引用作為附加參數傳遞（從第 6 位開始）。這是級聯選擇的標準模式 —— 例如，載入屬於先前所選省份的區縣。
+
+<Callout type="warning">
+如果您的 SQL 包含至少一個 `?` 且未提供參數，則該欄位將返回空結果集。這可以防止在進行父級選擇之前出現過時或無範圍的資料。
+</Callout>
+
+### 區縣級聯範例
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+`${province}` 的值綁定到第一個 `?`。在調查員選擇省份之前，該欄位為空。
+
+### 雙參數範例 —— 鄉鎮級聯
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+參數按位置綁定：`${province}` → 第一個 `?`，`${district}` → 第二個 `?`。
+
+---
+
+## 用於特殊值的 UNION SELECT
+
+使用 `UNION SELECT` 直接在 SQL 中注入合成行 —— 例如「不知道」或「拒絕回答」：
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Không biết</i>", "888"')
+```
+
+RTSurvey 表單中使用的約定：
+
+| 代碼 | 含義 |
+|---|---|
+| `888` | 不知道 |
+| `999` | 拒絕回答 |
+
+顯示字串中的 HTML 標籤（如 `<i>`）由應用程式渲染 —— 您可以使用它們來直觀地區分特殊選項。
+
+---
+
+## 多語言顯示
+
+在不同的欄位中儲存特定語言的標籤（例如 `label_vi`, `label_en`），並根據表單中的語言欄位選擇合適的欄位：
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+要根據 `${language}` 欄位動態切換欄位，請在顯示欄位參數上使用 `if()` 表達式在語言欄位之間切換：
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+顯示欄位參數在查詢執行前進行評估。只有欄位名（不含括號）被傳遞給 SQL 引擎；括號是在解析時剝離的修飾標記。
+</Callout>
+
+---
+
+## 驗證真實選擇
+
+當欄位允許特殊值（如 888 或 999）時，簡單的 `required = yes` 檢查是不夠的 —— 即使調查員選擇了「不知道」，它也會被滿足。使用 `selected-at(., 0) != -997` 約束來驗證儲存的值是真實的選定項，而不是內部的「未選擇」哨兵值 `-997`：
+
+| column | value |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | 請選擇一個有效選項 |
+
+值 `-997` 是 RTSurvey 在尚未從自動完成列表中選擇任何項目時儲存的內部代碼。選擇 888 或 999 仍然是一種刻意的選擇，並能通過此檢查。
+
+要另外要求一個真實（非特殊）值，請擴展約束：
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## 比較：本地資料庫與其他搜尋方法
+
+| 特性 | `rawquery` 自動完成 | `search-api()` | `search()` CSV | 普通 CSV 選項 |
+|---|---|---|---|---|
+| 資料源 | 捆綁的 `.db` (SQLite) | 遠端 REST API | 捆綁的 CSV | Choices 表單頁 |
+| 離線工作 | 是 | 否 | 是 | 是 |
+| 支援原始 SQL | 是 | 否 | 否 | 否 |
+| 級聯過濾 | 是 —— 參數化 `?` | 透過請求體 | 有限 | 否 |
+| 資料集大小 | 非常大（數百萬行） | 無限制（伺服器端） | 中等（數萬行） | 較小 |
+| 特殊注入行 | 是 —— `UNION SELECT` | 否 | 否 | 是（手動） |
+| 設置複雜度 | 中等 —— 需要捆綁的 `.db` | 高 —— 需要 API 伺服器 | 低 | 無 |
+
+---
+
+## 限制
+
+- `.db` 檔案必須在部署前捆綁到表單的媒體包中。資料庫的動態更新需要重新部署表單。
+- SQL 在設備上按原樣執行。沒有伺服器端清理 —— 避免根據調查員的自由文本輸入建構 SQL。
+- 僅支援 `SELECT` 語句。不允許 `INSERT`, `UPDATE` 和 `DELETE`。
+- 非常複雜的查詢（大型 `UNION` 鏈，多個連接）在低端 Android 設備上可能會很慢。
+- `search-autocomplete-noedit` 變體不允許調查員儲存不在結果集中的值。如果需要自由文本輸入，請使用單獨的 `text` 欄位。
+- 僅當查詢中缺失 `DISTINCT` 時，才會自動注入 `SELECT DISTINCT`。如果您顯式編寫 `SELECT DISTINCT`，它不會被重複。

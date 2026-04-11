@@ -1,0 +1,118 @@
+---
+title: "Audio opname"
+description: "Neem omgevingsgeluid of interviewgeluid op tijdens het verzamelen van enquêtegegevens door gebruik te maken van de verschijningsvormen audio-start en audio-end op tekstvelden."
+---
+
+Audio-opname kan een formulier geruisloos of zichtbaar audio vastleggen tijdens een deel van een enquête. Het is handig voor het opnemen van interviews, omgevingsgeluid tijdens veldobserveringen of gesproken antwoorden die een aanvulling vormen op gestructureerde antwoorden.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Alleen mobiele app.** Audio-opname vereist de mobiele rtSurvey app. In het webformulier worden de verschijningsvormen `audio-start` en `audio-end` stilletjes genegeerd - er vindt geen opname plaats en er wordt geen fout getoond. Test altijd op het apparaat zelf wanneer audio-opname vereist is.
+</Callout>
+
+---
+
+## Hoe het werkt
+
+Audio-opname wordt bestuurd door twee `text`-velden die fungeren als **markers**:
+
+- Een veld met de verschijningsvorm `audio-start` begint met opnemen wanneer de enquêteur het bereikt.
+- Een veld met de verschijningsvorm `audio-end` stopt de opname en slaat het audiobestand op bij de inzending.
+
+Beide markervelden zijn van het type `text`. Ze zijn meestal verborgen voor de enquêteur (door `relevant = false` te gebruiken of op een niet-interactieve positie te plaatsen), maar ze kunnen ook zichtbaar zijn. De opgenomen audio wordt aan de inzending toegevoegd als een bestand dat is gekoppeld aan het `audio-end` veld.
+
+---
+
+## Basisvoorbeeld
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Naam respondent | |
+| text | q_occupation | Beroep | |
+| integer | q_age | Leeftijd | |
+| text | audio_e_a1 | | `audio-end` |
+
+De app begint met opnemen wanneer de enquêteur `audio_s_a1` bereikt en stopt wanneer ze `audio_e_a1` bereiken. Alle vragen tussen de twee markers worden opgenomen.
+
+---
+
+## Stille opname: `audio-start invisible`
+
+Standaard toont de mobiele app een opname-indicator terwijl de audio wordt vastgelegd. Het toevoegen van `invisible` aan de verschijningsvorm onderdrukt deze indicator, zodat de opname plaatsvindt zonder zichtbaar signaal voor de respondent.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Gaat u akkoord met deelname? | |
+| text | q_feedback | Uw feedback | |
+| text | audio_e_a1 | | `audio-end` |
+
+Gebruik `invisible` alleen wanneer aan de openbaarmakingsvereisten is voldaan via andere middelen (bijv. een apart schriftelijk toestemmingsveld vóór het opnamegedeelte).
+
+---
+
+## Naamgevingsconventie
+
+Productieformulieren gebruiken een consistent naamgevingspatroon voor markervelden:
+
+```
+audio_s_{section}{n}   — startmarker
+audio_e_{section}{n}   — eindmarker
+```
+
+Waarbij `{section}` een kort label is voor de sectie van het formulier en `{n}` een volgnummer binnen die sectie.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | Eerste opname in sectie A |
+| `audio_e_a1` | End | Einde eerste opname in sectie A |
+| `audio_s_b1` | Start | Eerste opname in sectie B |
+| `audio_e_b1` | End | Einde eerste opname in sectie B |
+| `audio_s_a2` | Start | Tweede opname in sectie A |
+| `audio_e_a2` | End | Einde tweede opname in sectie A |
+
+Het volgen van deze conventie maakt het gemakkelijk om de grenzen van de opname te identificeren bij het beoordelen van formulierdefinities en inzendinggegevens.
+
+---
+
+## Opslag en ophalen
+
+Wanneer de enquêteur het `audio-end` veld bereikt, rondt de app het audiobestand af en voegt het toe aan de inzending. Het bestand is:
+
+- Opgeslagen als audiobijlage bij de inzending, geassocieerd met de naam van het `audio-end` veld.
+- Toegankelijk in de rtSurvey back-end inzendingenviewer naast andere mediabijlagen.
+- Te downloaden via de standaard export van inzendingen - audiobestanden verschijnen in de mediakolom die overeenkomt met de naam van het `audio-end` veld.
+
+Bestandsformaat en bitrate hangen af van het apparaat en de versie van de app.
+
+---
+
+## Meerdere opnamesecties
+
+Een formulier kan verschillende niet-overlappende opnamesecties bevatten. Elk paar `audio-start` / `audio-end` markers moet volledig ingesloten zijn - secties mogen niet in elkaar overlopen.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Introductie | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Details | |
+| text | audio_e_b1 | | `audio-end` |
+
+Elke sectie produceert een apart audiobestand dat is gekoppeld aan het respectieve `audio-end` veld.
+
+---
+
+## Beperkingen
+
+- **Alleen mobiele app.** De functie wordt niet ondersteund in het webformulier. `audio-start` en `audio-end` worden geruisloos genegeerd in een browser.
+- **Niet nesten.** Opnamesecties mogen niet overlappen. Het starten van een nieuwe opname voordat de vorige `audio-end` marker is bereikt, wordt niet ondersteund.
+- **Veldtype moet `text` zijn.** Het gebruik van `audio-start` of `audio-end` op een ander type vraag wordt niet ondersteund.
+- **Uploadgrootte.** Lange opnames maken grote bestanden. Wees bewust van de limieten voor de inzendinggrootte en de netwerkomstandigheden in het veld.
+- **Geen pauze tijdens de opname.** De opname loopt continu van de startmarker naar de eindmarker; er is geen mechanisme om te pauzeren en te hervatten binnen een sectie.

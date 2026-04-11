@@ -1,33 +1,33 @@
 ---
-title: "Dukungan multibahasa"
+title: "Dukungan Multi-bahasa"
 description: ""
 ---
 
-rtSurvey menyediakan dukungan multibahasa yang kuat, memungkinkan Anda membuat survei dalam berbagai bahasa. Fitur ini sangat penting untuk melakukan penelitian di berbagai populasi linguistik atau dalam lingkungan multibahasa.
+rtSurvey menyediakan dukungan multi-bahasa yang kuat, memungkinkan Anda membuat survei dalam berbagai bahasa. Fitur ini sangat penting untuk melakukan penelitian di berbagai populasi linguistik yang beragam atau dalam lingkungan multibahasa.
 
-## Menyiapkan Survei Multibahasa
+## Menyiapkan Survei Multi-bahasa
 
-Untuk membuat survei multibahasa di rtSurvey, Anda perlu menambahkan kolom spesifik bahasa ke XLSForm Anda. Berikut caranya:
+Untuk membuat survei multi-bahasa di rtSurvey, Anda perlu menambahkan kolom khusus bahasa ke XLSForm Anda. Berikut caranya:
 
 1. **Terjemahan Label**: Tambahkan kolom untuk setiap bahasa menggunakan format `label::Language (code)`.
-2. **Terjemahan Hint**: Gunakan `hint::Language (code)` untuk menerjemahkan petunjuk.
-3. **Terjemahan File Media**: Untuk media spesifik bahasa, gunakan `media::Language (code)`.
+2. **Terjemahan Hint**: Gunakan `hint::Language (code)` untuk menerjemahkan hint.
+3. **Terjemahan File Media**: Untuk media khusus bahasa, gunakan `media::Language (code)`.
 
 Contoh:
 
 ```
 | type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
 |---------|------|---------------------|---------------------|---------------------|---------------------|
-| integer | age  | Berapa usia Anda?   | ¿Cuántos años tienes?| Masukkan usia Anda | Ingrese su edad     |
+| integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
 ```
 
 ## Kode Bahasa
 
-Disarankan untuk menggunakan kode bahasa resmi 2 karakter (subtag) setelah nama bahasa. Ini memfasilitasi pencocokan bahasa formulir dengan bahasa antarmuka pengguna. Anda dapat menemukan kode resmi [di sini](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+Direkomendasikan untuk menggunakan kode bahasa 2 karakter resmi (subtag) setelah nama bahasa. Ini memudahkan pencocokan bahasa formulir dengan bahasa antarmuka pengguna. Anda dapat menemukan kode resmi [di sini](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
 ## Menetapkan Bahasa Default
 
-Untuk menetapkan bahasa default untuk pengumpulan data, gunakan lembar kerja `settings` dalam XLSForm Anda:
+Untuk menetapkan bahasa default untuk pengumpulan data, gunakan lembar kerja `settings` di XLSForm Anda:
 
 ```
 | form_id   | version | default_language |
@@ -37,21 +37,31 @@ Untuk menetapkan bahasa default untuk pengumpulan data, gunakan lembar kerja `se
 
 ## Fitur Khusus rtSurvey
 
-### Pergantian Bahasa Dinamis
+### Peralihan Bahasa Dinamis
 
-rtSurvey memungkinkan pengguna mengganti bahasa secara dinamis selama pengumpulan data:
+rtSurvey memungkinkan pengguna untuk beralih bahasa secara dinamis selama pengumpulan data:
 
 - Di antarmuka web, gunakan dropdown bahasa di bilah navigasi atas.
-- Di aplikasi mobile, akses opsi bahasa melalui menu pengaturan.
+- Di aplikasi seluler, akses opsi bahasa melalui menu pengaturan.
 
-### Pesan Validasi Spesifik Bahasa
+### Pesan Validasi Khusus Bahasa
 
-rtSurvey memperluas dukungan multibahasa ke pesan validasi:
+rtSurvey memperluas dukungan multi-bahasa ke pesan validasi:
 
 ```
 | type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
 |---------|------|------------|----------------------------------|----------------------------------|
-| integer | age  | . <= 150   | Usia harus 150 atau kurang       | La edad debe ser 150 o menos     |
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
+```
+
+### Pesan wajib yang dilokalkan
+
+Gunakan `required_message::Language (code)` untuk menunjukkan kesalahan terjemahan saat bidang wajib dibiarkan kosong:
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường ini là bắt buộc |
 ```
 
 ### Dukungan Bahasa RTL
@@ -61,60 +71,96 @@ Untuk bahasa kanan-ke-kiri (RTL) seperti Arab atau Ibrani, rtSurvey secara otoma
 ```
 | type | name | label::English (en) | label::Arabic (ar) |
 |------|------|---------------------|---------------------|
-| text | name | Nama Anda           | اسمك                |
+| text | name | Your name           | اسمك                |
 ```
 
-### Appearance Spesifik Bahasa
+### Tampilan Khusus Bahasa
 
-rtSurvey memungkinkan Anda menentukan appearance yang berbeda untuk bahasa yang berbeda:
+rtSurvey memungkinkan Anda untuk menentukan tampilan (appearance) yang berbeda untuk bahasa yang berbeda:
 
 ```
 | type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
 |------|------|---------------------|---------------------|--------------------------|---------------------------|
-| text | address | Alamat          | 地址                 | multiline                | textarea                  |
+| text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
 
-## Praktik Terbaik untuk Survei Multibahasa
+## Pemformatan HTML dalam label bilingual
+
+Anda dapat menggabungkan tag HTML dengan wrapper bahasa dalam satu sel label. rtSurvey mengekstrak blok bahasa aktif dan merender HTML yang tersisa.
+
+Contoh penggunaan huruf tebal dan warna font per bahasa:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Tag inline yang didukung di dalam wrapper bahasa: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Contoh teks berwarna per bahasa:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Perhitungan berbasis bahasa
+
+Ketika formulir memiliki bidang `${language_use}` (ditetapkan oleh widget `change_language`), gunakan `if()` untuk mengembalikan nilai dalam bahasa aktif:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Contoh — menampilkan hasil pencarian dalam bahasa aktif menggunakan `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Catatan: Bidang `language_use` biasanya ditetapkan oleh widget tampilan `change_language`. Lihat Appearance — change_language.
+
+## Praktik Terbaik untuk Survei Multi-bahasa
 
 1. **Penamaan Konsisten**: Gunakan kode bahasa yang konsisten di seluruh formulir Anda.
-2. **Terjemahan Profesional**: Gunakan penerjemah profesional yang familiar dengan konteks survei.
-3. **Catatan Konteks**: Berikan catatan konteks untuk penerjemah untuk memastikan terjemahan yang akurat.
-4. **Pengujian**: Uji formulir Anda dalam semua bahasa sebelum penerapan.
+2. **Terjemahan Profesional**: Pekerjakan penerjemah profesional yang akrab dengan konteks survei.
+3. **Catatan Konteks**: Berikan catatan konteks bagi penerjemah untuk memastikan terjemahan yang akurat.
+4. **Pengujian**: Uji formulir Anda dalam semua bahasa sebelum diterapkan.
 5. **Dukungan Unicode**: Pastikan perangkat pengumpulan data Anda mendukung Unicode untuk skrip non-Latin.
-6. **Media Spesifik Bahasa**: Gunakan gambar atau audio yang sesuai secara budaya untuk setiap bahasa.
+6. **Media Khusus Bahasa**: Gunakan gambar atau audio yang sesuai secara budaya untuk setiap bahasa.
 7. **Hindari Teks dalam Gambar**: Jika menggunakan gambar dengan teks, buat gambar terpisah untuk setiap bahasa.
 
 ## Menangani Kasus Khusus
 
 ### Respons Bahasa Campuran
 
-rtSurvey memungkinkan responden memasukkan teks dalam skrip apa pun, terlepas dari bahasa formulir yang dipilih. Ini berguna untuk menangkap nama atau alamat dalam skrip aslinya.
+rtSurvey memungkinkan responden untuk memasukkan teks dalam skrip apa pun, terlepas dari bahasa formulir yang dipilih. Ini berguna untuk menangkap nama atau alamat dalam skrip aslinya.
 
-### Jenis Pertanyaan Spesifik Bahasa
+### Tipe Pertanyaan Khusus Bahasa
 
-Beberapa jenis pertanyaan mungkin lebih sesuai untuk bahasa tertentu. rtSurvey memungkinkan Anda menggunakan jenis pertanyaan yang berbeda untuk bahasa yang berbeda:
+Beberapa tipe pertanyaan mungkin lebih tepat untuk bahasa tertentu. rtSurvey memungkinkan Anda untuk menggunakan tipe pertanyaan yang berbeda untuk bahasa yang berbeda:
 
 ```
 | type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
 |--------------------|---------------------|------|---------------------|----------------------|
-| text               | select_one kanji    | name | Masukkan nama Anda  | 名前を選んでください    |
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
 ```
 
-## Mengekspor Data Multibahasa
+## Mengekspor Data Multi-bahasa
 
 Saat mengekspor data dari rtSurvey:
 
 - Pilih untuk mengekspor dalam bahasa tertentu atau sertakan semua versi bahasa.
-- Metadata bahasa disertakan dalam ekspor, menunjukkan bahasa mana yang digunakan untuk setiap respons.
+- Metadata bahasa disertakan dalam ekspor, yang menunjukkan bahasa mana yang digunakan untuk setiap respons.
 
-## Pertimbangan Aplikasi Mobile
+## Pertimbangan Aplikasi Seluler
 
-- Aplikasi mobile rtSurvey mendukung pergantian bahasa offline.
+- Aplikasi seluler rtSurvey mendukung peralihan bahasa secara offline.
 - Pastikan semua file bahasa yang diperlukan diunduh sebelum offline.
 
-## Keterbatasan yang Diketahui
+## Batasan yang Diketahui
 
 - Beberapa fitur lanjutan mungkin tidak tersedia dalam semua bahasa.
-- Terjemahan yang sangat panjang dapat memengaruhi tata letak di layar yang lebih kecil.
+- Terjemahan yang sangat panjang dapat memengaruhi tata letak pada layar yang kecil.
 
-Dengan memanfaatkan kemampuan multibahasa rtSurvey, Anda dapat membuat survei yang inklusif dan dapat diakses yang menjangkau populasi yang beragam dan menyediakan data yang akurat secara linguistik dan berkualitas tinggi.
+Dengan memanfaatkan kemampuan multi-bahasa rtSurvey, Anda dapat membuat survei yang inklusif dan dapat diakses yang menjangkau beragam populasi dan menyediakan data yang berkualitas tinggi dan akurat secara linguistik.

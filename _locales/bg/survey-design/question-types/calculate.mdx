@@ -1,111 +1,128 @@
 ---
-title: "Изчисление"
-description: ""
+title: "calculate"
+description: "Типът въпрос calculate извършва фонови изчисления в XLSForm, съхранявайки производни стойности, без да показва вход на анкетьора."
 ---
 
-Calculate questions in XLSForms and rtSurvey are used to perform computations based on other fields or values in your form. These questions don't display to the user but instead run in the background, storing their results for later use or submission.
+import { Callout } from 'nextra/components'
 
-## Синтаксис
+Типът въпрос `calculate` изпълнява формула тихомълком във фонов режим. Той съхранява резултата в именовано поле, към което други въпроси могат да реферират — но не показва вход или етикет на анкетьора. Използвайте го за извеждане на стойности, конкатениране на низове, изпълнение на условна логика или търсене на данни, които ви трябват по-късно във формуляра.
 
-In the XLSForm, a calculate question is defined as follows:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Основен синтаксис
 
-- **type**: Always "calculate" for this question type.
-- **name**: A unique name for the calculate question.
-- **label**: Usually left blank as calculate questions are not displayed to users.
-- **calculation**: The formula to be evaluated.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Приложения
+- **type**: Винаги `calculate`.
+- **name**: Уникално име на полето. Други въпроси реферират към него с `${name}`.
+- **label**: Оставете празно — полетата calculate никога не се показват на анкетьора.
+- **calculation**: Формулата за изчисление. Поддържа всички [XLSForm функции](../operators-and-functions/functions) и референции към полета.
 
-Calculate questions are commonly used for:
+---
 
-1. Performing arithmetic operations
-2. Concatenating strings
-3. Applying complex logic or functions
-4. Storing intermediate results for later use
+## Често срещани модели
 
-## Примери
+### Аритметика
 
-### Основна аритметика
-
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
 ### Конкатенация на низове
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-### Използване на функции
+### Условна стойност
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-## Разширена употреба в rtSurvey
+### Възраст от дата на раждане
 
-### Функция pulldata()
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-rtSurvey supports the `pulldata()` function in calculate fields, allowing you to retrieve data from external CSV files:
+---
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+## Използване на `once()` за заключване на стойността
 
-#### Syntax
+По подразбиране `calculate` се преизчислява винаги, когато някое реферирано поле се промени. Обградете формулата в `once()`, за да се изчисли само при първото зареждане и да замразите резултата:
 
-The basic syntax for pulldata() is:
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+Използвайте `once()` за клейма за време, първоначални стойности или всеки случай, в който преизчисляването при промяна е нежелателно.
 
-- 'csv_filename': Name of the CSV file (without .csv extension)
-- 'column_to_return': Column name containing the data you want to pull
-- 'key_column': Column name to match against
-- `${matching_value}`: Value to look up in the key column (often a variable from the form)
+---
 
-#### Important Notes
+## Извличане на данни от външни източници
 
-1. The CSV file must be uploaded along with your XLSForm when deploying the survey.
-2. Use commas as separators in your CSV file, not semicolons.
-3. Avoid commas within the data fields of your CSV, as they can cause parsing issues.
-4. pulldata() only supports 1-to-1 relationships. If multiple matches are found, it returns only the first one.
-5. There may be limitations on text length that can be pulled (around 76 characters).
-6. You can use pulldata() in constraints to validate entries against the CSV data.
-
-### Условни изчисления
-
-You can use if() statements for conditional calculations:
+### От CSV файл
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
+
+Вижте [pulldata()](../operators-and-functions/pulldata) за пълната справка.
+
+### От пакетна SQLite база данни
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Вижте [Търсене в локална база данни](../advanced-features/local-database-search) за подробности относно изграждането на пътя.
+
+### От контекста на приложението
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Вижте [App API](../app-api) за всички налични ключове.
+
+---
+
+## Използване на calculate в relevant и constraint
+
+Други полета могат да реферират към резултат от `calculate` точно както всяко друго поле:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
 
 ## Най-добри практики
 
-1. Use meaningful names for calculate fields to improve form readability.
-2. Avoid overly complex calculations in a single field; break them down if necessary.
-3. Test your calculations thoroughly, especially when using complex formulas or external data.
-4. Remember that calculate fields run each time the form is evaluated, which can impact performance for very complex or numerous calculations.
-5. When using pulldata(), ensure your CSV files are correctly formatted and test thoroughly with your specific data and form structure.
+1. Дайте на полетата calculate смислени имена — `total_cost` е по-ясно от `calc1` и по-лесно за проследяване при експортиране.
+2. Разделяйте сложните формули на няколко верижни полета calculate вместо един дълбоко вложен израз.
+3. Използвайте `once()` за клейма за време и първоначални снимки, за да предотвратите промяната на стойностите след първото заснемане.
+4. Поставете полетата `calculate` преди първия въпрос, който реферира към тях — редът на оценяване следва реда на формуляра.
+5. Оставете колоната `label` празна. Някои инструменти показват етикета; оставянето му празно избягва объркващ изход.
 
 ## Ограничения
 
-- Calculate fields are not directly editable by users.
-- The result of a calculate field is not immediately visible unless referenced in a display field or used in form logic.
+- Полетата Calculate никога не се показват директно на анкетьора — използвайте поле `note`, за да покажете резултата.
+- Колоната `calculation` е задължителна; ред `calculate` без формула винаги съхранява празен низ.
+- Резултатите се преизчисляват при всяка промяна на формуляра, освен ако не са обградени в `once()` — много сложни формули в големи формуляри могат да повлияят на производителността на изобразяване на устройства от нисък клас.
+- Изчислените стойности се съхраняват като низове в подаването. Използвайте `number()`, `int()` или `boolean()`, за да преобразувате резултата, когато го предавате на аритметични или логически изрази.

@@ -1,0 +1,104 @@
+---
+title: "Formular-navigationskontroller"
+description: "Brug SaveFinalizedExit og SaveIncompleteExit-udseendeværdier til at generere stylede afslutningsknapper, der gemmer og forlader formularen."
+---
+
+**Formular-navigationskontroller** er udseendeværdier placeret på `note` (eller `text`) felter, der vises som stylede knapper i fuld bredde nederst i en undersøgelse. De lader intervieweren gemme indsendelsen og forlade formularen med ét tryk — enten som en afsluttet (finaliseret) post eller som en kladde (ufuldstændig) post.
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Genererer en knap, der **gemmer indsendelsen som finaliseret** og afslutter formularen. Knappens tekst tages fra feltets `label` kolonne.
+
+| XLSForm column | Værdi |
+|----------------|-------|
+| `type` | `note` |
+| `name` | ethvert unikt navn (f.eks. `btn_finish`) |
+| `label` | tekst vist på knappen |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Indsendelsen markeres som en endelig, komplet post. Dette svarer til at trykke på den indbyggede indsend-knap.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Genererer en knap, der **gemmer indsendelsen som ufuldstændig (kladde)** og afslutter formularen. Intervieweren kann vende tilbage til den senere og fortsætte med at udfylde den.
+
+| XLSForm column | Værdi |
+|----------------|-------|
+| `type` | `note` |
+| `name` | ethvert unikt navn (f.eks. `btn_pause`) |
+| `label` | tekst vist på knappen |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Farvesyntaks
+
+Begge udseender accepterer en inline farve i formatet `<#RRGGBB/>`:
+
+- `#` efterfulgt af præcis **6 hex-cifre** (store eller små bogstaver)
+- Den lukkende `/>` er **påkrævet** — udeladelse afbryder parsing
+- Eksempel: `<#04B404/>` (grøn), `<#EDC602/>` (ravgul), `<#D9534F/>` (rød)
+
+Farven styrer knappens baggrund. Tekstfarven bestemmes automatisk af appen.
+
+---
+
+## Eksempel
+
+De følgende to felter placeret i slutningen af en formular producerer en grøn **Indsend** knap og en ravgul **Gem som kladde** knap:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Indsend | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Gem som kladde | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — ekskludering af knapper fra indholdsfortegnelsen
+
+`toc-hide` udseende-tokenet fortæller rtSurvey at ekskludere et felt fra formularens **indholdsfortegnelse** (oversigtslisten over spørgsmål). Navigationsknapper er ikke spørgsmål, så de bør aldrig vises i indholdsfortegnelsen (TOC).
+
+Tilføj altid `toc-hide` efter afslutningsudseendet:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Se [Udseende — toc-hide](../appearance#group-and-navigation) for toc-hide referencen.
+
+---
+
+## Placeringskonvention
+
+Følg disse konventioner, når du tilføjer navigationskontroller til en formular:
+
+- Placer begge knapper til **aller sidst** i formularen, efter alle spørgsmål og grupper.
+- Inkluder altid **begge** knapper sammen — en finaliseret og en ufuldstændig — så intervieweren altid har en måde at afslutte på uanset gennemførelsesstatus.
+- Brug `relevant` kolonnen på den finaliserede afslutningsknap, hvis indsendelse kun bør tillades, når visse betingelser er opfyldt (f.eks. en påkrævet sektion er færdig). Den ufuldstændige afslutningsknap bør generelt forblive **altid synlig**.
+
+---
+
+## Betinget finaliseret afslutning
+
+Brug `relevant` kolonnen til at kontrollere, hvornår den finaliserede afslutningsknap vises. Den ufuldstændige afslutning bør forblive ubetinget synlig, så intervieweren altid kan holde pause og vende tilbage.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Indsend | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Gem som kladde | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+I dette eksempel vises **Indsend** knappen kun, når intervieweren har givet samtykke og markeret sektion A som færdig. **Gem som kladde** knappen er altid tilgængelig.
+
+---
+
+## Begrænsninger
+
+- **Felttype skal være `note` eller `text`.** Brug af disse udseender på enhver anden spørgsmålstype understøttes ikke.
+- **Kun 6-cifret hex.** Kortfattet hex (`<#FFF/>`) og navngivne farver understøttes ikke — brug altid det fulde 6-cifrede format (f.eks. `<#FFFFFF/>`).
+- **Label-kolonnen er knappens tekst.** `hint` kolonnen ignoreres for disse felter; kun `label` renderes.
+- **Begge knapper bør være til stede.** Udeladelse af den ufuldstændige afslutningsknap efterlader intervieweren uden en måde at holde pause midt i formularen.

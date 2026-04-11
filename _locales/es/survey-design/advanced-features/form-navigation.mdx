@@ -1,0 +1,104 @@
+---
+title: "Controles de navegación del formulario"
+description: "Utilice los valores de apariencia SaveFinalizedExit y SaveIncompleteExit para representar botones de salida con estilo que guardan y salen del formulario."
+---
+
+**Los controles de navegación del formulario** son valores de apariencia colocados en campos `note` (o `text`) que se representan como botones con estilo de ancho completo en la parte inferior de una encuesta. Permiten al encuestador guardar el envío y salir del formulario con un solo toque, ya sea como un registro completado (finalizado) o como un borrador (registro incompleto).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Representa un botón que **guarda el envío como finalizado** y sale del formulario. La etiqueta del botón se toma de la columna `label` del campo.
+
+| XLSForm column | Valor |
+|----------------|-------|
+| `type` | `note` |
+| `name` | cualquier nombre único (p. ej., `btn_finish`) |
+| `label` | texto que se muestra en el botón |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+El envío se marca como un registro final y completo. Esto es equivalente a tocar el botón de envío incorporado.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Representa un botón que **guarda el envío como incompleto (borrador)** y sale del formulario. El encuestador puede volver a él más tarde y continuar completándolo.
+
+| XLSForm column | Valor |
+|----------------|-------|
+| `type` | `note` |
+| `name` | cualquier nombre único (p. ej., `btn_pause`) |
+| `label` | texto que se muestra en el botón |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Sintaxis de color
+
+Ambas apariencias aceptan un color en línea en formato `<#RRGGBB/>`:
+
+- `#` seguido de exactamente **6 dígitos hex** (mayúsculas o minúsculas)
+- El `/>` de cierre es **obligatorio**; omitirlo interrumpe el análisis
+- Ejemplo: `<#04B404/>` (verde), `<#EDC602/>` (ámbar), `<#D9534F/>` (rojo)
+
+El color controla el fondo del botón. El color del texto lo determina automáticamente la aplicación.
+
+---
+
+## Ejemplo
+
+Los siguientes dos campos colocados al final de un formulario producen un botón **Enviar** verde y un botón **Guardar como borrador** ámbar:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Enviar | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Guardar como borrador | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — excluir botones de la tabla de contenido
+
+El token de apariencia `toc-hide` le indica a rtSurvey que excluya un campo de la **tabla de contenido** del formulario (la lista general de preguntas). Los botones de navegación no son preguntas, por lo que nunca deben aparecer en la TOC.
+
+Siempre agregue `toc-hide` después de la apariencia de salida:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Consulte [Apariencia — toc-hide](../appearance#group-and-navigation) para la referencia de toc-hide.
+
+---
+
+## Convención de colocación
+
+Siga estas convenciones al agregar controles de navegación a un formulario:
+
+- Coloque ambos botones al **final** del formulario, después de todas las preguntas y grupos.
+- Siempre incluya **ambos** botones juntos (uno finalizado y otro incompleto) para que el encuestador siempre tenga una forma de salir independientemente del estado de finalización.
+- Utilice la columna `relevant` en el botón de salida finalizado si el envío solo debe permitirse cuando se cumplen ciertas condiciones (p. ej., una sección obligatoria está completa). El botón de salida incompleto generalmente debe permanecer **siempre visible**.
+
+---
+
+## Salida finalizada condicional
+
+Utilice la columna `relevant` para controlar cuándo se muestra el botón de salida finalizado. La salida incompleta debe permanecer visible incondicionalmente para que el encuestador siempre pueda pausar y regresar.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Enviar | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Guardar como borrador | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+En este ejemplo, el botón **Enviar** solo aparece cuando el encuestador ha dado su consentimiento y ha marcado la sección A como completa. El botón **Guardar como borrador** está siempre disponible.
+
+---
+
+## Limitaciones
+
+- **El tipo de campo debe ser `note` o `text`.** No se admite el uso de estas apariencias en ningún otro tipo de pregunta.
+- **Solo hexadecimal de 6 dígitos.** No se admiten hexadecimales abreviados (`<#FFF/>`) ni nombres de colores; utilice siempre el formato completo de 6 dígitos (p. ej., `<#FFFFFF/>`).
+- **La columna de etiqueta es el texto del botón.** La columna `hint` se ignora para estos campos; solo se representa `label`.
+- **Ambos botones deben estar presentes.** Omitir el botón de salida incompleto deja al encuestador sin una forma de pausar a mitad del formulario.

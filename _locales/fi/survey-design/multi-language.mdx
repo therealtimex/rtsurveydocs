@@ -3,60 +3,70 @@ title: "Monikielinen tuki"
 description: ""
 ---
 
-rtSurvey tarjoaa vankan monikielisen tuen, mahdollistaen kyselyjen luomisen useilla kielillä. Tämä ominaisuus on ratkaisevan tärkeä tutkimuksessa, joka kattaa monimuotoisia kielellisiä väestöryhmiä tai monikielisiä ympäristöjä.
+rtSurvey tarjoaa vankan monikielisen tuen, jonka avulla voit luoda kyselyitä useilla kielillä. Tämä ominaisuus on ratkaisevan tärkeä tutkittaessa kielellisesti erilaisia väestöryhmiä tai toimittaessa monikielisissä ympäristöissä.
 
-## Monikielisten kyselyjen asettaminen
+## Monikielisten kyselyiden määrittäminen
 
-Monikielisen kyselyn luomiseksi rtSurveyssa sinun on lisättävä kielikohtaisia sarakkeita XLSFormiisi. Näin:
+Luo monikielinen kysely rtSurveyssä lisäämällä kielikohtaisia sarakkeita XLSForm-lomakkeeseen. Toimi näin:
 
-1. **Otsikoiden käännökset**: Lisää sarakkeet kullekin kielelle käyttämällä muotoa `label::Language (code)`.
-2. **Vihjeiden käännökset**: Käytä `hint::Language (code)` vihjeiden kääntämiseen.
-3. **Mediatiedostojen käännökset**: Kielikohtaiseen mediaan käytä `media::Language (code)`.
+1. **Otsikoiden käännökset (Label Translations)**: Lisää sarakkeita jokaiselle kielelle muodossa `label::Kieli (koodi)`.
+2. **Vihjeiden käännökset (Hint Translations)**: Käytä muotoa `hint::Kieli (koodi)` vihjeiden kääntämiseen.
+3. **Mediatiedostojen käännökset (Media File Translations)**: Käytä kielikohtaiselle medialle muotoa `media::Kieli (koodi)`.
 
 Esimerkki:
 
 ```
-| type    | name | label::English (en) | label::Finnish (fi) | hint::English (en) | hint::Finnish (fi) |
+| type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
 |---------|------|---------------------|---------------------|---------------------|---------------------|
-| integer | age  | How old are you?    | Kuinka vanha olet?  | Enter your age      | Anna ikäsi          |
+| integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
 ```
 
 ## Kielikoodit
 
-On suositeltavaa käyttää virallisia 2-merkkisiä kielikoodeja (alatunnisteet) kielen nimen jälkeen. Tämä helpottaa lomakkeen kielen sovittamista käyttöliittymän kieleen. Viralliset koodit löydät [täältä](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+On suositeltavaa käyttää virallisia 2-merkkisiä kielikoodeja (subtags) kielen nimen jälkeen. Tämä helpottaa lomakkeen kielen yhdistämistä käyttöliittymän kieleen. Löydät viralliset koodit [täältä](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
 ## Oletuskielen asettaminen
 
-Asettaaksesi oletuskielen tiedonkeruulle, käytä XLSFormisi `settings`-laskentataulukkoa:
+Aseta tiedonkeruun oletuskieli XLSForm-lomakkeen `settings`-välilehdellä:
 
 ```
 | form_id   | version | default_language |
 |-----------|---------|-------------------|
-| test_form | 101     | Finnish (fi)      |
+| test_form | 101     | French (fr)       |
 ```
 
 ## rtSurvey-kohtaiset ominaisuudet
 
-### Dynaaminen kielen vaihto
+### Dynaaminen kielen vaihtaminen
 
-rtSurvey mahdollistaa käyttäjien vaihtaa kieltä dynaamisesti tiedonkeruun aikana:
+rtSurvey antaa käyttäjien vaihtaa kieltä dynaamisesti tiedonkeruun aikana:
 
-- Webliittymässä käytä kielen pudotusvalikkoa ylätoimintopalkissa.
-- Mobiilisovelluksessa käytä asetusvalikkoa kieliasetuksiin.
+- Käytä verkkokäyttöliittymässä ylänavigointipalkin kielenvalintavalikkoa.
+- Mobiilisovelluksessa pääset kielivaihtoehtoihin asetusvalikon kautta.
 
-### Kielikohtaiset validointiviestit
+### Kielikohtaiset vahvistusviestit
 
-rtSurvey laajentaa monikielistä tukea validointiviesteihin:
+rtSurvey laajentaa monikielisen tuen myös vahvistusviesteihin:
 
 ```
-| type    | name | constraint | constraint_message::English (en) | constraint_message::Finnish (fi) |
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
 |---------|------|------------|----------------------------------|----------------------------------|
-| integer | age  | . <= 150   | Age must be 150 or less          | Iän on oltava 150 tai vähemmän   |
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-### RTL-kielituki
+### Lokaloidut pakollisuuden virheilmoitukset
 
-Oikealta vasemmalle (RTL) kirjoitettaville kielille, kuten arabialle tai hebrealle, rtSurvey säätää asettelua automaattisesti:
+Käytä muotoa `required_message::Kieli (koodi)` näyttääksesi käännetyn virheen, kun pakollinen kenttä jätetään tyhjäksi:
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
+### RTL-kielten tuki
+
+Oikealta vasemmalle (RTL) luettaville kielille, kuten arabialle tai heprealle, rtSurvey säätää asettelun automaattisesti:
 
 ```
 | type | name | label::English (en) | label::Arabic (ar) |
@@ -64,35 +74,71 @@ Oikealta vasemmalle (RTL) kirjoitettaville kielille, kuten arabialle tai hebreal
 | text | name | Your name           | اسمك                |
 ```
 
-### Kielikohtainen ulkoasu
+### Kielikohtainen ulkoasu (Appearance)
 
-rtSurvey mahdollistaa erilaisten ulkoasujen määrittämisen eri kielille:
+rtSurvey antaa sinun määrittää erilaisia ulkoasuja eri kielille:
 
 ```
-| type | name | label::English (en) | label::Finnish (fi) | appearance::English (en) | appearance::Finnish (fi) |
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
 |------|------|---------------------|---------------------|--------------------------|---------------------------|
-| text | address | Address          | Osoite              | multiline                | textarea                  |
+| text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
+
+## HTML-muotoilu kaksikielisissä otsikoissa
+
+Voit yhdistää HTML-tageja ja kielikääreitä yhdessä otsikkosolussa. rtSurvey poimii aktiivisen kielen lohkon ja renderöi loput HTML:stä.
+
+Esimerkki lihavoinnin ja fontin värin käytöstä kieltä kohden:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Tuetut rivinsisäiset tagit kielikääreiden sisällä: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Värillisen tekstin esimerkki kieltä kohden:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Kielitietoiset laskεννά (Calculations)
+
+Kun lomakkeella on `${language_use}`-kenttä (jonka asettaa `change_language`-widget), käytä `if()`-funktiota palauttamaan arvoja aktiivisella kielellä:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Esimerkki — hakutuloksen näyttäminen aktiivisella kielellä `pulldata('rawquery', ...)`-funktiolla:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Huomautus: `language_use`-kenttä asetetaan yleensä `change_language`-ulkoasuwidgetillä. Katso Appearance — change_language.
 
 ## Parhaat käytännöt monikielisille kyselyille
 
 1. **Johdonmukainen nimeäminen**: Käytä johdonmukaisia kielikoodeja koko lomakkeessasi.
-2. **Ammattimaiset käännökset**: Käytä ammattikääntäjiä, jotka tuntevat kyselyn asiayhteyden.
-3. **Kontekstihuomiot**: Tarjoa kontekstihuomioita kääntäjille tarkkuuden varmistamiseksi.
-4. **Testaus**: Testaa lomaketta kaikilla kielillä ennen käyttöönottoa.
-5. **Unicode-tuki**: Varmista, että tiedonkeruulaitteet tukevat Unicodea ei-latinalaisille aakkostoille.
-6. **Kielikohtainen media**: Käytä kulttuurisesti sopivia kuvia tai ääntä kullekin kielelle.
-7. **Vältä tekstiä kuvissa**: Jos käytät tekstiä sisältäviä kuvia, luo erilliset kuvat kullekin kielelle.
+2. **Ammattimainen käännös**: Käytä kyselyn asiayhteyden tuntevia ammattikääntäjiä.
+3. **Kontekstihuomautukset**: Anna kääntäjille kontekstihuomautuksia tarkkojen käännösten varmistamiseksi.
+4. **Testaus**: Testaa lomakkeesi kaikilla kielillä ennen käyttöönottoa.
+5. **Unicode-tuki**: Varmista, että tiedonkeruulaitteesi tukevat Unicodea muille kuin latinalaisille kirjaimistoille.
+6. **Kielikohtainen media**: Käytä kullekin kielelle kulttuurisesti sopivia kuvia tai ääntä.
+7. **Vältä tekstiä kuvissa**: Jos käytät kuvia, joissa on tekstiä, luo erilliset kuvat jokaiselle kielelle.
 
 ## Erikoistapausten käsittely
 
-### Sekapohjaiset vastaukset
+### Sekakieliset vastaukset
 
-rtSurvey mahdollistaa vastaajien syöttää tekstiä millä tahansa aakkostolla valitusta lomakkeen kielestä riippumatta. Tämä on hyödyllistä nimien tai osoitteiden tallentamisessa alkuperäisessä aakkostossaan.
+rtSurvey antaa vastaajien syöttää tekstiä millä tahansa kirjaimistolla riippumatta valitusta lomakkeen kielestä. Tämä on hyödyllistä esimerkiksi nimien tai osoitteiden tallentamisessa niiden alkuperäisessä muodossa.
 
 ### Kielikohtaiset kysymystyypit
 
-Jotkut kysymystyypit saattavat soveltua paremmin tietyille kielille. rtSurvey mahdollistaa erilaisten kysymystyyppien käytön eri kielille:
+Jotkut kysymystyypit voivat olla sopivampia tietyille kielille. rtSurvey antaa sinun käyttää eri kysymystyyppejä eri kielille:
 
 ```
 | type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
@@ -100,21 +146,21 @@ Jotkut kysymystyypit saattavat soveltua paremmin tietyille kielille. rtSurvey ma
 | text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
 ```
 
-## Monikielisen tiedon vienti
+## Monikielisen tiedon vienti (Export)
 
-Tietoja rtSurveysta vietäessä:
+Viedessäsi tietoa rtSurveystä:
 
-- Valitse viedäänkö tiedot tietyllä kielellä vai sisällytetäänkö kaikki kieliversiot.
-- KieliMetatieto sisällytetään vientiin osoittaen, millä kielellä kutakin vastausta käytettiin.
+- Valitse vienti tietyllä kielellä tai sisällytä kaikki kieliversiot.
+- Kielen metatiedot sisältyvät vientiin osoittaen, mitä kieltä kussakin vastauksessa käytettiin.
 
-## Mobiilisovelluksen huomioiminen
+## Mobiilisovelluksen huomiot
 
-- rtSurveyn mobiilisovellus tukee offline-kielen vaihtoa.
-- Varmista, että kaikki tarvittavat kielitiedostot on ladattu ennen offline-toimintaa.
+- rtSurvey-mobiilisovellus tukee kielen vaihtamista offline-tilassa.
+- Varmista, että kaikki tarvittavat kielitiedostot on ladattu ennen offline-tilaan siirtymistä.
 
 ## Tunnetut rajoitukset
 
-- Jotkut edistyneet ominaisuudet eivät välttämättä ole käytettävissä kaikilla kielillä.
-- Erittäin pitkät käännökset saattavat vaikuttaa asetteluun pienemmillä näytöillä.
+- Jotkut edistyneet ominaisuudet eivät välttämättä ole saatavilla kaikilla kielillä.
+- Erittäin pitkät käännökset voivat vaikuttaa asetteluun pienemmillä näytöillä.
 
-Hyödyntämällä rtSurveyn monikielisiä ominaisuuksia voit luoda inklusiivisia, saavutettavia kyselyitä, jotka tavoittavat monimuotoisen väestön ja tarjoavat korkealaatuista, kielellisesti tarkkaa tietoa.
+Hyödyntämällä rtSurveyn monikielisiä ominaisuuksia voit luoda osallistavia, saavutettavia kyselyitä, jotka tavoittavat erilaisia väestöryhmiä ja tarjoavat korkealaatuista, kielellisesti tarkkaa tietoa.

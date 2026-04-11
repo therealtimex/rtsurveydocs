@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "មុខងារ pulldata() ទាញយកតម្លៃពីឯកសារ CSV ខាងក្រៅដែលបានភ្ជាប់ជាមួយទម្រង់ ដោយផ្គូផ្គងជួរឈរគន្លឹះទៅនឹងតម្លៃគន្លឹះ និងបញ្ជូនត្រឡប់មកវិញនូវជួរឈរលទ្ធផលដែលត្រូវគ្នា។"
+---
+
+import { Callout } from 'nextra/components'
+
+មុខងារ `pulldata()` ទាញយកតម្លៃពីឯកសារ CSV ដែលបានភ្ជាប់ជាមួយទម្រង់។ ដោយផ្ដល់ឈ្មោះឯកសារ ជួរឈរដែលត្រូវបញ្ជូនត្រឡប់មកវិញ ជួរឈរដែលត្រូវផ្គូផ្គង និងតម្លៃគន្លឹះ វានឹងបញ្ជូនត្រឡប់មកវិញនូវក្រឡានៅចំណុចប្រសព្វនៃជួរដេកដែលផ្គូផ្គង និងជួរឈរលទ្ធផល។
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| ទីតាំង | ប៉ារ៉ាម៉ែត្រ | ការពិពណ៌នា |
+|----------|-----------|-------------|
+| 1 | Filename | ឈ្មោះឯកសារមេឌៀ CSV (ឈ្មោះដូចគ្នាដែលប្រើក្នុង `select_one_from_file`) |
+| 2 | Result column | ជួរឈរដែលអ្នកចង់ឱ្យបញ្ជូនតម្លៃត្រឡប់មកវិញ |
+| 3 | Key column | ជួរឈរដែលត្រូវផ្គូផ្គងជាមួយ |
+| 4 | Key value | តម្លៃដែលត្រូវផ្គូផ្គង — ជាទូទៅគឺជាការយោងវាលដូចជា `${field}` |
+
+មុខងារនេះបញ្ជូនត្រឡប់មកវិញនូវខ្សែអក្សរទទេ ប្រសិនបើរកមិនឃើញការផ្គូផ្គង។
+
+---
+
+## តម្រូវការជាមុន
+
+ឯកសារ CSV ត្រូវតែភ្ជាប់ជាមួយទម្រង់ជា **ឯកសារមេឌៀ**។ ឯកសារដដែលដែលយោងដោយ `pulldata()` ក៏អាចប្រើជាបញ្ជីជម្រើសសម្រាប់ `select_one_from_file` បានដែរ។
+
+**ឧទាហរណ៍ CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## ឧទាហរណ៍មូលដ្ឋាន
+
+ស្វែងរកផ្នែក និងទូរស័ព្ទរបស់បុគ្គលិកពីលេខសម្គាល់ (ID) របស់ពួកគេ៖
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Select staff member | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Department: `${dept}` — Phone: `${phone}` | |
+
+<Callout type="info">
+ជួរឈរ `name` នៅក្នុង CSV របស់ `select_one_from_file` គឺជាតម្លៃដែលបានរក្សាទុក។ នៅពេលអ្នកបំពេញទម្រង់ជ្រើសរើស "Alice" នោះ `${staff_id}` នឹងរក្សាទុកតម្លៃ `"Alice"` ដែល `pulldata()` ប្រើជាគន្លឹះដើម្បីទាញយកផ្នែក និងទូរស័ព្ទរបស់គាត់។
+</Callout>
+
+---
+
+## ការទាញយកស្លាក (label) នៃជម្រើសដែលបានជ្រើសរើស
+
+សំណួរ `select_one_from_file` រក្សាទុកតម្លៃ `name`។ ដើម្បីបង្ហាញ `label` ដែលមនុស្សអាចអានបាន សូមប្រើ `pulldata()` ដើម្បីស្វែងរកវា៖
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Select village | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | You selected: `${village_label}` | |
+
+---
+
+## ការស្វែងរកច្រើនពីការជ្រើសរើសតែមួយ
+
+អ្នកអាចហៅ `pulldata()` ច្រើនដងលើឯកសារតែមួយ ដើម្បីទាញយកជួរឈរផ្សេងៗគ្នាសម្រាប់ជួរដេកដែលបានជ្រើសរើសដូចគ្នា៖
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Select facility | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## ការប្រើប្រាស់ pulldata ក្នុង relevant និង constraint
+
+`pulldata()` អាចត្រូវបានប្រើក្នុងជួរឈរ `relevant` និង `constraint` ដើម្បីអនុវត្តតក្កវិជ្ជាដោយផ្អែកលើតម្លៃដែលបានស្វែងរក៖
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Select facility | | |
+| integer | bed_count | Number of beds occupied | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## ការប្រើប្រាស់ pulldata ជាមួយ once()
+
+ដើម្បីគណនា `pulldata()` តែនៅពេលផ្ទុកដំបូង (ការពារការគណនាឡើងវិញនៅពេលវាលគន្លឹះផ្លាស់ប្តូរបន្ទាប់ពីការបញ្ចូលដំបូង) សូមដាក់វាខាងក្នុង `once()`៖
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## ការអនុវត្តល្អបំផុត
+
+1. ជួរឈរគន្លឹះក្នុង CSV ត្រូវតែផ្គូផ្គងនឹងជួរឈរ `name` ដែលប្រើក្នុង `select_one_from_file` — តម្លៃទាំងនេះត្រូវតែដូចគ្នា។
+2. ឈ្មោះជួរឈរក្នុង CSV គឺប្រកាន់អក្សរតូចធំ — `Department` និង `department` គឺជាជួរឈរផ្សេងគ្នា។
+3. ប្រសិនបើតម្លៃគន្លឹះរកមិនឃើញ `pulldata()` បញ្ជូនត្រឡប់មកវិញនូវខ្សែអក្សរទទេ — សូមប្រើ `if(${field} != '', pulldata(...), '')` ដើម្បីការពារការជ្រើសរើសទទេ។
+4. រក្សាឯកសារ CSV ឱ្យតូចតាមដែលអាចធ្វើទៅបាន — ឯកសារធំនឹងបង្កើនពេលវេលាផ្ទុកទម្រង់លើការភ្ជាប់អ៊ីនធឺណិតដែលមានល្បឿនទាប។
+5. សម្រាប់ទិន្នន័យដែលផ្លាស់ប្តូររវាងវគ្គប្រមូលទិន្នន័យ សូមធ្វើបច្ចុប្បន្នភាពឯកសារមេឌៀ CSV ដោយផ្ទុកឡើងនូវកំណែទម្រង់ថ្មី។
+
+## កម្រិតកំណត់
+
+- `pulldata()` ផ្គូផ្គងតែជួរដេក **ដំបូង** ដែលជួរឈរគន្លឹះស្មើនឹងតម្លៃគន្លឹះ — តម្លៃគន្លឹះស្ទួនក្នុង CSV មិនត្រូវបានគាំទ្រទេ។
+- ឯកសារ CSV ត្រូវតែភ្ជាប់ជាមួយទម្រង់មុនពេលដាក់ឱ្យប្រើប្រាស់ (deployment); វាមិនអាចទាញយកពី URL នៅពេលដំណើរការ (runtime) បានទេ។
+- តម្លៃលេខដែលបញ្ជូនត្រឡប់មកវិញដោយ `pulldata()` គឺជាខ្សែអក្សរ — សូមដាក់វាខាងក្នុង `number()` នៅពេលប្រើក្នុងការគណនាលេខ៖ `number(pulldata(...))`។
+
+<Callout type="info">
+rtSurvey ក៏គាំទ្រទម្រង់បន្ថែមនៃ `pulldata()` សម្រាប់ការអានទិន្នន័យមេតាឧបករណ៍ (device metadata), វាល JWT និងទិន្នន័យ JSON ផងដែរ។ សូមមើល [App API](../app-api) សម្រាប់ `pulldata('app-api', ...)` និងទំព័រ [Call API](../advanced-features/call-api) សម្រាប់គំរូស្វែងរកផ្អែកលើ JSON។
+</Callout>
+
+---
+
+## វ៉ារ្យ៉ង់ pulldata() បន្ថែម
+
+ក្រៅពីការស្វែងរកក្នុង CSV `pulldata()` គាំទ្រប្រភពទិន្នន័យបន្ថែមមួយចំនួនទៀតដោយផ្លាស់ប្តូរអាគុយម៉ង់ដំបូង។
+
+### `pulldata('app-api', key)`
+
+អានទិន្នន័យមេតាឧបករណ៍, លក្ខណៈសម្បត្តិអ្នកប្រើប្រាស់ និងបរិបទកម្មវិធី។ សូមមើលឯកសារយោងពេញលេញនៅលើទំព័រ [App API](../app-api)។
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+ញែកខ្សែអក្សរ JSON ក្នុងជួរ និងទាញយកតម្លៃដោយប្រើកន្សោម JSONPath។ មានប្រយោជន៍នៅពេលអ្នកមាន JSON literal បង្កប់ក្នុងទម្រង់។
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+បញ្ជូនត្រឡប់មកវិញនូវតម្លៃដែលផ្គូផ្គងជាខ្សែអក្សរ ឬខ្សែអក្សរទទេប្រសិនបើរករកមិនឃើញ។
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+ទាញយកតម្លៃពីខ្សែអក្សរ JSON ដែលបានរក្សាទុកក្នុងវាលផ្សេងទៀតដោយប្រើកន្សោម JSONPath។ នេះស្មើនឹង `substr-jsonpath(${field}, jsonpath)`។
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+បំប្លែងកូដ (decode) ថូខឹន (token) JWT ដែលបានរក្សាទុកក្នុងវាលមួយ ហើយបញ្ជូនត្រឡប់មកវិញនូវតម្លៃនៃ claim ជាក់លាក់ពី payload។
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+បញ្ជូនត្រឡប់មកវិញនូវខ្សែអក្សរទទេ ប្រសិនបើថូខឹនមិនត្រឹមត្រូវ ឬ claim មិនមានវត្តមាន។
+
+### `pulldata('instanceid')`
+
+បញ្ជូនត្រឡប់មកវិញនូវ instance ID តែមួយគត់នៃការដាក់ស្នើបច្ចុប្បន្ន។ ស្មើនឹងវាលមេតា `instanceID`។
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+ផ្គូផ្គងតម្លៃមួយទៅតម្លៃមួយទៀតដោយប្រើតារាងផ្គូផ្គង (mapping table) ដែលបានកំណត់ក្នុងការកំណត់ទម្រង់។
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+បញ្ជូនត្រឡប់មកវិញនូវតម្លៃដែលបានផ្គូផ្គង ឬខ្សែអក្សរទទេប្រសិនបើគ្មានការផ្គូផ្គង។
+
+### `pulldata('options', optionName)`
+
+អានជម្រើសកំណត់ទម្រង់តាមឈ្មោះ។
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+អនុវត្ត SQL `SELECT` លើឯកសារ SQLite `.db` ដែលបានភ្ជាប់មកជាមួយ ហើយបញ្ជូនត្រឡប់មកវិញនូវតម្លៃពីជួរឈរដំបូងនៃជួរដេកដែលផ្គូផ្គងដំបូង។ ប៉ារ៉ាម៉ែត្របន្ទាប់ពីខ្សែអក្សរ SQL ត្រូវបានជំនួសតាមលំដាប់សម្រាប់សញ្ញា `?`។
+
+| ទីតាំង | ប៉ារ៉ាម៉ែត្រ | ការពិពណ៌នា |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | ខ្សែអក្សរដែលសម្គាល់វ៉ារ្យ៉ង់នេះ |
+| 2 | path | ផ្លូវឯកសារក្នុងទម្រង់ `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | សេចក្តីថ្លែងការណ៍ `SELECT` ដោយប្រើ `?` ជាកន្លែងសម្រាប់ដាក់តាមទីតាំង |
+| 4+ | params | តម្លៃដែលត្រូវជំនួសសម្រាប់ `?` នីមួយៗតាមលំដាប់ — ជាទូទៅគឺជាការយោងវាលដូចជា `${field}` |
+
+បញ្ជូនត្រឡប់មកវិញនូវខ្សែអក្សរទទេ ប្រសិនបើគ្មានជួរដេកផ្គូផ្គង។
+
+**ឧទាហរណ៍ — ស្វែងរកឈ្មោះខេត្តតាមរយៈ ID៖**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**ឧទាហរណ៍ — ស្វែងរកឈ្មោះសង្កាត់ដោយចម្រោះតាមរយៈទាំងកូដខេត្ត និងកូដស្រុក៖**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+មិនដូច `pulldata()` ស្តង់ដារដែលមានអាគុយម៉ង់បួនដែលផ្គូផ្គងនឹងជួរឈរគន្លឹះតែមួយក្នុងឯកសារ CSV ទេ វ៉ារ្យ៉ង់ `rawquery` អនុវត្ត SQL `SELECT` ពេញលេញលើមូលដ្ឋានទិន្នន័យ SQLite ដែលអនុញ្ញាតឱ្យមានលក្ខខណ្ឌ `WHERE` ច្រើនជួរឈរ និងជួរឈរណាមួយជាតម្លៃបញ្ជូនត្រឡប់មកវិញ។
+
+<Callout type="info">
+`rawquery` ត្រូវបានប្រើជាទូទៅជាមួយវាល autocomplete សម្រាប់ការស្វែងរកទីតាំងតាមលំដាប់ថ្នាក់។ សូមមើល [ការស្វែងរកមូលដ្ឋានទិន្នន័យមូលដ្ឋាន](../advanced-features/local-database-search) សម្រាប់ព័ត៌មានលម្អិតអំពីការបង្កើតឯកសារ `.db` និងការភ្ជាប់វាជាមួយ `pulldata('rawquery', ...)`។
+</Callout>

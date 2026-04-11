@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path adalah field calculate konvensi yang mengembalikan jalur direktori media bawaan formulir saat runtime — diperlukan oleh setiap formulir yang menggunakan pencarian database lokal atau pencarian berbasis file."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` adalah field calculate konvensi yang menyimpan jalur ke direktori media bawaan formulir. Setiap formulir yang melakukan pencarian database lokal dengan `rawquery`, `pulldata`, atau `search()` harus menyertakan field ini — tanpa field ini, jalur file tidak dapat diselesaikan dan pencarian secara diam-diam mengembalikan hasil kosong.
+
+---
+
+## Field calculate
+
+Tambahkan baris ini di dekat bagian atas lembar survey Anda, setelah field meta apa pun dan sebelum pertanyaan pertama yang menggunakan file database:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Field ini tidak menyimpan nilai yang terlihat dan tidak memerlukan label. Ini adalah prasyarat senyap untuk semua konstruksi jalur yang mengikutinya.
+
+---
+
+## Mengapa ini diperlukan
+
+RTSurvey menyertakan media formulir — database SQLite, gambar, klip audio — di dalam direktori per-formulir di perangkat. Jalur pastinya berbeda di setiap platform (Android, iOS, web) dan antar perangkat.
+
+Saat runtime, aplikasi mengisi `family_path` secara otomatis. Nilai umum yang dihasilkan terlihat seperti:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Karena jalurnya spesifik platform dan ditentukan pada saat peluncuran, jalur tersebut tidak dapat di-hard-code dalam formulir. `pulldata('app-api', 'family_path')` adalah satu-satunya cara yang andal untuk mengambilnya.
+
+---
+
+## Cara menggunakannya dalam jalur
+
+Setelah `family_path` ditentukan, buat jalur file lengkap dengan `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Akhiran `::tableName` akan dihapus saat aplikasi membuka file; nama tabel hanya digunakan di dalam kueri SQL Anda.
+
+---
+
+## Di mana family_path digunakan
+
+`family_path` diperlukan dalam argumen jalur setiap kali Anda mereferensikan file bawaan:
+
+- **Pencarian database lokal** — argumen `db_path` dari `search-autocomplete-noedit-v2('rawquery', ...)` harus dibuat dengan `concat(${family_path}, ...)`. Lihat [Pencarian Database Lokal](local-database-search) untuk detail penggunaan lengkap.
+- **`pulldata` rawquery** — setiap panggilan `pulldata('rawquery', ...)` yang membaca dari file `.db` menggunakan pola `concat()` yang sama.
+- **`search()` dengan file lokal** — penampilan pencarian dinamis yang memuat dari file CSV atau DB bawaan juga mengandalkan `family_path` untuk referensi file.
+
+---
+
+## Penempatan dalam formulir
+
+`family_path` harus muncul **sebelum field pertama yang mereferensikannya**. Posisi yang disarankan adalah segera setelah grup meta:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Provinsi | *(rawquery appearance mereferensikan `${family_path}`)* |
+
+<Callout type="warning">
+Jika `family_path` hilang dari formulir, atau ditempatkan setelah field `rawquery` / `search()` pertama yang mereferensikannya, semua pencarian terhadap file bawaan akan secara diam-diam mengembalikan hasil kosong. Tidak ada pesan kesalahan — pelengkapan otomatis tidak akan menunjukkan hasil apa pun.
+</Callout>
+
+---
+
+## Beberapa file database
+
+Satu formulir dapat menggunakan beberapa file `.db`. Setiap jalur dibuat secara independen dengan `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Definisikan `family_path` sekali; referensikan di sebanyak mungkin field yang diperlukan.
+
+---
+
+## Verifikasi selama pengembangan
+
+Tambahkan field `note` sementara di bawah `family_path` untuk memeriksa nilai yang dihasilkan di perangkat:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Path: ${family_path}` | |
+
+Catatan tersebut akan menampilkan jalur aktual yang dihasilkan selama pengujian. Hapus sebelum menyebarkan formulir akhir.

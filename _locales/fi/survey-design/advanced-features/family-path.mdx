@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path on konventionaalinen laskentakenttä, joka palauttaa lomakkeen mukana toimitettavan mediahakemiston polun suorituksen aikana. Se on pakollinen kaikille lomakkeille, jotka käyttävät paikallisia tietokantahakuja tai tiedostopohjaista hakua."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` on konventionaalinen laskentakenttä (calculate), joka sisältää polun lomakkeen mukana toimitettavaan mediahakemistoon. Jokaisen lomakkeen, joka tekee paikallisia tietokantahakuja funktioilla `rawquery`, `pulldata` tai `search()`, on sisällettävä tämä kenttä. Ilman sitä tiedostopolkuja ei voida selvittää, ja haut palauttavat hiljaisesti tyhjiä tuloksia.
+
+---
+
+## Laskentakenttä (calculate)
+
+Lisää tämä rivi survey-arkin yläosaan, kaikkien metakenttien jälkeen ja ennen ensimmäistä tietokantatiedostoa käyttävää kysymystä:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Kenttä ei tallenna näkyvää arvoa eikä vaadi otsikkoa (label). Se on hiljainen edellytys kaikille seuraaville polkumäärityksille.
+
+---
+
+## Miksi se on tarpeen
+
+RTSurvey paketoi lomakkeen median – SQLite-tietokannat, kuvat, äänitiedostot – laitteella olevaan lomakekohtaiseen hakemistoon. Tarkka polku vaihtelee alustojen (Android, iOS, verkko) ja laitteiden välillä.
+
+Suorituksen aikana sovellus täyttää `family_path`-arvon automaattisesti. Tyypillinen selvitetty arvo näyttää tältä:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Koska polku on alustakohtainen ja se määritetään käynnistyshetkellä, sitä ei voida kovakoodata lomakkeeseen. `pulldata('app-api', 'family_path')` on ainoa luotettava tapa hakea se.
+
+---
+
+## Kuinka käyttää sitä poluissa
+
+Kun `family_path` on määritetty, rakenna täysi tiedostopolku funktiolla `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+`::tableName`-pääte poistetaan, kun sovellus avaa tiedoston; taulukon nimeä käytetään vain SQL-kyselyssäsi.
+
+---
+
+## Missä family_path-kenttää käytetään
+
+`family_path` on pakollinen polkuargumentissa aina, kun viittaat mukana toimitettuun tiedostoon:
+
+- **Paikallinen tietokantahaku** — funktion `search-autocomplete-noedit-v2('rawquery', ...)` argumentti `db_path` on rakennettava käyttämällä `concat(${family_path}, ...)`. Katso täydelliset käyttötiedot kohdasta [Paikallinen tietokantahaku](local-database-search).
+- **`pulldata` rawquery** — kaikki `pulldata('rawquery', ...)` -kutsut, jotka lukevat `.db`-tiedostosta, käyttävät samaa `concat()`-mallia.
+- **`search()` paikallisen tiedoston kanssa** — dynaamiset haku-ulkoasut (appearances), jotka lataavat tietoja mukana toimitetusta CSV- tai DB-tiedostosta, tukeutuvat myös `family_path`-kenttään tiedostoviittauksessa.
+
+---
+
+## Sijoittelu lomakkeessa
+
+`family_path`-kentän on oltava **ennen ensimmäistä siihen viittaavaa kenttää**. Suositeltu sijainti on välittömästi metaryhmän jälkeen:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(rawquery-ulkoasu viittaa kenttään `${family_path}`)* |
+
+<Callout type="warning">
+Jos `family_path` puuttuu lomakkeesta tai se on sijoitettu ensimmäisen siihen viittaavan `rawquery` / `search()` -kentän jälkeen, kaikki haut mukana toimitetuista tiedostoista palauttavat hiljaisesti tyhjän tuloksen. Virheilmoitusta ei tule – automaattinen täydennys ei vain näytä tuloksia.
+</Callout>
+
+---
+
+## Useat tietokantatiedostot
+
+Yksi lomake voi käyttää useita `.db`-tiedostoja. Jokainen polku rakennetaan itsenäisesti funktiolla `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Määritä `family_path` kerran; viittaa siihen tarvittavissa kentissä.
+
+---
+
+## Varmistus kehityksen aikana
+
+Lisää väliaikainen `note`-kenttä `family_path`-kentän alapuolelle tarkistaaksesi selvitetyn arvon laitteella:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Polku: ${family_path}` | |
+
+Huomautus näyttää todellisen selvitetyn polun testauksen aikana. Poista se ennen lopullisen lomakkeen käyttöönottoa.

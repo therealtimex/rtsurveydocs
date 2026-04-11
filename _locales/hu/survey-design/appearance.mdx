@@ -3,131 +3,212 @@ title: "Megjelenés"
 description: ""
 ---
 
-Az rtSurvey `appearance` oszlopa lehetővé teszi a kérdések vizuális megjelenítésének és viselkedésének testreszabását a felmérésekben. Ez a funkció javítja a felhasználói élményt és jelentősen növelheti az adatgyűjtés hatékonyságát. Az rtSurvey támogatja az XLSForm szabványos megjelenési attribútumait, és azokat további lehetőségekkel egészíti ki.
+Az rtSurvey `appearance` oszlopa lehetővé teszi a kérdések vizuális megjelenítésének és viselkedésének testreszabását a kérdőívekben. Ez a funkció javítja a felhasználói élményt, és jelentősen növelheti az adatgyűjtés hatékonyságát. Az rtSurvey támogatja a szabványos XLSForm megjelenési attribútumokat, és további lehetőségekkel egészíti ki azokat.
 
 ## Szabványos XLSForm megjelenési attribútumok
 
 Az rtSurvey a következő szabványos XLSForm megjelenési attribútumokat támogatja:
 
 | Megjelenési attribútum | Kérdéstípusok | Leírás |
-|------------------------|----------------|--------|
-| multiline | text | Többsoros szövegmezőt hoz létre (webes kliensekhez ajánlott) |
-| minimal | select_one, select_multiple | Legördülő menüben jeleníti meg a választási lehetőségeket |
-| quick | select_one | Kiválasztás után automatikusan a következő kérdésre ugrik (csak mobilon) |
-| no-calendar | date | Elrejti a naptárat (csak mobilon) |
+|----------------------|----------------|-------------|
+| multiline | text | Többsoros szövegdobozt hoz létre (webes kliensekhez a legjobb) |
+| minimal | select_one, select_multiple | Választási lehetőségek megjelenítése legördülő menüben |
+| quick | select_one | Kiválasztás után automatikusan a következő kérdésre lép (csak mobil) |
+| no-calendar | date | Letiltja a naptár megjelenítését (csak mobil) |
 | month-year | date | Csak hónap és év kiválasztását teszi lehetővé |
 | year | date | Csak év kiválasztását teszi lehetővé |
-| horizontal-compact | select_one, select_multiple | Vízszintesen jeleníti meg a lehetőségeket (csak weben) |
-| horizontal | select_one, select_multiple | Vízszintesen, oszlopokba rendezve jeleníti meg a lehetőségeket (csak weben) |
-| likert | select_one | Likert-skálaként jeleníti meg a lehetőségeket |
-| compact | select_one, select_multiple | Minimális térközzel egymás mellé rendezi a lehetőségeket |
-| quickcompact | select_one | Ötvözi a kompakt megjelenést az automatikus továbblépéssel (csak mobilon) |
-| field-list | groups | A teljes csoportot egy képernyőn jeleníti meg (csak mobilon) |
-| label | select_one, select_multiple | Csak feliratokat mutat, beviteli mezők nélkül |
-| list-nolabel | select_one, select_multiple | Csak beviteli mezőket mutat, feliratok nélkül (a `label`-lel együtt használva) |
-| table-list | groups | Táblázat formátumban jeleníti meg a kérdéseket |
-| signature | image | Aláírás rögzítését teszi lehetővé (csak mobilon) |
-| draw | image | Szabad kézzel való rajzolást tesz lehetővé (csak mobilon) |
-| map, quick map | select_one, select_one_from_file | Térképes kiválasztást tesz lehetővé |
+| horizontal-compact | select_one, select_multiple | Vízszintesen jeleníti meg a választási lehetőségeket (csak web) |
+| horizontal | select_one, select_multiple | Vízszintesen, oszlopokban jeleníti meg a választási lehetőségeket (csak web) |
+| likert | select_one | Likert-skálaként jeleníti meg a választási lehetőségeket |
+| compact | select_one, select_multiple | Egymás mellett jeleníti meg a választási lehetőségeket minimális kitöltéssel |
+| quickcompact | select_one | Egyesíti a kompakt megjelenítést az automatikus továbblépéssel (csak mobil) |
+| field-list | groups | A teljes csoportot egy képernyőn jeleníti meg (csak mobil) |
+| label | select_one, select_multiple | Megjeleníti a választási címkéket bemeneti mezők nélkül |
+| list-nolabel | select_one, select_multiple | Megjeleníti a bemeneti mezőket címkék nélkül (használja a `label` attribútummal) |
+| table-list | groups | Táblázatos formátumban jeleníti meg a kérdéseket |
+| signature | image | Lehetővé teszi az aláírás rögzítését (csak mobil) |
+| draw | image | Lehetővé teszi a szabadkézi rajzolást (csak mobil) |
+| map, quick map | select_one, select_one_from_file | Lehetővé teszi a térképi funkciókból való választást |
 
-## A megjelenés használatának bevált módszerei
+## Legjobb gyakorlatok a Megjelenés használatához
 
-1. **Következetesség**: Használjon megjelenési attribútumokat következetesen a felmérésben az egységes megjelenés érdekében.
-2. **Mobil vs. web**: Vegye figyelembe, hogyan jelennek meg a különféle eszközökön és platformokon.
-3. **Teljesítmény**: Legyen óvatos a form betöltését esetleg lelassító megjelenési attribútumokkal (pl. `table-list` nagy csoportoknál).
-4. **Felhasználói élmény**: Válasszon olyan megjelenést, ami megkönnyíti és intuitívabbá teszi az adatbevitelt.
-5. **Tesztelés**: Mindig tesztelje az űrlapot a céleszközökön, hogy a megjelenés a várt módon működjön.
+1. **Konzisztencia**: Használja következetesen a megjelenési attribútumokat a kérdőívben az egységes megjelenés érdekében.
+2. **Mobil vs. Web**: Vegye figyelembe, hogyan jelennek meg a különböző attribútumok a különböző eszközökön és platformokon.
+3. **Teljesítmény**: Legyen óvatos azokkal a megjelenési attribútumokkal, amelyek lassíthatják az űrlap betöltését (pl. `table-list` nagy csoportok esetén).
+4. **Felhasználói élmény**: Válasszon olyan megjelenési módokat, amelyek megkönnyítik és intuitívabbá teszik az adatbevitelt a válaszadók számára.
+5. **Tesztelés**: Mindig tesztelje az űrlapot a céleszközökön, hogy megbizonyosodjon a megjelenési módok elvárt működéséről.
 
 ## Haladó technikák
 
-### Megjelenési beállítások kombinálása
+### Megjelenések kombinálása
 
-Egyes megjelenési attribútumok összetettebb elrendezés érdekében kombinálhatók:
+Néhány megjelenési attribútum kombinálható bonyolultabb elrendezésekhez:
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Válasszon egyet: | minimal compact |
+| select_one options | choice | Select one: | minimal compact |
 ```
 
-### Dinamikus megjelenés
+### Dinamikus megjelenések
 
-Az rtSurvey lehetővé teszi az űrlap logikáján alapuló dinamikus megjelenési változtatásokat:
+Az rtSurvey lehetővé teszi a megjelenés dinamikus változtatását az űrlap logikája alapján:
 
 ```
 | type | name | label | appearance | relevant |
 |------|------|-------|------------|----------|
-| text | time | Adja meg az időpontot: | inline-[%H:%M] | ${show_time} = 'yes' |
+| text | time | Enter time: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## Mobilalkalmazás szempontjai
+## Mobilalkalmazással kapcsolatos megfontolások
 
-- Egyes megjelenési beállítások (pl. `quick`, `signature`) csak mobileszközökre vonatkoznak.
-- Tesztelje alaposan Android és iOS rendszereken is az egységes viselkedés érdekében.
+- Néhány megjelenési mód (pl. `quick`, `signature`) specifikusan mobileszközökre vonatkozik.
+- Alaposan tesztelje mind Androidon, mind iOS-en a konzisztens viselkedés biztosítása érdekében.
 
 ## rtSurvey kiterjesztett megjelenési attribútumok
 
-A szabványos XLSForm megjelenési beállításokon túl az rtSurvey a következő platform-specifikus lehetőségeket is támogatja:
+A szabványos XLSForm megjelenési módokon kívül az rtSurvey a következő platformspecifikus opciókat támogatja:
 
-### Adatok és megjelenítés szabályozása
+### Adat- és megjelenítésvezérlés
 
 | Megjelenési attribútum | Kérdéstípusok | Leírás |
-|------------------------|----------------|--------|
-| `invisible` | bármely | Elrejti a mezőt, miközben az értéket továbbra is gyűjti vagy kiszámítja. Különbözik a `hidden` típustól – a mező részt vesz a logikában. |
-| `displaytitle` | bármely | A mező feliratának/címének megjelenítését kényszeríti ki, ha egyébként elrejtené. |
-| `autopull` | select_one, select_multiple | Automatikusan betölti a külső adatokat a lehetőségek feltöltéséhez, amikor az űrlap megnyílik vagy egy trigger mező változik. |
-| `floating_hint` | text, integer, decimal | A súgószöveget lebegő feliratként jeleníti meg a beviteli mező felett, nem alatta. |
-| `calculate-button` | calculate | Látható gombot ad hozzá, amely igény szerinti újraszámítást vált ki, nem automatikus számítás helyett. |
+|----------------------|----------------|-------------|
+| `invisible` | bármely | Elrejti a mezőt a nézet elől, miközben továbbra is gyűjti vagy kiszámítja az értékét. Különbözik a `hidden` típustól — a mező továbbra is részt vesz a logikában. |
+| `displaytitle` | bármely | Kényszeríti a mező címkéjének/címének megjelenítését akkor is, ha egyébként el lenne rejtve. |
+| `autopull` | select_one, select_multiple | Automatikusan lekéri a külső adatokat a választási lehetőségek feltöltéséhez az űrlap betöltésekor vagy egy kiváltó mező változásakor. |
+| `floating_hint` | text, integer, decimal | A súgószöveget lebegő címkeként jeleníti meg a beviteli mező felett, nem pedig alatta. |
+| `calculate-button` | calculate | Egy látható gombot ad hozzá, amely igény szerint elindítja a mező újraszámítását, ahelyett, hogy automatikusan kiszámítaná. |
+
+### Csoport és navigáció
+
+| Megjelenési attribútum | Kérdéstípusok | Leírás |
+|----------------------|----------------|-------------|
+| `section` | group | A csoportot összecsukható szakasz kártyaként jeleníti meg. Megjegyzés: csak mobilalkalmazás. |
+| `toc-hide` | bármely | Kizárja a kérdést a tartalomjegyzék (TOC) navigációs paneljéről. |
+| `minilog` | begin_repeat | A befejezett ismétlődő bejegyzéseket kompakt minilog-listaként jeleníti meg, nem pedig minden bejegyzést külön kibontva. |
+
+### Bemeneti viselkedés
+
+| Megjelenési attribútum | Kérdéstípusok | Leírás |
+|----------------------|----------------|-------------|
+| `proper` | text | Automatikusan nagybetűvel kezdi minden szó első betűjét, ahogy a válaszadó gépel (title-case viselkedés). |
+| `text-nolabel` | text, integer, decimal | Látható címke nélkül jeleníti meg a beviteli mezőt. |
+| `inline-1line` | text | Kényszeríti a szöveges bevitelt egyetlen sorban való megjelenítésre, még akkor is, ha a kérdés címkéje hosszú. |
+| `popup` | bármely | A mezőt egy felugró / modális ablakban jeleníti meg az oldalba ágyazott megjelenítés helyett. |
 
 ### Elrendezés
 
 | Megjelenési attribútum | Kérdéstípusok | Leírás |
-|------------------------|----------------|--------|
-| `1screen` | group | A teljes csoportot egyetlen képernyőn jeleníti meg, a csoport méretétől függetlenül. |
-| `columns(n)` | select_one, select_multiple | A lehetőségeket `n` oszlopban jeleníti meg. Pl.: `columns(3)` háromoszlopos rádiógombok. |
-| `gridformat<row=R col=C colspan=S align=center>` | bármely | CSS-rácselrendezésben helyezi el a mezőt az `R` sorban, `C` oszlopban, `S` oszlopot átfedve. Az `advanced-extension/grid-layout` funkcióval használható. |
-| `ignore-simplify` | bármely | Utasítja a form-megjelenítőt, hogy hagyja ki az automatikus egyszerűsítést ennél a mezőnél. |
+|----------------------|----------------|-------------|
+| `1screen` | group | A teljes csoportot egyetlen képernyőn jeleníti meg, függetlenül a csoport méretétől. |
+| `columns(n)` | select_one, select_multiple | A választási lehetőségeket `n` oszlopban jeleníti meg. Példa: `columns(3)` három oszlopban jeleníti meg a választógombokat. |
+| `gridformat<row=R col=C colspan=S align=center>` | bármely | Pozicionálja a mezőt egy CSS-rács elrendezésben az `R` sorban, `C` oszlopban, `S` oszlopot áthidalva. Az `advanced-extension/grid-layout` funkcióval együtt használatos. |
+| `ignore-simplify` | bármely | Utasítja az űrlap-megjelenítőt, hogy hagyja ki a mező elrendezésének automatikus egyszerűsítését vagy tömörítését. |
+| `horizontal(N)` | select_one, select_multiple | Beállítja, hogy minden választási lehetőség a sor szélességének `N` százalékát foglalja el. Példa: `horizontal(50)` két választási lehetőséget helyez el soronként. |
+| `scroll-view(N%)` | group, repeat | A konténert a nézetablak (vagy szülő) magasságának maximum `N%`-ára korlátozza, görgetősávot adva hozzá, ha a tartalom túlnyúlik. Példa: `scroll-view(60%)`. |
 
 ### Widgetek
 
 | Megjelenési attribútum | Kérdéstípusok | Leírás |
-|------------------------|----------------|--------|
-| `likert` | select_one | Likert-skálaként jeleníti meg a lehetőségeket (a szabványos táblában is szerepel). |
-| `distress` | select_one | A Kessler Pszichológiai Distresszskálát (K10) jeleníti meg érzelmi ikonokkal. |
+|----------------------|----------------|-------------|
+| `likert` | select_one | Likert-skála sorként jeleníti meg a választási lehetőségeket (már szerepel a fenti szabványos táblázatban; támogatása megerősítve). |
+| `distress` | select_one | A választási lehetőségeket Kessler Pszichológiai Distressz Skála (K10) vizuális widgetként jeleníti meg, érzelmi ikonokkal. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Stílusos értékelő dobozokként jeleníti meg a választási lehetőségeket öt színhellyel. `c1` = külső konténer szegélye, `c2` = nem bejelölt szegély, `c3` = bejelölt szegély és kitöltés, `c4` = nem bejelölt szöveg színe, `c5` = bejelölt szöveg színe. Példa: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Színes címke chip-ekként jeleníti meg a választási lehetőségeket. Az öt színhely ugyanazt a sorrendet követi, mint a `rating_box-fill`. A kiválasztott lehetőségek kiemelve jelennek meg; a nem kiválasztott lehetőségek el vannak rejtve az összefoglaló nézetben. |
 
-### API-integráció
+### API integráció
 
 | Megjelenési attribútum | Kérdéstípusok | Leírás |
-|------------------------|----------------|--------|
-| `callapi` | text, integer, decimal, select_one | API-hívás integrációját teszi lehetővé ennél a mezőnél. A calculation oszlopnak `callapi()` kifejezést kell tartalmaznia. Lásd: [API hívása](advanced-extension/call-api). |
-| `callapi-verify(params)` | text, integer, decimal | API-ellenőrző hívást indít statikus paraméterekkel. Az űrlap addig blokkolja a továbblépést, amíg az API meg nem erősíti az értéket. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | Ugyanaz, mint a `callapi-verify`, de a paraméterek futásidőben más mezők értékeiből származnak. |
+|----------------------|----------------|-------------|
+| `callapi` | text, integer, decimal, select_one | Lehetővé teszi az API-hívás integrációját ehhez a mezőhöz. A calculation oszlopnak egy `callapi()` kifejezést kell tartalmaznia. Lásd: [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | API-ellenőrző hívást vált ki statikus paraméterekkel. Az űrlap blokkolja a továbblépést, amíg az API meg nem erősíti az értéket. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Ugyanaz, mint a `callapi-verify`, de a paraméterek más mezőértékekből származnak futás közben. |
 
-### Beágyazott dátum/idő formátum
+### Nyelvváltó
 
-A `date`, `time` és `datetime` típusú mezőknél egyedi megjelenítési formátumot adhat meg a megjelenési értékhez fűzött formátum-karakterlánccal:
+| Megjelenési attribútum | Kérdéstípusok | Leírás |
+|----------------------|----------------|-------------|
+| `change_language-{colors} default('lang')` | note, text | Nyelvváltó widgetet jelenít meg a megadott színkódokkal stílusozva. A `default('lang')` token beállítja a kezdeti nyelvet (pl. `default('en')`); belsőleg `rtDefault('lang')`-re íródik át az elemzés során. Példa: `change_language-blue-white default('vi')`. |
+
+### Inline dátum/idő formátum
+
+A `date`, `time` és `datetime` mezőkhöz egyedi megjelenítési formátumot adhat meg a megjelenéshez fűzött formátumstringgel:
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-A formátum-tokenek megegyeznek a `format-date()` és `format-date-time()` függvényekéivel. Lásd: [Függvények — Dátum és idő függvények](operators-and-functions/functions#date-and-time-functions).
+A formátum tokenek megegyeznek a `format-date()` és `format-date-time()` függvényekével. Lásd: [Függvények — Dátum és idő függvények](operators-and-functions/functions#date-and-time-functions).
 
 Példa:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| datetime | event_time | Esemény dátuma és időpontja | inline-[%d/%m/%Y %I:%M %p] |
+| datetime | event_time | Esemény dátuma és ideje | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | Születési dátum | inline-[%d/%m/%Y] |
+
+### Inline gomb elrendezés — `display{}` és `results{}`
+
+Azoknál a kérdéstípusoknál, amelyek beágyazott ikon gombként jelennek meg (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), két megjelenési módosító vezérli a gomb pozícióját és a rögzítés utáni viselkedést.
+
+#### `display{...}` — gomb pozíciója rögzítés előtt
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Paraméter | Értékek | Alapértelmezett |
+|-----------|--------|---------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex pl. `#FF5500` | elsődleges témaszín |
+| Flag | `inline-icon` | ikon mód kényszerítése |
+
+| Align érték | Elrendezés |
+|-------------|--------|
+| `right` | Gomb a címkétől jobbra |
+| `left` | Gomb a címkétől balra |
+| `top` | Gomb a címke felett, teljes szélességben középre zárva |
+| `center` / `bottom` | Gomb a címke alatt, teljes szélességben középre zárva |
+
+#### `results{...}` — elrendezés és láthatóság rögzítés után
+
+Örökli a `display{}` beállításait. Használja a gomb áthelyezésére vagy elemek elrejtésére az érték rögzítése után.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| `hide` érték | Hatás |
+|---|---|
+| `hide(capture)` | Elrejti a rögzítés gombot, ha a fájl/érték már létezik |
+| `hide(review)` | Elrejti az ellenőrző indexképet / lejátszás gombot |
+| `hide(filename)` | Elrejti a feltöltés után megjelenő fájlnevet |
+| `hide(camera)` | Elrejti a kamera indítógombját rögzítés után |
+| `hide(scanner)` | Elrejti a vonalkód-leolvasó gombot az érték beolvasása után |
+| `hide(value)` | Elrejti a beolvasott érték szövegét (vonalkód / geopoint) |
+
+A widget automatikusan átvált a `display{}` elrendezésről a `results{}` elrendezésre az érték rögzítésének pillanatában.
+
+**Példák:**
+
+```
+inline display{right}                                    → ikon a címkétől jobbra
+inline display{left, large}                              → nagy ikon a bal oldalon
+inline display{center, large, #FF5500}                   → nagy narancssárga ikon a címke alatt
+inline display{right} results{left}                      → az ikon balra kerül rögzítés után
+inline display{right} results{hide(capture)}             → az ikon eltűnik rögzítés után
+inline display{center} results{hide(capture), hide(filename)}
+```
 
 ## Ismert korlátozások
 
-- Az összetett megjelenési beállítások nem feltétlenül jelennek meg egyformán minden platformon.
-- Egyes haladó rtSurvey-megjelenések offline módban esetleg nem támogatottak.
+- Az összetett megjelenési módok nem biztos, hogy minden platformon azonosan jelennek meg.
+- Néhány speciális rtSurvey megjelenési mód nem feltétlenül támogatott offline módban.
 
-## A megjelenési problémák hibaelhárítása
+## Megjelenési problémák hibaelhárítása
 
-1. **Megjelenés nem érvényesül**: Ellenőrizze a megjelenési oszlop elírásait.
-2. **Következetlen megjelenítés**: Ellenőrizze a kompatibilitást a kérdéstípussal és a platformmal.
-3. **Teljesítményproblémák**: Fontolja meg az összetett megjelenési beállítások egyszerűsítését, különösen nagy felmérések esetén.
+1. **A megjelenés nem alkalmazódik**: Ellenőrizze a gépelési hibákat az appearance oszlopban.
+2. **Inkonzisztens megjelenítés**: Ellenőrizze a kompatibilitást a kérdéstípussal és a platformmal.
+3. **Teljesítményproblémák**: Fontolja meg az összetett megjelenési módok egyszerűsítését, különösen nagy kérdőívek esetén.

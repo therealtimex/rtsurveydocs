@@ -1,0 +1,104 @@
+---
+title: "Navigeringskontroller för formulär"
+description: "Använd utseendevärdena SaveFinalizedExit och SaveIncompleteExit för att rendera stiliserade avslutningsknappar som sparar och lämnar formuläret."
+---
+
+**Navigeringskontroller för formulär** är utseendevärden som placeras på `note`- (eller `text`-) fält som visas som stiliserade knappar i full bredd längst ner i en undersökning. De låter intervjuaren spara insändningen och lämna formuläret med ett tryck — antingen som en slutförd (finaliserad) post eller som ett utkast (ofullständig) post.
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Renderar en knapp som **sparar insändningen som finaliserad** och avslutar formuläret. Knappens etikett hämtas från fältets `label`-kolumn.
+
+| XLSForm column | Värde |
+|----------------|-------|
+| `type` | `note` |
+| `name` | valfritt unikt namn (t.ex. `btn_finish`) |
+| `label` | text som visas på knappen |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Insändningen markeras som en slutgiltig, komplett post. Detta motsvarar att trycka på den inbyggda skicka-knappen.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Renderar en knapp som **sparar insändningen som ofullständig (utkast)** och avslutar formuläret. Intervjuaren kan återvända till den senare och fortsätta ifyllningen.
+
+| XLSForm column | Värde |
+|----------------|-------|
+| `type` | `note` |
+| `name` | valfritt unikt namn (t.ex. `btn_pause`) |
+| `label` | text som visas på knappen |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Färgsyntax
+
+Båda utseendena accepterar en inline-färg i formatet `<#RRGGBB/>`:
+
+- `#` följt av exakt **6 hexadecimala siffror** (stora eller små bokstäver)
+- Den avslutande `/>` är **obligatorisk** — om den utelämnas avbryts parsningen
+- Exempel: `<#04B404/>` (grön), `<#EDC602/>` (bärnsten), `<#D9534F/>` (röd)
+
+Färgen styr knappens bakgrund. Textfärgen bestäms automatiskt av appen.
+
+---
+
+## Exempel
+
+De följande två fälten placerade i slutet av ett formulär producerar en grön **Skicka**-knapp och en bärnstensfärgad **Spara som utkast**-knapp:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Skicka | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Spara som utkast | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — exkludering av knappar från innehållsförteckningen
+
+`toc-hide`-utseendetokenet instruerar rtSurvey att exkludera ett fält från formulärets **innehållsförteckning** (översiktslistan över frågor). Navigeringsknappar är inte frågor, så de ska aldrig visas i innehållsförteckningen (TOC).
+
+Lägg alltid till `toc-hide` efter avslutningsutseendet:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Se [Utseende — toc-hide](../appearance#group-and-navigation) för referensen till toc-hide.
+
+---
+
+## Placeringskonvention
+
+Följ dessa konventioner när du lägger till navigeringskontroller i ett formulär:
+
+- Placera båda knapparna helt i **slutet** av formuläret, efter alla frågor och grupper.
+- Inkludera alltid **båda** knapparna tillsammans — en finaliserad och en ofullständig — så att intervjuaren alltid har ett sätt att avsluta oavsett slutförandestatus.
+- Använd `relevant`-kolumnen på den finaliserade avslutningsknappen om insändning endast ska tillåtas när vissa villkor är uppfyllda (t.ex. en obligatorisk del är klar). Den ofullständiga avslutningsknappen bör i allmänhet vara **alltid synlig**.
+
+---
+
+## Villkorlig finaliserad avslutning
+
+Använd `relevant`-kolumnen för att kontrollera när den finaliserade avslutningsknappen visas. Den ofullständiga avslutningen ska förbli villkorslöst synlig så att intervjuaren alltid kan pausa och återvända.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Skicka | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Spara som utkast | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+I detta exempel visas **Skicka**-knappen bara när intervjuaren har gett sitt samtycke och markerat del A som klar. **Spara som utkast**-knappen är alltid tillgänglig.
+
+---
+
+## Begränsningar
+
+- **Fälttypen måste vara `note` eller `text`.** Användning av dessa utseenden på andra frågetyper stöds inte.
+- **Endast 6-siffrig hexadecimal.** Kortfattad hexadecimal (`<#FFF/>`) och namngivna färger stöds inte — använd alltid det fulla 6-siffriga formatet (t.ex. `<#FFFFFF/>`).
+- **Label-kolumnen är knapptexten.** `hint`-kolonnen ignoreras för dessa fält; endast `label` ritas.
+- **Båda knapparna bör vara närvarande.** Om du utelämnar knappen för ofullständig avslutning lämnas intervjuaren utan något sätt att pausa mitt i formuläret.

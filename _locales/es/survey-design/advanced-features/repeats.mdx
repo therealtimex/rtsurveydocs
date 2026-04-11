@@ -1,15 +1,15 @@
 ---
-title: "Repeticiones avanzadas"
+title: "Repeticiones Avanzadas"
 description: "Patrones avanzados para grupos de repetición: conteos dinámicos, repeticiones anidadas, resumen de datos de repetición y referencia de valores entre repeticiones."
 ---
 
-Esta página cubre patrones avanzados para trabajar con grupos de repetición en rtSurvey. Para los conceptos básicos sobre cómo configurar un grupo de repetición, consulte [Agrupación y repeticiones](../repeats).
+Esta página cubre patrones avanzados para trabajar con grupos de repetición en rtSurvey. Para conocer los conceptos básicos sobre cómo configurar un grupo de repetición, consulte [Agrupación y repeticiones](../repeats).
 
 ---
 
 ## Conteo dinámico de repeticiones
 
-De forma predeterminada, el encuestador decide cuántas veces repetir. Puede fijar el número de repeticiones usando `repeat_count`:
+De forma predeterminada, el encuestador decide cuántas veces repetir. Puede fijar el número de repeticiones utilizando `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,39 +18,39 @@ De forma predeterminada, el encuestador decide cuántas veces repetir. Puede fij
 | integer | member_age | Edad | |
 | end_repeat | | | |
 
-La repetición se ejecuta exactamente `${num_members}` veces, donde `num_members` se recopiló anteriormente en el formulario. El encuestador no puede agregar ni eliminar instancias.
+La repetición se ejecuta exactamente `${num_members}` veces, donde `num_members` se recopiló anteriormente en el formulario. El encuestador no puede añadir ni eliminar instancias.
 
 ---
 
 ## Acceso indexado: `indexed-repeat()`
 
-Acceda al valor del campo de una instancia de repetición específica desde **fuera** del grupo de repetición usando `indexed-repeat(repeatedField, repeatGroup, index)`:
+Acceda al valor de un campo de una instancia de repetición específica desde **fuera** del grupo de repetición utilizando `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Esto es útil para construir campos de resumen o referenciar los datos del miembro "principal" después de la repetición.
+Esto es útil para crear campos de resumen o hacer referencia a los datos del miembro "principal" después de la repetición.
 
 ---
 
 ## Posición de la instancia actual: `index()`
 
-Dentro de un grupo de repetición, `index()` devuelve la posición basada en 1 de la instancia actual. Úselo para etiquetar cada repetición o crear identificadores únicos:
+Dentro de un grupo de repetición, `index()` devuelve la posición (basada en 1) de la instancia actual. Úselo para etiquetar cada repetición o crear identificadores únicos:
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | plots | Parcela |
-| note | plot_label | Número de parcela `${index()}` |
-| text | plot_id | ID de parcela |
+| note | plot_label | Parcela número `${index()}` |
+| text | plot_id | ID de la parcela |
 | end_repeat | | |
 
 ---
 
 ## Referenciar campos en la misma instancia
 
-Dentro de una repetición, use `${fieldname}` para referenciar otro campo **en la misma instancia de repetición**. No es necesario usar `indexed-repeat()` dentro del mismo bucle:
+Dentro de una repetición, utilice `${fieldname}` para hacer referencia a otro campo **en la misma instancia de repetición**. No es necesario usar `indexed-repeat()` dentro del mismo bucle:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,13 +62,13 @@ Dentro de una repetición, use `${fieldname}` para referenciar otro campo **en l
 
 ---
 
-## Referenciar campos padre desde dentro de una repetición
+## Referenciar campos padre desde el interior de una repetición
 
-Los campos fuera (por encima) del grupo de repetición se pueden referenciar normalmente con `${fieldname}`:
+Los campos fuera (arriba) del grupo de repetición se pueden referenciar normalmente con `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
-| text | village | Nombre del pueblo |
+| text | village | Nombre de la aldea |
 | begin_repeat | plots | Parcela agrícola |
 | note | plot_context | Parcelas en `${village}` |
 | end_repeat | | |
@@ -77,10 +77,10 @@ Los campos fuera (por encima) del grupo de repetición se pueden referenciar nor
 
 ## Resumen de datos de repetición
 
-Use funciones de agregado de repetición **fuera** del grupo de repetición para resumir:
+Utilice las funciones de agregación de repetición **fuera** del grupo de repetición para resumir:
 
 | Función | Ejemplo | Descripción |
-|---------|---------|-------------|
+|----------|---------|-------------|
 | `count(group)` | `count(${household_members})` | Número de instancias |
 | `sum(field)` | `sum(${loan_amount})` | Suma de un campo numérico |
 | `min(field)` | `min(${member_age})` | Valor mínimo |
@@ -102,13 +102,13 @@ Use funciones de agregado de repetición **fuera** del grupo de repetición para
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` miembros; `${children_count}` menores de 18. Adultos: `${adult_names}` | |
+| note | summary | `${total_members}` miembros; `${children_count}` menores de 18 años. Adultos: `${adult_names}` | |
 
 ---
 
 ## Repeticiones anidadas
 
-Un grupo de repetición puede contener otro grupo de repetición. Úselo con cuidado; las repeticiones anidadas agregan complejidad y pueden ser confusas para los encuestadores.
+Un grupo de repetición puede contener otro grupo de repetición. Use esto con cuidado: las repeticiones anidadas añaden complejidad y pueden ser confusas para los encuestadores.
 
 | type | name | label |
 |------|------|-------|
@@ -119,36 +119,132 @@ Un grupo de repetición puede contener otro grupo de repetición. Úselo con cui
 | end_repeat | | |
 | end_repeat | | |
 
-Para referenciar un campo en una repetición exterior desde la repetición interior, use `${fieldname}`; se resuelve al ancestro coincidente más cercano:
+Para hacer referencia a un campo en una repetición externa desde la repetición interna, utilice `${fieldname}`; esto se resuelve en el ancestro coincidente más cercano:
 
-Dentro de la repetición `hh_members`, `${hh_id}` devuelve el ID del hogar **actual**, no todos los hogares.
+Dentro de la repetición `hh_members`, `${hh_id}` devuelve el ID del hogar **actual**, no de todos los hogares.
 
 ---
 
 ## Rango dentro de grupos de repetición: `rank-index()`
 
-Cuando existe un campo `rank` dentro de una repetición, use `rank-index(instanceNumber, repeatedField)` desde fuera para obtener el rango ordinal de una instancia específica:
+Cuando existe un campo `rank` dentro de una repetición, utilice `rank-index(instanceNumber, repeatedField)` desde fuera para obtener el rango ordinal de una instancia específica:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` devuelve el índice de instancia de la puntuación más alta.
+`rank-index(1, ${score})` devuelve el índice de instancia con la puntuación más alta.
 
 ---
 
-## Mejores prácticas
+## Apariencia `1screen` en `begin_repeat`
 
-1. Siempre use `repeat_count` cuando el número de repeticiones se conozca de antemano; evita que los encuestadores agreguen o eliminen instancias accidentalmente.
+Añadir `1screen` a la columna `appearance` de una fila `begin_repeat` muestra todas las preguntas de cada instancia juntas en una sola pantalla, en lugar de una pregunta por pantalla.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Miembro del hogar | `1screen` |
+| text | member_name | Nombre del miembro | |
+| integer | member_age | Edad | |
+| end_repeat | | | |
+
+Cuando se establece `1screen` y no hay un campo `repeat_count` ni `add_repeat` dentro del grupo, rtSurvey genera automáticamente un botón circular **+** en la parte inferior de la pantalla para que los encuestadores puedan añadir nuevas instancias sin ninguna configuración adicional.
+
+| Apariencia | Una pantalla por instancia | Botón + predeterminado añadido |
+|------------|---------------------------|--------------------------------|
+| `1screen` | Sí | Sí (cuando no hay un hijo `add_repeat`) |
+| `field-list` | Sí | No |
+
+Use `field-list` cuando desee el diseño agrupado sin el botón de añadir automático. Use `1screen` cuando desee tanto el diseño agrupado como una forma integrada de añadir instancias.
+
+---
+
+## Botón de añadir personalizado `add_repeat`
+
+Un campo `note` (o `text`) colocado **dentro** del grupo de repetición con `appearance: add_repeat` se representa como un botón "Añadir" de ancho completo. La etiqueta del botón proviene de la columna `label` del campo. Cuando hay un campo `add_repeat` presente, se suprime el botón circular + predeterminado (de `1screen`).
+
+Coloque el campo `add_repeat` como el último campo dentro del grupo de repetición:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Miembro | `1screen` |
+| text | member_name | Nombre del miembro | |
+| integer | member_age | Edad | |
+| note | btn_add | + Añadir miembro | `add_repeat` |
+| end_repeat | | | |
+
+### Personalización de colores
+
+Pase un código de color dentro del valor de apariencia para dar estilo al botón:
+
+| Valor de apariencia | Resultado |
+|---------------------|-----------|
+| `add_repeat <#04B404/>` | Fondo verde, color de texto predeterminado |
+| `add_repeat 04B404-ffffff` | Fondo verde, texto blanco |
+
+El primer color es el fondo y el segundo (después del guion) es el color del texto. Omita el `#` cuando use la forma separada por guiones.
+
+### Variante de icono
+
+Utilice `add_repeat icon` (con un espacio) para representar un botón de icono circular compacto en lugar del botón de ancho completo:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Añadir | `add_repeat icon` |
+
+---
+
+## Botones de eliminación: `delete-repeat-current` y `delete-repeat-last`
+
+Un campo `note` dentro del grupo de repetición con `appearance: delete-repeat-current` o `appearance: delete-repeat-last` se representa como un botón de eliminación dividido.
+
+| Apariencia | Acción |
+|------------|--------|
+| `delete-repeat-current` | Elimina la instancia actual (activa) |
+| `delete-repeat-last` | Elimina la última instancia de la repetición |
+
+El botón predeterminado (que no es de icono) es un botón dividido: un icono de papelera a la izquierda y el texto de la etiqueta del campo a la derecha, ocupando todo el ancho de la pantalla.
+
+### Variante de icono
+
+Añada `-icon` para obtener un botón de icono de papelera circular compacto:
+
+| Apariencia | Resultado |
+|------------|-----------|
+| `delete-repeat-current-icon` | Icono de papelera circular, elimina la instancia actual |
+| `delete-repeat-last-icon` | Icono de papelera circular, elimina la última instancia |
+
+### Personalización de colores
+
+El formato de color es idéntico a `add_repeat`: use `<#RRGGBB/>` o `RRGGBB-RRGGBB` (fondo-texto).
+
+### Ejemplo de patrón completo
+
+La siguiente repetición utiliza `1screen`, un botón circular de eliminar-actual en la parte superior y un botón de añadir de ancho completo en la parte inferior:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Miembro | `1screen` |
+| note | btn_del | Eliminar | `delete-repeat-current-icon` |
+| text | member_name | Nombre del miembro | |
+| integer | member_age | Edad | |
+| note | btn_add | + Añadir miembro | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## Mejores Prácticas
+
+1. Utilice siempre `repeat_count` cuando se conozca de antemano el número de repeticiones; esto evita que los encuestadores añadan o eliminen instancias accidentalmente.
 2. Mantenga los grupos de repetición enfocados; una repetición con más de 20 preguntas por instancia es difícil de navegar.
-3. Nombre los grupos de repetición de forma clara (p. ej., `household_members`, no `repeat1`); el nombre aparece en las llamadas de función y los datos exportados.
-4. Pruebe con el número máximo esperado de instancias para verificar el rendimiento.
-5. Use la apariencia `field-list` en el grupo de repetición para mostrar todos los campos en una pantalla por instancia (móvil).
+3. Nombre los grupos de repetición con claridad (por ejemplo, `household_members`, no `repeat1`); el nombre aparece en las llamadas a funciones y en los datos exportados.
+4. Realice pruebas con el número máximo esperado de instancias para verificar el rendimiento.
+5. Utilice `1screen` en `begin_repeat` para mostrar todas las preguntas en una pantalla por instancia, junto con un campo de nota `add_repeat` dentro del grupo para ofrecer a los encuestadores un botón "Añadir" claramente etiquetado.
 
 ---
 
 ## Limitaciones
 
-- `indexed-repeat()` requiere un índice válido (1 al conteo de instancias); los índices fuera de rango devuelven vacío.
-- Las repeticiones anidadas más allá de 2 niveles no se recomiendan y pueden causar problemas de visualización en algunos clientes.
-- Las funciones de agregado (`sum`, `count`, etc.) operan sobre todo el grupo de repetición; no puede agregar un subconjunto de instancias sin las variantes `*-if`.
+- `indexed-repeat()` requiere un índice válido (de 1 al recuento de instancias); los índices fuera de rango devuelven un valor vacío.
+- No se recomiendan las repeticiones anidadas más allá de 2 niveles y pueden causar problemas de visualización en algunos clientes.
+- Las funciones de agregación (`sum`, `count`, etc.) operan en todo el grupo de repetición; no se puede agregar un subconjunto de instancias sin las variantes `*-if`.

@@ -1,100 +1,128 @@
 ---
-title: "الحساب"
-description: ""
+title: "calculate"
+description: "يقوم نوع السؤال 'calculate' بإجراء حسابات في الخلفية في XLSForm، مع تخزين القيم المشتقة دون عرض أي مدخلات للمجمع."
 ---
 
-تُستخدم أسئلة calculate في XLSForms وrtSurvey لإجراء العمليات الحسابية بناءً على حقول أو قيم أخرى في نموذجك. لا تُعرض هذه الأسئلة للمستخدم بل تعمل في الخلفية، وتخزن نتائجها للاستخدام اللاحق أو الإرسال.
+import { Callout } from 'nextra/components'
 
-## الصياغة
+يقوم نوع السؤال `calculate` بتشغيل صيغة بصمت في الخلفية. ويقوم بتخزين النتيجة في حقل مسمى يمكن للأسئلة الأخرى الرجوع إليه - ولكنه لا يعرض أي مدخلات أو تسمية للمجمع. استخدمه لاشتقاق القيم، أو دمج السلاسل، أو تشغيل المنطق الشرطي، أو البحث عن البيانات التي ستحتاجها لاحقًا في النموذج.
 
-في XLSForm، يُعرَّف سؤال calculate كالتالي:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## البنية الأساسية
 
-- **type**: دائماً "calculate" لهذا النوع من الأسئلة.
-- **name**: اسم فريد لسؤال calculate.
-- **label**: يُترك فارغاً عادةً لأن أسئلة calculate لا تُعرض للمستخدمين.
-- **calculation**: الصيغة المراد تقييمها.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## الاستخدامات
+- **type**: دائمًا `calculate`.
+- **name**: اسم حقل فريد. تشير الأسئلة الأخرى إلى هذا باستخدام `${name}`.
+- **label**: اتركه فارغًا - لا يتم عرض حقول calculate أبدًا للمجمع.
+- **calculation**: الصيغة المطلوب تقييمها. يدعم جميع [وظائف XLSForm](../operators-and-functions/functions) ومراجع الحقول.
 
-تُستخدم أسئلة calculate شائعاً لـ:
+---
 
-1. إجراء العمليات الحسابية
-2. دمج السلاسل النصية
-3. تطبيق المنطق المعقد أو الدوال
-4. تخزين النتائج الوسيطة للاستخدام اللاحق
+## الأنماط الشائعة
 
-## أمثلة
+### الحساب
 
-### العمليات الحسابية الأساسية
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### دمج السلاسل
 
-### دمج السلاسل النصية
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### القيمة الشرطية
 
-### استخدام الدوال
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### العمر من تاريخ الميلاد
 
-## الاستخدام المتقدم في rtSurvey
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### دالة pulldata()
+---
 
-يدعم rtSurvey دالة `pulldata()` في حقول calculate، مما يتيح استرداد البيانات من ملفات CSV خارجية:
+## استخدام `once()` لقفل القيمة
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+بشكل افتراضي، يعيد `calculate` التقييم كلما تغير أي حقل مشار إليه. قم بلف الصيغة بـ `once()` للتقييم عند التحميل الأول فقط وتجميد النتيجة:
 
-#### الصياغة
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-الصياغة الأساسية لـ pulldata() هي:
+استخدم `once()` للطوابع الزمنية، أو القيم الأولية، أو أي حالة يكون فيها إعادة الحساب عند التغيير غير مرغوب فيها.
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+---
 
-- 'csv_filename': اسم ملف CSV (بدون امتداد .csv)
-- 'column_to_return': اسم العمود الذي يحتوي على البيانات المراد سحبها
-- 'key_column': اسم العمود للمطابقة
-- `${matching_value}`: القيمة للبحث عنها في عمود المفتاح
+## سحب البيانات من مصادر خارجية
 
-### الحسابات الشرطية
-
-يمكنك استخدام عبارات if() للحسابات الشرطية:
+### من ملف CSV
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
+
+راجع [pulldata()](../operators-and-functions/pulldata) للحصول على المرجع الكامل.
+
+### من قاعدة بيانات SQLite المضمنة
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+راجع [البحث في قاعدة البيانات المحلية](../advanced-features/local-database-search) للحصول على تفاصيل إنشاء المسار.
+
+### من سياق التطبيق
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+راجع [App API](../app-api) لجميع المفاتيح المتاحة.
+
+---
+
+## استخدام calculate في relevant و constraint
+
+يمكن للحقول الأخرى الرجوع إلى نتيجة `calculate` مثل أي حقل:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
 
 ## أفضل الممارسات
 
-1. استخدم أسماء ذات معنى لحقول calculate لتحسين قابلية قراءة النموذج.
-2. تجنب الحسابات المعقدة جداً في حقل واحد؛ قسّمها إذا لزم الأمر.
-3. اختبر حساباتك بشكل شامل، خاصةً عند استخدام صيغ معقدة أو بيانات خارجية.
+1. امنح حقول calculate أسماء ذات معنى - `total_cost` أوضح من `calc1` وأسهل في التتبع في عمليات التصدير.
+2. قم بتقسيم الصيغ المعقدة إلى حقول calculate متعددة متسلسلة بدلاً من تعبير واحد متداخل بعمق.
+3. استخدم `once()` للطوابع الزمنية واللقطات الأولية لمنع القيم من التغير بعد الالتقاط الأول.
+4. ضع حقول `calculate` قبل السؤال الأول الذي يشير إليها - يتبع ترتيب التقييم ترتيب النموذج.
+5. اترك عمود `label` فارغًا. تعرض بعض الأدوات التسمية؛ تركه فارغًا يتجنب المخرجات المربكة.
 
 ## القيود
 
-- حقول calculate غير قابلة للتعديل مباشرةً من قِبَل المستخدمين.
-- نتيجة حقل calculate غير مرئية فوراً ما لم تتم الإشارة إليها في حقل عرض أو تُستخدم في منطق النموذج.
+- لا يتم عرض حقول Calculate أبدًا مباشرة للمجمع - استخدم حقل `note` لعرض النتيجة.
+- عمود `calculation` مطلوب؛ يقوم صف `calculate` بدون صيغة دائمًا بتخزين سلسلة فارغة.
+- تتم إعادة تقييم النتائج عند كل تغيير في النموذج ما لم يتم لفها بـ `once()` - يمكن أن تؤثر الصيغ المعقدة للغاية في النماذج الكبيرة على أداء العرض على الأجهزة منخفضة المواصفات.
+- يتم تخزين القيم المحسوبة كسلاسل في الإرسال. استخدم `number()` أو `int()` أو `boolean()` للتحويل عند تمرير النتيجة إلى تعبيرات حسابية أو منطقية.

@@ -1,0 +1,118 @@
+---
+title: "Audio ierakstīšana"
+description: "Ierakstiet apkārtējo vai intervijas audio aptaujas datu vākšanas laikā, izmantojot audio-start un audio-end izskatus teksta laukos."
+---
+
+Audio ierakstīšana ļauj formā klusi vai redzami fiksēt audio aptaujas sadaļas laikā. Tas ir noderīgi, lai ierakstītu intervijas, apkārtējo skaņu lauka novērojumu laikā vai mutiskas atbildes, kas papildina strukturētās atbildes.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Tikai mobilajai lietotnei.** Audio ierakstīšanai nepieciešama rtSurvey mobilā lietotne. Tīmekļa formā `audio-start` un `audio-end` izskati (appearances) tiek klusi ignorēti — ierakstīšana nenotiek un kļūda netiek rādīta. Vienmēr testējiet ierīcē, kad nepieciešama audio ierakstīšana.
+</Callout>
+
+---
+
+## Kā tas darbojas
+
+Audio ierakstīšanu kontrolē divi `text` lauki, kas darbojas kā **marķieri**:
+
+- Lauks ar izskatu `audio-start` sāk ierakstīšanu, kad intervētājs to sasniedz.
+- Lauks ar izskatu `audio-end` aptur ierakstīšanu un saglabā audio failu iesniegumā.
+
+Abi marķieru lauki ir `text` tipa. Parasti tie ir paslēpti no intervētāja (izmantojot `relevant = false` vai novietoti neinteraktīvā pozīcijā), lai gan tie var būt arī redzami. Ierakstītais audio tiek pievienots iesniegumam kā fails, kas saistīts ar `audio-end` lauku.
+
+---
+
+## Pamata piemērs
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Respondenta vārds | |
+| text | q_occupation | Nodarbošanās | |
+| integer | q_age | Vecums | |
+| text | audio_e_a1 | | `audio-end` |
+
+Lietotne sāk ierakstīšanu, kad intervētājs sasniedz `audio_s_a1`, un apstājas, kad viņš sasniedz `audio_e_a1`. Visi jautājumi starp abiem marķieriem tiek ierakstīti.
+
+---
+
+## Klusā ierakstīšana: `audio-start invisible`
+
+Pēc noklusējuma mobilā lietotne rāda ierakstīšanas indikatoru, kamēr tiek fiksēts audio. Pievienojot `invisible` pie izskata (appearance), šis indikators tiek paslēpts, tāpēc ierakstīšana notiek bez jebkādām redzamām norādēm respondentam.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Vai piekrītat piedalīties? | |
+| text | q_feedback | Jūsu atsauksmes | |
+| text | audio_e_a1 | | `audio-end` |
+
+Izmantojiet `invisible` tikai tad, ja informēšanas prasības ir izpildītas ar citiem līdzekļiem (piemēram, atsevišķu rakstiskas piekrišanas lauku pirms ierakstīšanas sadaļas).
+
+---
+
+## Nosaukumu piešķiršanas konvencija
+
+Ražošanas formās marķieru laukiem tiek izmantots konsekvents nosaukumu modelis:
+
+```
+audio_s_{section}{n}   — sākuma marķieris
+audio_e_{section}{n}   — beigu marķieris
+```
+
+Kur `{section}` ir īsa formas sadaļas etiķete un `{n}` ir kārtas numurs šajā sadaļā.
+
+| Lauka nosaukums | Loma | Nozīme |
+|------------|------|---------|
+| `audio_s_a1` | Sākums | Pirmais ieraksts A sadaļā |
+| `audio_e_a1` | Beigas | Pirmā ieraksta beigas A sadaļā |
+| `audio_s_b1` | Sākums | Pirmais ieraksts B sadaļā |
+| `audio_e_b1` | Beigas | Pirmā ieraksta beigas B sadaļā |
+| `audio_s_a2` | Sākums | Otrais ieraksts A sadaļā |
+| `audio_e_a2` | Beigas | Otrā ieraksta beigas A sadaļā |
+
+Ievērojot šo konvenciju, ir viegli identificēt ierakstīšanas robežas, pārskatot formu definīcijas un iesniegtos datus.
+
+---
+
+## Uzglabāšana un izgūšana
+
+Kad intervētājs sasniedz `audio-end` lauku, lietotne pabeidz audio failu un pievieno to iesniegumam. Fails tiek:
+
+- Uzglabāts kā audio pielikums iesniegumam, kas saistīts ar `audio-end` lauka nosaukumu.
+- Pieejams rtSurvey iesniegumu skatītājā kopā ar citiem mediju pielikumiem.
+- Lejupielādējams, izmantojot standarta iesniegumu eksportu — audio faili parādās mediju kolonnā, kas atbilst `audio-end` lauka nosaukumam.
+
+Faila formāts un bitu pārraides ātrums ir atkarīgs no ierīces un lietotnes versijas.
+
+---
+
+## Vairākas ierakstīšanas sadaļas
+
+Forma var saturēt vairākas nepārklājošās ierakstīšanas sadaļas. Katram `audio-start` / `audio-end` marķieru pārim jābūt pilnībā noslēgtam — sadaļas nedrīkst pārklāties.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Ievads | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Detaļas | |
+| text | audio_e_b1 | | `audio-end` |
+
+Katra sadaļa izveido atsevišķu audio failu, kas pievienots attiecīgajam `audio-end` laukam.
+
+---
+
+## Ierobežojumi
+
+- **Tikai mobilajai lietotnei.** Funkcija netiek atbalstīta tīmekļa formā. `audio-start` un `audio-end` pārlūkprogrammā tiek klusi ignorēti.
+- **Nav ligzdošanas.** Ierakstīšanas sadaļas nevar pārklāties. Jauna ieraksta sākšana pirms iepriekšējā `audio-end` marķiera sasniegšanas netiek atbalstīta.
+- **Lauka tipam jābūt `text`.** `audio-start` vai `audio-end` izmantošana jebkuram citam jautājuma tipam netiek atbalstīta.
+- **Augšupielādes izmērs.** Gari ieraksti rada lielus failus. Esiet informēti par iesniegumu izmēra ierobežojumiem un tīkla apstākļiem laukā.
+- **Ierakstīšanas laikā nav pauzes.** Ierakstīšana notiek nepārtraukti no sākuma marķiera līdz beigu marķierim; sadaļas ietvaros nav mehānisma, lai apturētu un atsāktu ierakstīšanu.

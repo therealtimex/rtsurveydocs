@@ -1,0 +1,102 @@
+---
+title: "Data Settings"
+description: "dataSetting.csv configures remote databases the app downloads at form load time and stores as local SQLite files, queryable offline via rawquery."
+---
+
+import { Callout } from 'nextra/components'
+
+`dataSetting.csv` configures remote databases that the app downloads automatically when a form opens. Each row describes one remote file: where to download it from, where to store it locally, and how often to refresh it. Once downloaded the file is a standard local SQLite database queryable with `rawquery` — the same as any bundled CSV database.
+
+---
+
+## How to include
+
+Upload the file as family media with the exact filename `dataSetting.csv`. The app converts it to `dataSetting.db` on the device and processes each row every time the form is opened.
+
+---
+
+## Column reference
+
+| column | required | description |
+|--------|----------|-------------|
+| `filepath` | yes | Local path where the downloaded file is stored. Root is the app internal folder. Must be unique per form. Supports `##key##` substitution from form opening arguments — on substitution failure the key is replaced with an empty string. |
+| `service_url` | yes | Direct download URL that returns a SQLite `.db` file or a `.zip` containing one. Use a `./` prefix to refer to the current server (`./api/download/...`). Does **not** support `##openArgs.key##` — openArgs keys are **not** substituted here. |
+| `option` | yes | `overwrite` — replace the local file with a fresh download each time. (`append` is deprecated — do not use.) |
+| `frequency` | yes | Minimum seconds between re-downloads. The app re-downloads when the elapsed time since the last download exceeds this value. |
+| `primary_key` | no | Primary key column. Only relevant for the deprecated `append` mode. Leave empty for `overwrite`. |
+| `where` | no | SQL-style filter appended to `service_url` as a `where` GET parameter. Supports `##key##` from openArgs and App API keys. If any key substitution fails the entire `where` parameter is dropped from the request. |
+| `dynamic_part` | no | Additional GET parameters appended after `where`. Supports `##key##`. Overrides duplicate keys that appear in `service_url` or `where`. Dropped entirely if any substitution fails. |
+
+---
+
+## Downloaded file requirements
+
+- The download must be a SQLite `.db` file, or a `.zip` containing a `.db` plus optional binary attachments.
+- The SQLite file must have exactly **one table named `externalData`**.
+- Two system-reserved columns exist in every downloaded table:
+  - `max_order` — update recency indicator (higher = newer record)
+  - `marked_as_deleted` — soft-delete flag. Always filter these out in your queries: `WHERE marked_as_deleted != 1`
+
+---
+
+## `##key##` substitution
+
+The `##key##` pattern is replaced at runtime with values from the form's opening arguments (`openArgs`) or App API keys.
+
+| column | supports openArgs | supports App API | on substitution failure |
+|--------|------------------|-----------------|-------------------------|
+| `filepath` | yes | yes | replaced with empty string |
+| `service_url` | **no** | yes | n/a |
+| `where` | yes | yes | entire `where` param dropped |
+| `dynamic_part` | yes | yes | entire `dynamic_part` dropped |
+
+<Callout type="warning">
+`service_url` does not support openArgs substitution. If you need to parameterise the URL by opening argument, use the `where` or `dynamic_part` columns instead.
+</Callout>
+
+---
+
+## `where` vs `dynamic_part`
+
+Both columns append GET parameters to `service_url`:
+
+- `where` is appended first. If `service_url` already contains a `where` parameter, the two values are joined with ` AND `.
+- `dynamic_part` is appended after `where`. It overrides any duplicate parameter keys already present in `service_url` or `where`.
+
+---
+
+## Example
+
+```csv
+filepath,service_url,option,frequency,primary_key,where,dynamic_part
+resources/familyMedia/FORM_A/staff.db,./api/dm/getData?token=tk&dm_name=staff_list,overwrite,3600,,`department`='##department##',
+resources/familyMedia/FORM_A/facilities.db,./api/download/facilities,overwrite,86400,,,
+```
+
+- `staff.db` — downloads a staff list filtered by the `department` argument passed when opening the form; refreshes every hour.
+- `facilities.db` — downloads the full facility reference with no filter; refreshes once a day.
+
+---
+
+## Querying after download
+
+After download, reference the file with `rawquery` exactly like a bundled database:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/staff.db::externalData'),
+  '[name]', 'id',
+  'SELECT name, id FROM externalData WHERE marked_as_deleted != 1')
+```
+
+The file path is constructed with `family_path` just like any other bundled file. See [family_path](family-path) and [Local Database Search](local-database-search) for full details.
+
+---
+
+## When to use `dataSetting.csv` vs other approaches
+
+| Situation | Recommended approach |
+|-----------|---------------------|
+| Data is static, finalized at form design time | Bundled CSV or `.db` in family media |
+| Data changes periodically (daily / weekly), offline access needed | `dataSetting.csv` |
+| Data changes in real-time, online access acceptable | `search-api()` |

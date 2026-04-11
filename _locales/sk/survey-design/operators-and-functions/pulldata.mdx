@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "Funkcia pulldata() načítava hodnotu z externého súboru CSV priloženého k formuláru, pričom priraďuje stĺpec kľúča k hodnote kľúča a vracia zodpovedajúci výsledný stĺpec."
+---
+
+import { Callout } from 'nextra/components'
+
+Funkcia `pulldata()` načítava hodnotu zo súboru CSV priloženého k formuláru. Na základe názvu súboru, stĺpca, ktorý sa má vrátiť, stĺpca na priradenie a hodnoty kľúča vráti bunku na priesečníku zodpovedajúceho riadka a výsledného stĺpca.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Pozícia | Parameter | Popis |
+|---------|-----------|-------|
+| 1 | Názov súboru | Názov mediálneho súboru CSV (rovnaký názov použitý v `select_one_from_file`) |
+| 2 | Výsledný stĺpec | Stĺpec, ktorého hodnotu chcete vrátiť |
+| 3 | Stĺpec kľúča | Stĺpec, voči ktorému sa má vykonať priradenie |
+| 4 | Hodnota kľúča | Hodnota na priradenie — zvyčajne odkaz na pole ako `${field}` |
+
+Funkcia vráti prázdny reťazec, ak sa nenájde žiadna zhoda.
+
+---
+
+## Požiadavky
+
+Súbor CSV musí byť k formuláru priložený ako **mediálny súbor**. Ten istý súbor, na ktorý odkazuje `pulldata()`, možno použiť aj ako zoznam možností pre `select_one_from_file`.
+
+**Príklad CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Základný príklad
+
+Vyhľadanie oddelenia a telefónu zamestnanca podľa jeho ID:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Vyberte zamestnanca | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Department: `${dept}` — Phone: `${phone}` | |
+
+<Callout type="info">
+Stĺpec `name` v CSV pre `select_one_from_file` je uložená hodnota. Keď anketár vyberie „Alice“, `${staff_id}` obsahuje hodnotu `"Alice"`, ktorú `pulldata()` použije ako kľúč na načítanie jej oddelenia a telefónu.
+</Callout>
+
+---
+
+## Získanie štítka (label) vybranej možnosti
+
+Otázka typu `select_one_from_file` ukladá hodnotu `name`. Na zobrazenie čitateľného štítka `label` použite `pulldata()` na jeho vyhľadanie:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Vyberte dedinu | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | You selected: `${village_label}` | |
+
+---
+
+## Viacnásobné vyhľadávanie z jedného výberu
+
+Funkciu `pulldata()` môžete volať viackrát pre ten istý súbor, aby ste načítali rôzne stĺpce pre ten istý vybraný riadok:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Vyberte zariadenie | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## Používanie pulldata v relevant a constraint
+
+`pulldata()` možno použiť v stĺpcoch `relevant` a `constraint` na aplikovanie logiky založenej na vyhľadaných hodnotách:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Vyberte zariadenie | | |
+| integer | bed_count | Number of beds occupied | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## Používanie pulldata s `once()`
+
+Ak chcete vyhodnotiť `pulldata()` iba pri prvom načítaní (čím zabránite opätovnému vyhodnoteniu pri zmene kľúčového poľa po počiatočnom zadaní), zabaľte ho do `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Osvedčené postupy
+
+1. Stĺpec kľúča v CSV sa musí zhodovať so stĺpcom `name` použitým v `select_one_from_file` — musia mať rovnakú hodnotu.
+2. Názvy stĺpcov v CSV rozlišujú malé a veľké písmená — `Department` a `department` sú rôzne stĺpce.
+3. Ak sa hodnota kľúča nenájde, `pulldata()` vráti prázdny reťazec — použite `if(${field} != '', pulldata(...), '')` na ochranu pred prázdnymi výbermi.
+4. Ak je to možné, udržiavajte súbory CSV malé — veľké súbory predlžujú čas načítania formulára pri pripojení s nízkou šírkou pásma.
+5. Pri údajoch, ktoré sa menia medzi kolami zberu údajov, aktualizujte mediálny súbor CSV nahraním novej verzie formulára.
+
+## Obmedzenia
+
+- `pulldata()` priraďuje iba **prvý** riadok, v ktorom sa stĺpec kľúča rovná hodnote kľúča — duplicitné hodnoty kľúča v CSV nie sú podporované.
+- Súbor CSV musí byť k formuláru priložený pred nasadením; počas prevádzky ho nemožno načítať z adresy URL.
+- Číselné hodnoty vrátené funkciou `pulldata()` sú reťazce — pri použití v aritmetike ich zabaľte do `number()`: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey podporuje aj rozšírené formy `pulldata()` na čítanie metadát zariadenia, polí JWT a údajov JSON. Pozrite si [App API](../app-api) pre `pulldata('app-api', ...)` a stránku [Call API](../advanced-features/call-api) pre vzory vyhľadávania založené na JSON.
+</Callout>
+
+---
+
+## Rozšírené varianty pulldata()
+
+Okrem vyhľadávania v CSV podporuje `pulldata()` niekoľko ďalších zdrojov údajov zmenou prvého argumentu.
+
+### `pulldata('app-api', key)`
+
+Čítanie metadát zariadenia, atribútov používateľa a kontextu aplikácie. Úplnú referenciu nájdete na stránke [App API](../app-api).
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Analýza vloženého reťazca JSON a extrakcia hodnoty pomocou výrazu JSONPath. Užitočné, keď máte literál JSON vložený vo formulári.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Vráti zhodnú hodnotu ako reťazec alebo prázdny reťazec, ak sa nenájde.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Extrakcia hodnoty z reťazca JSON uloženého v inom poli pomocou výrazu JSONPath. Je to ekvivalent `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Dekódovanie tokenu JWT uloženého v poli a vrátenie hodnoty konkrétneho nároku (claim) z payloadu.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Vráti prázdny reťazec, ak je token neplatný alebo nárok nie je prítomný.
+
+### `pulldata('instanceid')`
+
+Vráti jedinečné ID inštancie (instance ID) aktuálneho odoslania. Ekvivalent meta poľa `instanceID`.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Mapovanie hodnoty na inú pomocou pomenovanej mapovacej tabuľky definovanej v konfigurácii formulára.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Vráti namapovanú hodnotu alebo prázdny reťazec, ak sa žiadne mapovanie nezhoduje.
+
+### `pulldata('options', optionName)`
+
+Čítanie možnosti konfigurácie formulára podľa názvu.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Vykonanie SQL `SELECT` nad priloženým súborom SQLite `.db` a vrátenie hodnoty z prvého stĺpca prvého zodpovedajúceho riadka. Parametre za reťazcom SQL sa nahrádzajú v poradí za zástupné znaky `?`.
+
+| Pozícia | Parameter | Popis |
+|---------|-----------|-------|
+| 1 | `'rawquery'` | Literálny reťazec identifikujúci tento variant |
+| 2 | path | Cesta k súboru vo formáte `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | Príkaz `SELECT` používajúci `?` ako pozičné zástupné znaky |
+| 4+ | params | Hodnoty nahrádzané za každý znak `?` v poradí — zvyčajne odkazy na polia ako `${field}` |
+
+Vráti prázdny reťazec, ak sa nezhoduje žiadny riadok.
+
+**Príklad — vyhľadanie názvu provincie podľa ID:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Príklad — vyhľadanie názvu obvodu (ward) filtrovaného podľa kódov provincie aj okresu:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Na rozdiel od štandardného štvorargumentového `pulldata()`, ktoré priraďuje jeden stĺpec kľúča v súbore CSV, variant `rawquery` vykonáva úplný SQL `SELECT` nad databázou SQLite, čo umožňuje podmienky `WHERE` pre viacero stĺpcov a ľubovoľný stĺpec ako návratovú hodnotu.
+
+<Callout type="info">
+`rawquery` sa bežne používa s poľami automatického dopĺňania na hierarchické vyhľadávanie lokalít. Podrobnosti o vytváraní súborov `.db` a ich prepojení na `pulldata('rawquery', ...)` nájdete v časti [Local Database Search](../advanced-features/local-database-search).
+</Callout>

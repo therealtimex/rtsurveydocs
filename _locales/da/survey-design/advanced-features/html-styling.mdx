@@ -1,14 +1,14 @@
 ---
-title: "HTML-styling"
-description: "rtSurvey understøtter HTML-tags i labels og hints, hvilket muliggør formatering af rig tekst, links og dynamisk farvetemaer."
+title: "HTML Styling"
+description: "rtSurvey understøtter HTML-tags i etiketter og tip, hvilket giver mulighed for rig tekstformatering, links og dynamisk farvetema."
 ---
 
 import { Callout } from 'nextra/components'
 
-rtSurvey gengiver **label**- og **hint**-tekst som HTML på webformularer. Det betyder, at du kan bruge standard HTML-tags til at formatere tekst, tilføje linjeskift, oprette links og anvende farver. Dette er særligt nyttigt til note-felter, sektionsinstruktioner og dynamiske opsummeringer.
+rtSurvey renderer **etiket (label)** og **tip (hint)** tekst som HTML på webformularer. Dette betyder, at du kan bruge standard HTML-tags til at formatere tekst, tilføje linjeskift, oprette links og anvende farver. Dette er især nyttigt til feltnoter, sektionsinstruktioner og dynamiske opsummeringer.
 
 <Callout type="warning">
-HTML i labels gengives på **webformularen** og rtSurvey-mobilapps. Det gengives muligvis ikke i alle ODK-kompatible klienter. Test altid på din målplatform.
+HTML i etiketter renderes på **webformularen** og rtSurvey-mobilapps. Det renderes muligvis ikke i alle ODK-kompatible klienter. Test altid på din målplatform.
 </Callout>
 
 ---
@@ -18,124 +18,194 @@ HTML i labels gengives på **webformularen** og rtSurvey-mobilapps. Det gengives
 ### Tekstformatering
 
 | Tag | Resultat |
-|-----|---------|
-| `<strong>tekst</strong>` eller `<b>tekst</b>` | **Fed tekst** |
-| `<em>tekst</em>` eller `<i>tekst</i>` | *Kursiv tekst* |
-| `<u>tekst</u>` | Understreget tekst |
+|-----|--------|
+| `<strong>text</strong>` eller `<b>text</b>` | **Fed tekst** |
+| `<em>text</em>` eller `<i>text</i>` | *Kursiv tekst* |
+| `<u>text</u>` | Understreget tekst |
 | `<br>` | Linjeskift |
-| `<span style="...">tekst</span>` | Inline-styling |
+| `<span style="...">text</span>` | Inline styling |
 
 ### Links
 
 ```html
-<a href="https://example.com" target="_blank">Klik her</a>
+<a href="https://example.com" target="_blank">Click here</a>
 ```
 
-Åbnes i en ny fane. Brug til referencedokumenter, retningslinjer eller eksterne ressourcer, som intervieweren bør konsultere.
+Åbner i en ny fane. Bruges til referencedokumenter, retningslinjer eller eksterne ressourcer, som intervieweren skal konsultere.
 
 ### Farver
 
-Brug `<span>` med inline-styles:
+Brug `<span>` med inline-typografier:
 
 ```html
-<span style="color: red;">Advarsel: værdien er uden for intervallet</span>
-<span style="color: #009688;">Sektionen er gennemført</span>
+<span style="color: red;">Warning: value is out of range</span>
+<span style="color: #009688;">Section completed</span>
 ```
 
 ---
 
-## Farvemetavariabler
+## Variabler for farvetema
 
-rtSurvey understøtter **farvemetavariable**, der tilpasser sig appens konfigurerede tema. Brug syntaksen `__FARVE_TEMA_NAVN__`:
+rtSurvey understøtter **farvetema-tokens**, der tilpasser sig appens konfigurerede tema. Brug `__COLOR_THEME_NAME__`-syntaksen:
 
 ```html
-<span style="color: var(--color-theme-primary);">Primær farvetekst</span>
+<span style="color: var(--color-theme-primary);">Primary color text</span>
 ```
 
-Eller ved brug af token-forkortelsen i labelteksten:
+Eller brug token-genvejen i etiket-teksten:
 
 ```
-<font color="var(--COLOR_THEME_PRIMARY)">Vigtig note</font>
+<font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
 ```
 
-Dette konverteres automatisk til den tilsvarende `<span>` med en CSS-variabel ved gengivelsestidspunktet.
+Dette konverteres automatisk til den tilsvarende `<span>` med en CSS-variabel på renderingstidspunktet.
 
 ---
 
-## Flersprogede labels
+## Flersprogede etiketter
 
-Omslut indhold i sprogtags for at understøtte flere sprog i én labelcelle:
+Indpak indhold i sprogtags for at understøtte flere sprog i en enkelt etiket-celle:
 
 ```
 <en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
 ```
 
-rtSurvey udtrækker indholdet, der matcher det aktuelle appsprog. Hvis intet matchende sprogtag findes, vises den fulde streng som den er.
+rtSurvey udtrækker det indhold, der matcher det aktuelle app-sprog. Hvis der ikke findes et matchende sprogtag, vises den fulde streng, som den er.
 
 ---
 
-## Eksempler i note-felter
+## Eksempler i notefelter
 
-### Sektionsinstruktion med fed skrift og linjeskift
+### Sektionsinstruktion med fed skrift og et linjeskift
 
 | type | name | label |
 |------|------|-------|
-| note | section_intro | `<strong>Sektion 3: Arealanvendelse</strong><br>Stil alle spørgsmål i denne sektion kun til husstandsoverhoveder.` |
+| note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
 
-### Dynamisk opsummering med beregnede referencer
+### Dynamisk opsummering med beregningsreference
 
 | type | name | label |
 |------|------|-------|
 | calculate | total | | `${adults} + ${children}` |
-| note | summary | `Samlede husholdningsmedlemmer: <strong>${total}</strong><br><span style="color: gray;">Voksne: ${adults} · Børn: ${children}</span>` |
+| note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
 
 ### Advarsel i rødt
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| note | age_warning | `<span style="color: red;"><strong>Advarsel:</strong> Indtastet alder (${age}) er usædvanligt høj. Venligst verificer.</span>` | `${age} > 100` |
+| note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
 
 ### Link til et referencedokument
 
 | type | name | label |
 |------|------|-------|
-| note | guidelines_link | `Se <a href="https://docs.example.com/guidelines" target="_blank">Feltretningslinjerne</a>, inden du starter denne sektion.` |
+| note | guidelines_link | `Refer to the <a href="https://docs.example.com/guidelines" target="_blank">Field Guidelines</a> before starting this section.` |
 
 ---
 
 ## Specielle rtSurvey HTML-tags
 
-### `<webbox src='url' title='titel'>...</webbox>`
+### `<webbox src='url' title='title'>...</webbox>`
 
-Indlejrer en knap, der åbner en URL i en modal-dialog inden for formularen. Se [Webbox](webbox) for fulde detaljer.
+Indlejrer en knap, der åbner en URL i en modal i formularen. Se [Webbox](webbox) for alle detaljer.
 
 ### `<delete-repeat-current>label</delete-repeat-current>`
 
-Gengiver en knap inde i en gentagelsesgruppe, der sletter den aktuelle gentagelsesinstans, når der trykkes på den.
+Renderer en knap inde i en gentagelsesgruppe, der sletter den aktuelle gentagelsesforekomst, når der trykkes på den.
 
 ### `<delete-repeat-last>label</delete-repeat-last>`
 
-Gengiver en knap, der sletter den sidste gentagelsesinstans.
+Renderer en knap, der sletter den sidste gentagelsesforekomst.
 
 Eksempel på brug i en gentagelsesgruppe:
 
 | type | name | label |
 |------|------|-------|
-| note | delete_btn | `<delete-repeat-current>Fjern dette medlem</delete-repeat-current>` |
+| note | delete_btn | `<delete-repeat-current>Remove this member</delete-repeat-current>` |
+
+---
+
+## Dynamiske HTML-opsummeringer med autopull()
+
+`autopull()` renderer en blok af HTML inde i et `note`-felt og **genberegner det ved hver feltændring** i formularen. Dette gør det velegnet til live opsummeringspaneler, skærmbilleder til gennemgang før indsendelse og løbende totaler, der opdateres, efterhånden som intervieweren udfylder data.
+
+<Callout type="info">
+`autopull()` virker kun på **note**-felter. Etiket-kolonnen ignoreres — alt HTML-indhold skal leveres via **appearance**-kolonnen ved hjælp af `concat()`.
+</Callout>
+
+### Syntaks
+
+Placer `autopull()` i **appearance**-kolonnen for et `note`-felt:
+
+```
+autopull(concat('<html>...</html>'))
+```
+
+Feltreferencer (`${field_name}`) inde i `concat()` erstattes med de aktuelle live-værdier, og HTML'en renderes igen ved hver ændring.
+
+### Begrænsning af højde med scroll-view()
+
+For længere opsummeringer kan du kombinere `autopull()` med `scroll-view(N%)` for at begrænse panelets højde og gøre det rullebart:
+
+```
+scroll-view(45%) autopull(concat('<html>...</html>'))
+```
+
+`N%`-værdien er i forhold til det synlige formularområde. `45%` er en praktisk standard for et opsummeringspanel midt på siden.
+
+### Fuldt eksempel — opsummering af husstandens placering
+
+Følgende `note`-felt renderer en tabel med to kolonner, der viser den valgte provins, distrikt og kommune. Den opdateres automatisk, hver gang `${tinh_name}`, `${huyen_name}` eller `${xa_name}` ændres.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | location_summary | | `scroll-view(45%) autopull(concat('<html><table style="width:100%;border-collapse:collapse"><tr><td style="padding:4px;font-weight:bold">Province:</td><td style="padding:4px">', ${tinh_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">District:</td><td style="padding:4px">', ${huyen_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Commune:</td><td style="padding:4px">', ${xa_name}, '</td></tr></table></html>'))` |
+
+I XLSForm skrives appearance-værdien i en enkelt celle:
+
+```
+scroll-view(45%) autopull(concat(
+  '<html><table style="width:100%;border-collapse:collapse">
+   <tr><td style="padding:4px;font-weight:bold">Province:</td>
+       <td style="padding:4px">', ${tinh_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">District:</td>
+       <td style="padding:4px">', ${huyen_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Commune:</td>
+       <td style="padding:4px">', ${xa_name}, '</td></tr>
+   </table></html>'))
+```
+
+### Inline-typografier
+
+Inline `style="..."`-attributter på ethvert HTML-element understøttes og er den anbefalede måde at anvende visuel formatering inde i `autopull()`-blokke.
+
+Følgende understøttes **ikke** i `autopull()`-indhold:
+
+- `<style>`-blokke
+- Eksterne stylesheet `<link>`-tags
+- JavaScript (`<script>`)
+
+### Hvornår skal man bruge autopull()
+
+| Brugsscenarie | Noter |
+|----------|-------|
+| Skærmbillede til gennemgang før indsendelse | Vis alle vigtige svar på ét panel, før intervieweren afslutter |
+| Løbende totaler | Vis en beregnet sum, der opdateres, efterhånden som mængder indtastes |
+| Synligt referencepanel | Vis en valgt opslagsværdi (f.eks. provinsnavn), mens intervieweren udfylder underfelter |
 
 ---
 
 ## Bedste praksis
 
-1. Brug HTML sparsomt — overformaterede labels er sværere at læse, ikke lettere.
-2. Foretrække `<strong>` til fed skrift og `<em>` til kursiv frem for de forældede `<b>` og `<i>`.
-3. Hold farvebrugen meningsfuld — brug rødt til advarsler, ikke til dekoration.
-4. Test altid HTML-gengivelse på både mobilapp og webformular, da gengivelsen kan afvige en smule.
-5. Undgå `<table>`-tags inde i labels — de gengives sjældent godt på mobilskærme.
-6. Brug ikke JavaScript (`<script>`) — det fjernes eller forårsager fejl.
+1. Brug HTML med måde — overformaterede etiketter er sværere at læse, ikke lettere.
+2. Foretræk `<strong>` til fed og `<em>` til kursiv frem for forældede `<b>` og `<i>`.
+3. Hold farvebrugen meningsfuld — brug rød til advarsler, ikke til dekoration.
+4. Test altid HTML-rendering på både mobilapp og webformular, da renderingen kan variere en smule.
+5. Undgå `<table>`-tags inde i etiketter — de renderes sjældent godt på mobilskærme.
+6. Brug ikke JavaScript (`<script>`) — det vil blive fjernet eller forårsage fejl.
 
 ## Begrænsninger
 
-- Kompleks HTML (tabeller, formularer, scripts) understøttes ikke og kan ødelægge gengivelsen.
-- Nogle ældre mobilklienter kan vise HTML-tags som bogstavelig tekst — test på alle målenheder.
-- `<a>`-links åbnes i en browser eller WebView — intervieweren forlader formularen, hvilket kan være forstyrrende på mobil.
+- Kompleks HTML (tabeller, formularer, scripts) understøttes ikke og kan ødelægge renderingen.
+- Nogle ældre mobilklienter viser muligvis HTML-tags som bogstavelig tekst — test på alle målenheder.
+- `<a>`-links åbnes i en browser eller WebView — intervieweren forlader formularen, hvilket kan være forstyrrende på mobilen.

@@ -1,0 +1,224 @@
+---
+title: "Kërkimi në bazën e të dhënave lokale"
+description: "Kërkimi në bazën e të dhënave lokale bën pyetje në një skedar SQLite .db të bashkëngjitur duke përdorur SQL të papërpunuar, duke mundësuar plotësimin automatik të shpejtë offline për grupe të mëdha të dhënash statike."
+---
+
+import { Callout } from 'nextra/components'
+
+**Kërkimi në bazën e të dhënave lokale** lejon një fushë `select_one` ose `text` të bëjë pyetje në një skedar SQLite `.db` që është i bashkëngjitur me paketën e mediave të formularit — plotësisht offline, pa pasur nevojë për komunikim me serverin. Kjo është qasja e duhur kur lista juaj e zgjedhjeve është e madhe dhe statike (p.sh., një listë kombëtare e fshatrave, objekteve shëndetësore ose kufijve administrativë) dhe lidhja nuk mund të garantohet.
+
+| Qasja | Burimi i të dhënave | Kërkon lidhje |
+|---|---|---|
+| Kërkimi në bazën e të dhënave lokale (`rawquery`) | Skedar i bashkëngjitur `.db` (SQLite) | Jo |
+| `search-api()` | REST API në distancë | Po |
+| `search()` | Skedar i bashkëngjitur CSV | Jo |
+
+---
+
+## Variantet e pamjes (Appearance)
+
+Fusha e plotësimit automatik konfigurohet përmes kolonës `appearance`. Janë të disponueshëm tre variante:
+
+| Varianti | Shënime |
+|---|---|
+| `search-autocomplete-noedit(...)` | Plotësimi automatik standard — anketuesi duhet të zgjedhë nga lista; hyrja e tekstit të lirë nuk ruhet |
+| `search-autocomplete-noedit-v2(...)` | Varianti i rekomanduar — i njëjti sjellje, por përdor një motor renderimi të përditësuar me performancë më të mirë në grupe të mëdha rezultatesh |
+| `search(...)` | Përputhje e thjeshtë e bazuar në skedar me një CSV të bashkëngjitur; **nuk** mbështet SQL të papërpunuar — renditur këtu vetëm për krahasim |
+
+<Callout type="info">
+`search-autocomplete-noedit` është një alias — në kohën e analizimit, aplikacioni e zëvendëson atë me emrin e funksionit të brendshëm `searchAutocompleteNoedit`. Përdorni secilin drejtshkrim në XLSForm-in tuaj; të dy funksionojnë.
+</Callout>
+
+---
+
+## Burimi i të dhënave `rawquery`
+
+Për të ekzekutuar një pyetje SQL ndaj një skedari `.db`, kaloni `'rawquery'` si argumentin e parë të funksionit të pamjes. Nënshkrimi i plotë është:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parametrat
+
+| Pozicioni | Parametri | Përshkrimi |
+|---|---|---|
+| 1 | `'rawquery'` | Vargu i mirëfilltë — i thotë aplikacionit të ekzekutojë SQL-në drejtpërdrejt |
+| 2 | `db_path` | Shtegu i skedarit SQLite, në formën `<dir>/<file>.db::tableName`. Prapashtesa `::tableName` hiqet kur hapet skedari; emri i tabelës përdoret brenda SQL-së tuaj |
+| 3 | `'[display_col]'` | Kolona që do të shfaqet në listën rënëse. Kllapat rrethuese `[ ]` hiqen gjatë kohës së ekzekutimit |
+| 4 | `'value_col'` | Kolona, vlera e së cilës ruhet kur anketuesi bën një përzgjedhje |
+| 5 | `'SELECT ...'` | Çdo deklaratë e vlefshme SELECT në SQLite. `SELECT DISTINCT` injektohet automatikisht nëse `DISTINCT` nuk është tashmë i pranishëm |
+| 6+ | `param1, ...` | Opsionale. Vlerat e lidhura me vendmbajtësit `?` në SQL, sipas radhës. Nëse SQL-ja përmban `?` por nuk jepen parametra, fusha kthehet bosh (një mbrojtje e integruar kundër argumenteve që mungojnë) |
+
+### Konventa `db_path`
+
+Skedari i bazës së të dhënave ndodhet brenda direktorisë së mediave të bashkëngjitura të formularit. Gjatë kohës së ekzekutimit, `pulldata('app-api', 'family_path')` kthen atë shteg direktorie. Shihni [family_path](family-path) për detajet e konfigurimit. Modeli standard është:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Kur aplikacioni hap skedarin, ai heq pjesën `::tableName` dhe përdor shtegun e thjeshtë të skedarit. Emri i tabelës shfaqet vetëm brenda SQL-së tuaj.
+
+---
+
+## Shembull bazë — kërkimi i provincës
+
+Një listë rënëse e provincave vetëm për lexim e mbështetur nga një skedar i bashkëngjitur `vnxa3.db`:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Provinca | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+Kolona `appearance` (e zgjeruar për lehtësi leximi):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Etiketa e shfaqur vjen nga kolona `provv`.
+- Vlera e ruajtur vjen nga kolona `provid`.
+- Shfaqen vetëm rreshtat ku `rta_filter = "1"`.
+
+---
+
+## Pyetje të parametrizuara
+
+Përdorni vendmbajtësit `?` në SQL-në tuaj dhe kaloni referencat përkatëse të fushave si argumente shtesë (nga pozicioni 6 e tutje). Ky është modeli standard për përzgjedhjet kaskadë — p.sh., ngarkimi i rretheve që i përkasin provincës së përzgjedhur më parë.
+
+<Callout type="warning">
+Nëse SQL-ja juaj përmban të paktën një `?` dhe nuk jepen argumente parametrash, fusha kthen një grup rezultatesh bosh. Kjo parandalon shfaqjen e të dhënave të vjetruara ose jashtë fushëveprimit përpara se të bëhet një përzgjedhje prind.
+</Callout>
+
+### Shembull i kaskadës së rrethit
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+Vlera e `${province}` është e lidhur me `?` e parë. Fusha është bosh derisa anketuesi të zgjedhë një provincë.
+
+### Shembull me dy parametra — kaskada e komunës
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parametrat janë të lidhur sipas pozicionit: `${province}` → `?` e parë, `${district}` → `?` e dytë.
+
+---
+
+## UNION SELECT për vlera speciale
+
+Injektoni rreshta sintetikë — si "Nuk e di" ose "Refuzoj të përgjigjem" — drejtpërdrejt në SQL duke përdorur `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Nuk e di</i>", "888"')
+```
+
+Konventat e përdorura në formularët e RTSurvey:
+
+| Kodi | Kuptimi |
+|---|---|
+| `888` | Nuk e di |
+| `999` | Refuzoj të përgjigjem |
+
+Tag-et HTML si `<i>` në vargun e shfaqjes renditen nga aplikacioni — mund t'i përdorni për të dalluar vizualisht opsionet speciale.
+
+---
+
+## Shfaqja në shumë gjuhë
+
+Ruani etiketat specifike për gjuhën në kolona të veçanta (p.sh., `label_vi`, `label_en`) dhe zgjidhni atë të duhurën bazuar në një fushë gjuhe në formularin tuaj:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Për të ndërruar kolonat dinamikisht bazuar në një fushë `${language}`, përdorni një shprehje `if()` në parametrin e kolonës së shfaqjes për të kaluar midis kolonave të gjuhës:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Parametri i kolonës së shfaqjes vlerësohet përpara se të ekzekutohet pyetja. Vetëm emri i kolonës (pa kllapa) i kalohet motorit SQL; kllapat janë marka kozmetike që hiqen në kohën e analizimit.
+</Callout>
+
+---
+
+## Validimi i një përzgjedhjeje reale
+
+Kur fusha lejon vlera speciale si 888 ose 999, një kontroll i thjeshtë `required = yes` është i pamjaftueshëm — ai plotësohet edhe nëse anketuesi zgjedh "Nuk e di". Përdorni kufizimin `selected-at(., 0) != -997` për të vërtetuar që vlera e ruajtur është një përzgjedhje e vërtetë dhe jo roja e brendshme "asgjë nuk është përzgjedhur" `-997`:
+
+| kolona | vlera |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Ju lutem zgjidhni një opsion të vlefshëm |
+
+Vlera `-997` është kodi i brendshëm që RTSurvey ruan kur asnjë artikull nuk është përzgjedhur nga lista e plotësimit automatik. Një përzgjedhje prej 888 ose 999 është ende një zgjedhje e qëllimshme dhe e kalon këtë kontroll.
+
+Për të kërkuar gjithashtu një vlerë reale (jo speciale), zgjeroni kufizimin:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Krahasimi: baza e të dhënave lokale kundrejt metodave të tjera të kërkimit
+
+| Veçoria | Plotësimi automatik `rawquery` | `search-api()` | `search()` CSV | Zgjedhjet e thjeshta CSV |
+|---|---|---|---|---|
+| Burimi i të dhënave | `.db` i bashkëngjitur (SQLite) | REST API në distancë | CSV e bashkëngjitur | Fleta Choices |
+| Punon offline | Po | Jo | Po | Po |
+| Mbështet SQL të papërpunuar | Po | Jo | Jo | Jo |
+| Filtrat kaskadë | Po — `?` i parametrizuar | Përmes trupit të kërkesës | I kufizuar | Jo |
+| Madhësia e grupit të të dhënave | Shumë e madhe (miliona rreshta) | E pakufizuar (nga ana e serverit) | Mesatare (dhjetëra mijëra) | E vogël |
+| Rreshta të injektuar speciale | Po — `UNION SELECT` | Jo | Jo | Po (manual) |
+| Kompleksiteti i konfigurimit | Mesatar — kërkon `.db` të bashkëngjitur | I lartë — kërkon server API | I ulët | Asnjë |
+
+---
+
+## Kufizimet
+
+- Skedari `.db` duhet të bashkëngjitet brenda paketës së mediave të formularit përpara vendosjes. Përditësimet dinamike në bazën e të dhënave kërkojnë një vendosje të re të formularit.
+- SQL-ja ekzekutohet siç është në pajisje. Nuk ka asnjë pastrim (sanitization) nga ana e serverit — shmangni ndërtimin e SQL-së nga hyrja e tekstit të lirë të anketuesit.
+- Mbështeten vetëm deklaratat `SELECT`. `INSERT`, `UPDATE` dhe `DELETE` nuk lejohen.
+- Pyetjet shumë komplekse (zinxhirë të mëdhenj `UNION`, bashkime të shumta) mund të jenë të ngadalta në pajisjet Android të nivelit të ulët.
+- Variantet `search-autocomplete-noedit` nuk lejojnë anketuesin të ruajë një vlerë që nuk është në grupin e rezultateve. Nëse kërkohet hyrja e tekstit të lirë, përdorni një fushë të veçantë `text`.
+- `SELECT DISTINCT` injektohet automatikisht vetëm kur `DISTINCT` mungon në pyetje. Nëse shkruani `SELECT DISTINCT` në mënyrë të qartë, ai nuk do të dyfishohet.

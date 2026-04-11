@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "Hàm pulldata() truy xuất một giá trị từ tệp CSV bên ngoài được đính kèm vào biểu mẫu, khớp cột khóa với giá trị khóa và trả về cột kết quả tương ứng."
+---
+
+import { Callout } from 'nextra/components'
+
+Hàm `pulldata()` truy xuất một giá trị từ tệp CSV được đính kèm vào biểu mẫu. Khi cung cấp tên tệp, cột cần trả về, cột cần khớp và giá trị khóa, hàm sẽ trả về ô tại giao điểm của hàng khớp và cột kết quả.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Vị trí | Tham số | Mô tả |
+|----------|-----------|-------------|
+| 1 | Tên tệp | Tên của tệp phương tiện CSV (cùng tên được sử dụng trong `select_one_from_file`) |
+| 2 | Cột kết quả | Cột có giá trị mà bạn muốn trả về |
+| 3 | Cột khóa | Cột dùng để so khớp |
+| 4 | Giá trị khóa | Giá trị cần khớp — thường là một tham chiếu trường như `${field}` |
+
+Hàm trả về một chuỗi trống nếu không tìm thấy kết quả khớp nào.
+
+---
+
+## Điều kiện tiên quyết
+
+Tệp CSV phải được đính kèm vào biểu mẫu dưới dạng **tệp phương tiện** (media file). Cùng một tệp được `pulldata()` tham chiếu cũng có thể được sử dụng làm danh sách lựa chọn cho `select_one_from_file`.
+
+**Ví dụ CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Ví dụ cơ bản
+
+Tra cứu phòng ban và số điện thoại của nhân viên từ ID của họ:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Select staff member | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Department: `${dept}` — Phone: `${phone}` | |
+
+<Callout type="info">
+Cột `name` trong tệp CSV `select_one_from_file` là giá trị được lưu trữ. Khi điều tra viên chọn "Alice", `${staff_id}` sẽ giữ giá trị `"Alice"`, giá trị này được `pulldata()` sử dụng làm khóa để truy xuất phòng ban và số điện thoại của cô ấy.
+</Callout>
+
+---
+
+## Truy xuất nhãn của một lựa chọn đã chọn
+
+Câu hỏi `select_one_from_file` lưu trữ giá trị `name`. Để hiển thị nhãn `label` mà con người có thể đọc được, hãy sử dụng `pulldata()` để tra cứu:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Select village | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | You selected: `${village_label}` | |
+
+---
+
+## Nhiều tra cứu từ một lựa chọn
+
+Bạn có thể gọi `pulldata()` nhiều lần trên cùng một tệp để truy xuất các cột khác nhau cho cùng một hàng đã chọn:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Select facility | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## Sử dụng pulldata trong relevant và constraint
+
+`pulldata()` có thể được sử dụng trong các cột `relevant` và `constraint` để áp dụng logic dựa trên các giá trị được tra cứu:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Select facility | | |
+| integer | bed_count | Number of beds occupied | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## Sử dụng pulldata với `once()`
+
+Để tính toán `pulldata()` chỉ trong lần tải đầu tiên (ngăn việc tính toán lại khi trường khóa thay đổi sau lần nhập ban đầu), hãy bao bọc nó trong `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Thực hành tốt nhất
+
+1. Cột khóa trong tệp CSV phải khớp với cột `name` được sử dụng trong `select_one_from_file` — chúng phải là cùng một giá trị.
+2. Tên cột trong tệp CSV có phân biệt chữ hoa chữ thường — `Department` và `department` là hai cột khác nhau.
+3. Nếu không tìm thấy giá trị khóa, `pulldata()` trả về một chuỗi trống — hãy sử dụng `if(${field} != '', pulldata(...), '')` để bảo vệ chống lại các lựa chọn trống.
+4. Giữ cho tệp CSV nhỏ nhất có thể — tệp lớn làm tăng thời gian tải biểu mẫu trên các kết nối băng thông thấp.
+5. Đối với dữ liệu thay đổi giữa các đợt thu thập dữ liệu, hãy cập nhật tệp phương tiện CSV bằng cách tải lên phiên bản biểu mẫu mới.
+
+## Hạn chế
+
+- `pulldata()` chỉ khớp với hàng **đầu tiên** có cột khóa bằng giá trị khóa — các giá trị khóa trùng lặp trong tệp CSV không được hỗ trợ.
+- Tệp CSV phải được đính kèm vào biểu mẫu trước khi triển khai; không thể lấy tệp từ một URL tại thời điểm chạy.
+- Các giá trị số được trả về bởi `pulldata()` là các chuỗi — hãy bao bọc trong `number()` khi sử dụng trong các phép tính số học: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey cũng hỗ trợ các dạng mở rộng của `pulldata()` để đọc siêu dữ liệu thiết bị, các trường JWT và dữ liệu JSON. Xem [App API](../app-api) cho `pulldata('app-api', ...)` và trang [Call API](../advanced-features/call-api) cho các mẫu tra cứu dựa trên JSON.
+</Callout>
+
+---
+
+## Các biến thể pulldata() mở rộng
+
+Ngoài tra cứu CSV, `pulldata()` hỗ trợ một số nguồn dữ liệu bổ sung bằng cách thay đổi đối số đầu tiên.
+
+### `pulldata('app-api', key)`
+
+Đọc siêu dữ liệu thiết bị, thuộc tính người dùng và ngữ cảnh ứng dụng. Xem tham chiếu đầy đủ trên trang [App API](../app-api).
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Phân tích cú pháp một chuỗi JSON nội dòng và trích xuất một giá trị bằng biểu thức JSONPath. Hữu ích khi bạn có một giá trị JSON được nhúng trong biểu mẫu.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Trả về giá trị khớp dưới dạng chuỗi hoặc chuỗi trống nếu không tìm thấy.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Trích xuất một giá trị từ chuỗi JSON được lưu trữ trong một trường khác bằng biểu thức JSONPath. Điều này tương đương với `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Giải mã mã thông báo JWT được lưu trữ trong một trường và trả về giá trị của một xác nhận (claim) cụ thể từ tải trọng (payload).
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Trả về chuỗi trống nếu mã thông báo không hợp lệ hoặc xác nhận không tồn tại.
+
+### `pulldata('instanceid')`
+
+Trả về ID phiên bản (instance ID) duy nhất của lần gửi hiện tại. Tương đương với trường meta `instanceID`.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Ánh xạ một giá trị sang một giá trị khác bằng cách sử dụng bảng ánh xạ có tên được định nghĩa trong cấu hình biểu mẫu.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Trả về giá trị được ánh xạ hoặc chuỗi trống nếu không có ánh xạ nào khớp.
+
+### `pulldata('options', optionName)`
+
+Đọc một tùy chọn cấu hình biểu mẫu theo tên.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Thực thi một câu lệnh SQL `SELECT` đối với tệp SQLite `.db` đi kèm và trả về giá trị từ cột đầu tiên của hàng khớp đầu tiên. Các tham số sau chuỗi SQL được thay thế theo thứ tự cho các trình giữ chỗ `?`.
+
+| Vị trí | Tham số | Mô tả |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | Chuỗi ký tự định danh biến thể này |
+| 2 | path | Đường dẫn tệp ở định dạng `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | Câu lệnh `SELECT` sử dụng `?` làm trình giữ chỗ theo vị trí |
+| 4+ | tham số | Các giá trị được thay thế cho mỗi `?` theo thứ tự — thường là các tham chiếu trường như `${field}` |
+
+Trả về một chuỗi trống nếu không có hàng nào khớp.
+
+**Ví dụ — tra cứu tên tỉnh theo ID:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Ví dụ — tra cứu tên phường được lọc bởi cả mã tỉnh và mã huyện:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Khác với hàm `pulldata()` bốn đối số tiêu chuẩn so khớp một cột khóa duy nhất trong tệp CSV, biến thể `rawquery` thực thi một câu lệnh SQL `SELECT` đầy đủ đối với cơ sở dữ liệu SQLite, cho phép các điều kiện `WHERE` nhiều cột và bất kỳ cột nào làm giá trị trả về.
+
+<Callout type="info">
+`rawquery` thường được sử dụng với các trường tự động hoàn thành (autocomplete) để tra cứu vị trí theo thứ bậc. Xem [Tìm kiếm cơ sở dữ liệu cục bộ](../advanced-features/local-database-search) để biết chi tiết về cách xây dựng tệp `.db` và kết nối chúng với `pulldata('rawquery', ...)`.
+</Callout>

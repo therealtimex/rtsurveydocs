@@ -1,0 +1,82 @@
+---
+title: "Form Settings"
+description: "formSetting.csv is a per-form configuration file uploaded as family media that overrides the global collect settings for that form only."
+---
+
+import { Callout } from 'nextra/components'
+
+`formSetting.csv` lets you override the global RTSurvey collect configuration on a per-form basis. Settings defined here apply only to that form and take precedence over the global settings for every form entry session.
+
+---
+
+## File format
+
+`formSetting.csv` is a CSV file with **6 columns**:
+
+| column | description |
+|--------|-------------|
+| `type` | Value type: `boolean` (1 / 0) or `text` |
+| `name` | Setting key — must match an entry in the reference table below |
+| `value` | The override value |
+| `disable` | `yes` — setting is locked and not editable in the app UI; `no` — user can still change it in the app |
+| `note` | Short label shown in the app settings UI next to the control |
+| `description` | Longer description for documentation purposes; not displayed to end-users |
+
+Only include rows for settings you want to override. Rows you omit are inherited from the global collect configuration.
+
+---
+
+## How to include
+
+Upload the file as family media with the exact filename `formSetting.csv`. The app reads it at the start of every form entry session and applies the overrides before the form loads.
+
+---
+
+## Settings reference
+
+| name | type | default | description |
+|------|------|---------|-------------|
+| `change_language` | boolean | 1 | Show language switcher in the form |
+| `save_mid` | boolean | 0 | Allow save-incomplete (exit mid-form and resume later) |
+| `jump_to` | boolean | 0 | Show a table of contents / prompt list the enumerator can jump to |
+| `autosend_wifi` | boolean | 1 | Auto-submit finalized instances when connected over WiFi |
+| `autosend_network` | boolean | 1 | Auto-submit finalized instances over any network connection |
+| `hide_incomplete_button` | boolean | 0 | Hide the "save incomplete and exit" button on the end-of-form screen |
+| `show_welcome_screen` | boolean | 1 | Show the welcome screen when the form opens |
+| `show_final_screen` | boolean | 1 | Show the final confirmation screen when the form ends |
+| `show_required_asterisk` | boolean | 1 | Show a red asterisk on required questions |
+| `navigation` | text | `swipe_one` | Navigation mode: `swipe_one` (one-page swipe) or `swipe_two` (two-page swipe) |
+| `buttons` | boolean | 1 | Show previous/next navigation buttons |
+| `navigation_swipe_up_down_left_right` | boolean | 1 | Show 4-directional navigation buttons |
+| `font_size` | text | 21 | Font size in points |
+| `disable_screen_off` | boolean | 1 | Prevent the device screen from turning off during form entry |
+| `disable_fullscreen` | boolean | 0 | Disable fullscreen mode |
+| `access_settings` | boolean | 0 | Show a settings access menu item in the form |
+| `validate_form` | boolean | 1 | Validate form constraints when the user saves incomplete |
+| `long_press_remove_answer` | boolean | 1 | Allow long-press on a field to clear its answer |
+| `long_press_remove_repeat` | boolean | 0 | Allow long-press on a repeat instance to delete it |
+| `change_fontsize` | boolean | 0 | Show font-size adjustment menu item |
+| `disable_screen_navigation` | text | -1 | Disable navigation buttons: `-1` = off (no restriction), `0` = disable Previous, `1` = disable Next, `2` = disable both |
+| `disable_swipe` | text | -1 | Disable swipe gestures: `-1` = off, `0` = disable swipe-back, `1` = disable swipe-forward, `2` = disable both |
+
+---
+
+## Example
+
+```csv
+type,name,value,disable,note,description
+boolean,autosend_wifi,1,yes,,Auto send over WiFi
+boolean,save_mid,0,yes,,No mid-form save allowed
+text,font_size,18,no,,Slightly smaller font
+boolean,show_welcome_screen,0,yes,,Skip welcome screen
+```
+
+<Callout type="info">
+The `note` and `description` columns are optional and can be left empty. They do not affect behavior — `note` is shown as a short label in the app settings UI, and `description` is for documentation only.
+</Callout>
+
+---
+
+## `disable` vs global settings
+
+The `disable` column controls editability in the app's settings screen — it does not affect whether the setting is applied. A setting with `disable: yes` is applied and cannot be changed by the enumerator. A setting with `disable: no` is applied as the default but the enumerator can still override it for that session.

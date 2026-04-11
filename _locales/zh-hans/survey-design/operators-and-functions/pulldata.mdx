@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "pulldata() 函数从附加到表单的外部 CSV 文件中检索值，将键列与键值匹配并返回对应的结果列。"
+---
+
+import { Callout } from 'nextra/components'
+
+`pulldata()` 函数从附加到表单的 CSV 文件中检索值。给定文件名、要返回的列、要匹配的列和键值，它将返回匹配行与结果列交叉处的单元格。
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| 位置 | 参数 | 描述 |
+|----------|-----------|-------------|
+| 1 | 文件名 | CSV 媒体文件的名称（与 `select_one_from_file` 中使用的名称相同） |
+| 2 | 结果列 | 您想要返回其值的列 |
+| 3 | 键列 | 用于匹配的列 |
+| 4 | 键值 | 要匹配的值 —— 通常是字段引用，例如 `${field}` |
+
+如果未找到匹配项，该函数将返回一个空字符串。
+
+---
+
+## 先决条件
+
+CSV 文件必须作为**媒体文件**附加到表单中。`pulldata()` 引用的同一个文件也可以用作 `select_one_from_file` 的选项列表。
+
+**示例 CSV —— `staff.csv`：**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## 基本示例
+
+根据员工 ID 查询其部门和电话：
+
+**survey：**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Select staff member | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Department: `${dept}` — Phone: `${phone}` | |
+
+<Callout type="info">
+`select_one_from_file` CSV 中的 `name` 列是存储的值。当调查员选择 "Alice" 时，`${staff_id}` 的值为 `"Alice"`，`pulldata()` 将其用作键来检索她的部门和电话。
+</Callout>
+
+---
+
+## 检索所选选项的标签
+
+`select_one_from_file` 问题存储的是 `name` 值。要显示人类可读的 `label`（标签），请使用 `pulldata()` 进行查询：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Select village | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | You selected: `${village_label}` | |
+
+---
+
+## 从一个选择中进行多次查询
+
+您可以对同一个文件多次调用 `pulldata()`，以为同一个选定行检索不同的列：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Select facility | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## 在 relevant 和 constraint 中使用 pulldata
+
+`pulldata()` 可用于 `relevant`（相关性）和 `constraint`（约束）列，以根据查询到的值应用逻辑：
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Select facility | | |
+| integer | bed_count | Number of beds occupied | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## 将 pulldata 与 `once()` 配合使用
+
+要在仅在首次加载时评估 `pulldata()`（防止在初始输入后键字段更改时重新评估），请将其包装在 `once()` 中：
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## 最佳实践
+
+1. CSV 中的键列必须与 `select_one_from_file` 中使用的 `name` 列匹配 —— 它们必须是相同的值。
+2. CSV 中的列名区分大小写 —— `Department` 和 `department` 是不同的列。
+3. 如果未找到键值，`pulldata()` 返回空字符串 —— 使用 `if(${field} != '', pulldata(...), '')` 来防止空选择。
+4. 尽可能保持 CSV 文件较小 —— 大文件会增加低带宽连接下的表单加载时间。
+5. 对于在数据收集轮次之间发生变化的数据，通过上传新的表单版本来更新 CSV 媒体文件。
+
+## 限制
+
+- `pulldata()` 仅匹配键列等于键值的**第一行** —— 不支持 CSV 中存在重复的键值。
+- CSV 文件必须在部署前附加到表单；无法在运行时从 URL 获取。
+- `pulldata()` 返回的数值是字符串 —— 在算术运算中使用时请包装在 `number()` 中：`number(pulldata(...))`。
+
+<Callout type="info">
+rtSurvey 还支持扩展形式的 `pulldata()`，用于读取设备元数据、JWT 字段和 JSON 数据。请参阅 [App API](../app-api) 了解 `pulldata('app-api', ...)`，以及 [Call API](../advanced-features/call-api) 页面了解基于 JSON 的查询模式。
+</Callout>
+
+---
+
+## 扩展的 pulldata() 变体
+
+除了 CSV 查询外，`pulldata()` 还通过更改第一个参数来支持多种额外的数据源。
+
+### `pulldata('app-api', key)`
+
+读取设备元数据、用户属性和应用上下文。请参阅 [App API](../app-api) 页面上的完整参考。
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+解析内联 JSON 字符串并使用 JSONPath 表达式提取值。当您在表单中嵌入了 JSON 字面量时非常有用。
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+以字符串形式返回匹配的值，如果未找到则返回空字符串。
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+使用 JSONPath 表达式从存储在另一个字段中的 JSON 字符串中提取值。这相当于 `substr-jsonpath(${field}, jsonpath)`。
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+解码存储在字段中的 JWT 令牌，并从有效载荷（payload）中返回特定声明（claim）的值。
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+如果令牌无效或声明不存在，则返回空字符串。
+
+### `pulldata('instanceid')`
+
+返回当前提交的唯一实例 ID。相当于 `instanceID` 元字段。
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+使用表单配置中定义的命名映射表将一个值映射到另一个值。
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+返回映射后的值，如果没有匹配的映射则返回空字符串。
+
+### `pulldata('options', optionName)`
+
+按名称读取表单配置选项。
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+针对捆绑的 SQLite `.db` 文件执行 SQL `SELECT`，并返回第一个匹配行第一列的值。SQL 字符串后的参数按顺序替换 `?` 占位符。
+
+| 位置 | 参数 | 描述 |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | 标识此变体的字面量字符串 |
+| 2 | path | `concat(${family_path}, '/file.db::tableName')` 格式的文件路径 |
+| 3 | SQL | 使用 `?` 作为位置占位符的 `SELECT` 语句 |
+| 4+ | params | 按顺序为每个 `?` 替换的值 —— 通常是字段引用，例如 `${field}` |
+
+如果没有任何行匹配，则返回空字符串。
+
+**示例 —— 根据 ID 查询省份名称：**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**示例 —— 查询根据省份和地区代码过滤的乡镇名称：**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+与匹配 CSV 文件中单个键列的标准四参数 `pulldata()` 不同，`rawquery` 变体针对 SQLite 数据库执行完整的 SQL `SELECT`，允许进行多列 `WHERE` 条件，并可以使用任何列作为返回值。
+
+<Callout type="info">
+`rawquery` 通常与自动完成字段配合使用，进行分层级的位置查询。有关构建 `.db` 文件并将其连接到 `pulldata('rawquery', ...)` 的详细信息，请参阅 [本地数据库搜索](../advanced-features/local-database-search)。
+</Callout>

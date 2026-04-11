@@ -1,0 +1,118 @@
+---
+title: "Lydopptak"
+description: "Ta opp lyd fra omgivelsene eller intervjuer under innsamling av undersøkelsesdata ved hjelp av audio-start og audio-end utseende på tekstfelt."
+---
+
+Lydopptak lar et skjema fange opp lyd stille eller synlig under en del av en undersøkelse. Det er nyttig for å ta opp intervjuer, bakgrunnsstøy under feltobservasjoner, eller muntlige svar som utfyller strukturerte svar.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Kun mobilapp.** Lydopptak krever rtSurvey-mobilappen. I webskjemaet blir `audio-start` og `audio-end` utseende (appearances) ignorert – ingen opptak finner sted og ingen feilmelding vises. Test alltid på enheten når lydopptak er påkrevd.
+</Callout>
+
+---
+
+## Hvordan det fungerer
+
+Lydopptak styres av to `text`-felt som fungerer som **markører**:
+
+- Et felt med utseende `audio-start` starter opptaket når intervjueren når det.
+- Et felt med utseende `audio-end` stopper opptaket og lagrer lydfilen til innsendingen.
+
+Begge markørfeltene er av typen `text`. De er vanligvis skjult for intervjueren (ved å bruke `relevant = false` eller plassert i en ikke-interaktiv posisjon), selv om de kan være synlige. Det opptatte lydopptaket er vedlagt innsendingen som en fil knyttet til `audio-end`-feltet.
+
+---
+
+## Grunnleggende eksempel
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Respondentens navn | |
+| text | q_occupation | Yrke | |
+| integer | q_age | Alder | |
+| text | audio_e_a1 | | `audio-end` |
+
+Appen starter opptaket når intervjueren når `audio_s_a1` og stopper når de når `audio_e_a1`. Alle spørsmål mellom de to markørene blir tatt opp.
+
+---
+
+## Stille opptak: `audio-start invisible`
+
+Som standard viser mobilappen en opptaksindikator mens lyd fanges opp. Ved å legge til `invisible` i utseendet fjernes denne indikatoren, slik at opptaket skjer uten noen synlige tegn for respondenten.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Samtykker du til å delta? | |
+| text | q_feedback | Din tilbakemelding | |
+| text | audio_e_a1 | | `audio-end` |
+
+Bruk `invisible` kun når krav til opplysning er oppfylt på andre måter (f.eks. et separat skriftlig samtykkefelt før opptaksdelen).
+
+---
+
+## Navnekonvensjon
+
+Produksjonsskjemaer bruker et konsekvent navnemønster for markørfelt:
+
+```
+audio_s_{section}{n}   — startmarkør
+audio_e_{section}{n}   — sluttmarkør
+```
+
+Hvor `{section}` er en kort etikett for skjemadelen og `{n}` er et sekvensielt nummer innenfor den delen.
+
+| Feltnavn | Rolle | Betydning |
+|------------|------|---------|
+| `audio_s_a1` | Start | Første opptak i seksjon A |
+| `audio_e_a1` | Slutt | Slutt på første opptak i seksjon A |
+| `audio_s_b1` | Start | Første opptak i seksjon B |
+| `audio_e_b1` | Slutt | Slutt på første opptak i seksjon B |
+| `audio_s_a2` | Start | Andre opptak i seksjon A |
+| `audio_e_a2` | Slutt | Slutt på andre opptak i seksjon A |
+
+Ved å følge denne konvensjonen er det enkelt å identifisere opptaksgrenser når du går gjennom skjemadefinisjoner og innsendte data.
+
+---
+
+## Lagring og henting
+
+Når intervjueren når `audio-end`-feltet, ferdigstiller appen lydfilen og legger den ved innsendingen. Filen blir:
+
+- Lagret som et lydvedlegg til innsendingen, knyttet til `audio-end`-feltnavnet.
+- Tilgjengelig i rtSurvey back-end innsendingsvisning sammen med andre medievedlegg.
+- Nedlastbar via standard eksport av innsendinger – lydfiler vises i mediekolonnen som tilsvarer `audio-end`-feltnavnet.
+
+Filformat og bithastighet avhenger av enheten og appversjonen.
+
+---
+
+## Flere opptaksdeler
+
+Et skjema kan inneholde flere opptaksdeler som ikke overlapper. Hvert par med `audio-start` / `audio-end`-markører må være fullstendig inneholdt – seksjoner må ikke flettes inn i hverandre.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Introduksjon | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Detaljer | |
+| text | audio_e_b1 | | `audio-end` |
+
+Hver del produserer en separat lydfil vedlagt det respektive `audio-end`-feltet.
+
+---
+
+## Begrensninger
+
+- **Kun mobilapp.** Funksjonen støttes ikke i webskjemaer. `audio-start` og `audio-end` blir stille ignorert i en nettleser.
+- **Ingen nøsting.** Opptaksdeler kan ikke overlappe. Det støttes ikke å starte et nytt opptak før den forrige `audio-end`-markøren er nådd.
+- **Felttype må være `text`.** Bruk av `audio-start` eller `audio-end` på andre spørsmålstyper støttes ikke.
+- **Opplastingsstørrelse.** Lange opptak gir store filer. Vær oppmerksom på størrelsesbegrensninger for innsending og nettverksforhold i feltet.
+- **Ingen pause under opptak.** Opptaket kjører kontinuerlig fra startmarkøren til sluttmarkøren; det finnes ingen mekanisme for å pause og gjenoppta innenfor en seksjon.

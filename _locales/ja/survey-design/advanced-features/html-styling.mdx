@@ -1,141 +1,211 @@
 ---
-title: "HTML Styling"
-description: "rtSurveyはラベルとヒントでHTMLタグをサポートし、リッチテキスト書式設定、リンク、および動的カラーテーマを可能にします。"
+title: "HTMLスタイリング"
+description: "rtSurveyはラベルとヒントでのHTMLタグをサポートしており、リッチテキスト形式、リンク、動的なカラーテーマ設定が可能です。"
 ---
 
 import { Callout } from 'nextra/components'
 
-rtSurveyはWebフォームで**label**と**hint**テキストをHTMLとしてレンダリングします。つまり、標準のHTMLタグを使用してテキストを書式設定したり、改行を追加したり、リンクを作成したり、色を適用したりできます。これはnoteフィールド、セクション指示、および動的サマリーに特に便利です。
+rtSurveyは、ウェブフォーム上で**ラベル (label)**と**ヒント (hint)**のテキストをHTMLとしてレンダリングします。つまり、標準的なHTMLタグを使用して、テキストの書式設定、改行の追加、リンクの作成、色の適用が可能です。これは特に、ノートフィールド、セクションの指示、動的なサマリーに役立ちます。
 
 <Callout type="warning">
-ラベルのHTMLは**Webフォーム**とrtSurveyモバイルアプリでレンダリングされます。すべてのODK互換クライアントでレンダリングされない場合があります。常にターゲットプラットフォームでテストしてください。
+ラベル内のHTMLは、**ウェブフォーム**およびrtSurveyモバイルアプリでレンダリングされます。すべてのODK互換クライアントでレンダリングされるとは限りません。必ずターゲットプラットフォームでテストしてください。
 </Callout>
 
 ---
 
-## サポートされるHTMLタグ
+## サポートされているHTMLタグ
 
-### テキスト書式設定
+### テキストの書式設定
 
 | タグ | 結果 |
 |-----|--------|
-| `<strong>text</strong>`または`<b>text</b>` | **太字テキスト** |
-| `<em>text</em>`または`<i>text</i>` | *斜体テキスト* |
+| `<strong>text</strong>` または `<b>text</b>` | **太字テキスト** |
+| `<em>text</em>` または `<i>text</i>` | *斜体テキスト* |
 | `<u>text</u>` | 下線付きテキスト |
 | `<br>` | 改行 |
-| `<span style="...">text</span>` | インラインスタイル |
+| `<span style="...">text</span>` | インラインスタイリング |
 
 ### リンク
 
 ```html
-<a href="https://example.com" target="_blank">ここをクリック</a>
+<a href="https://example.com" target="_blank">Click here</a>
 ```
 
 新しいタブで開きます。調査員が参照すべき参考文書、ガイドライン、または外部リソースに使用します。
 
 ### 色
 
-インラインスタイルを使った`<span>`を使用します：
+インラインスタイルで `<span>` を使用します：
 
 ```html
-<span style="color: red;">警告：値が範囲外です</span>
-<span style="color: #009688;">セクション完了</span>
+<span style="color: red;">Warning: value is out of range</span>
+<span style="color: #009688;">Section completed</span>
 ```
 
 ---
 
 ## カラーテーマ変数
 
-rtSurveyはアプリの設定テーマに適応する**カラーテーマトークン**をサポートします。`__COLOR_THEME_NAME__`構文を使用します：
+rtSurveyは、アプリの設定済みテーマに適応する**カラーテーマトークン**をサポートしています。`__COLOR_THEME_NAME__` 構文を使用します：
 
 ```html
-<span style="color: var(--color-theme-primary);">プライマリカラーテキスト</span>
+<span style="color: var(--color-theme-primary);">Primary color text</span>
 ```
 
-またはラベルテキストのトークン省略記法を使用します：
+または、ラベルテキスト内でトークンの短縮形を使用します：
 
 ```
-<font color="var(--COLOR_THEME_PRIMARY)">重要なメモ</font>
+<font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
 ```
 
-これはレンダリング時に同等の`<span>`とCSSバリアブルに自動的に変換されます。
+これはレンダリング時に、CSS変数を使用した同等の `<span>` に自動的に変換されます。
 
 ---
 
 ## 多言語ラベル
 
-単一のラベルセルで複数の言語をサポートするためにコンテンツを言語タグで囲みます：
+コンテンツを言語タグで囲むことで、単一のラベルセルで複数の言語をサポートできます：
 
 ```
 <en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
 ```
 
-rtSurveyは現在のアプリ言語に一致するコンテンツを抽出します。一致する言語タグが見つからない場合は、文字列全体がそのまま表示されます。
+rtSurveyは、現在のアプリの言語に一致するコンテンツを抽出します。一致する言語タグが見つからない場合は、文字列全体がそのまま表示されます。
 
 ---
 
-## noteフィールドでの例
+## ノートフィールドでの例
 
-### 太字と改行付きのセクション指示
+### 太字と改行を含むセクションの指示
 
 | type | name | label |
 |------|------|-------|
-| note | section_intro | `<strong>セクション3：土地利用</strong><br>このセクションのすべての質問は世帯主のみに尋ねてください。` |
+| note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
 
-### 計算参照付きの動的サマリー
+### 計算参照を含む動的なサマリー
 
 | type | name | label |
 |------|------|-------|
 | calculate | total | | `${adults} + ${children}` |
-| note | summary | `世帯員総数：<strong>${total}</strong><br><span style="color: gray;">大人：${adults} · 子供：${children}</span>` |
+| note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
 
-### 赤い警告
+### 赤色の警告
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| note | age_warning | `<span style="color: red;"><strong>警告：</strong>入力された年齢（${age}）が異常に高いです。確認してください。</span>` | `${age} > 100` |
+| note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
 
 ### 参考文書へのリンク
 
 | type | name | label |
 |------|------|-------|
-| note | guidelines_link | `このセクションを始める前に<a href="https://docs.example.com/guidelines" target="_blank">フィールドガイドライン</a>を参照してください。` |
+| note | guidelines_link | `Refer to the <a href="https://docs.example.com/guidelines" target="_blank">Field Guidelines</a> before starting this section.` |
 
 ---
 
-## rtSurvey固有のHTMLタグ
+## 特殊なrtSurvey HTMLタグ
 
 ### `<webbox src='url' title='title'>...</webbox>`
 
-フォーム内のモーダルにURLを埋め込むボタンをレンダリングします。詳細については[Webbox](webbox)を参照してください。
+フォーム内のモーダルでURLを開くボタンを埋め込みます。詳細は [Webbox](webbox) を参照してください。
 
 ### `<delete-repeat-current>label</delete-repeat-current>`
 
-タップすると現在の繰り返しインスタンスを削除する繰り返しグループ内のボタンをレンダリングします。
+リピートグループ内に、タップすると現在のリピートインスタンスを削除するボタンをレンダリングします。
 
 ### `<delete-repeat-last>label</delete-repeat-last>`
 
-最後の繰り返しインスタンスを削除するボタンをレンダリングします。
+最後のリピートインスタンスを削除するボタンをレンダリングします。
 
-繰り返しグループ内での使用例：
+リピートグループでの使用例：
 
 | type | name | label |
 |------|------|-------|
-| note | delete_btn | `<delete-repeat-current>このメンバーを削除</delete-repeat-current>` |
+| note | delete_btn | `<delete-repeat-current>Remove this member</delete-repeat-current>` |
+
+---
+
+## autopull() による動的なHTMLサマリー
+
+`autopull()` は、`note` フィールド内にHTMLブロックをレンダリングし、フォーム内の**フィールドが変更されるたびに再評価**します。これにより、ライブサマリーパネル、送信前の確認画面、調査員がデータを入力するにつれて更新される累計などに適しています。
+
+<Callout type="info">
+`autopull()` は **note** フィールドでのみ機能します。ラベル (label) 列は無視されます。すべてのHTMLコンテンツは、`concat()` を使用して **appearance** 列を通じて提供する必要があります。
+</Callout>
+
+### 構文
+
+`note` フィールドの **appearance** 列に `autopull()` を配置します：
+
+```
+autopull(concat('<html>...</html>'))
+```
+
+`concat()` 内のフィールド参照 (`${field_name}`) は現在のライブの値に置き換えられ、変更のたびにHTMLが再レンダリングされます。
+
+### scroll-view() による高さの制限
+
+長いサマリーの場合は、`autopull()` を `scroll-view(N%)` と組み合わせてパネルの高さを制限し、スクロール可能にします：
+
+```
+scroll-view(45%) autopull(concat('<html>...</html>'))
+```
+
+`N%` の値は、表示されているフォーム領域に対する相対値です。`45%` は、ページ中間のサマリーパネルの実用的なデフォルト値です。
+
+### 完全な例 — 世帯所在地のサマリー
+
+次の `note` フィールドは、選択された州、郡、コミューンを示す2列のテーブルをレンダリングします。`${tinh_name}`、`${huyen_name}`、または `${xa_name}` が変更されるたびに自動的に更新されます。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | location_summary | | `scroll-view(45%) autopull(concat('<html><table style="width:100%;border-collapse:collapse"><tr><td style="padding:4px;font-weight:bold">Province:</td><td style="padding:4px">', ${tinh_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">District:</td><td style="padding:4px">', ${huyen_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Commune:</td><td style="padding:4px">', ${xa_name}, '</td></tr></table></html>'))` |
+
+XLSFormでは、外観 (appearance) の値は単一のセルに記述されます：
+
+```
+scroll-view(45%) autopull(concat(
+  '<html><table style="width:100%;border-collapse:collapse">
+   <tr><td style="padding:4px;font-weight:bold">Province:</td>
+       <td style="padding:4px">', ${tinh_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">District:</td>
+       <td style="padding:4px">', ${huyen_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Commune:</td>
+       <td style="padding:4px">', ${xa_name}, '</td></tr>
+   </table></html>'))
+```
+
+### インラインスタイル
+
+任意のHTML要素のインライン `style="..."` 属性がサポートされており、`autopull()` ブロック内で視覚的な書式を適用する推奨される方法です。
+
+以下は、`autopull()` コンテンツ内ではサポートされて**いません**：
+
+- `<style>` ブロック
+- 外部スタイルシートの `<link>` タグ
+- JavaScript (`<script>`)
+
+### autopull() を使用すべき場合
+
+| ユースケース | 備考 |
+|----------|-------|
+| 送信前の確認画面 | 調査員が終了する前に、すべての主要な回答を1つのパネルに表示する |
+| 累計 | 数量が入力されるにつれて更新される計算済みの合計を表示する |
+| 表示される参照パネル | 調査員が子フィールドを入力している間、選択されたルックアップ値（州名など）を表示する |
 
 ---
 
 ## ベストプラクティス
 
-1. HTMLは控えめに使用してください — 過度に書式設定されたラベルは読みにくくなります。
-2. 太字には`<strong>`を、斜体には`<em>`を使用してください（非推奨の`<b>`と`<i>`の代わりに）。
-3. 色の使用を意味のあるものにしてください — 警告には赤を使用し、装飾には使用しないでください。
-4. HTMLのレンダリングがわずかに異なる場合があるため、モバイルアプリとWebフォームの両方で常にHTMLレンダリングをテストしてください。
-5. ラベル内の`<table>`タグは避けてください — モバイル画面でのレンダリングがよくありません。
-6. JavaScriptは使用しないでください（`<script>`）— 削除されるかエラーを引き起こします。
+1. HTMLは控えめに使用してください。過度に装飾されたラベルは読みやすくなるどころか、かえって読みにくくなります。
+2. 非推奨の `<b>` や `<i>` よりも、太字には `<strong>`、斜体には `<em>` を優先して使用してください。
+3. 色の使用は意味のあるものにしてください。警告には赤色を使用し、装飾目的では使用しないでください。
+4. レンダリングは若干異なる場合があるため、常にモバイルアプリとウェブフォームの両方でHTMLレンダリングをテストしてください。
+5. ラベル内での `<table>` タグは避けてください。モバイル画面で適切にレンダリングされることは稀です。
+6. JavaScript (`<script>`) は使用しないでください。削除されるか、エラーの原因となります。
 
 ## 制限事項
 
-- 複雑なHTML（テーブル、フォーム、スクリプト）はサポートされておらず、レンダリングを壊す可能性があります。
-- 一部の古いモバイルクライアントはHTMLタグをリテラルテキストとして表示する場合があります — すべてのターゲットデバイスでテストしてください。
-- `<a>`リンクはブラウザまたはWebViewで開きます — 調査員がフォームを離れることになり、モバイルでは混乱を招く可能性があります。
+- 複雑なHTML（テーブル、フォーム、スクリプト）はサポートされておらず、レンダリングが崩れる可能性があります。
+- 一部の古いモバイルクライアントでは、HTMLタグがそのままのテキストとして表示される場合があります。すべてのターゲットデバイスでテストしてください。
+- `<a>` リンクはブラウザまたはWebViewで開きます。調査員がフォームを離れることになるため、モバイルでは作業の妨げになる可能性があります。

@@ -1,17 +1,17 @@
 ---
-title: "Suporte multilingue"
+title: "Suporte multi-idioma"
 description: ""
 ---
 
-O rtSurvey fornece suporte multilingue robusto, permitindo-lhe criar inquéritos em múltiplos idiomas. Esta funcionalidade é crucial para realizar investigação em populações linguisticamente diversas ou em ambientes multilingues.
+O rtSurvey oferece um suporte multi-idioma robusto, permitindo que você crie inquéritos em vários idiomas. Esta funcionalidade é crucial para a realização de pesquisas em diversas populações linguísticas ou em ambientes multilingues.
 
-## Configurar Inquéritos Multilingues
+## Configuração de Inquéritos Multi-Idioma
 
-Para criar um inquérito multilingue no rtSurvey, precisa de adicionar colunas específicas de idioma ao seu XLSForm. Aqui está como:
+Para criar um inquérito multi-idioma no rtSurvey, você precisa adicionar colunas específicas para cada idioma ao seu XLSForm. Veja como:
 
-1. **Traduções de Etiquetas**: Adicione colunas para cada idioma usando o formato `label::Idioma (código)`.
-2. **Traduções de Dicas**: Use `hint::Idioma (código)` para traduzir dicas.
-3. **Traduções de Ficheiros de Multimédia**: Para multimédia específica de idioma, use `media::Idioma (código)`.
+1. **Traduções de Rótulos (Label Translations)**: Adicione colunas para cada idioma usando o formato `label::Language (code)`.
+2. **Traduções de Dicas (Hint Translations)**: Use `hint::Language (code)` para traduzir as dicas.
+3. **Traduções de Ficheiros Multimédia (Media File Translations)**: Para multimédia específica do idioma, use `media::Language (code)`.
 
 Exemplo:
 
@@ -23,11 +23,11 @@ Exemplo:
 
 ## Códigos de Idioma
 
-É recomendado usar os códigos de idioma oficiais de 2 caracteres (subetiquetas) após o nome do idioma. Isto facilita a correspondência do idioma do formulário com o idioma da interface do utilizador. Pode encontrar os códigos oficiais [aqui](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+Recomenda-se o uso dos códigos de idioma oficiais de 2 caracteres (subtags) após o nome do idioma. Isto facilita a correspondência entre o idioma do formulário e o idioma da interface do utilizador. Você pode encontrar os códigos oficiais [aqui](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
-## Definir um Idioma Predefinido
+## Definição de um Idioma Padrão
 
-Para definir um idioma predefinido para a recolha de dados, use a folha de trabalho `settings` no seu XLSForm:
+Para definir um idioma padrão para a recolha de dados, utilize a folha de cálculo `settings` no seu XLSForm:
 
 ```
 | form_id   | version | default_language |
@@ -39,14 +39,14 @@ Para definir um idioma predefinido para a recolha de dados, use a folha de traba
 
 ### Troca Dinâmica de Idioma
 
-O rtSurvey permite aos utilizadores trocar de idioma dinamicamente durante a recolha de dados:
+O rtSurvey permite que os utilizadores troquem de idioma dinamicamente durante a recolha de dados:
 
-- Na interface web, use o menu suspenso de idioma na barra de navegação superior.
-- Na aplicação móvel, aceda às opções de idioma através do menu de configurações.
+- Na interface web, utilize o menu suspenso de idiomas na barra de navegação superior.
+- Na aplicação móvel, aceda às opções de idioma através do menu de definições.
 
-### Mensagens de Validação Específicas de Idioma
+### Mensagens de Validação Específicas do Idioma
 
-O rtSurvey alarga o suporte multilingue às mensagens de validação:
+O rtSurvey estende o suporte multi-idioma às mensagens de validação:
 
 ```
 | type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
@@ -54,9 +54,19 @@ O rtSurvey alarga o suporte multilingue às mensagens de validação:
 | integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-### Suporte a Idiomas RTL
+### Mensagens de obrigatoriedade localizadas
 
-Para idiomas da direita para a esquerda (RTL) como árabe ou hebraico, o rtSurvey ajusta automaticamente o layout:
+Use `required_message::Language (code)` para mostrar um erro traduzido quando um campo obrigatório é deixado em branco:
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
+### Suporte para Idiomas RTL
+
+Para idiomas da direita para a esquerda (RTL), como o árabe ou o hebraico, o rtSurvey ajusta automaticamente o layout:
 
 ```
 | type | name | label::English (en) | label::Arabic (ar) |
@@ -64,12 +74,93 @@ Para idiomas da direita para a esquerda (RTL) como árabe ou hebraico, o rtSurve
 | text | name | Your name           | اسمك                |
 ```
 
-### Aparência Específica de Idioma
+### Aparência (Appearance) Específica do Idioma
 
-O rtSurvey permite-lhe especificar diferentes aparências para diferentes idiomas:
+O rtSurvey permite especificar diferentes aparências para diferentes idiomas:
 
 ```
 | type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
 |------|------|---------------------|---------------------|--------------------------|---------------------------|
 | text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
+
+## Formatação HTML em rótulos bilingues
+
+Você pode combinar tags HTML com wrappers de idioma numa única célula de rótulo. O rtSurvey extrai o bloco do idioma ativo e renderiza o HTML restante.
+
+Exemplo usando negrito e cor de fonte por idioma:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Tags inline suportadas dentro de wrappers de idioma: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Exemplo de texto colorido por idioma:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Cálculos sensíveis ao idioma (Language-aware calculations)
+
+Quando um formulário tem um campo `${language_use}` (definido por um widget `change_language`), use `if()` para retornar valores no idioma ativo:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Exemplo — exibir um resultado de pesquisa no idioma ativo usando `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Nota: O campo `language_use` é normalmente definido por um widget de aparência `change_language`. Consulte Appearance — change_language.
+
+## Boas Práticas para Inquéritos Multi-Idioma
+
+1. **Nomenclatura Consistente**: Use códigos de idioma consistentes em todo o seu formulário.
+2. **Tradução Profissional**: Utilize tradutores profissionais familiarizados com o contexto do inquérito.
+3. **Notas de Contexto**: Forneça notas de contexto para os tradutores garantirem traduções precisas.
+4. **Testes**: Teste o seu formulário em todos os idiomas antes da implementação.
+5. **Suporte Unicode**: Certifique-se de que os seus dispositivos de recolha de dados suportam Unicode para scripts não latinos.
+6. **Multimédia Específica do Idioma**: Use imagens ou áudio culturalmente apropriados para cada idioma.
+7. **Evite Texto em Imagens**: Se usar imagens com textoo, crie imagens separadas para cada idioma.
+
+## Tratamento de Casos Especiais
+
+### Respostas em Idiomas Mistos
+
+O rtSurvey permite que os respondentes insiram texto em qualquer script, independentemente do idioma selecionado no formulário. Isto é útil para capturar nomes ou endereços no seu script original.
+
+### Tipos de Questão Específicos do Idioma
+
+Alguns tipos de questão podem ser mais apropriados para certos idiomas. O rtSurvey permite que você use diferentes tipos de questão para diferentes idiomas:
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
+```
+
+## Exportação de Dados Multi-Idioma
+
+Ao exportar dados do rtSurvey:
+
+- Escolha exportar num idioma específico ou incluir todas as versões de idioma.
+- Os metadados de idioma são incluídos na exportação, indicando qual idioma foi utilizado para cada resposta.
+
+## Considerações sobre a Aplicação Móvel
+
+- A aplicação móvel rtSurvey suporta a troca de idioma offline.
+- Certifique-se de que todos os ficheiros de idioma necessários foram descarregados antes de ficar offline.
+
+## Limitações Conhecidas
+
+- Algumas funcionalidades avançadas podem não estar disponíveis em todos os idiomas.
+- Traduções extremamente longas podem afetar o layout em ecrãs pequenos.
+
+Ao aproveitar as capacidades multi-idioma do rtSurvey, você pode criar inquéritos inclusivos e acessíveis que alcançam populações diversas e fornecem dados de alta qualidade e linguisticamente precisos.

@@ -1,80 +1,206 @@
 ---
-title: "Utseende"
+title: "Utseende (Appearance)"
 description: ""
 ---
 
-Kolumnen `appearance` i rtSurvey låter dig anpassa den visuella presentationen och beteendet hos frågor i dina undersökningar. Denna funktion förbättrar användarupplevelsen och kan avsevärt förbättra datainsamlingseffektiviteten. rtSurvey stöder standard XLSForm-utseendeattribut och utökar dem med ytterligare alternativ.
+Kolumnen `appearance` i rtSurvey gör det möjligt att anpassa den visuella presentationen och beteendet hos frågor i dina undersökningar. Denna funktion förbättrar användarupplevelsen och kan avsevärt effektivisera datainsamlingen. rtSurvey stöder standardattribut för utseende i XLSForm och utökar dem med ytterligare alternativ.
 
-## Standard XLSForm-utseendeattribut
+## Standardattribut för utseende i XLSForm
 
-rtSurvey stöder följande standard XLSForm-utseendeattribut:
+rtSurvey stöder följande standardattribut för utseende i XLSForm:
 
 | Utseendeattribut | Frågetyper | Beskrivning |
 |----------------------|----------------|-------------|
-| multiline | text | Skapar en flerradig textruta (bäst för webbklienter) |
-| minimal | select_one, select_multiple | Visar alternativ i en rullgardinsmeny |
-| quick | select_one | Avancerar automatiskt till nästa fråga efter val (endast mobil) |
-| no-calendar | date | Undertrycker kalendervisningen (endast mobil) |
-| month-year | date | Tillåter val av månad och år endast |
-| year | date | Tillåter val av år endast |
-| horizontal-compact | select_one, select_multiple | Visar alternativ horisontellt (endast webb) |
-| horizontal | select_one, select_multiple | Visar alternativ horisontellt i kolumner (endast webb) |
-| likert | select_one | Presenterar alternativ som en Likert-skala |
-| compact | select_one, select_multiple | Visar alternativ sida vid sida med minimal utfyllnad |
-| quickcompact | select_one | Kombinerar kompakt visning med automatisk avancering (endast mobil) |
-| field-list | grupper | Visar hela gruppen på en skärm (endast mobil) |
-| label | select_one, select_multiple | Visar alternativens etiketter utan inmatning |
-| list-nolabel | select_one, select_multiple | Visar inmatning utan etiketter (används med `label`) |
-| table-list | grupper | Visar frågor i tabellformat |
-| signature | image | Aktiverar signaturfångst (endast mobil) |
+| multiline | text | Skapar en textruta med flera rader (bäst för webbklienter) |
+| minimal | select_one, select_multiple | Visar val i en rullgardinsmeny |
+| quick | select_one | Går automatiskt vidare till nästa fråga efter val (endast mobil) |
+| no-calendar | date | Döljer kalendern (endast mobil) |
+| month-year | date | Tillåter endast val av månad och år |
+| year | date | Tillåter endast val av år |
+| horizontal-compact | select_one, select_multiple | Visar val horisontellt (endast webb) |
+| horizontal | select_one, select_multiple | Visar val horisontellt i kolumner (endast webb) |
+| likert | select_one | Presenterar val som en Likert-skala |
+| compact | select_one, select_multiple | Visar val sida vid sida med minimal utfyllnad |
+| quickcompact | select_one | Kombinerar kompakt visning med automatisk frammatning (endast mobil) |
+| field-list | groups | Visar hela gruppen på en skärm (endast mobil) |
+| label | select_one, select_multiple | Visar valalternativens etiketter utan inmatningsfält |
+| list-nolabel | select_one, select_multiple | Visar inmatningsfält utan etiketter (används med `label`) |
+| table-list | groups | Visar frågor i ett tabellformat |
+| signature | image | Möjliggör signaturfångst (endast mobil) |
 | draw | image | Tillåter frihandsteckning (endast mobil) |
-| map, quick map | select_one, select_one_from_file | Aktiverar val från kartfunktioner |
+| map, quick map | select_one, select_one_from_file | Möjliggör val från kartfunktioner |
 
-## Bästa praxis för att använda utseende
+## Bästa praxis för användning av utseende
 
-1. **Konsekvens**: Använd utseendeattribut konsekvent i hela din undersökning för ett enhetligt utseende.
-2. **Mobil kontra webb**: Tänk på hur utseenden renderas på olika enheter och plattformar.
-3. **Prestanda**: Var försiktig med utseendeattribut som kan sakta ned formulärladdning (t.ex. `table-list` för stora grupper).
-4. **Användarupplevelse**: Välj utseenden som gör datainmatning enklare och mer intuitiv för respondenter.
+1. **Konsekvens**: Använd utseendeattribut konsekvent i hela undersökningen för ett enhetligt utseende.
+2. **Mobil vs. Webb**: Tänk på hur utseenden kommer att renderas på olika enheter och plattformar.
+3. **Prestanda**: Var försiktig med utseendeattribut som kan sakta ner laddningen av formuläret (t.ex. `table-list` för stora grupper).
+4. **Användarupplevelse**: Välj utseenden som gör datainmatningen enklare och mer intuitiv för respondenterna.
 5. **Testning**: Testa alltid ditt formulär på målenheter för att säkerställa att utseenden fungerar som förväntat.
 
-## rtSurvey Utökade utseendeattribut
+## Avancerade tekniker
 
-Förutom standard XLSForm-utseenden stöder rtSurvey följande plattformsspecifika alternativ:
+### Kombinera utseenden
+
+Vissa utseendeattribut kan kombineras för mer komplexa layouter:
+
+```
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one options | choice | Välj en: | minimal compact |
+```
+
+### Dynamiska utseenden
+
+rtSurvey tillåter dynamiska ändringar av utseende baserat på formulärlogik:
+
+```
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| text | time | Ange tid: | inline-[%H:%M] | ${show_time} = 'yes' |
+```
+
+## Överväganden för mobilappen
+
+- Vissa utseenden (t.ex. `quick`, `signature`) är specifika för mobila enheter.
+- Testa noggrant på både Android och iOS för att säkerställa ett konsekvent beteende.
+
+## rtSurvey utökade utseendeattribut
+
+Förutom standardutseenden i XLSForm stöder rtSurvey följande plattformsspecifika alternativ:
 
 ### Data- och visningskontroll
 
 | Utseendeattribut | Frågetyper | Beskrivning |
 |----------------------|----------------|-------------|
-| `invisible` | valfri | Döljer fältet från visning samtidigt som det fortfarande samlar in eller beräknar sitt värde. |
-| `displaytitle` | valfri | Tvingar visning av fältets etikett/titel. |
-| `autopull` | select_one, select_multiple | Hämtar automatiskt externa data för att fylla i alternativ när formuläret laddas. |
-| `floating_hint` | text, integer, decimal | Visar tipstext som en flytande etikett ovanför inmatningsfältet. |
-| `calculate-button` | calculate | Lägger till en synlig knapp som utlöser omberäkning av fältet på begäran. |
+| `invisible` | any | Döljer fältet från vyn medan det fortfarande samlar in eller beräknar dess värde. Skiljer sig från typen `hidden` — fältet deltar fortfarande i logiken. |
+| `displaytitle` | any | Tvingar fram visning av fältets etikett/titel även när den annars skulle döljas. |
+| `autopull` | select_one, select_multiple | Hämtar automatiskt externa data för att fylla i val när formuläret laddas eller ett utlösande fält ändras. |
+| `floating_hint` | text, integer, decimal | Visar ledtexten som en svävande etikett ovanför inmatningsfältet istället för under det. |
+| `calculate-button` | calculate | Lägger till en synlig knapp som utlöser omberäkning av fältet vid behov, istället för att beräkna automatiskt. |
+
+### Grupp och navigering
+
+| Utseendeattribut | Frågetyper | Beskrivning |
+|----------------------|----------------|-------------|
+| `section` | group | Renderar gruppen som ett hopfällbart avsnittskort. Obs: endast mobilapp. |
+| `toc-hide` | any | Exkluderar frågan från navigationspanelen för innehållsförteckningen (TOC). |
+| `minilog` | begin_repeat | Visar färdiga upprepade poster som en kompakt miniloggslista istället för att expandera varje post radvis. |
+
+### Inmatningsbeteende
+
+| Utseendeattribut | Frågetyper | Beskrivning |
+|----------------------|----------------|-------------|
+| `proper` | text | Gör automatiskt stor begynnelsebokstav i varje ord när respondenten skriver (title-case-beteende). |
+| `text-nolabel` | text, integer, decimal | Renderar inmatningsfältet utan en synlig etikett. |
+| `inline-1line` | text | Tvingar textinmatningen att visas på en enda rad även när frågeetiketten är lång. |
+| `popup` | any | Renderar fältet inuti en popup / modalt fönster istället för radvis på sidan. |
 
 ### Layout
 
 | Utseendeattribut | Frågetyper | Beskrivning |
 |----------------------|----------------|-------------|
-| `1screen` | grupp | Tvingar hela gruppen att visas på en enda skärm. |
-| `columns(n)` | select_one, select_multiple | Visar alternativ i `n` kolumner. Exempel: `columns(3)` visar tre kolumner med radioknappar. |
-| `gridformat<row=R col=C colspan=S align=center>` | valfri | Placerar fältet i en CSS-rutnätslayout. |
-| `ignore-simplify` | valfri | Instruerar formulärrenderaren att hoppa över automatisk förenkling av fältets layout. |
+| `1screen` | group | Tvingar hela gruppen att visas på en enda skärm oavsett gruppstorlek. |
+| `columns(n)` | select_one, select_multiple | Visar val i `n` kolumner. Exempel: `columns(3)` visar tre kolumner med radioknappar. |
+| `gridformat<row=R col=C colspan=S align=center>` | any | Placerar fältet i en CSS-grid-layout på rad `R`, kolumn `C`, och sträcker sig över `S` kolumner. Används med `advanced-extension/grid-layout`. |
+| `ignore-simplify` | any | Instruerar formulärrenderaren att hoppa över automatisk förenkling eller komprimering av detta fälts layout. |
+| `horizontal(N)` | select_one, select_multiple | Ställer in varje val att uppta `N` procent av radbredden. Exempel: `horizontal(50)` placerar två val per rad. |
+| `scroll-view(N%)` | group, repeat | Begränsar behållaren till en maximal höjd på `N%` av visningsfönstret (eller föräldern) och lägger till en rullningslist när innehållet flödar över. Exempel: `scroll-view(60%)`. |
 
 ### Widgetar
 
 | Utseendeattribut | Frågetyper | Beskrivning |
 |----------------------|----------------|-------------|
-| `likert` | select_one | Presenterar alternativ som en Likert-skalarad. |
-| `distress` | select_one | Renderar alternativ som den psykologiska stressskalans (K10) visuella widget med emotionella ikoner. |
+| `likert` | select_one | Presenterar val som en rad i en Likert-skala (finns redan i standardtabellen ovan; bekräftat stöd). |
+| `distress` | select_one | Renderar val som Kessler Psychological Distress Scale (K10) visuell widget med känslomässiga ikoner. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Renderar val som stiliserade betygslådor med fem färgplatser. `c1` = yttre behållarens kant, `c2` = omarkerad kant, `c3` = markerad kant och fyllning, `c4` = omarkerad textfärg, `c5` = markerad textfärg. Exempel: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Renderera val som färgade taggar. De fem färgplatserna följer samma ordning som `rating_box-fill`. Valda alternativ markeras; ovalda alternativ döljs i sammanfattningsvyn. |
 
 ### API-integration
 
 | Utseendeattribut | Frågetyper | Beskrivning |
 |----------------------|----------------|-------------|
-| `callapi` | text, integer, decimal, select_one | Aktiverar API-anropsintegration för detta fält. |
-| `callapi-verify(params)` | text, integer, decimal | Utlöser ett API-verifieringsanrop med statiska parametrar. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | Samma som `callapi-verify` men med parametrar härrörda från andra fältvärden vid körning. |
+| `callapi` | text, integer, decimal, select_one | Möjliggör API-anropsintegrering för detta fält. Beräkningskolumnen ska innehålla ett `callapi()`-uttryck. Se [Anropa API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Utlöser ett API-verifieringsanrop med statiska parametrar. Formuläret blockerar framsteg tills API:et bekräftar värdet. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Samma som `callapi-verify` men med parametrar som härleds från andra fältvärden under körning. |
+
+### Språkväljare
+
+| Utseendeattribut | Frågetyper | Beskrivning |
+|----------------------|----------------|-------------|
+| `change_language-{colors} default('lang')` | note, text | Renderar en språkväljarwidget stiliserad med de givna färgkoderna. `default('lang')`-token ställer in det ursprungliga språket (t.ex. `default('en')`); det skrivs om till `rtDefault('lang')` internt under parsning. Exempel: `change_language-blue-white default('vi')`. |
+
+### Inline datum-/tidsformat
+
+För fälten `date`, `time` och `datetime` kan du ange ett anpassat visningsformat med hjälp av en formatsträng som läggs till i utseendet:
+
+```
+inline-[%d/%m/%Y]
+inline-1line-[%d/%m/%Y %H:%M]
+```
+
+Format-tokens är desamma som `format-date()` och `format-date-time()`. Se [Funktioner — Datum- och tidsfunktioner](operators-and-functions/functions#date-and-time-functions).
+
+Exempel:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| datetime | event_time | Datum och tid för händelse | inline-[%d/%m/%Y %I:%M %p] |
+| date | birth_date | Födelsedatum | inline-[%d/%m/%Y] |
+
+### Inline knapplayout — `display{}` och `results{}`
+
+För frågetyper som renderas som en inbäddad ikonknapp (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), styr två utseendemodifierare knappens position och beteende efter fångst.
+
+#### `display{...}` — knappens position före fångst
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parameter | Värden | Standard |
+|-----------|--------|---------|
+| Align (Justera) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (Storlek) | `small`, `medium`, `large` | `small` |
+| Color (Färg) | hex t.ex. `#FF5500` | primär temafärg |
+| Flag | `inline-icon` | tvingar ikonläge |
+
+| Justeringsvärde | Layout |
+|-------------|--------|
+| `right` | Knapp till höger om etiketten |
+| `left` | Knapp till vänster om etiketten |
+| `top` | Knapp ovanför etiketten, centrerad i full bredd |
+| `center` / `bottom` | Knapp under etiketten, centrerad i full bredd |
+
+#### `results{...}` — layout och synlighet efter fångst
+
+Ärver inställningarna för `display{}`. Används för att flytta knappen eller dölja element när ett värde har fångats.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| `hide`-värde | Effekt |
+|---|---|
+| `hide(capture)` | Döljer fångstknappen när en fil/ett värde finns |
+| `hide(review)` | Döljer miniatyrbilden / uppspelningsknappen |
+| `hide(filename)` | Döljer filnamnet som visas efter uppladdning |
+| `hide(camera)` | Döljer kameraknappen efter fångst |
+| `hide(scanner)` | Döljer streckkodsskanningsknappen efter att ett värde har skannats |
+| `hide(value)` | Döljer texten för det skannade värdet (streckkod / geopoint) |
+
+Widgeten växlar automatiskt från `display{}`- till `results{}`-layout i samma ögonblick som ett värde fångas.
+
+**Exempel:**
+
+```
+inline display{right}                                    → ikon till höger om etikett
+inline display{left, large}                              → stor ikon till vänster
+inline display{center, large, #FF5500}                   → stor orange ikon under etikett
+inline display{right} results{left}                      → ikonen flyttas till vänster efter fångst
+inline display{right} results{hide(capture)}             → ikonen försvinner efter fångst
+inline display{center} results{hide(capture), hide(filename)}
+```
 
 ## Kända begränsningar
 
@@ -83,6 +209,6 @@ Förutom standard XLSForm-utseenden stöder rtSurvey följande plattformsspecifi
 
 ## Felsökning av utseendeproblem
 
-1. **Utseende tillämpas inte**: Kontrollera om det finns stavfel i utseendekolumnen.
-2. **Inkonsekvent rendering**: Verifiera kompatibilitet med frågetypen och plattformen.
+1. **Utseendet tillämpas inte**: Kontrollera om det finns stavfel i appearance-kolumnen.
+2. **Inkonsekvent rendering**: Verifiera kompatibilitet med frågetyp och plattform.
 3. **Prestandaproblem**: Överväg att förenkla komplexa utseenden, särskilt för stora undersökningar.

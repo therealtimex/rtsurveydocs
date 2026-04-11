@@ -1,0 +1,118 @@
+---
+title: "Hangfelvétel"
+description: "Környezeti vagy interjú hang rögzítése a kérdőíves adatgyűjtés során a szöveges mezőkön található audio-start és audio-end megjelenések használatával."
+---
+
+A hangfelvétel lehetővé teszi, hogy egy űrlap csendben vagy láthatóan hangot rögzítsen a kérdőív egy szakasza alatt. Hasznos interjúk rögzítéséhez, környezeti hangok rögzítéséhez a terepi megfigyelések során, vagy a strukturált válaszokat kiegészítő élőszavas válaszokhoz.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Csak mobilalkalmazás.** A hangfelvételhez az rtSurvey mobilalkalmazás szükséges. A webes űrlapon az `audio-start` és `audio-end` megjelenések csendben figyelmen kívül maradnak — nem történik felvétel, és nem jelenik meg hibaüzenet. Mindig tesztelje eszközön, ha hangfelvételre van szükség.
+</Callout>
+
+---
+
+## Hogyan működik
+
+A hangfelvételt két `text` mező vezérli, amelyek **jelölőként** működnek:
+
+- Az `audio-start` megjelenésű mező elindítja a felvételt, amikor a kérdező eléri azt.
+- Az `audio-end` megjelenésű mező leállítja a felvételt, és elmenti a hangfájlt a beküldéshez.
+
+Mindkét jelölőmező `text` típusú. Általában rejtve vannak a kérdező elől (a `relevant = false` használatával vagy nem interaktív pozícióba helyezve), bár láthatóak is lehetnek. A rögzített hangfájl a beküldéshez csatolva jelenik meg, az `audio-end` mezőhöz kapcsolódva.
+
+---
+
+## Alappélda
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Válaszadó neve | |
+| text | q_occupation | Foglalkozás | |
+| integer | q_age | Életkor | |
+| text | audio_e_a1 | | `audio-end` |
+
+Az alkalmazás elindítja a felvételt, amikor a kérdező eléri az `audio_s_a1` mezőt, és leállítja, amikor eléri az `audio_e_a1` mezőt. A két jelölő közötti összes kérdés rögzítésre kerül.
+
+---
+
+## Csendes felvétel: `audio-start invisible`
+
+Alapértelmezés szerint a mobilalkalmazás felvételi jelzőt jelenít meg a hang rögzítése közben. Az `invisible` hozzáadása a megjelenéshez elnyomja ezt a jelzőt, így a felvétel a válaszadó számára látható jelzés nélkül történik.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Beleegyezik a részvételbe? | |
+| text | q_feedback | Az Ön visszajelzése | |
+| text | audio_e_a1 | | `audio-end` |
+
+Az `invisible` jelzőt csak akkor használja, ha a tájékoztatási követelmények más módon teljesültek (pl. egy külön írásos beleegyező mező a felvételi szakasz előtt).
+
+---
+
+## Elnevezési konvenció
+
+A produkciós űrlapok következetes elnevezési mintát használnak a jelölőmezőkhöz:
+
+```
+audio_s_{section}{n}   — kezdő jelölő
+audio_e_{section}{n}   — záró jelölő
+```
+
+Ahol a `{section}` az űrlapszakasz rövid jelölése, az `{n}` pedig egy sorszám az adott szakaszon belül.
+
+| Mezőnév | Szerep | Jelentés |
+|------------|------|---------|
+| `audio_s_a1` | Kezdés | Első felvétel az A szakaszban |
+| `audio_e_a1` | Befejezés | Első felvétel vége az A szakaszban |
+| `audio_s_b1` | Kezdés | Első felvétel a B szakaszban |
+| `audio_e_b1` | Befejezés | Első felvétel vége a B szakaszban |
+| `audio_s_a2` | Kezdés | Második felvétel az A szakaszban |
+| `audio_e_a2` | Befejezés | Második felvétel vége az A szakaszban |
+
+A konvenció követése megkönnyíti a felvételi határok azonosítását az űrlapdefiníciók és a beküldött adatok áttekintésekor.
+
+---
+
+## Tárolás és lekérdezés
+
+Amikor a kérdező eléri az `audio-end` mezőt, az alkalmazás véglegesíti a hangfájlt és csatolja a beküldéshez. A fájl:
+
+- Hangcsatolmányként tárolódik a beküldésben, az `audio-end` mezőnévhez társítva.
+- Elérhető az rtSurvey back-end beküldéskezelőjében a többi médiacsatolmány mellett.
+- Letölthető a szabványos beküldés-exportáláson keresztül — a hangfájlok az `audio-end` mezőnévnek megfelelő médiaoszlopban jelennek meg.
+
+A fájlformátum és a bitsebesség az eszköztől és az alkalmazás verziójától függ.
+
+---
+
+## Több felvételi szakasz
+
+Egy űrlap több nem átfedő felvételi szakaszt is tartalmazhat. Minden `audio-start` / `audio-end` jelölőpárnak teljes mértékben tartalmaznia kell a szakaszt — a szakaszok nem fedhetik egymást.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Bevezetés | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Részletek | |
+| text | audio_e_b1 | | `audio-end` |
+
+Minden szakasz külön hangfájlt hoz létre, amely a megfelelő `audio-end` mezőhöz kapcsolódik.
+
+---
+
+## Korlátozások
+
+- **Csak mobilalkalmazás.** A funkció nem támogatott a webes űrlapon. Az `audio-start` és `audio-end` csendben figyelmen kívül marad a böngészőben.
+- **Nincs egymásba ágyazás.** A felvételi szakaszok nem fedhetik egymást. Új felvétel indítása az előző `audio-end` jelölő elérése előtt nem támogatott.
+- **A mező típusának `text`-nek kell lennie.** Az `audio-start` vagy `audio-end` használata bármely más kérdéstípuson nem támogatott.
+- **Feltöltési méret.** A hosszú felvételek nagy fájlokat eredményeznek. Ügyeljen a beküldési méretkorlátokra és a terepi hálózati feltételekre.
+- **Nincs felvétel közbeni szünet.** A felvétel folyamatosan fut a kezdő jelölőtől a záró jelölőig; nincs lehetőség a szüneteltetésre és a folytatásra egy szakaszon belül.

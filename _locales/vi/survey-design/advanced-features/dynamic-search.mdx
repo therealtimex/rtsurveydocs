@@ -1,43 +1,43 @@
 ---
-title: "Dynamic Search"
-description: "Dynamic Search tải lựa chọn từ API từ xa theo thời gian thực khi người điều tra gõ, cho phép xử lý tập dữ liệu lớn hoặc cập nhật thường xuyên."
+title: "Tìm kiếm Động"
+description: "Tìm kiếm Động tải các lựa chọn từ một API từ xa theo thời gian thực khi điều tra viên nhập liệu, cho phép sử dụng các tập dữ liệu lớn hoặc được cập nhật thường xuyên."
 ---
 
-**Dynamic Search** (còn gọi là Search API) cho phép trường `select_one`, `select_multiple`, hoặc `text` tải lựa chọn từ dịch vụ web từ xa **lúc chạy** khi người điều tra gõ. Đây là cách tiếp cận đúng khi danh sách lựa chọn quá lớn để đóng gói trong tệp CSV, được cập nhật thường xuyên, hoặc đến từ cơ sở dữ liệu trực tiếp.
+**Tìm kiếm Động** (còn được gọi là Search API) cho phép các trường `select_one`, `select_multiple`, hoặc `text` tải các lựa chọn từ một dịch vụ web từ xa **tại thời điểm chạy** khi điều tra viên nhập liệu. Đây là phương pháp đúng đắn khi danh sách lựa chọn của bạn quá lớn để đóng gói trong tệp CSV, được cập nhật thường xuyên, hoặc đến từ một cơ sở dữ liệu trực tiếp.
 
 ---
 
-## Appearance `search-api()`
+## Hiển thị (appearance) `search-api()`
 
-Tìm kiếm động được cấu hình qua cột `appearance` bằng hàm `search-api()`:
+Tìm kiếm động được cấu hình thông qua cột `appearance` bằng hàm `search-api()`:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
 ```
 
-### Tham số
+### Các tham số
 
 | Tham số | Mô tả |
-|---------|-------|
-| `method` | Luôn dùng `'POST'` |
-| `url` | Endpoint API để truy vấn |
-| `post_body` | Body JSON gửi đến API. Dùng `%__input__%` làm placeholder cho văn bản tìm kiếm hiện tại của người điều tra |
-| `value_column` | Khóa trong đối tượng phản hồi để dùng làm **giá trị** được lưu |
-| `display` | Khóa (hoặc mẫu) để dùng làm **nhãn** hiển thị trong danh sách thả xuống. Hỗ trợ placeholder `##key##` và biểu thức `@{func}` |
-| `data_path` | JSONPath đến mảng đối tượng kết quả trong phản hồi (ví dụ: `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Tên để lưu phản hồi thô để các trường khác dùng |
+|-----------|-------------|
+| `method` | Luôn sử dụng `'POST'` |
+| `url` | Điểm cuối API để truy vấn |
+| `post_body` | Thân JSON được gửi đến API. Sử dụng `%__input__%` làm trình giữ chỗ cho văn bản tìm kiếm hiện tại của điều tra viên |
+| `value_column` | Khóa trong đối tượng phản hồi được sử dụng làm **giá trị** lưu trữ |
+| `display` | Khóa (hoặc mẫu) được sử dụng làm **nhãn** hiển thị trong danh sách thả xuống. Hỗ trợ các trình giữ chỗ `##key##` và các biểu thức `@{func}` |
+| `data_path` | JSONPath đến mảng các đối tượng kết quả trong phản hồi (ví dụ: `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Một tên mà phản hồi thô được lưu dưới đó để các trường khác sử dụng |
 
 ---
 
 ## Ví dụ cơ bản
 
-Tra cứu cơ sở y tế nơi người điều tra gõ một phần tên cơ sở:
+Tra cứu cơ sở y tế nơi điều tra viên nhập một phần tên cơ sở:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one | facility | Chọn cơ sở y tế | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-API nhận `{"query": "nair"}` khi người điều tra gõ "nair" và trả về:
+API nhận được `{"query": "nair"}` khi điều tra viên nhập "nair" và trả về:
 
 ```json
 {
@@ -48,13 +48,13 @@ API nhận `{"query": "nair"}` khi người điều tra gõ "nair" và trả v�
 }
 ```
 
-Danh sách thả xuống hiển thị `Nairobi Central Clinic` và `Nairobi West Hospital`; giá trị được lưu là `HF001` hoặc `HF002`.
+Danh sách thả xuống hiển thị `Nairobi Central Clinic` và `Nairobi West Hospital`; giá trị lưu trữ là `HF001` hoặc `HF002`.
 
 ---
 
 ## Định dạng hiển thị nâng cao
 
-### Dùng mẫu `##key##`
+### Sử dụng mẫu `##key##`
 
 Hiển thị nhiều trường trong nhãn:
 
@@ -62,9 +62,9 @@ Hiển thị nhiều trường trong nhãn:
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
 ```
 
-Hiển thị như: `Nairobi Central Clinic (Nairobi)`.
+Hiển thị dưới dạng: `Nairobi Central Clinic (Nairobi)`.
 
-### Dùng biểu thức `@{func}`
+### Sử dụng biểu thức `@{func}`
 
 Áp dụng logic có điều kiện trong nhãn hiển thị:
 
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Kết quả hoạt động hiển thị `✓ Tên cơ sở`; không hoạt động hiển thị `✗ Tên cơ sở`.
+Kết quả đang hoạt động hiển thị `✓ Clinic Name`; không hoạt động hiển thị `✗ Clinic Name`.
 
 ---
 
-## Đặt giá trị mặc định: `search-default-api()`
+## Thiết lập giá trị mặc định: `search-default-api()`
 
-Dùng `search-default-api()` sau `search-api()` để điền sẵn trường với lựa chọn mặc định được tải từ một lần gọi API riêng (ví dụ: khi chỉnh sửa bản ghi có sẵn):
+Sử dụng `search-default-api()` sau `search-api()` để điền trước vào trường một lựa chọn mặc định được tải từ một lệnh gọi API riêng biệt (ví dụ: khi chỉnh sửa một bản ghi hiện có):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -88,50 +88,109 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## Ký tự phân cách tùy chỉnh cho select_multiple: `search-default-separator()`
+## Dấu phân cách tùy chỉnh cho select_multiple: `search-default-separator()`
 
-Với trường `select_multiple`, chỉ định cách ghép nhiều giá trị đã chọn trong chuỗi được lưu:
+Đối với các trường `select_multiple`, chỉ định cách các giá trị được chọn được nối với nhau trong chuỗi lưu trữ:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
 ```
 
-Ký tự phân cách mặc định là dấu cách.
+Dấu phân cách mặc định là một khoảng trắng.
 
 ---
 
 ## Các loại câu hỏi được hỗ trợ
 
 | Loại câu hỏi | Trường hợp sử dụng |
-|--------------|-------------------|
+|---------------|----------|
 | `select_one` | Chọn một từ kết quả tìm kiếm |
 | `select_multiple` | Chọn nhiều từ kết quả tìm kiếm |
-| `text` | Tự động hoàn thành — người điều tra gõ tự do nhưng có thể chọn gợi ý |
+| `text` | Tự động hoàn thành — điều tra viên nhập tự do nhưng có thể chọn một gợi ý |
 
 ---
 
-## Dùng dữ liệu phản hồi đã lưu
+## Sử dụng dữ liệu phản hồi đã lưu
 
-`save_path` lưu đối tượng phản hồi API đầy đủ dưới tên đã cho. Các trường khác có thể tham chiếu bằng `pulldata()`:
+Khi điều tra viên chọn một kết quả, rtSurvey lưu đối tượng khớp đầy đủ từ phản hồi dưới tên `save_path`. Các trường khác có thể đọc từ đó theo hai cách.
+
+### Cách 1 — Tra cứu `pulldata()`
+
+Sử dụng `pulldata('save_path', 'key')` để đọc một trường cấp cao nhất từ đối tượng đã lưu:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Chọn cơ sở | `search-api(..., 'facility_data')` |
+| select_one | facility | Chọn cơ sở | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+Hiển thị trên hàng `select_one` phải bao gồm `search-api(..., 'facility_data')` với `save_path` khớp.
+
+Đối với **các trường JSON lồng nhau**, kết hợp với `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
 
 ---
 
-## Thực hành tốt
+## Tìm kiếm tệp cục bộ với `search()`
 
-1. Đảm bảo endpoint API phản hồi trong 1–2 giây — API chậm làm cho tìm kiếm có cảm giác không phản hồi.
-2. Dùng `%__input__%` trong `post_body` để API chỉ trả về kết quả khớp, không phải toàn bộ tập dữ liệu.
-3. Lập chỉ mục trường tìm kiếm phía server (ví dụ: Elasticsearch, full-text index cơ sở dữ liệu) để phản hồi nhanh.
-4. Giới hạn kết quả ở 20–50 mục mỗi truy vấn — trả về hàng nghìn kết quả làm mất ý nghĩa của tìm kiếm.
-5. Thêm yêu cầu độ dài input tối thiểu trong API để tránh kích hoạt truy vấn rộng khi nhập một ký tự.
+`search()` thực hiện tra cứu ngoại tuyến, so sánh bằng trên cột đối với tệp SQLite `.db` được đóng gói — không cần kết nối mạng và không cần truy vấn SQL. Sử dụng nó khi dữ liệu tham chiếu của bạn được đóng gói cùng với biểu mẫu và bạn cần một tra cứu đơn giản "tìm tất cả các hàng có cột bằng giá trị".
 
-## Giới hạn
+### Cú pháp (Signature)
 
-- Dynamic Search yêu cầu kết nối mạng — không hoạt động ngoại tuyến.
-- Placeholder `%__input__%` được đưa vào nguyên văn; hãy làm sạch input phía server để ngăn tấn công injection.
-- Các biểu thức hiển thị `@{func}` phức tạp có thể được hỗ trợ hạn chế trên các phiên bản client rtSurvey.
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Các tham số
+
+| Tham số | Mô tả |
+|-----------|-------------|
+| `path` | Đường dẫn đến bảng SQLite: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Toán tử khớp — trả về các hàng có cột bằng giá trị |
+| `'list_name'` | Tên cột để so khớp |
+| `${field}` | Giá trị để khớp; thường là một tham chiếu trường |
+
+### Ví dụ
+
+Điền vào một `select_one` từ cơ sở dữ liệu cục bộ bằng cách so khớp giá trị của `${d307}` với cột `list_name` trong bảng `externalData` của `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Chọn cơ sở | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Khi `${d307}` bằng `"HF001"`, `search()` trả về mọi hàng trong `externalData` nơi `list_name = 'HF001'` — hoàn toàn từ tệp được đóng gói, không cần gọi mạng.
+
+### search() so với tự động hoàn thành rawquery
+
+| Tính năng | `search()` | Tự động hoàn thành `rawquery` |
+|---------|-----------|------------------------|
+| Truy vấn SQL | Không — chỉ so sánh bằng cột | Có — đầy đủ `SELECT … FROM …` |
+| Đầu vào được tham số hóa | Khớp giá trị cột | Được nhúng trong chuỗi SQL |
+| Nhập văn bản tự do | Có — điều tra viên có thể nhập tự do | Không — phải chọn từ danh sách |
+| UNION / đa bảng | Không được hỗ trợ | Được hỗ trợ |
+
+### Khi nào nên sử dụng mỗi loại
+
+- Sử dụng **`search()`** khi bạn cần so khớp bằng đơn giản đối với tệp `.db` được đóng gói, biểu mẫu phải hoạt động ngoại tuyến và bạn muốn cho phép nhập văn bản tự do.
+- Sử dụng **tự động hoàn thành `rawquery`** khi bạn cần sự linh hoạt của SQL (JOIN, UNION, cột tính toán) hoặc phải truy vấn trên nhiều bảng và biểu mẫu có kết nối mạng ổn định.
+
+---
+
+## Thực hành tốt nhất
+
+1. Đảm bảo điểm cuối API của bạn phản hồi trong vòng 1–2 giây — API chậm làm cho việc tìm kiếm có cảm giác không nhạy.
+2. Sử dụng `%__input__%` trong `post_body` để API chỉ trả về các kết quả khớp, không phải toàn bộ tập dữ liệu.
+3. Đánh chỉ mục trường tìm kiếm ở phía máy chủ (ví dụ: Elasticsearch, chỉ mục toàn văn cơ sở dữ liệu) để có phản hồi nhanh.
+4. Giới hạn kết quả ở 20–50 mục cho mỗi truy vấn — trả về hàng nghìn kết quả làm mất đi mục đích của tìm kiếm.
+5. Bao gồm yêu cầu độ dài đầu vào tối thiểu trong API để tránh kích hoạt các truy vấn rộng trên các đầu vào chỉ có một ký tự.
+
+## Hạn chế
+
+- Tìm kiếm Động yêu cầu kết nối mạng — nó không hoạt động ngoại tuyến.
+- Trình giữ chỗ `%__input__%` được chèn nguyên trạng; làm sạch đầu vào ở phía máy chủ để ngăn chặn các cuộc tấn công chèn mã (injection attacks).
+- Các biểu thức hiển thị `@{func}` phức tạp có thể có sự hỗ trợ hạn chế trên tất cả các phiên bản ứng dụng khách rtSurvey.

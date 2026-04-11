@@ -1,0 +1,224 @@
+---
+title: "ローカルデータベース検索"
+description: "ローカルデータベース検索は、生のSQLを使用してバンドルされたSQLite .dbファイルをクエリし、大規模な静的データセットに対して高速なオフラインオートコンプリートを可能にします。"
+---
+
+import { Callout } from 'nextra/components'
+
+**ローカルデータベース検索**を使用すると、フォームのメディアパッケージにバンドルされているSQLite `.db`ファイルに対して、`select_one`または`text`フィールドからクエリを実行できます。これは完全にオフラインで動作し、サーバーとの通信は発生しません。選択リストが大規模で静的な場合（例：全国の村、医療施設、行政境界のリストなど）、かつ通信環境が保証されない場合に最適なアプローチです。
+
+| アプローチ | データソース | 通信が必要 |
+|---|---|---|
+| ローカルデータベース検索 (`rawquery`) | バンドルされた `.db` ファイル (SQLite) | いいえ |
+| `search-api()` | リモート REST API | はい |
+| `search()` | バンドルされた CSV ファイル | いいえ |
+
+---
+
+## 外観のバリエーション (Appearance variants)
+
+オートコンプリートフィールドは、`appearance`列を通じて設定します。3つのバリエーションが利用可能です。
+
+| バリエーション | 備考 |
+|---|---|
+| `search-autocomplete-noedit(...)` | 標準的なオートコンプリート — 調査員はリストから選択する必要があり、自由形式のテキスト入力は保存されません。 |
+| `search-autocomplete-noedit-v2(...)` | 推奨されるバリエーション — 動作は同じですが、更新されたレンダリングエンジンを使用しており、大規模な結果セットでのパフォーマンスが向上しています。 |
+| `search(...)` | バンドルされたCSVに対する単純なファイルベースのマッチング。生のSQLはサポート**していません**。比較のためにここに記載しています。 |
+
+<Callout type="info">
+`search-autocomplete-noedit` はエイリアスです。解析時に、アプリはこれを内部関数名である `searchAutocompleteNoedit` に置き換えます。XLSFormではどちらの綴りを使用しても機能します。
+</Callout>
+
+---
+
+## `rawquery` データソース
+
+`.db`ファイルに対してSQLクエリを実行するには、外観関数の最初の引数として `'rawquery'` を渡します。完全なシグネチャは以下の通りです。
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### パラメータ
+
+| 位置 | パラメータ | 説明 |
+|---|---|---|
+| 1 | `'rawquery'` | リテラル文字列 — アプリにSQLを直接実行するように指示します。 |
+| 2 | `db_path` | SQLiteファイルへのパス。形式は `<dir>/<file>.db::tableName` です。ファイルを開く際に `::tableName` 接尾辞は削除され、テーブル名はSQL内で使用されます。 |
+| 3 | `'[display_col]'` | ドロップダウンに表示する列名。前後の `[ ]` ブラケットは実行時に削除されます。 |
+| 4 | `'value_col'` | 調査員が選択した際に保存される値を持つ列名。 |
+| 5 | `'SELECT ...'` | 有効な任意の SQLite SELECT 文。 `DISTINCT` が含まれていない場合は、 `SELECT DISTINCT` が自動的に挿入されます。 |
+| 6+ | `param1, ...` | 任意。SQL内の `?` プレースホルダーに順にバインドされる値。SQLに `?` が含まれているのにパラメータが提供されない場合、フィールドは空の結果を返します（引数不足に対する組み込みのガード機能）。 |
+
+### `db_path` の規約
+
+データベースファイルは、フォームにバンドルされたメディアディレクトリ内に配置されます。実行時、 `pulldata('app-api', 'family_path')` はそのディレクトリパスを返します。セットアップの詳細については [family_path](family-path) を参照してください。標準的なパターンは以下の通りです。
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+アプリがファイルを開く際、 `::tableName` の部分は切り捨てられ、純粋なファイルパスが使用されます。テーブル名はSQL文の中でのみ使用されます。
+
+---
+
+## 基本的な例 — 都道府県の検索
+
+バンドルされた `vnxa3.db` ファイルを使用した、読み取り専用の都道府県ドロップダウンの例：
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+`appearance` 列（読みやすく展開したもの）：
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- 表示されるラベルは `provv` 列から取得されます。
+- 保存される値は `provid` 列から取得されます。
+- `rta_filter = "1"` の行のみが表示されます。
+
+---
+
+## パラメータ化クエリ
+
+SQL内で `?` プレースホルダーを使用し、対応するフィールド参照を（6番目以降の）追加引数として渡します。これは、以前に選択された都道府県に属する市区町村を読み込むなどの、連動する選択肢（cascading selects）を実現するための標準的なパターンです。
+
+<Callout type="warning">
+SQLに少なくとも1つの `?` が含まれており、パラメータ引数が提供されていない場合、フィールドは空の結果セットを返します。これにより、親の選択が行われる前に、古いデータやスコープ外のデータが表示されるのを防ぎます。
+</Callout>
+
+### 市区町村の連動例
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+`${province}` の値が最初の `?` にバインドされます。調査員が都道府県を選択するまで、このフィールドは空白のままです。
+
+### 2つのパラメータを使用した例 — 町村の連動
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+パラメータは位置に基づいてバインドされます： `${province}` → 最初の `?`、 `${district}` → 2番目の `?`。
+
+---
+
+## 特別な値のための UNION SELECT
+
+`UNION SELECT` を使用して、「わからない」や「回答拒否」などの合成行をSQL内に直接挿入できます。
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>わからない</i>", "888"')
+```
+
+RTSurvey フォームで使用される規約：
+
+| コード | 意味 |
+|---|---|
+| `888` | わからない |
+| `999` | 回答拒否 |
+
+表示文字列内の `<i>` などのHTMLタグはアプリによってレンダリングされます。これを使用して、特別なオプションを視覚的に区別することができます。
+
+---
+
+## 多言語表示
+
+言語固有のラベルを別々の列（例： `label_vi`, `label_en`）に保存し、フォーム内の言語フィールドに基づいて適切な列を選択します。
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+`${language}` フィールドに基づいて動的に列を切り替えるには、表示列パラメータに `if()` 式を使用して、言語列を切り替えます。
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+表示列パラメータはクエリ実行前に評価されます。SQLエンジンには列名のみ（ブラケットなし）が渡されます。ブラケットは解析時に削除される装飾的なマーカーです。
+</Callout>
+
+---
+
+## 実際の選択の検証
+
+フィールドで 888 や 999 などの特別な値を許可している場合、単純な `required = yes` チェックでは不十分です。これは、調査員が「わからない」を選択した場合でも満たされてしまうからです。保存された値が実際の選択であり、内部の「未選択」センチネルである `-997` ではないことを確認するには、 `selected-at(., 0) != -997` 制約を使用します。
+
+| 列 | 値 |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | 有効なオプションを選択してください |
+
+値 `-997` は、オートコンプリートリストから何も選択されていないときに RTSurvey が保存する内部コードです。888 や 999 の選択は、意図的な選択とみなされ、このチェックを通過します。
+
+さらに実際の（特別な値ではない）値を要求するには、制約を拡張します。
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## 比較：ローカルデータベース vs その他の検索方法
+
+| 機能 | `rawquery` オートコンプリート | `search-api()` | `search()` CSV | 通常のCSV選択肢 |
+|---|---|---|---|---|
+| データソース | バンドルされた `.db` (SQLite) | リモート REST API | バンドルされた CSV | choices シート |
+| オフライン動作 | はい | いいえ | はい | はい |
+| 生のSQLをサポート | はい | いいえ | いいえ | いいえ |
+| 連動フィルタ | はい — パラメータ化された `?` | リクエストボディ経由 | 制限あり | いいえ |
+| データセットサイズ | 非常に大きい (数百万行) | 無制限 (サーバー側) | 中規模 (数万行) | 小規模 |
+| 特別な挿入行 | はい — `UNION SELECT` | いいえ | いいえ | はい (手動) |
+| 設定の複雑さ | 中程度 — バンドルされた `.db` が必要 | 高い — API サーバーが必要 | 低い | なし |
+
+---
+
+## 制限事項
+
+- `.db` ファイルは、デプロイ前にフォームのメディアパッケージ内にバンドルされている必要があります。データベースの動的な更新には、新しいフォームのデプロイが必要です。
+- SQLはデバイス上でそのまま実行されます。サーバー側でのサニタイズは行われません。調査員が入力した自由形式のテキストからSQLを構築することは避けてください。
+- `SELECT` 文のみがサポートされています。 `INSERT`, `UPDATE`, `DELETE` は許可されていません。
+- 非常に複雑なクエリ（大規模な `UNION` チェーン、複数の結合など）は、低スペックの Android デバイスでは動作が遅くなる可能性があります。
+- `search-autocomplete-noedit` バリエーションでは、調査員が結果セットにない値を保存することはできません。自由形式のテキスト入力が必要な場合は、別の `text` フィールドを使用してください。
+- `SELECT DISTINCT` は、クエリに `DISTINCT` が含まれていない場合にのみ自動的に挿入されます。明示的に `SELECT DISTINCT` と記述した場合、重複して挿入されることはありません。

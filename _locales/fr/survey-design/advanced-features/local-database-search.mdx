@@ -1,0 +1,224 @@
+---
+title: "Recherche en base de données locale"
+description: "La recherche en base de données locale interroge un fichier SQLite .db intégré à l'aide de SQL brut, permettant une saisie semi-automatique hors ligne rapide pour les grands ensembles de données statiques."
+---
+
+import { Callout } from 'nextra/components'
+
+**La recherche en base de données locale** permet à un champ `select_one` ou `text` d'interroger un fichier SQLite `.db` qui est intégré au package média du formulaire — entièrement hors ligne, sans communication avec le serveur. C'est l'approche appropriée lorsque votre liste de choix est volumineuse et statique (par exemple, une liste nationale de villages, d'établissements de santé ou de limites administratives) et que la connectivité ne peut être garantie.
+
+| Approche | Source de données | Nécessite une connectivité |
+|---|---|---|
+| Recherche en base de données locale (`rawquery`) | Fichier `.db` intégré (SQLite) | Non |
+| `search-api()` | API REST distante | Oui |
+| `search()` | Fichier CSV intégré | Non |
+
+---
+
+## Variantes d'apparence
+
+Le champ de saisie semi-automatique est configuré via la colonne `appearance`. Trois variantes sont disponibles :
+
+| Variante | Notes |
+|---|---|
+| `search-autocomplete-noedit(...)` | Saisie semi-automatique standard — l'enquêteur doit sélectionner dans la liste ; la saisie de texte libre n'est pas enregistrée |
+| `search-autocomplete-noedit-v2(...)` | Variante recommandée — même comportement mais utilise un moteur de rendu mis à jour avec de meilleures performances sur les grands ensembles de résultats |
+| `search(...)` | Correspondance simple basée sur un fichier par rapport à un CSV intégré ; ne prend **pas** en charge le SQL brut — répertorié ici uniquement à des fins de comparaison |
+
+<Callout type="info">
+`search-autocomplete-noedit` est un alias — au moment de l'analyse, l'application le remplace par le nom de la fonction interne `searchAutocompleteNoedit`. Utilisez l'une ou l'autre orthographe dans votre XLSForm ; les deux fonctionnent.
+</Callout>
+
+---
+
+## La source de données `rawquery`
+
+Pour exécuter une requête SQL sur un fichier `.db`, passez `'rawquery'` comme premier argument de la fonction d'apparence. La signature complète est :
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Paramètres
+
+| Position | Paramètre | Description |
+|---|---|---|
+| 1 | `'rawquery'` | Chaîne littérale — indique à l'application d'exécuter le SQL directement |
+| 2 | `db_path` | Chemin vers le fichier SQLite, sous la forme `<dir>/<file>.db::tableName`. Le suffixe `::tableName` est supprimé lors de l'ouverture du fichier ; le nom de la table est utilisé dans votre SQL |
+| 3 | `'[display_col]'` | Colonne à afficher dans la liste déroulante. Les crochets `[ ]` environnants sont supprimés au moment de l'exécution |
+| 4 | `'value_col'` | Colonne dont la valeur est stockée lorsque l'enquêteur effectue une sélection |
+| 5 | `'SELECT ...'` | Toute instruction SQLite SELECT valide. `SELECT DISTINCT` est automatiquement injecté si `DISTINCT` n'est pas déjà présent |
+| 6+ | `param1, ...` | Facultatif. Valeurs liées aux espaces réservés `?` dans le SQL, dans l'ordre. Si le SQL contient `?` mais qu'aucun paramètre n'est fourni, le champ renvoie un résultat vide (une protection intégrée contre les arguments manquants) |
+
+### La convention `db_path`
+
+Le fichier de base de données réside dans le répertoire média intégré du formulaire. Au moment de l'exécution, `pulldata('app-api', 'family_path')` renvoie ce chemin de répertoire. Voir [family_path](family-path) pour les détails de configuration. Le modèle standard est :
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Lorsque l'application ouvre le fichier, elle supprime la partie `::tableName` et utilise le chemin du fichier seul. Le nom de la table n'apparaît qu'à l'intérieur de votre SQL.
+
+---
+
+## Exemple de base — recherche de province
+
+Une liste déroulante de provinces en lecture seule s'appuyant sur un fichier `vnxa3.db` intégré :
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+La colonne `appearance` (développée pour la lisibilité) :
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- L'étiquette affichée provient de la colonne `provv`.
+- La valeur stockée provient de la colonne `provid`.
+- Seules les lignes où `rta_filter = "1"` sont affichées.
+
+---
+
+## Requêtes paramétrées
+
+Utilisez des espaces réservés `?` dans votre SQL et transmettez les références de champ correspondantes en tant qu'arguments supplémentaires (positions 6 et suivantes). C'est le modèle standard pour les sélections en cascade — par exemple, charger les districts qui appartiennent à la province précédemment sélectionnée.
+
+<Callout type="warning">
+Si votre SQL contient au moins un `?` et qu'aucun argument de paramètre n'est fourni, le champ renvoie un ensemble de résultats vide. Cela empêche l'affichage de données obsolètes ou non filtrées avant qu'une sélection parente ne soit effectuée.
+</Callout>
+
+### Exemple de cascade de districts
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+La valeur de `${province}` est liée au premier `?`. Le champ est vide jusqu'à ce que l'enquêteur sélectionne une province.
+
+### Exemple à deux paramètres — cascade de communes
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Les paramètres sont liés par position : `${province}` → premier `?`, `${district}` → second `?`.
+
+---
+
+## UNION SELECT pour les valeurs spéciales
+
+Injectez des lignes synthétiques — telles que « Ne sait pas » ou « Refus de répondre » — directement dans le SQL à l'aide de `UNION SELECT` :
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Ne sait pas</i>", "888"')
+```
+
+Conventions utilisées dans les formulaires RTSurvey :
+
+| Code | Signification |
+|---|---|
+| `888` | Ne sait pas |
+| `999` | Refus de répondre |
+
+Les balises HTML telles que `<i>` dans la chaîne d'affichage sont rendues par l'application — vous pouvez les utiliser pour distinguer visuellement les options spéciales.
+
+---
+
+## Affichage multilingue
+
+Stockez les étiquettes spécifiques à la langue dans des colonnes séparées (par exemple, `label_vi`, `label_en`) et sélectionnez celle appropriée en fonction d'un champ de langue dans votre formulaire :
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Pour changer de colonne de manière dynamique en fonction d'un champ `${language}`, utilisez une expression `if()` sur le paramètre de la colonne d'affichage pour basculer entre les colonnes de langue :
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Le paramètre de la colonne d'affichage est évalué avant l'exécution de la requête. Seul le nom de la colonne (sans crochets) est transmis au moteur SQL ; les crochets sont des marqueurs cosmétiques supprimés au moment de l'analyse.
+</Callout>
+
+---
+
+## Validation d'une sélection réelle
+
+Lorsque le champ autorise des valeurs spéciales telles que 888 ou 999, une simple vérification `required = yes` est insuffisante — elle est satisfaite même si l'enquêteur sélectionne « Ne sait pas ». Utilisez la contrainte `selected-at(., 0) != -997` pour vérifier que la valeur stockée est une sélection authentique et non la sentinelle interne « rien de sélectionné » `-997` :
+
+| colonne | valeur |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Veuillez sélectionner une option valide |
+
+La valeur `-997` est le code interne que RTSurvey stocke lorsqu'aucun élément n'a été sélectionné dans la liste de saisie semi-automatique. Une sélection de 888 ou 999 reste un choix délibéré et réussit cette vérification.
+
+Pour exiger en plus une valeur réelle (non spéciale), étendez la contrainte :
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Comparaison : base de données locale par rapport aux autres méthodes de recherche
+
+| Fonctionnalité | Saisie semi-automatique `rawquery` | `search-api()` | `search()` CSV | Choix CSV simples |
+|---|---|---|---|---|
+| Source de données | `.db` intégré (SQLite) | API REST distante | CSV intégré | Feuille de choix |
+| Fonctionne hors ligne | Oui | Non | Oui | Oui |
+| Prend en charge le SQL brut | Oui | Non | Non | Non |
+| Filtres en cascade | Oui — `?` paramétré | Via le corps de la requête | Limité | Non |
+| Taille de l'ensemble de données | Très grande (millions de lignes) | Illimitée (côté serveur) | Moyenne (dizaines de milliers) | Petite |
+| Lignes injectées spéciales | Oui — `UNION SELECT` | Non | Non | Oui (manuel) |
+| Complexité de configuration | Moyenne — nécessite un `.db` intégré | Élevée — nécessite un serveur API | Faible | Aucune |
+
+---
+
+## Limites
+
+- Le fichier `.db` doit être intégré dans le package média du formulaire avant le déploiement. Les mises à jour dynamiques de la base de données nécessitent un nouveau déploiement du formulaire.
+- Le SQL est exécuté tel quel sur l'appareil. Il n'y a pas de nettoyage côté serveur — évitez de construire du SQL à partir d'une saisie de texte libre de l'enquêteur.
+- Seules les instructions `SELECT` sont prises en charge. `INSERT`, `UPDATE` et `DELETE` ne sont pas autorisés.
+- Les requêtes très complexes (grandes chaînes `UNION`, plusieurs jointures) peuvent être lentes sur les appareils Android bas de gamme.
+- Les variantes `search-autocomplete-noedit` ne permettent pas à l'enquêteur d'enregistrer une valeur qui ne figure pas dans l'ensemble de résultats. Si la saisie de texte libre est requise, utilisez un champ `text` séparé.
+- `SELECT DISTINCT` est injecté automatiquement uniquement lorsque `DISTINCT` est absent de la requête. Si vous écrivez `SELECT DISTINCT` explicitement, il ne sera pas doublé.

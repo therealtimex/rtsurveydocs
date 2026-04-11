@@ -1,48 +1,48 @@
 ---
 title: "Geavanceerde herhalingen"
-description: "Geavanceerde patronen voor herhalingsgroepen: dynamische tellingen, geneste herhalingen, samenvatten van herhalingsgegevens en verwijzen naar waarden over herhalingen."
+description: "Geavanceerde patronen voor herhalingsgroepen: dynamische aantallen, geneste herhalingen, samenvatten van herhalingsgegevens en het verwijzen naar waarden tussen herhalingen."
 ---
 
-Deze pagina behandelt geavanceerde patronen voor het werken met herhalingsgroepen in rtSurvey. Voor de basis van het instellen van een herhalingsgroep, zie [Groepering en herhalingen](../repeats).
+Deze pagina behandelt geavanceerde patronen voor het werken met herhalingsgroepen (repeat groups) in rtSurvey. Zie [Groeperen en herhalen](../repeats) voor de basisbeginselen van het instellen van een herhalingsgroep.
 
 ---
 
-## Dynamische herhalingstelling
+## Dynamisch herhalingsaantal
 
-Standaard beslist de enumerator hoe vaak te herhalen. U kunt het aantal herhalingen fixeren met `repeat_count`:
+Standaard beslist de enquêteur hoe vaak een herhaling wordt uitgevoerd. U kunt het aantal herhalingen vastzetten met `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
 | begin_repeat | household_members | Huishoudlid | `${num_members}` |
-| text | member_name | Naam van lid | |
+| text | member_name | Naam lid | |
 | integer | member_age | Leeftijd | |
 | end_repeat | | | |
 
-De herhaling wordt precies `${num_members}` keer uitgevoerd, waarbij `num_members` eerder in het formulier is verzameld. De enumerator kan geen instanties toevoegen of verwijderen.
+De herhaling wordt precies `${num_members}` keer uitgevoerd, waarbij `num_members` eerder in het formulier is verzameld. De enquêteur kan geen instanties toevoegen of verwijderen.
 
 ---
 
 ## Geïndexeerde toegang: `indexed-repeat()`
 
-Toegang krijgen tot de veldwaarde van een specifieke herhalingsinstantie van **buiten** de herhalingsgroep met `indexed-repeat(herhaaldVeld, herhalingsgroep, index)`:
+Krijg toegang tot de veldwaarde van een specifieke herhalingsinstantie van **buiten** de herhalingsgroep met `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Dit is nuttig voor het bouwen van samenvattingsvelden of het verwijzen naar de gegevens van het "primaire" lid na de herhaling.
+Dit is handig voor het maken van samenvattingsvelden of het verwijzen naar de gegevens van het "primaire" lid na de herhaling.
 
 ---
 
-## Huidige instantiepositie: `index()`
+## Positie huidige instantie: `index()`
 
-Binnen een herhalingsgroep geeft `index()` de 1-gebaseerde positie van de huidige instantie terug. Gebruik het om elke herhaling te labelen of unieke identificatoren te maken:
+Binnen een herhalingsgroep retourneert `index()` de op 1 gebaseerde positie van de huidige instantie. Gebruik dit om elke herhaling te labelen of unieke identificatiegegevens te maken:
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | plots | Perceel |
-| note | plot_label | Perceelnummer `${index()}` |
+| note | plot_label | Perceel nummer `${index()}` |
 | text | plot_id | Perceel-ID |
 | end_repeat | | |
 
@@ -50,25 +50,25 @@ Binnen een herhalingsgroep geeft `index()` de 1-gebaseerde positie van de huidig
 
 ## Verwijzen naar velden in dezelfde instantie
 
-Gebruik binnen een herhaling `${veldnaam}` om te verwijzen naar een ander veld **in dezelfde herhalingsinstantie**. Er is geen `indexed-repeat()` nodig binnen dezelfde lus:
+Gebruik binnen een herhaling `${fieldname}` om naar een ander veld **in dezelfde herhalingsinstantie** te verwijzen. Het is niet nodig om `indexed-repeat()` te gebruiken binnen dezelfde lus:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
 | begin_repeat | members | Lid | |
 | text | member_name | Naam | |
 | integer | member_age | Leeftijd | |
-| text | school_name | Schoolnaam | `${member_age} < 18` |
+| text | school_name | Naam school | `${member_age} < 18` |
 | end_repeat | | | |
 
 ---
 
-## Verwijzen naar bovenliggende velden van binnenuit een herhaling
+## Verwijzen naar bovenliggende velden vanuit een herhaling
 
-Velden buiten (boven) de herhalingsgroep kunnen normaal worden gerefereerd met `${veldnaam}`:
+Naar velden buiten (boven) de herhalingsgroep kan normaal worden verwezen met `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
-| text | village | Dorpsnaam |
+| text | village | Naam dorp |
 | begin_repeat | plots | Landbouwperceel |
 | note | plot_context | Percelen in `${village}` |
 | end_repeat | | |
@@ -80,17 +80,17 @@ Velden buiten (boven) de herhalingsgroep kunnen normaal worden gerefereerd met `
 Gebruik herhalingsaggregatiefuncties **buiten** de herhalingsgroep om samen te vatten:
 
 | Functie | Voorbeeld | Beschrijving |
-|---------|---------|-------------|
-| `count(groep)` | `count(${household_members})` | Aantal instanties |
-| `sum(veld)` | `sum(${loan_amount})` | Som van een numeriek veld |
-| `min(veld)` | `min(${member_age})` | Minimumwaarde |
-| `max(veld)` | `max(${member_age})` | Maximumwaarde |
-| `join(sep, veld)` | `join(', ', ${member_name})` | Met komma's gescheiden lijst |
-| `count-if(groep, expr)` | `count-if(${members}, ${member_age} < 18)` | Voorwaardelijke telling |
-| `sum-if(veld, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Voorwaardelijke som |
-| `join-if(sep, veld, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Voorwaardelijke samenvoeging |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | Aantal instanties |
+| `sum(field)` | `sum(${loan_amount})` | Som van een numeriek veld |
+| `min(field)` | `min(${member_age})` | Minimumwaarde |
+| `max(field)` | `max(${member_age})` | Maximumwaarde |
+| `join(sep, field)` | `join(', ', ${member_name})` | Door komma's gescheiden lijst |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Voorwaardelijke telling |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Voorwaardelijke som |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Voorwaardelijke samenvoeging |
 
-### Voorbeeld: Huishoudsamenvatting
+### Voorbeeld: Samenvatting huishouden
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -102,53 +102,149 @@ Gebruik herhalingsaggregatiefuncties **buiten** de herhalingsgroep om samen te v
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` leden; `${children_count}` onder 18. Volwassenen: `${adult_names}` | |
+| note | summary | `${total_members}` leden; `${children_count}` onder de 18. Volwassenen: `${adult_names}` | |
 
 ---
 
 ## Geneste herhalingen
 
-Een herhalingsgroep kan een andere herhalingsgroep bevatten. Gebruik dit voorzichtig — geneste herhalingen voegen complexiteit toe en kunnen verwarrend zijn voor enumeratoren.
+Een herhalingsgroep kan een andere herhalingsgroep bevatten. Gebruik dit voorzichtig — geneste herhalingen voegen complexiteit toe en kunnen verwarrend zijn voor enquêteurs.
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | households | Huishouden |
 | text | hh_id | Huishoud-ID |
 | begin_repeat | hh_members | Lid |
-| text | member_name | Naam van lid |
+| text | member_name | Naam lid |
 | end_repeat | | |
 | end_repeat | | |
 
-Om te verwijzen naar een veld in een buitenste herhaling vanuit de binnenste herhaling, gebruikt u `${veldnaam}` — het wordt omgezet naar de dichtstbijzijnde overeenkomende voorouder:
+Om vanuit de binnenste herhaling naar een veld in een buitenste herhaling te verwijzen, gebruikt u `${fieldname}` — dit verwijst naar de dichtstbijzijnde overeenkomende ouder:
 
-Binnen de herhaling `hh_members` geeft `${hh_id}` de ID van het **huidige** huishouden terug, niet alle huishoudens.
+Binnen de `hh_members`-herhaling retourneert `${hh_id}` de ID van het **huidige** huishouden, niet van alle huishoudens.
 
 ---
 
-## Rang binnen herhalingsgroepen: `rank-index()`
+## Rangschikking binnen herhalingsgroepen: `rank-index()`
 
-Wanneer een `rank`-veld bestaat binnen een herhaling, gebruik dan `rank-index(instantienummer, herhaaldVeld)` van buiten om de ordinale rang van een specifieke instantie te krijgen:
+Wanneer er een `rank`-veld bestaat binnen een herhaling, gebruikt u `rank-index(instanceNumber, repeatedField)` van buitenaf om de rangorde van een specifieke instantie te verkrijgen:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` geeft de instantie-index van de hoogste score terug.
+`rank-index(1, ${score})` retourneert de instantie-index van de hoogste score.
 
 ---
 
-## Aanbevolen werkwijzen
+## `1screen` weergave op `begin_repeat`
 
-1. Gebruik altijd `repeat_count` wanneer het aantal herhalingen van tevoren bekend is — dit voorkomt dat enumeratoren per ongeluk instanties toevoegen of verwijderen.
-2. Houd herhalingsgroepen gefocust — een herhaling met 20+ vragen per instantie is moeilijk te navigeren.
-3. Benoem herhalingsgroepen duidelijk (bijv. `household_members`, niet `repeat1`) — de naam verschijnt in functieaanroepen en geëxporteerde gegevens.
-4. Test met het maximale verwachte aantal instanties om de prestaties te verifiëren.
-5. Gebruik de weergave `field-list` op de herhalingsgroep om alle velden op één scherm per instantie te tonen (mobiel).
+Het toevoegen van `1screen` aan de kolom `appearance` van een `begin_repeat`-rij zorgt ervoor dat alle vragen voor elke instantie samen op één scherm worden getoond, in plaats van één vraag per scherm.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Huishoudlid | `1screen` |
+| text | member_name | Naam lid | |
+| integer | member_age | Leeftijd | |
+| end_repeat | | | |
+
+Wanneer `1screen` is ingesteld en er geen `repeat_count` en geen `add_repeat`-veld binnen de groep is, toont rtSurvey automatisch een ronde **+** knop onderaan het scherm, zodat enquêteurs nieuwe instanties kunnen toevoegen zonder extra configuratie.
+
+| Weergave | Eén scherm per instantie | Standaard + knop toegevoegd |
+|------------|-------------------------|------------------------|
+| `1screen` | Ja | Ja (wanneer geen `add_repeat` kind-veld) |
+| `field-list` | Ja | Nee |
+
+Gebruik `field-list` wanneer u de gegroepeerde lay-out wilt zonder de automatische toevoegknop. Gebruik `1screen` wanneer u zowel de gegroepeerde lay-out als een ingebouwde manier om instanties toe te voegen wilt.
+
+---
+
+## `add_repeat` aangepaste toevoegknop
+
+Een `note`- (of `text`-) veld dat **binnen** de herhalingsgroep is geplaatst met `appearance: add_repeat`, wordt weergegeven als een "Toevoegen"-knop over de volledige breedte. Het knoplabel is afkomstig uit de kolom `label` van het veld. Wanneer een `add_repeat`-veld aanwezig is, wordt de standaard ronde + knop (van `1screen`) onderdrukt.
+
+Plaats het `add_repeat`-veld als het laatste veld binnen de herhalingsgroep:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Lid | `1screen` |
+| text | member_name | Naam lid | |
+| integer | member_age | Leeftijd | |
+| note | btn_add | + Lid toevoegen | `add_repeat` |
+| end_repeat | | | |
+
+### Kleur aanpassen
+
+Geef een kleurcode op binnen de appearance-waarde om de knop op te maken:
+
+| Appearance-waarde | Resultaat |
+|-------------------|-----------|
+| `add_repeat <#04B404/>` | Groene achtergrond, standaard tekstkleur |
+| `add_repeat 04B404-ffffff` | Groene achtergrond, witte tekst |
+
+De eerste kleur is de achtergrond en de tweede (na het streepje) is de tekstkleur. Laat de `#` weg bij gebruik van de door een streepje gescheiden vorm.
+
+### Icoon-variant
+
+Gebruik `add_repeat icon` (met een spatie) om een compacte ronde icoonknop weer te geven in plaats van de knop over de volledige breedte:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Toevoegen | `add_repeat icon` |
+
+---
+
+## Verwijderknoppen: `delete-repeat-current` en `delete-repeat-last`
+
+Een `note`-veld binnen de herhalingsgroep met `appearance: delete-repeat-current` of `appearance: delete-repeat-last` wordt weergegeven als een gesplitste verwijderknop.
+
+| Weergave | Actie |
+|------------|--------|
+| `delete-repeat-current` | Verwijdert de huidige (actieve) instantie |
+| `delete-repeat-last` | Verwijdert de laatste instantie in de herhaling |
+
+De standaardknop (geen icoon) is een gesplitste knop: een prullenbak-icoon aan de linkerkant en de labeltekst van het veld aan de rechterkant, die de volledige breedte van het scherm beslaat.
+
+### Icoon-variant
+
+Voeg `-icon` toe voor een compacte ronde prullenbak-icoonknop:
+
+| Weergave | Resultaat |
+|------------|--------|
+| `delete-repeat-current-icon` | Rond prullenbak-icoon, verwijdert huidige instantie |
+| `delete-repeat-last-icon` | Rond prullenbak-icoon, verwijdert laatste instantie |
+
+### Kleur aanpassen
+
+Het kleurformaat is identiek aan `add_repeat`: gebruik `<#RRGGBB/>` of `RRGGBB-RRGGBB` (achtergrond-tekst).
+
+### Voorbeeld volledig patroon
+
+De volgende herhaling gebruikt `1screen`, een ronde verwijder-huidige knop bovenaan en een toevoegknop over de volledige breedte onderaan:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Lid | `1screen` |
+| note | btn_del | Verwijderen | `delete-repeat-current-icon` |
+| text | member_name | Naam lid | |
+| integer | member_age | Leeftijd | |
+| note | btn_add | + Lid toevoegen | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## Best Practices
+
+1. Gebruik altijd `repeat_count` wanneer het aantal herhalingen vooraf bekend is — dit voorkomt dat enquêteurs per ongeluk instanties toevoegen of verwijderen.
+2. Houd herhalingsgroepen gefocust — een herhaling met meer dan 20 vragen per instantie is moeilijk te navigeren.
+3. Geef herhalingsgroepen duidelijke namen (bijv. `household_members`, niet `repeat1`) — de naam verschijnt in functieaanroepen en geëxporteerde gegevens.
+4. Test met het maximaal verwachte aantal instanties om de prestaties te verifiëren.
+5. Gebruik `1screen` op `begin_repeat` om alle vragen op één scherm per instantie te tonen, in combinatie met een `add_repeat` notitieveld binnen de groep om enquêteurs een duidelijk gelabelde "Toevoegen"-knop te geven.
 
 ---
 
 ## Beperkingen
 
-- `indexed-repeat()` vereist een geldige index (1 tot het aantal instanties) — indices buiten bereik retourneren leeg.
-- Geneste herhalingen dieper dan 2 niveaus worden niet aanbevolen en kunnen weergaveproblemen op sommige clients veroorzaken.
-- Aggregatiefuncties (`sum`, `count`, etc.) werken op de gehele herhalingsgroep — u kunt geen subset van instanties aggregeren zonder de `*-if`-varianten.
+- `indexed-repeat()` vereist een geldige index (1 tot het aantal instanties) — indexen buiten het bereik retourneren een lege waarde.
+- Geneste herhalingen verder dan 2 niveaus worden niet aanbevolen en kunnen weergaveproblemen veroorzaken op sommige clients.
+- Aggregatiefuncties (`sum`, `count`, etc.) werken op de gehele herhalingsgroep — u kunt geen subset van instanties aggregeren zonder `*-if`-varianten.

@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "Audio ierakstīšana",
   "call-api": "Call API",
   "dynamic-question-type": "Dinamiskais jautājuma tips",
   "dynamic-search": "Dinamiskā meklēšana",

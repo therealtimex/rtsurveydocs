@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path 는 런타임 시 폼의 번들된 미디어 디렉토리 경로를 반환하는 규칙 calculate 필드입니다. 로컬 데이터베이스 조회 또는 파일 기반 검색을 사용하는 모든 폼에 필요합니다."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` 는 폼의 번들된 미디어 디렉토리에 대한 경로를 보유하는 규칙 calculate 필드입니다. `rawquery`, `pulldata` 또는 `search()` 를 사용하여 로컬 데이터베이스 조회를 수행하는 모든 폼에는 이 필드가 포함되어야 합니다. 이 필드가 없으면 파일 경로를 해석할 수 없으며 조회 결과가 자동으로 빈 값으로 반환됩니다.
+
+---
+
+## calculate 필드
+
+survey 시트의 상단 근처, 메타 필드 뒤와 데이터베이스 파일을 사용하는 첫 번째 질문 앞에 이 행을 추가합니다.
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+이 필드는 표시되는 값을 저장하지 않으며 label 이 필요하지 않습니다. 이는 이후에 따르는 모든 경로 구성에 대한 보이지 않는 전제 조건입니다.
+
+---
+
+## 이것이 필요한 이유
+
+RTSurvey 는 SQLite 데이터베이스, 이미지, 오디오 클립과 같은 폼 미디어를 기기의 폼별 디렉토리 내에 번들로 제공합니다. 정확한 경로는 플랫폼(Android, iOS, 웹) 및 기기에 따라 다릅니다.
+
+런타임 시 앱은 `family_path` 를 자동으로 채웁니다. 일반적인 해석된 값은 다음과 같습니다.
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+경로는 플랫폼에 따라 다르며 실행 시점에 결정되므로 폼에 하드코딩할 수 없습니다. `pulldata('app-api', 'family_path')` 가 이를 가져오는 유일하고 신뢰할 수 있는 방법입니다.
+
+---
+
+## 경로에서 사용하는 방법
+
+`family_path` 가 정의되면 `concat()` 를 사용하여 전체 파일 경로를 작성합니다.
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+`::tableName` 접미사는 앱이 파일을 열 때 제거됩니다. 테이블 이름은 SQL 쿼리 내부에서만 사용됩니다.
+
+---
+
+## family_path 가 사용되는 위치
+
+번들된 파일을 참조할 때마다 경로 인수에 `family_path` 가 필요합니다.
+
+- **로컬 데이터베이스 검색** — `search-autocomplete-noedit-v2('rawquery', ...)` 의 `db_path` 인수는 `concat(${family_path}, ...)` 로 구성되어야 합니다. 전체 사용법 세부 정보는 [로컬 데이터베이스 검색](local-database-search)을 참조하십시오.
+- **`pulldata` rawquery** — `.db` 파일에서 읽는 모든 `pulldata('rawquery', ...)` 호출은 동일한 `concat()` 패턴을 사용합니다.
+- **로컬 파일을 사용한 `search()`** — 번들된 CSV 또는 DB 파일에서 로드되는 동적 검색 appearance 도 파일 참조를 위해 `family_path` 에 의존합니다.
+
+---
+
+## 폼 내 배치
+
+`family_path` 는 **이를 참조하는 첫 번째 필드 앞에** 나타나야 합니다. 권장 위치는 메타 그룹 바로 뒤입니다.
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | 도/시 | *( `${family_path}` 를 참조하는 rawquery appearance)* |
+
+<Callout type="warning">
+폼에 `family_path` 가 없거나 이를 참조하는 첫 번째 `rawquery` / `search()` 필드 뒤에 배치되면 번들된 파일에 대한 모든 조회가 자동으로 빈 값으로 반환됩니다. 오류 메시지는 표시되지 않으며 자동 완성에 결과가 나타나지 않습니다.
+</Callout>
+
+---
+
+## 여러 데이터베이스 파일
+
+단일 폼에서 여러 개의 `.db` 파일을 사용할 수 있습니다. 각 경로는 `concat()` 를 사용하여 독립적으로 작성됩니다.
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+`family_path` 를 한 번 정의하고 필요한 만큼 많은 필드에서 참조하십시오.
+
+---
+
+## 개발 중 확인
+
+기기에서 해석된 값을 검사하려면 `family_path` 아래에 임시 `note` 필드를 추가하십시오.
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `경로: ${family_path}` | |
+
+노트는 테스트 중에 실제 해석된 경로를 표시합니다. 최종 폼을 배포하기 전에 제거하십시오.

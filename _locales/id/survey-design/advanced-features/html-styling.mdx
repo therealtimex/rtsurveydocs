@@ -1,29 +1,29 @@
 ---
 title: "Penataan HTML"
-description: "rtSurvey mendukung tag HTML dalam label dan petunjuk, memungkinkan format teks kaya, tautan, dan tema warna dinamis."
+description: "rtSurvey mendukung tag HTML dalam label dan petunjuk, memungkinkan pemformatan teks kaya, tautan, dan tema warna dinamis."
 ---
 
 import { Callout } from 'nextra/components'
 
-rtSurvey merender teks **label** dan **hint** sebagai HTML pada formulir web. Ini berarti Anda dapat menggunakan tag HTML standar untuk memformat teks, menambahkan jeda baris, membuat tautan, dan menerapkan warna. Ini sangat berguna untuk bidang catatan, instruksi bagian, dan ringkasan dinamis.
+rtSurvey merender teks **label** dan **hint** (petunjuk) sebagai HTML pada formulir web. Ini berarti Anda dapat menggunakan tag HTML standar untuk memformat teks, menambahkan ganti baris, membuat tautan, dan menerapkan warna. Ini sangat berguna untuk bidang catatan, instruksi bagian, dan ringkasan dinamis.
 
 <Callout type="warning">
-HTML dalam label dirender di **formulir web** dan aplikasi mobile rtSurvey. Mungkin tidak dirender di semua klien yang kompatibel dengan ODK. Selalu uji di platform target Anda.
+HTML dalam label dirender pada **formulir web** dan aplikasi seluler rtSurvey. Ini mungkin tidak dirender di semua klien yang kompatibel dengan ODK. Selalu uji pada platform target Anda.
 </Callout>
 
 ---
 
-## Tag HTML yang didukung
+## Tag HTML yang Didukung
 
-### Format teks
+### Pemformatan teks
 
 | Tag | Hasil |
-|-----|-------|
-| `<strong>text</strong>` atau `<b>text</b>` | **Teks tebal** |
-| `<em>text</em>` atau `<i>text</i>` | *Teks miring* |
-| `<u>text</u>` | Teks bergaris bawah |
-| `<br>` | Jeda baris |
-| `<span style="...">text</span>` | Penataan inline |
+|-----|--------|
+| `<strong>teks</strong>` atau `<b>teks</b>` | **Teks tebal** |
+| `<em>teks</em>` atau `<i>teks</i>` | *Teks miring* |
+| `<u>teks</u>` | Teks bergaris bawah |
+| `<br>` | Ganti baris |
+| `<span style="...">teks</span>` | Penataan sebaris |
 
 ### Tautan
 
@@ -31,14 +31,14 @@ HTML dalam label dirender di **formulir web** dan aplikasi mobile rtSurvey. Mung
 <a href="https://example.com" target="_blank">Klik di sini</a>
 ```
 
-Membuka di tab baru. Gunakan untuk dokumen referensi, panduan, atau sumber daya eksternal yang harus dikonsultasikan enumerator.
+Terbuka di tab baru. Gunakan untuk dokumen referensi, pedoman, atau sumber daya eksternal yang harus dikonsultasikan oleh enumerator.
 
 ### Warna
 
-Gunakan `<span>` dengan gaya inline:
+Gunakan `<span>` dengan gaya sebaris:
 
 ```html
-<span style="color: red;">Peringatan: nilai di luar rentang</span>
+<span style="color: red;">Peringatan: nilai di luar jangkauan</span>
 <span style="color: #009688;">Bagian selesai</span>
 ```
 
@@ -46,10 +46,10 @@ Gunakan `<span>` dengan gaya inline:
 
 ## Variabel tema warna
 
-rtSurvey mendukung **token tema warna** yang beradaptasi dengan tema yang dikonfigurasi aplikasi. Gunakan sintaks `__COLOR_THEME_NAME__`:
+rtSurvey mendukung **token tema warna** yang menyesuaikan dengan tema yang dikonfigurasi aplikasi. Gunakan sintaks `__COLOR_THEME_NAME__`:
 
 ```html
-<span style="color: var(--color-theme-primary);">Teks warna utama</span>
+<span style="color: var(--color-theme-primary);">Teks warna primer</span>
 ```
 
 Atau menggunakan singkatan token dalam teks label:
@@ -58,11 +58,11 @@ Atau menggunakan singkatan token dalam teks label:
 <font color="var(--COLOR_THEME_PRIMARY)">Catatan penting</font>
 ```
 
-Ini secara otomatis dikonversi ke `<span>` yang setara dengan variabel CSS saat dirender.
+Ini secara otomatis dikonversi ke `<span>` yang setara dengan variabel CSS pada saat perenderan.
 
 ---
 
-## Label multi-bahasa
+## Label multibahasa
 
 Bungkus konten dalam tag bahasa untuk mendukung beberapa bahasa dalam satu sel label:
 
@@ -70,17 +70,17 @@ Bungkus konten dalam tag bahasa untuk mendukung beberapa bahasa dalam satu sel l
 <en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
 ```
 
-rtSurvey mengekstrak konten yang cocok dengan bahasa aplikasi saat ini. Jika tidak ada tag bahasa yang cocok ditemukan, string lengkap ditampilkan apa adanya.
+rtSurvey mengekstrak konten yang sesuai dengan bahasa aplikasi saat ini. Jika tidak ada tag bahasa yang cocok ditemukan, string lengkap akan ditampilkan apa adanya.
 
 ---
 
-## Contoh dalam bidang catatan
+## Contoh di bidang catatan
 
-### Instruksi bagian dengan teks tebal dan jeda baris
+### Instruksi bagian dengan tebal dan ganti baris
 
 | type | name | label |
 |------|------|-------|
-| note | section_intro | `<strong>Bagian 3: Penggunaan Lahan</strong><br>Ajukan semua pertanyaan dalam bagian ini hanya kepada kepala rumah tangga.` |
+| note | section_intro | `<strong>Bagian 3: Tata Guna Lahan</strong><br>Ajukan semua pertanyaan di bagian ini hanya kepada kepala rumah tangga.` |
 
 ### Ringkasan dinamis dengan referensi perhitungan
 
@@ -99,7 +99,7 @@ rtSurvey mengekstrak konten yang cocok dengan bahasa aplikasi saat ini. Jika tid
 
 | type | name | label |
 |------|------|-------|
-| note | guidelines_link | `Lihat <a href="https://docs.example.com/guidelines" target="_blank">Panduan Lapangan</a> sebelum memulai bagian ini.` |
+| note | guidelines_link | `Lihat <a href="https://docs.example.com/guidelines" target="_blank">Pedoman Lapangan</a> sebelum memulai bagian ini.` |
 
 ---
 
@@ -125,17 +125,87 @@ Contoh penggunaan dalam grup pengulangan:
 
 ---
 
+## Ringkasan HTML dinamis dengan autopull()
+
+`autopull()` merender blok HTML di dalam bidang `note` dan **mengevaluasi kembali pada setiap perubahan bidang** dalam formulir. Ini membuatnya cocok untuk panel ringkasan langsung, layar tinjauan sebelum dikirim, dan total berjalan yang diperbarui saat enumerator mengisi data.
+
+<Callout type="info">
+`autopull()` hanya berfungsi pada bidang **note**. Kolom label diabaikan — semua konten HTML harus disediakan melalui kolom **appearance** menggunakan `concat()`.
+</Callout>
+
+### Sintaks
+
+Tempatkan `autopull()` di kolom **appearance** pada bidang `note`:
+
+```
+autopull(concat('<html>...</html>'))
+```
+
+Referensi bidang (`${field_name}`) di dalam `concat()` diganti dengan nilai langsung saat ini dan HTML dirender ulang pada setiap perubahan.
+
+### Membatasi tinggi dengan scroll-view()
+
+Untuk ringkasan yang lebih panjang, gabungkan `autopull()` dengan `scroll-view(N%)` untuk membatasi tinggi panel dan membuatnya dapat digulir:
+
+```
+scroll-view(45%) autopull(concat('<html>...</html>'))
+```
+
+Nilai `N%` relatif terhadap area formulir yang terlihat. `45%` adalah default praktis untuk panel ringkasan di tengah halaman.
+
+### Contoh lengkap — ringkasan lokasi rumah tangga
+
+Bidang `note` berikut merender tabel dua kolom yang menunjukkan provinsi, distrik, dan desa yang dipilih. Ini diperbarui secara otomatis setiap kali `${tinh_name}`, `${huyen_name}`, atau `${xa_name}` berubah.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | location_summary | | `scroll-view(45%) autopull(concat('<html><table style="width:100%;border-collapse:collapse"><tr><td style="padding:4px;font-weight:bold">Province:</td><td style="padding:4px">', ${tinh_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">District:</td><td style="padding:4px">', ${huyen_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Commune:</td><td style="padding:4px">', ${xa_name}, '</td></tr></table></html>'))` |
+
+Dalam XLSForm nilai tampilan ditulis dalam satu sel:
+
+```
+scroll-view(45%) autopull(concat(
+  '<html><table style="width:100%;border-collapse:collapse">
+   <tr><td style="padding:4px;font-weight:bold">Province:</td>
+       <td style="padding:4px">', ${tinh_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">District:</td>
+       <td style="padding:4px">', ${huyen_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Commune:</td>
+       <td style="padding:4px">', ${xa_name}, '</td></tr>
+   </table></html>'))
+```
+
+### Gaya sebaris
+
+Atribut `style="..."` sebaris pada elemen HTML apa pun didukung dan merupakan cara yang disarankan untuk menerapkan pemformatan visual di dalam blok `autopull()`.
+
+Hal-hal berikut **tidak** didukung di dalam konten `autopull()`:
+
+- Blok `<style>`
+- Tag `<link>` lembar gaya eksternal
+- JavaScript (`<script>`)
+
+### Kapan menggunakan autopull()
+
+| Kasus penggunaan | Catatan |
+|----------|-------|
+| Layar tinjauan sebelum dikirim | Tampilkan semua jawaban kunci pada satu panel sebelum enumerator selesai |
+| Total berjalan | Tampilkan jumlah terhitung yang diperbarui saat jumlah dimasukkan |
+| Panel referensi yang terlihat | Tampilkan nilai pencarian yang dipilih (misalnya nama provinsi) saat enumerator mengisi bidang anak |
+
+---
+
 ## Praktik Terbaik
 
-1. Gunakan HTML secukupnya — label yang terlalu diformat lebih sulit dibaca, bukan lebih mudah.
-2. Pilih `<strong>` untuk tebal dan `<em>` untuk miring daripada `<b>` dan `<i>` yang sudah usang.
-3. Jaga penggunaan warna bermakna — gunakan merah untuk peringatan, bukan untuk dekorasi.
-4. Selalu uji rendering HTML di aplikasi mobile dan formulir web, karena rendering mungkin sedikit berbeda.
-5. Hindari tag `<table>` di dalam label — jarang dirender dengan baik di layar mobile.
-6. Jangan gunakan JavaScript (`<script>`) — akan dihapus atau menyebabkan kesalahan.
+1. Gunakan HTML dengan hemat — label yang diformat secara berlebihan lebih sulit dibaca.
+2. Lebih suka `<strong>` untuk tebal dan `<em>` for miring daripada tag `<b>` dan `<i>` yang sudah tidak digunakan lagi.
+3. Gunakan warna secara bermakna — gunakan merah untuk peringatan, bukan untuk dekorasi.
+4. Selalu uji perenderan HTML pada aplikasi seluler dan formulir web, karena perenderan mungkin sedikit berbeda.
+5. Hindari tag `<table>` di dalam label — tag tersebut jarang merender dengan baik di layar seluler.
+6. Jangan gunakan JavaScript (`<script>`) — ini akan dihapus atau menyebabkan kesalahan.
 
-## Keterbatasan
+## Batasan
 
-- HTML yang kompleks (tabel, formulir, skrip) tidak didukung dan mungkin merusak rendering.
-- Beberapa klien mobile yang lebih lama mungkin menampilkan tag HTML sebagai teks literal — uji di semua perangkat target.
-- Tautan `<a>` dibuka di browser atau WebView — enumerator meninggalkan formulir, yang bisa mengganggu di mobile.
+- HTML kompleks (tabel, formulir, skrip) tidak didukung dan dapat merusak perenderan.
+- Beberapa klien seluler lama mungkin menampilkan tag HTML sebagai teks literal — uji pada semua perangkat target.
+- Tautan `<a>` terbuka di browser atau WebView — enumerator meninggalkan formulir, yang dapat mengganggu di seluler.

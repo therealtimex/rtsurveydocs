@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path ir konvencionāls calculate lauks, kas izpildlaikā atgriež veidlapas pievienoto mēdiju direktorijas ceļu — tas ir nepieciešams katrai veidlapai, kas izmanto vietējās datubāzes meklēšanu vai uz failiem balstītu meklēšanu."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` ir konvencionāls calculate lauks, kas satur ceļu uz veidlapas pievienoto mēdiju direktoriju. Katrai veidlapai, kas veic vietējās datubāzes meklēšanu ar `rawquery`, `pulldata` vai `search()`, ir jāiekļauj šis lauks — bez tā failu ceļi nevar tikt atrisināti, un meklēšana klusi atgriež tukšu rezultātu.
+
+---
+
+## Calculate lauks
+
+Pievienojiet šo rindu survey lapas augšpusē, pēc jebkuriem meta laukiem un pirms pirmā jautājuma, kurā tiek izmantots datubāzes fails:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Lauks nesaglabā redzamu vērtību un tam nav nepieciešams label. Tas ir kluss priekšnosacījums visai turpmākajai ceļu izveidei.
+
+---
+
+## Kāpēc tas ir nepieciešams
+
+RTSurvey apkopo veidlapas mēdijus — SQLite datubāzes, attēlus, audio klipus — ierīces direktorijā, kas ir specifiska katrai veidlapai. Precīzs ceļš atšķiras starp platformām (Android, iOS, tīmeklis) un starp ierīcēm.
+
+Izpildlaikā lietotne automātiski aizpilda `family_path`. Tipiska atrisinātā vērtība izskatās šādi:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Tā kā ceļš ir specifisks platformai un tiek noteikts palaišanas laikā, to nevar ierakstīt veidlapā kā pastāvīgu kodu. `pulldata('app-api', 'family_path')` ir vienīgais drošais veids, kā to iegūt.
+
+---
+
+## Kā to izmantot ceļos
+
+Kad `family_path` ir definēts, izveidojiet pilnu faila ceļu ar `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Sufikss `::tableName` tiek noņemts, kad lietotne atver failu; tabulas nosaukums tiek izmantots tikai jūsu SQL vaicājumā.
+
+---
+
+## Kur tiek izmantots family_path
+
+Ceļa argumentā vienmēr ir nepieciešams `family_path`, kad atsaucaties uz pievienotu failu:
+
+- **Vietējā datubāzes meklēšana** — `search-autocomplete-noedit-v2('rawquery', ...)` argumentam `db_path` jābūt izveidotam ar `concat(${family_path}, ...)`. Pilnu informāciju par lietošanu skatiet sadaļā [Vietējā datubāzes meklēšana](local-database-search).
+- **`pulldata` rawquery** — jebkurš `pulldata('rawquery', ...)` izsaukums, kas nolasa datus no `.db` faila, izmanto to pašu `concat()` modeli.
+- **`search()` ar vietējo failu** — dinamiskās meklēšanas izskati (appearances), kas tiek ielādēti no pievienota CSV vai DB faila, arī paļaujas uz `family_path` faila atsaucei.
+
+---
+
+## Izvietojums veidlapā
+
+`family_path` ir jāparādās **pirms pirmā lauka, kas uz to atsaucas**. Ieteicamā pozīcija ir tūlīt pēc meta grupas:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(rawquery appearance, kas atsaucas uz `${family_path}`)* |
+
+<Callout type="warning">
+Ja veidlapā trūkst `family_path` vai tas ir novietots pēc pirmā `rawquery` / `search()` lauka, kas uz to atsaucas, visas meklēšanas darbības pievienotajos failos klusi atgriezīs tukšu rezultātu. Nav kļūdas ziņojuma — automātiskā pabeigšana vienkārši nerāda nekādus rezultātus.
+</Callout>
+
+---
+
+## Vairāki datubāzes faili
+
+Viena veidlapa var izmantot vairākus `.db` failus. Katrs ceļš tiek izveidots neatkarīgi ar `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Definējiet `family_path` vienu reizi; atsaucieties uz to tik daudzos laukos, cik nepieciešams.
+
+---
+
+## Pārbaude izstrādes laikā
+
+Pievienojiet pagaidu `note` lauku zem `family_path`, lai pārbaudītu atrisināto vērtību ierīcē:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Ceļš: ${family_path}` | |
+
+Piezīme testēšanas laikā parādīs faktisko atrisināto ceļu. Noņemiet to pirms galīgās veidlapas izvietošanas.

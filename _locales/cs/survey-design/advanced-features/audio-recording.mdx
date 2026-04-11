@@ -1,0 +1,118 @@
+---
+title: "Nahrávání zvuku"
+description: "Nahrávejte okolní zvuk nebo zvuk z rozhovoru během sběru dat v průzkumu pomocí vzhledů audio-start a audio-end v textových polích."
+---
+
+Nahrávání zvuku umožňuje formuláři skrytě nebo viditelně zachytit zvuk během části průzkumu. Je to užitečné pro nahrávání rozhovorů, okolního zvuku během pozorování v terénu nebo mluvených odpovědí, které doplňují strukturované odpovědi.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Pouze pro mobilní aplikaci.** Nahrávání zvuku vyžaduje mobilní aplikaci rtSurvey. Ve webovém formuláři jsou vzhledy `audio-start` a `audio-end` tiše ignorovány – neprobíhá žádné nahrávání a nezobrazuje se žádná chyba. Vždy testujte na zařízení, pokud je nahrávání zvuku vyžadováno.
+</Callout>
+
+---
+
+## Jak to funguje
+
+Nahrávání zvuku je řízeno dvěma textovými poli (`text`), která fungují jako **značky**:
+
+- Pole se vzhledem `audio-start` zahájí nahrávání, jakmile k němu tazatel dorazí.
+- Pole se vzhledem `audio-end` ukončí nahrávání a uloží zvukový soubor k odeslanému záznamu.
+
+Obě značkovací pole jsou typu `text`. Obvykle jsou tazateli skryta (pomocí `relevant = false` nebo umístěním na neinteraktivní pozici), i když mohou být viditelná. Nahraný zvuk je k odeslanému záznamu přiložen jako soubor propojený s polem `audio-end`.
+
+---
+
+## Základní příklad
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Respondent name | |
+| text | q_occupation | Occupation | |
+| integer | q_age | Age | |
+| text | audio_e_a1 | | `audio-end` |
+
+Aplikace začne nahrávat, když tazatel dorazí na `audio_s_a1`, a zastaví se, když dorazí na `audio_e_a1`. Všechny otázky mezi těmito dvěma značkami jsou nahrávány.
+
+---
+
+## Tiché nahrávání: `audio-start invisible`
+
+Ve výchozím nastavení mobilní aplikace zobrazuje indikátor nahrávání během zachycování zvuku. Přidáním `invisible` ke vzhledu se tento indikátor potlačí, takže nahrávání probíhá bez jakéhokoli viditelného upozornění pro respondenta.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Do you agree to participate? | |
+| text | q_feedback | Your feedback | |
+| text | audio_e_a1 | | `audio-end` |
+
+Používejte `invisible` pouze tehdy, když byly požadavky na informování splněny jinými prostředky (např. samostatným polem pro písemný souhlas před sekcí nahrávání).
+
+---
+
+## Konvence pojmenování
+
+Produkční formuláře používají pro značkovací pole konzistentní vzor pojmenování:
+
+```
+audio_s_{section}{n}   — počáteční značka
+audio_e_{section}{n}   — koncová značka
+```
+
+Kde `{section}` je krátký štítek pro sekci formuláře a `{n}` je pořadové číslo v rámci této sekce.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | First recording in section A |
+| `audio_e_a1` | End | End of first recording in section A |
+| `audio_s_b1` | Start | First recording in section B |
+| `audio_e_b1` | End | End of first recording in section B |
+| `audio_s_a2` | Start | Second recording in section A |
+| `audio_e_a2` | End | End of second recording in section A |
+
+Dodržování této konvence usnadňuje identifikaci hranic nahrávání při kontrole definic formulářů a odeslaných dat.
+
+---
+
+## Ukládání a vyvolávání
+
+Když tazatel dorazí do pole `audio-end`, aplikace dokončí zvukový soubor a přiloží jej k odeslanému záznamu. Soubor je:
+
+- Uložen jako zvuková příloha k odeslanému záznamu, přidružená k názvu pole `audio-end`.
+- Přístupný v prohlížeči odeslaných záznamů v back-endu rtSurvey spolu s ostatními mediálními přílohami.
+- Ke stažení prostřednictvím standardního exportu záznamů – zvukové soubory se objeví v mediálním sloupci odpovídajícím názvu pole `audio-end`.
+
+Formát souboru a datový tok závisí na zařízení a verzi aplikace.
+
+---
+
+## Více nahrávacích sekcí
+
+Formulář může obsahovat několik nepřekrývajících se nahrávacích sekcí. Každá dvojice značek `audio-start` / `audio-end` musí být plně obsažena – sekce se nesmí prolínat.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Introduction | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Details | |
+| text | audio_e_b1 | | `audio-end` |
+
+Každá sekce vytvoří samostatný zvukový soubor přiložený k příslušnému poli `audio-end`.
+
+---
+
+## Omezení
+
+- **Pouze pro mobilní aplikaci.** Funkce není podporována ve webovém formuláři. `audio-start` a `audio-end` jsou v prohlížeči tiše ignorovány.
+- **Žádné vnořování.** Nahrávací sekce se nemohou překrývat. Spuštění nové nahrávky před dosažením předchozí značky `audio-end` není podporováno.
+- **Typ pole musí být `text`.** Použití `audio-start` nebo `audio-end` na jakémkoli jiném typu otázky není podporováno.
+- **Velikost nahrávání.** Dlouhé nahrávky vytvářejí velké soubory. Mějte na paměti limity velikosti odesílaných dat a síťové podmínky v terénu.
+- **Žádná pauza během nahrávání.** Nahrávání běží nepřetržitě od počáteční značky k cílové značce; v rámci sekce neexistuje mechanismus pro pozastavení a obnovení.

@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "Audio opname",
   "call-api": "Call API",
   "dynamic-question-type": "Dynamisch vraagtype",
   "dynamic-search": "Dynamisch zoeken",

@@ -1,0 +1,104 @@
+---
+title: "Navigasjonskontroller for skjema"
+description: "Bruk utseendeverdiene SaveFinalizedExit og SaveIncompleteExit for å generere stylede avslutningsknapper som lagrer og forlater skjemaet."
+---
+
+**Navigasjonskontroller for skjema** er utseendeverdier plassert på `note`- (eller `text`-) felt som vises som stylede knapper i full bredde nederst i en undersøkelse. De lar intervjueren lagre innsendingen og forlate skjemaet med ett trykk — enten som en fullført (ferdigstilt) post eller som et utkast (ufulstendig) post.
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Genererer en knapp som **lagrer innsendingen som ferdigstilt** og avslutter skjemaet. Knappens tekst hentes fra feltets `label`-kolonne.
+
+| XLSForm column | Verdi |
+|----------------|-------|
+| `type` | `note` |
+| `name` | ethvert unikt navn (f.eks. `btn_finish`) |
+| `label` | tekst vist på knappen |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Innsendingen merkes som en endelig, komplett post. Dette tilsvarer å trykke på den innebygde send-knappen.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Genererer en knapp som **lagrer innsendingen som ufullstendig (utkast)** og avslutter skjemaet. Intervjueren kan gå tilbake til den senere og fortsette utfyllingen.
+
+| XLSForm column | Verdi |
+|----------------|-------|
+| `type` | `note` |
+| `name` | ethvert unikt navn (f.eks. `btn_pause`) |
+| `label` | tekst vist på knappen |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Fargesyntaks
+
+Begge utseender godtar en innebygd farge i formatet `<#RRGGBB/>`:
+
+- `#` etterfulgt av nøyaktig **6 heksadesimale sifre** (store eller små bokstaver)
+- Den lukkende `/>` er **påkrevd** — hvis den utelates, vil ikke analysen fungere
+- Eksempel: `<#04B404/>` (grønn), `<#EDC602/>` (ravgul), `<#D9534F/>` (rød)
+
+Fargen styrer knappens bakgrunn. Tekstfargen bestemmes automatisk av appen.
+
+---
+
+## Eksempel
+
+De følgende to feltene plassert på slutten av et skjema produserer en grønn **Send inn**-knapp og en ravgul **Lagre som utkast**-knapp:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Send inn | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Lagre som utkast | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — ekskludering av knapper fra innholdsfortegnelsen
+
+`toc-hide`-utseendetokenet ber rtSurvey ekskludere et felt fra skjemaets **innholdsfortegnelse** (oversiktslisten over spørsmål). Navigasjonsknapper er ikke spørsmål, så de skal aldri vises i innholdsfortegnelsen (TOC).
+
+Legg alltid til `toc-hide` etter avslutningsutseendet:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Se [Utseende — toc-hide](../appearance#group-and-navigation) for referansen til toc-hide.
+
+---
+
+## Plasseringskonvensjon
+
+Følg disse konvensjonene når du legger til navigasjonskontroller i et skjema:
+
+- Plasser begge knappene helt til **slutt** i skjemaet, etter alle spørsmål og grupper.
+- Inkluder alltid **begge** knappene sammen — én ferdigstilt og én ufullstendig — slik at intervjueren alltid har en måte å avslutte på uavhengig av fullføringsstatus.
+- Bruk `relevant`-kolonnen på den ferdigstilte avslutningsknappen hvis innsending bare skal tillates når visse betingelser er oppfylt (f.eks. en obligatorisk del er fullført). Den ufullstendige avslutningsknappen bør generelt være **alltid synlig**.
+
+---
+
+## Betinget ferdigstilt avslutning
+
+Bruk `relevant`-kolonnen for å kontrollere når den ferdigstilte avslutningsknappen vises. Den ufullstendige avslutningen skal forbli ubetinget synlig slik at intervjueren alltid kan pause og gå tilbake.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Send inn | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Lagre som utkast | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+I dette eksempelet vises **Send inn**-knappen bare når intervjueren har gitt samtykke og merket del A som fullført. **Lagre som utkast**-knappen er alltid tilgjengelig.
+
+---
+
+## Begrensninger
+
+- **Felttypen må være `note` eller `text`.** Bruk av disse utseendene på andre spørsmålstyper støttes ikke.
+- **Bare 6-sifret heksadesimal.** Kortfattet heksadesimal (`<#FFF/>`) og navngitte farger støttes ikke — bruk alltid det fulle 6-sifrede formatet (f.eks. `<#FFFFFF/>`).
+- **Label-kolonnen er knappeteksten.** `hint`-kolonnen ignoreres for disse feltene; bare `label` tegnes.
+- **Begge knappene bør være til stede.** Hvis du utelater knappen for ufullstendig avslutning, vil ikke intervjueren ha noen måte å ta en pause midt i skjemaet.

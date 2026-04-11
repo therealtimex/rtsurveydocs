@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "Fungsi pulldata() mengambil nilai dari file CSV eksternal yang terlampir pada formulir, mencocokkan kolom kunci dengan nilai kunci dan mengembalikan kolom hasil yang sesuai."
+---
+
+import { Callout } from 'nextra/components'
+
+Fungsi `pulldata()` mengambil nilai dari file CSV yang terlampir pada formulir. Dengan memberikan nama file, kolom yang akan dikembalikan, kolom untuk dicocokkan, dan nilai kunci, fungsi ini mengembalikan sel pada perpotongan baris yang cocok dan kolom hasil.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Posisi | Parameter | Deskripsi |
+|----------|-----------|-------------|
+| 1 | Filename | Nama file media CSV (nama yang sama digunakan dalam `select_one_from_file`) |
+| 2 | Result column | Kolom yang nilainya ingin Anda kembalikan |
+| 3 | Key column | Kolom yang akan dicocokkan |
+| 4 | Key value | Nilai yang akan dicocokkan — biasanya referensi bidang seperti `${field}` |
+
+Fungsi mengembalikan string kosong jika tidak ada kecocokan yang ditemukan.
+
+---
+
+## Prasyarat
+
+File CSV harus dilampirkan ke formulir sebagai **file media**. File yang sama yang direferensikan oleh `pulldata()` juga dapat digunakan sebagai daftar pilihan untuk `select_one_from_file`.
+
+**Contoh CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Contoh dasar
+
+Mencari departemen dan telepon anggota staf dari ID mereka:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Select staff member | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Department: `${dept}` — Phone: `${phone}` | |
+
+<Callout type="info">
+Kolom `name` dalam CSV `select_one_from_file` adalah nilai yang disimpan. Ketika enumerator memilih "Alice", `${staff_id}` berisi `"Alice"`, yang digunakan `pulldata()` sebagai kunci untuk mengambil departemen dan teleponnya.
+</Callout>
+
+---
+
+## Mengambil label dari pilihan yang dipilih
+
+Pertanyaan `select_one_from_file` menyimpan nilai `name`. Untuk menampilkan `label` yang dapat dibaca manusia, gunakan `pulldata()` untuk mencarinya:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Select village | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | You selected: `${village_label}` | |
+
+---
+
+## Beberapa pencarian dari satu pilihan
+
+Anda dapat memanggil `pulldata()` beberapa kali pada file yang sama untuk mengambil kolom yang berbeda untuk baris yang dipilih yang sama:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Select facility | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## Menggunakan pulldata dalam relevant dan constraint
+
+`pulldata()` dapat digunakan dalam kolom `relevant` dan `constraint` untuk menerapkan logika berdasarkan nilai yang dicari:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Select facility | | |
+| integer | bed_count | Number of beds occupied | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## Menggunakan pulldata dengan once()
+
+Untuk mengevaluasi `pulldata()` hanya pada pemuatan pertama (mencegah evaluasi ulang ketika bidang kunci berubah setelah entri awal), bungkus dalam `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Praktik Terbaik
+
+1. Kolom kunci dalam CSV harus sesuai dengan kolom `name` yang digunakan dalam `select_one_from_file` — keduanya harus memiliki nilai yang sama.
+2. Nama kolom dalam CSV peka huruf besar-kecil — `Department` dan `department` adalah kolom yang berbeda.
+3. Jika nilai kunci tidak ditemukan, `pulldata()` mengembalikan string kosong — gunakan `if(${field} != '', pulldata(...), '')` untuk menjaga terhadap pilihan kosong.
+4. Jaga agar file CSV tetap kecil jika memungkinkan — file besar meningkatkan waktu pemuatan formulir pada koneksi bandwidth rendah.
+5. Untuk data yang berubah antar putaran pengumpulan data, perbarui file media CSV dengan mengunggah versi formulir baru.
+
+## Batasan
+
+- `pulldata()` hanya cocok dengan baris **pertama** di mana kolom kunci sama dengan nilai kunci — nilai kunci duplikat dalam CSV tidak didukung.
+- File CSV harus dilampirkan ke formulir sebelum penyebaran; file tersebut tidak dapat diambil dari URL saat runtime.
+- Nilai numerik yang dikembalikan oleh `pulldata()` adalah string — bungkus dalam `number()` saat digunakan dalam aritmatika: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey juga mendukung bentuk tambahan dari `pulldata()` untuk membaca metadata perangkat, bidang JWT, dan data JSON. Lihat [App API](../app-api) untuk `pulldata('app-api', ...)` dan halaman [Call API](../advanced-features/call-api) untuk pola pencarian berbasis JSON.
+</Callout>
+
+---
+
+## Varian pulldata() yang diperluas
+
+Selain pencarian CSV, `pulldata()` mendukung beberapa sumber data tambahan dengan mengubah argumen pertama.
+
+### `pulldata('app-api', key)`
+
+Baca metadata perangkat, atribut pengguna, dan konteks aplikasi. Lihat referensi lengkap di halaman [App API](../app-api).
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Urai string JSON inline dan ekstrak nilai menggunakan ekspresi JSONPath. Berguna bila Anda memiliki literal JSON yang tertanam dalam formulir.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Mengembalikan nilai yang cocok sebagai string, atau string kosong jika tidak ditemukan.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Ekstrak nilai dari string JSON yang disimpan di bidang lain menggunakan ekspresi JSONPath. Ini setara dengan `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Dekode token JWT yang disimpan dalam bidang dan kembalikan nilai klaim tertentu dari payload.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Mengembalikan string kosong jika token tidak valid atau klaim tidak ada.
+
+### `pulldata('instanceid')`
+
+Mengembalikan ID instans unik dari pengiriman saat ini. Setara dengan bidang meta `instanceID`.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Petakan nilai ke nilai lainnya menggunakan tabel pemetaan bernama yang ditentukan dalam konfigurasi formulir.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Mengembalikan nilai yang dipetakan, atau string kosong jika tidak ada pemetaan yang cocok.
+
+### `pulldata('options', optionName)`
+
+Baca opsi konfigurasi formulir berdasarkan nama.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Jalankan SQL `SELECT` terhadap file SQLite `.db` yang dibundel dan kembalikan nilai dari kolom pertama baris pertama yang cocok. Parameter setelah string SQL diganti secara berurutan untuk placeholder `?`.
+
+| Posisi | Parameter | Deskripsi |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | String literal yang mengidentifikasi varian ini |
+| 2 | path | Jalur file dalam format `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | Pernyataan `SELECT` menggunakan `?` sebagai placeholder posisional |
+| 4+ | params | Nilai yang diganti untuk setiap `?` secara berurutan — biasanya referensi bidang seperti `${field}` |
+
+Mengembalikan string kosong jika tidak ada baris yang cocok.
+
+**Contoh — mencari nama provinsi berdasarkan ID:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Contoh — mencari nama kelurahan yang difilter berdasarkan kode provinsi dan kabupaten:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Berbeda dengan standar empat argumen `pulldata()` yang mencocokkan satu kolom kunci dalam file CSV, varian `rawquery` menjalankan SQL `SELECT` penuh terhadap database SQLite, memungkinkan kondisi `WHERE` multi-kolom dan kolom apa pun sebagai nilai kembalian.
+
+<Callout type="info">
+`rawquery` biasanya digunakan dengan bidang lengkapi otomatis untuk pencarian lokasi hierarkis. Lihat [Pencarian Database Lokal](../advanced-features/local-database-search) untuk detail tentang membangun file `.db` dan menghubungkannya ke `pulldata('rawquery', ...)`.
+</Callout>

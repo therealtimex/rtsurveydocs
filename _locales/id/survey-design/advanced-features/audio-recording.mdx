@@ -1,0 +1,118 @@
+---
+title: "Rekaman Audio"
+description: "Rekam audio lingkungan atau wawancara selama pengumpulan data survei menggunakan tampilan audio-start dan audio-end pada kolom teks."
+---
+
+Rekaman audio memungkinkan formulir menangkap audio secara diam-diam atau terlihat selama bagian survei. Ini berguna untuk merekam wawancara, suara lingkungan selama pengamatan lapangan, atau respons lisan yang melengkapi jawaban terstruktur.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Khusus aplikasi seluler.** Rekaman audio memerlukan aplikasi seluler rtSurvey. Dalam formulir web, tampilan `audio-start` dan `audio-end` diabaikan secara diam-diam — tidak ada rekaman yang terjadi dan tidak ada kesalahan yang ditampilkan. Selalu uji pada perangkat saat rekaman audio diperlukan.
+</Callout>
+
+---
+
+## Cara kerjanya
+
+Rekaman audio dikendalikan oleh dua kolom `text` yang bertindak sebagai **penanda**:
+
+- Kolom dengan tampilan `audio-start` mulai merekam saat enumerator mencapainya.
+- Kolom dengan tampilan `audio-end` berhenti merekam dan menyimpan file audio ke pengiriman.
+
+Kedua kolom penanda bertipe `text`. Mereka biasanya disembunyikan dari enumerator (menggunakan `relevant = false` atau ditempatkan di posisi non-interaktif), meskipun mereka bisa terlihat. Audio yang direkam dilampirkan ke pengiriman sebagai file yang ditautkan ke kolom `audio-end`.
+
+---
+
+## Contoh dasar
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Nama responden | |
+| text | q_occupation | Pekerjaan | |
+| integer | q_age | Usia | |
+| text | audio_e_a1 | | `audio-end` |
+
+Aplikasi mulai merekam saat enumerator mencapai `audio_s_a1` and berhenti saat mereka mencapai `audio_e_a1`. Semua pertanyaan di antara kedua penanda tersebut direkam.
+
+---
+
+## Rekaman diam: `audio-start invisible`
+
+Secara default, aplikasi seluler menampilkan indikator rekaman saat audio sedang ditangkap. Menambahkan `invisible` ke tampilan akan menghilangkan indikator ini, sehingga rekaman terjadi tanpa isyarat yang terlihat bagi responden.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Apakah Anda setuju untuk berpartisipasi? | |
+| text | q_feedback | Umpan balik Anda | |
+| text | audio_e_a1 | | `audio-end` |
+
+Gunakan `invisible` hanya jika persyaratan pengungkapan telah dipenuhi melalui cara lain (misalnya, kolom persetujuan tertulis terpisah sebelum bagian rekaman).
+
+---
+
+## Konvensi penamaan
+
+Formulir produksi menggunakan pola penamaan yang konsisten untuk kolom penanda:
+
+```
+audio_s_{section}{n}   — penanda mulai
+audio_e_{section}{n}   — penanda selesai
+```
+
+Di mana `{section}` adalah label pendek untuk bagian formulir dan `{n}` adalah nomor berurutan dalam bagian tersebut.
+
+| Nama kolom | Peran | Arti |
+|------------|------|---------|
+| `audio_s_a1` | Mulai | Rekaman pertama di bagian A |
+| `audio_e_a1` | Selesai | Akhir rekaman pertama di bagian A |
+| `audio_s_b1` | Mulai | Rekaman pertama di bagian B |
+| `audio_e_b1` | Selesai | Akhir rekaman pertama di bagian B |
+| `audio_s_a2` | Mulai | Rekaman kedua di bagian A |
+| `audio_e_a2` | Selesai | Akhir rekaman kedua di bagian A |
+
+Mengikuti konvensi ini memudahkan identifikasi batas rekaman saat meninjau definisi formulir dan data pengiriman.
+
+---
+
+## Penyimpanan dan pengambilan
+
+Saat enumerator mencapai kolom `audio-end`, aplikasi menyelesaikan file audio dan melampirkannya ke pengiriman. File tersebut:
+
+- Disimpan sebagai lampiran audio pada pengiriman, terkait dengan nama kolom `audio-end`.
+- Dapat diakses di penampil pengiriman back-end rtSurvey bersama lampiran media lainnya.
+- Dapat diunduh melalui ekspor pengiriman standar — file audio muncul di kolom media yang sesuai dengan nama kolom `audio-end`.
+
+Format file dan bitrate tergantung pada perangkat dan versi aplikasi.
+
+---
+
+## Beberapa bagian rekaman
+
+Formulir dapat berisi beberapa bagian rekaman yang tidak tumpang tindih. Setiap pasangan penanda `audio-start` / `audio-end` harus sepenuhnya terkandung — bagian-bagian tidak boleh tumpang tindih.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Pendahuluan | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Detail | |
+| text | audio_e_b1 | | `audio-end` |
+
+Setiap bagian menghasilkan file audio terpisah yang dilampirkan ke masing-masing kolom `audio-end`.
+
+---
+
+## Batasan
+
+- **Khusus aplikasi seluler.** Fitur ini tidak didukung dalam formulir web. `audio-start` dan `audio-end` diabaikan secara diam-diam di browser.
+- **Tidak ada penaruhan (nesting).** Bagian rekaman tidak boleh tumpang tindih. Memulai rekaman baru sebelum penanda `audio-end` sebelumnya tercapai tidak didukung.
+- **Tipe kolom harus `text`.** Menggunakan `audio-start` atau `audio-end` pada tipe pertanyaan lain tidak didukung.
+- **Ukuran unggahan.** Rekaman yang panjang menghasilkan file besar. Perhatikan batas ukuran pengiriman dan kondisi jaringan di lapangan.
+- **Tidak ada jeda di tengah rekaman.** Rekaman berjalan terus menerus dari penanda awal hingga penanda akhir; tidak ada mekanisme untuk menjeda dan melanjutkan dalam satu bagian.

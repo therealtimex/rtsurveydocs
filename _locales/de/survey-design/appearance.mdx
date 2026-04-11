@@ -1,53 +1,53 @@
 ---
-title: "Erscheinungsbild"
+title: "Erscheinungsbild (Appearance)"
 description: ""
 ---
 
-Die Spalte `appearance` in rtSurvey ermöglicht es Ihnen, die visuelle Darstellung und das Verhalten von Fragen in Ihren Umfragen anzupassen. Diese Funktion verbessert die Benutzererfahrung und kann die Effizienz der Datenerhebung erheblich steigern. rtSurvey unterstützt Standard-XLSForm-Erscheinungsattribute und erweitert diese um zusätzliche Optionen.
+Die Spalte `appearance` in rtSurvey ermöglicht es Ihnen, die visuelle Darstellung und das Verhalten von Fragen in Ihren Umfragen anzupassen. Diese Funktion verbessert die Benutzererfahrung und kann die Effizienz der Datenerfassung erheblich steigern. rtSurvey unterstützt standardmäßige XLSForm-Erscheinungsbildattribute und erweitert diese um zusätzliche Optionen.
 
-## Standard-XLSForm-Erscheinungsattribute
+## Standard-XLSForm-Erscheinungsbildattribute
 
-rtSurvey unterstützt die folgenden Standard-XLSForm-Erscheinungsattribute:
+rtSurvey unterstützt die folgenden standardmäßigen XLSForm-Erscheinungsbildattribute:
 
-| Erscheinungsattribut | Fragetypen | Beschreibung |
+| Erscheinungsbildattribut (Appearance Attribute) | Fragetypen (Question Types) | Beschreibung |
 |----------------------|----------------|-------------|
 | multiline | text | Erstellt ein mehrzeiliges Textfeld (am besten für Web-Clients) |
 | minimal | select_one, select_multiple | Zeigt Auswahlmöglichkeiten in einem Dropdown-Menü an |
-| quick | select_one | Springt nach der Auswahl automatisch zur nächsten Frage (nur mobil) |
-| no-calendar | date | Unterdrückt die Kalenderanzeige (nur mobil) |
+| quick | select_one | Springt nach der Auswahl automatisch zur nächsten Frage (nur Mobilgeräte) |
+| no-calendar | date | Unterdrückt die Kalenderanzeige (nur Mobilgeräte) |
 | month-year | date | Ermöglicht nur die Auswahl von Monat und Jahr |
 | year | date | Ermöglicht nur die Auswahl des Jahres |
 | horizontal-compact | select_one, select_multiple | Zeigt Auswahlmöglichkeiten horizontal an (nur Web) |
 | horizontal | select_one, select_multiple | Zeigt Auswahlmöglichkeiten horizontal in Spalten an (nur Web) |
-| likert | select_one | Präsentiert Auswahlmöglichkeiten als Likert-Skala |
+| likert | select_one | Stellt Auswahlmöglichkeiten als Likert-Skala dar |
 | compact | select_one, select_multiple | Zeigt Auswahlmöglichkeiten nebeneinander mit minimalem Abstand an |
-| quickcompact | select_one | Kombiniert kompakte Anzeige mit automatischem Weiterspringen (nur mobil) |
-| field-list | groups | Zeigt die gesamte Gruppe auf einem Bildschirm an (nur mobil) |
+| quickcompact | select_one | Kombiniert kompakte Anzeige mit automatischem Weiterspringen (nur Mobilgeräte) |
+| field-list | groups | Zeigt die gesamte Gruppe auf einem Bildschirm an (nur Mobilgeräte) |
 | label | select_one, select_multiple | Zeigt Auswahlbeschriftungen ohne Eingabefelder an |
 | list-nolabel | select_one, select_multiple | Zeigt Eingabefelder ohne Beschriftungen an (zusammen mit `label` verwenden) |
 | table-list | groups | Zeigt Fragen in einem Tabellenformat an |
-| signature | image | Ermöglicht die Erfassung einer Unterschrift (nur mobil) |
-| draw | image | Ermöglicht Freihandzeichnen (nur mobil) |
+| signature | image | Ermöglicht die Erfassung von Unterschriften (nur Mobilgeräte) |
+| draw | image | Ermöglicht Freihandzeichnen (nur Mobilgeräte) |
 | map, quick map | select_one, select_one_from_file | Ermöglicht die Auswahl aus Kartenmerkmalen |
 
-## Empfohlene Vorgehensweisen für die Verwendung des Erscheinungsbilds
+## Best Practices für die Verwendung von Appearance
 
-1. **Konsistenz**: Verwenden Sie Erscheinungsattribute konsistent in Ihrer gesamten Umfrage für ein einheitliches Erscheinungsbild.
+1. **Konsistenz**: Verwenden Sie Erscheinungsbildattribute konsistent in Ihrer Umfrage für ein einheitliches Erscheinungsbild.
 2. **Mobil vs. Web**: Berücksichtigen Sie, wie das Erscheinungsbild auf verschiedenen Geräten und Plattformen gerendert wird.
-3. **Leistung**: Seien Sie vorsichtig mit Erscheinungsattributen, die das Laden des Formulars verlangsamen könnten (z. B. `table-list` bei großen Gruppen).
-4. **Benutzererfahrung**: Wählen Sie Darstellungen, die die Dateneingabe für die Befragten einfacher und intuitiver machen.
-5. **Testen**: Testen Sie Ihr Formular immer auf den Zielgeräten, um sicherzustellen, dass die Darstellungen wie erwartet funktionieren.
+3. **Leistung**: Seien Sie vorsichtig mit Erscheinungsbildattributen, die das Laden des Formulars verlangsamen könnten (z. B. `table-list` für große Gruppen).
+4. **Benutzererfahrung**: Wählen Sie Erscheinungsbilder, die die Dateneingabe für die Befragten einfacher und intuitiver machen.
+5. **Testen**: Testen Sie Ihr Formular immer auf den Zielgeräten, um sicherzustellen, dass die Erscheinungsbilder wie erwartet funktionieren.
 
 ## Fortgeschrittene Techniken
 
 ### Kombinieren von Erscheinungsbildern
 
-Einige Erscheinungsattribute können für komplexere Layouts kombiniert werden:
+Einige Erscheinungsbildattribute können für komplexere Layouts kombiniert werden:
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Auswahl: | minimal compact |
+| select_one options | choice | Wählen Sie eine Option: | minimal compact |
 ```
 
 ### Dynamische Erscheinungsbilder
@@ -62,72 +62,153 @@ rtSurvey ermöglicht dynamische Änderungen des Erscheinungsbilds basierend auf 
 
 ## Überlegungen zur mobilen App
 
-- Einige Darstellungen (z. B. `quick`, `signature`) sind spezifisch für mobile Geräte.
-- Testen Sie gründlich auf Android und iOS, um ein konsistentes Verhalten sicherzustellen.
+- Einige Erscheinungsbilder (z. B. `quick`, `signature`) sind spezifisch für Mobilgeräte.
+- Testen Sie gründlich sowohl auf Android als auch auf iOS, um ein konsistentes Verhalten sicherzustellen.
 
-## Erweiterte rtSurvey-Erscheinungsattribute
+## Erweiterte Erscheinungsbildattribute von rtSurvey
 
-Zusätzlich zu den Standard-XLSForm-Erscheinungsbildern unterstützt rtSurvey folgende plattformspezifische Optionen:
+Zusätzlich zu den standardmäßigen XLSForm-Erscheinungsbildern unterstützt rtSurvey die folgenden plattformspezifischen Optionen:
 
 ### Daten- und Anzeigesteuerung
 
-| Erscheinungsattribut | Fragetypen | Beschreibung |
+| Erscheinungsbildattribut (Appearance Attribute) | Fragetypen (Question Types) | Beschreibung |
 |----------------------|----------------|-------------|
-| `invisible` | beliebig | Blendet das Feld aus der Ansicht aus, erfasst oder berechnet seinen Wert aber weiterhin. Anders als der Typ `hidden` — das Feld nimmt weiterhin an der Logik teil. |
-| `displaytitle` | beliebig | Erzwingt die Anzeige der Feldbeschriftung/des Titels, auch wenn dieser normalerweise unterdrückt würde. |
-| `autopull` | select_one, select_multiple | Ruft automatisch externe Daten ab, um Auswahlmöglichkeiten zu befüllen, wenn das Formular geladen wird oder sich ein Auslöserfeld ändert. |
-| `floating_hint` | text, integer, decimal | Zeigt den Hinweistext als schwebende Beschriftung über dem Eingabefeld an, statt darunter. |
-| `calculate-button` | calculate | Fügt eine sichtbare Schaltfläche hinzu, die bei Bedarf eine Neuberechnung des Feldes auslöst, statt automatisch zu berechnen. |
+| `invisible` | any | Blendet das Feld aus, während sein Wert weiterhin erfasst oder berechnet wird. Unterscheidet sich vom Typ `hidden` — das Feld nimmt weiterhin an der Logik teil. |
+| `displaytitle` | any | Erzwingt die Anzeige der Beschriftung/des Titels des Feldes, auch wenn diese ansonsten unterdrückt würde. |
+| `autopull` | select_one, select_multiple | Ruft automatisch externe Daten ab, um Auswahlmöglichkeiten zu füllen, wenn das Formular geladen wird oder sich ein Trigger-Feld ändert. |
+| `floating_hint` | text, integer, decimal | Zeigt den Hinweistext (Hint) als schwebende Beschriftung über dem Eingabefeld anstatt darunter an. |
+| `calculate-button` | calculate | Fügt eine sichtbare Schaltfläche hinzu, die bei Bedarf eine Neuberechnung des Feldes auslöst, anstatt sie automatisch durchzuführen. |
+
+### Gruppe und Navigation
+
+| Erscheinungsbildattribut (Appearance Attribute) | Fragetypen (Question Types) | Beschreibung |
+|----------------------|----------------|-------------|
+| `section` | group | Rendert die Gruppe als einklappbare Abschnittskarte. Hinweis: Nur mobile App. |
+| `toc-hide` | any | Schließt die Frage aus dem Navigationspanel des Inhaltsverzeichnisses (TOC) aus. |
+| `minilog` | begin_repeat | Zeigt abgeschlossene Wiederholungseinträge als kompakte Mini-Log-Liste an, anstatt jeden Eintrag inline zu erweitern. |
+
+### Eingabeverhalten
+
+| Erscheinungsbildattribut (Appearance Attribute) | Fragetypen (Question Types) | Beschreibung |
+|----------------------|----------------|-------------|
+| `proper` | text | Schreibt den ersten Buchstaben jedes Wortes automatisch groß, während der Befragte tippt (Title-Case-Verhalten). |
+| `text-nolabel` | text, integer, decimal | Rendert das Eingabefeld ohne sichtbare Beschriftung. |
+| `inline-1line` | text | Erzwingt die Anzeige der Texteingabe in einer einzigen Zeile, auch wenn die Fragenbeschriftung lang ist. |
+| `popup` | any | Rendert das Feld in einem Popup / modalen Overlay anstatt inline auf der Seite. |
 
 ### Layout
 
-| Erscheinungsattribut | Fragetypen | Beschreibung |
+| Erscheinungsbildattribut (Appearance Attribute) | Fragetypen (Question Types) | Beschreibung |
 |----------------------|----------------|-------------|
 | `1screen` | group | Erzwingt die Anzeige der gesamten Gruppe auf einem einzigen Bildschirm, unabhängig von der Gruppengröße. |
-| `columns(n)` | select_one, select_multiple | Zeigt Auswahlmöglichkeiten in `n` Spalten an. Beispiel: `columns(3)` zeigt drei Spalten von Optionsfeldern. |
-| `gridformat<row=R col=C colspan=S align=center>` | beliebig | Positioniert das Feld in einem CSS-Grid-Layout bei Zeile `R`, Spalte `C`, über `S` Spalten. Wird mit `advanced-extension/grid-layout` verwendet. |
-| `ignore-simplify` | beliebig | Weist den Formular-Renderer an, die automatische Vereinfachung oder Komprimierung des Layouts dieses Feldes zu überspringen. |
+| `columns(n)` | select_one, select_multiple | Zeigt Auswahlmöglichkeiten in `n` Spalten an. Beispiel: `columns(3)` zeigt drei Spalten mit Radio-Buttons. |
+| `gridformat<row=R col=C colspan=S align=center>` | any | Positioniert das Feld in einem CSS-Grid-Layout in Zeile `R`, Spalte `C`, über `S` Spalten erstreckend. Wird mit `advanced-extension/grid-layout` verwendet. |
+| `ignore-simplify` | any | Weist den Formular-Renderer an, die automatische Vereinfachung oder Verdichtung des Layouts dieses Feldes zu überspringen. |
+| `horizontal(N)` | select_one, select_multiple | Legt fest, dass jede Auswahl `N` Prozent der Zeilenbreite einnimmt. Beispiel: `horizontal(50)` platziert zwei Auswahlmöglichkeiten pro Zeile. |
+| `scroll-view(N%)` | group, repeat | Begrenzt den Container auf eine maximale Höhe von `N%` des Viewports (oder des übergeordneten Elements) und fügt einen Scrollbalken hinzu, wenn der Inhalt überläuft. Beispiel: `scroll-view(60%)`. |
 
 ### Widgets
 
-| Erscheinungsattribut | Fragetypen | Beschreibung |
+| Erscheinungsbildattribut (Appearance Attribute) | Fragetypen (Question Types) | Beschreibung |
 |----------------------|----------------|-------------|
-| `likert` | select_one | Präsentiert Auswahlmöglichkeiten als Likert-Skalenreihe (bereits in der Standardtabelle oben; Unterstützung bestätigt). |
-| `distress` | select_one | Stellt Auswahlmöglichkeiten als Kessler Psychological Distress Scale (K10) visuelles Widget mit emotionalen Symbolen dar. |
+| `likert` | select_one | Stellt Auswahlmöglichkeiten als Likert-Skalenzeile dar (bereits in der Standardtabelle oben aufgeführt; Unterstützung bestätigt). |
+| `distress` | select_one | Rendert Auswahlmöglichkeiten als Kessler Psychological Distress Scale (K10) visuelles Widget mit emotionalen Icons. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Rendert Auswahlmöglichkeiten als gestaltete Bewertungsboxen mit fünf Farbslots. `c1` = äußerer Containerrand, `c2` = nicht ausgewählter Rand, `c3` = ausgewählter Rand und Füllung, `c4` = nicht ausgewählte Textfarbe, `c5` = ausgewählte Textfarbe. Beispiel: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Rendert Auswahlmöglichkeiten als farbige Tag-Chips. Die fünf Farbslots folgen der gleichen Reihenfolge wie bei `rating_box-fill`. Ausgewählte Optionen werden hervorgehoben; nicht ausgewählte Optionen werden in der Zusammenfassungsansicht unterdrückt. |
 
 ### API-Integration
 
-| Erscheinungsattribut | Fragetypen | Beschreibung |
+| Erscheinungsbildattribut (Appearance Attribute) | Fragetypen (Question Types) | Beschreibung |
 |----------------------|----------------|-------------|
-| `callapi` | text, integer, decimal, select_one | Aktiviert die API-Aufruf-Integration für dieses Feld. Die Berechnungsspalte sollte einen `callapi()`-Ausdruck enthalten. Siehe [API-Aufruf](advanced-extension/call-api). |
-| `callapi-verify(params)` | text, integer, decimal | Löst einen API-Verifizierungsaufruf mit statischen Parametern aus. Das Formular blockiert den Fortschritt, bis die API den Wert bestätigt. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | Gleich wie `callapi-verify`, aber mit Parametern, die zur Laufzeit aus anderen Feldwerten abgeleitet werden. |
+| `callapi` | text, integer, decimal, select_one | Ermöglicht die Integration von API-Aufrufen für dieses Feld. Die Berechnungspalte (calculation) sollte einen `callapi()`-Ausdruck enthalten. Siehe [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Löst einen API-Verifizierungsaufruf mit statischen Parametern aus. Das Formular blockiert das Fortschreiten, bis die API den Wert bestätigt. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Wie `callapi-verify`, jedoch mit Parametern, die zur Laufzeit von anderen Feldwerten abgeleitet werden. |
 
-### Inline-Datum/Uhrzeit-Format
+### Sprachumschalter (Language switcher)
 
-Für Felder `date`, `time` und `datetime` können Sie ein benutzerdefiniertes Anzeigeformat mit einer an das Erscheinungsbild angehängten Formatzeichenkette angeben:
+| Erscheinungsbildattribut (Appearance Attribute) | Fragetypen (Question Types) | Beschreibung |
+|----------------------|----------------|-------------|
+| `change_language-{colors} default('lang')` | note, text | Rendert ein Sprachumschalter-Widget, das mit den angegebenen Farbcodes gestaltet ist. Das Token `default('lang')` legt die Ausgangssprache fest (z. B. `default('en')`); es wird intern beim Parsen in `rtDefault('lang')` umgeschrieben. Beispiel: `change_language-blue-white default('vi')`. |
+
+### Inline-Datums-/Zeitformat
+
+Für `date`-, `time`- und `datetime`-Felder können Sie ein benutzerdefiniertes Anzeigeformat angeben, indem Sie eine Formatzeichenfolge an das Erscheinungsbild anhängen:
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-Format-Token sind dieselben wie bei `format-date()` und `format-date-time()`. Siehe [Funktionen — Datums- und Uhrzeitfunktionen](operators-and-functions/functions#date-and-time-functions).
+Format-Token sind dieselben wie bei `format-date()` und `format-date-time()`. Siehe [Funktionen — Datums- und Zeitfunktionen](operators-and-functions/functions#date-and-time-functions).
 
 Beispiel:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| datetime | event_time | Ereignisdatum und -uhrzeit | inline-[%d/%m/%Y %I:%M %p] |
+| datetime | event_time | Datum und Uhrzeit des Ereignisses | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | Geburtsdatum | inline-[%d/%m/%Y] |
+
+### Inline-Schaltflächen-Layout — `display{}` und `results{}`
+
+Für Fragetypen, die als Inline-Icon-Schaltfläche gerendert werden (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), steuern zwei Erscheinungsbild-Modifikatoren die Schaltflächenposition und das Verhalten nach der Erfassung.
+
+#### `display{...}` — Schaltflächenposition vor der Erfassung
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parameter | Werte | Standard |
+|-----------|--------|---------|
+| Ausrichtung (Align) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Größe (Size) | `small`, `medium`, `large` | `small` |
+| Farbe (Color) | Hex, z. B. `#FF5500` | Primäre Themenfarbe |
+| Flag | `inline-icon` | Erzwingt Icon-Modus |
+
+| Ausrichtungswert (Align) | Layout |
+|-------------|--------|
+| `right` | Schaltfläche rechts neben der Beschriftung |
+| `left` | Schaltfläche links neben der Beschriftung |
+| `top` | Schaltfläche über der Beschriftung, zentriert über die volle Breite |
+| `center` / `bottom` | Schaltfläche unter der Beschriftung, zentriert über die volle Breite |
+
+#### `results{...}` — Layout und Sichtbarkeit nach der Erfassung
+
+Erbt die `display{}`-Einstellungen. Zum Verschieben der Schaltfläche oder zum Ausblenden von Elementen verwenden, sobald ein Wert erfasst wurde.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| `hide`-Wert | Effekt |
+|---|---|
+| `hide(capture)` | Blendet die Erfassungsschaltfläche aus, sobald eine Datei/ein Wert vorhanden ist |
+| `hide(review)` | Blendet das Vorschaubild / die Wiedergabetaste aus |
+| `hide(filename)` | Blendet den nach dem Hochladen angezeigten Dateinamen aus |
+| `hide(camera)` | Blendet die Kameraauslösetaste nach der Erfassung aus |
+| `hide(scanner)` | Blendet die Barcode-Scan-Taste aus, nachdem ein Wert gescannt wurde |
+| `hide(value)` | Blendet den Text des gescannten Wertes aus (Barcode / Geopunkt) |
+
+Das Widget wechselt automatisch vom `display{}`- zum `results{}`-Layout, sobald ein Wert erfasst wird.
+
+**Beispiele:**
+
+```
+inline display{right}                                    → Icon rechts von der Beschriftung
+inline display{left, large}                              → großes Icon links
+inline display{center, large, #FF5500}                   → großes orangefarbenes Icon unter der Beschriftung
+inline display{right} results{left}                      → Icon bewegt sich nach der Erfassung nach links
+inline display{right} results{hide(capture)}             → Icon verschwindet nach der Erfassung
+inline display{center} results{hide(capture), hide(filename)}
+```
 
 ## Bekannte Einschränkungen
 
 - Komplexe Erscheinungsbilder werden möglicherweise nicht auf allen Plattformen identisch gerendert.
 - Einige fortgeschrittene rtSurvey-Erscheinungsbilder werden im Offline-Modus möglicherweise nicht unterstützt.
 
-## Fehlerbehebung bei Darstellungsproblemen
+## Fehlerbehebung bei Erscheinungsbild-Problemen
 
-1. **Darstellung nicht angewendet**: Überprüfen Sie die Spalte appearance auf Tippfehler.
+1. **Erscheinungsbild nicht angewendet**: Prüfen Sie auf Tippfehler in der Spalte appearance.
 2. **Inkonsistentes Rendering**: Überprüfen Sie die Kompatibilität mit dem Fragetyp und der Plattform.
-3. **Leistungsprobleme**: Erwägen Sie die Vereinfachung komplexer Darstellungen, insbesondere bei umfangreichen Umfragen.
+3. **Leistungsprobleme**: Erwägen Sie die Vereinfachung komplexer Erscheinungsbilder, insbesondere bei umfangreichen Umfragen.

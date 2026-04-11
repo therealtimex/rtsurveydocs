@@ -1,15 +1,15 @@
 ---
 title: "Edistyneet toistot"
-description: "Edistyneet mallit toistoryhmille: dynaamiset määrät, sisäkkäiset toistot, toistodatan yhteenveto ja arvojen viittaaminen toistojen välillä."
+description: "Edistyneet mallit toistoryhmille: dynaamiset määrät, sisäkkäiset toistot, toistotietojen yhteenveto ja arvojen viittaaminen toistojen välillä."
 ---
 
-Tällä sivulla käsitellään edistyneitä malleja toistoryhmien käyttöön rtSurveyssa. Toistoryhmien perusteista katso [Ryhmittely ja toistot](../repeats).
+Tämä sivu käsittelee edistyneitä malleja toistoryhmien käyttöön rtSurveyssä. Perusasiat toistoryhmän asettamisesta löydät sivulta [Ryhmittely ja toistot](../repeats).
 
 ---
 
-## Dynaaminen toistomäärä
+## Dynaaminen toistojen määrä
 
-Oletuksena luetteloija päättää kuinka monta kertaa toistaa. Voit kiinnittää toistojen lukumäärän käyttämällä `repeat_count`:tia:
+Oletusarvoisesti haastattelija päättää, kuinka monta kertaa toistetaan. Voit kiinnittää toistojen määrän käyttämällä `repeat_count`-saraketta:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,39 +18,39 @@ Oletuksena luetteloija päättää kuinka monta kertaa toistaa. Voit kiinnittä�
 | integer | member_age | Ikä | |
 | end_repeat | | | |
 
-Toisto suoritetaan täsmälleen `${num_members}` kertaa, jossa `num_members` kerättiin aiemmin lomakkeessa. Luetteloija ei voi lisätä tai poistaa tapauksia.
+Toisto suoritetaan tasan `${num_members}` kertaa, missä `num_members` on kerätty aiemmin lomakkeella. Haastattelija ei voi lisätä tai poistaa esiintymiä.
 
 ---
 
-## Indeksoitu pääsy: `indexed-repeat()`
+## Indeksoitu haku: `indexed-repeat()`
 
-Pääse tietyn toistotapauksen kenttäarvoon **toistoryhmän ulkopuolelta** käyttämällä `indexed-repeat(repeatedField, repeatGroup, index)`:
+Hae tietyn toistoesiintymän kentän arvo toistoryhmän **ulkopuolelta** käyttämällä funktiota `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Tämä on hyödyllinen yhteenvetokenttien rakentamisessa tai "ensisijaisen" jäsenen tietojen viittaamisessa toiston jälkeen.
+Tämä on hyödyllistä yhteenvetokenttien rakentamisessa tai viittaamisessa "pääjäsenen" tietoihin toiston jälkeen.
 
 ---
 
-## Nykyinen tapausnumero: `index()`
+## Nykyisen esiintymän sijainti: `index()`
 
-Toistoryhmän sisällä `index()` palauttaa nykyisen tapauksen 1-pohjaisen sijainnin. Käytä sitä kunkin toiston nimeämiseen tai ainutlaatuisten tunnisteiden luomiseen:
+Toistoryhmän sisällä `index()` palauttaa nykyisen esiintymän sijainnin (alkaen numerosta 1). Käytä sitä kunkin toiston nimeämiseen tai yksilöllisten tunnisteiden luomiseen:
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | Pelto |
-| note | plot_label | Pelto numero `${index()}` |
-| text | plot_id | Pellon tunnus |
+| begin_repeat | plots | Palsta |
+| note | plot_label | Palsta numero `${index()}` |
+| text | plot_id | Palstan tunnus |
 | end_repeat | | |
 
 ---
 
-## Saman tapauksen kenttien viittaaminen
+## Kenttiin viittaaminen samassa esiintymässä
 
-Toiston sisällä käytä `${fieldname}` viittaaksesi toiseen kenttään **samassa toistotapauksessa**. `indexed-repeat()`:ia ei tarvita saman silmukan sisällä:
+Käytä toiston sisällä merkintää `${fieldname}` viittaamaan toiseen kenttään **samassa toistoesiintymässä**. `indexed-repeat()`-funktiota ei tarvita saman silmukan sisällä:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,35 +62,35 @@ Toiston sisällä käytä `${fieldname}` viittaaksesi toiseen kenttään **samas
 
 ---
 
-## Päivittävien kenttien viittaaminen toiston sisältä
+## Yläkenttiin viittaaminen toiston sisältä
 
-Toistoryhmän ulkopuolella (yläpuolella) olevia kenttiä voidaan viitata normaalisti `${fieldname}`:lla:
+Toistoryhmän ulkopuolisiin (yläpuolella oleviin) kenttiin voidaan viitata normaalisti merkinnällä `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
 | text | village | Kylän nimi |
-| begin_repeat | plots | Maatalousmaa |
-| note | plot_context | Pellot kylässä `${village}` |
+| begin_repeat | plots | Viljelypalsta |
+| note | plot_context | Palstat kylässä `${village}` |
 | end_repeat | | |
 
 ---
 
-## Toistodatan yhteenveto
+## Toistotietojen yhteenveto
 
-Käytä toiston koostefunktioita **toistoryhmän ulkopuolella** yhteenvedon luomiseen:
+Käytä toistojen koontifunktioita toistoryhmän **ulkopuolella** yhteenvedon tekemiseen:
 
 | Funktio | Esimerkki | Kuvaus |
-|---------|---------|--------|
-| `count(group)` | `count(${household_members})` | Tapausten lukumäärä |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | Esiintymien määrä |
 | `sum(field)` | `sum(${loan_amount})` | Numeerisen kentän summa |
-| `min(field)` | `min(${member_age})` | Pienin arvo |
-| `max(field)` | `max(${member_age})` | Suurin arvo |
-| `join(sep, field)` | `join(', ', ${member_name})` | Pilkuilla eroteltu lista |
-| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Ehdollinen lukumäärä |
+| `min(field)` | `min(${member_age})` | Minimiarvo |
+| `max(field)` | `max(${member_age})` | Maksimiarvo |
+| `join(sep, field)` | `join(', ', ${member_name})` | Pilkulla erotettu lista |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Ehdollinen määrä |
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Ehdollinen summa |
-| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Ehdollinen liittäminen |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Ehdollinen yhdistäminen |
 
-### Esimerkki: Kotitalousyhteenveto
+### Esimerkki: Kotitalouden yhteenveto
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -108,47 +108,143 @@ Käytä toiston koostefunktioita **toistoryhmän ulkopuolella** yhteenvedon luom
 
 ## Sisäkkäiset toistot
 
-Toistoryhmä voi sisältää toisen toistoryhmän. Käytä tätä harkiten — sisäkkäiset toistot lisäävät monimutkaisuutta ja voivat olla hämmentäviä luetteloijille.
+Toistoryhmä voi sisältää toisen toistoryhmän. Käytä tätä varoen – sisäkkäiset toistot lisäävät monimutkaisuutta ja voivat olla hämmentäviä haastattelijoille.
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | households | Kotitalous |
-| text | hh_id | Kotitaloustunnus |
+| text | hh_id | Kotitalouden tunnus |
 | begin_repeat | hh_members | Jäsen |
 | text | member_name | Jäsenen nimi |
 | end_repeat | | |
 | end_repeat | | |
 
-Viitattaessa ulomman toiston kenttään sisemmästä toistosta, käytä `${fieldname}` — se ratkaisee lähimpään vastaavaan yläisäntään:
+Viitataksesi ulomman toiston kenttään sisemmästä toistosta, käytä merkintää `${fieldname}` – se hakee lähimmän vastaavan yläelementin:
 
-`hh_members`-toiston sisällä `${hh_id}` palauttaa **nykyisen** kotitalouden tunnuksen, ei kaikkien kotitalouksien tunnuksia.
+Toiston `hh_members` sisällä `${hh_id}` palauttaa **nykyisen** kotitalouden tunnuksen, ei kaikkien kotitalouksien tunnuksia.
 
 ---
 
 ## Järjestys toistoryhmissä: `rank-index()`
 
-Kun `rank`-kenttä on toiston sisällä, käytä `rank-index(instanceNumber, repeatedField)` ulkopuolelta saadaksesi tietyn tapauksen ordinaalijarjestyksen:
+Kun toiston sisällä on `rank`-kenttä, käytä toistoryhmän ulkopuolelta funktiota `rank-index(instanceNumber, repeatedField)` saadaksesi tietyn esiintymän järjestysnumeron:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` palauttaa korkeimman pistemäärän tapausindeksin.
+`rank-index(1, ${score})` palauttaa korkeimman pistemäärän saaneen esiintymän indeksin.
+
+---
+
+## `1screen`-ulkoasu `begin_repeat`-rivillä
+
+Lisäämällä `1screen` `appearance`-sarakkeeseen `begin_repeat`-riville, kaikki kunkin esiintymän kysymykset näytetään yhdessä yhdellä näytöllä sen sijaan, että näytettäisiin yksi kysymys kerrallaan.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Kotitalouden jäsen | `1screen` |
+| text | member_name | Jäsenen nimi | |
+| integer | member_age | Ikä | |
+| end_repeat | | | |
+
+Kun `1screen` on käytössä eikä ryhmän sisällä ole `repeat_count`- tai `add_repeat`-kenttää, rtSurvey lisää automaattisesti pyöreän **+**-painikkeen näytön alareunaan, jotta haastattelijat voivat lisätä uusia esiintymiä ilman erillisiä määrityksiä.
+
+| Ulkoasu | Yksi näyttö per esiintymä | Oletusarvoinen +-painike lisätty |
+|------------|-------------------------|------------------------|
+| `1screen` | Kyllä | Kyllä (kun ei `add_repeat`-lapsikenttää) |
+| `field-list` | Kyllä | Ei |
+
+Käytä `field-list`-asetusta, kun haluat ryhmitellyn asettelun ilman automaattista lisäyspainiketta. Käytä `1screen`-asetusta, kun haluat sekä ryhmitellyn asettelun että sisäänrakennetun tavan lisätä esiintymiä.
+
+---
+
+## `add_repeat`-muokattu lisäyspainike
+
+Toistoryhmän **sisälle** sijoitettu `note`- (tai `text`-) kenttä, jolla on `appearance: add_repeat`, näytetään koko näytön levyisenä "Lisää"-painikkeena. Painikkeen teksti tulee kentän `label`-sarakkeesta. Kun `add_repeat`-kenttä on käytössä, oletusarvoinen pyöreä +-painike (joka tulee `1screen`-asetuksesta) piilotetaan.
+
+Sijoita `add_repeat`-kenttä viimeiseksi kentäksi toistoryhmän sisälle:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Jäsen | `1screen` |
+| text | member_name | Jäsenen nimi | |
+| integer | member_age | Ikä | |
+| note | btn_add | + Lisää jäsen | `add_repeat` |
+| end_repeat | | | |
+
+### Värien muokkaaminen
+
+Voit tyylitellä painikkeen lisäämällä värikoodin ulkoasuarvon sisään:
+
+| Ulkoasuarvo | Tulos |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Vihreä tausta, oletustekstiväri |
+| `add_repeat 04B404-ffffff` | Vihreä tausta, valkoinen teksti |
+
+Ensimmäinen väri on taustaväri ja toinen (viivan jälkeen) on tekstin väri. Jätä `#`-merkki pois, kun käytät viivalla erotettua muotoa.
+
+### Ikonivariantti
+
+Käytä `add_repeat icon` -asetusta (välilyönnillä) näyttääksesi pienen pyöreän ikonipainikkeen koko näytön levyisen painikkeen sijaan:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Lisää | `add_repeat icon` |
+
+---
+
+## Poistopainikkeet: `delete-repeat-current` ja `delete-repeat-last`
+
+Toistoryhmän sisällä oleva `note`-kenttä, jolla on `appearance: delete-repeat-current` tai `appearance: delete-repeat-last`, näkyy jaettuna poistopainikkeena.
+
+| Ulkoasu | Toiminto |
+|------------|--------|
+| `delete-repeat-current` | Poistaa nykyisen (aktiivisen) esiintymän |
+| `delete-repeat-last` | Poistaa toiston viimeisen esiintymän |
+
+Oletusarvoinen (ei-ikoni) painike on jaettu painike: roskakori-ikoni vasemmalla ja kentän otsikkoteksti oikealla, täyttäen koko näytön leveyden.
+
+### Ikonivariantti
+
+Lisää `-icon`-pääte saadaksesi pienen pyöreän roskakori-ikonipainikkeen:
+
+| Ulkoasu | Tulos |
+|------------|--------|
+| `delete-repeat-current-icon` | Pyöreä roskakori-ikoni, poistaa nykyisen esiintymän |
+| `delete-repeat-last-icon` | Pyöreä roskakori-ikoni, poistaa viimeisen esiintymän |
+
+### Värien muokkaaminen
+
+Värimuoto on identtinen `add_repeat`-asetuksen kanssa: käytä `<#RRGGBB/>` tai `RRGGBB-RRGGBB` (tausta-teksti).
+
+### Esimerkki kokonaisesta mallista
+
+Seuraava toisto käyttää `1screen`-asetusta, pyöreää poista-nykyinen-painiketta ylhäällä ja koko näytön levyistä lisäyspainiketta alhaalla:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Jäsen | `1screen` |
+| note | btn_del | Poista | `delete-repeat-current-icon` |
+| text | member_name | Jäsenen nimi | |
+| integer | member_age | Ikä | |
+| note | btn_add | + Lisää jäsen | `add_repeat` |
+| end_repeat | | | |
 
 ---
 
 ## Parhaat käytännöt
 
-1. Käytä aina `repeat_count`:ia, kun toistojen lukumäärä tiedetään etukäteen — se estää luetteloijia lisäämästä tai poistamasta tapauksia vahingossa.
-2. Pidä toistoryhmät fokusoiduina — 20+ kysymyksen toisto per tapaus on vaikea navigoida.
-3. Nimeä toistoryhmät selkeästi (esim. `household_members`, ei `repeat1`) — nimi näkyy funktiokutsuissa ja viedyissä tiedoissa.
-4. Testaa maksimaalisen odotetun tapausmäärän kanssa suorituskyvyn tarkistamiseksi.
-5. Käytä `field-list`-ulkoasua toistoryhmässä näyttääksesi kaikki kentät yhdellä näytöllä per tapaus (mobiili).
+1. Käytä aina `repeat_count`-asetusta, kun toistojen määrä on tiedossa etukäteen – se estää haastattelijoita lisäämästä tai poistamasta esiintymiä vahingossa.
+2. Pidä toistoryhmät selkeinä – toisto, jossa on yli 20 kysymystä per esiintymä, on vaikea hallita.
+3. Nimeä toistoryhmät selkeästi (esim. `household_members`, ei `repeat1`) – nimi näkyy funktiokutsuissa ja viedyissä tiedoissa.
+4. Testaa lomake suurimmalla odotetulla esiintymien määrällä suorituskyvyn varmistamiseksi.
+5. Käytä `1screen`-asetusta `begin_repeat`-rivillä näyttääksesi kaikki kysymykset yhdellä näytöllä esiintymää kohden, ja käytä `add_repeat`-huomautuskenttää ryhmän sisällä tarjotaksesi haastattelijoille selkeän "Lisää"-painikkeen.
 
 ---
 
 ## Rajoitukset
 
-- `indexed-repeat()` vaatii kelvollisen indeksin (1 tapausmäärään asti) — alueen ulkopuoliset indeksit palauttavat tyhjän.
-- Sisäkkäiset toistot yli 2 tasoa eivät ole suositeltuja ja saattavat aiheuttaa näyttöongelmia joillakin asiakkailla.
-- Koostefunktiot (`sum`, `count` jne.) toimivat koko toistoryhmälle — et voi koota osajoukkoa tapauksista ilman `*-if`-variantteja.
+- `indexed-repeat()` vaatii kelvollisen indeksin (1:stä esiintymien määrään) – rajojen ulkopuoliset indeksit palauttavat tyhjän arvon.
+- Yli 2-tasoisia sisäkkäisiä toistoja ei suositella, ja ne voivat aiheuttaa näyttöongelmia joillakin laitteilla.
+- Koontifunktiot (`sum`, `count` jne.) toimivat koko toistoryhmässä – et voi tehdä koontia esiintymien osajoukosta ilman `*-if`-variantteja.

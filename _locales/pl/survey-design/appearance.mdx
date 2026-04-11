@@ -1,58 +1,58 @@
 ---
-title: "Wygląd"
+title: "Wygląd (Appearance)"
 description: ""
 ---
 
-Kolumna `appearance` w rtSurvey pozwala dostosować wizualną prezentację i zachowanie pytań w ankietach. Ta funkcja poprawia doświadczenie użytkownika i może znacznie zwiększyć efektywność zbierania danych. rtSurvey obsługuje standardowe atrybuty wyglądu XLSForm i rozszerza je o dodatkowe opcje.
+Kolumna `appearance` w rtSurvey pozwala na dostosowanie wizualnej prezentacji i zachowania pytań w ankietach. Ta funkcja poprawia doświadczenie użytkownika i może znacznie zwiększyć efektywność zbierania danych. rtSurvey obsługuje standardowe atrybuty wyglądu XLSForm i rozszerza je o dodatkowe opcje.
 
 ## Standardowe atrybuty wyglądu XLSForm
 
 rtSurvey obsługuje następujące standardowe atrybuty wyglądu XLSForm:
 
-| Atrybut wyglądu | Typy pytań | Opis |
+| Atrybut wyglądu (Appearance Attribute) | Typy pytań | Opis |
 |----------------------|----------------|-------------|
 | multiline | text | Tworzy wieloliniowe pole tekstowe (najlepsze dla klientów webowych) |
 | minimal | select_one, select_multiple | Wyświetla opcje w menu rozwijanym |
-| quick | select_one | Automatycznie przechodzi do następnego pytania po wyborze (tylko mobile) |
-| no-calendar | date | Ukrywa wyświetlanie kalendarza (tylko mobile) |
-| month-year | date | Umożliwia wybór tylko miesiąca i roku |
-| year | date | Umożliwia wybór tylko roku |
-| horizontal-compact | select_one, select_multiple | Wyświetla opcje poziomo (tylko web) |
-| horizontal | select_one, select_multiple | Wyświetla opcje poziomo w kolumnach (tylko web) |
+| quick | select_one | Automatycznie przechodzi do następnego pytania po dokonaniu wyboru (tylko urządzenia mobilne) |
+| no-calendar | date | Ukrywa wyświetlanie kalendarza (tylko urządzenia mobilne) |
+| month-year | date | Pozwala na wybór tylko miesiąca i roku |
+| year | date | Pozwala na wybór tylko roku |
+| horizontal-compact | select_one, select_multiple | Wyświetla opcje poziomo (tylko klient webowy) |
+| horizontal | select_one, select_multiple | Wyświetla opcje poziomo w kolumnach (tylko klient webowy) |
 | likert | select_one | Prezentuje opcje jako skalę Likerta |
-| compact | select_one, select_multiple | Wyświetla opcje obok siebie z minimalnym odstępem |
-| quickcompact | select_one | Łączy kompaktowy wyświetlacz z automatycznym przejściem (tylko mobile) |
-| field-list | groups | Wyświetla całą grupę na jednym ekranie (tylko mobile) |
-| label | select_one, select_multiple | Pokazuje etykiety opcji bez danych wejściowych |
-| list-nolabel | select_one, select_multiple | Pokazuje dane wejściowe bez etykiet (użyj z `label`) |
+| compact | select_one, select_multiple | Wyświetla opcje obok siebie z minimalnym marginesem |
+| quickcompact | select_one | Łączy kompaktowe wyświetlanie z automatycznym przechodzeniem dalej (tylko urządzenia mobilne) |
+| field-list | groups | Wyświetla całą grupę na jednym ekranie (tylko urządzenia mobilne) |
+| label | select_one, select_multiple | Pokazuje etykiety wyborów bez pól wyboru |
+| list-nolabel | select_one, select_multiple | Pokazuje pola wyboru bez etykiet (używane z `label`) |
 | table-list | groups | Wyświetla pytania w formacie tabeli |
-| signature | image | Umożliwia przechwytywanie podpisu (tylko mobile) |
-| draw | image | Umożliwia rysowanie odręczne (tylko mobile) |
-| map, quick map | select_one, select_one_from_file | Umożliwia wybór z elementów mapy |
+| signature | image | Umożliwia przechwytywanie podpisu (tylko urządzenia mobilne) |
+| draw | image | Umożliwia rysowanie odręczne (tylko urządzenia mobilne) |
+| map, quick map | select_one, select_one_from_file | Umożliwia wybór z funkcji mapy |
 
-## Najlepsze praktyki używania wyglądu
+## Najlepsze praktyki korzystania z wyglądu
 
-1. **Spójność**: Używaj atrybutów wyglądu spójnie w całej ankiecie dla jednolitego wyglądu.
-2. **Mobile vs. Web**: Rozważ, jak wyglądy będą renderowane na różnych urządzeniach i platformach.
-3. **Wydajność**: Zachowaj ostrożność z atrybutami wyglądu, które mogą spowalniać ładowanie formularza (np. `table-list` dla dużych grup).
-4. **Doświadczenie użytkownika**: Wybierz wyglądy, które ułatwiają wprowadzanie danych i są intuicyjne dla respondentów.
-5. **Testowanie**: Zawsze testuj formularz na docelowych urządzeniach, aby upewnić się, że wyglądy działają zgodnie z oczekiwaniami.
+1. **Spójność**: Używaj atrybutów wyglądu konsekwentnie w całej ankiecie, aby uzyskać jednolity wygląd.
+2. **Urządzenia mobilne a WWW**: Zastanów się, jak wygląd będzie renderowany na różnych urządzeniach i platformach.
+3. **Wydajność**: Zachowaj ostrożność przy atrybutach wyglądu, które mogą spowolnić ładowanie formularza (np. `table-list` dla dużych grup).
+4. **Doświadczenie użytkownika**: Wybieraj opcje wyglądu, które ułatwiają wprowadzanie danych i są bardziej intuicyjne dla respondentów.
+5. **Testowanie**: Zawsze testuj formularz na urządzeniach docelowych, aby upewnić się, że wygląd działa zgodnie z oczekiwaniami.
 
 ## Zaawansowane techniki
 
-### Łączenie wyglądu
+### Łączenie atrybutów wyglądu
 
-Niektóre atrybuty wyglądu można łączyć dla bardziej złożonych układów:
+Niektóre atrybuty wyglądu można łączyć w celu uzyskania bardziej złożonych układów:
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Wybierz jeden: | minimal compact |
+| select_one options | choice | Wybierz jedno: | minimal compact |
 ```
 
 ### Dynamiczny wygląd
 
-rtSurvey umożliwia dynamiczne zmiany wyglądu na podstawie logiki formularza:
+rtSurvey pozwala na dynamiczne zmiany wyglądu w oparciu o logikę formularza:
 
 ```
 | type | name | label | appearance | relevant |
@@ -62,16 +62,153 @@ rtSurvey umożliwia dynamiczne zmiany wyglądu na podstawie logiki formularza:
 
 ## Uwagi dotyczące aplikacji mobilnej
 
-- Niektóre wyglądy (np. `quick`, `signature`) są specyficzne dla urządzeń mobilnych.
-- Testuj dokładnie zarówno na Android, jak i iOS, aby zapewnić spójne działanie.
+- Niektóre atrybuty wyglądu (np. `quick`, `signature`) są specyficzne dla urządzeń mobilnych.
+- Przetestuj dokładnie na systemach Android i iOS, aby zapewnić spójne zachowanie.
+
+## Rozszerzone atrybuty wyglądu rtSurvey
+
+Oprócz standardowych atrybutów XLSForm, rtSurvey obsługuje następujące opcje specyficzne dla platformy:
+
+### Kontrola danych i wyświetlania
+
+| Atrybut wyglądu (Appearance Attribute) | Typy pytań | Opis |
+|----------------------|----------------|-------------|
+| `invisible` | any | Ukrywa pole przed widokiem, jednocześnie zbierając lub obliczając jego wartość. Różni się od typu `hidden` — pole nadal uczestniczy w logice. |
+| `displaytitle` | any | Wymusza wyświetlanie etykiety/tytułu pola, nawet jeśli normalnie zostałoby ono ukryte. |
+| `autopull` | select_one, select_multiple | Automatycznie pobiera dane zewnętrzne w celu wypełnienia opcji wyboru podczas ładowania formularza lub zmiany pola wyzwalającego. |
+| `floating_hint` | text, integer, decimal | Wyświetla tekst podpowiedzi jako pływającą etykietę powyżej pola wprowadzania, a nie poniżej niego. |
+| `calculate-button` | calculate | Dodaje widoczny przycisk, który wyzwala ponowne przeliczenie pola na żądanie, zamiast obliczać je automatycznie. |
+
+### Grupa i nawigacja
+
+| Atrybut wyglądu (Appearance Attribute) | Typy pytań | Opis |
+|----------------------|----------------|-------------|
+| `section` | group | Renderuje grupę jako zwijaną kartę sekcji. Uwaga: tylko aplikacja mobilna. |
+| `toc-hide` | any | Wyklucza pytanie z panelu nawigacji spisu treści (TOC). |
+| `minilog` | begin_repeat | Wyświetla zakończone wpisy powtórzeń jako kompaktową listę mini-logów, zamiast rozwijać każdy wpis wierszowo. |
+
+### Zachowanie wejścia
+
+| Atrybut wyglądu (Appearance Attribute) | Typy pytań | Opis |
+|----------------------|----------------|-------------|
+| `proper` | text | Automatycznie zmienia pierwszą literę każdego słowa na wielką podczas pisania przez respondenta (zachowanie typu title-case). |
+| `text-nolabel` | text, integer, decimal | Renderuje pole wprowadzania bez widocznej etykiety. |
+| `inline-1line` | text | Wymusza wyświetlanie tekstu w jednej linii, nawet jeśli etykieta pytania jest długa. |
+| `popup` | any | Renderuje pole wewnątrz wyskakującego okienka (popup / modal), a nie wierszowo na stronie. |
+
+### Układ
+
+| Atrybut wyglądu (Appearance Attribute) | Typy pytań | Opis |
+|----------------------|----------------|-------------|
+| `1screen` | group | Wymusza wyświetlanie całej grupy na jednym ekranie, niezależnie od jej wielkości. |
+| `columns(n)` | select_one, select_multiple | Wyświetla opcje w `n` kolumnach. Przykład: `columns(3)` pokazuje trzy kolumny przycisków radiowych. |
+| `gridformat<row=R col=C colspan=S align=center>` | any | Umieszcza pole w układzie CSS-grid w wierszu `R`, kolumnie `C`, zajmując `S` kolumn. Używane z `advanced-extension/grid-layout`. |
+| `ignore-simplify` | any | Instruuje renderer formularza, aby pominął automatyczne upraszczanie lub kondensowanie układu tego pola. |
+| `horizontal(N)` | select_one, select_multiple | Ustawia każdy wybór tak, aby zajmował `N` procent szerokości wiersza. Przykład: `horizontal(50)` umieszcza dwie opcje w wierszu. |
+| `scroll-view(N%)` | group, repeat | Ogranicza kontener do maksymalnej wysokości `N%` rzutni (lub elementu nadrzędnego), dodając pasek przewijania, gdy treść wykracza poza obszar. Przykład: `scroll-view(60%)`. |
+
+### Widżety
+
+| Atrybut wyglądu (Appearance Attribute) | Typy pytań | Opis |
+|----------------------|----------------|-------------|
+| `likert` | select_one | Prezentuje opcje jako wiersz skali Likerta (potwierdzone wsparcie, jak w tabeli powyżej). |
+| `distress` | select_one | Renderuje opcje jako wizualny widżet skali stresu psychologicznego Kesslera (K10) z ikonami emocji. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Renderuje opcje jako stylizowane pola ocen z pięcioma gniazdami kolorów. `c1` = obramowanie zewnętrznego kontenera, `c2` = obramowanie niezaznaczone, `c3` = obramowanie zaznaczone i wypełnienie, `c4` = kolor tekstu niezaznaczonego, `c5` = kolor tekstu zaznaczonego. Przykład: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Renderuje opcje jako kolorowe chipy tagów. Pięć gniazd kolorów postępuje w tej samej kolejności co `rating_box-fill`. Wybrane opcje są podświetlone; niewybrane opcje są ukryte w widoku podsumowania. |
+
+### Integracja z API
+
+| Atrybut wyglądu (Appearance Attribute) | Typy pytań | Opis |
+|----------------------|----------------|-------------|
+| `callapi` | text, integer, decimal, select_one | Umożliwia integrację wywołań API dla tego pola. Kolumna obliczeniowa powinna zawierać wyrażenie `callapi()`. Zobacz [Wywołanie API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Wyzwala wywołanie weryfikacyjne API przy użyciu parametrów statycznych. Formularz blokuje postęp, dopóki API nie potwierdzi wartości. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | To samo co `callapi-verify`, ale z parametrami pochodzącymi z wartości innych pól w czasie rzeczywistym. |
+
+### Przełącznik języka
+
+| Atrybut wyglądu (Appearance Attribute) | Typy pytań | Opis |
+|----------------------|----------------|-------------|
+| `change_language-{colors} default('lang')` | note, text | Renderuje widżet przełącznika języka stylizowany podanymi kodami kolorów. Token `default('lang')` ustawia język początkowy (np. `default('en')`); podczas parsowania jest on wewnętrznie zamieniany na `rtDefault('lang')`. Przykład: `change_language-blue-white default('vi')`. |
+
+### Inline format daty/czasu
+
+W przypadku pól `date`, `time` i `datetime` można określić niestandardowy format wyświetlania za pomocą ciągu formatującego dołączonego do atrybutu wyglądu:
+
+```
+inline-[%d/%m/%Y]
+inline-1line-[%d/%m/%Y %H:%M]
+```
+
+Tokeny formatowania są takie same jak w `format-date()` i `format-date-time()`. Zobacz [Funkcje — Funkcje daty i czasu](operators-and-functions/functions#date-and-time-functions).
+
+Przykład:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| datetime | event_time | Data i godzina wydarzenia | inline-[%d/%m/%Y %I:%M %p] |
+| date | birth_date | Data urodzenia | inline-[%d/%m/%Y] |
+
+### Układ przycisków wierszowych — `display{}` i `results{}`
+
+Dla typów pytań renderowanych jako wierszowy przycisk z ikoną (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), dwa modyfikatory wyglądu kontrolują pozycję przycisku i zachowanie po przechwyceniu danych.
+
+#### `display{...}` — pozycja przycisku przed przechwyceniem danych
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parametr | Wartości | Domyślnie |
+|-----------|--------|---------|
+| Align (Wyrównanie) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (Rozmiar) | `small`, `medium`, `large` | `small` |
+| Color (Kolor) | hex np. `#FF5500` | podstawowy kolor motywu |
+| Flag (Flaga) | `inline-icon` | wymusza tryb ikony |
+
+| Wartość Align | Układ |
+|-------------|--------|
+| `right` | Przycisk po prawej stronie etykiety |
+| `left` | Przycisk po lewej stronie etykiety |
+| `top` | Przycisk nad etykietą, wyśrodkowany na pełną szerokość |
+| `center` / `bottom` | Przycisk pod etykietą, wyśrodkowany na pełną szerokość |
+
+#### `results{...}` — układ i widoczność po przechwyceniu danych
+
+Dziedziczy ustawienia `display{}`. Służy do przeniesienia przycisku lub ukrycia elementów po przechwyceniu wartości.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| Wartość `hide` | Efekt |
+|---|---|
+| `hide(capture)` | Ukrywa przycisk przechwytywania, gdy plik/wartość już istnieje |
+| `hide(review)` | Ukrywa miniaturę podglądu / przycisk odtwarzania |
+| `hide(filename)` | Ukrywa nazwę pliku wyświetlaną po przesłaniu |
+| `hide(camera)` | Ukrywa przycisk wyzwalania aparatu po zrobieniu zdjęcia |
+| `hide(scanner)` | Ukrywa przycisk skanowania kodu kreskowego po zeskanowaniu wartości |
+| `hide(value)` | Ukrywa tekst zeskanowanej wartości (kod kreskowy / punkt geograficzny) |
+
+Widżet automatycznie przełącza się z układu `display{}` na `results{}` w momencie przechwycenia wartości.
+
+**Przykłady:**
+
+```
+inline display{right}                                    → ikona po prawej stronie etykiety
+inline display{left, large}                              → duża ikona po lewej stronie
+inline display{center, large, #FF5500}                   → duża pomarańczowa ikona pod etykietą
+inline display{right} results{left}                      → ikona przesuwa się w lewo po przechwyceniu
+inline display{right} results{hide(capture)}             → ikona znika po przechwyceniu
+inline display{center} results{hide(capture), hide(filename)}
+```
 
 ## Znane ograniczenia
 
-- Złożone wyglądy mogą nie renderować się identycznie na wszystkich platformach.
-- Niektóre zaawansowane wyglądy rtSurvey mogą nie być obsługiwane w trybie offline.
+- Złożone atrybuty wyglądu mogą nie być renderowane identycznie na wszystkich platformach.
+- Niektóre zaawansowane atrybuty wyglądu rtSurvey mogą nie być obsługiwane w trybie offline.
 
 ## Rozwiązywanie problemów z wyglądem
 
-1. **Wygląd nie jest stosowany**: Sprawdź literówki w kolumnie wyglądu.
+1. **Wygląd nie został zastosowany**: Sprawdź, czy w kolumnie appearance nie ma literówek.
 2. **Niespójne renderowanie**: Zweryfikuj kompatybilność z typem pytania i platformą.
-3. **Problemy z wydajnością**: Rozważ uproszczenie złożonych wyglądów, szczególnie dla dużych ankiet.
+3. **Problemy z wydajnością**: Rozważ uproszczenie złożonych atrybutów wyglądu, szczególnie w przypadku dużych ankiet.

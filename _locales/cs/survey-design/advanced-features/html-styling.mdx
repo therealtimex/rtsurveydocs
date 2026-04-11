@@ -1,14 +1,14 @@
 ---
-title: "HTML stylování"
-description: "rtSurvey podporuje HTML tagy v popisках a nápovědách, umožňující formátování textu, odkazy a dynamické barevné témata."
+title: "HTML Styling"
+description: "rtSurvey podporuje HTML tagy v popiscích a nápovědách, což umožňuje formátování bohatého textu, odkazy a dynamické barevné motivy."
 ---
 
 import { Callout } from 'nextra/components'
 
-rtSurvey vykresluje text **popisku** a **nápovědy** jako HTML ve webových formulářích. To znamená, že můžete používat standardní HTML tagy pro formátování textu, přidávání zalomení řádků, vytváření odkazů a aplikaci barev. To je zvláště užitečné pro pole poznámek, instrukce sekcí a dynamické souhrny.
+rtSurvey vykresluje text **popisku (label)** a **nápovědy (hint)** jako HTML ve webových formulářích. To znamená, že můžete používat standardní HTML tagy k formátování textu, přidávání zalomení řádků, vytváření odkazů a aplikování barev. To je užitečné zejména pro pole poznámek, instrukce k sekcím a dynamické souhrny.
 
 <Callout type="warning">
-HTML v popisках je vykreslováno ve **webovém formuláři** a mobilních aplikacích rtSurvey. Nemusí se vykreslovat ve všech klientech kompatibilních s ODK. Vždy testujte na cílové platformě.
+HTML v popiscích se vykresluje ve **webovém formuláři** a v mobilních aplikacích rtSurvey. Nemusí se vykreslovat ve všech klientech kompatibilních s ODK. Vždy testujte na své cílové platformě.
 </Callout>
 
 ---
@@ -18,88 +18,88 @@ HTML v popisках je vykreslováno ve **webovém formuláři** a mobilních apl
 ### Formátování textu
 
 | Tag | Výsledek |
-|-----|---------|
+|-----|--------|
 | `<strong>text</strong>` nebo `<b>text</b>` | **Tučný text** |
 | `<em>text</em>` nebo `<i>text</i>` | *Kurzíva* |
 | `<u>text</u>` | Podtržený text |
 | `<br>` | Zalomení řádku |
-| `<span style="...">text</span>` | Inline stylování |
+| `<span style="...">text</span>` | Inline styling |
 
 ### Odkazy
 
 ```html
-<a href="https://example.com" target="_blank">Klikněte zde</a>
+<a href="https://example.com" target="_blank">Click here</a>
 ```
 
-Otevírá se v nové záložce. Použijte pro referenční dokumenty, pokyny nebo externí zdroje, které by enumerátor měl konzultovat.
+Otevírá se na nové kartě. Použijte pro referenční dokumenty, pokyny nebo externí zdroje, které by měl tazatel konzultovat.
 
 ### Barvy
 
 Použijte `<span>` s inline styly:
 
 ```html
-<span style="color: red;">Varování: hodnota je mimo rozsah</span>
-<span style="color: #009688;">Sekce dokončena</span>
+<span style="color: red;">Warning: value is out of range</span>
+<span style="color: #009688;">Section completed</span>
 ```
 
 ---
 
-## Proměnné barevného tématu
+## Proměnné barevných motivů
 
-rtSurvey podporuje **tokeny barevného tématu**, které se přizpůsobují nakonfigurovanému tématu aplikace. Použijte syntaxi `__COLOR_THEME_NAME__`:
+rtSurvey podporuje **tokeny barevných motivů**, které se přizpůsobují nakonfigurovanému motivu aplikace. Použijte syntaxi `__COLOR_THEME_NAME__`:
 
 ```html
-<span style="color: var(--color-theme-primary);">Text primární barvy</span>
+<span style="color: var(--color-theme-primary);">Primary color text</span>
 ```
 
-Nebo pomocí zkráceného tokenu v textu popisku:
+Nebo pomocí zkratky tokenu v textu popisku:
 
 ```
-<font color="var(--COLOR_THEME_PRIMARY)">Důležitá poznámka</font>
+<font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
 ```
 
-To je automaticky převedeno na ekvivalentní `<span>` s CSS proměnnou při vykreslování.
+To se při vykreslování automaticky převede na ekvivalentní `<span>` s proměnnou CSS.
 
 ---
 
 ## Vícejazyčné popisky
 
-Obalte obsah do jazykových tagů pro podporu více jazyků v jedné buňce popisku:
+Zabalte obsah do jazykových tagů pro podporu více jazyků v jedné buňce popisku:
 
 ```
 <en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
 ```
 
-rtSurvey extrahuje obsah odpovídající aktuálnímu jazyku aplikace. Pokud není nalezen odpovídající jazykový tag, zobrazí se celý řetězec tak, jak je.
+rtSurvey extrahuje obsah odpovídající aktuálnímu jazyku aplikace. Pokud není nalezen žádný odpovídající jazykový tag, zobrazí se celý řetězec tak, jak je.
 
 ---
 
 ## Příklady v polích poznámek
 
-### Instrukce sekce s tučným textem a zalomením řádku
+### Instrukce k sekci s tučným písmem a zalomením řádku
 
 | type | name | label |
 |------|------|-------|
-| note | section_intro | `<strong>Sekce 3: Využití půdy</strong><br>Všechny otázky v této sekci pokládejte pouze vedoucímu domácnosti.` |
+| note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
 
-### Dynamický souhrn s odkazem na výpočet
+### Dynamický souhrn s referencí na výpočet
 
 | type | name | label |
 |------|------|-------|
 | calculate | total | | `${adults} + ${children}` |
-| note | summary | `Celkový počet členů domácnosti: <strong>${total}</strong><br><span style="color: gray;">Dospělí: ${adults} · Děti: ${children}</span>` |
+| note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
 
-### Varování červenou barvou
+### Varování v červené barvě
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| note | age_warning | `<span style="color: red;"><strong>Varování:</strong> Zadaný věk (${age}) je neobvykle vysoký. Prosím ověřte.</span>` | `${age} > 100` |
+| note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
 
 ### Odkaz na referenční dokument
 
 | type | name | label |
 |------|------|-------|
-| note | guidelines_link | `Před zahájením této sekce si přečtěte <a href="https://docs.example.com/guidelines" target="_blank">Terénní pokyny</a>.` |
+| note | guidelines_link | `Refer to the <a href="https://docs.example.com/guidelines" target="_blank">Field Guidelines</a> before starting this section.` |
 
 ---
 
@@ -107,35 +107,105 @@ rtSurvey extrahuje obsah odpovídající aktuálnímu jazyku aplikace. Pokud nen
 
 ### `<webbox src='url' title='title'>...</webbox>`
 
-Vloží tlačítko, které otevře URL v modálním okně uvnitř formuláře. Viz [Webbox](webbox) pro podrobnosti.
+Vloží tlačítko, které otevře URL v modálním okně přímo ve formuláři. Další podrobnosti naleznete v části [Webbox](webbox).
 
-### `<delete-repeat-current>popisek</delete-repeat-current>`
+### `<delete-repeat-current>label</delete-repeat-current>`
 
-Vykreslí tlačítko uvnitř skupiny opakování, které smaže aktuální instanci opakování po klepnutí.
+Vykreslí tlačítko uvnitř opakovací skupiny, které po klepnutí odstraní aktuální instanci opakování.
 
-### `<delete-repeat-last>popisek</delete-repeat-last>`
+### `<delete-repeat-last>label</delete-repeat-last>`
 
-Vykreslí tlačítko, které smaže poslední instanci opakování.
+Vykreslí tlačítko, které odstraní poslední instanci opakování.
 
-Příklad použití ve skupině opakování:
+Příklad použití v opakovací skupině:
 
 | type | name | label |
 |------|------|-------|
-| note | delete_btn | `<delete-repeat-current>Odebrat tohoto člena</delete-repeat-current>` |
+| note | delete_btn | `<delete-repeat-current>Remove this member</delete-repeat-current>` |
 
 ---
 
-## Osvědčené postupy
+## Dynamické souhrny HTML pomocí autopull()
 
-1. Používejte HTML střídmě — přeformátované popisky jsou těžší ke čtení, ne snazší.
-2. Upřednostňujte `<strong>` pro tučný text a `<em>` pro kurzívu před zastaralými `<b>` a `<i>`.
-3. Udržujte použití barev smysluplné — používejte červenou pro varování, nikoli pro dekoraci.
-4. Vždy testujte vykreslování HTML na mobilní aplikaci i webovém formuláři, protože vykreslování se může mírně lišit.
-5. Vyhněte se tagům `<table>` uvnitř popisků — na mobilních obrazovkách se zřídka vykreslují dobře.
+`autopull()` vykresluje blok HTML uvnitř pole `note` a **přehodnocuje jej při každé změně pole** ve formuláři. Díky tomu je vhodný pro živé souhrnné panely, obrazovky pro kontrolu před odesláním a průběžné součty, které se aktualizují podle toho, jak tazatel vyplňuje data.
+
+<Callout type="info">
+`autopull()` funguje pouze u polí **poznámek (note)**. Sloupec popisku (label) je ignorován — veškerý obsah HTML musí být dodán prostřednictvím sloupce **vzhledu (appearance)** pomocí `concat()`.
+</Callout>
+
+### Syntaxe
+
+Umístěte `autopull()` do sloupce **vzhledu (appearance)** pole `note`:
+
+```
+autopull(concat('<html>...</html>'))
+```
+
+Reference na pole (`${field_name}`) uvnitř `concat()` jsou nahrazeny aktuálními živými hodnotami a HTML se při každé změně znovu vykreslí.
+
+### Omezení výšky pomocí scroll-view()
+
+U delších souhrnů zkombinujte `autopull()` se `scroll-view(N%)`, abyste omezili výšku panelu a umožnili jeho posouvání:
+
+```
+scroll-view(45%) autopull(concat('<html>...</html>'))
+```
+
+Hodnota `N%` je relativní k viditelné oblasti formuláře. `45%` je praktická výchozí hodnota pro souhrnný panel uprostřed stránky.
+
+### Úplný příklad — souhrn polohy domácnosti
+
+Následující pole `note` vykresluje dvousloupcovou tabulku zobrazující vybranou provincii, okres a obec. Aktualizuje se automaticky vždy, když se změní `${tinh_name}`, `${huyen_name}` nebo `${xa_name}`.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | location_summary | | `scroll-view(45%) autopull(concat('<html><table style="width:100%;border-collapse:collapse"><tr><td style="padding:4px;font-weight:bold">Province:</td><td style="padding:4px">', ${tinh_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">District:</td><td style="padding:4px">', ${huyen_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Commune:</td><td style="padding:4px">', ${xa_name}, '</td></tr></table></html>'))` |
+
+V XLSForm se hodnota vzhledu zapisuje do jediné buňky:
+
+```
+scroll-view(45%) autopull(concat(
+  '<html><table style="width:100%;border-collapse:collapse">
+   <tr><td style="padding:4px;font-weight:bold">Province:</td>
+       <td style="padding:4px">', ${tinh_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">District:</td>
+       <td style="padding:4px">', ${huyen_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Commune:</td>
+       <td style="padding:4px">', ${xa_name}, '</td></tr>
+   </table></html>'))
+```
+
+### Inline styly
+
+Atributy inline `style="..."` u jakéhokoli elementu HTML jsou podporovány a jsou doporučeným způsobem aplikace vizuálního formátování uvnitř bloků `autopull()`.
+
+Následující prvky **nejsou** v obsahu `autopull()` podporovány:
+
+- Bloky `<style>`
+- Tagy `<link>` pro externí styly
+- JavaScript (`<script>`)
+
+### Kdy použít autopull()
+
+| Případ použití | Poznámky |
+|----------|-------|
+| Obrazovka kontroly před odesláním | Zobrazení všech klíčových odpovědí na jednom panelu dříve, než tazatel skončí |
+| Průběžné součty | Zobrazení vypočteného součtu, který se aktualizuje při zadávání množství |
+| Viditelný referenční panel | Zobrazení vybrané hodnoty vyhledávání (např. název provincie), zatímco tazatel vyplňuje podřízená pole |
+
+---
+
+## Doporučené postupy
+
+1. Používejte HTML střídmě — příliš formátované popisky se hůře čtou.
+2. Dávejte přednost `<strong>` pro tučné písmo a `<em>` pro kurzívu před zastaralými `<b>` a `<i>`.
+3. Používejte barvy smysluplně — červenou používejte pro varování, nikoli pro dekoraci.
+4. Vždy testujte vykreslování HTML v mobilní aplikaci i ve webovém formuláři, protože vykreslování se může mírně lišit.
+5. Vyhněte se tagům `<table>` uvnitř popisků — na mobilních obrazovkách se vykreslují málokdy dobře.
 6. Nepoužívejte JavaScript (`<script>`) — bude odstraněn nebo způsobí chyby.
 
 ## Omezení
 
 - Komplexní HTML (tabulky, formuláře, skripty) není podporováno a může narušit vykreslování.
-- Některé starší mobilní klienty mohou zobrazovat HTML tagy jako doslovný text — testujte na všech cílových zařízeních.
-- Odkazy `<a>` se otevírají v prohlížeči nebo WebView — enumerátor opustí formulář, což může být rušivé na mobilních zařízeních.
+- Někteří starší mobilní klienti mohou zobrazovat HTML tagy jako prostý text — testujte na všech cílových zařízeních.
+- Odkazy `<a>` se otevírají v prohlížeči nebo WebView — tazatel opustí formulář, což může být na mobilu rušivé.

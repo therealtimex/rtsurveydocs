@@ -1,19 +1,19 @@
 ---
-title: "多語言支援"
+title: "多語言支持"
 description: ""
 ---
 
-rtSurvey 提供強大的多語言支援，讓您可以建立多種語言的問卷調查。此功能對於在不同語言人群中進行研究或在多語言環境中進行調查至關重要。
+rtSurvey 提供強大的多語言支持，允許您建立多種語言的問卷。這一特性對於在不同語言群體或多語言環境中進行研究至關重要。
 
-## 設定多語言問卷調查
+## 設置多語言問卷
 
-要在 rtSurvey 中建立多語言問卷調查，您需要在 XLSForm 中添加特定語言的欄位。方法如下：
+要在 rtSurvey 中建立多語言問卷，您需要在 XLSForm 中添加特定於語言的列。操作方法如下：
 
-1. **標籤翻譯**：使用 `label::Language (code)` 格式為每種語言添加欄位。
-2. **提示翻譯**：使用 `hint::Language (code)` 翻譯提示。
-3. **媒體文件翻譯**：對於特定語言的媒體，使用 `media::Language (code)`。
+1. **標籤翻譯 (Label Translations)**：使用 `label::Language (code)` 格式為每種語言添加列。
+2. **提示翻譯 (Hint Translations)**：使用 `hint::Language (code)` 翻譯提示信息。
+3. **媒體文件翻譯 (Media File Translations)**：對於特定於語言的媒體文件，使用 `media::Language (code)`。
 
-範例：
+示例：
 
 ```
 | type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
@@ -23,11 +23,11 @@ rtSurvey 提供強大的多語言支援，讓您可以建立多種語言的問�
 
 ## 語言代碼
 
-建議在語言名稱後使用官方 2 字符語言代碼（子標籤）。這有助於將表單語言與使用者介面語言匹配。您可以在[此處](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)找到官方代碼。
+建議在語言名稱後使用官方的 2 字符語言代碼（子標籤）。這有助於將表單語言與用戶界面語言匹配。您可以在[此處](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)找到官方代碼。
 
-## 設定預設語言
+## 設置默認語言
 
-要設定資料收集的預設語言，請在 XLSForm 的 `settings` 工作表中使用：
+要為數據收集設置默認語言，請使用 XLSForm 中的 `settings` 工作表：
 
 ```
 | form_id   | version | default_language |
@@ -35,18 +35,18 @@ rtSurvey 提供強大的多語言支援，讓您可以建立多種語言的問�
 | test_form | 101     | French (fr)       |
 ```
 
-## rtSurvey 特定功能
+## rtSurvey 特有功能
 
 ### 動態語言切換
 
-rtSurvey 允許使用者在資料收集期間動態切換語言：
+rtSurvey 允許用戶在數據收集過程中動態切換語言：
 
-- 在網頁介面中，使用頂部導航欄中的語言下拉選單。
-- 在行動應用程式中，透過設定選單存取語言選項。
+- 在 Web 界面中，使用頂部導航欄中的語言下拉菜單。
+- 在移動應用中，通過設置菜單訪問語言選項。
 
-### 特定語言的驗證訊息
+### 特定於語言的驗證消息
 
-rtSurvey 將多語言支援擴展至驗證訊息：
+rtSurvey 將多語言支持擴展到驗證消息：
 
 ```
 | type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
@@ -54,9 +54,19 @@ rtSurvey 將多語言支援擴展至驗證訊息：
 | integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-### RTL 語言支援
+### 本地化必填消息
 
-對於從右到左（RTL）的語言，如阿拉伯語或希伯來語，rtSurvey 會自動調整佈局：
+使用 `required_message::Language (code)` 在必填字段留空時顯示翻譯後的錯誤提示：
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
+### RTL 語言支持
+
+對於阿拉伯語或希伯來語等從右向左 (RTL) 書寫的語言，rtSurvey 會自動調整佈局：
 
 ```
 | type | name | label::English (en) | label::Arabic (ar) |
@@ -64,7 +74,7 @@ rtSurvey 將多語言支援擴展至驗證訊息：
 | text | name | Your name           | اسمك                |
 ```
 
-### 特定語言的外觀
+### 特定於語言的外觀 (Appearance)
 
 rtSurvey 允許您為不同語言指定不同的外觀：
 
@@ -74,25 +84,61 @@ rtSurvey 允許您為不同語言指定不同的外觀：
 | text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
 
-## 多語言問卷調查的最佳實踐
+## 雙語標籤中的 HTML 格式化
 
-1. **一致的命名**：在整個表單中使用一致的語言代碼。
-2. **專業翻譯**：聘請熟悉問卷調查背景的專業翻譯人員。
-3. **背景備注**：為翻譯人員提供背景備注，確保準確翻譯。
-4. **測試**：在部署前以所有語言測試您的表單。
-5. **Unicode 支援**：確保您的資料收集裝置支援非拉丁文字的 Unicode。
-6. **特定語言的媒體**：為每種語言使用文化上適當的圖像或音頻。
-7. **避免圖像中的文字**：如果使用帶有文字的圖像，請為每種語言建立單獨的圖像。
+您可以在單個標籤單元格中將 HTML 標籤與語言包裝器結合使用。rtSurvey 會提取當前語言塊並渲染其餘的 HTML。
+
+每種語言使用粗體和字體顏色的示例：
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+語言包裝器內支持的行內標籤：`<b>`、`<i>`、`<u>`、`<big>`、`<small>`、`<font color="...">`、`<br>`、`<span style="...">`。
+
+每種語言的有色文本示例：
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## 語言感知計算
+
+當表單包含 `${language_use}` 字段（由 `change_language` 組件設置）時，使用 `if()` 返回當前語言的值：
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+示例 — 使用 `pulldata('rawquery', ...)` 以當前語言顯示查找結果：
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+注意：`${language_use}` 字段通常由 `change_language` 外觀組件設置。請參閱 Appearance — change_language。
+
+## 多語言問卷最佳實踐
+
+1. **命名一致性**：在整個表單中使用一致的語言代碼。
+2. **專業翻譯**：聘請熟悉調查背景的專業翻譯人員。
+3. **上下文注釋**：為翻譯人員提供上下文注釋，以確保翻譯準確。
+4. **測試**：在部署前用所有語言測試您的表單。
+5. **Unicode 支持**：確保您的數據收集設備支持非拉丁腳本的 Unicode。
+6. **特定於語言的媒體**：為每種語言使用文化上合適的圖像或音頻。
+7. **避免在圖像中使用文本**：如果圖像包含文本，請為每種語言建立單獨的圖像。
 
 ## 處理特殊情況
 
-### 混合語言回應
+### 混合語言回答
 
-rtSurvey 允許受訪者以任何文字輸入文字，無論選取的表單語言如何。這對於以原始文字捕獲姓名或地址很有用。
+rtSurvey 允許受訪者以任何腳本輸入文本，無論選擇哪種表單語言。这對於捕獲原始腳本中的姓名或地址非常有用。
 
-### 特定語言的問題類型
+### 特定於語言的問題類型
 
-某些問題類型可能更適合特定語言。rtSurvey 允許您為不同語言使用不同的問題類型：
+某些問題類型可能更適合某些語言。rtSurvey 允許您為不同語言使用不同的問題類型：
 
 ```
 | type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
@@ -100,21 +146,21 @@ rtSurvey 允許受訪者以任何文字輸入文字，無論選取的表單語�
 | text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
 ```
 
-## 匯出多語言資料
+## 導出多語言數據
 
-從 rtSurvey 匯出資料時：
+從 rtSurvey 導出數據時：
 
-- 選擇以特定語言匯出或包含所有語言版本。
-- 語言元資料包含在匯出中，指示每個回應使用了哪種語言。
+- 選擇以特定語言導出或包含所有語言版本。
+- 導出結果中包含語言元數據，指示每個回答使用了哪種語言。
 
-## 行動應用程式注意事項
+## 移動應用注意事項
 
-- rtSurvey 行動應用程式支援離線語言切換。
-- 確保在離線前已下載所有所需的語言文件。
+- rtSurvey 移動應用支持離線語言切換。
+- 確保在離線前已下載所有必需的語言文件。
 
 ## 已知限制
 
-- 某些進階功能可能無法在所有語言中使用。
-- 極長的翻譯可能會影響較小螢幕上的佈局。
+- 某些高級功能可能並非在所有語言中都可用。
+- 過長的翻譯可能會影響較小屏幕上的佈局。
 
-透過利用 rtSurvey 的多語言功能，您可以建立包容性、可存取性的問卷調查，覆蓋多元人群，並提供高品質、語言準確的資料。
+通過利用 rtSurvey 的多語言功能，您可以建立包容性、易於訪問的問卷，覆蓋不同的人群並提供高品質、語言準確的數據。

@@ -1,81 +1,166 @@
 ---
-title: "Flerspråksstöd"
+title: "Stöd för flera språk"
 description: ""
 ---
 
-rtSurvey tillhandahåller robust flerspråksstöd, vilket låter dig skapa undersökningar på flera språk. Denna funktion är avgörande för att bedriva forskning i olika språkliga populationer eller i flerspråkiga miljöer.
+rtSurvey erbjuder robust stöd för flera språk, vilket gör att du kan skapa enkäter på flera olika språk. Denna funktion är avgörande för att genomföra undersökningar bland olika språkgrupper eller i flerspråkiga miljöer.
 
-## Konfigurera flerspråkiga undersökningar
+## Ställa in flerspråkiga enkäter
 
-För att skapa en flerspråkig undersökning i rtSurvey behöver du lägga till språkspecifika kolumner i ditt XLSForm. Så här gör du:
+För att skapa en flerspråkig enkät i rtSurvey behöver du lägga till språkspecifika kolumner i ditt XLSForm. Så här gör du:
 
-1. **Etikettöversättningar**: Lägg till kolumner för varje språk med formatet `label::Language (code)`.
-2. **Tipsöversättningar**: Använd `hint::Language (code)` för att översätta tips.
-3. **Mediefilöversättningar**: För språkspecifika medier, använd `media::Language (code)`.
+1. **Översättningar av etiketter (Label)**: Lägg till kolumner för varje språk med formatet `label::Language (code)`.
+2. **Översättningar av tips (Hint)**: Använd `hint::Language (code)` för att översätta tips.
+3. **Översättningar av mediefiler**: För språkspecifik media, använd `media::Language (code)`.
 
 Exempel:
 
 ```
-| type    | name | label::Swedish (sv) | label::English (en) | hint::Swedish (sv)  | hint::English (en)  |
+| type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
 |---------|------|---------------------|---------------------|---------------------|---------------------|
-| integer | age  | Hur gammal är du?   | How old are you?    | Ange din ålder      | Enter your age      |
+| integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
 ```
 
 ## Språkkoder
 
-Det rekommenderas att använda de officiella 2-teckenspråkkoderna (undertaggar) efter språknamnet. Du kan hitta de officiella koderna [här](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+Det rekommenderas att använda de officiella språkkoderna med 2 tecken (subtags) efter språknamnet. Detta underlättar matchning av formulärspråk med användargränssnittets språk. Du hittar de officiella koderna [här](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
 ## Ange ett standardspråk
 
-För att ange ett standardspråk för datainsamling, använd kalkylbladet `settings` i ditt XLSForm:
+För att ange ett standardspråk för datainsamling, använd arbetsbladet `settings` i ditt XLSForm:
 
 ```
 | form_id   | version | default_language |
 |-----------|---------|-------------------|
-| test_form | 101     | Swedish (sv)      |
+| test_form | 101     | French (fr)       |
 ```
 
-## rtSurvey-specifika funktioner
+## Specifika funktioner i rtSurvey
 
-### Dynamisk språkväxling
+### Dynamiskt språkbyte
 
-rtSurvey tillåter användare att växla språk dynamiskt under datainsamling:
+rtSurvey tillåter användare att byta språk dynamiskt under datainsamlingen:
 
-- I webbgränssnittet, använd språkrullgardinsmenyn i det övre navigeringsfältet.
-- I mobilappen, öppna språkalternativ via inställningsmenyn.
+- I webbgränssnittet använder du rullgardinsmenyn för språk i det övre navigeringsfältet.
+- I mobilappen kommer du åt språkalternativen via inställningsmenyn.
 
 ### Språkspecifika valideringsmeddelanden
 
-rtSurvey utökar flerspråksstödet till valideringsmeddelanden:
+rtSurvey utökar flerspråksstödet till att även gälla valideringsmeddelanden:
 
 ```
-| type    | name | constraint | constraint_message::Swedish (sv) | constraint_message::English (en) |
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
 |---------|------|------------|----------------------------------|----------------------------------|
-| integer | age  | . <= 150   | Ålder måste vara 150 eller lägre | Age must be 150 or less          |
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-### RTL-språkstöd
+### Lokaliserade meddelanden för obligatoriska fält
 
-För höger-till-vänster (RTL) språk som arabiska eller hebreiska justerar rtSurvey automatiskt layouten.
+Använd `required_message::Language (code)` för att visa ett översatt felmeddelande när ett obligatoriskt fält lämnas tomt:
 
-## Bästa praxis för flerspråkiga undersökningar
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
 
-1. **Konsekvent namngivning**: Använd konsekventa språkkoder i hela ditt formulär.
-2. **Professionell översättning**: Anlita professionella översättare som är bekanta med undersökningskontexten.
-3. **Kontextanteckningar**: Tillhandahåll kontextanteckningar för översättare för att säkerställa korrekta översättningar.
-4. **Testning**: Testa ditt formulär på alla språk innan driftsättning.
+### Stöd för RTL-språk
+
+För höger-till-vänster-språk (RTL) som arabiska eller hebreiska anpassar rtSurvey automatiskt layouten:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Your name           | اسمك                |
+```
+
+### Språkspecifikt utseende (Appearance)
+
+rtSurvey låter dig ange olika utseenden för olika språk:
+
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Address          | 地址                 | multiline                | textarea                  |
+```
+
+## HTML-formatering i tvåspråkiga etiketter
+
+Du kan kombinera HTML-taggar med språkomslag i en enda etikettcell. rtSurvey extraherar blocket för det aktiva språket och renderar den återstående HTML-koden.
+
+Exempel med fetstil och teckensnittsfärg per språk:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Inline-taggar som stöds i språkomslag: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Exempel på färgad text per språk:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Språkmedvetna beräkningar
+
+När ett formulär har ett `${language_use}`-fält (inställt av en `change_language`-widget), använd `if()` för att returnera värden på det aktiva språket:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Exempel — visa ett sökresultat på det aktiva språket med `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Obs: Fältet `language_use` ställs vanligtvis in av en `change_language`-utseendewidget. Se Appearance — change_language.
+
+## Bästa praxis för flerspråkiga enkäter
+
+1. **Konsekvent namngivning**: Använd konsekventa språkkoder i hela formuläret.
+2. **Professionell översättning**: Anlita professionella översättare som är bekanta med enkätens sammanhang.
+3. **Kontextuella anteckningar**: Ge kontextuella anteckningar till översättare för att säkerställa korrekta översättningar.
+4. **Testning**: Testa ditt formulär på alla språk före driftsättning.
 5. **Unicode-stöd**: Se till att dina datainsamlingsenheter stöder Unicode för icke-latinska skrifter.
-6. **Språkspecifika medier**: Använd kulturellt lämpliga bilder eller ljud för varje språk.
+6. **Språkspecifik media**: Använd kulturellt lämpliga bilder eller ljud för varje språk.
 7. **Undvik text i bilder**: Om du använder bilder med text, skapa separata bilder för varje språk.
 
-## Exportera flerspråkiga data
+## Hantering av specialfall
+
+### Svar på olika språk
+
+rtSurvey tillåter respondenter att skriva in text i valfri skrift, oavsett vilket formulärspråk som valts. Detta är användbart för att fånga namn eller adresser i deras ursprungliga skrift.
+
+### Språkspecifika frågetyper
+
+Vissa frågetyper kan vara mer lämpliga för vissa språk. rtSurvey låter dig använda olika frågetyper för olika språk:
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
+```
+
+## Exportera flerspråkig data
 
 När du exporterar data från rtSurvey:
 
 - Välj att exportera på ett specifikt språk eller inkludera alla språkversioner.
-- Språkmetadata inkluderas i exporten, vilket anger vilket språk som användes för varje svar.
+- Språkmetadata inkluderas i exporten, vilket indikerar vilket språk som användades för varje svar.
+
+## Överväganden för mobilappen
+
+- Mobilappen rtSurvey stöder språkbyte offline.
+- Se till att alla nödvändiga språkfiler är nedladdade innan du går offline.
 
 ## Kända begränsningar
 
 - Vissa avancerade funktioner kanske inte är tillgängliga på alla språk.
 - Extremt långa översättningar kan påverka layouten på mindre skärmar.
+
+Genom att utnyttja rtSurveys flerspråksmöjligheter kan du skapa inkluderande, tillgängliga enkäter som når olika grupper och ger lingvistiskt korrekta data av hög kvalitet.

@@ -1,0 +1,104 @@
+---
+title: "Điều khiển điều hướng biểu mẫu"
+description: "Sử dụng các giá trị giao diện SaveFinalizedExit và SaveIncompleteExit để hiển thị các nút thoát có kiểu dáng giúp lưu và rời khỏi biểu mẫu."
+---
+
+**Điều khiển điều hướng biểu mẫu** là các giá trị giao diện được đặt trên các trường `note` (hoặc `text`) hiển thị dưới dạng các nút có kiểu dáng chiều rộng đầy đủ ở cuối cuộc khảo sát. Chúng cho phép điều tra viên lưu nội dung gửi và thoát khỏi biểu mẫu bằng một lần nhấn — dưới dạng bản ghi đã hoàn thành (đã chốt) hoặc dưới dạng bản nháp (bản ghi chưa hoàn thành).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Hiển thị một nút để **lưu nội dung gửi là đã chốt** và thoát khỏi biểu mẫu. Nhãn nút được lấy từ cột `label` của trường.
+
+| XLSForm column | Giá trị |
+|----------------|-------|
+| `type` | `note` |
+| `name` | bất kỳ tên duy nhất nào (ví dụ: `btn_finish`) |
+| `label` | văn bản hiển thị trên nút |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Nội dung gửi được đánh dấu là một bản ghi hoàn chỉnh, cuối cùng. Điều này tương đương với việc nhấn vào nút gửi tích hợp sẵn.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Hiển thị một nút để **lưu nội dung gửi là chưa hoàn thành (bản nháp)** và thoát khỏi biểu mẫu. Điều tra viên có thể quay lại sau và tiếp tục điền thông tin.
+
+| XLSForm column | Giá trị |
+|----------------|-------|
+| `type` | `note` |
+| `name` | bất kỳ tên duy nhất nào (ví dụ: `btn_pause`) |
+| `label` | văn bản hiển thị trên nút |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Cú pháp màu
+
+Cả hai giao diện đều chấp nhận màu nội dòng ở định dạng `<#RRGGBB/>`:
+
+- `#` theo sau bởi chính xác **6 chữ số thập lục phân** (chữ hoa hoặc chữ thường)
+- Dấu đóng `/>` là **bắt buộc** — việc bỏ qua nó sẽ làm hỏng quá trình phân tích cú pháp
+- Ví dụ: `<#04B404/>` (xanh lá cây), `<#EDC602/>` (màu hổ phách), `<#D9534F/>` (đỏ)
+
+Màu sắc điều khiển nền của nút. Màu văn bản được ứng dụng xác định tự động.
+
+---
+
+## Ví dụ
+
+Hai trường sau đây được đặt ở cuối biểu mẫu tạo ra nút **Gửi** màu xanh lá cây và nút **Lưu dưới dạng bản nháp** màu hổ phách:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Gửi | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Lưu dưới dạng bản nháp | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — loại trừ các nút khỏi mục lục
+
+Mã thông báo giao diện `toc-hide` yêu cầu rtSurvey loại trừ một trường khỏi **mục lục** của biểu mẫu (danh sách câu hỏi tổng quan). Các nút điều hướng không phải là câu hỏi, vì vậy chúng không bao giờ được xuất hiện trong TOC.
+
+Luôn thêm `toc-hide` sau giao diện thoát:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Xem [Giao diện — toc-hide](../appearance#group-and-navigation) để biết tham chiếu về toc-hide.
+
+---
+
+## Quy ước đặt vị trí
+
+Tuân theo các quy ước này khi thêm điều khiển điều hướng vào biểu mẫu:
+
+- Đặt cả hai nút ở **phần cuối cùng** của biểu mẫu, sau tất cả các câu hỏi và nhóm.
+- Luôn bao gồm **cả hai** nút cùng nhau — một nút đã chốt và một nút chưa hoàn thành — để điều tra viên luôn có cách thoát bất kể trạng thái hoàn thành.
+- Sử dụng cột `relevant` trên nút thoát đã chốt nếu việc gửi chỉ được phép khi đáp ứng các điều kiện nhất định (ví dụ: một phần bắt buộc đã hoàn thành). Nút thoát chưa hoàn thành thường phải **luôn hiển thị**.
+
+---
+
+## Thoát đã chốt có điều kiện
+
+Sử dụng cột `relevant` để kiểm soát thời điểm nút thoát đã chốt được hiển thị. Việc thoát chưa hoàn thành phải luôn hiển thị vô điều kiện để điều tra viên luôn có thể tạm dừng và quay lại.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Gửi | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Lưu dưới dạng bản nháp | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Trong ví dụ này, nút **Gửi** chỉ xuất hiện khi điều tra viên đã đưa ra sự đồng ý và đánh dấu phần A là đã hoàn thành. Nút **Lưu dưới dạng bản nháp** luôn có sẵn.
+
+---
+
+## Hạn chế
+
+- **Loại trường phải là `note` hoặc `text`.** Việc sử dụng các giao diện này trên bất kỳ loại câu hỏi nào khác đều không được hỗ trợ.
+- **Chỉ mã thập lục phân 6 chữ số.** Mã thập lục phân viết tắt (`<#FFF/>`) và màu có tên không được hỗ trợ — luôn sử dụng định dạng 6 chữ số đầy đủ (ví dụ: `<#FFFFFF/>`).
+- **Cột nhãn là văn bản của nút.** Cột `hint` bị bỏ qua đối với các trường này; chỉ có `label` được hiển thị.
+- **Cả hai nút phải có mặt.** Việc bỏ qua nút thoát chưa hoàn thành khiến điều tra viên không có cách nào để tạm dừng giữa chừng biểu mẫu.

@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "Gravação de Áudio",
   "call-api": "Call API",
   "dynamic-question-type": "Tipo de pergunta dinâmica",
   "dynamic-search": "Pesquisa dinâmica",

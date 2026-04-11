@@ -8,98 +8,113 @@ import { Callout } from 'nextra/components'
 ### 文字列関数
 
 <Callout type="warning">
-式内の文字列を操作する際、リテラル文字列を囲むために一重引用符（''）を使用することが重要です。ただし、リテラル文字列内に一重引用符を含めたい場合は例外があります。そのような場合は、文字列全体を囲むために二重引用符（""）を使用できます。
+式の中で文字列を扱う場合、リテラル文字列を囲むにはシングルクォート（''）を使用することが重要です。ただし、リテラル文字列の中にシングルクォートを含めたい場合は例外です。そのような場合は、文字列全体をダブルクォート（""）で囲むことができます。
 
 例：
-- 正しい：if(`${yesno}` = 1, "a string with 'single quotes' in it", "no single quotes here")
-- 誤り：if(`${yesno}` = 1, 'a string with 'single quotes' in it', 'no single quotes here')
+- 正：if(`${yesno}` = 1, "a string with 'single quotes' in it", "no single quotes here")
+- 誤：if(`${yesno}` = 1, 'a string with 'single quotes' in it', 'no single quotes here')
 
-スマートクォートについては、式でエラーを引き起こす可能性があるため、その存在に注意することが重要です。多くのリッチテキストエディターは直線の引用符（""または''）をスマートクォートまたはカーリークォート（""または''）に自動変換し、構文エラーや予期しない動作を引き起こす可能性があります。これを避けるために、式で直線の引用符（''）を一貫して使用してください。
+スマートクォート（全角の引用符）については、式の中で問題を引き起こす可能性があるため、その存在に注意することが極めて重要です。多くのリッチテキストエディタは、直線の引用符（"" または ''）をスマートクォートやカールクォート（“” または ‘’）に自動的に変換しますが、これにより構文エラーや予期しない動作が発生する可能性があります。これを避けるために、式の中では一貫して直線の引用符（''）を使用していることを確認してください。
+
+ご不明な点や追加のサポートが必要な場合は、お気軽にお問い合わせください。
 </Callout>
 
-rtSurveyはさまざまな関数をサポートしています：
+rtSurveyは、以下を含む様々な関数をサポートしています。
 
-1. `string(field)`：フィールドを文字列に変換する。
-   - 例：`string(34.8)`は`'34.8'`に変換される。
+1. `string(field)`：フィールドを文字列に変換します。
+   - 例：`string(34.8)` は `'34.8'` に変換されます。
 
-2. `string-length(field)`：文字列フィールドの長さを返す。
-   - 例：`string-length(.) > 3 and string-length(.) < 10`を使って現在のフィールドが3文字から10文字の間であることを確認できる。
+2. `string-length(field)`：文字列フィールドの長さを返します。
+   - 例：`string-length(.) > 3 and string-length(.) < 10` は、現在のフィールドが3文字から10文字の間であることを確認するために使用できます。
+   - **カスケード依存パターン**：`string-length(${province}) >= 0` は常に `true` と評価されますが、`${province}` が変更されるたびに rtSurvey に式を再評価させます。これを `relevant`（関連性）列で使用して、親フィールドが更新されたときにカスケード更新をトリガーします。
+     | type | name | relevant |
+     |------|------|----------|
+     | select_one | district | `string-length(${province}) >= 0` |
+     これにより、province（州）が変更されるたびに、district（郡）の質問がその `search()` または `rawquery` の appearance（外観）を再評価することが保証されます。
 
-3. `substr(fieldorstring, startindex, endindex)`：`startindex`から始まり`endindex`の直前で終わる部分文字列を返す。インデックスは文字列の最初の文字が0から始まる。
-   - 例：`substr(${phone}, 0, 3)`は電話番号の最初の3桁を返す。
+3. `substr(fieldorstring, startindex, endindex)`：`startindex` で始まり、`endindex` の直前で終わる部分文字列を返します。インデックスは文字列の最初の文字を 0 として始まります。
+   - 例：`substr(${phone}, 0, 3)` は電話番号の最初の3桁を返します。
 
-4. `concat(a, b, c, ...)`：フィールド（や文字列）を連結する。
-   - 例：`concat(${firstname}, ' ', ${lastname})`は`firstname`と`lastname`フィールドの値を組み合わせてフルネームを返す。
+4. `concat(a, b, c, ...)`：フィールド（および/または文字列）を連結します。
+   - 例：`concat(${firstname}, ' ', ${lastname})` は、`firstname` フィールドと `lastname` フィールドの値を組み合わせてフルネームを返します。
 
-5. `linebreak()`：改行文字を返す。
-   - 例：`concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})`は3つのフィールド値を改行で区切ったリストを返す。
+5. `linebreak()`：改行文字を返します。
+   - 例：`concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` は、間に改行を入れた3つのフィールド値のリストを返します。
 
-6. `lower()`：文字列をすべて小文字に変換する。
-   - 例：`lower('Street Name')`は「street name」を返す。
+6. `lower()`：文字列をすべて小文字に変換します。
+   - 例：`lower('Street Name')` は "street name" を返します。
 
-7. `upper()`：文字列をすべて大文字に変換する。
-   - 例：`upper('Street Name')`は「STREET NAME」を返す。
+7. `upper()`：文字列をすべて大文字に変換します。
+   - 例：`upper('Street Name')` は "STREET NAME" を返します。
 
-### select_oneとselect_multiple関数
+### select_one および select_multiple 関数
 
-1. `count-selected(field)`：select_multipleフィールドで選択されたアイテムの数を返す。
-   - 例：`count-selected(.) = 3`を制約式として使用して正確に3つの選択肢が選択されていることを確認できる。
+1. `count-selected(field)`：select_multiple フィールドで選択された項目の数を返します。
+   - 例：`count-selected(.) = 3` は、正確に3つの選択肢が選択されていることを確認するための constraint（制約）式として使用できます。
 
-2. `selected(field, value)`：指定された値がselect_oneまたはselect_multipleフィールドで選択されているかどうかによってtrueまたはfalseを返す。
-   - 例：`selected(${color}, 'Blue')`をrelevance式として使用して、回答者がお気に入りの色として「Blue」を選択した場合のみグループまたはフィールドを表示できる。
-   - 注意：2番目のパラメーターは常に選択肢のラベルではなく選択肢の値を指定する必要があります。
+2. `selected(field, value)`：指定された値が select_one または select_multiple フィールドで選択されたかどうかに応じて、true または false を返します。
+   - 例：`selected(${color}, 'Blue')` は、回答者が好きな色として「Blue」を選択した場合にのみグループまたはフィールドを表示するための relevance（関連性）式として使用できます。
+   - 注：2番目のパラメータには常に選択肢ラベルではなく、選択肢の値を指定する必要があります。フォーム定義の choices ワークシートの value 列の値を使用してください。
 
-3. `selected-at(field, number)`：select_multipleフィールドの指定された位置の選択されたアイテムを返す。渡された数値が0の場合は最初の選択されたアイテムを返し、数値が1の場合は2番目の選択されたアイテムを返す、など。
-   - 例：`selected-at(${fruits}, 0) = 'Apple'`をrelevance式として使用して、最初に選択された選択肢が「Apple」の場合のみグループまたはフィールドを表示できる。
+3. `selected-at(field, number)`：select_multiple フィールド内の指定された位置にある選択項目を返します。渡された数値が 0 の場合は最初に選択された項目を返し、数値が 1 の場合は2番目に選択された項目を返す、というようになります。
+   - 例：`selected-at(${fruits}, 0) = 'Apple'` は、最初に選択された選択肢が「Apple」である場合にのみグループまたはフィールドを表示するための relevance 式として使用できます。
+   - 注：返される値は選択肢ラベルではなく、選択肢の値になります。フォーム定義の choices ワークシートの value 列の値を使用してください。
 
-4. `choice-label(field, value)`：フォーム定義のchoicesワークシートで定義されたselect_oneまたはselect_multipleフィールドの選択肢のラベルを返す。
-   - 例1：`choice-label(${country}, ${country})`は`country`フィールドで現在選択されている選択肢のラベルを返す。
-   - 例2：`choice-label(${languages}, selected-at(${languages}, 0))`は`languages`フィールドで最初に選択された選択肢のラベルを返す。
+4. `choice-label(field, value)`：フォーム定義の choices ワークシートで定義されている、select_one または select_multiple フィールドの選択肢のラベルを返します。
+   - 例1：`choice-label(${country}, ${country})` は、`country` という名前のフィールドで現在選択されている選択肢のラベルを返します。
+   - 例2：`choice-label(${languages}, selected-at(${languages}, 0))` は、`languages` という名前のフィールドで最初に選択された選択肢のラベルを返します。
+   - 注：この関数は値ではなく選択肢ラベルを取得します。フォーム定義の choices ワークシートの label 列を使用します。
 
 ### 繰り返しフィールド関数
 
-rtSurveyで同じ質問を複数回尋ねたい場合は、フィールドを繰り返しグループ内に配置できます。これにより同じフィールドの複数のインスタンスが生成されます。以下の関数はこれらの繰り返しフィールドと生成される繰り返しデータを扱うのに役立ちます。
+rtSurveyでは、同じ質問を複数回行いたい場合、フィールドをリピートグループ（繰り返しグループ）の中に入れることができます。これにより、同じフィールドの複数のインスタンスが作成されます。以下の関数は、これらの繰り返しフィールドと、それらが生成する繰り返しデータを処理するのに役立ちます。詳細については、繰り返しフィールドに関するヘルプトピックを参照してください。
 
-1. `join(string, repeatedfield)`：繰り返しグループ内のフィールドに対して、文字列で区切られた値のリストを生成する。最初のパラメーターは値を区切るためのデリミタを指定する。
-   - 例：`join(', ', ${member_name})`は入力されたすべての名前からカンマ区切りのリストを生成する。
+1. `join(string, repeatedfield)`：リピートグループ内のフィールドについて、文字列で区切られた値のリストを生成します。最初のパラメータは、値を区切るために使用するデリミタ（区切り文字）を指定します。
+   - 例：`join(', ', ${member_name})` は、入力されたすべての名前から、単一のカンマ区切りのリストを生成します。
 
-2. `join-if(string, repeatedfield, expression)`：`join()`とまったく同じように機能するが、提供された式を使って繰り返しグループの各インスタンスをチェックする。式がfalseと評価された場合、そのアイテムは出力から除外される。
-   - 例：`join-if(', ', ${member_name}, ${age} >= 18)`は成人メンバー（18歳以上）の名前のみのカンマ区切りリストを生成する。
+2. `join-if(string, repeatedfield, expression)`：`join()` とまったく同じように機能しますが、指定された式を使用してリピートグループ内の各インスタンスをチェックします。式が false と評価された場合、その項目は出力から除外されます。
+   - 例：`join-if(', ', ${member_name}, ${age} >= 18)` は、成人メンバー（18歳以上のメンバー）のみの名前をカンマ区切りで生成します。
 
-3. `count(repeatgroup)`：繰り返しグループが繰り返された現在の回数を返す。
-   - 例：`count(${groupname})`はグループのインスタンス数を返す。
+3. `count(repeatgroup)`：リピートグループが現在繰り返された回数を返します。
+   - 例：`count(${groupname})` は、グループのインスタンス数を返します。
 
-4. `count-if(repeatgroup, expression)`：`count()`とまったく同じように機能するが、提供された式を使って繰り返しグループの各インスタンスをチェックする。式がfalseと評価された場合、そのアイテムはカウントから除外される。
-   - 例：`count-if(${members}, ${age} >= 18)`は「members」繰り返しグループ内のageフィールドに基づいて成人メンバーの数を返す。
+4. `count-if(repeatgroup, expression)`：`count()` とまったく同じように機能しますが、指定された式を使用してリピートグループ内の各インスタンスをチェックします。式が false と評価された場合、その項目はカウントから除外されます。
+   - 例：`count-if(${members}, ${age} >= 18)` は、"members" リピートグループ内の age フィールドに基づいて成人メンバーのカウントを返します。
 
-5. `sum(repeatedfield)`：繰り返しグループ内のフィールドに対して、すべての値の合計を計算する。
-   - 例：`sum(${loan_amount})`はすべてのローンの合計値を返す。
+5. `sum(repeatedfield)`：リピートグループ内のフィールドについて、すべての値の合計を計算します。
+   - 例：`sum(${loan_amount})` は、すべてのローンの合計額を返します。
 
-6. `sum-if(repeatedfield, expression)`：`sum()`とまったく同じように機能するが、式がfalseの場合はそのアイテムを除外する。
-   - 例：`sum-if(${loan_amount}, ${loan_amount} > 500)`は500を超えるすべてのローンの合計値を返す。
+6. `sum-if(repeatedfield, expression)`：`sum()` とまったく同じように機能しますが、指定された式を使用してリピートグループ内の各インスタンスをチェックします。式が false と評価された場合、その項目は出力から除外されます。
+   - 例：`sum-if(${loan_amount}, ${loan_amount} > 500)` は、500を超えるすべてのローンの合計額を返します。それより少額のローンは無視されます。
 
-7. `min(repeatedfield)`：繰り返しグループ内のフィールドに対して、すべての値の最小値を計算する。
-   - 例：`min(${member_age})`はグループ内の最年少メンバーの年齢を返す。
+7. `min(repeatedfield)`：リピートグループ内のフィールドについて、すべての値の最小値を計算します。
+   - 例：`min(${member_age})` は、グループ内の最年少メンバーの年齢を返します。
 
-8. `min-if(repeatedfield, expression)`：`min()`とまったく同じように機能するが、式がfalseの場合はそのアイテムを除外する。
+8. `min-if(repeatedfield, expression)`：`min()` とまったく同じように機能しますが、指定された式を使用してリピートグループ内の各インスタンスをチェックします。式が false と評価された場合、その項目は最小値の計算から除外されます。
+   - 例：`min-if(${member_age}, ${member_age} >= 18)` は、グループ内の最年少の成人の年齢を返します。18歳未満の人は無視されます。
 
-9. `max(repeatedfield)`：繰り返しグループ内のフィールドに対して、すべての値の最大値を計算する。
-   - 例：`max(${member_age})`はグループ内の最年長メンバーの年齢を返す。
+9. `max(repeatedfield)`：リピートグループ内のフィールドについて、すべての値の最大値を計算します。
+   - 例：`max(${member_age})` は、グループ内の最年長メンバーの年齢を返します。
 
-10. `max-if(repeatedfield, expression)`：`max()`とまったく同じように機能するが、式がfalseの場合はそのアイテムを除外する。
+10. `max-if(repeatedfield, expression)`：`max()` とまったく同じように機能しますが、指定された式を使用してリピートグループ内の各インスタンスをチェックします。式が false と評価された場合、その項目は最大値の計算から除外されます。
+    - 例：`max-if(${member_age}, ${member_age} >= 18)` は、グループ内の最年長の成人の年齢を返します。18歳未満の人は無視されます。
 
-11. `index()`：繰り返しグループ内で呼び出すと、現在のグループまたはインスタンスのインデックス番号を返す。
+11. `index()`：リピートグループ内で呼び出され、現在のグループまたはインスタンスのインデックス番号を返します。
+    - 例：リピートグループ内で `index()` を使用すると、最初のインスタンスには 1、2番目には 2、というように返されます。
 
-12. `indexed-repeat(repeatedfield, repeatgroup, index)`：繰り返しグループの外からその中のフィールドまたはグループを参照する。
-    - 例1：`indexed-repeat(${name}, ${names}, 1)`は「names」という名前の繰り返しグループ内にnameフィールドがある場合、最初の名前を返す。
+12. `indexed-repeat(repeatedfield, repeatgroup, index)`：リピートグループの外部から、そのリピートグループ内にあるフィールドまたはグループを参照します。最初のパラメータは対象となる繰り返しフィールドまたはグループを指定し、2番目はそのフィールドまたはグループが含まれるリピートグループを指定し、3番目は使用するリピートグループ内のインスタンス番号を指定します。
+    - 例1：`indexed-repeat(${name}, ${names}, 1)` は、name フィールドが "names" という名前の先行するリピートグループ内にある場合に、使用可能な最初の名前を返します。
+    - 例2：`indexed-repeat(${name}, ${names}, index())` は、現在のリピートグループのインスタンス番号に対応する名前を取得します。
 
-13. `rank-index(index, repeatedfield)`：この関数は繰り返しグループの外での使用のために、繰り返しフィールドの指定されたインスタンスの序数ランクを計算する。
+13. `rank-index(index, repeatedfield)`：この関数は、リピートグループの外で使用するために、繰り返しフィールドの指定されたインスタンスの順位を計算します。順位1は最も高い値を持つインスタンスに割り当てられ、順位2は次に高い値を持つインスタンスに割り当てられます。無効なインデックス、または数値以外の値を持つインスタンスへのインデックスを渡すと、順位 999 が返されます。
+    - 例：`rank-index(1, ${random_draw})` は、他のインスタンスの値と比較した `random_draw` フィールドの値に基づいて、最初のインスタンスの順位を計算します。
 
-14. `rank-index-if(index, repeatedfield, expression)`：この関数は`rank-index()`と同様に機能するが、提供された式を使って繰り返しフィールドの繰り返しグループの各インスタンスをチェックする。
+14. `rank-index-if(index, repeatedfield, expression)`：この関数は `rank-index()` と同様に機能しますが、指定された式を使用して繰り返しフィールドのリピートグループ内の各インスタンスをチェックします。式が false と評価された場合、その項目は計算から除外されます。使用されるインデックスは、各インスタンスの式を評価する前の、インスタンスの完全なセットに基づいています。式を満たさないために無視されたインスタンスのインデックスを渡した場合、それは無効なインデックスとみなされ、順位 999 が返されます。
+    - 例：`rank-index-if(1, ${age}, ${age} >= 18)` は、年齢が18歳以上のインスタンスのみを考慮して、成人セット内での年齢順位を計算します。
 
 ### 数値関数
 
-| 演算子 | 操作 | 例 | 例の答え |
+| 演算子 | 演算 | 例 | 例の答え |
 |----------|-----------|---------|----------------|
 | `+` | 加算 | 1 + 1 | 2 |
 | `-` | 減算 | 3 - 2 | 1 |
@@ -107,123 +122,214 @@ rtSurveyで同じ質問を複数回尋ねたい場合は、フィールドを繰
 | `div` | 除算 | 10 div 2 | 5 |
 | `mod` | 剰余 | 9 mod 2 | 1 |
 
-rtSurveyは数値関数をサポートしています：
-- `number(field)`：フィールドの値を数値に変換する。
-- `int(field)`：フィールドの値を整数に変換する。
-- `min(field1, ..., fieldx)`：渡されたフィールドの中の最小値を返す。
-- `max(field1, ..., fieldx)`：渡されたフィールドの中の最大値を返す。
-- `format-number(field)`：ユーザーのロケール設定に従って整数または小数フィールドの値をフォーマットする。
-- `round(field, digits)`：数値フィールドの値を小数点以下の指定桁数に丸める。
-- `abs(number)`：数値の絶対値を返す。
-- `pow(base, exponent)`：最初のパラメーターを2番目のパラメーターの累乗で返す。
-- `log10(fieldorvalue)`：渡されたフィールドまたは値の常用対数を返す。
-- `sin(fieldorvalue)`：渡されたフィールドまたは値のサイン（ラジアン）を返す。
-- `cos(fieldorvalue)`：渡されたフィールドまたは値のコサイン（ラジアン）を返す。
-- `tan(fieldorvalue)`：渡されたフィールドまたは値のタンジェント（ラジアン）を返す。
-- `asin(fieldorvalue)`：渡されたフィールドまたは値のアークサイン（ラジアン）を返す。
-- `acos(fieldorvalue)`：渡されたフィールドまたは値のアークコサイン（ラジアン）を返す。
-- `atan(fieldorvalue)`：渡されたフィールドまたは値のアークタンジェント（ラジアン）を返す。
-- `atan2(x, y)`：座標（x, y）と正のx軸の原点での角度（ラジアン）を返す。結果は-pi()からpi()の範囲内。
-- `sqrt(fieldorvalue)`：渡されたフィールドまたは値の非負の平方根を返す。
-- `exp(x)`：e^xの値を返す。
-- `pi()`：πの値を返す。
+rtSurveyは、以下を含む数値関数をサポートしています。
+- `number(field)`：フィールドの値を数値に変換します。
+  - 例：`number('34.8')` = 34.8
 
-### 日付と時間関数
+- `int(field)`：フィールドの値を整数に変換します。
+  - 例：`int('39.2')` = 39
+
+- `min(field1, ..., fieldx)`：渡されたフィールドの中で最小の値を返します。
+  - 例：`min(${father_age}, ${mother_age})` は、母親または父親のいずれか小さい方の年齢を返します。
+
+- `max(field1, ..., fieldx)`：渡されたフィールドの中で最大の値を返します。
+  - 例：`max(${father_age}, ${mother_age})` は、母親または父親のいずれか大きい方の年齢を返します。
+
+- `format-number(field)`：ユーザーのロケール設定に従って、整数または小数のフィールド値をフォーマットします。
+  - 例：`format-number(${income})` この式は "120000" を "120,000" のようにフォーマットする場合があります。
+
+- `round(field, digits)`：数値フィールドの値を、小数点以下の指定された桁数に四捨五入します。
+  - 例：`round(${interest_rate}, 2)`
+
+- `abs(number)`：数値の絶対値を返します。
+  
+- `pow(base, exponent)`：最初のパラメータを2番目のパラメータのべき乗にした値を返します。
+  - 各パラメータはフィールド、数値、または式にすることができます。
+
+- `log10(fieldorvalue)`：渡されたフィールドまたは値の常用対数（底が10）を返します。
+
+- `sin(fieldorvalue)`：渡されたフィールドまたは値のサイン（正弦）をラジアンで返します。
+  
+- `cos(fieldorvalue)`：渡されたフィールドまたは値のコサイン（余弦）をラジアンで返します。
+
+- `tan(fieldorvalue)`：渡されたフィールドまたは値のタンジェント（正接）をラジアンで返します。
+
+- `asin(fieldorvalue)`：渡されたフィールドまたは値のアークサイン（逆正弦）をラジアンで返します。
+
+- `acos(fieldorvalue)`：渡されたフィールドまたは値のアークコサイン（逆余弦）をラジアンで返します。
+
+- `atan(fieldorvalue)`：渡されたフィールドまたは値のアークタンジェント（逆正接）をラジアンで返します。
+
+- `atan2(x, y)`：座標 (x, y) の点と正の x 軸が原点でなす角度をラジアンで返します。結果は -pi() から pi() の範囲になります。
+
+- `sqrt(fieldorvalue)`：渡されたフィールドまたは値の非負の平方根を返します。
+
+- `exp(x)`：e^x の値を返します。
+
+- `pi()`：円周率の値を返します。
+
+### 日付および時刻関数
 
 <Callout type="warning">
-rtSurveyの日付値は`YYYY-MM-DD`形式の文字列として保存されます。日時値はISO 8601文字列（`YYYY-MM-DDTHH:MM:SS`）として保存されます。算術（例：期間の計算）のために数値に変換するには`decimal-date-time()`を使用してください。
+rtSurveyの日付値は、`YYYY-MM-DD` 形式の文字列として保存されます。日時値は ISO 8601 文字列（`YYYY-MM-DDTHH:MM:SS`）として保存されます。算術演算（期間の計算など）のために数値に変換するには、`decimal-date-time()` を使用してください。
 </Callout>
 
-1. `today()`：今日の日付を`YYYY-MM-DD`形式の文字列で返す。フォームが開かれたときに1回評価される。
+1. `today()`：今日の日の日付を `YYYY-MM-DD` 形式の文字列で返します。フォームが開いたときに一度評価されます。
+   - 例：`today()` → `'2024-03-15'`
+   - 一般的な用途：今日の日の日付を事前入力するための `default` 列、または日付フィールドと比較するための `relevant`/`constraint` での使用。
 
-2. `now()`：現在の日時をISO 8601文字列として返す。式が計算されるたびに評価される。
+2. `now()`：現在のシステムの日付と時刻を ISO 8601 文字列として返します。式が計算されるたびに評価されます。
+   - 例：`now()` → `'2024-03-15T14:32:00.000+03:00'`
+   - 一般的な用途：調査中の特定のイベントの正確なタイムスタンプの記録。
 
-3. `date(value)`：値（文字列または数値）を日付文字列に変換する。
+3. `date(value)`：値（文字列または数値）を日付文字列に変換します。計算された値を日付型に強制するのに役立ちます。
+   - 例：`date('2024-03-15')` → `'2024-03-15'`
 
-4. `date-time(value)`：値を日時文字列に変換する。
+4. `date-time(value)`：値を日時文字列に変換します。
+   - 例：`date-time(${event_timestamp})`
 
-5. `decimal-date-time(value)`：日付または日時文字列をUnixエポックからのミリ秒を86400000で割った（つまり1970-01-01からの分数日数）小数数値に変換する。日付の算術を実行するために使用する。
-   - 例：2つの日付間の日数：`decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
+5. `decimal-date-time(value)`：日付または日時の文字列を、Unixエポックからのミリ秒を 86400000 で割った値を表す小数（すなわち、1970年1月1日からの端数日数）に変換します。これを使用して日付の算術演算を行います。
+   - 例：2つの日付の間の日数：
+     `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
+   - 例：2つの日時の間の分数：
+     `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
 
-6. `format-date(date, format)`：パターン文字列を使って日付値をフォーマットする。
-   - フォーマットトークン：`%Y`（4桁年）、`%y`（2桁年）、`%m`（月01〜12）、`%d`（日01〜31）、`%a`（曜日略称）、`%b`（月名略称）
+6. `format-date(date, format)`：パターン文字列を使用して日付値をフォーマットします。
+   - フォーマットトークン：`%Y`（4桁の年）、`%y`（2桁の年）、`%m`（月 01–12）、`%d`（日 01–31）、`%a`（曜日の略称）、`%b`（月の略称）
    - 例：`format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+   - 例：`format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
 
-7. `format-date-time(datetime, format)`：パターン文字列を使って日時値をフォーマットする。`format-date`トークンに加えて：
-   - `%H`（時00〜23）、`%h`（時01〜12）、`%M`（分00〜59）、`%S`（秒00〜59）、`%3`（ミリ秒）、`%P`（AM/PM）
+7. `format-date-time(datetime, format)`：パターン文字列を使用して日時値をフォーマットします。すべての `format-date` トークンに加えて、以下を受け入れます。
+   - `%H`（時 00–23）、`%h`（時 01–12）、`%M`（分 00–59）、`%S`（秒 00–59）、`%3`（ミリ秒）、`%P`（AM/PM）
+   - 例：`format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+   - 例：`format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
+
+8. `STRFTIME(format, datetime)`：SQLiteスタイルの日付フォーマット。`rawquery` クエリに渡される SQL 文字列内でのみ使用可能であり、XLSForm の `calculation` 列や `label` 列では使用**できません**。SQLite のフォーマットトークン（`%Y`, `%m`, `%d`, `%H`, `%M`, `%S`）を使用します。
+   - rawquery SQL 文字列内での例：`'SELECT STRFTIME(''%Y-%m'', interview_date) AS month FROM data WHERE id = ?'`
+   - 注：XLSForm の式で日付をフォーマットするには、`format-date-time()` を使用してください。`STRFTIME()` は、`rawquery` に渡される SQL 内でのみ使用可能な SQLite 関数です。
 
 ---
 
-### Boolean関数
+### 論理（Boolean）関数
 
-1. `boolean(value)`：任意の値をbooleanに変換する。空でない文字列、非ゼロの数値、trueには`true`を返し、空の文字列、`0`、falseには`false`を返す。
+1. `boolean(value)`：任意の値を論理値に変換します。空でない文字列、0以外の数値、および `true` に対して `true` を返します。空の文字列、`0`、および `false` に対して `false` を返します。
+   - 例：`boolean(${name})` は、`name` が空でない場合に `true` を返します。
 
-2. `boolean-from-string(string)`：文字列が`'1'`または`'true'`（大文字小文字を区別しない）の場合は`true`を返し、それ以外は`false`を返す。
+2. `boolean-from-string(string)`：文字列が `'1'` または `'true'`（大文字小文字を区別しない）の場合に `true` を返し、それ以外の場合は `false` を返します。
+   - 例：`boolean-from-string(${enabled_flag})` — フィールドが `'true'`/`'false'` をテキストとして保存している場合に便利です。
 
-3. `true()`：boolean値`true`を返す。
+3. `true()`：論理値 `true` を返します。
+   - 例：`required`（必須）列において、`true()` は `yes` と同等です。
 
-4. `false()`：boolean値`false`を返す。
+4. `false()`：論理値 `false` を返します。
+   - 例：`if(${skip_section} = 'yes', false(), true())` — 必須設定を動的に設定します。
 
-5. `not(expression)`：式の論理否定を返す。式がfalseの場合は`true`を返し、逆も同様。
+5. `not(expression)`：式の論理否定を返します。式が false の場合は `true` を返し、その逆も同様です。
+   - 例：`not(${consent} = 'yes')` — 同意が得られなかった場合に警告を表示します。
+   - 例：`not(selected(${issues}, 'none'))` — 「none」が選択されていない場合にのみ詳細を要求します。
 
 ---
 
 ### 追加の文字列関数
 
-1. `starts-with(string, prefix)`：`string`が`prefix`で始まる場合は`true`を返す。
+1. `starts-with(string, prefix)`：`string` が `prefix` で始まる場合に `true` を返します。
+   - 例：`starts-with(${phone}, '+254')` は、電話番号がケニアの国番号で始まるかどうかをチェックします。
 
-2. `contains(string, substring)`：`string`が`substring`を含む場合は`true`を返す。
+2. `contains(string, substring)`：`string` が `substring` を含む場合に `true` を返します。
+   - 例：`contains(${email}, '@')` は、メールアドレスに `@` 記号が含まれているかチェックします。
+   - 例：`contains(${notes}, 'urgent')` は、メモに "urgent"（緊急）と記載されている場合に追加の質問をトリガーします。
 
-3. `substring-before(string, needle)`：`needle`の最初の出現前の`string`の部分を返す。
+3. `substring-before(string, needle)`：`string` の中で、最初に現れる `needle` より前の部分を返します。
+   - 例：`substring-before(${full_name}, ' ')` は、最初の単語（名）を抽出します。
 
-4. `substring-after(string, needle)`：`needle`の最初の出現後の`string`の部分を返す。
+4. `substring-after(string, needle)`：`string` の中で、最初に現れる `needle` より後の部分を返します。
+   - 例：`substring-after(${email}, '@')` は、メールアドレスのドメイン部分を抽出します。
 
-5. `normalize-space(string)`：先頭と末尾の空白を削除し、内部のすべての空白シーケンスを単一のスペースに縮小する。
+5. `normalize-space(string)`：前後の空白を取り除き、内部のすべての空白シーケンスを単一のスペースにまとめます。
+   - 例：`normalize-space(${name})` — 余分なスペースが含まれて入力された可能性がある名前をクリーンアップします。
 
-6. `translate(string, search_chars, replace_chars)`：`search_chars`に現れる`string`の各文字を`replace_chars`の対応する文字に置き換える。
+6. `translate(string, search_chars, replace_chars)`：`string` 内の `search_chars` に含まれる各文字を、`replace_chars` の対応する文字に置き換えます。`replace_chars` に対応する文字がない `search_chars` の文字は削除されます。
+   - 例：`translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` は大文字に変換します（`upper()` と同等）。
+   - 例：`translate(${phone}, ' -()', '')` は、電話番号からスペース、ダッシュ、括弧を取り除きます。
 
 ---
 
 ### 追加の数学関数
 
-1. `floor(number)`：`number`以下の最大の整数を返す（負の無限大方向に丸める）。
+1. `floor(number)`：`number` 以下の最大の整数を返します（負の無限大方向に丸めます）。
+   - 例：`floor(4.9)` = 4, `floor(-2.1)` = -3
 
-2. `ceiling(number)`：`number`以上の最小の整数を返す（正の無限大方向に丸める）。
+2. `ceiling(number)`：`number` 以上の最小の整数を返します（正の無限大方向に丸めます）。
+   - 例：`ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
 
-3. `random()`：0.0（含む）から1.0（含まない）の間のランダムな小数を返す。
+3. `random()`：0.0（含む）から 1.0（含まない）の間のランダムな小数を返します。通常、`calculate` フィールドでランダムな値を割り当てたり、質問の順序をランダム化したりするために使用されます。
+   - 例：`random()` → 例：`0.7341`
+   - 例：`int(random() * 6) + 1` → 1〜6の乱数（サイコロの目）
 
-4. `coalesce(a, b)`：`a`が空でない場合は`a`を返し、そうでなければ`b`を返す。フィールドが空の場合のフォールバックとして有用。
+4. `coalesce(a, b)`：`a` が空でない場合は `a` を返し、そうでない場合は `b` を返します。フィールドが空である可能性がある場合のフォールバック（代わりの手段）として役立ちます。
+   - 例：`coalesce(${preferred_name}, ${full_name})` — 呼称が設定されている場合はそれを使用し、そうでない場合はフルネームを使用します。
 
-5. `once(value)`：現在のフィールドが**空の場合のみ**`value`を評価して保存する。フィールドにすでに値がある場合は既存の値を変更せずに返す。
+5. `once(value)`：`value` を評価して保存しますが、現在のフィールドが**空**の場合に限ります。フィールドに既に値がある場合（例：以前に設定された）、`once()` は既存の値を変更せずに返します。これにより、再計算によってユーザー入力が上書きされるのを防ぎます。
+   - 例：`default` 列で `once(today())` を使用すると、今日の日の日付が一度だけ設定され、調査員がフォームを再度開いても更新されません。
+   - 例：`once(uuid())` は UUID を一度だけ生成し、再編集時もそれを維持します。
 
 ---
 
-### 地理関数
+### Geo（地理）関数
 
-1. `area(geoshape_value)`：geoshape（ポリゴン）値で囲まれた**面積を平方メートル**で計算する。
+1. `area(geoshape_value)`：ジオシェイプ（ポリゴン）値で囲まれた**面積を平方メートル**で計算します。
+   - パラメータは、`lat1 lon1 0 0; lat2 lon2 0 0; ...` という形式のジオシェイプフィールドの値です。
+   - 例：`area(${field_boundary})` — 調査された土地の面積を m² で計算します。
+   - 例：`round(area(${field_boundary}) div 10000, 2)` — ヘクタールに変換します。
 
-2. `distance(coordinates)`：geotrace（線）の**合計パス長をメートル**で計算するか、2つのgeopointの間の距離を計算する。
+2. `distance(coordinates)`：ジオトレース（線）の**総経路長をメートル**で計算するか、2つのジオポイント間の距離を計算します。
+   - ジオトレースの場合：`distance(${route})` は総経路長をメートルで返します。
+   - 2つのジオポイントの場合：`distance(concat(${point_a}, ' ', ${point_b}))` はそれらの間の距離を返します。
+   - 例：`round(distance(${road_trace}) div 1000, 3)` — 道路の長さをキロメートルで表示します。
 
 ---
 
 ### 検証関数
 
-1. `regex(value, pattern)`：`value`が正規表現`pattern`に一致する場合は`true`を返す。`constraint`列でパターンベースの検証に使用する。
+1. `regex(value, pattern)`：`value` が正規表現 `pattern` と一致する場合に `true` を返します。パターンに基づいた検証のために `constraint`（制約）列で使用します。
+   - パターンは標準的な正規表現構文（POSIX ERE サブセット）を使用します。
+   - 例：`regex(., '^[0-9]{10}$')` — 10桁の数値を検証します。
+   - 例：`regex(., '^[A-Z]{2}[0-9]{6}$')` — パスポート番号の形式（大文字2つに続いて6桁の数字）を検証します。
+   - 例：`regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — 基本的なメール形式のチェック。
 
-2. `checklist(min, max, v1, v2, ...)`：boolean式のリストを評価して、`true`の値の数が`min`と`max`の間（含む）であれば`true`を返す。
+2. `checklist(min, max, v1, v2, ...)`：論理式のリストを評価し、`true` の値の数が `min` と `max` の間（両端を含む）である場合に `true` を返します。境界をスキップするには、`min` または `max` に `-1` を渡します。
+   - 例：`checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — 3つの条件のうち、正確に 2つまたは 3つが true の場合に合格します。
+   - 例：`checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — 少なくとも1つの安全対策が true である必要があります。
 
-3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`：`checklist()`と同様だが、各値に重みがある。`true`の値の重みの合計が`min`と`max`の間である必要がある。
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`：`checklist()` と同様ですが、各値に重みがあります。`true` の値の重みの合計が `min` と `max` の間にある必要があります。
+   - 例：`weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — 存在する設備の重みの合計が少なくとも 10 である必要があります。
 
 ---
 
 ### ユーティリティ関数
 
-1. `uuid()`：ランダムなUUID（RFC 4122 v4形式）を文字列として生成する。
+1. `uuid()`：ランダムな UUID（RFC 4122 v4 形式）を文字列として生成します。
+   - 例：`uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
+   - 通常、安定した一意の ID を生成するために `once()` と共に使用されます：`once(uuid())`
 
-2. `version()`：settingsワークシートで設定されたフォームの`version`属性の値を返す。
+2. `version()`：設定ワークシートで設定されたフォームの `version`（バージョン）属性の値を返します。
+   - 例：`version()` → `'3.1'`
+   - エクスポートされたデータにフォームのバージョンを埋め込むために、`calculate` フィールドで役立ちます。
 
-3. `position()`：**繰り返しグループ**内で呼び出すと、現在の繰り返しインスタンスの1ベースのインデックスを返す。
+3. `position()`：**リピートグループ**内で呼び出されたとき、現在の繰り返しインスタンスの 1 から始まるインデックスを返します。
+   - 例：最初のインスタンスで `position()` を使用すると `1`、2番目では `2`、というように返されます。
+   - 参照：`index()`（エイリアス）、グループ外から繰り返しの値を参照するための `indexed-repeat()`。
 
-4. `thousandsep(length, separator, value)`：千の位区切り記号を使って数値をフォーマットする。
+4. `thousandsep(length, separator, value)`：数値を千の位の区切り文字でフォーマットします。`length` は文字列の最小合計長（短い場合はスペースで埋められます）、`separator` は使用する文字（例：`','`）、`value` はフォーマットする数値です。
+   - 例：`thousandsep(0, ',', 1234567)` → `'1,234,567'`
+   - 例：`thousandsep(0, '.', ${income})` — 収入をピリオドを千の位の区切り文字としてフォーマットします。
 
-5. `substr-jsonpath(value, jsonpath)`：JSONPath式を使ってJSON文字列から部分文字列を抽出する。
+5. `substr-jsonpath(value, jsonpath)`：JSONPath 式を使用して JSON 文字列から値を取得します。
+   - `value` は JSON 文字列である必要があります（例：`callapi(..., 'json:', ...)` を使用して生の API レスポンスを保存したフィールド）。
+   - `jsonpath` は JSONPath 式です（例：`'$.data.name'`, `'$.items[0].id'`）。
+   - 常に **文字列** を返します。算術演算で使用する場合は `number()` で囲んでください。
+   - パスが見つからない場合、または `value` が有効な JSON でない場合は、空の文字列 `''` を返します。
+   - 例：`substr-jsonpath(${api_response}, '$.data.name')` — `name` フィールドを取得します。
+   - 例：`substr-jsonpath(${api_response}, '$.items[0].label')` — 配列の最初の要素を取得します。
+   - 例：`number(substr-jsonpath(${api_response}, '$.price'))` — 数値を取得します。
+   - 通常、1つの API レスポンスから複数のフィールドを取得するために `callapi(..., 'json:', ...)` と共に使用されます。[1つのAPI呼び出しから複数の値を取得する](../advanced-features/call-api#fetching-multiple-values-from-one-api-call) を参照してください。

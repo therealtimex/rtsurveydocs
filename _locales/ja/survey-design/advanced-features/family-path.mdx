@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path は、実行時にフォームのバンドルされたメディアディレクトリパスを返すコンベンション calculate フィールドです。ローカルデータベース検索やファイルベースの検索を使用するすべてのフォームに必要です。"
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` は、フォームのバンドルされたメディアディレクトリへのパスを保持するコンベンション calculate フィールドです。`rawquery`、`pulldata`、または `search()` を使用してローカルデータベース検索を実行するすべてのフォームには、このフィールドを含める必要があります。これがないと、ファイルパスを解決できず、検索結果が暗黙的に空になります。
+
+---
+
+## calculate フィールド
+
+この行を survey シートの上部付近、メタフィールドの後、かつデータベースファイルを使用する最初の質問の前に追加します。
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+このフィールドには表示される値は保存されず、label も必要ありません。これは、それ以降のすべてのパス構築における暗黙の前提条件となります。
+
+---
+
+## なぜ必要なのか
+
+RTSurvey は、SQLite データベース、画像、オーディオクリップなどのフォームメディアを、デバイス上のフォームごとのディレクトリ内にバンドルします。正確なパスは、プラットフォーム（Android、iOS、Web）やデバイスによって異なります。
+
+実行時に、アプリは `family_path` を自動的に入力します。一般的な解決値は次のようになります。
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+パスはプラットフォーム固有であり、起動時に決定されるため、フォーム内にハードコードすることはできません。`pulldata('app-api', 'family_path')` が、パスを取得する唯一の信頼できる方法です。
+
+---
+
+## パス内での使用方法
+
+`family_path` が定義されたら、`concat()` を使用して完全なファイルパスを構築します。
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+`::tableName` 接尾辞は、アプリがファイルを開くときに削除されます。テーブル名は SQL クエリ内でのみ使用されます。
+
+---
+
+## family_path が使用される場所
+
+バンドルされたファイルを参照する場合、パス引数には常に `family_path` が必要です。
+
+- **ローカルデータベース検索** — `search-autocomplete-noedit-v2('rawquery', ...)` の `db_path` 引数は、`concat(${family_path}, ...)` を使用して構築する必要があります。詳細については、[ローカルデータベース検索](local-database-search)を参照してください。
+- **`pulldata` rawquery** — `.db` ファイルから読み取るすべての `pulldata('rawquery', ...)` 呼び出しは、同じ `concat()` パターンを使用します。
+- **ローカルファイルを使用した `search()`** — バンドルされた CSV または DB ファイルから読み込む動的検索 appearance も、ファイル参照のために `family_path` に依存します。
+
+---
+
+## フォーム内での配置
+
+`family_path` は、**それを参照する最初のフィールドよりも前に**配置する必要があります。推奨される位置は、メタグループの直後です。
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | 都道府県 | *(rawquery appearance で `${family_path}` を参照)* |
+
+<Callout type="warning">
+フォームに `family_path` がない場合、またはそれを参照する最初の `rawquery` / `search()` フィールドよりも後に配置されている場合、バンドルされたファイルに対するすべての検索は暗黙的に空の結果を返します。エラーメッセージは表示されず、オートコンプリートには結果が表示されません。
+</Callout>
+
+---
+
+## 複数のデータベースファイル
+
+1つのフォームで複数の `.db` ファイルを使用できます。各パスは `concat()` を使用して個別に構築されます。
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+`family_path` を一度定義すれば、必要な数のフィールドで参照できます。
+
+---
+
+## 開発中の検証
+
+デバイス上の解決された値を確認するには、`family_path` の下に一時的な `note` フィールドを追加します。
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `パス: ${family_path}` | |
+
+ノートには、テスト中に実際に解決されたパスが表示されます。最終的なフォームをデプロイする前に削除してください。

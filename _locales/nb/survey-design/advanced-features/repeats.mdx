@@ -1,56 +1,56 @@
 ---
-title: "Avanserte repeats"
-description: "Avanserte mønstre for repeat-grupper: dynamiske antall, nestede repeats, sammendrag av repeat-data og referering til verdier på tvers av repeats."
+title: "Avanserte repetisjoner"
+description: "Avanserte mønstre for repetisjonsgrupper: dynamiske antall, nøstede repetisjoner, oppsummering av repetisjonsdata og referanse til verdier på tvers av repetisjoner."
 ---
 
-Denne siden dekker avanserte mønstre for arbeid med repeat-grupper i rtSurvey. For grunnleggende informasjon om oppsett av en repeat-gruppe, se [Gruppering og repeats](../repeats).
+Denne siden dekker avanserte mønstre for arbeid med repetisjonsgrupper (repeat groups) i rtSurvey. For det grunnleggende om hvordan du setter opp en repetisjonsgruppe, se [Gruppering og repetisjoner](../repeats).
 
 ---
 
-## Dynamisk repeat-antall
+## Dynamisk antall repetisjoner
 
-Som standard bestemmer telleren hvor mange ganger det skal gjentas. Du kan fikse antall gjentagelser ved hjelp av `repeat_count`:
+Som standard bestemmer intervjueren hvor mange ganger man skal repetere. Du kan fiksere antall repetisjoner ved hjelp av `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
-| begin_repeat | household_members | Husholdningsmedlem | `${num_members}` |
-| text | member_name | Medlemsnavn | |
+| begin_repeat | household_members | Husstandsmedlem | `${num_members}` |
+| text | member_name | Medlemmets navn | |
 | integer | member_age | Alder | |
 | end_repeat | | | |
 
-Gjentagelsen kjører nøyaktig `${num_members}` ganger, der `num_members` ble samlet inn tidligere i skjemaet. Telleren kan ikke legge til eller fjerne instanser.
+Repetisjonen kjører nøyaktig `${num_members}` ganger, der `num_members` ble samlet inn tidligere i skjemaet. Intervjueren kan ikke legge til eller fjerne forekomster.
 
 ---
 
 ## Indeksert tilgang: `indexed-repeat()`
 
-Gå til et spesifikt repeat-instanses feltverdi fra **utenfor** repeat-gruppen ved hjelp av `indexed-repeat(repeatedField, repeatGroup, index)`:
+Få tilgang til en spesifikk repetisjonsforekomst sin feltverdi fra **utsiden** av repetisjonsgruppen ved hjelp av `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Dette er nyttig for å bygge sammendragsfelt eller referere til "primære" medlemmets data etter repeat-en.
+Dette er nyttig for å bygge oppsummeringsfelt eller referere til dataene til det "primære" medlemmet etter repetisjonen.
 
 ---
 
-## Gjeldende instansposisjon: `index()`
+## Posisjon for gjeldende forekomst: `index()`
 
-Inne i en repeat-gruppe returnerer `index()` den 1-baserte posisjonen til gjeldende instans. Bruk det til å merke hver gjentagelse eller lage unike identifikatorer:
+Inne i en repetisjonsgruppe returnerer `index()` den 1-baserte posisjonen til den gjeldende forekomsten. Bruk den til å merke hver repetisjon eller lage unike identifikatorer:
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | Plot |
-| note | plot_label | Plotnummer `${index()}` |
-| text | plot_id | Plot-ID |
+| begin_repeat | plots | Parsell |
+| note | plot_label | Parsell nummer `${index()}` |
+| text | plot_id | Parsell-ID |
 | end_repeat | | |
 
 ---
 
-## Referere til felt i samme instans
+## Referere til felt i samme forekomst
 
-Inne i en repeat, bruk `${feltnavn}` for å referere til et annet felt **i samme repeat-instans**. Det er ikke nødvendig med `indexed-repeat()` innenfor samme løkke:
+Innenfor en repetisjon, bruk `${fieldname}` for å referere til et annet felt **i samme repetisjonsforekomst**. Det er ikke behov for `indexed-repeat()` innenfor samme løkke:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,35 +62,35 @@ Inne i en repeat, bruk `${feltnavn}` for å referere til et annet felt **i samme
 
 ---
 
-## Referere til overordnede felt fra innsiden av en repeat
+## Referere til foreldrefelt fra innsiden av en repetisjon
 
-Felt utenfor (over) repeat-gruppen kan refereres til normalt med `${feltnavn}`:
+Felt utenfor (over) repetisjonsgruppen kan refereres til som normalt med `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
-| text | village | Landsbynavn |
-| begin_repeat | plots | Jordbruksplot |
-| note | plot_context | Plotter i `${village}` |
+| text | village | Landsbyens navn |
+| begin_repeat | plots | Landbruksparsell |
+| note | plot_context | Parseller i `${village}` |
 | end_repeat | | |
 
 ---
 
-## Oppsummering av repeat-data
+## Oppsummering av repetisjonsdata
 
-Bruk repeat-aggregatfunksjoner **utenfor** repeat-gruppen for å oppsummere:
+Bruk repetisjonsaggregatfunksjoner **utenfor** repetisjonsgruppen for å oppsummere:
 
 | Funksjon | Eksempel | Beskrivelse |
 |----------|---------|-------------|
-| `count(group)` | `count(${household_members})` | Antall instanser |
+| `count(group)` | `count(${household_members})` | Antall forekomster |
 | `sum(field)` | `sum(${loan_amount})` | Sum av et numerisk felt |
 | `min(field)` | `min(${member_age})` | Minimumsverdi |
 | `max(field)` | `max(${member_age})` | Maksimumsverdi |
 | `join(sep, field)` | `join(', ', ${member_name})` | Kommaseparert liste |
 | `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Betinget telling |
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Betinget sum |
-| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Betinget join |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Betinget sammenslåing |
 
-### Eksempel: Husholdningssammendrag
+### Eksempel: Husstandsoppsummering
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -106,49 +106,145 @@ Bruk repeat-aggregatfunksjoner **utenfor** repeat-gruppen for å oppsummere:
 
 ---
 
-## Nestede repeats
+## Nøstede repetisjoner
 
-En repeat-gruppe kan inneholde en annen repeat-gruppe. Bruk dette med forsiktighet — nestede repeats legger til kompleksitet og kan forvirre tellere.
+En repetisjonsgruppe kan inneholde en annen repetisjonsgruppe. Bruk dette forsiktig – nøstede repetisjoner øker kompleksiteten og kan være forvirrende for intervjuere.
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | households | Hushold |
-| text | hh_id | Hushold-ID |
+| begin_repeat | households | Husstand |
+| text | hh_id | Husstands-ID |
 | begin_repeat | hh_members | Medlem |
-| text | member_name | Medlemsnavn |
+| text | member_name | Medlemmets navn |
 | end_repeat | | |
 | end_repeat | | |
 
-For å referere til et felt i en ytre repeat fra den indre repeat-en, bruk `${feltnavn}` — det løses til nærmeste samsvarende forfedre:
+For å referere til et felt i en ytre repetisjon fra den indre repetisjonen, bruk `${fieldname}` – den peker til den nærmeste samsvarende overordnede:
 
-Inne i `hh_members`-repeaten returnerer `${hh_id}` ID-en til **gjeldende** hushold, ikke alle hushold.
+Inne i `hh_members`-repetisjonen vil `${hh_id}` returnere ID-en til den **gjeldende** husstanden, ikke alle husstander.
 
 ---
 
-## Rangering inne i repeat-grupper: `rank-index()`
+## Rangering inne i repetisjonsgrupper: `rank-index()`
 
-Når et `rank`-felt eksisterer inne i en repeat, bruk `rank-index(instanceNumber, repeatedField)` fra utsiden for å få den ordinale rangeringen til en spesifikk instans:
+Når et `rank`-felt finnes inne i en repetisjon, bruk `rank-index(instanceNumber, repeatedField)` fra utsiden for å få den ordinale rangeringen til en spesifikk forekomst:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` returnerer instansindeksen til den høyeste poengsummen.
+`rank-index(1, ${score})` returnerer forekomstindeksen for den høyeste poengsummen.
+
+---
+
+## `1screen`-utseende på `begin_repeat`
+
+Ved å legge til `1screen` i `appearance`-kolonnen på en `begin_repeat`-rad, vises alle spørsmål for hver forekomst sammen på én skjerm, i stedet for ett spørsmål per skjerm.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Husstandsmedlem | `1screen` |
+| text | member_name | Medlemmets navn | |
+| integer | member_age | Alder | |
+| end_repeat | | | |
+
+Når `1screen` er satt, og det ikke finnes et `repeat_count`-felt eller et `add_repeat`-felt inne i gruppen, vil rtSurvey automatisk generere en sirkulær **+**-knapp nederst på skjermen slik at intervjuere kan legge til nye forekomster uten ekstra konfigurasjon.
+
+| Utseende | Én skjerm per forekomst | Standard +-knapp lagt til |
+|------------|-------------------------|------------------------|
+| `1screen` | Ja | Ja (når ingen `add_repeat`-underordnet) |
+| `field-list` | Ja | Nei |
+
+Bruk `field-list` når du vil ha det grupperte oppsettet uten den automatiske legg til-knappen. Bruk `1screen` når du vil ha både det grupperte oppsettet og en innebygd måte å legge til forekomster på.
+
+---
+
+## `add_repeat` tilpasset legg til-knapp
+
+Et `note`- (eller `text`-) felt plassert **inne** i repetisjonsgruppen med `appearance: add_repeat` vises som en "Legg til"-knapp i full bredde. Knappens tekst kommer fra feltets `label`-kolonne. Når et `add_repeat`-felt er til stede, blir den sirkulære standard +-knappen (fra `1screen`) undertrykt.
+
+Plasser `add_repeat`-feltet som det siste feltet inne i repetisjonsgruppen:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Medlem | `1screen` |
+| text | member_name | Medlemmets navn | |
+| integer | member_age | Alder | |
+| note | btn_add | + Legg til medlem | `add_repeat` |
+| end_repeat | | | |
+
+### Tilpasning av farger
+
+Oppgi en fargekode inne i appearance-verdien for å style knappen:
+
+| Appearance-verdi | Resultat |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Grønn bakgrunn, standard tekstfarge |
+| `add_repeat 04B404-ffffff` | Grønn bakgrunn, hvit tekst |
+
+Den første fargen er bakgrunnen og den andre (etter bindestreken) er tekstfargen. Utelat `#` når du bruker bindestrek-separert form.
+
+### Ikon-variant
+
+Bruk `add_repeat icon` (med mellomrom) for å vise en kompakt sirkulær ikonknapp i stedet for knappen i full bredde:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Legg til | `add_repeat icon` |
+
+---
+
+## Sletteknapper: `delete-repeat-current` og `delete-repeat-last`
+
+Et `note`-felt inne i repetisjonsgruppen med `appearance: delete-repeat-current` eller `appearance: delete-repeat-last` vises som en delt sletteknapp.
+
+| Utseende | Handling |
+|------------|--------|
+| `delete-repeat-current` | Sletter den gjeldende (aktive) forekomsten |
+| `delete-repeat-last` | Sletter den siste forekomsten i repetisjonen |
+
+Standardknappen (uten ikon) er en delt knapp: et søppelbøtteikon til venstre og feltets etikettekst til høyre, og den strekker seg over hele skjermens bredde.
+
+### Ikon-variant
+
+Legg til `-icon` for å få en kompakt sirkulær søppelbøtte-ikonknapp:
+
+| Utseende | Resultat |
+|------------|--------|
+| `delete-repeat-current-icon` | Sirkulært søppelbøtteikon, sletter gjeldende forekomst |
+| `delete-repeat-last-icon` | Sirkulært søppelbøtteikon, sletter siste forekomst |
+
+### Tilpasning av farger
+
+Fargeformatet er identisk med `add_repeat`: bruk `<#RRGGBB/>` eller `RRGGBB-RRGGBB` (bakgrunn-tekst).
+
+### Komplett mønstereksempel
+
+Følgende repetisjon bruker `1screen`, en sirkulær slett-gjeldende-knapp øverst, og en legg til-knapp i full bredde nederst:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Medlem | `1screen` |
+| note | btn_del | Fjern | `delete-repeat-current-icon` |
+| text | member_name | Medlemmets navn | |
+| integer | member_age | Alder | |
+| note | btn_add | + Legg til medlem | `add_repeat` |
+| end_repeat | | | |
 
 ---
 
 ## Beste praksis
 
-1. Bruk alltid `repeat_count` når antall gjentagelser er kjent på forhånd — det forhindrer tellere fra å tilfeldigvis legge til eller fjerne instanser.
-2. Hold repeat-grupper fokuserte — en repeat med 20+ spørsmål per instans er vanskelig å navigere.
-3. Navngi repeat-grupper tydelig (f.eks. `household_members`, ikke `repeat1`) — navnet vises i funksjonskall og eksporterte data.
-4. Test med maksimalt forventet antall instanser for å verifisere ytelsen.
-5. Bruk `field-list`-utseende på repeat-gruppen for å vise alle felt på én skjerm per instans (mobil).
+1. Bruk alltid `repeat_count` når antall repetisjoner er kjent på forhånd – det forhindrer at intervjuere ved et uhell legger til eller fjerner forekomster.
+2. Hold repetisjonsgruppene fokuserte – en repetisjon med 20+ spørsmål per forekomst er vanskelig å navigere i.
+3. Gi repetisjonsgruppene tydelige navn (f.eks. `household_members`, ikke `repeat1`) – navnet vises i funksjonskall og eksporterte data.
+4. Test med det maksimale forventede antall forekomster for å verifisere ytelsen.
+5. Bruk `1screen` på `begin_repeat` for å vise alle spørsmål på én skjerm per forekomst, kombinert med et `add_repeat`-notatfelt inne i gruppen for å gi intervjuerne en tydelig merket "Legg til"-knapp.
 
 ---
 
 ## Begrensninger
 
-- `indexed-repeat()` krever en gyldig indeks (1 til antall instanser) — indekser utenfor rekkevidde returnerer tom.
-- Nestede repeats utover 2 nivåer anbefales ikke og kan forårsake visningsproblemer på noen klienter.
-- Aggregatfunksjoner (`sum`, `count`, osv.) opererer på hele repeat-gruppen — du kan ikke aggregere en delmengde av instanser uten `*-if`-varianter.
+- `indexed-repeat()` krever en gyldig indeks (1 til antall forekomster) – indekser utenfor området returnerer tomt.
+- Nøstede repetisjoner utover 2 nivåer anbefales ikke og kan føre til visningsproblemer på enkelte enheter.
+- Aggregatfunksjoner (`sum`, `count`, osv.) opererer på hele repetisjonsgruppen – du kan ikke aggregere et delsett av forekomster uten `*-if`-varianter.

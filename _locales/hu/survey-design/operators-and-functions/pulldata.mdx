@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "A pulldata() függvény lekér egy értéket az űrlaphoz csatolt külső CSV-fájlból, egy kulcsoszlopot egy kulcsértékhez illesztve, és visszaküldi a megfelelő eredményoszlopot."
+---
+
+import { Callout } from 'nextra/components'
+
+A `pulldata()` függvény egy értéket kér le az űrlaphoz csatolt CSV-fájlból. Egy fájlnév, egy visszaküldendő oszlop, egy illesztendő oszlop és egy kulcsérték megadásával visszaküldi a cellát az illeszkedő sor és az eredményoszlop metszéspontjában.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Pozíció | Paraméter | Leírás |
+|----------|-----------|-------------|
+| 1 | Fájlnév | A CSV médiafájl neve (ugyanaz a név, amelyet a `select_one_from_file`-ban használnak) |
+| 2 | Eredményoszlop | Az oszlop, amelynek az értékét vissza szeretné kapni |
+| 3 | Kulcsoszlop | Az oszlop, amelyhez illeszteni kell |
+| 4 | Kulcsérték | Az illesztendő érték — általában egy mezőhivatkozás, például `${field}` |
+
+A függvény üres karakterláncot ad vissza, ha nem található egyezés.
+
+---
+
+## Előfeltételek
+
+A CSV-fájlt médiafájlként kell az űrlaphoz csatolni. A `pulldata()` által hivatkozott fájl a `select_one_from_file` választási listájaként is használható.
+
+**Példa CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Alappélda
+
+Keresse ki egy munkatárs részlegét és telefonszámát az azonosítója alapján:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Select staff member | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Department: `${dept}` — Phone: `${phone}` | |
+
+<Callout type="info">
+A `select_one_from_file` CSV `name` oszlopa a tárolt érték. Amikor a kérdező kiválasztja az "Alice"-t, a `${staff_id}` az `"Alice"` értéket fogja tartalmazni, amelyet a `pulldata()` kulcsként használ a részlegének és telefonszámának lekéréséhez.
+</Callout>
+
+---
+
+## Egy kiválasztott lehetőség feliratának lekérése
+
+A `select_one_from_file` kérdés a `name` értéket tárolja. Az ember által olvasható `label` (felirat) megjelenítéséhez használja a `pulldata()` függvényt a kikereséséhez:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Select village | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | You selected: `${village_label}` | |
+
+---
+
+## Több lekérdezés egyetlen választásból
+
+A `pulldata()` függvényt többször is meghívhatja ugyanarra a fájlra, hogy különböző oszlopokat kérjen le ugyanahhoz a kiválasztott sorhoz:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Select facility | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## A pulldata használata a relevant és constraint oszlopokban
+
+A `pulldata()` használható a `relevant` és `constraint` oszlopokban, hogy a kikeresett értékeken alapuló logikát alkalmazzon:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Select facility | | |
+| integer | bed_count | Number of beds occupied | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## A pulldata használata az once() függvénnyel
+
+Ha a `pulldata()` függvényt csak az első betöltéskor szeretné kiértékelni (megakadályozva az újbóli kiértékelést, ha a kulcsmező a kezdeti bevitel után megváltozik), ágyazza be az `once()` függvénybe:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Legjobb gyakorlatok
+
+1. A CSV-ben lévő kulcsoszlopnak meg kell egyeznie a `select_one_from_file`-ban használt `name` oszloppal — ezeknek ugyanannak az értéknek kell lenniük.
+2. A CSV-ben az oszlopnevek megkülönböztetik a kis- és nagybetűket — a `Department` és a `department` különböző oszlopok.
+3. Ha a kulcsérték nem található, a `pulldata()` üres karakterláncot ad vissza — használja az `if(${field} != '', pulldata(...), '')` kifejezést az üres választások elleni védelemhez.
+4. Ahol lehetséges, tartsa kicsinek a CSV-fájlokat — a nagy fájlok növelik az űrlap betöltési idejét alacsony sávszélességű kapcsolatokon.
+5. Az adatgyűjtési fordulók között változó adatok esetén frissítse a CSV médiafájlt egy új űrlapverzió feltöltésével.
+
+## Korlátozások
+
+- A `pulldata()` csak az első olyan sort illeszti, ahol a kulcsoszlop megegyezik a kulcsértékkel — a CSV-ben lévő duplikált kulcsértékek nem támogatottak.
+- A CSV-fájlt a közzététel előtt csatolni kell az űrlaphoz; futási időben nem kérhető le URL-ről.
+- A `pulldata()` által visszaadott numerikus értékek karakterláncok — ágyazza be a `number()` függvénybe, ha aritmetikában használja: `number(pulldata(...))`.
+
+<Callout type="info">
+Az rtSurvey támogatja a `pulldata()` kiterjesztett formáit is az eszköz metaadatainak, JWT mezőknek és JSON adatoknak az olvasásához. Lásd az [App API](../app-api) oldalt a `pulldata('app-api', ...)` használatához és a [Call API](../advanced-features/call-api) oldalt a JSON-alapú keresési mintákhoz.
+</Callout>
+
+---
+
+## Kiterjesztett pulldata() változatok
+
+A CSV-kereséseken túl a `pulldata()` számos további adatforrást támogat az első argumentum megváltoztatásával.
+
+### `pulldata('app-api', key)`
+
+Eszköz metaadatok, felhasználói attribútumok és alkalmazáskörnyezet olvasása. Lásd a teljes hivatkozást az [App API](../app-api) oldalon.
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Egy inline JSON karakterlánc elemzése és egy érték kinyerése JSONPath kifejezéssel. Hasznos, ha az űrlapba ágyazott JSON-literál van.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+A talált értéket karakterláncként adja vissza, vagy üres karakterláncot, ha nem található.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Érték kinyerése egy másik mezőben tárolt JSON karakterláncból JSONPath kifejezés használatával. Ez egyenértékű a `substr-jsonpath(${field}, jsonpath)` függvénnyel.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Egy mezőben tárolt JWT token dekódolása és egy specifikus claim értékének visszaküldése a hasznos teherből.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Üres karakterláncot ad vissza, ha a token érvénytelen vagy a claim nincs jelen.
+
+### `pulldata('instanceid')`
+
+A jelenlegi beküldés egyedi példányazonosítóját (instance ID) adja vissza. Egyenértékű az `instanceID` metamezővel.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Egy érték leképezése egy másikra az űrlapkonfigurációban meghatározott névvel ellátott leképezési táblázat segítségével.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+A leképezett értéket adja vissza, vagy üres karakterláncot, ha nincs egyező leképezés.
+
+### `pulldata('options', optionName)`
+
+Egy űrlapkonfigurációs opció olvasása név szerint.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+SQL `SELECT` végrehajtása egy csatolt SQLite `.db` fájlon, és az első illeszkedő sor első oszlopából származó érték visszaküldése. A SQL karakterlánc utáni paraméterek sorrendben helyettesítik a `?` helyőrzőket.
+
+| Pozíció | Paraméter | Leírás |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | Litereális karakterlánc, amely azonosítja ezt a változatot |
+| 2 | path | Fájl elérési útja `concat(${family_path}, '/file.db::tableName')` formátumban |
+| 3 | SQL | Egy `SELECT` utasítás, amely a `?`-et pozicionális helyőrzőként használja |
+| 4+ | params | Az egyes `?`-ek helyére sorrendben behelyettesített értékek — általában mezőhivatkozások, mint a `${field}` |
+
+Üres karakterláncot ad vissza, ha egyetlen sor sem illeszkedik.
+
+**Példa — tartomány nevének kikeresése azonosító alapján:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Példa — körzet nevének kikeresése tartományi és járási kódok alapján szűrve:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Szemben a standard négyargumentumos `pulldata()` függvénnyel, amely egyetlen kulcsoszlopot illeszt egy CSV-fájlban, a `rawquery` változat egy teljes SQL `SELECT`-et hajt végre egy SQLite adatbázison, lehetővé téve a többoszlopos `WHERE` feltételeket és bármely oszlop visszatérési értékként való használatát.
+
+<Callout type="info">
+A `rawquery`-t gyakran használják automatikus kiegészítésű mezőkkel hierarchikus helymeghatározáshoz. Lásd a [Helyi adatbázis keresése](../advanced-features/local-database-search) oldalt a `.db` fájlok építésével és a `pulldata('rawquery', ...)` használatával kapcsolatos részletekért.
+</Callout>

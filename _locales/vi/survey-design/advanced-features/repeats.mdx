@@ -1,15 +1,15 @@
 ---
-title: "Nhóm lặp nâng cao"
-description: "Các mẫu nâng cao cho nhóm lặp: số lần lặp động, lặp lồng nhau, tóm tắt dữ liệu lặp và tham chiếu giá trị giữa các lần lặp."
+title: "Lặp lại Nâng cao"
+description: "Các mẫu nâng cao cho nhóm lặp lại: số lượng động, lặp lại lồng nhau, tóm tắt dữ liệu lặp lại và tham chiếu giá trị giữa các lần lặp."
 ---
 
-Trang này đề cập đến các mẫu nâng cao khi làm việc với nhóm lặp trong rtSurvey. Để biết kiến thức cơ bản về thiết lập nhóm lặp, xem [Nhóm và Lặp](../repeats).
+Trang này đề cập đến các mẫu nâng cao để làm việc với các nhóm lặp lại trong rtSurvey. Để biết kiến thức cơ bản về cách thiết lập nhóm lặp lại, hãy xem [Nhóm và Lặp lại](../repeats).
 
 ---
 
-## Số lần lặp động
+## Số lượng lặp lại động
 
-Mặc định, người điều tra quyết định số lần lặp. Bạn có thể cố định số lần lặp bằng `repeat_count`:
+Theo mặc định, điều tra viên quyết định số lần lặp lại. Bạn có thể cố định số lần lặp lại bằng cách sử dụng `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,26 +18,26 @@ Mặc định, người điều tra quyết định số lần lặp. Bạn có 
 | integer | member_age | Tuổi | |
 | end_repeat | | | |
 
-Vòng lặp chạy đúng `${num_members}` lần, nơi `num_members` được thu thập trước đó trong biểu mẫu. Người điều tra không thể thêm hoặc xóa phiên bản.
+Lần lặp lại chạy chính xác `${num_members}` lần, trong đó `num_members` đã được thu thập trước đó trong biểu mẫu. Điều tra viên không thể thêm hoặc xóa các phiên bản.
 
 ---
 
-## Truy cập theo chỉ số: `indexed-repeat()`
+## Truy cập theo chỉ mục: `indexed-repeat()`
 
-Truy cập giá trị trường của một phiên bản lặp cụ thể từ **bên ngoài** nhóm lặp bằng `indexed-repeat(repeatedField, repeatGroup, index)`:
+Truy cập giá trị trường của một phiên bản lặp lại cụ thể từ **bên ngoài** nhóm lặp lại bằng cách sử dụng `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Điều này hữu ích để xây dựng trường tóm tắt hoặc tham chiếu dữ liệu thành viên "chính" sau vòng lặp.
+Điều này hữu ích để xây dựng các trường tóm tắt hoặc tham chiếu dữ liệu của thành viên "chính" sau khi lặp lại.
 
 ---
 
 ## Vị trí phiên bản hiện tại: `index()`
 
-Trong nhóm lặp, `index()` trả về vị trí (bắt đầu từ 1) của phiên bản hiện tại. Dùng để gán nhãn mỗi lần lặp hoặc tạo mã định danh duy nhất:
+Bên trong một nhóm lặp lại, `index()` trả về vị trí (bắt đầu từ 1) của phiên bản hiện tại. Sử dụng nó để gắn nhãn cho mỗi lần lặp lại hoặc tạo mã định danh duy nhất:
 
 | type | name | label |
 |------|------|-------|
@@ -48,9 +48,9 @@ Trong nhóm lặp, `index()` trả về vị trí (bắt đầu từ 1) của ph
 
 ---
 
-## Tham chiếu trường trong cùng phiên bản
+## Tham chiếu các trường trong cùng một phiên bản
 
-Trong vòng lặp, dùng `${fieldname}` để tham chiếu trường khác **trong cùng phiên bản lặp**. Không cần `indexed-repeat()` trong cùng vòng lặp:
+Trong một lần lặp lại, hãy sử dụng `${fieldname}` để tham chiếu một trường khác **trong cùng một phiên bản lặp lại**. Không cần sử dụng `indexed-repeat()` trong cùng một vòng lặp:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,33 +62,33 @@ Trong vòng lặp, dùng `${fieldname}` để tham chiếu trường khác **tro
 
 ---
 
-## Tham chiếu trường cha từ trong vòng lặp
+## Tham chiếu các trường cha từ bên trong một lần lặp lại
 
-Các trường bên ngoài (phía trên) nhóm lặp có thể được tham chiếu bình thường bằng `${fieldname}`:
+Các trường bên ngoài (phía trên) nhóm lặp lại có thể được tham chiếu bình thường bằng `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
-| text | village | Tên làng/xã |
+| text | village | Tên làng |
 | begin_repeat | plots | Thửa đất nông nghiệp |
-| note | plot_context | Thửa đất ở `${village}` |
+| note | plot_context | Các thửa đất tại `${village}` |
 | end_repeat | | |
 
 ---
 
-## Tóm tắt dữ liệu lặp
+## Tóm tắt dữ liệu lặp lại
 
-Dùng các hàm tổng hợp lặp **bên ngoài** nhóm lặp để tóm tắt:
+Sử dụng các hàm tổng hợp lặp lại **bên ngoài** nhóm lặp lại để tóm tắt:
 
-| Hàm | Ví dụ | Mô tả |
-|-----|-------|-------|
-| `count(group)` | `count(${household_members})` | Số phiên bản |
-| `sum(field)` | `sum(${loan_amount})` | Tổng trường số |
+| Function | Example | Description |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | Số lượng phiên bản |
+| `sum(field)` | `sum(${loan_amount})` | Tổng của một trường số |
 | `min(field)` | `min(${member_age})` | Giá trị nhỏ nhất |
 | `max(field)` | `max(${member_age})` | Giá trị lớn nhất |
-| `join(sep, field)` | `join(', ', ${member_name})` | Danh sách phân cách bởi dấu phẩy |
+| `join(sep, field)` | `join(', ', ${member_name})` | Danh sách được ngăn cách bằng dấu phẩy |
 | `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Đếm có điều kiện |
-| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Tổng có điều kiện |
-| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Ghép có điều kiện |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Tính tổng có điều kiện |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Nối có điều kiện |
 
 ### Ví dụ: Tóm tắt hộ gia đình
 
@@ -106,9 +106,9 @@ Dùng các hàm tổng hợp lặp **bên ngoài** nhóm lặp để tóm tắt:
 
 ---
 
-## Lặp lồng nhau
+## Lặp lại lồng nhau
 
-Nhóm lặp có thể chứa nhóm lặp khác. Dùng cẩn thận — lặp lồng nhau thêm độ phức tạp và có thể gây nhầm lẫn cho người điều tra.
+Một nhóm lặp lại có thể chứa một nhóm lặp lại khác. Hãy sử dụng điều này một cách cẩn thận — các lần lặp lại lồng nhau làm tăng độ phức tạp và có thể gây nhầm lẫn cho những điều tra viên.
 
 | type | name | label |
 |------|------|-------|
@@ -119,36 +119,132 @@ Nhóm lặp có thể chứa nhóm lặp khác. Dùng cẩn thận — lặp l�
 | end_repeat | | |
 | end_repeat | | |
 
-Để tham chiếu trường trong vòng lặp ngoài từ vòng lặp trong, dùng `${fieldname}` — nó phân giải đến tổ tiên khớp gần nhất:
+Để tham chiếu một trường trong vòng lặp bên ngoài từ vòng lặp bên trong, hãy sử dụng `${fieldname}` — nó sẽ tìm đến cấp tổ tiên gần nhất phù hợp:
 
-Bên trong vòng lặp `hh_members`, `${hh_id}` trả về ID của **hộ gia đình hiện tại**, không phải tất cả hộ gia đình.
+Bên trong vòng lặp `hh_members`, `${hh_id}` trả về ID của hộ gia đình **hiện tại**, không phải tất cả các hộ gia đình.
 
 ---
 
-## Rank trong nhóm lặp: `rank-index()`
+## Xếp hạng bên trong các nhóm lặp lại: `rank-index()`
 
-Khi trường `rank` tồn tại trong vòng lặp, dùng `rank-index(instanceNumber, repeatedField)` từ bên ngoài để lấy thứ hạng theo thứ tự của một phiên bản cụ thể:
+Khi trường `rank` tồn tại bên trong một lần lặp lại, hãy sử dụng `rank-index(instanceNumber, repeatedField)` từ bên ngoài để lấy xếp hạng theo thứ tự của một phiên bản cụ thể:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` trả về chỉ số phiên bản có điểm cao nhất.
+`rank-index(1, ${score})` trả về chỉ số phiên bản của điểm số cao nhất.
 
 ---
 
-## Thực hành tốt
+## Giao diện `1screen` trên `begin_repeat`
 
-1. Luôn dùng `repeat_count` khi số lần lặp đã biết trước — điều này ngăn người điều tra vô tình thêm hoặc xóa phiên bản.
-2. Giữ nhóm lặp tập trung — vòng lặp với 20+ câu hỏi mỗi phiên bản khó điều hướng.
-3. Đặt tên nhóm lặp rõ ràng (ví dụ: `household_members`, không phải `repeat1`) — tên xuất hiện trong lời gọi hàm và dữ liệu xuất.
-4. Kiểm tra với số lần lặp tối đa dự kiến để xác minh hiệu suất.
-5. Dùng appearance `field-list` trên nhóm lặp để hiển thị tất cả trường trên một màn hình mỗi phiên bản (mobile).
+Thêm `1screen` vào cột `appearance` của hàng `begin_repeat` sẽ hiển thị tất cả các câu hỏi cho mỗi phiên bản cùng nhau trên một màn hình duy nhất, thay vì mỗi câu hỏi một màn hình.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Thành viên hộ gia đình | `1screen` |
+| text | member_name | Tên thành viên | |
+| integer | member_age | Tuổi | |
+| end_repeat | | | |
+
+Khi `1screen` được thiết lập và không có trường `repeat_count` cũng như không có trường `add_repeat` bên trong nhóm, rtSurvey sẽ tự động hiển thị nút **+** hình tròn ở cuối màn hình để điều tra viên có thể thêm các phiên bản mới mà không cần cấu hình thêm.
+
+| Appearance | Một màn hình cho mỗi phiên bản | Nút + mặc định được thêm |
+|------------|-------------------------|------------------------|
+| `1screen` | Có | Có (khi không có trường con `add_repeat`) |
+| `field-list` | Có | Không |
+
+Sử dụng `field-list` khi bạn muốn bố cục theo nhóm mà không có nút thêm tự động. Sử dụng `1screen` khi bạn muốn cả bố cục theo nhóm và cách tích hợp để thêm các phiên bản.
 
 ---
 
-## Giới hạn
+## Nút thêm tùy chỉnh `add_repeat`
 
-- `indexed-repeat()` cần chỉ số hợp lệ (1 đến số phiên bản) — chỉ số ngoài phạm vi trả về rỗng.
-- Lặp lồng nhau quá 2 cấp không được khuyến nghị và có thể gây vấn đề hiển thị trên một số client.
-- Các hàm tổng hợp (`sum`, `count`, v.v.) hoạt động trên toàn bộ nhóm lặp — bạn không thể tổng hợp một tập con phiên bản nếu không dùng các biến thể `*-if`.
+Trường `note` (hoặc `text`) được đặt **bên trong** nhóm lặp lại với `appearance: add_repeat` sẽ hiển thị dưới dạng nút "Thêm" có chiều rộng đầy đủ. Nhãn nút lấy từ cột `label` của trường. Khi trường `add_repeat` xuất hiện, nút + hình tròn mặc định (từ `1screen`) sẽ bị ẩn đi.
+
+Đặt trường `add_repeat` làm trường cuối cùng bên trong nhóm lặp lại:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Thành viên | `1screen` |
+| text | member_name | Tên thành viên | |
+| integer | member_age | Tuổi | |
+| note | btn_add | + Thêm thành viên | `add_repeat` |
+| end_repeat | | | |
+
+### Tùy chỉnh màu sắc
+
+Cung cấp mã màu bên trong giá trị appearance để tạo kiểu cho nút:
+
+| Appearance value | Result |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Nền xanh lá cây, màu văn bản mặc định |
+| `add_repeat 04B404-ffffff` | Nền xanh lá cây, văn bản trắng |
+
+Màu đầu tiên là nền và màu thứ hai (sau dấu gạch ngang) là màu văn bản. Bỏ qua dấu `#` khi sử dụng dạng phân cách bằng dấu gạch ngang.
+
+### Biến thể biểu tượng
+
+Sử dụng `add_repeat icon` (có khoảng trắng) để hiển thị nút biểu tượng hình tròn nhỏ gọn thay vì nút có chiều rộng đầy đủ:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Thêm | `add_repeat icon` |
+
+---
+
+## Các nút xóa: `delete-repeat-current` và `delete-repeat-last`
+
+Trường `note` bên trong nhóm lặp lại với `appearance: delete-repeat-current` hoặc `appearance: delete-repeat-last` sẽ hiển thị dưới dạng nút xóa chia đôi.
+
+| Appearance | Action |
+|------------|--------|
+| `delete-repeat-current` | Xóa phiên bản hiện tại (đang hoạt động) |
+| `delete-repeat-last` | Xóa phiên bản cuối cùng trong lần lặp lại |
+
+Nút mặc định (không phải biểu tượng) là nút chia đôi: biểu tượng thùng rác ở bên trái và văn bản nhãn của trường ở bên phải, trải dài toàn bộ chiều rộng của màn hình.
+
+### Biến thể biểu tượng
+
+Thêm `-icon` để có nút biểu tượng thùng rác hình tròn nhỏ gọn:
+
+| Appearance | Result |
+|------------|--------|
+| `delete-repeat-current-icon` | Biểu tượng thùng rác hình tròn, xóa phiên bản hiện tại |
+| `delete-repeat-last-icon` | Biểu tượng thùng rác hình tròn, xóa phiên bản cuối cùng |
+
+### Tùy chỉnh màu sắc
+
+Định dạng màu sắc giống hệt với `add_repeat`: sử dụng `<#RRGGBB/>` hoặc `RRGGBB-RRGGBB` (nền-văn bản).
+
+### Ví dụ về mẫu đầy đủ
+
+Lần lặp lại sau đây sử dụng `1screen`, nút xóa phiên bản hiện tại hình tròn ở trên cùng và nút thêm có chiều rộng đầy đủ ở dưới cùng:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Thành viên | `1screen` |
+| note | btn_del | Xóa | `delete-repeat-current-icon` |
+| text | member_name | Tên thành viên | |
+| integer | member_age | Tuổi | |
+| note | btn_add | + Thêm thành viên | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## Các phương pháp hay nhất
+
+1. Luôn sử dụng `repeat_count` khi số lần lặp lại được biết trước — nó giúp ngăn các điều tra viên vô tình thêm hoặc xóa các phiên bản.
+2. Giữ các nhóm lặp lại tập trung — một lần lặp lại với hơn 20 câu hỏi cho mỗi phiên bản rất khó điều hướng.
+3. Đặt tên các nhóm lặp lại rõ ràng (ví dụ: `household_members`, không phải `repeat1`) — tên này xuất hiện trong các lệnh gọi hàm và dữ liệu xuất ra.
+4. Kiểm tra với số lượng phiên bản tối đa dự kiến để xác minh hiệu suất.
+5. Sử dụng `1screen` trên `begin_repeat` để hiển thị tất cả các câu hỏi trên một màn hình cho mỗi phiên bản, kết hợp với trường ghi chú `add_repeat` bên trong nhóm để cung cấp cho điều tra viên một nút "Thêm" được dán nhãn rõ ràng.
+
+---
+
+## Hạn chế
+
+- `indexed-repeat()` yêu cầu một chỉ mục hợp lệ (1 đến tổng số phiên bản) — các chỉ mục nằm ngoài phạm vi sẽ trả về giá trị trống.
+- Không nên sử dụng các lần lặp lại lồng nhau vượt quá 2 cấp độ và có thể gây ra sự cố hiển thị trên một số thiết bị khách.
+- Các hàm tổng hợp (`sum`, `count`, v.v.) hoạt động trên toàn bộ nhóm lặp lại — bạn không thể tổng hợp một tập hợp con của các phiên bản nếu không có các biến thể `*-if`.

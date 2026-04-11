@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "Funkcija pulldata() nuskaito reikšmę iš išorinio CSV failo, pridėto prie formos, surasdama rakto stulpelį pagal rakto reikšmę ir grąžindama atitinkamą rezultatų stulpelį."
+---
+
+import { Callout } from 'nextra/components'
+
+Funkcija `pulldata()` nuskaito reikšmę iš CSV failo, pridėto prie formos. Nurodžius failo pavadinimą, stulpelį, kurį norite grąžinti, stulpelį, pagal kurį norite sutapatinti, ir rakto reikšmę, ji grąžina langelį, esantį atitinkamos eilutės ir rezultatų stulpelio sankirtoje.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Pozicija | Parametras | Aprašymas |
+|----------|-----------|-------------|
+| 1 | Failo pavadinimas | CSV medijos failo pavadinimas (tas pats pavadinimas, naudojamas `select_one_from_file`) |
+| 2 | Rezultatų stulpelis | Stulpelis, kurio reikšmę norite grąžinti |
+| 3 | Rakto stulpelis | Stulpelis, su kuriuo reikia lyginti |
+| 4 | Rakto reikšmė | Reikšmė, su kuria reikia lyginti — paprastai nuoroda į lauką, pvz., `${field}` |
+
+Funkcija grąžina tuščią eilutę, jei atitiktis nerandama.
+
+---
+
+## Būtinos sąlygos
+
+CSV failas turi būti pridėtas prie formos kaip **medijos failas**. Tas pats failas, nurodytas `pulldata()`, taip pat gali būti naudojamas kaip `select_one_from_file` pasirinkimų sąrašas.
+
+**CSV pavyzdys — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Pagrindinis pavyzdys
+
+Sužinokite darbuotojo skyrių ir telefono numerį pagal jų ID:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Pasirinkite darbuotoją | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Skyrius: `${dept}` — Telefonas: `${phone}` | |
+
+<Callout type="info">
+Stulpelis `name` `select_one_from_file` CSV faile yra saugoma reikšmė. Kai surašinėtojas pasirenka „Alice“, `${staff_id}` saugo „Alice“, kurią `pulldata()` naudoja kaip raktą jos skyriui ir telefonui gauti.
+</Callout>
+
+---
+
+## Pasirinkto varianto etiketės (label) gavimas
+
+Klausimas `select_one_from_file` saugo `name` reikšmę. Norėdami rodyti žmogui suprantamą `label`, naudokite `pulldata()`, kad ją surastumėte:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Pasirinkite kaimą | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | Pasirinkote: `${village_label}` | |
+
+---
+
+## Kelių reikšmių gavimas iš vieno pasirinkimo
+
+Galite kviesti `pulldata()` kelis kartus tam pačiam failui, kad gautumėte skirtingus stulpelius tai pačiai pasirinktai eilutei:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Pasirinkite įstaigą | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## pulldata naudojimas relevant ir constraint stulpeliuose
+
+`pulldata()` gali būti naudojama `relevant` ir `constraint` stulpeliuose, kad būtų pritaikyta logika, pagrįsta surastomis reikšmėmis:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Pasirinkite įstaigą | | |
+| integer | bed_count | Užimtų lovų skaičius | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## pulldata naudojimas su `once()`
+
+Norėdami, kad `pulldata()` būtų vykdoma tik pirmą kartą įkeliant (užkertant kelią pakartotiniam vertinimui, kai rakto laukas pasikeičia po pirminio įvedimo), apgaubkite ją `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Geriausia praktika
+
+1. Rakto stulpelis CSV faile turi sutapti su `name` stulpeliu, naudojamu `select_one_from_file` — tai turi būti ta pati reikšmė.
+2. Stulpelių pavadinimai CSV faile yra jautrūs raidžių registrui — `Department` ir `department` yra skirtingi stulpeliai.
+3. Jei rakto reikšmė nerandama, `pulldata()` grąžina tuščią eilutę — naudokite `if(${field} != '', pulldata(...), '')`, kad apsisaugotumėte nuo tuščių pasirinkimų.
+4. Jei įmanoma, CSV failai turėtų būti maži — dideli failai padidina formos įkėlimo laiką esant lėtam ryšiui.
+5. Duomenims, kurie keičiasi tarp duomenų rinkimo etapų, atnaujinkite CSV medijos failą įkeldami naują formos versiją.
+
+## Apribojimai
+
+- `pulldata()` atitinka tik **pirmąją** eilutę, kurioje rakto stulpelis lygus rakto reikšmei — pasikartojančios rakto reikšmės CSV faile nepalaikomos.
+- CSV failas turi būti pridėtas prie formos prieš ją diegiant; jo negalima gauti iš URL vykdymo metu.
+- Skaitinės reikšmės, kurias grąžina `pulldata()`, yra eilutės — naudodami aritmetikoje, apgaubkite jas `number()`: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey taip pat palaiko išplėstines `pulldata()` formas, skirtas įrenginio metaduomenims, JWT laukams ir JSON duomenims skaityti. Žr. [App API](../app-api) dėl `pulldata('app-api', ...)` ir [Call API](../advanced-features/call-api) puslapį JSON pagrįstiems paieškos modeliams.
+</Callout>
+
+---
+
+## Išplėstiniai pulldata() variantai
+
+Be CSV paieškos, `pulldata()` palaiko kelis papildomus duomenų šaltinius, pakeičiant pirmąjį argumentą.
+
+### `pulldata('app-api', key)`
+
+Skaityti įrenginio metaduomenis, vartotojo atributus ir programėlės kontekstą. Visą informaciją rasite [App API](../app-api) puslapyje.
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Išanalizuoti JSON eilutę ir išgauti reikšmę naudojant JSONPath išraišką. Naudinga, kai formoje turite įterptą JSON literalą.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Grąžina atitinkamą reikšmę kaip eilutę arba tuščią eilutę, jei nerasta.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Ištraukti reikšmę iš JSON eilutės, saugomos kitame lauke, naudojant JSONPath išraišką. Tai tolygu `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Iškoduoti lauke saugomą JWT žetoną (token) ir grąžinti konkretaus teiginio (claim) reikšmę iš naudingojo krūvio (payload).
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Grąžina tuščią eilutę, jei žetonas neteisingas arba teiginio nėra.
+
+### `pulldata('instanceid')`
+
+Grąžina unikalų dabartinio pateikimo egzemplioriaus ID. Atitinka `instanceID` meta lauką.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Susieti reikšmę su kita naudojant pavadintą susiejimo lentelę, apibrėžtą formos konfigūracijoje.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Grąžina susietą reikšmę arba tuščią eilutę, jei atitiktis nerasta.
+
+### `pulldata('options', optionName)`
+
+Skaityti formos konfigūracijos parinktį pagal pavadinimą.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Vykdyti SQL `SELECT` prieš pridėtą SQLite `.db` failą ir grąžinti reikšmę iš pirmojo stulpelio pirmosios atitinkančios eilutės. Parametrai po SQL eilutės yra paeiliui keičiami į `?` vietos žymeklius.
+
+| Pozicija | Parametras | Aprašymas |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | Literalioji eilutė, identifikuojanti šį variantą |
+| 2 | kelias | Failo kelias `concat(${family_path}, '/file.db::tableName')` formatu |
+| 3 | SQL | `SELECT` sakinys, naudojantis `?` kaip pozicinius vietos žymeklius |
+| 4+ | parametrai | Reikšmės, paeiliui keičiamos į kiekvieną `?` — paprastai nuorodos į laukus, pvz., `${field}` |
+
+Grąžina tuščią eilutę, jei eilutė nerasta.
+
+**Pavyzdys — provincijos pavadinimo paieška pagal ID:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Pavyzdys — apylinkės (ward) pavadinimo paieška, filtruojant pagal provincijos ir rajono kodus:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Skirtingai nuo standartinės keturių argumentų `pulldata()`, kuri CSV faile atitinka vieną rakto stulpelį, `rawquery` variantas vykdo pilną SQL `SELECT` prieš SQLite duomenų bazę, leidžiant naudoti kelių stulpelių `WHERE` sąlygas ir bet kurį stulpelį kaip grąžinamą reikšmę.
+
+<Callout type="info">
+`rawquery` dažnai naudojamas su automatinio užpildymo laukais hierarchinei vietovių paieškai. Žr. [Vietinės duomenų bazės paieška](../advanced-features/local-database-search), jei norite sužinoti daugiau apie `.db` failų kūrimą ir jų prijungimą prie `pulldata('rawquery', ...)`.
+</Callout>

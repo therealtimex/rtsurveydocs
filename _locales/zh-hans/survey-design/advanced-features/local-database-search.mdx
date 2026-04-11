@@ -1,0 +1,224 @@
+---
+title: "本地数据库搜索"
+description: "本地数据库搜索使用原始 SQL 查询捆绑的 SQLite .db 文件，为大型静态数据集实现快速离线自动完成。"
+---
+
+import { Callout } from 'nextra/components'
+
+**本地数据库搜索**允许 `select_one` 或 `text` 字段查询与表单媒体包捆绑在一起的 SQLite `.db` 文件 —— 完全离线，无需服务器往返。当您的选项列表庞大且静态（例如全国村庄列表、卫生设施或行政边界）且无法保证连接性时，这是正确的方法。
+
+| 方法 | 数据源 | 需要连接性 |
+|---|---|---|
+| 本地数据库搜索 (`rawquery`) | 捆绑的 `.db` 文件 (SQLite) | 否 |
+| `search-api()` | 远程 REST API | 是 |
+| `search()` | 捆绑的 CSV 文件 | 否 |
+
+---
+
+## 外观变体
+
+自动完成字段通过 `appearance` 列进行配置。有三种变体可用：
+
+| 变体 | 备注 |
+|---|---|
+| `search-autocomplete-noedit(...)` | 标准自动完成 —— 调查员必须从列表中选择；不保存自由文本输入 |
+| `search-autocomplete-noedit-v2(...)` | 推荐变体 —— 行为相同，但使用更新的渲染引擎，在大型结果集上性能更好 |
+| `search(...)` | 针对捆绑 CSV 的简单文件匹配；**不支持**原始 SQL —— 此处列出仅用于比较 |
+
+<Callout type="info">
+`search-autocomplete-noedit` 是一个别名 —— 在解析时，应用程序会将其替换为内部函数名 `searchAutocompleteNoedit`。在您的 XLSForm 中使用任一拼写均可；两者都有效。
+</Callout>
+
+---
+
+## `rawquery` 数据源
+
+要对 `.db` 文件运行 SQL 查询，请将 `'rawquery'` 作为 appearance 函数的第一个参数传递。完整签名如下：
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### 参数
+
+| 位置 | 参数 | 描述 |
+|---|---|---|
+| 1 | `'rawquery'` | 字面字符串 —— 告诉应用程序直接执行 SQL |
+| 2 | `db_path` | SQLite 文件的路径，格式为 `<dir>/<file>.db::tableName`。打开文件时会剥离 `::tableName` 后缀；表名在 SQL 内部使用 |
+| 3 | `'[display_col]'` | 在下拉列表中显示的列。周围的 `[ ]` 括号在运行时会被剥离 |
+| 4 | `'value_col'` | 调查员做出选择时存储其值的列 |
+| 5 | `'SELECT ...'` | 任何有效的 SQLite SELECT 语句。如果尚未存在 `DISTINCT`，则会自动注入 `SELECT DISTINCT` |
+| 6+ | `param1, ...` | 可选。按顺序绑定到 SQL 中 `?` 占位符的值。如果 SQL 包含 `?` 但未提供参数，则字段返回空值（防止参数缺失的内置保护机制） |
+
+### `db_path` 约定
+
+数据库文件位于表单捆绑的媒体目录中。在运行时，`pulldata('app-api', 'family_path')` 返回该目录路径。有关设置详情，请参见 [family_path](family-path)。标准模式是：
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+当应用程序打开文件时，它会剥离 `::tableName` 部分并使用裸文件路径。表名仅出现在 SQL 内部。
+
+---
+
+## 基本示例 —— 省份查找
+
+由捆绑的 `vnxa3.db` 文件支持的只读省份下拉列表：
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | 省份 | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+`appearance` 列（展开以提高可读性）：
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- 显示的标签来自 `provv` 列。
+- 存储的值来自 `provid` 列。
+- 仅显示 `rta_filter = "1"` 的行。
+
+---
+
+## 参数化查询
+
+在 SQL 中使用 `?` 占位符，并将相应的字段引用作为附加参数传递（从第 6 位开始）。这是级联选择的标准模式 —— 例如，加载属于先前所选省份的区县。
+
+<Callout type="warning">
+如果您的 SQL 包含至少一个 `?` 且未提供参数，则该字段将返回空结果集。这可以防止在进行父级选择之前出现过时或无范围的数据。
+</Callout>
+
+### 区县级联示例
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+`${province}` 的值绑定到第一个 `?`。在调查员选择省份之前，该字段为空。
+
+### 双参数示例 —— 乡镇级联
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+参数按位置绑定：`${province}` → 第一个 `?`，`${district}` → 第二个 `?`。
+
+---
+
+## 用于特殊值的 UNION SELECT
+
+使用 `UNION SELECT` 直接在 SQL 中注入合成行 —— 例如“不知道”或“拒绝回答”：
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Không biết</i>", "888"')
+```
+
+RTSurvey 表单中使用的约定：
+
+| 代码 | 含义 |
+|---|---|
+| `888` | 不知道 |
+| `999` | 拒绝回答 |
+
+显示字符串中的 HTML 标签（如 `<i>`）由应用程序渲染 —— 您可以使用它们来直观地区分特殊选项。
+
+---
+
+## 多语言显示
+
+在不同的列中存储特定语言的标签（例如 `label_vi`, `label_en`），并根据表单中的语言字段选择合适的列：
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+要根据 `${language}` 字段动态切换列，请在显示列参数上使用 `if()` 表达式在语言列之间切换：
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+显示列参数在查询运行前进行评估。只有列名（不含括号）被传递给 SQL 引擎；括号是在解析时剥离的修饰标记。
+</Callout>
+
+---
+
+## 验证真实选择
+
+当字段允许特殊值（如 888 或 999）时，简单的 `required = yes` 检查是不够的 —— 即使调查员选择了“不知道”，它也会被满足。使用 `selected-at(., 0) != -997` 约束来验证存储的值是真实的选定项，而不是内部的“未选择”哨兵值 `-997`：
+
+| column | value |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | 请选择一个有效选项 |
+
+值 `-997` 是 RTSurvey 在尚未从自动完成列表中选择任何项目时存储的内部代码。选择 888 或 999 仍然是一种刻意的选择，并能通过此检查。
+
+要另外要求一个真实（非特殊）值，请扩展约束：
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## 比较：本地数据库与其他搜索方法
+
+| 特性 | `rawquery` 自动完成 | `search-api()` | `search()` CSV | 普通 CSV 选项 |
+|---|---|---|---|---|
+| 数据源 | 捆绑的 `.db` (SQLite) | 远程 REST API | 捆绑的 CSV | Choices 表单页 |
+| 离线工作 | 是 | 否 | 是 | 是 |
+| 支持原始 SQL | 是 | 否 | 否 | 否 |
+| 级联过滤 | 是 —— 参数化 `?` | 通过请求体 | 有限 | 否 |
+| 数据集大小 | 非常大（数百万行） | 无限制（服务器端） | 中等（数万行） | 较小 |
+| 特殊注入行 | 是 —— `UNION SELECT` | 否 | 否 | 是（手动） |
+| 设置复杂度 | 中等 —— 需要捆绑的 `.db` | 高 —— 需要 API 服务器 | 低 | 无 |
+
+---
+
+## 限制
+
+- `.db` 文件必须在部署前捆绑到表单的媒体包中。数据库的动态更新需要重新部署表单。
+- SQL 在设备上按原样执行。没有服务器端清理 —— 避免根据调查员的自由文本输入构建 SQL。
+- 仅支持 `SELECT` 语句。不允许 `INSERT`, `UPDATE` 和 `DELETE`。
+- 非常复杂的查询（大型 `UNION` 链，多个连接）在低端 Android 设备上可能会很慢。
+- `search-autocomplete-noedit` 变体不允许调查员保存不在结果集中的值。如果需要自由文本输入，请使用单独的 `text` 字段。
+- 仅当查询中缺失 `DISTINCT` 时，才会自动注入 `SELECT DISTINCT`。如果您显式编写 `SELECT DISTINCT`，它不会被重复。

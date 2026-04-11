@@ -1,0 +1,104 @@
+---
+title: "Űrlap navigációs vezérlők"
+description: "Használja a SaveFinalizedExit és SaveIncompleteExit megjelenési értékeket olyan stílusos kilépési gombok megjelenítéséhez, amelyek mentik és elhagyják az űrlapot."
+---
+
+Az **űrlap navigációs vezérlők** olyan megjelenési értékek, amelyeket `note` (vagy `text`) mezőkhöz rendelnek, és széles, stílusos gombokként jelennek meg a felmérés alján. Lehetővé teszik a számlálóbiztos számára, hogy egyetlen koppintással mentse a beküldést és kilépjen az űrlapból — akár befejezett (véglegesített) rekordként, akár piszkozatként (befejezetlen rekordként).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Megjelenít egy gombot, amely **véglegesítettként menti a beküldést** és kilép az űrlapból. A gomb felirata a mező `label` oszlopából származik.
+
+| XLSForm column | Érték |
+|----------------|-------|
+| `type` | `note` |
+| `name` | bármilyen egyedi név (pl. `btn_finish`) |
+| `label` | a gombon megjelenő szöveg |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+A beküldés végleges, befejezett rekordként lesz megjelölve. Ez egyenértékű a beépített beküldés gomb megnyomásával.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Megjelenít egy gombot, amely **befejezetlenként (piszkozatként) menti a beküldést** és kilép az űrlapból. A számlálóbiztos később visszatérhet hozzá, és folytathatja a kitöltést.
+
+| XLSForm column | Érték |
+|----------------|-------|
+| `type` | `note` |
+| `name` | bármilyen egyedi név (pl. `btn_pause`) |
+| `label` | a gombon megjelenő szöveg |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Színszintaxis
+
+Mindkét megjelenés elfogad egy beágyazott színt `<#RRGGBB/>` formátumban:
+
+- `#` szimbólumot pontosan **6 hexadecimális számjegy** követ (nagy- vagy kisbetűvel)
+- A záró `/>` **kötelező** — elhagyása megszakítja az elemzést
+- Példa: `<#04B404/>` (zöld), `<#EDC602/>` (borostyán), `<#D9534F/>` (vörös)
+
+A szín a gomb hátterét vezérli. A szöveg színét az alkalmazás automatikusan határozza meg.
+
+---
+
+## Példa
+
+Az űrlap végén elhelyezett következő két mező egy zöld **Beküldés** gombot és egy borostyánsárga **Mentés piszkozatként** gombot hoz létre:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Beküldés | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Mentés piszkozatként | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — gombok kihagyása a tartalomjegyzékből
+
+A `toc-hide` megjelenési token arra utasítja az rtSurvey-t, hogy hagyjon ki egy mezőt az űrlap **tartalomjegyzékéből** (a kérdések áttekintő listájából). A navigációs gombok nem kérdések, ezért soha nem szabad megjelenniük a tartalomjegyzékben.
+
+Mindig fűzze a `toc-hide` tokent a kilépési megjelenés után:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+A tartalomjegyzék elrejtésével kapcsolatos hivatkozást lásd: [Megjelenés — toc-hide](../appearance#group-and-navigation).
+
+---
+
+## Elhelyezési szabályok
+
+Kövesse ezeket a szabályokat a navigációs vezérlők űrlaphoz való hozzáadásakor:
+
+- Helyezze mindkét gombot az űrlap **legvégére**, az összes kérdés és csoport után.
+- Mindig **mindkét** gombot szerepeltesse együtt — egy véglegesítettet és egy befejezetlent —, hogy a számlálóbiztosnak a befejezettségi állapottól függetlenül mindig legyen lehetősége a kilépésre.
+- Használja a `relevant` oszlopot a véglegesített kilépés gombon, ha a beküldést csak bizonyos feltételek teljesülése esetén (pl. egy kötelező szakasz befejezése) szabad engedélyezni. A befejezetlen kilépés gombnak általában **mindig láthatónak** kell maradnia.
+
+---
+
+## Feltételes véglegesített kilépés
+
+Használja a `relevant` oszlopot annak szabályozására, hogy mikor jelenjen meg a véglegesített kilépés gomb. A befejezetlen kilépésnek feltétel nélkül láthatónak kell maradnia, hogy a számlálóbiztos bármikor megállhasson és visszatérhessen.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Beküldés | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Mentés piszkozatként | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Ebben a példában a **Beküldés** gomb csak akkor jelenik meg, ha a számlálóbiztos megadta a beleegyezését, és az A szakaszt befejezettnek jelölte. A **Mentés piszkozatként** gomb mindig elérhető.
+
+---
+
+## Korlátozások
+
+- **A mező típusának `note` vagy `text` kell lennie.** Ezen megjelenések használata bármely más kérdéstípuson nem támogatott.
+- **Csak 6 számjegyű hexadecimális kód.** A rövidített hexadecimális kód (`<#FFF/>`) és a megnevezett színek nem támogatottak — mindig a teljes 6 számjegyű formátumot használja (pl. `<#FFFFFF/>`).
+- **A label oszlop a gomb szövege.** A `hint` oszlopot a rendszer figyelmen kívül hagyja ezeknél a mezőknél; csak a `label` jelenik meg.
+- **Mindkettő gombnak jelen kell lennie.** A befejezetlen kilépés gomb elhagyása esetén a számlálóbiztosnak nem marad lehetősége a megállásra az űrlap kitöltése közben.

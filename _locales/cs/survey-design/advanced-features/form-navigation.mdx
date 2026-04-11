@@ -1,0 +1,104 @@
+---
+title: "Navigační prvky formuláře"
+description: "Použijte hodnoty vzhledu SaveFinalizedExit a SaveIncompleteExit k vykreslení stylovaných tlačítek pro ukončení, která uloží a opustí formulář."
+---
+
+**Navigační prvky formuláře** jsou hodnoty vzhledu umístěné v polích typu `note` (nebo `text`), které se vykreslují jako stylovaná tlačítka na celou šířku v dolní části průzkumu. Umožňují tazateli uložit odeslání a opustit formulář jedním klepnutím — buď jako dokončený (finalizovaný) záznam, nebo jako koncept (nedokončený) záznam.
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Vykreslí tlačítko, které **uloží odeslání jako finalizované** a ukončí formulář. Štítek tlačítka je převzat ze sloupce `label` daného pole.
+
+| XLSForm column | Hodnota |
+|----------------|-------|
+| `type` | `note` |
+| `name` | jakýkoli jedinečný název (např. `btn_finish`) |
+| `label` | text zobrazený na tlačítku |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Odeslání je označeno jako finální, kompletní záznam. To odpovídá klepnutí na vestavěné tlačítko odeslat.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Vykreslí tlačítko, které **uloží odeslání jako nedokončené (koncept)** a ukončí formulář. Tazatel se k němu může později vrátit a pokračovat v vyplňování.
+
+| XLSForm column | Hodnota |
+|----------------|-------|
+| `type` | `note` |
+| `name` | jakýkoli jedinečný název (např. `btn_pause`) |
+| `label` | text zobrazený na tlačítku |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Barevná syntaxe
+
+Oba vzhledy přijímají vloženou barvu ve formátu `<#RRGGBB/>`:
+
+- `#` následovaný přesně **6 hexadecimálními číslicemi** (velká nebo malá písmena)
+- Uzavírací `/>` je **vyžadováno** — jeho vynechání přeruší analýzu
+- Příklad: `<#04B404/>` (zelená), `<#EDC602/>` (jantarová), `<#D9534F/>` (červená)
+
+Barva ovládá pozadí tlačítka. Barva textu je určena automaticky aplikací.
+
+---
+
+## Příklad
+
+Následující dvě pole umístěná na konci formuláře vytvoří zelené tlačítko **Odeslat** a jantarové tlačítko **Uložit jako koncept**:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Odeslat | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Uložit jako koncept | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — vyloučení tlačítek z obsahu
+
+Token vzhledu `toc-hide` říká rtSurvey, aby vyloučil pole z **obsahu** formuláře (přehledového seznamu otázek). Navigační tlačítka nejsou otázky, takže by se nikdy neměla objevit v obsahu.
+
+Vždy připojte `toc-hide` za vzhled pro ukončení:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Viz [Vzhled — toc-hide](../appearance#group-and-navigation) pro referenci toc-hide.
+
+---
+
+## Konvence umístění
+
+Při přidávání navigačních prvků do formuláře dodržujte tyto konvence:
+
+- Umístěte obě tlačítka na **úplný konec** formuláře, za všechny otázky a skupiny.
+- Vždy zahrňte **obě** tlačítka společně — jedno finalizované a jedno nedokončené — aby tazatel měl vždy možnost ukončení bez ohledu na stav dokončení.
+- Použijte sloupec `relevant` u tlačítka pro finalizované ukončení, pokud by odeslání mělo být povoleno pouze při splnění určitých podmínek (např. dokončení povinné sekce). Tlačítko pro nedokončené ukončení by mělo obecně zůstat **vždy viditelné**.
+
+---
+
+## Podmíněné finalizované ukončení
+
+Použijte sloupec `relevant` k ovládání toho, kdy se zobrazí tlačítko pro finalizované ukončení. Nedokončené ukončení by mělo zůstat bezpodmínečně viditelné, aby tazatel mohl vždy přerušit a vrátit se.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Odeslat | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Uložit jako koncept | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+V tomto příkladu se tlačítko **Odeslat** zobrazí pouze tehdy, když tazatel udělil souhlas a označil sekci A jako dokončenou. Tlačítko **Uložit jako koncept** je k dispozici vždy.
+
+---
+
+## Omezení
+
+- **Typ pole musí být `note` nebo `text`.** Použití těchto vzhledů u jakéhokoli jiného typu otázky není podporováno.
+- **Pouze 6místný hex kód.** Zkrácený hex kód (`<#FFF/>`) a pojmenované barvy nejsou podporovány — vždy používejte plný 6místný formát (např. `<#FFFFFF/>`).
+- **Sloupec label je text tlačítka.** Sloupec `hint` je u těchto polí ignorován; vykresluje se pouze `label`.
+- **Měla by být přítomna obě tlačítka.** Vynechání tlačítka pro nedokončené ukončení ponechává tazatele bez možnosti přerušení uprostřed formuláře.

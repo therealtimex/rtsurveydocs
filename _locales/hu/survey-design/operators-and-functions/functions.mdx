@@ -5,107 +5,114 @@ description: ""
 
 import { Callout } from 'nextra/components'
 
-### Karakterlánc-függvények
+### Karakterlánc (string) függvények
 
 <Callout type="warning">
-Amikor kifejezéseken belül karakterláncokkal dolgozik, fontos az egyszeres idézőjelek ('') használata az irodalmi karakterláncok körülzárásához. Kivétel azonban, ha egyszeres idézőjeleket szeretne beleilleszteni egy irodalmi karakterláncba. Ilyen esetekben kettős idézőjeleket ("") használhat a teljes karakterlánc körülzárásához.
+Amikor karakterláncokkal dolgozik kifejezéseken belül, fontos, hogy egyszeres idézőjeleket ('') használjon a literális karakterláncok bezárásához. Kivételt képez azonban, ha egyszeres idézőjelet szeretne szerepeltetni egy literális karakterláncon belül. Ilyen esetekben használhat kettős idézőjelet ("") a teljes karakterlánc bezárásához.
 
 Például:
-- Helyes: if(`${yesno}` = 1, "egy 'egyszeres idézőjeleket' tartalmazó karakterlánc", "itt nincsenek egyszeres idézőjelek")
-- Helytelen: if(`${yesno}` = 1, 'egy 'egyszeres idézőjeleket' tartalmazó karakterlánc', 'itt nincsenek egyszeres idézőjelek')
+- Helyes: if(`${yesno}` = 1, "a string with 'single quotes' in it", "no single quotes here")
+- Helytelen: if(`${yesno}` = 1, 'a string with 'single quotes' in it', 'no single quotes here')
 
-Az okos idézőjelek vonatkozásában fontos tudni, hogy azok problémákat okozhatnak a kifejezésekben. Sok szövegszerkesztő automatikusan konvertálja az egyenes idézőjeleket ("" vagy '') okos idézőjelekre vagy görbe idézőjelekre ("" vagy ''), ami szintaktikai hibákat vagy váratlan viselkedést okozhat. Ennek elkerülése érdekében győződjön meg arról, hogy következetesen egyenes idézőjeleket ('') használ a kifejezéseiben.
+Ami az „okos” idézőjeleket (smart quotes) illeti, kulcsfontosságú tudatában lenni jelenlétüknek, mivel problémákat okozhatnak a kifejezésekben. Sok szövegszerkesztő automatikusan átalakítja az egyenes idézőjeleket ("" vagy '') okos idézőjelekké vagy göndör idézőjelekké („” vagy ‘’), ami szintaktikai hibákhoz vagy váratlan viselkedéshez vezethet. Ennek elkerülése érdekében győződjön meg arról, hogy következetesen egyenes idézőjeleket ('') használ a kifejezéseiben.
+
+Kérjük, tudassa velünk, ha további kérdése van, vagy további segítségre van szüksége!
 </Callout>
 
 Az rtSurvey különféle függvényeket támogat, többek között:
 
-1. `string(mező)`: Karakterlánccá alakítja a mezőt.
-   - Példa: `string(34.8)` `'34.8'` értékre konvertálódik.
+1. `string(field)`: Egy mezőt karakterlánccá alakít.
+   - Példa: `string(34.8)` átalakítva `'34.8'` lesz.
 
-2. `string-length(mező)`: Visszaadja a karakterlánc-mező hosszát.
-   - Példa: `string-length(.) > 3 and string-length(.) < 10` biztosítja, hogy az aktuális mező 3 és 10 karakter között legyen.
+2. `string-length(field)`: Visszaadja egy karakterlánc mező hosszát.
+   - Példa: `string-length(.) > 3 and string-length(.) < 10` használható annak biztosítására, hogy az aktuális mező 3 és 10 karakter között legyen.
+   - **Kaszkád függőségi minta**: A `string-length(${province}) >= 0` mindig `true`-ra értékelődik, de arra kényszeríti az rtSurvey-t, hogy újraértékelje a kifejezést, amikor a `${province}` értéke megváltozik. Használja ezt a `relevant` oszlopban a kaszkád frissítés aktiválásához, ha egy szülő mező frissül:
+     | type | name | relevant |
+     |------|------|----------|
+     | select_one | district | `string-length(${province}) >= 0` |
+     Ez biztosítja, hogy a körzet (district) kérdés újraértékelje a `search()` vagy `rawquery` megjelenését (appearance), amikor a tartomány (province) megváltozik.
 
-3. `substr(mezőVagyKarakterlánc, kezdőIndex, végIndex)`: Alszövegláncot ad vissza a `kezdőIndex`-től a `végIndex` előttig. Az indexek 0-tól számozódnak.
+3. `substr(fieldorstring, startindex, endindex)`: Visszaad egy részstringet, amely a `startindex` helyen kezdődik és közvetlenül az `endindex` előtt végződik. Az indexek 0-val kezdődnek a karakterlánc első karakterénél.
    - Példa: `substr(${phone}, 0, 3)` a telefonszám első három számjegyét adja vissza.
 
-4. `concat(a, b, c, ...)`: Mezőket (és/vagy karakterláncokat) fűz össze.
-   - Példa: `concat(${firstname}, ' ', ${lastname})` teljes nevet ad vissza az `utónév` és `vezetéknév` mezők kombinálásával.
+4. `concat(a, b, c, ...)`: Összefűzi a mezőket (és/vagy karakterláncokat).
+   - Példa: `concat(${firstname}, ' ', ${lastname})` egy teljes nevet ad vissza a `firstname` és `lastname` mezők értékeinek kombinálásával.
 
-5. `linebreak()`: Sortörés karaktert ad vissza.
-   - Példa: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` három mező értékét adja vissza sortörésekkel elválasztva.
+5. `linebreak()`: Soremelés karaktert ad vissza.
+   - Példa: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` három mezőérték listáját adja vissza, köztük soremelésekkel.
 
-6. `lower()`: Karakterláncot kisbetűssé alakítja.
-   - Példa: `lower('Utca neve')` "utca neve" értéket ad vissza.
+6. `lower()`: Egy karakterláncot csupa kisbetűssé alakít.
+   - Példa: `lower('Street Name')` eredménye "street name" lesz.
 
-7. `upper()`: Karakterláncot nagybetűssé alakítja.
-   - Példa: `upper('Utca neve')` "UTCA NEVE" értéket ad vissza.
+7. `upper()`: Egy karakterláncot csupa nagybetűssé alakít.
+   - Példa: `upper('Street Name')` eredménye "STREET NAME" lesz.
 
 ### select_one és select_multiple függvények
 
-1. `count-selected(mező)`: Visszaadja a select_multiple mezőben kiválasztott elemek számát.
-   - Példa: `count-selected(.) = 3` korlátként biztosítja, hogy pontosan három lehetőség legyen kiválasztva.
+1. `count-selected(field)`: Visszaadja a select_multiple mezőben kiválasztott elemek számát.
+   - Példa: `count-selected(.) = 3` korlátozási (constraint) kifejezésként használható annak biztosítására, hogy pontosan három választás legyen kijelölve.
 
-2. `selected(mező, érték)`: Igaz vagy hamis értéket ad vissza attól függően, hogy a megadott érték ki van-e választva.
-   - Példa: `selected(${color}, 'Blue')` relevanciakifejezésként csak akkor jelenít meg egy csoportot, ha a válaszadó "Kéket" választott.
-   - Megjegyzés: A második paraméter mindig a lehetőség értékét adja meg, nem a feliratot. Használja a choices munkalap value oszlopának értékét.
+2. `selected(field, value)`: Igaz vagy hamis értéket ad vissza attól függően, hogy a megadott érték ki lett-e választva a select_one vagy select_multiple mezőben.
+   - Példa: `selected(${color}, 'Blue')` relevanciakifejezésként használható egy csoport vagy mező megjelenítéséhez csak akkor, ha a válaszadó a „Blue”-t jelölte meg kedvenc színeként.
+   - Megjegyzés: A második paraméternek mindig a választási értéket (choice value) kell megadnia, nem a választási címkét (choice label). Használja az űrlapdefiníció choices munkalapjának value oszlopából származó értéket.
 
-3. `selected-at(mező, szám)`: Visszaadja a select_multiple mezőben a megadott pozíción lévő kiválasztott elemet. A 0 az első kiválasztott elemet adja vissza, az 1 a másodikat, stb.
-   - Példa: `selected-at(${fruits}, 0) = 'Apple'` relevanciakifejezésként csak akkor jelenít meg egy csoportot, ha az első kiválasztott lehetőség "Apple".
-   - Megjegyzés: A visszaadott érték a lehetőség értéke, nem a felirata.
+3. `selected-at(field, number)`: Visszaadja a kiválasztott elemet a megadott pozícióban egy select_multiple mezőben. Ha a megadott szám 0, az első kiválasztott elemet adja vissza; ha a szám 1, a másodikat, és így tovább.
+   - Példa: `selected-at(${fruits}, 0) = 'Apple'` relevanciakifejezésként használható egy csoport vagy mező megjelenítéséhez csak akkor, ha az elsőként kiválasztott lehetőség az „Apple”.
+   - Megjegyzés: A visszakapott érték a választási érték lesz, nem a választási címke. Használja az űrlapdefiníció choices munkalapjának value oszlopából származó értéket.
 
-4. `choice-label(mező, érték)`: Visszaadja egy select_one vagy select_multiple mező lehetőségének feliratát.
-   - 1. példa: `choice-label(${country}, ${country})` visszaadja az aktuálisan kiválasztott lehetőség feliratát a `country` nevű mezőben.
-   - 2. példa: `choice-label(${languages}, selected-at(${languages}, 0))` visszaadja az első kiválasztott lehetőség feliratát a `languages` mezőben.
-   - Megjegyzés: Ez a függvény a lehetőség feliratát adja vissza, nem az értékét.
+4. `choice-label(field, value)`: Visszaadja egy select_one vagy select_multiple mezőválasztás címkéjét, ahogy az az űrlapdefiníció choices munkalapján meg van határozva.
+   - 1. példa: `choice-label(${country}, ${country})` visszaadja a jelenleg kiválasztott választási címkét a `country` nevű mezőben.
+   - 2. példa: `choice-label(${languages}, selected-at(${languages}, 0))` visszaadja az elsőként kiválasztott választás címkéjét a `languages` nevű mezőben.
+   - Megjegyzés: Ez a függvény a választási címkét kéri le, nem az értéket. Az űrlapdefiníció choices munkalapjának label oszlopát használja.
 
-### Ismétlődő mezők függvényei
+### Ismételt mező (repeated field) függvények
 
-Az rtSurvey-ben, ha ugyanazt a kérdést többször szeretné feltenni, elhelyezhet egy mezőt egy ismétlőcsoportban. Az alábbi függvények segítenek kezelni az ilyen ismétlődő mezőket és adatokat.
+Az rtSurvey-ben, ha ugyanazt a kérdést többször szeretné feltenni, egy mezőt egy ismétlődő csoportba (repeat group) helyezhet. Ez ugyanazon mező több példányát eredményezi. A következő függvények segíthetnek ezeknek az ismételt mezőknek és az általuk létrehozott ismétlődő adatoknak a kezelésében. További részletekért tekintse meg az ismétlődő mezőkről szóló súgótémakört.
 
-1. `join(elválasztó, ismétlődőMező)`: Ismétlőcsoporton belüli mező esetén karakterlánccal elválasztott listát generál az értékekből.
-   - Példa: `join(', ', ${member_name})` vesszővel elválasztott listát generál az összes megadott névből.
+1. `join(string, repeatedfield)`: Egy ismétlődő csoporton belüli mezőhöz karakterlánccal elválasztott értéklistát generál. Az első paraméter határozza meg az értékek elválasztásához használt határolójelet.
+   - Példa: `join(', ', ${member_name})` egyetlen vesszővel elválasztott listát generál az összes beírt névből.
 
-2. `join-if(elválasztó, ismétlődőMező, kifejezés)`: Ugyanúgy működik, mint a `join()`, de megvizsgálja az egyes példányokat a megadott kifejezéssel. Ha a kifejezés hamis, az elem kimarad.
-   - Példa: `join-if(', ', ${member_name}, ${age} >= 18)` felnőtt tagok neveiből álló listát generál.
+2. `join-if(string, repeatedfield, expression)`: Pontosan úgy működik, mint a `join()`, azzal a különbséggel, hogy a megadott kifejezés segítségével ellenőrzi az ismétlődő csoport minden egyes példányát. Ha a kifejezés értéke hamis, az elem kimarad a kimenetből.
+   - Példa: `join-if(', ', ${member_name}, ${age} >= 18)` vesszővel elválasztott listát generál csak a felnőtt tagok neveiből (azokéból, akiknek az életkora 18 év vagy annál több).
 
-3. `count(ismétlőcsoport)`: Visszaadja az ismétlőcsoport aktuális ismétlésszámát.
-   - Példa: `count(${groupname})` a csoport példányainak számát adja vissza.
+3. `count(repeatgroup)`: Visszaadja, hogy egy ismétlődő csoport jelenleg hányszor ismétlődött meg.
+   - Példa: `count(${groupname})` visszaadja a csoport példányainak számát.
 
-4. `count-if(ismétlőcsoport, kifejezés)`: Ugyanúgy működik, mint a `count()`, de csak a feltételt teljesítő példányokat számolja.
-   - Példa: `count-if(${members}, ${age} >= 18)` felnőtt tagok számát adja vissza.
+4. `count-if(repeatgroup, expression)`: Pontosan úgy működik, mint a `count()`, azzal a különbséggel, hogy a megadott kifejezés segítségével ellenőrzi az ismétlődő csoport minden egyes példányát. Ha a kifejezés értéke hamis, az elem kimarad a számlálásból.
+   - Példa: `count-if(${members}, ${age} >= 18)` visszaadja a felnőtt tagok számát a "members" ismétlődő csoporton belüli age mező alapján.
 
-5. `sum(ismétlődőMező)`: Ismétlőcsoporton belüli mező esetén kiszámítja az összes érték összegét.
-   - Példa: `sum(${loan_amount})` az összes kölcsön összértékét adja vissza.
+5. `sum(repeatedfield)`: Egy ismétlődő csoporton belüli mezőhöz kiszámítja az összes érték összegét.
+   - Példa: `sum(${loan_amount})` visszaadja az összes kölcsön összértékét.
 
-6. `sum-if(ismétlődőMező, kifejezés)`: Ugyanúgy működik, mint a `sum()`, de csak a feltételt teljesítő példányokat összegzi.
-   - Példa: `sum-if(${loan_amount}, ${loan_amount} > 500)` az 500 feletti kölcsönök összértékét adja vissza.
+6. `sum-if(repeatedfield, expression)`: Pontosan úgy működik, mint a `sum()`, azzal a különbséggel, hogy a megadott kifejezés segítségével ellenőrzi az ismétlődő csoport minden egyes példányát. Ha a kifejezés értéke hamis, az elem kimarad az összegzésből.
+   - Példa: `sum-if(${loan_amount}, ${loan_amount} > 500)` visszaadja az összes 500 feletti kölcsön összértékét. A kisebb kölcsönöket figyelmen kívül hagyja.
 
-7. `min(ismétlődőMező)`: Ismétlőcsoporton belüli mező esetén kiszámítja az összes érték minimumát.
-   - Példa: `min(${member_age})` a legfiatalabb tag korát adja vissza.
+7. `min(repeatedfield)`: Egy ismétlődő csoporton belüli mezőhöz kiszámítja az összes érték minimumát.
+   - Példa: `min(${member_age})` visszaadja a csoport legfiatalabb tagjának életkorát.
 
-8. `min-if(ismétlődőMező, kifejezés)`: Ugyanúgy működik, mint a `min()`, de csak a feltételt teljesítő példányokkal.
-   - Példa: `min-if(${member_age}, ${member_age} >= 18)` a legfiatalabb felnőtt tag korát adja vissza.
+8. `min-if(repeatedfield, expression)`: Pontosan úgy működik, mint a `min()`, azzal a különbséggel, hogy a megadott kifejezés segítségével ellenőrzi az ismétlődő csoport minden egyes példányát. Ha a kifejezés értéke hamis, az elem kimarad a minimumszámításból.
+   - Példa: `min-if(${member_age}, ${member_age} >= 18)` visszaadja a csoport legfiatalabb felnőttjének életkorát. A 18 évnél fiatalabbakat figyelmen kívül hagyja.
 
-9. `max(ismétlődőMező)`: Ismétlőcsoporton belüli mező esetén kiszámítja az összes érték maximumát.
-   - Példa: `max(${member_age})` a legidősebb tag korát adja vissza.
+9. `max(repeatedfield)`: Egy ismétlődő csoporton belüli mezőhöz kiszámítja az összes érték maximumát.
+   - Példa: `max(${member_age})` visszaadja a csoport legidősebb tagjának életkorát.
 
-10. `max-if(ismétlődőMező, kifejezés)`: Ugyanúgy működik, mint a `max()`, de csak a feltételt teljesítő példányokkal.
-    - Példa: `max-if(${member_age}, ${member_age} >= 18)` a legidősebb felnőtt tag korát adja vissza.
+10. `max-if(repeatedfield, expression)`: Pontosan úgy működik, mint a `max()`, azzal a különbséggel, hogy a megadott kifejezés segítségével ellenőrzi az ismétlődő csoport minden egyes példányát. Ha a kifejezés értéke hamis, az elem kimarad a maximumszámításból.
+    - Példa: `max-if(${member_age}, ${member_age} >= 18)` visszaadja a csoport legidősebb felnőttjének életkorát. A 18 évnél fiatalabbakat figyelmen kívül hagyja.
 
-11. `index()`: Ismétlőcsoporton belül hívva visszaadja az aktuális csoport vagy példány indexszámát.
-    - Példa: `index()` ismétlőcsoporton belül az első példánynál 1-et, a másodiknál 2-t ad vissza, stb.
+11. `index()`: Egy ismétlődő csoporton belül meghívva visszaadja az aktuális csoport vagy példány indexszámát.
+    - Példa: Az `index()` ismétlődő csoporton belül használva az első példányra 1-et, a másodikra 2-t ad vissza, és így tovább.
 
-12. `indexed-repeat(ismétlődőMező, ismétlőcsoport, index)`: Hivatkozik ismétlőcsoporton belüli mezőre annak kívülről. Az első paraméter adja meg az ismétlődő mezőt vagy csoportot, a második az ismétlőcsoportot, a harmadik a sorszámot.
-    - 1. példa: `indexed-repeat(${name}, ${names}, 1)` visszaadja az első nevet, ha a name mező egy "names" nevű korábbi ismétlőcsoportban van.
-    - 2. példa: `indexed-repeat(${name}, ${names}, index())` a neve-t adja vissza az aktuális ismétlőcsoport-példányszámnak megfelelő indexszel.
+12. `indexed-repeat(repeatedfield, repeatgroup, index)`: Az ismétlődő csoporton kívülről hivatkozik egy azon belüli mezőre vagy csoportra. Az első paraméter a kérdéses ismételt mezőt vagy csoportot határozza meg, a második az ismétlődő csoportot, amelyben a mező vagy csoport található, a harmadik pedig az ismétlődő csoporton belüli példányszámot, amelyet használni kell.
+    - 1. példa: `indexed-repeat(${name}, ${names}, 1)` visszaadja az első elérhető nevet, ha a name mező egy korábbi, "names" nevű ismétlődő csoporton belül van.
+    - 2. példa: `indexed-repeat(${name}, ${names}, index())` lekéri az aktuális ismétlődő csoport példányszámának megfelelő nevet.
 
-13. `rank-index(index, ismétlődőMező)`: Kiszámítja az ismétlődő mező megadott példányának sorrendi rangját az ismétlőcsoporton kívüli használathoz. Az 1-es rang a legmagasabb értékű példányhoz, a 2-es a következő legmagasabb értékűhöz rendelődik, stb.
-    - Példa: `rank-index(1, ${random_draw})` kiszámítja az első példány rangját a `random_draw` mező értéke alapján a többi példányhoz képest.
+13. `rank-index(index, repeatedfield)`: Ez a függvény kiszámítja egy ismételt mező megadott példányának sorszámát az ismétlődő csoporton kívüli használatra. Az 1-es rangot a legmagasabb értékű példány kapja, a 2-est a következő legmagasabb, és így tovább. Ha érvénytelen indexet vagy nem numerikus értékű példány indexét adja meg, 999-es rangot ad vissza.
+    - Példa: `rank-index(1, ${random_draw})` kiszámítja az első példány rangját a `random_draw` mezőjének értéke alapján, összehasonlítva a többi példány értékével.
 
-14. `rank-index-if(index, ismétlődőMező, kifejezés)`: Hasonlóan működik, mint a `rank-index()`, de megvizsgálja az egyes példányokat a megadott kifejezéssel. Ha a kifejezés hamis, az elem kihagyódik. Ha a feltétel miatt kihagyott példányhoz ad meg indexet, érvénytelen indexnek számít, és 999-es rang kerül visszaadásra.
-    - Példa: `rank-index-if(1, ${age}, ${age} >= 18)` kiszámítja a kor rangját a felnőttek körében, csak a 18 évesnél idősebb példányokat figyelembe véve.
+14. `rank-index-if(index, repeatedfield, expression)`: Ez a függvény a `rank-index()`-hez hasonlóan működik, de a megadott kifejezés segítségével ellenőrzi az ismételt mező ismétlődő csoportjának minden példányát. Ha a kifejezés értéke hamis, az elem kimarad a számításból. A használt index a példányok teljes készletén alapul a kifejezés értékelése előtt. Ha olyan példány indexét adja meg, amelyet a kifejezés nem teljesítése miatt figyelmen kívül hagyott, az érvénytelen indexnek minősül, és 999-es rangot ad vissza.
+    - Példa: `rank-index-if(1, ${age}, ${age} >= 18)` kiszámítja az életkori rangot a felnőttek körében, csak azokat a példányokat figyelembe véve, ahol az életkor legalább 18 év.
 
-### Numerikus függvények
+### Számfüggvények
 
 | Operátor | Művelet | Példa | Példa válasz |
 |----------|-----------|---------|----------------|
@@ -113,199 +120,216 @@ Az rtSurvey-ben, ha ugyanazt a kérdést többször szeretné feltenni, elhelyez
 | `-` | Kivonás | 3 - 2 | 1 |
 | `*` | Szorzás | 3 * 2 | 6 |
 | `div` | Osztás | 10 div 2 | 5 |
-| `mod` | Modulus | 9 mod 2 | 1 |
+| `mod` | Maradékos osztás | 9 mod 2 | 1 |
 
-Az rtSurvey numerikus függvényeket is támogat, többek között:
-- `number(mező)`: Számmá alakítja a mező értékét.
+Az rtSurvey támogatja a számfüggvényeket, többek között:
+- `number(field)`: A mező értékét számmá alakítja.
   - Példa: `number('34.8')` = 34.8
 
-- `int(mező)`: Egésszé alakítja a mező értékét.
+- `int(field)`: A mező értékét egésszé alakítja.
   - Példa: `int('39.2')` = 39
 
-- `min(mező1, ..., mezőx)`: Visszaadja a megadott mezők minimális értékét.
-  - Példa: `min(${father_age}, ${mother_age})` az apa vagy anya korát adja vissza, amelyik kisebb.
+- `min(field1, ..., fieldx)`: Visszaadja a minimális értéket az átadott mezők közül.
+  - Példa: `min(${father_age}, ${mother_age})` az anya vagy az apa életkorát adja vissza, amelyik kisebb.
 
-- `max(mező1, ..., mezőx)`: Visszaadja a megadott mezők maximális értékét.
-  - Példa: `max(${father_age}, ${mother_age})` az apa vagy anya korát adja vissza, amelyik nagyobb.
+- `max(field1, ..., fieldx)`: Visszaadja a maximális értéket az átadott mezők közül.
+  - Példa: `max(${father_age}, ${mother_age})` az anya vagy az apa életkorát adja vissza, amelyik nagyobb.
 
-- `format-number(mező)`: A felhasználó területi beállításainak megfelelően formázza az egész szám vagy tizedes érték mezőt.
-  - Példa: `format-number(${income})` a "120000" értéket "120 000" formában formázhatja.
+- `format-number(field)`: Egy egész vagy tizedes mező értékét formázza a felhasználó területi beállításainak megfelelően.
+  - Példa: `format-number(${income})` Ez a kifejezés a "120000" értéket "120,000" formátumban jelenítheti meg.
 
-- `round(mező, számjegyek)`: A numerikus mező értékét a megadott tizedesjegy-számra kerekíti.
+- `round(field, digits)`: A numerikus mező értékét a megadott számú tizedesjegyre kerekíti.
   - Példa: `round(${interest_rate}, 2)`
 
-- `abs(szám)`: Visszaadja egy szám abszolút értékét.
+- `abs(number)`: Egy szám abszolút értékét adja vissza.
+  
+- `pow(base, exponent)`: Az első paraméter értékét a második paraméter hatványára emelve adja vissza.
+  - Minden paraméter lehet mező, szám vagy kifejezés.
 
-- `pow(alap, kitevő)`: Visszaadja az első paraméter értékét a második paraméter hatványán emelve.
+- `log10(fieldorvalue)`: Visszaadja az átadott mező vagy érték tízes alapú logaritmusát.
 
-- `log10(mezőVagyÉrték)`: Visszaadja a mező vagy érték tízes alapú logaritmusát.
+- `sin(fieldorvalue)`: Visszaadja az átadott mező vagy érték szinuszát radiánban kifejezve.
+  
+- `cos(fieldorvalue)`: Visszaadja az átadott mező vagy érték koszinuszát radiánban kifejezve.
 
-- `sin(mezőVagyÉrték)`: Visszaadja a mező vagy érték szinuszát, radiánban kifejezve.
+- `tan(fieldorvalue)`: Visszaadja az átadott mező vagy érték tangensét radiánban kifejezve.
 
-- `cos(mezőVagyÉrték)`: Visszaadja a mező vagy érték koszinuszát, radiánban kifejezve.
+- `asin(fieldorvalue)`: Visszaadja az átadott mező vagy érték arkusz szinuszát radiánban kifejezve.
 
-- `tan(mezőVagyÉrték)`: Visszaadja a mező vagy érték tangesét, radiánban kifejezve.
+- `acos(fieldorvalue)`: Visszaadja az átadott mező vagy érték arkusz koszinuszát radiánban kifejezve.
 
-- `asin(mezőVagyÉrték)`: Visszaadja a mező vagy érték arkszinuszát, radiánban kifejezve.
+- `atan(fieldorvalue)`: Visszaadja az átadott mező vagy érték arkusz tangensét radiánban kifejezve.
 
-- `acos(mezőVagyÉrték)`: Visszaadja a mező vagy érték arkkoszinuszát, radiánban kifejezve.
+- `atan2(x, y)`: Visszaadja radiánban azt a szöget, amelyet az (x, y) koordinátájú pont és a pozitív x-tengely az origónál bezár. Az eredmény a -pi() és pi() közötti tartományba esik.
 
-- `atan(mezőVagyÉrték)`: Visszaadja a mező vagy érték arktangensét, radiánban kifejezve.
+- `sqrt(fieldorvalue)`: Visszaadja az átadott mező vagy érték nem negatív négyzetgyökét.
 
-- `atan2(x, y)`: Visszaadja a (x, y) koordinátájú pont és a pozitív x-tengely által bezárt szöget radiánban. Az eredmény -pi() és pi() közé esik.
-
-- `sqrt(mezőVagyÉrték)`: Visszaadja a mező vagy érték nemnegatív négyzetgyökét.
-
-- `exp(x)`: Visszaadja az e^x értékét.
+- `exp(x)`: Visszaadja az e^x értéket.
 
 - `pi()`: Visszaadja a pi értékét.
 
 ### Dátum és idő függvények
 
 <Callout type="warning">
-Az rtSurvey-ben a dátumértékek `ÉÉÉÉ-HH-NN` formátumú karakterláncként vannak tárolva. A dátum-idő értékek ISO 8601 karakterláncként (`ÉÉÉÉ-HH-NNTTÓ:PP:MP`). Az aritmetikához (pl. időtartamok kiszámításához) használja a `decimal-date-time()` függvényt számrá konvertáláshoz.
+A dátumértékek az rtSurvey-ben karakterláncként tárolódnak `YYYY-MM-DD` formátumban. A dátum-idő értékek ISO 8601 karakterláncként tárolódnak (`YYYY-MM-DDTHH:MM:SS`). Használja a `decimal-date-time()` függvényt számértékké alakításhoz aritmetikai műveletekhez (pl. időtartamok kiszámításához).
 </Callout>
 
-1. `today()`: Visszaadja a mai dátumot `ÉÉÉÉ-HH-NN` formátumú karakterláncként. Az űrlap megnyitásakor egyszer értékelődik ki.
+1. `today()`: Visszaadja a mai dátumot karakterláncként `YYYY-MM-DD` formátumban. Az űrlap megnyitásakor egyszer értékelődik ki.
    - Példa: `today()` → `'2024-03-15'`
-   - Általános felhasználás: `default` oszlopban a mai dátum előzetes kitöltéséhez, vagy `relevant`/`constraint` mezőkben egy dátummezővel való összehasonlításhoz.
+   - Gyakori használat: a `default` oszlopban a mai dátum előzetes kitöltéséhez, vagy a `relevant`/`constraint` oszlopban egy dátummezővel való összehasonlításhoz.
 
-2. `now()`: Visszaadja az aktuális dátumot és időt ISO 8601 karakterláncként. Minden egyes kiértékeléskor újra kiszámítja.
+2. `now()`: Visszaadja az aktuális dátumot és időt ISO 8601 karakterláncként. A kifejezés minden kiszámításakor kiértékelődik.
    - Példa: `now()` → `'2024-03-15T14:32:00.000+03:00'`
-   - Általános felhasználás: Egy adott esemény pontos időbélyegének rögzítése a felmérés során.
+   - Gyakori használat: Egy adott esemény pontos időbélyegének rögzítése a felmérés során.
 
-3. `date(érték)`: Értéket (karakterlánc vagy szám) dátum karakterlánccá konvertál.
+3. `date(value)`: Egy értéket (karakterláncot vagy számot) dátum-karakterlánccá alakít. Hasznos a kiszámított értékek dátumtípusra kényszerítéséhez.
    - Példa: `date('2024-03-15')` → `'2024-03-15'`
 
-4. `date-time(érték)`: Értéket dátum-idő karakterlánccá konvertál.
+4. `date-time(value)`: Egy értéket dátum-idő karakterlánccá alakít.
    - Példa: `date-time(${event_timestamp})`
 
-5. `decimal-date-time(érték)`: Dátum vagy dátum-idő karakterláncot tizedes számmá konvertál, amely a Unix epoch óta eltelt milliszekundumokat osztva 86400000-rel jelöl (töredék napok 1970-01-01 óta). Ezt a dátumok aritmetikájához kell használni.
-   - Példa: Két dátum közötti napok száma:
+5. `decimal-date-time(value)`: Egy dátum vagy dátum-idő karakterláncot tizedes számmá alakít, amely a Unix-korszak óta eltelt ezredmásodperceket jelenti osztva 86400000-rel (azaz az 1970-01-01 óta eltelt tört napokat). Használja ezt dátumokon végzett aritmetikai műveletekhez.
+   - Példa: Időtartam napokban két dátum között:
      `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
-   - Példa: Két dátum-idő közötti percek száma:
+   - Példa: Időtartam percekben két dátum-idő között:
      `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
 
-6. `format-date(dátum, formátum)`: Dátumértéket formáz egy mintakarakterlánc segítségével.
-   - Formátum tokenek: `%Y` (4 jegyű év), `%y` (2 jegyű év), `%m` (hónap 01–12), `%d` (nap 01–31), `%a` (hét napja rövidítve), `%b` (hónap neve rövidítve)
+6. `format-date(date, format)`: Egy dátumértéket formáz egy mintakarakterlánc használatával.
+   - Formázási tokenek: `%Y` (4 jegyű év), `%y` (2 jegyű év), `%m` (hónap 01–12), `%d` (nap 01–31), `%a` (rövidített hétköznap), `%b` (rövidített hónapnév)
    - Példa: `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+   - Példa: `format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
 
-7. `format-date-time(dátumIdő, formátum)`: Dátum-idő értéket formáz egy mintakarakterlánc segítségével. A `format-date` tokeneken kívül fogadja:
-   - `%H` (óra 00–23), `%h` (óra 01–12), `%M` (perc 00–59), `%S` (másodperc 00–59), `%3` (milliszekundum), `%P` (DE/DU)
+7. `format-date-time(datetime, format)`: Egy dátum-idő értéket formáz egy mintakarakterlánc használatával. Elfogadja az összes `format-date` tokent, plusz:
+   - `%H` (óra 00–23), `%h` (óra 01–12), `%M` (perc 00–59), `%S` (másodperc 00–59), `%3` (ezredmásodperc), `%P` (AM/PM)
    - Példa: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+   - Példa: `format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
+
+8. `STRFTIME(format, datetime)`: SQLite-stílusú dátumformázás. A `rawquery` lekérdezéseknek átadott SQL-karakterláncokon belül érhető el — **nem** érhető el az XLSForm `calculation` vagy `label` oszlopaiban. SQLite formátumtokeneket használ (`%Y`, `%m`, `%d`, `%H`, `%M`, `%S`).
+   - Példa egy rawquery SQL karakterláncon belül: `'SELECT STRFTIME(''%Y-%m'', interview_date) AS month FROM data WHERE id = ?'`
+   - Megjegyzés: Használja a `format-date-time()` függvényt a dátumformázáshoz az XLSForm kifejezésekben. Az `STRFTIME()` egy SQLite függvény, amely csak a `rawquery`-nek átadott SQL-en belül érhető el.
 
 ---
 
-### Boolean függvények
+### Logikai (boolean) függvények
 
-1. `boolean(érték)`: Bármely értéket boolean-ná konvertál. Nem üres karakterláncokra, nem nulla számokra és `true` értékre `igaz`-t, üres karakterláncokra, `0`-ra és `false` értékre `hamis`-t ad vissza.
-   - Példa: `boolean(${name})` `igaz` értéket ad vissza, ha a `name` nem üres.
+1. `boolean(value)`: Bármilyen értéket logikai értékké alakít. `true` értéket ad vissza nem üres karakterláncokra, nem nulla számokra és a `true` értékre; `false` értéket ad vissza üres karakterláncokra, `0`-ra és a `false` értékre.
+   - Példa: `boolean(${name})` `true` értéket ad vissza, ha a `name` nem üres.
 
-2. `boolean-from-string(karakterlánc)`: `igaz`-t ad vissza, ha a karakterlánc `'1'` vagy `'true'` (kis- és nagybetű-érzéketlen); egyébként `hamis`-t.
-   - Példa: `boolean-from-string(${enabled_flag})` – hasznos, ha egy mező `'true'`/`'false'` szövegként tárol értéket.
+2. `boolean-from-string(string)`: `true` értéket ad vissza, ha a karakterlánc `'1'` vagy `'true'` (kis- és nagybetű nem számít); ellenkező esetben `false` értéket ad vissza.
+   - Példa: `boolean-from-string(${enabled_flag})` — hasznos, ha egy mező a `'true'`/`'false'` értéket szövegként tárolja.
 
-3. `true()`: Visszaadja a boolean `igaz` értéket.
+3. `true()`: A `true` logikai értéket adja vissza.
    - Példa: A `required` oszlopban a `true()` egyenértékű a `yes` értékkel.
 
-4. `false()`: Visszaadja a boolean `hamis` értéket.
-   - Példa: `if(${skip_section} = 'yes', false(), true())` – dinamikusan állítja be a kötelezőséget.
+4. `false()`: A `false` logikai értéket adja vissza.
+   - Példa: `if(${skip_section} = 'yes', false(), true())` — a kitöltési kötelezettség dinamikus beállítása.
 
-5. `not(kifejezés)`: Visszaadja a kifejezés logikai negáltját.
-   - Példa: `not(${consent} = 'yes')` – figyelmeztetést jelenít meg, ha NEM adtak beleegyezést.
-   - Példa: `not(selected(${issues}, 'none'))` – részlet megkövetelése, ha nem "none" lett kiválasztva.
+5. `not(expression)`: A kifejezés logikai negációját adja vissza. `true` értéket ad vissza, ha a kifejezés hamis, és fordítva.
+   - Példa: `not(${consent} = 'yes')` — figyelmeztetés megjelenítése, ha a beleegyezés NEM történt meg.
+   - Példa: `not(selected(${issues}, 'none'))` — részletek bekérése csak akkor, ha a "none" nincs kiválasztva.
 
 ---
 
-### További karakterlánc-függvények
+### További karakterlánc függvények
 
-1. `starts-with(karakterlánc, előtag)`: `igaz`-t ad vissza, ha a `karakterlánc` az `előtag`-gal kezdődik.
-   - Példa: `starts-with(${phone}, '+36')` ellenőrzi, hogy a telefonszám a magyarországi körzetszámmal kezdődik-e.
+1. `starts-with(string, prefix)`: `true` értéket ad vissza, ha a `string` a `prefix` értékkel kezdődik.
+   - Példa: `starts-with(${phone}, '+254')` ellenőrzi, hogy a telefonszám a kenyai országkóddal kezdődik-e.
 
-2. `contains(karakterlánc, részkarakter)`: `igaz`-t ad vissza, ha a `karakterlánc` tartalmazza a `részkarakter`-t.
-   - Példa: `contains(${email}, '@')` ellenőrzi, hogy az e-mail-cím tartalmaz-e `@` jelet.
+2. `contains(string, substring)`: `true` értéket ad vissza, ha a `string` tartalmazza a `substring` értéket.
+   - Példa: `contains(${email}, '@')` ellenőrzi, hogy az e-mail cím tartalmaz-e `@` jelet.
+   - Példa: `contains(${notes}, 'urgent')` egy követő kérdést vált ki, ha a megjegyzések tartalmazzák az "urgent" szót.
 
-3. `substring-before(karakterlánc, tű)`: Visszaadja a `karakterlánc` azon részét, amely a `tű` első előfordulása előtt van.
-   - Példa: `substring-before(${full_name}, ' ')` kinyeri az első szót (utónevet).
+3. `substring-before(string, needle)`: A `string` azon részét adja vissza, amely a `needle` első előfordulása előtt szerepel.
+   - Példa: `substring-before(${full_name}, ' ')` kinyeri az első szót (keresztnév).
 
-4. `substring-after(karakterlánc, tű)`: Visszaadja a `karakterlánc` azon részét, amely a `tű` első előfordulása után van.
-   - Példa: `substring-after(${email}, '@')` kinyeri az e-mail-cím domain részét.
+4. `substring-after(string, needle)`: A `string` azon részét adja vissza, amely a `needle` első előfordulása után szerepel.
+   - Példa: `substring-after(${email}, '@')` kinyeri az e-mail cím domain részét.
 
-5. `normalize-space(karakterlánc)`: Eltávolítja a vezető és záró szóközöket, és az összes belső szóközsorozatot egyetlen szóközre redukálja.
-   - Példa: `normalize-space(${name})` – megtisztítja a névtől a felesleges szóközöket.
+5. `normalize-space(string)`: Eltávolítja a kezdő és záró szóközöket, és minden belső szóköz-sorozatot egyetlen szóközzé von össze.
+   - Példa: `normalize-space(${name})` — megtisztít egy nevet, amelyet esetleg felesleges szóközökkel írtak be.
 
-6. `translate(karakterlánc, keresési_karakterek, csere_karakterek)`: A `karakterlánc`ban szereplő és a `keresési_karakterek`-ben megtalálható minden karaktert a `csere_karakterek`-ben lévő megfelelő karakterre cseréli. A `csere_karakterek`-ben nem szereplő megfelelővel rendelkező karakterek törlődnek.
-   - Példa: `translate(${phone}, ' -()', '')` eltávolítja a szóközöket, kötőjeleket és zárójeleket a telefonszámból.
+6. `translate(string, search_chars, replace_chars)`: A `string` minden olyan karakterét, amely szerepel a `search_chars` listában, lecseréli a `replace_chars` lista megfelelő karakterére. A `search_chars` azon karakterei, amelyeknek nincs megfelelője a `replace_chars` listában, törlődnek.
+   - Példa: `translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` nagybetűssé alakít (egyenértékű az `upper()` függvénnyel).
+   - Példa: `translate(${phone}, ' -()', '')` eltávolítja a szóközöket, kötőjeleket és zárójeleket egy telefonszámból.
 
 ---
 
 ### További matematikai függvények
 
-1. `floor(szám)`: Visszaadja a `szám`-nál kisebb vagy egyenlő legnagyobb egészt (negatív végtelen felé kerekít).
+1. `floor(number)`: Visszaadja a legnagyobb egészet, amely kisebb vagy egyenlő, mint a `number` (a negatív végtelen felé kerekít).
    - Példa: `floor(4.9)` = 4, `floor(-2.1)` = -3
 
-2. `ceiling(szám)`: Visszaadja a `szám`-nál nagyobb vagy egyenlő legkisebb egészt (pozitív végtelen felé kerekít).
+2. `ceiling(number)`: Visszaadja a legkisebb egészet, amely nagyobb vagy egyenlő, mint a `number` (a pozitív végtelen felé kerekít).
    - Példa: `ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
 
-3. `random()`: 0.0 (befoglalt) és 1.0 (kizárt) közötti véletlenszerű tizedes számot ad vissza.
+3. `random()`: Egy véletlen tizedes számot ad vissza 0.0 (zárt) és 1.0 (nyitott) között. Jellemzően a `calculate` mezőkben használják véletlenszerű értékek hozzárendelésére vagy a kérdések sorrendjének véletlenszerűvé tételére.
    - Példa: `random()` → pl. `0.7341`
-   - Példa: `int(random() * 6) + 1` → véletlenszerű szám 1–6 között (kockadobás)
+   - Példa: `int(random() * 6) + 1` → véletlen szám 1–6 között (dobókocka dobás)
 
-4. `coalesce(a, b)`: Visszaadja `a` értékét, ha `a` nem üres; egyébként visszaadja `b` értékét. Hasznos tartalékként, ha egy mező esetleg üres lehet.
-   - Példa: `coalesce(${preferred_name}, ${full_name})` – ha be van állítva, a preferált nevet használja, egyébként a teljes névhez esik vissza.
+4. `coalesce(a, b)`: Visszaadja `a`-t, ha `a` nem üres; egyébként visszatér `b`-vel. Hasznos tartalék megoldásként, ha egy mező üres lehet.
+   - Példa: `coalesce(${preferred_name}, ${full_name})` — a preferált név használata, ha meg van adva, különben a teljes név használata.
 
-5. `once(érték)`: Kiértékeli az `érték`-et és tárolja, de csak akkor, ha az aktuális mező **üres**. Ha a mező már rendelkezik értékkel, az `once()` a meglévő értéket adja vissza változatlanul. Ez megakadályozza, hogy az újraszámítás felülírja a felhasználói bevitelt.
-   - Példa: `once(today())` a `default` oszlopban egyszer beállítja a mai dátumot, és nem frissíti, ha a kérdező újra megnyitja az űrlapot.
-   - Példa: `once(uuid())` egyszer generál UUID-t, és az újraszerkesztések során stabil marad.
-
----
-
-### Geo-függvények
-
-1. `area(geoshape_érték)`: Kiszámítja egy geoshape (sokszög) által bezárt területet **négyzetméterben**.
-   - A paraméter egy `lat1 lon1 0 0; lat2 lon2 0 0; ...` formátumú geoshape értéke.
-   - Példa: `area(${field_boundary})` – kiszámítja a felmért mező területét m²-ben.
-   - Példa: `round(area(${field_boundary}) div 10000, 2)` – hektárrá konvertál.
-
-2. `distance(koordináták)`: Kiszámítja egy geotrace (vonal) **teljes útvonal hosszát méterben**, vagy két geopoint közötti távolságot.
-   - Geotrace esetén: `distance(${route})` a teljes útvonal hosszát méterben adja vissza.
-   - Két geopoint esetén: `distance(concat(${point_a}, ' ', ${point_b}))` a köztük lévő távolságot adja vissza.
-   - Példa: `round(distance(${road_trace}) div 1000, 3)` – közúti hossz kilométerben.
+5. `once(value)`: Kiértékeli a `value` értéket és eltárolja azt, de csak akkor, ha az aktuális mező **üres**. Ha a mezőnek már van értéke (pl. korábban be lett állítva), az `once()` változatlanul adja vissza a meglévő értéket. Ez megakadályozza, hogy az újraszámítás felülírja a felhasználói bevitelt.
+   - Példa: `once(today())` a `default` oszlopban egyszer beállítja a mai dátumot, és nem frissül, ha az adatgyűjtő újra megnyitja az űrlapot.
+   - Példa: `once(uuid())` egyszer generál egy UUID-t, és stabilan megtartja az újraszerkesztések során.
 
 ---
 
-### Ellenőrző függvények
+### Geo (földrajzi) függvények
 
-1. `regex(érték, minta)`: `igaz`-t ad vissza, ha az `érték` illeszkedik a `minta` reguláris kifejezésre. A `constraint` oszlopban mintaalapú ellenőrzéshez használja.
-   - Példa: `regex(., '^[0-9]{10}$')` – 10 jegyű szám ellenőrzése.
-   - Példa: `regex(., '^[A-Z]{2}[0-9]{6}$')` – útlevélszám formátum ellenőrzése (2 nagybetű + 6 számjegy).
-   - Példa: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` – alapvető e-mail formátum ellenőrzése.
+1. `area(geoshape_value)`: Kiszámítja egy geoshape (poligon) érték által bezárt **területet négyzetméterben**.
+   - A paraméter egy geoshape mezőérték `lat1 lon1 0 0; lat2 lon2 0 0; ...` formátumban.
+   - Példa: `area(${field_boundary})` — egy felmért terület nagyságának kiszámítása m²-ben.
+   - Példa: `round(area(${field_boundary}) div 10000, 2)` — átváltás hektárra.
 
-2. `checklist(min, max, v1, v2, ...)`: Kiértékeli a boolean kifejezések listáját, és `igaz`-t ad vissza, ha az `igaz` értékek száma `min` és `max` közé esik (befoglalóan). Adjon meg `-1`-et a `min` vagy `max` értéknél, hogy kihagyja azt a korlátot.
-   - Példa: `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` – pontosan 2 vagy 3 feltétel teljesítésekor ad át.
+2. `distance(coordinates)`: Kiszámítja egy geotrace (vonal) **teljes útvonalhosszát méterben**, vagy két geopoint közötti távolságot.
+   - Geotrace esetén: `distance(${route})` visszaadja a teljes útvonalhosszt méterben.
+   - Két geopoint esetén: `distance(concat(${point_a}, ' ', ${point_b}))` visszaadja a köztük lévő távolságot.
+   - Példa: `round(distance(${road_trace}) div 1000, 3)` — úthossz kilométerben.
 
-3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Hasonló a `checklist()`-hez, de minden értéknek súlya van. Az `igaz` értékek súlyainak összege `min` és `max` közé kell essen.
-   - Példa: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` – a meglévő létesítmények súlyainak összege legalább 10 kell legyen.
+---
+
+### Érvényesítési függvények
+
+1. `regex(value, pattern)`: `true` értéket ad vissza, ha a `value` illeszkedik a `pattern` reguláris kifejezésre. Használja a `constraint` oszlopban mintaalapú érvényesítéshez.
+   - A minta szabványos regex szintaxist használ (POSIX ERE részhalmaz).
+   - Példa: `regex(., '^[0-9]{10}$')` — egy 10 jegyű szám érvényesítése.
+   - Példa: `regex(., '^[A-Z]{2}[0-9]{6}$')` — útlevélszám formátumának érvényesítése (2 nagybetű, majd 6 számjegy).
+   - Példa: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — alapvető e-mail formátum ellenőrzése.
+
+2. `checklist(min, max, v1, v2, ...)`: Kiértékeli a logikai kifejezések listáját, és `true` értéket ad vissza, ha a `true` értékek száma `min` és `max` között van (zárt intervallum). Adjon át `-1`-et `min` vagy `max` esetén az adott határ kihagyásához.
+   - Példa: `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — akkor sikeres, ha a három feltétel közül pontosan 2 vagy 3 igaz.
+   - Példa: `checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — legalább egy biztonsági intézkedésnek igaznak kell lennie.
+
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Hasonló a `checklist()` függvényhez, de minden értéknek súlya van. A `true` értékek súlyainak összegének `min` és `max` között kell lennie.
+   - Példa: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — a meglévő létesítmények súlyainak összege legalább 10 kell legyen.
 
 ---
 
 ### Segédfüggvények
 
-1. `uuid()`: Véletlenszerű UUID-t generál (RFC 4122 v4 formátum) karakterláncként.
+1. `uuid()`: Egy véletlenszerű UUID-t generál (RFC 4122 v4 formátum) karakterláncként.
    - Példa: `uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
-   - Általában `once()` segítségével stabil egyedi ID generálásához: `once(uuid())`
+   - Jellemzően az `once()` függvénnyel együtt használják stabil egyedi azonosító generálására: `once(uuid())`
 
-2. `version()`: Visszaadja az űrlap `version` attribútumának értékét a settings munkalapról.
+2. `version()`: Visszaadja az űrlap `version` attribútumának értékét, ahogy az a settings munkalapon be van állítva.
    - Példa: `version()` → `'3.1'`
-   - Hasznos `calculate` mezőkben az űrlap verziójának exportált adatokba való beágyazásához.
+   - Hasznos a `calculate` mezőkben az űrlap verziójának beágyazásához az exportált adatokba.
 
-3. `position()`: **Ismétlőcsoporton belül** hívva visszaadja az aktuális ismétlési példány 1-től számozott indexét.
-   - Példa: `position()` az első példányban `1`-et, a másodikban `2`-t ad vissza, stb.
-   - Lásd még: `index()` (alias), `indexed-repeat()` az ismétlési értékek hivatkozásához a csoporton kívülről.
+3. `position()`: Egy **ismétlődő csoporton** belül meghívva visszaadja az aktuális ismétlődési példány 1-alapú indexét.
+   - Példa: a `position()` az első példányban `1`-et, a másodikban `2`-t ad vissza, és így tovább.
+   - Lásd még: `index()` (álnév), `indexed-repeat()` az ismétlődő értékekre a csoporton kívülről való hivatkozáshoz.
 
-4. `thousandsep(hossz, elválasztó, érték)`: Ezres elválasztóval formázza a számot. A `hossz` a minimális karakterlánc teljes hossza (szóközökkel töltve ki, ha rövidebb), az `elválasztó` a használandó karakter (pl. `','`), az `érték` a formázandó szám.
+4. `thousandsep(length, separator, value)`: Egy számot formáz ezres elválasztóval. A `length` a karakterlánc minimális teljes hossza (szóközökkel feltöltve, ha rövidebb), a `separator` a használni kívánt karakter (pl. `','`), a `value` pedig a formázandó szám.
    - Példa: `thousandsep(0, ',', 1234567)` → `'1,234,567'`
-   - Példa: `thousandsep(0, '.', ${income})` → a jövedelmet ponttal formázza ezres elválasztóként.
+   - Példa: `thousandsep(0, '.', ${income})` → a jövedelem formázása ponttal mint ezres elválasztóval.
 
-5. `substr-jsonpath(érték, jsonpath)`: Alszöveget von ki egy JSON-karakterláncból JSONPath-kifejezés segítségével.
-   - Példa: `substr-jsonpath(${api_response}, '$.data.name')` – kinyeri az `api_response`-ban tárolt JSON-karakterlánc `name` mezőjét.
-   - Általában a `callapi()` segítségével az API-válaszokból való specifikus értékek kinyeréséhez használják.
+5. `substr-jsonpath(value, jsonpath)`: Kinyer egy értéket egy JSON karakterláncból JSONPath kifejezés segítségével.
+   - A `value` egy JSON karakterlánc kell legyen (pl. egy olyan mező, amely egy nyers API-választ tárolt a `callapi(..., 'json:', ...)` használatával).
+   - A `jsonpath` egy JSONPath kifejezés (pl. `'$.data.name'`, `'$.items[0].id'`).
+   - Mindig **karakterláncot** ad vissza — aritmetikai műveletekben való használatkor zárja `number()` függvénybe.
+   - Üres karakterláncot `''` ad vissza, ha az útvonal nem található, vagy a `value` nem érvényes JSON.
+   - Példa: `substr-jsonpath(${api_response}, '$.data.name')` — a `name` mező kinyerése.
+   - Példa: `substr-jsonpath(${api_response}, '$.items[0].label')` — egy tömb első eleme.
+   - Példa: `number(substr-jsonpath(${api_response}, '$.price'))` — numerikus érték kinyerése.
+   - Jellemzően a `callapi(..., 'json:', ...)` mellett használják több mező kinyerésére egyetlen API-válaszból. Lásd: [Több érték lekérése egyetlen API hívásból](../advanced-features/call-api#fetching-multiple-values-from-one-api-call).

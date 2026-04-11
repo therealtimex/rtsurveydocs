@@ -3,15 +3,15 @@ title: "多语言支持"
 description: ""
 ---
 
-rtSurvey 提供强大的多语言支持，允许您以多种语言创建调查。此功能对于在多样化语言群体或多语言环境中开展研究至关重要。
+rtSurvey 提供强大的多语言支持，允许您创建多种语言的问卷。这一特性对于在不同语言群体或多语言环境中进行研究至关重要。
 
-## 设置多语言调查
+## 设置多语言问卷
 
-要在 rtSurvey 中创建多语言调查，您需要在 XLSForm 中添加特定语言的列。以下是操作方法：
+要在 rtSurvey 中创建多语言问卷，您需要在 XLSForm 中添加特定于语言的列。操作方法如下：
 
-1. **标签翻译**：使用 `label::语言（代码）` 格式为每种语言添加列。
-2. **提示翻译**：使用 `hint::语言（代码）` 翻译提示。
-3. **媒体文件翻译**：对于特定语言的媒体，使用 `media::语言（代码）`。
+1. **标签翻译 (Label Translations)**：使用 `label::Language (code)` 格式为每种语言添加列。
+2. **提示翻译 (Hint Translations)**：使用 `hint::Language (code)` 翻译提示信息。
+3. **媒体文件翻译 (Media File Translations)**：对于特定于语言的媒体文件，使用 `media::Language (code)`。
 
 示例：
 
@@ -23,11 +23,11 @@ rtSurvey 提供强大的多语言支持，允许您以多种语言创建调查�
 
 ## 语言代码
 
-建议在语言名称后使用官方 2 字符语言代码（子标签）。这有助于将表单语言与用户界面语言匹配。您可以在[此处](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)找到官方代码。
+建议在语言名称后使用官方的 2 字符语言代码（子标签）。这有助于将表单语言与用户界面语言匹配。您可以在[此处](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)找到官方代码。
 
 ## 设置默认语言
 
-要为数据收集设置默认语言，请在 XLSForm 的 `settings` 工作表中使用：
+要为数据收集设置默认语言，请使用 XLSForm 中的 `settings` 工作表：
 
 ```
 | form_id   | version | default_language |
@@ -39,12 +39,12 @@ rtSurvey 提供强大的多语言支持，允许您以多种语言创建调查�
 
 ### 动态语言切换
 
-rtSurvey 允许用户在数据收集期间动态切换语言：
+rtSurvey 允许用户在数据收集过程中动态切换语言：
 
-- 在网页界面中，使用顶部导航栏中的语言下拉菜单。
+- 在 Web 界面中，使用顶部导航栏中的语言下拉菜单。
 - 在移动应用中，通过设置菜单访问语言选项。
 
-### 特定语言的验证消息
+### 特定于语言的验证消息
 
 rtSurvey 将多语言支持扩展到验证消息：
 
@@ -54,9 +54,19 @@ rtSurvey 将多语言支持扩展到验证消息：
 | integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
+### 本地化必填消息
+
+使用 `required_message::Language (code)` 在必填字段留空时显示翻译后的错误提示：
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
 ### RTL 语言支持
 
-对于阿拉伯语或希伯来语等从右到左（RTL）语言，rtSurvey 自动调整布局：
+对于阿拉伯语或希伯来语等从右向左 (RTL) 书写的语言，rtSurvey 会自动调整布局：
 
 ```
 | type | name | label::English (en) | label::Arabic (ar) |
@@ -64,7 +74,7 @@ rtSurvey 将多语言支持扩展到验证消息：
 | text | name | Your name           | اسمك                |
 ```
 
-### 特定语言的外观
+### 特定于语言的外观 (Appearance)
 
 rtSurvey 允许您为不同语言指定不同的外观：
 
@@ -74,23 +84,59 @@ rtSurvey 允许您为不同语言指定不同的外观：
 | text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
 
-## 多语言调查最佳实践
+## 双语标签中的 HTML 格式化
 
-1. **命名一致**：在整个表单中使用一致的语言代码。
+您可以在单个标签单元格中将 HTML 标签与语言包装器结合使用。rtSurvey 会提取当前语言块并渲染其余的 HTML。
+
+每种语言使用粗体和字体颜色的示例：
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+语言包装器内支持的行内标签：`<b>`、`<i>`、`<u>`、`<big>`、`<small>`、`<font color="...">`、`<br>`、`<span style="...">`。
+
+每种语言的有色文本示例：
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## 语言感知计算
+
+当表单包含 `${language_use}` 字段（由 `change_language` 组件设置）时，使用 `if()` 返回当前语言的值：
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+示例 — 使用 `pulldata('rawquery', ...)` 以当前语言显示查找结果：
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+注意：`${language_use}` 字段通常由 `change_language` 外观组件设置。请参阅 Appearance — change_language。
+
+## 多语言问卷最佳实践
+
+1. **命名一致性**：在整个表单中使用一致的语言代码。
 2. **专业翻译**：聘请熟悉调查背景的专业翻译人员。
-3. **上下文注释**：为翻译人员提供上下文注释以确保翻译准确。
-4. **测试**：在部署前以所有语言测试表单。
-5. **Unicode 支持**：确保数据收集设备支持非拉丁文字的 Unicode。
-6. **特定语言的媒体**：为每种语言使用文化上适当的图像或音频。
-7. **避免图像中的文字**：如果使用含文字的图像，请为每种语言创建单独的图像。
+3. **上下文注释**：为翻译人员提供上下文注释，以确保翻译准确。
+4. **测试**：在部署前用所有语言测试您的表单。
+5. **Unicode 支持**：确保您的数据收集设备支持非拉丁脚本的 Unicode。
+6. **特定于语言的媒体**：为每种语言使用文化上合适的图像或音频。
+7. **避免在图像中使用文本**：如果图像包含文本，请为每种语言创建单独的图像。
 
 ## 处理特殊情况
 
 ### 混合语言回答
 
-rtSurvey 允许受访者以任何文字输入文本，无论所选表单语言如何。这对于以原始文字捕获姓名或地址很有用。
+rtSurvey 允许受访者以任何脚本输入文本，无论选择哪种表单语言。这对于捕获原始脚本中的姓名或地址非常有用。
 
-### 特定语言的问题类型
+### 特定于语言的问题类型
 
 某些问题类型可能更适合某些语言。rtSurvey 允许您为不同语言使用不同的问题类型：
 
@@ -105,16 +151,16 @@ rtSurvey 允许受访者以任何文字输入文本，无论所选表单语言�
 从 rtSurvey 导出数据时：
 
 - 选择以特定语言导出或包含所有语言版本。
-- 导出中包含语言元数据，指示每个回答使用了哪种语言。
+- 导出结果中包含语言元数据，指示每个回答使用了哪种语言。
 
 ## 移动应用注意事项
 
 - rtSurvey 移动应用支持离线语言切换。
-- 确保在离线前下载所有所需的语言文件。
+- 确保在离线前已下载所有必需的语言文件。
 
 ## 已知限制
 
-- 某些高级功能可能不适用于所有语言。
-- 极长的翻译可能影响较小屏幕上的布局。
+- 某些高级功能可能并非在所有语言中都可用。
+- 过长的翻译可能会影响较小屏幕上的布局。
 
-通过利用 rtSurvey 的多语言功能，您可以创建包容、无障碍的调查，覆盖多样化人群并提供高质量、语言准确的数据。
+通过利用 rtSurvey 的多语言功能，您可以创建包容性、易于访问的问卷，覆盖不同的人群并提供高质量、语言准确的数据。

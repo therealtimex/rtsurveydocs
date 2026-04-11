@@ -1,15 +1,15 @@
 ---
 title: "Pokročilá opakování"
-description: "Pokročilé vzory pro skupiny opakování: dynamické počty, vnořená opakování, sumarizace dat opakování a odkazování hodnot napříč opakováními."
+description: "Pokročilé vzorce pro skupiny opakování: dynamické počty, vnořená opakování, sumarizace dat opakování a odkazování na hodnoty napříč opakováními."
 ---
 
-Tato stránka pokrývá pokročilé vzory pro práci se skupinami opakování v rtSurvey. Pro základy nastavení skupiny opakování viz [Seskupování a opakování](../repeats).
+Tato stránka se zabývá pokročilými vzorci pro práci se skupinami opakování v rtSurvey. Základy nastavení skupiny opakování naleznete v části [Seskupování a opakování](../repeats).
 
 ---
 
 ## Dynamický počet opakování
 
-Ve výchozím nastavení enumerátor rozhoduje, kolikrát opakovat. Počet opakování lze zafixovat pomocí `repeat_count`:
+Ve výchozím nastavení rozhoduje tazatel o tom, kolikrát se má opakování provést. Počet opakování můžete zafixovat pomocí `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,39 +18,39 @@ Ve výchozím nastavení enumerátor rozhoduje, kolikrát opakovat. Počet opako
 | integer | member_age | Věk | |
 | end_repeat | | | |
 
-Opakování proběhne přesně `${num_members}` krát, kde `num_members` byl sebrán dříve ve formuláři. Enumerátor nemůže přidávat ani odebírat instance.
+Opakování se provede přesně `${num_members}` krát, přičemž hodnota `num_members` byla sebrána dříve ve formuláři. Tazatel nemůže přidávat ani odebírat instance.
 
 ---
 
 ## Indexovaný přístup: `indexed-repeat()`
 
-Přistupte k hodnotě pole konkrétní instance opakování **zvenku** skupiny opakování pomocí `indexed-repeat(repeatedField, repeatGroup, index)`:
+Přístup k hodnotě pole konkrétní instance opakování **mimo** skupinu opakování pomocí `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-To je užitečné pro vytváření souhrnných polí nebo odkazování na data „primárního" člena po opakování.
+To je užitečné pro vytváření souhrnných polí nebo odkazování na údaje "primárního" člena po skončení opakování.
 
 ---
 
-## Aktuální pozice instance: `index()`
+## Pozice aktuální instance: `index()`
 
-Uvnitř skupiny opakování vrací `index()` 1-based pozici aktuální instance. Použijte ji pro označení každého opakování nebo vytvoření jedinečných identifikátorů:
+Uvnitř skupiny opakování vrací funkce `index()` pozici aktuální instance (začíná od 1). Použijte ji k označení každého opakování nebo k vytvoření jedinečných identifikátorů:
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | Parcela |
-| note | plot_label | Číslo parcely `${index()}` |
-| text | plot_id | ID parcely |
+| begin_repeat | plots | Pozemek |
+| note | plot_label | Číslo pozemku `${index()}` |
+| text | plot_id | ID pozemku |
 | end_repeat | | |
 
 ---
 
-## Odkazování polí ve stejné instanci
+## Odkazování na pole ve stejné instanci
 
-V rámci opakování použijte `${fieldname}` pro odkazování na jiné pole **ve stejné instanci opakování**. Není třeba `indexed-repeat()` v rámci stejné smyčky:
+V rámci opakování použijte `${fieldname}` pro odkaz na jiné pole **ve stejné instanci opakování**. V rámci stejné smyčky není třeba používat `indexed-repeat()`:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,25 +62,25 @@ V rámci opakování použijte `${fieldname}` pro odkazování na jiné pole **v
 
 ---
 
-## Odkazování nadřazených polí zevnitř opakování
+## Odkazování na nadřazená pole zevnitř opakování
 
-Pole mimo (nad) skupinu opakování lze normálně odkazovat pomocí `${fieldname}`:
+Na pole mimo skupinu opakování (nad ní) lze standardně odkazovat pomocí `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
 | text | village | Název vesnice |
-| begin_repeat | plots | Zemědělská parcela |
-| note | plot_context | Parcely ve `${village}` |
+| begin_repeat | plots | Zemědělský pozemek |
+| note | plot_context | Pozemky v obci `${village}` |
 | end_repeat | | |
 
 ---
 
 ## Sumarizace dat opakování
 
-Použijte agregační funkce opakování **mimo** skupinu opakování pro sumarizaci:
+K sumarizaci použijte agregační funkce opakování **mimo** skupinu opakování:
 
-| Funkce | Příklad | Popis |
-|--------|---------|-------|
+| Function | Example | Description |
+|----------|---------|-------------|
 | `count(group)` | `count(${household_members})` | Počet instancí |
 | `sum(field)` | `sum(${loan_amount})` | Součet číselného pole |
 | `min(field)` | `min(${member_age})` | Minimální hodnota |
@@ -90,11 +90,11 @@ Použijte agregační funkce opakování **mimo** skupinu opakování pro sumari
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Podmíněný součet |
 | `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Podmíněné spojení |
 
-### Příklad: Souhrn domácnosti
+### Příklad: Souhrn za domácnost
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| integer | num_members | Kolik členů? | |
+| integer | num_members | Kolik má domácnost členů? | |
 | begin_repeat | members | Člen | `${num_members}` |
 | text | member_name | Jméno | |
 | integer | member_age | Věk | |
@@ -102,13 +102,13 @@ Použijte agregační funkce opakování **mimo** skupinu opakování pro sumari
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` členů; `${children_count}` do 18 let. Dospělí: `${adult_names}` | |
+| note | summary | `${total_members}` členů; `${children_count}` mladších 18 let. Dospělí: `${adult_names}` | |
 
 ---
 
 ## Vnořená opakování
 
-Skupina opakování může obsahovat další skupinu opakování. Používejte toto opatrně — vnořená opakování přidávají složitost a mohou být matoucí pro enumerátory.
+Skupina opakování může obsahovat jinou skupinu opakování. Používejte to opatrně — vnořená opakování zvyšují složitost a mohou být pro tazatele matoucí.
 
 | type | name | label |
 |------|------|-------|
@@ -119,36 +119,132 @@ Skupina opakování může obsahovat další skupinu opakování. Používejte t
 | end_repeat | | |
 | end_repeat | | |
 
-Pro odkazování pole ve vnějším opakování zevnitř vnitřního opakování použijte `${fieldname}` — překládá se na nejbližšího odpovídajícího předka:
+Chcete-li se odkázat na pole ve vnějším opakování z vnitřního opakování, použijte `${fieldname}` — odkazuje na nejbližšího odpovídajícího předka:
 
-Uvnitř opakování `hh_members` vrací `${hh_id}` ID **aktuální** domácnosti, nikoli všech domácností.
+Uvnitř opakování `hh_members` vrací `${hh_id}` ID **aktuální** domácnosti, nikoliv všech domácností.
 
 ---
 
 ## Pořadí uvnitř skupin opakování: `rank-index()`
 
-Když pole `rank` existuje uvnitř opakování, použijte `rank-index(instanceNumber, repeatedField)` zvenku pro získání ordinálního pořadí konkrétní instance:
+Pokud se pole `rank` nachází uvnitř opakování, použijte `rank-index(instanceNumber, repeatedField)` zvenčí, abyste získali pořadí konkrétní instance:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` vrátí index instance s nejvyšším skóre.
+`rank-index(1, ${score})` vrací index instance s nejvyšším skóre.
+
+---
+
+## Vzhled `1screen` u `begin_repeat`
+
+Přidáním `1screen` do sloupce `appearance` v řádku `begin_repeat` se zobrazí všechny otázky pro každou instanci společně na jedné obrazovce, nikoli jedna otázka na obrazovku.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Člen domácnosti | `1screen` |
+| text | member_name | Jméno člena | |
+| integer | member_age | Věk | |
+| end_repeat | | | |
+
+Pokud je nastaveno `1screen` a v rámci skupiny není žádné pole `repeat_count` ani `add_repeat`, rtSurvey automaticky vykreslí kulaté tlačítko **+** ve spodní části obrazovky, aby tazatelé mohli přidávat nové instance bez další konfigurace.
+
+| Appearance | Jedna obrazovka na instanci | Přidáno výchozí tlačítko + |
+|------------|-------------------------|------------------------|
+| `1screen` | Ano | Ano (pokud není přítomno podřízené pole `add_repeat`) |
+| `field-list` | Ano | Ne |
+
+Použijte `field-list`, pokud chcete seskupené rozvržení bez automatického tlačítka pro přidání. Použijte `1screen`, pokud chcete seskupené rozvržení i vestavěný způsob přidávání instancí.
+
+---
+
+## Vlastní tlačítko pro přidání `add_repeat`
+
+Pole typu `note` (nebo `text`) umístěné **uvnitř** skupiny opakování s `appearance: add_repeat` se vykreslí jako tlačítko "Přidat" na celou šířku. Popisek tlačítka pochází ze sloupce `label` daného pole. Pokud je přítomno pole `add_repeat`, výchozí kulaté tlačítko + (z `1screen`) se skryje.
+
+Pole `add_repeat` umístěte jako poslední pole uvnitř skupiny opakování:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Člen | `1screen` |
+| text | member_name | Jméno člena | |
+| integer | member_age | Věk | |
+| note | btn_add | + Přidat člena | `add_repeat` |
+| end_repeat | | | |
+
+### Přizpůsobení barev
+
+Chcete-li tlačítko stylovat, předejte v hodnotě vzhledu kód barvy:
+
+| Appearance value | Result |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Zelené pozadí, výchozí barva textu |
+| `add_repeat 04B404-ffffff` | Zelené pozadí, bílý text |
+
+První barva je pozadí a druhá (za pomlčkou) je barva textu. Při použití formátu s pomlčkou vynechejte `#`.
+
+### Varianta s ikonou
+
+Použijte `add_repeat icon` (s mezerou) pro vykreslení kompaktního kulatého tlačítka s ikonou namísto tlačítka na celou šířku:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Přidat | `add_repeat icon` |
+
+---
+
+## Tlačítka pro mazání: `delete-repeat-current` a `delete-repeat-last`
+
+Pole typu `note` uvnitř skupiny opakování s `appearance: delete-repeat-current` nebo `appearance: delete-repeat-last` se vykreslí jako rozdělené tlačítko pro mazání.
+
+| Appearance | Action |
+|------------|--------|
+| `delete-repeat-current` | Vymaže aktuální (aktivní) instanci |
+| `delete-repeat-last` | Vymaže poslední instanci v opakování |
+
+Výchozí tlačítko (bez ikony) je rozdělené tlačítko: ikona koše vlevo a text popisku pole vpravo, přičemž zabírá celou šířku obrazovky.
+
+### Varianta s ikonou
+
+Přidejte příponu `-icon`, abyste získali kompaktní kulaté tlačítko s ikonou koše:
+
+| Appearance | Result |
+|------------|--------|
+| `delete-repeat-current-icon` | Kulatá ikona koše, smaže aktuální instanci |
+| `delete-repeat-last-icon` | Kulatá ikona koše, smaže poslední instanci |
+
+### Přizpůsobení barev
+
+Formát barev je shodný s `add_repeat`: použijte `<#RRGGBB/>` nebo `RRGGBB-RRGGBB` (pozadí-text).
+
+### Příklad kompletního vzorce
+
+Následující opakování používá `1screen`, kulaté tlačítko pro smazání aktuální instance nahoře a tlačítko pro přidání na celou šířku dole:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Člen | `1screen` |
+| note | btn_del | Odstranit | `delete-repeat-current-icon` |
+| text | member_name | Jméno člena | |
+| integer | member_age | Věk | |
+| note | btn_add | + Přidat člena | `add_repeat` |
+| end_repeat | | | |
 
 ---
 
 ## Osvědčené postupy
 
-1. Vždy používejte `repeat_count`, když je počet opakování předem znám — zabraňuje enumerátorům v náhodném přidávání nebo odebírání instancí.
-2. Udržujte skupiny opakování zaměřené — opakování s 20+ otázkami na instanci je obtížné navigovat.
-3. Pojmenovávejte skupiny opakování jasně (např. `household_members`, nikoli `repeat1`) — název se objevuje ve voláních funkcí a exportovaných datech.
-4. Testujte s maximálním očekávaným počtem instancí pro ověření výkonu.
-5. Používejte vzhled `field-list` na skupině opakování pro zobrazení všech polí na jedné obrazovce na instanci (mobil).
+1. Vždy používejte `repeat_count`, pokud je počet opakování znám předem — zabráníte tak tazatelům v nechtěném přidávání nebo odebírání instancí.
+2. Skupiny opakování udržujte přehledné — v opakování s více než 20 otázkami na instanci se špatně orientuje.
+3. Skupiny opakování pojmenovávejte jasně (např. `household_members`, nikoli `repeat1`) — název se objevuje ve volání funkcí a exportovaných datech.
+4. Otestujte s maximálním očekávaným počtem instancí, abyste ověřili výkon.
+5. Používejte `1screen` u `begin_repeat` pro zobrazení všech otázek na jedné obrazovce na instanci, v kombinaci s polem poznámky `add_repeat` uvnitř skupiny, abyste tazatelům poskytli jasně označené tlačítko "Přidat".
 
 ---
 
 ## Omezení
 
-- `indexed-repeat()` vyžaduje platný index (1 až počet instancí) — indexy mimo rozsah vrátí prázdnou hodnotu.
-- Vnořená opakování nad 2 úrovně nejsou doporučena a mohou způsobit problémy se zobrazením na některých klientech.
-- Agregační funkce (`sum`, `count` atd.) operují na celé skupině opakování — nemůžete agregovat podmnožinu instancí bez variant `*-if`.
+- `indexed-repeat()` vyžaduje platný index (1 až počet instancí) — indexy mimo rozsah vrací prázdnou hodnotu.
+- Vnořená opakování přesahující 2 úrovně se nedoporučují a u některých klientů mohou způsobit problémy se zobrazením.
+- Agregační funkce (`sum`, `count` atd.) pracují s celou skupinou opakování — bez variant `*-if` nelze agregovat podmnožinu instancí.

@@ -1,131 +1,214 @@
 ---
-title: "外観"
+title: "外観 (Appearance)"
 description: ""
 ---
 
-rtSurveyの`appearance`列は調査の質問の視覚的な表示と動作をカスタマイズできます。この機能はユーザーエクスペリエンスを向上させ、データ収集効率を大幅に改善できます。rtSurveyは標準的なXLSForm外観属性をサポートし、追加オプションで拡張しています。
+rtSurveyの `appearance` 列を使用すると、調査内の質問の視覚的な表示と動作をカスタマイズできます。この機能はユーザーエクスペリエンスを向上させ、データ収集の効率を大幅に改善することができます。rtSurveyは、標準のXLSForm外観属性をサポートし、さらに追加のオプションでそれらを拡張しています。
 
 ## 標準XLSForm外観属性
 
-rtSurveyは以下の標準XLSForm外観属性をサポートしています：
+rtSurveyは、以下の標準XLSForm外観属性をサポートしています。
 
 | 外観属性 | 質問タイプ | 説明 |
-|----------------------|----------------|-------------|
-| multiline | text | 複数行のテキストボックスを作成する（Webクライアントに最適） |
-| minimal | select_one、select_multiple | ドロップダウンメニューに選択肢を表示する |
-| quick | select_one | 選択後に次の質問に自動進む（モバイルのみ） |
-| no-calendar | date | カレンダー表示を非表示にする（モバイルのみ） |
-| month-year | date | 月と年のみの選択を許可する |
-| year | date | 年のみの選択を許可する |
-| horizontal-compact | select_one、select_multiple | 選択肢を水平に表示する（Webのみ） |
-| horizontal | select_one、select_multiple | 選択肢を列で水平に表示する（Webのみ） |
-| likert | select_one | 選択肢をリッカートスケールとして表示する |
-| compact | select_one、select_multiple | 最小パディングで選択肢を並べて表示する |
-| quickcompact | select_one | コンパクト表示と自動進行を組み合わせる（モバイルのみ） |
-| field-list | groups | グループ全体を1画面に表示する（モバイルのみ） |
-| label | select_one、select_multiple | 入力なしで選択肢のラベルを表示する |
-| list-nolabel | select_one、select_multiple | ラベルなしで入力を表示する（`label`と一緒に使用） |
-| table-list | groups | 質問をテーブル形式で表示する |
-| signature | image | 署名キャプチャを有効にする（モバイルのみ） |
-| draw | image | フリーハンド描画を許可する（モバイルのみ） |
-| map、quick map | select_one、select_one_from_file | 地図からの選択を有効にする |
+|----------|------------|------|
+| multiline | text | 複数行のテキストボックスを作成します（ウェブクライアントに最適） |
+| minimal | select_one, select_multiple | 選択肢をドロップダウンメニューで表示します |
+| quick | select_one | 選択後、自動的に次の質問に進みます（モバイルのみ） |
+| no-calendar | date | カレンダーの表示を抑制します（モバイルのみ） |
+| month-year | date | 月と年のみを選択できるようにします |
+| year | date | 年のみを選択できるようにします |
+| horizontal-compact | select_one, select_multiple | 選択肢を水平方向に表示します（ウェブのみ） |
+| horizontal | select_one, select_multiple | 選択肢を列の中に水平方向に表示します（ウェブのみ） |
+| likert | select_one | 選択肢をリッカート尺度として提示します |
+| compact | select_one, select_multiple | 選択肢を最小限のパディングで並べて表示します |
+| quickcompact | select_one | コンパクト表示と自動進行を組み合わせます（モバイルのみ） |
+| field-list | groups | グループ全体を1つの画面に表示します（モバイルのみ） |
+| label | select_one, select_multiple | 入力なしで選択肢のラベルを表示します |
+| list-nolabel | select_one, select_multiple | ラベルなしで入力を表示します（ `label` と併用） |
+| table-list | groups | 質問をテーブル形式で表示します |
+| signature | image | 署名のキャプチャを有効にします（モバイルのみ） |
+| draw | image | フリーハンドの描画を可能にします（モバイルのみ） |
+| map, quick map | select_one, select_one_from_file | 地図機能からの選択を有効にします |
 
-## 外観使用のベストプラクティス
+## 外観を使用するためのベストプラクティス
 
-1. **一貫性**：調査全体で外観属性を一貫して使用する。
-2. **モバイルとWeb**：異なるデバイスとプラットフォームでの表示を考慮する。
-3. **パフォーマンス**：フォームの読み込みを遅くする可能性のある外観属性（例：大きなグループの`table-list`）に注意する。
-4. **ユーザーエクスペリエンス**：回答者のデータ入力をより簡単で直感的にする外観を選択する。
-5. **テスト**：外観が期待通りに機能することを確認するために、ターゲットデバイスで常にフォームをテストする。
+1. **一貫性**: 調査全体で外観属性を一貫して使用し、統一感のある外観にします。
+2. **モバイル対ウェブ**: デバイスやプラットフォームによって外観がどのようにレンダリングされるかを考慮してください。
+3. **パフォーマンス**: フォームの読み込みを遅くする可能性のある外観属性（例：大きなグループに対する `table-list`）には注意してください。
+4. **ユーザーエクスペリエンス**: 回答者にとってデータ入力がより簡単かつ直感的になる外観を選択してください。
+5. **テスト**: ターゲットデバイスで常にフォームをテストし、外観が期待通りに機能することを確認してください。
 
 ## 高度なテクニック
 
 ### 外観の組み合わせ
 
-一部の外観属性はより複雑なレイアウトのために組み合わせることができます：
+一部の外観属性は、より複雑なレイアウトのために組み合わせることができます。
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | 1つ選択してください： | minimal compact |
+| select_one options | choice | Select one: | minimal compact |
 ```
 
-### 動的外観
+### 動的な外観
 
-rtSurveyはフォームロジックに基づいた動的な外観変更を許可します：
+rtSurveyでは、フォームのロジックに基づいて外観を動的に変更できます。
 
 ```
 | type | name | label | appearance | relevant |
 |------|------|-------|------------|----------|
-| text | time | 時間を入力してください： | inline-[%H:%M] | ${show_time} = 'yes' |
+| text | time | Enter time: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## モバイルアプリの考慮事項
+## モバイルアプリに関する考慮事項
 
-- 一部の外観（例：`quick`、`signature`）はモバイルデバイス固有です。
-- 一貫した動作を確認するためにAndroidとiOSの両方で徹底的にテストする。
+- 一部の外観（例： `quick`、 `signature`）はモバイルデバイス専用です。
+- AndroidとiOSの両方で徹底的にテストし、一貫した動作を確認してください。
 
-## rtSurvey拡張外観属性
+## rtSurvey 拡張外観属性
 
-標準のXLSForm外観に加えて、rtSurveyは以下のプラットフォーム固有のオプションをサポートしています：
+標準のXLSFormの外観に加えて、rtSurveyは以下のプラットフォーム固有のオプションをサポートしています。
 
 ### データと表示の制御
 
 | 外観属性 | 質問タイプ | 説明 |
-|----------------------|----------------|-------------|
-| `invisible` | any | フィールドを非表示にしながらも値の収集または計算を続ける。`hidden`タイプとは異なり、フィールドはロジックに参加し続ける。 |
-| `displaytitle` | any | 通常は抑制される場合でもフィールドのラベル/タイトルを強制的に表示する。 |
-| `autopull` | select_one、select_multiple | フォームが読み込まれるかトリガーフィールドが変わるときに外部データを自動取得して選択肢を入力する。 |
-| `floating_hint` | text、integer、decimal | ヒントテキストを入力フィールドの下ではなく上のフローティングラベルとして表示する。 |
-| `calculate-button` | calculate | 自動計算ではなく、オンデマンドでフィールドの再計算をトリガーする可視ボタンを追加する。 |
+|----------|------------|------|
+| `invisible` | すべて | フィールドの値を収集または計算しながら、フィールドをビューから非表示にします。 `hidden` タイプとは異なり、フィールドは引き続きロジックに参加します。 |
+| `displaytitle` | すべて | 通常は抑制される場合でも、フィールドのラベル/タイトルを強制的に表示します。 |
+| `autopull` | select_one, select_multiple | フォームの読み込み時またはトリガーフィールドの変更時に、外部データを自動的に取得して選択肢に挿入します。 |
+| `floating_hint` | text, integer, decimal | ヒントテキストを入力フィールドの下ではなく、入力フィールドの上のフローティングラベルとして表示します。 |
+| `calculate-button` | calculate | 自動的に計算するのではなく、オンデマンドでフィールドの再計算をトリガーする表示ボタンを追加します。 |
+
+### グループとナビゲーション
+
+| 外観属性 | 質問タイプ | 説明 |
+|----------|------------|------|
+| `section` | group | グループを折りたたみ可能なセクションカードとしてレンダリングします。注：モバイルアプリのみ。 |
+| `toc-hide` | すべて | 目次（TOC）ナビゲーションパネルから質問を除外します。 |
+| `minilog` | begin_repeat | 完了したリピートエントリを、各エントリをインラインで展開するのではなく、コンパクトなミニログリストとして表示します。 |
+
+### 入力動作
+
+| 外観属性 | 質問タイプ | 説明 |
+|----------|------------|------|
+| `proper` | text | 回答者が入力する際に、各単語の最初の文字を自動的に大文字にします（タイトルケースの動作）。 |
+| `text-nolabel` | text, integer, decimal | 入力フィールドを可視ラベルなしでレンダリングします。 |
+| `inline-1line` | text | 質問ラベルが長くても、テキスト入力を1行で表示するように強制します。 |
+| `popup` | すべて | ページ内にインラインで表示するのではなく、ポップアップ / モーダルオーバーレイ内にフィールドをレンダリングします。 |
 
 ### レイアウト
 
 | 外観属性 | 質問タイプ | 説明 |
-|----------------------|----------------|-------------|
-| `1screen` | group | グループサイズに関わらずグループ全体を1画面に強制表示する。 |
-| `columns(n)` | select_one、select_multiple | 選択肢を`n`列で表示する。例：`columns(3)`は3列のラジオボタンを表示する。 |
-| `gridformat<row=R col=C colspan=S align=center>` | any | CSSグリッドレイアウトで行`R`、列`C`、`S`列スパンにフィールドを配置する。`advanced-extension/grid-layout`と一緒に使用する。 |
-| `ignore-simplify` | any | フォームレンダラーにこのフィールドのレイアウトの自動簡略化や縮小をスキップするよう指示する。 |
+|----------|------------|------|
+| `1screen` | group | グループのサイズに関係なく、グループ全体を1つの画面に強制的に表示します。 |
+| `columns(n)` | select_one, select_multiple | 選択肢を `n` 列で表示します。例： `columns(3)` は、ラジオボタンの3つの列を表示します。 |
+| `gridformat<row=R col=C colspan=S align=center>` | すべて | フィールドをCSSグリッドレイアウトの行 `R`、列 `C` に配置し、 `S` 列にわたって表示します。 `advanced-extension/grid-layout` と共に使用されます。 |
+| `ignore-simplify` | すべて | フォームレンダラーに対し、このフィールドのレイアウトの自動簡略化または圧縮をスキップするよう指示します。 |
+| `horizontal(N)` | select_one, select_multiple | 各選択肢が列の幅の `N` パーセントを占めるように設定します。例： `horizontal(50)` は、1行に2つの選択肢を配置します。 |
+| `scroll-view(N%)` | group, repeat | コンテナをビューポート（または親）の高さの最大 `N%` に制限し、コンテンツが溢れる場合にスクロールバーを追加します。例： `scroll-view(60%)`。 |
 
 ### ウィジェット
 
 | 外観属性 | 質問タイプ | 説明 |
-|----------------------|----------------|-------------|
-| `likert` | select_one | 選択肢をリッカートスケール行として表示する。 |
-| `distress` | select_one | 感情的なアイコンを持つKessler心理的苦痛スケール（K10）ビジュアルウィジェットとして選択肢をレンダリングする。 |
+|----------|------------|------|
+| `likert` | select_one | 選択肢をリッカート尺度行として提示します（上記の標準テーブルに既に記載されており、サポートが確認されています）。 |
+| `distress` | select_one | 選択肢を、感情的なアイコンを備えたケスラー心理的苦痛尺度（K10）の視覚的なウィジェットとしてレンダリングします。 |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | 選択肢を、5つのカラースロットを持つスタイリッシュな評価ボックスとしてレンダリングします。 `c1` = 外側コンテナの境界線、 `c2` = 未チェックの境界線、 `c3` = チェック済みの境界線と塗りつぶし、 `c4` = 未チェックのテキスト色、 `c5` = チェック済みのテキスト色。例： `rating_box-fill-grey-blue-green-black-white`。 |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | 選択肢を色付きのタグチップとしてレンダリングします。5つのカラースロットは `rating_box-fill` と同じ順序に従います。選択された選択肢はハイライトされ、選択されていない選択肢はサマリービューから抑制されます。 |
 
-### API統合
+### API 統合
 
 | 外観属性 | 質問タイプ | 説明 |
-|----------------------|----------------|-------------|
-| `callapi` | text、integer、decimal、select_one | このフィールドのAPI呼び出し統合を有効にする。calculationカラムには`callapi()`式を含める必要がある。[Call API](advanced-extension/call-api)を参照。 |
-| `callapi-verify(params)` | text、integer、decimal | 静的パラメーターを使ってAPI検証呼び出しをトリガーする。APIが値を確認するまでフォームの進行をブロックする。 |
-| `callapi-verify(dynamicParams)` | text、integer、decimal | `callapi-verify`と同じだが、パラメーターは実行時に他のフィールド値から導出される。 |
+|----------|------------|------|
+| `callapi` | text, integer, decimal, select_one | このフィールドのAPI呼び出し統合を有効にします。calculation列には `callapi()` 式を含める必要があります。 [Call API](advanced-features/call-api) を参照してください。 |
+| `callapi-verify(params)` | text, integer, decimal | 静的パラメータを使用してAPI検証呼び出しをトリガーします。APIが値を確認するまで、フォームは進行をブロックします。 |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | `callapi-verify` と同じですが、実行時に他のフィールド値から派生したパラメータを使用します。 |
 
-### インライン日付/時間フォーマット
+### 言語切り替え
 
-`date`、`time`、`datetime`フィールドでは、外観に追加されたフォーマット文字列を使ってカスタム表示フォーマットを指定できます：
+| 外観属性 | 質問タイプ | 説明 |
+|----------|------------|------|
+| `change_language-{colors} default('lang')` | note, text | 指定されたカラーコードでスタイル設定された言語切り替えウィジェットをレンダリングします。 `default('lang')` トークンは初期言語（例： `default('en')`）を設定します。解析中に内部的に `rtDefault('lang')` に書き換えられます。例： `change_language-blue-white default('vi')`。 |
+
+### インラインの日付/時刻形式
+
+`date`、 `time`、および `datetime` フィールドの場合、外観に追加された書式設定文字列を使用してカスタム表示形式を指定できます。
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-フォーマットトークンは`format-date()`および`format-date-time()`と同じです。[関数 — 日付と時間関数](operators-and-functions/functions#date-and-time-functions)を参照してください。
+書式設定トークンは `format-date()` および `format-date-time()` と同じです。 [関数 — 日付と時刻の関数](operators-and-functions/functions#date-and-time-functions) を参照してください。
+
+例：
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | datetime | event_time | イベントの日時 | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | 生年月日 | inline-[%d/%m/%Y] |
 
-## 既知の制限
+### インラインボタンのレイアウト — `display{}` と `results{}`
 
-- 複雑な外観はすべてのプラットフォームで同一にレンダリングされないことがある。
-- 一部の高度なrtSurvey外観はオフラインモードではサポートされない場合がある。
+インラインアイコンボタン（`date`、 `time`、 `datetime`、 `image`、 `audio`、 `video`、 `file`、 `barcode`、 `geopoint`）としてレンダリングされる質問タイプの場合、2つの外観修飾子がボタンの位置とキャプチャ後の動作を制御します。
 
-## 外観問題のトラブルシューティング
+#### `display{...}` — キャプチャ前のボタン位置
 
-1. **外観が適用されない**：外観列のタイポを確認する。
-2. **一貫性のないレンダリング**：質問タイプとプラットフォームとの互換性を確認する。
-3. **パフォーマンスの問題**：複雑な外観を簡略化することを検討する（特に大規模な調査の場合）。
+```
+display{<align>, <size>, <color>}
+```
+
+| パラメータ | 値 | デフォルト |
+|------------|------|------------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | 16進数 例： `#FF5500` | プライマリーテーマカラー |
+| Flag | `inline-icon` | アイコンモードを強制 |
+
+| Align の値 | レイアウト |
+|-------------|------------|
+| `right` | ラベルの右側にボタン |
+| `left` | ラベルの左側にボタン |
+| `top` | ラベルの上にボタン、全幅中央揃え |
+| `center` / `bottom` | ラベルの下にボタン、全幅中央揃え |
+
+#### `results{...}` — キャプチャ後のレイアウトと可視性
+
+`display{}` の設定を継承します。値がキャプチャされた後にボタンを移動したり、要素を非表示にしたりするために使用します。
+
+```
+results{<align>, hide(<element>)}
+```
+
+| `hide` の値 | 効果 |
+|---|---|
+| `hide(capture)` | ファイル/値が存在する場合、キャプチャボタンを非表示にします |
+| `hide(review)` | レビューサムネイル / 再生ボタンを非表示にします |
+| `hide(filename)` | アップロード後に表示されるファイル名を非表示にします |
+| `hide(camera)` | キャプチャ後にカメラトリガーボタンを非表示にします |
+| `hide(scanner)` | 値がスキャンされた後にバーコードスキャンボタンを非表示にします |
+| `hide(value)` | スキャンされた値のテキスト（バーコード / geopoint）を非表示にします |
+
+ウィジェットは、値がキャプチャされた瞬間に、 `display{}` レイアウトから `results{}` レイアウトに自動的に切り替わります。
+
+**例：**
+
+```
+inline display{right}                                    → ラベルの右側にアイコン
+inline display{left, large}                              → 左側に大きなアイコン
+inline display{center, large, #FF5500}                   → ラベルの下に大きなオレンジ色のアイコン
+inline display{right} results{left}                      → キャプチャ後にアイコンが左に移動
+inline display{right} results{hide(capture)}             → キャプチャ後にアイコンが消える
+inline display{center} results{hide(capture), hide(filename)}
+```
+
+## 既知の制限事項
+
+- 複雑な外観は、すべてのプラットフォームで同一にレンダリングされない場合があります。
+- 一部の高度な rtSurvey の外観は、オフラインモードでサポートされていない場合があります。
+
+## 外観の問題のトラブルシューティング
+
+1. **外観が適用されない**: appearance列にタイポがないか確認してください。
+2. **一貫性のないレンダリング**: 質問タイプおよびプラットフォームとの互換性を確認してください。
+3. **パフォーマンスの問題**: 特に大規模な調査では、複雑な外観を簡素化することを検討してください。

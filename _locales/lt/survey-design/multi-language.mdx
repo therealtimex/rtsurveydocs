@@ -1,17 +1,17 @@
 ---
-title: "Daugiakalbis palaikymas"
+title: "Daugiakalbystės palaikymas"
 description: ""
 ---
 
-rtSurvey suteikia patikimą daugiakalbį palaikymą, leidžiantį kurti apklausas keliomis kalbomis. Ši funkcija yra esminė vykdant tyrimus tarp įvairių kalbinių grupių arba daugiakalbėje aplinkoje.
+„rtSurvey“ užtikrina tvirtą daugiakalbystės palaikymą, leidžiantį kurti apklausas keliomis kalbomis. Ši funkcija yra itin svarbi atliekant tyrimus įvairiose kalbinėse grupėse arba daugiakalbėse aplinkose.
 
-## Daugiakalbių apklausų konfigūravimas
+## Daugiakalbių apklausų nustatymas
 
-Norėdami sukurti daugiakalbę apklausą rtSurvey sistemoje, turite pridėti kalbai specifinių stulpelių prie savo XLSForm. Štai kaip:
+Norėdami sukurti daugiakalbę apklausą „rtSurvey“, į savo „XLSForm“ turite pridėti kalbai specifinius stulpelius. Štai kaip tai padaryti:
 
-1. **Etikečių vertimai**: pridėkite kiekvienos kalbos stulpelius naudodami formatą `label::Kalba (kodas)`.
-2. **Patarimų vertimai**: naudokite `hint::Kalba (kodas)` patarimų vertimui.
-3. **Medijos failų vertimai**: kalbai specifinei medijai naudokite `media::Kalba (kodas)`.
+1. **Etikečių vertimai (Label Translations)**: Pridėkite stulpelius kiekvienai kalbai naudodami formatą `label::Language (code)`.
+2. **Užuominų vertimai (Hint Translations)**: Naudokite `hint::Language (code)` užuominų vertimui.
+3. **Medijos failų vertimai (Media File Translations)**: Kalbai specifinei medijai naudokite `media::Language (code)`.
 
 Pavyzdys:
 
@@ -23,11 +23,11 @@ Pavyzdys:
 
 ## Kalbų kodai
 
-Rekomenduojama naudoti oficialius 2 simbolių kalbų kodus (subžymas) po kalbos pavadinimo. Tai palengvina formos kalbos suderinimą su naudotojo sąsajos kalba. Oficialius kodus galite rasti [čia](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+Rekomenduojama po kalbos pavadinimo naudoti oficialius 2 simbolių kalbų kodus (subtags). Tai palengvina formos kalbos suderinimą su vartotojo sąsajos kalba. Oficialius kodus galite rasti [čia](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
 ## Numatytosios kalbos nustatymas
 
-Norėdami nustatyti numatytąją duomenų rinkimo kalbą, naudokite `settings` darbalapį savo XLSForm:
+Norėdami nustatyti numatytąją kalbą duomenų rinkimui, naudokite `settings` darbalapį savo „XLSForm“:
 
 ```
 | form_id   | version | default_language |
@@ -35,18 +35,18 @@ Norėdami nustatyti numatytąją duomenų rinkimo kalbą, naudokite `settings` d
 | test_form | 101     | French (fr)       |
 ```
 
-## rtSurvey specifinės funkcijos
+## „rtSurvey“ specifinės funkcijos
 
-### Dinaminis kalbos keitimas
+### Dinaminis kalbos perjungimas
 
-rtSurvey leidžia naudotojams dinamiškai keisti kalbą duomenų rinkimo metu:
+„rtSurvey“ leidžia vartotojams dinamiškai keisti kalbas duomenų rinkimo metu:
 
-- Žiniatinklio sąsajoje naudokite kalbos išskleidžiamąjį meniu viršutinėje naršymo juostoje.
-- Mobiliojoje programoje pasiekite kalbos parinktis per nustatymų meniu.
+- Žiniatinklio sąsajoje naudokite kalbų išskleidžiamąjį sąrašą viršutinėje navigacijos juostoje.
+- Mobiliojoje programėlėje pasiekite kalbos parinktis per nustatymų meniu.
 
-### Kalbai specifiniai tikrinimo pranešimai
+### Kalbai specifiniai validacijos pranešimai
 
-rtSurvey išplečia daugiakalbį palaikymą tikrinimo pranešimais:
+„rtSurvey“ išplečia daugiakalbystės palaikymą ir validacijos pranešimams:
 
 ```
 | type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
@@ -54,9 +54,19 @@ rtSurvey išplečia daugiakalbį palaikymą tikrinimo pranešimais:
 | integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
+### Lokalizuoti privalomi pranešimai
+
+Naudokite `required_message::Language (code)`, kad parodytumėte išverstą klaidą, kai privalomas laukas paliekamas tuščias:
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
 ### RTL kalbų palaikymas
 
-Dešinės į kairę (RTL) kalboms, tokioms kaip arabų ar hebrajų, rtSurvey automatiškai koreguoja išdėstymą:
+Kalbomis, kurios rašomos iš dešinės į kairę (RTL), pavyzdžiui, arabų ar hebrajų, „rtSurvey“ automatiškai pritaiko išdėstymą:
 
 ```
 | type | name | label::English (en) | label::Arabic (ar) |
@@ -64,9 +74,9 @@ Dešinės į kairę (RTL) kalboms, tokioms kaip arabų ar hebrajų, rtSurvey aut
 | text | name | Your name           | اسمك                |
 ```
 
-### Kalbai specifinė išvaizda
+### Kalbai specifinis Appearance
 
-rtSurvey leidžia nurodyti skirtingas išvaizdas skirtingoms kalboms:
+„rtSurvey“ leidžia nurodyti skirtingus appearance nustatymus skirtingoms kalboms:
 
 ```
 | type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
@@ -74,47 +84,81 @@ rtSurvey leidžia nurodyti skirtingas išvaizdas skirtingoms kalboms:
 | text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
 
-## Geriausios daugiakalbių apklausų praktikos
+## HTML formatavimas dvikalbėse etiketėse
 
-1. **Nuoseklus pavadinimas**: naudokite nuoseklius kalbų kodus visoje formoje.
-2. **Profesionalus vertimas**: pasitelkite profesionalius vertėjus, susipažinusius su apklausos kontekstu.
-3. **Konteksto pastabos**: pateikite konteksto pastabas vertėjams, kad užtikrintumėte tikslų vertimą.
-4. **Testavimas**: prieš diegimą patikrinkite savo formą visomis kalbomis.
-5. **Unicode palaikymas**: užtikrinkite, kad jūsų duomenų rinkimo įrenginiai palaiko Unicode ne-lotyniškiems rašmenims.
-6. **Kalbai specifinė medija**: naudokite kultūriškai tinkamus vaizdus ar garsą kiekvienai kalbai.
-7. **Venkite teksto vaizduose**: jei naudojate vaizdus su tekstu, sukurkite atskirus vaizdus kiekvienai kalbai.
+Vienoje etiketės langelyje galite derinti HTML žymas su kalbos apvalkalais. „rtSurvey“ ištraukia aktyvios kalbos bloką ir atvaizduoja likusį HTML.
 
-## Specialių atvejų tvarkymas
+Pavyzdys naudojant paryškinimą ir šrifto spalvą kiekvienai kalbai:
 
-### Mišrūs kalbų atsakymai
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
 
-rtSurvey leidžia respondentams įvesti tekstą bet kokiu raštu, nepaisant pasirinktos formos kalbos. Tai naudinga vardams ar adresams fiksuoti originaliu raštu.
+Palaikomos vidinės žymos kalbos apvalkaluose: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Spalvoto teksto pavyzdys kiekvienai kalbai:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Kalbą atpažįstantys skaičiavimai
+
+Kai forma turi `${language_use}` lauką (nustatomą `change_language` valdikliu), naudokite `if()`, kad grąžintumėte vertes aktyvia kalba:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Pavyzdys – parodyti paieškos rezultatą aktyvia kalba naudojant `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Pastaba: `${language_use}` laukas paprastai nustatomas `change_language` appearance valdikliu. Žr. Appearance — change_language.
+
+## Geriausia daugiakalbių apklausų praktika
+
+1. **Nuoseklus pavadinimų suteikimas**: Visoje formoje naudokite nuoseklius kalbų kodus.
+2. **Profesionalus vertimas**: Pasitelkite profesionalius vertėjus, susipažinusius su apklausos kontekstu.
+3. **Konteksto pastabos**: Pateikite konteksto pastabas vertėjams, kad užtikrintumėte tikslius vertimus.
+4. **Testavimas**: Prieš įdiegdami, išbandykite formą visomis kalbomis.
+5. **Unicode palaikymas**: Įsitikinkite, kad jūsų duomenų rinkimo įrenginiai palaiko „Unicode“ ne lotyniškiems raštams.
+6. **Kalbai specifinė medija**: Kiekvienai kalbai naudokite kultūriškai tinkamus vaizdus ar garsą.
+7. **Venkite teksto vaizduose**: Jei naudojate vaizdus su tekstu, sukurkite atskirus vaizdus kiekvienai kalbai.
+
+## Specialiųjų atvejų tvarkymas
+
+### Mišriakalbiai atsakymai
+
+„rtSurvey“ leidžia respondentams įvesti tekstą bet kokiu raštu, nepriklausomai nuo pasirinktos formos kalbos. Tai naudinga norint užfiksuoti vardus ar adresus jų originaliu raštu.
 
 ### Kalbai specifiniai klausimų tipai
 
-Kai kurie klausimų tipai gali būti tinkamesni tam tikroms kalboms. rtSurvey leidžia naudoti skirtingus klausimų tipus skirtingoms kalboms:
+Kai kurie klausimų tipai gali būti tinkamesni tam tikroms kalboms. „rtSurvey“ leidžia naudoti skirtingus klausimų tipus skirtingoms kalboms:
 
-```
 | type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
 |--------------------|---------------------|------|---------------------|----------------------|
-| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
-```
+| text               | select_one kanji    | name | Įveskite savo vardą | 名前を選んでください    |
 
-## Daugiakalbių duomenų eksportas
+## Daugiakalbių duomenų eksportavimas
 
-Eksportuojant duomenis iš rtSurvey:
+Eksportuojant duomenis iš „rtSurvey“:
 
 - Pasirinkite eksportuoti konkrečia kalba arba įtraukti visas kalbų versijas.
-- Kalbos metaduomenys įtraukiami į eksportą, nurodant, kuria kalba buvo naudojamas kiekvienas atsakymas.
+- Į eksportą įtraukiami kalbų metaduomenys, nurodantys, kuri kalba buvo naudojama kiekvienam atsakymui.
 
-## Mobiliosios programos svarstymai
+## Svarstymai mobiliajai programėlei
 
-- rtSurvey mobilioji programa palaiko neprisijungusio veikimo kalbos keitimą.
-- Prieš išjungdami internetą, įsitikinkite, kad visi reikalingi kalbų failai yra atsisiųsti.
+- „rtSurvey“ mobilioji programėlė palaiko kalbų perjungimą neprisijungus.
+- Prieš atsijungdami įsitikinkite, kad visi reikiami kalbų failai yra atsisiųsti.
 
-## Žinomos apribojimai
+## Žinomi apribojimai
 
-- Kai kurios pažangios funkcijos gali būti neprieinamos visomis kalbomis.
+- Kai kurios pažangios funkcijos gali būti prieinamos ne visomis kalbomis.
 - Itin ilgi vertimai gali turėti įtakos išdėstymui mažesniuose ekranuose.
 
-Pasinaudodami rtSurvey daugiakalbėmis galimybėmis, galite kurti įtraukias, prieinamas apklausas, pasiekiančias įvairias gyventojų grupes ir teikiančias aukštos kokybės, kalbiškai tikslius duomenis.
+Išnaudodami „rtSurvey“ daugiakalbystės galimybes, galite sukurti įtraukias, prieinamas apklausas, kurios pasiekia įvairias grupes ir pateikia aukštos kokybės, kalbiškai tikslius duomenis.

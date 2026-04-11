@@ -1,0 +1,104 @@
+---
+title: "Form Gezinti Kontrolleri"
+description: "Kaydeden ve formdan çıkan stilli çıkış butonları oluşturmak için SaveFinalizedExit ve SaveIncompleteExit görünüm değerlerini kullanın."
+---
+
+**Form Gezinti Kontrolleri**, bir anketin altında tam genişlikte stilli butonlar olarak görünen `note` (veya `text`) alanlarına yerleştirilen görünüm değerleridir. Sayım görevlisinin tek bir dokunuşla gönderimi kaydetmesine ve formdan çıkmasına olanak tanırlar; bu çıkış, tamamlanmış (kesinleşmiş) bir kayıt veya bir taslak (tamamlanmamış) kayıt olarak yapılabilir.
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Gönderimi **kesinleşmiş olarak kaydeden** ve formdan çıkan bir buton oluşturur. Buton etiketi, alanın `label` sütunundan alınır.
+
+| XLSForm column | Değer |
+|----------------|-------|
+| `type` | `note` |
+| `name` | herhangi bir benzersiz ad (örneğin, `btn_finish`) |
+| `label` | buton üzerinde gösterilen metin |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Gönderim nihai, tamamlanmış bir kayıt olarak işaretlenir. Bu, yerleşik gönder butonuna dokunmakla eşdeğerdir.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Gönderimi **tamamlanmamış (taslak) olarak kaydeden** ve formdan çıkan bir buton oluşturur. Sayım görevlisi daha sonra buraya dönebilir ve doldurmaya devam edebilir.
+
+| XLSForm column | Değer |
+|----------------|-------|
+| `type` | `note` |
+| `name` | herhangi bir benzersiz ad (örneğin, `btn_pause`) |
+| `label` | buton üzerinde gösterilen metin |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Renk sözdizimi
+
+Her iki görünüm de `<#RRGGBB/>` formatında bir satır içi rengi kabul eder:
+
+- Tam olarak **6 onaltılık basamak** (büyük veya küçük harf) tarafından takip edilen `#`
+- Kapatma `/>` **zorunludur** — ihmal edilmesi ayrıştırmayı bozar
+- Örnek: `<#04B404/>` (yeşil), `<#EDC602/>` (kehribar), `<#D9534F/>` (kırmızı)
+
+Renk buton arka planını kontrol eder. Metin rengi uygulama tarafından otomatik olarak belirlenir.
+
+---
+
+## Örnek
+
+Bir formun sonuna yerleştirilen aşağıdaki iki alan, yeşil bir **Gönder** butonu ve kehribar rengi bir **Taslak olarak kaydet** butonu oluşturur:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Gönder | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Taslak olarak kaydet | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — butonları içindekiler tablosundan hariç tutma
+
+`toc-hide` görünüm belirteci, rtSurvey'e bir alanı formun **içindekiler tablosundan** (soruların genel bakış listesi) hariç tutmasını söyler. Gezinti butonları soru değildir, bu nedenle asla TOC'de görünmemelidir.
+
+Çıkış görünümünden sonra her zaman `toc-hide` ekleyin:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+toc-hide referansı için [Görünüm — toc-hide](../appearance#group-and-navigation) bölümüne bakın.
+
+---
+
+## Yerleşim kuralı
+
+Bir forma gezinti kontrolleri eklerken şu kurallara uyun:
+
+- Her iki butonu da formun **en sonuna**, tüm soru ve gruplardan sonraya yerleştirin.
+- Tamamlanma durumundan bağımsız olarak sayım görevlisinin her zaman çıkış yapabileceği bir yolu olması için her zaman **her iki** butonu birlikte ekleyin (biri kesinleşmiş, biri tamamlanmamış).
+- Gönderime yalnızca belirli koşullar karşılandığında (örneğin, zorunlu bir bölümün tamamlanması) izin verilmesi gerekiyorsa, kesinleşmiş çıkış butonunda `relevant` sütununu kullanın. Tamamlanmamış çıkış butonu genellikle **her zaman görünür** kalmalıdır.
+
+---
+
+## Koşullu kesinleşmiş çıkış
+
+Kesinleşmiş çıkış butonunun ne zaman gösterileceğini kontrol etmek için `relevant` sütununu kullanın. Tamamlanmamış çıkış, sayım görevlisinin her zaman duraklatıp geri dönebilmesi için koşulsuz olarak görünür kalmalıdır.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Gönder | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Taslak olarak kaydet | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Bu örnekte **Gönder** butonu yalnızca sayım görevlisi onay verdiğinde ve A bölümünü tamamlanmış olarak işaretlediğinde görünür. **Taslak olarak kaydet** butonu her zaman kullanılabilir.
+
+---
+
+## Sınırlamalar
+
+- **Alan türü `note` veya `text` olmalıdır.** Bu görünümlerin başka herhangi bir soru türünde kullanılması desteklenmez.
+- **Yalnızca 6 basamaklı onaltılık.** Kısa onaltılık (`<#FFF/>`) ve adlandırılmış renkler desteklenmez — her zaman tam 6 basamaklı formatı kullanın (örneğin, `<#FFFFFF/>`).
+- **Etiket sütunu buton metnidir.** `hint` sütunu bu alanlar için yok sayılır; yalnızca `label` işlenir.
+- **Her iki buton da mevcut olmalıdır.** Tamamlanmamış çıkış butonunun ihmal edilmesi, sayım görevlisini form ortasında duraklatma yolu olmadan bırakır.

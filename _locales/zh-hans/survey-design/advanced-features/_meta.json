@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "音频录制",
   "call-api": "Call API",
   "dynamic-question-type": "动态题目类型",
   "dynamic-search": "动态搜索",

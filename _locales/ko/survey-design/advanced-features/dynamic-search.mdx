@@ -1,72 +1,72 @@
 ---
-title: "동적 검색"
-description: "동적 검색은 조사원이 입력하는 동안 실시간으로 원격 API에서 선택지를 로드하여 크거나 자주 업데이트되는 데이터셋을 가능하게 합니다."
+title: "동적 검색 (Dynamic Search)"
+description: "동적 검색은 조사원이 입력함에 따라 실시간으로 원격 API에서 선택 항목을 로드하여, 대규모 또는 빈번하게 업데이트되는 데이터셋을 사용할 수 있게 합니다."
 ---
 
-**동적 검색** (검색 API라고도 함)은 `select_one`, `select_multiple` 또는 `text` 필드가 조사원이 입력하는 동안 **런타임**에 원격 웹 서비스에서 선택지를 로드할 수 있도록 합니다. 선택지 목록이 CSV 파일에 번들로 묶기에 너무 크거나, 자주 업데이트되거나, 실시간 데이터베이스에서 제공될 때 적합한 방법입니다.
+**동적 검색**(Search API라고도 함)은 `select_one`, `select_multiple` 또는 `text` 필드가 조사원이 입력하는 동안 **런타임**에 원격 웹 서비스에서 선택 항목을 로드할 수 있도록 합니다. 이는 선택 항목 목록이 너무 커서 CSV 파일에 묶을 수 없거나, 자주 업데이트되거나, 라이브 데이터베이스에서 가져와야 하는 경우에 적합한 방식입니다.
 
 ---
 
 ## `search-api()` appearance
 
-동적 검색은 `search-api()` 함수를 사용하여 `appearance` 열에서 구성됩니다:
+동적 검색은 `appearance` 열에서 `search-api()` 함수를 사용하여 설정합니다:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
 ```
 
-### 매개변수
+### Parameters
 
-| 매개변수 | 설명 |
+| Parameter | 설명 |
 |-----------|-------------|
-| `method` | 항상 `'POST'`를 사용합니다 |
-| `url` | 쿼리할 API 엔드포인트 |
-| `post_body` | API에 전송되는 JSON 본문. 조사원의 현재 검색 텍스트의 자리 표시자로 `%__input__%`를 사용합니다 |
-| `value_column` | 저장된 **값**으로 사용할 응답 객체의 키 |
-| `display` | 드롭다운에 표시되는 **레이블**로 사용할 키 (또는 템플릿). `##key##` 자리 표시자와 `@{func}` 표현식을 지원합니다 |
-| `data_path` | 응답의 결과 객체 배열에 대한 JSONPath (예: `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | 다른 필드에서 사용할 수 있도록 원시 응답이 저장되는 이름 |
+| `method` | 항상 `'POST'`를 사용합니다. |
+| `url` | 쿼리할 API 엔드포인트입니다. |
+| `post_body` | API로 전송되는 JSON 본문입니다. 조사원의 현재 검색 텍스트에 대한 플레이스홀더로 `%__input__%`를 사용하십시오. |
+| `value_column` | 응답 객체에서 저장된 **값(value)**으로 사용할 키입니다. |
+| `display` | 드롭다운에 표시되는 **레이블(label)**로 사용할 키(또는 템플릿)입니다. `##key##` 플레이스홀더와 `@{func}` 표현식을 지원합니다. |
+| `data_path` | 응답에서 결과 객체 배열에 대한 JSONPath입니다(예: `$.data`, `$.hits.hits.*._source`). |
+| `save_path` | 다른 필드에서 사용할 수 있도록 원시 응답이 저장되는 이름입니다. |
 
 ---
 
 ## 기본 예시
 
-조사원이 시설 이름의 일부를 입력하는 의료 시설 조회:
+조사원이 의료 시설 이름의 일부를 입력하는 의료 시설 조회 예시입니다:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one | facility | 의료 시설 선택 | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-조사원이 "나이" 입력 시 API는 `{"query": "나이"}`를 수신하고 반환합니다:
+조사원이 "nair"를 입력하면 API는 `{"query": "nair"}`를 수신하고 다음을 반환합니다:
 
 ```json
 {
   "results": [
-    {"id": "HF001", "name": "나이로비 중앙 클리닉"},
-    {"id": "HF002", "name": "나이로비 웨스트 병원"}
+    {"id": "HF001", "name": "Nairobi Central Clinic"},
+    {"id": "HF002", "name": "Nairobi West Hospital"}
   ]
 }
 ```
 
-드롭다운에 `나이로비 중앙 클리닉`과 `나이로비 웨스트 병원`이 표시됩니다; 저장된 값은 `HF001` 또는 `HF002`입니다.
+드롭다운에는 `Nairobi Central Clinic`과 `Nairobi West Hospital`이 표시되며, 저장되는 값은 `HF001` 또는 `HF002`입니다.
 
 ---
 
-## 고급 표시 형식
+## 고급 표시 형식 설정
 
 ### `##key##` 템플릿 사용
 
-레이블에 여러 필드 표시:
+레이블에 여러 필드를 표시합니다:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
 ```
 
-표시 형식: `나이로비 중앙 클리닉 (나이로비)`.
+표시 결과: `Nairobi Central Clinic (Nairobi)`.
 
 ### `@{func}` 표현식 사용
 
-표시 레이블에서 조건부 논리 적용:
+표시 레이블에 조건부 로직을 적용합니다:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-활성 결과는 `✓ 클리닉 이름`으로, 비활성은 `✗ 클리닉 이름`으로 표시됩니다.
+활성 결과는 `✓ Clinic Name`으로 표시되고, 비활성 결과는 `✗ Clinic Name`으로 표시됩니다.
 
 ---
 
 ## 기본값 설정: `search-default-api()`
 
-`search-api()` 뒤에 `search-default-api()`를 사용하여 별도의 API 호출에서 로드된 기본 선택지로 필드를 미리 채웁니다 (예: 기존 레코드 편집 시):
+`search-api()` 뒤에 `search-default-api()`를 사용하여 별도의 API 호출로부터 로드된 기본 선택 항목으로 필드를 미리 채울 수 있습니다(예: 기존 레코드를 편집할 때):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -88,9 +88,9 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## select_multiple에 대한 사용자 정의 구분자: `search-default-separator()`
+## select_multiple을 위한 사용자 정의 구분자: `search-default-separator()`
 
-`select_multiple` 필드의 경우 여러 선택된 값이 저장된 문자열에서 연결되는 방식을 지정합니다:
+`select_multiple` 필드의 경우, 선택된 여러 값이 저장된 문자열에서 어떻게 결합될지 지정할 수 있습니다:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
@@ -106,32 +106,91 @@ appearance: search-api(...) search-default-separator(' || ')
 |---------------|----------|
 | `select_one` | 검색 결과에서 단일 선택 |
 | `select_multiple` | 검색 결과에서 다중 선택 |
-| `text` | 자동 완성 — 조사원이 자유롭게 입력하지만 제안을 선택할 수 있음 |
+| `text` | 자동 완성 — 조사원이 자유롭게 입력할 수 있지만 제안 항목을 선택할 수도 있음 |
 
 ---
 
 ## 저장된 응답 데이터 사용
 
-`save_path`는 전체 API 응답 객체를 지정된 이름 아래에 저장합니다. 다른 필드는 `pulldata()`로 참조할 수 있습니다:
+조사원이 결과를 선택하면 rtSurvey는 응답에서 일치하는 전체 객체를 `save_path` 이름으로 저장합니다. 다른 필드에서는 두 가지 방법으로 이를 읽을 수 있습니다.
+
+### 방법 1 — `pulldata()` 조회
+
+`pulldata('save_path', 'key')`를 사용하여 저장된 객체에서 최상위 필드를 읽습니다:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | 시설 선택 | `search-api(..., 'facility_data')` |
+| select_one | facility | 시설 선택 | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+`select_one` 행의 appearance에는 일치하는 `save_path`를 가진 `search-api(..., 'facility_data')`가 포함되어야 합니다.
+
+**중첩된 JSON 필드**의 경우, `substr-jsonpath()`와 결합하십시오:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
 
 ---
 
-## 모범 사례
+## search()를 이용한 로컬 파일 검색
 
-1. API 엔드포인트가 1–2초 내에 응답하는지 확인합니다 — 느린 API는 검색이 반응하지 않는 것처럼 느껴지게 합니다.
-2. API가 전체 데이터셋이 아닌 일치하는 결과만 반환하도록 `post_body`에 `%__input__%`를 사용합니다.
-3. 빠른 응답을 위해 서버 측 (예: Elasticsearch, 데이터베이스 전체 텍스트 인덱스)에서 검색 필드를 인덱싱합니다.
-4. 쿼리당 결과를 20–50개로 제한합니다 — 수천 개의 결과를 반환하면 검색의 목적이 무의미해집니다.
-5. 단일 문자 입력으로 광범위한 쿼리가 트리거되는 것을 방지하기 위해 API에서 최소 입력 길이 요구 사항을 포함합니다.
+`search()`는 번들로 제공되는 SQLite `.db` 파일에 대해 오프라인 열 일치 조회를 수행합니다. 네트워크 연결이나 SQL 쿼리가 필요하지 않습니다. 참조 데이터가 양식과 함께 패키징되어 있고 "열이 값과 일치하는 모든 행 찾기"와 같은 간단한 조회가 필요한 경우에 사용하십시오.
+
+### Signature
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parameters
+
+| Parameter | 설명 |
+|-----------|-------------|
+| `path` | SQLite 테이블 경로: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | 일치 연산자 — 열이 값과 일치하는 행을 반환합니다. |
+| `'list_name'` | 일치 여부를 확인할 열 이름입니다. |
+| `${field}` | 일치시킬 값으로, 일반적으로 필드 참조입니다. |
+
+### 예시
+
+`${d307}`의 값을 `d307.db`의 `externalData` 테이블에 있는 `list_name` 열과 일치시켜 로컬 데이터베이스에서 `select_one`을 채웁니다:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | 시설 선택 | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+`${d307}`이 `"HF001"`인 경우, `search()`는 네트워크 호출 없이 번들 파일에서 `list_name = 'HF001'`인 `externalData`의 모든 행을 반환합니다.
+
+### search() vs rawquery 자동 완성
+
+| 기능 | `search()` | `rawquery` 자동 완성 |
+|---------|-----------|------------------------|
+| SQL 쿼리 | 아니요 — 열 일치만 가능 | 예 — 전체 `SELECT … FROM …` |
+| 매개변수화된 입력 | 열 값 일치 | SQL 문자열에 포함됨 |
+| 자유 텍스트 입력 | 예 — 조사원이 자유롭게 입력 가능 | 아니요 — 목록에서 선택해야 함 |
+| UNION / 다중 테이블 | 지원되지 않음 | 지원됨 |
+
+### 각각 언제 사용해야 하는가
+
+- 번들로 제공되는 `.db` 파일에 대해 간단한 일치 조회가 필요하고, 양식이 오프라인에서 작동해야 하며, 자유 텍스트 입력을 허용하려는 경우 **`search()`**를 사용하십시오.
+- SQL 유연성(JOIN, UNION, 계산된 열)이 필요하거나 여러 테이블에 걸쳐 쿼리해야 하고, 양식이 안정적인 연결성을 갖춘 경우 **`rawquery` 자동 완성**을 사용하십시오.
+
+---
+
+## 권장 사항 (Best Practices)
+
+1. API 엔드포인트가 1~2초 이내에 응답하도록 하십시오. API가 느리면 검색 반응이 느리게 느껴질 수 있습니다.
+2. `post_body`에 `%__input__%`를 사용하여 API가 전체 데이터셋이 아닌 일치하는 결과만 반환하도록 하십시오.
+3. 빠른 응답을 위해 서버 측에서 검색 필드에 인덱스(예: Elasticsearch, 데이터베이스 전체 텍스트 인덱스)를 생성하십시오.
+4. 쿼리당 결과를 20~50개로 제한하십시오. 수천 개의 결과를 반환하는 것은 검색의 목적에 어긋납니다.
+5. 단일 문자 입력 시 광범위한 쿼리가 트리거되는 것을 방지하기 위해 API에 최소 입력 길이 요구 사항을 포함하십시오.
 
 ## 제한 사항
 
-- 동적 검색은 네트워크 연결이 필요합니다 — 오프라인에서는 작동하지 않습니다.
-- `%__input__%` 자리 표시자는 그대로 삽입됩니다; 인젝션 공격을 방지하기 위해 서버 측에서 입력을 정제합니다.
-- 복잡한 `@{func}` 표시 표현식은 모든 rtSurvey 클라이언트 버전에서 지원이 제한될 수 있습니다.
+- 동적 검색은 네트워크 연결이 필요하며 오프라인에서는 작동하지 않습니다.
+- `%__input__%` 플레이스홀더는 있는 그대로 주입됩니다. 인젝션 공격을 방지하기 위해 서버 측에서 입력을 살균(Sanitise)하십시오.
+- 복잡한 `@{func}` 표시 표현식은 일부 rtSurvey 클라이언트 버전에서 지원이 제한될 수 있습니다.

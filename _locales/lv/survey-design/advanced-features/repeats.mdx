@@ -1,60 +1,250 @@
 ---
-title: "Uzlabotas atkārtojumu grupas"
-description: "Uzlaboti modeļi atkārtojumu grupām: dinamiskie skaiti, ligzdotas atkārtojumu grupas, atkārtojumu datu apkopošana un vērtību atsauces starp atkārtojumiem."
+title: "Sarežģīti atkārtojumi"
+description: "Sarežģīti atkārtojumu grupu modeļi: dinamisks skaits, ligzdoti atkārtojumi, atkārtojumu datu apkopošana un atsauces uz vērtībām starp atkārtojumiem."
 ---
 
-Šī lapa aptver uzlabotos modeļus darbam ar atkārtojumu grupām rtSurvey. Atkārtojumu grupas pamatu iestatīšanai skatiet [Grupēšana un atkārtojumi](../repeats).
+Šajā lapā ir aprakstīti sarežģīti modeļi darbam ar atkārtojumu grupām (repeat groups) rtSurvey. Atkārtojumu grupas iestatīšanas pamatus skatiet lapā [Grupēšana un atkārtojumi](../repeats).
 
 ---
 
-## Dinamiskie atkārtojumu skaiti
+## Dinamisks atkārtojumu skaits
 
-Izmantojiet iepriekšējo atbilžu lauku, lai noteiktu atkārtojumu skaitu:
+Pēc noklusējuma intervētājs izlemj, cik reizes atkārtot. Atkārtojumu skaitu var fiksēt, izmantojot `repeat_count`:
 
-```
-| type         | name           | label                          | repeat_count       |
-|--------------|----------------|--------------------------------|--------------------|
-| integer      | num_children   | Bērnu skaits?                  |                    |
-| begin repeat | child          | Bērns                          | ${num_children}    |
-| text         | child_name     | Bērna vārds                    |                    |
-| integer      | child_age      | Bērna vecums                   |                    |
-| end repeat   |                |                                |                    |
-```
+| type | name | label | repeat_count |
+|------|------|-------|--------------|
+| begin_repeat | household_members | Mājsaimniecības loceklis | `${num_members}` |
+| text | member_name | Locekļa vārds | |
+| integer | member_age | Vecums | |
+| end_repeat | | | |
 
-## Atsauces uz atkārtojumu vērtībām no ārpuses
+Atkārtojums tiek veikts tieši `${num_members}` reizes, kur `num_members` vērtība tika iegūta iepriekš formā. Intervētājs nevar pievienot vai noņemt eksemplārus.
 
-Izmantojiet `indexed-repeat()`, lai piekļūtu konkrētai atkārtojuma instancei no ārpuses atkārtojuma grupas:
+---
 
-```
-indexed-repeat(${child_name}, ${children}, 1)
-```
+## Indeksēta piekļuve: `indexed-repeat()`
 
-Tas atgriež pirmā bērna vārdu.
+Piekļūstiet konkrēta atkārtojuma eksemplāra lauka vērtībai no atkārtojumu grupas **ārpuses**, izmantojot `indexed-repeat(repeatedField, repeatGroup, index)`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+Tas ir noderīgi, veidojot kopsavilkuma laukus vai atsaucoties uz "galvenā" locekļa datiem pēc atkārtojuma cikla beigām.
+
+---
+
+## Pašreizējā eksemplāra pozīcija: `index()`
+
+Atkārtojumu grupas iekšpusē `index()` atgriež pašreizējā eksemplāra pozīciju (sākot no 1). Izmantojiet to, lai marķētu katru atkārtojumu vai izveidotu unikālus identifikatorus:
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | plots | Zemes gabals |
+| note | plot_label | Zemes gabals numur `${index()}` |
+| text | plot_id | Zemes gabala ID |
+| end_repeat | | |
+
+---
+
+## Atsauces uz laukiem tajā pašā eksemplārā
+
+Atkārtojuma ietvaros izmantojiet `${fieldname}`, lai atsauktos uz citu lauku **tajā pašā atkārtojuma eksemplārā**. Tajā pašā ciklā nav nepieciešams izmantot `indexed-repeat()`:
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | Loceklis | |
+| text | member_name | Vārds | |
+| integer | member_age | Vecums | |
+| text | school_name | Skolas nosaukums | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## Atsauces uz vecākelementu laukiem no atkārtojuma iekšpuses
+
+Uz laukiem ārpus (virs) atkārtojumu grupas var atsaukties parastajā veidā, izmantojot `${fieldname}`:
+
+| type | name | label |
+|------|------|-------|
+| text | village | Ciemata nosaukums |
+| begin_repeat | plots | Lauksaimniecības zemes gabals |
+| note | plot_context | Zemes gabali ciematā `${village}` |
+| end_repeat | | |
+
+---
 
 ## Atkārtojumu datu apkopošana
 
-```
-sum(${loan_amount})          → Visu aizdevumu summa
-count(${household_members})  → Mājsaimniecības locekļu skaits
-join(', ', ${member_name})   → Komata atdalīts vārdu saraksts
-```
+Izmantojiet atkārtojumu apkopošanas funkcijas **ārpus** atkārtojumu grupas, lai apkopotu datus:
 
-## Ligzdotas atkārtojumu grupas
+| Funkcija | Piemērs | Apraksts |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | Eksemplāru skaits |
+| `sum(field)` | `sum(${loan_amount})` | Skaitliskā lauka summa |
+| `min(field)` | `min(${member_age})` | Minimālā vērtība |
+| `max(field)` | `max(${member_age})` | Maksimālā vērtība |
+| `join(sep, field)` | `join(', ', ${member_name})` | Ar komatiem atdalīts saraksts |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Nosacījuma skaits |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Nosacījuma summa |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Nosacījuma apvienošana |
 
-```
-| type         | name           | label                |
-|--------------|----------------|----------------------|
-| begin repeat | household      | Mājsaimniecība       |
-| text         | hh_name        | Mājsaimniecības nosaukums |
-| begin repeat | hh_member      | Mājsaimniecības loceklis |
-| text         | member_name    | Locekļa vārds        |
-| integer      | member_age     | Locekļa vecums       |
-| end repeat   |                |                      |
-| end repeat   |                |                      |
-```
+### Piemērs: Mājsaimniecības kopsavilkums
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | Cik locekļu ir pavisam? | |
+| begin_repeat | members | Loceklis | `${num_members}` |
+| text | member_name | Vārds | |
+| integer | member_age | Vecums | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | `${total_members}` locekļi; `${children_count}` jaunāki par 18 gadiem. Pieaugušie: `${adult_names}` | |
+
+---
+
+## Ligzdoti atkārtojumi
+
+Atkārtojumu grupa var saturēt citu atkārtojumu grupu. Izmantojiet to uzmanīgi – ligzdoti atkārtojumi palielina sarežģītību un var mulsināt intervētājus.
+
+| type | name | label |
+|------|------|-------|
+| begin_repeat | households | Mājsaimniecība |
+| text | hh_id | Mājsaimniecības ID |
+| begin_repeat | hh_members | Loceklis |
+| text | member_name | Locekļa vārds |
+| end_repeat | | |
+| end_repeat | | |
+
+Lai no iekšējā atkārtojuma atsauktos uz lauku ārējā atkārtojumā, izmantojiet `${fieldname}` – tas norādīs uz tuvāko atbilstošo augstāka līmeņa elementu:
+
+Atkārtojuma `hh_members` iekšpusē `${hh_id}` atgriež **pašreizējās** mājsaimniecības ID, nevis visu mājsaimniecību ID.
+
+---
+
+## Rangs atkārtojumu grupās: `rank-index()`
+
+Ja atkārtojuma iekšpusē ir lauks `rank`, izmantojiet `rank-index(instanceNumber, repeatedField)` no ārpuses, lai iegūtu konkrēta eksemplāra kārtas rangu:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
+
+`rank-index(1, ${score})` atgriež eksemplāra indeksu ar visaugstāko punktu skaitu.
+
+---
+
+## `1screen` izskats `begin_repeat` rindā
+
+Pievienojot `1screen` rindas `begin_repeat` stabiņā `appearance`, visi katra atkārtojuma jautājumi tiek parādīti kopā vienā ekrānā, nevis katrs jautājums savā ekrānā.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Mājsaimniecības loceklis | `1screen` |
+| text | member_name | Locekļa vārds | |
+| integer | member_age | Vecums | |
+| end_repeat | | | |
+
+Ja ir iestatīts `1screen` un grupā nav lauka `repeat_count` un nav lauka `add_repeat`, rtSurvey ekrāna apakšā automātiski parāda apaļu **+** pogu, lai intervētāji varētu pievienot jaunus eksemplārus bez papildu konfigurācijas.
+
+| Izskats | Viens ekrāns katram eksemplāram | Pievienota noklusējuma + poga |
+|------------|-------------------------|------------------------|
+| `1screen` | Jā | Jā (ja nav apakšlaukuma `add_repeat`) |
+| `field-list` | Jā | Nē |
+
+Izmantojiet `field-list`, ja vēlaties grupētu izkārtojumu bez automātiskās pievienošanas pogas. Izmantojiet `1screen`, ja vēlaties gan grupētu izkārtojumu, gan iebūvētu veidu eksemplāru pievienošanai.
+
+---
+
+## `add_repeat` pielāgota pievienošanas poga
+
+Lauks `note` (vai `text`), kas novietots **atkārtojuma grupas iekšpusē** ar iestatījumu `appearance: add_repeat`, tiek rādīts kā pilna platuma poga "Pievienot". Pogas nosaukums tiek ņemts no lauka stabiņa `label`. Ja ir lauks `add_repeat`, noklusējuma apaļā + poga (no `1screen`) tiek paslēpta.
+
+Novietojiet lauku `add_repeat` kā pēdējo lauku atkārtojuma grupā:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Loceklis | `1screen` |
+| text | member_name | Locekļa vārds | |
+| integer | member_age | Vecums | |
+| note | btn_add | + Pievienot locekli | `add_repeat` |
+| end_repeat | | | |
+
+### Krāsu pielāgošana
+
+Izskata vērtībā ierakstiet krāsas kodu, lai mainītu pogas stilu:
+
+| Izskata vērtība | Rezultāts |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Zaļš fons, noklusējuma teksta krāsa |
+| `add_repeat 04B404-ffffff` | Zaļš fons, balts teksts |
+
+Pirmā krāsa ir fons, un otrā (aiz domuzīmes) ir teksta krāsa. Neizmantojiet `#` zīmi, ja izmantojat formātu ar domuzīmi.
+
+### Ikonas variants
+
+Izmantojiet `add_repeat icon` (ar atstarpi), lai rādītu kompaktu apaļu ikonas pogu pilna platuma pogas vietā:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Pievienot | `add_repeat icon` |
+
+---
+
+## Dzēšanas pogas: `delete-repeat-current` un `delete-repeat-last`
+
+Lauks `note` atkārtojuma grupas iekšpusē ar iestatījumu `appearance: delete-repeat-current` vai `appearance: delete-repeat-last` tiek rādīts kā sadalīta dzēšanas poga.
+
+| Izskats | Darbība |
+|------------|--------|
+| `delete-repeat-current` | Izdzēš pašreizējo (aktīvo) eksemplāru |
+| `delete-repeat-last` | Izdzēš pēdējo eksemplāru atkārtojumā |
+
+Noklusējuma poga (bez ikonas) ir sadalīta poga: atkritnes ikona kreisajā pusē un lauka etiķetes teksts labajā pusē, aizņemot visu ekrāna platumu.
+
+### Ikonas variants
+
+Pievienojiet galotni `-icon`, lai iegūtu kompaktu apaļu atkritnes ikonas pogu:
+
+| Izskats | Rezultāts |
+|------------|--------|
+| `delete-repeat-current-icon` | Apaļa atkritnes ikona, izdzēš pašreizējo eksemplāru |
+| `delete-repeat-last-icon` | Apaļa atkritnes ikona, izdzēš pēdējo eksemplāru |
+
+### Krāsu pielāgošana
+
+Krāsu formāts ir identisks `add_repeat`: izmantojiet `<#RRGGBB/>` vai `RRGGBB-RRGGBB` (fons-teksts).
+
+### Pilna parauga piemērs
+
+Šajā atkārtojumā tiek izmantots `1screen` izskats, augšpusē ir apaļa pašreizējā eksemplāra dzēšanas poga, bet apakšā – pilna platuma pievienošanas poga:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Loceklis | `1screen` |
+| note | btn_del | Noņemt | `delete-repeat-current-icon` |
+| text | member_name | Locekļa vārds | |
+| integer | member_age | Vecums | |
+| note | btn_add | + Pievienot locekli | `add_repeat` |
+| end_repeat | | | |
+
+---
 
 ## Labākā prakse
 
-1. Ierobežojiet ligzdošanas dziļumu — dziļi ligzdoti atkārtojumi var ietekmēt veiktspēju.
-2. Izmantojiet `count()` un `sum()` apkopojuma aprēķiniem.
-3. Pārbaudiet ar lieliem atkārtojumu skaitiem mobilo ierīču veiktspējai.
+1. Vienmēr izmantojiet `repeat_count`, ja atkārtojumu skaits ir zināms iepriekš – tas novērš nejaušu eksemplāru pievienošanu vai noņemšanu.
+2. Atkārtojumu grupām jābūt mērķtiecīgām – atkārtojumu ar vairāk nekā 20 jautājumiem vienā eksemplārā ir grūti pārskatīt.
+3. Nosauciet atkārtojumu grupas skaidri (piemēram, `household_members`, nevis `repeat1`) – nosaukums parādās funkciju izsaukumos un eksportētajos datos.
+4. Veiciet testēšanu ar maksimālo paredzamo eksemplāru skaitu, lai pārbaudītu veiktspēju.
+5. Izmantojiet `1screen` parametrā `begin_repeat`, lai parādītu visus jautājumus vienā ekrānā katram eksemplāram, un grupā pievienojiet `add_repeat` piezīmju lauku, lai sniegtu intervētājiem skaidri marķētu pogu "Pievienot".
+
+---
+
+## Ierobežojumi
+
+- Funkcijai `indexed-repeat()` nepieciešams derīgs indekss (no 1 līdz eksemplāru skaitam) – indeksi ārpus diapazona atgriež tukšu vērtību.
+- Nav ieteicams izmantot vairāk nekā 2 līmeņu ligzdotus atkārtojumus, jo tas var izraisīt attēlošanas problēmas dažās ierīcēs.
+- Apkopošanas funkcijas (`sum`, `count` u.c.) darbojas visā atkārtojumu grupā – jūs nevarat apkopot tikai daļu eksemplāru bez `*-if` variantiem.

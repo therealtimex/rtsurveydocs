@@ -1,15 +1,15 @@
 ---
-title: "Pokročilé opakovania"
-description: "Pokročilé vzory pre skupiny opakovaní: dynamické počty, vnorené opakovania, sumarizácia dát opakovaní a odkazovanie hodnôt naprieč opakovaniami."
+title: "Pokročilé Opakovania"
+description: "Pokročilé vzory pre opakované skupiny: dynamické počty, vnorené opakovania, sumarizácia údajov z opakovaní a odkazovanie na hodnoty naprieč opakovaniami."
 ---
 
-Táto stránka pokrýva pokročilé vzory pre prácu so skupinami opakovaní v rtSurvey. Pre základné nastavenie skupiny opakovaní pozri [Zoskupovanie a opakovania](../repeats).
+Táto stránka sa venuje pokročilým vzorom pre prácu s opakovanými skupinami v rtSurvey. Základy nastavenia opakovanej skupiny nájdete v časti [Zoskupovanie a opakovania](../repeats).
 
 ---
 
 ## Dynamický počet opakovaní
 
-Predvolene anketár rozhoduje, koľkokrát opakovať. Počet opakovaní môžete zafixovať pomocou `repeat_count`:
+V predvolenom nastavení rozhoduje o počte opakovaní anketár. Počet opakovaní môžete fixne určiť pomocou `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,39 +18,39 @@ Predvolene anketár rozhoduje, koľkokrát opakovať. Počet opakovaní môžete
 | integer | member_age | Vek | |
 | end_repeat | | | |
 
-Opakovanie prebehne presne `${num_members}`-krát, kde `num_members` bol zozbieraný skôr vo formulári. Anketár nemôže pridávať ani odstraňovať inštancie.
+Opakovanie sa spustí presne `${num_members}`-krát, pričom hodnota `num_members` bola získaná skôr vo formulári. Anketár nemôže pridávať ani odstraňovať inštancie.
 
 ---
 
 ## Indexovaný prístup: `indexed-repeat()`
 
-Prístup k hodnote poľa konkrétnej inštancie opakovania **zvonku** skupiny opakovaní pomocou `indexed-repeat(repeatedField, repeatGroup, index)`:
+K hodnote poľa konkrétnej inštancie opakovania môžete pristupovať **mimo** opakovanej skupiny pomocou `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Toto je užitočné na vytváranie súhrnných polí alebo odkazovanie dát „primárneho" člena po opakovní.
+To je užitočné na vytváranie súhrnných polí alebo na odkazovanie na údaje "primárneho" člena po skončení opakovania.
 
 ---
 
-## Aktuálna pozícia inštancie: `index()`
+## Pozícia aktuálnej inštancie: `index()`
 
-Vo vnútri skupiny opakovaní, `index()` vráti pozíciu aktuálnej inštancie (začína od 1). Použite ho na označenie každého opakovania alebo vytváranie jedinečných identifikátorov:
+Vo vnútri opakovanej skupiny vracia funkcia `index()` pozíciu aktuálnej inštancie (začína od 1). Použite ju na označenie každého opakovania alebo na vytvorenie jedinečných identifikátorov:
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | plots | Parcela |
-| note | plot_label | Parcela číslo `${index()}` |
+| note | plot_label | Číslo parcely `${index()}` |
 | text | plot_id | ID parcely |
 | end_repeat | | |
 
 ---
 
-## Odkazovanie polí v tej istej inštancii
+## Odkazovanie na polia v rovnakej inštancii
 
-V rámci opakovania použite `${fieldname}` na odkazovanie iného poľa **v tej istej inštancii opakovania**. V rámci toho istého cyklu nie je potrebné `indexed-repeat()`:
+V rámci opakovania použite `${fieldname}` na odkazovanie na iné pole **v rovnakej inštancii opakovania**. V rámci tej istej slučky nie je potrebné používať `indexed-repeat()`:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,30 +62,30 @@ V rámci opakovania použite `${fieldname}` na odkazovanie iného poľa **v tej 
 
 ---
 
-## Odkazovanie rodičovských polí zvnútra opakovania
+## Odkazovanie na nadradené polia z vnútra opakovania
 
-Polia mimo (nad) skupinou opakovaní môžu byť odkazované normálne pomocou `${fieldname}`:
+Na polia mimo (nad) opakovanej skupiny sa možno normálne odkazovať pomocou `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
 | text | village | Názov obce |
 | begin_repeat | plots | Poľnohospodárska parcela |
-| note | plot_context | Parcely v `${village}` |
+| note | plot_context | Parcely v obci `${village}` |
 | end_repeat | | |
 
 ---
 
-## Sumarizácia dát opakovaní
+## Sumarizácia údajov z opakovaní
 
-Použite agregačné funkcie opakovania **mimo** skupiny opakovaní na sumarizáciu:
+Na sumarizáciu použite agregačné funkcie opakovaní **mimo** opakovanej skupiny:
 
-| Funkcia | Príklad | Popis |
-|---------|---------|-------|
+| Function | Example | Description |
+|----------|---------|-------------|
 | `count(group)` | `count(${household_members})` | Počet inštancií |
 | `sum(field)` | `sum(${loan_amount})` | Súčet číselného poľa |
 | `min(field)` | `min(${member_age})` | Minimálna hodnota |
 | `max(field)` | `max(${member_age})` | Maximálna hodnota |
-| `join(sep, field)` | `join(', ', ${member_name})` | Zoznam oddelený čiarkami |
+| `join(sep, field)` | `join(', ', ${member_name})` | Zoznam oddelený čiarkou |
 | `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Podmienený počet |
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Podmienený súčet |
 | `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Podmienené spojenie |
@@ -94,7 +94,7 @@ Použite agregačné funkcie opakovania **mimo** skupiny opakovaní na sumarizá
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| integer | num_members | Koľko členov? | |
+| integer | num_members | Koľko má členov? | |
 | begin_repeat | members | Člen | `${num_members}` |
 | text | member_name | Meno | |
 | integer | member_age | Vek | |
@@ -102,13 +102,13 @@ Použite agregačné funkcie opakovania **mimo** skupiny opakovaní na sumarizá
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` členov; `${children_count}` mladších ako 18. Dospelí: `${adult_names}` | |
+| note | summary | `${total_members}` členov; `${children_count}` mladších ako 18 rokov. Dospelí: `${adult_names}` | |
 
 ---
 
 ## Vnorené opakovania
 
-Skupina opakovaní môže obsahovať inú skupinu opakovaní. Používajte to opatrne — vnorené opakovania pridávajú komplexnosť a môžu byť mätúce pre anketárov.
+Opakovaná skupina môže obsahovať ďalšiu opakovanú skupinu. Používajte to opatrne — vnorené opakovania zvyšujú komplexnosť a môžu byť pre anketárov mätúce.
 
 | type | name | label |
 |------|------|-------|
@@ -119,15 +119,15 @@ Skupina opakovaní môže obsahovať inú skupinu opakovaní. Používajte to op
 | end_repeat | | |
 | end_repeat | | |
 
-Na odkazovanie poľa vo vonkajšom opakovaní zvnútra vnútorného opakovania použite `${fieldname}` — preloží sa na najbližšieho zodpovedajúceho predka:
+Ak chcete z vnútorného opakovania odkazovať na pole vo vonkajšom opakovaní, použite `${fieldname}` — odkaz sa vyrieši na najbližšieho zodpovedajúceho predka:
 
-Vo vnútri opakovania `hh_members`, `${hh_id}` vráti ID **aktuálnej** domácnosti, nie všetkých domácností.
+Vo vnútri opakovania `hh_members` vráti `${hh_id}` ID **aktuálnej** domácnosti, nie všetkých domácností.
 
 ---
 
-## Poradie vo vnútri skupín opakovaní: `rank-index()`
+## Poradie v rámci opakovaných skupín: `rank-index()`
 
-Keď pole `rank` existuje vo vnútri opakovania, použite `rank-index(instanceNumber, repeatedField)` zvonku na získanie poradia konkrétnej inštancie:
+Ak sa v rámci opakovania nachádza pole typu `rank`, použite `rank-index(instanceNumber, repeatedField)` zvonku na získanie poradového čísla (indexu) konkrétnej inštancie:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -137,18 +137,114 @@ Keď pole `rank` existuje vo vnútri opakovania, použite `rank-index(instanceNu
 
 ---
 
+## Vzhľad `1screen` na `begin_repeat`
+
+Pridanie `1screen` do stĺpca `appearance` riadku `begin_repeat` zobrazí všetky otázky pre každú inštanciu spoločne na jednej obrazovke namiesto jednej otázky na obrazovku.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Člen domácnosti | `1screen` |
+| text | member_name | Meno člena | |
+| integer | member_age | Vek | |
+| end_repeat | | | |
+
+Keď je nastavené `1screen` a v skupine nie je pole `repeat_count` ani `add_repeat`, rtSurvey automaticky vykreslí kruhové tlačidlo **+** v spodnej časti obrazovky, aby anketári mohli pridávať nové inštancie bez akejkoľvek ďalšej konfigurácie.
+
+| Appearance | Jedna obrazovka na inštanciu | Predvolené tlačidlo + pridané |
+|------------|-------------------------|------------------------|
+| `1screen` | Áno | Áno (ak nie je prítomné `add_repeat`) |
+| `field-list` | Áno | Nie |
+
+Použite `field-list`, ak chcete skupinové rozloženie bez automatického tlačidla pridávania. Použite `1screen`, ak chcete skupinové rozloženie aj vstavaný spôsob pridávania inštancií.
+
+---
+
+## Vlastné tlačidlo pridávania `add_repeat`
+
+Pole typu `note` (alebo `text`) umiestnené **vo vnútri** opakovanej skupiny s `appearance: add_repeat` sa vykreslí ako tlačidlo „Pridať“ na celú šírku. Označenie tlačidla pochádza zo stĺpca `label` daného poľa. Ak je prítomné pole `add_repeat`, predvolené kruhové tlačidlo + (z `1screen`) sa potlačí.
+
+Umiestnite pole `add_repeat` ako posledné pole vo vnútri opakovanej skupiny:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Člen | `1screen` |
+| text | member_name | Meno člena | |
+| integer | member_age | Vek | |
+| note | btn_add | + Pridať člena | `add_repeat` |
+| end_repeat | | | |
+
+### Prispôsobenie farieb
+
+Štýl tlačidla môžete upraviť zadaním kódu farby v hodnote vzhľadu (appearance):
+
+| Appearance value | Result |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Zelené pozadie, predvolená farba textu |
+| `add_repeat 04B404-ffffff` | Zelené pozadie, biely text |
+
+Prvá farba je pozadie a druhá (za pomlčkou) je farba textu. Pri použití formátu oddeleného pomlčkou vynechajte znak `#`.
+
+### Variant s ikonou
+
+Použite `add_repeat icon` (s medzerou) na vykreslenie kompaktného kruhového tlačidla s ikonou namiesto tlačidla na celú šírku:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Pridať | `add_repeat icon` |
+
+---
+
+## Tlačidlá na odstránenie: `delete-repeat-current` a `delete-repeat-last`
+
+Pole `note` vo vnútri opakovanej skupiny s `appearance: delete-repeat-current` alebo `appearance: delete-repeat-last` sa vykreslí ako rozdelené tlačidlo na odstránenie.
+
+| Appearance | Action |
+|------------|--------|
+| `delete-repeat-current` | Odstráni aktuálnu (aktívnu) inštanciu |
+| `delete-repeat-last` | Odstráni poslednú inštanciu v opakovaní |
+
+Predvolené tlačidlo (bez ikony) je rozdelené tlačidlo: ikona koša vľavo a text označenia poľa vpravo, rozprestierajúce sa na celú šírku obrazovky.
+
+### Variant s ikonou
+
+Pridajte príponu `-icon`, aby ste získali kompaktné kruhové tlačidlo s ikonou koša:
+
+| Appearance | Result |
+|------------|--------|
+| `delete-repeat-current-icon` | Kruhová ikona koša, odstráni aktuálnu inštanciu |
+| `delete-repeat-last-icon` | Kruhová ikona koša, odstráni poslednú inštanciu |
+
+### Prispôsobenie farieb
+
+Formát farieb je identický s `add_repeat`: použite `<#RRGGBB/>` alebo `RRGGBB-RRGGBB` (pozadie-text).
+
+### Príklad kompletného vzoru
+
+Nasledujúce opakovanie používa `1screen`, kruhové tlačidlo na odstránenie aktuálnej inštancie v hornej časti a tlačidlo na pridanie na celú šírku v dolnej časti:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Člen | `1screen` |
+| note | btn_del | Odstrániť | `delete-repeat-current-icon` |
+| text | member_name | Meno člena | |
+| integer | member_age | Vek | |
+| note | btn_add | + Pridať člena | `add_repeat` |
+| end_repeat | | | |
+
+---
+
 ## Najlepšie postupy
 
-1. Vždy používajte `repeat_count` ak je počet opakovaní vopred známy — zabraňuje anketárom náhodne pridávať alebo odstraňovať inštancie.
-2. Udržujte skupiny opakovaní zamerané — opakovanie s viac ako 20 otázkami na inštanciu je ťažko navigovateľné.
-3. Pomenujte skupiny opakovaní jasne (napr. `household_members`, nie `repeat1`) — názov sa objavuje vo volaní funkcií a exportovaných dátach.
-4. Testujte s maximálnym očakávaným počtom inštancií na overenie výkonu.
-5. Použite vzhľad `field-list` na skupinu opakovaní, aby sa všetky polia zobrazili na jednej obrazovke na inštanciu (mobil).
+1. Vždy používajte `repeat_count`, keď je počet opakovaní známy vopred — zabránite tým anketárom náhodne pridať alebo odstrániť inštancie.
+2. Udržujte opakované skupiny prehľadné — opakovanie s viac ako 20 otázkami na inštanciu sa ťažko ovláda.
+3. Opakované skupiny pomenúvajte jasne (napr. `household_members`, nie `repeat1`) — názov sa objavuje vo volaniach funkcií a v exportovaných údajoch.
+4. Otestujte formulár s maximálnym očakávaným počtom inštancií, aby ste overili výkon.
+5. Použite `1screen` na `begin_repeat`, aby sa zobrazili všetky otázky na jednej obrazovke na inštanciu, v kombinácii s poľom `add_repeat` vo vnútri skupiny, čím anketárom poskytnete jasne označené tlačidlo „Pridať“.
 
 ---
 
 ## Obmedzenia
 
 - `indexed-repeat()` vyžaduje platný index (1 až počet inštancií) — indexy mimo rozsahu vracajú prázdnu hodnotu.
-- Vnorené opakovania nad 2 úrovne sa neodporúčajú a môžu spôsobiť problémy s zobrazením na niektorých klientoch.
-- Agregačné funkcie (`sum`, `count` atď.) operujú na celej skupine opakovaní — podmnožinu inštancií nemôžete agregovať bez variantov `*-if`.
+- Vnorené opakovania presahujúce 2 úrovne sa neodporúčajú a môžu na niektorých klientoch spôsobiť problémy so zobrazením.
+- Agregačné funkcie (`sum`, `count` atď.) pracujú s celou opakovanou skupinou — nemôžete agregovať podmnožinu inštancií bez variantov `*-if`.

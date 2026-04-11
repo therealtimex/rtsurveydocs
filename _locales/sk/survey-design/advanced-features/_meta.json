@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "Nahrávanie zvuku",
   "call-api": "Call API",
   "dynamic-question-type": "Dynamický typ otázky",
   "dynamic-search": "Dynamické vyhľadávanie",

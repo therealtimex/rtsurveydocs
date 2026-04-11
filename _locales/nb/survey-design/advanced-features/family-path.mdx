@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path er et beregningsfelt (calculate) som returnerer banen til skjemaets vedlagte medie-mappe ved kjøretid — påkrevd for alle skjemaer som bruker lokale databaseoppslag eller filbasert søk."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` er et beregningsfelt som inneholder banen til skjemaets vedlagte medie-mappe. Alle skjemaer som utfører lokale databaseoppslag med `rawquery`, `pulldata` eller `search()` må inkludere dette feltet — uten det kan ikke filbaner løses, og oppslag vil i stillhet returnere tomt resultat.
+
+---
+
+## The calculate field
+
+Legg til denne raden nær toppen av survey-arket, etter eventuelle metafelt og før det første spørsmålet som bruker en databasefil:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Feltet lagrer ingen synlig verdi og krever ingen etikett (label). Det er en usynlig forutsetning for all påfølgende banekonstruksjon.
+
+---
+
+## Why it is needed
+
+RTSurvey pakker skjema-medier — SQLite-databaser, bilder, lydklipp — i en mappe per skjema på enheten. Den nøyaktige banen varierer mellom plattformer (Android, iOS, web) og mellom enheter.
+
+Ved kjøretid fyller appen inn `family_path` automatisk. En typisk verdi ser slik ut:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Fordi banen er plattformspesifikk og bestemmes ved oppstart, kan den ikke hardkodes i skjemaet. `pulldata('app-api', 'family_path')` er den eneste pålitelige måten å hente den på.
+
+---
+
+## How to use it in paths
+
+Når `family_path` er definert, bygg en full filbane med `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Suffikset `::tableName` fjernes når appen åpner filen; tabellnavnet brukes bare inne i SQL-spørringen din.
+
+---
+
+## Where family_path is used
+
+`family_path` er påkrevd i baneargumentet når du refererer til en vedlagt fil:
+
+- **Lokalt databasesøk** — `db_path`-argumentet til `search-autocomplete-noedit-v2('rawquery', ...)` må bygges med `concat(${family_path}, ...)`. Se [Lokalt databasesøk](local-database-search) for fullstendige detaljer om bruk.
+- **`pulldata` rawquery** — alle `pulldata('rawquery', ...)`-kall som leser fra en `.db`-fil bruker samme `concat()`-mønster.
+- **`search()` med en lokal fil** — utseender for dynamisk søk som laster fra en vedlagt CSV- eller DB-fil, avhenger også av `family_path` for filreferansen.
+
+---
+
+## Placement in the form
+
+`family_path` må vises **før det første feltet som refererer til det**. Den anbefalte posisjonen er umiddelbart etter meta-gruppen:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(rawquery utseende som refererer til `${family_path}`)* |
+
+<Callout type="warning">
+Hvis `family_path` mangler i skjemaet, eller plasseres etter det første `rawquery`- / `search()`-feltet som refererer til det, vil alle oppslag mot vedlagte filer i stillhet returnere tomt. Det gis ingen feilmelding — autofullfør viser rett og slett ingen resultater.
+</Callout>
+
+---
+
+## Multiple database files
+
+Et enkelt skjema kan bruke flere `.db`-filer. Hver bane konstrueres uavhengig med `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Definer `family_path` én gang; referer til det i så mange felt som nødvendig.
+
+---
+
+## Verification during development
+
+Legg til et midlertidig `note`-felt under `family_path` for å inspisere den utledede verdien på enheten:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Path: ${family_path}` | |
+
+Notatet vil vise den faktiske banen under testing. Fjern det før du ruller ut det endelige skjemaet.

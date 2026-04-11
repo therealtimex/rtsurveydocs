@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "A family_path egy konvencionális calculate mező, amely futás közben adja vissza az űrlap csomagolt média könyvtárának útvonalát — minden olyan űrlaphoz szükséges, amely helyi adatbázis-lekérdezést vagy fájlalapú keresést használ."
+---
+
+import { Callout } from 'nextra/components'
+
+A `family_path` egy konvencionális calculate mező, amely az űrlap csomagolt média könyvtárának útvonalát tartalmazza. Minden olyan űrlapnak tartalmaznia kell ezt a mezőt, amely helyi adatbázis-lekérdezést végez a `rawquery`, `pulldata` vagy `search()` funkcióval — enélkül a fájlútvonalak nem oldhatók fel, és a lekérdezések némán üres értéket adnak vissza.
+
+---
+
+## A calculate mező
+
+Adja hozzá ezt a sort a survey munkalap tetejének közelében, a meta mezők után és az első olyan kérdés előtt, amely adatbázisfájlt használ:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+A mező nem tárol látható értéket, és nem igényel feliratot (label). Ez egy láthatatlan előfeltétel minden azt követő útvonal-összeállításhoz.
+
+---
+
+## Miért van rá szükség
+
+Az RTSurvey az űrlap médiatartalmait — SQLite adatbázisokat, képeket, audioklipeket — az eszközön egy űrlaponkénti könyvtárba csomagolja. A pontos útvonal eltérő a platformok (Android, iOS, web) és az eszközök között.
+
+Futás közben az alkalmazás automatikusan kitölti a `family_path` értékét. Egy tipikus feloldott érték így néz ki:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Mivel az útvonal platformspecifikus és az indításkor dől el, nem lehet fixen kódolni az űrlapban. A `pulldata('app-api', 'family_path')` az egyetlen megbízható módja a lekérésének.
+
+---
+
+## Hogyan használjuk az útvonalakban
+
+A `family_path` meghatározása után építsen fel egy teljes fájlútvonalat a `concat()` függvénnyel:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+A `::tableName` utótagot az alkalmazás eltávolítja a fájl megnyitásakor; a táblanév csak az SQL lekérdezésen belül használatos.
+
+---
+
+## Hol használatos a family_path
+
+A `family_path` megadása kötelező az útvonal argumentumban minden alkalommal, amikor egy csomagolt fájlra hivatkozik:
+
+- **Helyi adatbázis keresés** — a `search-autocomplete-noedit-v2('rawquery', ...)` funkció `db_path` argumentumát a `concat(${family_path}, ...)` segítségével kell felépíteni. A teljes használati részletekért lásd a [Helyi adatbázis keresés](local-database-search) oldalt.
+- **`pulldata` rawquery** — minden olyan `pulldata('rawquery', ...)` hívás, amely `.db` fájlból olvas, ugyanezt a `concat()` mintát használja.
+- **`search()` helyi fájllal** — a csomagolt CSV vagy DB fájlból betöltődő dinamikus keresési megjelenések (appearances) szintén a `family_path`-re támaszkodnak a fájlhivatkozáshoz.
+
+---
+
+## Elhelyezés az űrlapon
+
+A `family_path`-nek az **első olyan mező előtt kell megjelennie, amely hivatkozik rá**. Az ajánlott pozíció közvetlenül a meta csoport után van:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Tartomány | *(rawquery appearance referencing `${family_path}`)* |
+
+<Callout type="warning">
+Ha a `family_path` hiányzik az űrlapról, vagy az első rá hivatkozó `rawquery` / `search()` mező után kerül elhelyezésre, a csomagolt fájlokon végzett összes lekérdezés némán üres értéket ad vissza. Nincs hibaüzenet — az automatikus kiegészítés egyszerűen nem mutat eredményt.
+</Callout>
+
+---
+
+## Több adatbázisfájl
+
+Egyetlen űrlap több `.db` fájlt is használhat. Minden útvonal függetlenül épül fel a `concat()` segítségével:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Definiálja egyszer a `family_path`-t; hivatkozzon rá annyi mezőben, amennyiben szükséges.
+
+---
+
+## Ellenőrzés a fejlesztés során
+
+Adjon hozzá egy ideiglenes `note` mezőt a `family_path` alá, hogy megvizsgálja a feloldott értéket az eszközön:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Útvonal: ${family_path}` | |
+
+A megjegyzés a tesztelés során megjeleníti a ténylegesen feloldott útvonalat. Távolítsa el a végleges űrlap közzététele előtt.

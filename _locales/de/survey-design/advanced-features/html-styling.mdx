@@ -1,14 +1,14 @@
 ---
 title: "HTML-Styling"
-description: "rtSurvey unterstützt HTML-Tags in Beschriftungen und Hinweisen und ermöglicht so Rich-Text-Formatierung, Links und dynamische Farbthemen."
+description: "rtSurvey unterstützt HTML-Tags in Labels und Hinweisen und ermöglicht so Rich-Text-Formatierung, Links und dynamische Farbthemen."
 ---
 
 import { Callout } from 'nextra/components'
 
-rtSurvey rendert **Beschriftungs**- und **Hinweis**-Text als HTML in Webformularen. Das bedeutet, dass Sie Standard-HTML-Tags verwenden können, um Text zu formatieren, Zeilenumbrüche hinzuzufügen, Links zu erstellen und Farben anzuwenden. Dies ist besonders nützlich für Notizfelder, Abschnittsanweisungen und dynamische Zusammenfassungen.
+rtSurvey stellt **Label-** und **Hinweistexte** in Webformularen als HTML dar. Das bedeutet, dass Sie Standard-HTML-Tags verwenden können, um Text zu formatieren, Zeilenumbrüche hinzuzufügen, Links zu erstellen und Farben anzuwenden. Dies ist besonders nützlich für Notizfelder, Abschnittsanweisungen und dynamische Zusammenfassungen.
 
 <Callout type="warning">
-HTML in Beschriftungen wird im **Webformular** und in den mobilen rtSurvey-Apps gerendert. Es wird möglicherweise nicht in allen ODK-kompatiblen Clients gerendert. Testen Sie immer auf Ihrer Zielplattform.
+HTML in Labels wird im **Webformular** und in den mobilen Apps von rtSurvey gerendert. Es wird möglicherweise nicht in allen ODK-kompatiblen Clients korrekt dargestellt. Testen Sie immer auf Ihrer Zielplattform.
 </Callout>
 
 ---
@@ -19,7 +19,7 @@ HTML in Beschriftungen wird im **Webformular** und in den mobilen rtSurvey-Apps 
 
 | Tag | Ergebnis |
 |-----|--------|
-| `<strong>Text</strong>` oder `<b>Text</b>` | **Fettgedruckter Text** |
+| `<strong>Text</strong>` oder `<b>Text</b>` | **Fetter Text** |
 | `<em>Text</em>` oder `<i>Text</i>` | *Kursiver Text* |
 | `<u>Text</u>` | Unterstrichener Text |
 | `<br>` | Zeilenumbruch |
@@ -31,7 +31,7 @@ HTML in Beschriftungen wird im **Webformular** und in den mobilen rtSurvey-Apps 
 <a href="https://example.com" target="_blank">Hier klicken</a>
 ```
 
-Öffnet in einem neuen Tab. Verwenden Sie dies für Referenzdokumente, Leitlinien oder externe Ressourcen, die der Interviewer konsultieren soll.
+Öffnet in einem neuen Tab. Verwenden Sie dies für Referenzdokumente, Richtlinien oder externe Ressourcen, die der Enumerator konsultieren sollte.
 
 ### Farben
 
@@ -44,43 +44,43 @@ Verwenden Sie `<span>` mit Inline-Styles:
 
 ---
 
-## Farbthema-Variablen
+## Farbthemen-Variablen
 
-rtSurvey unterstützt **Farbthema-Token**, die sich an das konfigurierte Thema der App anpassen. Verwenden Sie die `__COLOR_THEME_NAME__`-Syntax:
+rtSurvey unterstützt **Farbthemen-Token**, die sich an das konfigurierte Thema der App anpassen. Verwenden Sie die Syntax `__COLOR_THEME_NAME__`:
 
 ```html
 <span style="color: var(--color-theme-primary);">Text in Primärfarbe</span>
 ```
 
-Oder mit dem Token-Kürzel im Beschriftungstext:
+Oder verwenden Sie das Token-Kürzel im Labeltext:
 
 ```
 <font color="var(--COLOR_THEME_PRIMARY)">Wichtiger Hinweis</font>
 ```
 
-Dies wird beim Rendern automatisch in das entsprechende `<span>` mit einer CSS-Variable umgewandelt.
+Dies wird zum Zeitpunkt des Renderings automatisch in das entsprechende `<span>` mit einer CSS-Variablen umgewandelt.
 
 ---
 
-## Mehrsprachige Beschriftungen
+## Mehrsprachige Labels
 
-Wickeln Sie Inhalte in Sprach-Tags ein, um mehrere Sprachen in einer einzigen Beschriftungszelle zu unterstützen:
+Umschließen Sie Inhalte mit Sprachtags, um mehrere Sprachen in einer einzigen Label-Zelle zu unterstützen:
 
 ```
 <en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
 ```
 
-rtSurvey extrahiert den Inhalt, der der aktuellen App-Sprache entspricht. Wenn kein passender Sprach-Tag gefunden wird, wird die gesamte Zeichenkette unverändert angezeigt.
+rtSurvey extrahiert den Inhalt, der der aktuellen App-Sprache entspricht. Wenn kein passendes Sprachtag gefunden wird, wird die vollständige Zeichenfolge unverändert angezeigt.
 
 ---
 
 ## Beispiele in Notizfeldern
 
-### Abschnittsanweisung mit Fettschrift und Zeilenumbruch
+### Abschnittsanweisung mit Fettdruck und Zeilenumbruch
 
 | type | name | label |
 |------|------|-------|
-| note | section_intro | `<strong>Abschnitt 3: Flächennutzung</strong><br>Alle Fragen in diesem Abschnitt nur dem Haushaltsvorstand stellen.` |
+| note | section_intro | `<strong>Abschnitt 3: Landnutzung</strong><br>Stellen Sie alle Fragen in diesem Abschnitt nur dem Haushaltsvorstand.` |
 
 ### Dynamische Zusammenfassung mit Berechnungsreferenz
 
@@ -93,31 +93,31 @@ rtSurvey extrahiert den Inhalt, der der aktuellen App-Sprache entspricht. Wenn k
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| note | age_warning | `<span style="color: red;"><strong>Warnung:</strong> Eingegebenes Alter (${age}) ist ungewöhnlich hoch. Bitte überprüfen.</span>` | `${age} > 100` |
+| note | age_warning | `<span style="color: red;"><strong>Warnung:</strong> Das eingegebene Alter (${age}) ist ungewöhnlich hoch. Bitte überprüfen.</span>` | `${age} > 100` |
 
 ### Link zu einem Referenzdokument
 
 | type | name | label |
 |------|------|-------|
-| note | guidelines_link | `Lesen Sie die <a href="https://docs.example.com/guidelines" target="_blank">Feldleitlinien</a>, bevor Sie diesen Abschnitt beginnen.` |
+| note | guidelines_link | `Lesen Sie die <a href="https://docs.example.com/guidelines" target="_blank">Feldrichtlinien</a>, bevor Sie mit diesem Abschnitt beginnen.` |
 
 ---
 
-## Besondere rtSurvey-HTML-Tags
+## Spezielle rtSurvey-HTML-Tags
 
 ### `<webbox src='url' title='title'>...</webbox>`
 
-Bettet eine Schaltfläche ein, die eine URL in einem Formular-internen Modal öffnet. Vollständige Details unter [Webbox](webbox).
+Bettet eine Schaltfläche ein, die eine URL in einem modalen Fenster innerhalb des Formulars öffnet. Weitere Einzelheiten finden Sie unter [Webbox](webbox).
 
-### `<delete-repeat-current>Beschriftung</delete-repeat-current>`
+### `<delete-repeat-current>label</delete-repeat-current>`
 
 Rendert eine Schaltfläche innerhalb einer Wiederholungsgruppe, die die aktuelle Wiederholungsinstanz löscht, wenn sie angetippt wird.
 
-### `<delete-repeat-last>Beschriftung</delete-repeat-last>`
+### `<delete-repeat-last>label</delete-repeat-last>`
 
 Rendert eine Schaltfläche, die die letzte Wiederholungsinstanz löscht.
 
-Verwendungsbeispiel in einer Wiederholungsgruppe:
+Beispiel für die Verwendung in einer Wiederholungsgruppe:
 
 | type | name | label |
 |------|------|-------|
@@ -125,17 +125,87 @@ Verwendungsbeispiel in einer Wiederholungsgruppe:
 
 ---
 
-## Empfohlene Vorgehensweisen
+## Dynamische HTML-Zusammenfassungen mit autopull()
 
-1. Verwenden Sie HTML sparsam — übermäßig formatierte Beschriftungen sind schwerer zu lesen, nicht leichter.
-2. Bevorzugen Sie `<strong>` für Fettschrift und `<em>` für Kursivschrift gegenüber den veralteten `<b>` und `<i>`.
-3. Verwenden Sie Farben bedeutungstragend — Rot für Warnungen, nicht für Dekoration.
-4. Testen Sie das HTML-Rendering immer auf der mobilen App und dem Webformular, da das Rendering leicht abweichen kann.
-5. Vermeiden Sie `<table>`-Tags in Beschriftungen — sie werden auf mobilen Bildschirmen selten gut gerendert.
-6. Verwenden Sie kein JavaScript (`<script>`) — es wird entfernt oder verursacht Fehler.
+`autopull()` rendert einen HTML-Block innerhalb eines `note`-Feldes und **bewertet ihn bei jeder Feldänderung** im Formular neu. Dadurch eignet es sich für Live-Zusammenfassungs-Panels, Bildschirme zur Überprüfung vor dem Absenden und laufende Summen, die aktualisiert werden, während der Enumerator Daten eingibt.
+
+<Callout type="info">
+`autopull()` funktioniert nur bei **note**-Feldern. Die Label-Spalte wird ignoriert – der gesamte HTML-Inhalt muss über die Spalte **appearance** mit `concat()` bereitgestellt werden.
+</Callout>
+
+### Syntax
+
+Platzieren Sie `autopull()` in der Spalte **appearance** eines `note`-Feldes:
+
+```
+autopull(concat('<html>...</html>'))
+```
+
+Feldreferenzen (`${field_name}`) innerhalb von `concat()` werden durch die aktuellen Live-Werte ersetzt, und das HTML wird bei jeder Änderung neu gerendert.
+
+### Begrenzung der Höhe mit scroll-view()
+
+Kombinieren Sie bei längeren Zusammenfassungen `autopull()` mit `scroll-view(N%)`, um die Panelhöhe zu begrenzen und es scrollbar zu machen:
+
+```
+scroll-view(45%) autopull(concat('<html>...</html>'))
+```
+
+Der Wert `N%` bezieht sich auf den sichtbaren Formularbereich. `45%` ist ein praktischer Standardwert für ein Zusammenfassungs-Panel in der Mitte der Seite.
+
+### Vollständiges Beispiel – Zusammenfassung des Standorts des Haushalts
+
+Das folgende `note`-Feld rendert eine zweispaltige Tabelle, die die ausgewählte Provinz, den Distrikt und die Gemeinde anzeigt. Es wird automatisch aktualisiert, wenn sich `${tinh_name}`, `${huyen_name}` oder `${xa_name}` ändern.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | location_summary | | `scroll-view(45%) autopull(concat('<html><table style="width:100%;border-collapse:collapse"><tr><td style="padding:4px;font-weight:bold">Provinz:</td><td style="padding:4px">', ${tinh_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Distrikt:</td><td style="padding:4px">', ${huyen_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Gemeinde:</td><td style="padding:4px">', ${xa_name}, '</td></tr></table></html>'))` |
+
+In XLSForm wird der Appearance-Wert in einer einzigen Zelle geschrieben:
+
+```
+scroll-view(45%) autopull(concat(
+  '<html><table style="width:100%;border-collapse:collapse">
+   <tr><td style="padding:4px;font-weight:bold">Provinz:</td>
+       <td style="padding:4px">', ${tinh_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Distrikt:</td>
+       <td style="padding:4px">', ${huyen_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Gemeinde:</td>
+       <td style="padding:4px">', ${xa_name}, '</td></tr>
+   </table></html>'))
+```
+
+### Inline-Styles
+
+Inline-`style="..."`-Attribute auf jedem HTML-Element werden unterstützt und sind die empfohlene Methode zur Anwendung visueller Formatierungen innerhalb von `autopull()`-Blöcken.
+
+Folgendes wird innerhalb von `autopull()`-Inhalten **nicht** unterstützt:
+
+- `<style>`-Blöcke
+- Externe Stylesheet-`<link>`-Tags
+- JavaScript (`<script>`)
+
+### Wann man autopull() verwendet
+
+| Anwendungsfall | Hinweise |
+|----------|-------|
+| Überprüfung-vor-Absenden-Bildschirm | Alle wichtigen Antworten in einem Panel anzeigen, bevor der Enumerator fertig ist |
+| Laufende Summen | Eine berechnete Summe anzeigen, die sich bei der Eingabe von Mengen aktualisiert |
+| Sichtbares Referenz-Panel | Einen ausgewählten Lookup-Wert anzeigen (z. B. Provinzname), während der Enumerator untergeordnete Felder ausfüllt |
+
+---
+
+## Best Practices
+
+1. Gehen Sie sparsam mit HTML um – übermäßig formatierte Labels sind schwerer zu lesen, nicht einfacher.
+2. Bevorzugen Sie `<strong>` für Fettgedrucktes und `<em>` für Kursivschrift gegenüber den veralteten Tags `<b>` und `<i>`.
+3. Verwenden Sie Farben sinnvoll – nutzen Sie Rot für Warnungen, nicht zur Dekoration.
+4. Testen Sie das HTML-Rendering immer sowohl in der mobilen App als auch im Webformular, da die Darstellung leicht variieren kann.
+5. Vermeiden Sie `<table>`-Tags innerhalb von Labels – sie werden auf mobilen Bildschirmen selten gut dargestellt.
+6. Verwenden Sie kein JavaScript (`<script>`) – es wird entfernt oder verursacht Fehler.
 
 ## Einschränkungen
 
-- Komplexes HTML (Tabellen, Formulare, Skripte) wird nicht unterstützt und kann das Rendering zerstören.
-- Einige ältere mobile Clients zeigen möglicherweise HTML-Tags als wörtlichen Text an — testen Sie auf allen Zielgeräten.
-- `<a>`-Links öffnen sich in einem Browser oder WebView — der Interviewer verlässt das Formular, was auf mobilen Geräten störend sein kann.
+- Komplexes HTML (Tabellen, Formulare, Skripte) wird nicht unterstützt und kann das Rendering beeinträchtigen.
+- Einige ältere mobile Clients zeigen HTML-Tags möglicherweise als Literaler Text an – testen Sie auf allen Zielgeräten.
+- `<a>`-Links werden in einem Browser oder einer WebView geöffnet – der Enumerator verlässt das Formular, was auf dem Handy störend sein kann.

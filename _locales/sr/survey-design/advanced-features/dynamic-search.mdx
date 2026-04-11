@@ -1,15 +1,15 @@
 ---
 title: "Dinamička pretraga"
-description: "Dinamička pretraga učitava opcije iz udaljenog API-ja u realnom vremenu dok anketar kuca, omogućavajući velike ili često ažurirane skupove podataka."
+description: "Dinamička pretraga učitava opcije sa udaljenog API-ja u realnom vremenu dok anketar kuca, omogućavajući rad sa velikim ili često ažuriranim skupovima podataka."
 ---
 
-**Dinamička pretraga** (poznata i kao Search API) omogućava polju `select_one`, `select_multiple` ili `text` da učita opcije iz udaljenog veb servisa **u vreme izvođenja** dok anketar kuca. Ovo je pravi pristup kada je vaša lista opcija prevelika da se ugradi u CSV datoteku, često se ažurira, ili dolazi iz žive baze podataka.
+**Dinamička pretraga** (takođe poznata kao Search API) omogućava poljima tipa `select_one`, `select_multiple` ili `text` da učitaju svoje opcije sa udaljenog veb servisa **u realnom vremenu** dok anketar kuca. Ovo je pravi pristup kada je vaša lista opcija prevelika da bi se spakovala u CSV datoteku, kada se često ažurira ili dolazi iz baze podataka uživo.
 
 ---
 
-## Izgled `search-api()`
+## `search-api()` izgled (appearance)
 
-Dinamička pretraga je konfigurisana putem kolone `appearance` koristeći funkciju `search-api()`:
+Dinamička pretraga se konfiguriše kroz kolonu `appearance` koristeći funkciju `search-api()`:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -18,26 +18,26 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 ### Parametri
 
 | Parametar | Opis |
-|-----------|------|
+|-----------|-------------|
 | `method` | Uvek koristite `'POST'` |
-| `url` | API krajnja tačka za upit |
-| `post_body` | JSON telo poslato API-ju. Koristite `%__input__%` kao čuvar mesta za trenutni tekst pretrage anketara |
-| `value_column` | Ključ u objektu odgovora koji se koristi kao sačuvana **vrednost** |
-| `display` | Ključ (ili šablon) koji se koristi kao **oznaka** prikazana u padajućem meniju. Podržava `##ključ##` čuvare mesta i `@{func}` izraze |
-| `data_path` | JSONPath do niza objekata rezultata u odgovoru (npr. `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Naziv pod kojim se sirovi odgovor čuva za upotrebu od strane других polja |
+| `url` | API krajnja tačka (endpoint) za upit |
+| `post_body` | JSON telo koje se šalje API-ju. Koristite `%__input__%` kao placeholder za trenutni tekst pretrage koji je anketar uneo |
+| `value_column` | Ključ u objektu odgovora koji će se koristiti kao sačuvana **vrednost** |
+| `display` | Ključ (ili šablon) koji će se koristiti kao **oznaka** (label) prikazana u padajućoj listi. Podržava `##key##` placeholdere i `@{func}` izraze |
+| `data_path` | JSONPath do niza rezultata u odgovoru (npr. `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Naziv pod kojim se sirovi odgovor čuva za korišćenje u drugim poljima |
 
 ---
 
 ## Osnovni primer
 
-Pretraživanje zdravstvenih ustanova gde anketar kuca deo naziva ustanove:
+Pretraga zdravstvenih ustanova gde anketar kuca deo naziva ustanove:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one | facility | Izaberite zdravstvenu ustanovu | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-API prima `{"query": "nair"}` kada anketar kuca "nair" i vraća:
+API dobija `{"query": "nair"}` kada anketar ukuca "nair" i vraća:
 
 ```json
 {
@@ -48,15 +48,15 @@ API prima `{"query": "nair"}` kada anketar kuca "nair" i vraća:
 }
 ```
 
-Padajući meni prikazuje `Nairobi Central Clinic` i `Nairobi West Hospital`; sačuvana vrednost je `HF001` ili `HF002`.
+U padajućoj listi se prikazuju `Nairobi Central Clinic` i `Nairobi West Hospital`; sačuvana vrednost je `HF001` ili `HF002`.
 
 ---
 
 ## Napredno formatiranje prikaza
 
-### Korišćenje šablona `##ključ##`
+### Korišćenje `##key##` šablona
 
-Prikazivanje više polja u oznaci:
+Prikaz više polja u oznaci:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Aktivni rezultati prikazuju `✓ Naziv klinike`; neaktivni prikazuju `✗ Naziv klinike`.
+Aktivni rezultati prikazuju `✓ Clinic Name`; neaktivni prikazuju `✗ Clinic Name`.
 
 ---
 
-## Postavljanje podrazumevane vrednosti: `search-default-api()`
+## Podešavanje podrazumevane vrednosti: `search-default-api()`
 
-Koristite `search-default-api()` posle `search-api()` za prethodno popunjavanje polja podrazumevanom opcijom učitanom iz zasebnog API poziva (npr. pri uređivanju postojećeg zapisa):
+Koristite `search-default-api()` nakon `search-api()` da biste unapred popunili polje podrazumevanom opcijom učitanom putem posebnog API poziva (npr. prilikom uređivanja postojećeg zapisa):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -90,7 +90,7 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ## Prilagođeni separator za select_multiple: `search-default-separator()`
 
-Za polja `select_multiple`, navedite kako se višestruko izabrane vrednosti spajaju u sačuvanom stringu:
+Za polja tipa `select_multiple`, odredite kako se više izabranih vrednosti spaja u sačuvanom nizu:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
@@ -102,36 +102,95 @@ Podrazumevani separator je razmak.
 
 ## Podržani tipovi pitanja
 
-| Tip pitanja | Slučaj upotrebe |
-|-------------|-----------------|
-| `select_one` | Jednostruki izbor iz rezultata pretrage |
-| `select_multiple` | Višestruki izbor iz rezultata pretrage |
-| `text` | Autocomplete — anketar kuca slobodno ali može izabrati sugestiju |
+| Tip pitanja | Slučaj korišćenja |
+|---------------|----------|
+| `select_one` | Jedan izbor iz rezultata pretrage |
+| `select_multiple` | Više izbora iz rezultata pretrage |
+| `text` | Autokomplet (Autocomplete) — anketar slobodno kuca ali može izabrati predlog |
 
 ---
 
 ## Korišćenje sačuvanih podataka odgovora
 
-`save_path` čuva kompletan objekat API odgovora pod datim imenom. Druga polja ga mogu referencirati sa `pulldata()`:
+Kada anketar izabere rezultat, rtSurvey čuva ceo odgovarajući objekat iz odgovora pod nazivom definisanim u `save_path`. Druga polja mogu čitati iz njega na dva načina.
+
+### Metoda 1 — `pulldata()` pretraga
+
+Koristite `pulldata('save_path', 'key')` za čitanje polja najvišeg nivoa iz sačuvanog objekta:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Izaberite ustanovu | `search-api(..., 'facility_data')` |
+| select_one | facility | Izaberite ustanovu | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+Izgled (appearance) u redu `select_one` mora uključivati `search-api(..., 'facility_data')` sa odgovarajućim `save_path`.
+
+Za **ugnježđena JSON polja**, kombinujte sa `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## Pretraga lokalnih datoteka pomoću search()
+
+`search()` vrši oflajn pretragu po principu jednakosti kolona u odnosu na upakovanu SQLite `.db` datoteku — nije potrebna mrežna veza niti SQL upiti. Koristite ga kada su vaši referentni podaci upakovani uz obrazac i potrebna vam je jednostavna pretraga tipa „pronađi sve redove gde je kolona jednaka vrednosti“.
+
+### Potpis (Signature)
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parametri
+
+| Parametar | Opis |
+|-----------|-------------|
+| `path` | Putanja do SQLite tabele: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Operator podudaranja — vraća redove gde je kolona jednaka vrednosti |
+| `'list_name'` | Naziv kolone sa kojom se vrši poređenje |
+| `${field}` | Vrednost za upoređivanje; obično referenca na polje |
+
+### Primer
+
+Popunjavanje polja `select_one` iz lokalne baze podataka poređenjem vrednosti `${d307}` sa kolonom `list_name` u tabeli `externalData` datoteke `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Izaberite ustanovu | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Kada je `${d307}` jednako `"HF001"`, `search()` vraća svaki red u tabeli `externalData` gde je `list_name = 'HF001'` — u potpunosti iz upakovane datoteke, bez mrežnog poziva.
+
+### search() naspram rawquery autokompleta
+
+| Funkcionalnost | `search()` | `rawquery` autokomplet |
+|---------|-----------|------------------------|
+| SQL upiti | Ne — samo jednakost kolona | Da — pun `SELECT … FROM …` |
+| Parametrizovani unos | Podudaranje vrednosti kolone | Ugrađeno u SQL string |
+| Slobodan unos teksta | Da — anketar može slobodno kucati | Ne — mora izabrati sa liste |
+| UNION / više tabela | Nije podržano | Podržano |
+
+### Kada koristiti koji
+
+- Koristite **`search()`** kada vam je potrebno jednostavno podudaranje po jednakosti sa upakovanom `.db` datotekom, obrazac mora da radi oflajn i želite da dozvolite slobodan unos teksta.
+- Koristite **`rawquery` autokomplet** kada vam je potrebna SQL fleksibilnost (JOIN, UNION, izračunate kolone) ili morate da vršite upite kroz više tabela, a obrazac ima pouzdanu internet vezu.
 
 ---
 
 ## Najbolje prakse
 
-1. Osigurajte da vaša API krajnja tačka odgovara unutar 1–2 sekunde — spori API-ji čine pretragu neresponsivnom.
+1. Uverite se da vaša API krajnja tačka odgovara u roku od 1–2 sekunde — spori API-ji čine da pretraga deluje tromo.
 2. Koristite `%__input__%` u `post_body` tako da API vraća samo odgovarajuće rezultate, a ne ceo skup podataka.
-3. Indeksirajte polje pretrage na strani servera (npr. Elasticsearch, full-text indeks baze podataka) za brze odgovore.
-4. Ograničite rezultate na 20–50 stavki po upitu — vraćanje hiljada rezultata poražava svrhu pretrage.
-5. Uključite zahtev za minimalnom dužinom unosa u API-ju da biste izbegli pokretanje širokih upita na unosima jednog karaktera.
+3. Indeksirajte polje za pretragu na strani servera (npr. Elasticsearch, puni tekstualni indeks baze podataka) za brze odgovore.
+4. Ograničite rezultate na 20–50 stavki po upitu — vraćanje hiljada rezultata obesmišljava svrhu pretrage.
+5. Uključite zahtev za minimalnu dužinu unosa u API-ju kako biste izbegli pokretanje širokih upita na unosima od jednog karaktera.
 
 ## Ograničenja
 
-- Dinamička pretraga zahteva mrežnu vezu — ne funkcioniše offline.
-- Čuvar mesta `%__input__%` se ubacuje kao što jeste; čistite unose na strani servera da biste sprečili napade ubacivanjem.
-- Složeni `@{func}` izrazi prikaza mogu imati ograničenu podršku na svim verzijama rtSurvey klijenta.
+- Dinamička pretraga zahteva mrežnu vezu — ne radi oflajn.
+- Placeholder `%__input__%` se ubacuje onakav kakav jeste; sanirajte unose na strani servera kako biste sprečili napade ubacivanjem (injection attacks).
+- Složeni `@{func}` izrazi za prikaz mogu imati ograničenu podršku u svim verzijama rtSurvey klijenta.

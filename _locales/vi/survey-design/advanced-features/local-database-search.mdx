@@ -1,0 +1,224 @@
+---
+title: "Tìm kiếm cơ sở dữ liệu nội bộ"
+description: "Tìm kiếm cơ sở dữ liệu nội bộ truy vấn một tệp SQLite .db đi kèm bằng cách sử dụng SQL thuần, cho phép tự động điền ngoại tuyến nhanh chóng cho các tập dữ liệu tĩnh lớn."
+---
+
+import { Callout } from 'nextra/components'
+
+**Tìm kiếm cơ sở dữ liệu nội bộ (Local Database Search)** cho phép trường `select_one` hoặc `text` truy vấn tệp SQLite `.db` được đóng gói kèm theo gói phương tiện của biểu mẫu — hoàn toàn ngoại tuyến, không cần giao tiếp với máy chủ. Đây là phương pháp phù hợp khi danh sách lựa chọn của bạn lớn và tĩnh (ví dụ: danh sách làng bản quốc gia, cơ sở y tế hoặc ranh giới hành chính) và kết nối mạng không được đảm bảo.
+
+| Phương pháp | Nguồn dữ liệu | Yêu cầu kết nối |
+|---|---|---|
+| Tìm kiếm cơ sở dữ liệu nội bộ (`rawquery`) | Tệp `.db` đi kèm (SQLite) | Không |
+| `search-api()` | REST API từ xa | Có |
+| `search()` | Tệp CSV đi kèm | Không |
+
+---
+
+## Các biến thể Appearance
+
+Trường tự động điền được cấu hình thông qua cột `appearance`. Có ba biến thể có sẵn:
+
+| Biến thể | Ghi chú |
+|---|---|
+| `search-autocomplete-noedit(...)` | Tự động điền tiêu chuẩn — điều tra viên phải chọn từ danh sách; nhập văn bản tự do không được lưu |
+| `search-autocomplete-noedit-v2(...)` | Biến thể được khuyến nghị — hành vi tương tự nhưng sử dụng công cụ hiển thị được cập nhật với hiệu suất tốt hơn trên các bộ kết quả lớn |
+| `search(...)` | Khớp dựa trên tệp đơn giản với tệp CSV đi kèm; **không** hỗ trợ SQL thuần — được liệt kê ở đây chỉ để so sánh |
+
+<Callout type="info">
+`search-autocomplete-noedit` là một bí danh — tại thời điểm phân tích cú pháp, ứng dụng sẽ thay thế nó bằng tên hàm nội bộ `searchAutocompleteNoedit`. Bạn có thể sử dụng bất kỳ cách viết nào trong XLSForm của mình; cả hai đều hoạt động.
+</Callout>
+
+---
+
+## Nguồn dữ liệu `rawquery`
+
+Để chạy một truy vấn SQL đối với tệp `.db`, hãy truyền `'rawquery'` làm đối số đầu tiên của hàm appearance. Cú pháp đầy đủ là:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Các tham số (Parameters)
+
+| Vị trí | Tham số | Mô tả |
+|---|---|---|
+| 1 | `'rawquery'` | Chuỗi ký tự — yêu cầu ứng dụng thực thi SQL trực tiếp |
+| 2 | `db_path` | Đường dẫn đến tệp SQLite, ở dạng `<dir>/<file>.db::tableName`. Hậu tố `::tableName` được loại bỏ khi mở tệp; tên bảng được sử dụng bên trong SQL của bạn |
+| 3 | `'[display_col]'` | Cột để hiển thị trong danh sách thả xuống. Các dấu ngoặc vuông `[ ]` bao quanh được loại bỏ khi chạy |
+| 4 | `'value_col'` | Cột có giá trị được lưu trữ khi điều tra viên thực hiện lựa chọn |
+| 5 | `'SELECT ...'` | Bất kỳ câu lệnh SQLite SELECT hợp lệ nào. `SELECT DISTINCT` được tự động chèn nếu `DISTINCT` chưa có sẵn |
+| 6+ | `param1, ...` | Tùy chọn. Các giá trị được liên kết với trình giữ chỗ `?` trong SQL, theo thứ tự. Nếu SQL chứa `?` nhưng không có tham số nào được cung cấp, trường sẽ trả về kết quả trống (một biện pháp bảo vệ tích hợp chống lại các đối số bị thiếu) |
+
+### Quy ước `db_path`
+
+Tệp cơ sở dữ liệu nằm bên trong thư mục phương tiện đi kèm của biểu mẫu. Khi chạy, `pulldata('app-api', 'family_path')` trả về đường dẫn thư mục đó. Xem [family_path](family-path) để biết chi tiết thiết lập. Mẫu tiêu chuẩn là:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Khi ứng dụng mở tệp, nó sẽ loại bỏ phần `::tableName` và sử dụng đường dẫn tệp đơn thuần. Tên bảng chỉ xuất hiện bên trong SQL của bạn.
+
+---
+
+## Ví dụ cơ bản — tra cứu tỉnh thành
+
+Một danh sách thả xuống tỉnh thành chỉ đọc được hỗ trợ bởi tệp `vnxa3.db` đi kèm:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Tỉnh/Thành phố | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+Cột `appearance` (được mở rộng để dễ đọc):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Nhãn hiển thị lấy từ cột `provv`.
+- Giá trị được lưu trữ lấy từ cột `provid`.
+- Chỉ các hàng có `rta_filter = "1"` mới được hiển thị.
+
+---
+
+## Truy vấn được tham số hóa (Parameterized queries)
+
+Sử dụng các trình giữ chỗ `?` trong SQL của bạn và truyền các tham chiếu trường tương ứng làm đối số bổ sung (từ vị trí 6 trở đi). Đây là mẫu tiêu chuẩn cho các lựa chọn phân cấp (cascading selects) — ví dụ: tải các huyện thuộc tỉnh đã chọn trước đó.
+
+<Callout type="warning">
+Nếu SQL của bạn chứa ít nhất một dấu `?` và không có đối số tham số nào được cung cấp, trường sẽ trả về một bộ kết quả trống. Điều này ngăn dữ liệu cũ hoặc không thuộc phạm vi xuất hiện trước khi thực hiện lựa chọn cha.
+</Callout>
+
+### Ví dụ phân cấp huyện
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+Giá trị của `${province}` được liên kết với dấu `?` đầu tiên. Trường sẽ trống cho đến khi điều tra viên chọn một tỉnh.
+
+### Ví dụ hai tham số — phân cấp xã
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Các tham số được liên kết theo vị trí: `${province}` → dấu `?` đầu tiên, `${district}` → dấu `?` thứ hai.
+
+---
+
+## UNION SELECT cho các giá trị đặc biệt
+
+Chèn các hàng tổng hợp — chẳng hạn như "Không biết" hoặc "Từ chối trả lời" — trực tiếp trong SQL bằng cách sử dụng `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Không biết</i>", "888"')
+```
+
+Các quy ước được sử dụng trong biểu mẫu RTSurvey:
+
+| Mã | Ý nghĩa |
+|---|---|
+| `888` | Không biết |
+| `999` | Từ chối trả lời |
+
+Các thẻ HTML như `<i>` trong chuỗi hiển thị được ứng dụng hiển thị — bạn có thể sử dụng chúng để phân biệt trực quan các tùy chọn đặc biệt.
+
+---
+
+## Hiển thị đa ngôn ngữ
+
+Lưu trữ các nhãn theo ngôn ngữ cụ thể trong các cột riêng biệt (ví dụ: `label_vi`, `label_en`) và chọn nhãn thích hợp dựa trên trường ngôn ngữ trong biểu mẫu của bạn:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Để chuyển đổi cột linh hoạt dựa trên trường `${language}`, hãy sử dụng biểu thức `if()` trên tham số cột hiển thị để chuyển đổi giữa các cột ngôn ngữ:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Tham số cột hiển thị được đánh giá trước khi truy vấn chạy. Chỉ tên cột (không có dấu ngoặc) được chuyển đến công cụ SQL; dấu ngoặc là các ký hiệu trang trí được loại bỏ khi phân tích cú pháp.
+</Callout>
+
+---
+
+## Kiểm tra một lựa chọn thực tế
+
+Khi trường cho phép các giá trị đặc biệt như 888 hoặc 999, việc kiểm tra `required = yes` đơn thuần là không đủ — nó được thỏa mãn ngay cả khi điều tra viên chọn "Không biết". Sử dụng ràng buộc `selected-at(., 0) != -997` để xác minh rằng giá trị được lưu trữ là một lựa chọn thực sự chứ không phải là giá trị đánh dấu "không có gì được chọn" nội bộ `-997`:
+
+| cột | giá trị |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Vui lòng chọn một tùy chọn hợp lệ |
+
+Giá trị `-997` là mã nội bộ mà RTSurvey lưu trữ khi không có mục nào được chọn từ danh sách tự động điền. Việc chọn 888 hoặc 999 vẫn là một lựa chọn có chủ ý và vượt qua kiểm tra này.
+
+Để yêu cầu thêm một giá trị thực (không đặc biệt), hãy mở rộng ràng buộc:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## So sánh: cơ sở dữ liệu nội bộ và các phương pháp tìm kiếm khác
+
+| Tính năng | Tự động điền `rawquery` | `search-api()` | `search()` CSV | Lựa chọn CSV thông thường |
+|---|---|---|---|---|
+| Nguồn dữ liệu | `.db` đi kèm (SQLite) | REST API từ xa | CSV đi kèm | Trang Choices |
+| Hoạt động ngoại tuyến | Có | Không | Có | Có |
+| Hỗ trợ SQL thuần | Có | Không | Không | Không |
+| Bộ lọc phân cấp | Có — sử dụng `?` | Qua thân yêu cầu (request body) | Hạn chế | Không |
+| Kích thước tập dữ liệu | Rất lớn (hàng triệu hàng) | Không giới hạn (phía máy chủ) | Trung bình (hàng chục nghìn) | Nhỏ |
+| Các hàng chèn đặc biệt | Có — `UNION SELECT` | Không | Không | Có (thủ công) |
+| Độ phức tạp thiết lập | Trung bình — yêu cầu `.db` đi kèm | Cao — yêu cầu máy chủ API | Thấp | Không |
+
+---
+
+## Hạn chế
+
+- Tệp `.db` phải được đóng gói bên trong gói phương tiện của biểu mẫu trước khi triển khai. Các cập nhật động cho cơ sở dữ liệu yêu cầu triển khai biểu mẫu mới.
+- SQL được thực thi nguyên trạng trên thiết bị. Không có việc làm sạch (sanitization) phía máy chủ — tránh xây dựng SQL từ đầu vào văn bản tự do của điều tra viên.
+- Chỉ hỗ trợ các câu lệnh `SELECT`. `INSERT`, `UPDATE` và `DELETE` không được phép.
+- Các truy vấn rất phức tạp (chuỗi `UNION` lớn, nhiều phép nối join) có thể chậm trên các thiết bị Android cấu hình thấp.
+- Các biến thể `search-autocomplete-noedit` không cho phép điều tra viên lưu một giá trị không có trong bộ kết quả. Nếu yêu cầu nhập văn bản tự do, hãy sử dụng trường `text` riêng biệt.
+- `SELECT DISTINCT` chỉ được chèn tự động khi `DISTINCT` vắng mặt trong truy vấn. Nếu bạn viết `SELECT DISTINCT` một cách rõ ràng, nó sẽ không được nhân đôi.

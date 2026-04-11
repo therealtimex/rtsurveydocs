@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path là một trường calculate quy ước trả về đường dẫn thư mục media đi kèm của biểu mẫu tại thời điểm chạy — bắt buộc đối với mọi biểu mẫu sử dụng tra cứu cơ sở dữ liệu cục bộ hoặc tìm kiếm dựa trên tệp."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` là một trường calculate quy ước giữ đường dẫn đến thư mục media đi kèm của biểu mẫu. Mọi biểu mẫu thực hiện tra cứu cơ sở dữ liệu cục bộ bằng `rawquery`, `pulldata`, hoặc `search()` đều phải bao gồm trường này — nếu không có nó, đường dẫn tệp không thể được giải quyết và các lần tra cứu sẽ âm thầm trả về kết quả trống.
+
+---
+
+## Trường calculate
+
+Thêm hàng này gần đầu bảng survey của bạn, sau bất kỳ trường meta nào và trước câu hỏi đầu tiên sử dụng tệp cơ sở dữ liệu:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Trường này không lưu trữ giá trị hiển thị và không yêu cầu label. Đây là một điều kiện tiên quyết thầm lặng cho tất cả các cấu trúc đường dẫn theo sau.
+
+---
+
+## Tại sao nó cần thiết
+
+RTSurvey đóng gói media của biểu mẫu — cơ sở dữ liệu SQLite, hình ảnh, đoạn âm thanh — bên trong một thư mục cho mỗi biểu mẫu trên thiết bị. Đường dẫn chính xác khác nhau giữa các nền tảng (Android, iOS, web) và giữa các thiết bị.
+
+Tại thời điểm chạy, ứng dụng sẽ tự động điền vào `family_path`. Một giá trị được giải quyết điển hình trông giống như:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Vì đường dẫn phụ thuộc vào nền tảng và được xác định tại thời điểm khởi chạy, nó không thể được mã hóa cứng trong biểu mẫu. `pulldata('app-api', 'family_path')` là cách đáng tin cậy duy nhất để lấy nó.
+
+---
+
+## Cách sử dụng nó trong các đường dẫn
+
+Khi `family_path` đã được xác định, hãy xây dựng một đường dẫn tệp đầy đủ với `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Hậu tố `::tableName` sẽ bị loại bỏ khi ứng dụng mở tệp; tên bảng chỉ được sử dụng bên trong truy vấn SQL của bạn.
+
+---
+
+## Nơi family_path được sử dụng
+
+`family_path` được yêu cầu trong đối số đường dẫn bất khi nào bạn tham chiếu đến một tệp đi kèm:
+
+- **Tìm kiếm cơ sở dữ liệu cục bộ** — đối số `db_path` của `search-autocomplete-noedit-v2('rawquery', ...)` phải được xây dựng bằng `concat(${family_path}, ...)`. Xem [Tìm kiếm cơ sở dữ liệu cục bộ](local-database-search) để biết chi tiết sử dụng đầy đủ.
+- **`pulldata` rawquery** — bất kỳ lệnh gọi `pulldata('rawquery', ...)` nào đọc từ tệp `.db` đều sử dụng cùng một mẫu `concat()`.
+- **`search()` với một tệp cục bộ** — các thuộc tính hiển thị (appearance) tìm kiếm động tải từ tệp CSV hoặc DB đi kèm cũng dựa vào `family_path` cho tham chiếu tệp.
+
+---
+
+## Vị trí trong biểu mẫu
+
+`family_path` phải xuất hiện **trước trường đầu tiên tham chiếu đến nó**. Vị trí được khuyến nghị là ngay sau nhóm meta:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(thuộc tính hiển thị rawquery tham chiếu đến `${family_path}`)* |
+
+<Callout type="warning">
+Nếu `family_path` bị thiếu trong biểu mẫu, hoặc được đặt sau trường `rawquery` / `search()` đầu tiên tham chiếu đến nó, tất cả các lần tra cứu đối với các tệp đi kèm sẽ âm thầm trả về kết quả trống. Không có thông báo lỗi — tính năng tự động hoàn thành chỉ đơn giản là không hiển thị kết quả.
+</Callout>
+
+---
+
+## Nhiều tệp cơ sở dữ liệu
+
+Một biểu mẫu duy nhất có thể sử dụng nhiều tệp `.db`. Mỗi đường dẫn được xây dựng độc lập với `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Xác định `family_path` một lần; tham chiếu nó trong bao nhiêu trường tùy ý.
+
+---
+
+## Xác minh trong quá trình phát triển
+
+Thêm một trường `note` tạm thời bên dưới `family_path` để kiểm tra giá trị được giải quyết trên thiết bị:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Path: ${family_path}` | |
+
+Ghi chú sẽ hiển thị đường dẫn được giải quyết thực tế trong quá trình thử nghiệm. Xóa nó trước khi triển khai biểu mẫu cuối cùng.

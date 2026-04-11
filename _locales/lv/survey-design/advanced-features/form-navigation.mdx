@@ -1,0 +1,104 @@
+---
+title: "Formas navigācijas vadīklas"
+description: "Izmantojiet SaveFinalizedExit un SaveIncompleteExit izskata vērtības, lai izveidotu stilizētas izejas pogas, kas saglabā datus un aizver formu."
+---
+
+**Formas navigācijas vadīklas** ir izskata vērtības, kas tiek pievienotas `note` (vai `text`) laukiem un kas aptaujas apakšā tiek rādītas kā pilna platuma stilizētas pogas. Tās ļauj intervētājam ar vienu pieskārienu saglabāt iesniegumu un iziet no formas — vai nu kā pabeigtu (finalizētu) ierakstu, vai kā melnrakstu (nepabeigtu ierakstu).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Izveido pogu, kas **saglabā iesniegumu kā finalizētu** un iziet no formas. Pogas etiķete tiek ņemta no lauka stabiņa `label`.
+
+| XLSForm column | Vērtība |
+|----------------|-------|
+| `type` | `note` |
+| `name` | jebkurš unikāls nosaukums (piem., `btn_finish`) |
+| `label` | teksts, kas redzams uz pogas |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Iesniegums tiek atzīmēts kā galīgs, pilnīgs ieraksts. Tas ir ekvivalents iebūvētās iesniegšanas pogas nospiešanai.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Izveido pogu, kas **saglabā iesniegumu kā nepabeigtu (melnrakstu)** un iziet no formas. Intervētājs var pie tā atgriezties vēlāk un turpināt aizpildīšanu.
+
+| XLSForm column | Vērtība |
+|----------------|-------|
+| `type` | `note` |
+| `name` | jebkurš unikāls nosaukums (piem., `btn_pause`) |
+| `label` | teksts, kas redzams uz pogas |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Krāsu sintakse
+
+Abi izskati pieņem iekļautu krāsu formātā `<#RRGGBB/>`:
+
+- `#`, kam seko tieši **6 sešpadsmitnieku cipari** (lielie vai mazie burti)
+- Noslēdzošais `/>` ir **obligāts** — tā izlaišana pārtrauc analīzi
+- Piemērs: `<#04B404/>` (zaļa), `<#EDC602/>` (dzintara), `<#D9534F/>` (sarkana)
+
+Krāsa kontrolē pogas fonu. Teksta krāsu lietotne nosaka automātiski.
+
+---
+
+## Piemērs
+
+Šie divi lauki, kas novietoti formas beigās, izveido zaļu pogu **Iesniegt** un dzintara krāsas pogu **Saglabāt kā melnrakstu**:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Iesniegt | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Saglabāt kā melnrakstu | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — pogu izslēgšana no satura rādītāja
+
+Izskata marķieris `toc-hide` norāda rtSurvey izslēgt lauku no formas **satura rādītāja** (jautājumu pārskata saraksta). Navigācijas pogas nav jautājumi, tāpēc tām nekad nevajadzētu parādīties satura rādītājā.
+
+Vienmēr pievienojiet `toc-hide` pēc izejas izskata:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Skatīt [Izskats — toc-hide](../appearance#group-and-navigation) informāciju par toc-hide.
+
+---
+
+## Izvietojuma konvencija
+
+Pievienojot formas navigācijas vadīklas, ievērojiet šīs konvencijas:
+
+- Novietojiet abas pogas pašās formas **beigās**, pēc visiem jautājumiem un grupām.
+- Vienmēr iekļaujiet **abas** pogas kopā — vienu finalizētu un vienu nepabeigtu —, lai intervētājam vienmēr būtu iespēja iziet neatkarīgi no pabeigšanas statusa.
+- Izmantojiet stabiņu `relevant` finalizētās izejas pogai, ja iesniegšana jāmēra tikai tad, ja ir izpildīti noteikti nosacījumi (piemēram, ir pabeigta obligāta sadaļa). Nepabeigtās izejas pogai parasti jāpaliek **vienmēr redzamai**.
+
+---
+
+## Nosacīta finalizēta izeja
+
+Izmantojiet stabiņu `relevant`, lai kontrolētu, kad tiek rādīta finalizētās izejas poga. Nepabeigtajai izejai jāpaliek beznosacījuma redzamai, lai intervētājs vienmēr varētu apstāties un atgriezties.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Iesniegt | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Saglabāt kā melnrakstu | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Šajā piemērā poga **Iesniegt** parādās tikai tad, kad intervētājs ir devis piekrišanu un atzīmējis A sadaļu kā pabeigtu. Poga **Saglabāt kā melnrakstu** ir pieejama vienmēr.
+
+---
+
+## Ierobežojumi
+
+- **Lauka veidam jābūt `note` vai `text`.** Šo izskatu izmantošana jebkuram citam jautājumu veidam netiek atbalstīta.
+- **Tikai 6 ciparu sešpadsmitnieku kods.** Saīsinātais sešpadsmitnieku kods (`<#FFF/>`) un nosauktās krāsas netiek atbalstītas — vienmēr izmantojiet pilno 6 ciparu formātu (piemēram, `<#FFFFFF/>`).
+- **Etiķetes stabiņš ir pogas teksts.** Stabiņš `hint` šiem laukiem tiek ignorēts; tiek rādīta tikai `label`.
+- **Jābūt abām pogām.** Nepabeigtās izejas pogas izlaišana atstāj intervētāju bez iespējas apstāties formas vidū.

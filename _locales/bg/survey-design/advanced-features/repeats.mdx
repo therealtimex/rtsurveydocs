@@ -1,154 +1,250 @@
 ---
 title: "Разширени повторения"
-description: "Разширени модели за групи за повторение: динамични броячи, вложени повторения, обобщаване на данни от повторения и препратка към стойности в рамките на повторения."
+description: "Разширени модели за групи от повторения: динамичен брой, вложени повторения, обобщаване на данни от повторения и рефериране на стойности между повторения."
 ---
 
-This page covers advanced patterns for working with repeat groups in rtSurvey. For the basics of setting up a repeat group, see [Grouping and Repeats](../repeats).
+Тази страница обхваща разширени модели за работа с групи от повторения в rtSurvey. За основите на настройката на група от повторения вижте [Групиране и повторения](../repeats).
 
 ---
 
 ## Динамичен брой повторения
 
-By default, the enumerator decides how many times to repeat. You can fix the number of repetitions using `repeat_count`:
+По подразбиране анкетьорът решава колко пъти да повтори. Можете да фиксирате броя на повторенията, като използвате `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
-| begin_repeat | household_members | Household member | `${num_members}` |
-| text | member_name | Member name | |
-| integer | member_age | Age | |
+| begin_repeat | household_members | Член на домакинството | `${num_members}` |
+| text | member_name | Име на члена | |
+| integer | member_age | Възраст | |
 | end_repeat | | | |
 
-The repeat runs exactly `${num_members}` times, where `num_members` was collected earlier in the form. The enumerator cannot add or remove instances.
+Повторението се изпълнява точно `${num_members}` пъти, като `num_members` е събрано по-рано във формуляра. Анкетьорът не може да добавя или премахва екземпляри.
 
 ---
 
 ## Индексиран достъп: `indexed-repeat()`
 
-Access a specific repeat instance's field value from **outside** the repeat group using `indexed-repeat(repeatedField, repeatGroup, index)`:
+Достъп до стойността на полето на конкретен екземпляр от повторение от **външната страна** на групата за повторение чрез `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-This is useful for building summary fields or referencing the "primary" member's data after the repeat.
+това е полезно за изграждане на обобщени полета или рефериране на данните на "основните" членове след повторението.
 
 ---
 
-## Текуща позиция на екземпляра: `index()`
+## Позиция на текущия екземпляр: `index()`
 
-Inside a repeat group, `index()` returns the 1-based position of the current instance. Use it to label each repetition or create unique identifiers:
+Вътре в група от повторения `index()` връща позицията на текущия екземпляр (базирана на 1). Използвайте я, за да етикетирате всяко повторение или да създадете уникални идентификатори:
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | Plot |
-| note | plot_label | Plot number `${index()}` |
-| text | plot_id | Plot ID |
+| begin_repeat | plots | Парцел |
+| note | plot_label | Номер на парцел `${index()}` |
+| text | plot_id | ID на парцел |
 | end_repeat | | |
 
 ---
 
-## Препратка към полета в същия екземпляр
+## Рефериране на полета в същия екземпляр
 
-Within a repeat, use `${fieldname}` to reference another field **in the same repeat instance**. There is no need for `indexed-repeat()` within the same loop:
+В рамките на едно повторение използвайте `${fieldname}`, за да реферирате към друго поле **в същия екземпляр на повторението**. Няма нужда от `indexed-repeat()` в рамките на същия цикъл:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| begin_repeat | members | Member | |
-| text | member_name | Name | |
-| integer | member_age | Age | |
-| text | school_name | School name | `${member_age} < 18` |
+| begin_repeat | members | Член | |
+| text | member_name | Име | |
+| integer | member_age | Възраст | |
+| text | school_name | Име на училище | `${member_age} < 18` |
 | end_repeat | | | |
 
 ---
 
-## Препратка към родителски полета от вътрешността на повторение
+## Рефериране на родителски полета отвътре на повторение
 
-Fields outside (above) the repeat group can be referenced normally with `${fieldname}`:
+Полетата извън (над) групата за повторение могат да бъдат реферирани нормално с `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
-| text | village | Village name |
-| begin_repeat | plots | Agricultural plot |
-| note | plot_context | Plots in `${village}` |
+| text | village | Име на село |
+| begin_repeat | plots | Земеделски парцел |
+| note | plot_context | Парцели в `${village}` |
 | end_repeat | | |
 
 ---
 
 ## Обобщаване на данни от повторения
 
-Use repeat aggregate functions **outside** the repeat group to summarise:
+Използвайте агрегатни функции за повторение **извън** групата за повторение за обобщаване:
 
 | Function | Example | Description |
 |----------|---------|-------------|
-| `count(group)` | `count(${household_members})` | Number of instances |
-| `sum(field)` | `sum(${loan_amount})` | Sum of a numeric field |
-| `min(field)` | `min(${member_age})` | Minimum value |
-| `max(field)` | `max(${member_age})` | Maximum value |
-| `join(sep, field)` | `join(', ', ${member_name})` | Comma-separated list |
-| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Conditional count |
-| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Conditional sum |
-| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Conditional join |
+| `count(group)` | `count(${household_members})` | Брой екземпляри |
+| `sum(field)` | `sum(${loan_amount})` | Сума от числово поле |
+| `min(field)` | `min(${member_age})` | Минимална стойност |
+| `max(field)` | `max(${member_age})` | Максимална стойност |
+| `join(sep, field)` | `join(', ', ${member_name})` | Списък, разделен със запетая |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Условен брой |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Условна сума |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Условно съединяване |
 
-### Пример: Household summary
+### Пример: Обобщение на домакинството
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| integer | num_members | How many members? | |
-| begin_repeat | members | Member | `${num_members}` |
-| text | member_name | Name | |
-| integer | member_age | Age | |
+| integer | num_members | Колко са членовете? | |
+| begin_repeat | members | Член | `${num_members}` |
+| text | member_name | Име | |
+| integer | member_age | Възраст | |
 | end_repeat | | | |
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` members; `${children_count}` under 18. Adults: `${adult_names}` | |
+| note | summary | `${total_members}` членове; `${children_count}` под 18 г. Възрастни: `${adult_names}` | |
 
 ---
 
 ## Вложени повторения
 
-A repeat group can contain another repeat group. Use this carefully — nested repeats add complexity and can be confusing for enumerators.
+Група от повторения може да съдържа друга група от повторения. Използвайте това внимателно — вложените повторения добавят сложност и могат да бъдат объркващи за анкетьорите.
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | households | Household |
-| text | hh_id | Household ID |
-| begin_repeat | hh_members | Member |
-| text | member_name | Member name |
+| begin_repeat | households | Домакинство |
+| text | hh_id | ID на домакинство |
+| begin_repeat | hh_members | Член |
+| text | member_name | Име на член |
 | end_repeat | | |
 | end_repeat | | |
 
-To reference a field in an outer repeat from the inner repeat, use `${fieldname}` — it resolves to the nearest matching ancestor:
+За да реферирате към поле във външно повторение от вътрешното повторение, използвайте `${fieldname}` — то се разрешава до най-близкия съвпадащ предшественик:
 
-Inside the `hh_members` repeat, `${hh_id}` returns the ID of the **current** household, not all households.
+Вътре в повторението `hh_members`, `${hh_id}` връща ID на **текущото** домакинство, а не на всички домакинства.
 
 ---
 
-## Класиране в групи за повторение: `rank-index()`
+## Ранг в групи от повторения: `rank-index()`
 
-When a `rank` field exists inside a repeat, use `rank-index(instanceNumber, repeatedField)` from outside to get the ordinal rank of a specific instance:
+Когато полето `rank` съществува вътре в повторението, използвайте `rank-index(instanceNumber, repeatedField)` отвън, за да получите поредния ранг на конкретен екземпляр:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` returns the instance index of the highest score.
+`rank-index(1, ${score})` връща индекса на екземпляра с най-висок резултат.
+
+---
+
+## Изглед `1screen` при `begin_repeat`
+
+Добавянето на `1screen` към колоната `appearance` на ред `begin_repeat` показва всички въпроси за всеки екземпляр заедно на един екран, вместо по един въпрос на екран.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Член на домакинството | `1screen` |
+| text | member_name | Име на члена | |
+| integer | member_age | Възраст | |
+| end_repeat | | | |
+
+Когато е зададено `1screen` и няма поле `repeat_count` и няма поле `add_repeat` вътре в групата, rtSurvey автоматично изобразява кръгъл бутон **+** в долната част на екрана, така че анкетьорите да могат да добавят нови екземпляри без допълнителна конфигурация.
+
+| Appearance | Един екран на екземпляр | Добавен бутон + по подразбиране |
+|------------|-------------------------|------------------------|
+| `1screen` | Да | Да (когато няма `add_repeat` подполе) |
+| `field-list` | Да | Не |
+
+Използвайте `field-list`, когато искате групираното оформление без автоматичния бутон за добавяне. Използвайте `1screen`, когато искате и групираното оформление, и вграден начин за добавяне на екземпляри.
+
+---
+
+## `add_repeat` персонализиран бутон за добавяне
+
+Поле `note` (или `text`), поставено **вътре** в групата за повторение с `appearance: add_repeat`, се изобразява като бутон "Добавяне" с пълна ширина. Етикетът на бутона идва от колоната `label` на полето. Когато е налично поле `add_repeat`, стандартният кръгъл бутон + (от `1screen`) се скрива.
+
+Поставете полето `add_repeat` като последно поле вътре в групата за повторение:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Член | `1screen` |
+| text | member_name | Име на члена | |
+| integer | member_age | Възраст | |
+| note | btn_add | + Добави член | `add_repeat` |
+| end_repeat | | | |
+
+### Персонализиране на цвета
+
+Предайте цветен код в стойността на изгледа (appearance), за да стилизирате бутона:
+
+| Appearance value | Result |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Зелен фон, стандартен цвят на текста |
+| `add_repeat 04B404-ffffff` | Зелен фон, бял текст |
+
+Първият цвят е фонът, а вторият (след тирето) е цветът на текста. Пропуснете `#`, когато използвате формата, разделена с тире.
+
+### Вариант с икона
+
+Използвайте `add_repeat icon` (с интервал), за да изобразите компактен кръгъл бутон с икона вместо бутона с пълна ширина:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Добави | `add_repeat icon` |
+
+---
+
+## Бутони за изтриване: `delete-repeat-current` и `delete-repeat-last`
+
+Поле `note` вътре в групата за повторение с `appearance: delete-repeat-current` или `appearance: delete-repeat-last` се изобразява като разделен бутон за изтриване.
+
+| Appearance | Action |
+|------------|--------|
+| `delete-repeat-current` | Изтрива текущия (активен) екземпляр |
+| `delete-repeat-last` | Изтрива последния екземпляр в повторението |
+
+Бутонът по подразбиране (без икона) е разделен бутон: икона на кошче вляво и текст на етикета на полето вдясно, обхващащ пълната ширина на екрана.
+
+### Вариант с икона
+
+Добавете накрая `-icon`, за да получите компактен кръгъл бутон с икона на кошче:
+
+| Appearance | Result |
+|------------|--------|
+| `delete-repeat-current-icon` | Кръгла икона на кошче, изтрива текущия екземпляр |
+| `delete-repeat-last-icon` | Кръгла икона на кошче, изтрива последния екземпляр |
+
+### Персонализиране на цвета
+
+Форматът на цвета е идентичен с `add_repeat`: използвайте `<#RRGGBB/>` или `RRGGBB-RRGGBB` (фон-текст).
+
+### Пример за пълен модел
+
+Следното повторение използва `1screen`, кръгъл бутон за изтриване на текущия екземпляр отгоре и бутон за добавяне с пълна ширина отдолу:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Член | `1screen` |
+| note | btn_del | Премахни | `delete-repeat-current-icon` |
+| text | member_name | Име на члена | |
+| integer | member_age | Възраст | |
+| note | btn_add | + Добави член | `add_repeat` |
+| end_repeat | | | |
 
 ---
 
 ## Най-добри практики
 
-1. Always use `repeat_count` when the number of repetitions is known in advance — it prevents enumerators from accidentally adding or removing instances.
-2. Keep repeat groups focused — a repeat with 20+ questions per instance is difficult to navigate.
-3. Name repeat groups clearly (e.g., `household_members`, not `repeat1`) — the name appears in function calls and exported data.
-4. Test with the maximum expected number of instances to verify performance.
-5. Use `field-list` appearance on the repeat group to show all fields on one screen per instance (mobile).
+1. Винаги използвайте `repeat_count`, когато броят на повторенията е известен предварително — това предотвратява случайно добавяне или премахване на екземпляри от страна на анкетьорите.
+2. Поддържайте групите от повторения фокусирани — повторение с над 20 въпроса на екземпляр е трудно за навигация.
+3. Именувайте групите от повторения ясно (напр. `household_members`, а не `repeat1`) — името се появява в повиквания на функции и експортирани данни.
+4. Тествайте с максималния очакван брой екземпляри, за да проверите производителността.
+5. Използвайте `1screen` при `begin_repeat`, за да показвате всички въпроси на един екран за всеки екземпляр, съчетано с поле за бележка `add_repeat` вътре в групата, за да дадете на анкетьорите ясно обозначен бутон "Добавяне".
 
 ---
 
 ## Ограничения
 
-- `indexed-repeat()` requires a valid index (1 to count of instances) — out-of-range indices return empty.
-- Nested repeats beyond 2 levels are not recommended and may cause display issues on some clients.
-- Aggregate functions (`sum`, `count`, etc.) operate on the entire repeat group — you cannot aggregate a subset of instances without `*-if` variants.
+- `indexed-repeat()` изисква валиден индекс (от 1 до броя на екземплярите) — индексите извън обхвата връщат празна стойност.
+- Вложени повторения над 2 нива не се препоръчват и могат да причинят проблеми с показването при някои клиенти.
+- Агрегатните функции (`sum`, `count` и др.) работят върху цялата група от повторения — не можете да агрегирате подмножество от екземпляри без вариантите `*-if`.

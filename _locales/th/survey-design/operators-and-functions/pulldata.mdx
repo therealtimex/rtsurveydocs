@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "ฟังก์ชัน pulldata() ใช้เพื่อดึงค่าจากไฟล์ CSV ภายนอกที่แนบมากับฟอร์ม โดยจับคู่คอลัมน์คีย์กับค่าคีย์และคืนค่าคอลัมน์ผลลัพธ์ที่เกี่ยวข้อง"
+---
+
+import { Callout } from 'nextra/components'
+
+ฟังก์ชัน `pulldata()` ใช้เพื่อดึงค่าจากไฟล์ CSV ที่แนบมากับฟอร์ม เมื่อระบุชื่อไฟล์, คอลัมน์ที่ต้องการคืนค่า, คอลัมน์ที่ต้องการจับคู่ และค่าคีย์ ฟังก์ชันจะคืนค่าเซลล์ที่จุดตัดของแถวที่ตรงกันและคอลัมน์ผลลัพธ์
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| ตำแหน่ง | พารามิเตอร์ | คำอธิบาย |
+|----------|-----------|-------------|
+| 1 | Filename | ชื่อไฟล์สื่อ CSV (ชื่อเดียวกันกับที่ใช้ใน `select_one_from_file`) |
+| 2 | Result column | คอลัมน์ที่ต้องการคืนค่า |
+| 3 | Key column | คอลัมน์ที่ต้องการจับคู่ |
+| 4 | Key value | ค่าที่ต้องการจับคู่ — โดยปกติจะเป็นการอ้างอิงฟิลด์เช่น `${field}` |
+
+ฟังก์ชันจะคืนค่าเป็นสตริงว่างหากไม่พบข้อมูลที่ตรงกัน
+
+---
+
+## ข้อกำหนดเบื้องต้น
+
+ไฟล์ CSV จะต้องแนบมากับฟอร์มในฐานะ **ไฟล์สื่อ (media file)** โดยไฟล์เดียวกันนี้ที่อ้างอิงโดย `pulldata()` สามารถใช้เป็นรายการตัวเลือกสำหรับ `select_one_from_file` ได้เช่นกัน
+
+**ตัวอย่าง CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## ตัวอย่างพื้นฐาน
+
+ค้นหาแผนกและหมายเลขโทรศัพท์ของพนักงานจากรหัสพนักงาน (ID):
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | เลือกพนักงาน | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | แผนก: `${dept}` — โทรศัพท์: `${phone}` | |
+
+<Callout type="info">
+คอลัมน์ `name` ใน CSV สำหรับ `select_one_from_file` คือค่าที่ถูกจัดเก็บ เมื่อผู้เก็บข้อมูลเลือก "Alice" ตัวแปร `${staff_id}` จะมีค่าเป็น `"Alice"` ซึ่ง `pulldata()` จะใช้เป็นคีย์เพื่อดึงข้อมูลแผนกและโทรศัพท์ของเธอ
+</Callout>
+
+---
+
+## การดึงเลเบล (label) ของตัวเลือกที่เลือก
+
+คำถามแบบ `select_one_from_file` จะเก็บค่า `name` หากต้องการแสดงเลเบลที่มนุษย์อ่านได้ (`label`) ให้ใช้ `pulldata()` เพื่อค้นหาค่าดังกล่าว:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | เลือกหมู่บ้าน | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | คุณเลือก: `${village_label}` | |
+
+---
+
+## การค้นหาหลายค่าจากการเลือกเพียงครั้งเดียว
+
+คุณสามารถเรียกใช้ `pulldata()` หลายครั้งในไฟล์เดียวกันเพื่อดึงคอลัมน์ต่างๆ สำหรับแถวที่เลือกเดียวกันได้:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | เลือกสถานที่ | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## การใช้ pulldata ใน relevant และ constraint
+
+สามารถใช้ `pulldata()` ในคอลัมน์ `relevant` และ `constraint` เพื่อใช้ตรรกะตามค่าที่ค้นหาได้:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | เลือกสถานที่ | | |
+| integer | bed_count | จำนวนเตียงที่ถูกใช้งาน | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## การใช้ pulldata ร่วมกับ `once()`
+
+หากต้องการประมวลผล `pulldata()` เฉพาะตอนโหลดฟอร์มครั้งแรกเท่านั้น (เพื่อป้องกันการประมวลผลใหม่เมื่อฟิลด์คีย์เปลี่ยนแปลงหลังจากป้อนข้อมูลครั้งแรกแล้ว) ให้ครอบด้วย `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## แนวทางปฏิบัติที่ดีที่สุด
+
+1. คอลัมน์คีย์ใน CSV ต้องตรงกับคอลัมน์ `name` ที่ใช้ใน `select_one_from_file` — ค่าเหล่านี้ต้องเป็นค่าเดียวกัน
+2. ชื่อคอลัมน์ใน CSV เป็นแบบ Case-sensitive (ตัวพิมพ์ใหญ่-เล็กต่างกัน) — `Department` และ `department` ถือว่าเป็นคนละคอลัมน์กัน
+3. หากไม่พบค่าคีย์ `pulldata()` จะคืนค่าเป็นสตริงว่าง — ควรใช้ `if(${field} != '', pulldata(...), '')` เพื่อป้องกันกรณีที่ยังไม่ได้เลือกข้อมูล
+4. พยายามทำให้ไฟล์ CSV มีขนาดเล็กที่สุดเท่าที่จะเป็นไปได้ — ไฟล์ขนาดใหญ่จะเพิ่มเวลาในการโหลดฟอร์มสำหรับพื้นที่ที่มีแบนด์วิดท์ต่ำ
+5. สำหรับข้อมูลที่มีการเปลี่ยนแปลงระหว่างรอบการเก็บข้อมูล ให้จัดการอัปเดตไฟล์สื่อ CSV โดยการอัปโหลดฟอร์มเวอร์ชันใหม่
+
+## ข้อจำกัด
+
+- `pulldata()` จะจับคู่เฉพาะแถว **แรก** ที่คอลัมน์คีย์เท่ากับค่าคีย์เท่านั้น — ไม่รองรับค่าคีย์ที่ซ้ำกันใน CSV
+- ไฟล์ CSV ต้องถูกแนบมากับฟอร์มก่อนการปรับใช้ (deployment) ไม่สามารถดึงข้อมูลจาก URL ขณะรันไทม์ได้
+- ค่าตัวเลขที่คืนมาจาก `pulldata()` จะเป็นสตริง — ให้ครอบด้วย `number()` เมื่อใช้ในการคำนวณทางคณิตศาสตร์: `number(pulldata(...))`
+
+<Callout type="info">
+rtSurvey ยังรองรับ `pulldata()` รูปแบบขยายสำหรับการอ่านข้อมูลเมตาของอุปกรณ์, ฟิลด์ JWT และข้อมูล JSON ดูเพิ่มเติมที่ [App API](../app-api) สำหรับ `pulldata('app-api', ...)` และหน้า [Call API](../advanced-features/call-api) สำหรับรูปแบบการค้นหาข้อมูลจาก JSON
+</Callout>
+
+---
+
+## รูปแบบขยายของ pulldata()
+
+นอกเหนือจากการค้นหาใน CSV แล้ว `pulldata()` ยังรองรับแหล่งข้อมูลเพิ่มเติมอื่นๆ โดยการเปลี่ยนอาร์กิวเมนต์แรก
+
+### `pulldata('app-api', key)`
+
+อ่านข้อมูลเมตาของอุปกรณ์, คุณลักษณะของผู้ใช้ และบริบทของแอป ดูข้อมูลอ้างอิงฉบับเต็มได้ที่หน้า [App API](../app-api)
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+ประมวลผลสตริง JSON ภายในฟอร์มและดึงค่าออกมาโดยใช้นิพจน์ JSONPath มีประโยชน์เมื่อคุณมี JSON literal ฝังอยู่ในฟอร์ม
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+คืนค่าที่ตรงกันเป็นสตริง หรือสตริงว่างหากไม่พบ
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+ดึงค่าจากสตริง JSON ที่เก็บไว้ในฟิลด์อื่นโดยใช้นิพจน์ JSONPath ซึ่งเทียบเท่ากับ `substr-jsonpath(${field}, jsonpath)`
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+ถอดรหัสโทเค็น JWT ที่เก็บไว้ในฟิลด์และคืนค่าของ claim เฉพาะจากข้อมูลส่วนบรรทุก (payload)
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+คืนค่าเป็นสตริงว่างหากโทเค็นไม่ถูกต้องหรือไม่พบ claim ดังกล่าว
+
+### `pulldata('instanceid')`
+
+คืนค่า ID อินสแตนซ์ที่ไม่ซ้ำกันของการส่งข้อมูลปัจจุบัน เทียบเท่ากับเมตาฟิลด์ `instanceID`
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+จับคู่ค่าหนึ่งไปยังอีกค่าหนึ่งโดยใช้ตารางการแมป (mapping table) ที่กำหนดไว้ในการกำหนดค่าของฟอร์ม
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+คืนค่าที่แมปแล้ว หรือสตริงว่างหากไม่มีข้อมูลที่ตรงกัน
+
+### `pulldata('options', optionName)`
+
+อ่านตัวเลือกการกำหนดค่าของฟอร์มตามชื่อ
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+รันคำสั่ง SQL `SELECT` กับไฟล์ SQLite `.db` ที่แนบมา และคืนค่าจากคอลัมน์แรกของแถวแรกที่ตรงกัน พารามิเตอร์หลังสตริง SQL จะถูกแทนที่ตามลำดับสำหรับเครื่องหมาย `?`
+
+| ตำแหน่ง | พารามิเตอร์ | คำอธิบาย |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | สตริงคงที่เพื่อระบุรูปแบบนี้ |
+| 2 | path | พาธไฟล์ในรูปแบบ `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | คำสั่ง `SELECT` ที่ใช้ `?` เป็นตัวระบุตำแหน่งพารามิเตอร์ |
+| 4+ | params | ค่าที่จะนำไปแทนที่ในแต่ละ `?` ตามลำดับ — โดยปกติจะเป็นการอ้างอิงฟิลด์เช่น `${field}` |
+
+คืนค่าเป็นสตริงว่างหากไม่พบแถวที่ตรงกัน
+
+**ตัวอย่าง — ค้นหาชื่อจังหวัดด้วย ID:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**ตัวอย่าง — ค้นหาชื่อแขวง/ตำบลโดยกรองจากทั้งรหัสจังหวัดและรหัสอำเภอ:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+ฟังก์ชัน `pulldata()` แบบสี่อาร์กิวเมนต์มาตรฐานจะใช้เพื่อจับคู่คอลัมน์คีย์เดียวในไฟล์ CSV แต่รูปแบบ `rawquery` จะรันคำสั่ง SQL `SELECT` เต็มรูปแบบกับฐานข้อมูล SQLite ซึ่งช่วยให้สามารถใช้เงื่อนไข `WHERE` หลายคอลัมน์และคืนค่าจากคอลัมน์ใดก็ได้ตามต้องการ
+
+<Callout type="info">
+`rawquery` มักใช้กับฟิลด์ autocompleteสำหรับการค้นหาตำแหน่งที่ตั้งตามลำดับชั้น ดูรายละเอียดการสร้างไฟล์ `.db` และการเชื่อมต่อกับ `pulldata('rawquery', ...)` ได้ที่หน้า [การค้นหาฐานข้อมูลท้องถิ่น](../advanced-features/local-database-search)
+</Callout>

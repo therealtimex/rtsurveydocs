@@ -1,0 +1,224 @@
+---
+title: "Meklēšana vietējā datubāzē"
+description: "Meklēšana vietējā datubāzē veic vaicājumus komplektētā SQLite .db failā, izmantojot neapstrādātu SQL, nodrošinot ātru bezsaistes automātisko pabeigšanu lielām statiskām datu kopām."
+---
+
+import { Callout } from 'nextra/components'
+
+**Meklēšana vietējā datubāzē** ļauj `select_one` vai `text` laukam veikt vaicājumu SQLite `.db` failā, kas ir pievienots veidlapas multivides pakotnei — pilnīgi bezsaistē, bez saziņas ar serveri. Šī ir pareizā pieeja, ja jūsu izvēles saraksts ir liels un statisks (piemēram, valsts mēroga ciematu saraksts, veselības aprūpes iestādes vai administratīvās robežas) un savienojamība nevar tikt garantēta.
+
+| Pieeja | Datu avots | Nepieciešams savienojums |
+|---|---|---|
+| Meklēšana vietējā datubāzē (`rawquery`) | Pievienots `.db` fails (SQLite) | Nē |
+| `search-api()` | Attāls REST API | Jā |
+| `search()` | Pievienots CSV fails | Nē |
+
+---
+
+## Izskata varianti
+
+Automātiskās pabeigšanas lauks tiek konfigurēts, izmantojot `appearance` kolonnu. Pieejami trīs varianti:
+
+| Variants | Piezīmes |
+|---|---|
+| `search-autocomplete-noedit(...)` | Standarta automātiskā pabeigšana — skaitītājam jāizvēlas no saraksta; brīva teksta ievade netiek saglabāta |
+| `search-autocomplete-noedit-v2(...)` | Ieteicamais variants — tāda pati darbība, bet izmanto atjauninātu atveidošanas dzinēju ar labāku veiktspēju lielām rezultātu kopām |
+| `search(...)` | Vienkārša failā balstīta sakritība ar pievienotu CSV; **neatbalsta** neapstrādātu SQL — šeit uzskaitīts tikai salīdzināšanai |
+
+<Callout type="info">
+`search-autocomplete-noedit` ir aizstājvārds — parsēšanas laikā lietotne to aizstāj ar iekšējās funkcijas nosaukumu `searchAutocompleteNoedit`. Izmantojiet jebkuru rakstību savā XLSForm; abi darbojas.
+</Callout>
+
+---
+
+## `rawquery` datu avots
+
+Lai palaistu SQL vaicājumu pret `.db` failu, kā pirmo izskata funkcijas argumentu nododiet `'rawquery'`. Pilns paraksts ir:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parametri
+
+| Pozīcija | Parametrs | Apraksts |
+|---|---|---|
+| 1 | `'rawquery'` | Burtiska virkne — norāda lietotnei tieši izpildīt SQL |
+| 2 | `db_path` | Ceļš uz SQLite failu, veidā `<dir>/<file>.db::tableName`. Piedēklis `::tableName` tiek noņemts, atverot failu; tabulas nosaukums tiek izmantots jūsu SQL |
+| 3 | `'[display_col]'` | Kolonna, ko parādīt nolaižamajā sarakstā. Iekavas `[ ]` tiek noņemtas izpildlaikā |
+| 4 | `'value_col'` | Kolonna, kuras vērtība tiek saglabāta, kad skaitītājs veic izvēli |
+| 5 | `'SELECT ...'` | Jebkurš derīgs SQLite SELECT paziņojums. `SELECT DISTINCT` tiek automātiski ievietots, ja `DISTINCT` vēl nav |
+| 6+ | `param1, ...` | Neobligāti. Vērtības, kas piesaistītas `?` aizstājējiem SQL secībā. Ja SQL satur `?`, bet parametri nav sniegti, lauks atgriež tukšumu (iebūvēta aizsardzība pret trūkstošiem argumentiem) |
+
+### `db_path` konvencija
+
+Datubāzes fails atrodas veidlapas pievienotajā multivides direktorijā. Izpildlaikā `pulldata('app-api', 'family_path')` atgriež šo direktorija ceļu. Skatiet [family_path](family-path) iestatīšanas detaļas. Standarta modelis ir:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Kad lietotne atver failu, tā noņem `::tableName` daļu un izmanto tīro faila ceļu. Tabulas nosaukums parādās tikai jūsu SQL iekšienē.
+
+---
+
+## Pamata piemērs — provinces meklēšana
+
+Tikai lasāms provinces nolaižamais saraksts, kura pamatā ir pievienots `vnxa3.db` fails:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+Kolonna `appearance` (paplašināta lasāmībai):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Parādītā etiķete nāk no `provv` kolonnas.
+- Saglabātā vērtība nāk no `provid` kolonnas.
+- Tiek rādītas tikai rindas, kur `rta_filter = "1"`.
+
+---
+
+## Parametrizēti vaicājumi
+
+Izmantojiet `?` aizstājējus savā SQL un nododiet atbilstošās lauku atsauces kā papildu argumentus (no 6. pozīcijas). Šis ir standarta modelis kaskādes izvēlei — piemēram, ielādējot rajonus, kas pieder iepriekš izvēlētajai provincei.
+
+<Callout type="warning">
+Ja jūsu SQL satur vismaz vienu `?` un nav sniegti parametru argumenti, lauks atgriež tukšu rezultātu kopu. Tas novērš novecojušu vai neattiecīgu datu parādīšanos pirms vecāka līmeņa izvēles.
+</Callout>
+
+### Rajonu kaskādes piemērs
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+`${province}` vērtība tiek piesaistīta pirmajam `?`. Lauks ir tukšs, līdz skaitītājs izvēlas provinci.
+
+### Divu parametru piemērs — komūnu kaskāde
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parametri tiek piesaistīti pozicionāli: `${province}` → pirmais `?`, `${district}` → otrais `?`.
+
+---
+
+## UNION SELECT īpašām vērtībām
+
+Ievietojiet sintētiskas rindas — piemēram, "Nezinu" vai "Atteikties atbildēt" — tieši SQL, izmantojot `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Nezinu</i>", "888"')
+```
+
+Konvencijas, kas tiek izmantotas RTSurvey veidlapās:
+
+| Kods | Nozīme |
+|---|---|
+| `888` | Nezinu |
+| `999` | Atteikties atbildēt |
+
+HTML tagus, piemēram, `<i>`, parādāmajā virknē atveido lietotne — varat tos izmantot, lai vizuāli atšķirtu īpašās opcijas.
+
+---
+
+## Vairāku valodu displejs
+
+Saglabājiet valodai specifiskas etiķetes atsevišķās kolonnās (piemēram, `label_vi`, `label_en`) un atlasiet atbilstošo, pamatojoties uz valodas lauku jūsu veidlapā:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Lai dinamiski mainītu kolonnas, pamatojoties uz `${language}` lauku, izmantojiet `if()` izteiksmi displeja kolonnas parametram, lai pārslēgtos starp valodu kolonnām:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Displeja kolonnas parametrs tiek novērtēts pirms vaicājuma palaišanas. SQL dzinējam tiek nodots tikai kolonnas nosaukums (bez iekavām); iekavas ir kosmētikas marķieri, kas tiek noņemti parsēšanas laikā.
+</Callout>
+
+---
+
+## Reālas izvēles apstiprināšana
+
+Ja lauks pieļauj īpašas vērtības, piemēram, 888 vai 999, ar vienkāršu `required = yes` pārbaudi nepietiek — tā ir izpildīta pat tad, ja skaitītājs izvēlas "Nezinu". Izmantojiet `selected-at(., 0) != -997` ierobežojumu, lai pārbaudītu, vai saglabātā vērtība ir patiesa izvēle, nevis iekšējā vērtība "nekas nav atlasīts" `-997`:
+
+| kolonna | vērtība |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Lūdzu, izvēlieties derīgu opciju |
+
+Vērtība `-997` ir iekšējais kods, ko RTSurvey saglabā, ja no automātiskās pabeigšanas saraksta nav izvēlēts neviens vienums. Izvēle 888 vai 999 joprojām ir apzināta izvēle un iztur šo pārbaudi.
+
+Lai papildus pieprasītu reālu (nevis īpašu) vērtību, paplašiniet ierobežojumu:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Salīdzinājums: vietējā datubāze pret citām meklēšanas metodēm
+
+| Funkcija | `rawquery` automātiskā pabeigšana | `search-api()` | `search()` CSV | Parastās CSV izvēles |
+|---|---|---|---|---|
+| Datu avots | Pievienots `.db` (SQLite) | Attāls REST API | Pievienots CSV | Izvēļu lapa |
+| Darbojas bezsaistē | Jā | Nē | Jā | Jā |
+| Atbalsta neapstrādātu SQL | Jā | Nē | Nē | Nē |
+| Kaskādes filtri | Jā — parametrizēts `?` | Izmantojot pieprasījuma pamattekstu | Ierobežots | Nē |
+| Datu kopas lielums | Ļoti liels (miljoniem rindu) | Neierobežots (servera pusē) | Vidējs (desmitiem tūkstošu) | Mazs |
+| Īpašas ievietotas rindas | Jā — `UNION SELECT` | Nē | Nē | Jā (manuāli) |
+| Iestatīšanas sarežģītība | Vidēja — nepieciešams pievienots `.db` | Augsta — nepieciešams API serveris | Zema | Nav |
+
+---
+
+## Ierobežojumi
+
+- Pirms izvietošanas `.db` failam jābūt pievienotam veidlapas multivides pakotnē. Dinamiskiem datubāzes atjauninājumiem nepieciešama jauna veidlapas izvietošana.
+- SQL tiek izpildīts tādā veidā, kāds tas ir ierīcē. Servera pusē netiek veikta nekāda sanitizācija — izvairieties no SQL konstruēšanas no skaitītāja brīva teksta ievades.
+- Tiek atbalstīti tikai `SELECT` paziņojumi. `INSERT`, `UPDATE` un `DELETE` nav atļauti.
+- Ļoti sarežģīti vaicājumi (lielas `UNION` ķēdes, vairāki savienojumi) var būt lēni zemas klases Android ierīcēs.
+- `search-autocomplete-noedit` varianti neļauj skaitītājam saglabāt vērtību, kas nav rezultātu kopā. Ja nepieciešama brīva teksta ievade, izmantojiet atsevišķu `text` lauku.
+- `SELECT DISTINCT` tiek automātiski ievietots tikai tad, ja vaicājumā nav `DISTINCT`. Ja rakstāt `SELECT DISTINCT` tieši, tas netiks dubultots.

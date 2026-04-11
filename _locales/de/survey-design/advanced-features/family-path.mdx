@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path ist ein Konventions-Berechnungsfeld, das den Pfad zum gebündelten Medienverzeichnis des Formulars zur Laufzeit zurückgibt — erforderlich für jedes Formular, das lokale Datenbankabfragen oder dateibasierte Suchen verwendet."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` ist ein Konventions-Berechnungsfeld (calculate), das den Pfad zum gebündelten Medienverzeichnis des Formulars enthält. Jedes Formular, das lokale Datenbankabfragen mit `rawquery`, `pulldata` oder `search()` durchführt, muss dieses Feld enthalten — ohne dieses Feld können Dateipfade nicht aufgelöst werden und Abfragen geben stillschweigend leere Ergebnisse zurück.
+
+---
+
+## Das calculate-Feld
+
+Fügen Sie diese Zeile weit oben in Ihrem Survey-Blatt ein, nach allen Meta-Feldern und vor der ersten Frage, die eine Datenbankdatei verwendet:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Das Feld speichert keinen sichtbaren Wert und benötigt kein Label. Es ist eine stille Voraussetzung für alle folgenden Pfadkonstruktionen.
+
+---
+
+## Warum es benötigt wird
+
+RTSurvey bündelt Formularmedien — SQLite-Datenbanken, Bilder, Audioclips — in einem formularspezifischen Verzeichnis auf dem Gerät. Der genaue Pfad unterscheidet sich je nach Plattform (Android, iOS, Web) und Gerät.
+
+Zur Laufzeit füllt die App `family_path` automatisch aus. Ein typischer aufgelöster Wert sieht so aus:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Da der Pfad plattformspezifisch ist und zum Startzeitpunkt festgelegt wird, kann er nicht fest im Formular kodiert werden. `pulldata('app-api', 'family_path')` ist die einzige zuverlässige Methode, um ihn abzurufen.
+
+---
+
+## Verwendung in Pfaden
+
+Sobald `family_path` definiert ist, erstellen Sie einen vollständigen Dateipfad mit `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Das Suffix `::tableName` wird entfernt, wenn die App die Datei öffnet; der Tabellenname wird nur innerhalb Ihrer SQL-Abfrage verwendet.
+
+---
+
+## Wo family_path verwendet wird
+
+`family_path` ist im Pfad-Argument erforderlich, wann immer Sie auf eine gebündelte Datei verweisen:
+
+- **Lokale Datenbanksuche** — das `db_path`-Argument von `search-autocomplete-noedit-v2('rawquery', ...)` muss mit `concat(${family_path}, ...)` erstellt werden. Siehe [Lokale Datenbanksuche](local-database-search) für vollständige Nutzungsdetails.
+- **`pulldata` rawquery** — jeder `pulldata('rawquery', ...)`-Aufruf, der aus einer `.db`-Datei liest, verwendet dasselbe `concat()`-Muster.
+- **`search()` mit einer lokalen Datei** — dynamische Such-Appearances, die aus einer gebündelten CSV- oder DB-Datei geladen werden, verlassen sich ebenfalls auf `family_path` für die Dateireferenz.
+
+---
+
+## Platzierung im Formular
+
+`family_path` muss **vor dem ersten Feld erscheinen, das darauf verweist**. Die empfohlene Position ist unmittelbar nach der Meta-Gruppe:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(rawquery appearance, die auf `${family_path}` verweist)* |
+
+<Callout type="warning">
+Wenn `family_path` im Formular fehlt oder nach dem ersten `rawquery` / `search()`-Feld platziert wird, das darauf verweist, geben alle Abfragen gegen gebündelte Dateien stillschweigend leere Ergebnisse zurück. Es gibt keine Fehlermeldung — die Autovervollständigung zeigt einfach keine Ergebnisse an.
+</Callout>
+
+---
+
+## Mehrere Datenbankdateien
+
+Ein einzelnes Formular kann mehrere `.db`-Dateien verwenden. Jeder Pfad wird unabhängig mit `concat()` konstruiert:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Definieren Sie `family_path` einmal und verweisen Sie in so vielen Feldern darauf wie nötig.
+
+---
+
+## Überprüfung während der Entwicklung
+
+Fügen Sie ein temporäres `note`-Feld unter `family_path` hinzu, um den aufgelösten Wert auf dem Gerät zu überprüfen:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Pfad: ${family_path}` | |
+
+Die Notiz zeigt während des Tests den tatsächlich aufgelösten Pfad an. Entfernen Sie sie vor der Bereitstellung des endgültigen Formulars.

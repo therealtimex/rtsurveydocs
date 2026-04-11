@@ -1,15 +1,15 @@
 ---
-title: "Pažangūs kartojimai"
-description: "Pažangūs kartojimų grupių modeliai: dinaminis skaičius, įdėtiniai kartojimai, kartojimų duomenų apibendrinimas ir reikšmių nuoroda per kartojimus."
+title: "Sudėtingesni kartojimai"
+description: "Pažangūs kartojimo grupių šablonai: dinaminis skaičius, įterptieji kartojimai, duomenų apibendrinimas ir nuorodos į reikšmes tarp kartojimų."
 ---
 
-Šiame puslapyje aprašomi pažangūs kartojimų grupių naudojimo modeliai rtSurvey sistemoje. Pagrindinę informaciją apie kartojimų grupių konfigūravimą rasite [Grupavimas ir kartojimai](../repeats).
+Šiame puslapyje aprašomi pažangūs darbo su kartojimo grupėmis (repeat groups) šablonai „rtSurvey“ sistemoje. Pagrindinę informaciją apie kartojimo grupės nustatymą rasite puslapyje [Grupavimas ir kartojimai](../repeats).
 
 ---
 
 ## Dinaminis kartojimų skaičius
 
-Pagal numatymą surašytojas nusprendžia, kiek kartų kartoti. Galite fiksuoti kartojimų skaičių naudodami `repeat_count`:
+Pagal numatytuosius nustatymus apklausos vykdytojas nusprendžia, kiek kartų kartoti. Galite užfiksuoti kartojimų skaičių naudodami `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,26 +18,26 @@ Pagal numatymą surašytojas nusprendžia, kiek kartų kartoti. Galite fiksuoti 
 | integer | member_age | Amžius | |
 | end_repeat | | | |
 
-Kartojimas vykdomas tiksliai `${num_members}` kartų, kur `num_members` buvo surinkta anksčiau formoje. Surašytojas negali pridėti ar pašalinti egzempliorių.
+Kartojimas vykdomas tiksliai `${num_members}` kartų, kur `num_members` reikšmė buvo surinkta anksčiau formoje. Apklausos vykdytojas negali pridėti ar pašalinti egzempliorių.
 
 ---
 
 ## Indeksuota prieiga: `indexed-repeat()`
 
-Pasiekite konkretaus kartojimo egzemplioriaus lauko reikšmę **iš kartojimų grupės išorės** naudodami `indexed-repeat(kartotasLaukas, kartojimųGrupė, indeksas)`:
+Pasiekite konkretaus kartojimo egzemplioriaus lauko reikšmę iš **išorės** naudodami `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Tai naudinga kuriant suvestinių laukus arba nurodant „pagrindinio" nario duomenis po kartojimo.
+Tai naudinga kuriant suvestinės laukus arba nurodant „pagrindinio“ nario duomenis po kartojimo ciklo.
 
 ---
 
 ## Dabartinio egzemplioriaus pozicija: `index()`
 
-Kartojimų grupės viduje `index()` grąžina dabartinio egzemplioriaus 1 nuo pradžios skaičiuojamą poziciją. Naudokite jį kiekvienam kartojimui žymėti arba unikalių identifikatorių kūrimui:
+Kartojimo grupės viduje `index()` grąžina dabartinio egzemplioriaus poziciją (nuo 1). Naudokite tai kiekvienam kartojimui paženklinti arba unikaliems identifikatoriams sukurti:
 
 | type | name | label |
 |------|------|-------|
@@ -48,9 +48,9 @@ Kartojimų grupės viduje `index()` grąžina dabartinio egzemplioriaus 1 nuo pr
 
 ---
 
-## Laukų nuoroda tame pačiame egzemplioriuje
+## Nuorodos į tos pačios iteracijos laukus
 
-Kartojimo viduje naudokite `${lauko_pavadinimas}`, kad nurodytumėte kitą lauką **tame pačiame kartojimo egzemplioriuje**. Nereikia `indexed-repeat()` toje pačioje kilpoje:
+Kartojimo viduje naudokite `${fieldname}`, norėdami nurodyti kitą lauką **tame pačiame kartojimo egzemplioriuje**. Tam pačiam ciklui `indexed-repeat()` naudoti nereikia:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,22 +62,22 @@ Kartojimo viduje naudokite `${lauko_pavadinimas}`, kad nurodytumėte kitą lauk�
 
 ---
 
-## Pirminių laukų nuoroda iš kartojimo vidaus
+## Nuorodos į tėvinius laukus iš kartojimo vidaus
 
-Laukai už kartojimų grupės ribų (aukščiau) gali būti nurodomi normaliai su `${lauko_pavadinimas}`:
+Laukus, esančius už kartojimo grupės ribų (virš jos), galima nurodyti įprastai naudojant `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
 | text | village | Kaimo pavadinimas |
 | begin_repeat | plots | Žemės ūkio sklypas |
-| note | plot_context | Sklypai `${village}` kaime |
+| note | plot_context | Sklypai kaime: `${village}` |
 | end_repeat | | |
 
 ---
 
-## Kartojimų duomenų apibendrinimas
+## Kartojimo duomenų apibendrinimas
 
-Naudokite kartojimų agregavimo funkcijas **kartojimų grupės išorėje** apibendrinimui:
+Norėdami apibendrinti duomenis, naudokite kartojimo agregavimo funkcijas **už** kartojimo grupės ribų:
 
 | Funkcija | Pavyzdys | Aprašymas |
 |----------|---------|-------------|
@@ -86,15 +86,15 @@ Naudokite kartojimų agregavimo funkcijas **kartojimų grupės išorėje** apibe
 | `min(field)` | `min(${member_age})` | Minimali reikšmė |
 | `max(field)` | `max(${member_age})` | Maksimali reikšmė |
 | `join(sep, field)` | `join(', ', ${member_name})` | Kableliais atskirtas sąrašas |
-| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Sąlyginis skaičius |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Sąlyginis skaičiavimas |
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Sąlyginė suma |
 | `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Sąlyginis sujungimas |
 
-### Pavyzdys: namų ūkio suvestinė
+### Pavyzdys: Namų ūkio suvestinė
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| integer | num_members | Kiek narių? | |
+| integer | num_members | Kiek iš viso narių? | |
 | begin_repeat | members | Narys | `${num_members}` |
 | text | member_name | Vardas | |
 | integer | member_age | Amžius | |
@@ -102,13 +102,13 @@ Naudokite kartojimų agregavimo funkcijas **kartojimų grupės išorėje** apibe
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` nariai; `${children_count}` iki 18 metų. Suaugusieji: `${adult_names}` | |
+| note | summary | `${total_members}` nariai; `${children_count}` jaunesni nei 18 m. Suaugusieji: `${adult_names}` | |
 
 ---
 
-## Įdėtiniai kartojimai
+## Įterptieji kartojimai
 
-Kartojimų grupė gali turėti kitą kartojimų grupę. Naudokite tai atsargiai — įdėtiniai kartojimai prideda sudėtingumo ir gali klaidinti surašytojus.
+Kartojimo grupėje gali būti kita kartojimo grupė. Naudokite tai atsargiai – įterptieji kartojimai didina sudėtingumą ir gali klaidinti apklausos vykdytojus.
 
 | type | name | label |
 |------|------|-------|
@@ -119,36 +119,132 @@ Kartojimų grupė gali turėti kitą kartojimų grupę. Naudokite tai atsargiai 
 | end_repeat | | |
 | end_repeat | | |
 
-Norėdami nurodyt lauką išoriniame kartojime iš vidinio kartojimo, naudokite `${lauko_pavadinimas}` — jis išsprendžia iki artimiausio atitinkančio pirminio:
+Norėdami iš vidinio kartojimo nurodyti lauką išoriniame kartojime, naudokite `${fieldname}` – bus nurodomas artimiausias atitinkamas protėvis:
 
-`hh_members` kartojimo viduje `${hh_id}` grąžina **dabartinio** namų ūkio ID, o ne visų namų ūkių.
+Kartojimo `hh_members` viduje `${hh_id}` grąžina **dabartinio** namų ūkio ID, o ne visų namų ūkių ID.
 
 ---
 
-## Reitingas kartojimų grupėse: `rank-index()`
+## Rangas kartojimo grupėse: `rank-index()`
 
-Kai kartojimo viduje yra `rank` laukas, naudokite `rank-index(egzemplioriausNumeris, kartotasLaukas)` iš išorės, kad gautumėte konkretaus egzemplioriaus eilinį reitingą:
+Jei kartojimo viduje yra laukas `rank`, naudokite `rank-index(instanceNumber, repeatedField)` iš išorės, kad gautumėte konkretaus egzemplioriaus eilės rangą:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` grąžina aukščiausio balo egzemplioriaus indeksą.
+`rank-index(1, ${score})` grąžina egzemplioriaus indeksą su didžiausiu balu.
 
 ---
 
-## Geriausios praktikos
+## `1screen` išvaizda `begin_repeat` eilutėje
 
-1. Visada naudokite `repeat_count`, kai kartojimų skaičius yra žinomas iš anksto — tai neleidžia surašytojams atsitiktinai pridėti ar pašalinti egzempliorių.
-2. Laikykite kartojimų grupes sutelktas — kartojimas su 20+ klausimų kiekvienam egzemplioriui yra sunku naršyti.
-3. Aiškiai pavadinkite kartojimų grupes (pvz., `household_members`, o ne `repeat1`) — pavadinimas rodomas funkcijų skambučiuose ir eksportuotų duomenų.
-4. Patikrinkite su maksimaliu tikėtinu egzempliorių skaičiumi, kad patikrintumėte našumą.
-5. Naudokite `field-list` išvaizdą kartojimų grupėje, kad rodytumėte visus laukus viename ekrane kiekvienam egzemplioriui (mobilieji).
+Pridėjus `1screen` prie `begin_repeat` eilutės stulpelio `appearance`, visi kiekvienos iteracijos klausimai rodomi kartu viename ekrane, o ne po vieną klausimą kiekviename ekrane.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Namų ūkio narys | `1screen` |
+| text | member_name | Nario vardas | |
+| integer | member_age | Amžius | |
+| end_repeat | | | |
+
+Kai nustatyta `1screen` ir grupės viduje nėra nei `repeat_count`, nei `add_repeat` lauko, „rtSurvey“ ekrano apačioje automatiškai parodo apvalų **+** mygtuką, kad apklausos vykdytojai galėtų pridėti naujų egzempliorių be papildomos konfigūracijos.
+
+| Išvaizda | Vienas ekranas egzemplioriui | Pridedamas numatytasis + mygtukas |
+|------------|-------------------------|------------------------|
+| `1screen` | Taip | Taip (kai nėra vaikinio `add_repeat` lauko) |
+| `field-list` | Taip | Ne |
+
+Naudokite `field-list`, kai norite grupuoto išdėstymo be automatinio pridėjimo mygtuko. Naudokite `1screen`, kai norite ir grupuoto išdėstymo, ir integruoto būdo pridėti egzempliorius.
+
+---
+
+## `add_repeat` pasirinktinis pridėjimo mygtukas
+
+Laukas `note` (arba `text`), esantis **kartojimo grupės viduje** su nustatyta išvaizda `appearance: add_repeat`, rodomas kaip viso pločio mygtukas „Pridėti“. Mygtuko etiketė paimama iš lauko stulpelio `label`. Kai yra laukas `add_repeat`, numatytasis apvalus + mygtukas (iš `1screen`) yra paslepiamas.
+
+Lauką `add_repeat` įdėkite kaip paskutinį lauką kartojimo grupės viduje:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Narys | `1screen` |
+| text | member_name | Nario vardas | |
+| integer | member_age | Amžius | |
+| note | btn_add | + Pridėti narį | `add_repeat` |
+| end_repeat | | | |
+
+### Spalvų pritaikymas
+
+Į išvaizdos reikšmę įrašykite spalvos kodą, kad pakeistumėte mygtuko stilių:
+
+| Išvaizdos reikšmė | Rezultatas |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Žalias fonas, numatytoji teksto spalva |
+| `add_repeat 04B404-ffffff` | Žalias fonas, baltas tekstas |
+
+Pirmoji spalva yra fonas, o antroji (po brūkšnio) – teksto spalva. Nenaudokite `#` ženklo, kai naudojate formatą su brūkšniu.
+
+### Ikonos variantas
+
+Naudokite `add_repeat icon` (su tarpu), kad būtų rodomas kompaktiškas apvalus ikonos mygtukas vietoj viso pločio mygtuko:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Pridėti | `add_repeat icon` |
+
+---
+
+## Ištrynimo mygtukai: `delete-repeat-current` ir `delete-repeat-last`
+
+Laukas `note` kartojimo grupės viduje su nustatyta išvaizda `appearance: delete-repeat-current` arba `appearance: delete-repeat-last` rodomas kaip padalintas ištrynimo mygtukas.
+
+| Išvaizda | Veiksmas |
+|------------|--------|
+| `delete-repeat-current` | Ištrina dabartinį (aktyvų) egzempliorių |
+| `delete-repeat-last` | Ištrina paskutinį egzempliorių kartojimo cikle |
+
+Numatytasis mygtukas yra padalintas: kairėje pusėje šiukšliadėžės piktograma, o dešinėje – lauko etiketės tekstas, užimantis visą ekrano plotį.
+
+### Ikonos variantas
+
+Pridėkite `-icon` galūnę, kad gautumėte kompaktišką apvalų šiukšliadėžės piktogramos mygtuką:
+
+| Išvaizda | Rezultatas |
+|------------|--------|
+| `delete-repeat-current-icon` | Apvali šiukšliadėžės piktograma, ištrina dabartinį egzempliorių |
+| `delete-repeat-last-icon` | Apvali šiukšliadėžės piktograma, ištrina paskutinį egzempliorių |
+
+### Spalvų pritaikymas
+
+Spalvų formatas yra toks pat kaip ir `add_repeat`: naudokite `<#RRGGBB/>` arba `RRGGBB-RRGGBB` (fonas-tekstas).
+
+### Pilno šablono pavyzdys
+
+Šiame kartojime naudojama `1screen` išvaizda, viršuje – apvalus dabartinio egzemplioriaus ištrynimo mygtukas, o apačioje – viso pločio pridėjimo mygtukas:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Narys | `1screen` |
+| note | btn_del | Pašalinti | `delete-repeat-current-icon` |
+| text | member_name | Nario vardas | |
+| integer | member_age | Amžius | |
+| note | btn_add | + Pridėti narį | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## Geriausia praktika
+
+1. Visada naudokite `repeat_count`, kai kartojimų skaičius žinomas iš anksto – tai apsaugo nuo atsitiktinio egzempliorių pridėjimo ar pašalinimo.
+2. Kartojimo grupės turėtų būti tikslingos – kartojimą su daugiau nei 20 klausimų vienoje iteracijoje sudėtinga naudoti.
+3. Kartojimo grupes vadinkite aiškiai (pvz., `household_members`, o ne `repeat1`) – šis pavadinimas matomas funkcijų kvietimuose ir eksportuojamuose duomenyse.
+4. Išbandykite formą su didžiausiu tikėtinu egzempliorių skaičiumi, kad patikrintumėte veikimo greitį.
+5. Naudokite `1screen` parametruose `begin_repeat`, kad visi iteracijos klausimai būtų rodomi viename ekrane, ir pridėkite `add_repeat` pastabos lauką grupės viduje, kad apklausos vykdytojai turėtų aiškiai pažymėtą mygtuką „Pridėti“.
 
 ---
 
 ## Apribojimai
 
-- `indexed-repeat()` reikalauja galiojančio indekso (nuo 1 iki egzempliorių skaičiaus) — už diapazono ribų esantys indeksai grąžina tuščią reikšmę.
-- Įdėtiniai kartojimai daugiau nei 2 lygių nerekomenduojami ir gali sukelti ekrano problemų kai kuriuose klientuose.
-- Agregavimo funkcijos (`sum`, `count` ir kt.) veikia visoje kartojimų grupėje — negalite agreguoti egzempliorių pogrupį be `*-if` variantų.
+- Funkcijai `indexed-repeat()` reikalingas galiojantis indeksas (nuo 1 iki egzempliorių skaičiaus) – nurodžius indeksą už rėžių ribų, grąžinama tuščia reikšmė.
+- Nerekomenduojama naudoti daugiau nei 2 lygių įterptųjų kartojimų, nes kai kuriuose įrenginiuose gali kilti rodymo problemų.
+- Agregavimo funkcijos (`sum`, `count` ir kt.) veikia visai kartojimo grupei – negalite agreguoti tik dalies egzempliorių nenaudodami `*-if` variantų.

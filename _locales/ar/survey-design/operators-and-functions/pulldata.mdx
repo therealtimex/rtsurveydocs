@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "تقوم وظيفة pulldata() باسترجاع قيمة من ملف CSV خارجي مرفق بالنموذج، حيث تطابق عمود المفتاح مع قيمة المفتاح وتعيد عمود النتيجة المقابل."
+---
+
+import { Callout } from 'nextra/components'
+
+تقوم وظيفة `pulldata()` باسترجاع قيمة من ملف CSV مرفق بالنموذج. عند إعطائها اسم ملف، وعموداً للإرجاع، وعموداً للمطابقة، وقيمة مفتاح، فإنها تعيد الخلية الموجودة عند تقاطع الصف المطابق وعمود النتيجة.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| الموقع | المعامل | الوصف |
+|----------|-----------|-------------|
+| 1 | Filename | اسم ملف وسائط CSV (نفس الاسم المستخدم في `select_one_from_file`) |
+| 2 | Result column | العمود الذي تريد إرجاع قيمته |
+| 3 | Key column | العمود الذي تريد المطابقة معه |
+| 4 | Key value | القيمة المطلوب مطابقتها — عادة ما تكون مرجع حقل مثل `${field}` |
+
+تعيد الوظيفة سلسلة فارغة إذا لم يتم العثور على مطابقة.
+
+---
+
+## المتطلبات الأساسية
+
+يجب إرفاق ملف CSV بالنموذج كـ **ملف وسائط (media file)**. يمكن أيضاً استخدام نفس الملف المشار إليه بواسطة `pulldata()` كقائمة خيارات لـ `select_one_from_file`.
+
+**مثال لملف CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## مثال أساسي
+
+ابحث عن قسم الموظف ورقم هاتفه من خلال معرفه الخاص:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | اختر موظفاً | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | القسم: `${dept}` — الهاتف: `${phone}` | |
+
+<Callout type="info">
+العمود `name` في ملف CSV الخاص بـ `select_one_from_file` هو القيمة المخزنة. عندما يختار جامع البيانات "Alice"، فإن `${staff_id}` يحتوي على `"Alice"`، والتي تستخدمها `pulldata()` كمفتاح لاسترجاع قسمها وهاتفها.
+</Callout>
+
+---
+
+## استرجاع تسمية (label) الخيار المحدد
+
+يقوم سؤال `select_one_from_file` بتخزين قيمة `name`. لعرض التسمية (`label`) المقروءة بشرياً، استخدم `pulldata()` للبحث عنها:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | اختر القرية | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | لقد اخترت: `${village_label}` | |
+
+---
+
+## عمليات بحث متعددة من اختيار واحد
+
+يمكنك استدعاء `pulldata()` عدة مرات في نفس الملف لاسترجاع أعمدة مختلفة لنفس الصف المحدد:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | اختر المنشأة | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## استخدام pulldata في relevant و constraint
+
+يمكن استخدام `pulldata()` في أعمدة `relevant` و `constraint` لتطبيق المنطق بناءً على القيم التي تم البحث عنها:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | اختر المنشأة | | |
+| integer | bed_count | عدد الأسرة المشغولة | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## استخدام pulldata مع `once()`
+
+لتقييم `pulldata()` فقط عند التحميل الأول (منع إعادة التقييم عند تغير حقل المفتاح بعد الإدخال الأولي)، قم بلفها بـ `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## أفضل الممارسات
+
+1. يجب أن يتطابق عمود المفتاح في ملف CSV مع عمود `name` المستخدم في `select_one_from_file` — يجب أن تكون هذه القيم هي نفسها.
+2. أسماء الأعمدة في ملف CSV حساسة لحالة الأحرف — `Department` و `department` هما عمودان مختلفان.
+3. إذا لم يتم العثور على قيمة المفتاح، فإن `pulldata()` تعيد سلسلة فارغة — استخدم `if(${field} != '', pulldata(...), '')` للحماية من الاختيارات الفارغة.
+4. حافظ على صغر حجم ملفات CSV قدر الإمكان — تزيد الملفات الكبيرة من وقت تحميل النموذج في الاتصالات ذات النطاق الترددي المنخفض.
+5. بالنسبة للبيانات التي تتغير بين جولات جمع البيانات، قم بتحديث ملف وسائط CSV عن طريق تحميل إصدار جديد من النموذج.
+
+## القيود
+
+- تطابق `pulldata()` الصف **الأول** فقط حيث يساوي عمود المفتاح قيمة المفتاح — قيم المفاتيح المكررة في ملف CSV غير مدعومة.
+- يجب إرفاق ملف CSV بالنموذج قبل النشر؛ ولا يمكن جلبها من عنوان URL في وقت التشغيل.
+- القيم الرقمية التي تعيدها `pulldata()` هي سلاسل نصية — قم بلفها بـ `number()` عند استخدامها في العمليات الحسابية: `number(pulldata(...))`.
+
+<Callout type="info">
+يدعم rtSurvey أيضاً أشكالاً ممتدة من `pulldata()` لقراءة البيانات الوصفية للجهاز، وحقول JWT، وبيانات JSON. راجع [App API](../app-api) لاستخدام `pulldata('app-api', ...)` وصفحة [استدعاء API](../advanced-features/call-api) لأنماط البحث القائمة على JSON.
+</Callout>
+
+---
+
+## متغيرات pulldata() الممتدة
+
+بالإضافة إلى عمليات البحث في ملفات CSV، تدعم `pulldata()` عدة مصادر بيانات إضافية عن طريق تغيير المعامل الأول.
+
+### `pulldata('app-api', key)`
+
+قراءة البيانات الوصفية للجهاز، وخصائص المستخدم، وسياق التطبيق. راجع المرجع الكامل في صفحة [App API](../app-api).
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+تحليل سلسلة JSON مضمنة واستخراج قيمة باستخدام تعبير JSONPath. مفيد عندما يكون لديك سلسلة JSON ثابتة مضمنة في النموذج.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+يعيد القيمة المطابقة كسلسلة نصية، أو سلسلة فارغة إذا لم يتم العثور عليها.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+استخراج قيمة من سلسلة JSON مخزنة في حقل آخر باستخدام تعبير JSONPath. هذا يعادل `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+فك تشفير رمز JWT المخزن في حقل وإرجاع قيمة مطالبة (claim) محددة من الحمولة.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+يعيد سلسلة فارغة إذا كان الرمز غير صالح أو كانت المطالبة غير موجودة.
+
+### `pulldata('instanceid')`
+
+يعيد معرف المثيل الفريد للتقديم الحالي. يعادل حقل `instanceID` الوصفي.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+تعيين قيمة إلى أخرى باستخدام جدول تعيين (mapping table) محدد في تكوين النموذج.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+يعيد القيمة المعينة، أو سلسلة فارغة إذا لم يتطابق أي تعيين.
+
+### `pulldata('options', optionName)`
+
+قراءة خيار تكوين النموذج حسب الاسم.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+تنفيذ استعلام SQL `SELECT` مقابل ملف SQLite `.db` مضمن وإرجاع القيمة من العمود الأول من الصف المطابق الأول. يتم استبدال المعاملات بعد سلسلة SQL بالترتيب بدلاً من علامات `?`.
+
+| الموقع | المعامل | الوصف |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | سلسلة نصية تحدد هذا المتغير |
+| 2 | path | مسار الملف بتنسيق `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | عبارة `SELECT` تستخدم `?` كعلامات مكانية للموقع |
+| 4+ | params | القيم المستبدلة لكل `?` بالترتيب — عادة ما تكون مراجع حقول مثل `${field}` |
+
+يعيد سلسلة فارغة إذا لم يتطابق أي صف.
+
+**مثال — البحث عن اسم المقاطعة بواسطة المعرف:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**مثال — البحث عن اسم الدائرة المصفى بكل من رموز المقاطعة والمنطقة:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+على عكس `pulldata()` القياسية ذات المعاملات الأربعة والتي تطابق عمود مفتاح واحد في ملف CSV، ينفذ متغير `rawquery` استعلام SQL `SELECT` كاملاً مقابل قاعدة بيانات SQLite، مما يسمح بشروط `WHERE` متعددة الأعمدة وأي عمود كقيمة إرجاع.
+
+<Callout type="info">
+يُستخدم `rawquery` بشكل شائع مع حقول الإكمال التلقائي لعمليات البحث عن المواقع الهرمية. راجع [البحث في قاعدة البيانات المحلية](../advanced-features/local-database-search) للحصول على تفاصيل حول بناء ملفات `.db` وربطها بـ `pulldata('rawquery', ...)`.
+</Callout>

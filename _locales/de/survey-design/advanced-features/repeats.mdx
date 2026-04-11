@@ -1,15 +1,15 @@
 ---
 title: "Erweiterte Wiederholungen"
-description: "Fortgeschrittene Muster für Wiederholungsgruppen: dynamische Zählung, verschachtelte Wiederholungen, Zusammenfassung von Wiederholungsdaten und Referenzierung von Werten über Wiederholungen hinweg."
+description: "Erweiterte Muster für Wiederholungsgruppen: dynamische Anzahl, verschachtelte Wiederholungen, Zusammenfassen von Wiederholungsdaten und Referenzieren von Werten über Wiederholungen hinweg."
 ---
 
-Diese Seite behandelt fortgeschrittene Muster für die Arbeit mit Wiederholungsgruppen in rtSurvey. Für die Grundlagen zur Einrichtung einer Wiederholungsgruppe, siehe [Gruppierung und Wiederholungen](../repeats).
+Diese Seite behandelt erweiterte Muster für die Arbeit mit Wiederholungsgruppen in rtSurvey. Informationen zu den Grundlagen der Einrichtung einer Wiederholungsgruppe finden Sie unter [Gruppierung und Wiederholungen](../repeats).
 
 ---
 
 ## Dynamische Wiederholungsanzahl
 
-Standardmäßig entscheidet der Interviewer, wie oft er wiederholt. Sie können die Anzahl der Wiederholungen mit `repeat_count` festlegen:
+Standardmäßig entscheidet der Interviewer, wie oft wiederholt werden soll. Sie können die Anzahl der Wiederholungen mit `repeat_count` festlegen:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,57 +18,57 @@ Standardmäßig entscheidet der Interviewer, wie oft er wiederholt. Sie können 
 | integer | member_age | Alter | |
 | end_repeat | | | |
 
-Die Wiederholung läuft genau `${num_members}` Mal, wobei `num_members` zuvor im Formular erfasst wurde. Der Interviewer kann keine Instanzen hinzufügen oder entfernen.
+Die Wiederholung wird genau `${num_members}` Mal ausgeführt, wobei `num_members` zuvor im Formular erfasst wurde. Der Interviewer kann keine Instanzen hinzufügen oder entfernen.
 
 ---
 
-## Indiziierter Zugriff: `indexed-repeat()`
+## Indexierter Zugriff: `indexed-repeat()`
 
-Greifen Sie auf den Feldwert einer bestimmten Wiederholungsinstanz von **außerhalb** der Wiederholungsgruppe zu mit `indexed-repeat(repeatedField, repeatGroup, index)`:
+Greifen Sie von **außerhalb** der Wiederholungsgruppe auf den Feldwert einer bestimmten Wiederholungsinstanz zu, indem Sie `indexed-repeat(repeatedField, repeatGroup, index)` verwenden:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Dies ist nützlich für das Erstellen von Zusammenfassungsfeldern oder für die Referenzierung der Daten des "primären" Mitglieds nach der Wiederholung.
+Dies ist nützlich für die Erstellung von Zusammenfassungsfeldern oder zum Referenzieren der Daten des "primären" Mitglieds nach der Wiederholung.
 
 ---
 
-## Aktuelle Instanzposition: `index()`
+## Position der aktuellen Instanz: `index()`
 
-Innerhalb einer Wiederholungsgruppe gibt `index()` die 1-basierte Position der aktuellen Instanz zurück. Verwenden Sie es, um jede Wiederholung zu beschriften oder eindeutige Bezeichner zu erstellen:
+Innerhalb einer Wiederholungsgruppe gibt `index()` die 1-basierte Position der aktuellen Instanz zurück. Verwenden Sie dies, um jede Wiederholung zu beschriften oder eindeutige Identifikatoren zu erstellen:
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | plots | Parzelle |
-| note | plot_label | Parzellennummer `${index()}` |
+| note | plot_label | Parzelle Nummer `${index()}` |
 | text | plot_id | Parzellen-ID |
 | end_repeat | | |
 
 ---
 
-## Felder in derselben Instanz referenzieren
+## Referenzieren von Feldern in derselben Instanz
 
-Innerhalb einer Wiederholung verwenden Sie `${fieldname}`, um ein anderes Feld **in derselben Wiederholungsinstanz** zu referenzieren. `indexed-repeat()` ist innerhalb derselben Schleife nicht erforderlich:
+Verwenden Sie innerhalb einer Wiederholung `${fieldname}`, um auf ein anderes Feld **in derselben Wiederholungsinstanz** zu verweisen. Ein `indexed-repeat()` innerhalb derselben Schleife ist nicht erforderlich:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
 | begin_repeat | members | Mitglied | |
 | text | member_name | Name | |
 | integer | member_age | Alter | |
-| text | school_name | Schulname | `${member_age} < 18` |
+| text | school_name | Name der Schule | `${member_age} < 18` |
 | end_repeat | | | |
 
 ---
 
-## Übergeordnete Felder von innerhalb einer Wiederholung referenzieren
+## Referenzieren von Elternfeldern aus einer Wiederholung heraus
 
-Felder außerhalb (oberhalb) der Wiederholungsgruppe können normal mit `${fieldname}` referenziert werden:
+Felder außerhalb (oberhalb) der Wiederholungsgruppe können ganz normal mit `${fieldname}` referenziert werden:
 
 | type | name | label |
 |------|------|-------|
-| text | village | Dorfname |
+| text | village | Name des Dorfes |
 | begin_repeat | plots | Landwirtschaftliche Parzelle |
 | note | plot_context | Parzellen in `${village}` |
 | end_repeat | | |
@@ -77,18 +77,18 @@ Felder außerhalb (oberhalb) der Wiederholungsgruppe können normal mit `${field
 
 ## Wiederholungsdaten zusammenfassen
 
-Verwenden Sie Wiederholungs-Aggregatfunktionen **außerhalb** der Wiederholungsgruppe zur Zusammenfassung:
+Verwenden Sie Aggregatfunktionen für Wiederholungen **außerhalb** der Wiederholungsgruppe zum Zusammenfassen:
 
-| Funktion | Beispiel | Beschreibung |
+| Function | Example | Description |
 |----------|---------|-------------|
 | `count(group)` | `count(${household_members})` | Anzahl der Instanzen |
 | `sum(field)` | `sum(${loan_amount})` | Summe eines numerischen Feldes |
 | `min(field)` | `min(${member_age})` | Minimalwert |
 | `max(field)` | `max(${member_age})` | Maximalwert |
 | `join(sep, field)` | `join(', ', ${member_name})` | Kommagetrennte Liste |
-| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Bedingte Zählung |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Bedingte Anzahl |
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Bedingte Summe |
-| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Bedingtes Verbinden |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Bedingtes Zusammenfügen |
 
 ### Beispiel: Haushaltszusammenfassung
 
@@ -108,26 +108,26 @@ Verwenden Sie Wiederholungs-Aggregatfunktionen **außerhalb** der Wiederholungsg
 
 ## Verschachtelte Wiederholungen
 
-Eine Wiederholungsgruppe kann eine weitere Wiederholungsgruppe enthalten. Verwenden Sie dies sorgfältig — verschachtelte Wiederholungen erhöhen die Komplexität und können für Interviewer verwirrend sein.
+Eine Wiederholungsgruppe kann eine weitere Wiederholungsgruppe enthalten. Verwenden Sie dies vorsichtig – verschachtelte Wiederholungen erhöhen die Komplexität und können für Interviewer verwirrend sein.
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | households | Haushalt |
 | text | hh_id | Haushalts-ID |
 | begin_repeat | hh_members | Mitglied |
-| text | member_name | Mitgliedsname |
+| text | member_name | Name des Mitglieds |
 | end_repeat | | |
 | end_repeat | | |
 
-Um ein Feld in einer äußeren Wiederholung von der inneren Wiederholung aus zu referenzieren, verwenden Sie `${fieldname}` — es löst sich zum nächsten passenden Vorfahren auf:
+Um von der inneren Wiederholung auf ein Feld in einer äußeren Wiederholung zu verweisen, verwenden Sie `${fieldname}` – es wird zum nächsten passenden Vorfahren aufgelöst:
 
 Innerhalb der `hh_members`-Wiederholung gibt `${hh_id}` die ID des **aktuellen** Haushalts zurück, nicht aller Haushalte.
 
 ---
 
-## Rank innerhalb von Wiederholungsgruppen: `rank-index()`
+## Rang innerhalb von Wiederholungsgruppen: `rank-index()`
 
-Wenn ein `rank`-Feld innerhalb einer Wiederholung vorhanden ist, verwenden Sie `rank-index(instanceNumber, repeatedField)` von außen, um den ordinalen Rang einer bestimmten Instanz zu erhalten:
+Wenn ein `rank`-Feld innerhalb einer Wiederholung vorhanden ist, verwenden Sie von außerhalb `rank-index(instanceNumber, repeatedField)`, um den ordinalen Rang einer bestimmten Instanz zu erhalten:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -137,18 +137,114 @@ Wenn ein `rank`-Feld innerhalb einer Wiederholung vorhanden ist, verwenden Sie `
 
 ---
 
-## Empfohlene Vorgehensweisen
+## `1screen`-Darstellung bei `begin_repeat`
 
-1. Verwenden Sie immer `repeat_count`, wenn die Anzahl der Wiederholungen im Voraus bekannt ist — dies verhindert, dass Interviewer versehentlich Instanzen hinzufügen oder entfernen.
-2. Halten Sie Wiederholungsgruppen fokussiert — eine Wiederholung mit 20+ Fragen pro Instanz ist schwer zu navigieren.
-3. Benennen Sie Wiederholungsgruppen klar (z. B. `household_members`, nicht `repeat1`) — der Name erscheint in Funktionsaufrufen und exportierten Daten.
-4. Testen Sie mit der maximal erwarteten Anzahl von Instanzen, um die Leistung zu überprüfen.
-5. Verwenden Sie das `field-list`-Erscheinungsbild für die Wiederholungsgruppe, um alle Felder auf einem Bildschirm pro Instanz anzuzeigen (mobil).
+Das Hinzufügen von `1screen` zur Spalte `appearance` einer `begin_repeat`-Zeile zeigt alle Fragen für jede Instanz zusammen auf einem einzigen Bildschirm an, anstatt eine Frage pro Bildschirm.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Haushaltsmitglied | `1screen` |
+| text | member_name | Name des Mitglieds | |
+| integer | member_age | Alter | |
+| end_repeat | | | |
+
+Wenn `1screen` eingestellt ist und kein `repeat_count` sowie kein `add_repeat`-Feld innerhalb der Gruppe vorhanden ist, rendert rtSurvey automatisch eine kreisförmige **+**-Schaltfläche am unteren Bildschirmrand, sodass Interviewer neue Instanzen ohne zusätzliche Konfiguration hinzufügen können.
+
+| Appearance | Ein Bildschirm pro Instanz | Standard-+-Schaltfläche hinzugefügt |
+|------------|-------------------------|------------------------|
+| `1screen` | Ja | Ja (wenn kein `add_repeat`-Kindelement) |
+| `field-list` | Ja | Nein |
+
+Verwenden Sie `field-list`, wenn Sie das gruppierte Layout ohne die automatische Hinzufügen-Schaltfläche wünschen. Verwenden Sie `1screen`, wenn Sie sowohl das gruppierte Layout als auch eine integrierte Möglichkeit zum Hinzufügen von Instanzen wünschen.
+
+---
+
+## `add_repeat` benutzerdefinierte Hinzufügen-Schaltfläche
+
+Ein `note`- (oder `text`-) Feld, das **innerhalb** der Wiederholungsgruppe mit `appearance: add_repeat` platziert wird, wird als "Hinzufügen"-Schaltfläche in voller Breite gerendert. Die Beschriftung der Schaltfläche stammt aus der Spalte `label` des Feldes. Wenn ein `add_repeat`-Feld vorhanden ist, wird die standardmäßige kreisförmige +-Schaltfläche (von `1screen`) unterdrückt.
+
+Platzieren Sie das `add_repeat`-Feld als letztes Feld innerhalb der Wiederholungsgruppe:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Mitglied | `1screen` |
+| text | member_name | Name des Mitglieds | |
+| integer | member_age | Alter | |
+| note | btn_add | + Mitglied hinzufügen | `add_repeat` |
+| end_repeat | | | |
+
+### Farbanpassung
+
+Geben Sie einen Farbcode innerhalb des appearance-Werts an, um die Schaltfläche zu stylen:
+
+| Appearance value | Result |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Grüner Hintergrund, Standard-Textfarbe |
+| `add_repeat 04B404-ffffff` | Grüner Hintergrund, weißer Text |
+
+Die erste Farbe ist der Hintergrund und die zweite (nach dem Bindestrich) ist die Textfarbe. Lassen Sie das `#` weg, wenn Sie die durch Bindestriche getrennte Form verwenden.
+
+### Icon-Variante
+
+Verwenden Sie `add_repeat icon` (mit einem Leerzeichen), um eine kompakte kreisförmige Icon-Schaltfläche anstelle der Schaltfläche in voller Breite zu rendern:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Hinzufügen | `add_repeat icon` |
+
+---
+
+## Lösch-Schaltflächen: `delete-repeat-current` und `delete-repeat-last`
+
+Ein `note`-Feld innerhalb der Wiederholungsgruppe mit `appearance: delete-repeat-current` oder `appearance: delete-repeat-last` wird als geteilte Lösch-Schaltfläche gerendert.
+
+| Appearance | Action |
+|------------|--------|
+| `delete-repeat-current` | Löscht die aktuelle (aktive) Instanz |
+| `delete-repeat-last` | Löscht die letzte Instanz in der Wiederholung |
+
+Die Standard-Schaltfläche (kein Icon) ist eine geteilte Schaltfläche: ein Mülltonnen-Icon auf der linken Seite und der Label-Text des Feldes auf der rechten Seite, der sich über die gesamte Breite des Bildschirms erstreckt.
+
+### Icon-Variante
+
+Hängen Sie `-icon` an, um eine kompakte kreisförmige Mülltonnen-Icon-Schaltfläche zu erhalten:
+
+| Appearance | Result |
+|------------|--------|
+| `delete-repeat-current-icon` | Kreisförmiges Mülltonnen-Icon, löscht aktuelle Instanz |
+| `delete-repeat-last-icon` | Kreisförmiges Mülltonnen-Icon, löscht letzte Instanz |
+
+### Farbanpassung
+
+Das Farbformat ist identisch mit `add_repeat`: Verwenden Sie `<#RRGGBB/>` oder `RRGGBB-RRGGBB` (Hintergrund-Text).
+
+### Beispiel für ein vollständiges Muster
+
+Die folgende Wiederholung verwendet `1screen`, eine kreisförmige Schaltfläche zum Löschen der aktuellen Instanz oben und eine Schaltfläche zum Hinzufügen in voller Breite unten:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Mitglied | `1screen` |
+| note | btn_del | Entfernen | `delete-repeat-current-icon` |
+| text | member_name | Name des Mitglieds | |
+| integer | member_age | Alter | |
+| note | btn_add | + Mitglied hinzufügen | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## Best Practices
+
+1. Verwenden Sie immer `repeat_count`, wenn die Anzahl der Wiederholungen im Voraus bekannt ist – dies verhindert, dass Interviewer versehentlich Instanzen hinzufügen oder entfernen.
+2. Halten Sie Wiederholungsgruppen fokussiert – eine Wiederholung mit mehr als 20 Fragen pro Instanz ist schwer zu navigieren.
+3. Benennen Sie Wiederholungsgruppen klar (z. B. `household_members`, nicht `repeat1`) – der Name erscheint in Funktionsaufrufen und exportierten Daten.
+4. Testen Sie mit der maximal erwarteten Anzahl von Instanzen, um die Performance zu überprüfen.
+5. Verwenden Sie `1screen` bei `begin_repeat`, um alle Fragen auf einem Bildschirm pro Instanz anzuzeigen, kombiniert mit einem `add_repeat`-Notizfeld innerhalb der Gruppe, um den Interviewern eine klar beschriftete „Hinzufügen“-Schaltfläche zu geben.
 
 ---
 
 ## Einschränkungen
 
-- `indexed-repeat()` erfordert einen gültigen Index (1 bis Instanzanzahl) — Indizes außerhalb des Bereichs geben leer zurück.
-- Verschachtelte Wiederholungen über 2 Ebenen hinaus werden nicht empfohlen und können bei einigen Clients Anzeigeprobleme verursachen.
-- Aggregatfunktionen (`sum`, `count` usw.) arbeiten auf der gesamten Wiederholungsgruppe — Sie können keine Teilmenge von Instanzen ohne die `*-if`-Varianten aggregieren.
+- `indexed-repeat()` erfordert einen gültigen Index (1 bis Anzahl der Instanzen) – Indizes außerhalb des Bereichs geben einen leeren Wert zurück.
+- Verschachtelte Wiederholungen über 2 Ebenen hinaus werden nicht empfohlen und können bei einigen Clients zu Darstellungsproblemen führen.
+- Aggregatfunktionen (`sum`, `count` usw.) beziehen sich auf die gesamte Wiederholungsgruppe – Sie können keine Teilmenge von Instanzen ohne die `*-if`-Varianten aggregieren.

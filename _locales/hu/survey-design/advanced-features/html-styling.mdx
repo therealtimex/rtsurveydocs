@@ -1,141 +1,211 @@
 ---
-title: "HTML-stílus"
-description: "Az rtSurvey HTML-tageket támogat a feliratokban és súgókban, lehetővé téve a formázott szöveget, hivatkozásokat és dinamikus szín-témákat."
+title: "HTML stílus"
+description: "Az rtSurvey támogatja a HTML tageket a címkékben és a súgókban, lehetővé téve a rich text formázást, linkeket és a dinamikus színvilágot."
 ---
 
 import { Callout } from 'nextra/components'
 
-Az rtSurvey a **felirat** és **súgó** szövegét HTML-ként jeleníti meg a webes űrlapokon. Ez azt jelenti, hogy szabványos HTML-tagekkel formázhatja a szöveget, sortöréseket adhat hozzá, hivatkozásokat hozhat létre és színeket alkalmazhat. Ez különösen hasznos megjegyzésmezőknél, szakaszutasításoknál és dinamikus összefoglalóknál.
+Az rtSurvey a webes űrlapokon a **label** (címke) és a **hint** (súgó) szövegeket HTML-ként jeleníti meg. Ez azt jelenti, hogy szabványos HTML tageket használhat a szöveg formázásához, soremelések hozzáadásához, linkek létrehozásához és színek alkalmazásához. Ez különösen hasznos megjegyzés mezőknél, szakasz utasításoknál és dinamikus összefoglalóknál.
 
 <Callout type="warning">
-A feliratokban lévő HTML a **webes űrlapon** és az rtSurvey mobilalkalmazásokban jelenik meg. Esetleg nem jelenik meg az összes ODK-kompatibilis kliensben. Mindig tesztelje a célplatformon.
+A címkékben lévő HTML a **webes űrlapon** és az rtSurvey mobilalkalmazásokban jelenik meg. Előfordulhat, hogy nem minden ODK-kompatibilis kliensben jelenik meg. Mindig tesztelje a célplatformon.
 </Callout>
 
 ---
 
-## Támogatott HTML-tagek
+## Támogatott HTML tagek
 
-### Szövegformázás
+### Szöveg formázása
 
 | Tag | Eredmény |
 |-----|--------|
-| `<strong>szöveg</strong>` vagy `<b>szöveg</b>` | **Félkövér szöveg** |
-| `<em>szöveg</em>` vagy `<i>szöveg</i>` | *Dőlt szöveg* |
-| `<u>szöveg</u>` | Aláhúzott szöveg |
-| `<br>` | Sortörés |
-| `<span style="...">szöveg</span>` | Inline stílus |
+| `<strong>text</strong>` vagy `<b>text</b>` | **Félkövér szöveg** |
+| `<em>text</em>` vagy `<i>text</i>` | *Dőlt szöveg* |
+| `<u>text</u>` | Aláhúzott szöveg |
+| `<br>` | Soremelés |
+| `<span style="...">text</span>` | Beágyazott stílus |
 
-### Hivatkozások
+### Linkek
 
 ```html
-<a href="https://example.com" target="_blank">Kattintson ide</a>
+<a href="https://example.com" target="_blank">Click here</a>
 ```
 
-Új lapon nyílik meg. Hivatkozási dokumentumokhoz, irányelvekhez vagy a kérdező által felkeresendő külső forrásokhoz használja.
+Új lapon nyílik meg. Használja referenciadokumentumokhoz, irányelvekhez vagy külső forrásokhoz, amelyeket a kérdezőnek meg kell néznie.
 
 ### Színek
 
-Használja a `<span>` tagot inline stílusokkal:
+Használja a `<span>` taget beágyazott stílusokkal:
 
 ```html
-<span style="color: red;">Figyelmeztetés: az érték tartományon kívül van</span>
-<span style="color: #009688;">Szakasz befejezve</span>
+<span style="color: red;">Warning: value is out of range</span>
+<span style="color: #009688;">Section completed</span>
 ```
 
 ---
 
-## Szín-téma változók
+## Színvilág változók
 
-Az rtSurvey az alkalmazás konfigurált témájához alkalmazkodó **szín-téma tokeneket** támogat. Használja a `__SZÍN_TÉMA_NEVE__` szintaxist:
+Az rtSurvey támogatja a **színvilág tokeneket**, amelyek alkalmazkodnak az alkalmazás beállított témájához. Használja a `__COLOR_THEME_NAME__` szintaxist:
 
 ```html
-<span style="color: var(--color-theme-primary);">Elsődleges szín szöveg</span>
+<span style="color: var(--color-theme-primary);">Primary color text</span>
 ```
 
-Vagy a token rövidítést a felirat szövegében:
+Vagy használja a token rövidítést a címkeszövegben:
 
 ```
-<font color="var(--COLOR_THEME_PRIMARY)">Fontos megjegyzés</font>
+<font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
 ```
 
-Ez megjelenítéskor automatikusan a CSS-változót tartalmazó megfelelő `<span>` taggé alakul.
+Ez a megjelenítéskor automatikusan átalakul az egyenértékű, CSS-változóval ellátott `<span>` taggé.
 
 ---
 
-## Többnyelvű feliratok
+## Többnyelvű címkék
 
-Az egynyelvű tartalom több nyelven való támogatásához csomagolja be az adott tartalmakat nyelvcímkékbe egyetlen feliratcellán belül:
+Csomagolja a tartalmat nyelvi tagekbe a több nyelv támogatásához egyetlen címke cellában:
 
 ```
-<en>Enter the household size</en><hu>Adja meg a háztartás méretét</hu>
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
 ```
 
-Az rtSurvey kinyeri az aktuális alkalmazásnyelv-nek megfelelő tartalmat. Ha nem találja a megfelelő nyelvcímkét, a teljes karakterláncot jeleníti meg.
+Az rtSurvey kinyeri az alkalmazás aktuális nyelvének megfelelő tartalmat. Ha nem található megfelelő nyelvi tag, a teljes karakterlánc változatlanul jelenik meg.
 
 ---
 
-## Példák megjegyzésmezőkre
+## Példák megjegyzés mezőkben
 
-### Szakaszutasítás félkövér szöveggel és sortöréssel
+### Szakasz utasítás félkövérrel és soremeléssel
 
 | type | name | label |
 |------|------|-------|
-| note | section_intro | `<strong>3. szakasz: Földhasználat</strong><br>Ebben a szakaszban az összes kérdést csak a háztartásfőnek tegye fel.` |
+| note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
 
 ### Dinamikus összefoglaló számítási hivatkozással
 
 | type | name | label |
 |------|------|-------|
 | calculate | total | | `${adults} + ${children}` |
-| note | summary | `Háztartástagok száma összesen: <strong>${total}</strong><br><span style="color: gray;">Felnőttek: ${adults} · Gyermekek: ${children}</span>` |
+| note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
 
-### Figyelmeztetés pirosban
+### Figyelmeztetés pirossal
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| note | age_warning | `<span style="color: red;"><strong>Figyelmeztetés:</strong> A megadott kor (${age}) szokatlanul magas. Kérjük, ellenőrizze.</span>` | `${age} > 100` |
+| note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
 
-### Hivatkozás referencia-dokumentumra
-
-| type | name | label |
-|------|------|-------|
-| note | guidelines_link | `A szakasz megkezdése előtt tekintse meg a <a href="https://docs.example.com/guidelines" target="_blank">Terepi irányelveket</a>.` |
-
----
-
-## rtSurvey speciális HTML-tagek
-
-### `<webbox src='url' title='cím'>...</webbox>`
-
-Egy URL-t ágyaz be az űrlapba modális iframeként. A teljes részletekért lásd: [Webbox](webbox).
-
-### `<delete-repeat-current>felirat</delete-repeat-current>`
-
-Egy ismétlőcsoporton belül gombot jelenít meg, amely megnyomáskor törli az aktuális ismétlési példányt.
-
-### `<delete-repeat-last>felirat</delete-repeat-last>`
-
-Egy gombot jelenít meg, amely törli az utolsó ismétlési példányt.
-
-Példa használat egy ismétlőcsoportban:
+### Link egy referenciadokumentumhoz
 
 | type | name | label |
 |------|------|-------|
-| note | delete_btn | `<delete-repeat-current>Ez a tag törlése</delete-repeat-current>` |
+| note | guidelines_link | `Refer to the <a href="https://docs.example.com/guidelines" target="_blank">Field Guidelines</a> before starting this section.` |
 
 ---
 
-## Bevált módszerek
+## Speciális rtSurvey HTML tagek
 
-1. Takarékosan használja a HTML-t – a túlformázott feliratok nehezebben olvashatók, nem könnyebben.
-2. Félkövérhez előnyben részesítse a `<strong>` tagot, dőlthez az `<em>` tagot az elavult `<b>` és `<i>` helyett.
-3. A színhasználatot tegye értelemmel teltté – a pirosat figyelmeztetésekre használja, ne dekorációra.
-4. Mindig tesztelje a HTML-megjelenítést mobilalkalmazáson és webes űrlapon egyaránt, mivel a megjelenítés kissé eltérhet.
-5. Kerülje a `<table>` tagokat a feliratokban – ezek ritkán jelennek meg jól mobilképernyőkön.
-6. Ne használjon JavaScript-et (`<script>`) – ez el lesz távolítva vagy hibát okoz.
+### `<webbox src='url' title='title'>...</webbox>`
+
+Beágyaz egy gombot, amely megnyit egy URL-t egy űrlapon belüli modális ablakban. A részletekért lásd a [Webbox](webbox) oldalt.
+
+### `<delete-repeat-current>label</delete-repeat-current>`
+
+Megjelenít egy gombot egy ismétlődő csoporton belül, amely megérintésekor törli az aktuális ismétlődési példányt.
+
+### `<delete-repeat-last>label</delete-repeat-last>`
+
+Megjelenít egy gombot, amely törli az utolsó ismétlődési példányt.
+
+Példa használatra egy ismétlődő csoportban:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Remove this member</delete-repeat-current>` |
+
+---
+
+## Dinamikus HTML összefoglalók az autopull() függvénnyel
+
+Az `autopull()` egy HTML blokkot jelenít meg egy `note` mezőben, és az űrlap **minden mezőváltozásakor újraértékeli**. Ez alkalmassá teszi élő összefoglaló panelekhez, beküldés előtti áttekintő képernyőkhöz és folyamatosan frissülő összesítésekhez, miközben a kérdező kitölti az adatokat.
+
+<Callout type="info">
+Az `autopull()` csak **note** mezőkön működik. A címke (label) oszlopot figyelmen kívül hagyja — minden HTML tartalmat az **appearance** oszlopon keresztül kell megadni a `concat()` függvény használatával.
+</Callout>
+
+### Szintaxis
+
+Helyezze az `autopull()`-t egy `note` mező **appearance** oszlopába:
+
+```
+autopull(concat('<html>...</html>'))
+```
+
+A `concat()`-on belüli mezőhivatkozások (`${field_name}`) helyére az aktuális élő értékek kerülnek, és a HTML minden változáskor újramegjelenik.
+
+### Magasság korlátozása a scroll-view() függvénnyel
+
+Hosszabb összefoglalók esetén kombinálja az `autopull()`-t a `scroll-view(N%)`-el a panel magasságának korlátozásához és görgethetővé tételééhez:
+
+```
+scroll-view(45%) autopull(concat('<html>...</html>'))
+```
+
+Az `N%` érték a látható űrlapterülethez viszonyított. A `45%` praktikus alapértelmezett érték egy oldal közepi összefoglaló panelhez.
+
+### Teljes példa — háztartás helyének összefoglalója
+
+A következő `note` mező egy kétoszlopos táblázatot jelenít meg, amely a kiválasztott tartományt, körzetet és községet mutatja. Automatikusan frissül, valahányszor a `${tinh_name}`, `${huyen_name}` vagy `${xa_name}` megváltozik.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | location_summary | | `scroll-view(45%) autopull(concat('<html><table style="width:100%;border-collapse:collapse"><tr><td style="padding:4px;font-weight:bold">Province:</td><td style="padding:4px">', ${tinh_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">District:</td><td style="padding:4px">', ${huyen_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Commune:</td><td style="padding:4px">', ${xa_name}, '</td></tr></table></html>'))` |
+
+XLSForm-ban a megjelenési érték egyetlen cellába van írva:
+
+```
+scroll-view(45%) autopull(concat(
+  '<html><table style="width:100%;border-collapse:collapse">
+   <tr><td style="padding:4px;font-weight:bold">Province:</td>
+       <td style="padding:4px">', ${tinh_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">District:</td>
+       <td style="padding:4px">', ${huyen_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Commune:</td>
+       <td style="padding:4px">', ${xa_name}, '</td></tr>
+   </table></html>'))
+```
+
+### Beágyazott stílusok
+
+A tetszőleges HTML-elemen belüli beágyazott `style="..."` attribútumok támogatottak, és ez a javasolt módszer a vizuális formázás alkalmazására az `autopull()` blokkokon belül.
+
+A következők **nem** támogatottak az `autopull()` tartalmakban:
+
+- `<style>` blokkok
+- Külső stíluslap `<link>` tagek
+- JavaScript (`<script>`)
+
+### Mikor használjuk az autopull()-t
+
+| Felhasználási eset | Megjegyzések |
+|----------|-------|
+| Beküldés előtti áttekintő képernyő | Az összes fontos válasz megjelenítése egyetlen panelen, mielőtt a kérdező befejezné |
+| Folyamatos összesítések | Egy kiszámított összeg megjelenítése, amely a mennyiségek megadásakor frissül |
+| Látható referenciapanel | Egy kiválasztott keresési érték (pl. tartomány neve) megjelenítése, miközben a kérdező kitölti a gyermek mezőket |
+
+---
+
+## Legjobb gyakorlatok
+
+1. Takarékosan használja a HTML-t — a túlzottan formázott címkéket nehezebb olvasni, nem könnyebb.
+2. Részesítse előnyben a `<strong>`-ot a félkövérhez és az `<em>`-et a dőlthöz az elavult `<b>` és `<i>` helyett.
+3. A színhasználat legyen értelmes — a pirosat figyelmeztetésekre használja, ne díszítésre.
+4. Mindig tesztelje a HTML megjelenítést mind a mobilalkalmazásban, mind a webes űrlapon, mivel a megjelenítés kismértékben eltérhet.
+5. Kerülje a `<table>` tageket a címkéken belül — mobilképernyőkön ritkán jelennek meg jól.
+6. Ne használjon JavaScriptet (`<script>`) — el lesz távolítva, vagy hibákat okoz.
 
 ## Korlátozások
 
-- Az összetett HTML (táblázatok, űrlapok, szkriptek) nem támogatott, és megjelenítési problémákat okozhat.
-- Egyes régebbi mobil kliensek literál szövegként jeleníthetik meg a HTML-tageket – tesztelje az összes céleszközön.
-- A `<a>` hivatkozások böngészőben vagy WebView-ban nyílnak meg – a kérdező elhagyja az űrlapot, ami zavaró lehet mobilon.
+- Az összetett HTML (táblázatok, űrlapok, szkriptek) nem támogatott, és tönkreteheti a megjelenítést.
+- Egyes régebbi mobilkliensek a HTML tageket szó szerinti szövegként jeleníthetik meg — tesztelje az összes célkészüléken.
+- Az `<a>` linkek böngészőben vagy WebView-ban nyílnak meg — a kérdező elhagyja az űrlapot, ami zavaró lehet mobilon.

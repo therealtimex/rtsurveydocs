@@ -1,15 +1,15 @@
 ---
 title: "Dinamikus keresés"
-description: "A dinamikus keresés valós időben tölt be lehetőségeket egy távoli API-ból a kérdező gépelése közben, lehetővé téve nagy vagy sűrűn frissített adathalmazok kezelését."
+description: "A dinamikus keresés valós időben tölti be a lehetőségeket egy távoli API-ból, ahogy a kérdező gépel, lehetővé téve nagy vagy gyakran frissített adatkészletek használatát."
 ---
 
-A **Dinamikus keresés** (más néven Search API) lehetővé teszi, hogy egy `select_one`, `select_multiple` vagy `text` mező **futásidőben** töltsön be lehetőségeket egy távoli webszolgáltatásból, ahogy a kérdező gépel. Ez a megfelelő megközelítés akkor, ha a lehetőségek listája túl nagy ahhoz, hogy CSV-fájlban legyen csomagolva, sűrűn frissül, vagy egy élő adatbázisból származik.
+A **Dinamikus keresés** (más néven Search API) lehetővé teszi, hogy egy `select_one`, `select_multiple` vagy `text` mező egy távoli webszolgáltatásból töltse be a választási lehetőségeit **futásidőben**, ahogy a kérdező gépel. Ez a megfelelő megközelítés, ha a választási lista túl nagy ahhoz, hogy CSV-fájlba csomagolják, gyakran frissül, vagy élő adatbázisból származik.
 
 ---
 
 ## `search-api()` megjelenés
 
-A dinamikus keresés az `appearance` oszlopon keresztül konfigurálható a `search-api()` függvény segítségével:
+A dinamikus keresés az `appearance` oszlopban konfigurálható a `search-api()` függvény használatával:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -18,26 +18,26 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 ### Paraméterek
 
 | Paraméter | Leírás |
-|-----------|--------|
-| `method` | Mindig `'POST'` |
-| `url` | Az API-végpont a lekérdezéshez |
+|-----------|-------------|
+| `method` | Mindig használja a `'POST'` értéket |
+| `url` | A lekérdezni kívánt API végpont |
 | `post_body` | Az API-nak küldött JSON törzs. Használja a `%__input__%` helyőrzőt a kérdező aktuális keresési szövegéhez |
-| `value_column` | A válaszobjektumban tárolt **értékként** használandó kulcs |
-| `display` | A legördülő menüben megjelenő **feliratként** használandó kulcs (vagy sablon). Támogatja a `##kulcs##` helyőrzőket és a `@{func}` kifejezéseket |
+| `value_column` | A válaszobjektum azon kulcsa, amelyet tárolt **értékként** (value) kell használni |
+| `display` | A legördülő menüben megjelenő **címkeként** (label) használandó kulcs (vagy sablon). Támogatja a `##key##` helyőrzőket és a `@{func}` kifejezéseket |
 | `data_path` | JSONPath az eredményobjektumok tömbjéhez a válaszban (pl. `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Név, amely alatt a nyers válasz el van mentve más mezők általi felhasználáshoz |
+| `save_path` | Egy név, amely alatt a nyers választ elmentik más mezők általi használatra |
 
 ---
 
 ## Alapvető példa
 
-Egészségügyi intézmény keresése, ahol a kérdező az intézmény nevének egy részét gépeli:
+Egy egészségügyi intézmény keresése, ahol a kérdező az intézmény nevének egy részét gépeli be:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one | facility | Válasszon egészségügyi intézményt | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-Az API `{"query": "nair"}` értéket kap, amikor a kérdező "nair"-t gépel, és visszaadja:
+Az API megkapja a `{"query": "nair"}` értéket, amikor a kérdező beírja a "nair" szót, és a következőt adja vissza:
 
 ```json
 {
@@ -48,15 +48,15 @@ Az API `{"query": "nair"}` értéket kap, amikor a kérdező "nair"-t gépel, é
 }
 ```
 
-A legördülő menüben megjelenik a `Nairobi Central Clinic` és a `Nairobi West Hospital`; a tárolt érték `HF001` vagy `HF002`.
+A legördülő menüben a `Nairobi Central Clinic` és a `Nairobi West Hospital` jelenik meg; a tárolt érték `HF001` vagy `HF002`.
 
 ---
 
-## Haladó megjelenítési formázás
+## Speciális megjelenítési formázás
 
-### `##kulcs##` sablonok használata
+### `##key##` sablonok használata
 
-Több mező megjelenítése a feliratban:
+Több mező megjelenítése a címkében:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
@@ -66,7 +66,7 @@ Megjelenítés: `Nairobi Central Clinic (Nairobi)`.
 
 ### `@{func}` kifejezések használata
 
-Feltételes logika alkalmazása a megjelenítési feliratban:
+Feltételes logika alkalmazása a megjelenítési címkében:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Az aktív eredmények `✓ Klinika neve` formátumban jelennek meg; az inaktívak `✗ Klinika neve` formátumban.
+Az aktív eredményeknél `✓ Intézmény neve`, az inaktívaknál `✗ Intézmény neve` jelenik meg.
 
 ---
 
 ## Alapértelmezett érték beállítása: `search-default-api()`
 
-A `search-default-api()` értéket a `search-api()` után használja, hogy a mezőt egy külön API-hívásból betöltött alapértelmezett lehetőséggel töltse fel előre (pl. meglévő rekord szerkesztésekor):
+Használja a `search-default-api()` függvényt a `search-api()` után a mező előre történő kitöltéséhez egy külön API-hívásból betöltött alapértelmezett választással (pl. egy meglévő rekord szerkesztésekor):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -88,50 +88,109 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## Egyedi elválasztó a select_multiple esetén: `search-default-separator()`
+## Egyéni elválasztó a select_multiple típushoz: `search-default-separator()`
 
-`select_multiple` mezőknél adja meg, hogyan kötődjön össze a tárolt karakterláncban a több kiválasztott érték:
+A `select_multiple` mezők esetében adja meg, hogyan kapcsolódjanak össze a kiválasztott értékek a tárolt karakterláncban:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
 ```
 
-Az alapértelmezett elválasztó szóköz.
+Az alapértelmezett elválasztó a szóköz.
 
 ---
 
 ## Támogatott kérdéstípusok
 
-| Kérdéstípus | Felhasználási mód |
-|-------------|-------------------|
-| `select_one` | Egyetlen kiválasztás a keresési eredményekből |
-| `select_multiple` | Több kiválasztás a keresési eredményekből |
-| `text` | Automatikus kiegészítés – a kérdező szabadon gépel, de kiválaszthat javaslatot |
+| Kérdés típusa | Felhasználási eset |
+|---------------|----------|
+| `select_one` | Egyetlen választás a keresési eredményekből |
+| `select_multiple` | Több választás a keresési eredményekből |
+| `text` | Automatikus kiegészítés — a kérdező szabadon gépelhet, de választhat javaslatot is |
 
 ---
 
-## Mentett válasz adatok felhasználása
+## Elmentett válaszadatok használata
 
-A `save_path` az API teljes válaszobjektumát tárolja a megadott név alatt. Más mezők hivatkozhatnak rá a `pulldata()` függvénnyel:
+Amikor a kérdező kiválaszt egy eredményt, az rtSurvey elmenti a válaszból származó teljes egyező objektumot a `save_path` név alatt. Más mezők kétféleképpen olvashatnak ebből.
+
+### 1. módszer — `pulldata()` lekérdezés
+
+Használja a `pulldata('save_path', 'key')` függvényt egy legfelső szintű mező beolvasásához az elmentett objektumból:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Intézmény kiválasztása | `search-api(..., 'facility_data')` |
+| select_one | facility | Válasszon intézményt | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+A `select_one` sor megjelenésének tartalmaznia kell a `search-api(..., 'facility_data')` hívást a megfelelő `save_path` értékkel.
+
+**Beágyazott JSON mezők** esetén kombinálja a `substr-jsonpath()` függvénnyel:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
 
 ---
 
-## Bevált módszerek
+## Helyi fájl keresése a search() függvénnyel
 
-1. Győződjön meg arról, hogy az API-végpont 1–2 másodpercen belül válaszol – a lassú API-k reagálatlanná teszik a keresést.
-2. Használja a `%__input__%` értéket a `post_body`-ban, hogy az API csak az egyező eredményeket adja vissza, nem az összes adatot.
-3. Indexelje a keresési mezőt szerver oldalon (pl. Elasticsearch, adatbázis teljes szöveges index) a gyors válaszadáshoz.
-4. Korlátozza az eredményeket lekérésenként 20–50 elemre – több ezer eredmény visszaadása nem éri el a keresés célját.
-5. Illesszen be minimális beviteli hossz követelményt az API-ba, hogy elkerülje az egykarakteres bemeneteken induló átfogó lekérdezéseket.
+A `search()` offline, oszlop-egyenlőség alapú lekérdezéseket hajt végre egy csomagolt SQLite `.db` fájlon — nincs szükség hálózati kapcsolatra és SQL lekérdezésekre. Akkor használja, ha a referenciaadatai az űrlappal együtt vannak csomagolva, és egy egyszerű "keress meg minden sort, ahol az oszlop egyenlő az értékkel" lekérdezésre van szüksége.
+
+### Szignatúra
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Paraméterek
+
+| Paraméter | Leírás |
+|-----------|-------------|
+| `path` | Az SQLite tábla elérési útja: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Egyezési operátor — visszaadja azokat a sorokat, ahol az oszlop megegyezik az értékkel |
+| `'list_name'` | Az oszlop neve, amellyel az egyezést vizsgálni kell |
+| `${field}` | Az egyeztetni kívánt érték; jellemzően egy mezőhivatkozás |
+
+### Példa
+
+Egy `select_one` feltöltése helyi adatbázisból a `${d307}` értékének és a `list_name` oszlopnak az összevetésével a `d307.db` fájl `externalData` táblájában:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Válasszon intézményt | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Amikor a `${d307}` értéke `"HF001"`, a `search()` visszaad minden olyan sort az `externalData` táblából, ahol `list_name = 'HF001'` — teljesen a csomagolt fájlból, hálózati hívás nélkül.
+
+### search() vs rawquery automatikus kiegészítés
+
+| Funkció | `search()` | `rawquery` automatikus kiegészítés |
+|---------|-----------|------------------------|
+| SQL lekérdezések | Nem — csak oszlop-egyenlőség | Igen — teljes `SELECT … FROM …` |
+| Paraméterezett bevitel | Oszlopérték egyezés | SQL karakterláncba ágyazva |
+| Szabad szöveges bevitel | Igen — a kérdező szabadon gépelhet | Nem — listából kell választani |
+| UNION / több tábla | Nem támogatott | Támogatott |
+
+### Mikor melyiket használjuk?
+
+- Használja a **`search()`** függvényt, ha egyszerű egyenlőségi egyezésre van szüksége egy csomagolt `.db` fájllal szemben, az űrlapnak offline is működnie kell, és engedélyezni szeretné a szabad szöveges bevitelt.
+- Használja a **`rawquery` automatikus kiegészítést**, ha SQL rugalmasságra van szüksége (JOIN-ok, UNION-ok, számított oszlopok), vagy több táblán keresztül kell lekérdeznie, és az űrlap megbízható kapcsolattal rendelkezik.
+
+---
+
+## Legjobb gyakorlatok
+
+1. Győződjön meg arról, hogy az API végpontja 1-2 másodpercen belül válaszol — a lassú API-k miatt a keresés nehézkesnek tűnik.
+2. Használja a `%__input__%` helyőrzőt a `post_body`-ban, hogy az API csak a megfelelő eredményeket küldje vissza, ne a teljes adatkészletet.
+3. Indexelje a keresési mezőt a szerver oldalon (pl. Elasticsearch, adatbázis teljes szöveges index) a gyors válaszok érdekében.
+4. Korlátozza az eredményeket lekérdezésenként 20–50 elemre — több ezer eredmény visszaadása értelmetlenné teszi a keresést.
+5. Tartalmazzon minimális beviteli hosszra vonatkozó követelményt az API-ban, hogy elkerülje a tág lekérdezések indítását egyetlen karakter beírásakor.
 
 ## Korlátozások
 
-- A dinamikus keresés hálózati kapcsolatot igényel – offline módban nem működik.
-- A `%__input__%` helyőrző pontosan van beillesztve; szerver oldalon szanitizálja a bemeneteket az injekciós támadások megelőzéséhez.
-- Az összetett `@{func}` megjelenítési kifejezések esetleg korlátozott támogatással rendelkeznek az rtSurvey kliensverzióiban.
+- A dinamikus keresés hálózati kapcsolatot igényel — offline nem működik.
+- A `%__input__%` helyőrző változtatás nélkül kerül beillesztésre; a szerver oldalon tisztítsa meg a bemeneteket az injekciós támadások megelőzése érdekében.
+- Az összetett `@{func}` megjelenítési kifejezések támogatása korlátozott lehet az rtSurvey kliens verzióitól függően.

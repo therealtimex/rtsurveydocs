@@ -1,15 +1,15 @@
 ---
 title: "Dinamik Arama"
-description: "Dinamik Arama, sayımcı yazarken gerçek zamanlı olarak uzak API'den seçenekler yükler; büyük veya sık güncellenen veri kümelerini mümkün kılar."
+description: "Dinamik Arama, enumeratör yazarken seçenekleri gerçek zamanlı olarak uzak bir API'den yükleyerek büyük veya sık güncellenen veri kümelerine olanak tanır."
 ---
 
-**Dinamik Arama** (Arama API'si olarak da adlandırılır), bir `select_one`, `select_multiple` veya `text` alanının sayımcı yazarken seçeneklerini uzak bir web hizmetinden **çalışma zamanında** yüklemesine olanak tanır. Seçenek listeniz bir CSV dosyasına sığamayacak kadar büyükse, sık sık güncelleniyorsa veya canlı bir veritabanından geliyorsa bu doğru yaklaşımdır.
+**Dinamik Arama** (Arama API'si olarak da adlandırılır), bir `select_one`, `select_multiple` veya `text` alanının seçeneklerini, enumeratör yazarken **çalışma zamanında** uzak bir web servisinden yüklemesine olanak tanır. Seçenek listeniz bir CSV dosyasına sığmayacak kadar büyükse, sık güncelleniyorsa veya canlı bir veritabanından geliyorsa doğru yaklaşım budur.
 
 ---
 
-## `search-api()` görünümü
+## `search-api()` görünümü (appearance)
 
-Dinamik arama, `search-api()` fonksiyonunu kullanarak `appearance` sütunu aracılığıyla yapılandırılır:
+Dinamik arama, `appearance` sütunu aracılığıyla `search-api()` fonksiyonu kullanılarak yapılandırılır:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -21,48 +21,48 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 |-----------|-------------|
 | `method` | Her zaman `'POST'` kullanın |
 | `url` | Sorgulanacak API uç noktası |
-| `post_body` | API'ye gönderilen JSON gövdesi. Sayımcının geçerli arama metni için yer tutucu olarak `%__input__%` kullanın |
-| `value_column` | Depolanan **değer** olarak kullanılacak yanıt nesnesindeki anahtar |
+| `post_body` | API'ye gönderilen JSON gövdesi. Enumeratörün mevcut arama metni için yer tutucu olarak `%__input__%` kullanın |
+| `value_column` | Yanıt nesnesinde saklanan **değer** olarak kullanılacak anahtar |
 | `display` | Açılır menüde gösterilen **etiket** olarak kullanılacak anahtar (veya şablon). `##key##` yer tutucularını ve `@{func}` ifadelerini destekler |
-| `data_path` | Yanıttaki sonuç nesneleri dizisine JSONPath (örn. `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Ham yanıtın diğer alanlar tarafından kullanım için kaydedileceği ad |
+| `data_path` | Yanıttaki sonuç nesneleri dizisine giden JSONPath (örneğin, `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Ham yanıtın diğer alanlar tarafından kullanılmak üzere kaydedileceği bir ad |
 
 ---
 
 ## Temel örnek
 
-Sayımcının tesis adının bir kısmını yazdığı sağlık tesisi araması:
+Enumeratörün tesis adının bir kısmını yazdığı bir sağlık tesisi araması:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one | facility | Sağlık tesisini seçin | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-API, sayımcı "nairo" yazdığında `{"query": "nairo"}` alır ve döndürür:
+Enumeratör "nair" yazdığında API `{"query": "nair"}` alır ve şunu döndürür:
 
 ```json
 {
   "results": [
-    {"id": "HF001", "name": "Nairobi Merkez Kliniği"},
-    {"id": "HF002", "name": "Nairobi Batı Hastanesi"}
+    {"id": "HF001", "name": "Nairobi Central Clinic"},
+    {"id": "HF002", "name": "Nairobi West Hospital"}
   ]
 }
 ```
 
-Açılır menü `Nairobi Merkez Kliniği` ve `Nairobi Batı Hastanesi`'ni gösterir; depolanan değer `HF001` veya `HF002`'dir.
+Açılır menü `Nairobi Central Clinic` ve `Nairobi West Hospital` gösterir; saklanan değer `HF001` veya `HF002` olur.
 
 ---
 
-## Gelişmiş görüntüleme biçimlendirme
+## Gelişmiş görüntüleme biçimlendirmesi
 
 ### `##key##` şablonlarını kullanma
 
-Etikette birden fazla alanı göster:
+Etikette birden fazla alan gösterin:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
 ```
 
-Şöyle görüntülenir: `Nairobi Merkez Kliniği (Nairobi)`.
+Şu şekilde görüntülenir: `Nairobi Central Clinic (Nairobi)`.
 
 ### `@{func}` ifadelerini kullanma
 
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Aktif sonuçlar `✓ Klinik Adı` gösterir; inaktif sonuçlar `✗ Klinik Adı` gösterir.
+Aktif sonuçlar `✓ Clinic Name`; aktif olmayanlar `✗ Clinic Name` gösterir.
 
 ---
 
 ## Varsayılan değer ayarlama: `search-default-api()`
 
-Alanı ayrı bir API çağrısından yüklenen varsayılan bir seçimle önceden doldurmak için `search-api()`'den sonra `search-default-api()` kullanın (örn. mevcut bir kaydı düzenlerken):
+Alanı ayrı bir API çağrısından yüklenen varsayılan bir seçenekle önceden doldurmak için (örneğin, mevcut bir kaydı düzenlerken) `search-api()`'den sonra `search-default-api()` kullanın:
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -90,7 +90,7 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ## select_multiple için özel ayırıcı: `search-default-separator()`
 
-`select_multiple` alanları için, birden fazla seçili değerin depolanan dizede nasıl birleştirileceğini belirtin:
+`select_multiple` alanları için, seçilen birden fazla değerin saklanan dizede nasıl birleştirileceğini belirtin:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
@@ -105,33 +105,92 @@ Varsayılan ayırıcı bir boşluktur.
 | Soru türü | Kullanım durumu |
 |---------------|----------|
 | `select_one` | Arama sonuçlarından tek seçim |
-| `select_multiple` | Arama sonuçlarından çoklu seçim |
-| `text` | Otomatik tamamlama — sayımcı serbestçe yazar ama öneri seçebilir |
+| `select_multiple` | Arama sonuçlarından birden fazla seçim |
+| `text` | Otomatik tamamlama — enumeratör serbestçe yazar ancak bir öneri seçebilir |
 
 ---
 
-## Kaydedilmiş yanıt verilerini kullanma
+## Kaydedilen yanıt verilerini kullanma
 
-`save_path`, tam API yanıt nesnesini verilen ad altında depolar. Diğer alanlar `pulldata()` ile buna referans verebilir:
+Enumeratör bir sonuç seçtiğinde, rtSurvey yanıttaki tam eşleşen nesneyi `save_path` adı altında kaydeder. Diğer alanlar buradan iki şekilde okuma yapabilir.
+
+### Yöntem 1 — `pulldata()` araması
+
+Kaydedilen nesneden üst düzey bir alanı okumak için `pulldata('save_path', 'key')` kullanın:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Tesis seçin | `search-api(..., 'facility_data')` |
+| select_one | facility | Tesis seçin | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+`select_one` satırındaki görünüm, eşleşen `save_path` ile `search-api(..., 'facility_data')` içermelidir.
+
+**İç içe geçmiş JSON alanları** için `substr-jsonpath()` ile birleştirin:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## search() ile yerel dosya araması
+
+`search()`, paketlenmiş bir SQLite `.db` dosyasına karşı çevrimdışı, sütun eşitliği aramaları gerçekleştirir — ağ bağlantısı ve SQL sorgusu gerekmez. Referans verileriniz formla birlikte paketlendiğinde ve basit bir "sütunun değere eşit olduğu tüm satırları bul" aramasına ihtiyacınız olduğunda bunu kullanın.
+
+### İmzası (Signature)
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parametreler
+
+| Parametre | Açıklama |
+|-----------|-------------|
+| `path` | SQLite tablosuna giden yol: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Eşleşme operatörü — sütunun değere eşit olduğu satırları döndürür |
+| `'list_name'` | Eşleştirilecek sütun adı |
+| `${field}` | Eşleştirilecek değer; genellikle bir alan referansı |
+
+### Örnek
+
+`${d307.db}` içindeki `externalData` tablosunun `list_name` sütununa karşı `${d307}` değerini eşleştirerek bir `select_one` alanını yerel bir veritabanından doldurun:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Tesis seçin | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+`${d307}`, `"HF001"` değerine eşit olduğunda, `search()` ağ çağrısı yapmadan tamamen paketlenmiş dosyadan `list_name = 'HF001'` olan `externalData` içindeki her satırı döndürür.
+
+### search() vs rawquery otomatik tamamlama
+
+| Özellik | `search()` | `rawquery` otomatik tamamlama |
+|---------|-----------|------------------------|
+| SQL sorguları | Hayır — yalnızca sütun eşitliği | Evet — tam `SELECT … FROM …` |
+| Parametreli giriş | Sütun değeri eşleşmesi | SQL dizesine gömülü |
+| Serbest metin girişi | Evet — enumeratör serbestçe yazabilir | Hayır — listeden seçmelidir |
+| UNION / çoklu tablo | Desteklenmiyor | Destekleniyor |
+
+### Her birini ne zaman kullanmalı?
+
+- Paketlenmiş bir `.db` dosyasına karşı basit bir eşitlik eşleşmesine ihtiyacınız olduğunda, formun çevrimdışı çalışması gerektiğinde ve serbest metin girişine izin vermek istediğinizde **`search()`** kullanın.
+- SQL esnekliğine (JOIN'ler, UNION'lar, hesaplanmış sütunlar) ihtiyacınız olduğunda veya birden fazla tablo arasında sorgu yapmanız gerektiğinde ve formun güvenilir bağlantısı olduğunda **`rawquery` otomatik tamamlama** kullanın.
 
 ---
 
 ## En İyi Uygulamalar
 
-1. API uç noktasının 1–2 saniye içinde yanıt verdiğinden emin olun — yavaş API'ler aramayı yavaş hissettirirler.
-2. API'nin yalnızca eşleşen sonuçları döndürmesi için `post_body`'de `%__input__%` kullanın; tüm veri kümesini değil.
-3. Hızlı yanıtlar için sunucu tarafında arama alanını indeksleyin (örn. Elasticsearch, veritabanı tam metin indeksi).
-4. Sorgu başına sonuçları 20–50 öğeyle sınırlandırın — binlerce sonuç döndürmek aramanın amacını ortadan kaldırır.
-5. Tek karakterli girişlerde geniş sorguların tetiklenmesini önlemek için API'de minimum giriş uzunluğu gereksinimi ekleyin.
+1. API uç noktanızın 1-2 saniye içinde yanıt verdiğinden emin olun — yavaş API'ler aramanın yanıt vermediği hissini uyandırır.
+2. `post_body` içinde `%__input__%` kullanın, böylece API tüm veri kümesini değil, yalnızca eşleşen sonuçları döndürür.
+3. Hızlı yanıtlar için sunucu tarafındaki arama alanını dizinleyin (örneğin, Elasticsearch, veritabanı tam metin dizini).
+4. Sonuçları sorgu başına 20–50 öğeyle sınırlayın — binlerce sonuç döndürmek aramanın amacını bozar.
+5. Tek karakterli girişlerde geniş sorguların tetiklenmesini önlemek için API'ye minimum giriş uzunluğu gereksinimi ekleyin.
 
 ## Sınırlamalar
 
-- Dinamik Arama, ağ bağlantısı gerektirir — çevrimdışı çalışmaz.
-- `%__input__%` yer tutucusu olduğu gibi eklenir; enjeksiyon saldırılarını önlemek için sunucu tarafında girişleri temizleyin.
-- Karmaşık `@{func}` görüntüleme ifadeleri tüm rtSurvey istemci sürümlerinde sınırlı desteğe sahip olabilir.
+- Dinamik Arama ağ bağlantısı gerektirir — çevrimdışı çalışmaz.
+- `%__input__%` yer tutucusu olduğu gibi enjekte edilir; enjeksiyon saldırılarını önlemek için sunucu tarafındaki girişleri temizleyin.
+- Karmaşık `@{func}` görüntüleme ifadeleri, tüm rtSurvey istemci sürümlerinde sınırlı desteğe sahip olabilir.

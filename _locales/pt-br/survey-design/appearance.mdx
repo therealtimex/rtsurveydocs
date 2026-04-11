@@ -3,54 +3,54 @@ title: "Aparência"
 description: ""
 ---
 
-A coluna `appearance` no rtSurvey permite que você personalize a apresentação visual e o comportamento das perguntas nas suas pesquisas. Este recurso melhora a experiência do usuário e pode melhorar significativamente a eficiência da coleta de dados. O rtSurvey suporta atributos de aparência padrão do XLSForm e os estende com opções adicionais.
+A coluna `appearance` no rtSurvey permite personalizar a apresentação visual e o comportamento das perguntas em suas pesquisas. Esse recurso melhora a experiência do usuário e pode aumentar significativamente a eficiência da coleta de dados. O rtSurvey suporta atributos de aparência padrão do XLSForm e os estende com opções adicionais.
 
-## Atributos de aparência padrão do XLSForm
+## Atributos de Aparência Padrão do XLSForm
 
 O rtSurvey suporta os seguintes atributos de aparência padrão do XLSForm:
 
-| Atributo de aparência | Tipos de perguntas | Descrição |
-|-----------------------|-------------------|-----------|
-| multiline | text | Cria uma caixa de texto de várias linhas (melhor para clientes web) |
-| minimal | select_one, select_multiple | Exibe opções em um menu suspenso |
-| quick | select_one | Avança automaticamente para a próxima pergunta após a seleção (somente móvel) |
-| no-calendar | date | Suprime a exibição do calendário (somente móvel) |
-| month-year | date | Permite a seleção apenas de mês e ano |
-| year | date | Permite a seleção apenas do ano |
-| horizontal-compact | select_one, select_multiple | Exibe opções horizontalmente (somente web) |
-| horizontal | select_one, select_multiple | Exibe opções horizontalmente em colunas (somente web) |
-| likert | select_one | Apresenta opções como uma escala Likert |
-| compact | select_one, select_multiple | Exibe opções lado a lado com preenchimento mínimo |
-| quickcompact | select_one | Combina exibição compacta com avanço automático (somente móvel) |
-| field-list | groups | Exibe o grupo inteiro em uma única tela (somente móvel) |
-| label | select_one, select_multiple | Mostra rótulos de opção sem entradas |
-| list-nolabel | select_one, select_multiple | Mostra entradas sem rótulos (use com `label`) |
-| table-list | groups | Exibe perguntas em formato de tabela |
-| signature | image | Habilita captura de assinatura (somente móvel) |
-| draw | image | Permite desenho à mão livre (somente móvel) |
-| map, quick map | select_one, select_one_from_file | Habilita seleção a partir de recursos do mapa |
+| Atributo de Aparência | Tipos de Pergunta | Descrição |
+|----------------------|----------------|-------------|
+| multiline | text | Cria uma caixa de texto multilinha (melhor para clientes web) |
+| minimal | select_one, select_multiple | Exibe as escolhas em um menu suspenso |
+| quick | select_one | Avança automaticamente para a próxima pergunta após a seleção (apenas dispositivos móveis) |
+| no-calendar | date | Suprime a exibição do calendário (apenas dispositivos móveis) |
+| month-year | date | Permite apenas a seleção de mês e ano |
+| year | date | Permite apenas a seleção do ano |
+| horizontal-compact | select_one, select_multiple | Exibe as escolhas horizontalmente (apenas web) |
+| horizontal | select_one, select_multiple | Exibe as escolhas horizontalmente em colunas (apenas web) |
+| likert | select_one | Apresenta as escolhas como uma escala Likert |
+| compact | select_one, select_multiple | Exibe as escolhas lado a lado com preenchimento mínimo |
+| quickcompact | select_one | Combina a exibição compacta com o avanço automático (apenas dispositivos móveis) |
+| field-list | groups | Exibe o grupo inteiro em uma única tela (apenas dispositivos móveis) |
+| label | select_one, select_multiple | Mostra os rótulos das escolhas sem campos de entrada |
+| list-nolabel | select_one, select_multiple | Mostra os campos de entrada sem rótulos (usar com `label`) |
+| table-list | groups | Exibe as perguntas em um formato de tabela |
+| signature | image | Permite a captura de assinatura (apenas dispositivos móveis) |
+| draw | image | Permite o desenho à mão livre (apenas dispositivos móveis) |
+| map, quick map | select_one, select_one_from_file | Permite a seleção a partir de recursos do mapa |
 
-## Práticas recomendadas para usar aparência
+## Boas Práticas para o Uso de Aparência
 
-1. **Consistência**: Use atributos de aparência de forma consistente em toda a sua pesquisa para uma aparência uniforme.
-2. **Móvel vs. web**: Considere como as aparências serão renderizadas em diferentes dispositivos e plataformas.
-3. **Desempenho**: Tenha cuidado com atributos de aparência que podem diminuir o carregamento do formulário (por exemplo, `table-list` para grupos grandes).
-4. **Experiência do usuário**: Escolha aparências que facilitem a entrada de dados e sejam mais intuitivas para os respondentes.
-5. **Teste**: Sempre teste seu formulário nos dispositivos de destino para garantir que as aparências funcionem conforme esperado.
+1. **Consistência**: Use atributos de aparência de forma consistente em toda a sua pesquisa para um visual uniforme.
+2. **Móvel vs. Web**: Considere como as aparências serão renderizadas em diferentes dispositivos e plataformas.
+3. **Desempenho**: Seja cauteloso com atributos de aparência que possam retardar o carregamento do formulário (ex: `table-list` para grupos grandes).
+4. **Experiência do Usuário**: Escolha aparências que tornem a entrada de dados mais fácil e intuitiva para os respondentes.
+5. **Testes**: Teste sempre o seu formulário nos dispositivos de destino para garantir que as aparências funcionem como esperado.
 
-## Técnicas avançadas
+## Técnicas Avançadas
 
-### Combinando aparências
+### Combinando Aparências
 
 Alguns atributos de aparência podem ser combinados para layouts mais complexos:
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Selecione um: | minimal compact |
+| select_one options | choice | Selecione uma: | minimal compact |
 ```
 
-### Aparências dinâmicas
+### Aparências Dinâmicas
 
 O rtSurvey permite alterações dinâmicas de aparência com base na lógica do formulário:
 
@@ -60,50 +60,77 @@ O rtSurvey permite alterações dinâmicas de aparência com base na lógica do 
 | text | time | Insira a hora: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## Considerações sobre aplicativo móvel
+## Considerações para Aplicativos Móveis
 
-- Algumas aparências (por exemplo, `quick`, `signature`) são específicas para dispositivos móveis.
-- Teste minuciosamente no Android e iOS para garantir comportamento consistente.
+- Algumas aparências (ex: `quick`, `signature`) são específicas para dispositivos móveis.
+- Teste minuciosamente tanto em Android quanto em iOS para garantir um comportamento consistente.
 
-## Atributos de aparência estendidos do rtSurvey
+## Atributos de Aparência Estendidos do rtSurvey
 
 Além das aparências padrão do XLSForm, o rtSurvey suporta as seguintes opções específicas da plataforma:
 
 ### Controle de dados e exibição
 
-| Atributo de aparência | Tipos de perguntas | Descrição |
-|-----------------------|-------------------|-----------|
-| `invisible` | qualquer | Oculta o campo da visualização enquanto ainda coleta ou calcula seu valor. Diferente do tipo `hidden` — o campo ainda participa da lógica. |
-| `displaytitle` | qualquer | Força a exibição do rótulo/título do campo mesmo quando seria suprimido. |
-| `autopull` | select_one, select_multiple | Busca automaticamente dados externos para preencher opções quando o formulário carrega ou um campo de gatilho muda. |
-| `floating_hint` | text, integer, decimal | Mostra o texto de dica como um rótulo flutuante acima do campo de entrada em vez de abaixo. |
-| `calculate-button` | calculate | Adiciona um botão visível que aciona o recálculo do campo sob demanda, em vez de calcular automaticamente. |
+| Atributo de Aparência | Tipos de Pergunta | Descrição |
+|----------------------|----------------|-------------|
+| `invisible` | any | Oculta o campo da visão enquanto continua coletando ou calculando seu valor. Diferente do tipo `hidden` — o campo ainda participa da lógica. |
+| `displaytitle` | any | Força a exibição do rótulo/título do campo mesmo quando ele seria suprimido. |
+| `autopull` | select_one, select_multiple | Busca automaticamente dados externos para preencher as escolhas quando o formulário é carregado ou um campo de gatilho é alterado. |
+| `floating_hint` | text, integer, decimal | Mostra o texto de dica como um rótulo flutuante acima do campo de entrada, em vez de abaixo dele. |
+| `calculate-button` | calculate | Adiciona um botão visível que aciona o recálculo do campo sob demanda, em vez de computar automaticamente. |
+
+### Grupo e navegação
+
+| Atributo de Aparência | Tipos de Pergunta | Descrição |
+|----------------------|----------------|-------------|
+| `section` | group | Renderiza o grupo como um cartão de seção colapsável. Nota: apenas aplicativo móvel. |
+| `toc-hide` | any | Exclui a pergunta do painel de navegação do sumário (TOC). |
+| `minilog` | begin_repeat | Exibe entradas de repetição concluídas como uma lista de mini-log compacta em vez de expandir cada entrada em linha. |
+
+### Comportamento de entrada
+
+| Atributo de Aparência | Tipos de Pergunta | Descrição |
+|----------------------|----------------|-------------|
+| `proper` | text | Coloca automaticamente em maiúscula a primeira letra de cada palavra conforme o respondente digita (comportamento de title-case). |
+| `text-nolabel` | text, integer, decimal | Renderiza o campo de entrada sem um rótulo visível. |
+| `inline-1line` | text | Força a entrada de texto a ser exibida em uma única linha, mesmo quando o rótulo da pergunta é longo. |
+| `popup` | any | Renderiza o campo dentro de um popup / sobreposição modal em vez de em linha na página. |
 
 ### Layout
 
-| Atributo de aparência | Tipos de perguntas | Descrição |
-|-----------------------|-------------------|-----------|
+| Atributo de Aparência | Tipos de Pergunta | Descrição |
+|----------------------|----------------|-------------|
 | `1screen` | group | Força o grupo inteiro a ser exibido em uma única tela, independentemente do tamanho do grupo. |
-| `columns(n)` | select_one, select_multiple | Exibe opções em `n` colunas. Exemplo: `columns(3)` mostra três colunas de botões de rádio. |
-| `gridformat<row=R col=C colspan=S align=center>` | qualquer | Posiciona o campo em um layout CSS-grid na linha `R`, coluna `C`, abrangendo `S` colunas. Usado com `advanced-extension/grid-layout`. |
-| `ignore-simplify` | qualquer | Instrui o renderizador de formulário a pular a simplificação ou condensação automática do layout deste campo. |
+| `columns(n)` | select_one, select_multiple | Exibe as escolhas em `n` colunas. Exemplo: `columns(3)` mostra três colunas de botões de rádio. |
+| `gridformat<row=R col=C colspan=S align=center>` | any | Posiciona o campo em um layout CSS-grid na linha `R`, coluna `C`, abrangendo `S` colunas. Usado com `advanced-extension/grid-layout`. |
+| `ignore-simplify` | any | Instrui o renderizador do formulário a pular a simplificação ou condensação automática do layout deste campo. |
+| `horizontal(N)` | select_one, select_multiple | Define cada escolha para ocupar `N` por cento da largura da linha. Exemplo: `horizontal(50)` coloca duas escolhas por linha. |
+| `scroll-view(N%)` | group, repeat | Restringe o contêiner a uma altura máxima de `N%` da viewport (ou pai), adicionando uma barra de rolagem quando o conteúdo transborda. Exemplo: `scroll-view(60%)`. |
 
 ### Widgets
 
-| Atributo de aparência | Tipos de perguntas | Descrição |
-|-----------------------|-------------------|-----------|
-| `likert` | select_one | Apresenta opções como uma linha de escala Likert (já na tabela padrão acima; confirmado como suportado). |
-| `distress` | select_one | Renderiza opções como o widget visual da Escala de Sofrimento Psicológico de Kessler (K10) com ícones emocionais. |
+| Atributo de Aparência | Tipos de Pergunta | Descrição |
+|----------------------|----------------|-------------|
+| `likert` | select_one | Apresenta as escolhas como uma linha de escala Likert (já na tabela padrão acima; suporte confirmado). |
+| `distress` | select_one | Renderiza as escolhas como o widget visual da Escala de Aflição Psicológica de Kessler (K10) com ícones emocionais. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Renderiza as escolhas como caixas de classificação estilizadas com cinco slots de cor. `c1` = borda do contêiner externo, `c2` = borda não selecionada, `c3` = borda selecionada e preenchimento, `c4` = cor do texto não selecionado, `c5` = cor do texto selecionado. Exemplo: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Renderiza as escolhas como etiquetas coloridas (chips). Os cinco slots de cor seguem a mesma ordem que `rating_box-fill`. As escolhas selecionadas são destacadas; as escolhas não selecionadas são suprimidas na visualização de resumo. |
 
 ### Integração de API
 
-| Atributo de aparência | Tipos de perguntas | Descrição |
-|-----------------------|-------------------|-----------|
-| `callapi` | text, integer, decimal, select_one | Habilita integração de chamada de API para este campo. A coluna de cálculo deve conter uma expressão `callapi()`. Consulte [Call API](advanced-extension/call-api). |
+| Atributo de Aparência | Tipos de Pergunta | Descrição |
+|----------------------|----------------|-------------|
+| `callapi` | text, integer, decimal, select_one | Permite a integração de chamadas de API para este campo. A coluna de cálculo deve conter uma expressão `callapi()`. Veja [Call API](advanced-features/call-api). |
 | `callapi-verify(params)` | text, integer, decimal | Aciona uma chamada de verificação de API usando parâmetros estáticos. O formulário bloqueia o progresso até que a API confirme o valor. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | Igual a `callapi-verify`, mas com parâmetros derivados de outros valores de campo em tempo de execução. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Igual ao `callapi-verify`, mas com parâmetros derivados de outros valores de campos em tempo de execução. |
 
-### Formato de data/hora inline
+### Seletor de idioma
+
+| Atributo de Aparência | Typo de Pergunta | Descrição |
+|----------------------|----------------|-------------|
+| `change_language-{colors} default('lang')` | note, text | Renderiza um widget de seletor de idioma estilizado com os códigos de cor fornecidos. O token `default('lang')` define o idioma inicial (ex: `default('en')`); ele é reescrito para `rtDefault('lang')` internamente durante a análise. Exemplo: `change_language-blue-white default('vi')`. |
+
+### Formato de data/hora em linha
 
 Para campos `date`, `time` e `datetime`, você pode especificar um formato de exibição personalizado usando uma string de formato anexada à aparência:
 
@@ -112,7 +139,7 @@ inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-Os tokens de formato são os mesmos de `format-date()` e `format-date-time()`. Consulte [Funções — Funções de data e hora](operators-and-functions/functions#date-and-time-functions).
+Os tokens de formato são os mesmos que `format-date()` e `format-date-time()`. Veja [Funções — Funções de data e hora](operators-and-functions/functions#date-and-time-functions).
 
 Exemplo:
 
@@ -121,13 +148,67 @@ Exemplo:
 | datetime | event_time | Data e hora do evento | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | Data de nascimento | inline-[%d/%m/%Y] |
 
-## Limitações conhecidas
+### Layout de botões em linha — `display{}` e `results{}`
 
-- Aparências complexas podem não renderizar de forma idêntica em todas as plataformas.
-- Algumas aparências avançadas do rtSurvey podem não ser suportadas no modo off-line.
+Para tipos de perguntas que são renderizados como um botão de ícone em linha (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), dois modificadores de aparência controlam a posição do botão e o comportamento pós-captura.
 
-## Solução de problemas de aparência
+#### `display{...}` — posição do botão antes da captura
 
-1. **Aparência não aplicada**: Verifique erros de digitação na coluna de aparência.
-2. **Renderização inconsistente**: Verifique a compatibilidade com o tipo de pergunta e a plataforma.
-3. **Problemas de desempenho**: Considere simplificar aparências complexas, especialmente para pesquisas grandes.
+```
+display{<align>, <size>, <color>}
+```
+
+| Parâmetro | Valores | Padrão |
+|-----------|--------|---------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex ex: `#FF5500` | cor primária do tema |
+| Flag | `inline-icon` | força o modo de ícone |
+
+| Valor de Align | Layout |
+|-------------|--------|
+| `right` | Botão à direita do rótulo |
+| `left` | Botão à esquerda do rótulo |
+| `top` | Botão acima do rótulo, centralizado em largura total |
+| `center` / `bottom` | Botão abaixo do rótulo, centralizado em largura total |
+
+#### `results{...}` — layout e visibilidade após a captura
+
+Herda as configurações de `display{}`. Use para mover o botão ou ocultar elementos assim que um valor for capturado.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| Valor de `hide` | Efeito |
+|---|---|
+| `hide(capture)` | Oculta o botão de captura assim que um arquivo/valor existir |
+| `hide(review)` | Oculta a miniatura de revisão / botão de reprodução |
+| `hide(filename)` | Oculta o nome do arquivo mostrado após o upload |
+| `hide(camera)` | Oculta o botão de disparo da câmera após a captura |
+| `hide(scanner)` | Oculta o botão de leitura de código de barras após a leitura de um valor |
+| `hide(value)` | Oculta o texto do valor lido (código de barras / geoponto) |
+
+O widget muda automaticamente do layout `display{}` para o layout `results{}` no momento em que um valor é capturado.
+
+**Exemplos:**
+
+```
+inline display{right}                                    → ícone à direita do rótulo
+inline display{left, large}                              → ícone grande à esquerda
+inline display{center, large, #FF5500}                   → ícone grande laranja abaixo do rótulo
+inline display{right} results{left}                      → ícone move-se para a esquerda após a captura
+inline display{right} results{hide(capture)}             → ícone desaparece após a captura
+inline display{center} results{hide(capture), hide(filename)}
+```
+
+## Limitações Conhecidas
+
+- Aparências complexas podem não ser renderizadas de forma idêntica em todas as plataformas.
+- Algumas aparências avançadas do rtSurvey podem não ser suportadas no modo offline.
+
+## Solução de Problemas de Aparência
+
+1. **Aparência Não Aplicada**: Verifique se há erros de digitação na coluna appearance.
+2. **Renderização Inconsistente**: Verifique a compatibilidade com o tipo de pergunta e a plataforma.
+3. **Problemas de Desempenho**: Considere simplificar aparências complexas, especialmente para pesquisas grandes.

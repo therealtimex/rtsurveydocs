@@ -1,133 +1,214 @@
 ---
-title: "Utseende"
+title: "Utseende (Appearance)"
 description: ""
 ---
 
-`appearance`-kolonnen i rtSurvey lar deg tilpasse den visuelle presentasjonen og oppførselen til spørsmål i spørreundersøkelsene dine. Denne funksjonen forbedrer brukeropplevelsen og kan øke effektiviteten ved datainnsamling betydelig. rtSurvey støtter standard XLSForm-utseendeattributter og utvider dem med ytterligere alternativer.
+`appearance`-kolonnen i rtSurvey lar deg tilpasse den visuelle presentasjonen og oppførselen til spørsmål i undersøkelsene dine. Denne funksjonen forbedrer brukeropplevelsen og kan forbedre effektiviteten i datainnsamlingen betydelig. rtSurvey støtter standard XLSForm appearance-attributter og utvider dem med ytterligere alternativer.
 
-## Standard XLSForm-utseendeattributter
+## Standard XLSForm Appearance-attributter
 
-rtSurvey støtter følgende standard XLSForm-utseendeattributter:
+rtSurvey støtter følgende standard XLSForm appearance-attributter:
 
-| Utseendeattributt | Spørsmålstyper | Beskrivelse |
-|-------------------|----------------|-------------|
-| multiline | text | Oppretter et flerlinjers tekstfelt (best for webklienter) |
-| minimal | select_one, select_multiple | Viser alternativer i en nedtrekksmeny |
+| Appearance-attributt | Spørsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| multiline | text | Oppretter en tekstboks med flere linjer (best for webklienter) |
+| minimal | select_one, select_multiple | Viser valg i en rullegardinmeny |
 | quick | select_one | Går automatisk videre til neste spørsmål etter valg (kun mobil) |
 | no-calendar | date | Skjuler kalendervisningen (kun mobil) |
-| month-year | date | Tillater valg av måned og år kun |
-| year | date | Tillater valg av år kun |
-| horizontal-compact | select_one, select_multiple | Viser alternativer horisontalt (kun web) |
-| horizontal | select_one, select_multiple | Viser alternativer horisontalt i kolonner (kun web) |
-| likert | select_one | Presenterer alternativer som en Likert-skala |
-| compact | select_one, select_multiple | Viser alternativer side om side med minimal polstring |
-| quickcompact | select_one | Kombinerer kompakt visning med automatisk fremgang (kun mobil) |
+| month-year | date | Tillater kun valg av måned og år |
+| year | date | Tillater kun valg av år |
+| horizontal-compact | select_one, select_multiple | Viser valg horisontalt (kun web) |
+| horizontal | select_one, select_multiple | Viser valg horisontalt i kolonner (kun web) |
+| likert | select_one | Presenterer valg som en Likert-skala |
+| compact | select_one, select_multiple | Viser valg side om side med minimal utfylling |
+| quickcompact | select_one | Kombinerer kompakt visning med automatisk fremdrift (kun mobil) |
 | field-list | groups | Viser hele gruppen på én skjerm (kun mobil) |
-| label | select_one, select_multiple | Viser alternativtekster uten inndata |
-| list-nolabel | select_one, select_multiple | Viser inndata uten tekster (bruk med `label`) |
-| table-list | groups | Viser spørsmål i tabellformat |
-| signature | image | Aktiverer signaturregistrering (kun mobil) |
+| label | select_one, select_multiple | Viser valgetiketter uten inndatafelt |
+| list-nolabel | select_one, select_multiple | Viser inndatafelt uten etiketter (brukes sammen med `label`) |
+| table-list | groups | Viser spørsmål i et tabellformat |
+| signature | image | Muliggjør fangst av signatur (kun mobil) |
 | draw | image | Tillater frihåndstegning (kun mobil) |
-| map, quick map | select_one, select_one_from_file | Aktiverer valg fra kartfunksjoner |
+| map, quick map | select_one, select_one_from_file | Muliggjør valg fra kartfunksjoner |
 
-## Beste praksis for bruk av utseende
+## Beste praksis for bruk av Appearance
 
-1. **Konsistens**: Bruk utseendeattributter konsekvent i hele spørreundersøkelsen for et enhetlig utseende.
-2. **Mobil vs. web**: Vurder hvordan utseender vil vises på ulike enheter og plattformer.
-3. **Ytelse**: Vær forsiktig med utseendeattributter som kan bremse skjemalastingen (f.eks. `table-list` for store grupper).
-4. **Brukeropplevelse**: Velg utseender som gjør datainntasting enklere og mer intuitiv for respondentene.
-5. **Testing**: Test alltid skjemaet på målenheter for å sikre at utseender fungerer som forventet.
+1. **Konsistens**: Bruk appearance-attributter konsekvent gjennom hele undersøkelsen for et enhetlig utseende.
+2. **Mobil vs. Web**: Vurder hvordan utseendet vil se ut på ulike enheter og plattformer.
+3. **Ytelse**: Vær forsiktig med appearance-attributter som kan gjøre at skjemaet lastes tregere (f.eks. `table-list` for store grupper).
+4. **Brukeropplevelse**: Velg utseende som gjør datainnlegging enklere og mer intuitivt for respondentene.
+5. **Testing**: Test alltid skjemaet ditt på målenheter for å sikre at utseendet fungerer som forventet.
 
 ## Avanserte teknikker
 
-### Kombinere utseender
+### Kombinere Appearances
 
-Noen utseendeattributter kan kombineres for mer komplekse oppsett:
+Noen appearance-attributter kan kombineres for mer komplekse layouter:
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | Velg én: | minimal compact |
+| select_one options | choice | Select one: | minimal compact |
 ```
 
-### Dynamiske utseender
+### Dynamiske Appearances
 
-rtSurvey tillater dynamiske utseendeendringer basert på skjemalogikk:
+rtSurvey tillater dynamiske endringer i utseende basert på skjemalogikk:
 
 ```
 | type | name | label | appearance | relevant |
 |------|------|-------|------------|----------|
-| text | time | Skriv inn tid: | inline-[%H:%M] | ${show_time} = 'yes' |
+| text | time | Enter time: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## Hensyn til mobilapp
+## Hensyn til mobilappen
 
 - Noen utseender (f.eks. `quick`, `signature`) er spesifikke for mobile enheter.
-- Test grundig på både Android og iOS for å sikre konsistent adferd.
+- Test grundig på både Android og iOS for å sikre konsistent oppførsel.
 
-## rtSurvey utvidede utseendeattributter
+## rtSurvey utvidede appearance-attributter
 
-I tillegg til standard XLSForm-utseender støtter rtSurvey følgende plattformspesifikke alternativer:
+I tillegg til standard XLSForm-utseender, støtter rtSurvey følgende plattformspesifikke alternativer:
 
 ### Data- og visningskontroll
 
-| Utseendeattributt | Spørsmålstyper | Beskrivelse |
-|-------------------|----------------|-------------|
-| `invisible` | enhver | Skjuler feltet fra visningen mens det fortsatt samler inn eller beregner verdien. Forskjellig fra `hidden`-type — feltet deltar fortsatt i logikken. |
-| `displaytitle` | enhver | Tvinger visning av feltets etikett/tittel selv om det ellers ville blitt undertrykt. |
-| `autopull` | select_one, select_multiple | Henter automatisk eksterne data for å fylle ut alternativer når skjemaet lastes eller et triggerfelt endres. |
+| Appearance-attributt | Spørsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| `invisible` | alle | Skjuler feltet fra visning mens det fortsatt samler inn eller beregner verdien. Forskjellig fra `hidden`-type — feltet deltar fortsatt i logikken. |
+| `displaytitle` | alle | Tvinger visning av feltets etikett/tittel selv når den ellers ville vært skjult. |
+| `autopull` | select_one, select_multiple | Henter automatisk eksterne data for å fylle valg når skjemaet lastes eller et utløserfelt endres. |
 | `floating_hint` | text, integer, decimal | Viser hintteksten som en flytende etikett over inndatafeltet i stedet for under det. |
-| `calculate-button` | calculate | Legger til en synlig knapp som utløser omberegning av feltet på forespørsel, i stedet for å beregne automatisk. |
+| `calculate-button` | calculate | Legger til en synlig knapp som utløser rekalkulering av feltet ved behov, i stedet for å beregne automatisk. |
 
-### Oppsett
+### Gruppe og navigasjon
 
-| Utseendeattributt | Spørsmålstyper | Beskrivelse |
-|-------------------|----------------|-------------|
-| `1screen` | group | Tvinger hele gruppen til å vises på én skjerm uavhengig av gruppestørrelse. |
-| `columns(n)` | select_one, select_multiple | Viser alternativer i `n` kolonner. Eksempel: `columns(3)` viser tre kolonner med radioknapper. |
-| `gridformat<row=R col=C colspan=S align=center>` | enhver | Plasserer feltet i et CSS-grid-oppsett ved rad `R`, kolonne `C`, med `S` kolonner. Brukes med `advanced-extension/grid-layout`. |
-| `ignore-simplify` | enhver | Instruerer skjemaviseren til å hoppe over automatisk forenkling eller komprimering av dette feltets oppsett. |
+| Appearance-attributt | Spørsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| `section` | group | Rendrer gruppen som et sammenleggbart seksjonskort. Merk: kun mobilapp. |
+| `toc-hide` | alle | Ekskluderer spørsmålet fra navigasjonspanelet for innholdsfortegnelsen (TOC). |
+| `minilog` | begin_repeat | Viser fullførte repetisjonsoppføringer som en kompakt minilog-liste i stedet for å utvide hver oppføring inline. |
 
-### Widgets
+### Inndataoppførsel
 
-| Utseendeattributt | Spørsmålstyper | Beskrivelse |
-|-------------------|----------------|-------------|
-| `likert` | select_one | Presenterer alternativer som en Likert-skalarad (allerede i standardtabellen ovenfor; bekreftet støttet). |
-| `distress` | select_one | Gjengir alternativer som Kessler Psychological Distress Scale (K10) visuell widget med emosjonelle ikoner. |
+| Appearance-attributt | Spørsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| `proper` | text | Setter automatisk stor bokstav i hvert ord etter hvert som respondenten skriver (tittel-oppførsel). |
+| `text-nolabel` | text, integer, decimal | Rendrer inndatafeltet uten en synlig etikett. |
+| `inline-1line` | text | Tvinger tekstinndata til å vises som en enkelt linje selv når spørsmålsetiketten er lang. |
+| `popup` | alle | Rendrer feltet inne i et popup- / modalt overlegg i stedet for inline på siden. |
+
+### Layout
+
+| Appearance-attributt | Spørsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| `1screen` | group | Tvinger hele gruppen til å vises på én enkelt skjerm uavhengig av gruppestørrelse. |
+| `columns(n)` | select_one, select_multiple | Viser valg i `n` kolonner. Eksempel: `columns(3)` viser tre kolonner med radioknapper. |
+| `gridformat<row=R col=C colspan=S align=center>` | alle | Plasserer feltet i en CSS-gridlayout på rad `R`, kolonne `C`, og spenner over `S` kolonner. Brukes med `advanced-extension/grid-layout`. |
+| `ignore-simplify` | alle | Instruerer skjemarendreren om å hoppe over automatisk forenkling eller fortetting av dette feltets layout. |
+| `horizontal(N)` | select_one, select_multiple | Setter hvert valg til å oppta `N` prosent av radbredden. Eksempel: `horizontal(50)` plasserer to valg per rad. |
+| `scroll-view(N%)` | group, repeat | Begrenser beholderen til en maksimal høyde på `N%` av visningsområdet (eller forelderen), og legger til en rullefelt når innholdet renner over. Eksempel: `scroll-view(60%)`. |
+
+### Widgeter
+
+| Appearance-attributt | Spørsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| `likert` | select_one | Presenterer valg som en Likert-skalarad (allerede i standardtabellen ovenfor; bekreftet støttet). |
+| `distress` | select_one | Rendrer valg som den visuelle widgeten Kessler Psychological Distress Scale (K10) med emosjonelle ikoner. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Rendrer valg som stylede rangeringsbokser med fem fargespor. `c1` = ytre beholderkant, `c2` = ikke-avmerket kant, `c3` = avmerket kant og fyll, `c4` = tekstfarge for ikke-avmerket, `c5` = tekstfarge for avmerket. Eksempel: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Rendrer valg som fargede brikker (tags). De fem fargesporene følger samme rekkefølge som `rating_box-fill`. Valgte alternativer utheves; ikke-valgte alternativer skjules fra sammendragsvisningen. |
 
 ### API-integrasjon
 
-| Utseendeattributt | Spørsmålstyper | Beskrivelse |
-|-------------------|----------------|-------------|
-| `callapi` | text, integer, decimal, select_one | Aktiverer API-kallintegrasjon for dette feltet. Beregningskolonnen skal inneholde et `callapi()`-uttrykk. Se [Call API](advanced-extension/call-api). |
-| `callapi-verify(params)` | text, integer, decimal | Utløser et API-verifiseringskall med statiske parametere. Skjemaet blokkerer fremgang til API-en bekrefter verdien. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | Samme som `callapi-verify`, men med parametere avledet fra andre feltverdier ved kjøretid. |
+| Appearance-attributt | Spørsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| `callapi` | text, integer, decimal, select_one | Muliggjør integrasjon av API-kall for dette feltet. Beregningskolonnen skal inneholde et `callapi()`-uttrykk. Se [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Utløser et API-verifiseringskall ved hjelp av statiske parametere. Skjemaet blokkerer fremdrift til API-et bekrefter verdien. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | Samme som `callapi-verify`, men med parametere utledet fra andre feltverdier ved kjøretid. |
 
-### Innebygd dato/klokkeslettformat
+### Språkvelger
 
-For `date`-, `time`- og `datetime`-felt kan du angi et tilpasset visningsformat ved å legge til en formatstreng til utseendet:
+| Appearance-attributt | Spørsmålstyper | Beskrivelse |
+|----------------------|----------------|-------------|
+| `change_language-{colors} default('lang')` | note, text | Rendrer en språkvelger-widget stylet med de gitte fargekodene. `default('lang')`-tokenet angir det opprinnelige språket (f.eks. `default('en')`); det skrives om til `rtDefault('lang')` internt under parsing. Eksempel: `change_language-blue-white default('vi')`. |
+
+### Inline dato-/tidsformat
+
+For felt av typen `date`, `time` og `datetime`, kan du spesifisere et tilpasset visningsformat ved å bruke en formatstreng lagt til utseendet:
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-Formattokener er de samme som for `format-date()` og `format-date-time()`. Se [Funksjoner — Dato og klokkeslettfunksjoner](operators-and-functions/functions#dato-og-klokkeslettfunksjoner).
+Formattokens er de samme som for `format-date()` og `format-date-time()`. Se [Funksjoner — Dato- og tidsfunksjoner](operators-and-functions/functions#date-and-time-functions).
 
 Eksempel:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| datetime | event_time | Hendelsesdato og -tid | inline-[%d/%m/%Y %I:%M %p] |
+| datetime | event_time | Hendelsesdato og -klokkeslett | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | Fødselsdato | inline-[%d/%m/%Y] |
+
+### Layout for inline-knapper — `display{}` og `results{}`
+
+For spørsmålstyper som rendres som en inline ikonknapp (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), kontrollerer to utseendemodifikatorer knappens posisjon og oppførsel etter fangst.
+
+#### `display{...}` — knappeposisjon før fangst
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parameter | Verdier | Standard |
+|-----------|---------|----------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex f.eks. `#FF5500` | primær temafarge |
+| Flag | `inline-icon` | tvinger ikonmodus |
+
+| Align-verdi | Layout |
+|-------------|--------|
+| `right` | Knapp til høyre for etiketten |
+| `left` | Knapp til venstre for etiketten |
+| `top` | Knapp over etiketten, full bredde sentrert |
+| `center` / `bottom` | Knapp under etiketten, full bredde sentrert |
+
+#### `results{...}` — layout og synlighet etter fangst
+
+Arver `display{}`-innstillinger. Bruk for å flytte knappen eller skjule elementer når en verdi er fanget.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| `hide`-verdi | Effekt |
+|---|---|
+| `hide(capture)` | Skjuler fangstknappen når en fil/verdi eksisterer |
+| `hide(review)` | Skjuler miniatyrbilde for gjennomgang / avspillingsknapp |
+| `hide(filename)` | Skjuler filnavnet som vises etter opplasting |
+| `hide(camera)` | Skjuler kamerautløserknappen etter fangst |
+| `hide(scanner)` | Skjuler knappen for svivtrekkodescan etter at en verdi er scannet |
+| `hide(value)` | Skjuler den scannede verditeksten (svivtrekkode / geopoint) |
+
+Widgeten bytter automatisk fra `display{}`- til `results{}`-layout i det øyeblikket en verdi fanges.
+
+**Eksempler:**
+
+```
+inline display{right}                                    → ikon til høyre for etikett
+inline display{left, large}                              → stort ikon til venstre
+inline display{center, large, #FF5500}                   → stort oransje ikon under etikett
+inline display{right} results{left}                      → ikon flyttes til venstre etter fangst
+inline display{right} results{hide(capture)}             → ikon forsvinner etter fangst
+inline display{center} results{hide(capture), hide(filename)}
+```
 
 ## Kjente begrensninger
 
-- Komplekse utseender kan ikke gjengis identisk på alle plattformer.
+- Komplekse utseender rendres kanskje ikke identisk på alle plattformer.
 - Noen avanserte rtSurvey-utseender støttes kanskje ikke i frakoblet modus.
 
 ## Feilsøking av utseendeproblemer
 
-1. **Utseende ikke brukt**: Sjekk for skrivefeil i utseendekolonnen.
-2. **Inkonsistent gjengivelse**: Verifiser kompatibilitet med spørsmålstypen og plattformen.
-3. **Ytelsesproblemer**: Vurder å forenkle komplekse utseender, spesielt for store spørreundersøkelser.
+1. **Utseende ikke brukt**: Sjekk for skrivefeil i appearance-kolonnen.
+2. **Inkonsistent rendring**: Verifiser kompatibilitet med spørsmålstype og plattform.
+3. **Ytelsesproblemer**: Vurder å forenkle komplekse utseender, spesielt for store undersøkelser.

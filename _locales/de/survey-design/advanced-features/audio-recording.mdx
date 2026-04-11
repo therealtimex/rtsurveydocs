@@ -1,0 +1,118 @@
+---
+title: "Audioaufnahme"
+description: "Nehmen Sie Umgebungs- oder Interview-Audio während der Erfassung von Umfragedaten auf, indem Sie die Darstellungsformen audio-start und audio-end in Textfeldern verwenden."
+---
+
+Die Audioaufnahme ermöglicht es einem Formular, während eines Abschnitts einer Umfrage geräuschlos oder sichtbar Audio aufzunehmen. Sie ist nützlich für die Aufzeichnung von Interviews, Umgebungsgeräuschen bei Feldbeobachtungen oder gesprochenen Antworten, die strukturierte Antworten ergänzen.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Nur mobile App.** Die Audioaufnahme erfordert die rtSurvey mobile App. Im Webformular werden die Darstellungsformen `audio-start` und `audio-end` stillschweigend ignoriert — es findet keine Aufnahme statt und es wird kein Fehler angezeigt. Testen Sie immer auf dem Gerät, wenn eine Audioaufnahme erforderlich ist.
+</Callout>
+
+---
+
+## Wie es funktioniert
+
+Die Audioaufnahme wird durch zwei Textfelder (`text`) gesteuert, die als **Marker** fungieren:
+
+- Ein Feld mit der Darstellungsform `audio-start` beginnt mit der Aufnahme, wenn der Enumerator es erreicht.
+- Ein Feld mit der Darstellungsform `audio-end` stoppt die Aufnahme und speichert die Audiodatei in der Übermittlung.
+
+Beide Markerfelder sind vom Typ `text`. Sie sind in der Regel für den Enumerator ausgeblendet (durch `relevant = false` oder an einer nicht interaktiven Position platziert), können aber auch sichtbar sein. Das aufgenommene Audio wird der Übermittlung als Datei beigefügt, die mit dem Feld `audio-end` verknüpft ist.
+
+---
+
+## Basispiel
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Respondent name | |
+| text | q_occupation | Occupation | |
+| integer | q_age | Age | |
+| text | audio_e_a1 | | `audio-end` |
+
+Die App startet die Aufnahme, wenn der Enumerator `audio_s_a1` erreicht, und stoppt, wenn er `audio_e_a1` erreicht. Alle Fragen zwischen den beiden Markern werden aufgezeichnet.
+
+---
+
+## Stille Aufnahme: `audio-start invisible`
+
+Standardmäßig zeigt die mobile App während der Audioaufnahme eine Aufnahmeanzeige an. Durch Hinzufügen von `invisible` zur Darstellungsform wird diese Anzeige unterdrückt, sodass die Aufnahme ohne sichtbaren Hinweis für den Befragten erfolgt.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Do you agree to participate? | |
+| text | q_feedback | Your feedback | |
+| text | audio_e_a1 | | `audio-end` |
+
+Verwenden Sie `invisible` nur dann, wenn die Offenlegungspflichten auf andere Weise erfüllt wurden (z. B. durch ein separates schriftliches Zustimmungsfeld vor dem Aufnahmeabschnitt).
+
+---
+
+## Namenskonvention
+
+Produktionsformulare verwenden ein einheitliches Benennungsmuster für Markerfelder:
+
+```
+audio_s_{section}{n}   — Startmarker
+audio_e_{section}{n}   — Endmarker
+```
+
+Dabei ist `{section}` eine kurze Bezeichnung für den Formularabschnitt und `{n}` eine fortlaufende Nummer innerhalb dieses Abschnitts.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | First recording in section A |
+| `audio_e_a1` | End | End of first recording in section A |
+| `audio_s_b1` | Start | First recording in section B |
+| `audio_e_b1` | End | End of first recording in section B |
+| `audio_s_a2` | Start | Second recording in section A |
+| `audio_e_a2` | End | End of second recording in section A |
+
+Das Befolgen dieser Konvention erleichtert die Identifizierung von Aufnahmegrenzen bei der Überprüfung von Formulardefinitionen und Übermittlungsdaten.
+
+---
+
+## Speicherung und Abruf
+
+Wenn der Enumerator das Feld `audio-end` erreicht, schließt die App die Audiodatei ab und fügt sie der Übermittlung bei. Die Datei ist:
+
+- Als Audioanhang in der Übermittlung gespeichert, der mit dem Feldnamen `audio-end` verknüpft ist.
+- Im rtSurvey-Backend-Übermittlungs-Viewer neben anderen Medienanhängen zugänglich.
+- Über den Standard-Übermittlungsexport herunterladbar — Audiodateien erscheinen in der Medienspalte, die dem Feldnamen `audio-end` entspricht.
+
+Dateiformat und Bitrate hängen vom Gerät und der App-Version ab.
+
+---
+
+## Mehrere Aufnahmeabschnitte
+
+Ein Formular kann mehrere nicht überlappende Aufnahmeabschnitte enthalten. Jedes Paar von `audio-start` / `audio-end` Markern muss vollständig enthalten sein — Abschnitte dürfen sich nicht überschneiden.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Introduction | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Details | |
+| text | audio_e_b1 | | `audio-end` |
+
+Jeder Abschnitt erzeugt eine separate Audiodatei, die dem jeweiligen `audio-end`-Feld beigefügt ist.
+
+---
+
+## Einschränkungen
+
+- **Nur mobile App.** Die Funktion wird im Webformular nicht unterstützt. `audio-start` und `audio-end` werden in einem Browser stillschweigend ignoriert.
+- **Keine Verschachtelung.** Aufnahmeabschnitte können sich nicht überschneiden. Das Starten einer neuen Aufnahme, bevor der vorherige `audio-end`-Marker erreicht wurde, wird nicht unterstützt.
+- **Feldtyp muss `text` sein.** Die Verwendung von `audio-start` oder `audio-end` bei jedem anderen Fragetyp wird nicht unterstützt.
+- **Upload-Größe.** Lange Aufnahmen erzeugen große Dateien. Achten Sie auf Übermittlungsgrößenbeschränkungen und Netzwerkbedingungen vor Ort.
+- **Keine Pause während der Aufnahme.** Die Aufnahme läuft kontinuierlich vom Startmarker bis zum Endmarker; es gibt keinen Mechanismus zum Pausieren und Fortsetzen innerhalb eines Abschnitts.

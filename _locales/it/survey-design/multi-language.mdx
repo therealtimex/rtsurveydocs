@@ -3,81 +3,164 @@ title: "Supporto multilingua"
 description: ""
 ---
 
-rtSurvey fornisce un robusto supporto multilingua, consentendoti di creare sondaggi in più lingue. Questa funzionalità è fondamentale per condurre ricerche su popolazioni linguistiche diverse o in ambienti multilingua.
+rtSurvey offre un solido supporto multilingua, consentendo di creare sondaggi in più lingue. Questa funzione è fondamentale per condurre ricerche tra diverse popolazioni linguistiche o in ambienti multilingue.
 
-## Impostazione di sondaggi multilingua
+## Configurazione di sondaggi multilingua
 
-Per creare un sondaggio multilingua in rtSurvey, devi aggiungere colonne specifiche della lingua al tuo XLSForm. Ecco come:
+Per creare un sondaggio multilingua in rtSurvey, è necessario aggiungere colonne specifiche per la lingua all'XLSForm. Ecco come fare:
 
-1. **Traduzione delle etichette**: Aggiungi colonne per ogni lingua usando il formato `label::Language (code)`.
-2. **Traduzione dei suggerimenti**: Usa `hint::Language (code)` per la traduzione dei suggerimenti.
-3. **Traduzione dei file media**: Per i media specifici della lingua, usa `media::Language (code)`.
+1. **Traduzioni delle etichette**: aggiungi colonne per ogni lingua utilizzando il formato `label::Language (code)`.
+2. **Traduzioni dei suggerimenti**: usa `hint::Language (code)` per tradurre i suggerimenti.
+3. **Traduzioni dei file multimediali**: per i file multimediali specifici della lingua, usa `media::Language (code)`.
 
 Esempio:
 
 ```
-| type    | name | label::Italian (it) | label::English (en) | hint::Italian (it) | hint::English (en) |
+| type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
 |---------|------|---------------------|---------------------|---------------------|---------------------|
-| integer | age  | Quanti anni hai?    | How old are you?    | Inserisci la tua età | Enter your age     |
+| integer | age  | How old are you?    | ¿Cuántos anni tienes?| Enter your age      | Ingrese su edad     |
 ```
 
 ## Codici lingua
 
-Si raccomanda di usare i codici lingua ufficiali a 2 caratteri (subtag) dopo il nome della lingua. Questo facilita la corrispondenza della lingua del modulo con la lingua dell'interfaccia utente. Puoi trovare i codici ufficiali [qui](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+Si consiglia di utilizzare i codici lingua ufficiali a 2 caratteri (subtag) dopo il nome della lingua. Ciò facilita l'abbinamento della lingua del modulo con la lingua dell'interfaccia utente. È possibile trovare i codici ufficiali [qui](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
 ## Impostazione di una lingua predefinita
 
-Per impostare una lingua predefinita per la raccolta dati, usa il foglio di lavoro `settings` nel tuo XLSForm:
+Per impostare una lingua predefinita per la raccolta dei dati, utilizza il foglio di lavoro `settings` nel tuo XLSForm:
 
 ```
 | form_id   | version | default_language |
 |-----------|---------|-------------------|
-| test_form | 101     | Italian (it)      |
+| test_form | 101     | French (fr)       |
 ```
 
 ## Funzionalità specifiche di rtSurvey
 
-### Cambio dinamico della lingua
+### Cambio lingua dinamico
 
-rtSurvey consente agli utenti di cambiare lingua dinamicamente durante la raccolta dati:
+rtSurvey consente agli utenti di cambiare lingua dinamicamente durante la raccolta dei dati:
 
 - Nell'interfaccia web, usa il menu a discesa della lingua nella barra di navigazione superiore.
-- Nell'app mobile, accedi alle opzioni di lingua tramite il menu delle impostazioni.
+- Nell'app mobile, accedi alle opzioni della lingua tramite il menu delle impostazioni.
 
-### Messaggi di validazione specifici della lingua
+### Messaggi di validazione specifici per la lingua
 
-rtSurvey supporta messaggi di vincolo specifici della lingua:
-
-```
-| type    | name | label                  | constraint | constraint_message |
-|---------|------|------------------------|------------|-------------------|
-| integer | age  | Quanti anni hai?       | . > 0 and . < 120 | <en>Age must be between 1 and 120</en><it>L'età deve essere compresa tra 1 e 120</it> |
-```
-
-### Contenuto condizionale multilingua
-
-Usa i tag lingua nelle etichette per contenuto condizionale basato sulla lingua:
+rtSurvey estende il supporto multilingua ai messaggi di validazione:
 
 ```
-<it>Inserisci il tuo nome completo</it><en>Enter your full name</en>
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
+|---------|------|------------|----------------------------------|----------------------------------|
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-## Best practice per i sondaggi multilingua
+### Messaggi di campo obbligatorio localizzati
 
-1. **Usa i codici lingua standardizzati**: Attieniti ai codici lingua ufficiali a 2 caratteri.
-2. **Imposta una lingua predefinita**: Specifica sempre una lingua predefinita nel foglio settings.
-3. **Testa tutte le lingue**: Verifica che le traduzioni siano complete e accurate per ogni lingua.
-4. **Considera il layout**: Alcune lingue possono richiedere più spazio del testo di altre — testa il layout in tutte le lingue.
-5. **Coinvolgi i madrelingua**: Fai sempre revisionare le traduzioni da madrelingua prima del deployment.
+Usa `required_message::Language (code)` per mostrare un errore tradotto quando un campo obbligatorio viene lasciato vuoto:
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
+### Supporto per le lingue RTL
+
+Per le lingue da destra a sinistra (RTL) come l'arabo o l'ebraico, rtSurvey regola automaticamente il layout:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Your name           | اسمك                |
+```
+
+### Aspetto specifico per la lingua
+
+rtSurvey consente di specificare diversi aspetti (appearance) per diverse lingue:
+
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Address          | 地址                 | multiline                | textarea                  |
+```
+
+## Formattazione HTML nelle etichette bilingue
+
+È possibile combinare tag HTML con wrapper di lingua in una singola cella etichetta. rtSurvey estrae il blocco della lingua attiva e renderizza l'HTML rimanente.
+
+Esempio di utilizzo di grassetto e colore del carattere per lingua:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Tag inline supportati all'interno dei wrapper di lingua: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Esempio di testo colorato per lingua:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Calcoli sensibili alla lingua
+
+Quando un modulo ha un campo `${language_use}` (impostato da un widget `change_language`), usa `if()` per restituire i valori nella lingua attiva:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Esempio — visualizza un risultato di ricerca nella lingua attiva utilizzando `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Nota: Il campo `language_use` è solitamente impostato da un widget di aspetto `change_language`. Vedere Appearance — change_language.
+
+## Migliori pratiche per i sondaggi multilingua
+
+1. **Denominazione coerente**: usa codici lingua coerenti in tutto il modulo.
+2. **Traduzione professionale**: impiega traduttori professionisti che abbiano familiarità con il contesto del sondaggio.
+3. **Note di contesto**: fornisci note di contesto ai traduttori per garantire traduzioni accurate.
+4. **Test**: testa il modulo in tutte le lingue prima della distribuzione.
+5. **Supporto Unicode**: assicurati che i dispositivi di raccolta dati supportino Unicode per gli script non latini.
+6. **Media specifici per la lingua**: usa immagini o audio culturalmente appropriati per ogni lingua.
+7. **Evita il testo nelle immagini**: se utilizzi immagini con testo, crea immagini separate per ogni lingua.
+
+## Gestione di casi speciali
+
+### Risposte in lingua mista
+
+rtSurvey consente ai rispondenti di inserire testo in qualsiasi script, indipendentemente dalla lingua del modulo selezionata. Ciò è utile per acquisire nomi o indirizzi nel loro script originale.
+
+### Tipi di domanda specifici per la lingua
+
+Alcuni tipi di domanda potrebbero essere più appropriati per determinate lingue. rtSurvey consente di utilizzare diversi tipi di domanda per diverse lingue:
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
+```
+
+## Esportazione di dati multilingua
+
+Quando si esportano dati da rtSurvey:
+
+- Scegli di esportare in una lingua specifica o includi tutte le versioni linguistiche.
+- I metadati della lingua sono inclusi nell'esportazione, indicando quale lingua è stata utilizzata per ogni risposta.
+
+## Considerazioni sull'app mobile
+
+- L'app mobile rtSurvey supporta il cambio di lingua offline.
+- Assicurati che tutti i file di lingua richiesti siano scaricati prima di andare offline.
 
 ## Limitazioni note
 
-- Il cambio dinamico della lingua potrebbe non ripristinare le risposte già fornite.
-- Alcune funzionalità avanzate di rtSurvey potrebbero avere un supporto limitato per lingue specifiche.
-- Il supporto delle lingue da destra a sinistra (RTL) potrebbe richiedere configurazione aggiuntiva.
+- Alcune funzionalità avanzate potrebbero non essere disponibili in tutte le lingue.
+- Traduzioni estremamente lunghe potrebbero influire sul layout sugli schermi più piccoli.
 
-## Risoluzione dei problemi multilingua
-
-1. **Traduzione non visualizzata**: Controlla che il codice lingua nella colonna corrisponda alla lingua selezionata nell'app.
-2. **Colonne mancanti**: Assicurati che ogni colonna lingua sia presente sia nel foglio survey che nel foglio choices.
-3. **Caratteri non visualizzati**: Verifica che il carattere del dispositivo supporti la lingua di destinazione.
+Sfruttando le funzionalità multilingua di rtSurvey, è possibile creare sondaggi inclusivi e accessibili che raggiungano popolazioni diverse e forniscano dati di alta qualità e linguisticamente accurati.

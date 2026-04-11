@@ -5,265 +5,331 @@ description: ""
 
 import { Callout } from 'nextra/components'
 
-### Funksionet e vargjeve
+### Funksionet e vargjeve (String)
 
 <Callout type="warning">
-Kur punoni me vargje brenda shprehjeve, është e rëndësishme të përdorni thonjëza të vetme ('') për të mbyllur vargjet literale. Megjithatë, bëhet përjashtim kur dëshironi të përfshini thonjëza të vetme brenda një vargu literal. Në raste të tilla, mund të përdorni thonjëza të dyfishta ("") për të mbyllur të gjithë vargun.
+Kur punoni me vargje brenda shprehjeve, është e rëndësishme të përdorni thonjëza teke ('') për të rrethuar vargjet literale. Megjithatë, një përjashtim lind kur dëshironi të përfshini thonjëza teke brenda një vargu literal. Në raste të tilla, mund të përdorni thonjëza dyshe ("") për të rrethuar të gjithë vargun.
 
 Për shembull:
-- E saktë: if(`${yesno}` = 1, "një varg me 'thonjëza të vetme' në të", "pa thonjëza të vetme këtu")
-- E pasaktë: if(`${yesno}` = 1, 'një varg me 'thonjëza të vetme' në të', 'pa thonjëza të vetme këtu')
+- Saktë: if(`${yesno}` = 1, "a string with 'single quotes' in it", "no single quotes here")
+- Gabim: if(`${yesno}` = 1, 'a string with 'single quotes' in it', 'no single quotes here')
 
-Sa i përket thonjëzave inteligjente, është thelbësore të jeni të vetëdijshëm për praninë e tyre, pasi mund të shkaktojnë probleme në shprehje. Shumë redaktorë teksti të pasur konvertojnë automatikisht thonjëzat e drejta ("" ose '') në thonjëza inteligjente ose të lakuara ("" ose ''), të cilat mund të rezultojnë në gabime sintaksore ose sjellje të papritura. Për të shmangur këtë, sigurohuni që po përdorni thonjëza të drejta ('') qëndrueshëm në shprehjet tuaja.
+Sa i përket thonjëzave inteligjente, është thelbësore të jeni të vetëdijshëm për praninë e tyre, pasi ato mund të shkaktojnë probleme në shprehje. Shumë redaktues teksti të pasur konvertojnë automatikasht thonjëzat e drejta ("" ose '') në thonjëza inteligjente ose kaçurrela (“” ose ‘’), të cilat mund të rezultojnë në gabime sintaksore ose sjellje të papritur. Për të shmangur këtë, sigurohuni që të përdorni thonjëza e drejta ('') vazhdimisht në shprehjet tuaja.
+
+Ju lutemi më njoftoni nëse keni ndonjë pyetje të mëtejshme ose keni nevojë për ndihmë shtesë!
 </Callout>
 
 rtSurvey mbështet funksione të ndryshme, duke përfshirë:
 
-1. `string(field)`: Konverton një fushë në varg.
+1. `string(field)`: Konverton një fushë në varg (string).
    - Shembull: `string(34.8)` do të konvertohet në `'34.8'`.
 
-2. `string-length(field)`: Kthen gjatësinë e një fushe vargu.
-   - Shembull: `string-length(.) > 3 and string-length(.) < 10` mund të përdoret për të garantuar që fusha aktuale është midis 3 dhe 10 karaktereve.
+2. `string-length(field)`: Kthen gjatësinë e një fushe varg (string).
+   - Shembull: `string-length(.) > 3 and string-length(.) < 10` mund të përdoret për të siguruar që fusha aktuale është midis 3 dhe 10 karaktereve.
+   - **Pattern-i i varësisë kaskadë**: `string-length(${province}) >= 0` vlerësohet gjithmonë si `true` por e detyron rtSurvey të ri-vlerësojë shprehjen sa herë që ndryshon `${province}`. Përdoreni këtë në `relevant` për të shkaktuar një rifreskim kaskadë kur një fushë prindërore përditësohet:
+     | type | name | relevant |
+     |------|------|----------|
+     | select_one | district | `string-length(${province}) >= 0` |
+     Kjo siguron që pyetja e rrethit ri-vlerëson pamjen e saj `search()` ose `rawquery` sa herë që provinca ndryshon.
 
-3. `substr(fieldorstring, startindex, endindex)`: Kthen një nënvarg duke filluar nga `startindex` dhe duke mbaruar pak para `endindex`. Indekset fillojnë nga 0 për karakterin e parë në varg.
-   - Shembull: `substr(${phone}, 0, 3)` do të kthejë tre shifrat e para të numrit të telefonit.
+3. `substr(fieldorstring, startindex, endindex)`: Kthen një nënvarg duke filluar në `startindex` dhe duke përfunduar pak para `endindex`. Indekset fillojnë në 0 për karakterin e parë në varg.
+   - Shembull: `substr(${phone}, 0, 3)` do të kthejë tre shifrat e para të një numri telefoni.
 
-4. `concat(a, b, c, ...)`: Bashkon fushat (dhe/ose vargjet) bashkë.
-   - Shembull: `concat(${firstname}, ' ', ${lastname})` do të kthejë emrin e plotë duke kombinuar vlerat në fushat `firstname` dhe `lastname`.
+4. `concat(a, b, c, ...)`: Bashkon fushat (dhe/ose vargjet) së bashku.
+   - Shembull: `concat(${firstname}, ' ', ${lastname})` do të kthejë një emër të plotë duke kombinuar vlerat në fushat `firstname` dhe `lastname`.
 
-5. `linebreak()`: Kthen një karakter rreshti të ri.
-   - Shembull: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` do të kthejë një listë të tre vlerave fushësh me rreshta të rinj midis tyre.
+5. `linebreak()`: Kthen një karakter ndërprerjeje rreshti (linebreak).
+   - Shembull: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` do të kthejë një listë me tre vlera fushash me ndërprerje rreshtash mes tyre.
 
-6. `lower()`: Konverton një varg në të gjitha karaktere me shkronja të vogla.
-   - Shembull: `lower('Emri i Rrugës')` do të kthejë "emri i rrugës".
+6. `lower()`: Konverton një varg në të gjithë karakteret e vogla.
+   - Shembull: `lower('Street Name')` do të kthejë "street name".
 
-7. `upper()`: Konverton një varg në të gjitha karaktere me shkronja kapitale.
-   - Shembull: `upper('Emri i Rrugës')` do të kthejë "EMRI I RRUGËS".
+7. `upper()`: Konverton një varg në të gjithë karakteret e mëdha.
+   - Shembull: `upper('Street Name')` do të kthejë "STREET NAME".
 
 ### Funksionet select_one dhe select_multiple
 
-1. `count-selected(field)`: Kthen numrin e artikujve të zgjedhur në një fushë select_multiple.
-   - Shembull: `count-selected(.) = 3` mund të përdoret si shprehje kufizimi për të garantuar saktësisht tre zgjedhje.
+1. `count-selected(field)`: Kthen numrin e artikujve të përzgjedhur në një fushë select_multiple.
+   - Shembull: `count-selected(.) = 3` mund të përdoret si një shprehje kufizuese (`constraint`) për të siguruar që janë përzgjedhur saktësisht tre zgjedhje.
 
-2. `selected(field, value)`: Kthen të vërtetën ose të rremin varësisht nga nëse vlera e specifikuar u zgjodh në fushën select_one ose select_multiple.
-   - Shembull: `selected(${color}, 'Blue')` mund të përdoret si shprehje relevant për të treguar grup ose fushë vetëm nëse i anketuari zgjodhi "Blue" si ngjyrën e preferuar.
-   - Shënim: Parametri i dytë duhet të specifikojë gjithmonë vlerën e zgjedhjes, jo etiketën e zgjedhjes.
+2. `selected(field, value)`: Kthen true ose false varësisht nëse vlera e specifikuar është përzgjedhur në fushën select_one ose select_multiple.
+   - Shembull: `selected(${color}, 'Blue')` mund të përdoret si një shprehje rëndësie (`relevant`) për të shfaqur një grup ose fushë vetëm nëse i intervistuari ka përzgjedhur "Blue" si ngjyrën e tyre të preferuar.
+   - Shënim: Parametri i dytë duhet të specifikojë gjithmonë vlerën e zgjedhjes, jo etiketën e zgjedhjes. Përdorni vlerën nga kolona value në fletën e punës choices të përkufizimit të formularit.
 
-3. `selected-at(field, number)`: Kthen artikullin e zgjedhur në pozicionin e specifikuar në një fushë select_multiple.
-   - Shembull: `selected-at(${fruits}, 0) = 'Apple'` mund të përdoret si shprehje relevant për të treguar grupin ose fushën vetëm nëse zgjedhja e parë e zgjedhur është "Apple".
+3. `selected-at(field, number)`: Kthen artikullin e përzgjedhur në pozicionin e specifikuar në një fushë select_multiple. Kur numri i kaluar është 0, kthen artikullin e parë të përzgjedhur; kur numri është 1, kthen artikullin e dytë të përzgjedhur, e kështu me radhë.
+   - Shembull: `selected-at(${fruits}, 0) = 'Apple'` mund të përdoret si një shprehje rëndësie (`relevant`) për të shfaqur një grup ose fushë vetëm nëse zgjedhja e parë e përzgjedhur është "Apple".
+   - Shënim: Vlera e kthyer do të jetë vlera e zgjedhjes, jo etiketa e zgjedhjes. Përdorni vlerën nga kolona value në fletën e punës choices të përkufizimit të formularit.
 
-4. `choice-label(field, value)`: Kthen etiketën për një zgjedhje fushe select_one ose select_multiple.
-   - Shembull 1: `choice-label(${country}, ${country})` do të kthejë etiketën e zgjedhjes për zgjedhjen aktuale të zgjedhur në fushën `country`.
-   - Shembull 2: `choice-label(${languages}, selected-at(${languages}, 0))` do të kthejë etiketën për zgjedhjen e parë të zgjedhur në fushën `languages`.
+4. `choice-label(field, value)`: Kthen etiketën për një zgjedhje të fushës select_one ose select_multiple, siç është përcaktuar në fletën e punës choices të përkufizimit të formularit.
+   - Shembull 1: `choice-label(${country}, ${country})` do të kthejë etiketën e zgjedhjes për zgjedhjen aktualisht të përzgjedhur në fushën e emërtuar `country`.
+   - Shembull 2: `choice-label(${languages}, selected-at(${languages}, 0))` do të kthejë etiketën për zgjedhjen e parë të përzgjedhur në fushën e emërtuar `languages`.
+   - Shënim: Ky funksion merr etiketën e zgjedhjes, jo vlerën. Përdor kolonën label nga fleta e punës choices të përkufizimit të formularit.
 
 ### Funksionet e fushave të përsëritura
 
-Në rtSurvey, nëse dëshironi të bëni të njëjtën pyetje(t) disa herë, mund të vendosni një fushë brenda një grupi përsëritjeje. Kjo rezulton në instanca të shumëfishta të të njëjtës fushë. Funksionet e mëposhtme mund t'ju ndihmojnë të trajtoni këto fusha të përsëritura dhe të dhënat e përsëritura që prodhojnë.
+Në rtSurvey, nëse dëshironi të bëni të njëjtën pyetje (pyetje) disa herë, mund të vendosni një fushë brenda një grupi përsëritës (repeat group). Kjo rezulton në instanca të shumta të së njëjtës fushë. Funksionet e mëposhtme mund t'ju ndihmojnë të merreni me këto fushat e përsëritura dhe të dhënat e përsëritura që ato prodhojnë. Shihni temën e ndihmës mbi fushat e përsëritura për më shumë detaje.
 
-1. `join(string, repeatedfield)`: Për një fushë brenda një grupi përsëritjeje, gjeneron një listë të vlerave të ndara me varg. Parametri i parë specifikon kufizuesin për të ndarë vlerat.
-   - Shembull: `join(', ', ${member_name})` do të gjenerojë një listë të vetme të ndarë me presje nga të gjitha emrat e futur.
+1. `join(string, repeatedfield)`: Për një fushë brenda një grupi përsëritës, gjeneron një listë vlerash të ndara me varg (string). Parametri i parë specifikon ndarësin që do të përdoret për të ndarë vlerat.
+   - Shembull: `join(', ', ${member_name})` do të gjenerojë një listë të vetme të ndarë me presje nga të gjithë emrat e futur.
 
-2. `join-if(string, repeatedfield, expression)`: Funksionon saktësisht si `join()`, përveçse kontrollon çdo instancë në grupin e përsëritjes duke përdorur shprehjen e furnizuar.
-   - Shembull: `join-if(', ', ${member_name}, ${age} >= 18)` do të gjenerojë një listë të ndarë me presje të emrave vetëm të anëtarëve adult (ata me moshë 18 e lart).
+2. `join-if(string, repeatedfield, expression)`: Funksionon saktësisht si `join()`, përveç se kontrollon çdo instancë në grupin përsëritës duke përdorur shprehjen e dhënë. Nëse shprehja vlerësohet si false, artikulli do të hiqet nga prodhimi.
+   - Shembull: `join-if(', ', ${member_name}, ${age} >= 18)` do të gjenerojë një listë emrash të ndarë me presje vetëm për anëtarët e rritur (ata me moshë 18 vjeç e lart).
 
-3. `count(repeatgroup)`: Kthen numrin aktual të herëve që një grup përsëritjeje ka përsëritur.
+3. `count(repeatgroup)`: Kthen numrin aktual të herëve që një grup përsëritës është përsëritur.
    - Shembull: `count(${groupname})` do të kthejë numrin e instancave të grupit.
 
-4. `count-if(repeatgroup, expression)`: Funksionon saktësisht si `count()`, përveçse kontrollon çdo instancë duke përdorur shprehjen e furnizuar.
-   - Shembull: `count-if(${members}, ${age} >= 18)` do të kthejë numrin e anëtarëve adult bazuar në fushën e moshës brenda grupit "members".
+4. `count-if(repeatgroup, expression)`: Funksionon saktësisht si `count()`, përveç se kontrollon çdo instancë në grupin përsëritës duke përdorur shprehjen e dhënë. Nëse shprehja vlerësohet si false, artikulli do të hiqet nga prodhimi.
+   - Shembull: `count-if(${members}, ${age} >= 18)` do të kthejë numrin e anëtarëve të rritur bazuar në fushën age brenda grupit përsëritës "members".
 
-5. `sum(repeatedfield)`: Për një fushë brenda një grupi përsëritjeje, llogarit shumën e të gjitha vlerave.
-   - Shembull: `sum(${loan_amount})` do të kthejë vlerën totale të të gjitha kredive.
+5. `sum(repeatedfield)`: Për një fushë brenda një grupi përsëritës, llogarit shumën e të gjitha vlerave.
+   - Shembull: `sum(${loan_amount})` do të kthejë vlerën totale të të gjitha huave.
 
-6. `sum-if(repeatedfield, expression)`: Funksionon saktësisht si `sum()`, përveçse kontrollon çdo instancë duke përdorur shprehjen e furnizuar.
-   - Shembull: `sum-if(${loan_amount}, ${loan_amount} > 500)` do të kthejë vlerën totale të të gjitha kredive mbi 500.
+6. `sum-if(repeatedfield, expression)`: Funksionon saktësisht si `sum()`, përveç se kontrollon çdo instancë në grupin përsëritës duke përdorur shprehjen e dhënë. Nëse shprehja vlerësohet si false, artikulli do të hiqet nga prodhimi.
+   - Shembull: `sum-if(${loan_amount}, ${loan_amount} > 500)` do të kthejë vlerën totale të të gjitha huave që janë mbi 500. Huatë më të vogla do të injorohen.
 
-7. `min(repeatedfield)`: Për një fushë brenda një grupi përsëritjeje, llogarit minimumin e të gjitha vlerave.
+7. `min(repeatedfield)`: Për një fushë brenda një grupi përsëritës, llogarit minimumin e të gjitha vlerave.
    - Shembull: `min(${member_age})` do të kthejë moshën e anëtarit më të ri në grup.
 
-8. `min-if(repeatedfield, expression)`: Funksionon saktësisht si `min()`, përveçse kontrollon çdo instancë duke përdorur shprehjen e furnizuar.
+8. `min-if(repeatedfield, expression)`: Funksionon saktësisht si `min()`, përveç se kontrollon çdo instancë në grupin përsëritës duke përdorur shprehjen e dhënë. Nëse shprehja vlerësohet si false, artikulli do të hiqet nga prodhimi.
+   - Shembull: `min-if(${member_age}, ${member_age} >= 18)` do të kthejë moshën e të rriturit më të ri në grup. Ata më të rinj se 18 vjeç do të injorohen.
 
-9. `max(repeatedfield)`: Për një fushë brenda një grupi përsëritjeje, llogarit maksimumin e të gjitha vlerave.
-   - Shembull: `max(${member_age})` do të kthejë moshën e anëtarit më të vjetër në grup.
+9. `max(repeatedfield)`: Për një fushë brenda një grupi përsëritës, llogarit maksimumin e të gjitha vlerave.
+   - Shembull: `max(${member_age})` do të kthejë moshën e anëtarit më të moshuar në grup.
 
-10. `max-if(repeatedfield, expression)`: Funksionon saktësisht si `max()`, përveçse kontrollon çdo instancë duke përdorur shprehjen e furnizuar.
+10. `max-if(repeatedfield, expression)`: Funksionon saktësisht si `max()`, përveç se kontrollon çdo instancë në grupin përsëritës duke përdorur shprehjen e dhënë. Nëse shprehja vlerësohet si false, artikulli do të hiqet nga prodhimi.
+    - Shembull: `max-if(${member_age}, ${member_age} >= 18)` do të kthejë moshën e të rriturit më të moshuar në grup. Ata më të rinj se 18 vjeç do të injorohen.
 
-11. `index()`: I thirrur brenda një grupi përsëritjeje, kthen numrin e indeksit për grupin ose instancën aktuale.
-    - Shembull: `index()` kur përdoret brenda një grupi përsëritjeje do të kthejë 1 për instancën e parë, 2 për të dytën, dhe kështu me radhë.
+11. `index()`: Thirrur brenda një grupi përsëritës, kthen numrin e indeksit për grupin ose instancën aktuale.
+    - Shembull: `index()` kur përdoret brenda një grupi përsëritës do të kthejë 1 për instancën e parë, 2 për të dytën, e kështu me radhë.
 
-12. `indexed-repeat(repeatedfield, repeatgroup, index)`: Referon një fushë ose grup brenda një grupi përsëritjeje nga jashtë atij grupi.
-    - Shembull 1: `indexed-repeat(${name}, ${names}, 1)` do të kthejë emrin e parë të disponueshëm kur fusha e emrit është brenda një grupi të mëparshëm përsëritjeje të quajtur "names".
-    - Shembull 2: `indexed-repeat(${name}, ${names}, index())` do të tërheqë emrin përkatës numrit të instancës së grupit aktual të përsëritjes.
+12. `indexed-repeat(repeatedfield, repeatgroup, index)`: Referon një fushë ose grup që është brenda një grupi përsëritës nga jashtë atij grupi përsëritës. Parametri i parë specifikon fushën ose grupin e përsëritur të interesit, i dyti specifikon grupin përsëritës brenda të cilit ndodhet fusha ose grupi, dhe i treti specifikon numrin e instancës brenda grupit përsëritës për t'u përdorur.
+    - Shembull 1: `indexed-repeat(${name}, ${names}, 1)` do të kthejë emrin e parë të disponueshëm kur fusha name është brenda një grupi përsëritës pararendës të emërtuar "names".
+    - Shembull 2: `indexed-repeat(${name}, ${names}, index())` do të tërheqë emrin që korrespondon me numrin e instancës së grupit përsëritës aktual.
 
-13. `rank-index(index, repeatedfield)`: Ky funksion llogarit rendin ordinal të instancës së specifikuar të një fushe të përsëritur për përdorim jashtë grupit të përsëritjes.
-    - Shembull: `rank-index(1, ${random_draw})` llogarit rendin e instancës së parë bazuar në vlerën e fushës së saj `random_draw` krahasuar me vlerat e instancave të tjera.
+13. `rank-index(index, repeatedfield)`: Ky funksion llogarit renditjen ordinale të instancës së specifikuar të një fushe të përsëritur për përdorim jashtë grupit përsëritës. Renditja 1 i caktohet instancës me vlerën më të lartë, renditja 2 instancës me vlerën vijuese më të lartë, e kështu me radhë. Nëse kaloni një indeks të pavlefshëm ose një indeks në një instancë me vlerë jo-numerike, do të kthehet renditja 999.
+    - Shembull: `rank-index(1, ${random_draw})` llogarit renditjen e instancës së parë bazuar në vlerën e fushës së saj `random_draw` në krahasim me vlerat e instancave të tjera.
 
-14. `rank-index-if(index, repeatedfield, expression)`: Ky funksion funksionon ngjashëm me `rank-index()`, por kontrollon çdo instancë duke përdorur shprehjen e furnizuar.
+14. `rank-index-if(index, repeatedfield, expression)`: Ky funksion punon në mënyrë të ngjashme me `rank-index()`, por kontrollon çdo instancë në grupin përsëritës të fushës së përsëritur duke përdorur shprehjen e dhënë. Nëse shprehja vlerësohet si false, artikulli do të hiqet nga llogaritja. Indeksi i përdorur bazohet në grupin e plotë të instancave para vlerësimit të shprehjes për çdo instancë. Nëse kaloni një indeks për një instancë që është injoruar për shkak të mosplotësimit të shprehjes, ai konsiderohet si indeks i pavlefshëm dhe do të kthehet renditja 999.
+    - Shembull: `rank-index-if(1, ${age}, ${age} >= 18)` llogarit renditjen e moshës brenda grupit të të rriturve, duke konsideruar vetëm instancat ku mosha është më e madhe ose e barabartë me 18.
 
-### Funksionet e numrave
+### Funksionet numerike 
 
-| Operatori | Operacioni | Shembulli | Përgjigja e shembullit |
+| Operator | Operacioni | Shembull | Përgjigje shembull |
 |----------|-----------|---------|----------------|
-| `+` | Mbledhje | 1 + 1 | 2 |
-| `-` | Zbritje | 3 - 2 | 1 |
-| `*` | Shumëzim | 3 * 2 | 6 |
-| `div` | Pjesëtim | 10 div 2 | 5 |
-| `mod` | Modulo | 9 mod 2 | 1 |
+| `+` | Mbledhja | 1 + 1 | 2 |
+| `-` | Zbritja | 3 - 2 | 1 |
+| `*` | Shumëzimi | 3 * 2 | 6 |
+| `div` | Pjesëtimi | 10 div 2 | 5 |
+| `mod` | Modulus | 9 mod 2 | 1 |
 
-rtSurvey mbështet funksionet e numrave, duke përfshirë:
-- `number(field)`: Konverton vlerën e fushës në numër.
+rtSurvey mbështet funksione numerike, duke përfshirë:
+- `number(field)`: Konverton vlerën e fushës në një numër.
   - Shembull: `number('34.8')` = 34.8
 
-- `int(field)`: Konverton vlerën e fushës në numër të plotë.
+- `int(field)`: Konverton vlerën e fushës në një numër të plotë (integer).
   - Shembull: `int('39.2')` = 39
 
 - `min(field1, ..., fieldx)`: Kthen vlerën minimale midis fushave të kaluara.
-  - Shembull: `min(${father_age}, ${mother_age})` do të kthejë moshën ose të atit ose të nënës, cilado që është më e vogël.
+  - Shembull: `min(${father_age}, ${mother_age})` do të kthejë moshën e nënës ose të babait, cilado që është më e vogël.
 
 - `max(field1, ..., fieldx)`: Kthen vlerën maksimale midis fushave të kaluara.
-  - Shembull: `max(${father_age}, ${mother_age})` do të kthejë moshën ose të atit ose të nënës, cilado që është më e madhe.
+  - Shembull: `max(${father_age}, ${mother_age})` do të kthejë moshën e nënës ose të babait, cilado që është më e madhe.
 
-- `format-number(field)`: Formon vlerën e një fushe numër të plotë ose decimal sipas cilësimeve të lokaleve të përdoruesit.
+- `format-number(field)`: Formaton vlerën e një fushe numër i plotë ose dhjetor sipas cilësimeve të gjuhës së përdoruesit.
+  - Shembull: `format-number(${income})` Kjo shprehje mund të formatojë "120000" si "120,000".
 
-- `round(field, digits)`: Rrumbullakon vlerën e fushës numerike në numrin e specifikuar të shifrave pas pikës decimale.
+- `round(field, digits)`: Rrumbullakos vlerën e fushës numerike në numrin e specifikuar të shifrave pas presjes dhjetore.
+  - Shembull: `round(${interest_rate}, 2)`
 
 - `abs(number)`: Kthen vlerën absolute të një numri.
+  
+- `pow(base, exponent)`: Kthen vlerën e parametrit të parë të ngritur në fuqinë e parametrit të dytë.
+  - Çdo parametër mund të jetë një fushë, numër ose shprehje.
 
-- `pow(base, exponent)`: Kthen vlerën e parametrit të parë ngritur në fuqinë e parametrit të dytë.
+- `log10(fieldorvalue)`: Kthen logaritmin me bazë dhjetë të fushës ose vlerës së kaluar.
 
-- `log10(fieldorvalue)`: Kthen logaritmin bazë-dhjetë të fushës ose vlerës të kaluar.
+- `sin(fieldorvalue)`: Kthen sinusin e fushës ose vlerës së kaluar, të shprehur në radianë.
+  
+- `cos(fieldorvalue)`: Kthen kosinusin e fushës ose vlerës së kaluar, të shprehur në radianë.
 
-- `sin(fieldorvalue)`: Kthen sinusin e fushës ose vlerës të kaluar, e shprehur në radianë.
+- `tan(fieldorvalue)`: Kthen tangjentin e fushës ose vlerës së kaluar, të shprehur në radianë.
 
-- `cos(fieldorvalue)`: Kthen kosinusin e fushës ose vlerës të kaluar, e shprehur në radianë.
+- `asin(fieldorvalue)`: Kthen arkusing e fushës ose vlerës së kaluar, të shprehur në radianë.
 
-- `tan(fieldorvalue)`: Kthen tangentin e fushës ose vlerës të kaluar, e shprehur në radianë.
+- `acos(fieldorvalue)`: Kthen arkokosinusin e fushës ose vlerës së kaluar, të shprehur në radianë.
 
-- `asin(fieldorvalue)`: Kthen arksinusin e fushës ose vlerës të kaluar, e shprehur në radianë.
+- `atan(fieldorvalue)`: Kthen arkotangjentin e fushës ose vlerës së kaluar, të shprehur në radianë.
 
-- `acos(fieldorvalue)`: Kthen arkkosinusin e fushës ose vlerës të kaluar, e shprehur në radianë.
+- `atan2(x, y)`: Kthen këndin në radianë të krijuar në origjinë nga pika me koordinata (x, y) dhe boshtin pozitiv x. Rezultati është në diapazonin -pi() deri në pi().
 
-- `atan(fieldorvalue)`: Kthen arktangentin e fushës ose vlerës të kaluar, e shprehur në radianë.
-
-- `atan2(x, y)`: Kthen këndin në radianë.
-
-- `sqrt(fieldorvalue)`: Kthen rrënjën katrore jo-negative të fushës ose vlerës të kaluar.
+- `sqrt(fieldorvalue)`: Kthen rrënjën katrore jo-negative të fushës ose vlerës së kaluar.
 
 - `exp(x)`: Kthen vlerën e e^x.
 
 - `pi()`: Kthen vlerën e pi.
 
-### Funksionet e datës dhe orës
+### Funksionet e datës dhe kohës
 
 <Callout type="warning">
-Vlerat e datës në rtSurvey ruhen si vargje në formatin `YYYY-MM-DD`. Vlerat datetime ruhen si vargje ISO 8601 (`YYYY-MM-DDTHH:MM:SS`). Përdorni `decimal-date-time()` për të konvertuar në numër për aritmetikë (p.sh., llogaritja e kohëzgjatjeve).
+Vlerat e datës në rtSurvey ruhen si vargje (strings) në formatin `YYYY-MM-DD`. Vlerat e datës dhe kohës (datetime) ruhen si vargje ISO 8601 (`YYYY-MM-DDTHH:MM:SS`). Përdorni `decimal-date-time()` për të konvertuar në një numër për aritmetikë (p.sh., llogaritjen e kohëzgjatjeve).
 </Callout>
 
-1. `today()`: Kthen datën e sotme si varg në formatin `YYYY-MM-DD`. Vlerësohet një herë kur formulari hapet.
+1. `today()`: Kthen datën e sotme si një varg (string) në formatin `YYYY-MM-DD`. Vlerësohet një herë kur formulari hapet.
    - Shembull: `today()` → `'2024-03-15'`
+   - Përdorimi i zakonshëm: Kolona `default` për të para-plotësuar datën e sotme, ose në `relevant`/`constraint` për të krahasuar me një fushë date.
 
-2. `now()`: Kthen datën dhe orën aktuale si varg ISO 8601. Vlerësohet çdo herë që llogaritet shprehja.
+2. `now()`: Kthen datën dhe kohën aktuale si një varg ISO 8601. Vlerësohet çdo herë që shprehja llogaritet.
    - Shembull: `now()` → `'2024-03-15T14:32:00.000+03:00'`
+   - Përdorimi i zakonshëm: Regjistrimi i vulës kohore ekzakte të një ngjarjeje specifike gjatë anketës.
 
-3. `date(value)`: Konverton një vlerë (varg ose numër) në varg date.
+3. `date(value)`: Konverton një vlerë (varg ose numër) në një varg date. I dobishëm për të detyruar vlerat e llogaritura në një lloj date.
    - Shembull: `date('2024-03-15')` → `'2024-03-15'`
 
-4. `date-time(value)`: Konverton një vlerë në varg datetime.
+4. `date-time(value)`: Konverton një vlerë në një varg datetime.
+   - Shembull: `date-time(${event_timestamp})`
 
-5. `decimal-date-time(value)`: Konverton një varg date ose datetime në numër decimal që përfaqëson milisekonda nga epoka Unix të pjesëtuara me 86400000. Përdoreni për të kryer aritmetikë në data.
+5. `decimal-date-time(value)`: Konverton një varg date ose datetime në një numër dhjetor që përfaqëson milisekonda që nga epoka Unix pjesëtuar me 86400000 (d.m.th., ditët thyesore që nga 1970-01-01). Përdoreni këtë për të kryer aritmetikë mbi datat.
    - Shembull: Kohëzgjatja në ditë midis dy datave:
      `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
+   - Shembull: Kohëzgjatja në minuta midis dy datetime:
+     `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
 
-6. `format-date(date, format)`: Formon një vlerë date duke përdorur një varg modeli.
-   - Shenjat e formatit: `%Y` (viti 4-shifror), `%y` (viti 2-shifror), `%m` (muaji 01–12), `%d` (dita 01–31), `%a` (shkurtim i ditës së javës), `%b` (shkurtim i emrit të muajit)
+6. `format-date(date, format)`: Formaton një vlerë date duke përdorur një varg pattern-i.
+   - Tokenët e formatit: `%Y` (viti me 4 shifra), `%y` (viti me 2 shifra), `%m` (muaji 01–12), `%d` (dita 01–31), `%a` (dita e javës e shkurtuar), `%b` (emri i muajit i shkurtuar)
    - Shembull: `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
+   - Shembull: `format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
 
-7. `format-date-time(datetime, format)`: Formon një vlerë datetime duke përdorur një varg modeli. Pranon të gjitha shenjat `format-date` plus:
-   - `%H` (ora 00–23), `%h` (ora 01–12), `%M` (minutat 00–59), `%S` (sekondat 00–59), `%3` (milisekondat), `%P` (AM/PM)
+7. `format-date-time(datetime, format)`: Formaton një vlerë datetime duke përdorur një varg pattern-i. Pranon të gjithë tokenët e `format-date` plus:
+   - `%H` (ora 00–23), `%h` (ora 01–12), `%M` (minutat 00–59), `%S` (sekondat 00–59), `%3` (milisekonda), `%P` (AM/PM)
+   - Shembull: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
+   - Shembull: `format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
+
+8. `STRFTIME(format, datetime)`: Formatim i datës në stilin SQLite. I disponueshëm brenda vargjeve SQL të kaluara në pyetjet `rawquery` — **jo** i disponueshëm në kolonat `calculation` ose `label` të XLSForm. Përdor tokenët e formatit SQLite (`%Y`, `%m`, `%d`, `%H`, `%M`, `%S`).
+   - Shembull brenda një vargu SQL të rawquery: `'SELECT STRFTIME(''%Y-%m'', interview_date) AS month FROM data WHERE id = ?'`
+   - Shënim: Përdorni `format-date-time()` për formatimin e datës në shprehjet XLSForm. `STRFTIME()` është një funksion SQLite i disponueshëm vetëm brenda SQL të kaluar në `rawquery`.
 
 ---
 
-### Funksionet boolean
+### Funksionet Boolean
 
-1. `boolean(value)`: Konverton çdo vlerë në boolean. Kthen `true` për vargje jo-bosh, numra jo-zero dhe `true`; kthen `false` për vargje bosh, `0` dhe `false`.
+1. `boolean(value)`: Konverton çdo vlerë në boolean. Kthen `true` për vargjet jo-bosh, numrat jo-zero dhe `true`; kthen `false` për vargjet bosh, `0` dhe `false`.
+   - Shembull: `boolean(${name})` kthen `true` nëse `name` nuk është bosh.
 
-2. `boolean-from-string(string)`: Kthen `true` nëse vargu është `'1'` ose `'true'` (pa ndjekshmëri ndaj shkronjave); kthen `false` ndryshe.
+2. `boolean-from-string(string)`: Kthen `true` nëse vargu është `'1'` ose `'true'` (pa marrë parasysh shkronjat e mëdha/vogla); kthen `false` ndryshe.
+   - Shembull: `boolean-from-string(${enabled_flag})` — i dobishëm kur një fushë ruan `'true'`/`'false'` si tekst.
 
 3. `true()`: Kthen vlerën boolean `true`.
+   - Shembull: Në kolonën `required`, `true()` është e barabartë me `yes`.
 
 4. `false()`: Kthen vlerën boolean `false`.
+   - Shembull: `if(${skip_section} = 'yes', false(), true())` — vendos në mënyrë dinamike detyrimin (required).
 
-5. `not(expression)`: Kthen negacionin logjik të shprehjes. Kthen `true` nëse shprehja është e rreme, dhe anasjelltas.
-   - Shembull: `not(${consent} = 'yes')` — tregon paralajmërim kur konsenti NUK u dha.
+5. `not(expression)`: Kthen mohimin logjik të shprehjes. Kthen `true` nëse shprehja është false, dhe anasjelltas.
+   - Shembull: `not(${consent} = 'yes')` — shfaq një paralajmërim kur miratimi NUK është dhënë.
+   - Shembull: `not(selected(${issues}, 'none'))` — kërkon detaje vetëm nëse "asnjë" nuk u përzgjodh.
 
 ---
 
-### Funksione shtesë vargjesh
+### Funksione shtesë të vargjeve (string)
 
 1. `starts-with(string, prefix)`: Kthen `true` nëse `string` fillon me `prefix`.
+   - Shembull: `starts-with(${phone}, '+254')` kontrollon nëse numri i telefonit fillon me kodin e shtetit të Kenias.
 
 2. `contains(string, substring)`: Kthen `true` nëse `string` përmban `substring`.
+   - Shembull: `contains(${email}, '@')` kontrollon që një adresë emaili ka një shenjë `@`.
+   - Shembull: `contains(${notes}, 'urgent')` shkakton një pyetje vijuese nëse shënimet përmendin "urgent".
 
 3. `substring-before(string, needle)`: Kthen pjesën e `string` që shfaqet para shfaqjes së parë të `needle`.
+   - Shembull: `substring-before(${full_name}, ' ')` nxjerr fjalën e parë (emrin).
 
 4. `substring-after(string, needle)`: Kthen pjesën e `string` që shfaqet pas shfaqjes së parë të `needle`.
+   - Shembull: `substring-after(${email}, '@')` nxjerr pjesën e domenit të një adrese emaili.
 
-5. `normalize-space(string)`: Heq hapësirat kryesore dhe fundore dhe ngushton të gjitha sekuencat e brendshme hapësirave në një hapësirë të vetme.
+5. `normalize-space(string)`: Heq hapësirat e bardha fillestare dhe përfundimtare dhe redukton të gjitha sekuencat e brendshme të hapësirave të bardha në një hapësirë të vetme.
+   - Shembull: `normalize-space(${name})` — pastron një emër që mund të jetë shtypur me hapësira shtesë.
 
-6. `translate(string, search_chars, replace_chars)`: Zëvendëson çdo karakter në `string` që shfaqet në `search_chars` me karakterin korrespondues në `replace_chars`.
+6. `translate(string, search_chars, replace_chars)`: Zëvendëson çdo karakter në `string` që shfaqet në `search_chars` me karakterin korrespondues në `replace_chars`. Karakteret në `search_chars` pa karakter korrespondues në `replace_chars` fshihen.
+   - Shembull: `translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` konverton në shkronja të mëdha (e barabartë me `upper()`).
+   - Shembull: `translate(${phone}, ' -()', '')` heq hapësirat, vizat dhe kllapat nga një numër telefoni.
 
 ---
 
 ### Funksione shtesë matematike
 
-1. `floor(number)`: Kthen numrin e plotë më të madh që është më i vogël ose i barabartë me `number` (rrumbullakon drejt negativiteti të pafund).
+1. `floor(number)`: Kthen numrin e plotë më të madh më të vogël ose të barabartë me `number` (rrumbullakoset drejt pafundësisë negative).
+   - Shembull: `floor(4.9)` = 4, `floor(-2.1)` = -3
 
-2. `ceiling(number)`: Kthen numrin e plotë më të vogël që është më i madh ose i barabartë me `number` (rrumbullakon drejt pozitiviteti të pafund).
+2. `ceiling(number)`: Kthen numrin e plotë më të vogël më të madh ose të barabartë me `number` (rrumbullakoset drejt pafundësisë pozitive).
+   - Shembull: `ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
 
-3. `random()`: Kthen një numër decimal të rastit midis 0.0 (i përfshirë) dhe 1.0 (i përjashtuar).
-   - Shembull: `int(random() * 6) + 1` → numër i rastit 1–6 (hedhje zare)
+3. `random()`: Kthen një numër dhjetor të rastësishëm midis 0.0 (përfshirë) dhe 1.0 (përjashtuar). Zakonisht përdoret në fushat `calculate` për të caktuar vlera të rastësishme ose për të randomizuar radhën e pyetjeve.
+   - Shembull: `random()` → p.sh., `0.7341`
+   - Shembull: `int(random() * 6) + 1` → numër i rastësishëm 1–6 (hedhja e zarit)
 
-4. `coalesce(a, b)`: Kthen `a` nëse `a` është jo-bosh; ndryshe kthen `b`. I dobishëm si alternativë kur fusha mund të jetë bosh.
+4. `coalesce(a, b)`: Kthen `a` nëse `a` nuk është bosh; përndryshe kthen `b`. I dobishëm si një alternativë rezervë kur një fushë mund të jetë bosh.
+   - Shembull: `coalesce(${preferred_name}, ${full_name})` — përdor emrin e preferuar nëse është i vendosur, përndryshe kthehu tek emri i plotë.
 
-5. `once(value)`: Vlerëson `value` dhe e ruan, por vetëm nëse fusha aktuale është **bosh**. Nëse fusha ka tashmë vlerë, `once()` kthen vlerën ekzistuese të pandryshuar.
-   - Shembull: `once(today())` në kolonën `default` cakton datën e sotme një herë dhe nuk përditësohet nëse numëruesi rihap formularin.
-   - Shembull: `once(uuid())` gjeneron UUID një herë dhe e mban të qëndrueshëm nëpërmjet ri-editimeve.
+5. `once(value)`: Vlerëson `value` dhe e ruan atë, pot vetëm nëse fusha aktuale është **bosh**. Nëse fusha ka tashmë një vlerë (p.sh., është vendosur më parë), `once()` kthen vlerën ekzistuese të pandryshuar. Kjo parandalon ri-llogaritjen nga mbishkrimi i hyrjes së përdoruesit.
+   - Shembull: `once(today())` në kolonën `default` vendos datën e sotme një herë dhe nuk përditësohet nëse anketuesi ri-hap formularin.
+   - Shembull: `once(uuid())` gjeneron një UUID një herë dhe e mban atë të qëndrueshëm gjatë ri-redaktimeve.
 
 ---
 
-### Funksionet gjeografike
+### Funksionet gjeo (Geo)
 
-1. `area(geoshape_value)`: Llogarit **sipërfaqen në metra katrorë** të mbyllur nga një vlerë geoshape (poligon).
-   - Shembull: `area(${field_boundary})` — llogarit sipërfaqen e një fushe të sondazhit në m².
-   - Shembull: `round(area(${field_boundary}) div 10000, 2)` — konverton në hektarë.
+1. `area(geoshape_value)`: Llogarit **sipërfaqen në metra katrorë** të rrethuar nga një vlerë geoshape (poligon).
+   - Parametri është një vlerë e fushës geoshape në formatin `lat1 lon1 0 0; lat2 lon2 0 0; ...`
+   - Shembull: `area(${field_boundary})` — llogarit sipërfaqen e një fushe të anketuar në m².
+   - Shembull: `round(area(${field_boundary}) div 10000, 2)` — konverto në hektarë.
 
-2. `distance(coordinates)`: Llogarit **gjatësinë totale të rrugës në metra** të një geotrace (vijë), ose distancën midis dy geopointeve.
+2. `distance(coordinates)`: Llogarit **gjatësinë totale të shtegut në metra** të një geotrace (linjë), ose distancën midis dy geopoints.
+   - Për një geotrace: `distance(${route})` kthen gjatësinë totale të shtegut në metra.
+   - Për dy geopoints: `distance(concat(${point_a}, ' ', ${point_b}))` kthen distancën midis tyre.
    - Shembull: `round(distance(${road_trace}) div 1000, 3)` — gjatësia e rrugës në kilometra.
 
 ---
 
 ### Funksionet e validimit
 
-1. `regex(value, pattern)`: Kthen `true` nëse `value` përputhet me shprehjen e rregullt `pattern`. Përdoreni në kolonën `constraint` për validim të bazuar në model.
-   - Shembull: `regex(., '^[0-9]{10}$')` — validoni një numër me 10 shifra.
+1. `regex(value, pattern)`: Kthen `true` nëse `value` përputhet me shprehjen e rregullt (regular expression) `pattern`. Përdoreni në kolonën `constraint` për validim të bazuar në pattern-e.
+   - Pattern-i përdor sintaksën standarde regex (POSIX ERE subset).
+   - Shembull: `regex(., '^[0-9]{10}$')` — validon një numër me 10 shifra.
+   - Shembull: `regex(., '^[A-Z]{2}[0-9]{6}$')` — validon një format numri pasaporte (2 shkronja të mëdha të ndjekura nga 6 shifra).
+   - Shembull: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — kontroll bazë i formatit të emailit.
 
-2. `checklist(min, max, v1, v2, ...)`: Vlerëson një listë shprehjesh boolean dhe kthen `true` nëse numri i vlerave `true` është midis `min` dhe `max` (të përfshira).
+2. `checklist(min, max, v1, v2, ...)`: Vlerëson një listë shprehjesh boolean dhe kthen `true` nëse numri i vlerave `true` është midis `min` dhe `max` (përfshirë). Kaloni `-1` për `min` ose `max` për të anashkaluar atë kufi.
+   - Shembull: `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — kalon nëse saktësisht 2 ose 3 nga tri kushtet janë të vërteta.
+   - Shembull: `checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — të paktën një masë sigurie duhet të jetë e vërtetë.
 
-3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Ashtu si `checklist()`, por çdo vlerë ka peshë. Shuma e peshave për vlerat `true` duhet të jetë midis `min` dhe `max`.
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Si `checklist()`, por çdo vlerë ka një peshë. Shuma e peshave për vlerat `true` duhet të jetë midis `min` dhe `max`.
+   - Shembull: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — shuma e peshave për pajisjet e pranishme duhet të jetë të paktën 10.
 
 ---
 
-### Funksionet ndihmëse
+### Funksionet e shërbimit (Utility)
 
-1. `uuid()`: Gjeneron UUID të rastit (formati RFC 4122 v4) si varg.
-   - Zakonisht përdoret me `once()` për të gjeneruar ID unike të qëndrueshme: `once(uuid())`
+1. `uuid()`: Gjeneron një UUID të rastësishëm (formati RFC 4122 v4) si një varg (string).
+   - Shembull: `uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
+   - Zakonisht përdoret me `once()` për të gjeneruar një ID unik të qëndrueshëm: `once(uuid())`
 
-2. `version()`: Kthen vlerën e atributit `version` të formularit siç është caktuar në fletën e punës settings.
+2. `version()`: Kthen vlerën e atributit `version` të formularit siç është vendosur në fletën e punës settings.
+   - Shembull: `version()` → `'3.1'`
+   - I dobishëm në fushat `calculate` për të ndërthurur versionin e formularit në të dhënat e eksportuara.
 
-3. `position()`: Kur thirret brenda një **grupi përsëritjeje**, kthen indeksin 1-bazë të instancës aktuale të përsëritjes.
+3. `position()`: Kur thirret brenda një **grupi përsëritës**, kthen indeksin (duke filluar nga 1) e instancës aktuale të përsëritjes.
+   - Shembull: `position()` në instancën e parë kthen `1`, në të dytën kthen `2`, e kështu me radhë.
+   - Shih gjithashtu: `index()` (alias), `indexed-repeat()` për referimin e vlerave të përsëritjes nga jashtë grupit.
 
-4. `thousandsep(length, separator, value)`: Formon një numër me ndarës mijësh.
-   - Shembull: `thousandsep(0, ',', 1234567)` → `'1,234,567'`
+4. `thousandsep(length, separator, value)`: Formaton një numër me një ndarës mijësh. `length` është gjatësia minimale totale e vargut (mbushur me hapësira nëse është më i shkurtër), `separator` është karakteri që do të përdoret (p.sh., `','`), dhe `value` është numri që do të formatohet.
+   - Shembull: `thousandsep(0, ',', 1234567)` → `'1,2,34,567'`
+   - Shembull: `thousandsep(0, '.', ${income})` → formaton të ardhurat me pikë si ndarës mijësh.
 
-5. `substr-jsonpath(value, jsonpath)`: Nxjerr nënvarg nga një varg JSON duke përdorur shprehje JSONPath.
-   - Shembull: `substr-jsonpath(${api_response}, '$.data.name')` — nxirrni fushën `name` nga vargu JSON.
+5. `substr-jsonpath(value, jsonpath)`: Nxjerr një vlerë nga një varg JSON duke përdorur një shprehje JSONPath.
+   - `value` duhet të jetë një varg JSON (p.sh. një fushë që ka ruajtur një përgjigje të papërpunuar API duke përdorur `callapi(..., 'json:', ...)`).
+   - `jsonpath` është një shprehje JSONPath (p.sh. `'$.data.name'`, `'$.items[0].id'`).
+   - Gjithmonë kthen një **varg (string)** — rrethojeni me `number()` kur përdoret në aritmetikë.
+   - Kthen një varg bosh `''` nëse shtegu nuk gjendet ose `value` nuk është një JSON i vlefshëm.
+   - Shembull: `substr-jsonpath(${api_response}, '$.data.name')` — nxjerr fushën `name`.
+   - Shembull: `substr-jsonpath(${api_response}, '$.items[0].label')` — elementi i parë i një vargu.
+   - Shembull: `number(substr-jsonpath(${api_response}, '$.price'))` — nxjerr një vlerë numerike.
+   - Zakonisht përdoret së bashku me `callapi(..., 'json:', ...)` për të nxjerrë fusha të shumta nga një përgjigje API. Shih [Marrja e vlerave të shumta nga një thirrje API](../advanced-features/call-api#fetching-multiple-values-from-one-api-call).

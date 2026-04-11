@@ -1,15 +1,15 @@
 ---
 title: "Dynamisk sökning"
-description: "Dynamisk sökning laddar alternativ från ett fjärr-API i realtid när räknaren skriver, vilket möjliggör stora eller ofta uppdaterade datamängder."
+description: "Dynamisk sökning laddar val från ett fjärr-API i realtid medan uppräknaren skriver, vilket möjliggör stora eller ofta uppdaterade dataset."
 ---
 
-**Dynamisk sökning** (kallas även Sök-API) låter ett `select_one`-, `select_multiple`- eller `text`-fält ladda sina alternativ från en fjärrwebbtjänst **vid körning** när räknaren skriver. Det här är rätt tillvägagångssätt när din alternativlista är för stor för att paketeras i en CSV-fil, uppdateras ofta eller kommer från en levande databas.
+**Dynamisk sökning** (även kallat Search API) tillåter ett `select_one`-, `select_multiple`- eller `text`-fält att ladda sina val från en fjärrwebbtjänst **vid körning** medan uppräknaren skriver. Detta är rätt tillvägagångssätt när din vallslista är för stor för att inkluderas i en CSV-fil, uppdateras ofta eller kommer från en livedatabas.
 
 ---
 
 ## `search-api()` utseende
 
-Den dynamiska sökningen konfigureras via `appearance`-kolumnen med funktionen `search-api()`:
+Den dynamiska sökningen konfigureras via kolumnen `appearance` med funktionen `search-api()`:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -20,24 +20,24 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 | Parameter | Beskrivning |
 |-----------|-------------|
 | `method` | Använd alltid `'POST'` |
-| `url` | API-slutpunkten att fråga |
-| `post_body` | JSON-kropp som skickas till API:et. Använd `%__input__%` som platshållare för räknarens aktuella söktext |
-| `value_column` | Nyckeln i svarsobjektet som används som lagrat **värde** |
-| `display` | Nyckeln (eller mallen) som används som **etikett** i rullgardinsmenyn. Stöder `##key##`-platshållare och `@{func}`-uttryck |
+| `url` | API-slutpunkten som ska anropas |
+| `post_body` | JSON-body som skickas till API:et. Använd `%__input__%` som en platshållare för uppräknarens aktuella söktext |
+| `value_column` | Nyckeln i svarsobjektet som ska användas som det lagrade **värdet** |
+| `display` | Nyckeln (eller mallen) som ska användas som **etikett** som visas i rullgardinsmenyn. Stöder `##key##`-platshållare och `@{func}`-uttryck |
 | `data_path` | JSONPath till arrayen av resultatobjekt i svaret (t.ex. `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Ett namn under vilket råsvaret sparas för användning av andra fält |
+| `save_path` | Ett namn under vilket det råa svaret sparas för användning av andra fält |
 
 ---
 
 ## Grundläggande exempel
 
-En sökning efter hälsoinrättningar där räknaren skriver en del av inrättningens namn:
+En sökning efter hälsofaciliteter där uppräknaren skriver en del av facilitetens namn:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one | facility | Välj hälsoinrättning | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+| select_one | facility | Välj hälsofacilitet | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-API:et tar emot `{"query": "nair"}` när räknaren skriver "nair" och returnerar:
+API:et tar emot `{"query": "nair"}` när uppräknaren skriver "nair" och returnerar:
 
 ```json
 {
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Aktiva resultat visar `✓ Kliniknamn`; inaktiva visar `✗ Kliniknamn`.
+Aktiva resultat visar `✓ Clinic Name`; inaktiva visar `✗ Clinic Name`.
 
 ---
 
 ## Ange ett standardvärde: `search-default-api()`
 
-Använd `search-default-api()` efter `search-api()` för att förifyla fältet med ett standardval laddat från ett separat API-anrop (t.ex. när en befintlig post redigeras):
+Använd `search-default-api()` efter `search-api()` för att förpopulera fältet med ett standardval laddat från ett separat API-anrop (t.ex. vid redigering av en befintlig post):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -88,50 +88,109 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## Anpassad separator för select_multiple: `search-default-separator()`
+## Anpassad avskiljare för select_multiple: `search-default-separator()`
 
-För `select_multiple`-fält, ange hur flera valda värden kopplas samman i den lagrade strängen:
+För `select_multiple`-fält, ange hur flera valda värden sammanfogas i den lagrade strängen:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
 ```
 
-Standardseparatorn är ett mellanslag.
+Standardavskiljare är ett mellanslag.
 
 ---
 
-## Stödda frågtyper
+## Frågetyper som stöds
 
-| Frågtyp | Användningsfall |
-|---------|-----------------|
-| `select_one` | Enkelt val från sökresultat |
+| Frågetyp | Användningsfall |
+|---------------|----------|
+| `select_one` | Enstaka val från sökresultat |
 | `select_multiple` | Flera val från sökresultat |
-| `text` | Autokomplettering — räknaren skriver fritt men kan välja ett förslag |
+| `text` | Autokomplettering — uppräknaren skriver fritt men kan välja ett förslag |
 
 ---
 
-## Använda sparad svarsdata
+## Använda sparade svarsdata
 
-`save_path` lagrar det fullständiga API-svarsobjektet under det angivna namnet. Andra fält kan referera till det med `pulldata()`:
+När uppräknaren väljer ett resultat sparar rtSurvey det fullständiga matchande objektet från svaret under namnet `save_path`. Andra fält kan läsa från det på två sätt.
+
+### Metod 1 — `pulldata()`-uppslagning
+
+Använd `pulldata('save_path', 'key')` för att läsa ett fält på toppnivå från det sparade objektet:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Välj inrättning | `search-api(..., 'facility_data')` |
+| select_one | facility | Välj facilitet | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+Utseendet på `select_one`-raden måste inkludera `search-api(..., 'facility_data')` med matchande `save_path`.
+
+För **nästlade JSON-fält**, kombinera med `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## Lokal filsökning med search()
+
+`search()` utför offline-uppslagningar av kolumnekvivalens mot en medföljande SQLite `.db`-fil — ingen nätverksanslutning och inga SQL-frågor krävs. Använd det när dina referensdata är förpackade med formuläret och du behöver en enkel "hitta alla rader där kolumnen är lika med värdet"-uppslagning.
+
+### Signatur
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parametrar
+
+| Parameter | Beskrivning |
+|-----------|-------------|
+| `path` | Sökväg till SQLite-tabellen: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Matchningsoperator — returnerar rader där kolumnen är lika med värdet |
+| `'list_name'` | Kolumnnamn att matcha mot |
+| `${field}` | Värde att matcha; vanligtvis en fältreferens |
+
+### Exempel
+
+Populera en `select_one` från en lokal databas genom att matcha värdet på `${d307}` mot kolumnen `list_name` i tabellen `externalData` i `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Välj facilitet | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+När `${d307}` är lika med `"HF001"`, returnerar `search()` varje rad i `externalData` där `list_name = 'HF001'` — helt från den medföljande filen, utan nätverksanrop.
+
+### search() mot rawquery autokomplettering
+
+| Funktion | `search()` | `rawquery` autokomplettering |
+|---------|-----------|------------------------|
+| SQL-frågor | Nej — endast kolumnekvivalens | Ja — fullständig `SELECT … FROM …` |
+| Parametriserad indata | Matchning av kolumnvärde | Inbäddat i SQL-sträng |
+| Fritextinmatning | Ja — uppräknaren kan skriva fritt | Nej — måste välja från lista |
+| UNION / flera tabeller | Stöds inte | Stöds |
+
+### När man ska använda vad
+
+- Använd **`search()`** när du behöver en enkel ekvivalensmatchning mot en medföljande `.db`-fil, formuläret måste fungera offline och du vill tillåta fritextinmatning.
+- Använd **`rawquery` autokomplettering** när du behöver SQL-flexibilitet (JOINs, UNIONs, beräknade kolumner) eller måste fråga över flera tabeller, och formuläret har tillförlitlig anslutning.
 
 ---
 
 ## Bästa praxis
 
-1. Se till att din API-slutpunkt svarar inom 1–2 sekunder — långsamma API:er gör sökningen opåsvarlig.
-2. Använd `%__input__%` i `post_body` så att API:et bara returnerar matchande resultat, inte hela datamängden.
-3. Indexera sökfältet på serversidan (t.ex. Elasticsearch, fulltext-index i databasen) för snabba svar.
-4. Begränsa resultaten till 20–50 objekt per fråga — att returnera tusentals resultat motverkar syftet med sökning.
-5. Inkludera ett krav på minsta inmatningslängd i API:et för att undvika breda frågor vid enskilda tecken.
+1. Se till att din API-slutpunkt svarar inom 1–2 sekunder — långsamma API:er gör att sökningen känns oresponsiv.
+2. Använd `%__input__%` i `post_body` så att API:et endast returnerar matchande resultat, inte hela datasetet.
+3. Indexera sökfältet på serversidan (t.ex. Elasticsearch, fulltextsökindex i databasen) för snabba svar.
+4. Begränsa resultaten till 20–50 objekt per fråga — att returnera tusentals resultat motverkar syftet med sökningen.
+5. Inkludera ett krav på minsta indatalängd i API:et för att undvika att utlösa breda frågor på inmatningar med ett enda tecken.
 
 ## Begränsningar
 
-- Dynamisk sökning kräver nätverksanslutning — den fungerar inte offline.
-- `%__input__%`-platshållaren injiceras som den är; sanera indata på serversidan för att förhindra injektionsattacker.
+- Dynamisk sökning kräver nätverksanslutning — det fungerar inte offline.
+- Platshållaren `%__input__%` injiceras som den är; sanera indata på serversidan för att förhindra injektionsattacker.
 - Komplexa `@{func}`-visningsuttryck kan ha begränsat stöd i alla rtSurvey-klientversioner.

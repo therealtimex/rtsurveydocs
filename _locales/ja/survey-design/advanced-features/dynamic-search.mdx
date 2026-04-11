@@ -1,43 +1,43 @@
 ---
-title: "Dynamic Search"
-description: "Dynamic Searchは調査員が入力するにつれてリモートAPIからリアルタイムで選択肢を読み込み、大規模または頻繁に更新されるデータセットを可能にします。"
+title: "ダイナミック検索"
+description: "ダイナミック検索は、調査員が入力する際にリモートAPIからリアルタイムで選択肢を読み込み、大規模または頻繁に更新されるデータセットの使用を可能にします。"
 ---
 
-**Dynamic Search**（Search APIとも呼ばれる）により、`select_one`、`select_multiple`、または`text`フィールドが調査員の入力に合わせて**実行時に**リモートWebサービスから選択肢を読み込めます。選択肢リストがCSVファイルにバンドルするには大きすぎる場合、頻繁に更新される場合、またはライブデータベースから取得する場合に適したアプローチです。
+**ダイナミック検索**（Search APIとも呼ばれます）を使用すると、`select_one`、`select_multiple`、または `text` フィールドが、調査員の入力に合わせて**実行時**にリモートWebサービスから選択肢を読み込むことができます。これは、選択肢リストが大きすぎてCSVファイルに同梱できない場合、頻繁に更新される場合、またはライブデータベースから取得する場合に適したアプローチです。
 
 ---
 
-## `search-api()`外観
+## `search-api()` の外観（appearance）
 
-ダイナミック検索は`appearance`列で`search-api()`関数を使用して設定されます：
+ダイナミック検索は、`appearance` 列で `search-api()` 関数を使用して設定します。
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
 ```
 
-### パラメーター
+### パラメータ
 
-| パラメーター | 説明 |
+| パラメータ | 説明 |
 |-----------|-------------|
-| `method` | 常に`'POST'`を使用 |
-| `url` | クエリするAPIエンドポイント |
-| `post_body` | APIに送信されるJSONボディ。調査員の現在の検索テキストのプレースホルダーとして`%__input__%`を使用 |
-| `value_column` | 保存される**値**として使用するレスポンスオブジェクトのキー |
-| `display` | ドロップダウンに表示される**ラベル**として使用するキー（またはテンプレート）。`##key##`プレースホルダーと`@{func}`式をサポート |
-| `data_path` | レスポンス内の結果オブジェクトの配列へのJSONPath（例：`$.data`、`$.hits.hits.*._source`） |
-| `save_path` | 他のフィールドが使用するために生のレスポンスが保存される名前 |
+| `method` | 常に `'POST'` を使用します |
+| `url` | 問い合わせ先となるAPIエンドポイント |
+| `post_body` | APIに送信されるJSONボディ。調査員の現在の検索テキストのプレースホルダーとして `%__input__%` を使用します |
+| `value_column` | 保存される**値**（value）として使用するレスポンスオブジェクト内のキー |
+| `display` | ドロップダウンに表示される**ラベル**（label）として使用するキー（またはテンプレート）。`##key##` プレースホルダーと `@{func}` 式をサポートします |
+| `data_path` | レスポンス内の結果オブジェクトの配列へのJSONPath（例: `$.data`、`$.hits.hits.*._source`） |
+| `save_path` | 他のフィールドで使用するために、生のレスポンスを保存する際の名前 |
 
 ---
 
 ## 基本的な例
 
-調査員が施設名の一部を入力する医療施設検索：
+調査員が施設名の一部を入力する医療施設検索の例：
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one | facility | 医療施設を選択してください | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+| select_one | facility | 医療施設を選択 | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-調査員が「nair」と入力するとAPIは`{"query": "nair"}`を受け取り、以下を返します：
+調査員が「nair」と入力すると、APIは `{"query": "nair"}` を受信し、以下を返します。
 
 ```json
 {
@@ -48,25 +48,25 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 }
 ```
 
-ドロップダウンには`Nairobi Central Clinic`と`Nairobi West Hospital`が表示され、保存される値は`HF001`または`HF002`です。
+ドロップダウンには `Nairobi Central Clinic` と `Nairobi West Hospital` が表示され、保存される値は `HF001` または `HF002` になります。
 
 ---
 
-## 高度な表示フォーマット
+## 高度な表示形式
 
-### `##key##`テンプレートの使用
+### `##key##` テンプレートの使用
 
-ラベルに複数のフィールドを表示する：
+ラベルに複数のフィールドを表示します。
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
 ```
 
-`Nairobi Central Clinic (Nairobi)`のように表示されます。
+表示例: `Nairobi Central Clinic (Nairobi)`
 
-### `@{func}`式の使用
+### `@{func}` 式の使用
 
-表示ラベルに条件ロジックを適用する：
+表示ラベルに条件ロジックを適用します。
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-アクティブな結果は`✓ クリニック名`と表示され、非アクティブは`✗ クリニック名`と表示されます。
+アクティブな結果には `✓ 施設名`、非アクティブな結果には `✗ 施設名` が表示されます。
 
 ---
 
-## デフォルト値の設定：`search-default-api()`
+## デフォルト値の設定: `search-default-api()`
 
-`search-api()`の後に`search-default-api()`を使用して、別のAPIコールから読み込まれたデフォルトの選択肢でフィールドを事前入力します（例：既存のレコードを編集するとき）：
+`search-api()` の後に `search-default-api()` を使用して、別のAPI呼び出しから読み込まれたデフォルトの選択肢をフィールドにあらかじめ入力します（例: 既存のレコードを編集する場合）。
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -88,50 +88,109 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## select_multipleのカスタムセパレーター：`search-default-separator()`
+## select_multiple 用のカスタム区切り文字: `search-default-separator()`
 
-`select_multiple`フィールドでは、複数の選択された値が保存文字列でどのように結合されるかを指定します：
+`select_multiple` フィールドにおいて、選択された複数の値を保存用文字列内でどのように結合するかを指定します。
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
 ```
 
-デフォルトのセパレーターはスペースです。
+デフォルトの区切り文字はスペースです。
 
 ---
 
-## サポートされる質問タイプ
+## サポートされている質問タイプ
 
 | 質問タイプ | ユースケース |
 |---------------|----------|
 | `select_one` | 検索結果からの単一選択 |
 | `select_multiple` | 検索結果からの複数選択 |
-| `text` | オートコンプリート — 調査員が自由に入力するが提案から選択できる |
+| `text` | オートコンプリート — 調査員は自由に入力できますが、候補を選択することもできます |
 
 ---
 
 ## 保存されたレスポンスデータの使用
 
-`save_path`は完全なAPIレスポンスオブジェクトを指定された名前で保存します。他のフィールドは`pulldata()`でそれを参照できます：
+調査員が結果を選択すると、rtSurveyはレスポンスから一致したオブジェクト全体を `save_path` で指定した名前で保存します。他のフィールドからは、2つの方法でそのデータを読み取ることができます。
+
+### 方法1 — `pulldata()` ルックアップ
+
+`pulldata('save_path', 'key')` を使用して、保存されたオブジェクトからトップレベルのフィールドを読み取ります。
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | 施設を選択してください | `search-api(..., 'facility_data')` |
+| select_one | facility | 施設を選択 | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+`select_one` 行の appearance には、一致する `save_path` を指定した `search-api(..., 'facility_data')` が含まれている必要があります。
+
+**ネストされたJSONフィールド**の場合は、`substr-jsonpath()` と組み合わせます。
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## search() によるローカルファイル検索
+
+`search()` は、同梱されたSQLite `.db` ファイルに対して、オフラインで列の等価ルックアップを実行します。ネットワーク接続やSQLクエリは不要です。参照データがフォームに同梱されており、「列が値と等しいすべての行を検索する」という単純なルックアップが必要な場合に使用します。
+
+### シグネチャ
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### パラメータ
+
+| パラメータ | 説明 |
+|-----------|-------------|
+| `path` | SQLiteテーブルへのパス: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | 一致演算子 — 列が値と等しい行を返します |
+| `'list_name'` | 一致させる列名 |
+| `${field}` | 一致させる値。通常はフィールド参照です |
+
+### 例
+
+`${d307}` の値を `d307.db` の `externalData` テーブル内の `list_name` 列と照合して、ローカルデータベースから `select_one` の選択肢を生成します。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | 施設を選択 | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+`${d307}` が `"HF001"` と等しい場合、`search()` は `externalData` 内の `list_name = 'HF001'` であるすべての行を返します。これは完全に同梱されたファイルから行われ、ネットワーク呼び出しは発生しません。
+
+### search() vs rawquery オートコンプリート
+
+| 機能 | `search()` | `rawquery` オートコンプリート |
+|---------|-----------|------------------------|
+| SQLクエリ | いいえ — 列の等価性のみ | はい — 完全な `SELECT … FROM …` |
+| パラメータ化された入力 | 列値の一致 | SQL文字列に埋め込み |
+| 自由テキスト入力 | はい — 調査員は自由に入力可能 | いいえ — リストから選択が必要 |
+| UNION / 複数テーブル | サポート外 | サポートあり |
+
+### 使い分け
+
+- 同梱された `.db` ファイルに対して単純な等価一致が必要で、フォームがオフラインで動作する必要があり、自由なテキスト入力を許可したい場合は、**`search()`** を使用します。
+- SQLの柔軟性（JOIN、UNION、計算列）が必要な場合や、複数のテーブルにまたがってクエリを実行する必要があり、フォームに信頼できる接続性がある場合は、**`rawquery` オートコンプリート**を使用します。
 
 ---
 
 ## ベストプラクティス
 
-1. APIエンドポイントが1〜2秒以内に応答することを確認してください — 遅いAPIは検索を応答性がなく感じさせます。
-2. APIが一致する結果のみを返すようにpost_bodyで`%__input__%`を使用してください。
-3. 高速なレスポンスのためにサーバー側で検索フィールドをインデックス化してください（例：Elasticsearch、データベースの全文インデックス）。
-4. クエリごとの結果を20〜50項目に制限してください — 何千もの結果を返すと検索の目的が失われます。
-5. 単一文字の入力に対して広いクエリがトリガーされないように、APIに最小入力長の要件を含めてください。
+1. APIエンドポイントが1〜2秒以内に応答するようにしてください。APIが遅いと、検索の反応が悪く感じられます。
+2. データセット全体ではなく、一致する結果のみをAPIが返すように、`post_body` で `%__input__%` を使用してください。
+3. 高速なレスポンスのために、サーバー側で検索フィールドにインデックス（Elasticsearchやデータベースの全文検索インデックスなど）を作成してください。
+4. 1つのクエリあたりの結果を20〜50項目に制限してください。数千の結果を返すと、検索の目的が損なわれます。
+5. 1文字の入力で広範なクエリが実行されるのを避けるため、APIに入力の最小文字数要件を含めてください。
 
 ## 制限事項
 
-- Dynamic Searchはネットワーク接続が必要です — オフラインでは機能しません。
-- `%__input__%`プレースホルダーはそのまま注入されます；インジェクション攻撃を防ぐためにサーバー側で入力をサニタイズしてください。
-- 複雑な`@{func}`表示式はすべてのrtSurveyクライアントバージョンでサポートが制限されている場合があります。
+- ダイナミック検索にはネットワーク接続が必要です。オフラインでは動作しません。
+- `%__input__%` プレースホルダーはそのまま挿入されます。インジェクション攻撃を防ぐために、サーバー側で入力をサニタイズしてください。
+- 複雑な `@{func}` 表示式は、rtSurveyクライアントのバージョンによってはサポートが限定的な場合があります。

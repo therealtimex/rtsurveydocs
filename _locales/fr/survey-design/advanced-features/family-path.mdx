@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path est un champ de calcul de convention qui renvoie le chemin du répertoire multimédia groupé du formulaire au moment de l'exécution — requis par tout formulaire utilisant des recherches dans une base de données locale ou une recherche basée sur des fichiers."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` est un champ de calcul (calculate) de convention qui contient le chemin vers le répertoire multimédia groupé du formulaire. Tout formulaire effectuant des recherches dans une base de données locale avec `rawquery`, `pulldata` ou `search()` doit inclure ce champ — sans lui, les chemins de fichiers ne peuvent pas être résolus et les recherches renvoient silencieusement des résultats vides.
+
+---
+
+## Le champ calculate
+
+Ajoutez cette ligne vers le haut de votre feuille d'enquête (survey), après tout champ méta et avant la première question utilisant un fichier de base de données :
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Le champ ne stocke aucune valeur visible et ne nécessite aucune étiquette (label). C'est un prérequis silencieux pour toute la construction de chemins qui suit.
+
+---
+
+## Pourquoi est-ce nécessaire
+
+RTSurvey regroupe les médias du formulaire — bases de données SQLite, images, clips audio — dans un répertoire par formulaire sur l'appareil. Le chemin exact diffère selon les plateformes (Android, iOS, Web) et entre les appareils.
+
+Au moment de l'exécution, l'application remplit automatiquement `family_path`. Une valeur résolue typique ressemble à :
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Étant donné que le chemin est spécifique à la plateforme et déterminé au moment du lancement, il ne peut pas être codé en dur dans le formulaire. `pulldata('app-api', 'family_path')` est le seul moyen fiable de le récupérer.
+
+---
+
+## Comment l'utiliser dans les chemins
+
+Une fois `family_path` défini, construisez un chemin de fichier complet avec `concat()` :
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Le suffixe `::tableName` est supprimé lorsque l'application ouvre le fichier ; le name de la table est utilisé uniquement dans votre requête SQL.
+
+---
+
+## Où family_path est utilisé
+
+`family_path` est requis dans l'argument de chemin chaque fois que vous faites référence à un fichier groupé :
+
+- **Recherche dans une base de données locale** — l'argument `db_path` de `search-autocomplete-noedit-v2('rawquery', ...)` doit être construit avec `concat(${family_path}, ...)`. Voir [Recherche dans une base de données locale](local-database-search) pour les détails complets d'utilisation.
+- **`pulldata` rawquery** — tout appel `pulldata('rawquery', ...)` qui lit à partir d'un fichier `.db` utilise le même modèle `concat()`.
+- **`search()` avec un fichier local** — les apparences (appearances) de recherche dynamique qui se chargent à partir d'un fichier CSV ou DB groupé reposent également sur `family_path` pour la référence du fichier.
+
+---
+
+## Emplacement dans le formulaire
+
+`family_path` doit apparaître **avant le premier champ qui y fait référence**. La position recommandée est immédiatement après le groupe méta :
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(apparence rawquery faisant référence à `${family_path}`)* |
+
+<Callout type="warning">
+Si `family_path` est manquant dans le formulaire, ou s'il est placé après le premier champ `rawquery` / `search()` qui y fait référence, toutes les recherches dans les fichiers groupés renverront silencieusement des résultats vides. Il n'y a pas de message d'erreur — l'autocomplétion n'affiche tout simplement aucun résultat.
+</Callout>
+
+---
+
+## Fichiers de base de données multiples
+
+Un seul formulaire peut utiliser plusieurs fichiers `.db`. Chaque chemin est construit indépendamment avec `concat()` :
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Définissez `family_path` une fois ; faites-y référence dans autant de champs que nécessaire.
+
+---
+
+## Vérification pendant le développement
+
+Ajoutez un champ `note` temporaire sous `family_path` pour inspecter la valeur résolue sur l'appareil :
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Chemin : ${family_path}` | |
+
+La note affichera le chemin résolu réel pendant les tests. Supprimez-la avant de déployer le formulaire final.

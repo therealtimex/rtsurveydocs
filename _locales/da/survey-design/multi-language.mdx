@@ -1,75 +1,166 @@
 ---
-title: "Flersproget understøttelse"
+title: "Flersproget support"
 description: ""
 ---
 
-rtSurvey giver robust flersproget understøttelse, der giver dig mulighed for at oprette undersøgelser på flere sprog. Denne funktion er afgørende til forskning på tværs af forskellige sproglige befolkninger eller i flersprogede miljøer.
+rtSurvey leverer robust flersproget support, der giver dig mulighed for at oprette undersøgelser på flere sprog. Denne funktion er afgørende for at udføre forskning på tværs af forskellige sproglige befolkninger eller i flersprogede miljøer.
 
 ## Opsætning af flersprogede undersøgelser
 
-For at oprette en flersproget undersøgelse i rtSurvey skal du tilføje sprogspecifikke kolonner til din XLSForm. Sådan gør du:
+For at oprette en flersproget undersøgelse i rtSurvey skal du tilføje sprogspecifikke kolonner til din XLSForm. Her er hvordan:
 
-1. **Labelsvarsoversættelser**: Tilføj kolonner for hvert sprog ved hjælp af formatet `label::Sprog (kode)`.
-2. **Hintsvarsoversættelser**: Brug `hint::Sprog (kode)` til oversættelse af hints.
-3. **Mediefil-oversættelser**: Til sprogspecifikke medier skal du bruge `media::Sprog (kode)`.
+1. **Oversættelser af labels**: Tilføj kolonner for hvert sprog ved hjælp af formatet `label::Language (code)`.
+2. **Oversættelser af hints**: Brug `hint::Language (code)` til oversættelse af hints.
+3. **Oversættelser af mediefiler**: Til sprogspecifikke medier skal du bruge `media::Language (code)`.
 
 Eksempel:
 
 ```
-| type    | name | label::Dansk (da) | label::Engelsk (en) | hint::Dansk (da) | hint::Engelsk (en) |
-|---------|------|-------------------|---------------------|------------------|---------------------|
-| integer | age  | Hvor gammel er du?| How old are you?    | Angiv din alder  | Enter your age      |
+| type    | name | label::English (en) | label::Danish (da) | hint::English (en) | hint::Danish (da) |
+|---------|------|---------------------|--------------------|---------------------|-------------------|
+| integer | age  | How old are you?    | Hvor gammel er du? | Enter your age      | Indtast din alder |
 ```
 
 ## Sprogkoder
 
-Det anbefales at bruge de officielle 2-tegns sprogkoder (subtags) efter sprognavnet. Dette letter matchning af formularsprog med brugergrænsefladsesproget. Du kan finde de officielle koder [her](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+Det anbefales at bruge de officielle 2-tegns sprogkoder (subtags) efter sprognavnet. Dette letter matchning af formularsprog med brugergrænsefladesproget. Du kan finde de officielle koder [her](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
-## Angivelse af et standardsprog
+## Indstilling af et standardsprog
 
-For at angive et standardsprog til dataindsamling skal du bruge regnearket `settings` i din XLSForm:
+For at indstille et standardsprog til dataindsamling skal du bruge regnearket `settings` i din XLSForm:
 
 ```
 | form_id   | version | default_language |
 |-----------|---------|-------------------|
-| test_form | 101     | Dansk (da)        |
+| test_form | 101     | Danish (da)       |
 ```
 
 ## rtSurvey-specifikke funktioner
 
 ### Dynamisk sprogskift
 
-rtSurvey giver brugere mulighed for at skifte sprog dynamisk under dataindsamlingen:
+rtSurvey giver brugerne mulighed for at skifte sprog dynamisk under dataindsamling:
 
-- I webgrænsefladen kan du bruge sprogmenuen i den øverste navigationsbjælke.
-- I mobilappen kan du tilgå sproglmuligheder via indstillingsmenuen.
+- I webinterfacet skal du bruge sprog-dropdown-menuen i den øverste navigationslinje.
+- I mobilappen kan du få adgang til sprogindstillinger via indstillingsmenuen.
 
 ### Sprogspecifikke valideringsmeddelelser
 
-rtSurvey udvider flersproget understøttelse til valideringsmeddelelser:
+rtSurvey udvider flersproget support til valideringsmeddelelser:
 
 ```
-| type    | name | constraint | constraint_message::Dansk (da) | constraint_message::Engelsk (en) |
-|---------|------|------------|--------------------------------|----------------------------------|
-| integer | age  | . <= 150   | Alderen skal være 150 eller derunder | Age must be 150 or less     |
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Danish (da) |
+|---------|------|------------|----------------------------------|---------------------------------|
+| integer | age  | . <= 150   | Age must be 150 or less          | Alder skal være 150 eller mindre|
 ```
 
-### RTL-sprogunderstøttelse
+### Lokaliserede påkrævede meddelelser
 
-Til højre-til-venstre (RTL) sprog som arabisk eller hebraisk justerer rtSurvey automatisk layoutet.
+Brug `required_message::Language (code)` til at vise en oversat fejl, når et påkrævet felt efterlades tomt:
 
-## Bedste praksis for flersprogede undersøgelser
+```
+| type | name | required | required_message::English (en) | required_message::Danish (da) |
+|------|------|----------|-------------------------------|------------------------------|
+| text | name | yes      | This field is required        | Dette felt er påkrævet        |
+```
+
+### RTL sprogsupport
+
+For højre-mod-venstre (RTL) sprog som arabisk eller hebraisk justerer rtSurvey automatisk layoutet:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
+|------|------|---------------------|---------------------|
+| text | name | Your name           | اسمك                |
+```
+
+### Sprogspecifikt udseende (Appearance)
+
+rtSurvey giver dig mulighed for at angive forskellige udseender for forskellige sprog:
+
+```
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
+|------|------|---------------------|---------------------|--------------------------|---------------------------|
+| text | address | Address          | 地址                 | multiline                | textarea                  |
+```
+
+## HTML-formatering i tosprogede labels
+
+Du kan kombinere HTML-tags med sprogindpakninger i en enkelt label-celle. rtSurvey udtrækker blokken for det aktive sprog og renderer den resterende HTML.
+
+Eksempel med fed skrift og skriftfarve pr. sprog:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><da><big><b>Sektion 2: Husstandsindkomst</b></big><br>Spørg kun husstandsoverhovedet.</da>
+```
+
+Understøttede inline-tags inde i sprogindpakninger: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Eksempel på farvet tekst pr. sprog:
+
+```
+<en><font color="red">Required field</font></en><da><font color="red">Påkrævet felt</font></da>
+```
+
+## Sprogbevidste beregninger
+
+Når en formular har et `${language_use}` felt (indstillet af en `change_language` widget), skal du bruge `if()` til at returnere værdier på det aktive sprog:
+
+```
+if(${language_use} = 'en', label_en, label_da)
+```
+
+Eksempel — vis et opslagsresultat på det aktive sprog ved hjælp af `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_da FROM externalData WHERE code = ?', ${district})) |
+```
+
+Bemærk: `language_use` feltet indstilles typisk af en `change_language` appearance widget. Se Appearance — change_language.
+
+## Best practices for flersprogede undersøgelser
 
 1. **Konsistent navngivning**: Brug konsistente sprogkoder i hele din formular.
-2. **Professionel oversættelse**: Anvend professionelle oversættere med kendskab til undersøgelseskonteksten.
-3. **Kontekstoversigter**: Giv kontekstoversigter til oversættere for at sikre nøjagtige oversættelser.
-4. **Test**: Test din formular på alle sprog inden implementering.
-5. **Unicode-understøttelse**: Sørg for, at dine dataindsamlingsenheder understøtter Unicode for ikke-latinske skriftsystemer.
+2. **Professionel oversættelse**: Benyt professionelle oversættere, der er fortrolige med undersøgelsens kontekst.
+3. **Kontekstnoter**: Giv kontekstnoter til oversættere for at sikre nøjagtige oversættelser.
+4. **Test**: Test din formular på alle sprog før implementering.
+5. **Unicode-support**: Sørg for, at dine dataindsamlingsenheder understøtter Unicode til ikke-latinske skrifter.
 6. **Sprogspecifikke medier**: Brug kulturelt passende billeder eller lyd for hvert sprog.
+7. **Undgå tekst i billeder**: Hvis du bruger billeder med tekst, skal du oprette separate billeder for hvert sprog.
 
-## Eksportér flersprogede data
+## Håndtering af specialtilfælde
+
+### Svar på blandede sprog
+
+rtSurvey giver respondenter mulighed for at indtaste tekst i ethvert script, uanset det valgte formularsprog. Dette er nyttigt til at indfange navne eller adresser i deres originale script.
+
+### Sprogspecifikke spørgsmålstyper
+
+Nogle spørgsmålstyper kan være mere passende for visse sprog. rtSurvey giver dig mulighed for at bruge forskellige spørgsmålstyper til forskellige sprog:
+
+```
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
+|--------------------|---------------------|------|---------------------|----------------------|
+| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
+```
+
+## Eksport af flersprogede data
 
 Når du eksporterer data fra rtSurvey:
 
-- Vælg at eksportere på et bestemt sprog eller inkluder alle sprogversioner.
-- Sprogmetadata inkluderes i eksporten og angiver, hvilket sprog der blev brugt for hvert svar.
+- Vælg at eksportere på et bestemt sprog eller medtag alle sprogversioner.
+- Sprogmetadata er inkluderet i eksporten, hvilket indikerer, hvilket sprog der blev brugt for hver besvarelse.
+
+## Overvejelser om mobilappen
+
+- rtSurvey-mobilappen understøtter offline sprogskift.
+- Sørg for, at alle påkrævede sprogfiler er downloadet, før du går offline.
+
+## Kendte begrænsninger
+
+- Nogle avancerede funktioner er muligvis ikke tilgængelige på alle sprog.
+- Ekstremt lange oversættelser kan påvirke layoutet på mindre skærme.
+
+Ved at udnytte rtSurveys flersprogede muligheder kan du oprette inkluderende, tilgængelige undersøgelser, der når ud til forskellige befolkningsgrupper og giver sprogligt nøjagtige data af høj kvalitet.

@@ -3,46 +3,46 @@ title: "Görünüm"
 description: ""
 ---
 
-rtSurvey'deki `appearance` sütunu, anketlerdeki soruların görsel sunumunu ve davranışını özelleştirmenize olanak tanır. Bu özellik kullanıcı deneyimini geliştirir ve veri toplama verimliliğini önemli ölçüde artırabilir. rtSurvey, standart XLSForm görünüm özniteliklerini destekler ve bunları ek seçeneklerle genişletir.
+rtSurvey'deki `appearance` sütunu, anketlerinizdeki soruların görsel sunumunu ve davranışını özelleştirmenize olanak tanır. Bu özellik kullanıcı deneyimini geliştirir ve veri toplama verimliliğini önemli ölçüde artırabilir. rtSurvey, standart XLSForm görünüm niteliklerini destekler ve bunları ek seçeneklerle genişletir.
 
-## Standart XLSForm Görünüm Öznitelikleri
+## Standart XLSForm Görünüm Nitelikleri
 
-rtSurvey aşağıdaki standart XLSForm görünüm özniteliklerini destekler:
+rtSurvey aşağıdaki standart XLSForm görünüm niteliklerini destekler:
 
-| Görünüm Özniteliği | Soru Türleri | Açıklama |
-|----------------------|----------------|-------------|
-| multiline | text | Çok satırlı metin kutusu oluşturur (web istemcileri için en uygun) |
-| minimal | select_one, select_multiple | Seçenekleri açılır menüde görüntüler |
-| quick | select_one | Seçimden sonra bir sonraki soruya otomatik ilerler (yalnızca mobil) |
+| Görünüm Niteliği | Soru Türleri | Açıklama |
+|------------------|--------------|----------|
+| multiline | text | Çok satırlı bir metin kutusu oluşturur (web istemcileri için en iyisidir) |
+| minimal | select_one, select_multiple | Seçenekleri bir açılır menüde görüntüler |
+| quick | select_one | Seçimden sonra otomatik olarak bir sonraki soruya geçer (yalnızca mobil) |
 | no-calendar | date | Takvim görüntüsünü bastırır (yalnızca mobil) |
 | month-year | date | Yalnızca ay ve yıl seçimine izin verir |
 | year | date | Yalnızca yıl seçimine izin verir |
 | horizontal-compact | select_one, select_multiple | Seçenekleri yatay olarak görüntüler (yalnızca web) |
-| horizontal | select_one, select_multiple | Seçenekleri sütunlarda yatay olarak görüntüler (yalnızca web) |
-| likert | select_one | Seçenekleri Likert ölçeği olarak sunar |
+| horizontal | select_one, select_multiple | Seçenekleri sütunlar halinde yatay olarak görüntüler (yalnızca web) |
+| likert | select_one | Seçenekleri bir Likert ölçeği olarak sunar |
 | compact | select_one, select_multiple | Seçenekleri minimum dolgu ile yan yana görüntüler |
-| quickcompact | select_one | Kompakt görünümü otomatik ilerlemeyle birleştirir (yalnızca mobil) |
-| field-list | groups | Tüm grubu tek ekranda görüntüler (yalnızca mobil) |
-| label | select_one, select_multiple | Girişler olmadan seçenek etiketlerini gösterir |
-| list-nolabel | select_one, select_multiple | Etiketler olmadan girişleri gösterir (`label` ile kullanın) |
-| table-list | groups | Soruları tablo biçiminde görüntüler |
+| quickcompact | select_one | Kompakt görünümü otomatik ilerleme ile birleştirir (yalnızca mobil) |
+| field-list | groups | Tüm grubu tek bir ekranda görüntüler (yalnızca mobil) |
+| label | select_one, select_multiple | Girdi olmadan seçenek etiketlerini gösterir |
+| list-nolabel | select_one, select_multiple | Etiketler olmadan girdileri gösterir (`label` ile kullanın) |
+| table-list | groups | Soruları tablo formatında görüntüler |
 | signature | image | İmza yakalamayı etkinleştirir (yalnızca mobil) |
-| draw | image | Serbest çizime izin verir (yalnızca mobil) |
-| map, quick map | select_one, select_one_from_file | Harita özelliklerinden seçime olanak tanır |
+| draw | image | Serbest el çizimine izin verir (yalnızca mobil) |
+| map, quick map | select_one, select_one_from_file | Harita özelliklerinden seçim yapmayı etkinleştirir |
 
-## Görünüm Kullanımı için En İyi Uygulamalar
+## Görünüm Kullanımı İçin En İyi Uygulamalar
 
-1. **Tutarlılık**: Tekdüze bir görünüm için anketiniz genelinde görünüm özniteliklerini tutarlı biçimde kullanın.
-2. **Mobil ve Web**: Görünümlerin farklı cihaz ve platformlarda nasıl görüneceğini göz önünde bulundurun.
-3. **Performans**: Form yüklemesini yavaşlatabilecek görünüm öznitelikleri konusunda dikkatli olun (örn. büyük gruplar için `table-list`).
-4. **Kullanıcı Deneyimi**: Katılımcılar için veri girişini daha kolay ve sezgisel hale getiren görünümleri seçin.
-5. **Test**: Görünümlerin beklendiği gibi çalıştığından emin olmak için formunuzu her zaman hedef cihazlarda test edin.
+1. **Tutarlılık**: Tek tip bir görünüm için anketiniz boyunca görünüm niteliklerini tutarlı bir şekilde kullanın.
+2. **Mobil ve Web Karşılaştırması**: Görünümlerin farklı cihazlarda ve platformlarda nasıl işleneceğini düşünün.
+3. **Performans**: Form yüklemesini yavaşlatabilecek görünüm niteliklerine karşı dikkatli olun (örneğin, büyük gruplar için `table-list`).
+4. **Kullanıcı Deneyimi**: Yanıtlayanlar için veri girişini daha kolay ve daha sezgisel hale getiren görünümleri seçin.
+5. **Test Etme**: Görünümlerin beklendiği gibi çalıştığından emin olmak için formunuzu her zaman hedef cihazlarda test edin.
 
 ## Gelişmiş Teknikler
 
 ### Görünümleri Birleştirme
 
-Bazı görünüm öznitelikleri daha karmaşık düzenler için birleştirilebilir:
+Bazı görünüm nitelikleri daha karmaşık düzenler için birleştirilebilir:
 
 ```
 | type | name | label | appearance |
@@ -62,33 +62,153 @@ rtSurvey, form mantığına dayalı dinamik görünüm değişikliklerine izin v
 
 ## Mobil Uygulama Hususları
 
-- Bazı görünümler (örn. `quick`, `signature`) mobil cihazlara özgüdür.
-- Tutarlı davranışı sağlamak için hem Android hem de iOS'ta kapsamlı test yapın.
+- Bazı görünümler (örneğin, `quick`, `signature`) mobil cihazlara özgüdür.
+- Tutarlı davranışı sağlamak için hem Android hem de iOS üzerinde iyice test edin.
 
-## rtSurvey Genişletilmiş Görünüm Öznitelikleri
+## rtSurvey Genişletilmiş Görünüm Nitelikleri
 
 Standart XLSForm görünümlerine ek olarak, rtSurvey aşağıdaki platforma özgü seçenekleri destekler:
 
-### Veri ve görüntüleme kontrolü
+### Veri ve görüntü kontrolü
 
-| Görünüm Özniteliği | Soru Türleri | Açıklama |
-|----------------------|----------------|-------------|
-| `invisible` | herhangi | Alanı görünümden gizlerken değerini toplamaya veya hesaplamaya devam eder. `hidden` türünden farklı olarak alan hâlâ mantığa katılır. |
-| `displaytitle` | herhangi | Alanın etiketinin/başlığının aksi hâlde bastırılacağı durumlarda bile görüntülenmesini zorlar. |
-| `autopull` | select_one, select_multiple | Form yüklendiğinde veya tetikleyici alan değiştiğinde seçenekleri doldurmak için harici verileri otomatik olarak getirir. |
-| `floating_hint` | text, integer, decimal | İpucu metnini aşağıda değil, giriş alanının üzerinde yüzen bir etiket olarak gösterir. |
-| `calculate-button` | calculate | Otomatik hesaplamak yerine alanın isteğe bağlı olarak yeniden hesaplanmasını tetikleyen görünür bir düğme ekler. |
+| Görünüm Niteliği | Soru Türleri | Açıklama |
+|------------------|--------------|----------|
+| `invisible` | herhangi | Değerini toplamaya veya hesaplamaya devam ederken alanı görünümden gizler. `hidden` türünden farklıdır — alan hala mantığa katılır. |
+| `displaytitle` | herhangi | Normalde bastırılacak olsa bile alanın etiketinin/başlığının görüntülenmesini zorlar. |
+| `autopull` | select_one, select_multiple | Form yüklendiğinde veya bir tetikleyici alan değiştiğinde seçenekleri doldurmak için harici verileri otomatik olarak getirir. |
+| `floating_hint` | text, integer, decimal | İpucu metnini giriş alanının altında değil, üzerinde yüzen bir etiket olarak gösterir. |
+| `calculate-button` | calculate | Alanın otomatik olarak hesaplanması yerine, isteğe bağlı olarak yeniden hesaplanmasını tetikleyen görünür bir düğme ekler. |
+
+### Grup ve gezinme
+
+| Görünüm Niteliği | Soru Türleri | Açıklama |
+|------------------|--------------|----------|
+| `section` | group | Grubu daraltılabilir bir bölüm kartı olarak işler. Not: yalnızca mobil uygulama. |
+| `toc-hide` | herhangi | Soruyu içindekiler tablosu (TOC) gezinme panelinden hariç tutar. |
+| `minilog` | begin_repeat | Tamamlanan tekrar girişlerini, her girişi satır içinde genişletmek yerine kompakt bir mini günlük listesi olarak görüntüler. |
+
+### Giriş davranışı
+
+| Görünüm Niteliği | Soru Türleri | Açıklama |
+|------------------|--------------|----------|
+| `proper` | text | Yanıtlayan yazarken her kelimenin ilk harfini otomatik olarak büyük harf yapar (başlık düzeni davranışı). |
+| `text-nolabel` | text, integer, decimal | Giriş alanını görünür bir etiket olmadan işler. |
+| `inline-1line` | text | Soru etiketi uzun olsa bile metin girişini tek bir satır olarak görüntülenmeye zorlar. |
+| `popup` | herhangi | Alanı sayfada satır içi yerine bir açılır pencere / modal katmanı içinde işler. |
 
 ### Düzen
 
-| Görünüm Özniteliği | Soru Türleri | Açıklama |
-|----------------------|----------------|-------------|
-| `1screen` | group | Grup boyutundan bağımsız olarak tüm grubun tek bir ekranda görüntülenmesini zorlar. |
+| Görünüm Niteliği | Soru Türleri | Açıklama |
+|------------------|--------------|----------|
+| `1screen` | group | Grup boyutuna bakılmaksızın tüm grubun tek bir ekranda görüntülenmesini zorlar. |
 | `columns(n)` | select_one, select_multiple | Seçenekleri `n` sütunda görüntüler. Örnek: `columns(3)` üç sütun radyo düğmesi gösterir. |
-| `gridformat<row=R col=C colspan=S align=center>` | herhangi | Alanı `R` satır, `C` sütun konumunda `S` sütun kapsayan bir CSS ızgara düzenine yerleştirir. `advanced-extension/grid-layout` ile kullanılır. |
-| `ignore-simplify` | herhangi | Form oluşturucuya bu alanın düzeninin otomatik basitleştirilmesini veya sıkıştırılmasını atlamasını söyler. |
+| `gridformat<row=R col=C colspan=S align=center>` | herhangi | Alanı satır `R`, sütun `C`, `S` sütun kapsayacak şekilde bir CSS ızgara düzeninde konumlandırır. `advanced-extension/grid-layout` ile birlikte kullanılır. |
+| `ignore-simplify` | herhangi | Form oluşturucuya bu alanın düzeninin otomatik olarak basitleştirilmesini veya yoğunlaştırılmasını atlamasını söyler. |
+| `horizontal(N)` | select_one, select_multiple | Her seçeneği satır genişliğinin yüzde `N`'sini kaplayacak şekilde ayarlar. Örnek: `horizontal(50)` satır başına iki seçenek yerleştirir. |
+| `scroll-view(N%)` | group, repeat | Kapsayıcıyı görünüm alanının (veya ebeveynin) maksimum yüzde `N` yüksekliğiyle sınırlar ve içerik taştığında bir kaydırma çubuğu ekler. Örnek: `scroll-view(60%)`. |
 
-### Widget'lar
+### Pencere Öğeleri
 
-| Görünüm Özniteliği | Soru Türleri | Açıklama |
-|----------------------|----------------|-------------|
+| Görünüm Niteliği | Soru Türleri | Açıklama |
+|------------------|--------------|----------|
+| `likert` | select_one | Seçenekleri bir Likert ölçeği satırı olarak sunar (zaten yukarıdaki standart tabloda var; desteklendiği onaylandı). |
+| `distress` | select_one | Seçenekleri duygusal simgeler içeren Kessler Psikolojik Sıkıntı Ölçeği (K10) görsel pencere öğesi olarak işler. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Seçenekleri beş renk yuvasına sahip stillendirilmiş derecelendirme kutuları olarak işler. `c1` = dış kapsayıcı kenarlığı, `c2` = seçilmemiş kenarlık, `c3` = seçilmiş kenarlık ve dolgu, `c4` = seçilmemiş metin rengi, `c5` = seçilmiş metin rengi. Örnek: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Seçenekleri renkli etiket çipleri olarak işler. Beş renk yuvası `rating_box-fill` ile aynı sırayı izler. Seçilen seçenekler vurgulanır; seçilmeyen seçenekler özet görünümünden kaldırılır. |
+
+### API entegrasyonu
+
+| Görünüm Niteliği | Soru Türleri | Açıklama |
+|------------------|--------------|----------|
+| `callapi` | text, integer, decimal, select_one | Bu alan için API çağrısı entegrasyonunu etkinleştirir. Hesaplama sütunu bir `callapi()` ifadesi içermelidir. Bkz. [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Statik parametreler kullanarak bir API doğrulama çağrısını tetikler. Form, API değeri onaylayana kadar ilerlemeyi engeller. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | `callapi-verify` ile aynıdır ancak parametreler çalışma zamanında diğer alan değerlerinden türetilir. |
+
+### Dil değiştirici
+
+| Görünüm Niteliği | Soru Türleri | Açıklama |
+|------------------|--------------|----------|
+| `change_language-{colors} default('lang')` | note, text | Verilen renk kodlarıyla stillendirilmiş bir dil değiştirici pencere öğesi işler. `default('lang')` belirteci başlangıç dilini ayarlar (örneğin `default('en')`); ayrıştırma sırasında dahili olarak `rtDefault('lang')` şeklinde yeniden yazılır. Örnek: `change_language-blue-white default('vi')`. |
+
+### Satır içi tarih/saat formatı
+
+`date`, `time` ve `datetime` alanları için, görünüme eklenen bir format dizesi kullanarak özel bir görüntüleme formatı belirtebilirsiniz:
+
+```
+inline-[%d/%m/%Y]
+inline-1line-[%d/%m/%Y %H:%M]
+```
+
+Format belirteçleri `format-date()` ve `format-date-time()` ile aynıdır. Bkz. [Fonksiyonlar — Tarih ve saat fonksiyonları](operators-and-functions/functions#date-and-time-functions).
+
+Örnek:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| datetime | event_time | Etkinlik tarihi ve saati | inline-[%d/%m/%Y %I:%M %p] |
+| date | birth_date | Doğum tarihi | inline-[%d/%m/%Y] |
+
+### Satır içi düğme düzeni — `display{}` ve `results{}`
+
+Satır içi simge düğmesi olarak işlenen soru türleri için (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), iki görünüm değiştirici düğme konumunu ve yakalama sonrası davranışı kontrol eder.
+
+#### `display{...}` — yakalama öncesi düğme konumu
+
+```
+display{<align>, <size>, <color>}
+```
+
+| Parametre | Değerler | Varsayılan |
+|-----------|----------|------------|
+| Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size | `small`, `medium`, `large` | `small` |
+| Color | hex örn. `#FF5500` | birincil tema rengi |
+| Flag | `inline-icon` | simge modunu zorlar |
+
+| Hizalama değeri | Düzen |
+|-----------------|-------|
+| `right` | Etiketin sağındaki düğme |
+| `left` | Etiketin solundaki düğme |
+| `top` | Etiketin üzerindeki düğme, tam genişlikte ortalanmış |
+| `center` / `bottom` | Etiketin altındaki düğme, tam genişlikte ortalanmış |
+
+#### `results{...}` — yakalama sonrası düzen ve görünürlük
+
+`display{}` ayarlarını devralır. Bir değer yakalandıktan sonra düğmeyi taşımak veya öğeleri gizlemek için kullanın.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| `hide` değeri | Etki |
+|---|---|
+| `hide(capture)` | Bir dosya/değer mevcut olduğunda yakalama düğmesini gizler |
+| `hide(review)` | İnceleme küçük resmini / oynatma düğmesini gizler |
+| `hide(filename)` | Yüklemeden sonra gösterilen dosya adını gizler |
+| `hide(camera)` | Yakalamadan sonra kamera tetikleme düğmesini gizler |
+| `hide(scanner)` | Bir değer tarandıktan sonra barkod tarama düğmesini gizler |
+| `hide(value)` | Taranan değer metnini gizler (barkod / geopoint) |
+
+Pencere öğesi, bir değer yakalandığı anda otomatik olarak `display{}` düzeninden `results{}` düzenine geçer.
+
+**Örnekler:**
+
+```
+inline display{right}                                    → etiketin sağında simge
+inline display{left, large}                              → solda büyük simge
+inline display{center, large, #FF5500}                   → etiketin altında büyük turuncu simge
+inline display{right} results{left}                      → yakalamadan sonra simge sola hareket eder
+inline display{right} results{hide(capture)}             → yakalamadan sonra simge kaybolur
+inline display{center} results{hide(capture), hide(filename)}
+```
+
+## Bilinen Sınırlamalar
+
+- Karmaşık görünümler tüm platformlarda aynı şekilde işlenmeyebilir.
+- Bazı gelişmiş rtSurvey görünümleri çevrimdışı modda desteklenmeyebilir.
+
+## Görünüm Sorunlarını Giderme
+
+1. **Görünüm Uygulanmadı**: Görünüm sütunundaki yazım hatalarını kontrol edin.
+2. **Tutarsız İşleme**: Soru türü ve platform ile uyumluluğu doğrulayın.
+3. **Performans Sorunları**: Özellikle büyük anketler için karmaşık görünümleri basitleştirmeyi düşünün.

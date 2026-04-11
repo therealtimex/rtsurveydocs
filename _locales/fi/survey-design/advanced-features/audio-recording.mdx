@@ -1,0 +1,118 @@
+---
+title: "Äänitallennus"
+description: "Tallenna ympäristön ääniä tai haastatteluja kyselyaineiston keruun aikana käyttämällä audio-start- ja audio-end-ulkoasuja tekstikentissä."
+---
+
+Äänitallennuksen avulla lomake voi tallentaa ääntä hiljaa tai näkyvästi kyselyn osion aikana. Se on hyödyllinen haastattelujen, kenttähavaintojen taustaäänten tai strukturoituja vastauksia täydentävien puhevastausten tallentamiseen.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Vain mobiilisovellus.** Äänitallennus vaatii rtSurvey-mobiilisovelluksen. Verkkolomakkeessa `audio-start`- ja `audio-end`-ulkoasut ohitetaan hiljaisesti — tallennusta ei tapahdu eikä virheilmoitusta näytetä. Testaa aina laitteella, kun äänitallennusta tarvitaan.
+</Callout>
+
+---
+
+## Kuinka se toimii
+
+Äänitallennusta ohjataan kahdella `text`-kentällä, jotka toimivat **merkkeinä**:
+
+- Kenttä, jonka ulkoasu on `audio-start`, aloittaa tallennuksen, kun haastattelija saavuttaa sen.
+- Kenttä, jonka ulkoasu on `audio-end`, lopettaa tallennuksen ja tallentaa äänitiedoston lähetykseen.
+
+Molemmat merkkikentät ovat tyyppiä `text`. Ne on yleensä piilotettu haastattelijalta (käyttämällä `relevant = false` tai sijoittamalla ne ei-vuorovaikutteiseen kohtaan), vaikka ne voivat olla näkyvissä. Tallennettu ääni liitetään lähetykseen tiedostona, joka on linkitetty `audio-end`-kenttään.
+
+---
+
+## Perusesimerkki
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Vastaajan nimi | |
+| text | q_occupation | Ammatti | |
+| integer | q_age | Ikä | |
+| text | audio_e_a1 | | `audio-end` |
+
+Sovellus aloittaa tallennuksen, kun haastattelija saavuttaa `audio_s_a1`-kentän, ja lopettaa, kun hän saavuttaa `audio_e_a1`-kentän. Kaikki näiden kahden merkin väliset kysymykset tallennetaan.
+
+---
+
+## Hiljainen tallennus: `audio-start invisible`
+
+Oletusarvoisesti mobiilisovellus näyttää tallennusilmaisimen äänen tallennuksen aikana. Lisäämällä `invisible` ulkoasuun tämä ilmaisin poistetaan, jolloin tallennus tapahtuu ilman näkyvää merkkiä vastaajalle.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Suostutko osallistumaan? | |
+| text | q_feedback | Palautteesi | |
+| text | audio_e_a1 | | `audio-end` |
+
+Käytä `invisible`-ominaisuutta vain, kun tiedonantovaatimukset on täytetty muilla tavoin (esim. erillinen kirjallinen suostumuskenttä ennen tallennusosiota).
+
+---
+
+## Nimeämiskäytäntö
+
+Tuotantolomakkeissa käytetään johdonmukaista nimeämiskäytäntöä merkkikentille:
+
+```
+audio_s_{section}{n}   — aloitusmerkki
+audio_e_{section}{n}   — lopetusmerkki
+```
+
+Missä `{section}` on lyhyt tunniste lomakkeen osiolle ja `{n}` on juokseva numero kyseisessä osiossa.
+
+| Kentän nimi | Rooli | Merkitys |
+|------------|------|---------|
+| `audio_s_a1` | Alku | Ensimmäinen tallennus osiossa A |
+| `audio_e_a1` | Loppu | Ensimmäisen tallennuksen loppu osiossa A |
+| `audio_s_b1` | Alku | Ensimmäinen tallennus osiossa B |
+| `audio_e_b1` | Loppu | Ensimmäisen tallennuksen loppu osiossa B |
+| `audio_s_a2` | Alku | Toinen tallennus osiossa A |
+| `audio_e_a2` | Loppu | Toisen tallennuksen loppu osiossa A |
+
+Tämän käytännön noudattaminen helpottaa tallennusrajojen tunnistamista lomakemäärittelyjä ja lähetystietoja tarkasteltaessa.
+
+---
+
+## Tallennus ja haku
+
+Kun haastattelija saavuttaa `audio-end`-kentän, sovellus viimeistelee äänitiedoston ja liittää sen lähetykseen. Tiedosto:
+
+- Tallennetaan ääni-liitteenä lähetykseen, joka on liitetty `audio-end`-kentän nimeen.
+- On käytettävissä rtSurvey-taustajärjestelmän lähetysten katseluohjelmassa muiden medialiitteiden ohella.
+- On ladattavissa tavallisen lähetysten viennin kautta — äänitiedostot näkyvät `audio-end`-kentän nimeä vastaavassa mediasarakkeessa.
+
+Tiedostomuoto ja bittinopeus riippuvat laitteesta ja sovellusversiosta.
+
+---
+
+## Useita tallennusosioita
+
+Lomake voi sisältää useita päällekkäisyyttömiä tallennusosioita. Jokaisen `audio-start` / `audio-end` -merkkiparin on oltava täysin suljettu — osiot eivät saa olla limittäisiä.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Johdanto | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Tiedot | |
+| text | audio_e_b1 | | `audio-end` |
+
+Jokainen osio tuottaa erillisen äänitiedoston, joka on liitetty vastaavaan `audio-end`-kenttään.
+
+---
+
+## Rajoitukset
+
+- **Vain mobiilisovellus.** Ominaisuutta ei tueta verkkolomakkeessa. `audio-start` ja `audio-end` ohitetaan hiljaisesti selaimessa.
+- **Ei sisäkkäisyyttä.** Tallennusosiot eivät voi olla päällekkäisiä. Uuden tallennuksen aloittamista ennen edellisen `audio-end`-merkin saavuttamista ei tueta.
+- **Kentän tyypin on oltava `text`.** `audio-start`- tai `audio-end`-ulkoasun käyttö muissa kysymystyypeissä ei ole tuettu.
+- **Latauskoko.** Pitkät tallennukset tuottavat suuria tiedostoja. Huomioi lähetyskoon rajoitukset ja verkko-olosuhteet kentällä.
+- **Ei tallennuksen keskeytystä.** Tallennus jatkuu keskeytyksettä aloitusmerkistä lopetusmerkkiin; osion sisällä ei ole mekanismia tallennuksen keskeyttämiseen ja jatkamiseen.

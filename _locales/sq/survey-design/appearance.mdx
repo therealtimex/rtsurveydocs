@@ -1,48 +1,48 @@
 ---
-title: "Pamja"
+title: "Pamja (Appearance)"
 description: ""
 ---
 
-Kolona `appearance` në rtSurvey ju lejon të personalizoni prezantimin vizual dhe sjelljen e pyetjeve në sondazhet tuaja. Kjo veçori rrit eksperiencën e përdoruesit dhe mund të përmirësojë ndjeshëm efikasitetin e mbledhjes së të dhënave. rtSurvey mbështet atributet standarde të pamjes XLSForm dhe i zgjeron ato me opsione shtesë.
+Kolona `appearance` në rtSurvey ju lejon të personalizoni prezantimin vizual dhe sjelljen e pyetjeve në anketimet tuaja. Kjo veçori përmirëson përvojën e përdoruesit dhe mund të rrisë ndjeshëm efikasitetin e mbledhjes së të dhënave. rtSurvey mbështet atributet standarde të pamjes XLSForm dhe i zgjeron ato me opsione shtesë.
 
 ## Atributet Standarde të Pamjes XLSForm
 
-rtSurvey mbështet atributet e mëposhtme standarde të pamjes XLSForm:
+rtSurvey mbështet atributet standarde të pamjes XLSForm si më poshtë:
 
-| Atributi i Pamjes | Llojet e Pyetjeve | Përshkrimi |
+| Atributi i Pamjes | Tipet e Pyetjeve | Përshkrimi |
 |----------------------|----------------|-------------|
-| multiline | text | Krijon një kuti teksti me shumë rreshta (më e mirë për klientët ueb) |
-| minimal | select_one, select_multiple | Shfaq zgjedhjet në një menu rënëse |
-| quick | select_one | Kalon automatikisht te pyetja tjetër pas zgjedhjes (vetëm celular) |
-| no-calendar | date | Fshin shfaqjen e kalendarit (vetëm celular) |
-| month-year | date | Lejon zgjedhjen e muajit dhe vitit vetëm |
-| year | date | Lejon zgjedhjen e vitit vetëm |
-| horizontal-compact | select_one, select_multiple | Shfaq zgjedhjet horizontalisht (vetëm ueb) |
-| horizontal | select_one, select_multiple | Shfaq zgjedhjet horizontalisht në kolona (vetëm ueb) |
-| likert | select_one | Paraqet zgjedhjet si një shkallë Likert |
-| compact | select_one, select_multiple | Shfaq zgjedhjet anë për anë me mbushje minimale |
-| quickcompact | select_one | Kombinon shfaqjen kompakte me avancim automatik (vetëm celular) |
-| field-list | groups | Shfaq të gjithë grupin në një ekran (vetëm celular) |
-| label | select_one, select_multiple | Tregon etiketat e zgjedhjes pa hyrje |
-| list-nolabel | select_one, select_multiple | Tregon hyrjet pa etiketa (përdorni me `label`) |
-| table-list | groups | Shfaq pyetjet në format tabele |
-| signature | image | Aktivizon kapjen e nënshkrimit (vetëm celular) |
-| draw | image | Lejon vizatim me dorë të lirë (vetëm celular) |
-| map, quick map | select_one, select_one_from_file | Mundëson zgjedhjen nga veçoritë e hartës |
+| multiline | text | Krijon një kuti teksti me shumë rreshta (më e mira për klientët web) |
+| minimal | select_one, select_multiple | Shfaq zgjedhjet në një menu që hapet poshtë (dropdown) |
+| quick | select_one | Kalon automatikisht te pyetja tjetër pas përzgjedhjes (vetëm në celular) |
+| no-calendar | date | Heq shfaqjen e kalendarit (vetëm në celular) |
+| month-year | date | Lejon vetëm përzgjedhjen e muajit dhe vitit |
+| year | date | Lejon vetëm përzgjedhjen e vitit |
+| horizontal-compact | select_one, select_multiple | Shfaq zgjedhjet horizontalisht (vetëm në web) |
+| horizontal | select_one, select_multiple | Shfaq zgjedhjet horizontalisht në kolona (vetëm në web) |
+| likert | select_one | Prezanton zgjedhjet si një shkallë Likert |
+| compact | select_one, select_multiple | Shfaq zgjedhjet krah për krah me hapësirë minimale |
+| quickcompact | select_one | Kombinon shfaqjen kompakte me kalimin automatik (vetëm në celular) |
+| field-list | groups | Shfaq gjithë grupin në një ekran (vetëm në celular) |
+| label | select_one, select_multiple | Tregon etiketat e zgjedhjeve pa fushat e hyrjes |
+| list-nolabel | select_one, select_multiple | Tregon fushat e hyrjes pa etiketa (përdoret me `label`) |
+| table-list | groups | Shfaq pyetjet në formatin e tabelës |
+| signature | image | Mundëson kapjen e nënshkrimit (vetëm në celular) |
+| draw | image | Lejon vizatimin e lirë (vetëm në celular) |
+| map, quick map | select_one, select_one_from_file | Mundëson përzgjedhjen nga karakteristikat e hartës |
 
-## Praktikat Më të Mira për Përdorimin e Pamjes
+## Praktikat më të Mira për Përdorimin e Pamjes
 
-1. **Qëndrueshmëria**: Përdorni atributet e pamjes qëndrueshëm në të gjithë sondazhin tuaj për një pamje uniforme.
-2. **Celular kundrejt Ueb**: Konsideroni si do të shfaqen pamjet në pajisje dhe platforma të ndryshme.
-3. **Performanca**: Bëni kujdes me atributet e pamjes që mund të ngadalësojnë ngarkimin e formularit (p.sh., `table-list` për grupe të mëdha).
-4. **Eksperienca e Përdoruesit**: Zgjidhni pamjet që e bëjnë hyrjen e të dhënave më të lehtë dhe intuitivisht për të anketuarit.
-5. **Testimi**: Gjithmonë testoni formularin tuaj në pajisjet e shënjestruara për të garantuar që pamjet funksionojnë sipas pritjeve.
+1. **Konsistenca**: Përdorni atributet e pamjes në mënyrë konsistente në të gjithë anketimin tuaj për një pamje uniforme.
+2. **Celular vs. Web**: Merrni parasysh se si do të shfaqen pamjet në pajisje dhe platforma të ndryshme.
+3. **Performanca**: Kini kujdes me atributet e pamjes që mund të ngadalësojnë ngarkimin e formularit (p.sh., `table-list` për grupe të mëdha).
+4. **Përvoja e Përdoruesit**: Zgjidhni pamjet që e bëjnë futjen e të dhënave më të lehtë dhe më intuitive për respondentët.
+5. **Testimi**: Gjithmonë testoni formularin tuaj në pajisjet e synuara për t'u siguruar që pamjet funksionojnë siç pritet.
 
-## Teknikat e Avancuara
+## Teknika të Avancuara
 
 ### Kombinimi i Pamjeve
 
-Disa atribute pamjeje mund të kombinohen për paraqitje më komplekse:
+Disa atribute të pamjes mund të kombinohen për struktura më komplekse:
 
 ```
 | type | name | label | appearance |
@@ -52,82 +52,163 @@ Disa atribute pamjeje mund të kombinohen për paraqitje më komplekse:
 
 ### Pamjet Dinamike
 
-rtSurvey lejon ndryshimet dinamike të pamjes bazuar në logjikën e formularit:
+rtSurvey lejon ndryshime dinamike të pamjes bazuar në logjikën e formularit:
 
 ```
 | type | name | label | appearance | relevant |
 |------|------|-------|------------|----------|
-| text | time | Futni orën: | inline-[%H:%M] | ${show_time} = 'yes' |
+| text | time | Jepni kohën: | inline-[%H:%M] | ${show_time} = 'yes' |
 ```
 
-## Konsideratat e Aplikacionit Celular
+## Konsiderata për Aplikacionin Celular
 
 - Disa pamje (p.sh., `quick`, `signature`) janë specifike për pajisjet celulare.
-- Testoni tërësisht si në Android ashtu edhe në iOS për të garantuar sjellje të qëndrueshme.
+- Testoni plotësisht në Android dhe iOS për të siguruar sjellje konsistente.
 
-## Atributet e Zgjeruara të Pamjes rtSurvey
+## Atributet e Zgjeruara të Pamjes në rtSurvey
 
 Përveç pamjeve standarde XLSForm, rtSurvey mbështet opsionet e mëposhtme specifike për platformën:
 
 ### Kontrolli i të dhënave dhe shfaqjes
 
-| Atributi i Pamjes | Llojet e Pyetjeve | Përshkrimi |
+| Atributi i Pamjes | Tipet e Pyetjeve | Përshkrimi |
 |----------------------|----------------|-------------|
-| `invisible` | çdo | Fsheh fushën nga pamja ndërkohë që vazhdon të mbledhë ose llogarisë vlerën e saj. Ndryshe nga tipi `hidden` — fusha vazhdon të marrë pjesë në logjikë. |
-| `displaytitle` | çdo | Detyron shfaqjen e etiketës/titullit të fushës edhe kur do të fshihej ndryshe. |
-| `autopull` | select_one, select_multiple | Merr automatikisht të dhëna të jashtme për të populluar zgjedhjet kur formulari ngarkohet ose ndryshon fusha nxitëse. |
-| `floating_hint` | text, integer, decimal | Tregon tekstin e udhëzimit si etiketë lundruese mbi fushën e hyrjes në vend se nën të. |
-| `calculate-button` | calculate | Shton një buton të dukshëm që nxit rillogaritjen e fushës me kërkesë, në vend se të llogarisë automatikisht. |
+| `invisible` | any | Fsheh fushën nga pamja ndërsa vazhdon të mbledhë ose llogarisë vlerën e saj. Ndryshon nga tipi `hidden` — fusha merr pjesë ende në logjikë. |
+| `displaytitle` | any | Detyron shfaqjen e etiketës/titullit të fushës edhe kur ajo normalisht do të hiqej. |
+| `autopull` | select_one, select_multiple | Merr automatikisht të dhëna të jashtme për të populluar zgjedhjet kur ngarkohet formulari ose kur ndryshon një fushë nxitëse. |
+| `floating_hint` | text, integer, decimal | Shfaq tekstin e sugjerimit si një etiketë lundruese mbi fushën e hyrjes në vend që ta shfaqë poshtë saj. |
+| `calculate-button` | calculate | Shton një buton të dukshëm që nxit rillogaritjen e fushës sipas kërkesës, në vend që ta llogarisë automatikisht. |
 
-### Paraqitja
+### Grupet dhe navigimi
 
-| Atributi i Pamjes | Llojet e Pyetjeve | Përshkrimi |
+| Atributi i Pamjes | Tipet e Pyetjeve | Përshkrimi |
 |----------------------|----------------|-------------|
-| `1screen` | group | Detyron të gjithë grupin të shfaqet në një ekran të vetëm pavarësisht madhësisë së grupit. |
-| `columns(n)` | select_one, select_multiple | Shfaq zgjedhjet në `n` kolona. Shembull: `columns(3)` tregon tre kolona butonaesh radio. |
-| `gridformat<row=R col=C colspan=S align=center>` | çdo | Pozicionon fushën në një paraqitje CSS-grid në rreshtin `R`, kolonën `C`, duke shtrirë `S` kolona. Përdoret me `advanced-extension/grid-layout`. |
-| `ignore-simplify` | çdo | Instrukton renderin e formularit të kapërcejë thjeshtimin ose ngjeshjen automatike të paraqitjes së kësaj fushe. |
+| `section` | group | E shfaq grupin si një kartë seksioni që mund të mblidhet. Shënim: vetëm në aplikacionin celular. |
+| `toc-hide` | any | Përjashton pyetjen nga paneli i navigimit të tabelës së përmbajtjes (TOC). |
+| `minilog` | begin_repeat | Shfaq hyrjet e përfunduara të përsëritjes si një listë kompakte mini-log në vend që të zgjerojë çdo hyrje në rresht. |
 
-### Widget-et
+### Sjellja e hyrjes
 
-| Atributi i Pamjes | Llojet e Pyetjeve | Përshkrimi |
+| Atributi i Pamjes | Tipet e Pyetjeve | Përshkrimi |
 |----------------------|----------------|-------------|
-| `likert` | select_one | Paraqet zgjedhjet si një rresht shkalle Likert (tashmë në tabelën standarde; i konfirmuar si i mbështetur). |
-| `distress` | select_one | Renderueson zgjedhjet si widget-in vizual të Shkallës Psikologjike të Shqetësimit Kessler (K10) me ikona emocionale. |
+| `proper` | text | Vendos automatikisht me shkronjë të madhe shkronjën e parë të çdo fjale ndërsa respondenti shkruan (sjellja title-case). |
+| `text-nolabel` | text, integer, decimal | Shfaq fushën e hyrjes pa një etiketë të dukshme. |
+| `inline-1line` | text | Detyron hyrjen e tekstit të shfaqet si një rresht i vetëm edhe kur etiketa e pyetjes është e gjatë. |
+| `popup` | any | E shfaq fushën brenda një dritareje popup / modal në vend që ta shfaqë në rresht në faqe. |
 
-### Integrimi API
+### Struktura (Layout)
 
-| Atributi i Pamjes | Llojet e Pyetjeve | Përshkrimi |
+| Atributi i Pamjes | Tipet e Pyetjeve | Përshkrimi |
 |----------------------|----------------|-------------|
-| `callapi` | text, integer, decimal, select_one | Mundëson integrimin e thirrjes API për këtë fushë. Kolona calculation duhet të përmbajë një shprehje `callapi()`. Shikoni [Thirrja API](advanced-extension/call-api). |
-| `callapi-verify(params)` | text, integer, decimal | Nxit një thirrje verifikimi API duke përdorur parametra statikë. Formulari bllokon progresin derisa API të konfirmojë vlerën. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | E njëjta si `callapi-verify` por me parametra të nxjerrë nga vlerat e tjera të fushës në kohën e ekzekutimit. |
+| `1screen` | group | Detyron të gjithë grupin të shfaqet në një ekran të vetëm pavarësisht nga madhësia e grupit. |
+| `columns(n)` | select_one, select_multiple | Shfaq zgjedhjet në `n` kolona. Shembull: `columns(3)` tregon tre kolona me butona radio. |
+| `gridformat<row=R col=C colspan=S align=center>` | any | Pozicionon fushën në një strukturë CSS-grid në rreshtin `R`, kolonën `C`, duke zënë `S` kolona. Përdoret me `advanced-extension/grid-layout`. |
+| `ignore-simplify` | any | Udhëzon renderuesin e formularit të anashkalojë thjeshtimin automatik ose ngjeshjen e strukturës së kësaj fushe. |
+| `horizontal(N)` | select_one, select_multiple | Cakton çdo zgjedhje të zërë `N` për qind të gjerësisë së rreshtit. Shembull: `horizontal(50)` vendos dy zgjedhje për rresht. |
+| `scroll-view(N%)` | group, repeat | Kufizon kontejnerin në një lartësi maksimale prej `N%` të hapësirës së shikimit (ose prindit), duke shtuar një shirit lëvizës (scroll bar) kur përmbajtja tejkalohet. Shembull: `scroll-view(60%)`. |
 
-### Formati i brendshëm datë/orë
+### Widžetët (Widgets)
 
-Për fushat `date`, `time` dhe `datetime`, mund të specifikoni një format shfaqjeje të personalizuar duke përdorur një varg formati të bashkëngjitur me pamjen:
+| Atributi i Pamjes | Tipet e Pyetjeve | Përshkrimi |
+|----------------------|----------------|-------------|
+| `likert` | select_one | Prezanton zgjedhjet si një rresht i shkallës Likert (tashmë në tabelën standarde më lart; mbështetje e konfirmuar). |
+| `distress` | select_one | Shfaq zgjedhjet si widžeti vizual i Shkallës së Distresit Psikologjik Kessler (K10) me ikona emocionale. |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Shfaq zgjedhjet si kuti vlerësimi të stilizuara me pesë vende për ngjyrat. `c1` = korniza e kontejnerit të jashtëm, `c2` = korniza e pazgjedhur, `c3` = korniza dhe mbushja e zgjedhur, `c4` = ngjyra e tekstit të pazgjedhur, `c5` = ngjyra e tekstit të zgjedhur. Shembull: `rating_box-fill-grey-blue-green-black-white`. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | Shfaq zgjedhjet si "chips" etiketash me ngjyra. Pesë vendet për ngjyrat ndjekin të njëjtin rend si `rating_box-fill`. Zgjedhjet e përzgjedhura theksohen; zgjedhjet e papërzgjedhura hiqen nga pamja përmbledhëse. |
+
+### Integrimi i API-t
+
+| Atributi i Pamjes | Tipet e Pyetjeve | Përshkrimi |
+|----------------------|----------------|-------------|
+| `callapi` | text, integer, decimal, select_one | Mundëson integrimin e thirrjeve API për këtë fushë. Kolona e llogaritjes duhet të përmbajë një shprehje `callapi()`. Shih [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal | Nxit një thirrje verifikimi API duke përdorur parametra statikë. Formulari bllokon përparimin derisa API të konfirmojë vlerën. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | E njëjtë me `callapi-verify` por me parametra të nxjerrë nga vlerat e fushave të tjera në kohë reale. |
+
+### Ndërruesi i gjuhës
+
+| Atributi i Pamjes | Tipet e Pyetjeve | Përshkrimi |
+|----------------------|----------------|-------------|
+| `change_language-{colors} default('lang')` | note, text | Shfaq një widžet për ndërrimin e gjuhës i stilizuar me kodet e dhëna të ngjyrave. Shenja `default('lang')` cakton gjuhën fillestare (p.sh. `default('en')`); ajo rishkruhet në `rtDefault('lang')` brenda sistemit gjatë analizimit. Shembull: `change_language-blue-white default('vi')`. |
+
+### Formati inline i datës/kohës
+
+Për fushat `date`, `time` dhe `datetime`, mund të specifikoni një format shfaqjeje të personalizuar duke përdorur një varg formati të bashkëngjitur te pamja:
 
 ```
 inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-Shenjat e formatit janë të njëjta si `format-date()` dhe `format-date-time()`. Shikoni [Funksionet — Funksionet e datës dhe orës](operators-and-functions/functions#date-and-time-functions).
+Shenjat e formatit janë të njëjta me `format-date()` dhe `format-date-time()`. Shih [Funksionet — Funksionet e datës dhe kohës](operators-and-functions/functions#date-and-time-functions).
 
 Shembull:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| datetime | event_time | Data dhe ora e ngjarjes | inline-[%d/%m/%Y %I:%M %p] |
+| datetime | event_time | Data dhe koha e ngjarjes | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | Data e lindjes | inline-[%d/%m/%Y] |
 
-## Kufizimet e Njohura
+### Struktura e butonave inline — `display{}` dhe `results{}`
 
-- Pamjet komplekse mund të mos renderohen njëlloj nëpërmjet të gjitha platformave.
-- Disa pamje të avancuara rtSurvey mund të mos mbështeten në mënyrën offline.
+Për tipet e pyetjeve që shfaqen si një buton ikone në rresht (`date`, `time`, `datetime`, `image`, `audio`, `video`, `file`, `barcode`, `geopoint`), dy modifikues të pamjes kontrollojnë pozicionin e butonit dhe sjelljen pas kapjes së të dhënave.
 
-## Zgjidhja e Problemeve të Pamjes
+#### `display{...}` — pozicioni i butonit para kapjes
 
-1. **Pamja Nuk Aplikohet**: Kontrolloni gabimet e shtypjes në kolonën e pamjes.
-2. **Renderim i Paqëndrueshëm**: Verifikoni përputhshmërinë me llojin e pyetjes dhe platformën.
-3. **Probleme Performancë**: Konsideroni thjeshtimin e pamjeve komplekse, veçanërisht për sondazhe të mëdha.
+```
+display{<align>, <size>, <color>}
+```
+
+| Parametri | Vlerat | Parazgjedhja |
+|-----------|--------|---------|
+| Align (Drejtimi) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (Madhësia) | `small`, `medium`, `large` | `small` |
+| Color (Ngjyra) | hex p.sh. `#FF5500` | ngjyra parësore e temës |
+| Flag | `inline-icon` | detyron modalitetin e ikonës |
+
+| Vlera Align | Struktura |
+|-------------|--------|
+| `right` | Butoni në të djathtë të etiketës |
+| `left` | Butoni në të majtë të etiketës |
+| `top` | Butoni mbi etiketë, i centruar në gjerësi të plotë |
+| `center` / `bottom` | Butoni nën etiketë, i centruar në gjerësi të plotë |
+
+#### `results{...}` — struktura dhe dukshmëria pas kapjes
+
+Trashëgon cilësimet e `display{}`. Përdoreni për të lëvizur butonin ose për të fshehur elementet pasi një vlerë është kapur.
+
+```
+results{<align>, hide(<element>)}
+```
+
+| Vlera `hide` | Efekti |
+|---|---|
+| `hide(capture)` | Fsheh butonin e kapjes pasi një skedar/vlerë ekziston |
+| `hide(review)` | Fsheh miniaturën e rishikimit / butonin e dëgjimit |
+| `hide(filename)` | Fsheh emrin e skedarit që tregohet pas ngarkimit |
+| `hide(camera)` | Fsheh butonin e shkrehjes së kameras pas kapjes |
+| `hide(scanner)` | Fsheh butonin e skanimit të barkodit pasi një vlerë është skanuar |
+| `hide(value)` | Fsheh tekstin e vlerës së skanuar (barkod / geopoint) |
+
+Widžeti kalon automatikisht nga struktura `display{}` në `results{}` në momentin që kapet një vlerë.
+
+**Shembuj:**
+
+```
+inline display{right}                                    → ikona në të djathtë të etiketës
+inline display{left, large}                              → ikonë e madhe në të majtë
+inline display{center, large, #FF5500}                   → ikonë e madhe portokalli nën etiketë
+inline display{right} results{left}                      → ikona lëviz majtas pas kapjes
+inline display{right} results{hide(capture)}             → ikona zhduket pas kapjes
+inline display{center} results{hide(capture), hide(filename)}
+```
+
+## Kufizime të Njohura
+
+- Pamjet komplekse mund të mos shfaqen në mënyrë identike në të gjitha platformat.
+- Disa pamje të avancuara të rtSurvey mund të mos mbështeten në modalitetin offline.
+
+## Zgjidhja e Problemeve me Pamjen
+
+1. **Pamja nuk është zbatuar**: Kontrolloni për gabime shkrimi në kolonën appearance.
+2. **Shfaqje jo konsistente**: Verifikoni pajtueshmërinë me tipin e pyetjes dhe platformën.
+3. **Probleme të performancës**: Merrni parasysh thjeshtimin e pamjeve komplekse, veçanërisht për anketimet e mëdha.

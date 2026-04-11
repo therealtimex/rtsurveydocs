@@ -1,0 +1,118 @@
+---
+title: "Registrazione Audio"
+description: "Registra audio ambientale o di intervista durante la raccolta dati del sondaggio utilizzando le apparizioni audio-start e audio-end nei campi di testo."
+---
+
+La registrazione audio consente a un modulo di catturare l'audio in modo silenzioso o visibile durante una sezione di un sondaggio. È utile per registrare interviste, suoni ambientali durante le osservazioni sul campo o risposte vocali che completano le risposte strutturate.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Solo app mobile.** La registrazione audio richiede l'app mobile rtSurvey. Nel modulo web le apparizioni `audio-start` e `audio-end` vengono ignorate silenziosamente — non avviene alcuna registrazione e non viene mostrato alcun errore. Testa sempre sul dispositivo quando è richiesta la registrazione audio.
+</Callout>
+
+---
+
+## Come funziona
+
+La registrazione audio è controllata da due campi `text` che fungono da **marcatori**:
+
+- Un campo con apparizione `audio-start` inizia la registrazione quando il rilevatore lo raggiunge.
+- Un campo con apparizione `audio-end` interrompe la registrazione e salva il file audio nell'invio.
+
+Entrambi i campi marcatori sono di tipo `text`. In genere sono nascosti al rilevatore (usando `relevant = false` o posizionati in una posizione non interattiva), sebbene possano essere visibili. L'audio registrato è allegato all'invio come file collegato al campo `audio-end`.
+
+---
+
+## Esempio di base
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Nome del rispondente | |
+| text | q_occupation | Occupazione | |
+| integer | q_age | Età | |
+| text | audio_e_a1 | | `audio-end` |
+
+L'app inizia a registrare quando il rilevatore raggiunge `audio_s_a1` e si ferma quando raggiunge `audio_e_a1`. Tutte le domande tra i due marcatori vengono registrate.
+
+---
+
+## Registrazione silenziosa: `audio-start invisible`
+
+Per impostazione predefinita, l'app mobile visualizza un indicatore di registrazione mentre l'audio viene catturato. L'aggiunta di `invisible` all'apparizione sopprime questo indicatore, in modo che la registrazione avvenga senza alcun segnale visibile per il rispondente.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Accetti di partecipare? | |
+| text | q_feedback | Il tuo feedback | |
+| text | audio_e_a1 | | `audio-end` |
+
+Usa `invisible` solo quando i requisiti di divulgazione sono stati soddisfatti attraverso altri mezzi (ad esempio, un campo di consenso scritto separato prima della sezione di registrazione).
+
+---
+
+## Convenzione di denominazione
+
+I moduli di produzione utilizzano un modello di denominazione coerente per i campi marcatori:
+
+```
+audio_s_{section}{n}   — marcatore di inizio
+audio_e_{section}{n}   — marcatore di fine
+```
+
+Dove `{section}` è una breve etichetta per la sezione del modulo e `{n}` è un numero sequenziale all'interno di quella sezione.
+
+| Nome del campo | Ruolo | Significato |
+|------------|------|---------|
+| `audio_s_a1` | Inizio | Prima registrazione nella sezione A |
+| `audio_e_a1` | Fine | Fine della prima registrazione nella sezione A |
+| `audio_s_b1` | Inizio | Prima registrazione nella sezione B |
+| `audio_e_b1` | Fine | Fine della prima registrazione nella sezione B |
+| `audio_s_a2` | Inizio | Seconda registrazione nella sezione A |
+| `audio_e_a2` | Fine | Fine della seconda registrazione nella sezione A |
+
+Seguire questa convenzione facilita l'identificazione dei confini della registrazione durante la revisione delle definizioni dei moduli e dei dati inviati.
+
+---
+
+## Archiviazione e recupero
+
+Quando il rilevatore raggiunge il campo `audio-end`, l'app finalizza il file audio e lo allega all'invio. Il file è:
+
+- Archiviato come allegato audio sull'invio, associato al nome del campo `audio-end`.
+- Accessibile nel visualizzatore degli invii back-end di rtSurvey insieme ad altri allegati multimediali.
+- Scaricabile tramite l'esportazione standard degli invii — i file audio appaiono nella colonna multimediale corrispondente al nome del campo `audio-end`.
+
+Il formato del file e il bitrate dipendono dal dispositivo e dalla versione dell'app.
+
+---
+
+## Più sezioni di registrazione
+
+Un modulo può contenere diverse sezioni di registrazione non sovrapposte. Ogni coppia di marcatori `audio-start` / `audio-end` deve essere completamente contenuta — le sezioni non devono intrecciarsi.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Introduzione | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Dettagli | |
+| text | audio_e_b1 | | `audio-end` |
+
+Ogni sezione produce un file audio separato allegato al rispettivo campo `audio-end`.
+
+---
+
+## Limitazioni
+
+- **Solo app mobile.** La funzione non è supportata nel modulo web. `audio-start` e `audio-end` vengono ignorati silenziosamente in un browser.
+- **Nessun annidamento.** Le sezioni di registrazione non possono sovrapporsi. L'avvio di una nuova registrazione prima che venga raggiunto il precedente marcatore `audio-end` non è supportato.
+- **Il tipo di campo deve essere `text`.** L'uso di `audio-start` o `audio-end` su qualsiasi altro tipo di domanda non è supportato.
+- **Dimensioni di caricamento.** Le registrazioni lunghe producono file di grandi dimensioni. Tieni presente i limiti di dimensione dell'invio e le condizioni della rete sul campo.
+- **Nessuna pausa durante la registrazione.** La registrazione viene eseguita continuamente dal marcatore di inizio al marcatore di fine; non esiste alcun meccanismo per mettere in pausa e riprendere all'interno di una sezione.

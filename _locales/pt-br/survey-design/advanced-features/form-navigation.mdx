@@ -1,0 +1,104 @@
+---
+title: "Controles de navegação do formulário"
+description: "Use os valores de aparência SaveFinalizedExit e SaveIncompleteExit para renderizar botões de saída estilizados que salvam e saem do formulário."
+---
+
+**Controles de navegação do formulário** são valores de aparência colocados em campos `note` (ou `text`) que são renderizados como botões estilizados de largura total na parte inferior de uma pesquisa. Eles permitem que o entrevistador salve o envio e saia do formulário com um toque — seja como um registro concluído (finalizado) ou como um rascunho (registro incompleto).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Renderiza um botão que **salva o envio como finalizado** e sai do formulário. O rótulo do botão é extraído da coluna `label` do campo.
+
+| XLSForm column | Valor |
+|----------------|-------|
+| `type` | `note` |
+| `name` | qualquer nome exclusivo (ex: `btn_finish`) |
+| `label` | texto exibido no botão |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+O envio é marcado como um registro final e completo. Isso equivale a tocar no botão de envio integrado.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Renderiza um botão que **salva o envio como incompleto (rascunho)** e sai do formulário. O entrevistador pode retornar a ele mais tarde e continuar o preenchimento.
+
+| XLSForm column | Valor |
+|----------------|-------|
+| `type` | `note` |
+| `name` | qualquer nome exclusivo (ex: `btn_pause`) |
+| `label` | texto exibido no botão |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Sintaxe de cores
+
+Ambas as aparências aceitam uma cor inline no formato `<#RRGGBB/>`:
+
+- `#` seguido de exatamente **6 dígitos hex** (maiúsculas ou minúsculas)
+- O `/>` de fechamento é **obrigatório** — omiti-lo interrompe a análise
+- Exemplo: `<#04B404/>` (verde), `<#EDC602/>` (âmbar), `<#D9534F/>` (vermelho)
+
+A cor controla o fundo do botão. A cor do texto é determinada automaticamente pelo aplicativo.
+
+---
+
+## Exemplo
+
+Os dois campos a seguir, colocados no final de um formulário, produzem um botão **Enviar** verde e um botão **Salvar como rascunho** âmbar:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Enviar | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Salvar como rascunho | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — excluindo botões do índice
+
+O token de aparência `toc-hide` instrui o rtSurvey a excluir um campo do **índice** do formulário (a lista geral de perguntas). Os botões de navegação não são perguntas, portanto nunca devem aparecer no índice.
+
+Sempre adicione `toc-hide` após a aparência de saída:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Consulte [Aparência — toc-hide](../appearance#group-and-navigation) para a referência toc-hide.
+
+---
+
+## Convenção de posicionamento
+
+Siga estas convenções ao adicionar controles de navegação a um formulário:
+
+- Coloque ambos os botões no **final** do formulário, após todas as perguntas e grupos.
+- Sempre inclua **ambos** os botões juntos — um finalizado e um incompleto — para que o entrevistador sempre tenha uma maneira de sair, independentemente do status de conclusão.
+- Use a coluna `relevant` no botão de saída finalizada se o envio deve ser permitido apenas quando certas condições forem atendidas (ex: uma seção obrigatória está concluída). O botão de saída incompleta geralmente deve permanecer **sempre visível**.
+
+---
+
+## Saída finalizada condicional
+
+Use a coluna `relevant` para controlar quando o botão de saída finalizada é exibido. A saída incompleta deve permanecer visível incondicionalmente para que o entrevistador possa sempre pausar e retornar.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Enviar | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Salvar como rascunho | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Neste exemplo, o botão **Enviar** aparece apenas quando o entrevistador deu o consentimento e marcou a seção A como concluída. O botão **Salvar como rascunho** está sempre disponível.
+
+---
+
+## Limitações
+
+- **O tipo de campo deve ser `note` ou `text`.** O uso dessas aparências em qualquer outro tipo de pergunta não é suportado.
+- **Apenas hexadecimal de 6 dígitos.** Hexadecimal abreviado (`<#FFF/>`) e cores nomeadas não são suportados — use sempre o formato completo de 6 dígitos (ex: `<#FFFFFF/>`).
+- **A coluna de rótulo é o texto do botão.** A coluna `hint` é ignorada para esses campos; apenas `label` é renderizado.
+- **Ambos os botões devem estar presentes.** Omitir o botão de saída incompleta deixa o entrevistador sem uma maneira de pausar no meio do formulário.

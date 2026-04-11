@@ -1,111 +1,128 @@
 ---
-title: "Calculate"
-description: ""
+title: "calculate"
+description: "Typ otázky calculate provádí výpočty na pozadí v XLSFormu a ukládá odvozené hodnoty, aniž by tazateli zobrazoval vstupní pole."
 ---
 
-Otázky calculate v XLSForms a rtSurvey se používají pro provádění výpočtů na základě jiných polí nebo hodnot ve formuláři. Tyto otázky se uživateli nezobrazují, ale místo toho běží na pozadí a ukládají výsledky pro pozdější použití nebo odeslání.
+import { Callout } from 'nextra/components'
 
-## Syntaxe
+Typ otázky `calculate` spouští vzorec tiše na pozadí. Výsledek uloží do pojmenovaného pole, na které mohou odkazovat jiné otázky – tazateli se však nezobrazí žádný vstup ani popisek. Použijte jej k odvození hodnot, spojování řetězců, spouštění podmíněné logiky nebo vyhledávání dat, která budete potřebovat později ve formuláři.
 
-V XLSForm je otázka calculate definována takto:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Základní syntaxe
 
-- **type**: Vždy „calculate" pro tento typ otázky.
-- **name**: Jedinečný název pro otázku calculate.
-- **label**: Obvykle ponecháno prázdné, protože otázky calculate se uživatelům nezobrazují.
-- **calculation**: Vzorec, který má být vyhodnocen.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Použití
+- **type**: Vždy `calculate`.
+- **name**: Unikátní název pole. Ostatní otázky na něj odkazují pomocí `${name}`.
+- **label**: Ponechte prázdné – pole typu calculate se tazateli nikdy nezobrazují.
+- **calculation**: Vzorec k vyhodnocení. Podporuje všechny [funkce XLSForm](../operators-and-functions/functions) a odkazy na pole.
 
-Otázky calculate se běžně používají pro:
+---
 
-1. Provádění aritmetických operací
-2. Zřetězení řetězců
-3. Aplikaci složité logiky nebo funkcí
-4. Ukládání mezivýsledků pro pozdější použití
+## Běžné vzorce
 
-## Příklady
+### Aristmetika
 
-### Základní aritmetika
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### Spojování řetězců
 
-### Zřetězení řetězců
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Podmíněná hodnota
 
-### Použití funkcí
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Věk z data narození
 
-## Pokročilé použití v rtSurvey
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### Funkce pulldata()
+---
 
-rtSurvey podporuje funkci `pulldata()` v polích calculate, což umožňuje načítání dat z externích CSV souborů:
+## Použití `once()` k uzamčení hodnoty
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Ve výchozím nastavení se `calculate` přehodnocuje pokaždé, když se změní jakékoli odkazované pole. Zabalte vzorec do `once()`, aby se vyhodnotil pouze při prvním načtení a výsledek se zmrazil:
 
-#### Syntaxe
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-Základní syntaxe pro pulldata() je:
+Použijte `once()` pro časová razítka, počáteční hodnoty nebo jakýkoli případ, kdy je přepočet při změně nežádoucí.
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+---
 
-- `'csv_filename'`: Název CSV souboru (bez přípony .csv)
-- `'column_to_return'`: Název sloupce obsahujícího data, která chcete načíst
-- `'key_column'`: Název sloupce pro porovnání
-- `${matching_value}`: Hodnota pro vyhledání v klíčovém sloupci (často proměnná z formuláře)
+## Načítání dat z externích zdrojů
 
-#### Důležité poznámky
-
-1. CSV soubor musí být nahrán spolu s vaším XLSForm při nasazení průzkumu.
-2. V CSV souboru používejte čárky jako oddělovače, nikoli středníky.
-3. Vyhněte se čárkám uvnitř datových polí CSV, protože mohou způsobit problémy s parsováním.
-4. pulldata() podporuje pouze relace 1:1. Pokud je nalezeno více shod, vrátí pouze první.
-5. Mohou existovat omezení délky textu, který lze načíst (přibližně 76 znaků).
-6. pulldata() můžete použít v omezeních pro validaci záznamů oproti datům CSV.
-
-### Podmíněné výpočty
-
-Můžete použít příkazy if() pro podmíněné výpočty:
+### Ze souboru CSV
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
+
+Úplnou referenci naleznete v části [pulldata()](../operators-and-functions/pulldata).
+
+### Z přibalené databáze SQLite
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Podrobnosti o konstrukci cesty naleznete v části [Hledání v lokální databázi](../advanced-features/local-database-search).
+
+### Z kontextu aplikace
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Všechny dostupné klíče naleznete v části [App API](../app-api).
+
+---
+
+## Použití calculate v relevant a constraint
+
+Ostatní pole mohou odkazovat na výsledek `calculate` stejně jako na jakékoli jiné pole:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
 
 ## Osvědčené postupy
 
-1. Používejte smysluplné názvy pro pole calculate pro zlepšení čitelnosti formuláře.
-2. Vyhněte se příliš složitým výpočtům v jediném poli; v případě potřeby je rozdělte.
-3. Důkladně testujte výpočty, zejména při použití složitých vzorců nebo externích dat.
-4. Pamatujte, že pole calculate se spouštějí při každém vyhodnocení formuláře, což může ovlivnit výkon u velmi složitých nebo početných výpočtů.
-5. Při použití pulldata() zajistěte správné formátování CSV souborů a důkladně testujte s konkrétními daty a strukturou formuláře.
+1. Pojmenovávejte pole calculate smysluplně – `total_cost` je jasnější než `calc1` a snadněji se sleduje v exportech.
+2. Rozdělte složité vzorce do více řetězených polí calculate namísto jednoho hluboce vnořeného výrazu.
+3. Používejте `once()` pro časová razítka a počáteční snímky, aby se zabránilo změnám hodnot po prvním zachycení.
+4. Pole `calculate` umístěte před první otázku, která na ně odkazuje – pořadí vyhodnocování odpovídá pořadí ve formuláři.
+5. Sloupec `label` ponechte prázdný. Některé nástroje popisek zobrazují; jeho ponechání prázdného zabrání matoucím výstupům.
 
 ## Omezení
 
-- Pole calculate nejsou přímo editovatelná uživateli.
-- Výsledek pole calculate není okamžitě viditelný, pokud není odkazován v poli zobrazení nebo použit v logice formuláře.
+- Pole Calculate se tazateli nikdy nezobrazují přímo – k zobrazení výsledku použijte pole `note`.
+- Sloupec `calculation` je povinný; řádek `calculate` bez vzorce vždy ukládá prázdný řetězec.
+- Výsledky se přehodnocují při každé změně formuláře, pokud nejsou zabaleny v `once()` – velmi složité vzorce ve velkých formulářích mohou ovlivnit výkon vykreslování na méně výkonných zařízeních.
+- Vypočtené hodnoty se v odeslaných datech ukládají jako řetězce. Při předávání výsledku do aritmetických nebo logických výrazů použijte k přetypování `number()`, `int()` nebo `boolean()`.

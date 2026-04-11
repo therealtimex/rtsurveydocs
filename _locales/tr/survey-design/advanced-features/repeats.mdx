@@ -1,15 +1,15 @@
 ---
 title: "Gelişmiş Tekrarlar"
-description: "Tekrar grupları için gelişmiş kalıplar: dinamik sayılar, iç içe tekrarlar, tekrar verilerini özetleme ve tekrarlar arasında değerlere referans verme."
+description: "Tekrar grupları için gelişmiş modeller: dinamik sayımlar, iç içe tekrarlar, tekrar verilerini özetleme ve tekrarlar arası değerlere referans verme."
 ---
 
-Bu sayfa, rtSurvey'de tekrar gruplarıyla çalışmak için gelişmiş kalıpları kapsar. Tekrar grubu kurmanın temellerini görmek için [Gruplama ve Tekrarlar](../repeats) sayfasına bakın.
+Bu sayfa, rtSurvey'deki tekrar gruplarıyla çalışmaya yönelik gelişmiş modelleri kapsar. Tekrar grubu kurmanın temelleri için [Gruplandırma ve Tekrarlar](../repeats) bölümüne bakın.
 
 ---
 
 ## Dinamik tekrar sayısı
 
-Varsayılan olarak sayımcı kaç kez tekrarlayacağına karar verir. `repeat_count` kullanarak tekrarlama sayısını sabitleyebilirsiniz:
+Varsayılan olarak, kaç kez tekrarlanacağına anketör karar verir. `repeat_count` kullanarak tekrar sayısını sabitleyebilirsiniz:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,39 +18,39 @@ Varsayılan olarak sayımcı kaç kez tekrarlayacağına karar verir. `repeat_co
 | integer | member_age | Yaş | |
 | end_repeat | | | |
 
-Tekrar, daha önce formda toplanan `num_members` sayısı kadar tam olarak çalışır. Sayımcı örnek ekleyemez veya kaldıramaz.
+Tekrar, formda daha önce toplanan `num_members` değeri kadar, tam olarak `${num_members}` kez çalışır. Anketör yeni örnek ekleyemez veya mevcut olanları kaldıramaz.
 
 ---
 
-## Endekslenmiş erişim: `indexed-repeat()`
+## İndeksli erişim: `indexed-repeat()`
 
-Tekrar grubunun **dışından** belirli bir tekrar örneğinin alan değerine erişmek için `indexed-repeat(repeatedField, repeatGroup, index)` kullanın:
+Tekrar grubu **dışından**, `indexed-repeat(repeatedField, repeatGroup, index)` işlevini kullanarak belirli bir tekrar örneğinin alan değerine erişin:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Bu, tekrardan sonra özet alanlar oluşturmak veya "birincil" üyenin verilerine referans vermek için kullanışlıdır.
+Bu, özet alanları oluşturmak veya tekrardan sonra "birincil" üyenin verilerine referans vermek için kullanışlıdır.
 
 ---
 
-## Geçerli örnek pozisyonu: `index()`
+## Mevcut örnek konumu: `index()`
 
-Bir tekrar grubu içinde, `index()` geçerli örneğin 1 tabanlı pozisyonunu döndürür. Her tekrarı etiketlemek veya benzersiz tanımlayıcılar oluşturmak için kullanın:
+Bir tekrar grubu içinde, `index()` mevcut örneğin (1 tabanlı) konumunu döndürür. Bunu her tekrarı etiketlemek veya benzersiz tanımlayıcılar oluşturmak için kullanın:
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | Arazi |
-| note | plot_label | Arazi numarası `${index()}` |
-| text | plot_id | Arazi Kimliği |
+| begin_repeat | plots | Parsel |
+| note | plot_label | Parsel numarası `${index()}` |
+| text | plot_id | Parsel ID |
 | end_repeat | | |
 
 ---
 
 ## Aynı örnekteki alanlara referans verme
 
-Bir tekrar içinde, **aynı tekrar örneğindeki** başka bir alana referans vermek için `${fieldname}` kullanın. Aynı döngü içinde `indexed-repeat()` gerekmez:
+Bir tekrar içinde, **aynı tekrar örneğindeki** başka bir alana referans vermek için `${fieldname}` kullanın. Aynı döngü içinde `indexed-repeat()` kullanmaya gerek yoktur:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -64,29 +64,29 @@ Bir tekrar içinde, **aynı tekrar örneğindeki** başka bir alana referans ver
 
 ## Tekrar içinden üst alanlara referans verme
 
-Tekrar grubunun dışında (üstünde) bulunan alanlar `${fieldname}` ile normal şekilde referans alınabilir:
+Tekrar grubunun dışındaki (üstündeki) alanlara `${fieldname}` ile normal şekilde referans verilebilir:
 
 | type | name | label |
 |------|------|-------|
 | text | village | Köy adı |
-| begin_repeat | plots | Tarım arazisi |
-| note | plot_context | `${village}` köyündeki araziler |
+| begin_repeat | plots | Tarımsal parsel |
+| note | plot_context | `${village}` içindeki parseller |
 | end_repeat | | |
 
 ---
 
 ## Tekrar verilerini özetleme
 
-Özetlemek için tekrar grubunun **dışında** tekrar toplama fonksiyonlarını kullanın:
+Özetlemek için tekrar grubu **dışında** tekrar toplama (aggregate) işlevlerini kullanın:
 
-| Fonksiyon | Örnek | Açıklama |
+| Function | Example | Description |
 |----------|---------|-------------|
 | `count(group)` | `count(${household_members})` | Örnek sayısı |
 | `sum(field)` | `sum(${loan_amount})` | Sayısal bir alanın toplamı |
 | `min(field)` | `min(${member_age})` | Minimum değer |
 | `max(field)` | `max(${member_age})` | Maksimum değer |
 | `join(sep, field)` | `join(', ', ${member_name})` | Virgülle ayrılmış liste |
-| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Koşullu sayı |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Koşullu sayım |
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Koşullu toplam |
 | `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Koşullu birleştirme |
 
@@ -102,53 +102,149 @@ Tekrar grubunun dışında (üstünde) bulunan alanlar `${fieldname}` ile normal
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` üye; `${children_count}` 18 yaşından küçük. Yetişkinler: `${adult_names}` | |
+| note | summary | `${total_members}` üye; `${children_count}` kişi 18 yaş altı. Yetişkinler: `${adult_names}` | |
 
 ---
 
 ## İç içe tekrarlar
 
-Bir tekrar grubu başka bir tekrar grubu içerebilir. Bunu dikkatli kullanın — iç içe tekrarlar karmaşıklık ekler ve sayımcılar için kafa karıştırıcı olabilir.
+Bir tekrar grubu başka bir tekrar grubu içerebilir. Bunu dikkatli kullanın — iç içe tekrarlar karmaşıklığı artırır ve anketörler için kafa karıştırıcı olabilir.
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | households | Hane |
-| text | hh_id | Hane Kimliği |
+| text | hh_id | Hane ID |
 | begin_repeat | hh_members | Üye |
 | text | member_name | Üye adı |
 | end_repeat | | |
 | end_repeat | | |
 
-İç tekrardaki bir alana dış tekrardan referans vermek için `${fieldname}` kullanın — en yakın eşleşen ataya çözümlenir:
+İç tekrardan dış tekrardaki bir alana referans vermek için `${fieldname}` kullanın — bu, en yakın eşleşen üst öğeye çözümlenir:
 
-`hh_members` tekrarı içinde, `${hh_id}` **geçerli** hanenin kimliğini döndürür, tüm hanelerin kimliğini değil.
+`hh_members` tekrarı içinde, `${hh_id}` tüm hanelerin değil, **mevcut** hanenin ID'sini döndürür.
 
 ---
 
-## Tekrar gruplarındaki sıralama: `rank-index()`
+## Tekrar grupları içinde sıralama: `rank-index()`
 
-Tekrar içinde bir `rank` alanı varsa, belirli bir örneğin sıra sıralamasını dışarıdan almak için dışarıdan `rank-index(instanceNumber, repeatedField)` kullanın:
+Bir tekrar içinde bir `rank` alanı olduğunda, belirli bir örneğin sıra derecesini dışarıdan almak için `rank-index(instanceNumber, repeatedField)` işlevini kullanın:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})`, en yüksek puanın örnek indeksini döndürür.
+`rank-index(1, ${score})` en yüksek puanın örnek indeksini döndürür.
+
+---
+
+## `begin_repeat` üzerinde `1screen` görünümü
+
+Bir `begin_repeat` satırının `appearance` sütununa `1screen` eklemek, her örnek için tüm soruları ekran başına bir soru yerine tek bir ekranda bir arada görüntüler.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Hane üyesi | `1screen` |
+| text | member_name | Üye adı | |
+| integer | member_age | Yaş | |
+| end_repeat | | | |
+
+`1screen` ayarlandığında ve grup içinde `repeat_count` ve `add_repeat` alanı olmadığında, rtSurvey ekranın altında otomatik olarak dairesel bir **+** düğmesi oluşturur; böylece anketörler herhangi bir ekstra yapılandırma yapmadan yeni örnekler ekleyebilir.
+
+| Appearance | Örnek başına bir ekran | Varsayılan + düğmesi eklendi |
+|------------|-------------------------|------------------------|
+| `1screen` | Evet | Evet (`add_repeat` alt öğesi yoksa) |
+| `field-list` | Evet | Hayır |
+
+Otomatik ekleme düğmesi olmadan gruplanmış düzeni istediğinizde `field-list` kullanın. Hem gruplanmış düzeni hem de örnek eklemek için yerleşik bir yol istediğinizde `1screen` kullanın.
+
+---
+
+## `add_repeat` özel ekleme düğmesi
+
+Tekrar grubunun **içine** `appearance: add_repeat` ile yerleştirilen bir `note` (veya `text`) alanı, tam genişlikte bir "Ekle" düğmesi olarak oluşturulur. Düğme etiketi alanın `label` sütunundan gelir. Bir `add_repeat` alanı mevcut olduğunda, varsayılan dairesel + düğmesi (`1screen`'den gelen) gizlenir.
+
+`add_repeat` alanını tekrar grubu içindeki son alan olarak yerleştirin:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Üye | `1screen` |
+| text | member_name | Üye adı | |
+| integer | member_age | Yaş | |
+| note | btn_add | + Üye ekle | `add_repeat` |
+| end_repeat | | | |
+
+### Renk özelleştirme
+
+Düğmeyi stillendirmek için görünüm değeri içine bir renk kodu ekleyin:
+
+| Appearance value | Result |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Yeşil arka plan, varsayılan metin rengi |
+| `add_repeat 04B404-ffffff` | Yeşil arka plan, beyaz metin |
+
+İlk renk arka plan, ikincisi (tireden sonraki) ise metin rengidir. Tire ile ayrılmış formu kullanırken `#` işaretini atlayın.
+
+### Simge varyantı
+
+Tam genişlikteki düğme yerine kompakt dairesel bir simge düğmesi oluşturmak için `add_repeat icon` (arada boşluk bırakarak) kullanın:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Ekle | `add_repeat icon` |
+
+---
+
+## Silme düğmeleri: `delete-repeat-current` ve `delete-repeat-last`
+
+Tekrar grubunun içindeki `appearance: delete-repeat-current` veya `appearance: delete-repeat-last` özelliğine sahip bir `note` alanı, bölünmüş bir silme düğmesi olarak oluşturulur.
+
+| Appearance | Action |
+|------------|--------|
+| `delete-repeat-current` | Mevcut (aktif) örneği siler |
+| `delete-repeat-last` | Tekrardaki son örneği siler |
+
+Varsayılan (simge olmayan) düğme, bölünmüş bir düğmedir: solda bir çöp kutusu simgesi ve sağda alanın etiket metni yer alır ve ekranın tam genişliğini kaplar.
+
+### Simge varyantı
+
+Kompakt dairesel bir çöp kutusu simgesi düğmesi elde etmek için sonuna `-icon` ekleyin:
+
+| Appearance | Result |
+|------------|--------|
+| `delete-repeat-current-icon` | Dairesel çöp kutusu simgesi, mevcut örneği siler |
+| `delete-repeat-last-icon` | Dairesel çöp kutusu simgesi, son örneği siler |
+
+### Renk özelleştirme
+
+Renk formatı `add_repeat` ile aynıdır: `<#RRGGBB/>` veya `RRGGBB-RRGGBB` (arka plan-metin) kullanın.
+
+### Tam model örneği
+
+Aşağıdaki tekrar, üstte dairesel bir mevcut-olanı-sil düğmesi ve altta tam genişlikte bir ekleme düğmesi ile birlikte `1screen` kullanır:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Üye | `1screen` |
+| note | btn_del | Kaldır | `delete-repeat-current-icon` |
+| text | member_name | Üye adı | |
+| integer | member_age | Yaş | |
+| note | btn_add | + Üye ekle | `add_repeat` |
+| end_repeat | | | |
 
 ---
 
 ## En İyi Uygulamalar
 
-1. Tekrarlama sayısı önceden biliniyorsa her zaman `repeat_count` kullanın — sayımcıların yanlışlıkla örnek eklemesini veya kaldırmasını önler.
-2. Tekrar gruplarını odaklı tutun — örnek başına 20'den fazla sorusu olan bir tekrar gezinmesi zordur.
-3. Tekrar gruplarını net biçimde adlandırın (örn. `household_members`, `repeat1` değil) — ad fonksiyon çağrılarında ve dışa aktarılan veride görünür.
+1. Tekrar sayısı önceden bilindiğinde her zaman `repeat_count` kullanın — bu, anketörlerin yanlışlıkla örnek eklemesini veya çıkarmasını önler.
+2. Tekrar gruplarını odaklanmış tutun — örnek başına 20'den fazla soru içeren bir tekrarda gezinmek zordur.
+3. Tekrar gruplarını açıkça adlandırın (örneğin, `repeat1` değil, `household_members`) — ad, işlev çağrılarında ve dışa aktarılan verilerde görünür.
 4. Performansı doğrulamak için beklenen maksimum örnek sayısıyla test edin.
-5. Tüm alanları tek bir ekranda göstermek için tekrar grubu üzerinde `field-list` görünümü kullanın (mobil).
+5. Her örnek için tüm soruları tek bir ekranda göstermek için `begin_repeat` üzerinde `1screen` kullanın ve anketörlere açıkça etiketlenmiş bir "Ekle" düğmesi sağlamak için grup içindeki bir `add_repeat` not alanıyla eşleştirin.
 
 ---
 
 ## Sınırlamalar
 
-- `indexed-repeat()` geçerli bir indeks (1'den örnek sayısına kadar) gerektirir — aralık dışı indeksler boş döndürür.
-- 2 düzeyin ötesinde iç içe tekrarlar önerilmez ve bazı istemcilerde görüntüleme sorunlarına neden olabilir.
-- Toplama fonksiyonları (`sum`, `count`, vb.) tüm tekrar grubu üzerinde çalışır — `*-if` varyantları olmadan örnek alt kümesini toplayamazsınız.
+- `indexed-repeat()`, geçerli bir indeks (1'den örnek sayısına kadar) gerektirir — aralık dışı indeksler boş döndürür.
+- 2 seviyenin üzerindeki iç içe tekrarlar önerilmez ve bazı istemcilerde görüntüleme sorunlarına neden olabilir.
+- Toplama işlevleri (`sum`, `count` vb.) tüm tekrar grubu üzerinde çalışır — `*-if` varyantları olmadan örneklerin bir alt kümesini toplayamazsınız.

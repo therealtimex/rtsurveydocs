@@ -1,0 +1,118 @@
+---
+title: "Ghi âm"
+description: "Ghi lại âm thanh môi trường hoặc phỏng vấn trong quá trình thu thập dữ liệu khảo sát bằng cách sử dụng các thuộc tính audio-start và audio-end trên các trường văn bản."
+---
+
+Tính năng ghi âm cho phép một biểu mẫu thu thập âm thanh một cách âm thầm hoặc công khai trong một phần của cuộc khảo sát. Nó hữu ích cho việc ghi âm các cuộc phỏng vấn, âm thanh môi trường trong khi quan sát thực địa, hoặc các phản hồi bằng lời nói bổ sung cho các câu trả lời có cấu trúc.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Chỉ dành cho ứng dụng di động.** Tính năng ghi âm yêu cầu ứng dụng di động rtSurvey. Trên biểu mẫu web, các thuộc tính `audio-start` và `audio-end` sẽ bị bỏ qua một cách âm thầm — không có hoạt động ghi âm nào diễn ra và không có lỗi nào được hiển thị. Luôn kiểm tra trên thiết bị khi yêu cầu ghi âm.
+</Callout>
+
+---
+
+## Cách hoạt động
+
+Việc ghi âm được điều khiển bởi hai trường `text` đóng vai trò là **điểm đánh dấu (markers)**:
+
+- Một trường có thuộc tính `audio-start` sẽ bắt đầu ghi âm khi điều tra viên tiếp cận nó.
+- Một trường có thuộc tính `audio-end` sẽ dừng ghi âm và lưu tệp âm thanh vào bản nộp (submission).
+
+Cả hai trường đánh dấu đều có loại là `text`. Chúng thường được ẩn khỏi điều tra viên (bằng cách sử dụng `relevant = false` hoặc đặt ở vị trí không tương tác), mặc dù chúng có thể để ở chế độ hiển thị. Âm thanh được ghi lại sẽ được đính kèm vào bản nộp dưới dạng một tệp được liên kết với trường `audio-end`.
+
+---
+
+## Ví dụ cơ bản
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Tên người trả lời | |
+| text | q_occupation | Nghề nghiệp | |
+| integer | q_age | Tuổi | |
+| text | audio_e_a1 | | `audio-end` |
+
+Ứng dụng bắt đầu ghi âm khi điều tra viên đến trường `audio_s_a1` và dừng lại khi họ đến trường `audio_e_a1`. Tất cả các câu hỏi nằm giữa hai điểm đánh dấu sẽ được ghi âm lại.
+
+---
+
+## Ghi âm âm thầm: `audio-start invisible`
+
+Theo mặc định, ứng dụng di động sẽ hiển thị biểu tượng chỉ báo ghi âm trong khi âm thanh đang được thu thập. Thêm thuộc tính `invisible` vào appearance sẽ ẩn chỉ báo này, do đó việc ghi âm diễn ra mà không có bất kỳ dấu hiệu hiển thị nào cho người trả lời.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Bạn có đồng ý tham gia không? | |
+| text | q_feedback | Phản hồi của bạn | |
+| text | audio_e_a1 | | `audio-end` |
+
+Chỉ sử dụng `invisible` khi các yêu cầu về công khai thông tin đã được thỏa mãn thông qua các phương tiện khác (ví dụ: một trường đồng ý bằng văn bản riêng biệt trước phần ghi âm).
+
+---
+
+## Quy ước đặt tên
+
+Các biểu mẫu thực tế sử dụng một mẫu đặt tên nhất quán cho các trường đánh dấu:
+
+```
+audio_s_{section}{n}   — điểm bắt đầu
+audio_e_{section}{n}   — điểm kết thúc
+```
+
+Trong đó `{section}` là một nhãn ngắn cho phần của biểu mẫu và `{n}` là số thứ tự trong phần đó.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | Bản ghi âm đầu tiên trong phần A |
+| `audio_e_a1` | End | Kết thúc bản ghi âm đầu tiên trong phần A |
+| `audio_s_b1` | Start | Bản ghi âm đầu tiên trong phần B |
+| `audio_e_b1` | End | Kết thúc bản ghi âm đầu tiên trong phần B |
+| `audio_s_a2` | Start | Bản ghi âm thứ hai trong phần A |
+| `audio_e_a2` | End | Kết thúc bản ghi âm thứ hai trong phần A |
+
+Việc tuân theo quy ước này giúp dễ dàng xác định ranh giới ghi âm khi xem xét các định nghĩa biểu mẫu và dữ liệu nộp lên.
+
+---
+
+## Lưu trữ và truy xuất
+
+Khi điều tra viên đến trường `audio-end`, ứng dụng sẽ hoàn tất tệp âm thanh và đính kèm vào bản nộp. Tệp này:
+
+- Được lưu trữ dưới dạng tệp âm thanh đính kèm trong bản nộp, liên kết với tên trường `audio-end`.
+- Có thể truy cập được trong trình xem bản nộp ở hệ thống quản trị rtSurvey cùng với các tệp phương tiện đính kèm khác.
+- Có thể tải xuống thông qua tính năng xuất bản nộp tiêu chuẩn — các tệp âm thanh xuất hiện trong cột phương tiện tương ứng với tên trường `audio-end`.
+
+Định dạng tệp và tốc độ bit phụ thuộc vào thiết bị và phiên bản ứng dụng.
+
+---
+
+## Nhiều phần ghi âm
+
+Một biểu mẫu có thể chứa nhiều phần ghi âm không chồng lấn. Mỗi cặp điểm đánh dấu `audio-start` / `audio-end` phải được chứa đầy đủ — các phần không được xen kẽ nhau.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Giới thiệu | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Chi tiết | |
+| text | audio_e_b1 | | `audio-end` |
+
+Mỗi phần sẽ tạo ra một tệp âm thanh riêng biệt được đính kèm vào trường `audio-end` tương ứng.
+
+---
+
+## Hạn chế
+
+- **Chỉ dành cho ứng dụng di động.** Tính năng này không được hỗ trợ trong biểu mẫu web. `audio-start` và `audio-end` sẽ bị bỏ qua trong trình duyệt.
+- **Không lồng nhau.** Các phần ghi âm không thể chồng lấn. Việc bắt đầu một bản ghi âm mới trước khi đạt đến điểm đánh dấu `audio-end` trước đó là không được hỗ trợ.
+- **Loại trường phải là `text`.** Việc sử dụng `audio-start` hoặc `audio-end` trên bất kỳ loại câu hỏi nào khác đều không được hỗ trợ.
+- **Kích thước tải lên.** Các bản ghi âm dài sẽ tạo ra các tệp lớn. Hãy lưu ý về giới hạn kích thước bản nộp và điều kiện mạng tại thực địa.
+- **Không tạm dừng khi đang ghi âm.** Việc ghi âm diễn ra liên tục từ điểm bắt đầu đến điểm kết thúc; không có cơ chế để tạm dừng và tiếp tục trong một phần.

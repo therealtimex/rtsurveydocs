@@ -1,154 +1,250 @@
 ---
-title: "Napredna ponavljanja"
-description: "Napredni obrasci za grupe ponavljanja: dinamički broj, ugnežđena ponavljanja, sumiranje podataka ponavljanja i referenciranje vrednosti kroz ponavljanja."
+title: "Напредна понављања"
+description: "Напредни обрасци за групе понављања: динамички број понављања, угнежђена понављања, сумирање података и референцирање вредности кроз понављања."
 ---
 
-Ova stranica pokriva napredne obrasce za rad sa grupama ponavljanja u rtSurvey-u. Za osnove postavljanja grupe ponavljanja, pogledajte [Grupisanje i ponavljanja](../repeats).
+Ова страница покрива напредне обрасце за рад са групама понављања у rtSurvey-у. За основе подешавања групе понављања, погледајте [Груписање и понављања](../repeats).
 
 ---
 
-## Dinamički broj ponavljanja
+## Динамички број понављања
 
-Podrazumevano, anketar odlučuje koliko puta da ponovi. Možete fiksirati broj ponavljanja koristeći `repeat_count`:
+По подразумеваној вредности, анкетар одлучује колико пута ће се група поновити. Можете фиксирати број понављања користећи `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
-| begin_repeat | household_members | Član domaćinstva | `${num_members}` |
-| text | member_name | Ime člana | |
-| integer | member_age | Godine | |
+| begin_repeat | household_members | Члан домаћинства | `${num_members}` |
+| text | member_name | Име члана | |
+| integer | member_age | Године | |
 | end_repeat | | | |
 
-Ponavljanje se izvršava tačno `${num_members}` puta, gde je `num_members` prikupljeno ranije u formularu. Anketar ne može dodavati ili uklanjati instance.
+Понављање се извршава тачно `${num_members}` пута, где је `num_members` прикупљено раније у формулару. Анкетар не може додавати нити уклањати инстанце.
 
 ---
 
-## Indeksovani pristup: `indexed-repeat()`
+## Индексирани приступ: `indexed-repeat()`
 
-Pristupite vrednosti polja specifične instance ponavljanja **izvan** grupe ponavljanja koristeći `indexed-repeat(repeated_polje, grupa_ponavljanja, indeks)`:
+Приступите вредности поља одређене инстанце понављања **изван** групе понављања користећи `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Ovo je korisno za izgradnju rezimea polja ili referenciranje podataka "primarnog" člana nakon ponavljanja.
+Ово је корисно за креирање збирних поља или референцирање података "примарног" члана након понављања.
 
 ---
 
-## Pozicija trenutne instance: `index()`
+## Позиција тренутне инстанце: `index()`
 
-Unutar grupe ponavljanja, `index()` vraća poziciju trenutne instance počevši od 1. Koristite je za označavanje svakog ponavljanja ili kreiranje jedinstvenih identifikatora:
+Унутар групе понављања, `index()` враћа позицију тренутне инстанце (почиње од 1). Користите га за означавање сваког понављања или креирање јединствених идентификатора:
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | Parcela |
-| note | plot_label | Broj parcele `${index()}` |
-| text | plot_id | ID parcele |
+| begin_repeat | plots | Парцела |
+| note | plot_label | Парцела број `${index()}` |
+| text | plot_id | ИД парцеле |
 | end_repeat | | |
 
 ---
 
-## Referenciranje polja u istoj instanci
+## Референцирање поља у истој инстанци
 
-Unutar ponavljanja, koristite `${ime_polja}` za referenciranje drugog polja **u istoj instanci ponavljanja**. Nije potrebno koristiti `indexed-repeat()` unutar iste petlje:
+Унутар понављања, користите `${fieldname}` за референцирање другог поља **у истој инстанци понављања**. Нема потребе за `indexed-repeat()` унутар истог циклуса:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| begin_repeat | members | Član | |
-| text | member_name | Ime | |
-| integer | member_age | Godine | |
-| text | school_name | Naziv škole | `${member_age} < 18` |
+| begin_repeat | members | Члан | |
+| text | member_name | Име | |
+| integer | member_age | Године | |
+| text | school_name | Име школе | `${member_age} < 18` |
 | end_repeat | | | |
 
 ---
 
-## Referenciranje roditeljskih polja unutar ponavljanja
+## Референцирање надређених поља изнутар понављања
 
-Polja izvan (iznad) grupe ponavljanja mogu se normalno referencirati sa `${ime_polja}`:
+Поља изван (изнад) групе понављања могу се референцирати нормално помоћо `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
-| text | village | Naziv sela |
-| begin_repeat | plots | Poljoprivredna parcela |
-| note | plot_context | Parcele u `${village}` |
+| text | village | Име села |
+| begin_repeat | plots | Пољопривредна парцела |
+| note | plot_context | Парцеле у месту `${village}` |
 | end_repeat | | |
 
 ---
 
-## Sumiranje podataka ponavljanja
+## Сумирање података понављања
 
-Koristite agregate funkcije ponavljanja **izvan** grupe ponavljanja za sumiranje:
+Користите агрегатне функције понављања **изван** групе понављања за сумирање:
 
-| Funkcija | Primer | Opis |
-|----------|--------|----|
-| `count(group)` | `count(${household_members})` | Broj instanci |
-| `sum(field)` | `sum(${loan_amount})` | Zbir numeričkog polja |
-| `min(field)` | `min(${member_age})` | Minimalna vrednost |
-| `max(field)` | `max(${member_age})` | Maksimalna vrednost |
-| `join(sep, field)` | `join(', ', ${member_name})` | Lista razdvojena zarezima |
-| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Uslovni broj |
-| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Uslovni zbir |
-| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Uslovni spoj |
+| Function | Example | Description |
+|----------|---------|-------------|
+| `count(group)` | `count(${household_members})` | Број инстанци |
+| `sum(field)` | `sum(${loan_amount})` | Збир нумеричког поља |
+| `min(field)` | `min(${member_age})` | Минимална вредност |
+| `max(field)` | `max(${member_age})` | Максимална вредност |
+| `join(sep, field)` | `join(', ', ${member_name})` | Листа одвојена зарезом |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Условни број |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Условни збир |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Условно спајање |
 
-### Primer: Rezime domaćinstva
+### Пример: Резиме домаћинства
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| integer | num_members | Koliko članova? | |
-| begin_repeat | members | Član | `${num_members}` |
-| text | member_name | Ime | |
-| integer | member_age | Godine | |
+| integer | num_members | Колико чланова? | |
+| begin_repeat | members | Члан | `${num_members}` |
+| text | member_name | Име | |
+| integer | member_age | Године | |
 | end_repeat | | | |
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` članova; `${children_count}` ispod 18. Odrasli: `${adult_names}` | |
+| note | summary | `${total_members}` чланова; `${children_count}` млађих од 18. Одрасли: `${adult_names}` | |
 
 ---
 
-## Ugnežđena ponavljanja
+## Угнежђена понављања
 
-Grupa ponavljanja može sadržati drugu grupu ponavljanja. Koristite ovo pažljivo — ugnežđena ponavljanja dodaju složenost i mogu zbuniti anketare.
+Група понављања може садржати другу групу понављања. Користите ово пажљиво — угнежђена понављања повећавају сложеност и могу бити збуњујућа за анкету.
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | households | Domaćinstvo |
-| text | hh_id | ID domaćinstva |
-| begin_repeat | hh_members | Član |
-| text | member_name | Ime člana |
+| begin_repeat | households | Домаћинство |
+| text | hh_id | ИД домаћинства |
+| begin_repeat | hh_members | Члан |
+| text | member_name | Име члана |
 | end_repeat | | |
 | end_repeat | | |
 
-Za referenciranje polja u spoljnom ponavljanju iz unutrašnjeg ponavljanja, koristite `${ime_polja}` — ono se razrešava na najbliži odgovarajući predak:
+Да бисте референцирали поље у спољашњем понављању из унутрашњег понављања, користите `${fieldname}` — он се разрешава на најближег одговарајућег претка:
 
-Unutar ponavljanja `hh_members`, `${hh_id}` vraća ID **trenutnog** domaćinstva, ne svih domaćinstava.
+Унутар `hh_members` понављања, `${hh_id}` враћа ИД **тренутног** домаћинства, а не свих домаћинстава.
 
 ---
 
-## Rangiranje unutar grupa ponavljanja: `rank-index()`
+## Ранг унутар група понављања: `rank-index()`
 
-Kada polje `rank` postoji unutar ponavljanja, koristite `rank-index(instanceNumber, polje_ponavljanja)` izvan da dobijete redni rang specifične instance:
+Када поље `rank` постоји унутар понављања, користите `rank-index(instanceNumber, repeatedField)` споља да бисте добили редни ранг одређене инстанце:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` vraća indeks instance sa najvišim skorom.
+`rank-index(1, ${score})` враћа индекс инстанце са највећим бројем бодова.
 
 ---
 
-## Najbolje prakse
+## `1screen` изглед на `begin_repeat`
 
-1. Uvek koristite `repeat_count` kada je broj ponavljanja unapred poznat — sprečava anketare da slučajno dodaju ili uklanjaju instance.
-2. Zadržite grupe ponavljanja fokusiranima — ponavljanje sa 20+ pitanja po instanci je teško za navigaciju.
-3. Jasno imenujte grupe ponavljanja (npr. `household_members`, ne `repeat1`) — ime se pojavljuje u pozivima funkcija i izvezenim podacima.
-4. Testirajte sa maksimalnim očekivanim brojem instanci da biste proverili performanse.
-5. Koristite izgled `field-list` na grupi ponavljanja za prikaz svih polja na jednom ekranu po instanci (mobilni).
+Додавање `1screen` у колону `appearance` реда `begin_repeat` приказује сва питања за сваку инстанцу заједно на једном екрану, уместо једног питања по екрану.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Члан домаћинства | `1screen` |
+| text | member_name | Име члана | |
+| integer | member_age | Године | |
+| end_repeat | | | |
+
+Када је подешено `1screen` и нема поља `repeat_count` нити `add_repeat` унутар групе, rtSurvey аутоматски приказује кружно **+** дугме на дну екрана како би анкетари могли да додају нове инстанце без икакве додатне конфигурације.
+
+| Appearance | Један екран по инстанци | Подразумевано + дугме додато |
+|------------|-------------------------|------------------------|
+| `1screen` | Да | Да (када нема `add_repeat` детета) |
+| `field-list` | Да | Не |
+
+Користите `field-list` када желите груписани изглед без аутоматског дугмета за додавање. Користите `1screen` када желите и груписани изглед и уграђени начин за додавање инстанци.
 
 ---
 
-## Ograničenja
+## `add_repeat` прилагођено дугме за додавање
 
-- `indexed-repeat()` zahteva validan indeks (1 do broja instanci) — indeksi van opsega vraćaju prazan rezultat.
-- Ugnežđena ponavljanja dublja od 2 nivoa nisu preporučena i mogu izazvati probleme sa prikazom na nekim klijentima.
-- Agregate funkcije (`sum`, `count`, itd.) rade na celoj grupi ponavljanja — ne možete agregirati podskup instanci bez varijanti `*-if`.
+Поље `note` (или `text`) постављено **унутар** групе понављања са `appearance: add_repeat` приказује се као "Додај" дугме пуне ширине. Ознака дугмета долази из колоне `label` поља. Када је поље `add_repeat` присутно, подразумевано кружно + дугме (из `1screen`) се не приказује.
+
+Поставите поље `add_repeat` као последње поље унутар групе понављања:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Члан | `1screen` |
+| text | member_name | Име члана | |
+| integer | member_age | Године | |
+| note | btn_add | + Додај члана | `add_repeat` |
+| end_repeat | | | |
+
+### Прилагођавање боја
+
+Проследите код боје унутар вредности изгледа (appearance) да бисте стилизовали дугме:
+
+| Appearance value | Result |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Зелена позадина, подразумевана боја текста |
+| `add_repeat 04B404-ffffff` | Зелена позадина, бели текст |
+
+Прва боја је позадина, а друга (након цртице) је боја текста. Изоставите `#` када користите формат са цртицом.
+
+### Варијанта са иконицом
+
+Користите `add_repeat icon` (са размаком) да бисте приказали компактно кружно дугме са иконицом уместо дугмета пуне ширине:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Додај | `add_repeat icon` |
+
+---
+
+## Дугмад за брисање: `delete-repeat-current` и `delete-repeat-last`
+
+Поље `note` унутар групе понављања са `appearance: delete-repeat-current` или `appearance: delete-repeat-last` приказује се као подељено дугме за брисање.
+
+| Appearance | Action |
+|------------|--------|
+| `delete-repeat-current` | Брише тренутну (активну) инстанцу |
+| `delete-repeat-last` | Брише последњу инстанцу у понављању |
+
+Подразумевано дугме (без иконице) је подељено дугме: иконица канте за смеће лево и текст ознаке поља десно, који се протеже целом ширином екрана.
+
+### Варијанта са иконицом
+
+Додајте `-icon` да бисте добили компактно кружно дугме са иконицом канте за смеће:
+
+| Appearance | Result |
+|------------|--------|
+| `delete-repeat-current-icon` | Кружна иконица канте, брише тренутну инстанцу |
+| `delete-repeat-last-icon` | Кружна иконица канте, брише последњу инстанцу |
+
+### Прилагођавање боја
+
+Формат боја је идентичан као за `add_repeat`: користите `<#RRGGBB/>` или `RRGGBB-RRGGBB` (позадина-текст).
+
+### Пример комплетног обрасца
+
+Следеће понављање користи `1screen`, кружно дугме за брисање тренутне инстанце на врху и дугме за додавање пуне ширине на дну:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Члан | `1screen` |
+| note | btn_del | Уклони | `delete-repeat-current-icon` |
+| text | member_name | Име члана | |
+| integer | member_age | Године | |
+| note | btn_add | + Додај члана | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## Најбоље праксе
+
+1. Увек користите `repeat_count` када је број понављања познат унапред — то спречава анкетаре да случајно додају или уклоне инстанце.
+2. Нека групе понављања буду фокусиране — понављање са више од 20 питања по инстанци је тешко за навигацију.
+3. Јасно именујте групе понављања (нпр. `household_members`, а не `repeat1`) — име се појављује у позивима функција и извезеним подацима.
+4. Тестирајте са максималним очекиваним бројем инстанци да бисте проверили перформансе.
+5. Користите `1screen` на `begin_repeat` да бисте приказали сва питања на једном екрану по инстанци, упарено са `add_repeat` пољем напомене унутар групе како бисте анкетарима дали јасно означено дугме "Додај".
+
+---
+
+## Ограничења
+
+- `indexed-repeat()` захтева важећи индекс (1 до укупног броја инстанци) — индекси ван опсега враћају празну вредност.
+- Угнежђена понављања преко 2 нивоа се не препоручују и могу изазвати проблеме са приказом на неким клијентима.
+- Агрегатне функције (`sum`, `count`, итд.) раде на целој групи понављања — не можете агрегирати подскуп инстанци без `*-if` варијанти.

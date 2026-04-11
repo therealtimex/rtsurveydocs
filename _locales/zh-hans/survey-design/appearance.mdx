@@ -1,58 +1,58 @@
 ---
-title: "外观"
+title: "外观 (Appearance)"
 description: ""
 ---
 
-rtSurvey 中的 `appearance` 列允许您自定义调查中问题的视觉呈现和行为。此功能增强了用户体验，可以显著提高数据收集效率。rtSurvey 支持标准的 XLSForm 外观属性，并用额外选项加以扩展。
+rtSurvey 中的 `appearance` 列允许您自定义调查中问题的视觉呈现和行为。此功能增强了用户体验，并可以显著提高数据收集效率。rtSurvey 支持标准的 XLSForm 外观属性，并提供了额外的扩展选项。
 
 ## 标准 XLSForm 外观属性
 
 rtSurvey 支持以下标准 XLSForm 外观属性：
 
 | 外观属性 | 问题类型 | 描述 |
-|----------------------|----------------|-------------|
-| multiline | text | 创建多行文本框（最适合网页客户端） |
+|----------|----------|------|
+| multiline | text | 创建多行文本框（最适合 Web 客户端） |
 | minimal | select_one, select_multiple | 在下拉菜单中显示选项 |
-| quick | select_one | 选择后自动前进到下一个问题（仅限移动端） |
-| no-calendar | date | 隐藏日历显示（仅限移动端） |
-| month-year | date | 只允许选择月份和年份 |
-| year | date | 只允许选择年份 |
-| horizontal-compact | select_one, select_multiple | 水平显示选项（仅限网页） |
-| horizontal | select_one, select_multiple | 按列水平显示选项（仅限网页） |
-| likert | select_one | 以李克特量表呈现选项 |
-| compact | select_one, select_multiple | 以最小填充并排显示选项 |
-| quickcompact | select_one | 将紧凑显示与自动前进结合（仅限移动端） |
+| quick | select_one | 选择后自动跳转到下一个问题（仅限移动端） |
+| no-calendar | date | 抑制日历显示（仅限移动端） |
+| month-year | date | 仅允许选择月和年 |
+| year | date | 仅允许选择年 |
+| horizontal-compact | select_one, select_multiple | 水平显示选项（仅限 Web） |
+| horizontal | select_one, select_multiple | 在列中水平显示选项（仅限 Web） |
+| likert | select_one | 将选项呈现为李克特量表 |
+| compact | select_one, select_multiple | 以最小间距并排显示选项 |
+| quickcompact | select_one | 将紧凑显示与自动跳转结合（仅限移动端） |
 | field-list | groups | 在一个屏幕上显示整个组（仅限移动端） |
-| label | select_one, select_multiple | 显示选项标签但不显示输入框 |
-| list-nolabel | select_one, select_multiple | 显示输入框但不显示标签（与 `label` 一起使用） |
+| label | select_one, select_multiple | 显示选项标签而不显示输入框 |
+| list-nolabel | select_one, select_multiple | 显示输入框而不显示标签（与 `label` 配合使用） |
 | table-list | groups | 以表格格式显示问题 |
-| signature | image | 启用签名捕获（仅限移动端） |
+| signature | image | 启用签名采集（仅限移动端） |
 | draw | image | 允许手绘（仅限移动端） |
-| map, quick map | select_one, select_one_from_file | 从地图功能中启用选择 |
+| map, quick map | select_one, select_one_from_file | 支持从地图要素中进行选择 |
 
 ## 使用外观的最佳实践
 
-1. **一致性**：在整个调查中一致地使用外观属性，保持统一的外观。
-2. **移动端与网页**：考虑外观在不同设备和平台上的渲染效果。
-3. **性能**：对可能减慢表单加载的外观属性要谨慎（例如大型组的 `table-list`）。
-4. **用户体验**：选择使受访者数据输入更轻松、更直观的外观。
-5. **测试**：始终在目标设备上测试表单，确保外观按预期工作。
+1. **一致性**：在整个调查中一致地使用外观属性，以获得统一的外观。
+2. **移动端 vs. Web**：考虑外观在不同设备和平台上的呈现效果。
+3. **性能**：谨慎使用可能减慢表单加载速度的外观属性（例如，大组的 `table-list`）。
+4. **用户体验**：选择使数据输入对受访者而言更简单、更直观的外观。
+5. **测试**：务必在目标设备上测试表单，以确保外观按预期工作。
 
-## 高级技术
+## 高级技巧
 
 ### 组合外观
 
-某些外观属性可以组合以实现更复杂的布局：
+某些外观属性可以组合使用，以实现更复杂的布局：
 
 ```
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one options | choice | 选择一项： | minimal compact |
+| select_one options | choice | 请选择一个：| minimal compact |
 ```
 
 ### 动态外观
 
-rtSurvey 允许基于表单逻辑的动态外观变化：
+rtSurvey 允许根据表单逻辑动态更改外观：
 
 ```
 | type | name | label | appearance | relevant |
@@ -62,46 +62,73 @@ rtSurvey 允许基于表单逻辑的动态外观变化：
 
 ## 移动应用注意事项
 
-- 某些外观（例如 `quick`、`signature`）特定于移动设备。
-- 在 Android 和 iOS 上全面测试以确保一致的行为。
+- 某些外观（例如 `quick`、`signature`）仅适用于移动设备。
+- 在 Android 和 iOS 上进行彻底测试，以确保行为一致。
 
 ## rtSurvey 扩展外观属性
 
-除标准 XLSForm 外观外，rtSurvey 还支持以下平台特有选项：
+除了标准 XLSForm 外观外，rtSurvey 还支持以下平台特定的选项：
 
 ### 数据和显示控制
 
 | 外观属性 | 问题类型 | 描述 |
-|----------------------|----------------|-------------|
-| `invisible` | 任意 | 在视图中隐藏字段，同时仍收集或计算其值。与 `hidden` 类型不同——字段仍参与逻辑。 |
-| `displaytitle` | 任意 | 强制显示字段的标签/标题，即使它通常会被隐藏。 |
-| `autopull` | select_one, select_multiple | 在表单加载或触发字段更改时自动获取外部数据以填充选项。 |
-| `floating_hint` | text, integer, decimal | 将提示文本显示为输入字段上方的浮动标签，而不是显示在下方。 |
-| `calculate-button` | calculate | 添加一个可见按钮，按需触发字段重新计算，而不是自动计算。 |
+|----------|----------|------|
+| `invisible` | 任何类型 | 在视图中隐藏该字段，但仍收集或计算其值。与 `hidden` 类型不同——该字段仍参与逻辑。 |
+| `displaytitle` | 任何类型 | 即使在通常会被抑制的情况下，也强制显示字段的标签/标题。 |
+| `autopull` | select_one, select_multiple | 当表单加载或触发字段更改时，自动获取外部数据以填充选项。 |
+| `floating_hint` | text, integer, decimal | 将提示文本显示为输入框上方的浮动标签，而不是下方。 |
+| `calculate-button` | calculate | 添加一个可见按钮，按需触发字段的重新计算，而不是自动计算。 |
+
+### 组和导航
+
+| 外观属性 | 问题类型 | 描述 |
+|----------|----------|------|
+| `section` | group | 将组呈现为可折叠的分段卡片。注意：仅限移动应用。 |
+| `toc-hide` | 任何类型 | 从目录 (TOC) 导航面板中排除该问题。 |
+| `minilog` | begin_repeat | 将完成的重复条目显示为紧凑的迷你日志列表，而不是内联展开每个条目。 |
+
+### 输入行为
+
+| 外观属性 | 问题类型 | 描述 |
+|----------|----------|------|
+| `proper` | text | 在受访者输入时自动将每个单词的首字母大写（标题大小写行为）。 |
+| `text-nolabel` | text, integer, decimal | 呈现不带可见标签的输入框。 |
+| `inline-1line` | text | 即使问题标签很长，也强制文本输入显示为单行。 |
+| `popup` | 任何类型 | 在弹出窗口 / 模态层中呈现该字段，而不是页面内联呈现。 |
 
 ### 布局
 
 | 外观属性 | 问题类型 | 描述 |
-|----------------------|----------------|-------------|
-| `1screen` | group | 强制整个组显示在单个屏幕上，无论组的大小。 |
-| `columns(n)` | select_one, select_multiple | 以 `n` 列显示选项。例如：`columns(3)` 显示三列单选按钮。 |
-| `gridformat<row=R col=C colspan=S align=center>` | 任意 | 将字段定位在 CSS 网格布局中的第 R 行、第 C 列，跨越 S 列。与 `advanced-extension/grid-layout` 一起使用。 |
-| `ignore-simplify` | 任意 | 指示表单渲染器跳过此字段布局的自动简化或压缩。 |
+|----------|----------|------|
+| `1screen` | group | 无论组大小如何，强制整个组在单个屏幕上显示。 |
+| `columns(n)` | select_one, select_multiple | 在 `n` 列中显示选项。示例：`columns(3)` 显示三列单选按钮。 |
+| `gridformat<row=R col=C colspan=S align=center>` | 任何类型 | 将字段放置在 CSS 网格布局中，位于第 `R` 行、第 `C` 列，跨越 `S` 列。与 `advanced-extension/grid-layout` 配合使用。 |
+| `ignore-simplify` | 任何类型 | 指示表单渲染器跳过对此字段布局的自动简化或压缩。 |
+| `horizontal(N)` | select_one, select_multiple | 设置每个选项占据行宽的 `N` 百分比。示例：`horizontal(50)` 每行放置两个选项。 |
+| `scroll-view(N%)` | group, repeat | 将容器限制为视口（或父级）高度的最大 `N%`，并在内容溢出时添加滚动条。示例：`scroll-view(60%)`。 |
 
-### 小部件
+### 组件 (Widgets)
 
 | 外观属性 | 问题类型 | 描述 |
-|----------------------|----------------|-------------|
-| `likert` | select_one | 以李克特量表行呈现选项（标准表格中已确认支持）。 |
-| `distress` | select_one | 将选项渲染为 Kessler 心理困扰量表（K10）带情感图标的可视小部件。 |
+|----------|----------|------|
+| `likert` | select_one | 将选项呈现为李克特量表行（已在上方标准表中列出；确认支持）。 |
+| `distress` | select_one | 将选项呈现为带情感图标的 Kessler 心理困扰量表 (K10) 视觉组件。 |
+| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | 将选项呈现为带五个颜色槽位的样式化评分框。`c1` = 外部容器边框，`c2` = 未选中边框，`c3` = 已选中边框和填充，`c4` = 未选中文本颜色，`c5` = 已选中文本颜色。示例：`rating_box-fill-grey-blue-green-black-white`。 |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_multiple | 将选项呈现为彩色标签。五个颜色槽位遵循与 `rating_box-fill` 相同的顺序。选中的选项会被高亮显示；未选中的选项会从摘要视图中隐藏。 |
 
 ### API 集成
 
 | 外观属性 | 问题类型 | 描述 |
-|----------------------|----------------|-------------|
-| `callapi` | text, integer, decimal, select_one | 为此字段启用 API 调用集成。calculation 列应包含 `callapi()` 表达式。参见 [Call API](advanced-extension/call-api)。 |
-| `callapi-verify(params)` | text, integer, decimal | 使用静态参数触发 API 验证调用。表单会阻止进度，直到 API 确认该值。 |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | 与 `callapi-verify` 相同，但参数来自运行时的其他字段值。 |
+|----------|----------|------|
+| `callapi` | text, integer, decimal, select_one | 为此字段启用 API 调用集成。计算列应包含 `callapi()` 表达式。请参阅 [Call API](advanced-features/call-api)。 |
+| `callapi-verify(params)` | text, integer, decimal | 使用静态参数触发 API 验证调用。表单会阻塞进度，直到 API 确认该值。 |
+| `callapi-verify(dynamicParams)` | text, integer, decimal | 与 `callapi-verify` 相同，但参数在运行时衍生自其他字段值。 |
+
+### 语言切换器
+
+| 外观属性 | 问题类型 | 描述 |
+|----------|----------|------|
+| `change_language-{colors} default('lang')` | note, text | 呈现一个使用给定颜色代码样式化的语言切换器组件。`default('lang')` 标记设置初始语言（例如 `default('en')`）；在解析过程中它会在内部重写为 `rtDefault('lang')`。示例：`change_language-blue-white default('vi')`。 |
 
 ### 内联日期/时间格式
 
@@ -112,7 +139,7 @@ inline-[%d/%m/%Y]
 inline-1line-[%d/%m/%Y %H:%M]
 ```
 
-格式标记与 `format-date()` 和 `format-date-time()` 相同。参见[函数 — 日期和时间函数](operators-and-functions/functions#date-and-time-functions)。
+格式标记与 `format-date()` 和 `format-date-time()` 相同。请参阅 [函数 — 日期和时间函数](operators-and-functions/functions#date-and-time-functions)。
 
 示例：
 
@@ -121,13 +148,67 @@ inline-1line-[%d/%m/%Y %H:%M]
 | datetime | event_time | 事件日期和时间 | inline-[%d/%m/%Y %I:%M %p] |
 | date | birth_date | 出生日期 | inline-[%d/%m/%Y] |
 
+### 内联按钮布局 — `display{}` 和 `results{}`
+
+对于呈现为内联图标按钮的问题类型（`date`、`time`、`datetime`、`image`、`audio`、`video`、`file`、`barcode`、`geopoint`），两个外观修改器控制按钮位置和采集后的行为。
+
+#### `display{...}` — 采集前的按钮位置
+
+```
+display{<align>, <size>, <color>}
+```
+
+| 参数 | 值 | 默认值 |
+|------|----|--------|
+| Align (对齐) | `left`, `right`, `top`, `center`, `bottom` | `right` |
+| Size (大小) | `small`, `medium`, `large` | `small` |
+| Color (颜色) | 十六进制值，例如 `#FF5500` | 主题主色 |
+| Flag (标记) | `inline-icon` | 强制图标模式 |
+
+| 对齐值 | 布局 |
+|--------|------|
+| `right` | 按钮位于标签右侧 |
+| `left` | 按钮位于标签左侧 |
+| `top` | 按钮位于标签上方，全宽居中 |
+| `center` / `bottom` | 按钮位于标签下方，全宽居中 |
+
+#### `results{...}` — 采集后的布局和可见性
+
+继承 `display{}` 设置。用于在采集到值后移动按钮或隐藏元素。
+
+```
+results{<align>, hide(<element>)}
+```
+
+| `hide` 值 | 效果 |
+|---|---|
+| `hide(capture)` | 一旦文件/值存在，隐藏采集按钮 |
+| `hide(review)` | 隐藏预览缩略图 / 播放按钮 |
+| `hide(filename)` | 隐藏上传后显示的文件名 |
+| `hide(camera)` | 采集后隐藏摄像头触发按钮 |
+| `hide(scanner)` | 扫描到值后隐藏条形码扫描按钮 |
+| `hide(value)` | 隐藏扫描出的值文本（条形码 / 地理点） |
+
+一旦采集到值，组件会自动从 `display{}` 布局切换到 `results{}` 布局。
+
+**示例：**
+
+```
+inline display{right}                                    → 图标位于标签右侧
+inline display{left, large}                              → 左侧大图标
+inline display{center, large, #FF5500}                   → 标签下方的大橙色图标
+inline display{right} results{left}                      → 采集后图标移动到左侧
+inline display{right} results{hide(capture)}             → 采集后图标消失
+inline display{center} results{hide(capture), hide(filename)}
+```
+
 ## 已知限制
 
-- 复杂的外观在所有平台上的渲染可能不完全相同。
-- 某些高级的 rtSurvey 外观在离线模式下可能不受支持。
+- 复杂的外观在所有平台上可能无法完全一致地呈现。
+- 离线模式下可能不支持某些高级 rtSurvey 外观。
 
-## 外观问题故障排除
+## 排除外观问题
 
-1. **外观未应用**：检查外观列中的拼写错误。
+1. **外观未应用**：检查 appearance 列是否存在拼写错误。
 2. **渲染不一致**：验证与问题类型和平台的兼容性。
 3. **性能问题**：考虑简化复杂的外观，尤其是对于大型调查。

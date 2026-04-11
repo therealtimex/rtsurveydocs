@@ -1,0 +1,104 @@
+---
+title: "Kontrol Navigasi Formulir"
+description: "Gunakan nilai tampilan SaveFinalizedExit dan SaveIncompleteExit untuk merender tombol keluar bergaya yang menyimpan dan meninggalkan formulir."
+---
+
+**Kontrol Navigasi Formulir** adalah nilai tampilan yang ditempatkan pada bidang `note` (atau `text`) yang merender sebagai tombol bergaya lebar penuh di bagian bawah survei. Mereka membiarkan enumerator menyimpan kiriman dan keluar dari formulir dalam satu ketukan — baik sebagai catatan yang sudah selesai (final) atau sebagai catatan draf (tidak lengkap).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Merender tombol yang **menyimpan kiriman sebagai final** dan keluar dari formulir. Label tombol diambil dari kolom `label` bidang.
+
+| XLSForm column | Nilai |
+|----------------|-------|
+| `type` | `note` |
+| `name` | nama unik apa pun (misalnya, `btn_finish`) |
+| `label` | teks yang ditampilkan pada tombol |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+Kiriman ditandai sebagai catatan akhir yang lengkap. Ini setara dengan mengetuk tombol kirim bawaan.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Merender tombol yang **menyimpan kiriman sebagai tidak lengkap (draf)** dan keluar dari formulir. Enumerator dapat kembali ke sana nanti dan melanjutkan pengisiannya.
+
+| XLSForm column | Nilai |
+|----------------|-------|
+| `type` | `note` |
+| `name` | nama unik apa pun (misalnya, `btn_pause`) |
+| `label` | teks yang ditampilkan pada tombol |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Sintaks warna
+
+Kedua tampilan menerima warna sebaris dalam format `<#RRGGBB/>`:
+
+- `#` diikuti oleh tepat **6 digit heksadesimal** (huruf besar atau kecil)
+- Penutup `/>` **diperlukan** — menghilangkannya akan merusak penguraian
+- Contoh: `<#04B404/>` (hijau), `<#EDC602/>` (amber), `<#D9534F/>` (merah)
+
+Warna mengontrol latar belakang tombol. Warna teks ditentukan secara otomatis oleh aplikasi.
+
+---
+
+## Contoh
+
+Dua bidang berikut yang ditempatkan di akhir formulir menghasilkan tombol **Kirim** hijau dan tombol **Simpan sebagai draf** amber:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Kirim | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Simpan sebagai draf | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — mengecualikan tombol dari daftar isi
+
+Token tampilan `toc-hide` memberi tahu rtSurvey untuk mengecualikan bidang dari **daftar isi** formulir (daftar ringkasan pertanyaan). Tombol navigasi bukan pertanyaan, jadi mereka tidak boleh muncul di TOC.
+
+Selalu tambahkan `toc-hide` setelah tampilan keluar:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Lihat [Tampilan — toc-hide](../appearance#group-and-navigation) untuk referensi toc-hide.
+
+---
+
+## Konvensi penempatan
+
+Ikuti konvensi ini saat menambahkan kontrol navigasi ke formulir:
+
+- Tempatkan kedua tombol di **paling akhir** formulir, setelah semua pertanyaan dan grup.
+- Selalu sertakan **kedua** tombol secara bersamaan — satu yang sudah difinalisasi dan satu yang tidak lengkap — sehingga enumerator selalu memiliki cara untuk keluar terlepas dari status penyelesaian.
+- Gunakan kolom `relevant` pada tombol keluar yang sudah difinalisasi jika pengiriman hanya diizinkan ketika kondisi tertentu terpenuhi (misalnya, bagian yang diperlukan selesai). Tombol keluar yang tidak lengkap umumnya harus tetap **selalu terlihat**.
+
+---
+
+## Keluar final bersyarat
+
+Gunakan kolom `relevant` untuk mengontrol kapan tombol keluar yang sudah difinalisasi ditampilkan. Keluar yang tidak lengkap harus tetap terlihat tanpa syarat sehingga enumerator selalu dapat menjeda dan kembali.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Kirim | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Simpan sebagai draf | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Dalam contoh ini tombol **Kirim** hanya muncul ketika enumerator telah memberikan persetujuan dan menandai bagian A sebagai selesai. Tombol **Simpan sebagai draf** selalu tersedia.
+
+---
+
+## Batasan
+
+- **Jenis bidang harus `note` atau `text`.** Menggunakan tampilan ini pada jenis pertanyaan lain tidak didukung.
+- **Hanya heksadesimal 6 digit.** Heksadesimal singkat (`<#FFF/>`) dan warna bernama tidak didukung — selalu gunakan format 6 digit lengkap (misalnya, `<#FFFFFF/>`).
+- **Kolom label adalah teks tombol.** Kolom `hint` diabaikan untuk bidang ini; hanya `label` yang dirender.
+- **Kedua tombol harus ada.** Menghilangkan tombol keluar yang tidak lengkap membuat enumerator tidak memiliki cara untuk menjeda di tengah formulir.

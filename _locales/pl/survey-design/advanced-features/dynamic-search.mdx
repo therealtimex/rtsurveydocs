@@ -1,15 +1,15 @@
 ---
-title: "Dynamic Search"
-description: "Dynamiczne wyszukiwanie ładuje opcje ze zdalnego API w czasie rzeczywistym podczas wpisywania przez ankietera, umożliwiając obsługę dużych lub często aktualizowanych zestawów danych."
+title: "Dynamiczne wyszukiwanie"
+description: "Dynamiczne wyszukiwanie ładuje opcje ze zdalnego API w czasie rzeczywistym podczas pisania przez ankietera, co umożliwia obsługę dużych lub często aktualizowanych zestawów danych."
 ---
 
-**Dynamiczne wyszukiwanie** (zwane też Search API) pozwala polu `select_one`, `select_multiple` lub `text` ładować opcje ze zdalnej usługi internetowej **w czasie rzeczywistym** podczas wpisywania przez ankietera. Jest to właściwe podejście, gdy lista opcji jest zbyt duża, aby dołączyć ją do pliku CSV, jest często aktualizowana lub pochodzi z aktualnej bazy danych.
+**Dynamiczne wyszukiwanie** (zwane również Search API) pozwala polom `select_one`, `select_multiple` lub `text` ładować opcje ze zdalnej usługi internetowej **w czasie rzeczywistym** podczas pisania przez ankietera. Jest to właściwe podejście, gdy lista opcji jest zbyt duża, aby dołączyć ją w pliku CSV, jest często aktualizowana lub pochodzi z bazy danych działającej na żywo.
 
 ---
 
 ## Wygląd `search-api()`
 
-Dynamiczne wyszukiwanie jest konfigurowane w kolumnie `appearance` za pomocą funkcji `search-api()`:
+Dynamiczne wyszukiwanie konfiguruje się w kolumnie `appearance` przy użyciu funkcji `search-api()`:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -18,26 +18,26 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 ### Parametry
 
 | Parametr | Opis |
-|----------|------|
+|-----------|-------------|
 | `method` | Zawsze używaj `'POST'` |
-| `url` | Punkt końcowy API do zapytania |
-| `post_body` | Treść JSON wysyłana do API. Użyj `%__input__%` jako symbolu zastępczego dla bieżącego tekstu wyszukiwania ankietera |
-| `value_column` | Klucz w obiekcie odpowiedzi używany jako przechowywana **wartość** |
-| `display` | Klucz (lub szablon) używany jako **etykieta** wyświetlana na liście. Obsługuje symbole zastępcze `##key##` i wyrażenia `@{func}` |
-| `data_path` | JSONPath do tablicy obiektów wynikowych w odpowiedzi (np. `$.data`, `$.hits.hits.*._source`) |
+| `url` | Punkt końcowy API (endpoint), do którego wysyłane jest zapytanie |
+| `post_body` | Treść JSON wysyłana do API. Użyj `%__input__%` jako symbolu zastępczego dla aktualnego tekstu wyszukiwania wpisanego przez ankietera |
+| `value_column` | Klucz w obiekcie odpowiedzi, który ma być użyty jako zapisana **wartość** (`value`) |
+| `display` | Klucz (lub szablon), który ma być użyty jako **etykieta** (`label`) wyświetlana na liście rozwijanej. Obsługuje symbole zastępcze `##key##` i wyrażenia `@{func}` |
+| `data_path` | Ścieżka JSONPath do tablicy obiektów wynikowych w odpowiedzi (np. `$.data`, `$.hits.hits.*._source`) |
 | `save_path` | Nazwa, pod którą surowa odpowiedź jest zapisywana do użytku przez inne pola |
 
 ---
 
 ## Podstawowy przykład
 
-Wyszukiwanie placówki ochrony zdrowia, gdzie ankieter wpisuje część nazwy placówki:
+Wyszukiwanie placówki medycznej, w którym ankieter wpisuje część nazwy placówki:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one | facility | Wybierz placówkę ochrony zdrowia | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+| select_one | facility | Wybierz placówkę medyczną | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-API otrzymuje `{"query": "nair"}`, gdy ankieter wpisuje „nair" i zwraca:
+API otrzymuje `{"query": "nair"}`, gdy ankieter wpisze „nair”, i zwraca:
 
 ```json
 {
@@ -48,7 +48,7 @@ API otrzymuje `{"query": "nair"}`, gdy ankieter wpisuje „nair" i zwraca:
 }
 ```
 
-Lista rozwijana pokazuje `Nairobi Central Clinic` i `Nairobi West Hospital`; przechowywana wartość to `HF001` lub `HF002`.
+Lista rozwijana pokazuje `Nairobi Central Clinic` oraz `Nairobi West Hospital`; zapisaną wartością jest `HF001` lub `HF002`.
 
 ---
 
@@ -56,7 +56,7 @@ Lista rozwijana pokazuje `Nairobi Central Clinic` i `Nairobi West Hospital`; prz
 
 ### Używanie szablonów `##key##`
 
-Pokaż wiele pól w etykiecie:
+Wyświetlanie wielu pól w etykiecie:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
@@ -66,7 +66,7 @@ Wyświetlane jako: `Nairobi Central Clinic (Nairobi)`.
 
 ### Używanie wyrażeń `@{func}`
 
-Zastosuj logikę warunkową w etykiecie wyświetlania:
+Stosowanie logiki warunkowej w etykiecie wyświetlania:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Aktywne wyniki pokazują `✓ Nazwa kliniki`; nieaktywne pokazują `✗ Nazwa kliniki`.
+Aktywne wyniki pokazują `✓ Clinic Name`; nieaktywne pokazują `✗ Clinic Name`.
 
 ---
 
-## Ustawianie domyślnej wartości: `search-default-api()`
+## Ustawianie wartości domyślnej: `search-default-api()`
 
-Użyj `search-default-api()` po `search-api()`, aby wstępnie wypełnić pole domyślną opcją załadowaną z oddzielnego wywołania API (np. przy edytowaniu istniejącego rekordu):
+Użyj `search-default-api()` po `search-api()`, aby wstępnie wypełnić pole domyślnym wyborem załadowanym z oddzielnego wywołania API (np. podczas edycji istniejącego rekordu):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -90,7 +90,7 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ## Niestandardowy separator dla select_multiple: `search-default-separator()`
 
-Dla pól `select_multiple` określ sposób łączenia wybranych wartości w przechowywany ciąg:
+Dla pól `select_multiple` określ, jak wiele wybranych wartości ma być połączonych w zapisanym ciągu znaków:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
@@ -103,35 +103,94 @@ Domyślnym separatorem jest spacja.
 ## Obsługiwane typy pytań
 
 | Typ pytania | Przypadek użycia |
-|-------------|-----------------|
+|---------------|----------|
 | `select_one` | Pojedynczy wybór z wyników wyszukiwania |
 | `select_multiple` | Wielokrotny wybór z wyników wyszukiwania |
-| `text` | Autouzupełnianie — ankieter wpisuje swobodnie, ale może wybrać sugestię |
+| `text` | Autouzupełnianie — ankieter wpisuje tekst swobodnie, ale może wybrać sugestię |
 
 ---
 
 ## Używanie zapisanych danych odpowiedzi
 
-`save_path` przechowuje pełny obiekt odpowiedzi API pod podaną nazwą. Inne pola mogą odwoływać się do niego za pomocą `pulldata()`:
+Gdy ankieter wybierze wynik, rtSurvey zapisuje pełny pasujący obiekt z odpowiedzi pod nazwą zdefiniowaną w `save_path`. Inne pola mogą z niego czytać na dwa sposoby.
+
+### Metoda 1 — wyszukiwanie `pulldata()`
+
+Użyj `pulldata('save_path', 'key')`, aby odczytać pole najwyższego poziomu z zapisanego obiektu:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Wybierz placówkę | `search-api(..., 'facility_data')` |
+| select_one | facility | Wybierz placówkę | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+Właściwość `appearance` w wierszu `select_one` musi zawierać `search-api(..., 'facility_data')` z pasującą wartością `save_path`.
+
+Dla **zagnieżdżonych pól JSON** połącz z `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## Wyszukiwanie w plikach lokalnych za pomocą search()
+
+`search()` wykonuje zapytania offline sprawdzające równość kolumn w powiązanym pliku SQLite `.db` — bez połączenia sieciowego i bez wymagań dotyczących zapytań SQL. Używaj go, gdy dane referencyjne są dołączone do formularza i potrzebujesz prostego wyszukiwania typu „znajdź wszystkie wiersze, w których kolumna równa się wartości”.
+
+### Sygnatura
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parametry
+
+| Parametr | Opis |
+|-----------|-------------|
+| `path` | Ścieżka do tabeli SQLite: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Operator dopasowania — zwraca wiersze, w których kolumna równa się wartości |
+| `'list_name'` | Nazwa kolumny, z którą ma nastąpić dopasowanie |
+| `${field}` | Wartość do dopasowania; zazwyczaj odniesienie do pola |
+
+### Przykład
+
+Wypełnienie pola `select_one` z lokalnej bazy danych poprzez dopasowanie wartości `${d307}` do kolumny `list_name` w tabeli `externalData` w pliku `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Wybierz placówkę | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Gdy `${d307}` jest równe `"HF001"`, `search()` zwraca każdy wiersz w `externalData`, gdzie `list_name = 'HF001'` — całkowicie z dołączonego pliku, bez wywołania sieciowego.
+
+### search() kontra autouzupełnianie rawquery
+
+| Funkcja | `search()` | Autouzupełnianie `rawquery` |
+|---------|-----------|------------------------|
+| Zapytania SQL | Nie — tylko równość kolumn | Tak — pełne `SELECT … FROM …` |
+| Sparametryzowane wejście | Dopasowanie wartości kolumny | Osadzone w ciągu SQL |
+| Wprowadzanie tekstu swobodnego | Tak — ankieter może pisać swobodnie | Nie — musi wybrać z listy |
+| UNION / wiele tabel | Nieobsługiwane | Obsługiwane |
+
+### Kiedy używać każdego z nich
+
+- Używaj **`search()`**, gdy potrzebujesz prostego dopasowania równości w dołączonym pliku `.db`, formularz musi działać offline i chcesz pozwolić na swobodne wprowadzanie tekstu.
+- Używaj **autouzupełniania `rawquery`**, gdy potrzebujesz elastyczności SQL (JOIN, UNION, kolumny obliczeniowe) lub musisz wysyłać zapytania do wielu tabel, a formularz ma niezawodną łączność.
 
 ---
 
 ## Najlepsze praktyki
 
-1. Upewnij się, że punkt końcowy API odpowiada w ciągu 1–2 sekund — wolne API sprawia, że wyszukiwanie wydaje się nieresponsywne.
+1. Upewnij się, że punkt końcowy API odpowiada w ciągu 1–2 sekund — wolne API sprawiają, że wyszukiwanie wydaje się nie reagować.
 2. Używaj `%__input__%` w `post_body`, aby API zwracało tylko pasujące wyniki, a nie cały zestaw danych.
 3. Indeksuj pole wyszukiwania po stronie serwera (np. Elasticsearch, pełnotekstowy indeks bazy danych) dla szybkich odpowiedzi.
 4. Ogranicz wyniki do 20–50 elementów na zapytanie — zwracanie tysięcy wyników mija się z celem wyszukiwania.
-5. Uwzględnij wymaganie minimalnej długości wejścia w API, aby uniknąć uruchamiania szerokich zapytań przy pojedynczych znakach.
+5. Uwzględnij w API wymaganie minimalnej długości wpisanych znaków, aby uniknąć wyzwalania szerokich zapytań przy wpisaniu pojedynczego znaku.
 
 ## Ograniczenia
 
-- Dynamiczne wyszukiwanie wymaga połączenia sieciowego — nie działa offline.
-- Symbol zastępczy `%__input__%` jest wstrzykiwany w stanie surowym; czyść dane wejściowe po stronie serwera, aby zapobiec atakom wstrzyknięcia.
-- Złożone wyrażenia wyświetlania `@{func}` mogą mieć ograniczone wsparcie we wszystkich wersjach klienta rtSurvey.
+- Dynamiczne wyszukiwanie wymaga łączności sieciowej — nie działa offline.
+- Symbol zastępczy `%__input__%` jest wstawiany w postaci niezmienionej; należy oczyszczać dane wejściowe po stronie serwera, aby zapobiec atakom typu injection.
+- Złożone wyrażenia wyświetlania `@{func}` mogą mieć ograniczone wsparcie w niektórych wersjach klienta rtSurvey.

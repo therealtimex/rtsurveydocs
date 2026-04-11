@@ -1,114 +1,114 @@
 ---
 title: "Haladó ismétlések"
-description: "Haladó minták ismétlőcsoportokhoz: dinamikus számok, beágyazott ismétlések, ismétlési adatok összefoglalása és értékek hivatkozása ismétlések között."
+description: "Haladó minták ismétlődő csoportokhoz: dinamikus számok, egymásba ágyazott ismétlések, ismétlődő adatok összegzése és értékek hivatkozása ismétlések között."
 ---
 
-Ez az oldal haladó mintákat tárgyal az rtSurvey ismétlőcsoportjaihoz. Az ismétlőcsoport beállításának alapjairól lásd: [Csoportosítás és ismétlések](../repeats).
+Ez az oldal az ismétlődő csoportokkal való munka haladó mintáit tárgyalja az rtSurvey-ben. Az ismétlődő csoportok beállításának alapjait a [Csoportosítás és ismétlések](../repeats) oldalon találja.
 
 ---
 
-## Dinamikus ismétlésszám
+## Dinamikus ismétlési szám
 
-Alapértelmezés szerint a kérdező dönt arról, hányszor ismételjen. Az ismétlések számát a `repeat_count` segítségével rögzítheti:
+Alapértelmezés szerint a kérdező dönti el, hányszor kell ismételni. Az ismétlések számát a `repeat_count` oszlop segítségével rögzítheti:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
-| begin_repeat | household_members | Háztartástag | `${num_members}` |
+| begin_repeat | household_members | Háztartás tagja | `${num_members}` |
 | text | member_name | Tag neve | |
-| integer | member_age | Kor | |
+| integer | member_age | Életkor | |
 | end_repeat | | | |
 
-Az ismétlés pontosan `${num_members}` alkalommal fut le, ahol a `num_members` értékét korábban az űrlapon gyűjtötték. A kérdező nem adhat hozzá vagy távolíthat el példányokat.
+Az ismétlés pontosan `${num_members}` alkalommal fut le, ahol a `num_members` értékét korábban gyűjtötték be az űrlapon. A kérdező nem adhat hozzá és nem távolíthat el példányokat.
 
 ---
 
 ## Indexelt hozzáférés: `indexed-repeat()`
 
-Egy adott ismétlési példány mezőértékének elérése az ismétlőcsoporton **kívülről** az `indexed-repeat(repeatedField, repeatGroup, index)` segítségével:
+Egy adott ismétlési példány mezőértékének elérése az ismétlődő csoporton **kívülről** az `indexed-repeat(repeatedField, repeatGroup, index)` függvény használatával:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Ez hasznos összefoglaló mezők felépítéséhez vagy az ismétlés utáni "elsődleges" tag adataira való hivatkozáshoz.
+Ez hasznos összegző mezők létrehozásához vagy az "elsődleges" tag adataira való hivatkozáshoz az ismétlés után.
 
 ---
 
 ## Aktuális példány pozíciója: `index()`
 
-Az ismétlőcsoporton belül az `index()` az aktuális példány 1-től számozott pozícióját adja vissza. Ezzel az egyes ismétlések megcímkézhetők vagy egyedi azonosítók hozhatók létre:
+Ismétlődő csoporton belül az `index()` az aktuális példány 1-alapú pozícióját adja vissza. Használja minden egyes ismétlés megcímkézésére vagy egyedi azonosítók létrehozására:
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | plots | Parcella |
-| note | plot_label | `${index()}`. parcella |
+| note | plot_label | Parcella száma: `${index()}` |
 | text | plot_id | Parcella azonosítója |
 | end_repeat | | |
 
 ---
 
-## Ugyanabban a példányban lévő mezőkre való hivatkozás
+## Mezőkre való hivatkozás ugyanazon a példányon belül
 
-Az ismétlésen belül a `${mezőnév}` segítségével hivatkozhat egy másik mezőre **ugyanabban az ismétlési példányban**. Az `indexed-repeat()` nem szükséges ugyanazon a cikluson belül:
+Egy ismétlésen belül használja a `${fieldname}` formátumot egy másik mezőre való hivatkozáshoz **ugyanazon az ismétlési példányon belül**. Nincs szükség az `indexed-repeat()` használatára ugyanazon a cikluson belül:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
 | begin_repeat | members | Tag | |
 | text | member_name | Név | |
-| integer | member_age | Kor | |
+| integer | member_age | Életkor | |
 | text | school_name | Iskola neve | `${member_age} < 18` |
 | end_repeat | | | |
 
 ---
 
-## Szülőmezőkre való hivatkozás ismétlésen belülről
+## Szülőmezőkre való hivatkozás egy ismétlésen belülről
 
-Az ismétlőcsoporton kívül (felette) lévő mezőkre normálisan hivatkozhat a `${mezőnév}` segítségével:
+Az ismétlődő csoporton kívüli (felette lévő) mezőkre normál módon hivatkozhatunk a `${fieldname}` segítségével:
 
 | type | name | label |
 |------|------|-------|
 | text | village | Falu neve |
 | begin_repeat | plots | Mezőgazdasági parcella |
-| note | plot_context | Parcellák `${village}` területén |
+| note | plot_context | Parcellák itt: `${village}` |
 | end_repeat | | |
 
 ---
 
-## Ismétlési adatok összefoglalása
+## Ismétlődő adatok összegzése
 
-Az ismétlőcsoporton **kívüli** összesítő függvények használata az összefoglaláshoz:
+Használjon ismétlődő aggregáló függvényeket az ismétlődő csoporton **kívül** az összegzéshez:
 
 | Függvény | Példa | Leírás |
-|----------|---------|--------|
+|----------|---------|-------------|
 | `count(group)` | `count(${household_members})` | Példányok száma |
 | `sum(field)` | `sum(${loan_amount})` | Numerikus mező összege |
-| `min(field)` | `min(${member_age})` | Minimális érték |
-| `max(field)` | `max(${member_age})` | Maximális érték |
+| `min(field)` | `min(${member_age})` | Minimum érték |
+| `max(field)` | `max(${member_age})` | Maximum érték |
 | `join(sep, field)` | `join(', ', ${member_name})` | Vesszővel elválasztott lista |
 | `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Feltételes számlálás |
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Feltételes összegzés |
-| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Feltételes összefűzés |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Feltételes összekapcsolás |
 
-### Példa: Háztartás összefoglalója
+### Példa: Háztartás összegzése
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| integer | num_members | Hány tag van? | |
+| integer | num_members | Hány tagja van? | |
 | begin_repeat | members | Tag | `${num_members}` |
 | text | member_name | Név | |
-| integer | member_age | Kor | |
+| integer | member_age | Életkor | |
 | end_repeat | | | |
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` tag; `${children_count}` 18 éven aluli. Felnőttek: `${adult_names}` | |
+| note | summary | `${total_members}` tag; `${children_count}` 18 év alatti. Felnőttek: `${adult_names}` | |
 
 ---
 
-## Beágyazott ismétlések
+## Egymásba ágyazott ismétlések
 
-Egy ismétlőcsoport tartalmazhat másik ismétlőcsoportot. Ezt óvatosan alkalmazza – a beágyazott ismétlések bonyolultabbak és zavaróak lehetnek a kérdezők számára.
+Egy ismétlődő csoport tartalmazhat egy másik ismétlődő csoportot. Ezt óvatosan használja – az egymásba ágyazott ismétlések növelik az összetettséget, és zavaróak lehetnek a kérdezők számára.
 
 | type | name | label |
 |------|------|-------|
@@ -119,15 +119,15 @@ Egy ismétlőcsoport tartalmazhat másik ismétlőcsoportot. Ezt óvatosan alkal
 | end_repeat | | |
 | end_repeat | | |
 
-A belső ismétlésből a külső ismétlés mezőjére való hivatkozáshoz használja a `${mezőnév}` értéket – ez a legközelebbi egyező ősre oldódik fel:
+Egy külső ismétlés mezőjére való hivatkozáshoz a belső ismétlésből használja a `${fieldname}` formátumot – ez a legközelebbi egyező őshöz oldódik fel:
 
 A `hh_members` ismétlésen belül a `${hh_id}` az **aktuális** háztartás azonosítóját adja vissza, nem az összes háztartásét.
 
 ---
 
-## Rang ismétlőcsoportokban: `rank-index()`
+## Rangsor az ismétlődő csoportokon belül: `rank-index()`
 
-Ha egy `rank` mező egy ismétlőcsoporton belül van, a `rank-index(instanceNumber, repeatedField)` segítségével kinyerheti egy adott példány rangját az ismétlésen kívülről:
+Ha egy `rank` mező található egy ismétlésen belül, használja a `rank-index(instanceNumber, repeatedField)` függvényt kívülről egy adott példány sorszámának lekéréséhez:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -137,18 +137,114 @@ A `rank-index(1, ${score})` a legmagasabb pontszámú példány indexét adja vi
 
 ---
 
-## Bevált módszerek
+## `1screen` megjelenés a `begin_repeat` soron
 
-1. Mindig használjon `repeat_count` értéket, ha az ismétlések száma előre ismert – ez megakadályozza, hogy a kérdezők véletlenül hozzáadjanak vagy eltávolítsanak példányokat.
-2. Tartsa az ismétlőcsoportokat fókuszáltan – a 20+ kérdést tartalmazó ismétlési példányok nehézek a navigáláshoz.
-3. Névvezze az ismétlőcsoportokat egyértelműen (pl. `household_members`, nem `repeat1`) – a név megjelenik a függvényhívásokban és az exportált adatokban.
-4. Tesztelje a maximálisan várt példányszámmal a teljesítmény ellenőrzéséhez.
-5. Mobilon használja a `field-list` megjelenést az ismétlőcsoporton, hogy minden mező egy képernyőn jelenjen meg példányonként.
+Ha hozzáadja az `1screen` értéket egy `begin_repeat` sor `appearance` oszlopához, az minden egyes példány összes kérdését együtt, egyetlen képernyőn jeleníti meg, nem pedig képernyőnként egy kérdést.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Háztartás tagja | `1screen` |
+| text | member_name | Tag neve | |
+| integer | member_age | Életkor | |
+| end_repeat | | | |
+
+Ha az `1screen` be van állítva, és nincs `repeat_count` és nincs `add_repeat` mező a csoporton belül, az rtSurvey automatikusan megjelenít egy kör alakú **+** gombot a képernyő alján, így a kérdezők külön konfiguráció nélkül adhatnak hozzá új példányokat.
+
+| Megjelenés | Egy képernyő példányonként | Alapértelmezett + gomb hozzáadva |
+|------------|----------------------------|---------------------------------|
+| `1screen` | Igen | Igen (ha nincs `add_repeat` gyermekmező) |
+| `field-list` | Igen | Nem |
+
+Használja a `field-list` értéket, ha a csoportosított elrendezést szeretné az automatikus hozzáadás gomb nélkül. Használja az `1screen` értéket, ha mind a csoportosított elrendezést, mind a beépített példány-hozzáadási módot szeretné.
+
+---
+
+## `add_repeat` egyéni hozzáadás gomb
+
+Az ismétlődő csoporton **belül** elhelyezett `note` (vagy `text`) mező `appearance: add_repeat` beállítással teljes szélességű "Hozzáadás" gombként jelenik meg. A gomb felirata a mező `label` oszlopából származik. Ha van `add_repeat` mező, az alapértelmezett kör alakú + gomb (az `1screen` beállításból) eltűnik.
+
+Helyezze az `add_repeat` mezőt az utolsó mezőként az ismétlődő csoporton belül:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Tag | `1screen` |
+| text | member_name | Tag neve | |
+| integer | member_age | Életkor | |
+| note | btn_add | + Tag hozzáadása | `add_repeat` |
+| end_repeat | | | |
+
+### Szín testreszabása
+
+A gomb stílusának kialakításához adjon meg egy színkódot a megjelenési értéken belül:
+
+| Megjelenési érték | Eredmény |
+|-------------------|----------|
+| `add_repeat <#04B404/>` | Zöld háttér, alapértelmezett szövegszín |
+| `add_repeat 04B404-ffffff` | Zöld háttér, fehér szöveg |
+
+Az első szín a háttér, a második (a kötőjel után) a szöveg színe. Hagyja el a `#` jelet a kötőjellel elválasztott forma használatakor.
+
+### Ikon változat
+
+Használja az `add_repeat icon` értéket (szóközzel) egy kompakt, kör alakú ikongomb megjelenítéséhez a teljes szélességű gomb helyett:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Hozzáadás | `add_repeat icon` |
+
+---
+
+## Törlés gombok: `delete-repeat-current` és `delete-repeat-last`
+
+Az ismétlődő csoporton belüli `note` mező `appearance: delete-repeat-current` vagy `appearance: delete-repeat-last` beállítással osztott törlés gombként jelenik meg.
+
+| Megjelenés | Művelet |
+|------------|---------|
+| `delete-repeat-current` | Törli az aktuális (aktív) példányt |
+| `delete-repeat-last` | Törli az utolsó példányt az ismétlésben |
+
+Az alapértelmezett (nem ikon) gomb egy osztott gomb: bal oldalon egy kuka ikon, jobb oldalon pedig a mező felirata, amely a képernyő teljes szélességét kitölti.
+
+### Ikon változat
+
+Fűzze hozzá a `-icon` utótagot egy kompakt, kör alakú kuka ikongombhoz:
+
+| Megjelenés | Eredmény |
+|------------|----------|
+| `delete-repeat-current-icon` | Kör alakú kuka ikon, törli az aktuális példányt |
+| `delete-repeat-last-icon` | Kör alakú kuka ikon, törli az utolsó példányt |
+
+### Szín testreszabása
+
+A színformátum megegyezik az `add_repeat` beállítással: használja a `<#RRGGBB/>` vagy az `RRGGBB-RRGGBB` (háttér-szöveg) formátumot.
+
+### Teljes minta példa
+
+A következő ismétlés az `1screen` beállítást használja, a tetején egy kör alakú aktuális példány törlése gombbal, az alján pedig egy teljes szélességű hozzáadás gombbal:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Tag | `1screen` |
+| note | btn_del | Eltávolítás | `delete-repeat-current-icon` |
+| text | member_name | Tag neve | |
+| integer | member_age | Életkor | |
+| note | btn_add | + Tag hozzáadása | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## Legjobb gyakorlatok
+
+1. Mindig használja a `repeat_count` beállítást, ha az ismétlések száma előre ismert – ez megakadályozza, hogy a kérdezők véletlenül hozzáadjanak vagy eltávolítsanak példányokat.
+2. Tartsa az ismétlődő csoportokat fókuszáltan – egy példányonként 20-nál több kérdést tartalmazó ismétlés nehezen navigálható.
+3. Nevezze el egyértelműen az ismétlődő csoportokat (pl. `household_members`, nem pedig `repeat1`) – a név megjelenik a függvényhívásokban és az exportált adatokban.
+4. Tesztelje a várható maximális példányszámmal a teljesítmény ellenőrzéséhez.
+5. Használja az `1screen` értéket a `begin_repeat` soron, hogy minden kérdés egyetlen képernyőn jelenjen meg példányonként, és párosítsa egy `add_repeat` megjegyzésmezővel a csoporton belül, hogy a kérdezők egyértelműen feliratozott "Hozzáadás" gombot kapjanak.
 
 ---
 
 ## Korlátozások
 
-- Az `indexed-repeat()` érvényes indexet igényel (1-től a példányok számáig) – tartományon kívüli indexek üres értéket adnak vissza.
-- A 2 szintnél mélyebb beágyazott ismétlések nem ajánlottak, és egyes kliensekben megjelenítési problémákat okozhatnak.
-- Az összesítő függvények (`sum`, `count` stb.) a teljes ismétlőcsoporton működnek – nem lehet a példányok egy részhalmazán összesíteni a `*-if` változatok nélkül.
+- Az `indexed-repeat()` függvényhez érvényes indexre van szükség (1-től a példányok számáig) – a tartományon kívüli indexek üres értéket adnak vissza.
+- A 2 szintnél mélyebb egymásba ágyazott ismétlések nem javasoltak, és megjelenítési problémákat okozhatnak egyes klienseken.
+- Az aggregáló függvények (`sum`, `count` stb.) a teljes ismétlődő csoporton működnek – nem lehet aggregálni a példányok egy részhalmazát a `*-if` változatok nélkül.

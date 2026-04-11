@@ -1,14 +1,14 @@
 ---
-title: "HTML стилизиране"
-description: "rtSurvey поддържа HTML тагове в заглавия и подсказки, позволявайки богато форматиране на текст, връзки и динамично задаване на теми с цветове."
+title: "HTML Стилизиране"
+description: "rtSurvey поддържа HTML тагове в етикетите и подсказките, позволявайки форматиране на богат текст, връзки и динамично цветно тематизиране."
 ---
 
 import { Callout } from 'nextra/components'
 
-rtSurvey renders **label** and **hint** text as HTML on web forms. This means you can use standard HTML tags to format text, add line breaks, create links, and apply colors. This is particularly useful for note fields, section instructions, and dynamic summaries.
+rtSurvey изобразява текста на **етикета (label)** и **подсказката (hint)** като HTML в уеб формите. Това означава, че можете да използвате стандартни HTML тагове за форматиране на текст, добавяне на прекъсвания на редове, създаване на връзки и прилагане на цветове. Това е особено полезно за полета за бележки, инструкции за раздели и динамични обобщения.
 
 <Callout type="warning">
-HTML in labels is rendered on the **web form** and rtSurvey mobile apps. It may not render in all ODK-compatible clients. Always test on your target platform.
+HTML в етикетите се изобразява в **уеб формата** и мобилните приложения на rtSurvey. Той може да не се изобразява във всички ODK-съвместими клиенти. Винаги тествайте на вашата целева платформа.
 </Callout>
 
 ---
@@ -17,13 +17,13 @@ HTML in labels is rendered on the **web form** and rtSurvey mobile apps. It may 
 
 ### Форматиране на текст
 
-| Tag | Result |
+| Таг | Резултат |
 |-----|--------|
-| `<strong>text</strong>` or `<b>text</b>` | **Bold text** |
-| `<em>text</em>` or `<i>text</i>` | *Italic text* |
-| `<u>text</u>` | Underlined text |
-| `<br>` | Line break |
-| `<span style="...">text</span>` | Inline styling |
+| `<strong>text</strong>` или `<b>text</b>` | **Удебелен текст** |
+| `<em>text</em>` или `<i>text</i>` | *Курсивен текст* |
+| `<u>text</u>` | Подчертан текст |
+| `<br>` | Прекъсване на ред |
+| `<span style="...">text</span>` | Вградено стилизиране |
 
 ### Връзки
 
@@ -31,11 +31,11 @@ HTML in labels is rendered on the **web form** and rtSurvey mobile apps. It may 
 <a href="https://example.com" target="_blank">Click here</a>
 ```
 
-Opens in a new tab. Use for reference documents, guidelines, or external resources the enumerator should consult.
+Отваря се в нов раздел. Използвайте за референтни документи, насоки или външни ресурси, с които анкетьорът трябва да се консултира.
 
 ### Цветове
 
-Use `<span>` with inline styles:
+Използвайте `<span>` с вградени стилове:
 
 ```html
 <span style="color: red;">Warning: value is out of range</span>
@@ -44,39 +44,39 @@ Use `<span>` with inline styles:
 
 ---
 
-## Променливи на цветовата тема
+## Променливи на цветната тема
 
-rtSurvey supports **color theme tokens** that adapt to the app's configured theme. Use the `__COLOR_THEME_NAME__` syntax:
+rtSurvey поддържа **токени за цветна тема**, които се адаптират към конфигурираната тема на приложението. Използвайте синтаксиса `__COLOR_THEME_NAME__`:
 
 ```html
 <span style="color: var(--color-theme-primary);">Primary color text</span>
 ```
 
-Or using the token shorthand in label text:
+Или използвайки съкращението на токена в текста на етикета:
 
 ```
 <font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
 ```
 
-This is automatically converted to the equivalent `<span>` with a CSS variable at render time.
+Това автоматично се преобразува в еквивалентния `<span>` с CSS променлива по време на изобразяване.
 
 ---
 
 ## Многоезични етикети
 
-Wrap content in language tags to support multiple languages in a single label cell:
+Оградете съдържанието в езикови тагове, за да поддържате няколко езика в една клетка за етикет:
 
 ```
 <en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
 ```
 
-rtSurvey extracts the content matching the current app language. If no matching language tag is found, the full string is shown as-is.
+rtSurvey извлича съдържанието, съответстващо на текущия език на приложението. Ако не бъде намерен съответстващ езиков таг, пълният низ се показва такъв, какъвто е.
 
 ---
 
-## Примери в note полета
+## Примери в полета за бележки
 
-### Инструкция за секция с удебелен шрифт и нов ред
+### Инструкция за раздел с удебелен шрифт и прекъсване на ред
 
 | type | name | label |
 |------|------|-------|
@@ -103,21 +103,21 @@ rtSurvey extracts the content matching the current app language. If no matching 
 
 ---
 
-## Специални HTML тагове на rtSurvey
+## Специални rtSurvey HTML тагове
 
 ### `<webbox src='url' title='title'>...</webbox>`
 
-Embeds a button that opens a URL in an in-form modal. See [Webbox](webbox) for full details.
+Вгражда бутон, който отваря URL адрес в модален прозорец в самата форма. Вижте [Webbox](webbox) за пълни подробности.
 
 ### `<delete-repeat-current>label</delete-repeat-current>`
 
-Renders a button inside a repeat group that deletes the current repeat instance when tapped.
+Изобразява бутон вътре в група за повторение, който изтрива текущия екземпляр на повторение при докосване.
 
 ### `<delete-repeat-last>label</delete-repeat-last>`
 
-Renders a button that deletes the last repeat instance.
+Изобразява бутон, който изтрива последния екземпляр на повторение.
 
-Example usage in a repeat group:
+Пример за използване в група за повторение:
 
 | type | name | label |
 |------|------|-------|
@@ -125,17 +125,87 @@ Example usage in a repeat group:
 
 ---
 
+## Динамични HTML обобщения с autopull()
+
+`autopull()` изобразява блок от HTML вътре в поле `note` и **го преизчислява при всяка промяна на поле** във формата. Това го прави подходящ за панели за обобщение на живо, екрани за преглед преди изпращане и текущи суми, които се актуализират, докато анкетьорът попълва данни.
+
+<Callout type="info">
+`autopull()` работи само върху полета за **бележки (note)**. Колоната за етикет (label) се игнорира — цялото HTML съдържание трябва да бъде предоставено чрез колоната за **външен вид (appearance)**, използвайки `concat()`.
+</Callout>
+
+### Синтаксис
+
+Поставете `autopull()` в колоната за **външен вид (appearance)** на поле `note`:
+
+```
+autopull(concat('<html>...</html>'))
+```
+
+Препратките към полета (`${field_name}`) вътре в `concat()` се заместват с текущите стойности на живо и HTML се преизобразява при всяка промяна.
+
+### Ограничаване на височината със scroll-view()
+
+За по-дълги обобщения комбинирайте `autopull()` със `scroll-view(N%)`, за да ограничите височината на панела и да го направите превъртаем:
+
+```
+scroll-view(45%) autopull(concat('<html>...</html>'))
+```
+
+Стойността `N%` е спрямо видимата област на формата. `45%` е практическа стойност по подразбиране за панел за обобщение в средата на страницата.
+
+### Пълен пример — обобщение на местоположението на домакинството
+
+Следното поле `note` изобразява таблица с две колони, показваща избраната провинция, област и община. Тя се актуализира автоматично всеки път, когато `${tinh_name}`, `${huyen_name}` или `${xa_name}` се променят.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | location_summary | | `scroll-view(45%) autopull(concat('<html><table style="width:100%;border-collapse:collapse"><tr><td style="padding:4px;font-weight:bold">Province:</td><td style="padding:4px">', ${tinh_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">District:</td><td style="padding:4px">', ${huyen_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Commune:</td><td style="padding:4px">', ${xa_name}, '</td></tr></table></html>'))` |
+
+В XLSForm стойността на външния вид се записва в една клетка:
+
+```
+scroll-view(45%) autopull(concat(
+  '<html><table style="width:100%;border-collapse:collapse">
+   <tr><td style="padding:4px;font-weight:bold">Province:</td>
+       <td style="padding:4px">', ${tinh_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">District:</td>
+       <td style="padding:4px">', ${huyen_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Commune:</td>
+       <td style="padding:4px">', ${xa_name}, '</td></tr>
+   </table></html>'))
+```
+
+### Вградени стилове
+
+Вградените атрибути `style="..."` върху всеки HTML елемент се поддържат и са препоръчителният начин за прилагане на визуално форматиране вътре в блоковете на `autopull()`.
+
+Следното **не** се поддържа вътре в съдържанието на `autopull()`:
+
+- Блокове `<style>`
+- Тагове за външни таблици със стилове `<link>`
+- JavaScript (`<script>`)
+
+### Кога да използвате autopull()
+
+| Случай на употреба | Бележки |
+|----------|-------|
+| Екран за преглед преди изпращане | Покажете всички ключови отговори на един панел, преди анкетьорът да приключи |
+| Текущи суми | Покажете изчислена сума, която се актуализира при въвеждане на количества |
+| Видим референтен панел | Покажете избрана стойност от търсене (напр. име на провинция), докато анкетьорът попълва подчинени полета |
+
+---
+
 ## Най-добри практики
 
-1. Use HTML sparingly — overformatted labels are harder to read, not easier.
-2. Prefer `<strong>` for bold and `<em>` for italics over deprecated `<b>` and `<i>`.
-3. Keep color usage meaningful — use red for warnings, not for decoration.
-4. Always test HTML rendering on both mobile app and web form, as rendering may differ slightly.
-5. Avoid `<table>` tags inside labels — they rarely render well on mobile screens.
-6. Do not use JavaScript (`<script>`) — it will be stripped or cause errors.
+1. Използвайте HTML пестеливо — прекалено форматираните етикети са по-трудни за четене, а не по-лесни.
+2. Предпочитайте `<strong>` за удебелен шрифт и `<em>` за курсив пред остарелите `<b>` и `<i>`.
+3. Използвайте цветовете смислено — използвайте червено за предупреждения, а не за декорация.
+4. Винаги тествайте изобразяването на HTML както в мобилното приложение, така и в уеб формата, тъй като изобразяването може леко да се различава.
+5. Избягвайте тагове `<table>` вътре в етикетите — те рядко се изобразяват добре на мобилни екрани.
+6. Не използвайте JavaScript (`<script>`) — той ще бъде премахнат или ще предизвика грешки.
 
 ## Ограничения
 
-- Complex HTML (tables, forms, scripts) is not supported and may break rendering.
-- Some older mobile clients may display HTML tags as literal text — test on all target devices.
-- `<a>` links open in a browser or WebView — the enumerator leaves the form, which can be disruptive on mobile.
+- Сложният HTML (таблици, форми, скриптове) не се поддържа и може да наруши изобразяването.
+- Някои по-стари мобилни клиенти могат да показват HTML таговете като литерален текст — тествайте на всички целеви устройства.
+- Връзките `<a>` се отварят в браузър или WebView — анкетьорът напуска формата, което може да бъде обезпокоително на мобилно устройство.

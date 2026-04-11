@@ -1,0 +1,211 @@
+---
+title: "HTML स्टाइलिंग"
+description: "rtSurvey लेबल और हिंट में HTML टैग का समर्थन करता है, जिससे रिच टेक्स्ट फॉर्मेटिंग, लिंक और डायनेमिक कलर थीमिंग की अनुमति मिलती है।"
+---
+
+import { Callout } from 'nextra/components'
+
+rtSurvey वेब फ़ॉर्म पर **लेबल (label)** और **हिंट (hint)** टेक्स्ट को HTML के रूप में रेंडर करता है। इसका मतलब है कि आप टेक्स्ट को फॉर्मेट करने, लाइन ब्रेक जोड़ने, लिंक बनाने और रंग लागू करने के लिए मानक HTML टैग का उपयोग कर सकते हैं। यह विशेष रूप से नोट फ़ील्ड, सेक्शन निर्देश और डायनेमिक सारांश के लिए उपयोगी है।
+
+<Callout type="warning">
+लेबल में HTML **वेब फ़ॉर्म** और rtSurvey मोबाइल ऐप पर रेंडर किया जाता है। यह सभी ODK-संगत क्लाइंट में रेंडर नहीं हो सकता है। हमेशा अपने लक्षित प्लेटफ़ॉर्म पर परीक्षण करें।
+</Callout>
+
+---
+
+## समर्थित HTML टैग
+
+### टेक्स्ट फॉर्मेटिंग
+
+| टैग | परिणाम |
+|-----|--------|
+| `<strong>text</strong>` या `<b>text</b>` | **बोल्ड टेक्स्ट** |
+| `<em>text</em>` या `<i>text</i>` | *इटैलिक टेक्स्ट* |
+| `<u>text</u>` | अंडरलाइन टेक्स्ट |
+| `<br>` | लाइन ब्रेक |
+| `<span style="...">text</span>` | इनलाइन स्टाइलिंग |
+
+### लिंक
+
+```html
+<a href="https://example.com" target="_blank">Click here</a>
+```
+
+एक नए टैब में खुलता है। संदर्भ दस्तावेजों, दिशानिर्देशों या बाहरी संसाधनों के लिए उपयोग करें जिन्हें गणनाकार को परामर्श करना चाहिए।
+
+### रंग
+
+इनलाइन स्टाइल के साथ `<span>` का उपयोग करें:
+
+```html
+<span style="color: red;">Warning: value is out of range</span>
+<span style="color: #009688;">Section completed</span>
+```
+
+---
+
+## कलर थीम वेरिएबल
+
+rtSurvey **कलर थीम टोकन** का समर्थन करता है जो ऐप की कॉन्फ़िगर की गई थीम के अनुकूल होते हैं। `__COLOR_THEME_NAME__` सिंटैक्स का उपयोग करें:
+
+```html
+<span style="color: var(--color-theme-primary);">Primary color text</span>
+```
+
+या लेबल टेक्स्ट में टोकन शॉर्टहैंड का उपयोग करना:
+
+```
+<font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
+```
+
+यह रेंडर समय पर CSS वेरिएबल के साथ समकक्ष `<span>` में स्वचालित रूप से परिवर्तित हो जाता है।
+
+---
+
+## बहु-भाषी लेबल
+
+एकल लेबल सेल में कई भाषाओं का समर्थन करने के लिए सामग्री को भाषा टैग में लपेटें:
+
+```
+<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+```
+
+rtSurvey वर्तमान ऐप भाषा से मेल खाने वाली सामग्री निकालता है। यदि कोई मिलान करने वाला भाषा टैग नहीं मिलता है, तो पूर्ण स्ट्रिंग को वैसे ही दिखाया जाता है।
+
+---
+
+## नोट फ़ील्ड में उदाहरण
+
+### बोल्ड और लाइन ब्रेक के साथ सेक्शन निर्देश
+
+| type | name | label |
+|------|------|-------|
+| note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
+
+### गणना संदर्भ के साथ डायनेमिक सारांश
+
+| type | name | label |
+|------|------|-------|
+| calculate | total | | `${adults} + ${children}` |
+| note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
+
+### लाल रंग में चेतावनी
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
+
+### संदर्भ दस्तावेज़ का लिंक
+
+| type | name | label |
+|------|------|-------|
+| note | guidelines_link | `Refer to the <a href="https://docs.example.com/guidelines" target="_blank">Field Guidelines</a> before starting this section.` |
+
+---
+
+## विशेष rtSurvey HTML टैग
+
+### `<webbox src='url' title='title'>...</webbox>`
+
+एक बटन एम्बेड करता है जो इन-फ़ॉर्म मोडल में URL खोलता है। पूरी जानकारी के लिए [Webbox](webbox) देखें।
+
+### `<delete-repeat-current>label</delete-repeat-current>`
+
+रिपीट ग्रुप के अंदर एक बटन रेंडर करता है जो टैप करने पर वर्तमान रिपीट इंस्टेंस को हटा देता है।
+
+### `<delete-repeat-last>label</delete-repeat-last>`
+
+एक बटन रेंडर करता है जो अंतिम रिपीट इंस्टेंस को हटा देता है।
+
+रिपीट ग्रुप में उदाहरण उपयोग:
+
+| type | name | label |
+|------|------|-------|
+| note | delete_btn | `<delete-repeat-current>Remove this member</delete-repeat-current>` |
+
+---
+
+## autopull() के साथ डायनेमिक HTML सारांश
+
+`autopull()` `note` फ़ील्ड के अंदर HTML का एक ब्लॉक रेंडर करता है और फ़ॉर्म में **हर फ़ील्ड परिवर्तन पर इसे पुन: मूल्यांकन करता है**। यह इसे लाइव सारांश पैनल, सबमिट करने से पहले समीक्षा स्क्रीन और गणनाकार द्वारा डेटा भरने के साथ अपडेट होने वाले रनिंग टोटल के लिए उपयुक्त बनाता।
+
+<Callout type="info">
+`autopull()` केवल **note** फ़ील्ड पर काम करता है। लेबल कॉलम को अनदेखा कर दिया जाता है — सभी HTML सामग्री `concat()` का उपयोग करके **appearance** कॉलम के माध्यम से आपूर्ति की जानी चाहिए।
+</Callout>
+
+### सिंटैक्स
+
+`note` फ़ील्ड के **appearance** कॉलम में `autopull()` रखें:
+
+```
+autopull(concat('<html>...</html>'))
+```
+
+`concat()` के अंदर फ़ील्ड संदर्भ (`${field_name}`) वर्तमान लाइव मानों के साथ प्रतिस्थापित किए जाते हैं और हर परिवर्तन पर HTML को पुन: रेंडर किया जाता है।
+
+### scroll-view() के साथ ऊंचाई सीमित करना
+
+लंबे सारांश के लिए, पैनल की ऊंचाई सीमित करने और इसे स्क्रॉल करने योग्य बनाने के लिए `autopull()` को `scroll-view(N%)` के साथ संयोजित करें:
+
+```
+scroll-view(45%) autopull(concat('<html>...</html>'))
+```
+
+`N%` मान दृश्यमान फ़ॉर्म क्षेत्र के सापेक्ष है। पेज के बीच में सारांश पैनल के लिए `45%` एक व्यावहारिक डिफ़ॉल्ट है।
+
+### पूर्ण उदाहरण — घरेलू स्थान सारांश
+
+निम्नलिखित `note` फ़ील्ड एक दो-कॉलम वाली तालिका रेंडर करता है जो चयनित प्रांत, जिला और कम्यून दिखाती है। यह स्वचालित रूप से अपडेट हो जाता है जब भी `${tinh_name}`, `${huyen_name}`, या `${xa_name}` बदलते हैं।
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | location_summary | | `scroll-view(45%) autopull(concat('<html><table style="width:100%;border-collapse:collapse"><tr><td style="padding:4px;font-weight:bold">Province:</td><td style="padding:4px">', ${tinh_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">District:</td><td style="padding:4px">', ${huyen_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Commune:</td><td style="padding:4px">', ${xa_name}, '</td></tr></table></html>'))` |
+
+XLSForm में दिखावट मान एक ही सेल में लिखा जाता है:
+
+```
+scroll-view(45%) autopull(concat(
+  '<html><table style="width:100%;border-collapse:collapse">
+   <tr><td style="padding:4px;font-weight:bold">Province:</td>
+       <td style="padding:4px">', ${tinh_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">District:</td>
+       <td style="padding:4px">', ${huyen_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Commune:</td>
+       <td style="padding:4px">', ${xa_name}, '</td></tr>
+   </table></html>'))
+```
+
+### इनलाइन स्टाइल
+
+किसी भी HTML तत्व पर इनलाइन `style="..."` विशेषता समर्थित है और `autopull()` ब्लॉक के अंदर दृश्य फॉर्मेटिंग लागू करने का अनुशंसित तरीका है।
+
+निम्नलिखित `autopull()` सामग्री के अंदर समर्थित **नहीं** हैं:
+
+- `<style>` ब्लॉक
+- बाहरी स्टाइलशीट `<link>` टैग
+- JavaScript (`<script>`)
+
+### autopull() का उपयोग कब करें
+
+| उपयोग मामला | नोट्स |
+|----------|-------|
+| सबमिट करने से पहले समीक्षा स्क्रीन | गणनाकार के समाप्त होने से पहले एक पैनल पर सभी मुख्य उत्तर दिखाएं |
+| रनिंग टोटल | एक गणना की गई राशि प्रदर्शित करें जो मात्रा दर्ज करने पर अपडेट होती है |
+| दृश्यमान संदर्भ पैनल | गणनाकार द्वारा चाइल्ड फ़ील्ड भरने के दौरान एक चयनित लुकअप मान (जैसे प्रांत का नाम) दिखाएं |
+
+---
+
+## सर्वोत्तम प्रथाएं
+
+1. HTML का कम उपयोग करें — अत्यधिक स्वरूपित लेबल पढ़ना कठिन होता है, आसान नहीं।
+2. पुराने `<b>` और `<i>` के बजाय बोल्ड के लिए `<strong>` और इटैलिक के लिए `<em>` को प्राथमिकता दें।
+3. रंग के उपयोग को सार्थक रखें — चेतावनी के लिए लाल रंग का उपयोग करें, सजावट के लिए नहीं।
+4. हमेशा मोबाइल ऐप और वेब फ़ॉर्म दोनों पर HTML रेंडरिंग का परीक्षण करें, क्योंकि रेंडरिंग थोड़ा भिन्न हो सकती है।
+5. लेबल के अंदर `<table>` टैग से बचें — वे मोबाइल स्क्रीन पर शायद ही कभी अच्छे रेंडर होते हैं।
+6. JavaScript (`<script>`) का उपयोग न करें — इसे हटा दिया जाएगा या त्रुटियां उत्पन्न होंगी।
+
+## सीमाएं
+
+- जटिल HTML (तालिका, फ़ॉर्म, स्क्रिप्ट) समर्थित नहीं है और रेंडरिंग को तोड़ सकता है।
+- कुछ पुराने मोबाइल क्लाइंट HTML टैग को शाब्दिक टेक्स्ट के रूप में प्रदर्शित कर सकते हैं — सभी लक्षित उपकरणों पर परीक्षण करें।
+- `<a>` लिंक ब्राउज़र या WebView में खुलते हैं — गणनाकार फ़ॉर्म छोड़ देता है, जो मोबाइल पर विघटनकारी हो सकता है।

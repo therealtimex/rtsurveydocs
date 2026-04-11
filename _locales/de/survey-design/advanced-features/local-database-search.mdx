@@ -1,0 +1,224 @@
+---
+title: "Lokale Datenbanksuche"
+description: "Die lokale Datenbanksuche fragt eine mitgelieferte SQLite .db-Datei mittels nativem SQL ab und ermöglicht so eine schnelle Offline-Autovervollständigung für große statische Datensätze."
+---
+
+import { Callout } from 'nextra/components'
+
+Die **Lokale Datenbanksuche** ermöglicht es einem `select_one`- oder `text`-Feld, eine SQLite-`.db`-Datei abzufragen, die im Medienpaket des Formulars enthalten ist – vollständig offline, ohne Serverkommunikation. Dies ist der richtige Ansatz, wenn Ihre Auswahlliste groß und statisch ist (z. B. eine nationale Liste von Dörfern, Gesundheitseinrichtungen oder Verwaltungsgrenzen) und die Konnektivität nicht garantiert werden kann.
+
+| Ansatz | Datenquelle | Erfordert Konnektivität |
+|---|---|---|
+| Lokale Datenbanksuche (`rawquery`) | Mitgelieferte `.db`-Datei (SQLite) | Nein |
+| `search-api()` | Remote-REST-API | Ja |
+| `search()` | Mitgelieferte CSV-Datei | Nein |
+
+---
+
+## Darstellungsvarianten
+
+Das Autovervollständigungsfeld wird über die Spalte `appearance` konfiguriert. Es stehen drei Varianten zur Verfügung:
+
+| Variante | Hinweise |
+|---|---|
+| `search-autocomplete-noedit(...)` | Standard-Autovervollständigung – der Enumerator muss aus der Liste auswählen; Freitexteingaben werden nicht gespeichert |
+| `search-autocomplete-noedit-v2(...)` | Empfohlene Variante – gleiches Verhalten, verwendet jedoch eine aktualisierte Rendering-Engine mit besserer Leistung bei großen Ergebnismengen |
+| `search(...)` | Einfacher dateibasierter Abgleich mit einer mitgelieferten CSV-Datei; unterstützt **kein** natives SQL – hier nur zum Vergleich aufgeführt |
+
+<Callout type="info">
+`search-autocomplete-noedit` ist ein Alias – beim Parsen ersetzt die App diesen durch den internen Funktionsnamen `searchAutocompleteNoedit`. Verwenden Sie eine der beiden Schreibweisen in Ihrem XLSForm; beide funktionieren.
+</Callout>
+
+---
+
+## Die `rawquery`-Datenquelle
+
+Um eine SQL-Abfrage für eine `.db`-Datei auszuführen, übergeben Sie `'rawquery'` als erstes Argument der Appearance-Funktion. Die vollständige Signatur lautet:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parameter
+
+| Position | Parameter | Beschreibung |
+|---|---|---|
+| 1 | `'rawquery'` | Literal-String – weist die App an, das SQL direkt auszuführen |
+| 2 | `db_path` | Pfad zur SQLite-Datei in der Form `<dir>/<file>.db::tableName`. Das Suffix `::tableName` wird beim Öffnen der Datei entfernt; der Tabellenname wird innerhalb Ihres SQL verwendet |
+| 3 | `'[display_col]'` | Spalte, die im Dropdown-Menü angezeigt werden soll. Die umschließenden eckigen Klammern `[ ]` werden zur Laufzeit entfernt |
+| 4 | `'value_col'` | Spalte, deren Wert gespeichert wird, wenn der Enumerator eine Auswahl trifft |
+| 5 | `'SELECT ...'` | Jede gültige SQLite-SELECT-Anweisung. `SELECT DISTINCT` wird automatisch eingefügt, wenn `DISTINCT` noch nicht vorhanden ist |
+| 6+ | `param1, ...` | Optional. Werte, die nacheinander an `?`-Platzhalter im SQL gebunden werden. Wenn das SQL `?` enthält, aber keine Parameter angegeben werden, gibt das Feld ein leeres Ergebnis zurück (ein integrierter Schutz gegen fehlende Argumente) |
+
+### Die `db_path`-Konvention
+
+Die Datenbankdatei befindet sich im mitgelieferten Medienverzeichnis des Formulars. Zur Laufzeit gibt `pulldata('app-api', 'family_path')` diesen Verzeichnispfad zurück. Einzelheiten zur Einrichtung finden Sie unter [family_path](family-path). Das Standardmuster ist:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Wenn die App die Datei öffnet, entfernt sie den Teil `::tableName` und verwendet den reinen Dateipfad. Der Tabellenname erscheint nur innerhalb Ihres SQL.
+
+---
+
+## Basispiel – Provinzsuche
+
+Ein schreibgeschütztes Provinz-Dropdown-Menü, das auf einer mitgelieferten `vnxa3.db`-Datei basiert:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Provinz | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+Die Spalte `appearance` (zur besseren Lesbarkeit erweitert):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Das angezeigte Label stammt aus der Spalte `provv`.
+- Der gespeicherte Wert stammt aus der Spalte `provid`.
+- Es werden nur Zeilen angezeigt, in denen `rta_filter = "1"` ist.
+
+---
+
+## Parametrisierte Abfragen
+
+Verwenden Sie `?`-Platzhalter in Ihrem SQL und übergeben Sie die entsprechenden Feldreferenzen als zusätzliche Argumente (ab Position 6). Dies ist das Standardmuster für kaskadierende Auswahlen – z. B. das Laden von Distrikten, die zur zuvor ausgewählten Provinz gehören.
+
+<Callout type="warning">
+Wenn Ihr SQL mindestens ein `?` enthält und keine Parameterargumente angegeben werden, gibt das Feld eine leere Ergebnismenge zurück. Dies verhindert, dass veraltete oder ungefilterte Daten angezeigt werden, bevor eine übergeordnete Auswahl getroffen wurde.
+</Callout>
+
+### Beispiel für Distrikt-Kaskade
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+Der Wert von `${province}` wird an das erste `?` gebunden. Das Feld ist leer, bis der Enumerator eine Provinz auswählt.
+
+### Beispiel mit zwei Parametern – Kommunen-Kaskade
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parameter werden positionsabhängig gebunden: `${province}` → erstes `?`, `${district}` → zweites `?`.
+
+---
+
+## UNION SELECT für Sonderwerte
+
+Fügen Sie synthetische Zeilen – wie „Weiß nicht“ oder „Antwort verweigert“ – direkt im SQL mittels `UNION SELECT` ein:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Nicht bekannt</i>", "888"')
+```
+
+In RTSurvey-Formularen verwendete Konventionen:
+
+| Code | Bedeutung |
+|---|---|
+| `888` | Weiß nicht |
+| `999` | Antwort verweigert |
+
+HTML-Tags wie `<i>` im Anzeigestring werden von der App gerendert – Sie können diese verwenden, um spezielle Optionen visuell hervorzuheben.
+
+---
+
+## Mehrsprachige Anzeige
+
+Speichern Sie sprachspezifische Labels in separaten Spalten (z. B. `label_vi`, `label_en`) und wählen Sie das passende Label basierend auf einem Sprachfeld in Ihrem Formular aus:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Um Spalten dynamisch basierend auf einem `${language}`-Feld zu wechseln, verwenden Sie einen `if()`-Ausdruck im Parameter für die Anzeigespalte:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Der Parameter für die Anzeigespalte wird ausgewertet, bevor die Abfrage ausgeführt wird. Nur der Spaltenname (ohne Klammern) wird an die SQL-Engine übergeben; die Klammern sind kosmetische Markierungen, die beim Parsen entfernt werden.
+</Callout>
+
+---
+
+## Validierung einer echten Auswahl
+
+Wenn das Feld Sonderwerte wie 888 oder 999 zulässt, reicht eine einfache `required = yes`-Prüfung nicht aus – sie ist erfüllt, selbst wenn der Enumerator „Weiß nicht“ auswählt. Verwenden Sie die Einschränkung `selected-at(., 0) != -997`, um sicherzustellen, dass der gespeicherte Wert eine echte Auswahl ist und nicht der interne Platzhalter für „nichts ausgewählt“ `-997`:
+
+| Spalte | Wert |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Bitte wählen Sie eine gültige Option aus |
+
+Der Wert `-997` ist der interne Code, den RTSurvey speichert, wenn kein Element aus der Autovervollständigungsliste ausgewählt wurde. Eine Auswahl von 888 oder 999 ist dennoch eine bewusste Entscheidung und besteht diese Prüfung.
+
+Um zusätzlich einen echten (nicht speziellen) Wert zu fordern, erweitern Sie die Einschränkung:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Vergleich: Lokale Datenbank vs. andere Suchmethoden
+
+| Merkmal | `rawquery`-Autovervollständigung | `search-api()` | `search()` CSV | Einfache CSV-Auswahl |
+|---|---|---|---|---|
+| Datenquelle | Mitgelieferte `.db` (SQLite) | Remote-REST-API | Mitgelieferte CSV | Choices-Tabellenblatt |
+| Funktioniert offline | Ja | Nein | Ja | Ja |
+| Unterstützt natives SQL | Ja | Nein | Nein | Nein |
+| Kaskadierende Filter | Ja – parametriertes `?` | Über Request-Body | Eingeschränkt | Nein |
+| Datensatzgröße | Sehr groß (Millionen Zeilen) | Unbegrenzt (serverseitig) | Mittel (Zehntausende) | Klein |
+| Spezielle eingefügte Zeilen | Ja – `UNION SELECT` | Nein | Nein | Ja (manuell) |
+| Einrichtungskomplexität | Mittel – erfordert mitgelieferte `.db` | Hoch – erfordert API-Server | Niedrig | Keine |
+
+---
+
+## Einschränkungen
+
+- Die `.db`-Datei muss vor der Bereitstellung im Medienpaket des Formulars enthalten sein. Dynamische Aktualisierungen der Datenbank erfordern eine neue Formularbereitstellung.
+- SQL wird unverändert auf dem Gerät ausgeführt. Es findet keine serverseitige Bereinigung statt – vermeiden Sie die Konstruktion von SQL-Abfragen aus Freitexteingaben des Enumerators.
+- Es werden nur `SELECT`-Anweisungen unterstützt. `INSERT`, `UPDATE` und `DELETE` sind nicht zulässig.
+- Sehr komplexe Abfragen (große `UNION`-Ketten, mehrere Joins) können auf leistungsschwachen Android-Geräten langsam sein.
+- Die `search-autocomplete-noedit`-Varianten erlauben es dem Enumerator nicht, einen Wert zu speichern, der nicht in der Ergebnismenge enthalten ist. Wenn eine Freitexteingabe erforderlich ist, verwenden Sie ein separates `text`-Feld.
+- `SELECT DISTINCT` wird nur dann automatisch eingefügt, wenn `DISTINCT` nicht in der Abfrage vorhanden ist. Wenn Sie `SELECT DISTINCT` explizit schreiben, wird es nicht verdoppelt.

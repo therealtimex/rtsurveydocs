@@ -1,15 +1,15 @@
 ---
 title: "Avancerade upprepningar"
-description: "Avancerade mönster för upprepningsgrupper: dynamiska antal, kapslade upprepningar, sammanfattning av upprepningsdata och referering till värden mellan upprepningar."
+description: "Avancerade mönster för upprepningsgrupper: dynamiska antal, nästlade upprepningar, sammanfattning av upprepningsdata och referering till värden mellan upprepningar."
 ---
 
-Den här sidan täcker avancerade mönster för att arbeta med upprepningsgrupper i rtSurvey. För grunderna i att konfigurera en upprepningsgrupp, se [Gruppering och upprepningar](../repeats).
+Den här sidan täcker avancerade mönster för att arbeta med upprepningsgrupper (repeats) i rtSurvey. För grunderna i hur man ställer in en upprepningsgrupp, se [Gruppering och upprepningar](../repeats).
 
 ---
 
 ## Dynamiskt antal upprepningar
 
-Som standard bestämmer räknaren hur många gånger att upprepa. Du kan bestämma antalet upprepningar med `repeat_count`:
+Som standard bestämmer intervjuaren hur många gånger en grupp ska upprepas. Du kan fixera antalet upprepningar med `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,39 +18,39 @@ Som standard bestämmer räknaren hur många gånger att upprepa. Du kan bestäm
 | integer | member_age | Ålder | |
 | end_repeat | | | |
 
-Upprepningen körs exakt `${num_members}` gånger, där `num_members` samlades in tidigare i formuläret. Räknaren kan inte lägga till eller ta bort instanser.
+Upprepningen körs exakt `${num_members}` gånger, där `num_members` samlades in tidigare i formuläret. Intervjuaren kan inte lägga till eller ta bort instanser.
 
 ---
 
 ## Indexerad åtkomst: `indexed-repeat()`
 
-Komma åt ett specifikt upprepningsinstanskältvärde **utanför** upprepningsgruppen med `indexed-repeat(repeatedField, repeatGroup, index)`:
+Kom åt ett fältvärde för en specifik upprepningsinstans **utanför** upprepningsgruppen med `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Detta är användbart för att bygga sammanfattningsfält eller referera till "primär"-medlemmens data efter upprepningen.
+Detta är användbart för att bygga sammanfattningsfält eller referera till data för den "primära" medlemmen efter upprepningen.
 
 ---
 
 ## Aktuell instansposition: `index()`
 
-Inne i en upprepningsgrupp returnerar `index()` den 1-baserade positionen för den aktuella instansen. Använd det för att märka varje upprepning eller skapa unika identifierare:
+Inuti en upprepningsgrupp returnerar `index()` den 1-baserade positionen för den aktuella instansen. Använd den för att märka varje upprepning eller skapa unika identifierare:
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | Parcel |
-| note | plot_label | Parcelnummer `${index()}` |
-| text | plot_id | Parcel-ID |
+| begin_repeat | plots | Tomt |
+| note | plot_label | Tomt nummer `${index()}` |
+| text | plot_id | Tomt-ID |
 | end_repeat | | |
 
 ---
 
 ## Referera till fält i samma instans
 
-Inom en upprepning, använd `${fieldname}` för att referera till ett annat fält **i samma upprepningsinstans**. Det finns inget behov av `indexed-repeat()` inom samma slinga:
+Inuti en upprepning, använd `${fieldname}` för att referera till ett annat fält **i samma upprepningsinstans**. Det finns inget behov av `indexed-repeat()` inuti samma loop:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,33 +62,33 @@ Inom en upprepning, använd `${fieldname}` för att referera till ett annat fäl
 
 ---
 
-## Referera till överordnade fält inifrån en upprepning
+## Referera till föräldrafält inifrån en upprepning
 
 Fält utanför (ovanför) upprepningsgruppen kan refereras normalt med `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
 | text | village | Byns namn |
-| begin_repeat | plots | Jordbruksparcel |
-| note | plot_context | Parceller i `${village}` |
+| begin_repeat | plots | Jordbrukslott |
+| note | plot_context | Lotter i `${village}` |
 | end_repeat | | |
 
 ---
 
 ## Sammanfatta upprepningsdata
 
-Använd aggregeringsfunktioner för upprepningar **utanför** upprepningsgruppen för att sammanfatta:
+Använd aggregationsfunktioner för upprepningar **utanför** upprepningsgruppen för att sammanfatta:
 
-| Funktion | Exempel | Beskrivning |
+| Function | Example | Description |
 |----------|---------|-------------|
 | `count(group)` | `count(${household_members})` | Antal instanser |
 | `sum(field)` | `sum(${loan_amount})` | Summa av ett numeriskt fält |
-| `min(field)` | `min(${member_age})` | Minimivärde |
-| `max(field)` | `max(${member_age})` | Maximivärde |
+| `min(field)` | `min(${member_age})` | Minsta värde |
+| `max(field)` | `max(${member_age})` | Största värde |
 | `join(sep, field)` | `join(', ', ${member_name})` | Kommaseparerad lista |
 | `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Villkorligt antal |
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Villkorlig summa |
-| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Villkorlig sammanslagning |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Villkorlig sammanfogning |
 
 ### Exempel: Hushållssammanfattning
 
@@ -102,13 +102,13 @@ Använd aggregeringsfunktioner för upprepningar **utanför** upprepningsgruppen
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` medlemmar; `${children_count}` under 18. Vuxna: `${adult_names}` | |
+| note | summary | `${total_members}` medlemmar; `${children_count}` under 18 år. Vuxna: `${adult_names}` | |
 
 ---
 
-## Kapslade upprepningar
+## Nästlade upprepningar
 
-En upprepningsgrupp kan innehålla en annan upprepningsgrupp. Använd detta varsamt — kapslade upprepningar lägger till komplexitet och kan vara förvirrande för räknare.
+En upprepningsgrupp kan innehålla en annan upprepningsgrupp. Använd detta försiktigt — nästlade upprepningar ökar komplexiteten och kan vara förvirrande för intervjuare.
 
 | type | name | label |
 |------|------|-------|
@@ -119,36 +119,132 @@ En upprepningsgrupp kan innehålla en annan upprepningsgrupp. Använd detta vars
 | end_repeat | | |
 | end_repeat | | |
 
-För att referera till ett fält i en yttre upprepning inifrån den inre upprepningen, använd `${fieldname}` — det löser sig till den närmaste matchande förfadern:
+För att referera till ett fält i en yttre upprepning från den inre upprepningen, använd `${fieldname}` — det letar upp den närmaste matchande föräldern:
 
-Inne i `hh_members`-upprepningen returnerar `${hh_id}` ID:t för det **aktuella** hushållet, inte alla hushåll.
+Inuti `hh_members`-upprepningen returnerar `${hh_id}` ID:t för det **aktuella** hushållet, inte alla hushåll.
 
 ---
 
-## Rang inom upprepningsgrupper: `rank-index()`
+## Rankning inuti upprepningsgrupper: `rank-index()`
 
-När ett `rank`-fält finns inuti en upprepning, använd `rank-index(instanceNumber, repeatedField)` utifrån för att få den ordinala rangen för en specifik instans:
+När ett `rank`-fält finns inuti en upprepning, använd `rank-index(instanceNumber, repeatedField)` från utsidan för att få ordningsrankningen för en specifik instans:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` returnerar instansindexet med det högsta poängtalet.
+`rank-index(1, ${score})` returnerar instansindexet för det högsta resultatet.
+
+---
+
+## `1screen`-utseende på `begin_repeat`
+
+Genom att lägga till `1screen` i kolumnen `appearance` för en `begin_repeat`-rad visas alla frågor för varje instans tillsammans på en enda skärm, istället för en fråga per skärm.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Hushållsmedlem | `1screen` |
+| text | member_name | Medlemmens namn | |
+| integer | member_age | Ålder | |
+| end_repeat | | | |
+
+När `1screen` är inställt och det inte finns något `repeat_count`-fält och inget `add_repeat`-fält inuti gruppen, renderar rtSurvey automatiskt en cirkulär **+**-knapp längst ner på skärmen så att intervjuare kan lägga till nya instanser utan extra konfiguration.
+
+| Appearance | En skärm per instans | Standard-+-knapp tillagd |
+|------------|----------------------|--------------------------|
+| `1screen` | Ja | Ja (när inget `add_repeat`-barn finns) |
+| `field-list` | Ja | Nej |
+
+Använd `field-list` när du vill ha den grupperade layouten utan den automatiska lägg till-knappen. Använd `1screen` när du vill ha både den grupperade layouten och ett inbyggt sätt att lägga till instanser.
+
+---
+
+## `add_repeat` anpassad lägg till-knapp
+
+Ett `note`- (eller `text`-) fält placerat **inuti** upprepningsgruppen med `appearance: add_repeat` renderas som en "Lägg till"-knapp i full bredd. Knappens etikett kommer från fältets `label`-kolumn. När ett `add_repeat`-fält finns, undertrycks den runda standard-+-knappen (från `1screen`).
+
+Placera `add_repeat`-fältet som det sista fältet inuti upprepningsgruppen:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Medlem | `1screen` |
+| text | member_name | Medlemmens namn | |
+| integer | member_age | Ålder | |
+| note | btn_add | + Lägg till medlem | `add_repeat` |
+| end_repeat | | | |
+
+### Färgjustering
+
+Ange en färgkod inuti utseendevärdet (appearance) för att styla knappen:
+
+| Appearance value | Result |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Grön bakgrund, standardfärg på text |
+| `add_repeat 04B404-ffffff` | Grön bakgrund, vit text |
+
+Den första färgen är bakgrunden och den andra (efter bindestrecket) är textfärgen. Uteslut `#` när du använder den bindestrecksseparerade formen.
+
+### Ikonvariant
+
+Använd `add_repeat icon` (med ett mellanslag) för att rendera en kompakt cirkulär ikonknapp istället för knappen i full bredd:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Lägg till | `add_repeat icon` |
+
+---
+
+## Radera-knappar: `delete-repeat-current` och `delete-repeat-last`
+
+Ett `note`-fält inuti upprepningsgruppen med `appearance: delete-repeat-current` eller `appearance: delete-repeat-last` renderas som en delad radera-knapp.
+
+| Appearance | Action |
+|------------|--------|
+| `delete-repeat-current` | Raderar den aktuella (aktiva) instansen |
+| `delete-repeat-last` | Raderar den sista instansen i upprepningen |
+
+Standardknappen (utan ikon) är en delad knapp: en papperskorgsikon till vänster och fältets etiketttext till höger, som sträcker sig över hela skärmens bredd.
+
+### Ikonvariant
+
+Lägg till `-icon` för att få en kompakt cirkulär papperskorgsikonknapp:
+
+| Appearance | Result |
+|------------|--------|
+| `delete-repeat-current-icon` | Cirkulär papperskorgsikon, raderar aktuell instans |
+| `delete-repeat-last-icon` | Cirkulär papperskorgsikon, raderar sista instansen |
+
+### Färgjustering
+
+Färgformatet är identiskt med `add_repeat`: använd `<#RRGGBB/>` eller `RRGGBB-RRGGBB` (bakgrund-text).
+
+### Exempel på fullständigt mönster
+
+Följande upprepning använder `1screen`, en cirkulär delete-current-knapp längst upp och en lägg till-knapp i full bredd längst ner:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Medlem | `1screen` |
+| note | btn_del | Ta bort | `delete-repeat-current-icon` |
+| text | member_name | Medlemmens namn | |
+| integer | member_age | Ålder | |
+| note | btn_add | + Lägg till medlem | `add_repeat` |
+| end_repeat | | | |
 
 ---
 
 ## Bästa praxis
 
-1. Använd alltid `repeat_count` när antalet upprepningar är känt i förväg — det förhindrar räknare från att oavsiktligt lägga till eller ta bort instanser.
-2. Håll upprepningsgrupper fokuserade — en upprepning med 20+ frågor per instans är svår att navigera.
-3. Namnge upprepningsgrupper tydligt (t.ex. `household_members`, inte `repeat1`) — namnet visas i funktionsanrop och exporterade data.
-4. Testa med det maximalt förväntade antalet instanser för att verifiera prestanda.
-5. Använd `field-list`-utseende på upprepningsgruppen för att visa alla fält på en skärm per instans (mobil).
+1. Använd alltid `repeat_count` när antalet upprepningar är känt i förväg — det förhindrar att intervjuare av misstag lägger till eller tar bort instanser.
+2. Håll upprepningsgrupper fokuserade — en upprepning med 20+ frågor per instans är svår att navigera i.
+3. Namnge upprepningsgrupper tydligt (t.ex. `household_members`, inte `repeat1`) — namnet visas i funktionsanrop och exporterad data.
+4. Testa med det maximala förväntade antalet instanser för att verifiera prestanda.
+5. Använd `1screen` på `begin_repeat` för att visa alla frågor på en skärm per instans, parat med ett `add_repeat`-anteckningsfält inuti gruppen för att ge intervjuare en tydligt märkt "Lägg till"-knapp.
 
 ---
 
 ## Begränsningar
 
-- `indexed-repeat()` kräver ett giltigt index (1 till antal instanser) — index utanför intervallet returnerar tom.
-- Kapslade upprepningar bortom 2 nivåer rekommenderas inte och kan orsaka visningsproblem på vissa klienter.
-- Aggregeringsfunktioner (`sum`, `count` osv.) arbetar på hela upprepningsgruppen — du kan inte aggregera en delmängd av instanser utan `*-if`-varianter.
+- `indexed-repeat()` kräver ett giltigt index (1 till antal instanser) — index utanför intervallet returnerar tomt.
+- Nästlade upprepningar bortom 2 nivåer rekommenderas inte och kan orsaka visningsproblem på vissa klienter.
+- Aggregationsfunktioner (`sum`, `count`, etc.) fungerar på hela upprepningsgruppen — du kan inte aggregera en delmängd av instanser utan `*-if`-varianter.

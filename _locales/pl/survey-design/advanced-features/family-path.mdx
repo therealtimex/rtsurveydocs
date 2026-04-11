@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path to konwencyjne pole obliczeniowe (calculate), które zwraca ścieżkę do katalogu mediów powiązanego z formularzem w czasie wykonywania — wymagane w każdym formularzu korzystającym z lokalnych baz danych lub wyszukiwania opartego na plikach."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` to konwencyjne pole obliczeniowe, które przechowuje ścieżkę do katalogu mediów powiązanego z formularzem. Każdy formularz, który wykonuje lokalne zapytania do bazy danych za pomocą `rawquery`, `pulldata` lub `search()`, musi zawierać to pole — bez niego ścieżki do plików nie mogą zostać rozpoznane, a zapytania po cichu zwracają pusty wynik.
+
+---
+
+## Pole calculate
+
+Dodaj ten wiersz blisko góry arkusza survey, po polach meta i przed pierwszym pytaniem korzystającym z pliku bazy danych:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Pole to nie przechowuje widocznej wartości i nie wymaga etykiety (label). Jest to cichy warunek wstępny dla wszystkich konstrukcji ścieżek, które następują później.
+
+---
+
+## Dlaczego jest to potrzebne
+
+RTSurvey pakuje media formularza — bazy danych SQLite, obrazy, klipy audio — w katalogu dedykowanym dla formularza na urządzeniu. Dokładna ścieżka różni się w zależności od platformy (Android, iOS, web) i urządzenia.
+
+W czasie wykonywania aplikacja automatycznie uzupełnia `family_path`. Typowa rozpoznana wartość wygląda następująco:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Ponieważ ścieżka jest zależna od platformy i określana w momencie uruchomienia, nie może być zakodowana na stałe w formularzu. `pulldata('app-api', 'family_path')` to jedyny niezawodny sposób na jej pobranie.
+
+---
+
+## Jak używać tego w ścieżkach
+
+Po zdefiniowaniu `family_path`, zbuduj pełną ścieżkę do pliku za pomocą `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Sufiks `::tableName` jest usuwany, gdy aplikacja otwiera plik; nazwa tabeli jest używana tylko wewnątrz zapytania SQL.
+
+---
+
+## Gdzie używane jest family_path
+
+`family_path` jest wymagane w argumencie ścieżki za każdym razem, gdy odwołujesz się do dołączonego pliku:
+
+- **Lokalne wyszukiwanie w bazie danych** — argument `db_path` funkcji `search-autocomplete-noedit-v2('rawquery', ...)` musi być zbudowany za pomocą `concat(${family_path}, ...)`. Szczegółowe informacje na temat użycia znajdują się w sekcji [Lokalne wyszukiwanie w bazie danych](local-database-search).
+- **`pulldata` rawquery** — każde wywołanie `pulldata('rawquery', ...)`, które odczytuje dane z pliku `.db`, wykorzystuje ten sam wzorzec `concat()`.
+- **`search()` z plikiem lokalnym** — utseender (appearances) dla dynamicznego wyszukiwania, które ładuje dane z dołączonego pliku CSV lub DB, również opierają się na `family_path` w odniesieniu do pliku.
+
+---
+
+## Umiejscowienie w formularzu
+
+`family_path` musi pojawić się **przed pierwszym polem, które się do niego odwołuje**. Zalecana pozycja to bezpośrednio po grupie meta:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(rawquery appearance odwołujący się do `${family_path}`)* |
+
+<Callout type="warning">
+Jeśli w formularzu brakuje pola `family_path` lub zostanie ono umieszczone po pierwszym polu `rawquery` / `search()`, które się do niego odwołuje, wszystkie zapytania do dołączonych plików będą po cichu zwracać pusty wynik. Nie pojawi się żaden komunikat o błędzie — autouzupełnianie po prostu nie pokaże żadnych wyników.
+</Callout>
+
+---
+
+## Wiele plików bazy danych
+
+Pojedynczy formularz może korzystać z kilku plików `.db`. Każda ścieżka jest budowana niezależnie za pomocą `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Zdefiniuj `family_path` raz; odwołuj się do niego w tylu polach, w ilu jest to potrzebne.
+
+---
+
+## Weryfikacja podczas projektowania
+
+Dodaj tymczasowe pole `note` poniżej `family_path`, aby sprawdzić rozpoznaną wartość na urządzeniu:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Path: ${family_path}` | |
+
+Notatka wyświetli rzeczywistą rozpoznaną ścieżkę podczas testów. Usuń ją przed wdrożeniem ostatecznej wersji formularza.

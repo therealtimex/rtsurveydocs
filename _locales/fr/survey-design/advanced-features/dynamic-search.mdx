@@ -1,15 +1,15 @@
 ---
-title: "Recherche dynamique"
-description: "La recherche dynamique charge les choix depuis une API distante en temps réel au fil de la saisie de l'enquêteur, permettant des jeux de données volumineux ou fréquemment mis à jour."
+title: "Recherche Dynamique"
+description: "La recherche dynamique charge des choix à partir d'une API distante en temps réel à mesure que l'enquêteur tape, ce qui permet d'utiliser des ensembles de données volumineux ou fréquemment mis à jour."
 ---
 
-La **Recherche dynamique** (également appelée Search API) permet à un champ `select_one`, `select_multiple` ou `text` de charger ses choix depuis un service web distant **au moment de l'exécution**, au fil de la saisie de l'enquêteur. C'est la bonne approche lorsque votre liste de choix est trop grande pour être incluse dans un fichier CSV, est mise à jour fréquemment, ou provient d'une base de données en direct.
+La **Recherche Dynamique** (également appelée Search API) permet à un champ `select_one`, `select_multiple` ou `text` de charger ses choix à partir d'un service Web distant **au moment de l'exécution** à mesure que l'enquêteur tape. C'est l'approche idéale lorsque votre liste de choix est trop volumineuse pour être incluse dans un fichier CSV, qu'elle est mise à jour fréquemment ou qu'elle provient d'une base de données en direct.
 
 ---
 
 ## Apparence `search-api()`
 
-La recherche dynamique est configurée via la colonne `appearance` en utilisant la fonction `search-api()` :
+La recherche dynamique est configurée via la colonne `appearance` à l'aide de la fonction `search-api()` :
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -20,24 +20,24 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 | Paramètre | Description |
 |-----------|-------------|
 | `method` | Utilisez toujours `'POST'` |
-| `url` | Le point de terminaison API à interroger |
+| `url` | Le point de terminaison de l'API à interroger |
 | `post_body` | Corps JSON envoyé à l'API. Utilisez `%__input__%` comme espace réservé pour le texte de recherche actuel de l'enquêteur |
 | `value_column` | La clé dans l'objet de réponse à utiliser comme **valeur** stockée |
-| `display` | La clé (ou modèle) à utiliser comme **étiquette** affichée dans la liste déroulante. Prend en charge les espaces réservés `##key##` et les expressions `@{func}` |
-| `data_path` | JSONPath vers le tableau d'objets de résultat dans la réponse (ex. : `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Un nom sous lequel la réponse brute est sauvegardée pour utilisation par d'autres champs |
+| `display` | La clé (ou le modèle) à utiliser comme **étiquette** affichée dans la liste déroulante. Prend en charge les espaces réservés `##key##` et les expressions `@{func}` |
+| `data_path` | JSONPath vers le tableau d'objets de résultats dans la réponse (par exemple, `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Un nom sous lequel la réponse brute est enregistrée pour être utilisée par d'autres champs |
 
 ---
 
 ## Exemple de base
 
-Recherche d'établissement de santé où l'enquêteur saisit une partie du nom de l'établissement :
+Une recherche d'établissement de santé où l'enquêteur tape une partie du nom de l'établissement :
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one | facility | Sélectionner l'établissement de santé | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-L'API reçoit `{"query": "nair"}` lorsque l'enquêteur saisit "nair" et retourne :
+L'API reçoit `{"query": "nair"}` lorsque l'enquêteur tape "nair" et renvoie :
 
 ```json
 {
@@ -54,7 +54,7 @@ La liste déroulante affiche `Nairobi Central Clinic` et `Nairobi West Hospital`
 
 ## Formatage d'affichage avancé
 
-### Utiliser des modèles `##key##`
+### Utilisation des modèles `##key##`
 
 Afficher plusieurs champs dans l'étiquette :
 
@@ -64,7 +64,7 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
 
 Affiché comme : `Nairobi Central Clinic (Nairobi)`.
 
-### Utiliser des expressions `@{func}`
+### Utilisation des expressions `@{func}`
 
 Appliquer une logique conditionnelle dans l'étiquette d'affichage :
 
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Les résultats actifs affichent `✓ Clinic Name` ; les inactifs affichent `✗ Clinic Name`.
+Les résultats actifs affichent `✓ Clinic Name` ; les résultats inactifs affichent `✗ Clinic Name`.
 
 ---
 
-## Définir une valeur par défaut : `search-default-api()`
+## Définition d'une valeur par défaut : `search-default-api()`
 
-Utilisez `search-default-api()` après `search-api()` pour pré-remplir le champ avec un choix par défaut chargé depuis un appel API séparé (ex. : lors de la modification d'un enregistrement existant) :
+Utilisez `search-default-api()` après `search-api()` pour pré-remplir le champ avec un choix par défaut chargé à partir d'un appel d'API distinct (par exemple, lors de l'édition d'un enregistrement existant) :
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -90,7 +90,7 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ## Séparateur personnalisé pour select_multiple : `search-default-separator()`
 
-Pour les champs `select_multiple`, spécifiez comment plusieurs valeurs sélectionnées sont jointes dans la chaîne stockée :
+Pour les champs `select_multiple`, spécifiez comment les valeurs sélectionnées multiples sont jointes dans la chaîne stockée :
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
@@ -106,32 +106,91 @@ Le séparateur par défaut est un espace.
 |---------------|----------|
 | `select_one` | Sélection unique parmi les résultats de recherche |
 | `select_multiple` | Sélections multiples parmi les résultats de recherche |
-| `text` | Autocomplétion — l'enquêteur saisit librement mais peut sélectionner une suggestion |
+| `text` | Saisie semi-automatique — l'enquêteur tape librement mais peut sélectionner une suggestion |
 
 ---
 
-## Utiliser les données de réponse sauvegardées
+## Utilisation des données de réponse enregistrées
 
-Le `save_path` stocke l'objet de réponse API complet sous le nom donné. D'autres champs peuvent le référencer avec `pulldata()` :
+Lorsque l'enquêteur sélectionne un résultat, rtSurvey enregistre l'objet correspondant complet de la réponse sous le nom `save_path`. D'autres champs peuvent y lire des données de deux manières.
+
+### Méthode 1 — Recherche `pulldata()`
+
+Utilisez `pulldata('save_path', 'key')` pour lire un champ de niveau supérieur à partir de l'objet enregistré :
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Sélectionner l'établissement | `search-api(..., 'facility_data')` |
+| select_one | facility | Sélectionner l'établissement | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+L'apparence sur la ligne `select_one` doit inclure `search-api(..., 'facility_data')` avec le `save_path` correspondant.
+
+Pour les **champs JSON imbriqués**, combinez avec `substr-jsonpath()` :
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
 
 ---
 
-## Bonnes pratiques
+## Recherche de fichiers locaux avec search()
 
-1. Assurez-vous que votre point de terminaison API répond en 1-2 secondes — les API lentes rendent la recherche peu réactive.
-2. Utilisez `%__input__%` dans le `post_body` pour que l'API ne retourne que les résultats correspondants, pas l'ensemble du jeu de données.
-3. Indexez le champ de recherche côté serveur (ex. : Elasticsearch, index de texte intégral de base de données) pour des réponses rapides.
-4. Limitez les résultats à 20-50 éléments par requête — retourner des milliers de résultats annule l'intérêt de la recherche.
+`search()` effectue des recherches d'égalité de colonnes hors ligne sur un fichier SQLite `.db` inclus — aucune connexion réseau ni requête SQL n'est requise. Utilisez-la lorsque vos données de référence sont fournies avec le formulaire et que vous avez besoin d'une recherche simple de type "trouver toutes les lignes où la colonne est égale à la valeur".
+
+### Signature
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Paramètres
+
+| Paramètre | Description |
+|-----------|-------------|
+| `path` | Chemin vers la table SQLite : `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Opérateur de correspondance — renvoie les lignes où la colonne est égale à la valeur |
+| `'list_name'` | Nom de la colonne avec laquelle effectuer la correspondance |
+| `${field}` | Valeur à faire correspondre ; généralement une référence de champ |
+
+### Exemple
+
+Remplir un `select_one` à partir d'une base de données locale en faisant correspondre la valeur de `${d307}` à la colonne `list_name` dans la table `externalData` de `d307.db` :
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Sélectionner l'établissement | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Lorsque `${d307}` est égal à `"HF001"`, `search()` renvoie chaque ligne de `externalData` où `list_name = 'HF001'` — entièrement à partir du fichier inclus, sans appel réseau.
+
+### search() vs saisie semi-automatique rawquery
+
+| Caractéristique | `search()` | Saisie semi-automatique `rawquery` |
+|---------|-----------|------------------------|
+| Requêtes SQL | Non — égalité de colonnes uniquement | Oui — `SELECT … FROM …` complet |
+| Entrée paramétrée | Correspondance de valeur de colonne | Intégrée dans la chaîne SQL |
+| Saisie de texte libre | Oui — l'enquêteur peut taper librement | Non — doit sélectionner dans la liste |
+| UNION / multi-tables | Non pris en charge | Pris en charge |
+
+### Quand utiliser l'un ou l'autre
+
+- Utilisez **`search()`** lorsque vous avez besoin d'une correspondance d'égalité simple avec un fichier `.db` inclus, que le formulaire doit fonctionner hors ligne et que vous souhaitez autoriser la saisie de texte libre.
+- Utilisez la **saisie semi-automatique `rawquery`** lorsque vous avez besoin de la flexibilité SQL (JOINs, UNIONs, colonnes calculées) ou que vous devez interroger plusieurs tables, et que le formulaire dispose d'une connectivité fiable.
+
+---
+
+## Meilleures Pratiques
+
+1. Assurez-vous que le point de terminaison de votre API répond en 1 à 2 secondes — les API lentes rendent la recherche peu réactive.
+2. Utilisez `%__input__%` dans le `post_body` afin que l'API ne renvoie que les résultats correspondants, et non l'ensemble des données.
+3. Indexez le champ de recherche côté serveur (par exemple, Elasticsearch, index plein texte de base de données) pour des réponses rapides.
+4. Limitez les résultats à 20-50 éléments par requête — renvoyer des milliers de résultats va à l'encontre de l'objectif de la recherche.
 5. Incluez une exigence de longueur minimale de saisie dans l'API pour éviter de déclencher des requêtes larges sur des saisies d'un seul caractère.
 
 ## Limitations
 
-- La recherche dynamique nécessite une connectivité réseau — elle ne fonctionne pas hors ligne.
-- L'espace réservé `%__input__%` est injecté tel quel ; assainissez les saisies côté serveur pour prévenir les injections.
-- Les expressions d'affichage `@{func}` complexes peuvent avoir un support limité selon les versions du client rtSurvey.
+- La Recherche Dynamique nécessite une connectivité réseau — elle ne fonctionne pas hors ligne.
+- L'espace réservé `%__input__%` est injecté tel quel ; nettoyez les entrées côté serveur pour éviter les attaques par injection.
+- Les expressions d'affichage complexes `@{func}` peuvent avoir un support limité selon les versions du client rtSurvey.

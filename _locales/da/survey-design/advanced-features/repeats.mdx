@@ -1,56 +1,56 @@
 ---
 title: "Avancerede gentagelser"
-description: "Avancerede mønstre for gentagelsesgrupper: dynamiske antal, indlejrede gentagelser, opsummering af gentagelsesdata og krydsreferencer mellem gentagelser."
+description: "Avancerede mønstre for gentagelsesgrupper: dynamiske tællinger, indlejrede gentagelser, opsummering af gentagelsesdata og reference til værdier på tværs af gentagelser."
 ---
 
-Denne side dækker avancerede mønstre for arbejde med gentagelsesgrupper i rtSurvey. For det grundlæggende om opsætning af en gentagelsesgruppe, se [Grupperinger og gentagelser](../repeats).
+Denne side dækker avancerede mønstre for arbejde med gentagelsesgrupper i rtSurvey. For det grundlæggende i opsætning af en gentagelsesgruppe, se [Gruppering og gentagelser](../repeats).
 
 ---
 
 ## Dynamisk gentagelsesantal
 
-Som standard bestemmer intervieweren, hvor mange gange der skal gentages. Du kan fastlåse antallet af gentagelser ved hjælp af `repeat_count`:
+Som standard bestemmer intervieweren, hvor mange gange der skal gentages. Du kan fiksere antallet af gentagelser ved hjælp af `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
-| begin_repeat | household_members | Husholdningsmedlem | `${num_members}` |
+| begin_repeat | household_members | Husstandsmedlem | `${num_members}` |
 | text | member_name | Medlemsnavn | |
 | integer | member_age | Alder | |
 | end_repeat | | | |
 
-Gentagelsen kører præcis `${num_members}` gange, hvor `num_members` er indsamlet tidligere i formularen. Intervieweren kan ikke tilføje eller fjerne instanser.
+Gentagelsen kører nøjagtigt `${num_members}` gange, hvor `num_members` blev indsamlet tidligere i formularen. Intervieweren kan ikke tilføje eller fjerne instanser.
 
 ---
 
 ## Indekseret adgang: `indexed-repeat()`
 
-Adgang til en specifik gentagelsesinstans' feltværdi fra **udenfor** gentagelsesgruppen ved hjælp af `indexed-repeat(gentagetFelt, gentagelsesGruppe, indeks)`:
+Få adgang til en specifik gentagelsesinstans' feltværdi fra **uden for** gentagelsesgruppen ved hjælp af `indexed-repeat(repeatedField, repeatGroup, index)`:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Dette er nyttigt til at opbygge opsummeringsfelter eller referere til det "primære" members data efter gentagelsen.
+Dette er nyttigt til at opbygge opsummeringsfelter eller referere til det "primære" medlems data efter gentagelsen.
 
 ---
 
 ## Aktuel instansposition: `index()`
 
-Inden for en gentagelsesgruppe returnerer `index()` den 1-baserede position for den aktuelle instans. Brug det til at mærke hver gentagelse eller oprette unikke identifikatorer:
+Inde i en gentagelsesgruppe returnerer `index()` den 1-baserede position af den aktuelle instans. Brug det til at mærke hver gentagelse eller oprette unikke identifikatorer:
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | Plot |
-| note | plot_label | Plotnummer `${index()}` |
-| text | plot_id | Plot-ID |
+| begin_repeat | plots | Lod |
+| note | plot_label | Lod nummer `${index()}` |
+| text | plot_id | Lod-ID |
 | end_repeat | | |
 
 ---
 
-## Krydsreferencer til felter i den samme instans
+## Reference til felter i samme instans
 
-Inden for en gentagelse bruges `${feltnavn}` til at referere til et andet felt **i den samme gentagelsesinstans**. Der er ikke brug for `indexed-repeat()` inden for den samme løkke:
+Inden for en gentagelse skal du bruge `${fieldname}` for at referere til et andet felt **i samme gentagelsesinstans**. Der er ikke behov for `indexed-repeat()` inden for samme løkke:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,35 +62,35 @@ Inden for en gentagelse bruges `${feltnavn}` til at referere til et andet felt *
 
 ---
 
-## Krydsreferencer til overordnede felter fra en gentagelse
+## Reference til forældrefelter fra en gentagelse
 
-Felter uden for (over) gentagelsesgruppen kan refereres normalt med `${feltnavn}`:
+Felter uden for (over) gentagelsesgruppen kan refereres normalt med `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
 | text | village | Landsbynavn |
-| begin_repeat | plots | Landbrugsplot |
-| note | plot_context | Plot i `${village}` |
+| begin_repeat | plots | Landbrugslod |
+| note | plot_context | Lodder i `${village}` |
 | end_repeat | | |
 
 ---
 
 ## Opsummering af gentagelsesdata
 
-Brug aggregatfunktioner for gentagelser **udenfor** gentagelsesgruppen til at opsummere:
+Brug gentagelses-aggregatfunktioner **uden for** gentagelsesgruppen for at opsummere:
 
-| Funktion | Eksempel | Beskrivelse |
+| Function | Example | Description |
 |----------|---------|-------------|
 | `count(group)` | `count(${household_members})` | Antal instanser |
 | `sum(field)` | `sum(${loan_amount})` | Sum af et numerisk felt |
 | `min(field)` | `min(${member_age})` | Minimumsværdi |
 | `max(field)` | `max(${member_age})` | Maksimumsværdi |
 | `join(sep, field)` | `join(', ', ${member_name})` | Kommasepareret liste |
-| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Betinget tælling |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Betinget antal |
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Betinget sum |
 | `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Betinget sammenføjning |
 
-### Eksempel: Husholdningsopsummering
+### Eksempel: Husstandsoversigt
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -108,26 +108,26 @@ Brug aggregatfunktioner for gentagelser **udenfor** gentagelsesgruppen til at op
 
 ## Indlejrede gentagelser
 
-En gentagelsesgruppe kan indeholde en anden gentagelsesgruppe. Brug dette forsigtigt — indlejrede gentagelser tilføjer kompleksitet og kan forvirre interviewere.
+En gentagelsesgruppe kan indeholde en anden gentagelsesgruppe. Brug dette forsigtigt — indlejrede gentagelser tilføjer kompleksitet og kan være forvirrende for interviewere.
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | households | Husholdning |
-| text | hh_id | Husholdnings-ID |
+| begin_repeat | households | Husstand |
+| text | hh_id | Husstands-ID |
 | begin_repeat | hh_members | Medlem |
 | text | member_name | Medlemsnavn |
 | end_repeat | | |
 | end_repeat | | |
 
-For at referere til et felt i en ydre gentagelse fra den indre gentagelse bruges `${feltnavn}` — det opløser til den nærmeste matchende forfader:
+For at referere til et felt i en ydre gentagelse fra den indre gentagelse, skal du bruge `${fieldname}` — det løses til den nærmeste matchende forfader:
 
-Inden i `hh_members`-gentagelsen returnerer `${hh_id}` ID'et for den **aktuelle** husholdning, ikke alle husholdninger.
+Inde i `hh_members`-gentagelsen returnerer `${hh_id}` ID'et for den **aktuelle** husstand, ikke alle husstande.
 
 ---
 
 ## Rang inden for gentagelsesgrupper: `rank-index()`
 
-Når et `rank`-felt findes inden i en gentagelse, bruges `rank-index(instansNummer, gentagetFelt)` udefra for at få den ordinale rang for en specifik instans:
+Når et `rank`-felt findes inde i en gentagelse, skal du bruge `rank-index(instanceNumber, repeatedField)` udefra for at få den ordinale rang af en specifik instans:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -137,18 +137,114 @@ Når et `rank`-felt findes inden i en gentagelse, bruges `rank-index(instansNumm
 
 ---
 
+## `1screen` udseende på `begin_repeat`
+
+Tilføjelse af `1screen` til `appearance`-kolonnen i en `begin_repeat`-række viser alle spørgsmål for hver instans samlet på en enkelt skærm i stedet for ét spørgsmål per skærm.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Husstandsmedlem | `1screen` |
+| text | member_name | Medlemsnavn | |
+| integer | member_age | Alder | |
+| end_repeat | | | |
+
+Når `1screen` er indstillet, og der ikke er noget `repeat_count` og intet `add_repeat`-felt inde i gruppen, genererer rtSurvey automatisk en cirkulær **+**-knap nederst på skærmen, så interviewere kan tilføje nye instanser uden ekstra konfiguration.
+
+| Appearance | En skærm per instans | Standard +-knap tilføjet |
+|------------|-------------------------|------------------------|
+| `1screen` | Ja | Ja (når der ikke er noget `add_repeat` barn) |
+| `field-list` | Ja | Nej |
+
+Brug `field-list`, når du ønsker det grupperede layout uden den automatiske tilføj-knap. Brug `1screen`, når du ønsker både det grupperede layout og en indbygget måde at tilføje instanser på.
+
+---
+
+## `add_repeat` brugerdefineret tilføj-knap
+
+Et `note`- (eller `text`-) felt placeret **inde** i gentagelsesgruppen med `appearance: add_repeat` vises som en "Tilføj"-knap i fuld bredde. Knapmærkatet kommer fra feltets `label`-kolonne. Når et `add_repeat`-felt er til stede, undertrykkes den cirkulære standard +-knap (fra `1screen`).
+
+Placer `add_repeat`-feltet som det sidste felt inde i gentagelsesgruppen:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Medlem | `1screen` |
+| text | member_name | Medlemsnavn | |
+| integer | member_age | Alder | |
+| note | btn_add | + Tilføj medlem | `add_repeat` |
+| end_repeat | | | |
+
+### Farvetilpasning
+
+Indsend en farvekode i appearance-værdien for at style knappen:
+
+| Appearance value | Result |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Grøn baggrund, standard tekstfarve |
+| `add_repeat 04B404-ffffff` | Grøn baggrund, hvid tekst |
+
+Den første farve er baggrunden, og den anden (efter bindestregen) er tekstfarven. Udelad `#`, når du bruger den bindestreg-separerede form.
+
+### Ikon-variant
+
+Brug `add_repeat icon` (med et mellemrum) for at få en kompakt cirkulær ikon-knap i stedet for knappen i fuld bredde:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Tilføj | `add_repeat icon` |
+
+---
+
+## Slet-knapper: `delete-repeat-current` og `delete-repeat-last`
+
+Et `note`-felt inde i gentagelsesgruppen med `appearance: delete-repeat-current` eller `appearance: delete-repeat-last` vises som en delt slet-knap.
+
+| Appearance | Action |
+|------------|--------|
+| `delete-repeat-current` | Sletter den aktuelle (aktive) instans |
+| `delete-repeat-last` | Sletter den sidste instans i gentagelsen |
+
+Standardknappen (ikke ikon) er en delt knap: et skraldespandsikon til venstre og feltets mærkattekst til højre, der spænder over hele skærmens bredde.
+
+### Ikon-variant
+
+Tilføj `-icon` for at få en kompakt cirkulær skraldespandsikon-knap:
+
+| Appearance | Result |
+|------------|--------|
+| `delete-repeat-current-icon` | Cirkulært skraldespandsikon, sletter aktuel instans |
+| `delete-repeat-last-icon` | Cirkulært skraldespandsikon, sletter sidste instans |
+
+### Farvetilpasning
+
+Farveformatet er identisk med `add_repeat`: brug `<#RRGGBB/>` or `RRGGBB-RRGGBB` (baggrund-tekst).
+
+### Eksempel på fuldt mønster
+
+Den følgende gentagelse bruger `1screen`, en cirkulær slet-aktuel-knap øverst og en tilføj-knap i fuld bredde nederst:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Medlem | `1screen` |
+| note | btn_del | Fjern | `delete-repeat-current-icon` |
+| text | member_name | Medlemsnavn | |
+| integer | member_age | Alder | |
+| note | btn_add | + Tilføj medlem | `add_repeat` |
+| end_repeat | | | |
+
+---
+
 ## Bedste praksis
 
-1. Brug altid `repeat_count`, når antallet af gentagelser er kendt på forhånd — det forhindrer interviewere i utilsigtet at tilføje eller fjerne instanser.
-2. Hold gentagelsesgrupper fokuserede — en gentagelse med 20+ spørgsmål pr. instans er svær at navigere.
-3. Navngiv gentagelsesgrupper tydeligt (f.eks. `household_members`, ikke `repeat1`) — navnet vises i funktionskald og eksporterede data.
-4. Test med det maksimalt forventede antal instanser for at verificere ydelsen.
-5. Brug `field-list` appearance på gentagelsesgruppen for at vise alle felter på én skærm pr. instans (mobil).
+1. Brug altid `repeat_count`, når antallet af gentagelser er kendt på forhånd — det forhindrer interviewere i ved et uheld at tilføje eller fjerne instanser.
+2. Hold gentagelsesgrupper fokuserede — en gentagelse med 20+ spørgsmål per instans er svær at navigere i.
+3. Navngiv gentagelsesgrupper tydeligt (f.eks. `household_members`, ikke `repeat1`) — navnet optræder i funktionskald og eksporterede data.
+4. Test med det maksimale forventede antal instanser for at verificere ydeevnen.
+5. Brug `1screen` på `begin_repeat` for at vise alle spørgsmål på én skærm per instans, parret med et `add_repeat` note-felt inde i gruppen for at give interviewere en tydeligt mærket "Tilføj"-knap.
 
 ---
 
 ## Begrænsninger
 
-- `indexed-repeat()` kræver et gyldigt indeks (1 til antal instanser) — indekser uden for intervallet returnerer tomme værdier.
-- Indlejrede gentagelser ud over 2 niveauer anbefales ikke og kan forårsage visningsproblemer på nogle klienter.
-- Aggregatfunktioner (`sum`, `count` osv.) opererer på hele gentagelsesgruppen — du kan ikke aggregere en delmængde af instanser uden `*-if`-varianterne.
+- `indexed-repeat()` kræver et gyldigt indeks (1 til antallet af instanser) — indeks uden for intervallet returnerer tomt.
+- Indlejrede gentagelser ud over 2 niveauer anbefales ikke og kan forårsage visningsproblemer på visse klienter.
+- Aggregatfunktioner (`sum`, `count` osv.) opererer på hele gentagelsesgruppen — du kan ikke aggregere en undergruppe af instanser uden `*-if`-varianter.

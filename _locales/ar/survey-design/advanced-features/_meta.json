@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "تسجيل الصوت",
   "call-api": "Call API",
   "dynamic-question-type": "نوع السؤال الديناميكي",
   "dynamic-search": "البحث الديناميكي",

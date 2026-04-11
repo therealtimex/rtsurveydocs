@@ -5,157 +5,164 @@ description: ""
 
 import { Callout } from 'nextra/components'
 
-### Funkcije za stringove
+### String funkcije
 
 <Callout type="warning">
-Kada radite sa stringovima unutar izraza, važno je koristiti jednostruke navodnike ('') za zatvaranje literalnih stringova. Međutim, izuzetak nastaje kada želite da uključite jednostruke navodnike unutar literalnog stringa. U takvim slučajevima, možete koristiti dvostruke navodnike ("") za zatvaranje celog stringa.
+Kada radite sa stringovima unutar izraza, važno je koristiti jednostruke navodnike ('') za zatvaranje literala stringova. Međutim, izuzetak nastaje kada želite da uključite jednostruke navodnike unutar samog stringa. U takvim slučajevima, možete koristiti dvostruke navodnike ("") da zatvorite ceo string.
 
 Na primer:
-- Tačno: if(`${yesno}` = 1, "string sa 'jednostrukim navodnicima' u njemu", "bez jednostrukih navodnika ovde")
-- Netačno: if(`${yesno}` = 1, 'string sa 'jednostrukim navodnicima' u njemu', 'bez jednostrukih navodnika ovde')
+- Ispravno: if(`${yesno}` = 1, "a string with 'single quotes' in it", "no single quotes here")
+- Neispravno: if(`${yesno}` = 1, 'a string with 'single quotes' in it', 'no single quotes here')
 
-Kada su u pitanju pametni navodnici, ključno je biti svestan njihovog prisustva, jer mogu izazvati probleme u izrazima. Mnogi urednici bogatog teksta automatski konvertuju prave navodnike ("" ili '') u pametne ili zaobljene navodnike ("" ili ''), što može rezultovati sintaksnim greškama ili neočekivanim ponašanjem. Da biste to izbegli, osigurajte da dosljedno koristite prave navodnike ('') u vašim izrazima.
+Što se tiče "pametnih" navodnika (smart quotes), ključno je biti svestan njihovog prisustva, jer mogu izazvati probleme u izrazima. Mnogi napredni tekstualni editori automatski konvertuju ravne navodnike ("" ili '') u pametne ili zakrivljene navodnike (“” ili ‘’), što može rezultirati sintaksičkim greškama ili neočekivanim ponašanjem. Da biste to izbegli, postarajte se da dosledno koristite ravne navodnike ('') u svojim izrazima.
+
+Slobodno nas kontaktirajte ako imate dodatnih pitanja ili vam je potrebna pomoć!
 </Callout>
 
 rtSurvey podržava različite funkcije, uključujući:
 
-1. `string(polje)`: Konvertuje polje u string.
-   - Primer: `string(34.8)` biće konvertovano u `'34.8'`.
+1. `string(field)`: Konvertuje polje u string.
+   - Primer: `string(34.8)` će biti konvertovano u `'34.8'`.
 
-2. `string-length(polje)`: Vraća dužinu polja tipa string.
-   - Primer: `string-length(.) > 3 and string-length(.) < 10` može se koristiti da osigura da je trenutno polje između 3 i 10 karaktera.
+2. `string-length(field)`: Vraća dužinu string polja.
+   - Primer: `string-length(.) > 3 and string-length(.) < 10` se može koristiti da se osigura da trenutno polje ima između 3 i 10 karaktera.
+   - **Obrazac kaskadne zavisnosti**: `string-length(${province}) >= 0` uvek rezultira sa `true`, ali primorava rtSurvey da ponovo izračuna izraz kad god se `${province}` promeni. Koristite ovo u `relevant` koloni da biste aktivirali kaskadno osvežavanje kada se nadređeno polje ažurira:
+     | type | name | relevant |
+     |------|------|----------|
+     | select_one | district | `string-length(${province}) >= 0` |
+     Ovo osigurava da pitanje o okrugu ponovo procenjuje svoj `search()` ili `rawquery` prikaz kad god se pokrajina (province) promeni.
 
-3. `substr(polje_ili_string, pocetni_indeks, krajnji_indeks)`: Vraća podniz koji počinje od `pocetni_indeks` i završava se neposredno pre `krajnji_indeks`. Indeksi počinju od 0 za prvi karakter u stringu.
+3. `substr(fieldorstring, startindex, endindex)`: Vraća podstring koji počinje na `startindex` i završava se neposredno pre `endindex`. Indeksi počinju od 0 za prvi karakter u stringu.
    - Primer: `substr(${phone}, 0, 3)` će vratiti prve tri cifre broja telefona.
 
 4. `concat(a, b, c, ...)`: Spaja polja (i/ili stringove) zajedno.
    - Primer: `concat(${firstname}, ' ', ${lastname})` će vratiti puno ime kombinovanjem vrednosti u poljima `firstname` i `lastname`.
 
-5. `linebreak()`: Vraća karakter za prelom reda.
-   - Primer: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` će vratiti listu od tri vrednosti polja sa prelomima redova između njih.
+5. `linebreak()`: Vraća karakter za novi red.
+   - Primer: `concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` će vratiti listu vrednosti tri polja sa novim redovima između njih.
 
 6. `lower()`: Konvertuje string u sva mala slova.
-   - Primer: `lower('Naziv ulice')` će vratiti "naziv ulice".
+   - Primer: `lower('Street Name')` će vratiti "street name".
 
 7. `upper()`: Konvertuje string u sva velika slova.
-   - Primer: `upper('Naziv ulice')` će vratiti "NAZIV ULICE".
+   - Primer: `upper('Street Name')` će vratiti "STREET NAME".
 
-### Funkcije za select_one i select_multiple
+### select_one i select_multiple funkcije
 
-1. `count-selected(polje)`: Vraća broj stavki izabranih u polju select_multiple.
-   - Primer: `count-selected(.) = 3` može se koristiti kao izraz ograničenja da osigura da su tačno tri opcije izabrane.
+1. `count-selected(field)`: Vraća broj stavki izabranih u select_multiple polju.
+   - Primer: `count-selected(.) = 3` se može koristiti kao `constraint` izraz da bi se osiguralo da su izabrane tačno tri opcije.
 
-2. `selected(polje, vrednost)`: Vraća tačno ili netačno u zavisnosti od toga da li je navedena vrednost izabrana u polju select_one ili select_multiple.
-   - Primer: `selected(${color}, 'Blue')` može se koristiti kao izraz relevantnosti za prikazivanje grupe ili polja samo ako je ispitanik izabrao "Plavo" kao omiljenu boju.
-   - Napomena: Drugi parametar treba uvek da navodi vrednost opcije, ne oznaku opcije. Koristite vrednost iz kolone vrednosti u radnom listu choices definicije formulara.
+2. `selected(field, value)`: Vraća true ili false u zavisnosti od toga da li je navedena vrednost izabrana u select_one ili select_multiple polju.
+   - Primer: `selected(${color}, 'Blue')` se može koristiti kao `relevant` izraz da bi se prikazala grupa ili polje samo ako je ispitanik izabrao "Blue" kao svoju omiljenu boju.
+   - Napomena: Drugi parametar uvek treba da navodi choice vrednost, a ne choice labelu. Koristite vrednost iz `value` kolone u `choices` listu definicije forme.
 
-3. `selected-at(polje, broj)`: Vraća izabranu stavku na navedenoj poziciji u polju select_multiple. Kada je prosleđeni broj 0, vraća prvu izabranu stavku; kada je broj 1, vraća drugu izabranu stavku, i tako dalje.
-   - Primer: `selected-at(${fruits}, 0) = 'Apple'` može se koristiti kao izraz relevantnosti za prikazivanje grupe ili polja samo ako je prvi izabrani izbor "Jabuka".
-   - Napomena: Vraćena vrednost će biti vrednost opcije, ne oznaka opcije. Koristite vrednost iz kolone vrednosti u radnom listu choices definicije formulara.
+3. `selected-at(field, number)`: Vraća izabranu stavku na navedenoj poziciji u select_multiple polju. Kada je prosleđeni broj 0, vraća prvu izabranu stavku; kada je broj 1, vraća drugu izabranu stavku, i tako dalje.
+   - Primer: `selected-at(${fruits}, 0) = 'Apple'` se može koristiti kao `relevant` izraz da bi se prikazala grupa ili polje samo ako je prvi izabrani izbor "Apple".
+   - Napomena: Vraćena vrednost će biti choice vrednost, a ne choice labela. Koristite vrednost iz `value` kolone u `choices` listu definicije forme.
 
-4. `choice-label(polje, vrednost)`: Vraća oznaku za izbor polja select_one ili select_multiple, kako je definisano u radnom listu choices definicije formulara.
-   - Primer 1: `choice-label(${country}, ${country})` će vratiti oznaku opcije za trenutno izabrani izbor u polju nazvanom `country`.
-   - Primer 2: `choice-label(${languages}, selected-at(${languages}, 0))` će vratiti oznaku za prvi izabrani izbor u polju nazvanom `languages`.
-   - Napomena: Ova funkcija dohvata oznaku opcije, ne vrednost. Koristi kolonu oznake iz radnog lista choices definicije formulara.
+4. `choice-label(field, value)`: Vraća labelu za izbor u select_one ili select_multiple polju, kako je definisano u `choices` listu definicije forme.
+   - Primer 1: `choice-label(${country}, ${country})` će vratiti labelu izbora za trenutno izabranu opciju u polju pod nazivom `country`.
+   - Primer 2: `choice-label(${languages}, selected-at(${languages}, 0))` će vratiti labelu za prvi izabrani izbor u polju pod nazivom `languages`.
+   - Napomena: Ova funkcija preuzima labelu izbora, a ne vrednost. Koristi `label` kolonu iz `choices` lista definicije forme.
 
 ### Funkcije za ponavljajuća polja
 
-U rtSurvey-u, ako želite da postavljate ista pitanja više puta, možete staviti polje unutar grupe ponavljanja. Ovo rezultuje u više instanci istog polja. Sledeće funkcije vam mogu pomoći u radu sa ovim ponavljajućim poljima i ponavljajućim podacima koje oni proizvode. Pogledajte temu pomoći o ponavljajućim poljima za više detalja.
+U rtSurvey, ako želite da postavite isto pitanje (ili pitanja) više puta, možete staviti polje unutar ponavljajuće grupe (repeat group). To rezultira višestrukim instancama istog polja. Sledeće funkcije vam mogu pomoći da upravljate ovim ponavljajućim poljima i podacima koje oni proizvode. Pogledajte temu o ponavljajućim poljima za više detalja.
 
-1. `join(string, ponavljajuce_polje)`: Za polje unutar grupe ponavljanja, generiše listu vrednosti razdvojenu stringom. Prvi parametar navodi delimiter koji se koristi za razdvajanje vrednosti.
+1. `join(string, repeatedfield)`: Za polje unutar ponavljajuće grupe, generiše listu vrednosti razdvojenih stringom. Prvi parametar određuje separator koji će se koristiti za razdvajanje vrednosti.
    - Primer: `join(', ', ${member_name})` će generisati jednu listu razdvojenu zarezima od svih unetih imena.
 
-2. `join-if(string, ponavljajuce_polje, izraz)`: Funkcioniše tačno kao `join()`, osim što proverava svaku instancu u grupi ponavljanja koristeći navedeni izraz. Ako se izraz evaluira kao netačno, stavka će biti izostavljena iz izlaza.
-   - Primer: `join-if(', ', ${member_name}, ${age} >= 18)` će generisati listu razdvojenu zarezima sa imenima samo odraslih članova (onih sa godinama 18 i više).
+2. `join-if(string, repeatedfield, expression)`: Funkcioniše isto kao `join()`, osim što proverava svaku instancu u ponavljajućoj grupi koristeći priloženi izraz. Ako izraz rezultira sa false, stavka će biti izostavljena iz izlaza.
+   - Primer: `join-if(', ', ${member_name}, ${age} >= 18)` će generisati listu imena razdvojenu zarezima samo za odrasle članove (one sa 18 i više godina).
 
-3. `count(grupa_ponavljanja)`: Vraća trenutni broj puta da se grupa ponavljanja ponovila.
+3. `count(repeatgroup)`: Vraća trenutni broj ponavljanja ponavljajuće grupe.
    - Primer: `count(${groupname})` će vratiti broj instanci grupe.
 
-4. `count-if(grupa_ponavljanja, izraz)`: Funkcioniše tačno kao `count()`, osim što proverava svaku instancu u grupi ponavljanja koristeći navedeni izraz. Ako se izraz evaluira kao netačno, stavka će biti izostavljena iz izlaza.
-   - Primer: `count-if(${members}, ${age} >= 18)` će vratiti broj odraslih članova na osnovu polja za godine unutar grupe ponavljanja "members".
+4. `count-if(repeatgroup, expression)`: Funkcioniše isto kao `count()`, osim što proverava svaku instancu u ponavljajućoj grupi koristeći priloženi izraz. Ako izraz rezultira sa false, stavka će biti izostavljena iz izlaza.
+   - Primer: `count-if(${members}, ${age} >= 18)` će vratiti broj odraslih članova na osnovu polja `age` unutar ponavljajuće grupe "members".
 
-5. `sum(ponavljajuce_polje)`: Za polje unutar grupe ponavljanja, izračunava zbir svih vrednosti.
-   - Primer: `sum(${loan_amount})` će vratiti ukupnu vrednost svih zajmova.
+5. `sum(repeatedfield)`: Za polje unutar ponavljajuće grupe, izračunava sumu svih vrednosti.
+   - Primer: `sum(${loan_amount})` će vratiti ukupnu vrednost svih kredita.
 
-6. `sum-if(ponavljajuce_polje, izraz)`: Funkcioniše tačno kao `sum()`, osim što proverava svaku instancu u grupi ponavljanja koristeći navedeni izraz. Ako se izraz evaluira kao netačno, stavka će biti izostavljena iz izlaza.
-   - Primer: `sum-if(${loan_amount}, ${loan_amount} > 500)` će vratiti ukupnu vrednost svih zajmova koji su veći od 500. Manji zajmovi će biti ignorisani.
+6. `sum-if(repeatedfield, expression)`: Funkcioniše isto kao `sum()`, osim što proverava svaku instancu u ponavljajućoj grupi koristeći priloženi izraz. Ako izraz rezultira sa false, stavka će biti izostavljena iz izlaza.
+   - Primer: `sum-if(${loan_amount}, ${loan_amount} > 500)` će vratiti ukupnu vrednost svih kredita koji su veći od 500. Manji krediti će biti zanemareni.
 
-7. `min(ponavljajuce_polje)`: Za polje unutar grupe ponavljanja, izračunava minimum svih vrednosti.
-   - Primer: `min(${member_age})` će vratiti godine najmlađeg člana u grupi.
+7. `min(repeatedfield)`: Za polje unutar ponavljajuće grupe, izračunava minimum svih vrednosti.
+   - Primer: `min(${member_age})` će vratiti starost najmlađeg člana u grupi.
 
-8. `min-if(ponavljajuce_polje, izraz)`: Funkcioniše tačno kao `min()`, osim što proverava svaku instancu u grupi ponavljanja koristeći navedeni izraz. Ako se izraz evaluira kao netačno, stavka će biti izostavljena iz izlaza.
-   - Primer: `min-if(${member_age}, ${member_age} >= 18)` će vratiti godine najmlađeg odraslog u grupi. Oni mlađi od 18 godina će biti ignorisani.
+8. `min-if(repeatedfield, expression)`: Funkcioniše isto kao `min()`, osim što proverava svaku instancu u ponavljajućoj grupi koristeći priloženi izraz. Ako izraz rezultira sa false, stavka će biti izostavljena iz izlaza.
+   - Primer: `min-if(${member_age}, ${member_age} >= 18)` će vratiti starost najmlađe odrasle osobe u grupi. Oni mlađi od 18 godina će biti zanemareni.
 
-9. `max(ponavljajuce_polje)`: Za polje unutar grupe ponavljanja, izračunava maksimum svih vrednosti.
-   - Primer: `max(${member_age})` će vratiti godine najstarijeg člana u grupi.
+9. `max(repeatedfield)`: Za polje unutar ponavljajuće grupe, izračunava maksimum svih vrednosti.
+   - Primer: `max(${member_age})` će vratiti starost najstarijeg člana u grupi.
 
-10. `max-if(ponavljajuce_polje, izraz)`: Funkcioniše tačno kao `max()`, osim što proverava svaku instancu u grupi ponavljanja koristeći navedeni izraz. Ako se izraz evaluira kao netačno, stavka će biti izostavljena iz izlaza.
-    - Primer: `max-if(${member_age}, ${member_age} >= 18)` će vratiti godine najstarijeg odraslog u grupi. Oni mlađi od 18 godina će biti ignorisani.
+10. `max-if(repeatedfield, expression)`: Funkcioniše isto kao `max()`, osim što proverava svaku instancu u ponavljajućoj grupi koristeći priloženi izraz. Ako izraz rezultira sa false, stavka će biti izostavljena iz izlaza.
+    - Primer: `max-if(${member_age}, ${member_age} >= 18)` će vratiti starost najstarije odrasle osobe u grupi. Oni mlađi od 18 godina će biti zanemareni.
 
-11. `index()`: Pozvano unutar grupe ponavljanja, vraća indeksni broj za trenutnu grupu ili instancu.
-    - Primer: `index()` kada se koristi unutar grupe ponavljanja vratiće 1 za prvu instancu, 2 za drugu, i tako dalje.
+11. `index()`: Pozvana unutar ponavljajuće grupe, vraća indeksni broj za trenutnu grupu ili instancu.
+    - Primer: `index()` kada se koristi unutar ponavljajuće grupe vratiće 1 za prvu instancu, 2 za drugu, i tako dalje.
 
-12. `indexed-repeat(ponavljajuce_polje, grupa_ponavljanja, indeks)`: Referencira polje ili grupu koja je unutar grupe ponavljanja spolja te grupe ponavljanja. Prvi parametar navodi ponavljajuće polje ili grupu od interesa, drugi navodi grupu ponavljanja unutar koje se polje ili grupa nalazi, a treći navodi broj instance unutar grupe ponavljanja koja se koristi.
-    - Primer 1: `indexed-repeat(${name}, ${names}, 1)` će vratiti prvo dostupno ime kada je polje name unutar prethodne grupe ponavljanja nazvane "names".
-    - Primer 2: `indexed-repeat(${name}, ${names}, index())` će povući ime koje odgovara broju instance trenutne grupe ponavljanja.
+12. `indexed-repeat(repeatedfield, repeatgroup, index)`: Referencira polje ili grupu koja se nalazi unutar ponavljajuće grupe izvan te grupe. Prvi parametar navodi ponavljajuće polje ili grupu, drugi navodi ponavljajuću grupu u kojoj se polje ili grupa nalazi, a treći navodi broj instance unutar ponavljajuće grupe koji treba koristiti.
+    - Primer 1: `indexed-repeat(${name}, ${names}, 1)` će vratiti prvo dostupno ime kada se polje `name` nalazi unutar prethodne ponavljajuće grupe pod nazivom "names".
+    - Primer 2: `indexed-repeat(${name}, ${names}, index())` će povući ime koje odgovara broju instance trenutne ponavljajuće grupe.
 
-13. `rank-index(indeks, ponavljajuce_polje)`: Ova funkcija izračunava redni rang navedene instance ponavljajućeg polja za upotrebu izvan grupe ponavljanja. Rang 1 se dodeljuje instanci sa najvišom vrednošću, rang 2 instanci sa sledećom najvišom vrednošću, i tako dalje. Ako prosledite nevažeći indeks ili indeks na instancu sa nenumeričkom vrednošću, vratiće se rang 999.
-    - Primer: `rank-index(1, ${random_draw})` izračunava rang prve instance na osnovu vrednosti njenog polja `random_draw` u poređenju sa vrednostima ostalih instanci.
+13. `rank-index(index, repeatedfield)`: Ova funkcija izračunava redni rang navedene instance ponavljajućeg polja za upotrebu van ponavljajuće grupe. Rang 1 se dodeljuje instanci sa najvišom vrednošću, rang 2 instanci sa sledećom najvišom vrednošću, i tako dalje. Ako prosledite nevažeći indeks ili indeks instance sa nenumeričkom vrednošću, biće vraćen rang 999.
+    - Primer: `rank-index(1, ${random_draw})` izračunava rang prve instance na osnovu vrednosti njenog `random_draw` polja u poređenju sa vrednostima ostalih instanci.
 
-14. `rank-index-if(indeks, ponavljajuce_polje, izraz)`: Ova funkcija radi slično kao `rank-index()`, ali proverava svaku instancu u grupi ponavljanja ponavljajućeg polja koristeći navedeni izraz. Ako se izraz evaluira kao netačno, stavka će biti izostavljena iz proračuna. Indeks koji se koristi zasniva se na punom skupu instanci pre evaluacije izraza za svaku instancu. Ako prosledite indeks za instancu koja je bila ignorisana jer nije zadovoljila izraz, smatra se nevažećim indeksom i vratiće se rang 999.
-    - Primer: `rank-index-if(1, ${age}, ${age} >= 18)` izračunava rang godina unutar skupa odraslih, uzimajući u obzir samo instance gde su godine veće ili jednake 18.
+14. `rank-index-if(index, repeatedfield, expression)`: Ova funkcija radi slično kao `rank-index()`, ali proverava svaku instancu u ponavljajućoj grupi ponavljajućeg polja koristeći priloženi izraz. Ako izraz rezultira sa false, stavka će biti izostavljena iz obračuna. Korišćeni indeks se zasniva na punom skupu instanci pre procene izraza za svaku instancu. Ako prosledite indeks za instancu koja je zanemarena jer ne ispunjava izraz, on se smatra nevažećim indeksom i biće vraćen rang 999.
+    - Primer: `rank-index-if(1, ${age}, ${age} >= 18)` izračunava rang starosti unutar skupa odraslih, uzimajući u obzir samo instance gde je starost veća ili jednaka 18.
 
-### Numeričke funkcije
+### Numeričke funkcije 
 
-| Operator | Operacija | Primer | Primer odgovora |
-|----------|-----------|--------|-----------------|
+| Operator | Operacija | Primer | Primer rezultata |
+|----------|-----------|---------|----------------|
 | `+` | Sabiranje | 1 + 1 | 2 |
 | `-` | Oduzimanje | 3 - 2 | 1 |
 | `*` | Množenje | 3 * 2 | 6 |
 | `div` | Deljenje | 10 div 2 | 5 |
-| `mod` | Moduo | 9 mod 2 | 1 |
+| `mod` | Ostatak pri deljenju (Modulus) | 9 mod 2 | 1 |
 
 rtSurvey podržava numeričke funkcije, uključujući:
-- `number(polje)`: Konvertuje vrednost polja u broj.
+- `number(field)`: Konvertuje vrednost polja u broj.
   - Primer: `number('34.8')` = 34.8
 
-- `int(polje)`: Konvertuje vrednost polja u integer.
+- `int(field)`: Konvertuje vrednost polja u ceo broj (integer).
   - Primer: `int('39.2')` = 39
 
-- `min(polje1, ..., poljeX)`: Vraća minimalnu vrednost među prosleđenim poljima.
-  - Primer: `min(${father_age}, ${mother_age})` će vratiti godine oca ili majke, koja god je manja.
+- `min(field1, ..., fieldx)`: Vraća minimalnu vrednost među prosleđenim poljima.
+  - Primer: `min(${father_age}, ${mother_age})` će vratiti starost majke ili oca, u zavisnosti od toga koja je vrednost manja.
 
-- `max(polje1, ..., poljeX)`: Vraća maksimalnu vrednost među prosleđenim poljima.
-  - Primer: `max(${father_age}, ${mother_age})` će vratiti godine oca ili majke, koja god je veća.
+- `max(field1, ..., fieldx)`: Vraća maksimalnu vrednost među prosleđenim poljima.
+  - Primer: `max(${father_age}, ${mother_age})` će vratiti starost majke ili oca, u zavisnosti od toga koja je vrednost veća.
 
-- `format-number(polje)`: Formatira vrednost integer ili decimal polja prema korisničkim lokalnim podešavanjima.
-  - Primer: `format-number(${income})` Ovaj izraz može formatirati "120000" kao "120,000".
+- `format-number(field)`: Formatira vrednost celobrojnog ili decimalnog polja prema lokalnim podešavanjima korisnika.
+  - Primer: `format-number(${income})` Ovaj izraz bi mogao da formatira "120000" kao "120,000".
 
-- `round(polje, cifre)`: Zaokružuje numeričku vrednost polja na navedeni broj cifara iza decimalne tačke.
+- `round(field, digits)`: Zaokružuje numeričku vrednost polja na navedeni broj cifara nakon decimalnog zareza.
   - Primer: `round(${interest_rate}, 2)`
 
-- `abs(broj)`: Vraća apsolutnu vrednost broja.
-
-- `pow(osnova, eksponent)`: Vraća vrednost prvog parametra podignuto na stepen drugog parametra.
+- `abs(number)`: Vraća apsolutnu vrednost broja.
+  
+- `pow(base, exponent)`: Vraća vrednost prvog parametra podignutu na stepen drugog parametra.
   - Svaki parametar može biti polje, broj ili izraz.
 
-- `log10(polje_ili_vrednost)`: Vraća logaritam baze deset polja ili vrednosti prosleđene.
+- `log10(fieldorvalue)`: Vraća dekadni logaritam prosleđenog polja ili vrednosti.
 
-- `sin(polje_ili_vrednost)`: Vraća sinus polja ili vrednosti prosleđene, izražen u radijanima.
+- `sin(fieldorvalue)`: Vraća sinus prosleđenog polja ili vrednosti, izražen u radijanima.
+  
+- `cos(fieldorvalue)`: Vraća kosinus prosleđenog polja ili vrednosti, izražen u radijanima.
 
-- `cos(polje_ili_vrednost)`: Vraća kosinus polja ili vrednosti prosleđene, izražen u radijanima.
+- `tan(fieldorvalue)`: Vraća tangens prosleđenog polja ili vrednosti, izražen u radijanima.
 
-- `tan(polje_ili_vrednost)`: Vraća tangens polja ili vrednosti prosleđene, izražen u radijanima.
+- `asin(fieldorvalue)`: Vraća arksinus prosleđenog polja ili vrednosti, izražen u radijanima.
 
-- `asin(polje_ili_vrednost)`: Vraća arkus sinus polja ili vrednosti prosleđene, izražen u radijanima.
+- `acos(fieldorvalue)`: Vraća arkkosinus prosleđenog polja ili vrednosti, izražen u radijanima.
 
-- `acos(polje_ili_vrednost)`: Vraća arkus kosinus polja ili vrednosti prosleđene, izražen u radijanima.
+- `atan(fieldorvalue)`: Vraća arktangens prosleđenog polja ili vrednosti, izražen u radijanima.
 
-- `atan(polje_ili_vrednost)`: Vraća arkus tangens polja ili vrednosti prosleđene, izražen u radijanima.
+- `atan2(x, y)`: Vraća ugao u radijanima koji zaklapa tačka sa koordinatama (x, y) sa pozitivnim delom x-ose u koordinatnom početku. Rezultat je u opsegu od -pi() do pi().
 
-- `atan2(x, y)`: Vraća ugao u radijanima koji zaklapa koordinatni početak sa tačkom koordinata (x, y) i pozitivnom x-osom. Rezultat je u opsegu od -pi() do pi().
-
-- `sqrt(polje_ili_vrednost)`: Vraća nenegativan kvadratni koren polja ili vrednosti prosleđene.
+- `sqrt(fieldorvalue)`: Vraća nenegativni kvadratni koren prosleđenog polja ili vrednosti.
 
 - `exp(x)`: Vraća vrednost e^x.
 
@@ -164,115 +171,119 @@ rtSurvey podržava numeričke funkcije, uključujući:
 ### Funkcije za datum i vreme
 
 <Callout type="warning">
-Vrednosti datuma u rtSurvey-u se čuvaju kao stringovi u formatu `YYYY-MM-DD`. Vrednosti datetime se čuvaju kao ISO 8601 stringovi (`YYYY-MM-DDTHH:MM:SS`). Koristite `decimal-date-time()` za konverziju u broj radi aritmetike (npr. izračunavanje trajanja).
+Vrednosti datuma u rtSurvey se čuvaju kao stringovi u `YYYY-MM-DD` formatu. Vrednosti datuma i vremena (datetime) se čuvaju kao ISO 8601 stringovi (`YYYY-MM-DDTHH:MM:SS`). Koristite `decimal-date-time()` da konvertujete u broj za aritmetičke operacije (npr. izračunavanje trajanja).
 </Callout>
 
-1. `today()`: Vraća današnji datum kao string u formatu `YYYY-MM-DD`. Evaluira se jednom kada se formular otvori.
+1. `today()`: Vraća današnji datum kao string u `YYYY-MM-DD` formatu. Izračunava se jednom kada se forma otvori.
    - Primer: `today()` → `'2024-03-15'`
-   - Uobičajena upotreba: Kolona `default` za prethodno popunjavanje današnjeg datuma, ili u `relevant`/`constraint` za poređenje sa poljem datuma.
+   - Uobičajena upotreba: `default` kolona za unapred uneti današnji datum, ili u `relevant`/`constraint` za poređenje sa poljem datuma.
 
-2. `now()`: Vraća trenutni datum i vreme kao ISO 8601 string. Evaluira se svaki put kada se izraz izračunava.
+2. `now()`: Vraća trenutni datum i vreme kao ISO 8601 string. Izračunava se svaki put kada se izraz obrađuje.
    - Primer: `now()` → `'2024-03-15T14:32:00.000+03:00'`
-   - Uobičajena upotreba: Beleženje tačne vremenske oznake određenog događaja tokom ankete.
+   - Uobičajena upotreba: Beleženje tačnog vremenskog žiga određenog događaja tokom ankete.
 
-3. `date(vrednost)`: Konvertuje vrednost (string ili broj) u string datuma. Korisno za prinudno konvertovanje izračunatih vrednosti u tip datuma.
+3. `date(value)`: Konvertuje vrednost (string ili broj) u string datuma. Korisno za primoravanje izračunatih vrednosti u tip datuma.
    - Primer: `date('2024-03-15')` → `'2024-03-15'`
 
-4. `date-time(vrednost)`: Konvertuje vrednost u string datetime.
+4. `date-time(value)`: Konvertuje vrednost u datetime string.
    - Primer: `date-time(${event_timestamp})`
 
-5. `decimal-date-time(vrednost)`: Konvertuje string datuma ili datetime u decimalni broj koji predstavlja milisekunde od Unix epohe podeljene sa 86400000 (tj. frakcione dane od 1970-01-01). Koristite ovo za obavljanje aritmetike nad datumima.
+5. `decimal-date-time(value)`: Konvertuje string datuma ili datuma i vremena u decimalni broj koji predstavlja milisekunde od Unix epohe podeljene sa 86400000 (tj. razlomljeni deo dana od 1970-01-01). Koristite ovo za obavljanje aritmetičkih operacija na datumima.
    - Primer: Trajanje u danima između dva datuma:
      `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
-   - Primer: Trajanje u minutama između dva datetime-a:
+   - Primer: Trajanje u minutima između dva datuma i vremena:
      `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
 
-6. `format-date(datum, format)`: Formatira vrednost datuma koristeći string uzorka.
-   - Tokeni formata: `%Y` (4-cifrena godina), `%y` (2-cifrena godina), `%m` (mesec 01–12), `%d` (dan 01–31), `%a` (skraćeni naziv dana u sedmici), `%b` (skraćeni naziv meseca)
+6. `format-date(date, format)`: Formatira vrednost datuma koristeći obrazac (pattern string).
+   - Tokeni formata: `%Y` (4-cifrena godina), `%y` (2-cifrena godina), `%m` (mesec 01–12), `%d` (dan 01–31), `%a` (skraćeni dan u nedelji), `%b` (skraćeni naziv meseca)
    - Primer: `format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
    - Primer: `format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
 
-7. `format-date-time(datetime, format)`: Formatira vrednost datetime koristeći string uzorka. Prihvata sve tokene `format-date` plus:
+7. `format-date-time(datetime, format)`: Formatira vrednost datuma i vremena koristeći obrazac. Prihvata sve `format-date` tokene plus:
    - `%H` (sat 00–23), `%h` (sat 01–12), `%M` (minuti 00–59), `%S` (sekunde 00–59), `%3` (milisekunde), `%P` (AM/PM)
    - Primer: `format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
    - Primer: `format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
 
+8. `STRFTIME(format, datetime)`: Formatiranje datuma u SQLite stilu. Dostupno unutar SQL stringova koji se prosleđuju `rawquery` upitima — **nije** dostupno u XLSForm `calculation` ili `label` kolonama. Koristi SQLite tokene za formatiranje (`%Y`, `%m`, `%d`, `%H`, `%M`, `%S`).
+   - Primer unutar rawquery SQL stringa: `'SELECT STRFTIME(''%Y-%m'', interview_date) AS month FROM data WHERE id = ?'`
+   - Napomena: Koristite `format-date-time()` za formatiranje datuma u XLSForm izrazima. `STRFTIME()` je SQLite funkcija dostupna samo unutar SQL-a koji se prosleđuje `rawquery`.
+
 ---
 
-### Boolean funkcije
+### Logičke (boolean) funkcije
 
-1. `boolean(vrednost)`: Konvertuje bilo koju vrednost u boolean. Vraća `true` za neprazne stringove, nenulte brojeve i `true`; vraća `false` za prazne stringove, `0` i `false`.
+1. `boolean(value)`: Konvertuje bilo koju vrednost u logičku (boolean). Vraća `true` za stringove koji nisu prazni, brojeve koji nisu nula i `true`; vraća `false` za prazne stringove, `0` i `false`.
    - Primer: `boolean(${name})` vraća `true` ako `name` nije prazno.
 
-2. `boolean-from-string(string)`: Vraća `true` ako je string `'1'` ili `'true'` (bez obzira na velika/mala slova); vraća `false` inače.
+2. `boolean-from-string(string)`: Vraća `true` ako je string `'1'` ili `'true'` (bez obzira na mala/velika slova); u suprotnom vraća `false`.
    - Primer: `boolean-from-string(${enabled_flag})` — korisno kada polje čuva `'true'`/`'false'` kao tekst.
 
-3. `true()`: Vraća boolean vrednost `true`.
-   - Primer: U koloni `required`, `true()` je ekvivalent sa `yes`.
+3. `true()`: Vraća logičku vrednost `true`.
+   - Primer: U `required` koloni, `true()` je ekvivalentno sa `yes`.
 
-4. `false()`: Vraća boolean vrednost `false`.
-   - Primer: `if(${skip_section} = 'yes', false(), true())` — dinamički postavljanje obaveznog.
+4. `false()`: Vraća logičku vrednost `false`.
+   - Primer: `if(${skip_section} = 'yes', false(), true())` — dinamički postavlja obaveznost.
 
-5. `not(izraz)`: Vraća logičku negaciju izraza. Vraća `true` ako je izraz netačan, i obratno.
-   - Primer: `not(${consent} = 'yes')` — prikazuje upozorenje kada saglasnost NIJE data.
-   - Primer: `not(selected(${issues}, 'none'))` — zahteva detalje samo ako "nijedno" nije izabrano.
+5. `not(expression)`: Vraća logičku negaciju izraza. Vraća `true` ako je izraz false, i obrnuto.
+   - Primer: `not(${consent} = 'yes')` — prikaži upozorenje kada pristanak NIJE dat.
+   - Primer: `not(selected(${issues}, 'none'))` — zahtevaj detalje samo ako nije izabrano "none".
 
 ---
 
 ### Dodatne funkcije za stringove
 
-1. `starts-with(string, prefiks)`: Vraća `true` ako `string` počinje sa `prefiks`.
-   - Primer: `starts-with(${phone}, '+254')` proverava da li broj telefona počinje sa keniskim pozivnim brojem.
+1. `starts-with(string, prefix)`: Vraća `true` ako `string` počinje sa `prefix`.
+   - Primer: `starts-with(${phone}, '+254')` proverava da li broj telefona počinje sa pozivnim brojem za Keniju.
 
-2. `contains(string, podniz)`: Vraća `true` ako `string` sadrži `podniz`.
-   - Primer: `contains(${email}, '@')` proverava da email adresa ima znak `@`.
-   - Primer: `contains(${notes}, 'urgent')` pokreće pitanje za praćenje ako beleške pominju "hitno".
+2. `contains(string, substring)`: Vraća `true` ako `string` sadrži `substring`.
+   - Primer: `contains(${email}, '@')` proverava da li adresa e-pošte sadrži znak `@`.
+   - Primer: `contains(${notes}, 'urgent')` aktivira naknadno pitanje ako napomene pominju "urgent".
 
-3. `substring-before(string, granicnik)`: Vraća deo `stringa` koji se pojavljuje pre prvog pojavljivanja `granicnika`.
-   - Primer: `substring-before(${full_name}, ' ')` izvlači prvu reč (ime).
+3. `substring-before(string, needle)`: Vraća deo `string`-a koji se pojavljuje pre prvog pojavljivanja `needle`.
+   - Primer: `substring-before(${full_name}, ' ')` ekstrahuje prvu reč (ime).
 
-4. `substring-after(string, granicnik)`: Vraća deo `stringa` koji se pojavljuje posle prvog pojavljivanja `granicnika`.
-   - Primer: `substring-after(${email}, '@')` izvlači deo domene email adrese.
+4. `substring-after(string, needle)`: Vraća deo `string`-a koji se pojavljuje nakon prvog pojavljivanja `needle`.
+   - Primer: `substring-after(${email}, '@')` ekstrahuje domenski deo adrese e-pošte.
 
-5. `normalize-space(string)`: Uklanja vodeće i prateće razmake i sve interne sekvence razmaka redukuje na jedan razmak.
-   - Primer: `normalize-space(${name})` — čisti ime koje možda ima dodatne razmake.
+5. `normalize-space(string)`: Uklanja vodeće i prateće prazne prostore i smanjuje sve unutrašnje sekvence praznog prostora na jedan razmak.
+   - Primer: `normalize-space(${name})` — čisti ime koje je možda ukucano sa viškom razmaka.
 
-6. `translate(string, znakovi_za_trazenje, znakovi_za_zamenu)`: Zamenjuje svaki karakter u `stringu` koji se pojavljuje u `znakovi_za_trazenje` odgovarajućim karakterom u `znakovi_za_zamenu`. Karakteri u `znakovi_za_trazenje` bez odgovarajućeg karaktera u `znakovi_za_zamenu` se brišu.
-   - Primer: `translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` konvertuje u velika slova (ekvivalent sa `upper()`).
+6. `translate(string, search_chars, replace_chars)`: Zamenjuje svaki karakter u `string`-u koji se pojavljuje u `search_chars` sa odgovarajućim karakterom u `replace_chars`. Karakteri u `search_chars` koji nemaju odgovarajući karakter u `replace_chars` se brišu.
+   - Primer: `translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` konvertuje u velika slova (ekvivalentno `upper()`).
    - Primer: `translate(${phone}, ' -()', '')` uklanja razmake, crtice i zagrade iz broja telefona.
 
 ---
 
 ### Dodatne matematičke funkcije
 
-1. `floor(broj)`: Vraća najveći integer manji ili jednak `broju` (zaokružuje ka negativnoj beskonačnosti).
+1. `floor(number)`: Vraća najveći ceo broj koji je manji ili jednak broju `number` (zaokružuje ka negativnoj beskonačnosti).
    - Primer: `floor(4.9)` = 4, `floor(-2.1)` = -3
 
-2. `ceiling(broj)`: Vraća najmanji integer veći ili jednak `broju` (zaokružuje ka pozitivnoj beskonačnosti).
+2. `ceiling(number)`: Vraća najmanji ceo broj koji je veći ili jednak broju `number` (zaokružuje ka pozitivnoj beskonačnosti).
    - Primer: `ceiling(4.1)` = 5, `ceiling(-2.9)` = -2
 
-3. `random()`: Vraća nasumičan decimalni broj između 0.0 (uključivo) i 1.0 (isključivo). Obično se koristi u poljima `calculate` za dodeljivanje nasumičnih vrednosti ili nasumičan redosled pitanja.
-   - Primer: `random()` → npr. `0.7341`
-   - Primer: `int(random() * 6) + 1` → nasumičan broj 1–6 (bacanje kockice)
+3. `random()`: Vraća nasumičan decimalni broj između 0.0 (uključujući) i 1.0 (isključujući). Obično se koristi u `calculate` poljima za dodelu nasumičnih vrednosti ili nasumičan redosled pitanja.
+   - Primer: `random()` → npr., `0.7341`
+   - Primer: `int(random() * 6) + 1` → nasumičan broj 1–6 (bacanje kocke)
 
-4. `coalesce(a, b)`: Vraća `a` ako `a` nije prazno; inače vraća `b`. Korisno kao rezervna opcija kada polje može biti prazno.
-   - Primer: `coalesce(${preferred_name}, ${full_name})` — koristi preferirano ime ako je postavljeno, inače se vraća na puno ime.
+4. `coalesce(a, b)`: Vraća `a` ako `a` nije prazno; u suprotnom vraća `b`. Korisno kao rezervna opcija kada polje može biti prazno.
+   - Primer: `coalesce(${preferred_name}, ${full_name})` — koristi preferirano ime ako je postavljeno, u suprotnom koristi puno ime.
 
-5. `once(vrednost)`: Evaluira `vrednost` i čuva je, ali samo ako je trenutno polje **prazno**. Ako polje već ima vrednost (npr. prethodno je postavljeno), `once()` vraća postojeću vrednost nepromenjenu. Ovo sprečava ponovni proračun da prepiše korisnički unos.
-   - Primer: `once(today())` u koloni `default` postavlja današnji datum jednom i ne ažurira ga ako anketar ponovo otvori formular.
-   - Primer: `once(uuid())` generiše UUID jednom i zadržava ga stabilnim tokom ponovnih uređivanja.
+5. `once(value)`: Izračunava `value` i čuva ga, ali samo ako je trenutno polje **prazno**. Ako polje već ima vrednost (npr. prethodno je postavljeno), `once()` vraća postojeću vrednost nepromenjenu. Ovo sprečava da ponovno izračunavanje prebriše korisnički unos.
+   - Primer: `once(today())` u `default` koloni postavlja današnji datum jednom i ne ažurira ga ako anketar ponovo otvori formu.
+   - Primer: `once(uuid())` generiše UUID jednom i čuva ga stabilnim kroz ponovne izmene.
 
 ---
 
 ### Geo funkcije
 
-1. `area(vrednost_geoshape)`: Izračunava **površinu u kvadratnim metrima** unutar geoshape (poligona) vrednosti.
-   - Parametar je vrednost geoshape polja u formatu `sirina1 duzina1 0 0; sirina2 duzina2 0 0; ...`
-   - Primer: `area(${field_boundary})` — izračunava površinu anketiranog polja u m².
-   - Primer: `round(area(${field_boundary}) div 10000, 2)` — konvertuje u hektare.
+1. `area(geoshape_value)`: Izračunava **površinu u kvadratnim metrima** obuhvaćenu vrednošću `geoshape` (poligona).
+   - Parametar je vrednost geoshape polja u formatu `lat1 lon1 0 0; lat2 lon2 0 0; ...`
+   - Primer: `area(${field_boundary})` — izračunaj površinu anketiranog polja u m².
+   - Primer: `round(area(${field_boundary}) div 10000, 2)` — konvertuj u hektare.
 
-2. `distance(koordinate)`: Izračunava **ukupnu dužinu puta u metrima** geotrace (linije), ili rastojanje između dva geopoint-a.
-   - Za geotrace: `distance(${route})` vraća ukupnu dužinu puta u metrima.
+2. `distance(coordinates)`: Izračunava **ukupnu dužinu putanje u metrima** za `geotrace` (liniju) ili rastojanje između dva `geopoint`-a.
+   - Za geotrace: `distance(${route})` vraća ukupnu dužinu putanje u metrima.
    - Za dva geopoint-a: `distance(concat(${point_a}, ' ', ${point_b}))` vraća rastojanje između njih.
    - Primer: `round(distance(${road_trace}) div 1000, 3)` — dužina puta u kilometrima.
 
@@ -280,39 +291,45 @@ Vrednosti datuma u rtSurvey-u se čuvaju kao stringovi u formatu `YYYY-MM-DD`. V
 
 ### Funkcije za validaciju
 
-1. `regex(vrednost, uzorak)`: Vraća `true` ako `vrednost` odgovara regularnom izrazu `uzorak`. Koristite u koloni `constraint` za validaciju zasnovanu na uzorku.
-   - Uzorak koristi standardnu regex sintaksu (podskup POSIX ERE).
-   - Primer: `regex(., '^[0-9]{10}$')` — validira 10-cifreni broj.
-   - Primer: `regex(., '^[A-Z]{2}[0-9]{6}$')` — validira format broja pasoša (2 velika slova praćena sa 6 cifara).
-   - Primer: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — osnovna provera formata email adrese.
+1. `regex(value, pattern)`: Vraća `true` ako se `value` podudara sa regularnim izrazom `pattern`. Koristite u koloni `constraint` za validaciju zasnovanu na obrascu.
+   - Obrazac koristi standardnu regex sintaksu (POSIX ERE podskup).
+   - Primer: `regex(., '^[0-9]{10}$')` — validacija 10-cifrenog broja.
+   - Primer: `regex(., '^[A-Z]{2}[0-9]{6}$')` — validacija formata broja pasoša (2 velika slova praćena sa 6 cifara).
+   - Primer: `regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — osnovna provera formata e-pošte.
 
-2. `checklist(min, max, v1, v2, ...)`: Evaluira listu boolean izraza i vraća `true` ako je broj `true` vrednosti između `min` i `max` (uključivo). Prosledite `-1` za `min` ili `max` da preskočite tu granicu.
+2. `checklist(min, max, v1, v2, ...)`: Proverava listu logičkih izraza i vraća `true` ako je broj tačnih (`true`) vrednosti između `min` i `max` (uključujući). Prosledite `-1` za `min` ili `max` da biste preskočili tu granicu.
    - Primer: `checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — prolazi ako su tačno 2 ili 3 od tri uslova tačna.
-   - Primer: `checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — najmanje jedna bezbednosna mera mora biti tačna.
+   - Primer: `checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — barem jedna bezbednosna mera mora biti tačna.
 
-3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Kao `checklist()`, ali svaka vrednost ima težinu. Zbir težina za `true` vrednosti mora biti između `min` i `max`.
-   - Primer: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — zbir težina prisutnih objekata mora biti najmanje 10.
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`: Slično kao `checklist()`, ali svaka vrednost ima težinu. Suma težina za tačne (`true`) vrednosti mora biti između `min` i `max`.
+   - Primer: `weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — suma težina za prisutne objekte mora biti najmanje 10.
 
 ---
 
-### Korisne funkcije
+### Pomoćne funkcije
 
 1. `uuid()`: Generiše nasumičan UUID (RFC 4122 v4 format) kao string.
    - Primer: `uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
    - Obično se koristi sa `once()` za generisanje stabilnog jedinstvenog ID-a: `once(uuid())`
 
-2. `version()`: Vraća vrednost atributa `version` formulara kako je postavljeno u radnom listu settings.
+2. `version()`: Vraća vrednost atributa `version` forme, kako je postavljeno u `settings` listu.
    - Primer: `version()` → `'3.1'`
-   - Korisno u poljima `calculate` za ugrađivanje verzije formulara u izvezene podatke.
+   - Korisno u `calculate` poljima za umetanje verzije forme u izvezene podatke.
 
-3. `position()`: Kada se pozove unutar **grupe ponavljanja**, vraća indeks koji počinje od 1 trenutne instance ponavljanja.
+3. `position()`: Kada se pozove unutar **ponavljajuće grupe**, vraća indeks trenutne instance ponavljanja (počevši od 1).
    - Primer: `position()` u prvoj instanci vraća `1`, u drugoj vraća `2`, i tako dalje.
-   - Pogledajte takođe: `index()` (pseudonim), `indexed-repeat()` za referenciranje vrednosti ponavljanja spolja.
+   - Pogledajte i: `index()` (alias), `indexed-repeat()` za referenciranje vrednosti ponavljanja izvan grupe.
 
-4. `thousandsep(duzina, separator, vrednost)`: Formatira broj sa separatorom hiljada. `duzina` je minimalna ukupna dužina stringa (dopunjena razmacima ako je kraća), `separator` je karakter koji se koristi (npr. `','`), a `vrednost` je broj za formatiranje.
+4. `thousandsep(length, separator, value)`: Formatira broj sa separatorom hiljada. `length` je minimalna ukupna dužina stringa (dopunjena razmacima ako je kraća), `separator` je karakter koji se koristi (npr. `','`), a `value` je broj koji se formatira.
    - Primer: `thousandsep(0, ',', 1234567)` → `'1,234,567'`
    - Primer: `thousandsep(0, '.', ${income})` → formatira prihod sa tačkom kao separatorom hiljada.
 
-5. `substr-jsonpath(vrednost, jsonpath)`: Izvlači podniz iz JSON stringa koristeći JSONPath izraz.
-   - Primer: `substr-jsonpath(${api_response}, '$.data.name')` — izvlači polje `name` iz JSON stringa sačuvanog u `api_response`.
-   - Obično se koristi uz `callapi()` za izvlačenje specifičnih vrednosti iz API odgovora.
+5. `substr-jsonpath(value, jsonpath)`: Ekstrahuje vrednost iz JSON stringa koristeći JSONPath izraz.
+   - `value` mora biti JSON string (npr. polje koje je sačuvalo sirov API odgovor koristeći `callapi(..., 'json:', ...)`).
+   - `jsonpath` je JSONPath izraz (npr. `'$.data.name'`, `'$.items[0].id'`).
+   - Uvek vraća **string** — obmotajte u `number()` kada se koristi u aritmetičkim operacijama.
+   - Vraća prazan string `''` ako putanja nije pronađena ili `value` nije ispravan JSON.
+   - Primer: `substr-jsonpath(${api_response}, '$.data.name')` — ekstrahuje polje `name`.
+   - Primer: `substr-jsonpath(${api_response}, '$.items[0].label')` — prvi element niza.
+   - Primer: `number(substr-jsonpath(${api_response}, '$.price'))` — ekstrahuje numeričku vrednost.
+   - Obično se koristi uz `callapi(..., 'json:', ...)` za ekstrakciju više polja iz jednog API odgovora. Pogledajte [Preuzimanje više vrednosti iz jednog API poziva](../advanced-features/call-api#fetching-multiple-values-from-one-api-call).

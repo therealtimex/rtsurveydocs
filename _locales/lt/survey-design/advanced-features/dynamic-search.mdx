@@ -1,9 +1,9 @@
 ---
 title: "Dinaminė paieška"
-description: "Dinaminė paieška įkelia pasirinkimus iš nuotolinės API realiuoju laiku, kai surašytojas rašo, įgalinant didelius ar dažnai atnaujinamais duomenų rinkinius."
+description: "Dinaminė paieška įkelia pasirinkimus iš nuotolinio API realiuoju laiku, kai surašinėtojas rašo, todėl galima naudoti didelius arba dažnai atnaujinamus duomenų rinkinius."
 ---
 
-**Dinaminė paieška** (taip pat vadinama Paieškos API) leidžia `select_one`, `select_multiple` arba `text` laukui įkelti savo pasirinkimus iš nuotolinės žiniatinklio paslaugos **vykdymo metu**, kai surašytojas rašo. Tai tinkamas metodas, kai jūsų pasirinkimų sąrašas yra per didelis, kad jį būtų galima įtraukti į CSV failą, yra dažnai atnaujinamas arba ateina iš gyvos duomenų bazės.
+**Dinaminė paieška** (taip pat vadinama „Search API“) leidžia `select_one`, `select_multiple` arba `text` laukams įkelti pasirinkimus iš nuotolinės žiniatinklio paslaugos **vykdymo metu**, kai surašinėtojas rašo. Tai tinkamas požiūris, kai jūsų pasirinkimų sąrašas yra per didelis, kad jį būtų galima įtraukti į CSV failą, yra dažnai atnaujinamas arba gaunamas iš tiesioginės duomenų bazės.
 
 ---
 
@@ -20,24 +20,24 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 | Parametras | Aprašymas |
 |-----------|-------------|
 | `method` | Visada naudokite `'POST'` |
-| `url` | API galiuklio URL užklausai |
-| `post_body` | JSON turinys, siunčiamas API. Naudokite `%__input__%` kaip vietos laikiklį dabartiniam surašytojo paieškos tekstui |
-| `value_column` | Atsakymo objekto raktas, naudojamas kaip saugoma **reikšmė** |
-| `display` | Raktas (arba šablonas), naudojamas kaip **etiketė**, rodoma išskleidžiamajame sąraše. Palaiko `##raktas##` vietos laikiklius ir `@{func}` išraiškas |
+| `url` | API galinis taškas, kuriam siunčiama užklausa |
+| `post_body` | API siunčiamas JSON turinys. Naudokite `%__input__%` kaip vietos žymeklį dabartiniam surašinėtojo paieškos tekstui |
+| `value_column` | Atsakymo objekto raktas, kuris bus naudojamas kaip išsaugota **reikšmė** (value) |
+| `display` | Raktas (arba šablonas), kuris bus naudojamas kaip **etiketė** (label), rodoma išskleidžiamajame sąraše. Palaiko `##key##` vietos žymeklius ir `@{func}` išraiškas |
 | `data_path` | JSONPath į rezultatų objektų masyvą atsakyme (pvz., `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Pavadinimas, po kuriuo saugomas neapdorotas atsakymas, kad galėtų juo naudotis kiti laukai |
+| `save_path` | Pavadinimas, kuriuo išsaugomas neapdorotas atsakymas, kad jį galėtų naudoti kiti laukai |
 
 ---
 
 ## Pagrindinis pavyzdys
 
-Sveikatos įstaigos paieška, kai surašytojas įveda dalį įstaigos pavadinimo:
+Sveikatos priežiūros įstaigos paieška, kai surašinėtojas įrašo dalį įstaigos pavadinimo:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one | facility | Pasirinkite sveikatos įstaigą | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+| select_one | facility | Pasirinkite sveikatos priežiūros įstaigą | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-API gauna `{"query": "nair"}`, kai surašytojas įveda „nair", ir grąžina:
+API gauna `{"query": "nair"}`, kai surašinėtojas įrašo „nair“, ir grąžina:
 
 ```json
 {
@@ -48,15 +48,15 @@ API gauna `{"query": "nair"}`, kai surašytojas įveda „nair", ir grąžina:
 }
 ```
 
-Išskleidžiamajame meniu rodoma `Nairobi Central Clinic` ir `Nairobi West Hospital`; saugoma reikšmė yra `HF001` arba `HF002`.
+Išskleidžiamajame sąraše rodoma `Nairobi Central Clinic` ir `Nairobi West Hospital`; išsaugota reikšmė yra `HF001` arba `HF002`.
 
 ---
 
-## Pažangus rodinio formatavimas
+## Išplėstinis rodymo formatavimas
 
-### `##raktas##` šablonų naudojimas
+### `##key##` šablonų naudojimas
 
-Rodykite kelis laukus etiketėje:
+Etiketėje rodyti kelis laukus:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
@@ -66,7 +66,7 @@ Rodoma kaip: `Nairobi Central Clinic (Nairobi)`.
 
 ### `@{func}` išraiškų naudojimas
 
-Taikykite sąlyginę logiką rodinio etiketėje:
+Taikyti sąlyginę logiką rodymo etiketėje:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Aktyvūs rezultatai rodo `✓ Klinikos pavadinimas`; neaktyvūs — `✗ Klinikos pavadinimas`.
+Aktyvūs rezultatai rodomi kaip `✓ Clinic Name`; neaktyvūs – `✗ Clinic Name`.
 
 ---
 
 ## Numatytosios reikšmės nustatymas: `search-default-api()`
 
-Naudokite `search-default-api()` po `search-api()`, kad iš anksto užpildytumėte lauką su numatytąja pasirinkimo reikšme, įkelta iš atskiro API skambučio (pvz., redaguojant esamą įrašą):
+Naudokite `search-default-api()` po `search-api()`, kad iš anksto užpildytumėte lauką numatytuoju pasirinkimu, įkeltu iš atskiro API iškvietimo (pvz., redaguojant esamą įrašą):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -88,15 +88,15 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## Pasirinktinis atskyriklias select_multiple: `search-default-separator()`
+## Pasirinktinis skyriklis „select_multiple“ laukui: `search-default-separator()`
 
-`select_multiple` laukams nurodykite, kaip kelios pasirinktos reikšmės sujungiamos saugomoje eilutėje:
+`select_multiple` laukams nurodykite, kaip kelios pasirinktos reikšmės sujungiamos išsaugotoje eilutėje:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
 ```
 
-Numatytasis atskyriklias yra tarpas.
+Numatytasis skyriklis yra tarpas.
 
 ---
 
@@ -106,32 +106,91 @@ Numatytasis atskyriklias yra tarpas.
 |---------------|----------|
 | `select_one` | Vienas pasirinkimas iš paieškos rezultatų |
 | `select_multiple` | Keli pasirinkimai iš paieškos rezultatų |
-| `text` | Automatinis pildymas — surašytojas rašo laisvai, tačiau gali pasirinkti pasiūlymą |
+| `text` | Automatinis užbaigimas – surašinėtojas rašo laisvai, bet gali pasirinkti pasiūlymą |
 
 ---
 
-## Saugomo atsakymo duomenų naudojimas
+## Išsaugoto atsakymo duomenų naudojimas
 
-`save_path` saugo pilną API atsakymo objektą nurodytu pavadinimu. Kiti laukai gali jį pasiekti naudodami `pulldata()`:
+Kai surašinėtojas pasirenka rezultatą, „rtSurvey“ išsaugo visą atitinkamą objektą iš atsakymo pavadinimu `save_path`. Kiti laukai gali skaityti iš jo dviem būdais.
+
+### 1 būdas – `pulldata()` paieška
+
+Naudokite `pulldata('save_path', 'key')`, kad nuskaitytumėte aukščiausio lygio lauką iš išsaugoto objekto:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Pasirinkite įstaigą | `search-api(..., 'facility_data')` |
+| select_one | facility | Pasirinkite įstaigą | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+`select_one` eilutės išvaizda turi apimti `search-api(..., 'facility_data')` su atitinkamu `save_path`.
+
+**Giliems JSON laukams** derinkite su `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
 
 ---
 
-## Geriausios praktikos
+## Vietinio failo paieška naudojant search()
 
-1. Užtikrinkite, kad jūsų API galiuklis reaguoja per 1–2 sekundes — lėtos API padaro paiešką nejautrią.
-2. Naudokite `%__input__%` `post_body`, kad API grąžintų tik atitinkančius rezultatus, o ne visą duomenų rinkinį.
-3. Indeksuokite paieškos lauką serveryje (pvz., Elasticsearch, duomenų bazės visateksčio teksto indeksas) gretiems atsakymams.
-4. Ribokite rezultatus iki 20–50 elementų vienai užklausai — tūkstančių rezultatų grąžinimas naikina paieškos tikslą.
-5. Įtraukite minimalios įvesties ilgio reikalavimą API, kad išvengtumėte platių užklausų aktyvavimo vieno simbolio įvestimis.
+`search()` atlieka paiešką neprisijungus, stulpelių lygybės patikrinimus pagal pridėtą SQLite `.db` failą – nereikia tinklo ryšio ir jokių SQL užklausų. Naudokite jį, kai jūsų informaciniai duomenys yra supakuoti kartu su forma ir jums reikia paprastos paieškos „rasti visas eilutes, kuriose stulpelis lygus reikšmei“.
+
+### Parašas
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parametrai
+
+| Parametras | Aprašymas |
+|-----------|-------------|
+| `path` | Kelias į SQLite lentelę: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Atitikties operatorius – grąžina eilutes, kuriose stulpelis lygus reikšmei |
+| `'list_name'` | Stulpelio pavadinimas, pagal kurį bus tikrinama atitiktis |
+| `${field}` | Reikšmė, pagal kurią ieškoma; paprastai tai nuoroda į lauką |
+
+### Pavyzdys
+
+Užpildykite `select_one` iš vietinės duomenų bazės, palygindami `${d307}` reikšmę su stulpeliu `list_name` lentelėje `externalData`, esančioje `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Pasirinkite įstaigą | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Kai `${d307}` lygus `"HF001"`, `search()` grąžina kiekvieną eilutę iš `externalData`, kur `list_name = 'HF001'` – visiškai iš pridėto failo, be jokio tinklo iškvietimo.
+
+### search() vs rawquery automatinis užbaigimas
+
+| Funkcija | `search()` | `rawquery` automatinis užbaigimas |
+|---------|-----------|------------------------|
+| SQL užklausos | Ne – tik stulpelių lygybė | Taip – pilnas `SELECT … FROM …` |
+| Parametrizuota įvestis | Stulpelio reikšmės atitiktis | Įtraukta į SQL eilutę |
+| Laisvo teksto įvedimas | Taip – surašinėtojas gali rašyti laisvai | Ne – turi pasirinkti iš sąrašo |
+| UNION / kelios lentelės | Nepalaikoma | Palaikoma |
+
+### Kada naudoti kurį
+
+- Naudokite **`search()`**, kai jums reikia paprasto lygybės atitikimo pagal pridėtą `.db` failą, forma turi veikti neprisijungus ir norite leisti įvesti laisvą tekstą.
+- Naudokite **`rawquery` automatinį užbaigimą**, kai jums reikia SQL lankstumo (JOIN, UNION, apskaičiuoti stulpeliai) arba turite atlikti užklausas keliose lentelėse, o forma turi patikimą ryšį.
+
+---
+
+## Geriausia praktika
+
+1. Įsitikinkite, kad jūsų API galinis taškas atsako per 1–2 sekundes – lėtas API sukelia paieškos nereagavimo jausmą.
+2. Naudokite `%__input__%` parametre `post_body`, kad API grąžintų tik atitinkamus rezultatus, o ne visą duomenų rinkinį.
+3. Indeksuokite paieškos lauką serverio pusėje (pvz., „Elasticsearch“, duomenų bazės viso teksto indeksas), kad gautumėte greitus atsakymus.
+4. Apribokite rezultatus iki 20–50 elementų užklausai – grąžinti tūkstančius rezultatų prieštarauja paieškos tikslui.
+5. Įtraukite minimalaus įvesties ilgio reikalavimą API, kad išvengtumėte plačių užklausų pagal vieno simbolio įvestį.
 
 ## Apribojimai
 
-- Dinaminei paieškai reikalingas tinklo ryšys — ji neveikia neprisijungus.
-- Vietos laikiklis `%__input__%` įterpiamas tokiame pavidale; sanitizuokite įvestis serveryje, kad išvengtumėte injekcijos atakų.
-- Sudėtingos `@{func}` rodymo išraiškos gali turėti ribotą palaikymą visose rtSurvey kliento versijose.
+- Dinaminei paieškai reikalingas tinklo ryšys – ji neveikia neprisijungus.
+- `%__input__%` vietos žymeklis įterpiamas toks, koks yra; išvalykite (sanitise) įvestis serverio pusėje, kad išvengtumėte įterpimo (injection) atakų.
+- Sudėtingos `@{func}` rodymo išraiškos gali turėti ribotą palaikymą visose „rtSurvey“ klientų versijose.

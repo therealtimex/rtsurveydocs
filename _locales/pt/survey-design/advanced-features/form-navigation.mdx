@@ -1,0 +1,104 @@
+---
+title: "Controlos de navegação do formulário"
+description: "Utilize os valores de aparência SaveFinalizedExit e SaveIncompleteExit para renderizar botões de saída estilizados que guardam e saem do formulário."
+---
+
+**Os controlos de navegação do formulário** são valores de aparência colocados em campos `note` (ou `text`) que são renderizados como botões estilizados de largura total na parte inferior de um inquérito. Eles permitem que o enumerador guarde o envio e saia do formulário com um toque — quer como um registo concluído (finalizado) ou como um rascunho (registo incompleto).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Renderiza um botão que **guarda o envio como finalizado** e sai do formulário. A etiqueta do botão é retirada da coluna `label` do campo.
+
+| XLSForm column | Valor |
+|----------------|-------|
+| `type` | `note` |
+| `name` | qualquer nome único (ex: `btn_finish`) |
+| `label` | texto apresentado no botão |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+O envio é marcado como um registo final e completo. Isto é equivalente a tocar no botão de submeter incorporado.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Renderiza um botão que **guarda o envio como incompleto (rascunho)** e sai do formulário. O enumerador pode voltar a ele mais tarde e continuar a preenchê-lo.
+
+| XLSForm column | Valor |
+|----------------|-------|
+| `type` | `note` |
+| `name` | qualquier nome único (ex: `btn_pause`) |
+| `label` | texto apresentado no botão |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Sintaxe de cores
+
+Ambas as aparências aceitam uma cor inline no formato `<#RRGGBB/>`:
+
+- `#` seguido de exatamente **6 dígitos hex** (maiúsculas ou minúsculas)
+- O `/>` de fecho é **obrigatório** — omiti-lo quebra a análise
+- Exemplo: `<#04B404/>` (verde), `<#EDC602/>` (âmbar), `<#D9534F/>` (vermelho)
+
+A cor controla o fundo do botão. A cor do texto é determinada automaticamente pela aplicação.
+
+---
+
+## Exemplo
+
+Os dois campos seguintes colocados no final de um formulário produzem um botão **Submeter** verde e um botão **Guardar como rascunho** âmbar:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Submeter | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Guardar como rascunho | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — excluir botões do índice
+
+O token de aparência `toc-hide` indica ao rtSurvey para excluir um campo do **índice** do formulário (a lista geral de perguntas). Os botões de navegação não são perguntas, pelo que nunca devem aparecer no índice.
+
+Acrescente sempre `toc-hide` após a aparência de saída:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Consulte [Aparência — toc-hide](../appearance#group-and-navigation) para a referência toc-hide.
+
+---
+
+## Convenção de colocação
+
+Siga estas convenções ao adicionar controlos de navegação a um formulário:
+
+- Coloque ambos os botões no **final** do formulário, após todas as perguntas e grupos.
+- Inclua sempre **ambos** os botões juntos — um finalizado e um incompleto — para que o enumerador tenha sempre uma forma de sair, independentemente do estado de conclusão.
+- Utilize a coluna `relevant` no botão de saída finalizada se a submissão apenas deve ser permitida quando certas condições forem cumpridas (ex: uma secção obrigatória está completa). O botão de saída incompleta deve geralmente permanecer **sempre visível**.
+
+---
+
+## Saída finalizada condicional
+
+Utilize a coluna `relevant` para controlar quando o botão de saída finalizada é apresentado. A saída incompleta deve permanecer visível incondicionalmente para que o enumerador possa sempre pausar e voltar.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Submeter | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Guardar como rascunho | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+Neste exemplo, o botão **Submeter** apenas aparece quando o enumerador deu o consentimento e marcou a secção A como completa. O botão **Guardar como rascunho** está sempre disponível.
+
+---
+
+## Limitações
+
+- **O tipo de campo deve ser `note` ou `text`.** A utilização destas aparências em qualquer outro tipo de pergunta não é suportada.
+- **Apenas hexadecimal de 6 dígitos.** Hexadecimal abreviado (`<#FFF/>`) e cores nomeadas não são suportados — utilize sempre o formato completo de 6 dígitos (ex: `<#FFFFFF/>`).
+- **A coluna de etiqueta é o texto do botão.** A coluna `hint` é ignorada para estes campos; apenas o `label` é renderizado.
+- **Ambos os botões devem estar presentes.** Omitir o botão de saída incompleta deixa o enumerador sem uma forma de pausar a meio do formulário.

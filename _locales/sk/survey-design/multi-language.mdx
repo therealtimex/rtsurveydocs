@@ -3,118 +3,164 @@ title: "Podpora viacerých jazykov"
 description: ""
 ---
 
-rtSurvey poskytuje robustnú podporu viacerých jazykov, čo vám umožňuje vytvárať prieskumy v mnohých jazykoch. Táto funkcia je kľúčová pre vykonávanie výskumu naprieč rôznymi jazykovými populáciami alebo vo viacjazyčných prostrediach.
+rtSurvey poskytuje robustnú podporu pre viacero jazykov, čo vám umožňuje vytvárať prieskumy v rôznych jazykoch. Táto funkcia je kľúčová pre vykonávanie výskumu v rôznych lingvistických populáciách alebo v multilingválnom prostredí.
 
-## Nastavenie viacjazyčných prieskumov
+## Nastavenie prieskumov vo viacerých jazykoch
 
-Na vytvorenie viacjazyčného prieskumu v rtSurvey musíte do vášho XLSForm pridať stĺpce špecifické pre jazyk. Tu je postup:
+Ak chcete v rtSurvey vytvoriť prieskum vo viacerých jazykoch, musíte do svojho XLSForm pridať stĺpce špecifické pre daný jazyk. Tu je postup:
 
-1. **Preklady popiskov**: Pridajte stĺpce pre každý jazyk vo formáte `label::Jazyk (kód)`.
-2. **Preklady nápovied**: Použite `hint::Jazyk (kód)` na prekladanie nápovied.
-3. **Preklady mediálnych súborov**: Pre médiá špecifické pre jazyk použite `media::Jazyk (kód)`.
+1. **Preklady menoviek (Label Translations)**: Pridajte stĺpce pre každý jazyk pomocou formátu `label::Language (code)`.
+2. **Preklady nápoved (Hint Translations)**: Na preklad nápoved použite `hint::Language (code)`.
+3. **Preklady multimediálnych súborov (Media File Translations)**: Pre médiá špecifické pre daný jazyk použite `media::Language (code)`.
 
 Príklad:
 
 ```
-| type    | name | label::Slovenčina (sk) | label::Angličtina (en) | hint::Slovenčina (sk) | hint::Angličtina (en) |
+| type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
 |---------|------|---------------------|---------------------|---------------------|---------------------|
-| integer | age  | Koľko máte rokov?    | How old are you?    | Zadajte váš vek      | Enter your age     |
+| integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
 ```
 
 ## Jazykové kódy
 
-Odporúča sa používať oficiálne 2-znakové jazykové kódy (podznačky) za názvom jazyka. To uľahčuje porovnanie jazyka formulára s jazykom používateľského rozhrania. Oficiálne kódy nájdete [tu](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+Odporúča sa používať oficiálne 2-znakové jazykové kódy (subtagy) za názvom jazyka. To uľahčuje zladenie jazyka formulára s jazykom používateľského rozhrania. Oficiálne kódy nájdete [tu](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
 ## Nastavenie predvoleného jazyka
 
-Na nastavenie predvoleného jazyka pre zber dát použite hárok `settings` vo vašom XLSForm:
+Ak chcete nastaviť predvolený jazyk pre zber údajov, použite pracovný hárok `settings` vo svojom XLSForm:
 
 ```
 | form_id   | version | default_language |
 |-----------|---------|-------------------|
-| test_form | 101     | Slovak (sk)       |
+| test_form | 101     | French (fr)       |
 ```
 
 ## Funkcie špecifické pre rtSurvey
 
 ### Dynamické prepínanie jazykov
 
-rtSurvey umožňuje používateľom dynamicky prepínať jazyky počas zberu dát:
+rtSurvey umožňuje používateľom dynamicky prepínať jazyky počas zberu údajov:
 
-- Vo webovom rozhraní použite rozbaľovací zoznam jazyka v hornej navigačnej lište.
-- V mobilnej aplikácii pristúpte k možnostiam jazyka cez menu nastavení.
+- Vo webovom rozhraní použite rozbaľovaciu ponuku jazykov v hornej navigačnej lište.
+- V mobilnej aplikácii získate prístup k možnostiam jazyka prostredníctvom ponuky nastavení.
 
-### Správy overovania špecifické pre jazyk
+### Správy o validácii špecifické pre jazyk
 
-rtSurvey rozširuje viacjazyčnú podporu na správy overovania:
+rtSurvey rozširuje podporu viacerých jazykov aj na správy o validácii:
 
 ```
-| type    | name | constraint | constraint_message::Slovenčina (sk) | constraint_message::Angličtina (en) |
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
 |---------|------|------------|----------------------------------|----------------------------------|
-| integer | age  | . <= 150   | Vek musí byť 150 alebo menej          | Age must be 150 or less          |
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-### Podpora RTL jazykov
+### Lokalizované správy o povinnom poli
 
-Pre jazyky sprava doľava (RTL) ako arabčina alebo hebrejčina rtSurvey automaticky prispôsobuje rozloženie:
+Pomocou `required_message::Language (code)` zobrazíte preloženú chybu, keď zostane povinné pole prázdne:
 
 ```
-| type | name | label::Slovenčina (sk) | label::Arabčina (ar) |
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
+### Podpora jazykov RTL
+
+Pre jazyky písané sprava doľava (RTL), ako je arabčina alebo hebrejčina, rtSurvey automaticky upraví rozloženie:
+
+```
+| type | name | label::English (en) | label::Arabic (ar) |
 |------|------|---------------------|---------------------|
-| text | name | Vaše meno           | اسمك                |
+| text | name | Your name           | اسمك                |
 ```
 
-### Vzhľad špecifický pre jazyk
+### Vzhľad (Appearance) špecifický pre jazyk
 
-rtSurvey umožňuje zadať rôzne vzhľady pre rôzne jazyky:
+rtSurvey vám umožňuje zadať rôzne vzhľady pre rôzne jazyky:
 
 ```
-| type | name | label::Angličtina (en) | label::Čínština (zh) | appearance::Angličtina (en) | appearance::Čínština (zh) |
+| type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
 |------|------|---------------------|---------------------|--------------------------|---------------------------|
 | text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
 
-## Najlepšie postupy pre viacjazyčné prieskumy
+## HTML formátovanie v dvojjazyčných menovkách
 
-1. **Konzistentné pomenovanie**: Používajte konzistentné jazykové kódy v celom formulári.
-2. **Profesionálny preklad**: Zamestnajte profesionálnych prekladateľov oboznámených s kontextom prieskumu.
-3. **Kontextové poznámky**: Poskytnite kontextové poznámky pre prekladateľov na zabezpečenie presných prekladov.
-4. **Testovanie**: Pred nasadením otestujte váš formulár vo všetkých jazykoch.
-5. **Podpora Unicode**: Uistite sa, že vaše zariadenia na zber dát podporujú Unicode pre nelatin písma.
-6. **Médiá špecifické pre jazyk**: Používajte kultúrne vhodné obrázky alebo zvuk pre každý jazyk.
+V jednej bunke menovky môžete kombinovať HTML tagy s jazykovými obalmi (wrappers). rtSurvey extrahuje blok aktívneho jazyka a vykreslí zostávajúce HTML.
+
+Príklad použitia tučného písma a farby písma pre každý jazyk:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Podporované inline tagy vo vnútri jazykových obalov: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Príklad farebného textu pre každý jazyk:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Výpočty zohľadňujúce jazyk (Language-aware calculations)
+
+Keď má formulár pole `${language_use}` (nastavené widgetom `change_language`), použite `if()` na vrátenie hodnôt v aktívnom jazyku:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Príklad — zobrazenie výsledku vyhľadávania v aktívnom jazyku pomocou `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Poznámka: Pole `language_use` je zvyčajne nastavené widgetom vzhľadu `change_language`. Pozrite Appearance — change_language.
+
+## Najlepšie postupy pre prieskumy vo viacerých jazykoch
+
+1. **Konzistentné pomenovanie**: V celom formulári používajte konzistentné jazykové kódy.
+2. **Profesionálny preklad**: Využívajte profesionálnych prekladateľov oboznámených s kontextom prieskumu.
+3. **Poznámky ku kontextu**: Poskytnite prekladateľom poznámky ku kontextu, aby ste zabezpečili presné preklady.
+4. **Testovanie**: Pred nasadením otestujte svoj formulár vo všetkých jazykoch.
+5. **Podpora Unicode**: Uistite sa, že vaše zariadenia na zber údajov podporujú Unicode pre nelatinské písma.
+6. **Médiá špecifické pre jazyk**: Pre každý jazyk používajte kultúrne vhodné obrázky alebo zvuk.
 7. **Vyhnite sa textu v obrázkoch**: Ak používate obrázky s textom, vytvorte samostatné obrázky pre každý jazyk.
 
-## Spracovanie špeciálnych prípadov
+## Riešenie špeciálnych prípadov
 
-### Odpovede v zmiešanom jazyku
+### Odpovede v zmiešaných jazykoch
 
-rtSurvey umožňuje respondentom zadávať text v akomkoľvek písme bez ohľadu na zvolený jazyk formulára. Je to užitočné na zachytávanie mien alebo adries v ich pôvodnom písme.
+rtSurvey umožňuje respondentom zadávať text v akomkoľvek písme, bez ohľadu na vybraný jazyk formulára. To je užitočné na zachytenie mien alebo adries v ich pôvodnom písme.
 
 ### Typy otázok špecifické pre jazyk
 
-Niektoré typy otázok môžu byť vhodnejšie pre určité jazyky. rtSurvey umožňuje používať rôzne typy otázok pre rôzne jazyky:
+Niektoré typy otázok môžu byť vhodnejšie pre určité jazyky. rtSurvey vám umožňuje používať rôzne typy otázok pre rôzne jazyky:
 
 ```
-| type::Angličtina (en) | type::Japončina (ja) | name | label::Angličtina (en) | label::Japončina (ja) |
+| type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
 |--------------------|---------------------|------|---------------------|----------------------|
 | text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
 ```
 
-## Export viacjazyčných dát
+## Exportovanie viacjazyčných údajov
 
-Pri exporte dát z rtSurvey:
+Pri exportovaní údajov z rtSurvey:
 
 - Vyberte export v konkrétnom jazyku alebo zahrňte všetky jazykové verzie.
-- Metadáta jazyka sú zahrnuté v exporte a označujú, ktorý jazyk bol použitý pre každú odpoveď.
+- Metadáta o jazyku sú zahrnuté v exporte a označujú, ktorý jazyk bol použitý pre každú odpoveď.
 
-## Úvahy pre mobilnú aplikáciu
+## Úvahy o mobilnej aplikácii
 
-- Mobilná aplikácia rtSurvey podporuje offline prepínanie jazykov.
-- Pred prechodom do offline režimu sa uistite, že sú stiahnuté všetky požadované jazykové súbory.
+- Mobilná aplikácia rtSurvey podporuje prepínanie jazykov v režime offline.
+- Pred prechodom do režimu offline sa uistite, že sú stiahnuté všetky potrebné jazykové súbory.
 
 ## Známe obmedzenia
 
 - Niektoré pokročilé funkcie nemusia byť dostupné vo všetkých jazykoch.
 - Extrémne dlhé preklady môžu ovplyvniť rozloženie na menších obrazovkách.
 
-Využívaním viacjazyčných schopností rtSurvey môžete vytvárať inkluzívne, prístupné prieskumy, ktoré oslovujú rôzne populácie a poskytujú vysokokvalitnée, jazykovo presné dáta.
+Využitím viacjazyčných schopností rtSurvey môžete vytvárať inkluzívne a prístupné prieskumy, ktoré oslovia rôzne populácie a poskytnú vysokokvalitné a lingvisticky presné údaje.

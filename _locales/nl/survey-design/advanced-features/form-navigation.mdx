@@ -1,0 +1,104 @@
+---
+title: "Navigatieknoppen voor formulieren"
+description: "Gebruik de weergavewaarden SaveFinalizedExit en SaveIncompleteExit om gestileerde afsluitknoppen weer te geven die het formulier opslaan en verlaten."
+---
+
+**Navigatieknoppen voor formulieren** zijn weergavewaarden die op `note`- (of `text`-) velden worden geplaatst en die worden weergegeven als gestileerde knoppen over de volledige breedte onderaan een enquête. Hiermee kan de interviewer de inzending met één tik opslaan en het formulier verlaten — ofwel als een voltooid (gefinaliseerd) record of als een concept (onvoltooid) record.
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Geeft een knop weer die de **inzending opslaat als gefinaliseerd** en het formulier afsluit. Het label van de knop wordt overgenomen uit de kolom `label` van het veld.
+
+| XLSForm column | Waarde |
+|----------------|-------|
+| `type` | `note` |
+| `name` | elke unieke naam (bijv. `btn_finish`) |
+| `label` | tekst die op de knop wordt weergegeven |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+De inzending wordt gemarkeerd als een definitief, voltooid record. Dit staat gelijk aan het tikken op de ingebouwde verzendknop.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Geeft een knop weer die de **inzending opslaat als onvoltooid (concept)** en het formulier afsluit. De interviewer kan er later naar terugkeren en verdergaan met invullen.
+
+| XLSForm column | Waarde |
+|----------------|-------|
+| `type` | `note` |
+| `name` | elke unieke naam (bijv. `btn_pause`) |
+| `label` | tekst die op de knop wordt weergegeven |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Kleursyntaxis
+
+Beide weergaven accepteren een inline kleur in de indeling `<#RRGGBB/>`:
+
+- `#` gevolgd door precies **6 hexadecimale cijfers** (hoofdletters of kleine letters)
+- De afsluitende `/>` is **verplicht** — het weglaten ervan verbreekt de parsing
+- Voorbeeld: `<#04B404/>` (groen), `<#EDC602/>` (amber), `<#D9534F/>` (rood)
+
+De kleur regelt de achtergrond van de knop. De tekstkleur wordt automatisch bepaald door de app.
+
+---
+
+## Voorbeeld
+
+De volgende twee velden aan het einde van een formulier genereren een groene **Verzenden**-knop en een amberkleurige **Opslaan als concept**-knop:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Verzenden | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Opslaan als concept | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — knoppen uitsluiten van de inhoudsopgave
+
+Het weergavetoken `toc-hide` vertelt rtSurvey om een veld uit te sluiten van de **inhoudsopgave** van het formulier (de overzochtslijst met vragen). Navigatieknoppen zijn geen vragen en mogen daarom nooit in de inhoudsopgave verschijnen.
+
+Voeg altijd `toc-hide` toe na de afsluitweergave:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Zie [Weergave — toc-hide](../appearance#group-and-navigation) voor de toc-hide-referentie.
+
+---
+
+## Plaatsingsconventie
+
+Volg deze conventies bij het toevoegen van navigatieknoppen aan un formulier:
+
+- Plaats beide knoppen aan het **allereinde** van het formulier, na alle vragen en groepen.
+- Voeg altijd **beide** knoppen samen toe — één gefinaliseerd en één onvoltooid — zodat de interviewer altijd een manier heeft om af te sluiten, ongeacht de voltooiingsstatus.
+- Gebruik de kolom `relevant` op de gefinaliseerde afsluitknop als inzending alleen mag worden toegestaan wanneer aan bepaalde voorwaarden is voldaan (bijv. een vereist gedeelte is voltooid). De onvoltooide afsluitknop moet over het algemeen **altijd zichtbaar** blijven.
+
+---
+
+## Voorwaardelijke gefinaliseerde afsluiting
+
+Gebruik de kolom `relevant` om te bepalen wanneer de gefinaliseerde afsluitknop wordt weergegeven. De onvoltooide afsluiting moet onvoorwaardelijk zichtbaar blijven, zodat de interviewer altijd kan pauzeren en terugkeren.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Verzenden | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Opslaan als concept | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+In dit voorbeeld verschijnt de knop **Verzenden** alleen wanneer de interviewer toestemming heeft gegeven en sectie A als voltooid heeft gemarkeerd. De knop **Opslaan als concept** is altijd beschikbaar.
+
+---
+
+## Beperkingen
+
+- **Veldtype moet `note` of `text` zijn.** Het gebruik van deze weergaven op elk ander vraagtype wordt niet ondersteund.
+- **Alleen 6-cijferige hex.** Verkorte hex (`<#FFF/>`) en kleurnamen worden niet ondersteund — gebruik altijd de volledige 6-cijferige indeling (bijv. `<#FFFFFF/>`).
+- **De labelkolom is de knoptekst.** De kolom `hint` wordt genegeerd voor deze velden; alleen `label` wordt weergegeven.
+- **Beide knoppen moeten aanwezig zijn.** Het weglaten van de onvoltooide afsluitknop laat de interviewer achter zonder een manier om halverwege het formulier te pauzeren.

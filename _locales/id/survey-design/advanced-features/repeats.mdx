@@ -1,15 +1,15 @@
 ---
 title: "Pengulangan Lanjutan"
-description: "Pola lanjutan untuk grup pengulangan: jumlah dinamis, pengulangan bersarang, meringkas data pengulangan, dan mereferensikan nilai antar pengulangan."
+description: "Pola lanjutan untuk grup pengulangan (repeat groups): penghitungan dinamis, pengulangan bersarang, perangkuman data pengulangan, dan referensi nilai antar pengulangan."
 ---
 
-Halaman ini mencakup pola lanjutan untuk bekerja dengan grup pengulangan di rtSurvey. Untuk dasar-dasar pengaturan grup pengulangan, lihat [Pengelompokan dan Pengulangan](../repeats).
+Halaman ini membahas pola lanjutan untuk bekerja dengan grup pengulangan (repeat groups) di rtSurvey. Untuk dasar-dasar pengaturan grup pengulangan, lihat [Pengelompokan dan Pengulangan](../repeats).
 
 ---
 
 ## Jumlah pengulangan dinamis
 
-Secara default, enumerator memutuskan berapa kali harus mengulang. Anda dapat memperbaiki jumlah pengulangan menggunakan `repeat_count`:
+Secara default, enumerator memutuskan berapa kali pengulangan dilakukan. Anda dapat menetapkan jumlah pengulangan menggunakan `repeat_count`:
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -31,26 +31,26 @@ Akses nilai bidang instans pengulangan tertentu dari **luar** grup pengulangan m
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-Ini berguna untuk membangun bidang ringkasan atau mereferensikan data anggota "utama" setelah pengulangan.
+Ini berguna untuk membangun bidang ringkasan atau merujuk data anggota "utama" setelah pengulangan.
 
 ---
 
 ## Posisi instans saat ini: `index()`
 
-Di dalam grup pengulangan, `index()` mengembalikan posisi berbasis 1 dari instans saat ini. Gunakan untuk memberi label setiap pengulangan atau membuat pengidentifikasi unik:
+Di dalam grup pengulangan, `index()` mengembalikan posisi berbasis 1 dari instans saat ini. Gunakan ini untuk melabeli setiap pengulangan atau membuat pengidentifikasi unik:
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | Plot |
-| note | plot_label | Plot nomor `${index()}` |
-| text | plot_id | ID Plot |
+| begin_repeat | plots | Petak |
+| note | plot_label | Petak nomor `${index()}` |
+| text | plot_id | ID Petak |
 | end_repeat | | |
 
 ---
 
-## Mereferensikan bidang dalam instans yang sama
+## Merujuk bidang dalam instans yang sama
 
-Di dalam pengulangan, gunakan `${fieldname}` untuk mereferensikan bidang lain **dalam instans pengulangan yang sama**. Tidak perlu `indexed-repeat()` dalam loop yang sama:
+Dalam pengulangan, gunakan `${fieldname}` untuk merujuk bidang lain **dalam instans pengulangan yang sama**. Tidak perlu menggunakan `indexed-repeat()` dalam loop yang sama:
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,33 +62,33 @@ Di dalam pengulangan, gunakan `${fieldname}` untuk mereferensikan bidang lain **
 
 ---
 
-## Mereferensikan bidang induk dari dalam pengulangan
+## Merujuk bidang induk dari dalam pengulangan
 
-Bidang di luar (di atas) grup pengulangan dapat direferensikan secara normal dengan `${fieldname}`:
+Bidang di luar (di atas) grup pengulangan dapat dirujuk secara normal dengan `${fieldname}`:
 
 | type | name | label |
 |------|------|-------|
 | text | village | Nama desa |
-| begin_repeat | plots | Lahan pertanian |
-| note | plot_context | Plot di `${village}` |
+| begin_repeat | plots | Petak pertanian |
+| note | plot_context | Petak di `${village}` |
 | end_repeat | | |
 
 ---
 
-## Meringkas data pengulangan
+## Merangkum data pengulangan
 
-Gunakan fungsi agregat pengulangan **di luar** grup pengulangan untuk meringkas:
+Gunakan fungsi agregat pengulangan di **luar** grup pengulangan untuk merangkum:
 
 | Fungsi | Contoh | Deskripsi |
-|--------|--------|-----------|
+|----------|---------|-------------|
 | `count(group)` | `count(${household_members})` | Jumlah instans |
 | `sum(field)` | `sum(${loan_amount})` | Jumlah bidang numerik |
 | `min(field)` | `min(${member_age})` | Nilai minimum |
 | `max(field)` | `max(${member_age})` | Nilai maksimum |
 | `join(sep, field)` | `join(', ', ${member_name})` | Daftar yang dipisahkan koma |
-| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Jumlah kondisional |
-| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Jumlah kondisional |
-| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Gabungan kondisional |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Hitungan bersyarat |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | Jumlah bersyarat |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | Gabungan bersyarat |
 
 ### Contoh: Ringkasan rumah tangga
 
@@ -102,32 +102,32 @@ Gunakan fungsi agregat pengulangan **di luar** grup pengulangan untuk meringkas:
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}` anggota; `${children_count}` di bawah 18. Dewasa: `${adult_names}` | |
+| note | summary | `${total_members}` anggota; `${children_count}` di bawah 18 tahun. Dewasa: `${adult_names}` | |
 
 ---
 
-## Pengulangan bersarang
+## Pengulangan bersarang (Nested repeats)
 
-Grup pengulangan dapat berisi grup pengulangan lain. Gunakan ini dengan hati-hati — pengulangan bersarang menambah kompleksitas dan bisa membingungkan enumerator.
+Grup pengulangan dapat berisi grup pengulangan lainnya. Gunakan ini dengan hati-hati — pengulangan bersarang menambah kompleksitas dan dapat membingungkan enumerator.
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | households | Rumah Tangga |
-| text | hh_id | ID Rumah Tangga |
+| begin_repeat | households | Rumah tangga |
+| text | hh_id | ID Rumah tangga |
 | begin_repeat | hh_members | Anggota |
 | text | member_name | Nama anggota |
 | end_repeat | | |
 | end_repeat | | |
 
-Untuk mereferensikan bidang dalam pengulangan luar dari pengulangan dalam, gunakan `${fieldname}` — itu diselesaikan ke leluhur yang paling dekat cocok:
+Untuk merujuk bidang dalam pengulangan luar dari pengulangan dalam, gunakan `${fieldname}` — ini merujuk ke leluhur terdekat yang cocok:
 
-Di dalam pengulangan `hh_members`, `${hh_id}` mengembalikan ID rumah tangga **saat ini**, bukan semua rumah tangga.
+Di dalam pengulangan `hh_members`, `${hh_id}` mengembalikan ID dari rumah tangga **saat ini**, bukan semua rumah tangga.
 
 ---
 
-## Peringkat dalam grup pengulangan: `rank-index()`
+## Peringkat di dalam grup pengulangan: `rank-index()`
 
-Ketika bidang `rank` ada di dalam pengulangan, gunakan `rank-index(instanceNumber, repeatedField)` dari luar untuk mendapatkan peringkat ordinal instans tertentu:
+Ketika bidang `rank` ada di dalam pengulangan, gunakan `rank-index(instanceNumber, repeatedField)` dari luar untuk mendapatkan peringkat ordinal dari instans tertentu:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -137,18 +137,114 @@ Ketika bidang `rank` ada di dalam pengulangan, gunakan `rank-index(instanceNumbe
 
 ---
 
-## Praktik Terbaik
+## Tampilan `1screen` pada `begin_repeat`
 
-1. Selalu gunakan `repeat_count` ketika jumlah pengulangan diketahui sebelumnya — ini mencegah enumerator secara tidak sengaja menambah atau menghapus instans.
-2. Jaga grup pengulangan tetap terfokus — pengulangan dengan 20+ pertanyaan per instans sulit dinavigasi.
-3. Beri nama grup pengulangan dengan jelas (misalnya, `household_members`, bukan `repeat1`) — nama muncul dalam panggilan fungsi dan data yang diekspor.
-4. Uji dengan jumlah instans maksimum yang diharapkan untuk memverifikasi kinerja.
-5. Gunakan appearance `field-list` pada grup pengulangan untuk menampilkan semua bidang di satu layar per instans (mobile).
+Menambahkan `1screen` ke kolom `appearance` dari baris `begin_repeat` menampilkan semua pertanyaan untuk setiap instans secara bersamaan dalam satu layar, alih-alih satu pertanyaan per layar.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Anggota rumah tangga | `1screen` |
+| text | member_name | Nama anggota | |
+| integer | member_age | Usia | |
+| end_repeat | | | |
+
+Ketika `1screen` diatur dan tidak ada bidang `repeat_count` dan tidak ada bidang `add_repeat` di dalam grup, rtSurvey secara otomatis merender tombol **+** melingkar di bagian bawah layar sehingga enumerator dapat menambah instans baru tanpa konfigurasi tambahan.
+
+| Tampilan | Satu layar per instans | Tombol + default ditambahkan |
+|------------|-------------------------|------------------------|
+| `1screen` | Ya | Ya (ketika tidak ada anak `add_repeat`) |
+| `field-list` | Ya | Tidak |
+
+Gunakan `field-list` ketika Anda ingin tata letak dikelompokkan tanpa tombol tambah otomatis. Gunakan `1screen` ketika Anda menginginkan tata letak dikelompokkan dan cara bawaan untuk menambah instans.
 
 ---
 
-## Keterbatasan
+## Tombol tambah kustom `add_repeat`
 
-- `indexed-repeat()` memerlukan indeks yang valid (1 hingga jumlah instans) — indeks di luar rentang mengembalikan kosong.
-- Pengulangan bersarang lebih dari 2 tingkat tidak disarankan dan dapat menyebabkan masalah tampilan pada beberapa klien.
-- Fungsi agregat (`sum`, `count`, dll.) beroperasi pada seluruh grup pengulangan — Anda tidak dapat mengagregat subset instans tanpa varian `*-if`.
+Bidang `note` (atau `text`) yang ditempatkan **di dalam** grup pengulangan dengan `appearance: add_repeat` merender sebagai tombol "Tambah" dengan lebar penuh. Label tombol berasal dari kolom `label` bidang tersebut. Ketika bidang `add_repeat` ada, tombol + melingkar default (dari `1screen`) akan ditekan (dihilangkan).
+
+Tempatkan bidang `add_repeat` sebagai bidang terakhir di dalam grup pengulangan:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Anggota | `1screen` |
+| text | member_name | Nama anggota | |
+| integer | member_age | Usia | |
+| note | btn_add | + Tambah anggota | `add_repeat` |
+| end_repeat | | | |
+
+### Kustomisasi warna
+
+Sertakan kode warna di dalam nilai tampilan untuk mengatur gaya tombol:
+
+| Nilai tampilan | Hasil |
+|------------------|--------|
+| `add_repeat <#04B404/>` | Latar belakang hijau, warna teks default |
+| `add_repeat 04B404-ffffff` | Latar belakang hijau, teks putih |
+
+Warna pertama adalah latar belakang dan yang kedua (setelah tanda hubung) adalah warna teks. Abaikan tanda `#` saat menggunakan format yang dipisahkan tanda hubung.
+
+### Varian ikon
+
+Gunakan `add_repeat icon` (dengan spasi) untuk merender tombol ikon melingkar yang ringkas, alih-alih tombol dengan lebar penuh:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Tambah | `add_repeat icon` |
+
+---
+
+## Tombol hapus: `delete-repeat-current` dan `delete-repeat-last`
+
+Bidang `note` di dalam grup pengulangan dengan `appearance: delete-repeat-current` atau `appearance: delete-repeat-last` merender sebagai tombol hapus terpisah.
+
+| Tampilan | Tindakan |
+|------------|--------|
+| `delete-repeat-current` | Menghapus instans saat ini (aktif) |
+| `delete-repeat-last` | Menghapus instans terakhir dalam pengulangan |
+
+Tombol default (non-ikon) adalah tombol terpisah: ikon tempat sampah di sebelah kiri dan teks label bidang di sebelah kanan, membentang selebar layar.
+
+### Varian ikon
+
+Tambahkan `-icon` untuk mendapatkan tombol ikon tempat sampah melingkar yang ringkas:
+
+| Tampilan | Hasil |
+|------------|--------|
+| `delete-repeat-current-icon` | Ikon tempat sampah melingkar, menghapus instans saat ini |
+| `delete-repeat-last-icon` | Ikon tempat sampah melingkar, menghapus instans terakhir |
+
+### Kustomisasi warna
+
+Format warna identik dengan `add_repeat`: gunakan `<#RRGGBB/>` atau `RRGGBB-RRGGBB` (latar belakang-teks).
+
+### Contoh pola lengkap
+
+Pengulangan berikut menggunakan `1screen`, tombol hapus-saat-ini melingkar di bagian atas, dan tombol tambah dengan lebar penuh di bagian bawah:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Anggota | `1screen` |
+| note | btn_del | Hapus | `delete-repeat-current-icon` |
+| text | member_name | Nama anggota | |
+| integer | member_age | Usia | |
+| note | btn_add | + Tambah anggota | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## Praktik Terbaik
+
+1. Selalu gunakan `repeat_count` ketika jumlah pengulangan diketahui sebelumnya — ini mencegah enumerator menambah atau menghapus instans secara tidak sengaja.
+2. Jaga agar grup pengulangan tetap fokus — pengulangan dengan 20+ pertanyaan per instans sulit untuk dinavigasi.
+3. Beri nama grup pengulangan dengan jelas (misal, `household_members`, bukan `repeat1`) — nama muncul dalam panggilan fungsi dan data yang diekspor.
+4. Uji dengan jumlah instans maksimum yang diharapkan untuk memverifikasi kinerja.
+5. Gunakan `1screen` pada `begin_repeat` untuk menampilkan semua pertanyaan dalam satu layar per instans, dipasangkan dengan bidang catatan `add_repeat` di dalam grup untuk memberikan tombol "Tambah" yang terlabel jelas kepada enumerator.
+
+---
+
+## Batasan
+
+- `indexed-repeat()` memerlukan indeks yang valid (1 hingga jumlah instans) — indeks di luar rentang akan mengembalikan nilai kosong.
+- Pengulangan bersarang di luar 2 level tidak direkomendasikan dan dapat menyebabkan masalah tampilan pada beberapa klien.
+- Fungsi agregat (`sum`, `count`, dll.) beroperasi pada seluruh grup pengulangan — Anda tidak dapat mengagregasi subset instans tanpa varian `*-if`.

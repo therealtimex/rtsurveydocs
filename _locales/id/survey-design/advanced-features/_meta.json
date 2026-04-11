@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "Rekaman Audio",
   "call-api": "Call API",
   "dynamic-question-type": "Tipe Pertanyaan Dinamis",
   "dynamic-search": "Pencarian Dinamis",

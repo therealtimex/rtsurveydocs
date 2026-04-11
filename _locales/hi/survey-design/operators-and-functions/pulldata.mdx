@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "pulldata() फ़ंक्शन फॉर्म के साथ जुड़े एक बाहरी CSV फ़ाइल से एक मान प्राप्त करता है, एक कुंजी कॉलम को एक कुंजी मान से मिलाता है और संबंधित परिणाम कॉलम देता है।"
+---
+
+import { Callout } from 'nextra/components'
+
+`pulldata()` फ़ंक्शन फॉर्म से जुड़ी एक CSV फ़ाइल से एक मान प्राप्त करता है। एक फ़ाइल नाम, वापस करने के लिए एक कॉलम, मिलान करने के लिए एक कॉलम और एक कुंजी मान दिए जाने पर, यह मिलान करने वाली पंक्ति और परिणाम कॉलम के प्रतिच्छेदन (intersection) पर स्थित सेल को वापस करता है।
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| स्थान | पैरामीटर | विवरण |
+|----------|-----------|-------------|
+| 1 | फ़ाइल नाम | CSV मीडिया फ़ाइल का नाम (`select_one_from_file` में उपयोग किया गया वही नाम) |
+| 2 | परिणाम कॉलम | वह कॉलम जिसका मान आप प्राप्त करना चाहते हैं |
+| 3 | कुंजी कॉलम | वह कॉलम जिसके साथ मिलान करना है |
+| 4 | कुंजी मान | मिलान करने के लिए मान — आमतौर पर `${field}` जैसा फ़ील्ड संदर्भ |
+
+मिलान नहीं मिलने पर फ़ंक्शन एक खाली स्ट्रिंग (empty string) वापस करता है।
+
+---
+
+## पूर्व-आवश्यकताएं (Prerequisites)
+
+CSV फ़ाइल को फॉर्म के साथ **मीडिया फ़ाइल (media file)** के रूप में संलग्न किया जाना चाहिए। `pulldata()` द्वारा संदर्भित उसी फ़ाइल का उपयोग `select_one_from_file` के विकल्प सूची (choice list) के रूप में भी किया जा सकता है।
+
+**उदाहरण CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## बुनियादी उदाहरण (Basic example)
+
+स्टाफ सदस्य की आईडी से उनका विभाग और फोन नंबर खोजें:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | स्टाफ सदस्य चुनें | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | विभाग: `${dept}` — फोन: `${phone}` | |
+
+<Callout type="info">
+`select_one_from_file` CSV में `name` कॉलम संग्रहीत मान (stored value) होता है। जब गणनाकार (enumerator) "Alice" चुनता है, तो `${staff_id}` में `"Alice"` होता है, जिसे `pulldata()` उसके विभाग और फोन को प्राप्त करने के लिए कुंजी के रूप में उपयोग करता है।
+</Callout>
+
+---
+
+## चुने गए विकल्प का लेबल प्राप्त करना (Retrieving the label of a selected choice)
+
+`select_one_from_file` प्रश्न `name` मान संग्रहीत करता है। मानव-पठनीय लेबल (`label`) प्रदर्शित करने के लिए, इसे खोजने के लिए `pulldata()` का उपयोग करें:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | गांव चुनें | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | आपने चुना है: `${village_label}` | |
+
+---
+
+## एक चयन से एकाधिक लुकअप (Multiple lookups from one selection)
+
+आप एक ही चुनी हुई पंक्ति के लिए अलग-अलग कॉलम प्राप्त करने के लिए एक ही फ़ाइल पर कई बार `pulldata()` कॉल कर सकते हैं:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | सुविधा चुनें | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## relevant और constraint में pulldata का उपयोग
+
+लुकअप किए गए मानों के आधार पर लॉजिक लागू करने के लिए `relevant` और `constraint` कॉलम में `pulldata()` का उपयोग किया जा सकता है:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | सुविधा चुनें | | |
+| integer | bed_count | भरे हुए बिस्तरों की संख्या | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## `once()` के साथ pulldata का उपयोग
+
+केवल पहले लोड पर `pulldata()` का मूल्यांकन करने के लिए (प्रारंभिक प्रविष्टि के बाद कुंजी फ़ील्ड बदलने पर पुन: मूल्यांकन को रोकने के लिए), इसे `once()` में लपेटें:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## सर्वोत्तम प्रथाएं (Best Practices)
+
+1. CSV में कुंजी कॉलम `select_one_from_file` में उपयोग किए गए `name` कॉलम से मेल खाना चाहिए — ये एक ही मान होने चाहिए।
+2. CSV में कॉलम के नाम केस-सेंसिटिव होते हैं — `Department` और `department` अलग-अलग कॉलम हैं।
+3. यदि कुंजी मान नहीं मिलता है, तो `pulldata()` एक खाली स्ट्रिंग वापस करता है — खाली चयनों से बचने के लिए `if(${field} != '', pulldata(...), '')` का उपयोग करें।
+4. जहाँ तक संभव हो CSV फ़ाइलों को छोटा रखें — बड़ी फ़ाइलें कम बैंडविड्थ वाले कनेक्शन पर फॉर्म लोड होने का समय बढ़ा देती हैं।
+5. डेटा संग्रह दौरों के बीच बदलने वाले डेटा के लिए, नया फॉर्म संस्करण अपलोड करके CSV मीडिया फ़ाइल को अपडेट करें।
+
+## सीमाएं (Limitations)
+
+- `pulldata()` केवल **पहली** पंक्ति से मेल खाता है जहाँ कुंजी कॉलम कुंजी मान के बराबर होता है। CSV में डुप्लिकेट कुंजी मान समर्थित नहीं हैं।
+- परिनियोजन (deployment) से पहले CSV फ़ाइल को फॉर्म के साथ संलग्न किया जाना चाहिए; इसे रनटाइम पर URL से प्राप्त नहीं किया जा सकता है।
+- `pulldata()` द्वारा लौटाए गए संख्यात्मक मान स्ट्रिंग होते हैं — अंकगणित में उपयोग किए जाने पर `number()` में लपेटें: `number(pulldata(...))`।
+
+<Callout type="info">
+rtSurvey डिवाइस मेटाडेटा, JWT फ़ील्ड और JSON डेटा पढ़ने के लिए `pulldata()` के विस्तारित रूपों का भी समर्थन करता है। `pulldata('app-api', ...)` के लिए [App API](../app-api) और JSON-आधारित लुकअप पैटर्न के लिए [Call API](../advanced-features/call-api) पेज देखें।
+</Callout>
+
+---
+
+## विस्तारित pulldata() वेरिएंट (Extended pulldata() variants)
+
+CSV लुकअप के अलावा, `pulldata()` पहले तर्क को बदलकर कई अतिरिक्त डेटा स्रोतों का समर्थन करता है।
+
+### `pulldata('app-api', key)`
+
+डिवाइस मेटाडेटा, उपयोगकर्ता विशेषताएँ और ऐप संदर्भ पढ़ें। [App API](../app-api) पेज पर पूर्ण संदर्भ देखें।
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+इनलाइन JSON स्ट्रिंग को पार्स करें और JSONPath अभिव्यक्ति का उपयोग करके एक मान निकालें। तब उपयोगी होता है जब आपके पास फॉर्म में JSON लिटरल एम्बेडेड हो।
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+मिलान किए गए मान को स्ट्रिंग के रूप में वापस करता है, या नहीं मिलने पर खाली स्ट्रिंग वापस करता है।
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+JSONPath अभिव्यक्ति का उपयोग करके किसी अन्य फ़ील्ड में संग्रहीत JSON स्ट्रिंग से मान निकालें। यह `substr-jsonpath(${field}, jsonpath)` के बराबर है।
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+एक फ़ील्ड में संग्रहीत JWT टोकन को डिकोड करें और पेलोड से एक विशिष्ट दावे (claim) का मान वापस करें।
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+यदि टोकन अमान्य है या दावा मौजूद नहीं है तो खाली स्ट्रिंग वापस करता है।
+
+### `pulldata('instanceid')`
+
+वर्तमान सबमिशन की विशिष्ट इंस्टेंस आईडी वापस करता है। `instanceID` मेटा फ़ील्ड के बराबर।
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+फॉर्म कॉन्फ़िगरेशन में परिभाषित एक नामित मैपिंग टेबल का उपयोग करके एक मान को दूसरे में मैप करें।
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+मैप किया गया मान वापस करता है, या मिलान नहीं होने पर खाली स्ट्रिंग वापस करता है।
+
+### `pulldata('options', optionName)`
+
+नाम से फॉर्म कॉन्फ़िगरेशन विकल्प पढ़ें।
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+एक बंडल की गई SQLite `.db` फ़ाइल के विरुद्ध SQL `SELECT` निष्पादित करें और पहली मिलान वाली पंक्ति के पहले कॉलम से मान वापस करें। SQL स्ट्रिंग के बाद के पैरामीटर `?` प्लेसहोल्डर के लिए क्रम में प्रतिस्थापित किए जाते हैं।
+
+| Position | Parameter | Description |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | इस वेरिएंट की पहचान करने वाला लिटरल स्ट्रिंग |
+| 2 | path | `concat(${family_path}, '/file.db::tableName')` प्रारूप में फ़ाइल पथ |
+| 3 | SQL | `?` का उपयोग पोजिशनल प्लेसहोल्डर के रूप में करने वाला `SELECT` स्टेटमेंट |
+| 4+ | params | प्रत्येक `?` के लिए क्रम में प्रतिस्थापित मान — आमतौर पर `${field}` जैसे फ़ील्ड संदर्भ |
+
+यदि कोई पंक्ति मेल नहीं खाती है तो खाली स्ट्रिंग वापस करता है।
+
+**उदाहरण — आईडी द्वारा प्रांत का नाम खोजें:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**उदाहरण — प्रांत और जिला कोड दोनों द्वारा फ़िल्टर किया गया वार्ड का नाम खोजें:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+मानक चार-तर्क वाले `pulldata()` के विपरीत, जो CSV फ़ाइल में एक कुंजी कॉलम से मेल खाता है, `rawquery` वेरिएंट SQLite डेटाबेस के विरुद्ध पूर्ण SQL `SELECT` निष्पादित करता है, जिससे बहु-कॉलम `WHERE` स्थितियों और किसी भी कॉलम को रिटर्न मान के रूप में अनुमति मिलती है।
+
+<Callout type="info">
+श्रेणीबद्ध स्थान लुकअप (hierarchical location lookups) के लिए आमतौर पर ऑटो-कम्पलीट फ़ील्ड के साथ `rawquery` का उपयोग किया जाता है। `.db` फ़ाइलें बनाने और उन्हें `pulldata('rawquery', ...)` से जोड़ने के विवरण के लिए [Local Database Search](../advanced-features/local-database-search) देखें।
+</Callout>

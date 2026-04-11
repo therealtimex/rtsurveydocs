@@ -1,15 +1,15 @@
 ---
-title: "Advanced Repeats"
-description: "繰り返しグループの高度なパターン：動的なカウント、ネストされた繰り返し、繰り返しデータのサマリー、繰り返しをまたいだ値の参照。"
+title: "高度なリピート"
+description: "リピートグループの高度なパターン：動的なカウント、ネストされたリピート、リピートデータの集計、およびリピート間での値の参照。"
 ---
 
-このページでは、rtSurveyで繰り返しグループを扱うための高度なパターンをカバーします。繰り返しグループのセットアップの基本については、[グループ化と繰り返し](../repeats)を参照してください。
+このページでは、rtSurveyでのリピートグループ（repeat groups）の高度な使用パターンについて説明します。リピートグループの設定の基本については、[グループ化とリピート](../repeats)を参照してください。
 
 ---
 
-## 動的な繰り返しカウント
+## 動的なリピートカウント
 
-デフォルトでは、調査員が繰り返し回数を決定します。`repeat_count`を使用して繰り返しの回数を固定できます：
+デフォルトでは、調査員がリピート回数を決定します。`repeat_count`を使用してリピート回数を固定することができます。
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
@@ -18,74 +18,74 @@ description: "繰り返しグループの高度なパターン：動的なカウ
 | integer | member_age | 年齢 | |
 | end_repeat | | | |
 
-繰り返しはちょうど`${num_members}`回実行されます。`num_members`はフォームの前の部分で収集されます。調査員はインスタンスを追加または削除できません。
+リピートは正確に `${num_members}` 回実行されます。ここで、`num_members` はフォーム内で以前に収集された値です。調査員はインスタンスを追加または削除することはできません。
 
 ---
 
-## インデックスアクセス：`indexed-repeat()`
+## インデックスによるアクセス: `indexed-repeat()`
 
-**繰り返しグループの外**から特定の繰り返しインスタンスのフィールド値にアクセスするには、`indexed-repeat(repeatedField, repeatGroup, index)`を使用します：
+リピートグループの**外側**から、`indexed-repeat(repeatedField, repeatGroup, index)` を使用して特定のリピートインスタンスのフィールド値にアクセスします。
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-これはサマリーフィールドを構築したり、繰り返しの後に「主要な」メンバーのデータを参照したりするのに便利です。
+これは、サマリーフィールドの作成や、リピート終了後に「主要な」メンバーのデータを参照する場合に便利です。
 
 ---
 
-## 現在のインスタンス位置：`index()`
+## 現在のインスタンスの位置: `index()`
 
-繰り返しグループ内で、`index()`は現在のインスタンスの1ベースの位置を返します。各繰り返しにラベルを付けたり、一意の識別子を作成したりするために使用します：
+リピートグループ内では、`index()` は現在のインスタンスの1から始まる位置を返します。各リピートにラベルを付けたり、一意の識別子を作成したりするために使用します。
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | 農地 |
-| note | plot_label | 農地番号 `${index()}` |
-| text | plot_id | 農地ID |
+| begin_repeat | plots | 区画 |
+| note | plot_label | 区画番号 `${index()}` |
+| text | plot_id | 区画ID |
 | end_repeat | | |
 
 ---
 
-## 同じインスタンス内のフィールドの参照
+## 同一インスタンス内のフィールドの参照
 
-繰り返し内では、`${fieldname}`を使用して**同じ繰り返しインスタンス**内の別のフィールドを参照します。同じループ内では`indexed-repeat()`は不要です：
+リピート内では、`${fieldname}` を使用して**同じリピートインスタンス内**の別のフィールドを参照します。同じループ内では `indexed-repeat()` を使用する必要はありません。
 
 | type | name | label | relevant |
 |------|------|-------|----------|
 | begin_repeat | members | メンバー | |
-| text | member_name | 氏名 | |
+| text | member_name | 名前 | |
 | integer | member_age | 年齢 | |
 | text | school_name | 学校名 | `${member_age} < 18` |
 | end_repeat | | | |
 
 ---
 
-## 繰り返し内から親フィールドの参照
+## リピート内からの親フィールドの参照
 
-繰り返しグループの外（上）にあるフィールドは、通常の`${fieldname}`で参照できます：
+リピートグループの外側（上側）にあるフィールドは、通常通り `${fieldname}` で参照できます。
 
 | type | name | label |
 |------|------|-------|
 | text | village | 村の名前 |
-| begin_repeat | plots | 農地 |
-| note | plot_context | `${village}`の農地 |
+| begin_repeat | plots | 農区画 |
+| note | plot_context | `${village}` 内の区画 |
 | end_repeat | | |
 
 ---
 
-## 繰り返しデータのサマリー
+## リピートデータの集計
 
-繰り返しグループの**外**で繰り返し集計関数を使用してサマリーを作成します：
+リピートグループの**外側**でリピート集計関数を使用して集計を行います。
 
 | 関数 | 例 | 説明 |
 |----------|---------|-------------|
-| `count(group)` | `count(${household_members})` | インスタンスの数 |
+| `count(group)` | `count(${household_members})` | インスタンス数 |
 | `sum(field)` | `sum(${loan_amount})` | 数値フィールドの合計 |
 | `min(field)` | `min(${member_age})` | 最小値 |
 | `max(field)` | `max(${member_age})` | 最大値 |
-| `join(sep, field)` | `join(', ', ${member_name})` | カンマ区切りリスト |
+| `join(sep, field)` | `join(', ', ${member_name})` | カンマ区切りのリスト |
 | `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | 条件付きカウント |
 | `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | 条件付き合計 |
 | `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | 条件付き結合 |
@@ -94,61 +94,157 @@ description: "繰り返しグループの高度なパターン：動的なカウ
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| integer | num_members | 何人のメンバーがいますか？ | |
+| integer | num_members | 何人家族ですか？ | |
 | begin_repeat | members | メンバー | `${num_members}` |
-| text | member_name | 氏名 | |
+| text | member_name | 名前 | |
 | integer | member_age | 年齢 | |
 | end_repeat | | | |
 | calculate | total_members | | `count(${members})` |
 | calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
 | calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
-| note | summary | `${total_members}`人のメンバー；`${children_count}`人が18歳未満。大人：`${adult_names}` | |
+| note | summary | `${total_members}` 人のメンバー。`${children_count}` 人が18歳未満。成人： `${adult_names}` | |
 
 ---
 
-## ネストされた繰り返し
+## ネストされたリピート
 
-繰り返しグループには別の繰り返しグループを含めることができます。これは慎重に使用してください — ネストされた繰り返しは複雑さを増し、調査員を混乱させる可能性があります。
+リピートグループの中に別のリピートグループを含めることができます。ネストされたリピートは複雑さを増し、調査員を混乱させる可能性があるため、注意して使用してください。
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | households | 世帯 |
 | text | hh_id | 世帯ID |
 | begin_repeat | hh_members | メンバー |
-| text | member_name | 氏名 |
+| text | member_name | メンバー名 |
 | end_repeat | | |
 | end_repeat | | |
 
-内側の繰り返しから外側の繰り返しのフィールドを参照するには、`${fieldname}`を使用します — 最も近い一致する先祖に解決されます：
+内側のリピートから外側のリピートのフィールドを参照するには、`${fieldname}` を使用します。これは、最も近い一致する祖先を参照します。
 
-`hh_members`繰り返し内では、`${hh_id}`はすべての世帯ではなく**現在の**世帯のIDを返します。
+`hh_members` リピート内では、`${hh_id}` はすべての世帯ではなく、**現在の**世帯のIDを返します。
 
 ---
 
-## 繰り返しグループ内のランク：`rank-index()`
+## リピートグループ内の順位: `rank-index()`
 
-`rank`フィールドが繰り返し内に存在する場合、外部から特定のインスタンスの順位ランクを取得するために`rank-index(instanceNumber, repeatedField)`を使用します：
+リピート内に `rank` フィールドが存在する場合、外側から `rank-index(instanceNumber, repeatedField)` を使用して、特定のインスタンスの順位を取得します。
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})`は最高スコアのインスタンスインデックスを返します。
+`rank-index(1, ${score})` は、最高スコアのインスタンスインデックスを返します。
+
+---
+
+## `begin_repeat` での `1screen` 外観
+
+`begin_repeat` 行の `appearance` 列に `1screen` を追加すると、各インスタンスのすべての質問が、画面ごとに1つの質問ではなく、1つの画面にまとめて表示されます。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | 世帯員 | `1screen` |
+| text | member_name | 氏名 | |
+| integer | member_age | 年齢 | |
+| end_repeat | | | |
+
+`1screen` が設定されており、グループ内に `repeat_count` も `add_repeat` フィールドもない場合、rtSurveyは画面の下部に丸い **+** ボタンを自動的にレンダリングします。これにより、調査員は追加の設定なしで新しいインスタンスを追加できます。
+
+| 外観 | インスタンスごとに1画面 | デフォルトの + ボタン追加 |
+|------------|-------------------------|------------------------|
+| `1screen` | はい | はい (`add_repeat` 子フィールドがない場合) |
+| `field-list` | はい | いいえ |
+
+自動追加ボタンなしでグループ化されたレイアウトが必要な場合は `field-list` を使用します。グループ化されたレイアウトとインスタンスを追加するための組み込み方法の両方が必要な場合は `1screen` を使用します。
+
+---
+
+## `add_repeat` カスタム追加ボタン
+
+リピートグループの**内側**に `appearance: add_repeat` を指定した `note` (または `text`) フィールドを配置すると、全幅の「追加」ボタンとしてレンダリングされます。ボタンのラベルはフィールドの `label` 列から取得されます。`add_repeat` フィールドが存在する場合、(`1screen` による) デフォルトの丸い + ボタンは表示されません。
+
+`add_repeat` フィールドはリピートグループ内の最後のフィールドとして配置してください。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | メンバー | `1screen` |
+| text | member_name | 氏名 | |
+| integer | member_age | 年齢 | |
+| note | btn_add | + メンバーを追加 | `add_repeat` |
+| end_repeat | | | |
+
+### 色のカスタマイズ
+
+外観の値の中にカラーコードを指定して、ボタンのスタイルを設定できます。
+
+| 外観の値 | 結果 |
+|------------------|--------|
+| `add_repeat <#04B404/>` | 緑色の背景、デフォルトのテキスト色 |
+| `add_repeat 04B404-ffffff` | 緑色の背景、白色のテキスト |
+
+最初の色は背景色で、2番目の色（ハイフンの後）はテキスト色です。ハイフンで区切られた形式を使用する場合は、`#` を省略してください。
+
+### アイコンバリアント
+
+全幅ボタンの代わりにコンパクトな丸いアイコンボタンをレンダリングするには、`add_repeat icon` (スペースあり) を使用します。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + 追加 | `add_repeat icon` |
+
+---
+
+## 削除ボタン: `delete-repeat-current` および `delete-repeat-last`
+
+リピートグループ内の `appearance: delete-repeat-current` または `appearance: delete-repeat-last` を指定した `note` フィールドは、分割された削除ボタンとしてレンダリングされます。
+
+| 外観 | アクション |
+|------------|--------|
+| `delete-repeat-current` | 現在の（アクティブな）インスタンスを削除 |
+| `delete-repeat-last` | リピート内の最後のインスタンスを削除 |
+
+デフォルト（アイコンなし）のボタンは分割ボタンです。左側にゴミ箱アイコン、右側にフィールドのラベルテキストが表示され、画面の全幅に広がります。
+
+### アイコンバリアント
+
+`-icon` を追加すると、コンパクトな丸いゴミ箱アイコンボタンが表示されます。
+
+| 外観 | 結果 |
+|------------|--------|
+| `delete-repeat-current-icon` | 丸いゴミ箱アイコン、現在のインスタンスを削除 |
+| `delete-repeat-last-icon` | 丸いゴミ箱アイコン、最後のインスタンスを削除 |
+
+### 色のカスタマイズ
+
+色の形式は `add_repeat` と同じです。`<#RRGGBB/>` または `RRGGBB-RRGGBB` (背景色-テキスト色) を使用してください。
+
+### 完全なパターン例
+
+以下のリピートは、`1screen`、上部に丸い現在のインスタンス削除ボタン、下部に全幅の追加ボタンを使用しています。
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | メンバー | `1screen` |
+| note | btn_del | 削除 | `delete-repeat-current-icon` |
+| text | member_name | 氏名 | |
+| integer | member_age | 年齢 | |
+| note | btn_add | + メンバーを追加 | `add_repeat` |
+| end_repeat | | | |
 
 ---
 
 ## ベストプラクティス
 
-1. 繰り返し回数が事前にわかっている場合は常に`repeat_count`を使用してください — これにより調査員が誤ってインスタンスを追加または削除するのを防げます。
-2. 繰り返しグループに集中してください — インスタンスごとに20以上の質問がある繰り返しはナビゲートが困難です。
-3. 繰り返しグループに明確な名前を付けてください（例：`household_members`、`repeat1`ではなく）— 名前は関数呼び出しとエクスポートされたデータに表示されます。
-4. 予想される最大インスタンス数でパフォーマンスを確認するためにテストしてください。
-5. インスタンスごとに1つの画面にすべてのフィールドを表示するために繰り返しグループに`field-list`外観を使用してください（モバイル）。
+1. リピート回数が事前にわかっている場合は、常に `repeat_count` を使用してください。これにより、調査員が誤ってインスタンスを追加または削除するのを防ぐことができます。
+2. リピートグループは焦点を絞ったものにしてください。1インスタンスあたり20以上の質問があるリピートは操作が困難です。
+3. リピートグループには分かりやすい名前を付けてください（例： `repeat1` ではなく `household_members`）。この名前は関数呼び出しやエクスポートされたデータに表示されます。
+4. パフォーマンスを検証するために、予想される最大インスタンス数でテストしてください。
+5. インスタンスごとにすべての質問を1つの画面に表示するには `begin_repeat` で `1screen` を使用し、グループ内に `add_repeat` noteフィールドを組み合わせて、調査員に明確なラベルが付いた「追加」ボタンを提供してください。
 
 ---
 
 ## 制限事項
 
-- `indexed-repeat()`は有効なインデックス（1からインスタンスのカウント）が必要です — 範囲外のインデックスは空を返します。
-- 2レベルを超えるネストされた繰り返しは推奨されず、一部のクライアントで表示の問題を引き起こす可能性があります。
-- 集計関数（`sum`、`count`など）は繰り返しグループ全体に対して機能します — `*-if`バリアントなしではインスタンスのサブセットを集計できません。
+- `indexed-repeat()` は有効なインデックス（1からインスタンス数まで）を必要とします。範囲外のインデックスは空を返します。
+- 2レベルを超えるネストされたリピートは推奨されず、一部のクライアントで表示の問題が発生する可能性があります。
+- 集計関数（`sum`, `count` など）はリピートグループ全体に対して動作します。`*-if` バリアントを使用せずにインスタンスのサブセットを集計することはできません。

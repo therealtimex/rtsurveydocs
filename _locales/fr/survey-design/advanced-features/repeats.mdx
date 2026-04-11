@@ -1,9 +1,9 @@
 ---
-title: "Répétitions avancées"
-description: "Schémas avancés pour les groupes de répétition : comptages dynamiques, répétitions imbriquées, résumé des données répétées et référencement de valeurs entre répétitions."
+title: "Répétitions Avancées"
+description: "Modèles avancés pour les groupes de répétition : comptages dynamiques, répétitions imbriquées, résumé des données de répétition et référencement des valeurs entre répétitions."
 ---
 
-Cette page couvre les schémas avancés pour travailler avec des groupes de répétition dans rtSurvey. Pour les bases de la configuration d'un groupe de répétition, consultez [Regroupement et répétitions](../repeats).
+Cette page couvre les modèles avancés pour travailler avec les groupes de répétition dans rtSurvey. Pour les bases de la configuration d'un groupe de répétition, voir [Groupage et Répétitions](../repeats).
 
 ---
 
@@ -18,39 +18,39 @@ Par défaut, l'enquêteur décide du nombre de répétitions. Vous pouvez fixer 
 | integer | member_age | Âge | |
 | end_repeat | | | |
 
-La répétition s'exécute exactement `${num_members}` fois, où `num_members` a été collecté plus tôt dans le formulaire. L'enquêteur ne peut pas ajouter ou supprimer des instances.
+La répétition s'exécute exactement `${num_members}` fois, où `num_members` a été collecté plus tôt dans le formulaire. L'enquêteur ne peut pas ajouter ou supprimer d'instances.
 
 ---
 
 ## Accès indexé : `indexed-repeat()`
 
-Accédez à la valeur d'un champ d'une instance spécifique de répétition depuis **l'extérieur** du groupe de répétition en utilisant `indexed-repeat(repeatedField, repeatGroup, index)` :
+Accédez à la valeur d'un champ d'une instance de répétition spécifique depuis **l'extérieur** du groupe de répétition en utilisant `indexed-repeat(repeatedField, repeatGroup, index)` :
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
 | calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
 
-C'est utile pour créer des champs récapitulatifs ou référencer les données du membre "principal" après la répétition.
+Ceci est utile pour construire des champs de résumé ou référencer les données du membre "principal" après la répétition.
 
 ---
 
 ## Position de l'instance actuelle : `index()`
 
-Dans un groupe de répétition, `index()` retourne la position (basée sur 1) de l'instance actuelle. Utilisez-le pour étiqueter chaque répétition ou créer des identifiants uniques :
+À l'intérieur d'un groupe de répétition, `index()` renvoie la position (basée sur 1) de l'instance actuelle. Utilisez-le pour étiqueter chaque répétition ou créer des identifiants uniques :
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | plots | Parcelle |
 | note | plot_label | Parcelle numéro `${index()}` |
-| text | plot_id | Identifiant de la parcelle |
+| text | plot_id | ID de la parcelle |
 | end_repeat | | |
 
 ---
 
-## Référencer des champs dans la même instance
+## Référencement de champs dans la même instance
 
-Dans une répétition, utilisez `${fieldname}` pour référencer un autre champ **dans la même instance de répétition**. Il n'est pas nécessaire d'utiliser `indexed-repeat()` dans la même boucle :
+Au sein d'une répétition, utilisez `${fieldname}` pour référencer un autre champ **dans la même instance de répétition**. Il n'est pas nécessaire d'utiliser `indexed-repeat()` au sein de la même boucle :
 
 | type | name | label | relevant |
 |------|------|-------|----------|
@@ -62,22 +62,22 @@ Dans une répétition, utilisez `${fieldname}` pour référencer un autre champ 
 
 ---
 
-## Référencer des champs parents depuis l'intérieur d'une répétition
+## Référencement de champs parents depuis l'intérieur d'une répétition
 
-Les champs en dehors (au-dessus) du groupe de répétition peuvent être référencés normalement avec `${fieldname}` :
+Les champs à l'extérieur (au-dessus) du groupe de répétition peuvent être référencés normalement avec `${fieldname}` :
 
 | type | name | label |
 |------|------|-------|
 | text | village | Nom du village |
 | begin_repeat | plots | Parcelle agricole |
-| note | plot_context | Parcelles dans `${village}` |
+| note | plot_context | Parcelles à `${village}` |
 | end_repeat | | |
 
 ---
 
-## Résumer les données répétées
+## Résumé des données de répétition
 
-Utilisez les fonctions d'agrégation de répétition **en dehors** du groupe de répétition pour résumer :
+Utilisez les fonctions d'agrégation de répétition **à l'extérieur** du groupe de répétition pour résumer :
 
 | Fonction | Exemple | Description |
 |----------|---------|-------------|
@@ -108,47 +108,143 @@ Utilisez les fonctions d'agrégation de répétition **en dehors** du groupe de 
 
 ## Répétitions imbriquées
 
-Un groupe de répétition peut contenir un autre groupe de répétition. Utilisez ceci avec précaution — les répétitions imbriquées ajoutent de la complexité et peuvent être déroutantes pour les enquêteurs.
+Un groupe de répétition peut contenir un autre groupe de répétition. Utilisez cela avec précaution — les répétitions imbriquées ajoutent de la complexité et peuvent être déroutantes pour les enquêteurs.
 
 | type | name | label |
 |------|------|-------|
 | begin_repeat | households | Ménage |
-| text | hh_id | Identifiant du ménage |
+| text | hh_id | ID du ménage |
 | begin_repeat | hh_members | Membre |
 | text | member_name | Nom du membre |
 | end_repeat | | |
 | end_repeat | | |
 
-Pour référencer un champ dans une répétition externe depuis la répétition interne, utilisez `${fieldname}` — il se résout au plus proche ancêtre correspondant :
+Pour référencer un champ dans une répétition externe depuis la répétition interne, utilisez `${fieldname}` — il se résout à l'ancêtre correspondant le plus proche :
 
-Dans la répétition `hh_members`, `${hh_id}` retourne l'identifiant du ménage **actuel**, pas de tous les ménages.
+À l'intérieur de la répétition `hh_members`, `${hh_id}` renvoie l'ID du ménage **actuel**, pas celui de tous les ménages.
 
 ---
 
-## Classement dans les groupes de répétition : `rank-index()`
+## Rang à l'intérieur des groupes de répétition : `rank-index()`
 
-Quand un champ `rank` existe dans une répétition, utilisez `rank-index(instanceNumber, repeatedField)` depuis l'extérieur pour obtenir le rang ordinal d'une instance spécifique :
+Lorsqu'un champ `rank` existe à l'intérieur d'une répétition, utilisez `rank-index(instanceNumber, repeatedField)` depuis l'extérieur pour obtenir le rang ordinal d'une instance spécifique :
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | top_scorer | | `rank-index(1, ${score})` |
 
-`rank-index(1, ${score})` retourne l'index d'instance du score le plus élevé.
+`rank-index(1, ${score})` renvoie l'index d'instance du score le plus élevé.
 
 ---
 
-## Bonnes pratiques
+## Apparence `1screen` sur `begin_repeat`
 
-1. Utilisez toujours `repeat_count` lorsque le nombre de répétitions est connu à l'avance — cela évite aux enquêteurs d'ajouter ou supprimer accidentellement des instances.
-2. Gardez les groupes de répétition focalisés — une répétition avec plus de 20 questions par instance est difficile à naviguer.
-3. Nommez les groupes de répétition clairement (ex. : `household_members`, pas `repeat1`) — le nom apparaît dans les appels de fonctions et les données exportées.
+L'ajout de `1screen` à la colonne `appearance` d'une ligne `begin_repeat` affiche toutes les questions de chaque instance ensemble sur un seul écran, plutôt qu'une question par écran.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | Membre du ménage | `1screen` |
+| text | member_name | Nom du membre | |
+| integer | member_age | Âge | |
+| end_repeat | | | |
+
+Lorsque `1screen` est défini et qu'il n'y a pas de champ `repeat_count` ni de champ `add_repeat` à l'intérieur du groupe, rtSurvey affiche automatiquement un bouton circulaire **+** au bas de l'écran afin que les enquêteurs puissent ajouter de nouvelles instances sans aucune configuration supplémentaire.
+
+| Apparence | Un écran par instance | Bouton + par défaut ajouté |
+|------------|-----------------------|----------------------------|
+| `1screen` | Oui | Oui (si aucun enfant `add_repeat`) |
+| `field-list` | Oui | Non |
+
+Utilisez `field-list` lorsque vous voulez la disposition groupée sans le bouton d'ajout automatique. Utilisez `1screen` lorsque vous voulez à la fois la disposition groupée et un moyen intégré d'ajouter des instances.
+
+---
+
+## Bouton d'ajout personnalisé `add_repeat`
+
+Un champ `note` (ou `text`) placé **à l'intérieur** du groupe de répétition avec `appearance: add_repeat` s'affiche comme un bouton "Ajouter" de pleine largeur. Le libellé du bouton provient de la colonne `label` du champ. Lorsqu'un champ `add_repeat` est présent, le bouton circulaire + par défaut (de `1screen`) est supprimé.
+
+Placez le champ `add_repeat` comme dernier champ à l'intérieur du groupe de répétition :
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Membre | `1screen` |
+| text | member_name | Nom du membre | |
+| integer | member_age | Âge | |
+| note | btn_add | + Ajouter un membre | `add_repeat` |
+| end_repeat | | | |
+
+### Personnalisation des couleurs
+
+Passez un code couleur dans la valeur d'apparence pour styliser le bouton :
+
+| Valeur d'apparence | Résultat |
+|--------------------|----------|
+| `add_repeat <#04B404/>` | Fond vert, couleur de texte par défaut |
+| `add_repeat 04B404-ffffff` | Fond vert, texte blanc |
+
+La première couleur est l'arrière-plan et la seconde (après le tiret) est la couleur du texte. Omettez le `#` lors de l'utilisation de la forme séparée par un tiret.
+
+### Variante d'icône
+
+Utilisez `add_repeat icon` (avec un espace) pour afficher un bouton d'icône circulaire compact au lieu du bouton de pleine largeur :
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + Ajouter | `add_repeat icon` |
+
+---
+
+## Boutons de suppression : `delete-repeat-current` et `delete-repeat-last`
+
+Un champ `note` à l'intérieur du groupe de répétition avec `appearance: delete-repeat-current` ou `appearance: delete-repeat-last` s'affiche comme un bouton de suppression partagé.
+
+| Apparence | Action |
+|------------|--------|
+| `delete-repeat-current` | Supprime l'instance actuelle (active) |
+| `delete-repeat-last` | Supprime la dernière instance de la répétition |
+
+Le bouton par défaut (sans icône) est un bouton partagé : une icône de corbeille à gauche et le texte du libellé du champ à droite, s'étendant sur toute la largeur de l'écran.
+
+### Variante d'icône
+
+Ajoutez `-icon` pour obtenir un bouton d'icône de corbeille circulaire compact :
+
+| Apparence | Résultat |
+|------------|----------|
+| `delete-repeat-current-icon` | Icône de corbeille circulaire, supprime l'instance actuelle |
+| `delete-repeat-last-icon` | Icône de corbeille circulaire, supprime la dernière instance |
+
+### Personnalisation des couleurs
+
+Le format de couleur est identique à `add_repeat` : utilisez `<#RRGGBB/>` ou `RRGGBB-RRGGBB` (arrière-plan-texte).
+
+### Exemple de modèle complet
+
+La répétition suivante utilise `1screen`, un bouton circulaire de suppression de l'instance actuelle en haut, et un bouton d'ajout de pleine largeur en bas :
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | Membre | `1screen` |
+| note | btn_del | Supprimer | `delete-repeat-current-icon` |
+| text | member_name | Nom du membre | |
+| integer | member_age | Âge | |
+| note | btn_add | + Ajouter un membre | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## Bonnes Pratiques
+
+1. Utilisez toujours `repeat_count` lorsque le nombre de répétitions est connu à l'avance — cela empêche les enquêteurs d'ajouter ou de supprimer accidentelment des instances.
+2. Gardez les groupes de répétition ciblés — une répétition avec plus de 20 questions par instance est difficile à naviguer.
+3. Nommez clairement les groupes de répétition (ex. `household_members`, pas `repeat1`) — le nom apparaît dans les appels de fonction et les données exportées.
 4. Testez avec le nombre maximum d'instances attendu pour vérifier les performances.
-5. Utilisez l'apparence `field-list` sur le groupe de répétition pour afficher tous les champs sur un seul écran par instance (mobile).
+5. Utilisez `1screen` sur `begin_repeat` pour afficher toutes les questions sur un seul écran par instance, associé à un champ de note `add_repeat` à l'intérieur du groupe pour donner aux enquêteurs un bouton "Ajouter" clairement étiqueté.
 
 ---
 
-## Limitations
+## Limites
 
-- `indexed-repeat()` nécessite un index valide (de 1 au nombre d'instances) — les index hors plage retournent vide.
+- `indexed-repeat()` nécessite un index valide (1 au nombre d'instances) — les index hors plage renvoient une valeur vide.
 - Les répétitions imbriquées au-delà de 2 niveaux ne sont pas recommandées et peuvent causer des problèmes d'affichage sur certains clients.
 - Les fonctions d'agrégation (`sum`, `count`, etc.) opèrent sur l'ensemble du groupe de répétition — vous ne pouvez pas agréger un sous-ensemble d'instances sans les variantes `*-if`.

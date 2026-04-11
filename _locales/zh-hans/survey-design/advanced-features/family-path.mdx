@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path 是一个约定的计算字段，它在运行时返回表单绑定的媒体目录路径 —— 这是每个使用本地数据库查询或基于文件的搜索的表单所必需的。"
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` 是一个约定的计算字段，用于保存表单绑定的媒体目录路径。每个使用 `rawquery`、`pulldata` 或 `search()` 执行本地数据库查询的表单都必须包含此字段 —— 如果没有它，文件路径将无法解析，查询会静默返回空结果。
+
+---
+
+## 计算字段 (calculate field)
+
+在 survey 表格的顶部附近，在任何元数据字段之后，以及在使用数据库文件的第一个问题之前，添加此行：
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+该字段不存储任何可见值，也不需要标签。它是后续所有路径构建的隐形先决条件。
+
+---
+
+## 为什么需要它
+
+RTSurvey 将表单媒体 —— SQLite 数据库、图像、音频剪辑 —— 捆绑在设备上每个表单的目录中。确切路径在不同平台（Android、iOS、Web）和设备之间有所不同。
+
+在运行时，应用程序会自动填充 `family_path`。一个典型的解析后的值如下所示：
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+由于路径是特定于平台的，且是在启动时确定的，因此无法在表单中硬编码。`pulldata('app-api', 'family_path')` 是检索它的唯一可靠方法。
+
+---
+
+## 如何在路径中使用它
+
+定义 `family_path` 后，使用 `concat()` 构建完整的文件路径：
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+当应用程序打开文件时，`::tableName` 后缀会被剥离；表名仅在 SQL 查询内部使用。
+
+---
+
+## family_path 的用途
+
+每当你引用捆绑的文件时，路径参数中都需要 `family_path`：
+
+- **本地数据库搜索** —— `search-autocomplete-noedit-v2('rawquery', ...)` 的 `db_path` 参数必须使用 `concat(${family_path}, ...)` 构建。有关完整的用法详细信息，请参阅[本地数据库搜索](local-database-search)。
+- **`pulldata` rawquery** —— 任何从 `.db` 文件读取的 `pulldata('rawquery', ...)` 调用都使用相同的 `concat()` 模式。
+- **使用本地文件的 `search()`** —— 从捆绑的 CSV 或 DB 文件加载的动态搜索外观 (appearance) 也依赖于 `family_path` 进行文件引用。
+
+---
+
+## 在表单中的位置
+
+`family_path` 必须出现在**引用它的第一个字段之前**。建议的位置是紧跟在元数据组之后：
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(引用 `${family_path}` 的 rawquery 外观)* |
+
+<Callout type="warning">
+如果表单中缺少 `family_path`，或者将其放置在引用它的第一个 `rawquery` / `search()` 字段之后，所有针对捆绑文件的查询都将静默返回空。没有错误消息 —— 自动完成只是不显示任何结果。
+</Callout>
+
+---
+
+## 多个数据库文件
+
+单个表单可以使用多个 `.db` 文件。每个路径都使用 `concat()` 独立构建：
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+定义一次 `family_path`；在需要的多个字段中引用它。
+
+---
+
+## 开发期间的验证
+
+在 `family_path` 下方添加一个临时的 `note` 字段，以检查设备上解析后的值：
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Path: ${family_path}` | |
+
+在测试期间，注释将显示实际解析后的路径。在部署最终表单之前将其删除。

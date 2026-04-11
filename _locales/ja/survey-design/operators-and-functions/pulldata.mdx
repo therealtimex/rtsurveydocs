@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "pulldata() 関数は、フォームに添付された外部 CSV ファイルから値を取得し、キー列をキー値と照合して、対応する結果列を返します。"
+---
+
+import { Callout } from 'nextra/components'
+
+`pulldata()` 関数は、フォームに添付された CSV ファイルから値を取得します。ファイル名、取得する列、照合する列、およびキー値を指定すると、一致する行と結果列の交点にあるセルを返します。
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| 位置 | パラメーター | 説明 |
+|----------|-----------|-------------|
+| 1 | ファイル名 | CSV メディアファイルの名前 (`select_one_from_file` で使用されるのと同じ名前) |
+| 2 | 結果列 | 返したい値が含まれる列 |
+| 3 | キー列 | 照合対象となる列 |
+| 4 | キー値 | 照合する値 — 通常は `${field}` のようなフィールド参照 |
+
+一致するものが見つからない場合、関数は空の文字列を返します。
+
+---
+
+## 前提条件
+
+CSV ファイルは、**メディアファイル**としてフォームに添付されている必要があります。`pulldata()` で参照されるのと同じファイルを、`select_one_from_file` の選択肢リストとして使用することもできます。
+
+**CSV の例 — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## 基本的な例
+
+ID からスタッフの部署と電話番号を検索します。
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Select staff member | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Department: `${dept}` — Phone: `${phone}` | |
+
+<Callout type="info">
+`select_one_from_file` CSV の `name` 列が保存される値です。調査員が「Alice」を選択すると、`${staff_id}` には `"Alice"` が保持され、`pulldata()` はこれをキーとして彼女の部署と電話番号を取得します。
+</Callout>
+
+---
+
+## 選択された選択肢のラベルの取得
+
+`select_one_from_file` の質問には `name` の値が保存されます。人間が読める `label` (ラベル) を表示するには、`pulldata()` を使用して検索します。
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Select village | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | You selected: `${village_label}` | |
+
+---
+
+## 1つの選択からの複数の検索
+
+同じファイルに対して `pulldata()` を複数回呼び出し、同じ選択行から異なる列を取得できます。
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Select facility | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## relevant および constraint での pulldata の使用
+
+`pulldata()` は、検索された値に基づいてロジックを適用するために、`relevant` 列および `constraint` 列で使用できます。
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Select facility | | |
+| integer | bed_count | Number of beds occupied | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## once() と共に pulldata を使用する
+
+最初の読み込み時にのみ `pulldata()` を評価する場合 (最初の入力後にキーフィールドが変更されたときに再評価されるのを防ぐため)、`once()` で囲みます。
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## ベストプラクティス
+
+1. CSV のキー列は、`select_one_from_file` で使用される `name` 列と一致している必要があります。これらは同じ値である必要があります。
+2. CSV の列名は、大文字と小文字を区別します。`Department` と `department` は異なる列です。
+3. キー値が見つからない場合、`pulldata()` は空の文字列を返します。空の選択を防ぐために `if(${field} != '', pulldata(...), '')` を使用してください。
+4. 可能な限り CSV ファイルを小さく保ってください。大きなファイルは、低帯域幅の接続でのフォームの読み込み時間を増加させます。
+5. データ収集ラウンドの間に変更されるデータについては、新しいフォームバージョンをアップロードして CSV メディアファイルを更新してください。
+
+## 制限事項
+
+- `pulldata()` は、キー列がキー値と等しい **最初の** 行のみに一致します。CSV 内の重複するキー値はサポートされていません。
+- CSV ファイルはデプロイ前にフォームに添付されている必要があります。実行時に URL から取得することはできません。
+- `pulldata()` によって返される数値は文字列です。算術演算で使用する場合は、`number()` で囲んでください: `number(pulldata(...))`。
+
+<Callout type="info">
+rtSurvey は、デバイスのメタデータ、JWT フィールド、および JSON データを読み取るための `pulldata()` の拡張形式もサポートしています。`pulldata('app-api', ...)` については [App API](../app-api) を、JSON ベースの検索パターンについては [Call API](../advanced-features/call-api) ページを参照してください。
+</Callout>
+
+---
+
+## 拡張 pulldata() バリアント
+
+CSV 検索以外に、`pulldata()` は最初の引数を変更することで、いくつかの追加データソースをサポートしています。
+
+### `pulldata('app-api', key)`
+
+デバイスのメタデータ、ユーザー属性、およびアプリのコンテキストを読み取ります。詳細は [App API](../app-api) ページを参照してください。
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+インライン JSON 文字列を解析し、JSONPath 式を使用して値を取得します。JSON リテラルがフォームに埋め込まれている場合に便利です。
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+一致した値を文字列として返します。見つからない場合は空の文字列を返します。
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+JSONPath 式を使用して、別のフィールドに保存されている JSON 文字列から値を取得します。これは `substr-jsonpath(${field}, jsonpath)` と同等です。
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+フィールドに保存されている JWT トークンをデコードし、ペイロードから特定のクレームの値を返します。
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+トークンが無効であるか、クレームが存在しない場合は、空の文字列を返します。
+
+### `pulldata('instanceid')`
+
+現在の送信のユニークなインスタンス ID を返します。`instanceID` メタフィールドと同等です。
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+フォーム構成で定義された名前付きマッピングテーブルを使用して、ある値を別の値にマッピングします。
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+マッピングされた値を返します。マッピングが一致しない場合は空の文字列を返します。
+
+### `pulldata('options', optionName)`
+
+名前を指定してフォーム構成オプションを読み取ります。
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+バンドルされた SQLite `.db` ファイルに対して SQL `SELECT` を実行し、一致する最初の行の最初の列から値を返します。SQL 文字列の後のパラメーターは、`?` プレースホルダーに順番に置き換えられます。
+
+| 位置 | パラメーター | 説明 |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | このバリアントを識別するリテラル文字列 |
+| 2 | path | `concat(${family_path}, '/file.db::tableName')` 形式のファイルパス |
+| 3 | SQL | `?` を位置プレースホルダーとして使用する `SELECT` 文 |
+| 4+ | params | 各 `?` に順番に置き換えられる値 — 通常は `${field}` のようなフィールド参照 |
+
+一致する行がない場合は空の文字列を返します。
+
+**例 — ID で州名を検索する:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**例 — 州コードと郡コードの両方でフィルタリングされた区名を検索する:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+CSV ファイル内の単一のキー列と照合する標準の 4 引数 `pulldata()` とは異なり、`rawquery` バリアントは SQLite データベースに対して完全な SQL `SELECT` を実行し、複数列の `WHERE` 条件と戻り値としての任意の列を可能にします。
+
+<Callout type="info">
+`rawquery` は、階層的な場所の検索のために、オートコンプリートフィールドでよく使用されます。`.db` ファイルの作成と `pulldata('rawquery', ...)` への接続の詳細については、[ローカルデータベース検索](../advanced-features/local-database-search)を参照してください。
+</Callout>

@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "Funksjonen pulldata() henter en verdi fra en ekstern CSV-fil som er vedlagt skjemaet, ved å matche en nøkkelkolonne mot en nøkkelverdi og returnere den tilsvarende resultatkolonnen."
+---
+
+import { Callout } from 'nextra/components'
+
+Funksjonen `pulldata()` henter en verdi fra en CSV-fil som er vedlagt skjemaet. Gitt et filnavn, en kolonne som skal returneres, en kolonne det skal matches på, og en nøkkelverdi, returnerer den cellen i skjæringspunktet mellom den samsvarende raden og resultatkolonnen.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Posisjon | Parameter | Beskrivelse |
+|----------|-----------|-------------|
+| 1 | Filnavn | Navnet på CSV-mediefilen (samme navn som brukes i `select_one_from_file`) |
+| 2 | Resultatkolonne | Kolonnen hvis verdi du vil returnere |
+| 3 | Nøkkelkolonne | Kolonnen det skal matches mot |
+| 4 | Nøkkelverdi | Verdien som skal matches — vanligvis en feltreferanse som `${field}` |
+
+Funksjonen returnerer en tom streng hvis ingen match blir funnet.
+
+---
+
+## Forutsetninger
+
+CSV-filen må være vedlagt skjemaet som en **mediefil**. Den samme filen som refereres til av `pulldata()`, kan også brukes som valgliste for `select_one_from_file`.
+
+**Eksempel på CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Grunnleggende eksempel
+
+Slå opp en ansatts avdeling og telefonnummer basert på ID:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Velg ansatt | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Avdeling: `${dept}` — Telefon: `${phone}` | |
+
+<Callout type="info">
+`name`-kolonnen i en `select_one_from_file`-CSV er den lagrede verdien. Når intervjueren velger «Alice», inneholder `${staff_id}` verdien «Alice», som `pulldata()` bruker som nøkkel for å hente hennes avdeling og telefonnummer.
+</Callout>
+
+---
+
+## Hente etiketten (label) til et valgt valg
+
+Et `select_one_from_file`-spørsmål lagrer `name`-verdien. For å vise den menneskelig lesbare etiketten (`label`), bruk `pulldata()` for å slå den opp:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Velg landsby | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | Du valgte: `${village_label}` | |
+
+---
+
+## Flere oppslag fra ett valg
+
+Du kan kalle `pulldata()` flere ganger på samme fil for å hente forskjellige kolonner for den samme valgte raden:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Velg fasilitet | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## Bruke pulldata i relevant og constraint
+
+`pulldata()` kan brukes i `relevant`- og `constraint`-kolonner for å anvende logikk basert på oppslåtte verdier:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Velg fasilitet | | |
+| integer | bed_count | Antall senger opptatt | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## Bruke pulldata med `once()`
+
+For å evaluere `pulldata()` kun ved første innlasting (for å forhindre ny evaluering når nøkkelfeltet endres etter første inntasting), pakk den inn i `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Beste praksis
+
+1. Nøkkelkolonnen i CSV-filen må samsvare med `name`-kolonnen som brukes i `select_one_from_file` — disse må være samme verdi.
+2. Kolonnenavn i CSV-filen er følsomme for store/små bokstaver — `Department` og `department` er forskjellige kolonner.
+3. Hvis nøkkelverdien ikke blir funnet, returnerer `pulldata()` en tom streng — bruk `if(${field} != '', pulldata(...), '')` for å sikre mot tomme valg.
+4. Hold CSV-filer små der det er mulig — store filer øker innlastingstiden for skjemaer på trege forbindelser.
+5. For data som endres mellom datainnsamlingsrunder, oppdater CSV-mediefilen ved å laste opp en ny skjemaversjon.
+
+## Begrensninger
+
+- `pulldata()` matcher kun den **første** raden der nøkkelkolonnen er lik nøkkelverdien — duplikate nøkkelverdier i CSV-filen støttes ikke.
+- CSV-filen må være vedlagt skjemaet før utrulling; den kan ikke hentes fra en URL under kjøring.
+- Numeriske verdier returnert av `pulldata()` er strenger — pakk dem inn i `number()` når de brukes i aritmetikk: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey støtter også utvidede former for `pulldata()` for lesing av enhetsmetadata, JWT-felt og JSON-data. Se [App API](../app-api) for `pulldata('app-api', ...)` og [Call API](../advanced-features/call-api)-siden for JSON-baserte oppslagsmønstre.
+</Callout>
+
+---
+
+## Utvidede pulldata()-varianter
+
+Utover CSV-oppslag støtter `pulldata()` flere ekstra datakilder ved å endre det første argumentet.
+
+### `pulldata('app-api', key)`
+
+Les enhetsmetadata, brukerattributter og app-kontekst. Se hele referansen på [App API](../app-api)-siden.
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Analyser en inline JSON-streng og hent ut en verdi ved hjelp av et JSONPath-uttrykk. Nyttig når du har en JSON-literal innebygd i skjemaet.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Returnerer den matchende verdien som en streng, eller en tom streng hvis den ikke blir funnet.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Hent ut en verdi fra en JSON-streng lagret i et annet felt ved hjelp av et JSONPath-uttrykk. Dette tilsvarer `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Dekod et JWT-token lagret i et felt og returner verdien av et spesifikt krav (claim) fra nyttelasten (payload).
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Returnerer en tom streng hvis tokenet er ugyldig eller kravet ikke er til stede.
+
+### `pulldata('instanceid')`
+
+Returnerer den unike instans-ID-en til den gjeldende innsendingen. Tilsvarer metafeltet `instanceID`.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Map en verdi til en annen ved hjelp av en navngitt mapping-tabell definert i skjemakonfigurasjonen.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Returnerer den mappede verdien, eller en tom streng hvis ingen mapping matcher.
+
+### `pulldata('options', optionName)`
+
+Les et skjemakonfigurasjonsvalg etter navn.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Utfør en SQL `SELECT` mot en vedlagt SQLite `.db`-fil og returner verdien fra den første kolonnen i den første matchende raden. Parametere etter SQL-strengen erstattes i rekkefølge for `?`-plassholdere.
+
+| Posisjon | Parameter | Beskrivelse |
+|----------|-----------|-------------|
+| 1 | `'rawquery'` | Literaltegn som identifiserer denne varianten |
+| 2 | path | Filsti i formatet `concat(${family_path}, '/file.db::tableName')` |
+| 3 | SQL | En `SELECT`-setning som bruker `?` som posisjonelle plassholdere |
+| 4+ | params | Verdier som erstattes for hver `?` i rekkefølge — vanligvis feltreferanser som `${field}` |
+
+Returnerer en tom streng hvis ingen rad matcher.
+
+**Eksempel — slå opp et provinsnavn etter ID:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Eksempel — slå opp et bydelsnavn (ward) filtrert etter både provins- og distriktskoder:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+I motsetning til den vanlige `pulldata()` med fire argumenter som matcher en enkelt nøkkelkolonne i en CSV-fil, utfører `rawquery`-varianten en full SQL `SELECT` mot en SQLite-database, noe som tillater `WHERE`-betingelser over flere kolonner og hvilken som helst kolonne som returverdi.
+
+<Callout type="info">
+`rawquery` brukes ofte med autofullfør-felt for hierarkiske lokasjonsoppslag. Se [Lokalt databasesøk](../advanced-features/local-database-search) for detaljer om hvordan du bygger `.db`-filer og kobler dem til `pulldata('rawquery', ...)`.
+</Callout>

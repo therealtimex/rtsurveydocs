@@ -1,0 +1,224 @@
+---
+title: "Vyhledávání v lokální databázi"
+description: "Vyhledávání v lokální databázi dotazuje přibalený soubor SQLite .db pomocí čistého SQL, což umožňuje rychlé offline automatické doplňování pro velké statické sady dat."
+---
+
+import { Callout } from 'nextra/components'
+
+**Vyhledávání v lokální databázi** umožňuje polím `select_one` nebo `text` dotazovat soubor SQLite `.db`, který je přibalen k balíčku médií formuláře — zcela offline, bez nutnosti komunikace se serverem. Toto je správný přístup, pokud je váš seznam výběrů velký a statický (např. národní seznam vesnic, zdravotnických zařízení nebo administrativních hranic) a nelze zaručit konektivitu.
+
+| Přístup | Zdroj dat | Vyžaduje konektivitu |
+|---|---|---|
+| Vyhledávání v lokální databázi (`rawquery`) | Přibalený soubor `.db` (SQLite) | Ne |
+| `search-api()` | Vzdálené REST API | Ano |
+| `search()` | Přibalený soubor CSV | Ne |
+
+---
+
+## Varianty vzhledu
+
+Pole s automatickým doplňováním se konfiguruje prostřednictvím sloupce `appearance`. K dispozici jsou tři varianty:
+
+| Varianta | Poznámky |
+|---|---|
+| `search-autocomplete-noedit(...)` | Standardní automatické doplňování — tazatel musí vybrat ze seznamu; zadání volného textu se neukládá |
+| `search-autocomplete-noedit-v2(...)` | Doporučená varianta — stejné chování, ale využívá aktualizovaný vykreslovací modul s lepším výkonem u velkých sad výsledků |
+| `search(...)` | Jednoduchá shoda založená na souboru vůči přibalenému CSV; **nepodporuje** čisté SQL — uvedeno zde pouze pro srovnání |
+
+<Callout type="info">
+`search-autocomplete-noedit` je alias — při zpracování jej aplikace nahradí interním názvem funkce `searchAutocompleteNoedit`. Ve svém XLSFormu můžete použít oba zápisy; oba fungují.
+</Callout>
+
+---
+
+## Zdroj dat `rawquery`
+
+Chcete-li spustit SQL dotaz proti souboru `.db`, předejte `'rawquery'` jako první argument funkce vzhledu. Úplná signatura je:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parametry
+
+| Pozice | Parametr | Popis |
+|---|---|---|
+| 1 | `'rawquery'` | Doslovný řetězec — říká aplikaci, aby provedla SQL přímo |
+| 2 | `db_path` | Cesta k souboru SQLite ve formátu `<dir>/<file>.db::tableName`. Přípona `::tableName` se při otevírání souboru odstraní; název tabulky se použije uvnitř vašeho SQL |
+| 3 | `'[display_col]'` | Sloupec, který se má zobrazit v rozevíracím seznamu. Obklopující hranaté závorky `[ ]` jsou za běhu odstraněny |
+| 4 | `'value_col'` | Sloupec, jehož hodnota se uloží, když tazatel provede výběr |
+| 5 | `'SELECT ...'` | Jakýkoli platný příkaz SQLite SELECT. `SELECT DISTINCT` je automaticky vložen, pokud již `DISTINCT` není přítomen |
+| 6+ | `param1, ...` | Volitelné. Hodnoty vázané na zástupné symboly `?` v SQL, v daném pořadí. Pokud SQL obsahuje `?`, ale nejsou dodány žádné parametry, pole vrátí prázdný výsledek (vestavěná ochrana proti chybějícím argumentům) |
+
+### Konvence `db_path`
+
+Soubor databáze se nachází uvnitř adresáře médií přibaleného k formuláři. Za běhu vrací `pulldata('app-api', 'family_path')` cestu k tomuto adresáři. Podrobnosti o nastavení naleznete v části [family_path](family-path). Standardní vzor je:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+Když aplikace soubor otevře, odstraní část `::tableName` a použije samotnou cestu k souboru. Název tabulky se objevuje pouze uvnitř vašeho SQL.
+
+---
+
+## Základní příklad — vyhledávání provincie
+
+Rozevírací seznam provincií pouze pro čtení podložený přibaleným souborem `vnxa3.db`:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Provincie | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+Sloupec `appearance` (rozbalený pro lepší čitelnost):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- Zobrazený popisek pochází ze sloupce `provv`.
+- Uložená hodnota pochází ze sloupce `provid`.
+- Zobrazeny jsou pouze řádky, kde `rta_filter = "1"`.
+
+---
+
+## Parametrizované dotazy
+
+Použijte zástupné symboly `?` ve svém SQL a předejte odpovídající odkazy na pole jako další argumenty (od pozice 6 dále). Toto je standardní vzor pro kaskádové výběry — např. načítání okresů, které patří k dříve vybrané provincii.
+
+<Callout type="warning">
+Pokud váš SQL obsahuje alespoň jeden `?` a nejsou dodány žádné argumenty parametrů, pole vrátí prázdnou sadu výsledků. Tím se zabrání zobrazení neaktuálních nebo nefiltrovaných dat dříve, než je proveden nadřazený výběr.
+</Callout>
+
+### Příklad kaskády okresů
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+Hodnota `${province}` je vázána na první `?`. Pole je prázdné, dokud tazatel nevybere provincii.
+
+### Příklad se dvěma parametry — kaskáda obcí
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parametry jsou vázány pozičně: `${province}` → první `?`, `${district}` → druhý `?`.
+
+---
+
+## UNION SELECT pro speciální hodnoty
+
+Vkládejte syntetické řádky — například "Nevím" nebo "Odmítám odpovědět" — přímo v SQL pomocí `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Nevím</i>", "888"')
+```
+
+Konvence používané ve formulářích RTSurvey:
+
+| Kód | Význam |
+|---|---|
+| `888` | Nevím |
+| `999` | Odmítám odpovědět |
+
+HTML tagy jako `<i>` v zobrazovaném řetězci jsou aplikací vykresleny — můžete je použít k vizuálnímu odlišení speciálních voleb.
+
+---
+
+## Vícejazyčné zobrazení
+
+Ukládejte popisky specifické pro daný jazyk do samostatných sloupců (např. `label_vi`, `label_en`) a vyberte ten správný na základě pole jazyka ve vašem formuláři:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+Chcete-li dynamicky přepínat sloupce na základě pole `${language}`, použijte výraz `if()` v parametru zobrazovaného sloupce pro přepínání mezi jazykovými sloupci:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+Parametr zobrazovaného sloupce je vyhodnocen před spuštěním dotazu. Do SQL modulu se předává pouze název sloupce (bez závorek); závorky jsou kosmetické značky odstraněné při zpracování.
+</Callout>
+
+---
+
+## Validace skutečného výběru
+
+Pokud pole umožňuje speciální hodnoty jako 888 nebo 999, prostá kontrola `required = yes` je nedostatečná — je splněna, i když tazatel vybere "Nevím". Použijte omezení `selected-at(., 0) != -997` k ověření, že uložená hodnota je skutečný výběr a nikoli interní značka "nic nevybráno" `-997`:
+
+| sloupec | hodnota |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Vyberte prosím platnou možnost |
+
+Hodnota `-997` je interní kód, který RTSurvey ukládá, když nebyla vybrána žádná položka ze seznamu automatického doplňování. Výběr 888 nebo 999 je stále vědomá volba a touto kontrolou projde.
+
+Chcete-li navíc vyžadovat skutečnou (nespeciální) hodnotu, rozšiřte omezení:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Srovnání: lokální databáze vs. jiné metody vyhledávání
+
+| Funkce | `rawquery` automatické doplňování | `search-api()` | `search()` CSV | Běžné volby v CSV |
+|---|---|---|---|---|
+| Zdroj dat | Přibalený `.db` (SQLite) | Vzdálené REST API | Přibalený CSV | List voleb |
+| Funguje offline | Ano | Ne | Ano | Ano |
+| Podporuje čisté SQL | Ano | Ne | Ne | Ne |
+| Kaskádové filtry | Ano — parametrizovaný `?` | Přes tělo požadavku | Omezeně | Ne |
+| Velikost datové sady | Velmi velká (miliony řádků) | Neomezená (na straně serveru) | Střední (desetitisíce) | Malá |
+| Speciální vložené řádky | Ano — `UNION SELECT` | Ne | Ne | Ano (ručně) |
+| Složitost nastavení | Střední — vyžaduje přibalené `.db` | Vysoká — vyžaduje API server | Nízká | Žádná |
+
+---
+
+## Omezení
+
+- Soubor `.db` musí být přibalen do balíčku médií formuláře před nasazením. Dynamické aktualizace databáze vyžadují nové nasazení formuláře.
+- SQL je spouštěno na zařízení tak, jak je. Na straně serveru neprobíhá žádná sanitizace — vyhněte se sestavování SQL z volného textového vstupu tazatele.
+- Podporovány jsou pouze příkazy `SELECT`. `INSERT`, `UPDATE` a `DELETE` nejsou povoleny.
+- Velmi složité dotazy (velké řetězce `UNION`, vícenásobná spojení) mohou být na levnějších zařízeních s Androidem pomalé.
+- Varianty `search-autocomplete-noedit` neumožňují tazateli uložit hodnotu, která není v sadě výsledků. Pokud je vyžadováno zadání volného textu, použijte samostatné pole `text`.
+- `SELECT DISTINCT` je vložen automaticky pouze tehdy, když v dotazu chybí `DISTINCT`. Pokud napíšete `SELECT DISTINCT` explicitně, nebude zdvojnásoben.

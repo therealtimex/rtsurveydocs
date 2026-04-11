@@ -1,15 +1,15 @@
 ---
-title: "Búsqueda dinámica"
-description: "La búsqueda dinámica carga opciones desde una API remota en tiempo real mientras el encuestador escribe, permitiendo conjuntos de datos grandes o actualizados con frecuencia."
+title: "Búsqueda Dinámica"
+description: "La Búsqueda Dinámica carga opciones desde una API remota en tiempo real a medida que el encuestador escribe, lo que permite conjuntos de datos grandes o actualizados con frecuencia."
 ---
 
-La **Búsqueda dinámica** (también llamada Search API) permite que un campo `select_one`, `select_multiple` o `text` cargue sus opciones desde un servicio web remoto **en tiempo real** mientras el encuestador escribe. Este es el enfoque correcto cuando su lista de opciones es demasiado grande para incluirla en un archivo CSV, se actualiza con frecuencia, o proviene de una base de datos activa.
+La **Búsqueda Dinámica** (también llamada Search API) permite que un campo `select_one`, `select_multiple` o `text` cargue sus opciones desde un servicio web remoto **en tiempo de ejecución** a medida que el encuestador escribe. Este es el enfoque correcto cuando su lista de opciones es demasiado grande para incluirla en un archivo CSV, se actualiza con frecuencia o proviene de una base de datos en vivo.
 
 ---
 
 ## Apariencia `search-api()`
 
-La búsqueda dinámica se configura a través de la columna `appearance` usando la función `search-api()`:
+La búsqueda dinámica se configura a través de la columna `appearance` utilizando la función `search-api()`:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -19,23 +19,23 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 
 | Parámetro | Descripción |
 |-----------|-------------|
-| `method` | Siempre use `'POST'` |
-| `url` | El endpoint de la API a consultar |
+| `method` | Utilice siempre `'POST'` |
+| `url` | El endpoint de la API para consultar |
 | `post_body` | Cuerpo JSON enviado a la API. Use `%__input__%` como marcador de posición para el texto de búsqueda actual del encuestador |
-| `value_column` | La clave en el objeto de respuesta que se usará como **valor** almacenado |
-| `display` | La clave (o plantilla) que se usará como **etiqueta** mostrada en el menú desplegable. Admite marcadores `##key##` y expresiones `@{func}` |
-| `data_path` | JSONPath al array de objetos de resultado en la respuesta (p. ej., `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Un nombre bajo el cual se guarda la respuesta sin procesar para uso por otros campos |
+| `value_column` | La clave en el objeto de respuesta que se utilizará como el **valor** almacenado |
+| `display` | La clave (o plantilla) que se utilizará como la **etiqueta** que se muestra en el menú desplegable. Admite marcadores de posición `##key##` y expresiones `@{func}` |
+| `data_path` | JSONPath al array de objetos de resultados en la respuesta (por ejemplo, `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Un nombre con el que se guarda la respuesta sin procesar para que la utilicen otros campos |
 
 ---
 
 ## Ejemplo básico
 
-Una búsqueda de establecimientos de salud donde el encuestador escribe parte del nombre del establecimiento:
+Una búsqueda de centros de salud donde el encuestador escribe parte del nombre del centro:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one | facility | Seleccione el establecimiento de salud | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+| select_one | facility | Seleccionar centro de salud | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
 La API recibe `{"query": "nair"}` cuando el encuestador escribe "nair" y devuelve:
 
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Los resultados activos muestran `✓ Nombre de la clínica`; los inactivos muestran `✗ Nombre de la clínica`.
+Los resultados activos muestran `✓ Clinic Name`; los inactivos muestran `✗ Clinic Name`.
 
 ---
 
 ## Establecer un valor predeterminado: `search-default-api()`
 
-Use `search-default-api()` después de `search-api()` para precargar el campo con una opción predeterminada cargada desde una llamada API separada (p. ej., al editar un registro existente):
+Utilice `search-default-api()` después de `search-api()` para pre-completar el campo con una opción predeterminada cargada desde una llamada API separada (por ejemplo, al editar un registro existente):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -90,7 +90,7 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ## Separador personalizado para select_multiple: `search-default-separator()`
 
-Para campos `select_multiple`, especifique cómo se unen múltiples valores seleccionados en la cadena almacenada:
+Para campos `select_multiple`, especifique cómo se unen los valores seleccionados múltiples en la cadena almacenada:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
@@ -100,38 +100,97 @@ El separador predeterminado es un espacio.
 
 ---
 
-## Tipos de pregunta admitidos
+## Tipos de preguntas admitidos
 
 | Tipo de pregunta | Caso de uso |
-|-----------------|-------------|
+|---------------|----------|
 | `select_one` | Selección única de los resultados de búsqueda |
-| `select_multiple` | Selecciones múltiples de los resultados de búsqueda |
-| `text` | Autocompletado: el encuestador escribe libremente pero puede seleccionar una sugerencia |
+| `select_multiple` | Múltiples selecciones de los resultados de búsqueda |
+| `text` | Autocompletar: el encuestador escribe libremente pero puede seleccionar una sugerencia |
 
 ---
 
 ## Uso de datos de respuesta guardados
 
-El `save_path` almacena el objeto de respuesta completo de la API bajo el nombre dado. Otros campos pueden referenciarlo con `pulldata()`:
+Cuando el encuestador selecciona un resultado, rtSurvey guarda el objeto coincidente completo de la respuesta bajo el nombre `save_path`. Otros campos pueden leer de él de dos maneras.
+
+### Método 1 — Búsqueda `pulldata()`
+
+Use `pulldata('save_path', 'key')` para leer un campo de nivel superior del objeto guardado:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Seleccionar establecimiento | `search-api(..., 'facility_data')` |
+| select_one | facility | Seleccionar centro | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+La apariencia en la fila `select_one` debe incluir `search-api(..., 'facility_data')` con el `save_path` correspondiente.
+
+Para **campos JSON anidados**, combine con `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
 
 ---
 
-## Mejores prácticas
+## Búsqueda de archivos locales con search()
 
-1. Asegúrese de que su endpoint de API responda en 1–2 segundos; las APIs lentas hacen que la búsqueda se sienta poco responsiva.
+`search()` realiza búsquedas de igualdad de columnas fuera de línea contra un archivo SQLite `.db` incluido; no se requiere conexión a la red ni consultas SQL. Úselo cuando sus datos de referencia estén empaquetados con el formulario y necesite una búsqueda simple de "encontrar todas las filas donde la columna sea igual al valor".
+
+### Firma
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parámetros
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| `path` | Ruta a la tabla SQLite: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Operador de coincidencia: devuelve filas donde la columna es igual al valor |
+| `'list_name'` | Nombre de la columna contra la que coincidir |
+| `${field}` | Valor a coincidir; típicamente una referencia de campo |
+
+### Ejemplo
+
+Completar un `select_one` desde una base de datos local haciendo coincidir el valor de `${d307}` contra la columna `list_name` en la tabla `externalData` de `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Seleccionar centro | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Cuando `${d307}` es igual a `"HF001"`, `search()` devuelve cada fila en `externalData` donde `list_name = 'HF001'`, completamente desde el archivo empaquetado, sin llamada a la red.
+
+### search() vs autocompletar rawquery
+
+| Característica | `search()` | Autocompletar `rawquery` |
+|---------|-----------|------------------------|
+| Consultas SQL | No — solo igualdad de columnas | Sí — `SELECT … FROM …` completo |
+| Entrada parametrizada | Coincidencia de valor de columna | Embebido en cadena SQL |
+| Entrada de texto libre | Sí: el encuestador puede escribir libremente | No: debe seleccionar de la lista |
+| UNION / multitabla | No soportado | Soportado |
+
+### Cuándo usar cada uno
+
+- Use **`search()`** cuando necesite una coincidencia de igualdad directa contra un archivo `.db` incluido, el formulario deba funcionar fuera de línea y desee permitir la entrada de texto libre.
+- Use **autocompletar `rawquery`** cuando necesite flexibilidad SQL (JOINs, UNIONs, columnas calculadas) o deba realizar consultas en varias tablas, y el formulario tenga una conectividad confiable.
+
+---
+
+## Mejores Prácticas
+
+1. Asegúrese de que el endpoint de su API responda en 1 o 2 segundos; las API lentas hacen que la búsqueda parezca no responder.
 2. Use `%__input__%` en el `post_body` para que la API solo devuelva resultados coincidentes, no el conjunto de datos completo.
-3. Indexe el campo de búsqueda en el servidor (p. ej., Elasticsearch, índice de texto completo de base de datos) para respuestas rápidas.
-4. Limite los resultados a 20–50 elementos por consulta; devolver miles de resultados anula el propósito de la búsqueda.
+3. Indexe el campo de búsqueda en el lado del servidor (por ejemplo, Elasticsearch, índice de texto completo de la base de datos) para obtener respuestas rápidas.
+4. Limite los resultados a 20 o 50 elementos por consulta; devolver miles de resultados anula el propósito de la búsqueda.
 5. Incluya un requisito de longitud mínima de entrada en la API para evitar activar consultas amplias con entradas de un solo carácter.
 
 ## Limitaciones
 
-- La búsqueda dinámica requiere conectividad de red; no funciona sin conexión.
-- El marcador `%__input__%` se inyecta tal cual; sanee las entradas en el servidor para prevenir ataques de inyección.
-- Las expresiones de visualización `@{func}` complejas pueden tener soporte limitado en todas las versiones del cliente rtSurvey.
+- La Búsqueda Dinámica requiere conectividad de red; no funciona fuera de línea.
+- El marcador de posición `%__input__%` se inyecta tal cual; sanee las entradas en el lado del servidor para evitar ataques de inyección.
+- Las expresiones de visualización complejas `@{func}` pueden tener un soporte limitado en todas las versiones del cliente rtSurvey.

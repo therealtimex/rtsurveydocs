@@ -1,0 +1,103 @@
+---
+title: "family_path"
+description: "family_path je konvenční výpočtové pole, které vrací cestu k adresáři médií přibalenému k formuláři za běhu — je vyžadováno každým formulářem, který používá vyhledávání v lokální databázi nebo vyhledávání založené na souborech."
+---
+
+import { Callout } from 'nextra/components'
+
+`family_path` je konvenční výpočtové pole (calculate), které uchovává cestu k adresáři s médii přibalenému k formuláři. Každý formulář, který provádí vyhledávání v lokální databázi pomocí funkcí `rawquery`, `pulldata` nebo `search()`, musí toto pole obsahovat — bez něj nelze rozlišit cesty k souborům a vyhledávání tiše vrací prázdné výsledky.
+
+---
+
+## Výpočtové pole (calculate)
+
+Přidejte tento řádek blízko horní části listu survey, za všechna meta pole a před první otázku, která používá soubor databáze:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+
+Pole neukládá žádnou viditelnou hodnotu a nevyžaduje popisek (label). Je to tichý předpoklad pro veškerou konstrukci cest, která následuje.
+
+---
+
+## Proč je to potřeba
+
+RTSurvey přibaluje média formuláře — databáze SQLite, obrázky, zvukové klipy — do adresáře specifického pro daný formulář v zařízení. Přesná cesta se liší mezi platformami (Android, iOS, web) a mezi zařízeními.
+
+Za běhu aplikace automaticky vyplní `family_path`. Typická výsledná hodnota vypadá takto:
+
+```
+resources/familyMedia/Phuong_Person_Test
+```
+
+Vzhledem k tomu, že cesta je specifická pro platformu a určuje se v době spuštění, nelze ji do formuláře zapsat napevno (hard-coded). `pulldata('app-api', 'family_path')` je jediný spolehlivý způsob, jak ji získat.
+
+---
+
+## Jak ji použít v cestách
+
+Jakmile je `family_path` definována, sestavte úplnou cestu k souboru pomocí funkce `concat()`:
+
+```
+concat(${family_path}, '/file.db::tableName')
+```
+
+Přípona `::tableName` se při otevření souboru aplikací odstraní; název tabulky se použije pouze uvnitř vašeho dotazu SQL.
+
+---
+
+## Kde se family_path používá
+
+`family_path` je vyžadována v argumentu cesty, kdykoli odkazujete na přibalený soubor:
+
+- **Hledání v lokální databázi** — argument `db_path` funkce `search-autocomplete-noedit-v2('rawquery', ...)` musí být vytvořen pomocí `concat(${family_path}, ...)`. Kompletní podrobnosti o použití naleznete v části [Vyhledávání v lokální databázi](local-database-search).
+- **`pulldata` rawquery** — jakékoli volání `pulldata('rawquery', ...)`, které čte ze souboru `.db`, používá stejný vzor `concat()`.
+- **`search()` s lokálním souborem** — vzhledy (appearances) pro dynamické vyhledávání, které se načítají z přibaleného souboru CSV nebo DB, také spoléhají na `family_path` pro odkaz na soubor.
+
+---
+
+## Umístění ve formuláři
+
+`family_path` se musí objevit **před prvním polem, které na něj odkazuje**. Doporučená pozice je ihned za meta skupinou:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| begin_group | meta | | |
+| deviceid | deviceid | | |
+| start | start | | |
+| end | end | | |
+| end_group | | | |
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | *(vzhled rawquery odkazující na `${family_path}`)* |
+
+<Callout type="warning">
+Pokud ve formuláři `family_path` chybí nebo je umístěna za prvním polem `rawquery` / `search()`, které na ni odkazuje, všechna vyhledávání v přibalených souborech tiše vrátí prázdnou hodnotu. Nezobrazí se žádná chybová zpráva — našeptávač (autocomplete) jednoduše neukáže žádné výsledky.
+</Callout>
+
+---
+
+## Více databázových souborů
+
+Jeden formulář může používat několik souborů `.db`. Každá cesta se konstruuje nezávisle pomocí `concat()`:
+
+```
+concat(${family_path}, '/locations.db::externalData')
+concat(${family_path}, '/health_facilities.db::facilities')
+concat(${family_path}, '/household_list.db::households')
+```
+
+Definujte `family_path` jednou; odkazujte na ni v tolika polích, v kolika je potřeba.
+
+---
+
+## Ověření během vývoje
+
+Chcete-li zkontrolovat výslednou hodnotu v zařízení, přidejte pod `family_path` dočasné pole `note`:
+
+| type | name | label | calculation |
+|---|---|---|---|
+| calculate | `family_path` | | `pulldata('app-api', 'family_path')` |
+| note | family_path_check | `Path: ${family_path}` | |
+
+Poznámka zobrazí skutečnou vyřešenou cestu během testování. Před nasazením finálního formuláře ji odstraňte.

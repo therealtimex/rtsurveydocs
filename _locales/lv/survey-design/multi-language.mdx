@@ -3,15 +3,15 @@ title: "Daudzvalodu atbalsts"
 description: ""
 ---
 
-rtSurvey nodrošina stabilu daudzvalodu atbalstu, ļaujot izveidot aptaujas vairākās valodās. Šī funkcija ir būtiska pētījumu veikšanai dažādās lingvistiskās populācijās vai daudzvalodu vidēs.
+rtSurvey nodrošina stabilu daudzvalodu atbalstu, ļaujot izveidot aptaujas vairākās valodās. Šī funkcija ir būtiska, lai veiktu pētījumus dažādās lingvistiskajās grupās vai daudzvalodu vidē.
 
 ## Daudzvalodu aptauju iestatīšana
 
-Lai izveidotu daudzvalodu aptauju rtSurvey, XLSForm jāpievieno valodai specifiskas kolonnas. Lūk, kā:
+Lai izveidotu daudzvalodu aptauju rtSurvey, XLSForm formā jāpievieno valodai specifiskas kolonnas. Lūk, kā to izdarīt:
 
-1. **Etiķešu tulkojumi**: Pievienojiet kolonnas katrai valodai, izmantojot formātu `label::Language (code)`.
-2. **Norādījumu tulkojumi**: Izmantojiet `hint::Language (code)` norādījumu tulkošanai.
-3. **Multivides failu tulkojumi**: Valodai specifiskai multividei izmantojiet `media::Language (code)`.
+1. **Etiķešu tulkojumi (Label Translations)**: Pievienojiet kolonnas katrai valodai, izmantojot formātu `label::Language (code)`.
+2. **Padomu tulkojumi (Hint Translations)**: Izmantojiet `hint::Language (code)` padomu tulkošanai.
+3. **Multivides failu tulkojumi (Media File Translations)**: Valodai specifiskai multividei izmantojiet `media::Language (code)`.
 
 Piemērs:
 
@@ -21,13 +21,13 @@ Piemērs:
 | integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
 ```
 
-## Valodas kodi
+## Valodu kodi
 
-Ieteicams izmantot oficiālos 2 rakstzīmju valodu kodus (apakštagus) pēc valodas nosaukuma. Tas atvieglo formas valodas saskaņošanu ar lietotāja saskarnes valodu. Oficiālos kodus varat atrast [šeit](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
+Ieteicams pēc valodas nosaukuma izmantot oficiālos 2 rakstzīmju valodu kodus (subtags). Tas atvieglo formas valodas saskaņošanu ar lietotāja saskarnes valodu. Oficiālos kodus varat atrast [šeit](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry).
 
 ## Noklusējuma valodas iestatīšana
 
-Lai iestatītu noklusējuma valodu datu vākšanai, XLSForm izmantojiet darblapu `settings`:
+Lai iestatītu noklusējuma valodu datu vākšanai, izmantojiet XLSForm `settings` darblapu:
 
 ```
 | form_id   | version | default_language |
@@ -37,16 +37,16 @@ Lai iestatītu noklusējuma valodu datu vākšanai, XLSForm izmantojiet darblapu
 
 ## rtSurvey specifiskās funkcijas
 
-### Dinamiskā valodas maiņa
+### Dinamiskā valodas pārslēgšana
 
-rtSurvey ļauj lietotājiem dinamiski mainīt valodas datu vākšanas laikā:
+rtSurvey ļauj lietotājiem datu vākšanas laikā dinamiskā veidā mainīt valodas:
 
-- Tīmekļa saskarnē izmantojiet valodas nolaižamo izvēlni augšējā navigācijas joslā.
-- Mobilajā lietotnē piekļūstiet valodas opcijām caur iestatījumu izvēlni.
+- Tīmekļa saskarnē izmantojiet valodu nolaižamo izvēlni augšējā navigācijas joslā.
+- Mobilajā lietotnē piekļūstiet valodas opcijām iestatījumu izvēlnē.
 
-### Valodai specifiskās validācijas ziņojumi
+### Valodai specifiski validācijas ziņojumi
 
-rtSurvey paplašina daudzvalodu atbalstu uz validācijas ziņojumiem:
+rtSurvey paplašina daudzvalodu atbalstu arī validācijas ziņojumiem:
 
 ```
 | type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
@@ -54,19 +54,29 @@ rtSurvey paplašina daudzvalodu atbalstu uz validācijas ziņojumiem:
 | integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-### LTR valodu atbalsts
+### Lokalizēti obligātie ziņojumi
 
-Valodām no labās uz kreiso (RTL) kā arābu vai ebreju, rtSurvey automātiski pielāgo izkārtojumu:
+Izmantojiet `required_message::Language (code)`, lai rādītu tulkotu kļūdas ziņojumu, ja obligātais lauks ir atstāts tukšs:
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
+### RTL valodu atbalsts
+
+Valodām, kuras raksta no labās uz kreiso pusi (RTL), piemēram, arābu vai ebreju valodai, rtSurvey automātiski pielāgo izkārtojumu:
 
 ```
 | type | name | label::English (en) | label::Arabic (ar) |
-|------|------|---------------------|---------------------|
+|------|------|----------|---------------------|
 | text | name | Your name           | اسمك                |
 ```
 
-### Valodai specifiskais izskats
+### Valodai specifisks Appearance
 
-rtSurvey ļauj norādīt dažādus izskata variantus dažādām valodām:
+rtSurvey ļauj norādīt dažādus appearance iestatījumus dažādām valodām:
 
 ```
 | type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
@@ -74,47 +84,81 @@ rtSurvey ļauj norādīt dažādus izskata variantus dažādām valodām:
 | text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
 
+## HTML formatēšana divvalodu etiķetēs
+
+Vienā etiķetes šūnā varat kombinēt HTML tagus ar valodas apvalkiem. rtSurvey izgūst aktīvās valodas bloku un renderē atlikušo HTML.
+
+Piemērs, izmantojot treknrakstu un fonta krāsu katrai valodai:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Atbalstītie iekļautie tagi valodas apvalkos: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Krāsaina teksta piemērs katrai valodai:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Valodas apzinoši aprēķini
+
+Ja veidlapai ir `${language_use}` lauks (iestatīts ar `change_language` logrīku), izmantojiet `if()`, lai atgrieztu vērtības aktīvajā valodā:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Piemērs – meklēšanas rezultāta parādīšana aktīvajā valodā, izmantojot `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Piezīme: `${language_use}` lauks parasti tiek iestatīts ar `change_language` appearance logrīku. Skatiet Appearance — change_language.
+
 ## Labākā prakse daudzvalodu aptaujām
 
-1. **Konsekventa nosaukšana**: Izmantojiet konsekventus valodu kodus visā formā.
-2. **Profesionāls tulkojums**: Piesaistiet profesionālus tulkotājus, kas pārzina aptaujas kontekstu.
-3. **Konteksta piezīmes**: Nodrošiniet konteksta piezīmes tulkotājiem precīzu tulkojumu nodrošināšanai.
-4. **Testēšana**: Testējiet formu visās valodās pirms izvietošanas.
-5. **Unicode atbalsts**: Nodrošiniet, ka datu vākšanas ierīces atbalsta Unicode nelatīņu rakstiem.
-6. **Valodai specifiskā multivide**: Izmantojiet katrai valodai kulturāli atbilstošus attēlus vai audio.
+1. **Konsekventa nosaukumu piešķiršana**: Visā veidlapā izmantojiet konsekventus valodu kodus.
+2. **Profesionāls tulkojums**: Izmantojiet profesionālus tulkotājus, kuri pārzina aptaujas kontekstu.
+3. **Konteksta piezīmes**: Sniedziet tulkotājiem konteksta piezīmes, lai nodrošinātu precīzus tulkojumus.
+4. **Testēšana**: Pirms ieviešanas pārbaudiet veidlapu visās valodās.
+5. **Unicode atbalsts**: Pārliecinieties, vai jūsu datu vākšanas ierīces atbalsta Unicode ne-latīņu rakstiem.
+6. **Valodai specifiska multivide**: Katrai valodai izmantojiet kultūrai atbilstošus attēlus vai audio.
 7. **Izvairieties no teksta attēlos**: Ja izmantojat attēlus ar tekstu, izveidojiet atsevišķus attēlus katrai valodai.
 
-## Īpašo gadījumu apstrāde
+## Īpašu gadījumu apstrāde
 
 ### Jauktas valodas atbildes
 
-rtSurvey ļauj respondentiem ievadīt tekstu jebkurā rakstā neatkarīgi no atlasītās formas valodas. Tas ir noderīgi, lai fiksētu vārdus vai adreses to oriģinālajā rakstā.
+rtSurvey ļauj respondentiem ievadīt tekstu jebkurā rakstībā, neatkarīgi no izvēlētās veidlapas valodas. Tas ir noderīgi, lai fiksētu vārdus vai adreses to oriģinālajā rakstībā.
 
-### Valodai specifiskie jautājumu tipi
+### Valodai specifiski jautājumu veidi
 
-Daži jautājumu tipi var būt piemērotāki noteiktām valodām. rtSurvey ļauj izmantot dažādus jautājumu tipus dažādām valodām:
+Daži jautājumu veidi var būt piemērotāki noteiktām valodām. rtSurvey ļauj izmantot dažādus jautājumu veidus dažādām valodām:
 
-```
 | type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
 |--------------------|---------------------|------|---------------------|----------------------|
-| text               | select_one kanji    | name | Enter your name     | 名前を選んでください    |
-```
+| text               | select_one kanji    | name | Ievadiet savu vārdu | 名前を選んでください    |
 
-## Daudzvalodu datu eksports
+## Daudzvalodu datu eksportēšana
 
 Eksportējot datus no rtSurvey:
 
-- Izvēlieties eksportu konkrētā valodā vai iekļaujiet visas valodu versijas.
-- Eksportā tiek iekļauti valodas metadati, norādot, kura valoda tika izmantota katrai atbildei.
+- Izvēlieties eksportēt konkrētā valodā vai iekļaut visas valodu versijas.
+- Eksportā tiek iekļauti valodu metadati, norādot, kura valoda tika izmantota katrai atbildei.
 
-## Mobilās lietotnes apsvērumi
+## Apsvērumi mobilajai lietotnei
 
-- rtSurvey mobilā lietotne atbalsta bezsaistes valodas maiņu.
-- Nodrošiniet, ka visi nepieciešamie valodas faili ir lejupielādēti pirms bezsaistes darba.
+- rtSurvey mobilā lietotne atbalsta valodas pārslēgšanu bezsaistē.
+- Pirms došanās bezsaistē pārliecinieties, vai visi nepieciešamie valodu faili ir lejupielādēti.
 
 ## Zināmie ierobežojumi
 
-- Dažas uzlabotas funkcijas var nebūt pieejamas visās valodās.
-- Ārkārtīgi gari tulkojumi var ietekmēt izkārtojumu mazākos ekrānos.
+- Dažas uzlabotās funkcijas var nebūt pieejamas visās valodās.
+- Īpaši gari tulkojumi var ietekmēt izkārtojumu mazākos ekrānos.
 
-Izmantojot rtSurvey daudzvalodu iespējas, varat izveidot iekļaujošas, pieejamas aptaujas, kas sasniedz dažādas iedzīvotāju grupas un nodrošina augstvērtīgus, lingvistiski precīzus datus.
+Izmantojot rtSurvey daudzvalodu iespējas, varat izveidot iekļaujošas, pieejamas aptaujas, kas sasniedz dažādas iedzīvotāju grupas un nodrošina augstas kvalitātes, lingvistiski precīzus datus.

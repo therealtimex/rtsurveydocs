@@ -1,0 +1,118 @@
+---
+title: "Gravação de Áudio"
+description: "Grave áudio ambiente ou de entrevistas durante a recolha de dados do inquérito utilizando as aparências audio-start e audio-end em campos de texto."
+---
+
+A gravação de áudio permite que um formulário capture áudio de forma silenciosa ou visível durante uma secção de um inquérito. É útil para gravar entrevistas, som ambiente durante observações de campo ou respostas faladas que complementam respostas estruturadas.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Apenas aplicação móvel.** A gravação de áudio requer a aplicação móvel rtSurvey. No formulário web, as aparências `audio-start` e `audio-end` são silenciosamente ignoradas — não ocorre nenhuma gravação e nenhum erro é exibido. Teste sempre no dispositivo quando a gravação de áudio for necessária.
+</Callout>
+
+---
+
+## Como funciona
+
+A gravação de áudio é controlada por dois campos `text` que atuam como **marcadores**:
+
+- Um campo com a aparência `audio-start` inicia a gravação quando o inquiridor chega a ele.
+- Um campo com a aparência `audio-end` interrompe a gravação e guarda o ficheiro de áudio na submissão.
+
+Ambos os campos de marcador são do tipo `text`. São tipicamente ocultados do inquiridor (utilizando `relevant = false` ou colocados numa posição não interativa), embora possam ser visíveis. O áudio gravado é anexado à submissão como um ficheiro ligado ao campo `audio-end`.
+
+---
+
+## Exemplo básico
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Nome do respondente | |
+| text | q_occupation | Profissão | |
+| integer | q_age | Idade | |
+| text | audio_e_a1 | | `audio-end` |
+
+A aplicação inicia a gravação quando o inquiridor chega a `audio_s_a1` e para quando chega a `audio_e_a1`. Todas as perguntas entre os dois marcadores são gravadas.
+
+---
+
+## Gravação silenciosa: `audio-start invisible`
+
+Por defeito, a aplicação móvel exibe um indicador de gravação enquanto o áudio está a ser capturado. Adicionar `invisible` à aparência suprime este indicador, pelo que a gravação acontece sem qualquer aviso visível para o respondente.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Aceita participar? | |
+| text | q_feedback | O seu feedback | |
+| text | audio_e_a1 | | `audio-end` |
+
+Utilize `invisible` apenas quando os requisitos de divulgação tiverem sido satisfeitos por outros meios (por exemplo, um campo de consentimento por escrito separado antes da secção de gravação).
+
+---
+
+## Convenção de nomenclatura
+
+Os formulários de produção utilizam um padrão de nomenclatura consistente para os campos de marcador:
+
+```
+audio_s_{section}{n}   — marcador de início
+audio_e_{section}{n}   — marcador de fim
+```
+
+Onde `{section}` é uma etiqueta curta para a secção do formulário e `{n}` é um número sequencial dentro dessa secção.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | Primeira gravação na secção A |
+| `audio_e_a1` | End | Fim da primeira gravação na secção A |
+| `audio_s_b1` | Start | Primeira gravação na secção B |
+| `audio_e_b1` | End | Fim da primeira gravação na secção B |
+| `audio_s_a2` | Start | Segunda gravação na secção A |
+| `audio_e_a2` | End | Fim da segunda gravação na secção A |
+
+Seguir esta convenção facilita a identificação dos limites da gravação ao rever as definições do formulário e os dados da submissão.
+
+---
+
+## Armazenamento e recuperação
+
+Quando o inquiridor chega ao campo `audio-end`, a aplicação finaliza o ficheiro de áudio e anexa-o à submissão. O ficheiro é:
+
+- Armazenado como um anexo de áudio na submissão, associado ao nome do campo `audio-end`.
+- Acessível no visualizador de submissões do back-end do rtSurvey juntamente com outros anexos de média.
+- Descarregável através da exportação padrão de submissões — os ficheiros de áudio aparecem na coluna de média correspondente ao nome do campo `audio-end`.
+
+O formato do ficheiro e a taxa de bits dependem do dispositivo e da versão da aplicação.
+
+---
+
+## Múltiplas secções de gravação
+
+Um formulário pode conter várias secções de gravação não sobrepostas. Cada par de marcadores `audio-start` / `audio-end` deve estar totalmente contido — as secções não se devem intercalar.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Introdução | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Detalhes | |
+| text | audio_e_b1 | | `audio-end` |
+
+Cada secção produz um ficheiro de áudio separado anexado ao seu respetivo campo `audio-end`.
+
+---
+
+## Limitações
+
+- **Apenas aplicação móvel.** A funcionalidade não é suportada no formulário web. `audio-start` e `audio-end` são silenciosamente ignorados num navegador.
+- **Sem aninhamento.** As secções de gravação não se podem sobrepor. Iniciar uma nova gravação antes que o marcador `audio-end` anterior seja alcançado não é suportado.
+- **O tipo de campo deve ser `text`.** A utilização de `audio-start` ou `audio-end` em qualquer outro tipo de pergunta não é suportada.
+- **Tamanho do carregamento.** Gravações longas produzem ficheiros grandes. Esteja ciente dos limites de tamanho da submissão e das condições da rede no terreno.
+- **Sem pausa a meio da gravação.** A gravação decorre continuamente do marcador de início ao marcador de fim; não existe nenhum mecanismo para pausar e retomar dentro de uma secção.

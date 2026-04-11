@@ -5,242 +5,256 @@ description: ""
 
 import { Callout } from 'nextra/components'
 
-### 字符串函數
+### 字串函數
 
 <Callout type="warning">
-在表達式中使用字符串時，使用單引號（''）括住字面字符串很重要。但是，當您想在字面字符串中包含單引號時，例外情況出現了。在這種情況下，您可以使用雙引號（""）括住整個字符串。
+在表達式中使用字串時，使用單引號 ('') 來封閉字串常值是非常重要的。但是，當您想在字串常值中包含單引號時，會出現例外情況。在這種情況下，您可以使用雙引號 ("") 來封閉整個字串。
 
 例如：
 - 正確：if(`${yesno}` = 1, "a string with 'single quotes' in it", "no single quotes here")
 - 錯誤：if(`${yesno}` = 1, 'a string with 'single quotes' in it', 'no single quotes here')
 
-關於智慧引號，了解其存在非常重要，因為它們可能會在表達式中引起問題。許多富文字編輯器會自動將直引號（"" 或 ''）轉換為智慧引號或彎引號（"" 或 ''），這可能導致語法錯誤或意外行為。為避免這種情況，請確保在您的表達式中始終使用直引號（''）。
+關於智慧引號（smart quotes），了解它們的存在至關重要，因為它們可能會導致表達式出現問題。許多富文本編輯器會自動將直引號 ("" 或 '') 轉換為智慧引號或捲曲引號 (“” 或 ‘’)，這可能會導致語法錯誤或非預期行為。為了避免這種情況，請確保在表達式中一致地使用直引號 ('')。
+
+如果您有任何進一步的問題或需要額外的協助，請告訴我！
 </Callout>
 
 rtSurvey 支援各種函數，包括：
 
-1. `string(field)`：將字段轉換為字符串。
+1. `string(field)`：將欄位轉換為字串。
    - 範例：`string(34.8)` 將被轉換為 `'34.8'`。
 
-2. `string-length(field)`：返回字符串字段的長度。
-   - 範例：`string-length(.) > 3 and string-length(.) < 10` 可用於確保當前字段在 3 到 10 個字符之間。
+2. `string-length(field)`：返回字串欄位的長度。
+   - 範例：`string-length(.) > 3 and string-length(.) < 10` 可用於確保當前欄位介於 3 到 10 個字元之間。
+   - **串聯依賴模式 (Cascade dependency pattern)**：`string-length(${province}) >= 0` 的評估結果始終為 `true`，但它會強制 rtSurvey 在 `${province}` 更改時重新評估表達式。在 `relevant` 中使用它可以在父欄位更新時觸發串聯刷新：
+     | type | name | relevant |
+     |------|------|----------|
+     | select_one | district | `string-length(${province}) >= 0` |
+     這確保了每當 province 更改時，district 問題都會重新評估其 `search()` 或 `rawquery` 的外觀 (appearance)。
 
-3. `substr(fieldorstring, startindex, endindex)`：返回從 `startindex` 開始並在 `endindex` 之前結束的子字符串。索引從字符串的第一個字符的 0 開始。
+3. `substr(fieldorstring, startindex, endindex)`：返回從 `startindex` 開始到 `endindex` 之前的子字串。字串中第一個字元的索引從 0 開始。
    - 範例：`substr(${phone}, 0, 3)` 將返回電話號碼的前三位數字。
 
-4. `concat(a, b, c, ...)`：將字段（和/或字符串）串聯在一起。
-   - 範例：`concat(${firstname}, ' ', ${lastname})` 將通過組合 `firstname` 和 `lastname` 字段中的值返回全名。
+4. `concat(a, b, c, ...)`：將欄位（和/或字串）連接在一起。
+   - 範例：`concat(${firstname}, ' ', ${lastname})` 將通過組合 `firstname` 和 `lastname` 欄位中的值來返回完整姓名。
 
-5. `linebreak()`：返回換行符。
-   - 範例：`concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` 將返回三個字段值的清單，值之間有換行符。
+5. `linebreak()`：返回換行符號。
+   - 範例：`concat(${field1}, linebreak(), ${field2}, linebreak(), ${field3})` 將返回三個欄位值的列表，它們之間有換行符號。
 
-6. `lower()`：將字符串轉換為所有小寫字符。
-   - 範例：`lower('Street Name')` 將返回「street name」。
+6. `lower()`：將字串轉換為全小寫字元。
+   - 範例：`lower('Street Name')` 將返回 "street name"。
 
-7. `upper()`：將字符串轉換為所有大寫字符。
-   - 範例：`upper('Street Name')` 將返回「STREET NAME」。
+7. `upper()`：將字串轉換為全大寫字元。
+   - 範例：`upper('Street Name')` 將返回 "STREET NAME"。
 
-### select_one 和 select_multiple 函數
+### select_one 與 select_multiple 函數
 
-1. `count-selected(field)`：返回在 select_multiple 字段中選取的項目數量。
-   - 範例：`count-selected(.) = 3` 可用作約束條件表達式，確保正好選取三個選項。
+1. `count-selected(field)`：返回 select_multiple 欄位中選擇的項目數量。
+   - 範例：`count-selected(.) = 3` 可用作約束 (constraint) 表達式，以確保精確選擇了三個選項。
 
-2. `selected(field, value)`：根據指定值是否在 select_one 或 select_multiple 字段中被選取返回 true 或 false。
-   - 範例：`selected(${color}, 'Blue')` 可用作相關性表達式，僅當受訪者選取「Blue」作為最喜歡的顏色時才顯示群組或字段。
-   - 注意：第二個參數應始終指定選項值，而不是選項標籤。使用表單定義的選項工作表中的值欄中的值。
+2. `selected(field, value)`：根據指定的 value 是否在 select_one 或 select_multiple 欄位中被選中，返回 true 或 false。
+   - 範例：`selected(${color}, 'Blue')` 可用作相關性 (relevance) 表達式，僅在受訪者選擇 "Blue" 作為其最喜歡的顏色時顯示群組或欄位。
+   - 注意：第二個參數應始終指定選項的 value，而不是選項的標籤 (label)。請使用表單定義中 choices 工作表 value 欄位中的值。
 
-3. `selected-at(field, number)`：返回 select_multiple 字段中指定位置的選定項目。當傳遞的數字為 0 時，返回第一個選定項目；當數字為 1 時，返回第二個選定項目，以此類推。
-   - 範例：`selected-at(${fruits}, 0) = 'Apple'` 可用作相關性表達式，僅當第一個選定選項為「Apple」時才顯示群組或字段。
-   - 注意：返回值將是選項值，而不是選項標籤。
+3. `selected-at(field, number)`：返回 select_multiple 欄位中指定位置的選中項目。當傳入的數字為 0 時，它返回第一個選中項目；當數字為 1 時，它返回第二個選中項目，依此類推。
+   - 範例：`selected-at(${fruits}, 0) = 'Apple'` 可用作相關性 (relevance) 表達式，僅在第一個選中的選項是 "Apple" 時顯示群組或欄位。
+   - 注意：返回值將是選項的 value，而不是選項的標籤 (label)。請使用表單定義中 choices 工作表 value 欄位中的值。
 
-4. `choice-label(field, value)`：返回 select_one 或 select_multiple 字段選項的標籤，如表單定義的選項工作表中定義的。
-   - 範例 1：`choice-label(${country}, ${country})` 將返回名為 `country` 的字段中當前選定選項的選項標籤。
-   - 範例 2：`choice-label(${languages}, selected-at(${languages}, 0))` 將返回名為 `languages` 的字段中第一個選定選項的標籤。
+4. `choice-label(field, value)`：返回 select_one 或 select_multiple 欄位選項的標籤 (label)，如表單定義的 choices 工作表中所定義。
+   - 範例 1：`choice-label(${country}, ${country})` 將返回名為 `country` 欄位中目前選中選項的標籤。
+   - 範例 2：`choice-label(${languages}, selected-at(${languages}, 0))` 將返回名為 `languages` 欄位中第一個選中選項的標籤。
+   - 注意：此函數檢索的是選項標籤 (label)，而不是 value。它使用表單定義中 choices 工作表的 label 欄位。
 
-### 重複字段函數
+### 重複欄位函數
 
-在 rtSurvey 中，如果您想多次詢問相同的問題，可以將字段放在重複群組中。這會產生同一字段的多個實例。以下函數可以幫助您處理這些重複字段及其產生的重複資料。
+在 rtSurvey 中，如果您想多次詢問相同的問題，可以將欄位放入重複群組 (repeat group) 中。這會導致同一個欄位出現多個實例。以下函數可以幫助您處理這些重複欄位及其產生的重複數據。有關更多詳細資訊，請參閱關於重複欄位的說明主題。
 
-1. `join(string, repeatedfield)`：對於重複群組中的字段，生成以字符串分隔的值清單。第一個參數指定用於分隔值的分隔符。
-   - 範例：`join(', ', ${member_name})` 將從所有輸入的名稱生成單個以逗號分隔的清單。
+1. `join(string, repeatedfield)`：對於重複群組中的欄位，生成一個以字串分隔的值列表。第一個參數指定用於分隔值的定界符。
+   - 範例：`join(', ', ${member_name})` 將根據所有輸入的姓名生成一個單一的逗號分隔列表。
 
-2. `join-if(string, repeatedfield, expression)`：與 `join()` 完全相同，只是它使用提供的表達式檢查重複群組中的每個實例。如果表達式評估為 false，則該項目將從輸出中省略。
-   - 範例：`join-if(', ', ${member_name}, ${age} >= 18)` 將生成僅成年成員（年齡 18 歲及以上的人）姓名的逗號分隔清單。
+2. `join-if(string, repeatedfield, expression)`：功能與 `join()` 完全相同，不同之處在於它使用提供的表達式檢查重複群組中的每個實例。如果表達式評估為 false，該項目將從輸出中省略。
+   - 範例：`join-if(', ', ${member_name}, ${age} >= 18)` 將生成一個僅包含成年成員（年齡在 18 歲及以上）姓名的逗號分隔列表。
 
-3. `count(repeatgroup)`：返回重複群組當前重複的次數。
-   - 範例：`count(${groupname})` 將返回群組的實例數量。
+3. `count(repeatgroup)`：返回重複群組當前的重複次數。
+   - 範例：`count(${groupname})` 將返回該群組的實例數量。
 
-4. `count-if(repeatgroup, expression)`：與 `count()` 完全相同，只是它使用提供的表達式檢查重複群組中的每個實例。
-   - 範例：`count-if(${members}, ${age} >= 18)` 將根據「members」重複群組中的年齡字段返回成年成員的計數。
+4. `count-if(repeatgroup, expression)`：功能與 `count()` 完全相同，不同之處在於它使用提供的表達式檢查重複群組中的每個實例。如果表達式評估為 false，該項目將從輸出中省略。
+   - 範例：`count-if(${members}, ${age} >= 18)` 將根據 "members" 重複群組中的 age 欄位返回成年成員的計數。
 
-5. `sum(repeatedfield)`：對於重複群組中的字段，計算所有值的總和。
-   - 範例：`sum(${loan_amount})` 將返回所有貸款的總值。
+5. `sum(repeatedfield)`：對於重複群組中的欄位，計算所有值的總和。
+   - 範例：`sum(${loan_amount})` 將返回所有貸款的總價值。
 
-6. `sum-if(repeatedfield, expression)`：與 `sum()` 完全相同，只是它使用提供的表達式檢查重複群組中的每個實例。
-   - 範例：`sum-if(${loan_amount}, ${loan_amount} > 500)` 將返回所有超過 500 的貸款的總值。
+6. `sum-if(repeatedfield, expression)`：功能與 `sum()` 完全相同，不同之處在於它使用提供的表達式檢查重複群組中的每個實例。如果表達式評估為 false，該項目將從輸出中省略。
+   - 範例：`sum-if(${loan_amount}, ${loan_amount} > 500)` 將返回所有超過 500 的貸款總價值。較小的貸款將被忽略。
 
-7. `min(repeatedfield)`：對於重複群組中的字段，計算所有值的最小值。
+7. `min(repeatedfield)`：對於重複群組中的欄位，計算所有值的最小值。
    - 範例：`min(${member_age})` 將返回群組中最年輕成員的年齡。
 
-8. `min-if(repeatedfield, expression)`：與 `min()` 完全相同，只是它使用提供的表達式檢查重複群組中的每個實例。
-   - 範例：`min-if(${member_age}, ${member_age} >= 18)` 將返回群組中最年輕成年人的年齡。
+8. `min-if(repeatedfield, expression)`：功能與 `min()` 完全相同，不同之處在於它使用提供的表達式檢查重複群組中的每個實例。如果表達式評估為 false，該項目將從輸出中省略。
+   - 範例：`min-if(${member_age}, ${member_age} >= 18)` 將返回群組中最年輕成年人的年齡。小於 18 歲的人將被忽略。
 
-9. `max(repeatedfield)`：對於重複群組中的字段，計算所有值的最大值。
+9. `max(repeatedfield)`：對於重複群組中的欄位，計算所有值的最大值。
    - 範例：`max(${member_age})` 將返回群組中最年長成員的年齡。
 
-10. `max-if(repeatedfield, expression)`：與 `max()` 完全相同，只是它使用提供的表達式檢查重複群組中的每個實例。
-    - 範例：`max-if(${member_age}, ${member_age} >= 18)` 將返回群組中最年長成年人的年齡。
+10. `max-if(repeatedfield, expression)`：功能與 `max()` 完全相同，不同之處在於它使用提供的表達式檢查重複群組中的每個實例。如果表達式評估為 false，該項目將從輸出中省略。
+    - 範例：`max-if(${member_age}, ${member_age} >= 18)` 將返回群組中最年長成年人的年齡。小於 18 歲的人將被忽略。
 
-11. `index()`：在重複群組中調用時，返回當前群組或實例的索引號。
-    - 範例：在重複群組中使用 `index()` 將對第一個實例返回 1，對第二個實例返回 2，以此類推。
+11. `index()`：在重複群組內調用，返回當前群組或實例的索引編號。
+    - 範例：在重複群組內使用 `index()` 時，第一個實例將返回 1，第二個實例返回 2，依此類推。
 
-12. `indexed-repeat(repeatedfield, repeatgroup, index)`：從重複群組外部參考重複群組內的字段或群組。第一個參數指定感興趣的重複字段或群組，第二個參數指定字段或群組所在的重複群組，第三個參數指定要使用的重複群組中的實例號。
-    - 範例 1：`indexed-repeat(${name}, ${names}, 1)` 當名稱字段位於名為「names」的先前重複群組中時，將返回第一個可用名稱。
-    - 範例 2：`indexed-repeat(${name}, ${names}, index())` 將拉取與當前重複群組的實例號對應的名稱。
+12. `indexed-repeat(repeatedfield, repeatgroup, index)`：從重複群組外部引用該群組內部的欄位或群組。第一個參數指定感興趣的重複欄位或群組，第二個指定該欄位或群組所在的重複群組，第三個指定要在重複群組中使用的實例編號。
+    - 範例 1：`indexed-repeat(${name}, ${names}, 1)` 當 name 欄位位於先前名為 "names" 的重複群組中時，將返回第一個可用的姓名。
+    - 範例 2：`indexed-repeat(${name}, ${names}, index())` 將提取與當前重複群組實例編號相對應的姓名。
 
-13. `rank-index(index, repeatedfield)`：此函數計算重複字段的指定實例的序數排名，用於重複群組外部。排名 1 分配給值最高的實例，排名 2 分配給次高值的實例，依此類推。
-    - 範例：`rank-index(1, ${random_draw})` 根據第一個實例的 `random_draw` 字段值與其他實例的值比較來計算排名。
+13. `rank-index(index, repeatedfield)`：此函數計算重複欄位指定實例的序數排名，以便在重複群組外部使用。值最高的實例排名為 1，值次高的實例排名為 2，依此類推。如果您傳入無效的索引或指向非數字值實例的索引，將返回排名 999。
+    - 範例：`rank-index(1, ${random_draw})` 根據第一實例的 `random_draw` 欄位值與其他實例值的比較來計算其排名。
 
-14. `rank-index-if(index, repeatedfield, expression)`：此函數的工作方式與 `rank-index()` 類似，但它使用提供的表達式檢查重複字段重複群組中的每個實例。
-    - 範例：`rank-index-if(1, ${age}, ${age} >= 18)` 在考慮年齡大於或等於 18 的實例的成年人集合中計算年齡排名。
+14. `rank-index-if(index, repeatedfield, expression)`：此函數的工作原理與 `rank-index()` 類似，但它使用提供的表達式檢查重複欄位所在的重複群組中的每個實例。如果表達式評估為 false，該項目將從計算中省略。所使用的索引是基於在為每個實例評估表達式之前的完整實例集。如果您傳入的索引指向由於不滿足表達式而被忽略的實例，則該索引被視為無效，並將返回排名 999。
+    - 範例：`rank-index-if(1, ${age}, ${age} >= 18)` 計算成年人集合中的年齡排名，僅考慮年齡大於或等於 18 的實例。
 
 ### 數字函數 
 
-| 運算符 | 操作 | 範例 | 範例答案 |
+| 運算子 | 運算 | 範例 | 範例答案 |
 |----------|-----------|---------|----------------|
 | `+` | 加法 | 1 + 1 | 2 |
 | `-` | 減法 | 3 - 2 | 1 |
 | `*` | 乘法 | 3 * 2 | 6 |
 | `div` | 除法 | 10 div 2 | 5 |
-| `mod` | 模數 | 9 mod 2 | 1 |
+| `mod` | 取模 | 9 mod 2 | 1 |
 
 rtSurvey 支援數字函數，包括：
-- `number(field)`：將字段的值轉換為數字。
+- `number(field)`：將欄位的值轉換為數字。
   - 範例：`number('34.8')` = 34.8
 
-- `int(field)`：將字段的值轉換為整數。
+- `int(field)`：將欄位的值轉換為整數。
   - 範例：`int('39.2')` = 39
 
-- `min(field1, ..., fieldx)`：返回傳遞字段中的最小值。
-  - 範例：`min(${father_age}, ${mother_age})` 將返回母親或父親的年齡，以較小者為準。
+- `min(field1, ..., fieldx)`：返回所傳欄位中的最小值。
+  - 範例：`min(${father_age}, ${mother_age})` 將返回母親或父親的年齡，取較小者。
 
-- `max(field1, ..., fieldx)`：返回傳遞字段中的最大值。
-  - 範例：`max(${father_age}, ${mother_age})` 將返回母親或父親的年齡，以較大者為準。
+- `max(field1, ..., fieldx)`：返回所傳欄位中的最大值。
+  - 範例：`max(${father_age}, ${mother_age})` 將返回母親或父親的年齡，取較大者。
 
-- `format-number(field)`：根據使用者的語言環境設定格式化整數或小數字段的值。
-  - 範例：`format-number(${income})` 此表達式可能將「120000」格式化為「120,000」。
+- `format-number(field)`：根據使用者的區域設定格式化整數或小數欄位的值。
+  - 範例：`format-number(${income})` 此表達式可能會將 "120000" 格式化為 "120,000"。
 
-- `round(field, digits)`：將數字字段值四捨五入到小數點後指定位數。
+- `round(field, digits)`：將數值欄位的值四捨五入到指定的小數位數。
   - 範例：`round(${interest_rate}, 2)`
 
 - `abs(number)`：返回數字的絕對值。
   
-- `pow(base, exponent)`：返回第一個參數乘以第二個參數的幂的值。每個參數可以是字段、數字或表達式。
+- `pow(base, exponent)`：返回第一個參數的第二個參數次方。
+  - 每個參數都可以是欄位、數字或表達式。
 
-- `log10(fieldorvalue)`：返回傳入字段或值的以十為底的對數。
+- `log10(fieldorvalue)`：返回傳入欄位或值的以 10 為底的對數。
 
-- `sin(fieldorvalue)`：返回傳入字段或值（以弧度表示）的正弦值。
+- `sin(fieldorvalue)`：返回傳入欄位或值的正弦值，以弧度表示。
   
-- `cos(fieldorvalue)`：返回傳入字段或值（以弧度表示）的余弦值。
+- `cos(fieldorvalue)`：返回傳入欄位或值的餘弦值，以弧度表示。
 
-- `tan(fieldorvalue)`：返回傳入字段或值（以弧度表示）的正切值。
+- `tan(fieldorvalue)`：返回傳入欄位或值的正切值，以弧度表示。
 
-- `asin(fieldorvalue)`：返回傳入字段或值（以弧度表示）的反正弦值。
+- `asin(fieldorvalue)`：返回傳入欄位或值的反正弦值，以弧度表示。
 
-- `acos(fieldorvalue)`：返回傳入字段或值（以弧度表示）的反余弦值。
+- `acos(fieldorvalue)`：返回傳入欄位或值的反餘弦值，以弧度表示。
 
-- `atan(fieldorvalue)`：返回傳入字段或值（以弧度表示）的反正切值。
+- `atan(fieldorvalue)`：返回傳入欄位或值的反正切值，以弧度表示。
 
-- `atan2(x, y)`：返回坐標為 (x, y) 的點與正 x 軸在原點處的夾角（以弧度表示）。結果在 -pi() 到 pi() 範圍內。
+- `atan2(x, y)`：返回坐標為 (x, y) 的點與原點的連線與 x 軸正方向之間的夾角（弧度）。結果範圍為 -pi() 到 pi()。
 
-- `sqrt(fieldorvalue)`：返回傳入字段或值的非負平方根。
+- `sqrt(fieldorvalue)`：返回傳入欄位或值的非負平方根。
 
 - `exp(x)`：返回 e^x 的值。
 
 - `pi()`：返回 pi 的值。
 
-### 日期和時間函數
+### 日期與時間函數
 
 <Callout type="warning">
-rtSurvey 中的日期值以 `YYYY-MM-DD` 格式的字符串儲存。Datetime 值以 ISO 8601 字符串（`YYYY-MM-DDTHH:MM:SS`）儲存。使用 `decimal-date-time()` 轉換為數字以進行算術運算（例如計算持續時間）。
+rtSurvey 中的日期值以 `YYYY-MM-DD` 格式的字串存儲。日期時間值以 ISO 8601 字串 (`YYYY-MM-DDTHH:MM:SS`) 存儲。使用 `decimal-date-time()` 將其轉換為數字進行算術運算（例如，計算持續時間）。
 </Callout>
 
-1. `today()`：以 `YYYY-MM-DD` 格式的字符串返回今天的日期。在表單開啟時評估一次。
+1. `today()`：以 `YYYY-MM-DD` 格式的字串返回今天的日期。在表單打開時評估一次。
    - 範例：`today()` → `'2024-03-15'`
-   - 常見用途：`default` 欄預先填寫今天的日期，或在 `relevant`/`constraint` 中與日期字段比較。
+   - 常見用法：在 `default` 欄位中預填今天的日期，或者在 `relevant`/`constraint` 中與日期欄位進行比較。
 
-2. `now()`：以 ISO 8601 字符串返回當前日期和時間。每次計算表達式時評估。
+2. `now()`：以 ISO 8601 字串形式返回當前的日期和時間。每次計算表達式時都會進行評估。
    - 範例：`now()` → `'2024-03-15T14:32:00.000+03:00'`
-   - 常見用途：記錄問卷調查期間特定事件的確切時間戳。
+   - 常見用法：在調查期間記錄特定事件的精確時間戳。
 
-3. `date(value)`：將值（字符串或數字）轉換為日期字符串。用於將計算值強制轉換為日期類型。
+3. `date(value)`：將值（字串或數字）轉換為日期字串。對於將計算值強制轉換為日期類型很有用。
    - 範例：`date('2024-03-15')` → `'2024-03-15'`
 
-4. `date-time(value)`：將值轉換為 datetime 字符串。
+4. `date-time(value)`：將值轉換為日期時間字串。
    - 範例：`date-time(${event_timestamp})`
 
-5. `decimal-date-time(value)`：將日期或 datetime 字符串轉換為表示自 Unix 紀元以來毫秒數除以 86400000 的十進位數字（即自 1970-01-01 以來的小數天數）。使用此函數對日期進行算術運算。
-   - 範例：兩個日期之間的天數：
+5. `decimal-date-time(value)`：將日期或日期時間字串轉換為十進位數字，表示自 Unix 紀元以來的毫秒數除以 86400000（即自 1970-01-01 以來的分數天數）。使用它對日期進行算術運算。
+   - 範例：兩個日期之間的天數持續時間：
      `decimal-date-time(${end_date}) - decimal-date-time(${start_date})`
-   - 範例：兩個 datetime 之間的分鐘數：
+   - 範例：兩個日期時間之間的分鐘持續時間：
      `(decimal-date-time(${end_time}) - decimal-date-time(${start_time})) * 1440`
 
-6. `format-date(date, format)`：使用格式模式字符串格式化日期值。
-   - 格式標記：`%Y`（4 位年份）、`%y`（2 位年份）、`%m`（月份 01–12）、`%d`（日期 01–31）、`%a`（縮寫星期幾）、`%b`（縮寫月份名稱）
+6. `format-date(date, format)`：使用模式字串格式化日期值。
+   - 格式標記：%Y（4 位年份）、%y（2 位年份）、%m（月份 01–12）、%d（日期 01–31）、%a（縮寫星期幾）、%b（縮寫月份名稱）
    - 範例：`format-date(today(), '%d/%m/%Y')` → `'15/03/2024'`
    - 範例：`format-date(${dob}, '%B %d, %Y')` → `'March 15, 1990'`
 
-7. `format-date-time(datetime, format)`：使用格式模式字符串格式化 datetime 值。接受所有 `format-date` 標記加上：
-   - `%H`（小時 00–23）、`%h`（小時 01–12）、`%M`（分鐘 00–59）、`%S`（秒鐘 00–59）、`%3`（毫秒）、`%P`（AM/PM）
+7. `format-date-time(datetime, format)`：使用模式字串格式化日期時間值。接受所有 `format-date` 標記以及：
+   - %H（小時 00–23）、%h（小時 01–12）、%M（分鐘 00–59）、%S（秒 00–59）、%3（毫秒）、%P（AM/PM）
    - 範例：`format-date-time(now(), '%d/%m/%Y %H:%M')` → `'15/03/2024 14:32'`
    - 範例：`format-date-time(${event_time}, '%I:%M %p')` → `'02:32 PM'`
 
----
-
-### Boolean 函數
-
-1. `boolean(value)`：將任何值轉換為 boolean。對非空字符串、非零數字和 `true` 返回 `true`；對空字符串、`0` 和 `false` 返回 `false`。
-   - 範例：`boolean(${name})` 如果 `name` 不為空則返回 `true`。
-
-2. `boolean-from-string(string)`：如果字符串為 `'1'` 或 `'true'`（不區分大小寫）則返回 `true`；否則返回 `false`。
-   - 範例：`boolean-from-string(${enabled_flag})` — 當字段將 `'true'`/`'false'` 儲存為文字時有用。
-
-3. `true()`：返回 boolean 值 `true`。
-   - 範例：在 `required` 欄中，`true()` 等同於 `yes`。
-
-4. `false()`：返回 boolean 值 `false`。
-   - 範例：`if(${skip_section} = 'yes', false(), true())` — 動態設定必填。
-
-5. `not(expression)`：返回表達式的邏輯否定。如果表達式為 false 則返回 `true`，反之亦然。
-   - 範例：`not(${consent} = 'yes')` — 在未給予同意時顯示警告。
-   - 範例：`not(selected(${issues}, 'none'))` — 僅當未選取「none」時才需要詳細資訊。
+8. `STRFTIME(format, datetime)`：SQLite 風格的日期格式化。在傳遞給 `rawquery` 查詢的 SQL 字串中可用 —— **不適用**於 XLSForm 的 `calculation` 或 `label` 欄位。使用 SQLite 格式標記（%Y、%m、%d、%H、%M、%S）。
+   - rawquery SQL 字串中的範例：`'SELECT STRFTIME(''%Y-%m'', interview_date) AS month FROM data WHERE id = ?'`
+   - 注意：在 XLSForm 表達式中使用 `format-date-time()` 進行日期格式化。`STRFTIME()` 是一個 SQLite 函數，僅在傳遞給 `rawquery` 的 SQL 中可用。
 
 ---
 
-### 附加字符串函數
+### 布林函數
 
-1. `starts-with(string, prefix)`：如果 `string` 以 `prefix` 開頭則返回 `true`。
+1. `boolean(value)`：將任何值轉換為布林值。對於非空字串、非零數字和 `true` 返回 `true`；對於空字串、`0` 和 `false` 返回 `false`。
+   - 範例：如果 `name` 不為空，`boolean(${name})` 返回 `true`。
+
+2. `boolean-from-string(string)`：如果字串為 `'1'` 或 `'true'`（不區分大小寫），則返回 `true`；否則返回 `false`。
+   - 範例：`boolean-from-string(${enabled_flag})` —— 當欄位將 `'true'`/`'false'` 存儲為文本時很有用。
+
+3. `true()`：返回布林值 `true`。
+   - 範例：在 `required` 欄位中，`true()` 等效於 `yes`。
+
+4. `false()`：返回布林值 `false`。
+   - 範例：`if(${skip_section} = 'yes', false(), true())` —— 動態設置必填。
+
+5. `not(expression)`：返回表達式的邏輯否定。如果表達式為 false，則返回 `true`，反之亦然。
+   - 範例：`not(${consent} = 'yes')` —— 在未給予同意時顯示警告。
+   - 範例：`not(selected(${issues}, 'none'))` —— 僅在未選擇 "none" 時要求詳細資訊。
+
+---
+
+### 其他字串函數
+
+1. `starts-with(string, prefix)`：如果 `string` 以 `prefix` 開頭，則返回 `true`。
    - 範例：`starts-with(${phone}, '+254')` 檢查電話號碼是否以肯亞國家代碼開頭。
 
-2. `contains(string, substring)`：如果 `string` 包含 `substring` 則返回 `true`。
-   - 範例：`contains(${email}, '@')` 檢查電子郵件地址是否有 `@` 符號。
-   - 範例：`contains(${notes}, 'urgent')` 如果備注中提到「urgent」則觸發後續問題。
+2. `contains(string, substring)`：如果 `string` 包含 `substring`，則返回 `true`。
+   - 範例：`contains(${email}, '@')` 檢查電子郵件地址是否含有 `@` 符號。
+   - 範例：`contains(${notes}, 'urgent')` 如果備註中提到 "urgent"，則觸發後續問題。
 
-3. `substring-before(string, needle)`：返回 `string` 中第一次出現 `needle` 之前的部分。
-   - 範例：`substring-before(${full_name}, ' ')` 提取第一個詞（名字）。
+3. `substring-before(string, needle)`：返回 `string` 中出現在第一次出現 `needle` 之前的部分。
+   - 範例：`substring-before(${full_name}, ' ')` 提取第一個單詞（名字）。
 
-4. `substring-after(string, needle)`：返回 `string` 中第一次出現 `needle` 之後的部分。
-   - 範例：`substring-after(${email}, '@')` 提取電子郵件地址的域名部分。
+4. `substring-after(string, needle)`：返回 `string` 中出現在第一次出現 `needle` 之後的部分。
+   - 範例：`substring-after(${email}, '@')` 提取電子郵件地址的網域部分。
 
-5. `normalize-space(string)`：去除前導和尾隨空格，並將所有內部空格序列折疊為單個空格。
-   - 範例：`normalize-space(${name})` — 清理可能包含額外空格的名稱。
+5. `normalize-space(string)`：移除首尾空格，並將所有內部空格序列摺疊為單個空格。
+   - 範例：`normalize-space(${name})` —— 清理可能輸入了額外空格的姓名。
 
-6. `translate(string, search_chars, replace_chars)`：將 `string` 中出現在 `search_chars` 中的每個字符替換為 `replace_chars` 中的對應字符。在 `search_chars` 中但在 `replace_chars` 中沒有對應字符的字符將被刪除。
-   - 範例：`translate(${phone}, ' -()', '')` 從電話號碼中刪除空格、連字符和括號。
+6. `translate(string, search_chars, replace_chars)`：將 `string` 中出現在 `search_chars` 中的每個字元替換為 `replace_chars` 中對應的字元。`search_chars` 中沒有對應 `replace_chars` 字元的字元將被刪除。
+   - 範例：`translate(${code}, 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')` 轉換為大寫（等效於 `upper()`）。
+   - 範例：`translate(${phone}, ' -()', '')` 從電話號碼中移除空格、破折號和括號。
 
 ---
 
-### 附加數學函數
+### 其他數學函數
 
 1. `floor(number)`：返回小於或等於 `number` 的最大整數（向負無窮大方向取整）。
    - 範例：`floor(4.9)` = 4，`floor(-2.1)` = -3
@@ -248,67 +262,74 @@ rtSurvey 中的日期值以 `YYYY-MM-DD` 格式的字符串儲存。Datetime 值
 2. `ceiling(number)`：返回大於或等於 `number` 的最小整數（向正無窮大方向取整）。
    - 範例：`ceiling(4.1)` = 5，`ceiling(-2.9)` = -2
 
-3. `random()`：返回 0.0（含）到 1.0（不含）之間的隨機十進位數字。通常在 `calculate` 字段中用於分配隨機值或隨機化問題順序。
+3. `random()`：返回 0.0（含）到 1.0（不含）之間的隨機十進位數字。通常在 `calculate` 欄位中用於分配隨機值或隨機化問題順序。
    - 範例：`random()` → 例如 `0.7341`
-   - 範例：`int(random() * 6) + 1` → 隨機數字 1–6（骰子擲出）
+   - 範例：`int(random() * 6) + 1` → 1–6 之間的隨機數（擲骰子）
 
-4. `coalesce(a, b)`：如果 `a` 非空則返回 `a`；否則返回 `b`。當字段可能為空時用作後備。
-   - 範例：`coalesce(${preferred_name}, ${full_name})` — 如果設定了首選名稱則使用，否則回退至全名。
+4. `coalesce(a, b)`：如果 `a` 不為空，則返回 `a`；否則返回 `b`。在欄位可能為空時，可用作備用方案。
+   - 範例：`coalesce(${preferred_name}, ${full_name})` —— 如果設置了偏好名稱則使用它，否則回退到完整姓名。
 
-5. `once(value)`：評估 `value` 並儲存，但只有當當前字段**為空**時才這樣做。如果字段已有值（例如之前設定過），`once()` 返回現有值不變。這防止重新計算覆寫使用者輸入。
-   - 範例：在 `default` 欄中的 `once(today())` 設定今天的日期一次，如果調查員重新開啟表單則不更新。
-   - 範例：`once(uuid())` 生成一個 UUID 一次並在重新編輯時保持穩定。
+5. `once(value)`：評估 `value` 並存儲它，但僅當當前欄位為 **空** 時。如果欄位已有值（例如，之前已設置），則 `once()` 返回不變的現有值。這可以防止重新計算覆蓋使用者輸入。
+   - 範例：`default` 欄位中的 `once(today())` 只會設置一次今天的日期，如果調查員重新打開表單，則不會更新。
+   - 範例：`once(uuid())` 生成一次 UUID，並在重新編輯時保持不變。
 
 ---
 
 ### 地理函數
 
-1. `area(geoshape_value)`：計算 geoshape（多邊形）值所包圍的**面積（平方米）**。
-   - 參數是 `lat1 lon1 0 0; lat2 lon2 0 0; ...` 格式的 geoshape 字段值
-   - 範例：`area(${field_boundary})` — 計算測量田地的面積（平方米）。
-   - 範例：`round(area(${field_boundary}) div 10000, 2)` — 轉換為公頃。
+1. `area(geoshape_value)`：計算地理圖形 (geoshape/polygon) 值所包圍的 **面積（以平方米為單位）**。
+   - 參數是地理圖形欄位值，格式為 `lat1 lon1 0 0; lat2 lon2 0 0; ...`
+   - 範例：`area(${field_boundary})` —— 計算調查土地的面積（平方米）。
+   - 範例：`round(area(${field_boundary}) div 10000, 2)` —— 轉換為公頃。
 
-2. `distance(coordinates)`：計算 geotrace（線）的**總路徑長度（米）**，或兩個 geopoint 之間的距離。
-   - 對於 geotrace：`distance(${route})` 返回總路徑長度（米）。
-   - 對於兩個 geopoint：`distance(concat(${point_a}, ' ', ${point_b}))` 返回它們之間的距離。
-   - 範例：`round(distance(${road_trace}) div 1000, 3)` — 道路長度（公里）。
+2. `distance(coordinates)`：計算地理軌跡 (geotrace/line) 的 **總路徑長度（以米為單位）**，或兩個地理點 (geopoints) 之間的距離。
+   - 對於地理軌跡：`distance(${route})` 返回總路徑長度（米）。
+   - 對於兩個地理點：`distance(concat(${point_a}, ' ', ${point_b}))` 返回它們之間的距離。
+   - 範例：`round(distance(${road_trace}) div 1000, 3)` —— 道路長度（公里）。
 
 ---
 
 ### 驗證函數
 
-1. `regex(value, pattern)`：如果 `value` 與正則表達式 `pattern` 匹配則返回 `true`。在 `constraint` 欄中用於基於模式的驗證。
-   - 模式使用標準正則表達式語法（POSIX ERE 子集）。
-   - 範例：`regex(., '^[0-9]{10}$')` — 驗證 10 位數字。
-   - 範例：`regex(., '^[A-Z]{2}[0-9]{6}$')` — 驗證護照號碼格式（2 個大寫字母後跟 6 位數字）。
-   - 範例：`regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` — 基本電子郵件格式檢查。
+1. `regex(value, pattern)`：如果 `value` 匹配正規表達式 `pattern`，則返回 `true`。在 `constraint` 欄位中用於基於模式的驗證。
+   - 模式使用標準正規表達式語法（POSIX ERE 子集）。
+   - 範例：`regex(., '^[0-9]{10}$')` —— 驗證 10 位數字。
+   - 範例：`regex(., '^[A-Z]{2}[0-9]{6}$')` —— 驗證護照號碼格式（2 個大寫字母後跟 6 位數字）。
+   - 範例：`regex(., '^[^@]+@[^@]+\.[^@]{2,}$')` —— 基本電子郵件格式檢查。
 
-2. `checklist(min, max, v1, v2, ...)`：評估 boolean 表達式清單，如果 `true` 值的數量在 `min` 和 `max`（含）之間則返回 `true`。傳遞 `-1` 給 `min` 或 `max` 以跳過該界限。
-   - 範例：`checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` — 如果三個條件中正好有 2 或 3 個為真則通過。
-   - 範例：`checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` — 至少一個安全措施必須為真。
+2. `checklist(min, max, v1, v2, ...)`：評估布林表達式列表，如果 `true` 值的數量介於 `min` 和 `max` 之間（含），則返回 `true`。傳入 `-1` 給 `min` 或 `max` 以跳過該邊界。
+   - 範例：`checklist(2, 3, ${q1} = 'yes', ${q2} = 'yes', ${q3} = 'yes')` —— 如果三個條件中恰好有 2 個或 3 個為真，則通過。
+   - 範例：`checklist(1, -1, ${smoke_alarm}, ${fire_ext}, ${emergency_plan})` —— 至少有一項安全措施必須為真。
 
-3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`：與 `checklist()` 類似，但每個值都有一個權重。`true` 值的權重總和必須在 `min` 和 `max` 之間。
-   - 範例：`weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` — 現有設施的權重總和必須至少為 10。
+3. `weighted-checklist(min, max, v1, w1, v2, w2, ...)`：類似於 `checklist()`，但每個值都有權重。`true` 值的權重總和必須介於 `min` 和 `max` 之間。
+   - 範例：`weighted-checklist(10, -1, ${has_toilet}, 4, ${has_sink}, 3, ${has_shower}, 5)` —— 現有設施的權重總和必須至少為 10。
 
 ---
 
-### 實用函數
+### 工具函數
 
-1. `uuid()`：以字符串形式生成隨機 UUID（RFC 4122 v4 格式）。
+1. `uuid()`：生成一個隨機 UUID（RFC 4122 v4 格式）字串。
    - 範例：`uuid()` → `'a3f8b2c1-4d5e-6f7a-8b9c-0d1e2f3a4b5c'`
    - 通常與 `once()` 一起使用以生成穩定的唯一 ID：`once(uuid())`
 
-2. `version()`：返回設定工作表中設定的表單 `version` 屬性的值。
+2. `version()`：返回在 settings 工作表中設置的表單 `version` 屬性值。
    - 範例：`version()` → `'3.1'`
-   - 在 `calculate` 字段中用於將表單版本嵌入匯出資料。
+   - 在 `calculate` 欄位中很有用，可將表單版本嵌入到導出的數據中。
 
-3. `position()`：在**重複群組**中調用時，返回當前重複實例的基於 1 的索引。
-   - 範例：在第一個實例中 `position()` 返回 `1`，在第二個實例中返回 `2`，以此類推。
+3. `position()`：在 **重複群組 (repeat group)** 內部調用時，返回當前重複實例的從 1 開始的索引。
+   - 範例：第一個實例中的 `position()` 返回 `1`，第二個實例返回 `2`，依此類推。
+   - 另請參閱：`index()` (別名)，`indexed-repeat()` 用於從群組外部引用重複值。
 
-4. `thousandsep(length, separator, value)`：使用千位分隔符格式化數字。`length` 是最小總字符串長度（如果較短則用空格填充），`separator` 是要使用的字符（例如 `','`），`value` 是要格式化的數字。
+4. `thousandsep(length, separator, value)`：格式化帶有千分位分隔符的數字。`length` 是最小總字串長度（如果較短則補空格），`separator` 是要使用的字元（例如 `','`），而 `value` 是要格式化的數字。
    - 範例：`thousandsep(0, ',', 1234567)` → `'1,234,567'`
-   - 範例：`thousandsep(0, '.', ${income})` → 使用句點作為千位分隔符格式化收入。
+   - 範例：`thousandsep(0, '.', ${income})` —— 使用句點作為千分位分隔符來格式化收入。
 
-5. `substr-jsonpath(value, jsonpath)`：使用 JSONPath 表達式從 JSON 字符串中提取子字符串。
-   - 範例：`substr-jsonpath(${api_response}, '$.data.name')` — 從儲存在 `api_response` 中的 JSON 字符串中提取 `name` 字段。
-   - 通常與 `callapi()` 一起使用以從 API 回應中提取特定值。
+5. `substr-jsonpath(value, jsonpath)`：使用 JSONPath 表達式從 JSON 字串中提取值。
+   - `value` 必須是 JSON 字串（例如，使用 `callapi(..., 'json:', ...)` 存儲原始 API 響應的欄位）。
+   - `jsonpath` 是 JSONPath 表達式（例如 `'$.data.name'`，`'$.items[0].id'`）。
+   - 始終返回 **字串** —— 在算術運算中使用時請用 `number()` 包裝。
+   - 如果找不到路徑或 `value` 不是有效的 JSON，則返回空字串 `''`。
+   - 範例：`substr-jsonpath(${api_response}, '$.data.name')` —— 提取 `name` 欄位。
+   - 範例：`substr-jsonpath(${api_response}, '$.items[0].label')` —— 數組的第一個元素。
+   - 範例：`number(substr-jsonpath(${api_response}, '$.price'))` —— 提取數值。
+   - 通常與 `callapi(..., 'json:', ...)` 配合使用，從一個 API 響應中提取多個欄位。請參閱 [從一次 API 調用中獲取多個值](../advanced-features/call-api#fetching-multiple-values-from-one-api-call)。

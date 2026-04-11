@@ -1,15 +1,15 @@
 ---
 title: "Dynaaminen haku"
-description: "Dynaaminen haku lataa valinnat etäpalvelimelta API:n kautta reaaliaikaisesti luetteloijan kirjoittaessa, mahdollistaen suuret tai usein päivittyvät tietoaineistot."
+description: "Dynaaminen haku lataa vaihtoehdot etä-API:sta reaaliajassa kerääjän kirjoittaessa, mikä mahdollistaa suurten tai usein päivittyvien tietojoukkojen käytön."
 ---
 
-**Dynaaminen haku** (tunnetaan myös nimellä Search API) mahdollistaa `select_one`-, `select_multiple`- tai `text`-kentän valintojen lataamisen etäpalvelulta **suorituksenaikaisesti** luetteloijan kirjoittaessa. Tämä on oikea lähestymistapa, kun valintalista on liian suuri sisällytettäväksi CSV-tiedostoon, päivittyy usein tai tulee live-tietokannasta.
+**Dynaaminen haku** (kutsutaan myös nimellä Search API) mahdollistaa `select_one`-, `select_multiple`- tai `text`-kentän vaihtoehtojen lataamisen etäpalvelusta **ajon aikana** kerääjän kirjoittaessa. Tämä on oikea lähestymistapa, kun vaihtoehtoluettelosi on liian suuri sisällytettäväksi CSV-tiedostoon, se päivittyy usein tai se on peräisin reaaliaikaisesta tietokannasta.
 
 ---
 
-## `search-api()`-ulkoasu
+## `search-api()` ulkoasu (appearance)
 
-Dynaaminen haku konfiguroidaan `appearance`-sarakkeessa käyttämällä `search-api()`-funktiota:
+Dynaaminen haku konfiguroidaan `appearance`-sarakkeen kautta käyttämällä `search-api()`-funktiota:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -18,26 +18,26 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 ### Parametrit
 
 | Parametri | Kuvaus |
-|-----------|--------|
-| `method` | Käytä aina `'POST'` |
-| `url` | Kyselyyn käytettävä API-päätepiste |
-| `post_body` | API:lle lähetetty JSON-runko. Käytä `%__input__%` paikkamerkkinä luetteloijan nykyiselle hakutekstille |
-| `value_column` | Avain vastausobjektissa, jota käytetään tallennetuksi **arvoksi** |
-| `display` | Avain (tai malli) pudotusvalikossa näytettäväksi **otsikoksi**. Tukee `##key##`-paikkamerkkejä ja `@{func}`-lausekkeita |
-| `data_path` | JSONPath tulosobjektien taulukkoon vastauksessa (esim. `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | Nimi, jonka alle raaka vastaus tallennetaan muiden kenttien käyttöön |
+|-----------|-------------|
+| `method` | Käytä aina arvoa `'POST'` |
+| `url` | API-päätepiste, josta kysely tehdään |
+| `post_body` | API:lle lähetettävä JSON-runko. Käytä `%__input__%`-paikkamerkkiä kerääjän nykyiselle hakutekstille |
+| `value_column` | Vastausobjektin avain, jota käytetään tallennettuna **arvona** (value) |
+| `display` | Avain (tai malli), jota käytetään pudotusvalikossa näkyvänä **otsikkona** (label). Tukee `##key##`-paikkamerkkejä ja `@{func}`-lausekkeita |
+| `data_path` | JSONPath vastauksen tulosobjektien taulukkoon (esim. `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Nimi, jolla raaka vastaus tallennetaan muiden kenttien käyttöä varten |
 
 ---
 
 ## Perusesimerkki
 
-Terveydenhuollon toimipaikan haku, jossa luetteloija kirjoittaa osan toimipaikan nimestä:
+Terveyslaitoksen haku, jossa kerääjä kirjoittaa osan laitoksen nimestä:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one | facility | Valitse terveydenhuollon toimipaikka | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+| select_one | facility | Valitse terveyslaitos | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-API vastaanottaa `{"query": "nair"}`, kun luetteloija kirjoittaa "nair" ja palauttaa:
+API vastaanottaa tiedon `{"query": "nair"}`, kun kerääjä kirjoittaa "nair", ja palauttaa:
 
 ```json
 {
@@ -48,11 +48,11 @@ API vastaanottaa `{"query": "nair"}`, kun luetteloija kirjoittaa "nair" ja palau
 }
 ```
 
-Pudotusvalikko näyttää `Nairobi Central Clinic` ja `Nairobi West Hospital`; tallennettu arvo on `HF001` tai `HF002`.
+Pudotusvalikossa näkyvät `Nairobi Central Clinic` ja `Nairobi West Hospital`; tallennettu arvo on `HF001` tai `HF002`.
 
 ---
 
-## Edistynyt näyttömuotoilu
+## Kehittynyt näyttömuotoilu
 
 ### `##key##`-mallien käyttö
 
@@ -66,7 +66,7 @@ Näytetään muodossa: `Nairobi Central Clinic (Nairobi)`.
 
 ### `@{func}`-lausekkeiden käyttö
 
-Sovella ehdollista logiikkaa näyttöotsikossa:
+Käytä ehdollista logiikkaa näyttöotsikossa:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Aktiiviset tulokset näyttävät `✓ Klinikan nimi`; passiiviset näyttävät `✗ Klinikan nimi`.
+Aktiiviset tulokset näyttävät `✓ Clinic Name`; ei-aktiiviset näyttävät `✗ Clinic Name`.
 
 ---
 
 ## Oletusarvon asettaminen: `search-default-api()`
 
-Käytä `search-default-api()`:tä `search-api()`:n jälkeen esitäyttääksesi kenttä oletusvalinnalla, joka ladataan erillisestä API-kutsusta (esim. olemassa olevan tietueen muokkaamisen yhteydessä):
+Käytä `search-default-api()`-funktiota `search-api()`-funktion jälkeen esitäyttääksesi kentän oletusvalinnalla, joka ladataan erillisestä API-kutsusta (esim. muokattaessa olemassa olevaa tietoa):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -88,9 +88,9 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## Mukautettu erotin select_multiple:lle: `search-default-separator()`
+## Mukautettu erotin select_multiple-kentälle: `search-default-separator()`
 
-`select_multiple`-kentille määritä, miten useita valittuja arvoja yhdistetään tallennetussa merkkijonossa:
+Määritä `select_multiple`-kentille, kuinka useat valitut arvot yhdistetään tallennetussa merkkijonossa:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
@@ -103,35 +103,94 @@ Oletuserotin on välilyönti.
 ## Tuetut kysymystyypit
 
 | Kysymystyyppi | Käyttötapaus |
-|---------------|--------------|
-| `select_one` | Yksittäinen valinta hakutuloksista |
+|---------------|----------|
+| `select_one` | Yksi valinta hakutuloksista |
 | `select_multiple` | Useita valintoja hakutuloksista |
-| `text` | Automaattinen täydennys — luetteloija kirjoittaa vapaasti mutta voi valita ehdotuksen |
+| `text` | Automaattinen täydennys — kerääjä kirjoittaa vapaasti, mutta voi valita ehdotuksen |
 
 ---
 
-## Tallennetun vastausdatan käyttö
+## Tallennetun vastaustiedon käyttö
 
-`save_path` tallentaa täyden API-vastausobjektin annetun nimen alle. Muut kentät voivat viitata siihen `pulldata()`:llä:
+Kun kerääjä valitsee tuloksen, rtSurvey tallentaa koko vastaavan objektin vastauksesta `save_path`-nimen alle. Muut kentät voivat lukea siitä kahdella tavalla.
+
+### Tapa 1 — `pulldata()`-haku
+
+Käytä `pulldata('save_path', 'key')`-funktiota lukeaksesi ylätason kentän tallennetusta objektista:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Valitse toimipaikka | `search-api(..., 'facility_data')` |
+| select_one | facility | Valitse laitos | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+`select_one`-rivin ulkoasun on sisällettävä `search-api(..., 'facility_data')` vastaavalla `save_path`-arvolla.
+
+**Sisäkkäisille JSON-kentille** yhdistä `substr-jsonpath()`-funktioon:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## Paikallisen tiedoston haku search()-funktiolla
+
+`search()` suorittaa offline-tilassa sarakkeiden vertailuun perustuvia hakuja paketoidusta SQLite `.db` -tiedostosta — verkkoyhteyttä tai SQL-kyselyitä ei tarvita. Käytä tätä, kun viitetietosi on pakattu lomakkeen mukaan ja tarvitset yksinkertaisen "etsi kaikki rivit, joissa sarake on yhtä suuri kuin arvo" -haun.
+
+### Allekirjoitus (Signature)
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Parametrit
+
+| Parametri | Kuvaus |
+|-----------|-------------|
+| `path` | Polku SQLite-taulukkoon: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Vertailuoperaattori — palauttaa rivit, joissa sarake on yhtä suuri kuin arvo |
+| `'list_name'` | Sarakkeen nimi, jota vastaan verrataan |
+| `${field}` | Verrattava arvo; yleensä kenttäviittaus |
+
+### Esimerkki
+
+Täytä `select_one` paikallisesta tietokannasta vertaamalla `${d307}`-arvoa `list_name`-sarakkeeseen `d307.db`-tiedoston `externalData`-taulukossa:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Valitse laitos | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Kun `${d307}` on yhtä suuri kuin `"HF001"`, `search()` palauttaa jokaisen rivin `externalData`-taulukosta, jossa `list_name = 'HF001'` — täysin paketoidusta tiedostosta ilman verkkokutsua.
+
+### search() vs rawquery-automaattitäydennys
+
+| Ominaisuus | `search()` | `rawquery`-automaattitäydennys |
+|---------|-----------|------------------------|
+| SQL-kyselyt | Ei — vain sarakkeiden vertailu | Kyllä — täysi `SELECT … FROM …` |
+| Parametrisoitu syöte | Sarakkeen arvon vertailu | Upotettu SQL-merkkijonoon |
+| Vapaatekstisyöttö | Kyllä — kerääjä voi kirjoittaa vapaasti | Ei — täytyy valita luettelosta |
+| UNION / usean taulukon kysely | Ei tuettu | Tuettu |
+
+### Milloin kumpaakin käytetään
+
+- Käytä **`search()`**-funktiota, kun tarvitset suoran yhtäläisyysvertailun paketoitua `.db`-tiedostoa vastaan, lomakkeen on toimittava offline-tilassa ja haluat sallia vapaatekstisyötön.
+- Käytä **`rawquery`-automaattitäydennystä**, kun tarvitset SQL:n joustavuutta (JOINit, UNIONit, laskennalliset sarakkeet) tai sinun on tehtävä kyselyitä useisiin taulukoihin, ja lomakkeella on luotettava yhteys.
 
 ---
 
 ## Parhaat käytännöt
 
-1. Varmista, että API-päätepiste vastaa 1–2 sekunnin sisällä — hitaat API:t tekevät hausta epämiellyttävää.
-2. Käytä `%__input__%` `post_body`-kohdassa niin, että API palauttaa vain vastaavat tulokset eikä koko tietoaineistoa.
-3. Indeksoi hakukenttä palvelinpuolella (esim. Elasticsearch, tietokannan kokotekstihakemisto) nopeita vastauksia varten.
-4. Rajoita tulokset 20–50 kohteeseen per kysely — tuhansien tulosten palauttaminen vie haun tarkoituksen.
-5. Sisällytä API:iin minimikirjoitusmäärän vaatimus välttääksesi laajojen kyselyjen käynnistämistä yksittäisillä merkillä.
+1. Varmista, että API-päätepisteesi vastaa 1–2 sekunnissa — hitaat API:t saavat haun tuntumaan kankealta.
+2. Käytä `%__input__%`-paikkamerkkiä `post_body`-osassa, jotta API palauttaa vain vastaavat tulokset, ei koko tietojoukkoa.
+3. Indeksoi hakukenttä palvelinpuolella (esim. Elasticsearch, tietokannan kokoteksti-indeksi) nopeiden vastausten varmistamisemaiseksi.
+4. Rajoita tulokset 20–50 kohteeseen kyselyä kohden — tuhansien tulosten palauttaminen kumoaa haun tarkoituksen.
+5. Sisällytä API:han vaatimus syötteen vähimmäispituudesta, jotta vältetään laajojen kyselyiden käynnistyminen yhden merkin syötteillä.
 
 ## Rajoitukset
 
 - Dynaaminen haku vaatii verkkoyhteyden — se ei toimi offline-tilassa.
-- `%__input__%`-paikkamerkki injektoidaan sellaisenaan; suorita palvelinpuolella syötteiden puhdistus injection-hyökkäysten estämiseksi.
-- Monimutkaisilla `@{func}`-näyttölausekkeilla saattaa olla rajoitettu tuki kaikissa rtSurvey-asiakasversioissa.
+- `%__input__%`-paikkamerkki sijoitetaan sellaisenaan; puhdista syötteet palvelinpuolella injektiohyökkäysten estämiseksi.
+- Monimutkaisilla `@{func}`-näyttölausekkeilla voi olla rajoitettu tuki eri rtSurvey-asiakasversioissa.

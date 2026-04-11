@@ -1,14 +1,14 @@
 ---
 title: "Stile HTML"
-description: "rtSurvey supporta i tag HTML nelle etichette e nei suggerimenti, consentendo formattazione di testo avanzata, link e temi di colore dinamici."
+description: "rtSurvey supporta i tag HTML nelle etichette e nei suggerimenti, consentendo la formattazione di testo ricco, collegamenti e temi di colore dinamici."
 ---
 
 import { Callout } from 'nextra/components'
 
-rtSurvey renderizza il testo di **label** e **hint** come HTML sui moduli web. Questo significa che puoi usare tag HTML standard per formattare il testo, aggiungere interruzioni di riga, creare link e applicare colori. Questo è particolarmente utile per i campi note, le istruzioni di sezione e i riepiloghi dinamici.
+rtSurvey esegue il rendering del testo di **etichetta (label)** e **suggerimento (hint)** come HTML sui moduli web. Ciò significa che è possibile utilizzare i tag HTML standard per formattare il testo, aggiungere interruzioni di riga, creare collegamenti e applicare colori. Questo è particolarmente utile per i campi nota, le istruzioni di sezione e i riepiloghi dinamici.
 
 <Callout type="warning">
-L'HTML nelle etichette viene renderizzato sul **modulo web** e nelle app mobili di rtSurvey. Potrebbe non essere renderizzato in tutti i client compatibili con ODK. Testa sempre sulla tua piattaforma di destinazione.
+L'HTML nelle etichette viene renderizzato sul **modulo web** e sulle app mobili rtSurvey. Potrebbe non essere renderizzato in tutti i client compatibili con ODK. Testare sempre sulla piattaforma di destinazione.
 </Callout>
 
 ---
@@ -23,119 +23,189 @@ L'HTML nelle etichette viene renderizzato sul **modulo web** e nelle app mobili 
 | `<em>testo</em>` o `<i>testo</i>` | *Testo in corsivo* |
 | `<u>testo</u>` | Testo sottolineato |
 | `<br>` | Interruzione di riga |
-| `<span style="...">testo</span>` | Stile inline |
+| `<span style="...">testo</span>` | Stile in linea |
 
-### Link
+### Collegamenti
 
 ```html
-<a href="https://example.com" target="_blank">Fai clic qui</a>
+<a href="https://example.com" target="_blank">Clicca qui</a>
 ```
 
-Si apre in una nuova scheda. Usalo per documenti di riferimento, linee guida o risorse esterne che l'intervistatore dovrebbe consultare.
+Si apre in una nuova scheda. Utilizzare per documenti di riferimento, linee guida o risorse esterne che il rilevatore dovrebbe consultare.
 
 ### Colori
 
-Usa `<span>` con stili inline:
+Usa `<span>` con stili in linea:
 
 ```html
-<span style="color: red;">Avviso: il valore è fuori range</span>
-<span style="color: #009688;">Sezione completata</span>
+<span style="color: red;">Warning: value is out of range</span>
+<span style="color: #009688;">Section completed</span>
 ```
 
 ---
 
-## Variabili del tema colore
+## Variabili del tema di colore
 
-rtSurvey supporta **token del tema colore** che si adattano al tema configurato dell'app. Usa la sintassi `__COLOR_THEME_NAME__`:
+rtSurvey supporta i **token del tema di colore** che si adattano al tema configurato dell'app. Usa la sintassi `__COLOR_THEME_NAME__`:
 
 ```html
-<span style="color: var(--color-theme-primary);">Testo colore primario</span>
+<span style="color: var(--color-theme-primary);">Primary color text</span>
 ```
 
-O usando la forma abbreviata del token nel testo dell'etichetta:
+Oppure utilizzando la scorciatoia del token nel testo dell'etichetta:
 
 ```
-<font color="var(--COLOR_THEME_PRIMARY)">Nota importante</font>
+<font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
 ```
 
-Questo viene automaticamente convertito nell'equivalente `<span>` con una variabile CSS al momento del rendering.
+Questo viene convertito automaticamente nell'equivalente `<span>` con una variabile CSS al momento del rendering.
 
 ---
 
-## Etichette multilingua
+## Etichette multilingue
 
-Racchiudi il contenuto in tag lingua per supportare più lingue in una singola cella di etichetta:
+Racchiudi il contenuto nei tag di lingua per supportare più lingue in una singola cella di etichetta:
 
 ```
 <en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
 ```
 
-rtSurvey estrae il contenuto corrispondente alla lingua corrente dell'app. Se non viene trovato alcun tag lingua corrispondente, viene mostrata l'intera stringa così com'è.
+rtSurvey estrae il contenuto corrispondente alla lingua corrente dell'app. Se non viene trovato alcun tag di lingua corrispondente, l'intera stringa viene mostrata così com'è.
 
 ---
 
-## Esempi nei campi note
+## Esempi nei campi nota
 
 ### Istruzione di sezione con grassetto e interruzione di riga
 
 | type | name | label |
 |------|------|-------|
-| note | section_intro | `<strong>Sezione 3: Uso del suolo</strong><br>Poni tutte le domande di questa sezione solo al capofamiglia.` |
+| note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
 
 ### Riepilogo dinamico con riferimento al calcolo
 
 | type | name | label |
 |------|------|-------|
 | calculate | total | | `${adults} + ${children}` |
-| note | summary | `Membri totali del nucleo familiare: <strong>${total}</strong><br><span style="color: gray;">Adulti: ${adults} · Bambini: ${children}</span>` |
+| note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
 
 ### Avviso in rosso
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| note | age_warning | `<span style="color: red;"><strong>Avviso:</strong> L'età inserita (${age}) è insolitamente alta. Si prega di verificare.</span>` | `${age} > 100` |
+| note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
 
-### Link a un documento di riferimento
+### Collegamento a un document di riferimento
 
 | type | name | label |
 |------|------|-------|
-| note | guidelines_link | `Consulta le <a href="https://docs.example.com/guidelines" target="_blank">Linee guida sul campo</a> prima di iniziare questa sezione.` |
+| note | guidelines_link | `Refer to the <a href="https://docs.example.com/guidelines" target="_blank">Field Guidelines</a> before starting this section.` |
 
 ---
 
 ## Tag HTML speciali di rtSurvey
 
-### `<webbox src='url' title='titolo'>...</webbox>`
+### `<webbox src='url' title='title'>...</webbox>`
 
-Incorpora un pulsante che apre un URL in un modale nel modulo. Vedi [Webbox](webbox) per i dettagli completi.
+Incorpora un pulsante che apre un URL in un modale all'interno del modulo. Vedere [Webbox](webbox) per tutti i dettagli.
 
-### `<delete-repeat-current>etichetta</delete-repeat-current>`
+### `<delete-repeat-current>label</delete-repeat-current>`
 
-Renderizza un pulsante all'interno di un gruppo di ripetizioni che elimina l'istanza di ripetizione corrente quando viene toccato.
+Esegue il rendering di un pulsante all'interno di un gruppo di ripetizione che elimina l'istanza di ripetizione corrente quando viene toccato.
 
-### `<delete-repeat-last>etichetta</delete-repeat-last>`
+### `<delete-repeat-last>label</delete-repeat-last>`
 
-Renderizza un pulsante che elimina l'ultima istanza di ripetizione.
+Esegue il rendering di un pulsante che elimina l'ultima istanza di ripetizione.
 
-Esempio di utilizzo in un gruppo di ripetizioni:
+Esempio di utilizzo in un gruppo di ripetizione:
 
 | type | name | label |
 |------|------|-------|
-| note | delete_btn | `<delete-repeat-current>Rimuovi questo membro</delete-repeat-current>` |
+| note | delete_btn | `<delete-repeat-current>Remove this member</delete-repeat-current>` |
 
 ---
 
-## Best practice
+## Riepiloghi HTML dinamici con autopull()
 
-1. Usa l'HTML con parsimonia — le etichette troppo formattate sono più difficili da leggere, non più facili.
-2. Preferisci `<strong>` per il grassetto e `<em>` per il corsivo rispetto ai deprecati `<b>` e `<i>`.
-3. Mantieni l'uso del colore significativo — usa il rosso per gli avvisi, non per la decorazione.
-4. Testa sempre il rendering HTML sia sull'app mobile che sul modulo web, poiché il rendering potrebbe differire leggermente.
-5. Evita i tag `<table>` nelle etichette — raramente si renderizzano bene sugli schermi mobili.
-6. Non usare JavaScript (`<script>`) — verrà rimosso o causerà errori.
+`autopull()` esegue il rendering di un blocco di HTML all'interno di un campo `note` e **lo rivaluta ad ogni modifica di campo** nel modulo. Questo lo rende adatto per pannelli di riepilogo in tempo reale, schermate di revisione prima dell'invio e totali parziali che si aggiornano man mano che il rilevatore compila i dati.
+
+<Callout type="info">
+`autopull()` funziona solo sui campi **nota**. La colonna etichetta (label) viene ignorata — tutto il contenuto HTML deve essere fornito tramite la colonna **aspetto (appearance)** utilizzando `concat()`.
+</Callout>
+
+### Sintassi
+
+Posiziona `autopull()` nella colonna **aspetto (appearance)** di un campo `note`:
+
+```
+autopull(concat('<html>...</html>'))
+```
+
+I riferimenti ai campi (`${field_name}`) all'interno di `concat()` vengono sostituiti con i valori correnti in tempo reale e l'HTML viene renderizzato nuovamente ad ogni modifica.
+
+### Limitazione dell'altezza con scroll-view()
+
+Per riepiloghi più lunghi, combina `autopull()` con `scroll-view(N%)` per limitare l'altezza del pannello e renderlo scorrevole:
+
+```
+scroll-view(45%) autopull(concat('<html>...</html>'))
+```
+
+Il valore `N%` è relativo all'area visibile del modulo. `45%` è un valore predefinito pratico per un pannello di riepilogo a metà pagina.
+
+### Esempio completo — riepilogo della posizione del nucleo familiare
+
+Il seguente campo `note` esegue il rendering di una tabella a due colonne che mostra la provincia, il distretto e il comune selezionati. Si aggiorna automaticamente ogni volta che cambiano `${tinh_name}`, `${huyen_name}` o `${xa_name}`.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | location_summary | | `scroll-view(45%) autopull(concat('<html><table style="width:100%;border-collapse:collapse"><tr><td style="padding:4px;font-weight:bold">Province:</td><td style="padding:4px">', ${tinh_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">District:</td><td style="padding:4px">', ${huyen_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Commune:</td><td style="padding:4px">', ${xa_name}, '</td></tr></table></html>'))` |
+
+In XLSForm il valore dell'aspetto è scritto in una singola cella:
+
+```
+scroll-view(45%) autopull(concat(
+  '<html><table style="width:100%;border-collapse:collapse">
+   <tr><td style="padding:4px;font-weight:bold">Province:</td>
+       <td style="padding:4px">', ${tinh_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">District:</td>
+       <td style="padding:4px">', ${huyen_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Commune:</td>
+       <td style="padding:4px">', ${xa_name}, '</td></tr>
+   </table></html>'))
+```
+
+### Stili in linea
+
+Gli attributi `style="..."` in linea su qualsiasi elemento HTML sono supportati e rappresentano il modo consigliato per applicare la formattazione visiva all'interno dei blocchi `autopull()`.
+
+Quanto segue **non** è supportato all'interno del contenuto di `autopull()`:
+
+- Blocchi `<style>`
+- Tag `<link>` per fogli di stile esterni
+- JavaScript (`<script>`)
+
+### Quando usare autopull()
+
+| Caso d'uso | Note |
+|----------|-------|
+| Schermata di revisione prima dell'invio | Mostra tutte le risposte chiave su un unico pannello prima che il rilevatore finisca |
+| Totali parziali | Visualizza una somma calcolata che si aggiorna man mano che vengono inserite le quantità |
+| Pannello di riferimento visibile | Mostra un valore di ricerca selezionato (ad es. nome della provincia) mentre il rilevatore compila i campi figli |
+
+---
+
+## Buone pratiche
+
+1. Usa l'HTML con parsimonia — le etichette eccessivamente formattate sono più difficili da leggere.
+2. Preferisci `<strong>` per il grassetto ed `<em>` per il corsivo rispetto ai tag deprecati `<b>` e `<i>`.
+3. Mantieni un uso dei colori significativo — usa il rosso per gli avvisi, non per decorazione.
+4. Testare sempre il rendering HTML sia sull'app mobile che sul modulo web, poiché la visualizzazione potrebbe variare leggermente.
+5. Evita i tag `<table>` all'interno delle etichette — raramente vengono renderizzati bene sugli schermi mobili.
+6. Non utilizzare JavaScript (`<script>`) — verrà rimosso o causerà errori.
 
 ## Limitazioni
 
-- L'HTML complesso (tabelle, form, script) non è supportato e potrebbe rompere il rendering.
-- Alcuni client mobili più vecchi potrebbero visualizzare i tag HTML come testo letterale — testa su tutti i dispositivi di destinazione.
-- I link `<a>` si aprono in un browser o WebView — l'intervistatore lascia il modulo, il che può essere dirompente su mobile.
+- L'HTML complesso (tabelle, moduli, script) non è supportato e potrebbe interrompere il rendering.
+- Alcuni client mobili più vecchi potrebbero visualizzare i tag HTML come testo letterale — testare su tutti i dispositivi di destinazione.
+- I collegamenti `<a>` si aprono in un browser o in una WebView — il rilevatore lascia il modulo, il che può essere fonte di distrazione sul cellulare.

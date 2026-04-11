@@ -1,70 +1,250 @@
 ---
-title: "Advanced Repeats"
-description: "Advanced patterns សម្រាប់ repeat groups: dynamic counts, nested repeats, summarising repeat data, និង referencing values across repeats។"
+title: "ការប្រើប្រាស់ Repeat កម្រិតខ្ពស់"
+description: "លំនាំកម្រិតខ្ពស់សម្រាប់ក្រុម repeat៖ ការកំណត់ចំនួនឌីណាមិក, repeat ត្រួតគ្នា, ការសង្ខេបទិន្នន័យ repeat, និងការយោងតម្លៃឆ្លងកាត់ repeat។"
 ---
 
-## ចំនួនការដដែលៗថាមវន្ត
+ទំព័រនេះគ្របដណ្តប់លើលំនាំកម្រិតខ្ពស់សម្រាប់ធ្វើការជាមួយក្រុម repeat នៅក្នុង rtSurvey។ សម្រាប់មូលដ្ឋានគ្រឹះនៃការរៀបចំក្រុម repeat សូមមើល [ការដាក់ជាក្រុម និងការធ្វើ Repeat](../repeats)។
+
+---
+
+## ចំនួន repeat ឌីណាមិក
+
+តាមលំនាំដើម អ្នកប្រមូលទិន្នន័យជាអ្នកសម្រេចចិត្តថាតើត្រូវ repeat ប៉ុន្មានដង។ អ្នកអាចកំណត់ចំនួនដងនៃការ repeat ដោយប្រើ `repeat_count`៖
 
 | type | name | label | repeat_count |
 |------|------|-------|--------------|
-| begin_repeat | household_members | Household member | `${num_members}` |
-| text | member_name | Member name | |
-| integer | member_age | Age | |
+| begin_repeat | household_members | សមាជិកគ្រួសារ | `${num_members}` |
+| text | member_name | ឈ្មោះសមាជិក | |
+| integer | member_age | អាយុ | |
 | end_repeat | | | |
+
+ការ repeat នឹងដំណើរការយ៉ាងពិតប្រាកដចំនួន `${num_members}` ដង ដែល `num_members` ត្រូវបានប្រមូលពីមុននៅក្នុងទម្រង់បែបបទ។ អ្នកប្រមូលទិន្នន័យមិនអាចបន្ថែម ឬលុប instance បានទេ។
 
 ---
 
-## ការចូលប្រើដោយលំដាប់: `indexed-repeat()`
+## ការចូលប្រើតាមលិបិក្រម (Indexed access)៖ `indexed-repeat()`
+
+ចូលប្រើតម្លៃវាលនៃ instance ជាក់លាក់មួយពី **ខាងក្រៅ** ក្រុម repeat ដោយប្រើ `indexed-repeat(repeatedField, repeatGroup, index)`៖
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | first_name | | `indexed-repeat(${member_name}, ${household_members}, 1)` |
+| calculate | second_name | | `indexed-repeat(${member_name}, ${household_members}, 2)` |
+
+វាមានប្រយោជន៍សម្រាប់បង្កើតវាលសង្ខេប ឬការយោងទិន្នន័យសមាជិក "ចម្បង" បន្ទាប់ពីការ repeat។
 
 ---
 
-## ទីតាំងឧទាហរណ៍បច្ចុប្បន្ន: `index()`
+## ទីតាំង instance បច្ចុប្បន្ន៖ `index()`
+
+នៅក្នុងក្រុម repeat, `index()` ផ្តល់មកវិញនូវទីតាំងដែលចាប់ផ្តើមពីលេខ ១ នៃ instance បច្ចុប្បន្ន។ ប្រើវាដើម្បីដាក់ស្លាកការ repeat នីមួយៗ ឬបង្កើតលេខសម្គាល់តែមួយគត់៖
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | plots | Plot |
-| note | plot_label | Plot number `${index()}` |
+| begin_repeat | plots | ឡូត៍ដី |
+| note | plot_label | ឡូត៍ដីលេខ `${index()}` |
+| text | plot_id | លេខសម្គាល់ឡូត៍ដី |
 | end_repeat | | |
 
 ---
 
-## ការសង្ខេបទិន្នន័យដដែលៗ
+## ការយោងវាលនៅក្នុង instance តែមួយ
 
-| Function | Example | ការពិពណ៌នា |
+នៅក្នុង repeat, ប្រើ `${fieldname}` ដើម្បីយោងទៅវាលមួយផ្សេងទៀត **នៅក្នុង instance នៃ repeat តែមួយ**។ មិនចាំបាច់ប្រើ `indexed-repeat()` នៅក្នុងរង្វង់ (loop) តែមួយទេ៖
+
+| type | name | label | relevant |
+|------|------|-------|----------|
+| begin_repeat | members | សមាជិក | |
+| text | member_name | ឈ្មោះ | |
+| integer | member_age | អាយុ | |
+| text | school_name | ឈ្មោះសាលា | `${member_age} < 18` |
+| end_repeat | | | |
+
+---
+
+## ការយោងវាលមេ (parent) ពីក្នុង repeat
+
+វាលនៅខាងក្រៅ (ខាងលើ) ក្រុម repeat អាចត្រូវបានយោងតាមធម្មតាជាមួយ `${fieldname}`៖
+
+| type | name | label |
+|------|------|-------|
+| text | village | ឈ្មោះភូមិ |
+| begin_repeat | plots | ឡូត៍ដីកសិកម្ម |
+| note | plot_context | ឡូត៍ដីនៅក្នុងភូមិ `${village}` |
+| end_repeat | | |
+
+---
+
+## ការសង្ខេបទិន្នន័យ repeat
+
+ប្រើអនុគមន៍សរុប (aggregate functions) របស់ repeat **នៅខាងក្រៅ** ក្រុម repeat ដើម្បីសង្ខេប៖
+
+| អនុគមន៍ | ឧទាហរណ៍ | ការពិពណ៌នា |
 |----------|---------|-------------|
-| `count(group)` | `count(${household_members})` | ចំ នួ ន instances |
-| `sum(field)` | `sum(${loan_amount})` | Sum |
-| `min(field)` | `min(${member_age})` | Minimum |
-| `max(field)` | `max(${member_age})` | Maximum |
-| `join(sep, field)` | `join(', ', ${member_name})` | Comma-separated list |
-| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | Conditional count |
+| `count(group)` | `count(${household_members})` | ចំនួន instance |
+| `sum(field)` | `sum(${loan_amount})` | ផលបូកនៃវាលលេខ |
+| `min(field)` | `min(${member_age})` | តម្លៃតូចបំផុត |
+| `max(field)` | `max(${member_age})` | តម្លៃធំបំផុត |
+| `join(sep, field)` | `join(', ', ${member_name})` | បញ្ជីបំបែកដោយសញ្ញាក្បៀស |
+| `count-if(group, expr)` | `count-if(${members}, ${member_age} < 18)` | ការរាប់តាមលក្ខខណ្ឌ |
+| `sum-if(field, expr)` | `sum-if(${loan_amount}, ${loan_amount} > 500)` | ផលបូកតាមលក្ខខណ្ឌ |
+| `join-if(sep, field, expr)` | `join-if(', ', ${name}, ${age} >= 18)` | ការភ្ជាប់តាមលក្ខខណ្ឌ |
+
+### ឧទាហរណ៍៖ សេចក្ដីសង្ខេបគ្រួសារ
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | num_members | តើមានសមាជិកប៉ុន្មាននាក់? | |
+| begin_repeat | members | សមាជិក | `${num_members}` |
+| text | member_name | ឈ្មោះ | |
+| integer | member_age | អាយុ | |
+| end_repeat | | | |
+| calculate | total_members | | `count(${members})` |
+| calculate | children_count | | `count-if(${members}, ${member_age} < 18)` |
+| calculate | adult_names | | `join-if(', ', ${member_name}, ${member_age} >= 18)` |
+| note | summary | សមាជិក `${total_members}` នាក់; `${children_count}` នាក់អាយុក្រោម ១៨ ឆ្នាំ។ មនុស្សពេញវ័យ៖ `${adult_names}` | |
 
 ---
 
-## ការដដែលៗដំឡើងក្នុង
+## Repeat ត្រួតគ្នា (Nested repeats)
+
+ក្រុម repeat អាចមានក្រុម repeat ផ្សេងទៀតនៅខាងក្នុងវា។ សូមប្រើវាដោយប្រុងប្រយ័ត្ន — repeat ត្រួតគ្នាបង្កើនភាពស្មុគស្មាញ និងអាចធ្វើឱ្យអ្នកប្រមូលទិន្នន័យមានការភាន់ច្រឡំ។
 
 | type | name | label |
 |------|------|-------|
-| begin_repeat | households | Household |
-| text | hh_id | Household ID |
-| begin_repeat | hh_members | Member |
-| text | member_name | Member name |
+| begin_repeat | households | គ្រួសារ |
+| text | hh_id | លេខសម្គាល់គ្រួសារ |
+| begin_repeat | hh_members | សមាជិក |
+| text | member_name | ឈ្មោះសមាជិក |
 | end_repeat | | |
 | end_repeat | | |
+
+ដើម្បីយោងទៅវាលនៅក្នុង repeat ខាងក្រៅពីក្នុង repeat ខាងក្នុង, ប្រើ `${fieldname}` — វានឹងស្វែងរក ancestor ដែលត្រូវគ្នាជិតបំផុត៖
+
+នៅខាងក្នុង repeat `hh_members`, `${hh_id}` នឹងផ្តល់មកវិញនូវលេខសម្គាល់នៃគ្រួសារ **បច្ចុប្បន្ន** មិនមែនគ្រប់គ្រួសារទាំងអស់នោះទេ។
 
 ---
 
-## វិធីល្អបំផុត
+## ចំណាត់ថ្នាក់ក្នុងក្រុម repeat៖ `rank-index()`
 
-1. ប ្ រ ើ `repeat_count` ពេ ល ចំ នួ ន repetitions ត ្ រ ូ វ ប ា ន ដ ឹ ង ।
-2. ដ ា ក ់ ឈ ្ ម ោ ះ repeat groups ដ ោ យ ច ា ស ់ ។
-3. Test ជ ា ម ួ យ ចំ នួ ន instances ច ្ រ ើ ន ។
+នៅពេលវាល `rank` មាននៅខាងក្នុង repeat, ប្រើ `rank-index(instanceNumber, repeatedField)` ពីខាងក្រៅដើម្បីទទួលបានចំណាត់ថ្នាក់នៃ instance ជាក់លាក់មួយ៖
 
-## ដែនកំណត់
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | top_scorer | | `rank-index(1, ${score})` |
 
-- `indexed-repeat()` ត ្ រ ូ វ ក ា រ index valid ។
-- Nested repeats ច ្ រ ើ ន ជ ា ង 2 levels ម ិ ន ណ ែ ន ា ំ ។
+`rank-index(1, ${score})` ផ្តល់មកវិញនូវលិបិក្រម instance នៃពិន្ទុខ្ពស់បំផុត។
+
+---
+
+## រូបរាង `1screen` លើ `begin_repeat`
+
+ការបន្ថែម `1screen` ទៅក្នុងជួរឈរ `appearance` នៃជួរ `begin_repeat` បង្ហាញសំណួរទាំងអស់សម្រាប់ instance នីមួយៗជាមួយគ្នានៅលើអេក្រង់តែមួយ ជាជាងសំណួរមួយក្នុងមួយអេក្រង់។
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | household_members | សមាជិកគ្រួសារ | `1screen` |
+| text | member_name | ឈ្មោះសមាជិក | |
+| integer | member_age | អាយុ | |
+| end_repeat | | | |
+
+នៅពេល `1screen` ត្រូវបានកំណត់ ហើយមិនមានវាល `repeat_count` និងមិនមានវាល `add_repeat` នៅក្នុងក្រុម, rtSurvey បង្ហាញប៊ូតុងរង្វង់ **+** ដោយស្វ័យប្រវត្តិនៅផ្នែកខាងក្រោមនៃអេក្រង់ ដើម្បីឱ្យអ្នកប្រមូលទិន្នន័យអាចបន្ថែម instance ថ្មីដោយមិនចាំបាច់មានការកំណត់បន្ថែម។
+
+| រូបរាង | អេក្រង់មួយក្នុងមួយ instance | បន្ថែមប៊ូតុង + លំនាំដើម |
+|------------|-------------------------|------------------------|
+| `1screen` | បាទ/ចាស | បាទ/ចាស (នៅពេលគ្មានកូន `add_repeat`) |
+| `field-list` | បាទ/ចាស | ទេ |
+
+ប្រើ `field-list` នៅពេលអ្នកចង់បានប្លង់ជាក្រុមដោយមិនមានប៊ូតុងបន្ថែមស្វ័យប្រវត្តិ។ ប្រើ `1screen` នៅពេលអ្នកចង់បានទាំងប្លង់ជាក្រុម និងវិធីស្រាប់ដើម្បីបន្ថែម instance។
+
+---
+
+## ប៊ូតុងបន្ថែមផ្ទាល់ខ្លួន `add_repeat`
+
+វាល `note` (ឬ `text`) ដែលដាក់ **នៅខាងក្នុង** ក្រុម repeat ជាមួយ `appearance: add_repeat` នឹងបង្ហាញជាប៊ូតុង "បន្ថែម" ពេញទទឹងអេក្រង់។ ស្លាកប៊ូតុងបានមកពីជួរឈរ `label` នៃវាលនោះ។ នៅពេលមានវាល `add_repeat`, ប៊ូតុងរង្វង់ + លំនាំដើម (ពី `1screen`) នឹងត្រូវបានបិទ។
+
+ដាក់វាល `add_repeat` ជាវាលចុងក្រោយគេនៅក្នុងក្រុម repeat៖
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | សមាជិក | `1screen` |
+| text | member_name | ឈ្មោះសមាជិក | |
+| integer | member_age | អាយុ | |
+| note | btn_add | + បន្ថែមសមាជិក | `add_repeat` |
+| end_repeat | | | |
+
+### ការប្ដូរពណ៌តាមតម្រូវការ
+
+បញ្ចូលកូដពណ៌នៅក្នុងតម្លៃ appearance ដើម្បីរចនាប៊ូតុង៖
+
+| តម្លៃ Appearance | លទ្ធផល |
+|------------------|--------|
+| `add_repeat <#04B404/>` | ផ្ទៃខាងក្រោយពណ៌បៃតង, ពណ៌អត្ថបទលំនាំដើម |
+| `add_repeat 04B404-ffffff` | ផ្ទៃខាងក្រោយពណ៌បៃតង, អត្ថបទពណ៌ស |
+
+ពណ៌ទីមួយគឺផ្ទៃខាងក្រោយ ហើយពណ៌ទីពីរ (បន្ទាប់ពីសញ្ញាដក) គឺជាពណ៌អត្ថបទ។ កុំប្រើសញ្ញា `#` នៅពេលប្រើទម្រង់ដែលបំបែកដោយសញ្ញាដក។
+
+### វ៉ារ្យ៉ង់រូបតំណាង (Icon variant)
+
+ប្រើ `add_repeat icon` (ជាមួយចន្លោះ) ដើម្បីបង្ហាញជាប៊ូតុងរូបតំណាងរង្វង់តូច ជាជាងប៊ូតុងពេញទទឹងអេក្រង់៖
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_add | + បន្ថែម | `add_repeat icon` |
+
+---
+
+## ប៊ូតុងលុប៖ `delete-repeat-current` និង `delete-repeat-last`
+
+វាល `note` នៅខាងក្នុងក្រុម repeat ជាមួយ `appearance: delete-repeat-current` ឬ `appearance: delete-repeat-last` នឹងបង្ហាញជាប៊ូតុងលុបបែបបំបែក។
+
+| រូបរាង | សកម្មភាព |
+|------------|--------|
+| `delete-repeat-current` | លុប instance បច្ចុប្បន្ន (ដែលកំពុងសកម្ម) |
+| `delete-repeat-last` | លុប instance ចុងក្រោយនៅក្នុង repeat |
+
+ប៊ូតុងលំនាំដើម (មិនមែនរូបតំណាង) គឺជាប៊ូតុងបំបែក៖ រូបតំណាងធុងសំរាមនៅខាងឆ្វេង និងអត្ថបទស្លាកវាលនៅខាងស្តាំ ដែលលាតសន្ធឹងពេញទទឹងអេក្រង់។
+
+### វ៉ារ្យ៉ង់រូបតំណាង (Icon variant)
+
+បន្ថែម `-icon` ដើម្បីទទួលបានប៊ូតុងរូបតំណាងធុងសំរាមរង្វង់តូច៖
+
+| រូបរាង | លទ្ធផល |
+|------------|--------|
+| `delete-repeat-current-icon` | រូបតំណាងធុងសំរាមរង្វង់, លុប instance បច្ចុប្បន្ន |
+| `delete-repeat-last-icon` | រូបតំណាងធុងសំរាមរង្វង់, លុប instance ចុងក្រោយ |
+
+### ការប្ដូរពណ៌តាមតម្រូវការ
+
+ទម្រង់ពណ៌គឺដូចគ្នាទៅនឹង `add_repeat` ដែរ៖ ប្រើ `<#RRGGBB/>` ឬ `RRGGBB-RRGGBB` (ផ្ទៃខាងក្រោយ-អត្ថបទ)។
+
+### ឧទាហរណ៍លំនាំពេញលេញ
+
+Repeat ខាងក្រោមប្រើ `1screen`, ប៊ូតុងលុប-បច្ចុប្បន្នជារង្វង់នៅផ្នែកខាងលើ និងប៊ូតុងបន្ថែមពេញទទឹងនៅផ្នែកខាងក្រោម៖
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| begin_repeat | members | សមាជិក | `1screen` |
+| note | btn_del | ដកចេញ | `delete-repeat-current-icon` |
+| text | member_name | ឈ្មោះសមាជិក | |
+| integer | member_age | អាយុ | |
+| note | btn_add | + បន្ថែមសមាជិក | `add_repeat` |
+| end_repeat | | | |
+
+---
+
+## ការអនុវត្តល្អបំផុត
+
+១. តែងតែប្រើ `repeat_count` នៅពេលដឹងចំនួនដងនៃការ repeat ជាមុន — វាការពារអ្នកប្រមូលទិន្នន័យពីការបន្ថែម ឬលុប instance ដោយអចេតនា។
+២. រក្សាក្រុម repeat ឱ្យចំគោលដៅ — repeat ដែលមានសំណួរលើសពី ២០ ក្នុងមួយ instance គឺពិបากក្នុងការរុករក។
+៣. ដាក់ឈ្មោះក្រុម repeat ឱ្យបានច្បាស់លាស់ (ឧទាហរណ៍៖ `household_members` មិនមែន `repeat1`) — ឈ្មោះនឹងបង្ហាញនៅក្នុងការហៅអនុគមន៍ និងការនាំចេញទិន្នន័យ។
+៤. សាកល្បងជាមួយចំនួន instance អតិបរមាដែលរំពឹងទុក ដើម្បីផ្ទៀងផ្ទាត់ដំណើរការ។
+៥. ប្រើ `1screen` លើ `begin_repeat` ដើម្បីបង្ហាញសំណួរទាំងអស់នៅលើអេក្រង់តែមួយក្នុងមួយ instance ដោយភ្ជាប់ជាមួយវាល note `add_repeat` នៅក្នុងក្រុម ដើម្បីឱ្យអ្នកប្រមូលទិន្នន័យមានប៊ូតុង "បន្ថែម" ដែលមានស្លាកច្បាស់លាស់។
+
+---
+
+## ការកម្រិត
+
+- `indexed-repeat()` ទាមទារលិបិក្រមត្រឹមត្រូវ (ពី ១ ដល់ចំនួន instance) — លិបិក្រមដែលនៅក្រៅជួរនឹងផ្តល់មកវិញនូវតម្លៃទទេ។
+- repeat ត្រួតគ្នាលើសពី ២ ជាន់មិនត្រូវបានណែនាំទេ ហើយអាចបង្កបញ្ហាក្នុងការបង្ហាញលើកម្មវិធីមួយចំនួន។
+- អនុគមន៍សរុប (`sum`, `count` ។ល។) ដំណើរការលើក្រុម repeat ទាំងមូល — អ្នកមិនអាចសរុបទិន្នន័យមួយផ្នែកនៃ instance បានទេ ប្រសិនបើគ្មានវ៉ារ្យ៉ង់ `*-if`។

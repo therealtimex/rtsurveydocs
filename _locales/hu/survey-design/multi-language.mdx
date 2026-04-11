@@ -3,27 +3,27 @@ title: "Többnyelvű támogatás"
 description: ""
 ---
 
-Az rtSurvey erőteljes többnyelvű támogatást biztosít, lehetővé téve felmérések létrehozását több nyelven. Ez a funkció elengedhetetlen soknyelvű populációkon végzett kutatásokhoz vagy többnyelvű környezetekben végzett felmérésekhez.
+Az rtSurvey robusztus többnyelvű támogatást nyújt, lehetővé téve a felmérések több nyelven történő elkészítését. Ez a funkció kulcsfontosságú a különböző nyelvi populációk körében végzett kutatásokhoz vagy többnyelvű környezetben.
 
 ## Többnyelvű felmérések beállítása
 
-Többnyelvű felmérés létrehozásához az rtSurvey-ben nyelvspecifikus oszlopokat kell hozzáadni az XLSForm-hoz. A lépések:
+Többnyelvű felmérés létrehozásához az rtSurvey-ben nyelvspecifikus oszlopokat kell hozzáadnia az XLSFormhoz. Így teheti meg:
 
-1. **Felirat-fordítások**: Adjon hozzá oszlopokat minden nyelvhez a `label::Nyelv (kód)` formátumban.
-2. **Súgófordítások**: Használja a `hint::Nyelv (kód)` formátumot a súgók fordításához.
-3. **Médiafájl-fordítások**: Nyelvspecifikus médiához használja a `media::Nyelv (kód)` formátumot.
+1. **Címkefordítások**: Adjon hozzá oszlopokat minden nyelvhez a `label::Language (code)` formátumban.
+2. **Tippek fordítása**: Használja a `hint::Language (code)` formátumot a tippek fordításához.
+3. **Médiafájl-fordítások**: Nyelvspecifikus médiához használja a `media::Language (code)` formátumot.
 
 Példa:
 
 ```
-| type    | name | label::English (en) | label::Magyar (hu) | hint::English (en) | hint::Magyar (hu) |
+| type    | name | label::English (en) | label::Español (es) | hint::English (en) | hint::Español (es) |
 |---------|------|---------------------|---------------------|---------------------|---------------------|
-| integer | age  | How old are you?    | Hány éves?          | Enter your age      | Adja meg korát      |
+| integer | age  | How old are you?    | ¿Cuántos años tienes?| Enter your age      | Ingrese su edad     |
 ```
 
 ## Nyelvkódok
 
-Ajánlott a hivatalos 2 karakteres nyelvkódokat (altagokat) használni a nyelv neve után. Ez megkönnyíti az űrlap nyelvének és a felhasználói felület nyelvének egyeztetését. A hivatalos kódokat [itt](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry) találja.
+Javasoljuk, hogy a nyelv neve után használja a hivatalos 2 karakteres nyelvkódokat (szubtageket). Ez megkönnyíti az űrlap nyelvének és a felhasználói felület nyelvének összehangolását. A hivatalos kódokat [itt](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry) találja.
 
 ## Alapértelmezett nyelv beállítása
 
@@ -32,31 +32,41 @@ Az adatgyűjtés alapértelmezett nyelvének beállításához használja az XLS
 ```
 | form_id   | version | default_language |
 |-----------|---------|-------------------|
-| test_form | 101     | Magyar (hu)       |
+| test_form | 101     | French (fr)       |
 ```
 
 ## rtSurvey-specifikus funkciók
 
 ### Dinamikus nyelvváltás
 
-Az rtSurvey lehetővé teszi a felhasználók számára, hogy az adatgyűjtés során dinamikusan válthassanak nyelvet:
+Az rtSurvey lehetővé teszi a felhasználók számára a nyelvek dinamikus váltását az adatgyűjtés során:
 
-- A webes felületen használja a felső navigációs sáv nyelvi legördülő menüjét.
-- A mobilalkalmazásban a beállítások menüből érhetők el a nyelvi lehetőségek.
+- A webes felületen használja a felső navigációs sávban található nyelvválasztó legördülő menüt.
+- A mobilalkalmazásban a beállítások menüben érheti el a nyelvi opciókat.
 
-### Nyelvspecifikus ellenőrző üzenetek
+### Nyelvspecifikus érvényesítési üzenetek
 
-Az rtSurvey kiterjeszti a többnyelvű támogatást az ellenőrzési üzenetekre is:
+Az rtSurvey kiterjeszti a többnyelvű támogatást az érvényesítési üzenetekre:
 
 ```
-| type    | name | constraint | constraint_message::English (en) | constraint_message::Magyar (hu) |
+| type    | name | constraint | constraint_message::English (en) | constraint_message::Español (es) |
 |---------|------|------------|----------------------------------|----------------------------------|
-| integer | age  | . <= 150   | Age must be 150 or less          | A kornak legfeljebb 150-nek kell lennie |
+| integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
-### RTL-nyelvek támogatása
+### Lokalizált kötelező üzenetek
 
-Jobbról balra olvasható (RTL) nyelvek, például arab vagy héber esetén az rtSurvey automatikusan igazítja az elrendezést:
+Használja a `required_message::Language (code)`-ot, hogy lefordított hibaüzenetet jelenítsen meg, ha egy kötelező mező üresen marad:
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
+### RTL nyelvi támogatás
+
+Az olyan jobbról balra (RTL) írt nyelvek esetében, mint az arab vagy a héber, az rtSurvey automatikusan igazítja az elrendezést:
 
 ```
 | type | name | label::English (en) | label::Arabic (ar) |
@@ -66,7 +76,7 @@ Jobbról balra olvasható (RTL) nyelvek, például arab vagy héber esetén az r
 
 ### Nyelvspecifikus megjelenés
 
-Az rtSurvey lehetővé teszi különböző megjelenések megadását különböző nyelvekhez:
+Az rtSurvey lehetővé teszi a különböző megjelenések (appearance) megadását a különböző nyelvekhez:
 
 ```
 | type | name | label::English (en) | label::Chinese (zh) | appearance::English (en) | appearance::Chinese (zh) |
@@ -74,25 +84,61 @@ Az rtSurvey lehetővé teszi különböző megjelenések megadását különböz
 | text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
 
+## HTML formázás kétnyelvű címkékben
+
+Kombinálhatja a HTML tageket nyelvi csomagolókkal (wrapper) egyetlen címke cellában. Az rtSurvey kinyeri az aktív nyelvi blokkot, és megjeleníti a maradék HTML-t.
+
+Példa félkövér betűtípusra és betűszínre nyelvenként:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Támogatott inline tagek a nyelvi csomagolókon belül: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Színes szöveg példa nyelvenként:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Nyelvtudatos számítások
+
+Ha egy űrlap rendelkezik `${language_use}` mezővel (amelyet egy `change_language` widget állít be), használja az `if()` függvényt az értékek visszaadásához az aktív nyelven:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Példa — egy kikeresési eredmény megjelenítése az aktív nyelven a `pulldata('rawquery', ...)` használatával:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_en FROM externalData WHERE code = ?', ${district}), pulldata('rawquery', concat(${family_path}, '/locations.db::externalData'), 'SELECT label_vi FROM externalData WHERE code = ?', ${district})) |
+```
+
+Megjegyzés: A `language_use` mezőt általában egy `change_language` megjelenési widget állítja be. Lásd: Appearance — change_language.
+
 ## Bevált módszerek többnyelvű felmérésekhez
 
 1. **Következetes elnevezés**: Használjon következetes nyelvkódokat az egész űrlapon.
-2. **Professzionális fordítás**: Alkalmazzon a felmérési kontextusban jártas professzionális fordítókat.
-3. **Kontextusjegyzetek**: Adjon kontextusjegyzeteket a fordítóknak a pontos fordítás érdekében.
-4. **Tesztelés**: Telepítés előtt tesztelje az űrlapot minden nyelven.
-5. **Unicode-támogatás**: Győződjön meg arról, hogy az adatgyűjtő eszközök támogatják a Unicode-ot a latin betűkészleten kívüli írásrendszerekhez.
-6. **Nyelvspecifikus média**: Minden nyelvhez kulturálisan megfelelő képeket vagy hangot használjon.
-7. **Kerülje a szöveget a képekben**: Ha szöveget tartalmazó képeket használ, hozzon létre külön képeket minden nyelvhez.
+2. **Professzionális fordítás**: Alkalmazzon professzionális fordítókat, akik ismerik a felmérés kontextusát.
+3. **Kontextus megjegyzések**: Adjon kontextus megjegyzéseket a fordítóknak a pontos fordítás biztosítása érdekében.
+4. **Tesztelés**: Tesztelje az űrlapot minden nyelven a közzététel előtt.
+5. **Unicode támogatás**: Győződjön meg arról, hogy az adatgyűjtő eszközök támogatják az Unicode-ot a nem latin betűs írásmódokhoz.
+6. **Nyelvspecifikus média**: Használjon kulturálisan megfelelő képeket vagy hangokat minden nyelvhez.
+7. **Kerülje a szöveget a képeken**: Ha szöveges képeket használ, hozzon létre külön képeket minden nyelvhez.
 
 ## Különleges esetek kezelése
 
 ### Vegyes nyelvű válaszok
 
-Az rtSurvey lehetővé teszi, hogy a válaszadók bármilyen írásrendszerben adjanak meg szöveget, függetlenül a kiválasztott űrlapnyelvtől. Ez hasznos nevek vagy cím eredeti írásrendszerben való rögzítésekor.
+Az rtSurvey lehetővé teszi a válaszadók számára, hogy bármilyen írásmóddal szöveget írjanak be, függetlenül a választott űrlapnyelvtől. Ez hasznos nevek vagy címek rögzítéséhez az eredeti írásmódjukban.
 
 ### Nyelvspecifikus kérdéstípusok
 
-Egyes kérdéstípusok bizonyos nyelvekhez jobban megfelelhetnek. Az rtSurvey lehetővé teszi különböző kérdéstípusok használatát különböző nyelvekhez:
+Bizonyos kérdéstípusok megfelelőbbek lehetnek bizonyos nyelvekhez. Az rtSurvey lehetővé teszi a különböző kérdéstípusok használatát a különböző nyelvekhez:
 
 ```
 | type::English (en) | type::Japanese (ja) | name | label::English (en) | label::Japanese (ja) |
@@ -102,19 +148,19 @@ Egyes kérdéstípusok bizonyos nyelvekhez jobban megfelelhetnek. Az rtSurvey le
 
 ## Többnyelvű adatok exportálása
 
-Az rtSurvey-ből adatok exportálásakor:
+Adatok exportálásakor az rtSurvey-ből:
 
-- Dönthet úgy, hogy egy adott nyelven exportál, vagy az összes nyelvi verziót belefoglalja.
-- Az exportált adatokban szerepel a nyelvmetaadat, jelezve, hogy melyik nyelvet használták az egyes válaszoknál.
+- Választhatja az exportálást egy adott nyelven, vagy tartalmazhatja az összes nyelvi verziót.
+- A nyelvi metaadatok szerepelnek az exportban, jelezve, hogy melyik nyelvet használták az egyes válaszokhoz.
 
-## Mobilalkalmazás szempontjai
+## Mobilalkalmazással kapcsolatos szempontok
 
 - Az rtSurvey mobilalkalmazás támogatja az offline nyelvváltást.
-- Offline üzemmódba lépés előtt győződjön meg arról, hogy az összes szükséges nyelvi fájl le van töltve.
+- Győződjön meg arról, hogy minden szükséges nyelvi fájl le van töltve, mielőtt offline módba lépne.
 
 ## Ismert korlátozások
 
-- Egyes haladó funkciók esetleg nem érhetők el minden nyelven.
-- A nagyon hosszú fordítások kisebb képernyőkön befolyásolhatják az elrendezést.
+- Előfordulhat, hogy egyes speciális funkciók nem érhetők el minden nyelven.
+- A rendkívül hosszú fordítások befolyásolhatják az elrendezést a kisebb képernyőkön.
 
-Az rtSurvey többnyelvű lehetőségeinek kihasználásával inkluzív, hozzáférhető felméréseket hozhat létre, amelyek különféle populációkat érnek el, és minőségi, nyelvészetileg pontos adatokat nyújtanak.
+Az rtSurvey többnyelvű képességeinek kihasználásával befogadó, hozzáférhető felméréseket hozhat létre, amelyek különféle populációkat érnek el, és kiváló minőségű, nyelvileg pontos adatokat szolgáltatnak.

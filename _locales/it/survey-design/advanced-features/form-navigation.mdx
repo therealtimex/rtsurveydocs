@@ -1,0 +1,104 @@
+---
+title: "Controlli di navigazione del modulo"
+description: "Utilizzare i valori di aspetto SaveFinalizedExit e SaveIncompleteExit per visualizzare pulsanti di uscita stilizzati che salvano ed escono dal modulo."
+---
+
+**I controlli di navigazione del modulo** sono valori di aspetto posizionati su campi `note` (o `text`) che vengono visualizzati come pulsanti stilizzati a tutta larghezza in fondo a un sondaggio. Consentono all'intervistatore di salvare l'invio ed uscire dal modulo con un solo tocco, sia come record completato (finalizzato) che come bozza (record incompleto).
+
+---
+
+## `SaveFinalizedExit<#COLOR/>`
+
+Visualizza un pulsanti che **salva l'invio come finalizzato** ed esce dal modulo. L'etichetta del pulsante è presa dalla colonna `label` del campo.
+
+| XLSForm column | Valore |
+|----------------|-------|
+| `type` | `note` |
+| `name` | qualsiasi nome univoco (es. `btn_finish`) |
+| `label` | testo mostrato sul pulsante |
+| `appearance` | `SaveFinalizedExit<#RRGGBB/> toc-hide` |
+
+L'invio viene contrassegnato come record finale e completo. Ciò equivale a toccare il pulsante di invio integrato.
+
+---
+
+## `SaveIncompleteExit<#COLOR/>`
+
+Visualizza un pulsante che **salva l'invio come incompleto (bozza)** ed esce dal modulo. L'intervistatore può tornarvi più tardi e continuare a compilarlo.
+
+| XLSForm column | Valore |
+|----------------|-------|
+| `type` | `note` |
+| `name` | qualsiasi nome univoco (es. `btn_pause`) |
+| `label` | testo mostrato sul pulsante |
+| `appearance` | `SaveIncompleteExit<#RRGGBB/> toc-hide` |
+
+---
+
+## Sintassi del colore
+
+Entrambi gli aspetti accettano un colore inline nel formato `<#RRGGBB/>`:
+
+- `#` seguito da esattamente **6 cifre esadecimali** (maiuscole o minuscole)
+- Il `/>` di chiusura è **obbligatorio** — ometterlo interrompe l'analisi
+- Esempio: `<#04B404/>` (verde), `<#EDC602/>` (ambra), `<#D9534F/>` (rosso)
+
+Il colore controlla lo sfondo del pulsante. Il colore del testo è determinato automaticamente dall'app.
+
+---
+
+## Esempio
+
+I seguenti due campi posizionati alla fine di un modulo producono un pulsante verde **Invia** e un pulsante ambra **Salva come bozza**:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | btn_finish | Invia | `SaveFinalizedExit<#04B404/> toc-hide` |
+| note | btn_pause | Salva come bozza | `SaveIncompleteExit<#EDC602/> toc-hide` |
+
+---
+
+## toc-hide — escludere i pulsanti dal sommario
+
+Il token di aspetto `toc-hide` indica a rtSurvey di escludere un campo dal **sommario** del modulo (l'elenco generale delle domande). I pulsanti di navigazione non sono domande, quindi non dovrebbero mai apparire nel sommario.
+
+Aggiungi sempre `toc-hide` dopo l'aspetto di uscita:
+
+```
+SaveFinalizedExit<#04B404/> toc-hide
+SaveIncompleteExit<#EDC602/> toc-hide
+```
+
+Vedere [Aspetto — toc-hide](../appearance#group-and-navigation) per il riferimento a toc-hide.
+
+---
+
+## Convenzione di posizionamento
+
+Seguire queste convenzioni quando si aggiungono controlli di navigazione a un modulo:
+
+- Posizionare entrambi i pulsanti alla **fine** del modulo, dopo tutte le domande e i gruppi.
+- Includere sempre **entrambi** i pulsanti insieme — uno finalizzato e uno incompleto — in modo che l'intervistatore abbia sempre un modo per uscire indipendentemente dallo stato di completamento.
+- Utilizzare la colonna `relevant` sul pulsante di uscita finalizzato se l'invio deve essere consentito solo quando vengono soddisfatte determinate condizioni (ad esempio, una sezione obbligatoria è completa). Il pulsante di uscita incompleto dovrebbe generalmente rimanere **sempre visibile**.
+
+---
+
+## Uscita finalizzata condizionale
+
+Utilizzare la colonna `relevant` per controllare quando viene mostrato il pulsante di uscita finalizzato. L'uscita incompleta dovrebbe rimanere visibile incondizionatamente in modo che l'intervistatore possa sempre mettere in pausa e tornare.
+
+| type | name | label | appearance | relevant |
+|------|------|-------|------------|----------|
+| note | btn_finish | Invia | `SaveFinalizedExit<#04B404/> toc-hide` | `${consent} = 'yes' and ${section_a_complete} = '1'` |
+| note | btn_pause | Salva come bozza | `SaveIncompleteExit<#EDC602/> toc-hide` | |
+
+In questo esempio il pulsante **Invia** appare solo quando l'intervistatore ha dato il consenso e ha contrassegnato la sezione A come completa. Il pulsante **Salva come bozza** è sempre disponibile.
+
+---
+
+## Limitazioni
+
+- **Il tipo di campo deve essere `note` o `text`.** L'uso di questi aspetti su qualsiasi altro tipo di domanda non è supportato.
+- **Solo esadecimale a 6 cifre.** L'esadecimale abbreviato (`<#FFF/>`) e i colori con nome non sono supportati — usare sempre il formato completo a 6 cifre (es. `<#FFFFFF/>`).
+- **La colonna label è il testo del pulsante.** La colonna `hint` viene ignorata per questi campi; viene visualizzato solo `label`.
+- **Entrambi i pulsanti dovrebbero essere presenti.** Omettere il pulsante di uscita incompleto lascia l'intervistatore senza un modo per mettere in pausa a metà del modulo.

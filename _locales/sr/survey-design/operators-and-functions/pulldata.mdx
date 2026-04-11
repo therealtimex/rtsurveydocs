@@ -1,0 +1,230 @@
+---
+title: "pulldata()"
+description: "Funkcija pulldata() preuzima vrednost iz eksterne CSV datoteke priložene obrascu, upoređujući ključnu kolonu sa ključnom vrednošću i vraćajući odgovarajuću kolonu rezultata."
+---
+
+import { Callout } from 'nextra/components'
+
+Funkcija `pulldata()` preuzima vrednost iz CSV datoteke priložene obrascu. Na osnovu naziva datoteke, kolone koju treba vratiti, kolone za podudaranje i ključne vrednosti, ona vraća ćeliju na preseku odgovarajućeg reda i kolone rezultata.
+
+```
+pulldata('filename.csv', 'result_column', 'key_column', ${key_field})
+```
+
+| Pozicija | Parametar | Opis |
+|----------|-----------|------|
+| 1 | Filename | Naziv CSV medijske datoteke (isti naziv koji se koristi u `select_one_from_file`) |
+| 2 | Result column | Kolona čiju vrednost želite da vratite |
+| 3 | Key column | Kolona za upoređivanje |
+| 4 | Key value | Vrednost za podudaranje — obično referenca polja kao što je `${field}` |
+
+Funkcija vraća prazan string ako podudaranje nije pronađeno.
+
+---
+
+## Preduslovi
+
+CSV datoteka mora biti priložena obrascu kao **medijska datoteka**. Ista datoteka na koju se referiše `pulldata()` može se koristiti i kao lista izbora za `select_one_from_file`.
+
+**Primer CSV — `staff.csv`:**
+
+```
+name,id,department,phone
+Alice,S001,Health,+1234567890
+Bob,S002,Education,+0987654321
+Carol,S003,Health,+1122334455
+```
+
+---
+
+## Osnovni primer
+
+Potražite odeljenje i telefon člana osoblja na osnovu njegovog ID-a:
+
+**survey:**
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file staff.csv | staff_id | Izaberite člana osoblja | |
+| calculate | dept | | `pulldata('staff.csv', 'department', 'name', ${staff_id})` |
+| calculate | phone | | `pulldata('staff.csv', 'phone', 'name', ${staff_id})` |
+| note | dept_note | Odeljenje: `${dept}` — Telefon: `${phone}` | |
+
+<Callout type="info">
+Kolona `name` u `select_one_from_file` CSV-u je sačuvana vrednost. Kada anketar izabere "Alice", `${staff_id}` sadrži `"Alice"`, što `pulldata()` koristi kao ključ za preuzimanje njenog odeljenja i telefona.
+</Callout>
+
+---
+
+## Preuzimanje oznake (label) izabranog izbora
+
+Pitanje `select_one_from_file` čuva vrednost `name`. Da biste prikazali ljudima čitljivu oznaku `label`, koristite `pulldata()` da biste je potražili:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file villages.csv | village | Izaberite selo | |
+| calculate | village_label | | `pulldata('villages.csv', 'label', 'name', ${village})` |
+| note | confirm | Izabrali ste: `${village_label}` | |
+
+---
+
+## Višestruka pretraživanja iz jednog izbora
+
+Možete pozvati `pulldata()` više puta za istu datoteku da biste preuzeli različite kolone za isti izabrani red:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| select_one_from_file facilities.csv | facility | Izaberite objekat | |
+| calculate | fac_type | | `pulldata('facilities.csv', 'type', 'name', ${facility})` |
+| calculate | fac_district | | `pulldata('facilities.csv', 'district', 'name', ${facility})` |
+| calculate | fac_beds | | `pulldata('facilities.csv', 'beds', 'name', ${facility})` |
+
+---
+
+## Korišćenje pulldata u relevant i constraint
+
+`pulldata()` se može koristiti u kolonama `relevant` i `constraint` za primenu logike na osnovu potraženih vrednosti:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| select_one_from_file facilities.csv | facility | Izaberite objekat | | |
+| integer | bed_count | Broj zauzetih kreveta | | `. <= number(pulldata('facilities.csv', 'beds', 'name', ${facility}))` |
+
+---
+
+## Korišćenje pulldata sa `once()`
+
+Da biste evaluirali `pulldata()` samo pri prvom učitavanju (sprečavajući ponovnu evaluaciju kada se ključno polje promeni nakon početnog unosa), uokvirite ga u `once()`:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | initial_dept | | `once(pulldata('staff.csv', 'department', 'name', ${staff_id}))` |
+
+---
+
+## Najbolje prakse
+
+1. Ključna kolona u CSV-u mora odgovarati koloni `name` koja se koristi u `select_one_from_file` — to moraju biti iste vrednosti.
+2. Nazivi kolona u CSV-u su osetljivi na velika i mala slova — `Department` i `department` su različite kolone.
+3. Ako ključna vrednost nije pronađena, `pulldata()` vraća prazan string — koristite `if(${field} != '', pulldata(...), '')` da biste se zaštitili od praznih izbora.
+4. Održavajte CSV datoteke malim gde je to moguće — velike datoteke povećavaju vreme učitavanja obrasca na vezama sa malim propusnim opsegom.
+5. Za podatke koji se menjaju između krugova prikupljanja podataka, ažurirajte CSV medijsku datoteku otpremanjem nove verzije obrasca.
+
+## Ograničenja
+
+- `pulldata()` odgovara samo **prvom** redu gde je ključna kolona jednaka ključnoj vrednosti — duplirane ključne vrednosti u CSV-u nisu podržane.
+- CSV datoteka mora biti priložena obrascu pre postavljanja; ne može se preuzeti sa URL-a tokom rada.
+- Numeričke vrednosti koje vraća `pulldata()` su stringovi — uokvirite ih u `number()` kada se koriste u aritmetici: `number(pulldata(...))`.
+
+<Callout type="info">
+rtSurvey takođe podržava proširene oblike `pulldata()` za čitanje metapodataka uređaja, JWT polja i JSON podataka. Pogledajte [App API](../app-api) za `pulldata('app-api', ...)` i stranicu [Call API](../advanced-features/call-api) za obrasce pretraživanja zasnovane na JSON-u.
+</Callout>
+
+---
+
+## Proširene varijante pulldata()
+
+Pored CSV pretraživanja, `pulldata()` podržava nekoliko dodatnih izvora podataka promenom prvog argumenta.
+
+### `pulldata('app-api', key)`
+
+Pročitajte metapodatke uređaja, atribute korisnika i kontekst aplikacije. Pogledajte kompletnu referencu na stranici [App API](../app-api).
+
+```
+pulldata('app-api', 'user.name')
+pulldata('app-api', 'serverTime')
+pulldata('app-api', 'projectCode')
+```
+
+### `pulldata('json', jsonString, jsonpath)`
+
+Parsirajte JSON string unutar obrasca i izvucite vrednost koristeći JSONPath izraz. Korisno kada imate JSON literal ugrađen u obrazac.
+
+```
+pulldata('json', '{"status":"active","code":42}', '$.code')
+```
+
+Vraća podudarnu vrednost kao string, ili prazan string ako nije pronađena.
+
+### `pulldata('jsonpath', fieldRef, jsonpath)`
+
+Izvucite vrednost iz JSON stringa sačuvanog u drugom polju koristeći JSONPath izraz. Ovo je ekvivalentno `substr-jsonpath(${field}, jsonpath)`.
+
+```
+pulldata('jsonpath', ${api_raw}, '$.data.id')
+```
+
+### `pulldata('jwt', tokenField, claimName)`
+
+Dekodirajte JWT token sačuvan u polju i vratite vrednost specifičnog claim-a iz payload-a.
+
+```
+pulldata('jwt', ${auth_token}, 'sub')
+pulldata('jwt', ${auth_token}, 'exp')
+```
+
+Vraća prazan string ako je token nevažeći ili claim nije prisutan.
+
+### `pulldata('instanceid')`
+
+Vraća jedinstveni ID instance trenutnog slanja. Ekvivalentno meta polju `instanceID`.
+
+```
+pulldata('instanceid')
+```
+
+### `pulldata('mapping', value, mappingName)`
+
+Mapirajte vrednost u drugu koristeći imenovanu tabelu mapiranja definisanu u konfiguraciji obrasca.
+
+```
+pulldata('mapping', ${district_code}, 'district_names')
+```
+
+Vraća mapiranu vrednost, ili prazan string ako se nijedno mapiranje ne podudara.
+
+### `pulldata('options', optionName)`
+
+Pročitajte opciju konfiguracije obrasca po nazivu.
+
+```
+pulldata('options', 'max_household_size')
+```
+
+### `pulldata('rawquery', path, sql, param1, ...)`
+
+Izvršite SQL `SELECT` nad priloženom SQLite `.db` datotekom i vratite vrednost iz prve kolone prvog podudarnog reda. Parametri nakon SQL stringa se zamenjuju redom za `?` čuvare mesta.
+
+| Pozicija | Parametar | Opis |
+|----------|-----------|------|
+| 1 | `'rawquery'` | Literalni string koji identifikuje ovu varijantu |
+| 2 | path | Putanja datoteke u `concat(${family_path}, '/file.db::tableName')` formatu |
+| 3 | SQL | SQL `SELECT` naredba koja koristi `?` kao pozicione čuvare mesta |
+| 4+ | params | Vrednosti zamenjene za svaki `?` redom — obično reference polja poput `${field}` |
+
+Vraća prazan string ako se nijedan red ne podudara.
+
+**Primer — potražite naziv pokrajine po ID-u:**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+**Primer — potražite naziv odeljenja (ward) filtriran i po kodu pokrajine i po kodu okruga (district):**
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::wards'),
+  'SELECT name FROM wards WHERE province_code = ? AND district_code = ?',
+  ${province_code},
+  ${district_code})
+```
+
+Za razliku od standardne `pulldata()` sa četiri argumenta koja upoređuje jednu ključnu kolonu u CSV datoteci, varijanta `rawquery` izvršava kompletan SQL `SELECT` nad SQLite bazom podataka, omogućavajući `WHERE` uslove sa više kolona i bilo koju kolonu kao povratnu vrednost.
+
+<Callout type="info">
+`rawquery` se obično koristi sa poljima za automatsko dovršavanje (autocomplete) za hijerarhijska pretraživanja lokacija. Pogledajte [Pretraga lokalne baze podataka](../advanced-features/local-database-search) za detalje o pravljenju `.db` datoteka i njihovom povezivanju sa `pulldata('rawquery', ...)`.
+</Callout>

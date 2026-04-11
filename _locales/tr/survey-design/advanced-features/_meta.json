@@ -2,6 +2,7 @@
   "index": {
     "display": "hidden"
   },
+  "audio-recording": "Ses Kaydı",
   "call-api": "Call API",
   "dynamic-question-type": "Dinamik Soru Türü",
   "dynamic-search": "Dinamik Arama",

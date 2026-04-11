@@ -1,0 +1,118 @@
+---
+title: "Garso įrašymas"
+description: "Įrašykite aplinkos ar interviu garsą apklausos duomenų rinkimo metu naudodami audio-start ir audio-end rodinius tekstiniuose laukuose."
+---
+
+Garso įrašymas leidžia formoje tyliai arba matomai užfiksuoti garsą apklausos sekcijos metu. Tai naudinga įrašant interviu, aplinkos garsus lauko stebėjimų metu arba žodinius atsakymus, kurie papildo struktūrizuotus atsakymus.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Tik mobilioji programėlė.** Garso įrašymui reikalinga rtSurvey mobilioji programėlė. Interneto formoje `audio-start` ir `audio-end` rodiniai yra tyliai ignoruojami – įrašymas nevyksta ir klaida nerodoma. Visada testuokite įrenginyje, kai reikalingas garso įrašymas.
+</Callout>
+
+---
+
+## Kaip tai veikia
+
+Garso įrašymą valdo du `text` laukai, veikiantys kaip **žymekliai**:
+
+- Laukas su rodiniu `audio-start` pradeda įrašymą, kai apklausėjas jį pasiekia.
+- Laukas su rodiniu `audio-end` sustabdo įrašymą ir išsaugo garso failą pateikime.
+
+Abu žymeklių laukai yra `text` tipo. Paprastai jie yra paslėpti nuo apklausėjo (naudojant `relevant = false` arba padėjus į neinteraktyvią vietą), nors jie gali būti ir matomi. Įrašytas garsas pridedamas prie pateikimo kaip failas, susietas su `audio-end` lauku.
+
+---
+
+## Pagrindinis pavyzdys
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Respondento vardas | |
+| text | q_occupation | Užsiėmimas | |
+| integer | q_age | Amžius | |
+| text | audio_e_a1 | | `audio-end` |
+
+Programėlė pradeda įrašinėti, kai apklausėjas pasiekia `audio_s_a1`, ir sustoja, kai pasiekia `audio_e_a1`. Visi klausimai tarp dviejų žymeklių yra įrašomi.
+
+---
+
+## Tylus įrašymas: `audio-start invisible`
+
+Pagal numatytuosius nustatymus mobilioji programėlė rodo įrašymo indikatorių, kol fiksuojamas garsas. Pridėjus `invisible` prie rodinio (appearance), šis indikatorius paslepiamas, todėl įrašymas vyksta be jokių matomų ženklų respondentui.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Ar sutinkate dalyvauti? | |
+| text | q_feedback | Jūsų atsiliepimai | |
+| text | audio_e_a1 | | `audio-end` |
+
+Naudokite `invisible` tik tada, kai informavimo reikalavimai buvo įvykdyti kitomis priemonėmis (pvz., atskiru rašytinio sutikimo lauku prieš įrašymo sekciją).
+
+---
+
+## Pavadinimų suteikimo konvencija
+
+Gamybinėse formose žymeklių laukams naudojamas nuoseklus pavadinimų šablonas:
+
+```
+audio_s_{section}{n}   — pradžios žymeklis
+audio_e_{section}{n}   — pabaigos žymeklis
+```
+
+Kur `{section}` yra trumpa formos sekcijos etiketė, o `{n}` yra eilės numeris toje sekcijoje.
+
+| Lauko pavadinimas | Rolė | Reikšmė |
+|------------|------|---------|
+| `audio_s_a1` | Pradžia | Pirmas įrašas A sekcijoje |
+| `audio_e_a1` | Pabaiga | Pirmo įrašo pabaiga A sekcijoje |
+| `audio_s_b1` | Pradžia | Pirmas įrašas B sekcijoje |
+| `audio_e_b1` | Pabaiga | Pirmo įrašo pabaiga B sekcijoje |
+| `audio_s_a2` | Pradžia | Antras įrašas A sekcijoje |
+| `audio_e_a2` | Pabaiga | Antro įrašo pabaiga A sekcijoje |
+
+Laikantis šios konvencijos lengva nustatyti įrašymo ribas peržiūrint formų apibrėžimus ir pateiktus duomenis.
+
+---
+
+## Saugojimas ir gavimas
+
+Kai apklausėjas pasiekia `audio-end` lauką, programėlė užbaigia garso failą ir prideda jį prie pateikimo. Failas yra:
+
+- Saugomas kaip garso priedas prie pateikimo, susietas su `audio-end` lauko pavadinimu.
+- Pasiekiamas rtSurvey sisteminėje dalyje (back-end) per pateikimų peržiūrą kartu su kitais medijos priedais.
+- Atsisiunčiamas per standartinį pateikimų eksportą – garso failai rodomi medijos stulpelyje, atitinkančiame `audio-end` lauko pavadinimą.
+
+Failo formatas ir pralaidumas (bitrate) priklauso nuo įrenginio ir programėlės versijos.
+
+---
+
+## Kelios įrašymo sekcijos
+
+Formoje gali būti kelios nesutampančios įrašymo sekcijos. Kiekviena `audio-start` / `audio-end` žymeklių pora turi būti visiškai užbaigta – sekcijos neturi persidengti.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Įžanga | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Detalės | |
+| text | audio_e_b1 | | `audio-end` |
+
+Kiekviena sekcija sukuria atskirą garso failą, pridėtą prie atitinkamo `audio-end` lauko.
+
+---
+
+## Apribojimai
+
+- **Tik mobilioji programėlė.** Funkcija nepalaikoma interneto formose. Naršyklėje `audio-start` ir `audio-end` yra tyliai ignoruojami.
+- **Jokio persidengimo (nesting).** Įrašymo sekcijos negali persidengti. Naujo įrašymo pradėjimas nepasiekus ankstesnio `audio-end` žymeklio nėra palaikomas.
+- **Lauko tipas turi būti `text`.** `audio-start` arba `audio-end` naudojimas su bet kokiu kitu klausimo tipu nėra palaikomas.
+- **Įkėlimo dydis.** Ilgi įrašai sukuria didelius failus. Atkreipkite dėmesį į pateikimo dydžio apribojimus ir tinklo sąlygas lauko sąlygomis.
+- **Jokios pauzės įrašymo metu.** Įrašymas vyksta nepertraukiamai nuo pradžios žymeklio iki pabaigos žymeklio; nėra mechanizmo pristabdyti ir tęsti įrašymą sekcijos viduje.

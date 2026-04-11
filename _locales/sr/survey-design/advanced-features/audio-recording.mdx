@@ -1,0 +1,118 @@
+---
+title: "Audio snimanje"
+description: "Snimajte ambijentalni zvuk ili intervju tokom prikupljanja podataka u anketi koristeći audio-start i audio-end izglede na tekstualnim poljima."
+---
+
+Audio snimanje omogućava obrascu da tiho ili vidljivo snima audio tokom jednog dela ankete. Korisno je za snimanje intervjua, ambijentalnog zvuka tokom terenskih zapažanja ili govornih odgovora koji dopunjuju strukturirane odgovore.
+
+---
+
+import { Callout } from 'nextra/components'
+
+<Callout type="warning">
+**Samo mobilna aplikacija.** Audio snimanje zahteva mobilnu aplikaciju rtSurvey. U veb obrascu, izgledi `audio-start` i `audio-end` se tiho ignorišu — snimanje se ne vrši i ne prikazuje se greška. Uvek testirajte na uređaju kada je audio snimanje neophodno.
+</Callout>
+
+---
+
+## Kako funkcioniše
+
+Audio snimanje se kontroliše pomoću dva `text` polja koja deluju kao **markeri**:
+
+- Polje sa izgledom `audio-start` započinje snimanje kada anketar dođe do njega.
+- Polje sa izgledom `audio-end` zaustavlja snimanje i čuva audio fajl u podnesku.
+
+Oba polja markera su tipa `text`. Obično su skrivena od anketara (koristeći `relevant = false` ili postavljena na neinteraktivnu poziciju), mada mogu biti vidljiva. Snimljeni audio se prilaže podnesku kao fajl povezan sa poljem `audio-end`.
+
+---
+
+## Osnovni primer
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_name | Ime ispitanika | |
+| text | q_occupation | Zanimanje | |
+| integer | q_age | Starost | |
+| text | audio_e_a1 | | `audio-end` |
+
+Aplikacija počinje snimanje kada anketar dođe do `audio_s_a1` i prestaje kada dođe do `audio_e_a1`. Sva pitanja između dva markera se snimaju.
+
+---
+
+## Tiho snimanje: `audio-start invisible`
+
+Podrazumevano, mobilna aplikacija prikazuje indikator snimanja dok se audio snima. Dodavanje `invisible` izgledu potiskuje ovaj indikator, tako da se snimanje dešava bez vidljivog znaka ispitaniku.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start invisible` |
+| text | q_consent | Da li se slažete da učestvujete? | |
+| text | q_feedback | Vaše povratne informacije | |
+| text | audio_e_a1 | | `audio-end` |
+
+Koristite `invisible` samo kada su zahtevi za obelodanjivanjem ispunjeni na drugi način (npr. posebnim pisanim poljem za pristanak pre dela za snimanje).
+
+---
+
+## Konvencija imenovanja
+
+Produkcijski obrasci koriste dosledan obrazac imenovanja za polja markera:
+
+```
+audio_s_{section}{n}   — početni marker
+audio_e_{section}{n}   — krajnji marker
+```
+
+Gde je `{section}` kratka oznaka za deo obrasca, a `{n}` sekvencijalni broj unutar tog dela.
+
+| Field name | Role | Meaning |
+|------------|------|---------|
+| `audio_s_a1` | Start | Prvo snimanje u delu A |
+| `audio_e_a1` | End | Kraj prvog snimanja u delu A |
+| `audio_s_b1` | Start | Prvo snimanje u delu B |
+| `audio_e_b1` | End | Kraj prvog snimanja u delu B |
+| `audio_s_a2` | Start | Drugo snimanje u delu A |
+| `audio_e_a2` | End | Kraj drugog snimanja u delu A |
+
+Praćenje ove konvencije olakšava identifikaciju granica snimanja prilikom pregleda definicija obrasca i podataka podneska.
+
+---
+
+## Skladištenje i preuzimanje
+
+Kada anketar dođe do polja `audio-end`, aplikacija finalizuje audio fajl i prilaže ga podnesku. Fajl se:
+
+- Čuva kao audio prilog podnesku, povezan sa imenom polja `audio-end`.
+- Pristupa mu se u rtSurvey pozadinskom pregledaču podnesaka zajedno sa drugim medijskim prilozima.
+- Preuzima se putem standardnog izvoza podnesaka — audio fajlovi se pojavljuju u koloni medija koja odgovara imenu polja `audio-end`.
+
+Format fajla i brzina bitova zavise od uređaja i verzije aplikacije.
+
+---
+
+## Višestruki delovi za snimanje
+
+Obrazac može sadržati nekoliko delova za snimanje koji se ne preklapaju. Svaki par markera `audio-start` / `audio-end` mora biti potpuno sadržan — delovi se ne smeju ispreplitati.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| text | audio_s_a1 | | `audio-start` |
+| text | q_intro | Uvod | |
+| text | audio_e_a1 | | `audio-end` |
+| note | section_break | — | |
+| text | audio_s_b1 | | `audio-start invisible` |
+| text | q_detail | Detalji | |
+| text | audio_e_b1 | | `audio-end` |
+
+Svaki deo proizvodi poseban audio fajl priložen svom odgovarajućem polju `audio-end`.
+
+---
+
+## Ograničenja
+
+- **Samo mobilna aplikacija.** Funkcija nije podržana u veb obrascu. `audio-start` i `audio-end` se tiho ignorišu u pretraživaču.
+- **Bez gnežđenja.** Delovi za snimanje se ne mogu preklapati. Započinjanje novog snimanja pre nego što se stigne do prethodnog `audio-end` markera nije podržano.
+- **Tip polja mora biti `text`.** Korišćenje `audio-start` ili `audio-end` na bilo kom drugom tipu pitanja nije podržano.
+- **Veličina za otpremanje.** Duga snimanja proizvode velike fajlove. Budite svesni ograničenja veličine podnesaka i mrežnih uslova na terenu.
+- **Bez pauze usred snimanja.** Snimanje teče neprekidno od početnog do krajnjeg markera; ne postoji mehanizam za pauziranje i nastavak unutar jednog dela.

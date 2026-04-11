@@ -1,15 +1,15 @@
 ---
 title: "Динамично търсене"
-description: "Динамичното търсене зарежда опции от отдалечен API в реално време, докато анкетьорът пише, позволявайки работа с големи или часто актуализирани набори от данни."
+description: "Динамичното търсене зарежда опции от отдалечен API в реално време, докато анкетьорът пише, което позволява работа с големи или често актуализирани масиви от данни."
 ---
 
-**Dynamic Search** (also called Search API) allows a `select_one`, `select_multiple`, or `text` field to load its choices from a remote web service **at runtime** as the enumerator types. This is the right approach when your choice list is too large to bundle in a CSV file, is updated frequently, or comes from a live database.
+**Динамичното търсене** (наричано още Search API) позволява на полета от тип `select_one`, `select_multiple` или `text` да зареждат своите опции от отдалечена уеб услуга **в реално време**, докато анкетьорът пише. Това е правилният подход, когато списъкът с опции е твърде голям, за да бъде включен в CSV файл, актуализира се често или идва от база данни на живо.
 
 ---
 
-## Изглед `search-api()`
+## Външен вид на `search-api()`
 
-The dynamic search is configured through the `appearance` column using the `search-api()` function:
+Динамичното търсене се конфигурира чрез колоната `appearance`, като се използва функцията `search-api()`:
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -17,27 +17,27 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 
 ### Параметри
 
-| Parameter | Description |
+| Параметър | Описание |
 |-----------|-------------|
-| `method` | Always use `'POST'` |
-| `url` | The API endpoint to query |
-| `post_body` | JSON body sent to the API. Use `%__input__%` as a placeholder for the enumerator's current search text |
-| `value_column` | The key in the response object to use as the stored **value** |
-| `display` | The key (or template) to use as the **label** shown in the dropdown. Supports `##key##` placeholders and `@{func}` expressions |
-| `data_path` | JSONPath to the array of result objects in the response (e.g., `$.data`, `$.hits.hits.*._source`) |
-| `save_path` | A name under which the raw response is saved for use by other fields |
+| `method` | Винаги използвайте `'POST'` |
+| `url` | Крайната точка на API (endpoint), която ще се запитва |
+| `post_body` | JSON тяло, изпратено до API. Използвайте `%__input__%` като контейнер (placeholder) за текущия текст за търсене на анкетьора |
+| `value_column` | Ключът в обекта на отговора, който да се използва като съхранена **стойност** (value) |
+| `display` | Ключът (или шаблонът), който да се използва като **етикет** (label), показан в падащото меню. Поддържа `##key##` контейнери и `@{func}` изрази |
+| `data_path` | JSONPath до масива от обекти с резултати в отговора (напр. `$.data`, `$.hits.hits.*._source`) |
+| `save_path` | Име, под което необработеният отговор се запазва за използване от други полета |
 
 ---
 
 ## Основен пример
 
-A health facility lookup where the enumerator types part of the facility name:
+Търсене на здравно заведение, където анкетьорът пише част от името на заведението:
 
 | type | name | label | appearance |
 |------|------|-------|------------|
-| select_one | facility | Select health facility | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
+| select_one | facility | Изберете здравно заведение | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-The API receives `{"query": "nair"}` when the enumerator types "nair" and returns:
+API получава `{"query": "nair"}`, когато анкетьорът напише "nair" и връща:
 
 ```json
 {
@@ -48,25 +48,25 @@ The API receives `{"query": "nair"}` when the enumerator types "nair" and return
 }
 ```
 
-The dropdown shows `Nairobi Central Clinic` and `Nairobi West Hospital`; the stored value is `HF001` or `HF002`.
+Падащото меню показва `Nairobi Central Clinic` и `Nairobi West Hospital`; съхранената стойност е `HF001` или `HF002`.
 
 ---
 
-## Разширено display formatting
+## Разширено форматиране на дисплея
 
 ### Използване на шаблони `##key##`
 
-Show multiple fields in the label:
+Показване на множество полета в етикета:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
 ```
 
-Displayed as: `Nairobi Central Clinic (Nairobi)`.
+Показва се като: `Nairobi Central Clinic (Nairobi)`.
 
 ### Използване на изрази `@{func}`
 
-Apply conditional logic in the display label:
+Прилагане на условна логика в етикета на дисплея:
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-Active results show `✓ Clinic Name`; inactive show `✗ Clinic Name`.
+Активните резултати показват `✓ Clinic Name`; неактивните показват `✗ Clinic Name`.
 
 ---
 
 ## Задаване на стойност по подразбиране: `search-default-api()`
 
-Use `search-default-api()` after `search-api()` to pre-populate the field with a default choice loaded from a separate API call (e.g., when editing an existing record):
+Използвайте `search-default-api()` след `search-api()`, за да попълните предварително полето с избор по подразбиране, зареден от отделно повикване на API (напр. при редактиране на съществуващ запис):
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -90,48 +90,107 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ## Персонализиран разделител за select_multiple: `search-default-separator()`
 
-For `select_multiple` fields, specify how multiple selected values are joined in the stored string:
+За полета `select_multiple` укажете как множество избрани стойности се съединяват в съхранения низ:
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
 ```
 
-Default separator is a space.
+Разделителят по подразбиране е интервал.
 
 ---
 
 ## Поддържани типове въпроси
 
-| Question type | Use case |
+| Тип въпрос | Случай на употреба |
 |---------------|----------|
-| `select_one` | Single selection from search results |
-| `select_multiple` | Multiple selections from search results |
-| `text` | Autocomplete — enumerator types freely but can select a suggestion |
+| `select_one` | Единичен избор от резултатите от търсенето |
+| `select_multiple` | Множествен избор от резултатите от търсенето |
+| `text` | Автодовършване — анкетьорът пише свободно, но може да избере предложение |
 
 ---
 
-## Използване на записани данни от отговори
+## Използване на запазени данни от отговора
 
-The `save_path` stores the full API response object under the given name. Other fields can reference it with `pulldata()`:
+Когато анкетьорът избере резултат, rtSurvey запазва пълния съвпадащ обект от отговора под името `save_path`. Други полета могат да четат от него по два начина.
+
+### Метод 1 — Търсене с `pulldata()`
+
+Използвайте `pulldata('save_path', 'key')`, за да прочетете поле от най-високо ниво от запазения обект:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | Select facility | `search-api(..., 'facility_data')` |
+| select_one | facility | Изберете заведение | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+Външният вид на реда `select_one` трябва да включва `search-api(..., 'facility_data')` със съответния `save_path`.
+
+За **вложени JSON полета**, комбинирайте със `substr-jsonpath()`:
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## Търсене в локален файл със search()
+
+`search()` извършва офлайн търсения за съответствие на колони спрямо пакетиран SQLite `.db` файл — не се изисква мрежова връзка и SQL заявки. Използвайте го, когато вашите справочни данни са пакетирани с формуляра и имате нужда от просто търсене „намери всички редове, където колоната е равна на стойността“.
+
+### Сигнатура
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### Параметри
+
+| Параметър | Описание |
+|-----------|-------------|
+| `path` | Път до таблицата на SQLite: `concat(${family_path}, '/file.db::table')` |
+| `'matches'` | Оператор за съвпадение — връща редове, където колоната е равна на стойността |
+| `'list_name'` | Име на колоната, спрямо която да се търси съвпадение |
+| `${field}` | Стойност за съвпадение; обикновено препратка към поле |
+
+### Пример
+
+Попълване на `select_one` от локална база данни чрез съпоставяне на стойността на `${d307}` с колоната `list_name` в таблицата `externalData` на `d307.db`:
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | Изберете заведение | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+Когато `${d307}` е равно на `"HF001"`, `search()` връща всеки ред в `externalData`, където `list_name = 'HF001'` — изцяло от пакетирания файл, без мрежово повикване.
+
+### search() срещу rawquery автодовършване
+
+| Функция | `search()` | `rawquery` автодовършване |
+|---------|-----------|------------------------|
+| SQL заявки | Не — само съответствие на колони | Да — пълна `SELECT … FROM …` |
+| Параметризиран вход | Съответствие на стойността на колоната | Вграден в SQL низ |
+| Свободен текст | Да — анкетьорът може да пише свободно | Не — трябва да избере от списък |
+| UNION / множество таблици | Не се поддържа | Поддържа се |
+
+### Кога да използвате всяко от тях
+
+- Използвайте **`search()`**, когато имате нужда от директно съответствие на равенство спрямо пакетиран `.db` файл, формулярът трябва да работи офлайн и искате да разрешите въвеждане на свободен текст.
+- Използвайте **`rawquery` автодовършване**, когато имате нужда от SQL гъвкавост (JOINs, UNIONs, изчислени колони) или трябва да правите заявки в множество таблици и формулярът има надеждна свързаност.
 
 ---
 
 ## Най-добри практики
 
-1. Ensure your API endpoint responds within 1–2 seconds — slow APIs make the search feel unresponsive.
-2. Use `%__input__%` in the `post_body` so the API only returns matching results, not the entire dataset.
-3. Index the search field on the server side (e.g., Elasticsearch, database full-text index) for fast responses.
-4. Limit results to 20–50 items per query — returning thousands of results defeats the purpose of search.
-5. Include a minimum input length requirement in the API to avoid triggering broad queries on single-character inputs.
+1. Уверете се, че вашата крайна точка на API отговаря в рамките на 1–2 секунди — бавните API правят търсенето да изглежда тромаво.
+2. Използвайте `%__input__%` в `post_body`, така че API да връща само съвпадащи резултати, а не целия масив от данни.
+3. Индексирайте полето за търсене от страна на сървъра (напр. Elasticsearch, индекс за пълнотекстово търсене в база данни) за бързи отговори.
+4. Ограничете резултатите до 20–50 елемента на заявка — връщането на хиляди резултати обезсмисля търсенето.
+5. Включете изискване за минимална дължина на входа в API, за да избегнете задействането на широки заявки при въвеждане на един символ.
 
 ## Ограничения
 
-- Dynamic Search requires network connectivity — it does not work offline.
-- The `%__input__%` placeholder is injected as-is; sanitise inputs on the server side to prevent injection attacks.
-- Complex `@{func}` display expressions may have limited support across all rtSurvey client versions.
+- Динамичното търсене изисква мрежова свързаност — то не работи офлайн.
+- Контейнерът `%__input__%` се инжектира такъв, какъвто е; пречиствайте входовете от страна на сървъра, за да предотвратите атаки чрез инжектиране.
+- Сложните изрази за показване `@{func}` може да имат ограничена поддръжка във всички версии на клиентите на rtSurvey.

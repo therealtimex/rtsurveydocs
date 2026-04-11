@@ -1,15 +1,15 @@
 ---
 title: "動態搜尋"
-description: "動態搜尋在調查員輸入時從遠端 API 即時載入選項，支援大型或頻繁更新的資料集。"
+description: "動態搜尋可在調查員輸入時即時從遠端 API 載入選項，從而支援大型或頻繁更新的資料集。"
 ---
 
-**動態搜尋**（也稱為搜尋 API）允許 `select_one`、`select_multiple` 或 `text` 字段在調查員輸入時**即時**從遠端網路服務載入其選項。當您的選項列表太大而無法打包在 CSV 文件中、頻繁更新或來自即時資料庫時，這是正確的方法。
+**動態搜尋**（也稱為 Search API）允許 `select_one`、`select_multiple` 或 `text` 欄位在調查員輸入時**在執行時**從遠端 Web 服務載入其選項。當您的選項列表太大而無法捆綁在 CSV 檔案中、需要頻繁更新或來自即時資料庫时，這是正確的方法。
 
 ---
 
-## `search-api()` 外觀
+## `search-api()` 外觀 (appearance)
 
-動態搜尋透過 `appearance` 欄使用 `search-api()` 函數配置：
+動態搜尋透過 `appearance` 欄位使用 `search-api()` 函式進行配置：
 
 ```
 search-api(method, url, post_body, value_column, display, data_path, save_path)
@@ -17,27 +17,27 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 
 ### 參數
 
-| 參數 | 說明 |
+| 參數 | 描述 |
 |-----------|-------------|
 | `method` | 始終使用 `'POST'` |
 | `url` | 要查詢的 API 端點 |
-| `post_body` | 發送到 API 的 JSON 主體。使用 `%__input__%` 作為調查員當前搜尋文字的占位符 |
-| `value_column` | 回應物件中用作儲存**值**的鍵 |
-| `display` | 用作下拉選單中顯示的**標籤**的鍵（或模板）。支援 `##key##` 占位符和 `@{func}` 表達式 |
-| `data_path` | 回應中結果物件陣列的 JSONPath（例如 `$.data`、`$.hits.hits.*._source`） |
-| `save_path` | 保存原始回應以供其他字段使用的名稱 |
+| `post_body` | 發送到 API 的 JSON 正文。使用 `%__input__%` 作為調查員當前搜尋文字的佔位符 |
+| `value_column` | 響應物件中用作儲存**值**的鍵 |
+| `display` | 用作下拉選單中顯示的**標籤**的鍵（或範本）。支援 `##key##` 佔位符和 `@{func}` 表達式 |
+| `data_path` | 響應中結果物件陣列的 JSONPath（例如 `$.data`、`$.hits.hits.*._source`） |
+| `save_path` | 用於儲存原始響應以便其他欄位使用的名稱 |
 
 ---
 
-## 基本範例
+## 基礎範例
 
-調查員輸入部分機構名稱的醫療機構查詢：
+醫療機構查詢，調查員輸入機構名稱的一部分：
 
 | type | name | label | appearance |
 |------|------|-------|------------|
 | select_one | facility | 選擇醫療機構 | `search-api('POST', 'https://api.example.com/facilities/search', '{"query": "%__input__%"}', 'id', 'name', '$.results', 'facility_data')` |
 
-當調查員輸入「nair」時，API 接收 `{"query": "nair"}` 並返回：
+當調查員輸入 "nair" 時，API 接收到 `{"query": "nair"}` 並返回：
 
 ```json
 {
@@ -48,15 +48,15 @@ search-api(method, url, post_body, value_column, display, data_path, save_path)
 }
 ```
 
-下拉選單顯示 `Nairobi Central Clinic` 和 `Nairobi West Hospital`；儲存值為 `HF001` 或 `HF002`。
+下拉選單顯示 `Nairobi Central Clinic` 和 `Nairobi West Hospital`；儲存的值為 `HF001` 或 `HF002`。
 
 ---
 
-## 進階顯示格式
+## 進階顯示格式化
 
-### 使用 `##key##` 模板
+### 使用 `##key##` 範本
 
-在標籤中顯示多個字段：
+在標籤中顯示多個欄位：
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id', '##name## (##district##)', '$.data', 'res')
@@ -66,7 +66,7 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
 
 ### 使用 `@{func}` 表達式
 
-在顯示標籤中應用條件邏輯：
+在顯示標籤中套用條件邏輯：
 
 ```
 search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id',
@@ -74,13 +74,13 @@ search-api('POST', 'https://api.example.com/search', '{"q": "%__input__%"}', 'id
   '$.data', 'res')
 ```
 
-活躍結果顯示 `✓ 機構名稱`；非活躍顯示 `✗ 機構名稱`。
+激活的結果顯示 `✓ Clinic Name`；未激活的顯示 `✗ Clinic Name`。
 
 ---
 
-## 設定預設值：`search-default-api()`
+## 設置預設值：`search-default-api()`
 
-在 `search-api()` 後使用 `search-default-api()` 以從單獨 API 呼叫載入的預設選項預填字段（例如編輯現有記錄時）：
+在 `search-api()` 之後使用 `search-default-api()`，透過單獨的 API 呼叫載入預設選項來預填充欄位（例如，編輯現有記錄時）：
 
 ```
 appearance: search-api(...) search-default-api('POST', 'https://api.example.com/get', '{"id": "##saved_id##"}', 'id', 'name', '$.item')
@@ -88,9 +88,9 @@ appearance: search-api(...) search-default-api('POST', 'https://api.example.com/
 
 ---
 
-## select_multiple 的自訂分隔符：`search-default-separator()`
+## `select_multiple` 的自定義分隔符：`search-default-separator()`
 
-對於 `select_multiple` 字段，指定多個已選值在儲存字串中的連接方式：
+對於 `select_multiple` 欄位，指定多個選定值在儲存字串中如何連接：
 
 ```
 appearance: search-api(...) search-default-separator(' || ')
@@ -102,36 +102,95 @@ appearance: search-api(...) search-default-separator(' || ')
 
 ## 支援的問題類型
 
-| 問題類型 | 使用案例 |
+| 問題類型 | 使用場景 |
 |---------------|----------|
 | `select_one` | 從搜尋結果中單選 |
 | `select_multiple` | 從搜尋結果中多選 |
-| `text` | 自動完成——調查員自由輸入但可選擇建議 |
+| `text` | 自動完成 —— 調查員自由輸入，但可以從建議中選擇 |
 
 ---
 
-## 使用儲存的回應資料
+## 使用儲存的響應資料
 
-`save_path` 將完整的 API 回應物件儲存在給定名稱下。其他字段可使用 `pulldata()` 引用它：
+當調查員選擇結果時，rtSurvey 將響應中完全匹配的物件儲存在 `save_path` 名稱下。其他欄位可以透過兩種方式從中讀取。
+
+### 方法 1 —— `pulldata()` 查詢
+
+使用 `pulldata('save_path', 'key')` 從儲存的物件中讀取頂層欄位：
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| select_one | facility | 選擇機構 | `search-api(..., 'facility_data')` |
+| select_one | facility | 選擇機構 | |
 | calculate | facility_district | | `pulldata('facility_data', 'district')` |
 | calculate | facility_type | | `pulldata('facility_data', 'type')` |
+| calculate | facility_beds | | `pulldata('facility_data', 'beds')` |
+
+`select_one` 行的外觀必須包含帶有匹配 `save_path` 的 `search-api(..., 'facility_data')`。
+
+對於**嵌套 JSON 欄位**，結合使用 `substr-jsonpath()`：
+
+```
+substr-jsonpath(pulldata('facility_data', 'location'), '$.district')
+```
+
+
+---
+
+## 使用 search() 進行本地檔案搜尋
+
+`search()` 對捆綁的 SQLite `.db` 檔案執行離線、欄位相等查詢 —— 無需網路連接，也無需 SQL 查詢。當您的參考資料隨表單一起打包，並且您需要簡單的「查找欄位等於值的所有行」查詢時，請使用此方法。
+
+### 簽名 (Signature)
+
+```
+search(path, 'matches', 'list_name', ${field})
+```
+
+### 參數
+
+| 參數 | 描述 |
+|-----------|-------------|
+| `path` | SQLite 表的路徑：`concat(${family_path}, '/file.db::table')` |
+| `'matches'` | 匹配運算子 —— 返回欄位等於值的行 |
+| `'list_name'` | 要匹配的欄位名 |
+| `${field}` | 要匹配的值；通常是欄位引用 |
+
+### 範例
+
+透過將 `${d307}` 的值與 `d307.db` 的 `externalData` 表中的 `list_name` 欄位進行匹配，從本地資料庫填充 `select_one`：
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | facility | 選擇機構 | `search(concat(${family_path}, '/d307.db::externalData'), 'matches', 'list_name', ${d307})` |
+
+當 `${d307}` 等於 `"HF001"` 時，`search()` 返回 `externalData` 中 `list_name = 'HF001'` 的每一行 —— 完全來自捆绑檔案，無需網路呼叫。
+
+### search() 與 rawquery 自動完成的對比
+
+| 功能 | `search()` | `rawquery` 自動完成 |
+|---------|-----------|------------------------|
+| SQL 查詢 | 否 —— 僅欄位相等 | 是 —— 完整的 `SELECT … FROM …` |
+| 參數化輸入 | 欄位值匹配 | 嵌入在 SQL 字串中 |
+| 自由文字錄入 | 是 —— 調查員可以自由輸入 | 否 —— 必須從列表中選擇 |
+| UNION / 多表 | 不支援 | 支援 |
+
+### 適用場景
+
+- 當您需要對捆綁的 `.db` 檔案進行簡單的相等匹配，表单必須離線工作，並且您希望允許自由文字錄入時，請使用 **`search()`**。
+- 當您需要 SQL 靈活性（JOIN、UNION、計算欄位）或必須跨多個表查詢，且表单具有可靠的網路連接時，請使用 **`rawquery` 自動完成**。
 
 ---
 
 ## 最佳實踐
 
-1. 確保 API 端點在 1–2 秒內響應——慢速 API 使搜尋感覺無響應。
-2. 在 `post_body` 中使用 `%__input__%`，使 API 只返回匹配結果，而不是整個資料集。
-3. 在伺服器端對搜尋字段建立索引（例如 Elasticsearch、資料庫全文索引）以實現快速響應。
-4. 每次查詢限制 20–50 個結果——返回數千個結果會失去搜尋的意義。
-5. 在 API 中包含最小輸入長度要求，以避免在單字符輸入時觸發廣泛查詢。
+1. 確保您的 API 端點在 1-2 秒內響應 —— 緩慢的 API 會讓搜尋感覺遲鈍。
+2. 在 `post_body` 中使用 `%__input__%`，以便 API 僅返回匹配的結果，而不是整個資料集。
+3. 在伺服器端為搜尋欄位建立索引（例如 Elasticsearch、資料庫全文索引）以實現快速響應。
+4. 將每次查詢的结果限制在 20-50 項 —— 返回數千個結果會違背搜尋的初衷。
+5. 在 API 中包含最小輸入長度要求，以避免在輸入單個字元時觸發寬泛查詢。
 
 ## 限制
 
-- 動態搜尋需要網路連線——離線時不工作。
-- `%__input__%` 占位符按原樣注入；在伺服器端清理輸入以防止注入攻擊。
-- 複雜的 `@{func}` 顯示表達式在所有 rtSurvey 客戶端版本中的支援可能有限。
+- 動態搜尋需要網路連接 —— 它無法離線工作。
+- `%__input__%` 佔位符是原樣注入的；請在伺服器端清理輸入以防止注入攻擊。
+- 複雜的 `@{func}` 顯示表達式在所有 rtSurvey 客戶端版本中可能支援有限。
