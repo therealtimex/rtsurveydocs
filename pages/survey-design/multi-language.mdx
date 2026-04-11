@@ -54,6 +54,16 @@ rtSurvey extends multi-language support to validation messages:
 | integer | age  | . <= 150   | Age must be 150 or less          | La edad debe ser 150 o menos     |
 ```
 
+### Localized required messages
+
+Use `required_message::Language (code)` to show a translated error when a required field is left blank:
+
+```
+| type | name | required | required_message::English (en) | required_message::Tiếng Việt (vi) |
+|------|------|----------|-------------------------------|----------------------------------|
+| text | name | yes | This field is required | Trường này là bắt buộc |
+```
+
 ### RTL Language Support
 
 For right-to-left (RTL) languages like Arabic or Hebrew, rtSurvey automatically adjusts the layout:
@@ -73,6 +83,42 @@ rtSurvey allows you to specify different appearances for different languages:
 |------|------|---------------------|---------------------|--------------------------|---------------------------|
 | text | address | Address          | 地址                 | multiline                | textarea                  |
 ```
+
+## HTML formatting in bilingual labels
+
+You can combine HTML tags with language wrappers in a single label cell. rtSurvey extracts the active-language block and renders the remaining HTML.
+
+Example using bold and font color per language:
+
+```
+<en><big><b>Section 2: Household Income</b></big><br>Ask the household head only.</en><vi><big><b>Phần 2: Thu nhập hộ gia đình</b></big><br>Chỉ hỏi chủ hộ.</vi>
+```
+
+Supported inline tags inside language wrappers: `<b>`, `<i>`, `<u>`, `<big>`, `<small>`, `<font color="...">`, `<br>`, `<span style="...">`.
+
+Colored text example per language:
+
+```
+<en><font color="red">Required field</font></en><vi><font color="red">Trường bắt buộc</font></vi>
+```
+
+## Language-aware calculations
+
+When a form has a `${language_use}` field (set by a `change_language` widget), use `if()` to return values in the active language:
+
+```
+if(${language_use} = 'en', label_en, label_vi)
+```
+
+Example — display a lookup result in the active language using `pulldata('rawquery', ...)`:
+
+```
+| type      | name        | calculation                                                                 |
+|-----------|-------------|-----------------------------------------------------------------------------|
+| calculate | district_label | if(${language_use} = 'en', pulldata('rawquery', 'name_en', 'code', ${district}), pulldata('rawquery', 'name_vi', 'code', ${district})) |
+```
+
+Note: The `language_use` field is typically set by a `change_language` appearance widget. See Appearance — change_language.
 
 ## Best Practices for Multi-Language Surveys
 
