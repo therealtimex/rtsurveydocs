@@ -1,13 +1,13 @@
-# Translation Spec — Range question type
+# Translation Spec — Dynamic Search
 
 ## Source
-`pages/survey-design/question-types/range.mdx`
+`pages/survey-design/advanced-features/dynamic-search.mdx`
 
 ## Target path pattern
-`_locales/{locale}/survey-design/question-types/range.mdx`
+`_locales/{locale}/survey-design/advanced-features/dynamic-search.mdx`
 
 ## Summary of changes
-Updated intro and limitations to accurately reflect that rtSurvey web form renders range as a plain number input (no slider widget). Removed incorrect appearance/slider section.
+Added "Local file search with search()" section before Best Practices. Covers: search(path, 'matches', 'list_name', ${field}) signature, parameter table (path via concat(${family_path},...), 'matches' operator, list_name column, field value), example populating select_one from bundled .db by matching list_name column, comparison table (search() vs rawquery autocomplete: SQL queries, parameterized input, free-text entry, UNION/multi-table), when to use each.
 
 ## Locales
 

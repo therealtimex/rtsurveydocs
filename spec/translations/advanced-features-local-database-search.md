@@ -1,13 +1,13 @@
-# Translation Spec — Integer question type
+# Translation Spec — Local Database Search
 
 ## Source
-`pages/survey-design/question-types/integer.mdx`
+`pages/survey-design/advanced-features/local-database-search.mdx`
 
 ## Target path pattern
-`_locales/{locale}/survey-design/question-types/integer.mdx`
+`_locales/{locale}/survey-design/advanced-features/local-database-search.mdx`
 
 ## Summary of changes
-Full rewrite. Added: default behavior (parseInt, decimal point blocked), number-hspinner with hspinner() and colors(), thousandsep, digisep, textonly, floating_hint, embed, textpopup, charcount, prefix(), align_answer, inputs{qrscan}. Replaced placeholder "rtSurvey extensions would need to be confirmed" with accurate code-verified content.
+New page. Documents rawquery-backed autocomplete for offline SQLite lookups. Covers: appearance variants (search-autocomplete-noedit, search-autocomplete-noedit-v2, search()), rawquery data source signature (6 parameters), db_path convention using family_path, basic province lookup example, parameterized queries with ? placeholders (single and two-parameter cascade examples), UNION SELECT for 888/999 special values, multi-language display with if() on display column, selected-at(., 0) != -997 constraint for validating real selection, comparison table (rawquery vs search-api vs search() vs plain CSV choices), limitations.
 
 ## Locales
 

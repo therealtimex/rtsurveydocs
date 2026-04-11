@@ -1,13 +1,13 @@
-# Translation Spec — Barcode question type
+# Translation Spec — HTML Styling
 
 ## Source
-`pages/survey-design/question-types/barcode.mdx`
+`pages/survey-design/advanced-features/html-styling.mdx`
 
 ## Target path pattern
-`_locales/{locale}/survey-design/question-types/barcode.mdx`
+`_locales/{locale}/survey-design/advanced-features/html-styling.mdx`
 
 ## Summary of changes
-Full rewrite. Added: supported formats, default full-width button layout, scanner modal description (manual text entry, camera fallback), inline button layout with display{align, size, color} and results{} (hide(scanner), hide(review), hide(value)), inputs{auto-close(N)} countdown auto-close, inputs{floating} draggable scanner icon, invisible auto-show, repeat group auto-advance behavior, text-nolabel.
+Added "Dynamic HTML summaries with autopull()" section before Best Practices. Covers: autopull(concat('<html>...</html>')) syntax on note fields, live re-render on every field change, scroll-view(45%) pairing to cap panel height, full household location summary example (three-row table with province/district/commune), inline styles support and what is NOT supported inside autopull() (<style> blocks, external <link>, <script>), when-to-use table (review-before-submit, running totals, visible reference panel).
 
 ## Locales
 

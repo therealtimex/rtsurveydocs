@@ -1,13 +1,13 @@
-# Translation Spec — Image question type
+# Translation Spec — Multi-Language
 
 ## Source
-`pages/survey-design/question-types/image.mdx`
+`pages/survey-design/multi-language.mdx`
 
 ## Target path pattern
-`_locales/{locale}/survey-design/question-types/image.mdx`
+`_locales/{locale}/survey-design/multi-language.mdx`
 
 ## Summary of changes
-Added rtSurvey extensions: inline button layout with display{align, size, color} and results{} (hide(capture), hide(camera), hide(review), hide(filename)), invisible auto-show, signature (including quick variant), draw, watermark, text-nolabel.
+Added two sections before Best Practices. (1) "HTML formatting in bilingual labels": combining HTML tags with <en>/<vi> language wrappers in a single label cell, supported inline tags (b, i, u, big, small, font color, br, span style), colored text per language example. (2) "Language-aware calculations": using if(${language_use} = 'en', label_en, label_vi) pattern when a change_language widget is present, full example with pulldata('rawquery',...) returning label_en or label_vi based on language_use field, note about language_use being set by change_language appearance.
 
 ## Locales
 

@@ -1,13 +1,13 @@
-# Translation Spec — Decimal question type
+# Translation Spec — Form Navigation Controls
 
 ## Source
-`pages/survey-design/question-types/decimal.mdx`
+`pages/survey-design/advanced-features/form-navigation.mdx`
 
 ## Target path pattern
-`_locales/{locale}/survey-design/question-types/decimal.mdx`
+`_locales/{locale}/survey-design/advanced-features/form-navigation.mdx`
 
 ## Summary of changes
-Full rewrite. Added: default behavior (parseFloat, single decimal point allowed, 15-char limit in hspinner), number-hspinner with .toFixed(1) display and decimal step support via hspinner(), thousandsep, digisep, textonly, floating_hint, embed, textpopup, charcount, prefix(), align_answer, inputs{qrscan}. Replaced placeholder "rtSurvey extensions would need to be confirmed" with accurate code-verified content.
+New page. Documents SaveFinalizedExit and SaveIncompleteExit appearance values on note/text fields. Covers: SaveFinalizedExit<#COLOR/> (saves as final, exits), SaveIncompleteExit<#COLOR/> (saves as draft, exits), color syntax <#RRGGBB/> with rules (6 hex digits, closing /> required), combined example with green submit + amber draft buttons, toc-hide token and why navigation buttons should be excluded from TOC, placement convention (end of form, both buttons together), conditional finalized exit using relevant column, limitations (note/text only, 6-digit hex only, label is button text, both buttons should be present).
 
 ## Locales
 

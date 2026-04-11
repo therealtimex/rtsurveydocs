@@ -1,13 +1,13 @@
-# Translation Spec — Call API
+# Translation Spec — Audio Recording
 
 ## Source
-`pages/survey-design/advanced-features/call-api.mdx`
+`pages/survey-design/advanced-features/audio-recording.mdx`
 
 ## Target path pattern
-`_locales/{locale}/survey-design/advanced-features/call-api.mdx`
+`_locales/{locale}/survey-design/advanced-features/audio-recording.mdx`
 
 ## Summary of changes
-Added "Fetching multiple values from one API call" section: extract_expr='json:' stores raw JSON response, then substr-jsonpath() extracts individual fields in separate calculate rows — avoids multiple HTTP calls. Includes full XLSForm table example and link to substr-jsonpath().
+New page. Documents audio-start / audio-end appearances on text fields. Covers: mobile-only warning callout, how recording markers work, basic start/end example, audio-start invisible for silent recording, naming convention (audio_s_{section}{n} / audio_e_{section}{n}), storage and retrieval (attachment on audio-end field, accessible in backend), multiple non-overlapping recording sections example, limitations (mobile-only, no nesting, text type only, upload size, no mid-recording pause).
 
 ## Locales
 
