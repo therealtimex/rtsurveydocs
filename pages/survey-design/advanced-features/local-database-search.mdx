@@ -1,0 +1,224 @@
+---
+title: "Local Database Search"
+description: "Local Database Search queries a bundled SQLite .db file using raw SQL, enabling fast offline autocomplete for large static datasets."
+---
+
+import { Callout } from 'nextra/components'
+
+**Local Database Search** lets a `select_one` or `text` field query a SQLite `.db` file that is bundled with the form's media package — entirely offline, with no server round-trip. This is the right approach when your choice list is large and static (e.g., a national list of villages, health facilities, or administrative boundaries) and connectivity cannot be guaranteed.
+
+| Approach | Data source | Requires connectivity |
+|---|---|---|
+| Local database search (`rawquery`) | Bundled `.db` file (SQLite) | No |
+| `search-api()` | Remote REST API | Yes |
+| `search()` | Bundled CSV file | No |
+
+---
+
+## Appearance variants
+
+The autocomplete field is configured through the `appearance` column. Three variants are available:
+
+| Variant | Notes |
+|---|---|
+| `search-autocomplete-noedit(...)` | Standard autocomplete — enumerator must select from the list; free-text entry is not saved |
+| `search-autocomplete-noedit-v2(...)` | Recommended variant — same behaviour but uses an updated rendering engine with better performance on large result sets |
+| `search(...)` | Simple file-based match against a bundled CSV; does **not** support raw SQL — listed here for comparison only |
+
+<Callout type="info">
+`search-autocomplete-noedit` is an alias — at parse time the app replaces it with the internal function name `searchAutocompleteNoedit`. Use either spelling in your XLSForm; both work.
+</Callout>
+
+---
+
+## The `rawquery` data source
+
+To run a SQL query against a `.db` file, pass `'rawquery'` as the first argument of the appearance function. The full signature is:
+
+```
+search-autocomplete-noedit-v2(
+  'rawquery',
+  <db_path>,
+  '[display_col]',
+  'value_col',
+  'SELECT ...',
+  param1, param2, ...
+)
+```
+
+### Parameters
+
+| Position | Parameter | Description |
+|---|---|---|
+| 1 | `'rawquery'` | Literal string — tells the app to execute the SQL directly |
+| 2 | `db_path` | Path to the SQLite file, in the form `<dir>/<file>.db::tableName`. The `::tableName` suffix is stripped when opening the file; the table name is used inside your SQL |
+| 3 | `'[display_col]'` | Column to display in the dropdown. The surrounding `[ ]` brackets are stripped at runtime |
+| 4 | `'value_col'` | Column whose value is stored when the enumerator makes a selection |
+| 5 | `'SELECT ...'` | Any valid SQLite SELECT statement. `SELECT DISTINCT` is automatically injected if `DISTINCT` is not already present |
+| 6+ | `param1, ...` | Optional. Values bound to `?` placeholders in the SQL, in order. If the SQL contains `?` but no params are supplied, the field returns empty (a built-in guard against missing arguments) |
+
+### The `db_path` convention
+
+The database file lives inside the form's bundled media directory. At runtime, `pulldata('app-api', 'family_path')` returns that directory path. The standard pattern is:
+
+```
+concat(${family_path}, '/mydata.db::tableName')
+```
+
+When the app opens the file it strips the `::tableName` part and uses the bare file path. The table name appears only inside your SQL.
+
+---
+
+## Basic example — province lookup
+
+A read-only province dropdown backed by a bundled `vnxa3.db` file:
+
+| type | name | label | appearance | calculation |
+|---|---|---|---|---|
+| calculate | family_path | | | `pulldata('app-api', 'family_path')` |
+| select_one | province | Province | `search-autocomplete-noedit-v2('rawquery', concat(${family_path}, '/vnxa3.db::externalData'), '[provv]', 'provid', 'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')` | |
+
+The `appearance` column (expanded for readability):
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"')
+```
+
+- The displayed label comes from the `provv` column.
+- The stored value comes from the `provid` column.
+- Only rows where `rta_filter = "1"` are shown.
+
+---
+
+## Parameterized queries
+
+Use `?` placeholders in your SQL and pass the corresponding field references as additional arguments (positions 6 onward). This is the standard pattern for cascading selects — e.g., loading districts that belong to the previously selected province.
+
+<Callout type="warning">
+If your SQL contains at least one `?` and no parameter arguments are supplied, the field returns an empty result set. This prevents stale or unscoped data from appearing before a parent selection is made.
+</Callout>
+
+### District cascade example
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[distv]', 'distid',
+  'SELECT distv, distid FROM externalData
+   WHERE provid = ? AND rta_filter = "1"',
+  ${province})
+```
+
+The value of `${province}` is bound to the first `?`. The field is blank until the enumerator selects a province.
+
+### Two-parameter example — commune cascade
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[commv]', 'commid',
+  'SELECT commv, commid FROM externalData
+   WHERE provid = ? AND distid = ? AND rta_filter = "1"',
+  ${province}, ${district})
+```
+
+Parameters are bound positionally: `${province}` → first `?`, `${district}` → second `?`.
+
+---
+
+## UNION SELECT for special values
+
+Inject synthetic rows — such as "Don't Know" or "Refuse to Answer" — directly in the SQL using `UNION SELECT`:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[provv]', 'provid',
+  'SELECT provv, provid FROM externalData WHERE rta_filter = "1"
+   UNION SELECT "<i>Không biết</i>", "888"')
+```
+
+Conventions used in RTSurvey forms:
+
+| Code | Meaning |
+|---|---|
+| `888` | Don't Know |
+| `999` | Refuse to Answer |
+
+HTML tags such as `<i>` in the display string are rendered by the app — you can use them to visually distinguish special options.
+
+---
+
+## Multi-language display
+
+Store language-specific labels in separate columns (e.g., `label_vi`, `label_en`) and select the appropriate one based on a language field in your form:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  '[label_vi]', 'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+To switch columns dynamically based on a `${language}` field, use an `if()` expression on the display column parameter to switch between language columns:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/vnxa3.db::externalData'),
+  if(${language} = 'vi', '[label_vi]', '[label_en]'),
+  'provid',
+  'SELECT label_vi, label_en, provid FROM externalData
+   WHERE rta_filter = "1"')
+```
+
+<Callout type="info">
+The display column parameter is evaluated before the query runs. Only the column name (without brackets) is passed to the SQL engine; the brackets are cosmetic markers stripped at parse time.
+</Callout>
+
+---
+
+## Validating a real selection
+
+When the field allows special values such as 888 or 999, a plain `required = yes` check is insufficient — it is satisfied even if the enumerator selects "Don't Know". Use the `selected-at(., 0) != -997` constraint to verify that the stored value is a genuine selection and not the internal "nothing selected" sentinel `-997`:
+
+| column | value |
+|---|---|
+| constraint | `selected-at(., 0) != -997` |
+| constraint_message | Please select a valid option |
+
+The value `-997` is the internal code RTSurvey stores when no item has been selected from the autocomplete list. A selection of 888 or 999 is still a deliberate choice and passes this check.
+
+To additionally require a real (non-special) value, extend the constraint:
+
+```
+selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) != '999'
+```
+
+---
+
+## Comparison: local database vs other search methods
+
+| Feature | `rawquery` autocomplete | `search-api()` | `search()` CSV | Plain CSV choices |
+|---|---|---|---|---|
+| Data source | Bundled `.db` (SQLite) | Remote REST API | Bundled CSV | Choices sheet |
+| Works offline | Yes | No | Yes | Yes |
+| Supports raw SQL | Yes | No | No | No |
+| Cascading filters | Yes — parameterized `?` | Via request body | Limited | No |
+| Dataset size | Very large (millions of rows) | Unlimited (server-side) | Medium (tens of thousands) | Small |
+| Special injected rows | Yes — `UNION SELECT` | No | No | Yes (manual) |
+| Setup complexity | Medium — requires bundled `.db` | High — requires API server | Low | None |
+
+---
+
+## Limitations
+
+- The `.db` file must be bundled inside the form's media package before deployment. Dynamic updates to the database require a new form deployment.
+- SQL is executed as-is on the device. There is no server-side sanitisation — avoid constructing SQL from free-text enumerator input.
+- Only `SELECT` statements are supported. `INSERT`, `UPDATE`, and `DELETE` are not permitted.
+- Very complex queries (large `UNION` chains, multiple joins) may be slow on low-end Android devices.
+- The `search-autocomplete-noedit` variants do not allow the enumerator to save a value that is not in the result set. If free-text entry is required, use a separate `text` field.
+- `SELECT DISTINCT` is injected automatically only when `DISTINCT` is absent from the query. If you write `SELECT DISTINCT` explicitly, it will not be doubled.
