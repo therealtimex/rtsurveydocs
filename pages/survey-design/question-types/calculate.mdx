@@ -1,0 +1,128 @@
+---
+title: "calculate"
+description: "The calculate question type performs background computations in an XLSForm, storing derived values without displaying an input to the enumerator."
+---
+
+import { Callout } from 'nextra/components'
+
+The `calculate` question type runs a formula silently in the background. It stores the result in a named field that other questions can reference — but it shows no input or label to the enumerator. Use it to derive values, concatenate strings, run conditional logic, or look up data that you need later in the form.
+
+---
+
+## Basic syntax
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
+
+- **type**: Always `calculate`.
+- **name**: A unique field name. Other questions reference this with `${name}`.
+- **label**: Leave blank — calculate fields are never shown to the enumerator.
+- **calculation**: The formula to evaluate. Supports all [XLSForm functions](../operators-and-functions/functions) and field references.
+
+---
+
+## Common patterns
+
+### Arithmetic
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
+
+### String concatenation
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
+
+### Conditional value
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
+
+### Age from date of birth
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
+
+---
+
+## Using `once()` to lock the value
+
+By default, `calculate` re-evaluates whenever any referenced field changes. Wrap the formula in `once()` to evaluate only on first load and freeze the result:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
+
+Use `once()` for timestamps, initial values, or any case where recalculation on change is undesirable.
+
+---
+
+## Pulling data from external sources
+
+### From a CSV file
+
+```
+pulldata('staff.csv', 'department', 'name', ${staff_id})
+```
+
+See [pulldata()](../operators-and-functions/pulldata) for the full reference.
+
+### From a bundled SQLite database
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+See [Local Database Search](../advanced-features/local-database-search) for path construction details.
+
+### From app context
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+See [App API](../app-api) for all available keys.
+
+---
+
+## Using calculate in relevant and constraint
+
+Other fields can reference a `calculate` result just like any field:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## Best Practices
+
+1. Give calculate fields meaningful names — `total_cost` is clearer than `calc1` and easier to trace in exports.
+2. Break complex formulas into multiple chained calculate fields instead of one deeply nested expression.
+3. Use `once()` for timestamps and initial snapshots to prevent values from changing after first capture.
+4. Place `calculate` fields before the first question that references them — evaluation order follows form order.
+5. Keep the `label` column empty. Some tools display the label; leaving it blank avoids confusing output.
+
+## Limitations
+
+- Calculate fields are never displayed directly to the enumerator — use a `note` field to show the result.
+- The `calculation` column is required; a `calculate` row with no formula always stores an empty string.
+- Results re-evaluate on every form change unless wrapped in `once()` — very complex formulas in large forms can affect rendering performance on low-end devices.
+- Calculated values are stored as strings in the submission. Use `number()`, `int()`, or `boolean()` to cast when passing the result to arithmetic or logic expressions.
