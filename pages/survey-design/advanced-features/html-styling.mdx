@@ -125,6 +125,76 @@ Example usage in a repeat group:
 
 ---
 
+## Dynamic HTML summaries with autopull()
+
+`autopull()` renders a block of HTML inside a `note` field and **re-evaluates it on every field change** in the form. This makes it suitable for live summary panels, review-before-submit screens, and running totals that update as the enumerator fills in data.
+
+<Callout type="info">
+`autopull()` only works on **note** fields. The label column is ignored — all HTML content must be supplied through the **appearance** column using `concat()`.
+</Callout>
+
+### Syntax
+
+Place `autopull()` in the **appearance** column of a `note` field:
+
+```
+autopull(concat('<html>...</html>'))
+```
+
+Field references (`${field_name}`) inside `concat()` are substituted with the current live values and the HTML is re-rendered on every change.
+
+### Constraining height with scroll-view()
+
+For longer summaries, combine `autopull()` with `scroll-view(N%)` to cap the panel height and make it scrollable:
+
+```
+scroll-view(45%) autopull(concat('<html>...</html>'))
+```
+
+The `N%` value is relative to the visible form area. `45%` is a practical default for a mid-page summary panel.
+
+### Full example — household location summary
+
+The following `note` field renders a two-column table showing the selected province, district, and commune. It updates automatically whenever `${tinh_name}`, `${huyen_name}`, or `${xa_name}` change.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| note | location_summary | | `scroll-view(45%) autopull(concat('<html><table style="width:100%;border-collapse:collapse"><tr><td style="padding:4px;font-weight:bold">Province:</td><td style="padding:4px">', ${tinh_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">District:</td><td style="padding:4px">', ${huyen_name}, '</td></tr><tr><td style="padding:4px;font-weight:bold">Commune:</td><td style="padding:4px">', ${xa_name}, '</td></tr></table></html>'))` |
+
+In XLSForm the appearance value is written across a single cell:
+
+```
+scroll-view(45%) autopull(concat(
+  '<html><table style="width:100%;border-collapse:collapse">
+   <tr><td style="padding:4px;font-weight:bold">Province:</td>
+       <td style="padding:4px">', ${tinh_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">District:</td>
+       <td style="padding:4px">', ${huyen_name}, '</td></tr>
+   <tr><td style="padding:4px;font-weight:bold">Commune:</td>
+       <td style="padding:4px">', ${xa_name}, '</td></tr>
+   </table></html>'))
+```
+
+### Inline styles
+
+Inline `style="..."` attributes on any HTML element are supported and are the recommended way to apply visual formatting inside `autopull()` blocks.
+
+The following are **not** supported inside `autopull()` content:
+
+- `<style>` blocks
+- External stylesheet `<link>` tags
+- JavaScript (`<script>`)
+
+### When to use autopull()
+
+| Use case | Notes |
+|----------|-------|
+| Review-before-submit screen | Show all key answers on one panel before the enumerator finishes |
+| Running totals | Display a calculated sum that updates as quantities are entered |
+| Visible reference panel | Show a selected lookup value (e.g. province name) while the enumerator fills in child fields |
+
+---
+
 ## Best Practices
 
 1. Use HTML sparingly — overformatted labels are harder to read, not easier.
