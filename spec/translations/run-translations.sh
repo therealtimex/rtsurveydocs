@@ -12,6 +12,7 @@ chmod +x "$SPECS_DIR/run-one-spec.sh"
 
 find "$SPECS_DIR" -maxdepth 1 -name '*.md' ! -name 'README.md' \
   | sort \
+  | xargs grep -l "not_implemented" \
   | xargs -P "$MAX_JOBS" -I{} "$SPECS_DIR/run-one-spec.sh" {}
 
 echo ""

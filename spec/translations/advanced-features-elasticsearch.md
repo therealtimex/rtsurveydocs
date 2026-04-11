@@ -7,7 +7,7 @@
 `_locales/{locale}/survey-design/advanced-features/elasticsearch.mdx`
 
 ## Summary of changes
-New page. Documents how to use Elasticsearch data in RTSurvey forms from a form designer's perspective. Covers: (1) Real-time search via search-api() pointing at ES _search endpoint — data_path=$.hits.hits, ##_source.fieldname## display template, pulldata() after selection; (2) Offline via dataSetting.csv + rawquery — server exports ES snapshot as SQLite externalData table, query with marked_as_deleted filter; (3) When-to-use comparison table (real-time vs offline vs static bundled); (4) Security note — HTTP Basic Auth is server-side only, search-api() sends no auth headers to ES, use offline mode for sensitive data.
+New page. Documents how to use Elasticsearch data in RTSurvey forms from a form designer's perspective. Covers: (1) Real-time search via search-api() with full code example — POST to ES _search endpoint, data_path=$.hits.hits, ##_source.fieldname## display template, pulldata('es_result', '_source.field') after selection; (2) Offline via dataSetting.csv + rawquery — dataSetting.csv entry example for ES export endpoint, server exports ES snapshot as SQLite externalData table, rawquery appearance example with marked_as_deleted filter; (3) When-to-use comparison table (real-time vs offline vs static bundled); (4) Security note — HTTP Basic Auth is server-side only, search-api() sends no auth headers to ES, use offline mode for sensitive data.
 
 ## Locales
 

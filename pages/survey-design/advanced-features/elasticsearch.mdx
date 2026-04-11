@@ -11,15 +11,23 @@ Elasticsearch (ES) is a server-side search engine managed by the platform admini
 
 ## Real-time search with `search-api()`
 
-Point `search-api()` at the ES `_search` endpoint using `POST` method. Key parameters to configure:
+Point `search-api()` at the ES `_search` endpoint using `POST` method. In the `appearance` column:
 
-- **method**: `POST`
-- **url**: the ES `_search` endpoint URL
-- **body**: the ES query JSON — use `%__input__%` where the search term goes
-- **value_column**: `_id` or a field inside `_source`
-- **display_template**: use `##_source.fieldname##` to access nested source fields
-- **data_path**: `$.hits.hits` — each hit becomes one result item
-- **result_key**: any name, used to read fields with `pulldata()` after selection
+```
+search-api('POST',
+  'https://es.example.com/my_index/_search',
+  '{"query":{"match":{"name":"%__input__%"}},"size":20}',
+  '_id',
+  '##_source.name## — ##_source.district##',
+  '$.hits.hits',
+  'es_result')
+```
+
+Key points:
+- `data_path` must be `$.hits.hits` — each hit in the array becomes one result item
+- `display_template` uses `##_source.fieldname##` to access nested source fields
+- `value_column` is typically `_id` or a field inside `_source`
+- After selection, read any field with `pulldata('es_result', '_source.district')`, `pulldata('es_result', '_source.province')`, etc.
 
 See [Dynamic Search](dynamic-search) for the full `search-api()` parameter reference.
 
@@ -30,6 +38,22 @@ See [Dynamic Search](dynamic-search) for the full `search-api()` parameter refer
 ## Offline access with `dataSetting.csv`
 
 Use `dataSetting.csv` to download an ES data export as a SQLite file at form open time. The server exports the ES index as a SQLite file with a single `externalData` table. Once on the device, query it with `rawquery` like any other local database.
+
+`dataSetting.csv` entry for an ES export:
+
+```csv
+filepath,service_url,option,frequency,primary_key,where,dynamic_part
+resources/familyMedia/FORM/staff.db,./api/es/export?index=hr_staff,overwrite,3600,,,
+```
+
+Then in the form's `appearance` column:
+
+```
+search-autocomplete-noedit-v2('rawquery',
+  concat(${family_path}, '/staff.db::externalData'),
+  '[name]', 'id',
+  'SELECT name, id FROM externalData WHERE marked_as_deleted != 1')
+```
 
 See [Data Settings](data-settings) and [Local Database Search](local-database-search) for full reference.
 
