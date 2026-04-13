@@ -76,6 +76,7 @@ In addition to standard XLSForm appearances, rtSurvey supports the following pla
 | `invisible` | any | Hides the field from view while still collecting or calculating its value. Different from `hidden` type — the field still participates in logic. |
 | `displaytitle` | any | Forces display of the field's label/title even when it would otherwise be suppressed. |
 | `autopull` | select_one, select_multiple | Automatically fetches external data to populate choices when the form loads or a trigger field changes. |
+| `autopull(htmlContent)` | note | Renders a dynamic HTML block inside a `note` field and re-evaluates it on every field change. Content must be supplied as a `concat()` expression in the appearance column. See [HTML Styling](advanced-features/html-styling#dynamic-html-summaries-with-autopull). |
 | `floating_hint` | text, integer, decimal | Shows the hint text as a floating label above the input field rather than below it. |
 | `calculate-button` | calculate | Adds a visible button that triggers recalculation of the field on demand, rather than computing automatically. |
 
@@ -83,7 +84,7 @@ In addition to standard XLSForm appearances, rtSurvey supports the following pla
 
 | Appearance Attribute | Question Types | Description |
 |----------------------|----------------|-------------|
-| `section` | group | Renders the group as a collapsible section card. Note: mobile app only. |
+| `section` | group | Renders the group as a top-level section header/divider in the form's navigation. Questions inside the group scroll normally — this does not collapse content or show questions one per screen. |
 | `toc-hide` | any | Excludes the question from the table-of-contents (TOC) navigation panel. |
 | `minilog` | begin_repeat | Displays completed repeat entries as a compact mini-log list rather than expanding each entry inline. |
 
@@ -105,7 +106,7 @@ In addition to standard XLSForm appearances, rtSurvey supports the following pla
 | `gridformat<row=R col=C colspan=S align=center>` | any | Positions the field in a CSS-grid layout at row `R`, column `C`, spanning `S` columns. Used with `advanced-extension/grid-layout`. |
 | `ignore-simplify` | any | Instructs the form renderer to skip automatic simplification or condensing of this field's layout. |
 | `horizontal(N)` | select_one, select_multiple | Sets each choice to occupy `N` percent of the row width. Example: `horizontal(50)` places two choices per row. |
-| `scroll-view(N%)` | group, repeat | Constrains the container to a maximum height of `N%` of the viewport (or parent), adding a scroll bar when content overflows. Example: `scroll-view(60%)`. |
+| `scroll-view(N%)` | group, repeat, note | Constrains the container to a maximum height of `N%` of the viewport (or parent), adding a scroll bar when content overflows. Example: `scroll-view(60%)`. Commonly combined with `autopull(htmlContent)` on `note` fields to cap summary panel height. |
 
 ### Widgets
 
@@ -120,9 +121,9 @@ In addition to standard XLSForm appearances, rtSurvey supports the following pla
 
 | Appearance Attribute | Question Types | Description |
 |----------------------|----------------|-------------|
-| `callapi` | text, integer, decimal, select_one | Enables API call integration for this field. The calculation column should contain a `callapi()` expression. See [Call API](advanced-features/call-api). |
-| `callapi-verify(params)` | text, integer, decimal | Triggers an API verification call using static parameters. The form blocks progress until the API confirms the value. |
-| `callapi-verify(dynamicParams)` | text, integer, decimal | Same as `callapi-verify` but with parameters derived from other field values at runtime. |
+| `callapi` | calculate, text, integer, decimal, select_one | Enables API call integration for this field. The calculation column should contain a `callapi()` expression. See [Call API](advanced-features/call-api). |
+| `callapi-verify(params)` | text, integer, decimal, barcode, and other input types | Triggers an API verification call using static parameters. The form blocks progress until the API confirms the value. |
+| `callapi-verify(dynamicParams)` | text, integer, decimal, barcode, and other input types | Same as `callapi-verify` but with parameters derived from other field values at runtime. |
 
 ### Language switcher
 

@@ -7,8 +7,8 @@ The **Call API** feature lets a survey field make an HTTP request to an external
 
 There are two functions:
 
-- `callapi()` — fetches a value from an API and stores it in a `calculate` or `text` field
-- `callapi-verify()` — calls an API and blocks progress if the response does not match the expected value (used in `constraint`)
+- `callapi()` — fetches a value from an API and stores it in a `calculate`, `text`, `integer`, `decimal`, or `select_one` field
+- `callapi-verify()` — calls an API and blocks progress if the response does not match the expected value; can be applied to any input field type (used in `constraint`)
 
 ---
 
@@ -16,7 +16,7 @@ There are two functions:
 
 ### Syntax
 
-Place `callapi()` in the **`calculation`** column of a `calculate` or `text` field:
+Place `callapi()` in the **`calculation`** column of a `calculate`, `text`, `integer`, `decimal`, or `select_one` field:
 
 ```
 callapi(method, url, allowed_auto, max_retry, no_overwrite, extract_expr, timeout, lifetime, response_q, call_type, post_body)
