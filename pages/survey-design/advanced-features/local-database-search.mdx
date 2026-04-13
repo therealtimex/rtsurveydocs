@@ -10,7 +10,7 @@ import { Callout } from 'nextra/components'
 | Approach | Data source | Requires connectivity |
 |---|---|---|
 | Local database search (`rawquery`) | Bundled `.db` file (SQLite) | No |
-| `search-api()` | Remote REST API | Yes |
+| `search-api()` | Elasticsearch `_search` endpoint | Yes |
 | `search()` | Bundled CSV file | No |
 
 ---
@@ -204,7 +204,7 @@ selected-at(., 0) != -997 and selected-at(., 0) != '888' and selected-at(., 0) !
 
 | Feature | `rawquery` autocomplete | `search-api()` | `search()` CSV | Plain CSV choices |
 |---|---|---|---|---|
-| Data source | Bundled `.db` (SQLite) | Remote REST API | Bundled CSV | Choices sheet |
+| Data source | Bundled `.db` (SQLite) | Elasticsearch `_search` | Bundled CSV | Choices sheet |
 | Works offline | Yes | No | Yes | Yes |
 | Supports raw SQL | Yes | No | No | No |
 | Cascading filters | Yes — parameterized `?` | Via request body | Limited | No |

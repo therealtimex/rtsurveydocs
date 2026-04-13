@@ -11,7 +11,7 @@ Elasticsearch (ES) is a server-side search engine managed by the platform admini
 
 ## Real-time search with `search-api()`
 
-Point `search-api()` at the ES `_search` endpoint using `POST` method. In the `appearance` column:
+`search-api()` exclusively supports Elasticsearch `_search` endpoints — it does not work with arbitrary REST APIs. Point it at the ES `_search` endpoint using `POST` method. In the `appearance` column:
 
 ```
 search-api('POST',
