@@ -1,111 +1,128 @@
 ---
-title: "Beräkna"
-description: ""
+title: "calculate"
+description: "Frågetypen calculate utför bakgrundsberäkningar i ett XLSForm och lagrar härledda värden utan att visa ett inmatningsfält för intervjuaren."
 ---
 
-Beräkningsfrågor i XLSForms och rtSurvey används för att utföra beräkningar baserade på andra fält eller värden i ditt formulär. Dessa frågor visas inte för användaren utan körs i bakgrunden och lagrar sina resultat för senare användning eller inlämning.
+import { Callout } from 'nextra/components'
 
-## Syntax
+Frågetypen `calculate` kör en formel tyst i bakgrunden. Den lagrar resultatet i ett namngivet fält som andra frågor kan referera till — men den visar ingen inmatning eller etikett för intervjuaren. Använd den för att härleda värden, sammanfoga strängar, köra villkorlig logik eller slå upp data som du behöver senare i formuläret.
 
-I XLSForm definieras en beräkningsfråga enligt följande:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Grundläggande syntax
 
-- **type**: Alltid "calculate" för denna frågtyp.
-- **name**: Ett unikt namn för beräkningsfrågan.
-- **label**: Lämnas vanligtvis tomt eftersom beräkningsfrågor inte visas för användarna.
-- **calculation**: Formeln som ska utvärderas.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Användningsområden
+- **type**: Alltid `calculate`.
+- **name**: Ett unikt fältnamn. Andra frågor refererar till detta med `${name}`.
+- **label**: Lämna tomt — calculate-fält visas aldrig för intervjuaren.
+- **calculation**: Formeln som ska utvärderas. Stöder alla [XLSForm-funktioner](../operators-and-functions/functions) och fältreferenser.
 
-Beräkningsfrågor används vanligtvis för:
+---
 
-1. Utföra aritmetiska operationer
-2. Sammanfoga strängar
-3. Tillämpa komplex logik eller funktioner
-4. Lagra mellanliggande resultat för senare användning
+## Vanliga mönster
 
-## Exempel
+### Aritmetik
 
-### Grundläggande aritmetik
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### Sammanfogning av strängar (String concatenation)
 
-### Strängsammansättning
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Villkorligt värde
 
-### Använda funktioner
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Ålder från födelsedatum
 
-## Avancerad användning i rtSurvey
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### Funktionen pulldata()
+---
 
-rtSurvey stöder funktionen `pulldata()` i beräkningsfält, vilket gör det möjligt att hämta data från externa CSV-filer:
+## Använda `once()` för att låsa värdet
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Som standard omvärderas `calculate` närhelst ett refererat fält ändras. Inneslut formeln i `once()` för att utvärdera endast vid första laddningen och låsa resultatet:
 
-#### Syntax
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-Den grundläggande syntaxen för pulldata() är:
+Använd `once()` för tidsstämplar, initialvärden eller i alla fall där omberäkning vid ändring är oönskad.
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+---
 
-- 'csv_filename': Namn på CSV-filen (utan .csv-tillägg)
-- 'column_to_return': Kolumnnamn som innehåller de data du vill hämta
-- 'key_column': Kolumnnamn att matcha mot
-- `${matching_value}`: Värde att söka upp i nyckelkolumnen
+## Hämta data från externa källor
 
-#### Viktiga anmärkningar
-
-1. CSV-filen måste laddas upp tillsammans med ditt XLSForm när undersökningen driftsätts.
-2. Använd kommatecken som separatorer i din CSV-fil, inte semikolon.
-3. Undvik kommatecken i datafälten i din CSV, eftersom de kan orsaka tolkningsproblem.
-4. pulldata() stöder bara 1-till-1-relationer. Om flera matchningar hittas returneras bara den första.
-5. Det kan finnas begränsningar för textlängd som kan hämtas (ca 76 tecken).
-6. Du kan använda pulldata() i begränsningar för att validera poster mot CSV-data.
-
-### Villkorliga beräkningar
-
-Du kan använda if()-satser för villkorliga beräkningar:
+### Från en CSV-fil
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
+
+Se [pulldata()](../operators-and-functions/pulldata) för den fullständiga referensen.
+
+### Från en medföljande SQLite-databas
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Se [Lokal databassökning](../advanced-features/local-database-search) för detaljer om sökvägskonstruktion.
+
+### Från app-kontext
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Se [App API](../app-api) för alla tillgängliga nycklar.
+
+---
+
+## Använda calculate i relevant och constraint
+
+Andra fält kan referera till ett `calculate`-resultat precis som vilket fält som helst:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
 
 ## Bästa praxis
 
-1. Använd meningsfulla namn för beräkningsfält för att förbättra formulärläsbarheten.
-2. Undvik alltför komplexa beräkningar i ett enda fält; bryt ner dem om nödvändigt.
-3. Testa dina beräkningar noggrant, särskilt när du använder komplexa formler eller externa data.
-4. Kom ihåg att beräkningsfält körs varje gång formuläret utvärderas, vilket kan påverka prestandan för mycket komplexa eller många beräkningar.
-5. När du använder pulldata(), se till att dina CSV-filer är korrekt formaterade och testa noggrant.
+1. Ge calculate-fält meningsfulla namn — `total_cost` är tydligare än `calc1` och lättare att spåra i exporter.
+2. Dela upp komplexa formler i flera länkade calculate-fält istället för ett djupt nästlat uttryck.
+3. Använd `once()` för tidsstämplar och initiala snapshots för att förhindra att värden ändras efter första insamlingen.
+4. Placera `calculate`-fält före den första frågan som refererar till dem — utvärderingsordningen följer formulärets ordning.
+5. Håll kolumnen `label` tom. Vissa verktyg visar etiketten; att lämna den blank undviker förvirrande utdata.
 
 ## Begränsningar
 
-- Beräkningsfält kan inte redigeras direkt av användare.
-- Resultatet av ett beräkningsfält är inte omedelbart synligt om det inte refereras i ett visningsfält eller används i formulärlogik.
+- Calculate-fält visas aldrig direkt för intervjuaren — använd ett `note`-fält för att visa resultatet.
+- Kolumnen `calculation` är obligatorisk; en `calculate`-rad utan formel lagrar alltid en tom sträng.
+- Resultaten omvärderas vid varje formulärändring om de inte är inneslutna i `once()` — mycket komplexa formler i stora formulär kan påverka renderingsprestandan på enheter med lägre prestanda.
+- Beräknade värden lagras som strängar i inskickningen. Använd `number()`, `int()` eller `boolean()` för att typkonvertera när du skickar resultatet till aritmetiska uttryck eller logiska uttryck.

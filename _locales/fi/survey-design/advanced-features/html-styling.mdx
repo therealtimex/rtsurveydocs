@@ -1,14 +1,14 @@
 ---
-title: "HTML-tyylit"
-description: "rtSurvey tukee HTML-tageja otsikoissa ja vihjeissä, mikä mahdollistaa rikkaan tekstin muotoilun, linkit ja dynaamiset väriteemat."
+title: "HTML-muotoilu"
+description: "rtSurvey tukee HTML-tageja otsikoissa ja vihjeissä, mikä mahdollistaa tekstin monipuolisen muotoilun, linkit ja dynaamisen väriteemojen käytön."
 ---
 
 import { Callout } from 'nextra/components'
 
-rtSurvey renderöi **label** (otsikko) ja **hint** (vihje) -tekstit HTML-muodossa verkkolomakkeilla. Tämä tarkoittaa, että voit käyttää standardeja HTML-tageja tekstin muotoiluun, rivinvaihtojen lisäämiseen, linkkien luomiseen ja värien käyttämiseen. Tämä on erityisen hyödyllistä huomautuskentissä, osioiden ohjeissa ja dynaamisissa yhteenvedoissa.
+rtSurvey esittää **label**- ja **hint**-tekstit HTML-muodossa verkkolomakkeilla. Tämä tarkoittaa, että voit käyttää tavallisia HTML-tageja tekstin muotoiluun, rivinvaihtojen lisäämiseen, linkkien luomiseen ja värien käyttämiseen. Tämä on erityisen hyödyllistä huomautuskentissä, osio-ohjeissa ja dynaamisissa yhteenvedoissa.
 
 <Callout type="warning">
-Otsikoiden HTML renderöidään **verkkolomakkeella** ja rtSurveyn mobiilisovelluksissa. Se ei välttämättä renderöidy kaikissa ODK-yhteensopivissa asiakasohjelmissa. Testaa aina kohdealustallasi.
+Otsikoiden HTML esitetään **verkkolomakkeella** ja rtSurvey-mobiilisovelluksissa. Se ei välttämättä näy kaikissa ODK-yhteensopivissa sovelluksissa. Testaa aina kohdealustallasi.
 </Callout>
 
 ---
@@ -17,89 +17,89 @@ Otsikoiden HTML renderöidään **verkkolomakkeella** ja rtSurveyn mobiilisovell
 
 ### Tekstin muotoilu
 
-| Tagi | Tulos |
+| Tag | Result |
 |-----|--------|
 | `<strong>text</strong>` tai `<b>text</b>` | **Lihavoitu teksti** |
 | `<em>text</em>` tai `<i>text</i>` | *Kursivoitu teksti* |
 | `<u>text</u>` | Alleviivattu teksti |
 | `<br>` | Rivinvaihto |
-| `<span style="...">text</span>` | Rivinsisäinen tyylitys |
+| `<span style="...">text</span>` | Rivinsisäinen muotoilu |
 
 ### Linkit
 
 ```html
-<a href="https://example.com" target="_blank">Click here</a>
+<a href="https://example.com" target="_blank">Klikkaa tästä</a>
 ```
 
-Avautuu uuteen välilehteen. Käytä viiteasiakirjoihin, ohjeisiin tai ulkoisiin resursseihin, joita haastattelijan tulisi konsultoida.
+Avautuu uudessa välilehdessä. Käytä viiteasiakirjoihin, ohjeisiin tai ulkoisiin resursseihin, joita haastattelijan tulee tarkastella.
 
 ### Värit
 
-Käytä `<span>`-tagia rivinsisäisillä tyyleillä:
+Käytä `<span>`-tagia ja rivinsisäisiä tyylejä:
 
 ```html
-<span style="color: red;">Warning: value is out of range</span>
-<span style="color: #009688;">Section completed</span>
+<span style="color: red;">Varoitus: arvo on sallitun alueen ulkopuolella</span>
+<span style="color: #009688;">Osio valmis</span>
 ```
 
 ---
 
 ## Väriteeman muuttujat
 
-rtSurvey tukee **väriteeman tunnisteita** (tokens), jotka mukautuvat sovelluksen määritettyyn teemaan. Käytä `__COLOR_THEME_NAME__`-syntaksia:
+rtSurvey tukee **väriteeman tunnisteita**, jotka mukautuvat sovelluksen asetettuun teemaan. Käytä syntaksia `__COLOR_THEME_NAME__`:
 
 ```html
-<span style="color: var(--color-theme-primary);">Primary color text</span>
+<span style="color: var(--color-theme-primary);">Ensisijaisen värin teksti</span>
 ```
 
 Tai käyttämällä tunnisteen lyhennettä otsikkotekstissä:
 
 ```
-<font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
+<font color="var(--COLOR_THEME_PRIMARY)">Tärkeä huomautus</font>
 ```
 
-Tämä muunnetaan automaattisesti vastaavaksi `<span>`-tagiksi CSS-muuttujalla renderöintivaiheessa.
+Tämä muutetaan automaattisesti vastaavaksi `<span>`-tagiksi CSS-muuttujalla esitysvaiheessa.
 
 ---
 
 ## Monikieliset otsikot
 
-Kääri sisältö kielitgeihin tukeaksesi useita kieliä yhdessä otsikkosolussa:
+Kääri sisältö kielitunnisteisiin tukeaksesi useita kieliä yhdessä otsikkosolussa:
 
 ```
-<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+<en>Enter the household size</en><fi>Syötä kotitalouden koko</fi>
 ```
 
-rtSurvey poimii sisällön, joka vastaa sovelluksen nykyistä kieltä. Jos vastaavaa kielitagia ei löydy, koko merkkijono näytetään sellaisenaan.
+rtSurvey poimii sisällön, joka vastaa sovelluksen nykyistä kieltä. Jos vastaavaa kielitunnistetta ei löydy, koko merkkijono näytetään sellaisenaan.
 
 ---
 
 ## Esimerkkejä huomautuskentissä
 
-### Osion ohje lihavoinnilla ja rivinvaihdolla
+### Osio-ohje lihavoinnilla ja rivinvaihdolla
 
 | type | name | label |
 |------|------|-------|
-| note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
+| note | section_intro | `<strong>Osio 3: Maankäyttö</strong><br>Kysy kaikki tämän osion kysymykset vain kotitalouden päämieheltä.` |
 
-### Dynaaminen yhteenveto laskentaviittauksella
+### Dynaaminen yhteenveto laskentaviitteellä
 
 | type | name | label |
 |------|------|-------|
 | calculate | total | | `${adults} + ${children}` |
-| note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
+| note | summary | `Kotitalouden jäseniä yhteensä: <strong>${total}</strong><br><span style="color: gray;">Aikuisia: ${adults} · Lapsia: ${children}</span>` |
 
 ### Varoitus punaisella
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
+| note | age_warning | `<span style="color: red;"><strong>Varoitus:</strong> Syötetty ikä (${age}) on poikkeuksellisen korkea. Tarkista.</span>` | `${age} > 100` |
 
 ### Linkki viiteasiakirjaan
 
 | type | name | label |
 |------|------|-------|
-| note | guidelines_link | `Refer to the <a href="https://docs.example.com/guidelines" target="_blank">Field Guidelines</a> before starting this section.` |
+| note | guidelines_link | `Tutustu <a href="https://docs.example.com/guidelines" target="_blank">kenttäohjeisiin</a> ennen tämän osion aloittamista.` |
 
 ---
 
@@ -111,51 +111,51 @@ Upottaa painikkeen, joka avaa URL-osoitteen lomakkeen sisäisessä modaali-ikkun
 
 ### `<delete-repeat-current>label</delete-repeat-current>`
 
-Renderöi toistoryhmän sisälle painikkeen, joka poistaa nykyisen toistokerran, kun sitä napautetaan.
+Luo toistoryhmän sisälle painikkeen, joka poistaa nykyisen toistokerran napautettaessa.
 
 ### `<delete-repeat-last>label</delete-repeat-last>`
 
-Renderöi painikkeen, joka poistaa viimeisimmän toistokerran.
+Luo painikkeen, joka poistaa viimeisimmän toistokerran.
 
 Esimerkki käytöstä toistoryhmässä:
 
 | type | name | label |
 |------|------|-------|
-| note | delete_btn | `<delete-repeat-current>Remove this member</delete-repeat-current>` |
+| note | delete_btn | `<delete-repeat-current>Poista tämä jäsen</delete-repeat-current>` |
 
 ---
 
-## Dynaamiset HTML-yhteenvedot autopull()-funktiolla
+## Dynaamiset HTML-yhteenvedot autopull()-toiminnolla
 
-`autopull()` renderöi HTML-lohkon `note`-kentän sisällä ja **arvioi sen uudelleen jokaisen kenttämuutoksen yhteydessä** lomakkeella. Tämä tekee siitä sopivan live-yhteenvetopaneeleihin, tarkistusnäyttöihin ennen lähettämistä ja juokseviin summiin, jotka päivittyvät haastattelijan täyttäessä tietoja.
+`autopull()` esittää HTML-lohkon `note`-kentän sisällä ja **päivittää sen jokaisen kenttämuutoksen yhteydessä** lomakkeella. Tämä tekee siitä sopivan reaaliaikaisiin yhteenvetopaneeleihin, tarkista-ennen-lähetystä-näkymiin ja päivittyviin summiin haastattelijan täyttäessä tietoja.
 
 <Callout type="info">
-`autopull()` toimii vain **note**-kentissä. Otsikkosaraketta (label) ei huomioida — kaikki HTML-sisältö on annettava **appearance**-sarakkeen kautta käyttämällä `concat()`-funktiota.
+`autopull()` toimii vain **note**-kentissä. Otsikkosaraketta ei huomioida — kaikki HTML-sisältö on annettava **appearance**-sarakkeen kautta `concat()`-funktiolla.
 </Callout>
 
 ### Syntaksi
 
-Aseta `autopull()` `note`-kentän **appearance**-sarakkeeseen:
+Sijoita `autopull()` `note`-kentän **appearance**-sarakkeeseen:
 
 ```
 autopull(concat('<html>...</html>'))
 ```
 
-`concat()`-funktion sisällä olevat kenttäviittaukset (`${field_name}`) korvataan nykyisillä live-arvoilla ja HTML renderöidään uudelleen jokaisen muutoksen yhteydessä.
+Kenttäviittaukset (`${field_name}`) `concat()`-funktion sisällä korvataan nykyisillä reaaliaikaisilla arvoilla, ja HTML päivitetään jokaisen muutoksen yhteydessä.
 
-### Korkeuden rajoittaminen scroll-view()-funktiolla
+### Korkeuden rajoittaminen scroll-view()-toiminnolla
 
-Pidemmissä yhteenvedoissa voit yhdistää `autopull()`-funktion `scroll-view(N%)`-funktioon paneelin korkeuden rajoittamiseksi ja sen tekemiseksi vieritettäväksi:
+Pidemmissä yhteenvedoissa voit yhdistää `autopull()`- ja `scroll-view(N%)`-toiminnot rajoittaaksesi paneelin korkeutta ja tehdäksesi siitä vieritettävän:
 
 ```
 scroll-view(45%) autopull(concat('<html>...</html>'))
 ```
 
-`N%`-arvo on suhteessa lomakkeen näkyvään alueeseen. `45%` on käytännöllinen oletusarvo sivun keskivaiheilla olevalle yhteenvetopaneelille.
+`N%`-arvo on suhteessa lomakkeen näkyvään alueeseen. `45%` on käytännöllinen oletusarvo sivun keskellä olevalle yhteenvetopaneelille.
 
-### Täysi esimerkki — kotitalouden sijainnin yhteenveto
+### Täydellinen esimerkki — kotitalouden sijaintiyhteenveto
 
-Seuraava `note`-kenttä renderöi kaksisarakkeisen taulukon, joka näyttää valitun maakunnan, piirin ja kunnan. Se päivittyy automaattisesti aina, kun `${tinh_name}`, `${huyen_name}` tai `${xa_name}` muuttuvat.
+Seuraava `note`-kenttä esittää kaksisarakkeisen taulukon, joka näyttää valitun maakunnan, piirin ja kunnan. Se päivittyy automaattisesti aina, kun `${tinh_name}`, `${huyen_name}` tai `${xa_name}` muuttuvat.
 
 | type | name | label | appearance |
 |------|------|-------|------------|
@@ -177,7 +177,7 @@ scroll-view(45%) autopull(concat(
 
 ### Rivinsisäiset tyylit
 
-Rivinsisäisiä `style="..."`-attribuutteja tuetaan kaikissa HTML-elementeissä, ja ne ovat suositeltu tapa käyttää visuaalista muotoilua `autopull()`-lohkojen sisällä.
+Rivinsisäiset `style="..."`-attribuutit ovat tuettuja kaikissa HTML-elementeissä ja ovat suositeltu tapa visuaaliseen muotoiluun `autopull()`-lohkojen sisällä.
 
 Seuraavia **ei** tueta `autopull()`-sisällössä:
 
@@ -185,27 +185,27 @@ Seuraavia **ei** tueta `autopull()`-sisällössä:
 - Ulkoiset tyylitiedostot (`<link>`)
 - JavaScript (`<script>`)
 
-### Milloin autopull()-funktiota kannattaa käyttää
+### Milloin autopull()-toimintoa tulisi käyttää
 
 | Käyttötapaus | Huomautukset |
-|----------|-------|
-| Tarkistusnäyttö ennen lähettämistä | Näytä kaikki tärkeimmät vastaukset yhdessä paneelissa ennen kuin haastattelija lopettaa |
+|--------------|--------------|
+| Tarkista-ennen-lähetystä-näkymä | Näytä kaikki tärkeät vastaukset yhdellä paneelilla ennen kuin haastattelija lopettaa |
 | Juoksevat summat | Näytä laskettu summa, joka päivittyy määrien syöttämisen myötä |
-| Näkyvä viitepaneeli | Näytä valittu hakuarvo (esim. maakunnan nimi), kun haastattelija täyttää alikenttiä |
+| Näkyvä viitepaneeli | Näytä valittu hakuarvo (esim. maakunnan nimi) haastattelijan täyttäessä alikenttiä |
 
 ---
 
 ## Parhaat käytännöt
 
-1. Käytä HTML:ää säästeliäästi — liian muotoiltuja otsikoita on vaikeampi lukea.
-2. Suosi `<strong>`-tagia lihavointiin ja `<em>`-tagia kursivointiin vanhentuneiden `<b>`- ja `<i>`-tagien sijaan.
-3. Käytä värejä merkityksellisesti — käytä punaista varoituksiin, älä koristeeksi.
-4. Testaa HTML-renderöinti aina sekä mobiilisovelluksessa että verkkolomakkeella, sillä renderöinti voi vaihdella hieman.
-5. Vältä `<table>`-tageja otsikoiden sisällä — ne renderöityvät harvoin hyvin mobiilinäytöillä.
+1. Käytä HTML-koodia säästeliäästi — liian monimutkaisesti muotoillut otsikot ovat vaikealukuisempia.
+2. Käytä mieluummin `<strong>`-tagia lihavointiin ja `<em>`-tagia kursivointiin kuin vanhentuneita `<b>`- ja `<i>`-tageja.
+3. Käytä värejä merkityksellisesti — käytä punaista varoituksiin, älä koristeena.
+4. Testaa aina HTML-esitystä sekä mobiilisovelluksessa että verkkolomakkeella, sillä esitystapa voi poiketa hieman.
+5. Vältä `<table>`-tageja otsikoiden sisällä — ne näkyvät harvoin hyvin mobiilinäytöillä.
 6. Älä käytä JavaScriptiä (`<script>`) — se poistetaan tai se aiheuttaa virheitä.
 
 ## Rajoitukset
 
-- Monimutkaista HTML-koodia (taulukot, lomakkeet, skriptit) ei tueta, ja se voi rikkoa renderöinnin.
-- Jotkut vanhemmat mobiiliohjelmat saattavat näyttää HTML-tagit tekstinä — testaa kaikilla kohdelaitteilla.
-- `<a>`-linkit avautuvat selaimessa tai WebViews-näkymässä — haastattelija poistuu lomakkeelta, mikä voi olla häiritsevää mobiililaitteella.
+- Monimutkaista HTML-koodia (taulukot, lomakkeet, skriptit) ei tueta ja se voi rikkoa esityksen.
+- Jotkut vanhemmat mobiilisovellukset saattavat näyttää HTML-tagit pelkkänä tekstinä — testaa kaikilla kohdelaitteilla.
+- `<a>`-linkit avautuvat selaimessa tai WebView-näkymässä — haastattelija poistuu lomakkeelta, mikä voi olla häiritsevää mobiililaitteella.

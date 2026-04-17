@@ -1,19 +1,128 @@
 ---
-title: "Calculate"
-description: ""
+title: "calculate"
+description: "Typ pytania calculate wykonuje obliczenia w tle w formacie XLSForm, przechowując wartości pochodne bez wyświetlania pola wprowadzania ankieterowi."
 ---
 
-Typ pytania `calculate` wykonuje obliczenia oparte na wartościach innych pól i przechowuje wynik. Pole jest ukryte przed respondentem.
+import { Callout } from 'nextra/components'
 
-## Podstawowa specyfikacja XLSForm
+Typ pytania `calculate` po cichu uruchamia formułę w tle. Przechowuje wynik w nazwanym polu, do którego mogą odwoływać się inne pytania — ale nie wyświetla ankieterowi żadnego pola wprowadzania ani etykiety. Służy do wyprowadzania wartości, łączenia ciągów znaków, uruchamiania logiki warunkowej lub wyszukiwania danych, które będą potrzebne w dalszej części formularza.
 
-| type      | name   | label | calculation              |
-|-----------|--------|-------|--------------------------|
-| calculate | bmi    |       | `${weight} / (${height} * ${height})` |
+---
 
-## Typowe zastosowania
+## Podstawowa składnia
 
-- Obliczenia matematyczne (np. BMI, wiek z daty urodzenia)
-- Konkatenacja ciągów znaków
-- Logika warunkowa wymagająca przechowania pośrednich wyników
-- Wyodrębnianie danych z API przy użyciu `callapi()`
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
+
+- **type**: Zawsze `calculate`.
+- **name**: Unikalna nazwa pola. Inne pytania odwołują się do niej za pomocą `${name}`.
+- **label**: Pozostaw puste — pola calculate nigdy nie są wyświetlane ankieterowi.
+- **calculation**: Formuła do oceny. Obsługuje wszystkie [funkcje XLSForm](../operators-and-functions/functions) oraz odwołania do pól.
+
+---
+
+## Typowe wzorce
+
+### Arytmetyka
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
+
+### Łączenie ciągów znaków (String concatenation)
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
+
+### Wartość warunkowa
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
+
+### Wiek na podstawie daty urodzenia
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
+
+---
+
+## Użycie `once()` do blokowania wartości
+
+Domyślnie `calculate` jest ponownie oceniane za każdym razem, gdy zmienia się dowolne pole, do którego następuje odwołanie. Otocz formułę funkcją `once()`, aby została oceniona tylko przy pierwszym załadowaniu i aby wynik został zamrożony:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
+
+Używaj `once()` dla znaczników czasu, wartości początkowych lub w każdym przypadku, gdy ponowne przeliczanie przy zmianie jest niepożądane.
+
+---
+
+## Pobieranie danych ze źródeł zewnętrznych
+
+### Z pliku CSV
+
+```
+pulldata('staff.csv', 'department', 'name', ${staff_id})
+```
+
+Pełne informacje znajdują się w sekcji [pulldata()](../operators-and-functions/pulldata).
+
+### Z dołączonej bazy danych SQLite
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Szczegółowe informacje na temat budowania ścieżek znajdują się w sekcji [Wyszukiwanie w lokalnej bazie danych](../advanced-features/local-database-search).
+
+### Z kontekstu aplikacji
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Wszystkie dostępne klucze znajdują się w sekcji [App API](../app-api).
+
+---
+
+## Użycie calculate w relevant i constraint
+
+Inne pola mogą odwoływać się do wyniku `calculate` tak samo, jak do każdego innego pola:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## Najlepsze praktyki
+
+1. Nadawaj polom calculate znaczące nazwy — `total_cost` jest jaśniejsze niż `calc1` i łatwiejsze do śledzenia w eksportach.
+2. Rozbijaj złożone formuły na wiele połączonych pól calculate zamiast jednego głęboko zagnieżdżonego wyrażenia.
+3. Używaj `once()` dla znaczników czasu i początkowych migawek, aby zapobiec zmianie wartości po pierwszym przechwyceniu.
+4. Umieszczaj pola `calculate` przed pierwszym pytaniem, które się do nich odwołuje — kolejność oceny jest zgodna z kolejnością formularza.
+5. Pozostaw kolumnę `label` pustą. Niektóre narzędzia wyświetlają etykietę; pozostawienie jej pustej pozwala uniknąć mylących wyników.
+
+## Ograniczenia
+
+- Pola calculate nigdy nie są wyświetlane bezpośrednio ankieterowi — użyj pola `note`, aby pokazać wynik.
+- Kolumna `calculation` jest wymagana; wiersz `calculate` bez formuły zawsze przechowuje pusty ciąg znaków.
+- Wyniki są ponownie oceniane przy każdej zmianie formularza, chyba że są otoczone funkcją `once()` — bardzo złożone formuły w dużych formularzach mogą wpływać na wydajność renderowania na słabszych urządzeniach.
+- Obliczone wartości są przechowywane jako ciągi znaków w przesłanym formularzu. Użyj `number()`, `int()` lub `boolean()`, aby rzutować typ podczas przekazywania wyniku do wyrażeń arytmetycznych lub logicznych.

@@ -1,111 +1,128 @@
 ---
-title: "Skaičiavimas"
-description: ""
+title: "calculate"
+description: "Klausimo tipas calculate atlieka foninius skaičiavimus XLSForm formoje, išsaugodamas išvestines vertes ir nerodydamas įvesties lauko apklausėjui."
 ---
 
-XLSForm ir rtSurvey skaičiavimo klausimai naudojami skaičiavimams atlikti pagal kitus formos laukus ar reikšmes. Šie klausimai nerodomi naudotojui, bet vykdomi fone, saugodami savo rezultatus vėlesniam naudojimui ar pateikimui.
+import { Callout } from 'nextra/components'
 
-## Sintaksė
+Klausimo tipas `calculate` tyliai fone vykdo formulę. Jis išsaugo rezultatą nurodytame lauke, į kurį gali nuorodas daryti kiti klausimai, tačiau apklausėjui nerodoma jokia įvestis ar etiketė. Naudokite jį vertėms išvesti, eilutėms sujungti, sąlyginei logikai vykdyti arba duomenims, kurių prireiks vėliau formoje, ieškoti.
 
-XLSForm skaičiavimo klausimas apibrėžiamas taip:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Bazinė sintaksė
 
-- **type**: Visada „calculate" šiam klausimo tipui.
-- **name**: Unikalus skaičiavimo klausimo pavadinimas.
-- **label**: Paprastai paliekamas tuščias, nes skaičiavimo klausimai nerodomi naudotojams.
-- **calculation**: Vertinama formulė.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Naudojimo atvejai
+- **type**: Visada `calculate`.
+- **name**: Unikalus lauko pavadinimas. Kiti klausimai į jį nurodo naudodami `${name}`.
+- **label**: Palikite tuščią — calculate laukai apklausėjui niekada nerodomi.
+- **calculation**: Formulė, kurią reikia įvertinti. Palaiko visas [XLSForm funkcijas](../operators-and-functions/functions) ir nuorodas į laukus.
 
-Skaičiavimo klausimai dažnai naudojami:
+---
 
-1. Aritmetinėms operacijoms atlikti
-2. Eilutėms sujungti
-3. Sudėtingai logikai ar funkcijoms taikyti
-4. Tarpiniams rezultatams saugoti vėlesniam naudojimui
+## Dažni modeliai
 
-## Pavyzdžiai
+### Aritmetika
 
-### Pagrindinė aritmetika
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### Eilučių sujungimas (String concatenation)
 
-### Eilučių sujungimas
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Sąlyginė vertė
 
-### Funkcijų naudojimas
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Amžius pagal gimimo datą
 
-## Pažangus naudojimas rtSurvey sistemoje
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### Funkcija pulldata()
+---
 
-rtSurvey palaiko funkciją `pulldata()` skaičiavimo laukuose, leidžiančią gauti duomenis iš išorinių CSV failų:
+## `once()` naudojimas vertės užfiksavimui
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Pagal numatytuosius nustatymus `calculate` yra peržiūrimas iš naujo kiekvieną kartą, kai pasikeičia bet kuris nurodytas laukas. Apgaubkite formulę `once()`, kad ji būtų įvertinta tik per pirmąjį įkėlimą, o rezultatas būtų užfiksuotas:
 
-#### Sintaksė
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-Pagrindinė pulldata() sintaksė yra:
+Naudokite `once()` laiko žymoms, pradinėms vertėms arba bet kokiam atvejui, kai perskaičiavimas pasikeitus yra nepageidaujamas.
 
-```
-pulldata('csv_failo_pavadinimas', 'grąžinamas_stulpelis', 'raktinis_stulpelis', ${atitinkama_reikšmė})
-```
+---
 
-- 'csv_failo_pavadinimas': CSV failo pavadinimas (be .csv plėtinio)
-- 'grąžinamas_stulpelis': Stulpelio pavadinimas, kuriame yra duomenys, kuriuos norite gauti
-- 'raktinis_stulpelis': Stulpelio pavadinimas, pagal kurį atitinkama
-- `${atitinkama_reikšmė}`: Reikšmė, kurią reikia ieškoti raktiniame stulpelyje (dažnai kintamasis iš formos)
+## Duomenų traukimas iš išorinių šaltinių
 
-#### Svarbios pastabos
-
-1. CSV failas turi būti įkeltas kartu su jūsų XLSForm diegiant apklausą.
-2. Naudokite kableliais kaip atskyrikliais CSV faile, o ne kabliataškiais.
-3. Venkite kablelių CSV duomenų laukuose, nes jie gali sukelti apdorojimo problemų.
-4. pulldata() palaiko tik 1 prie 1 santykius. Jei rasta keletas atitikmenų, grąžina tik pirmą.
-5. Gali būti tekstų ilgio apribojimai, kuriuos galima gauti (apie 76 simboliai).
-6. pulldata() galite naudoti apribojimuose, kad patikrintumėte įrašus pagal CSV duomenis.
-
-### Sąlyginiai skaičiavimai
-
-Galite naudoti if() sakinius sąlyginiams skaičiavimams:
+### Iš CSV failo
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-## Geriausios praktikos
+Visą informaciją rasite [pulldata()](../operators-and-functions/pulldata).
 
-1. Naudokite prasmingus skaičiavimo laukų pavadinimus formos skaitomumui pagerinti.
-2. Venkite pernelyg sudėtingų skaičiavimų viename lauke; jei reikia, suskaidykite juos.
-3. Išsamiai patikrinkite savo skaičiavimus, ypač naudojant sudėtingas formules ar išorinius duomenis.
-4. Atminkite, kad skaičiavimo laukai vykdomi kiekvieną kartą, kai forma įvertinama, o tai gali turėti įtakos labai sudėtingų ar didelės apimties skaičiavimų našumui.
-5. Naudodami pulldata(), užtikrinkite, kad jūsų CSV failai yra teisingai suformatuoti, ir išsamiai testuokite su konkrečiais duomenimis ir formos struktūra.
+### Iš pridėtos SQLite duomenų bazės
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Išsamią informaciją apie kelio kūrimą rasite [Vietinė duomenų bazės paieška](../advanced-features/local-database-search).
+
+### Iš programėlės konteksto
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Visus galimus raktus rasite [App API](../app-api).
+
+---
+
+## calculate naudojimas relevant ir constraint laukuose
+
+Kiti laukai gali nurodyti į `calculate` rezultatą lygiai taip pat, kaip į bet kurį kitą lauką:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## Geriausia praktika
+
+1. Suteikite calculate laukams prasmingus pavadinimus — `total_cost` yra aiškiau nei `calc1` ir lengviau atsekti eksportuojant duomenis.
+2. Skaidykite sudėtingas formules į kelis sujungtus calculate laukus, užuot naudoję vieną giliai įdėtinę išraišką.
+3. Naudokite `once()` laiko žymoms ir pradinėms nuotraukoms, kad vertės nepasikeistų po pirmojo užfiksavimo.
+4. Padėkite `calculate` laukus prieš pirmąjį klausimą, kuris į juos nurodo — vertinimo tvarka atitinka formos tvarką.
+5. Palikite `label` stulpelį tuščią. Kai kurie įrankiai rodo etiketę; palikus ją tuščią, išvengiama painios išvesties.
 
 ## Apribojimai
 
-- Skaičiavimo laukai nėra tiesiogiai redaguojami naudotojų.
-- Skaičiavimo lauko rezultatas nėra iš karto matomas, nebent nurodytas rodymo lauke ar naudojamas formos logikoje.
+- Calculate laukai niekada nerodomi tiesiogiai apklausėjui — rezultatui parodyti naudokite `note` lauką.
+- Stulpelis `calculation` yra privalomas; `calculate` eilutė be formulės visada išsaugo tuščią eilutę.
+- Rezultatai perskaičiuojami kaskart pasikeitus formai, nebent jie yra apgaubti `once()` — labai sudėtingos formulės didelėse formose gali turėti įtakos atvaizdavimo našumui žemesnės klasės įrenginiuose.
+- Apskaičiuotos vertės pateiktoje formoje saugomos kaip eilutės. Naudokite `number()`, `int()` arba `boolean()`, kad pakeistumėte tipą, kai perduodate rezultatą aritmetinėms ar loginėms išraiškoms.

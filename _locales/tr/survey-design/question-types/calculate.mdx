@@ -1,111 +1,128 @@
 ---
-title: "Hesaplama"
-description: ""
+title: "calculate"
+description: "calculate soru tipi, XLSForm'da arka plan hesaplamaları gerçekleştirerek türetilmiş değerleri anketöre bir girdi göstermeden saklar."
 ---
 
-XLSForm'larda ve rtSurvey'de hesaplama soruları, formdaki diğer alanlara veya değerlere dayalı hesaplamalar yapmak için kullanılır. Bu sorular kullanıcıya görüntülenmez, bunun yerine arka planda çalışarak sonuçlarını daha sonra kullanılmak veya gönderilmek üzere saklar.
+import { Callout } from 'nextra/components'
 
-## Sözdizimi
+`calculate` soru tipi, arka planda sessizce bir formül çalıştırır. Sonucu, diğer soruların referans verebileceği adlandırılmış bir alanda saklar; ancak anketöre herhangi bir girdi veya etiket göstermez. Değer türetmek, dizeleri birleştirmek, koşullu mantık yürütmek veya formda daha sonra ihtiyaç duyacağınız verileri aramak için kullanın.
 
-XLSForm'da bir hesaplama sorusu şu şekilde tanımlanır:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Temel sözdizimi
 
-- **type**: Bu soru türü için her zaman "calculate".
-- **name**: Hesaplama sorusu için benzersiz bir ad.
-- **label**: Hesaplama soruları kullanıcılara görüntülenmediğinden genellikle boş bırakılır.
-- **calculation**: Değerlendirilecek formül.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Kullanım Alanları
+- **type**: Her zaman `calculate`.
+- **name**: Benzersiz bir alan adı. Diğer sorular buna `${name}` ile referans verir.
+- **label**: Boş bırakın — calculate alanları anketöre asla gösterilmez.
+- **calculation**: Değerlendirilecek formül. Tüm [XLSForm işlevlerini](../operators-and-functions/functions) ve alan referanslarını destekler.
 
-Hesaplama soruları yaygın olarak şunlar için kullanılır:
+---
 
-1. Aritmetik işlemler yapma
-2. Dizeleri birleştirme
-3. Karmaşık mantık veya fonksiyonlar uygulama
-4. Daha sonra kullanılmak üzere ara sonuçları saklama
+## Yaygın kalıplar
 
-## Örnekler
+### Aritmetik
 
-### Temel Aritmetik
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### Dize birleştirme (String concatenation)
 
-### Dize Birleştirme
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Koşullu değer
 
-### Fonksiyon Kullanımı
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Doğum tarihinden yaş hesaplama
 
-## rtSurvey'de Gelişmiş Kullanım
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### pulldata() Fonksiyonu
+---
 
-rtSurvey, hesaplama alanlarında `pulldata()` fonksiyonunu destekler ve harici CSV dosyalarından veri almanıza olanak tanır:
+## Değeri kilitlemek için `once()` kullanma
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Varsayılan olarak, referans verilen herhangi bir alan değiştiğinde `calculate` yeniden değerlendirilir. Formülü yalnızca ilk yüklemede değerlendirmek ve sonucu dondurmak için `once()` içine alın:
 
-#### Sözdizimi
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-pulldata() için temel sözdizimi:
+Zaman damgaları, başlangıç değerleri veya değişiklikle yeniden hesaplamanın istenmediği durumlar için `once()` kullanın.
 
-```
-pulldata('csv_dosyaadi', 'dondurilecek_sutun', 'anahtar_sutun', ${eslesen_deger})
-```
+---
 
-- 'csv_dosyaadi': CSV dosyasının adı (.csv uzantısı olmadan)
-- 'dondurilecek_sutun': Almak istediğiniz veriyi içeren sütun adı
-- 'anahtar_sutun': Karşılaştırılacak sütun adı
-- `${eslesen_deger}`: Anahtar sütunda aranacak değer (genellikle formdaki bir değişken)
+## Harici kaynaklardan veri çekme
 
-#### Önemli Notlar
-
-1. CSV dosyası, anketi dağıtırken XLSForm'unuzla birlikte yüklenmelidir.
-2. CSV dosyanızda ayırıcı olarak virgül kullanın, noktalı virgül değil.
-3. CSV'nin veri alanlarındaki virgüllerden kaçının, bunlar ayrıştırma sorunlarına neden olabilir.
-4. pulldata() yalnızca 1-1 ilişkileri destekler. Birden fazla eşleşme bulunursa yalnızca ilkini döndürür.
-5. Çekilebilecek metin uzunluğunda sınırlamalar olabilir (yaklaşık 76 karakter).
-6. Girişleri CSV verilerine göre doğrulamak için kısıtlamalarda pulldata() kullanabilirsiniz.
-
-### Koşullu Hesaplamalar
-
-Koşullu hesaplamalar için if() ifadelerini kullanabilirsiniz:
+### Bir CSV dosyasından
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
+
+Tam referans için [pulldata()](../operators-and-functions/pulldata) sayfasına bakın.
+
+### Paketlenmiş bir SQLite veritabanından
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Yol oluşturma ayrıntıları için [Yerel Veritabanı Araması](../advanced-features/local-database-search) sayfasına bakın.
+
+### Uygulama bağlamından
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Mevcut tüm anahtarlar için [App API](../app-api) sayfasına bakın.
+
+---
+
+## relevant ve constraint sütunlarında calculate kullanma
+
+Diğer alanlar, herhangi bir alan gibi bir `calculate` sonucuna referans verebilir:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
 
 ## En İyi Uygulamalar
 
-1. Form okunabilirliğini artırmak için hesaplama alanlarına anlamlı adlar verin.
-2. Tek bir alanda aşırı karmaşık hesaplamalardan kaçının; gerekirse bunları parçalara ayırın.
-3. Özellikle karmaşık formüller veya harici veriler kullanırken hesaplamalarınızı kapsamlı şekilde test edin.
-4. Hesaplama alanlarının form her değerlendirildiğinde çalıştığını unutmayın; bu çok karmaşık veya çok sayıda hesaplama için performansı etkileyebilir.
-5. pulldata() kullanırken CSV dosyalarınızın doğru biçimlendirildiğinden emin olun ve belirli veri ve form yapınızla kapsamlı testler yapın.
+1. Calculate alanlarına anlamlı adlar verin — `total_cost`, `calc1`den daha nettir ve dışa aktarmalarda izlenmesi daha kolaydır.
+2. Karmaşık formülleri tek bir derin iç içe geçmiş ifade yerine birden fazla zincirlenmiş calculate alanına bölün.
+3. Değerlerin ilk yakalamadan sonra değişmesini önlemek için zaman damgaları ve ilk anlık görüntüler için `once()` kullanın.
+4. `calculate` alanlarını, onlara referans veren ilk sorudan önce yerleştirin — değerlendirme sırası form sırasını takip eder.
+5. `label` sütununu boş bırakın. Bazı araçlar etiketi görüntüler; boş bırakmak kafa karıştırıcı çıktıları önler.
 
 ## Sınırlamalar
 
-- Hesaplama alanları kullanıcılar tarafından doğrudan düzenlenemez.
-- Bir hesaplama alanının sonucu, bir görüntü alanında başvurulmadığı veya form mantığında kullanılmadığı sürece hemen görünmez.
+- Calculate alanları anketöre asla doğrudan gösterilmez — sonucu göstermek için bir `note` alanı kullanın.
+- `calculation` sütunu zorunludur; formülü olmayan bir `calculate` satırı her zaman boş bir dize saklar.
+- Sonuçlar, `once()` içine alınmadıkça her form değişikliğinde yeniden değerlendirilir — büyük formlardaki çok karmaşık formüller, düşük donanımlı cihazlarda oluşturma performansını etkileyebilir.
+- Hesaplanan değerler gönderimde dize olarak saklanır. Sonucu aritmetik veya mantık ifadelerine geçirirken tür dönüşümü yapmak için `number()`, `int()` veya `boolean()` kullanın.

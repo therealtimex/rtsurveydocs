@@ -1,111 +1,128 @@
 ---
-title: "Calculate"
-description: ""
+title: "calculate"
+description: "El tipo de pregunta calculate realiza cálculos en segundo plano en un XLSForm, almacenando valores derivados sin mostrar una entrada al encuestador."
 ---
 
-Las preguntas de cálculo en XLSForms y rtSurvey se usan para realizar cómputos basados en otros campos o valores de su formulario. Estas preguntas no se muestran al usuario, sino que se ejecutan en segundo plano, almacenando sus resultados para uso posterior o envío.
+import { Callout } from 'nextra/components'
 
-## Sintaxis
+El tipo de pregunta `calculate` ejecuta una fórmula silenciosamente en segundo plano. Almacena el resultado en un campo con nombre al que otras preguntas pueden hacer referencia, pero no muestra ninguna entrada ni etiqueta al encuestador. Úselo para derivar valores, concatenar cadenas, ejecutar lógica condicional o buscar datos que necesite más adelante en el formulario.
 
-En el XLSForm, una pregunta de cálculo se define de la siguiente manera:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Sintaxis básica
 
-- **type**: Siempre "calculate" para este tipo de pregunta.
-- **name**: Un nombre único para la pregunta de cálculo.
-- **label**: Generalmente se deja en blanco ya que las preguntas de cálculo no se muestran a los usuarios.
-- **calculation**: La fórmula a evaluar.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Usos
+- **type**: Siempre `calculate`.
+- **name**: Un nombre de campo único. Otras preguntas hacen referencia a esto con `${name}`.
+- **label**: Dejar en blanco; los campos de cálculo nunca se muestran al encuestador.
+- **calculation**: La fórmula a evaluar. Admite todas las [funciones de XLSForm](../operators-and-functions/functions) y referencias a campos.
 
-Las preguntas de cálculo se usan comúnmente para:
+---
 
-1. Realizar operaciones aritméticas
-2. Concatenar cadenas
-3. Aplicar lógica o funciones complejas
-4. Almacenar resultados intermedios para uso posterior
+## Patrones comunes
 
-## Ejemplos
+### Aritmética
 
-### Aritmética básica
-
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
 ### Concatenación de cadenas
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-### Uso de funciones
+### Valor condicional
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-## Uso avanzado en rtSurvey
+### Edad a partir de la fecha de nacimiento
 
-### Función pulldata()
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-rtSurvey admite la función `pulldata()` en campos de cálculo, lo que le permite recuperar datos de archivos CSV externos:
+---
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+## Uso de `once()` para bloquear el valor
 
-#### Sintaxis
+Por defecto, `calculate` se vuelve a evaluar cada vez que cambia cualquier campo al que se hace referencia. Envuelva la fórmula en `once()` para evaluarla solo en la primera carga y congelar el resultado:
 
-La sintaxis básica para pulldata() es:
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+Use `once()` para marcas de tiempo, valores iniciales o cualquier caso en el que no sea deseable recalcular al cambiar.
 
-- `'csv_filename'`: Nombre del archivo CSV (sin extensión .csv)
-- `'column_to_return'`: Nombre de columna que contiene los datos que desea obtener
-- `'key_column'`: Nombre de columna con el que comparar
-- `${matching_value}`: Valor a buscar en la columna clave (a menudo una variable del formulario)
+---
 
-#### Notas importantes
+## Extracción de datos de fuentes externas
 
-1. El archivo CSV debe cargarse junto con su XLSForm al implementar la encuesta.
-2. Use comas como separadores en su archivo CSV, no punto y coma.
-3. Evite comas dentro de los campos de datos de su CSV, ya que pueden causar problemas de análisis.
-4. pulldata() solo admite relaciones 1 a 1. Si se encuentran múltiples coincidencias, devuelve solo la primera.
-5. Puede haber limitaciones en la longitud del texto que se puede obtener (alrededor de 76 caracteres).
-6. Puede usar pulldata() en restricciones para validar entradas contra los datos del CSV.
-
-### Cálculos condicionales
-
-Puede usar sentencias if() para cálculos condicionales:
+### De un archivo CSV
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-## Mejores prácticas
+Consulte [pulldata()](../operators-and-functions/pulldata) para obtener la referencia completa.
 
-1. Use nombres significativos para los campos de cálculo para mejorar la legibilidad del formulario.
-2. Evite cálculos demasiado complejos en un solo campo; desgloselos si es necesario.
-3. Pruebe exhaustivamente sus cálculos, especialmente cuando use fórmulas complejas o datos externos.
-4. Recuerde que los campos de cálculo se ejecutan cada vez que se evalúa el formulario, lo que puede afectar el rendimiento para cálculos muy complejos o numerosos.
-5. Al usar pulldata(), asegúrese de que sus archivos CSV estén correctamente formateados y pruebe exhaustivamente con sus datos y estructura de formulario específicos.
+### De una base de datos SQLite integrada
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Consulte [Búsqueda en base de datos local](../advanced-features/local-database-search) para obtener detalles sobre la construcción de rutas.
+
+### Del contexto de la aplicación
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Consulte [App API](../app-api) para conocer todas las claves disponibles.
+
+---
+
+## Uso de calculate en relevant y constraint
+
+Otros campos pueden hacer referencia a un resultado de `calculate` al igual que a cualquier campo:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## Mejores Prácticas
+
+1. Asigne nombres significativos a los campos de cálculo: `total_cost` es más claro que `calc1` y más fácil de rastrear en las exportaciones.
+2. Divida las fórmulas complejas en varios campos de cálculo encadenados en lugar de una expresión profundamente anidada.
+3. Use `once()` para marcas de tiempo y capturas iniciales para evitar que los valores cambien después de la primera captura.
+4. Coloque los campos `calculate` antes de la primera pregunta que haga referencia a ellos: el orden de evaluación sigue el orden del formulario.
+5. Mantenga vacía la columna `label`. Algunas herramientas muestran la etiqueta; dejarla en blanco evita resultados confusos.
 
 ## Limitaciones
 
-- Los campos de cálculo no son editables directamente por los usuarios.
-- El resultado de un campo de cálculo no es inmediatamente visible a menos que se referencie en un campo de visualización o se use en la lógica del formulario.
+- Los campos de cálculo nunca se muestran directamente al encuestador; use un campo `note` para mostrar el resultado.
+- La columna `calculation` es obligatoria; una fila `calculate` sin fórmula siempre almacena una cadena vacía.
+- Los resultados se vuelven a evaluar en cada cambio de formulario a menos que estén envueltos en `once()`; las fórmulas muy complejas en formularios grandes pueden afectar el rendimiento de la representación en dispositivos de gama baja.
+- Los valores calculados se almacenan como cadenas en el envío. Use `number()`, `int()` o `boolean()` para convertir el tipo al pasar el resultado a expresiones aritméticas o lógicas.

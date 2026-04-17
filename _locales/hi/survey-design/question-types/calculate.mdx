@@ -1,111 +1,128 @@
 ---
-title: "Calculate"
-description: ""
+title: "calculate"
+description: "calculate प्रश्न प्रकार XLSForm में पृष्ठभूमि गणना करता है, जो प्रगणक को इनपुट प्रदर्शित किए बिना व्युत्पन्न मानों को संग्रहीत करता है।"
 ---
 
-XLSForms और rtSurvey में Calculate questions का उपयोग आपके form के अन्य fields या values के आधार पर computations perform करने के लिए किया जाता है। ये questions user को display नहीं होते बल्कि background में run होते हैं, अपने results को बाद में उपयोग या submission के लिए store करते हैं।
+import { Callout } from 'nextra/components'
 
-## वाक्य विन्यास
+`calculate` प्रश्न प्रकार पृष्ठभूमि में चुपचाप एक सूत्र चलाता है। यह परिणाम को एक नामित फ़ील्ड में संग्रहीत करता है जिसे अन्य प्रश्न संदर्भित कर सकते हैं — लेकिन यह प्रगणक को कोई इनपुट या लेबल नहीं दिखाता है। मान प्राप्त करने, स्ट्रिंग्स को जोड़ने, सशर्त तर्क चलाने, या डेटा देखने के लिए इसका उपयोग करें जिसकी आपको बाद में फ़ॉर्म में आवश्यकता होगी।
 
-XLSForm में, एक calculate question इस प्रकार define किया जाता है:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## मूल सिंटैक्स
 
-- **type**: इस question type के लिए हमेशा "calculate"।
-- **name**: Calculate question के लिए एक unique name।
-- **label**: आमतौर पर blank छोड़ा जाता है क्योंकि calculate questions users को display नहीं होते।
-- **calculation**: Evaluate की जाने वाली formula।
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## उपयोग
+- **type**: हमेशा `calculate`|
+- **name**: एक अद्वितीय फ़ील्ड नाम। अन्य प्रश्न `${name}` के साथ इसे संदर्भित करते हैं।
+- **label**: खाली छोड़ दें — calculate फ़ील्ड प्रगणक को कभी नहीं दिखाए जाते हैं।
+- **calculation**: मूल्यांकन करने के लिए सूत्र। सभी [XLSForm कार्यों](../operators-and-functions/functions) और फ़ील्ड संदर्भों का समर्थन करता है।
 
-Calculate questions सामान्यतः इनके लिए उपयोग किए जाते हैं:
+---
 
-1. Arithmetic operations perform करना
-2. Strings concatenate करना
-3. Complex logic या functions लागू करना
-4. बाद में उपयोग के लिए intermediate results store करना
+## सामान्य पैटर्न
 
-## उदाहरण
+### अंकगणित
 
-### बुनियादी अंकगणित
-
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
 ### स्ट्रिंग संयोजन
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-### Functions का उपयोग करना
+### सशर्त मान
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-## rtSurvey में Advanced Usage
+### जन्म तिथि से आयु
 
-### pulldata() फ़ंक्शन
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-rtSurvey calculate fields में `pulldata()` function का समर्थन करता है, जिससे आप बाहरी CSV files से data retrieve कर सकते हैं:
+---
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+## मान को लॉक करने के लिए `once()` का उपयोग करना
 
-#### Syntax
+डिफ़ॉल्ट रूप से, जब भी कोई संदर्भित फ़ील्ड बदलता है, `calculate` पुनर्मूल्यांकन करता है। केवल पहले लोड पर मूल्यांकन करने और परिणाम को फ्रीज करने के लिए सूत्र को `once()` में लपेटें:
 
-pulldata() का basic syntax है:
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+टाइमस्टैम्प, प्रारंभिक मान, या किसी भी मामले में `once()` का उपयोग करें जहां परिवर्तन पर पुनर्गणना अवांछनीय है।
 
-- 'csv_filename': CSV file का नाम (.csv extension के बिना)
-- 'column_to_return': वह column name जिसमें आप जो data pull करना चाहते हैं वह है
-- 'key_column': Match करने के लिए column name
-- `${matching_value}`: Key column में lookup करने के लिए value (अक्सर form से एक variable)
+---
 
-#### महत्वपूर्ण Notes
+## बाहरी स्रोतों से डेटा खींचना
 
-1. Survey deploy करते समय CSV file को अपने XLSForm के साथ upload की जानी चाहिए।
-2. अपनी CSV file में separators के रूप में commas का उपयोग करें, semicolons का नहीं।
-3. अपने CSV के data fields में commas से बचें, क्योंकि वे parsing issues का कारण बन सकते हैं।
-4. pulldata() केवल 1-to-1 relationships का समर्थन करता है। यदि multiple matches मिलते हैं, तो यह केवल पहला return करता है।
-5. Pull किए जा सकने वाले text length पर सीमाएं हो सकती हैं (लगभग 76 characters)।
-6. आप CSV data के विरुद्ध entries validate करने के लिए constraints में pulldata() का उपयोग कर सकते हैं।
-
-### सशर्त गणनाएँ
-
-Conditional calculations के लिए if() statements का उपयोग कर सकते हैं:
+### एक CSV फ़ाइल से
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-## सर्वोत्तम प्रथाएँ
+पूर्ण संदर्भ के लिए [pulldata()](../operators-and-functions/pulldata) देखें।
 
-1. Form readability में सुधार करने के लिए calculate fields के लिए meaningful names का उपयोग करें।
-2. एक ही field में अत्यधिक complex calculations से बचें; यदि आवश्यक हो तो उन्हें break down करें।
-3. अपने calculations का पूरी तरह से परीक्षण करें, विशेषकर complex formulas या external data का उपयोग करते समय।
-4. याद रखें कि calculate fields हर बार form evaluate होने पर run होते हैं, जो बहुत complex या कई calculations के लिए performance को प्रभावित कर सकता है।
-5. pulldata() का उपयोग करते समय, सुनिश्चित करें कि आपकी CSV files सही ढंग से formatted हों और अपने specific data और form structure के साथ पूरी तरह से test करें।
+### एक बंडल SQLite डेटाबेस से
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+पथ निर्माण विवरण के लिए [स्थानीय डेटाबेस खोज](../advanced-features/local-database-search) देखें।
+
+### ऐप संदर्भ से
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+सभी उपलब्ध कुंजियों के लिए [App API](../app-api) देखें।
+
+---
+
+## relevant और constraint में calculate का उपयोग करना
+
+अन्य फ़ील्ड किसी भी फ़ील्ड की तरह `calculate` परिणाम को संदर्भित कर सकते हैं:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## सर्वोत्तम प्रथाएं
+
+1. गणना फ़ील्ड को सार्थक नाम दें — `total_cost` `calc1` की तुलना में स्पष्ट है और निर्यात में ट्रेस करना आसान है।
+2. एक गहरे नेस्टेड अभिव्यक्ति के बजाय जटिल सूत्रों को कई श्रृंखला गणना फ़ील्ड में तोड़ें।
+3. पहले कैप्चर के बाद मानों को बदलने से रोकने के लिए टाइमस्टैम्प और प्रारंभिक स्नैपशॉट के लिए `once()` का उपयोग करें।
+4. पहले प्रश्न से पहले `calculate` फ़ील्ड रखें जो उन्हें संदर्भित करता है — मूल्यांकन क्रम फ़ॉर्म क्रम का पालन करता है।
+5. `label` कॉलम को खाली रखें। कुछ उपकरण लेबल प्रदर्शित करते हैं; इसे खाली छोड़ने से भ्रमित करने वाले आउटपुट से बचा जा सकता है।
 
 ## सीमाएं
 
-- Calculate fields users द्वारा directly editable नहीं हैं।
-- Calculate field का result display field में referenced या form logic में उपयोग किए जाने तक immediately visible नहीं होता।
+- गणना फ़ील्ड प्रगणक को सीधे कभी प्रदर्शित नहीं होते हैं — परिणाम दिखाने के लिए `note` फ़ील्ड का उपयोग करें।
+- `calculation` कॉलम आवश्यक है; बिना सूत्र वाली `calculate` पंक्ति हमेशा एक खाली स्ट्रिंग संग्रहीत करती है।
+- परिणाम हर फ़ॉर्म परिवर्तन पर पुनर्मूल्यांकन करते हैं जब तक कि `once()` में लपेटे न गए हों — बड़े फ़ॉर्म में बहुत जटिल सूत्र लो-एंड डिवाइस पर रेंडरिंग प्रदर्शन को प्रभावित कर सकते हैं।
+- गणना किए गए मान सबमिशन में स्ट्रिंग्स के रूप में संग्रहीत किए जाते हैं। अंकगणितीय या तर्क अभिव्यक्तियों में परिणाम पारित करते समय कास्ट करने के लिए `number()`, `int()`, या `boolean()` का उपयोग करें।

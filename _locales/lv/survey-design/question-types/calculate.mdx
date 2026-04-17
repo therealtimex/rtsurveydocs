@@ -1,46 +1,128 @@
 ---
-title: "Aprēķināt"
-description: ""
+title: "calculate"
+description: "Jautājuma tips calculate veic fona aprēķinus XLSForm formātā, saglabājot atvasinātās vērtības un nerādot ievades lauku intervētājam."
 ---
 
-Aprēķina jautājumi XLSForms un rtSurvey tiek izmantoti, lai veiktu aprēķinus, pamatojoties uz citiem laukiem vai vērtībām formā. Šie jautājumi netiek parādīti lietotājam, bet tā vietā darbojas fonā, glabājot savus rezultātus vēlākai izmantošanai vai iesniegšanai.
+import { Callout } from 'nextra/components'
 
-## Sintakse
+Jautājuma tips `calculate` klusi fonā izpilda formulu. Tas saglabā rezultātu nosauktā laukā, uz kuru var atsaukties citi jautājumi, taču intervētājam netiek rādīta nekāda ievade vai etiķete. Izmantojiet to, lai atvasinātu vērtības, savienotu virknes, izpildītu nosacījumu loģiku vai meklētu datus, kas būs nepieciešami vēlāk formā.
+
+---
+
+## Pamata sintakse
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
-| calculate | bmi | | `${weight} div (${height} * ${height})` |
-| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
-| calculate | age_group | | `if(${age} < 18, 'jaunietis', if(${age} < 65, 'pieaugušais', 'seniors'))` |
+| calculate | total | | `${price} * ${quantity}` |
 
-## Biežākie aprēķini
+- **type**: Vienmēr `calculate`.
+- **name**: Unikāls lauka nosaukums. Citi jautājumi uz to atsaucas ar `${name}`.
+- **label**: Atstājiet tukšu — calculate lauki intervētājam nekad netiek rādīti.
+- **calculation**: Formula, kas jānovērtē. Atbalsta visas [XLSForm funkcijas](../operators-and-functions/functions) un lauku atsauces.
+
+---
+
+## Biežāk izmantotie paraugi
 
 ### Aritmētika
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
+
+### Virkņu savienošana (String concatenation)
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
+
+### Nosacījuma vērtība
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
+
+### Vecums no dzimšanas datuma
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
+
+---
+
+## `once()` izmantošana vērtības nofiksēšanai
+
+Pēc noklusējuma `calculate` tiek pārvērtēts ikreiz, kad mainās kāds no norādītajiem laukiem. Iekļaujiet formulu `once()`, lai tā tiktu novērtēta tikai pirmajā ielādes reizē un rezultāts tiktu nofiksēts:
+
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
+
+Izmantojiet `once()` laika zīmogiem, sākotnējām vērtībām vai jebkuram gadījumam, kad pārrēķināšana pie izmaiņām nav vēlama.
+
+---
+
+## Datu iegūšana no ārējiem avotiem
+
+### No CSV faila
+
 ```
-${adults} + ${children}
-${price} * ${quantity}
-${total} - ${discount}
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-### Virknes
+Pilnu informāciju skatiet sadaļā [pulldata()](../operators-and-functions/pulldata).
+
+### No pievienotās SQLite datubāzes
+
 ```
-concat(${first_name}, ' ', ${last_name})
-string-length(${answer})
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
 ```
 
-### Datums/laiks
+Sīkāku informāciju par ceļa izveidi skatiet sadaļā [Meklēšana vietējā datubāzē](../advanced-features/local-database-search).
+
+### No lietotnes konteksta
+
 ```
-decimal-date-time(${end_date}) - decimal-date-time(${start_date})
-format-date(today(), '%d/%m/%Y')
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
 ```
 
-### Nosacījuma loģika
-```
-if(${age} >= 18, 'pieaugušais', 'nepilngadīgs')
-```
+Visas pieejamās atslēgas skatiet sadaļā [App API](../app-api).
 
-## Labākā prakse
+---
 
-1. Izmantojiet `calculate` slēptu metadatu, piemēram, enumeratora vārda vai laika zīmoga, glabāšanai.
-2. Pārbaudiet aprēķinus ar robežvērtībām.
-3. Izmantojiet `once()`, lai novērstu atkārtotu aprēķināšanu: `once(uuid())`.
+## calculate izmantošana relevant un constraint laukos
+
+Citi lauki var atsaukties uz `calculate` rezultātu tāpat kā uz jebkuru citu lauku:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## Labā prakse
+
+1. Piešķiriet calculate laukiem jēgpilnus nosaukumus — `total_cost` ir skaidrāks par `calc1` un vieglāk izsekojams datos.
+2. Sadaliet sarežģītas formulas vairākos savienotos calculate laukos, nevis izmantojiet vienu dziļi iekļautu izteiksmi.
+3. Izmantojiet `once()` laika zīmogiem un sākotnējiem fiksējumiem, lai novērstu vērtību maiņu pēc pirmās tveršanas.
+4. Novietojiet `calculate` laukus pirms pirmā jautājuma, kas uz tiem atsaucas — novērtēšanas secība atbilst formas secībai.
+5. Atstājiet `label` kolonnu tukšu. Daži rīki rāda etiķeti; atstājot to tukšu, tiek novērsta mulsinoša izvade.
+
+## Ierobežojumi
+
+- Calculate lauki nekad netiek rādīti tieši intervētājam — izmantojiet `note` lauku, lai parādītu rezultātu.
+- Kolonna `calculation` ir obligāta; `calculate` rinda bez formulas vienmēr saglabā tukšu virkni.
+- Rezultāti tiek pārvērtēti pie katras formas izmaiņas, ja vien tie nav iekļauti `once()` — ļoti sarežģītas formulas lielās formās var ietekmēt renderēšanas veiktspēju zemākas klases ierīcēs.
+- Aprēķinātās vērtības iesniegumā tiek saglabātas kā virknes. Izmantojiet `number()`, `int()` vai `boolean()`, lai mainītu tipu, nododot rezultātu aritmētiskām vai loģiskām izteiksmēm.

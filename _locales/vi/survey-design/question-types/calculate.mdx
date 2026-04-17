@@ -1,111 +1,128 @@
 ---
-title: "Tính toán (Calculate)"
-description: ""
+title: "calculate"
+description: "Loại câu hỏi calculate thực hiện các phép tính ngầm trong XLSForm, lưu trữ các giá trị dẫn xuất mà không hiển thị trường nhập liệu cho điều tra viên."
 ---
 
-Các câu hỏi `calculate` (tính toán) trong XLSForms và rtSurvey được sử dụng để thực hiện các phép tính dựa trên các trường hoặc giá trị khác trong biểu mẫu của bạn. Các câu hỏi này không hiển thị cho người dùng mà chạy ở chế độ nền, lưu kết quả của chúng để sử dụng hoặc gửi sau này.
+import { Callout } from 'nextra/components'
 
-## Cú pháp
+Loại câu hỏi `calculate` chạy một công thức một cách âm thầm trong nền. Nó lưu trữ kết quả trong một trường được đặt tên mà các câu hỏi khác có thể tham chiếu — nhưng nó không hiển thị bất kỳ đầu nhập hoặc nhãn nào cho điều tra viên. Sử dụng nó để tính toán các giá trị, nối chuỗi, chạy logic có điều kiện hoặc tra cứu dữ liệu mà bạn cần sau này trong biểu mẫu.
 
-Trong XLSForm, một câu hỏi tính toán được định nghĩa như sau:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Cú pháp cơ bản
 
-- **type**: Luôn là "calculate" cho loại câu hỏi này.
-- **name**: Một tên duy nhất cho câu hỏi tính toán.
-- **label**: Thường được để trống vì các câu hỏi tính toán không hiển thị cho người dùng.
-- **calculation**: Công thức sẽ được thực hiện.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Các trường hợp sử dụng
+- **type**: Luôn là `calculate`.
+- **name**: Một tên trường duy nhất. Các câu hỏi khác tham chiếu đến trường này bằng `${name}`.
+- **label**: Để trống — các trường calculate không bao giờ hiển thị cho điều tra viên.
+- **calculation**: Công thức để tính toán. Hỗ trợ tất cả [hàm XLSForm](../operators-and-functions/functions) và tham chiếu trường.
 
-Câu hỏi tính toán thường được dùng cho:
+---
 
-1. Thực hiện các phép toán số học
-2. Nối các chuỗi văn bản
-3. Áp dụng các logic hoặc hàm phức tạp
-4. Lưu trữ các kết quả trung gian để sử dụng sau này
+## Các mẫu phổ biến
 
-## Ví dụ
+### Số học
 
-### Toán số học cơ bản
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### Nối chuỗi
 
-### Nối chuỗi văn bản
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Giá trị có điều kiện
 
-### Sử dụng các hàm
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Tuổi từ ngày sinh
 
-## Cách dùng nâng cao trong rtSurvey
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### Hàm pulldata()
+---
 
-rtSurvey hỗ trợ hàm `pulldata()` trong các trường tính toán, cho phép bạn truy xuất dữ liệu từ các tệp CSV bên ngoài:
+## Sử dụng `once()` để khóa giá trị
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Theo mặc định, `calculate` sẽ tính toán lại bất cứ khi nào bất kỳ trường được tham chiếu nào thay đổi. Bao bọc công thức trong `once()` để chỉ tính toán trong lần tải đầu tiên và đóng băng kết quả:
 
-#### Cú pháp
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-Cú pháp cơ bản cho pulldata() là:
+Sử dụng `once()` cho dấu thời gian, giá trị ban đầu hoặc bất kỳ trường hợp nào mà việc tính toán lại khi thay đổi là không mong muốn.
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+---
 
-- 'csv_filename': Tên tệp CSV (không có đuôi .csv)
-- 'column_to_return': Tên cột chứa dữ liệu bạn muốn lấy
-- 'key_column': Tên cột dùng để khớp dữ liệu
-- `${matching_value}`: Giá trị cần tra cứu trong cột khóa (thường là một biến từ biểu mẫu)
+## Lấy dữ liệu từ nguồn bên ngoài
 
-#### Các lưu ý quan trọng
-
-1. Tệp CSV phải được tải lên cùng với XLSForm của bạn khi triển khai cuộc khảo sát.
-2. Sử dụng dấu phẩy làm dấu phân cách trong tệp CSV của bạn, không phải dấu chấm phẩy.
-3. Tránh sử dụng dấu phẩy bên trong các trường dữ liệu của tệp CSV, vì chúng có thể gây ra lỗi phân tích cú pháp.
-4. pulldata() chỉ hỗ trợ mối quan hệ 1-1. Nếu tìm thấy nhiều kết quả khớp, nó chỉ trả về kết quả đầu tiên.
-5. Có thể có giới hạn về độ dài văn bản có thể kéo về (khoảng 76 ký tự).
-6. Bạn có thể sử dụng pulldata() trong các ràng buộc (`constraints`) để xác thực các mục nhập so với dữ liệu CSV.
-
-### Tính toán có điều kiện
-
-Bạn có thể sử dụng câu lệnh if() cho các phép tính có điều kiện:
+### Từ tệp CSV
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-## Các phương pháp hay nhất
+Xem [pulldata()](../operators-and-functions/pulldata) để biết tham chiếu đầy đủ.
 
-1. Sử dụng tên có ý nghĩa cho các trường tính toán để cải thiện khả năng đọc biểu mẫu.
-2. Tránh các phép tính quá phức tạp trong một trường duy nhất; hãy chia nhỏ chúng nếu cần thiết.
-3. Kiểm tra kỹ các phép tính của bạn, đặc biệt là khi sử dụng các công thức phức tạp hoặc dữ liệu bên ngoài.
-4. Hãy nhớ rằng các trường tính toán sẽ chạy mỗi khi biểu mẫu được đánh giá, điều này có thể ảnh hưởng đến hiệu suất nếu có quá nhiều hoặc các phép tính rất phức tạp.
-5. Khi sử dụng pulldata(), hãy đảm bảo các tệp CSV của bạn được định dạng chính xác và kiểm tra kỹ lưỡng với dữ liệu và cấu trúc biểu mẫu cụ thể của bạn.
+### Từ cơ sở dữ liệu SQLite đi kèm
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Xem [Tìm kiếm cơ sở dữ liệu cục bộ](../advanced-features/local-database-search) để biết chi tiết về cách xây dựng đường dẫn.
+
+### Từ ngữ cảnh ứng dụng
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Xem [App API](../app-api) để biết tất cả các khóa có sẵn.
+
+---
+
+## Sử dụng calculate trong relevant và constraint
+
+Các trường khác có thể tham chiếu kết quả `calculate` giống như bất kỳ trường nào:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## Thực hành tốt nhất
+
+1. Đặt tên có ý nghĩa cho các trường calculate — `total_cost` rõ ràng hơn `calc1` và dễ theo dõi hơn trong các lần xuất dữ liệu.
+2. Chia nhỏ các công thức phức tạp thành nhiều trường calculate chuỗi thay vì một biểu thức lồng nhau sâu.
+3. Sử dụng `once()` cho dấu thời gian và ảnh chụp ban đầu để ngăn giá trị thay đổi sau lần thu thập đầu tiên.
+4. Đặt các trường `calculate` trước câu hỏi đầu tiên tham chiếu đến chúng — thứ tự tính toán tuân theo thứ tự biểu mẫu.
+5. Giữ cột `label` trống. Một số công cụ hiển thị nhãn; để trống giúp tránh đầu ra gây nhầm lẫn.
 
 ## Hạn chế
 
-- Các trường tính toán không thể chỉnh sửa trực tiếp bởi người dùng.
-- Kết quả của trường tính toán không hiển thị ngay lập tức trừ khi được tham chiếu trong một trường hiển thị hoặc được sử dụng trong logic biểu mẫu.
+- Các trường Calculate không bao giờ được hiển thị trực tiếp cho điều tra viên — sử dụng trường `note` để hiển thị kết quả.
+- Cột `calculation` là bắt buộc; một hàng `calculate` không có công thức luôn lưu trữ một chuỗi trống.
+- Kết quả được tính toán lại trên mỗi thay đổi biểu mẫu trừ khi được bao bọc trong `once()` — các công thức rất phức tạp trong các biểu mẫu lớn có thể ảnh hưởng đến hiệu suất hiển thị trên các thiết bị cấu hình thấp.
+- Các giá trị được tính toán được lưu trữ dưới dạng chuỗi trong bản gửi. Sử dụng `number()`, `int()` hoặc `boolean()` để ép kiểu khi chuyển kết quả sang các biểu thức số học hoặc logic.

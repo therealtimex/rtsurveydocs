@@ -1,111 +1,128 @@
 ---
-title: "Calculate"
-description: ""
+title: "calculate"
+description: "ប្រភេទសំណួរ calculate អនុវត្តការគណនានៅផ្ទៃខាងក្រោយក្នុង XLSForm ដោយរក្សាទុកតម្លៃដែលបានមកពីការគណនា ដោយមិនបង្ហាញការបញ្ចូលទិន្នន័យទៅកាន់អ្នកប្រមូលទិន្នន័យឡើយ។"
 ---
 
-Questions calculate ក្នុង XLSForms និង rtSurvey ប្រើ ដើម្បី perform computations ផ្អែកលើ fields ឬ values ផ្សេងទៀតក្នុង form ។ Questions ទាំងនេះមិន display ដល់ user ប៉ុន្តែ run ក្នុង background ដោយ storing results សម្រាប់ later use ឬ submission។
+import { Callout } from 'nextra/components'
 
-## វាក្យសម្ព័ន្ធ
+ប្រភេទសំណួរ `calculate` ដំណើរការរូបមន្តដោយស្ងាត់ស្ងៀមនៅផ្ទៃខាងក្រោយ។ វាផ្ុកទុកលទ្ធផលក្នុងវាល (field) ដែលមានឈ្មោះ ដែលសំណួរផ្សេងទៀតអាចយោងទៅបាន — ប៉ុន្តែវាមិនបង្ហាញការបញ្ចូលទិន្នន័យ ឬស្លាក (label) ទៅកាន់អ្នកប្រមូលទិន្នន័យឡើយ។ ប្រើវាដើម្បីទាញយកតម្លៃ, ភ្ជាប់ខ្សែអក្សរ (strings), ដំណើរការតក្កវិជ្ជាមានលក្ខខណ្ឌ, ឬស្វែងរកទិន្នន័យដែលអ្នកត្រូវការនៅពេលក្រោយក្នុងទម្រង់បែបបទ។
 
-ក្នុង XLSForm, calculate question ត្រូវបានកំណត់ដូចខាងក្រោម:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## វាក្យសម្ព័ន្ធមូលដ្ឋាន
 
-- **type**: ជានិច្ច "calculate" សម្រាប់ប្រភេទ question នេះ។
-- **name**: ឈ្មោះ unique សម្រាប់ calculate question។
-- **label**: ជាធម្មតា blank ដោយសារ calculate questions មិន display ដល់ users។
-- **calculation**: formula ដើម្បី evaluate។
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## ការប្រើប្រាស់
+- **type**: ជានិច្ចកាលគឺ `calculate`។
+- **name**: ឈ្មោះវាលតែមួយគត់។ សំណួរផ្សេងទៀតយោងទៅវាលនេះជាមួយ `${name}`។
+- **label**: ទុកឱ្យនៅទំនេរ — វាល calculate មិនដែលត្រូវបានបង្ហាញទៅកាន់អ្នកប្រមូលទិន្នន័យឡើយ។
+- **calculation**: រូបមន្តសម្រាប់វាយតម្លៃ។ គាំទ្រ [មុខងារ XLSForm](../operators-and-functions/functions) ទាំងអស់ និងការយោងវាល។
 
-Calculate questions ប្រើជាទូទៅសម្រាប់:
+---
 
-1. ការ performing arithmetic operations
-2. ការ concatenating strings
-3. ការ applying complex logic ឬ functions
-4. ការ storing intermediate results សម្រាប់ later use
+## លំនាំទូទៅ
 
-## ឧទាហរណ៍
+### នព្វន្ត (Arithmetic)
 
-### Arithmetic មូលដ្ឋាន
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### ការភ្ជាប់ខ្សែអក្សរ (String concatenation)
 
-### String Concatenation
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### តម្លៃមានលក្ខខណ្ឌ
 
-### ការប្រើ Functions
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### អាយុពីថ្ងៃខែឆ្នាំកំណើត
 
-## ការប្រើប្រាស់ High ក្នុង rtSurvey
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### Function pulldata()
+---
 
-rtSurvey គាំទ្រ function `pulldata()` ក្នុង calculate fields ដោយអនុញ្ញាតឱ្យ retrieve data ពី CSV files ខាងក្រៅ:
+## ការប្រើប្រាស់ `once()` ដើម្បីចាក់សោតម្លៃ
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+តាមលំនាំដើម `calculate` វាយតម្លៃឡើងវិញរាល់ពេលដែលវាលដែលបានយោងផ្លាស់ប្តូរ។ ខ្ចប់រូបមន្តក្នុង `once()` ដើម្បីវាយតម្លៃតែនៅពេលផ្ទុកដំបូង និងរក្សាលទ្ធផលឱ្យនៅដដែល៖
 
-#### Syntax
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-syntax មូលដ្ឋានសម្រាប់ pulldata() គឺ:
+ប្រើ `once()` សម្រាប់ត្រាពេលវេលា (timestamps), តម្លៃដំបូង, ឬករណីណាមួយដែលការគណនាឡើងវិញនៅពេលផ្លាស់ប្តូរគឺមិនចង់បាន។
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+---
 
-- 'csv_filename': ឈ្មោះ CSV file (គ្មាន .csv extension)
-- 'column_to_return': ឈ្មោះជួរដែលផ្ទុក data ដែលអ្នកចង់ pull
-- 'key_column': ឈ្មោះជួរ ដើម្បី match against
-- `${matching_value}`: Value ដើម្បី look up ក្នុង key column (ជាញឹកញាប់ variable ពី form)
+## ការទាញយកទិន្នន័យពីប្រភពខាងក្រៅ
 
-#### Notes សំខាន់
-
-1. CSV file ត្រូវតែ upload ជាមួយ XLSForm នៅពេល deploy ការស្ទង់មតិ។
-2. ប្រើ commas ជា separators ក្នុង CSV file, មិនមែន semicolons។
-3. ជៀសវាង commas ក្នុង data fields CSV, ដោយ ពួកវាអាចបណ្តាល parsing issues។
-4. pulldata() គាំទ្រ 1-to-1 relationships តែប៉ុណ្ណោះ។ ប្រសិនបើ matches ច្រើននត្រូវបានរកឃើញ វា returns មួយដំបូងតែប៉ុណ្ណោះ។
-5. ប្រហែលមាន limitations លើ text length ដែលអាច pull (ប្រហែល 76 characters)។
-6. អ្នកអាចប្រើ pulldata() ក្នុង constraints ដើម្បី validate entries against CSV data។
-
-### Conditional Calculations
-
-អ្នកអាចប្រើ if() statements សម្រាប់ conditional calculations:
+### ពីឯកសារ CSV
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-## ការអនុវត្តល្អ
+សូមមើល [pulldata()](../operators-and-functions/pulldata) សម្រាប់ឯកសារយោងពេញលេញ។
 
-1. ប្រើ meaningful names សម្រាប់ calculate fields ដើម្បីធ្វើឱ្យ form readability ប្រសើរ។
-2. ជៀសវាង calculations ស្មុគ្រស្មាញ ហួសហេតុ ក្នុង field តែមួយ; break them down ប្រសិនបើចាំបាច់។
-3. Test calculations ហ្មត់ចត់ ជាពិសេសពេលប្រើ formulas ស្មុគ្រស្មាញ ឬ external data។
-4. ចងចាំ calculate fields run រៀងរាល់ពេល form ត្រូវបាន evaluated ដែលអាច impact performance សម្រាប់ calculations ស្មុគ្រស្មាញ ឬ ច្រើនណាស់។
-5. ពេលប្រើ pulldata() ធានា CSV files format ត្រឹមត្រូវ ហើយ test ហ្មត់ចត់ ជាមួយ data ជាក់ស្តែង ហើយ form structure ។
+### ពីមូលដ្ឋានទិន្នន័យ SQLite ដែលបានភ្ជាប់មកជាមួយ
 
-## ការដាក់កំហិត
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
 
-- Calculate fields មិនអាច edit ដោយ users ដោយផ្ទាល់។
-- លទ្ធផល calculate field មិន visible ភ្លាមៗ លើក លែងតែ referenced ក្នុង display field ឬ ប្រើក្នុង form logic។
+សូមមើល [ការស្វែងរកមូលដ្ឋានទិន្នន័យមូលដ្ឋាន](../advanced-features/local-database-search) សម្រាប់ព័ត៌មានលម្អិតអំពីការសាងសង់ផ្លូវ (path construction)។
+
+### ពីបរិបទកម្មវិធី (App context)
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+សូមមើល [App API](../app-api) សម្រាប់សោ (keys) ដែលមានទាំងអស់។
+
+---
+
+## ការប្រើប្រាស់ calculate ក្នុង relevant និង constraint
+
+វាលផ្សេងទៀតអាចយោងទៅលទ្ធផល `calculate` ដូចជាវាលណាមួយដែរ៖
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## ការអនុវត្តល្អបំផុត
+
+1. ផ្តល់ឈ្មោះដែលមានអត្ថន័យដល់វាល calculate — `total_cost` គឺច្បាស់ជាង `calc1` និងងាយស្រួលក្នុងការតាមដាននៅក្នុងការនាំចេញទិន្នន័យ។
+2. បំបែករូបមន្តស្មុគស្មាញទៅជាវាល calculate ជាច្រើនដែលតភ្ជាប់គ្នា ជំនួសឱ្យការប្រើកន្សោមដែលបង្កប់យ៉ាងជ្រៅតែមួយ។
+3. ប្រើ `once()` សម្រាប់ត្រាពេលវេលា និងរូបភាពដំបូងដើម្បីការពារកុំឱ្យតម្លៃផ្លាស់ប្តូរបន្ទាប់ពីការចាប់យកដំបូង។
+4. ដាក់វាល `calculate` មុនសំណួរដំបូងដែលយោងទៅពួកវា — លំដាប់វាយតម្លៃធ្វើតាមលំដាប់ទម្រង់បែបបទ។
+5. រក្សាជួរឈរ `label` ឱ្យនៅទំនេរ។ ឧបករណ៍មួយចំនួនបង្ហាញស្លាក; ការទុកវាឱ្យនៅទំនេរជួយជៀសវាងលទ្ធផលដែលនាំឱ្យមានការភាន់ច្រឡំ។
+
+## កម្រិតកំណត់
+
+- វាល Calculate មិនដែលត្រូវបានបង្ហាញដោយផ្ទាល់ទៅកាន់អ្នកប្រមូលទិន្នន័យឡើយ — ប្រើវាល `note` ដើម្បីបង្ហាញលទ្ធផល។
+- ជួរឈរ `calculation` គឺចាំបាច់; ជួរដេក `calculate` ដែលគ្មានរូបមន្តតែងតែរក្សាទុកខ្សែអក្សរទទេ (empty string)។
+- លទ្ធផលវាយតម្លៃឡើងវិញរាល់ពេលផ្លាស់ប្តូរទម្រង់បែបបទ លើកលែងតែត្រូវបានខ្ចប់ក្នុង `once()` — រូបមន្តដែលស្មុគស្មាញខ្លាំងនៅក្នុងទម្រង់បែបបទធំៗអាចប៉ះពាល់ដល់ដំណើរការបង្ហាញនៅលើឧបករណ៍ដែលមានលក្ខណៈបច្ចេកទេសទាប។
+- តម្លៃដែលបានគណនាត្រូវបានរក្សាទុកជាខ្សែអក្សរនៅក្នុងការបញ្ជូន។ ប្រើ `number()`, `int()`, ឬ `boolean()` ដើម្បីប្តូរប្រភេទនៅពេលបញ្ជូនលទ្ធផលទៅកាន់កន្សោមនព្វន្ត ឬតក្កវិជ្ជា។

@@ -1,6 +1,6 @@
 ---
 title: "calculate"
-description: "Der Fragetyp calculate führt Hintergrundberechnungen in einem XLSForm durch und speichert abgeleitete Werte, ohne dem Interviewer eine Eingabe anzuzeigen."
+description: "Der Fragetyp calculate führt Hintergrundberechnungen in einem XLSForm aus und speichert abgeleitete Werte, ohne dem Interviewer ein Eingabefeld anzuzeigen."
 ---
 
 import { Callout } from 'nextra/components'
@@ -16,13 +16,13 @@ Der Fragetyp `calculate` führt eine Formel lautlos im Hintergrund aus. Er speic
 | calculate | total | | `${price} * ${quantity}` |
 
 - **type**: Immer `calculate`.
-- **name**: Ein eindeutiger Feldname. Andere Fragen beziehen sich darauf mit `${name}`.
-- **label**: Leer lassen – Berechnungsfelder werden dem Interviewer nie angezeigt.
-- **calculation**: Die auszuwertende Formel. Unterstützt alle [XLSForm-Funktionen](../operators-and-functions/functions) und Feldreferenzen.
+- **name**: Ein eindeutiger Feldname. Andere Fragen verweisen darauf mit `${name}`.
+- **label**: Leer lassen – calculate-Felder werden dem Interviewer nie angezeigt.
+- **calculation**: Die zu berechnende Formel. Unterstützt alle [XLSForm-Funktionen](../operators-and-functions/functions) und Feldverweise.
 
 ---
 
-## Häufige Muster
+## Gängige Muster
 
 ### Arithmetik
 
@@ -33,7 +33,7 @@ Der Fragetyp `calculate` führt eine Formel lautlos im Hintergrund aus. Er speic
 | calculate | total | | `${price} * ${quantity}` |
 | note | total_note | Total: `${total}` | |
 
-### Zeichenfolgenverkettung
+### Zeichenfolgenverkettung (String Concatenation)
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -48,7 +48,7 @@ Der Fragetyp `calculate` führt eine Formel lautlos im Hintergrund aus. Er speic
 | integer | score | Score (0–100) | |
 | calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-### Alter aus Geburtsdatum
+### Alter aus Geburtsdatum berechnen
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -57,19 +57,19 @@ Der Fragetyp `calculate` führt eine Formel lautlos im Hintergrund aus. Er speic
 
 ---
 
-## Verwendung von `once()`, um den Wert zu sperren
+## `once()` verwenden, um den Wert einzufrieren
 
-Standardmäßig wird `calculate` neu ausgewertet, wenn sich ein referenziertes Feld ändert. Umschließen Sie die Formel mit `once()`, damit sie nur beim ersten Laden ausgewertet wird und das Ergebnis eingefroren wird:
+Standardmäßig wird ein `calculate`-Feld neu berechnet, wenn sich ein referenziertes Feld ändert. Schließen Sie die Formel in `once()` ein, um sie nur beim ersten Laden auszuwerten und das Ergebnis einzufrieren:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | interview_start | | `once(now())` |
 
-Verwenden Sie `once()` für Zeitstempel, Initialwerte oder alle Fälle, in denen eine Neuberechnung bei Änderungen unerwünscht ist.
+Verwenden Sie `once()` für Zeitstempel, Initialwerte oder in allen Fällen, in denen eine Neuberechnung bei Änderungen unerwünscht ist.
 
 ---
 
-## Abrufen von Daten aus externen Quellen
+## Daten aus externen Quellen abrufen
 
 ### Aus einer CSV-Datei
 
@@ -77,7 +77,7 @@ Verwenden Sie `once()` für Zeitstempel, Initialwerte oder alle Fälle, in denen
 pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-Die vollständige Referenz finden Sie unter [pulldata()](../operators-and-functions/pulldata).
+Siehe [pulldata()](../operators-and-functions/pulldata) für die vollständige Referenz.
 
 ### Aus einer gebündelten SQLite-Datenbank
 
@@ -88,7 +88,7 @@ pulldata('rawquery',
   ${province_id})
 ```
 
-Details zur Pfadkonstruktion finden Sie unter [Lokale Datenbanksuche](../advanced-features/local-database-search).
+Siehe [Lokale Datenbanksuche](../advanced-features/local-database-search) für Details zur Pfadkonstruktion.
 
 ### Aus dem App-Kontext
 
@@ -97,7 +97,7 @@ pulldata('app-api', 'user.username')
 pulldata('app-api', 'family_path')
 ```
 
-Alle verfügbaren Schlüssel finden Sie unter [App API](../app-api).
+Siehe [App API](../app-api) für alle verfügbaren Schlüssel.
 
 ---
 
@@ -114,15 +114,15 @@ Andere Felder können auf ein `calculate`-Ergebnis wie auf jedes andere Feld ver
 
 ## Best Practices
 
-1. Geben Sie Berechnungsfeldern aussagekräftige Namen – `total_cost` ist klarer als `calc1` und in Exporten leichter nachzuverfolgen.
-2. Teilen Sie komplexe Formeln in mehrere verkettete Berechnungsfelder auf, anstatt einen tief verschachtelten Ausdruck zu verwenden.
-3. Verwenden Sie `once()` für Zeitstempel und erste Snapshots, um zu verhindern, dass sich Werte nach der ersten Erfassung ändern.
+1. Geben Sie calculate-Feldern aussagekräftige Namen – `total_cost` ist klarer als `calc1` und in Exporten leichter nachzuverfolgen.
+2. Zerlegen Sie komplexe Formeln in mehrere verkettete calculate-Felder anstatt in einen einzigen, tief verschachtelten Ausdruck.
+3. Verwenden Sie `once()` für Zeitstempel und anfängliche Snapshots, um zu verhindern, dass sich Werte nach der ersten Erfassung ändern.
 4. Platzieren Sie `calculate`-Felder vor der ersten Frage, die auf sie verweist – die Auswertungsreihenfolge folgt der Formularreihenfolge.
 5. Lassen Sie die Spalte `label` leer. Einige Tools zeigen das Label an; wenn es leer bleibt, werden verwirrende Ausgaben vermieden.
 
 ## Einschränkungen
 
-- Berechnungsfelder werden dem Interviewer nie direkt angezeigt – verwenden Sie ein `note`-Feld, um das Ergebnis anzuzeigen.
+- Calculate-Felder werden dem Interviewer nie direkt angezeigt – verwenden Sie ein `note`-Feld, um das Ergebnis anzuzeigen.
 - Die Spalte `calculation` ist erforderlich; eine `calculate`-Zeile ohne Formel speichert immer eine leere Zeichenfolge.
-- Ergebnisse werden bei jeder Formularänderung neu ausgewertet, es sei denn, sie sind in `once()` eingeschlossen – sehr komplexe Formeln in großen Formularen können die Rendering-Leistung auf Low-End-Geräten beeinträchtigen.
-- Berechnete Werte werden in der Übermittlung als Zeichenfolgen gespeichert. Verwenden Sie `number()`, `int()` oder `boolean()` für die Typumwandlung, wenn Sie das Ergebnis an arithmetische oder logische Ausdrücke übergeben.
+- Ergebnisse werden bei jeder Formularänderung neu berechnet, es sei denn, sie sind in `once()` eingeschlossen – sehr komplexe Formeln in großen Formularen können die Rendering-Leistung auf Low-End-Geräten beeinträchtigen.
+- Berechnete Werte werden in der Übermittlung als Zeichenfolgen (Strings) gespeichert. Verwenden Sie `number()`, `int()` oder `boolean()` zur Typumwandlung, wenn Sie das Ergebnis an arithmetische oder logische Ausdrücke übergeben.

@@ -43,7 +43,7 @@ Both appearances accept an inline color in `<#RRGGBB/>` format:
 - The closing `/>` is **required** — omitting it breaks parsing
 - Example: `<#04B404/>` (green), `<#EDC602/>` (amber), `<#D9534F/>` (red)
 
-The color controls the button background. Text color is determined automatically by the app.
+The color controls the **button background**. Text color is always `var(--accent-color)` — it is not configurable via the appearance. If the `<#RRGGBB/>` token is omitted entirely, the button background falls back to `var(--primary-color)`.
 
 ---
 

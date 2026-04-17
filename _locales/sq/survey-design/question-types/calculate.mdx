@@ -1,111 +1,128 @@
 ---
-title: "Calculate"
-description: ""
+title: "calculate"
+description: "Lloji i pyetjes calculate kryen llogaritje në sfond në një XLSForm, duke ruajtur vlerat e nxjerra pa shfaqur një hyrje për anketuesin."
 ---
 
-Pyetjet calculate në XLSForms dhe rtSurvey përdoren për të kryer llogaritje bazuar në fusha të tjera ose vlera në formularin tuaj. Këto pyetje nuk shfaqen për përdoruesin por ekzekutohen në sfond, duke ruajtur rezultatet e tyre për përdorim të mëvonshëm ose dorëzim.
+import { Callout } from 'nextra/components'
 
-## Sintaksa
+Lloji i pyetjes `calculate` ekzekuton një formulë në heshtje në sfond. Ai e ruan rezultatin në një fushë të emërtuar të cilës pyetjet e tjera mund t'i referohen — por nuk shfaq asnjë hyrje apo etiketë për anketuesin. Përdoreni atë për të nxjerrë vlera, për të bashkuar vargje, për të ekzekutuar logjikë të kushtëzuar ose për të kërkuar të dhëna që do t'ju nevojiten më vonë në formular.
 
-Në XLSForm, pyetja calculate përcaktohet si më poshtë:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Sintaksa bazë
 
-- **type**: Gjithmonë "calculate" për këtë lloj pyetjeje.
-- **name**: Emër unik për pyetjen calculate.
-- **label**: Zakonisht lihet bosh pasi pyetjet calculate nuk shfaqen për përdoruesit.
-- **calculation**: Formula për t'u vlerësuar.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Përdorimet
+- **type**: Gjithmonë `calculate`.
+- **name**: Një emër unik i fushës. Pyetjet e tjera i referohen kësaj me `${name}`.
+- **label**: Lëreni bosh — fushat calculate nuk shfaqen kurrë për anketuesin.
+- **calculation**: Formula për t'u vlerësuar. Mbështet të gjitha [funksionet XLSForm](../operators-and-functions/functions) dhe referencat e fushave.
 
-Pyetjet calculate përdoren zakonisht për:
+---
 
-1. Kryerja e operacioneve aritmetike
-2. Bashkimi i vargjeve
-3. Zbatimi i logjikës ose funksioneve komplekse
-4. Ruajtja e rezultateve ndërmjetëse për përdorim të mëvonshëm
+## Modelet e zakonshme
 
-## Shembuj
+### Aritmetika
 
-### Aritmetika bazë
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### Bashkimi i vargjeve (String concatenation)
 
-### Bashkimi i vargjeve
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Vlera e kushtëzuar
 
-### Përdorimi i funksioneve
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Mosha nga data e lindjes
 
-## Përdorimi i avancuar në rtSurvey
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### Funksioni pulldata()
+---
 
-rtSurvey mbështet funksionin `pulldata()` në fushat calculate, duke ju lejuar të merrni të dhëna nga skedarët e jashtëm CSV:
+## Përdorimi i `once()` për të kyçur vlerën
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Si parazgjedhje, `calculate` rivlerësohet sa herë që ndryshon ndonjë fushë e referuar. Mbështillni formulën në `once()` për ta vlerësuar vetëm në ngarkimin e parë dhe për të ngrirë rezultatin:
 
-#### Sintaksa
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-Sintaksa bazë për pulldata() është:
+Përdorni `once()` për vulat kohore (timestamps), vlerat fillestare ose çdo rast ku rilogaritja me ndryshimin është e padëshirueshme.
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+---
 
-- `'csv_filename'`: Emri i skedarit CSV (pa shtesën .csv)
-- `'column_to_return'`: Emri i kolonës që përmban të dhënat që dëshironi të merrni
-- `'key_column'`: Emri i kolonës për t'u krahasuar
-- `${matching_value}`: Vlera për të kërkuar në kolonën çelës (shpesh një variabël nga formulari)
+## Tërheqja e të dhënave nga burimet e jashtme
 
-#### Shënime të rëndësishme
-
-1. Skedari CSV duhet të ngarkohet bashkë me XLSForm-in tuaj kur vendosni sondazhin.
-2. Përdorni presja si ndarës në skedarin tuaj CSV, jo pikëpresja.
-3. Shmangni presjet brenda fushave të të dhënave tuaja CSV, pasi mund të shkaktojnë probleme analize.
-4. pulldata() mbështet vetëm marrëdhënie 1-me-1. Nëse gjenden disa përputhje, kthen vetëm të parën.
-5. Mund të ketë kufizime në gjatësinë e tekstit që mund të merret (rreth 76 karaktere).
-6. Mund të përdorni pulldata() në kufizime për të validuar hyrjet kundrejt të dhënave CSV.
-
-### Llogaritjet e kushtëzuara
-
-Mund të përdorni deklaratat if() për llogaritjet e kushtëzuara:
+### Nga një skedar CSV
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
+
+Shihni [pulldata()](../operators-and-functions/pulldata) për referencën e plotë.
+
+### Nga një bazë të dhënash SQLite e bashkëngjitur
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Shihni [Kërkimi në bazën e të dhënave lokale](../advanced-features/local-database-search) për detajet e ndërtimit të rrugës.
+
+### Nga konteksti i aplikacionit
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Shihni [App API](../app-api) për të gjithë çelësat e disponueshëm.
+
+---
+
+## Përdorimi i calculate në relevant dhe constraint
+
+Fushat e tjera mund t'i referohen një rezultati `calculate` ashtu si çdo fushë:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
 
 ## Praktikat më të mira
 
-1. Përdorni emra kuptimplotë për fushat calculate për të përmirësuar lexueshmërinë e formularit.
-2. Shmangni llogaritjet tepër komplekse në një fushë të vetme; ndajini ato nëse është e nevojshme.
-3. Testoni llogaritjet tuaja tërësisht, veçanërisht kur përdorni formula komplekse ose të dhëna të jashtme.
-4. Mbani mend se fushat calculate ekzekutohen sa herë që formulari vlerësohet, gjë që mund të ndikojë performancën për llogaritje shumë komplekse ose të shumta.
-5. Kur përdorni pulldata(), sigurohuni që skedarët tuaj CSV janë formatuar saktë dhe testoni tërësisht me strukturën tuaj specifike të të dhënave dhe formularit.
+1. Jepuni fushave calculate emra kuptimplotë — `total_cost` është më e qartë se `calc1` dhe më e lehtë për t'u gjurmuar në eksporte.
+2. Ndani formulat komplekse në disa fusha calculate të lidhura në vend të një shprehjeje të vetme thellësisht të ndërfutur.
+3. Përdorni `once()` për vulat kohore dhe pamjet e para (snapshots) për të parandaluar ndryshimin e vlerave pas kapjes së parë.
+4. Vendosni fushat `calculate` përpara pyetjes së parë që u referohet atyre — rendi i vlerësimit ndjek rendin e formularit.
+5. Mbajeni kolonën `label` bosh. Disa mjete shfaqin etiketën; lënia e saj bosh shmang prodhimin konfuz.
 
 ## Kufizimet
 
-- Fushat calculate nuk janë të editushme drejtpërdrejt nga përdoruesit.
-- Rezultati i fushës calculate nuk është menjëherë i dukshëm nëse nuk referohet në fushën e shfaqjes ose nuk përdoret në logjikën e formularit.
+- Fushat calculate nuk shfaqen kurrë drejtpërdrejt për anketuesin — përdorni një fushë `note` për të treguar rezultatin.
+- Kolona `calculation` kërkohet; një rresht `calculate` pa formulë ruan gjithmonë një varg bosh.
+- Rezultatet rivlerësohen në çdo ndryshim të formularit përveç nëse janë mbështjellë në `once()` — formulat shumë komplekse në formularë të mëdhenj mund të ndikojnë në performancën e paraqitjes në pajisjet me cilësi të ulët.
+- Vlerat e llogaritura ruhen si vargje në dorëzim. Përdorni `number()`, `int()` ose `boolean()` për të konvertuar llojin kur kaloni rezultatin në shprehje aritmetike ose logjike.

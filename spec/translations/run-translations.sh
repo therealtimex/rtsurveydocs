@@ -5,7 +5,7 @@ set -euo pipefail
 
 SPECS_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_DIR="/tmp/gemini-translations"
-MAX_JOBS=5
+MAX_JOBS=2
 
 mkdir -p "$LOG_DIR"
 chmod +x "$SPECS_DIR/run-one-spec.sh"

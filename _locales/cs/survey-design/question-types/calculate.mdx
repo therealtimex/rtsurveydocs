@@ -1,11 +1,11 @@
 ---
 title: "calculate"
-description: "Typ otázky calculate provádí výpočty na pozadí v XLSFormu a ukládá odvozené hodnoty, aniž by tazateli zobrazoval vstupní pole."
+description: "Typ otázky calculate provádí výpočty na pozadí v XLSForm, ukládá odvozené hodnoty, aniž by tazateli zobrazoval vstupní pole."
 ---
 
 import { Callout } from 'nextra/components'
 
-Typ otázky `calculate` spouští vzorec tiše na pozadí. Výsledek uloží do pojmenovaného pole, na které mohou odkazovat jiné otázky – tazateli se však nezobrazí žádný vstup ani popisek. Použijte jej k odvození hodnot, spojování řetězců, spouštění podmíněné logiky nebo vyhledávání dat, která budete potřebovat později ve formuláři.
+Typ otázky `calculate` spouští vzorec tiše na pozadí. Výsledek ukládá do pojmenovaného pole, na které mohou odkazovat jiné otázky — tazateli se však nezobrazuje žádný vstup ani popisek. Použijte jej k odvození hodnot, spojování řetězců, provádění podmíněné logiky nebo vyhledávání dat, která budete v formuláři potřebovat později.
 
 ---
 
@@ -17,7 +17,7 @@ Typ otázky `calculate` spouští vzorec tiše na pozadí. Výsledek uloží do 
 
 - **type**: Vždy `calculate`.
 - **name**: Unikátní název pole. Ostatní otázky na něj odkazují pomocí `${name}`.
-- **label**: Ponechte prázdné – pole typu calculate se tazateli nikdy nezobrazují.
+- **label**: Ponechte prázdné — pole calculate se tazateli nikdy nezobrazují.
 - **calculation**: Vzorec k vyhodnocení. Podporuje všechny [funkce XLSForm](../operators-and-functions/functions) a odkazy na pole.
 
 ---
@@ -65,19 +65,19 @@ Ve výchozím nastavení se `calculate` přehodnocuje pokaždé, když se změn�
 |------|------|-------|-------------|
 | calculate | interview_start | | `once(now())` |
 
-Použijte `once()` pro časová razítka, počáteční hodnoty nebo jakýkoli případ, kdy je přepočet při změně nežádoucí.
+`once()` použijte pro časová razítka, počáteční hodnoty nebo jakýkoli případ, kdy je přepočet při změně nežádoucí.
 
 ---
 
-## Načítání dat z externích zdrojů
+## Tahání dat z externích zdrojů
 
-### Ze souboru CSV
+### Z CSV souboru
 
 ```
 pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-Úplnou referenci naleznete v části [pulldata()](../operators-and-functions/pulldata).
+Úplnou referenci naleznete v [pulldata()](../operators-and-functions/pulldata).
 
 ### Z přibalené databáze SQLite
 
@@ -88,7 +88,7 @@ pulldata('rawquery',
   ${province_id})
 ```
 
-Podrobnosti o konstrukci cesty naleznete v části [Hledání v lokální databázi](../advanced-features/local-database-search).
+Podrobnosti o konstrukci cest naleznete v [Hledání v místní databázi](../advanced-features/local-database-search).
 
 ### Z kontextu aplikace
 
@@ -97,7 +97,7 @@ pulldata('app-api', 'user.username')
 pulldata('app-api', 'family_path')
 ```
 
-Všechny dostupné klíče naleznete v části [App API](../app-api).
+Všechny dostupné klíče naleznete v [App API](../app-api).
 
 ---
 
@@ -114,15 +114,15 @@ Ostatní pole mohou odkazovat na výsledek `calculate` stejně jako na jakékoli
 
 ## Osvědčené postupy
 
-1. Pojmenovávejte pole calculate smysluplně – `total_cost` je jasnější než `calc1` a snadněji se sleduje v exportech.
-2. Rozdělte složité vzorce do více řetězených polí calculate namísto jednoho hluboce vnořeného výrazu.
-3. Používejте `once()` pro časová razítka a počáteční snímky, aby se zabránilo změnám hodnot po prvním zachycení.
-4. Pole `calculate` umístěte před první otázku, která na ně odkazuje – pořadí vyhodnocování odpovídá pořadí ve formuláři.
-5. Sloupec `label` ponechte prázdný. Některé nástroje popisek zobrazují; jeho ponechání prázdného zabrání matoucím výstupům.
+1. Dávejte polím calculate smysluplné názvy — `total_cost` je jasnější než `calc1` a snáze se sleduje v exportech.
+2. Rozdělte složité vzorce do více řetězených polí calculate místo jednoho hluboce vnořeného výrazu.
+3. Používejte `once()` pro časová razítka a počáteční snímky, abyste zabránili změně hodnot po prvním zachycení.
+4. Umístěte pole `calculate` před první otázku, která na ně odkazuje — pořadí vyhodnocování následuje pořadí formuláře.
+5. Sloupec `label` ponechte prázdný. Některé nástroje popisek zobrazují; ponechání prázdného pole zabrání matoucímu výstupu.
 
 ## Omezení
 
-- Pole Calculate se tazateli nikdy nezobrazují přímo – k zobrazení výsledku použijte pole `note`.
-- Sloupec `calculation` je povinný; řádek `calculate` bez vzorce vždy ukládá prázdný řetězec.
-- Výsledky se přehodnocují při každé změně formuláře, pokud nejsou zabaleny v `once()` – velmi složité vzorce ve velkých formulářích mohou ovlivnit výkon vykreslování na méně výkonných zařízeních.
-- Vypočtené hodnoty se v odeslaných datech ukládají jako řetězce. Při předávání výsledku do aritmetických nebo logických výrazů použijte k přetypování `number()`, `int()` nebo `boolean()`.
+- Pole Calculate se tazateli nikdy nezobrazují přímo — k zobrazení výsledku použijte pole `note`.
+- Sloupec `calculation` je povinný; řádek `calculate` bez vzorce vždy uloží prázdný řetězec.
+- Výsledky se přehodnocují při každé změně formuláře, pokud nejsou zabaleny v `once()` — velmi složité vzorce ve velkých formulářích mohou ovlivnit výkon vykreslování na zařízeních nižší třídy.
+- Vypočtené hodnoty se v odeslaném formuláři ukládají jako řetězce. Při předávání výsledku do aritmetických nebo logických výrazů použijte `number()`, `int()` nebo `boolean()` k přetypování.

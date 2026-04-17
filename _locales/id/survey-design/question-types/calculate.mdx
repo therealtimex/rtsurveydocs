@@ -1,111 +1,128 @@
 ---
-title: "Kalkulasi"
-description: ""
+title: "calculate"
+description: "Tipe pertanyaan calculate melakukan komputasi latar belakang dalam XLSForm, menyimpan nilai turunan tanpa menampilkan input kepada enumerator."
 ---
 
-Pertanyaan kalkulasi dalam XLSForm dan rtSurvey digunakan untuk melakukan komputasi berdasarkan bidang atau nilai lain dalam formulir Anda. Pertanyaan-pertanyaan ini tidak ditampilkan kepada pengguna tetapi berjalan di latar belakang, menyimpan hasilnya untuk digunakan nanti atau dikirimkan.
+import { Callout } from 'nextra/components'
 
-## Sintaks
+Tipe pertanyaan `calculate` menjalankan rumus secara diam-diam di latar belakang. Ini menyimpan hasilnya dalam bidang bernama yang dapat dirujuk oleh pertanyaan lain — tetapi tidak menampilkan input atau label kepada enumerator. Gunakan ini untuk menurunkan nilai, menggabungkan string, menjalankan logika kondisional, atau mencari data yang Anda butuhkan nanti dalam formulir.
 
-Dalam XLSForm, pertanyaan kalkulasi didefinisikan sebagai berikut:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Sintaks dasar
 
-- **type**: Selalu "calculate" untuk tipe pertanyaan ini.
-- **name**: Nama unik untuk pertanyaan kalkulasi.
-- **label**: Biasanya dikosongkan karena pertanyaan kalkulasi tidak ditampilkan kepada pengguna.
-- **calculation**: Rumus yang akan dievaluasi.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Penggunaan
+- **type**: Selalu `calculate`.
+- **name**: Nama bidang yang unik. Pertanyaan lain merujuk ini dengan `${name}`.
+- **label**: Kosongkan — bidang calculate tidak pernah ditampilkan kepada enumerator.
+- **calculation**: Rumus yang akan dievaluasi. Mendukung semua [fungsi XLSForm](../operators-and-functions/functions) dan referensi bidang.
 
-Pertanyaan kalkulasi umum digunakan untuk:
+---
 
-1. Melakukan operasi aritmatika
-2. Menggabungkan string
-3. Menerapkan logika atau fungsi yang kompleks
-4. Menyimpan hasil antara untuk digunakan nanti
+## Pola umum
 
-## Contoh
+### Aritmatika
 
-### Aritmatika Dasar
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### Penggabungan string (String concatenation)
 
-### Penggabungan String
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Nilai kondisional
 
-### Menggunakan Fungsi
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Usia dari tanggal lahir
 
-## Penggunaan Lanjutan di rtSurvey
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### Fungsi pulldata()
+---
 
-rtSurvey mendukung fungsi `pulldata()` dalam bidang kalkulasi, memungkinkan Anda mengambil data dari file CSV eksternal:
+## Menggunakan `once()` untuk mengunci nilai
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Secara default, `calculate` mengevaluasi kembali setiap kali ada bidang yang dirujuk berubah. Bungkus rumus dalam `once()` untuk mengevaluasi hanya pada pemuatan pertama dan membekukan hasilnya:
 
-#### Sintaks
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-Sintaks dasar untuk pulldata() adalah:
+Gunakan `once()` untuk stempel waktu, nilai awal, atau kasus apa pun di mana perhitungan ulang saat terjadi perubahan tidak diinginkan.
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+---
 
-- 'csv_filename': Nama file CSV (tanpa ekstensi .csv)
-- 'column_to_return': Nama kolom yang berisi data yang ingin Anda ambil
-- 'key_column': Nama kolom untuk dicocokkan
-- `${matching_value}`: Nilai yang akan dicari dalam kolom kunci (seringkali variabel dari formulir)
+## Menarik data dari sumber eksternal
 
-#### Catatan Penting
-
-1. File CSV harus diunggah bersama XLSForm Anda saat menerapkan survei.
-2. Gunakan koma sebagai pemisah dalam file CSV Anda, bukan titik koma.
-3. Hindari koma dalam bidang data CSV Anda, karena dapat menyebabkan masalah penguraian.
-4. pulldata() hanya mendukung hubungan 1-ke-1. Jika beberapa kecocokan ditemukan, hanya mengembalikan yang pertama.
-5. Mungkin ada batasan panjang teks yang dapat ditarik (sekitar 76 karakter).
-6. Anda dapat menggunakan pulldata() dalam constraint untuk memvalidasi entri terhadap data CSV.
-
-### Kalkulasi Kondisional
-
-Anda dapat menggunakan pernyataan if() untuk kalkulasi kondisional:
+### Dari file CSV
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
+
+Lihat [pulldata()](../operators-and-functions/pulldata) untuk referensi lengkap.
+
+### Dari database SQLite yang dibundel
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Lihat [Pencarian Database Lokal](../advanced-features/local-database-search) untuk detail konstruksi jalur.
+
+### Dari konteks aplikasi
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Lihat [App API](../app-api) untuk semua kunci yang tersedia.
+
+---
+
+## Menggunakan calculate dalam relevant dan constraint
+
+Bidang lain dapat merujuk hasil `calculate` seperti bidang apa pun:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
 
 ## Praktik Terbaik
 
-1. Gunakan nama yang bermakna untuk bidang kalkulasi untuk meningkatkan keterbacaan formulir.
-2. Hindari kalkulasi yang terlalu kompleks dalam satu bidang; pecah jika perlu.
-3. Uji kalkulasi Anda secara menyeluruh, terutama saat menggunakan rumus yang kompleks atau data eksternal.
-4. Ingat bahwa bidang kalkulasi berjalan setiap kali formulir dievaluasi, yang dapat memengaruhi kinerja untuk kalkulasi yang sangat kompleks atau banyak.
-5. Saat menggunakan pulldata(), pastikan file CSV Anda diformat dengan benar dan uji secara menyeluruh dengan data dan struktur formulir spesifik Anda.
+1. Berikan nama yang bermakna pada bidang calculate — `total_cost` lebih jelas daripada `calc1` dan lebih mudah dilacak dalam ekspor.
+2. Pecah rumus yang kompleks menjadi beberapa bidang calculate yang dirantai daripada satu ekspresi yang bersarang dalam.
+3. Gunakan `once()` untuk stempel waktu dan snapshot awal untuk mencegah nilai berubah setelah pengambilan pertama.
+4. Tempatkan bidang `calculate` sebelum pertanyaan pertama yang merujuknya — urutan evaluasi mengikuti urutan formulir.
+5. Biarkan kolom `label` kosong. Beberapa alat menampilkan label; membiarkannya kosong menghindari output yang membingungkan.
 
-## Keterbatasan
+## Batasan
 
-- Bidang kalkulasi tidak dapat langsung diedit oleh pengguna.
-- Hasil bidang kalkulasi tidak langsung terlihat kecuali direferensikan dalam bidang tampilan atau digunakan dalam logika formulir.
+- Bidang Calculate tidak pernah ditampilkan secara langsung kepada enumerator — gunakan bidang `note` untuk menunjukkan hasilnya.
+- Kolom `calculation` wajib diisi; baris `calculate` tanpa rumus selalu menyimpan string kosong.
+- Hasil dievaluasi kembali pada setiap perubahan formulir kecuali jika dibungkus dalam `once()` — rumus yang sangat kompleks dalam formulir besar dapat memengaruhi kinerja rendering pada perangkat kelas bawah.
+- Nilai yang dihitung disimpan sebagai string dalam pengiriman. Gunakan `number()`, `int()`, atau `boolean()` untuk melakukan pemeranan tipe saat meneruskan hasil ke ekspresi aritmatika atau logika.

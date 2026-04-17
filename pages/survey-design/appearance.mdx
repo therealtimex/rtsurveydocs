@@ -114,8 +114,76 @@ In addition to standard XLSForm appearances, rtSurvey supports the following pla
 |----------------------|----------------|-------------|
 | `likert` | select_one | Presents choices as a Likert scale row (already in standard table above; confirmed supported). |
 | `distress` | select_one | Renders choices as the Kessler Psychological Distress Scale (K10) visual widget with emotional icons. |
-| `rating_box-fill-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one | Renders choices as styled rating boxes with five colour slots. `c1` = outer container border, `c2` = unchecked border, `c3` = checked border and fill, `c4` = unchecked text colour, `c5` = checked text colour. Example: `rating_box-fill-grey-blue-green-black-white`. |
-| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one, select_multiple | Renders choices as coloured tag chips. The five colour slots follow the same order as `rating_box-fill`. Selected choices are highlighted; unselected choices are suppressed from the summary view. |
+| `rating_box-fill-{c1}-{c2}` or `rating_box-fill-{c1}-{c2}-{c3}-{c4}` | select_one | Renders choices as a row of styled rectangular buttons. Accepts 0, 2, or 4 colour slots. See colour reference below. |
+| `tagging-choices-noshow-v2-{c1}-{c2}-{c3}-{c4}-{c5}` | select_one, select_multiple | Renders choices as coloured tag chips. Selected chips are highlighted; unselected chips are suppressed in the summary view. Accepts 0 or 5 colour slots. See colour reference below. |
+
+#### `rating_box-fill` — colour slots
+
+Accepts **0, 2, or 4** hex colour slots. When no colours are provided the widget uses built-in defaults.
+
+| Slots provided | Slot | Controls |
+|----------------|------|----------|
+| 0 (omit entirely) | — | Uses defaults: unchecked border/fill = `#ffffff`, checked border/fill = `#fea500` |
+| 2 | `c1` | Unchecked border (and background when `-fill` is used) |
+| 2 | `c2` | Checked border (and background when `-fill` is used) |
+| 4 | `c1` | Unchecked border (and background when `-fill` is used) |
+| 4 | `c2` | Checked border (and background when `-fill` is used) |
+| 4 | `c3` | Unchecked text colour |
+| 4 | `c4` | Checked text colour |
+
+**Default colours (when no slots provided):**
+- Unchecked: border `#ffffff`, background `#ffffff` (with `-fill`)
+- Checked: border `#fea500`, background `#fea500` (with `-fill`)
+- Text colours inherit from CSS
+
+**Examples:**
+
+```
+rating_box-fill-cccccc-04B404
+```
+— grey unchecked, green checked (border + fill), text colours inherited.
+
+```
+rating_box-fill-cccccc-04B404-333333-ffffff
+```
+— grey unchecked, green checked, dark text unselected, white text selected.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_one | satisfaction | Rate your satisfaction | `rating_box-fill-cccccc-04B404-333333-ffffff` |
+
+---
+
+#### `tagging-choices-noshow-v2` — colour slots
+
+Accepts **0 or 5** hex colour slots.
+
+| Slot | Controls | Default |
+|------|----------|---------|
+| `c1` | Outer container / wrapper border | `#7f7f7f` (grey) |
+| `c2` | Individual chip border — unselected | `#ffffff` |
+| `c3` | Individual chip border **and** fill — selected | `#fea500` (orange) |
+| `c4` | Chip text colour — unselected | inherited from CSS |
+| `c5` | Chip text colour — selected | inherited from CSS |
+
+When colours are omitted entirely, the defaults above apply. All 5 slots must be provided together — partial colour lists are not supported for this widget.
+
+**Example:**
+
+```
+tagging-choices-noshow-v2-cccccc-cccccc-3498db-333333-ffffff
+```
+— grey wrapper border, grey chip borders unselected, blue fill selected, dark text unselected, white text selected.
+
+| type | name | label | appearance |
+|------|------|-------|------------|
+| select_multiple | topics | Select all that apply | `tagging-choices-noshow-v2-cccccc-cccccc-3498db-333333-ffffff` |
+
+---
+
+#### Colour value format (both widgets)
+
+Colour slots must be **6-digit hex codes without the `#` prefix** (e.g. `cccccc`, `04B404`, `3498db`). CSS named colours such as `grey` or `blue` are **not supported** and will be ignored, causing the widget to fall back to defaults. Dynamic colours can be provided via `colors(expression(...))` or theme variables (`__COLOR_THEME_XXX`).
 
 ### API integration
 
@@ -129,7 +197,14 @@ In addition to standard XLSForm appearances, rtSurvey supports the following pla
 
 | Appearance Attribute | Question Types | Description |
 |----------------------|----------------|-------------|
-| `change_language-{colors} default('lang')` | note, text | Renders a language-switcher widget styled with the given colour codes. The `default('lang')` token sets the initial language (e.g. `default('en')`); it is rewritten to `rtDefault('lang')` internally during parsing. Example: `change_language-blue-white default('vi')`. |
+| `change_language default('lang')` | note, text | Renders a language-switcher button. The `default('lang')` token sets the initial language (e.g. `default('en')`); it is rewritten to `rtDefault('lang')` internally during parsing. Button styling is controlled by the active CSS theme, not by appearance colours. |
+
+The `change_language` appearance does **not** accept colour parameters — any hex values appended after `change_language-` are ignored by the renderer. Use the CSS theme variables (`--accent-color`, `--primary-color`) to customise the button colour.
+
+```
+change_language default('vi')
+change_language default('en')
+```
 
 ### Inline date/time format
 
@@ -163,7 +238,7 @@ display{<align>, <size>, <color>}
 |-----------|--------|---------|
 | Align | `left`, `right`, `top`, `center`, `bottom` | `right` |
 | Size | `small`, `medium`, `large` | `small` |
-| Color | hex e.g. `#FF5500` | primary theme color |
+| Color | `#RRGGBB` hex e.g. `#FF5500` | `#0099FF` (blue) |
 | Flag | `inline-icon` | forces icon mode |
 
 | Align value | Layout |

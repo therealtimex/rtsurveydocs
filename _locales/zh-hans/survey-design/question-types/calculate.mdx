@@ -1,111 +1,128 @@
 ---
-title: "Calculate"
-description: ""
+title: "calculate"
+description: "calculate 问题类型在 XLSForm 中执行后台计算，存储派生值而不向枚举员显示输入框。"
 ---
 
-XLSForm 和 rtSurvey 中的 calculate 题目用于根据表单中的其他字段或值执行计算。这些题目不向用户显示，而是在后台运行，存储其结果供以后使用或提交。
+import { Callout } from 'nextra/components'
 
-## 语法
+`calculate` 问题类型在后台静默运行公式。它将结果存储在一个命名的字段中，其他问题可以引用该字段，但它不向枚举员显示任何输入或标签。使用它来派生值、连接字符串、运行条件逻辑或查找以后在表单中需要的数据。
 
-在 XLSForm 中，calculate 题目定义如下：
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## 基本语法
 
-- **type**：此题目类型始终为 "calculate"。
-- **name**：calculate 题目的唯一名称。
-- **label**：通常留空，因为 calculate 题目不向用户显示。
-- **calculation**：要评估的公式。
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## 用途
+- **type**: 始终为 `calculate`。
+- **name**: 唯一的字段名称。其他问题使用 `${name}` 引用此字段。
+- **label**: 留空 — calculate 字段永远不会显示给枚举员。
+- **calculation**: 要计算的公式。支持所有 [XLSForm 函数](../operators-and-functions/functions)和字段引用。
 
-Calculate 题目通常用于：
+---
 
-1. 执行算术运算
-2. 连接字符串
-3. 应用复杂逻辑或函数
-4. 存储中间结果供以后使用
+## 常用模式
 
-## 示例
+### 算术运算
 
-### 基本算术
-
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
 ### 字符串连接
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-### 使用函数
+### 条件值
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-## rtSurvey 高级用法
+### 根据出生日期计算年龄
 
-### pulldata() 函数
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-rtSurvey 在 calculate 字段中支持 `pulldata()` 函数，允许您从外部 CSV 文件检索数据：
+---
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+## 使用 `once()` 锁定值
 
-#### 语法
+默认情况下，每当引用的任何字段发生更改时，`calculate` 都会重新计算。将公式包装在 `once()` 中，以便仅在首次加载时计算并冻结结果：
 
-pulldata() 的基本语法为：
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+对于时间戳、初始值或任何不希望在更改时重新计算的情况，请使用 `once()`。
 
-- 'csv_filename'：CSV 文件的名称（不含 .csv 扩展名）
-- 'column_to_return'：包含您想要提取的数据的列名
-- 'key_column'：用于匹配的列名
-- `${matching_value}`：在键列中查找的值（通常是表单中的变量）
+---
 
-#### 重要说明
+## 从外部源提取数据
 
-1. 部署调查时，CSV 文件必须与您的 XLSForm 一起上传。
-2. 在 CSV 文件中使用逗号作为分隔符，而不是分号。
-3. 避免在 CSV 的数据字段中使用逗号，因为这会导致解析问题。
-4. pulldata() 仅支持一对一关系。如果找到多个匹配项，只返回第一个。
-5. 可提取的文本长度可能有限制（约 76 个字符）。
-6. 您可以在约束中使用 pulldata() 来根据 CSV 数据验证输入。
-
-### 条件计算
-
-您可以使用 if() 语句进行条件计算：
+### 从 CSV 文件
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
+
+有关完整参考，请参阅 [pulldata()](../operators-and-functions/pulldata)。
+
+### 从绑定的 SQLite 数据库
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+有关路径构造的详细信息，请参阅[本地数据库搜索](../advanced-features/local-database-search)。
+
+### 从应用程序上下文
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+有关所有可用键，请参阅 [App API](../app-api)。
+
+---
+
+## 在 relevant 和 constraint 中使用 calculate
+
+其他字段可以像引用任何字段一样引用 `calculate` 结果：
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
 
 ## 最佳实践
 
-1. 使用有意义的名称来命名 calculate 字段，以提高表单可读性。
-2. 避免在单个字段中进行过于复杂的计算；如有必要，将其分解。
-3. 彻底测试您的计算，尤其是在使用复杂公式或外部数据时。
-4. 请记住，calculate 字段在每次评估表单时都会运行，对于非常复杂或大量的计算可能影响性能。
-5. 使用 pulldata() 时，确保 CSV 文件格式正确，并使用您的特定数据和表单结构进行彻底测试。
+1. 给 calculate 字段起有意义的名字 — `total_cost` 比 `calc1` 更清晰，且在导出中更容易追踪。
+2. 将复杂的公式拆分为多个链式 calculate 字段，而不是使用一个深层嵌套的表达式。
+3. 对时间戳和初始快照使用 `once()`，以防止值在首次捕获后发生更改。
+4. 将 `calculate` 字段放在第一个引用它们的问题之前 — 计算顺序遵循表单顺序。
+5. 保持 `label` 列为空。某些工具会显示标签；留空可以避免令人困惑的输出。
 
 ## 限制
 
-- Calculate 字段不能由用户直接编辑。
-- Calculate 字段的结果不会立即可见，除非在显示字段中引用或用于表单逻辑。
+- Calculate 字段永远不会直接显示给枚举员 — 使用 `note` 字段来显示结果。
+- `calculation` 列是必需的；没有公式的 `calculate` 行始终存储空字符串。
+- 除非包装在 `once()` 中，否则结果会在每次表单更改时重新计算 — 大型表单中非常复杂的公式可能会影响低端设备的渲染性能。
+- 计算出的值在提交时存储为字符串。将结果传递给算术或逻辑表达式时，请使用 `number()`、`int()` 或 `boolean()` 进行类型转换。

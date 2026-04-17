@@ -1,21 +1,21 @@
 ---
 title: "Style HTML"
-description: "rtSurvey prend en charge les balises HTML dans les libellés et les conseils, permettant le formatage de texte enrichi, les liens et le thèmage de couleurs dynamique."
+description: "rtSurvey prend en charge les balises HTML dans les étiquettes et les conseils, permettant un formatage de texte riche, des liens et une thématisation dynamique des couleurs."
 ---
 
 import { Callout } from 'nextra/components'
 
-rtSurvey affiche le texte des **libellés (label)** et des **conseils (hint)** sous forme de HTML sur les formulaires web. Cela signifie que vous pouvez utiliser des balises HTML standard pour formater le texte, ajouter des sauts de ligne, créer des liens et appliquer des couleurs. Ceci est particulièrement utile pour les champs de notes, les instructions de section et les résumés dynamiques.
+rtSurvey affiche le texte des **étiquettes** (label) et des **conseils** (hint) sous forme de HTML sur les formulaires web. Cela signifie que vous pouvez utiliser des balises HTML standard pour formater le texte, ajouter des sauts de ligne, créer des liens et appliquer des couleurs. Ceci est particulièrement utile pour les champs de notes, les instructions de section et les résumés dynamiques.
 
 <Callout type="warning">
-Le HTML dans les libellés est rendu sur le **formulaire web** et les applications mobiles rtSurvey. Il peut ne pas s'afficher dans tous les clients compatibles ODK. Testez toujours sur votre plateforme cible.
+Le HTML dans les étiquettes est rendu sur le **formulaire web** et les applications mobiles rtSurvey. Il peut ne pas s'afficher dans tous les clients compatibles ODK. Testez toujours sur votre plateforme cible.
 </Callout>
 
 ---
 
 ## Balises HTML prises en charge
 
-### Formatage de texte
+### Formatage du texte
 
 | Balise | Résultat |
 |-----|--------|
@@ -38,8 +38,8 @@ S'ouvre dans un nouvel onglet. À utiliser pour les documents de référence, le
 Utilisez `<span>` avec des styles en ligne :
 
 ```html
-<span style="color: red;">Warning: value is out of range</span>
-<span style="color: #009688;">Section completed</span>
+<span style="color: red;">Avertissement : la valeur est hors de portée</span>
+<span style="color: #009688;">Section terminée</span>
 ```
 
 ---
@@ -49,25 +49,25 @@ Utilisez `<span>` avec des styles en ligne :
 rtSurvey prend en charge les **jetons de thème de couleur** qui s'adaptent au thème configuré de l'application. Utilisez la syntaxe `__COLOR_THEME_NAME__` :
 
 ```html
-<span style="color: var(--color-theme-primary);">Primary color text</span>
+<span style="color: var(--color-theme-primary);">Texte de couleur primaire</span>
 ```
 
-Ou en utilisant le raccourci du jeton dans le texte du libellé :
+Ou en utilisant le raccourci du jeton dans le texte de l'étiquette :
 
 ```
-<font color="var(--COLOR_THEME_PRIMARY)">Important note</font>
+<font color="var(--COLOR_THEME_PRIMARY)">Note importante</font>
 ```
 
-Ceci est automatiquement converti en l'équivalent `<span>` avec une variable CSS au moment du rendu.
+Ceci est automatiquement converti en `<span>` équivalent avec une variable CSS au moment du rendu.
 
 ---
 
-## Libellés multilingues
+## Étiquettes multilingues
 
-Encadrez le contenu avec des balises de langue pour prendre en charge plusieurs langues dans une seule cellule de libellé :
+Enveloppez le contenu dans des balises de langue pour prendre en charge plusieurs langues dans une seule cellule d'étiquette :
 
 ```
-<en>Enter the household size</en><vi>Nhập quy mô hộ gia đình</vi>
+<en>Enter the household size</en><fr>Entrez la taille du ménage</fr>
 ```
 
 rtSurvey extrait le contenu correspondant à la langue actuelle de l'application. Si aucune balise de langue correspondante n'est trouvée, la chaîne complète est affichée telle quelle.
@@ -80,26 +80,26 @@ rtSurvey extrait le contenu correspondant à la langue actuelle de l'application
 
 | type | name | label |
 |------|------|-------|
-| note | section_intro | `<strong>Section 3: Land Use</strong><br>Ask all questions in this section to the household head only.` |
+| note | section_intro | `<strong>Section 3 : Utilisation des terres</strong><br>Posez toutes les questions de cette section uniquement au chef de ménage.` |
 
 ### Résumé dynamique avec référence de calcul
 
 | type | name | label |
 |------|------|-------|
 | calculate | total | | `${adults} + ${children}` |
-| note | summary | `Total household members: <strong>${total}</strong><br><span style="color: gray;">Adults: ${adults} · Children: ${children}</span>` |
+| note | summary | `Total des membres du ménage : <strong>${total}</strong><br><span style="color: gray;">Adultes : ${adults} · Enfants : ${children}</span>` |
 
 ### Avertissement en rouge
 
 | type | name | label | relevant |
 |------|------|-------|----------|
-| note | age_warning | `<span style="color: red;"><strong>Warning:</strong> Age entered (${age}) is unusually high. Please verify.</span>` | `${age} > 100` |
+| note | age_warning | `<span style="color: red;"><strong>Avertissement :</strong> L'âge saisi (${age}) est anormalement élevé. Veuillez vérifier.</span>` | `${age} > 100` |
 
 ### Lien vers un document de référence
 
 | type | name | label |
 |------|------|-------|
-| note | guidelines_link | `Refer to the <a href="https://docs.example.com/guidelines" target="_blank">Field Guidelines</a> before starting this section.` |
+| note | guidelines_link | `Consultez les <a href="https://docs.example.com/guidelines" target="_blank">Directives de terrain</a> avant de commencer cette section.` |
 
 ---
 
@@ -107,55 +107,55 @@ rtSurvey extrait le contenu correspondant à la langue actuelle de l'application
 
 ### `<webbox src='url' title='title'>...</webbox>`
 
-Intègre un bouton qui ouvre une URL dans une fenêtre modale au sein du formulaire. Voir [Webbox](webbox) pour plus de détails.
+Intègre un bouton qui ouvre une URL dans une fenêtre modale à l'intérieur du formulaire. Voir [Webbox](webbox) pour plus de détails.
 
 ### `<delete-repeat-current>label</delete-repeat-current>`
 
-Affiche un bouton à l'intérieur d'un groupe de répétition qui supprime l'instance de répétition actuelle lorsqu'on appuie dessus.
+Affiche un bouton à l'intérieur d'un groupe répétitif qui supprime l'instance de répétition actuelle lorsqu'on appuie dessus.
 
 ### `<delete-repeat-last>label</delete-repeat-last>`
 
 Affiche un bouton qui supprime la dernière instance de répétition.
 
-Exemple d'utilisation dans un groupe de répétition :
+Exemple d'utilisation dans un groupe répétitif :
 
 | type | name | label |
 |------|------|-------|
-| note | delete_btn | `<delete-repeat-current>Remove this member</delete-repeat-current>` |
+| note | delete_btn | `<delete-repeat-current>Supprimer ce membre</delete-repeat-current>` |
 
 ---
 
 ## Résumés HTML dynamiques avec autopull()
 
-`autopull()` affiche un bloc de HTML à l'intérieur d'un champ `note` et **le réévalue à chaque changement de champ** dans le formulaire. Cela le rend adapté aux panneaux de résumé en direct, aux écrans de révision avant soumission et aux totaux cumulés qui se mettent à jour au fur et à mesure que l'enquêteur remplit les données.
+`autopull()` affiche un bloc de HTML à l'intérieur d'un champ `note` et le **réévalue à chaque changement de champ** dans le formulaire. Cela le rend approprié pour les panneaux de résumé en direct, les écrans de révision avant soumission et les totaux cumulés qui se mettent à jour au fur et à mesure que l'enquêteur remplit les données.
 
 <Callout type="info">
-`autopull()` ne fonctionne que sur les champs de type **note**. La colonne libellé (label) est ignorée — tout le contenu HTML doit être fourni via la colonne **apparence (appearance)** en utilisant `concat()`.
+`autopull()` ne fonctionne que sur les champs de type **note**. La colonne d'étiquette est ignorée — tout le contenu HTML doit être fourni via la colonne **appearance** en utilisant `concat()`.
 </Callout>
 
 ### Syntaxe
 
-Placez `autopull()` dans la colonne **apparence (appearance)** d'un champ `note` :
+Placez `autopull()` dans la colonne **appearance** d'un champ `note` :
 
 ```
 autopull(concat('<html>...</html>'))
 ```
 
-Les références aux champs (`${field_name}`) à l'intérieur de `concat()` sont remplacées par les valeurs actuelles en direct et le HTML est restitué à chaque changement.
+Les références de champs (`${field_name}`) à l'intérieur de `concat()` sont remplacées par les valeurs actuelles en direct et le HTML est de nouveau rendu à chaque changement.
 
-### Limitation de la hauteur avec scroll-view()
+### Contraindre la hauteur avec scroll-view()
 
-Pour les résumés plus longs, combinez `autopull()` avec `scroll-view(N%)` pour limiter la hauteur du panneau et le rendre défilable :
+Pour des résumés plus longs, combinez `autopull()` avec `scroll-view(N%)` pour limiter la hauteur du panneau et le rendre défilant :
 
 ```
 scroll-view(45%) autopull(concat('<html>...</html>'))
 ```
 
-La valeur `N%` est relative à la zone visible du formulaire. `45%` est une valeur par défaut pratique pour un panneau de résumé au milieu de la page.
+La valeur `N%` est relative à la zone visible du formulaire. `45%` est un défaut pratique pour un panneau de résumé au milieu de la page.
 
 ### Exemple complet — résumé de la localisation du ménage
 
-Le champ `note` suivant affiche un tableau à deux colonnes montrant la province, le district et la commune sélectionnés. Il se met à jour automatiquement dès que `${tinh_name}`, `${huyen_name}` ou `${xa_name}` changent.
+Le champ `note` suivant affiche un tableau à deux colonnes montrant la province, le district et la commune sélectionnés. Il se met à jour automatiquement chaque fois que `${tinh_name}`, `${huyen_name}` ou `${xa_name}` changent.
 
 | type | name | label | appearance |
 |------|------|-------|------------|
@@ -177,35 +177,35 @@ scroll-view(45%) autopull(concat(
 
 ### Styles en ligne
 
-Les attributs `style="..."` en ligne sur n'importe quel élément HTML sont pris en charge et constituent la méthode recommandée pour appliquer un formatage visuel à l'intérieur des blocs `autopull()`.
+Les attributs `style="..."` en ligne sur n'importe quel élément HTML sont pris en charge et constituent le moyen recommandé pour appliquer un formatage visuel à l'intérieur des blocs `autopull()`.
 
-Les éléments suivants ne sont **pas** pris en charge à l'intérieur du contenu `autopull()` :
+Les éléments suivants ne sont **pas** pris en charge dans le contenu `autopull()` :
 
 - Blocs `<style>`
-- Balises `<link>` de feuille de style externe
+- Balises de feuilles de style externes `<link>`
 - JavaScript (`<script>`)
 
 ### Quand utiliser autopull()
 
-| Cas d'utilisation | Remarques |
+| Cas d'utilisation | Notes |
 |----------|-------|
-| Écran de révision avant soumission | Afficher toutes les réponses clés sur un seul panneau avant que l'enquêteur ne termine |
-| Totaux cumulés | Afficher une somme calculée qui se met à jour au fur et à mesure que les quantités sont saisies |
-| Panneau de référence visible | Afficher une valeur de recherche sélectionnée (par exemple, le nom de la province) pendant que l'enquêteur remplit les champs enfants |
+| Écran de révision avant soumission | Affichez toutes les réponses clés sur un seul panneau avant que l'enquêteur ne termine |
+| Totaux cumulés | Affichez une somme calculée qui se met à jour au fur et à mesure de la saisie des quantités |
+| Panneau de référence visible | Affichez une valeur de recherche sélectionnée (par exemple, le nom de la province) pendant que l'enquêteur remplit les champs enfants |
 
 ---
 
-## Bonnes pratiques
+## Bonnes Pratiques
 
-1. Utilisez le HTML avec parcimonie — les libellés trop formatés sont plus difficiles à lire.
+1. Utilisez le HTML avec parcimonie — des étiquettes trop formatées sont plus difficiles à lire.
 2. Préférez `<strong>` pour le gras et `<em>` pour l'italique aux balises obsolètes `<b>` et `<i>`.
-3. Conservez une utilisation significative des couleurs — utilisez le rouge pour les avertissements, pas pour la décoration.
-4. Testez toujours le rendu HTML sur l'application mobile et le formulaire web, car l'affichage peut varier légèrement.
-5. Évitez les balises `<table>` à l'intérieur des libellés — elles s'affichent rarement bien sur les écrans mobiles.
-6. N'utilisez pas de JavaScript (`<script>`) — il sera supprimé ou provoquera des erreurs.
+3. Gardez une utilisation des couleurs significative — utilisez le rouge pour les avertissements, pas pour la décoration.
+4. Testez toujours le rendu HTML sur l'application mobile et le formulaire web, car le rendu peut différer légèrement.
+5. Évitez les balises `<table>` à l'intérieur des étiquettes — elles s'affichent rarement bien sur les écrans mobiles.
+6. N'utilisez pas de JavaScript (`<script>`) — il sera supprimé ou causera des erreurs.
 
 ## Limitations
 
-- Le HTML complexe (tableaux, formulaires, scripts) n'est pas pris en charge et peut perturber le rendu.
-- Certains anciens clients mobiles peuvent afficher les balises HTML comme du texte brut — testez sur tous les appareils cibles.
+- Le HTML complexe (tableaux, formulaires, scripts) n'est pas pris en charge et peut casser le rendu.
+- Certains clients mobiles plus anciens peuvent afficher les balises HTML comme du texte littéral — testez sur tous les appareils cibles.
 - Les liens `<a>` s'ouvrent dans un navigateur ou une WebView — l'enquêteur quitte le formulaire, ce qui peut être perturbant sur mobile.

@@ -1,11 +1,11 @@
 ---
 title: "calculate"
-description: "Spørgsmålstypen calculate udfører baggrundsberegninger i en XLSForm og gemmer afledte værdier uden at vise et input til intervieweren."
+description: "Spørgsmålstypen calculate udfører baggrundsberegninger i en XLSForm og gemmer afledte værdier uden at vise et inputfelt til intervieweren."
 ---
 
 import { Callout } from 'nextra/components'
 
-Spørgsmålstypen `calculate` kører en formel lydløst i baggrunden. Den gemmer resultatet i et navngivet felt, som andre spørgsmål kan referere til — men den viser intet input eller label til intervieweren. Brug den til at aflede værdier, sammensætte strenge, køre betinget logik eller slå data op, som du har brug for senere i formularen.
+Spørgsmålstypen `calculate` kører en formel lydløst i baggrunden. Den gemmer resultatet i et navngivet felt, som andre spørgsmål kan referere til — men den viser intet inputfelt eller label til intervieweren. Brug den til at aflede værdier, sammensætte strenge, køre betinget logik eller slå data op, som du skal bruge senere i formularen.
 
 ---
 
@@ -17,7 +17,7 @@ Spørgsmålstypen `calculate` kører en formel lydløst i baggrunden. Den gemmer
 
 - **type**: Altid `calculate`.
 - **name**: Et unikt feltnavn. Andre spørgsmål refererer til dette med `${name}`.
-- **label**: Lad den være tom — calculate-felter vises aldrig for intervieweren.
+- **label**: Efterlad feltet tomt — calculate-felter vises aldrig for intervieweren.
 - **calculation**: Formlen der skal evalueres. Understøtter alle [XLSForm-funktioner](../operators-and-functions/functions) og feltreferencer.
 
 ---
@@ -33,7 +33,7 @@ Spørgsmålstypen `calculate` kører en formel lydløst i baggrunden. Den gemmer
 | calculate | total | | `${price} * ${quantity}` |
 | note | total_note | Total: `${total}` | |
 
-### Streng-sammensætning
+### Sammensætning af strenge
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
@@ -57,19 +57,19 @@ Spørgsmålstypen `calculate` kører en formel lydløst i baggrunden. Den gemmer
 
 ---
 
-## Brug af `once()` til at låse værdien
+## Brug `once()` til at låse værdien
 
-Som standard genberegnes `calculate`, hver gang et refereret felt ændres. Indpak formlen i `once()` for kun at evaluere ved første indlæsning og fastfryse resultatet:
+Som standard genberegnes `calculate`, hver gang et refereret felt ændres. Indpak formlen i `once()` for kun at evaluere ved første indlæsning og fryse resultatet:
 
 | type | name | label | calculation |
 |------|------|-------|-------------|
 | calculate | interview_start | | `once(now())` |
 
-Brug `once()` til tidsstempler, startværdier eller ethvert tilfælde, hvor genberegning ved ændring er uønsket.
+Brug `once()` til tidsstempler, startværdier eller i alle tilfælde, hvor genberegning ved ændring er uønsket.
 
 ---
 
-## Træk data fra eksterne kilder
+## Hentning af data fra eksterne kilder
 
 ### Fra en CSV-fil
 
@@ -79,7 +79,7 @@ pulldata('staff.csv', 'department', 'name', ${staff_id})
 
 Se [pulldata()](../operators-and-functions/pulldata) for den fulde reference.
 
-### Fra en bundled SQLite-database
+### Fra en medfølgende SQLite-database
 
 ```
 pulldata('rawquery',
@@ -88,7 +88,7 @@ pulldata('rawquery',
   ${province_id})
 ```
 
-Se [Local Database Search](../advanced-features/local-database-search) for detaljer om konstruktion af stier.
+Se [Lokal databasesøgning](../advanced-features/local-database-search) for detaljer om sti-konstruktion.
 
 ### Fra app-kontekst
 
@@ -103,7 +103,7 @@ Se [App API](../app-api) for alle tilgængelige nøgler.
 
 ## Brug af calculate i relevant og constraint
 
-Andre felter kan referere til et `calculate`-resultat ligesom ethvert andet felt:
+Andre felter kan referere til et `calculate`-resultat præcis som ethvert andet felt:
 
 | type | name | label | relevant | constraint |
 |------|------|-------|----------|------------|
@@ -112,17 +112,17 @@ Andre felter kan referere til et `calculate`-resultat ligesom ethvert andet felt
 
 ---
 
-## Best Practices
+## Bedste praksis
 
 1. Giv calculate-felter meningsfulde navne — `total_cost` er tydeligere end `calc1` og lettere at spore i eksporter.
-2. Opdel komplekse formler i flere sammenkædede calculate-felter i stedet for ét dybt indlejret udtryk.
-3. Brug `once()` til tidsstempler og indledende snapshots for at forhindre værdier i at ændre sig efter første registrering.
+2. Opdel komplekse formler i flere kædede calculate-felter i stedet for ét dybt indlejret udtryk.
+3. Brug `once()` til tidsstempler og indledende snapshots for at forhindre, at værdier ændres efter første opsamling.
 4. Placer `calculate`-felter før det første spørgsmål, der refererer til dem — evalueringsrækkefølgen følger formularens rækkefølge.
-5. Hold `label`-kolonnen tom. Nogle værktøjer viser labelen; at lade den være tom undgår forvirrende output.
+5. Hold kolonnen `label` tom. Nogle værktøjer viser labelen; at lade den være blank undgår forvirrende output.
 
 ## Begrænsninger
 
 - Calculate-felter vises aldrig direkte for intervieweren — brug et `note`-felt til at vise resultatet.
 - Kolonnen `calculation` er påkrævet; en `calculate`-række uden formel gemmer altid en tom streng.
-- Resultater genberegnes ved hver ændring af formularen, medmindre de er indpakket i `once()` — meget komplekse formler i store formularer kan påvirke gengivelsesydelsen på low-end enheder.
-- Beregnede værdier gemmes som strenge i indsendelsen. Brug `number()`, `int()` eller `boolean()` til at caste, når resultatet sendes til aritmetiske eller logiske udtryk.
+- Resultater genberegnes ved hver ændring i formularen, medmindre de er indpakket i `once()` — meget komplekse formler i store formularer kan påvirke ydeevnen på enheder med lav ydeevne.
+- Beregnede værdier gemmes som strenge i indsendelsen. Brug `number()`, `int()` eller `boolean()` til at typekonvertere, når du sender resultatet til aritmetiske eller logiske udtryk.

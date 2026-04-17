@@ -1,111 +1,128 @@
 ---
-title: "Számítás"
-description: ""
+title: "calculate"
+description: "A calculate kérdéstípus háttérszámításokat végez az XLSForm-ban, tárolva a származtatott értékeket anélkül, hogy beviteli mezőt jelenítene meg a számlálónak."
 ---
 
-A számítás kérdések az XLSForm-ban és az rtSurvey-ben az űrlap más mezőin vagy értékein alapuló számítások elvégzésére szolgálnak. Ezek a kérdések nem jelennek meg a felhasználónak, hanem a háttérben futnak, és eredményeiket tárolják a későbbi felhasználáshoz vagy beküldéshez.
+import { Callout } from 'nextra/components'
 
-## Szintaxis
+A `calculate` kérdéstípus csendben, a háttérben futtat egy képletet. Az eredményt egy elnevezett mezőben tárolja, amelyre más kérdések hivatkozhatnak — de nem jelenít meg beviteli mezőt vagy címkét a számlálónak. Használja értékek származtatására, karakterláncok összefűzésére, feltételes logika futtatására vagy olyan adatok kikeresésére, amelyekre később szüksége lesz az űrlapon.
 
-Az XLSForm-ban a számítás kérdés a következőképpen definiálható:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Alapvető szintaxis
 
-- **type**: Mindig "calculate" ennél a kérdéstípusnál.
-- **name**: A számítás kérdés egyedi neve.
-- **label**: Általában üresen marad, mivel a számítás kérdések nem jelennek meg a felhasználóknak.
-- **calculation**: A kiértékelendő képlet.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Felhasználási területek
+- **type**: Mindig `calculate`.
+- **name**: Egyedi mezőnév. Más kérdések erre hivatkoznak a `${name}` használatával.
+- **label**: Hagyja üresen — a calculate mezők soha nem láthatók a számláló számára.
+- **calculation**: A kiértékelendő képlet. Támogatja az összes [XLSForm függvényt](../operators-and-functions/functions) és mezőhivatkozást.
 
-A számítás kérdések általánosan használt területei:
+---
 
-1. Aritmetikai műveletek elvégzése
-2. Karakterláncok összefűzése
-3. Összetett logika vagy függvények alkalmazása
-4. Közbenső eredmények tárolása a későbbi felhasználáshoz
+## Gyakori minták
 
-## Példák
+### Aritmetika
 
-### Alapvető aritmetika
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### Karakterláncok összefűzése
 
-### Karakterlánc összefűzése
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Feltételes érték
 
-### Függvények használata
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Életkor születési dátumból
 
-## Haladó használat az rtSurvey-ben
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### pulldata() függvény
+---
 
-Az rtSurvey támogatja a `pulldata()` függvényt a számítás mezőkben, lehetővé téve adatok lekérését külső CSV-fájlokból:
+## Az `once()` használata az érték rögzítésére
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Alapértelmezés szerint a `calculate` újraértékelődik, valahányszor bármely hivatkozott mező megváltozik. Csomagolja a képletet `once()` függvénybe, hogy csak az első betöltéskor értékelődjön ki, és az eredmény rögzüljön:
 
-#### Szintaxis
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-A pulldata() alapvető szintaxisa:
+Használja az `once()` függvényt időbélyegekhez, kezdeti értékekhez vagy minden olyan esethez, ahol a változáskor történő újraszámítás nem kívánatos.
 
-```
-pulldata('csv_fájlnév', 'visszaadandó_oszlop', 'kulcs_oszlop', ${egyező_érték})
-```
+---
 
-- 'csv_fájlnév': A CSV-fájl neve (.csv kiterjesztés nélkül)
-- 'visszaadandó_oszlop': A lekérendő adatot tartalmazó oszlopnév
-- 'kulcs_oszlop': Az egyeztetendő oszlopnév
-- `${egyező_érték}`: A kulcsoszlopban keresendő érték (általában egy változó az űrlapból)
+## Adatok lekérése külső forrásokból
 
-#### Fontos megjegyzések
-
-1. A CSV-fájlt az XLSForm feltöltésekor csatolni kell a felmérés telepítésekor.
-2. Vesszőket használjon elválasztóként a CSV-fájlban, ne pontosvesszőket.
-3. Kerülje a vesszőket a CSV adatmezőkön belül, mivel ezek elemzési problémákat okozhatnak.
-4. A pulldata() csak 1:1 arányú kapcsolatokat támogat. Több egyezés esetén csak az elsőt adja vissza.
-5. Korlátok lehetnek a kihúzható szöveg hosszán (kb. 76 karakter körül).
-6. Használhatja a pulldata() függvényt korlátokban a CSV-adatokkal való bejegyzések ellenőrzéséhez.
-
-### Feltételes számítások
-
-Az if() utasításokat feltételes számításokhoz használhatja:
+### CSV fájlból
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-## Bevált módszerek
+A teljes hivatkozást lásd: [pulldata()](../operators-and-functions/pulldata).
 
-1. Használjon értelmes neveket a számítás mezőknek az űrlap olvashatóságának javítása érdekében.
-2. Kerülje a túlzottan összetett számításokat egyetlen mezőben; szükség esetén bontsa szét azokat.
-3. Alaposan tesztelje a számításokat, különösen összetett képletek vagy külső adatok használatakor.
-4. Ne feledje, hogy a számítás mezők az űrlap minden kiértékelésekor lefutnak, ami teljesítményre hatással lehet nagyon összetett vagy számos számítás esetén.
-5. A pulldata() használatakor győződjön meg arról, hogy a CSV-fájlok helyesen vannak formázva, és alaposan tesztelje az adott adatokkal és az űrlap struktúrájával.
+### Csomagolt SQLite adatbázisból
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Az útvonal felépítésének részleteit lásd: [Helyi adatbázis keresés](../advanced-features/local-database-search).
+
+### Alkalmazás kontextusból
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Az összes elérhető kulcsot lásd: [App API](../app-api).
+
+---
+
+## A calculate használata relevant és constraint mezőkben
+
+Más mezők hivatkozhatnak a `calculate` eredményére, mint bármely más mezőre:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## Legjobb gyakorlatok
+
+1. Adjon értelmes neveket a calculate mezőknek — a `total_cost` egyértelműbb, mint a `calc1`, és könnyebb nyomon követni az exportokban.
+2. Bontsa a komplex képleteket több láncolt calculate mezőre egyetlen mélyen beágyazott kifejezés helyett.
+3. Használja az `once()` függvényt időbélyegekhez és kezdeti pillanatképekhez, hogy megakadályozza az értékek megváltozását az első rögzítés után.
+4. Helyezze a `calculate` mezőket az első rájuk hivatkozó kérdés elé — a kiértékelési sorrend követi az űrlap sorrendjét.
+5. Tartsa üresen a `label` oszlopot. Egyes eszközök megjelenítik a címkét; üresen hagyva elkerülhető a zavaró kimenet.
 
 ## Korlátozások
 
-- A számítás mezők nem szerkeszthetők közvetlenül a felhasználók által.
-- Egy számítás mező eredménye nem látható azonnal, hacsak nem egy megjelenítési mezőben hivatkoznak rá, vagy az űrlap logikájában nem használják.
+- A Calculate mezők soha nem jelennek meg közvetlenül a számláló számára — használjon `note` mezőt az eredmény megjelenítéséhez.
+- A `calculation` oszlop kötelező; a képlet nélküli `calculate` sor mindig üres karakterláncot tárol.
+- Az eredmények minden űrlapváltozáskor újraértékelődnek, hacsak nincsenek `once()` függvénybe csomagolva — a nagyméretű űrlapokon lévő nagyon összetett képletek befolyásolhatják a megjelenítési teljesítményt az alacsony kategóriájú eszközökön.
+- A számított értékek karakterláncként tárolódnak a beküldésben. Használja a `number()`, `int()` vagy `boolean()` függvényeket a típusátalakításhoz, amikor az eredményt aritmetikai vagy logikai kifejezéseknek adja át.

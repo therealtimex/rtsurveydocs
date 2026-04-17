@@ -1,109 +1,128 @@
 ---
-title: "Berekenen"
-description: ""
+title: "calculate"
+description: "Het vraagtype calculate voert berekeningen op de achtergrond uit in een XLSForm, waarbij afgeleide waarden worden opgeslagen zonder een invoerveld aan de teller te tonen."
 ---
 
-Berekeningsvragen in XLSForms en rtSurvey worden gebruikt om berekeningen uit te voeren op basis van andere velden of waarden in uw formulier. Deze vragen worden niet weergegeven aan de gebruiker maar draaien op de achtergrond en slaan hun resultaten op voor later gebruik of indiening.
+import { Callout } from 'nextra/components'
 
-## Syntaxis
+Het vraagtype `calculate` voert een formule geruisloos op de achtergrund uit. Het slaat het resultaat op in een benoemd veld waarnaar andere vragen kunnen verwijzen, maar toont geen invoer of label aan de teller. Gebruik het om waarden af te leiden, strings samen te voegen, voorwaardelijke logica uit te voeren of gegevens op te zoeken die u later in het formulier nodig hebt.
 
-In de XLSForm wordt een berekeningsvraag als volgt gedefinieerd:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Basissyntaxis
 
-- **type**: Altijd "calculate" voor dit vraagtype.
-- **name**: Een unieke naam voor de berekeningsvraag.
-- **label**: Gewoonlijk leeg gelaten omdat berekeningsvragen niet worden weergegeven aan gebruikers.
-- **calculation**: De te evalueren formule.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Toepassingen
+- **type**: Altijd `calculate`.
+- **name**: Een unieke veldnaam. Andere vragen verwijzen hiernaar met `${name}`.
+- **label**: Laat leeg — calculate-velden worden nooit getoond aan de teller.
+- **calculation**: De te evalueren formule. Ondersteunt alle [XLSForm-functies](../operators-and-functions/functions) en veldverwijzingen.
 
-Berekeningsvragen worden veelgebruikt voor:
+---
 
-1. Rekenkundige bewerkingen uitvoeren
-2. Tekenreeksen samenvoegen
-3. Complexe logica of functies toepassen
-4. Tussenresultaten opslaan voor later gebruik
+## Veelvoorkomende patronen
 
-## Voorbeelden
+### Rekenkunde
 
-### Basis rekenkunde
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### String-samenvoeging (String concatenation)
 
-### Tekenreekssamenvoegen
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Voorwaardelijke waarde
 
-### Functies gebruiken
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Leeftijd op basis van geboortedatum
 
-## Geavanceerd gebruik in rtSurvey
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### `pulldata()`-functie
+---
 
-rtSurvey ondersteunt de functie `pulldata()` in berekeningsvelden, waarmee u gegevens kunt ophalen uit externe CSV-bestanden:
+## `once()` gebruiken om de waarde te vergrendelen
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Standaard wordt `calculate` opnieuw geëvalueerd telkens wanneer een naar verwezen veld verandert. Plaats de formule in `once()` om deze alleen bij de eerste keer laden te evalueren en het resultaat te bevriezen:
 
-#### Syntaxis
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-De basissyntaxis voor pulldata() is:
+Gebruik `once()` voor tijdstempels, beginwaarden of elk geval waarin herberekening bij wijziging ongewenst is.
 
-```
-pulldata('csv_bestandsnaam', 'kolom_om_terug_te_geven', 'sleutelkolom', ${overeenkomende_waarde})
-```
+---
 
-- 'csv_bestandsnaam': Naam van het CSV-bestand (zonder .csv-extensie)
-- 'kolom_om_terug_te_geven': Kolomnaam die de gegevens bevat die u wilt ophalen
-- 'sleutelkolom': Kolomnaam om tegen te matchen
-- `${overeenkomende_waarde}`: Waarde om op te zoeken in de sleutelkolom (vaak een variabele uit het formulier)
+## Gegevens ophalen uit externe bronnen
 
-#### Belangrijke notities
-
-1. Het CSV-bestand moet worden geüpload samen met uw XLSForm bij het implementeren van de enquête.
-2. Gebruik komma's als scheidingstekens in uw CSV-bestand, niet puntkomma's.
-3. Vermijd komma's in de gegevensvelden van uw CSV, omdat ze parseerprobleem kunnen veroorzaken.
-4. pulldata() ondersteunt alleen 1-op-1 relaties. Als er meerdere overeenkomsten worden gevonden, retourneert het alleen de eerste.
-5. Er kunnen beperkingen zijn op de tekstlengte die kan worden opgehaald (ongeveer 76 tekens).
-
-### Voorwaardelijke berekeningen
-
-U kunt if()-instructies gebruiken voor voorwaardelijke berekeningen:
+### Uit een CSV-bestand
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
 
-## Aanbevolen werkwijzen
+Zie [pulldata()](../operators-and-functions/pulldata) voor de volledige referentie.
 
-1. Gebruik betekenisvolle namen voor berekeningsvelden om de leesbaarheid van formulieren te verbeteren.
-2. Vermijd overmatig complexe berekeningen in één veld; splits ze op indien nodig.
-3. Test uw berekeningen grondig, vooral bij gebruik van complexe formules of externe gegevens.
-4. Onthoud dat berekeningsvelden worden uitgevoerd elke keer dat het formulier wordt geëvalueerd.
+### Uit een gebundelde SQLite-database
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Zie [Lokaal zoeken in database](../advanced-features/local-database-search) voor details over padconstructie.
+
+### Uit app-context
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Zie [App API](../app-api) voor alle beschikbare sleutels.
+
+---
+
+## Calculate gebruiken in relevant en constraint
+
+Andere velden kunnen verwijzen naar een `calculate`-resultaat, net als naar elk ander veld:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
+
+## Best Practices
+
+1. Geef calculate-velden betekenisvolle namen — `total_cost` is duidelijker dan `calc1` en gemakkelijker te traceren bij exports.
+2. Splits complexe formules op in meerdere gekoppelde calculate-velden in plaats van één diep geneste uitdrukking.
+3. Gebruik `once()` voor tijdstempels en initiële snapshots om te voorkomen dat waarden veranderen na de eerste opname.
+4. Plaats `calculate`-velden vóór de eerste vraag die ernaar verwijst — de evaluatievolgorde volgt de volgorde van het formulier.
+5. Houd de kolom `label` leeg. Sommige tools tonen het label; door het leeg te laten worden verwarrende outputs vermeden.
 
 ## Beperkingen
 
-- Berekeningsvelden zijn niet rechtstreeks bewerkbaar door gebruikers.
-- Het resultaat van een berekeningsveld is niet onmiddellijk zichtbaar tenzij het wordt verwezen in een weergaveveld of gebruikt in formulierlogica.
+- Calculate-velden worden nooit rechtstreeks aan de teller getoond — gebruik een `note`-veld om het resultaat te tonen.
+- De kolom `calculation` is verplicht; een `calculate`-rij zonder formule slaat altijd een lege string op.
+- Resultaten worden bij elke wijziging in het formulier opnieuw geëvalueerd, tenzij ze zijn ingesloten in `once()` — zeer complexe formules in grote formulieren kunnen de weergaveprestaties op goedkope apparaten beïnvloeden.
+- Berekende waarden worden als strings opgeslagen in de inzending. Gebruik `number()`, `int()` of `boolean()` voor type-omzetting wanneer u het resultaat doorgeeft aan rekenkundige of logische uitdrukkingen.

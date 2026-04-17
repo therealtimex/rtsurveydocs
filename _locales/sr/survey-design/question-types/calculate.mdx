@@ -1,111 +1,128 @@
 ---
-title: "Calculate"
-description: ""
+title: "calculate"
+description: "Tip pitanja calculate vrši pozadinska izračunavanja u XLSForm-u, čuvajući izvedene vrednosti bez prikazivanja polja za unos anketaru."
 ---
 
-Pitanja tipa calculate u XLSForm-ovima i rtSurvey-u se koriste za obavljanje proračuna zasnovanih na drugim poljima ili vrednostima u vašem formularu. Ova pitanja se ne prikazuju korisniku, već se izvršavaju u pozadini, čuvajući rezultate za kasniju upotrebu ili slanje.
+import { Callout } from 'nextra/components'
 
-## Sintaksa
+Tip pitanja `calculate` tiho pokreće formulu u pozadini. Rezultat čuva u imenovanom polju na koje se druga pitanja mogu referisati — ali anketaru ne prikazuje nikakav unos niti oznaku. Koristite ga za izvođenje vrednosti, spajanje niski, pokretanje uslovne logike ili traženje podataka koji će vam trebati kasnije u obrascu.
 
-U XLSForm-u, pitanje tipa calculate je definisano na sledeći način:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Osnovna sintaksa
 
-- **type**: Uvek "calculate" za ovaj tip pitanja.
-- **name**: Jedinstveno ime za pitanje tipa calculate.
-- **label**: Obično ostavljeno praznim jer se pitanja tipa calculate ne prikazuju korisnicima.
-- **calculation**: Formula koja se evaluira.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Upotrebe
+- **type**: Uvek `calculate`.
+- **name**: Jedinstveno ime polja. Druga pitanja se referišu na ovo pomoću `${name}`.
+- **label**: Ostavite prazno — polja calculate se nikada ne prikazuju anketaru.
+- **calculation**: Formula koju treba proceniti. Podržava sve [XLSForm funkcije](../operators-and-functions/functions) i reference polja.
 
-Pitanja tipa calculate se uobičajeno koriste za:
+---
 
-1. Obavljanje aritmetičkih operacija
-2. Spajanje stringova
-3. Primenu složene logike ili funkcija
-4. Čuvanje međurezultata za kasniju upotrebu
+## Uobičajeni obrasci
 
-## Primeri
+### Aritmetika
 
-### Osnovna aritmetika
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+### Spajanje niski (String concatenation)
 
-### Spajanje stringova
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+### Uslovna vrednost
 
-### Korišćenje funkcija
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+### Starost na osnovu datuma rođenja
 
-## Napredna upotreba u rtSurvey-u
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-### Funkcija pulldata()
+---
 
-rtSurvey podržava funkciju `pulldata()` u poljima calculate, dozvoljavajući vam da preuzimate podatke iz spoljnih CSV datoteka:
+## Korišćenje `once()` za zaključavanje vrednosti
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+Podrazumevano, `calculate` se ponovo procenjuje kad god se promeni bilo koje polje na koje se referiše. Umotajte formulu u `once()` da biste je procenili samo pri prvom učitavanju i zamrznuli rezultat:
 
-#### Sintaksa
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-Osnovna sintaksa za pulldata() je:
+Koristite `once()` za vremenske oznake (timestamps), početne vrednosti ili bilo koji slučaj gde je ponovno izračunavanje pri promeni nepoželjno.
 
-```
-pulldata('naziv_csv_datoteke', 'kolona_za_povrat', 'kljucna_kolona', ${vrednost_za_trazenje})
-```
+---
 
-- 'naziv_csv_datoteke': Naziv CSV datoteke (bez ekstenzije .csv)
-- 'kolona_za_povrat': Naziv kolone koja sadrži podatke koje želite da preuzmete
-- 'kljucna_kolona': Naziv kolone za podudaranje
-- `${vrednost_za_trazenje}`: Vrednost za traženje u ključnoj koloni (često promenljiva iz formulara)
+## Izvlačenje podataka iz spoljnih izvora
 
-#### Važne napomene
-
-1. CSV datoteka mora biti otpremljena zajedno sa vašim XLSForm-om prilikom primene ankete.
-2. Koristite zareze kao separatore u vašoj CSV datoteci, ne tačke-zareze.
-3. Izbegavajte zareze unutar polja podataka vaše CSV datoteke, jer mogu izazvati probleme pri parsiranju.
-4. pulldata() podržava samo odnose 1-prema-1. Ako se pronađe više podudaranja, vraća samo prvo.
-5. Mogu postojati ograničenja dužine teksta koji se može preuzeti (oko 76 karaktera).
-6. Možete koristiti pulldata() u ograničenjima za validaciju unosa prema CSV podacima.
-
-### Uslovni proračuni
-
-Možete koristiti if() iskaze za uslovne proračune:
+### Iz CSV datoteke
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
+
+Pogledajte [pulldata()](../operators-and-functions/pulldata) za punu referencu.
+
+### Iz upakovane SQLite baze podataka
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Pogledajte [Lokalna pretraga baze podataka](../advanced-features/local-database-search) za detalje o konstrukciji putanje.
+
+### Iz konteksta aplikacije
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Pogledajte [App API](../app-api) za sve dostupne ključeve.
+
+---
+
+## Korišćenje calculate u relevant i constraint poljima
+
+Druga polja se mogu referisati na rezultat `calculate` baš kao i na bilo koje drugo polje:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
 
 ## Najbolje prakse
 
-1. Koristite smislena imena za polja calculate da biste poboljšali čitljivost formulara.
-2. Izbegavajte previše složene proračune u jednom polju; po potrebi ih razložite.
-3. Temeljno testirajte vaše proračune, posebno kada koristite složene formule ili spoljne podatke.
-4. Zapamtite da polja calculate se izvršavaju svaki put kada se formular evaluira, što može uticati na performanse za veoma složene ili brojne proračune.
-5. Kada koristite pulldata(), osigurajte da su vaše CSV datoteke ispravno formatirane i temeljno testirajte sa vašim specifičnim podacima i strukturom formulara.
+1. Dajte poljima calculate smislena imena — `total_cost` je jasnije od `calc1` i lakše ga je pratiti u izvozima.
+2. Razbijte složene formule na više povezanih calculate polja umesto jednog duboko ugnježdenog izraza.
+3. Koristite `once()` za vremenske oznake i početne snimke stanja kako biste sprečili promenu vrednosti nakon prvog snimanja.
+4. Postavite polja `calculate` pre prvog pitanja koje se na njih referiše — redosled procene prati redosled obrasca.
+5. Držite kolonu `label` praznom. Neki alati prikazuju oznaku; ostavljajući je praznom izbegavate zbunjujući izlaz.
 
 ## Ograničenja
 
-- Polja calculate nije moguće direktno uređivati od strane korisnika.
-- Rezultat polja calculate nije odmah vidljiv osim ako nije referenciran u polju za prikaz ili korišćen u logici formulara.
+- Polja Calculate se nikada ne prikazuju direktno anketaru — koristite polje `note` da biste prikazali rezultat.
+- Kolona `calculation` je obavezna; red `calculate` bez formule uvek čuva praznu nisku.
+- Rezultati se ponovo procenjuju pri svakoj promeni obrasca osim ako nisu umotani u `once()` — veoma složene formule u velikim obrascima mogu uticati na performanse prikazivanja na uređajima slabijih specifikacija.
+- Izračunate vrednosti se čuvaju kao niske u podnesku. Koristite `number()`, `int()` ili `boolean()` za promenu tipa (casting) kada prosleđujete rezultat aritmetičkim ili logičkim izrazima.

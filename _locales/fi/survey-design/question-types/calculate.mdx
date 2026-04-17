@@ -1,111 +1,128 @@
 ---
-title: "Calculate"
-description: ""
+title: "calculate"
+description: "Calculate-kysymystyyppi suorittaa taustalaskentaa XLSForm-lomakkeessa tallentaen johdettuja arvoja ilman, että haastattelijalle näytetään syöttökenttää."
 ---
 
-XLSFormien ja rtSurveyn calculate-kysymyksiä käytetään suorittamaan laskutoimituksia lomakkeen muihin kenttiin tai arvoihin perustuen. Nämä kysymykset eivät näy käyttäjälle, vaan toimivat taustalla tallentaen tuloksensa myöhempää käyttöä tai lähettämistä varten.
+import { Callout } from 'nextra/components'
 
-## Syntaksi
+`calculate`-kysymystyyppi suorittaa kaavan hiljaa taustalla. Se tallentaa tuloksen nimettyyn kenttään, johon muut kysymykset voivat viitata — mutta se ei näytä haastattelijalle syöttökenttää tai otsikkoa. Käytä sitä arvojen johtamiseen, merkkijonojen yhdistämiseen, ehdollisen logiikan suorittamiseen tai tietojen hakemiseen, joita tarvitset myöhemmin lomakkeessa.
 
-XLSFormissa calculate-kysymys määritellään seuraavasti:
+---
 
-| type      | name     | label | calculation |
-|-----------|----------|-------|-------------|
-| calculate | calc_q1  |       | `${q1}` + `${q2}` |
+## Perussyntaksi
 
-- **type**: Aina "calculate" tällä kysymystyypillä.
-- **name**: Yksikäsitteinen nimi calculate-kysymykselle.
-- **label**: Jätetään yleensä tyhjäksi, koska calculate-kysymykset eivät näy käyttäjille.
-- **calculation**: Arvioitava kaava.
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | total | | `${price} * ${quantity}` |
 
-## Käyttötarkoitukset
+- **type**: Aina `calculate`.
+- **name**: Yksilöllinen kentän nimi. Muut kysymykset viittaavat tähän `${name}`-muodossa.
+- **label**: Jätä tyhjäksi — calculate-kenttiä ei koskaan näytetä haastattelijalle.
+- **calculation**: Arvioitava kaava. Tukee kaikkia [XLSForm-funktioita](../operators-and-functions/functions) ja kenttäviittauksia.
 
-Calculate-kysymyksiä käytetään yleisesti:
+---
 
-1. Aritmeettisten operaatioiden suorittamiseen
-2. Merkkijonojen yhdistämiseen
-3. Monimutkaisen logiikan tai funktioiden soveltamiseen
-4. Väliaikaisten tulosten tallentamiseen myöhempää käyttöä varten
+## Yleisiä malleja
 
-## Esimerkit
+### Aritmetiikka
 
-### Perusaritmetiikka
-
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | total    | ${price} * ${quantity} |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | price | Unit price | |
+| integer | quantity | Quantity | |
+| calculate | total | | `${price} * ${quantity}` |
+| note | total_note | Total: `${total}` | |
 
 ### Merkkijonojen yhdistäminen
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | full_name| concat(${first_name}, ' ', ${last_name}) |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| text | first_name | First name | |
+| text | last_name | Last name | |
+| calculate | full_name | | `concat(${first_name}, ' ', ${last_name})` |
 
-### Funktioiden käyttö
+### Ehdollinen arvo
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | age      | int((today() - ${date_of_birth}) / 365.25) |
-```
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| integer | score | Score (0–100) | |
+| calculate | grade | | `if(${score} >= 90, 'A', if(${score} >= 75, 'B', if(${score} >= 60, 'C', 'F')))` |
 
-## Edistynyt käyttö rtSurveyssa
+### Ikä syntymäajasta
 
-### pulldata()-funktio
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| date | dob | Date of birth | |
+| calculate | age_years | | `int((today() - ${dob}) div 365.25)` |
 
-rtSurvey tukee `pulldata()`-funktiota calculate-kentissä, mikä mahdollistaa tietojen hakemisen ulkoisista CSV-tiedostoista:
+---
 
-```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | city     | pulldata('cities', 'city_name', 'zip_code', ${zip_input}) |
-```
+## `once()`-funktion käyttö arvon lukitsemiseen
 
-#### Syntaksi
+Oletusarvoisesti `calculate` lasketaan uudelleen aina, kun jokin viitattu kenttä muuttuu. Kääri kaava `once()`-funktioon, jotta se lasketaan vain ensimmäisellä latauskerralla ja tulos lukitaan:
 
-pulldata():n perusyntaksi on:
+| type | name | label | calculation |
+|------|------|-------|-------------|
+| calculate | interview_start | | `once(now())` |
 
-```
-pulldata('csv_filename', 'column_to_return', 'key_column', ${matching_value})
-```
+Käytä `once()`-funktiota aikaleimoihin, alkuarvoihin tai mihin tahansa tapaukseen, jossa uudelleenlaskenta muutoksen yhteydessä ei ole toivottavaa.
 
-- 'csv_filename': CSV-tiedoston nimi (ilman .csv-päätettä)
-- 'column_to_return': Sarakkeen nimi, joka sisältää haluamasi tiedot
-- 'key_column': Sarakkeen nimi, jota vasten verrataan
-- `${matching_value}`: Avainsarakkeesta etsittävä arvo (usein lomakkeen muuttuja)
+---
 
-#### Tärkeät huomiot
+## Tiedon haku ulkoisista lähteistä
 
-1. CSV-tiedosto on ladattava yhdessä XLSFormin kanssa kyselyn käyttöönottovaiheessa.
-2. Käytä pilkkuja erottimena CSV-tiedostossa, ei puolipisteitä.
-3. Vältä pilkkujen käyttöä CSV-tiedoston tietokenttien sisällä, sillä ne voivat aiheuttaa jäsennysongelmia.
-4. pulldata() tukee vain 1-1-suhteita. Jos useita vastaavuuksia löytyy, se palauttaa vain ensimmäisen.
-5. Vedetyn tekstin pituudessa voi olla rajoituksia (noin 76 merkkiä).
-6. Voit käyttää pulldata():a rajoitteissa merkintöjen validointiin CSV-tietoihin verraten.
-
-### Ehdolliset laskennat
-
-Voit käyttää if()-lausekkeita ehdollisiin laskutoimituksiin:
+### CSV-tiedostosta
 
 ```
-| type      | name     | calculation |
-|-----------|----------|-------------|
-| calculate | discount | if(${total} > 1000, ${total} * 0.1, 0) |
+pulldata('staff.csv', 'department', 'name', ${staff_id})
 ```
+
+Katso koko viite kohdasta [pulldata()](../operators-and-functions/pulldata).
+
+### Mukana tulevasta SQLite-tietokannasta
+
+```
+pulldata('rawquery',
+  concat(${family_path}, '/locations.db::provinces'),
+  'SELECT name FROM provinces WHERE id = ?',
+  ${province_id})
+```
+
+Katso polun muodostamisen tiedot kohdasta [Paikallinen tietokantahaku](../advanced-features/local-database-search).
+
+### Sovelluksen kontekstista
+
+```
+pulldata('app-api', 'user.username')
+pulldata('app-api', 'family_path')
+```
+
+Katso kaikki saatavilla olevat avaimet kohdasta [App API](../app-api).
+
+---
+
+## Calculate-kentän käyttö relevant- ja constraint-ehdoissa
+
+Muut kentät voivat viitata `calculate`-tulokseen aivan kuten mihin tahansa kenttään:
+
+| type | name | label | relevant | constraint |
+|------|------|-------|----------|------------|
+| calculate | bmi | | | `${weight} div (${height} * ${height}) * 10000` |
+| note | bmi_warning | BMI is very high — please verify weight and height. | `${bmi} > 40` | |
+
+---
 
 ## Parhaat käytännöt
 
-1. Käytä merkityksellisiä nimiä calculate-kentille lomakkeen luettavuuden parantamiseksi.
-2. Vältä liian monimutkaisia laskutoimituksia yhdessä kentässä; jaa ne tarvittaessa.
-3. Testaa laskutoimituksesi perusteellisesti, erityisesti käyttäessäsi monimutkaisia kaavoja tai ulkoisia tietoja.
-4. Muista, että calculate-kentät suoritetaan aina kun lomake evaluoidaan, mikä voi vaikuttaa suorituskykyyn erittäin monimutkaisissa tai lukuisissa laskutoimituksissa.
-5. Käyttäessäsi pulldata():a varmista, että CSV-tiedostosi on oikein muotoiltu ja testaa perusteellisesti omilla tiedoillasi ja lomakerakenteellasi.
+1. Anna calculate-kentille merkitykselliset nimet — `total_cost` on selkeämpi kuin `calc1` ja helpompi seurata vienneissä.
+2. Jaa monimutkaiset kaavat useisiin ketjutettuihin calculate-kenttiin yhden syvälle sisäkkäisen lausekkeen sijaan.
+3. Käytä `once()`-funktiota aikaleimoihin ja alkutilanteisiin estääksesi arvojen muuttumisen ensimmäisen tallennuksen jälkeen.
+4. Sijoita `calculate`-kentät ennen ensimmäistä niihin viittaavaa kysymystä — laskentajärjestys noudattaa lomakkeen järjestystä.
+5. Pidä `label`-sarake tyhjänä. Jotkut työkalut näyttävät otsikon; sen jättäminen tyhjäksi välttää hämmentävän tulosteen.
 
 ## Rajoitukset
 
-- Calculate-kenttien arvoja ei voi suoraan muokata käyttäjä.
-- Calculate-kentän tulokset eivät ole välittömästi näkyvissä, ellei niihin viitata näyttökentässä tai niitä käytetä lomakelogiikassa.
+- Calculate-kenttiä ei koskaan näytetä suoraan haastattelijalle — käytä `note`-kenttää tuloksen näyttämiseen.
+- `calculation`-sarake on pakollinen; `calculate`-rivi ilman kaavaa tallentaa aina tyhjän merkkijonon.
+- Tulokset lasketaan uudelleen jokaisen lomakemuutoksen yhteydessä, ellei niitä ole kääritty `once()`-funktioon — erittäin monimutkaiset kaavat suurissa lomakkeissa voivat vaikuttaa suorituskykyyn halvemmissa laitteissa.
+- Lasketut arvot tallennetaan merkkijonoina lähetyksessä. Käytä `number()`-, `int()`- tai `boolean()`-funktioita tyypin muuntamiseen, kun välität tuloksen aritmeettisiin tai loogisiin lausekkeisiin.
