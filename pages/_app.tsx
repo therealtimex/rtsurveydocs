@@ -7,10 +7,10 @@ export default function App({ Component, pageProps }: AppProps) {
     <>
       <Component {...pageProps} />
       <Script
-        src="https://embed-ex-d4a8523f9a.realtimex.ai/embed/realtimex-chat-widget.min.js"
-        data-embed-id="3cbc9350-a031-452f-8425-9f64189d7a16"
-        data-base-api-url="https://embed-ex-d4a8523f9a.realtimex.ai/api/embed"
-        data-assistant-name="Nagen Assistant Agent"
+        src="https://embed-ex-5e9c7b7337.realtimex.ai/embed/realtimex-chat-widget.min.js"
+        data-embed-id="d912063b-1519-4b6b-9e66-ead46ca6aa5e"
+        data-base-api-url="https://embed-ex-5e9c7b7337.realtimex.ai/api/embed"
+        data-assistant-name="Nagen agent assistent"
         data-greeting="Send a chat to get started."
         data-button-color="#262626"
         data-user-bg-color="#3DBEF5"
