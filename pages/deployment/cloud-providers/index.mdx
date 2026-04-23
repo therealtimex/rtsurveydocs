@@ -1,0 +1,51 @@
+---
+title: "Cloud Providers"
+description: "Deploy rtCloud on a cloud VM in minutes using automated startup scripts for DigitalOcean, Linode, GCP, and AWS."
+---
+
+import FeatureCard from '../../../components/FeatureCard';
+
+# Cloud Providers
+
+Each provider page includes a ready-to-use startup script that installs Docker, pulls the rtCloud image, and configures all services on first boot.
+
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginTop: '2rem', marginBottom: '2rem' }}>
+
+<FeatureCard
+  title="DigitalOcean"
+  href="/deployment/cloud-providers/digitalocean"
+  iconColor="#0080ff"
+  icon={<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 16.5v-3.17c2.376-.24 4.25-2.235 4.25-4.67 0-2.6-2.1-4.71-4.71-4.71-2.61 0-4.71 2.11-4.71 4.71h3.17c0-.85.69-1.54 1.54-1.54.85 0 1.54.69 1.54 1.54 0 .85-.69 1.54-1.54 1.54H9.33v3.17H7.17V14.5H5v-2.17h2.17C7.17 9.1 9.39 6.87 12 6.87c2.6 0 4.71 2.1 4.71 4.71 0 2.6-2.11 4.71-4.71 4.71V18.5z"/></svg>}
+>
+  Droplet with User Data script. Edit config vars, paste the script, and boot.
+</FeatureCard>
+
+<FeatureCard
+  title="Linode (Akamai)"
+  href="/deployment/cloud-providers/linode"
+  iconColor="#02b159"
+  icon={<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>}
+>
+  One-click StackScript. Fill in Linode's form and the script runs automatically.
+</FeatureCard>
+
+<FeatureCard
+  title="GCP Compute Engine"
+  href="/deployment/cloud-providers/gcp-compute-engine"
+  iconColor="#4285f4"
+  icon={<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>}
+>
+  VM with Startup script. Paste the script in Console and add a firewall rule for port 3838.
+</FeatureCard>
+
+
+<FeatureCard
+  title="AWS EC2"
+  href="/deployment/cloud-providers/aws-ec2"
+  iconColor="#ff9900"
+  icon={<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M13.527 0C6.055 0 0 6.055 0 13.527c0 5.985 3.89 11.07 9.289 12.87l.52-.52c-4.83-1.62-8.32-6.17-8.32-11.35 0-6.69 5.44-12.13 12.13-12.13 6.69 0 12.13 5.44 12.13 12.13 0 5.18-3.49 9.73-8.32 11.35l.52.52c5.4-1.8 9.29-6.885 9.29-12.87C27.054 6.055 21 0 13.527 0z"/></svg>}
+>
+  EC2 with User Data script. Paste the script at launch and configure SSL from the app UI.
+</FeatureCard>
+
+</div>
