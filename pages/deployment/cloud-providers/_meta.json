@@ -1,4 +1,7 @@
 {
+  "index": { "display": "hidden" },
   "digitalocean": "DigitalOcean",
-  "linode": "Linode (Akamai)"
+  "linode": "Linode (Akamai)",
+  "gcp-compute-engine": "GCP Compute Engine",
+  "aws-ec2": "AWS EC2"
 }

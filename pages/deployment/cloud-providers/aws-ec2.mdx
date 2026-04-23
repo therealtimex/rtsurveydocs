@@ -1,0 +1,128 @@
+---
+title: "AWS EC2"
+description: "Deploy rtCloud on an AWS EC2 instance using an automated user-data script. No configuration needed — just launch the instance and follow the post-deployment steps."
+---
+
+## Step 1 — Launch an EC2 instance
+
+1. Go to **[EC2 Console](https://console.aws.amazon.com/ec2)** → **Instances** → **Launch instances**
+2. Fill in the form:
+
+| Field | Recommended value |
+|-------|------------------|
+| **Name** | `rtsurvey-prod` |
+| **AMI** | Ubuntu Server 22.04 LTS (HVM) |
+| **Instance type** | `t3.medium` (2 vCPU / 4 GB RAM) |
+| **Key pair** | Select or create a key pair for SSH access |
+| **Security group** | Create new — see [Security group rules](#security-group-rules) below |
+
+3. Expand **Advanced details** → scroll to **User data**
+4. Paste the full contents of `aws-ec2.sh` into the **User data** field
+5. Click **Launch instance**
+
+> **No configuration needed.** The script uses safe defaults and starts in HTTP mode. You configure the domain and SSL from the app UI after the server is running — the same flow as Linode.
+
+**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+
+### Recommended instance types
+
+| Instance type | RAM | ~$/month | Notes |
+|---------------|-----|----------|-------|
+| `t3.medium` | 4 GB | ~$30 | Minimum for Keycloak |
+| `t3.large` | 8 GB | ~$60 | Recommended for production |
+
+---
+
+## Step 2 — Configure security group rules
+
+Create a new security group with these inbound rules:
+
+| Type | Protocol | Port | Source | Notes |
+|------|----------|------|--------|-------|
+| SSH | TCP | 22 | Your IP | Admin access |
+| HTTP | TCP | 80 | 0.0.0.0/0 | Nginx + ACME challenge |
+| HTTPS | TCP | 443 | 0.0.0.0/0 | Nginx after SSL setup |
+| Custom TCP | TCP | 3838 | 0.0.0.0/0 | Shiny Server (R analytics) |
+
+> **Outbound:** Allow all (required for Docker image pulls and Let's Encrypt).
+
+---
+
+## Step 3 — Wait for setup to complete
+
+The script runs automatically on first boot. It installs Docker, pulls the rtCloud image, initialises the database, and starts all services. This takes **5–10 minutes**.
+
+**No console access needed.** Open your browser and go to `http://<instance-public-ip>`. You will see a loading page while the app finishes starting up. It refreshes automatically every 5 seconds and loads the app once ready.
+
+> The instance public IP is shown in the **EC2 → Instances** list. If you assigned an Elastic IP, use that instead.
+
+To watch the log directly:
+
+```bash
+ssh ubuntu@<instance-public-ip>
+sudo tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## Step 4 — Set up SSL
+
+Once the app is running, follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+
+---
+
+## Step 5 — Change the default password
+
+All passwords default to `admin`. Change them immediately after your first login:
+
+- **App admin password** — account settings inside the app
+- **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
+
+---
+
+## Security group rules (reference)
+
+### Inbound
+
+| Type | Protocol | Port | Source | Notes |
+|------|----------|------|--------|-------|
+| SSH | TCP | 22 | Your IP | SSH access |
+| HTTP | TCP | 80 | 0.0.0.0/0 | Nginx HTTP + ACME challenge |
+| HTTPS | TCP | 443 | 0.0.0.0/0 | Nginx HTTPS after SSL setup |
+| Custom TCP | TCP | 3838 | 0.0.0.0/0 | Shiny Server (R analytics) |
+
+### Outbound
+
+| Type | Protocol | Port | Destination | Notes |
+|------|----------|------|-------------|-------|
+| All traffic | All | All | 0.0.0.0/0 | Docker pulls, certbot, etc. |
+
+### Ports NOT needed externally
+
+| Port | Service | Reason |
+|------|---------|--------|
+| 8080 | App container | Nginx proxies to it internally |
+| 8090 | Keycloak container | Nginx proxies to it internally |
+| 3306 | MySQL | Internal Docker network only |
+
+---
+
+## Troubleshooting
+
+### Check the setup log
+
+```bash
+sudo tail -200 /var/log/rtcloud-setup.log
+```
+
+### Check the SSL log
+
+```bash
+sudo tail -200 /var/log/rtcloud-ssl.log
+```
+
+### View container status
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
