@@ -1,0 +1,168 @@
+---
+title: "Google Cloud Platform (GCP)"
+description: "Deploy rtCloud on a Google Cloud Compute Engine VM using an automated startup script. No configuration needed — just create the server and follow the post-deployment steps."
+---
+
+## Before you start
+
+- You need a [Google account](https://accounts.google.com)
+- New GCP accounts get **$300 in free credits** valid for 90 days — no charge until you manually upgrade
+- A credit card is required for verification only
+
+---
+
+## Step 1 — Create a GCP account
+
+Go to **[console.cloud.google.com/freetrial](https://console.cloud.google.com/freetrial)**
+
+1. Sign in with your Google account
+2. Enter your credit card details (verification only — you will not be charged)
+3. Click **Start free** — your $300 credit activates immediately
+
+---
+
+## Step 2 — Create a project
+
+1. Go to **[console.cloud.google.com](https://console.cloud.google.com)**
+2. Click the project dropdown at the top → **New Project**
+3. Enter a name (e.g. `rtsurvey`) → **Create**
+4. Select the new project from the dropdown
+
+---
+
+## Step 3 — Enable Compute Engine API
+
+Go to **[Compute Engine API](https://console.cloud.google.com/apis/library/compute.googleapis.com)** → click **Enable**
+
+Wait about 1 minute for GCP to provision the API.
+
+---
+
+## Step 4 — Create a VM instance
+
+1. Go to **Compute Engine** → **VM instances** → **Create Instance**
+2. Fill in the form:
+
+| Field | Recommended value |
+|-------|------------------|
+| **Name** | `rtsurvey-prod` |
+| **Region** | Closest to your users (e.g. `asia-east1` for Southeast Asia) |
+| **Machine type** | `e2-medium` (2 vCPU / 4 GB RAM) |
+| **Boot disk** | Click **Change** → Ubuntu 22.04 LTS → 20 GB → **Select** |
+| **Firewall** | ✅ Allow HTTP traffic &nbsp; ✅ Allow HTTPS traffic |
+
+3. Click **Advanced options** → **Management** → scroll to **Automation**
+4. Paste the full contents of `gcp-compute.sh` into the **Startup script** field
+5. Click **Create**
+
+> **No configuration needed.** The script uses safe defaults and starts in HTTP mode. You configure the domain and SSL from the app UI after the server is running — the same flow as Linode.
+
+**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+
+### Recommended VM sizes
+
+| Machine type | RAM | ~$/month | $300 trial lasts |
+|--------------|-----|----------|-----------------|
+| `e2-medium` | 4 GB | ~$27 | ~11 months |
+| `e2-standard-2` | 8 GB | ~$49 | ~6 months |
+
+---
+
+## Step 5 — Open port 3838 (Shiny)
+
+GCP's **Allow HTTP/HTTPS** checkboxes only open ports 80 and 443. Port 3838 (Shiny analytics) requires a separate rule.
+
+1. Go to **VPC network** → **Firewall** → **Create firewall rule**
+2. Fill in the rule:
+
+| Field | Value |
+|-------|-------|
+| **Name** | `allow-shiny-3838` |
+| **Direction** | Ingress |
+| **Action** | Allow |
+| **Targets** | All instances in the network |
+| **Source IPv4 ranges** | `0.0.0.0/0` |
+| **Protocols and ports** | TCP `3838` |
+
+3. Click **Create**
+
+---
+
+## Step 6 — Wait for setup to complete
+
+The script runs automatically on first boot. It installs Docker, pulls the rtCloud image, initialises the database, and starts all services. This takes **5–10 minutes**.
+
+**No console access needed.** Open your browser and go to `http://<vm-external-ip>`. You will see a loading page while the app finishes starting up. It refreshes automatically every 5 seconds and loads the app once ready.
+
+> The VM external IP is shown in the **Compute Engine → VM instances** list.
+
+To watch the log directly:
+
+```bash
+ssh <user>@<vm-external-ip>
+sudo tail -f /var/log/rtcloud-setup.log
+```
+
+---
+
+## Step 7 — Set up SSL
+
+Once the app is running, follow the **[Set Up SSL guide →](../ssl-setup)** to configure HTTPS. The free **rtsurvey.com subdomain** is the fastest option — no DNS setup needed.
+
+---
+
+## Step 8 — Change the default password
+
+All passwords default to `admin`. Change them immediately after your first login:
+
+- **App admin password** — account settings inside the app
+- **Keycloak admin** — accessible at `https://your-domain.com/auth/admin` (login: `admin` / `admin`)
+
+---
+
+## Firewall rules (GCP VPC)
+
+The startup script configures `ufw` inside the VM. You also need these VPC-level firewall rules in GCP:
+
+### Inbound
+
+| Rule name | Protocol | Port | Notes |
+|-----------|----------|------|-------|
+| `default-allow-ssh` | TCP | 22 | SSH access (GCP default) |
+| `default-allow-http` | TCP | 80 | Nginx HTTP + ACME challenge |
+| `default-allow-https` | TCP | 443 | Nginx HTTPS after SSL setup |
+| `allow-shiny-3838` | TCP | 3838 | Shiny Server (R analytics) |
+
+### Ports NOT needed externally
+
+| Port | Service | Reason |
+|------|---------|--------|
+| 8080 | App container | Nginx proxies to it internally |
+| 8090 | Keycloak container | Nginx proxies to it internally |
+| 3306 | MySQL | Internal Docker network only |
+
+---
+
+## Troubleshooting
+
+### Check the setup log
+
+```bash
+sudo tail -200 /var/log/rtcloud-setup.log
+```
+
+### Check the SSL log
+
+```bash
+sudo tail -200 /var/log/rtcloud-ssl.log
+```
+
+### View container status
+
+```bash
+docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+```
+
+### Reboot behavior
+
+GCP reruns the startup script on every VM reboot. The script detects an existing installation at `/opt/rtcloud/` and exits immediately — no re-provisioning occurs.
