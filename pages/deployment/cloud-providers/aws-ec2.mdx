@@ -17,7 +17,11 @@ description: "Deploy rtSurvey on an AWS EC2 instance using an automated bootstra
 | **Security group** | Create new — see [Security group rules](#security-group-rules) below |
 
 3. Expand **Advanced details** → scroll to **User data**
-4. Paste the bootstrap snippet below into the **User data** field:
+4. Choose how to deploy:
+
+### Option A — Bootstrap snippet (EC2 console, recommended)
+
+AWS user-data has a **16 KB paste limit**. The full script exceeds this, so paste this small bootstrap instead — it fetches the full script from GitHub at first boot:
 
 ```bash
 #!/bin/bash
@@ -28,11 +32,23 @@ export TZ="Asia/Ho_Chi_Minh"
 curl -fsSL https://raw.githubusercontent.com/therealtimex/rtsurvey/main/scripts/aws-ec2.sh | bash
 ```
 
-> **Why a bootstrap?** AWS user-data has a 16 KB size limit. The full setup script exceeds this, so the bootstrap fetches it from GitHub at first boot. Customise by changing the `export` lines above.
+Customise by changing the `export` lines before launching.
 
-5. Click **Launch instance**
+### Option B — Full script via AWS CLI
 
-**Full script (for review or CLI upload):** [aws-ec2.sh](https://raw.githubusercontent.com/therealtimex/rtsurvey/main/scripts/aws-ec2.sh)
+The 16 KB limit does not apply when uploading via the CLI. Download [aws-ec2.sh](/scripts/aws-ec2.sh), edit the `CONFIGURATION` block at the top, then launch:
+
+```bash
+aws ec2 run-instances \
+  --image-id ami-0c02fb55956c7d316 \
+  --instance-type t3.medium \
+  --key-name YOUR_KEY_PAIR \
+  --security-group-ids sg-xxxxxxxx \
+  --user-data file://aws-ec2.sh \
+  --count 1
+```
+
+5. Click **Launch instance** (Option A) or run the CLI command (Option B)
 
 ### Recommended instance types
 

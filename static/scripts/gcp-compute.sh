@@ -1,84 +1,97 @@
 #!/bin/bash
 # ==============================================================================
-# rtCloud - GCP Compute Engine Startup Script
+# rtSurvey - GCP Compute Engine Startup Script
 # ==============================================================================
-# Provisions a fresh Ubuntu 22.04 LTS VM with Docker and launches rtCloud.
+# Provisions a fresh Ubuntu 22.04 LTS VM with Docker and launches rtSurvey.
 #
-# HOW TO USE:
-#   Option A — Console:
-#     VM creation > Advanced options > Management > Automation > Startup script
-#     Paste this entire script.
-#   Option B — gcloud CLI:
-#     gcloud compute instances create INSTANCE_NAME \
-#       --image-family=ubuntu-2204-lts --image-project=ubuntu-os-cloud \
-#       --machine-type=e2-medium \
-#       --metadata-from-file startup-script=gcp-compute.sh
-#   Recommended: e2-medium (2 vCPU / 4 GB RAM) or larger with Keycloak.
-#   Firewall: allow tcp:22, tcp:80, tcp:443, tcp:3838 in your VPC firewall rules.
+# HOW TO USE — Option A (bootstrap, recommended):
+#   GCP startup scripts have no size limit, but bootstrap keeps things clean.
+#   Pass as metadata via gcloud:
+#
+#   gcloud compute instances create INSTANCE_NAME \
+#     --image-family=ubuntu-2204-lts --image-project=ubuntu-os-cloud \
+#     --machine-type=e2-medium \
+#     --metadata=startup-script='#!/bin/bash
+#   export PROJECT_ID="rtsurvey"
+#   export ADMIN_PASSWORD="admin"
+#   export EMBED_KEYCLOAK="true"
+#   export TZ="Asia/Ho_Chi_Minh"
+#   curl -fsSL https://raw.githubusercontent.com/therealtimex/rtsurvey/main/scripts/gcp-compute.sh | bash'
+#
+# HOW TO USE — Option B (full script):
+#   gcloud compute instances create INSTANCE_NAME \
+#     --image-family=ubuntu-2204-lts --image-project=ubuntu-os-cloud \
+#     --machine-type=e2-medium \
+#     --metadata-from-file startup-script=gcp-compute.sh
+#
+# Size    : e2-medium (2 vCPU / 4 GB RAM) minimum; e2-standard-2 recommended with Keycloak
+# Firewall: allow tcp:22, tcp:80, tcp:443, tcp:3838 in your VPC firewall rules
 #
 # Monitor progress:
-#   ssh user@<instance-ip> sudo tail -f /var/log/rtcloud-setup.log
+#   ssh user@<instance-ip> sudo tail -f /var/log/rtsurvey-setup.log
 #
-# SSL: Leave DOMAIN blank for HTTP/IP mode. Set DOMAIN for HTTPS via Let's Encrypt (auto-retry).
+# SSL: Configured post-boot via the app UI (Domain & SSL setup page).
+#      A systemd path unit watches /opt/rtsurvey/ssl-trigger/request.json and
+#      runs /opt/rtsurvey/ssl-issue.sh when the admin submits a domain.
 # ==============================================================================
 
 # ==============================================================================
-# CONFIGURATION — Edit these values before pasting as user-data
+# CONFIGURATION — edit here (Option B) or export env vars before piping (Option A)
 # ==============================================================================
 
 # --- Required ---
-PROJECT_ID="myproject"                        # Unique identifier (no spaces)
-ADMIN_PASSWORD="admin"                        # rtCloud web admin password — change after first login
+PROJECT_ID="${PROJECT_ID:-rtsurvey}"                  # Unique identifier (no spaces)
+ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin}"              # Change after first login
 
-RTCLOUD_IMAGE="rtawebteam/rta-smartsurvey:survey-dockerize"
+RTCLOUD_IMAGE="${RTCLOUD_IMAGE:-rtawebteam/rtcloud:survey-public}"
 
-# --- Domain + SSL (optional — leave DOMAIN blank for HTTP/IP mode) ---
-DOMAIN=""                   # e.g. "myapp.example.com" — DNS A record must point here first
-PROJECT_URL=""              # Override URL (leave blank to use DOMAIN); useful behind Cloudflare
-LETSENCRYPT_EMAIL=""        # Required when DOMAIN is set, e.g. "admin@example.com"
+# --- Domain + SSL: leave blank — configure via app UI after boot ---
+# DOMAIN and LETSENCRYPT_EMAIL are set through the app UI, not here.
 
-# --- Ports (used in HTTP/IP mode when DOMAIN is blank) ---
-APP_PORT="80"
-SHINY_PORT="3838"
+# --- Ports ---
+APP_PORT="${APP_PORT:-80}"
+SHINY_PORT="${SHINY_PORT:-3838}"
 
 # --- Embedded Keycloak (built-in SSO) ---
-# Requires DOMAIN to be set (Keycloak needs HTTPS).
-# Set EMBED_KEYCLOAK=false to use an external OIDC provider instead.
-EMBED_KEYCLOAK="true"
-KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"  # defaults to ADMIN_PASSWORD; set explicitly to use a different password
-# Mobile client ID and redirect URI are auto-derived from PROJECT_ID:
-#   client_id           = PROJECT_ID
-#   mobile_redirect_uri = vn.rta.rtsurvey.auth://callback
+# Requires domain + SSL to be configured via app UI after boot.
+EMBED_KEYCLOAK="${EMBED_KEYCLOAK:-true}"
+KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-${ADMIN_PASSWORD}}"
 
 # --- SSO (external OIDC — used only when EMBED_KEYCLOAK=false) ---
-OIDC_ISSUER_URL=""
-OIDC_CLIENT_ID=""
-OIDC_CLIENT_SECRET=""
-OIDC_DISCOVERY_URL=""
-OIDC_AUTHORIZATION_ENDPOINT=""
-OIDC_TOKEN_ENDPOINT=""
-OIDC_USERINFO_ENDPOINT=""
-OIDC_SCOPE="openid email"
-OIDC_MOBILE_CLIENT_ID=""
-OIDC_MOBILE_REDIRECT_URI=""
-OPEN_REGISTRATION="true"
+OIDC_ISSUER_URL="${OIDC_ISSUER_URL:-}"
+OIDC_CLIENT_ID="${OIDC_CLIENT_ID:-}"
+OIDC_CLIENT_SECRET="${OIDC_CLIENT_SECRET:-}"
+OIDC_DISCOVERY_URL="${OIDC_DISCOVERY_URL:-}"
+OIDC_AUTHORIZATION_ENDPOINT="${OIDC_AUTHORIZATION_ENDPOINT:-}"
+OIDC_TOKEN_ENDPOINT="${OIDC_TOKEN_ENDPOINT:-}"
+OIDC_USERINFO_ENDPOINT="${OIDC_USERINFO_ENDPOINT:-}"
+OIDC_SCOPE="${OIDC_SCOPE:-openid email}"
+OIDC_MOBILE_CLIENT_ID="${OIDC_MOBILE_CLIENT_ID:-}"
+OIDC_MOBILE_REDIRECT_URI="${OIDC_MOBILE_REDIRECT_URI:-}"
+OPEN_REGISTRATION="${OPEN_REGISTRATION:-true}"
 
 # --- Stata14 ---
-STATA_ENABLED="false"
-STATA_LICENSE_B64=""        # base64 of stata.lic (required when STATA_ENABLED=true)
-#   How to encode:  base64 -w 0 stata.lic   (Linux) / base64 -i stata.lic   (macOS)
+STATA_ENABLED="${STATA_ENABLED:-false}"
+STATA_LICENSE_B64="${STATA_LICENSE_B64:-}"  # base64 -w 0 stata.lic (Linux) / base64 -i stata.lic (macOS)
 
 # --- Optional ---
-TZ="Asia/Ho_Chi_Minh"
-CSRF_VALIDATION_ENABLED="false"
+TZ="${TZ:-Asia/Ho_Chi_Minh}"
+CSRF_VALIDATION_ENABLED="${CSRF_VALIDATION_ENABLED:-true}"
 
 # ==============================================================================
 # END CONFIGURATION — Do not edit below this line
 # ==============================================================================
 
 set -euo pipefail
-exec > >(tee /var/log/rtcloud-setup.log) 2>&1
+exec > >(tee /var/log/rtsurvey-setup.log) 2>&1
 trap 'echo "ERROR: script failed at line $LINENO (exit $?)" >&2' ERR
+
+# GCP startup scripts run on every boot — skip if already provisioned
+if [[ -f /opt/rtsurvey/.env ]]; then
+  echo "Already provisioned (/opt/rtsurvey/.env exists) — skipping re-run."
+  echo "To re-provision: rm /opt/rtsurvey/.env and reboot (or re-run this script)."
+  exit 0
+fi
 
 # ------------------------------------------------------------------------------
 # Helpers
@@ -94,95 +107,21 @@ normalize_bool() {
 
 mask() { [[ -n "${1:-}" ]] && echo "***" || echo ""; }
 
-# ------------------------------------------------------------------------------
-# Nginx config helpers
-# ------------------------------------------------------------------------------
-
-# Temporary HTTP-only config used by certbot for the ACME challenge
-write_nginx_http_only() {
-  local domain="$1"
-  cat > /etc/nginx/sites-available/rtcloud << EOF
-server {
-    listen 80;
-    server_name ${domain};
-    root /var/www/html;
-    location / { try_files \$uri \$uri/ =404; }
-}
-EOF
-  ln -sf /etc/nginx/sites-available/rtcloud /etc/nginx/sites-enabled/rtcloud
-  rm -f /etc/nginx/sites-enabled/default
-}
-
-# Full HTTPS reverse-proxy config
-# Args: domain cert_path key_path keycloak_nginx_block
-write_nginx_ssl_config() {
-  local domain="$1"
-  local cert_path="$2"
-  local key_path="$3"
-  local keycloak_block="$4"
-  cat > /etc/nginx/sites-available/rtcloud << EOF
-server {
-    listen 80;
-    server_name ${domain};
-    return 301 https://\$host\$request_uri;
-}
-
-server {
-    listen 443 ssl;
-    server_name ${domain};
-
-    ssl_certificate     ${cert_path};
-    ssl_certificate_key ${key_path};
-    ssl_protocols       TLSv1.2 TLSv1.3;
-    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-    ssl_prefer_server_ciphers off;
-${keycloak_block}
-    location / {
-        proxy_pass         http://127.0.0.1:8080;
-        proxy_set_header   Host              \$host;
-        proxy_set_header   X-Real-IP         \$remote_addr;
-        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto \$scheme;
-        proxy_read_timeout 120s;
-        client_max_body_size 100M;
-    }
-}
-EOF
-  ln -sf /etc/nginx/sites-available/rtcloud /etc/nginx/sites-enabled/rtcloud
-  rm -f /etc/nginx/sites-enabled/default
-}
-
 echo "============================================================"
 echo " rtCloud GCP Compute Engine setup starting - $(date)"
 echo "============================================================"
 
-# GCP startup scripts run on every boot — skip if already provisioned
-if [[ -f /opt/rtcloud/.env ]]; then
-  echo "Already provisioned (/opt/rtcloud/.env exists) — skipping re-run."
-  echo "To re-provision: rm /opt/rtcloud/.env and reboot (or re-run this script)."
-  exit 0
-fi
-
 # Normalize booleans early
-EMBED_KEYCLOAK="$(normalize_bool "${EMBED_KEYCLOAK:-false}")"
+EMBED_KEYCLOAK="$(normalize_bool "${EMBED_KEYCLOAK:-true}")"
 OPEN_REGISTRATION="$(normalize_bool "${OPEN_REGISTRATION:-true}")"
 STATA_ENABLED="$(normalize_bool "${STATA_ENABLED:-false}")"
 
-# Auto-generate blank passwords (secrets stay out of the script source)
+# Auto-generate blank passwords
 MYSQL_PASSWORD="${MYSQL_PASSWORD:-admin}"
 MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-admin}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin}"
-# KC admin password auto-generated only in embed mode (printed in summary)
 if [[ "${EMBED_KEYCLOAK}" == "true" && -z "${KEYCLOAK_ADMIN_PASSWORD:-}" ]]; then
   KEYCLOAK_ADMIN_PASSWORD="${ADMIN_PASSWORD}"
-fi
-
-# Validations
-if [[ "${EMBED_KEYCLOAK}" == "true" && -z "${DOMAIN:-}" ]]; then
-  echo "ERROR: EMBED_KEYCLOAK=true requires DOMAIN to be set (Keycloak needs HTTPS)" >&2; exit 1
-fi
-if [[ -n "${DOMAIN:-}" && -z "${LETSENCRYPT_EMAIL:-}" ]]; then
-  echo "ERROR: LETSENCRYPT_EMAIL is required when DOMAIN is set" >&2; exit 1
 fi
 
 # ==============================================================================
@@ -193,7 +132,100 @@ echo "[1/7] Updating system and installing Docker and Nginx..."
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y -qq \
-  curl ca-certificates gnupg lsb-release ufw nginx openssl
+  curl ca-certificates gnupg lsb-release ufw nginx openssl jq dnsutils
+
+# Configure nginx immediately — waiting page active from the start
+mkdir -p /var/www/html
+rm -f /var/www/html/index.nginx-debian.html
+cat > /var/www/html/waiting.html << 'WAITING_EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>rtCloud - Starting up</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #333;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 48px 56px;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      max-width: 420px;
+      width: 90%;
+    }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 28px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h1 { font-size: 1.35rem; font-weight: 600; color: #1a202c; margin-bottom: 10px; }
+    p  { color: #64748b; font-size: 0.95rem; line-height: 1.6; }
+    .note { margin-top: 20px; font-size: 0.82rem; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="spinner"></div>
+    <h1>Server is starting up</h1>
+    <p>rtCloud is initializing. This may take a minute on first boot.</p>
+    <p class="note">This page will reload automatically when ready.</p>
+  </div>
+  <script>
+    setInterval(function () { window.location.reload(); }, 5000);
+  </script>
+</body>
+</html>
+WAITING_EOF
+
+cat > /etc/nginx/sites-available/rtsurvey << 'NGINX_INIT_EOF'
+server {
+    listen 80 default_server;
+    server_name _;
+
+    root /var/www/html;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location = /waiting.html {
+        internal;
+    }
+
+    location / {
+        proxy_pass             http://127.0.0.1:8080;
+        proxy_set_header       Host              $host;
+        proxy_set_header       X-Real-IP         $remote_addr;
+        proxy_set_header       X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header       X-Forwarded-Proto $scheme;
+        proxy_connect_timeout  5s;
+        proxy_read_timeout     120s;
+        client_max_body_size   100M;
+        proxy_intercept_errors on;
+        error_page 502 503 504 /waiting.html;
+    }
+}
+NGINX_INIT_EOF
+rm -f /etc/nginx/sites-enabled/*
+ln -sf /etc/nginx/sites-available/rtsurvey /etc/nginx/sites-enabled/rtsurvey
+nginx -t && systemctl restart nginx
+echo "  Nginx configured (waiting page active)."
 
 # Add Docker's official GPG key
 install -m 0755 -d /etc/apt/keyrings
@@ -218,8 +250,8 @@ echo "  Docker $(docker --version) installed."
 # ==============================================================================
 echo "[2/7] Writing docker-compose.production.yml..."
 
-mkdir -p /opt/rtcloud
-cd /opt/rtcloud
+mkdir -p /opt/rtsurvey
+cd /opt/rtsurvey
 
 cat > docker-compose.production.yml << 'COMPOSE_EOF'
 version: '3.8'
@@ -227,9 +259,9 @@ version: '3.8'
 services:
   mysql:
     image: mysql:8.0
-    container_name: ${COMPOSE_PROJECT_NAME:-rtcloud}-mysql
+    container_name: ${COMPOSE_PROJECT_NAME:-rtsurvey}-mysql
     restart: ${RESTART_POLICY:-unless-stopped}
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_unicode_ci --sql-mode=NO_ENGINE_SUBSTITUTION
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8 --collation-server=utf8_general_ci --sql-mode=NO_ENGINE_SUBSTITUTION
 
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -245,7 +277,7 @@ services:
       - ./mysql-init:/docker-entrypoint-initdb.d
 
     networks:
-      - rtcloud-net
+      - rtsurvey-net
 
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
@@ -254,9 +286,9 @@ services:
       retries: 5
       start_period: 30s
 
-  rtcloud:
-    image: ${RTCLOUD_IMAGE:-rtawebteam/rta-smartsurvey:survey-dockerize}
-    container_name: ${COMPOSE_PROJECT_NAME:-rtcloud}-app
+  rtsurvey:
+    image: ${RTCLOUD_IMAGE:-rtawebteam/rtcloud:survey-public}
+    container_name: ${COMPOSE_PROJECT_NAME:-rtsurvey}-app
     restart: ${RESTART_POLICY:-unless-stopped}
     entrypoint: ["/bin/entrypoint-production.sh"]
 
@@ -265,7 +297,7 @@ services:
         condition: service_healthy
 
     ports:
-      - "${APP_BIND:-127.0.0.1:8080}:80"
+      - "127.0.0.1:${APP_PORT:-8080}:80"
       - "${SHINY_PORT:-3838}:3838"
 
     env_file:
@@ -287,9 +319,12 @@ services:
       - shiny_data:/srv/shiny-server/smartsurvey
       - shiny_logs:/var/log/shiny-server
       - app_assets:/var/www/html/smartsurvey/assets
+      - app_modules_survey_advance:/var/www/html/smartsurvey/protected/modules/survey-advance
+      - app_modules_rtwork:/var/www/html/smartsurvey/protected/modules/rtwork
+      - /opt/rtsurvey/ssl-trigger:/opt/rtsurvey/ssl-trigger
 
     networks:
-      - rtcloud-net
+      - rtsurvey-net
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
@@ -306,7 +341,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
-    container_name: ${COMPOSE_PROJECT_NAME:-rtcloud}-keycloak
+    container_name: ${COMPOSE_PROJECT_NAME:-rtsurvey}-keycloak
     restart: ${RESTART_POLICY:-unless-stopped}
     profiles:
       - embed-keycloak
@@ -337,7 +372,7 @@ services:
         condition: service_healthy
 
     networks:
-      - rtcloud-net
+      - rtsurvey-net
 
     healthcheck:
       test: ["CMD-SHELL", "(exec 3<>/dev/tcp/localhost/8080) 2>/dev/null && exit 0 || exit 1"]
@@ -354,71 +389,65 @@ services:
 
 volumes:
   mysql_data:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_mysql_data
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_mysql_data
   app_uploads:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_uploads
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_uploads
   app_audios:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_audios
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_audios
   app_downloads:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_downloads
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_downloads
   app_gallery:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_gallery
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_gallery
   app_voicemail:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_voicemail
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_voicemail
   app_runtime:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_runtime
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_runtime
   app_v2_runtime:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_v2_runtime
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_v2_runtime
   app_cache:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_cache
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_cache
   app_tmp:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_tmp
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_tmp
   app_analytics:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_analytics
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_analytics
   app_aggregate:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_aggregate
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_aggregate
   app_converter:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_converter
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_converter
   shiny_data:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_shiny_data
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_shiny_data
   shiny_logs:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_shiny_logs
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_shiny_logs
   app_assets:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_assets
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_assets
+  app_modules_survey_advance:
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_modules_survey_advance
+  app_modules_rtwork:
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_modules_rtwork
 
 networks:
-  rtcloud-net:
-    name: ${COMPOSE_PROJECT_NAME:-rtcloud}_network
+  rtsurvey-net:
+    name: ${COMPOSE_PROJECT_NAME:-rtsurvey}_network
     driver: bridge
 COMPOSE_EOF
 
 echo "  docker-compose.production.yml written."
 
 # ==============================================================================
-# 3. Write .env (ONLY the active SSO block is written)
+# 3. Write .env (HTTP-only, IP-based — same approach as Linode)
 # ==============================================================================
 echo "[3/7] Writing .env..."
 
-# Detect public IP (GCP Compute Engine metadata)
+# Detect public IP (GCP Compute Engine metadata, with fallback)
 SERVER_IP=$(curl -s -H "Metadata-Flavor: Google" \
   "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip" 2>/dev/null \
-  || curl -s https://api.ipify.org 2>/dev/null \
+  || curl -s --max-time 5 https://api.ipify.org 2>/dev/null \
   || hostname -I | awk '{print $1}')
+echo "  Server IP: ${SERVER_IP}"
 
-if [[ -n "${DOMAIN:-}" ]]; then
-  EFFECTIVE_PROJECT_URL="${PROJECT_URL:-${DOMAIN}}"
-  EFFECTIVE_PROJECT_PORT=443
-  EFFECTIVE_HTTP_PROTOCOL=https
-  APP_BIND="127.0.0.1:8080"
-  OIDC_REDIRECT_URI_VALUE="https://${EFFECTIVE_PROJECT_URL}/cpms/cpmsSite/auth"
-else
-  EFFECTIVE_PROJECT_URL="${SERVER_IP}"
-  EFFECTIVE_PROJECT_PORT="${APP_PORT}"
-  EFFECTIVE_HTTP_PROTOCOL=http
-  APP_BIND="0.0.0.0:${APP_PORT}"
-  OIDC_REDIRECT_URI_VALUE="http://${SERVER_IP}/cpms/cpmsSite/auth"
-fi
-echo "  PROJECT_URL: ${EFFECTIVE_PROJECT_URL} (${EFFECTIVE_HTTP_PROTOCOL})"
+KEYCLOAK_DB_PASS="admin"
+KEYCLOAK_CLIENT_SECRET_GEN="admin"
+KEYCLOAK_MOBILE_REDIRECT_URI="vn.rta.rtsurvey.auth://callback"
 
 cat > .env << ENV_EOF
 # Generated by GCP Compute Engine startup script on $(date)
@@ -426,9 +455,10 @@ cat > .env << ENV_EOF
 # Project
 PROJECT_ID=${PROJECT_ID}
 PROJECT_TYPE=rtsurvey
-PROJECT_URL=${EFFECTIVE_PROJECT_URL}
-PROJECT_PORT=${EFFECTIVE_PROJECT_PORT}
-HTTP_PROTOCOL=${EFFECTIVE_HTTP_PROTOCOL}
+PROJECT_URL=${SERVER_IP}
+SERVER_IP=${SERVER_IP}
+PROJECT_PORT=80
+HTTP_PROTOCOL=http
 
 # Database
 MYSQL_HOST=mysql
@@ -441,9 +471,9 @@ MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
 # Admin
 ADMIN_PASSWORD=${ADMIN_PASSWORD}
 
-# Ports (app bound to localhost when Nginx is active; exposed directly in HTTP mode)
-APP_BIND=${APP_BIND}
-SHINY_PORT=${SHINY_PORT}
+# Ports (app bound to localhost — Nginx handles incoming traffic)
+APP_PORT=8080
+SHINY_PORT=3838
 KEYCLOAK_PORT=8090
 
 # Runtime
@@ -455,49 +485,42 @@ LOG_LEVEL=info
 # Security
 CSRF_VALIDATION_ENABLED=${CSRF_VALIDATION_ENABLED}
 GII_ENABLED=false
+OPEN_REGISTRATION=${OPEN_REGISTRATION}
 
 # Docker
-COMPOSE_PROJECT_NAME=rtcloud
+COMPOSE_PROJECT_NAME=rtsurvey
 RESTART_POLICY=unless-stopped
 RTCLOUD_IMAGE=${RTCLOUD_IMAGE}
+DEPLOYMENT_MODEL=docker
 
 # SSO mode
 EMBED_KEYCLOAK=${EMBED_KEYCLOAK}
+AUTH_PROVIDER=embedded-keycloak
 
 # Stata14
 STATA_ENABLED=${STATA_ENABLED}
+LETSENCRYPT_EMAIL=info@rta.vn
 STATA_BIN_PATH=/usr/bin/stata
 STATA_LICENSE_B64=${STATA_LICENSE_B64:-}
 ENV_EOF
 
-# Explicit provider (helps UI + debugging)
 if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
-  echo "AUTH_PROVIDER=embedded-keycloak" >> .env
-else
-  echo "AUTH_PROVIDER=oidc" >> .env
-fi
-
-# SSO configuration block (conditional on EMBED_KEYCLOAK)
-if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
-  KEYCLOAK_DB_PASS="admin"
-  KEYCLOAK_CLIENT_SECRET_GEN="admin"
-  KEYCLOAK_MOBILE_REDIRECT_URI="vn.rta.rtsurvey.auth://callback"
-
   cat >> .env << KC_EOF
 
 # ----------------------------------------------------------------------------
 # SSO - Embedded Keycloak
 # ----------------------------------------------------------------------------
-OIDC_ISSUER_URL=https://${EFFECTIVE_PROJECT_URL}/auth/realms/rtsurvey
+# Using server IP as placeholder -- ssl-issue.sh updates these after domain is set
+OIDC_ISSUER_URL=http://${SERVER_IP}/auth/realms/rtsurvey
 OIDC_CLIENT_ID=${PROJECT_ID}
 OIDC_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET_GEN}
-OIDC_REDIRECT_URI=https://${EFFECTIVE_PROJECT_URL}/cpms/cpmsSite/auth
+OIDC_REDIRECT_URI=http://${SERVER_IP}/cpms/cpmsSite/auth
 OIDC_DISCOVERY_URL=http://keycloak:8080/auth/realms/rtsurvey/.well-known/openid-configuration
 OIDC_MOBILE_CLIENT_ID=${PROJECT_ID}
 OIDC_MOBILE_REDIRECT_URI=${KEYCLOAK_MOBILE_REDIRECT_URI}
 
 # Keycloak container config
-KC_HOSTNAME=https://${EFFECTIVE_PROJECT_URL}/auth
+KC_HOSTNAME=http://${SERVER_IP}/auth
 KC_HEALTH_ENABLED=true
 KEYCLOAK_ADMIN_USER=admin
 KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
@@ -507,7 +530,6 @@ KEYCLOAK_DB_PASSWORD=${KEYCLOAK_DB_PASS}
 KC_EOF
 else
   OIDC_MOBILE_REDIRECT_URI_VALUE="${OIDC_MOBILE_REDIRECT_URI:-vn.rta.rtsurvey.auth://callback}"
-
   cat >> .env << OIDC_EOF
 
 # ----------------------------------------------------------------------------
@@ -516,7 +538,7 @@ else
 OIDC_ISSUER_URL=${OIDC_ISSUER_URL}
 OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
 OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
-OIDC_REDIRECT_URI=${OIDC_REDIRECT_URI_VALUE}
+OIDC_REDIRECT_URI=http://${SERVER_IP}/cpms/cpmsSite/auth
 OIDC_DISCOVERY_URL=${OIDC_DISCOVERY_URL}
 OIDC_AUTHORIZATION_ENDPOINT=${OIDC_AUTHORIZATION_ENDPOINT}
 OIDC_TOKEN_ENDPOINT=${OIDC_TOKEN_ENDPOINT}
@@ -524,7 +546,6 @@ OIDC_USERINFO_ENDPOINT=${OIDC_USERINFO_ENDPOINT}
 OIDC_SCOPE=${OIDC_SCOPE}
 OIDC_MOBILE_CLIENT_ID=${OIDC_MOBILE_CLIENT_ID:-${OIDC_CLIENT_ID}}
 OIDC_MOBILE_REDIRECT_URI=${OIDC_MOBILE_REDIRECT_URI_VALUE}
-OPEN_REGISTRATION=${OPEN_REGISTRATION}
 OIDC_EOF
 fi
 
@@ -532,33 +553,31 @@ chmod 600 .env
 echo "  .env written (permissions: 600)."
 
 echo ""
-echo "=== SSO CONFIG (selected) ==="
-echo "EMBED_KEYCLOAK=${EMBED_KEYCLOAK}"
+echo "=== SSO CONFIG ==="
 if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
   echo "AUTH_PROVIDER=embedded-keycloak"
-  echo "OIDC_ISSUER_URL=https://${EFFECTIVE_PROJECT_URL}/auth/realms/rtsurvey"
+  echo "OIDC_ISSUER_URL=http://${SERVER_IP}/auth/realms/rtsurvey  (placeholder, updated after domain setup)"
   echo "OIDC_CLIENT_ID=${PROJECT_ID}"
-  echo "OIDC_CLIENT_SECRET=$(mask "${KEYCLOAK_CLIENT_SECRET_GEN:-}")"
-  echo "KC_HOSTNAME=https://${EFFECTIVE_PROJECT_URL}/auth"
-  echo "KEYCLOAK_ADMIN_PASSWORD=$(mask "${KEYCLOAK_ADMIN_PASSWORD:-}")"
+  echo "OIDC_CLIENT_SECRET=$(mask "${KEYCLOAK_CLIENT_SECRET_GEN}")"
+  echo "KC_HOSTNAME=http://${SERVER_IP}/auth  (placeholder, updated after domain setup)"
+  echo "KEYCLOAK_ADMIN_PASSWORD=$(mask "${KEYCLOAK_ADMIN_PASSWORD}")"
 else
   echo "AUTH_PROVIDER=oidc"
   echo "OIDC_ISSUER_URL=${OIDC_ISSUER_URL}"
   echo "OIDC_CLIENT_ID=${OIDC_CLIENT_ID}"
   echo "OIDC_CLIENT_SECRET=$(mask "${OIDC_CLIENT_SECRET:-}")"
-  echo "OPEN_REGISTRATION=${OPEN_REGISTRATION}"
 fi
-echo "============================="
+echo "=================="
 echo ""
 
 # ==============================================================================
 # 4. Keycloak setup files (embed mode only)
 # ==============================================================================
-mkdir -p /opt/rtcloud/mysql-init /opt/rtcloud/keycloak-import
+mkdir -p /opt/rtsurvey/mysql-init /opt/rtsurvey/keycloak-import
 
 if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
   echo "  [Keycloak] Writing MySQL init script..."
-  cat > /opt/rtcloud/mysql-init/01-keycloak-db.sql << SQL_EOF
+  cat > /opt/rtsurvey/mysql-init/01-keycloak-db.sql << SQL_EOF
 CREATE DATABASE IF NOT EXISTS \`keycloak\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS 'keycloak'@'%' IDENTIFIED WITH mysql_native_password BY '${KEYCLOAK_DB_PASS}';
 GRANT ALL PRIVILEGES ON \`keycloak\`.* TO 'keycloak'@'%';
@@ -566,13 +585,13 @@ FLUSH PRIVILEGES;
 SQL_EOF
 
   echo "  [Keycloak] Writing realm import (realm=rtsurvey, client_id=${PROJECT_ID})..."
-  cat > /opt/rtcloud/keycloak-import/rtsurvey-realm.json << REALM_EOF
+  cat > /opt/rtsurvey/keycloak-import/rtsurvey-realm.json << REALM_EOF
 {
   "realm": "rtsurvey",
   "enabled": true,
   "ssoSessionIdleTimeout": 2592000,
   "ssoSessionMaxLifespan": 31536000,
-  "sslRequired": "external",
+  "sslRequired": "none",
   "registrationAllowed": false,
   "loginWithEmailAllowed": true,
   "clients": [
@@ -583,12 +602,12 @@ SQL_EOF
       "protocol": "openid-connect",
       "publicClient": true,
       "redirectUris": [
-        "https://${EFFECTIVE_PROJECT_URL}/*",
+        "http://${SERVER_IP}/*",
         "vn.rta.rtsurvey.auth:/*",
         "vn.rta.rtsurvey.logout:/*"
       ],
       "webOrigins": [
-        "https://${EFFECTIVE_PROJECT_URL}"
+        "http://${SERVER_IP}"
       ],
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
@@ -598,7 +617,7 @@ SQL_EOF
   "users": [
     {
       "username": "admin",
-      "email": "admin@${EFFECTIVE_PROJECT_URL}",
+      "email": "admin@${PROJECT_ID}.local",
       "enabled": true,
       "credentials": [
         {
@@ -628,98 +647,350 @@ else
 fi
 echo "  Services started."
 
-# Patch admin email to match Keycloak realm user (embed mode only)
-if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
-  echo "  [Keycloak] Waiting for rtcloud-app to be healthy before patching admin email..."
-  for i in $(seq 1 30); do
-    STATUS=$(docker inspect --format='{{.State.Health.Status}}' rtcloud-app 2>/dev/null || echo "missing")
-    if [[ "${STATUS}" == "healthy" ]]; then break; fi
-    echo "    waiting... (${i}/30)"
-    sleep 10
-  done
-  docker exec rtcloud-mysql mysql -u root -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" \
-    -e "UPDATE ss_user SET email='admin@${EFFECTIVE_PROJECT_URL}' WHERE username='admin';" 2>/dev/null || true
-  echo "  [Keycloak] Admin user email set to admin@${EFFECTIVE_PROJECT_URL}"
+echo "  [Keycloak] Waiting for rtsurvey-app to be healthy before patching admin email..."
+for i in $(seq 1 30); do
+  STATUS=$(docker inspect --format='{{.State.Health.Status}}' rtsurvey-app 2>/dev/null || echo "missing")
+  if [[ "${STATUS}" == "healthy" ]]; then break; fi
+  echo "    waiting... (${i}/30)"
+  sleep 10
+done
+PATCH_OK=false
+for attempt in $(seq 1 5); do
+  if docker exec rtsurvey-mysql mysql -u root -p"${MYSQL_ROOT_PASSWORD}" "${PROJECT_ID}" \
+      -e "UPDATE ss_user SET email='admin@${PROJECT_ID}.local', use_pin_code=0 WHERE username='admin';"; then
+    PATCH_OK=true; break
+  fi
+  echo "    DB patch attempt ${attempt}/5 failed, retrying in 5s..."
+  sleep 5
+done
+if [[ "${PATCH_OK}" == "true" ]]; then
+  echo "  Admin user email set to admin@${PROJECT_ID}.local (will update to domain after SSL setup)"
+else
+  echo "WARNING: Could not patch admin email -- set it manually after login." >&2
 fi
 
 # ==============================================================================
-# 6. SSL certificates + Nginx (skipped when DOMAIN is blank)
+# 6. Nginx (HTTP-only) + SSL trigger setup
 # ==============================================================================
-if [[ -n "${DOMAIN:-}" ]]; then
-  echo "[6/7] Configuring SSL and starting Nginx..."
+echo "[6/7] Starting Nginx and setting up SSL trigger..."
 
-  # Build optional Keycloak proxy block
-  if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
-    KEYCLOAK_NGINX_BLOCK="    location /auth/ {
+# Create ssl-trigger dir and initial status file (container bind-mounts this)
+mkdir -p /opt/rtsurvey/ssl-trigger
+echo '{"status":"none","domain":""}' > /opt/rtsurvey/ssl-trigger/status.json
+chmod 777 /opt/rtsurvey/ssl-trigger
+
+systemctl enable nginx
+systemctl is-active nginx && systemctl reload nginx || systemctl start nginx
+
+# Install Certbot (used by ssl-issue.sh when admin chooses certbot type)
+snap install --classic certbot
+ln -sf /snap/bin/certbot /usr/bin/certbot
+
+# --------------------------------------------------------------------------
+# Write /opt/rtsurvey/ssl-issue.sh -- triggered by systemd when request.json changes
+# --------------------------------------------------------------------------
+cat > /opt/rtsurvey/ssl-issue.sh << 'SSLSCRIPT_EOF'
+#!/bin/bash
+set -euo pipefail
+exec >> /var/log/rtsurvey-ssl.log 2>&1
+echo "[$(date -u +%FT%TZ)] ssl-issue.sh triggered"
+
+REQUEST=/opt/rtsurvey/ssl-trigger/request.json
+STATUS=/opt/rtsurvey/ssl-trigger/status.json
+ENV_FILE=/opt/rtsurvey/.env
+COMPOSE_FILE=/opt/rtsurvey/docker-compose.production.yml
+
+write_status() {
+  local s="$1" extra="${2:-}"
+  echo "{\"status\":\"${s}\",\"domain\":\"${DOMAIN}\",\"updated_at\":\"$(date -u +%FT%TZ)\"${extra}}" > "$STATUS"
+}
+
+[[ ! -f "$REQUEST" ]] && { echo "No request.json found"; exit 1; }
+
+DOMAIN=$(jq -r .domain "$REQUEST")
+TYPE=$(jq -r .type   "$REQUEST")
+echo "  domain=${DOMAIN} type=${TYPE}"
+
+write_status "pending"
+
+# Load vars from .env
+_env_val() { grep "^${1}=" "$ENV_FILE" | cut -d= -f2- | tr -d '\r'; }
+EMBED_KEYCLOAK=$(_env_val EMBED_KEYCLOAK)
+PROJECT_ID=$(_env_val PROJECT_ID)
+MYSQL_ROOT_PASSWORD=$(_env_val MYSQL_ROOT_PASSWORD)
+KEYCLOAK_ADMIN_PASSWORD=$(_env_val KEYCLOAK_ADMIN_PASSWORD)
+LETSENCRYPT_EMAIL=$(jq -r '.email // empty' "$REQUEST")
+[[ -z "$LETSENCRYPT_EMAIL" ]] && LETSENCRYPT_EMAIL=$(_env_val LETSENCRYPT_EMAIL)
+KEYCLOAK_PORT=$(_env_val KEYCLOAK_PORT)
+KEYCLOAK_PORT="${KEYCLOAK_PORT:-8090}"
+
+update_env() {
+  local key="$1" val="$2"
+  if grep -q "^${key}=" "$ENV_FILE"; then
+    sed -i "s|^${key}=.*|${key}=${val}|" "$ENV_FILE"
+  else
+    echo "${key}=${val}" >> "$ENV_FILE"
+  fi
+}
+
+# ------------------------------------------------------------------------------
+# SSL cert
+# ------------------------------------------------------------------------------
+CERT="" KEY="" PROTOCOL="https" PORT=443
+
+if [[ "$TYPE" == "certbot" ]]; then
+  if [[ -z "$LETSENCRYPT_EMAIL" ]]; then
+    write_status "error" ",\"error\":\"email not provided\""
+    exit 1
+  fi
+
+  # Wait for DNS to propagate before running certbot
+  SERVER_IP_VAL=$(_env_val SERVER_IP)
+  echo "  Waiting for DNS: $DOMAIN -> $SERVER_IP_VAL"
+  DNS_MAX=900
+  DNS_INTERVAL=30
+  DNS_ELAPSED=0
+  while true; do
+    RESOLVED=$(dig +short "$DOMAIN" @8.8.8.8 2>/dev/null | tail -1)
+    if [[ "$RESOLVED" == "$SERVER_IP_VAL" ]]; then
+      echo "  DNS propagated: $DOMAIN -> $RESOLVED"
+      break
+    fi
+    if [[ $DNS_ELAPSED -ge $DNS_MAX ]]; then
+      write_status "error" ",\"error\":\"DNS not propagated after ${DNS_MAX}s -- $DOMAIN resolves to ${RESOLVED:-unresolved}, expected $SERVER_IP_VAL\""
+      exit 1
+    fi
+    echo "  DNS not ready: $DOMAIN -> ${RESOLVED:-unresolved} (expected $SERVER_IP_VAL), retry in ${DNS_INTERVAL}s... ($DNS_ELAPSED/${DNS_MAX}s)"
+    sleep $DNS_INTERVAL
+    DNS_ELAPSED=$((DNS_ELAPSED + DNS_INTERVAL))
+  done
+
+  if ! certbot certonly --webroot -w /var/www/html -n --agree-tos \
+      -m "$LETSENCRYPT_EMAIL" -d "$DOMAIN"; then
+    write_status "error" ",\"error\":\"certbot failed -- check DNS points to this server\""
+    exit 1
+  fi
+
+  CERT="/etc/letsencrypt/live/${DOMAIN}/fullchain.pem"
+  KEY="/etc/letsencrypt/live/${DOMAIN}/privkey.pem"
+
+elif [[ "$TYPE" == "rtsurvey" ]]; then
+  # *.rtsurvey.com -- Cloudflare terminates SSL, origin serves HTTP only
+  PROTOCOL="https"
+  PORT=443
+fi
+
+# ------------------------------------------------------------------------------
+# Nginx final config
+# ------------------------------------------------------------------------------
+KC_BLOCK=""
+if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
+  KC_BLOCK='    location /auth/ {
         proxy_pass              http://127.0.0.1:8090/auth/;
-        proxy_set_header        Host              \$host;
-        proxy_set_header        X-Real-IP         \$remote_addr;
-        proxy_set_header        X-Forwarded-For   \$proxy_add_x_forwarded_for;
-        proxy_set_header        X-Forwarded-Proto \$scheme;
+        proxy_set_header        Host              $host;
+        proxy_set_header        X-Real-IP         $remote_addr;
+        proxy_set_header        X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto $scheme;
         proxy_buffer_size       128k;
         proxy_buffers           4 256k;
         proxy_busy_buffers_size 256k;
         proxy_read_timeout      120s;
-    }"
-  else
-    KEYCLOAK_NGINX_BLOCK=""
-  fi
-
-  systemctl enable nginx
-
-  # Print server IP so user can add DNS record while waiting
-  echo ""
-  echo "============================================================"
-  echo " Server IP : ${SERVER_IP}"
-  echo " Add this DNS A record now if you haven't already:"
-  echo "   ${DOMAIN}  ->  ${SERVER_IP}"
-  echo " The script will retry Certbot every 60s until DNS resolves."
-  echo "============================================================"
-  echo ""
-
-  snap install --classic certbot
-  ln -sf /snap/bin/certbot /usr/bin/certbot
-
-  mkdir -p /var/www/html
-  write_nginx_http_only "${DOMAIN}"
-  systemctl is-active nginx && systemctl reload nginx || systemctl start nginx
-
-  LE_CERT="/etc/letsencrypt/live/${DOMAIN}/fullchain.pem"
-  LE_KEY="/etc/letsencrypt/live/${DOMAIN}/privkey.pem"
-
-  # If cert already exists (re-run), skip certbot
-  CERT_OK=false
-  if [ -f "${LE_CERT}" ]; then
-    echo "  [SSL] Certificate already exists, skipping certbot."
-    CERT_OK=true
-  else
-    # Retry until DNS propagates (up to 60 attempts = ~60 min)
-    MAX_ATTEMPTS=60
-    for attempt in $(seq 1 ${MAX_ATTEMPTS}); do
-      echo "  [SSL] Certbot attempt ${attempt}/${MAX_ATTEMPTS}..."
-      CERTBOT_OUT=$(certbot certonly --webroot -w /var/www/html -n --agree-tos -m "${LETSENCRYPT_EMAIL}" -d "${DOMAIN}" 2>&1) && CERTBOT_EXIT=0 || CERTBOT_EXIT=$?
-      echo "${CERTBOT_OUT}"
-      if [[ ${CERTBOT_EXIT} -eq 0 ]]; then
-        CERT_OK=true; break
-      fi
-      if echo "${CERTBOT_OUT}" | grep -q "too many certificates"; then
-        RETRY_AFTER=$(echo "${CERTBOT_OUT}" | grep -o "retry after [^:]*" | head -1 || true)
-        echo "  [SSL] ERROR: Let's Encrypt rate limit hit. ${RETRY_AFTER}. Redeploy after that time." >&2
-        break
-      fi
-      echo "  [SSL] DNS not ready yet. Retrying in 60s... (${DOMAIN} must point to ${SERVER_IP})"
-      sleep 60
-    done
-  fi
-
-  [[ "${CERT_OK}" != "true" ]] && { echo "ERROR: Could not obtain SSL cert after ${MAX_ATTEMPTS} attempts. Check DNS." >&2; exit 1; }
-
-  write_nginx_ssl_config "${DOMAIN}" "${LE_CERT}" "${LE_KEY}" "${KEYCLOAK_NGINX_BLOCK}"
-  nginx -t && systemctl reload nginx
-  echo "  Nginx live with Let's Encrypt cert (auto-renews via snap certbot.timer)."
-else
-  echo "[6/7] No DOMAIN set — skipping Nginx/SSL (HTTP mode on port ${APP_PORT})."
+    }'
 fi
+
+if [[ "$TYPE" == "certbot" ]]; then
+  cat > /etc/nginx/sites-available/rtsurvey << NGINX_EOF
+server {
+    listen 80;
+    server_name ${DOMAIN};
+    return 301 https://\$host\$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name ${DOMAIN};
+
+    ssl_certificate     ${CERT};
+    ssl_certificate_key ${KEY};
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+
+${KC_BLOCK}
+    location / {
+        proxy_pass         http://127.0.0.1:8080;
+        proxy_set_header   Host              \$host;
+        proxy_set_header   X-Real-IP         \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 120s;
+        client_max_body_size 100M;
+    }
+}
+NGINX_EOF
+
+elif [[ "$TYPE" == "rtsurvey" ]]; then
+  # Cloudflare proxy -- origin serves HTTP, Cloudflare handles HTTPS
+  # Keep ACME challenge path so switching to certbot later still works
+  cat > /etc/nginx/sites-available/rtsurvey << NGINX_EOF
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+${KC_BLOCK}
+    location / {
+        proxy_pass         http://127.0.0.1:8080;
+        proxy_set_header   Host              \$host;
+        proxy_set_header   X-Real-IP         \$remote_addr;
+        proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 120s;
+        client_max_body_size 100M;
+    }
+}
+NGINX_EOF
+fi
+
+nginx -t && nginx -s reload
+echo "  Nginx reloaded with new config for ${DOMAIN}"
+
+# ------------------------------------------------------------------------------
+# Update .env
+# ------------------------------------------------------------------------------
+update_env PROJECT_URL    "$DOMAIN"
+update_env HTTP_PROTOCOL  "$PROTOCOL"
+update_env PROJECT_PORT   "$PORT"
+update_env OIDC_REDIRECT_URI "${PROTOCOL}://${DOMAIN}/cpms/cpmsSite/auth"
+
+if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
+  update_env OIDC_ISSUER_URL "${PROTOCOL}://${DOMAIN}/auth/realms/rtsurvey"
+  update_env KC_HOSTNAME     "${PROTOCOL}://${DOMAIN}/auth"
+fi
+
+# ------------------------------------------------------------------------------
+# Reload app container
+# ------------------------------------------------------------------------------
+docker compose -f "$COMPOSE_FILE" up -d rtsurvey
+echo "  App container restarted with updated environment"
+
+# ------------------------------------------------------------------------------
+# Keycloak: restart + update client redirect URIs
+# ------------------------------------------------------------------------------
+if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
+  echo "  Restarting Keycloak with new KC_HOSTNAME..."
+  docker compose -f "$COMPOSE_FILE" --profile embed-keycloak up -d keycloak
+
+  echo "  Waiting for Keycloak..."
+  for i in $(seq 1 30); do
+    if curl -sf "http://localhost:${KEYCLOAK_PORT}/auth/realms/master" > /dev/null 2>&1; then
+      echo "  Keycloak ready (attempt ${i})"; break
+    fi
+    sleep 5
+  done
+
+  TOKEN=$(curl -s -X POST \
+    "http://localhost:${KEYCLOAK_PORT}/auth/realms/master/protocol/openid-connect/token" \
+    -d "client_id=admin-cli&grant_type=password&username=admin&password=${KEYCLOAK_ADMIN_PASSWORD}" \
+    | jq -r .access_token)
+
+  if [[ -n "$TOKEN" && "$TOKEN" != "null" ]]; then
+    CLIENT_UUID=$(curl -s \
+      "http://localhost:${KEYCLOAK_PORT}/auth/admin/realms/rtsurvey/clients?clientId=${PROJECT_ID}" \
+      -H "Authorization: Bearer $TOKEN" | jq -r '.[0].id')
+
+    if [[ -n "$CLIENT_UUID" && "$CLIENT_UUID" != "null" ]]; then
+      curl -s -X PUT \
+        "http://localhost:${KEYCLOAK_PORT}/auth/admin/realms/rtsurvey/clients/${CLIENT_UUID}" \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{
+          \"redirectUris\": [\"${PROTOCOL}://${DOMAIN}/*\", \"vn.rta.rtsurvey.auth:/*\", \"vn.rta.rtsurvey.logout:/*\"],
+          \"webOrigins\":   [\"${PROTOCOL}://${DOMAIN}\"]
+        }"
+      echo "  Keycloak client redirect URIs updated"
+    fi
+
+    curl -s -X PUT \
+      "http://localhost:${KEYCLOAK_PORT}/auth/admin/realms/rtsurvey" \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"sslRequired":"external"}'
+    echo "  Keycloak sslRequired set to external"
+
+    ADMIN_KC_USER_ID=$(curl -s \
+      "http://localhost:${KEYCLOAK_PORT}/auth/admin/realms/rtsurvey/users?username=admin" \
+      -H "Authorization: Bearer $TOKEN" | jq -r '.[0].id')
+    if [[ -n "$ADMIN_KC_USER_ID" && "$ADMIN_KC_USER_ID" != "null" ]]; then
+      curl -s -X PUT \
+        "http://localhost:${KEYCLOAK_PORT}/auth/admin/realms/rtsurvey/users/${ADMIN_KC_USER_ID}" \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"email\":\"admin@${DOMAIN}\",\"emailVerified\":true}"
+      echo "  Keycloak admin user email updated to admin@${DOMAIN}"
+    fi
+  else
+    echo "  WARNING: Could not get Keycloak admin token -- update client URIs manually" >&2
+  fi
+
+  docker exec rtsurvey-mysql mysql -u root -p"${MYSQL_ROOT_PASSWORD}" "${PROJECT_ID}" \
+    -e "UPDATE ss_user SET email='admin@${DOMAIN}', use_pin_code=0 WHERE username='admin';" || true
+  echo "  Admin email & PIN code restriction updated"
+fi
+
+# ------------------------------------------------------------------------------
+# Write success status
+# ------------------------------------------------------------------------------
+CERT_EXPIRES=""
+if [[ -n "$CERT" ]] && command -v openssl > /dev/null 2>&1; then
+  CERT_EXPIRES=$(openssl x509 -enddate -noout -in "$CERT" 2>/dev/null \
+    | cut -d= -f2 | xargs -I{} date -d{} +%Y-%m-%d 2>/dev/null || true)
+fi
+
+CERT_FIELD=""
+[[ -n "$CERT_EXPIRES" ]] && CERT_FIELD=",\"cert_expires\":\"${CERT_EXPIRES}\""
+write_status "active" "$CERT_FIELD"
+
+echo "[$(date -u +%FT%TZ)] SSL setup complete: ${DOMAIN}"
+SSLSCRIPT_EOF
+
+chmod +x /opt/rtsurvey/ssl-issue.sh
+
+# --------------------------------------------------------------------------
+# Systemd path unit -- watches request.json, fires ssl-issue.sh on change
+# --------------------------------------------------------------------------
+cat > /etc/systemd/system/rtsurvey-ssl.path << 'PATH_EOF'
+[Unit]
+Description=Watch for rtCloud SSL domain setup request
+
+[Path]
+PathModified=/opt/rtsurvey/ssl-trigger/request.json
+
+[Install]
+WantedBy=multi-user.target
+PATH_EOF
+
+cat > /etc/systemd/system/rtsurvey-ssl.service << 'SVC_EOF'
+[Unit]
+Description=rtCloud SSL issue script
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/rtsurvey/ssl-issue.sh
+StandardOutput=append:/var/log/rtsurvey-ssl.log
+StandardError=append:/var/log/rtsurvey-ssl.log
+SVC_EOF
+
+systemctl daemon-reload
+systemctl enable --now rtsurvey-ssl.path
+# Edge case: if request.json already exists (reboot after form submit), trigger immediately
+[[ -f /opt/rtsurvey/ssl-trigger/request.json ]] && touch /opt/rtsurvey/ssl-trigger/request.json
+echo "  SSL trigger watcher enabled (systemd path unit)"
+echo "  Nginx running HTTP-only — admin sets domain via app UI to activate SSL"
 
 # ==============================================================================
 # 7. Firewall
@@ -727,71 +998,45 @@ fi
 echo "[7/7] Configuring firewall..."
 ufw --force enable
 ufw allow ssh
-if [[ -n "${DOMAIN:-}" ]]; then
-  ufw allow "Nginx Full"    # ports 80 + 443
-else
-  ufw allow "${APP_PORT}/tcp"
-fi
-ufw allow "${SHINY_PORT}/tcp"
-# port 8080 / 8090 are bound to 127.0.0.1 only — no rule needed
-echo "  Firewall: SSH, HTTP/HTTPS (or ${APP_PORT}), ${SHINY_PORT} allowed."
+ufw allow "Nginx Full"   # ports 80 + 443
+ufw allow 3838/tcp       # Shiny (direct)
+echo "  Firewall: SSH, 80, 443, 3838 allowed."
 
 # ==============================================================================
 # Done
 # ==============================================================================
 echo ""
 echo "============================================================"
-echo " rtCloud deployment complete!"
+echo " rtCloud deployment complete! (GCP Compute Engine)"
 echo "============================================================"
 echo " Server IP : ${SERVER_IP}"
-if [[ -n "${DOMAIN:-}" ]]; then
-  echo " App URL   : https://${DOMAIN}"
-  echo " SSL       : Let's Encrypt (certbot)"
-  echo " Note: Let's Encrypt cert auto-renews every 60 days via snap certbot.timer."
-else
-  echo " App URL   : http://${SERVER_IP}:${APP_PORT}"
-  echo " SSL       : none (HTTP mode — set DOMAIN to enable HTTPS)"
-fi
-echo " Shiny URL : http://${SERVER_IP}:${SHINY_PORT}"
+echo ""
+echo " App URL   : http://${SERVER_IP}  (HTTP only until domain is set)"
+echo " Admin     : admin / ${ADMIN_PASSWORD}"
+echo " DB Name   : ${PROJECT_ID}"
+echo " DB User   : ${PROJECT_ID}"
+echo " DB Pass   : ${MYSQL_PASSWORD}"
+echo " DB Root   : ${MYSQL_ROOT_PASSWORD}"
 echo " Stata     : ${STATA_ENABLED}"
 echo ""
-echo " Generated Credentials (save these now):"
-echo "   MySQL App Pass : ${MYSQL_PASSWORD}"
-echo "   MySQL Root Pass: ${MYSQL_ROOT_PASSWORD}"
-echo "   Admin Password : ${ADMIN_PASSWORD}"
-if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
-  echo "   KC Admin Pass  : ${KEYCLOAK_ADMIN_PASSWORD}"
-fi
-echo " Full log (including passwords): /var/log/rtcloud-setup.log"
-echo " IMPORTANT: chmod 600 /var/log/rtcloud-setup.log after noting passwords"
+echo " *** NEXT STEP: Configure domain & SSL ***"
+echo "   1. Log in to the app at http://${SERVER_IP}"
+echo "   2. Go to Configuration > System Properties > Domain & SSL"
+echo "   3. Enter your domain and choose SSL type (certbot or rtsurvey)"
+echo "   4. The server will obtain a cert and switch to HTTPS automatically"
 echo ""
-
 if [[ "${EMBED_KEYCLOAK}" == "true" ]]; then
-  echo " *** EMBEDDED KEYCLOAK — SSO auto-configured ***"
-  echo ""
-  echo "   Realm    : rtsurvey"
-  echo "   Client ID: ${PROJECT_ID}"
-  echo ""
-  echo "   Keycloak Admin Console:"
-  echo "     https://${DOMAIN}/auth/admin"
-  echo "     Login: admin / (KEYCLOAK_ADMIN_PASSWORD you configured)"
-  echo ""
-  echo "   App login will use Keycloak — no external provider needed."
-  echo ""
-else
-  echo " *** OIDC PROVIDER — register these callback URIs with your IdP ***"
-  echo ""
-  echo "   Web    : ${OIDC_REDIRECT_URI_VALUE}"
-  echo "   Mobile : ${OIDC_MOBILE_REDIRECT_URI:-vn.rta.rtsurvey.auth://callback}"
+  echo " *** EMBEDDED KEYCLOAK ***"
+  echo "   Running at http://${SERVER_IP}/auth (HTTP until domain is set)"
+  echo "   After SSL is active: https://<domain>/auth/admin"
+  echo "   Login: admin / ${KEYCLOAK_ADMIN_PASSWORD}"
   echo ""
 fi
-
 echo " !! SECURITY: All passwords default to 'admin'."
-echo "    Change them immediately after first login:"
-echo "    - App admin : https://${EFFECTIVE_PROJECT_URL} > Settings"
-echo "    - Keycloak  : https://${EFFECTIVE_PROJECT_URL}/auth/admin (if embedded)"
-echo "    - DB        : edit /opt/rtcloud/.env then docker compose up -d"
+echo "    Change them immediately after first login."
 echo ""
-echo " Logs  : /var/log/rtcloud-setup.log"
-echo " Files : /opt/rtcloud/"
+echo " Logs  : /var/log/rtsurvey-setup.log"
+echo "         /var/log/rtsurvey-ssl.log  (SSL trigger script)"
+echo " Files : /opt/rtsurvey/"
+echo " SSL trigger: /opt/rtsurvey/ssl-trigger/"
 echo "============================================================"
