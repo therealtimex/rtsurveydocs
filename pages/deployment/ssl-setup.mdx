@@ -123,3 +123,58 @@ chmod 600 /etc/letsencrypt/live/<your-domain>/privkey.pem
 
 The server will configure Nginx with your certificate and reload automatically.
 
+---
+
+## Troubleshooting
+
+### Certificate issuance failed
+
+All SSL options (including free `*.rtsurvey.com` subdomains) use **Let's Encrypt** and require:
+
+1. **Port 80 open** — Let's Encrypt's ACME HTTP challenge must reach the server on port 80. Check your cloud firewall:
+   - AWS: Security Group inbound rule — TCP 80 from `0.0.0.0/0`
+   - GCP: VPC firewall rule `default-allow-http` — TCP 80
+   - Linode: Cloud Firewall inbound — TCP 80
+
+2. **DNS pointing to this server** — Run from your local machine:
+   ```bash
+   dig +short your-domain.com @8.8.8.8
+   # Must return this server's IP
+   ```
+   The setup script waits up to 15 minutes for DNS propagation before timing out.
+
+### Check the SSL log
+
+```bash
+sudo tail -100 /var/log/rtsurvey-ssl.log
+```
+
+The log shows DNS propagation progress, certbot output, and any error messages.
+
+### Check SSL trigger status
+
+```bash
+cat /opt/rtsurvey/ssl-trigger/status.json
+```
+
+| Status | Meaning |
+|--------|---------|
+| `none` | No SSL request submitted yet |
+| `pending` | SSL issuance in progress |
+| `active` | SSL active — includes `cert_expires` field |
+| `error` | Failed — check `error` field for details |
+
+### Re-trigger SSL setup
+
+If setup failed (e.g. DNS wasn't ready), fix the issue then re-trigger:
+
+```bash
+echo '{"domain":"your-domain.com","type":"certbot","email":"you@example.com"}' \
+  > /opt/rtsurvey/ssl-trigger/request.json
+```
+
+Watch progress:
+```bash
+sudo tail -f /var/log/rtsurvey-ssl.log
+```
+
