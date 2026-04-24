@@ -5,19 +5,13 @@ description: "Deploy rtSurvey on a Google Cloud Compute Engine VM using an autom
 
 ## Before you start
 
-- You need a [Google account](https://accounts.google.com)
-- New GCP accounts get **$300 in free credits** valid for 90 days — no charge until you manually upgrade
-- A credit card is required for verification only
+- You need a [Google account](https://accounts.google.com) with an active GCP billing account
 
 ---
 
 ## Step 1 — Create a GCP account
 
-Go to **[console.cloud.google.com/freetrial](https://console.cloud.google.com/freetrial)**
-
-1. Sign in with your Google account
-2. Enter your credit card details (verification only — you will not be charged)
-3. Click **Start free** — your $300 credit activates immediately
+Go to **[console.cloud.google.com](https://console.cloud.google.com)** and sign in with your Google account. Ensure a billing account is linked before proceeding.
 
 ---
 
@@ -71,10 +65,10 @@ curl -fsSL https://raw.githubusercontent.com/therealtimex/rtsurvey/main/scripts/
 
 ### Recommended VM sizes
 
-| Machine type | RAM | ~$/month | $300 trial lasts |
-|--------------|-----|----------|-----------------|
-| `e2-medium` | 4 GB | ~$27 | ~11 months |
-| `e2-standard-2` | 8 GB | ~$49 | ~6 months |
+| Machine type | RAM | ~$/month | Notes |
+|--------------|-----|----------|-------|
+| `e2-medium` | 4 GB | ~$27 | Minimum for Keycloak |
+| `e2-standard-2` | 8 GB | ~$49 | Recommended for production |
 
 ---
 
