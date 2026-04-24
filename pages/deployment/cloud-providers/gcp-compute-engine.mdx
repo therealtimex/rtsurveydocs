@@ -1,6 +1,6 @@
 ---
 title: "Google Cloud Platform (GCP)"
-description: "Deploy rtCloud on a Google Cloud Compute Engine VM using an automated startup script. No configuration needed — just create the server and follow the post-deployment steps."
+description: "Deploy rtSurvey on a Google Cloud Compute Engine VM using an automated startup script. Paste a bootstrap snippet or upload the full script via gcloud CLI."
 ---
 
 ## Before you start
@@ -52,12 +52,22 @@ Wait about 1 minute for GCP to provision the API.
 | **Firewall** | ✅ Allow HTTP traffic &nbsp; ✅ Allow HTTPS traffic |
 
 3. Click **Advanced options** → **Management** → scroll to **Automation**
-4. Paste the full contents of `gcp-compute.sh` into the **Startup script** field
+4. Paste the bootstrap snippet below into the **Startup script** field:
+
+```bash
+#!/bin/bash
+export PROJECT_ID="rtsurvey"
+export ADMIN_PASSWORD="admin"
+export EMBED_KEYCLOAK="true"
+export TZ="Asia/Ho_Chi_Minh"
+curl -fsSL https://raw.githubusercontent.com/therealtimex/rtsurvey/main/scripts/gcp-compute.sh | bash
+```
+
 5. Click **Create**
 
-> **No configuration needed.** The script uses safe defaults and starts in HTTP mode. You configure the domain and SSL from the app UI after the server is running — the same flow as Linode.
+> **Customise:** Change the `export` lines to set your own project ID, password, timezone, etc. before clicking Create.
 
-**Download script:** [gcp-compute.sh](/scripts/gcp-compute.sh)
+**Full script (for review or gcloud CLI upload):** [gcp-compute.sh](https://raw.githubusercontent.com/therealtimex/rtsurvey/main/scripts/gcp-compute.sh)
 
 ### Recommended VM sizes
 
@@ -90,7 +100,7 @@ GCP's **Allow HTTP/HTTPS** checkboxes only open ports 80 and 443. Port 3838 (Shi
 
 ## Step 6 — Wait for setup to complete
 
-The script runs automatically on first boot. It installs Docker, pulls the rtCloud image, initialises the database, and starts all services. This takes **5–10 minutes**.
+The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
 
 **No console access needed.** Open your browser and go to `http://<vm-external-ip>`. You will see a loading page while the app finishes starting up. It refreshes automatically every 5 seconds and loads the app once ready.
 
@@ -100,7 +110,7 @@ To watch the log directly:
 
 ```bash
 ssh <user>@<vm-external-ip>
-sudo tail -f /var/log/rtcloud-setup.log
+sudo tail -f /var/log/rtsurvey-setup.log
 ```
 
 ---
@@ -148,21 +158,21 @@ The startup script configures `ufw` inside the VM. You also need these VPC-level
 ### Check the setup log
 
 ```bash
-sudo tail -200 /var/log/rtcloud-setup.log
+sudo tail -200 /var/log/rtsurvey-setup.log
 ```
 
 ### Check the SSL log
 
 ```bash
-sudo tail -200 /var/log/rtcloud-ssl.log
+sudo tail -200 /var/log/rtsurvey-ssl.log
 ```
 
 ### View container status
 
 ```bash
-docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+docker compose -f /opt/rtsurvey/docker-compose.production.yml ps
 ```
 
 ### Reboot behavior
 
-GCP reruns the startup script on every VM reboot. The script detects an existing installation at `/opt/rtcloud/` and exits immediately — no re-provisioning occurs.
+GCP reruns the startup script on every VM reboot. The script detects an existing installation at `/opt/rtsurvey/` and exits immediately — no re-provisioning occurs.

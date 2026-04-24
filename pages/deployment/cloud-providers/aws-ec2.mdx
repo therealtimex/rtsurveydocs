@@ -1,6 +1,6 @@
 ---
 title: "AWS EC2"
-description: "Deploy rtCloud on an AWS EC2 instance using an automated user-data script. No configuration needed — just launch the instance and follow the post-deployment steps."
+description: "Deploy rtSurvey on an AWS EC2 instance using an automated bootstrap script. Paste a small snippet as user-data — the full setup script is fetched from GitHub at boot."
 ---
 
 ## Step 1 — Launch an EC2 instance
@@ -17,12 +17,22 @@ description: "Deploy rtCloud on an AWS EC2 instance using an automated user-data
 | **Security group** | Create new — see [Security group rules](#security-group-rules) below |
 
 3. Expand **Advanced details** → scroll to **User data**
-4. Paste the full contents of `aws-ec2.sh` into the **User data** field
+4. Paste the bootstrap snippet below into the **User data** field:
+
+```bash
+#!/bin/bash
+export PROJECT_ID="rtsurvey"
+export ADMIN_PASSWORD="admin"
+export EMBED_KEYCLOAK="true"
+export TZ="Asia/Ho_Chi_Minh"
+curl -fsSL https://raw.githubusercontent.com/therealtimex/rtsurvey/main/scripts/aws-ec2.sh | bash
+```
+
+> **Why a bootstrap?** AWS user-data has a 16 KB size limit. The full setup script exceeds this, so the bootstrap fetches it from GitHub at first boot. Customise by changing the `export` lines above.
+
 5. Click **Launch instance**
 
-> **No configuration needed.** The script uses safe defaults and starts in HTTP mode. You configure the domain and SSL from the app UI after the server is running — the same flow as Linode.
-
-**Download script:** [aws-ec2.sh](/scripts/aws-ec2.sh)
+**Full script (for review or CLI upload):** [aws-ec2.sh](https://raw.githubusercontent.com/therealtimex/rtsurvey/main/scripts/aws-ec2.sh)
 
 ### Recommended instance types
 
@@ -50,7 +60,7 @@ Create a new security group with these inbound rules:
 
 ## Step 3 — Wait for setup to complete
 
-The script runs automatically on first boot. It installs Docker, pulls the rtCloud image, initialises the database, and starts all services. This takes **5–10 minutes**.
+The script runs automatically on first boot. It installs Docker, pulls the rtSurvey image, initialises the database, and starts all services. This takes **5–10 minutes**.
 
 **No console access needed.** Open your browser and go to `http://<instance-public-ip>`. You will see a loading page while the app finishes starting up. It refreshes automatically every 5 seconds and loads the app once ready.
 
@@ -60,7 +70,7 @@ To watch the log directly:
 
 ```bash
 ssh ubuntu@<instance-public-ip>
-sudo tail -f /var/log/rtcloud-setup.log
+sudo tail -f /var/log/rtsurvey-setup.log
 ```
 
 ---
@@ -112,17 +122,17 @@ All passwords default to `admin`. Change them immediately after your first login
 ### Check the setup log
 
 ```bash
-sudo tail -200 /var/log/rtcloud-setup.log
+sudo tail -200 /var/log/rtsurvey-setup.log
 ```
 
 ### Check the SSL log
 
 ```bash
-sudo tail -200 /var/log/rtcloud-ssl.log
+sudo tail -200 /var/log/rtsurvey-ssl.log
 ```
 
 ### View container status
 
 ```bash
-docker compose -f /opt/rtcloud/docker-compose.production.yml ps
+docker compose -f /opt/rtsurvey/docker-compose.production.yml ps
 ```
